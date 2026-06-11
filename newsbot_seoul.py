@@ -3,7 +3,7 @@
 """
 theseouljournal.com 영어 국제뉴스봇
 - CNN, BBC, Reuters, AP 등 RSS 수집
-- 9개 섹션 × 5개 = 하루 45개
+- 9개 섹션 × 3개 = 하루 27개
 - Gemini로 영어 리라이팅
 - 가상 기자: Sarah Kim, James Park, Emily Choi, David Lee, Rachel Yoon
 """
