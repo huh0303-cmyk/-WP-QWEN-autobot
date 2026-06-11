@@ -1,4 +1,4 @@
-name: WordPress Mega Auto Posting
+name: WordPress 전체 자동 포스팅
 
 on:
   schedule:
@@ -6,7 +6,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  autopost:
+
+  khealth-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python autopost_khealth.py
+        env:
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+
+  mega-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 480
     steps:
@@ -16,8 +30,31 @@ jobs:
           python-version: '3.11'
       - run: pip install requests
       - run: python autopost_mega.py
-      - uses: actions/upload-artifact@v4
-        if: always()
+        env:
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+
+  newsbot-korea:
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
-          name: result-${{ github.run_number }}
-          path: result_*.csv
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python newsbot_korea.py
+        env:
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+
+  newsbot-seoul:
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python newsbot_seoul.py
+        env:
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
