@@ -1,15 +1,11 @@
 name: WordPress 전체 자동 포스팅
-
 on:
   schedule:
     - cron: '0 23 * * *'
   workflow_dispatch:
-
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-
   khealth-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 480
@@ -26,6 +22,7 @@ jobs:
   mega-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 480
+    needs: khealth-bot
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -39,6 +36,7 @@ jobs:
   newsbot-korea:
     runs-on: ubuntu-latest
     timeout-minutes: 480
+    needs: mega-bot
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -52,6 +50,7 @@ jobs:
   newsbot-seoul:
     runs-on: ubuntu-latest
     timeout-minutes: 480
+    needs: newsbot-korea
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
