@@ -5,6 +5,9 @@ on:
     - cron: '0 23 * * *'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
 
   khealth-bot:
@@ -16,7 +19,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - run: python autopost_khealth.py
+      - name: k-health365 한국어 포스팅
+        run: python autopost_khealth.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
 
@@ -29,7 +33,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - run: python autopost_mega.py
+      - name: 22개 사이트 영어 포스팅
+        run: python autopost_mega.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
 
@@ -42,7 +47,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - run: python newsbot_korea.py
+      - name: koreanews365 한국어 뉴스
+        run: python newsbot_korea.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
 
@@ -55,6 +61,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - run: python newsbot_seoul.py
+      - name: theseouljournal 영어 뉴스
+        run: python newsbot_seoul.py
         env:
-          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }} 
