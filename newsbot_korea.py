@@ -62,7 +62,7 @@ SECTIONS = [
              "https://rss.joins.com/joins_it_list.xml"]},
 ]
 
-ARTICLES_PER_SECTION = 5
+ARTICLES_PER_SECTION = 3
 POST_GAP_MIN = 8   # 섹션 내 기사 간격(분)
 SECTION_GAP_MIN = 15  # 섹션 간 간격(분)
 
