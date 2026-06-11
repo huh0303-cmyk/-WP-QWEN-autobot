@@ -8,7 +8,8 @@ env:
 jobs:
   khealth-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 480
+    timeout-minutes: 300
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -18,10 +19,10 @@ jobs:
       - run: python autopost_khealth.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
-
   mega-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 480
+    timeout-minutes: 300
+    continue-on-error: true
     needs: khealth-bot
     steps:
       - uses: actions/checkout@v4
@@ -32,10 +33,10 @@ jobs:
       - run: python autopost_mega.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
-
   newsbot-korea:
     runs-on: ubuntu-latest
-    timeout-minutes: 480
+    timeout-minutes: 300
+    continue-on-error: true
     needs: mega-bot
     steps:
       - uses: actions/checkout@v4
@@ -46,10 +47,10 @@ jobs:
       - run: python newsbot_korea.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
-
   newsbot-seoul:
     runs-on: ubuntu-latest
-    timeout-minutes: 480
+    timeout-minutes: 300
+    continue-on-error: true
     needs: newsbot-korea
     steps:
       - uses: actions/checkout@v4
