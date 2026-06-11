@@ -59,7 +59,7 @@ SECTIONS = [
              "https://rss.cnn.com/rss/edition_technology.rss"]},
 ]
 
-ARTICLES_PER_SECTION = 5
+ARTICLES_PER_SECTION = 3
 POST_GAP_MIN = 8
 SECTION_GAP_MIN = 15
 
