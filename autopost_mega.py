@@ -68,7 +68,6 @@ def gen_random_times(n):
         tries += 1
         h = RANDOM_START_H + random.randint(0, RANDOM_END_H - RANDOM_START_H - 1)
         m = random.randint(0, 59)
-        # 자연스러움: 정각/30분 피하기 (±3분 범위로 흔들기)
         m = max(0, min(59, m + random.randint(-3, 3)))
         total = h * 60 + m
         if all(abs(total - u) >= MIN_GAP_MIN for u in used):
@@ -83,9 +82,7 @@ def get_domain(url):
 
 
 def build_prompt_en(keyword, theme, site_url, internal_refs, min_c, max_c, is_adsense, style):
-    """영문 SEO 포스트 프롬프트"""
     domain = get_domain(site_url)
-    # 내부링크 6개 랜덤 선택
     internal_html = "\n".join([
         f'   - <a href="https://{domain}/{ref.lower().replace(" ", "-")}/">{ref}</a>'
         for ref in random.sample(internal_refs, min(5, len(internal_refs)))])
@@ -179,7 +176,6 @@ Write the complete post now. Focus keyword: {keyword}"""
 
 
 def build_prompt_ko(keyword, style="news"):
-    """한국어 뉴스 기사 프롬프트 (koreanews365.com 전용)"""
     return f"""당신은 한국 최고의 시사 저널리스트입니다.
 아래 조건을 100% 만족하는 워드프레스 뉴스 기사를 작성하세요.
 
@@ -224,9 +220,11 @@ def call_gemini(prompt):
                                        "topP": 0.9}},
             timeout=120)
         r.raise_for_status()
+        time.sleep(6)   # ★ Gemini 성공 후 6초 대기 (분당 10회 유지)
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print(f"    ❌ Gemini: {e}")
+        time.sleep(15)  # ★ 실패 시 15초 대기 후 재시도 방지
         return None
 
 
@@ -270,7 +268,6 @@ def process_content(raw, site_url):
             content = "\n".join(lines[i+1:])
             break
 
-    # 이미지 교체
     def img_replacer(m):
         img = get_image(m.group(1).strip())
         alt = m.group(2).strip()
@@ -285,13 +282,11 @@ def process_content(raw, site_url):
     content = re.sub(r'<!-- IMAGE: (.+?) -->\s*<!-- ALT: (.+?) -->',
                      img_replacer, content, flags=re.DOTALL)
 
-    # FAQ 스키마
     if "SCHEMA_FAQ" in content:
         content += ('\n<script type="application/ld+json">'
                     '{"@context":"https://schema.org","@type":"FAQPage",'
                     '"mainEntity":[]}</script>')
 
-    # 태그 파싱
     tags = [t.strip() for t in tags_str.split(",") if t.strip()] if tags_str else []
 
     return {
@@ -335,7 +330,6 @@ def post_to_wp(site, parsed, keyword):
     url  = f"{site['url'].rstrip('/')}/wp-json/wp/v2/posts"
     auth = base64.b64encode(f"{WP_USERNAME}:{pwd}".encode()).decode()
 
-    # 태그 ID 가져오기 (없으면 생성)
     tag_ids = []
     for tag in parsed.get("tags", [])[:8]:
         try:
@@ -347,7 +341,6 @@ def post_to_wp(site, parsed, keyword):
             if r.status_code in [200, 201]:
                 tag_ids.append(r.json().get("id"))
             elif r.status_code == 400:
-                # 이미 존재하는 태그 - 검색
                 sr = requests.get(
                     f"{site['url'].rstrip('/')}/wp-json/wp/v2/tags?search={requests.utils.quote(tag)}",
                     headers={"Authorization": f"Basic {auth}"}, timeout=10)
@@ -386,7 +379,6 @@ def post_to_wp(site, parsed, keyword):
 
 
 def send_to_sheets(row_data):
-    """Google Sheets 웹훅으로 결과 전송"""
     if not SHEETS_WEBHOOK:
         return
     try:
@@ -408,11 +400,9 @@ def indexnow(site_url, post_url):
 
 
 def load_or_create_keywords(filename):
-    # 파일에서 로드
     if os.path.exists(filename):
         with open(filename, encoding="utf-8") as f:
             return [l.strip() for l in f if l.strip()]
-    # keywords_all.py에서 로드
     raw = KEYWORDS.get(filename, "")
     lines = [l.strip() for l in raw.strip().split("\n") if l.strip()]
     if lines:
@@ -422,7 +412,6 @@ def load_or_create_keywords(filename):
 
 
 def get_today_keywords(all_kws, daily_limit):
-    """오늘 날짜 기반으로 키워드 순환"""
     day_of_year = date.today().timetuple().tm_yday
     start = ((day_of_year - 1) * daily_limit) % max(len(all_kws), 1)
     result = []
@@ -432,7 +421,6 @@ def get_today_keywords(all_kws, daily_limit):
 
 
 def process_site(site, results_list, lock):
-    """사이트 1개 처리 (스레드에서 실행)"""
     domain = get_domain(site["url"])
     lang   = site.get("lang", "en")
     style  = site.get("style", "blog")
@@ -444,8 +432,6 @@ def process_site(site, results_list, lock):
 
     today_kws  = get_today_keywords(all_kws, DAILY_LIMIT)
     rand_times = gen_random_times(DAILY_LIMIT)
-
-    # 내부링크 참조용 키워드 5개
     internal_refs = random.sample(all_kws, min(7, len(all_kws)))
 
     min_c = MIN_CHARS_KO if lang == "ko" else MIN_CHARS_EN
@@ -458,14 +444,10 @@ def process_site(site, results_list, lock):
         print(f"     {i+1:2d}. {t//60:02d}:{t%60:02d}  {kw}")
 
     for i, (kw, target_min) in enumerate(zip(today_kws, rand_times)):
-        # 예약 시간까지 대기
-        # 즉시 실행 모드 (랜덤 시간은 로그에만 표시)
         print(f"\n  ⏰ [{domain}] 예약시각 {target_min//60:02d}:{target_min%60:02d} → 즉시 실행")
-
         print(f"\n  [{domain}] [{i+1}/{DAILY_LIMIT}] {kw}")
         print(f"  🧠 Gemini 생성 중...")
 
-        # 프롬프트 생성
         if lang == "ko":
             prompt = build_prompt_ko(kw, style)
         else:
@@ -492,7 +474,6 @@ def process_site(site, results_list, lock):
         print(f"  📏 {len(parsed['content'])}자 | SEO: {score}점 ({passed}/{len(checks)})")
         print(f"  🏷️  태그: {', '.join(parsed['tags'][:5])}")
 
-        # SEO 낮으면 재생성 1회
         if score < 70:
             print(f"  🔄 SEO {score}점 → 재생성...")
             raw2 = call_gemini(prompt)
@@ -525,6 +506,8 @@ def process_site(site, results_list, lock):
         with lock:
             results_list.append(row)
         send_to_sheets(row)
+
+        time.sleep(3)   # ★ 키워드 간 3초 추가 대기
 
 
 def print_summary(results):
@@ -566,7 +549,6 @@ def main():
     print(f"  사이트: {len(SITES)}개 | 사이트당 {DAILY_LIMIT}개 | 총 {len(SITES)*DAILY_LIMIT}개/일")
     print(f"{'═'*60}")
 
-    # 비밀번호 미설정 사이트 경고
     no_pwd = [get_domain(s["url"]) for s in SITES
               if not WP_PASSWORDS.get(get_domain(s["url"]),"")] 
     if no_pwd:
@@ -578,8 +560,6 @@ def main():
     results = []
     lock    = threading.Lock()
 
-    # 순차 실행 (Gemini API 과부하 방지)
-    # 병렬 실행 원하면 threading.Thread 사용
     for site in SITES:
         domain = get_domain(site["url"])
         if not WP_PASSWORDS.get(domain, ""):
@@ -587,13 +567,11 @@ def main():
             continue
         process_site(site, results, lock)
 
-    # 결과 저장
     today = date.today().strftime("%Y%m%d")
     rfile = f"result_{today}.json"
     with open(rfile, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
-    # CSV도 저장 (Excel/Sheets에서 바로 열기)
     cfile = f"result_{today}.csv"
     with open(cfile, "w", encoding="utf-8-sig") as f:
         cols = ["date","site","keyword","title","status","seo_score",
