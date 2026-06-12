@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 koreanews365.com 한국어 뉴스봇
-- 한국 메이저 신문 RSS 수집
-- 9개 섹션 × 3개 = 하루 27개
+- 9개 섹션 × 3개 = 하루 27개, 1라운드 실행 후 종료 (GitHub Actions용)
 - Gemini로 리라이팅
 - 가상 기자: 김민수, 박지아, 이현우, 최서연, 정도윤
-- 24시간 자동 발행
 """
 
 import os, json, time, random, requests, base64, re
@@ -22,7 +20,6 @@ WP_URL  = "https://koreanews365.com"
 WP_USER = "huh0303@gmail.com"
 WP_PASS = "dqn2 VR2L WaR0 sJmq GHeh fgYG"
 
-# 가상 기자진
 REPORTERS = [
     {"name": "김민수", "title": "정치·경제 전문기자"},
     {"name": "박지아", "title": "사회·문화 전문기자"},
@@ -31,7 +28,6 @@ REPORTERS = [
     {"name": "정도윤", "title": "산업·IT 전문기자"},
 ]
 
-# 9개 섹션 (카테고리 슬러그는 WP에서 생성 후 ID 조회)
 SECTIONS = [
     {"name": "정치",   "slug": "politics",  "id": None,
      "rss": ["https://www.chosun.com/arc/outboundfeeds/rss/category/politics/",
@@ -63,12 +59,11 @@ SECTIONS = [
 ]
 
 ARTICLES_PER_SECTION = 3
-POST_GAP_MIN = 8   # 섹션 내 기사 간격(분)
-SECTION_GAP_MIN = 15  # 섹션 간 간격(분)
+POST_GAP_MIN = 8
+SECTION_GAP_MIN = 15
 
 
 def fetch_rss(url):
-    """RSS 피드에서 기사 목록 가져오기"""
     try:
         r = requests.get(url, timeout=10,
             headers={"User-Agent": "Mozilla/5.0 (compatible; NewsBot/1.0)"})
@@ -80,21 +75,18 @@ def fetch_rss(url):
             desc  = item.findtext("description", "").strip()
             link  = item.findtext("link", "").strip()
             if title and len(title) > 5:
-                # HTML 태그 제거
                 desc = re.sub(r'<[^>]+>', '', desc)[:500]
                 items.append({"title": title, "desc": desc, "link": link})
         return items
-    except Exception as e:
+    except Exception:
         return []
 
 
 def get_news_items(section, count=5):
-    """섹션별 뉴스 수집"""
     all_items = []
     for rss_url in section["rss"]:
         items = fetch_rss(rss_url)
         all_items.extend(items)
-    # 중복 제거 후 랜덤 선택
     seen = set()
     unique = []
     for item in all_items:
@@ -150,9 +142,11 @@ def call_gemini(prompt):
                                        "maxOutputTokens": 8192}},
             timeout=120)
         r.raise_for_status()
+        time.sleep(6)   # ★ Gemini 분당 10회 제한 대비
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print(f"  ❌ Gemini: {e}")
+        time.sleep(15)
         return None
 
 
@@ -212,7 +206,6 @@ def process_content(raw):
     content = re.sub(r'<!-- IMAGE: (.+?) -->\s*<!-- ALT: (.+?) -->',
                      img_replacer, content, flags=re.DOTALL)
 
-    # 바이라인 추가
     if byline:
         content = f'<p class="byline" style="color:#666;font-size:13px;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:16px">✍️ {byline}</p>\n' + content
 
@@ -229,7 +222,6 @@ def get_cat_id(slug):
         data = r.json()
         if data:
             return data[0]["id"]
-        # 없으면 생성
         r2 = requests.post(
             f"{WP_URL}/wp-json/wp/v2/categories",
             headers={"Authorization": f"Basic {auth}",
@@ -241,7 +233,6 @@ def get_cat_id(slug):
 
 def post_to_wp(parsed, cat_id):
     auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
-    # 태그 등록
     tag_ids = []
     for tag in parsed.get("tags", [])[:8]:
         try:
@@ -278,10 +269,9 @@ def run_daily():
     print(f"\n{'═'*55}")
     print(f"  📰 koreanews365.com 뉴스봇 시작")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  9개 섹션 × 5개 = 45개 기사")
+    print(f"  9개 섹션 × {ARTICLES_PER_SECTION}개 = {9*ARTICLES_PER_SECTION}개 기사")
     print(f"{'═'*55}")
 
-    # 카테고리 ID 초기화
     for sec in SECTIONS:
         if sec["id"] is None:
             sec["id"] = get_cat_id(sec["slug"])
@@ -293,7 +283,6 @@ def run_daily():
     for sec_i, section in enumerate(SECTIONS):
         print(f"\n\n  📌 섹션: [{section['name']}]")
 
-        # RSS에서 뉴스 수집
         news_items = get_news_items(section, ARTICLES_PER_SECTION)
         if not news_items:
             print(f"  ⚠️  뉴스 수집 실패, 키워드 기반으로 대체")
@@ -311,7 +300,7 @@ def run_daily():
             reporter = REPORTERS[reporter_idx % len(REPORTERS)]
             reporter_idx += 1
 
-            print(f"\n  [{sec_i+1}/9] [{art_i+1}/5] {section['name']}")
+            print(f"\n  [{sec_i+1}/9] [{art_i+1}/{ARTICLES_PER_SECTION}] {section['name']}")
             print(f"  📰 원본: {news['title'][:50]}")
             print(f"  ✍️  기자: {reporter['name']}")
             print(f"  🧠 Gemini 리라이팅 중...")
@@ -331,7 +320,6 @@ def run_daily():
                                 "title": parsed["title"], "url": purl,
                                 "time": datetime.now().strftime("%H:%M")})
 
-        # 섹션 간 대기
         if sec_i < len(SECTIONS)-1:
             gap = SECTION_GAP_MIN * 60 + random.randint(-120, 180)
             print(f"\n  ⏰ 다음 섹션까지 {gap//60}분 대기...")
@@ -344,12 +332,8 @@ def run_daily():
 
 
 if __name__ == "__main__":
-    while True:
-        results = run_daily()
-        fname = f"news_ko_{datetime.now().strftime('%Y%m%d')}.json"
-        with open(fname, "w", encoding="utf-8") as f:
-            json.dump(results, f, ensure_ascii=False, indent=2)
-        # 다음 라운드 6시간 후
-        gap = 360 * 60 + random.randint(-1800, 1800)
-        print(f"\n  ⏰ 다음 라운드: {gap//3600}시간 후")
-        time.sleep(gap)
+    results = run_daily()
+    fname = f"news_ko_{datetime.now().strftime('%Y%m%d')}.json"
+    with open(fname, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    print(f"\n  📁 결과 저장: {fname}")

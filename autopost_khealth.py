@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 k-health365.com 전용 자동 포스팅 봇
-- 11개 카테고리 × 15분 간격으로 순환
-- 3시간(±랜덤) 후 2라운드 반복
-- 내부링크 20개 사이트 연결
-- 외부링크 6개 이상
+- 11개 카테고리, 1라운드 실행 후 종료 (GitHub Actions용)
+- 내부링크 7개, 외부링크 6개
 - SEO 90점+ 한국어
 실행: python autopost_khealth.py
 """
@@ -25,10 +23,6 @@ INDEXNOW_KEY   = "khealth365indexnow2024"
 WP_URL      = "https://k-health365.com"
 WP_USER     = "huh0303@gmail.com"
 WP_PASS     = "i5p8 ircP SdL6 4wCY Vq1e fxq8"
-
-# 라운드 간격: 기본 3시간 ± 최대 30분 랜덤
-ROUND_GAP_BASE_MIN = 180
-ROUND_GAP_RAND_MIN = 30
 
 # 카테고리 간 간격: 15분 ± 3분 랜덤
 POST_GAP_BASE_MIN  = 15
@@ -122,7 +116,6 @@ EXTERNAL_LINKS = [
 
 
 def get_category_id(slug):
-    """슬러그로 WP 카테고리 ID 조회"""
     auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
     try:
         r = requests.get(
@@ -136,7 +129,6 @@ def get_category_id(slug):
 
 
 def init_category_ids():
-    """시작 시 모든 카테고리 ID 조회"""
     print("  카테고리 ID 조회 중...")
     for cat in CATEGORIES:
         if cat["id"] is None:
@@ -145,7 +137,6 @@ def init_category_ids():
 
 
 def build_keyword(cat):
-    """카테고리별 오늘 키워드 생성 (날짜 기반 순환)"""
     hints = cat["kw_hint"]
     day = datetime.now().timetuple().tm_yday
     base = hints[day % len(hints)]
@@ -156,13 +147,11 @@ def build_keyword(cat):
 
 
 def build_prompt(keyword, cat):
-    # 내부링크 7개 랜덤
     int_links = random.sample(INTERNAL_SITES, 7)
     int_html  = "\n".join([
         f'   - <a href="https://{domain}/" title="{anchor}">{anchor}</a>'
         for domain, anchor in int_links])
 
-    # 외부링크 6개 랜덤
     ext_links = random.sample(EXTERNAL_LINKS, 6)
     ext_html  = "\n".join([
         f'   - <a href="{url}" target="_blank" rel="nofollow noopener">{name}</a>'
@@ -226,9 +215,11 @@ def call_gemini(prompt):
                                        "topP": 0.9}},
             timeout=120)
         r.raise_for_status()
+        time.sleep(6)   # ★ Gemini 성공 후 6초 대기 (분당 10회 유지)
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print(f"    ❌ Gemini: {e}")
+        time.sleep(15)
         return None
 
 
@@ -442,37 +433,19 @@ def run_round(round_num, results):
     print(f"\n  ✅ ROUND {round_num} 완료: 성공 {ok}개 / 실패 {fail}개 / 평균 SEO {avg}점")
 
 
-def main():
+if __name__ == "__main__":
     print(f"\n{'═'*58}")
     print(f"  🤖 k-health365.com 전용 자동 포스팅 봇")
     print(f"  시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  카테고리: {len(CATEGORIES)}개")
-    print(f"  포스팅 간격: ~15분 | 라운드 간격: ~3시간")
+    print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)")
     print(f"{'═'*58}")
 
-    # 카테고리 ID 초기화
     init_category_ids()
-
     results = []
-    round_num = 1
+    run_round(1, results)
 
-    while True:
-        run_round(round_num, results)
+    fname = f"khealth_result_{datetime.now().strftime('%Y%m%d')}.json"
+    with open(fname, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
 
-        # 결과 저장
-        fname = f"khealth_result_{datetime.now().strftime('%Y%m%d')}.json"
-        with open(fname, "w", encoding="utf-8") as f:
-            json.dump(results, f, ensure_ascii=False, indent=2)
-
-        # 다음 라운드까지 대기 (3시간 ± 30분 랜덤)
-        gap_sec = (ROUND_GAP_BASE_MIN + random.randint(-ROUND_GAP_RAND_MIN, ROUND_GAP_RAND_MIN)) * 60
-        gap_h   = gap_sec // 3600
-        gap_m   = (gap_sec % 3600) // 60
-        next_t  = datetime.fromtimestamp(time.time() + gap_sec).strftime("%H:%M")
-        print(f"\n  ⏰ 다음 라운드: {gap_h}시간 {gap_m}분 후 ({next_t}) — Ctrl+C로 중단")
-        time.sleep(gap_sec)
-        round_num += 1
-
-
-if __name__ == "__main__":
-    main()
+    print(f"\n  📁 결과 저장: {fname}")

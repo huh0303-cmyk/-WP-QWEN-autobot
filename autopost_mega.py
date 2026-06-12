@@ -50,7 +50,7 @@ WP_PASSWORDS    = {
     "theseouljournal.com":    "Z7S7 97p2 vEBC gTxe sVDb hnMY",
 }
 
-DAILY_LIMIT     = 5   # 사이트당 하루 포스팅 수
+DAILY_LIMIT     = 10   # 사이트당 하루 포스팅 수
 MIN_CHARS_EN    = 1800
 MAX_CHARS_EN    = 2800
 MIN_CHARS_KO    = 2000

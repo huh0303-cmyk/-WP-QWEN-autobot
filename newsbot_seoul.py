@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 theseouljournal.com 영어 국제뉴스봇
-- CNN, BBC, Reuters, AP 등 RSS 수집
-- 9개 섹션 × 3개 = 하루 27개
+- 9개 섹션 × 3개 = 하루 27개, 1라운드 실행 후 종료 (GitHub Actions용)
 - Gemini로 영어 리라이팅
 - 가상 기자: Sarah Kim, James Park, Emily Choi, David Lee, Rachel Yoon
 """
@@ -140,9 +139,11 @@ def call_gemini(prompt):
                   "generationConfig":{"temperature":0.7,"maxOutputTokens":8192}},
             timeout=120)
         r.raise_for_status()
+        time.sleep(6)   # ★ Gemini 분당 10회 제한 대비
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print(f"  ❌ Gemini: {e}")
+        time.sleep(15)
         return None
 
 
@@ -240,6 +241,7 @@ def run_daily():
     print(f"\n{'═'*55}")
     print(f"  📰 The Seoul Journal 뉴스봇 시작")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  9개 섹션 × {ARTICLES_PER_SECTION}개 = {9*ARTICLES_PER_SECTION}개 기사")
     print(f"{'═'*55}")
     for sec in SECTIONS:
         if sec["id"] is None:
@@ -256,7 +258,7 @@ def run_daily():
                 time.sleep(gap)
             reporter=REPORTERS[reporter_idx%len(REPORTERS)]
             reporter_idx+=1
-            print(f"\n  [{si+1}/9][{ai+1}/5] {section['name']} — {reporter['name']}")
+            print(f"\n  [{si+1}/9][{ai+1}/{ARTICLES_PER_SECTION}] {section['name']} — {reporter['name']}")
             print(f"  📰 {news['title'][:50]}")
             raw=call_gemini(build_prompt(news,section,reporter))
             if not raw: continue
@@ -276,11 +278,8 @@ def run_daily():
 
 
 if __name__ == "__main__":
-    while True:
-        results=run_daily()
-        fname=f"news_en_{datetime.now().strftime('%Y%m%d')}.json"
-        with open(fname,"w",encoding="utf-8") as f:
-            json.dump(results,f,ensure_ascii=False,indent=2)
-        gap=360*60+random.randint(-1800,1800)
-        print(f"\n  ⏰ 다음 라운드: {gap//3600}시간 후")
-        time.sleep(gap)
+    results = run_daily()
+    fname = f"news_en_{datetime.now().strftime('%Y%m%d')}.json"
+    with open(fname, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    print(f"\n  📁 결과 저장: {fname}")
