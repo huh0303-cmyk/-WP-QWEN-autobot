@@ -305,7 +305,7 @@ def seo_score(parsed, keyword):
     ]
     score = sum(7 for _, ok in checks if ok)
     passed = sum(1 for _, ok in checks if ok)
-    print(f"  ┌─ SEO 체크 ({passed}/{len(checks, flush=True)}) ──────────────")
+    print(f"  ┌─ SEO 체크 ({passed}/{len(checks)}) ──────────────")
     for name, ok in checks:
         print(f"  │ {'✅' if ok else '❌'} {name}", flush=True)
     final = min(score, 100)
@@ -380,8 +380,8 @@ def indexnow(post_url):
 
 def run_round(round_num, results):
     print(f"\n{'═'*58}", flush=True)
-    print(f"  🔄 ROUND {round_num} 시작 — {datetime.now(, flush=True).strftime('%H:%M:%S')}")
-    print(f"  카테고리 {len(CATEGORIES, flush=True)}개 × 15분 간격")
+    print(f"  🔄 ROUND {round_num} 시작 — {datetime.now().strftime('%H:%M:%S')}")
+    print(f"  카테고리 {len(CATEGORIES)}개 × 15분 간격")
     print(f"{'═'*58}", flush=True)
 
     for i, cat in enumerate(CATEGORIES):
@@ -391,7 +391,7 @@ def run_round(round_num, results):
             time.sleep(gap)
 
         keyword = build_keyword(cat)
-        print(f"\n  ─── [{i+1}/{len(CATEGORIES, flush=True)}] [{cat['name']}] {keyword} ───")
+        print(f"\n  ─── [{i+1}/{len(CATEGORIES)}] [{cat['name']}] {keyword} ───")
         print(f"  🧠 Gemini 생성 중...", flush=True)
 
         raw = call_gemini(build_prompt(keyword, cat))
@@ -436,8 +436,8 @@ def run_round(round_num, results):
 if __name__ == "__main__":
     print(f"\n{'═'*58}", flush=True)
     print(f"  🤖 k-health365.com 전용 자동 포스팅 봇", flush=True)
-    print(f"  시작: {datetime.now(, flush=True).strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  카테고리: {len(CATEGORIES, flush=True)}개 (1라운드 실행 후 종료)")
+    print(f"  시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)")
     print(f"{'═'*58}", flush=True)
 
     init_category_ids()
