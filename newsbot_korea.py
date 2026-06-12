@@ -11,7 +11,7 @@ import os, json, time, random, requests, base64, re
 from datetime import datetime
 import xml.etree.ElementTree as ET
 
-GEMINI_API_KEY = "AQ.Ab8RN6Je6ngXK-4cSMxL05o3jlfF06RNHJtwz3XlPdB6zqLFbA"
+GEMINI_API_KEY = "AQ.Ab8RN6IRnt7A5tgZAA6xT8LOE-i4qolbc044L3jytLwlUwf0Nw"
 GEMINI_MODEL   = "gemini-2.5-flash"
 PEXELS_KEY     = "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
 PIXABAY_KEY    = "u_g0pmau3m85"
