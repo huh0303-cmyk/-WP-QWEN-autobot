@@ -24,9 +24,9 @@ WP_URL      = "https://k-health365.com"
 WP_USER     = "huh0303@gmail.com"
 WP_PASS     = "i5p8 ircP SdL6 4wCY Vq1e fxq8"
 
-# 카테고리 간 간격: 15분 ± 3분 랜덤
-POST_GAP_BASE_MIN  = 15
-POST_GAP_RAND_MIN  = 3
+# 카테고리 간 간격: 2분 ± 20초 랜덤 (테스트용 단축)
+POST_GAP_BASE_MIN  = 2
+POST_GAP_RAND_MIN  = 0
 
 # ── 11개 카테고리 ──────────────────────────
 CATEGORIES = [
@@ -129,11 +129,11 @@ def get_category_id(slug):
 
 
 def init_category_ids():
-    print("  카테고리 ID 조회 중...")
+    print("  카테고리 ID 조회 중...", flush=True)
     for cat in CATEGORIES:
         if cat["id"] is None:
             cat["id"] = get_category_id(cat["slug"])
-        print(f"  {cat['name']:15s} → ID: {cat['id']}")
+        print(f"  {cat['name']:15s} → ID: {cat['id']}", flush=True)
 
 
 def build_keyword(cat):
@@ -218,7 +218,7 @@ def call_gemini(prompt):
         time.sleep(6)   # ★ Gemini 성공 후 6초 대기 (분당 10회 유지)
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
-        print(f"    ❌ Gemini: {e}")
+        print(f"    ❌ Gemini: {e}", flush=True)
         time.sleep(15)
         return None
 
@@ -305,11 +305,11 @@ def seo_score(parsed, keyword):
     ]
     score = sum(7 for _, ok in checks if ok)
     passed = sum(1 for _, ok in checks if ok)
-    print(f"  ┌─ SEO 체크 ({passed}/{len(checks)}) ──────────────")
+    print(f"  ┌─ SEO 체크 ({passed}/{len(checks, flush=True)}) ──────────────")
     for name, ok in checks:
-        print(f"  │ {'✅' if ok else '❌'} {name}")
+        print(f"  │ {'✅' if ok else '❌'} {name}", flush=True)
     final = min(score, 100)
-    print(f"  └─ 점수: {final}점 {'🎉' if final >= 90 else '⚠️'}")
+    print(f"  └─ 점수: {final}점 {'🎉' if final >= 90 else '⚠️'}", flush=True)
     return final
 
 
@@ -361,8 +361,8 @@ def post_to_wp(parsed, cat_id, keyword):
         purl = r.json().get("link", "")
         return pid, purl
     except Exception as e:
-        print(f"  ❌ WP 오류: {e}")
-        try: print(f"     {e.response.text[:200]}")
+        print(f"  ❌ WP 오류: {e}", flush=True)
+        try: print(f"     {e.response.text[:200]}", flush=True)
         except: pass
         return None, None
 
@@ -379,24 +379,24 @@ def indexnow(post_url):
 
 
 def run_round(round_num, results):
-    print(f"\n{'═'*58}")
-    print(f"  🔄 ROUND {round_num} 시작 — {datetime.now().strftime('%H:%M:%S')}")
-    print(f"  카테고리 {len(CATEGORIES)}개 × 15분 간격")
-    print(f"{'═'*58}")
+    print(f"\n{'═'*58}", flush=True)
+    print(f"  🔄 ROUND {round_num} 시작 — {datetime.now(, flush=True).strftime('%H:%M:%S')}")
+    print(f"  카테고리 {len(CATEGORIES, flush=True)}개 × 15분 간격")
+    print(f"{'═'*58}", flush=True)
 
     for i, cat in enumerate(CATEGORIES):
         if i > 0:
             gap = POST_GAP_BASE_MIN * 60 + random.randint(-POST_GAP_RAND_MIN, POST_GAP_RAND_MIN) * 60
-            print(f"\n  ⏳ {gap//60}분 {gap%60}초 후 다음 카테고리...")
+            print(f"\n  ⏳ {gap//60}분 {gap%60}초 후 다음 카테고리...", flush=True)
             time.sleep(gap)
 
         keyword = build_keyword(cat)
-        print(f"\n  ─── [{i+1}/{len(CATEGORIES)}] [{cat['name']}] {keyword} ───")
-        print(f"  🧠 Gemini 생성 중...")
+        print(f"\n  ─── [{i+1}/{len(CATEGORIES, flush=True)}] [{cat['name']}] {keyword} ───")
+        print(f"  🧠 Gemini 생성 중...", flush=True)
 
         raw = call_gemini(build_prompt(keyword, cat))
         if not raw:
-            print(f"  ❌ 생성 실패")
+            print(f"  ❌ 생성 실패", flush=True)
             results.append({"round": round_num, "cat": cat["name"],
                             "keyword": keyword, "status": "FAIL",
                             "time": datetime.now().strftime("%H:%M")})
@@ -406,7 +406,7 @@ def run_round(round_num, results):
         score   = seo_score(parsed, keyword)
 
         if score < 72:
-            print("  🔄 재생성...")
+            print("  🔄 재생성...", flush=True)
             raw2 = call_gemini(build_prompt(keyword, cat))
             if raw2:
                 parsed = process_content(raw2)
@@ -415,8 +415,8 @@ def run_round(round_num, results):
         pid, purl = post_to_wp(parsed, cat["id"], keyword)
         if pid:
             indexnow(purl)
-            print(f"  ✅ 발행! ID:{pid} SEO:{score}점")
-            print(f"  🔗 {purl}")
+            print(f"  ✅ 발행! ID:{pid} SEO:{score}점", flush=True)
+            print(f"  🔗 {purl}", flush=True)
             results.append({"round": round_num, "cat": cat["name"],
                             "keyword": keyword, "title": parsed["title"],
                             "status": "OK", "seo": score,
@@ -430,15 +430,15 @@ def run_round(round_num, results):
     ok   = sum(1 for r in results if r.get("status")=="OK" and r.get("round")==round_num)
     fail = sum(1 for r in results if r.get("status")=="FAIL" and r.get("round")==round_num)
     avg  = sum(r.get("seo",0) for r in results if r.get("round")==round_num) // max(ok,1)
-    print(f"\n  ✅ ROUND {round_num} 완료: 성공 {ok}개 / 실패 {fail}개 / 평균 SEO {avg}점")
+    print(f"\n  ✅ ROUND {round_num} 완료: 성공 {ok}개 / 실패 {fail}개 / 평균 SEO {avg}점", flush=True)
 
 
 if __name__ == "__main__":
-    print(f"\n{'═'*58}")
-    print(f"  🤖 k-health365.com 전용 자동 포스팅 봇")
-    print(f"  시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)")
-    print(f"{'═'*58}")
+    print(f"\n{'═'*58}", flush=True)
+    print(f"  🤖 k-health365.com 전용 자동 포스팅 봇", flush=True)
+    print(f"  시작: {datetime.now(, flush=True).strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  카테고리: {len(CATEGORIES, flush=True)}개 (1라운드 실행 후 종료)")
+    print(f"{'═'*58}", flush=True)
 
     init_category_ids()
     results = []
@@ -448,4 +448,4 @@ if __name__ == "__main__":
     with open(fname, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
-    print(f"\n  📁 결과 저장: {fname}")
+    print(f"\n  📁 결과 저장: {fname}", flush=True)
