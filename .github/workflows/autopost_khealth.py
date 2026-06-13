@@ -115,6 +115,17 @@ EXTERNAL_LINKS = [
 # ══════════════════════════════════════════
 
 
+def test_auth():
+    auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
+    try:
+        r = requests.get(f"{WP_URL}/wp-json/wp/v2/users/me",
+            headers={"Authorization": f"Basic {auth}"}, timeout=10)
+        print(f"  🔑 인증 테스트: {r.status_code}", flush=True)
+        print(f"     {r.text[:300]}", flush=True)
+    except Exception as e:
+        print(f"  🔑 인증 테스트 실패: {e}", flush=True)
+
+
 def get_category_id(slug):
     auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
     try:
@@ -368,7 +379,8 @@ def post_to_wp(parsed, cat_id, keyword):
     except Exception as e:
         print(f"  ❌ WP 오류: {e}", flush=True)
         try:
-            print(f"     {e.response.text[:200]}", flush=True)
+            print(f"     {e.response.text[:500]}", flush=True)
+            print(f"     상태코드: {e.response.status_code}", flush=True)
         except Exception:
             pass
         return None, None
@@ -448,6 +460,7 @@ if __name__ == "__main__":
     print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)", flush=True)
     print(f"{'═'*58}", flush=True)
 
+    test_auth()
     init_category_ids()
     results = []
     run_round(1, results)
