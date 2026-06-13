@@ -392,8 +392,14 @@ def post_to_wp(parsed, cat_id, keyword):
     except Exception as e:
         print(f"  ❌ WP 오류: {e}", flush=True)
         try:
-            print(f"     {e.response.text[:500]}", flush=True)
+            txt = e.response.text
+            import re as _re
+            title_m = _re.search(r'<title>(.*?)</title>', txt, _re.IGNORECASE | _re.DOTALL)
             print(f"     상태코드: {e.response.status_code}", flush=True)
+            print(f"     TITLE: {title_m.group(1) if title_m else 'N/A'}", flush=True)
+            print(f"     서버헤더: {e.response.headers.get('Server','N/A')}", flush=True)
+            print(f"     CF헤더: {e.response.headers.get('CF-RAY','N/A')}", flush=True)
+            print(f"     본문(앞800자): {txt[:800]}", flush=True)
         except Exception:
             pass
         return None, None
