@@ -5,7 +5,7 @@ on:
     # ⏱️ [1번 봇] 한국 시간(KST) 밤 10시 정각 실행 (UTC 13:00)
     - cron: '0 13 * * *'
     
-    # ⏱️ [2번 봇] 한국 시간(KST) 밤 11시 30분 실행 (UTC 14:30) - 대량 작업 고려 배치
+    # ⏱️ [2번 봇] 한국 시간(KST) 밤 11시 30분 실행 (UTC 14:30)
     - cron: '30 14 * * *'
     
     # ⏱️ [3번 봇] 한국 시간(KST) 새벽 1시 30분 실행 (UTC 16:30)
@@ -14,10 +14,15 @@ on:
     # ⏱️ [4번 봇] 한국 시간(KST) 새벽 2시 30분 실행 (UTC 17:30)
     - cron: '30 17 * * *'
 
-  workflow_dispatch: # 관리자 페이지에서 필요할 때 수동으로 즉시 가동 버튼 활성화
+  workflow_dispatch: # 수동 즉시 가동 버튼 활성화
+
+# 동일 네트워크 자산 충돌을 방지하기 위한 안전 장치
+concurrency:
+  group: wordpress-qwen-chain
+  cancel-in-progress: false
 
 jobs:
-  # 🟢 1. K-Health 전용 봇 (한국 시간 밤 10시 실행)
+  # 🟢 1. K-Health 전용 봇 (밤 10시 스케줄 또는 수동 실행 시 첫 타자로 시동)
   khealth-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -37,13 +42,15 @@ jobs:
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
 
-  # 🟢 2. 23개 사이트 메가 봇 (한국 시간 밤 11시 30분 실행)
+  # 🟢 2. 22개 사이트 메가 봇 (밤 11시 30분 스케줄 또는 1번 봇 완료 후 수동 연동)
   mega-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 240
     continue-on-error: true
+    # 수동 실행 시에는 1번 봇이 끝난 후 순차 실행되도록 제어
+    needs: khealth-bot
     if: |
-      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'workflow_dispatch' && always()) || 
       (github.event_name == 'schedule' && github.event.schedule == '30 14 * * *')
     steps:
       - uses: actions/checkout@v4
@@ -57,13 +64,14 @@ jobs:
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
 
-  # 🟢 3. 한국어 뉴스 봇 (한국 시간 새벽 1시 30분 실행)
+  # 🟢 3. 한국어 뉴스 봇 (새벽 1시 30분 스케줄 또는 2번 봇 완료 후 수동 연동)
   newsbot-korea:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     continue-on-error: true
+    needs: mega-bot
     if: |
-      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'workflow_dispatch' && always()) || 
       (github.event_name == 'schedule' && github.event.schedule == '30 16 * * *')
     steps:
       - uses: actions/checkout@v4
@@ -77,13 +85,14 @@ jobs:
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
 
-  # 🟢 4. 서울 저널 영어 뉴스 봇 (한국 시간 새벽 2시 30분 실행)
+  # 🟢 4. 서울 저널 영어 뉴스 봇 (새벽 2시 30분 스케줄 또는 3번 봇 완료 후 수동 연동)
   newsbot-seoul:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     continue-on-error: true
+    needs: newsbot-korea
     if: |
-      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'workflow_dispatch' && always()) || 
       (github.event_name == 'schedule' && github.event.schedule == '30 17 * * *')
     steps:
       - uses: actions/checkout@v4
