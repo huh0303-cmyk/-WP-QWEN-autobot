@@ -124,7 +124,8 @@ def get_category_id(slug):
         data = r.json()
         if data and isinstance(data, list):
             return data[0]["id"]
-    except: pass
+    except Exception:
+        pass
     return 1
 
 
@@ -233,7 +234,8 @@ def get_image(query):
             p = random.choice(photos)
             return {"src": p["src"]["large2x"] or p["src"]["large"],
                     "credit": f'Photo by {p["photographer"]} on Pexels'}
-    except: pass
+    except Exception:
+        pass
     try:
         r = requests.get(
             f"https://pixabay.com/api/?key={PIXABAY_KEY}"
@@ -243,7 +245,8 @@ def get_image(query):
         if hits:
             p = random.choice(hits)
             return {"src": p["webformatURL"], "credit": "Image from Pixabay"}
-    except: pass
+    except Exception:
+        pass
     return {}
 
 
@@ -254,9 +257,9 @@ def process_content(raw):
         if line.startswith("TITLE:"):
             title = line.replace("TITLE:", "").strip()
         if "META_DESCRIPTION:" in line:
-            meta = line.split("META_DESCRIPTION:")[-1].replace("-->","").strip()
+            meta = line.split("META_DESCRIPTION:")[-1].replace("-->", "").strip()
         if "TAGS:" in line:
-            tags_str = line.split("TAGS:")[-1].replace("-->","").strip()
+            tags_str = line.split("TAGS:")[-1].replace("-->", "").strip()
         if title and meta:
             content = "\n".join(lines[i+1:])
             break
@@ -299,13 +302,13 @@ def seo_score(parsed, keyword):
         ("외부링크 6개 이상",    c.count('href="http') >= 6),
         ("내부링크 5개 이상",    c.count('k-health365.com') + c.count('.com/') >= 5),
         ("Strong 8개 이상",      c.count("<strong>") >= 8),
-        ("태그 5개 이상",        len(parsed.get("tags",[])) >= 5),
+        ("태그 5개 이상",        len(parsed.get("tags", [])) >= 5),
         ("TOC 포함",             "toc" in c.lower() or "목차" in c),
         ("CTA 포함",             "지금" in c or "바로" in c or "확인" in c),
     ]
     score = sum(7 for _, ok in checks if ok)
     passed = sum(1 for _, ok in checks if ok)
-    print(f"  ┌─ SEO 체크 ({passed}/{len(checks)}) ──────────────")
+    print(f"  ┌─ SEO 체크 ({passed}/{len(checks)}) ──────────────", flush=True)
     for name, ok in checks:
         print(f"  │ {'✅' if ok else '❌'} {name}", flush=True)
     final = min(score, 100)
@@ -330,8 +333,10 @@ def get_tag_ids(tags):
                     f"{WP_URL}/wp-json/wp/v2/tags?search={requests.utils.quote(tag)}",
                     headers={"Authorization": f"Basic {auth}"}, timeout=10)
                 res = sr.json()
-                if res: ids.append(res[0]["id"])
-        except: pass
+                if res:
+                    ids.append(res[0]["id"])
+        except Exception:
+            pass
     return ids
 
 
@@ -362,26 +367,29 @@ def post_to_wp(parsed, cat_id, keyword):
         return pid, purl
     except Exception as e:
         print(f"  ❌ WP 오류: {e}", flush=True)
-        try: print(f"     {e.response.text[:200]}", flush=True)
-        except: pass
+        try:
+            print(f"     {e.response.text[:200]}", flush=True)
+        except Exception:
+            pass
         return None, None
 
 
 def indexnow(post_url):
-    for ep in ["https://api.indexnow.org/indexnow","https://www.bing.com/indexnow"]:
+    for ep in ["https://api.indexnow.org/indexnow", "https://www.bing.com/indexnow"]:
         try:
             requests.post(ep, json={
                 "host": "k-health365.com", "key": INDEXNOW_KEY,
                 "keyLocation": f"{WP_URL}/{INDEXNOW_KEY}.txt",
                 "urlList": [post_url]
             }, timeout=10)
-        except: pass
+        except Exception:
+            pass
 
 
 def run_round(round_num, results):
     print(f"\n{'═'*58}", flush=True)
-    print(f"  🔄 ROUND {round_num} 시작 — {datetime.now().strftime('%H:%M:%S')}")
-    print(f"  카테고리 {len(CATEGORIES)}개 × 15분 간격")
+    print(f"  🔄 ROUND {round_num} 시작 — {datetime.now().strftime('%H:%M:%S')}", flush=True)
+    print(f"  카테고리 {len(CATEGORIES)}개 × 15분 간격", flush=True)
     print(f"{'═'*58}", flush=True)
 
     for i, cat in enumerate(CATEGORIES):
@@ -391,7 +399,7 @@ def run_round(round_num, results):
             time.sleep(gap)
 
         keyword = build_keyword(cat)
-        print(f"\n  ─── [{i+1}/{len(CATEGORIES)}] [{cat['name']}] {keyword} ───")
+        print(f"\n  ─── [{i+1}/{len(CATEGORIES)}] [{cat['name']}] {keyword} ───", flush=True)
         print(f"  🧠 Gemini 생성 중...", flush=True)
 
         raw = call_gemini(build_prompt(keyword, cat))
@@ -427,17 +435,17 @@ def run_round(round_num, results):
                             "keyword": keyword, "status": "FAIL",
                             "time": datetime.now().strftime("%H:%M")})
 
-    ok   = sum(1 for r in results if r.get("status")=="OK" and r.get("round")==round_num)
-    fail = sum(1 for r in results if r.get("status")=="FAIL" and r.get("round")==round_num)
-    avg  = sum(r.get("seo",0) for r in results if r.get("round")==round_num) // max(ok,1)
+    ok   = sum(1 for r in results if r.get("status") == "OK" and r.get("round") == round_num)
+    fail = sum(1 for r in results if r.get("status") == "FAIL" and r.get("round") == round_num)
+    avg  = sum(r.get("seo", 0) for r in results if r.get("round") == round_num) // max(ok, 1)
     print(f"\n  ✅ ROUND {round_num} 완료: 성공 {ok}개 / 실패 {fail}개 / 평균 SEO {avg}점", flush=True)
 
 
 if __name__ == "__main__":
     print(f"\n{'═'*58}", flush=True)
     print(f"  🤖 k-health365.com 전용 자동 포스팅 봇", flush=True)
-    print(f"  시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)")
+    print(f"  시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
+    print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)", flush=True)
     print(f"{'═'*58}", flush=True)
 
     init_category_ids()
