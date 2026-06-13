@@ -22,7 +22,7 @@ INDEXNOW_KEY   = "khealth365indexnow2024"
 
 WP_URL      = "https://k-health365.com"
 WP_USER     = "huh0303@gmail.com"
-WP_PASS     = "i5p8 ircP SdL6 4wCY Vq1e fxq8"
+WP_PASS     = "A3sK VQud Xday 1ait Zl0d ZAA2"
 
 # 카테고리 간 간격: 2분 ± 20초 랜덤 (테스트용 단축)
 POST_GAP_BASE_MIN  = 2
@@ -113,6 +113,30 @@ EXTERNAL_LINKS = [
     ("https://www.mohw.go.kr",              "보건복지부"),
 ]
 # ══════════════════════════════════════════
+
+
+def test_auth():
+    print("  🔑🔑🔑 인증 디버그 시작 🔑🔑🔑", flush=True)
+    auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
+    try:
+        r = requests.get(f"{WP_URL}/wp-json/wp/v2/users/me?context=edit",
+            headers={"Authorization": f"Basic {auth}"}, timeout=10)
+        print(f"  🔑 GET users/me: {r.status_code}", flush=True)
+        print(f"     {r.text[:600]}", flush=True)
+    except Exception as e:
+        print(f"  🔑 인증 테스트 실패: {e}", flush=True)
+
+    # POST 테스트 - draft 글 작성 시도
+    try:
+        r2 = requests.post(f"{WP_URL}/wp-json/wp/v2/posts",
+            headers={"Authorization": f"Basic {auth}",
+                     "Content-Type": "application/json"},
+            json={"title": "auth-test-draft", "status": "draft"}, timeout=15)
+        print(f"  🔑 POST draft 테스트: {r2.status_code}", flush=True)
+        print(f"     {r2.text[:400]}", flush=True)
+    except Exception as e:
+        print(f"  🔑 POST 테스트 실패: {e}", flush=True)
+    print("  🔑🔑🔑 인증 디버그 끝 🔑🔑🔑", flush=True)
 
 
 def get_category_id(slug):
@@ -368,7 +392,14 @@ def post_to_wp(parsed, cat_id, keyword):
     except Exception as e:
         print(f"  ❌ WP 오류: {e}", flush=True)
         try:
-            print(f"     {e.response.text[:200]}", flush=True)
+            txt = e.response.text
+            import re as _re
+            title_m = _re.search(r'<title>(.*?)</title>', txt, _re.IGNORECASE | _re.DOTALL)
+            print(f"     상태코드: {e.response.status_code}", flush=True)
+            print(f"     TITLE: {title_m.group(1) if title_m else 'N/A'}", flush=True)
+            print(f"     서버헤더: {e.response.headers.get('Server','N/A')}", flush=True)
+            print(f"     CF헤더: {e.response.headers.get('CF-RAY','N/A')}", flush=True)
+            print(f"     본문(앞800자): {txt[:800]}", flush=True)
         except Exception:
             pass
         return None, None
@@ -448,6 +479,7 @@ if __name__ == "__main__":
     print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)", flush=True)
     print(f"{'═'*58}", flush=True)
 
+    test_auth()
     init_category_ids()
     results = []
     run_round(1, results)
