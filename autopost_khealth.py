@@ -11,6 +11,14 @@ k-health365.com 전용 자동 포스팅 봇
 import os, json, time, random, requests, base64, re
 from datetime import datetime
 
+# ── 기자 풀 (랜덤 선택) ──────────────────────
+REPORTER_POOL_KR = ["전문기자 김윤서", "전문기자 이현수", "수석기자 김상준", "전문기자 박지아", "전문기자 정도윤"]
+REPORTER_POOL_EN = ["Sarah Mitchell", "James Anderson", "Emily Carter", "David Thompson", "Rachel Bennett"]
+
+def pick_reporter():
+    return random.choice(REPORTER_POOL_KR + REPORTER_POOL_EN)
+
+
 # ══════════════════════════════════════════
 #  ★ 설정
 # ══════════════════════════════════════════
@@ -115,30 +123,6 @@ EXTERNAL_LINKS = [
 # ══════════════════════════════════════════
 
 
-def test_auth():
-    print("  🔑🔑🔑 인증 디버그 시작 🔑🔑🔑", flush=True)
-    auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
-    try:
-        r = requests.get(f"{WP_URL}/wp-json/wp/v2/users/me?context=edit",
-            headers={"Authorization": f"Basic {auth}"}, timeout=10)
-        print(f"  🔑 GET users/me: {r.status_code}", flush=True)
-        print(f"     {r.text[:600]}", flush=True)
-    except Exception as e:
-        print(f"  🔑 인증 테스트 실패: {e}", flush=True)
-
-    # POST 테스트 - draft 글 작성 시도
-    try:
-        r2 = requests.post(f"{WP_URL}/wp-json/wp/v2/posts",
-            headers={"Authorization": f"Basic {auth}",
-                     "Content-Type": "application/json"},
-            json={"title": "auth-test-draft", "status": "draft"}, timeout=15)
-        print(f"  🔑 POST draft 테스트: {r2.status_code}", flush=True)
-        print(f"     {r2.text[:400]}", flush=True)
-    except Exception as e:
-        print(f"  🔑 POST 테스트 실패: {e}", flush=True)
-    print("  🔑🔑🔑 인증 디버그 끝 🔑🔑🔑", flush=True)
-
-
 def get_category_id(slug):
     auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
     try:
@@ -172,56 +156,65 @@ def build_keyword(cat):
 
 
 def build_prompt(keyword, cat):
-    int_links = random.sample(INTERNAL_SITES, 7)
+    int_links = random.sample(INTERNAL_SITES, 4)
     int_html  = "\n".join([
         f'   - <a href="https://{domain}/" title="{anchor}">{anchor}</a>'
         for domain, anchor in int_links])
 
-    ext_links = random.sample(EXTERNAL_LINKS, 6)
+    ext_links = random.sample(EXTERNAL_LINKS, 5)
     ext_html  = "\n".join([
         f'   - <a href="{url}" target="_blank" rel="nofollow noopener">{name}</a>'
         for url, name in ext_links])
 
-    return f"""당신은 한국 최고의 SEO 전문 블로거이자 건강/의료 전문 작가입니다.
-아래 조건을 100% 만족하는 완성된 WordPress 블로그 포스트를 HTML로 작성하세요.
+    return f"""당신은 의학 박사 톤을 유지하는 한국 최고의 SEO 전문 건강/의료 블로거입니다.
+아래 [GEMS SEO 및 가독성 최적화 지침]을 100% 만족하는 WordPress 블로그 글을 HTML로 작성하세요.
 
 [포커스 키워드]: {keyword}
 [카테고리]: {cat['name']} — {cat['theme']}
-[목표 글자수]: 2000~3000자 (반드시 준수)
-[언어]: 한국어
+
+══════════════════════════
+[GEMS SEO 및 가독성 최적화 지침]
+══════════════════════════
+
+1. SEO 구조화 원칙
+- 구글 SEO 점수 90점 이상 필수
+- 본문 총 어휘수 2500자 이상 (반드시 준수)
+- 제목: 단순 나열 금지. '효능', '부작용', '전문의 견해' 등 클릭 유도 키워드를 조합 (50~60자)
+- H2(주요 목차), H3(세부 내용) 태그로 구조를 명확히 함 (H1은 사용하지 않음, WordPress가 자동 추가)
+- 내부링크 4개 이상 — 독자 체류시간 증대를 위해 연관 건강 정보를 본문에 자연스럽게 언급하며 아래 링크 삽입:
+{int_html}
+
+2. 의학적 전문성 유지
+- 의학 박사 톤, 근거 중심 정보 제공, 연구결과 인용
+- 통계자료/표는 반드시 출처 외부링크 표시 — 외부링크 5개 이상, 아래 링크를 본문에 자연스럽게 삽입:
+{ext_html}
+- 글의 첫 100자 이내에 핵심 키워드 반드시 포함
+
+3. 모바일 가독성 규칙 (필수)
+- 모든 문단은 짧게 끊어 작성 (한 문단 2~3문장 이내)
+- 모든 문단(<p>) 사이에 빈 줄을 둘 것
+
+4. 실천 가이드 (필수 포함 항목)
+- '복용법', '주의사항', '결론' 항목 반드시 포함
+- 표(Table) 2개 이상, ul 목록 2개 이상, ol 목록 1개 이상
+- <strong> 강조 8~12개
+- 이미지 3곳:
+  <!-- IMAGE: 영어검색어 -->
+  <!-- ALT: 한국어 이미지 설명 -->
+- FAQ 5문제 (<!-- SCHEMA_FAQ --> 태그로 시작, H3로 질문 작성)
+- 글 마지막에:
+  - "관련 키워드 5개" 섹션: 각 키워드를 위 내부링크 4개 중 하나로 연결한 ul 목록
+  - 라벨: 로 시작하는 줄에, 쉼표로 연결된 명사 태그값 12개 단어 제시
 
 [Google AdSense 정책 — 필수 준수]
 - 허위·과장 의학 정보 금지, 반드시 근거 기반 작성
 - 저작권·성인·도박 관련 표현 절대 금지
 - 전문가 조언 권고 문구 포함
 
-[SEO 90점+ 달성 필수 조건]
-
-① 제목: 포커스 키워드 앞쪽 포함, 숫자 포함(TOP5/3가지/2026년), 50~60자
-② 메타디스크립션: 120~155자, 키워드 1회, 행동유도 문구 포함
-③ 목차(TOC): 앵커링크 포함 목차를 본문 시작 전 삽입
-④ H2 6개이상, 각 H2 아래 H3 2~3개
-⑤ 키워드 밀도 1~2%, 공신력 있는 데이터/수치 5개이상
-⑥ 내부링크 7개 — 아래 링크를 본문 자연스러운 위치에 삽입:
-{int_html}
-⑦ 외부링크 6개 — 아래 링크를 본문에 자연스럽게 삽입:
-{ext_html}
-⑧ 표(Table) 2개이상 (비교표, 성분표, 복용량표 등)
-⑨ ul 목록 2개이상, ol 목록 1개이상
-⑩ <strong> 강조 8~12개
-⑪ 이미지 3곳:
-   <!-- IMAGE: 영어검색어 -->
-   <!-- ALT: 한국어 이미지 설명 -->
-⑫ FAQ 7쌍 (<!-- SCHEMA_FAQ --> 태그로 시작)
-⑬ CTA(Call To Action) 2곳:
-   - 본문 중간: 관련 서비스/정보 클릭 유도
-   - 맺음말: 행동 유도 + 키워드 재언급
-⑭ 태그 8개: <!-- TAGS: 태그1, 태그2, ... -->
-
 [출력 형식 — 반드시 준수]
 첫째줄: TITLE: [제목]
-둘째줄: <!-- META_DESCRIPTION: [메타디스크립션] -->
-셋째줄: <!-- TAGS: 태그1, 태그2, 태그3, 태그4, 태그5, 태그6, 태그7, 태그8 -->
+둘째줄: <!-- META_DESCRIPTION_EN: [영어로 작성된 120자 내외 메타디스크립션] -->
+셋째줄: <!-- TAGS: 태그1, 태그2, ... (정확히 12개, 쉼표로 구분) -->
 넷째줄부터: 본문 HTML (<h1> 태그 사용 금지)
 
 지금 바로 작성하세요. 키워드: {keyword}"""
@@ -275,13 +268,21 @@ def get_image(query):
 
 
 def process_content(raw):
+    # LLM이 ```html ... ``` 형태로 감싸서 출력하는 경우 제거
+    raw = raw.strip()
+    raw = re.sub(r'^```[a-zA-Z]*\n?', '', raw)
+    raw = re.sub(r'\n?```$', '', raw)
+    raw = raw.strip()
+
     lines = raw.strip().split("\n")
     title, meta, tags_str, content = "", "", "", raw
     for i, line in enumerate(lines):
         if line.startswith("TITLE:"):
             title = line.replace("TITLE:", "").strip()
-        if "META_DESCRIPTION:" in line:
-            meta = line.split("META_DESCRIPTION:")[-1].replace("-->", "").strip()
+            title = re.sub(r'^```[a-zA-Z]*\s*', '', title)
+            title = title.strip('`"\' ')
+        if "META_DESCRIPTION_EN:" in line or "META_DESCRIPTION:" in line:
+            meta = line.split("META_DESCRIPTION")[-1].split(":",1)[-1].replace("-->", "").strip()
         if "TAGS:" in line:
             tags_str = line.split("TAGS:")[-1].replace("-->", "").strip()
         if title and meta:
@@ -316,19 +317,19 @@ def seo_score(parsed, keyword):
     c, t, m = parsed["content"], parsed["title"], parsed["meta"]
     checks = [
         ("제목에 키워드",         keyword.split()[0] in t),
-        ("메타디스크립션 120자+", len(m) >= 120),
-        ("본문 2000자 이상",      len(c) >= 2000),
+        ("메타디스크립션 100자+", len(m) >= 100),
+        ("본문 2500자 이상",      len(c) >= 2500),
         ("H2 5개 이상",          c.count("<h2") >= 5),
         ("H3 8개 이상",          c.count("<h3") >= 8),
         ("이미지+ALT",           "<img" in c and 'alt="' in c),
         ("테이블 2개 이상",      c.count("<table") >= 2),
         ("FAQ 포함",             "FAQ" in c or "자주 묻는" in c),
-        ("외부링크 6개 이상",    c.count('href="http') >= 6),
-        ("내부링크 5개 이상",    c.count('k-health365.com') + c.count('.com/') >= 5),
+        ("외부링크 5개 이상",    c.count('target="_blank"') >= 5),
+        ("내부링크 4개 이상",    c.count('.com/') >= 4),
         ("Strong 8개 이상",      c.count("<strong>") >= 8),
-        ("태그 5개 이상",        len(parsed.get("tags", [])) >= 5),
-        ("TOC 포함",             "toc" in c.lower() or "목차" in c),
-        ("CTA 포함",             "지금" in c or "바로" in c or "확인" in c),
+        ("태그 10개 이상",       len(parsed.get("tags", [])) >= 10),
+        ("복용법/주의사항/결론", all(k in c for k in ["복용법", "주의사항", "결론"])),
+        ("관련 키워드 섹션",     "관련 키워드" in c or "연관 키워드" in c),
     ]
     score = sum(7 for _, ok in checks if ok)
     passed = sum(1 for _, ok in checks if ok)
@@ -392,14 +393,7 @@ def post_to_wp(parsed, cat_id, keyword):
     except Exception as e:
         print(f"  ❌ WP 오류: {e}", flush=True)
         try:
-            txt = e.response.text
-            import re as _re
-            title_m = _re.search(r'<title>(.*?)</title>', txt, _re.IGNORECASE | _re.DOTALL)
-            print(f"     상태코드: {e.response.status_code}", flush=True)
-            print(f"     TITLE: {title_m.group(1) if title_m else 'N/A'}", flush=True)
-            print(f"     서버헤더: {e.response.headers.get('Server','N/A')}", flush=True)
-            print(f"     CF헤더: {e.response.headers.get('CF-RAY','N/A')}", flush=True)
-            print(f"     본문(앞800자): {txt[:800]}", flush=True)
+            print(f"     {e.response.text[:300]}", flush=True)
         except Exception:
             pass
         return None, None
@@ -444,12 +438,16 @@ def run_round(round_num, results):
         parsed  = process_content(raw)
         score   = seo_score(parsed, keyword)
 
-        if score < 72:
-            print("  🔄 재생성...", flush=True)
+        if score < 80:
+            print(f"  🔄 SEO {score}점 < 80점 → 재생성...", flush=True)
             raw2 = call_gemini(build_prompt(keyword, cat))
             if raw2:
-                parsed = process_content(raw2)
-                score  = seo_score(parsed, keyword)
+                parsed2 = process_content(raw2)
+                score2  = seo_score(parsed2, keyword)
+                if score2 > score:
+                    parsed, score = parsed2, score2
+            if score < 80:
+                print(f"  ⚠️ 재생성 후에도 {score}점, 최선의 결과로 발간 진행", flush=True)
 
         pid, purl = post_to_wp(parsed, cat["id"], keyword)
         if pid:
@@ -479,7 +477,6 @@ if __name__ == "__main__":
     print(f"  카테고리: {len(CATEGORIES)}개 (1라운드 실행 후 종료)", flush=True)
     print(f"{'═'*58}", flush=True)
 
-    test_auth()
     init_category_ids()
     results = []
     run_round(1, results)
