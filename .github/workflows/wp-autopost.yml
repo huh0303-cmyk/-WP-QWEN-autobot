@@ -1,61 +1,98 @@
-name: WordPress Auto Posting
+name: WordPress Auto Posting (Qwen Mega Chain)
+
 on:
   schedule:
-    - cron: '0 15 * * *'
-  workflow_dispatch:
+    # ⏱️ [1번 봇] 한국 시간(KST) 밤 10시 정각 실행 (UTC 13:00)
+    - cron: '0 13 * * *'
+    
+    # ⏱️ [2번 봇] 한국 시간(KST) 밤 11시 30분 실행 (UTC 14:30) - 대량 작업 고려 배치
+    - cron: '30 14 * * *'
+    
+    # ⏱️ [3번 봇] 한국 시간(KST) 새벽 1시 30분 실행 (UTC 16:30)
+    - cron: '30 16 * * *'
+    
+    # ⏱️ [4번 봇] 한국 시간(KST) 새벽 2시 30분 실행 (UTC 17:30)
+    - cron: '30 17 * * *'
+
+  workflow_dispatch: # 관리자 페이지에서 필요할 때 수동으로 즉시 가동 버튼 활성화
+
 jobs:
+  # 🟢 1. K-Health 전용 봇 (한국 시간 밤 10시 실행)
   khealth-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 90
     continue-on-error: true
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'schedule' && github.event.schedule == '0 13 * * *')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - run: python autopost_khealth.py
+      - name: Install Dependencies
+        run: pip install requests
+      - name: Run K-Health Bot (Qwen + Free Images)
+        run: python autopost_khealth.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+
+  # 🟢 2. 23개 사이트 메가 봇 (한국 시간 밤 11시 30분 실행)
   mega-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 240
     continue-on-error: true
-    needs: khealth-bot
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'schedule' && github.event.schedule == '30 14 * * *')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - run: python autopost_mega.py
+      - name: Install Dependencies
+        run: pip install requests
+      - name: Run Mega Bot (Qwen Multi-Chain)
+        run: python autopost_mega.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+
+  # 🟢 3. 한국어 뉴스 봇 (한국 시간 새벽 1시 30분 실행)
   newsbot-korea:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 120
     continue-on-error: true
-    needs: mega-bot
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'schedule' && github.event.schedule == '30 16 * * *')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - run: python newsbot_korea.py
+      - name: Install Dependencies
+        run: pip install requests
+      - name: Run Korean News Bot (Qwen System)
+        run: python newsbot_korea.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+
+  # 🟢 4. 서울 저널 영어 뉴스 봇 (한국 시간 새벽 2시 30분 실행)
   newsbot-seoul:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 120
     continue-on-error: true
-    needs: newsbot-korea
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'schedule' && github.event.schedule == '30 17 * * *')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - run: python newsbot_seoul.py
+      - name: Install Dependencies
+        run: pip install requests
+      - name: Run Seoul Journal News Bot
+        run: python newsbot_seoul.py
         env:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
