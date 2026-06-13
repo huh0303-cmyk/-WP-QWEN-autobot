@@ -116,14 +116,27 @@ EXTERNAL_LINKS = [
 
 
 def test_auth():
+    print("  🔑🔑🔑 인증 디버그 시작 🔑🔑🔑", flush=True)
     auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
     try:
-        r = requests.get(f"{WP_URL}/wp-json/wp/v2/users/me",
+        r = requests.get(f"{WP_URL}/wp-json/wp/v2/users/me?context=edit",
             headers={"Authorization": f"Basic {auth}"}, timeout=10)
-        print(f"  🔑 인증 테스트: {r.status_code}", flush=True)
-        print(f"     {r.text[:300]}", flush=True)
+        print(f"  🔑 GET users/me: {r.status_code}", flush=True)
+        print(f"     {r.text[:600]}", flush=True)
     except Exception as e:
         print(f"  🔑 인증 테스트 실패: {e}", flush=True)
+
+    # POST 테스트 - draft 글 작성 시도
+    try:
+        r2 = requests.post(f"{WP_URL}/wp-json/wp/v2/posts",
+            headers={"Authorization": f"Basic {auth}",
+                     "Content-Type": "application/json"},
+            json={"title": "auth-test-draft", "status": "draft"}, timeout=15)
+        print(f"  🔑 POST draft 테스트: {r2.status_code}", flush=True)
+        print(f"     {r2.text[:400]}", flush=True)
+    except Exception as e:
+        print(f"  🔑 POST 테스트 실패: {e}", flush=True)
+    print("  🔑🔑🔑 인증 디버그 끝 🔑🔑🔑", flush=True)
 
 
 def get_category_id(slug):
