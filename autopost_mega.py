@@ -14,16 +14,14 @@ from keywords_all import KEYWORDS
 # ══════════════════════════════════════════════
 #  ★ API 키 설정 ★
 # ══════════════════════════════════════════════
-GEMINI_API_KEY  = "AQ.Ab8RN6IRnt7A5tgZAA6xT8LOE-i4qolbc044L3jytLwlUwf0Nw"
+GEMINI_API_KEY  = "AQ.Ab8RN6L1RxG7CUO1FSFAl9E53oOM934QWAA3AqcFIWpA3Q7h5g"
 GEMINI_MODEL    = "gemini-2.5-flash"
 PEXELS_KEY      = "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
 PIXABAY_KEY     = "u_g0pmau3m85"
 INDEXNOW_KEY    = "khealth365indexnow2024"
 
-# Google Sheets 웹훅 URL (아래 설정 방법 참고)
 SHEETS_WEBHOOK  = os.getenv("SHEETS_WEBHOOK", "")
 
-# WordPress 공통 계정
 WP_USERNAME     = "huh0303@gmail.com"
 WP_PASSWORDS    = {
     "k-health365.com":        "Mlga kg0x KeNP w2ol OHhK HmuT",
@@ -50,19 +48,18 @@ WP_PASSWORDS    = {
     "theseouljournal.com":    "Z7S7 97p2 vEBC gTxe sVDb hnMY",
 }
 
-DAILY_LIMIT     = 10   # 사이트당 하루 포스팅 수
+DAILY_LIMIT     = 10
 MIN_CHARS_EN    = 1800
 MAX_CHARS_EN    = 2800
 MIN_CHARS_KO    = 2000
 MAX_CHARS_KO    = 3000
-RANDOM_START_H  = 7    # 오전 7시부터
-RANDOM_END_H    = 23   # 오후 12시까지
-MIN_GAP_MIN     = 30   # 최소 간격 30분
+RANDOM_START_H  = 7
+RANDOM_END_H    = 23
+MIN_GAP_MIN     = 30
 
 # ══════════════════════════════════════════════
 
 def gen_random_times(n):
-    """n개 완전 랜덤 시간 (분 단위, 오늘 기준)"""
     used, times, tries = [], [], 0
     while len(times) < n and tries < 2000:
         tries += 1
@@ -220,11 +217,11 @@ def call_gemini(prompt):
                                        "topP": 0.9}},
             timeout=120)
         r.raise_for_status()
-        time.sleep(6)   # ★ Gemini 성공 후 6초 대기 (분당 10회 유지)
+        time.sleep(6)
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print(f"    ❌ Gemini: {e}")
-        time.sleep(15)  # ★ 실패 시 15초 대기 후 재시도 방지
+        time.sleep(15)
         return None
 
 
@@ -507,7 +504,7 @@ def process_site(site, results_list, lock):
             results_list.append(row)
         send_to_sheets(row)
 
-        time.sleep(3)   # ★ 키워드 간 3초 추가 대기
+        time.sleep(3)
 
 
 def print_summary(results):

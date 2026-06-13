@@ -11,7 +11,7 @@ import os, json, time, random, requests, base64, re
 from datetime import datetime
 import xml.etree.ElementTree as ET
 
-GEMINI_API_KEY = "AQ.Ab8RN6IRnt7A5tgZAA6xT8LOE-i4qolbc044L3jytLwlUwf0Nw"
+GEMINI_API_KEY = "AQ.Ab8RN6L1RxG7CUO1FSFAl9E53oOM934QWAA3AqcFIWpA3Q7h5g"
 GEMINI_MODEL   = "gemini-2.5-flash"
 PEXELS_KEY     = "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
 PIXABAY_KEY    = "u_g0pmau3m85"
@@ -139,7 +139,7 @@ def call_gemini(prompt):
                   "generationConfig":{"temperature":0.7,"maxOutputTokens":8192}},
             timeout=120)
         r.raise_for_status()
-        time.sleep(6)   # ★ Gemini 분당 10회 제한 대비
+        time.sleep(6)
         return r.json()["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print(f"  ❌ Gemini: {e}")

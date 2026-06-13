@@ -14,7 +14,7 @@ from datetime import datetime
 # ══════════════════════════════════════════
 #  ★ 설정
 # ══════════════════════════════════════════
-GEMINI_API_KEY = "AQ.Ab8RN6IRnt7A5tgZAA6xT8LOE-i4qolbc044L3jytLwlUwf0Nw"
+GEMINI_API_KEY = "AQ.Ab8RN6L1RxG7CUO1FSFAl9E53oOM934QWAA3AqcFIWpA3Q7h5g"
 GEMINI_MODEL   = "gemini-2.5-flash"
 PEXELS_KEY     = "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
 PIXABAY_KEY    = "u_g0pmau3m85"
