@@ -1,9 +1,10 @@
  #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-WordPress AI 자동 포스팅 봇 - 23개 사이트 MEGA 버전 (Qwen API 완벽 전환 모델)
+WordPress AI 자동 포스팅 봇 - 22개 사이트 MEGA 버전 (Qwen API 최적화 모델)
 실행: python autopost_mega.py
 가독성: 모바일 가독성을 위해 모든 문장 사이 공백 라인 주입 및 극단적 짧은 문단 구조화 적용
+업데이트: 클릭을 부르는 후킹성 타이포 썸네일 랜덤 생성 알고리즘 탑재
 """
 
 import os, json, time, random, requests, base64, re, threading
@@ -51,22 +52,14 @@ WP_PASSWORDS    = {
     "koreacrypto365.com":     os.environ.get("WP_PASS", "ZQHo B2XY VpyM p3oM nwnO Yh3M"),
     "koreainsurance365.com":  os.environ.get("WP_PASS", "q42y V0tO f0lV IhHe g9e8 dEr3"),
     "koreanews365.com":       os.environ.get("WP_PASS", "d3fv cScN Ruvf AUiO Drae 6WuX"),
-    "koreawedding365.com":    os.environ.get("WP_PASS", "jPcA SAAa UdT4 nByC qnVi J2lV"),
+    "koreavedding365.com":    os.environ.get("WP_PASS", "jPcA SAAa UdT4 nByC qnVi J2lV"),
     "ktech365.com":           os.environ.get("WP_PASS", "lYyP q7wY 0P7J 7BOv G6w8 F3dC"),
     "kworld365.com":          os.environ.get("WP_PASS", "M0zy T8Vv 56mH 8HbP ueP9 KEDU"),
     "oliveyoungkorea.com":    os.environ.get("WP_PASS", "Aemu VCSZ l4nf xHq3 tgyE NIkb"),
     "theseouljournal.com":    os.environ.get("WP_PASS", "Z7S7 97p2 vEBC gTxe sVDb hnMY"),
 }
 
-# 🕸️ 상호 거미줄 연동을 위한 전체 도메인 자산 정의
-ALL_DOMAINS_KR = ["k-health365.com", "koreanews365.com"]
-ALL_DOMAINS_EN = [
-    "kworld365.com", "koreamedicaltour.com", "kskin365.com", "korea365.org",
-    "jobinkorea365.com", "jobkorea365.com", "jobkoreaglobal.com", "kstudy365.com",
-    "studyinkorea.com", "kfinance365.com", "koreainvest365.com", "koreataxlaw.com",
-    "k-trip365.com", "k-visa365.com", "koreacrypto365.com", "koreainsurance365.com",
-    "koreawedding365.com", "ktech365.com", "oliveyoungkorea.com", "theseouljournal.com"
-]
+ALL_DOMAINS_EN = [get_domain(s["url"]) for s in SITES if s["lang"] == "en"]
 
 DAILY_LIMIT     = 10
 MIN_CHARS_EN    = 1800
@@ -107,21 +100,20 @@ def build_prompt_en(keyword, theme, site_url, internal_refs, min_c, max_c, is_ad
         for ref in random.sample(internal_refs, min(3, len(internal_refs)))])
     
     other_en_domains = [d for d in ALL_DOMAINS_EN if d != domain]
-    network_targets = random.sample(other_en_domains, 2)
+    network_targets = random.sample(other_en_domains, min(2, len(other_en_domains)))
     network_links_guide = (
         f"   - Link 1: https://{network_targets[0]} (Anchor text must be highly relevant keyword)\n"
         f"   - Link 2: https://{network_targets[1]} (Anchor text must be highly relevant keyword)"
     )
 
-    magazine_note = "Write in a professional magazine style with a compelling narrative." if style=="magazine" else ""
-    news_note = "Write as a news-style article with a clear who/what/when/where/why structure." if style=="news" else ""
-
-    adsense_note = """
-CRITICAL - Google AdSense Policy Compliance:
-- No misleading health claims without scientific backing
-- No adult, gambling, or drug-related content
-- All medical info must cite authoritative sources
-""" if is_adsense else ""
+    thumbnail_styles = [
+        f"A bold, neon-lit cyberpunk digital signage featuring the short punchy text '{keyword}' in high-contrast pink and cyan, perfect for mobile scrolling.",
+        f"A premium minimalist magazine cover design with ultra-bold typography reading '{keyword}' in a modern serif font, high-end commercial style.",
+        f"A sleek 3D tech gadget mockup screen displaying '{keyword}' as a trending status bar topic, with futuristic abstract lighting.",
+        f"A retro-vintage analog terminal screen casting a bright green glow with the text '{keyword}' typed inside a flashing cursor box.",
+        f"An isometric data visualization grid where light-streaks form the large, readable keyword '{keyword}' in a dynamic corporate environment."
+    ]
+    selected_thumb_style = random.choice(thumbnail_styles)
 
     return f"""You are {reporter}, a doctorate-level expert in {theme}.
 Write a complete, publish-ready WordPress blog post following the [GEMS SEO & Readability Guidelines].
@@ -129,7 +121,14 @@ Write a complete, publish-ready WordPress blog post following the [GEMS SEO & Re
 [FOCUS KEYWORD]: {keyword}
 [TOPIC/NICHE]: {theme}
 [LANGUAGE]: English
-{magazine_note}{news_note}{adsense_note}
+
+══════════════════════════
+[IMAGE GENERATION CRITICAL DIRECTIVE]
+══════════════════════════
+- Your first image MUST be a featured thumbnail.
+- You MUST design the image search query to produce text on the image.
+- Use this exact style concept for the FIRST image query: "{selected_thumb_style}"
+- Ensure the word '{keyword}' is explicitly stated in the query as the core visual anchor.
 
 ══════════════════════════
 [GEMS SEO & Readability Guidelines]
@@ -140,20 +139,18 @@ Write a complete, publish-ready WordPress blog post following the [GEMS SEO & Re
 - A single paragraph (<p> block element) MUST contain only 1 sentence.
 - You MUST leave a clear, explicit empty line space between every single paragraph in the output HTML.
 
-2. SEO SPIDERWEB LINKING STRUCTURE (★NETWORK EXPANSION)
+2. SEO SPIDERWEB LINKING STRUCTURE
 - Total body length: 2500+ characters (strictly required)
-- TITLE: 50-60 chars, include focus keyword near the start, include a number (e.g., 2026 / Top 5)
+- TITLE: 50-60 chars, include focus keyword near the start, must be highly clickable and catchy!
 - Include the focus keyword within the first 100 characters of the body.
-- 3+ Internal Links:
-{internal_html}
-- 2+ Cross-Network Web Backlinks:
-{network_links_guide}
+- 3+ Internal Links: {internal_html}
+- 2+ Cross-Network Web Backlinks: {network_links_guide}
 
 3. REQUIRED SECTIONS & EXPERT AUTHORITY
-- Maintain an authoritative tone. Must include "Dosage/Usage", "Precautions", and "Conclusion" sections.
-- 5+ external authority links from (.gov, .org, or global press networks like Bloomberg/Reuters).
+- 5+ external authority links.
 - 2+ HTML <table> tags, 2+ <ul> lists, 1+ <ol> list, 8-12 <strong> emphasis tags.
-- 3 images formatted precisely as: - FAQ section with 5 Q&A pairs (preceded by )
+- 3 images formatted precisely as: (The FIRST image query must incorporate the custom thumbnail style defined above)
+- FAQ section with 5 Q&A pairs (preceded by )
 
 [OUTPUT FORMAT]
 Line 1: TITLE: [title]
@@ -171,6 +168,15 @@ def build_prompt_ko(keyword, style="news", is_news_site=False):
         sister_domain = "koreanews365.com"
         anchor_hint = "종합 시사 뉴스 전문 플랫폼 koreanews365.com"
 
+    thumbnail_styles_ko = [
+        f"A modern social media card design with bold, glowing neon font displaying '{keyword}' as a trending news headline.",
+        f"A highly-stylized digital smartphone screen mock-up showing a break-news notification with the text '{keyword}'.",
+        f"A minimalist corporate presentation slide with a large, clean bold heading that says '{keyword}' in high contrast color.",
+        f"A futuristic holograph interface projects the primary focus word '{keyword}' with dynamic cyber background.",
+        f"An editorial newspaper layout concept where the central headline boldly reads '{keyword}' in a premium retro look."
+    ]
+    selected_thumb_style_ko = random.choice(thumbnail_styles_ko)
+
     tone_style = "의학 박사 학위 소지자이자 건강 보건 전문 평론가"
     if is_news_site:
         tone_style = "깊이 있는 통찰력을 갖춘 대한민국 최고의 시사 종합 저널리스트"
@@ -179,7 +185,13 @@ def build_prompt_ko(keyword, style="news", is_news_site=False):
 아래 지침을 100% 충족하는 워드프레스 본문용 HTML 기사를 작성하세요.
 
 [주제어]: {keyword}
-[스타일]: 신문 기사 및 객관적 사실 기반 논평체
+
+══════════════════════════
+[썸네일 이미지 자동 텍스트 디자인 지침]
+══════════════════════════
+- 본문에 삽입될 첫 번째 이미지 마커는 반드시 SNS 및 포털 클릭률을 폭발시키는 후킹성 타이포 썸네일이어야 합니다.
+- 첫 번째 이미지의 영문 검색 쿼리 지시어는 무조건 다음 설정을 반영하여 작성하십시오: "{selected_thumb_style_ko}"
+- 쿼리 내부에 핵심 단어인 '{keyword}'가 텍스트 형태로 선명하게 강조되도록 유도하십시오.
 
 ══════════════════════════
 [GEMS SEO 및 모바일 거미줄 가독성 지침]
@@ -188,23 +200,22 @@ def build_prompt_ko(keyword, style="news", is_news_site=False):
 1. 모바일 독자 최적화 레이아웃 (★최우선 필수 지침)
 - 모든 문장은 극도로 짧게 끊어서 배치해야 합니다.
 - 하나의 문단(<p> 태그) 내부에는 무조건 단 1개의 문장만 넣습니다.
-- 문단과 문단 사이에는 반드시 본문 소스코드 상에 명확하게 '한 줄 이상의 공백 빈 줄'을 두어 시각적 여백을 확보하십시오.
+- 문단과 문단 사이에는 반드시 본문 소스코드 상에 명확하게 '한 줄 이상의 공백 빈 줄'을 두십시오.
 
 2. 거미줄 네트워크 링크 시스템
-- 내부링크 매칭: 현재 사이트 도메인인 {current_domain} 내부의 가상 서브 주소 형태 2개 이상을 키워드에 하이퍼링크 처리하십시오.
-- 네트워크 거미줄 링크 백링크: 자매 네트워크인 {sister_domain}의 주소로 연결되는 아웃바운드 하이퍼링크를 최소 1개 이상 앵커 텍스트로 자연스럽게 심어주십시오. (예시 앵커: {anchor_hint})
+- 내부링크 매칭: 현재 사이트 도메인인 {current_domain} 내부 서브 주소 2개 하이퍼링크 처리.
+- 네트워크 백링크: 자매 네트워크인 {sister_domain}의 주소로 연결되는 아웃바운드 링크 1개 이상 배치.
 
-3. 전문성 구현 및 필수 조건
-- 본문 전체 분량은 HTML 코드를 포함하여 공백 제외 최소 2,500자 이상으로 작성하십시오.
-- 공신력을 높여주는 정확한 수치나 통계 지표 데이터를 최소 3개 이상 반드시 포함시키십시오.
-- H2 태그 5개 이상, H3 태그 8개 이상을 사용하여 단락을 입체적으로 구조화하십시오 (H1 태그 절대 금지).
-- 신뢰성 높은 외부 출처 링크를 5개 이상 연동하십시오.
-- 2개 이상의 요약 데이터 표(Table)와 핵심 어휘 <strong> 태그 강조 처리를 진행하십시오.
-- 이미지 마커 3곳 삽입: - FAQ 5쌍 모듈(주석으로 시작)을 본문 내에 구성하십시오.
+3. 전문성 구현 및 후킹성 타이틀
+- TITLE(제목)은 단순 정보 나열이 아닌, "2026년 충격", "아무도 모르는 Top 5", "당신이 몰랐던 비밀" 등 모바일 유저가 즉시 클릭하고 싶게 만드는 강력한 어그로/후킹성 문구로 조형하십시오.
+- 본문 전체 분량은 공백 제외 최소 2,500자 이상.
+- H2 태그 5개 이상, H3 태그 8개 이상 구조화 (H1 태그 절대 금지).
+- 2개 이상의 요약 데이터 표(Table)와 <strong> 태그 강조 처리.
+- 이미지 마커 3곳 삽입: - FAQ 5쌍 모듈(주석으로 시작)을 구성하십시오.
 
 [출력 형식]
 첫째줄: TITLE: [제목]
-둘째줄: 셋째줄: 넷째줄: 다섯째줄부터: 본문 HTML 소스 코드 (상기 모바일 분절 가독성 및 공백 라인 규칙 철저히 이행)"""
+둘째줄: 셋째줄: 넷째줄: 다섯째줄부터: 본문 HTML 소스 코드"""
 
 
 def call_qwen(prompt):
@@ -290,7 +301,6 @@ def process_content(raw, site_url):
                     f'color:#666;">{img["credit"]}</figcaption></figure>')
         return f'<p><em>[Image: {alt}]</em></p>'
 
-    # 🛠️ 수정한 부분: 대소문자 무관 정규식 그룹() 패턴 매칭 및 예외 방어 완료
     content = re.sub(r'\s*', img_replacer, content, flags=re.DOTALL | re.IGNORECASE)
 
     if "SCHEMA_FAQ" in content:
@@ -432,17 +442,8 @@ def get_today_keywords(all_kws, daily_limit):
 
 def process_site(site, results_list, lock):
     domain = get_domain(site["url"])
-    
-    if domain == "k-health365.com":
-        lang = "ko"
-        is_news_site = False
-    elif domain == "koreanews365.com":
-        lang = "ko"
-        is_news_site = True
-    else:
-        lang = "en"
-        is_news_site = False
-
+    lang = site["lang"]
+    is_news_site = (domain == "koreanews365.com")
     style = site.get("style", "blog")
 
     all_kws = load_or_create_keywords(site["keywords_file"])
@@ -465,7 +466,6 @@ def process_site(site, results_list, lock):
         else:
             prompt = build_prompt_en(kw, site["theme"], site["url"], internal_refs, min_c, max_c, site.get("adsense", False), style)
 
-        # Qwen API 엔진 가동
         raw = call_qwen(prompt)
         if not raw:
             row = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "site": domain, "keyword": kw, "status": "❌ FAIL", "reason": "Qwen API error", "seo_score": 0, "post_url": ""}
@@ -526,4 +526,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()     
+    main()   
