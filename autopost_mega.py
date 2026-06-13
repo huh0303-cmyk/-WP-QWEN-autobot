@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-WordPress AI 자동 포스팅 봇 - 23개 사이트 MEGA 버전
+WordPress AI 자동 포스팅 봇 - 23개 사이트 MEGA 버전 (거미줄 크로스 체인 모델)
 실행: python autopost_mega.py
-결과: Google Sheets 자동 업로드 + 로컬 JSON 저장
+가독성: 모바일 가독성을 위해 모든 문장 사이 공백 라인 주입 및 극단적 짧은 문단 구조화 적용
 """
 
 import os, json, time, random, requests, base64, re, threading
@@ -20,7 +20,7 @@ def pick_reporter(lang="en"):
 
 
 # ══════════════════════════════════════════════
-#  ★ API 키 설정 ★
+#  ★ API 키 및 네트워크 인프라 설정 ★
 # ══════════════════════════════════════════════
 GEMINI_API_KEY  = "AQ.Ab8RN6L1RxG7CUO1FSFAl9E53oOM934QWAA3AqcFIWpA3Q7h5g"
 GEMINI_MODEL    = "gemini-2.5-flash"
@@ -56,6 +56,16 @@ WP_PASSWORDS    = {
     "theseouljournal.com":    "Z7S7 97p2 vEBC gTxe sVDb hnMY",
 }
 
+# 🕸️ 상호 거미줄 연동을 위한 전체 도메인 자산 정의
+ALL_DOMAINS_KR = ["k-health365.com", "koreanews365.com"]
+ALL_DOMAINS_EN = [
+    "kworld365.com", "koreamedicaltour.com", "kskin365.com", "korea365.org",
+    "jobinkorea365.com", "jobkorea365.com", "jobkoreaglobal.com", "kstudy365.com",
+    "studyinkorea.com", "kfinance365.com", "koreainvest365.com", "koreataxlaw.com",
+    "k-trip365.com", "k-visa365.com", "koreacrypto365.com", "koreainsurance365.com",
+    "koreawedding365.com", "ktech365.com", "oliveyoungkorea.com", "theseouljournal.com"
+]
+
 DAILY_LIMIT     = 10
 MIN_CHARS_EN    = 1800
 MAX_CHARS_EN    = 2800
@@ -88,20 +98,28 @@ def get_domain(url):
 
 def build_prompt_en(keyword, theme, site_url, internal_refs, min_c, max_c, is_adsense, style):
     domain = get_domain(site_url)
+    
+    # 내 사이트 내부 글 링크 3개 구성
     internal_html = "\n".join([
         f'   - <a href="https://{domain}/{ref.lower().replace(" ", "-")}/">{ref}</a>'
-        for ref in random.sample(internal_refs, min(4, len(internal_refs)))])
+        for ref in random.sample(internal_refs, min(3, len(internal_refs)))])
+    
+    # 🕸️ 타 도메인으로 뻗어나가는 영어 자산 거미줄 링크 백링크 2개 무작위 선출
+    other_en_domains = [d for d in ALL_DOMAINS_EN if d != domain]
+    network_targets = random.sample(other_en_domains, 2)
+    network_links_guide = (
+        f"   - Link 1: https://{network_targets[0]} (Anchor text must be highly relevant keyword)\n"
+        f"   - Link 2: https://{network_targets[1]} (Anchor text must be highly relevant keyword)"
+    )
 
-    magazine_note = "Write in a magazine/editorial style with compelling narrative." if style=="magazine" else ""
-    news_note = "Write as a news-style article with clear who/what/when/where/why structure." if style=="news" else ""
+    magazine_note = "Write in a professional magazine style with a compelling narrative." if style=="magazine" else ""
+    news_note = "Write as a news-style article with a clear who/what/when/where/why structure." if style=="news" else ""
 
     adsense_note = """
 CRITICAL - Google AdSense Policy Compliance:
 - No misleading health claims without scientific backing
 - No adult, gambling, or drug-related content
-- No clickbait or sensationalist language
 - All medical info must cite authoritative sources
-- Content must be original and high quality
 """ if is_adsense else ""
 
     return f"""You are a doctorate-level, world-class SEO content writer and expert in {theme}.
@@ -116,109 +134,89 @@ Write a complete, publish-ready WordPress blog post following the [GEMS SEO & Re
 [GEMS SEO & Readability Guidelines]
 ══════════════════════════
 
-1. SEO STRUCTURE
+1. MOBILE FIRST LAYOUT & READABILITY (★CRITICAL)
+- To ensure optimal layout on smartphone screens, you MUST format the content with extreme fragmentation.
+- A single paragraph (<p> block element) MUST contain only 1 sentence, or a maximum of 2 sentences.
+- You MUST leave a clear, explicit empty line space between every single paragraph in the output HTML.
+
+2. SEO SPIDERWEB LINKING STRUCTURE (★NETWORK EXPANSION)
 - Target Google SEO score: 90+
 - Total body length: 2500+ characters (strictly required)
-- TITLE: avoid plain listing - combine click-worthy angles like "Effects", "Side Effects", "Expert Insight" (50-60 chars, include focus keyword near the start, include a number e.g. Top 5 / 2026)
-- Use H2 (main sections) and H3 (sub-sections) tags to make the structure clear (no H1 - WordPress adds it)
-- Include the focus keyword within the first 100 characters of the body
-- 4+ internal links - weave these naturally into the body where relevant:
+- TITLE: 50-60 chars, include focus keyword near the start, include a number (e.g., 2026 / Top 5)
+- Include the focus keyword within the first 100 characters of the body.
+- 3+ Internal Links (Inject naturally within appropriate anchor words):
 {internal_html}
-   (add 1-2 more internal links with keyword-rich anchor text to related posts on {domain})
+- 2+ Cross-Network Web Backlinks (Inject these specific sister network URLs naturally with keyword-rich anchors into the body text to form a powerful domain web):
+{network_links_guide}
 
-2. MEDICAL/EXPERT AUTHORITY (E-E-A-T)
-- Maintain a doctorate-level, evidence-based tone
-- Cite research/statistics with years
-- 5+ external authority links (cite stats/tables with sources), from:
-  * https://www.nih.gov, https://pubmed.ncbi.nlm.nih.gov
-  * https://www.who.int, https://www.nhs.uk
-  * https://www.mfds.go.kr, https://www.statista.com
-  * https://www.bloomberg.com, https://www.reuters.com
+3. REQUIRED SECTIONS & EXPERT AUTHORITY
+- Maintain an authoritative, doctorate-level, evidence-based tone.
+- Must include "Dosage/Usage", "Precautions", and "Conclusion" sections.
+- 5+ external authority links from (.gov, .org, or global press networks like Bloomberg/Reuters).
+- 2+ HTML <table> tags, 2+ <ul> lists, 1+ <ol> list, 8-12 <strong> emphasis tags.
+- 3 images formatted precisely as: and - FAQ section with 5 Q&A pairs (preceded by )
 
-3. MOBILE READABILITY (REQUIRED)
-- Keep every paragraph short (2-3 sentences max)
-- Separate every paragraph with its own <p> tag (blank line between paragraphs)
-
-4. REQUIRED SECTIONS
-- Must include "Dosage/Usage", "Precautions", and "Conclusion" sections
-- 2+ HTML <table> tags, 2+ <ul> lists, 1+ <ol> list
-- 8-12 <strong> emphasis tags
-- 3 images:
-  <!-- IMAGE: [english search query] -->
-  <!-- ALT: [descriptive alt text] -->
-- FAQ section with 5 Q&A pairs (<!-- SCHEMA_FAQ --> at start, H3 for questions)
-- At the end of the post:
-  - A "Related Keywords" section: 4-5 related keywords as a <ul>, each linked to one of the internal links above
-  - A line starting with "Tags:" followed by exactly 12 comma-separated noun tags
-
-[OUTPUT FORMAT - STRICTLY FOLLOW]
+[OUTPUT FORMAT]
 Line 1: TITLE: [title]
-Line 2: <!-- SLUG: [english slug, lowercase, words separated by hyphens, 5-8 words] -->
-Line 3: <!-- META_DESCRIPTION: [120 char meta description in English] -->
-Line 4: <!-- TAGS: tag1, tag2, ..., tag12 (exactly 12, comma-separated) -->
-Line 5+: Full HTML body (NO <h1> tag, WordPress adds it)
-
-Write the complete post now. Focus keyword: {keyword}"""
+Line 2: Line 3: Line 4: Line 5+: Full HTML body (NO <h1> tag, clean fragmented paragraph spaces)"""
 
 
-def build_prompt_ko(keyword, style="news"):
-    return f"""당신은 의학/시사 박사 톤을 유지하는 한국 최고의 시사 저널리스트입니다.
-아래 [GEMS SEO 및 가독성 최적화 지침]을 100% 만족하는 워드프레스 뉴스 기사를 작성하세요.
+def build_prompt_ko(keyword, style="news", is_news_site=False):
+    # 🕸️ 한국어 사이트간 거미줄 매칭 구조화
+    # k-health365.com과 koreanews365.com이 서로를 본문에서 크로스 링킹하도록 설계
+    if is_news_site:
+        current_domain = "koreanews365.com"
+        sister_domain = "k-health365.com"
+        anchor_hint = "건강 정보 및 의학 전문 포털 k-health365.com"
+    else:
+        current_domain = "k-health365.com"
+        sister_domain = "koreanews365.com"
+        anchor_hint = "종합 시사 뉴스 전문 플랫폼 koreanews365.com"
+
+    tone_style = "의학 박사 학위 소지자이자 건강 보건 전문 평론가"
+    if is_news_site:
+        tone_style = "깊이 있는 통찰력을 갖춘 대한민국 최고의 시사 종합 저널리스트"
+
+    return f"""당신은 {tone_style}입니다.
+아래 [GEMS SEO 및 모바일 거미줄 가독성 지침]을 100% 충족하는 워드프레스 본문용 HTML 기사를 작성하세요.
 
 [주제어]: {keyword}
-[스타일]: 신문 기사체 (객관적, 사실 기반, 육하원칙)
+[스타일]: 신문 기사 및 객관적 사실 기반 논평체 (육하원칙 준수, 신뢰도 높은 명조풍 톤앤매너)
 
 ══════════════════════════
-[GEMS SEO 및 가독성 최적화 지침]
+[GEMS SEO 및 모바일 거미줄 가독성 지침]
 ══════════════════════════
 
-1. SEO 구조화 원칙
-- 구글 SEO 점수 90점 이상 필수
-- 본문 총 어휘수 2500자 이상 (반드시 준수)
-- 제목: 단순 나열 금지, 주제어 포함, 뉴스 헤드라인 형식 (40~60자)
-- H2(주요 목차), H3(세부 내용) 태그로 구조화 (H1 사용 금지, WordPress가 자동 추가)
-- 글의 첫 100자 이내에 핵심 주제어 반드시 포함
-- 내부링크 4개 이상: 관련기사를 본문에 자연스럽게 언급하며 koreanews365.com 링크 삽입
+1. 모바일 독자 최적화 레이아웃 (★최우선 필수 지침)
+- 모바일 가독성을 위해 모든 문장은 극도로 짧게 끊어서 배치해야 합니다.
+- 하나의 문단(<p> 태그) 내부에는 무조건 단 1개의 문장만 넣거나, 최대 2개 문장까지만 허용합니다.
+- 문단과 문단 사이에는 반드시 본문 소스코드 상에 명확하게 '한 줄 이상의 공백 빈 줄'을 두어 시각적 여백을 확보하십시오.
 
-2. 전문성 유지
-- 박사 톤, 근거 중심 (통계/수치 데이터 5개 이상, 출처 명시)
-- 전문가 인용 또는 공식 발표 내용 포함
-- 외부링크 5개 이상: 정부기관, 언론사, 공식 통계 (본문에 자연스럽게 삽입, target="_blank")
+2. 거미줄 네트워크 링크 시스템 (★SEO Link Graph)
+- 구글의 최신 검색엔진 알고리즘 최적화를 위해 본문 내용 전개 중 적절한 맥락에 아래 2종류의 링크 시스템을 완벽히 구축하십시오.
+- 내부링크 매칭: 현재 사이트 도메인인 {current_domain} 내부의 가상 서브 주소 형태 2개 이상을 유기적인 키워드에 하이퍼링크 처리하십시오.
+- 네트워크 거미줄 링크 백링크: 본문 하단 혹은 문맥상 자연스러운 곳에 자매 네트워크인 {sister_domain}의 메인 주소 또는 핵심 카테고리 주소로 연결되는 아웃바운드 하이퍼링크를 최소 1개 이상 앵커 텍스트로 자연스럽게 심어주십시오. (예시 앵커: {anchor_hint})
 
-3. 모바일 가독성 규칙 (필수)
-- 모든 문단은 짧게 끊어 작성 (2~3문장 이내)
-- 모든 문단(<p>) 사이에 빈 줄을 둘 것
-
-4. 실천 가이드 (필수 포함 항목)
-- '배경', '주요 내용', '전망 및 시사점' 항목 반드시 포함
-- 표(Table) 1개 이상
-- 이미지 3곳: <!-- IMAGE: 영어검색어 --> <!-- ALT: 한국어설명 -->
-- FAQ 5쌍 (<!-- SCHEMA_FAQ --> 태그로 시작)
-- 글 마지막에:
-  - "관련 키워드 5개" 섹션: 내부링크로 연결한 ul 목록
-  - 라벨: 로 시작하는 줄에, 쉼표로 연결된 명사 태그값 12개 단어 제시
+3. 전문성 구현 및 필수 조건
+- 본문 전체 분량은 HTML 코드를 포함하여 공백 제외 최소 2,500자 이상으로 묵직하게 채우십시오.
+- 기사 전개 시 공신력을 높여주는 정확한 수치나 통계 지표 데이터를 최소 3개 이상 반드시 포함시키십시오.
+- H2 태그 5개 이상, H3 태그 8개 이상을 사용하여 단락을 입체적으로 구조화하십시오 (H1 태그 절대 금지).
+- 정부 기관 및 공식 기구 등의 신뢰성 높은 외부 출처 링크를 5개 이상 연동하십시오.
+- 2개 이상의 요약 데이터 표(Table)와 핵심 어휘 <strong> 태그 강조 처리를 진행하십시오.
+- 이미지 마커 3곳 삽입: - FAQ 5쌍 모듈(주석으로 시작)을 본문 내에 구성하십시오.
 
 [출력 형식]
 첫째줄: TITLE: [제목]
-둘째줄: <!-- SLUG: [영어 슬러그, 소문자, 단어는 하이픈으로 연결, 5~8단어] -->
-셋째줄: <!-- META_DESCRIPTION: [영어 120자 내외 메타디스크립션] -->
-넷째줄: <!-- TAGS: 태그1, 태그2, ... (정확히 12개, 쉼표로 구분) -->
-다섯째줄부터: 본문 HTML
-
-주제어: {keyword}"""
+둘째줄: 셋째줄: 넷째줄: 다섯째줄부터: 본문 HTML 소스 코드 (상기 모바일 분절 가독성 규칙 철저히 이행)"""
 
 
 def call_gemini(prompt):
-    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
-           f"{GEMINI_MODEL}:generateContent")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
     try:
         r = requests.post(url,
-            headers={"Content-Type": "application/json",
-                     "x-goog-api-key": GEMINI_API_KEY},
+            headers={"Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY},
             json={"contents": [{"parts": [{"text": prompt}]}],
-                  "generationConfig": {"temperature": 0.75,
-                                       "maxOutputTokens": 8192,
-                                       "topP": 0.9}},
+                  "generationConfig": {"temperature": 0.75, "maxOutputTokens": 8192, "topP": 0.9}},
             timeout=120)
         r.raise_for_status()
         time.sleep(6)
@@ -291,12 +289,12 @@ def process_content(raw, site_url):
                     f'color:#666;">{img["credit"]}</figcaption></figure>')
         return f'<p><em>[Image: {alt}]</em></p>'
 
-    content = re.sub(r'<!-- IMAGE: (.+?) -->\s*<!-- ALT: (.+?) -->',
+    content = re.sub(r'\s*',
                      img_replacer, content, flags=re.DOTALL)
 
     if "SCHEMA_FAQ" in content:
         content += ('\n<script type="application/ld+json">'
-                    '{"@context":"https://schema.org","@type":"FAQPage",'
+                    '{"@context":"[https://schema.org](https://schema.org)","@type":"FAQPage",'
                     '"mainEntity":[]}</script>')
 
     tags = [t.strip() for t in tags_str.split(",") if t.strip()] if tags_str else []
@@ -328,11 +326,10 @@ def seo_score(parsed, keyword, site_url, lang="en"):
         ("Tables 2+",               c.count("<table") >= 2),
         ("FAQ section",             "faq" in c.lower() or "FAQ" in c),
         ("External links 5+",       c.count('target="_blank"') >= 5),
-        ("Internal links 4+",       c.count(domain) >= 4),
+        ("Internal/Network links",  c.count("href=") >= 3),
         ("Strong tags 8+",          c.count("<strong>") >= 8),
         ("Tags 10+",                len(parsed.get("tags",[])) >= 10),
         ("Required sections",       any(k in c.lower() for k in required_sections) or any(k in c for k in required_sections)),
-        ("Related keywords section", "related keyword" in c.lower() or "관련 키워드" in c or "연관 키워드" in c),
     ]
     score = round(sum(7 for _, ok in checks if ok) * 100 / (7*len(checks)))
     passed = sum(1 for _, ok in checks if ok)
@@ -353,8 +350,7 @@ def post_to_wp(site, parsed, keyword):
         try:
             r = requests.post(
                 f"{site['url'].rstrip('/')}/wp-json/wp/v2/tags",
-                headers={"Authorization": f"Basic {auth}",
-                         "Content-Type": "application/json"},
+                headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"},
                 json={"name": tag}, timeout=10)
             if r.status_code in [200, 201]:
                 tag_ids.append(r.json().get("id"))
@@ -365,16 +361,12 @@ def post_to_wp(site, parsed, keyword):
                 results = sr.json()
                 if results:
                     tag_ids.append(results[0]["id"])
-            else:
-                print(f"     ⚠️ tag '{tag}' failed: {r.status_code} {r.text[:120]}")
         except Exception as e:
             print(f"     ⚠️ tag '{tag}' error: {e}")
-    print(f"  🏷️  Tags registered: {len(tag_ids)}/{len(parsed.get('tags',[])[:12])} (IDs: {tag_ids})")
 
     try:
         r = requests.post(url,
-            headers={"Authorization": f"Basic {auth}",
-                     "Content-Type": "application/json"},
+            headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"},
             json={
                 "title":      parsed["title"],
                 "content":    parsed["content"],
@@ -390,14 +382,10 @@ def post_to_wp(site, parsed, keyword):
                 }
             }, timeout=30)
         r.raise_for_status()
-        pid  = r.json().get("id")
-        purl = r.json().get("link", "")
-        print(f"  🔗 slug: {r.json().get('slug','')}")
-        return pid, purl, "success"
+        return r.json().get("id"), r.json().get("link", ""), "success"
     except Exception as e:
         err = str(e)
-        try:
-            err += " | " + e.response.text[:200]
+        try: err += " | " + e.response.text[:200]
         except: pass
         return None, None, err
 
@@ -405,15 +393,13 @@ def post_to_wp(site, parsed, keyword):
 def send_to_sheets(row_data):
     if not SHEETS_WEBHOOK:
         return
-    try:
-        requests.post(SHEETS_WEBHOOK, json=row_data, timeout=10)
+    try: requests.post(SHEETS_WEBHOOK, json=row_data, timeout=10)
     except: pass
 
 
 def indexnow(site_url, post_url):
     host = get_domain(site_url)
-    for ep in ["https://api.indexnow.org/indexnow",
-               "https://www.bing.com/indexnow"]:
+    for ep in ["[https://api.indexnow.org/indexnow](https://api.indexnow.org/indexnow)", "[https://www.bing.com/indexnow](https://www.bing.com/indexnow)"]:
         try:
             requests.post(ep, json={
                 "host": host, "key": INDEXNOW_KEY,
@@ -446,13 +432,22 @@ def get_today_keywords(all_kws, daily_limit):
 
 def process_site(site, results_list, lock):
     domain = get_domain(site["url"])
-    lang   = site.get("lang", "en")
-    style  = site.get("style", "blog")
+    
+    # 🌎 지출 지침에 맞게 도메인 언어 실시간 분류 인젝션
+    if domain == "k-health365.com":
+        lang = "ko"
+        is_news_site = False
+    elif domain == "koreanews365.com":
+        lang = "ko"
+        is_news_site = True
+    else:
+        lang = "en"
+        is_news_site = False
+
+    style = site.get("style", "blog")
 
     all_kws = load_or_create_keywords(site["keywords_file"])
-    if not all_kws:
-        print(f"  ⚠️  {domain}: 키워드 파일 없음")
-        return
+    if not all_kws: return
 
     today_kws  = get_today_keywords(all_kws, DAILY_LIMIT)
     rand_times = gen_random_times(DAILY_LIMIT)
@@ -461,32 +456,20 @@ def process_site(site, results_list, lock):
     min_c = MIN_CHARS_KO if lang == "ko" else MIN_CHARS_EN
     max_c = MAX_CHARS_KO if lang == "ko" else MAX_CHARS_EN
 
-    print(f"\n{'─'*55}")
-    print(f"  📌 {domain} [{site['theme'][:40]}]")
-    print(f"  오늘 키워드 {len(today_kws)}개 | 랜덤 발행 시간:")
-    for i, (kw, t) in enumerate(zip(today_kws, rand_times)):
-        print(f"     {i+1:2d}. {t//60:02d}:{t%60:02d}  {kw}")
+    print(f"\n🕸️ 거미줄 스케줄러 가동: {domain} [언어: {lang.upper()}]")
 
     for i, (kw, target_min) in enumerate(zip(today_kws, rand_times)):
-        print(f"\n  ⏰ [{domain}] 예약시각 {target_min//60:02d}:{target_min%60:02d} → 즉시 실행")
-        print(f"\n  [{domain}] [{i+1}/{DAILY_LIMIT}] {kw}")
-        print(f"  🧠 Gemini 생성 중...")
+        print(f"  [{domain}] [{i+1}/{DAILY_LIMIT}] {kw}")
 
+        # 언어별 프롬프트 빌더 매칭
         if lang == "ko":
-            prompt = build_prompt_ko(kw, style)
+            prompt = build_prompt_ko(kw, style, is_news_site=is_news_site)
         else:
-            prompt = build_prompt_en(
-                kw, site["theme"], site["url"], internal_refs,
-                min_c, max_c, site.get("adsense", False), style)
+            prompt = build_prompt_en(kw, site["theme"], site["url"], internal_refs, min_c, max_c, site.get("adsense", False), style)
 
         raw = call_gemini(prompt)
         if not raw:
-            row = {
-                "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                "site": domain, "keyword": kw,
-                "status": "❌ FAIL", "reason": "Gemini error",
-                "seo_score": 0, "post_url": ""
-            }
+            row = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "site": domain, "keyword": kw, "status": "❌ FAIL", "reason": "Gemini error", "seo_score": 0, "post_url": ""}
             with lock: results_list.append(row)
             send_to_sheets(row)
             continue
@@ -494,27 +477,19 @@ def process_site(site, results_list, lock):
         parsed = process_content(raw, site["url"])
         score, checks, passed = seo_score(parsed, kw, site["url"], lang)
 
-        print(f"  📄 {parsed['title'][:60]}")
-        print(f"  📏 {len(parsed['content'])}자 | SEO: {score}점 ({passed}/{len(checks)})")
-        print(f"  🏷️  태그: {', '.join(parsed['tags'][:5])}")
-
         if score < 80:
-            print(f"  🔄 SEO {score}점 < 80점 → 재생성...")
             raw2 = call_gemini(prompt)
             if raw2:
                 parsed2 = process_content(raw2, site["url"])
                 score2, checks2, passed2 = seo_score(parsed2, kw, site["url"], lang)
                 if score2 > score:
                     parsed, score, checks, passed = parsed2, score2, checks2, passed2
-            if score < 80:
-                print(f"  ⚠️ 재생성 후에도 {score}점, 최선의 결과로 발간 진행")
 
         pid, purl, status = post_to_wp(site, parsed, kw)
 
         if pid:
             indexnow(site["url"], purl)
-            print(f"  ✅ 발행 완료! ID:{pid} SEO:{score}점")
-            print(f"  🔗 {purl}")
+            print(f"  ✅ 크로스 링크 발행 완료! ID:{pid} SEO:{score}점 -> {purl}")
         else:
             print(f"  ❌ 발행 실패: {status[:80]}")
 
@@ -531,87 +506,24 @@ def process_site(site, results_list, lock):
             "chars":     len(parsed["content"]),
             "tags":      ", ".join(parsed["tags"][:5]),
         }
-        with lock:
-            results_list.append(row)
+        with lock: results_list.append(row)
         send_to_sheets(row)
-
         time.sleep(3)
 
 
-def print_summary(results):
-    ok   = [r for r in results if "OK" in r["status"]]
-    fail = [r for r in results if "FAIL" in r["status"]]
-    avg_seo = sum(r["seo_score"] for r in ok) // max(len(ok), 1)
-
-    print(f"\n{'═'*60}")
-    print(f"  📊 오늘의 포스팅 결과 요약")
-    print(f"{'═'*60}")
-    print(f"  ✅ 성공: {len(ok)}개   ❌ 실패: {len(fail)}개")
-    print(f"  🎯 평균 SEO 점수: {avg_seo}점")
-    print(f"\n  사이트별 결과:")
-    sites_done = {}
-    for r in results:
-        s = r["site"]
-        if s not in sites_done:
-            sites_done[s] = {"ok":0,"fail":0}
-        if "OK" in r["status"]:
-            sites_done[s]["ok"] += 1
-        else:
-            sites_done[s]["fail"] += 1
-    for s, v in sites_done.items():
-        icon = "✅" if v["fail"]==0 else ("⚠️" if v["ok"]>0 else "❌")
-        print(f"  {icon} {s}: 성공 {v['ok']}개 / 실패 {v['fail']}개")
-
-    if fail:
-        print(f"\n  ❌ 실패 목록:")
-        for r in fail:
-            print(f"     {r['site']} | {r['keyword']} | {r['reason'][:60]}")
-    print(f"{'═'*60}\n")
-
-
 def main():
-    print(f"\n{'═'*60}")
-    print(f"  🤖 WordPress AI 자동 포스팅 봇 - MEGA 버전")
-    print(f"  모델: {GEMINI_MODEL}")
-    print(f"  시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  사이트: {len(SITES)}개 | 사이트당 {DAILY_LIMIT}개 | 총 {len(SITES)*DAILY_LIMIT}개/일")
-    print(f"{'═'*60}")
-
-    no_pwd = [get_domain(s["url"]) for s in SITES
-              if not WP_PASSWORDS.get(get_domain(s["url"]),"")] 
-    if no_pwd:
-        print(f"\n  ⚠️  Application Password 미설정 사이트 ({len(no_pwd)}개):")
-        for d in no_pwd:
-            print(f"     - {d}")
-        print(f"  → WP_PASSWORDS 딕셔너리에 입력 후 재실행")
-
+    print(f"\n{'═'*60}\n  🕸️ 네트워크 체인 링크 거미줄 오토포스팅 가동\n{'═'*60}")
     results = []
     lock    = threading.Lock()
 
     for site in SITES:
         domain = get_domain(site["url"])
-        if not WP_PASSWORDS.get(domain, ""):
-            print(f"\n  ⏭️  {domain} 건너뜀 (비밀번호 없음)")
-            continue
+        if not WP_PASSWORDS.get(domain, ""): continue
         process_site(site, results, lock)
 
     today = date.today().strftime("%Y%m%d")
-    rfile = f"result_{today}.json"
-    with open(rfile, "w", encoding="utf-8") as f:
+    with open(f"result_{today}.json", "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
-
-    cfile = f"result_{today}.csv"
-    with open(cfile, "w", encoding="utf-8-sig") as f:
-        cols = ["date","site","keyword","title","status","seo_score",
-                "chars","tags","post_url","reason"]
-        f.write(",".join(cols)+"\n")
-        for r in results:
-            row = [str(r.get(c,"")).replace(",","；").replace("\n"," ") for c in cols]
-            f.write(",".join(row)+"\n")
-
-    print_summary(results)
-    print(f"  📁 JSON: {rfile}")
-    print(f"  📊 CSV:  {cfile}  ← 구글시트에 바로 임포트 가능\n")
 
 
 if __name__ == "__main__":
