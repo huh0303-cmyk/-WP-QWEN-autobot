@@ -3,8 +3,8 @@
 """
 koreanews365.com 한국어 뉴스봇
 - 9개 섹션 × 3개 = 하루 27개, 1라운드 실행 후 종료 (GitHub Actions용)
-- Gemini로 리라이팅
-- 가상 기자: 김민수, 박지아, 이현우, 최서연, 정도윤
+- Gemini로 리라이팅, 1000~1500자 신문 기사체
+- 기자풀 10명 (한국 5 + 외국 5, 영미식 성)
 """
 
 import os, json, time, random, requests, base64, re
@@ -20,12 +20,18 @@ WP_URL  = "https://koreanews365.com"
 WP_USER = "huh0303@gmail.com"
 WP_PASS = "dqn2 VR2L WaR0 sJmq GHeh fgYG"
 
+# ── 기자 풀 (한국 5명 + 외국 5명, 영미식 성) ──────────
 REPORTERS = [
     {"name": "김민수", "title": "정치·경제 전문기자"},
     {"name": "박지아", "title": "사회·문화 전문기자"},
     {"name": "이현우", "title": "국제·외교 전문기자"},
     {"name": "최서연", "title": "K컬처·라이프 전문기자"},
     {"name": "정도윤", "title": "산업·IT 전문기자"},
+    {"name": "Sarah Mitchell",  "title": "Senior Political Correspondent"},
+    {"name": "James Anderson",  "title": "Business & Economy Reporter"},
+    {"name": "Emily Carter",    "title": "Culture & Lifestyle Editor"},
+    {"name": "David Thompson",  "title": "International Affairs Correspondent"},
+    {"name": "Rachel Bennett",  "title": "Technology & Innovation Reporter"},
 ]
 
 SECTIONS = [
@@ -98,36 +104,47 @@ def get_news_items(section, count=5):
 
 def build_news_prompt(news_item, section, reporter):
     return f"""당신은 {reporter['name']} 기자({reporter['title']})입니다.
-아래 뉴스를 바탕으로 완전히 새로운 독창적인 기사를 작성하세요.
+아래 뉴스를 바탕으로 완전히 새로운 독창적인 신문 기사를 작성하세요.
 절대 원문을 그대로 복사하지 마세요. 완전히 새로운 문장으로 재작성하세요.
 
 [원본 뉴스 제목]: {news_item['title']}
 [원본 내용 요약]: {news_item['desc'][:300]}
 [섹션]: {section['name']}
 [기자]: {reporter['name']} ({reporter['title']})
-[목표 글자수]: 1500~2500자
 
-[기사 작성 조건]
-① 제목: 원본과 다른 새로운 헤드라인, 핵심 키워드 포함, 40~60자
-② 메타디스크립션: 120~155자 요약
-③ 리드문: 첫 문단에 5W1H 핵심 내용
-④ H2 4개이상, H3 각 2개이상
-⑤ 통계·수치 3개이상 (출처 명시)
-⑥ 전문가 또는 관계자 인용 (창작 가능)
-⑦ 외부링크 3개: 정부기관·공식사이트
-⑧ 내부링크 3개: koreanews365.com 관련 기사
-⑨ 표(Table) 1개이상
-⑩ 태그 8개: <!-- TAGS: 태그1, 태그2, ... -->
-⑪ 이미지 2곳: <!-- IMAGE: 영어검색어 --> <!-- ALT: 한국어설명 -->
-⑫ 기사 마무리: 전망 및 시사점
-⑬ 바이라인: <!-- BYLINE: {reporter['name']} {reporter['title']} -->
+══════════════════════════
+[GEMS 신문기사 작성 지침]
+══════════════════════════
+
+1. 분량 및 형식
+- 본문 1000~1500자 (반드시 준수, 진짜 신문 기사처럼 간결하고 핵심만)
+- 제목: 원본과 다른 새로운 헤드라인, 핵심 키워드 포함 (40~60자)
+- 첫 100자 이내(리드문)에 5W1H 핵심 내용 요약
+- H2 3개 이상, H3 각 1~2개
+
+2. 신문 기사체 원칙
+- 객관적, 사실 기반, 육하원칙
+- 통계·수치 3개 이상 (출처 명시)
+- 전문가 또는 관계자 인용 (창작 가능)
+- 모든 문단은 2~3문장 이내로 짧게, 문단 사이 빈 줄 유지 (모바일 가독성)
+
+3. 링크
+- 외부링크 3개: 정부기관·공식사이트 (target="_blank")
+- 내부링크 3개: koreanews365.com 관련 기사 (예: https://koreanews365.com/category/{section['slug']}/)
+
+4. 구성요소
+- 표(Table) 1개 이상
+- 태그 10개: <!-- TAGS: 태그1, 태그2, ... -->
+- 이미지 2곳: <!-- IMAGE: 영어검색어 --> <!-- ALT: 한국어설명 -->
+- 기사 마무리: '전망 및 시사점' 섹션
+- 바이라인: <!-- BYLINE: {reporter['name']} {reporter['title']} -->
 
 [출력 형식]
 첫째줄: TITLE: [제목]
-둘째줄: <!-- META_DESCRIPTION: [요약] -->
-셋째줄: <!-- TAGS: 태그1, 태그2, 태그3, 태그4, 태그5, 태그6, 태그7, 태그8 -->
+둘째줄: <!-- META_DESCRIPTION: [영어 120자 내외 요약] -->
+셋째줄: <!-- TAGS: 태그1, 태그2, ..., 태그10 (정확히 10개) -->
 넷째줄: <!-- BYLINE: {reporter['name']} {reporter['title']} -->
-다섯째줄부터: 본문 HTML"""
+다섯째줄부터: 본문 HTML (h1 태그 사용 금지)"""
 
 
 def call_gemini(prompt):
@@ -174,6 +191,11 @@ def get_image(query):
 
 
 def process_content(raw):
+    raw = raw.strip()
+    raw = re.sub(r'^```[a-zA-Z]*\n?', '', raw)
+    raw = re.sub(r'\n?```$', '', raw)
+    raw = raw.strip()
+
     lines  = raw.strip().split("\n")
     title  = ""
     meta   = ""
@@ -184,6 +206,8 @@ def process_content(raw):
     for i, line in enumerate(lines):
         if line.startswith("TITLE:"):
             title = line.replace("TITLE:", "").strip()
+            title = re.sub(r'^```[a-zA-Z]*\s*', '', title)
+            title = title.strip('`"\' ')
         if "META_DESCRIPTION:" in line:
             meta = line.split("META_DESCRIPTION:")[-1].replace("-->","").strip()
         if "TAGS:" in line:
@@ -209,8 +233,34 @@ def process_content(raw):
     if byline:
         content = f'<p class="byline" style="color:#666;font-size:13px;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:16px">✍️ {byline}</p>\n' + content
 
-    tags = [t.strip() for t in tags_s.split(",") if t.strip()]
+    tags = [t.strip() for t in tags_s.split(",") if t.strip()][:10]
     return {"title": title or "뉴스 기사", "meta": meta, "content": content, "tags": tags}
+
+
+def seo_score(parsed):
+    c, t, m = parsed["content"], parsed["title"], parsed["meta"]
+    checks = [
+        ("제목 존재",              len(t) >= 20),
+        ("메타디스크립션 80자+",  len(m) >= 80),
+        ("본문 1000자 이상",      len(c) >= 1000),
+        ("본문 1700자 이하",      len(c) <= 1700),
+        ("H2 3개 이상",           c.count("<h2") >= 3),
+        ("H3 1개 이상",           c.count("<h3") >= 1),
+        ("이미지+ALT",            "<img" in c and 'alt="' in c),
+        ("테이블 1개 이상",       c.count("<table") >= 1),
+        ("외부링크 3개 이상",     c.count('target="_blank"') >= 3),
+        ("내부링크 3개 이상",     c.count("koreanews365.com") >= 3),
+        ("바이라인",              "byline" in c.lower()),
+        ("태그 8개 이상",         len(parsed.get("tags", [])) >= 8),
+        ("전망 섹션",             "전망" in c or "시사점" in c),
+    ]
+    score = round(sum(100/len(checks) for _, ok in checks if ok))
+    passed = sum(1 for _, ok in checks if ok)
+    print(f"  ┌─ 품질 체크 ({passed}/{len(checks)}) ──────────────", flush=True)
+    for name, ok in checks:
+        print(f"  │ {'✅' if ok else '❌'} {name}", flush=True)
+    print(f"  └─ 점수: {score}점 {'🎉' if score >= 90 else '⚠️'}", flush=True)
+    return score
 
 
 def get_cat_id(slug):
@@ -234,7 +284,7 @@ def get_cat_id(slug):
 def post_to_wp(parsed, cat_id):
     auth = base64.b64encode(f"{WP_USER}:{WP_PASS}".encode()).decode()
     tag_ids = []
-    for tag in parsed.get("tags", [])[:8]:
+    for tag in parsed.get("tags", [])[:10]:
         try:
             r = requests.post(f"{WP_URL}/wp-json/wp/v2/tags",
                 headers={"Authorization": f"Basic {auth}",
@@ -278,7 +328,7 @@ def run_daily():
         print(f"  {sec['name']:10s} → 카테고리 ID: {sec['id']}")
 
     results = []
-    reporter_idx = 0
+    used_reporters = []
 
     for sec_i, section in enumerate(SECTIONS):
         print(f"\n\n  📌 섹션: [{section['name']}]")
@@ -297,8 +347,10 @@ def run_daily():
                 print(f"\n  ⏳ {gap//60}분 대기...")
                 time.sleep(gap)
 
-            reporter = REPORTERS[reporter_idx % len(REPORTERS)]
-            reporter_idx += 1
+            # 직전 글과 다른 기자를 랜덤 선택 (가능한 경우)
+            choices = [r for r in REPORTERS if r["name"] != (used_reporters[-1]["name"] if used_reporters else None)]
+            reporter = random.choice(choices)
+            used_reporters.append(reporter)
 
             print(f"\n  [{sec_i+1}/9] [{art_i+1}/{ARTICLES_PER_SECTION}] {section['name']}")
             print(f"  📰 원본: {news['title'][:50]}")
@@ -310,14 +362,27 @@ def run_daily():
                 continue
 
             parsed = process_content(raw)
+            score = seo_score(parsed)
+
+            if score < 80:
+                print("  🔄 80점 미만 → 재생성...", flush=True)
+                raw2 = call_gemini(build_news_prompt(news, section, reporter))
+                if raw2:
+                    parsed2 = process_content(raw2)
+                    score2 = seo_score(parsed2)
+                    if score2 > score:
+                        parsed, score = parsed2, score2
+                if score < 80:
+                    print(f"  ⚠️ 재생성 후에도 {score}점, 최선의 결과로 발행", flush=True)
+
             print(f"  📄 {parsed['title'][:55]}")
 
             pid, purl = post_to_wp(parsed, section["id"])
             if pid:
-                print(f"  ✅ 발행! ID:{pid}")
+                print(f"  ✅ 발행! ID:{pid} 품질:{score}점")
                 print(f"  🔗 {purl}")
                 results.append({"section": section["name"], "reporter": reporter["name"],
-                                "title": parsed["title"], "url": purl,
+                                "title": parsed["title"], "url": purl, "score": score,
                                 "time": datetime.now().strftime("%H:%M")})
 
         if sec_i < len(SECTIONS)-1:
