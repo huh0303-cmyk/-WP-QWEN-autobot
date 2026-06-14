@@ -17,20 +17,18 @@ import re
 import threading
 from datetime import datetime, date
 
+# 데이터 구조 선로드
+from sites_config import SITES
+from keywords_all import KEYWORDS
+
 # ══════════════════════════════════════════════
-#  ★ 인프라 핵심 도메인 파싱 유틸리티 ★
+#  ★ 인프라 핵심 도메인 파싱 및 내부 매칭 유틸리티 ★
 # ══════════════════════════════════════════════
 def get_domain(url):
     """URL에서 프로토콜과 슬래시를 제거하여 순수 도메인만 추출"""
     return url.replace("https://", "").replace("http://", "").rstrip("/")
 
-# ══════════════════════════════════════════════
-#  ★ 인프라 연동 및 외부 마스터 자산 설정 ★
-# ══════════════════════════════════════════════
-from sites_config import SITES
-from keywords_all import KEYWORDS
-
-# 시스템 내부 전역 연동을 위한 안전한 영어 도메인 마스터 리스트 빌드
+# sites_config.py에서 터지던 로직을 가장 안전한 이곳 메인 인프라 영역으로 회수
 ALL_DOMAINS_EN = [get_domain(s["url"]) for s in SITES if s.get("lang") == "en"]
 
 # ── 기자 풀 (랜덤 선택) ──────────────────────
@@ -56,7 +54,7 @@ SHEETS_WEBHOOK  = os.getenv("SHEETS_WEBHOOK", "")
 WP_USERNAME     = "huh0303@gmail.com"
 WP_PASSWORDS    = {
     "k-health365.com":        os.environ.get("WP_PASS", "A3sK VQud Xday 1ait Zl0d ZAA2"),
-    "koreamedicaltour.com":   os.environ.get("WP_PASS", "MSqZ PAhu UpBL 2B1W cDle 4DEO"),
+    "koreanews365.com":       os.environ.get("WP_PASS", "MSqZ PAhu UpBL 2B1W cDle 4DEO"),
     "kskin365.com":           os.environ.get("WP_PASS", "ZvM8 0Dj7 ByPL R27O DKia Hubg"),
     "korea365.org":           os.environ.get("WP_PASS", "g536 KsvK qiCY 9Ye0 U6pe bywR"),
     "jobinkorea365.com":      os.environ.get("WP_PASS", "PwYU 4sif FfeH dY5k Uv7v GnVM"),
@@ -106,10 +104,7 @@ def gen_random_times(n):
 
 
 def build_network_links_guide(current_url):
-    """
-    현재 도메인을 제외한 다른 영어 자산 인프라 중 최대 2개를 랜덤 매칭하여 
-    LLM 프롬프트용 백링크 지시 구조를 생성합니다 (IndexError 완전 차단 장치).
-    """
+    """현재 도메인을 제외한 타 도메인 백링크 매칭용 안전 가이드 생성기"""
     domain = get_domain(current_url)
     other_en_domains = [d for d in ALL_DOMAINS_EN if d != domain]
     
@@ -411,4 +406,147 @@ def post_to_wp(site, parsed, keyword):
                 "status":     "publish",
                 "categories": [site.get("category_id", 1)],
                 "tags":       tag_ids,
-                **({"
+                **({"slug": parsed["slug"]} if parsed.get("slug") else {}),
+                "meta": {
+                    "rank_math_focus_keyword": keyword,
+                    "rank_math_description":   parsed["meta"],
+                    "_yoast_wpseo_focuskw":    keyword,
+                    "_yoast_wpseo_metadesc":   parsed["meta"],
+                }
+            }, timeout=30)
+        r.raise_for_status()
+        return r.json().get("id"), r.json().get("link", ""), "success"
+    except Exception as e:
+        err = str(e)
+        try: err += " | " + e.response.text[:200]
+        except: pass
+        return None, None, err
+
+
+def send_to_sheets(row_data):
+    if not SHEETS_WEBHOOK:
+        return
+    try: requests.post(SHEETS_WEBHOOK, json=row_data, timeout=10)
+    except: pass
+
+
+def indexnow(site_url, post_url):
+    host = get_domain(site_url)
+    for ep in ["[https://api.indexnow.org/indexnow](https://api.indexnow.org/indexnow)", "[https://www.bing.com/indexnow](https://www.bing.com/indexnow)"]:
+        try:
+            requests.post(ep, json={
+                "host": host, "key": INDEXNOW_KEY,
+                "keyLocation": f"{site_url}/{INDEXNOW_KEY}.txt",
+                "urlList": [post_url]
+            }, timeout=10)
+        except: pass
+
+
+def load_or_create_keywords(filename):
+    if os.path.exists(filename):
+        with open(filename, encoding="utf-8") as f:
+            return [l.strip() for l in f if l.strip()]
+    raw = KEYWORDS.get(filename, "")
+    lines = [l.strip() for l in raw.strip().split("\n") if l.strip()]
+    if lines:
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+    return lines
+
+
+def get_today_keywords(all_kws, daily_limit):
+    day_of_year = date.today().timetuple().tm_yday
+    start = ((day_of_year - 1) * daily_limit) % max(len(all_kws), 1)
+    result = []
+    for i in range(daily_limit):
+        result.append(all_kws[(start + i) % len(all_kws)])
+    return result
+
+
+def process_site(site, results_list, lock):
+    domain = get_domain(site["url"])
+    lang = site["lang"]
+    is_news_site = (domain == "koreanews365.com")
+    style = site.get("style", "blog")
+
+    all_kws = load_or_create_keywords(site["keywords_file"])
+    if not all_kws: return
+
+    today_kws  = get_today_keywords(all_kws, DAILY_LIMIT)
+    rand_times = gen_random_times(DAILY_LIMIT)
+    internal_refs = random.sample(all_kws, min(7, len(all_kws)))
+
+    min_c = MIN_CHARS_KO if lang == "ko" else MIN_CHARS_EN
+    max_c = MAX_CHARS_KO if lang == "ko" else MAX_CHARS_EN
+
+    print(f"\n🕸️ 거미줄 스케줄러 가동: {domain} [언어: {lang.upper()}]")
+
+    for i, (kw, target_min) in enumerate(zip(today_kws, rand_times)):
+        print(f"  [{domain}] [{i+1}/{DAILY_LIMIT}] {kw}")
+
+        if lang == "ko":
+            prompt = build_prompt_ko(kw, style, is_news_site=is_news_site)
+        else:
+            prompt = build_prompt_en(kw, site["theme"], site["url"], internal_refs, min_c, max_c, site.get("adsense", False), style)
+
+        raw = call_qwen(prompt)
+        if not raw:
+            row = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "site": domain, "keyword": kw, "status": "❌ FAIL", "reason": "Qwen API error", "seo_score": 0, "post_url": ""}
+            with lock: results_list.append(row)
+            send_to_sheets(row)
+            continue
+
+        parsed = process_content(raw, site["url"])
+        score, checks, passed = seo_score(parsed, kw, site["url"], lang)
+
+        if score < 80:
+            raw2 = call_qwen(prompt)
+            if raw2:
+                parsed2 = process_content(raw2, site["url"])
+                score2, checks2, passed2 = seo_score(parsed2, kw, site["url"], lang)
+                if score2 > score:
+                    parsed, score, checks, passed = parsed2, score2, checks2, passed2
+
+        pid, purl, status = post_to_wp(site, parsed, kw)
+
+        if pid:
+            indexnow(site["url"], purl)
+            print(f"  ✅ 크로스 링크 발행 완료! ID:{pid} SEO:{score}점 -> {purl}")
+        else:
+            print(f"  ❌ 발행 실패: {status[:80]}")
+
+        row = {
+            "date":      datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "site":      domain,
+            "keyword":   kw,
+            "title":     parsed["title"][:80],
+            "status":    "✅ OK" if pid else "❌ FAIL",
+            "reason":    "" if pid else status[:100],
+            "seo_score": score,
+            "post_id":   str(pid or ""),
+            "post_url":  purl or "",
+            "chars":     len(parsed["content"]),
+            "tags":      ", ".join(parsed["tags"][:5]),
+        }
+        with lock: results_list.append(row)
+        send_to_sheets(row)
+        time.sleep(3)
+
+
+def main():
+    print(f"\n{'═'*60}\n  🕸️ 네트워크 체인 링크 거미줄 오토포스팅 가동\n{'═'*60}")
+    results = []
+    lock    = threading.Lock()
+
+    for site in SITES:
+        domain = get_domain(site["url"])
+        if not WP_PASSWORDS.get(domain, ""): continue
+        process_site(site, results, lock)
+
+    today = date.today().strftime("%Y%m%d")
+    with open(f"result_{today}.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+
+
+if __name__ == "__main__":
+    main()
