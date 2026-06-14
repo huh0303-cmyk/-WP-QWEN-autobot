@@ -1,14 +1,8 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 WordPress AI 자동 포스팅 봇 - HIGH-END MEGA 3중 백업 및 완벽 SEO 시스템
 [실시간 구글 스프레드시트 업데이트 연동 버전]
-- 1차 LLM: Groq Qwen-2.5-72b-instruct
-- 2차 LLM: Google Gemini 2.5 Flash (통신 및 한도 초과 백업)
-- 3차 LLM: 내장형 도메인 박사 정적 HTML 생성 시스템 (무조건 발행 보장)
-- 이미지 백업: Pixabay API 우선 검색 -> 실패 시 Pexels API 백업 호출
-- 루프 보장: SEO 평가 스코어 80점 미만 시 최대 3회 자동 재작성 및 피드백 루프 작동
-- 실시간 동기화: 발행 성공/실패 여부와 SEO 점수를 지정된 구글 시트 웹훅으로 실시간 전송
 """
 
 import os
@@ -21,18 +15,11 @@ import re
 import threading
 from datetime import datetime, date
 
-# OpenAI 라이브러리 안전 로드 및 초기화 오류 원천 차단
-try:
-    from openai import OpenAI
-except ImportError:
-    OpenAI = None
-
 # 데이터 구조 선로드 (환경에 맞게 파일이 없다면 예외처리 가동)
 try:
     from sites_config import SITES
     from keywords_all import KEYWORDS
 except ImportError:
-    # 모듈이 없을 경우를 대비한 하드코딩 기본 샘플 데이터셋 제공
     SITES = [
         {"url": "https://k-health365.com", "lang": "ko", "theme": "건강 및 의학 보건 정보", "keywords_file": "health_kw.txt", "category_id": 964, "style": "news"},
         {"url": "https://koreanews365.com", "lang": "ko", "theme": "시사 종합 및 라이프 뉴스", "keywords_file": "news_kw.txt", "category_id": 1, "style": "news"},
@@ -47,28 +34,27 @@ except ImportError:
 # ══════════════════════════════════════════════
 #  ★ 인프라 자산 인코딩 및 보안 변수 선언 ★
 # ══════════════════════════════════════════════
-QWEN_API_KEY    = os.environ.get("QWEN_API_KEY", "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")
-OPENAI_API_KEY  = os.environ.get("OPENAI_API_KEY", QWEN_API_KEY) # 내부 OpenAI 엔진용 우회 처리
+# 깃허브 시크릿이 없을 때를 대비한 안전망(Fallback) 키 세팅
+QWEN_API_KEY    = os.environ.get("QWEN_API_KEY") or "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"
 QWEN_MODEL      = "qwen-2.5-72b-instruct"
 QWEN_API_URL    = "https://api.groq.com/openai/v1/chat/completions"
 
-GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY", "AIzaSyD-Your-Actual-Gemini-Key-Here")
+GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY") or "AIzaSyD-Your-Actual-Gemini-Key-Here"
 GEMINI_MODEL    = "gemini-2.5-flash"
 
-PIXABAY_KEY     = os.environ.get("PIXABAY_KEY", "u_g0pmau3m85")
-PEXELS_KEY      = os.environ.get("PEXELS_KEY", "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8")
+PIXABAY_KEY     = os.environ.get("PIXABAY_KEY") or "u_g0pmau3m85"
+PEXELS_KEY      = os.environ.get("PEXELS_KEY") or "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
 INDEXNOW_KEY    = "khealth365indexnow2024"
 
-# 제공해주신atutobot 구글 스프레드시트와 연결된 Apps Script 웹훅 URL 앱 주소 입력
-SHEETS_WEBHOOK  = os.environ.get("SHEETS_WEBHOOK", "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOY_ID/exec")
+SHEETS_WEBHOOK  = os.environ.get("SHEETS_WEBHOOK") or "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOY_ID/exec"
 
 WP_USERNAME     = "huh0303@gmail.com"
 WP_PASS_DEFAULT = "A3sK VQud Xday 1ait Zl0d ZAA2"
 
 WP_PASSWORDS = {
-    "k-health365.com":        os.environ.get("WP_PASS_HEALTH", "A3sK VQud Xday 1ait Zl0d ZAA2"),
-    "koreanews365.com":       os.environ.get("WP_PASS_NEWS", "MSqZ PAhu UpBL 2B1W cDle 4DEO"),
-    "theseouljournal.com":    os.environ.get("WP_PASS_JOURNAL", "Z7S7 97p2 vEBC gTxe sVDb hnMY"),
+    "k-health365.com":        os.environ.get("WP_PASS_HEALTH") or "A3sK VQud Xday 1ait Zl0d ZAA2",
+    "koreanews365.com":       os.environ.get("WP_PASS_NEWS") or "MSqZ PAhu UpBL 2B1W cDle 4DEO",
+    "theseouljournal.com":    os.environ.get("WP_PASS_JOURNAL") or "Z7S7 97p2 vEBC gTxe sVDb hnMY",
 }
 
 DAILY_LIMIT     = 10
@@ -77,13 +63,7 @@ MIN_GAP_MIN     = 30
 REPORTER_POOL_KR = ["전문기자 김윤서", "전문기자 이현수", "수석기자 김상준", "전문기자 박지아", "전문기자 정도윤"]
 REPORTER_POOL_EN = ["Sarah Mitchell", "James Anderson", "Emily Carter", "David Thompson", "Rachel Bennett"]
 
-# OpenAI 클라이언트 안전 초기화 (에러 원인 제거)
-client_qwen = None
-if OpenAI is not None and OPENAI_API_KEY:
-    try:
-        client_qwen = OpenAI(api_key=OPENAI_API_KEY)
-    except Exception:
-        client_qwen = None
+# 에러가 나던 OpenAI 라이브러리 선언 방식을 100% 제거하고 순수 requests 방식으로 변경했습니다. (에러 원천 봉쇄)
 
 def get_domain(url):
     return url.replace("https://", "").replace("http://", "").rstrip("/")
@@ -136,7 +116,7 @@ def get_image_backup_system(query):
 #  ★ 3단계 분기 보장형 고성능 글쓰기 엔진 ★
 # ══════════════════════════════════════════════
 def call_writer_triple_engine(prompt, keyword, lang="ko", theme=""):
-    # 1차 엔진: Qwen API 호출
+    # 1차 엔진: Qwen API 호출 (임포트 에러 없는 순수 HTTP 통신 방식)
     try:
         headers = {"Authorization": f"Bearer {QWEN_API_KEY}", "Content-Type": "application/json"}
         payload = {
@@ -377,7 +357,6 @@ def process_single_site_automation(site, results_list, lock):
             status_log = "❌ CRITICAL_LLM_FAIL"
             purl = ""
 
-        # 스프레드시트 실시간 전송용 가공 로우 데이터 생성
         row_payload = {
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "domain": domain,
@@ -388,7 +367,6 @@ def process_single_site_automation(site, results_list, lock):
             "url": purl
         }
 
-        # 🎯 지정해주신 시트로 실시간 전송 트리거 가동
         send_to_google_sheets_live(row_payload)
 
         with lock:
