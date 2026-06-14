@@ -6,21 +6,18 @@ on:
 jobs:
   autopost:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 360
     steps:
     - name: 1. 코드 다운로드
       uses: actions/checkout@v4
-
     - name: 2. 파이썬 3.11 설치
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-
     - name: 3. 패키지 설치
       run: |
         python -m pip install --upgrade pip
         pip install requests google-generativeai groq
-
     - name: 4. 오토포스팅 실행
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -30,5 +27,24 @@ jobs:
         WP_PASS_HEALTH: ${{ secrets.WP_PASS_HEALTH }}
         WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
         WP_PASS_JOURNAL: ${{ secrets.WP_PASS_JOURNAL }}
+        KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+        KSKIN365COM: ${{ secrets.KSKIN365COM }}
+        KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+        JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+        JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+        KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+        STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+        KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+        KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+        KOREATAXNLAW365COM: ${{ secrets.KOREATAXNLAW365COM }}
+        KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        KVISA365COM: ${{ secrets.KVISA365COM }}
+        KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+        KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+        KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+        KTECH365COM: ${{ secrets.KTECH365COM }}
+        KWORLD365COM: ${{ secrets.KWORLD365COM }}
+        OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
       run: |
         python .github/workflows/autopost_mega.py
