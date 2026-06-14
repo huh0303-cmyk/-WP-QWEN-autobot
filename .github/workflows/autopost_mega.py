@@ -17,27 +17,28 @@ genai.configure(api_key=GEMINI_API_KEY)
 groq_client = Groq(api_key=GROK_API_KEY)
 
 SITES_CONFIG = [
-    {
-        "url": "https://k-health365.com",
-        "theme": "Health and Medicine",
-        "category_id": 1,
-        "keywords_file": ".github/workflows/keywords_khealth.txt",
-        "wp_pass_env": "WP_PASS_HEALTH"
-    },
-    {
-        "url": "https://koreanews365.com",
-        "theme": "Korea News and Current Affairs",
-        "category_id": 1,
-        "keywords_file": ".github/workflows/keywords_koreanews.txt",
-        "wp_pass_env": "WP_PASS_NEWS"
-    },
-    {
-        "url": "https://theseouljournal.com",
-        "theme": "Seoul Lifestyle and Trends",
-        "category_id": 1,
-        "keywords_file": ".github/workflows/keywords_seouljournal.txt",
-        "wp_pass_env": "WP_PASS_JOURNAL"
-    }
+    {"url": "https://k-health365.com",        "theme": "Health and Medicine",               "keywords_file": ".github/workflows/keywords_khealth.txt",      "wp_pass_env": "WP_PASS_HEALTH"},
+    {"url": "https://koreanews365.com",        "theme": "Korea News and Current Affairs",    "keywords_file": ".github/workflows/keywords_koreanews.txt",     "wp_pass_env": "WP_PASS_NEWS"},
+    {"url": "https://theseouljournal.com",     "theme": "Seoul Lifestyle and Trends",        "keywords_file": ".github/workflows/keywords_seouljournal.txt",  "wp_pass_env": "WP_PASS_JOURNAL"},
+    {"url": "https://koreamedicaltour.com",    "theme": "Korea Medical Tourism",             "keywords_file": ".github/workflows/keywords_medicaltour.txt",   "wp_pass_env": "KOREAMEDICALTOURCOM"},
+    {"url": "https://kskin365.com",            "theme": "K-Beauty and Skincare",             "keywords_file": ".github/workflows/keywords_kskin.txt",         "wp_pass_env": "KSKIN365COM"},
+    {"url": "https://korea365.org",            "theme": "Korea Culture and Life",            "keywords_file": ".github/workflows/keywords_korea365.txt",      "wp_pass_env": "KOREA365ORG"},
+    {"url": "https://jobinkorea365.com",       "theme": "Jobs and Career in Korea",          "keywords_file": ".github/workflows/keywords_jobinkorea365.txt", "wp_pass_env": "JOBINKOREA365COM"},
+    {"url": "https://jobkorea365.com",         "theme": "Employment in Korea",               "keywords_file": ".github/workflows/keywords_jobkorea365.txt",   "wp_pass_env": "JOBKOREA365COM"},
+    {"url": "https://jobkoreaglobal.com",      "theme": "Global Career and Recruitment",     "keywords_file": ".github/workflows/keywords_jobkoreaglobal.txt","wp_pass_env": "JOBKOREAGLOBALCOM"},
+    {"url": "https://kstudy365.com",           "theme": "Study in Korea",                    "keywords_file": ".github/workflows/keywords_kstudy365.txt",     "wp_pass_env": "KSTUDY365COM"},
+    {"url": "https://studyinkorea.com",        "theme": "International Students in Korea",   "keywords_file": ".github/workflows/keywords_koreanews.txt",     "wp_pass_env": "STUDYINKOREA365COM"},
+    {"url": "https://kfinance365.com",         "theme": "Korean Economy and Finance",        "keywords_file": ".github/workflows/keywords_kfinance.txt",      "wp_pass_env": "KFINANCE365COM"},
+    {"url": "https://koreainvest365.com",      "theme": "Stock and Investment in Korea",     "keywords_file": ".github/workflows/keywords_kinvest.txt",       "wp_pass_env": "KOREAINVEST365COM"},
+    {"url": "https://koreataxnlaw.com",        "theme": "Korea Tax and Law",                 "keywords_file": ".github/workflows/keywords_ktax.txt",          "wp_pass_env": "KOREATAXNLAW365COM"},
+    {"url": "https://k-trip365.com",           "theme": "Korea Travel and Tourism",          "keywords_file": ".github/workflows/keywords_ktrip.txt",         "wp_pass_env": "KTRIP365COM"},
+    {"url": "https://k-visa365.com",           "theme": "Korea Visa and Immigration",        "keywords_file": ".github/workflows/keywords_kvisa.txt",         "wp_pass_env": "KVISA365COM"},
+    {"url": "https://koreacrypto365.com",      "theme": "Cryptocurrency in Korea",           "keywords_file": ".github/workflows/keywords_kcrypto.txt",       "wp_pass_env": "KOREACRYPTO365COM"},
+    {"url": "https://koreainsurance365.com",   "theme": "Insurance in Korea",                "keywords_file": ".github/workflows/keywords_kinsurance.txt",    "wp_pass_env": "KOREAINSURANCE365COM"},
+    {"url": "https://koreavedding365.com",     "theme": "Korea Wedding Industry",            "keywords_file": ".github/workflows/keywords_kwedding.txt",      "wp_pass_env": "KOREAWEDDING365COM"},
+    {"url": "https://ktech365.com",            "theme": "Korean Technology and Gadgets",     "keywords_file": ".github/workflows/keywords_ktech.txt",         "wp_pass_env": "KTECH365COM"},
+    {"url": "https://kworld365.com",           "theme": "Korean Entertainment and K-POP",   "keywords_file": ".github/workflows/keywords_kworld.txt",        "wp_pass_env": "KWORLD365COM"},
+    {"url": "https://oliveyoungkorea.com",     "theme": "K-Beauty Product Reviews",         "keywords_file": ".github/workflows/keywords_oliveyoung.txt",    "wp_pass_env": "OLIVEYOUNGKOREACOM"},
 ]
 
 ANCHORS = [
@@ -81,7 +82,6 @@ def load_keyword(filename, fallback):
     return fallback
 
 def generate_article(prompt):
-    # 1순위: Groq
     try:
         res = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -96,7 +96,6 @@ def generate_article(prompt):
     except Exception as e:
         print(f"⚠️ Groq 실패: {e}")
 
-    # 2순위: Gemini 2.5 Flash
     try:
         model = genai.GenerativeModel("gemini-2.5-flash-preview-05-20")
         res = model.generate_content(prompt)
@@ -106,7 +105,6 @@ def generate_article(prompt):
     except Exception as e:
         print(f"⚠️ Gemini 2.5 Flash 실패: {e}")
 
-    # 3순위: Gemini 1.5 Flash
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         res = model.generate_content(prompt)
@@ -116,7 +114,6 @@ def generate_article(prompt):
     except Exception as e:
         print(f"⚠️ Gemini 1.5 Flash 실패: {e}")
 
-    # 4순위: 내부 엔진
     print("⚠️ 내부 엔진 사용")
     return None
 
@@ -191,7 +188,7 @@ def publish(site, title, content, media_id=None):
     payload = {
         "title": title,
         "content": content,
-        "categories": [site['category_id']],
+        "categories": [1],
         "status": "publish"
     }
     if media_id:
@@ -207,16 +204,17 @@ def publish(site, title, content, media_id=None):
             post_url = res.json().get("link", "")
             print(f"✅ 발행 성공! → {post_url}")
             return True
-        print(f"❌ 발행 실패 ({res.status_code}): {res.text[:300]}")
+        print(f"❌ 발행 실패 ({res.status_code}): {res.text[:200]}")
     except Exception as e:
         print(f"💥 접속 불가: {e}")
     return False
 
 def run():
-    print(f"🚀 3개 사이트 × 3포스트 = 총 9개 발행 시작!")
-    for site in SITES_CONFIG:
+    total = len(SITES_CONFIG)
+    print(f"🚀 총 {total}개 사이트 × 3포스트 = {total*3}개 발행 시작!")
+    for i, site in enumerate(SITES_CONFIG, 1):
         print(f"\n{'='*55}")
-        print(f"🌐 {site['url']}")
+        print(f"🌐 [{i}/{total}] {site['url']}")
         print(f"{'='*55}")
         for post_num in range(1, 4):
             keyword = load_keyword(site['keywords_file'], site['theme'])
@@ -231,65 +229,57 @@ def run():
                 f"- Use HTML tags ONLY: h2, h3, p, ul, li, ol, strong\n"
                 f"- NO markdown, NO asterisks, ONLY HTML\n"
                 f"- Include '{keyword}' in the very first paragraph\n"
-                f"- Keyword density: naturally use '{keyword}' 8-12 times throughout\n"
-                f"- Structure: Introduction → 4-5 main sections (h2) → subsections (h3) → Conclusion\n"
-                f"- Include a practical tips section with ul/li\n"
-                f"- Write in an engaging, authoritative, expert tone\n"
-                f"- Provide real, actionable, valuable information\n"
+                f"- Naturally use '{keyword}' 8-12 times throughout\n"
+                f"- Structure: Introduction → 4-5 main h2 sections → h3 subsections → Conclusion\n"
+                f"- Include practical tips with ul/li list\n"
+                f"- Engaging, authoritative, expert tone\n"
             )
 
-            # 글 생성
             article = generate_article(prompt)
             if not article:
                 article = (
                     f"<h2>The Complete Guide to {keyword}</h2>"
-                    f"<p>Understanding {keyword} is essential in the world of {site['theme']}. "
-                    f"This comprehensive guide covers everything you need to know about {keyword}.</p>"
+                    f"<p>{keyword} is one of the most important topics in {site['theme']}. "
+                    f"This guide covers everything you need to know about {keyword}.</p>"
                     f"<h2>Why {keyword} Matters</h2>"
-                    f"<p>{keyword} plays a crucial role in {site['theme']}. Here is what experts say.</p>"
+                    f"<p>Understanding {keyword} is essential for success in {site['theme']}.</p>"
                     f"<h3>Key Benefits of {keyword}</h3><ul>"
-                    f"<li>Improved understanding of {keyword}</li>"
-                    f"<li>Practical tips for applying {keyword}</li>"
-                    f"<li>Expert insights on {keyword} in {site['theme']}</li>"
-                    f"<li>Up-to-date information and trends</li>"
+                    f"<li>Deep understanding of {keyword}</li>"
+                    f"<li>Practical tips for {keyword}</li>"
+                    f"<li>Expert insights on {keyword}</li>"
+                    f"<li>Latest trends in {keyword}</li>"
                     f"</ul>"
-                    f"<h2>How to Get Started with {keyword}</h2>"
-                    f"<p>Getting started with {keyword} requires understanding the basics of {site['theme']}.</p>"
-                    f"<h3>Step-by-Step Guide</h3><ol>"
-                    f"<li>Research the fundamentals of {keyword}</li>"
+                    f"<h2>How to Apply {keyword}</h2>"
+                    f"<p>Applying {keyword} in {site['theme']} requires a strategic approach.</p>"
+                    f"<h3>Step-by-Step</h3><ol>"
+                    f"<li>Research {keyword} thoroughly</li>"
                     f"<li>Apply best practices for {keyword}</li>"
-                    f"<li>Monitor and improve your {keyword} strategy</li>"
+                    f"<li>Monitor results and improve</li>"
                     f"</ol>"
-                    f"<h2>Expert Tips on {keyword}</h2>"
-                    f"<p>Our experts share their top tips for mastering {keyword} in {site['theme']}.</p>"
                     f"<h2>Conclusion</h2>"
-                    f"<p>Mastering {keyword} is a journey. With the right approach to {site['theme']}, "
-                    f"you can achieve excellent results with {keyword}.</p>"
+                    f"<p>Mastering {keyword} will give you a competitive edge in {site['theme']}.</p>"
                 )
 
-            # SEO 점수
             seo = calc_seo_score(article, keyword)
             print(f"📊 SEO 점수: {seo}/100")
 
             retry = 0
             while seo < 80 and retry < 2:
                 retry += 1
-                print(f"🔄 재작성 {retry}회차 (현재 {seo}점)")
-                new_article = generate_article(prompt)
-                if new_article:
-                    article = new_article
+                print(f"🔄 재작성 {retry}회차 ({seo}점)")
+                new = generate_article(prompt)
+                if new:
+                    article = new
                     seo = calc_seo_score(article, keyword)
-                    print(f"📊 재작성 후 SEO: {seo}/100")
+                    print(f"📊 재작성 후: {seo}/100")
 
             if seo < 80:
                 print(f"⚠️ 최종 {seo}점 → 그냥 발행")
             else:
-                print(f"🎯 SEO {seo}점 → 발행 승인!")
+                print(f"🎯 {seo}점 → 발행 승인!")
 
-            # 내부 링크
             final = inject_links(article, keyword, site['url'])
 
-            # 이미지
             media_id = None
             img_url = get_image(keyword)
             if img_url:
@@ -297,12 +287,10 @@ def run():
             else:
                 print("⚠️ 이미지 없이 발행")
 
-            # 발행
             publish(site, title, final, media_id)
 
-            # 3분 간격
-            if not (site == SITES_CONFIG[-1] and post_num == 3):
-                print(f"⏳ 3분 대기 중...")
+            if not (i == total and post_num == 3):
+                print(f"⏳ 3분 대기...")
                 time.sleep(180)
 
 if __name__ == "__main__":
