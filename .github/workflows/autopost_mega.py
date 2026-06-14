@@ -4,152 +4,310 @@ import time
 import random
 import requests
 from datetime import datetime
-from dotenv import load_dotenv
-
-from openai import OpenAI
 import google.generativeai as genai
+from groq import Groq
 
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# ── API 설정 ──────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-WP_USER = os.getenv("WP_USER")
-WP_APP_PASSWORD = os.getenv("WP_APP_PASSWORD")
+GROK_API_KEY   = os.getenv("GROK_API_KEY")
+PIXABAY_KEY    = os.getenv("PIXABAY_KEY")
+PEXELS_KEY     = os.getenv("PEXELS_KEY")
+WP_USER        = "huh0303@gmail.com"
 
-client_qwen = OpenAI(api_key=OPENAI_API_KEY)
 genai.configure(api_key=GEMINI_API_KEY)
+groq_client = Groq(api_key=GROK_API_KEY)
 
+# ── 사이트 설정 ───────────────────────────────────────────
 SITES_CONFIG = [
-    {"url": "https://k-health365.com", "lang": "ko", "theme": "Health and Medicine", "category_id": 1, "keywords_file": "keywords_khealth.txt", "style": "blog", "adsense": True},
-    {"url": "https://koreanews365.com", "lang": "ko", "theme": "General News and Issues", "category_id": 1, "keywords_file": "keywords_koreanews.txt", "style": "news", "adsense": True},
-    {"url": "https://koreamedicaltour.com", "lang": "en", "theme": "Korea Medical Tourism", "category_id": 1, "keywords_file": "keywords_medicaltour.txt", "style": "blog"},
-    {"url": "https://kskin365.com", "lang": "en", "theme": "K-Beauty and Skincare", "category_id": 1, "keywords_file": "keywords_kskin.txt", "style": "blog"},
-    {"url": "https://korea365.org", "lang": "en", "theme": "Korea Culture and Info", "category_id": 1, "keywords_file": "keywords_korea365.txt", "style": "blog"},
-    {"url": "https://jobinkorea365.com", "lang": "en", "theme": "Jobs and Career in Korea", "category_id": 1, "keywords_file": "keywords_jobinkorea.txt", "style": "blog"},
-    {"url": "https://jobkorea365.com", "lang": "en", "theme": "Employment in Korea", "category_id": 1, "keywords_file": "keywords_jobkorea365.txt", "style": "blog"},
-    {"url": "https://jobkoreaglobal.com", "lang": "en", "theme": "Global Career and Recruitment", "category_id": 1, "keywords_file": "keywords_jobglobal.txt", "style": "blog"},
-    {"url": "https://kstudy365.com", "lang": "en", "theme": "Study in Korea and Language", "category_id": 1, "keywords_file": "keywords_kstudy.txt", "style": "blog"},
-    {"url": "https://studyinkorea.com", "lang": "en", "theme": "International Students Guide", "category_id": 1, "keywords_file": "keywords_studyin.txt", "style": "blog"},
-    {"url": "https://kfinance365.com", "lang": "en", "theme": "Korean Economy and Finance", "category_id": 1, "keywords_file": "keywords_kfinance.txt", "style": "blog"},
-    {"url": "https://koreainvest365.com", "lang": "en", "theme": "Stock and Investment Info", "category_id": 1, "keywords_file": "keywords_kinvest.txt", "style": "blog"},
-    {"url": "https://koreataxlaw.com", "lang": "en", "theme": "Tax Regulations and Law", "category_id": 1, "keywords_file": "keywords_ktax.txt", "style": "blog"},
-    {"url": "https://k-trip365.com", "lang": "en", "theme": "Korea Travel and Tourism", "category_id": 1, "keywords_file": "keywords_ktrip.txt", "style": "blog"},
-    {"url": "https://k-visa365.com", "lang": "en", "theme": "Immigration and Visa Services", "category_id": 1, "keywords_file": "keywords_kvisa.txt", "style": "blog"},
-    {"url": "https://koreacrypto365.com", "lang": "en", "theme": "Cryptocurrency Trends", "category_id": 1, "keywords_file": "keywords_kcrypto.txt", "style": "blog"},
-    {"url": "https://koreainsurance365.com", "lang": "en", "theme": "Insurance and Risk Management", "category_id": 1, "keywords_file": "keywords_kinsurance.txt", "style": "blog"},
-    {"url": "https://koreavedding365.com", "lang": "en", "theme": "Korea Wedding Industry", "category_id": 1, "keywords_file": "keywords_kwedding.txt", "style": "blog"},
-    {"url": "https://ktech365.com", "lang": "en", "theme": "Korean Technology and Gadgets", "category_id": 1, "keywords_file": "keywords_ktech.txt", "style": "blog"},
-    {"url": "https://kworld365.com", "lang": "en", "theme": "Korean Entertainment and K-POP", "category_id": 1, "keywords_file": "keywords_kworld.txt", "style": "blog"},
-    {"url": "https://oliveyoungkorea.com", "lang": "en", "theme": "K-Beauty Product Reviews", "category_id": 1, "keywords_file": "keywords_oliveyoung.txt", "style": "blog"},
-    {"url": "https://theseouljournal.com", "lang": "en", "theme": "Seoul Lifestyle and Trends", "category_id": 1, "keywords_file": "keywords_seouljournal.txt", "style": "blog"}
+    {
+        "url": "https://k-health365.com",
+        "lang": "en",
+        "theme": "Health and Medicine",
+        "category_id": 1,
+        "keywords_file": ".github/workflows/keywords_khealth.txt",
+        "wp_pass_env": "WP_PASS_HEALTH"
+    },
+    {
+        "url": "https://koreanews365.com",
+        "lang": "en",
+        "theme": "Korea News and Current Affairs",
+        "category_id": 1,
+        "keywords_file": ".github/workflows/keywords_koreanews.txt",
+        "wp_pass_env": "WP_PASS_NEWS"
+    },
+    {
+        "url": "https://theseouljournal.com",
+        "lang": "en",
+        "theme": "Seoul Lifestyle and Trends",
+        "category_id": 1,
+        "keywords_file": ".github/workflows/keywords_seouljournal.txt",
+        "wp_pass_env": "WP_PASS_JOURNAL"
+    }
 ]
 
-ANCHOR_TEMPLATES = {
-    "ko": [
-        "함께 읽으면 시너지 효과가 나는 {keyword} 관련 고급 정보",
-        "최근 가이드라인에 따른 {keyword} 핵심 분석 확인하기",
-        "놓치면 후회하는 {keyword} 필수 주의사항 및 꿀팁 총정리"
-    ],
-    "en": [
-        "Highly recommended guide on {keyword} for premium insights",
-        "Must-read essential breakdown regarding {keyword} and updates",
-        "Deep dive analysis and useful tips about {keyword} you should know"
-    ]
-}
+# ── 내부 링크 앵커 ────────────────────────────────────────
+ANCHORS = [
+    "Highly recommended guide on {keyword}",
+    "Must-read breakdown about {keyword}",
+    "Deep dive analysis on {keyword}",
+    "Essential tips and insights on {keyword}",
+    "Everything you need to know about {keyword}"
+]
 
-def load_keyword_from_file(filename, fallback_theme):
+# ── SEO 점수 계산 ─────────────────────────────────────────
+def calc_seo_score(content, keyword):
+    score = 0
+    content_lower = content.lower()
+    keyword_lower = keyword.lower()
+
+    # 키워드 밀도
+    word_count = len(content.split())
+    keyword_count = content_lower.count(keyword_lower)
+    if word_count > 0:
+        density = (keyword_count / word_count) * 100
+        if 1 <= density <= 3:
+            score += 25
+        elif density > 0:
+            score += 10
+
+    # 구조 태그
+    if "<h2" in content: score += 15
+    if "<h3" in content: score += 10
+    if "<ul" in content or "<ol" in content: score += 10
+    if "<p"  in content: score += 10
+
+    # 길이
+    if word_count >= 800:  score += 20
+    elif word_count >= 500: score += 10
+
+    # 제목에 키워드
+    if keyword_lower in content_lower[:200]: score += 10
+
+    return min(score, 100)
+
+# ── 키워드 로드 ───────────────────────────────────────────
+def load_keyword(filename, fallback):
     try:
         if os.path.exists(filename):
             with open(filename, 'r', encoding='utf-8') as f:
-                keywords = [line.strip() for line in f if line.strip()]
+                keywords = [l.strip() for l in f if l.strip()]
             if keywords:
                 return random.choice(keywords)
     except Exception as e:
-        print(f"⚠️ 파일 {filename} 읽기 실패, 기본값 사용: {str(e)}")
-    return fallback_theme
+        print(f"⚠️ 키워드 파일 오류: {e}")
+    return fallback
 
-def inject_spider_web_links(html_content, current_keyword, current_url, lang):
-    filtered_blogs = [site for site in SITES_CONFIG if site['url'] != current_url]
-    selected_sites = random.sample(filtered_blogs, k=2) if len(filtered_blogs) >= 2 else filtered_blogs
-    
-    backlink_html = "\n\n\n"
-    backlink_html += "<hr style='border: dashed 1px #e0e0e0; margin: 30px 0;'>\n"
-    backlink_html += "<div style='background-color:#f9f9f9; padding:15px; border-radius:5px;'>\n"
-    title_text = "💡 유용한 추천 연관 정보" if lang == "ko" else "💡 Recommended Insights"
-    backlink_html += f"  <p style='font-weight:bold; margin-bottom:10px;'>{title_text}</p>\n"
-    backlink_html += "  <ul style='list-style-type: square; padding-left: 20px;'>\n"
-    
-    for site in selected_sites:
-        templates = ANCHOR_TEMPLATES['ko'] if lang == "ko" else ANCHOR_TEMPLATES['en']
-        anchor_text = random.choice(templates).format(keyword=current_keyword)
-        target_link = f"{site['url']}/?s={current_keyword}"
-        backlink_html += f"    <li style='margin-bottom:8px;'><a href='{target_link}' target='_blank' rel='noopener noreferrer' style='color:#0066cc; text-decoration:underline;'>{anchor_text}</a></li>\n"
-        
-    backlink_html += "  </ul>\n"
-    backlink_html += "</div>\n"
-    return html_content + backlink_html
-
-def generate_article(prompt, keyword, lang, theme):
+# ── 글 생성 (Groq → Gemini 2.5 → Gemini 1.5 → 내부엔진) ──
+def generate_article(prompt, keyword, theme):
+    # 1순위: Groq (llama-3.3-70b)
     try:
-        res = client_qwen.chat.completions.create(
-            model="gpt-4o-mini",
+        res = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            timeout=60
+            max_tokens=2000,
+            timeout=45
         )
-        return res.choices[0].message.content
-    except Exception:
-        pass
+        content = res.choices[0].message.content
+        if content and len(content) > 200:
+            print("✅ Groq 생성 성공")
+            return content
+    except Exception as e:
+        print(f"⚠️ Groq 실패: {e}")
+
+    # 2순위: Gemini 2.5 Flash
+    try:
+        model = genai.GenerativeModel("gemini-2.5-flash-preview-05-20")
+        res = model.generate_content(prompt)
+        if res.text and len(res.text) > 200:
+            print("✅ Gemini 2.5 Flash 생성 성공")
+            return res.text
+    except Exception as e:
+        print(f"⚠️ Gemini 2.5 Flash 실패: {e}")
+
+    # 3순위: Gemini 1.5 Flash
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         res = model.generate_content(prompt)
-        return res.text
-    except Exception:
-        pass
-    if lang == "ko":
-        return f"<h2>{keyword}에 관한 완벽 심층 정보 안내</h2><p>{theme} 분야 최고의 전문가들이 전하는 {keyword} 분석입니다.</p>"
-    else:
-        return f"<h2>The Ultimate Guide to {keyword}</h2><p>This is an in-depth breakdown of {keyword} regarding {theme}.</p>"
-
-def publish_to_wordpress(site_info, title, content):
-    wp_api_url = f"{site_info['url']}/wp-json/wp/v2/posts"
-    payload = {"title": title, "content": content, "categories": [site_info['category_id']], "status": "publish"}
-    try:
-        res = requests.post(wp_api_url, json=payload, auth=(WP_USER, WP_APP_PASSWORD), timeout=25)
-        if res.status_code == 201:
-            print(f"✅ 발행 성공: {site_info['url']} -> [{title}]")
-            return True
-        print(f"❌ {site_info['url']} 응답 실패 ({res.status_code}): {res.text}")
+        if res.text and len(res.text) > 200:
+            print("✅ Gemini 1.5 Flash 생성 성공")
+            return res.text
     except Exception as e:
-        print(f"💥 {site_info['url']} 접속 불가: {str(e)}")
+        print(f"⚠️ Gemini 1.5 Flash 실패: {e}")
+
+    # 4순위: 내부 기본 엔진
+    print("⚠️ 내부 엔진 사용")
+    return f"""<h2>The Complete Guide to {keyword}</h2>
+<p>Welcome to our comprehensive guide on {keyword}. This article covers everything you need to know about {theme}.</p>
+<h2>Why {keyword} Matters</h2>
+<p>Understanding {keyword} is essential for anyone interested in {theme}. Here we break down the key aspects.</p>
+<h3>Key Benefits</h3>
+<ul>
+<li>Comprehensive understanding of {keyword}</li>
+<li>Practical tips and expert insights</li>
+<li>Up-to-date information on {theme}</li>
+<li>Actionable advice you can use today</li>
+</ul>
+<h2>Getting Started with {keyword}</h2>
+<p>Whether you are a beginner or an expert, our guide on {keyword} provides valuable information tailored to your needs in {theme}.</p>
+<h3>Expert Tips</h3>
+<ul>
+<li>Always stay informed about the latest {keyword} developments</li>
+<li>Consult trusted sources when learning about {theme}</li>
+<li>Apply what you learn about {keyword} consistently</li>
+</ul>
+<h2>Conclusion</h2>
+<p>We hope this guide on {keyword} has been helpful. Stay tuned for more expert content on {theme}.</p>"""
+
+# ── 이미지 가져오기 (Pixabay → Pexels → None) ────────────
+def get_image(keyword):
+    # 1순위: Pixabay
+    try:
+        url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={keyword}&image_type=photo&per_page=5&safesearch=true"
+        res = requests.get(url, timeout=10)
+        data = res.json()
+        if data.get("hits"):
+            hit = random.choice(data["hits"])
+            return hit["webformatURL"], hit.get("pageURL", "")
+    except Exception as e:
+        print(f"⚠️ Pixabay 실패: {e}")
+
+    # 2순위: Pexels
+    try:
+        headers = {"Authorization": PEXELS_KEY}
+        url = f"https://api.pexels.com/v1/search?query={keyword}&per_page=5"
+        res = requests.get(url, headers=headers, timeout=10)
+        data = res.json()
+        if data.get("photos"):
+            photo = random.choice(data["photos"])
+            return photo["src"]["large"], photo.get("url", "")
+    except Exception as e:
+        print(f"⚠️ Pexels 실패: {e}")
+
+    return None, None
+
+# ── 내부 링크 주입 ────────────────────────────────────────
+def inject_links(content, keyword, current_url):
+    others = [s for s in SITES_CONFIG if s['url'] != current_url]
+    selected = random.sample(others, k=min(2, len(others)))
+
+    html = "\n\n<hr style='border:dashed 1px #e0e0e0;margin:30px 0;'>\n"
+    html += "<div style='background:#f9f9f9;padding:15px;border-radius:5px;'>\n"
+    html += "<p style='font-weight:bold;'>💡 Recommended Insights</p><ul>\n"
+    for site in selected:
+        anchor = random.choice(ANCHORS).format(keyword=keyword)
+        link = f"{site['url']}/?s={keyword}"
+        html += f"<li><a href='{link}' target='_blank' rel='noopener noreferrer'>{anchor}</a></li>\n"
+    html += "</ul></div>\n"
+    return content + html
+
+# ── WordPress 이미지 업로드 ───────────────────────────────
+def upload_image_to_wp(site, img_url, keyword):
+    try:
+        img_data = requests.get(img_url, timeout=15).content
+        wp_pass = os.getenv(site['wp_pass_env'])
+        media_url = f"{site['url']}/wp-json/wp/v2/media"
+        filename = f"{keyword.replace(' ', '-')}.jpg"
+        headers = {"Content-Disposition": f"attachment; filename={filename}", "Content-Type": "image/jpeg"}
+        res = requests.post(media_url, data=img_data, headers=headers, auth=(WP_USER, wp_pass), timeout=30)
+        if res.status_code == 201:
+            media_id = res.json().get("id")
+            print(f"✅ 이미지 업로드 성공: media_id={media_id}")
+            return media_id
+    except Exception as e:
+        print(f"⚠️ 이미지 업로드 실패: {e}")
+    return None
+
+# ── WordPress 발행 ────────────────────────────────────────
+def publish(site, title, content, media_id=None):
+    wp_pass = os.getenv(site['wp_pass_env'])
+    if not wp_pass:
+        print(f"❌ Secret 없음: {site['wp_pass_env']}")
+        return False
+
+    api_url = f"{site['url']}/wp-json/wp/v2/posts"
+    payload = {
+        "title": title,
+        "content": content,
+        "categories": [site['category_id']],
+        "status": "publish"
+    }
+    if media_id:
+        payload["featured_media"] = media_id
+
+    try:
+        res = requests.post(api_url, json=payload, auth=(WP_USER, wp_pass), timeout=30)
+        if res.status_code == 201:
+            print(f"✅ 발행 성공: {site['url']} [{title}]")
+            return True
+        print(f"❌ 발행 실패 ({res.status_code}): {site['url']} - {res.text[:300]}")
+    except Exception as e:
+        print(f"💥 접속 불가: {site['url']} - {e}")
     return False
 
-def run_mega_automation():
-    print(f"📝 총 {len(SITES_CONFIG)}개 블로그 대상 순회 포스팅을 시작합니다.")
+# ── 메인 실행 ─────────────────────────────────────────────
+def run():
+    print(f"🚀 총 {len(SITES_CONFIG)}개 사이트 포스팅 시작")
     for site in SITES_CONFIG:
-        keyword = load_keyword_from_file(site['keywords_file'], site['theme'])
-        if site['lang'] == "ko":
-            title = f"{keyword}에 관한 필수 가이드 및 주의사항 총정리" if site['style'] == "blog" else f"[속보] {keyword} 관련 최근 동향 및 핵심 쟁점 분석"
-            prompt = f"전문적인 블로거/기자 성격으로 '{keyword}'({site['theme']})에 대해 3000자 이상으로 한국어로 상세하게 서술해줘. HTML 태그(h2, h3, p, ul)를 사용해 줄 것."
-        else:
-            title = f"The Ultimate Guide to {keyword}: What You Need to Know" if site['style'] == "blog" else f"[Breaking] Latest Updates and Trends on {keyword} Explored"
-            prompt = f"Act as a professional writer/journalist and write an extensive article about '{keyword}' ({site['theme']}) in English. It must be over 800 words and structuralized with HTML tags (h2, h3, p, ul)."
+        # 사이트당 3개 포스팅
+        for post_num in range(1, 4):
+            keyword = load_keyword(site['keywords_file'], site['theme'])
+            print(f"\n📝 [{site['url']}] 포스트 {post_num}/3 | 키워드: {keyword}")
 
-        print(f"🚀 처리 중: {site['url']} (키워드: {keyword})")
-        article_body = generate_article(prompt, keyword, site['lang'], site['theme'])
-        final_content = inject_spider_web_links(article_body, keyword, site['url'], site['lang'])
-        publish_to_wordpress(site, title, final_content)
-        time.sleep(random.randint(5, 15))
+            title = f"The Ultimate Guide to {keyword}: Everything You Need to Know"
+            prompt = (
+                f"You are a professional SEO content writer. "
+                f"Write a comprehensive, SEO-optimized blog post about '{keyword}' ({site['theme']}) in English. "
+                f"Requirements:\n"
+                f"- Minimum 900 words\n"
+                f"- Use HTML tags: h2, h3, p, ul, li\n"
+                f"- Include the keyword '{keyword}' naturally throughout\n"
+                f"- Provide practical, valuable information\n"
+                f"- Write in an engaging, authoritative tone\n"
+                f"- Include a strong introduction and conclusion"
+            )
+
+            # 글 생성
+            article = generate_article(prompt, keyword, site['theme'])
+
+            # SEO 점수 체크
+            seo_score = calc_seo_score(article, keyword)
+            print(f"📊 SEO 점수: {seo_score}/100")
+
+            # 79점 이하 → 재작성 최대 2회
+            retry = 0
+            while seo_score < 80 and retry < 2:
+                retry += 1
+                print(f"🔄 SEO 점수 미달 ({seo_score}점) → 재작성 {retry}회차")
+                article = generate_article(prompt, keyword, site['theme'])
+                seo_score = calc_seo_score(article, keyword)
+                print(f"📊 재작성 후 SEO 점수: {seo_score}/100")
+
+            if seo_score < 80:
+                print(f"⚠️ 최종 SEO 점수 {seo_score}점 → 그냥 발행")
+
+            # 내부 링크 추가
+            final_content = inject_links(article, keyword, site['url'])
+
+            # 이미지 처리
+            media_id = None
+            img_url, _ = get_image(keyword)
+            if img_url:
+                media_id = upload_image_to_wp(site, img_url, keyword)
+
+            # 발행
+            publish(site, title, final_content, media_id)
+
+            # 포스트 간 랜덤 대기 (5~20분)
+            if post_num < 3:
+                wait = random.randint(300, 1200)
+                print(f"💤 다음 포스트까지 {wait//60}분 대기...")
+                time.sleep(wait)
+
+        # 사이트 간 대기 (10~30분)
+        print(f"\n💤 다음 사이트까지 대기...")
+        time.sleep(random.randint(600, 1800))
 
 if __name__ == "__main__":
-    print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 스텔스 오토봇 메가 가동")
-    random_delay = random.randint(1, 45)
-    print(f"💤 구글 봇 감시 회피: {random_delay}분 동안 대기 모드로 수면합니다...")
-    time.sleep(random_delay * 60)
-    
-    pass_gate = random.choice([True, False])
-    if pass_gate:
-        print("🎯 [주사위 합격] 포스팅 발행 가동 승인!")
-        run_mega_automation()
-        sys.exit(0)
-    else:
-        print("💤 [주사위 미통과] 구글 패스용 스킵 턴입니다. 클린 퇴근합니다.")
-        sys.exit(0)
+    print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 오토봇 가동")
+    run()
+    sys.exit(0)
