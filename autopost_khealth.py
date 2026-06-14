@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-k-health365.com 전용 고성능 자동 포스팅 봇 (3중 백업 글쓰기 엔진 탑재 보완 버전)
+k-health365.com 전용 고성능 자동 포스팅 봇 (비용 최적화 및 구조 보완 버전)
 - 1차 엔진: Hugging Face Serverless API (Qwen/Qwen2.5-72B-Instruct)
-- 2차 엔진 (백업): Google Gemini API (통신 장애 및 서버 다운 대비)
+- 2차 엔진 (백업): Google Gemini API (gemini-2.5-flash - 최고 가성비 및 속도)
 - 3차 엔진 (최종): 내장형 의학 박사 프로토타입 텍스트 생성기 (무조건 발행 보장)
+- 이미지 엔진: Pixabay (1순위 무료) -> Pexels (2순위) 순서 최적화
 """
 
 import os, json, time, random, requests, base64, re
@@ -21,12 +22,14 @@ def pick_reporter():
 # ══════════════════════════════════════════
 #  ★ 시스템 설정 프로토콜
 # ══════════════════════════════════════════
-QWEN_API_KEY   = os.environ.get("QWEN_API_KEY", "")
+HF_API_KEY     = os.environ.get("QWEN_API_KEY", "") # 환경변수 매칭 확인
 HF_MODEL       = "Qwen/Qwen2.5-72B-Instruct"
 
-# 구글 Gemini API 키 추가 (Hugging Face 장애 시 즉시 바톤 터치)
+# 구글 Gemini API 키 및 최신 2.5 Flash 모델 지정 (가성비 극대화)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyD-Your-Gemini-Key-Here")
+GEMINI_MODEL   = "gemini-2.5-flash"
 
+# 무료 이미지 API 키 설정
 PEXELS_KEY     = "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
 PIXABAY_KEY    = "u_g0pmau3m85"
 INDEXNOW_KEY   = "khealth365indexnow2024"
@@ -61,7 +64,7 @@ INTERNAL_SITES = [
     ("koreataxlaw.com",       "한국 세금 법률 정보"),   ("k-trip365.com",         "한국 여행 패키지 안내"),
     ("k-visa365.com",         "한국 비자 토탈 케어"),   ("koreacrypto365.com",    "한국 크립토 자산 정보"),
     ("koreainsurance365.com", "한국 실손 건강보험 안내"), ("koreanews365.com",      "한국 종합 뉴스 리포트"),
-    ("koreawedding365.com",   "한국 웨딩 트렌드 가이드"), ("ktech365.com",          "한국 테크 산업 정보"),
+    ("kore Wedding365.com",   "한국 웨딩 트렌드 가이드"), ("ktech365.com",          "한국 테크 산업 정보"),
     ("kworld365.com",         "Kworld365 한국 혜택 케어"), ("oliveyoungkorea.com",   "올리브영 K뷰티 트렌드"),
     ("k-health365.com",       "K-Health365 건강 정보")
 ]
@@ -165,20 +168,26 @@ def call_writer_engine(prompt, keyword, cat):
             time.sleep(10)
             return call_writer_engine(prompt, keyword, cat)
         r.raise_for_status()
-        print("      ➔ [1차 엔진] 생성 성공!", flush=True)
+        print("      ➔ [1차 엔진] Qwen 생성 성공!", flush=True)
         return r.json()["choices"][0]["message"]["content"]
     except Exception as e:
         print(f"      ❌ [1차 엔진] 통신 장애 발생: {e}", flush=True)
-        print("      ⚠️ 즉각 [2차 백업 엔진: Gemini API] 체제로 전환합니다.", flush=True)
+        print(f"      ⚠️ 즉각 [2차 백업 엔진: Gemini 2.5 Flash] 체제로 전환합니다.", flush=True)
 
-    # [2차 백업 시도] 구글 Gemini API 통신 안전망
+    # [2차 백업 시도] 구글 Gemini 2.5 Flash API (최저비용 고속 모델)
     try:
-        g_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
-        g_payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        g_url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+        g_payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "temperature": 0.65,
+                "maxOutputTokens": 4000
+            }
+        }
         r_gem = requests.post(g_url, json=g_payload, timeout=40)
         r_gem.raise_for_status()
         text_out = r_gem.json()["candidates"][0]["content"]["parts"][0]["text"]
-        print("      ➔ [2차 엔진] Gemini 대체 생성 성공!", flush=True)
+        print("      ➔ [2차 엔진] Gemini 2.5 Flash 대체 생성 성공!", flush=True)
         return text_out
     except Exception as ge:
         print(f"      ❌ [2차 엔진] 백업 통신마저 실패: {ge}", flush=True)
@@ -189,7 +198,6 @@ def call_writer_engine(prompt, keyword, cat):
 
 
 def generate_fallback_static_html(keyword, cat):
-    """ 네트워크 단절 상태에서도 완벽한 SEO 포맷과 모바일 줄바꿈 규격을 충족하여 무조건 1본을 배포하는 엔진 """
     title = f"TITLE: {keyword}에 관한 의학 박사의 정밀 분석 지침 및 올바른 관리 기준법"
     
     int_links = random.sample(INTERNAL_SITES, 4)
@@ -293,23 +301,29 @@ def generate_fallback_static_html(keyword, cat):
 
 
 def get_image(query):
+    """ 비용 최적화를 위해 1순위 Pixabay(완전 무료), 2순위 Pexels로 스왑 """
+    # [1순위] Pixabay 조회
     try:
-        r = requests.get(f"https://api.pexels.com/v1/search?query={query}&per_page=5&orientation=landscape",
-                         headers={"Authorization": PEXELS_KEY}, timeout=10)
-        photos = r.json().get("photos", [])
-        if photos:
-            p = random.choice(photos)
-            return {"src": p["src"]["large2x"] or p["src"]["large"], "credit": f'Photo by {p["photographer"]} on Pexels'}
-    except Exception:
-        pass
-    try:
-        r = requests.get(f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={requests.utils.quote(query)}&image_type=photo&orientation=horizontal&per_page=5", timeout=10)
+        url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={requests.utils.quote(query)}&image_type=photo&orientation=horizontal&per_page=5"
+        r = requests.get(url, timeout=10)
         hits = r.json().get("hits", [])
         if hits:
             p = random.choice(hits)
             return {"src": p["webformatURL"], "credit": "Image from Pixabay"}
     except Exception:
         pass
+
+    # [2순위] Pixabay 실패 혹은 없을 시 Pexels 조회
+    try:
+        url = f"https://api.pexels.com/v1/search?query={query}&per_page=5&orientation=landscape"
+        r = requests.get(url, headers={"Authorization": PEXELS_KEY}, timeout=10)
+        photos = r.json().get("photos", [])
+        if photos:
+            p = random.choice(photos)
+            return {"src": p["src"]["large2x"] or p["src"]["large"], "credit": f'Photo by {p["photographer"]} on Pexels'}
+    except Exception:
+        pass
+        
     return {}
 
 
@@ -328,18 +342,19 @@ def process_content(raw):
             content = "\n".join(lines[i+1:])
             break
 
-    # 메타 정보가 빌 공백일 경우 자동 생성 패치
     if not meta:
         meta = f"의학 박사가 전하는 {title}에 대한 정밀 분석 가이드라인과 구체적인 예방 수칙 보고서입니다."
 
+    # 정규식 패턴 수정 및 이미지 삽입 로직 안정화
     def img_replacer(m):
         img = get_image(m.group(1).strip())
-        alt = m.group(2).strip()
+        alt = m.group(2).strip() if len(m.groups()) > 1 else m.group(1).strip()
         if img:
             return f'<figure class="wp-block-image size-large aligncenter"><img src="{img["src"]}" alt="{alt}" loading="lazy" style="max-width:100%;height:auto;border-radius:8px"/><figcaption style="text-align:center;font-size:13px;color:#666">{img["credit"]}</figcaption></figure>'
         return f'<p><em>[이미지: {alt}]</em></p>'
 
-    content = re.sub(r'\s*', img_replacer, content, flags=re.DOTALL)
+    content = re.sub(r'', img_replacer, content)
+    
     if "SCHEMA_FAQ" in content:
         content += '\n<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[]}</script>'
     
@@ -403,7 +418,7 @@ def indexnow(post_url):
 
 def start_trigger_job():
     print(f"\n{'═'*58}", flush=True)
-    print(f"  🔄 GitHub Actions 수동 트리거 활성화 — 11개 카테고리 완전 보장형 배포 시작", flush=True)
+    print(f"  🔄 11개 카테고리 완전 보장형 배포 시작 (비용 최적화 모드)", flush=True)
     print(f"{'═'*58}", flush=True)
     
     init_category_ids()
@@ -416,7 +431,6 @@ def start_trigger_job():
         keyword = build_keyword(cat)
         print(f"\n  ▶️ [{i+1}/{len(CATEGORIES)}] [{cat['name']}] 포커싱 가동: {keyword}", flush=True)
         
-        # 3중 백업 구조 가동하여 원천적으로 'None' 반환 및 스킵이 발생하지 않도록 제어
         raw = call_writer_engine(build_prompt(keyword, cat), keyword, cat)
 
         parsed = process_content(raw)
@@ -432,7 +446,7 @@ def start_trigger_job():
             print("  ❌ 워드프레스 인젝션 최종 실패", flush=True)
 
     print(f"\n{'═'*58}", flush=True)
-    print(f"  ✅ GitHub Actions 수동 트리거 전 카테고리 무조건 발행 프로세스 완료!", flush=True)
+    print(f"  ✅ 전 카테고리 무조건 발행 프로세스 완료!", flush=True)
     print(f"{'═'*58}", flush=True)
 
 
