@@ -17,7 +17,6 @@ WP_USER        = "huh0303@gmail.com"
 genai.configure(api_key=GEMINI_API_KEY)
 groq_client = Groq(api_key=GROK_API_KEY)
 
-# ── 사이트 설정 ───────────────────────────────────────────
 SITES_CONFIG = [
     {
         "url": "https://k-health365.com",
@@ -45,7 +44,6 @@ SITES_CONFIG = [
     }
 ]
 
-# ── 내부 링크 앵커 ────────────────────────────────────────
 ANCHORS = [
     "Highly recommended guide on {keyword}",
     "Must-read breakdown about {keyword}",
@@ -54,13 +52,10 @@ ANCHORS = [
     "Everything you need to know about {keyword}"
 ]
 
-# ── SEO 점수 계산 ─────────────────────────────────────────
 def calc_seo_score(content, keyword):
     score = 0
     content_lower = content.lower()
     keyword_lower = keyword.lower()
-
-    # 키워드 밀도
     word_count = len(content.split())
     keyword_count = content_lower.count(keyword_lower)
     if word_count > 0:
@@ -69,23 +64,15 @@ def calc_seo_score(content, keyword):
             score += 25
         elif density > 0:
             score += 10
-
-    # 구조 태그
     if "<h2" in content: score += 15
     if "<h3" in content: score += 10
     if "<ul" in content or "<ol" in content: score += 10
     if "<p"  in content: score += 10
-
-    # 길이
     if word_count >= 800:  score += 20
     elif word_count >= 500: score += 10
-
-    # 제목에 키워드
     if keyword_lower in content_lower[:200]: score += 10
-
     return min(score, 100)
 
-# ── 키워드 로드 ───────────────────────────────────────────
 def load_keyword(filename, fallback):
     try:
         if os.path.exists(filename):
@@ -97,9 +84,7 @@ def load_keyword(filename, fallback):
         print(f"⚠️ 키워드 파일 오류: {e}")
     return fallback
 
-# ── 글 생성 (Groq → Gemini 2.5 → Gemini 1.5 → 내부엔진) ──
 def generate_article(prompt, keyword, theme):
-    # 1순위: Groq (llama-3.3-70b)
     try:
         res = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -114,7 +99,6 @@ def generate_article(prompt, keyword, theme):
     except Exception as e:
         print(f"⚠️ Groq 실패: {e}")
 
-    # 2순위: Gemini 2.5 Flash
     try:
         model = genai.GenerativeModel("gemini-2.5-flash-preview-05-20")
         res = model.generate_content(prompt)
@@ -124,7 +108,6 @@ def generate_article(prompt, keyword, theme):
     except Exception as e:
         print(f"⚠️ Gemini 2.5 Flash 실패: {e}")
 
-    # 3순위: Gemini 1.5 Flash
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         res = model.generate_content(prompt)
@@ -134,7 +117,6 @@ def generate_article(prompt, keyword, theme):
     except Exception as e:
         print(f"⚠️ Gemini 1.5 Flash 실패: {e}")
 
-    # 4순위: 내부 기본 엔진
     print("⚠️ 내부 엔진 사용")
     return f"""<h2>The Complete Guide to {keyword}</h2>
 <p>Welcome to our comprehensive guide on {keyword}. This article covers everything you need to know about {theme}.</p>
@@ -158,9 +140,7 @@ def generate_article(prompt, keyword, theme):
 <h2>Conclusion</h2>
 <p>We hope this guide on {keyword} has been helpful. Stay tuned for more expert content on {theme}.</p>"""
 
-# ── 이미지 가져오기 (Pixabay → Pexels → None) ────────────
 def get_image(keyword):
-    # 1순위: Pixabay
     try:
         url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={keyword}&image_type=photo&per_page=5&safesearch=true"
         res = requests.get(url, timeout=10)
@@ -171,7 +151,6 @@ def get_image(keyword):
     except Exception as e:
         print(f"⚠️ Pixabay 실패: {e}")
 
-    # 2순위: Pexels
     try:
         headers = {"Authorization": PEXELS_KEY}
         url = f"https://api.pexels.com/v1/search?query={keyword}&per_page=5"
@@ -185,11 +164,9 @@ def get_image(keyword):
 
     return None, None
 
-# ── 내부 링크 주입 ────────────────────────────────────────
 def inject_links(content, keyword, current_url):
     others = [s for s in SITES_CONFIG if s['url'] != current_url]
     selected = random.sample(others, k=min(2, len(others)))
-
     html = "\n\n<hr style='border:dashed 1px #e0e0e0;margin:30px 0;'>\n"
     html += "<div style='background:#f9f9f9;padding:15px;border-radius:5px;'>\n"
     html += "<p style='font-weight:bold;'>💡 Recommended Insights</p><ul>\n"
@@ -200,7 +177,6 @@ def inject_links(content, keyword, current_url):
     html += "</ul></div>\n"
     return content + html
 
-# ── WordPress 이미지 업로드 ───────────────────────────────
 def upload_image_to_wp(site, img_url, keyword):
     try:
         img_data = requests.get(img_url, timeout=15).content
@@ -217,13 +193,11 @@ def upload_image_to_wp(site, img_url, keyword):
         print(f"⚠️ 이미지 업로드 실패: {e}")
     return None
 
-# ── WordPress 발행 ────────────────────────────────────────
 def publish(site, title, content, media_id=None):
     wp_pass = os.getenv(site['wp_pass_env'])
     if not wp_pass:
         print(f"❌ Secret 없음: {site['wp_pass_env']}")
         return False
-
     api_url = f"{site['url']}/wp-json/wp/v2/posts"
     payload = {
         "title": title,
@@ -233,7 +207,6 @@ def publish(site, title, content, media_id=None):
     }
     if media_id:
         payload["featured_media"] = media_id
-
     try:
         res = requests.post(api_url, json=payload, auth=(WP_USER, wp_pass), timeout=30)
         if res.status_code == 201:
@@ -244,11 +217,9 @@ def publish(site, title, content, media_id=None):
         print(f"💥 접속 불가: {site['url']} - {e}")
     return False
 
-# ── 메인 실행 ─────────────────────────────────────────────
 def run():
     print(f"🚀 총 {len(SITES_CONFIG)}개 사이트 포스팅 시작")
     for site in SITES_CONFIG:
-        # 사이트당 3개 포스팅
         for post_num in range(1, 4):
             keyword = load_keyword(site['keywords_file'], site['theme'])
             print(f"\n📝 [{site['url']}] 포스트 {post_num}/3 | 키워드: {keyword}")
@@ -266,46 +237,29 @@ def run():
                 f"- Include a strong introduction and conclusion"
             )
 
-            # 글 생성
             article = generate_article(prompt, keyword, site['theme'])
-
-            # SEO 점수 체크
             seo_score = calc_seo_score(article, keyword)
             print(f"📊 SEO 점수: {seo_score}/100")
 
-            # 79점 이하 → 재작성 최대 2회
             retry = 0
             while seo_score < 80 and retry < 2:
                 retry += 1
-                print(f"🔄 SEO 점수 미달 ({seo_score}점) → 재작성 {retry}회차")
+                print(f"🔄 재작성 {retry}회차")
                 article = generate_article(prompt, keyword, site['theme'])
                 seo_score = calc_seo_score(article, keyword)
                 print(f"📊 재작성 후 SEO 점수: {seo_score}/100")
 
             if seo_score < 80:
-                print(f"⚠️ 최종 SEO 점수 {seo_score}점 → 그냥 발행")
+                print(f"⚠️ 최종 {seo_score}점 → 그냥 발행")
 
-            # 내부 링크 추가
             final_content = inject_links(article, keyword, site['url'])
 
-            # 이미지 처리
             media_id = None
             img_url, _ = get_image(keyword)
             if img_url:
                 media_id = upload_image_to_wp(site, img_url, keyword)
 
-            # 발행
             publish(site, title, final_content, media_id)
-
-            # 포스트 간 랜덤 대기 (5~20분)
-            if post_num < 3:
-                wait = random.randint(300, 1200)
-                print(f"💤 다음 포스트까지 {wait//60}분 대기...")
-                time.sleep(wait)
-
-        # 사이트 간 대기 (10~30분)
-        print(f"\n💤 다음 사이트까지 대기...")
-        time.sleep(random.randint(600, 1800))
 
 if __name__ == "__main__":
     print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 오토봇 가동")
