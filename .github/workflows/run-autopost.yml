@@ -1,41 +1,36 @@
 name: Auto Post Mega Bot
 
 on:
+  workflow_dispatch:        # 수동 실행 버튼 활성화
   schedule:
-    - cron: '0 */6 * * *'  # 6시간마다 실행
-  workflow_dispatch:  # 수동으로도 실행 가능
+    - cron: '0 15 * * *'    # 매일 밤 설정된 시간에 자동 실행
 
 jobs:
   autopost:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: 📥 저장소 체크아웃
-        uses: actions/checkout@v4
-      
-      - name: 🐍 Python 설정
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: 📦 의존성 설치
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests python-dotenv openai google-generativeai
-      
-      - name: 🚀 autopost_mega.py 실행
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          WP_USER: ${{ secrets.WP_USER }}
-          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
-        run: |
-          python .github/workflows/autopost_mega.py
-      
-      - name: ✅ 완료
-        if: success()
-        run: echo "✅ 자동 포스팅 완료!"
-      
-      - name: ❌ 에러 발생
-        if: failure()
-        run: echo "❌ 자동 포스팅 중 오류 발생"
+    - name: レ포지토리 코드 가져오기
+      uses: actions/checkout@v4
+
+    - name: 파이썬 3.11 설치
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: 필수 패키지 설치
+      run: |
+        pip install requests
+
+    - name: 메가 오토포스팅 엔진 강제 구동
+      env:
+        QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+        PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+        SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+        WP_PASS_HEALTH: ${{ secrets.WP_PASS_HEALTH }}
+        WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
+        WP_PASS_JOURNAL: ${{ secrets.WP_PASS_JOURNAL }}
+      run: |
+        python .github/workflows/autopost_mega.py
