@@ -18,10 +18,11 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: 3. 필수 패키지 강제 업그레이드 설치
+    - name: 3. 필수 패키지 강제 업그레이드 및 dotenv 설치
       run: |
         python -m pip install --upgrade pip
-        pip install requests setuptools wheel
+        # 📌 바로 이 부분에 범인이었던 python-dotenv 패키지를 강제로 주입합니다!
+        pip install requests setuptools wheel python-dotenv
 
     - name: 4. 메가 오토포스팅 엔진 구동
       env:
@@ -34,7 +35,4 @@ jobs:
         WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
         WP_PASS_JOURNAL: ${{ secrets.WP_PASS_JOURNAL }}
       run: |
-        # 현재 폴더 위치를 로그에 찍어서 확인하고 파이썬을 실행합니다.
-        pwd
-        ls -la
         python .github/workflows/autopost_mega.py
