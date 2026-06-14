@@ -7,25 +7,25 @@ jobs:
   autopost:
     runs-on: ubuntu-latest
     steps:
-    - name: 1. 레포지토리 코드 다운로드
+    - name: 1. 코드 다운로드
       uses: actions/checkout@v4
 
-    - name: 2. 파이썬 3.11 환경 빌드
+    - name: 2. 파이썬 3.11 설치
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    - name: 3. 필수 패키지 설치
+    - name: 3. 패키지 설치
       run: |
         python -m pip install --upgrade pip
-        pip install requests google-generativeai
+        pip install requests google-generativeai groq
 
-    - name: 4. 메가 오토포스팅 엔진 구동
+    - name: 4. 오토포스팅 실행
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
         PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
-        SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
         WP_PASS_HEALTH: ${{ secrets.WP_PASS_HEALTH }}
         WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
         WP_PASS_JOURNAL: ${{ secrets.WP_PASS_JOURNAL }}
