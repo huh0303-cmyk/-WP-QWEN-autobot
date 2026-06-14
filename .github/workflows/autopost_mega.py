@@ -1,4 +1,4 @@
-import os
+ import os
 import sys
 import time
 import random
@@ -18,28 +18,28 @@ genai.configure(api_key=GEMINI_API_KEY)
 groq_client = Groq(api_key=GROK_API_KEY)
 
 SITES_CONFIG = [
-    {"url": "https://k-health365.com",      "lang": "ko", "theme": "건강과 의학",              "keywords_file": ".github/workflows/keywords_khealth.txt",       "wp_pass_env": "WP_PASS_HEALTH"},
-    {"url": "https://koreanews365.com",      "lang": "ko", "theme": "한국 뉴스와 시사",          "keywords_file": ".github/workflows/keywords_koreanews.txt",      "wp_pass_env": "WP_PASS_NEWS"},
-    {"url": "https://theseouljournal.com",   "lang": "en", "theme": "Seoul Lifestyle and Trends",     "keywords_file": ".github/workflows/keywords_seouljournal.txt",  "wp_pass_env": "WP_PASS_JOURNAL"},
-    {"url": "https://koreamedicaltour.com",  "lang": "en", "theme": "Korea Medical Tourism",          "keywords_file": ".github/workflows/keywords_medicaltour.txt",   "wp_pass_env": "KOREAMEDICALTOURCOM"},
-    {"url": "https://kskin365.com",          "lang": "en", "theme": "K-Beauty and Skincare",          "keywords_file": ".github/workflows/keywords_kskin.txt",         "wp_pass_env": "KSKIN365COM"},
-    {"url": "https://korea365.org",          "lang": "en", "theme": "Korea Culture and Life",         "keywords_file": ".github/workflows/keywords_korea365.txt",      "wp_pass_env": "KOREA365ORG"},
-    {"url": "https://jobinkorea365.com",     "lang": "en", "theme": "Jobs and Career in Korea",       "keywords_file": ".github/workflows/keywords_jobinkorea365.txt", "wp_pass_env": "JOBINKOREA365COM"},
-    {"url": "https://jobkorea365.com",       "lang": "en", "theme": "Employment in Korea",            "keywords_file": ".github/workflows/keywords_jobkorea365.txt",   "wp_pass_env": "JOBKOREA365COM"},
-    {"url": "https://jobkoreaglobal.com",    "lang": "en", "theme": "Global Career and Recruitment",  "keywords_file": ".github/workflows/keywords_jobkoreaglobal.txt","wp_pass_env": "JOBKOREAGLOBALCOM"},
-    {"url": "https://kstudy365.com",         "lang": "en", "theme": "Study in Korea",                 "keywords_file": ".github/workflows/keywords_kstudy365.txt",     "wp_pass_env": "KSTUDY365COM"},
-    {"url": "https://studyinkorea.com",      "lang": "en", "theme": "International Students in Korea","keywords_file": ".github/workflows/keywords_koreanews.txt",      "wp_pass_env": "STUDYINKOREA365COM"},
-    {"url": "https://kfinance365.com",       "lang": "en", "theme": "Korean Economy and Finance",     "keywords_file": ".github/workflows/keywords_kfinance.txt",      "wp_pass_env": "KFINANCE365COM"},
-    {"url": "https://koreainvest365.com",    "lang": "en", "theme": "Stock and Investment in Korea",  "keywords_file": ".github/workflows/keywords_kinvest.txt",       "wp_pass_env": "KOREAINVEST365COM"},
-    {"url": "https://koreataxnlaw.com",      "lang": "en", "theme": "Korea Tax and Law",              "keywords_file": ".github/workflows/keywords_ktax.txt",          "wp_pass_env": "KOREATAXNLAW365COM"},
-    {"url": "https://k-trip365.com",         "lang": "en", "theme": "Korea Travel and Tourism",       "keywords_file": ".github/workflows/keywords_ktrip.txt",         "wp_pass_env": "KTRIP365COM"},
-    {"url": "https://k-visa365.com",         "lang": "en", "theme": "Korea Visa and Immigration",     "keywords_file": ".github/workflows/keywords_kvisa.txt",         "wp_pass_env": "KVISA365COM"},
-    {"url": "https://koreacrypto365.com",    "lang": "en", "theme": "Cryptocurrency in Korea",        "keywords_file": ".github/workflows/keywords_kcrypto.txt",       "wp_pass_env": "KOREACRYPTO365COM"},
-    {"url": "https://koreainsurance365.com", "lang": "en", "theme": "Insurance in Korea",             "keywords_file": ".github/workflows/keywords_kinsurance.txt",    "wp_pass_env": "KOREAINSURANCE365COM"},
-    {"url": "https://koreavedding365.com",   "lang": "en", "theme": "Korea Wedding Industry",         "keywords_file": ".github/workflows/keywords_kwedding.txt",      "wp_pass_env": "KOREAWEDDING365COM"},
-    {"url": "https://ktech365.com",          "lang": "en", "theme": "Korean Technology and Gadgets",  "keywords_file": ".github/workflows/keywords_ktech.txt",         "wp_pass_env": "KTECH365COM"},
-    {"url": "https://kworld365.com",         "lang": "en", "theme": "Korean Entertainment and K-POP", "keywords_file": ".github/workflows/keywords_kworld.txt",        "wp_pass_env": "KWORLD365COM"},
-    {"url": "https://oliveyoungkorea.com",   "lang": "en", "theme": "K-Beauty Product Reviews",       "keywords_file": ".github/workflows/keywords_oliveyoung.txt",    "wp_pass_env": "OLIVEYOUNGKOREACOM"},
+    {"url": "https://k-health365.com",      "lang": "ko", "theme": "건강과 의학",               "keywords_file": ".github/workflows/keywords_khealth.txt",       "wp_pass_env": "WP_PASS_HEALTH"},
+    {"url": "https://koreanews365.com",      "lang": "ko", "theme": "한국 뉴스와 시사",           "keywords_file": ".github/workflows/keywords_koreanews.txt",      "wp_pass_env": "WP_PASS_NEWS"},
+    {"url": "https://theseouljournal.com",   "lang": "en", "theme": "Seoul Lifestyle and Trends",      "keywords_file": ".github/workflows/keywords_seouljournal.txt",  "wp_pass_env": "WP_PASS_JOURNAL"},
+    {"url": "https://koreamedicaltour.com",  "lang": "en", "theme": "Korea Medical Tourism",           "keywords_file": ".github/workflows/keywords_medicaltour.txt",   "wp_pass_env": "KOREAMEDICALTOURCOM"},
+    {"url": "https://kskin365.com",          "lang": "en", "theme": "K-Beauty and Skincare",           "keywords_file": ".github/workflows/keywords_kskin.txt",         "wp_pass_env": "KSKIN365COM"},
+    {"url": "https://korea365.org",          "lang": "en", "theme": "Korea Culture and Life",          "keywords_file": ".github/workflows/keywords_korea365.txt",      "wp_pass_env": "KOREA365ORG"},
+    {"url": "https://jobinkorea365.com",     "lang": "en", "theme": "Jobs and Career in Korea",        "keywords_file": ".github/workflows/keywords_jobinkorea365.txt", "wp_pass_env": "JOBINKOREA365COM"},
+    {"url": "https://jobkorea365.com",       "lang": "en", "theme": "Employment in Korea",             "keywords_file": ".github/workflows/keywords_jobkorea365.txt",   "wp_pass_env": "JOBKOREA365COM"},
+    {"url": "https://jobkoreaglobal.com",    "lang": "en", "theme": "Global Career and Recruitment",   "keywords_file": ".github/workflows/keywords_jobkoreaglobal.txt","wp_pass_env": "JOBKOREAGLOBALCOM"},
+    {"url": "https://kstudy365.com",         "lang": "en", "theme": "Study in Korea",                  "keywords_file": ".github/workflows/keywords_kstudy365.txt",     "wp_pass_env": "KSTUDY365COM"},
+    {"url": "https://studyinkorea.com",      "lang": "en", "theme": "International Students in Korea", "keywords_file": ".github/workflows/keywords_koreanews.txt",      "wp_pass_env": "STUDYINKOREA365COM"},
+    {"url": "https://kfinance365.com",       "lang": "en", "theme": "Korean Economy and Finance",      "keywords_file": ".github/workflows/keywords_kfinance.txt",      "wp_pass_env": "KFINANCE365COM"},
+    {"url": "https://koreainvest365.com",    "lang": "en", "theme": "Stock and Investment in Korea",   "keywords_file": ".github/workflows/keywords_kinvest.txt",       "wp_pass_env": "KOREAINVEST365COM"},
+    {"url": "https://koreataxnlaw.com",      "lang": "en", "theme": "Korea Tax and Law",               "keywords_file": ".github/workflows/keywords_ktax.txt",          "wp_pass_env": "KOREATAXNLAW365COM"},
+    {"url": "https://k-trip365.com",         "lang": "en", "theme": "Korea Travel and Tourism",        "keywords_file": ".github/workflows/keywords_ktrip.txt",         "wp_pass_env": "KTRIP365COM"},
+    {"url": "https://k-visa365.com",         "lang": "en", "theme": "Korea Visa and Immigration",      "keywords_file": ".github/workflows/keywords_kvisa.txt",         "wp_pass_env": "KVISA365COM"},
+    {"url": "https://koreacrypto365.com",    "lang": "en", "theme": "Cryptocurrency in Korea",         "keywords_file": ".github/workflows/keywords_kcrypto.txt",       "wp_pass_env": "KOREACRYPTO365COM"},
+    {"url": "https://koreainsurance365.com", "lang": "en", "theme": "Insurance in Korea",              "keywords_file": ".github/workflows/keywords_kinsurance.txt",    "wp_pass_env": "KOREAINSURANCE365COM"},
+    {"url": "https://koreavedding365.com",   "lang": "en", "theme": "Korea Wedding Industry",          "keywords_file": ".github/workflows/keywords_kwedding.txt",      "wp_pass_env": "KOREAWEDDING365COM"},
+    {"url": "https://ktech365.com",          "lang": "en", "theme": "Korean Technology and Gadgets",   "keywords_file": ".github/workflows/keywords_ktech.txt",         "wp_pass_env": "KTECH365COM"},
+    {"url": "https://kworld365.com",         "lang": "en", "theme": "Korean Entertainment and K-POP",  "keywords_file": ".github/workflows/keywords_kworld.txt",        "wp_pass_env": "KWORLD365COM"},
+    {"url": "https://oliveyoungkorea.com",   "lang": "en", "theme": "K-Beauty Product Reviews",        "keywords_file": ".github/workflows/keywords_oliveyoung.txt",    "wp_pass_env": "OLIVEYOUNGKOREACOM"},
 ]
 
 KO_TITLE_TEMPLATES = [
@@ -133,11 +133,40 @@ def load_keyword(filename, fallback):
 
 def make_title(keyword, lang):
     year = datetime.now().year
+    templates = KO_TITLE_TEMPLATES if lang == "ko" else EN_TITLE_TEMPLATES
+    return random.choice(templates).format(keyword=keyword, year=year)
+
+def make_prompt(keyword, theme, lang):
     if lang == "ko":
-        template = random.choice(KO_TITLE_TEMPLATES)
+        return (
+            f"당신은 15년 경력의 전문 SEO 콘텐츠 작가입니다.\n"
+            f"'{keyword}'({theme}) 주제로 SEO 최적화된 한국어 블로그 포스트를 작성하세요.\n\n"
+            f"필수 요건:\n"
+            f"- 최소 1500자 이상 (필수)\n"
+            f"- HTML 태그만 사용: h2, h3, p, ul, li, ol, strong\n"
+            f"- 마크다운 사용 금지, HTML만 사용\n"
+            f"- 첫 문단에 '{keyword}' 반드시 포함\n"
+            f"- '{keyword}'를 자연스럽게 8~12회 사용\n"
+            f"- 구성: 도입부 → h2 섹션 4~5개 → h3 소제목 → 결론\n"
+            f"- ul/li 실용적 팁 섹션 포함\n"
+            f"- 전문적이고 신뢰감 있는 문체\n"
+            f"- FAQ 섹션 포함 (h3 + p 형식)\n"
+        )
     else:
-        template = random.choice(EN_TITLE_TEMPLATES)
-    return template.format(keyword=keyword, year=year)
+        return (
+            f"You are a professional SEO content writer with 15+ years of experience.\n"
+            f"Write a comprehensive, SEO-optimized blog post about '{keyword}' ({theme}) in English.\n\n"
+            f"STRICT REQUIREMENTS:\n"
+            f"- Minimum 1500 words (MUST)\n"
+            f"- Use HTML tags ONLY: h2, h3, p, ul, li, ol, strong\n"
+            f"- NO markdown, NO asterisks, ONLY HTML\n"
+            f"- Include '{keyword}' in the very first paragraph\n"
+            f"- Naturally use '{keyword}' 8-12 times throughout\n"
+            f"- Structure: Introduction → 4-5 main h2 sections → h3 subsections → Conclusion\n"
+            f"- Include practical tips with ul/li list\n"
+            f"- Include a FAQ section\n"
+            f"- Engaging, authoritative, expert tone\n"
+        )
 
 def generate_article(prompt):
     try:
@@ -177,16 +206,13 @@ def generate_article(prompt):
 
 def get_image(keyword):
     try:
-        q = keyword.encode('ascii', 'ignore').decode()
-        if not q.strip():
-            q = "korea"
+        q = keyword.encode('ascii', 'ignore').decode().strip() or "korea"
         url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={requests.utils.quote(q)}&image_type=photo&per_page=5&safesearch=true&lang=en"
         res = requests.get(url, timeout=10)
         data = res.json()
         if data.get("hits"):
-            hit = random.choice(data["hits"])
             print("✅ Pixabay 이미지 발견")
-            return hit["webformatURL"]
+            return random.choice(data["hits"])["webformatURL"]
     except Exception as e:
         print(f"⚠️ Pixabay 실패: {e}")
 
@@ -196,9 +222,8 @@ def get_image(keyword):
         res = requests.get(url, headers=headers, timeout=10)
         data = res.json()
         if data.get("photos"):
-            photo = random.choice(data["photos"])
             print("✅ Pexels 이미지 발견")
-            return photo["src"]["large"]
+            return random.choice(data["photos"])["src"]["large"]
     except Exception as e:
         print(f"⚠️ Pexels 실패: {e}")
 
@@ -208,9 +233,8 @@ def upload_image(site, img_url, keyword):
     try:
         img_data = requests.get(img_url, timeout=15).content
         wp_pass = os.getenv(site['wp_pass_env'])
-        filename = keyword.encode('ascii', 'ignore').decode().replace(' ', '-').lower()[:40] + ".jpg"
-        if not filename.replace('-','').replace('.jpg',''):
-            filename = "featured-image.jpg"
+        safe_name = keyword.encode('ascii', 'ignore').decode().replace(' ', '-').lower()[:40]
+        filename = (safe_name or "featured") + ".jpg"
         headers = {
             "Content-Disposition": f"attachment; filename={filename}",
             "Content-Type": "image/jpeg"
@@ -234,9 +258,9 @@ def inject_links(content, keyword, current_url, lang):
     others = [s for s in SITES_CONFIG if s['url'] != current_url]
     selected = random.sample(others, k=min(2, len(others)))
     anchors = ANCHORS_KO if lang == "ko" else ANCHORS_EN
+    label = "💡 관련 추천 정보" if lang == "ko" else "💡 Recommended Insights"
     html = "\n\n<hr style='border:dashed 1px #e0e0e0;margin:30px 0;'>\n"
     html += "<div style='background:#f9f9f9;padding:15px;border-radius:5px;'>\n"
-    label = "💡 관련 추천 정보" if lang == "ko" else "💡 Recommended Insights"
     html += f"<p style='font-weight:bold;'>{label}</p><ul>\n"
     for site in selected:
         anchor = random.choice(anchors).format(keyword=keyword)
@@ -275,38 +299,6 @@ def publish(site, title, content, media_id=None):
         print(f"💥 접속 불가: {e}")
         return False, "", str(e)
 
-def make_prompt(keyword, theme, lang):
-    if lang == "ko":
-        return (
-            f"당신은 15년 경력의 전문 SEO 콘텐츠 작가입니다.\n"
-            f"'{keyword}'({theme}) 주제로 SEO 최적화된 한국어 블로그 포스트를 작성하세요.\n\n"
-            f"필수 요건:\n"
-            f"- 최소 1500자 이상 (필수)\n"
-            f"- HTML 태그만 사용: h2, h3, p, ul, li, ol, strong\n"
-            f"- 마크다운 사용 금지, HTML만 사용\n"
-            f"- 첫 문단에 '{keyword}' 반드시 포함\n"
-            f"- '{keyword}'를 자연스럽게 8~12회 사용\n"
-            f"- 구성: 도입부 → h2 섹션 4~5개 → h3 소제목 → 결론\n"
-            f"- ul/li 실용적 팁 섹션 포함\n"
-            f"- 전문적이고 신뢰감 있는 문체\n"
-            f"- FAQ 섹션 포함 (h3 + p 형식)\n"
-        )
-    else:
-        return (
-            f"You are a professional SEO content writer with 15+ years of experience.\n"
-            f"Write a comprehensive, SEO-optimized blog post about '{keyword}' ({theme}) in English.\n\n"
-            f"STRICT REQUIREMENTS:\n"
-            f"- Minimum 1500 words (MUST)\n"
-            f"- Use HTML tags ONLY: h2, h3, p, ul, li, ol, strong\n"
-            f"- NO markdown, NO asterisks, ONLY HTML\n"
-            f"- Include '{keyword}' in the very first paragraph\n"
-            f"- Naturally use '{keyword}' 8-12 times throughout\n"
-            f"- Structure: Introduction → 4-5 main h2 sections → h3 subsections → Conclusion\n"
-            f"- Include practical tips with ul/li list\n"
-            f"- Include a FAQ section\n"
-            f"- Engaging, authoritative, expert tone\n"
-        )
-
 def run():
     total = len(SITES_CONFIG)
     print(f"🚀 총 {total}개 사이트 × 3포스트 = {total*3}개 발행 시작!")
@@ -325,3 +317,78 @@ def run():
 
             prompt = make_prompt(keyword, site['theme'], lang)
             article = generate_article(prompt)
+
+            if not article:
+                if lang == "ko":
+                    article = (
+                        f"<h2>{keyword} 완벽 가이드</h2>"
+                        f"<p>{keyword}은(는) {site['theme']} 분야에서 매우 중요한 주제입니다.</p>"
+                        f"<h2>{keyword}의 핵심 효능</h2>"
+                        f"<p>{keyword}에 대한 전문가 분석을 제공합니다.</p>"
+                        f"<h3>주요 장점</h3><ul>"
+                        f"<li>{keyword} 심층 이해</li>"
+                        f"<li>실용적인 {keyword} 활용법</li>"
+                        f"<li>전문가 {keyword} 조언</li>"
+                        f"</ul>"
+                        f"<h2>결론</h2>"
+                        f"<p>{keyword}을(를) 올바르게 이해하고 활용하시기 바랍니다.</p>"
+                    )
+                else:
+                    article = (
+                        f"<h2>The Complete Guide to {keyword}</h2>"
+                        f"<p>{keyword} is one of the most important topics in {site['theme']}.</p>"
+                        f"<h2>Why {keyword} Matters</h2>"
+                        f"<p>Understanding {keyword} is essential for success.</p>"
+                        f"<h3>Key Benefits</h3><ul>"
+                        f"<li>Deep understanding of {keyword}</li>"
+                        f"<li>Practical tips for {keyword}</li>"
+                        f"<li>Expert insights on {keyword}</li>"
+                        f"</ul>"
+                        f"<h2>Conclusion</h2>"
+                        f"<p>Mastering {keyword} gives you a competitive edge.</p>"
+                    )
+
+            seo = calc_seo_score(article, keyword)
+            print(f"📊 SEO 점수: {seo}/100")
+
+            retry = 0
+            while seo < 80 and retry < 2:
+                retry += 1
+                print(f"🔄 재작성 {retry}회차 ({seo}점)")
+                new = generate_article(prompt)
+                if new:
+                    article = new
+                    seo = calc_seo_score(article, keyword)
+                    print(f"📊 재작성 후: {seo}/100")
+
+            if seo < 80:
+                print(f"⚠️ 최종 {seo}점 → 그냥 발행")
+            else:
+                print(f"🎯 {seo}점 → 발행 승인!")
+
+            char_count = len(article)
+            final = inject_links(article, keyword, site['url'], lang)
+
+            media_id = None
+            img_url = get_image(keyword)
+            if img_url:
+                media_id = upload_image(site, img_url, keyword)
+            else:
+                print("⚠️ 이미지 없이 발행")
+
+            success, post_url, error_msg = publish(site, title, final, media_id)
+
+            log_to_sheets(
+                site['url'], keyword, title,
+                success, seo, char_count,
+                post_url, error_msg
+            )
+
+            if not (i == total and post_num == 3):
+                print(f"⏳ 3분 대기...")
+                time.sleep(180)
+
+if __name__ == "__main__":
+    print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 오토봇 가동")
+    run()
+    sys.exit(0)
