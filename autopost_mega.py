@@ -21,6 +21,12 @@ import re
 import threading
 from datetime import datetime, date
 
+# OpenAI 라이브러리 안전 로드 및 초기화 오류 원천 차단
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
+
 # 데이터 구조 선로드 (환경에 맞게 파일이 없다면 예외처리 가동)
 try:
     from sites_config import SITES
@@ -42,6 +48,7 @@ except ImportError:
 #  ★ 인프라 자산 인코딩 및 보안 변수 선언 ★
 # ══════════════════════════════════════════════
 QWEN_API_KEY    = os.environ.get("QWEN_API_KEY", "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")
+OPENAI_API_KEY  = os.environ.get("OPENAI_API_KEY", QWEN_API_KEY) # 내부 OpenAI 엔진용 우회 처리
 QWEN_MODEL      = "qwen-2.5-72b-instruct"
 QWEN_API_URL    = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -53,7 +60,6 @@ PEXELS_KEY      = os.environ.get("PEXELS_KEY", "41q16JQ0qBM123kTUgEk2YKAfK3e43l6
 INDEXNOW_KEY    = "khealth365indexnow2024"
 
 # 제공해주신atutobot 구글 스프레드시트와 연결된 Apps Script 웹훅 URL 앱 주소 입력
-# (환경변수에 SHEETS_WEBHOOK 주소를 세팅하거나 아래 문자열에 직접 붙여넣으시면 됩니다)
 SHEETS_WEBHOOK  = os.environ.get("SHEETS_WEBHOOK", "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOY_ID/exec")
 
 WP_USERNAME     = "huh0303@gmail.com"
@@ -71,6 +77,14 @@ MIN_GAP_MIN     = 30
 REPORTER_POOL_KR = ["전문기자 김윤서", "전문기자 이현수", "수석기자 김상준", "전문기자 박지아", "전문기자 정도윤"]
 REPORTER_POOL_EN = ["Sarah Mitchell", "James Anderson", "Emily Carter", "David Thompson", "Rachel Bennett"]
 
+# OpenAI 클라이언트 안전 초기화 (에러 원인 제거)
+client_qwen = None
+if OpenAI is not None and OPENAI_API_KEY:
+    try:
+        client_qwen = OpenAI(api_key=OPENAI_API_KEY)
+    except Exception:
+        client_qwen = None
+
 def get_domain(url):
     return url.replace("https://", "").replace("http://", "").rstrip("/")
 
@@ -83,13 +97,9 @@ def pick_reporter(lang="en"):
 #  ★ 구글 스프레드시트 실시간 전송 커넥터 ★
 # ══════════════════════════════════════════════
 def send_to_google_sheets_live(row_data):
-    """
-    작성된 포스팅의 진행 상황 및 검증 지표를 구글 스프레드시트에 실시간으로 push합니다.
-    """
     if not SHEETS_WEBHOOK or "YOUR_APPS_SCRIPT_DEPLOY_ID" in SHEETS_WEBHOOK:
         return
     try:
-        # 비동기식 실시간 데이터 동기화 전송
         response = requests.post(SHEETS_WEBHOOK, json=row_data, timeout=12)
         if response.status_code == 200:
             print("      📊 [구글 시트] 실시간 진행 상황 업데이트 완료.")
@@ -126,6 +136,7 @@ def get_image_backup_system(query):
 #  ★ 3단계 분기 보장형 고성능 글쓰기 엔진 ★
 # ══════════════════════════════════════════════
 def call_writer_triple_engine(prompt, keyword, lang="ko", theme=""):
+    # 1차 엔진: Qwen API 호출
     try:
         headers = {"Authorization": f"Bearer {QWEN_API_KEY}", "Content-Type": "application/json"}
         payload = {
@@ -142,6 +153,7 @@ def call_writer_triple_engine(prompt, keyword, lang="ko", theme=""):
     except Exception as e:
         print(f"      ❌ [1차 엔진: Qwen] 실패: {e} -> 2차 Gemini 시스템으로 인계합니다.")
 
+    # 2차 엔진: Gemini API 호출
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
         payload = {
@@ -154,6 +166,7 @@ def call_writer_triple_engine(prompt, keyword, lang="ko", theme=""):
     except Exception as e:
         print(f"      ❌ [2차 엔진: Gemini] 실패: {e} -> 3차 정적 복구 시스템 강제 조립 개시.")
 
+    # 3차 엔진: 최종 안전 백업 가동
     return generate_fallback_static_html(keyword, lang, theme)
 
 
@@ -162,7 +175,6 @@ def generate_fallback_static_html(keyword, lang, theme):
     if lang != "ko":
         title = f"TITLE: The Ultimate Master Guide to {keyword} - Critical Insights Revealed"
     
-    # (앞선 코드의 정적 HTML 조립 로직과 동일하여 지면상 간소화, 실제 실행 시 완벽 작동)
     return f"{title}\n\n<p>안녕하세요. {theme} 전문 임상 분석 데이터를 기반으로 신뢰할 수 있는 가이드를 전해드리는 전문 연구 지표 블로그입니다.</p><h2>1. {keyword} 핵심 배경</h2><p>우리가 느끼는 미세한 변화는 정밀하게 계산된 누적 결과물입니다.</p>"
 
 # ══════════════════════════════════════════════
@@ -323,7 +335,7 @@ def process_single_site_automation(site, results_list, lock):
     print(f"\n[🚀 오토 엔진 가동] 대상 도메인: {domain} ({lang.upper()})")
 
     for idx, kw in enumerate(target_kws):
-        print(f"  └─> ({idx+1}/{len(target_kws)}) 핵심 검색어 빌딩: '{kw}'")
+        print(f"   └─> ({idx+1}/{len(target_kws)}) 핵심 검색어 빌딩: '{kw}'")
         
         prompt = build_seo_prompt_studio(kw, site, lang)
         
