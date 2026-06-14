@@ -162,10 +162,21 @@ def process_single_site_automation(site, results_list, lock):
     lang = site.get("lang", "ko")
     kw_file = site["keywords_file"]
     
-    # 📌 외부 모듈 호출 대신 워크플로우 폴더 내에 실존하는 텍스트 파일을 직접 로드함
-    file_path = f".github/workflows/{kw_file}"
-    if not os.path.exists(file_path):
-        print(f"   ⚠️ 파일 없음 패스: {file_path}")
+    # 루트 기준과 워크플로우 기준 경로를 모두 탐색
+    possible_paths = [
+        f".github/workflows/{kw_file}",
+        kw_file,
+        os.path.join(os.path.dirname(__file__), kw_file)
+    ]
+    
+    file_path = None
+    for p in possible_paths:
+        if os.path.exists(p):
+            file_path = p
+            break
+
+    if not file_path:
+        print(f"   ⚠️ [경로 에러] 텍스트 파일을 찾을 수 없습니다: {kw_file}")
         return
 
     with open(file_path, "r", encoding="utf-8") as f:
@@ -174,7 +185,7 @@ def process_single_site_automation(site, results_list, lock):
     if not all_kws:
         return
 
-    target_kws = all_kws[:min(len(all_kws), 1)] # 속도 안정성을 위해 먼저 1개 테스트 구동
+    target_kws = all_kws[:min(len(all_kws), 1)]
     print(f"\n[🚀 엔진 가동] 대상 도메인: {domain}")
 
     for kw in target_kws:
