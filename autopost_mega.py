@@ -1,235 +1,163 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-WordPress AI 자동 포스팅 봇 - HIGH-END MEGA 독자 생존형 시스템
-"""
-
 import os
-import json
+import sys
 import time
 import random
 import requests
-import base64
-import re
-import threading
-from datetime import datetime, date
+from datetime import datetime
+import google.generativeai as genai
 
-# ══════════════════════════════════════════════
-#  ★ 외부 파일 종속성 100% 제거 및 다이렉트 매핑 ★
-# ══════════════════════════════════════════════
-SITES = [
-    {"url": "https://k-health365.com", "lang": "ko", "theme": "건강 및 의학 보건 정보", "keywords_file": "keywords_khealth.txt", "category_id": 964},
-    {"url": "https://koreanews365.com", "lang": "ko", "theme": "시사 종합 및 라이프 뉴스", "keywords_file": "keywords_koreanews.txt", "category_id": 1},
-    {"url": "https://theseouljournal.com", "lang": "en", "theme": "Korean culture, business, and daily life guide", "keywords_file": "keywords_seouljournal.txt", "category_id": 1}
+# ── 환경변수 로드 ──────────────────────────────────────────
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GEMINI_API_KEY)
+
+WP_USER = "huh0303@gmail.com"
+
+# ── 사이트 설정 (3개) ──────────────────────────────────────
+SITES_CONFIG = [
+    {
+        "url": "https://k-health365.com",
+        "lang": "ko",
+        "theme": "Health and Medicine",
+        "category_id": 1,
+        "keywords_file": ".github/workflows/keywords_khealth.txt",
+        "style": "blog",
+        "wp_pass_env": "WP_PASS_HEALTH"
+    },
+    {
+        "url": "https://koreanews365.com",
+        "lang": "ko",
+        "theme": "General News and Issues",
+        "category_id": 1,
+        "keywords_file": ".github/workflows/keywords_koreanews.txt",
+        "style": "news",
+        "wp_pass_env": "WP_PASS_NEWS"
+    },
+    {
+        "url": "https://theseouljournal.com",
+        "lang": "en",
+        "theme": "Seoul Lifestyle and Trends",
+        "category_id": 1,
+        "keywords_file": ".github/workflows/keywords_seouljournal.txt",
+        "style": "blog",
+        "wp_pass_env": "WP_PASS_JOURNAL"
+    }
 ]
 
-# ══════════════════════════════════════════════
-#  ★ 시크릿 및 인프라 자산 인코딩 ★
-# ══════════════════════════════════════════════
-QWEN_API_KEY    = os.environ.get("QWEN_API_KEY") or "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"
-QWEN_MODEL      = "qwen-2.5-72b-instruct"
-QWEN_API_URL    = "https://api.groq.com/openai/v1/chat/completions"
-
-GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY") or "AIzaSyD-Your-Actual-Gemini-Key-Here"
-GEMINI_MODEL    = "gemini-2.5-flash"
-
-PIXABAY_KEY     = os.environ.get("PIXABAY_KEY") or "u_g0pmau3m85"
-PEXELS_KEY      = os.environ.get("PEXELS_KEY") or "41q16JQ0qBM123kTUgEk2YKAfK3e43l6NCErWoWn0Fv41Zmdfub0XAs8"
-INDEXNOW_KEY    = "khealth365indexnow2024"
-
-SHEETS_WEBHOOK  = os.environ.get("SHEETS_WEBHOOK") or "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOY_ID/exec"
-
-WP_USERNAME     = "huh0303@gmail.com"
-WP_PASS_DEFAULT = "A3sK VQud Xday 1ait Zl0d ZAA2"
-
-WP_PASSWORDS = {
-    "k-health365.com":        os.environ.get("WP_PASS_HEALTH") or "A3sK VQud Xday 1ait Zl0d ZAA2",
-    "koreanews365.com":       os.environ.get("WP_PASS_NEWS") or "MSqZ PAhu UpBL 2B1W cDle 4DEO",
-    "theseouljournal.com":    os.environ.get("WP_PASS_JOURNAL") or "Z7S7 97p2 vEBC gTxe sVDb hnMY",
+# ── 내부 링크 앵커 텍스트 ──────────────────────────────────
+ANCHOR_TEMPLATES = {
+    "ko": [
+        "함께 읽으면 좋은 {keyword} 관련 정보",
+        "{keyword} 핵심 분석 확인하기",
+        "{keyword} 필수 주의사항 총정리"
+    ],
+    "en": [
+        "Recommended guide on {keyword}",
+        "Must-read breakdown about {keyword}",
+        "Deep dive analysis on {keyword}"
+    ]
 }
 
-REPORTER_POOL_KR = ["전문기자 김윤서", "전문기자 이현수", "수석기자 김상준", "전문기자 박지아"]
-REPORTER_POOL_EN = ["Sarah Mitchell", "James Anderson", "Emily Carter", "David Thompson"]
-
-def get_domain(url):
-    return url.replace("https://", "").replace("http://", "").rstrip("/")
-
-def pick_reporter(lang="en"):
-    return random.choice(REPORTER_POOL_KR if lang == "ko" else REPORTER_POOL_EN)
-
-def send_to_google_sheets_live(row_data):
-    if not SHEETS_WEBHOOK or "YOUR_APPS_SCRIPT_DEPLOY_ID" in SHEETS_WEBHOOK:
-        return
+# ── 키워드 파일 로드 ───────────────────────────────────────
+def load_keyword(filename, fallback):
     try:
-        requests.post(SHEETS_WEBHOOK, json=row_data, timeout=12)
-    except:
-        pass
-
-def get_image_backup_system(query):
-    try:
-        url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={requests.utils.quote(query)}&image_type=photo&orientation=horizontal&per_page=3&safesearch=true"
-        r = requests.get(url, timeout=10)
-        hits = r.json().get("hits", [])
-        if hits:
-            p = random.choice(hits)
-            return {"src": p["webformatURL"], "credit": 'Image from Pixabay'}
-    except:
-        pass
-    return {}
-
-def call_writer_triple_engine(prompt, keyword, lang="ko", theme=""):
-    try:
-        headers = {"Authorization": f"Bearer {QWEN_API_KEY}", "Content-Type": "application/json"}
-        payload = {
-            "model": QWEN_MODEL,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.7, "max_tokens": 4096
-        }
-        r = requests.post(QWEN_API_URL, headers=headers, json=payload, timeout=50)
-        if r.status_code == 200:
-            return r.json()["choices"][0]["message"]["content"]
+        if os.path.exists(filename):
+            with open(filename, 'r', encoding='utf-8') as f:
+                keywords = [line.strip() for line in f if line.strip()]
+            if keywords:
+                return random.choice(keywords)
     except Exception as e:
-        print(f"      ❌ Qwen API 장애로 2차 제미나이로 연결함: {e}")
+        print(f"⚠️ 키워드 파일 읽기 실패: {e}")
+    return fallback
 
+# ── 내부 링크 주입 ─────────────────────────────────────────
+def inject_links(html_content, keyword, current_url, lang):
+    others = [s for s in SITES_CONFIG if s['url'] != current_url]
+    selected = random.sample(others, k=min(2, len(others)))
+
+    title = "💡 유용한 추천 정보" if lang == "ko" else "💡 Recommended Insights"
+    html = "\n\n<hr style='border:dashed 1px #e0e0e0;margin:30px 0;'>\n"
+    html += "<div style='background:#f9f9f9;padding:15px;border-radius:5px;'>\n"
+    html += f"<p style='font-weight:bold;'>{title}</p><ul>\n"
+
+    for site in selected:
+        templates = ANCHOR_TEMPLATES['ko'] if lang == "ko" else ANCHOR_TEMPLATES['en']
+        anchor = random.choice(templates).format(keyword=keyword)
+        link = f"{site['url']}/?s={keyword}"
+        html += f"<li><a href='{link}' target='_blank' rel='noopener noreferrer'>{anchor}</a></li>\n"
+
+    html += "</ul></div>\n"
+    return html_content + html
+
+# ── Gemini 콘텐츠 생성 ────────────────────────────────────
+def generate_article(prompt):
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-        payload = {"contents": [{"parts": [{"text": prompt}]}]}
-        r = requests.post(url, json=payload, timeout=50)
-        if r.status_code == 200:
-            return r.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except:
-        pass
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        res = model.generate_content(prompt)
+        return res.text
+    except Exception as e:
+        print(f"⚠️ Gemini 생성 실패: {e}")
+        return None
 
-    return f"TITLE: {keyword} 가이드\n\n<p>본문 백업 활성화 시스템 가동.</p><h2>1. {keyword} 안내</h2><p>상세 분석 가이드 정보입니다.</p>"
+# ── WordPress 발행 ────────────────────────────────────────
+def publish(site, title, content):
+    wp_pass = os.getenv(site['wp_pass_env'])
+    if not wp_pass:
+        print(f"❌ Secret 없음: {site['wp_pass_env']}")
+        return False
 
-def process_content_layout(raw):
-    raw = raw.strip().replace("```html", "").replace("```", "").strip()
-    lines = raw.split("\n")
-    title, meta, content = "", "", raw
-
-    for i, line in enumerate(lines):
-        if line.startswith("TITLE:"):
-            title = line.replace("TITLE:", "").strip().strip('`"\' ')
-            content = "\n".join(lines[i+1:])
-            break
-
-    def img_replacer(m):
-        q = m.group(1).strip()
-        img = get_image_backup_system(q)
-        if img:
-            return f'\n\n<figure class="wp-block-image size-large"><img src="{img["src"]}" alt="{q}"/><figcaption>{img["credit"]}</figcaption></figure>\n\n'
-        return f'\n\n<p><em>[{q}]</em></p>\n\n'
-
-    content = re.sub(r'\[Image:\s*([^\]]+)\]', img_replacer, content, flags=re.IGNORECASE)
-    meta = f"Professional overview report on {title if title else 'Information'}."
-    return {"title": title or "Auto Post Article", "content": content, "meta": meta}
-
-def post_to_wordpress_platform(site, parsed, keyword):
-    domain = get_domain(site["url"])
-    pwd = WP_PASSWORDS.get(domain, WP_PASS_DEFAULT)
-    auth = base64.b64encode(f"{WP_USERNAME}:{pwd}".encode()).decode()
-    
-    url = f"{site['url'].rstrip('/')}/wp-json/wp/v2/posts"
+    api_url = f"{site['url']}/wp-json/wp/v2/posts"
     payload = {
-        "title": parsed["title"],
-        "content": parsed["content"],
-        "status": "publish",
-        "categories": [site.get("category_id", 1)],
-        "meta": {
-            "rank_math_focus_keyword": keyword,
-            "rank_math_description": parsed["meta"],
-            "_yoast_wpseo_focuskw": keyword,
-            "_yoast_wpseo_metadesc": parsed["meta"]
-        }
+        "title": title,
+        "content": content,
+        "categories": [site['category_id']],
+        "status": "publish"
     }
     try:
-        r = requests.post(url, headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"}, json=payload, timeout=30)
-        if r.status_code in [200, 201]:
-            return r.json().get("id"), r.json().get("link"), "success"
-        return None, None, f"HTTP {r.status_code}"
+        res = requests.post(api_url, json=payload, auth=(WP_USER, wp_pass), timeout=30)
+        if res.status_code == 201:
+            print(f"✅ 발행 성공: {site['url']} [{title}]")
+            return True
+        print(f"❌ 실패 ({res.status_code}): {site['url']} - {res.text[:200]}")
     except Exception as e:
-        return None, None, str(e)
+        print(f"💥 접속 불가: {site['url']} - {e}")
+    return False
 
-def build_seo_prompt_studio(keyword, site, lang="ko"):
-    reporter = pick_reporter(lang)
-    if lang == "ko":
-        return f"당신은 {site['theme']} 전문가 {reporter}입니다. [포커스 키워드]: {keyword} 에 대해 구글 상위 노출 규격 HTML 글을 쓰세요. 모바일 가독성을 위해 한 문단(<p>)에는 무조건 딱 1개의 문장만 들어가야 하며 문단 간 개행을 확실히 하세요. H2 태그 3개 이상 필수 포함. 첫 줄에 무조건 'TITLE: 제목' 양식으로 시작하고 나머지는 HTML 본문만 출력하세요."
-    else:
-        return f"You are {reporter}, an expert in {site['theme']}. Write an SEO article for [KEYWORD]: {keyword}. One sentence per <p> tag. Include 3+ <h2>. Line 1 must be: TITLE: [Your Title]."
+# ── 메인 실행 ─────────────────────────────────────────────
+def run():
+    print(f"🚀 총 {len(SITES_CONFIG)}개 사이트 포스팅 시작")
+    for site in SITES_CONFIG:
+        keyword = load_keyword(site['keywords_file'], site['theme'])
+        print(f"📝 처리 중: {site['url']} | 키워드: {keyword}")
 
-def process_single_site_automation(site, results_list, lock):
-    domain = get_domain(site["url"])
-    lang = site.get("lang", "ko")
-    kw_file = site["keywords_file"]
-    
-    # 루트 기준과 워크플로우 기준 경로를 모두 탐색
-    possible_paths = [
-        f".github/workflows/{kw_file}",
-        kw_file,
-        os.path.join(os.path.dirname(__file__), kw_file)
-    ]
-    
-    file_path = None
-    for p in possible_paths:
-        if os.path.exists(p):
-            file_path = p
-            break
-
-    if not file_path:
-        print(f"   ⚠️ [경로 에러] 텍스트 파일을 찾을 수 없습니다: {kw_file}")
-        return
-
-    with open(file_path, "r", encoding="utf-8") as f:
-        all_kws = [line.strip() for line in f if line.strip()]
-    
-    if not all_kws:
-        return
-
-    target_kws = all_kws[:min(len(all_kws), 1)]
-    print(f"\n[🚀 엔진 가동] 대상 도메인: {domain}")
-
-    for kw in target_kws:
-        prompt = build_seo_prompt_studio(kw, site, lang)
-        raw_output = call_writer_triple_engine(prompt, kw, lang, site["theme"])
-        parsed = process_content_layout(raw_output)
-        
-        pid, purl, msg = post_to_wordpress_platform(site, parsed, kw)
-        
-        if pid:
-            print(f"      ✅ [발행 완료] {domain} -> {purl}")
-            status_log = "✅ SUCCESS"
+        if site['lang'] == "ko":
+            if site['style'] == "news":
+                title = f"[속보] {keyword} 최근 동향 및 핵심 쟁점 분석"
+            else:
+                title = f"{keyword} 완벽 가이드 및 주의사항 총정리"
+            prompt = (
+                f"당신은 30년 경력의 전문 블로거입니다. "
+                f"'{keyword}'({site['theme']}) 주제로 3000자 이상 한국어 블로그 포스트를 작성하세요. "
+                f"HTML 태그(h2, h3, p, ul, li)를 사용하고 독자에게 실용적인 정보를 제공하세요."
+            )
         else:
-            print(f"      ❌ [발행 실패] {domain} -> 원인: {msg}")
-            status_log = f"❌ FAIL ({msg})"
+            title = f"The Ultimate Guide to {keyword}: What You Need to Know"
+            prompt = (
+                f"You are a professional writer with 20 years of experience. "
+                f"Write an 800+ word blog post about '{keyword}' ({site['theme']}) in English. "
+                f"Use HTML tags (h2, h3, p, ul, li) and provide practical, valuable information."
+            )
 
-        row_payload = {
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "domain": domain,
-            "keyword": kw,
-            "title": parsed["title"],
-            "seo_score": 90,
-            "status": status_log,
-            "url": purl or ""
-        }
-        send_to_google_sheets_live(row_payload)
+        article = generate_article(prompt)
+        if not article:
+            print(f"⚠️ 콘텐츠 생성 실패, 스킵: {site['url']}")
+            continue
 
-        with lock:
-            results_list.append(row_payload)
+        final = inject_links(article, keyword, site['url'], site['lang'])
+        publish(site, title, final)
+        time.sleep(random.randint(10, 20))
 
-def main():
-    print(f"\n🕸️ MEGA BOT DIRECT TEXT RUNNER ENGINE")
-    results = []
-    global_lock = threading.Lock()
-    threads = []
-
-    for site in SITES:
-        t = threading.Thread(target=process_single_site_automation, args=(site, results, global_lock))
-        threads.append(t)
-        t.start()
-        time.sleep(2)
-
-    for t in threads:
-        t.join()
-
+# ── 엔트리포인트 ──────────────────────────────────────────
 if __name__ == "__main__":
-    main()
+    print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 오토봇 가동")
+    run()
+    sys.exit(0)
