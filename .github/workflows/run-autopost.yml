@@ -3,14 +3,14 @@ name: Auto Post Mega Bot
 on:
   workflow_dispatch:        # 수동 실행 버튼 활성화
   schedule:
-    - cron: '0 15 * * *'    # 매일 밤 설정된 시간에 자동 실행
+    - cron: '0 15 * * *'    # 매일 밤 자동 실행
 
 jobs:
   autopost:
     runs-on: ubuntu-latest
 
     steps:
-    - name: レ포지토리 코드 가져오기
+    - name: 레포지토리 코드 가져오기
       uses: actions/checkout@v4
 
     - name: 파이썬 3.11 설치
@@ -22,7 +22,7 @@ jobs:
       run: |
         pip install requests
 
-    - name: 메가 오토포스팅 엔진 강제 구동
+    - name: 메가 오토포스팅 엔진 경로 교정 구동
       env:
         QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -33,4 +33,6 @@ jobs:
         WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
         WP_PASS_JOURNAL: ${{ secrets.WP_PASS_JOURNAL }}
       run: |
-        python .github/workflows/autopost_mega.py
+        # 📌 파이썬 파일을 최상단 루트 폴더로 임시 복사한 뒤 실행하여 모든 설정 파일(.py, .txt)을 완벽하게 인식하도록 만듭니다.
+        cp .github/workflows/autopost_mega.py ./autopost_mega_run.py
+        python autopost_mega_run.py
