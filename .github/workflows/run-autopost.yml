@@ -1,0 +1,41 @@
+name: Auto Post Mega Bot
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # 6시간마다 실행
+  workflow_dispatch:  # 수동으로도 실행 가능
+
+jobs:
+  autopost:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 저장소 체크아웃
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Python 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv openai google-generativeai
+      
+      - name: 🚀 autopost_mega.py 실행
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: |
+          python .github/workflows/autopost_mega.py
+      
+      - name: ✅ 완료
+        if: success()
+        run: echo "✅ 자동 포스팅 완료!"
+      
+      - name: ❌ 에러 발생
+        if: failure()
+        run: echo "❌ 자동 포스팅 중 오류 발생"
