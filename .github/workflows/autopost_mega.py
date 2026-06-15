@@ -20,7 +20,7 @@ groq_client = Groq(api_key=GROK_API_KEY)
 SITES_CONFIG = [
     {"url": "https://k-health365.com",      "lang": "ko", "theme": "건강과 의학",               "keywords_file": ".github/workflows/keywords_khealth.txt",       "wp_pass_env": "WP_PASS_HEALTH"},
     {"url": "https://koreanews365.com",      "lang": "ko", "theme": "한국 뉴스와 시사",           "keywords_file": ".github/workflows/keywords_koreanews.txt",      "wp_pass_env": "WP_PASS_NEWS"},
-    {"url": "https://theseouljournal.com",   "lang": "en", "theme": "Seoul Lifestyle and Trends",      "keywords_file": ".github/workflows/keywords_seouljournal.txt",  "wp_pass_env": "WP_PASS_JOURNAL"},
+    {"url": "https://theseouljournal.com",   "lang": "en", "theme": "Seoul Lifestyle and Trends",      "keywords_file": ".github/workflows/keywords_seouljournal.txt",  "wp_pass_env": "THESEOULJOURNALCOM"},
     {"url": "https://koreamedicaltour.com",  "lang": "en", "theme": "Korea Medical Tourism",           "keywords_file": ".github/workflows/keywords_medicaltour.txt",   "wp_pass_env": "KOREAMEDICALTOURCOM"},
     {"url": "https://kskin365.com",          "lang": "en", "theme": "K-Beauty and Skincare",           "keywords_file": ".github/workflows/keywords_kskin.txt",         "wp_pass_env": "KSKIN365COM"},
     {"url": "https://korea365.org",          "lang": "en", "theme": "Korea Culture and Life",          "keywords_file": ".github/workflows/keywords_korea365.txt",      "wp_pass_env": "KOREA365ORG"},
@@ -40,6 +40,29 @@ SITES_CONFIG = [
     {"url": "https://ktech365.com",          "lang": "en", "theme": "Korean Technology and Gadgets",   "keywords_file": ".github/workflows/keywords_ktech.txt",         "wp_pass_env": "KTECH365COM"},
     {"url": "https://kworld365.com",         "lang": "en", "theme": "Korean Entertainment and K-POP",  "keywords_file": ".github/workflows/keywords_kworld.txt",        "wp_pass_env": "KWORLD365COM"},
     {"url": "https://oliveyoungkorea.com",   "lang": "en", "theme": "K-Beauty Product Reviews",        "keywords_file": ".github/workflows/keywords_oliveyoung.txt",    "wp_pass_env": "OLIVEYOUNGKOREACOM"},
+]
+
+# 외부 권위 링크 (언어별)
+EXTERNAL_LINKS_KO = [
+    ("https://www.who.int/ko", "세계보건기구(WHO)"),
+    ("https://pubmed.ncbi.nlm.nih.gov", "PubMed 의학 논문"),
+    ("https://www.mfds.go.kr", "식품의약품안전처"),
+    ("https://www.mohw.go.kr", "보건복지부"),
+    ("https://www.nhs.uk", "영국 NHS 건강 정보"),
+    ("https://www.cdc.gov", "미국 질병통제예방센터(CDC)"),
+    ("https://www.korea.kr", "대한민국 정책브리핑"),
+    ("https://health.kdca.go.kr", "질병관리청"),
+]
+
+EXTERNAL_LINKS_EN = [
+    ("https://www.who.int", "World Health Organization (WHO)"),
+    ("https://pubmed.ncbi.nlm.nih.gov", "PubMed Medical Research"),
+    ("https://www.cdc.gov", "Centers for Disease Control (CDC)"),
+    ("https://www.nhs.uk", "UK National Health Service"),
+    ("https://www.healthline.com", "Healthline Expert Reviews"),
+    ("https://www.medicalnewstoday.com", "Medical News Today"),
+    ("https://www.investopedia.com", "Investopedia Financial Guide"),
+    ("https://www.immihelp.com", "Immigration Help Center"),
 ]
 
 KO_TITLE_TEMPLATES = [
@@ -62,19 +85,6 @@ EN_TITLE_TEMPLATES = [
     "{keyword} Explained: Everything You Must Know Now",
     "{keyword} {year}: Proven Tips From Industry Experts",
     "Stop Ignoring {keyword}: Here's What Experts Say",
-]
-
-ANCHORS_KO = [
-    "함께 읽으면 좋은 {keyword} 관련 정보",
-    "{keyword} 핵심 분석 확인하기",
-    "{keyword} 필수 가이드 총정리",
-]
-
-ANCHORS_EN = [
-    "Highly recommended guide on {keyword}",
-    "Must-read breakdown about {keyword}",
-    "Deep dive analysis on {keyword}",
-    "Essential tips and insights on {keyword}",
 ]
 
 def log_to_sheets(site_url, keyword, title, engine, image_count,
@@ -139,75 +149,203 @@ def make_title(keyword, lang):
     templates = KO_TITLE_TEMPLATES if lang == "ko" else EN_TITLE_TEMPLATES
     return random.choice(templates).format(keyword=keyword, year=year)
 
+def make_tags(keyword, theme, lang):
+    year = str(datetime.now().year)
+    if lang == "ko":
+        base_tags = [
+            keyword,
+            f"{keyword} 효능",
+            f"{keyword} 방법",
+            f"{keyword} 추천",
+            f"{keyword} 주의사항",
+            f"{keyword} {year}",
+            f"{keyword} 전문가",
+            theme,
+            "건강정보",
+            "전문가추천",
+            "한국정보",
+            "생활건강",
+            "건강가이드",
+        ]
+    else:
+        base_tags = [
+            keyword,
+            f"{keyword} guide",
+            f"{keyword} tips",
+            f"{keyword} {year}",
+            f"best {keyword}",
+            f"{keyword} expert",
+            f"{keyword} review",
+            theme,
+            "Korea",
+            "expert tips",
+            "health guide",
+            "lifestyle",
+            "Korea info",
+        ]
+    return base_tags[:13]
+
+def get_or_create_tag(site_url, wp_pass, tag_name):
+    try:
+        res = requests.get(
+            f"{site_url}/wp-json/wp/v2/tags",
+            params={"search": tag_name, "per_page": 1},
+            auth=(WP_USER, wp_pass),
+            timeout=10
+        )
+        if res.status_code == 200 and res.json():
+            return res.json()[0]["id"]
+        res = requests.post(
+            f"{site_url}/wp-json/wp/v2/tags",
+            json={"name": tag_name},
+            auth=(WP_USER, wp_pass),
+            timeout=10
+        )
+        if res.status_code == 201:
+            return res.json()["id"]
+    except Exception as e:
+        print(f"⚠️ 태그 처리 실패 ({tag_name}): {e}")
+    return None
+
+def create_tag_ids(site, keyword, theme, lang):
+    wp_pass = os.getenv(site['wp_pass_env'])
+    if not wp_pass:
+        return []
+    tags = make_tags(keyword, theme, lang)
+    tag_ids = []
+    for tag in tags:
+        tid = get_or_create_tag(site['url'], wp_pass, tag)
+        if tid:
+            tag_ids.append(tid)
+    print(f"🏷️ 태그 {len(tag_ids)}개 등록: {', '.join(tags[:len(tag_ids)])}")
+    return tag_ids
+
+def build_internal_links(keyword, current_url, lang):
+    others = [s for s in SITES_CONFIG if s['url'] != current_url]
+    selected = random.sample(others, k=min(10, len(others)))
+    links_html = ""
+    for site in selected:
+        if lang == "ko":
+            anchor = f"{keyword} 관련 {site['theme']} 정보"
+        else:
+            anchor = f"{keyword} - {site['theme']} Guide"
+        links_html += f'<li><a href="{site["url"]}/?s={requests.utils.quote(keyword)}" target="_blank" rel="noopener noreferrer">{anchor}</a></li>\n'
+    return links_html
+
+def build_external_links(lang):
+    ext_pool = EXTERNAL_LINKS_KO if lang == "ko" else EXTERNAL_LINKS_EN
+    selected = random.sample(ext_pool, k=min(5, len(ext_pool)))
+    links_html = ""
+    for url, name in selected:
+        links_html += f'<li><a href="{url}" target="_blank" rel="nofollow noopener noreferrer">{name}</a></li>\n'
+    return links_html
+
+def inject_links_section(content, keyword, current_url, lang):
+    internal_html = build_internal_links(keyword, current_url, lang)
+    external_html = build_external_links(lang)
+
+    if lang == "ko":
+        section = (
+            f"\n\n<hr style='border:dashed 1px #e0e0e0;margin:40px 0;'>\n"
+            f"<div style='background:#f0f7ff;padding:20px;border-radius:8px;margin:20px 0;'>\n"
+            f"<h3 style='color:#0066cc;'>🔗 관련 추천 사이트 (내부 링크)</h3>\n"
+            f"<ul style='list-style:square;padding-left:20px;'>\n"
+            f"{internal_html}"
+            f"</ul>\n"
+            f"</div>\n"
+            f"<div style='background:#f9f9f9;padding:20px;border-radius:8px;margin:20px 0;'>\n"
+            f"<h3 style='color:#333;'>📚 참고 자료 및 외부 링크</h3>\n"
+            f"<ul style='list-style:disc;padding-left:20px;'>\n"
+            f"{external_html}"
+            f"</ul>\n"
+            f"</div>\n"
+        )
+    else:
+        section = (
+            f"\n\n<hr style='border:dashed 1px #e0e0e0;margin:40px 0;'>\n"
+            f"<div style='background:#f0f7ff;padding:20px;border-radius:8px;margin:20px 0;'>\n"
+            f"<h3 style='color:#0066cc;'>🔗 Related Resources (Internal Links)</h3>\n"
+            f"<ul style='list-style:square;padding-left:20px;'>\n"
+            f"{internal_html}"
+            f"</ul>\n"
+            f"</div>\n"
+            f"<div style='background:#f9f9f9;padding:20px;border-radius:8px;margin:20px 0;'>\n"
+            f"<h3 style='color:#333;'>📚 References & External Resources</h3>\n"
+            f"<ul style='list-style:disc;padding-left:20px;'>\n"
+            f"{external_html}"
+            f"</ul>\n"
+            f"</div>\n"
+        )
+    return content + section
+
 def make_prompt(keyword, theme, lang):
     if lang == "ko":
         return (
             f"당신은 15년 경력의 전문 SEO 콘텐츠 작가입니다.\n"
-            f"'{keyword}'({theme}) 주제로 SEO 최적화된 한국어 블로그 포스트를 작성하세요.\n\n"
-            f"절대 필수 요건 (반드시 지킬 것):\n"
-            f"- 반드시 2000자 이상 작성 (이보다 짧으면 실패)\n"
-            f"- HTML 태그만 사용: h2, h3, p, ul, li, ol, strong\n"
-            f"- 마크다운 절대 금지, HTML만 사용\n"
+            f"'{keyword}'({theme}) 주제로 SEO 최적화된 전문적인 한국어 블로그 포스트를 작성하세요.\n\n"
+            f"절대 필수 요건:\n"
+            f"- 반드시 3000자 이상 작성 (매우 중요)\n"
+            f"- HTML 태그만 사용: h2, h3, p, ul, li, ol, strong, em\n"
+            f"- 마크다운 절대 금지, 별표(*) 절대 금지\n"
             f"- 첫 문단에 '{keyword}' 반드시 포함\n"
-            f"- '{keyword}'를 전체 글에 자연스럽게 10회 이상 사용\n"
-            f"- h2 섹션 최소 5개 이상\n"
-            f"- h3 소제목 최소 5개 이상\n"
-            f"- ul/li 목록 최소 3개 섹션\n"
-            f"- FAQ 섹션 반드시 포함 (질문 5개 이상)\n"
-            f"- 전문적이고 신뢰감 있는 문체\n"
+            f"- '{keyword}'를 전체 글에 10회 이상 자연스럽게 사용\n"
+            f"- h2 섹션 최소 6개\n"
+            f"- h3 소제목 최소 6개\n"
+            f"- ul/li 목록 최소 4개 섹션\n"
+            f"- 전문적이고 신뢰감 있는 의학/전문가 문체\n"
+            f"- FAQ 섹션 필수 포함 (Q&A 5개 이상)\n"
             f"- 결론 섹션 포함\n"
+            f"- 통계, 수치, 연구결과 등 구체적 정보 포함\n"
+            f"- 독자에게 실질적으로 도움이 되는 실용 정보 위주\n"
         )
     else:
         return (
             f"You are a professional SEO content writer with 15+ years of experience.\n"
-            f"Write a comprehensive SEO-optimized blog post about '{keyword}' ({theme}) in English.\n\n"
-            f"ABSOLUTE REQUIREMENTS (must follow):\n"
-            f"- MINIMUM 2000 words (shorter = failure)\n"
-            f"- Use HTML tags ONLY: h2, h3, p, ul, li, ol, strong\n"
+            f"Write a comprehensive, expert-level SEO-optimized blog post about '{keyword}' ({theme}) in English.\n\n"
+            f"ABSOLUTE REQUIREMENTS:\n"
+            f"- MINIMUM 3000 words (critical requirement)\n"
+            f"- HTML tags ONLY: h2, h3, p, ul, li, ol, strong, em\n"
             f"- ZERO markdown, ZERO asterisks, HTML ONLY\n"
             f"- Include '{keyword}' in the very first paragraph\n"
-            f"- Use '{keyword}' naturally at least 10 times throughout\n"
-            f"- Minimum 5 h2 main sections\n"
-            f"- Minimum 5 h3 subsections\n"
-            f"- Minimum 3 ul/li list sections\n"
-            f"- Include FAQ section with at least 5 questions\n"
-            f"- Engaging, authoritative, expert tone\n"
-            f"- Include conclusion section\n"
+            f"- Use '{keyword}' naturally 10+ times throughout\n"
+            f"- Minimum 6 h2 main sections\n"
+            f"- Minimum 6 h3 subsections\n"
+            f"- Minimum 4 ul/li list sections\n"
+            f"- Expert, authoritative, professional tone\n"
+            f"- FAQ section with 5+ Q&A pairs\n"
+            f"- Conclusion section\n"
+            f"- Include statistics, research data, specific numbers\n"
+            f"- Practical, actionable information for readers\n"
         )
 
 def generate_article(prompt):
-    engine_used = "내부엔진"
-
-    # 1순위: Groq
     try:
         res = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=4000,
+            max_tokens=4096,
             timeout=90
         )
         content = res.choices[0].message.content
-        if content and len(content) > 500:
+        if content and len(content) > 1000:
             print("✅ Groq 생성 성공")
             return content, "Groq(llama-3.3-70b)"
     except Exception as e:
         print(f"⚠️ Groq 실패: {e}")
 
-    # 2순위: Gemini 2.5 Flash
     try:
         model = genai.GenerativeModel("gemini-2.5-flash-preview-05-20")
         res = model.generate_content(prompt)
-        if res.text and len(res.text) > 500:
+        if res.text and len(res.text) > 1000:
             print("✅ Gemini 2.5 Flash 생성 성공")
             return res.text, "Gemini-2.5-Flash"
     except Exception as e:
         print(f"⚠️ Gemini 2.5 Flash 실패: {e}")
 
-    # 3순위: Gemini 1.5 Flash
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         res = model.generate_content(prompt)
-        if res.text and len(res.text) > 500:
+        if res.text and len(res.text) > 1000:
             print("✅ Gemini 1.5 Flash 생성 성공")
             return res.text, "Gemini-1.5-Flash"
     except Exception as e:
@@ -217,7 +355,6 @@ def generate_article(prompt):
     return None, "내부엔진"
 
 def get_image(keyword):
-    # 1순위: Pixabay
     try:
         q = keyword.encode('ascii', 'ignore').decode().strip() or "korea"
         url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={requests.utils.quote(q)}&image_type=photo&per_page=5&safesearch=true&lang=en"
@@ -229,7 +366,6 @@ def get_image(keyword):
     except Exception as e:
         print(f"⚠️ Pixabay 실패: {e}")
 
-    # 2순위: Pexels
     try:
         headers = {"Authorization": PEXELS_KEY}
         url = f"https://api.pexels.com/v1/search?query={requests.utils.quote(keyword)}&per_page=5"
@@ -268,30 +404,16 @@ def upload_image(site, img_url, keyword):
         print(f"⚠️ 이미지 업로드 실패: {e}")
     return None
 
-def inject_links(content, keyword, current_url, lang):
-    others = [s for s in SITES_CONFIG if s['url'] != current_url]
-    selected = random.sample(others, k=min(2, len(others)))
-    anchors = ANCHORS_KO if lang == "ko" else ANCHORS_EN
-    label = "💡 관련 추천 정보" if lang == "ko" else "💡 Recommended Insights"
-    html = "\n\n<hr style='border:dashed 1px #e0e0e0;margin:30px 0;'>\n"
-    html += "<div style='background:#f9f9f9;padding:15px;border-radius:5px;'>\n"
-    html += f"<p style='font-weight:bold;'>{label}</p><ul>\n"
-    for site in selected:
-        anchor = random.choice(anchors).format(keyword=keyword)
-        link = f"{site['url']}/?s={requests.utils.quote(keyword)}"
-        html += f"<li><a href='{link}' target='_blank' rel='noopener noreferrer'>{anchor}</a></li>\n"
-    html += "</ul></div>\n"
-    return content + html
-
-def publish(site, title, content, media_id=None):
+def publish(site, title, content, tag_ids, media_id=None):
     wp_pass = os.getenv(site['wp_pass_env'])
     if not wp_pass:
         return False, "", f"Secret 없음: {site['wp_pass_env']}"
     payload = {
-        "title": title,
-        "content": content,
+        "title":      title,
+        "content":    content,
         "categories": [1],
-        "status": "publish"
+        "tags":       tag_ids,
+        "status":     "publish"
     }
     if media_id:
         payload["featured_media"] = media_id
@@ -316,6 +438,7 @@ def publish(site, title, content, media_id=None):
 def run():
     total = len(SITES_CONFIG)
     print(f"🚀 총 {total}개 사이트 × 3포스트 = {total*3}개 발행 시작!")
+    print(f"⏰ 시작 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     for i, site in enumerate(SITES_CONFIG, 1):
         lang = site['lang']
@@ -324,6 +447,7 @@ def run():
         print(f"{'='*55}")
 
         for post_num in range(1, 4):
+            start_time = datetime.now()
             keyword = load_keyword(site['keywords_file'], site['theme'])
             title = make_title(keyword, lang)
             print(f"\n📝 [{post_num}/3] 키워드: {keyword}")
@@ -334,88 +458,36 @@ def run():
 
             if not article:
                 engine = "내부엔진"
-                if lang == "ko":
-                    article = (
-                        f"<h2>{keyword} 완벽 가이드</h2>"
-                        f"<p>{keyword}은(는) {site['theme']} 분야에서 매우 중요한 주제입니다. "
-                        f"{keyword}에 대해 제대로 알고 활용하면 삶의 질을 크게 높일 수 있습니다.</p>"
-                        f"<h2>{keyword}란 무엇인가?</h2>"
-                        f"<p>{keyword}은(는) {site['theme']}에서 핵심적인 역할을 합니다.</p>"
-                        f"<h3>{keyword}의 주요 특징</h3><ul>"
-                        f"<li>{keyword} 심층 이해</li>"
-                        f"<li>실용적인 {keyword} 활용법</li>"
-                        f"<li>전문가 {keyword} 조언</li>"
-                        f"<li>{keyword} 최신 트렌드</li>"
-                        f"</ul>"
-                        f"<h2>{keyword}의 핵심 효능</h2>"
-                        f"<p>{keyword}을(를) 올바르게 활용하면 다양한 이점을 얻을 수 있습니다.</p>"
-                        f"<h3>{keyword} 활용 팁</h3><ul>"
-                        f"<li>전문가와 상담 후 {keyword} 시작하기</li>"
-                        f"<li>꾸준한 {keyword} 실천이 중요</li>"
-                        f"<li>{keyword} 관련 최신 정보 지속 업데이트</li>"
-                        f"</ul>"
-                        f"<h2>FAQ: {keyword} 자주 묻는 질문</h2>"
-                        f"<h3>Q. {keyword}은(는) 누구에게 필요한가요?</h3>"
-                        f"<p>{keyword}은(는) {site['theme']}에 관심 있는 모든 분께 도움이 됩니다.</p>"
-                        f"<h3>Q. {keyword}을(를) 시작하려면 어떻게 해야 하나요?</h3>"
-                        f"<p>전문가의 조언을 구하고 단계적으로 {keyword}을(를) 시작하세요.</p>"
-                        f"<h2>결론</h2>"
-                        f"<p>{keyword}은(는) {site['theme']} 분야에서 매우 중요합니다. "
-                        f"올바른 {keyword} 이해와 실천으로 더 나은 결과를 얻으시기 바랍니다.</p>"
-                    )
-                else:
-                    article = (
-                        f"<h2>The Complete Guide to {keyword}</h2>"
-                        f"<p>{keyword} is one of the most important topics in {site['theme']}. "
-                        f"Understanding {keyword} can significantly improve your knowledge and results.</p>"
-                        f"<h2>What is {keyword}?</h2>"
-                        f"<p>{keyword} plays a crucial role in {site['theme']}. Here is what you need to know.</p>"
-                        f"<h3>Key Features of {keyword}</h3><ul>"
-                        f"<li>Deep understanding of {keyword}</li>"
-                        f"<li>Practical tips for {keyword}</li>"
-                        f"<li>Expert insights on {keyword}</li>"
-                        f"<li>Latest trends in {keyword}</li>"
-                        f"</ul>"
-                        f"<h2>Why {keyword} Matters</h2>"
-                        f"<p>Understanding {keyword} is essential for success in {site['theme']}.</p>"
-                        f"<h3>Benefits of {keyword}</h3><ul>"
-                        f"<li>Improved performance with {keyword}</li>"
-                        f"<li>Better results using {keyword}</li>"
-                        f"<li>Expert-backed {keyword} strategies</li>"
-                        f"</ul>"
-                        f"<h2>FAQ: {keyword}</h2>"
-                        f"<h3>Q. Who needs {keyword}?</h3>"
-                        f"<p>{keyword} is beneficial for anyone interested in {site['theme']}.</p>"
-                        f"<h3>Q. How do I get started with {keyword}?</h3>"
-                        f"<p>Start by researching {keyword} thoroughly and consulting experts.</p>"
-                        f"<h2>Conclusion</h2>"
-                        f"<p>Mastering {keyword} will give you a significant advantage in {site['theme']}. "
-                        f"Apply these {keyword} insights and see the difference.</p>"
-                    )
+                article = f"<h2>{keyword} 가이드</h2><p>{keyword}에 대한 전문 정보입니다.</p>"
 
-            # SEO 점수 체크
             seo = calc_seo_score(article, keyword)
-            print(f"📊 SEO 점수: {seo}/100")
+            char_count = len(article)
+            print(f"📊 SEO: {seo}/100 | 글자수: {char_count}")
 
             retry = 0
-            while seo < 80 and retry < 2:
+            while seo < 90 and retry < 3:
                 retry += 1
-                print(f"🔄 재작성 {retry}회차 ({seo}점)")
+                print(f"🔄 재작성 {retry}회차 (SEO {seo}점)")
                 new_article, new_engine = generate_article(prompt)
-                if new_article:
+                if new_article and len(new_article) > len(article):
                     article = new_article
                     engine = new_engine
                     seo = calc_seo_score(article, keyword)
-                    print(f"📊 재작성 후: {seo}/100")
+                    char_count = len(article)
+                    print(f"📊 재작성 후 SEO: {seo}/100 | 글자수: {char_count}")
 
-            if seo < 80:
-                print(f"⚠️ 최종 {seo}점 → 그냥 발행")
+            if seo >= 90:
+                print(f"🎯 SEO {seo}점 달성!")
+            elif seo >= 80:
+                print(f"🟡 SEO {seo}점 → 발행")
             else:
-                print(f"🎯 {seo}점 → 발행 승인!")
+                print(f"⚠️ SEO {seo}점 → 그냥 발행")
 
-            char_count = len(article)
-            print(f"📏 글자수: {char_count}")
-            final = inject_links(article, keyword, site['url'], lang)
+            # 내부10개 + 외부5개 링크 삽입
+            final = inject_links_section(article, keyword, site['url'], lang)
+
+            # 태그 13개 생성
+            tag_ids = create_tag_ids(site, keyword, site['theme'], lang)
 
             # 이미지
             image_count = 0
@@ -431,7 +503,10 @@ def run():
                 print("⚠️ 이미지 없이 발행")
 
             # 발행
-            success, post_url, error_msg = publish(site, title, final, media_id)
+            success, post_url, error_msg = publish(site, title, final, tag_ids, media_id)
+
+            elapsed = (datetime.now() - start_time).seconds
+            print(f"⏱️ 소요시간: {elapsed}초")
 
             # 구글 시트 기록
             log_to_sheets(
@@ -444,6 +519,8 @@ def run():
             if not (i == total and post_num == 3):
                 print(f"⏳ 3분 대기...")
                 time.sleep(180)
+
+    print(f"\n🏁 전체 완료! 종료 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
     print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 오토봇 가동")
