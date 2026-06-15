@@ -12,7 +12,7 @@ from google.genai import types
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 PIXABAY_KEY    = os.getenv("PIXABAY_KEY")
 PEXELS_KEY     = os.getenv("PEXELS_KEY")
-SHEETS_WEBHOOK = os.getenv("SHEETS_WEBHOOK")
+SHEETS_WEBHOOK = os.getenv("SHEETS_WEBHOOK") # 구글 시트 연결 웹훅 주소
 WP_USER        = "huh0303@gmail.com"
 
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
@@ -143,10 +143,24 @@ def build_related_search_links(keyword, lang):
     html += ", ".join(links) + "</div>"
     return html
 
+# 구글 스프레드시트 기록용 함수 추가
+def log_to_google_sheet(site_url, title):
+    if not SHEETS_WEBHOOK: return
+    try:
+        payload = {
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "site": site_url,
+            "title": title
+        }
+        requests.post(SHEETS_WEBHOOK, json=payload, timeout=10)
+        print(f"📊 구글 스프레드시트 전송 완료: {title}")
+    except:
+        print("⚠️ 구글 스프레드시트 전송 실패")
+
 def run():
-    print(f"🚀 [무조건 가동 모드] 시간 체크를 우회하여 릴레이 포스팅을 시작합니다.")
+    print(f"🚀 [시트 연동 모드] 릴레이 발행 및 구글 시트 동시 기록을 시작합니다.")
     
-    # 1. 메인 허브 사이트 즉시 포스팅
+    # 1. 메인 허브 사이트 즉시 포스팅 및 시트 전송
     site = SITES_CONFIG[0]
     wp_pass = os.getenv(site['wp_pass_env'])
     if wp_pass:
@@ -162,12 +176,17 @@ def run():
             for idx, url in enumerate(img_urls):
                 mid = upload_to_wp_media(site['url'], wp_pass, url, keyword, idx)
                 if mid: media_ids.append(mid)
-            payload = {"title": f"{keyword} 정보 완벽 정리", "content": article, "categories": [random.choice(HEALTH_CATEGORIES)], "status": "publish"}
+            
+            title = f"{keyword} 정보 완벽 정리"
+            payload = {"title": title, "content": article, "categories": [random.choice(HEALTH_CATEGORIES)], "status": "publish"}
             if media_ids: payload["featured_media"] = media_ids[0]
-            requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-            print(f"✅ [1/3] 메인허브 ({site['url']}) 발행 완료")
+            
+            res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
+            if res_post.status_code == 201:
+                print(f"✅ [1/3] 메인허브 ({site['url']}) 발행 완료")
+                log_to_google_sheet(site['url'], title)
 
-    # 2. 한국 뉴스 신문사 사이트 즉시 포스팅
+    # 2. 한국 뉴스 신문사 사이트 즉시 포스팅 및 시트 전송
     site = SITES_CONFIG[1]
     wp_pass = os.getenv(site['wp_pass_env'])
     if wp_pass:
@@ -176,11 +195,15 @@ def run():
         res = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         article = res.text if res.text else ""
         if len(article) > 300:
-            payload = {"title": f"[속보] {ref_title}", "content": article, "categories": [1], "status": "publish"}
-            requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-            print(f"📰 [2/3] 신문사 ({site['url']}) 뉴스 포스팅 완료")
+            title = f"[속보] {ref_title}"
+            payload = {"title": title, "content": article, "categories": [1], "status": "publish"}
+            
+            res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
+            if res_post.status_code == 201:
+                print(f"📰 [2/3] 신문사 ({site['url']}) 뉴스 포스팅 완료")
+                log_to_google_sheet(site['url'], title)
 
-    # 3. 글로벌 네트워크 사이트 중 무작위 1개 즉시 포스팅
+    # 3. 글로벌 네트워크 사이트 중 무작위 1개 즉시 포스팅 및 시트 전송
     global_site_idx = random.randint(2, len(SITES_CONFIG) - 1)
     site = SITES_CONFIG[global_site_idx]
     wp_pass = os.getenv(site['wp_pass_env'])
@@ -197,10 +220,15 @@ def run():
             for idx, url in enumerate(img_urls):
                 mid = upload_to_wp_media(site['url'], wp_pass, url, keyword, idx)
                 if mid: media_ids.append(mid)
-            payload = {"title": f"The Essential Guide to {keyword}", "content": article, "categories": [1], "status": "publish"}
+            
+            title = f"The Essential Guide to {keyword}"
+            payload = {"title": title, "content": article, "categories": [1], "status": "publish"}
             if media_ids: payload["featured_media"] = media_ids[0]
-            requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-            print(f"🌐 [3/3] 글로벌 스포크 사이트 ({site['url']}) 발행 완료")
+            
+            res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
+            if res_post.status_code == 201:
+                print(f"🌐 [3/3] 글로벌 스포크 사이트 ({site['url']}) 발행 완료")
+                log_to_google_sheet(site['url'], title)
 
 if __name__ == "__main__":
     run()
