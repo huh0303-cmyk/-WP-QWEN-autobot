@@ -4,18 +4,16 @@ import time
 import random
 import requests
 from datetime import datetime
-import google.generativeai as genai
-from groq import Groq
+from google import genai
+from google.genai import types
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GROK_API_KEY   = os.getenv("GROK_API_KEY")
 PIXABAY_KEY    = os.getenv("PIXABAY_KEY")
 PEXELS_KEY     = os.getenv("PEXELS_KEY")
 SHEETS_WEBHOOK = os.getenv("SHEETS_WEBHOOK")
 WP_USER        = "huh0303@gmail.com"
 
-genai.configure(api_key=GEMINI_API_KEY)
-groq_client = Groq(api_key=GROK_API_KEY)
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 SITES_CONFIG = [
     {"url": "https://k-health365.com",      "lang": "ko", "theme": "건강과 의학",               "keywords_file": ".github/workflows/keywords_khealth.txt",       "wp_pass_env": "WP_PASS_HEALTH"},
@@ -42,14 +40,13 @@ SITES_CONFIG = [
     {"url": "https://oliveyoungkorea.com",   "lang": "en", "theme": "K-Beauty Product Reviews",        "keywords_file": ".github/workflows/keywords_oliveyoung.txt",    "wp_pass_env": "OLIVEYOUNGKOREACOM"},
 ]
 
-# 외부 권위 링크 (언어별)
 EXTERNAL_LINKS_KO = [
     ("https://www.who.int/ko", "세계보건기구(WHO)"),
     ("https://pubmed.ncbi.nlm.nih.gov", "PubMed 의학 논문"),
     ("https://www.mfds.go.kr", "식품의약품안전처"),
     ("https://www.mohw.go.kr", "보건복지부"),
     ("https://www.nhs.uk", "영국 NHS 건강 정보"),
-    ("https://www.cdc.gov", "미국 질병통제예방센터(CDC)"),
+    ("https://www.cdc.gov", "미국 CDC"),
     ("https://www.korea.kr", "대한민국 정책브리핑"),
     ("https://health.kdca.go.kr", "질병관리청"),
 ]
@@ -152,59 +149,33 @@ def make_title(keyword, lang):
 def make_tags(keyword, theme, lang):
     year = str(datetime.now().year)
     if lang == "ko":
-        base_tags = [
-            keyword,
-            f"{keyword} 효능",
-            f"{keyword} 방법",
-            f"{keyword} 추천",
-            f"{keyword} 주의사항",
-            f"{keyword} {year}",
-            f"{keyword} 전문가",
-            theme,
-            "건강정보",
-            "전문가추천",
-            "한국정보",
-            "생활건강",
-            "건강가이드",
-        ]
+        tags = [keyword, f"{keyword} 효능", f"{keyword} 방법", f"{keyword} 추천",
+                f"{keyword} 주의사항", f"{keyword} {year}", f"{keyword} 전문가",
+                theme, "건강정보", "전문가추천", "한국정보", "생활건강", "건강가이드"]
     else:
-        base_tags = [
-            keyword,
-            f"{keyword} guide",
-            f"{keyword} tips",
-            f"{keyword} {year}",
-            f"best {keyword}",
-            f"{keyword} expert",
-            f"{keyword} review",
-            theme,
-            "Korea",
-            "expert tips",
-            "health guide",
-            "lifestyle",
-            "Korea info",
-        ]
-    return base_tags[:13]
+        tags = [keyword, f"{keyword} guide", f"{keyword} tips", f"{keyword} {year}",
+                f"best {keyword}", f"{keyword} expert", f"{keyword} review",
+                theme, "Korea", "expert tips", "health guide", "lifestyle", "Korea info"]
+    return tags[:13]
 
 def get_or_create_tag(site_url, wp_pass, tag_name):
     try:
         res = requests.get(
             f"{site_url}/wp-json/wp/v2/tags",
             params={"search": tag_name, "per_page": 1},
-            auth=(WP_USER, wp_pass),
-            timeout=10
+            auth=(WP_USER, wp_pass), timeout=10
         )
         if res.status_code == 200 and res.json():
             return res.json()[0]["id"]
         res = requests.post(
             f"{site_url}/wp-json/wp/v2/tags",
             json={"name": tag_name},
-            auth=(WP_USER, wp_pass),
-            timeout=10
+            auth=(WP_USER, wp_pass), timeout=10
         )
         if res.status_code == 201:
             return res.json()["id"]
     except Exception as e:
-        print(f"⚠️ 태그 처리 실패 ({tag_name}): {e}")
+        print(f"⚠️ 태그 실패 ({tag_name}): {e}")
     return None
 
 def create_tag_ids(site, keyword, theme, lang):
@@ -217,64 +188,48 @@ def create_tag_ids(site, keyword, theme, lang):
         tid = get_or_create_tag(site['url'], wp_pass, tag)
         if tid:
             tag_ids.append(tid)
-    print(f"🏷️ 태그 {len(tag_ids)}개 등록: {', '.join(tags[:len(tag_ids)])}")
+    print(f"🏷️ 태그 {len(tag_ids)}개 등록")
     return tag_ids
 
 def build_internal_links(keyword, current_url, lang):
     others = [s for s in SITES_CONFIG if s['url'] != current_url]
     selected = random.sample(others, k=min(10, len(others)))
-    links_html = ""
+    html = ""
     for site in selected:
-        if lang == "ko":
-            anchor = f"{keyword} 관련 {site['theme']} 정보"
-        else:
-            anchor = f"{keyword} - {site['theme']} Guide"
-        links_html += f'<li><a href="{site["url"]}/?s={requests.utils.quote(keyword)}" target="_blank" rel="noopener noreferrer">{anchor}</a></li>\n'
-    return links_html
+        anchor = f"{keyword} 관련 {site['theme']} 정보" if lang == "ko" else f"{keyword} - {site['theme']} Guide"
+        html += f'<li><a href="{site["url"]}/?s={requests.utils.quote(keyword)}" target="_blank" rel="noopener noreferrer">{anchor}</a></li>\n'
+    return html
 
 def build_external_links(lang):
-    ext_pool = EXTERNAL_LINKS_KO if lang == "ko" else EXTERNAL_LINKS_EN
-    selected = random.sample(ext_pool, k=min(5, len(ext_pool)))
-    links_html = ""
+    pool = EXTERNAL_LINKS_KO if lang == "ko" else EXTERNAL_LINKS_EN
+    selected = random.sample(pool, k=min(5, len(pool)))
+    html = ""
     for url, name in selected:
-        links_html += f'<li><a href="{url}" target="_blank" rel="nofollow noopener noreferrer">{name}</a></li>\n'
-    return links_html
+        html += f'<li><a href="{url}" target="_blank" rel="nofollow noopener noreferrer">{name}</a></li>\n'
+    return html
 
 def inject_links_section(content, keyword, current_url, lang):
-    internal_html = build_internal_links(keyword, current_url, lang)
-    external_html = build_external_links(lang)
-
+    internal = build_internal_links(keyword, current_url, lang)
+    external = build_external_links(lang)
     if lang == "ko":
         section = (
             f"\n\n<hr style='border:dashed 1px #e0e0e0;margin:40px 0;'>\n"
             f"<div style='background:#f0f7ff;padding:20px;border-radius:8px;margin:20px 0;'>\n"
-            f"<h3 style='color:#0066cc;'>🔗 관련 추천 사이트 (내부 링크)</h3>\n"
-            f"<ul style='list-style:square;padding-left:20px;'>\n"
-            f"{internal_html}"
-            f"</ul>\n"
-            f"</div>\n"
+            f"<h3 style='color:#0066cc;'>🔗 관련 추천 사이트</h3>\n"
+            f"<ul style='list-style:square;padding-left:20px;'>\n{internal}</ul>\n</div>\n"
             f"<div style='background:#f9f9f9;padding:20px;border-radius:8px;margin:20px 0;'>\n"
-            f"<h3 style='color:#333;'>📚 참고 자료 및 외부 링크</h3>\n"
-            f"<ul style='list-style:disc;padding-left:20px;'>\n"
-            f"{external_html}"
-            f"</ul>\n"
-            f"</div>\n"
+            f"<h3 style='color:#333;'>📚 참고 자료</h3>\n"
+            f"<ul style='list-style:disc;padding-left:20px;'>\n{external}</ul>\n</div>\n"
         )
     else:
         section = (
             f"\n\n<hr style='border:dashed 1px #e0e0e0;margin:40px 0;'>\n"
             f"<div style='background:#f0f7ff;padding:20px;border-radius:8px;margin:20px 0;'>\n"
-            f"<h3 style='color:#0066cc;'>🔗 Related Resources (Internal Links)</h3>\n"
-            f"<ul style='list-style:square;padding-left:20px;'>\n"
-            f"{internal_html}"
-            f"</ul>\n"
-            f"</div>\n"
+            f"<h3 style='color:#0066cc;'>🔗 Related Resources</h3>\n"
+            f"<ul style='list-style:square;padding-left:20px;'>\n{internal}</ul>\n</div>\n"
             f"<div style='background:#f9f9f9;padding:20px;border-radius:8px;margin:20px 0;'>\n"
-            f"<h3 style='color:#333;'>📚 References & External Resources</h3>\n"
-            f"<ul style='list-style:disc;padding-left:20px;'>\n"
-            f"{external_html}"
-            f"</ul>\n"
-            f"</div>\n"
+            f"<h3 style='color:#333;'>📚 References</h3>\n"
+            f"<ul style='list-style:disc;padding-left:20px;'>\n{external}</ul>\n</div>\n"
         )
     return content + section
 
@@ -282,74 +237,70 @@ def make_prompt(keyword, theme, lang):
     if lang == "ko":
         return (
             f"당신은 15년 경력의 전문 SEO 콘텐츠 작가입니다.\n"
-            f"'{keyword}'({theme}) 주제로 SEO 최적화된 전문적인 한국어 블로그 포스트를 작성하세요.\n\n"
-            f"절대 필수 요건:\n"
-            f"- 반드시 3000자 이상 작성 (매우 중요)\n"
-            f"- HTML 태그만 사용: h2, h3, p, ul, li, ol, strong, em\n"
-            f"- 마크다운 절대 금지, 별표(*) 절대 금지\n"
-            f"- 첫 문단에 '{keyword}' 반드시 포함\n"
-            f"- '{keyword}'를 전체 글에 10회 이상 자연스럽게 사용\n"
-            f"- h2 섹션 최소 6개\n"
-            f"- h3 소제목 최소 6개\n"
-            f"- ul/li 목록 최소 4개 섹션\n"
-            f"- 전문적이고 신뢰감 있는 의학/전문가 문체\n"
-            f"- FAQ 섹션 필수 포함 (Q&A 5개 이상)\n"
-            f"- 결론 섹션 포함\n"
-            f"- 통계, 수치, 연구결과 등 구체적 정보 포함\n"
-            f"- 독자에게 실질적으로 도움이 되는 실용 정보 위주\n"
+            f"'{keyword}'({theme}) 주제로 SEO 최적화된 한국어 블로그 포스트를 작성하세요.\n\n"
+            f"필수 요건:\n"
+            f"- 반드시 2000자 이상\n"
+            f"- HTML 태그만: h2, h3, p, ul, li, ol, strong\n"
+            f"- 마크다운 금지\n"
+            f"- 첫 문단에 '{keyword}' 포함\n"
+            f"- '{keyword}' 10회 이상 자연스럽게 사용\n"
+            f"- h2 최소 5개, h3 최소 5개\n"
+            f"- ul/li 목록 최소 3개\n"
+            f"- FAQ 섹션 (Q&A 5개)\n"
+            f"- 결론 섹션\n"
+            f"- 전문적이고 신뢰감 있는 문체\n"
         )
     else:
         return (
-            f"You are a professional SEO content writer with 15+ years of experience.\n"
-            f"Write a comprehensive, expert-level SEO-optimized blog post about '{keyword}' ({theme}) in English.\n\n"
-            f"ABSOLUTE REQUIREMENTS:\n"
-            f"- MINIMUM 3000 words (critical requirement)\n"
-            f"- HTML tags ONLY: h2, h3, p, ul, li, ol, strong, em\n"
-            f"- ZERO markdown, ZERO asterisks, HTML ONLY\n"
-            f"- Include '{keyword}' in the very first paragraph\n"
-            f"- Use '{keyword}' naturally 10+ times throughout\n"
-            f"- Minimum 6 h2 main sections\n"
-            f"- Minimum 6 h3 subsections\n"
-            f"- Minimum 4 ul/li list sections\n"
-            f"- Expert, authoritative, professional tone\n"
-            f"- FAQ section with 5+ Q&A pairs\n"
+            f"You are a professional SEO content writer with 15+ years experience.\n"
+            f"Write a comprehensive blog post about '{keyword}' ({theme}) in English.\n\n"
+            f"REQUIREMENTS:\n"
+            f"- MINIMUM 2000 words\n"
+            f"- HTML ONLY: h2, h3, p, ul, li, ol, strong\n"
+            f"- NO markdown, NO asterisks\n"
+            f"- Include '{keyword}' in first paragraph\n"
+            f"- Use '{keyword}' 10+ times naturally\n"
+            f"- Minimum 5 h2, 5 h3 sections\n"
+            f"- Minimum 3 ul/li lists\n"
+            f"- FAQ section (5 Q&As)\n"
             f"- Conclusion section\n"
-            f"- Include statistics, research data, specific numbers\n"
-            f"- Practical, actionable information for readers\n"
+            f"- Expert, authoritative tone\n"
         )
 
 def generate_article(prompt):
+    # 1순위: Gemini 2.5 Flash-Lite (하루 1000회)
     try:
-        res = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=4096,
-            timeout=90
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                max_output_tokens=8192,
+                temperature=0.7,
+            )
         )
-        content = res.choices[0].message.content
-        if content and len(content) > 1000:
-            print("✅ Groq 생성 성공")
-            return content, "Groq(llama-3.3-70b)"
+        text = response.text
+        if text and len(text) > 500:
+            print("✅ Gemini 2.5 Flash-Lite 생성 성공")
+            return text, "Gemini-2.5-Flash-Lite"
     except Exception as e:
-        print(f"⚠️ Groq 실패: {e}")
+        print(f"⚠️ Gemini 2.5 Flash-Lite 실패: {e}")
 
+    # 2순위: Gemini 2.5 Flash (하루 250회)
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash-preview-05-20")
-        res = model.generate_content(prompt)
-        if res.text and len(res.text) > 1000:
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                max_output_tokens=8192,
+                temperature=0.7,
+            )
+        )
+        text = response.text
+        if text and len(text) > 500:
             print("✅ Gemini 2.5 Flash 생성 성공")
-            return res.text, "Gemini-2.5-Flash"
+            return text, "Gemini-2.5-Flash"
     except Exception as e:
         print(f"⚠️ Gemini 2.5 Flash 실패: {e}")
-
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        res = model.generate_content(prompt)
-        if res.text and len(res.text) > 1000:
-            print("✅ Gemini 1.5 Flash 생성 성공")
-            return res.text, "Gemini-1.5-Flash"
-    except Exception as e:
-        print(f"⚠️ Gemini 1.5 Flash 실패: {e}")
 
     print("⚠️ 내부 엔진 사용")
     return None, "내부엔진"
@@ -365,7 +316,6 @@ def get_image(keyword):
             return random.choice(data["hits"])["webformatURL"], "Pixabay"
     except Exception as e:
         print(f"⚠️ Pixabay 실패: {e}")
-
     try:
         headers = {"Authorization": PEXELS_KEY}
         url = f"https://api.pexels.com/v1/search?query={requests.utils.quote(keyword)}&per_page=5"
@@ -376,7 +326,6 @@ def get_image(keyword):
             return random.choice(data["photos"])["src"]["large"], "Pexels"
     except Exception as e:
         print(f"⚠️ Pexels 실패: {e}")
-
     return None, "없음"
 
 def upload_image(site, img_url, keyword):
@@ -391,10 +340,8 @@ def upload_image(site, img_url, keyword):
         }
         res = requests.post(
             f"{site['url']}/wp-json/wp/v2/media",
-            data=img_data,
-            headers=headers,
-            auth=(WP_USER, wp_pass),
-            timeout=30
+            data=img_data, headers=headers,
+            auth=(WP_USER, wp_pass), timeout=30
         )
         if res.status_code == 201:
             media_id = res.json().get("id")
@@ -409,20 +356,15 @@ def publish(site, title, content, tag_ids, media_id=None):
     if not wp_pass:
         return False, "", f"Secret 없음: {site['wp_pass_env']}"
     payload = {
-        "title":      title,
-        "content":    content,
-        "categories": [1],
-        "tags":       tag_ids,
-        "status":     "publish"
+        "title": title, "content": content,
+        "categories": [1], "tags": tag_ids, "status": "publish"
     }
     if media_id:
         payload["featured_media"] = media_id
     try:
         res = requests.post(
             f"{site['url']}/wp-json/wp/v2/posts",
-            json=payload,
-            auth=(WP_USER, wp_pass),
-            timeout=30
+            json=payload, auth=(WP_USER, wp_pass), timeout=30
         )
         if res.status_code == 201:
             post_url = res.json().get("link", "")
@@ -435,10 +377,106 @@ def publish(site, title, content, tag_ids, media_id=None):
         print(f"💥 접속 불가: {e}")
         return False, "", str(e)
 
+def make_fallback(keyword, theme, lang):
+    if lang == "ko":
+        return (
+            f"<h2>{keyword} 완벽 가이드</h2>"
+            f"<p>{keyword}은(는) {theme} 분야의 핵심 주제입니다. {keyword}에 대해 전문가 시각으로 분석합니다.</p>"
+            f"<h2>{keyword}란 무엇인가?</h2>"
+            f"<p>{keyword}은(는) {theme}에서 중요한 역할을 합니다.</p>"
+            f"<h3>{keyword} 주요 특징</h3><ul>"
+            f"<li><strong>{keyword} 핵심 원리</strong>: 기본 이해</li>"
+            f"<li><strong>{keyword} 활용법</strong>: 실생활 적용</li>"
+            f"<li><strong>{keyword} 최신 정보</strong>: 2026년 업데이트</li>"
+            f"<li><strong>전문가 조언</strong>: 권장 사항</li>"
+            f"</ul>"
+            f"<h2>{keyword} 효능과 장점</h2>"
+            f"<p>{keyword}을(를) 올바르게 활용하면 다양한 이점을 얻을 수 있습니다.</p>"
+            f"<h3>{keyword} 장점</h3><ul>"
+            f"<li>{keyword} 전문 지식 습득</li>"
+            f"<li>실용적 {keyword} 활용</li>"
+            f"<li>최신 {keyword} 정보 파악</li>"
+            f"</ul>"
+            f"<h2>{keyword} 활용 방법</h2>"
+            f"<p>{keyword}을(를) 단계별로 효과적으로 활용하세요.</p>"
+            f"<h3>단계별 가이드</h3><ol>"
+            f"<li>{keyword} 기본 개념 이해</li>"
+            f"<li>전문가 {keyword} 조언 참고</li>"
+            f"<li>꾸준한 {keyword} 실천</li>"
+            f"</ol>"
+            f"<h2>{keyword} 주의사항</h2>"
+            f"<p>{keyword} 활용 시 주의사항을 숙지하세요.</p>"
+            f"<h3>주요 주의점</h3><ul>"
+            f"<li>전문가 상담 후 {keyword} 시작</li>"
+            f"<li>개인차 고려한 접근</li>"
+            f"<li>최신 정보 지속 확인</li>"
+            f"</ul>"
+            f"<h2>FAQ: {keyword} 자주 묻는 질문</h2>"
+            f"<h3>Q1. {keyword}은 누구에게 필요한가요?</h3>"
+            f"<p>{theme}에 관심 있는 모든 분께 도움이 됩니다.</p>"
+            f"<h3>Q2. {keyword} 시작 방법은?</h3>"
+            f"<p>전문가 조언을 구하고 단계적으로 시작하세요.</p>"
+            f"<h3>Q3. 효과는 언제 나타나나요?</h3>"
+            f"<p>개인차가 있지만 꾸준한 실천이 중요합니다.</p>"
+            f"<h3>Q4. 전문가는 어떻게 찾나요?</h3>"
+            f"<p>{theme} 분야 전문가에게 상담을 받으세요.</p>"
+            f"<h3>Q5. 최신 정보는 어디서?</h3>"
+            f"<p>신뢰할 수 있는 {theme} 전문 사이트를 참고하세요.</p>"
+            f"<h2>결론</h2>"
+            f"<p>{keyword}은(는) {theme}에서 매우 중요합니다. 전문가와 상담하여 최적의 방법을 찾으세요.</p>"
+        )
+    else:
+        return (
+            f"<h2>The Complete Guide to {keyword}</h2>"
+            f"<p>{keyword} is a crucial topic in {theme}. This guide provides expert insights on {keyword}.</p>"
+            f"<h2>What is {keyword}?</h2>"
+            f"<p>{keyword} plays a vital role in {theme}.</p>"
+            f"<h3>Key Features of {keyword}</h3><ul>"
+            f"<li><strong>Core principles</strong>: Understanding {keyword}</li>"
+            f"<li><strong>Applications</strong>: Real-world {keyword} usage</li>"
+            f"<li><strong>Latest trends</strong>: {keyword} in 2026</li>"
+            f"<li><strong>Expert advice</strong>: {keyword} recommendations</li>"
+            f"</ul>"
+            f"<h2>Why {keyword} Matters</h2>"
+            f"<p>{keyword} is essential for anyone in {theme}.</p>"
+            f"<h3>Benefits of {keyword}</h3><ul>"
+            f"<li>Deeper understanding of {keyword}</li>"
+            f"<li>Practical {keyword} skills</li>"
+            f"<li>Expert-backed {keyword} strategies</li>"
+            f"</ul>"
+            f"<h2>How to Get Started with {keyword}</h2>"
+            f"<p>Starting with {keyword} requires a clear strategy in {theme}.</p>"
+            f"<h3>Step-by-Step Guide</h3><ol>"
+            f"<li>Research {keyword} fundamentals</li>"
+            f"<li>Consult {keyword} experts</li>"
+            f"<li>Apply {keyword} consistently</li>"
+            f"</ol>"
+            f"<h2>Common {keyword} Mistakes</h2>"
+            f"<p>Avoid these mistakes when working with {keyword}.</p>"
+            f"<h3>Top Pitfalls</h3><ul>"
+            f"<li>Skipping expert consultation on {keyword}</li>"
+            f"<li>Ignoring individual differences in {keyword}</li>"
+            f"<li>Not staying updated on {keyword}</li>"
+            f"</ul>"
+            f"<h2>FAQ: {keyword}</h2>"
+            f"<h3>Q1. Who needs {keyword}?</h3>"
+            f"<p>Anyone interested in {theme} can benefit from {keyword}.</p>"
+            f"<h3>Q2. How to start with {keyword}?</h3>"
+            f"<p>Research and consult experts before starting {keyword}.</p>"
+            f"<h3>Q3. When to see {keyword} results?</h3>"
+            f"<p>Consistency is key with {keyword}.</p>"
+            f"<h3>Q4. Where to find {keyword} experts?</h3>"
+            f"<p>Look for certified professionals in {theme}.</p>"
+            f"<h3>Q5. Latest {keyword} updates?</h3>"
+            f"<p>Follow trusted {theme} resources for {keyword} news.</p>"
+            f"<h2>Conclusion</h2>"
+            f"<p>Mastering {keyword} gives you an edge in {theme}. Start your {keyword} journey today.</p>"
+        )
+
 def run():
     total = len(SITES_CONFIG)
     print(f"🚀 총 {total}개 사이트 × 3포스트 = {total*3}개 발행 시작!")
-    print(f"⏰ 시작 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"⏰ 시작: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     for i, site in enumerate(SITES_CONFIG, 1):
         lang = site['lang']
@@ -458,14 +496,14 @@ def run():
 
             if not article:
                 engine = "내부엔진"
-                article = f"<h2>{keyword} 가이드</h2><p>{keyword}에 대한 전문 정보입니다.</p>"
+                article = make_fallback(keyword, site['theme'], lang)
 
             seo = calc_seo_score(article, keyword)
             char_count = len(article)
             print(f"📊 SEO: {seo}/100 | 글자수: {char_count}")
 
             retry = 0
-            while seo < 90 and retry < 3:
+            while seo < 90 and retry < 2:
                 retry += 1
                 print(f"🔄 재작성 {retry}회차 (SEO {seo}점)")
                 new_article, new_engine = generate_article(prompt)
@@ -474,7 +512,7 @@ def run():
                     engine = new_engine
                     seo = calc_seo_score(article, keyword)
                     char_count = len(article)
-                    print(f"📊 재작성 후 SEO: {seo}/100 | 글자수: {char_count}")
+                    print(f"📊 재작성 후: SEO {seo}/100 | {char_count}자")
 
             if seo >= 90:
                 print(f"🎯 SEO {seo}점 달성!")
@@ -483,13 +521,9 @@ def run():
             else:
                 print(f"⚠️ SEO {seo}점 → 그냥 발행")
 
-            # 내부10개 + 외부5개 링크 삽입
             final = inject_links_section(article, keyword, site['url'], lang)
-
-            # 태그 13개 생성
             tag_ids = create_tag_ids(site, keyword, site['theme'], lang)
 
-            # 이미지
             image_count = 0
             image_source = "없음"
             media_id = None
@@ -502,13 +536,10 @@ def run():
             else:
                 print("⚠️ 이미지 없이 발행")
 
-            # 발행
             success, post_url, error_msg = publish(site, title, final, tag_ids, media_id)
-
             elapsed = (datetime.now() - start_time).seconds
-            print(f"⏱️ 소요시간: {elapsed}초")
+            print(f"⏱️ 소요: {elapsed}초")
 
-            # 구글 시트 기록
             log_to_sheets(
                 site['url'], keyword, title,
                 engine, image_count, image_source,
@@ -520,7 +551,7 @@ def run():
                 print(f"⏳ 3분 대기...")
                 time.sleep(180)
 
-    print(f"\n🏁 전체 완료! 종료 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"\n🏁 완료! {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
     print(f"⏰ [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 오토봇 가동")
