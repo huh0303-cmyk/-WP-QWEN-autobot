@@ -28,7 +28,6 @@ REPORTERS = [
 
 HEALTH_CATEGORIES = [2, 3, 4, 5, 6]
 
-# 대표님이 설정하신 깃허브 Secret 이름과 100% 일치하도록 바인딩 이름 수정 완료
 SITES_CONFIG = [
     {"url": "https://k-health365.com",      "type": "hub",  "lang": "ko", "theme": "건강과 의학", "keywords_file": ".github/workflows/keywords_khealth.txt", "wp_pass_env": "K_HEALTH365COM"},
     {"url": "https://koreanews365.com",      "type": "news", "lang": "ko", "theme": "한국 뉴스",   "keywords_file": ".github/workflows/keywords_koreanews.txt", "wp_pass_env": "KOREANEWS365COM"},
@@ -145,69 +144,51 @@ def build_related_search_links(keyword, lang):
     return html
 
 def run():
-    now = datetime.now()
-    minute_slot = now.minute
-    hour_slot = now.hour
+    print(f"🚀 [무조건 가동 모드] 시간 체크를 우회하여 릴레이 포스팅을 시작합니다.")
     
-    print(f"🚀 오토봇 스케줄 감지 완료 - 현재 시각: {hour_slot}시 {minute_slot}분")
-    
-    if minute_slot in [0, 30]:
-        site = SITES_CONFIG[0]
-        wp_pass = os.getenv(site['wp_pass_env'])
-        if wp_pass:
-            keyword = load_keyword(site['keywords_file'], "체지방 감소 식품")
-            prompt = make_seo_prompt(keyword, site['theme'], site['lang'], "blog")
-            res = gemini_client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
-            article = res.text if res.text else ""
-            
-            if len(article) > 300:
-                article += build_spider_web_links(keyword, site['url'], 'ko')
-                article += build_related_search_links(keyword, 'ko')
-                img_urls = get_multiple_images(keyword, 3)
-                media_ids = []
-                for idx, url in enumerate(img_urls):
-                    mid = upload_to_wp_media(site['url'], wp_pass, url, keyword, idx)
-                    if mid: media_ids.append(mid)
-                
-                payload = {
-                    "title": f"{keyword} 정보 완벽 정리",
-                    "content": article,
-                    "categories": [random.choice(HEALTH_CATEGORIES)],
-                    "status": "publish"
-                }
-                if media_ids: payload["featured_media"] = media_ids[0]
-                
-                requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-                print(f"✅ 메인허브 분산 카테고리 발행 성공")
+    # 1. 메인 허브 사이트 즉시 포스팅
+    site = SITES_CONFIG[0]
+    wp_pass = os.getenv(site['wp_pass_env'])
+    if wp_pass:
+        keyword = load_keyword(site['keywords_file'], "체지방 감소 식품")
+        prompt = make_seo_prompt(keyword, site['theme'], site['lang'], "blog")
+        res = gemini_client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
+        article = res.text if res.text else ""
+        if len(article) > 300:
+            article += build_spider_web_links(keyword, site['url'], 'ko')
+            article += build_related_search_links(keyword, 'ko')
+            img_urls = get_multiple_images(keyword, 3)
+            media_ids = []
+            for idx, url in enumerate(img_urls):
+                mid = upload_to_wp_media(site['url'], wp_pass, url, keyword, idx)
+                if mid: media_ids.append(mid)
+            payload = {"title": f"{keyword} 정보 완벽 정리", "content": article, "categories": [random.choice(HEALTH_CATEGORIES)], "status": "publish"}
+            if media_ids: payload["featured_media"] = media_ids[0]
+            requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
+            print(f"✅ [1/3] 메인허브 ({site['url']}) 발행 완료")
 
-    # 신문사 포스팅 파트 환경 변수 연동 수정 완료
-    if hour_slot % 2 == 0 and minute_slot == 15:
-        site = SITES_CONFIG[1]
-        wp_pass = os.getenv(site['wp_pass_env']) # KOREANEWS365COM 값을 정확하게 수집함
-            
-        if wp_pass:
-            ref_title, ref_desc = crawl_rss_news()
-            prompt = make_seo_prompt(ref_title, site['theme'], 'ko', "news")
-            res = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-            article = res.text if res.text else ""
-            
-            if len(article) > 300:
-                payload = {"title": f"[속보] {ref_title}", "content": article, "categories": [1], "status": "publish"}
-                res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-                print(f"📰 신문사 스타일 크롤링 기반 기사 포스팅 상태코드: {res_post.status_code}")
-        else:
-            print(f"⚠️ 경고: {site['wp_pass_env']} 비밀번호(Secret)를 코드에서 로드할 수 없습니다.")
+    # 2. 한국 뉴스 신문사 사이트 즉시 포스팅
+    site = SITES_CONFIG[1]
+    wp_pass = os.getenv(site['wp_pass_env'])
+    if wp_pass:
+        ref_title, ref_desc = crawl_rss_news()
+        prompt = make_seo_prompt(ref_title, site['theme'], 'ko', "news")
+        res = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        article = res.text if res.text else ""
+        if len(article) > 300:
+            payload = {"title": f"[속보] {ref_title}", "content": article, "categories": [1], "status": "publish"}
+            requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
+            print(f"📰 [2/3] 신문사 ({site['url']}) 뉴스 포스팅 완료")
 
-    global_site_idx = (hour_slot * 2 + (1 if minute_slot >= 30 else 0)) % (len(SITES_CONFIG) - 2) + 2
+    # 3. 글로벌 네트워크 사이트 중 무작위 1개 즉시 포스팅
+    global_site_idx = random.randint(2, len(SITES_CONFIG) - 1)
     site = SITES_CONFIG[global_site_idx]
     wp_pass = os.getenv(site['wp_pass_env'])
-    
     if wp_pass:
         keyword = load_keyword(site['keywords_file'], site['theme'])
         prompt = make_seo_prompt(keyword, site['theme'], site['lang'], "blog")
         res = gemini_client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
         article = res.text if res.text else ""
-        
         if len(article) > 300:
             article += build_spider_web_links(keyword, site['url'], site['lang'])
             article += build_related_search_links(keyword, site['lang'])
@@ -216,12 +197,10 @@ def run():
             for idx, url in enumerate(img_urls):
                 mid = upload_to_wp_media(site['url'], wp_pass, url, keyword, idx)
                 if mid: media_ids.append(mid)
-            
             payload = {"title": f"The Essential Guide to {keyword}", "content": article, "categories": [1], "status": "publish"}
             if media_ids: payload["featured_media"] = media_ids[0]
-            
             requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-            print(f"🌐 글로벌 사이트 [{site['url']}] 정밀 포스팅 완료")
+            print(f"🌐 [3/3] 글로벌 스포크 사이트 ({site['url']}) 발행 완료")
 
 if __name__ == "__main__":
     run()
