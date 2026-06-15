@@ -3,13 +3,12 @@ name: Auto Post Mega Bot
 on:
   workflow_dispatch:
   schedule:
-    # 한국 시간 기준 매 시간 15분마다 정밀하게 깨어나 순환 가동합니다.
-    - cron: '15 * * * *'
+    - cron: '*/30 * * * *'
 
 jobs:
   autopost:
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # 한 번 실행 시 최대 30분이면 충분하므로 타임아웃을 줄여 안전 장치를 합니다.
+    timeout-minutes: 15
     steps:
     - name: 1. 코드 다운로드
       uses: actions/checkout@v4
@@ -19,19 +18,20 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: 3. 패키지 설치
+    - name: 3. 시스템 의존성 및 필수 패키지 강제 설치
       run: |
         python -m pip install --upgrade pip
-        pip install requests google-genai
+        # beautifulsoup4와 필수 의존성 패키지를 명확하게 지정하여 강제 설치합니다.
+        pip install requests google-genai beautifulsoup4 lxml
 
-    - name: 4. 오토포스팅 실행
+    - name: 4. 오토포스팅 인프라 가동
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
         PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
         SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
-        WP_PASS_HEALTH: ${{ secrets.WP_PASS_HEALTH }}
-        WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
+        K_HEALTH365COM: ${{ secrets.K_HEALTH365COM }}
+        KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
         THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
         KSKIN365COM: ${{ secrets.KSKIN365COM }}
