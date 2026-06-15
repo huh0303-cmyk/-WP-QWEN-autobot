@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 WordPress 멀티 채널 자동 포스팅 인프라 - 사이트 설정 데이터베이스
