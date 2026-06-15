@@ -17,11 +17,10 @@ jobs:
     - name: 3. 패키지 설치
       run: |
         python -m pip install --upgrade pip
-        pip install requests google-generativeai groq
+        pip install requests google-genai
     - name: 4. 오토포스팅 실행
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
         PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
         SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
