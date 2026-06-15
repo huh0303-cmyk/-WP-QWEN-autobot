@@ -27,7 +27,7 @@ jobs:
         SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
         WP_PASS_HEALTH: ${{ secrets.WP_PASS_HEALTH }}
         WP_PASS_NEWS: ${{ secrets.WP_PASS_NEWS }}
-        WP_PASS_JOURNAL: ${{ secrets.WP_PASS_JOURNAL }}
+        THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
         KSKIN365COM: ${{ secrets.KSKIN365COM }}
         KOREA365ORG: ${{ secrets.KOREA365ORG }}
