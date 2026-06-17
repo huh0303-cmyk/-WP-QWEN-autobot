@@ -72,7 +72,7 @@ jobs:
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
-          K_HEALTH365COM: ${{ secrets.K_HEALTH365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -85,7 +85,7 @@ jobs:
           STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
           KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
-          KOREATAXNLAW365COM: ${{ secrets.KOREATAXNLAW365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
           KVISA365COM: ${{ secrets.KVISA365COM }}
           KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
