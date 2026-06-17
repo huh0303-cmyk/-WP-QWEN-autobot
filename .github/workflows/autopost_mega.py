@@ -40,7 +40,7 @@ MIN_BODY_LENGTH = 1800  # 애드센스 콘텐츠 충분성 기준: 너무 짧은
 # ============================================================
 SITES_CONFIG = [
     {"url": "https://k-health365.com",      "lang": "ko", "theme": "건강과 의학", "mode": "blog",
-     "keywords_file": ".github/workflows/keywords_khealth.txt", "wp_pass_env": "K_HEALTH365COM", "daily": 15},
+     "keywords_file": ".github/workflows/keywords_khealth.txt", "wp_pass_env": "KHEALTH365COM", "daily": 15},
 
     {"url": "https://koreamedicaltour.com", "lang": "en", "theme": "Korea Medical Tourism", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_medicaltour.txt", "wp_pass_env": "KOREAMEDICALTOURCOM", "daily": 3},
@@ -55,7 +55,7 @@ SITES_CONFIG = [
      "keywords_file": ".github/workflows/keywords_kfinance.txt", "wp_pass_env": "KFINANCE365COM", "daily": 3},
 
     {"url": "https://koreataxnlaw.com",     "lang": "en", "theme": "Tax and Law", "mode": "blog",
-     "keywords_file": ".github/workflows/keywords_ktax.txt", "wp_pass_env": "KOREATAXNLAW365COM", "daily": 3},
+     "keywords_file": ".github/workflows/keywords_ktax.txt", "wp_pass_env": "KOREATAXNLAWCOM", "daily": 3},
 
     {"url": "https://koreacrypto365.com",   "lang": "en", "theme": "Crypto", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kcrypto.txt", "wp_pass_env": "KOREACRYPTO365COM", "daily": 3},
