@@ -455,7 +455,12 @@ def get_images_from_pixabay(query, need):
         return urls
     try:
         url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={requests.utils.quote(query)}&image_type=photo&per_page=20&safesearch=true"
-        res = requests.get(url, timeout=10).json()
+        res_raw = requests.get(url, timeout=10)
+        try:
+            res = res_raw.json()
+        except Exception:
+            print(f"  🔍 [진단] Pixabay 응답이 JSON이 아님 (status={res_raw.status_code}): {res_raw.text[:300]}")
+            return urls
         hits = res.get("hits") or []
         if hits:
             sample = random.sample(hits, min(need, len(hits)))
@@ -765,7 +770,9 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         record_result(site['url'], title, tag_count=len(tag_ids), status="success")
         return True
     else:
-        print(f"❌ {site['url']} 발행 실패 (status={res_post.status_code}): {res_post.text[:200]}")
+        print(f"❌ {site['url']} 발행 실패 (status={res_post.status_code}): {res_post.text[:1500]}")
+        if res_post.status_code == 403:
+            print(f"  🔍 [진단] 응답 헤더: {dict(res_post.headers)}")
         record_result(site['url'], title, tag_count=len(tag_ids), status=f"fail_{res_post.status_code}")
         return False
 
