@@ -1,0 +1,98 @@
+name: Auto Post Mega Bot (22 Sites)
+on:
+  workflow_dispatch:
+    inputs:
+      run_slot:
+        description: '수동 실행 시 슬롯 번호 (1, 2, 3 중 선택)'
+        required: false
+        default: '1'
+  schedule:
+    # 하루 3회 실행. 각 회차마다 22개 사이트의 일일 목표량을 1/3씩 나눠 발행합니다.
+    # Gemini 2.5 Flash-Lite 무료 쿼터(분당 RPM, 일일 RPD) 보호를 위해
+    # 1회 실행당 약 26~30건만 처리하고, 글 사이마다 대기시간(SLEEP_BETWEEN_POSTS)을 둡니다.
+
+    # 1회차: 한국 시간(KST) 06:10 (UTC 21:10, 전날)
+    - cron: '10 21 * * *'
+
+    # 2회차: 한국 시간(KST) 14:10 (UTC 05:10)
+    - cron: '10 5 * * *'
+
+    # 3회차: 한국 시간(KST) 22:10 (UTC 13:10)
+    - cron: '10 13 * * *'
+
+# 동일 네트워크 자산(워드프레스 REST API) 충돌 방지
+concurrency:
+  group: wordpress-mega-bot-22sites
+  cancel-in-progress: false
+
+jobs:
+  determine-slot:
+    runs-on: ubuntu-latest
+    outputs:
+      slot: ${{ steps.set-slot.outputs.slot }}
+    steps:
+      - name: 실행 슬롯 결정
+        id: set-slot
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "slot=${{ github.event.inputs.run_slot }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "10 21 * * *" ]; then
+            echo "slot=1" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "10 5 * * *" ]; then
+            echo "slot=2" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "10 13 * * *" ]; then
+            echo "slot=3" >> "$GITHUB_OUTPUT"
+          else
+            echo "slot=1" >> "$GITHUB_OUTPUT"
+          fi
+
+  autopost:
+    needs: determine-slot
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: 1. 코드 다운로드
+        uses: actions/checkout@v4
+
+      - name: 2. 파이썬 3.11 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 3. 필수 패키지 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests google-genai beautifulsoup4 lxml
+
+      - name: 4. 오토포스팅 인프라 가동 (Slot ${{ needs.determine-slot.outputs.slot }})
+        env:
+          RUN_SLOT: ${{ needs.determine-slot.outputs.slot }}
+          SLEEP_BETWEEN_POSTS: '6'
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          K_HEALTH365COM: ${{ secrets.K_HEALTH365COM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KOREATAXNLAW365COM: ${{ secrets.KOREATAXNLAW365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+        run: |
+          python .github/workflows/autopost_mega.py
