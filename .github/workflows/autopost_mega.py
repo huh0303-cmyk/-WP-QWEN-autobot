@@ -267,9 +267,31 @@ def crawl_rss_news():
 # - 최소 글자수 상향, 출처/통계 인용 요구로 E-E-A-T 강화
 # - 광고 친화적 구조(짧은 문단, 명확한 h2/h3 계층, 표/리스트 혼합)
 # ============================================================
+TITLE_STYLES_KO = [
+    "숫자 리스트형: 구체적인 숫자를 넣어 호기심을 자극 (예: '○○하는 5가지 방법', '몰랐던 7가지 사실')",
+    "경고/주의형: 손해나 실수를 암시해 클릭을 유도 (예: '○○ 모르고 하면 손해보는 이유', '이것 모르면 100% 후회')",
+    "질문형: 독자가 스스로에게 묻게 만드는 질문 (예: '○○ 진짜 효과 있을까?', '당신도 ○○ 하고 있나요?')",
+    "비교/반전형: 통념을 깨거나 비교하는 구조 (예: '○○ vs △△, 정답은 따로 있다', '다들 잘못 알고 있는 ○○')",
+    "긴급/시급형: 시기나 타이밍을 강조 (예: '지금 안 하면 늦는 ○○', '2026년 꼭 알아야 할 ○○')",
+]
+
+TITLE_STYLES_EN = [
+    "Number/List style: spark curiosity with a specific count (e.g. '7 Things Nobody Tells You About X', '5 Mistakes to Avoid With X')",
+    "Warning style: hint at a loss or mistake to drive clicks (e.g. 'Why You're Losing Money on X', 'The X Mistake Everyone Makes')",
+    "Question style: a question readers ask themselves (e.g. 'Is X Really Worth It?', 'Are You Making This X Mistake?')",
+    "Comparison/contrarian style: challenge assumptions (e.g. 'X vs Y: Here's the Real Answer', 'What Nobody Tells You About X')",
+    "Urgency style: emphasize timing (e.g. 'Why X Matters More Than Ever in 2026', 'Don't Wait to Learn This About X')",
+]
+
+
+def pick_title_style(lang):
+    return random.choice(TITLE_STYLES_KO if lang == "ko" else TITLE_STYLES_EN)
+
+
 def make_seo_prompt(keyword, theme, lang, mode="blog"):
     reporter = random.choice(REPORTERS)
     tag_lang = "영어로" if lang == "en" else "한국어로"
+    title_style = pick_title_style(lang)
 
     if mode == "news":
         return f"""
@@ -282,11 +304,14 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
         3. 분량: HTML 태그(h2, h3, p, strong, ul, li)만 사용해 최소 1800자 이상, 정보가 충실한 기사로 작성하세요. 마크다운 금지.
         4. 신뢰성(E-E-A-T): 첫 단락에 핵심 리드문을 작성하고, 전문가 인터뷰 인용구, 구체적 통계 수치, 발표 기관명을 포함해 신뢰도를 극대화하십시오.
         5. 구조: h2 소제목 최소 3개, 단락은 3~4문장 이내로 짧게 끊어 가독성을 높이십시오 (애드센스는 짧은 문단의 가독성 높은 글을 선호함).
-        6. 메타 디스크립션: 기사 본문이 끝난 직후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내의 검색결과용 요약문을 작성하세요.
-        7. FAQ: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이어서 이 기사와 관련된 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 각 줄에 작성한 뒤 'FAQ_END' 로 마무리하세요.
-        8. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요.
+        6. 제목: 본문 작성에 앞서, 클릭을 유도하는 후킹성 제목을 직접 지어내십시오. 스타일 가이드: {title_style}
+           제목에는 반드시 '{keyword}'를 포함해야 하며, 과장이나 허위 사실 없이 진짜 흥미를 자극해야 합니다. 매 기사마다 뻔하고 비슷한 패턴("OO 완벽 정리", "OO 가이드")은 절대 쓰지 마세요.
+           출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
+        7. 메타 디스크립션: 기사 본문이 끝난 직후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내의 검색결과용 요약문을 작성하세요.
+        8. FAQ: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이어서 이 기사와 관련된 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 각 줄에 작성한 뒤 'FAQ_END' 로 마무리하세요.
+        9. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요.
 
-        출력 순서: [기사 본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
+        출력 순서: TITLE: ... → [기사 본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
         """
 
     persona = "의학 박사" if "건강" in theme or "medical" in theme.lower() else "산업 분야 최고 전문 자문위원"
@@ -302,19 +327,23 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
     4. 구조 다각화: h2 태그 최소 5개 이상, h3 태그 최소 4개 이상 배치하고, 가독성을 위한 불릿 포인트(ul/li) 리스트를 3개 이상, 비교 표(table)를 최소 1개 포함하세요.
     5. E-E-A-T 신뢰성 강화: 구체적인 수치, 통계, 공신력 있는 기관명(정부기관, 학회, 협회 등)을 본문 중 최소 2회 이상 자연스럽게 인용하여 전문성과 신뢰성을 보여주세요. 실제 경험에 기반한 듯한 구체적 디테일(예: 가격대, 기간, 절차 등)을 포함하세요.
     6. 가독성: 한 단락은 3~4문장 이내로 짧게 끊어 작성하세요. 광고가 들어갈 여백이 자연스럽게 생기도록 단락 사이를 명확히 구분하세요.
-    7. 메타 디스크립션: 본문이 모두 끝난 후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내로 검색결과에 노출될 매력적인 요약문을 작성하세요.
-    8. FAQ 스키마: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이 주제와 관련된 독자들이 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 한 줄씩 작성한 뒤 'FAQ_END' 로 마무리하세요. 이는 구글 FAQ 스키마 마크업에 사용됩니다.
-    9. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요.
+    7. 제목: 본문 작성에 앞서, 클릭을 유도하는 후킹성 제목을 직접 지어내십시오. 스타일 가이드: {title_style}
+       제목에는 반드시 '{keyword}'를 포함해야 하며, 과장이나 허위 사실 없이 진짜 흥미를 자극해야 합니다. 매 글마다 뻔하고 비슷한 패턴("The Essential Guide to X", "X 정보 완벽 정리")은 절대 쓰지 마세요. 매번 다른 각도로 신선하게 지으세요.
+       출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
+    8. 메타 디스크립션: 본문이 모두 끝난 후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내로 검색결과에 노출될 매력적인 요약문을 작성하세요.
+    9. FAQ 스키마: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이 주제와 관련된 독자들이 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 한 줄씩 작성한 뒤 'FAQ_END' 로 마무리하세요. 이는 구글 FAQ 스키마 마크업에 사용됩니다.
+    10. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요.
 
-    출력 순서: [본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
+    출력 순서: TITLE: ... → [본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
     """
 
 
 def extract_meta_and_faq(text):
     """
-    META_DESC, FAQ_START~FAQ_END 블록을 추출하고 본문에서 제거한다.
-    반환: (정제된 텍스트, meta_desc, faq_list[(q,a), ...])
+    TITLE, META_DESC, FAQ_START~FAQ_END 블록을 추출하고 본문에서 제거한다.
+    반환: (정제된 텍스트, title, meta_desc, faq_list[(q,a), ...])
     """
+    title = ""
     meta_desc = ""
     faq_list = []
     lines = text.split("\n")
@@ -324,6 +353,9 @@ def extract_meta_and_faq(text):
 
     for line in lines:
         stripped = line.strip()
+        if stripped.upper().startswith("TITLE:"):
+            title = stripped.split(":", 1)[1].strip() if ":" in stripped else ""
+            continue
         if stripped.upper().startswith("META_DESC:"):
             meta_desc = stripped.split(":", 1)[1].strip() if ":" in stripped else ""
             continue
@@ -342,7 +374,10 @@ def extract_meta_and_faq(text):
             continue
         out_lines.append(line)
 
-    return "\n".join(out_lines).strip(), meta_desc, faq_list
+    # 따옴표나 마크다운 잔재가 제목에 섞여 들어오는 경우 정리
+    title = title.strip('"').strip("'").strip("*").strip()
+
+    return "\n".join(out_lines).strip(), title, meta_desc, faq_list
 
 
 def build_fallback_tag_pool(fallback_keyword, theme=None, lang="ko"):
@@ -697,7 +732,7 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         record_result(site['url'], keyword, status="fail_short_body")
         return False
 
-    body_with_tags, meta_desc, faq_list = extract_meta_and_faq(raw_text)
+    body_with_tags, gemini_title, meta_desc, faq_list = extract_meta_and_faq(raw_text)
     article_body, tag_names = extract_tags_from_article(body_with_tags, keyword, theme=theme, lang=lang)
 
     # 애드센스 90점 기준: 콘텐츠 충분성 체크 (본문 HTML 태그 제외 텍스트 기준 대략 추정)
@@ -741,10 +776,25 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     if faq_schema:
         article_body += faq_schema
 
-    if lang == 'ko':
-        title = f"[속보] {keyword}" if mode == "news" else f"{keyword} 정보 완벽 정리"
+    # 제목: Gemini가 직접 지은 후킹성 제목을 최우선으로 사용.
+    # 키워드가 빠져있으면 SEO를 위해 자연스럽게 보강하고, 제목 생성에 실패한 경우에만 fallback 사용.
+    if gemini_title and len(gemini_title) >= 8:
+        title = gemini_title
+        if keyword.lower() not in title.lower():
+            title = f"{title} ({keyword})" if lang != 'ko' else f"{title} ({keyword})"
     else:
-        title = f"The Essential Guide to {keyword}"
+        if lang == 'ko':
+            title = f"[속보] {keyword}" if mode == "news" else f"{keyword} 정보 완벽 정리"
+        else:
+            title = f"The Essential Guide to {keyword}"
+
+    # Rank Math SEO 메타필드 강제 주입: 포커스 키워드 + 메타 디스크립션
+    # (Rank Math 무료 버전은 콤마로 구분된 키워드를 최대 5개까지 포커스 키워드로 인식함)
+    focus_keywords = [keyword] + tag_names[:4]
+    rank_math_meta = {
+        "rank_math_focus_keyword": ",".join(focus_keywords),
+        "rank_math_description": meta_desc,
+    }
 
     payload = {
         "title": title,
@@ -752,6 +802,7 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         "excerpt": meta_desc,
         "categories": category_ids,
         "status": "publish",
+        "meta": rank_math_meta,
     }
     if tag_ids:
         payload["tags"] = tag_ids
@@ -766,7 +817,37 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         return False
 
     if res_post.status_code == 201:
-        print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개: {title}")
+        post_data = res_post.json()
+        post_id = post_data.get("id")
+        returned_meta = post_data.get("meta", {}) or {}
+
+        rank_math_applied = (
+            returned_meta.get("rank_math_focus_keyword") == rank_math_meta["rank_math_focus_keyword"]
+        )
+
+        if not rank_math_applied and post_id:
+            # 생성 시점에 meta가 무시된 경우, PATCH로 한 번 더 시도 (일부 환경에서는 update에서만 허용됨)
+            try:
+                patch_res = requests.post(
+                    f"{site['url']}/wp-json/wp/v2/posts/{post_id}",
+                    json={"meta": rank_math_meta},
+                    auth=(WP_USER, wp_pass),
+                    timeout=15
+                )
+                if patch_res.status_code == 200:
+                    patched_meta = patch_res.json().get("meta", {}) or {}
+                    rank_math_applied = (
+                        patched_meta.get("rank_math_focus_keyword") == rank_math_meta["rank_math_focus_keyword"]
+                    )
+            except Exception:
+                pass
+
+        if rank_math_applied:
+            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개, Rank Math 메타 적용: {title}")
+        else:
+            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개: {title}")
+            print(f"  ⚠️ [진단] Rank Math 메타필드가 REST API에 반영되지 않음. 해당 사이트는 functions.php에 register_post_meta 노출 코드가 필요할 수 있음.")
+
         record_result(site['url'], title, tag_count=len(tag_ids), status="success")
         return True
     else:
