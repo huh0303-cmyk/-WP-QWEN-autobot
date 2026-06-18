@@ -3,10 +3,18 @@ import sys
 import time
 import random
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
 from google.genai import types
+
+# GitHub Actions 러너는 UTC로 동작하므로, 로그/시트에 찍히는 모든 시각은
+# 한국 표준시(KST, UTC+9)로 명시적으로 변환해서 사용한다.
+KST = timezone(timedelta(hours=9))
+
+
+def now_kst():
+    return datetime.now(KST)
 
 # ============================================================
 # 환경 변수 및 설정
@@ -21,7 +29,15 @@ RUN_SLOT = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "6"))
 
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-GEMINI_MODEL = "gemini-2.5-flash-lite"
+# Gemini 모델 우선순위: 무료 등급에서 더 품질이 좋은 일반 Flash를 먼저 쓰고,
+# 그 일일 한도(RPD)가 소진되면 한도가 더 넉넉한 Flash-Lite로 자동 전환해서 계속 발행한다.
+GEMINI_MODEL_PRIMARY = "gemini-2.5-flash"
+GEMINI_MODEL_FALLBACK = "gemini-2.5-flash-lite"
+GEMINI_MODEL = GEMINI_MODEL_PRIMARY  # 로그 출력용 표시 변수(실행 중 변경됨)
+
+# 한번 Flash 일일 한도가 소진된 것으로 판단되면, 남은 작업 전체를 Lite로 전환해서
+# 매번 Flash를 재시도하며 시간을 낭비하지 않도록 플래그로 기억한다.
+_gemini_fallback_active = False
 
 REPORTERS = [
     "김민준 기자 (minjun@kworld365.com)", "이서연 기자 (seoyeon@kworld365.com)",
@@ -643,12 +659,46 @@ def build_faq_html_and_schema(faq_list, lang):
 
 RUN_LOG = []
 
-def record_result(site_url, title, tag_count=None, status="success"):
+def estimate_seo_score(keyword, title, plain_len, meta_desc, img_count, faq_count, tag_count, rank_math_applied):
+    """
+    Rank Math 플러그인 내부 점수는 REST API로 가져올 수 없으므로,
+    우리가 직접 제어하는 항목들을 기준으로 0~100점 추정치를 자체 산출한다.
+    (실제 Rank Math 화면 점수와 정확히 일치하지 않을 수 있으나, 품질 추세를 보는 용도로는 충분함)
+    """
+    score = 0
+    # 제목에 키워드 포함 (15점)
+    if keyword.lower() in title.lower():
+        score += 15
+    # 본문 길이 충분 (20점, MIN_BODY_LENGTH 이상이면 만점)
+    score += min(20, int(20 * plain_len / MIN_BODY_LENGTH)) if MIN_BODY_LENGTH else 0
+    # 메타 디스크립션 존재 + 적정 길이(50~155자) (15점)
+    if meta_desc:
+        score += 15 if 50 <= len(meta_desc) <= 155 else 8
+    # 이미지 보유 (15점, 3장 기준 비례)
+    score += min(15, img_count * 5)
+    # FAQ 스키마 보유 (10점)
+    score += min(10, faq_count * 4)
+    # 태그 12개 충족 (10점)
+    score += min(10, int(10 * tag_count / TAG_COUNT)) if TAG_COUNT else 0
+    # Rank Math 포커스 키워드/메타 실제 반영 (15점)
+    if rank_math_applied:
+        score += 15
+    return min(100, score)
+
+
+def record_result(site_url, title, keyword="", tag_count=None, img_count=0, faq_count=0,
+                   plain_len=0, rank_math_applied=False, seo_score=None, status="success"):
     RUN_LOG.append({
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "date": now_kst().strftime("%Y-%m-%d %H:%M:%S"),
         "site": site_url,
+        "keyword": keyword,
         "title": title,
         "tag_count": tag_count,
+        "img_count": img_count,
+        "faq_count": faq_count,
+        "body_length": plain_len,
+        "rank_math_applied": rank_math_applied,
+        "seo_score": seo_score,
         "status": status,
     })
 
@@ -667,7 +717,7 @@ def flush_log_to_google_sheet():
     summary_payload = {
         "type": "summary",
         "run_slot": RUN_SLOT,
-        "run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "run_time": now_kst().strftime("%Y-%m-%d %H:%M:%S"),
         "total": len(RUN_LOG),
         "success": success_count,
         "fail": fail_count,
@@ -681,24 +731,55 @@ def flush_log_to_google_sheet():
 
 
 def generate_with_retry(prompt, max_retries=3):
+    """
+    1) 이미 폴백 모드가 아니면 Flash로 시도.
+    2) Flash가 429(rate limit)로 max_retries만큼 모두 실패하면, 이번 호출은 Lite로 즉시 한 번 더 시도하고,
+       이후 모든 호출은 전역 플래그를 통해 곧바로 Lite를 사용한다(Flash 일일 한도 소진으로 판단).
+    3) 429가 아닌 다른 에러는 같은 모델로 재시도(네트워크 일시 오류 등 대응).
+    """
+    global GEMINI_MODEL, _gemini_fallback_active
+
+    model = GEMINI_MODEL_FALLBACK if _gemini_fallback_active else GEMINI_MODEL_PRIMARY
+    GEMINI_MODEL = model
+
+    last_exception = None
     for attempt in range(1, max_retries + 1):
         try:
             res = gemini_client.models.generate_content(
-                model=GEMINI_MODEL,
+                model=model,
                 contents=prompt,
             )
             if res and res.text:
                 return res.text
         except Exception as e:
+            last_exception = e
             err_str = str(e)
             is_rate_limit = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str
             wait = 20 * attempt if is_rate_limit else 5 * attempt
-            print(f"  ⚠️ Gemini 호출 실패 (시도 {attempt}/{max_retries}): {e}")
+            print(f"  ⚠️ Gemini 호출 실패 ({model}, 시도 {attempt}/{max_retries}): {e}")
             if attempt < max_retries:
                 print(f"     {wait}초 대기 후 재시도...")
                 time.sleep(wait)
-            else:
-                raise
+
+    # Flash가 끝까지 429로 실패했고 아직 폴백 모드가 아니었다면, Lite로 한 번 더 즉시 시도
+    if not _gemini_fallback_active and model == GEMINI_MODEL_PRIMARY:
+        err_str = str(last_exception) if last_exception else ""
+        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+            print(f"  🔄 {GEMINI_MODEL_PRIMARY} 일일/분당 한도 소진으로 판단 — 이후 전체 작업을 {GEMINI_MODEL_FALLBACK}로 전환합니다.")
+            _gemini_fallback_active = True
+            GEMINI_MODEL = GEMINI_MODEL_FALLBACK
+            try:
+                res = gemini_client.models.generate_content(
+                    model=GEMINI_MODEL_FALLBACK,
+                    contents=prompt,
+                )
+                if res and res.text:
+                    return res.text
+            except Exception as e2:
+                last_exception = e2
+
+    if last_exception:
+        raise last_exception
     return ""
 
 
@@ -716,20 +797,21 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     wp_pass = os.getenv(site['wp_pass_env'])
     if not wp_pass:
         print(f"⏭️  {site['url']} - 비밀번호 환경변수 없음, 스킵")
-        record_result(site['url'], f"(skip) {keyword}", status="skip_no_password")
+        record_result(site['url'], f"(skip) {keyword}", keyword=keyword, status="skip_no_password")
         return False
 
     prompt = make_seo_prompt(keyword, theme, lang, mode)
     try:
         raw_text = generate_with_retry(prompt)
+        used_model = GEMINI_MODEL
     except Exception as e:
         print(f"  ❌ Gemini 생성 최종 실패 ({site['url']}): {e}")
-        record_result(site['url'], keyword, status="fail_gemini")
+        record_result(site['url'], keyword, keyword=keyword, status="fail_gemini")
         return False
 
     if len(raw_text) < 300:
         print(f"  ⚠️ 본문이 너무 짧음, 스킵: {site['url']}")
-        record_result(site['url'], keyword, status="fail_short_body")
+        record_result(site['url'], keyword, keyword=keyword, status="fail_short_body")
         return False
 
     body_with_tags, gemini_title, meta_desc, faq_list = extract_meta_and_faq(raw_text)
@@ -739,7 +821,7 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     plain_len = len(BeautifulSoup(article_body, "html.parser").get_text())
     if plain_len < MIN_BODY_LENGTH:
         print(f"  ⚠️ 본문 글자수 부족({plain_len}자 < {MIN_BODY_LENGTH}자) — 발행은 진행하되 품질 경고 기록")
-        record_result(site['url'], f"[글자수부족:{plain_len}] {keyword}", status="warn_short_content")
+        record_result(site['url'], f"[글자수부족:{plain_len}] {keyword}", keyword=keyword, plain_len=plain_len, status="warn_short_content")
 
     if not meta_desc:
         meta_desc = (article_body[:117] + "...") if len(article_body) > 120 else article_body
@@ -813,7 +895,7 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
     except Exception as e:
         print(f"  ❌ 포스팅 요청 실패 ({site['url']}): {e}")
-        record_result(site['url'], title, status="fail_request")
+        record_result(site['url'], title, keyword=keyword, plain_len=plain_len, status="fail_request")
         return False
 
     if res_post.status_code == 201:
@@ -842,19 +924,32 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
             except Exception:
                 pass
 
+        seo_score = estimate_seo_score(
+            keyword, title, plain_len, meta_desc,
+            img_count=len(media_ids), faq_count=len(faq_list),
+            tag_count=len(tag_ids), rank_math_applied=rank_math_applied
+        )
+
         if rank_math_applied:
-            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개, Rank Math 메타 적용: {title}")
+            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개, Rank Math 메타 적용, SEO추정 {seo_score}점, 모델:{used_model}: {title}")
         else:
-            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개: {title}")
+            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개, SEO추정 {seo_score}점, 모델:{used_model}: {title}")
             print(f"  ⚠️ [진단] Rank Math 메타필드가 REST API에 반영되지 않음. 해당 사이트는 functions.php에 register_post_meta 노출 코드가 필요할 수 있음.")
 
-        record_result(site['url'], title, tag_count=len(tag_ids), status="success")
+        record_result(
+            site['url'], title, keyword=keyword, tag_count=len(tag_ids),
+            img_count=len(media_ids), faq_count=len(faq_list), plain_len=plain_len,
+            rank_math_applied=rank_math_applied, seo_score=seo_score, status="success"
+        )
         return True
     else:
         print(f"❌ {site['url']} 발행 실패 (status={res_post.status_code}): {res_post.text[:1500]}")
         if res_post.status_code == 403:
             print(f"  🔍 [진단] 응답 헤더: {dict(res_post.headers)}")
-        record_result(site['url'], title, tag_count=len(tag_ids), status=f"fail_{res_post.status_code}")
+        record_result(
+            site['url'], title, keyword=keyword, tag_count=len(tag_ids),
+            plain_len=plain_len, status=f"fail_{res_post.status_code}"
+        )
         return False
 
 
