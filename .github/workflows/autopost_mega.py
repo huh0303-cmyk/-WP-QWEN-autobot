@@ -460,6 +460,20 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
     return article_body, tags
 
 
+def is_site_reachable(site_url, timeout=8):
+    """
+    무거운 발행 작업(Gemini 호출, 이미지 업로드 등) 전에 사이트가 최소한
+    DNS 해석이 되고 응답하는지 가볍게 확인한다. (DNS 전파 중인 사이트에
+    시간과 Gemini API 호출을 낭비하지 않기 위함)
+    네트워크 오류면 False, 그 외(403/200/404 등 어떤 HTTP 응답이라도 왔으면) True.
+    """
+    try:
+        requests.head(f"{site_url}/wp-json/", timeout=timeout)
+        return True
+    except Exception:
+        return False
+
+
 def get_or_create_tag_ids(site_url, wp_pass, tag_names):
     tag_ids = []
     for name in tag_names:
@@ -800,6 +814,16 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         record_result(site['url'], f"(skip) {keyword}", keyword=keyword, status="skip_no_password")
         return False
 
+    # 본격적인 작업(Gemini 호출, 이미지 업로드 등) 전에 사이트가 살아있는지 가볍게 확인.
+    # DNS 전파 중이거나 일시적으로 죽어있는 사이트에 시간/API 호출을 낭비하지 않기 위함.
+    # 한 번 실패해도 일시적일 수 있으므로 5초 대기 후 한 번 더 확인.
+    if not is_site_reachable(site['url']):
+        time.sleep(5)
+        if not is_site_reachable(site['url']):
+            print(f"⏭️  {site['url']} - 사이트 응답 없음(DNS/네트워크), 이번 회차 스킵")
+            record_result(site['url'], f"(skip) {keyword}", keyword=keyword, status="skip_unreachable")
+            return False
+
     prompt = make_seo_prompt(keyword, theme, lang, mode)
     try:
         raw_text = generate_with_retry(prompt)
@@ -891,12 +915,56 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     if media_ids:
         payload["featured_media"] = media_ids[0]
 
-    try:
-        res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload, auth=(WP_USER, wp_pass), timeout=20)
-    except Exception as e:
-        print(f"  ❌ 포스팅 요청 실패 ({site['url']}): {e}")
+    res_post = None
+    last_post_exception = None
+    for post_attempt in range(1, 4):
+        try:
+            res_post = requests.post(
+                f"{site['url']}/wp-json/wp/v2/posts", json=payload,
+                auth=(WP_USER, wp_pass), timeout=25
+            )
+            # 200/201이면 성공, 403이라도 일단 응답은 받았으니 루프 탈출(이후 분기에서 처리)
+            break
+        except Exception as e:
+            last_post_exception = e
+            err_str = str(e)
+            is_transient = (
+                "Name or service not known" in err_str
+                or "Temporary failure in name resolution" in err_str
+                or "NewConnectionError" in err_str
+                or "ConnectionError" in err_str
+                or "Timeout" in err_str
+                or "timed out" in err_str
+            )
+            if post_attempt < 3 and is_transient:
+                wait = 8 * post_attempt
+                print(f"  ⚠️ 포스팅 요청 실패 ({site['url']}, 시도 {post_attempt}/3, 일시적 오류로 판단): {e}")
+                print(f"     {wait}초 대기 후 재시도...")
+                time.sleep(wait)
+                continue
+            else:
+                print(f"  ❌ 포스팅 요청 최종 실패 ({site['url']}): {e}")
+                record_result(site['url'], title, keyword=keyword, plain_len=plain_len, status="fail_request")
+                return False
+
+    if res_post is None:
+        print(f"  ❌ 포스팅 요청 최종 실패 ({site['url']}): {last_post_exception}")
         record_result(site['url'], title, keyword=keyword, plain_len=plain_len, status="fail_request")
         return False
+
+    # 403 챌린지(hcdn 등 일시적 WAF 차단)로 보이는 경우 한 번 더 재시도
+    if res_post.status_code == 403 and "Checking your browser" in res_post.text:
+        print(f"  ⚠️ {site['url']} WAF/봇챌린지로 추정되는 403 — 15초 대기 후 1회 재시도")
+        time.sleep(15)
+        try:
+            res_post = requests.post(
+                f"{site['url']}/wp-json/wp/v2/posts", json=payload,
+                auth=(WP_USER, wp_pass), timeout=25
+            )
+        except Exception as e:
+            print(f"  ❌ 포스팅 재시도 요청 실패 ({site['url']}): {e}")
+            record_result(site['url'], title, keyword=keyword, plain_len=plain_len, status="fail_request")
+            return False
 
     if res_post.status_code == 201:
         post_data = res_post.json()
