@@ -325,7 +325,7 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
            출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
         7. 메타 디스크립션: 기사 본문이 끝난 직후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내의 검색결과용 요약문을 작성하세요.
         8. FAQ: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이어서 이 기사와 관련된 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 각 줄에 작성한 뒤 'FAQ_END' 로 마무리하세요.
-        9. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요.
+        9. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요. 이때 메인 키워드인 '{keyword}' 자체를 태그 목록의 첫 번째 항목으로 반드시 포함하세요.
 
         출력 순서: TITLE: ... → [기사 본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
         """
@@ -348,7 +348,7 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
        출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
     8. 메타 디스크립션: 본문이 모두 끝난 후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내로 검색결과에 노출될 매력적인 요약문을 작성하세요.
     9. FAQ 스키마: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이 주제와 관련된 독자들이 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 한 줄씩 작성한 뒤 'FAQ_END' 로 마무리하세요. 이는 구글 FAQ 스키마 마크업에 사용됩니다.
-    10. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요.
+    10. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요. 이때 메인 키워드인 '{keyword}' 자체를 태그 목록의 첫 번째 항목으로 반드시 포함하세요.
 
     출력 순서: TITLE: ... → [본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
     """
@@ -411,7 +411,10 @@ def build_fallback_tag_pool(fallback_keyword, theme=None, lang="ko"):
 
 def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="ko"):
     """
-    'TAGS: ...' 라인을 찾아 분리. 항상 정확히 TAG_COUNT(12)개를 보장한다.
+    'TAGS: ...' 라인을 찾아 분리하고, 메인 키워드(fallback_keyword)를 태그 목록의
+    1번 자리에 강제로 포함시킨다. Gemini가 키워드를 빠뜨리거나 변형해서 출력해도
+    실제 발행되는 태그에는 항상 정확한 키워드 원문이 들어가도록 보장한다.
+    항상 정확히 TAG_COUNT(12)개를 채워서 반환한다.
     """
     lines = article_text.strip().split("\n")
     tags = []
@@ -430,31 +433,39 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
     if not tags:
         tags = [fallback_keyword]
 
+    # --- 키워드 강제 포함 처리 ---
+    # Gemini가 이미 같은 키워드를 (대소문자/공백 차이 등으로) 포함시켰다면 중복 제거 후
+    # 항상 fallback_keyword 원문을 1번 자리로 승격시킨다.
+    keyword_key = fallback_keyword.strip().lower()
+    tags = [t for t in tags if t.strip().lower() != keyword_key]
+    tags.insert(0, fallback_keyword)
+
     seen = set()
     deduped = []
     for t in tags:
-        key = t.lower()
+        key = t.strip().lower()
         if key not in seen:
             seen.add(key)
             deduped.append(t)
     tags = deduped
 
     if len(tags) > TAG_COUNT:
+        # 0번(메인 키워드)은 항상 보존하고, 뒤에서부터 잘라낸다.
         tags = tags[:TAG_COUNT]
     elif len(tags) < TAG_COUNT:
         fallback_pool = build_fallback_tag_pool(fallback_keyword, theme, lang)
         for candidate in fallback_pool:
             if len(tags) >= TAG_COUNT:
                 break
-            if candidate.lower() not in seen:
+            if candidate.strip().lower() not in seen:
                 tags.append(candidate)
-                seen.add(candidate.lower())
+                seen.add(candidate.strip().lower())
         i = 1
         while len(tags) < TAG_COUNT:
             filler = f"{fallback_keyword} {i}" if i > 1 else fallback_keyword
-            if filler.lower() not in seen:
+            if filler.strip().lower() not in seen:
                 tags.append(filler)
-                seen.add(filler.lower())
+                seen.add(filler.strip().lower())
             i += 1
 
     return article_body, tags
@@ -801,7 +812,7 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     """
     발행 로직:
     1. Gemini로 본문 + META_DESC + FAQ + TAGS 생성
-    2. 메타디스크립션/FAQ/태그 분리
+    2. 메타디스크립션/FAQ/태그 분리 (메인 키워드는 태그 1번에 강제 포함)
     3. 글자수 기준 미달 시 스킵(저품질 방지)
     4. 이미지 업로드(alt텍스트 포함, 실패해도 발행 계속)
     5. 태그 ID 변환(항상 12개 보장, 실패시 재시도)
@@ -868,7 +879,7 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         tag_ids = get_or_create_tag_ids(site['url'], wp_pass, tag_names)
 
     if tag_ids:
-        print(f"  🏷️ 태그 {len(tag_ids)}/{len(tag_names)}개 확보")
+        print(f"  🏷️ 태그 {len(tag_ids)}/{len(tag_names)}개 확보 (메인 키워드 포함: {tag_names[0]})")
     else:
         print(f"  ⚠️ 태그를 전혀 확보하지 못했습니다 (태그 없이 발행 진행)")
 
@@ -896,7 +907,8 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
 
     # Rank Math SEO 메타필드 강제 주입: 포커스 키워드 + 메타 디스크립션
     # (Rank Math 무료 버전은 콤마로 구분된 키워드를 최대 5개까지 포커스 키워드로 인식함)
-    focus_keywords = [keyword] + tag_names[:4]
+    # tag_names[0]은 항상 메인 키워드(keyword)이므로 중복 없이 그대로 선두에 사용한다.
+    focus_keywords = [keyword] + [t for t in tag_names[1:5] if t.lower() != keyword.lower()]
     rank_math_meta = {
         "rank_math_focus_keyword": ",".join(focus_keywords),
         "rank_math_description": meta_desc,
