@@ -101,7 +101,7 @@ SITES_CONFIG = [
      "keywords_file": ".github/workflows/keywords_kstudy365.txt", "wp_pass_env": "KSTUDY365COM", "daily": 3},
 
     {"url": "https://studyinkorea365.com",  "lang": "en", "theme": "International Students", "mode": "blog",
-     "keywords_file": ".github/workflows/keywords_koreanews.txt", "wp_pass_env": "STUDYINKOREA365COM", "daily": 3},
+     "keywords_file": ".github/workflows/keywords_studyinkorea365.txt", "wp_pass_env": "STUDYINKOREA365COM", "daily": 3},
 
     {"url": "https://jobkorea365.com",      "lang": "en", "theme": "Employment", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_jobkorea365.txt", "wp_pass_env": "JOBKOREA365COM", "daily": 3},
