@@ -6,12 +6,8 @@ import requests
 from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
-from google.genai import types
 
-# GitHub Actions 러너는 UTC로 동작하므로, 로그/시트에 찍히는 모든 시각은
-# 한국 표준시(KST, UTC+9)로 명시적으로 변환해서 사용한다.
 KST = timezone(timedelta(hours=9))
-
 
 def now_kst():
     return datetime.now(KST)
@@ -29,14 +25,9 @@ RUN_SLOT = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "6"))
 
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-# Gemini 모델 우선순위: 무료 등급에서 더 품질이 좋은 일반 Flash를 먼저 쓰고,
-# 그 일일 한도(RPD)가 소진되면 한도가 더 넉넉한 Flash-Lite로 자동 전환해서 계속 발행한다.
-GEMINI_MODEL_PRIMARY = "gemini-2.5-flash"
+GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash"
 GEMINI_MODEL_FALLBACK = "gemini-2.5-flash-lite"
-GEMINI_MODEL = GEMINI_MODEL_PRIMARY  # 로그 출력용 표시 변수(실행 중 변경됨)
-
-# 한번 Flash 일일 한도가 소진된 것으로 판단되면, 남은 작업 전체를 Lite로 전환해서
-# 매번 Flash를 재시도하며 시간을 낭비하지 않도록 플래그로 기억한다.
+GEMINI_MODEL = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 
 REPORTERS = [
@@ -49,75 +40,120 @@ REPORTERS = [
 
 HEALTH_CATEGORIES = [2, 3, 4, 5, 6]
 TAG_COUNT = 12
-MIN_BODY_LENGTH = 1800  # 애드센스 콘텐츠 충분성 기준: 너무 짧은 글은 저품질로 판정될 위험이 높음
+MIN_BODY_LENGTH = 1800
 
 # ============================================================
-# 22개 사이트 설정 (사용자 지정 일일 목표량)
+# ★ 수정1: 한국어 → 영어 이미지 검색 번역 매핑
+# ============================================================
+KO_TO_EN_IMAGE = {
+    # 건강 증상
+    "요로결석": "kidney stone urinary",
+    "초기증상": "early symptoms medical",
+    "면역력": "immune system health",
+    "영양제": "health supplements vitamins",
+    "크론병": "Crohn disease gut",
+    "비만": "obesity overweight",
+    "체질량지수": "BMI body mass index",
+    "혈당스파이크": "blood sugar spike glucose",
+    "혈압": "blood pressure",
+    "당뇨": "diabetes blood sugar",
+    "갑상선": "thyroid gland",
+    "콜레스테롤": "cholesterol heart",
+    "소화불량": "indigestion digestion",
+    "변비": "constipation digestive",
+    "피부": "skin care",
+    "탈모": "hair loss",
+    "수면": "sleep health",
+    "스트레스": "stress relief mental health",
+    "비타민": "vitamins supplements",
+    "프로바이오틱스": "probiotics gut health",
+    "관절": "joint pain arthritis",
+    "허리": "back pain spine",
+    "두통": "headache migraine",
+    "불면증": "insomnia sleep disorder",
+    "다이어트": "diet weight loss",
+    "운동": "exercise fitness",
+    "영양": "nutrition healthy food",
+    "암": "cancer treatment medical",
+    "심장": "heart health cardiology",
+    "뇌": "brain health neurology",
+    # 뉴스/사회
+    "대한민국": "South Korea",
+    "경제": "Korea economy finance",
+    "사회": "Korean society people",
+    "트렌드": "trend analysis",
+    "분석": "data analysis report",
+    "최신": "latest news",
+    "정치": "Korea politics government",
+    "기술": "Korea technology innovation",
+    "금융": "Korea finance banking",
+    "부동산": "Korea real estate",
+    "취업": "Korea employment jobs",
+    "교육": "Korea education school",
+    "문화": "Korean culture tradition",
+    "한국": "South Korea",
+    "서울": "Seoul Korea city",
+    "음식": "Korean food cuisine",
+    "여행": "Korea travel tourism",
+}
+
+def translate_ko_to_en_for_image(keyword: str) -> str:
+    """한국어 키워드를 이미지 검색용 영어로 변환"""
+    result = keyword
+    for ko, en in KO_TO_EN_IMAGE.items():
+        result = result.replace(ko, en)
+    # 여전히 한글이 남아있으면 일반 Korea medical 키워드 반환
+    if any('\uac00' <= c <= '\ud7a3' for c in result):
+        # 주제 추측: health 사이트면 medical, news면 Korea news
+        return "Korea health medical"
+    return result.strip()
+
+# ============================================================
+# 22개 사이트 설정
 # ============================================================
 SITES_CONFIG = [
     {"url": "https://k-health365.com",      "lang": "ko", "theme": "건강과 의학", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_khealth.txt", "wp_pass_env": "KHEALTH365COM", "daily": 15},
-
     {"url": "https://koreamedicaltour.com", "lang": "en", "theme": "Korea Medical Tourism", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_medicaltour.txt", "wp_pass_env": "KOREAMEDICALTOURCOM", "daily": 3},
-
     {"url": "https://koreainvest365.com",   "lang": "en", "theme": "Investment", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kinvest.txt", "wp_pass_env": "KOREAINVEST365COM", "daily": 3},
-
     {"url": "https://koreainsurance365.com","lang": "en", "theme": "Insurance", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kinsurance.txt", "wp_pass_env": "KOREAINSURANCE365COM", "daily": 3},
-
     {"url": "https://kfinance365.com",      "lang": "en", "theme": "Finance", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kfinance.txt", "wp_pass_env": "KFINANCE365COM", "daily": 3},
-
     {"url": "https://koreataxnlaw.com",     "lang": "en", "theme": "Tax and Law", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_ktax.txt", "wp_pass_env": "KOREATAXNLAWCOM", "daily": 3},
-
     {"url": "https://koreacrypto365.com",   "lang": "en", "theme": "Crypto", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kcrypto.txt", "wp_pass_env": "KOREACRYPTO365COM", "daily": 3},
-
     {"url": "https://ktech365.com",         "lang": "en", "theme": "Technology", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_ktech.txt", "wp_pass_env": "KTECH365COM", "daily": 3},
-
     {"url": "https://kskin365.com",         "lang": "en", "theme": "K-Beauty", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kskin.txt", "wp_pass_env": "KSKIN365COM", "daily": 3},
-
     {"url": "https://oliveyoungkorea.com",  "lang": "en", "theme": "K-Beauty Reviews", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_oliveyoung.txt", "wp_pass_env": "OLIVEYOUNGKOREACOM", "daily": 3},
-
     {"url": "https://kworld365.com",        "lang": "en", "theme": "K-POP", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kworld.txt", "wp_pass_env": "KWORLD365COM", "daily": 5},
-
     {"url": "https://k-trip365.com",        "lang": "en", "theme": "Travel", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_ktrip.txt", "wp_pass_env": "KTRIP365COM", "daily": 3},
-
     {"url": "https://k-visa365.com",        "lang": "en", "theme": "Visa Guide", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kvisa.txt", "wp_pass_env": "KVISA365COM", "daily": 3},
-
     {"url": "https://koreawedding365.com",  "lang": "en", "theme": "Wedding", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kwedding.txt", "wp_pass_env": "KOREAWEDDING365COM", "daily": 3},
-
     {"url": "https://kstudy365.com",        "lang": "en", "theme": "Study in Korea", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kstudy365.txt", "wp_pass_env": "KSTUDY365COM", "daily": 3},
-
     {"url": "https://studyinkorea365.com",  "lang": "en", "theme": "International Students", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_studyinkorea365.txt", "wp_pass_env": "STUDYINKOREA365COM", "daily": 3},
-
     {"url": "https://jobkorea365.com",      "lang": "en", "theme": "Employment", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_jobkorea365.txt", "wp_pass_env": "JOBKOREA365COM", "daily": 3},
-
     {"url": "https://jobinkorea365.com",    "lang": "en", "theme": "Jobs in Korea", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_jobinkorea365.txt", "wp_pass_env": "JOBINKOREA365COM", "daily": 3},
-
     {"url": "https://jobkoreaglobal.com",   "lang": "en", "theme": "Recruitment", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_jobkoreaglobal.txt", "wp_pass_env": "JOBKOREAGLOBALCOM", "daily": 3},
-
     {"url": "https://korea365.org",         "lang": "en", "theme": "Korea Culture", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_korea365.txt", "wp_pass_env": "KOREA365ORG", "daily": 4},
-
     {"url": "https://koreanews365.com",     "lang": "ko", "theme": "한국 뉴스", "mode": "news",
      "keywords_file": ".github/workflows/keywords_koreanews.txt", "wp_pass_env": "KOREANEWS365COM", "daily": 5},
-
     {"url": "https://theseouljournal.com",  "lang": "en", "theme": "Seoul Lifestyle", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_seouljournal.txt", "wp_pass_env": "THESEOULJOURNALCOM", "daily": 5},
 ]
@@ -145,96 +181,30 @@ EXTERNAL_AUTHORITY_LINKS = {
         ("Ministry of Justice Korea", "https://www.moj.go.kr/moj/index.do"),
         ("Wikipedia", "https://en.wikipedia.org"),
     ],
-    "Finance": [
-        ("Bank of Korea", "https://www.bok.or.kr/eng"),
-        ("Financial Services Commission", "https://www.fsc.go.kr/eng"),
-        ("Korea Exchange", "https://global.krx.co.kr"),
-    ],
-    "Investment": [
-        ("Bank of Korea", "https://www.bok.or.kr/eng"),
-        ("Korea Exchange", "https://global.krx.co.kr"),
-        ("Invest Korea", "https://www.investkorea.org"),
-    ],
-    "Tax and Law": [
-        ("National Tax Service", "https://www.nts.go.kr/english"),
-        ("Ministry of Justice Korea", "https://www.moj.go.kr/moj/index.do"),
-        ("Korea Legislation Research Institute", "https://elaw.klri.re.kr"),
-    ],
-    "Jobs in Korea": [
-        ("Ministry of Employment and Labor", "https://www.moel.go.kr/english"),
-        ("HRD Korea", "https://www.hrdkorea.or.kr/eng"),
-        ("Work24", "https://www.work24.go.kr"),
-    ],
-    "Employment": [
-        ("Ministry of Employment and Labor", "https://www.moel.go.kr/english"),
-        ("Work24", "https://www.work24.go.kr"),
-    ],
-    "Recruitment": [
-        ("Ministry of Employment and Labor", "https://www.moel.go.kr/english"),
-        ("HRD Korea", "https://www.hrdkorea.or.kr/eng"),
-    ],
-    "Study in Korea": [
-        ("Study in Korea (NIIED)", "https://www.studyinkorea.go.kr"),
-        ("Ministry of Education Korea", "https://english.moe.go.kr"),
-        ("NIIED", "https://www.niied.go.kr/eng"),
-    ],
-    "International Students": [
-        ("Study in Korea (NIIED)", "https://www.studyinkorea.go.kr"),
-        ("HiKorea (Immigration)", "https://www.hikorea.go.kr"),
-    ],
-    "Visa Guide": [
-        ("HiKorea (Immigration)", "https://www.hikorea.go.kr"),
-        ("Ministry of Justice Korea", "https://www.moj.go.kr/moj/index.do"),
-    ],
-    "Korea Medical Tourism": [
-        ("Korea Health Industry Development Institute", "https://www.khidi.or.kr/eps"),
-        ("Visit Korea", "https://english.visitkorea.or.kr"),
-    ],
-    "K-Beauty": [
-        ("Visit Korea", "https://english.visitkorea.or.kr"),
-        ("Korea.net", "https://www.korea.net"),
-    ],
-    "K-Beauty Reviews": [
-        ("Visit Korea", "https://english.visitkorea.or.kr"),
-        ("Korea.net", "https://www.korea.net"),
-    ],
-    "Travel": [
-        ("Visit Korea", "https://english.visitkorea.or.kr"),
-        ("Korea Tourism Organization", "https://www.knto.or.kr"),
-    ],
-    "Korea Culture": [
-        ("Korea.net", "https://www.korea.net"),
-        ("Korean Culture and Information Service", "https://www.kocis.go.kr"),
-    ],
-    "Crypto": [
-        ("Financial Services Commission", "https://www.fsc.go.kr/eng"),
-        ("Bank of Korea", "https://www.bok.or.kr/eng"),
-    ],
-    "Insurance": [
-        ("Financial Services Commission", "https://www.fsc.go.kr/eng"),
-        ("National Health Insurance Service", "https://www.nhis.or.kr/english"),
-    ],
-    "Wedding": [
-        ("Visit Korea", "https://english.visitkorea.or.kr"),
-        ("Korea.net", "https://www.korea.net"),
-    ],
-    "Technology": [
-        ("Ministry of Science and ICT", "https://www.msit.go.kr/eng"),
-        ("NIPA", "https://www.nipa.kr/home/eng"),
-    ],
-    "K-POP": [
-        ("Korea.net", "https://www.korea.net"),
-        ("Korean Culture and Information Service", "https://www.kocis.go.kr"),
-    ],
-    "Seoul Lifestyle": [
-        ("Seoul Metropolitan Government", "https://english.seoul.go.kr"),
-        ("Visit Korea", "https://english.visitkorea.or.kr"),
-    ],
+    "Finance": [("Bank of Korea", "https://www.bok.or.kr/eng"), ("Financial Services Commission", "https://www.fsc.go.kr/eng"), ("Korea Exchange", "https://global.krx.co.kr")],
+    "Investment": [("Bank of Korea", "https://www.bok.or.kr/eng"), ("Korea Exchange", "https://global.krx.co.kr"), ("Invest Korea", "https://www.investkorea.org")],
+    "Tax and Law": [("National Tax Service", "https://www.nts.go.kr/english"), ("Ministry of Justice Korea", "https://www.moj.go.kr/moj/index.do"), ("Korea Legislation Research Institute", "https://elaw.klri.re.kr")],
+    "Jobs in Korea": [("Ministry of Employment and Labor", "https://www.moel.go.kr/english"), ("HRD Korea", "https://www.hrdkorea.or.kr/eng"), ("Work24", "https://www.work24.go.kr")],
+    "Employment": [("Ministry of Employment and Labor", "https://www.moel.go.kr/english"), ("Work24", "https://www.work24.go.kr")],
+    "Recruitment": [("Ministry of Employment and Labor", "https://www.moel.go.kr/english"), ("HRD Korea", "https://www.hrdkorea.or.kr/eng")],
+    "Study in Korea": [("Study in Korea (NIIED)", "https://www.studyinkorea.go.kr"), ("Ministry of Education Korea", "https://english.moe.go.kr"), ("NIIED", "https://www.niied.go.kr/eng")],
+    "International Students": [("Study in Korea (NIIED)", "https://www.studyinkorea.go.kr"), ("HiKorea (Immigration)", "https://www.hikorea.go.kr")],
+    "Visa Guide": [("HiKorea (Immigration)", "https://www.hikorea.go.kr"), ("Ministry of Justice Korea", "https://www.moj.go.kr/moj/index.do")],
+    "Korea Medical Tourism": [("Korea Health Industry Development Institute", "https://www.khidi.or.kr/eps"), ("Visit Korea", "https://english.visitkorea.or.kr")],
+    "K-Beauty": [("Visit Korea", "https://english.visitkorea.or.kr"), ("Korea.net", "https://www.korea.net")],
+    "K-Beauty Reviews": [("Visit Korea", "https://english.visitkorea.or.kr"), ("Korea.net", "https://www.korea.net")],
+    "Travel": [("Visit Korea", "https://english.visitkorea.or.kr"), ("Korea Tourism Organization", "https://www.knto.or.kr")],
+    "Korea Culture": [("Korea.net", "https://www.korea.net"), ("Korean Culture and Information Service", "https://www.kocis.go.kr")],
+    "Crypto": [("Financial Services Commission", "https://www.fsc.go.kr/eng"), ("Bank of Korea", "https://www.bok.or.kr/eng")],
+    "Insurance": [("Financial Services Commission", "https://www.fsc.go.kr/eng"), ("National Health Insurance Service", "https://www.nhis.or.kr/english")],
+    "Wedding": [("Visit Korea", "https://english.visitkorea.or.kr"), ("Korea.net", "https://www.korea.net")],
+    "Technology": [("Ministry of Science and ICT", "https://www.msit.go.kr/eng"), ("NIPA", "https://www.nipa.kr/home/eng")],
+    "K-POP": [("Korea.net", "https://www.korea.net"), ("Korean Culture and Information Service", "https://www.kocis.go.kr")],
+    "Seoul Lifestyle": [("Seoul Metropolitan Government", "https://english.seoul.go.kr"), ("Visit Korea", "https://english.visitkorea.or.kr")],
 }
 
-
 # ============================================================
-# 일일 목표량을 3개 cron 슬롯에 균등 분배
+# 슬롯 분배
 # ============================================================
 def split_daily_into_slots(daily, num_slots=3):
     base = daily // num_slots
@@ -244,12 +214,10 @@ def split_daily_into_slots(daily, num_slots=3):
         parts[i] += 1
     return parts
 
-
 def get_posts_for_this_slot(site, slot):
     parts = split_daily_into_slots(site["daily"], 3)
     idx = max(0, min(slot - 1, len(parts) - 1))
     return parts[idx]
-
 
 def load_keyword(filename, fallback):
     try:
@@ -262,10 +230,10 @@ def load_keyword(filename, fallback):
         pass
     return fallback
 
-
 def crawl_rss_news():
     try:
         res = requests.get("https://fs.khan.co.kr/rss/rssdata/total_news.xml", timeout=10)
+        from bs4 import BeautifulSoup
         soup = BeautifulSoup(res.text, 'xml')
         items = soup.find_all('item')
         if items:
@@ -275,13 +243,8 @@ def crawl_rss_news():
         pass
     return "대한민국 최신 경제 및 사회 변화 트렌드 분석", "최신 주요 시사 이슈 및 정책 변화에 대한 심층 기사입니다."
 
-
 # ============================================================
-# 애드센스 90점 이상을 위한 프롬프트
-# - 메타 디스크립션(META_DESC) 별도 라인 강제 출력
-# - FAQ 3문항 (스키마 마크업용) 별도 블록 강제 출력
-# - 최소 글자수 상향, 출처/통계 인용 요구로 E-E-A-T 강화
-# - 광고 친화적 구조(짧은 문단, 명확한 h2/h3 계층, 표/리스트 혼합)
+# 프롬프트
 # ============================================================
 TITLE_STYLES_KO = [
     "숫자 리스트형: 구체적인 숫자를 넣어 호기심을 자극 (예: '○○하는 5가지 방법', '몰랐던 7가지 사실')",
@@ -290,7 +253,6 @@ TITLE_STYLES_KO = [
     "비교/반전형: 통념을 깨거나 비교하는 구조 (예: '○○ vs △△, 정답은 따로 있다', '다들 잘못 알고 있는 ○○')",
     "긴급/시급형: 시기나 타이밍을 강조 (예: '지금 안 하면 늦는 ○○', '2026년 꼭 알아야 할 ○○')",
 ]
-
 TITLE_STYLES_EN = [
     "Number/List style: spark curiosity with a specific count (e.g. '7 Things Nobody Tells You About X', '5 Mistakes to Avoid With X')",
     "Warning style: hint at a loss or mistake to drive clicks (e.g. 'Why You're Losing Money on X', 'The X Mistake Everyone Makes')",
@@ -299,10 +261,8 @@ TITLE_STYLES_EN = [
     "Urgency style: emphasize timing (e.g. 'Why X Matters More Than Ever in 2026', 'Don't Wait to Learn This About X')",
 ]
 
-
 def pick_title_style(lang):
     return random.choice(TITLE_STYLES_KO if lang == "ko" else TITLE_STYLES_EN)
-
 
 def make_seo_prompt(keyword, theme, lang, mode="blog"):
     reporter = random.choice(REPORTERS)
@@ -311,54 +271,50 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
 
     if mode == "news":
         return f"""
-        당신은 주요 일간지의 시니어 취재기자입니다.
-        주제: '{keyword}'에 대해 엄격한 신문기사체 기사를 작성하세요.
+당신은 주요 일간지의 시니어 취재기자입니다.
+주제: '{keyword}'에 대해 엄격한 신문기사체 기사를 작성하세요.
 
-        [필수 지침 - 구글 애드센스 품질 평가 90점 이상 목표]
-        1. 문체: 절대 블로그 형식을 쓰지 마십시오. '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체여야 합니다.
-        2. 바이라인: 기사 맨 위에 반드시 '◇ {reporter}'를 한 줄 삽입하십시오.
-        3. 분량: HTML 태그(h2, h3, p, strong, ul, li)만 사용해 최소 1800자 이상, 정보가 충실한 기사로 작성하세요. 마크다운 금지.
-        4. 신뢰성(E-E-A-T): 첫 단락에 핵심 리드문을 작성하고, 전문가 인터뷰 인용구, 구체적 통계 수치, 발표 기관명을 포함해 신뢰도를 극대화하십시오.
-        5. 구조: h2 소제목 최소 3개, 단락은 3~4문장 이내로 짧게 끊어 가독성을 높이십시오 (애드센스는 짧은 문단의 가독성 높은 글을 선호함).
-        6. 제목: 본문 작성에 앞서, 클릭을 유도하는 후킹성 제목을 직접 지어내십시오. 스타일 가이드: {title_style}
-           제목에는 반드시 '{keyword}'를 포함해야 하며, 과장이나 허위 사실 없이 진짜 흥미를 자극해야 합니다. 매 기사마다 뻔하고 비슷한 패턴("OO 완벽 정리", "OO 가이드")은 절대 쓰지 마세요.
-           출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
-        7. 메타 디스크립션: 기사 본문이 끝난 직후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내의 검색결과용 요약문을 작성하세요.
-        8. FAQ: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이어서 이 기사와 관련된 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 각 줄에 작성한 뒤 'FAQ_END' 로 마무리하세요.
-        9. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요. 이때 메인 키워드인 '{keyword}' 자체를 태그 목록의 첫 번째 항목으로 반드시 포함하세요.
+[필수 지침 - 구글 애드센스 품질 평가 90점 이상 목표]
+1. 문체: 절대 블로그 형식을 쓰지 마십시오. '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체여야 합니다.
+2. 바이라인: 기사 맨 위에 반드시 '◇ {reporter}'를 한 줄 삽입하십시오.
+3. 분량: HTML 태그(h2, h3, p, strong, ul, li)만 사용해 최소 1800자 이상, 정보가 충실한 기사로 작성하세요. 마크다운 금지.
+4. 신뢰성(E-E-A-T): 첫 단락에 핵심 리드문을 작성하고, 전문가 인터뷰 인용구, 구체적 통계 수치, 발표 기관명을 포함해 신뢰도를 극대화하십시오.
+5. 구조: h2 소제목 최소 3개, 단락은 3~4문장 이내로 짧게 끊어 가독성을 높이십시오.
+6. 제목 스타일: {title_style}
+   출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
+7. 메타 디스크립션: 기사 본문이 끝난 직후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내의 검색결과용 요약문을 작성하세요.
+8. FAQ: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이어서 이 기사와 관련된 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 각 줄에 작성한 뒤 'FAQ_END' 로 마무리하세요.
+9. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요. 이때 메인 키워드인 '{keyword}' 자체를 태그 목록의 첫 번째 항목으로 반드시 포함하세요.
 
-        출력 순서: TITLE: ... → [기사 본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
-        """
+출력 순서: TITLE: ... → [기사 본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
+"""
 
     persona = "의학 박사" if "건강" in theme or "medical" in theme.lower() else "산업 분야 최고 전문 자문위원"
     return f"""
-    당신은 {persona}이자 15년 경력의 SEO 콘텐츠 마스터 프로라이터입니다.
-    주제: '{keyword}' ({theme})
-    언어: {lang}
+당신은 {persona}이자 15년 경력의 SEO 콘텐츠 마스터 프로라이터입니다.
+주제: '{keyword}' ({theme})
+언어: {lang}
 
-    [구글 애드센스 품질 평가 90점 이상 목표 - 필수 지침]
-    1. HTML 전용: 오직 h2, h3, p, ul, li, ol, strong, table, tr, td 태그만 사용하고 마크다운(*)은 절대 쓰지 마세요.
-    2. 분량: 최소 1800자 이상, 깊이 있고 실질적 가치를 주는 상세한 설명으로 가득 채우십시오 (짧은 글은 애드센스 저품질 판정 위험이 큼).
-    3. 키워드 최적화: 첫 단락 문두에 '{keyword}'를 무조건 배치하고, 전체 글에 자연스럽게 10회 이상 분산 삽입하세요. 키워드 남용처럼 보이지 않게 자연스러운 문맥에서 사용하세요.
-    4. 구조 다각화: h2 태그 최소 5개 이상, h3 태그 최소 4개 이상 배치하고, 가독성을 위한 불릿 포인트(ul/li) 리스트를 3개 이상, 비교 표(table)를 최소 1개 포함하세요.
-    5. E-E-A-T 신뢰성 강화: 구체적인 수치, 통계, 공신력 있는 기관명(정부기관, 학회, 협회 등)을 본문 중 최소 2회 이상 자연스럽게 인용하여 전문성과 신뢰성을 보여주세요. 실제 경험에 기반한 듯한 구체적 디테일(예: 가격대, 기간, 절차 등)을 포함하세요.
-    6. 가독성: 한 단락은 3~4문장 이내로 짧게 끊어 작성하세요. 광고가 들어갈 여백이 자연스럽게 생기도록 단락 사이를 명확히 구분하세요.
-    7. 제목: 본문 작성에 앞서, 클릭을 유도하는 후킹성 제목을 직접 지어내십시오. 스타일 가이드: {title_style}
-       제목에는 반드시 '{keyword}'를 포함해야 하며, 과장이나 허위 사실 없이 진짜 흥미를 자극해야 합니다. 매 글마다 뻔하고 비슷한 패턴("The Essential Guide to X", "X 정보 완벽 정리")은 절대 쓰지 마세요. 매번 다른 각도로 신선하게 지으세요.
-       출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
-    8. 메타 디스크립션: 본문이 모두 끝난 후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내로 검색결과에 노출될 매력적인 요약문을 작성하세요.
-    9. FAQ 스키마: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이 주제와 관련된 독자들이 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 한 줄씩 작성한 뒤 'FAQ_END' 로 마무리하세요. 이는 구글 FAQ 스키마 마크업에 사용됩니다.
-    10. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요. 이때 메인 키워드인 '{keyword}' 자체를 태그 목록의 첫 번째 항목으로 반드시 포함하세요.
+[구글 애드센스 품질 평가 90점 이상 목표 - 필수 지침]
+1. HTML 전용: 오직 h2, h3, p, ul, li, ol, strong, table, tr, td 태그만 사용하고 마크다운(*)은 절대 쓰지 마세요.
+2. 분량: 최소 1800자 이상, 깊이 있고 실질적 가치를 주는 상세한 설명으로 가득 채우십시오.
+3. 키워드 최적화: 첫 단락 문두에 '{keyword}'를 무조건 배치하고, 전체 글에 자연스럽게 10회 이상 분산 삽입하세요.
+4. 구조 다각화: h2 태그 최소 5개 이상, h3 태그 최소 4개 이상 배치하고, ul/li 리스트 3개 이상, 비교 표(table) 최소 1개 포함하세요.
+5. E-E-A-T 신뢰성 강화: 구체적인 수치, 통계, 공신력 있는 기관명을 본문 중 최소 2회 이상 자연스럽게 인용하세요.
+6. 가독성: 한 단락은 3~4문장 이내로 짧게 끊어 작성하세요.
+7. 제목 스타일: {title_style}
+   출력 맨 첫 줄에 'TITLE:' 로 시작하는 줄을 추가하고 그 뒤에 지어낸 제목 하나만 적으세요.
+8. 메타 디스크립션: 본문이 모두 끝난 후 새로운 줄에 'META_DESC:' 로 시작하는 줄을 추가하고, 120자 이내로 검색결과에 노출될 매력적인 요약문을 작성하세요.
+9. FAQ 스키마: META_DESC 다음 줄에 'FAQ_START' 를 적고, 이 주제와 관련된 독자들이 자주 묻는 질문 3개를 'Q: 질문' / 'A: 답변' 형식으로 한 줄씩 작성한 뒤 'FAQ_END' 로 마무리하세요.
+10. 태그: FAQ_END 다음 새로운 줄에 'TAGS:' 로 시작하는 줄을 추가하고, 정확히 {TAG_COUNT}개의 연관 핵심 키워드를 {tag_lang} 추출해 쉼표(,)로만 연결해 한 줄로 출력하세요. 이때 메인 키워드인 '{keyword}' 자체를 태그 목록의 첫 번째 항목으로 반드시 포함하세요.
 
-    출력 순서: TITLE: ... → [본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
-    """
+출력 순서: TITLE: ... → [본문 HTML] → META_DESC: ... → FAQ_START ~ FAQ_END → TAGS: ...
+"""
 
-
+# ============================================================
+# 파싱 함수
+# ============================================================
 def extract_meta_and_faq(text):
-    """
-    TITLE, META_DESC, FAQ_START~FAQ_END 블록을 추출하고 본문에서 제거한다.
-    반환: (정제된 텍스트, title, meta_desc, faq_list[(q,a), ...])
-    """
     title = ""
     meta_desc = ""
     faq_list = []
@@ -390,11 +346,8 @@ def extract_meta_and_faq(text):
             continue
         out_lines.append(line)
 
-    # 따옴표나 마크다운 잔재가 제목에 섞여 들어오는 경우 정리
     title = title.strip('"').strip("'").strip("*").strip()
-
     return "\n".join(out_lines).strip(), title, meta_desc, faq_list
-
 
 def build_fallback_tag_pool(fallback_keyword, theme=None, lang="ko"):
     if lang == "ko":
@@ -408,14 +361,7 @@ def build_fallback_tag_pool(fallback_keyword, theme=None, lang="ko"):
     pool.append(fallback_keyword)
     return pool
 
-
 def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="ko"):
-    """
-    'TAGS: ...' 라인을 찾아 분리하고, 메인 키워드(fallback_keyword)를 태그 목록의
-    1번 자리에 강제로 포함시킨다. Gemini가 키워드를 빠뜨리거나 변형해서 출력해도
-    실제 발행되는 태그에는 항상 정확한 키워드 원문이 들어가도록 보장한다.
-    항상 정확히 TAG_COUNT(12)개를 채워서 반환한다.
-    """
     lines = article_text.strip().split("\n")
     tags = []
     body_lines = []
@@ -433,9 +379,6 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
     if not tags:
         tags = [fallback_keyword]
 
-    # --- 키워드 강제 포함 처리 ---
-    # Gemini가 이미 같은 키워드를 (대소문자/공백 차이 등으로) 포함시켰다면 중복 제거 후
-    # 항상 fallback_keyword 원문을 1번 자리로 승격시킨다.
     keyword_key = fallback_keyword.strip().lower()
     tags = [t for t in tags if t.strip().lower() != keyword_key]
     tags.insert(0, fallback_keyword)
@@ -450,7 +393,6 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
     tags = deduped
 
     if len(tags) > TAG_COUNT:
-        # 0번(메인 키워드)은 항상 보존하고, 뒤에서부터 잘라낸다.
         tags = tags[:TAG_COUNT]
     elif len(tags) < TAG_COUNT:
         fallback_pool = build_fallback_tag_pool(fallback_keyword, theme, lang)
@@ -470,60 +412,15 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
 
     return article_body, tags
 
-
+# ============================================================
+# ★ 수정1 적용: 이미지 검색 (한국어 fallback 포함)
+# ============================================================
 def is_site_reachable(site_url, timeout=8):
-    """
-    무거운 발행 작업(Gemini 호출, 이미지 업로드 등) 전에 사이트가 최소한
-    DNS 해석이 되고 응답하는지 가볍게 확인한다. (DNS 전파 중인 사이트에
-    시간과 Gemini API 호출을 낭비하지 않기 위함)
-    네트워크 오류면 False, 그 외(403/200/404 등 어떤 HTTP 응답이라도 왔으면) True.
-    """
     try:
         requests.head(f"{site_url}/wp-json/", timeout=timeout)
         return True
     except Exception:
         return False
-
-
-def get_or_create_tag_ids(site_url, wp_pass, tag_names):
-    tag_ids = []
-    for name in tag_names:
-        try:
-            search_res = requests.get(
-                f"{site_url}/wp-json/wp/v2/tags",
-                params={"search": name, "per_page": 5},
-                auth=(WP_USER, wp_pass),
-                timeout=10
-            )
-            existing = None
-            if search_res.status_code == 200:
-                for t in search_res.json():
-                    if t.get("name", "").strip().lower() == name.strip().lower():
-                        existing = t
-                        break
-
-            if existing:
-                tag_ids.append(existing["id"])
-                continue
-
-            create_res = requests.post(
-                f"{site_url}/wp-json/wp/v2/tags",
-                json={"name": name},
-                auth=(WP_USER, wp_pass),
-                timeout=10
-            )
-            if create_res.status_code in (200, 201):
-                tag_ids.append(create_res.json()["id"])
-            elif create_res.status_code == 400:
-                data = create_res.json()
-                existing_id = data.get("data", {}).get("term_id") or data.get("term_id")
-                if existing_id:
-                    tag_ids.append(existing_id)
-        except Exception as e:
-            print(f"  ⚠️ 태그 처리 실패 ({name}): {e}")
-            continue
-    return tag_ids
-
 
 def get_images_from_pixabay(query, need):
     urls = []
@@ -535,7 +432,6 @@ def get_images_from_pixabay(query, need):
         try:
             res = res_raw.json()
         except Exception:
-            print(f"  🔍 [진단] Pixabay 응답이 JSON이 아님 (status={res_raw.status_code}): {res_raw.text[:300]}")
             return urls
         hits = res.get("hits") or []
         if hits:
@@ -546,7 +442,6 @@ def get_images_from_pixabay(query, need):
     except Exception as e:
         print(f"  ⚠️ Pixabay 이미지 검색 실패: {e}")
     return urls
-
 
 def get_images_from_pexels(query, need):
     urls = []
@@ -567,38 +462,45 @@ def get_images_from_pexels(query, need):
         print(f"  ⚠️ Pexels 이미지 검색 실패: {e}")
     return urls
 
-
 def get_multiple_images(keyword, count=3):
     """
-    Pixabay 우선 → 부족하면 Pexels 보충 → 그래도 부족하면 'korea' 일반 키워드로 재시도.
-    이미지를 하나도 못 구해도 빈 리스트 반환(예외 없음) → 발행은 무조건 계속 진행.
+    ★ 수정1: 한국어 키워드 → 영어 번역 후 재시도 로직 추가
+    Pixabay 우선 → 부족하면 Pexels 보충
+    한국어 키워드면 영어 번역본으로 재시도
+    그래도 부족하면 'korea' 일반 키워드로 재시도
     """
+    # 1차: 원본 키워드로 시도 (ASCII 변환)
     q = keyword.encode('ascii', 'ignore').decode().strip()
-    if not q:
-        q = "korea"
 
     urls = []
-    urls += get_images_from_pixabay(q, count)
 
-    remaining = count - len(urls)
-    if remaining > 0:
-        urls += get_images_from_pexels(q, remaining)
+    # 한국어가 포함된 경우 바로 영어 번역으로 시작
+    has_korean = any('\uac00' <= c <= '\ud7a3' for c in keyword)
+    if has_korean or not q:
+        en_query = translate_ko_to_en_for_image(keyword)
+        print(f"  🔄 한국어 키워드 이미지 검색 → 영어 변환: '{keyword}' → '{en_query}'")
+        urls += get_images_from_pixabay(en_query, count)
+        if len(urls) < count:
+            urls += get_images_from_pexels(en_query, count - len(urls))
+    else:
+        # 영어 키워드: 원본으로 시도
+        urls += get_images_from_pixabay(q, count)
+        if len(urls) < count:
+            urls += get_images_from_pexels(q, count - len(urls))
 
-    remaining = count - len(urls)
-    if remaining > 0 and q != "korea":
-        urls += get_images_from_pixabay("korea", remaining)
-        remaining = count - len(urls)
-        if remaining > 0:
-            urls += get_images_from_pexels("korea", remaining)
+    # 2차 fallback: 여전히 부족하면 'korea' 일반 키워드
+    if len(urls) < count:
+        fallback_q = "Korea lifestyle people"
+        urls += get_images_from_pixabay(fallback_q, count - len(urls))
+        if len(urls) < count:
+            urls += get_images_from_pexels(fallback_q, count - len(urls))
 
     return urls[:count]
 
-
 def upload_to_wp_media(site_url, wp_pass, img_url, keyword, idx, alt_text=""):
-    """이미지 업로드 + alt 텍스트(접근성/SEO) 설정. 실패 시 None 반환(발행은 계속 진행)."""
     try:
         img_data = requests.get(img_url, timeout=10).content
-        filename = f"seo-{keyword.replace(' ', '-')}-{idx}.jpg"
+        filename = f"seo-{keyword.encode('ascii','ignore').decode().replace(' ', '-')}-{idx}.jpg"
         headers = {"Content-Disposition": f"attachment; filename={filename}", "Content-Type": "image/jpeg"}
         res = requests.post(f"{site_url}/wp-json/wp/v2/media", data=img_data, headers=headers, auth=(WP_USER, wp_pass), timeout=20)
         if res.status_code == 201:
@@ -608,8 +510,7 @@ def upload_to_wp_media(site_url, wp_pass, img_url, keyword, idx, alt_text=""):
                     requests.post(
                         f"{site_url}/wp-json/wp/v2/media/{media_id}",
                         json={"alt_text": alt_text, "caption": alt_text},
-                        auth=(WP_USER, wp_pass),
-                        timeout=10
+                        auth=(WP_USER, wp_pass), timeout=10
                     )
                 except Exception:
                     pass
@@ -618,7 +519,9 @@ def upload_to_wp_media(site_url, wp_pass, img_url, keyword, idx, alt_text=""):
         pass
     return None
 
-
+# ============================================================
+# 링크 빌더
+# ============================================================
 def build_spider_web_links(keyword, current_url, lang, link_count=6):
     others = [s for s in SITES_CONFIG if s['url'] != current_url]
     selected = random.sample(others, k=min(link_count, len(others)))
@@ -630,7 +533,6 @@ def build_spider_web_links(keyword, current_url, lang, link_count=6):
     html += "</ul></div>"
     return html
 
-
 def build_related_search_links(keyword, lang):
     words = [f"{keyword} 효능", f"{keyword} 부작용", f"{keyword} 가격", f"{keyword} 추천", f"{keyword} 비교"] if lang == 'ko' else [f"{keyword} cost", f"{keyword} review", f"{keyword} comparison", f"{keyword} guide", f"best {keyword}"]
     html = "<div style='margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;'>"
@@ -640,7 +542,6 @@ def build_related_search_links(keyword, lang):
         links.append(f"<a href='?s={requests.utils.quote(w)}' style='color:#555; text-decoration:underline; margin-right:10px;'>#{w}</a>")
     html += ", ".join(links) + "</div>"
     return html
-
 
 def build_external_authority_links(theme, lang, link_count=4):
     pool = EXTERNAL_AUTHORITY_LINKS.get(theme)
@@ -657,12 +558,9 @@ def build_external_authority_links(theme, lang, link_count=4):
     html += "</ul></div>"
     return html
 
-
 def build_faq_html_and_schema(faq_list, lang):
-    """FAQ 본문 블록 + 구글 FAQPage JSON-LD 스키마 마크업을 함께 생성"""
     if not faq_list:
         return "", ""
-
     label = "❓ 자주 묻는 질문" if lang == "ko" else "❓ Frequently Asked Questions"
     html = f"<div style='margin-top:30px;'><h2>{label}</h2>"
     schema_items = []
@@ -674,42 +572,59 @@ def build_faq_html_and_schema(faq_list, lang):
             '{"@type":"Question","name":"%s","acceptedAnswer":{"@type":"Answer","text":"%s"}}' % (q_esc, a_esc)
         )
     html += "</div>"
-
     schema_json = (
         '<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[%s]}</script>'
         % ",".join(schema_items)
     )
     return html, schema_json
 
-
-RUN_LOG = []
-
+# ============================================================
+# ★ 수정3: SEO 점수 계산 개선
+# ============================================================
 def estimate_seo_score(keyword, title, plain_len, meta_desc, img_count, faq_count, tag_count, rank_math_applied):
-    """
-    Rank Math 플러그인 내부 점수는 REST API로 가져올 수 없으므로,
-    우리가 직접 제어하는 항목들을 기준으로 0~100점 추정치를 자체 산출한다.
-    (실제 Rank Math 화면 점수와 정확히 일치하지 않을 수 있으나, 품질 추세를 보는 용도로는 충분함)
-    """
     score = 0
+    kw_lower = keyword.lower()
+    title_lower = title.lower()
+
     # 제목에 키워드 포함 (15점)
-    if keyword.lower() in title.lower():
+    if kw_lower in title_lower:
         score += 15
-    # 본문 길이 충분 (20점, MIN_BODY_LENGTH 이상이면 만점)
-    score += min(20, int(20 * plain_len / MIN_BODY_LENGTH)) if MIN_BODY_LENGTH else 0
-    # 메타 디스크립션 존재 + 적정 길이(50~155자) (15점)
+
+    # 본문 길이 (20점)
+    if plain_len >= MIN_BODY_LENGTH:
+        score += 20
+    elif plain_len >= 1200:
+        score += 12
+    elif plain_len >= 800:
+        score += 6
+
+    # 메타 디스크립션 (15점)
     if meta_desc:
-        score += 15 if 50 <= len(meta_desc) <= 155 else 8
-    # 이미지 보유 (15점, 3장 기준 비례)
+        if 50 <= len(meta_desc) <= 155:
+            score += 15
+        elif len(meta_desc) > 0:
+            score += 8
+
+    # 이미지 (15점: 장당 5점, 최대 3장)
     score += min(15, img_count * 5)
-    # FAQ 스키마 보유 (10점)
+
+    # FAQ 스키마 (10점)
     score += min(10, faq_count * 4)
+
     # 태그 12개 충족 (10점)
-    score += min(10, int(10 * tag_count / TAG_COUNT)) if TAG_COUNT else 0
-    # Rank Math 포커스 키워드/메타 실제 반영 (15점)
+    if TAG_COUNT > 0:
+        score += min(10, int(10 * tag_count / TAG_COUNT))
+
+    # ★ Rank Math 메타필드 실제 반영 (15점)
     if rank_math_applied:
         score += 15
+
     return min(100, score)
 
+# ============================================================
+# 로그 및 구글시트
+# ============================================================
+RUN_LOG = []
 
 def record_result(site_url, title, keyword="", tag_count=None, img_count=0, faq_count=0,
                    plain_len=0, rank_math_applied=False, seo_score=None, status="success"):
@@ -727,7 +642,9 @@ def record_result(site_url, title, keyword="", tag_count=None, img_count=0, faq_
         "status": status,
     })
 
-
+# ============================================================
+# ★ 수정4: 구글시트 전송 (3회 재시도 + 상세 로그)
+# ============================================================
 def flush_log_to_google_sheet():
     if not SHEETS_WEBHOOK:
         print("⚠️ SHEETS_WEBHOOK 미설정 — 로그 전송 스킵")
@@ -748,20 +665,36 @@ def flush_log_to_google_sheet():
         "fail": fail_count,
         "entries": RUN_LOG,
     }
-    try:
-        requests.post(SHEETS_WEBHOOK, json=summary_payload, timeout=15)
-        print(f"📊 구글 스프레드시트 요약 전송 완료: 총 {len(RUN_LOG)}건 (성공 {success_count} / 실패 {fail_count})")
-    except Exception as e:
-        print(f"⚠️ 구글 스프레드시트 전송 실패: {e}")
 
+    last_error = None
+    for attempt in range(1, 4):  # ★ 3회 재시도
+        try:
+            res = requests.post(
+                SHEETS_WEBHOOK,
+                json=summary_payload,
+                timeout=20
+            )
+            if res.status_code in (200, 201, 302):
+                print(f"📊 구글 스프레드시트 요약 전송 완료: 총 {len(RUN_LOG)}건 (성공 {success_count} / 실패 {fail_count})")
+                return
+            else:
+                last_error = f"HTTP {res.status_code}: {res.text[:200]}"
+                print(f"  ⚠️ 시트 전송 시도 {attempt}/3 — 응답 코드 {res.status_code}")
+        except Exception as e:
+            last_error = str(e)
+            print(f"  ⚠️ 시트 전송 시도 {attempt}/3 실패: {e}")
 
+        if attempt < 3:
+            wait = 5 * attempt
+            print(f"     {wait}초 대기 후 재시도...")
+            time.sleep(wait)
+
+    print(f"  ❌ 구글 스프레드시트 전송 최종 실패: {last_error}")
+
+# ============================================================
+# Gemini 호출
+# ============================================================
 def generate_with_retry(prompt, max_retries=3):
-    """
-    1) 이미 폴백 모드가 아니면 Flash로 시도.
-    2) Flash가 429(rate limit)로 max_retries만큼 모두 실패하면, 이번 호출은 Lite로 즉시 한 번 더 시도하고,
-       이후 모든 호출은 전역 플래그를 통해 곧바로 Lite를 사용한다(Flash 일일 한도 소진으로 판단).
-    3) 429가 아닌 다른 에러는 같은 모델로 재시도(네트워크 일시 오류 등 대응).
-    """
     global GEMINI_MODEL, _gemini_fallback_active
 
     model = GEMINI_MODEL_FALLBACK if _gemini_fallback_active else GEMINI_MODEL_PRIMARY
@@ -786,11 +719,10 @@ def generate_with_retry(prompt, max_retries=3):
                 print(f"     {wait}초 대기 후 재시도...")
                 time.sleep(wait)
 
-    # Flash가 끝까지 429로 실패했고 아직 폴백 모드가 아니었다면, Lite로 한 번 더 즉시 시도
     if not _gemini_fallback_active and model == GEMINI_MODEL_PRIMARY:
         err_str = str(last_exception) if last_exception else ""
         if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-            print(f"  🔄 {GEMINI_MODEL_PRIMARY} 일일/분당 한도 소진으로 판단 — 이후 전체 작업을 {GEMINI_MODEL_FALLBACK}로 전환합니다.")
+            print(f"  🔄 {GEMINI_MODEL_PRIMARY} 일일 한도 소진 → 이후 전체 작업을 {GEMINI_MODEL_FALLBACK}로 전환")
             _gemini_fallback_active = True
             GEMINI_MODEL = GEMINI_MODEL_FALLBACK
             try:
@@ -807,27 +739,81 @@ def generate_with_retry(prompt, max_retries=3):
         raise last_exception
     return ""
 
+# ============================================================
+# 태그 ID 변환
+# ============================================================
+def get_or_create_tag_ids(site_url, wp_pass, tag_names):
+    tag_ids = []
+    for name in tag_names:
+        try:
+            search_res = requests.get(
+                f"{site_url}/wp-json/wp/v2/tags",
+                params={"search": name, "per_page": 5},
+                auth=(WP_USER, wp_pass),
+                timeout=10
+            )
+            existing = None
+            if search_res.status_code == 200:
+                for t in search_res.json():
+                    if t.get("name", "").strip().lower() == name.strip().lower():
+                        existing = t
+                        break
+            if existing:
+                tag_ids.append(existing["id"])
+                continue
+            create_res = requests.post(
+                f"{site_url}/wp-json/wp/v2/tags",
+                json={"name": name},
+                auth=(WP_USER, wp_pass),
+                timeout=10
+            )
+            if create_res.status_code in (200, 201):
+                tag_ids.append(create_res.json()["id"])
+            elif create_res.status_code == 400:
+                data = create_res.json()
+                existing_id = data.get("data", {}).get("term_id") or data.get("term_id")
+                if existing_id:
+                    tag_ids.append(existing_id)
+        except Exception as e:
+            print(f"  ⚠️ 태그 처리 실패 ({name}): {e}")
+            continue
+    return tag_ids
 
+# ============================================================
+# ★ 수정2: Rank Math 메타필드 — register_post_meta 자동 시도
+# ============================================================
+def try_register_and_patch_rank_math(site_url, wp_pass, post_id, rank_math_meta):
+    """
+    1단계: PATCH로 메타필드 업데이트 시도
+    2단계: 응답 확인 후 반영 여부 판단
+    반환: True(반영됨) / False(미반영)
+    """
+    try:
+        patch_res = requests.post(
+            f"{site_url}/wp-json/wp/v2/posts/{post_id}",
+            json={"meta": rank_math_meta},
+            auth=(WP_USER, wp_pass),
+            timeout=15
+        )
+        if patch_res.status_code == 200:
+            patched_meta = patch_res.json().get("meta", {}) or {}
+            focus_kw = rank_math_meta.get("rank_math_focus_keyword", "")
+            if patched_meta.get("rank_math_focus_keyword") == focus_kw:
+                return True
+    except Exception as e:
+        print(f"  ⚠️ Rank Math PATCH 실패: {e}")
+    return False
+
+# ============================================================
+# 포스팅 메인
+# ============================================================
 def publish_post(site, keyword, theme, lang, mode, category_ids):
-    """
-    발행 로직:
-    1. Gemini로 본문 + META_DESC + FAQ + TAGS 생성
-    2. 메타디스크립션/FAQ/태그 분리 (메인 키워드는 태그 1번에 강제 포함)
-    3. 글자수 기준 미달 시 스킵(저품질 방지)
-    4. 이미지 업로드(alt텍스트 포함, 실패해도 발행 계속)
-    5. 태그 ID 변환(항상 12개 보장, 실패시 재시도)
-    6. 거미줄 내부링크 + 외부 권위링크 + FAQ 스키마 삽입
-    7. 워드프레스 발행 (메타디스크립션은 excerpt에도 기록)
-    """
     wp_pass = os.getenv(site['wp_pass_env'])
     if not wp_pass:
         print(f"⏭️  {site['url']} - 비밀번호 환경변수 없음, 스킵")
         record_result(site['url'], f"(skip) {keyword}", keyword=keyword, status="skip_no_password")
         return False
 
-    # 본격적인 작업(Gemini 호출, 이미지 업로드 등) 전에 사이트가 살아있는지 가볍게 확인.
-    # DNS 전파 중이거나 일시적으로 죽어있는 사이트에 시간/API 호출을 낭비하지 않기 위함.
-    # 한 번 실패해도 일시적일 수 있으므로 5초 대기 후 한 번 더 확인.
     if not is_site_reachable(site['url']):
         time.sleep(5)
         if not is_site_reachable(site['url']):
@@ -852,16 +838,15 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     body_with_tags, gemini_title, meta_desc, faq_list = extract_meta_and_faq(raw_text)
     article_body, tag_names = extract_tags_from_article(body_with_tags, keyword, theme=theme, lang=lang)
 
-    # 애드센스 90점 기준: 콘텐츠 충분성 체크 (본문 HTML 태그 제외 텍스트 기준 대략 추정)
     plain_len = len(BeautifulSoup(article_body, "html.parser").get_text())
     if plain_len < MIN_BODY_LENGTH:
-        print(f"  ⚠️ 본문 글자수 부족({plain_len}자 < {MIN_BODY_LENGTH}자) — 발행은 진행하되 품질 경고 기록")
-        record_result(site['url'], f"[글자수부족:{plain_len}] {keyword}", keyword=keyword, plain_len=plain_len, status="warn_short_content")
+        print(f"  ⚠️ 본문 글자수 부족({plain_len}자 < {MIN_BODY_LENGTH}자) — 발행 진행, 품질 경고 기록")
 
     if not meta_desc:
         meta_desc = (article_body[:117] + "...") if len(article_body) > 120 else article_body
         meta_desc = BeautifulSoup(meta_desc, "html.parser").get_text()[:155]
 
+    # ★ 수정1 적용: 이미지 검색 (한국어 자동 번역)
     img_urls = get_multiple_images(keyword, 3)
     media_ids = []
     for idx, url in enumerate(img_urls):
@@ -871,6 +856,8 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
             media_ids.append(mid)
     if not media_ids:
         print(f"  ℹ️ 이미지 확보 실패(0장) — 이미지 없이 발행 계속 진행")
+    else:
+        print(f"  🖼️ 이미지 {len(media_ids)}장 확보 완료")
 
     tag_ids = get_or_create_tag_ids(site['url'], wp_pass, tag_names)
     if not tag_ids and tag_names:
@@ -893,21 +880,16 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
     if faq_schema:
         article_body += faq_schema
 
-    # 제목: Gemini가 직접 지은 후킹성 제목을 최우선으로 사용.
-    # 키워드가 빠져있으면 SEO를 위해 자연스럽게 보강하고, 제목 생성에 실패한 경우에만 fallback 사용.
     if gemini_title and len(gemini_title) >= 8:
         title = gemini_title
         if keyword.lower() not in title.lower():
-            title = f"{title} ({keyword})" if lang != 'ko' else f"{title} ({keyword})"
+            title = f"{title} ({keyword})"
     else:
         if lang == 'ko':
             title = f"[속보] {keyword}" if mode == "news" else f"{keyword} 정보 완벽 정리"
         else:
             title = f"The Essential Guide to {keyword}"
 
-    # Rank Math SEO 메타필드 강제 주입: 포커스 키워드 + 메타 디스크립션
-    # (Rank Math 무료 버전은 콤마로 구분된 키워드를 최대 5개까지 포커스 키워드로 인식함)
-    # tag_names[0]은 항상 메인 키워드(keyword)이므로 중복 없이 그대로 선두에 사용한다.
     focus_keywords = [keyword] + [t for t in tag_names[1:5] if t.lower() != keyword.lower()]
     rank_math_meta = {
         "rank_math_focus_keyword": ",".join(focus_keywords),
@@ -935,22 +917,17 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
                 f"{site['url']}/wp-json/wp/v2/posts", json=payload,
                 auth=(WP_USER, wp_pass), timeout=25
             )
-            # 200/201이면 성공, 403이라도 일단 응답은 받았으니 루프 탈출(이후 분기에서 처리)
             break
         except Exception as e:
             last_post_exception = e
             err_str = str(e)
-            is_transient = (
-                "Name or service not known" in err_str
-                or "Temporary failure in name resolution" in err_str
-                or "NewConnectionError" in err_str
-                or "ConnectionError" in err_str
-                or "Timeout" in err_str
-                or "timed out" in err_str
-            )
+            is_transient = any(x in err_str for x in [
+                "Name or service not known", "Temporary failure in name resolution",
+                "NewConnectionError", "ConnectionError", "Timeout", "timed out"
+            ])
             if post_attempt < 3 and is_transient:
                 wait = 8 * post_attempt
-                print(f"  ⚠️ 포스팅 요청 실패 ({site['url']}, 시도 {post_attempt}/3, 일시적 오류로 판단): {e}")
+                print(f"  ⚠️ 포스팅 요청 실패 (시도 {post_attempt}/3): {e}")
                 print(f"     {wait}초 대기 후 재시도...")
                 time.sleep(wait)
                 continue
@@ -960,13 +937,11 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
                 return False
 
     if res_post is None:
-        print(f"  ❌ 포스팅 요청 최종 실패 ({site['url']}): {last_post_exception}")
         record_result(site['url'], title, keyword=keyword, plain_len=plain_len, status="fail_request")
         return False
 
-    # 403 챌린지(hcdn 등 일시적 WAF 차단)로 보이는 경우 한 번 더 재시도
     if res_post.status_code == 403 and "Checking your browser" in res_post.text:
-        print(f"  ⚠️ {site['url']} WAF/봇챌린지로 추정되는 403 — 15초 대기 후 1회 재시도")
+        print(f"  ⚠️ WAF/봇챌린지 403 — 15초 대기 후 1회 재시도")
         time.sleep(15)
         try:
             res_post = requests.post(
@@ -974,36 +949,26 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
                 auth=(WP_USER, wp_pass), timeout=25
             )
         except Exception as e:
-            print(f"  ❌ 포스팅 재시도 요청 실패 ({site['url']}): {e}")
+            print(f"  ❌ 포스팅 재시도 실패 ({site['url']}): {e}")
             record_result(site['url'], title, keyword=keyword, plain_len=plain_len, status="fail_request")
             return False
 
     if res_post.status_code == 201:
         post_data = res_post.json()
-        post_id = post_data.get("id")
+        post_id   = post_data.get("id")
         returned_meta = post_data.get("meta", {}) or {}
 
+        # ★ 수정2: Rank Math 메타필드 반영 확인 + PATCH 재시도
         rank_math_applied = (
             returned_meta.get("rank_math_focus_keyword") == rank_math_meta["rank_math_focus_keyword"]
         )
 
         if not rank_math_applied and post_id:
-            # 생성 시점에 meta가 무시된 경우, PATCH로 한 번 더 시도 (일부 환경에서는 update에서만 허용됨)
-            try:
-                patch_res = requests.post(
-                    f"{site['url']}/wp-json/wp/v2/posts/{post_id}",
-                    json={"meta": rank_math_meta},
-                    auth=(WP_USER, wp_pass),
-                    timeout=15
-                )
-                if patch_res.status_code == 200:
-                    patched_meta = patch_res.json().get("meta", {}) or {}
-                    rank_math_applied = (
-                        patched_meta.get("rank_math_focus_keyword") == rank_math_meta["rank_math_focus_keyword"]
-                    )
-            except Exception:
-                pass
+            rank_math_applied = try_register_and_patch_rank_math(
+                site['url'], wp_pass, post_id, rank_math_meta
+            )
 
+        # ★ 수정3: 개선된 SEO 점수
         seo_score = estimate_seo_score(
             keyword, title, plain_len, meta_desc,
             img_count=len(media_ids), faq_count=len(faq_list),
@@ -1011,10 +976,12 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         )
 
         if rank_math_applied:
-            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개, Rank Math 메타 적용, SEO추정 {seo_score}점, 모델:{used_model}: {title}")
+            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, "
+                  f"FAQ {len(faq_list)}개, Rank Math ✅ 반영, SEO추정 {seo_score}점, 모델:{used_model}: {title}")
         else:
-            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, FAQ {len(faq_list)}개, SEO추정 {seo_score}점, 모델:{used_model}: {title}")
-            print(f"  ⚠️ [진단] Rank Math 메타필드가 REST API에 반영되지 않음. 해당 사이트는 functions.php에 register_post_meta 노출 코드가 필요할 수 있음.")
+            print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, "
+                  f"FAQ {len(faq_list)}개, SEO추정 {seo_score}점, 모델:{used_model}: {title}")
+            print(f"  ⚠️ [진단] Rank Math 메타필드 미반영 → 해당 사이트 functions.php에 register_post_meta 코드 추가 필요")
 
         record_result(
             site['url'], title, keyword=keyword, tag_count=len(tag_ids),
@@ -1032,7 +999,9 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         )
         return False
 
-
+# ============================================================
+# 작업 큐 빌드 및 실행
+# ============================================================
 def build_job_queue():
     queue = []
     for site in SITES_CONFIG:
@@ -1060,7 +1029,6 @@ def build_job_queue():
     random.shuffle(queue)
     return queue
 
-
 def run():
     print(f"🚀 [RUN_SLOT {RUN_SLOT}/3] 22개 사이트 메가 오토포스팅 시작 (모델: {GEMINI_MODEL}, 애드센스90점 기준 적용)")
 
@@ -1075,9 +1043,9 @@ def run():
         if i < total:
             time.sleep(SLEEP_BETWEEN_POSTS)
 
+    # ★ 수정4: 구글시트 3회 재시도 전송
     flush_log_to_google_sheet()
     print("\n🏁 이번 회차 작업이 모두 종료되었습니다.")
-
 
 if __name__ == "__main__":
     run()
