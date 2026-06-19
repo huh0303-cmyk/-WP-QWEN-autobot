@@ -113,6 +113,7 @@ KEYWORDS_DB = {
         "Remote HR manager global team", "Diversity and inclusion workplace", "Global talent visa parameters", "International school principal hiring", "Global consulting firm analyst",
         "Cross border tax consultant", "Global intellectual property lawyer", "English technical writer job", "Global customer success manager", "International event coordinator Seoul"
     ],
+    # ★ 수정: "keywords_studyinkorea.com" → "keywords_kstudy365.txt" (kstudy365.com 전용)
     "keywords_kstudy365.txt": [
         "Learn Korean language fast", "Best Korean language academy", "Sogang vs Yonsei Korean program", "TOPIK test preparation strategy", "Korean alphabet Hangul master",
         "Online Korean language course", "Korean vocabulary hacks daily", "Speaking Korean fluently tips", "Korean grammar intermediate guide", "Free Korean learning apps",
@@ -127,7 +128,8 @@ KEYWORDS_DB = {
         "Korean corporate terminology prep", "Street language Seoul guide", "Satoori regional dialects Korea", "Busan dialect useful phrases", "Jeju dialect unique words",
         "Korean language certificate value", "TOPIK registration process dates", "Computer based TOPIK test", "Best dictionary app Korean", "Learn Hangul in one hour"
     ],
-    "keywords_studyinkorea.com": [
+    # ★ 추가: studyinkorea365.com 전용 키워드 파일
+    "keywords_studyinkorea365.txt": [
         "Global Korea Scholarship GKS", "Apply to Seoul National University", "SKY universities admission international", "Tuition fees in South Korea", "D2 student visa application",
         "English track degree programs Korea", "KAIST scholarship international students", "Yonsei University Underwood College", "Korea University global admission", "Study abroad in Seoul guide",
         "Exchange student life in Korea", "University dormitory vs Goshiwon", "Cost of living student Seoul", "Part time job rules student", "Post graduate job prospects Korea",
@@ -175,7 +177,7 @@ KEYWORDS_DB = {
         "Housing rent tax deduction Korea", "Credit card spending tax deduction", "Flat tax rate option foreign", "Executive tax benefit corporate", "Corporate income tax rate return",
         "Transfer pricing documentation rules", "Permanent establishment tax trigger", "Controlled foreign corporation tax", "Withholding tax double treaty", "VAT refund system tourists",
         "Value added tax rate business", "Tax invoice system Home Tax", "Customs duty import tariff", "Duty free allowance Incheon airport", "Gift tax rate threshold family",
-        "Inheritance tax property calculation", "Real estate holding tax종부세", "Property acquisition tax rate", "Capital gains tax real estate", "Stock transfer tax capital gains",
+        "Inheritance tax property calculation", "Real estate holding tax", "Property acquisition tax rate", "Capital gains tax real estate", "Stock transfer tax capital gains",
         "Securities transaction tax rate", "Crypto tax implementation plan", "Digital service tax discussion", "Tax audit process corporate Korea", "Tax dispute resolution system",
         "National tax service contact center", "HomeTax website usage English", "Local income tax calculation", "Automobile tax rate criteria", "Stamp duty transaction contract",
         "Tax incentive R&D investment", "Startup tax holiday qualification", "Free economic zone tax reduction", "Foreign investor tax exemption", "Social security contribution vs tax",
@@ -255,7 +257,7 @@ KEYWORDS_DB = {
         "Wedding anniversary celebration culture Korea", "Vow renewal ceremony venue Seoul", "Second marriage trends wedding market", "Eco friendly wedding sustainable venue",
         "Hanok courtyard wedding venue cost", "Weekday evening wedding discount benefit", "Wedding expo Seoul registration date", "Catering tasting session bridal review",
         "Bridal bouquet custom flower trend", "Wedding videography cinematic editing firm", "After party venue rental Itaewon", "Pre marriage counseling program center",
-        "Bride waiting room interior setup", "Mobile wedding invitation link creation", "Wedding return gift 답례품 item", "Joint wedding expense division guide",
+        "Bride waiting room interior setup", "Mobile wedding invitation link creation", "Wedding return gift item", "Joint wedding expense division guide",
         "Micro wedding package boutique hotel", "Celebrity wedding venue trend analysis", "Average age of marriage Korea", "Wedding budget checklist excel calculator"
     ],
     "keywords_ktech.txt": [
@@ -288,7 +290,7 @@ KEYWORDS_DB = {
         "K-pop album sales unboxing review", "Korean agency global fan club", "K-drama OST chart topping melody", "Historical drama Sageuk filming set",
         "Korean theatre scene original musical", "Nanta cooking show performance ticket", "K-pop lyricist songwriting process insights", "Idol debut showcase streaming link",
         "Korean web novel premium translation", "K-pop backup dancer career opportunities", "Entertainment lawyer contract dispute Korea", "Idol mental health welfare policy",
-        "K-entertainment streaming platform comparison OTT", "釜산 international film festival program", "Jeonju indie film selection review", "Korean animation studio global co-production",
+        "K-entertainment streaming platform comparison OTT", "Busan international film festival program", "Jeonju indie film selection review", "Korean animation studio global co-production",
         "K-pop festival calendar worldwide locations", "Fan-led subway advertisement cost guide", "K-pop jargon dictionary fan terms", "Korean celebrity endorsement contract fee",
         "Retro K-pop vinyl record shop", "Korean traditional music crossover band", "K-drama fashion icon outfit match", "Pop culture museum Seoul archive"
     ],
@@ -329,8 +331,8 @@ KEYWORDS_DB = {
 }
 
 def build_keyword_files():
-    print(f"📂 [키워드 매니저] 한 달 치 자동 구축 가동 (총 {len(KEYWORDS_DB)}개 파일)")
-    current_dir = os.path.dirname(os.path.abspath(__file__)) if __file__ else "."
+    print(f"📂 [키워드 매니저] 총 {len(KEYWORDS_DB)}개 파일 생성 시작")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     created_count = 0
     for filename, keywords in KEYWORDS_DB.items():
         file_path = os.path.join(current_dir, filename)
@@ -339,11 +341,11 @@ def build_keyword_files():
             with open(file_path, "w", encoding="utf-8") as f:
                 for kw in unique_keywords:
                     f.write(f"{kw}\n")
-            print(f"  └ ✅ 생성 완료: {filename} ({len(unique_keywords)}개)")
+            print(f"  └ ✅ {filename} ({len(unique_keywords)}개)")
             created_count += 1
         except Exception as e:
             print(f"  └ ❌ 생성 실패 ({filename}): {str(e)}")
-    print(f"🎯 총 {created_count}개 파일 생성 완료!")
+    print(f"\n🎯 총 {created_count}개 파일 생성 완료!")
 
 if __name__ == "__main__":
     build_keyword_files()
