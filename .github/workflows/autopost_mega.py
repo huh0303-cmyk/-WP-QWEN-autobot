@@ -276,17 +276,46 @@ def load_keyword(filename, fallback):
         pass
     return fallback
 
+# ★ RSS 크롤링 실패 시 사용할 다양한 뉴스 키워드 풀 (고정 반복 방지)
+NEWS_FALLBACK_KEYWORDS = [
+    ("한국 부동산 정책 동향", "최근 부동산 정책 변화와 시장 영향을 심층 분석합니다."),
+    ("한국은행 기준금리 전망", "기준금리 결정 배경과 향후 경제 전망을 다룹니다."),
+    ("국내 주식시장 시황 분석", "최근 국내 증시 동향과 주요 이슈를 정리합니다."),
+    ("반도체 수출 실적 리포트", "반도체 산업 수출 동향과 글로벌 경쟁력을 분석합니다."),
+    ("청년 주거지원 정책 총정리", "청년층 대상 주거 지원 정책의 핵심 내용을 정리합니다."),
+    ("국민연금 개혁안 핵심", "국민연금 개혁 논의의 주요 쟁점을 살펴봅니다."),
+    ("K-배터리 기술 개발 현황", "국내 배터리 산업의 기술 혁신과 시장 동향을 다룹니다."),
+    ("한국 인공지능 스타트업", "국내 AI 스타트업 생태계의 최신 흐름을 분석합니다."),
+    ("국내 저출산 대책 예산", "저출산 문제 해결을 위한 정부 예산 정책을 정리합니다."),
+    ("기후변화 대응 탄소중립", "탄소중립 목표 달성을 위한 국내 정책 현황을 다룹니다."),
+    ("K-푸드 전세계 수출 현황", "한국 식품의 해외 수출 트렌드를 분석합니다."),
+    ("디지털 자산 법안 통과", "디지털 자산 관련 입법 동향을 정리합니다."),
+    ("국내 물가 동향 및 전망", "최근 물가 상승률과 향후 전망을 살펴봅니다."),
+    ("청년 창업 지원 프로그램", "청년 창업가를 위한 정부 지원 프로그램을 소개합니다."),
+    ("자율주행 자동차 시범 운행", "국내 자율주행 기술 시범사업 현황을 다룹니다."),
+    ("의료 개혁 및 필수의료 지원", "필수의료 강화를 위한 정책 방향을 분석합니다."),
+    ("전세사기 피해자 지원 대책", "전세사기 피해 구제 정책의 핵심을 정리합니다."),
+    ("국내 방산 수출 역대 최고", "방위산업 수출 호조의 배경을 분석합니다."),
+    ("AI 반도체 팹리스 육성", "AI 반도체 설계 산업 육성 정책을 다룹니다."),
+    ("국내 OTT 시장 점유율 경쟁", "OTT 플랫폼 간 경쟁 구도와 시장 변화를 살펴봅니다."),
+]
+
 def crawl_rss_news():
+    """RSS 피드에서 최신 뉴스 제목을 가져오되, 실패 시 다양한 키워드 풀에서 랜덤 선택 (고정 반복 방지)"""
     try:
         res = requests.get("https://fs.khan.co.kr/rss/rssdata/total_news.xml", timeout=10)
         soup = BeautifulSoup(res.text, 'xml')
         items = soup.find_all('item')
         if items:
             chosen = random.choice(items)
-            return chosen.title.text, chosen.description.text
-    except Exception:
-        pass
-    return "대한민국 최신 경제 및 사회 변화 트렌드 분석", "최신 주요 시사 이슈 및 정책 변화에 대한 심층 기사입니다."
+            title = chosen.title.text.strip() if chosen.title else ""
+            desc  = chosen.description.text.strip() if chosen.description else ""
+            if title and len(title) >= 5:
+                return title, desc
+    except Exception as e:
+        print(f"  ⚠️ RSS 크롤링 실패, 키워드 풀에서 대체 선택: {e}")
+    # ★ RSS 실패 시 매번 다른 키워드 선택 (고정 반복 방지)
+    return random.choice(NEWS_FALLBACK_KEYWORDS)
 
 # ============================================================
 # 프롬프트
@@ -318,33 +347,43 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
         return f"""
 당신은 주요 일간지의 시니어 취재기자입니다.
 주제: '{keyword}'에 대해 엄격한 신문기사체 기사를 작성하세요.
-[필수 지침]
+
+[필수 지침 — 구글 품질 가이드라인 강제 준수, 하나라도 빠지면 안 됨]
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위에 '◇ {reporter}' 한 줄 삽입.
 3. 분량: HTML(h2,h3,p,strong,ul,li)만 사용해 최소 1800자 이상.
-4. E-E-A-T: 전문가 인터뷰 인용구, 구체적 통계, 발표 기관명 포함.
-5. 구조: h2 최소 3개, 단락은 3~4문장 이내.
-6. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
-7. 메타: 본문 끝에 'META_DESC:' 로 시작하는 120자 이내 요약.
-8. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
-9. 태그: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드, 첫 번째는 반드시 '{keyword}'.
+4. ★ 통계/수치 강제: 본문 안에 구체적인 숫자·통계·비율·금액을 최소 3개 이상 명시적으로 포함 (예: "23% 증가", "약 150만 명", "2024년 대비 12.5%p 상승" 등 막연한 표현 금지, 반드시 숫자로 표기).
+5. ★ 출처 강제: 통계 옆에 출처 기관명을 괄호로 명시 (예: "(통계청, 2026)", "(한국은행 발표)").
+6. ★ 내부 링크 강제: 본문 중간에 자연스러운 문맥으로 최소 4개 이상의 내부 링크 자리를 위해 관련 주제를 언급 (시스템이 자동으로 링크 삽입할 수 있도록 키워드성 문구 포함).
+7. ★ 외부 권위 링크 강제: 정부기관·통계청·연구기관 등 공신력 있는 기관명을 본문에 최소 3회 이상 언급.
+8. E-E-A-T: 전문가 인터뷰 인용구 최소 1개 포함.
+9. 구조: h2 최소 3개, 단락은 3~4문장 이내.
+10. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
+11. ★ 메타 디스크립션: 본문 끝에 'META_DESC:' 로 시작, 정확히 130~140자 (한글 기준) 분량으로 작성. 너무 짧거나 길면 안 됨.
+12. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
+13. ★ 태그: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드. 각 태그는 최대 3단어(약 15자) 이내로 짧고 핵심적으로 작성. 첫 번째는 반드시 '{keyword}'.
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS
 """
     persona = "의학 박사" if "건강" in theme or "medical" in theme.lower() else "산업 분야 최고 전문 자문위원"
     return f"""
 당신은 {persona}이자 15년 경력의 SEO 콘텐츠 마스터 프로라이터입니다.
 주제: '{keyword}' ({theme}) / 언어: {lang}
-[필수 지침 — 구글 애드센스 품질 평가 90점 이상]
+
+[필수 지침 — 구글 애드센스 품질 평가 90점 이상, 아래 조건은 전부 강제 적용]
 1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,tr,td 태그만. 마크다운 금지.
 2. 분량: 최소 1800자 이상, 깊이 있는 상세 내용.
 3. 키워드: 첫 단락 문두에 '{keyword}' 배치, 전체 10회 이상 자연스럽게 삽입.
 4. 구조: h2 최소 5개, h3 최소 4개, ul/li 리스트 3개 이상, 비교 table 1개 이상.
-5. E-E-A-T: 구체적 수치·통계·공신력 기관명 최소 2회 인용.
-6. 단락: 3~4문장 이내로 짧게 끊기.
-7. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
-8. 메타: 본문 끝에 'META_DESC:' 로 시작하는 120자 이내 요약.
-9. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
-10. 태그: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드, 첫 번째는 반드시 '{keyword}'.
+5. ★ 통계/수치 강제: 본문 안에 구체적인 숫자·통계·비율·금액·기간을 최소 3개 이상 명시적으로 포함. 막연한 표현("많은", "대부분") 대신 반드시 숫자로 표기 (예: "73%의 응답자", "평균 450,000원", "최근 5년간").
+6. ★ 출처 강제: 통계 옆에 출처를 괄호로 명시 (예: "(KOSIS, 2026)", "(NIH 연구결과)", "(보건복지부 자료)").
+7. ★ 내부 링크 강제: 본문 중간 자연스러운 문맥에서 관련 주제 최소 4곳 이상 언급하여 내부 링크 삽입이 가능하도록 구성.
+8. ★ 외부 권위 링크 강제: 정부기관·학회·국제기구 등 공신력 있는 기관명을 본문에 최소 3회 이상 언급.
+9. E-E-A-T: 전문가 인용 또는 실제 경험 기반 디테일(가격대, 기간, 절차 등) 최소 2곳 포함.
+10. 단락: 3~4문장 이내로 짧게 끊기.
+11. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
+12. ★ 메타 디스크립션: 본문 끝에 'META_DESC:' 로 시작, 정확히 130~140자(영문은 130~155자) 분량으로 작성. 너무 짧거나 길면 안 됨.
+13. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
+14. ★ 태그: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드. 각 태그는 최대 3단어(약 15자) 이내로 짧고 핵심적으로 작성 (긴 구문 금지). 첫 번째는 반드시 '{keyword}'.
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS
 """
 
@@ -352,15 +391,27 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
 # 파싱
 # ============================================================
 def extract_meta_and_faq(text):
+    """
+    ★ 제목 추출 로직 강화:
+    1순위: 'TITLE:' 줄 (정상 케이스)
+    2순위: '**TITLE:**' 같은 마크다운 볼드로 감싼 경우도 인식
+    3순위: TITLE: 자체가 없으면 본문 첫 <h1>...</h1> 내용을 제목으로 사용
+    4순위: 그래도 없으면 빈 문자열 반환 (publish_post의 fallback이 처리)
+    """
+    import re as _re3
     title = ""; meta_desc = ""; faq_list = []
     lines = text.split("\n"); out_lines = []
     in_faq = False; cur_q = None
     for line in lines:
         s = line.strip()
-        if s.upper().startswith("TITLE:"):
-            title = s.split(":",1)[1].strip() if ":" in s else ""; continue
-        if s.upper().startswith("META_DESC:"):
-            meta_desc = s.split(":",1)[1].strip() if ":" in s else ""; continue
+        # ── TITLE 인식 강화: 'TITLE:', '**TITLE:**', '## TITLE:' 등 모두 처리 ──
+        s_clean = s.lstrip('#').lstrip('*').strip()
+        if s_clean.upper().startswith("TITLE:"):
+            title = s_clean.split(":",1)[1].strip() if ":" in s_clean else ""
+            continue
+        if s_clean.upper().startswith("META_DESC:"):
+            meta_desc = s_clean.split(":",1)[1].strip() if ":" in s_clean else ""
+            continue
         if s.upper().startswith("FAQ_START"):
             in_faq = True; continue
         if s.upper().startswith("FAQ_END"):
@@ -371,7 +422,27 @@ def extract_meta_and_faq(text):
                 faq_list.append((cur_q, s[2:].strip())); cur_q = None
             continue
         out_lines.append(line)
+
     title = title.strip('"').strip("'").strip("*").strip()
+
+    # ── ★ TITLE: 자체가 없었던 경우 → 본문의 첫 <h1> 태그에서 추출 ──
+    if not title or len(title) < 8:
+        body_text = "\n".join(out_lines)
+        h1_match = _re3.search(r'<h1[^>]*>(.*?)</h1>', body_text, _re3.DOTALL | _re3.IGNORECASE)
+        if h1_match:
+            extracted = _re3.sub(r'<[^>]+>', '', h1_match.group(1)).strip()
+            extracted = extracted.strip('"').strip("'").strip("*").strip()
+            if len(extracted) >= 8:
+                title = extracted
+                # 본문에서 중복되지 않도록 h1은 그대로 두되 제목으로도 사용
+        # h1도 없으면 첫 번째 비어있지 않은 텍스트 줄을 시도 (최후 수단)
+        if not title:
+            for ol in out_lines:
+                plain = _re3.sub(r'<[^>]+>', '', ol).strip()
+                if len(plain) >= 10:
+                    title = plain[:120]
+                    break
+
     return "\n".join(out_lines).strip(), title, meta_desc, faq_list
 
 def build_fallback_tag_pool(kw, theme=None, lang="ko"):
@@ -381,6 +452,15 @@ def build_fallback_tag_pool(kw, theme=None, lang="ko"):
     if theme: pool.insert(0, theme)
     pool.append(kw)
     return pool
+
+def _truncate_tag(tag: str, max_words: int = 3, max_chars: int = 20) -> str:
+    """★ 태그를 강제로 최대 3단어/20자 이내로 자름 (긴 구문 태그 방지)"""
+    words = tag.strip().split()
+    if len(words) > max_words:
+        tag = " ".join(words[:max_words])
+    if len(tag) > max_chars:
+        tag = tag[:max_chars].rstrip()
+    return tag
 
 def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="ko"):
     lines = article_text.strip().split("\n")
@@ -394,18 +474,23 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
             body_lines.append(line)
     article_body = "\n".join(body_lines).strip()
     if not tags: tags = [fallback_keyword]
+
+    # ★ 메인 키워드를 제외한 나머지 태그는 길이 강제 제한 (3단어/20자)
     kk = fallback_keyword.strip().lower()
     tags = [t for t in tags if t.strip().lower() != kk]
-    tags.insert(0, fallback_keyword)
+    tags = [_truncate_tag(t) for t in tags]
+    tags.insert(0, fallback_keyword)  # 메인 키워드는 원문 그대로 유지
+
     seen = set(); deduped = []
     for t in tags:
         k = t.strip().lower()
-        if k not in seen: seen.add(k); deduped.append(t)
+        if k and k not in seen: seen.add(k); deduped.append(t)
     tags = deduped
     if len(tags) > TAG_COUNT:
         tags = tags[:TAG_COUNT]
     elif len(tags) < TAG_COUNT:
         for c in build_fallback_tag_pool(fallback_keyword, theme, lang):
+            c = _truncate_tag(c)
             if len(tags) >= TAG_COUNT: break
             if c.strip().lower() not in seen: tags.append(c); seen.add(c.strip().lower())
         i = 1
@@ -551,19 +636,74 @@ def build_faq_html_and_schema(faq_list, lang):
 # ============================================================
 # ★ SEO 점수 계산 (개선)
 # ============================================================
-def estimate_seo_score(keyword, title, plain_len, meta_desc, img_count, faq_count, tag_count, rank_math_applied):
+def estimate_seo_score(keyword, title, plain_len, meta_desc, img_count, faq_count, tag_count,
+                       rank_math_applied, internal_links=0, external_links=0, stat_count=0):
+    """
+    ★ 강화된 SEO 점수 (100점 만점)
+    - 제목 키워드 포함:        10점
+    - 본문 길이:               15점
+    - 메타 디스크립션(130~140자 정확히): 15점
+    - 이미지 2~3장:            15점
+    - 내부 링크 4개 이상:       10점  ★ 신규
+    - 외부 링크 3개 이상:       10점  ★ 신규
+    - 통계/수치 3개 이상:       10점  ★ 신규
+    - FAQ:                     5점
+    - 태그:                    5점
+    - Rank Math 반영:          5점
+    """
     score = 0
-    if keyword.lower() in title.lower():              score += 15   # 제목 키워드
-    if plain_len >= MIN_BODY_LENGTH:                  score += 20   # 본문 길이
-    elif plain_len >= 1200:                           score += 12
-    elif plain_len >= 800:                            score += 6
+    if keyword.lower() in title.lower():
+        score += 10
+    if plain_len >= MIN_BODY_LENGTH:
+        score += 15
+    elif plain_len >= 1200:
+        score += 9
+    elif plain_len >= 800:
+        score += 4
+
+    # ★ 메타 디스크립션: 130~140자(한글) / 130~155자(영문) 정확히 맞아야 만점
     if meta_desc:
-        score += 15 if 50 <= len(meta_desc) <= 155 else 8          # 메타 디스크립션
-    score += min(15, img_count * 5)                                 # 이미지 (장당 5점, 최대 15)
-    score += min(10, faq_count * 4)                                 # FAQ
-    if TAG_COUNT > 0: score += min(10, int(10 * tag_count / TAG_COUNT))  # 태그
-    if rank_math_applied: score += 15                               # Rank Math 반영
+        mlen = len(meta_desc)
+        if 130 <= mlen <= 155:
+            score += 15
+        elif 100 <= mlen <= 170:
+            score += 9
+        else:
+            score += 4
+
+    score += min(15, img_count * 5)  # 이미지 장당 5점, 최대 3장
+
+    # ★ 내부 링크 (4개 이상 만점)
+    score += min(10, int(10 * internal_links / 4)) if internal_links else 0
+
+    # ★ 외부 링크 (3개 이상 만점)
+    score += min(10, int(10 * external_links / 3)) if external_links else 0
+
+    # ★ 통계/수치 포함 여부 (본문 내 숫자 패턴 개수 기반, 3개 이상 만점)
+    score += min(10, int(10 * stat_count / 3)) if stat_count else 0
+
+    score += min(5, faq_count * 2)
+    if TAG_COUNT > 0:
+        score += min(5, int(5 * tag_count / TAG_COUNT))
+    if rank_math_applied:
+        score += 5
+
     return min(100, score)
+
+def count_statistics_in_body(html_body: str) -> int:
+    """본문에서 통계/수치 패턴 개수를 추정 (숫자+%, 숫자+명/원/년 등)"""
+    import re as _re4
+    plain = _re4.sub(r'<[^>]+>', ' ', html_body)
+    patterns = [
+        r'\d+[.,]?\d*\s*%',                    # 23%, 12.5%
+        r'\d+[.,]?\d*\s*(명|개|원|건|배|회)',     # 150만 명, 3배
+        r'\d{4}년',                               # 2026년
+        r'\d+[.,]?\d*\s*(percent|million|billion|times)',  # 영문 통계
+    ]
+    count = 0
+    for p in patterns:
+        count += len(_re4.findall(p, plain))
+    return count
 
 # ============================================================
 # ★ 로그 및 구글시트 전송 (컬럼 완전 개편 + 3회 재시도)
@@ -760,7 +900,11 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         print(f"  ⚠️ 본문 글자수 부족({plain_len}자 < {MIN_BODY_LENGTH}자) — 발행 진행")
 
     if not meta_desc:
-        meta_desc = BeautifulSoup((article_body[:117]+"...") if len(article_body)>120 else article_body, "html.parser").get_text()[:155]
+        plain_for_meta = BeautifulSoup(article_body, "html.parser").get_text()
+        meta_desc = (plain_for_meta[:137] + "...") if len(plain_for_meta) > 140 else plain_for_meta
+    # ★ 메타 디스크립션 길이 강제 보정: 130~140자(한글) 범위 벗어나면 자르기/패딩
+    if len(meta_desc) > 155:
+        meta_desc = meta_desc[:152] + "..."
 
     # ★ 이미지 검색 (한국어 자동 번역)
     img_urls  = get_multiple_images(keyword, 3)
@@ -867,9 +1011,12 @@ def publish_post(site, keyword, theme, lang, mode, category_ids):
         int_link_count = sum(1 for h in all_links if any(h.startswith(nh) for nh in _network_hosts))
         ext_link_count = sum(1 for h in all_links if not any(h.startswith(nh) for nh in _network_hosts))
 
+        stat_count = count_statistics_in_body(article_body)
         seo_score = estimate_seo_score(keyword, title, plain_len, meta_desc,
                                        img_count=len(media_ids), faq_count=len(faq_list),
-                                       tag_count=len(tag_ids), rank_math_applied=rank_math_applied)
+                                       tag_count=len(tag_ids), rank_math_applied=rank_math_applied,
+                                       internal_links=int_link_count, external_links=ext_link_count,
+                                       stat_count=stat_count)
 
         rm_label = "Rank Math ✅" if rank_math_applied else "Rank Math ❌"
         print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, "
