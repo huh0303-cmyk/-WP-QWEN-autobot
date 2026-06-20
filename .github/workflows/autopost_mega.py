@@ -504,10 +504,22 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
 # ★ 이미지 검색 (한국어 자동 번역 fallback 포함)
 # ============================================================
 def is_site_reachable(site_url, timeout=8):
+    """★ 디버그 강화: 실패 원인을 정확히 출력 (DNS/타임아웃/연결거부/SSL 등 구분)"""
     try:
-        requests.head(f"{site_url}/wp-json/", timeout=timeout)
+        r = requests.head(f"{site_url}/wp-json/", timeout=timeout, allow_redirects=True)
+        # HTTP 상태코드가 뭐가 됐든(403, 404 포함) 일단 "서버에 도달은 했다"는 의미이므로 reachable로 간주
         return True
-    except Exception:
+    except requests.exceptions.ConnectionError as e:
+        print(f"    🔍 [reachability] ConnectionError: {str(e)[:200]}")
+        return False
+    except requests.exceptions.Timeout as e:
+        print(f"    🔍 [reachability] Timeout: {str(e)[:200]}")
+        return False
+    except requests.exceptions.SSLError as e:
+        print(f"    🔍 [reachability] SSLError: {str(e)[:200]}")
+        return False
+    except Exception as e:
+        print(f"    🔍 [reachability] {type(e).__name__}: {str(e)[:200]}")
         return False
 
 def get_images_from_pixabay(query, need):
