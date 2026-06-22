@@ -49,8 +49,8 @@ KO_TO_EN_IMAGE = {
     # ── 복합 패턴 (긴 것 우선 매칭) ─────────────────────────
     "대한민국 최신 경제 및 사회 변화 트렌드 분석": "South Korea economy society trend analysis business",
     "혈당스파이크 줄이는":   "blood sugar spike reduction tips",
-    "콜레스테롤 낮추는":     "cholesterol lowering heart healthy",
-    "혈압 낮추는":           "blood pressure lowering hypertension",
+    "콜레스테롤 낮추는":      "cholesterol lowering heart healthy",
+    "혈압 낮추는":            "blood pressure lowering hypertension",
     "고혈압 낮추는":         "hypertension blood pressure healthy food",
     "지방간에 좋은":         "fatty liver healthy food nutrition",
     "면역력 높이는":         "immune system boosting health supplements",
@@ -67,7 +67,7 @@ KO_TO_EN_IMAGE = {
     "공황장애":              "panic disorder anxiety mental",
     # ── 단어 단위 ────────────────────────────────────────────
     "고혈압":      "high blood pressure hypertension",
-    "혈당스파이크":"blood sugar spike glucose",
+    "혈당스파이크": "blood sugar spike glucose",
     "혈당":        "blood glucose sugar control",
     "혈압":        "blood pressure heart",
     "당뇨병":      "diabetes insulin treatment",
@@ -180,10 +180,8 @@ def translate_ko_to_en_for_image(keyword: str) -> str:
     """한국어 키워드 → 이미지 검색용 영어 (긴 패턴 우선 매칭)"""
     import re as _re2
     result = keyword
-    # 긴 패턴 먼저 매칭해야 정확도 향상
     for ko, en in sorted(KO_TO_EN_IMAGE.items(), key=lambda x: -len(x[0])):
         result = result.replace(ko, en)
-    # 한글 잔존 시 테마 기반 fallback
     if any('\uac00' <= c <= '\ud7a3' for c in result):
         if any(w in keyword for w in ["경제","사회","트렌드","뉴스","정치","금융","부동산"]):
             return "South Korea economy society business news"
@@ -191,7 +189,6 @@ def translate_ko_to_en_for_image(keyword: str) -> str:
             return "healthy Korean food nutrition diet"
         else:
             return "medical health treatment Korea"
-    # 연속 공백 정리 및 길이 제한
     result = _re2.sub(r'\s+', ' ', result).strip()
     return result[:80]
 
@@ -204,18 +201,18 @@ SITES_CONFIG = [
     {"url": "https://koreainvest365.com",    "lang": "en", "theme": "Investment",           "mode": "blog", "keywords_file": ".github/workflows/keywords_kinvest.txt",         "wp_pass_env": "KOREAINVEST365COM",   "daily": 3},
     {"url": "https://koreainsurance365.com", "lang": "en", "theme": "Insurance",            "mode": "blog", "keywords_file": ".github/workflows/keywords_kinsurance.txt",      "wp_pass_env": "KOREAINSURANCE365COM","daily": 3},
     {"url": "https://kfinance365.com",       "lang": "en", "theme": "Finance",              "mode": "blog", "keywords_file": ".github/workflows/keywords_kfinance.txt",        "wp_pass_env": "KFINANCE365COM",      "daily": 3},
-    {"url": "https://koreataxnlaw.com",      "lang": "en", "theme": "Tax and Law",          "mode": "blog", "keywords_file": ".github/workflows/keywords_ktax.txt",            "wp_pass_env": "KOREATAXNLAWCOM",     "daily": 3},
+    {"url": "https://koreataxnlaw.com",      "lang": "en", "theme": "Tax and Law",          "mode": "blog", "keywords_file": ".github/workflows/keywords_ktax.txt",             "wp_pass_env": "KOREATAXNLAWCOM",     "daily": 3},
     {"url": "https://koreacrypto365.com",    "lang": "en", "theme": "Crypto",               "mode": "blog", "keywords_file": ".github/workflows/keywords_kcrypto.txt",         "wp_pass_env": "KOREACRYPTO365COM",   "daily": 3},
-    {"url": "https://ktech365.com",          "lang": "en", "theme": "Technology",           "mode": "blog", "keywords_file": ".github/workflows/keywords_ktech.txt",           "wp_pass_env": "KTECH365COM",         "daily": 3},
-    {"url": "https://kskin365.com",          "lang": "en", "theme": "K-Beauty",             "mode": "blog", "keywords_file": ".github/workflows/keywords_kskin.txt",           "wp_pass_env": "KSKIN365COM",         "daily": 3},
+    {"url": "https://ktech365.com",          "lang": "en", "theme": "Technology",           "mode": "blog", "keywords_file": ".github/workflows/keywords_ktech.txt",            "wp_pass_env": "KTECH365COM",         "daily": 3},
+    {"url": "https://kskin365.com",          "lang": "en", "theme": "K-Beauty",              "mode": "blog", "keywords_file": ".github/workflows/keywords_kskin.txt",            "wp_pass_env": "KSKIN365COM",         "daily": 3},
     {"url": "https://oliveyoungkorea.com",   "lang": "en", "theme": "K-Beauty Reviews",     "mode": "blog", "keywords_file": ".github/workflows/keywords_oliveyoung.txt",      "wp_pass_env": "OLIVEYOUNGKOREACOM",  "daily": 3},
     {"url": "https://kworld365.com",         "lang": "en", "theme": "K-POP",                "mode": "blog", "keywords_file": ".github/workflows/keywords_kworld.txt",          "wp_pass_env": "KWORLD365COM",        "daily": 5},
-    {"url": "https://k-trip365.com",         "lang": "en", "theme": "Travel",               "mode": "blog", "keywords_file": ".github/workflows/keywords_ktrip.txt",           "wp_pass_env": "KTRIP365COM",         "daily": 3},
-    {"url": "https://k-visa365.com",         "lang": "en", "theme": "Visa Guide",           "mode": "blog", "keywords_file": ".github/workflows/keywords_kvisa.txt",           "wp_pass_env": "KVISA365COM",         "daily": 3},
+    {"url": "https://k-trip365.com",         "lang": "en", "theme": "Travel",               "mode": "blog", "keywords_file": ".github/workflows/keywords_ktrip.txt",            "wp_pass_env": "KTRIP365COM",         "daily": 3},
+    {"url": "https://k-visa365.com",         "lang": "en", "theme": "Visa Guide",           "mode": "blog", "keywords_file": ".github/workflows/keywords_kvisa.txt",            "wp_pass_env": "KVISA365COM",         "daily": 3},
     {"url": "https://koreawedding365.com",   "lang": "en", "theme": "Wedding",              "mode": "blog", "keywords_file": ".github/workflows/keywords_kwedding.txt",        "wp_pass_env": "KOREAWEDDING365COM",  "daily": 3},
     {"url": "https://kstudy365.com",         "lang": "en", "theme": "Study in Korea",       "mode": "blog", "keywords_file": ".github/workflows/keywords_kstudy365.txt",       "wp_pass_env": "KSTUDY365COM",        "daily": 3},
     {"url": "https://studyinkorea365.com",   "lang": "en", "theme": "International Students","mode": "blog","keywords_file": ".github/workflows/keywords_studyinkorea365.txt",  "wp_pass_env": "STUDYINKOREA365COM",  "daily": 3},
-    {"url": "https://jobkorea365.com",       "lang": "en", "theme": "Employment",           "mode": "blog", "keywords_file": ".github/workflows/keywords_jobkorea365.txt",     "wp_pass_env": "JOBKOREA365COM",      "daily": 3},
+    {"url": "https://jobkorea365.com",       "lang": "en", "theme": "Employment",           "mode": "blog", "keywords_file": ".github/workflows/keywords_jobkorea365.txt",      "wp_pass_env": "JOBKOREA365COM",      "daily": 3},
     {"url": "https://jobinkorea365.com",     "lang": "en", "theme": "Jobs in Korea",        "mode": "blog", "keywords_file": ".github/workflows/keywords_jobinkorea365.txt",   "wp_pass_env": "JOBINKOREA365COM",    "daily": 3},
     {"url": "https://jobkoreaglobal.com",    "lang": "en", "theme": "Recruitment",          "mode": "blog", "keywords_file": ".github/workflows/keywords_jobkoreaglobal.txt",  "wp_pass_env": "JOBKOREAGLOBALCOM",   "daily": 3},
     {"url": "https://korea365.org",          "lang": "en", "theme": "Korea Culture",        "mode": "blog", "keywords_file": ".github/workflows/keywords_korea365.txt",        "wp_pass_env": "KOREA365ORG",         "daily": 4},
@@ -245,7 +242,7 @@ EXTERNAL_AUTHORITY_LINKS = {
     "Insurance": [("Financial Services Commission","https://www.fsc.go.kr/eng"),("National Health Insurance Service","https://www.nhis.or.kr/english")],
     "Wedding": [("Visit Korea","https://english.visitkorea.or.kr"),("Korea.net","https://www.korea.net")],
     "Technology": [("Ministry of Science and ICT","https://www.msit.go.kr/eng"),("NIPA","https://www.nipa.kr/home/eng")],
-    "K-POP": [("Korea.net","https://www.korea.net"),("Korean Culture and Information Service","https://www.kocis.go.kr")],
+    "K-POP": [("Korea.net","https://www.korea.net"), "Korean Culture and Information Service","https://www.kocis.go.kr"],
     "Seoul Lifestyle": [("Seoul Metropolitan Government","https://english.seoul.go.kr"),("Visit Korea","https://english.visitkorea.or.kr")],
 }
 
@@ -276,7 +273,6 @@ def load_keyword(filename, fallback):
         pass
     return fallback
 
-# ★ RSS 크롤링 실패 시 사용할 다양한 뉴스 키워드 풀 (고정 반복 방지)
 NEWS_FALLBACK_KEYWORDS = [
     ("한국 부동산 정책 동향", "최근 부동산 정책 변화와 시장 영향을 심층 분석합니다."),
     ("한국은행 기준금리 전망", "기준금리 결정 배경과 향후 경제 전망을 다룹니다."),
@@ -301,7 +297,6 @@ NEWS_FALLBACK_KEYWORDS = [
 ]
 
 def crawl_rss_news():
-    """RSS 피드에서 최신 뉴스 제목을 가져오되, 실패 시 다양한 키워드 풀에서 랜덤 선택 (고정 반복 방지)"""
     try:
         res = requests.get("https://fs.khan.co.kr/rss/rssdata/total_news.xml", timeout=10)
         soup = BeautifulSoup(res.text, 'xml')
@@ -313,8 +308,7 @@ def crawl_rss_news():
             if title and len(title) >= 5:
                 return title, desc
     except Exception as e:
-        print(f"  ⚠️ RSS 크롤링 실패, 키워드 풀에서 대체 선택: {e}")
-    # ★ RSS 실패 시 매번 다른 키워드 선택 (고정 반복 방지)
+        print(f"   ⚠️ RSS 크롤링 실패, 키워드 풀에서 대체 선택: {e}")
     return random.choice(NEWS_FALLBACK_KEYWORDS)
 
 # ============================================================
@@ -338,10 +332,16 @@ TITLE_STYLES_EN = [
 def pick_title_style(lang):
     return random.choice(TITLE_STYLES_KO if lang == "ko" else TITLE_STYLES_EN)
 
+# ============================================================
+# ★ 보완 완료된 최종 프롬프트 생성 함수 (복사 영역)
+# ============================================================
 def make_seo_prompt(keyword, theme, lang, mode="blog"):
     reporter      = random.choice(REPORTERS)
     tag_lang      = "영어로" if lang == "en" else "한국어로"
     title_style   = pick_title_style(lang)
+
+    # 테마 분석 기반 의학 조건 설정
+    is_medical = "건강" in theme or "medical" in theme.lower()
 
     if mode == "news":
         return f"""
@@ -352,59 +352,56 @@ def make_seo_prompt(keyword, theme, lang, mode="blog"):
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위에 '◇ {reporter}' 한 줄 삽입.
 3. 분량: HTML(h2,h3,p,strong,ul,li)만 사용해 최소 1800자 이상.
-4. ★ 통계/수치 강제: 본문 안에 구체적인 숫자·통계·비율·금액을 최소 3개 이상 명시적으로 포함 (예: "23% 증가", "약 150만 명", "2024년 대비 12.5%p 상승" 등 막연한 표현 금지, 반드시 숫자로 표기).
-5. ★ 출처 강제: 통계 옆에 출처 기관명을 괄호로 명시 (예: "(통계청, 2026)", "(한국은행 발표)").
-6. ★ 내부 링크 강제: 본문 중간에 자연스러운 문맥으로 최소 4개 이상의 내부 링크 자리를 위해 관련 주제를 언급 (시스템이 자동으로 링크 삽입할 수 있도록 키워드성 문구 포함).
-7. ★ 외부 권위 링크 강제: 정부기관·통계청·연구기관 등 공신력 있는 기관명을 본문에 최소 3회 이상 언급.
-8. E-E-A-T: 전문가 인터뷰 인용구 최소 1개 포함.
-9. 구조: h2 최소 3개, 단락은 3~4문장 이내.
-10. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
-11. ★ 메타 디스크립션: 본문 끝에 'META_DESC:' 로 시작, 정확히 130~140자 (한글 기준) 분량으로 작성. 너무 짧거나 길면 안 됨.
-12. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
-13. ★ 태그: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드. 각 태그는 최대 3단어(약 15자) 이내로 짧고 핵심적으로 작성. 첫 번째는 반드시 '{keyword}'.
+4. ★ 모바일 가독성 강제 최적화: 모바일 가독성을 위해 모든 문장 사이에 반드시 한 줄 이상의 공백(<br> 또는 완벽히 분리된 <p> 태그)을 두고, 문단을 극도로 짧게(한 단락에 2~3문장 이내) 쪼개어 배치하세요. 텍스트 블록이 빽빽하게 뭉치면 절대 안 됩니다.
+5. ★ 통계/수치 강제: 본문 안에 구체적인 숫자·통계·비율·금액을 최소 3개 이상 명시적으로 포함 (예: "23% 증가", "약 150만 명", "2024년 대비 12.5%p 상승" 등 막연한 표현 금지, 반드시 숫자로 표기).
+6. ★ 출처 강제: 통계 옆에 출처 기관명을 괄호로 명시 (예: "(통계청, 2026)", "(한국은행 발표)").
+7. ★ 카테고리 일치 내부 링크 수립: 본문 중간 자연스러운 문맥으로 최소 4개 이상의 내부 링크 자리를 마련하되, 반드시 현재 카테고리인 '{theme}'와 어울리는 유기적인 주제로만 한정하세요. 전혀 관련 없는 다른 허브 테마(예: 웨딩, 뷰티, K-POP, 투자 등)를 섞어 쓰는 스팸성 링크 배열은 절대 금지합니다.
+8. ★ 외부 권위 링크 강제: 정부기관·통계청·연구기관 등 공신력 있는 기관명을 본문에 최소 3회 이상 언급.
+9. E-E-A-T: 전문가 인터뷰 인용구 최소 1개 포함.
+10. 구조: h2 최소 3개.
+11. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
+12. ★ 메타 디스크립션: 본문 끝에 'META_DESC:' 로 시작, 정확히 130~140자 (한글 기준) 분량으로 작성. 너무 짧거나 길면 안 됨.
+13. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
+14. ★ 태그 생성 알고리즘 제어: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드. 각 태그는 최대 3단어(약 15자) 이내로 짧고 핵심적으로 작성. 첫 번째는 반드시 '{keyword}'.
+    - {'[주의] 의학/질병 관련 키워드이므로 태그 조합 시 "#증상 효능", "#증상 가격" 같이 의미가 맞지 않는 무작위 자동조합은 절대 배제하세요. 대신 "원인", "치료법", "관리", "검사" 등의 단어로 매칭할 것.' if is_medical else '문맥상 완벽히 일치하는 자연스러운 키워드로만 조율할 것.'}
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS
 """
-    persona = "의학 박사" if "건강" in theme or "medical" in theme.lower() else "산업 분야 최고 전문 자문위원"
+
+    persona = "의학 박사" if is_medical else "산업 분야 최고 전문 자문위원"
+    
     return f"""
-당신은 {persona}이자 15년 경력의 SEO 콘텐츠 마스터 프로라이터입니다.
+당신은 {persona}이자 15년 경력의 글로벌 최고 권위 SEO 콘텐츠 마스터 프로라이터입니다.
 주제: '{keyword}' ({theme}) / 언어: {lang}
 
-[필수 지침 — 구글 애드센스 품질 평가 90점 이상, 아래 조건은 전부 강제 적용]
-1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,tr,td 태그만. 마크다운 금지.
-2. 분량: 최소 1800자 이상, 깊이 있는 상세 내용.
-3. 키워드: 첫 단락 문두에 '{keyword}' 배치, 전체 10회 이상 자연스럽게 삽입.
-4. 구조: h2 최소 5개, h3 최소 4개, ul/li 리스트 3개 이상, 비교 table 1개 이상.
-5. ★ 통계/수치 강제: 본문 안에 구체적인 숫자·통계·비율·금액·기간을 최소 3개 이상 명시적으로 포함. 막연한 표현("많은", "대부분") 대신 반드시 숫자로 표기 (예: "73%의 응답자", "평균 450,000원", "최근 5년간").
-6. ★ 출처 강제: 통계 옆에 출처를 괄호로 명시 (예: "(KOSIS, 2026)", "(NIH 연구결과)", "(보건복지부 자료)").
-7. ★ 내부 링크 강제: 본문 중간 자연스러운 문맥에서 관련 주제 최소 4곳 이상 언급하여 내부 링크 삽입이 가능하도록 구성.
-8. ★ 외부 권위 링크 강제: 정부기관·학회·국제기구 등 공신력 있는 기관명을 본문에 최소 3회 이상 언급.
-9. E-E-A-T: 전문가 인용 또는 실제 경험 기반 디테일(가격대, 기간, 절차 등) 최소 2곳 포함.
-10. 단락: 3~4문장 이내로 짧게 끊기.
+[필수 지침 — 구글 애드센스 품질 평가 및 구글 상위 노출 95점 이상 획득 기준]
+1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,tr,td 태그만. 마크다운(##, **, - 등) 절대 금지.
+2. 분량: 공백 제외 최소 2500자 이상의 깊이 있고 전문성이 고도로 집중된 상세 내용.
+3. ★ 모바일 독자 최적화 레이아웃 (체류 시간 증대): 모바일 가독성을 완벽하게 보장하기 위해 '모든 문장 사이에 반드시 한 줄 이상의 빈 줄 공백(<br> 또는 완전한 단락 공백)'을 삽입하고, 한 문단(<p>)은 '최대 2문장 이하'로 매우 짧게 동강 내어 구성하세요. 텍스트가 빽빽하면 품질 점수가 깎입니다.
+4. 키워드: 첫 단락 문두에 '{keyword}' 배치, 전체 10회 이상 자연스럽게 삽입.
+5. 구조: h2 최소 5개, h3 최소 4개, ul/li 리스트 3개 이상, 정밀 데이터 비교 table 1개 이상.
+6. ★ 통계/수치 강제: 본문 안에 구체적인 숫자·통계·비율·금액·기간을 최소 3개 이상 명시적으로 포함. 막연한 표현("많은", "대부분") 대신 반드시 숫자로 표기 (예: "73%의 응답자", "평균 450,000원", "최근 5년간").
+7. ★ 출처 강제: 통계 옆에 출처를 괄호로 명시 (예: "(KOSIS, 2026)", "(NIH 연구결과)", "(보건복지부 자료)").
+8. ★ 단일 테마 컨텍스트 유지 (중요): 본문 중간 자연스러운 문맥에서 내부 링크 삽입이 가능하도록 관련 키워드를 배치하되, 반드시 현재 도메인 테마인 '{theme}' 카테고리에 완벽하게 종속되는 내용이어야 합니다. 하단 링크 섹션이나 본문 내에 서로 다른 도메인 카테고리(예: K-Beauty, 뷰티 리뷰, 웨딩, 취업 등)의 키워드를 무작위 스팸 형태로 섞는 행위를 완벽히 금지합니다.
+9. ★ 외부 권위 링크 강제: 정부기관·학회·국제기구 등 공신력 있는 기관명을 본문에 최소 3회 이상 언급.
+10. E-E-A-T 기반 실제 경험: {persona}로서의 실무/임상 전문성을 입증할 수 있는 디테일한 진행 절차, 실제 기간, 실질적 비용대 등의 예시를 최소 2곳 이상 반영할 것.
 11. 제목 스타일: {title_style} / 출력 첫 줄에 'TITLE:' 로 시작하는 제목 한 줄.
 12. ★ 메타 디스크립션: 본문 끝에 'META_DESC:' 로 시작, 정확히 130~140자(영문은 130~155자) 분량으로 작성. 너무 짧거나 길면 안 됨.
 13. FAQ: META_DESC 다음 'FAQ_START' ~ 'FAQ_END' 블록에 Q:/A: 형식 3문항.
-14. ★ 태그: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드. 각 태그는 최대 3단어(약 15자) 이내로 짧고 핵심적으로 작성 (긴 구문 금지). 첫 번째는 반드시 '{keyword}'.
+14. ★ 태그 조합 무결성 검증: FAQ_END 다음 'TAGS:' 로 시작, {TAG_COUNT}개 {tag_lang} 키워드. 각 태그는 최대 3단어(약 15자) 이내로 짧고 핵심적으로 작성 (긴 구문 절대 금지). 첫 번째는 반드시 '{keyword}'.
+    - {'[크리티컬 감점 예방] 의학/질병 관련 글이므로 "#공황장애 증상 가격", "#공황장애 증상 효능" 처럼 문맥에 맞지 않는 조잡한 태그 조합을 생성하지 마십시오. 대신 "원인", "치료법", "예방", "체크리스트" 등과 조합하세요.' if is_medical else '주제 문맥에 완벽히 일치하는 전문 키워드로만 세팅하세요.'}
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS
 """
 
 # ============================================================
-# 파싱
+# 파싱 및 나머지 유틸리티 함수들 (기존 유지)
 # ============================================================
 def extract_meta_and_faq(text):
-    """
-    ★ 제목 추출 로직 강화:
-    1순위: 'TITLE:' 줄 (정상 케이스)
-    2순위: '**TITLE:**' 같은 마크다운 볼드로 감싼 경우도 인식
-    3순위: TITLE: 자체가 없으면 본문 첫 <h1>...</h1> 내용을 제목으로 사용
-    4순위: 그래도 없으면 빈 문자열 반환 (publish_post의 fallback이 처리)
-    """
     import re as _re3
     title = ""; meta_desc = ""; faq_list = []
     lines = text.split("\n"); out_lines = []
     in_faq = False; cur_q = None
     for line in lines:
         s = line.strip()
-        # ── TITLE 인식 강화: 'TITLE:', '**TITLE:**', '## TITLE:' 등 모두 처리 ──
         s_clean = s.lstrip('#').lstrip('*').strip()
         if s_clean.upper().startswith("TITLE:"):
             title = s_clean.split(":",1)[1].strip() if ":" in s_clean else ""
@@ -425,7 +422,6 @@ def extract_meta_and_faq(text):
 
     title = title.strip('"').strip("'").strip("*").strip()
 
-    # ── ★ TITLE: 자체가 없었던 경우 → 본문의 첫 <h1> 태그에서 추출 ──
     if not title or len(title) < 8:
         body_text = "\n".join(out_lines)
         h1_match = _re3.search(r'<h1[^>]*>(.*?)</h1>', body_text, _re3.DOTALL | _re3.IGNORECASE)
@@ -434,8 +430,6 @@ def extract_meta_and_faq(text):
             extracted = extracted.strip('"').strip("'").strip("*").strip()
             if len(extracted) >= 8:
                 title = extracted
-                # 본문에서 중복되지 않도록 h1은 그대로 두되 제목으로도 사용
-        # h1도 없으면 첫 번째 비어있지 않은 텍스트 줄을 시도 (최후 수단)
         if not title:
             for ol in out_lines:
                 plain = _re3.sub(r'<[^>]+>', '', ol).strip()
@@ -454,7 +448,6 @@ def build_fallback_tag_pool(kw, theme=None, lang="ko"):
     return pool
 
 def _truncate_tag(tag: str, max_words: int = 3, max_chars: int = 20) -> str:
-    """★ 태그를 강제로 최대 3단어/20자 이내로 자름 (긴 구문 태그 방지)"""
     words = tag.strip().split()
     if len(words) > max_words:
         tag = " ".join(words[:max_words])
@@ -475,11 +468,10 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
     article_body = "\n".join(body_lines).strip()
     if not tags: tags = [fallback_keyword]
 
-    # ★ 메인 키워드를 제외한 나머지 태그는 길이 강제 제한 (3단어/20자)
     kk = fallback_keyword.strip().lower()
     tags = [t for t in tags if t.strip().lower() != kk]
     tags = [_truncate_tag(t) for t in tags]
-    tags.insert(0, fallback_keyword)  # 메인 키워드는 원문 그대로 유지
+    tags.insert(0, fallback_keyword)
 
     seen = set(); deduped = []
     for t in tags:
@@ -500,14 +492,9 @@ def extract_tags_from_article(article_text, fallback_keyword, theme=None, lang="
             i += 1
     return article_body, tags
 
-# ============================================================
-# ★ 이미지 검색 (한국어 자동 번역 fallback 포함)
-# ============================================================
 def is_site_reachable(site_url, timeout=8):
-    """★ 디버그 강화: 실패 원인을 정확히 출력 (DNS/타임아웃/연결거부/SSL 등 구분)"""
     try:
         r = requests.head(f"{site_url}/wp-json/", timeout=timeout, allow_redirects=True)
-        # HTTP 상태코드가 뭐가 됐든(403, 404 포함) 일단 "서버에 도달은 했다"는 의미이므로 reachable로 간주
         return True
     except requests.exceptions.ConnectionError as e:
         print(f"    🔍 [reachability] ConnectionError: {str(e)[:200]}")
@@ -557,545 +544,16 @@ def get_images_from_pexels(query, need):
     return urls
 
 def get_multiple_images(keyword, count=3):
-    """한국어 키워드 → 영어 번역 후 이미지 검색. Pixabay 우선, Pexels 보충."""
     has_korean = any('\uac00' <= c <= '\ud7a3' for c in keyword)
     q = keyword.encode('ascii','ignore').decode().strip()
     urls = []
-
     if has_korean or not q:
         en_query = translate_ko_to_en_for_image(keyword)
-        print(f"  🔄 이미지 검색 번역: '{keyword}' → '{en_query}'")
-        urls += get_images_from_pixabay(en_query, count)
+        urls.extend(get_images_from_pixabay(en_query, count))
         if len(urls) < count:
-            urls += get_images_from_pexels(en_query, count - len(urls))
+            urls.extend(get_images_from_pexels(en_query, count - len(urls)))
     else:
-        urls += get_images_from_pixabay(q, count)
+        urls.extend(get_images_from_pixabay(keyword, count))
         if len(urls) < count:
-            urls += get_images_from_pexels(q, count - len(urls))
-
-    # 최종 fallback
-    if len(urls) < count:
-        fb = "Korea lifestyle people"
-        urls += get_images_from_pixabay(fb, count - len(urls))
-        if len(urls) < count:
-            urls += get_images_from_pexels(fb, count - len(urls))
-
-    return urls[:count]
-
-def upload_to_wp_media(site_url, wp_pass, img_url, keyword, idx, alt_text=""):
-    try:
-        img_data = requests.get(img_url, timeout=10).content
-        filename = f"seo-{keyword.encode('ascii','ignore').decode().replace(' ','-')}-{idx}.jpg"
-        headers  = {"Content-Disposition": f"attachment; filename={filename}", "Content-Type": "image/jpeg"}
-        res = requests.post(f"{site_url}/wp-json/wp/v2/media", data=img_data, headers=headers, auth=(WP_USER, wp_pass), timeout=20)
-        if res.status_code == 201:
-            media_id = res.json().get("id")
-            if media_id and alt_text:
-                try:
-                    requests.post(f"{site_url}/wp-json/wp/v2/media/{media_id}",
-                                  json={"alt_text": alt_text, "caption": alt_text},
-                                  auth=(WP_USER, wp_pass), timeout=10)
-                except: pass
-            return media_id
-    except: pass
-    return None
-
-# ============================================================
-# 링크 빌더
-# ============================================================
-def build_spider_web_links(keyword, current_url, lang, link_count=6):
-    others   = [s for s in SITES_CONFIG if s['url'] != current_url]
-    selected = random.sample(others, k=min(link_count, len(others)))
-    html = "<div style='margin-top:30px;background:#f9f9f9;padding:15px;border-left:4px solid #0066cc;'>"
-    html += f"<h4>🔗 {keyword} 연관 인기 가이드</h4><ul style='list-style:none;padding-left:0;'>"
-    for s in selected:
-        anchor = f"✨ [{s['theme']}] {keyword} 관련 연관 분석" if lang=='ko' else f"✨ {keyword} Extensive Industry Report"
-        html += f"<li style='margin-bottom:8px;'><a href='{s['url']}/?s={requests.utils.quote(keyword)}' target='_blank' rel='noopener'>{anchor}</a></li>"
-    html += "</ul></div>"
-    return html
-
-def build_related_search_links(keyword, lang):
-    words = [f"{keyword} 효능",f"{keyword} 부작용",f"{keyword} 가격",f"{keyword} 추천",f"{keyword} 비교"] if lang=='ko' \
-            else [f"{keyword} cost",f"{keyword} review",f"{keyword} comparison",f"{keyword} guide",f"best {keyword}"]
-    html  = "<div style='margin-top:20px;border-top:1px dashed #ccc;padding-top:15px;'><strong>💡 연관 검색어: </strong>"
-    links = [f"<a href='?s={requests.utils.quote(w)}' style='color:#555;text-decoration:underline;margin-right:10px;'>#{w}</a>" for w in words]
-    return html + ", ".join(links) + "</div>"
-
-def build_external_authority_links(theme, lang, link_count=4):
-    pool = EXTERNAL_AUTHORITY_LINKS.get(theme) or \
-           EXTERNAL_AUTHORITY_LINKS.get("default_en" if lang=="en" else "한국 뉴스", [])
-    if not pool: return ""
-    selected = random.sample(pool, k=min(link_count, len(pool)))
-    label    = "📚 참고자료 및 공식 출처" if lang=="ko" else "📚 References & Official Sources"
-    html  = f"<div style='margin-top:25px;background:#eef5ff;padding:15px;border-left:4px solid #1a73e8;'><h4>{label}</h4><ul style='padding-left:20px;'>"
-    for name, url in selected:
-        html += f"<li><a href='{url}' target='_blank' rel='nofollow noopener'>{name}</a></li>"
-    return html + "</ul></div>"
-
-def build_faq_html_and_schema(faq_list, lang):
-    if not faq_list: return "", ""
-    label = "❓ 자주 묻는 질문" if lang=="ko" else "❓ Frequently Asked Questions"
-    html  = f"<div style='margin-top:30px;'><h2>{label}</h2>"
-    schema_items = []
-    for q, a in faq_list:
-        html += f"<h3>{q}</h3><p>{a}</p>"
-        qe = q.replace('"','\\"'); ae = a.replace('"','\\"')
-        schema_items.append('{"@type":"Question","name":"%s","acceptedAnswer":{"@type":"Answer","text":"%s"}}' % (qe,ae))
-    html += "</div>"
-    schema = '<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[%s]}</script>' % ",".join(schema_items)
-    return html, schema
-
-# ============================================================
-# ★ SEO 점수 계산 (개선)
-# ============================================================
-def estimate_seo_score(keyword, title, plain_len, meta_desc, img_count, faq_count, tag_count,
-                       rank_math_applied, internal_links=0, external_links=0, stat_count=0):
-    """
-    ★ 강화된 SEO 점수 (100점 만점)
-    - 제목 키워드 포함:        10점
-    - 본문 길이:               15점
-    - 메타 디스크립션(130~140자 정확히): 15점
-    - 이미지 2~3장:            15점
-    - 내부 링크 4개 이상:       10점  ★ 신규
-    - 외부 링크 3개 이상:       10점  ★ 신규
-    - 통계/수치 3개 이상:       10점  ★ 신규
-    - FAQ:                     5점
-    - 태그:                    5점
-    - Rank Math 반영:          5점
-    """
-    score = 0
-    if keyword.lower() in title.lower():
-        score += 10
-    if plain_len >= MIN_BODY_LENGTH:
-        score += 15
-    elif plain_len >= 1200:
-        score += 9
-    elif plain_len >= 800:
-        score += 4
-
-    # ★ 메타 디스크립션: 130~140자(한글) / 130~155자(영문) 정확히 맞아야 만점
-    if meta_desc:
-        mlen = len(meta_desc)
-        if 130 <= mlen <= 155:
-            score += 15
-        elif 100 <= mlen <= 170:
-            score += 9
-        else:
-            score += 4
-
-    score += min(15, img_count * 5)  # 이미지 장당 5점, 최대 3장
-
-    # ★ 내부 링크 (4개 이상 만점)
-    score += min(10, int(10 * internal_links / 4)) if internal_links else 0
-
-    # ★ 외부 링크 (3개 이상 만점)
-    score += min(10, int(10 * external_links / 3)) if external_links else 0
-
-    # ★ 통계/수치 포함 여부 (본문 내 숫자 패턴 개수 기반, 3개 이상 만점)
-    score += min(10, int(10 * stat_count / 3)) if stat_count else 0
-
-    score += min(5, faq_count * 2)
-    if TAG_COUNT > 0:
-        score += min(5, int(5 * tag_count / TAG_COUNT))
-    if rank_math_applied:
-        score += 5
-
-    return min(100, score)
-
-def count_statistics_in_body(html_body: str) -> int:
-    """본문에서 통계/수치 패턴 개수를 추정 (숫자+%, 숫자+명/원/년 등)"""
-    import re as _re4
-    plain = _re4.sub(r'<[^>]+>', ' ', html_body)
-    patterns = [
-        r'\d+[.,]?\d*\s*%',                    # 23%, 12.5%
-        r'\d+[.,]?\d*\s*(명|개|원|건|배|회)',     # 150만 명, 3배
-        r'\d{4}년',                               # 2026년
-        r'\d+[.,]?\d*\s*(percent|million|billion|times)',  # 영문 통계
-    ]
-    count = 0
-    for p in patterns:
-        count += len(_re4.findall(p, plain))
-    return count
-
-# ============================================================
-# ★ 로그 및 구글시트 전송 (컬럼 완전 개편 + 3회 재시도)
-# 컬럼 순서: 기록시각 | 사이트 | 키워드 | 제목 | 모델 | 이미지수 | 이미지출처 | 글자수 | SEO점수 | 태그수 | RankMath | 상태 | 회차 | URL | 오류메시지
-# ============================================================
-RUN_LOG = []
-
-def record_result(site_url, title, keyword="", model="", tag_count=0,
-                   img_count=0, img_source="", plain_len=0,
-                   internal_links=0, external_links=0, faq_count=0,
-                   rank_math_applied=False, seo_score=0,
-                   status="success", post_url="", error_msg=""):
-    RUN_LOG.append({
-        "기록시각":   now_kst().strftime("%Y-%m-%d %H:%M:%S"),
-        "사이트":     site_url,
-        "키워드":     keyword,
-        "제목":       title,
-        "모델":       model,
-        "SEO점수":    seo_score,
-        "글자수":     plain_len,
-        "이미지수":   img_count,
-        "이미지출처": img_source,
-        "내부링크수": internal_links,
-        "외부링크수": external_links,
-        "태그수":     tag_count,
-        "FAQ수":      faq_count,
-        "RankMath":   "✅ 적용" if rank_math_applied else "❌ 미적용",
-        "상태":       status,
-        "회차":       RUN_SLOT,
-        "URL":        post_url,
-        "오류메시지": error_msg,
-    })
-
-def flush_log_to_google_sheet():
-    """★ 구글시트 전송 — 3회 재시도, 컬럼 완전 정렬"""
-    if not SHEETS_WEBHOOK:
-        print("⚠️ SHEETS_WEBHOOK 미설정 — 로그 전송 스킵")
-        return
-    if not RUN_LOG:
-        print("ℹ️ 이번 회차에 기록할 로그가 없습니다.")
-        return
-
-    success_count = sum(1 for r in RUN_LOG if r["상태"] == "success")
-    fail_count    = len(RUN_LOG) - success_count
-
-    payload = {
-        "type":     "summary",
-        "run_slot": RUN_SLOT,
-        "run_time": now_kst().strftime("%Y-%m-%d %H:%M:%S"),
-        "total":    len(RUN_LOG),
-        "success":  success_count,
-        "fail":     fail_count,
-        "columns":  ["기록시각","회차","사이트","키워드","제목","모델","SEO점수","글자수","이미지수","이미지출처","내부링크수","외부링크수","태그수","FAQ수","RankMath","상태","URL","오류메시지"],
-        "entries":  RUN_LOG,
-    }
-
-    last_error = None
-    for attempt in range(1, 4):
-        try:
-            res = requests.post(SHEETS_WEBHOOK, json=payload, timeout=20)
-            if res.status_code in (200, 201, 302):
-                print(f"📊 구글 스프레드시트 전송 완료: 총 {len(RUN_LOG)}건 (성공 {success_count} / 실패 {fail_count})")
-                return
-            else:
-                last_error = f"HTTP {res.status_code}: {res.text[:200]}"
-                print(f"  ⚠️ 시트 전송 시도 {attempt}/3 — 응답코드 {res.status_code}")
-        except Exception as e:
-            last_error = str(e)
-            print(f"  ⚠️ 시트 전송 시도 {attempt}/3 실패: {e}")
-        if attempt < 3:
-            time.sleep(5 * attempt)
-    print(f"  ❌ 구글 스프레드시트 최종 전송 실패: {last_error}")
-
-# ============================================================
-# Gemini 호출
-# ============================================================
-def generate_with_retry(prompt, max_retries=3):
-    global GEMINI_MODEL, _gemini_fallback_active
-    model = GEMINI_MODEL_FALLBACK if _gemini_fallback_active else GEMINI_MODEL_PRIMARY
-    GEMINI_MODEL = model
-    last_exception = None
-    for attempt in range(1, max_retries + 1):
-        try:
-            res = gemini_client.models.generate_content(model=model, contents=prompt)
-            if res and res.text: return res.text
-        except Exception as e:
-            last_exception = e
-            err_str = str(e)
-            is_rate_limit = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str
-            wait = 20 * attempt if is_rate_limit else 5 * attempt
-            print(f"  ⚠️ Gemini 호출 실패 ({model}, 시도 {attempt}/{max_retries}): {e}")
-            if attempt < max_retries:
-                print(f"     {wait}초 대기 후 재시도...")
-                time.sleep(wait)
-
-    if not _gemini_fallback_active and model == GEMINI_MODEL_PRIMARY:
-        err_str = str(last_exception) if last_exception else ""
-        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-            print(f"  🔄 {GEMINI_MODEL_PRIMARY} 한도 소진 → {GEMINI_MODEL_FALLBACK} 전환")
-            _gemini_fallback_active = True
-            GEMINI_MODEL = GEMINI_MODEL_FALLBACK
-            try:
-                res = gemini_client.models.generate_content(model=GEMINI_MODEL_FALLBACK, contents=prompt)
-                if res and res.text: return res.text
-            except Exception as e2:
-                last_exception = e2
-
-    if last_exception: raise last_exception
-    return ""
-
-# ============================================================
-# 태그 ID 변환
-# ============================================================
-def get_or_create_tag_ids(site_url, wp_pass, tag_names):
-    tag_ids = []
-    for name in tag_names:
-        try:
-            sr = requests.get(f"{site_url}/wp-json/wp/v2/tags", params={"search": name, "per_page": 5},
-                              auth=(WP_USER, wp_pass), timeout=10)
-            existing = None
-            if sr.status_code == 200:
-                for t in sr.json():
-                    if t.get("name","").strip().lower() == name.strip().lower():
-                        existing = t; break
-            if existing: tag_ids.append(existing["id"]); continue
-            cr = requests.post(f"{site_url}/wp-json/wp/v2/tags", json={"name": name},
-                               auth=(WP_USER, wp_pass), timeout=10)
-            if cr.status_code in (200,201):
-                tag_ids.append(cr.json()["id"])
-            elif cr.status_code == 400:
-                d = cr.json()
-                eid = d.get("data",{}).get("term_id") or d.get("term_id")
-                if eid: tag_ids.append(eid)
-        except Exception as e:
-            print(f"  ⚠️ 태그 처리 실패 ({name}): {e}")
-    return tag_ids
-
-# ============================================================
-# ★ Rank Math PATCH 재시도
-# ============================================================
-def try_register_and_patch_rank_math(site_url, wp_pass, post_id, rank_math_meta):
-    try:
-        pr = requests.post(f"{site_url}/wp-json/wp/v2/posts/{post_id}",
-                           json={"meta": rank_math_meta},
-                           auth=(WP_USER, wp_pass), timeout=15)
-        if pr.status_code == 200:
-            pm = pr.json().get("meta", {}) or {}
-            if pm.get("rank_math_focus_keyword") == rank_math_meta.get("rank_math_focus_keyword"):
-                return True
-    except Exception as e:
-        print(f"  ⚠️ Rank Math PATCH 실패: {e}")
-    return False
-
-# ============================================================
-# 포스팅 메인
-# ============================================================
-def publish_post(site, keyword, theme, lang, mode, category_ids):
-    wp_pass = os.getenv(site['wp_pass_env'])
-    if not wp_pass:
-        print(f"⏭️  {site['url']} — Secret '{site['wp_pass_env']}' 없음, 스킵")
-        record_result(site['url'], f"(skip) {keyword}", keyword=keyword,
-                      status="skip_no_password", error_msg=f"Secret {site['wp_pass_env']} not found")
-        return False
-
-    if not is_site_reachable(site['url']):
-        time.sleep(5)
-        if not is_site_reachable(site['url']):
-            print(f"⏭️  {site['url']} — 사이트 응답 없음, 스킵")
-            record_result(site['url'], f"(skip) {keyword}", keyword=keyword,
-                          status="skip_unreachable", error_msg="site unreachable")
-            return False
-
-    prompt = make_seo_prompt(keyword, theme, lang, mode)
-    try:
-        raw_text   = generate_with_retry(prompt)
-        used_model = GEMINI_MODEL
-    except Exception as e:
-        print(f"  ❌ Gemini 생성 최종 실패 ({site['url']}): {e}")
-        record_result(site['url'], keyword, keyword=keyword, model=GEMINI_MODEL,
-                      status="fail_gemini", error_msg=str(e)[:200])
-        return False
-
-    if len(raw_text) < 300:
-        print(f"  ⚠️ 본문 너무 짧음, 스킵")
-        record_result(site['url'], keyword, keyword=keyword, model=used_model,
-                      status="fail_short_body", error_msg="raw_text < 300 chars")
-        return False
-
-    body_with_tags, gemini_title, meta_desc, faq_list = extract_meta_and_faq(raw_text)
-    article_body,   tag_names                          = extract_tags_from_article(body_with_tags, keyword, theme=theme, lang=lang)
-
-    plain_len = len(BeautifulSoup(article_body, "html.parser").get_text())
-    if plain_len < MIN_BODY_LENGTH:
-        print(f"  ⚠️ 본문 글자수 부족({plain_len}자 < {MIN_BODY_LENGTH}자) — 발행 진행")
-
-    if not meta_desc:
-        plain_for_meta = BeautifulSoup(article_body, "html.parser").get_text()
-        meta_desc = (plain_for_meta[:137] + "...") if len(plain_for_meta) > 140 else plain_for_meta
-    # ★ 메타 디스크립션 길이 강제 보정: 130~140자(한글) 범위 벗어나면 자르기/패딩
-    if len(meta_desc) > 155:
-        meta_desc = meta_desc[:152] + "..."
-
-    # ★ 이미지 검색 (한국어 자동 번역)
-    img_urls  = get_multiple_images(keyword, 3)
-    media_ids = []; img_source = "none"
-    for idx, url in enumerate(img_urls):
-        alt = f"{keyword} - {theme}" if lang != 'ko' else f"{keyword} 관련 이미지"
-        mid = upload_to_wp_media(site['url'], wp_pass, url, keyword, idx, alt_text=alt)
-        if mid:
-            media_ids.append(mid)
-            if img_source == "none": img_source = "pixabay/pexels"
-    if not media_ids:
-        print(f"  ℹ️ 이미지 0장 — 이미지 없이 발행 진행")
-    else:
-        print(f"  🖼️ 이미지 {len(media_ids)}장 업로드 완료")
-
-    tag_ids = get_or_create_tag_ids(site['url'], wp_pass, tag_names)
-    if not tag_ids and tag_names:
-        print(f"  ⚠️ 태그 ID 변환 실패, 재시도 1회...")
-        time.sleep(3)
-        tag_ids = get_or_create_tag_ids(site['url'], wp_pass, tag_names)
-    print(f"  🏷️ 태그 {len(tag_ids)}/{len(tag_names)}개 확보 (메인: {tag_names[0]})")
-
-    faq_html, faq_schema = build_faq_html_and_schema(faq_list, lang)
-    article_body += build_spider_web_links(keyword, site['url'], lang)
-    article_body += build_related_search_links(keyword, lang)
-    article_body += build_external_authority_links(theme, lang)
-    if faq_html:   article_body += faq_html
-    if faq_schema: article_body += faq_schema
-
-    if gemini_title and len(gemini_title) >= 8:
-        title = gemini_title
-        if keyword.lower() not in title.lower(): title = f"{title} ({keyword})"
-    else:
-        title = f"[속보] {keyword}" if (lang=='ko' and mode=='news') else \
-                (f"{keyword} 정보 완벽 정리" if lang=='ko' else f"The Essential Guide to {keyword}")
-
-    focus_keywords = [keyword] + [t for t in tag_names[1:5] if t.lower() != keyword.lower()]
-    rank_math_meta = {
-        "rank_math_focus_keyword": ",".join(focus_keywords),
-        "rank_math_description":   meta_desc,
-    }
-
-    payload = {
-        "title": title, "content": article_body, "excerpt": meta_desc,
-        "categories": category_ids, "status": "publish", "meta": rank_math_meta,
-    }
-    if tag_ids:   payload["tags"]           = tag_ids
-    if media_ids: payload["featured_media"] = media_ids[0]
-
-    res_post = None; last_post_exception = None
-    for post_attempt in range(1, 4):
-        try:
-            res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload,
-                                     auth=(WP_USER, wp_pass), timeout=25)
-            break
-        except Exception as e:
-            last_post_exception = e
-            err_str = str(e)
-            is_transient = any(x in err_str for x in ["Name or service not known","Temporary failure",
-                                                        "NewConnectionError","ConnectionError","Timeout","timed out"])
-            if post_attempt < 3 and is_transient:
-                wait = 8 * post_attempt
-                print(f"  ⚠️ 포스팅 요청 실패 (시도 {post_attempt}/3): {e} — {wait}초 대기")
-                time.sleep(wait)
-            else:
-                print(f"  ❌ 포스팅 최종 실패 ({site['url']}): {e}")
-                record_result(site['url'], title, keyword=keyword, model=used_model,
-                              tag_count=len(tag_ids), img_count=len(media_ids), img_source=img_source,
-                              plain_len=plain_len, seo_score=0, status="fail_request", error_msg=str(e)[:200])
-                return False
-
-    if res_post is None:
-        record_result(site['url'], title, keyword=keyword, model=used_model,
-                      status="fail_request", error_msg=str(last_post_exception)[:200])
-        return False
-
-    if res_post.status_code == 403 and "Checking your browser" in res_post.text:
-        print(f"  ⚠️ WAF 403 — 15초 대기 후 1회 재시도")
-        time.sleep(15)
-        try:
-            res_post = requests.post(f"{site['url']}/wp-json/wp/v2/posts", json=payload,
-                                     auth=(WP_USER, wp_pass), timeout=25)
-        except Exception as e:
-            print(f"  ❌ 재시도 실패: {e}")
-            record_result(site['url'], title, keyword=keyword, model=used_model,
-                          status="fail_request", error_msg=str(e)[:200])
-            return False
-
-    if res_post.status_code == 201:
-        post_data     = res_post.json()
-        post_id       = post_data.get("id")
-        post_url      = post_data.get("link", "")
-        returned_meta = post_data.get("meta", {}) or {}
-
-        rank_math_applied = (returned_meta.get("rank_math_focus_keyword") == rank_math_meta["rank_math_focus_keyword"])
-        if not rank_math_applied and post_id:
-            rank_math_applied = try_register_and_patch_rank_math(site['url'], wp_pass, post_id, rank_math_meta)
-
-        # ★ 내부/외부 링크 수 계산
-        import re as _re
-        _pat = _re.compile(r'href=[^>]*https?://([^"\' >]+)')
-        all_links      = _pat.findall(article_body)
-        _network_hosts = set(s['url'].replace('https://','').rstrip('/') for s in SITES_CONFIG)
-        int_link_count = sum(1 for h in all_links if any(h.startswith(nh) for nh in _network_hosts))
-        ext_link_count = sum(1 for h in all_links if not any(h.startswith(nh) for nh in _network_hosts))
-
-        stat_count = count_statistics_in_body(article_body)
-        seo_score = estimate_seo_score(keyword, title, plain_len, meta_desc,
-                                       img_count=len(media_ids), faq_count=len(faq_list),
-                                       tag_count=len(tag_ids), rank_math_applied=rank_math_applied,
-                                       internal_links=int_link_count, external_links=ext_link_count,
-                                       stat_count=stat_count)
-
-        rm_label = "Rank Math ✅" if rank_math_applied else "Rank Math ❌"
-        print(f"✅ {site['url']} 발행 완료 — 태그 {len(tag_ids)}개, 이미지 {len(media_ids)}장, "
-              f"FAQ {len(faq_list)}개, {rm_label}, SEO {seo_score}점, 모델:{used_model}")
-        print(f"   제목: {title}")
-
-        if not rank_math_applied:
-            print(f"  ⚠️ [진단] Rank Math 미반영 → functions.php에 register_post_meta 코드 추가 필요")
-
-        record_result(
-            site['url'], title, keyword=keyword, model=used_model,
-            tag_count=len(tag_ids), img_count=len(media_ids), img_source=img_source,
-            plain_len=plain_len, internal_links=int_link_count,
-            external_links=ext_link_count, faq_count=len(faq_list),
-            rank_math_applied=rank_math_applied,
-            seo_score=seo_score, status="success", post_url=post_url
-        )
-        return True
-    else:
-        err = res_post.text[:300]
-        print(f"❌ {site['url']} 발행 실패 (HTTP {res_post.status_code}): {err}")
-        if res_post.status_code == 403:
-            print(f"  🔍 응답 헤더: {dict(res_post.headers)}")
-        record_result(
-            site['url'], title, keyword=keyword, model=used_model,
-            tag_count=len(tag_ids), img_count=len(media_ids), img_source=img_source,
-            plain_len=plain_len, seo_score=0,
-            status=f"fail_{res_post.status_code}", error_msg=err
-        )
-        return False
-
-# ============================================================
-# 작업 큐 빌드 및 실행
-# ============================================================
-def build_job_queue():
-    queue = []
-    for site in SITES_CONFIG:
-        count = get_posts_for_this_slot(site, RUN_SLOT)
-        if count <= 0: continue
-        for _ in range(count):
-            if site["mode"] == "news" and site["url"] == "https://koreanews365.com":
-                ref_title, _ = crawl_rss_news()
-                keyword       = ref_title
-                categories    = [1]
-            else:
-                keyword    = load_keyword(site["keywords_file"], site["theme"])
-                categories = [random.choice(HEALTH_CATEGORIES)] if site["url"] == "https://k-health365.com" else [1]
-            queue.append({"site": site, "keyword": keyword, "theme": site["theme"],
-                          "lang": site["lang"], "mode": site["mode"], "categories": categories})
-    random.shuffle(queue)
-    return queue
-
-def run():
-    print(f"🚀 [RUN_SLOT {RUN_SLOT}/3] 22개 사이트 메가 오토포스팅 시작 (모델: {GEMINI_MODEL}, 애드센스90점 기준)")
-    queue = build_job_queue()
-    total = len(queue)
-    print(f"📋 이번 회차 발행 예정 건수: {total}건")
-
-    for i, job in enumerate(queue, start=1):
-        site = job["site"]
-        print(f"\n[{i}/{total}] {site['url']} ({job['keyword']})")
-        publish_post(site, job["keyword"], job["theme"], job["lang"], job["mode"], job["categories"])
-        if i < total:
-            time.sleep(SLEEP_BETWEEN_POSTS)
-
-    flush_log_to_google_sheet()
-    print("\n🏁 이번 회차 작업이 모두 종료되었습니다.")
-
-if __name__ == "__main__":
-    run()
+            urls.extend(get_images_from_pexels(keyword, count - len(urls)))
+    return list(dict.fromkeys(urls))[:count]
