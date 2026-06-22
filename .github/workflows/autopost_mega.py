@@ -617,10 +617,71 @@ NEWS_EN_FALLBACK = [
 # 사용된 뉴스 제목 추적 (같은 실행 내 중복 방지)
 _used_news_titles: set = set()
 
+# ============================================================
+# ★ 뉴스 사이트 크로스런 중복 방지 — WP REST API 최근 제목 조회
+# ============================================================
+_wp_recent_titles_cache: dict = {}  # site_url → set of recent titles
+
+def fetch_recent_wp_titles(site_url: str, wp_pass: str, count: int = 30) -> set:
+    """WP REST API로 최근 발행 제목 count개를 가져와 소문자 set으로 반환"""
+    cached = _wp_recent_titles_cache.get(site_url)
+    if cached is not None:
+        return cached
+    titles = set()
+    try:
+        r = requests.get(
+            f"{site_url}/wp-json/wp/v2/posts",
+            auth=(WP_USER, wp_pass),
+            params={"per_page": count, "orderby": "date", "order": "desc",
+                    "_fields": "title", "status": "publish"},
+            timeout=12
+        )
+        if r.status_code == 200:
+            for post in r.json():
+                raw = post.get("title", {})
+                t = raw.get("rendered", "") if isinstance(raw, dict) else str(raw)
+                t = re.sub(r'<[^>]+>', '', t).strip().lower()
+                if t:
+                    titles.add(t)
+        print(f"   📋 {site_url} 최근 제목 {len(titles)}개 로드")
+    except Exception as e:
+        print(f"   ⚠️ WP 제목 조회 실패 ({site_url}): {e}")
+    _wp_recent_titles_cache[site_url] = titles
+    return titles
+
+def is_title_duplicate_across_news_sites(title: str) -> bool:
+    """두 뉴스 사이트(koreanews365, theseouljournal) 캐시에서 제목 중복 검사"""
+    t_lower = title.strip().lower()
+    for cached in _wp_recent_titles_cache.values():
+        if t_lower in cached:
+            return True
+    # 현재 실행 내 메모리 추적도 함께 검사
+    if t_lower in {x.lower() for x in _used_news_titles}:
+        return True
+    return False
+
+def preload_news_site_titles(sites_config: list, wp_user: str):
+    """실행 시작 시 두 뉴스 사이트 제목 사전 로드"""
+    for site in sites_config:
+        if site.get("mode") in ("news", "news_en"):
+            wp_pass = os.getenv(site["wp_pass_env"], "")
+            if wp_pass:
+                fetch_recent_wp_titles(site["url"], wp_pass, count=50)
+
 def crawl_rss_news(lang: str = "ko") -> tuple:
-    """RSS 크롤링 — lang에 따라 다른 풀 사용, 중복 방지"""
+    """RSS 크롤링 — lang에 따라 다른 풀 사용, 실행 내·크로스런 중복 방지"""
     global _used_news_titles
     fallback_pool = NEWS_KO_FALLBACK if lang == "ko" else NEWS_EN_FALLBACK
+
+    def _is_dup(title: str) -> bool:
+        """현재 실행 메모리 + WP 캐시(크로스런) 양쪽 모두 검사"""
+        t_l = title.strip().lower()
+        if t_l in {x.lower() for x in _used_news_titles}:
+            return True
+        for cached in _wp_recent_titles_cache.values():
+            if t_l in cached:
+                return True
+        return False
 
     # RSS 크롤링 (한국어만)
     if lang == "ko":
@@ -632,18 +693,20 @@ def crawl_rss_news(lang: str = "ko") -> tuple:
             for it in items:
                 t = it.title.text.strip() if it.title else ""
                 d = it.description.text.strip() if it.description else ""
-                if t and len(t) >= 5 and t not in _used_news_titles:
+                if t and len(t) >= 5 and not _is_dup(t):
                     candidates.append((t, d))
             if candidates:
                 chosen = random.choice(candidates)
                 _used_news_titles.add(chosen[0])
                 return chosen
+            elif items:
+                print(f"   ⚠️ RSS 후보 전부 중복 — fallback 사용")
         except Exception as e:
             print(f"   ⚠️ RSS 크롤링 실패: {e}")
 
-    # fallback — 미사용 항목 우선 선택
-    unused = [x for x in fallback_pool if x[0] not in _used_news_titles]
-    pool = unused if unused else fallback_pool
+    # fallback — 크로스런+실행내 중복 모두 제외한 미사용 항목 우선
+    unused = [x for x in fallback_pool if not _is_dup(x[0])]
+    pool = unused if unused else fallback_pool  # 모두 소진 시 재사용 허용
     chosen = random.choice(pool)
     _used_news_titles.add(chosen[0])
     return chosen
@@ -1271,7 +1334,7 @@ def process_one_post(site: dict, keyword: str) -> bool:
     prompt = make_seo_prompt(keyword, theme, lang, mode)
 
     # Gemini 생성 (SEO 90점 미달 시 최대 1회 재시도)
-    SEO_MIN_SCORE = 88   # 이 점수 미만이면 재생성
+    SEO_MIN_SCORE = 90   # 이 점수 미만이면 재생성
     MAX_REGEN     = 1    # 최대 재시도 횟수
     raw = None
     for gen_attempt in range(MAX_REGEN + 1):
@@ -1328,6 +1391,24 @@ def process_one_post(site: dict, keyword: str) -> bool:
         tb2       = len(re.findall(r'<table[\s>]', body, re.IGNORECASE))
         print(f"     ↳ 본문길이:{plain_len}자 | 통계수치:{stat_cnt2}개 | 내부링크:{ilinks2}개 | 테이블:{tb2}개")
 
+    # WP 발행 직전 — 뉴스 사이트는 최종 생성 제목으로 크로스런 중복 재검사
+    if mode in ("news", "news_en") and title:
+        t_lower = title.strip().lower()
+        is_cross_dup = False
+        for cached in _wp_recent_titles_cache.values():
+            if t_lower in cached:
+                is_cross_dup = True
+                break
+        if is_cross_dup:
+            print(f"  ⛔ 크로스런 제목 중복 감지 → 발행 취소: {title[:60]}")
+            record_result(url, theme, keyword, title, "", score, len(images),
+                          "⛔ skip_cross_dup")
+            return False
+        # 발행 성공 예정 제목을 캐시에 즉시 등록 (다음 포스트 방어)
+        for site_url_key in _wp_recent_titles_cache:
+            _wp_recent_titles_cache[site_url_key].add(t_lower)
+        _used_news_titles.add(title)
+
     # WP 발행
     result = wp_post(site, title, body, meta_desc, tags, faq_list, images, keyword, score)
     if result["ok"]:
@@ -1352,6 +1433,10 @@ def main():
     print(f"{'='*60}\n")
 
     total_ok = total_fail = total_skip = 0
+
+    # ★ 뉴스 사이트 크로스런 중복 방지 — 실행 시작 시 최근 발행 제목 50개 사전 로드
+    print("📋 뉴스 사이트 최근 제목 사전 로드 중...")
+    preload_news_site_titles(SITES_CONFIG, WP_USER)
 
     for site in SITES_CONFIG:
         url   = site["url"]
