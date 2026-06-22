@@ -873,49 +873,84 @@ def count_statistics_in_body(body_text: str) -> int:
 
 def estimate_seo_score(title: str, body: str, meta_desc: str, tags: list,
                         faq_list: list, image_urls: list, keyword: str) -> int:
+    """
+    구글 SEO 90점 이상 보장 기준 — Rank Math 90+ 항목별 배점
+    총 100점 만점 / 정상 실행 시 90점 이상 달성 목표
+    """
     score = 0
-    kw_l = keyword.lower()
-    # 제목 키워드 (10점)
-    if kw_l in title.lower(): score += 10
-    # 본문 길이 (15점)
+    kw_l  = keyword.lower()
     plain = re.sub(r'<[^>]+>', '', body)
-    blen = len(plain.replace(" ","").replace("\n",""))
-    if blen >= 2500: score += 15
-    elif blen >= 1800: score += 10
-    elif blen >= 1000: score += 5
-    # 메타 디스크립션 (15점)
+    blen  = len(plain.replace(" ","").replace("\n",""))
+
+    # [A] 제목 최적화 (15점)
+    title_l = title.lower()
+    if kw_l in title_l:                  score += 10
+    if 20 <= len(title) <= 65:           score += 3
+    if any(c.isdigit() for c in title):  score += 2
+
+    # [B] 본문 길이 (20점)
+    if   blen >= 3000: score += 20
+    elif blen >= 2500: score += 17
+    elif blen >= 2000: score += 13
+    elif blen >= 1800: score += 9
+    elif blen >= 1000: score += 4
+
+    # [C] 메타 디스크립션 (10점)
     mdl = len(meta_desc)
-    if 120 <= mdl <= 160: score += 15
-    elif 80 <= mdl < 120: score += 8
-    elif mdl > 0: score += 3
-    # 이미지 (15점)
+    if   130 <= mdl <= 160: score += 10
+    elif 100 <= mdl <  130: score += 7
+    elif  80 <= mdl <  100: score += 4
+    elif mdl > 0:           score += 1
+
+    # [D] 이미지 (10점)
     ic = len(image_urls)
-    if ic >= 3: score += 15
-    elif ic == 2: score += 10
-    elif ic == 1: score += 5
-    # 내부링크 (10점)
+    if   ic >= 3: score += 10
+    elif ic == 2: score += 7
+    elif ic == 1: score += 4
+
+    # [E] 내부 링크 구조 (10점)
     ilinks = len(re.findall(r'<a\s+href=["\'][^"\']*["\']', body, re.IGNORECASE))
-    if ilinks >= 4: score += 10
-    elif ilinks >= 2: score += 5
-    # 외부 권위링크 언급 (10점)
-    ext_mentions = len(re.findall(r'https?://', body))
-    if ext_mentions >= 3: score += 10
-    elif ext_mentions >= 1: score += 5
-    # 통계 수치 (10점)
+    if   ilinks >= 5: score += 10
+    elif ilinks >= 4: score += 8
+    elif ilinks >= 3: score += 5
+    elif ilinks >= 1: score += 2
+
+    # [F] 통계·수치·출처 (15점) — E-E-A-T 핵심
     stat_cnt = count_statistics_in_body(body)
-    if stat_cnt >= 3: score += 10
-    elif stat_cnt >= 1: score += 5
-    # FAQ (5점)
-    if len(faq_list) >= 3: score += 5
-    elif len(faq_list) >= 1: score += 2
-    # 태그 (5점)
-    if len(tags) >= TAG_COUNT: score += 5
-    elif len(tags) >= 6: score += 2
-    # Rank Math 적용 (5점) — 후처리에서 가산
+    if   stat_cnt >= 5: score += 10
+    elif stat_cnt >= 3: score += 8
+    elif stat_cnt >= 1: score += 4
+    cite_cnt = len(re.findall(r'\([^)]{3,40},\s*20[0-9]{2}\)', body))
+    if   cite_cnt >= 3: score += 5
+    elif cite_cnt >= 1: score += 2
+
+    # [G] 구조 완성도 h2/h3/ul/table (10점)
+    h2_c  = len(re.findall(r'<h2[\s>]', body, re.IGNORECASE))
+    h3_c  = len(re.findall(r'<h3[\s>]', body, re.IGNORECASE))
+    ul_c  = len(re.findall(r'<ul[\s>]', body, re.IGNORECASE))
+    tb_c  = len(re.findall(r'<table[\s>]', body, re.IGNORECASE))
+    st = 0
+    if h2_c >= 5:  st += 3
+    elif h2_c >= 3: st += 2
+    if h3_c >= 4:  st += 2
+    elif h3_c >= 2: st += 1
+    if ul_c >= 3:  st += 2
+    elif ul_c >= 1: st += 1
+    if tb_c >= 1:  st += 3
+    score += min(st, 10)
+
+    # [H] FAQ 스키마 (5점)
+    if   len(faq_list) >= 3: score += 5
+    elif len(faq_list) >= 2: score += 3
+    elif len(faq_list) >= 1: score += 1
+
+    # [I] 태그 품질 (5점)
+    if   len(tags) >= TAG_COUNT: score += 5
+    elif len(tags) >= 8:         score += 3
+    elif len(tags) >= 4:         score += 1
+
     return min(score, 100)
 
-# ============================================================
-# 이미지 수집 (3단계 fallback)
 # ============================================================
 def get_images_from_pixabay(query: str, need: int) -> list:
     urls = []
@@ -1235,30 +1270,63 @@ def process_one_post(site: dict, keyword: str) -> bool:
     # 프롬프트 생성
     prompt = make_seo_prompt(keyword, theme, lang, mode)
 
-    # Gemini 생성
-    try:
-        raw = generate_content_gemini(prompt)
-    except Exception as e:
-        print(f"  ❌ Gemini 생성 실패: {e}")
-        record_result(url, theme, keyword, "", "", 0, 0, "❌ Gemini 실패", str(e))
-        return False
-    time.sleep(SLEEP_BETWEEN_POSTS)
+    # Gemini 생성 (SEO 90점 미달 시 최대 1회 재시도)
+    SEO_MIN_SCORE = 88   # 이 점수 미만이면 재생성
+    MAX_REGEN     = 1    # 최대 재시도 횟수
+    raw = None
+    for gen_attempt in range(MAX_REGEN + 1):
+        try:
+            raw = generate_content_gemini(prompt)
+        except Exception as e:
+            print(f"  ❌ Gemini 생성 실패: {e}")
+            record_result(url, theme, keyword, "", "", 0, 0, "❌ Gemini 실패", str(e))
+            return False
+        time.sleep(SLEEP_BETWEEN_POSTS)
 
-    # 파싱
-    body_raw, title, meta_desc, faq_list = extract_meta_and_faq(raw)
-    body, tags = extract_tags_from_article(body_raw, keyword, theme, lang)
+        # 파싱
+        body_raw, title, meta_desc, faq_list = extract_meta_and_faq(raw)
+        body, tags = extract_tags_from_article(body_raw, keyword, theme, lang)
 
-    if not title:
-        title = (f"{keyword} — 완벽 정리 가이드" if lang == "ko"
-                 else f"{keyword} — Complete Guide {now_kst().year}")
+        if not title:
+            title = (f"{keyword} — 완벽 정리 가이드" if lang == "ko"
+                     else f"{keyword} — Complete Guide {now_kst().year}")
+
+        # 임시 점수 계산 (이미지 미포함)
+        _pre_score = estimate_seo_score(title, body, meta_desc, tags, faq_list, ["x","x","x"], keyword)
+        if _pre_score >= SEO_MIN_SCORE or gen_attempt >= MAX_REGEN:
+            print(f"  📝 생성 {gen_attempt+1}회차 → 본문 사전 SEO {_pre_score}점")
+            break
+        else:
+            print(f"  🔄 SEO {_pre_score}점 미달({SEO_MIN_SCORE}점 기준) → 재생성 시도 {gen_attempt+2}회차")
+            # 재생성 시 프롬프트에 보완 지시 추가
+            prompt = prompt + f"""
+
+[재생성 보완 지시 — 이전 결과가 SEO {_pre_score}점으로 기준 미달]
+아래 항목을 반드시 보완하여 재작성하세요:
+- 본문 <table> 데이터 비교표 반드시 1개 이상 포함
+- 통계 수치(%, 만 명, 원 등) 최소 5개 이상, 출처 괄호 3개 이상
+- 내부링크 앵커 <a href="URL">텍스트</a> 형식 5개 이상
+- h2 5개 이상, h3 4개 이상, ul 3개 이상
+- 본문 총 3,000자 이상"""
+            time.sleep(5)
 
     # 이미지
     images = get_multiple_images(keyword, count=3, theme=theme)
     print(f"  🖼  이미지 {len(images)}장")
 
-    # SEO 점수
+    # SEO 점수 (이미지 포함 최종)
     score = estimate_seo_score(title, body, meta_desc, tags, faq_list, images, keyword)
-    print(f"  📊 SEO 점수: {score}/100")
+    rank_label = ("🏆 우수" if score >= 95 else
+                  "✅ 양호" if score >= 90 else
+                  "⚠️ 보통" if score >= 80 else
+                  "❌ 미달")
+    print(f"  📊 SEO 최종 점수: {score}/100  {rank_label}")
+    if score < 90:
+        plain_len = len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+        stat_cnt2 = count_statistics_in_body(body)
+        ilinks2   = len(re.findall(r'<a\s+href=', body, re.IGNORECASE))
+        tb2       = len(re.findall(r'<table[\s>]', body, re.IGNORECASE))
+        print(f"     ↳ 본문길이:{plain_len}자 | 통계수치:{stat_cnt2}개 | 내부링크:{ilinks2}개 | 테이블:{tb2}개")
 
     # WP 발행
     result = wp_post(site, title, body, meta_desc, tags, faq_list, images, keyword, score)
@@ -1325,4 +1393,4 @@ def main():
     print(f"{'='*60}\n")
 
 if __name__ == "__main__":
-    main() 
+    main()
