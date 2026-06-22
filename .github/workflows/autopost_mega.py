@@ -48,6 +48,8 @@ MIN_BODY_LENGTH  = 1800
 # ============================================================
 # ★ 기자 명단 — 한국어 사이트(koreanews365) / 영문 사이트(seouljournal + 기타) 완전 분리
 # ============================================================
+# ★ 기자 명단 — 한국어 10명 + 미국 영어 10명, 각 사이트 이메일 분리
+# koreanews365.com 전용 한국 기자 10명
 REPORTERS_KO = [
     "김민준 기자 (minjun@koreanews365.com)",
     "이서연 기자 (seoyeon@koreanews365.com)",
@@ -61,17 +63,18 @@ REPORTERS_KO = [
     "오태영 기자 (taeyoung@koreanews365.com)",
 ]
 
+# theseouljournal.com 전용 — 미국 이름 5명 + 한국계 미국 이름 5명 (총 10명)
 REPORTERS_EN = [
-    "James Wilson (james@theseouljournal.com)",
-    "Emily Anderson (emily@theseouljournal.com)",
-    "Michael Chang (michael@theseouljournal.com)",
-    "Sarah Jenkins (sarah@theseouljournal.com)",
-    "David Miller (david@theseouljournal.com)",
-    "Jessica Park (jessica@theseouljournal.com)",
-    "Robert Kim (robert@theseouljournal.com)",
-    "Laura Chen (laura@theseouljournal.com)",
-    "Daniel Lee (daniel@theseouljournal.com)",
-    "Rachel Moon (rachel@theseouljournal.com)",
+    "James Patterson (james@theseouljournal.com)",
+    "Emily Crawford (emily@theseouljournal.com)",
+    "Michael Thompson (michael@theseouljournal.com)",
+    "Sarah Williams (sarah@theseouljournal.com)",
+    "David Harrison (david@theseouljournal.com)",
+    "Jessica Kim (jessica@theseouljournal.com)",
+    "Robert Park (robert@theseouljournal.com)",
+    "Laura Choi (laura@theseouljournal.com)",
+    "Daniel Yoon (daniel@theseouljournal.com)",
+    "Rachel Lim (rachel@theseouljournal.com)",
 ]
 
 def pick_reporter(lang: str) -> str:
@@ -370,20 +373,23 @@ SITES_CONFIG = [
      "wp_pass_env": "STUDYINKOREA365COM", "daily": 3},
 
     # ── 유학 관련 교육기관 ──────────────────────────────────
+    # kieca-korea.org: 한국국제교육문화협회 — 공익성 교육문화 기사 (한국어)
     {"url": "https://kieca-korea.org",
-     "lang": "en", "theme": "International Students", "mode": "blog",
+     "lang": "ko", "theme": "국제교육문화", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_kieca.txt",
-     "wp_pass_env": "KIECAKOREAORG", "daily": 2},
+     "wp_pass_env": "KIECAKOREAORG", "daily": 3},
 
+    # ksa-korea.org: 한국유학협회 — 외국인 유학생 타겟 한국어 콘텐츠
     {"url": "https://ksa-korea.org",
-     "lang": "en", "theme": "Study in Korea", "mode": "blog",
+     "lang": "ko", "theme": "한국유학정보", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_ksaKorea.txt",
-     "wp_pass_env": "KSAKOREAORG", "daily": 2},
+     "wp_pass_env": "KSAKOREAORG", "daily": 3},
 
+    # sis-korea.com: 서울국제학교 — 외국학생 대상 영어, 한국취업 특화 프로그램
     {"url": "https://sis-korea.com",
-     "lang": "en", "theme": "International Students", "mode": "blog",
+     "lang": "en", "theme": "Korea Career Programs", "mode": "blog",
      "keywords_file": ".github/workflows/keywords_sisKorea.txt",
-     "wp_pass_env": "SISKOREACOM", "daily": 2},
+     "wp_pass_env": "SISKOREACOM", "daily": 3},
 
     # ── 취업 ─────────────────────────────────────────────────
     {"url": "https://jobkorea365.com",
@@ -683,26 +689,47 @@ def crawl_rss_news(lang: str = "ko") -> tuple:
                 return True
         return False
 
-    # RSS 크롤링 (한국어만)
-    if lang == "ko":
+    # ★ RSS 소스 목록 — 한국어/영어 분리
+    RSS_SOURCES_KO = [
+        ("조선일보", "https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml"),
+        ("연합뉴스", "https://www.yonhapnewstv.co.kr/category/news/headline/feed/"),
+        ("경향신문", "https://www.khan.co.kr/rss/rssdata/total_news.xml"),
+    ]
+    RSS_SOURCES_EN = [
+        ("Korea Herald", "http://www.koreaherald.com/rss/020100000000.xml"),
+        ("Korea JoongAng Daily", "https://koreajoongangdaily.joins.com/rss/feed"),
+        ("The Korea Times", "https://www.koreatimes.co.kr/www/rss/rss.xml"),
+    ]
+
+    # RSS 크롤링 — 여러 소스에서 후보 수집 후 랜덤 선택
+    rss_sources = RSS_SOURCES_KO if lang == "ko" else RSS_SOURCES_EN
+    random.shuffle(rss_sources)  # 소스 순서 랜덤화
+    all_candidates = []
+    for src_name, src_url in rss_sources:
         try:
-            res = requests.get("https://fs.khan.co.kr/rss/rssdata/total_news.xml", timeout=10)
+            res = requests.get(src_url, timeout=10,
+                               headers={"User-Agent": "Mozilla/5.0 (compatible; RSS reader)"})
             soup = BeautifulSoup(res.text, 'xml')
             items = soup.find_all('item')
-            candidates = []
             for it in items:
                 t = it.title.text.strip() if it.title else ""
                 d = it.description.text.strip() if it.description else ""
+                # HTML 태그 제거
+                t = re.sub(r'<[^>]+>', '', t).strip()
+                d = re.sub(r'<[^>]+>', '', d).strip()
                 if t and len(t) >= 5 and not _is_dup(t):
-                    candidates.append((t, d))
-            if candidates:
-                chosen = random.choice(candidates)
-                _used_news_titles.add(chosen[0])
-                return chosen
-            elif items:
-                print(f"   ⚠️ RSS 후보 전부 중복 — fallback 사용")
+                    all_candidates.append((t, d, src_name))
         except Exception as e:
-            print(f"   ⚠️ RSS 크롤링 실패: {e}")
+            print(f"   ⚠️ RSS 실패 ({src_name}): {e}")
+
+    if all_candidates:
+        chosen_item = random.choice(all_candidates)
+        chosen = (chosen_item[0], chosen_item[1])
+        print(f"   📰 RSS 출처: {chosen_item[2]} — {chosen[0][:40]}")
+        _used_news_titles.add(chosen[0])
+        return chosen
+    elif all_candidates == [] and lang:
+        print(f"   ⚠️ 모든 RSS 소스 중복 또는 실패 — fallback 사용")
 
     # fallback — 크로스런+실행내 중복 모두 제외한 미사용 항목 우선
     unused = [x for x in fallback_pool if not _is_dup(x[0])]
