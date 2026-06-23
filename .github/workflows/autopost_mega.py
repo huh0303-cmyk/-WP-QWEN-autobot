@@ -791,9 +791,9 @@ def translate_ko_to_en_for_image(keyword: str, theme: str = "") -> str:
 # ============================================================
 SITES_CONFIG = [
     {"url": "https://k-health365.com",
-     "lang": "ko", "theme": "건강과 의학", "mode": "blog",
+     "lang": "ko", "theme": "건강과 의학", "mode": "health_blog",
      "keywords_file": ".github/workflows/keywords_khealth.txt",
-     "wp_pass_env": "KHEALTH365COM", "daily": 15},
+     "wp_pass_env": "KHEALTH365COM", "daily": 6},
 
     {"url": "https://koreamedicaltour.com",
      "lang": "en", "theme": "Korea Medical Tourism", "mode": "blog",
@@ -1363,6 +1363,110 @@ def pick_title_style(lang: str) -> str:
 # ============================================================
 # ★ SEO 프롬프트 생성 (내부링크 실제 URL 포함)
 # ============================================================
+def make_khealth_prompt(keyword: str, reporter: dict) -> str:
+    """
+    k-health365.com 전용 초고품질 의학 콘텐츠 프롬프트.
+    YMYL 기준 충족 + 구글 E-E-A-T 최고 수준 + 색인 최적화.
+    """
+    reporter_name = reporter_display(reporter)
+    byline = f"◇ {reporter_name} 기자"
+
+    internal_links = get_internal_links("https://k-health365.com", count=5)
+    internal_links_str = "\n".join(
+        f'  - <a href="{url}" title="{name}">{name}</a>' for name, url in internal_links
+    )
+
+    ext_links = get_authority_links("건강과 의학")
+    ext_sample = random.sample(ext_links, min(4, len(ext_links)))
+    ext_hint = ", ".join(f"{n}({u})" for n, u in ext_sample)
+
+    title_style = pick_title_style("ko")
+
+    return f"""당신은 대한민국 최고 권위의 내과 전문의이자 의학 저널리스트입니다.
+임상 경력 20년, 대한의학회 공인 전문위원 자격을 보유하고 있습니다.
+주제: '{keyword}' | 사이트: k-health365.com (구글 애드센스 승인 의학 전문 블로그)
+
+[★ YMYL 의학 콘텐츠 최고 품질 기준 — 구글 E-E-A-T 최상위 레벨]
+
+1. 바이라인: 본문 최상단 첫 줄에 정확히 '{byline}' 삽입.
+
+2. HTML 전용 출력: h2,h3,p,ul,li,ol,strong,table,tr,td,blockquote.
+   마크다운(##,**,- 등) 절대 금지. 순수 HTML만.
+
+3. ★ 분량: 공백 제외 최소 3,500자 이상. 깊이 있는 임상 의학 콘텐츠.
+
+4. ★ 모바일 최적화 (체류시간 극대화):
+   - 모든 <p>는 최대 2문장 이하.
+   - 단락 사이 반드시 완전한 줄바꿈.
+   - 텍스트 블록 빽빽하면 이탈률 급증 → SEO 치명적.
+
+5. ★ 키워드 배치:
+   - 첫 단락 첫 문장에 '{keyword}' 반드시 배치.
+   - 전체 본문에서 자연스럽게 15회 이상 사용.
+   - 동의어/관련어(예: 고혈압↔혈압↔혈압 수치↔혈압 조절) 함께 활용.
+
+6. ★ 문서 구조 (Rank Math SEO 만점 필수):
+   - h2 최소 6개
+   - h3 최소 5개
+   - ul/li 리스트 4개 이상
+   - 데이터 비교 <table> 2개 이상 (정상 수치 vs 비정상 수치, 치료법 비교 등)
+   - <blockquote>로 전문가 인용 또는 가이드라인 1개 이상
+
+7. ★ 통계·수치 10개 이상 필수 (YMYL 신뢰도 핵심):
+   - 구체적 숫자: %, 만 명, mmHg, mg/dL, IU, 년, 개월, 회/일 등
+   - 예시: "국내 고혈압 환자 수 1,200만 명(통계청, 2024)", "수축기 혈압 140mmHg 이상"
+   - 막연한 표현("많은", "대부분", "일부") 절대 금지
+
+8. ★ 출처 괄호 5회 이상 필수:
+   - 형식: "(질병관리청, 2025)", "(대한의학회 가이드라인, 2024)", "(NEJM, 2023)"
+   - 권위 기관 필수 언급: {ext_hint}
+
+9. ★ 실제 내부링크 5개 삽입 (가짜 앵커 절대 금지):
+{internal_links_str}
+   본문 내 자연스러운 맥락에서 위 URL을 그대로 사용.
+
+10. ★ E-E-A-T 전문성 증명 필수:
+    - 임상 경험 기반 디테일 3곳 이상
+      예: "외래에서 자주 보는 패턴", "환자들이 가장 많이 오해하는 부분"
+    - 최신 의학 가이드라인 1개 이상 명시
+    - 논문/연구 인용 1개 이상 (형식: "2023년 《Lancet》 게재 연구에 따르면...")
+
+11. ★ 의학 필수 섹션 (구글 YMYL 요구사항):
+    - "⚠️ 주의사항" 또는 "언제 병원을 가야 할까?" 섹션 반드시 포함
+    - "이 글은 의학적 참고 정보이며, 진단 및 치료는 반드시 전문의와 상담하세요." 문구 포함
+
+12. 제목 스타일: {title_style}
+    → 출력 첫 줄 반드시 'TITLE:' 로 시작.
+    → 제목에 숫자 포함 권장 (예: "5가지", "7단계", "2026년").
+    → 20~60자 사내.
+
+13. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작.
+    - 정확히 130~140자(한글 기준).
+    - '{keyword}' 포함.
+    - 클릭을 유도하는 구체적 혜택 언급.
+
+14. FAQ 스키마: 'FAQ_START' ~ 'FAQ_END' 블록.
+    - Q:/A: 형식 5문항 (기존 3개에서 강화).
+    - 실제 환자들이 검색하는 질문으로 구성.
+
+15. ★ TAGS: 'TAGS:' 로 시작, 12개 한국어 키워드.
+    - 각 태그 최대 3단어·15자 이내.
+    - 첫 번째는 반드시 '{keyword}'.
+    - [크리티컬] "#증상 가격", "#효능 부작용 가격" 같은 무의미 조합 절대 금지.
+    - 올바른 예: "{keyword} 원인", "{keyword} 예방법", "{keyword} 치료", "{keyword} 증상", "{keyword} 식이요법"
+
+출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS
+
+[콘텐츠 구성 권장 템플릿]
+<h2>{keyword}란? 기본 개념과 정의</h2>
+<h2>{keyword}의 주요 원인과 위험 요인</h2>
+<h2>{keyword} 증상과 자가 진단 체크리스트</h2>
+<h2>{keyword} 예방법 — 생활습관 개선 7가지</h2>
+<h2>{keyword} 치료법 — 약물 vs 비약물 비교</h2>
+<h2>⚠️ 이런 증상이면 즉시 병원 가세요</h2>
+<h2>자주 묻는 질문 (FAQ)</h2>"""
+
+
 def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
                     site_url: str = "", reporter: dict = None) -> str:
     reporter_name = reporter_display(reporter) if reporter else "편집부"
@@ -1981,12 +2085,16 @@ def process_one_post(site: dict, keyword: str) -> bool:
         kw_tuple = crawl_rss_news(lang, site_url=url)
         keyword, news_subtitle = kw_tuple if isinstance(kw_tuple, tuple) else (kw_tuple, "")
 
-    # 프롬프트 생성 (실제 내부링크 + 기자명 포함)
-    prompt = make_seo_prompt(keyword, theme, lang, mode, site_url=url, reporter=reporter)
+    # ★ k-health365 전용 초고품질 프롬프트 / 그 외 일반 프롬프트
+    is_khealth = (mode == "health_blog")
+    if is_khealth:
+        prompt = make_khealth_prompt(keyword, reporter)
+    else:
+        prompt = make_seo_prompt(keyword, theme, lang, mode, site_url=url, reporter=reporter)
 
-    # Gemini 생성 (SEO 90점 미달 시 최대 1회 재시도)
-    SEO_MIN_SCORE = 90
-    MAX_REGEN     = 1
+    # k-health365는 SEO 95점 기준, 최대 2회 재시도 / 그 외 90점 1회
+    SEO_MIN_SCORE = 95 if is_khealth else 90
+    MAX_REGEN     = 2  if is_khealth else 1
     raw = None
     for gen_attempt in range(MAX_REGEN + 1):
         try:
@@ -2010,7 +2118,21 @@ def process_one_post(site: dict, keyword: str) -> bool:
             break
         else:
             print(f"  🔄 SEO {_pre_score}점 미달 → 재생성 {gen_attempt+2}회차")
-            prompt = prompt + f"""
+            if is_khealth:
+                prompt = prompt + f"""
+
+[★ k-health365 재생성 보완 — SEO {_pre_score}점 미달, 목표 95점]
+의학 전문 콘텐츠 기준으로 다음을 반드시 강화:
+- 본문 <table> 2개 이상 (정상 수치 vs 비정상, 치료법 비교 등)
+- 통계·수치 10개 이상, 출처 괄호 5개 이상 (질병관리청, 대한의학회 등)
+- 내부링크 실제 URL 5개 이상 <a href="https://k-health365.com/...">
+- h2 6개 이상, h3 5개 이상, ul 4개 이상
+- <blockquote> 전문가 인용 또는 가이드라인 1개
+- "⚠️ 주의사항 / 병원 방문 기준" 섹션 필수
+- FAQ 5문항 (기존 3개 → 5개로 강화)
+- 본문 총 4,000자 이상"""
+            else:
+                prompt = prompt + f"""
 
 [재생성 보완 — 이전 결과 SEO {_pre_score}점 미달]
 반드시 보완:
@@ -2019,7 +2141,7 @@ def process_one_post(site: dict, keyword: str) -> bool:
 - 내부링크 실제 URL <a href="URL">텍스트</a> 5개 이상
 - h2 5개 이상, h3 4개 이상, ul 3개 이상
 - 본문 총 3,000자 이상"""
-            time.sleep(5)
+            time.sleep(5 if not is_khealth else 8)
 
     # 이미지 (최소 1장 보장)
     images = get_multiple_images(keyword, count=3, theme=theme)
