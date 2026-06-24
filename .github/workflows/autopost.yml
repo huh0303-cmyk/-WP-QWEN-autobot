@@ -57,7 +57,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests google-genai beautifulsoup4 lxml
 
-      - name: 4. 오토포스팅 인프라 가동 (Slot ${{ needs.determine-slot.outputs.slot }})
+      - name: 4. 오토포스팅 실행 (Slot ${{ needs.determine-slot.outputs.slot }})
         env:
           RUN_SLOT: ${{ needs.determine-slot.outputs.slot }}
           SLEEP_BETWEEN_POSTS: '8'
@@ -65,7 +65,7 @@ jobs:
           PIXABAY_KEY:    ${{ secrets.PIXABAY_KEY }}
           PEXELS_KEY:     ${{ secrets.PEXELS_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
-          # ── 건강 (핵심·승인완료) ──────────────────────────────
+          # ── 건강 (AdSense 승인완료) ───────────────────────────
           KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           # ── 의료관광 ─────────────────────────────────────────
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -80,10 +80,10 @@ jobs:
           KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
           # ── 테크 ─────────────────────────────────────────────
           KTECH365COM:          ${{ secrets.KTECH365COM }}
-          # ── K-뷰티 ────────────────────────────────────────────
+          # ── K-뷰티 ───────────────────────────────────────────
           KSKIN365COM:          ${{ secrets.KSKIN365COM }}
           OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
-          # ── K-POP ─────────────────────────────────────────────
+          # ── K-POP ────────────────────────────────────────────
           KWORLD365COM:         ${{ secrets.KWORLD365COM }}
           # ── 여행 ─────────────────────────────────────────────
           KTRIP365COM:          ${{ secrets.KTRIP365COM }}
@@ -103,7 +103,7 @@ jobs:
           JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
           # ── 문화 ─────────────────────────────────────────────
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
-          # ── 신문 (한글/영문 완전 분리) ──────────────────────
+          # ── 신문 (한국어/영문 완전 분리) ─────────────────────
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: |
