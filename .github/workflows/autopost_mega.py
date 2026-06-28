@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (SEO 95점 완전 보장판)
-업데이트: 2026-06
-  ✅ 27개 사이트 완전 반영
-  ✅ SEO 95점 목표 / 미달 시 최대 3회 재생성 + post-processing
-  ✅ 클릭 유발 제목 템플릿 완전 교체 (키워드 반복·진부한 패턴 제거)
-  ✅ 키워드 밀도 1~2% 제한 + 동의어 분산 지시
-  ✅ 키워드 밀도 과다 시 SEO 점수 페널티 적용
-  ✅ post-processing: 내부링크 강제 삽입 / 통계·출처 자동 보완 / TABLE 자동 생성
-  ✅ 메타 디스크립션 파싱 실패 시 Gemini 재요청
-  ✅ WP 실제 Author 랜덤 배정 (자동 생성 포함)
-  ✅ 테마별 카테고리 자동 분류 (기존 카테고리 우선 매칭)
-  ✅ koreanews365 ↔ theseouljournal 크로스런 중복 완전 차단
-  ✅ 이미지 카드형 3단 배치: 대표이미지(제목 아래) / 중간 / 하단
-  ✅ 구글시트 18컬럼 로깅 / Rank Math 메타 자동 주입
+autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (완전 무료 운영판 v2.1)
+업데이트: 2026-06 [무료화 최적화]
+  ✅ gemini-2.5-flash-lite 완전 고정 (비용 0원 · Free Tier 1500 RPD)
+  ✅ max_output_tokens 4096으로 최적화 (토큰 낭비 50% 절감)
+  ✅ MAX_REGEN 1회로 축소 (API 호출 ~191회/일 → Free Tier 완전 수용)
+  ✅ SLEEP_BETWEEN_POSTS 15초 (RPM 제한 60req/min 안전 준수)
+  ✅ 재시도 대기 60초 → 율속 초과 시 안전 복구
+  ✅ SEO 90점 기준 유지 (95점 무리한 재생성 제거)
+  ✅ post-processing 자동 보완으로 품질 방어
+  ✅ 이미지 Pixabay/Pexels 무료 API 유지
+  ✅ 클릭 유발 제목 템플릿·동의어 분산·키워드 밀도 제어 유지
+  ✅ WP Author·카테고리·Rank Math 메타 자동 주입 유지
 """
 
 import os, sys, time, random, re, json, hashlib
@@ -41,16 +39,24 @@ RUN_SLOT              = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS   = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
 
 gemini_client          = genai.Client(api_key=GEMINI_API_KEY)
-GEMINI_MODEL_PRIMARY   = "gemini-2.5-flash"
-GEMINI_MODEL_FALLBACK  = "gemini-2.5-flash-lite"
+
+# ★★★ 완전 무료화 설정 ★★★
+# gemini-2.5-flash-lite: 무료 1500 RPD / 분당 30 RPM
+# gemini-2.5-flash      : 유료 전환 위험 → 완전 제거
+GEMINI_MODEL_PRIMARY   = "gemini-2.5-flash-lite"  # 무료 고정
+GEMINI_MODEL_FALLBACK  = "gemini-2.5-flash-lite"  # 폴백도 lite 통일
 GEMINI_MODEL           = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 
 TAG_COUNT        = 12
 MIN_BODY_LENGTH  = 1800
-SEO_TARGET       = 95   # ★ 전 사이트 통일 목표 점수 (95점)
-MAX_REGEN        = 3    # ★ 최대 재생성 횟수
-KW_DENSITY_MAX   = 0.025  # ★ 키워드 밀도 상한 2.5% (초과 시 페널티)
+SEO_TARGET       = 90   # ★ 90점 기준 (95점 강요 시 재생성 폭탄 → 무료 한도 초과)
+MAX_REGEN        = 1    # ★ 최대 1회 재생성 (2회 호출/포스트 × 91건 = 182회 << 1500 RPD)
+KW_DENSITY_MAX   = 0.025  # ★ 키워드 밀도 상한 2.5%
+
+# ★ RPM(분당 요청) 제한 준수: flash-lite 무료 = 30 RPM
+# SLEEP_BETWEEN_POSTS를 15초로 설정 → 최대 4건/분 << 30 RPM 안전
+RATE_LIMIT_SLEEP = 15.0  # 포스트 간 최소 대기 (초)
 
 # ============================================================
 # ★ 가상 기자 명단
@@ -153,50 +159,30 @@ def reporter_display(reporter: dict) -> str:
 # ============================================================
 THEME_CATEGORIES = {
     "한국 뉴스": {
-        "default": "국제-INTERNATIONAL",
+        "default": "경제",
         "keyword_map": [
-            (["정치","대통령","국회","선거","정당","여당","야당","법안","탄핵","개헌"], "정치-POLITICS"),
-            (["경제","금리","물가","GDP","성장","수출","무역","환율","코스피","코스닥","주식","증시"], "경제-ECONOMY"),
-            (["기업","삼성","현대","SK","LG","스타트업","상장","IPO","CEO"], "비즈니스-BUSINESS"),
-            (["사회","범죄","사건","복지","노동","청년","저출산","인구"], "사회-SOCIETY"),
-            (["기술","AI","반도체","IT","디지털","로봇","자율주행","배터리"], "기술-TECH"),
-            (["문화","K-pop","드라마","영화","예술","전통","음식","스포츠"], "문화-CULTURE"),
-            (["교육","대학","입시","유학","학교","학생","취업","직업"], "교육-EDUCATION"),
-            (["부동산","아파트","주택","집값","전세","월세","분양"], "부동산-REALESTATE"),
-            (["국제","미국","중국","일본","러시아","EU","UN","외교","북한"], "국제-INTERNATIONAL"),
+            (["정치","대통령","국회","선거","정당","여당","야당","법안","탄핵","개헌","외교","북한"], "정치"),
+            (["경제","금리","물가","GDP","성장","수출","무역","환율","코스피","코스닥","주식","증시","기업","삼성","현대","SK","LG","스타트업","상장","IPO"], "경제"),
+            (["사회","범죄","사건","복지","노동","청년","저출산","인구","교육","대학","문화","K-pop","드라마","부동산","아파트","미국","중국","일본","국제","AI","반도체"], "사회"),
         ]
     },
     "Seoul Lifestyle": {
-        "default": "LIFESTYLE",
+        "default": "Culture",
         "keyword_map": [
-            (["politics","election","president","government","parliament","policy"], "POLITICS"),
-            (["economy","GDP","inflation","interest rate","export","trade","stock","market"], "ECONOMY"),
-            (["business","startup","company","CEO","IPO","investment","corporate"], "BUSINESS"),
-            (["global","international","US","China","Japan","UN","NATO","world"], "GLOBAL"),
-            (["culture","K-pop","drama","music","film","art","food","festival"], "CULTURE"),
-            (["education","university","study","student","school","scholarship"], "EDUCATION"),
-            (["tech","AI","semiconductor","IT","digital","robot","innovation"], "TECH"),
-            (["health","medical","wellness","hospital","treatment","beauty","skincare"], "HEALTH"),
-            (["travel","tourism","trip","hiking","destination","hotel","tour"], "TRAVEL"),
-            (["expat","foreigner","visa","immigration","living","apartment"], "EXPAT LIFE"),
+            (["politics","election","president","government","parliament","policy","North Korea","diplomacy","minister","sanctions","military","crisis"], "Politics"),
+            (["economy","GDP","inflation","interest rate","export","trade","stock","market","startup","tech","AI","semiconductor","Samsung","Hyundai","investment","fund"], "Economy"),
+            (["culture","K-pop","drama","music","film","art","food","festival","hanbok","celebrity","entertainment","lifestyle","expat","foreigner","visa","immigration","living","travel","tourism"], "Culture"),
         ]
     },
     "건강과 의학": {
-        "default": "건강정보",
+        "default": "건강의학정보",
         "keyword_map": [
-            (["혈압","고혈압","심장","혈관"], "심혈관건강"),
-            (["당뇨","혈당","인슐린"], "당뇨·혈당"),
-            (["암","종양","항암"], "암·종양"),
-            (["피부","아토피","여드름","탈모","두피"], "피부·모발"),
-            (["정신","우울","불안","스트레스","수면","불면"], "정신건강"),
-            (["뼈","관절","허리","디스크","골다공증"], "근골격계"),
-            (["영양","비타민","영양제","보충제"], "영양·보충제"),
-            (["다이어트","비만","체중","운동"], "다이어트·운동"),
-            (["소화","위장","장","변비","대장"], "소화기건강"),
-            (["간","지방간","간염","간수치"], "간·소화기"),
+            (["영양","비타민","영양제","보충제","유산균","프로바이오틱","오메가","콜라겐","다이어트","비만","체중","식품","기능성"], "건강기능식품정보"),
+            (["혈압","고혈압","당뇨","혈당","암","종양","피부","아토피","탈모","관절","허리","디스크","골다공증","수면","불면","우울","불안","간","소화","변비","치료","예방","관리"], "질환별관리법"),
+            (["심장","혈관","면역","건강정보","의학","질환","증상","병원","의사"], "건강의학정보"),
         ]
     },
-    "Finance": {"default": "Finance Tips", "keyword_map": [
+    "Finance": {"default": "Banking", "keyword_map": [
         (["stock","market","trading","invest","portfolio","dividend"], "Stock Market"),
         (["real estate","property","apartment","mortgage","rent"], "Real Estate Finance"),
         (["tax","deduction","refund","filing"], "Tax Guide"),
@@ -206,7 +192,7 @@ THEME_CATEGORIES = {
         (["loan","debt","credit","mortgage","borrow"], "Loans & Credit"),
         (["retirement","pension","fund","IRP"], "Retirement Planning"),
     ]},
-    "Investment": {"default": "Investment Guide", "keyword_map": [
+    "Investment": {"default": "Stocks", "keyword_map": [
         (["stock","equity","share","dividend","KOSPI","KOSDAQ"], "Stock Investment"),
         (["ETF","fund","mutual fund","index fund"], "Fund Investment"),
         (["real estate","property","REIT"], "Real Estate Investment"),
@@ -215,7 +201,7 @@ THEME_CATEGORIES = {
         (["global","overseas","foreign","US stock","NYSE"], "Global Investment"),
         (["startup","VC","venture","angel"], "Startup Investment"),
     ]},
-    "Korea Investment": {"default": "투자전략", "keyword_map": [
+    "Korea Investment": {"default": "주식", "keyword_map": [
         (["주식","코스피","코스닥","배당","상장"], "주식투자"),
         (["ETF","펀드","인덱스"], "펀드·ETF"),
         (["부동산","아파트","분양","리츠"], "부동산투자"),
@@ -224,7 +210,7 @@ THEME_CATEGORIES = {
         (["해외","미국주식","글로벌"], "해외투자"),
         (["절세","세금","IRP","연금"], "절세·연금"),
     ]},
-    "Korea Real Estate": {"default": "부동산정보", "keyword_map": [
+    "Korea Real Estate": {"default": "Apartments", "keyword_map": [
         (["아파트","분양","청약","재건축"], "아파트·분양"),
         (["전세","월세","임대","보증금"], "전월세"),
         (["정책","규제","LTV","DSR","금리"], "정책·규제"),
@@ -232,14 +218,14 @@ THEME_CATEGORIES = {
         (["상가","오피스텔","빌딩","수익형"], "수익형부동산"),
         (["시세","가격","호가","실거래"], "가격·시세"),
     ]},
-    "Insurance": {"default": "Insurance Guide", "keyword_map": [
+    "Insurance": {"default": "Health Insurance", "keyword_map": [
         (["life","death benefit","term life","whole life"], "Life Insurance"),
         (["health","medical","hospital","coverage"], "Health Insurance"),
         (["car","auto","vehicle","accident"], "Auto Insurance"),
         (["travel","trip","overseas","abroad"], "Travel Insurance"),
         (["pension","retirement","annuity"], "Pension & Annuity"),
     ]},
-    "Tax and Law": {"default": "Tax & Legal Guide", "keyword_map": [
+    "Tax and Law": {"default": "Taxes", "keyword_map": [
         (["income tax","소득세","withholding","filing"], "Income Tax"),
         (["corporate tax","법인세","business tax"], "Corporate Tax"),
         (["VAT","부가세","consumption tax"], "VAT & Consumption Tax"),
@@ -248,7 +234,7 @@ THEME_CATEGORIES = {
         (["labor","employment","contract","wage"], "Labor Law"),
         (["property","real estate","취득세","양도세"], "Property Tax"),
     ]},
-    "Crypto": {"default": "Crypto Guide", "keyword_map": [
+    "Crypto": {"default": "Bitcoin", "keyword_map": [
         (["bitcoin","BTC"], "Bitcoin"),
         (["ethereum","ETH","smart contract"], "Ethereum"),
         (["altcoin","XRP","SOL","BNB"], "Altcoins"),
@@ -258,7 +244,7 @@ THEME_CATEGORIES = {
         (["regulation","법","SEC","FSC"], "Regulation"),
         (["staking","mining","yield"], "Staking & Mining"),
     ]},
-    "Technology": {"default": "Tech News", "keyword_map": [
+    "Technology": {"default": "AI", "keyword_map": [
         (["AI","artificial intelligence","machine learning","GPT","LLM"], "AI & Machine Learning"),
         (["semiconductor","chip","TSMC","Samsung"], "Semiconductor"),
         (["smartphone","mobile","app","iOS","Android"], "Mobile Tech"),
@@ -267,7 +253,7 @@ THEME_CATEGORIES = {
         (["startup","venture","innovation","unicorn"], "Startup & Innovation"),
         (["EV","electric vehicle","battery","charging"], "EV & Battery"),
     ]},
-    "K-Beauty": {"default": "K-Beauty Guide", "keyword_map": [
+    "K-Beauty": {"default": "Skincare", "keyword_map": [
         (["skincare","moisturizer","serum","toner"], "Skincare Routine"),
         (["makeup","foundation","lipstick","blush"], "K-Makeup"),
         (["hair","scalp","shampoo","treatment"], "Hair Care"),
@@ -276,7 +262,7 @@ THEME_CATEGORIES = {
         (["ingredient","niacinamide","hyaluronic","vitamin C"], "Ingredients"),
         (["brand","innisfree","laneige","cosrx","olive young"], "K-Beauty Brands"),
     ]},
-    "K-Beauty Reviews": {"default": "Product Reviews", "keyword_map": [
+    "K-Beauty Reviews": {"default": "Skincare", "keyword_map": [
         (["review","best","ranking","top","recommend"], "Product Reviews"),
         (["skincare","moisturizer","serum","essence"], "Skincare Reviews"),
         (["makeup","foundation","lip","eye"], "Makeup Reviews"),
@@ -284,7 +270,7 @@ THEME_CATEGORIES = {
         (["budget","affordable","cheap","drugstore"], "Budget Picks"),
         (["luxury","premium","high-end"], "Premium Picks"),
     ]},
-    "K-POP": {"default": "K-POP News", "keyword_map": [
+    "K-POP": {"default": "Artists", "keyword_map": [
         (["BTS","BLACKPINK","EXO","TWICE","aespa","NewJeans","SEVENTEEN","Stray Kids"], "Artist Spotlight"),
         (["album","release","comeback","single","MV"], "New Releases"),
         (["concert","tour","performance","live"], "Concerts & Tours"),
@@ -292,7 +278,7 @@ THEME_CATEGORIES = {
         (["trainee","debut","audition","idol","agency"], "Idol & Agency"),
         (["fandom","fan","ARMY","BLINK","culture"], "Fan Culture"),
     ]},
-    "Travel": {"default": "Travel Guide", "keyword_map": [
+    "Travel": {"default": "Travel Guides", "keyword_map": [
         (["Seoul","서울","Gyeongbokgung","Myeongdong","Hongdae"], "Seoul Travel"),
         (["Busan","부산","beach","Haeundae","Gamcheon"], "Busan Travel"),
         (["Jeju","제주","island","Hallasan"], "Jeju Island"),
@@ -302,7 +288,7 @@ THEME_CATEGORIES = {
         (["day trip","weekend","itinerary","tour"], "Itineraries"),
         (["temple","palace","museum","history","heritage"], "Culture & History"),
     ]},
-    "Visa Guide": {"default": "Visa Guide", "keyword_map": [
+    "Visa Guide": {"default": "Work Visa", "keyword_map": [
         (["student visa","D-2","language school","D-4"], "Student Visa"),
         (["work visa","E-7","employment visa","skilled worker"], "Work Visa"),
         (["F-2","F-5","permanent residence","long-term","settlement"], "Long-term Residence"),
@@ -311,7 +297,7 @@ THEME_CATEGORIES = {
         (["family","F-1","spouse","dependent"], "Family Visa"),
         (["extension","renewal","immigration office","HiKorea"], "Visa Extension"),
     ]},
-    "Korea Medical Tourism": {"default": "Medical Tourism", "keyword_map": [
+    "Korea Medical Tourism": {"default": "Surgery", "keyword_map": [
         (["plastic surgery","nose","eye","chin","jaw","rhinoplasty"], "Plastic Surgery"),
         (["dental","teeth","orthodontics","implant","whitening"], "Dental Treatment"),
         (["cancer","oncology","treatment","hospital"], "Cancer Treatment"),
@@ -320,7 +306,7 @@ THEME_CATEGORIES = {
         (["cost","price","affordable","cheap","package"], "Cost & Packages"),
         (["visa","medical visa","C-3","entry"], "Medical Visa"),
     ]},
-    "Wedding": {"default": "Wedding Guide", "keyword_map": [
+    "Wedding": {"default": "Planning", "keyword_map": [
         (["venue","hall","ceremony","location","outdoor"], "Wedding Venue"),
         (["dress","gown","suit","attire","fashion"], "Wedding Fashion"),
         (["photographer","photo","video","videographer"], "Photography & Video"),
@@ -330,7 +316,7 @@ THEME_CATEGORIES = {
         (["budget","cost","planning","checklist","tips"], "Wedding Planning"),
         (["invitation","decoration","flower","theme"], "Decoration & Theme"),
     ]},
-    "Study in Korea": {"default": "Study in Korea", "keyword_map": [
+    "Study in Korea": {"default": "Admissions", "keyword_map": [
         (["TOPIK","Korean language","language test","KLAT"], "Korean Language"),
         (["university","admission","application","undergraduate"], "University Admission"),
         (["scholarship","KGSP","GKS","funding","stipend"], "Scholarships"),
@@ -339,7 +325,7 @@ THEME_CATEGORIES = {
         (["part-time job","work","employment","income"], "Part-time Work"),
         (["graduate","master","PhD","research"], "Graduate Studies"),
     ]},
-    "International Students": {"default": "Student Guide", "keyword_map": [
+    "International Students": {"default": "Admissions", "keyword_map": [
         (["scholarship","funding","GKS","KGSP","award"], "Scholarships"),
         (["language","Korean","TOPIK","class"], "Language Learning"),
         (["visa","D-2","extension","immigration"], "Visa & Immigration"),
@@ -347,7 +333,7 @@ THEME_CATEGORIES = {
         (["part-time","job","work","allowable hours"], "Part-time Work"),
         (["culture","adjustment","life","social"], "Cultural Adjustment"),
     ]},
-    "Employment": {"default": "Employment Guide", "keyword_map": [
+    "Employment": {"default": "Jobs", "keyword_map": [
         (["resume","CV","cover letter","application","interview"], "Job Application"),
         (["salary","wage","income","compensation","pay"], "Salary & Compensation"),
         (["IT","tech","developer","engineer","coding"], "IT Jobs"),
@@ -356,7 +342,7 @@ THEME_CATEGORIES = {
         (["startup","freelance","remote","contract"], "Freelance & Startup"),
         (["benefits","health insurance","pension","allowance"], "Benefits & Welfare"),
     ]},
-    "Jobs in Korea": {"default": "Jobs Guide", "keyword_map": [
+    "Jobs in Korea": {"default": "Jobs", "keyword_map": [
         (["IT","developer","engineer","coding","software"], "IT & Tech Jobs"),
         (["teacher","English","education","EPIK","hagwon"], "Teaching Jobs"),
         (["finance","banking","accounting","analyst"], "Finance Jobs"),
@@ -365,7 +351,7 @@ THEME_CATEGORIES = {
         (["startup","SME","entrepreneur","founder"], "Startup Jobs"),
         (["global","multinational","MNC","foreign company"], "Global Companies"),
     ]},
-    "Recruitment": {"default": "Recruitment Guide", "keyword_map": [
+    "Recruitment": {"default": "Hiring", "keyword_map": [
         (["hiring","recruit","talent","HR","headhunting"], "Hiring Strategy"),
         (["interview","screening","assessment","evaluation"], "Interview Process"),
         (["salary","offer","negotiation","compensation"], "Salary Negotiation"),
@@ -373,7 +359,7 @@ THEME_CATEGORIES = {
         (["global talent","expat","international hire"], "Global Talent"),
         (["platform","job board","LinkedIn","Saramin","Incruit"], "Recruitment Platforms"),
     ]},
-    "Korea Culture": {"default": "Korean Culture", "keyword_map": [
+    "Korea Culture": {"default": "Culture", "keyword_map": [
         (["food","cuisine","recipe","dish","eat","restaurant"], "Korean Food"),
         (["festival","holiday","Chuseok","Lunar New Year","Seollal"], "Festivals & Holidays"),
         (["traditional","Joseon","history","heritage","palace","hanok"], "History & Heritage"),
@@ -382,14 +368,14 @@ THEME_CATEGORIES = {
         (["fashion","style","trend","design","art"], "Fashion & Art"),
         (["language","Korean","hangul","expression","phrase"], "Korean Language"),
     ]},
-    "국제교육문화": {"default": "국제교육", "keyword_map": [
+    "국제교육문화": {"default": "Language", "keyword_map": [
         (["유학","해외","어학연수","교환학생"], "해외유학"),
         (["한국어","TOPIK","어학당","한국어교육"], "한국어교육"),
         (["문화교류","국제교류","MOU","협약"], "문화교류"),
         (["취업","커리어","글로벌","인턴"], "글로벌취업"),
         (["입시","대학원","장학금","지원"], "입학·장학"),
     ]},
-    "한국유학정보": {"default": "유학정보", "keyword_map": [
+    "한국유학정보": {"default": "입학정보", "keyword_map": [
         (["비자","D-2","출입국","체류"], "비자·출입국"),
         (["장학금","GKS","정부초청","지원금"], "장학금"),
         (["기숙사","숙소","자취","주거"], "숙소·생활"),
@@ -397,7 +383,7 @@ THEME_CATEGORIES = {
         (["대학","입학","전형","지원"], "대학입학"),
         (["생활","적응","문화","생활비"], "유학생활"),
     ]},
-    "Korea Career Programs": {"default": "Career Programs", "keyword_map": [
+    "Korea Career Programs": {"default": "Programs", "keyword_map": [
         (["internship","training","program","experience"], "Internship Programs"),
         (["language","Korean","English","bilingual"], "Language Programs"),
         (["certification","qualification","license","exam"], "Certifications"),
@@ -533,7 +519,7 @@ def translate_ko_to_en_for_image(keyword: str, theme: str = "") -> str:
 # ============================================================
 SITES_CONFIG = [
     {"url":"https://k-health365.com",        "lang":"ko","theme":"건강과 의학",         "mode":"health_blog",
-     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":6},
+     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":4},  # 무료화: 6→4
     {"url":"https://koreamedicaltour.com",    "lang":"en","theme":"Korea Medical Tourism","mode":"blog",
      "keywords_file":".github/workflows/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":3},
     {"url":"https://koreainvest365.com",      "lang":"en","theme":"Investment",           "mode":"blog",
@@ -557,7 +543,7 @@ SITES_CONFIG = [
     {"url":"https://oliveyoungkorea.com",     "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",
      "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":3},
     {"url":"https://kworld365.com",           "lang":"en","theme":"K-POP",               "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":5},
+     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":4},  # 무료화: 5→4
     {"url":"https://k-trip365.com",           "lang":"en","theme":"Travel",              "mode":"blog",
      "keywords_file":".github/workflows/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":3},
     {"url":"https://k-visa365.com",           "lang":"en","theme":"Visa Guide",          "mode":"blog",
@@ -581,11 +567,11 @@ SITES_CONFIG = [
     {"url":"https://jobkoreaglobal.com",      "lang":"en","theme":"Recruitment",         "mode":"blog",
      "keywords_file":".github/workflows/keywords_jobkoreaglobal.txt", "wp_pass_env":"JOBKOREAGLOBALCOM",    "daily":3},
     {"url":"https://korea365.org",            "lang":"en","theme":"Korea Culture",       "mode":"blog",
-     "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":4},
+     "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":3},  # 무료화: 4→3
     {"url":"https://koreanews365.com",        "lang":"ko","theme":"한국 뉴스",            "mode":"news",
-     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":5},
+     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":4},  # 무료화: 5→4
     {"url":"https://theseouljournal.com",     "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",
-     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":5},
+     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":4},  # 무료화: 5→4
 ]
 
 # ============================================================
@@ -1501,7 +1487,7 @@ def make_khealth_prompt(keyword: str, reporter: dict, mode: str = "health_blog")
 2. HTML 전용 출력: h2,h3,p,ul,li,ol,strong,table,tr,td,th,blockquote 태그만.
    마크다운(##,**,- 등) 절대 금지. 순수 HTML만 출력.
 
-3. ★ 분량: 공백 제외 최소 3,500자 이상. 깊이 있는 임상 의학 콘텐츠.
+3. ★ 분량: 공백 제외 최소 2,000자 이상. 핵심만 담은 고밀도 의학 콘텐츠.
 
 4. ★ 모바일 최적화: 모든 <p>는 최대 2문장 이하. 단락 사이 완전한 줄바꿈 필수.
 
@@ -1575,7 +1561,7 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
 [필수 지침 — SEO 95점 목표]
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위 첫 줄에 정확히 '{byline_ko}' 삽입.
-3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 2,000자 이상.
+3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 1,800자 이상.
 4. ★ 모바일 가독성: 모든 <p>는 2~3문장 이하.
 5. ★★★ 키워드 밀도 제한: '{keyword}'는 전체 본문 최대 6회 이하.
    대신 관련 용어·동의어로 분산: {synonym_hint}
@@ -1605,7 +1591,7 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 [MANDATORY RULES — SEO 95+ target]
 1. Style: Journalistic English, inverted pyramid. No markdown.
 2. Byline: First line must be exactly '{byline_en}'.
-3. ★ Length: Minimum 2,000 characters using HTML only (h2, h3, p, strong, ul, li, table).
+3. ★ Length: Minimum 1,800 characters using HTML only (h2, h3, p, strong, ul, li, table).
 4. ★ Mobile readability: Every <p> max 2~3 sentences.
 5. ★★★ Keyword density control: Use '{keyword}' maximum 6 times in the entire body.
    Replace additional mentions with synonyms/variants: {synonym_hint}
@@ -1639,7 +1625,7 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
 
 [필수 지침 — 구글 애드센스 승인·상위 노출 SEO 95점 이상 목표]
 1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td 태그만. 마크다운 절대 금지.
-2. ★ 분량: 공백 제외 최소 2,500자 이상.
+2. ★ 분량: 공백 제외 최소 2,000자 이상.
 3. ★ 모바일 최적화: 모든 <p>는 최대 2문장. 단락 사이 완전한 줄바꿈 필수.
 4. ★★★ 키워드 밀도 엄격 제한 (SEO 핵심):
    - '{keyword}'는 전체 본문에서 최대 8회 이하로만 사용.
@@ -1675,7 +1661,7 @@ Topic: '{keyword}' | Category: {theme} | Language: English
 
 [MANDATORY RULES — Google AdSense quality + SEO 95+ score target]
 1. HTML only: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td. No markdown ever.
-2. ★ Length: Minimum 2,500 characters of in-depth expert content.
+2. ★ Length: Minimum 2,000 characters of high-density expert content.
 3. ★ Mobile optimization: Every <p> max 2 sentences. Full paragraph breaks between sections.
 4. ★★★ Keyword density control (critical for SEO):
    - Use '{keyword}' maximum 8 times in the ENTIRE body.
@@ -2220,29 +2206,50 @@ def get_posts_for_this_slot(site: dict, slot: int) -> int:
 # ============================================================
 # Gemini 콘텐츠 생성
 # ============================================================
+# ── RPM 추적기 (flash-lite 무료: 30 RPM) ───────────────────────
+import time as _time_module
+_rpm_call_times: list = []
+_RPM_LIMIT = 28  # 30 RPM에서 2 여유분 확보
+
+def _wait_for_rpm():
+    """분당 호출 횟수가 한도 초과하면 대기"""
+    now = _time_module.time()
+    # 1분 이내 호출 기록만 유지
+    global _rpm_call_times
+    _rpm_call_times = [t for t in _rpm_call_times if now - t < 60]
+    if len(_rpm_call_times) >= _RPM_LIMIT:
+        oldest = _rpm_call_times[0]
+        wait = 61 - (now - oldest)
+        if wait > 0:
+            print(f"  ⏳ RPM 한도({_RPM_LIMIT}/분) 도달 → {wait:.0f}초 대기")
+            _time_module.sleep(wait)
+        _rpm_call_times = []
+    _rpm_call_times.append(_time_module.time())
+
 def generate_content_gemini(prompt: str) -> str:
     global GEMINI_MODEL, _gemini_fallback_active
+    _wait_for_rpm()  # ★ RPM 가드
     for attempt in range(3):
         try:
             resp = gemini_client.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,
-                config={"temperature": 0.85, "max_output_tokens": 8192}
+                config={"temperature": 0.80, "max_output_tokens": 4096}
             )
             return resp.text
         except Exception as e:
             err = str(e).lower()
             if "429" in err or "resource_exhausted" in err or "quota" in err:
                 if not _gemini_fallback_active:
-                    print(f"  ⚠️ Gemini quota 초과 → fallback 모델 전환")
-                    GEMINI_MODEL = GEMINI_MODEL_FALLBACK
+                    print(f"  ⚠️ Gemini RPM/RPD 초과 → 62초 대기 후 재시도")
                     _gemini_fallback_active = True
-                    time.sleep(15); continue
+                    _rpm_call_times.clear()
+                    time.sleep(62); continue  # 60초 + 여유 2초
                 else:
-                    print(f"  ❌ Gemini fallback도 quota 초과. 대기 60초")
-                    time.sleep(60); raise
+                    print(f"  ❌ Gemini lite RPD 한도 도달. 120초 대기")
+                    time.sleep(120); raise
             print(f"  ⚠️ Gemini 오류 (attempt {attempt+1}): {e}")
-            if attempt < 2: time.sleep(10)
+            if attempt < 2: time.sleep(20)
     raise RuntimeError("Gemini 3회 연속 실패")
 
 # ============================================================
@@ -2444,7 +2451,7 @@ def process_one_post(site: dict, keyword: str) -> bool:
             record_result(url, theme, keyword, "", "", 0, 0, "❌ Gemini 실패", str(e))
             return False
 
-        time.sleep(SLEEP_BETWEEN_POSTS)
+        time.sleep(RATE_LIMIT_SLEEP)
 
         body_raw, title, meta_desc, faq_list = extract_meta_and_faq(raw)
         body, tags = extract_tags_from_article(body_raw, keyword, theme, lang)
@@ -2473,7 +2480,7 @@ def process_one_post(site: dict, keyword: str) -> bool:
                                         tags, keyword, lang, is_khealth)
             prompt = base_prompt + suffix
             print(f"  🔄 SEO {pre_score}점 미달 → {gen_attempt+2}회차 재생성")
-            time.sleep(5)
+            time.sleep(30)  # 재생성 전 30초 대기 (RPM 보호)
 
     body, title, meta_desc, faq_list, tags = best_result
 
@@ -2541,9 +2548,10 @@ def process_one_post(site: dict, keyword: str) -> bool:
 def main():
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py 시작 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
-    print(f"   Gemini 모델: {GEMINI_MODEL}")
-    print(f"   SEO 목표: {SEO_TARGET}점 이상 | 최대 재생성: {MAX_REGEN}회 + post-processing")
-    print(f"   키워드 밀도 상한: {KW_DENSITY_MAX:.1%}")
+    print(f"   Gemini 모델: {GEMINI_MODEL} (무료 Free Tier)")
+    print(f"   SEO 목표: {SEO_TARGET}점 이상 | 최대 재생성: {MAX_REGEN}회 | RPM 상한: {_RPM_LIMIT}/분")
+    print(f"   키워드 밀도 상한: {KW_DENSITY_MAX:.1%} | 포스트간 대기: {RATE_LIMIT_SLEEP}초")
+ 
     print(f"{'='*60}\n")
 
     total_ok = total_fail = total_skip = 0
@@ -2580,7 +2588,7 @@ def main():
             ok = process_one_post(site, keyword)
             if ok: total_ok += 1
             else:  total_fail += 1
-            if i < n - 1: time.sleep(random.uniform(10, 18))
+            if i < n - 1: time.sleep(random.uniform(RATE_LIMIT_SLEEP, RATE_LIMIT_SLEEP + 5))
 
     flush_log_to_google_sheet()
 
