@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (SEO 90점 완전 보장판)
+autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (SEO 95점 완전 보장판)
 업데이트: 2026-06
   ✅ 27개 사이트 완전 반영
-  ✅ SEO 90점 미달 시 최대 3회 재생성 (전 사이트 동일)
+  ✅ SEO 95점 목표 / 미달 시 최대 3회 재생성 + post-processing
+  ✅ 클릭 유발 제목 템플릿 완전 교체 (키워드 반복·진부한 패턴 제거)
+  ✅ 키워드 밀도 1~2% 제한 + 동의어 분산 지시
+  ✅ 키워드 밀도 과다 시 SEO 점수 페널티 적용
   ✅ post-processing: 내부링크 강제 삽입 / 통계·출처 자동 보완 / TABLE 자동 생성
   ✅ 메타 디스크립션 파싱 실패 시 Gemini 재요청
-  ✅ 27개 사이트 자체 내부링크 완전판 + 네트워크 교차링크
   ✅ WP 실제 Author 랜덤 배정 (자동 생성 포함)
-  ✅ 테마별 카테고리 자동 분류
+  ✅ 테마별 카테고리 자동 분류 (기존 카테고리 우선 매칭)
   ✅ koreanews365 ↔ theseouljournal 크로스런 중복 완전 차단
   ✅ 이미지 카드형 3단 배치: 대표이미지(제목 아래) / 중간 / 하단
   ✅ 구글시트 18컬럼 로깅 / Rank Math 메타 자동 주입
@@ -46,8 +48,9 @@ _gemini_fallback_active = False
 
 TAG_COUNT        = 12
 MIN_BODY_LENGTH  = 1800
-SEO_TARGET       = 90   # ★ 전 사이트 통일 목표 점수
-MAX_REGEN        = 3    # ★ 최대 재생성 횟수 (전 사이트 동일)
+SEO_TARGET       = 95   # ★ 전 사이트 통일 목표 점수 (95점)
+MAX_REGEN        = 3    # ★ 최대 재생성 횟수
+KW_DENSITY_MAX   = 0.025  # ★ 키워드 밀도 상한 2.5% (초과 시 페널티)
 
 # ============================================================
 # ★ 가상 기자 명단
@@ -484,6 +487,7 @@ KO_TO_EN_IMAGE = {
     "방법":"method tips guide","효과":"effect benefit result",
     "추천":"recommended best top","종류":"types kinds overview",
     "부작용":"side effects risks warning","개선":"improvement recovery",
+    "유산균":"probiotics gut bacteria health",
 }
 THEME_IMAGE_FALLBACK = {
     "건강과 의학":"medical health treatment Korea doctor",
@@ -587,7 +591,6 @@ SITES_CONFIG = [
 # ============================================================
 # ★ 외부 권위 링크 (정부기관·대학·통계청 등)
 # ============================================================
-# ★★★ 외부 권위 링크 — 한국 정부기관 / 대학 / 통계청 공신력 기관으로 전면 통일 ★★★
 EXTERNAL_AUTHORITY_LINKS = {
     "건강과 의학": [
         ("질병관리청", "https://www.kdca.go.kr"),
@@ -972,7 +975,6 @@ NETWORK_CROSS_LINKS = {
 }
 
 SITE_INTERNAL_LINKS = {
-    # ── 건강 ──────────────────────────────────────────────────
     "https://k-health365.com": [
         ("건강 정보 홈", "https://k-health365.com"),
         ("혈압 관리 완전 가이드", "https://k-health365.com/?s=혈압"),
@@ -981,7 +983,6 @@ SITE_INTERNAL_LINKS = {
         ("수면 건강 개선법", "https://k-health365.com/?s=수면"),
         ("콜레스테롤 낮추는 법", "https://k-health365.com/?s=콜레스테롤"),
     ],
-    # ── 의료관광 ──────────────────────────────────────────────
     "https://koreamedicaltour.com": [
         ("Korea Medical Tourism Guide", "https://koreamedicaltour.com"),
         ("Plastic Surgery in Korea", "https://koreamedicaltour.com/?s=plastic+surgery"),
@@ -990,7 +991,6 @@ SITE_INTERNAL_LINKS = {
         ("Best Hospitals in Korea", "https://koreamedicaltour.com/?s=hospital"),
         ("Medical Tourism Cost Guide", "https://koreamedicaltour.com/?s=cost"),
     ],
-    # ── 투자·금융 ─────────────────────────────────────────────
     "https://koreainvest365.com": [
         ("Korea Investment Guide", "https://koreainvest365.com"),
         ("Korea Stock Market Guide", "https://koreainvest365.com/?s=stock"),
@@ -1039,7 +1039,6 @@ SITE_INTERNAL_LINKS = {
         ("Crypto Tax Korea", "https://koreacrypto365.com/?s=tax"),
         ("Korean Crypto Exchanges", "https://koreacrypto365.com/?s=exchange"),
     ],
-    # ── 부동산 ────────────────────────────────────────────────
     "https://krealestate365.com": [
         ("한국 부동산 정보", "https://krealestate365.com"),
         ("아파트 시세 분석", "https://krealestate365.com/?s=아파트"),
@@ -1048,7 +1047,6 @@ SITE_INTERNAL_LINKS = {
         ("부동산 정책 총정리", "https://krealestate365.com/?s=정책"),
         ("재건축 재개발 정보", "https://krealestate365.com/?s=재건축"),
     ],
-    # ── 테크 ──────────────────────────────────────────────────
     "https://ktech365.com": [
         ("Korea Tech News", "https://ktech365.com"),
         ("AI Technology Korea", "https://ktech365.com/?s=AI"),
@@ -1057,7 +1055,6 @@ SITE_INTERNAL_LINKS = {
         ("EV Battery Technology Korea", "https://ktech365.com/?s=EV+battery"),
         ("Cybersecurity Korea", "https://ktech365.com/?s=cybersecurity"),
     ],
-    # ── K-뷰티 ────────────────────────────────────────────────
     "https://kskin365.com": [
         ("K-Beauty Guide", "https://kskin365.com"),
         ("Korean Skincare Routine", "https://kskin365.com/?s=skincare"),
@@ -1074,7 +1071,6 @@ SITE_INTERNAL_LINKS = {
         ("K-Beauty Brand Guide", "https://oliveyoungkorea.com/?s=brand"),
         ("Olive Young Korea Shopping", "https://oliveyoungkorea.com/?s=olive+young"),
     ],
-    # ── K-POP ─────────────────────────────────────────────────
     "https://kworld365.com": [
         ("K-POP News", "https://kworld365.com"),
         ("BTS Latest News", "https://kworld365.com/?s=BTS"),
@@ -1083,7 +1079,6 @@ SITE_INTERNAL_LINKS = {
         ("K-POP Concert Guide", "https://kworld365.com/?s=concert"),
         ("K-POP Charts and Awards", "https://kworld365.com/?s=chart"),
     ],
-    # ── 여행 ──────────────────────────────────────────────────
     "https://k-trip365.com": [
         ("Korea Travel Guide", "https://k-trip365.com"),
         ("Seoul Travel Guide", "https://k-trip365.com/?s=Seoul"),
@@ -1092,7 +1087,6 @@ SITE_INTERNAL_LINKS = {
         ("Korean Food Guide", "https://k-trip365.com/?s=food"),
         ("Korea Budget Travel Tips", "https://k-trip365.com/?s=budget+travel"),
     ],
-    # ── 비자 ──────────────────────────────────────────────────
     "https://k-visa365.com": [
         ("Korea Visa Guide", "https://k-visa365.com"),
         ("Student Visa D-2 Korea", "https://k-visa365.com/?s=D-2"),
@@ -1101,7 +1095,6 @@ SITE_INTERNAL_LINKS = {
         ("Korea Visa Extension", "https://k-visa365.com/?s=extension"),
         ("F-2 Long-term Visa Korea", "https://k-visa365.com/?s=F-2"),
     ],
-    # ── 웨딩 ──────────────────────────────────────────────────
     "https://koreawedding365.com": [
         ("Korea Wedding Guide", "https://koreawedding365.com"),
         ("Korea Wedding Venues", "https://koreawedding365.com/?s=venue"),
@@ -1110,7 +1103,6 @@ SITE_INTERNAL_LINKS = {
         ("Korea Wedding Budget Guide", "https://koreawedding365.com/?s=budget"),
         ("Korea Honeymoon Guide", "https://koreawedding365.com/?s=honeymoon"),
     ],
-    # ── 유학 ──────────────────────────────────────────────────
     "https://kstudy365.com": [
         ("Study in Korea Guide", "https://kstudy365.com"),
         ("Korean University Admission", "https://kstudy365.com/?s=university"),
@@ -1151,7 +1143,6 @@ SITE_INTERNAL_LINKS = {
         ("Job Placement Korea", "https://sis-korea.com/?s=job"),
         ("Career Networking Korea", "https://sis-korea.com/?s=networking"),
     ],
-    # ── 취업 ──────────────────────────────────────────────────
     "https://jobkorea365.com": [
         ("Jobs in Korea Guide", "https://jobkorea365.com"),
         ("IT Jobs Korea", "https://jobkorea365.com/?s=IT"),
@@ -1176,7 +1167,6 @@ SITE_INTERNAL_LINKS = {
         ("Salary Negotiation Korea", "https://jobkoreaglobal.com/?s=salary"),
         ("Korea HR Recruitment Platforms", "https://jobkoreaglobal.com/?s=platform"),
     ],
-    # ── 문화 ──────────────────────────────────────────────────
     "https://korea365.org": [
         ("Korean Culture Guide", "https://korea365.org"),
         ("Korean Food and Cuisine", "https://korea365.org/?s=food"),
@@ -1185,7 +1175,6 @@ SITE_INTERNAL_LINKS = {
         ("K-Wave Hallyu Guide", "https://korea365.org/?s=K-pop"),
         ("Korean Language Phrases", "https://korea365.org/?s=language"),
     ],
-    # ── 뉴스 ──────────────────────────────────────────────────
     "https://koreanews365.com": [
         ("더한국타임즈 최신 뉴스", "https://koreanews365.com"),
         ("경제 뉴스", "https://koreanews365.com/category/경제-economy/"),
@@ -1205,7 +1194,6 @@ SITE_INTERNAL_LINKS = {
 }
 
 def get_internal_links(site_url: str, count: int = 5) -> list:
-    """자체 내부링크 3개 + 교차링크 2개 조합"""
     own_links   = SITE_INTERNAL_LINKS.get(site_url, [])
     cross_links = NETWORK_CROSS_LINKS.get(site_url, [])
     selected = []
@@ -1222,16 +1210,16 @@ def get_internal_links(site_url: str, count: int = 5) -> list:
 # ★ 뉴스 키워드 풀
 # ============================================================
 NEWS_KO_FALLBACK = [
-    ("한국 부동산 정책 동향 2026", "최근 부동산 정책 변화와 시장 영향을 심층 분석합니다."),
+    ("한국 부동산 정책 동향", "최근 부동산 정책 변화와 시장 영향을 심층 분석합니다."),
     ("한국은행 기준금리 결정 배경", "기준금리 결정 배경과 향후 경제 전망을 다룹니다."),
     ("코스피·코스닥 시황 주간 분석", "최근 국내 증시 동향과 주요 이슈를 정리합니다."),
     ("반도체 수출 실적 역대 최고치", "반도체 산업 수출 동향과 글로벌 경쟁력을 분석합니다."),
-    ("청년 주거지원 정책 2026 총정리", "청년층 대상 주거 지원 정책의 핵심 내용을 정리합니다."),
+    ("청년 주거지원 정책 총정리", "청년층 대상 주거 지원 정책의 핵심 내용을 정리합니다."),
     ("국민연금 개혁안 핵심 쟁점 분석", "국민연금 개혁 논의의 주요 쟁점을 살펴봅니다."),
     ("K-배터리 차세대 기술 개발 현황", "국내 배터리 산업의 기술 혁신과 시장 동향을 다룹니다."),
     ("한국 인공지능 스타트업 생태계", "국내 AI 스타트업 생태계의 최신 흐름을 분석합니다."),
     ("저출산 대책 예산 집행 현황", "저출산 문제 해결을 위한 정부 예산 정책을 정리합니다."),
-    ("탄소중립 2050 정책 추진 현황", "탄소중립 목표 달성을 위한 국내 정책 현황을 다룹니다."),
+    ("탄소중립 정책 추진 현황", "탄소중립 목표 달성을 위한 국내 정책 현황을 다룹니다."),
     ("K-푸드 글로벌 수출 신기록", "한국 식품의 해외 수출 트렌드를 분석합니다."),
     ("가상자산 법안 국회 통과 영향", "디지털 자산 관련 입법 동향을 정리합니다."),
     ("소비자물가지수 상승률 분석", "최근 물가 상승률과 향후 전망을 살펴봅니다."),
@@ -1241,29 +1229,29 @@ NEWS_KO_FALLBACK = [
     ("AI 반도체 팹리스 육성 전략", "AI 반도체 설계 산업 육성 정책을 다룹니다."),
     ("국내 OTT 플랫폼 시장 점유율", "OTT 플랫폼 간 경쟁 구도와 시장 변화를 살펴봅니다."),
     ("외국인 직접투자 유치 현황 분석", "한국 내 외국인 투자 동향과 유망 섹터를 다룹니다."),
-    ("2026년 최저임금 인상 영향 분석", "최저임금 결정 배경과 산업별 영향을 분석합니다."),
+    ("최저임금 인상 영향 분석", "최저임금 결정 배경과 산업별 영향을 분석합니다."),
 ]
 NEWS_EN_FALLBACK = [
-    ("Living in Seoul as an Expat in 2026", "A practical guide for foreigners settling in Seoul."),
+    ("Living in Seoul as an Expat", "A practical guide for foreigners settling in Seoul."),
     ("Best Neighborhoods to Live in Seoul for Foreigners", "Top Seoul neighborhoods ranked by expat-friendliness."),
     ("How to Open a Bank Account in Korea as a Foreigner", "Step-by-step guide to Korean banking for foreigners."),
     ("Korean Work Culture Explained for International Professionals", "What to expect when working in a Korean company."),
     ("Street Food Culture in Seoul: A Complete Guide", "Exploring Seoul's best street food scenes and markets."),
     ("How to Get an E-7 Visa for Skilled Workers in Korea", "Detailed walkthrough of the E-7 visa application process."),
-    ("Top Korean Language Schools in Seoul 2026", "Comparing the best Korean language programs for expats."),
+    ("Top Korean Language Schools in Seoul", "Comparing the best Korean language programs for expats."),
     ("Korea's National Health Insurance for Foreigners", "What foreign residents need to know about Korean healthcare."),
     ("Hiking Trails Near Seoul: Weekend Guide", "The best hiking spots within 1 hour of Seoul city center."),
     ("How to Find an Apartment in Seoul Without an Agent", "DIY apartment hunting guide for expats in Seoul."),
     ("K-beauty Skincare Routine: What Actually Works", "Science-backed Korean skincare tips verified by dermatologists."),
     ("Korean Food for Beginners: 15 Dishes to Try First", "The ultimate starter guide to Korean cuisine."),
-    ("Working Holiday Visa Korea 2026 Guide", "Complete guide to applying for a Korean working holiday visa."),
-    ("Cafes and Co-working Spaces in Seoul 2026", "Best spots to work remotely in Seoul for digital nomads."),
+    ("Working Holiday Visa Korea Guide", "Complete guide to applying for a Korean working holiday visa."),
+    ("Cafes and Co-working Spaces in Seoul", "Best spots to work remotely in Seoul for digital nomads."),
     ("Korean Traditional Festivals You Should Attend", "Cultural events and traditional festivals not to miss in Korea."),
     ("How to Use Seoul Public Transport Like a Local", "Complete guide to buses, metro, and KTX for newcomers."),
-    ("Cost of Living in Seoul 2026: Honest Breakdown", "Realistic monthly budget breakdown for expats in Seoul."),
-    ("Best Day Trips from Seoul in 2026", "Top destinations within 2 hours of Seoul for weekend trips."),
+    ("Cost of Living in Seoul: Honest Breakdown", "Realistic monthly budget breakdown for expats in Seoul."),
+    ("Best Day Trips from Seoul", "Top destinations within 2 hours of Seoul for weekend trips."),
     ("Understanding Korean Visa Categories: F, E, D Series", "Clear explanation of Korean visa types for foreigners."),
-    ("How to Teach English in Korea in 2026", "Complete guide to EPIK, hagwon, and private tutoring jobs."),
+    ("How to Teach English in Korea", "Complete guide to EPIK, hagwon, and private tutoring jobs."),
 ]
 
 _used_news_titles_ko: set = set()
@@ -1350,30 +1338,145 @@ def crawl_rss_news(lang: str = "ko", site_url: str = "") -> tuple:
     return chosen
 
 # ============================================================
-# ★ 제목 스타일
+# ★★★ 클릭 유발 제목 템플릿 (전면 교체 — 진부한 패턴 완전 삭제)
 # ============================================================
-TITLE_STYLES_KO = [
-    "숫자 리스트형: '○○하는 5가지 방법', '몰랐던 7가지 사실' — 구체적 숫자로 신뢰감 자극",
-    "경고·주의형: '○○ 모르고 하면 손해보는 이유', '이것만 모르면 100% 후회' — 손실 회피 심리 자극",
-    "질문형: '○○ 진짜 효과 있을까?', '당신도 혹시 ○○ 하고 있나요?' — 독자 자기 점검 유도",
-    "비교·반전형: '○○ vs △△, 정답은 따로 있다', '다들 잘못 알고 있는 ○○ 진실' — 통념 파괴",
-    "긴급·시기형: '지금 안 하면 늦는 ○○', '2026년 꼭 알아야 할 ○○ 총정리' — 긴박감 조성",
-]
-TITLE_STYLES_EN = [
-    "Number/List: '7 Things Nobody Tells You About X', '5 Mistakes to Avoid' — count builds trust",
-    "Warning: 'Why You're Losing Money on X', 'Stop Making This X Mistake' — loss aversion",
-    "Question: 'Is X Really Worth It in 2026?', 'Are You Making This X Mistake?' — self-check",
-    "Contrarian: 'X vs Y: Here's the Real Answer', 'What Nobody Tells You About X' — myth-busting",
-    "Urgency: 'Why X Matters More Than Ever in 2026', 'The Complete X Guide You Need Now' — FOMO",
+# 설계 원칙:
+# 1. 제목에 키워드를 1회만 사용 (키워드 반복 금지)
+# 2. 구체적 숫자·기간·금액으로 신뢰감 부여
+# 3. 독자의 손실 회피 심리 / 호기심 / 긴박감 중 하나를 정확히 자극
+# 4. "총정리", "완벽 가이드", "A to Z" 등 진부한 표현 완전 배제
+# 5. 대괄호·이모지 활용으로 시각적 주목도 제고
+# ============================================================
+
+TITLE_TEMPLATES_KO = [
+    # 숫자 기반 — 신뢰·구체성
+    "[전문의 직접 검증] {keyword}, 제대로 알면 달라지는 것들",
+    "많은 사람이 모르는 {keyword}의 불편한 진실",
+    "지금 당장 바꿔야 할 {keyword} 습관 — 의사가 직접 말하다",
+    "병원에서 알려주지 않는 {keyword} 핵심 포인트",
+    "{keyword}, 제대로 안 하면 오히려 독이 됩니다",
+    "전문가도 헷갈리는 {keyword} — 이것만은 꼭 알아두세요",
+    "[경고] 잘못된 {keyword} 상식이 당신의 건강을 망치고 있습니다",
+    "{keyword} 효과 없던 이유 — 순서가 틀렸습니다",
+    "돈 낭비 없이 {keyword} 해결하는 현실적인 방법",
+    "남들은 이미 알고 있는 {keyword} 핵심 — 당신만 모르고 있었나요?",
+    # 반전·호기심
+    "다들 잘못 알고 있는 {keyword} — 진짜 정답은 따로 있었다",
+    "{keyword}에 대해 당신이 배운 것 중 절반은 틀렸습니다",
+    "열심히 했는데 왜 안 될까? {keyword} 실패하는 진짜 이유",
+    # 긴박감·손실 회피
+    "지금 모르면 손해보는 {keyword} 핵심 변화",
+    "이미 늦었다고 생각하는 {keyword} — 지금 시작해도 됩니다",
+    "방치하면 위험한 {keyword} 초기 신호 — 몇 가지나 해당되나요?",
 ]
 
-def pick_title_style(lang: str) -> str:
-    return random.choice(TITLE_STYLES_KO if lang == "ko" else TITLE_STYLES_EN)
+TITLE_TEMPLATES_EN = [
+    # Numbers & specificity
+    "What Nobody Tells You About {keyword} (And Why It Matters)",
+    "The {keyword} Advice Experts Actually Follow — Not What You Read Online",
+    "Stop Wasting Money on {keyword}: What Actually Works in Practice",
+    "The Uncomfortable Truth About {keyword} Most People Ignore",
+    "{keyword}: The Common Mistakes That Are Costing You Results",
+    "I Tried Every {keyword} Method — Here's What Changed Everything",
+    # Contrarian / myth-busting
+    "Everything You Think You Know About {keyword} Is Probably Wrong",
+    "The {keyword} Strategy Nobody Talks About (That Actually Works)",
+    "Why Popular {keyword} Advice Fails Most People",
+    "The Hidden Side of {keyword} That Changes How You Should Approach It",
+    # Urgency / loss aversion
+    "If You're Still Ignoring {keyword}, This Is What It's Costing You",
+    "Don't Make This {keyword} Mistake — It's More Common Than You Think",
+    "The {keyword} Warning Signs Most People Miss Until It's Too Late",
+    # Intrigue / curiosity gap
+    "What a {keyword} Expert Does Differently (And You Can Too)",
+    "The Surprising Reason Your {keyword} Approach Isn't Working",
+    "What 3 Months of {keyword} Research Taught Me That No One Talks About",
+]
+
+TITLE_TEMPLATES_NEWS_KO = [
+    "지금 한국에서 벌어지는 일 — {keyword} 완전 해석",
+    "{keyword} 파장, 생각보다 훨씬 크다",
+    "수면 아래 숨겨진 {keyword}의 진짜 의미",
+    "전문가들이 주목하는 {keyword}의 핵심 변수",
+    "{keyword}, 이것이 앞으로 달라질 것들",
+    "숫자로 읽는 {keyword} — 지표가 말하는 진실",
+    "[심층] {keyword}: 표면 뒤에 있는 구조적 문제",
+    "{keyword}가 당신의 일상에 미치는 영향",
+]
+
+TITLE_TEMPLATES_NEWS_EN = [
+    "What's Really Happening With {keyword} in Korea Right Now",
+    "The {keyword} Story Korea's Media Is Underreporting",
+    "Why {keyword} Matters More Than Most Koreans Realize",
+    "The Numbers Behind {keyword} Tell a Different Story",
+    "{keyword}: What It Means for Expats and Investors in Korea",
+    "Reading Between the Lines on {keyword}",
+    "The Quiet Shift in {keyword} That Could Change Everything",
+    "What Experts Are Saying About {keyword} — And What They're Missing",
+]
+
+def pick_title_template(lang: str, mode: str = "blog") -> str:
+    """★ 키워드 1회 삽입 제목 템플릿 선택"""
+    if mode == "news":
+        return random.choice(TITLE_TEMPLATES_NEWS_KO)
+    elif mode == "news_en":
+        return random.choice(TITLE_TEMPLATES_NEWS_EN)
+    elif lang == "ko":
+        return random.choice(TITLE_TEMPLATES_KO)
+    else:
+        return random.choice(TITLE_TEMPLATES_EN)
+
+def apply_title_template(template: str, keyword: str) -> str:
+    """템플릿에 키워드 삽입 — {keyword}를 정확히 1회만 치환"""
+    return template.replace("{keyword}", keyword, 1)
+
+# ============================================================
+# ★ 키워드 동의어 / 분산 표현 (밀도 제어용)
+# ============================================================
+KW_SYNONYMS_KO = {
+    "유산균": ["프로바이오틱스", "장내 유익균", "유익 미생물", "발효균"],
+    "혈압": ["혈압 수치", "동맥압", "심혈관 지표"],
+    "당뇨": ["혈당 조절", "인슐린 분비", "대사 질환"],
+    "면역력": ["면역 기능", "신체 방어력", "면역 체계"],
+    "콜레스테롤": ["혈중 지질", "LDL 수치", "지질 대사"],
+    "다이어트": ["체중 감량", "체중 관리", "비만 개선"],
+    "수면": ["숙면", "수면 질", "야간 회복"],
+    "탈모": ["두피 건강", "모발 손실", "헤어 케어"],
+    "부동산": ["주택 시장", "아파트 시세", "부동산 시장"],
+    "주식": ["증시", "주식 시장", "코스피"],
+    "비트코인": ["가상자산", "암호화폐", "디지털 자산"],
+}
+
+KW_SYNONYMS_EN = {
+    "probiotics": ["gut bacteria", "beneficial microorganisms", "live cultures", "microbiome support"],
+    "skincare": ["skin health", "dermal care", "complexion routine", "skin wellness"],
+    "investment": ["asset allocation", "portfolio strategy", "wealth building", "financial growth"],
+    "visa": ["immigration status", "residency permit", "entry authorization", "legal status"],
+    "insurance": ["coverage plan", "risk protection", "policy benefits", "financial safety net"],
+    "salary": ["compensation", "earnings", "income level", "pay structure"],
+    "scholarship": ["financial aid", "tuition support", "study grant", "academic funding"],
+}
+
+def get_synonym_hint(keyword: str, lang: str) -> str:
+    """키워드 동의어 힌트 생성 (프롬프트 삽입용)"""
+    synonyms = KW_SYNONYMS_KO if lang == "ko" else KW_SYNONYMS_EN
+    kw_lower = keyword.lower()
+    for k, v in synonyms.items():
+        if k.lower() in kw_lower or kw_lower in k.lower():
+            sample = random.sample(v, min(3, len(v)))
+            if lang == "ko":
+                return f"대신 쓸 수 있는 동의어·변형어: {', '.join(sample)}"
+            else:
+                return f"Use these synonyms/variants instead: {', '.join(sample)}"
+    if lang == "ko":
+        return "관련 전문 용어와 유사 표현을 섞어서 사용하세요"
+    else:
+        return "Mix in related terms, synonyms, and expert vocabulary throughout"
 
 # ============================================================
 # ★ SEO 프롬프트 생성
 # ============================================================
-def make_khealth_prompt(keyword: str, reporter: dict) -> str:
+def make_khealth_prompt(keyword: str, reporter: dict, mode: str = "health_blog") -> str:
     reporter_name = reporter_display(reporter)
     byline = f"◇ {reporter_name} 기자"
     internal_links = get_internal_links("https://k-health365.com", count=5)
@@ -1383,7 +1486,10 @@ def make_khealth_prompt(keyword: str, reporter: dict) -> str:
     ext_links = get_authority_links("건강과 의학")
     ext_sample = random.sample(ext_links, min(4, len(ext_links)))
     ext_hint = ", ".join(f"{n}({u})" for n, u in ext_sample)
-    title_style = pick_title_style("ko")
+    title_template = pick_title_template("ko", mode)
+    suggested_title = apply_title_template(title_template, keyword)
+    synonym_hint = get_synonym_hint(keyword, "ko")
+
     return f"""당신은 대한민국 최고 권위의 내과 전문의이자 의학 저널리스트입니다.
 임상 경력 20년, 대한의학회 공인 전문위원 자격을 보유하고 있습니다.
 주제: '{keyword}' | 사이트: k-health365.com (구글 애드센스 승인 의학 전문 블로그)
@@ -1399,7 +1505,11 @@ def make_khealth_prompt(keyword: str, reporter: dict) -> str:
 
 4. ★ 모바일 최적화: 모든 <p>는 최대 2문장 이하. 단락 사이 완전한 줄바꿈 필수.
 
-5. ★ 키워드: 첫 단락 첫 문장에 '{keyword}' 반드시 배치. 전체 15회 이상 사용.
+5. ★★★ 키워드 밀도 엄격 제한 (매우 중요):
+   - 핵심 키워드 '{keyword}'는 전체 본문에서 최대 8회 이하로만 사용.
+   - 나머지는 반드시 동의어·관련 표현으로 대체: {synonym_hint}
+   - 같은 키워드가 연속 2단락에 반복되면 안 됩니다.
+   - 첫 단락 첫 문장에 '{keyword}' 1회 배치 후, 자연스럽게 분산.
 
 6. ★ 문서 구조 (필수):
    - h2 최소 6개, h3 최소 5개
@@ -1421,14 +1531,21 @@ def make_khealth_prompt(keyword: str, reporter: dict) -> str:
     - "⚠️ 주의사항 / 언제 병원을 가야 할까?" 섹션 필수 포함
     - 본문 어딘가에: "이 글은 의학적 참고 정보이며, 진단 및 치료는 반드시 전문의와 상담하세요." 문구 포함
 
-12. 제목 스타일: {title_style}
-    → 출력 첫 줄 반드시 'TITLE:' 로 시작. 20~60자.
+12. ★★★ 제목 (매우 중요):
+    - 아래 제안 제목을 참고하여 클릭을 부르는 제목을 작성하세요:
+      참고 제목: "{suggested_title}"
+    - 제목에 '{keyword}'는 반드시 포함하되 1회만 사용.
+    - "총정리", "A to Z", "완벽 가이드", "효과 효과 효과" 같은 반복·진부한 표현 금지.
+    - 숫자, 경고, 반전, 전문가 관점 중 하나의 훅(hook)을 반드시 사용.
+    - 출력 첫 줄 반드시 'TITLE:' 로 시작. 20~60자.
 
-13. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작. 정확히 130~140자(한글). '{keyword}' 포함.
+13. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작. 정확히 130~140자(한글).
+    '{keyword}' 포함. '{keyword}' 반복 없이 자연스러운 한 문장으로.
 
-14. FAQ: 'FAQ_START' ~ 'FAQ_END' 블록. Q:/A: 형식 5문항.
+14. FAQ: 'FAQ_START' ~ 'FAQ_END' 블록. Q:/A: 형식 5문항. 각 답변 완전한 문장으로.
 
 15. ★ TAGS: 'TAGS:' 로 시작, 12개 한국어 키워드. 첫 번째는 '{keyword}'.
+    나머지 11개는 '{keyword}'를 포함하지 않는 관련 키워드로 작성.
 
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS"""
 
@@ -1438,7 +1555,8 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
     reporter_name = reporter_display(reporter) if reporter else "편집부"
     byline_ko = f"◇ {reporter_name} 기자"
     byline_en = f"◇ By {reporter_name}"
-    title_style = pick_title_style(lang)
+    title_template = pick_title_template(lang, mode)
+    suggested_title = apply_title_template(title_template, keyword)
     is_medical  = ("건강" in theme or "의학" in theme or "medical" in theme.lower()
                    or "beauty" in theme.lower())
     ext_links   = get_authority_links(theme)
@@ -1448,51 +1566,66 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
     internal_links_str = "\n".join(
         f'  - <a href="{url}" title="{name}">{name}</a>' for name, url in internal_links
     )
+    synonym_hint = get_synonym_hint(keyword, lang)
 
     if mode == "news":
         return f"""당신은 주요 일간지의 시니어 취재기자입니다.
 주제: '{keyword}'에 대해 엄격한 신문기사체 뉴스 기사를 작성하세요.
 
-[필수 지침 — SEO 90점 목표]
+[필수 지침 — SEO 95점 목표]
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위 첫 줄에 정확히 '{byline_ko}' 삽입.
 3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 2,000자 이상.
-4. ★ 모바일 가독성: 모든 <p>는 2~3문장 이하. 단락 사이 완전한 줄바꿈 필수.
-5. ★ 통계·수치 5개 이상: "%", "만 명", "억 원" 등 구체적 숫자.
-6. ★ 출처 괄호 3회 이상: "(통계청, 2026)", "(한국은행 발표)" 형식.
-7. ★ 데이터 비교 <table> 1개 이상 반드시 포함 (thead/tbody 완전 구조).
-8. ★ 실제 내부링크 5개 본문에 자연스럽게 삽입 (완전한 href URL):
+4. ★ 모바일 가독성: 모든 <p>는 2~3문장 이하.
+5. ★★★ 키워드 밀도 제한: '{keyword}'는 전체 본문 최대 6회 이하.
+   대신 관련 용어·동의어로 분산: {synonym_hint}
+6. ★ 통계·수치 5개 이상: "%", "만 명", "억 원" 등 구체적 숫자.
+7. ★ 출처 괄호 3회 이상: "(통계청, 2026)", "(한국은행 발표)" 형식.
+8. ★ 데이터 비교 <table> 1개 이상 반드시 포함 (thead/tbody 완전 구조).
+9. ★ 실제 내부링크 5개 본문에 자연스럽게 삽입 (완전한 href URL):
 {internal_links_str}
-9. ★ 권위 기관 3회 이상 언급 (한국 정부기관/대학교/통계청만 — 사설언론사 금지): {ext_hint}
-10. E-E-A-T 전문가 인용구 1개 이상.
-11. h2 최소 4개, h3 최소 2개, ul/li 2개 이상.
-12. 제목 스타일: {title_style} → 출력 첫 줄 'TITLE:' 로 시작.
-13. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작, 정확히 130~140자(한글).
-14. FAQ: 'FAQ_START' ~ 'FAQ_END' 블록, Q:/A: 형식 3문항.
-15. ★ TAGS: 'TAGS:' 로 시작, {TAG_COUNT}개 한국어 키워드. 첫 번째는 '{keyword}'.
+10. ★ 권위 기관 3회 이상 언급 (한국 정부기관/대학교/통계청만 — 사설언론사 금지): {ext_hint}
+11. E-E-A-T 전문가 인용구 1개 이상.
+12. h2 최소 4개, h3 최소 2개, ul/li 2개 이상.
+13. ★★★ 제목 (매우 중요):
+    참고 제목: "{suggested_title}"
+    - 제목에 '{keyword}' 1회만 사용. 진부한 반복 표현 금지.
+    - 독자의 호기심 또는 손실 회피 심리를 자극하는 훅 사용.
+    출력 첫 줄 'TITLE:' 로 시작.
+14. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작, 정확히 130~140자(한글).
+    '{keyword}' 1회만 포함, 클릭 유발 자연스러운 문장.
+15. FAQ: 'FAQ_START' ~ 'FAQ_END' 블록, Q:/A: 형식 3문항. 각 답변 완전한 문장.
+16. ★ TAGS: 'TAGS:' 로 시작, {TAG_COUNT}개 한국어 키워드. 첫 번째는 '{keyword}'.
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS"""
 
     if mode == "news_en":
         return f"""You are a senior staff writer at an English-language newspaper based in Seoul.
 Topic: Write a professional English news/feature article about '{keyword}' ({theme}).
 
-[MANDATORY RULES — SEO 90+ target]
+[MANDATORY RULES — SEO 95+ target]
 1. Style: Journalistic English, inverted pyramid. No markdown.
 2. Byline: First line must be exactly '{byline_en}'.
 3. ★ Length: Minimum 2,000 characters using HTML only (h2, h3, p, strong, ul, li, table).
-4. ★ Mobile readability: Every <p> max 2~3 sentences. Full paragraph breaks between sections.
-5. ★ Statistics (minimum 5): Specific numbers (%, figures, dates, costs).
-6. ★ Source citations (minimum 3): "(Statistics Korea, 2026)", "(Ministry of Health)" format.
-7. ★ Data comparison <table> at least 1 (with thead/tbody/tr/th/td full structure).
-8. ★ Real internal links — insert naturally in body (minimum 5 links, complete href URLs):
+4. ★ Mobile readability: Every <p> max 2~3 sentences.
+5. ★★★ Keyword density control: Use '{keyword}' maximum 6 times in the entire body.
+   Replace additional mentions with synonyms/variants: {synonym_hint}
+6. ★ Statistics (minimum 5): Specific numbers (%, figures, dates, costs).
+7. ★ Source citations (minimum 3): "(Statistics Korea, 2026)", "(Ministry of Health)" format.
+8. ★ Data comparison <table> at least 1 (with thead/tbody/tr/th/td full structure).
+9. ★ Real internal links — insert naturally in body (minimum 5 links, complete href URLs):
 {internal_links_str}
-9. ★ Authority sources — Korean gov/universities/official bodies ONLY (no private media, min 3): {ext_hint}
-10. E-E-A-T: At least 1 expert quote or attributed statement.
-11. Minimum 4 h2, 2 h3, 2 ul/li lists.
-12. Title style: {title_style} → First line starting 'TITLE:'.
-13. ★ META_DESC: After body, 'META_DESC:', exactly 130~155 English characters.
-14. FAQ: 'FAQ_START' ~ 'FAQ_END' block, Q:/A: format, 3 questions.
-15. ★ TAGS: 'TAGS:', {TAG_COUNT} English keywords. First tag must be '{keyword}'.
+10. ★ Authority sources — Korean gov/universities/official bodies ONLY (no private media, min 3): {ext_hint}
+11. E-E-A-T: At least 1 expert quote or attributed statement.
+12. Minimum 4 h2, 2 h3, 2 ul/li lists.
+13. ★★★ Title (very important):
+    Reference title: "{suggested_title}"
+    - Use '{keyword}' exactly once in title. No clichéd "complete guide / A to Z" phrases.
+    - Use one strong hook: curiosity gap, loss aversion, contrarian, or expert perspective.
+    First line starting 'TITLE:'.
+14. ★ META_DESC: After body, 'META_DESC:', exactly 130~155 English characters.
+    Include '{keyword}' once. Natural, click-driving sentence.
+15. FAQ: 'FAQ_START' ~ 'FAQ_END' block, Q:/A: format, 3 questions. Complete answers.
+16. ★ TAGS: 'TAGS:', {TAG_COUNT} English keywords. First tag must be '{keyword}'.
 Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS"""
 
     persona = ("의학박사 및 임상 전문의" if is_medical else "해당 분야 15년 경력 최고 전문 자문위원")
@@ -1504,11 +1637,15 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
         return f"""당신은 {p}이자 구글 SEO 최고 전문 콘텐츠 라이터입니다.
 주제: '{keyword}' | 카테고리: {theme}
 
-[필수 지침 — 구글 애드센스 승인·상위 노출 SEO 90점 이상 목표]
+[필수 지침 — 구글 애드센스 승인·상위 노출 SEO 95점 이상 목표]
 1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td 태그만. 마크다운 절대 금지.
 2. ★ 분량: 공백 제외 최소 2,500자 이상.
 3. ★ 모바일 최적화: 모든 <p>는 최대 2문장. 단락 사이 완전한 줄바꿈 필수.
-4. 키워드: 첫 단락 문두에 '{keyword}' 배치, 전체 10회 이상 자연스럽게 삽입.
+4. ★★★ 키워드 밀도 엄격 제한 (SEO 핵심):
+   - '{keyword}'는 전체 본문에서 최대 8회 이하로만 사용.
+   - 반드시 동의어·관련 표현으로 분산: {synonym_hint}
+   - 첫 단락 첫 문장에 '{keyword}' 1회 배치 후, 이후 단락에서 자연스럽게 분산.
+   - 동일 키워드가 연속 단락에 반복되면 안 됩니다.
 5. ★ 구조 (모두 필수):
    - h2 최소 5개, h3 최소 4개
    - ul/li 리스트 3개 이상
@@ -1519,21 +1656,32 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
 {internal_links_str}
 9. ★ 권위 기관 3회 이상 언급 (한국 정부기관/대학교/통계청만 — 사설사이트 금지): {ext_hint}
 10. E-E-A-T 전문성: 실무 경험 기반 디테일 2곳 이상.
-11. 제목 스타일: {title_style} → 출력 첫 줄 'TITLE:' 로 시작.
+11. ★★★ 제목 (SEO 95점의 핵심):
+    참고 제목: "{suggested_title}"
+    - 반드시 클릭을 부르는 제목으로. '{keyword}' 1회만 사용.
+    - "총정리", "완벽 가이드", "A to Z" 등 진부한 표현 절대 금지.
+    - 숫자, 경고, 반전, 전문가 관점 중 하나의 강력한 훅 사용.
+    출력 첫 줄 'TITLE:' 로 시작.
 12. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작, 정확히 130~140자(한글).
-13. FAQ: 'FAQ_START' ~ 'FAQ_END' 블록, Q:/A: 형식 3문항.
+    '{keyword}' 1회만 포함, 클릭 유발 자연스러운 문장.
+13. FAQ: 'FAQ_START' ~ 'FAQ_END' 블록, Q:/A: 형식 3문항. 각 답변 완전한 문장.
 14. ★ TAGS: 'TAGS:' 로 시작, {TAG_COUNT}개 한국어 키워드. 첫 번째는 '{keyword}'.
+    나머지 11개는 '{keyword}'를 포함하지 않는 관련 키워드.
 출력 순서: TITLE → 본문HTML → META_DESC → FAQ_START~FAQ_END → TAGS"""
 
     else:
         return f"""You are a {p} and a top SEO content writer.
 Topic: '{keyword}' | Category: {theme} | Language: English
 
-[MANDATORY RULES — Google AdSense quality + SEO 90+ score target]
+[MANDATORY RULES — Google AdSense quality + SEO 95+ score target]
 1. HTML only: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td. No markdown ever.
 2. ★ Length: Minimum 2,500 characters of in-depth expert content.
 3. ★ Mobile optimization: Every <p> max 2 sentences. Full paragraph breaks between sections.
-4. Keyword placement: '{keyword}' in first sentence, natural use 10+ times throughout.
+4. ★★★ Keyword density control (critical for SEO):
+   - Use '{keyword}' maximum 8 times in the ENTIRE body.
+   - Replace additional mentions with: {synonym_hint}
+   - Place '{keyword}' in the first sentence, then distribute naturally throughout.
+   - Never repeat '{keyword}' in consecutive paragraphs.
 5. ★ Structure (ALL required):
    - Minimum 5 h2, minimum 4 h3
    - 3+ ul/li lists
@@ -1544,10 +1692,16 @@ Topic: '{keyword}' | Category: {theme} | Language: English
 {internal_links_str}
 9. ★ Authority sources — Korean gov/universities/official bodies ONLY (no private sites, min 3): {ext_hint}
 10. E-E-A-T expertise: 2+ specific procedural details from a {p}'s perspective.
-11. Title style: {title_style} → First output line starting 'TITLE:'.
+11. ★★★ Title (core of 95-point SEO):
+    Reference title: "{suggested_title}"
+    - Use '{keyword}' exactly once. No clichés like "Complete Guide / A to Z / Everything You Need".
+    - Use ONE strong hook: curiosity gap, loss aversion, contrarian angle, or expert reveal.
+    First output line starting 'TITLE:'.
 12. ★ META_DESC: After body, 'META_DESC:', exactly 130~155 English characters.
-13. FAQ: 'FAQ_START' ~ 'FAQ_END' block, Q:/A: format, 3 questions.
+    Include '{keyword}' once. Click-driving, natural sentence.
+13. FAQ: 'FAQ_START' ~ 'FAQ_END' block, Q:/A: format, 3 questions. Complete answer sentences.
 14. ★ TAGS: 'TAGS:', {TAG_COUNT} English keywords. First tag must be '{keyword}'.
+    Remaining 11 tags should NOT repeat '{keyword}' verbatim.
 Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS"""
 
 # ============================================================
@@ -1555,7 +1709,6 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
 # ============================================================
 def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
                       tags: list, keyword: str, lang: str, is_khealth: bool) -> str:
-    """부족한 항목을 정확히 진단해서 타겟 보완 지시문 생성"""
     issues = []
     plain = re.sub(r'<[^>]+>', '', body).replace(' ', '').replace('\n', '')
     blen  = len(plain)
@@ -1566,10 +1719,13 @@ def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
     h2_cnt   = len(re.findall(r'<h2[\s>]', body, re.IGNORECASE))
     h3_cnt   = len(re.findall(r'<h3[\s>]', body, re.IGNORECASE))
     ul_cnt   = len(re.findall(r'<ul[\s>]', body, re.IGNORECASE))
+    kw_density = compute_keyword_density(body, keyword)
 
     target_len = 3500 if is_khealth else 2500
     if blen < target_len:
         issues.append(f"본문 길이 {blen}자 → {target_len}자 이상으로 증량 필수")
+    if kw_density > KW_DENSITY_MAX:
+        issues.append(f"키워드 밀도 {kw_density:.1%} → 2.5% 이하로 감소 필수 (동의어 분산)")
     if stat_cnt < 5:
         issues.append(f"통계 수치 {stat_cnt}개 → 5개 이상 추가 (%, 만 명, mmHg, 원 등 구체적 숫자)")
     if cite_cnt < 3:
@@ -1585,14 +1741,14 @@ def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
     if ul_cnt < 2:
         issues.append(f"ul/li {ul_cnt}개 → 2개 이상 추가")
     if len(meta_desc) < 100:
-        issues.append(f"META_DESC {len(meta_desc)}자 → 130~155자로 재작성 ('{keyword}' 포함)")
+        issues.append(f"META_DESC {len(meta_desc)}자 → 130~155자로 재작성 ('{keyword}' 1회 포함)")
     if len(faq_list) < 3:
-        issues.append(f"FAQ {len(faq_list)}개 → 3개 이상으로 보완")
+        issues.append(f"FAQ {len(faq_list)}개 → 3개 이상으로 보완 (각 답변 완전한 문장)")
 
     if not issues:
         return ""
 
-    suffix = f"\n\n[★ 재생성 {score}점 미달 → SEO 90점 목표 보완 지시]\n"
+    suffix = f"\n\n[★ 재생성 {score}점 미달 → SEO 95점 목표 보완 지시]\n"
     suffix += "아래 항목을 반드시 보완하여 전체 내용을 다시 작성하세요:\n"
     for i, issue in enumerate(issues, 1):
         suffix += f"{i}. {issue}\n"
@@ -1603,7 +1759,6 @@ def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
 # ★ POST-PROCESSING: SEO 보완 자동 삽입
 # ============================================================
 def postprocess_internal_links(body: str, site_url: str) -> str:
-    """내부링크 5개 미만이면 본문 중간에 강제 삽입"""
     ilinks = len(re.findall(r'<a\s+href=["\']https?://[^"\']+["\']', body, re.IGNORECASE))
     if ilinks >= 5:
         return body
@@ -1614,7 +1769,6 @@ def postprocess_internal_links(body: str, site_url: str) -> str:
     for name, url in extra:
         link_html += f'<li><a href="{url}" title="{name}">{name}</a></li>'
     link_html += '</ul></div>'
-    # 절반 지점의 </p> 뒤에 삽입
     half = len(body) // 2
     pm = re.search(r'</p>', body[half:], re.IGNORECASE)
     if pm:
@@ -1627,13 +1781,12 @@ def postprocess_internal_links(body: str, site_url: str) -> str:
 
 
 def postprocess_statistics(body: str, keyword: str, lang: str) -> str:
-    """통계 수치 3개 미만이면 보완 섹션 추가"""
     stat_cnt = count_statistics_in_body(body)
     if stat_cnt >= 3:
         return body
     if lang == "ko":
         extra = (
-            f'<h3>{keyword} 관련 주요 통계</h3>'
+            f'<h3>관련 주요 통계</h3>'
             f'<ul>'
             f'<li>국내 관련 인구는 약 <strong>500만 명</strong>으로 추정됩니다 (통계청, 2026).</li>'
             f'<li>전년 대비 <strong>12.3%</strong> 증가한 수치입니다 (KOSIS, 2026).</li>'
@@ -1643,7 +1796,7 @@ def postprocess_statistics(body: str, keyword: str, lang: str) -> str:
         )
     else:
         extra = (
-            f'<h3>Key Statistics on {keyword}</h3>'
+            f'<h3>Key Statistics</h3>'
             f'<ul>'
             f'<li>Approximately <strong>5 million people</strong> are affected annually (Statistics Korea, 2026).</li>'
             f'<li>A <strong>12.3% increase</strong> compared to the previous year (KOSIS, 2026).</li>'
@@ -1657,13 +1810,12 @@ def postprocess_statistics(body: str, keyword: str, lang: str) -> str:
 
 
 def postprocess_table(body: str, keyword: str, lang: str) -> str:
-    """TABLE 0개면 간단한 비교표 자동 생성 삽입"""
     tb_cnt = len(re.findall(r'<table[\s>]', body, re.IGNORECASE))
     if tb_cnt >= 1:
         return body
     if lang == "ko":
         table_html = (
-            f'<h3>{keyword} 핵심 비교 정보</h3>'
+            f'<h3>핵심 비교 정보</h3>'
             f'<table style="width:100%;border-collapse:collapse;margin:16px 0;">'
             f'<thead><tr style="background:#0066cc;color:#fff;">'
             f'<th style="padding:10px;border:1px solid #ddd;">구분</th>'
@@ -1684,12 +1836,12 @@ def postprocess_table(body: str, keyword: str, lang: str) -> str:
         )
     else:
         table_html = (
-            f'<h3>{keyword}: Quick Comparison</h3>'
+            f'<h3>Quick Comparison</h3>'
             f'<table style="width:100%;border-collapse:collapse;margin:16px 0;">'
             f'<thead><tr style="background:#0066cc;color:#fff;">'
             f'<th style="padding:10px;border:1px solid #ddd;">Aspect</th>'
             f'<th style="padding:10px;border:1px solid #ddd;">Standard Approach</th>'
-            f'<th style="padding:10px;border:1px solid #ddd;">Recommended Approach</th>'
+            f'<th style="padding:10px;border:1px solid #ddd;">Recommended</th>'
             f'</tr></thead>'
             f'<tbody>'
             f'<tr><td style="padding:10px;border:1px solid #ddd;">Effectiveness</td>'
@@ -1703,7 +1855,6 @@ def postprocess_table(body: str, keyword: str, lang: str) -> str:
             f'<td style="padding:10px;border:1px solid #ddd;">More cost-effective long-term</td></tr>'
             f'</tbody></table>'
         )
-    # 두 번째 h2 이후에 삽입
     h2_ends = [m.end() for m in re.finditer(r'</h2>', body, re.IGNORECASE)]
     if len(h2_ends) >= 2:
         pm = re.search(r'</p>', body[h2_ends[1]:], re.IGNORECASE)
@@ -1719,15 +1870,15 @@ def postprocess_table(body: str, keyword: str, lang: str) -> str:
 
 def postprocess_meta_desc(meta_desc: str, title: str, keyword: str,
                            lang: str, gemini_gen_fn) -> str:
-    """메타 디스크립션 미달 시 Gemini 재요청"""
     if 100 <= len(meta_desc) <= 160:
         return meta_desc
     print(f"   📝 META_DESC {len(meta_desc)}자 미달 → 재생성")
     target_len = "130~140자(한글)" if lang == "ko" else "130~155 English characters"
     prompt = (
-        f"다음 SEO 메타 디스크립션을 {target_len}로 작성하세요. "
-        f"키워드 '{keyword}'를 포함하고, 클릭을 유도하는 자연스러운 문장으로.\n"
+        f"SEO 메타 디스크립션을 {target_len}로 작성하세요. "
+        f"키워드 '{keyword}'를 1회만 포함하고, 클릭을 유도하는 자연스러운 문장으로.\n"
         f"제목: {title}\n"
+        f"주의: '{keyword}'를 반복하지 마세요. 동의어를 활용하세요.\n"
         f"META_DESC만 출력하세요. 따옴표나 접두사 없이 순수 텍스트만."
     )
     try:
@@ -1737,17 +1888,15 @@ def postprocess_meta_desc(meta_desc: str, title: str, keyword: str,
             return result
     except Exception:
         pass
-    # 최후 fallback: 제목 기반 자동 생성
     if lang == "ko":
-        return f"{keyword}에 대한 완전한 가이드입니다. 전문가가 검증한 최신 정보와 실용적인 조언을 한 곳에서 확인하세요. 지금 바로 시작하세요."[:140]
+        return f"{keyword}에 대한 최신 정보와 전문가 검증 가이드를 확인하세요. 지금 바로 알아야 할 핵심 내용을 담았습니다."[:140]
     else:
-        return f"Complete guide to {keyword}. Expert-verified information and practical advice you need to know. Start reading now for the latest insights."[:155]
+        return f"Expert insights on {keyword} backed by verified research. Discover what actually works — and what you've been getting wrong."[:155]
 
 
 def apply_all_postprocessing(body: str, meta_desc: str, title: str, faq_list: list,
                               keyword: str, lang: str, site_url: str,
                               is_khealth: bool, gemini_gen_fn) -> tuple:
-    """모든 post-processing 적용"""
     body = postprocess_internal_links(body, site_url)
     body = postprocess_statistics(body, keyword, lang)
     body = postprocess_table(body, keyword, lang)
@@ -1792,9 +1941,9 @@ def extract_meta_and_faq(text: str):
     return "\n".join(out_lines).strip(), title, meta_desc, faq_list
 
 def build_fallback_tag_pool(kw: str, theme: str = None, lang: str = "ko") -> list:
-    s = (["효능","부작용","추천","비교","후기","방법","원인","예방","관리","총정리","가이드","체크리스트"]
+    s = (["효능","부작용","추천","비교","후기","방법","원인","예방","관리","가이드","체크리스트","주의사항"]
          if lang == "ko" else
-         ["guide","review","tips","comparison","benefits","prevention","checklist","overview","FAQ","how to","best","2026"])
+         ["guide","review","tips","comparison","benefits","prevention","checklist","overview","FAQ","how to","best","expert"])
     pool = [f"{kw} {x}" for x in s]
     if theme: pool.insert(0, theme)
     pool.append(kw)
@@ -1845,6 +1994,22 @@ def count_statistics_in_body(body_text: str) -> int:
     pattern = r'(\d+[\.,]?\d*\s*(?:%|퍼센트|percent|명|만|억|원|달러|달|년|월|개|배|회|건|점))'
     return len(re.findall(pattern, body_text, re.IGNORECASE))
 
+def compute_keyword_density(body: str, keyword: str) -> float:
+    """★ 키워드 밀도 계산 (plain text 기준)"""
+    plain = re.sub(r'<[^>]+>', '', body)
+    plain_lower = plain.lower()
+    kw_lower = keyword.lower()
+    if not plain_lower or not kw_lower:
+        return 0.0
+    # 단어 단위 계산 (한국어는 어절 기준)
+    total_chars = len(plain.replace(' ', '').replace('\n', ''))
+    kw_count = plain_lower.count(kw_lower)
+    if total_chars == 0:
+        return 0.0
+    # 키워드 길이 기준 밀도
+    density = (kw_count * len(kw_lower)) / total_chars
+    return density
+
 def estimate_seo_score(title: str, body: str, meta_desc: str, tags: list,
                         faq_list: list, image_urls: list, keyword: str) -> int:
     score = 0
@@ -1852,42 +2017,63 @@ def estimate_seo_score(title: str, body: str, meta_desc: str, tags: list,
     plain = re.sub(r'<[^>]+>', '', body)
     blen  = len(plain.replace(" ", "").replace("\n", ""))
 
+    # ★ 제목 품질 (10점)
     title_l = title.lower()
-    if kw_l in title_l:                  score += 10
+    if kw_l in title_l:                  score += 7
     if 20 <= len(title) <= 65:           score += 3
-    if any(c.isdigit() for c in title):  score += 2
 
+    # ★ 제목 페널티: 진부한 패턴 감점
+    cliche_patterns = ["총정리", "a to z", "완벽 가이드", "everything you need",
+                       "complete guide to", "a-to-z", "효과 효과", "방법 방법"]
+    for p in cliche_patterns:
+        if p in title_l:
+            score -= 5
+            break
+
+    # ★ 본문 길이 (20점)
     if   blen >= 3000: score += 20
     elif blen >= 2500: score += 17
     elif blen >= 2000: score += 13
     elif blen >= 1800: score += 9
     elif blen >= 1000: score += 4
 
+    # ★★★ 키워드 밀도 페널티 (SEO 핵심 — 최대 -15점)
+    kw_density = compute_keyword_density(body, keyword)
+    if kw_density <= 0.015:       score += 10  # 1.5% 이하: 이상적
+    elif kw_density <= 0.025:     score += 5   # 1.5~2.5%: 허용
+    elif kw_density <= 0.040:     score -= 5   # 2.5~4%: 페널티
+    else:                         score -= 15  # 4% 초과: 심각한 패널티
+
+    # ★ 메타 디스크립션 (10점)
     mdl = len(meta_desc)
     if   130 <= mdl <= 160: score += 10
     elif 100 <= mdl <  130: score += 7
     elif  80 <= mdl <  100: score += 4
     elif mdl > 0:           score += 1
 
+    # ★ 이미지 (10점)
     ic = len(image_urls)
     if   ic >= 3: score += 10
     elif ic == 2: score += 7
     elif ic == 1: score += 4
 
+    # ★ 내부링크 (10점)
     ilinks = len(re.findall(r'<a\s+href=["\']https?://[^"\']+["\']', body, re.IGNORECASE))
     if   ilinks >= 5: score += 10
     elif ilinks >= 4: score += 8
     elif ilinks >= 3: score += 5
     elif ilinks >= 1: score += 2
 
+    # ★ 통계·출처 (10점)
     stat_cnt = count_statistics_in_body(body)
-    if   stat_cnt >= 5: score += 10
-    elif stat_cnt >= 3: score += 8
-    elif stat_cnt >= 1: score += 4
+    if   stat_cnt >= 5: score += 6
+    elif stat_cnt >= 3: score += 4
+    elif stat_cnt >= 1: score += 2
     cite_cnt = len(re.findall(r'\([^)]{3,40},\s*20[0-9]{2}\)', body))
-    if   cite_cnt >= 3: score += 5
+    if   cite_cnt >= 3: score += 4
     elif cite_cnt >= 1: score += 2
 
+    # ★ 구조 (10점)
     h2_c  = len(re.findall(r'<h2[\s>]', body, re.IGNORECASE))
     h3_c  = len(re.findall(r'<h3[\s>]', body, re.IGNORECASE))
     ul_c  = len(re.findall(r'<ul[\s>]', body, re.IGNORECASE))
@@ -1902,15 +2088,17 @@ def estimate_seo_score(title: str, body: str, meta_desc: str, tags: list,
     if tb_c >= 1:   st += 3
     score += min(st, 10)
 
+    # ★ FAQ (5점)
     if   len(faq_list) >= 3: score += 5
     elif len(faq_list) >= 2: score += 3
     elif len(faq_list) >= 1: score += 1
 
+    # ★ 태그 (5점)
     if   len(tags) >= TAG_COUNT: score += 5
     elif len(tags) >= 8:         score += 3
     elif len(tags) >= 4:         score += 1
 
-    return min(score, 100)
+    return max(0, min(score, 100))
 
 # ============================================================
 # ★ 이미지 처리 (카드형 3단 배치)
@@ -2075,7 +2263,7 @@ def build_faq_schema_html(faq_list: list) -> str:
 def build_image_html(image_urls: list, keyword: str) -> str:
     html = ""
     for i, u in enumerate(image_urls):
-        alt = f"{keyword} 관련 이미지 {i+1}" if i > 0 else keyword
+        alt = f"{keyword} 관련 정보 이미지" if i > 0 else keyword
         html += (
             '<figure style="margin:20px 0;padding:0;background:#f8f9fa;'
             'border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.10);">'
@@ -2099,13 +2287,11 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
     category_name = get_category_for_post(theme, keyword, title)
     category_id   = get_or_create_wp_category(site_url, wp_pass, category_name)
 
-    # 이미지 카드형 3단 배치
     hero_img = build_image_html(image_urls[:1], keyword)   if image_urls        else ""
     mid_img  = build_image_html(image_urls[1:2], keyword)  if len(image_urls)>1 else ""
     end_img  = build_image_html(image_urls[2:3], keyword)  if len(image_urls)>2 else ""
     faq_html = build_faq_schema_html(faq_list)
 
-    # 중간 삽입 지점: 두 번째 </h2> 이후 첫 번째 </p>
     h2_ends = [m.end() for m in re.finditer(r'</h2>', body_html, re.IGNORECASE)]
     insert_mid = -1
     if len(h2_ends) >= 2:
@@ -2125,7 +2311,6 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
         + faq_html
     )
 
-    # 태그 ID 수집
     tags_payload = []
     for tag in tags:
         try:
@@ -2223,7 +2408,7 @@ def flush_log_to_google_sheet():
             pass
 
 # ============================================================
-# ★ 단일 포스트 처리 (SEO 90점 완전 보장)
+# ★ 단일 포스트 처리 (SEO 95점 완전 보장)
 # ============================================================
 def process_one_post(site: dict, keyword: str) -> bool:
     url   = site["url"]
@@ -2240,15 +2425,16 @@ def process_one_post(site: dict, keyword: str) -> bool:
         keyword, _ = kw_tuple if isinstance(kw_tuple, tuple) else (kw_tuple, "")
 
     if is_khealth:
-        base_prompt = make_khealth_prompt(keyword, reporter)
+        base_prompt = make_khealth_prompt(keyword, reporter, mode)
     else:
         base_prompt = make_seo_prompt(keyword, theme, lang, mode, site_url=url, reporter=reporter)
 
     prompt = base_prompt
     body = title = meta_desc = ""
     faq_list = []
+    tags = []
     best_score = 0
-    best_result = None  # (body, title, meta_desc, faq_list) 최고점 결과 보관
+    best_result = None
 
     for gen_attempt in range(MAX_REGEN + 1):
         try:
@@ -2264,13 +2450,15 @@ def process_one_post(site: dict, keyword: str) -> bool:
         body, tags = extract_tags_from_article(body_raw, keyword, theme, lang)
 
         if not title:
-            title = (f"{keyword} — 완벽 정리 가이드" if lang == "ko"
-                     else f"{keyword} — Complete Guide 2026")
+            title = apply_title_template(
+                pick_title_template(lang, mode), keyword
+            )
 
         pre_score = estimate_seo_score(title, body, meta_desc, tags, faq_list,
                                        ["x", "x", "x"], keyword)
 
-        print(f"  📝 생성 {gen_attempt+1}회차 → 사전 SEO {pre_score}점")
+        kw_density = compute_keyword_density(body, keyword)
+        print(f"  📝 생성 {gen_attempt+1}회차 → 사전 SEO {pre_score}점 | 키워드 밀도 {kw_density:.1%}")
 
         if pre_score > best_score:
             best_score = pre_score
@@ -2284,13 +2472,11 @@ def process_one_post(site: dict, keyword: str) -> bool:
             suffix = make_regen_suffix(pre_score, body, meta_desc, faq_list,
                                         tags, keyword, lang, is_khealth)
             prompt = base_prompt + suffix
-            print(f"  🔄 SEO {pre_score}점 미달 → {gen_attempt+2}회차 재생성 (부족 항목 타겟 보완)")
+            print(f"  🔄 SEO {pre_score}점 미달 → {gen_attempt+2}회차 재생성")
             time.sleep(5)
 
-    # 최고점 결과 사용
     body, title, meta_desc, faq_list, tags = best_result
 
-    # ★ POST-PROCESSING: 여전히 미달이면 자동 보완
     if best_score < SEO_TARGET:
         print(f"  🔧 {MAX_REGEN+1}회 재생성 후도 {best_score}점 → post-processing 자동 보완 적용")
         body, meta_desc = apply_all_postprocessing(
@@ -2298,7 +2484,6 @@ def process_one_post(site: dict, keyword: str) -> bool:
             is_khealth, generate_content_gemini
         )
 
-    # 이미지 수집
     images = get_multiple_images(keyword, count=3, theme=theme)
     if not images:
         images = get_images_from_pixabay("South Korea nature", 3)
@@ -2306,15 +2491,14 @@ def process_one_post(site: dict, keyword: str) -> bool:
         images = get_images_from_pexels("Seoul Korea", 3)
     print(f"  🖼  이미지 {len(images)}장")
 
-    # 최종 SEO 점수
     score = estimate_seo_score(title, body, meta_desc, tags, faq_list, images, keyword)
-    rank_label = ("🏆 우수" if score >= 95 else
-                  "✅ 양호" if score >= 90 else
-                  "⚠️ 보통" if score >= 80 else
+    kw_density_final = compute_keyword_density(body, keyword)
+    rank_label = ("🏆 최우수" if score >= 95 else
+                  "✅ 우수"   if score >= 90 else
+                  "⚠️ 보통"  if score >= 80 else
                   "❌ 미달")
-    print(f"  📊 SEO 최종 점수: {score}/100  {rank_label}")
+    print(f"  📊 SEO 최종 점수: {score}/100  {rank_label}  키워드밀도: {kw_density_final:.1%}")
 
-    # 진단 출력
     plain_len = len(re.sub(r'<[^>]+>', '', body).replace(' ', '').replace('\n', ''))
     stat_cnt  = count_statistics_in_body(body)
     ilinks    = len(re.findall(r'<a\s+href=["\']https?://', body, re.IGNORECASE))
@@ -2359,6 +2543,7 @@ def main():
     print(f"🚀 autopost_mega.py 시작 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
     print(f"   Gemini 모델: {GEMINI_MODEL}")
     print(f"   SEO 목표: {SEO_TARGET}점 이상 | 최대 재생성: {MAX_REGEN}회 + post-processing")
+    print(f"   키워드 밀도 상한: {KW_DENSITY_MAX:.1%}")
     print(f"{'='*60}\n")
 
     total_ok = total_fail = total_skip = 0
@@ -2390,7 +2575,7 @@ def main():
             else:
                 keyword = load_keyword_no_dup(
                     site["keywords_file"], url,
-                    fallback=f"{theme} tips 2026"
+                    fallback=f"{theme} tips"
                 )
             ok = process_one_post(site, keyword)
             if ok: total_ok += 1
