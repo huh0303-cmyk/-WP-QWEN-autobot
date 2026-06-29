@@ -49,8 +49,16 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             SLOT="${{ github.event.inputs.run_slot }}"
             S="${{ github.event.inputs.step }}"
-            if [ "$S" = "setup" ] || [ "$S" = "all" ]; then RUN_SETUP=true; else RUN_SETUP=false; fi
-            if [ "$S" = "post"  ] || [ "$S" = "all" ]; then RUN_POST=true;  else RUN_POST=false;  fi
+            if [ "$S" = "setup" ] || [ "$S" = "all" ]; then
+              RUN_SETUP=true
+            else
+              RUN_SETUP=false
+            fi
+            if [ "$S" = "post" ] || [ "$S" = "all" ]; then
+              RUN_POST=true
+            else
+              RUN_POST=false
+            fi
           elif [ "${{ github.event.schedule }}" = "10 21 * * *" ]; then
             SLOT=1; RUN_SETUP=false; RUN_POST=true
           elif [ "${{ github.event.schedule }}" = "10 5 * * *" ]; then
@@ -72,7 +80,7 @@ jobs:
 # ══════════════════════════════════════════════════════════
   site-setup:
     needs: determine-slot
-    if: needs.determine-slot.outputs.run_setup == 'true'
+    if: ${{ needs.determine-slot.outputs.run_setup == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -123,7 +131,7 @@ jobs:
 # ══════════════════════════════════════════════════════════
   autopost:
     needs: determine-slot
-    if: needs.determine-slot.outputs.run_post == 'true'
+    if: ${{ needs.determine-slot.outputs.run_post == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
