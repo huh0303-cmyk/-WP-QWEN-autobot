@@ -193,13 +193,13 @@ THEME_CATEGORIES = {
         (["retirement","pension","fund","IRP"], "Retirement Planning"),
     ]},
     "Investment": {"default": "Stocks", "keyword_map": [
-        (["stock","equity","share","dividend","KOSPI","KOSDAQ"], "Stock Investment"),
-        (["ETF","fund","mutual fund","index fund"], "Fund Investment"),
-        (["real estate","property","REIT"], "Real Estate Investment"),
-        (["crypto","bitcoin","ethereum","altcoin"], "Crypto Investment"),
-        (["bond","fixed income","treasury"], "Bond & Fixed Income"),
-        (["global","overseas","foreign","US stock","NYSE"], "Global Investment"),
-        (["startup","VC","venture","angel"], "Startup Investment"),
+        (["stock","equity","share","dividend","KOSPI","KOSDAQ"], "Stocks"),
+        (["ETF","fund","mutual fund","index fund"], "Funds"),
+        (["real estate","property","REIT"], "Real Estate"),
+        (["crypto","bitcoin","ethereum","altcoin"], "Funds"),
+        (["bond","fixed income","treasury"], "Funds"),
+        (["global","overseas","foreign","US stock","NYSE"], "Stocks"),
+        (["startup","VC","venture","angel"], "Stocks"),
     ]},
     "Korea Investment": {"default": "주식", "keyword_map": [
         (["주식","코스피","코스닥","배당","상장"], "주식투자"),
@@ -210,13 +210,13 @@ THEME_CATEGORIES = {
         (["해외","미국주식","글로벌"], "해외투자"),
         (["절세","세금","IRP","연금"], "절세·연금"),
     ]},
-    "Korea Real Estate": {"default": "Apartments", "keyword_map": [
-        (["아파트","분양","청약","재건축"], "아파트·분양"),
-        (["전세","월세","임대","보증금"], "전월세"),
-        (["정책","규제","LTV","DSR","금리"], "정책·규제"),
-        (["지역","서울","경기","부산","지방"], "지역별시장"),
-        (["상가","오피스텔","빌딩","수익형"], "수익형부동산"),
-        (["시세","가격","호가","실거래"], "가격·시세"),
+    "Korea Real Estate": {"default": "아파트", "keyword_map": [
+        (["아파트","분양","청약","재건축"], "아파트"),
+        (["전세","월세","임대","보증금"], "아파트"),
+        (["정책","규제","LTV","DSR","금리"], "세금"),
+        (["지역","서울","경기","부산","지방"], "아파트"),
+        (["상가","오피스텔","빌딩","수익형"], "투자"),
+        (["시세","가격","호가","실거래"], "아파트"),
     ]},
     "Insurance": {"default": "Health Insurance", "keyword_map": [
         (["life","death benefit","term life","whole life"], "Life Insurance"),
@@ -271,22 +271,22 @@ THEME_CATEGORIES = {
         (["luxury","premium","high-end"], "Premium Picks"),
     ]},
     "K-POP": {"default": "Artists", "keyword_map": [
-        (["BTS","BLACKPINK","EXO","TWICE","aespa","NewJeans","SEVENTEEN","Stray Kids"], "Artist Spotlight"),
-        (["album","release","comeback","single","MV"], "New Releases"),
-        (["concert","tour","performance","live"], "Concerts & Tours"),
-        (["chart","billboard","ranking","award","daesang"], "Charts & Awards"),
-        (["trainee","debut","audition","idol","agency"], "Idol & Agency"),
-        (["fandom","fan","ARMY","BLINK","culture"], "Fan Culture"),
+        (["BTS","BLACKPINK","EXO","TWICE","aespa","NewJeans","SEVENTEEN","Stray Kids"], "Artists"),
+        (["album","release","comeback","single","MV"], "Music"),
+        (["concert","tour","performance","live"], "Tours"),
+        (["chart","billboard","ranking","award","daesang"], "Music"),
+        (["trainee","debut","audition","idol","agency"], "Artists"),
+        (["fandom","fan","ARMY","BLINK","culture"], "Artists"),
     ]},
     "Travel": {"default": "Travel Guides", "keyword_map": [
-        (["Seoul","서울","Gyeongbokgung","Myeongdong","Hongdae"], "Seoul Travel"),
-        (["Busan","부산","beach","Haeundae","Gamcheon"], "Busan Travel"),
-        (["Jeju","제주","island","Hallasan"], "Jeju Island"),
-        (["hiking","trail","mountain","national park","trekking"], "Hiking & Nature"),
-        (["food","cuisine","restaurant","street food","market"], "Food & Dining"),
-        (["hotel","accommodation","stay","hostel","guesthouse"], "Accommodation"),
-        (["day trip","weekend","itinerary","tour"], "Itineraries"),
-        (["temple","palace","museum","history","heritage"], "Culture & History"),
+        (["Seoul","서울","Gyeongbokgung","Myeongdong","Hongdae"], "Travel Guides"),
+        (["Busan","부산","beach","Haeundae","Gamcheon"], "Travel Guides"),
+        (["Jeju","제주","island","Hallasan"], "Travel Guides"),
+        (["hiking","trail","mountain","national park","trekking"], "Travel Guides"),
+        (["food","cuisine","restaurant","street food","market"], "Food"),
+        (["hotel","accommodation","stay","hostel","guesthouse"], "Hotels"),
+        (["day trip","weekend","itinerary","tour"], "Travel Guides"),
+        (["temple","palace","museum","history","heritage"], "Travel Guides"),
     ]},
     "Visa Guide": {"default": "Work Visa", "keyword_map": [
         (["student visa","D-2","language school","D-4"], "Student Visa"),
@@ -317,7 +317,7 @@ THEME_CATEGORIES = {
         (["invitation","decoration","flower","theme"], "Decoration & Theme"),
     ]},
     "Study in Korea": {"default": "Admissions", "keyword_map": [
-        (["TOPIK","Korean language","language test","KLAT"], "Korean Language"),
+        (["TOPIK","Korean language","language test","KLAT"], "Living in Korea"),
         (["university","admission","application","undergraduate"], "University Admission"),
         (["scholarship","KGSP","GKS","funding","stipend"], "Scholarships"),
         (["campus life","dorm","dormitory","student life"], "Campus Life"),
@@ -359,14 +359,14 @@ THEME_CATEGORIES = {
         (["global talent","expat","international hire"], "Global Talent"),
         (["platform","job board","LinkedIn","Saramin","Incruit"], "Recruitment Platforms"),
     ]},
-    "Korea Culture": {"default": "Culture", "keyword_map": [
-        (["food","cuisine","recipe","dish","eat","restaurant"], "Korean Food"),
-        (["festival","holiday","Chuseok","Lunar New Year","Seollal"], "Festivals & Holidays"),
-        (["traditional","Joseon","history","heritage","palace","hanok"], "History & Heritage"),
-        (["K-pop","drama","movie","entertainment","hallyu"], "K-Wave & Entertainment"),
-        (["sport","soccer","baseball","Taekwondo","esports"], "Sports"),
-        (["fashion","style","trend","design","art"], "Fashion & Art"),
-        (["language","Korean","hangul","expression","phrase"], "Korean Language"),
+    "Korea Culture": {"default": "Korean Culture", "keyword_map": [
+        (["food","cuisine","recipe","dish","eat","restaurant"], "Travel & Food"),
+        (["festival","holiday","Chuseok","Lunar New Year","Seollal"], "Korean Culture"),
+        (["traditional","Joseon","history","heritage","palace","hanok"], "Korean Culture"),
+        (["K-pop","drama","movie","entertainment","hallyu"], "Korean Culture"),
+        (["sport","soccer","baseball","Taekwondo","esports"], "Korean Culture"),
+        (["fashion","style","trend","design","art"], "Korean Culture"),
+        (["language","Korean","hangul","expression","phrase"], "Living in Korea"),
     ]},
     "국제교육문화": {"default": "Language", "keyword_map": [
         (["유학","해외","어학연수","교환학생"], "해외유학"),
@@ -543,7 +543,7 @@ SITES_CONFIG = [
     {"url":"https://oliveyoungkorea.com",     "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",
      "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":3},
     {"url":"https://kworld365.com",           "lang":"en","theme":"K-POP",               "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":4},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":3},  # 무료화: 5→4
     {"url":"https://k-trip365.com",           "lang":"en","theme":"Travel",              "mode":"blog",
      "keywords_file":".github/workflows/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":3},
     {"url":"https://k-visa365.com",           "lang":"en","theme":"Visa Guide",          "mode":"blog",
@@ -569,9 +569,9 @@ SITES_CONFIG = [
     {"url":"https://korea365.org",            "lang":"en","theme":"Korea Culture",       "mode":"blog",
      "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":3},  # 무료화: 4→3
     {"url":"https://koreanews365.com",        "lang":"ko","theme":"한국 뉴스",            "mode":"news",
-     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":4},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":3},  # 무료화: 5→4
     {"url":"https://theseouljournal.com",     "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",
-     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":4},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":3},  # 무료화: 5→4
 ]
 
 # ============================================================
@@ -1163,19 +1163,19 @@ SITE_INTERNAL_LINKS = {
     ],
     "https://koreanews365.com": [
         ("더한국타임즈 최신 뉴스", "https://koreanews365.com"),
-        ("경제 뉴스", "https://koreanews365.com/category/경제-economy/"),
-        ("정치 뉴스", "https://koreanews365.com/category/정치-politics/"),
-        ("사회 뉴스", "https://koreanews365.com/category/사회-society/"),
-        ("국제 뉴스", "https://koreanews365.com/category/국제-international/"),
-        ("기술 뉴스", "https://koreanews365.com/category/기술-tech/"),
+        ("경제 뉴스", "https://koreanews365.com/category/경제/"),
+        ("정치 뉴스", "https://koreanews365.com/category/정치/"),
+        ("사회 뉴스", "https://koreanews365.com/category/사회/"),
+        ("국제 뉴스", "https://koreanews365.com/category/국제/"),
+        ("기술 뉴스", "https://koreanews365.com/category/사회/"),
     ],
     "https://theseouljournal.com": [
         ("The Seoul Journal", "https://theseouljournal.com"),
         ("Politics", "https://theseouljournal.com/category/politics/"),
         ("Economy", "https://theseouljournal.com/category/economy/"),
         ("Culture", "https://theseouljournal.com/category/culture/"),
-        ("Expat Life", "https://theseouljournal.com/category/expat-life/"),
-        ("Tech News", "https://theseouljournal.com/category/tech/"),
+        ("Culture", "https://theseouljournal.com/category/culture/"),
+        ("Economy", "https://theseouljournal.com/category/economy/"),
     ],
 }
 
