@@ -158,249 +158,250 @@ def reporter_display(reporter: dict) -> str:
 # ★ 테마별 카테고리 매핑
 # ============================================================
 THEME_CATEGORIES = {
+    # ── 황금 카테고리 3개와 완전 일치 (신규 카테고리 생성 절대 금지) ──
+
+    "건강과 의학": {
+        "default": "건강의학정보",
+        "golden": ["건강의학정보","건강기능식품정보","질환별관리법"],
+        "keyword_map": [
+            (["영양","비타민","영양제","보충제","유산균","프로바이오틱","오메가","콜라겐",
+               "다이어트","비만","체중","식품","기능성"], "건강기능식품정보"),
+            (["혈압","당뇨","혈당","암","피부","아토피","탈모","관절","허리","디스크",
+               "골다공증","수면","불면","우울","불안","간","소화","변비","치료","예방","관리"], "질환별관리법"),
+        ]
+    },
     "한국 뉴스": {
         "default": "경제",
+        "golden": ["경제","정치","사회"],
         "keyword_map": [
-            (["정치","대통령","국회","선거","정당","여당","야당","법안","탄핵","개헌","외교","북한"], "정치"),
-            (["경제","금리","물가","GDP","성장","수출","무역","환율","코스피","코스닥","주식","증시","기업","삼성","현대","SK","LG","스타트업","상장","IPO"], "경제"),
-            (["사회","범죄","사건","복지","노동","청년","저출산","인구","교육","대학","문화","K-pop","드라마","부동산","아파트","미국","중국","일본","국제","AI","반도체"], "사회"),
+            (["정치","대통령","국회","선거","정당","여당","야당","법안","탄핵","외교","북한"], "정치"),
+            (["사회","범죄","복지","노동","청년","저출산","교육","문화","K-pop","드라마",
+               "미국","중국","일본","국제","AI","반도체"], "사회"),
         ]
     },
     "Seoul Lifestyle": {
         "default": "Culture",
+        "golden": ["Politics","Economy","Culture"],
         "keyword_map": [
-            (["politics","election","president","government","parliament","policy","North Korea","diplomacy","minister","sanctions","military","crisis"], "Politics"),
-            (["economy","GDP","inflation","interest rate","export","trade","stock","market","startup","tech","AI","semiconductor","Samsung","Hyundai","investment","fund"], "Economy"),
-            (["culture","K-pop","drama","music","film","art","food","festival","hanbok","celebrity","entertainment","lifestyle","expat","foreigner","visa","immigration","living","travel","tourism"], "Culture"),
+            (["politics","election","president","government","parliament","policy",
+               "North Korea","diplomacy","minister","sanctions","military","crisis"], "Politics"),
+            (["economy","GDP","inflation","interest rate","export","trade","stock","market",
+               "startup","tech","AI","semiconductor","Samsung","Hyundai","investment","fund"], "Economy"),
         ]
     },
-    "건강과 의학": {
-        "default": "건강의학정보",
+    "Korea Medical Tourism": {
+        "default": "Surgery",
+        "golden": ["Surgery","Dental","Dermatology"],
         "keyword_map": [
-            (["영양","비타민","영양제","보충제","유산균","프로바이오틱","오메가","콜라겐","다이어트","비만","체중","식품","기능성"], "건강기능식품정보"),
-            (["혈압","고혈압","당뇨","혈당","암","종양","피부","아토피","탈모","관절","허리","디스크","골다공증","수면","불면","우울","불안","간","소화","변비","치료","예방","관리"], "질환별관리법"),
-            (["심장","혈관","면역","건강정보","의학","질환","증상","병원","의사"], "건강의학정보"),
+            (["dental","teeth","orthodontics","implant","whitening","gum","braces"], "Dental"),
+            (["dermatology","skin","laser","botox","filler","acne","pigmentation","aesthetics"], "Dermatology"),
         ]
     },
-    "Finance": {"default": "Banking", "keyword_map": [
-        (["stock","market","trading","invest","portfolio","dividend"], "Stock Market"),
-        (["real estate","property","apartment","mortgage","rent"], "Real Estate Finance"),
-        (["tax","deduction","refund","filing"], "Tax Guide"),
-        (["savings","deposit","interest","bank","account"], "Savings & Banking"),
-        (["insurance","premium","coverage","policy","claim"], "Insurance"),
-        (["crypto","bitcoin","blockchain","NFT","DeFi"], "Crypto Finance"),
-        (["loan","debt","credit","mortgage","borrow"], "Loans & Credit"),
-        (["retirement","pension","fund","IRP"], "Retirement Planning"),
-    ]},
-    "Investment": {"default": "Stocks", "keyword_map": [
-        (["stock","equity","share","dividend","KOSPI","KOSDAQ"], "Stocks"),
-        (["ETF","fund","mutual fund","index fund"], "Funds"),
-        (["real estate","property","REIT"], "Real Estate"),
-        (["crypto","bitcoin","ethereum","altcoin"], "Funds"),
-        (["bond","fixed income","treasury"], "Funds"),
-        (["global","overseas","foreign","US stock","NYSE"], "Stocks"),
-        (["startup","VC","venture","angel"], "Stocks"),
-    ]},
-    "Korea Investment": {"default": "주식", "keyword_map": [
-        (["주식","코스피","코스닥","배당","상장"], "주식투자"),
-        (["ETF","펀드","인덱스"], "펀드·ETF"),
-        (["부동산","아파트","분양","리츠"], "부동산투자"),
-        (["암호화폐","비트코인","이더리움","코인"], "암호화폐"),
-        (["채권","국채","금리"], "채권·금리"),
-        (["해외","미국주식","글로벌"], "해외투자"),
-        (["절세","세금","IRP","연금"], "절세·연금"),
-    ]},
-    "Korea Real Estate": {"default": "아파트", "keyword_map": [
-        (["아파트","분양","청약","재건축"], "아파트"),
-        (["전세","월세","임대","보증금"], "아파트"),
-        (["정책","규제","LTV","DSR","금리"], "세금"),
-        (["지역","서울","경기","부산","지방"], "아파트"),
-        (["상가","오피스텔","빌딩","수익형"], "투자"),
-        (["시세","가격","호가","실거래"], "아파트"),
-    ]},
-    "Insurance": {"default": "Health Insurance", "keyword_map": [
-        (["life","death benefit","term life","whole life"], "Life Insurance"),
-        (["health","medical","hospital","coverage"], "Health Insurance"),
-        (["car","auto","vehicle","accident"], "Auto Insurance"),
-        (["travel","trip","overseas","abroad"], "Travel Insurance"),
-        (["pension","retirement","annuity"], "Pension & Annuity"),
-    ]},
-    "Tax and Law": {"default": "Taxes", "keyword_map": [
-        (["income tax","소득세","withholding","filing"], "Income Tax"),
-        (["corporate tax","법인세","business tax"], "Corporate Tax"),
-        (["VAT","부가세","consumption tax"], "VAT & Consumption Tax"),
-        (["inheritance","estate","상속세","gift tax"], "Inheritance & Gift Tax"),
-        (["visa","immigration","residence","permit"], "Immigration Law"),
-        (["labor","employment","contract","wage"], "Labor Law"),
-        (["property","real estate","취득세","양도세"], "Property Tax"),
-    ]},
-    "Crypto": {"default": "Bitcoin", "keyword_map": [
-        (["bitcoin","BTC"], "Bitcoin"),
-        (["ethereum","ETH","smart contract"], "Ethereum"),
-        (["altcoin","XRP","SOL","BNB"], "Altcoins"),
-        (["DeFi","decentralized","DEX","liquidity"], "DeFi"),
-        (["NFT","token","metaverse"], "NFT & Metaverse"),
-        (["exchange","거래소","binance","upbit"], "Exchanges"),
-        (["regulation","법","SEC","FSC"], "Regulation"),
-        (["staking","mining","yield"], "Staking & Mining"),
-    ]},
-    "Technology": {"default": "AI", "keyword_map": [
-        (["AI","artificial intelligence","machine learning","GPT","LLM"], "AI & Machine Learning"),
-        (["semiconductor","chip","TSMC","Samsung"], "Semiconductor"),
-        (["smartphone","mobile","app","iOS","Android"], "Mobile Tech"),
-        (["cybersecurity","hacking","privacy","data breach"], "Cybersecurity"),
-        (["robot","automation","autonomous","drone"], "Robotics & Automation"),
-        (["startup","venture","innovation","unicorn"], "Startup & Innovation"),
-        (["EV","electric vehicle","battery","charging"], "EV & Battery"),
-    ]},
-    "K-Beauty": {"default": "Skincare", "keyword_map": [
-        (["skincare","moisturizer","serum","toner"], "Skincare Routine"),
-        (["makeup","foundation","lipstick","blush"], "K-Makeup"),
-        (["hair","scalp","shampoo","treatment"], "Hair Care"),
-        (["sunscreen","SPF","UV","protection"], "Sun Protection"),
-        (["anti-aging","wrinkle","collagen","retinol"], "Anti-Aging"),
-        (["ingredient","niacinamide","hyaluronic","vitamin C"], "Ingredients"),
-        (["brand","innisfree","laneige","cosrx","olive young"], "K-Beauty Brands"),
-    ]},
-    "K-Beauty Reviews": {"default": "Skincare", "keyword_map": [
-        (["review","best","ranking","top","recommend"], "Product Reviews"),
-        (["skincare","moisturizer","serum","essence"], "Skincare Reviews"),
-        (["makeup","foundation","lip","eye"], "Makeup Reviews"),
-        (["hair","scalp","shampoo"], "Hair Care Reviews"),
-        (["budget","affordable","cheap","drugstore"], "Budget Picks"),
-        (["luxury","premium","high-end"], "Premium Picks"),
-    ]},
-    "K-POP": {"default": "Artists", "keyword_map": [
-        (["BTS","BLACKPINK","EXO","TWICE","aespa","NewJeans","SEVENTEEN","Stray Kids"], "Artists"),
-        (["album","release","comeback","single","MV"], "Music"),
-        (["concert","tour","performance","live"], "Tours"),
-        (["chart","billboard","ranking","award","daesang"], "Music"),
-        (["trainee","debut","audition","idol","agency"], "Artists"),
-        (["fandom","fan","ARMY","BLINK","culture"], "Artists"),
-    ]},
-    "Travel": {"default": "Travel Guides", "keyword_map": [
-        (["Seoul","서울","Gyeongbokgung","Myeongdong","Hongdae"], "Travel Guides"),
-        (["Busan","부산","beach","Haeundae","Gamcheon"], "Travel Guides"),
-        (["Jeju","제주","island","Hallasan"], "Travel Guides"),
-        (["hiking","trail","mountain","national park","trekking"], "Travel Guides"),
-        (["food","cuisine","restaurant","street food","market"], "Food"),
-        (["hotel","accommodation","stay","hostel","guesthouse"], "Hotels"),
-        (["day trip","weekend","itinerary","tour"], "Travel Guides"),
-        (["temple","palace","museum","history","heritage"], "Travel Guides"),
-    ]},
-    "Visa Guide": {"default": "Work Visa", "keyword_map": [
-        (["student visa","D-2","language school","D-4"], "Student Visa"),
-        (["work visa","E-7","employment visa","skilled worker"], "Work Visa"),
-        (["F-2","F-5","permanent residence","long-term","settlement"], "Long-term Residence"),
-        (["tourist","B-1","B-2","short-term","K-ETA"], "Tourist & Short-term"),
-        (["working holiday","H-1","youth"], "Working Holiday"),
-        (["family","F-1","spouse","dependent"], "Family Visa"),
-        (["extension","renewal","immigration office","HiKorea"], "Visa Extension"),
-    ]},
-    "Korea Medical Tourism": {"default": "Surgery", "keyword_map": [
-        (["plastic surgery","nose","eye","chin","jaw","rhinoplasty"], "Plastic Surgery"),
-        (["dental","teeth","orthodontics","implant","whitening"], "Dental Treatment"),
-        (["cancer","oncology","treatment","hospital"], "Cancer Treatment"),
-        (["dermatology","skin","laser","botox","filler"], "Dermatology & Aesthetics"),
-        (["traditional","oriental","acupuncture","herbal"], "Korean Traditional Medicine"),
-        (["cost","price","affordable","cheap","package"], "Cost & Packages"),
-        (["visa","medical visa","C-3","entry"], "Medical Visa"),
-    ]},
-    "Wedding": {"default": "Planning", "keyword_map": [
-        (["venue","hall","ceremony","location","outdoor"], "Wedding Venue"),
-        (["dress","gown","suit","attire","fashion"], "Wedding Fashion"),
-        (["photographer","photo","video","videographer"], "Photography & Video"),
-        (["catering","food","menu","banquet","reception"], "Catering & Reception"),
-        (["traditional","hanbok","Korean wedding","Paebaek"], "Traditional Korean Wedding"),
-        (["honeymoon","trip","travel","destination"], "Honeymoon"),
-        (["budget","cost","planning","checklist","tips"], "Wedding Planning"),
-        (["invitation","decoration","flower","theme"], "Decoration & Theme"),
-    ]},
-    "Study in Korea": {"default": "Admissions", "keyword_map": [
-        (["TOPIK","Korean language","language test","KLAT"], "Living in Korea"),
-        (["university","admission","application","undergraduate"], "University Admission"),
-        (["scholarship","KGSP","GKS","funding","stipend"], "Scholarships"),
-        (["campus life","dorm","dormitory","student life"], "Campus Life"),
-        (["visa","D-2","student visa","immigration"], "Student Visa"),
-        (["part-time job","work","employment","income"], "Part-time Work"),
-        (["graduate","master","PhD","research"], "Graduate Studies"),
-    ]},
-    "International Students": {"default": "Admissions", "keyword_map": [
-        (["scholarship","funding","GKS","KGSP","award"], "Scholarships"),
-        (["language","Korean","TOPIK","class"], "Language Learning"),
-        (["visa","D-2","extension","immigration"], "Visa & Immigration"),
-        (["housing","dormitory","accommodation","living"], "Housing"),
-        (["part-time","job","work","allowable hours"], "Part-time Work"),
-        (["culture","adjustment","life","social"], "Cultural Adjustment"),
-    ]},
-    "Employment": {"default": "Jobs", "keyword_map": [
-        (["resume","CV","cover letter","application","interview"], "Job Application"),
-        (["salary","wage","income","compensation","pay"], "Salary & Compensation"),
-        (["IT","tech","developer","engineer","coding"], "IT Jobs"),
-        (["teaching","English teacher","EPIK","hagwon"], "Teaching Jobs"),
-        (["visa","E-7","work permit","eligibility"], "Work Visa"),
-        (["startup","freelance","remote","contract"], "Freelance & Startup"),
-        (["benefits","health insurance","pension","allowance"], "Benefits & Welfare"),
-    ]},
-    "Jobs in Korea": {"default": "Jobs", "keyword_map": [
-        (["IT","developer","engineer","coding","software"], "IT & Tech Jobs"),
-        (["teacher","English","education","EPIK","hagwon"], "Teaching Jobs"),
-        (["finance","banking","accounting","analyst"], "Finance Jobs"),
-        (["marketing","sales","PR","advertising"], "Marketing & Sales"),
-        (["factory","manufacturing","E-9","worker"], "Manufacturing Jobs"),
-        (["startup","SME","entrepreneur","founder"], "Startup Jobs"),
-        (["global","multinational","MNC","foreign company"], "Global Companies"),
-    ]},
-    "Recruitment": {"default": "Hiring", "keyword_map": [
-        (["hiring","recruit","talent","HR","headhunting"], "Hiring Strategy"),
-        (["interview","screening","assessment","evaluation"], "Interview Process"),
-        (["salary","offer","negotiation","compensation"], "Salary Negotiation"),
-        (["foreign worker","E-9","H-2","EPS"], "Foreign Worker Recruitment"),
-        (["global talent","expat","international hire"], "Global Talent"),
-        (["platform","job board","LinkedIn","Saramin","Incruit"], "Recruitment Platforms"),
-    ]},
-    "Korea Culture": {"default": "Korean Culture", "keyword_map": [
-        (["food","cuisine","recipe","dish","eat","restaurant"], "Travel & Food"),
-        (["festival","holiday","Chuseok","Lunar New Year","Seollal"], "Korean Culture"),
-        (["traditional","Joseon","history","heritage","palace","hanok"], "Korean Culture"),
-        (["K-pop","drama","movie","entertainment","hallyu"], "Korean Culture"),
-        (["sport","soccer","baseball","Taekwondo","esports"], "Korean Culture"),
-        (["fashion","style","trend","design","art"], "Korean Culture"),
-        (["language","Korean","hangul","expression","phrase"], "Living in Korea"),
-    ]},
-    "국제교육문화": {"default": "Language", "keyword_map": [
-        (["유학","해외","어학연수","교환학생"], "해외유학"),
-        (["한국어","TOPIK","어학당","한국어교육"], "한국어교육"),
-        (["문화교류","국제교류","MOU","협약"], "문화교류"),
-        (["취업","커리어","글로벌","인턴"], "글로벌취업"),
-        (["입시","대학원","장학금","지원"], "입학·장학"),
-    ]},
-    "한국유학정보": {"default": "입학정보", "keyword_map": [
-        (["비자","D-2","출입국","체류"], "비자·출입국"),
-        (["장학금","GKS","정부초청","지원금"], "장학금"),
-        (["기숙사","숙소","자취","주거"], "숙소·생활"),
-        (["한국어","TOPIK","어학","언어"], "한국어학습"),
-        (["대학","입학","전형","지원"], "대학입학"),
-        (["생활","적응","문화","생활비"], "유학생활"),
-    ]},
-    "Korea Career Programs": {"default": "Programs", "keyword_map": [
-        (["internship","training","program","experience"], "Internship Programs"),
-        (["language","Korean","English","bilingual"], "Language Programs"),
-        (["certification","qualification","license","exam"], "Certifications"),
-        (["networking","alumni","community","event"], "Networking"),
-        (["job","career","employment","placement"], "Job Placement"),
-    ]},
+    "Investment": {
+        "default": "Stocks",
+        "golden": ["Stocks","Real Estate","Funds"],
+        "keyword_map": [
+            (["real estate","property","apartment","jeonse","housing","land","REIT"], "Real Estate"),
+            (["ETF","fund","mutual fund","index fund","bond","fixed income","DeFi","crypto","bitcoin"], "Funds"),
+        ]
+    },
+    "Korea Investment": {
+        "default": "주식",
+        "golden": ["주식","부동산","절세"],
+        "keyword_map": [
+            (["부동산","아파트","청약","분양","전세","리츠","토지"], "부동산"),
+            (["절세","세금","IRP","연금","비과세","공제","채권","금리"], "절세"),
+        ]
+    },
+    "Insurance": {
+        "default": "Health Insurance",
+        "golden": ["Health Insurance","Life Insurance","Auto Insurance"],
+        "keyword_map": [
+            (["life","death","term life","whole life","pension","retirement","annuity","accident"], "Life Insurance"),
+            (["car","auto","vehicle","driver","traffic","motorcycle"], "Auto Insurance"),
+        ]
+    },
+    "Finance": {
+        "default": "Banking",
+        "golden": ["Banking","Investing","Taxes"],
+        "keyword_map": [
+            (["stock","market","trading","invest","portfolio","dividend","fund","ETF","crypto","bitcoin"], "Investing"),
+            (["tax","income tax","VAT","deduction","refund","filing","inheritance","property tax"], "Taxes"),
+        ]
+    },
+    "Tax and Law": {
+        "default": "Taxes",
+        "golden": ["Taxes","Business","Visas"],
+        "keyword_map": [
+            (["business","company","startup","registration","corporate","CEO","labor","employment","contract"], "Business"),
+            (["visa","immigration","residence","permit","foreigner","alien","naturalization"], "Visas"),
+        ]
+    },
+    "Crypto": {
+        "default": "Bitcoin",
+        "golden": ["Bitcoin","Exchanges","Regulation"],
+        "keyword_map": [
+            (["exchange","거래소","binance","upbit","bithumb","trading","buy","sell","platform"], "Exchanges"),
+            (["regulation","law","SEC","FSC","tax","legal","compliance","ban","policy"], "Regulation"),
+        ]
+    },
+    "Korea Real Estate": {
+        "default": "아파트",
+        "golden": ["아파트","투자","세금"],
+        "keyword_map": [
+            (["투자","전략","수익","리츠","경매","갭투자","법인","오피스텔"], "투자"),
+            (["세금","취득세","양도세","재산세","증여","상속","절세"], "세금"),
+        ]
+    },
+    "Technology": {
+        "default": "AI",
+        "golden": ["AI","Startups","Semiconductors"],
+        "keyword_map": [
+            (["startup","venture","innovation","unicorn","founder","funding","scale","SME"], "Startups"),
+            (["semiconductor","chip","TSMC","fab","wafer","memory","DRAM","NAND","EV","battery","display"], "Semiconductors"),
+        ]
+    },
+    "K-Beauty": {
+        "default": "Skincare",
+        "golden": ["Skincare","Ingredients","Routines"],
+        "keyword_map": [
+            (["ingredient","niacinamide","hyaluronic","vitamin C","peptide","ceramide",
+               "retinol","AHA","BHA","acid","extract"], "Ingredients"),
+            (["routine","steps","morning","night","AM","PM","order","layering","how to","guide"], "Routines"),
+        ]
+    },
+    "K-Beauty Reviews": {
+        "default": "Skincare",
+        "golden": ["Skincare","Makeup","Haircare"],
+        "keyword_map": [
+            (["makeup","foundation","lipstick","blush","eyeshadow","concealer","mascara","lip","contour"], "Makeup"),
+            (["hair","shampoo","scalp","conditioner","treatment","keratin","mask","oil"], "Haircare"),
+        ]
+    },
+    "K-POP": {
+        "default": "Artists",
+        "golden": ["Artists","Music","Tours"],
+        "keyword_map": [
+            (["album","release","comeback","single","MV","track","playlist","song","lyrics"], "Music"),
+            (["concert","tour","performance","live","show","event","stadium","ticket"], "Tours"),
+        ]
+    },
+    "Travel": {
+        "default": "Travel Guides",
+        "golden": ["Travel Guides","Food","Hotels"],
+        "keyword_map": [
+            (["food","cuisine","restaurant","street food","dish","eat","cafe","coffee","market","recipe"], "Food"),
+            (["hotel","accommodation","stay","hostel","guesthouse","airbnb","pension","resort"], "Hotels"),
+        ]
+    },
+    "Visa Guide": {
+        "default": "Work Visa",
+        "golden": ["Work Visa","Student Visa","Long-term Visa"],
+        "keyword_map": [
+            (["student","D-2","D-4","language school","university","study","academic"], "Student Visa"),
+            (["F-2","F-5","long-term","permanent","settlement","naturalization","PR"], "Long-term Visa"),
+        ]
+    },
+    "Wedding": {
+        "default": "Planning",
+        "golden": ["Planning","Venues","Legal"],
+        "keyword_map": [
+            (["venue","hall","ceremony","location","outdoor","garden","rooftop","ballroom"], "Venues"),
+            (["legal","registration","document","certificate","marriage law","registry","divorce","paperwork"], "Legal"),
+        ]
+    },
+    "Study in Korea": {
+        "default": "Study Korea",
+        "golden": ["Study Korea","Scholarships","Student Life"],
+        "keyword_map": [
+            (["scholarship","KGSP","GKS","funding","stipend","grant","financial aid","award"], "Scholarships"),
+            (["campus","dorm","dormitory","visa","part-time","life","housing","club","adjustment"], "Student Life"),
+        ]
+    },
+    "International Students": {
+        "default": "Admissions",
+        "golden": ["Admissions","Scholarships","Campus Life"],
+        "keyword_map": [
+            (["scholarship","funding","GKS","KGSP","award","grant","stipend","financial"], "Scholarships"),
+            (["campus","dormitory","housing","life","club","activities","adjustment","culture"], "Campus Life"),
+        ]
+    },
+    "국제교육문화": {
+        "default": "Language",
+        "golden": ["Language","Culture","Careers"],
+        "keyword_map": [
+            (["문화","전통","교류","축제","역사","예술","heritage"], "Culture"),
+            (["취업","커리어","글로벌","인턴","직업","일자리"], "Careers"),
+        ]
+    },
+    "한국유학정보": {
+        "default": "입학정보",
+        "golden": ["입학정보","장학금","비자"],
+        "keyword_map": [
+            (["장학금","GKS","정부초청","지원금","면제","장학"], "장학금"),
+            (["비자","D-2","출입국","체류","연장","HiKorea","사증"], "비자"),
+        ]
+    },
+    "Korea Career Programs": {
+        "default": "Programs",
+        "golden": ["Programs","Scholarships","TOPIK"],
+        "keyword_map": [
+            (["scholarship","fee","funding","financial","tuition","cost","grant"], "Scholarships"),
+            (["TOPIK","Korean test","language exam","proficiency","level","test prep","KPT"], "TOPIK"),
+        ]
+    },
+    "Employment": {
+        "default": "Jobs",
+        "golden": ["Jobs","Salaries","Work Visa"],
+        "keyword_map": [
+            (["salary","wage","income","compensation","pay","benefits","pension","allowance","raise"], "Salaries"),
+            (["visa","E-7","work permit","eligibility","sponsor","D-10","work authorization"], "Work Visa"),
+        ]
+    },
+    "Jobs in Korea": {
+        "default": "Jobs",
+        "golden": ["Jobs","Interviews","Salaries"],
+        "keyword_map": [
+            (["interview","preparation","question","answer","tips","STAR","behavioral","resume","CV","cover letter"], "Interviews"),
+            (["salary","wage","negotiation","pay","compensation","raise","package","benefits"], "Salaries"),
+        ]
+    },
+    "Recruitment": {
+        "default": "Hiring",
+        "golden": ["Hiring","Salaries","Foreign Workers"],
+        "keyword_map": [
+            (["salary","compensation","benefits","pay scale","benchmark","raise","offer","negotiation"], "Salaries"),
+            (["foreign worker","E-9","H-2","EPS","migrant","overseas","international hire","expat"], "Foreign Workers"),
+        ]
+    },
+    "Korea Culture": {
+        "default": "Korean Culture",
+        "golden": ["Korean Culture","Travel & Food","Living in Korea"],
+        "keyword_map": [
+            (["food","cuisine","recipe","dish","eat","restaurant","travel","tourism","trip","destination","cafe"], "Travel & Food"),
+            (["living","expat","foreigner","daily","tips","cost","apartment","transport","language","hangul","move"], "Living in Korea"),
+        ]
+    },
 }
 
+
 def get_category_for_post(theme: str, keyword: str, title: str = "") -> str:
+    """★ 반드시 황금 카테고리 3개 중 하나만 반환 — 신규 카테고리 절대 불가"""
     theme_data = THEME_CATEGORIES.get(theme)
-    if not theme_data: return "General"
+    if not theme_data:
+        return "General"
+    golden = theme_data.get("golden", [])
     search_text = f"{keyword} {title}".lower()
     for keywords_list, category in theme_data.get("keyword_map", []):
         for kw in keywords_list:
             if kw.lower() in search_text:
-                return category
-    return theme_data.get("default", "General")
+                # 황금 카테고리에 있는지 검증
+                if category in golden:
+                    return category
+                # 황금 카테고리에 없으면 default 반환
+                return theme_data.get("default", golden[0] if golden else "General")
+    # 키워드 매칭 없으면 항상 default (첫번째 황금 카테고리)
+    return theme_data.get("default", golden[0] if golden else "General")
 
 def get_or_create_wp_category(site_url: str, wp_pass: str, category_name: str) -> int:
     """★ 황금 카테고리 3개 안에서만 찾기 — 신규 생성 완전 금지"""
@@ -2559,13 +2560,28 @@ def main():
     print("📋 뉴스 사이트 최근 제목 사전 로드 중...")
     preload_news_site_titles(SITES_CONFIG, WP_USER)
 
-    for site in SITES_CONFIG:
+    # ★ Free Tier 20 RPD 보호: 27개 사이트를 3슬롯에 균등 배분
+    # 슬롯1: 사이트 1~9번, 슬롯2: 10~18번, 슬롯3: 19~27번
+    # 각 슬롯에서 최대 9개 사이트 × 1건 = 9 API/슬롯 < 20 RPD ✅
+    slot_groups = {
+        1: list(range(0, 9)),    # 사이트 0~8번 인덱스
+        2: list(range(9, 18)),   # 사이트 9~17번 인덱스
+        3: list(range(18, 27)),  # 사이트 18~26번 인덱스
+    }
+    active_indices = slot_groups.get(RUN_SLOT, list(range(27)))
+
+    for site_idx, site in enumerate(SITES_CONFIG):
         url   = site["url"]
         theme = site["theme"]
-        n     = get_posts_for_this_slot(site, RUN_SLOT)
-        if n == 0:
-            print(f"⏭  {url} — 이번 슬롯 발행 없음")
+
+        # ★ 이번 슬롯에 해당하는 사이트만 실행
+        if site_idx not in active_indices:
             continue
+
+        n = 1  # ★ 슬롯당 사이트당 1건 (20 RPD 보호)
+        # k-health365는 예외적으로 2건
+        if "k-health365" in url:
+            n = 2
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url}  [{theme}]  슬롯{RUN_SLOT} → {n}건 예정")
