@@ -367,6 +367,155 @@ def check_noindex(url):
     except:
         return None
 
+
+# ════════════════════════════════════════════════════════════
+# ★ v5.0 추가 함수들
+# ════════════════════════════════════════════════════════════
+
+def activate_gp_premium(site_url: str, pw: str) -> bool:
+    """GeneratePress Premium 강제 활성화 + Elementor 완전 제거"""
+    try:
+        # 1. 현재 활성 테마 확인
+        r = requests.get(f"{site_url}/wp-json/wp/v2/themes",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"status":"active"}, timeout=10)
+        if r.status_code == 200:
+            themes = r.json() if isinstance(r.json(), list) else list(r.json().values())
+            for t in themes:
+                slug = t.get("stylesheet","")
+                if "generatepress" in slug.lower():
+                    print(f"    ✅ GP 이미 활성화: {slug}")
+                    break
+
+        # 2. 설치된 테마 중 GP 찾아 활성화
+        r2 = requests.get(f"{site_url}/wp-json/wp/v2/themes",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw), timeout=10)
+        if r2.status_code == 200:
+            all_t = r2.json()
+            themes_list = all_t if isinstance(all_t, list) else list(all_t.values())
+            for t in themes_list:
+                slug = t.get("stylesheet","") or t.get("template","")
+                if "generatepress" in slug.lower():
+                    act = requests.post(
+                        f"{site_url}/wp-json/wp/v2/themes/{slug}",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        json={"status":"active"}, timeout=15)
+                    if act.status_code in (200,201):
+                        print(f"    ✅ GP Premium 활성화: {slug}")
+                        return True
+
+        # 3. WP Settings API로 테마 변경 시도
+        r3 = requests.post(f"{site_url}/wp-json/wp/v2/settings",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json={"stylesheet":"generatepress"}, timeout=10)
+        print(f"    ⚠️ GP REST 활성화 제한 → hPanel 수동 필요 ({r3.status_code})")
+        return False
+    except Exception as e:
+        print(f"    ⚠️ GP 활성화 오류: {e}")
+        return False
+
+
+def remove_elementor_templates(site_url: str, pw: str):
+    """Elementor 테마빌더 템플릿 전부 삭제"""
+    removed = 0
+    try:
+        # elementor_library (테마빌더 템플릿) 조회
+        for post_type in ["elementor_library", "wp_template", "wp_template_part"]:
+            r = requests.get(
+                f"{site_url}/wp-json/wp/v2/{post_type}",
+                auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                params={"per_page":100, "status":"any"},
+                timeout=10)
+            if r.status_code == 200 and isinstance(r.json(), list):
+                for item in r.json():
+                    pid = item.get("id")
+                    if pid:
+                        dr = requests.delete(
+                            f"{site_url}/wp-json/wp/v2/{post_type}/{pid}",
+                            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                            params={"force":True}, timeout=8)
+                        if dr.status_code in (200,201):
+                            removed += 1
+        if removed:
+            print(f"    🗑️ Elementor 템플릿 {removed}개 삭제")
+        else:
+            print(f"    ✅ Elementor 템플릿 없음")
+    except Exception as e:
+        print(f"    ⚠️ Elementor 삭제 오류: {e}")
+    return removed
+
+
+def set_homepage_to_latest_posts(site_url: str, pw: str):
+    """홈페이지를 최신글(블로그형)으로 강제 설정"""
+    try:
+        r = requests.post(
+            f"{site_url}/wp-json/wp/v2/settings",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"show_on_front":"posts", "page_on_front":0, "page_for_posts":0},
+            timeout=10)
+        if r.status_code in (200,201):
+            print(f"    ✅ 홈페이지 → 최신글 설정 완료")
+        else:
+            print(f"    ⚠️ 홈페이지 설정 ({r.status_code})")
+    except Exception as e:
+        print(f"    ⚠️ 홈페이지 설정 오류: {e}")
+
+
+def set_site_language(site_url: str, pw: str, lang: str):
+    """사이트 언어 강제 설정 (ko_KR 또는 en_US)"""
+    locale = "ko_KR" if lang == "ko" else "en_US"
+    try:
+        r = requests.post(
+            f"{site_url}/wp-json/wp/v2/settings",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"language": locale, "WPLANG": locale},
+            timeout=10)
+        print(f"    {'✅' if r.status_code in (200,201) else '⚠️'} 언어 설정: {locale} ({r.status_code})")
+    except Exception as e:
+        print(f"    ⚠️ 언어 설정 오류: {e}")
+
+
+def verify_post_seo(site_url: str, pw: str, limit: int = 10):
+    """최근 글 SEO 기본 확인 (featured image + focus keyword)"""
+    try:
+        r = requests.get(
+            f"{site_url}/wp-json/wp/v2/posts",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            params={"per_page": limit, "status":"publish",
+                    "_fields":"id,title,featured_media,meta"},
+            timeout=12)
+        if r.status_code != 200:
+            return
+        posts = r.json()
+        no_img = 0
+        no_kw = 0
+        for p in posts:
+            if not p.get("featured_media"):
+                no_img += 1
+            meta = p.get("meta", {})
+            if not meta.get("rank_math_focus_keyword",""):
+                no_kw += 1
+        total = len(posts)
+        print(f"    📊 최근{total}글 | 이미지없음:{no_img}건 | 키워드없음:{no_kw}건")
+    except Exception as e:
+        print(f"    ⚠️ SEO 확인 오류: {e}")
+
+
+def ping_search_engines(site_url: str):
+    """Google + Naver + Bing Sitemap ping"""
+    sitemap = f"{site_url}/sitemap_index.xml"
+    pings = [
+        f"https://www.google.com/ping?sitemap={requests.utils.quote(sitemap)}",
+        f"https://www.bing.com/ping?sitemap={requests.utils.quote(sitemap)}",
+    ]
+    for ping_url in pings:
+        try:
+            r = requests.get(ping_url, timeout=8)
+            engine = "Google" if "google" in ping_url else "Bing"
+            print(f"    🔍 {engine} ping: HTTP {r.status_code}")
+        except Exception as e:
+            print(f"    ⚠️ ping 실패: {e}")
+
 def allow_indexing(base, pw):
     code,_,_ = api("POST",f"{base}/settings",pw,{"blog_public":True})
     print(f"    {'✅' if code<300 else '⚠️'} 색인 허용 ({code})")
@@ -785,17 +934,29 @@ def run():
             print("  🔓 색인 차단 해제...")
             allow_indexing(base, pw)
 
-        # [1-1] ★ GeneratePress Premium 강제 활성화 (모든 블로그형 사이트)
+        # ★ GP Premium 제외 사이트
         skip_gp = any(x in url for x in [
-            "koreanews365","theseouljournal","korea365",
-            "kieca-korea","ksa-korea","sis-korea"
+            "koreanews365","theseouljournal","korea365"
         ])
+
+        # [1-1] ★ Elementor 템플릿 완전 삭제
         if not skip_gp:
-            print("  🎨 GeneratePress Premium 활성화...")
-            force_generatepress_premium(url, pw)
-        elif not theme_ok_default:
-            print("  🎨 GeneratePress 강제 설치·활성화...")
-            force_generatepress_premium(url, pw)
+            print("  🗑️ Elementor 템플릿 삭제...")
+            remove_elementor_templates(url, pw)
+
+        # [1-2] ★ GP Premium 강제 활성화
+        if not skip_gp:
+            print("  🎨 GP Premium 강제 활성화...")
+            activate_gp_premium(url, pw)
+
+        # [1-3] ★ 홈페이지 → 최신글 설정
+        if not skip_gp:
+            print("  🏠 홈페이지 최신글 설정...")
+            set_homepage_to_latest_posts(url, pw)
+
+        # [1-4] ★ 언어 설정 (k-health365, koreanews365만 ko)
+        print(f"  🌐 언어 설정: {'ko' if lang=='ko' else 'en'}...")
+        set_site_language(url, pw, lang)
 
         # [2] ★ 황금3 + Etc/기타 = 4개 카테고리 생성
         etc_name = "기타" if lang=="ko" else "Etc"
@@ -869,9 +1030,13 @@ def run():
                               [c1,c2,c3,etc_name],
                               pg_map)
 
-        # [7] ★ 색인 요청 (Sitemap ping)
-        print("  🔍 색인 요청...")
-        request_indexing(url, pw)
+        # [7] ★ SEO 상태 확인
+        print("  📊 SEO 확인...")
+        verify_post_seo(url, pw, limit=10)
+
+        # [8] ★ 검색엔진 색인 ping
+        print("  🔍 검색엔진 ping...")
+        ping_search_engines(url)
 
         # 최종 카테고리 수 확인
         final_cats=[c for c in get_all_cats(base,pw) if c.get("id")!=1]
