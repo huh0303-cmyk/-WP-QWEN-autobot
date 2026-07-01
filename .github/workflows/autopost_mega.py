@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (완전 무료 운영판 v2.1)
-업데이트: 2026-06 [무료화 최적화]
-  ✅ gemini-2.5-flash-lite 완전 고정 (비용 0원 · Free Tier 1500 RPD)
-  ✅ max_output_tokens 4096으로 최적화 (토큰 낭비 50% 절감)
-  ✅ MAX_REGEN 0회 (Free Tier 20RPD 한도 준수 → 비용 0원 완전 보장)
-  ✅ SLEEP_BETWEEN_POSTS 15초 (RPM 제한 60req/min 안전 준수)
-  ✅ 재시도 대기 60초 → 율속 초과 시 안전 복구
-  ✅ SEO 90점 기준 유지 (95점 무리한 재생성 제거)
-  ✅ post-processing 자동 보완으로 품질 방어
-  ✅ 이미지 Pixabay/Pexels 무료 API 유지
-  ✅ 클릭 유발 제목 템플릿·동의어 분산·키워드 밀도 제어 유지
-  ✅ WP Author·카테고리·Rank Math 메타 자동 주입 유지
+autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (유료 크레딧 운영판 v3.0)
+업데이트: 2026-07 [유료 크레딧 최적화]
+  ✅ gemini-2.5-flash-lite 고정 (huh0303@gmail.com · Gemini Project20260531 · 유료 크레딧)
+  ✅ max_output_tokens 8192로 증량 (글 길이 3,000자+ 보장)
+  ✅ MAX_REGEN 1회 (품질 보장 재생성 허용)
+  ✅ RATE_LIMIT_SLEEP 12초 (유료 RPM 여유)
+  ✅ 슬롯당 27개 사이트 전부 실행 (하루 86건 목표)
+  ✅ SEO 92점 목표 (품질 상향)
+  ✅ 글 최소 길이 3,000자 (얇은 콘텐츠 방지)
+  ✅ k-health365: 슬롯당 2건 (하루 4~6건)
+  ✅ koreanews365: 하루 5건 (슬롯1=2, 슬롯2=2, 슬롯3=1)
+  ✅ theseouljournal: 하루 5건 (슬롯1=2, 슬롯2=2, 슬롯3=1)
+  ✅ 나머지 24개: 하루 3건 (슬롯당 1건)
 """
 
 import os, sys, time, random, re, json, hashlib
@@ -49,14 +50,14 @@ GEMINI_MODEL           = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 
 TAG_COUNT        = 12
-MIN_BODY_LENGTH  = 1800
-SEO_TARGET       = 90   # ★ 90점 기준 (95점 강요 시 재생성 폭탄 → 무료 한도 초과)
-MAX_REGEN        = 0    # ★ Free Tier 20RPD → 재생성 없음, 1회 호출/포스트 (2회 호출/포스트 × 91건 = 182회 << 1500 RPD)
+MIN_BODY_LENGTH  = 3000
+SEO_TARGET       = 92   # ★ 유료모드: 92점 목표
+MAX_REGEN        = 1    # ★ 유료모드: 재생성 1회 허용
 KW_DENSITY_MAX   = 0.025  # ★ 키워드 밀도 상한 2.5%
 
 # ★ RPM(분당 요청) 제한 준수: flash-lite 무료 = 30 RPM
 # SLEEP_BETWEEN_POSTS를 15초로 설정 → 최대 4건/분 << 30 RPM 안전
-RATE_LIMIT_SLEEP = 35.0  # Free Tier RPM 보호 (35초 간격)
+RATE_LIMIT_SLEEP = 12.0  # 유료모드: 12초 간격
 
 # ============================================================
 # ★ 가상 기자 명단
@@ -520,7 +521,7 @@ def translate_ko_to_en_for_image(keyword: str, theme: str = "") -> str:
 # ============================================================
 SITES_CONFIG = [
     {"url":"https://k-health365.com",        "lang":"ko","theme":"건강과 의학",         "mode":"health_blog",
-     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":4},  # 무료화: 6→4
+     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":6},  # 무료화: 6→4
     {"url":"https://koreamedicaltour.com",    "lang":"en","theme":"Korea Medical Tourism","mode":"blog",
      "keywords_file":".github/workflows/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":3},
     {"url":"https://koreainvest365.com",      "lang":"en","theme":"Investment",           "mode":"blog",
@@ -570,9 +571,9 @@ SITES_CONFIG = [
     {"url":"https://korea365.org",            "lang":"en","theme":"Korea Culture",       "mode":"blog",
      "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":3},  # 무료화: 4→3
     {"url":"https://koreanews365.com",        "lang":"ko","theme":"한국 뉴스",            "mode":"news",
-     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":3},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":5},  # 무료화: 5→4
     {"url":"https://theseouljournal.com",     "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",
-     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":3},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":5},  # 무료화: 5→4
 ]
 
 # ============================================================
@@ -1488,7 +1489,7 @@ def make_khealth_prompt(keyword: str, reporter: dict, mode: str = "health_blog")
 2. HTML 전용 출력: h2,h3,p,ul,li,ol,strong,table,tr,td,th,blockquote 태그만.
    마크다운(##,**,- 등) 절대 금지. 순수 HTML만 출력.
 
-3. ★ 분량: 공백 제외 최소 2,000자 이상. 핵심만 담은 고밀도 의학 콘텐츠.
+3. ★ 분량: 공백 제외 최소 3,500자 이상. 깊이 있는 고밀도 의학 콘텐츠.
 
 4. ★ 모바일 최적화: 모든 <p>는 최대 2문장 이하. 단락 사이 완전한 줄바꿈 필수.
 
@@ -1562,7 +1563,7 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
 [필수 지침 — SEO 95점 목표]
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위 첫 줄에 정확히 '{byline_ko}' 삽입.
-3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 1,800자 이상.
+3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 2,500자 이상.
 4. ★ 모바일 가독성: 모든 <p>는 2~3문장 이하.
 5. ★★★ 키워드 밀도 제한: '{keyword}'는 전체 본문 최대 6회 이하.
    대신 관련 용어·동의어로 분산: {synonym_hint}
@@ -1592,7 +1593,7 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 [MANDATORY RULES — SEO 95+ target]
 1. Style: Journalistic English, inverted pyramid. No markdown.
 2. Byline: First line must be exactly '{byline_en}'.
-3. ★ Length: Minimum 1,800 characters using HTML only (h2, h3, p, strong, ul, li, table).
+3. ★ Length: Minimum 2,500 characters using HTML only (h2, h3, p, strong, ul, li, table).
 4. ★ Mobile readability: Every <p> max 2~3 sentences.
 5. ★★★ Keyword density control: Use '{keyword}' maximum 6 times in the entire body.
    Replace additional mentions with synonyms/variants: {synonym_hint}
@@ -1626,7 +1627,7 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
 
 [필수 지침 — 구글 애드센스 승인·상위 노출 SEO 95점 이상 목표]
 1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td 태그만. 마크다운 절대 금지.
-2. ★ 분량: 공백 제외 최소 2,000자 이상.
+2. ★ 분량: 공백 제외 최소 3,000자 이상.
 3. ★ 모바일 최적화: 모든 <p>는 최대 2문장. 단락 사이 완전한 줄바꿈 필수.
 4. ★★★ 키워드 밀도 엄격 제한 (SEO 핵심):
    - '{keyword}'는 전체 본문에서 최대 8회 이하로만 사용.
@@ -1662,7 +1663,7 @@ Topic: '{keyword}' | Category: {theme} | Language: English
 
 [MANDATORY RULES — Google AdSense quality + SEO 95+ score target]
 1. HTML only: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td. No markdown ever.
-2. ★ Length: Minimum 2,000 characters of high-density expert content.
+2. ★ Length: Minimum 3,000 characters of high-density expert content.
 3. ★ Mobile optimization: Every <p> max 2 sentences. Full paragraph breaks between sections.
 4. ★★★ Keyword density control (critical for SEO):
    - Use '{keyword}' maximum 8 times in the ENTIRE body.
@@ -1708,7 +1709,7 @@ def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
     ul_cnt   = len(re.findall(r'<ul[\s>]', body, re.IGNORECASE))
     kw_density = compute_keyword_density(body, keyword)
 
-    target_len = 3500 if is_khealth else 2500
+    target_len = 4500 if is_khealth else 3000
     if blen < target_len:
         issues.append(f"본문 길이 {blen}자 → {target_len}자 이상으로 증량 필수")
     if kw_density > KW_DENSITY_MAX:
@@ -2235,7 +2236,7 @@ def generate_content_gemini(prompt: str) -> str:
             resp = gemini_client.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,
-                config={"temperature": 0.80, "max_output_tokens": 4096}
+                config={"temperature": 0.80, "max_output_tokens": 8192}
             )
             return resp.text
         except Exception as e:
@@ -2564,9 +2565,9 @@ def main():
     # 슬롯1: 사이트 1~9번, 슬롯2: 10~18번, 슬롯3: 19~27번
     # 각 슬롯에서 최대 9개 사이트 × 1건 = 9 API/슬롯 < 20 RPD ✅
     slot_groups = {
-        1: list(range(0, 9)),    # 사이트 0~8번 인덱스
-        2: list(range(9, 18)),   # 사이트 9~17번 인덱스
-        3: list(range(18, 27)),  # 사이트 18~26번 인덱스
+        1: list(range(0, 27)),   # ★ 유료모드: 슬롯1 — 27개 전부
+        2: list(range(0, 27)),   # ★ 유료모드: 슬롯2 — 27개 전부
+        3: list(range(0, 27)),   # ★ 유료모드: 슬롯3 — 27개 전부
     }
     active_indices = slot_groups.get(RUN_SLOT, list(range(27)))
 
@@ -2578,10 +2579,10 @@ def main():
         if site_idx not in active_indices:
             continue
 
-        n = 1  # ★ 슬롯당 사이트당 1건 (20 RPD 보호)
-        # k-health365는 예외적으로 2건
-        if "k-health365" in url:
-            n = 2
+        # ★ 유료모드: 슬롯당 발행 건수
+        n = get_posts_for_this_slot(site, RUN_SLOT)
+        if n < 1:
+            n = 1
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url}  [{theme}]  슬롯{RUN_SLOT} → {n}건 예정")
