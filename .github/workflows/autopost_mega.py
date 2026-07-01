@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (유료 크레딧 운영판 v3.0)
-업데이트: 2026-07 [유료 크레딧 최적화]
-  ✅ gemini-2.5-flash-lite 고정 (huh0303@gmail.com · Gemini Project20260531 · 유료 크레딧)
-  ✅ max_output_tokens 8192로 증량 (글 길이 3,000자+ 보장)
-  ✅ MAX_REGEN 1회 (품질 보장 재생성 허용)
-  ✅ RATE_LIMIT_SLEEP 12초 (유료 RPM 여유)
-  ✅ 슬롯당 27개 사이트 전부 실행 (하루 86건 목표)
-  ✅ SEO 92점 목표 (품질 상향)
-  ✅ 글 최소 길이 3,000자 (얇은 콘텐츠 방지)
-  ✅ k-health365: 슬롯당 2건 (하루 4~6건)
-  ✅ koreanews365: 하루 5건 (슬롯1=2, 슬롯2=2, 슬롯3=1)
-  ✅ theseouljournal: 하루 5건 (슬롯1=2, 슬롯2=2, 슬롯3=1)
-  ✅ 나머지 24개: 하루 3건 (슬롯당 1건)
+autopost_mega.py — 27개 사이트 메가 오토포스팅 봇 (완전 무료 운영판 v2.1)
+업데이트: 2026-06 [무료화 최적화]
+  ✅ gemini-2.5-flash-lite 완전 고정 (비용 0원 · Free Tier 1500 RPD)
+  ✅ max_output_tokens 4096으로 최적화 (토큰 낭비 50% 절감)
+  ✅ MAX_REGEN 0회 (Free Tier 20RPD 한도 준수 → 비용 0원 완전 보장)
+  ✅ SLEEP_BETWEEN_POSTS 15초 (RPM 제한 60req/min 안전 준수)
+  ✅ 재시도 대기 60초 → 율속 초과 시 안전 복구
+  ✅ SEO 90점 기준 유지 (95점 무리한 재생성 제거)
+  ✅ post-processing 자동 보완으로 품질 방어
+  ✅ 이미지 Pixabay/Pexels 무료 API 유지
+  ✅ 클릭 유발 제목 템플릿·동의어 분산·키워드 밀도 제어 유지
+  ✅ WP Author·카테고리·Rank Math 메타 자동 주입 유지
 """
 
 import os, sys, time, random, re, json, hashlib
@@ -50,14 +49,14 @@ GEMINI_MODEL           = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 
 TAG_COUNT        = 12
-MIN_BODY_LENGTH  = 3000
-SEO_TARGET       = 92   # ★ 유료모드: 92점 목표
-MAX_REGEN        = 1    # ★ 유료모드: 재생성 1회 허용
+MIN_BODY_LENGTH  = 1800
+SEO_TARGET       = 90   # ★ 90점 기준 (95점 강요 시 재생성 폭탄 → 무료 한도 초과)
+MAX_REGEN        = 0    # ★ Free Tier 20RPD → 재생성 없음, 1회 호출/포스트 (2회 호출/포스트 × 91건 = 182회 << 1500 RPD)
 KW_DENSITY_MAX   = 0.025  # ★ 키워드 밀도 상한 2.5%
 
 # ★ RPM(분당 요청) 제한 준수: flash-lite 무료 = 30 RPM
 # SLEEP_BETWEEN_POSTS를 15초로 설정 → 최대 4건/분 << 30 RPM 안전
-RATE_LIMIT_SLEEP = 12.0  # 유료모드: 12초 간격
+RATE_LIMIT_SLEEP = 35.0  # Free Tier RPM 보호 (35초 간격)
 
 # ============================================================
 # ★ 가상 기자 명단
@@ -159,7 +158,7 @@ def reporter_display(reporter: dict) -> str:
 # ★ 테마별 카테고리 매핑
 # ============================================================
 THEME_CATEGORIES = {
-    # ── 황금 카테고리 3개와 완전 일치 (신규 카테고리 생성 절대 금지) ──
+    # ★ 황금3 + Etc/기타 = 총 4개 고정 (신규 카테고리 절대 생성 금지)
 
     "건강과 의학": {
         "default": "건강의학정보",
@@ -191,67 +190,67 @@ THEME_CATEGORIES = {
         ]
     },
     "Korea Medical Tourism": {
-        "default": "Surgery",
-        "golden": ["Surgery","Dental","Dermatology"],
+        "default": "성형·피부과",
+        "golden": ["성형·피부과","정부지원혜택","비용·병원비","Etc"],
         "keyword_map": [
-            (["dental","teeth","orthodontics","implant","whitening","gum","braces"], "Dental"),
-            (["dermatology","skin","laser","botox","filler","acne","pigmentation","aesthetics"], "Dermatology"),
+            (["정부","지자체","서울시","부산","대구","인천","지원","혜택","보조","의료관광"], "정부지원혜택"),
+            (["비용","가격","cost","price","fee","얼마","견적","할인","패키지"], "비용·병원비"),
         ]
     },
     "Investment": {
-        "default": "Stocks",
-        "golden": ["Stocks","Real Estate","Funds"],
+        "default": "Korea Stocks",
+        "golden": ["Korea Stocks","Korea Funds & ETF","Crypto & Digital","Etc"],
         "keyword_map": [
-            (["real estate","property","apartment","jeonse","housing","land","REIT"], "Real Estate"),
-            (["ETF","fund","mutual fund","index fund","bond","fixed income","DeFi","crypto","bitcoin"], "Funds"),
+            (["ETF","fund","mutual","index","bond","dividend","yield","REIT"], "Korea Funds & ETF"),
+            (["crypto","bitcoin","ethereum","DeFi","NFT","blockchain","digital asset","upbit","bithumb"], "Crypto & Digital"),
         ]
     },
     "Korea Investment": {
-        "default": "주식",
-        "golden": ["주식","부동산","절세"],
+        "default": "국내주식·ETF",
+        "golden": ["국내주식·ETF","부동산·청약","절세·연금","기타"],
         "keyword_map": [
-            (["부동산","아파트","청약","분양","전세","리츠","토지"], "부동산"),
-            (["절세","세금","IRP","연금","비과세","공제","채권","금리"], "절세"),
+            (["부동산","아파트","청약","분양","전세","리츠","토지","오피스텔"], "부동산·청약"),
+            (["절세","IRP","연금","비과세","공제","채권","금리","세금","펀드"], "절세·연금"),
         ]
     },
     "Insurance": {
-        "default": "Health Insurance",
-        "golden": ["Health Insurance","Life Insurance","Auto Insurance"],
+        "default": "외국인 건강보험",
+        "golden": ["외국인 건강보험","외국인 자동차보험","외국인 치과보험","Etc"],
         "keyword_map": [
-            (["life","death","term life","whole life","pension","retirement","annuity","accident"], "Life Insurance"),
-            (["car","auto","vehicle","driver","traffic","motorcycle"], "Auto Insurance"),
+            (["car","auto","vehicle","driver","traffic","자동차","운전","교통사고"], "외국인 자동차보험"),
+            (["dental","치과","implant","임플란트","tooth","teeth","scaling","orthodontics"], "외국인 치과보험"),
         ]
     },
     "Finance": {
-        "default": "Banking",
-        "golden": ["Banking","Investing","Taxes"],
+        "default": "외국인 은행·송금",
+        "golden": ["외국인 은행·송금","외국인 투자·주식","외국인 세금·환급","Etc"],
         "keyword_map": [
-            (["stock","market","trading","invest","portfolio","dividend","fund","ETF","crypto","bitcoin"], "Investing"),
-            (["tax","income tax","VAT","deduction","refund","filing","inheritance","property tax"], "Taxes"),
+            (["stock","invest","ETF","fund","KOSPI","trading","portfolio","dividend","주식","펀드"], "외국인 투자·주식"),
+            (["tax","세금","refund","환급","VAT","income tax","deduction","신고","연말정산"], "외국인 세금·환급"),
         ]
     },
     "Tax and Law": {
-        "default": "Taxes",
-        "golden": ["Taxes","Business","Visas"],
+        "default": "외국인 세금·신고",
+        "golden": ["외국인 세금·신고","외국인 법인·창업","외국인 비자·체류","Etc"],
         "keyword_map": [
-            (["business","company","startup","registration","corporate","CEO","labor","employment","contract"], "Business"),
-            (["visa","immigration","residence","permit","foreigner","alien","naturalization"], "Visas"),
+            (["business","company","startup","corporation","법인","창업","registration","투자","M&A"], "외국인 법인·창업"),
+            (["visa","immigration","체류","residence","permit","비자","ARC","HiKorea","출입국"], "외국인 비자·체류"),
         ]
     },
     "Crypto": {
-        "default": "Bitcoin",
-        "golden": ["Bitcoin","Exchanges","Regulation"],
+        "default": "업비트·거래소 가입",
+        "golden": ["업비트·거래소 가입","외국인 코인 투자법","한국 가상화폐 규제","Etc"],
         "keyword_map": [
-            (["exchange","거래소","binance","upbit","bithumb","trading","buy","sell","platform"], "Exchanges"),
-            (["regulation","law","SEC","FSC","tax","legal","compliance","ban","policy"], "Regulation"),
+            (["foreign","외국인","invest","투자","buy","구매","how to","방법","guide","beginner"], "외국인 코인 투자법"),
+            (["regulation","규제","law","FSC","금융위","tax","세금","legal","policy","ban","허용"], "한국 가상화폐 규제"),
         ]
     },
     "Korea Real Estate": {
-        "default": "아파트",
-        "golden": ["아파트","투자","세금"],
+        "default": "아파트 매매·전세·월세",
+        "golden": ["아파트 매매·전세·월세","상가·사업장 임대","외국인 대출·세금","기타"],
         "keyword_map": [
-            (["투자","전략","수익","리츠","경매","갭투자","법인","오피스텔"], "투자"),
-            (["세금","취득세","양도세","재산세","증여","상속","절세"], "세금"),
+            (["상가","사무실","office","store","사업장","임대","월세","lease","commercial"], "상가·사업장 임대"),
+            (["대출","loan","세금","tax","취득세","양도세","mortgage","은행","금리"], "외국인 대출·세금"),
         ]
     },
     "Technology": {
@@ -272,11 +271,11 @@ THEME_CATEGORIES = {
         ]
     },
     "K-Beauty Reviews": {
-        "default": "Skincare",
-        "golden": ["Skincare","Makeup","Haircare"],
+        "default": "인기상품 TOP30",
+        "golden": ["인기상품 TOP30","Skincare","Wellness","Etc"],
         "keyword_map": [
-            (["makeup","foundation","lipstick","blush","eyeshadow","concealer","mascara","lip","contour"], "Makeup"),
-            (["hair","shampoo","scalp","conditioner","treatment","keratin","mask","oil"], "Haircare"),
+            (["skincare","toner","serum","moisturizer","sunscreen","essence","ampoule","cream","skin"], "Skincare"),
+            (["wellness","supplement","vitamin","probiotic","collagen","health","inner beauty","gut"], "Wellness"),
         ]
     },
     "K-POP": {
@@ -288,11 +287,11 @@ THEME_CATEGORIES = {
         ]
     },
     "Travel": {
-        "default": "Travel Guides",
-        "golden": ["Travel Guides","Food","Hotels"],
+        "default": "Hotels & Stays",
+        "golden": ["Hotels & Stays","AirBnB & 민박","Travel Guides","Etc"],
         "keyword_map": [
-            (["food","cuisine","restaurant","street food","dish","eat","cafe","coffee","market","recipe"], "Food"),
-            (["hotel","accommodation","stay","hostel","guesthouse","airbnb","pension","resort"], "Hotels"),
+            (["airbnb","민박","guesthouse","pension","게스트하우스","민박집","여기어때","숙박"], "AirBnB & 민박"),
+            (["guide","itinerary","travel","tour","trip","visit","attraction","sightseeing","여행"], "Travel Guides"),
         ]
     },
     "Visa Guide": {
@@ -304,11 +303,11 @@ THEME_CATEGORIES = {
         ]
     },
     "Wedding": {
-        "default": "Planning",
-        "golden": ["Planning","Venues","Legal"],
+        "default": "결혼·법적·비자",
+        "golden": ["결혼·법적·비자","자녀국적·교육혜택","매칭·결혼비용","Etc"],
         "keyword_map": [
-            (["venue","hall","ceremony","location","outdoor","garden","rooftop","ballroom"], "Venues"),
-            (["legal","registration","document","certificate","marriage law","registry","divorce","paperwork"], "Legal"),
+            (["child","자녀","nationality","국적","education","교육","school","학교","benefit","혜택"], "자녀국적·교육혜택"),
+            (["match","matchmaking","소개","맞선","비용","cost","price","wedding cost","결혼비용","agency"], "매칭·결혼비용"),
         ]
     },
     "Study in Korea": {
@@ -521,7 +520,7 @@ def translate_ko_to_en_for_image(keyword: str, theme: str = "") -> str:
 # ============================================================
 SITES_CONFIG = [
     {"url":"https://k-health365.com",        "lang":"ko","theme":"건강과 의학",         "mode":"health_blog",
-     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":6},  # 무료화: 6→4
+     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":4},  # 무료화: 6→4
     {"url":"https://koreamedicaltour.com",    "lang":"en","theme":"Korea Medical Tourism","mode":"blog",
      "keywords_file":".github/workflows/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":3},
     {"url":"https://koreainvest365.com",      "lang":"en","theme":"Investment",           "mode":"blog",
@@ -571,9 +570,9 @@ SITES_CONFIG = [
     {"url":"https://korea365.org",            "lang":"en","theme":"Korea Culture",       "mode":"blog",
      "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":3},  # 무료화: 4→3
     {"url":"https://koreanews365.com",        "lang":"ko","theme":"한국 뉴스",            "mode":"news",
-     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":5},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":3},  # 무료화: 5→4
     {"url":"https://theseouljournal.com",     "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",
-     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":5},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":3},  # 무료화: 5→4
 ]
 
 # ============================================================
@@ -1489,7 +1488,7 @@ def make_khealth_prompt(keyword: str, reporter: dict, mode: str = "health_blog")
 2. HTML 전용 출력: h2,h3,p,ul,li,ol,strong,table,tr,td,th,blockquote 태그만.
    마크다운(##,**,- 등) 절대 금지. 순수 HTML만 출력.
 
-3. ★ 분량: 공백 제외 최소 3,500자 이상. 깊이 있는 고밀도 의학 콘텐츠.
+3. ★ 분량: 공백 제외 최소 2,000자 이상. 핵심만 담은 고밀도 의학 콘텐츠.
 
 4. ★ 모바일 최적화: 모든 <p>는 최대 2문장 이하. 단락 사이 완전한 줄바꿈 필수.
 
@@ -1563,7 +1562,7 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
 [필수 지침 — SEO 95점 목표]
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위 첫 줄에 정확히 '{byline_ko}' 삽입.
-3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 2,500자 이상.
+3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 1,800자 이상.
 4. ★ 모바일 가독성: 모든 <p>는 2~3문장 이하.
 5. ★★★ 키워드 밀도 제한: '{keyword}'는 전체 본문 최대 6회 이하.
    대신 관련 용어·동의어로 분산: {synonym_hint}
@@ -1593,7 +1592,7 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 [MANDATORY RULES — SEO 95+ target]
 1. Style: Journalistic English, inverted pyramid. No markdown.
 2. Byline: First line must be exactly '{byline_en}'.
-3. ★ Length: Minimum 2,500 characters using HTML only (h2, h3, p, strong, ul, li, table).
+3. ★ Length: Minimum 1,800 characters using HTML only (h2, h3, p, strong, ul, li, table).
 4. ★ Mobile readability: Every <p> max 2~3 sentences.
 5. ★★★ Keyword density control: Use '{keyword}' maximum 6 times in the entire body.
    Replace additional mentions with synonyms/variants: {synonym_hint}
@@ -1627,7 +1626,7 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
 
 [필수 지침 — 구글 애드센스 승인·상위 노출 SEO 95점 이상 목표]
 1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td 태그만. 마크다운 절대 금지.
-2. ★ 분량: 공백 제외 최소 3,000자 이상.
+2. ★ 분량: 공백 제외 최소 2,000자 이상.
 3. ★ 모바일 최적화: 모든 <p>는 최대 2문장. 단락 사이 완전한 줄바꿈 필수.
 4. ★★★ 키워드 밀도 엄격 제한 (SEO 핵심):
    - '{keyword}'는 전체 본문에서 최대 8회 이하로만 사용.
@@ -1663,7 +1662,7 @@ Topic: '{keyword}' | Category: {theme} | Language: English
 
 [MANDATORY RULES — Google AdSense quality + SEO 95+ score target]
 1. HTML only: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td. No markdown ever.
-2. ★ Length: Minimum 3,000 characters of high-density expert content.
+2. ★ Length: Minimum 2,000 characters of high-density expert content.
 3. ★ Mobile optimization: Every <p> max 2 sentences. Full paragraph breaks between sections.
 4. ★★★ Keyword density control (critical for SEO):
    - Use '{keyword}' maximum 8 times in the ENTIRE body.
@@ -1709,7 +1708,7 @@ def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
     ul_cnt   = len(re.findall(r'<ul[\s>]', body, re.IGNORECASE))
     kw_density = compute_keyword_density(body, keyword)
 
-    target_len = 4500 if is_khealth else 3000
+    target_len = 3500 if is_khealth else 2500
     if blen < target_len:
         issues.append(f"본문 길이 {blen}자 → {target_len}자 이상으로 증량 필수")
     if kw_density > KW_DENSITY_MAX:
@@ -2236,7 +2235,7 @@ def generate_content_gemini(prompt: str) -> str:
             resp = gemini_client.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,
-                config={"temperature": 0.80, "max_output_tokens": 8192}
+                config={"temperature": 0.80, "max_output_tokens": 4096}
             )
             return resp.text
         except Exception as e:
@@ -2565,9 +2564,9 @@ def main():
     # 슬롯1: 사이트 1~9번, 슬롯2: 10~18번, 슬롯3: 19~27번
     # 각 슬롯에서 최대 9개 사이트 × 1건 = 9 API/슬롯 < 20 RPD ✅
     slot_groups = {
-        1: list(range(0, 27)),   # ★ 유료모드: 슬롯1 — 27개 전부
-        2: list(range(0, 27)),   # ★ 유료모드: 슬롯2 — 27개 전부
-        3: list(range(0, 27)),   # ★ 유료모드: 슬롯3 — 27개 전부
+        1: list(range(0, 9)),    # 사이트 0~8번 인덱스
+        2: list(range(9, 18)),   # 사이트 9~17번 인덱스
+        3: list(range(18, 27)),  # 사이트 18~26번 인덱스
     }
     active_indices = slot_groups.get(RUN_SLOT, list(range(27)))
 
@@ -2579,10 +2578,10 @@ def main():
         if site_idx not in active_indices:
             continue
 
-        # ★ 유료모드: 슬롯당 발행 건수
-        n = get_posts_for_this_slot(site, RUN_SLOT)
-        if n < 1:
-            n = 1
+        n = 1  # ★ 슬롯당 사이트당 1건 (20 RPD 보호)
+        # k-health365는 예외적으로 2건
+        if "k-health365" in url:
+            n = 2
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url}  [{theme}]  슬롯{RUN_SLOT} → {n}건 예정")
