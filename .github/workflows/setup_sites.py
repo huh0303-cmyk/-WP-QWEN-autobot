@@ -91,7 +91,7 @@ SITES = [
    ["혈압","당뇨","혈당","암","피부","아토피","탈모","관절","허리","디스크","골다공증","수면","불면","우울","치료","예방","관리"],
    False, True, True),
 
-  ("https://koreamedicaltour.com","KOREAMEDICALTOURCOM","ko","한국의료관광","Korea Medical Tour",
+  ("https://koreamedicaltour.com","KOREAMEDICALTOURCOM","en","한국의료관광","Korea Medical Tour",
    "성형·피부과","정부지원혜택","비용·병원비",
    ["정부","지자체","서울시","부산","대구","인천","지원","혜택","보조","의료관광"],
    ["비용","가격","cost","price","fee","얼마","견적","할인","패키지","surgery cost"],
@@ -103,7 +103,7 @@ SITES = [
    ["crypto","bitcoin","ethereum","DeFi","NFT","blockchain","digital asset","upbit"],
    False, True, True),
 
-  ("https://ki-korea.com","KIKOREACOM","ko","한국투자(KO)","KI Korea 한국투자",
+  ("https://ki-korea.com","KIKOREACOM","en","한국투자(KO)","KI Korea 한국투자",
    "국내주식·ETF","부동산·청약","절세·연금",
    ["부동산","아파트","청약","분양","전세","리츠","토지","오피스텔"],
    ["절세","IRP","연금","비과세","공제","채권","금리","세금"],
@@ -133,7 +133,7 @@ SITES = [
    ["regulation","규제","law","FSC","금융위","tax","세금","legal","policy","ban"],
    False, True, True),
 
-  ("https://krealestate365.com","KREALESTATE365COM","ko","외국인부동산","한국부동산 정석",
+  ("https://krealestate365.com","KREALESTATE365COM","en","외국인부동산","한국부동산 정석",
    "아파트 매매·전세·월세","상가·사업장 임대","외국인 대출·세금",
    ["상가","사무실","office","store","사업장","임대","월세","lease","commercial"],
    ["대출","loan","세금","tax","취득세","양도세","mortgage","은행","금리"],
@@ -199,7 +199,7 @@ SITES = [
    ["career","job","work","internship","employment"],
    False, True, True),
 
-  ("https://ksa-korea.org","KSAKOREAORG","ko","한국유학협회","KSA Korea 한국유학협회",
+  ("https://ksa-korea.org","KSAKOREAORG","en","한국유학협회","KSA Korea 한국유학협회",
    "입학정보","장학금","비자",
    ["장학금","GKS","정부초청","지원금","면제"],
    ["비자","D-2","출입국","체류","연장"],
@@ -370,13 +370,337 @@ def check_noindex(url):
 def allow_indexing(base, pw):
     code,_,_ = api("POST",f"{base}/settings",pw,{"blog_public":True})
     print(f"    {'✅' if code<300 else '⚠️'} 색인 허용 ({code})")
+def force_generatepress_premium(site_url: str, pw: str, theme_slug: str = "generatepress"):
+    """GeneratePress (Premium) 강제 활성화"""
+    try:
+        # 현재 활성 테마 확인
+        r = requests.get(f"{site_url}/wp-json/wp/v2/themes",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"status": "active"}, timeout=10)
+        if r.status_code == 200:
+            themes = r.json()
+            if isinstance(themes, list):
+                for t in themes:
+                    slug = t.get("stylesheet","") or t.get("template","")
+                    if "generatepress" in slug.lower():
+                        print(f"    ✅ GP 이미 활성화됨: {slug}")
+                        return True
+
+        # 설치된 테마 목록에서 GP 찾기
+        r2 = requests.get(f"{site_url}/wp-json/wp/v2/themes",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         timeout=10)
+        if r2.status_code == 200:
+            all_themes = r2.json()
+            if isinstance(all_themes, list):
+                for t in all_themes:
+                    slug = t.get("stylesheet","") or t.get("template","")
+                    if "generatepress" in slug.lower():
+                        # 활성화 시도
+                        act = requests.post(
+                            f"{site_url}/wp-json/wp/v2/themes/{slug}",
+                            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                            json={"status": "active"}, timeout=15)
+                        if act.status_code in (200,201):
+                            print(f"    ✅ GP 활성화 완료: {slug}")
+                            return True
+
+        print(f"    ⚠️ GP REST API 활성화 불가 → hPanel에서 수동 확인 필요")
+        return False
+    except Exception as e:
+        print(f"    ⚠️ GP 설치 오류: {e}")
+        return False
+
+
+def fix_duplicate_pages(base: str, pw: str):
+    """중복 페이지 삭제 — 같은 slug 중 가장 오래된 것만 유지, 나머지 삭제"""
+    all_pages = get_all_pages(base, pw)
+    slug_map = {}
+    for pg in all_pages:
+        slug = pg.get("slug","")
+        pid = pg.get("id")
+        date = pg.get("date","")
+        if slug not in slug_map:
+            slug_map[slug] = []
+        slug_map[slug].append((pid, date))
+
+    deleted = 0
+    for slug, items in slug_map.items():
+        if len(items) <= 1:
+            continue
+        # 날짜순 정렬 — 가장 오래된 것(첫번째) 유지, 나머지 삭제
+        items_sorted = sorted(items, key=lambda x: x[1])
+        for pid, date in items_sorted[1:]:  # 첫번째 제외 삭제
+            code,_,_ = api("DELETE", f"{base}/pages/{pid}", pw, params={"force": True})
+            if code in (200,201):
+                deleted += 1
+                print(f"    🗑️ 중복 페이지 삭제: {slug} (ID:{pid})")
+    if deleted:
+        print(f"    ✅ 중복 페이지 {deleted}개 삭제 완료")
+    return deleted
+
+
+def setup_menu_and_footer(site_url: str, pw: str, lang: str,
+                           cat_ids: list, cat_names: list, page_slugs_map: dict):
+    """메인메뉴 = 황금카테고리3+1 / Footer = 필수4페이지"""
+    base_wp = f"{site_url}/wp-json"
+
+    try:
+        # ── 메뉴 목록 조회 ──
+        r = requests.get(f"{base_wp}/wp/v2/menus",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw), timeout=10)
+        if r.status_code != 200:
+            # menus/v1 시도
+            r = requests.get(f"{base_wp}/menus/v1/menus",
+                            auth=requests.auth.HTTPBasicAuth(WP_USER, pw), timeout=10)
+
+        menus = r.json() if r.status_code == 200 else []
+        if not isinstance(menus, list) or not menus:
+            # 메뉴 없으면 새로 생성
+            cr = requests.post(f"{base_wp}/wp/v2/menus",
+                              auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                              json={"name": "Primary Menu", "slug": "primary-menu"},
+                              timeout=10)
+            if cr.status_code in (200,201):
+                menus = [cr.json()]
+            else:
+                print(f"    ⚠️ 메뉴 생성 실패")
+                return
+
+        # 주 메뉴 (첫번째)
+        main_menu = menus[0]
+        menu_id = main_menu.get("id") or main_menu.get("term_id")
+
+        # Footer 메뉴 찾기 또는 생성
+        footer_menu_id = None
+        for m in menus:
+            name = (m.get("name") or "").lower()
+            if "footer" in name:
+                footer_menu_id = m.get("id") or m.get("term_id")
+                break
+        if not footer_menu_id:
+            fr = requests.post(f"{base_wp}/wp/v2/menus",
+                              auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                              json={"name": "Footer Menu", "slug": "footer-menu"},
+                              timeout=10)
+            if fr.status_code in (200,201):
+                footer_menu_id = fr.json().get("id")
+
+        # ── 기존 메뉴 아이템 전부 삭제 후 재구성 ──
+        for mid in [menu_id, footer_menu_id]:
+            if not mid: continue
+            ir = requests.get(f"{base_wp}/wp/v2/menu-items",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             params={"menus": mid, "per_page": 100}, timeout=10)
+            if ir.status_code == 200:
+                for item in ir.json():
+                    requests.delete(f"{base_wp}/wp/v2/menu-items/{item['id']}",
+                                   auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                   params={"force": True}, timeout=8)
+
+        # ── 메인메뉴: 황금 카테고리 3+1 ──
+        etc_name = "기타" if lang == "ko" else "Etc"
+        added_cats = 0
+        for cid, cname in zip(cat_ids, cat_names):
+            if not cid or cid <= 0: continue
+            r = requests.post(f"{base_wp}/wp/v2/menu-items",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             json={"menus": menu_id, "object_id": cid,
+                                   "object": "category", "type": "taxonomy",
+                                   "status": "publish"}, timeout=10)
+            if r.status_code in (200,201):
+                added_cats += 1
+        print(f"    📋 메인메뉴 카테고리 {added_cats}개 등록")
+
+        # ── Footer: 필수 4페이지 ──
+        page_order = ["privacy-policy","disclaimer","contact","about"]
+        page_labels = {
+            "privacy-policy": "Privacy Policy" if lang=="en" else "개인정보처리방침",
+            "disclaimer": "Disclaimer" if lang=="en" else "면책공고",
+            "contact": "Contact Us" if lang=="en" else "문의하기",
+            "about": "About Us" if lang=="en" else "사이트 소개",
+        }
+        added_pages = 0
+        base_api = f"{site_url}/wp-json/wp/v2"
+        for slug in page_order:
+            page_id = page_slugs_map.get(slug)
+            if not page_id:
+                # 직접 조회
+                pr = requests.get(f"{base_api}/pages",
+                                 auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                 params={"slug": slug, "per_page":1}, timeout=8)
+                if pr.status_code == 200 and pr.json():
+                    page_id = pr.json()[0]["id"]
+            if not page_id: continue
+
+            target_menu = footer_menu_id or menu_id
+            r = requests.post(f"{base_wp}/wp/v2/menu-items",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             json={"menus": target_menu, "object_id": page_id,
+                                   "object": "page", "type": "post_type",
+                                   "title": page_labels.get(slug, slug),
+                                   "status": "publish"}, timeout=10)
+            if r.status_code in (200,201):
+                added_pages += 1
+        print(f"    📋 Footer 필수페이지 {added_pages}개 등록")
+
+        # ── 메뉴 위치 등록 (Primary + Footer) ──
+        loc_r = requests.post(f"{base_wp}/wp/v2/menu-locations",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             json={"primary": menu_id, "footer": footer_menu_id},
+                             timeout=10)
+
+    except Exception as e:
+        print(f"    ⚠️ 메뉴 설정 오류: {e}")
+
+
+def force_install_generatepress(site_url: str, pw: str):
+    """GeneratePress 테마 강제 설치 및 활성화"""
+    base = f"{site_url}/wp-json/wp/v2"
+    
+    # 1. 현재 활성 테마 확인
+    code, r, _ = api("GET", f"{site_url}/wp-json/wp/v1/themes", pw, 
+                     params={"status": "active"})
+    if code == 200 and isinstance(r, list) and r:
+        current = r[0].get("stylesheet", "")
+        print(f"    현재 테마: {current}")
+        if "generatepress" in current.lower():
+            print(f"    ✅ 이미 GeneratePress 활성화됨")
+            return True
+
+    # 2. GeneratePress 설치 (WP CLI via REST)
+    # themes endpoint로 설치
+    install_r = requests.post(
+        f"{site_url}/wp-json/wp/v1/themes",
+        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+        json={"slug": "generatepress", "status": "active"},
+        timeout=30
+    )
+    if install_r.status_code in (200, 201):
+        print(f"    ✅ GeneratePress 설치·활성화 완료")
+        return True
+    
+    # 3. 이미 설치된 경우 활성화만
+    activate_r = requests.post(
+        f"{site_url}/wp-json/wp/v1/themes/generatepress",
+        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+        json={"status": "active"},
+        timeout=20
+    )
+    if activate_r.status_code in (200, 201):
+        print(f"    ✅ GeneratePress 활성화 완료")
+        return True
+    
+    print(f"    ⚠️ REST API 테마 설치 불가 ({install_r.status_code}) → Hostinger에서 수동 설치 필요")
+    return False
+
+
+def register_pages_to_menu(site_url: str, pw: str, lang: str):
+    """필수 4페이지를 메인 메뉴에 자동 등록"""
+    base = site_url
+    try:
+        # 메뉴 목록 조회
+        r = requests.get(f"{base}/wp-json/wp/v2/menus",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        timeout=10)
+        if r.status_code != 200:
+            # 메뉴 API 없으면 wp-json/menus/v1 시도
+            r = requests.get(f"{base}/wp-json/menus/v1/menus",
+                            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                            timeout=10)
+        if r.status_code != 200:
+            print(f"    ⚠️ 메뉴 API 없음 — 스킵")
+            return
+
+        menus = r.json()
+        if not menus:
+            print(f"    ⚠️ 메뉴 없음")
+            return
+
+        menu_id = menus[0].get("id") or menus[0].get("term_id")
+        if not menu_id:
+            return
+
+        # 등록할 페이지 슬러그 목록
+        page_slugs = ["privacy-policy","disclaimer","contact","about"]
+        wp_base = f"{site_url}/wp-json/wp/v2"
+
+        for slug in page_slugs:
+            # 페이지 ID 조회
+            pr = requests.get(f"{wp_base}/pages",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             params={"slug": slug, "per_page": 1},
+                             timeout=10)
+            if pr.status_code != 200 or not pr.json():
+                continue
+            page_id = pr.json()[0]["id"]
+            page_url = pr.json()[0].get("link", "")
+
+            # 메뉴 아이템 등록
+            mi = requests.post(f"{site_url}/wp-json/wp/v2/menu-items",
+                              auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                              json={"menus": menu_id, "object_id": page_id,
+                                    "object": "page", "type": "post_type",
+                                    "status": "publish"},
+                              timeout=10)
+            if mi.status_code in (200, 201):
+                print(f"    ✅ 메뉴 등록: {slug}")
+            elif mi.status_code == 400:
+                print(f"    ℹ️ 이미 등록됨: {slug}")
+    except Exception as e:
+        print(f"    ⚠️ 메뉴 등록 실패: {e}")
+
+
+
+# ★ 한글 → 영어 슬러그 변환 테이블
+SLUG_MAP = {
+    "건강의학정보": "health-medical-info",
+    "건강기능식품정보": "health-functional-food",
+    "질환별관리법": "disease-management",
+    "기타": "etc",
+    "경제": "economy",
+    "정치": "politics",
+    "사회": "society",
+    "성형·피부과": "plastic-dermatology",
+    "정부지원혜택": "government-support",
+    "비용·병원비": "medical-cost",
+    "국내주식·etf": "korea-stocks-etf",
+    "부동산·청약": "real-estate-subscription",
+    "절세·연금": "tax-saving-pension",
+    "외국인 건강보험": "foreigner-health-insurance",
+    "외국인 자동차보험": "foreigner-auto-insurance",
+    "외국인 치과보험": "foreigner-dental-insurance",
+    "외국인 은행·송금": "foreigner-banking-remittance",
+    "외국인 투자·주식": "foreigner-investment-stocks",
+    "외국인 세금·환급": "foreigner-tax-refund",
+    "외국인 세금·신고": "foreigner-tax-filing",
+    "외국인 법인·창업": "foreigner-corporation-startup",
+    "외국인 비자·체류": "foreigner-visa-stay",
+    "업비트·거래소 가입": "upbit-exchange-signup",
+    "외국인 코인 투자법": "foreigner-crypto-investing",
+    "한국 가상화폐 규제": "korea-crypto-regulation",
+    "아파트 매매·전세·월세": "apartment-buy-rent",
+    "상가·사업장 임대": "commercial-lease",
+    "외국인 대출·세금": "foreigner-loan-tax",
+    "인기상품 top30": "top30-products",
+    "결혼·법적·비자": "marriage-legal-visa",
+    "자녀국적·교육혜택": "children-nationality-education",
+    "매칭·결혼비용": "matchmaking-wedding-cost",
+    "입학정보": "admission-info",
+    "장학금": "scholarship",
+    "비자": "visa",
+}
 
 def slug_of(name):
-    s=name.lower()
-    s=re.sub(r'[&·]','-',s)
-    s=re.sub(r'\s+','-',s)
-    s=re.sub(r'[^a-z0-9가-힣\-]','',s)
-    return s.strip('-')
+    key = name.lower().strip()
+    if key in SLUG_MAP:
+        return SLUG_MAP[key]
+    s = name.lower()
+    s = re.sub(r'[&·/]', '-', s)
+    s = re.sub(r'\s+', '-', s)
+    s = re.sub(r'[^a-z0-9\-]', '', s)  # ★ 한글 완전 제거
+    s = re.sub(r'-+', '-', s)
+    return s.strip('-') or "category"
 
 # ★ 색인 요청 (IndexNow + Search Console ping)
 def request_indexing(site_url: str, wp_pass: str):
@@ -461,6 +785,18 @@ def run():
             print("  🔓 색인 차단 해제...")
             allow_indexing(base, pw)
 
+        # [1-1] ★ GeneratePress Premium 강제 활성화 (모든 블로그형 사이트)
+        skip_gp = any(x in url for x in [
+            "koreanews365","theseouljournal","korea365",
+            "kieca-korea","ksa-korea","sis-korea"
+        ])
+        if not skip_gp:
+            print("  🎨 GeneratePress Premium 활성화...")
+            force_generatepress_premium(url, pw)
+        elif not theme_ok_default:
+            print("  🎨 GeneratePress 강제 설치·활성화...")
+            force_generatepress_premium(url, pw)
+
         # [2] ★ 황금3 + Etc/기타 = 4개 카테고리 생성
         etc_name = "기타" if lang=="ko" else "Etc"
         print(f"  📁 카테고리: {c1} / {c2} / {c3} / {etc_name}")
@@ -469,6 +805,10 @@ def run():
         id3=get_or_create_cat(base,pw,c3,slug_of(c3))
         id4=get_or_create_cat(base,pw,etc_name,slug_of(etc_name))
         keep_ids=[x for x in [id1,id2,id3,id4] if x]
+
+        # [2-1] ★ 기본 카테고리를 황금1번으로 설정 (기존 default 카테고리 삭제 가능하게)
+        if id1:
+            api("POST",f"{base}/settings",pw,{"default_category": id1})
 
         # [3] 포스트 재배분
         if keep_ids and total_posts>0:
@@ -511,6 +851,23 @@ def run():
 
         # [6] 사이트명
         api("POST",f"{base}/settings",pw,{"title":site_title})
+
+        # [6-1] ★ 중복 페이지 삭제
+        print("  🗑️ 중복 페이지 정리...")
+        fix_duplicate_pages(base, pw)
+
+        # [6-2] ★ 메인메뉴(황금카테고리3+1) + Footer(필수4페이지) 자동 구성
+        print("  📋 메뉴 자동 구성...")
+        pg_map = {}
+        for s in ["privacy-policy","disclaimer","contact","about"]:
+            pr = requests.get(f"{base}/pages", auth=requests.auth.HTTPBasicAuth(WP_USER,pw),
+                             params={"slug":s,"per_page":1}, timeout=8)
+            if pr.status_code==200 and pr.json():
+                pg_map[s] = pr.json()[0]["id"]
+        setup_menu_and_footer(url, pw, lang,
+                              [id1,id2,id3,id4],
+                              [c1,c2,c3,etc_name],
+                              pg_map)
 
         # [7] ★ 색인 요청 (Sitemap ping)
         print("  🔍 색인 요청...")
