@@ -1,24 +1,12 @@
 name: "🚀 MASTER — 27사이트 AdSense 승인 자동화"
 
-# ──────────────────────────────────────────────────────────
-# 이 파일 하나로 모든 것을 처리합니다
-#
-# [수동 실행]  Actions → Run workflow
-#   step=setup  → 구조 작업만  (카테고리·페이지·robots·noindex)
-#   step=post   → 글 발행만
-#   step=all    → 구조 작업 + 글 발행 동시
-#
-# [자동 실행]  매일 3회 스케줄 (글 발행만)
-#   KST 06:10 / 14:10 / 22:10
-# ──────────────────────────────────────────────────────────
-
 on:
   workflow_dispatch:
     inputs:
       step:
         description: "setup=구조작업 / post=글발행 / all=전체"
         required: false
-        default: "all"
+        default: "post"
       run_slot:
         description: "슬롯 1=오전 2=오후 3=저녁"
         required: false
@@ -32,7 +20,6 @@ concurrency:
   group: master-27sites
   cancel-in-progress: false
 
-# ──────────────────────────────────────────────────────────
 jobs:
 # ══════════════════════════════════════════════════════════
 # JOB 1: 슬롯 결정
@@ -72,27 +59,72 @@ jobs:
           echo "▶ 슬롯=$SLOT | 구조작업=$RUN_SETUP | 글발행=$RUN_POST"
 
 # ══════════════════════════════════════════════════════════
-# JOB 2: 사이트 구조 자동 설정
-#   - robots.txt / noindex 차단 해제 (ksa-korea, kworld365, krealestate365)
-#   - 27개 사이트 카테고리 3개 생성
-#   - 필수 4페이지 자동 생성 (Privacy·Disclaimer·Contact·About)
-#   - 메뉴에 카테고리 자동 등록
+# JOB 2: 연결 테스트 (HTTP 0 사전 감지)
 # ══════════════════════════════════════════════════════════
-  site-setup:
+  connection-test:
     needs: determine-slot
-    if: ${{ needs.determine-slot.outputs.run_setup == 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    outputs:
+      can_connect: ${{ steps.test.outputs.can_connect }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - run: pip install requests -q
+      - id: test
+        name: "🔌 연결 테스트"
+        env:
+          KHEALTH365COM:   ${{ secrets.KHEALTH365COM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          KFINANCE365COM:  ${{ secrets.KFINANCE365COM }}
+        run: |
+          python3 -c "
+          import requests, os, sys, time
+          WP_USER = 'huh0303@gmail.com'
+          test_sites = [
+              ('https://k-health365.com', os.getenv('KHEALTH365COM','')),
+              ('https://koreanews365.com', os.getenv('KOREANEWS365COM','')),
+              ('https://kfinance365.com', os.getenv('KFINANCE365COM','')),
+          ]
+          ok = 0
+          for url, pw in test_sites:
+              if not pw: continue
+              for attempt in range(3):
+                  try:
+                      r = requests.get(f'{url}/wp-json/wp/v2/posts',
+                                      auth=(WP_USER, pw),
+                                      params={'per_page':1},
+                                      timeout=20,
+                                      headers={'User-Agent':'WordPress/6.0'})
+                      if r.status_code < 500:
+                          print(f'✅ {url}: HTTP {r.status_code}')
+                          ok += 1; break
+                  except Exception as e:
+                      print(f'⚠️ {url} 시도{attempt+1}: {e}')
+                      time.sleep(15)
+          print(f'연결 성공: {ok}/3')
+          # 1개라도 연결되면 진행
+          sys.exit(0 if ok >= 1 else 1)
+          "
+          echo "can_connect=true" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
 
-      - name: "🔧 27개 사이트 구조 자동 설정"
+# ══════════════════════════════════════════════════════════
+# JOB 3: 사이트 구조 설정
+# ══════════════════════════════════════════════════════════
+  site-setup:
+    needs: [determine-slot, connection-test]
+    if: ${{ needs.determine-slot.outputs.run_setup == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "🔧 27개 사이트 구조 설정"
         env:
           KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -121,38 +153,33 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
+          SHEETS_WEBHOOK:       ${{ secrets.SHEETS_WEBHOOK }}
         run: python .github/workflows/setup_sites.py
 
 # ══════════════════════════════════════════════════════════
-# JOB 3: 자동 포스팅 (매일 3회 / 사이트당 3건 고퀄리티 글)
-#   - gemini-2.5-flash-lite (무료 고정)
-#   - 이미지: Pixabay + Pexels (무료)
-#   - SEO 90점 목표
+# JOB 4: 자동 포스팅
 # ══════════════════════════════════════════════════════════
   autopost:
-    needs: determine-slot
+    needs: [determine-slot, connection-test]
     if: ${{ needs.determine-slot.outputs.run_post == 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: "패키지 캐시"
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: pip-autopost-v3
-
+          key: pip-autopost-v4
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-
+      - name: "⏳ 연결 안정화 대기 (30초)"
+        run: sleep 30
       - name: "📝 오토포스팅 Slot ${{ needs.determine-slot.outputs.slot }}"
         env:
           RUN_SLOT:             ${{ needs.determine-slot.outputs.slot }}
-          SLEEP_BETWEEN_POSTS:  "15"
           GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
           PIXABAY_KEY:          ${{ secrets.PIXABAY_KEY }}
           PEXELS_KEY:           ${{ secrets.PEXELS_KEY }}
