@@ -2290,9 +2290,11 @@ def upload_featured_image(site_url: str, wp_pass: str,
         else:
             ext = "jpg"; mime = "image/jpeg"
 
-        # 파일명 생성 (키워드 기반)
+        # ★ 파일명 생성 — 영어+숫자만 (한글 제거)
         import re as _re
-        safe_kw = _re.sub(r'[^a-z0-9가-힣]', '-', keyword.lower())[:30]
+        safe_kw = _re.sub(r'[^a-z0-9]', '-', keyword.lower())[:30]
+        safe_kw = _re.sub(r'-+', '-', safe_kw).strip('-')
+        if not safe_kw: safe_kw = "korea-image"
         filename = f"{safe_kw}-{int(time.time())}.{ext}"
 
         # WP 미디어 업로드
