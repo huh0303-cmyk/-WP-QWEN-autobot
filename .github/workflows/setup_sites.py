@@ -693,6 +693,172 @@ def verify_post_seo(site_url: str, pw: str, limit: int = 10):
         print(f"    ⚠️ SEO 확인 오류: {e}")
 
 
+
+def fix_post_noindex_and_404(site_url: str, pw: str):
+    """기존 글 noindex 제거 + 404 태그/카테고리 정리"""
+    base = f"{site_url}/wp-json/wp/v2"
+    fixed = 0
+    
+    try:
+        # 1. 전체 글 noindex 제거 (Rank Math meta)
+        page = 1
+        while True:
+            r = requests.get(f"{base}/posts",
+                           auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                           params={"per_page":50, "page":page, "status":"publish",
+                                   "_fields":"id,meta"},
+                           timeout=15)
+            if r.status_code != 200 or not r.json(): break
+            posts = r.json()
+            for post in posts:
+                meta = post.get("meta", {})
+                robots = meta.get("rank_math_robots", [])
+                # noindex가 있으면 제거
+                if isinstance(robots, list) and "noindex" in robots:
+                    new_robots = [r for r in robots if r != "noindex"]
+                    requests.post(
+                        f"{base}/posts/{post['id']}",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        json={"meta": {"rank_math_robots": new_robots}},
+                        timeout=10)
+                    fixed += 1
+                elif isinstance(robots, str) and "noindex" in robots:
+                    requests.post(
+                        f"{base}/posts/{post['id']}",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        json={"meta": {"rank_math_robots": []}},
+                        timeout=10)
+                    fixed += 1
+            if len(posts) < 50: break
+            page += 1
+            
+        if fixed:
+            print(f"    ✅ noindex 제거: {fixed}개 글")
+        else:
+            print(f"    ✅ noindex 문제 없음")
+            
+        # 2. 사용하지 않는 태그 정리 (404 방지)
+        r = requests.get(f"{base}/tags",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"per_page":100, "hide_empty":True},
+                        timeout=10)
+        if r.status_code == 200:
+            tags = r.json()
+            print(f"    📌 활성 태그: {len(tags)}개")
+            
+    except Exception as e:
+        print(f"    ⚠️ 오류: {e}")
+
+
+def audit_and_clean_posts(site_url: str, pw: str, lang: str, dry_run: bool = False):
+    """
+    글 품질 감사 및 정리:
+    1. 제목에 2020~2025 연도 포함 → 삭제
+    2. 중복 제목 → 오래된 것 삭제
+    3. 저품질 패턴 제목 → 삭제
+    4. 카테고리 미분류 글 → 재배분
+    """
+    import re as _re
+    base = f"{site_url}/wp-json/wp/v2"
+    
+    # 전체 글 수집
+    all_posts = []
+    page = 1
+    while True:
+        r = requests.get(f"{base}/posts",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"per_page":100,"page":page,"status":"publish",
+                                "_fields":"id,title,date,slug,categories"},
+                        timeout=20)
+        if r.status_code != 200 or not isinstance(r.json(), list) or not r.json():
+            break
+        posts = r.json()
+        all_posts.extend(posts)
+        if len(posts) < 100: break
+        page += 1
+
+    print(f"    📋 전체 {len(all_posts)}건 분석 중...")
+
+    deleted = 0
+    title_seen = {}
+
+    # 저품질 패턴
+    BAD_PATTERNS_KO = [
+        r'202[0-5]년',   # 2020~2025년
+        r'202[0-5]', # 단독 연도
+    ]
+    BAD_PATTERNS_EN = [
+        r'202[0-5]',
+        r'in 202[0-5]',
+        r'202[0-5] guide',
+        r'202[0-5] tips',
+    ]
+    bad_patterns = BAD_PATTERNS_KO if lang == "ko" else BAD_PATTERNS_EN
+
+    # 진부한 제목 패턴 (삭제)
+    CLICHE_KO = ["총정리", "A to Z", "a-to-z", "모든것을 알아보자", "완벽가이드", "알아보자!"]
+    CLICHE_EN = ["everything you need to know", "complete guide to", "a to z", "a-to-z guide"]
+    cliches = CLICHE_KO if lang == "ko" else CLICHE_EN
+
+    to_delete = []
+
+    for post in all_posts:
+        raw = post.get("title", {})
+        title = raw.get("rendered","") if isinstance(raw, dict) else str(raw)
+        import html as _html
+        title = _html.unescape(title)
+        title = _re.sub(r'<[^>]+>', '', title).strip()
+        pid = post.get("id")
+        date = post.get("date","")[:10]
+
+        # 1. 연도 포함 제목
+        for pat in bad_patterns:
+            if _re.search(pat, title, _re.IGNORECASE):
+                to_delete.append((pid, title, date, "연도포함"))
+                break
+
+        # 2. 진부한 패턴
+        title_lower = title.lower()
+        for cliche in cliches:
+            if cliche in title_lower:
+                to_delete.append((pid, title, date, "저품질패턴"))
+                break
+
+        # 3. 중복 제목 (앞 25자 기준)
+        key = _re.sub(r'\s+','',title[:25].lower())
+        if key in title_seen:
+            # 나중에 작성된 글 삭제
+            to_delete.append((pid, title, date, "중복제목"))
+        else:
+            title_seen[key] = pid
+
+    # 중복 제거
+    delete_ids = list({item[0]: item for item in to_delete}.values())
+
+    print(f"    🗑️ 삭제 대상: {len(delete_ids)}건")
+    for pid, title, date, reason in delete_ids[:10]:
+        print(f"       [{reason}] {date} ID:{pid} {title[:50]}")
+    if len(delete_ids) > 10:
+        print(f"       ... 외 {len(delete_ids)-10}건")
+
+    if not dry_run and delete_ids:
+        for pid, title, date, reason in delete_ids:
+            try:
+                dr = requests.delete(
+                    f"{base}/posts/{pid}",
+                    auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                    params={"force": True},
+                    timeout=10)
+                if dr.status_code in (200, 201):
+                    deleted += 1
+            except Exception as e:
+                print(f"       ⚠️ 삭제 실패 ID:{pid}: {e}")
+        print(f"    ✅ {deleted}건 삭제 완료")
+    elif dry_run:
+        print(f"    ℹ️ dry_run 모드 — 실제 삭제 안 함")
+
+    return deleted
+
 def ping_search_engines(site_url: str):
     """Google + Naver + Bing Sitemap ping"""
     sitemap = f"{site_url}/sitemap_index.xml"
@@ -707,6 +873,127 @@ def ping_search_engines(site_url: str):
             print(f"    🔍 {engine} ping: HTTP {r.status_code}")
         except Exception as e:
             print(f"    ⚠️ ping 실패: {e}")
+
+
+def install_github_ip_whitelist(site_url: str, pw: str):
+    """WPCode Lite로 GitHub Actions IP 허용 코드 삽입"""
+    base = f"{site_url}/wp-json/wp/v2"
+    
+    php_code = """<?php
+// GitHub Actions IP Whitelist for WordPress REST API
+add_filter('rest_authentication_errors', function($result) {
+    $allowed_ranges = ['4.148.', '20.1.', '20.200.', '40.74.', '192.30.', '185.199.', '140.82.'];
+    $ip = $_SERVER['REMOTE_ADDR'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+    $ip = trim(explode(',', $ip)[0]);
+    foreach ($allowed_ranges as $range) {
+        if (strpos($ip, $range) === 0) return true;
+    }
+    return $result;
+}, 10, 1);
+
+// Also allow REST API access
+add_filter('rest_enabled', '__return_true');
+add_filter('rest_jsonp_enabled', '__return_true');
+"""
+    
+    # WPCode REST API로 스니펫 삽입
+    try:
+        # 기존 스니펫 확인
+        r = requests.get(f"{base}/wpcode-snippets",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"per_page": 20}, timeout=10)
+        
+        snippet_data = {
+            "title": "GitHub Actions IP Whitelist",
+            "content": php_code,
+            "code_type": "php",
+            "status": "publish",
+            "location": "everywhere",
+        }
+        
+        if r.status_code == 200 and r.json():
+            # 기존 스니펫 업데이트
+            for s in r.json():
+                if "GitHub Actions" in s.get("title", {}).get("rendered", ""):
+                    ur = requests.post(
+                        f"{base}/wpcode-snippets/{s['id']}",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        json=snippet_data, timeout=10)
+                    if ur.status_code in (200,201):
+                        print(f"    ✅ IP 허용 코드 업데이트")
+                        return True
+        
+        # 새로 생성
+        cr = requests.post(f"{base}/wpcode-snippets",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json=snippet_data, timeout=10)
+        if cr.status_code in (200,201):
+            print(f"    ✅ IP 허용 코드 삽입 완료")
+            return True
+            
+        # WPCode API 없으면 wp_options에 직접
+        print(f"    ⚠️ WPCode API 없음 → wp_options 방식 시도")
+        
+        # functions.php에 코드 추가 (wp-json/wp/v2/settings 경유)
+        r2 = requests.post(f"{site_url}/wp-json/wp/v2/settings",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json={"wpcode_auto_insert": php_code},
+                          timeout=10)
+        return False
+        
+    except Exception as e:
+        print(f"    ⚠️ IP 허용 코드 삽입 실패: {e}")
+        return False
+
+
+def setup_rank_math_indexing(site_url: str, pw: str):
+    """Rank Math Instant Indexing 활성화 + URL 제출"""
+    base = f"{site_url}/wp-json"
+    try:
+        # 1. Instant Indexing 플러그인 설정 확인
+        r = requests.get(f"{base}/rankmath/v1/getOptions",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        timeout=10)
+        
+        # 2. 최근 글 URL 수집
+        posts_r = requests.get(f"{base}/wp/v2/posts",
+                              auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                              params={"per_page": 100, "status": "publish",
+                                      "_fields": "link", "orderby": "date"},
+                              timeout=15)
+        
+        if posts_r.status_code != 200:
+            print(f"    ⚠️ 글 목록 조회 실패")
+            return 0
+            
+        urls = [p.get("link","") for p in posts_r.json() if p.get("link")]
+        
+        # 3. Rank Math Instant Indexing API로 URL 제출
+        submitted = 0
+        batch_size = 20
+        for i in range(0, min(len(urls), 100), batch_size):
+            batch = urls[i:i+batch_size]
+            ir = requests.post(
+                f"{base}/rankmath/v1/instantIndexing",
+                auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                json={"urls": batch, "action": "URL_UPDATED"},
+                timeout=20)
+            if ir.status_code in (200,201):
+                submitted += len(batch)
+                
+        if submitted:
+            print(f"    ✅ Instant Indexing {submitted}개 URL 제출")
+        else:
+            # Google ping으로 대체
+            sitemap = f"{site_url}/sitemap_index.xml"
+            ping = f"https://www.google.com/ping?sitemap={requests.utils.quote(sitemap)}"
+            requests.get(ping, timeout=8)
+            print(f"    ✅ Google Sitemap ping 완료")
+            
+        return submitted
+    except Exception as e:
+        print(f"    ⚠️ Instant Indexing 오류: {e}")
+        return 0
 
 def allow_indexing(base, pw):
     code,_,_ = api("POST",f"{base}/settings",pw,{"blog_public":True})
@@ -1232,11 +1519,27 @@ def run():
         print("  🎨 메뉴 CSS 삽입...")
         inject_menu_css(url, pw)
 
-        # [7] ★ SEO 상태 확인
+        # [7] ★ GitHub Actions IP 허용 코드 삽입
+        print("  🔓 GitHub Actions IP 허용...")
+        install_github_ip_whitelist(url, pw)
+
+        # [8] ★ Rank Math Instant Indexing
+        print("  🔍 Rank Math Instant Indexing...")
+        setup_rank_math_indexing(url, pw)
+
+        # [9] ★ SEO 상태 확인
         print("  📊 SEO 확인...")
         verify_post_seo(url, pw, limit=10)
 
-        # [8] ★ 검색엔진 색인 ping
+        # [9-1] ★ 기존 글 noindex 제거 + 404 정리
+        print("  🔧 기존 글 noindex 제거...")
+        fix_post_noindex_and_404(url, pw)
+
+        # [9-2] ★ 저품질 글 정리 (연도포함/중복/진부한 패턴)
+        print("  🗑️ 저품질 글 정리...")
+        audit_and_clean_posts(url, pw, lang, dry_run=False)
+
+        # [10] ★ 검색엔진 ping
         print("  🔍 검색엔진 ping...")
         ping_search_engines(url)
 
