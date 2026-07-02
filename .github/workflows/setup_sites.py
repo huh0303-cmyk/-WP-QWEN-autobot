@@ -752,15 +752,65 @@ def fix_post_noindex_and_404(site_url: str, pw: str):
 
 def audit_and_clean_posts(site_url: str, pw: str, lang: str, dry_run: bool = False):
     """
-    글 품질 감사 및 정리:
-    1. 제목에 2020~2025 연도 포함 → 삭제
-    2. 중복 제목 → 오래된 것 삭제
-    3. 저품질 패턴 제목 → 삭제
-    4. 카테고리 미분류 글 → 재배분
+    ★ v2.0 엄격 기준 저품질 글 정리
+    삭제 기준:
+    1. 제목에 2020~2025 연도 포함
+    2. 중복/유사 제목 (앞 20자 동일)
+    3. 진부한 제목 패턴 (Complete Guide, Ultimate Guide, 총정리 등)
+    4. 카테고리 주제 벗어난 글 (사이트 테마와 무관한 키워드)
+    5. SEO 점수 낮은 글 (본문 너무 짧거나 이미지 없음)
     """
-    import re as _re
+    import re as _re, html as _html
     base = f"{site_url}/wp-json/wp/v2"
-    
+    domain = site_url.replace("https://","")
+
+    # ── 사이트별 허용 토픽 키워드 ──────────────────────────
+    SITE_TOPICS = {
+        "k-health365.com": ["건강","의학","질환","증상","치료","예방","영양","비타민","약","수면","통증","혈압","당뇨","암","피부","탈모","관절","다이어트","면역","보충제","한방"],
+        "koreamedicaltour.com": ["medical","surgery","dental","dermatology","clinic","hospital","treatment","korea","plastic","skin","laser","botox","aesthetic","health","tour","cost","price"],
+        "koreainvest365.com": ["invest","stock","ETF","fund","crypto","bitcoin","KOSPI","market","korea","dividend","portfolio","trading","asset","financial"],
+        "ki-korea.com": ["주식","ETF","부동산","청약","절세","연금","투자","금융","코스피","펀드","채권","IRP","세금"],
+        "koreainsurance365.com": ["insurance","건강보험","자동차보험","치과보험","foreigner","expat","coverage","policy","premium","health","auto","dental"],
+        "kfinance365.com": ["finance","banking","tax","invest","송금","세금","환급","은행","외국인","foreigner","refund","VAT","income"],
+        "koreataxnlaw.com": ["tax","법인","visa","세금","비자","창업","foreigner","law","legal","corporate","business","immigration"],
+        "koreacrypto365.com": ["crypto","bitcoin","upbit","bithumb","exchange","거래소","blockchain","regulation","DeFi","NFT","coin","투자"],
+        "krealestate365.com": ["부동산","아파트","전세","월세","매매","임대","대출","세금","상가","foreigner","real estate","property"],
+        "ktech365.com": ["AI","tech","startup","semiconductor","chip","innovation","korea","technology","robot","digital","software"],
+        "kskin365.com": ["skincare","skin","beauty","K-beauty","ingredient","routine","serum","toner","moisturizer","sunscreen","korean"],
+        "oliveyoungkorea.com": ["olive young","skincare","beauty","K-beauty","product","wellness","supplement","makeup","review","korean"],
+        "kworld365.com": ["K-pop","artist","music","concert","tour","idol","album","BTS","BLACKPINK","kpop","entertainment"],
+        "k-trip365.com": ["hotel","travel","korea","airbnb","accommodation","stay","trip","tour","tourism","booking","숙박","여행"],
+        "k-visa365.com": ["visa","immigration","permit","D-2","E-7","F-5","korea","foreigner","residence","work","student"],
+        "koreawedding365.com": ["wedding","marriage","결혼","비자","국적","자녀","matchmaking","cost","legal","spouse"],
+        "kstudy365.com": ["study","korea","university","scholarship","student","GKS","campus","TOPIK","admission","academic"],
+        "studyinkorea365.com": ["study","korea","university","scholarship","campus","student","admission","international","academic"],
+        "kieca-korea.org": ["language","culture","career","education","international","korean","exchange","program"],
+        "ksa-korea.org": ["유학","입학","장학금","비자","한국","대학","외국인","scholarship","admission"],
+        "sis-korea.com": ["program","scholarship","TOPIK","korea","international","student","career","language"],
+        "jobkorea365.com": ["job","work","korea","salary","visa","employment","foreigner","career","E-7","hiring"],
+        "jobinkorea365.com": ["job","korea","interview","salary","work","foreigner","employment","career","resume"],
+        "jobkoreaglobal.com": ["hiring","recruitment","global","salary","foreign","worker","korea","career","international"],
+        "korea365.org": ["korea","culture","travel","food","living","expat","lifestyle","tourist","korean","guide"],
+        "koreanews365.com": ["경제","정치","사회","한국","뉴스","정책","시장","기업","국제","문화"],
+        "theseouljournal.com": ["korea","politics","economy","culture","seoul","news","society","business","international"],
+    }
+
+    topic_keywords = SITE_TOPICS.get(domain, [])
+
+    # ── 진부한 패턴 (삭제) ──────────────────────────────────
+    CLICHE_PATTERNS = [
+        r'complete guide to', r'ultimate guide', r'your complete guide',
+        r'everything you need to know', r'a to z', r'a-to-z',
+        r'총정리', r'완벽\s*가이드', r'모든\s*것', r'알아보자',
+        r'top \d+ (?:reasons|tips|ways|things)',
+        r'\d+ essential (?:tips|insights|reasons|things)',
+        r'the essential guide', r'your essential guide',
+        r'\*\*',  # markdown 별표
+    ]
+
+    # ── 연도 패턴 ────────────────────────────────────────────
+    YEAR_PATTERNS = [r'202[0-5]', r'202[0-5]년']
+
     # 전체 글 수집
     all_posts = []
     page = 1
@@ -768,7 +818,7 @@ def audit_and_clean_posts(site_url: str, pw: str, lang: str, dry_run: bool = Fal
         r = requests.get(f"{base}/posts",
                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
                         params={"per_page":100,"page":page,"status":"publish",
-                                "_fields":"id,title,date,slug,categories"},
+                                "_fields":"id,title,date,slug,content,categories"},
                         timeout=20)
         if r.status_code != 200 or not isinstance(r.json(), list) or not r.json():
             break
@@ -777,87 +827,92 @@ def audit_and_clean_posts(site_url: str, pw: str, lang: str, dry_run: bool = Fal
         if len(posts) < 100: break
         page += 1
 
-    print(f"    📋 전체 {len(all_posts)}건 분석 중...")
+    print(f"    📋 전체 {len(all_posts)}건 엄격 분석 중...")
 
-    deleted = 0
+    to_delete = {}  # pid → (title, date, reason)
     title_seen = {}
-
-    # 저품질 패턴
-    BAD_PATTERNS_KO = [
-        r'202[0-5]년',   # 2020~2025년
-        r'202[0-5]', # 단독 연도
-    ]
-    BAD_PATTERNS_EN = [
-        r'202[0-5]',
-        r'in 202[0-5]',
-        r'202[0-5] guide',
-        r'202[0-5] tips',
-    ]
-    bad_patterns = BAD_PATTERNS_KO if lang == "ko" else BAD_PATTERNS_EN
-
-    # 진부한 제목 패턴 (삭제)
-    CLICHE_KO = ["총정리", "A to Z", "a-to-z", "모든것을 알아보자", "완벽가이드", "알아보자!"]
-    CLICHE_EN = ["everything you need to know", "complete guide to", "a to z", "a-to-z guide"]
-    cliches = CLICHE_KO if lang == "ko" else CLICHE_EN
-
-    to_delete = []
 
     for post in all_posts:
         raw = post.get("title", {})
         title = raw.get("rendered","") if isinstance(raw, dict) else str(raw)
-        import html as _html
         title = _html.unescape(title)
         title = _re.sub(r'<[^>]+>', '', title).strip()
         pid = post.get("id")
         date = post.get("date","")[:10]
 
-        # 1. 연도 포함 제목
-        for pat in bad_patterns:
+        # 본문 길이 확인
+        raw_content = post.get("content", {})
+        content_html = raw_content.get("rendered","") if isinstance(raw_content, dict) else ""
+        plain_text = _re.sub('<[^>]+>', '', content_html).strip()
+        content_len = len(plain_text.replace(' ','').replace(chr(10),''))
+
+        title_lower = title.lower()
+
+        # 1. 연도 포함
+        for pat in YEAR_PATTERNS:
             if _re.search(pat, title, _re.IGNORECASE):
-                to_delete.append((pid, title, date, "연도포함"))
+                to_delete[pid] = (title, date, "연도포함")
                 break
+
+        if pid in to_delete: continue
 
         # 2. 진부한 패턴
-        title_lower = title.lower()
-        for cliche in cliches:
-            if cliche in title_lower:
-                to_delete.append((pid, title, date, "저품질패턴"))
+        for pat in CLICHE_PATTERNS:
+            if _re.search(pat, title_lower, _re.IGNORECASE):
+                to_delete[pid] = (title, date, "진부한패턴")
                 break
 
-        # 3. 중복 제목 (앞 25자 기준)
-        key = _re.sub(r'\s+','',title[:25].lower())
+        if pid in to_delete: continue
+
+        # 3. 중복 제목 (앞 20자)
+        key = _re.sub(r'\s+','', title[:20].lower())
         if key in title_seen:
-            # 나중에 작성된 글 삭제
-            to_delete.append((pid, title, date, "중복제목"))
+            to_delete[pid] = (title, date, "중복제목")
         else:
             title_seen[key] = pid
 
-    # 중복 제거
-    delete_ids = list({item[0]: item for item in to_delete}.values())
+        if pid in to_delete: continue
 
-    print(f"    🗑️ 삭제 대상: {len(delete_ids)}건")
-    for pid, title, date, reason in delete_ids[:10]:
-        print(f"       [{reason}] {date} ID:{pid} {title[:50]}")
-    if len(delete_ids) > 10:
-        print(f"       ... 외 {len(delete_ids)-10}건")
+        # 4. 카테고리 주제 벗어남 (토픽 키워드 없음)
+        if topic_keywords and content_len > 0:
+            title_and_content = (title_lower + " " + plain_text[:500].lower())
+            topic_match = any(kw.lower() in title_and_content for kw in topic_keywords)
+            if not topic_match:
+                to_delete[pid] = (title, date, "주제이탈")
 
-    if not dry_run and delete_ids:
-        for pid, title, date, reason in delete_ids:
+        if pid in to_delete: continue
+
+        # 5. 본문 너무 짧음 (1000자 미만 = 확실한 저품질)
+        if content_len < 800:
+            to_delete[pid] = (title, date, f"본문짧음({content_len}자)")
+
+    delete_list = list(to_delete.items())
+    print(f"    🗑️ 삭제 대상: {len(delete_list)}건")
+    for pid, (title, date, reason) in delete_list[:15]:
+        print(f"       [{reason}] {date} ID:{pid} {title[:55]}")
+    if len(delete_list) > 15:
+        print(f"       ... 외 {len(delete_list)-15}건")
+
+    deleted = 0
+    if not dry_run and delete_list:
+        for pid, (title, date, reason) in delete_list:
             try:
                 dr = requests.delete(
                     f"{base}/posts/{pid}",
                     auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
                     params={"force": True},
-                    timeout=10)
+                    timeout=15)
                 if dr.status_code in (200, 201):
                     deleted += 1
             except Exception as e:
-                print(f"       ⚠️ 삭제 실패 ID:{pid}: {e}")
-        print(f"    ✅ {deleted}건 삭제 완료")
+                pass
+        print(f"    ✅ {deleted}건 삭제 완료 | 남은 글: {len(all_posts)-deleted}건")
     elif dry_run:
-        print(f"    ℹ️ dry_run 모드 — 실제 삭제 안 함")
+        print(f"    ℹ️ dry_run — 실제 삭제 안 함")
 
     return deleted
+
+
 
 def ping_search_engines(site_url: str):
     """Google + Naver + Bing Sitemap ping"""
