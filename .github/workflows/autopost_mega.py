@@ -526,7 +526,7 @@ SITES_CONFIG = [
     {"url":"https://koreainvest365.com",      "lang":"en","theme":"Investment",           "mode":"blog",
      "keywords_file":".github/workflows/keywords_kinvest.txt",        "wp_pass_env":"KOREAINVEST365COM",    "daily":3},
     {"url":"https://ki-korea.com",            "lang":"en","theme":"Korea Investment",     "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":3},
+     "keywords_file":".github/workflows/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":6},
     {"url":"https://koreainsurance365.com",   "lang":"en","theme":"Insurance",            "mode":"blog",
      "keywords_file":".github/workflows/keywords_kinsurance.txt",     "wp_pass_env":"KOREAINSURANCE365COM", "daily":3},
     {"url":"https://kfinance365.com",         "lang":"en","theme":"Finance",              "mode":"blog",
@@ -536,31 +536,31 @@ SITES_CONFIG = [
     {"url":"https://koreacrypto365.com",      "lang":"en","theme":"Crypto",               "mode":"blog",
      "keywords_file":".github/workflows/keywords_kcrypto.txt",        "wp_pass_env":"KOREACRYPTO365COM",    "daily":3},
     {"url":"https://krealestate365.com",      "lang":"en","theme":"Korea Real Estate",    "mode":"blog",
-     "keywords_file":".github/workflows/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":3},
+     "keywords_file":".github/workflows/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":6},
     {"url":"https://ktech365.com",            "lang":"en","theme":"Technology",           "mode":"blog",
      "keywords_file":".github/workflows/keywords_ktech.txt",          "wp_pass_env":"KTECH365COM",          "daily":3},
     {"url":"https://kskin365.com",            "lang":"en","theme":"K-Beauty",             "mode":"blog",
      "keywords_file":".github/workflows/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":3},
     {"url":"https://oliveyoungkorea.com",     "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",
-     "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":3},
+     "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":5},
     {"url":"https://kworld365.com",           "lang":"en","theme":"K-POP",               "mode":"blog",
      "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":3},  # 무료화: 5→4
     {"url":"https://k-trip365.com",           "lang":"en","theme":"Travel",              "mode":"blog",
-     "keywords_file":".github/workflows/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":3},
+     "keywords_file":".github/workflows/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":2},
     {"url":"https://k-visa365.com",           "lang":"en","theme":"Visa Guide",          "mode":"blog",
      "keywords_file":".github/workflows/keywords_kvisa.txt",          "wp_pass_env":"KVISA365COM",          "daily":3},
     {"url":"https://koreawedding365.com",     "lang":"en","theme":"Wedding",             "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kwedding.txt",       "wp_pass_env":"KOREAWEDDING365COM",   "daily":3},
+     "keywords_file":".github/workflows/keywords_kwedding.txt",       "wp_pass_env":"KOREAWEDDING365COM",   "daily":5},
     {"url":"https://kstudy365.com",           "lang":"en","theme":"Study in Korea",      "mode":"blog",
      "keywords_file":".github/workflows/keywords_kstudy365.txt",      "wp_pass_env":"KSTUDY365COM",         "daily":3},
     {"url":"https://studyinkorea365.com",     "lang":"en","theme":"International Students","mode":"blog",
-     "keywords_file":".github/workflows/keywords_studyinkorea365.txt","wp_pass_env":"STUDYINKOREA365COM",   "daily":3},
+     "keywords_file":".github/workflows/keywords_studyinkorea365.txt","wp_pass_env":"STUDYINKOREA365COM",   "daily":5},
     {"url":"https://kieca-korea.org",         "lang":"en","theme":"국제교육문화",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kieca.txt",          "wp_pass_env":"KIECAKOREAORG",        "daily":3},
+     "keywords_file":".github/workflows/keywords_kieca.txt",          "wp_pass_env":"KIECAKOREAORG",        "daily":6},
     {"url":"https://ksa-korea.org",           "lang":"en","theme":"한국유학정보",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_ksaKorea.txt",       "wp_pass_env":"KSAKOREAORG",          "daily":3},
+     "keywords_file":".github/workflows/keywords_ksaKorea.txt",       "wp_pass_env":"KSAKOREAORG",          "daily":6},
     {"url":"https://sis-korea.com",           "lang":"en","theme":"Korea Career Programs","mode":"blog",
-     "keywords_file":".github/workflows/keywords_sisKorea.txt",       "wp_pass_env":"SISKOREACOM",          "daily":3},
+     "keywords_file":".github/workflows/keywords_sisKorea.txt",       "wp_pass_env":"SISKOREACOM",          "daily":6},
     {"url":"https://jobkorea365.com",         "lang":"en","theme":"Employment",          "mode":"blog",
      "keywords_file":".github/workflows/keywords_jobkorea365.txt",    "wp_pass_env":"JOBKOREA365COM",       "daily":3},
     {"url":"https://jobinkorea365.com",       "lang":"en","theme":"Jobs in Korea",       "mode":"blog",
@@ -570,9 +570,9 @@ SITES_CONFIG = [
     {"url":"https://korea365.org",            "lang":"en","theme":"Korea Culture",       "mode":"blog",
      "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":3},  # 무료화: 4→3
     {"url":"https://koreanews365.com",        "lang":"ko","theme":"한국 뉴스",            "mode":"news",
-     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":3},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":5},  # 무료화: 5→4
     {"url":"https://theseouljournal.com",     "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",
-     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":3},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":5},  # 무료화: 5→4
 ]
 
 # ============================================================
@@ -2268,6 +2268,52 @@ def build_faq_schema_html(faq_list: list) -> str:
     return (f'<div itemscope itemtype="https://schema.org/FAQPage">'
             f'<h2>자주 묻는 질문 (FAQ)</h2>{items}</div>')
 
+
+def upload_featured_image(site_url: str, wp_pass: str,
+                           image_url: str, keyword: str) -> int:
+    """이미지 URL을 WP 미디어 라이브러리에 업로드 → Featured Image ID 반환"""
+    try:
+        # 이미지 다운로드
+        r = requests.get(image_url, timeout=15,
+                        headers={"User-Agent":"Mozilla/5.0"})
+        if r.status_code != 200:
+            return 0
+
+        # Content-Type 확인
+        ctype = r.headers.get("Content-Type","image/jpeg")
+        if "jpeg" in ctype or "jpg" in ctype:
+            ext = "jpg"; mime = "image/jpeg"
+        elif "png" in ctype:
+            ext = "png"; mime = "image/png"
+        elif "webp" in ctype:
+            ext = "webp"; mime = "image/webp"
+        else:
+            ext = "jpg"; mime = "image/jpeg"
+
+        # 파일명 생성 (키워드 기반)
+        import re as _re
+        safe_kw = _re.sub(r'[^a-z0-9가-힣]', '-', keyword.lower())[:30]
+        filename = f"{safe_kw}-{int(time.time())}.{ext}"
+
+        # WP 미디어 업로드
+        upload_r = requests.post(
+            f"{site_url}/wp-json/wp/v2/media",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, wp_pass),
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Content-Type": mime,
+            },
+            data=r.content,
+            timeout=30
+        )
+        if upload_r.status_code in (200, 201):
+            media_id = upload_r.json().get("id", 0)
+            return media_id
+        return 0
+    except Exception as e:
+        print(f"   ⚠️ 이미지 업로드 실패: {e}")
+        return 0
+
 def build_image_html(image_urls: list, keyword: str) -> str:
     html = ""
     for i, u in enumerate(image_urls):
@@ -2335,6 +2381,17 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
             pass
 
     rank_kw = ",".join([keyword] + tags[:4])
+
+    # ★ Featured Image WP 미디어에 직접 업로드
+    featured_media_id = 0
+    if image_urls:
+        print(f"   📸 Featured Image 업로드 중...")
+        featured_media_id = upload_featured_image(site_url, wp_pass, image_urls[0], keyword)
+        if featured_media_id:
+            print(f"   ✅ Featured Image 업로드 완료 (ID:{featured_media_id})")
+        else:
+            print(f"   ⚠️ Featured Image 업로드 실패 → URL 방식 유지")
+
     post_data = {
         "title":      title,
         "content":    final_body,
@@ -2349,6 +2406,9 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
     }
     if author_id and author_id > 0:
         post_data["author"] = author_id
+    # ★ Featured Image 설정
+    if featured_media_id:
+        post_data["featured_media"] = featured_media_id
 
     try:
         r = requests.post(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
