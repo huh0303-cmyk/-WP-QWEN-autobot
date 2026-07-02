@@ -461,6 +461,198 @@ def set_homepage_to_latest_posts(site_url: str, pw: str):
         print(f"    ⚠️ 홈페이지 설정 오류: {e}")
 
 
+def inject_menu_css(site_url: str, pw: str):
+    """GP Premium 메뉴 2줄 CSS 강제 삽입"""
+    css = """
+/* ★ 메뉴 2줄 색상 구분 */
+.site-header {
+    background: #ffffff !important;
+}
+/* 상단 보조 메뉴 (필수 4페이지) */
+.top-bar {
+    background: #1a1a2e !important;
+    color: #ffffff !important;
+}
+.top-bar a {
+    color: #cccccc !important;
+    font-size: 12px !important;
+}
+.top-bar a:hover {
+    color: #ffffff !important;
+}
+/* 메인 네비게이션 (카테고리) */
+.main-navigation {
+    background: #0066cc !important;
+}
+.main-navigation a {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+.main-navigation a:hover,
+.main-navigation .current-menu-item > a {
+    background: #004499 !important;
+    color: #ffffff !important;
+}
+/* 이미지 반드시 표시 */
+.post-image img,
+.featured-image img,
+.wp-post-image {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+}
+"""
+    try:
+        # WP Customizer CSS API
+        r = requests.post(
+            f"{site_url}/wp-json/wp/v2/settings",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"custom_css": css},
+            timeout=10
+        )
+        if r.status_code in (200, 201):
+            print(f"    ✅ 메뉴 CSS 삽입 완료")
+        else:
+            # WP Additional CSS 방식
+            r2 = requests.post(
+                f"{site_url}/wp-json/wp/v2/global-styles/1",
+                auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                json={"settings": {}, "styles": {"css": css}},
+                timeout=10
+            )
+            print(f"    ⚠️ CSS 삽입 시도 ({r.status_code})")
+    except Exception as e:
+        print(f"    ⚠️ CSS 삽입 오류: {e}")
+
+
+def setup_dual_menu(site_url: str, pw: str, lang: str,
+                    cat_ids: list, cat_names: list, page_ids_map: dict):
+    """
+    2줄 메뉴 강제 구성:
+    Top Bar (어두운색): Privacy Policy | Disclaimer | Contact Us | About Us
+    Main Nav (파란색): 카테고리1 | 카테고리2 | 카테고리3 | Etc
+    """
+    base = f"{site_url}/wp-json"
+    
+    try:
+        # 기존 메뉴 전부 조회
+        r = requests.get(f"{base}/wp/v2/menus",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw), timeout=10)
+        existing = r.json() if r.status_code == 200 and isinstance(r.json(), list) else []
+        
+        # 기존 메뉴 아이템 전부 삭제
+        for menu in existing:
+            mid = menu.get("id") or menu.get("term_id")
+            if not mid: continue
+            ir = requests.get(f"{base}/wp/v2/menu-items",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             params={"menus": mid, "per_page": 100}, timeout=10)
+            if ir.status_code == 200:
+                for item in ir.json():
+                    requests.delete(f"{base}/wp/v2/menu-items/{item['id']}",
+                                   auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                   params={"force": True}, timeout=8)
+
+        # ── Primary Menu 생성 (카테고리) ──
+        primary_id = None
+        for m in existing:
+            if "primary" in (m.get("slug","") or "").lower() or                "main" in (m.get("name","") or "").lower():
+                primary_id = m.get("id") or m.get("term_id")
+                break
+        if not primary_id:
+            cr = requests.post(f"{base}/wp/v2/menus",
+                              auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                              json={"name":"Primary Menu","slug":"primary-menu"}, timeout=10)
+            if cr.status_code in (200,201):
+                primary_id = cr.json().get("id")
+
+        # ── Secondary Menu 생성 (페이지) ──
+        secondary_id = None
+        for m in existing:
+            if "secondary" in (m.get("slug","") or "").lower() or                "top" in (m.get("name","") or "").lower():
+                secondary_id = m.get("id") or m.get("term_id")
+                break
+        if not secondary_id:
+            cr2 = requests.post(f"{base}/wp/v2/menus",
+                               auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                               json={"name":"Secondary Menu","slug":"secondary-menu"}, timeout=10)
+            if cr2.status_code in (200,201):
+                secondary_id = cr2.json().get("id")
+
+        # ── Footer Menu 생성 ──
+        footer_id = None
+        for m in existing:
+            if "footer" in (m.get("slug","") or "").lower():
+                footer_id = m.get("id") or m.get("term_id")
+                break
+        if not footer_id:
+            cr3 = requests.post(f"{base}/wp/v2/menus",
+                               auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                               json={"name":"Footer Menu","slug":"footer-menu"}, timeout=10)
+            if cr3.status_code in (200,201):
+                footer_id = cr3.json().get("id")
+
+        # ── Primary Menu에 카테고리 4개 등록 ──
+        cat_added = 0
+        if primary_id:
+            for order, (cid, cname) in enumerate(zip(cat_ids, cat_names), 1):
+                if not cid or cid <= 0: continue
+                r = requests.post(f"{base}/wp/v2/menu-items",
+                                 auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                 json={"menus": primary_id, "object_id": cid,
+                                       "object":"category","type":"taxonomy",
+                                       "menu_order": order, "status":"publish"},
+                                 timeout=10)
+                if r.status_code in (200,201): cat_added += 1
+            print(f"    ✅ 메인메뉴(카테고리) {cat_added}개 등록")
+
+        # ── Secondary + Footer에 필수 4페이지 등록 ──
+        page_order_list = [
+            ("privacy-policy", "Privacy Policy" if lang=="en" else "개인정보처리방침"),
+            ("disclaimer",     "Disclaimer"     if lang=="en" else "면책공고"),
+            ("contact",        "Contact Us"     if lang=="en" else "문의하기"),
+            ("about",          "About Us"       if lang=="en" else "사이트 소개"),
+        ]
+        base_api = f"{site_url}/wp-json/wp/v2"
+        page_added = 0
+        for order, (slug, label) in enumerate(page_order_list, 1):
+            page_id = page_ids_map.get(slug)
+            if not page_id:
+                pr = requests.get(f"{base_api}/pages",
+                                 auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                 params={"slug":slug,"per_page":1}, timeout=8)
+                if pr.status_code==200 and pr.json():
+                    page_id = pr.json()[0]["id"]
+            if not page_id: continue
+
+            for menu_id in [secondary_id, footer_id]:
+                if not menu_id: continue
+                r = requests.post(f"{base}/wp/v2/menu-items",
+                                 auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                 json={"menus": menu_id, "object_id": page_id,
+                                       "object":"page","type":"post_type",
+                                       "title": label, "menu_order": order,
+                                       "status":"publish"},
+                                 timeout=10)
+            page_added += 1
+
+        print(f"    ✅ 보조메뉴/Footer(필수페이지) {page_added}개 등록")
+
+        # 메뉴 위치 등록
+        loc_payload = {}
+        if primary_id:   loc_payload["primary"] = primary_id
+        if secondary_id: loc_payload["secondary"] = secondary_id
+        if footer_id:    loc_payload["footer"] = footer_id
+        if loc_payload:
+            requests.post(f"{base}/wp/v2/menu-locations",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         json=loc_payload, timeout=10)
+
+    except Exception as e:
+        print(f"    ⚠️ 메뉴 구성 오류: {e}")
+
+
 def set_site_language(site_url: str, pw: str, lang: str):
     """사이트 언어 강제 설정 (ko_KR 또는 en_US)"""
     locale = "ko_KR" if lang == "ko" else "en_US"
@@ -591,7 +783,12 @@ def fix_duplicate_pages(base: str, pw: str):
 
 def setup_menu_and_footer(site_url: str, pw: str, lang: str,
                            cat_ids: list, cat_names: list, page_slugs_map: dict):
-    """메인메뉴 = 황금카테고리3+1 / Footer = 필수4페이지"""
+    """
+    메뉴 2줄 구성:
+    - Primary Menu (1줄): 카테고리 4개 (황금3+Etc)
+    - Secondary/Top Menu (2줄): 필수 4페이지
+    - Footer Menu: 필수 4페이지
+    """
     base_wp = f"{site_url}/wp-json"
 
     try:
@@ -1017,18 +1214,23 @@ def run():
         print("  🗑️ 중복 페이지 정리...")
         fix_duplicate_pages(base, pw)
 
-        # [6-2] ★ 메인메뉴(황금카테고리3+1) + Footer(필수4페이지) 자동 구성
-        print("  📋 메뉴 자동 구성...")
+        # [6-2] ★ 2줄 메뉴 자동 구성 + CSS 삽입
+        print("  📋 2줄 메뉴 구성 (카테고리줄 + 페이지줄)...")
         pg_map = {}
         for s in ["privacy-policy","disclaimer","contact","about"]:
-            pr = requests.get(f"{base}/pages", auth=requests.auth.HTTPBasicAuth(WP_USER,pw),
+            pr = requests.get(f"{base}/pages",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER,pw),
                              params={"slug":s,"per_page":1}, timeout=8)
             if pr.status_code==200 and pr.json():
                 pg_map[s] = pr.json()[0]["id"]
-        setup_menu_and_footer(url, pw, lang,
-                              [id1,id2,id3,id4],
-                              [c1,c2,c3,etc_name],
-                              pg_map)
+        setup_dual_menu(url, pw, lang,
+                        [id1,id2,id3,id4],
+                        [c1,c2,c3,etc_name],
+                        pg_map)
+
+        # [6-3] ★ 메뉴 CSS 삽입
+        print("  🎨 메뉴 CSS 삽입...")
+        inject_menu_css(url, pw)
 
         # [7] ★ SEO 상태 확인
         print("  📊 SEO 확인...")
