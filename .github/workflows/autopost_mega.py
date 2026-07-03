@@ -2334,6 +2334,206 @@ def build_image_html(image_urls: list, keyword: str) -> str:
         )
     return html
 
+
+# ════════════════════════════════════════════════════════════
+# ★ v4.1 추가 기능
+# ════════════════════════════════════════════════════════════
+
+def get_diverse_image(keyword: str, site_theme: str, attempt: int = 0) -> list:
+    """Pixabay → Pexels → Unsplash 순으로 이미지 검색 (중복 방지)"""
+    import random
+    
+    PIXABAY_KEY = os.getenv("PIXABAY_KEY", "")
+    PEXELS_KEY  = os.getenv("PEXELS_KEY", "")
+    
+    # 키워드를 영어로 변환 (한글 키워드는 번역)
+    search_kw = keyword
+    ko_to_en_map = {
+        "건강": "health", "의학": "medical", "질환": "disease", "증상": "symptom",
+        "치료": "treatment", "영양": "nutrition", "비타민": "vitamin", "약": "medicine",
+        "운동": "exercise", "식단": "diet", "피부": "skin", "탈모": "hair loss",
+        "당뇨": "diabetes", "고혈압": "blood pressure", "암": "cancer",
+        "관절": "joint", "허리": "back pain", "수면": "sleep", "면역": "immune",
+        "한국": "Korea", "유학": "study abroad", "취업": "employment",
+        "부동산": "real estate", "주식": "stock market", "보험": "insurance",
+    }
+    for ko, en in ko_to_en_map.items():
+        if ko in search_kw:
+            search_kw = search_kw.replace(ko, en)
+    
+    # 테마별 보조 키워드로 이미지 품질 향상
+    theme_extras = {
+        "건강과 의학": "healthcare medical professional",
+        "Korea Medical Tourism": "medical korea clinic",
+        "Investment": "finance investment chart",
+        "Insurance": "insurance protection family",
+        "Finance": "finance banking money",
+        "Crypto": "cryptocurrency blockchain digital",
+        "Korea Real Estate": "real estate apartment building",
+        "K-Beauty": "skincare beauty korean",
+        "K-Beauty Reviews": "beauty product review korean",
+        "Travel": "korea travel tourism",
+        "Visa": "passport visa document",
+        "Wedding": "wedding ceremony couple",
+        "Education": "university education student",
+        "Job": "job career office work",
+    }
+    extra = theme_extras.get(site_theme, "korea")
+    
+    # 페이지 랜덤화로 중복 방지
+    rand_page = random.randint(1, 10) + attempt
+    
+    urls = []
+    
+    # 1차: Pixabay
+    if PIXABAY_KEY:
+        try:
+            r = requests.get("https://pixabay.com/api/", params={
+                "key": PIXABAY_KEY, "q": f"{search_kw} {extra}",
+                "image_type": "photo", "per_page": 10, "page": rand_page,
+                "safesearch": "true", "min_width": 800,
+            }, timeout=10)
+            if r.status_code == 200:
+                hits = r.json().get("hits", [])
+                random.shuffle(hits)
+                urls = [h["webformatURL"] for h in hits[:3] if h.get("webformatURL")]
+        except: pass
+    
+    # 2차: Pexels (Pixabay 실패 시)
+    if not urls and PEXELS_KEY:
+        try:
+            r = requests.get("https://api.pexels.com/v1/search", 
+                           headers={"Authorization": PEXELS_KEY},
+                           params={"query": f"{search_kw}", "per_page": 10,
+                                   "page": rand_page}, timeout=10)
+            if r.status_code == 200:
+                photos = r.json().get("photos", [])
+                random.shuffle(photos)
+                urls = [p["src"]["large"] for p in photos[:3] if p.get("src")]
+        except: pass
+    
+    # 3차: Pixabay 다른 키워드로 재시도
+    if not urls and PIXABAY_KEY:
+        try:
+            r = requests.get("https://pixabay.com/api/", params={
+                "key": PIXABAY_KEY, "q": extra,
+                "image_type": "photo", "per_page": 10, "page": 1,
+                "safesearch": "true",
+            }, timeout=10)
+            if r.status_code == 200:
+                hits = r.json().get("hits", [])
+                urls = [h["webformatURL"] for h in hits[:3] if h.get("webformatURL")]
+        except: pass
+    
+    return urls
+
+
+def request_indexing_all(site_url: str, post_url: str, pw: str):
+    """글 발행 후 Google/Naver/Bing/Daum 색인 자동 요청"""
+    indexnow_key = os.getenv("INDEXNOW_KEY", "")
+    domain = site_url.replace("https://","").replace("http://","")
+    
+    results = []
+    
+    # ── 1. Google Search Console (Rank Math Instant Indexing) ──
+    try:
+        r = requests.post(
+            f"{site_url}/wp-json/rankmath/v1/instantIndexing",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"urls": [post_url], "action": "URL_UPDATED"},
+            timeout=15)
+        if r.status_code in (200, 201):
+            results.append("Google✅")
+        else:
+            # Google ping 방식으로 대체
+            sitemap = f"{site_url}/sitemap_index.xml"
+            requests.get(f"https://www.google.com/ping?sitemap={requests.utils.quote(sitemap)}", timeout=8)
+            results.append("Google-ping✅")
+    except:
+        results.append("Google❌")
+    
+    # ── 2. IndexNow (Bing + Yandex + Naver 동시) ──
+    if indexnow_key:
+        try:
+            r = requests.post(
+                "https://api.indexnow.org/indexnow",
+                json={
+                    "host": domain,
+                    "key": indexnow_key,
+                    "keyLocation": f"{site_url}/{indexnow_key}.txt",
+                    "urlList": [post_url]
+                },
+                headers={"Content-Type": "application/json"},
+                timeout=10)
+            if r.status_code in (200, 202):
+                results.append("IndexNow✅")
+            else:
+                results.append(f"IndexNow❌({r.status_code})")
+        except:
+            results.append("IndexNow❌")
+    
+    # ── 3. Bing 직접 ──
+    try:
+        r = requests.get(
+            f"https://www.bing.com/ping?sitemap={requests.utils.quote(site_url+'/sitemap_index.xml')}",
+            timeout=8)
+        if r.status_code == 200:
+            results.append("Bing✅")
+    except:
+        pass
+    
+    # ── 4. Naver ──
+    try:
+        r = requests.get(
+            f"https://searchadvisor.naver.com/indexnow",
+            params={"url": post_url}, timeout=8)
+        results.append("Naver✅" if r.status_code in (200,202) else "Naver-skip")
+    except:
+        pass
+    
+    print(f"   🔍 색인요청: {' | '.join(results)}")
+
+
+def delete_low_seo_posts(site_url: str, pw: str, min_score: int = 90):
+    """SEO 90점 이하 글 삭제"""
+    base = f"{site_url}/wp-json/wp/v2"
+    deleted = 0
+    page = 1
+    
+    while True:
+        try:
+            r = requests.get(f"{base}/posts",
+                           auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                           params={"per_page":50,"page":page,"status":"publish",
+                                   "_fields":"id,title,meta,date"},
+                           timeout=15)
+            if r.status_code != 200 or not r.json(): break
+            posts = r.json()
+            
+            for post in posts:
+                meta = post.get("meta", {})
+                score = meta.get("rank_math_seo_score", "")
+                try:
+                    score_int = int(float(str(score))) if score else 0
+                except:
+                    score_int = 0
+                
+                if 0 < score_int < min_score:
+                    dr = requests.delete(f"{base}/posts/{post['id']}",
+                                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                        params={"force": True}, timeout=10)
+                    if dr.status_code in (200, 201):
+                        deleted += 1
+            
+            if len(posts) < 50: break
+            page += 1
+        except Exception as e:
+            break
+    
+    if deleted:
+        print(f"   🗑️ SEO {min_score}점 이하 {deleted}건 삭제")
+    return deleted
+
 def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
             tags: list, faq_list: list, image_urls: list,
             keyword: str, seo_score: int, reporter: dict) -> dict:
@@ -2443,6 +2643,9 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
                                    json={"meta": {"rank_math_focus_keyword": rank_kw,
                                                   "rank_math_description": meta_desc}},
                                    timeout=15)
+            # ★ 발행 즉시 색인 요청 (Google/Bing/Naver/IndexNow)
+            if post_url:
+                request_indexing_all(site_url, post_url, wp_pass)
             return {"ok": True, "post_id": post_id, "url": post_url,
                     "author": reporter["name"], "category": category_name}
         else:
