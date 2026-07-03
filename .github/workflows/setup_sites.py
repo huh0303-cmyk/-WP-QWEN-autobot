@@ -462,68 +462,150 @@ def set_homepage_to_latest_posts(site_url: str, pw: str):
 
 
 def inject_menu_css(site_url: str, pw: str):
-    """GP Premium 메뉴 2줄 CSS 강제 삽입"""
+    """
+    메뉴 2줄 통일 CSS:
+    1줄 (작게, 어두운 배경, 우측정렬): Privacy Policy | Disclaimer | Contact Us | About Us
+    2줄 (굵게, 파란 배경, 중앙): 황금 카테고리 4개
+    Footer: 카테고리 4개만
+    """
     css = """
-/* ★ 메뉴 2줄 색상 구분 */
-.site-header {
-    background: #ffffff !important;
+/* ★ TOP BAR: 필수 4페이지 (작게, 어두운배경, 우측정렬) */
+.top-bar, .site-top-bar {
+    background: #1e2433 !important;
+    padding: 4px 0 !important;
+    font-size: 11px !important;
 }
-/* 상단 보조 메뉴 (필수 4페이지) */
-.top-bar {
-    background: #1a1a2e !important;
+.top-bar .inside-top-bar,
+.site-top-bar .inside {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+.top-bar a, .site-top-bar a {
+    color: #aab4c8 !important;
+    font-size: 11px !important;
+    text-decoration: none !important;
+    letter-spacing: 0.3px !important;
+}
+.top-bar a:hover, .site-top-bar a:hover {
     color: #ffffff !important;
 }
-.top-bar a {
-    color: #cccccc !important;
-    font-size: 12px !important;
+
+/* ★ MAIN NAV: 황금 카테고리 4개 (굵게, 파란배경, 중앙) */
+.main-navigation, .site-navigation, #site-navigation {
+    background: #1a6fd4 !important;
+    padding: 0 !important;
 }
-.top-bar a:hover {
+.main-navigation .menu,
+.main-navigation ul,
+.site-navigation ul {
+    display: flex !important;
+    justify-content: center !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+.main-navigation a,
+.site-navigation a {
     color: #ffffff !important;
-}
-/* 메인 네비게이션 (카테고리) */
-.main-navigation {
-    background: #0066cc !important;
-}
-.main-navigation a {
-    color: #ffffff !important;
-    font-weight: 600 !important;
     font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 12px 22px !important;
+    display: block !important;
+    text-decoration: none !important;
+    letter-spacing: 0.3px !important;
+    transition: background 0.2s !important;
 }
 .main-navigation a:hover,
+.site-navigation a:hover,
 .main-navigation .current-menu-item > a {
-    background: #004499 !important;
+    background: #1558aa !important;
     color: #ffffff !important;
 }
-/* 이미지 반드시 표시 */
-.post-image img,
-.featured-image img,
-.wp-post-image {
+
+/* ★ FOOTER: 카테고리 4개만 */
+.site-footer .menu, .footer-navigation ul,
+.footer-menu ul, #footer-menu ul {
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px 24px !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.site-footer a, .footer-navigation a,
+.footer-menu a {
+    color: #aab4c8 !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+}
+.site-footer a:hover, .footer-navigation a:hover {
+    color: #ffffff !important;
+}
+
+/* ★ 이미지 대표이미지 잘 보이게 */
+.post-thumbnail img,
+.wp-post-image,
+article img:first-of-type {
     width: 100% !important;
     height: auto !important;
+    border-radius: 6px !important;
     display: block !important;
+    margin-bottom: 16px !important;
+}
+
+/* ★ 사이트 헤더 여백 */
+.site-header {
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
 }
 """
     try:
-        # WP Customizer CSS API
         r = requests.post(
             f"{site_url}/wp-json/wp/v2/settings",
             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
             json={"custom_css": css},
-            timeout=10
-        )
+            timeout=10)
         if r.status_code in (200, 201):
             print(f"    ✅ 메뉴 CSS 삽입 완료")
-        else:
-            # WP Additional CSS 방식
-            r2 = requests.post(
-                f"{site_url}/wp-json/wp/v2/global-styles/1",
-                auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
-                json={"settings": {}, "styles": {"css": css}},
-                timeout=10
-            )
-            print(f"    ⚠️ CSS 삽입 시도 ({r.status_code})")
+            return True
+
+        # WPCode로 추가 CSS 삽입
+        base = f"{site_url}/wp-json/wp/v2"
+        snippet_data = {
+            "title": "Menu Layout CSS v2",
+            "content": f"<style>{css}</style>",
+            "code_type": "html",
+            "location": "site_header",
+            "status": "publish",
+        }
+        r2 = requests.get(f"{base}/wpcode-snippets",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         params={"per_page": 50}, timeout=10)
+        if r2.status_code == 200 and isinstance(r2.json(), list):
+            for s in r2.json():
+                t = s.get("title", {})
+                if "Menu Layout CSS" in (t.get("rendered","") if isinstance(t,dict) else str(t)):
+                    ur = requests.post(f"{base}/wpcode-snippets/{s['id']}",
+                                      auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                      json=snippet_data, timeout=10)
+                    if ur.status_code in (200,201):
+                        print(f"    ✅ 메뉴 CSS WPCode 업데이트")
+                        return True
+        cr = requests.post(f"{base}/wpcode-snippets",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json=snippet_data, timeout=10)
+        if cr.status_code in (200,201):
+            print(f"    ✅ 메뉴 CSS WPCode 생성")
+            return True
+        print(f"    ⚠️ CSS 삽입 ({r.status_code})")
+        return False
     except Exception as e:
-        print(f"    ⚠️ CSS 삽입 오류: {e}")
+        print(f"    ⚠️ CSS 오류: {e}")
+        return False
 
 
 def setup_dual_menu(site_url: str, pw: str, lang: str,
@@ -626,16 +708,27 @@ def setup_dual_menu(site_url: str, pw: str, lang: str,
                     page_id = pr.json()[0]["id"]
             if not page_id: continue
 
-            for menu_id in [secondary_id, footer_id]:
-                if not menu_id: continue
+            # Secondary에만 페이지 등록 (Footer는 카테고리만)
+            if secondary_id:
                 r = requests.post(f"{base}/wp/v2/menu-items",
                                  auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
-                                 json={"menus": menu_id, "object_id": page_id,
+                                 json={"menus": secondary_id, "object_id": page_id,
                                        "object":"page","type":"post_type",
                                        "title": label, "menu_order": order,
                                        "status":"publish"},
                                  timeout=10)
             page_added += 1
+
+        # ── Footer: 카테고리 4개만 ──
+        if footer_id:
+            for order2, (cid, cname) in enumerate(zip(cat_ids, cat_names), 1):
+                if not cid or cid <= 0: continue
+                requests.post(f"{base}/wp/v2/menu-items",
+                             auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                             json={"menus": footer_id, "object_id": cid,
+                                   "object":"category","type":"taxonomy",
+                                   "menu_order": order2, "status":"publish"},
+                             timeout=10)
 
         print(f"    ✅ 보조메뉴/Footer(필수페이지) {page_added}개 등록")
 
