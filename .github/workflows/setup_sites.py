@@ -608,6 +608,133 @@ article img:first-of-type {
         return False
 
 
+
+def inject_theme_specific_css(site_url: str, pw: str, theme_type: str):
+    """
+    비GP 테마 전용 메뉴 CSS:
+    MoreNews, MoreMag → 뉴스형 메뉴
+    Astra → 국제기관형 메뉴
+    Education Zone → 교육기관형 메뉴
+    """
+    # 공통 2줄 메뉴 구조
+    base_css = """
+/* ★ TOP: 4페이지 작게 우측정렬 (어두운배경) */
+.top-header, .ast-top-header, .header-bar,
+.above-header-wrap, .header-top {
+    background: #1e2433 !important;
+    padding: 5px 0 !important;
+}
+.top-header a, .ast-top-header a, .header-bar a,
+.above-header-wrap a, .header-top a {
+    color: #aab4c8 !important;
+    font-size: 11px !important;
+    text-decoration: none !important;
+}
+.top-header .menu, .ast-top-header .menu,
+.above-header-wrap .menu {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 16px !important;
+    list-style: none !important;
+    padding: 0 20px !important;
+    margin: 0 !important;
+}
+
+/* ★ MAIN NAV: 카테고리 굵게 (파란배경) */
+.primary-navigation, .main-navigation,
+.ast-primary-nav, .site-header-primary-nav,
+.morenews-primary-menu, .navigation-primary {
+    background: #1a6fd4 !important;
+}
+.primary-navigation a, .main-navigation a,
+.ast-primary-nav a, .morenews-primary-menu a,
+.navigation-primary a {
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 11px 20px !important;
+}
+.primary-navigation a:hover, .main-navigation a:hover {
+    background: #1558aa !important;
+    color: #ffffff !important;
+}
+.primary-navigation ul, .main-navigation ul {
+    display: flex !important;
+    justify-content: center !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ★ FOOTER: 카테고리만 중앙정렬 */
+.footer-widget-area, .site-footer-above,
+.ast-footer-layout, footer .widget_nav_menu {
+    background: #0f1523 !important;
+}
+footer a, .site-footer a {
+    color: #7a8499 !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+}
+footer a:hover { color: #ffffff !important; }
+.footer-menu ul, footer .menu {
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px 20px !important;
+    list-style: none !important;
+    padding: 12px 0 !important;
+    margin: 0 !important;
+}
+
+/* ★ 이미지 대표이미지 */
+.post-thumbnail img, .wp-post-image,
+.featured-image img, article .entry-content img:first-child {
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 4px !important;
+    display: block !important;
+}
+"""
+
+    try:
+        base = f"{site_url}/wp-json/wp/v2"
+        # WPCode HTML 스니펫으로 삽입
+        snippet_data = {
+            "title": f"Theme Menu CSS - {theme_type}",
+            "content": f"<style>{base_css}</style>",
+            "code_type": "html",
+            "location": "site_header",
+            "status": "publish",
+        }
+        # 기존 스니펫 업데이트 또는 새로 생성
+        r = requests.get(f"{base}/wpcode-snippets",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"per_page": 50}, timeout=10)
+        if r.status_code == 200 and isinstance(r.json(), list):
+            for s in r.json():
+                t = s.get("title", {})
+                t_str = t.get("rendered","") if isinstance(t,dict) else str(t)
+                if "Theme Menu CSS" in t_str or "Menu Layout CSS" in t_str:
+                    ur = requests.post(f"{base}/wpcode-snippets/{s['id']}",
+                                      auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                      json=snippet_data, timeout=10)
+                    if ur.status_code in (200,201):
+                        print(f"    ✅ {theme_type} CSS 업데이트")
+                        return True
+
+        cr = requests.post(f"{base}/wpcode-snippets",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json=snippet_data, timeout=10)
+        if cr.status_code in (200,201):
+            print(f"    ✅ {theme_type} CSS 삽입")
+            return True
+        print(f"    ⚠️ {theme_type} CSS ({cr.status_code})")
+        return False
+    except Exception as e:
+        print(f"    ⚠️ CSS 오류: {e}")
+        return False
+
 def setup_dual_menu(site_url: str, pw: str, lang: str,
                     cat_ids: list, cat_names: list, page_ids_map: dict):
     """
@@ -1134,6 +1261,129 @@ def fix_ads_txt(site_url: str, pw: str, publisher_id: str = "pub-345672791638694
     except Exception as e:
         print(f"    ⚠️ ads.txt 오류: {e}")
         return False
+
+
+def submit_to_all_search_engines(site_url: str, pw: str, lang: str):
+    """
+    모든 검색엔진에 색인 제출:
+    Google, Naver, Daum, Bing, Yahoo, Yandex, IndexNow
+    """
+    indexnow_key = os.getenv("INDEXNOW_KEY", "")
+    domain = site_url.replace("https://","").replace("http://","")
+    sitemap_url = f"{site_url}/sitemap_index.xml"
+    encoded_sitemap = requests.utils.quote(sitemap_url)
+    results = []
+
+    # 1. Google Sitemap ping
+    try:
+        r = requests.get(f"https://www.google.com/ping?sitemap={encoded_sitemap}", timeout=8)
+        results.append(f"Google({'✅' if r.status_code==200 else '⚠️'})")
+    except: results.append("Google(❌)")
+
+    # 2. Bing Sitemap ping
+    try:
+        r = requests.get(f"https://www.bing.com/ping?sitemap={encoded_sitemap}", timeout=8)
+        results.append(f"Bing({'✅' if r.status_code==200 else '⚠️'})")
+    except: results.append("Bing(❌)")
+
+    # 3. Naver SearchAdvisor
+    try:
+        r = requests.get(
+            f"https://searchadvisor.naver.com/sitemap.xml?url={encoded_sitemap}",
+            timeout=8)
+        results.append(f"Naver({'✅' if r.status_code in (200,202) else '⚠️'})")
+    except: results.append("Naver(⚠️)")
+
+    # 4. Daum (카카오)
+    try:
+        r = requests.get(
+            f"https://register.search.daum.net/index.daum?act=reg&url={requests.utils.quote(site_url)}",
+            timeout=8)
+        results.append(f"Daum({'✅' if r.status_code==200 else '⚠️'})")
+    except: results.append("Daum(⚠️)")
+
+    # 5. IndexNow (Bing+Yandex+Naver 동시)
+    if indexnow_key:
+        try:
+            r = requests.post("https://api.indexnow.org/indexnow", json={
+                "host": domain,
+                "key": indexnow_key,
+                "keyLocation": f"{site_url}/{indexnow_key}.txt",
+                "urlList": [site_url, sitemap_url]
+            }, headers={"Content-Type":"application/json"}, timeout=10)
+            results.append(f"IndexNow({'✅' if r.status_code in (200,202) else '⚠️'})")
+        except: results.append("IndexNow(❌)")
+
+    # 6. Rank Math Instant Indexing (Google 즉시)
+    try:
+        r = requests.post(
+            f"{site_url}/wp-json/rankmath/v1/instantIndexing",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"urls":[site_url],"action":"URL_UPDATED"},
+            timeout=10)
+        results.append(f"RM-Instant({'✅' if r.status_code in (200,201) else '⚠️'})")
+    except: results.append("RM-Instant(⚠️)")
+
+    print(f"    🔍 검색엔진 등록: {' | '.join(results)}")
+
+
+def verify_seo_essentials(site_url: str, pw: str):
+    """
+    SEO 핵심 요소 점검:
+    ads.txt / sitemap / robots.txt / noindex / 언어설정
+    """
+    domain = site_url.replace("https://","")
+    issues = []
+    ok_list = []
+
+    # 1. ads.txt 확인
+    try:
+        r = requests.get(f"{site_url}/ads.txt", timeout=8,
+                        headers={"User-Agent":"Mozilla/5.0"})
+        if r.status_code == 200 and "pub-" in r.text:
+            ok_list.append("ads.txt✅")
+        else:
+            issues.append("ads.txt❌")
+    except: issues.append("ads.txt❌")
+
+    # 2. sitemap 확인
+    try:
+        r = requests.get(f"{site_url}/sitemap_index.xml", timeout=8,
+                        headers={"User-Agent":"Mozilla/5.0"})
+        if r.status_code == 200 and "sitemap" in r.text.lower():
+            ok_list.append("sitemap✅")
+        else:
+            issues.append("sitemap❌")
+            # 퍼머링크 재저장으로 sitemap 살리기
+            requests.post(f"{site_url}/wp-json/wp/v2/settings",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         json={"permalink_structure":"/%postname%/"}, timeout=10)
+    except: issues.append("sitemap❌")
+
+    # 3. robots.txt 확인
+    try:
+        r = requests.get(f"{site_url}/robots.txt", timeout=8,
+                        headers={"User-Agent":"Mozilla/5.0"})
+        if r.status_code == 200 and "allow" in r.text.lower():
+            ok_list.append("robots✅")
+        else:
+            issues.append("robots❌")
+    except: issues.append("robots❌")
+
+    # 4. 색인 허용 확인
+    try:
+        r = requests.get(site_url, timeout=8,
+                        headers={"User-Agent":"Googlebot/2.1"})
+        if "noindex" in r.text[:3000].lower():
+            issues.append("noindex❌")
+        else:
+            ok_list.append("색인허용✅")
+    except: pass
+
+    if issues:
+        print(f"    ⚠️ 문제: {' | '.join(issues)}")
+    print(f"    ✅ OK: {' | '.join(ok_list)}")
+    return len(issues) == 0
 
 def ping_search_engines(site_url: str):
     """Google + Naver + Bing Sitemap ping"""
@@ -1800,9 +2050,22 @@ def run():
                         [c1,c2,c3,etc_name],
                         pg_map)
 
-        # [6-3] ★ 메뉴 CSS 삽입
+        # [6-3] ★ 메뉴 CSS 삽입 (테마별 적용)
         print("  🎨 메뉴 CSS 삽입...")
-        inject_menu_css(url, pw)
+        non_gp_sites = [
+            "koreanews365.com", "theseouljournal.com",  # MoreNews
+            "korea365.org",                              # MoreMag
+            "kieca-korea.org",                           # Astra
+            "ksa-korea.org", "sis-korea.com",            # Education Zone
+        ]
+        if any(s in url for s in non_gp_sites):
+            theme_type = "MoreNews" if any(s in url for s in ["koreanews365","theseouljournal"]) \
+                        else "MoreMag" if "korea365" in url \
+                        else "Astra" if "kieca" in url \
+                        else "EducationZone"
+            inject_theme_specific_css(url, pw, theme_type)
+        else:
+            inject_menu_css(url, pw)
 
         # [7] ★ GitHub Actions IP 허용 코드 삽입
         print("  🔓 GitHub Actions IP 허용...")
@@ -1856,9 +2119,13 @@ def run():
         if deleted_low:
             print(f"    ✅ SEO 90점 이하 {deleted_low}건 삭제")
 
-        # [10] ★ 검색엔진 ping
-        print("  🔍 검색엔진 ping...")
-        ping_search_engines(url)
+        # [10] ★ 모든 검색엔진 등록 + SEO 점검
+        print("  🔍 모든 검색엔진 제출...")
+        submit_to_all_search_engines(url, pw, lang)
+
+        # [11] ★ SEO 핵심 요소 점검
+        print("  🔎 SEO 필수 요소 점검...")
+        verify_seo_essentials(url, pw)
 
         # 최종 카테고리 수 확인
         final_cats=[c for c in get_all_cats(base,pw) if c.get("id")!=1]
