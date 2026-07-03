@@ -983,6 +983,65 @@ def cleanup_medicaltour(site_url: str, pw: str):
     print(f"    ✅ koreamedicaltour 정리 완료: {deleted}건 삭제")
     return deleted
 
+
+def fix_ads_txt(site_url: str, pw: str, publisher_id: str = "pub-3456727916386941"):
+    """ads.txt WPCode PHP snippet으로 자동 삽입"""
+    ads_line = "google.com, " + publisher_id + ", DIRECT, f08c47fec0942fa0"
+    
+    php_code = (
+        "<?php\n"
+        "if (isset($_SERVER[\"REQUEST_URI\"]) && $_SERVER[\"REQUEST_URI\"] === \"/ads.txt\") {\n"
+        "    header(\"Content-Type: text/plain\");\n"
+        "    echo \"" + ads_line + "\";\n"
+        "    exit;\n"
+        "}\n"
+        "?>"
+    )
+    
+    try:
+        base = f"{site_url}/wp-json/wp/v2"
+        
+        # 기존 ads.txt 스니펫 확인
+        r = requests.get(f"{base}/wpcode-snippets",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"per_page": 50}, timeout=10)
+        
+        snippet_data = {
+            "title": "ads.txt AdSense",
+            "code_type": "php",
+            "location": "everywhere",
+            "status": "publish",
+            "content": php_code,
+        }
+        
+        if r.status_code == 200 and isinstance(r.json(), list):
+            for s in r.json():
+                title_raw = s.get("title", {})
+                title_str = title_raw.get("rendered","") if isinstance(title_raw, dict) else str(title_raw)
+                if "ads.txt" in title_str.lower():
+                    ur = requests.post(
+                        f"{base}/wpcode-snippets/{s['id']}",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        json=snippet_data, timeout=10)
+                    if ur.status_code in (200,201):
+                        print(f"    ✅ ads.txt 스니펫 업데이트")
+                        return True
+        
+        # 새로 생성
+        cr = requests.post(f"{base}/wpcode-snippets",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json=snippet_data, timeout=10)
+        if cr.status_code in (200,201):
+            print(f"    ✅ ads.txt 스니펫 생성")
+            return True
+        
+        print(f"    ⚠️ ads.txt 삽입 실패 ({cr.status_code})")
+        return False
+        
+    except Exception as e:
+        print(f"    ⚠️ ads.txt 오류: {e}")
+        return False
+
 def ping_search_engines(site_url: str):
     """Google + Naver + Bing Sitemap ping"""
     sitemap = f"{site_url}/sitemap_index.xml"
@@ -1625,6 +1684,10 @@ def run():
 
         # [6] 사이트명
         api("POST",f"{base}/settings",pw,{"title":site_title})
+
+        # [6-0] ★ ads.txt 자동 삽입
+        print("  📄 ads.txt 삽입...")
+        fix_ads_txt(url, pw)
 
         # [6-1] ★ 중복 페이지 삭제
         print("  🗑️ 중복 페이지 정리...")
