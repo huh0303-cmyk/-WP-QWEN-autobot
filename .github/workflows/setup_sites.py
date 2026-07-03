@@ -914,6 +914,75 @@ def audit_and_clean_posts(site_url: str, pw: str, lang: str, dry_run: bool = Fal
 
 
 
+
+def cleanup_medicaltour(site_url: str, pw: str):
+    """koreamedicaltour.com 전용:
+    1. 한국어 글 전부 삭제
+    2. 수술/주사기/메스 관련 이미지 포함 글 삭제
+    """
+    import re as _re
+    base = f"{site_url}/wp-json/wp/v2"
+    
+    BLOCK_WORDS_KO = ["수술", "성형수술", "지방흡입", "주사기", "메스", "절개", "봉합",
+                       "수술실", "마취", "시술", "보톡스주사", "필러주사"]
+    BLOCK_WORDS_EN = ["surgery photo", "operating room", "scalpel", "incision",
+                       "surgical procedure", "anesthesia", "needle injection"]
+    
+    deleted = 0
+    page = 1
+    while True:
+        r = requests.get(f"{base}/posts",
+                        auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                        params={"per_page": 50, "page": page, "status": "publish",
+                                "_fields": "id,title,content,lang"},
+                        timeout=20)
+        if r.status_code != 200 or not isinstance(r.json(), list) or not r.json():
+            break
+        posts = r.json()
+        
+        for post in posts:
+            raw = post.get("title", {})
+            title = raw.get("rendered", "") if isinstance(raw, dict) else str(raw)
+            title = _re.sub('<[^>]+>', '', title).strip()
+            
+            raw_c = post.get("content", {})
+            body = raw_c.get("rendered", "") if isinstance(raw_c, dict) else ""
+            plain = _re.sub('<[^>]+>', '', body).strip()
+            
+            pid = post.get("id")
+            should_delete = False
+            reason = ""
+            
+            # 1. 한국어 글 감지 (한글 비율 30% 이상)
+            ko_chars = len(_re.findall(r'[가-힣]', plain[:500]))
+            total_chars = len(plain[:500].replace(' ', ''))
+            if total_chars > 0 and ko_chars / total_chars > 0.3:
+                should_delete = True
+                reason = "한국어글"
+            
+            # 2. 수술 관련 키워드
+            if not should_delete:
+                combined = (title + " " + plain[:300]).lower()
+                for bw in BLOCK_WORDS_KO + BLOCK_WORDS_EN:
+                    if bw.lower() in combined:
+                        should_delete = True
+                        reason = f"수술관련({bw})"
+                        break
+            
+            if should_delete:
+                dr = requests.delete(f"{base}/posts/{pid}",
+                                    auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                    params={"force": True}, timeout=10)
+                if dr.status_code in (200, 201):
+                    deleted += 1
+                    print(f"    🗑️ [{reason}] {title[:50]}")
+        
+        if len(posts) < 50: break
+        page += 1
+    
+    print(f"    ✅ koreamedicaltour 정리 완료: {deleted}건 삭제")
+    return deleted
+
 def ping_search_engines(site_url: str):
     """Google + Naver + Bing Sitemap ping"""
     sitemap = f"{site_url}/sitemap_index.xml"
@@ -1472,6 +1541,11 @@ def run():
         if fix_idx:
             print("  🔓 색인 차단 해제...")
             allow_indexing(base, pw)
+
+        # [1-0] ★ koreamedicaltour 전용 긴급 정리
+        if "koreamedicaltour" in url:
+            print("  🚨 koreamedicaltour 한국어글+수술사진 긴급 삭제...")
+            cleanup_medicaltour(url, pw)
 
         # ★ GP Premium 제외 사이트
         skip_gp = any(x in url for x in [
