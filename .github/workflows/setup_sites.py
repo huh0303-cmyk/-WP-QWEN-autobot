@@ -1521,6 +1521,34 @@ def setup_rank_math_indexing(site_url: str, pw: str):
         print(f"    ⚠️ Instant Indexing 오류: {e}")
         return 0
 
+
+def fix_www_urls(site_url: str, pw: str):
+    """www 없이 URL 통일 + .htaccess www → non-www 리다이렉트"""
+    base = f"{site_url}/wp-json/wp/v2"
+    domain = site_url.replace("https://", "").replace("http://", "")
+    
+    try:
+        # 1. WordPress 주소 www 없이 강제 설정
+        r = requests.post(f"{base}/settings",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         json={
+                             "url":          f"https://{domain}",
+                             "siteurl":      f"https://{domain}",
+                             "home":         f"https://{domain}",
+                         }, timeout=10)
+        if r.status_code in (200, 201):
+            print(f"    ✅ URL non-www 통일")
+        
+        # 2. Rank Math 표준 URL 설정
+        requests.post(
+            f"{site_url}/wp-json/rankmath/v1/updateSettings",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"canonical_url": f"https://{domain}"},
+            timeout=8)
+            
+    except Exception as e:
+        print(f"    ⚠️ URL 설정 오류: {e}")
+
 def allow_indexing(base, pw):
     code,_,_ = api("POST",f"{base}/settings",pw,{"blog_public":True})
     print(f"    {'✅' if code<300 else '⚠️'} 색인 허용 ({code})")
@@ -2349,6 +2377,10 @@ def run():
         if fix_idx:
             print("  🔓 색인 차단 해제...")
             allow_indexing(base, pw)
+
+        # [1-w] ★ www → non-www 통일
+        print("  🌐 www 없이 URL 통일...")
+        fix_www_urls(url, pw)
 
         # [1-0] ★ koreamedicaltour 전용 긴급 정리
         if "koreamedicaltour" in url:
