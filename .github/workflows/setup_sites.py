@@ -1586,13 +1586,45 @@ def run():
         print("  📊 SEO 확인...")
         verify_post_seo(url, pw, limit=10)
 
-        # [9-1] ★ 기존 글 noindex 제거 + 404 정리
+        # [9-1] ★ 기존 글 noindex 제거
         print("  🔧 기존 글 noindex 제거...")
         fix_post_noindex_and_404(url, pw)
 
-        # [9-2] ★ 저품질 글 정리 (연도포함/중복/진부한 패턴)
-        print("  🗑️ 저품질 글 정리...")
+        # [9-2] ★ 저품질 글 정리 (연도/중복/주제이탈/800자미만)
+        print("  🗑️ 저품질 글 정리 v2.0...")
         audit_and_clean_posts(url, pw, lang, dry_run=False)
+
+        # [9-3] ★ SEO 90점 이하 삭제
+        print("  🗑️ SEO 90점 이하 삭제...")
+        deleted_low = 0
+        page_s = 1
+        while True:
+            try:
+                rs = requests.get(f"{base}/posts",
+                               auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                               params={"per_page":50,"page":page_s,"status":"publish",
+                                       "_fields":"id,meta,title"},
+                               timeout=15)
+                if rs.status_code != 200 or not rs.json(): break
+                posts_s = rs.json()
+                for post_s in posts_s:
+                    meta_s = post_s.get("meta", {})
+                    score_s = meta_s.get("rank_math_seo_score", "")
+                    try:
+                        score_int = int(float(str(score_s))) if score_s else 0
+                    except:
+                        score_int = 0
+                    if 0 < score_int < 90:
+                        dr = requests.delete(f"{base}/posts/{post_s['id']}",
+                                            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                            params={"force": True}, timeout=10)
+                        if dr.status_code in (200, 201):
+                            deleted_low += 1
+                if len(posts_s) < 50: break
+                page_s += 1
+            except: break
+        if deleted_low:
+            print(f"    ✅ SEO 90점 이하 {deleted_low}건 삭제")
 
         # [10] ★ 검색엔진 ping
         print("  🔍 검색엔진 ping...")
