@@ -12,9 +12,9 @@ on:
         required: false
         default: "1"
   schedule:
-    - cron: "10 21 * * *"   # KST 06:10  슬롯1
-    - cron: "10 5 * * *"    # KST 14:10  슬롯2
-    - cron: "10 13 * * *"   # KST 22:10  슬롯3
+    - cron: "10 21 * * *"
+    - cron: "10 5 * * *"
+    - cron: "10 13 * * *"
 
 concurrency:
   group: master-27sites
@@ -30,42 +30,36 @@ jobs:
       slot:      ${{ steps.slot.outputs.slot }}
       run_setup: ${{ steps.slot.outputs.run_setup }}
       run_post:  ${{ steps.slot.outputs.run_post }}
+      run_ads:   ${{ steps.slot.outputs.run_ads }}
     steps:
       - id: slot
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             SLOT="${{ github.event.inputs.run_slot }}"
             S="${{ github.event.inputs.step }}"
-            if [ "$S" = "setup" ] || [ "$S" = "all" ]; then
-              RUN_SETUP=true
-            else
-              RUN_SETUP=false
-            fi
-            if [ "$S" = "post" ] || [ "$S" = "all" ]; then
-              RUN_POST=true
-            else
-              RUN_POST=false
-            fi
+            RUN_SETUP=false; RUN_POST=false; RUN_ADS=false
+            if [ "$S" = "setup" ] || [ "$S" = "all" ]; then RUN_SETUP=true; fi
+            if [ "$S" = "post"  ] || [ "$S" = "all" ]; then RUN_POST=true;  fi
+            if [ "$S" = "ads"   ] || [ "$S" = "all" ]; then RUN_ADS=true;   fi
           elif [ "${{ github.event.schedule }}" = "10 21 * * *" ]; then
-            SLOT=1; RUN_SETUP=false; RUN_POST=true
+            SLOT=1; RUN_SETUP=false; RUN_POST=true; RUN_ADS=false
           elif [ "${{ github.event.schedule }}" = "10 5 * * *" ]; then
-            SLOT=2; RUN_SETUP=false; RUN_POST=true
+            SLOT=2; RUN_SETUP=false; RUN_POST=true; RUN_ADS=false
           else
-            SLOT=3; RUN_SETUP=false; RUN_POST=true
+            SLOT=3; RUN_SETUP=false; RUN_POST=true; RUN_ADS=false
           fi
           echo "slot=$SLOT"           >> "$GITHUB_OUTPUT"
           echo "run_setup=$RUN_SETUP" >> "$GITHUB_OUTPUT"
           echo "run_post=$RUN_POST"   >> "$GITHUB_OUTPUT"
-          echo "▶ 슬롯=$SLOT | 구조작업=$RUN_SETUP | 글발행=$RUN_POST"
-
-
+          echo "run_ads=$RUN_ADS"     >> "$GITHUB_OUTPUT"
+          echo "▶ 슬롯=$SLOT | setup=$RUN_SETUP | post=$RUN_POST | ads=$RUN_ADS"
 
 # ══════════════════════════════════════════════════════════
-# JOB: ads.txt 전용 삽입
+# JOB 2: ads.txt 삽입
 # ══════════════════════════════════════════════════════════
   inject-ads:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'ads' || github.event.inputs.step == 'all' }}
+    if: ${{ needs.determine-slot.outputs.run_ads == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -109,7 +103,7 @@ jobs:
 # JOB 3: 사이트 구조 설정
 # ══════════════════════════════════════════════════════════
   site-setup:
-    needs: [determine-slot, connection-test]
+    needs: determine-slot
     if: ${{ needs.determine-slot.outputs.run_setup == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -155,7 +149,7 @@ jobs:
 # JOB 4: 자동 포스팅
 # ══════════════════════════════════════════════════════════
   autopost:
-    needs: [determine-slot, connection-test]
+    needs: determine-slot
     if: ${{ needs.determine-slot.outputs.run_post == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
@@ -170,8 +164,8 @@ jobs:
           path: ~/.cache/pip
           key: pip-autopost-v4
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "⏳ 연결 안정화 대기 (30초)"
-        run: sleep 30
+      - name: "⏳ 연결 안정화 대기"
+        run: sleep 15
       - name: "📝 오토포스팅 Slot ${{ needs.determine-slot.outputs.slot }}"
         env:
           RUN_SLOT:             ${{ needs.determine-slot.outputs.slot }}
