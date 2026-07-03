@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       step:
-        description: "setup=구조작업 / post=글발행 / ads=ads.txt삽입 / all=전체"
+        description: "setup=구조작업 / post=글발행 / ads=adstxt삽입 / all=전체"
         required: false
         default: "post"
       run_slot:
@@ -59,8 +59,9 @@ jobs:
           echo "▶ 슬롯=$SLOT | 구조작업=$RUN_SETUP | 글발행=$RUN_POST"
 
 
+
 # ══════════════════════════════════════════════════════════
-# JOB: ads.txt 전용 삽입 (step=ads 실행 시)
+# JOB: ads.txt 전용 삽입
 # ══════════════════════════════════════════════════════════
   inject-ads:
     needs: determine-slot
@@ -73,7 +74,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests -q
-      - name: "📄 27개 사이트 ads.txt 강제 삽입"
+      - name: "📄 27개 ads.txt 삽입"
         env:
           KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -103,57 +104,6 @@ jobs:
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/inject_ads_txt.py
-# ══════════════════════════════════════════════════════════
-# JOB 2: 연결 테스트 (HTTP 0 사전 감지)
-# ══════════════════════════════════════════════════════════
-  connection-test:
-    needs: determine-slot
-    runs-on: ubuntu-latest
-    outputs:
-      can_connect: ${{ steps.test.outputs.can_connect }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests -q
-      - id: test
-        name: "🔌 연결 테스트"
-        env:
-          KHEALTH365COM:   ${{ secrets.KHEALTH365COM }}
-          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-          KFINANCE365COM:  ${{ secrets.KFINANCE365COM }}
-        run: |
-          python3 -c "
-          import requests, os, sys, time
-          WP_USER = 'huh0303@gmail.com'
-          test_sites = [
-              ('https://k-health365.com', os.getenv('KHEALTH365COM','')),
-              ('https://koreanews365.com', os.getenv('KOREANEWS365COM','')),
-              ('https://kfinance365.com', os.getenv('KFINANCE365COM','')),
-          ]
-          ok = 0
-          for url, pw in test_sites:
-              if not pw: continue
-              for attempt in range(3):
-                  try:
-                      r = requests.get(f'{url}/wp-json/wp/v2/posts',
-                                      auth=(WP_USER, pw),
-                                      params={'per_page':1},
-                                      timeout=20,
-                                      headers={'User-Agent':'WordPress/6.0'})
-                      if r.status_code < 500:
-                          print(f'✅ {url}: HTTP {r.status_code}')
-                          ok += 1; break
-                  except Exception as e:
-                      print(f'⚠️ {url} 시도{attempt+1}: {e}')
-                      time.sleep(15)
-          print(f'연결 성공: {ok}/3')
-          # 1개라도 연결되면 진행
-          sys.exit(0 if ok >= 1 else 1)
-          "
-          echo "can_connect=true" >> "$GITHUB_OUTPUT"
-        continue-on-error: true
 
 # ══════════════════════════════════════════════════════════
 # JOB 3: 사이트 구조 설정
