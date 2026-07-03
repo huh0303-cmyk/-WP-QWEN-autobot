@@ -157,11 +157,11 @@ SITES = [
    ["wellness","supplement","vitamin","probiotic","collagen","health","inner beauty"],
    False, True, True),
 
-  ("https://kworld365.com","KWORLD365COM","en","K-POP","KWorld365 K-POP",
-   "Artists","Music","Tours",
-   ["album","release","comeback","single","MV","music"],
-   ["concert","tour","performance","live","show"],
-   True, False, True),
+  ("https://kworld365.com","KWORLD365COM","en","K-Culture","KWorld365 K-Culture",
+   "K-Pop & Artists","K-Culture & Learn Korean","Korean Life & Travel",
+   ["learn korean","study korean","hangul","korean language","TOPIK","free korean"],
+   ["travel","food","Seoul","Busan","Jeju","korean life","expat","kdrama"],
+   False, True, True),
 
   ("https://k-trip365.com","KTRIP365COM","en","한국숙박여행","K-Trip365 Korea Stay & Travel",
    "Hotels & Stays","AirBnB & 민박","Travel Guides",
