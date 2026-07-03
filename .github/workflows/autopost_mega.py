@@ -1857,6 +1857,10 @@ def postprocess_table(body: str, keyword: str, lang: str) -> str:
 
 def postprocess_meta_desc(meta_desc: str, title: str, keyword: str,
                            lang: str, gemini_gen_fn) -> str:
+    # ★ 바이라인이 메타디스크립션에 들어간 경우 제거
+    import re as _re
+    meta_desc = _re.sub(r'^[◇◆▶▷]\s*[가-힣\w]+\s*(기자|기자님|reporter|writer)?\.?\s*', '', meta_desc, flags=_re.IGNORECASE).strip()
+    meta_desc = _re.sub(r'^By\s+[\w\s]+\s*\.?\s*', '', meta_desc, flags=_re.IGNORECASE).strip()
     if 100 <= len(meta_desc) <= 160:
         return meta_desc
     print(f"   📝 META_DESC {len(meta_desc)}자 미달 → 재생성")
@@ -2383,6 +2387,16 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
             pass
 
     rank_kw = ",".join([keyword] + tags[:4])
+
+    # ★ 메타 디스크립션에서 바이라인 제거
+    import re as _re2
+    meta_desc = _re2.sub(r'^[◇◆▶▷]\s*[가-힣\w\s]+\s*(기자|reporter)?\.?\s*', '', meta_desc).strip()
+    meta_desc = _re2.sub(r'^By\s+[\w\s]+\.?\s*', '', meta_desc, flags=_re2.IGNORECASE).strip()
+    if len(meta_desc) < 50:
+        if lang == "ko":
+            meta_desc = f"{keyword}에 대한 전문가 검증 정보와 최신 가이드를 확인하세요."
+        else:
+            meta_desc = f"Expert guide on {keyword} — verified information and practical tips you need to know."
 
     # ★ Featured Image WP 미디어에 직접 업로드
     featured_media_id = 0
