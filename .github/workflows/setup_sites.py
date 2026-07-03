@@ -1524,6 +1524,412 @@ def setup_rank_math_indexing(site_url: str, pw: str):
 def allow_indexing(base, pw):
     code,_,_ = api("POST",f"{base}/settings",pw,{"blog_public":True})
     print(f"    {'✅' if code<300 else '⚠️'} 색인 허용 ({code})")
+
+# ════════════════════════════════════════════════════════════
+# ★ MASTER SEO + ADS + MENU SYSTEM v6.0
+# ════════════════════════════════════════════════════════════
+
+# 테마별 메뉴 CSS 설정
+def get_menu_css(theme_type: str, lang: str) -> str:
+    """사이트 테마별 최적화된 2줄 메뉴 CSS"""
+    
+    # 공통 변수
+    top_bg = "#1e2433"      # 상단 페이지줄 (어두운)
+    nav_bg = "#1a6fd4"      # 메인 카테고리줄 (파랑)
+    nav_hover = "#1558aa"   # 카테고리 호버
+    
+    # MoreNews/MoreMag 전용 선택자
+    if theme_type in ["MoreNews", "MoreMag"]:
+        return f"""
+/* TOP BAR - 페이지 4개 작게 우측 */
+#top-bar, .top-bar, .site-top-bar,
+.morenews-top-bar, .moremag-top-bar {{
+    background:{top_bg} !important; padding:4px 0 !important;
+}}
+#top-bar .menu, .top-bar .menu, .site-top-bar .menu {{
+    display:flex !important; justify-content:flex-end !important;
+    gap:16px !important; list-style:none !important;
+    margin:0 !important; padding:0 20px !important;
+}}
+#top-bar a, .top-bar a, .site-top-bar a {{
+    color:#aab4c8 !important; font-size:11px !important;
+    text-decoration:none !important; white-space:nowrap !important;
+}}
+#top-bar a:hover {{ color:#fff !important; }}
+
+/* MAIN NAV - 카테고리 4개 중앙 파랑 */
+#site-navigation, .main-navigation, .primary-menu-container,
+.morenews-primary-nav, .moremag-nav {{
+    background:{nav_bg} !important;
+}}
+#site-navigation ul, .main-navigation ul {{
+    display:flex !important; justify-content:center !important;
+    list-style:none !important; margin:0 !important; padding:0 !important;
+    flex-wrap:wrap !important;
+}}
+#site-navigation a, .main-navigation a {{
+    color:#fff !important; font-size:14px !important; font-weight:700 !important;
+    padding:12px 24px !important; display:block !important;
+    text-decoration:none !important; text-transform:uppercase !important;
+    letter-spacing:0.5px !important;
+}}
+#site-navigation a:hover, .main-navigation a:hover {{
+    background:{nav_hover} !important;
+}}
+/* FOOTER - 카테고리만 */
+.site-footer .menu, .footer-nav ul {{
+    display:flex !important; justify-content:center !important;
+    flex-wrap:wrap !important; gap:6px 20px !important;
+    list-style:none !important; padding:10px 0 !important; margin:0 !important;
+}}
+.site-footer a {{ color:#7a8499 !important; font-size:12px !important; }}
+.site-footer a:hover {{ color:#fff !important; }}
+/* 대표이미지 */
+.entry-thumbnail img, .post-thumbnail img, .wp-post-image {{
+    width:100% !important; height:auto !important;
+    border-radius:6px !important; display:block !important;
+}}
+"""
+
+    # Astra 전용
+    elif theme_type == "Astra":
+        return f"""
+/* Astra TOP - 페이지 4개 우측 */
+.ast-above-header-wrap, #ast-top-header {{
+    background:{top_bg} !important; min-height:30px !important;
+}}
+.ast-above-header-wrap .main-header-menu,
+#ast-top-header .ast-custom-menu {{
+    display:flex !important; justify-content:flex-end !important;
+    gap:16px !important; list-style:none !important;
+    margin:0 !important; padding:0 20px !important;
+}}
+.ast-above-header-wrap a, #ast-top-header a {{
+    color:#aab4c8 !important; font-size:11px !important;
+    text-decoration:none !important;
+}}
+/* Astra MAIN NAV - 카테고리 */
+.ast-primary-header-bar, #masthead .main-header-bar {{
+    background:{nav_bg} !important;
+}}
+.ast-primary-header-bar .main-header-menu,
+.main-navigation .ast-flex {{
+    display:flex !important; justify-content:center !important;
+}}
+.ast-primary-header-bar a, #ast-header-primary-nav a {{
+    color:#fff !important; font-size:14px !important; font-weight:700 !important;
+    padding:12px 22px !important;
+}}
+.ast-primary-header-bar a:hover {{ background:{nav_hover} !important; }}
+/* Astra Footer */
+.ast-footer-widget-area, .site-footer {{
+    background:#0f1523 !important;
+}}
+.site-footer a {{ color:#7a8499 !important; font-size:12px !important; }}
+/* 이미지 */
+.ast-single-post .wp-post-image, .entry-content img:first-child {{
+    width:100% !important; height:auto !important; border-radius:6px !important;
+}}
+"""
+
+    # Education Zone 전용
+    elif theme_type == "EducationZone":
+        return f"""
+/* EduZone TOP - 페이지 4개 우측 */
+#top-header, .top-header-wrap, .edu-top-header {{
+    background:{top_bg} !important; padding:4px 0 !important;
+}}
+#top-header .menu, .top-header-wrap nav ul {{
+    display:flex !important; justify-content:flex-end !important;
+    gap:16px !important; list-style:none !important;
+    padding:0 20px !important; margin:0 !important;
+}}
+#top-header a {{ color:#aab4c8 !important; font-size:11px !important; }}
+/* EduZone MAIN NAV */
+#site-header nav, .edu-zone-nav, #primary-menu-wrap {{
+    background:{nav_bg} !important;
+}}
+#primary-menu, #primary-menu-wrap ul {{
+    display:flex !important; justify-content:center !important;
+    list-style:none !important; margin:0 !important; padding:0 !important;
+}}
+#primary-menu a, #primary-menu-wrap a {{
+    color:#fff !important; font-size:14px !important; font-weight:700 !important;
+    padding:12px 22px !important; display:block !important;
+}}
+#primary-menu a:hover {{ background:{nav_hover} !important; }}
+/* Footer */
+#colophon, .site-footer {{ background:#0f1523 !important; }}
+.site-footer a {{ color:#7a8499 !important; font-size:12px !important; }}
+/* 이미지 */
+.entry-thumbnail img, .edu-featured-img {{
+    width:100% !important; height:auto !important; border-radius:6px !important;
+}}
+"""
+
+    # GP Premium (기본)
+    else:
+        return f"""
+/* GP TOP BAR - 페이지 4개 우측 */
+.top-bar {{ background:{top_bg} !important; padding:4px 0 !important; }}
+.top-bar .inside-top-bar {{
+    display:flex !important; justify-content:flex-end !important;
+    align-items:center !important; gap:16px !important;
+    max-width:1200px !important; margin:0 auto !important; padding:0 20px !important;
+}}
+.top-bar a {{
+    color:#aab4c8 !important; font-size:11px !important;
+    text-decoration:none !important; white-space:nowrap !important;
+}}
+.top-bar a:hover {{ color:#fff !important; }}
+
+/* GP MAIN NAV - 카테고리 4개 중앙 파랑 */
+.site-header {{ background:#fff !important; box-shadow:0 1px 4px rgba(0,0,0,.08) !important; }}
+.main-navigation {{ background:{nav_bg} !important; }}
+.main-navigation .menu, .main-navigation ul.menu {{
+    display:flex !important; justify-content:center !important;
+    list-style:none !important; margin:0 !important; padding:0 !important;
+    flex-wrap:wrap !important;
+}}
+.main-navigation a {{
+    color:#fff !important; font-size:14px !important; font-weight:700 !important;
+    padding:12px 24px !important; display:block !important;
+    text-decoration:none !important; text-transform:uppercase !important;
+    letter-spacing:0.5px !important; transition:background .2s !important;
+}}
+.main-navigation a:hover,
+.main-navigation .current-menu-item>a {{
+    background:{nav_hover} !important; color:#fff !important;
+}}
+
+/* GP FOOTER - 카테고리만 */
+.site-footer {{ background:#0f1523 !important; color:#aab4c8 !important; }}
+.footer-bar {{ background:#0d1020 !important; }}
+.footer-bar a, .site-footer a {{
+    color:#7a8499 !important; font-size:12px !important;
+    text-decoration:none !important;
+}}
+.footer-bar a:hover, .site-footer a:hover {{ color:#fff !important; }}
+.footer-bar .menu, .footer-bar ul {{
+    display:flex !important; justify-content:center !important;
+    flex-wrap:wrap !important; gap:6px 20px !important;
+    list-style:none !important; padding:10px 0 !important; margin:0 !important;
+}}
+
+/* 대표이미지 */
+.post-image img, .wp-post-image, .featured-image img,
+article .entry-content img:first-of-type {{
+    width:100% !important; height:auto !important;
+    border-radius:6px !important; display:block !important;
+    margin-bottom:16px !important;
+}}
+"""
+
+
+def apply_full_css(site_url: str, pw: str, theme_type: str, lang: str):
+    """WPCode + wp/v2/settings 두 가지 방법으로 CSS 주입"""
+    css = get_menu_css(theme_type, lang)
+    base = f"{site_url}/wp-json/wp/v2"
+    
+    # 방법1: WP Customizer additional CSS
+    try:
+        r = requests.post(f"{base}/settings",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         json={"custom_css": css}, timeout=10)
+        if r.status_code in (200,201):
+            print(f"    ✅ Customizer CSS ({theme_type})")
+            return True
+    except: pass
+    
+    # 방법2: WPCode 스니펫
+    try:
+        snippet = {
+            "title": f"2Row Menu CSS v6 - {theme_type}",
+            "content": f"<style>{css}</style>",
+            "code_type": "html",
+            "location": "site_header",
+            "status": "publish",
+        }
+        r2 = requests.get(f"{base}/wpcode-snippets",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         params={"per_page":50}, timeout=10)
+        if r2.status_code == 200 and isinstance(r2.json(), list):
+            for s in r2.json():
+                t = s.get("title",{})
+                ts = t.get("rendered","") if isinstance(t,dict) else str(t)
+                if "Menu CSS" in ts or "menu-css" in ts.lower():
+                    ur = requests.post(f"{base}/wpcode-snippets/{s['id']}",
+                                      auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                      json=snippet, timeout=10)
+                    if ur.status_code in (200,201):
+                        print(f"    ✅ WPCode CSS 업데이트 ({theme_type})")
+                        return True
+        cr = requests.post(f"{base}/wpcode-snippets",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json=snippet, timeout=10)
+        if cr.status_code in (200,201):
+            print(f"    ✅ WPCode CSS 생성 ({theme_type})")
+            return True
+    except Exception as e:
+        print(f"    ⚠️ CSS 오류: {e}")
+    return False
+
+
+def ensure_ads_txt(site_url: str, pw: str, pub_id: str = "pub-3456727916386941"):
+    """ads.txt 확실하게 삽입 (PHP + 직접확인)"""
+    ads_line = f"google.com, {pub_id}, DIRECT, f08c47fec0942fa0"
+    base = f"{site_url}/wp-json/wp/v2"
+    
+    # 먼저 현재 ads.txt 확인
+    try:
+        r = requests.get(f"{site_url}/ads.txt", timeout=8,
+                        headers={"User-Agent":"Mozilla/5.0"})
+        if r.status_code == 200 and pub_id in r.text:
+            print(f"    ✅ ads.txt 이미 정상")
+            return True
+    except: pass
+    
+    # PHP 스니펫으로 ads.txt 서빙
+    # PHP 스니펫으로 ads.txt 서빙
+    php = chr(10).join([
+        "<?php",
+        "add_action('init', function() {",
+        "    if (isset($_SERVER['REQUEST_URI'])) {",
+        "        $uri = strtok($_SERVER['REQUEST_URI'], '?');",
+        "        if ($uri === '/ads.txt') {",
+        "            header('Content-Type: text/plain; charset=utf-8');",
+        "            header('Cache-Control: public, max-age=86400');",
+        "            echo '" + ads_line + "';",
+        "            exit;",
+        "        }",
+        "    }",
+        "});",
+    ])
+    
+    snippet = {
+        "title": "ads.txt Generator",
+        "content": php,
+        "code_type": "php",
+        "location": "everywhere",
+        "status": "publish",
+    }
+    
+    try:
+        # 기존 삭제 후 재생성
+        r2 = requests.get(f"{base}/wpcode-snippets",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         params={"per_page":50}, timeout=10)
+        if r2.status_code == 200 and isinstance(r2.json(), list):
+            for s in r2.json():
+                t = s.get("title",{})
+                ts = t.get("rendered","") if isinstance(t,dict) else str(t)
+                if "ads.txt" in ts.lower() or "adsense" in ts.lower():
+                    requests.delete(f"{base}/wpcode-snippets/{s['id']}",
+                                   auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                                   params={"force":True}, timeout=8)
+        
+        cr = requests.post(f"{base}/wpcode-snippets",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json=snippet, timeout=10)
+        if cr.status_code in (200,201):
+            print(f"    ✅ ads.txt PHP 스니펫 생성")
+            return True
+    except Exception as e:
+        print(f"    ⚠️ ads.txt 오류: {e}")
+    return False
+
+
+def fix_robots_txt(site_url: str, pw: str):
+    """robots.txt 정상화"""
+    base = f"{site_url}/wp-json/wp/v2"
+    robots_content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /wp-admin/\n"
+        "Allow: /wp-admin/admin-ajax.php\n"
+        f"Sitemap: {site_url}/sitemap_index.xml\n"
+    )
+    
+    try:
+        # Rank Math robots.txt 설정
+        r = requests.post(
+            f"{site_url}/wp-json/rankmath/v1/updateRobotsTxt",
+            auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+            json={"robots_txt": robots_content}, timeout=10)
+        if r.status_code in (200,201):
+            print(f"    ✅ robots.txt Rank Math 설정")
+            return True
+        
+        # WP Settings API
+        r2 = requests.post(f"{base}/settings",
+                          auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                          json={"robots_txt": robots_content}, timeout=10)
+        if r2.status_code in (200,201):
+            print(f"    ✅ robots.txt 설정")
+            return True
+    except: pass
+    
+    print(f"    ⚠️ robots.txt 수동 설정 필요")
+    return False
+
+
+def submit_all_search_engines(site_url: str, pw: str, lang: str):
+    """모든 검색엔진에 색인 제출"""
+    INDEXNOW_KEY = os.getenv("INDEXNOW_KEY", "")
+    sitemap = f"{site_url}/sitemap_index.xml"
+    enc = requests.utils.quote(sitemap)
+    domain = site_url.replace("https://","")
+    results = []
+    
+    engines = [
+        ("Google", f"https://www.google.com/ping?sitemap={enc}"),
+        ("Bing",   f"https://www.bing.com/ping?sitemap={enc}"),
+    ]
+    
+    for name, url_ping in engines:
+        try:
+            r = requests.get(url_ping, timeout=8)
+            results.append(f"{name}{'✅' if r.status_code==200 else '⚠️'}")
+        except: results.append(f"{name}❌")
+    
+    # Naver
+    try:
+        r = requests.get(
+            f"https://searchadvisor.naver.com/indexnow?url={requests.utils.quote(site_url)}",
+            timeout=8)
+        results.append(f"Naver{'✅' if r.status_code in (200,202) else '⚠️'}")
+    except: results.append("Naver⚠️")
+    
+    # Daum
+    try:
+        r = requests.get(
+            f"https://register.search.daum.net/index.daum?act=reg&url={requests.utils.quote(site_url)}",
+            timeout=8)
+        results.append(f"Daum{'✅' if r.status_code==200 else '⚠️'}")
+    except: results.append("Daum⚠️")
+    
+    # IndexNow
+    if INDEXNOW_KEY:
+        try:
+            r = requests.post("https://api.indexnow.org/indexnow",
+                            json={"host":domain,"key":INDEXNOW_KEY,
+                                  "keyLocation":f"{site_url}/{INDEXNOW_KEY}.txt",
+                                  "urlList":[site_url, sitemap]},
+                            headers={"Content-Type":"application/json"}, timeout=10)
+            results.append(f"IndexNow{'✅' if r.status_code in (200,202) else '⚠️'}")
+        except: results.append("IndexNow❌")
+    
+    # Rank Math Instant Indexing
+    try:
+        r = requests.post(f"{site_url}/wp-json/rankmath/v1/instantIndexing",
+                         auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
+                         json={"urls":[site_url],"action":"URL_UPDATED"}, timeout=10)
+        results.append(f"RM-Instant{'✅' if r.status_code in (200,201) else '⚠️'}")
+    except: results.append("RM-Instant⚠️")
+    
+    print(f"    🔍 {' | '.join(results)}")
+
+
 def force_generatepress_premium(site_url: str, pw: str, theme_slug: str = "generatepress"):
     """GeneratePress (Premium) 강제 활성화"""
     try:
@@ -2028,9 +2434,13 @@ def run():
         # [6] 사이트명
         api("POST",f"{base}/settings",pw,{"title":site_title})
 
-        # [6-0] ★ ads.txt 자동 삽입
+        # [6-0] ★ ads.txt 확실하게 삽입
         print("  📄 ads.txt 삽입...")
-        fix_ads_txt(url, pw)
+        ensure_ads_txt(url, pw)
+
+        # [6-0b] ★ robots.txt 정상화
+        print("  🤖 robots.txt 설정...")
+        fix_robots_txt(url, pw)
 
         # [6-1] ★ 중복 페이지 삭제
         print("  🗑️ 중복 페이지 정리...")
@@ -2050,22 +2460,19 @@ def run():
                         [c1,c2,c3,etc_name],
                         pg_map)
 
-        # [6-3] ★ 메뉴 CSS 삽입 (테마별 적용)
+        # [6-3] ★ 테마별 2줄 메뉴 CSS 적용
         print("  🎨 메뉴 CSS 삽입...")
-        non_gp_sites = [
-            "koreanews365.com", "theseouljournal.com",  # MoreNews
-            "korea365.org",                              # MoreMag
-            "kieca-korea.org",                           # Astra
-            "ksa-korea.org", "sis-korea.com",            # Education Zone
-        ]
-        if any(s in url for s in non_gp_sites):
-            theme_type = "MoreNews" if any(s in url for s in ["koreanews365","theseouljournal"]) \
-                        else "MoreMag" if "korea365" in url \
-                        else "Astra" if "kieca" in url \
-                        else "EducationZone"
-            inject_theme_specific_css(url, pw, theme_type)
+        if any(s in url for s in ["koreanews365","theseouljournal"]):
+            _theme_type = "MoreNews"
+        elif "korea365.org" in url:
+            _theme_type = "MoreMag"
+        elif "kieca-korea" in url:
+            _theme_type = "Astra"
+        elif any(s in url for s in ["ksa-korea","sis-korea"]):
+            _theme_type = "EducationZone"
         else:
-            inject_menu_css(url, pw)
+            _theme_type = "GP"
+        apply_full_css(url, pw, _theme_type, lang)
 
         # [7] ★ GitHub Actions IP 허용 코드 삽입
         print("  🔓 GitHub Actions IP 허용...")
@@ -2119,13 +2526,9 @@ def run():
         if deleted_low:
             print(f"    ✅ SEO 90점 이하 {deleted_low}건 삭제")
 
-        # [10] ★ 모든 검색엔진 등록 + SEO 점검
-        print("  🔍 모든 검색엔진 제출...")
-        submit_to_all_search_engines(url, pw, lang)
-
-        # [11] ★ SEO 핵심 요소 점검
-        print("  🔎 SEO 필수 요소 점검...")
-        verify_seo_essentials(url, pw)
+        # [10] ★ 모든 검색엔진 색인 제출
+        print("  🔍 검색엔진 제출 (Google/Bing/Naver/Daum/IndexNow)...")
+        submit_all_search_engines(url, pw, lang)
 
         # 최종 카테고리 수 확인
         final_cats=[c for c in get_all_cats(base,pw) if c.get("id")!=1]
