@@ -2340,92 +2340,157 @@ def build_image_html(image_urls: list, keyword: str) -> str:
 # ════════════════════════════════════════════════════════════
 
 def get_diverse_image(keyword: str, site_theme: str, attempt: int = 0) -> list:
-    """Pixabay → Pexels → Unsplash 순으로 이미지 검색 (중복 방지)"""
-    import random
+    """
+    ★ v2.0 이미지 개선:
+    - 의료 수술 사진 완전 제외 (수술실/메스/주사기/수술장면)
+    - 사이트당 1개 대표 이미지만 (반복 없음)
+    - 랜덤 페이지로 중복 방지
+    - Korea 관련 이미지 적극 활용
+    """
+    import random, hashlib, time as _time
     
     PIXABAY_KEY = os.getenv("PIXABAY_KEY", "")
     PEXELS_KEY  = os.getenv("PEXELS_KEY", "")
     
-    # 키워드를 영어로 변환 (한글 키워드는 번역)
-    search_kw = keyword
-    ko_to_en_map = {
-        "건강": "health", "의학": "medical", "질환": "disease", "증상": "symptom",
-        "치료": "treatment", "영양": "nutrition", "비타민": "vitamin", "약": "medicine",
-        "운동": "exercise", "식단": "diet", "피부": "skin", "탈모": "hair loss",
-        "당뇨": "diabetes", "고혈압": "blood pressure", "암": "cancer",
-        "관절": "joint", "허리": "back pain", "수면": "sleep", "면역": "immune",
-        "한국": "Korea", "유학": "study abroad", "취업": "employment",
-        "부동산": "real estate", "주식": "stock market", "보험": "insurance",
+    # ── 의료 수술 사진 제외 키워드 ──
+    MEDICAL_BLOCK = [
+        "surgery", "operation", "surgical", "scalpel", "needle", "syringe",
+        "operating room", "surgeon", "incision", "wound", "blood", "bandage",
+        "수술", "메스", "주사기", "수술실", "절개", "봉합"
+    ]
+    
+    # ── 한글 → 영어 키워드 변환 ──
+    KO_EN = {
+        "건강": "health wellness", "의학": "medical healthcare",
+        "질환": "health condition", "증상": "health symptoms",
+        "치료": "healthcare treatment", "영양": "nutrition food",
+        "비타민": "vitamins supplements", "약": "medicine pharmacy",
+        "운동": "fitness exercise", "식단": "healthy diet food",
+        "피부": "skin beauty care", "탈모": "hair care",
+        "당뇨": "diabetes health", "고혈압": "blood pressure health",
+        "관절": "joint health orthopedic", "허리": "back health spine",
+        "수면": "sleep wellness rest", "면역": "immune system health",
+        "한국": "Korea Seoul city", "유학": "study abroad university",
+        "취업": "career office work", "부동산": "real estate property",
+        "주식": "stock market finance", "보험": "insurance protection",
+        "경제": "economy finance business", "정치": "government policy",
     }
-    for ko, en in ko_to_en_map.items():
+    
+    search_kw = keyword
+    for ko, en in KO_EN.items():
         if ko in search_kw:
             search_kw = search_kw.replace(ko, en)
+            break
     
-    # 테마별 보조 키워드로 이미지 품질 향상
-    theme_extras = {
-        "건강과 의학": "healthcare medical professional",
-        "Korea Medical Tourism": "medical korea clinic",
-        "Investment": "finance investment chart",
-        "Insurance": "insurance protection family",
-        "Finance": "finance banking money",
-        "Crypto": "cryptocurrency blockchain digital",
-        "Korea Real Estate": "real estate apartment building",
-        "K-Beauty": "skincare beauty korean",
-        "K-Beauty Reviews": "beauty product review korean",
-        "Travel": "korea travel tourism",
-        "Visa": "passport visa document",
-        "Wedding": "wedding ceremony couple",
-        "Education": "university education student",
-        "Job": "job career office work",
+    # ── 테마별 이미지 컨셉 (Korea 활용 강화) ──
+    THEME_SEARCH = {
+        "한국의료관광": "Korea medical clinic hospital modern",
+        "Korea Medical Tourism": "Korea healthcare medical center Seoul",
+        "건강과 의학": "healthcare wellness doctor consultation",
+        "Investment": "finance investment korea seoul business",
+        "Korea Investment": "korean stock market finance seoul",
+        "Insurance": "insurance protection family korea",
+        "Finance": "korea banking finance seoul city",
+        "Tax and Law": "korea legal business office",
+        "Crypto": "cryptocurrency blockchain digital korea",
+        "Korea Real Estate": "korea apartment seoul cityscape",
+        "K-Beauty": "korean skincare beauty product",
+        "K-Beauty Reviews": "korean beauty product cosmetic",
+        "Travel": "korea travel tourism hotel seoul",
+        "Visa": "korea passport document office",
+        "Wedding": "wedding couple korea ceremony",
+        "Education": "korea university campus student",
+        "Job": "korea office career work professional",
+        "K-Pop": "kpop concert music stage performance",
+        "한국 뉴스": "korea seoul city skyline news",
+        "Korea News": "korea politics economy business news",
     }
-    extra = theme_extras.get(site_theme, "korea")
     
-    # 페이지 랜덤화로 중복 방지
-    rand_page = random.randint(1, 10) + attempt
+    # 테마 매칭
+    extra = "Korea"
+    for theme_key, theme_search in THEME_SEARCH.items():
+        if theme_key.lower() in site_theme.lower():
+            extra = theme_search
+            break
     
-    urls = []
+    # 랜덤 페이지 (중복 방지) - 시간+키워드 해시 기반
+    hash_val = int(hashlib.md5(f"{keyword}{int(_time.time()//3600)}".encode()).hexdigest()[:4], 16)
+    rand_page = (hash_val % 15) + 1 + attempt * 3
     
-    # 1차: Pixabay
+    def is_safe_image(url: str, tags: str = "") -> bool:
+        """의료 수술 이미지 필터링"""
+        check_str = (url + " " + tags).lower()
+        for block in MEDICAL_BLOCK:
+            if block.lower() in check_str:
+                return False
+        return True
+    
+    url = None
+    
+    # ── 1차: Pixabay ──
     if PIXABAY_KEY:
+        for q in [f"{search_kw}", f"{extra}", "Korea Seoul"]:
+            try:
+                r = requests.get("https://pixabay.com/api/", params={
+                    "key": PIXABAY_KEY,
+                    "q": q,
+                    "image_type": "photo",
+                    "per_page": 20,
+                    "page": rand_page,
+                    "safesearch": "true",
+                    "min_width": 800,
+                    "orientation": "horizontal",
+                }, timeout=10)
+                if r.status_code == 200:
+                    hits = r.json().get("hits", [])
+                    random.shuffle(hits)
+                    for h in hits:
+                        img_url = h.get("webformatURL", "")
+                        tags = h.get("tags", "")
+                        if img_url and is_safe_image(img_url, tags):
+                            url = img_url
+                            break
+                if url: break
+            except: continue
+    
+    # ── 2차: Pexels ──
+    if not url and PEXELS_KEY:
+        for q in [search_kw, extra, "Korea"]:
+            try:
+                r = requests.get(
+                    "https://api.pexels.com/v1/search",
+                    headers={"Authorization": PEXELS_KEY},
+                    params={"query": q, "per_page": 15,
+                            "page": rand_page, "orientation": "landscape"},
+                    timeout=10)
+                if r.status_code == 200:
+                    photos = r.json().get("photos", [])
+                    random.shuffle(photos)
+                    for p in photos:
+                        img_url = p.get("src", {}).get("large", "")
+                        if img_url and is_safe_image(img_url):
+                            url = img_url
+                            break
+                if url: break
+            except: continue
+    
+    # ── 3차: Pixabay Korea 폴백 ──
+    if not url and PIXABAY_KEY:
         try:
             r = requests.get("https://pixabay.com/api/", params={
-                "key": PIXABAY_KEY, "q": f"{search_kw} {extra}",
-                "image_type": "photo", "per_page": 10, "page": rand_page,
-                "safesearch": "true", "min_width": 800,
-            }, timeout=10)
-            if r.status_code == 200:
-                hits = r.json().get("hits", [])
-                random.shuffle(hits)
-                urls = [h["webformatURL"] for h in hits[:3] if h.get("webformatURL")]
-        except: pass
-    
-    # 2차: Pexels (Pixabay 실패 시)
-    if not urls and PEXELS_KEY:
-        try:
-            r = requests.get("https://api.pexels.com/v1/search", 
-                           headers={"Authorization": PEXELS_KEY},
-                           params={"query": f"{search_kw}", "per_page": 10,
-                                   "page": rand_page}, timeout=10)
-            if r.status_code == 200:
-                photos = r.json().get("photos", [])
-                random.shuffle(photos)
-                urls = [p["src"]["large"] for p in photos[:3] if p.get("src")]
-        except: pass
-    
-    # 3차: Pixabay 다른 키워드로 재시도
-    if not urls and PIXABAY_KEY:
-        try:
-            r = requests.get("https://pixabay.com/api/", params={
-                "key": PIXABAY_KEY, "q": extra,
-                "image_type": "photo", "per_page": 10, "page": 1,
+                "key": PIXABAY_KEY,
+                "q": "Korea Seoul city",
+                "image_type": "photo",
+                "per_page": 20, "page": 1,
                 "safesearch": "true",
             }, timeout=10)
             if r.status_code == 200:
                 hits = r.json().get("hits", [])
-                urls = [h["webformatURL"] for h in hits[:3] if h.get("webformatURL")]
+                if hits:
+                    url = hits[hash_val % len(hits)].get("webformatURL", "")
         except: pass
     
-    return urls
+    return [url] if url else []
 
 
 def request_indexing_all(site_url: str, post_url: str, pw: str):
@@ -2547,9 +2612,10 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
     category_name = get_category_for_post(theme, keyword, title)
     category_id   = get_or_create_wp_category(site_url, wp_pass, category_name)
 
-    hero_img = build_image_html(image_urls[:1], keyword)   if image_urls        else ""
-    mid_img  = build_image_html(image_urls[1:2], keyword)  if len(image_urls)>1 else ""
-    end_img  = build_image_html(image_urls[2:3], keyword)  if len(image_urls)>2 else ""
+    # ★ 이미지 1개만 (반복 방지, Featured Image로 활용)
+    hero_img = build_image_html(image_urls[:1], keyword) if image_urls else ""
+    mid_img  = ""  # 중간 이미지 제거
+    end_img  = ""  # 하단 이미지 제거
     faq_html = build_faq_schema_html(faq_list)
 
     h2_ends = [m.end() for m in re.finditer(r'</h2>', body_html, re.IGNORECASE)]
