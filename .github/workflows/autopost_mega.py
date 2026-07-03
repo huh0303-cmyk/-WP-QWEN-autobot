@@ -280,10 +280,22 @@ THEME_CATEGORIES = {
     },
     "K-POP": {
         "default": "Artists",
-        "golden": ["Artists","Music","Tours"],
+        "golden": ["Artists","Music","Tours","Etc"],
         "keyword_map": [
             (["album","release","comeback","single","MV","track","playlist","song","lyrics"], "Music"),
             (["concert","tour","performance","live","show","event","stadium","ticket"], "Tours"),
+        ]
+    },
+    "K-Culture": {
+        "default": "K-Pop & Artists",
+        "golden": ["K-Pop & Artists","K-Culture & Learn Korean","Korean Life & Travel","Etc"],
+        "keyword_map": [
+            (["learn korean","study korean","korean language","TOPIK","grammar","vocabulary",
+              "hangul","korean class","korean lesson","speak korean","korean alphabet",
+              "free korean","korean for beginners","한국어"], "K-Culture & Learn Korean"),
+            (["travel","food","restaurant","Seoul","Busan","Jeju","trip","tour","tourism",
+              "korean life","living in korea","expat","foreigner","korean culture",
+              "korean tradition","kdrama","k-drama"], "Korean Life & Travel"),
         ]
     },
     "Travel": {
@@ -543,8 +555,8 @@ SITES_CONFIG = [
      "keywords_file":".github/workflows/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":3},
     {"url":"https://oliveyoungkorea.com",     "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",
      "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":5},
-    {"url":"https://kworld365.com",           "lang":"en","theme":"K-POP",               "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":3},  # 무료화: 5→4
+    {"url":"https://kworld365.com",           "lang":"en","theme":"K-Culture",           "mode":"blog",
+     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":5},
     {"url":"https://k-trip365.com",           "lang":"en","theme":"Travel",              "mode":"blog",
      "keywords_file":".github/workflows/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":2},
     {"url":"https://k-visa365.com",           "lang":"en","theme":"Visa Guide",          "mode":"blog",
