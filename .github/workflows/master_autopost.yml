@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       step:
-        description: "setup=구조 / post=발행 / ads=adstxt / check=상태확인 / all=전체"
+        description: "setup / post / ads / check / verify=애드센스확인 / all"
         required: false
         default: "post"
       run_slot:
@@ -54,6 +54,52 @@ jobs:
           echo "run_ads=$RUN_ADS"     >> "$GITHUB_OUTPUT"
           echo "▶ 슬롯=$SLOT | setup=$RUN_SETUP | post=$RUN_POST | ads=$RUN_ADS"
 
+
+
+# ══════════════════════════════════════════════════════════
+# JOB: AdSense 소유권확인 + 크롤링 유도
+# ══════════════════════════════════════════════════════════
+  adsense-verify:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'verify' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "🔑 AdSense 소유권확인 + ads.txt + 크롤링유도"
+        env:
+          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM:          ${{ secrets.KTECH365COM }}
+          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
+          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
+          KVISA365COM:          ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
+        run: python .github/workflows/adsense_verify.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: 전체 사이트 상태 확인
