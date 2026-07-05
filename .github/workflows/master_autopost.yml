@@ -106,6 +106,26 @@ jobs:
 
 
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: k-health365 카테고리 5개 설정
+# ══════════════════════════════════════════════════════════
+  fix-khealth-cats:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'khealth' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "k-health365 카테고리 5개 + 리디렉션"
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python .github/workflows/fix_khealth_cats.py
+
 # ══════════════════════════════════════════════════════════
 # JOB: k-health365 color index fix
 # ══════════════════════════════════════════════════════════
