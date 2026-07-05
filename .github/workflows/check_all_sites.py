@@ -32,28 +32,66 @@ SITES = [
     ("https://theseouljournal.com",    "THESEOULJOURNALCOM"),
 ]
 
-print(f"{'#':>2} {'도메인':<30} {'현재글수':>8}")
-print("=" * 45)
+BEFORE = {
+    "k-health365.com": 519,
+    "koreamedicaltour.com": 95,
+    "koreainvest365.com": 53,
+    "ki-korea.com": 27,
+    "koreainsurance365.com": 80,
+    "kfinance365.com": 78,
+    "koreataxnlaw.com": 89,
+    "koreacrypto365.com": 47,
+    "krealestate365.com": 24,
+    "ktech365.com": 51,
+    "kskin365.com": 72,
+    "oliveyoungkorea.com": 40,
+    "kworld365.com": 4,
+    "k-trip365.com": 444,
+    "k-visa365.com": 62,
+    "koreawedding365.com": 40,
+    "kstudy365.com": 51,
+    "studyinkorea365.com": 44,
+    "kieca-korea.org": 24,
+    "ksa-korea.org": 25,
+    "sis-korea.com": 29,
+    "jobkorea365.com": 57,
+    "jobinkorea365.com": 64,
+    "jobkoreaglobal.com": 54,
+    "korea365.org": 111,
+    "koreanews365.com": 127,
+    "theseouljournal.com": 131,
+}
 
-total = 0
+print(f"{'#':>2} {'도메인':<28} {'삭제전':>6} {'현재':>6} {'삭제됨':>7}")
+print("=" * 55)
+
+total_before = total_now = total_del = 0
 for i, (url, env) in enumerate(SITES, 1):
-    pw = os.getenv(env, "")
+    pw  = os.getenv(env, "")
     dom = url.replace("https://","")
+    before = BEFORE.get(dom, 0)
+
     if not pw:
-        print(f"{i:>2} {dom:<30} {'비번없음':>8}")
+        print(f"{i:>2} {dom:<28} {before:>6} {'?':>6} {'?':>7}")
         continue
+
     try:
-        r = requests.get(f"{url}/wp-json/wp/v2/posts", auth=(WP_USER, pw),
-                        params={"per_page":1,"status":"publish"}, timeout=10)
+        r = requests.get(url + "/wp-json/wp/v2/posts",
+                        auth=(WP_USER, pw),
+                        params={"per_page":1,"status":"publish"},
+                        timeout=10)
         if r.status_code == 200:
-            count = int(r.headers.get("X-WP-Total", 0))
-            total += count
-            print(f"{i:>2} {dom:<30} {count:>8}")
+            now = int(r.headers.get("X-WP-Total", 0))
+            deleted = before - now
+            total_before += before
+            total_now    += now
+            total_del    += deleted
+            print(f"{i:>2} {dom:<28} {before:>6} {now:>6} {deleted:>7}")
         else:
-            print(f"{i:>2} {dom:<30} {'오류':>8} ({r.status_code})")
+            print(f"{i:>2} {dom:<28} {before:>6} {'ERR':>6} {r.status_code:>7}")
     except:
-        print(f"{i:>2} {dom:<30} {'접속불가':>8}")
+        print(f"{i:>2} {dom:<28} {before:>6} {'ERR':>6} {'?':>7}")
     time.sleep(0.3)
 
-print("=" * 45)
-print(f"{'합계':<32} {total:>8}")
+print("=" * 55)
+print(f"{'합계':<30} {total_before:>6} {total_now:>6} {total_del:>7}")
