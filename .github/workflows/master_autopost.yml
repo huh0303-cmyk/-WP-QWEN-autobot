@@ -105,6 +105,26 @@ jobs:
 
 
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: k-health365 color index fix
+# ══════════════════════════════════════════════════════════
+  fix-khealth:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'khealth' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "k-health365 noindex remove + index fix"
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python .github/workflows/fix_khealth_index.py
+
 # ══════════════════════════════════════════════════════════
 # JOB: 27개 사이트 글 전수조사
 # ══════════════════════════════════════════════════════════
