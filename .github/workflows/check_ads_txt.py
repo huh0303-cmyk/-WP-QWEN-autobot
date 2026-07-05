@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ads.txt "찾을 수 없음" 문제를 겪는 사이트들을 일괄 점검하는 스크립트.
+27개 전체 사이트 ads.txt 상태 일괄 점검 스크립트.
 - http/https 리다이렉트 상태 확인
 - ads.txt 존재 여부 및 상태 코드 확인
 - AdSense publisher ID 포함 여부 확인
@@ -14,17 +14,34 @@ from datetime import datetime
 
 PUBLISHER_ID = "pub-3456727916386941"
 
-# 지금 AdSense에서 "찾을 수 없음"으로 뜬 9개 사이트
 DOMAINS = [
-    "k-trip365.com",
-    "kworld365.com",
-    "kstudy365.com",
+    "k-health365.com",
+    "koreamedicaltour.com",
+    "koreainvest365.com",
+    "ki-korea.com",
     "koreainsurance365.com",
-    "jobkoreaglobal.com",
-    "koreanews365.com",
-    "jobinkorea365.com",
-    "theseouljournal.com",
+    "kfinance365.com",
+    "koreataxnlaw.com",
+    "koreacrypto365.com",
+    "krealestate365.com",
+    "ktech365.com",
+    "kskin365.com",
+    "oliveyoungkorea.com",
+    "kworld365.com",
+    "k-trip365.com",
+    "k-visa365.com",
+    "koreawedding365.com",
+    "kstudy365.com",
+    "studyinkorea365.com",
+    "kieca-korea.org",
+    "ksa-korea.org",
     "sis-korea.com",
+    "jobkorea365.com",
+    "jobinkorea365.com",
+    "jobkoreaglobal.com",
+    "korea365.org",
+    "koreanews365.com",
+    "theseouljournal.com",
 ]
 
 HEADERS = {
@@ -63,7 +80,6 @@ def check_domain(domain):
 
 
 def analyze(result):
-    domain = result["domain"]
     lines = []
     any_success = False
     for url, r in result.items():
@@ -91,7 +107,7 @@ def main():
     print("=" * 100)
 
     results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(check_domain, d): d for d in DOMAINS}
         for future in concurrent.futures.as_completed(futures):
             results.append(future.result())
