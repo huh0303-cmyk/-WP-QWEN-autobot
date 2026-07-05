@@ -103,6 +103,33 @@ jobs:
 
 
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: sitemap 오류 긴급 수정
+# ══════════════════════════════════════════════════════════
+  fix-sitemaps:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fixsm' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "🔧 sitemap 오류 수정 + 퍼머링크 재저장"
+        env:
+          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
+          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
+          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
+          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
+          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
+        run: python .github/workflows/fix_sitemaps.py
+
 # ══════════════════════════════════════════════════════════
 # JOB: Sitemap 27개 전체 제출
 # ══════════════════════════════════════════════════════════
