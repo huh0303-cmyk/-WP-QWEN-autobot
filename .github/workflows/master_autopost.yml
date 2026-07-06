@@ -236,6 +236,26 @@ jobs:
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/audit_posts.py
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: k-trip365 더미글 삭제
+# ══════════════════════════════════════════════════════════
+  clean-ktrip:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'ktrip' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "k-trip365 더미글 삭제"
+        env:
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        run: python .github/workflows/clean_ktrip.py
+
 # ══════════════════════════════════════════════════════════
 # JOB: sitemap 오류 긴급 수정
 # ══════════════════════════════════════════════════════════
