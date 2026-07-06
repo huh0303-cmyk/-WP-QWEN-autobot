@@ -192,11 +192,12 @@ THEME_CATEGORIES = {
         ]
     },
     "Korea Medical Tourism": {
-        "default": "성형·피부과",
-        "golden": ["성형·피부과","정부지원혜택","비용·병원비","Etc"],
+        "default": "Cosmetic Surgery",
+        "golden": ["Cosmetic Surgery","Government Support","Hospital Costs","Etc"],
         "keyword_map": [
-            (["정부","지자체","서울시","부산","대구","인천","지원","혜택","보조","의료관광"], "정부지원혜택"),
-            (["비용","가격","cost","price","fee","얼마","견적","할인","패키지"], "비용·병원비"),
+            (["정부","지자체","서울시","부산","대구","인천","지원","혜택","보조","의료관광",
+              "government","subsidy","support","benefit"], "Government Support"),
+            (["비용","가격","cost","price","fee","얼마","견적","할인","패키지"], "Hospital Costs"),
         ]
     },
     "Investment": {
@@ -208,51 +209,53 @@ THEME_CATEGORIES = {
         ]
     },
     "Korea Investment": {
-        "default": "국내주식·ETF",
-        "golden": ["국내주식·ETF","부동산·청약","절세·연금","기타"],
+        "default": "Stocks",
+        "golden": ["Stocks","Real Estate","Pension","Etc"],
         "keyword_map": [
-            (["부동산","아파트","청약","분양","전세","리츠","토지","오피스텔"], "부동산·청약"),
-            (["절세","IRP","연금","비과세","공제","채권","금리","세금","펀드"], "절세·연금"),
+            (["부동산","아파트","청약","분양","전세","리츠","토지","오피스텔",
+              "real estate","apartment","subscription"], "Real Estate"),
+            (["절세","IRP","연금","비과세","공제","채권","금리","세금","펀드",
+              "tax saving","pension","bond"], "Pension"),
         ]
     },
     "Insurance": {
-        "default": "외국인 건강보험",
-        "golden": ["외국인 건강보험","외국인 자동차보험","외국인 치과보험","Etc"],
+        "default": "Health Insurance",
+        "golden": ["Health Insurance","Auto Insurance","Dental Insurance","Etc"],
         "keyword_map": [
-            (["car","auto","vehicle","driver","traffic","자동차","운전","교통사고"], "외국인 자동차보험"),
-            (["dental","치과","implant","임플란트","tooth","teeth","scaling","orthodontics"], "외국인 치과보험"),
+            (["car","auto","vehicle","driver","traffic","자동차","운전","교통사고"], "Auto Insurance"),
+            (["dental","치과","implant","임플란트","tooth","teeth","scaling","orthodontics"], "Dental Insurance"),
         ]
     },
     "Finance": {
-        "default": "외국인 은행·송금",
-        "golden": ["외국인 은행·송금","외국인 투자·주식","외국인 세금·환급","Etc"],
+        "default": "Banking",
+        "golden": ["Banking","Investing","Tax Refund","Etc"],
         "keyword_map": [
-            (["stock","invest","ETF","fund","KOSPI","trading","portfolio","dividend","주식","펀드"], "외국인 투자·주식"),
-            (["tax","세금","refund","환급","VAT","income tax","deduction","신고","연말정산"], "외국인 세금·환급"),
+            (["stock","invest","ETF","fund","KOSPI","trading","portfolio","dividend","주식","펀드"], "Investing"),
+            (["tax","세금","refund","환급","VAT","income tax","deduction","신고","연말정산"], "Tax Refund"),
         ]
     },
     "Tax and Law": {
-        "default": "외국인 세금·신고",
-        "golden": ["외국인 세금·신고","외국인 법인·창업","외국인 비자·체류","Etc"],
+        "default": "Tax Filing",
+        "golden": ["Tax Filing","Business Setup","Visa","Etc"],
         "keyword_map": [
-            (["business","company","startup","corporation","법인","창업","registration","투자","M&A"], "외국인 법인·창업"),
-            (["visa","immigration","체류","residence","permit","비자","ARC","HiKorea","출입국"], "외국인 비자·체류"),
+            (["business","company","startup","corporation","법인","창업","registration","투자","M&A"], "Business Setup"),
+            (["visa","immigration","체류","residence","permit","비자","ARC","HiKorea","출입국"], "Visa"),
         ]
     },
     "Crypto": {
-        "default": "업비트·거래소 가입",
-        "golden": ["업비트·거래소 가입","외국인 코인 투자법","한국 가상화폐 규제","Etc"],
+        "default": "Exchanges",
+        "golden": ["Exchanges","Investing","Regulations","Etc"],
         "keyword_map": [
-            (["foreign","외국인","invest","투자","buy","구매","how to","방법","guide","beginner"], "외국인 코인 투자법"),
-            (["regulation","규제","law","FSC","금융위","tax","세금","legal","policy","ban","허용"], "한국 가상화폐 규제"),
+            (["foreign","외국인","invest","투자","buy","구매","how to","방법","guide","beginner"], "Investing"),
+            (["regulation","규제","law","FSC","금융위","tax","세금","legal","policy","ban","허용"], "Regulations"),
         ]
     },
     "Korea Real Estate": {
-        "default": "아파트 매매·전세·월세",
-        "golden": ["아파트 매매·전세·월세","상가·사업장 임대","외국인 대출·세금","기타"],
+        "default": "Apartments",
+        "golden": ["Apartments","Commercial","Loans","Etc"],
         "keyword_map": [
-            (["상가","사무실","office","store","사업장","임대","월세","lease","commercial"], "상가·사업장 임대"),
-            (["대출","loan","세금","tax","취득세","양도세","mortgage","은행","금리"], "외국인 대출·세금"),
+            (["상가","사무실","office","store","사업장","임대","월세","lease","commercial"], "Commercial"),
+            (["대출","loan","세금","tax","취득세","양도세","mortgage","은행","금리"], "Loans"),
         ]
     },
     "Technology": {
@@ -273,8 +276,8 @@ THEME_CATEGORIES = {
         ]
     },
     "K-Beauty Reviews": {
-        "default": "인기상품 TOP30",
-        "golden": ["인기상품 TOP30","Skincare","Wellness","Etc"],
+        "default": "Top Products",
+        "golden": ["Top Products","Skincare","Wellness","Etc"],
         "keyword_map": [
             (["skincare","toner","serum","moisturizer","sunscreen","essence","ampoule","cream","skin"], "Skincare"),
             (["wellness","supplement","vitamin","probiotic","collagen","health","inner beauty","gut"], "Wellness"),
@@ -289,23 +292,23 @@ THEME_CATEGORIES = {
         ]
     },
     "K-Culture": {
-        "default": "K-Pop & Artists",
-        "golden": ["K-Pop & Artists","K-Culture & Learn Korean","Korean Life & Travel","Etc"],
+        "default": "K-Pop",
+        "golden": ["K-Pop","Learn Korean","Travel","Etc"],
         "keyword_map": [
             (["learn korean","study korean","korean language","TOPIK","grammar","vocabulary",
               "hangul","korean class","korean lesson","speak korean","korean alphabet",
-              "free korean","korean for beginners","한국어"], "K-Culture & Learn Korean"),
+              "free korean","korean for beginners","한국어"], "Learn Korean"),
             (["travel","food","restaurant","Seoul","Busan","Jeju","trip","tour","tourism",
               "korean life","living in korea","expat","foreigner","korean culture",
-              "korean tradition","kdrama","k-drama"], "Korean Life & Travel"),
+              "korean tradition","kdrama","k-drama"], "Travel"),
         ]
     },
     "Travel": {
-        "default": "Hotels & Stays",
-        "golden": ["Hotels & Stays","AirBnB & 민박","Travel Guides","Etc"],
+        "default": "Hotels",
+        "golden": ["Hotels","AirBnB","Guides","Etc"],
         "keyword_map": [
-            (["airbnb","민박","guesthouse","pension","게스트하우스","민박집","여기어때","숙박"], "AirBnB & 민박"),
-            (["guide","itinerary","travel","tour","trip","visit","attraction","sightseeing","여행"], "Travel Guides"),
+            (["airbnb","민박","guesthouse","pension","게스트하우스","민박집","여기어때","숙박"], "AirBnB"),
+            (["guide","itinerary","travel","tour","trip","visit","attraction","sightseeing","여행"], "Guides"),
         ]
     },
     "Visa Guide": {
@@ -317,11 +320,11 @@ THEME_CATEGORIES = {
         ]
     },
     "Wedding": {
-        "default": "결혼·법적·비자",
-        "golden": ["결혼·법적·비자","자녀국적·교육혜택","매칭·결혼비용","Etc"],
+        "default": "Marriage",
+        "golden": ["Marriage","Education","Matching","Etc"],
         "keyword_map": [
-            (["child","자녀","nationality","국적","education","교육","school","학교","benefit","혜택"], "자녀국적·교육혜택"),
-            (["match","matchmaking","소개","맞선","비용","cost","price","wedding cost","결혼비용","agency"], "매칭·결혼비용"),
+            (["child","자녀","nationality","국적","education","교육","school","학교","benefit","혜택"], "Education"),
+            (["match","matchmaking","소개","맞선","비용","cost","price","wedding cost","결혼비용","agency"], "Matching"),
         ]
     },
     "Study in Korea": {
@@ -349,11 +352,11 @@ THEME_CATEGORIES = {
         ]
     },
     "한국유학정보": {
-        "default": "입학정보",
-        "golden": ["입학정보","장학금","비자"],
+        "default": "Admissions",
+        "golden": ["Admissions","Scholarships","Visa"],
         "keyword_map": [
-            (["장학금","GKS","정부초청","지원금","면제","장학"], "장학금"),
-            (["비자","D-2","출입국","체류","연장","HiKorea","사증"], "비자"),
+            (["장학금","GKS","정부초청","지원금","면제","장학","scholarship"], "Scholarships"),
+            (["비자","D-2","출입국","체류","연장","HiKorea","사증","visa"], "Visa"),
         ]
     },
     "Korea Career Programs": {
@@ -389,11 +392,11 @@ THEME_CATEGORIES = {
         ]
     },
     "Korea Culture": {
-        "default": "Korean Culture",
-        "golden": ["Korean Culture","Travel & Food","Living in Korea"],
+        "default": "Culture",
+        "golden": ["Culture","Travel","Living"],
         "keyword_map": [
-            (["food","cuisine","recipe","dish","eat","restaurant","travel","tourism","trip","destination","cafe"], "Travel & Food"),
-            (["living","expat","foreigner","daily","tips","cost","apartment","transport","language","hangul","move"], "Living in Korea"),
+            (["food","cuisine","recipe","dish","eat","restaurant","travel","tourism","trip","destination","cafe"], "Travel"),
+            (["living","expat","foreigner","daily","tips","cost","apartment","transport","language","hangul","move"], "Living"),
         ]
     },
 }
@@ -2663,7 +2666,7 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
     category_name = get_category_for_post(theme, keyword, title)
     # ★ kworld365.com: AdSense 심사 대비 하루 3건, 슬롯별로 카테고리 강제 고정 배정
     if "kworld365" in site_url:
-        _kworld_slot_cat = {1: "K-Pop & Artists", 2: "K-Culture & Learn Korean", 3: "Korean Life & Travel"}
+        _kworld_slot_cat = {1: "K-Pop", 2: "Learn Korean", 3: "Travel"}
         category_name = _kworld_slot_cat.get(RUN_SLOT, category_name)
     category_id   = get_or_create_wp_category(site_url, wp_pass, category_name)
 
@@ -2927,7 +2930,7 @@ def process_one_post(site: dict, keyword: str) -> bool:
 
     category_name = get_category_for_post(theme, keyword, title)
     if "kworld365" in url:
-        category_name = {1: "K-Pop & Artists", 2: "K-Culture & Learn Korean", 3: "Korean Life & Travel"}.get(RUN_SLOT, category_name)
+        category_name = {1: "K-Pop", 2: "Learn Korean", 3: "Travel"}.get(RUN_SLOT, category_name)
     print(f"  📁 카테고리: {category_name}")
 
     if mode in ("news", "news_en") and title:
