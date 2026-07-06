@@ -1969,6 +1969,34 @@ def _truncate_tag(tag: str, max_words: int = 3, max_chars: int = 20) -> str:
     if len(tag) > max_chars:   tag = tag[:max_chars].rstrip()
     return tag
 
+# ★ k-health365 전용 "황금 태그" 고정 풀 (매번 새 태그 생성 대신 이 안에서만 재사용
+#   → 태그 아카이브 페이지 난립(1회성 희석 페이지) 방지, 태그 페이지당 다건 축적으로 SEO 강화)
+GOLDEN_TAGS_KHEALTH = [
+    "영양제", "비타민", "오메가3", "콜라겐", "유산균", "콘드로이친", "알부민",
+    "혈압관리", "당뇨관리", "콜레스테롤", "관절건강", "피부건강", "수면건강",
+    "다이어트", "면역력", "항산화", "장건강", "간건강", "눈건강", "뇌건강",
+    "실비보험", "건강정보", "질환예방",
+]
+
+def select_golden_tags(keyword: str, title: str, body: str, max_tags: int = 5) -> list:
+    """황금 태그 풀 안에서만 매칭되는 태그를 골라 반환 (신규 태그 생성 없음)"""
+    search_text = f"{keyword} {title} {body}".lower()
+    matched = [t for t in GOLDEN_TAGS_KHEALTH if t.lower() in search_text]
+    if keyword not in matched:
+        matched.insert(0, keyword)
+    seen = set(); out = []
+    for t in matched:
+        k = t.strip().lower()
+        if k and k not in seen:
+            seen.add(k); out.append(t)
+    if len(out) < 3:
+        for t in GOLDEN_TAGS_KHEALTH:
+            if t not in out:
+                out.append(t)
+            if len(out) >= 3:
+                break
+    return out[:max_tags]
+
 def extract_tags_from_article(article_text: str, fallback_keyword: str,
                                theme: str = None, lang: str = "ko"):
     lines = article_text.strip().split("\n")
@@ -2107,10 +2135,10 @@ def estimate_seo_score(title: str, body: str, meta_desc: str, tags: list,
     elif len(faq_list) >= 2: score += 3
     elif len(faq_list) >= 1: score += 1
 
-    # ★ 태그 (5점)
-    if   len(tags) >= TAG_COUNT: score += 5
-    elif len(tags) >= 8:         score += 3
-    elif len(tags) >= 4:         score += 1
+    # ★ 태그 (5점) — 다수 생성보다 "황금 태그" 재사용 품질을 반영하도록 기준 완화
+    if   len(tags) >= 5: score += 5
+    elif len(tags) >= 3: score += 3
+    elif len(tags) >= 1: score += 1
 
     return max(0, min(score, 100))
 
@@ -2823,7 +2851,12 @@ def process_one_post(site: dict, keyword: str) -> bool:
         time.sleep(RATE_LIMIT_SLEEP)
 
         body_raw, title, meta_desc, faq_list = extract_meta_and_faq(raw)
-        body, tags = extract_tags_from_article(body_raw, keyword, theme, lang)
+        if is_khealth:
+            # 본문에서 TAGS: 줄만 제거하고 본문은 그대로 사용, 태그는 황금풀에서 선택
+            body, _discard_tags = extract_tags_from_article(body_raw, keyword, theme, lang)
+            tags = select_golden_tags(keyword, title, body)
+        else:
+            body, tags = extract_tags_from_article(body_raw, keyword, theme, lang)
 
         if not title:
             title = apply_title_template(
