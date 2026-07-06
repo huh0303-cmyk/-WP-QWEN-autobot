@@ -1,0 +1,12 @@
+
+https://k-trip365.com
+  'Hotels & Stays'(id=3067) -> 'Hotels': status=401 {"code":"rest_cannot_update","message":"\uc8c4\uc1a1\ud558\uc9c0\ub9cc, \uc774 \ud56d\ubaa9\uc744 \ud3b8\uc9d1\ud560 \uad8c\ud55c\uc774 \uc5c6\uc2b5\u
+  'AirBnB & 민박'(id=3082) -> 'AirBnB': status=401 {"code":"rest_cannot_update","message":"\uc8c4\uc1a1\ud558\uc9c0\ub9cc, \uc774 \ud56d\ubaa9\uc744 \ud3b8\uc9d1\ud560 \uad8c\ud55c\uc774 \uc5c6\uc2b5\u
+
+https://kworld365.com
+  'K-Pop & Artists'(id=2) -> 'K-Pop': status=200 {"id":2,"count":0,"description":"Latest K-pop news, artist profiles, album reviews and concert guides for global fans","link":"https:\/\/kworld365.com
+  'K-Culture & Learn Korean'(id=16) -> 'Learn Korean': status=200 {"id":16,"count":1,"description":"K-Culture &amp; Learn Korean category","link":"https:\/\/kworld365.com\/category\/k-culture-learn-korean\/","name":"
+  'Korean Life & Travel'(id=4) -> 'Travel': status=200 {"id":4,"count":0,"description":"Seoul travel tips, Korean food guides, expat life and culture in Korea","link":"https:\/\/kworld365.com\/category\/ko
+
+https://korea365.org
+  'Travel & Food'(id=743) -> 'Travel': status=200 {"id":743,"count":0,"description":"Travel &amp; Food category","link":"https:\/\/korea365.org\/category\/travel-food\/","name":"Travel","slug":"travel
