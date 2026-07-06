@@ -1,84 +1,121 @@
-import os, requests, time
+import os, requests, time, re, html
 
 WP_USER = "huh0303@gmail.com"
+SITE    = "https://k-trip365.com"
+pw      = os.getenv("KTRIP365COM", "")
 
-SITES = [
-    ("https://k-health365.com",       "KHEALTH365COM"),
-    ("https://koreamedicaltour.com",   "KOREAMEDICALTOURCOM"),
-    ("https://koreainvest365.com",     "KOREAINVEST365COM"),
-    ("https://ki-korea.com",           "KIKOREACOM"),
-    ("https://koreainsurance365.com",  "KOREAINSURANCE365COM"),
-    ("https://kfinance365.com",        "KFINANCE365COM"),
-    ("https://koreataxnlaw.com",       "KOREATAXNLAWCOM"),
-    ("https://koreacrypto365.com",     "KOREACRYPTO365COM"),
-    ("https://krealestate365.com",     "KREALESTATE365COM"),
-    ("https://ktech365.com",           "KTECH365COM"),
-    ("https://kskin365.com",           "KSKIN365COM"),
-    ("https://oliveyoungkorea.com",    "OLIVEYOUNGKOREACOM"),
-    ("https://kworld365.com",          "KWORLD365COM"),
-    ("https://k-trip365.com",          "KTRIP365COM"),
-    ("https://k-visa365.com",          "KVISA365COM"),
-    ("https://koreawedding365.com",    "KOREAWEDDING365COM"),
-    ("https://kstudy365.com",          "KSTUDY365COM"),
-    ("https://studyinkorea365.com",    "STUDYINKOREA365COM"),
-    ("https://kieca-korea.org",        "KIECAKOREAORG"),
-    ("https://ksa-korea.org",          "KSAKOREAORG"),
-    ("https://sis-korea.com",          "SISKOREACOM"),
-    ("https://jobkorea365.com",        "JOBKOREA365COM"),
-    ("https://jobinkorea365.com",      "JOBINKOREA365COM"),
-    ("https://jobkoreaglobal.com",     "JOBKOREAGLOBALCOM"),
-    ("https://korea365.org",           "KOREA365ORG"),
-    ("https://koreanews365.com",       "KOREANEWS365COM"),
-    ("https://theseouljournal.com",    "THESEOULJOURNALCOM"),
+if not pw:
+    print("NO PASSWORD"); exit(1)
+
+base = SITE + "/wp-json/wp/v2"
+auth = (WP_USER, pw)
+
+print("=== k-trip365.com 더미글 삭제 시작 ===")
+
+# 삭제 대상 패턴
+DUMMY_PATTERNS = [
+    r"hello world",
+    r"sample page",
+    r"lorem ipsum",
+    r"this is an example",
+    r"welcome to wordpress",
+    r"just another wordpress",
+    r"test post",
+    r"draft",
+    r"untitled",
+    r"^sample",
+    r"^test",
 ]
 
-def fix(url, pw):
-    dom = url.replace("https://","")
-    base = url + "/wp-json/wp/v2"
-    auth = (WP_USER, pw)
+# 한국 관련 키워드 (이것 없으면 삭제 후보)
+KOREA_KEYWORDS = [
+    "korea","korean","seoul","busan","jeju","incheon","gangnam","hongdae",
+    "hanok","temple","palace","dmz","kpop","k-pop","hallyu","hansik",
+    "bibimbap","bulgogi","kimchi","tteokbokki","samgyeopsal","galbi",
+    "hotel","hostel","airbnb","pension","resort","guesthouse",
+    "travel","trip","tour","visit","itinerary","tourist","attraction",
+    "subway","ktx","bus","transport","flight","airport",
+    "restaurant","cafe","food","eat","drink","market","shopping",
+    "visa","foreigner","expat","tourist","currency","won",
+    "spring","summer","autumn","fall","winter","cherry blossom",
+    "hiking","mountain","beach","island","nature","park",
+    "한국","서울","부산","제주","여행","관광","호텔","맛집","음식",
+    "숙소","교통","지하철","버스","공항","펜션","리조트",
+]
 
-    # 퍼머링크 3회 재저장
-    for _ in range(3):
-        requests.post(base + "/settings", auth=auth,
-                     json={"permalink_structure": "/%postname%/"}, timeout=10)
-        time.sleep(1)
+# 전체 글 수집
+all_posts = []
+page = 1
+while True:
+    r = requests.get(base + "/posts", auth=auth,
+                    params={"per_page":100,"page":page,
+                            "status":"publish",
+                            "_fields":"id,title,content,date"},
+                    timeout=20)
+    if r.status_code != 200 or not r.json(): break
+    all_posts.extend(r.json())
+    if len(r.json()) < 100: break
+    page += 1
+    time.sleep(0.2)
 
-    requests.post(base + "/settings", auth=auth,
-                 json={"blog_public": True}, timeout=8)
+print(f"총 글 수: {len(all_posts)}")
 
-    time.sleep(3)
+keep = delete = 0
+deleted_titles = []
 
-    # sitemap 확인
-    sm_ok = False
-    for path in ["/sitemap_index.xml", "/sitemap.xml"]:
-        try:
-            r = requests.get(url + path, timeout=10,
-                           headers={"User-Agent": "Googlebot/2.1"})
-            if r.status_code == 200 and len(r.text) > 100:
-                sm_ok = True
-                enc = requests.utils.quote(url + path)
-                requests.get("https://www.google.com/ping?sitemap=" + enc, timeout=5)
-                requests.get("https://www.bing.com/ping?sitemap=" + enc, timeout=5)
-                print("OK " + dom + path)
-                break
-        except:
-            pass
+for p in all_posts:
+    t     = p.get("title",{})
+    title = html.unescape(re.sub('<[^>]+>','',
+            t.get("rendered","") if isinstance(t,dict) else str(t))).strip()
+    c     = p.get("content",{})
+    body  = re.sub('<[^>]+>','',
+            c.get("rendered","") if isinstance(c,dict) else str(c))
+    body_len = len(body.replace(' ','').replace('\n',''))
 
-    if not sm_ok:
-        print("FAIL " + dom)
+    title_lower = title.lower()
+    body_lower  = body.lower()
 
-print("=" * 55)
-print("sitemap fix 27 sites")
-print("=" * 55)
-ok = skip = 0
-for url, env in SITES:
-    pw = os.getenv(env, "")
-    if not pw:
-        print("SKIP " + url.replace("https://",""))
-        skip += 1
-        continue
-    fix(url, pw)
-    ok += 1
-    time.sleep(0.3)
+    should_delete = False
 
-print("Done: " + str(ok) + " / skip: " + str(skip))
+    # 1. 더미 패턴 매칭
+    for pat in DUMMY_PATTERNS:
+        if re.search(pat, title_lower):
+            should_delete = True
+            break
+
+    # 2. 본문 너무 짧음 (300자 미만)
+    if body_len < 300:
+        should_delete = True
+
+    # 3. 한국 관련 키워드 전혀 없음
+    if not should_delete:
+        has_korea = any(kw in title_lower or kw in body_lower
+                       for kw in KOREA_KEYWORDS)
+        if not has_korea:
+            should_delete = True
+
+    if should_delete:
+        dr = requests.delete(base + "/posts/" + str(p["id"]),
+                            auth=auth,
+                            params={"force": True}, timeout=10)
+        if dr.status_code in (200,201):
+            delete += 1
+            deleted_titles.append(title[:50])
+        time.sleep(0.2)
+    else:
+        keep += 1
+
+print(f"\n유지: {keep}건")
+print(f"삭제: {delete}건")
+print(f"\n삭제된 글 목록 (처음 20개):")
+for t in deleted_titles[:20]:
+    print(f"  - {t}")
+
+# Google ping
+try:
+    sm = requests.utils.quote(SITE + "/sitemap_index.xml")
+    requests.get("https://www.google.com/ping?sitemap=" + sm, timeout=6)
+    print("\nGoogle ping OK")
+except: pass
+
+print("=== 완료 ===")
