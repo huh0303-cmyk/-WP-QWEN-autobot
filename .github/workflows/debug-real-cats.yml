@@ -1,0 +1,28 @@
+name: Debug Real Categories
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - env:
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: python .github/workflows/debug_real_cats.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add real_cats_debug.txt
+          git commit -m "카테고리 디버그" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
