@@ -532,7 +532,7 @@ def translate_ko_to_en_for_image(keyword: str, theme: str = "") -> str:
 # ============================================================
 SITES_CONFIG = [
     {"url":"https://k-health365.com",        "lang":"ko","theme":"건강과 의학",         "mode":"health_blog",
-     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":4},  # 무료화: 6→4
+     "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":2},  # 고퀄리티 정책: 아침/저녁 1건씩
     {"url":"https://koreamedicaltour.com",    "lang":"en","theme":"Korea Medical Tourism","mode":"blog",
      "keywords_file":".github/workflows/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":3},
     {"url":"https://koreainvest365.com",      "lang":"en","theme":"Investment",           "mode":"blog",
@@ -2936,9 +2936,9 @@ def main():
             continue
 
         n = 1  # ★ 슬롯당 사이트당 1건 (20 RPD 보호)
-        # k-health365는 예외적으로 2건
+        # k-health365: 하루 2건 고퀄리티 정책 → 아침(슬롯1)/저녁(슬롯3) 1건씩, 낮(슬롯2)은 건너뜀
         if "k-health365" in url:
-            n = 2
+            n = 0 if RUN_SLOT == 2 else 1
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url}  [{theme}]  슬롯{RUN_SLOT} → {n}건 예정")
