@@ -1489,11 +1489,17 @@ def make_khealth_prompt(keyword: str, reporter: dict, mode: str = "health_blog")
     suggested_title = apply_title_template(title_template, keyword)
     synonym_hint = get_synonym_hint(keyword, "ko")
 
-    return f"""당신은 대한민국 최고 권위의 내과 전문의이자 의학 저널리스트입니다.
-임상 경력 20년, 대한의학회 공인 전문위원 자격을 보유하고 있습니다.
+    return f"""당신은 신뢰할 수 있는 의학·건강 전문 콘텐츠 작가입니다.
+질병관리청, 대한의학회, 국내 대학병원 등 공신력 있는 공개 자료를 근거로,
+정확하고 검증 가능한 건강 정보를 전달하는 것이 목표입니다.
 주제: '{keyword}' | 사이트: k-health365.com (구글 애드센스 승인 의학 전문 블로그)
 
 [★ YMYL 의학 콘텐츠 최고 품질 — 구글 E-E-A-T 최상위 / SEO 95점 목표]
+
+★★★ 매우 중요 (신뢰성/사실 준수): 실존하지 않는 특정 인물(예: "OO대학병원 OO교수", "OO 전문의")을
+이름을 지어내어 인용하지 마세요. 전문가 인용이 필요하면 반드시 기관명으로만 표현하세요.
+예: "대한의학회에 따르면", "질병관리청 가이드라인에 의하면", "국내 대학병원 임상 연구 결과에 따르면" 등.
+특정 개인의 이름·소속·직함을 창작해서 인용문을 만드는 것은 절대 금지입니다.
 
 1. 바이라인: 본문 최상단 첫 줄에 정확히 '{byline}' 삽입.
 
@@ -1514,7 +1520,7 @@ def make_khealth_prompt(keyword: str, reporter: dict, mode: str = "health_blog")
    - h2 최소 6개, h3 최소 5개
    - ul/li 리스트 4개 이상
    - 데이터 비교 <table> 반드시 2개 이상 (thead/tbody/tr/th/td 완전한 구조로)
-   - <blockquote>로 전문가 인용 또는 가이드라인 1개 이상
+   - <blockquote>로 공신력 있는 기관의 가이드라인 인용 1개 이상 (개인 이름 창작 금지, 기관명만 사용)
 
 7. ★ 통계·수치 10개 이상 필수 (구체적 숫자: %, 만 명, mmHg, mg/dL 등)
 
@@ -1584,7 +1590,8 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
 9. ★ 실제 내부링크 5개 본문에 자연스럽게 삽입 (완전한 href URL):
 {internal_links_str}
 10. ★ 권위 기관 3회 이상 언급 (한국 정부기관/대학교/통계청만 — 사설언론사 금지): {ext_hint}
-11. E-E-A-T 전문가 인용구 1개 이상.
+11. E-E-A-T: 공신력 있는 기관 인용구 1개 이상 (실존하지 않는 개인 이름을 지어내어
+    인용하지 말 것. "OO청에 따르면", "OO대학 연구에 의하면" 등 기관명으로만 인용).
 12. h2 최소 4개, h3 최소 2개, ul/li 2개 이상.
 13. ★★★ 제목 (매우 중요):
     참고 제목: "{suggested_title}"
@@ -1614,7 +1621,9 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 9. ★ Real internal links — insert naturally in body (minimum 5 links, complete href URLs):
 {internal_links_str}
 10. ★ Authority sources — Korean gov/universities/official bodies ONLY (no private media, min 3): {ext_hint}
-11. E-E-A-T: At least 1 expert quote or attributed statement.
+11. E-E-A-T: At least 1 attributed statement from an official source or institution (do NOT invent
+    a named individual expert/doctor/professor — attribute to the institution only, e.g.
+    "according to [government agency]" or "per [university/hospital] published guidelines").
 12. Minimum 4 h2, 2 h3, 2 ul/li lists.
 13. ★★★ Title (very important):
     Reference title: "{suggested_title}"
@@ -1627,8 +1636,8 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 16. ★ TAGS: 'TAGS:', {TAG_COUNT} English keywords. First tag must be '{keyword}'.
 Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS"""
 
-    persona = ("의학박사 및 임상 전문의" if is_medical else "해당 분야 15년 경력 최고 전문 자문위원")
-    persona_en = ("medical doctor and clinical specialist" if is_medical
+    persona = ("건강·의학 전문 콘텐츠 작가" if is_medical else "해당 분야 15년 경력 최고 전문 자문위원")
+    persona_en = ("experienced health & medical content writer" if is_medical
                   else "senior industry expert with 15 years of experience")
     p = persona if lang == "ko" else persona_en
 
