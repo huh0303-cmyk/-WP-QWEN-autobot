@@ -1,0 +1,24 @@
+name: Cleanup Low Quality Posts - k-health365.com
+
+on:
+  workflow_dispatch: {}   # Actions 탭에서 수동으로 "Run workflow" 버튼으로 실행
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run cleanup script
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python .github/workflows/cleanup_low_quality_posts.py
