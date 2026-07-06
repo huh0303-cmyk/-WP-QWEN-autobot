@@ -1,0 +1,1 @@
+status=200 body={"id":1,"count":0,"description":"","link":"https:\/\/koreawedding365.com\/category\/%eb%af%b8%eb%b6%84%eb%a5%98\/","name":"Uncategorized","slug":"%eb%af%b8%eb%b6%84%eb%a5%98","taxonomy":"category","parent":0,"meta":[],"_links":{"self":[{"href":"https:\/\/koreawedding365.com\/wp-json\/wp\/v2\/categor
