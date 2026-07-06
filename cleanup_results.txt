@@ -1,5 +1,5 @@
 ==========================================================================================
-모드: DRY RUN (미리보기만)
+모드: 실제 삭제 실행 (trash)
 기준: 본문<2000자 / SEO<90점 / 중복슬러그(원본존재시) — 더미슬러그 단독으론 삭제 안함
 ==========================================================================================
 
@@ -20,6 +20,7 @@
      - [본문부족(1892자)] 오십견 루틴 – 굳어가는 어깨를 풀어주는 하루 몇분 습관 | https://k-health365.com/post-72-2/
      - [본문부족(1706자), 더미슬러그(참고)] 이걸 안 하면 계속 피곤하다? 아침 대사 루틴 – 체중과 컨디션을 동시에 | https://k-health365.com/post-102/
      - [본문부족(1649자), 더미슬러그(참고)] 매일 5분 뇌 건강 찾는 반복 일상법 – 치매를 늦추는 실천법 | https://k-health365.com/post-115/
+   🗑️ 처리완료: 14개 성공, 0개 실패
 
 🌐 https://koreamedicaltour.com
    전체 80개 중 삭제후보 0개 (0%)
@@ -27,6 +28,7 @@
 🌐 https://koreainvest365.com
    전체 52개 중 삭제후보 1개 (2%)
      - [본문부족(1309자)] Is South Korea&#8217;s Bitcoin Regulatio | https://koreainvest365.com/is-south-koreas-bitcoin-regulation-a-clear-path-or-a-complex-maze-for-investors/
+   🗑️ 처리완료: 1개 성공, 0개 실패
 
 🌐 https://ki-korea.com
    전체 26개 중 삭제후보 0개 (0%)
@@ -54,6 +56,7 @@
      - [본문부족(935자)] Niacinamide toner K-beauty 2026: Proven  | https://kskin365.com/niacinamide-toner-k-beauty-2026-proven-tips-from-industry-experts/
      - [본문부족(1248자)] Your Go-To Guide for Picking the Perfect | https://kskin365.com/your-go-to-guide-for-picking-the-perfect-foundation-for-your-skin-tone/
      - [본문부족(1342자)] Global Beauty Hacks: Must-Try Rituals an | https://kskin365.com/global-beauty-hacks-must-try-rituals-and-ingredients/
+   🗑️ 처리완료: 3개 성공, 0개 실패
 
 🌐 https://oliveyoungkorea.com
    전체 38개 중 삭제후보 0개 (0%)
@@ -91,6 +94,7 @@
 🌐 https://jobinkorea365.com
    전체 48개 중 삭제후보 1개 (2%)
      - [본문부족(966자)] National pension refund expats: Top 7 Fa | https://jobinkorea365.com/national-pension-refund-expats-top-7-facts-that-will-surprise-you/
+   🗑️ 처리완료: 1개 성공, 0개 실패
 
 🌐 https://jobkoreaglobal.com
    전체 39개 중 삭제후보 0개 (0%)
@@ -99,11 +103,13 @@
    전체 74개 중 삭제후보 2개 (3%)
      - [본문부족(951자)] Korean cinema beyond Parasite: Top 7 Fac | https://korea365.org/korean-cinema-beyond-parasite-top-7-facts-that-will-surprise-you/
      - [본문부족(958자)] K-beauty shopping in Myeongdong Explaine | https://korea365.org/k-beauty-shopping-in-myeongdong-explained-everything-you-must-know-now/
+   🗑️ 처리완료: 2개 성공, 0개 실패
 
 🌐 https://koreanews365.com
    전체 57개 중 삭제후보 2개 (4%)
      - [본문부족(1070자)] 16년 병가 쓰고 &#8216;월급 꼬박꼬박&#8217;&#8230; 유 | https://koreanews365.com/16%eb%85%84-%eb%b3%91%ea%b0%80-%ec%93%b0%ea%b3%a0-%ec%9b%94%ea%b8%89-%ea%bc%ac%eb%b0%95%ea%bc%ac%eb%b0%95-%ec%9c%a0%eb%9f%bd-%ec%a7%81%ec%9e%a5%ec%9d%b8-%ec%89%ac%ec%96%b4%ea%b0%80%ea%b8%b0/
      - [본문부족(1439자)] 일본, 이란 사태에 물가 비상 속 미국 편에 서다 | https://koreanews365.com/%ec%9d%bc%eb%b3%b8-%ec%9d%b4%eb%9e%80-%ec%82%ac%ed%83%9c%ec%97%90-%eb%ac%bc%ea%b0%80-%eb%b9%84%ec%83%81-%ec%86%8d-%eb%af%b8%ea%b5%ad-%ed%8e%b8%ec%97%90-%ec%84%9c%eb%8b%a4/
+   🗑️ 처리완료: 2개 성공, 0개 실패
 
 🌐 https://theseouljournal.com
    전체 92개 중 삭제후보 10개 (11%)
@@ -117,10 +123,8 @@
      - [본문부족(1985자)] North Korea builds Ukraine war soldier m | https://theseouljournal.com/north-korea-builds-ukraine-war-soldier-memorial/
      - [본문부족(1079자)] South Korea&#8217;s &#8216;Monster Missi | https://theseouljournal.com/south-koreas-monster-missile-sparks-tensions-with-north/
      - [본문부족(1187자)] North Korean soldier breaches DMZ to def | https://theseouljournal.com/north-korean-soldier-breaches-dmz-to-defect-to-south-korea/
+   🗑️ 처리완료: 10개 성공, 0개 실패
 
 ==========================================================================================
 전체 요약: 27개 사이트 / 총 게시물 1641개 / 삭제후보 33개
-
-★ DRY RUN이었습니다. 목록을 확인 후 스크립트 상단 DRY_RUN=False로 바꿔서
-★ 다시 실행하면 위 후보들이 'trash' 처리됩니다.
 ==========================================================================================
