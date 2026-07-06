@@ -32,7 +32,7 @@ def log(msg=""):
 
 # ============ 설정 ============
 
-DRY_RUN = True          # ★★★ True = 목록/개수만 확인, 실제 삭제 안 함
+DRY_RUN = False          # ★★★ True = 목록/개수만 확인, 실제 삭제 안 함
 VERBOSE = True          # True로 하면 사이트별 삭제후보 글 제목까지 전부 출력
 DELETE_MODE = "trash"   # "trash"(복구가능) 권장 / "delete"(영구삭제)
 
