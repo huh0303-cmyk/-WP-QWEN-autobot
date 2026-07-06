@@ -534,57 +534,57 @@ SITES_CONFIG = [
     {"url":"https://k-health365.com",        "lang":"ko","theme":"건강과 의학",         "mode":"health_blog",
      "keywords_file":".github/workflows/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":2},  # 고퀄리티 정책: 아침/저녁 1건씩
     {"url":"https://koreamedicaltour.com",    "lang":"en","theme":"Korea Medical Tourism","mode":"blog",
-     "keywords_file":".github/workflows/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":3},
+     "keywords_file":".github/workflows/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":2},
     {"url":"https://koreainvest365.com",      "lang":"en","theme":"Investment",           "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kinvest.txt",        "wp_pass_env":"KOREAINVEST365COM",    "daily":3},
+     "keywords_file":".github/workflows/keywords_kinvest.txt",        "wp_pass_env":"KOREAINVEST365COM",    "daily":2},
     {"url":"https://ki-korea.com",            "lang":"en","theme":"Korea Investment",     "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":6},
+     "keywords_file":".github/workflows/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":2},
     {"url":"https://koreainsurance365.com",   "lang":"en","theme":"Insurance",            "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kinsurance.txt",     "wp_pass_env":"KOREAINSURANCE365COM", "daily":3},
+     "keywords_file":".github/workflows/keywords_kinsurance.txt",     "wp_pass_env":"KOREAINSURANCE365COM", "daily":2},
     {"url":"https://kfinance365.com",         "lang":"en","theme":"Finance",              "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kfinance.txt",       "wp_pass_env":"KFINANCE365COM",       "daily":3},
+     "keywords_file":".github/workflows/keywords_kfinance.txt",       "wp_pass_env":"KFINANCE365COM",       "daily":2},
     {"url":"https://koreataxnlaw.com",        "lang":"en","theme":"Tax and Law",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_ktax.txt",           "wp_pass_env":"KOREATAXNLAWCOM",      "daily":3},
+     "keywords_file":".github/workflows/keywords_ktax.txt",           "wp_pass_env":"KOREATAXNLAWCOM",      "daily":2},
     {"url":"https://koreacrypto365.com",      "lang":"en","theme":"Crypto",               "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kcrypto.txt",        "wp_pass_env":"KOREACRYPTO365COM",    "daily":3},
+     "keywords_file":".github/workflows/keywords_kcrypto.txt",        "wp_pass_env":"KOREACRYPTO365COM",    "daily":2},
     {"url":"https://krealestate365.com",      "lang":"en","theme":"Korea Real Estate",    "mode":"blog",
-     "keywords_file":".github/workflows/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":6},
+     "keywords_file":".github/workflows/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":2},
     {"url":"https://ktech365.com",            "lang":"en","theme":"Technology",           "mode":"blog",
-     "keywords_file":".github/workflows/keywords_ktech.txt",          "wp_pass_env":"KTECH365COM",          "daily":3},
+     "keywords_file":".github/workflows/keywords_ktech.txt",          "wp_pass_env":"KTECH365COM",          "daily":2},
     {"url":"https://kskin365.com",            "lang":"en","theme":"K-Beauty",             "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":3},
+     "keywords_file":".github/workflows/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":2},
     {"url":"https://oliveyoungkorea.com",     "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",
-     "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":5},
+     "keywords_file":".github/workflows/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":2},
     {"url":"https://kworld365.com",           "lang":"en","theme":"K-Culture",           "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":5},
+     "keywords_file":".github/workflows/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":2},
     {"url":"https://k-trip365.com",           "lang":"en","theme":"Travel",              "mode":"blog",
      "keywords_file":".github/workflows/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":2},
     {"url":"https://k-visa365.com",           "lang":"en","theme":"Visa Guide",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kvisa.txt",          "wp_pass_env":"KVISA365COM",          "daily":3},
+     "keywords_file":".github/workflows/keywords_kvisa.txt",          "wp_pass_env":"KVISA365COM",          "daily":2},
     {"url":"https://koreawedding365.com",     "lang":"en","theme":"Wedding",             "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kwedding.txt",       "wp_pass_env":"KOREAWEDDING365COM",   "daily":5},
+     "keywords_file":".github/workflows/keywords_kwedding.txt",       "wp_pass_env":"KOREAWEDDING365COM",   "daily":2},
     {"url":"https://kstudy365.com",           "lang":"en","theme":"Study in Korea",      "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kstudy365.txt",      "wp_pass_env":"KSTUDY365COM",         "daily":3},
+     "keywords_file":".github/workflows/keywords_kstudy365.txt",      "wp_pass_env":"KSTUDY365COM",         "daily":2},
     {"url":"https://studyinkorea365.com",     "lang":"en","theme":"International Students","mode":"blog",
-     "keywords_file":".github/workflows/keywords_studyinkorea365.txt","wp_pass_env":"STUDYINKOREA365COM",   "daily":5},
+     "keywords_file":".github/workflows/keywords_studyinkorea365.txt","wp_pass_env":"STUDYINKOREA365COM",   "daily":2},
     {"url":"https://kieca-korea.org",         "lang":"en","theme":"국제교육문화",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_kieca.txt",          "wp_pass_env":"KIECAKOREAORG",        "daily":6},
+     "keywords_file":".github/workflows/keywords_kieca.txt",          "wp_pass_env":"KIECAKOREAORG",        "daily":2},
     {"url":"https://ksa-korea.org",           "lang":"en","theme":"한국유학정보",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_ksaKorea.txt",       "wp_pass_env":"KSAKOREAORG",          "daily":6},
+     "keywords_file":".github/workflows/keywords_ksaKorea.txt",       "wp_pass_env":"KSAKOREAORG",          "daily":2},
     {"url":"https://sis-korea.com",           "lang":"en","theme":"Korea Career Programs","mode":"blog",
-     "keywords_file":".github/workflows/keywords_sisKorea.txt",       "wp_pass_env":"SISKOREACOM",          "daily":6},
+     "keywords_file":".github/workflows/keywords_sisKorea.txt",       "wp_pass_env":"SISKOREACOM",          "daily":2},
     {"url":"https://jobkorea365.com",         "lang":"en","theme":"Employment",          "mode":"blog",
-     "keywords_file":".github/workflows/keywords_jobkorea365.txt",    "wp_pass_env":"JOBKOREA365COM",       "daily":3},
+     "keywords_file":".github/workflows/keywords_jobkorea365.txt",    "wp_pass_env":"JOBKOREA365COM",       "daily":2},
     {"url":"https://jobinkorea365.com",       "lang":"en","theme":"Jobs in Korea",       "mode":"blog",
-     "keywords_file":".github/workflows/keywords_jobinkorea365.txt",  "wp_pass_env":"JOBINKOREA365COM",     "daily":3},
+     "keywords_file":".github/workflows/keywords_jobinkorea365.txt",  "wp_pass_env":"JOBINKOREA365COM",     "daily":2},
     {"url":"https://jobkoreaglobal.com",      "lang":"en","theme":"Recruitment",         "mode":"blog",
-     "keywords_file":".github/workflows/keywords_jobkoreaglobal.txt", "wp_pass_env":"JOBKOREAGLOBALCOM",    "daily":3},
+     "keywords_file":".github/workflows/keywords_jobkoreaglobal.txt", "wp_pass_env":"JOBKOREAGLOBALCOM",    "daily":2},
     {"url":"https://korea365.org",            "lang":"en","theme":"Korea Culture",       "mode":"blog",
-     "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":3},  # 무료화: 4→3
+     "keywords_file":".github/workflows/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":2},  # 무료화: 4→3
     {"url":"https://koreanews365.com",        "lang":"ko","theme":"한국 뉴스",            "mode":"news",
-     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":5},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":2},  # 무료화: 5→4
     {"url":"https://theseouljournal.com",     "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",
-     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":5},  # 무료화: 5→4
+     "keywords_file":".github/workflows/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":2},  # 무료화: 5→4
 ]
 
 # ============================================================
@@ -1580,7 +1580,7 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
 [필수 지침 — SEO 95점 목표]
 1. 문체: '했다', '밝혔다', '조사됐다'로 끝나는 6하원칙 기사체. 마크다운 금지.
 2. 바이라인: 기사 맨 위 첫 줄에 정확히 '{byline_ko}' 삽입.
-3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 1,800자 이상.
+3. ★ 분량: HTML(h2,h3,p,strong,ul,li,table) 사용, 최소 3,000자 이상.
 4. ★ 모바일 가독성: 모든 <p>는 2~3문장 이하.
 5. ★★★ 키워드 밀도 제한: '{keyword}'는 전체 본문 최대 6회 이하.
    대신 관련 용어·동의어로 분산: {synonym_hint}
@@ -1611,7 +1611,7 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 [MANDATORY RULES — SEO 95+ target]
 1. Style: Journalistic English, inverted pyramid. No markdown.
 2. Byline: First line must be exactly '{byline_en}'.
-3. ★ Length: Minimum 1,800 characters using HTML only (h2, h3, p, strong, ul, li, table).
+3. ★ Length: Minimum 3,000 characters using HTML only (h2, h3, p, strong, ul, li, table).
 4. ★ Mobile readability: Every <p> max 2~3 sentences.
 5. ★★★ Keyword density control: Use '{keyword}' maximum 6 times in the entire body.
    Replace additional mentions with synonyms/variants: {synonym_hint}
@@ -1647,7 +1647,7 @@ Output order: TITLE → body HTML → META_DESC → FAQ_START~FAQ_END → TAGS""
 
 [필수 지침 — 구글 애드센스 승인·상위 노출 SEO 95점 이상 목표]
 1. HTML 전용: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td 태그만. 마크다운 절대 금지.
-2. ★ 분량: 공백 제외 최소 2,000자 이상.
+2. ★ 분량: 공백 제외 최소 3,000자 이상.
 3. ★ 모바일 최적화: 모든 <p>는 최대 2문장. 단락 사이 완전한 줄바꿈 필수.
 4. ★★★ 키워드 밀도 엄격 제한 (SEO 핵심):
    - '{keyword}'는 전체 본문에서 최대 8회 이하로만 사용.
@@ -1683,7 +1683,7 @@ Topic: '{keyword}' | Category: {theme} | Language: English
 
 [MANDATORY RULES — Google AdSense quality + SEO 95+ score target]
 1. HTML only: h2,h3,p,ul,li,ol,strong,table,thead,tbody,tr,th,td. No markdown ever.
-2. ★ Length: Minimum 2,000 characters of high-density expert content.
+2. ★ Length: Minimum 3,000 characters of high-density expert content.
 3. ★ Mobile optimization: Every <p> max 2 sentences. Full paragraph breaks between sections.
 4. ★★★ Keyword density control (critical for SEO):
    - Use '{keyword}' maximum 8 times in the ENTIRE body.
@@ -1729,7 +1729,7 @@ def make_regen_suffix(score: int, body: str, meta_desc: str, faq_list: list,
     ul_cnt   = len(re.findall(r'<ul[\s>]', body, re.IGNORECASE))
     kw_density = compute_keyword_density(body, keyword)
 
-    target_len = 3500 if is_khealth else 2500
+    target_len = 3500 if is_khealth else 3200
     if blen < target_len:
         issues.append(f"본문 길이 {blen}자 → {target_len}자 이상으로 증량 필수")
     if kw_density > KW_DENSITY_MAX:
@@ -2873,6 +2873,12 @@ def process_one_post(site: dict, keyword: str) -> bool:
                   "❌ 미달")
     print(f"  📊 SEO 최종 점수: {score}/100  {rank_label}  키워드밀도: {kw_density_final:.1%}")
 
+    # ★★★ SEO 90점 미만 발행 차단 (k-health365.com은 예외 — 기존 정책 유지)
+    if not is_khealth and score < SEO_TARGET:
+        print(f"  ⛔ SEO {score}점 < {SEO_TARGET}점 → 발행 취소 (품질 기준 미달)")
+        record_result(url, theme, keyword, title, "", score, len(images), "⛔ skip_low_seo")
+        return False
+
     plain_len = len(re.sub(r'<[^>]+>', '', body).replace(' ', '').replace('\n', ''))
     stat_cnt  = count_statistics_in_body(body)
     ilinks    = len(re.findall(r'<a\s+href=["\']https?://', body, re.IGNORECASE))
@@ -2926,28 +2932,31 @@ def main():
     print("📋 뉴스 사이트 최근 제목 사전 로드 중...")
     preload_news_site_titles(SITES_CONFIG, WP_USER)
 
-    # ★ Free Tier 20 RPD 보호: 27개 사이트를 3슬롯에 균등 배분
-    # 슬롯1: 사이트 1~9번, 슬롯2: 10~18번, 슬롯3: 19~27번
-    # 각 슬롯에서 최대 9개 사이트 × 1건 = 9 API/슬롯 < 20 RPD ✅
-    slot_groups = {
-        1: list(range(0, 9)),    # 사이트 0~8번 인덱스
-        2: list(range(9, 18)),   # 사이트 9~17번 인덱스
-        3: list(range(18, 27)),  # 사이트 18~26번 인덱스
-    }
-    active_indices = slot_groups.get(RUN_SLOT, list(range(27)))
+    # ★ 발행 시간 랜덤화: 매 실행마다 0~20분 무작위 대기 후 시작 (기계적 정시 발행 패턴 은닉)
+    import random as _random_jitter
+    _jitter = _random_jitter.randint(0, 1200)
+    print(f"⏳ 발행 시간 랜덤화: {_jitter//60}분 {_jitter%60}초 대기 후 시작...")
+    _time_module.sleep(_jitter)
+
+    # ★★★ 개편: 27개 사이트 전체 하루 2건 발행 (아침/점심/저녁 3슬롯 중 2슬롯 로테이션)
+    # k-health365.com은 항상 슬롯1(아침)+슬롯3(저녁) 고정, 나머지 26개 사이트는
+    # 사이트+날짜 기준으로 매일 다른 슬롯을 건너뛰어 패턴이 고정되지 않도록 함
+    import datetime as _dt
+    _day_of_year = _dt.datetime.now().timetuple().tm_yday
 
     for site_idx, site in enumerate(SITES_CONFIG):
         url   = site["url"]
         theme = site["theme"]
+        is_khealth = "k-health365" in url
 
-        # ★ 이번 슬롯에 해당하는 사이트만 실행
-        if site_idx not in active_indices:
+        if is_khealth:
+            n = 0 if RUN_SLOT == 2 else 1  # 아침/저녁만, 낮 건너뜀
+        else:
+            skip_slot = ((site_idx + _day_of_year) % 3) + 1  # 매일 로테이션되는 스킵 슬롯
+            n = 0 if RUN_SLOT == skip_slot else 1
+
+        if n == 0:
             continue
-
-        n = 1  # ★ 슬롯당 사이트당 1건 (20 RPD 보호)
-        # k-health365: 하루 2건 고퀄리티 정책 → 아침(슬롯1)/저녁(슬롯3) 1건씩, 낮(슬롯2)은 건너뜀
-        if "k-health365" in url:
-            n = 0 if RUN_SLOT == 2 else 1
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url}  [{theme}]  슬롯{RUN_SLOT} → {n}건 예정")
