@@ -2973,10 +2973,12 @@ def main():
     print("📋 뉴스 사이트 최근 제목 사전 로드 중...")
     preload_news_site_titles(SITES_CONFIG, WP_USER)
 
-    # ★ 발행 시간 랜덤화: 매 실행마다 0~20분 무작위 대기 후 시작 (기계적 정시 발행 패턴 은닉)
+    # ★ 발행 시간 랜덤화: 매 실행마다 0~120분(2시간) 무작위 대기 후 시작
+    #   (크론 자체를 목표시각보다 1시간 앞당겨 걸어두고, 여기서 0~2시간 랜덤 대기를 더해
+    #    최종 발행 시각이 매일 "목표시각 ±1시간" 범위 안에서 무작위로 흔들리게 함 — 정시패턴 완전 차단)
     import random as _random_jitter
-    _jitter = _random_jitter.randint(0, 1200)
-    print(f"⏳ 발행 시간 랜덤화: {_jitter//60}분 {_jitter%60}초 대기 후 시작...")
+    _jitter = _random_jitter.randint(0, 7200)
+    print(f"⏳ 발행 시간 랜덤화: {_jitter//60}분 {_jitter%60}초 대기 후 시작 (목표시각 ±1시간 범위)...")
     _time_module.sleep(_jitter)
 
     # ★★★ 개편: 27개 사이트 전체 하루 2건 발행 (아침/점심/저녁 3슬롯 중 2슬롯 로테이션)
