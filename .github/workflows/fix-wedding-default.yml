@@ -1,0 +1,29 @@
+name: Fix Wedding Default Category
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - env:
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+        run: python .github/workflows/fix_wedding_default.py
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add fix_wedding_result.txt
+          git commit -m "wedding 기본카테고리 수정 결과" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
