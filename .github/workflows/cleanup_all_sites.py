@@ -125,23 +125,46 @@ def is_generic_slug(post):
     return bool(GENERIC_SLUG_PATTERN.match(post.get("slug", "")))
 
 
-def classify(post):
+DUP_SUFFIX_PATTERN = re.compile(r"^(.+)-(\d+)$")
+
+def find_duplicate_base(post, all_slugs):
+    """slug가 'xxx-2', 'xxx-3' 형태면서 원본 'xxx'가 실제 존재하면 중복으로 판단"""
+    slug = post.get("slug", "")
+    m = DUP_SUFFIX_PATTERN.match(slug)
+    if not m:
+        return None
+    base = m.group(1)
+    if base != slug and base in all_slugs:
+        return base
+    return None
+
+
+def classify(post, all_slugs):
     reasons = []
-    if is_generic_slug(post):
-        reasons.append("더미(제목없음)")
+    dup_base = find_duplicate_base(post, all_slugs)
     chars = content_char_count(post)
-    if chars < MIN_CONTENT_CHARS:
-        reasons.append(f"본문부족({chars}자)")
     score = get_seo_score(post)
-    if 0 < score < MIN_SEO_SCORE:
+    low_quality = chars < MIN_CONTENT_CHARS
+    low_seo = 0 < score < MIN_SEO_SCORE
+
+    # 실제 삭제 트리거: 중복 / 본문부족 / SEO낮음 (더미슬러그 자체는 트리거 아님, 참고 태그만)
+    if dup_base:
+        reasons.append(f"중복의심(원본:{dup_base})")
+    if low_quality:
+        reasons.append(f"본문부족({chars}자)")
+    if low_seo:
         reasons.append(f"SEO낮음({score}점)")
+
+    if reasons and is_generic_slug(post):
+        reasons.append("더미슬러그(참고)")
+
     return reasons
 
 
 def main():
     log(f"{'='*90}")
     log(f"모드: {'DRY RUN (미리보기만)' if DRY_RUN else f'실제 삭제 실행 ({DELETE_MODE})'}")
-    log(f"기준: 더미슬러그 / 본문<{MIN_CONTENT_CHARS}자 / SEO<{MIN_SEO_SCORE}점")
+    log(f"기준: 본문<{MIN_CONTENT_CHARS}자 / SEO<{MIN_SEO_SCORE}점 / 중복슬러그(원본존재시) — 더미슬러그 단독으론 삭제 안함")
     log(f"{'='*90}\n")
 
     grand_total_posts = 0
@@ -162,8 +185,9 @@ def main():
             continue
 
         candidates = []
+        all_slugs = {p.get("slug", "") for p in posts}
         for p in posts:
-            reasons = classify(p)
+            reasons = classify(p, all_slugs)
             if reasons:
                 candidates.append((p, reasons))
 
