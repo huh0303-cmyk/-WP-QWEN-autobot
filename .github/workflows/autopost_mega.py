@@ -51,7 +51,7 @@ _gemini_fallback_active = False
 TAG_COUNT        = 12
 MIN_BODY_LENGTH  = 1800
 SEO_TARGET       = 90   # ★ 90점 기준 (95점 강요 시 재생성 폭탄 → 무료 한도 초과)
-MAX_REGEN        = 0    # ★ Free Tier 20RPD → 재생성 없음, 1회 호출/포스트 (2회 호출/포스트 × 91건 = 182회 << 1500 RPD)
+MAX_REGEN        = 1    # ★ 재생성 1회 허용 (최대 약 110회/일 << 1500 RPD, 여전히 완전 무료) — SEO90 미달로 발행 누락되는 것 방지
 KW_DENSITY_MAX   = 0.025  # ★ 키워드 밀도 상한 2.5%
 
 # ★ RPM(분당 요청) 제한 준수: flash-lite 무료 = 30 RPM
