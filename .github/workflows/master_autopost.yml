@@ -12,9 +12,9 @@ on:
         required: false
         default: "1"
   schedule:
-    - cron: "10 21 * * *"
-    - cron: "10 5 * * *"
-    - cron: "10 13 * * *"
+    - cron: "10 20 * * *"
+    - cron: "10 4 * * *"
+    - cron: "10 12 * * *"
 
 concurrency:
   group: master-27sites
@@ -41,9 +41,9 @@ jobs:
             if [ "$S" = "setup" ] || [ "$S" = "all" ]; then RUN_SETUP=true; fi
             if [ "$S" = "post"  ] || [ "$S" = "all" ]; then RUN_POST=true;  fi
             if [ "$S" = "ads"   ] || [ "$S" = "all" ]; then RUN_ADS=true;   fi
-          elif [ "${{ github.event.schedule }}" = "10 21 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "10 20 * * *" ]; then
             SLOT=1; RUN_SETUP=false; RUN_POST=true; RUN_ADS=false
-          elif [ "${{ github.event.schedule }}" = "10 5 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "10 4 * * *" ]; then
             SLOT=2; RUN_SETUP=false; RUN_POST=true; RUN_ADS=false
           else
             SLOT=3; RUN_SETUP=false; RUN_POST=true; RUN_ADS=false
