@@ -1,0 +1,30 @@
+name: Reorganize k-health365 Categories
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  reorganize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Run reorganize script
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python .github/workflows/reorganize_categories.py
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add reorganize_categories_results.txt
+          git commit -m "카테고리 정리 결과" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
