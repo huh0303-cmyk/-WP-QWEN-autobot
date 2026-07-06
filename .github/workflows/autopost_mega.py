@@ -2290,7 +2290,7 @@ def generate_content_gemini(prompt: str) -> str:
             resp = gemini_client.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,
-                config={"temperature": 0.80, "max_output_tokens": 4096}
+                config={"temperature": 0.80, "max_output_tokens": 8192}
             )
             return resp.text
         except Exception as e:
