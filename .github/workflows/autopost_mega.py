@@ -2661,6 +2661,10 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
 
     author_id     = get_or_create_wp_author(site_url, wp_pass, reporter)
     category_name = get_category_for_post(theme, keyword, title)
+    # ★ kworld365.com: AdSense 심사 대비 하루 3건, 슬롯별로 카테고리 강제 고정 배정
+    if "kworld365" in site_url:
+        _kworld_slot_cat = {1: "K-Pop & Artists", 2: "K-Culture & Learn Korean", 3: "Korean Life & Travel"}
+        category_name = _kworld_slot_cat.get(RUN_SLOT, category_name)
     category_id   = get_or_create_wp_category(site_url, wp_pass, category_name)
 
     # ★ 이미지 1개만 (반복 방지, Featured Image로 활용)
@@ -2922,6 +2926,8 @@ def process_one_post(site: dict, keyword: str) -> bool:
     print(f"     ↳ 본문:{plain_len}자 | 통계:{stat_cnt}개 | 링크:{ilinks}개 | TABLE:{tb_cnt}개 | H2:{h2_cnt}개 | META:{len(meta_desc)}자")
 
     category_name = get_category_for_post(theme, keyword, title)
+    if "kworld365" in url:
+        category_name = {1: "K-Pop & Artists", 2: "K-Culture & Learn Korean", 3: "Korean Life & Travel"}.get(RUN_SLOT, category_name)
     print(f"  📁 카테고리: {category_name}")
 
     if mode in ("news", "news_en") and title:
@@ -2983,9 +2989,12 @@ def main():
         url   = site["url"]
         theme = site["theme"]
         is_khealth = "k-health365" in url
+        is_kworld  = "kworld365" in url
 
         if is_khealth:
             n = 0 if RUN_SLOT == 2 else 1  # 아침/저녁만, 낮 건너뜀
+        elif is_kworld:
+            n = 1  # ★ AdSense 심사 대비: 하루 3건, 슬롯마다 카테고리 하나씩 고정 배정
         else:
             skip_slot = ((site_idx + _day_of_year) % 3) + 1  # 매일 로테이션되는 스킵 슬롯
             n = 0 if RUN_SLOT == skip_slot else 1
