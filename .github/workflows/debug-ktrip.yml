@@ -1,0 +1,29 @@
+name: Debug ktrip365 delete failure
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - env:
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        run: python .github/workflows/debug_ktrip.py
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add ktrip_debug_results.txt
+          git commit -m "ktrip365 삭제실패 진단 결과" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
