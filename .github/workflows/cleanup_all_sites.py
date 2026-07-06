@@ -25,6 +25,11 @@ import base64
 import requests
 from datetime import datetime, timedelta
 
+_LOG_LINES = []
+def log(msg=""):
+    print(msg)
+    _LOG_LINES.append(str(msg))
+
 # ============ 설정 ============
 
 DRY_RUN = True          # ★★★ True = 목록/개수만 확인, 실제 삭제 안 함
@@ -85,11 +90,11 @@ def fetch_all_posts(site_url, pw):
             r = requests.get(url, auth=requests.auth.HTTPBasicAuth(WP_USER, pw),
                               params=params, timeout=20)
         except Exception as e:
-            print(f"    ⚠️ 연결 오류: {e}")
+            log(f"    ⚠️ 연결 오류: {e}")
             break
         if r.status_code != 200:
             if page == 1:
-                print(f"    ⚠️ API 오류 (status {r.status_code}) - 인증/접속 확인 필요")
+                log(f"    ⚠️ API 오류 (status {r.status_code}) - 인증/접속 확인 필요")
             break
         batch = r.json()
         if not batch:
@@ -134,10 +139,10 @@ def classify(post):
 
 
 def main():
-    print(f"{'='*90}")
-    print(f"모드: {'DRY RUN (미리보기만)' if DRY_RUN else f'실제 삭제 실행 ({DELETE_MODE})'}")
-    print(f"기준: 더미슬러그 / 본문<{MIN_CONTENT_CHARS}자 / SEO<{MIN_SEO_SCORE}점")
-    print(f"{'='*90}\n")
+    log(f"{'='*90}")
+    log(f"모드: {'DRY RUN (미리보기만)' if DRY_RUN else f'실제 삭제 실행 ({DELETE_MODE})'}")
+    log(f"기준: 더미슬러그 / 본문<{MIN_CONTENT_CHARS}자 / SEO<{MIN_SEO_SCORE}점")
+    log(f"{'='*90}\n")
 
     grand_total_posts = 0
     grand_total_candidates = 0
@@ -145,15 +150,15 @@ def main():
 
     for site_url, secret_name in SITES:
         pw = os.environ.get(secret_name)
-        print(f"\n🌐 {site_url}")
+        log(f"\n🌐 {site_url}")
         if not pw:
-            print(f"   ⚠️ 환경변수 {secret_name} 없음 → 건너뜀")
+            log(f"   ⚠️ 환경변수 {secret_name} 없음 → 건너뜀")
             continue
 
         posts = fetch_all_posts(site_url, pw)
         total = len(posts)
         if total == 0:
-            print(f"   게시물 없음 또는 접속 실패")
+            log(f"   게시물 없음 또는 접속 실패")
             continue
 
         candidates = []
@@ -166,15 +171,15 @@ def main():
         grand_total_posts += total
         grand_total_candidates += len(candidates)
 
-        print(f"   전체 {total}개 중 삭제후보 {len(candidates)}개 ({ratio:.0%})")
+        log(f"   전체 {total}개 중 삭제후보 {len(candidates)}개 ({ratio:.0%})")
 
         if VERBOSE:
             for p, reasons in candidates:
                 title = p.get("title", {}).get("rendered", "(제목없음)")
-                print(f"     - [{', '.join(reasons)}] {title[:40]} | {p['link']}")
+                log(f"     - [{', '.join(reasons)}] {title[:40]} | {p['link']}")
 
         if ratio > SAFETY_RATIO_LIMIT and site_url not in SAFETY_OVERRIDE:
-            print(f"   🛑 위험: 후보 비율이 {SAFETY_RATIO_LIMIT:.0%}를 초과 → 이 사이트는 "
+            log(f"   🛑 위험: 후보 비율이 {SAFETY_RATIO_LIMIT:.0%}를 초과 → 이 사이트는 "
                   f"자동 스킵합니다 (전체 삭제 사고 방지). 확인 후 SAFETY_OVERRIDE에 추가하세요.")
             skipped_sites.append(site_url)
             continue
@@ -193,17 +198,20 @@ def main():
                 deleted += 1
             else:
                 failed += 1
-        print(f"   🗑️ 처리완료: {deleted}개 성공, {failed}개 실패")
+        log(f"   🗑️ 처리완료: {deleted}개 성공, {failed}개 실패")
 
-    print(f"\n{'='*90}")
-    print(f"전체 요약: {len(SITES)}개 사이트 / 총 게시물 {grand_total_posts}개 / "
+    log(f"\n{'='*90}")
+    log(f"전체 요약: {len(SITES)}개 사이트 / 총 게시물 {grand_total_posts}개 / "
           f"삭제후보 {grand_total_candidates}개")
     if skipped_sites:
-        print(f"⚠️ 안전상 자동 스킵된 사이트({len(skipped_sites)}개): {', '.join(skipped_sites)}")
+        log(f"⚠️ 안전상 자동 스킵된 사이트({len(skipped_sites)}개): {', '.join(skipped_sites)}")
     if DRY_RUN:
-        print(f"\n★ DRY RUN이었습니다. 목록을 확인 후 스크립트 상단 DRY_RUN=False로 바꿔서")
-        print(f"★ 다시 실행하면 위 후보들이 '{DELETE_MODE}' 처리됩니다.")
-    print(f"{'='*90}")
+        log(f"\n★ DRY RUN이었습니다. 목록을 확인 후 스크립트 상단 DRY_RUN=False로 바꿔서")
+        log(f"★ 다시 실행하면 위 후보들이 '{DELETE_MODE}' 처리됩니다.")
+    log(f"{'='*90}")
+
+    with open("cleanup_results.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(_LOG_LINES))
 
 
 if __name__ == "__main__":
