@@ -55,9 +55,8 @@ jobs:
       - name: Commit results file
         if: always()
         run: |
-          mv cleanup_results.txt .github/workflows/cleanup_results.txt || true
           git config user.name "cleanup-bot"
           git config user.email "cleanup-bot@users.noreply.github.com"
-          git add .github/workflows/cleanup_results.txt
+          git add cleanup_results.txt
           git commit -m "결과 업데이트: cleanup_all_sites 실행 로그" || echo "no changes"
           git push
