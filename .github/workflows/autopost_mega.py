@@ -2988,8 +2988,8 @@ def process_one_post(site: dict, keyword: str, forced_category: str = None) -> b
                   "❌ 미달")
     print(f"  📊 SEO 최종 점수: {score}/100  {rank_label}  키워드밀도: {kw_density_final:.1%}")
 
-    # ★★★ SEO 90점 미만 발행 차단 (k-health365.com은 예외 — 기존 정책 유지)
-    if not is_khealth and score < SEO_TARGET:
+    # ★★★ SEO 90점 미만 발행 차단 (전 사이트 동일 정책 — k-health365.com 예외 폐지)
+    if score < SEO_TARGET:
         print(f"  ⛔ SEO {score}점 < {SEO_TARGET}점 → 발행 취소 (품질 기준 미달)")
         record_result(url, theme, keyword, title, "", score, len(images), "⛔ skip_low_seo")
         return False
@@ -3056,6 +3056,23 @@ def main():
     _jitter = _random_jitter.randint(0, 7200)
     print(f"⏳ 발행 시간 랜덤화: {_jitter//60}분 {_jitter%60}초 대기 후 시작 (목표시각 ±1시간 범위)...")
     _time_module.sleep(_jitter)
+
+    # ★★★ SEO 90점 미만 기존 글 자동 삭제 (전 사이트 동일 정책, 하루 1회 슬롯1에서만 실행)
+    if RUN_SLOT == 1:
+        print(f"\n{'='*60}")
+        print("🗑️  SEO 90점 미만 기존 글 정리 시작 (전 사이트)")
+        print(f"{'='*60}")
+        total_deleted = 0
+        for site in SITES_CONFIG:
+            wp_pass = os.getenv(site["wp_pass_env"], "")
+            if not wp_pass:
+                continue
+            try:
+                deleted = delete_low_seo_posts(site["url"], wp_pass, min_score=SEO_TARGET)
+                total_deleted += deleted
+            except Exception as e:
+                print(f"   ⚠️ {site['url']} 정리 중 오류: {e}")
+        print(f"🗑️  정리 완료 — 총 {total_deleted}건 삭제\n")
 
     # ★★★ 개편: 27개 사이트 전체 하루 2건 발행 (아침/점심/저녁 3슬롯 중 2슬롯 로테이션)
     # k-health365.com은 항상 슬롯1(아침)+슬롯3(저녁) 고정, 나머지 26개 사이트는
