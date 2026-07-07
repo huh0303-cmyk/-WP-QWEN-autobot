@@ -15,6 +15,8 @@ on:
 jobs:
   fix-images:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -56,3 +58,11 @@ jobs:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python fix_duplicate_hero_images.py
+
+      - name: Commit results file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fix_duplicate_images_results.txt
+          git diff --staged --quiet || git commit -m "chore: 중복 이미지 수정 결과 기록 [skip ci]"
+          git push
