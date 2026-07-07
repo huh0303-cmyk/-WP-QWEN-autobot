@@ -1,6 +1,7 @@
 HTTP 200
-발행된 페이지 총 3개:
+발행된 페이지 총 4개:
 
+  - Privacy Policy → https://kworld365.com/privacy-policy-3/ (slug: privacy-policy-3)
   - About Us → https://kworld365.com/about/ (slug: about)
   - Contact Us → https://kworld365.com/contact/ (slug: contact)
   - Disclaimer → https://kworld365.com/disclaimer/ (slug: disclaimer)
@@ -8,5 +9,5 @@ HTTP 200
 필수 4페이지 체크:
   About: ✅ 있음 (https://kworld365.com/about/)
   Contact: ✅ 있음 (https://kworld365.com/contact/)
-  Privacy: ❌ 없음
+  Privacy: ✅ 있음 (https://kworld365.com/privacy-policy-3/)
   Disclaimer: ✅ 있음 (https://kworld365.com/disclaimer/)
