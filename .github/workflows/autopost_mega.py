@@ -1435,6 +1435,35 @@ def apply_title_template(template: str, keyword: str) -> str:
     return template.replace("{keyword}", keyword, 1)
 
 # ============================================================
+# ★★★ 제목 클리셰(진부한 AI 문구) 감지·차단
+# ============================================================
+BANNED_TITLE_PHRASES = [
+    # 영어 AI 클리셰 (실제 반복 발생 문구 포함)
+    "unlocking", "unlock the", "uncovering", "uncover the", "discover the secrets",
+    "the ultimate guide", "unleash", "elevate your", "dive into", "diving into",
+    "navigating the world of", "a deep dive into", "delve into", "delving into",
+    "harnessing the power of", "revolutionize your", "transform your",
+    "everything you need to know about", "the power of", "a comprehensive guide",
+    "in the world of", "when it comes to",
+    # 한국어 클리셰
+    "총정리", "완벽가이드", "완벽 가이드", "모든 것을 알려드립니다", "총망라",
+    "a to z", "낱낱이 파헤치다",
+]
+
+def has_cliche_title(title: str) -> bool:
+    t = (title or "").lower()
+    return any(p in t for p in BANNED_TITLE_PHRASES)
+
+def enforce_title_quality(title: str, keyword: str, lang: str, mode: str) -> str:
+    """Gemini가 생성한 제목이 클리셰면 안전한 템플릿 제목으로 강제 교체.
+    템플릿 풀(TITLE_TEMPLATES_*)에는 금지 문구가 없으므로 100% 안전."""
+    if title and not has_cliche_title(title):
+        return title
+    safe_title = apply_title_template(pick_title_template(lang, mode), keyword)
+    print(f"   🚫 클리셰 제목 감지 → 안전 템플릿으로 교체: {safe_title[:70]}")
+    return safe_title
+
+# ============================================================
 # ★ 키워드 동의어 / 분산 표현 (밀도 제어용)
 # ============================================================
 KW_SYNONYMS_KO = {
@@ -1602,6 +1631,8 @@ def make_seo_prompt(keyword: str, theme: str, lang: str, mode: str = "blog",
     참고 제목: "{suggested_title}"
     - 제목에 '{keyword}' 1회만 사용. 진부한 반복 표현 금지.
     - 독자의 호기심 또는 손실 회피 심리를 자극하는 훅 사용.
+    - "총정리", "완벽 가이드" 등 상투적 문구 및 영어 클리셰(Unlocking, Uncover, Dive into,
+      Delve into, Elevate Your, Ultimate Guide 등) 절대 사용 금지.
     출력 첫 줄 'TITLE:' 로 시작.
 14. ★ META_DESC: 본문 끝 'META_DESC:' 로 시작, 정확히 130~140자(한글).
     '{keyword}' 1회만 포함, 클릭 유발 자연스러운 문장.
@@ -1632,8 +1663,13 @@ Topic: Write a professional English news/feature article about '{keyword}' ({the
 12. Minimum 4 h2, 2 h3, 2 ul/li lists.
 13. ★★★ Title (very important):
     Reference title: "{suggested_title}"
-    - Use '{keyword}' exactly once in title. No clichéd "complete guide / A to Z" phrases.
-    - Use one strong hook: curiosity gap, loss aversion, contrarian, or expert perspective.
+    - Use '{keyword}' exactly once in title.
+    - ★ NEVER use these overused AI-clickbait phrases (very important — these have been
+      appearing far too often and must be completely avoided): "Unlocking", "Unlock the",
+      "Uncover", "Uncovering", "Discover the Secrets of", "Dive into", "Delve into",
+      "Navigating the World of", "Harnessing the Power of", "Elevate Your", "Unleash",
+      "The Ultimate Guide", "A Comprehensive Guide", "Everything You Need to Know About".
+    - Use ONE strong hook instead: curiosity gap, loss aversion, contrarian, or expert reveal.
     First line starting 'TITLE:'.
 14. ★ META_DESC: After body, 'META_DESC:', exactly 130~155 English characters.
     Include '{keyword}' once. Natural, click-driving sentence.
@@ -1707,7 +1743,12 @@ Topic: '{keyword}' | Category: {theme} | Language: English
 10. E-E-A-T expertise: 2+ specific procedural details from a {p}'s perspective.
 11. ★★★ Title (core of 95-point SEO):
     Reference title: "{suggested_title}"
-    - Use '{keyword}' exactly once. No clichés like "Complete Guide / A to Z / Everything You Need".
+    - Use '{keyword}' exactly once.
+    - ★ NEVER use these overused AI-clickbait phrases (this is critical — these keep
+      appearing and must be completely avoided): "Unlocking", "Unlock the", "Uncover",
+      "Uncovering", "Discover the Secrets of", "Dive into", "Delve into",
+      "Navigating the World of", "Harnessing the Power of", "Elevate Your", "Unleash",
+      "The Ultimate Guide", "A Comprehensive Guide", "Everything You Need to Know About".
     - Use ONE strong hook: curiosity gap, loss aversion, contrarian angle, or expert reveal.
     First output line starting 'TITLE:'.
 12. ★ META_DESC: After body, 'META_DESC:', exactly 130~155 English characters.
@@ -2069,7 +2110,9 @@ def estimate_seo_score(title: str, body: str, meta_desc: str, tags: list,
 
     # ★ 제목 페널티: 진부한 패턴 감점
     cliche_patterns = ["총정리", "a to z", "완벽 가이드", "everything you need",
-                       "complete guide to", "a-to-z", "효과 효과", "방법 방법"]
+                       "complete guide to", "a-to-z", "효과 효과", "방법 방법",
+                       "unlocking", "unlock the", "uncover", "unleash", "elevate your",
+                       "dive into", "delve into", "the ultimate guide"]
     for p in cliche_patterns:
         if p in title_l:
             score -= 5
@@ -2661,6 +2704,7 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
         return {"ok": False, "error": f"WP_PASS_ENV '{site['wp_pass_env']}' not set"}
     site_url = site["url"]
     theme    = site["theme"]
+    lang     = site.get("lang", "en")
 
     author_id     = get_or_create_wp_author(site_url, wp_pass, reporter)
     category_name = get_category_for_post(theme, keyword, title)
@@ -2670,10 +2714,15 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
         category_name = _kworld_slot_cat.get(RUN_SLOT, category_name)
     category_id   = get_or_create_wp_category(site_url, wp_pass, category_name)
 
-    # ★ 이미지 1개만 (반복 방지, Featured Image로 활용)
-    hero_img = build_image_html(image_urls[:1], keyword) if image_urls else ""
-    mid_img  = ""  # 중간 이미지 제거
-    end_img  = ""  # 하단 이미지 제거
+    # ★★★ 이미지 중복 버그 수정 ★★★
+    # 기존 문제: image_urls[0]이 "본문 최상단(hero_img)"과 "Featured Image" 양쪽에
+    #           동시에 쓰여서, 테마가 Featured Image를 글 상단에 자동 노출하는 사이트에서는
+    #           같은 사진이 화면에 두 번(대표이미지 1번 + 본문 이미지 1번) 나타났음.
+    # 수정: image_urls[0]은 오직 Featured Image로만 사용. 본문에는 절대 삽입하지 않음.
+    #      본문에는 남은 이미지(1번, 2번 인덱스)만 사용 → 중복 없이 이미지 낭비도 없음.
+    hero_img = ""  # ★ Featured Image와 중복되므로 본문 최상단엔 절대 삽입하지 않음
+    mid_img  = build_image_html(image_urls[1:2], keyword) if len(image_urls) > 1 else ""
+    end_img  = build_image_html(image_urls[2:3], keyword) if len(image_urls) > 2 else ""
     faq_html = build_faq_schema_html(faq_list)
 
     h2_ends = [m.end() for m in re.finditer(r'</h2>', body_html, re.IGNORECASE)]
@@ -2722,7 +2771,7 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
         else:
             meta_desc = f"Expert guide on {keyword} — verified information and practical tips you need to know."
 
-    # ★ Featured Image WP 미디어에 직접 업로드
+    # ★ Featured Image WP 미디어에 직접 업로드 (image_urls[0] 전용 — 본문과 절대 겹치지 않음)
     featured_media_id = 0
     if image_urls:
         print(f"   📸 Featured Image 업로드 중...")
@@ -2869,6 +2918,9 @@ def process_one_post(site: dict, keyword: str) -> bool:
             title = apply_title_template(
                 pick_title_template(lang, mode), keyword
             )
+
+        # ★★★ 클리셰 제목("Unlocking" 등) 감지 시 안전 템플릿으로 강제 교체
+        title = enforce_title_quality(title, keyword, lang, mode)
 
         pre_score = estimate_seo_score(title, body, meta_desc, tags, faq_list,
                                        ["x", "x", "x"], keyword)
