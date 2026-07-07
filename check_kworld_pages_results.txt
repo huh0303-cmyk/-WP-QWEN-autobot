@@ -1,0 +1,12 @@
+HTTP 200
+발행된 페이지 총 3개:
+
+  - About Us → https://kworld365.com/about/ (slug: about)
+  - Contact Us → https://kworld365.com/contact/ (slug: contact)
+  - Disclaimer → https://kworld365.com/disclaimer/ (slug: disclaimer)
+
+필수 4페이지 체크:
+  About: ✅ 있음 (https://kworld365.com/about/)
+  Contact: ✅ 있음 (https://kworld365.com/contact/)
+  Privacy: ❌ 없음
+  Disclaimer: ✅ 있음 (https://kworld365.com/disclaimer/)
