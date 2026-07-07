@@ -1,27 +1,27 @@
-🌐 https://k-health365.com → 오류: HTTPSConnectionPool(host='k-health365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='k-health365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreamedicaltour.com → 오류: HTTPSConnectionPool(host='koreamedicaltour.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreamedicaltour.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreainvest365.com → 오류: HTTPSConnectionPool(host='koreainvest365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreainvest365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://ki-korea.com → 오류: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='ki-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreainsurance365.com → 오류: HTTPSConnectionPool(host='koreainsurance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreainsurance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://kfinance365.com → 오류: HTTPSConnectionPool(host='kfinance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='kfinance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreataxnlaw.com → 오류: HTTPSConnectionPool(host='koreataxnlaw.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreataxnlaw.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreacrypto365.com → 오류: HTTPSConnectionPool(host='koreacrypto365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreacrypto365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://krealestate365.com → 오류: HTTPSConnectionPool(host='krealestate365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='krealestate365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://ktech365.com → 오류: HTTPSConnectionPool(host='ktech365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='ktech365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://kskin365.com → 오류: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='kskin365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://oliveyoungkorea.com → 오류: HTTPSConnectionPool(host='oliveyoungkorea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='oliveyoungkorea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://kworld365.com → 플러그인 조회 실패 (HTTP 403: <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" conten)
-🌐 https://k-trip365.com → 오류: HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://k-visa365.com → 오류: HTTPSConnectionPool(host='k-visa365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='k-visa365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreawedding365.com → 오류: HTTPSConnectionPool(host='koreawedding365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreawedding365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://kstudy365.com → 오류: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://studyinkorea365.com → 오류: HTTPSConnectionPool(host='studyinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='studyinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://kieca-korea.org → 오류: HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://ksa-korea.org → 오류: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='ksa-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://sis-korea.com → 오류: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='sis-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://jobkorea365.com → 오류: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='jobkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://jobinkorea365.com → 오류: HTTPSConnectionPool(host='jobinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='jobinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://jobkoreaglobal.com → 오류: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://korea365.org → 오류: HTTPSConnectionPool(host='korea365.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='korea365.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://koreanews365.com → 오류: HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-🌐 https://theseouljournal.com → 오류: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/plugins?status=active (Caused by NewConnectionError("HTTPSConnection(host='theseouljournal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
+🌐 https://k-health365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://koreamedicaltour.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 5개 플러그인
+🌐 https://koreainvest365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 4개 플러그인
+🌐 https://ki-korea.com → 코드삽입 관련: ['google-site-kit/google-site-kit'] | 전체 5개 플러그인
+🌐 https://koreainsurance365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://kfinance365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 4개 플러그인
+🌐 https://koreataxnlaw.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://koreacrypto365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://krealestate365.com → 코드삽입 관련: ['google-site-kit/google-site-kit', 'insert-headers-and-footers/ihaf'] | 전체 4개 플러그인
+🌐 https://ktech365.com → 코드삽입 관련: ['google-site-kit/google-site-kit', 'insert-headers-and-footers/ihaf'] | 전체 4개 플러그인
+🌐 https://kskin365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://oliveyoungkorea.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://kworld365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 2개 플러그인
+🌐 https://k-trip365.com → 플러그인 조회 실패 (HTTP 401: {"code":"rest_cannot_view_plugins","message":"\uc8c4\uc1a1\ud558\uc9c0\ub9cc, \uc774 \uc0ac\uc774\ud)
+🌐 https://k-visa365.com → 코드삽입 관련: ['google-site-kit/google-site-kit', 'insert-headers-and-footers/ihaf'] | 전체 4개 플러그인
+🌐 https://koreawedding365.com → 코드삽입 관련: ['google-site-kit/google-site-kit'] | 전체 6개 플러그인
+🌐 https://kstudy365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 14개 플러그인
+🌐 https://studyinkorea365.com → 코드삽입 관련: 없음 | 전체 2개 플러그인
+🌐 https://kieca-korea.org → 코드삽입 관련: 없음 | 전체 3개 플러그인
+🌐 https://ksa-korea.org → 코드삽입 관련: ['google-site-kit/google-site-kit'] | 전체 3개 플러그인
+🌐 https://sis-korea.com → 코드삽입 관련: 없음 | 전체 3개 플러그인
+🌐 https://jobkorea365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 5개 플러그인
+🌐 https://jobinkorea365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://jobkoreaglobal.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 12개 플러그인
+🌐 https://korea365.org → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 3개 플러그인
+🌐 https://koreanews365.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 9개 플러그인
+🌐 https://theseouljournal.com → 코드삽입 관련: ['insert-headers-and-footers/ihaf'] | 전체 6개 플러그인
