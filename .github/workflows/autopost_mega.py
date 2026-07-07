@@ -2270,6 +2270,27 @@ def load_keyword_no_dup(filename: str, site_url: str, fallback: str) -> str:
     return fallback
 
 # ============================================================
+# WP 발행글 수 조회 (X-WP-Total 헤더 활용 — 가볍게 카운트만)
+# ============================================================
+def get_wp_post_count(site_url: str, wp_pass: str, after_iso: str = None) -> int:
+    try:
+        params = {"per_page": 1, "status": "publish"}
+        if after_iso:
+            params["after"] = after_iso
+        r = requests.head(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+                          params=params, timeout=10)
+        if r.status_code != 200:
+            # 일부 서버는 HEAD를 안 받으므로 GET으로 폴백
+            r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+                             params={**params, "_fields": "id"}, timeout=10)
+        total = r.headers.get("X-WP-Total")
+        return int(total) if total is not None else 0
+    except Exception as e:
+        print(f"   ⚠️ 발행글수 조회 실패 ({site_url}): {e}")
+        return 0
+
+
+# ============================================================
 # 사이트 도달 가능 여부
 # ============================================================
 def is_site_reachable(site_url: str, timeout: int = 8) -> bool:
@@ -2698,7 +2719,7 @@ def delete_low_seo_posts(site_url: str, pw: str, min_score: int = 90):
 
 def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
             tags: list, faq_list: list, image_urls: list,
-            keyword: str, seo_score: int, reporter: dict) -> dict:
+            keyword: str, seo_score: int, reporter: dict, forced_category: str = None) -> dict:
     wp_pass  = os.getenv(site["wp_pass_env"], "")
     if not wp_pass:
         return {"ok": False, "error": f"WP_PASS_ENV '{site['wp_pass_env']}' not set"}
@@ -2708,10 +2729,10 @@ def wp_post(site: dict, title: str, body_html: str, meta_desc: str,
 
     author_id     = get_or_create_wp_author(site_url, wp_pass, reporter)
     category_name = get_category_for_post(theme, keyword, title)
-    # ★ kworld365.com: AdSense 심사 대비 하루 3건, 슬롯별로 카테고리 강제 고정 배정
-    if "kworld365" in site_url:
-        _kworld_slot_cat = {1: "K-Pop", 2: "Learn Korean", 3: "Travel"}
-        category_name = _kworld_slot_cat.get(RUN_SLOT, category_name)
+    # ★ kworld365.com: AdSense 심사 대비 — 그날 이미 발행된 건수를 기준으로
+    #   K-Pop/Learn Korean/Travel을 순환 배정 (forced_category로 전달받음)
+    if "kworld365" in site_url and forced_category:
+        category_name = forced_category
     category_id   = get_or_create_wp_category(site_url, wp_pass, category_name)
 
     # ★★★ 이미지 중복 버그 수정 ★★★
@@ -2870,7 +2891,7 @@ def flush_log_to_google_sheet():
 # ============================================================
 # ★ 단일 포스트 처리 (SEO 95점 완전 보장)
 # ============================================================
-def process_one_post(site: dict, keyword: str) -> bool:
+def process_one_post(site: dict, keyword: str, forced_category: str = None) -> bool:
     url   = site["url"]
     lang  = site["lang"]
     theme = site["theme"]
@@ -2981,8 +3002,8 @@ def process_one_post(site: dict, keyword: str) -> bool:
     print(f"     ↳ 본문:{plain_len}자 | 통계:{stat_cnt}개 | 링크:{ilinks}개 | TABLE:{tb_cnt}개 | H2:{h2_cnt}개 | META:{len(meta_desc)}자")
 
     category_name = get_category_for_post(theme, keyword, title)
-    if "kworld365" in url:
-        category_name = {1: "K-Pop", 2: "Learn Korean", 3: "Travel"}.get(RUN_SLOT, category_name)
+    if "kworld365" in url and forced_category:
+        category_name = forced_category
     print(f"  📁 카테고리: {category_name}")
 
     if mode in ("news", "news_en") and title:
@@ -2996,7 +3017,7 @@ def process_one_post(site: dict, keyword: str) -> bool:
         _wp_recent_titles_cache[url] = site_cache
 
     result = wp_post(site, title, body, meta_desc, tags, faq_list, images,
-                     keyword, score, reporter)
+                     keyword, score, reporter, forced_category=forced_category)
     if result["ok"]:
         author_name    = result.get("author", reporter["name"])
         category_label = result.get("category", category_name)
@@ -3048,10 +3069,29 @@ def main():
         is_khealth = "k-health365" in url
         is_kworld  = "kworld365" in url
 
+        kworld_categories_for_today = []  # 오늘 발행분에 순서대로 배정할 카테고리 목록
+
         if is_khealth:
             n = 0 if RUN_SLOT == 2 else 1  # 아침/저녁만, 낮 건너뜀
         elif is_kworld:
-            n = 1  # ★ AdSense 심사 대비: 하루 3건, 슬롯마다 카테고리 하나씩 고정 배정
+            # ★★★ kworld365.com AdSense 심사 준비: 총 발행글 30건 될 때까지 하루 4건,
+            #     그 이후는 하루 2건. 3슬롯(아침/점심/저녁)에 나눠서 발행.
+            wp_pass_kw = os.getenv(site["wp_pass_env"], "")
+            total_count = get_wp_post_count(url, wp_pass_kw) if wp_pass_kw else 0
+            daily_target = 4 if total_count < 30 else 2
+            slot_map = {1: 2, 2: 1, 3: 1} if daily_target == 4 else {1: 1, 2: 0, 3: 1}
+            n = slot_map.get(RUN_SLOT, 0)
+            print(f"   📊 kworld365 누적 발행 {total_count}건 → 오늘 목표 {daily_target}건/일 (슬롯{RUN_SLOT}: {n}건)")
+
+            if n > 0 and wp_pass_kw:
+                # 오늘(KST) 이미 발행된 건수를 구해서 카테고리를 이어서 순환 배정
+                today_start_kst = now_kst().replace(hour=0, minute=0, second=0, microsecond=0)
+                today_start_utc_iso = today_start_kst.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+                today_count = get_wp_post_count(url, wp_pass_kw, after_iso=today_start_utc_iso)
+                golden_cats = ["K-Pop", "Learn Korean", "Travel"]
+                kworld_categories_for_today = [
+                    golden_cats[(today_count + i) % 3] for i in range(n)
+                ]
         else:
             skip_slot = ((site_idx + _day_of_year) % 3) + 1  # 매일 로테이션되는 스킵 슬롯
             n = 0 if RUN_SLOT == skip_slot else 1
@@ -3077,7 +3117,8 @@ def main():
                     site["keywords_file"], url,
                     fallback=f"{theme} tips"
                 )
-            ok = process_one_post(site, keyword)
+            forced_category = kworld_categories_for_today[i] if is_kworld and i < len(kworld_categories_for_today) else None
+            ok = process_one_post(site, keyword, forced_category=forced_category)
             if ok: total_ok += 1
             else:  total_fail += 1
             if i < n - 1: time.sleep(random.uniform(RATE_LIMIT_SLEEP, RATE_LIMIT_SLEEP + 5))
