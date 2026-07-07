@@ -1,0 +1,28 @@
+name: Check Kworld365 Required Pages (일회성 수동 실행)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-pages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run check
+        env:
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+        run: python check_kworld_pages.py
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add check_kworld_pages_results.txt
+          git diff --staged --quiet || git commit -m "chore: kworld365 필수페이지 점검 결과 [skip ci]"
+          git push
