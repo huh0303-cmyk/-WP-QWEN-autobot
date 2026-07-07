@@ -16,6 +16,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
       - name: Run check
+        continue-on-error: true
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -46,6 +47,7 @@ jobs:
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python inject_ga4_widget.py
       - name: Commit results
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
