@@ -1,0 +1,35 @@
+name: Remove Site Kit Plugin (일회성 수동 실행)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Remove Site Kit
+        continue-on-error: true
+        env:
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+        run: python remove_sitekit.py
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add remove_sitekit_results.txt
+          git diff --staged --quiet || git commit -m "chore: Site Kit 삭제 결과 [skip ci]"
+          git push
