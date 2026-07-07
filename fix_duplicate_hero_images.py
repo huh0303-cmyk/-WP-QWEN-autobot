@@ -159,24 +159,32 @@ def fix_site(site: dict) -> dict:
 
 
 def main():
-    print(f"{'='*60}")
-    print(f"🔧 중복 이미지 일괄 수정 시작 {'(DRY_RUN — 미리보기만)' if DRY_RUN else ''}")
-    print(f"{'='*60}\n")
+    lines = []
+    def log(msg):
+        print(msg)
+        lines.append(msg)
+
+    log(f"{'='*60}")
+    log(f"🔧 중복 이미지 일괄 수정 결과 {'(DRY_RUN — 미리보기만)' if DRY_RUN else ''}")
+    log(f"{'='*60}\n")
 
     grand_total = {"scanned": 0, "fixed": 0, "skipped": 0, "errors": 0}
 
     for site in SITES:
-        print(f"🌐 {site['url']}")
+        log(f"🌐 {site['url']}")
         stats = fix_site(site)
         for k in grand_total:
             grand_total[k] += stats[k]
-        print(f"   → 스캔 {stats['scanned']}건 | 수정 {stats['fixed']}건 | "
-              f"해당없음 {stats['skipped']}건 | 오류 {stats['errors']}건\n")
+        log(f"   → 스캔 {stats['scanned']}건 | 수정 {stats['fixed']}건 | "
+            f"해당없음 {stats['skipped']}건 | 오류 {stats['errors']}건\n")
 
-    print(f"{'='*60}")
-    print(f"✅ 전체 완료 — 스캔 {grand_total['scanned']}건 | "
-          f"수정 {grand_total['fixed']}건 | 오류 {grand_total['errors']}건")
-    print(f"{'='*60}")
+    log(f"{'='*60}")
+    log(f"✅ 전체 완료 — 스캔 {grand_total['scanned']}건 | "
+        f"수정 {grand_total['fixed']}건 | 오류 {grand_total['errors']}건")
+    log(f"{'='*60}")
+
+    with open("fix_duplicate_images_results.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
 
 
 if __name__ == "__main__":
