@@ -1,0 +1,19 @@
+name: Dedup Kworld GA4 Widget (일회성 수동 실행)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dedup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Dedup
+        env:
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+        run: python dedup_kworld_ga4.py
