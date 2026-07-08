@@ -1,0 +1,70 @@
+name: Inject GA4 Widget (일회성 수동 실행)
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_only:
+        description: "true면 kworld365.com에만 테스트 삽입"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      ga4_id:
+        description: "GA4 측정 ID (G-XXXXXXXXXX)"
+        required: true
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Inject GA4
+        continue-on-error: true
+        env:
+          TEST_ONLY: ${{ github.event.inputs.test_only }}
+          GA4_MEASUREMENT_ID: ${{ github.event.inputs.ga4_id }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python inject_ga4_widget_v2.py
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add inject_ga4_results.txt
+          git diff --staged --quiet || git commit -m "chore: GA4 위젯 삽입 결과 [skip ci]"
+          git push
