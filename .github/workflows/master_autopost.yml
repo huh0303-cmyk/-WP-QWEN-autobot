@@ -709,6 +709,27 @@ jobs:
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/setup_indexnow.py
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: k-health365 URL 수집 + IndexNow 전송
+# ══════════════════════════════════════════════════════════
+  collect-khealth-urls:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'urlsend' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "URL 수집 + IndexNow 전송"
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          INDEXNOW_KEY:  ${{ secrets.INDEXNOW_KEY }}
+        run: python .github/workflows/collect_khealth_urls.py
+
 # JOB 4: 자동 포스팅
 # ══════════════════════════════════════════════════════════
   autopost:
