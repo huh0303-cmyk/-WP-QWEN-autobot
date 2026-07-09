@@ -730,6 +730,26 @@ jobs:
           INDEXNOW_KEY:  ${{ secrets.INDEXNOW_KEY }}
         run: python .github/workflows/collect_khealth_urls.py
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: 더미 슬러그 전수조사 + 영구 삭제
+# ══════════════════════════════════════════════════════════
+  fix-dummy-posts:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fixdummy' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "더미슬러그 전수조사+영구삭제"
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python .github/workflows/fix_dummy_posts.py
+
 # JOB 4: 자동 포스팅
 # ══════════════════════════════════════════════════════════
   autopost:
