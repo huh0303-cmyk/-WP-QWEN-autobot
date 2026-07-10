@@ -945,3 +945,21 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/ping_sitemaps.py
 
+
+  debug-kworld:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'debugkworld' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "kworld+kieca 발행 테스트"
+        env:
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+        run: python .github/workflows/debug_kworld.py
+
