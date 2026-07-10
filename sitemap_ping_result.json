@@ -1,0 +1,384 @@
+{
+  "total_ok": 54,
+  "total_fail": 162,
+  "sites": {
+    "k-health365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreamedicaltour.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreainvest365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "ki-korea.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreainsurance365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "kfinance365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreataxnlaw.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreacrypto365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "krealestate365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "ktech365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "kskin365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "oliveyoungkorea.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "kworld365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "k-trip365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "k-visa365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreawedding365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "kstudy365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "studyinkorea365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "kieca-korea.org": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "ksa-korea.org": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "sis-korea.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "jobkorea365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "jobinkorea365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "jobkoreaglobal.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "korea365.org": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "koreanews365.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    },
+    "theseouljournal.com": {
+      "ok": [
+        "Yandex:sitemap_index.xml",
+        "Yandex:post-sitemap.xml"
+      ],
+      "fail": [
+        "Google:404",
+        "Bing:410",
+        "Naver:404",
+        "Google:404",
+        "Bing:410",
+        "Naver:404"
+      ]
+    }
+  }
+}
