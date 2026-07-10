@@ -1067,3 +1067,22 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/diagnose_khealth_index.py
 
+
+  fix-khealth-meta:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fixkhealthmeta' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "khealth blog_public+Rank Math 메타 일괄 수정"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/fix_khealth_meta.py
+
