@@ -1145,3 +1145,22 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/deep_fix_khealth.py
 
+
+  fix-khealth-404:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fix404' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "404 수정 + 이미지ALT + 301 리다이렉트"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/fix_khealth_404.py
+
