@@ -1,0 +1,249 @@
+{
+  "grand_ok": 54,
+  "grand_fail": 0,
+  "sites": [
+    {
+      "site": "https://k-health365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreamedicaltour.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreainvest365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://ki-korea.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreainsurance365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://kfinance365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreataxnlaw.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreacrypto365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://krealestate365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://ktech365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://kskin365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://oliveyoungkorea.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://kworld365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://k-trip365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://k-visa365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreawedding365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://kstudy365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://studyinkorea365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://kieca-korea.org",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://ksa-korea.org",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://sis-korea.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://jobkorea365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://jobinkorea365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://jobkoreaglobal.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://korea365.org",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://koreanews365.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    },
+    {
+      "site": "https://theseouljournal.com",
+      "ok": 2,
+      "fail": 0,
+      "done": [
+        "blog_public",
+        "permalink_resave"
+      ]
+    }
+  ]
+}
