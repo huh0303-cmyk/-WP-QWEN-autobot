@@ -924,3 +924,24 @@ jobs:
           GITHUB_REPOSITORY:        ${{ github.repository }}
         run: python .github/workflows/gsc_sitemap_manager.py
 
+
+# ══════════════════════════════════════════════════════════
+# JOB: 27개 사이트맵 Google/Bing/Naver/Yandex ping
+# ══════════════════════════════════════════════════════════
+  ping-sitemaps:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'ping' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "27개 사이트맵 검색엔진 ping"
+        env:
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/ping_sitemaps.py
+
