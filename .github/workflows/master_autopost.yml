@@ -751,6 +751,7 @@ jobs:
         run: python .github/workflows/fix_dummy_posts.py
 
 
+
 # ══════════════════════════════════════════════════════════
 # JOB: 27개 사이트 더미글 전수 즉시 삭제
 # ══════════════════════════════════════════════════════════
@@ -767,6 +768,8 @@ jobs:
       - run: pip install requests -q
       - name: "27개 사이트 더미글 전수삭제"
         env:
+          GITHUB_TOKEN:         ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY:    ${{ github.repository }}
           KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
@@ -795,23 +798,8 @@ jobs:
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/delete_all_dummy.py
-      - name: "결과 파일 API 커밋"
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -f dummy_delete_result.json ]; then
-            CONTENT=$(base64 -w0 dummy_delete_result.json)
-            SHA=$(curl -s -H "Authorization: token $GH_TOKEN"               "https://api.github.com/repos/${{ github.repository }}/contents/dummy_delete_result.json"               | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
-            if [ -n "$SHA" ]; then
-              curl -s -X PUT -H "Authorization: token $GH_TOKEN" -H "Content-Type: application/json"                 -d "{"message":"result: 더미삭제 완료","content":"$CONTENT","sha":"$SHA"}"                 "https://api.github.com/repos/${{ github.repository }}/contents/dummy_delete_result.json"
-            else
-              curl -s -X PUT -H "Authorization: token $GH_TOKEN" -H "Content-Type: application/json"                 -d "{"message":"result: 더미삭제 완료","content":"$CONTENT"}"                 "https://api.github.com/repos/${{ github.repository }}/contents/dummy_delete_result.json"
-            fi
-            echo "✅ 결과파일 커밋 완료"
-          fi
 
-# JOB 4: 자동 포스팅
+
 # ══════════════════════════════════════════════════════════
   autopost:
     needs: determine-slot
