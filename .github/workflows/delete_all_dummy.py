@@ -4,7 +4,7 @@
 import os, requests, time, re, sys, json, base64
 
 WP_USER  = "huh0303@gmail.com"
-GH_TOKEN = os.getenv("GITHUB_TOKEN","")
+GH_TOKEN = os.getenv("GH_PAT","")
 GH_REPO  = os.getenv("GITHUB_REPOSITORY","huh0303-cmyk/-WP-QWEN-autobot")
 
 SITES = [
