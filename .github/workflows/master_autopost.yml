@@ -768,7 +768,7 @@ jobs:
       - run: pip install requests -q
       - name: "27개 사이트 더미글 전수삭제"
         env:
-          GITHUB_TOKEN:         ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT:               ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY:    ${{ github.repository }}
           KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
