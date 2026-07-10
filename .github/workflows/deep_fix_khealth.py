@@ -95,8 +95,8 @@ try:
             cat_map[cat["id"]] = name
             if name in ('기타','Etc','etc','General'):
                 etc_id = cat["id"]
-print(f"  카테고리: {cat_map}")
-print(f"  기타 카테고리 ID: {etc_id}")
+    print(f"  카테고리: {cat_map}")
+    print(f"  기타 카테고리 ID: {etc_id}")
 except: pass
 
 # 건강 카테고리-키워드 매핑
