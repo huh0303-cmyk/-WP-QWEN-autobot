@@ -961,5 +961,7 @@ jobs:
         env:
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/debug_kworld.py
 
