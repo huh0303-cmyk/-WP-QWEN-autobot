@@ -1048,3 +1048,22 @@ jobs:
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/audit_tags.py
 
+
+  diagnose-khealth:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'diagnosekhealth' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "k-health365 색인1개 원인 정밀진단"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/diagnose_khealth_index.py
+
