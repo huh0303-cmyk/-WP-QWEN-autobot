@@ -10,7 +10,15 @@ k-health365.com 남은 글 심층 정리
 5. Rank Math 태그 noindex 강제 설정
 """
 import os, requests, re, time, sys, json, base64
-from google import genai
+try:
+    from google import genai
+    GEMINI_OK = True
+except ImportError:
+    try:
+        import google.generativeai as genai_old
+        GEMINI_OK = False
+    except:
+        GEMINI_OK = False
 
 WP_USER   = "huh0303@gmail.com"
 SITE      = "https://k-health365.com"
@@ -22,7 +30,13 @@ GH_REPO   = os.getenv("GITHUB_REPOSITORY","")
 if not pw: print("NO PW"); exit(1)
 base = f"{SITE}/wp-json/wp/v2"
 auth = (WP_USER, pw)
-gemini = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
+if GEMINI_OK and GEMINI_KEY:
+    try:
+        gemini = genai.Client(api_key=GEMINI_KEY)
+    except:
+        gemini = None
+else:
+    gemini = None
 
 print("="*65)
 print("k-health365.com 심층 정리")
