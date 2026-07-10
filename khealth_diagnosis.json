@@ -1,0 +1,18 @@
+{
+  "blog_public": null,
+  "robots_txt_status": 200,
+  "robots_txt": "User-agent: *\nAllow: /\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: https://k-health365.com/sitemap_index.xml",
+  "homepage_status": 200,
+  "homepage_noindex": false,
+  "homepage_canonical": [
+    "https://k-health365.com/"
+  ],
+  "x_robots_tag": "없음",
+  "post_noindex_count": 0,
+  "post_issues": [],
+  "total": 452,
+  "index": 452,
+  "noindex": 0,
+  "no_focus": 288,
+  "no_desc": 359
+}
