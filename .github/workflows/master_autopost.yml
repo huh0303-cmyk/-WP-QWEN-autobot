@@ -1136,7 +1136,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
+      - run: pip install requests google-genai -q
       - name: "khealth 태그삭제+제목수정+카테고리+메타"
         env:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
