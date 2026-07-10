@@ -795,6 +795,14 @@ jobs:
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/delete_all_dummy.py
+      - name: "결과 파일 커밋"
+        if: always()
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add dummy_delete_result.json || true
+          git diff --staged --quiet || git commit -m "result: 더미삭제 결과"
+          git push || true
 
 # JOB 4: 자동 포스팅
 # ══════════════════════════════════════════════════════════
