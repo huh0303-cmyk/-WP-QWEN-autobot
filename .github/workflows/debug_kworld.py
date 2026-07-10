@@ -1,53 +1,73 @@
 #!/usr/bin/env python3
-import os, requests
+import os, requests, json, base64
 
-WP_USER = "huh0303@gmail.com"
+WP_USER  = "huh0303@gmail.com"
+GH_TOKEN = os.getenv("GH_PAT","")
+GH_REPO  = os.getenv("GITHUB_REPOSITORY","")
+
 SITES = [
-    ("https://kworld365.com",  "KWORLD365COM"),
-    ("https://kieca-korea.org","KIECAKOREAORG"),
+    ("https://kworld365.com",   "KWORLD365COM"),
+    ("https://kieca-korea.org", "KIECAKOREAORG"),
 ]
 
+results = {}
 for site_url, env_key in SITES:
     pw = os.getenv(env_key,"")
+    info = {"pw_exists": bool(pw), "rest_status": 0, "post_count": 0, "publish_test": "", "error": ""}
+
     if not pw:
-        print(f"❌ {site_url} — Secret없음"); continue
+        info["error"] = "Secret없음"
+        results[site_url] = info
+        continue
 
     base = f"{site_url}/wp-json/wp/v2"
     auth = (WP_USER, pw)
-    print(f"\n🌐 {site_url}")
 
-    # 1. WP REST 접근
-    r = requests.get(f"{base}/posts?per_page=3&_fields=id,title,date",
-                     auth=auth, timeout=15)
-    print(f"  REST 접근: HTTP {r.status_code}")
-    if r.status_code == 200:
-        posts = r.json()
-        print(f"  글 수 확인: {len(posts)}개")
-        for p in posts:
-            t = p.get("title",{}).get("rendered","")
-            print(f"    [{p['id']}] {t[:50]} | {p['date'][:10]}")
-    else:
-        print(f"  오류: {r.text[:200]}")
-
-    # 2. 사이트 도달 가능
     try:
-        r2 = requests.head(f"{site_url}/wp-json/", auth=auth, timeout=8)
-        print(f"  wp-json: HTTP {r2.status_code}")
-        deny = r2.headers.get("x-deny-reason","없음")
-        print(f"  WAF deny: {deny}")
+        r = requests.get(f"{base}/posts?per_page=5&status=publish&_fields=id,title,date",
+                         auth=auth, timeout=15)
+        info["rest_status"] = r.status_code
+        if r.status_code == 200:
+            posts = r.json()
+            info["post_count"] = len(posts)
+            info["recent_posts"] = [
+                {"id": p["id"], "title": p.get("title",{}).get("rendered","")[:50],
+                 "date": p.get("date","")[:10]} for p in posts
+            ]
     except Exception as e:
-        print(f"  연결오류: {e}")
+        info["error"] = str(e)[:100]
 
-    # 3. 테스트 글 발행
-    test = {"title":"[TEST] kworld 발행 테스트","content":"테스트","status":"draft"}
-    r3 = requests.post(f"{base}/posts", auth=auth, json=test, timeout=15)
-    print(f"  테스트 발행: HTTP {r3.status_code}")
-    if r3.status_code in (200,201):
-        pid = r3.json().get("id")
-        print(f"  ✅ 발행 성공 (draft id={pid})")
-        # 즉시 삭제
-        requests.delete(f"{base}/posts/{pid}", auth=auth,
-                       params={"force":"true"}, timeout=10)
-        print(f"  🗑️  테스트 글 삭제")
-    else:
-        print(f"  ❌ 발행 실패: {r3.text[:200]}")
+    try:
+        r2 = requests.post(f"{base}/posts", auth=auth,
+                           json={"title":"[TEST DELETE]","content":"test","status":"draft"},
+                           timeout=15)
+        info["publish_test"] = f"HTTP {r2.status_code}"
+        if r2.status_code in (200,201):
+            pid = r2.json().get("id")
+            requests.delete(f"{base}/posts/{pid}", auth=auth,
+                           params={"force":"true"}, timeout=10)
+            info["publish_test"] += f" OK (id={pid} deleted)"
+        else:
+            info["publish_test"] += f" ERR: {r2.text[:100]}"
+    except Exception as e:
+        info["publish_test"] = str(e)[:100]
+
+    results[site_url] = info
+
+# GitHub에 결과 저장
+if GH_TOKEN:
+    content = base64.b64encode(json.dumps(results, ensure_ascii=False, indent=2).encode()).decode()
+    gh_h = {"Authorization": f"token {GH_TOKEN}", "Content-Type": "application/json"}
+    path = "debug_kworld_result.json"
+    rg = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}", headers=gh_h, timeout=10)
+    sha = rg.json().get("sha","") if rg.status_code==200 else ""
+    payload = {"message":"debug: kworld kieca 진단 결과","content":content}
+    if sha: payload["sha"] = sha
+    requests.put(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
+                 headers=gh_h, json=payload, timeout=15)
+    print("결과 저장 완료")
+
+for site, info in results.items():
+    print(f"\n{site}")
+    for k,v in info.items():
+        print(f"  {k}: {v}")
