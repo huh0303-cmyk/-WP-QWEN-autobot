@@ -1125,3 +1125,23 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/check_blog_public.py
 
+
+  deep-fix-khealth:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'deepfixkhealth' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai -q
+      - name: "khealth 태그삭제+제목수정+카테고리+메타"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/deep_fix_khealth.py
+
