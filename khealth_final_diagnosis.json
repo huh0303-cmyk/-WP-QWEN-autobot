@@ -1,0 +1,39 @@
+{
+  "robots_txt_status": 200,
+  "robots_txt": "User-agent: *\nAllow: /\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: https://k-health365.com/sitemap_index.xml",
+  "home_status": 200,
+  "home_url": "https://k-health365.com/",
+  "home_canonical": [
+    "https://k-health365.com/"
+  ],
+  "noindex_posts_found": [],
+  "blog_public": null,
+  "wp_settings_keys": [
+    "title",
+    "description",
+    "url",
+    "email",
+    "timezone",
+    "date_format",
+    "time_format",
+    "start_of_week",
+    "language",
+    "use_smilies",
+    "default_category",
+    "default_post_format",
+    "posts_per_page",
+    "show_on_front",
+    "page_on_front",
+    "page_for_posts",
+    "default_ping_status",
+    "default_comment_status",
+    "site_logo",
+    "site_icon"
+  ],
+  "total_posts": 291,
+  "noindex_db": 0,
+  "no_focus": 33,
+  "no_desc": 0,
+  "issues": [],
+  "issue_count": 0
+}
