@@ -1240,3 +1240,22 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/get_top_posts.py
 
+
+  get-index-urls:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'indexurls' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "GSC 색인요청 URL 목록 추출"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/get_index_urls.py
+
