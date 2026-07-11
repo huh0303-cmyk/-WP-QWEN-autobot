@@ -1183,3 +1183,22 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/workflows/nuke_all_tags.py
 
+
+  fix-blogger:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fixblogger' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "Blogger 잔재 URL 301 리다이렉트"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/fix_blogger_remnants.py
+
