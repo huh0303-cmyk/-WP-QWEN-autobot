@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-inject_adsense_v2.py
-Rank Math Analytics 연동으로 애드센스 코드 삽입
-방법: WP Options API 직접 → generate_settings (GeneratePress)
+inject_via_wpcode.py
+WPCode 플러그인 스니펫 API로 애드센스 코드 삽입
+WPCode REST endpoint: /wp-json/wpcode/v1/snippets
 """
 import os, requests, time, sys, json, base64
 
@@ -11,10 +11,18 @@ PUB_ID     = "ca-pub-3456727916386941"
 GH_TOKEN   = os.getenv("GH_PAT","")
 GH_REPO    = os.getenv("GITHUB_REPOSITORY","")
 
-ADSENSE_SCRIPT = f'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={PUB_ID}" crossorigin="anonymous"></script>'
+# k-health365.com에 있는 것과 동일한 헤더 코드
+HEADER_CODE = f'''<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={PUB_ID}" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
+<style>
+ins.adsbygoogle {{ display: block; min-height: 90px; }}
+ins.adsbygoogle[data-ad-status="unfilled"],
+ins.adsbygoogle:not([data-ad-status]) {{ min-height: 90px !important; background: transparent; }}
+.ad-slot, .adsense, .google-auto-placed {{ min-height: 90px; display: block; }}
+</style>'''
 
 SITES = [
-    ("https://k-health365.com",        "KHEALTH365COM"),
     ("https://koreamedicaltour.com",    "KOREAMEDICALTOURCOM"),
     ("https://koreainvest365.com",      "KOREAINVEST365COM"),
     ("https://ki-korea.com",            "KIKOREACOM"),
@@ -46,102 +54,97 @@ SITES = [
 results = {"ok":[], "fail":[]}
 
 print("="*60)
-print("애드센스 Auto Ads 코드 삽입 v2")
+print("WPCode로 애드센스 코드 26개 사이트 삽입")
 print("="*60)
 sys.stdout.flush()
 
 for site_url, env_key in SITES:
     pw = os.getenv(env_key,"")
     if not pw:
-        results["fail"].append(site_url)
+        print(f"\n⚠️  {site_url} — Secret없음")
+        results["fail"].append(site_url.replace("https://",""))
         continue
 
     domain = site_url.replace("https://","")
-    base   = f"{site_url}/wp-json/wp/v2"
     auth   = (WP_USER, pw)
     inserted = False
 
     print(f"\n🌐 {domain}")
     sys.stdout.flush()
 
-    # ── 방법1: Rank Math Analytics settings에 삽입 ──
-    try:
-        r = requests.get(f"{site_url}/wp-json/rankmath/v1/settings",
-                        auth=auth, timeout=10)
-        if r.status_code == 200:
-            rm = r.json()
-            general = rm.get("general", {})
+    # ── WPCode v1 스니펫 API ──────────────────────────────
+    wpcode_ep = f"{site_url}/wp-json/wpcode/v1/snippets"
 
-            # 이미 있는지 확인
-            head_code = general.get("head_code","") or ""
-            if PUB_ID in head_code:
-                print(f"  ✅ 이미 삽입됨 (Rank Math)")
+    # 기존 스니펫 목록 조회
+    try:
+        r = requests.get(wpcode_ep, auth=auth, timeout=10)
+        print(f"  WPCode API: HTTP {r.status_code}")
+
+        if r.status_code == 200:
+            snippets = r.json()
+            # 이미 애드센스 코드 있는지 확인
+            existing = None
+            for sn in (snippets if isinstance(snippets,list) else snippets.get("items",[])):
+                if PUB_ID in str(sn.get("code","")) or PUB_ID in str(sn.get("snippet_code","")):
+                    existing = sn
+                    break
+
+            if existing:
+                print(f"  ✅ 이미 존재 (ID: {existing.get('id')})")
                 results["ok"].append(domain)
                 inserted = True
             else:
-                new_head = (head_code + "\n" + ADSENSE_SCRIPT).strip()
-                general["head_code"] = new_head
-                r2 = requests.post(
-                    f"{site_url}/wp-json/rankmath/v1/settings",
-                    auth=auth,
-                    json={"general": general},
-                    timeout=15
-                )
-                if r2.status_code == 200:
-                    # 확인
-                    check = r2.json().get("general",{}).get("head_code","")
-                    if PUB_ID in check:
-                        print(f"  ✅ Rank Math head_code 삽입 성공")
-                        results["ok"].append(domain)
-                        inserted = True
-                    else:
-                        print(f"  ⚠️ Rank Math 저장됐지만 확인 안 됨")
-                else:
-                    print(f"  ⚠️ Rank Math: HTTP {r2.status_code}")
-    except Exception as e:
-        print(f"  📍 Rank Math 방법 실패: {e}")
+                # 새 스니펫 생성
+                new_snippet = {
+                    "name":     "Google AdSense Auto Ads",
+                    "code":     HEADER_CODE,
+                    "location": "header",  # wp_head
+                    "active":   True,
+                    "type":     "html",
+                }
+                r2 = requests.post(wpcode_ep, auth=auth, json=new_snippet, timeout=15)
+                print(f"  스니펫 생성: HTTP {r2.status_code}")
 
-    # ── 방법2: WP 플러그인 옵션 직접 ──
+                if r2.status_code in (200, 201):
+                    sid = r2.json().get("id") or r2.json().get("snippet_id")
+                    print(f"  ✅ WPCode 스니펫 생성 완료 (ID: {sid})")
+                    results["ok"].append(domain)
+                    inserted = True
+                else:
+                    print(f"  응답: {r2.text[:150]}")
+
+        elif r.status_code == 401:
+            print(f"  ⚠️ 인증 실패")
+        elif r.status_code == 404:
+            print(f"  ⚠️ WPCode 미설치")
+        else:
+            print(f"  응답: {r.text[:100]}")
+
+    except Exception as e:
+        print(f"  ❌ {e}")
+
+    # ── WPCode v2 시도 ────────────────────────────────────
     if not inserted:
-        # Insert Headers and Footers 플러그인 (ih_options)
-        for plugin_endpoint in [
-            f"{site_url}/wp-json/ihaf/v1/code",
-            f"{site_url}/wp-json/wpcode/v1/snippets",
+        for alt_ep in [
+            f"{site_url}/wp-json/wpcode/v2/snippets",
+            f"{site_url}/wp-json/wp-code-manager/v1/snippets",
         ]:
             try:
-                r = requests.get(plugin_endpoint, auth=auth, timeout=5)
-                if r.status_code not in (404, 403):
-                    print(f"  📍 플러그인 API 발견: {plugin_endpoint}")
+                r = requests.get(alt_ep, auth=auth, timeout=6)
+                if r.status_code == 200:
+                    print(f"  대안 API: {alt_ep}")
+                    r2 = requests.post(alt_ep, auth=auth,
+                                      json={"name":"AdSense","code":HEADER_CODE,
+                                            "location":"header","active":True},
+                                      timeout=10)
+                    if r2.status_code in (200,201):
+                        print(f"  ✅ 대안 API로 삽입 성공")
+                        results["ok"].append(domain)
+                        inserted = True
+                        break
             except: pass
 
-    # ── 방법3: GeneratePress hooks ──
     if not inserted:
-        try:
-            r = requests.get(f"{base}/settings", auth=auth, timeout=10)
-            if r.status_code == 200:
-                settings = r.json()
-                # generate_hooks_data 확인
-                for key in settings:
-                    if 'generate' in key.lower() and 'hook' in key.lower():
-                        current = settings[key]
-                        if PUB_ID not in str(current):
-                            # 훅에 추가
-                            if isinstance(current, dict):
-                                current["wp_head"] = ADSENSE_SCRIPT
-                            else:
-                                current = {"wp_head": ADSENSE_SCRIPT}
-                            r2 = requests.post(f"{base}/settings", auth=auth,
-                                             json={key: current}, timeout=10)
-                            if r2.status_code == 200:
-                                print(f"  ✅ GeneratePress hooks 삽입 ({key})")
-                                results["ok"].append(domain)
-                                inserted = True
-                                break
-        except Exception as e:
-            print(f"  📍 GeneratePress 실패: {e}")
-
-    if not inserted:
-        print(f"  ❌ 자동 삽입 불가 → WP 관리자 수동 필요")
         results["fail"].append(domain)
 
     time.sleep(0.5)
@@ -150,15 +153,19 @@ for site_url, env_key in SITES:
 if GH_TOKEN:
     content = base64.b64encode(json.dumps(results,ensure_ascii=False,indent=2).encode()).decode()
     gh_h = {"Authorization":f"token {GH_TOKEN}","Content-Type":"application/json"}
-    path = "adsense_inject_result.json"
+    path = "adsense_wpcode_result.json"
     rg = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
                      headers=gh_h, timeout=10)
     sha = rg.json().get("sha","") if rg.status_code==200 else ""
-    payload = {"message":"result: 애드센스 삽입 v2","content":content}
+    payload = {"message":"result: WPCode 애드센스 삽입","content":content}
     if sha: payload["sha"] = sha
     requests.put(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
                 headers=gh_h, json=payload, timeout=15)
 
 print(f"\n{'='*60}")
-print(f"완료 | 성공:{len(results['ok'])} | 수동필요:{len(results['fail'])}")
+print(f"✅ 완료 | 성공:{len(results['ok'])} | 실패:{len(results['fail'])}")
+if results['ok']:
+    print(f"  성공: {results['ok']}")
+if results['fail']:
+    print(f"  실패: {results['fail']}")
 print(f"{'='*60}")
