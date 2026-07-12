@@ -782,6 +782,62 @@ def get_internal_links(site_url, count=4):
     return sel[:count] or [("홈페이지", site_url)]
 
 # ============================================================
+# ★★★ 실제 글 기반 "관련 글" 블록 — 코드가 직접 삽입 (AI 지시에 의존하지 않음) ★★★
+# GSC에서 내부링크 669개가 전부 홈페이지로만 잡힌 원인:
+#   1) 기존 SITE_INTERNAL_LINKS가 실제 글이 아닌 "?s=검색어" 검색결과 URL이었음
+#   2) 프롬프트로 AI에게 "자연스럽게 삽입해줘" 요청만 했을 뿐 강제되지 않았음
+# → 발행 직전 코드가 WP REST API로 실제 최근 글 목록을 가져와
+#   진짜 permalink로 "관련 글" 박스를 무조건 본문 끝에 삽입한다.
+# ============================================================
+_wp_posts_cache: dict = {}
+
+def fetch_recent_wp_posts(site_url, wp_pass, count=30):
+    """실제 발행된 글의 (제목, permalink) 목록을 가져와 캐싱."""
+    if site_url in _wp_posts_cache: return _wp_posts_cache[site_url]
+    posts = []
+    try:
+        r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+                         params={"per_page": count, "orderby":"date", "order":"desc",
+                                 "_fields":"title,link", "status":"publish"}, timeout=12)
+        if r.status_code == 200:
+            for p in r.json():
+                raw = p.get("title", {})
+                t = raw.get("rendered", "") if isinstance(raw, dict) else str(raw)
+                t = re.sub(r'<[^>]+>', '', t).strip()
+                link = p.get("link", "")
+                if t and link:
+                    posts.append((t, link))
+    except: pass
+    _wp_posts_cache[site_url] = posts
+    return posts
+
+def build_related_links_html(site_url, wp_pass, lang, exclude_title=""):
+    """
+    같은 사이트의 실제 글 2~3개(무작위) + (30% 확률로) 클러스터 내
+    형제 사이트 1개를 '관련 글' 박스로 만들어 반환. 전부 실제 permalink.
+    """
+    posts = fetch_recent_wp_posts(site_url, wp_pass, count=30)
+    posts = [p for p in posts if p[0].strip().lower() != exclude_title.strip().lower()]
+    if not posts:
+        return ""  # 그 사이트 첫 글이면 관련글 없음 — 자연스러운 상태
+
+    own_sel = random.sample(posts, min(3, len(posts)))
+    heading = "관련 글" if lang == "ko" else "Related Articles"
+    items = "".join(f'<li><a href="{link}">{title}</a></li>' for title, link in own_sel)
+
+    # 사이트 간 링크는 매번 넣지 않고 ~30%만 (기계적 패턴 방지, 클러스터 내부만)
+    if random.random() < 0.3:
+        cross = CROSS_LINKS.get(site_url, [])
+        if cross:
+            cname, curl = random.choice(cross)
+            items += f'<li><a href="{curl}">{cname}</a></li>'
+
+    return (f'<div class="related-links" style="margin:32px 0;padding:20px;'
+            f'background:#f7f9fb;border-radius:10px;">'
+            f'<h3 style="margin-top:0;">{heading}</h3>'
+            f'<ul style="margin:0;padding-left:20px;">{items}</ul></div>')
+
+# ============================================================
 # ★ 뉴스 키워드
 # ============================================================
 NEWS_KO_FALLBACK = [
@@ -1246,6 +1302,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         ins=half+pm.end() if pm else half
 
     final=hero+body_html[:ins]+(mid if mid else "")+body_html[ins:]+end+faq_html
+
+    related_html = build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
+    final += related_html
 
     tag_ids=[]
     for tag in tags:
