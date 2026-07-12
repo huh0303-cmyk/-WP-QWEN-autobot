@@ -1627,3 +1627,20 @@ jobs:
           GITHUB_REPOSITORY:   ${{ github.repository }}
         run: python .github/workflows/find_adsense_location.py
 
+
+  fix-404-redirects:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fix404' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "404 Blogger URL 301 리다이렉트"
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python .github/workflows/fix_404_redirects.py
+
