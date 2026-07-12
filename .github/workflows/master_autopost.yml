@@ -11,6 +11,10 @@ on:
         description: "슬롯 1=오전 2=오후 3=저녁"
         required: false
         default: "1"
+      target_site:
+        description: "backfilllinks 전용: 특정 사이트 URL만 (비우면 27개 전체) 예) https://k-health365.com"
+        required: false
+        default: ""
   schedule:
     - cron: "10 20 * * *"
     - cron: "10 4 * * *"
@@ -899,7 +903,14 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/backfill_related_links.py
+        run: |
+          if [ -n "${{ github.event.inputs.target_site }}" ]; then
+            echo "▶ 대상 사이트: ${{ github.event.inputs.target_site }}"
+            python scripts/backfill_related_links.py --site "${{ github.event.inputs.target_site }}"
+          else
+            echo "▶ 대상: 27개 사이트 전체"
+            python scripts/backfill_related_links.py
+          fi
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
