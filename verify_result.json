@@ -1,0 +1,25 @@
+{
+  "site": "https://k-health365.com",
+  "total_posts": 183,
+  "posts_with_related_block": 183,
+  "sample": [
+    {
+      "id": 4862,
+      "title": "연예인 건강 이슈 정리 때문에 힘드셨나요? 전문의가 알려주는 해결법",
+      "link": "https://k-health365.com/%ec%97%b0%ec%98%88%ec%9d%b8-%ea%b1%b4%ea%b0%95-%ec%9d%b4%ec%8a%88-%ec%a0%95%eb%a6%ac-%eb%95%8c%eb%ac%b8%ec%97%90-%ed%9e%98%eb%93%9c%ec%85%a8%eb%82%98%ec%9a%94-%ec%a0%84%eb%ac%b8%ec%9d%98%ea%b0%80/",
+      "has_related_block": true
+    },
+    {
+      "id": 4861,
+      "title": "역류성식도염 때문에 힘드셨나요? 전문의가 알려주는 해결법",
+      "link": "https://k-health365.com/%ec%97%ad%eb%a5%98%ec%84%b1%ec%8b%9d%eb%8f%84%ec%97%bc-%eb%95%8c%eb%ac%b8%ec%97%90-%ed%9e%98%eb%93%9c%ec%85%a8%eb%82%98%ec%9a%94-%ec%a0%84%eb%ac%b8%ec%9d%98%ea%b0%80-%ec%95%8c%eb%a0%a4%ec%a3%bc/",
+      "has_related_block": true
+    },
+    {
+      "id": 4844,
+      "title": "임상경력 20년 내과 전문의가 알려주는 안전한 의약품 복용, &#8216;의약품 리콜 확인법",
+      "link": "https://k-health365.com/%ec%9e%84%ec%83%81%ea%b2%bd%eb%a0%a5-20%eb%85%84-%eb%82%b4%ea%b3%bc-%ec%a0%84%eb%ac%b8%ec%9d%98%ea%b0%80-%ec%95%8c%eb%a0%a4%ec%a3%bc%eb%8a%94-%ec%95%88%ec%a0%84%ed%95%9c-%ec%9d%98%ec%95%bd%ed%92%88/",
+      "has_related_block": true
+    }
+  ]
+}
