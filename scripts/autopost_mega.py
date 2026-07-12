@@ -1077,6 +1077,76 @@ def extract_meta_and_faq(text):
                 if len(pl)>=10: title=pl[:120]; break
     return "\n".join(out).strip(), title, meta, faq
 
+# ============================================================
+# ★★★ 제목 다양화 — AI에게 "부탁"하지 않고 코드가 직접 22개 템플릿 중 랜덤 선택 ★★★
+# 문제: 기존엔 프롬프트로 "패턴 7개 중 골라서 절대 반복하지 마라"고 지시만 했는데,
+#      AI가 실제로는 "How to Actually X: A Specialist's Guide" 류로 계속 수렴함
+#      → 반복 패턴은 구글이 "찍어낸 AI 콘텐츠"로 인식해 색인에 불리
+# 해결: AI 지시에 의존하지 않고, 코드가 22개 템플릿 중 매번 진짜 랜덤으로 뽑아
+#      키워드만 채워 넣는 방식으로 강제 (내부링크 수정과 동일한 원칙)
+# ============================================================
+TITLE_TEMPLATES_KO = [
+    "{keyword}, 왜 이런 문제가 생길까? 전문가가 답하다",
+    "{keyword}에 대해 의사가 꼭 알려주고 싶은 {n}가지",
+    "{keyword}에 대한 흔한 오해, 진실은 이렇습니다",
+    "설문조사: 10명 중 {n}명이 {keyword}를 잘못 알고 있다",
+    "{keyword}, 제대로 대처하는 법 — 전문가 가이드",
+    "절대 놓치면 안 되는 {keyword} 경고 신호",
+    "{keyword}, 당신이 아는 것과 뭐가 다를까",
+    "아무도 말해주지 않는 {keyword}의 진실",
+    "{keyword}, 정말 중요한 건 따로 있습니다",
+    "{keyword}, 정말 효과가 있을까? 솔직한 분석",
+    "{keyword}에서 사람들이 자주 하는 {n}가지 실수",
+    "{keyword}, 실제로는 어떻게 진행될까",
+    "{keyword}, 쉽게 풀어드립니다",
+    "{year}년, {keyword}를 다시 생각해보다",
+    "{keyword}의 진짜 비용 — 미리 알아야 할 것들",
+    "{keyword} 시작 전에 꼭 읽어야 할 글",
+    "{keyword}에 대해 자주 놓치는 사실들",
+    "외국인을 위한 {keyword} 실전 가이드",
+    "{keyword} 입문 — 처음이라면 꼭 알아야 할 것",
+    "{keyword}에 대한 흔한 오해 바로잡기",
+    "{year}년 달라진 {keyword}, 무엇이 바뀌었나",
+    "{keyword} 궁금증, 현장 전문가가 답하다",
+]
+TITLE_TEMPLATES_EN = [
+    "Why Does {keyword} Cause Problems? Experts Explain",
+    "{n} Things About {keyword} Your Doctor Wants You to Know",
+    "The Truth About {keyword} That Most People Get Wrong",
+    "Study Reveals: {n} in 10 People Misunderstand {keyword}",
+    "How to Actually Handle {keyword}: A Specialist's Guide",
+    "{keyword} Warning Signs You Should Never Ignore",
+    "{keyword} vs What You Think You Know: Key Differences",
+    "What Nobody Tells You About {keyword}",
+    "{keyword}: A Closer Look at What Really Matters",
+    "Is {keyword} Really Worth It? An Honest Breakdown",
+    "{n} Mistakes People Make With {keyword}",
+    "Behind the Scenes: What {keyword} Actually Involves",
+    "{keyword} Explained in Plain English",
+    "Rethinking {keyword}: A Fresh Perspective for {year}",
+    "The Real Cost of {keyword} — What to Expect",
+    "Before You Try {keyword}, Read This First",
+    "{keyword}: Frequently Overlooked Facts",
+    "A Practical Look at {keyword} for International Patients",
+    "{keyword} 101: What First-Timers Should Know",
+    "Debunking Common Myths About {keyword}",
+    "How {keyword} Has Changed in {year}",
+    "{keyword} Q&A: Answers From the Field",
+]
+_last_title_idx: dict = {}  # 사이트별 직전 사용 인덱스 (연속 반복 방지)
+
+def build_diverse_title(keyword, lang, site_url=""):
+    pool = TITLE_TEMPLATES_KO if lang == "ko" else TITLE_TEMPLATES_EN
+    prev = _last_title_idx.get(site_url, -1)
+    idx = random.randrange(len(pool))
+    if len(pool) > 1:
+        while idx == prev:
+            idx = random.randrange(len(pool))
+    _last_title_idx[site_url] = idx
+    n = random.choice([3, 4, 5, 6, 7, 8, 9])
+    year = str(datetime.now().year)
+    return pool[idx].format(keyword=keyword, n=n, year=year)
+
 def extract_tags(text, keyword, theme, lang):
     lines=text.strip().split("\n"); tags=[]; body_lines=[]
     for line in lines:
@@ -1388,8 +1458,9 @@ def process_one(site, keyword):
         body_raw,title,meta,faq=extract_meta_and_faq(raw)
         body,tags=extract_tags(body_raw,keyword,theme,lang)
 
-        if not title:
-            title=f"{keyword} — 완벽 정리 가이드" if lang=="ko" else f"{keyword} — Complete Guide 2026"
+        # AI가 만든 제목은 버리고, 코드가 22개 템플릿 중 랜덤으로 뽑아 무조건 교체
+        # (반복 패턴이 구글에 "AI 대량생산"으로 보이는 문제 해결)
+        title=build_diverse_title(keyword,lang,site_url=url)
 
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
