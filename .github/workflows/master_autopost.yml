@@ -933,6 +933,7 @@ jobs:
           git config user.name "huh0303-cmyk"
           git add verify_result.json
           git commit -m "검증 결과 (임시)" || echo "변경 없음"
+          git pull --rebase origin main
           git push
   fix-rankmath-noindex:
     needs: determine-slot
