@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       step:
-        description: "setup / post / ads / check / adsense=애드센스승인 / backfilllinks=기존글관련링크소급 / all"
+        description: "setup / post / ads / check / adsense=애드센스승인 / backfilllinks=기존글관련링크소급 / fix2024=2024→2026수정 / all"
         required: false
         default: "post"
       run_slot:
@@ -910,6 +910,54 @@ jobs:
           else
             echo "▶ 대상: 27개 사이트 전체"
             python scripts/backfill_related_links.py
+          fi
+
+  fix-2024-to-2026:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fix2024' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml -q
+      - name: "🗓️ 제목/본문 2024→2026 일괄 수정"
+        env:
+          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
+          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM:          ${{ secrets.KTECH365COM }}
+          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
+          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
+          KVISA365COM:          ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
+        run: |
+          if [ -n "${{ github.event.inputs.target_site }}" ]; then
+            python scripts/fix_2024_to_2026.py --site "${{ github.event.inputs.target_site }}"
+          else
+            python scripts/fix_2024_to_2026.py
           fi
 
   fix-rankmath-noindex:
