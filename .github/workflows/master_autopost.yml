@@ -1585,3 +1585,23 @@ jobs:
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python .github/workflows/check_adsense_27.py
 
+
+  check-adsense-detail:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'checkadsdetail' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "애드센스 중복 위치 확인"
+        env:
+          KHEALTH365COM:       ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KFINANCE365COM:      ${{ secrets.KFINANCE365COM }}
+          KTRIP365COM:         ${{ secrets.KTRIP365COM }}
+        run: python .github/workflows/check_adsense_detail.py
+
