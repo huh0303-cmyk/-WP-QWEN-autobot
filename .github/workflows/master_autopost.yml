@@ -1661,3 +1661,22 @@ jobs:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
         run: python .github/workflows/fix_www_redirect.py
 
+
+  full-seo-audit:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'seoaudit' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "k-health365 SEO 전수 감사"
+        env:
+          KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/workflows/full_seo_audit.py
+
