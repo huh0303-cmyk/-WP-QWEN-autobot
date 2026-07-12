@@ -446,10 +446,6 @@ SITE_PERSONA = {
         "tone": "친근한 전문의 스타일. 공감 → 원인 → 해결 순서. '~하세요', '~입니다' 체.",
         "structure": ["오늘 느끼신 증상이 왜 나타나는지 공감형 도입","핵심 원인 3~5가지 (환자 관점)","일상 관리법 (구체적 수치)","⚠️ 위험 신호 — 병원 가야 할 때","전문의 한마디 blockquote","FAQ 5문항"],
         "min_chars": 3500, "tables": 2, "lang": "ko", "no_image": True,
-        "golden_tags": ["혈압관리","당뇨관리","관절건강","피부건강","면역력강화",
-                        "소화기건강","갱년기증상","탈모예방","수면건강","간건강",
-                        "심혈관건강","비타민영양제","다이어트","스트레스관리",
-                        "암예방","골다공증","혈당조절","콜레스테롤","요통관리","치매예방"],
     },
     "https://koreamedicaltour.com": {
         "persona_en": "Medical tourism consultant with 12 years helping international patients navigate Korean hospitals.",
@@ -909,23 +905,17 @@ def make_site_prompt(keyword, site, reporter):
 1. 바이라인: 첫 줄 정확히 '{byline}'
 2. HTML 전용 (h2,h3,p,ul,li,ol,strong,table,blockquote). 마크다운 절대 금지
 3. 최소 {min_chars}자 이상 (공백 제외)
-0. TITLE 작성 규칙 (최우선):
-   - 매 글마다 아래 12가지 패턴 중 다른 것 선택 (절대 반복 금지):
-     1) "[키워드], 전문의가 30년 진료실에서 발견한 진짜 원인"
-     2) "왜 [키워드]는 [나이대]에 갑자기 악화될까"
-     3) "한국인의 [비율]%가 잘못 알고 있는 [키워드] 상식"
-     4) "[키워드] 환자가 가장 먼저 달라지는 [기간]의 변화"
-     5) "[키워드], 병원 가기 전에 반드시 확인할 [N]가지"
-     6) "식약처가 경고한 [키워드] 관련 잘못된 상식"
-     7) "[키워드] 완화에 효과 있다는 [방법], 실제로는?"
-     8) "[관련증상]인 줄 알았는데 [키워드]였다 — 구별법"
-     9) "[키워드] 있는 사람이 절대 하면 안 되는 [N]가지"
-    10) "내과 전문의가 [키워드] 환자에게 매번 하는 한마디"
-    11) "[키워드] [N]년째 관리 중인 환자들의 공통점"
-    12) "[키워드] 검사 결과 나왔을 때 제일 먼저 할 것"
-   - 절대 금지 단어: unlocking, unveiling, comprehensive, ultimate, 황금, 모르면손해, 모르면100%, 후회, 총정리, 완벽정리, 다들잘못, 진짜진짜
-   - 제목 길이: 20~40자 (한글 기준)
-   - 숫자 있으면 구체적으로: "3가지" "7년째" "40대" 등
+0. TITLE 작성 규칙 (매우 중요):
+   - 아래 패턴 중 랜덤으로 1개 선택해서 작성 (매번 다른 패턴 사용):
+     a) 질문형: "왜 [키워드]가 [문제]를 일으킬까?"
+     b) 숫자형: "[키워드] [N]가지 핵심 — 전문의가 직접 밝힌다"
+     c) 반전형: "[키워드], 당신이 알고 있던 것은 틀렸다"
+     d) 경험형: "10년 환자가 겪은 [키워드] 실제 증상과 회복법"
+     e) 데이터형: "한국인 [N]명 중 [N]명이 모르는 [키워드] 진실"
+     f) 해결형: "[키워드] 때문에 힘드셨나요? 전문의가 알려주는 해결법"
+     g) 비교형: "[키워드] vs [관련증상], 어떻게 구분하나"
+   - 금지: "모르면 후회", "모르면 손해", "100% 손해", "unlocking", "unveiling", "진짜", "완벽 가이드", "총정리", "다들 잘못 알고" 반복 사용 금지
+   - 제목 길이: 25~45자
 4. 모든 <p>는 2문장 이하. 단락 사이 줄바꿈 필수
 5. '{keyword}' 첫 문장 + 전체 10회 이상
 6. 통계·수치 5개 이상 (%, 만 명, mmHg, 원 등)
@@ -946,22 +936,17 @@ Topic: '{keyword}' | Site: {url} | Category: {theme}
 Tone: {tone}
 
 [MANDATORY OUTPUT RULES]
-0. TITLE RULES (top priority — vary every single article):
-   Pick ONE pattern below, rotate through all 12, never repeat:
-   1) "The [keyword] Mistake [N] in [N] Koreans Make Every Day"
-   2) "What Your Doctor Actually Checks First for [keyword]"
-   3) "After [N] Years of [keyword]: What Actually Changed"
-   4) "[keyword] at [Age]: Why It Suddenly Gets Worse"
-   5) "[N] [keyword] Symptoms Most People Brush Off as Stress"
-   6) "Korea's Top Specialist on [keyword]: The One Thing That Works"
-   7) "If You Have [keyword], Stop Doing These [N] Things"
-   8) "Mistaken for [related condition]? It Could Be [keyword]"
-   9) "Why [keyword] Keeps Coming Back — And How to Break the Cycle"
-  10) "The [keyword] Reality No Health Blog Will Tell You"
-  11) "[keyword] and [related topic]: The Link Most People Miss"
-  12) "Before Your [keyword] Appointment: Read This First"
-   BANNED: unlocking, unveiling, comprehensive, ultimate, complete guide, everything you need, you wont believe, shocking
-   Title length: 45-75 characters
+0. TITLE RULES (critical — vary every article):
+   Choose ONE pattern randomly (never repeat same pattern twice in a row):
+   a) Question: "Why Does [keyword] Cause [Problem]? Experts Explain"
+   b) Number: "[N] Things About [keyword] Your Doctor Wants You to Know"
+   c) Myth-bust: "The Truth About [keyword] That Most People Get Wrong"
+   d) Data: "Study: [N] in [N] Koreans Misunderstand [keyword]"
+   e) How-to: "How to Actually Fix [keyword]: A Specialist's Guide"
+   f) Warning: "[keyword] Warning Signs You Should Never Ignore"
+   g) Comparison: "[keyword] vs [related]: How to Tell the Difference"
+   FORBIDDEN words in title: "Complete Guide", "Ultimate", "Everything You Need", "comprehensive" — never repeat same structure
+   Title length: 50-80 characters
 1. Byline: First line exactly '{byline}'
 2. HTML only (h2,h3,p,ul,li,ol,strong,table,blockquote). Absolutely no markdown
 3. Minimum {min_chars} characters
@@ -1047,12 +1032,6 @@ def extract_tags(text, keyword, theme, lang):
     if not tags: tags=[keyword]
     kk=keyword.strip().lower()
     tags=[t for t in tags if t.strip().lower()!=kk]
-    # golden_tags 우선 사용 (noindex 재발 방지)
-    _golden = site.get("golden_tags",[])
-    if _golden:
-        import random as _r
-        _picks = _r.sample(_golden, min(3,len(_golden)))
-        tags = _picks + [t for t in tags if t not in _picks]
     tags=list({t.strip().lower():t for t in tags}.values())[:TAG_COUNT-1]
     tags=[keyword]+tags
     fb=(["효능","방법","원인","예방","관리","가이드","추천","총정리","비교","주의사항","체크리스트","2026"] if lang=="ko"
