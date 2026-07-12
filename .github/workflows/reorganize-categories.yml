@@ -18,7 +18,7 @@ jobs:
       - name: Run reorganize script
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/reorganize_categories.py
+        run: python scripts/reorganize_categories.py
       - name: Commit results
         if: always()
         run: |

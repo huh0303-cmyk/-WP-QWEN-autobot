@@ -44,7 +44,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/check_themes.py
+        run: python scripts/check_themes.py
       - name: Commit results
         if: always()
         run: |

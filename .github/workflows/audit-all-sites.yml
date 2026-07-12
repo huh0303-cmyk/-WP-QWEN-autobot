@@ -43,7 +43,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/audit_all_sites.py
+        run: python scripts/audit_all_sites.py
       - name: Commit results
         if: always()
         run: |

@@ -21,4 +21,4 @@ jobs:
       - name: Run cleanup script
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/cleanup_low_quality_posts.py
+        run: python scripts/cleanup_low_quality_posts.py

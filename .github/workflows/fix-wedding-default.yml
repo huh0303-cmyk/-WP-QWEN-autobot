@@ -17,7 +17,7 @@ jobs:
       - run: pip install requests
       - env:
           KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
-        run: python .github/workflows/fix_wedding_default.py
+        run: python scripts/fix_wedding_default.py
       - name: Commit results
         if: always()
         run: |

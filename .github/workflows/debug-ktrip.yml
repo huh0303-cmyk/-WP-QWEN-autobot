@@ -17,7 +17,7 @@ jobs:
       - run: pip install requests
       - env:
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
-        run: python .github/workflows/debug_ktrip.py
+        run: python scripts/debug_ktrip.py
       - name: Commit results
         if: always()
         run: |

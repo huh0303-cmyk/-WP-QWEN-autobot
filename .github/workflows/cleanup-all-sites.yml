@@ -50,7 +50,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/cleanup_all_sites.py
+        run: python scripts/cleanup_all_sites.py
 
       - name: Commit results file
         if: always()

@@ -44,7 +44,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python check_plugins.py
+        run: python scripts/check_plugins.py
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"

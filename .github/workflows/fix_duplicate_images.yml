@@ -57,7 +57,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python fix_duplicate_hero_images.py
+        run: python scripts/fix_duplicate_hero_images.py
 
       - name: Commit results file
         run: |

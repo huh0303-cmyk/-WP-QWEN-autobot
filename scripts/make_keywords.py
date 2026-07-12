@@ -332,7 +332,8 @@ KEYWORDS_DB = {
 
 def build_keyword_files():
     print(f"📂 [키워드 매니저] 총 {len(KEYWORDS_DB)}개 파일 생성 시작")
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "keywords")
+    os.makedirs(current_dir, exist_ok=True)
     created_count = 0
     for filename, keywords in KEYWORDS_DB.items():
         file_path = os.path.join(current_dir, filename)

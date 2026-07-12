@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests
-      - run: python .github/workflows/check_subdomains.py
+      - run: python scripts/check_subdomains.py
       - name: Commit results
         if: always()
         run: |

@@ -44,7 +44,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python ensure_required_pages.py
+        run: python scripts/ensure_required_pages.py
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"

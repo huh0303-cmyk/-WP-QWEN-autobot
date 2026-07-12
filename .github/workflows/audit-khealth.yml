@@ -21,7 +21,7 @@ jobs:
       - name: Run audit script
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python audit_khealth_indexing.py
+        run: python scripts/audit_khealth_indexing.py
 
       - name: Commit results file
         run: |

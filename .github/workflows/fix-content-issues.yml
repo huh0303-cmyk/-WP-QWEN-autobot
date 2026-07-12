@@ -50,13 +50,13 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/fix_title_years.py
+        run: python scripts/fix_title_years.py
 
       - name: Fix fake personas (k-health365.com)
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python .github/workflows/fix_fake_personas.py
+        run: python scripts/fix_fake_personas.py
 
       - name: Commit results files
         if: always()

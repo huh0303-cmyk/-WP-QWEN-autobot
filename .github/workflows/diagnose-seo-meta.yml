@@ -19,7 +19,7 @@ jobs:
         continue-on-error: true
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python diagnose_seo_meta.py > diagnose_seo_meta_results.txt 2>&1
+        run: python scripts/diagnose_seo_meta.py > diagnose_seo_meta_results.txt 2>&1
       - name: Commit results
         if: always()
         run: |

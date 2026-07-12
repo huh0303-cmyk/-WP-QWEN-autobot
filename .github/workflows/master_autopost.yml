@@ -97,7 +97,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/adsense_verify.py
+        run: python scripts/adsense_verify.py
 
 
 
@@ -124,7 +124,7 @@ jobs:
       - name: "k-health365 카테고리 5개 + 리디렉션"
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/fix_khealth_cats.py
+        run: python scripts/fix_khealth_cats.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -170,7 +170,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/fix_modsec.py
+        run: python scripts/fix_modsec.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: k-health365 color index fix
@@ -189,7 +189,7 @@ jobs:
       - name: "k-health365 noindex remove + index fix"
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/fix_khealth_index.py
+        run: python scripts/fix_khealth_index.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: 27개 사이트 글 전수조사
@@ -234,7 +234,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/audit_posts.py
+        run: python scripts/audit_posts.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -254,7 +254,7 @@ jobs:
       - name: "k-trip365 더미글 삭제"
         env:
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
-        run: python .github/workflows/clean_ktrip.py
+        run: python scripts/clean_ktrip.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: sitemap 오류 긴급 수정
@@ -280,7 +280,7 @@ jobs:
           KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
           KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
           KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
-        run: python .github/workflows/fix_sitemaps.py
+        run: python scripts/fix_sitemaps.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: Sitemap 27개 전체 제출
@@ -326,7 +326,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/submit_sitemaps.py
+        run: python scripts/submit_sitemaps.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: Site Kit 비활성화 + ads.txt 재삽입
@@ -371,7 +371,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/disable_sitekit.py
+        run: python scripts/disable_sitekit.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: kworld365 카테고리 + 고품질 글 발행
@@ -390,7 +390,7 @@ jobs:
       - name: "🎵 kworld365 카테고리+글 발행"
         env:
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
-        run: python .github/workflows/kworld_posts.py
+        run: python scripts/kworld_posts.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: AdSense 승인 준비 (ads.txt + 헤더 + ping)
@@ -435,7 +435,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/adsense_request.py
+        run: python scripts/adsense_request.py
 
 
 
@@ -482,7 +482,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/insert_adsense_meta.py
+        run: python scripts/insert_adsense_meta.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: 홈페이지 post_title 긴급 수정
@@ -503,7 +503,7 @@ jobs:
           JOBINKOREA365COM:  ${{ secrets.JOBINKOREA365COM }}
           JOBKOREA365COM:    ${{ secrets.JOBKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
-        run: python .github/workflows/fix_homepage.py
+        run: python scripts/fix_homepage.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: 전체 사이트 상태 확인
@@ -548,7 +548,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/check_all_sites.py
+        run: python scripts/check_all_sites.py
 
 # ══════════════════════════════════════════════════════════
 # JOB 2: ads.txt 삽입
@@ -593,7 +593,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/inject_ads_txt.py
+        run: python scripts/inject_ads_txt.py
 
 # ══════════════════════════════════════════════════════════
 # JOB 3: 사이트 구조 설정
@@ -639,7 +639,7 @@ jobs:
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
           SHEETS_WEBHOOK:       ${{ secrets.SHEETS_WEBHOOK }}
-        run: python .github/workflows/setup_sites.py
+        run: python scripts/setup_sites.py
 
 # ══════════════════════════════════════════════════════════
 
@@ -661,7 +661,7 @@ jobs:
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           INDEXNOW_KEY:  ${{ secrets.INDEXNOW_KEY }}
-        run: python .github/workflows/fix_khealth_index.py
+        run: python scripts/fix_khealth_index.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: IndexNow 27개 사이트 설정
@@ -707,7 +707,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/setup_indexnow.py
+        run: python scripts/setup_indexnow.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -728,7 +728,7 @@ jobs:
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           INDEXNOW_KEY:  ${{ secrets.INDEXNOW_KEY }}
-        run: python .github/workflows/collect_khealth_urls.py
+        run: python scripts/collect_khealth_urls.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -748,7 +748,7 @@ jobs:
       - name: "더미슬러그 전수조사+영구삭제"
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/fix_dummy_posts.py
+        run: python scripts/fix_dummy_posts.py
 
 
 
@@ -797,7 +797,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/delete_all_dummy.py
+        run: python scripts/delete_all_dummy.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -853,7 +853,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/autopost_mega.py
+        run: python scripts/autopost_mega.py
 
 # ══════════════════════════════════════════════════════════
 # JOB: 27개 사이트 Rank Math noindex 설정
@@ -900,7 +900,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/fix_rankmath_noindex.py
+        run: python scripts/fix_rankmath_noindex.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -922,7 +922,7 @@ jobs:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GH_PAT:                   ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY:        ${{ github.repository }}
-        run: python .github/workflows/gsc_sitemap_manager.py
+        run: python scripts/gsc_sitemap_manager.py
 
 
 # ══════════════════════════════════════════════════════════
@@ -943,7 +943,7 @@ jobs:
         env:
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/ping_sitemaps.py
+        run: python scripts/ping_sitemaps.py
 
 
   debug-kworld:
@@ -963,7 +963,7 @@ jobs:
           KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
           GH_PAT: ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/debug_kworld.py
+        run: python scripts/debug_kworld.py
 
 
   analyze-noindex:
@@ -982,7 +982,7 @@ jobs:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           GH_PAT:        ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/analyze_khealth_noindex.py
+        run: python scripts/analyze_khealth_noindex.py
 
 
   fix-tags-noindex:
@@ -1001,7 +1001,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/fix_tags_noindex.py
+        run: python scripts/fix_tags_noindex.py
 
 
   audit-tags:
@@ -1046,7 +1046,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/audit_tags.py
+        run: python scripts/audit_tags.py
 
 
   diagnose-khealth:
@@ -1065,7 +1065,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/diagnose_khealth_index.py
+        run: python scripts/diagnose_khealth_index.py
 
 
   fix-khealth-meta:
@@ -1084,7 +1084,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/fix_khealth_meta.py
+        run: python scripts/fix_khealth_meta.py
 
 
   fix-khealth-content:
@@ -1104,7 +1104,7 @@ jobs:
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/fix_khealth_content.py
+        run: python scripts/fix_khealth_content.py
 
 
   check-blog-public:
@@ -1123,7 +1123,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/check_blog_public.py
+        run: python scripts/check_blog_public.py
 
 
   deep-fix-khealth:
@@ -1143,7 +1143,7 @@ jobs:
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/deep_fix_khealth.py
+        run: python scripts/deep_fix_khealth.py
 
 
   fix-khealth-404:
@@ -1162,7 +1162,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/fix_khealth_404.py
+        run: python scripts/fix_khealth_404.py
 
 
   nuke-tags:
@@ -1181,7 +1181,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/nuke_all_tags.py
+        run: python scripts/nuke_all_tags.py
 
 
   fix-blogger:
@@ -1200,7 +1200,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/fix_blogger_remnants.py
+        run: python scripts/fix_blogger_remnants.py
 
 
   deep-check-khealth:
@@ -1219,7 +1219,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/deep_check_khealth.py
+        run: python scripts/deep_check_khealth.py
 
 
   get-top-posts:
@@ -1238,7 +1238,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/get_top_posts.py
+        run: python scripts/get_top_posts.py
 
 
   get-index-urls:
@@ -1257,7 +1257,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/get_index_urls.py
+        run: python scripts/get_index_urls.py
 
 
   fix-gsc-issues:
@@ -1276,7 +1276,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/fix_gsc_issues.py
+        run: python scripts/fix_gsc_issues.py
 
 
   inject-adsense:
@@ -1321,7 +1321,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/inject_adsense.py
+        run: python scripts/inject_adsense.py
 
 
   check-wpcode:
@@ -1340,7 +1340,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/check_wpcode.py
+        run: python scripts/check_wpcode.py
 
 
   check-adsense-code:
@@ -1359,7 +1359,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/check_adsense_code.py
+        run: python scripts/check_adsense_code.py
 
 
   inject-gp-elements:
@@ -1404,7 +1404,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/inject_gp_elements.py
+        run: python scripts/inject_gp_elements.py
 
 
   inject-wpcode-final:
@@ -1449,7 +1449,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/inject_wpcode_v2.py
+        run: python scripts/inject_wpcode_v2.py
 
 
   inject-wpcode-hf:
@@ -1494,7 +1494,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/inject_wpcode_hf.py
+        run: python scripts/inject_wpcode_hf.py
 
 
   inject-hf-final:
@@ -1538,7 +1538,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/inject_wpcode_hf_final.py
+        run: python scripts/inject_wpcode_hf_final.py
 
 
   check-adsense-27:
@@ -1583,7 +1583,7 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/check_adsense_27.py
+        run: python scripts/check_adsense_27.py
 
 
   check-adsense-detail:
@@ -1603,7 +1603,7 @@ jobs:
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KFINANCE365COM:      ${{ secrets.KFINANCE365COM }}
           KTRIP365COM:         ${{ secrets.KTRIP365COM }}
-        run: python .github/workflows/check_adsense_detail.py
+        run: python scripts/check_adsense_detail.py
 
 
   find-adsense-location:
@@ -1625,7 +1625,7 @@ jobs:
           KTRIP365COM:         ${{ secrets.KTRIP365COM }}
           GH_PAT:              ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY:   ${{ github.repository }}
-        run: python .github/workflows/find_adsense_location.py
+        run: python scripts/find_adsense_location.py
 
 
   fix-404-redirects:
@@ -1642,7 +1642,7 @@ jobs:
       - name: "404 Blogger URL 301 리다이렉트"
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/fix_404_redirects.py
+        run: python scripts/fix_404_redirects.py
 
 
   fix-www-redirect:
@@ -1659,7 +1659,7 @@ jobs:
       - name: "www/http 301 리다이렉트"
         env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python .github/workflows/fix_www_redirect.py
+        run: python scripts/fix_www_redirect.py
 
 
   full-seo-audit:
@@ -1678,7 +1678,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/full_seo_audit.py
+        run: python scripts/full_seo_audit.py
 
 
   execute-seo-cleanup:
@@ -1697,7 +1697,7 @@ jobs:
           KHEALTH365COM:     ${{ secrets.KHEALTH365COM }}
           GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python .github/workflows/execute_seo_cleanup.py
+        run: python scripts/execute_seo_cleanup.py
 
 
   cleanup-27sites:
@@ -1739,5 +1739,5 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python .github/workflows/cleanup_27sites.py
+        run: python scripts/cleanup_27sites.py
 

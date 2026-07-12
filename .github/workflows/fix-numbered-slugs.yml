@@ -31,7 +31,7 @@ jobs:
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python fix_numbered_slugs.py
+        run: python scripts/fix_numbered_slugs.py
 
       - name: Commit results file
         run: |

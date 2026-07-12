@@ -25,7 +25,7 @@ jobs:
           KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
           KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
           KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
-        run: python .github/workflows/check_categories_lang.py
+        run: python scripts/check_categories_lang.py
       - name: Commit results
         if: always()
         run: |

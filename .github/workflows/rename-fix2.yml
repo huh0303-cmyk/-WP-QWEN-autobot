@@ -16,7 +16,7 @@ jobs:
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python .github/workflows/rename_fix2.py
+        run: python scripts/rename_fix2.py
       - name: Commit
         if: always()
         run: |

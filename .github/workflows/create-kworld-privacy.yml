@@ -16,4 +16,4 @@ jobs:
       - name: Create page
         env:
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
-        run: python create_privacy_page.py
+        run: python scripts/create_privacy_page.py

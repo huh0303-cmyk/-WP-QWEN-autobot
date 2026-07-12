@@ -18,7 +18,7 @@ jobs:
       - name: Run check
         env:
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
-        run: python check_kworld_pages.py
+        run: python scripts/check_kworld_pages.py
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"

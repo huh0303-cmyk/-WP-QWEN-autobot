@@ -20,7 +20,7 @@ jobs:
         env:
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
-        run: python diagnose_ktrip_kworld.py > diagnose_ktrip_kworld_results.txt 2>&1
+        run: python scripts/diagnose_ktrip_kworld.py > diagnose_ktrip_kworld_results.txt 2>&1
       - name: Commit results
         if: always()
         run: |

@@ -30,7 +30,7 @@ jobs:
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python .github/workflows/rename_categories_short_en.py
+        run: python scripts/rename_categories_short_en.py
       - name: Commit results
         if: always()
         run: |

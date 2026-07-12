@@ -45,7 +45,7 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python inject_ga4_widget.py
+        run: python scripts/inject_ga4_widget.py
       - name: Commit results
         if: always()
         run: |

@@ -16,7 +16,7 @@ jobs:
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python .github/workflows/debug_real_cats.py
+        run: python scripts/debug_real_cats.py
       - name: Commit
         if: always()
         run: |

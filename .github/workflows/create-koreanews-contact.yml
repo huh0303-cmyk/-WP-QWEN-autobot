@@ -16,4 +16,4 @@ jobs:
       - name: Create page
         env:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-        run: python create_koreanews_contact.py
+        run: python scripts/create_koreanews_contact.py

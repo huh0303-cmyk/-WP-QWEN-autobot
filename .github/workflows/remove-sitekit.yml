@@ -24,7 +24,7 @@ jobs:
           KVISA365COM: ${{ secrets.KVISA365COM }}
           KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
           KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
-        run: python remove_sitekit.py
+        run: python scripts/remove_sitekit.py
       - name: Commit results
         if: always()
         run: |
