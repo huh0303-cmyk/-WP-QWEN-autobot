@@ -1364,8 +1364,12 @@ def process_one(site, keyword):
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
-    images=get_multiple_images(keyword,count=3,theme=theme)
-    if not images: images=get_images_pixabay("South Korea nature",3)
+    if site.get("no_image"):
+        images=[]
+        print(f"  🚫 이미지 없음 (no_image=True)")
+    else:
+        images=get_multiple_images(keyword,count=3,theme=theme)
+        if not images: images=get_images_pixabay("South Korea nature",3)
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
