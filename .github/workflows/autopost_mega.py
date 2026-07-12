@@ -905,6 +905,17 @@ def make_site_prompt(keyword, site, reporter):
 1. 바이라인: 첫 줄 정확히 '{byline}'
 2. HTML 전용 (h2,h3,p,ul,li,ol,strong,table,blockquote). 마크다운 절대 금지
 3. 최소 {min_chars}자 이상 (공백 제외)
+0. TITLE 작성 규칙 (매우 중요):
+   - 아래 패턴 중 랜덤으로 1개 선택해서 작성 (매번 다른 패턴 사용):
+     a) 질문형: "왜 [키워드]가 [문제]를 일으킬까?"
+     b) 숫자형: "[키워드] [N]가지 핵심 — 전문의가 직접 밝힌다"
+     c) 반전형: "[키워드], 당신이 알고 있던 것은 틀렸다"
+     d) 경험형: "10년 환자가 겪은 [키워드] 실제 증상과 회복법"
+     e) 데이터형: "한국인 [N]명 중 [N]명이 모르는 [키워드] 진실"
+     f) 해결형: "[키워드] 때문에 힘드셨나요? 전문의가 알려주는 해결법"
+     g) 비교형: "[키워드] vs [관련증상], 어떻게 구분하나"
+   - 금지: "모르면 후회", "100% 후회", "진짜", "완벽 가이드", "총정리", "다들 잘못 알고" 반복 사용 금지
+   - 제목 길이: 25~45자
 4. 모든 <p>는 2문장 이하. 단락 사이 줄바꿈 필수
 5. '{keyword}' 첫 문장 + 전체 10회 이상
 6. 통계·수치 5개 이상 (%, 만 명, mmHg, 원 등)
@@ -925,6 +936,17 @@ Topic: '{keyword}' | Site: {url} | Category: {theme}
 Tone: {tone}
 
 [MANDATORY OUTPUT RULES]
+0. TITLE RULES (critical — vary every article):
+   Choose ONE pattern randomly (never repeat same pattern twice in a row):
+   a) Question: "Why Does [keyword] Cause [Problem]? Experts Explain"
+   b) Number: "[N] Things About [keyword] Your Doctor Wants You to Know"
+   c) Myth-bust: "The Truth About [keyword] That Most People Get Wrong"
+   d) Data: "Study: [N] in [N] Koreans Misunderstand [keyword]"
+   e) How-to: "How to Actually Fix [keyword]: A Specialist's Guide"
+   f) Warning: "[keyword] Warning Signs You Should Never Ignore"
+   g) Comparison: "[keyword] vs [related]: How to Tell the Difference"
+   FORBIDDEN words in title: "Complete Guide", "Ultimate", "Everything You Need", "comprehensive" — never repeat same structure
+   Title length: 50-80 characters
 1. Byline: First line exactly '{byline}'
 2. HTML only (h2,h3,p,ul,li,ol,strong,table,blockquote). Absolutely no markdown
 3. Minimum {min_chars} characters
