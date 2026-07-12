@@ -445,7 +445,7 @@ SITE_PERSONA = {
         "persona_ko": "임상경력 20년 내과 전문의. 환자에게 직접 설명하듯 쉽고 따뜻하게 씁니다. 전문 용어는 반드시 괄호로 풀어줍니다.",
         "tone": "친근한 전문의 스타일. 공감 → 원인 → 해결 순서. '~하세요', '~입니다' 체.",
         "structure": ["오늘 느끼신 증상이 왜 나타나는지 공감형 도입","핵심 원인 3~5가지 (환자 관점)","일상 관리법 (구체적 수치)","⚠️ 위험 신호 — 병원 가야 할 때","전문의 한마디 blockquote","FAQ 5문항"],
-        "min_chars": 3500, "tables": 2, "lang": "ko",
+        "min_chars": 3500, "tables": 2, "lang": "ko", "no_image": True,
     },
     "https://koreamedicaltour.com": {
         "persona_en": "Medical tourism consultant with 12 years helping international patients navigate Korean hospitals.",
