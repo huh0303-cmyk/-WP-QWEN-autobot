@@ -960,7 +960,7 @@ Tone: {tone}
   10) "The [keyword] Reality No Health Blog Will Tell You"
   11) "[keyword] and [related topic]: The Link Most People Miss"
   12) "Before Your [keyword] Appointment: Read This First"
-   BANNED: unlocking, unveiling, comprehensive, ultimate, complete guide, everything you need, you won't believe, shocking
+   BANNED: unlocking, unveiling, comprehensive, ultimate, complete guide, everything you need, you wont believe, shocking
    Title length: 45-75 characters
 1. Byline: First line exactly '{byline}'
 2. HTML only (h2,h3,p,ul,li,ol,strong,table,blockquote). Absolutely no markdown
