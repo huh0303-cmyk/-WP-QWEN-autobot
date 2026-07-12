@@ -912,31 +912,6 @@ jobs:
             python scripts/backfill_related_links.py
           fi
 
-  verify-related-links:
-    needs: determine-slot
-    if: ${{ github.event.inputs.step == 'verifylinks' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests -q
-      - name: "검증 실행"
-        env:
-          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python scripts/verify_related_links.py --site "https://k-health365.com" --env KHEALTH365COM
-      - name: "결과 커밋"
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add verify_result.json
-          git commit -m "검증 결과 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
