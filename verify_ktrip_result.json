@@ -1,0 +1,43 @@
+{
+  "site": "https://k-trip365.com",
+  "wp_user": "huh0303@gmail.com",
+  "has_password_secret": true,
+  "rest_api_root_status": 200,
+  "auth_me_status": 200,
+  "auth_me_body": {
+    "id": 1,
+    "name": "전문기자 김윤서",
+    "url": "http://k-trip365.com",
+    "description": "http://k-trip365.com",
+    "link": "https://k-trip365.com/author/huh0303gmail-com/",
+    "slug": "huh0303gmail-com",
+    "avatar_urls": {
+      "24": "https://secure.gravatar.com/avatar/3d93c4fdb06cd04f4ad898e069af1d022e1c321bb120ecfa67eab95ca7bbb27c?s=24&d=mm&r=g",
+      "48": "https://secure.gravatar.com/avatar/3d93c4fdb06cd04f4ad898e069af1d022e1c321bb120ecfa67eab95ca7bbb27c?s=48&d=mm&r=g",
+      "96": "https://secure.gravatar.com/avatar/3d93c4fdb06cd04f4ad898e069af1d022e1c321bb120ecfa67eab95ca7bbb27c?s=96&d=mm&r=g"
+    },
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://k-trip365.com/wp-json/wp/v2/users/1",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://k-trip365.com/wp-json/wp/v2/users"
+        }
+      ]
+    }
+  },
+  "public_posts_status": 200
+}
