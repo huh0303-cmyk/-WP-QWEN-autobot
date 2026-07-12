@@ -1,9 +1,9 @@
 {
-  "total": 452,
-  "fixed_focus": 288,
-  "fixed_desc": 359,
+  "total": 202,
+  "fixed_focus": 15,
+  "fixed_desc": 0,
   "fixed_robots": 0,
-  "already_ok": 93,
-  "errors": 1,
-  "indexnow_submitted": 452
+  "already_ok": 187,
+  "errors": 0,
+  "indexnow_submitted": 202
 }
