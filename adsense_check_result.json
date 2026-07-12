@@ -69,6 +69,18 @@
       "count": 1
     },
     {
+      "domain": "kieca-korea.org",
+      "count": 1
+    },
+    {
+      "domain": "ksa-korea.org",
+      "count": 1
+    },
+    {
+      "domain": "sis-korea.com",
+      "count": 1
+    },
+    {
       "domain": "jobkorea365.com",
       "count": 1
     },
@@ -94,10 +106,7 @@
     }
   ],
   "no_ads": [
-    "ki-korea.com",
-    "kieca-korea.org",
-    "ksa-korea.org",
-    "sis-korea.com"
+    "ki-korea.com"
   ],
   "error": []
 }
