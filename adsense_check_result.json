@@ -1,114 +1,33 @@
 {
-  "ok": [
-    {
-      "domain": "k-health365.com",
-      "count": 3
-    },
-    {
-      "domain": "koreamedicaltour.com",
-      "count": 2
-    },
-    {
-      "domain": "koreainvest365.com",
-      "count": 1
-    },
-    {
-      "domain": "ki-korea.com",
-      "count": 1
-    },
-    {
-      "domain": "koreainsurance365.com",
-      "count": 1
-    },
-    {
-      "domain": "kfinance365.com",
-      "count": 3
-    },
-    {
-      "domain": "koreataxnlaw.com",
-      "count": 1
-    },
-    {
-      "domain": "koreacrypto365.com",
-      "count": 1
-    },
-    {
-      "domain": "krealestate365.com",
-      "count": 1
-    },
-    {
-      "domain": "ktech365.com",
-      "count": 1
-    },
-    {
-      "domain": "kskin365.com",
-      "count": 1
-    },
-    {
-      "domain": "oliveyoungkorea.com",
-      "count": 1
-    },
-    {
-      "domain": "kworld365.com",
-      "count": 1
-    },
-    {
-      "domain": "k-trip365.com",
-      "count": 2
-    },
-    {
-      "domain": "k-visa365.com",
-      "count": 1
-    },
-    {
-      "domain": "koreawedding365.com",
-      "count": 1
-    },
-    {
-      "domain": "kstudy365.com",
-      "count": 1
-    },
-    {
-      "domain": "studyinkorea365.com",
-      "count": 1
-    },
-    {
-      "domain": "kieca-korea.org",
-      "count": 1
-    },
-    {
-      "domain": "ksa-korea.org",
-      "count": 1
-    },
-    {
-      "domain": "sis-korea.com",
-      "count": 1
-    },
-    {
-      "domain": "jobkorea365.com",
-      "count": 1
-    },
-    {
-      "domain": "jobinkorea365.com",
-      "count": 1
-    },
-    {
-      "domain": "jobkoreaglobal.com",
-      "count": 1
-    },
-    {
-      "domain": "korea365.org",
-      "count": 1
-    },
-    {
-      "domain": "koreanews365.com",
-      "count": 1
-    },
-    {
-      "domain": "theseouljournal.com",
-      "count": 1
-    }
-  ],
+  "ok": [],
   "no_ads": [],
-  "error": []
+  "error": [
+    "k-health365.com",
+    "koreamedicaltour.com",
+    "koreainvest365.com",
+    "ki-korea.com",
+    "koreainsurance365.com",
+    "kfinance365.com",
+    "koreataxnlaw.com",
+    "koreacrypto365.com",
+    "krealestate365.com",
+    "ktech365.com",
+    "kskin365.com",
+    "oliveyoungkorea.com",
+    "kworld365.com",
+    "k-trip365.com",
+    "k-visa365.com",
+    "koreawedding365.com",
+    "kstudy365.com",
+    "studyinkorea365.com",
+    "kieca-korea.org",
+    "ksa-korea.org",
+    "sis-korea.com",
+    "jobkorea365.com",
+    "jobinkorea365.com",
+    "jobkoreaglobal.com",
+    "korea365.org",
+    "koreanews365.com",
+    "theseouljournal.com"
+  ]
 }
