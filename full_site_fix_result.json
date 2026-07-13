@@ -1,345 +1,297 @@
 {
-  "site": "https://kstudy365.com",
+  "site": "https://studyinkorea365.com",
   "dup_pages": "none",
   "posts": [
     {
-      "id": 922,
-      "old_title": "What Nobody Tells You About SKY universi",
-      "new_title": "The Real Cost of SKY university admissio",
-      "cat_id": 360,
+      "id": 2655,
+      "old_title": "Korean university culture shock vs What ",
+      "new_title": "Before You Try Korean university culture",
+      "cat_id": 445,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 920,
-      "old_title": "Debunking Common Myths About Sejong scho",
-      "new_title": "Sejong scholarship Korea: Frequently Ove",
-      "cat_id": 346,
+      "id": 2653,
+      "old_title": "5 Mistakes People Make With transfer adm",
+      "new_title": "5 Mistakes People Make With transfer adm",
+      "cat_id": 23,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 850,
-      "old_title": "How to Actually Secure Your Yonsei Unive",
-      "new_title": "4 Things About Yonsei university applica",
-      "cat_id": 360,
+      "id": 2591,
+      "old_title": "The Truth About MBA Scholarship Korea Th",
+      "new_title": "A Practical Look at MBA scholarship Kore",
+      "cat_id": 433,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 849,
-      "old_title": "How to Actually Master Your Graduation R",
-      "new_title": "Rethinking graduation requirement Korea:",
-      "cat_id": 345,
+      "id": 2590,
+      "old_title": "How to Actually Ace Your Korea Admission",
+      "new_title": "What Nobody Tells You About admission in",
+      "cat_id": 23,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 848,
-      "old_title": "◇ By Hannah Park",
-      "new_title": "How to Actually Handle university club K",
-      "cat_id": 345,
+      "id": 2589,
+      "old_title": "Korean University Sports Facilities: The",
+      "new_title": "5 Things About university sports facilit",
+      "cat_id": 445,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 846,
-      "old_title": "Your Definitive Guide to Graduate School",
-      "new_title": "graduate school Korea apply Warning Sign",
-      "cat_id": 345,
+      "id": 2588,
+      "old_title": "Cracking the Code: The Brutally Honest T",
+      "new_title": "research grant Korea Warning Signs You S",
+      "cat_id": 445,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 845,
-      "old_title": "Scholarship Essay Korea Tips: Your Path ",
-      "new_title": "Before You Try scholarship essay Korea t",
-      "cat_id": 345,
+      "id": 2587,
+      "old_title": "The Brutal Truth About Transfer Admissio",
+      "new_title": "Debunking Common Myths About transfer ad",
+      "cat_id": 23,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 844,
-      "old_title": "Navigating Dormitory Life at a Korea Uni",
-      "new_title": "Study Reveals: 9 in 10 People Misunderst",
-      "cat_id": 347,
+      "id": 2586,
+      "old_title": "Exchange Program Korea: The Unfiltered T",
+      "new_title": "What Nobody Tells You About exchange pro",
+      "cat_id": 445,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 835,
-      "old_title": "Dormitory Life Korea University: Your Es",
-      "new_title": "Why Does dormitory life Korea university",
-      "cat_id": 347,
+      "id": 2579,
+      "old_title": "Unlocking University Sports Facilities i",
+      "new_title": "How university sports facilities Has Cha",
+      "cat_id": 445,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 834,
-      "old_title": "University Hospital Korea Student: Your ",
-      "new_title": "The Truth About university hospital Kore",
-      "cat_id": 347,
+      "id": 2578,
+      "old_title": "Exchange Program Korea: Your Gateway to ",
+      "new_title": "exchange program Korea Warning Signs You",
+      "cat_id": 445,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 833,
-      "old_title": "Campus Food Korea: Delicious &#038; Affo",
-      "new_title": "The Real Cost of campus food Korea affor",
-      "cat_id": 347,
+      "id": 2577,
+      "old_title": "Merit Scholarship Korea: Why Missing The",
+      "new_title": "9 Things About merit scholarship Korea Y",
+      "cat_id": 433,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 832,
-      "old_title": "student mental health Korea: Why Overloo",
-      "new_title": "Behind the Scenes: What student mental h",
-      "cat_id": 347,
+      "id": 2575,
+      "old_title": "The campus shuttle Korea guide: Unseen C",
+      "new_title": "Behind the Scenes: What campus shuttle K",
+      "cat_id": 434,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 830,
-      "old_title": "Korean University Ranking 2026: The Hidd",
-      "new_title": "Korean university ranking 2026 Warning S",
-      "cat_id": 345,
+      "id": 2573,
+      "old_title": "What Nobody Tells You About MBA scholars",
+      "new_title": "A Practical Look at MBA scholarship Kore",
+      "cat_id": 433,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 826,
-      "old_title": "I Found a Hidden university scholarship ",
-      "new_title": "university scholarship Korea: A Closer L",
-      "cat_id": 346,
+      "id": 2540,
+      "old_title": "What Nobody Tells You About campus shutt",
+      "new_title": "campus shuttle Korea guide: Frequently O",
+      "cat_id": 434,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 793,
-      "old_title": "I Discovered the Secret to Scholarship E",
-      "new_title": "Is scholarship essay Korea tips Really W",
-      "cat_id": 346,
+      "id": 2476,
+      "old_title": "Don&#8217;t Make This TTMIK Talk To Me I",
+      "new_title": "5 Mistakes People Make With TTMIK Talk T",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2426,
+      "old_title": "The Hidden Pitfalls of KT SKT LG U+ Stud",
+      "new_title": "Is KT SKT LG U+ student plan comparison ",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2425,
+      "old_title": "Unlocking Korean Job Markets: Expert Rev",
+      "new_title": "Why Does Korean resume writing tips fore",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2371,
+      "old_title": "Stop Undermining Your Second Year Intern",
+      "new_title": "second year international student Korea ",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2370,
+      "old_title": "Is Setting Up Internet in Your New Korea",
+      "new_title": "6 Things About internet setup Korea new ",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2368,
+      "old_title": "The Complete Beauty Skincare Routine Kor",
+      "new_title": "beauty skincare routine Korea student li",
+      "cat_id": 434,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2366,
+      "old_title": "Stop Missing Out: Why an MBA in Korea is",
+      "new_title": "MBA program Korea international students",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2362,
+      "old_title": "Is Graduate Student Life in Korea Really",
+      "new_title": "How to Actually Handle graduate student ",
+      "cat_id": 434,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2357,
+      "old_title": "Don&#8217;t Miss Out: The Ultimate Korea",
+      "new_title": "Korean convenience store life hack stude",
+      "cat_id": 434,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2356,
+      "old_title": "Stop Sabotaging Your Korean Language Jou",
+      "new_title": "Debunking Common Myths About Korean webt",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2355,
+      "old_title": "Navigating Korean Convenience Stores: Is",
+      "new_title": "Before You Try GS25 CU 7-Eleven Korea st",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2354,
+      "old_title": "Is Korea&#8217;s Startup Ecosystem Truly",
+      "new_title": "startup ecosystem Korea foreign graduate",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2353,
+      "old_title": "Don&#8217;t Miss Out: Why a Master&#8217",
+      "new_title": "How master's degree Korea English taught",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2352,
+      "old_title": "Insadong Culture Experience: What Intern",
+      "new_title": "Insadong culture experience students Exp",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2350,
+      "old_title": "Utility Bills in Korea Student Apartment",
+      "new_title": "What Nobody Tells You About utility bill",
+      "cat_id": 445,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2334,
+      "old_title": "Are International Students Truly Shaping",
+      "new_title": "International Students 101: What First-T",
+      "cat_id": 445,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 682,
-      "old_title": "The Student Discount Culture Korea Strat",
-      "new_title": "student discount culture Korea Q&A: Answ",
-      "cat_id": 347,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 681,
-      "old_title": "The Hidden Side of scholarship for Vietn",
-      "new_title": "What Nobody Tells You About scholarship ",
-      "cat_id": 346,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 677,
-      "old_title": "The Unspoken Realities: What 15 Years in",
-      "new_title": "Before You Try campus life tips Korea in",
-      "cat_id": 347,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 612,
-      "old_title": "Why You&#8217;re Missing Out on the Best",
-      "new_title": "Study Reveals: 5 in 10 People Misunderst",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 610,
-      "old_title": "What Nobody Tells You About the Korean U",
-      "new_title": "A Practical Look at Korean university se",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 609,
-      "old_title": "Korean University Counseling Centers: Th",
-      "new_title": "9 Mistakes People Make With counseling c",
-      "cat_id": 347,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 608,
-      "old_title": "The Essential K-pop Dance Club Universit",
-      "new_title": "How to Actually Handle K-pop dance club ",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 607,
-      "old_title": "Is Your Pre-Departure Preparation for St",
-      "new_title": "Is pre-departure preparation study in Ko",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 606,
-      "old_title": "Is Adjusting to Korean University Cultur",
-      "new_title": "adjusting to Korean university culture E",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 605,
-      "old_title": "Is Navigating the Student Discount Cultu",
-      "new_title": "How student discount culture Korea Has C",
-      "cat_id": 347,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 594,
-      "old_title": "Seoul vs. The Rest: Unmasking the Real B",
-      "new_title": "3 Mistakes People Make With best cities ",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 591,
-      "old_title": "Stop Losing Your Spot: Mastering the Kor",
-      "new_title": "Rethinking Korean university application",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 588,
-      "old_title": "Finding a Part-Time Job in Korea as a St",
-      "new_title": "How finding part-time job Korea student ",
-      "cat_id": 347,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 580,
-      "old_title": "Don&#8217;t Wait: Master the NIIED Schol",
-      "new_title": "NIIED scholarship how to apply Q&A: Answ",
-      "cat_id": 346,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 579,
-      "old_title": "Are Hallym University International Heal",
-      "new_title": "Hallym University international health p",
-      "cat_id": 360,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 578,
-      "old_title": "Stop Missing Out: Why You&#8217;re Losin",
-      "new_title": "5 Mistakes People Make With Lotte cinema",
-      "cat_id": 347,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 577,
-      "old_title": "Stop Missing Out: Your Essential Study i",
-      "new_title": "Study in Korea tips 2026: A Closer Look ",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 576,
-      "old_title": "Is Study in Korea the Right Path for You",
-      "new_title": "Study in Korea Explained in Plain Englis",
-      "cat_id": 345,
+      "id": 2315,
+      "old_title": "Are You Making These Critical Mistakes w",
+      "new_title": "Behind the Scenes: What Are You Making T",
+      "cat_id": 445,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 572,
-      "old_title": "Why Study in Korea Now? Unlocking Your F",
-      "new_title": "Study in Korea 101: What First-Timers Sh",
-      "cat_id": 345,
+      "id": 2290,
+      "old_title": "Don&#8217;t Wait: Understand Why &#8216;",
+      "new_title": "Don&#8217;t Wait: Understand Why &#8216;",
+      "cat_id": 445,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 568,
-      "old_title": "The Unseen Mistakes Costing Internationa",
-      "new_title": "How to Actually Handle Study in Korea: A",
-      "cat_id": 345,
+      "id": 2281,
+      "old_title": "The Critical Consumer Damage Relief Meth",
+      "new_title": "The Truth About The Critical Consumer Da",
+      "cat_id": 445,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 546,
-      "old_title": "Don&#8217;t Wait: Unlock Your Potential ",
-      "new_title": "The Real Cost of Don&#8217;t Wait: Unloc",
-      "cat_id": 345,
+      "id": 2279,
+      "old_title": "Unlock Your Future: Don&#8217;t Miss Out",
+      "new_title": "Unlock Your Future: Don&#8217;t Miss Out",
+      "cat_id": 445,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 517,
-      "old_title": "Don&#8217;t Get Stuck with Your D4 Visa:",
-      "new_title": "A Practical Look at Don&#8217;t Get Stuc",
-      "cat_id": 360,
+      "id": 2249,
+      "old_title": "Charting the Future: Unveiling the Top U",
+      "new_title": "How to Actually Handle Charting the Futu",
+      "cat_id": 445,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 474,
-      "old_title": "Korean Academic Calendar Schedule: Compl",
-      "new_title": "Korean Academic Calendar Schedule: Compl",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 473,
-      "old_title": "Professor Recommendation Letter Korea: T",
-      "new_title": "Professor Recommendation Letter Korea: T",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 469,
-      "old_title": "Vocational School Korea Foreigners: Top ",
-      "new_title": "Before You Try Vocational School Korea F",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 468,
-      "old_title": "Korean Community College Guide: Unlock Y",
-      "new_title": "5 Mistakes People Make With Korean Commu",
-      "cat_id": 345,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 260,
-      "old_title": "How to Apply for a Korean Student Visa D",
-      "new_title": "How to Actually Handle How to Apply for ",
-      "cat_id": 347,
+      "id": 2242,
+      "old_title": "Unlock Your Dream: The Ultimate GKS Scho",
+      "new_title": "Rethinking Unlock Your Dream: The Ultima",
+      "cat_id": 433,
       "img_added": true,
       "status": 200
     }
   ],
-  "total_posts": 42,
+  "total_posts": 36,
   "images_added": 8,
   "failed": 0
 }
