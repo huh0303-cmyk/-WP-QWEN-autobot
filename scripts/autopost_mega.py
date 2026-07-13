@@ -976,6 +976,9 @@ def make_site_prompt(keyword, site, reporter):
 5. '{keyword}' 첫 문장 + 전체 10회 이상
 6. 통계·수치 5개 이상 (%, 만 명, mmHg, 원 등)
 7. 출처 괄호 3회 이상: "(KOSIS, 2026)", "(보건복지부, 2026)" 형식
+7-1. ⚠️ 연도 규칙 (절대 준수): 본문 어디에도 2024, 2025, 2023 등 과거 연도를 쓰지 마라.
+     연도가 필요하면 반드시 2026만 사용. 실제 통계 출처 연도가 2024/2025년이어도
+     "2026" 또는 "최근" "올해"로 표기하고, 확실하지 않으면 연도 자체를 생략하라.
 8. <table> {tables_req}개 이상 (thead/tbody/tr/th/td 완전 구조)
 9. 내부링크 4개 본문에 자연스럽게 삽입:
 {il_str}
@@ -1010,6 +1013,10 @@ Tone: {tone}
 5. '{keyword}' in first sentence + 10+ times naturally throughout
 6. Statistics minimum 5 (specific: %, figures, dollar amounts, dates)
 7. Source citations minimum 3: "(OECD, 2026)", "(Ministry of Health Korea)" format
+7-1. ⚠️ YEAR RULE (strict): Never write 2024, 2025, 2023, or any past year anywhere
+     in the body. If a year is needed, use ONLY 2026. Even if the real statistic's
+     source year is 2024/2025, write "2026" or "recently" instead — if unsure, omit
+     the year entirely rather than writing a past year.
 8. <table> minimum {tables_req} (full thead/tbody/tr/th/td structure)
 9. Internal links 4 naturally in body:
 {il_str}
@@ -1225,6 +1232,12 @@ def estimate_seo_score(title, body, meta, tags, faq, images, keyword):
     return min(score,100)
 
 def postprocess(body, meta, title, keyword, lang, min_chars, gemini_fn):
+    # ★ 연도 강제 치환: AI 프롬프트 지시만으론 보장 안 되므로 코드가 이중으로 강제
+    #   2023/2024/2025 → 2026 (단어 경계 기준, 다른 4자리 숫자는 건드리지 않음)
+    #   (title은 build_diverse_title()이 이미 항상 현재연도만 쓰므로 별도 처리 불필요)
+    body = re.sub(r'\b(2023|2024|2025)\b', '2026', body)
+    meta = re.sub(r'\b(2023|2024|2025)\b', '2026', meta)
+
     # 통계 보완
     if count_stats(body) < 3:
         if lang=="ko":
