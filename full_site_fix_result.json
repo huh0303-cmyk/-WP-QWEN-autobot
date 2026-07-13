@@ -1,297 +1,449 @@
 {
-  "site": "https://krealestate365.com",
-  "dup_pages": "none",
+  "site": "https://ktech365.com",
+  "dup_pages": {
+    "kept": 3901,
+    "deleted": [
+      {
+        "id": 3884,
+        "status": 200
+      }
+    ]
+  },
   "posts": [
     {
-      "id": 317,
-      "old_title": "2026년, capital gains tax real estate Kor",
-      "new_title": "capital gains tax real estate Korea, 정말 ",
-      "cat_id": 264,
+      "id": 4247,
+      "old_title": "The Real Cost of AI healthcare Korea — W",
+      "new_title": "Debunking Common Myths About AI healthca",
+      "cat_id": 462,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 316,
-      "old_title": "절대 놓치면 안 되는 bank loan foreigner Korea 경고",
-      "new_title": "bank loan foreigner Korea에서 사람들이 자주 하는 7",
-      "cat_id": 263,
+      "id": 4245,
+      "old_title": "3 Mistakes People Make With Samsung semi",
+      "new_title": "3 Things About Samsung semiconductor fab",
+      "cat_id": 464,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 314,
-      "old_title": "외국인을 위한 business location Korea foreigne",
-      "new_title": "business location Korea foreigner의 진짜 비용",
-      "cat_id": 264,
+      "id": 4164,
+      "old_title": "TSMC vs Samsung competition vs. Foundry ",
+      "new_title": "A Practical Look at TSMC vs Samsung comp",
+      "cat_id": 482,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 257,
-      "old_title": "real estate registration tax Korea 때문에 힘",
-      "new_title": "real estate registration tax Korea, 정말 효",
-      "cat_id": 264,
+      "id": 4163,
+      "old_title": "Warning: Chip Design Korea University Wa",
+      "new_title": "Behind the Scenes: What chip design Kore",
+      "cat_id": 482,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 256,
-      "old_title": "restaurant lease Korea foreigner 3가지 핵심 ",
-      "new_title": "절대 놓치면 안 되는 restaurant lease Korea forei",
-      "cat_id": 264,
+      "id": 4162,
+      "old_title": "South Korea&#8217;s Strategic Push: How ",
+      "new_title": "7 Things About chip design Korea univers",
+      "cat_id": 482,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 255,
-      "old_title": "대한민국 외국인 토지 매수 현황과 전망: &#8216;foreigner ",
-      "new_title": "foreigner land purchase Korea에 대한 흔한 오해,",
-      "cat_id": 264,
+      "id": 4160,
+      "old_title": "South Korea&#8217;s AI Ambition: Chartin",
+      "new_title": "AI education Korea future Q&A: Answers F",
+      "cat_id": 462,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 252,
-      "old_title": "한국 REIT 시장, 외국인 투자자를 위한 심층 분석: 기회와 도전",
-      "new_title": "REIT investment Korea foreigner에 대해 자주 놓",
-      "cat_id": 264,
+      "id": 4159,
+      "old_title": "K-Startup Global Program: Fueling Korea&",
+      "new_title": "K-Startup global program 101: What First",
+      "cat_id": 463,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 251,
-      "old_title": "acquisition tax Korea foreigner: 서울·수도권 ",
-      "new_title": "acquisition tax Korea foreigner, 정말 효과가 ",
-      "cat_id": 264,
+      "id": 4158,
+      "old_title": "Korea&#8217;s AI Robot Revolution: From ",
+      "new_title": "4 Mistakes People Make With Korean AI ro",
+      "cat_id": 462,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 250,
-      "old_title": "property inheritance Korea foreigner&#82",
-      "new_title": "property inheritance Korea foreigner 궁금증",
-      "cat_id": 264,
+      "id": 4133,
+      "old_title": "From Seoul to Global Stage: The Unfoldin",
+      "new_title": "A Practical Look at Korean startup succe",
+      "cat_id": 462,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 248,
-      "old_title": "HUG Jeonse Insurance Korea: Your Ultimat",
-      "new_title": "HUG jeonse insurance Korea 시작 전에 꼭 읽어야 할",
-      "cat_id": 264,
+      "id": 4132,
+      "old_title": "Korea AI Industry Growth: Charting the N",
+      "new_title": "3 Mistakes People Make With Korea AI ind",
+      "cat_id": 462,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 247,
-      "old_title": "The Crucial Apartment Contract Korea Eng",
-      "new_title": "apartment contract Korea English 궁금증, 현장",
-      "cat_id": 261,
+      "id": 4131,
+      "old_title": "Pangyo Tech Valley Korea: South Korea&#8",
+      "new_title": "Pangyo tech valley Korea 101: What First",
+      "cat_id": 482,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 245,
-      "old_title": "Property Tax Korea Foreigner: Expert Ins",
-      "new_title": "외국인을 위한 property tax Korea foreigner 실전 ",
-      "cat_id": 264,
+      "id": 4130,
+      "old_title": "What 3 Months of startup funding Korea g",
+      "new_title": "Behind the Scenes: What startup funding ",
+      "cat_id": 463,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 243,
-      "old_title": "The Unforeseen Hurdles in Foreigner Land",
-      "new_title": "foreigner land purchase Korea 시작 전에 꼭 읽어",
-      "cat_id": 264,
+      "id": 4128,
+      "old_title": "What 15 Years in Semiconductor Packaging",
+      "new_title": "advanced packaging Korea 101: What First",
+      "cat_id": 464,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 236,
-      "old_title": "real estate fund Korea foreigner: Naviga",
-      "new_title": "real estate fund Korea foreigner 입문 — 처음",
-      "cat_id": 264,
+      "id": 4126,
+      "old_title": "The Korean Startup Success Story: What T",
+      "new_title": "Korean startup success story Warning Sig",
+      "cat_id": 463,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 4124,
+      "old_title": "Korea startup ecosystem 2026: The Hidden",
+      "new_title": "Korea startup ecosystem 2026 Explained i",
+      "cat_id": 463,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 4090,
+      "old_title": "The Hidden Factor Influencing Memory Chi",
+      "new_title": "Behind the Scenes: What memory chip pric",
+      "cat_id": 482,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 186,
-      "old_title": "The Unforeseen Complexity of acquisition",
-      "new_title": "acquisition tax Korea foreigner, 왜 이런 문제",
-      "cat_id": 264,
+      "id": 4076,
+      "old_title": "The Uncomfortable Truth About Korea Star",
+      "new_title": "Korea startup ecosystem 2026 101: What F",
+      "cat_id": 463,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 184,
-      "old_title": "What a office rent Seoul foreigner Exper",
-      "new_title": "office rent Seoul foreigner, 정말 중요한 건 따로",
-      "cat_id": 264,
+      "id": 4014,
+      "old_title": "The Hidden Side of nuclear fusion KSTAR ",
+      "new_title": "Debunking Common Myths About nuclear fus",
+      "cat_id": 482,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 171,
-      "old_title": "REIT investment Korea foreigner: Unveili",
-      "new_title": "REIT investment Korea foreigner에 대해 의사가 ",
-      "cat_id": 264,
+      "id": 3964,
+      "old_title": "The Hidden Side of K-battery technology ",
+      "new_title": "K-battery technology trend Warning Signs",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3963,
+      "old_title": "The Naver AI HyperCLOVA guide: Expert In",
+      "new_title": "Naver AI HyperCLOVA guide: Frequently Ov",
+      "cat_id": 462,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3959,
+      "old_title": "Unveiling the Hyundai Robot Factory: Wha",
+      "new_title": "Hyundai robot factory guide: A Closer Lo",
+      "cat_id": 462,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3900,
+      "old_title": "What Nobody Tells You About Virtual Idol",
+      "new_title": "How to Actually Handle virtual idol tech",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3899,
+      "old_title": "Is the Korea Web Browser Platform Monocu",
+      "new_title": "How Korea web browser platform Has Chang",
+      "cat_id": 462,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3898,
+      "old_title": "Don&#8217;t Underestimate the Strategic ",
+      "new_title": "What Nobody Tells You About Korea 6G net",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3897,
+      "old_title": "Is Small Modular Reactor Korea&#8217;s E",
+      "new_title": "The Truth About small modular reactor Ko",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3896,
+      "old_title": "Wearable Health Tracker Korea: What Nobo",
+      "new_title": "What Nobody Tells You About wearable hea",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3895,
+      "old_title": "Are You Missing Out? Your Ultimate Metav",
+      "new_title": "How metaverse Zepeto guide Has Changed i",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3894,
+      "old_title": "The Complete Fintech Sandbox Korea Resul",
+      "new_title": "Debunking Common Myths About fintech san",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3893,
+      "old_title": "Is the Webtoon AI Tool Korea Market Pois",
+      "new_title": "Is webtoon AI tool Korea Really Worth It",
+      "cat_id": 462,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3883,
+      "old_title": "Stop Underestimating the Impact of Deliv",
+      "new_title": "How delivery drone Korea test Has Change",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3882,
+      "old_title": "What the Cybersecurity Korea Threat Repo",
+      "new_title": "The Real Cost of cybersecurity Korea thr",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3881,
+      "old_title": "Stop Overlooking These Critical Trends i",
+      "new_title": "Is wearable health tracker Korea Really ",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3880,
+      "old_title": "Fintech Sandbox Korea Results: What the ",
+      "new_title": "9 Mistakes People Make With fintech sand",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3879,
+      "old_title": "Stop Overlooking Songdo: Your smart city",
+      "new_title": "What Nobody Tells You About smart city S",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3878,
+      "old_title": "Is the K-Battery Technology Trend Poised",
+      "new_title": "Is K-battery technology trend Really Wor",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3876,
+      "old_title": "Naver AI HyperCLOVA: Unpacking the Hype ",
+      "new_title": "The Real Cost of Naver AI HyperCLOVA gui",
+      "cat_id": 462,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3870,
+      "old_title": "Stop Ignoring the Future of Energy: Your",
+      "new_title": "nuclear fusion KSTAR guide: Frequently O",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3868,
+      "old_title": "Are Delivery Drone Korea Test Initiative",
+      "new_title": "Why Does delivery drone Korea test Cause",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3867,
+      "old_title": "Is the LG Rollable Display Guide a Glimp",
+      "new_title": "Behind the Scenes: What LG rollable disp",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3866,
+      "old_title": "Is the KSTAR Nuclear Fusion Reactor Guid",
+      "new_title": "nuclear fusion KSTAR guide Warning Signs",
+      "cat_id": 482,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3853,
+      "old_title": "Don&#8217;t Wait to Understand Why Korea",
+      "new_title": "The Truth About Korea supercomputer guid",
+      "cat_id": 462,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 107,
-      "old_title": "Unveiling the Nuances of Korea Real Esta",
-      "new_title": "Korea real estate transaction process에 대",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3845,
+      "old_title": "The Urgent Imperative: Why Plastic Recyc",
+      "new_title": "How to Actually Handle plastic recycling",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 93,
-      "old_title": "The Hidden Costs of Not Knowing Where to",
-      "new_title": "2026년, where to stay in Seoul for a mont",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3841,
+      "old_title": "Is a Hydrogen Car in Korea the Smart Cho",
+      "new_title": "Rethinking hydrogen car Korea guide: A F",
+      "cat_id": 462,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 65,
-      "old_title": "The Hidden Side of how to pay rent in Ko",
-      "new_title": "how to pay rent in Korea foreigner에 대해 자",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3827,
+      "old_title": "The Critical Mistake Undermining Your Ko",
+      "new_title": "The Critical Mistake Undermining Your Ko",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 60,
-      "old_title": "한국 정착 외국인, 서울 단기 숙소 &#8216;숨겨진 함정&#8217;",
-      "new_title": "short term housing Seoul expat 입문 — 처음이라",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3817,
+      "old_title": "Is Your Korea Cloud Computing Career Kor",
+      "new_title": "Is Your Korea Cloud Computing Career Kor",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 31,
-      "old_title": "외국인을 위한 한국 전세, 당신도 이해하고 제대로 활용하고 있나요?",
-      "new_title": "Korea jeonse explained for foreigners, 정",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3812,
+      "old_title": "The Critical Oversight in Korea Drone Te",
+      "new_title": "Debunking Common Myths About The Critica",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 30,
-      "old_title": "capital gains tax Korea property sale, 당",
-      "new_title": "2026년 달라진 capital gains tax Korea proper",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3807,
+      "old_title": "Superconductor Research Update Laborator",
+      "new_title": "Superconductor Research Update Laborator",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 28,
-      "old_title": "서울에서 고시원을 찾는 7가지 현명한 방법: 최고의 가성비 숙소를 위한 ",
-      "new_title": "how to find goshiwon in Seoul 궁금증, 현장 전문",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3802,
+      "old_title": "Voice Recognition Processor Dialect Hand",
+      "new_title": "A Practical Look at Voice Recognition Pr",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 22,
-      "old_title": "Korea digital nomad accommodation: 당신이 잘",
-      "new_title": "설문조사: 10명 중 8명이 Korea digital nomad acco",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3769,
+      "old_title": "The Dawn of South Korea’s AI Era: Key Tr",
+      "new_title": "South Korea’s AI Era: A Closer Look at W",
+      "cat_id": 462,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 21,
-      "old_title": "GTX 노선 수혜 지역, 놓치면 후회할 7가지 핵심 투자 포인트",
-      "new_title": "GTX 노선 수혜 지역, 제대로 대처하는 법 — 전문가 가이드",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3750,
+      "old_title": "The Evolution of HBM4 Why SK Hynix and S",
+      "new_title": "9 Things About The Evolution of HBM4 Why",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 20,
-      "old_title": "한국 인구감소, 당신의 부동산 자산에도 치명적인 영향을 미칠까요?",
-      "new_title": "한국 인구감소 부동산 영향에서 사람들이 자주 하는 4가지 실수",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3748,
+      "old_title": "The Rise of Collaborative Robots (Cobots",
+      "new_title": "The Truth About The Rise of Collaborativ",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 19,
-      "old_title": "용산 개발 계획 분석, 과연 당신의 투자 지도를 바꿀 지각 변동일까?",
-      "new_title": "용산 개발 계획 분석의 진짜 비용 — 미리 알아야 할 것들",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3746,
+      "old_title": "South Koreas Roadmap to Solid State Batt",
+      "new_title": "South Koreas Roadmap to Solid State Batt",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 18,
-      "old_title": "강남 아파트 시세, 과연 지금이 기회일까요? 당신의 투자 전략은 안전한가",
-      "new_title": "강남 아파트 시세 분석, 정말 중요한 건 따로 있습니다",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3744,
+      "old_title": "How AI is Revolutionizing the Korean EdT",
+      "new_title": "The Real Cost of How AI is Revolutionizi",
+      "cat_id": 462,
+      "img_added": true,
       "status": 200
     },
     {
-      "id": 16,
-      "old_title": "다들 잘못 알고 있는 수도권 공급 부족 지역의 진실: 아파트 투자, 어디",
-      "new_title": "2026년, 수도권 공급 부족 지역를 다시 생각해보다",
-      "cat_id": 264,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 15,
-      "old_title": "분당 아파트 리모델링 투자, 이것만 모르면 100% 후회합니다!",
-      "new_title": "분당 아파트 리모델링 투자, 실제로는 어떻게 진행될까",
-      "cat_id": 264,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 14,
-      "old_title": "숲세권 아파트 프리미엄, 그저 낭만일까? 전문가가 밝히는 숨겨진 진실과 ",
-      "new_title": "2026년, 숲세권 아파트 프리미엄를 다시 생각해보다",
-      "cat_id": 264,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 13,
-      "old_title": "일산 부동산 전망 분석, 당신의 투자 전략은 정말 안전한가요?",
-      "new_title": "일산 부동산 전망 분석 궁금증, 현장 전문가가 답하다",
-      "cat_id": 264,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 12,
-      "old_title": "고양 창릉 부동산, 지금 투자해도 후회하지 않을까요? 최고의 전문가가 심",
-      "new_title": "고양 창릉 부동산 분석에 대한 흔한 오해 바로잡기",
-      "cat_id": 264,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 11,
-      "old_title": "한국 상가 투자 수익률, 당신은 제대로 알고 투자하고 있나요?",
-      "new_title": "한국 상가 투자 수익률 시작 전에 꼭 읽어야 할 글",
-      "cat_id": 264,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 9,
-      "old_title": "서울역 주변 부동산, 지금 투자해도 괜찮을까요? 미래 가치 분석",
-      "new_title": "2026년 달라진 서울역 주변 부동산 전망, 무엇이 바뀌었나",
-      "cat_id": 264,
-      "img_added": false,
+      "id": 3729,
+      "old_title": "The Rise of HyperCLOVA X Understanding K",
+      "new_title": "The Truth About The Rise of HyperCLOVA X",
+      "cat_id": 482,
+      "img_added": true,
       "status": 200
     }
   ],
-  "total_posts": 36,
-  "images_added": 3,
+  "total_posts": 54,
+  "images_added": 16,
   "failed": 0
 }
