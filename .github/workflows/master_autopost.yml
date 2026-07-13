@@ -1008,11 +1008,11 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  eval-adsense-2sites:
+  check-dup-pages:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'evaladsense2' }}
+    if: ${{ github.event.inputs.step == 'checkduppages' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
@@ -1021,18 +1021,19 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "2개 사이트 애드센스 평가"
+      - name: "중복페이지 확인"
         env:
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           JOBINKOREA365COM:  ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
-        run: python scripts/eval_adsense_2sites.py
+          JOBKOREA365COM:    ${{ secrets.JOBKOREA365COM }}
+        run: python scripts/check_dup_pages.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add adsense_eval_2sites.json
-          git commit -m "애드센스평가2 (임시)" || echo "변경 없음"
+          git add dup_pages_check.json
+          git commit -m "중복페이지확인 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
