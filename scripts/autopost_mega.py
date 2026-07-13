@@ -138,67 +138,78 @@ def pick_reporter(site):
 # ============================================================
 _wp_category_cache: dict = {}
 
-def find_existing_wp_category(site_url, wp_pass, category_name):
-    """기존 카테고리 조회 후, 없으면 새로 생성한다 (더 이상 미분류로 방치하지 않음)."""
+def load_site_categories(site_url, wp_pass):
+    """사이트에 실제 존재하는 카테고리 전체를 (id, name) 리스트로 로드 (캐싱)."""
     cache = _wp_category_cache.setdefault(site_url, {})
-    if category_name in cache: return cache[category_name]
-
-    if "__loaded__" not in cache:
-        try:
-            page = 1
-            while True:
-                r = requests.get(f"{site_url}/wp-json/wp/v2/categories",
-                                 auth=(WP_USER, wp_pass),
-                                 params={"per_page": 100, "page": page}, timeout=12)
-                if r.status_code != 200: break
-                cats = r.json()
-                if not cats: break
-                for cat in cats:
-                    n = cat.get("name","").strip()
-                    cid = cat.get("id", 1)
-                    cache[n] = cid
-                    cache[n.lower()] = cid
-                page += 1
-                if len(cats) < 100: break
-            cache["__loaded__"] = True
-            loaded = len([k for k in cache if isinstance(cache[k], int)])
-            print(f"   📁 {site_url} 카테고리 {loaded}개 로드")
-        except Exception as e:
-            print(f"   ⚠️ 카테고리 로드 실패: {e}")
-            cache["__loaded__"] = True
-
-    lower = category_name.lower()
-    if lower in cache: return cache[lower]
-
-    for key, cid in cache.items():
-        if key == "__loaded__" or not isinstance(cid, int): continue
-        if lower in key.lower() or key.lower() in lower:
-            print(f"   📁 부분매칭: '{category_name}' → '{key}' ({cid})")
-            cache[category_name] = cid; return cid
-
-    # ★ 없으면 새로 생성 (예전엔 여기서 미분류(1)로 빠졌음 — 그게 버그였음)
+    if "__all__" in cache:
+        return cache["__all__"]
+    all_cats = []
     try:
-        r = requests.post(f"{site_url}/wp-json/wp/v2/categories", auth=(WP_USER, wp_pass),
-                          json={"name": category_name}, timeout=12)
-        if r.status_code in (200, 201):
-            new_id = r.json().get("id", 1)
-            print(f"   📁 신규 생성: '{category_name}' ({new_id})")
-            cache[category_name] = new_id; cache[category_name.lower()] = new_id
-            return new_id
-        elif r.status_code == 400:
-            # 동시성 등으로 이미 존재하는 경우, 에러 응답에 term_id가 오기도 함
-            try:
-                existing_id = r.json().get("data", {}).get("term_id")
-                if existing_id:
-                    cache[category_name] = existing_id
-                    return existing_id
-            except Exception:
-                pass
+        page = 1
+        while True:
+            r = requests.get(f"{site_url}/wp-json/wp/v2/categories",
+                             auth=(WP_USER, wp_pass),
+                             params={"per_page": 100, "page": page}, timeout=12)
+            if r.status_code != 200: break
+            cats = r.json()
+            if not cats: break
+            for cat in cats:
+                n = cat.get("name", "").strip()
+                cid = cat.get("id", 1)
+                if n:
+                    all_cats.append((cid, n))
+            page += 1
+            if len(cats) < 100: break
     except Exception as e:
-        print(f"   ⚠️ 카테고리 생성 실패: {e}")
+        print(f"   ⚠️ 카테고리 로드 실패: {e}")
+    cache["__all__"] = all_cats
+    print(f"   📁 {site_url} 실제 카테고리 {len(all_cats)}개: {[n for _,n in all_cats]}")
+    return all_cats
 
-    print(f"   📁 '{category_name}' 생성도 실패 → 미분류(1)")
-    cache[category_name] = 1; return 1
+
+def pick_best_category(site_url, wp_pass, keyword, title=""):
+    """
+    사이트에 이미 존재하는 카테고리 중에서만 고른다. 새로 생성하지 않는다.
+    'Uncategorized'/'미분류'는 후보에서 제외(진짜 fallback 카테고리가 따로 있음:
+    'Etc'/'기타' 등). 매칭되는 게 없으면 그 fallback 카테고리로 보낸다.
+    """
+    cats = load_site_categories(site_url, wp_pass)
+    if not cats:
+        return 1  # 사이트에 카테고리 정보 자체를 못 가져왔을 때만 최후수단
+
+    real = [(cid, n) for cid, n in cats if n.strip().lower() not in ("uncategorized", "미분류")]
+    if not real:
+        return cats[0][0]
+
+    etc_cat = None
+    for cid, n in real:
+        if n.strip().lower() in ("etc", "기타", "etc.", "other", "others"):
+            etc_cat = (cid, n)
+
+    st = f"{keyword} {title}".lower()
+    st_words = [w for w in re.split(r'[\s/,\-]+', st) if len(w) > 2]
+    best, best_score = None, 0
+    for cid, name in real:
+        if etc_cat and cid == etc_cat[0]:
+            continue  # etc는 최후수단이므로 매칭 후보에서 제외
+        cat_words = [w for w in re.split(r'[\s/,\-]+', name.lower()) if len(w) > 2]
+        score = 0
+        for cw in cat_words:
+            stem = cw[:5] if len(cw) > 5 else cw  # 어간(앞 5글자)으로 단복수/변형 흡수
+            for sw in st_words:
+                if sw.startswith(stem) or stem.startswith(sw[:5]):
+                    score += 1
+                    break
+        if name.strip().lower() in st:
+            score += 10
+        if score > best_score:
+            best, best_score = (cid, name), score
+
+    if best and best_score > 0:
+        return best[0]
+    if etc_cat:
+        return etc_cat[0]
+    return real[0][0]
 
 # ============================================================
 # ★ 카테고리 매핑
@@ -1387,8 +1398,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     url=site["url"]; theme=site["theme"]
 
     author_id=get_or_create_wp_author(url,pw,reporter)
-    cat_name=get_category_for_post(theme,keyword,title)
-    cat_id=find_existing_wp_category(url,pw,cat_name)
+    cat_id=pick_best_category(url,pw,keyword,title)
 
     hero=build_img_html(images[:1],keyword)
     mid =build_img_html(images[1:2],keyword) if len(images)>1 else ""
@@ -1575,7 +1585,7 @@ def main():
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
     print(f"   Gemini: {GEMINI_MODEL} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
-    print(f"   ✅ 카테고리 생성 금지 (find_existing_wp_category)")
+    print(f"   ✅ 카테고리 생성 금지 — 기존 카테고리 중에서만 매칭 (pick_best_category)")
     print(f"   ✅ 27개 사이트별 독립 페르소나 (SITE_PERSONA)")
     print(f"   ✅ IndexNow 발행 즉시 ping")
     print(f"{'='*60}\n")
