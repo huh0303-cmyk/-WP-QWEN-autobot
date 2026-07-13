@@ -1,6 +1,433 @@
 {
-  "site": "https://k-trip365.com",
+  "site": "https://k-visa365.com",
   "dup_pages": "none",
-  "fatal_error": "HTTPSConnectionPool(host='k-trip365.com', port=443): Read timed out. (read timeout=45)",
-  "traceback": "Traceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 534, in _make_request\n    response = conn.getresponse()\n               ^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 571, in getresponse\n    httplib_response = super().getresponse()\n                       ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/http/client.py\", line 1415, in getresponse\n    response.begin()\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/http/client.py\", line 330, in begin\n    version, status, reason = self._read_status()\n                              ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/http/client.py\", line 291, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/socket.py\", line 718, in readinto\n    return self._sock.recv_into(b)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/ssl.py\", line 1314, in recv_into\n    return self.read(nbytes, buffer)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/ssl.py\", line 1166, in read\n    return self._sslobj.read(len, buffer)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTimeoutError: The read operation timed out\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 696, in send\n    resp = conn.urlopen(\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 842, in urlopen\n    retries = retries.increment(\n              ^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/retry.py\", line 498, in increment\n    raise reraise(type(error), error, _stacktrace)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/util.py\", line 39, in reraise\n    raise value\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 788, in urlopen\n    response = self._make_request(\n               ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 536, in _make_request\n    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 367, in _raise_timeout\n    raise ReadTimeoutError(\nurllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='k-trip365.com', port=443): Read timed out. (read timeout=45)\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 127, in <module>\n    fix_titles_categories_images(args.site, pw, lang, theme, log)\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 51, in fix_titles_categories_images\n    r = _get_with_retry(f\"{site_url}/wp-json/wp/v2/posts\", (WP_USER, pw),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 26, in _get_with_retry\n    raise last_exc\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 22, in _get_with_retry\n    return requests.get(url, auth=auth, params=params, timeout=timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 71, in request\n    return session.request(method=method, url=url, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 651, in request\n    resp = self.send(prep, **send_kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 784, in send\n    r = adapter.send(request, **kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 742, in send\n    raise ReadTimeout(e, request=request)\nrequests.exceptions.ReadTimeout: HTTPSConnectionPool(host='k-trip365.com', port=443): Read timed out. (read timeout=45)\n"
+  "posts": [
+    {
+      "id": 2823,
+      "old_title": "7 Things About work visa document checkl",
+      "new_title": "The Real Cost of work visa document chec",
+      "cat_id": 492,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2822,
+      "old_title": "naturalization Korea process vs What You",
+      "new_title": "naturalization Korea process Explained i",
+      "cat_id": 502,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2724,
+      "old_title": "How to Actually Fix Work Visa Extension ",
+      "new_title": "work visa extension Korea Warning Signs ",
+      "cat_id": 492,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2723,
+      "old_title": "How to Actually Secure Your D-10 Job See",
+      "new_title": "A Practical Look at D-10 job seeker visa",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2722,
+      "old_title": "Comprehensive Guide to the F-4 Overseas ",
+      "new_title": "F-4 overseas Korean visa Explained in Pl",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2720,
+      "old_title": "Comprehensive Guide to Employment Contra",
+      "new_title": "Why Does employment contract visa Korea ",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2719,
+      "old_title": "Navigating Your Student Visa Document Ko",
+      "new_title": "student visa document Korea Q&A: Answers",
+      "cat_id": 486,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2716,
+      "old_title": "Your Comprehensive Guide to the D-4 Lang",
+      "new_title": "D-4 language visa Korea Warning Signs Yo",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2715,
+      "old_title": "Navigating the F-4 Overseas Korean Visa:",
+      "new_title": "F-4 overseas Korean visa 101: What First",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2714,
+      "old_title": "Part-Time Work Student Visa: Your Compre",
+      "new_title": "Rethinking part time work student visa: ",
+      "cat_id": 486,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2713,
+      "old_title": "Navigating Your Change of Employer with ",
+      "new_title": "change employer E-7 visa vs What You Thi",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2712,
+      "old_title": "Real D-2 student visa Korea guide: Avoid",
+      "new_title": "What Nobody Tells You About D-2 student ",
+      "cat_id": 486,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2710,
+      "old_title": "The F-6 Marriage Visa Korea Strategy Nob",
+      "new_title": "The Real Cost of F-6 marriage visa Korea",
+      "cat_id": 492,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2706,
+      "old_title": "D-2 student visa Korea guide: Expert Rev",
+      "new_title": "Is D-2 student visa Korea guide Really W",
+      "cat_id": 486,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2661,
+      "old_title": "The student visa extension Korea Strateg",
+      "new_title": "Study Reveals: 3 in 10 People Misunderst",
+      "cat_id": 486,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2550,
+      "old_title": "D10 Job Seeker Visa Points: The Hidden F",
+      "new_title": "A Practical Look at D10 job seeker visa ",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2549,
+      "old_title": "I Found a Flaw in My F6 marriage visa do",
+      "new_title": "How F6 marriage visa documents Has Chang",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2482,
+      "old_title": "D2 Student Visa Documents: The Hidden Tr",
+      "new_title": "D2 student visa documents vs What You Th",
+      "cat_id": 486,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2481,
+      "old_title": "Are You Ready for the KIIP Test in ? You",
+      "new_title": "KIIP test guide foreigner Q&A: Answers F",
+      "cat_id": 502,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2480,
+      "old_title": "The Complete Working Holiday Visa Korea ",
+      "new_title": "The Real Cost of working holiday visa Ko",
+      "cat_id": 492,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2479,
+      "old_title": "The Complete F5 Permanent Residency Guid",
+      "new_title": "F5 permanent residency guide Explained i",
+      "cat_id": 502,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2463,
+      "old_title": "What Your Visa Extension Online Guide Mi",
+      "new_title": "visa extension online guide: Frequently ",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2462,
+      "old_title": "OASIS Startup Visa Guide: What Nobody Te",
+      "new_title": "Rethinking OASIS startup visa guide: A F",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2461,
+      "old_title": "Stop Making This Critical Mistake: How t",
+      "new_title": "How change workplace visa notice Has Cha",
+      "cat_id": 492,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2459,
+      "old_title": "Stop Undermining Your D4 Language Visa P",
+      "new_title": "D4 language visa process: Frequently Ove",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2457,
+      "old_title": "Stop Making These Costly Mistakes with Y",
+      "new_title": "criminal record check visa vs What You T",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2456,
+      "old_title": "H2 Working Visa for Ethnic Koreans: What",
+      "new_title": "What Nobody Tells You About H2 working v",
+      "cat_id": 492,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2453,
+      "old_title": "Don&#8217;t Overpay: Understanding the V",
+      "new_title": "3 Mistakes People Make With visa agency ",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2452,
+      "old_title": "Don&#8217;t Miss Out: Why the Digital No",
+      "new_title": "Debunking Common Myths About digital nom",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2450,
+      "old_title": "Don&#8217;t Delay: Your Essential F2-7 P",
+      "new_title": "F2-7 points visa guide: A Closer Look at",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2449,
+      "old_title": "Don&#8217;t Risk Your Future: The Essent",
+      "new_title": "D2 student visa documents: Frequently Ov",
+      "cat_id": 486,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2448,
+      "old_title": "Is Navigating D10 Job Seeker Visa Points",
+      "new_title": "Before You Try D10 job seeker visa point",
+      "cat_id": 493,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2447,
+      "old_title": "The Critical Korea Tourist Visa Requirem",
+      "new_title": "How Korea tourist visa requirements Has ",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2443,
+      "old_title": "Are You Navigating the E7 Visa Sponsorsh",
+      "new_title": "The Real Cost of E7 visa sponsorship gui",
+      "cat_id": 492,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2435,
+      "old_title": "Are You Prepared for the Financial Proof",
+      "new_title": "financial proof visa Korea Q&A: Answers ",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2423,
+      "old_title": "Don&#8217;t Wait: Navigating Your Korea ",
+      "new_title": "Korea D2 visa part time work permit: Fre",
+      "cat_id": 492,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2417,
+      "old_title": "Korea Visa Passport Renewal During Stay:",
+      "new_title": "Why Does Korea Visa Passport Renewal Cau",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2412,
+      "old_title": "Are You Making the Right Choice: Korea V",
+      "new_title": "Are You Making the Right Choice: Korea V",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2407,
+      "old_title": "Korea D2 Visa Part-Time Work Permit: Wha",
+      "new_title": "Korea D2 Visa Part-Time Work Permit: Wha",
+      "cat_id": 492,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2402,
+      "old_title": "Don&#8217;t Make This Costly Mistake: Th",
+      "new_title": "How Don&#8217;t Make This Costly Mistake",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2397,
+      "old_title": "Don&#8217;t Risk Your Korean Dream: Comm",
+      "new_title": "Behind the Scenes: What Don&#8217;t Risk",
+      "cat_id": 486,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2392,
+      "old_title": "The Costly Mistake Many Indonesian Stude",
+      "new_title": "The Costly Mistake Many Indonesian Stude",
+      "cat_id": 486,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2387,
+      "old_title": "Don&#8217;t Get Denied: Your Urgent Guid",
+      "new_title": "How Don&#8217;t Get Denied: Your Urgent ",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2382,
+      "old_title": "Don&#8217;t Wait: The Critical 2026 Guid",
+      "new_title": "Don&#8217;t Wait: The Critical 2026 Guid",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2377,
+      "old_title": "Are You Overlooking Critical Refusal of ",
+      "new_title": "Are You Overlooking Critical Refusal of ",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2372,
+      "old_title": "Navigating Your Visa Application: Do You",
+      "new_title": "Before You Try Navigating Your Visa Appl",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2367,
+      "old_title": "Avoid a Visa Nightmare: The Crucial Immi",
+      "new_title": "The Truth About Avoid a Visa Nightmare: ",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2363,
+      "old_title": "Visa sponsorship cancellation remedy",
+      "new_title": "4 Mistakes People Make With Visa sponsor",
+      "cat_id": 493,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2359,
+      "old_title": "Invitation letter format immigration",
+      "new_title": "Study Reveals: 5 in 10 People Misunderst",
+      "cat_id": 502,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2336,
+      "old_title": "Understanding the National Pension Schem",
+      "new_title": "A Practical Look at Understanding the Na",
+      "cat_id": 502,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2334,
+      "old_title": "Understanding the Korean Labor Law Minim",
+      "new_title": "Understanding the Korean Labor Law Minim",
+      "cat_id": 502,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2328,
+      "old_title": "How to Get a Korean National Health Insu",
+      "new_title": "8 Things About How to Get a Korean Natio",
+      "cat_id": 502,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2288,
+      "old_title": "How to Find Tech Jobs in South Korea Bes",
+      "new_title": "How to Find Tech Jobs in South Korea Bes",
+      "cat_id": 502,
+      "img_added": true,
+      "status": 200
+    }
+  ],
+  "total_posts": 53,
+  "images_added": 23,
+  "failed": 0
 }
