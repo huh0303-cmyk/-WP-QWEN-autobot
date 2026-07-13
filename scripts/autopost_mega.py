@@ -139,7 +139,7 @@ def pick_reporter(site):
 _wp_category_cache: dict = {}
 
 def find_existing_wp_category(site_url, wp_pass, category_name):
-    """기존 카테고리 조회만. 없으면 1(미분류). 절대 생성 안 함."""
+    """기존 카테고리 조회 후, 없으면 새로 생성한다 (더 이상 미분류로 방치하지 않음)."""
     cache = _wp_category_cache.setdefault(site_url, {})
     if category_name in cache: return cache[category_name]
 
@@ -176,7 +176,28 @@ def find_existing_wp_category(site_url, wp_pass, category_name):
             print(f"   📁 부분매칭: '{category_name}' → '{key}' ({cid})")
             cache[category_name] = cid; return cid
 
-    print(f"   📁 '{category_name}' 없음 → 미분류(1)")
+    # ★ 없으면 새로 생성 (예전엔 여기서 미분류(1)로 빠졌음 — 그게 버그였음)
+    try:
+        r = requests.post(f"{site_url}/wp-json/wp/v2/categories", auth=(WP_USER, wp_pass),
+                          json={"name": category_name}, timeout=12)
+        if r.status_code in (200, 201):
+            new_id = r.json().get("id", 1)
+            print(f"   📁 신규 생성: '{category_name}' ({new_id})")
+            cache[category_name] = new_id; cache[category_name.lower()] = new_id
+            return new_id
+        elif r.status_code == 400:
+            # 동시성 등으로 이미 존재하는 경우, 에러 응답에 term_id가 오기도 함
+            try:
+                existing_id = r.json().get("data", {}).get("term_id")
+                if existing_id:
+                    cache[category_name] = existing_id
+                    return existing_id
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"   ⚠️ 카테고리 생성 실패: {e}")
+
+    print(f"   📁 '{category_name}' 생성도 실패 → 미분류(1)")
     cache[category_name] = 1; return 1
 
 # ============================================================
