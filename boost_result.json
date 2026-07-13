@@ -1,0 +1,34 @@
+[
+  {
+    "site": "https://ktech365.com",
+    "boosted": 4,
+    "failed": 0,
+    "skipped": 50,
+    "log": [
+      {
+        "id": 3827,
+        "title": "The Critical Mistake Undermining Your Ko",
+        "before": 45,
+        "after": 65
+      },
+      {
+        "id": 3817,
+        "title": "Is Your Korea Cloud Computing Career Kor",
+        "before": 45,
+        "after": 63
+      },
+      {
+        "id": 3812,
+        "title": "The Critical Oversight in Korea Drone Te",
+        "before": 47,
+        "after": 67
+      },
+      {
+        "id": 3807,
+        "title": "Superconductor Research Update Laborator",
+        "before": 47,
+        "after": 61
+      }
+    ]
+  }
+]
