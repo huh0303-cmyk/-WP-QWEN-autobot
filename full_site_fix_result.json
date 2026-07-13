@@ -1,329 +1,345 @@
 {
-  "site": "https://koreawedding365.com",
+  "site": "https://kstudy365.com",
   "dup_pages": "none",
   "posts": [
     {
-      "id": 471,
-      "old_title": "marriage interview Korea visa Q&#038;A: ",
-      "new_title": "marriage interview Korea visa Warning Si",
-      "cat_id": 425,
+      "id": 922,
+      "old_title": "What Nobody Tells You About SKY universi",
+      "new_title": "The Real Cost of SKY university admissio",
+      "cat_id": 360,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 920,
+      "old_title": "Debunking Common Myths About Sejong scho",
+      "new_title": "Sejong scholarship Korea: Frequently Ove",
+      "cat_id": 346,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 850,
+      "old_title": "How to Actually Secure Your Yonsei Unive",
+      "new_title": "4 Things About Yonsei university applica",
+      "cat_id": 360,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 849,
+      "old_title": "How to Actually Master Your Graduation R",
+      "new_title": "Rethinking graduation requirement Korea:",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 848,
+      "old_title": "◇ By Hannah Park",
+      "new_title": "How to Actually Handle university club K",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 846,
+      "old_title": "Your Definitive Guide to Graduate School",
+      "new_title": "graduate school Korea apply Warning Sign",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 845,
+      "old_title": "Scholarship Essay Korea Tips: Your Path ",
+      "new_title": "Before You Try scholarship essay Korea t",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 844,
+      "old_title": "Navigating Dormitory Life at a Korea Uni",
+      "new_title": "Study Reveals: 9 in 10 People Misunderst",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 835,
+      "old_title": "Dormitory Life Korea University: Your Es",
+      "new_title": "Why Does dormitory life Korea university",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 834,
+      "old_title": "University Hospital Korea Student: Your ",
+      "new_title": "The Truth About university hospital Kore",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 833,
+      "old_title": "Campus Food Korea: Delicious &#038; Affo",
+      "new_title": "The Real Cost of campus food Korea affor",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 832,
+      "old_title": "student mental health Korea: Why Overloo",
+      "new_title": "Behind the Scenes: What student mental h",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 830,
+      "old_title": "Korean University Ranking 2026: The Hidd",
+      "new_title": "Korean university ranking 2026 Warning S",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 826,
+      "old_title": "I Found a Hidden university scholarship ",
+      "new_title": "university scholarship Korea: A Closer L",
+      "cat_id": 346,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 793,
+      "old_title": "I Discovered the Secret to Scholarship E",
+      "new_title": "Is scholarship essay Korea tips Really W",
+      "cat_id": 346,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 682,
+      "old_title": "The Student Discount Culture Korea Strat",
+      "new_title": "student discount culture Korea Q&A: Answ",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 681,
+      "old_title": "The Hidden Side of scholarship for Vietn",
+      "new_title": "What Nobody Tells You About scholarship ",
+      "cat_id": 346,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 677,
+      "old_title": "The Unspoken Realities: What 15 Years in",
+      "new_title": "Before You Try campus life tips Korea in",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 612,
+      "old_title": "Why You&#8217;re Missing Out on the Best",
+      "new_title": "Study Reveals: 5 in 10 People Misunderst",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 610,
+      "old_title": "What Nobody Tells You About the Korean U",
+      "new_title": "A Practical Look at Korean university se",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 609,
+      "old_title": "Korean University Counseling Centers: Th",
+      "new_title": "9 Mistakes People Make With counseling c",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 608,
+      "old_title": "The Essential K-pop Dance Club Universit",
+      "new_title": "How to Actually Handle K-pop dance club ",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 607,
+      "old_title": "Is Your Pre-Departure Preparation for St",
+      "new_title": "Is pre-departure preparation study in Ko",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 606,
+      "old_title": "Is Adjusting to Korean University Cultur",
+      "new_title": "adjusting to Korean university culture E",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 605,
+      "old_title": "Is Navigating the Student Discount Cultu",
+      "new_title": "How student discount culture Korea Has C",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 594,
+      "old_title": "Seoul vs. The Rest: Unmasking the Real B",
+      "new_title": "3 Mistakes People Make With best cities ",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 591,
+      "old_title": "Stop Losing Your Spot: Mastering the Kor",
+      "new_title": "Rethinking Korean university application",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 588,
+      "old_title": "Finding a Part-Time Job in Korea as a St",
+      "new_title": "How finding part-time job Korea student ",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 580,
+      "old_title": "Don&#8217;t Wait: Master the NIIED Schol",
+      "new_title": "NIIED scholarship how to apply Q&A: Answ",
+      "cat_id": 346,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 579,
+      "old_title": "Are Hallym University International Heal",
+      "new_title": "Hallym University international health p",
+      "cat_id": 360,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 578,
+      "old_title": "Stop Missing Out: Why You&#8217;re Losin",
+      "new_title": "5 Mistakes People Make With Lotte cinema",
+      "cat_id": 347,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 577,
+      "old_title": "Stop Missing Out: Your Essential Study i",
+      "new_title": "Study in Korea tips 2026: A Closer Look ",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 576,
+      "old_title": "Is Study in Korea the Right Path for You",
+      "new_title": "Study in Korea Explained in Plain Englis",
+      "cat_id": 345,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 572,
+      "old_title": "Why Study in Korea Now? Unlocking Your F",
+      "new_title": "Study in Korea 101: What First-Timers Sh",
+      "cat_id": 345,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 568,
+      "old_title": "The Unseen Mistakes Costing Internationa",
+      "new_title": "How to Actually Handle Study in Korea: A",
+      "cat_id": 345,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 546,
+      "old_title": "Don&#8217;t Wait: Unlock Your Potential ",
+      "new_title": "The Real Cost of Don&#8217;t Wait: Unloc",
+      "cat_id": 345,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 517,
+      "old_title": "Don&#8217;t Get Stuck with Your D4 Visa:",
+      "new_title": "A Practical Look at Don&#8217;t Get Stuc",
+      "cat_id": 360,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 474,
+      "old_title": "Korean Academic Calendar Schedule: Compl",
+      "new_title": "Korean Academic Calendar Schedule: Compl",
+      "cat_id": 345,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 473,
+      "old_title": "Professor Recommendation Letter Korea: T",
+      "new_title": "Professor Recommendation Letter Korea: T",
+      "cat_id": 345,
       "img_added": false,
       "status": 200
     },
     {
       "id": 469,
-      "old_title": "spouse visa Korea requirements vs What Y",
-      "new_title": "Debunking Common Myths About spouse visa",
-      "cat_id": 413,
+      "old_title": "Vocational School Korea Foreigners: Top ",
+      "new_title": "Before You Try Vocational School Korea F",
+      "cat_id": 345,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 396,
-      "old_title": "How to Actually Navigate Dual Citizenshi",
-      "new_title": "How to Actually Handle dual citizenship ",
-      "cat_id": 413,
+      "id": 468,
+      "old_title": "Korean Community College Guide: Unlock Y",
+      "new_title": "5 Mistakes People Make With Korean Commu",
+      "cat_id": 345,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 395,
-      "old_title": "◇ By Kevin Yoon",
-      "new_title": "The Real Cost of dual citizenship Korea ",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 394,
-      "old_title": "Navigating Your Korean Marriage Journey:",
-      "new_title": "5 Things About marriage interview Korea ",
-      "cat_id": 425,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 393,
-      "old_title": "A Comprehensive Guide to Navigating Kore",
-      "new_title": "Korean child visa foreigner parent Warni",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 392,
-      "old_title": "Your journey to forever in Korea is a be",
-      "new_title": "A Practical Look at F-6 marriage visa Ko",
-      "cat_id": 425,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 386,
-      "old_title": "TITLE: Capturing Your Love Story: A Deep",
-      "new_title": "The Real Cost of wedding photography Kor",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 385,
-      "old_title": "Your Essential Guide to Wedding Venue Co",
-      "new_title": "How to Actually Handle wedding venue cos",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 383,
-      "old_title": "Dual Citizenship Korea for Children: Nav",
-      "new_title": "Why Does dual citizenship Korea child Ca",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 382,
-      "old_title": "The Real Cost of Finding Love: Understan",
-      "new_title": "The Real Cost of marriage agency fee Kor",
-      "cat_id": 425,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 380,
-      "old_title": "The Korean Marriage Document List: What ",
-      "new_title": "Rethinking Korean marriage document list",
-      "cat_id": 425,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 378,
-      "old_title": "The finding Korean spouse foreigner Warn",
-      "new_title": "What Nobody Tells You About finding Kore",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 330,
-      "old_title": "The Unexpected Hurdle in Your marriage r",
-      "new_title": "marriage registration Korea foreigner Q&",
-      "cat_id": 425,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 266,
-      "old_title": "The Hidden Side of wedding ring jewelry ",
-      "new_title": "7 Mistakes People Make With wedding ring",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 215,
-      "old_title": "Why Popular Wedding Guest Etiquette Kore",
-      "new_title": "wedding guest etiquette Korea vs What Yo",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 163,
-      "old_title": "Is Marriage Registration Foreigner Korea",
-      "new_title": "A Practical Look at marriage registratio",
-      "cat_id": 425,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 162,
-      "old_title": "What Nobody Tells You About Hotel Weddin",
-      "new_title": "hotel wedding Seoul cost Explained in Pl",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 160,
-      "old_title": "Why Overlooking the Evolving Average Mar",
-      "new_title": "The Real Cost of average marriage age Ko",
-      "cat_id": 425,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 159,
-      "old_title": "The Complete Bridal Bouquet Trend Korea ",
-      "new_title": "bridal bouquet trend Korea: Frequently O",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 158,
-      "old_title": "Stop Losing Out on Value: Expert Guide t",
-      "new_title": "Rethinking wedding ring jewelry Cheongda",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 157,
-      "old_title": "Are You Maximizing Your Jeju Outdoor Wed",
-      "new_title": "Jeju outdoor wedding photo 101: What Fir",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 150,
-      "old_title": "Is Groom Tuxedo Rental Korea Really Wort",
-      "new_title": "A Practical Look at groom tuxedo rental ",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 148,
-      "old_title": "Is Jeju Island the Perfect Destination f",
-      "new_title": "destination wedding Jeju guide: Frequent",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 145,
-      "old_title": "Are You Choosing the Right Wedding Ring ",
-      "new_title": "The Real Cost of wedding ring brand Kore",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 143,
-      "old_title": "Is Choosing the Right Wedding Makeup Sal",
-      "new_title": "Rethinking wedding makeup salon Seoul: A",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 142,
-      "old_title": "Is the Small Wedding Trend in Seoul the ",
-      "new_title": "small wedding trend Seoul Explained in P",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 141,
-      "old_title": "Is Your Gangnam Wedding Venue Booking St",
-      "new_title": "Gangnam wedding venue booking Warning Si",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 140,
-      "old_title": "Are You Ready to Embrace the Beauty of a",
-      "new_title": "traditional Korean wedding guide 101: Wh",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 139,
-      "old_title": "How Much Does a Wedding Planner Cost in ",
-      "new_title": "Study Reveals: 6 in 10 People Misunderst",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 138,
-      "old_title": "Don&#8217;t Wait: Your Essential Hanbok ",
-      "new_title": "The Real Cost of Hanbok rental wedding g",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 137,
-      "old_title": "Stop Overpaying: Unlocking the Real Wedd",
-      "new_title": "wedding videography Korea cost 101: What",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 136,
-      "old_title": "Are You Overlooking Crucial Steps in You",
-      "new_title": "Rethinking Gangnam wedding venue booking",
-      "cat_id": 413,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 127,
-      "old_title": "Why Understanding the Average Marriage A",
-      "new_title": "average marriage age Korea Explained in ",
-      "cat_id": 425,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 119,
-      "old_title": "Korea Marriage Counseling for Foreigner ",
-      "new_title": "Korea marriage counseling foreigner coup",
-      "cat_id": 425,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 104,
-      "old_title": "Considering a Korea Couple Photoshoot Lo",
-      "new_title": "How to Actually Handle Considering a Kor",
-      "cat_id": 413,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 79,
-      "old_title": "The Critical F6 Spouse Visa Wedding Cert",
-      "new_title": "The Critical F6 Spouse Visa Wedding Cert",
-      "cat_id": 413,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 69,
-      "old_title": "Beyond the Ballroom: Why Itaewon After P",
-      "new_title": "How Beyond the Ballroom: Why Itaewon Aft",
-      "cat_id": 413,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 39,
-      "old_title": "Step-by-Step Guide to the Korean Marriag",
-      "new_title": "What Nobody Tells You About Step-by-Step",
-      "cat_id": 425,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 37,
-      "old_title": "외국인 여성 결혼비자 F-6 발급 100% 성공 전략정리",
-      "new_title": "외국인 여성 결혼비자 F-6 발급 100% 성공 전략정리: A Close",
-      "cat_id": 413,
+      "id": 260,
+      "old_title": "How to Apply for a Korean Student Visa D",
+      "new_title": "How to Actually Handle How to Apply for ",
+      "cat_id": 347,
       "img_added": true,
       "status": 200
     }
   ],
-  "total_posts": 40,
+  "total_posts": 42,
   "images_added": 8,
   "failed": 0
 }
