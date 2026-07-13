@@ -1008,11 +1008,11 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  eval-insurance-invest:
+  fix-insurance-invest:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'evalinsinv' }}
+    if: ${{ github.event.inputs.step == 'fixinsinv' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     permissions:
       contents: write
     steps:
@@ -1021,18 +1021,21 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "koreainsurance365, koreainvest365 평가"
+      - name: "보험/투자 사이트 보강"
         env:
           GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
           KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
           KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
-        run: python scripts/eval_insurance_invest.py
+          PIXABAY_KEY:          ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY:           ${{ secrets.PEXELS_KEY }}
+        run: python scripts/fix_insurance_invest.py
       - name: "결과 커밋"
+        if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add eval_insurance_invest.json
-          git commit -m "보험투자평가 (임시)" || echo "변경 없음"
+          git add insurance_invest_fix_result.json
+          git commit -m "보험투자보강 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
