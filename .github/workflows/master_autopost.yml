@@ -1012,32 +1012,22 @@ jobs:
           git pull --rebase origin main
           git push
 
-  find-bad-posts:
+  fix-bad-titles:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'findbad' }}
+    if: ${{ github.event.inputs.step == 'fixbadtitles' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "문제글 확인"
+      - name: "문제글 제목 수정"
         env:
-          GEMINI_API_KEY:  ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY:   ${{ secrets.GEMINI_API_KEY }}
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
-        run: python scripts/find_bad_posts.py
-      - name: "결과 커밋"
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add bad_posts.json
-          git commit -m "문제글 확인 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
+        run: python scripts/fix_bad_titles.py
 
   fix-rankmath-noindex:
     needs: determine-slot
