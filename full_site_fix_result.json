@@ -1,569 +1,393 @@
 {
-  "site": "https://kskin365.com",
-  "dup_pages": "none",
+  "site": "https://oliveyoungkorea.com",
+  "dup_pages": {
+    "kept": 146,
+    "deleted": [
+      {
+        "id": 133,
+        "status": 200
+      }
+    ]
+  },
   "posts": [
     {
-      "id": 2127,
-      "old_title": "Debunking Common Myths About AHA BHA Kor",
-      "new_title": "How AHA BHA Korean skincare Has Changed ",
-      "cat_id": 385,
+      "id": 467,
+      "old_title": "Anua heartleaf toner review Explained in",
+      "new_title": "How to Actually Handle Anua heartleaf to",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2126,
-      "old_title": "How morning skincare routine Korea Has C",
-      "new_title": "The Truth About morning skincare routine",
-      "cat_id": 385,
+      "id": 465,
+      "old_title": "Teazen kombucha review Q&#038;A: Answers",
+      "new_title": "Study Reveals: 8 in 10 People Misunderst",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2023,
-      "old_title": "The Truth About AHA BHA Korean Skincare ",
-      "new_title": "What Nobody Tells You About AHA BHA Kore",
-      "cat_id": 385,
+      "id": 389,
+      "old_title": "The Truth About Olive Young Supplements ",
+      "new_title": "How Olive Young supplements Korea Has Ch",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2022,
-      "old_title": "The Truth About Peptide Complex Skincare",
-      "new_title": "Is peptide complex skincare Really Worth",
-      "cat_id": 385,
+      "id": 388,
+      "old_title": "How to Actually Fix Dull Skin: A Medihea",
+      "new_title": "7 Things About Mediheal mask review Your",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2021,
-      "old_title": "The Ultimate Guide to Korean Moisturizer",
-      "new_title": "Behind the Scenes: What Korean moisturiz",
-      "cat_id": 385,
+      "id": 387,
+      "old_title": "My 4-Week Journey with Korean Inner Beau",
+      "new_title": "Korean inner beauty drink Q&A: Answers F",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2020,
-      "old_title": "The Science of Simplicity: Unlocking You",
-      "new_title": "minimal Korean skincare routine Explaine",
-      "cat_id": 385,
+      "id": 386,
+      "old_title": "Korean Inner Beauty Drinks: My 4-Week Ho",
+      "new_title": "5 Mistakes People Make With Korean inner",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2019,
-      "old_title": "Korean Sunscreen Best Picks: Your Ultima",
-      "new_title": "Korean sunscreen best picks Q&A: Answers",
-      "cat_id": 404,
+      "id": 385,
+      "old_title": "My 4-Week Journey with Korean Inner Beau",
+      "new_title": "Behind the Scenes: What Korean inner bea",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2018,
-      "old_title": "The Definitive Guide to Essence vs Serum",
-      "new_title": "The Real Cost of essence vs serum order ",
-      "cat_id": 387,
+      "id": 384,
+      "old_title": "Unlocking K-Immunity: My 4-Week Deep Div",
+      "new_title": "7 Mistakes People Make With Korean immun",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2007,
-      "old_title": "Unlocking Youthful Skin: The Science Beh",
-      "new_title": "A Practical Look at peptide complex skin",
-      "cat_id": 385,
+      "id": 381,
+      "old_title": "My Honest Round Lab Toner Review: 4 Week",
+      "new_title": "Round Lab toner review: Frequently Overl",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2006,
-      "old_title": "K-Beauty Essence vs Serum: The Ultimate ",
-      "new_title": "Rethinking essence vs serum order: A Fre",
-      "cat_id": 404,
+      "id": 380,
+      "old_title": "Anua Heartleaf Toner Review: Is This K-B",
+      "new_title": "Anua heartleaf toner review Q&A: Answers",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2005,
-      "old_title": "The Salicylic Acid Korean Products Trap ",
-      "new_title": "How to Actually Handle salicylic acid Ko",
-      "cat_id": 404,
+      "id": 379,
+      "old_title": "The Hidden Side of Skin1004 ampoule revi",
+      "new_title": "How Skin1004 ampoule review Has Changed ",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 2003,
-      "old_title": "The Missing Step in Your Korean Skincare",
-      "new_title": "Korean skincare men guide vs What You Th",
-      "cat_id": 385,
+      "id": 377,
+      "old_title": "Stop Wasting Money on Korean serum best ",
+      "new_title": "Behind the Scenes: What Korean serum bes",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1998,
-      "old_title": "Stop Wasting Money on Salicylic Acid Kor",
-      "new_title": "The Real Cost of salicylic acid Korean p",
-      "cat_id": 404,
+      "id": 375,
+      "old_title": "Korean Sleeping Pack Review: Why Your Sk",
+      "new_title": "Study Reveals: 8 in 10 People Misunderst",
+      "cat_id": 363,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 373,
+      "old_title": "I Tested Every Olive Young Eye Cream—Her",
+      "new_title": "Is Olive Young eye cream Really Worth It",
+      "cat_id": 382,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 339,
+      "old_title": "The Uncomfortable Truth About Korean det",
+      "new_title": "What Nobody Tells You About Korean detox",
+      "cat_id": 382,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 1965,
-      "old_title": "The Uncomfortable Truth About exfoliatio",
-      "new_title": "exfoliation frequency Korean skin 101: W",
-      "cat_id": 385,
+      "id": 313,
+      "old_title": "What a Skin1004 ampoule review Expert Do",
+      "new_title": "Skin1004 ampoule review: A Closer Look a",
+      "cat_id": 382,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 1939,
-      "old_title": "K-beauty Skincare Basics: The 3 Subtle S",
-      "new_title": "K-beauty skincare basics: Frequently Ove",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1829,
-      "old_title": "The best Korean cushion foundation: Unve",
-      "new_title": "Behind the Scenes: What best Korean cush",
-      "cat_id": 385,
+      "id": 251,
+      "old_title": "The Hidden Side of Purito Centella Serum",
+      "new_title": "8 Things About Purito centella serum rev",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1828,
-      "old_title": "The Hidden Side of best Korean sunscreen",
-      "new_title": "What Nobody Tells You About best Korean ",
-      "cat_id": 404,
+      "id": 200,
+      "old_title": "The Best Korean Toner Pad Review: Are Yo",
+      "new_title": "Study Reveals: 4 in 10 People Misunderst",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1824,
-      "old_title": "What a ceramide cream for skin barrier E",
-      "new_title": "How ceramide cream for skin barrier Has ",
-      "cat_id": 385,
+      "id": 196,
+      "old_title": "The Expert Dermatologist&#8217;s Take on",
+      "new_title": "Heimish clean balm review Explained in P",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1726,
-      "old_title": "The Complete Korean Skincare Routine Ord",
-      "new_title": "Debunking Common Myths About Korean skin",
-      "cat_id": 385,
+      "id": 145,
+      "old_title": "What Your BBIA Eyeliner Review Misses: A",
+      "new_title": "bbia eyeliner review 101: What First-Tim",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1725,
-      "old_title": "What Nobody Tells You About Korean Skinc",
-      "new_title": "A Practical Look at Korean skincare for ",
-      "cat_id": 385,
+      "id": 144,
+      "old_title": "TITLE: Stop Wasting Money on the Wrong L",
+      "new_title": "Rethinking Romand lip tint review: A Fre",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1724,
-      "old_title": "Are You Truly Maximizing Your Hyaluronic",
-      "new_title": "hyaluronic acid serum benefits Warning S",
-      "cat_id": 404,
+      "id": 143,
+      "old_title": "The Complete BBIA Eyeliner Review Guide ",
+      "new_title": "5 Mistakes People Make With bbia eyeline",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1722,
-      "old_title": "Stop Letting Acne Scars Steal Your Confi",
-      "new_title": "The Truth About Korean skincare for acne",
-      "cat_id": 385,
+      "id": 141,
+      "old_title": "Myth vs. Reality: What Your Manyo Cleans",
+      "new_title": "Manyo cleansing oil review Q&A: Answers ",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1720,
-      "old_title": "Dark Circles: What Nobody Tells You Abou",
-      "new_title": "Behind the Scenes: What best eye cream f",
-      "cat_id": 404,
+      "id": 140,
+      "old_title": "The Complete Purito Centella Serum Revie",
+      "new_title": "Rethinking Purito centella serum review:",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1712,
-      "old_title": "Stop Wasting Money on Ineffective Bright",
-      "new_title": "Study Reveals: 7 in 10 People Misunderst",
-      "cat_id": 404,
+      "id": 138,
+      "old_title": "Stop Making This Sunscreen Mistake: An E",
+      "new_title": "The Real Cost of Isntree sun review — Wh",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1710,
-      "old_title": "Stop Wasting Money: How to Find the Best",
-      "new_title": "4 Mistakes People Make With best Korean ",
-      "cat_id": 404,
+      "id": 132,
+      "old_title": "Wakemake Tint Review: What Nobody Tells ",
+      "new_title": "What Nobody Tells You About Wakemake tin",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1709,
-      "old_title": "Collagen Cream Benefits Skin: What K-Bea",
-      "new_title": "collagen cream benefits skin: A Closer L",
-      "cat_id": 385,
+      "id": 130,
+      "old_title": "Is Round Lab Moisturizer Really the K-Be",
+      "new_title": "Why Does Round Lab moisturizer review Ca",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1708,
-      "old_title": "Stop Missing Out: The Astounding Hyaluro",
-      "new_title": "Before You Try hyaluronic acid serum ben",
-      "cat_id": 385,
+      "id": 128,
+      "old_title": "Stop Making This Cleansing Mistake: A Do",
+      "new_title": "Before You Try Heimish clean balm review",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1707,
-      "old_title": "Are You Following the Best Glass Skin Ro",
-      "new_title": "The Truth About glass skin routine steps",
-      "cat_id": 387,
+      "id": 127,
+      "old_title": "Is the Pyunkang Yul Cream Truly a Game-C",
+      "new_title": "Pyunkang Yul cream review: Frequently Ov",
+      "cat_id": 363,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1706,
-      "old_title": "Korean Exfoliating Toners: What Every De",
-      "new_title": "Korean exfoliating toner guide 101: What",
-      "cat_id": 404,
+      "id": 126,
+      "old_title": "Don&#8217;t Miss Out: Your Urgent Numbuz",
+      "new_title": "Numbuzin serum guide: A Closer Look at W",
+      "cat_id": 363,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1704,
-      "old_title": "Are You Using the Best Eye Cream for Dar",
-      "new_title": "Debunking Common Myths About best eye cr",
-      "cat_id": 387,
+      "id": 118,
+      "old_title": "Stop Making These Costly Mistakes: A Med",
+      "new_title": "Clio cushion foundation review 101: What",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1701,
-      "old_title": "Are You Optimizing Your Korean Skincare ",
-      "new_title": "4 Things About Korean skincare for 30s Y",
-      "cat_id": 385,
+      "id": 117,
+      "old_title": "Don&#8217;t Wait to Read This BBIA Eyeli",
+      "new_title": "A Practical Look at bbia eyeliner review",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1700,
-      "old_title": "Don&#8217;t Wait: Why Ginseng Skincare B",
-      "new_title": "Study Reveals: 6 in 10 People Misunderst",
-      "cat_id": 385,
+      "id": 116,
+      "old_title": "Skinfood Mask Review: What Dermatologist",
+      "new_title": "How Skinfood mask review Has Changed in ",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1699,
-      "old_title": "Stop Sacrificing Your Skin: Why Your Sun",
-      "new_title": "Rethinking Korean sunscreen vs western s",
-      "cat_id": 404,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1698,
-      "old_title": "Is the Double Cleansing Method Korea&#82",
-      "new_title": "A Practical Look at double cleansing met",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1694,
-      "old_title": "Are You Making This Critical Korean Shee",
-      "new_title": "Korean sheet mask how often 101: What Fi",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1690,
-      "old_title": "Don&#8217;t Wait: Discover the Best Tone",
-      "new_title": "What Nobody Tells You About best toner f",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1682,
-      "old_title": "Are Korean Propolis Skincare Benefits th",
-      "new_title": "Is Korean propolis skincare benefits Rea",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1677,
-      "old_title": "Why Korean Ginseng Skincare Benefits Are",
-      "new_title": "Why Korean Ginseng Skincare Benefits Are",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1672,
-      "old_title": "Don&#8217;t Wait: Unlock the Global Powe",
-      "new_title": "5 Things About Don&#8217;t Wait: Unlock ",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1667,
-      "old_title": "Are Your Korean Glass Skin Routine Steps",
-      "new_title": "How to Actually Handle Are Your Korean G",
-      "cat_id": 387,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1662,
-      "old_title": "Why Your Foundation Isn&#8217;t Lasting:",
-      "new_title": "Before You Try Why Your Foundation Isn&#",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1652,
-      "old_title": "Why Your Blackheads Won&#8217;t Wait: Un",
-      "new_title": "Why Does Why Your Blackheads Won&#8217;t",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1647,
-      "old_title": "Why Your Glutathione Skin Brightening Ef",
-      "new_title": "Why Your Glutathione Skin Brightening Ef",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1636,
-      "old_title": "The $5 K-Beauty Secret Revealing Skin Yo",
-      "new_title": "Why Does The $5 K-Beauty Secret Revealin",
-      "cat_id": 385,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1631,
-      "old_title": "Is Centella Asiatica the Secret Weapon f",
-      "new_title": "Is Centella Asiatica the Secret Weapon f",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1610,
-      "old_title": "The Truth About Peptide complex serum Ko",
-      "new_title": "Before You Try The Truth About Peptide c",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1608,
-      "old_title": "Why Korean sleeping pack hydration Matte",
-      "new_title": "How Why Korean sleeping pack hydration M",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1606,
-      "old_title": "Why Snail mucin serum review Matters: A ",
-      "new_title": "Why Snail mucin serum review Matters: A ",
-      "cat_id": 404,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 1592,
-      "old_title": "Korean Anti-Aging Skincare Routine: 7 St",
-      "new_title": "3 Things About Korean Anti-Aging Skincar",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1591,
-      "old_title": "K-Beauty for Oily Skin: Top 7 Secrets to",
-      "new_title": "Why Does K-Beauty for Oily Skin: Top 7 S",
-      "cat_id": 404,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1590,
-      "old_title": "Top 7 Korean Eye Cream Recommendations f",
-      "new_title": "Behind the Scenes: What Top 7 Korean Eye",
-      "cat_id": 404,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1589,
-      "old_title": "Vitamin C Serum Korea Review: Top 7 Pick",
-      "new_title": "A Practical Look at Vitamin C Serum Kore",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1588,
-      "old_title": "Korean Moisturizer for Dry Skin: Top 7 P",
-      "new_title": "Why Does Korean Moisturizer for Dry Skin",
-      "cat_id": 404,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1587,
-      "old_title": "Fermented Skincare Korea Brands: Top 7 S",
-      "new_title": "5 Mistakes People Make With Fermented Sk",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1586,
-      "old_title": "Propolis Skincare Korea: Top 7 Secrets t",
-      "new_title": "Propolis Skincare Korea: Top 7 Secrets t",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1585,
-      "old_title": "Korean Sheet Masks Benefits: Unlock Your",
-      "new_title": "3 Mistakes People Make With Korean Sheet",
-      "cat_id": 404,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1584,
-      "old_title": "AHA BHA Exfoliants Korea: 7 Secrets to U",
-      "new_title": "AHA BHA Exfoliants Korea: 7 Secrets to U",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1583,
-      "old_title": "Korean Essence vs Serum: 7 Key Differenc",
+      "id": 114,
+      "old_title": "Peripera Ink Tint Review: What Your Derm",
       "new_title": "Study Reveals: 3 in 10 People Misunderst",
-      "cat_id": 404,
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1582,
-      "old_title": "SPF 50 Korean Sunscreen Guide: Your Ulti",
-      "new_title": "The Real Cost of SPF 50 Korean Sunscreen",
-      "cat_id": 385,
+      "id": 112,
+      "old_title": "Olive Young Global Shipping: The Hidden ",
+      "new_title": "Olive Young global shipping guide Q&A: A",
+      "cat_id": 382,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 1580,
-      "old_title": "Ceramide Moisturizer Korea: Top 7 Secret",
-      "new_title": "Ceramide Moisturizer Korea: Top 7 Secret",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1579,
-      "old_title": "Peptide Serum Korean Brands: 7 Anti-Agin",
-      "new_title": "Peptide Serum Korean Brands: 7 Anti-Agin",
-      "cat_id": 404,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1578,
-      "old_title": "Korean Skincare for Acne: 7 Steps to Cle",
-      "new_title": "Korean Skincare for Acne: 7 Steps to Cle",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1577,
-      "old_title": "K-beauty Ingredients Guide: Unlock Your ",
-      "new_title": "Why Does K-beauty Ingredients Guide: Unl",
-      "cat_id": 386,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1576,
-      "old_title": "Korean Collagen Cream Review: Top 7 for ",
-      "new_title": "4 Mistakes People Make With Korean Colla",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1575,
-      "old_title": "Bakuchiol Natural Retinol Korea: Top 7 S",
-      "new_title": "What Nobody Tells You About Bakuchiol Na",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1574,
-      "old_title": "Mugwort Skincare Korea: 7 Amazing Benefi",
-      "new_title": "Why Does Mugwort Skincare Korea: 7 Amazi",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1573,
-      "old_title": "Rice Water: 7 Amazing Skincare Benefits ",
-      "new_title": "Before You Try Rice Water: 7 Amazing Ski",
-      "cat_id": 385,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 1566,
-      "old_title": "Korean Glass Skin Guide",
-      "new_title": "How to Actually Handle Korean Glass Skin",
-      "cat_id": 385,
+      "id": 97,
+      "old_title": "Is Romand Lip Tint Truly the K-Beauty Ho",
+      "new_title": "Behind the Scenes: What Romand lip tint ",
+      "cat_id": 382,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 1562,
-      "old_title": "Cystic Acne Causes",
-      "new_title": "Is Cystic Acne Causes Really Worth It? A",
-      "cat_id": 404,
+      "id": 89,
+      "old_title": "Don&#8217;t Miss Out: Why Olive Young Ha",
+      "new_title": "Olive Young hair care top Warning Signs ",
+      "cat_id": 384,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 1557,
-      "old_title": "Unveiling the Secret: Your Ultimate K-Be",
-      "new_title": "Why Does Unveiling the Secret: Your Ulti",
-      "cat_id": 385,
+      "id": 85,
+      "old_title": "Don&#8217;t Wait: Why an Olive Young Vit",
+      "new_title": "Study Reveals: 4 in 10 People Misunderst",
+      "cat_id": 363,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 80,
+      "old_title": "The Unseen Damage: Why Skipping This Oli",
+      "new_title": "The Unseen Damage: Why Skipping This Oli",
+      "cat_id": 382,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 75,
+      "old_title": "Why Ignoring These Olive Young Sheet Mas",
+      "new_title": "Why Ignoring These Olive Young Sheet Mas",
+      "cat_id": 363,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 70,
+      "old_title": "Are You Overpaying? Unveiling the Truth ",
+      "new_title": "Why Does Are You Overpaying? Unveiling t",
+      "cat_id": 382,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 65,
+      "old_title": "The Critical Olive Young Pharmacy Sectio",
+      "new_title": "The Real Cost of The Critical Olive Youn",
+      "cat_id": 382,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 60,
+      "old_title": "Are You Missing Out on the Ultimate Oliv",
+      "new_title": "Are You Missing Out on the Ultimate Oliv",
+      "cat_id": 382,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 55,
+      "old_title": "Don&#8217;t Wait! The Critical Reedle Sh",
+      "new_title": "Don&#8217;t Wait! The Critical Reedle Sh",
+      "cat_id": 382,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 50,
+      "old_title": "Don&#8217;t Wait! The Olive Young Awards",
+      "new_title": "Don&#8217;t Wait! The Olive Young Awards",
+      "cat_id": 363,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 28,
+      "old_title": "Olive Young Product Top 10: Medical Anal",
+      "new_title": "Debunking Common Myths About Olive Young",
+      "cat_id": 384,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 20,
+      "old_title": "The Rise of Inner Beauty Trends in South",
+      "new_title": "The Truth About The Rise of Inner Beauty",
+      "cat_id": 382,
       "img_added": true,
       "status": 200
     }
   ],
-  "total_posts": 70,
-  "images_added": 21,
+  "total_posts": 47,
+  "images_added": 14,
   "failed": 0
 }
