@@ -960,6 +960,23 @@ jobs:
             python scripts/fix_2024_to_2026.py
           fi
 
+  test-meta:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'testmeta' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml -q
+      - name: "meta 필드 테스트"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KHEALTH365COM:  ${{ secrets.KHEALTH365COM }}
+        run: python scripts/test_meta_field.py
+
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
