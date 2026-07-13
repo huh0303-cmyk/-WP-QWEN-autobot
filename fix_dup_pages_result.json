@@ -1,0 +1,18 @@
+[
+  {
+    "site": "jobinkorea365.com",
+    "action": "delete dup id395",
+    "status": 200
+  },
+  {
+    "site": "jobkoreaglobal.com",
+    "action": "delete dup id646",
+    "status": 200
+  },
+  {
+    "site": "jobkorea365.com",
+    "action": "rename slug id385",
+    "status": 200,
+    "new_link": "https://jobkorea365.com/privacy-policy/"
+  }
+]
