@@ -1,0 +1,489 @@
+[
+  {
+    "site": "https://koreainsurance365.com",
+    "pages_found": [
+      {
+        "id": 2944,
+        "title": "Privacy Policy",
+        "link": "https://koreainsurance365.com/privacy-policy/"
+      },
+      {
+        "id": 2796,
+        "title": "About Us",
+        "link": "https://koreainsurance365.com/about/"
+      },
+      {
+        "id": 2792,
+        "title": "Contact Us",
+        "link": "https://koreainsurance365.com/contact/"
+      },
+      {
+        "id": 2563,
+        "title": "Disclaimer",
+        "link": "https://koreainsurance365.com/disclaimer/"
+      }
+    ],
+    "has_privacy_policy": true,
+    "has_about": true,
+    "has_contact": true,
+    "duplicate_pages": {},
+    "ads_txt_status": 200,
+    "ads_txt_content": "google.com, pub-3456727916386941, DIRECT, f08c47fec0942fa0",
+    "robots_status": 200,
+    "total_posts": 84,
+    "avg_content_length": 28320,
+    "min_content_length": 7368,
+    "posts_under_1500chars": 0,
+    "duplicate_titles": {},
+    "posts_with_zero_images": 50,
+    "zero_image_list": [
+      {
+        "id": 2276,
+        "date": "2026-03-11T19:53:17",
+        "title": "Hospice Palliative Care Systems and Insurance in S"
+      },
+      {
+        "id": 2278,
+        "date": "2026-03-11T19:55:59",
+        "title": "How to Buy Direct Insurance Without an Agent in Ko"
+      },
+      {
+        "id": 2280,
+        "date": "2026-03-12T08:15:36",
+        "title": "How to Check for National Health Insurance Refunds"
+      },
+      {
+        "id": 2282,
+        "date": "2026-03-12T09:06:21",
+        "title": "Liability Coverage for Foreign Drivers in South Ko"
+      },
+      {
+        "id": 2284,
+        "date": "2026-03-12T09:27:24",
+        "title": "Safe Driving and Auto Insurance Premium Reductions"
+      },
+      {
+        "id": 2364,
+        "date": "2026-03-13T09:23:12",
+        "title": "Comparing Major Auto Insurance Providers for Expat"
+      },
+      {
+        "id": 2373,
+        "date": "2026-03-13T19:23:39",
+        "title": "Essential Add-ons for Your Korean Auto Insurance P"
+      },
+      {
+        "id": 2377,
+        "date": "2026-03-16T09:07:44",
+        "title": "The Legal Difference Between Auto Insurance and Dr"
+      },
+      {
+        "id": 2379,
+        "date": "2026-03-16T09:11:21",
+        "title": "Why You Need Roadside Assistance in Your Korean Ca"
+      },
+      {
+        "id": 2381,
+        "date": "2026-03-16T09:42:20",
+        "title": "How to Insure a Rental Car for a Long-term Stay in"
+      },
+      {
+        "id": 2383,
+        "date": "2026-03-16T10:01:49",
+        "title": "The Impact of Traffic Violations on Your Insurance"
+      },
+      {
+        "id": 2385,
+        "date": "2026-03-16T10:07:22",
+        "title": "Pension vs Savings Insurance Planning for Retireme"
+      },
+      {
+        "id": 2418,
+        "date": "2026-03-16T14:01:44",
+        "title": "Personal Injury Claims for Foreigners in South Kor"
+      },
+      {
+        "id": 2420,
+        "date": "2026-03-16T14:07:29",
+        "title": "Cost Differences Between Emergency and Non Emergen"
+      },
+      {
+        "id": 2428,
+        "date": "2026-03-16T15:09:16",
+        "title": "Suspension of Insurance During Military Service an"
+      },
+      {
+        "id": 2436,
+        "date": "2026-03-16T16:27:42",
+        "title": "Voluntary Continuation of Insurance After Resignat"
+      },
+      {
+        "id": 2439,
+        "date": "2026-03-16T16:37:47",
+        "title": "Dental Insurance Benefits How to Cover Your Implan"
+      },
+      {
+        "id": 2440,
+        "date": "2026-03-16T16:39:25",
+        "title": "Child and Prenatal Insurance in South Korea Guide"
+      },
+      {
+        "id": 2442,
+        "date": "2026-03-16T20:19:04",
+        "title": "The Benefit of Unlimited Liability Coverage in Kor"
+      },
+      {
+        "id": 2446,
+        "date": "2026-03-16T20:43:25",
+        "title": "Procedures for Filing Industrial Accident Insuranc"
+      },
+      {
+        "id": 2448,
+        "date": "2026-03-16T20:53:20",
+        "title": "Maximizing Pregnancy and Birth Benefits with Kookm"
+      },
+      {
+        "id": 2452,
+        "date": "2026-03-16T21:24:10",
+        "title": "Why Every Expat Needs Personal Accident Insurance "
+      },
+      {
+        "id": 2458,
+        "date": "2026-03-17T02:13:37",
+        "title": "How to Renew Your Auto Insurance Online in 5 Minut"
+      },
+      {
+        "id": 2460,
+        "date": "2026-03-17T02:15:58",
+        "title": "Understanding the No-Claim Discount (NCD) System i"
+      },
+      {
+        "id": 2467,
+        "date": "2026-03-17T08:51:51",
+        "title": "Applying for Long Term Care Insurance for Seniors "
+      },
+      {
+        "id": 2471,
+        "date": "2026-03-17T08:57:30",
+        "title": "Cataract Surgery Insurance Disputes and Current St"
+      },
+      {
+        "id": 2473,
+        "date": "2026-03-17T20:25:01",
+        "title": "Why First-time Foreign Drivers Pay More for Insura"
+      },
+      {
+        "id": 2484,
+        "date": "2026-03-18T16:22:46",
+        "title": "Special Coverage for Rare and Incurable Diseases i"
+      },
+      {
+        "id": 2492,
+        "date": "2026-03-18T18:19:06",
+        "title": "Differences Between Type 1 and Type 2 Medical Aid "
+      },
+      {
+        "id": 2494,
+        "date": "2026-03-18T18:27:20",
+        "title": "Comparing Diagnosis vs Caregiver Benefits in Demen"
+      },
+      {
+        "id": 2498,
+        "date": "2026-03-18T18:48:25",
+        "title": "The Role of Travel Insurance for Expats Visiting H"
+      },
+      {
+        "id": 2504,
+        "date": "2026-03-18T23:01:47",
+        "title": "The Difference Between Personal Injury and Propert"
+      },
+      {
+        "id": 2508,
+        "date": "2026-03-18T23:21:28",
+        "title": "Disaster Medical Support Reducing the Burden of Hi"
+      },
+      {
+        "id": 2520,
+        "date": "2026-03-18T23:31:31",
+        "title": "Understanding Non Coverage and Duty of Disclosure"
+      },
+      {
+        "id": 2641,
+        "date": "2026-06-16T10:36:24",
+        "title": "Foreigner Car Insurance in Korea: Ultimate 2026 Dr"
+      },
+      {
+        "id": 2644,
+        "date": "2026-06-16T10:40:21",
+        "title": "Dental Insurance Foreigner in Korea: Complete 2026"
+      },
+      {
+        "id": 2686,
+        "date": "2026-06-19T08:21:46",
+        "title": "Is Your Korea Insurance Company Complaint Process "
+      },
+      {
+        "id": 2691,
+        "date": "2026-06-19T19:03:56",
+        "title": "Are You Missing These Essential Details for Your K"
+      },
+      {
+        "id": 2696,
+        "date": "2026-06-20T01:17:47",
+        "title": "The Hidden Penalties You Face Without Proper Korea"
+      },
+      {
+        "id": 2706,
+        "date": "2026-06-20T06:21:50",
+        "title": "Is Your Business Truly Protected? Navigating Korea"
+      },
+      {
+        "id": 2711,
+        "date": "2026-06-20T07:13:15",
+        "title": "Is Navigating Your Korea Pension Insurance Refund "
+      },
+      {
+        "id": 2716,
+        "date": "2026-06-20T12:24:55",
+        "title": "Korea Motorbike Rental Insurance: What Nobody Tell"
+      },
+      {
+        "id": 2740,
+        "date": "2026-06-21T07:26:49",
+        "title": "Are You Overlooking Crucial Life Insurance Expat C"
+      },
+      {
+        "id": 2744,
+        "date": "2026-06-21T18:08:56",
+        "title": "The Costly Windstorm Flood Insurance Mistake You C"
+      },
+      {
+        "id": 2748,
+        "date": "2026-06-22T00:28:56",
+        "title": "Don&#8217;t Wait: Why D2 Student Health Insurance "
+      },
+      {
+        "id": 2985,
+        "date": "2026-07-03T17:20:56",
+        "title": "The Unseen Hurdles of national health insurance fo"
+      },
+      {
+        "id": 2999,
+        "date": "2026-07-04T01:26:05",
+        "title": "The Hidden Cost of Not Optimizing Your vehicle ins"
+      },
+      {
+        "id": 3014,
+        "date": "2026-07-05T07:14:30",
+        "title": "The Hidden Side of orthodontics cost Korea foreign"
+      },
+      {
+        "id": 3064,
+        "date": "2026-07-06T07:18:32",
+        "title": "What Nobody Tells You About wisdom tooth removal K"
+      },
+      {
+        "id": 3066,
+        "date": "2026-07-06T18:19:21",
+        "title": "The Unseen Complications of health insurance chang"
+      }
+    ],
+    "avg_images_per_post": 1.1,
+    "first_post_date": "2026-03-11T19:53:17",
+    "last_post_date": "2026-07-14T00:07:43",
+    "categories": [
+      {
+        "id": 1032,
+        "name": "Auto Insurance",
+        "count": 23
+      },
+      {
+        "id": 1033,
+        "name": "Dental Insurance",
+        "count": 4
+      },
+      {
+        "id": 1034,
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "id": 1031,
+        "name": "Health Insurance",
+        "count": 55
+      }
+    ]
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "pages_found": [
+      {
+        "id": 2685,
+        "title": "Privacy Policy",
+        "link": "https://koreainvest365.com/privacy-policy/"
+      },
+      {
+        "id": 2472,
+        "title": "Disclaimer",
+        "link": "https://koreainvest365.com/disclaimer/"
+      },
+      {
+        "id": 2469,
+        "title": "Privacy Policy",
+        "link": "https://koreainvest365.com/privacy-policy-2/"
+      },
+      {
+        "id": 40,
+        "title": "Contact",
+        "link": "https://koreainvest365.com/contact/"
+      },
+      {
+        "id": 34,
+        "title": "About",
+        "link": "https://koreainvest365.com/about/"
+      }
+    ],
+    "has_privacy_policy": true,
+    "has_about": true,
+    "has_contact": true,
+    "duplicate_pages": {
+      "privacy policy": 2
+    },
+    "ads_txt_status": 200,
+    "ads_txt_content": "google.com, pub-3456727916386941, DIRECT, f08c47fec0942fa0",
+    "robots_status": 200,
+    "total_posts": 58,
+    "avg_content_length": 15939,
+    "min_content_length": 7000,
+    "posts_under_1500chars": 0,
+    "duplicate_titles": {},
+    "posts_with_zero_images": 19,
+    "zero_image_list": [
+      {
+        "id": 2341,
+        "date": "2026-03-20T20:47:02",
+        "title": "How to Manage Your Wealth in South Korea as an Exp"
+      },
+      {
+        "id": 2344,
+        "date": "2026-03-20T20:52:36",
+        "title": "Why South Korea is the Best Place for Tech Startup"
+      },
+      {
+        "id": 2346,
+        "date": "2026-03-20T20:56:26",
+        "title": "How to Open a Korean Stock Brokerage Account as a "
+      },
+      {
+        "id": 2348,
+        "date": "2026-03-20T20:59:10",
+        "title": "How to Buy Real Estate in South Korea as a Foreign"
+      },
+      {
+        "id": 2357,
+        "date": "2026-06-16T10:11:03",
+        "title": "Navigating Korea Investment: The Ultimate 2026 For"
+      },
+      {
+        "id": 2378,
+        "date": "2026-06-18T05:45:32",
+        "title": "Stock Split History Top Firms: More Than Just a Pr"
+      },
+      {
+        "id": 2383,
+        "date": "2026-06-18T10:14:54",
+        "title": "7 Critical Investment Risk Mitigation Strategies S"
+      },
+      {
+        "id": 2388,
+        "date": "2026-06-18T13:58:10",
+        "title": "Are You Making Critical Mistakes Choosing a Stock "
+      },
+      {
+        "id": 2398,
+        "date": "2026-06-19T08:04:02",
+        "title": "5 Unspoken Truths About Korea Bank Stocks Dividend"
+      },
+      {
+        "id": 2403,
+        "date": "2026-06-19T18:58:05",
+        "title": "Are You Making These Costly Mistakes When You how "
+      },
+      {
+        "id": 2408,
+        "date": "2026-06-20T01:28:40",
+        "title": "Is Your Portfolio Missing the Explosive Growth Pot"
+      },
+      {
+        "id": 2413,
+        "date": "2026-06-20T03:46:17",
+        "title": "Korea ESG Fund Performance: What the Experts Won&#"
+      },
+      {
+        "id": 2437,
+        "date": "2026-06-20T12:13:29",
+        "title": "The Hidden Mistakes Costing You Thousands in Your "
+      },
+      {
+        "id": 2445,
+        "date": "2026-06-21T07:44:26",
+        "title": "What You Need to Know: A Comprehensive Treasury Bo"
+      },
+      {
+        "id": 2453,
+        "date": "2026-06-22T00:39:26",
+        "title": "The Critical Hyundai Motor Stock Mistakes Every In"
+      },
+      {
+        "id": 2653,
+        "date": "2026-07-03T17:18:14",
+        "title": "Samsung Electronics Stock Analysis: The Hidden Sec"
+      },
+      {
+        "id": 2667,
+        "date": "2026-07-04T01:23:35",
+        "title": "Korean REITs Investment for Foreigners: Why Most I"
+      },
+      {
+        "id": 2682,
+        "date": "2026-07-05T07:12:16",
+        "title": "The Korea crypto regulation 2026 Advice Experts Ac"
+      },
+      {
+        "id": 2725,
+        "date": "2026-07-06T07:15:56",
+        "title": "KOSDAQ Investment Strategy: The Unseen Edge for Ac"
+      }
+    ],
+    "avg_images_per_post": 1.8,
+    "first_post_date": "2026-03-20T20:47:02",
+    "last_post_date": "2026-07-14T00:02:44",
+    "categories": [
+      {
+        "id": 561,
+        "name": "Crypto &amp; Digital",
+        "count": 10
+      },
+      {
+        "id": 562,
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "id": 560,
+        "name": "Korea Funds &amp; ETF",
+        "count": 4
+      },
+      {
+        "id": 559,
+        "name": "Korea Stocks",
+        "count": 34
+      },
+      {
+        "id": 1,
+        "name": "Uncategorized",
+        "count": 10
+      }
+    ]
+  }
+]
