@@ -1008,11 +1008,11 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  audit-kfinance365:
+  fix-kfinance365:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'auditkfin' }}
+    if: ${{ github.event.inputs.step == 'fixkfin' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     permissions:
       contents: write
     steps:
@@ -1021,17 +1021,20 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "kfinance365 전수조사"
+      - name: "kfinance365 종합 수정"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
-        run: python scripts/audit_kfinance365.py
+          PIXABAY_KEY:    ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY:     ${{ secrets.PEXELS_KEY }}
+        run: python scripts/fix_kfinance365.py
       - name: "결과 커밋"
+        if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add kfinance365_audit.json
-          git commit -m "kfinance365조사 (임시)" || echo "변경 없음"
+          git add kfinance365_fix_result.json
+          git commit -m "kfinance365수정 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
