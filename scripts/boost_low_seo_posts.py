@@ -10,7 +10,8 @@ import os, sys, re, json, time, random, requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from autopost_mega import (
-    SITES_CONFIG, WP_USER, count_stats, TAG_COUNT, generate_content_gemini
+    SITES_CONFIG, WP_USER, count_stats, TAG_COUNT, generate_content_gemini,
+    get_multiple_images, build_img_html, get_authority_links
 )
 
 LOW_THRESHOLD = 50  # 이 점수 미만인 글만 보강 대상
@@ -170,6 +171,25 @@ def boost_site(site):
                     continue
 
                 marker = 'class="related-links"'
+
+                # 이미지 2장 + 권위기관 링크 2개 추가 (이미지/링크 배점 보강)
+                extra_html = ""
+                try:
+                    imgs = get_multiple_images(prompt_keyword, count=2, theme=site.get("theme", ""))
+                    if imgs:
+                        extra_html += build_img_html(imgs, prompt_keyword)
+                except Exception:
+                    pass
+                try:
+                    auth = get_authority_links(site.get("theme", ""))
+                    if auth:
+                        label = "참고 자료" if lang == "ko" else "References"
+                        items = "".join(f'<li><a href="{u}" target="_blank" rel="noopener">{n}</a></li>' for n, u in auth[:3])
+                        extra_html += f'<div style="margin:20px 0;"><h3>{label}</h3><ul>{items}</ul></div>'
+                except Exception:
+                    pass
+                sup_html = sup_html + extra_html
+
                 if marker in body:
                     idx = body.find('<div class="related-links"')
                     new_body = body[:idx] + sup_html + body[idx:]
