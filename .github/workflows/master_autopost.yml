@@ -960,11 +960,11 @@ jobs:
             python scripts/fix_2024_to_2026.py
           fi
 
-  boost-low-seo:
+  trash-low-seo:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'boostlow' }}
+    if: ${{ github.event.inputs.step == 'trashlow' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
     permissions:
       contents: write
     steps:
@@ -973,9 +973,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "최하위 SEO 글 보강 (0~49점 대상)"
+      - name: "27개 사이트 전체 50점 미만 글 휴지통 이동"
         env:
           GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
+          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
           KIKOREACOM:           ${{ secrets.KIKOREACOM }}
@@ -1002,19 +1003,14 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: |
-          if [ -n "${{ github.event.inputs.target_site }}" ]; then
-            python scripts/boost_low_seo_posts.py --site "${{ github.event.inputs.target_site }}"
-          else
-            python scripts/boost_low_seo_posts.py
-          fi
+        run: python scripts/trash_low_seo_posts.py
       - name: "결과 커밋"
         if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add boost_result.json
-          git commit -m "저품질글 보강 결과 (임시)" || echo "변경 없음"
+          git add trash_result.json
+          git commit -m "저품질글 휴지통이동 결과 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
