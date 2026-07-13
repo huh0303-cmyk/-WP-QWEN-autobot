@@ -15,9 +15,20 @@ from autopost_mega import (
 )
 
 
+def _get_with_retry(url, auth, params, tries=4, timeout=45):
+    last_exc = None
+    for i in range(tries):
+        try:
+            return requests.get(url, auth=auth, params=params, timeout=timeout)
+        except Exception as e:
+            last_exc = e
+            time.sleep(6)
+    raise last_exc
+
+
 def fix_dup_privacy(site_url, pw, log):
-    r = requests.get(f"{site_url}/wp-json/wp/v2/pages", auth=(WP_USER, pw),
-                      params={"per_page": 50, "_fields": "id,title,link"}, timeout=25)
+    r = _get_with_retry(f"{site_url}/wp-json/wp/v2/pages", (WP_USER, pw),
+                         {"per_page": 50, "_fields": "id,title,link"})
     pages = r.json() if r.status_code == 200 else []
     pp = [p for p in pages if p["title"]["rendered"].strip().lower() == "privacy policy"]
     if len(pp) <= 1:
@@ -37,9 +48,9 @@ def fix_dup_privacy(site_url, pw, log):
 def fix_titles_categories_images(site_url, pw, lang, theme, log):
     posts, page = [], 1
     while True:
-        r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, pw),
-                          params={"per_page": 20, "page": page, "status": "publish",
-                                  "_fields": "id,title,content,meta"}, timeout=30)
+        r = _get_with_retry(f"{site_url}/wp-json/wp/v2/posts", (WP_USER, pw),
+                             {"per_page": 20, "page": page, "status": "publish",
+                              "_fields": "id,title,content,meta"})
         if r.status_code != 200: break
         batch = r.json()
         if not batch: break
