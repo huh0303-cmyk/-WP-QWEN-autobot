@@ -1,0 +1,22 @@
+[
+  {
+    "site": "https://kworld365.com",
+    "boosted": 2,
+    "failed": 0,
+    "skipped": 35,
+    "log": [
+      {
+        "id": 97,
+        "title": "BLACKPINK Comeback Update: What BLINKs N",
+        "before": 44,
+        "after": 62
+      },
+      {
+        "id": 96,
+        "title": "BLACKPINK Comeback Update: What Blinks N",
+        "before": 47,
+        "after": 64
+      }
+    ]
+  }
+]
