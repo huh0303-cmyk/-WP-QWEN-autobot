@@ -1,449 +1,569 @@
 {
-  "site": "https://ktech365.com",
-  "dup_pages": {
-    "kept": 3901,
-    "deleted": [
-      {
-        "id": 3884,
-        "status": 200
-      }
-    ]
-  },
+  "site": "https://kskin365.com",
+  "dup_pages": "none",
   "posts": [
     {
-      "id": 4247,
-      "old_title": "The Real Cost of AI healthcare Korea — W",
-      "new_title": "Debunking Common Myths About AI healthca",
-      "cat_id": 462,
+      "id": 2127,
+      "old_title": "Debunking Common Myths About AHA BHA Kor",
+      "new_title": "How AHA BHA Korean skincare Has Changed ",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4245,
-      "old_title": "3 Mistakes People Make With Samsung semi",
-      "new_title": "3 Things About Samsung semiconductor fab",
-      "cat_id": 464,
+      "id": 2126,
+      "old_title": "How morning skincare routine Korea Has C",
+      "new_title": "The Truth About morning skincare routine",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4164,
-      "old_title": "TSMC vs Samsung competition vs. Foundry ",
-      "new_title": "A Practical Look at TSMC vs Samsung comp",
-      "cat_id": 482,
+      "id": 2023,
+      "old_title": "The Truth About AHA BHA Korean Skincare ",
+      "new_title": "What Nobody Tells You About AHA BHA Kore",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4163,
-      "old_title": "Warning: Chip Design Korea University Wa",
-      "new_title": "Behind the Scenes: What chip design Kore",
-      "cat_id": 482,
+      "id": 2022,
+      "old_title": "The Truth About Peptide Complex Skincare",
+      "new_title": "Is peptide complex skincare Really Worth",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4162,
-      "old_title": "South Korea&#8217;s Strategic Push: How ",
-      "new_title": "7 Things About chip design Korea univers",
-      "cat_id": 482,
+      "id": 2021,
+      "old_title": "The Ultimate Guide to Korean Moisturizer",
+      "new_title": "Behind the Scenes: What Korean moisturiz",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4160,
-      "old_title": "South Korea&#8217;s AI Ambition: Chartin",
-      "new_title": "AI education Korea future Q&A: Answers F",
-      "cat_id": 462,
+      "id": 2020,
+      "old_title": "The Science of Simplicity: Unlocking You",
+      "new_title": "minimal Korean skincare routine Explaine",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4159,
-      "old_title": "K-Startup Global Program: Fueling Korea&",
-      "new_title": "K-Startup global program 101: What First",
-      "cat_id": 463,
+      "id": 2019,
+      "old_title": "Korean Sunscreen Best Picks: Your Ultima",
+      "new_title": "Korean sunscreen best picks Q&A: Answers",
+      "cat_id": 404,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4158,
-      "old_title": "Korea&#8217;s AI Robot Revolution: From ",
-      "new_title": "4 Mistakes People Make With Korean AI ro",
-      "cat_id": 462,
+      "id": 2018,
+      "old_title": "The Definitive Guide to Essence vs Serum",
+      "new_title": "The Real Cost of essence vs serum order ",
+      "cat_id": 387,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4133,
-      "old_title": "From Seoul to Global Stage: The Unfoldin",
-      "new_title": "A Practical Look at Korean startup succe",
-      "cat_id": 462,
+      "id": 2007,
+      "old_title": "Unlocking Youthful Skin: The Science Beh",
+      "new_title": "A Practical Look at peptide complex skin",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4132,
-      "old_title": "Korea AI Industry Growth: Charting the N",
-      "new_title": "3 Mistakes People Make With Korea AI ind",
-      "cat_id": 462,
+      "id": 2006,
+      "old_title": "K-Beauty Essence vs Serum: The Ultimate ",
+      "new_title": "Rethinking essence vs serum order: A Fre",
+      "cat_id": 404,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4131,
-      "old_title": "Pangyo Tech Valley Korea: South Korea&#8",
-      "new_title": "Pangyo tech valley Korea 101: What First",
-      "cat_id": 482,
+      "id": 2005,
+      "old_title": "The Salicylic Acid Korean Products Trap ",
+      "new_title": "How to Actually Handle salicylic acid Ko",
+      "cat_id": 404,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4130,
-      "old_title": "What 3 Months of startup funding Korea g",
-      "new_title": "Behind the Scenes: What startup funding ",
-      "cat_id": 463,
+      "id": 2003,
+      "old_title": "The Missing Step in Your Korean Skincare",
+      "new_title": "Korean skincare men guide vs What You Th",
+      "cat_id": 385,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 4128,
-      "old_title": "What 15 Years in Semiconductor Packaging",
-      "new_title": "advanced packaging Korea 101: What First",
-      "cat_id": 464,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 4126,
-      "old_title": "The Korean Startup Success Story: What T",
-      "new_title": "Korean startup success story Warning Sig",
-      "cat_id": 463,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 4124,
-      "old_title": "Korea startup ecosystem 2026: The Hidden",
-      "new_title": "Korea startup ecosystem 2026 Explained i",
-      "cat_id": 463,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 4090,
-      "old_title": "The Hidden Factor Influencing Memory Chi",
-      "new_title": "Behind the Scenes: What memory chip pric",
-      "cat_id": 482,
+      "id": 1998,
+      "old_title": "Stop Wasting Money on Salicylic Acid Kor",
+      "new_title": "The Real Cost of salicylic acid Korean p",
+      "cat_id": 404,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 4076,
-      "old_title": "The Uncomfortable Truth About Korea Star",
-      "new_title": "Korea startup ecosystem 2026 101: What F",
-      "cat_id": 463,
+      "id": 1965,
+      "old_title": "The Uncomfortable Truth About exfoliatio",
+      "new_title": "exfoliation frequency Korean skin 101: W",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 4014,
-      "old_title": "The Hidden Side of nuclear fusion KSTAR ",
-      "new_title": "Debunking Common Myths About nuclear fus",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3964,
-      "old_title": "The Hidden Side of K-battery technology ",
-      "new_title": "K-battery technology trend Warning Signs",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3963,
-      "old_title": "The Naver AI HyperCLOVA guide: Expert In",
-      "new_title": "Naver AI HyperCLOVA guide: Frequently Ov",
-      "cat_id": 462,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3959,
-      "old_title": "Unveiling the Hyundai Robot Factory: Wha",
-      "new_title": "Hyundai robot factory guide: A Closer Lo",
-      "cat_id": 462,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3900,
-      "old_title": "What Nobody Tells You About Virtual Idol",
-      "new_title": "How to Actually Handle virtual idol tech",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3899,
-      "old_title": "Is the Korea Web Browser Platform Monocu",
-      "new_title": "How Korea web browser platform Has Chang",
-      "cat_id": 462,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3898,
-      "old_title": "Don&#8217;t Underestimate the Strategic ",
-      "new_title": "What Nobody Tells You About Korea 6G net",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3897,
-      "old_title": "Is Small Modular Reactor Korea&#8217;s E",
-      "new_title": "The Truth About small modular reactor Ko",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3896,
-      "old_title": "Wearable Health Tracker Korea: What Nobo",
-      "new_title": "What Nobody Tells You About wearable hea",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3895,
-      "old_title": "Are You Missing Out? Your Ultimate Metav",
-      "new_title": "How metaverse Zepeto guide Has Changed i",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3894,
-      "old_title": "The Complete Fintech Sandbox Korea Resul",
-      "new_title": "Debunking Common Myths About fintech san",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3893,
-      "old_title": "Is the Webtoon AI Tool Korea Market Pois",
-      "new_title": "Is webtoon AI tool Korea Really Worth It",
-      "cat_id": 462,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3883,
-      "old_title": "Stop Underestimating the Impact of Deliv",
-      "new_title": "How delivery drone Korea test Has Change",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3882,
-      "old_title": "What the Cybersecurity Korea Threat Repo",
-      "new_title": "The Real Cost of cybersecurity Korea thr",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3881,
-      "old_title": "Stop Overlooking These Critical Trends i",
-      "new_title": "Is wearable health tracker Korea Really ",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3880,
-      "old_title": "Fintech Sandbox Korea Results: What the ",
-      "new_title": "9 Mistakes People Make With fintech sand",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3879,
-      "old_title": "Stop Overlooking Songdo: Your smart city",
-      "new_title": "What Nobody Tells You About smart city S",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3878,
-      "old_title": "Is the K-Battery Technology Trend Poised",
-      "new_title": "Is K-battery technology trend Really Wor",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3876,
-      "old_title": "Naver AI HyperCLOVA: Unpacking the Hype ",
-      "new_title": "The Real Cost of Naver AI HyperCLOVA gui",
-      "cat_id": 462,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3870,
-      "old_title": "Stop Ignoring the Future of Energy: Your",
-      "new_title": "nuclear fusion KSTAR guide: Frequently O",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3868,
-      "old_title": "Are Delivery Drone Korea Test Initiative",
-      "new_title": "Why Does delivery drone Korea test Cause",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3867,
-      "old_title": "Is the LG Rollable Display Guide a Glimp",
-      "new_title": "Behind the Scenes: What LG rollable disp",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3866,
-      "old_title": "Is the KSTAR Nuclear Fusion Reactor Guid",
-      "new_title": "nuclear fusion KSTAR guide Warning Signs",
-      "cat_id": 482,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 3853,
-      "old_title": "Don&#8217;t Wait to Understand Why Korea",
-      "new_title": "The Truth About Korea supercomputer guid",
-      "cat_id": 462,
+      "id": 1939,
+      "old_title": "K-beauty Skincare Basics: The 3 Subtle S",
+      "new_title": "K-beauty skincare basics: Frequently Ove",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3845,
-      "old_title": "The Urgent Imperative: Why Plastic Recyc",
-      "new_title": "How to Actually Handle plastic recycling",
-      "cat_id": 482,
+      "id": 1829,
+      "old_title": "The best Korean cushion foundation: Unve",
+      "new_title": "Behind the Scenes: What best Korean cush",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1828,
+      "old_title": "The Hidden Side of best Korean sunscreen",
+      "new_title": "What Nobody Tells You About best Korean ",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1824,
+      "old_title": "What a ceramide cream for skin barrier E",
+      "new_title": "How ceramide cream for skin barrier Has ",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1726,
+      "old_title": "The Complete Korean Skincare Routine Ord",
+      "new_title": "Debunking Common Myths About Korean skin",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1725,
+      "old_title": "What Nobody Tells You About Korean Skinc",
+      "new_title": "A Practical Look at Korean skincare for ",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1724,
+      "old_title": "Are You Truly Maximizing Your Hyaluronic",
+      "new_title": "hyaluronic acid serum benefits Warning S",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1722,
+      "old_title": "Stop Letting Acne Scars Steal Your Confi",
+      "new_title": "The Truth About Korean skincare for acne",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1720,
+      "old_title": "Dark Circles: What Nobody Tells You Abou",
+      "new_title": "Behind the Scenes: What best eye cream f",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1712,
+      "old_title": "Stop Wasting Money on Ineffective Bright",
+      "new_title": "Study Reveals: 7 in 10 People Misunderst",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1710,
+      "old_title": "Stop Wasting Money: How to Find the Best",
+      "new_title": "4 Mistakes People Make With best Korean ",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1709,
+      "old_title": "Collagen Cream Benefits Skin: What K-Bea",
+      "new_title": "collagen cream benefits skin: A Closer L",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1708,
+      "old_title": "Stop Missing Out: The Astounding Hyaluro",
+      "new_title": "Before You Try hyaluronic acid serum ben",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1707,
+      "old_title": "Are You Following the Best Glass Skin Ro",
+      "new_title": "The Truth About glass skin routine steps",
+      "cat_id": 387,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1706,
+      "old_title": "Korean Exfoliating Toners: What Every De",
+      "new_title": "Korean exfoliating toner guide 101: What",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1704,
+      "old_title": "Are You Using the Best Eye Cream for Dar",
+      "new_title": "Debunking Common Myths About best eye cr",
+      "cat_id": 387,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1701,
+      "old_title": "Are You Optimizing Your Korean Skincare ",
+      "new_title": "4 Things About Korean skincare for 30s Y",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1700,
+      "old_title": "Don&#8217;t Wait: Why Ginseng Skincare B",
+      "new_title": "Study Reveals: 6 in 10 People Misunderst",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1699,
+      "old_title": "Stop Sacrificing Your Skin: Why Your Sun",
+      "new_title": "Rethinking Korean sunscreen vs western s",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1698,
+      "old_title": "Is the Double Cleansing Method Korea&#82",
+      "new_title": "A Practical Look at double cleansing met",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3841,
-      "old_title": "Is a Hydrogen Car in Korea the Smart Cho",
-      "new_title": "Rethinking hydrogen car Korea guide: A F",
-      "cat_id": 462,
+      "id": 1694,
+      "old_title": "Are You Making This Critical Korean Shee",
+      "new_title": "Korean sheet mask how often 101: What Fi",
+      "cat_id": 404,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3827,
-      "old_title": "The Critical Mistake Undermining Your Ko",
-      "new_title": "The Critical Mistake Undermining Your Ko",
-      "cat_id": 482,
+      "id": 1690,
+      "old_title": "Don&#8217;t Wait: Discover the Best Tone",
+      "new_title": "What Nobody Tells You About best toner f",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3817,
-      "old_title": "Is Your Korea Cloud Computing Career Kor",
-      "new_title": "Is Your Korea Cloud Computing Career Kor",
-      "cat_id": 482,
+      "id": 1682,
+      "old_title": "Are Korean Propolis Skincare Benefits th",
+      "new_title": "Is Korean propolis skincare benefits Rea",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3812,
-      "old_title": "The Critical Oversight in Korea Drone Te",
-      "new_title": "Debunking Common Myths About The Critica",
-      "cat_id": 482,
+      "id": 1677,
+      "old_title": "Why Korean Ginseng Skincare Benefits Are",
+      "new_title": "Why Korean Ginseng Skincare Benefits Are",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3807,
-      "old_title": "Superconductor Research Update Laborator",
-      "new_title": "Superconductor Research Update Laborator",
-      "cat_id": 482,
+      "id": 1672,
+      "old_title": "Don&#8217;t Wait: Unlock the Global Powe",
+      "new_title": "5 Things About Don&#8217;t Wait: Unlock ",
+      "cat_id": 404,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3802,
-      "old_title": "Voice Recognition Processor Dialect Hand",
-      "new_title": "A Practical Look at Voice Recognition Pr",
-      "cat_id": 482,
+      "id": 1667,
+      "old_title": "Are Your Korean Glass Skin Routine Steps",
+      "new_title": "How to Actually Handle Are Your Korean G",
+      "cat_id": 387,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3769,
-      "old_title": "The Dawn of South Korea’s AI Era: Key Tr",
-      "new_title": "South Korea’s AI Era: A Closer Look at W",
-      "cat_id": 462,
+      "id": 1662,
+      "old_title": "Why Your Foundation Isn&#8217;t Lasting:",
+      "new_title": "Before You Try Why Your Foundation Isn&#",
+      "cat_id": 404,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3750,
-      "old_title": "The Evolution of HBM4 Why SK Hynix and S",
-      "new_title": "9 Things About The Evolution of HBM4 Why",
-      "cat_id": 482,
+      "id": 1652,
+      "old_title": "Why Your Blackheads Won&#8217;t Wait: Un",
+      "new_title": "Why Does Why Your Blackheads Won&#8217;t",
+      "cat_id": 404,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3748,
-      "old_title": "The Rise of Collaborative Robots (Cobots",
-      "new_title": "The Truth About The Rise of Collaborativ",
-      "cat_id": 482,
+      "id": 1647,
+      "old_title": "Why Your Glutathione Skin Brightening Ef",
+      "new_title": "Why Your Glutathione Skin Brightening Ef",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3746,
-      "old_title": "South Koreas Roadmap to Solid State Batt",
-      "new_title": "South Koreas Roadmap to Solid State Batt",
-      "cat_id": 482,
+      "id": 1636,
+      "old_title": "The $5 K-Beauty Secret Revealing Skin Yo",
+      "new_title": "Why Does The $5 K-Beauty Secret Revealin",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3744,
-      "old_title": "How AI is Revolutionizing the Korean EdT",
-      "new_title": "The Real Cost of How AI is Revolutionizi",
-      "cat_id": 462,
+      "id": 1631,
+      "old_title": "Is Centella Asiatica the Secret Weapon f",
+      "new_title": "Is Centella Asiatica the Secret Weapon f",
+      "cat_id": 404,
       "img_added": true,
       "status": 200
     },
     {
-      "id": 3729,
-      "old_title": "The Rise of HyperCLOVA X Understanding K",
-      "new_title": "The Truth About The Rise of HyperCLOVA X",
-      "cat_id": 482,
+      "id": 1610,
+      "old_title": "The Truth About Peptide complex serum Ko",
+      "new_title": "Before You Try The Truth About Peptide c",
+      "cat_id": 404,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 1608,
+      "old_title": "Why Korean sleeping pack hydration Matte",
+      "new_title": "How Why Korean sleeping pack hydration M",
+      "cat_id": 404,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 1606,
+      "old_title": "Why Snail mucin serum review Matters: A ",
+      "new_title": "Why Snail mucin serum review Matters: A ",
+      "cat_id": 404,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 1592,
+      "old_title": "Korean Anti-Aging Skincare Routine: 7 St",
+      "new_title": "3 Things About Korean Anti-Aging Skincar",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1591,
+      "old_title": "K-Beauty for Oily Skin: Top 7 Secrets to",
+      "new_title": "Why Does K-Beauty for Oily Skin: Top 7 S",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1590,
+      "old_title": "Top 7 Korean Eye Cream Recommendations f",
+      "new_title": "Behind the Scenes: What Top 7 Korean Eye",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1589,
+      "old_title": "Vitamin C Serum Korea Review: Top 7 Pick",
+      "new_title": "A Practical Look at Vitamin C Serum Kore",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1588,
+      "old_title": "Korean Moisturizer for Dry Skin: Top 7 P",
+      "new_title": "Why Does Korean Moisturizer for Dry Skin",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1587,
+      "old_title": "Fermented Skincare Korea Brands: Top 7 S",
+      "new_title": "5 Mistakes People Make With Fermented Sk",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1586,
+      "old_title": "Propolis Skincare Korea: Top 7 Secrets t",
+      "new_title": "Propolis Skincare Korea: Top 7 Secrets t",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1585,
+      "old_title": "Korean Sheet Masks Benefits: Unlock Your",
+      "new_title": "3 Mistakes People Make With Korean Sheet",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1584,
+      "old_title": "AHA BHA Exfoliants Korea: 7 Secrets to U",
+      "new_title": "AHA BHA Exfoliants Korea: 7 Secrets to U",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1583,
+      "old_title": "Korean Essence vs Serum: 7 Key Differenc",
+      "new_title": "Study Reveals: 3 in 10 People Misunderst",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1582,
+      "old_title": "SPF 50 Korean Sunscreen Guide: Your Ulti",
+      "new_title": "The Real Cost of SPF 50 Korean Sunscreen",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1580,
+      "old_title": "Ceramide Moisturizer Korea: Top 7 Secret",
+      "new_title": "Ceramide Moisturizer Korea: Top 7 Secret",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1579,
+      "old_title": "Peptide Serum Korean Brands: 7 Anti-Agin",
+      "new_title": "Peptide Serum Korean Brands: 7 Anti-Agin",
+      "cat_id": 404,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1578,
+      "old_title": "Korean Skincare for Acne: 7 Steps to Cle",
+      "new_title": "Korean Skincare for Acne: 7 Steps to Cle",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1577,
+      "old_title": "K-beauty Ingredients Guide: Unlock Your ",
+      "new_title": "Why Does K-beauty Ingredients Guide: Unl",
+      "cat_id": 386,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1576,
+      "old_title": "Korean Collagen Cream Review: Top 7 for ",
+      "new_title": "4 Mistakes People Make With Korean Colla",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1575,
+      "old_title": "Bakuchiol Natural Retinol Korea: Top 7 S",
+      "new_title": "What Nobody Tells You About Bakuchiol Na",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1574,
+      "old_title": "Mugwort Skincare Korea: 7 Amazing Benefi",
+      "new_title": "Why Does Mugwort Skincare Korea: 7 Amazi",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1573,
+      "old_title": "Rice Water: 7 Amazing Skincare Benefits ",
+      "new_title": "Before You Try Rice Water: 7 Amazing Ski",
+      "cat_id": 385,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 1566,
+      "old_title": "Korean Glass Skin Guide",
+      "new_title": "How to Actually Handle Korean Glass Skin",
+      "cat_id": 385,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 1562,
+      "old_title": "Cystic Acne Causes",
+      "new_title": "Is Cystic Acne Causes Really Worth It? A",
+      "cat_id": 404,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 1557,
+      "old_title": "Unveiling the Secret: Your Ultimate K-Be",
+      "new_title": "Why Does Unveiling the Secret: Your Ulti",
+      "cat_id": 385,
       "img_added": true,
       "status": 200
     }
   ],
-  "total_posts": 54,
-  "images_added": 16,
+  "total_posts": 70,
+  "images_added": 21,
   "failed": 0
 }
