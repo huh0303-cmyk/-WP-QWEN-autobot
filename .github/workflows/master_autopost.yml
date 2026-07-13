@@ -1008,11 +1008,11 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  fix-double-titles:
+  manual-fix-titles:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'fixdouble' }}
+    if: ${{ github.event.inputs.step == 'manualfix' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
@@ -1021,18 +1021,18 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "이중꼬임 제목 수정"
+      - name: "수동 제목 정리"
         env:
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
-        run: python scripts/fix_double_titles.py
+        run: python scripts/manual_fix_titles.py
       - name: "결과 커밋"
         if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add fix_double_result.json
-          git commit -m "이중꼬임 수정결과 (임시)" || echo "변경 없음"
+          git add manual_fix_result.json
+          git commit -m "수동정리 결과 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
