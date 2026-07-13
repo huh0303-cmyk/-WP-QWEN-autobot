@@ -147,7 +147,7 @@ def boost_site(site):
             title = p.get("title", {}).get("rendered", "")
             body = p.get("content", {}).get("rendered", "")
             meta_obj = p.get("meta", {}) or {}
-            keyword = meta_obj.get("rank_math_focus_keyword", "") or title
+            keyword = meta_obj.get("rank_math_focus_keyword", "")
             tag_count = len(p.get("tags", []) or [])
             faq_count = body.count("schema.org/Question")
             meta_desc = meta_obj.get("rank_math_description", "")
@@ -158,7 +158,8 @@ def boost_site(site):
                 continue
 
             try:
-                prompt = build_supplement_prompt(keyword.split(",")[0], title, lang)
+                prompt_keyword = (keyword.split(",")[0].strip() if keyword else title)
+                prompt = build_supplement_prompt(prompt_keyword, title, lang)
                 raw = generate_content_gemini(prompt)
                 sup_html, sup_meta = parse_supplement(raw)
                 if not sup_html:
