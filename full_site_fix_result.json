@@ -1,5 +1,273 @@
 {
-  "site": "https://kieca-korea.org",
-  "fatal_error": "HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
-  "traceback": "Traceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 204, in _new_conn\n    sock = connection.create_connection(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/connection.py\", line 85, in create_connection\n    raise err\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/connection.py\", line 73, in create_connection\n    sock.connect(sa)\nOSError: [Errno 101] Network is unreachable\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 788, in urlopen\n    response = self._make_request(\n               ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 488, in _make_request\n    raise new_e\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 464, in _make_request\n    self._validate_conn(conn)\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1106, in _validate_conn\n    conn.connect()\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 759, in connect\n    self.sock = sock = self._new_conn()\n                       ^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 219, in _new_conn\n    raise NewConnectionError(\nurllib3.exceptions.NewConnectionError: HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 696, in send\n    resp = conn.urlopen(\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 842, in urlopen\n    retries = retries.increment(\n              ^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/retry.py\", line 543, in increment\n    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nurllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 126, in <module>\n    fix_dup_privacy(args.site, pw, log)\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 30, in fix_dup_privacy\n    r = _get_with_retry(f\"{site_url}/wp-json/wp/v2/pages\", (WP_USER, pw),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 26, in _get_with_retry\n    raise last_exc\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 22, in _get_with_retry\n    return requests.get(url, auth=auth, params=params, timeout=timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 71, in request\n    return session.request(method=method, url=url, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 651, in request\n    resp = self.send(prep, **send_kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 784, in send\n    r = adapter.send(request, **kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 729, in send\n    raise ConnectionError(e, request=request)\nrequests.exceptions.ConnectionError: HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))\n"
+  "site": "https://ksa-korea.org",
+  "dup_pages": "none",
+  "posts": [
+    {
+      "id": 555,
+      "old_title": "ASEAN scholarship Korea에 대한 흔한 오해 바로잡기",
+      "new_title": "ASEAN scholarship Korea에 대한 흔한 오해 바로잡기",
+      "cat_id": 230,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 554,
+      "old_title": "departure confirmation Korea, 당신이 아는 것과 ",
+      "new_title": "departure confirmation Korea, 실제로는 어떻게 진",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 503,
+      "old_title": "Korean language scholarship 7가지 핵심 — 유학 ",
+      "new_title": "절대 놓치면 안 되는 Korean language scholarship ",
+      "cat_id": 230,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 502,
+      "old_title": "왜 medical school Korea foreigner 입학이 수많은",
+      "new_title": "2026년 달라진 medical school Korea foreigner",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 501,
+      "old_title": "한국 유학 장학금, 아무도 안 알려주는 합격 비밀: scholarship",
+      "new_title": "2026년, scholarship selection criteria Ko",
+      "cat_id": 230,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 496,
+      "old_title": "여러분, 한국에서 &#8216;visa reapplication Kore",
+      "new_title": "visa reapplication Korea 입문 — 처음이라면 꼭 알아",
+      "cat_id": 231,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 495,
+      "old_title": "[departure confirmation Korea] 한국 유학, 이거",
+      "new_title": "departure confirmation Korea, 실제로는 어떻게 진",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 494,
+      "old_title": "law school Korea international: 한국 유학 10",
+      "new_title": "law school Korea international에 대한 흔한 오해",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 493,
+      "old_title": "한국 유학 비자 변경, 이것만큼은 꼭 알고 가세요! 선배가 알려주는 vi",
+      "new_title": "아무도 말해주지 않는 visa change status Korea stu",
+      "cat_id": 231,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 492,
+      "old_title": "Unlock Your Global Career: How to Apply ",
+      "new_title": "외국인을 위한 business school Korea apply 실전 가",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 491,
+      "old_title": "Unlock Your Future: A Comprehensive Guid",
+      "new_title": "2026년, GKS scholarship apply를 다시 생각해보다",
+      "cat_id": 230,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 490,
+      "old_title": "Medical School Korea Foreigner: The Hidd",
+      "new_title": "medical school Korea foreigner, 제대로 대처하는",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 488,
+      "old_title": "ASEAN Scholarship Korea: The Expert&#821",
+      "new_title": "ASEAN scholarship Korea, 정말 중요한 건 따로 있습니",
+      "cat_id": 230,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 486,
+      "old_title": "The law school Korea international Advic",
+      "new_title": "law school Korea international 시작 전에 꼭 읽",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 446,
+      "old_title": "The Hidden Costs of Overlooking Engineer",
+      "new_title": "engineering school Korea admission에 대해 자",
+      "cat_id": 229,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 396,
+      "old_title": "The Expert Reveal: Why Your 한국 입국 후 첫 일주",
+      "new_title": "한국 입국 후 첫 일주일 준비사항, 쉽게 풀어드립니다",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 341,
+      "old_title": "15년 경력 전문가가 밝히는 한국 유학 성공 비결: ‘이것’ 하나면 당신",
+      "new_title": "절대 놓치면 안 되는 외국인 유학생 선배가 알려주는 꿀팁 경고 신호",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 294,
+      "old_title": "한국 스타트업 취업, 당신의 성공 전략은 충분한가요?",
+      "new_title": "한국 스타트업 취업 방법 안내, 정말 중요한 건 따로 있습니다",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 293,
+      "old_title": "한국 유학생 여행, &#8216;유명 관광지&#8217; vs &#821",
+      "new_title": "한국 여행지 추천 유학생 필수코스에 대한 흔한 오해 바로잡기",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 292,
+      "old_title": "한국어 단어 암기, 이것 모르고 하면 100% 후회합니다! 15년 전문가",
+      "new_title": "한국어 단어 암기 효과적인 방법에 대해 의사가 꼭 알려주고 싶은 9가지",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 290,
+      "old_title": "한국 대학 장학금, 당신도 혹시 놓치고 있진 않나요?",
+      "new_title": "한국 대학 장학금 종류와 신청법의 진짜 비용 — 미리 알아야 할 것들",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 289,
+      "old_title": "한국 유학 준비: 2026년을 위한 7단계 완전 가이드",
+      "new_title": "한국 유학 준비 완전 가이드 2026, 실제로는 어떻게 진행될까",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 283,
+      "old_title": "외국인을 위한 한국어 문법 정리: 완벽 마스터를 위한 7가지 핵심 전략",
+      "new_title": "2026년, 외국인을 위한 한국어 문법 정리를 다시 생각해보다",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 282,
+      "old_title": "한국어 언어교환 파트너 찾기, 다들 잘못 알고 있는 진실과 최적의 방법",
+      "new_title": "한국어 언어교환 파트너 찾기, 제대로 대처하는 법 — 전문가 가이드",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 280,
+      "old_title": "한국 유학 성공한 외국인 인터뷰, 당신의 미래도 달라질 수 있을까요?",
+      "new_title": "외국인을 위한 한국 유학 성공한 외국인 인터뷰 실전 가이드",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 279,
+      "old_title": "한국 유학, 석사 박사 과정 외국인 입학, 당신의 성공 전략은 충분한가요",
+      "new_title": "석사 박사 과정 외국인 입학 안내에 대한 흔한 오해 바로잡기",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 277,
+      "old_title": "한국 편의점 100% 활용하는 7가지 비결: 유학생을 위한 완전 가이드",
+      "new_title": "한국 편의점 완전 활용 가이드 궁금증, 현장 전문가가 답하다",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 276,
+      "old_title": "서울 무료 관광지 베스트 10, 정말 유학 생활에 활력을 줄까요?",
+      "new_title": "설문조사: 10명 중 9명이 서울 무료 관광지 베스트 10를 잘못 알고 ",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 275,
+      "old_title": "서울 유학 생활비 현실적 정보, 이것 모르고 가면 100% 후회합니다",
+      "new_title": "서울 유학 생활비 현실적 정보, 정말 효과가 있을까? 솔직한 분석",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 274,
+      "old_title": "한국 직장 문화, 당신은 얼마나 알고 있나요? 성공적인 정착을 위한 필수",
+      "new_title": "한국 직장 문화 이해 가이드의 진짜 비용 — 미리 알아야 할 것들",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 273,
+      "old_title": "비자 연장, 쉬운 줄 알았죠? 다들 잘못 알고 있는 숨겨진 &#8216;",
+      "new_title": "비자 연장 신청 방법과 주의사항, 실제로는 어떻게 진행될까",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 272,
+      "old_title": "한국 유학 성공한 외국인들의 7가지 비결: 인터뷰로 알아보는 심층 전략",
+      "new_title": "한국 유학 성공한 외국인 인터뷰의 진짜 비용 — 미리 알아야 할 것들",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 270,
+      "old_title": "F-2 지역특화 비자, 성공적인 신청의 숨겨진 비법? 다들 놓치는 핵심 ",
+      "new_title": "F-2 지역특화 비자 신청 방법, 당신이 아는 것과 뭐가 다를까",
+      "cat_id": 232,
+      "img_added": false,
+      "status": 200
+    }
+  ],
+  "total_posts": 33,
+  "images_added": 1,
+  "failed": 0
 }
