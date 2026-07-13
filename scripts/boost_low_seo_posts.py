@@ -7,12 +7,26 @@ AI로 보강 생성해 기존 본문 끝(관련글 블록 앞)에 삽입한다.
 - 보강 콘텐츠만 추가(append), 실패해도 원본 그대로 유지
 """
 import os, sys, re, json, time, random, requests
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutTimeout
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from autopost_mega import (
     SITES_CONFIG, WP_USER, count_stats, TAG_COUNT, generate_content_gemini,
     get_multiple_images, build_img_html, get_authority_links
 )
+
+def generate_with_timeout(prompt, timeout_sec=90):
+    """generate_content_gemini가 응답 없이 멈추는 경우를 대비한 강제 타임아웃.
+    매번 새 executor를 써서, 이전에 멈춘 호출이 다음 호출을 막지 않게 한다."""
+    ex = ThreadPoolExecutor(max_workers=1)
+    fut = ex.submit(generate_content_gemini, prompt)
+    try:
+        result = fut.result(timeout=timeout_sec)
+        ex.shutdown(wait=False)
+        return result
+    except FutTimeout:
+        ex.shutdown(wait=False)
+        raise TimeoutError(f"Gemini 응답 {timeout_sec}초 초과")
 
 LOW_THRESHOLD = 50  # 이 점수 미만인 글만 보강 대상
 
@@ -118,7 +132,7 @@ def parse_supplement(raw):
     return html, meta
 
 
-def boost_site(site):
+def boost_site(site, max_seconds=900):
     url = site["url"]
     pw = os.getenv(site["wp_pass_env"], "")
     if not pw:
@@ -127,8 +141,12 @@ def boost_site(site):
     lang = site.get("lang", "ko")
     boosted = failed = skipped = 0
     log = []
+    site_start = time.time()
     page = 1
     while True:
+        if time.time() - site_start > max_seconds:
+            log.append({"note": f"⏱ 사이트별 제한시간({max_seconds}초) 초과로 중단, 다음 사이트로 넘어감"})
+            break
         r = None
         for attempt in range(3):
             try:
@@ -147,6 +165,9 @@ def boost_site(site):
             break
 
         for p in batch:
+            if time.time() - site_start > max_seconds:
+                log.append({"note": f"⏱ 사이트별 제한시간({max_seconds}초) 초과로 중단"})
+                break
             title = p.get("title", {}).get("rendered", "")
             body = p.get("content", {}).get("rendered", "")
             meta_obj = p.get("meta", {}) or {}
@@ -163,7 +184,7 @@ def boost_site(site):
             try:
                 prompt_keyword = (keyword.split(",")[0].strip() if keyword else title)
                 prompt = build_supplement_prompt(prompt_keyword, title, lang)
-                raw = generate_content_gemini(prompt)
+                raw = generate_with_timeout(prompt, timeout_sec=90)
                 sup_html, sup_meta = parse_supplement(raw)
                 if not sup_html:
                     failed += 1
