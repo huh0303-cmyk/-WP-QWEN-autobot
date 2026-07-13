@@ -1008,33 +1008,6 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  check-jobkorea365:
-    needs: determine-slot
-    if: ${{ github.event.inputs.step == 'checkjk365' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "jobkorea365 확인"
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
-        run: python scripts/check_jobkorea365.py
-      - name: "결과 커밋"
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add jobkorea365_check.json
-          git commit -m "jobkorea365확인 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
-
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
