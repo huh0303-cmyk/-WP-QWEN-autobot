@@ -1013,6 +1013,8 @@ jobs:
     if: ${{ github.event.inputs.step == 'fixdouble' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -1024,6 +1026,15 @@ jobs:
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
         run: python scripts/fix_double_titles.py
+      - name: "결과 커밋"
+        if: always()
+        run: |
+          git config user.email "huh0303@gmail.com"
+          git config user.name "huh0303-cmyk"
+          git add fix_double_result.json
+          git commit -m "이중꼬임 수정결과 (임시)" || echo "변경 없음"
+          git pull --rebase origin main
+          git push
 
   fix-rankmath-noindex:
     needs: determine-slot
