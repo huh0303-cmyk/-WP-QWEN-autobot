@@ -1,393 +1,305 @@
 {
-  "site": "https://oliveyoungkorea.com",
-  "dup_pages": {
-    "kept": 146,
-    "deleted": [
-      {
-        "id": 133,
-        "status": 200
-      }
-    ]
-  },
+  "site": "https://kworld365.com",
+  "dup_pages": "none",
   "posts": [
     {
-      "id": 467,
-      "old_title": "Anua heartleaf toner review Explained in",
-      "new_title": "How to Actually Handle Anua heartleaf to",
-      "cat_id": 382,
+      "id": 227,
+      "old_title": "NCT 127 world tour Q&#038;A: Answers Fro",
+      "new_title": "Is NCT 127 world tour Q&#038;A: Answers ",
+      "cat_id": 5,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 465,
-      "old_title": "Teazen kombucha review Q&#038;A: Answers",
-      "new_title": "Study Reveals: 8 in 10 People Misunderst",
-      "cat_id": 382,
+      "id": 225,
+      "old_title": "K-pop awards ceremony guide Warning Sign",
+      "new_title": "How K-pop awards ceremony guide Warning ",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 389,
-      "old_title": "The Truth About Olive Young Supplements ",
-      "new_title": "How Olive Young supplements Korea Has Ch",
-      "cat_id": 382,
+      "id": 223,
+      "old_title": "Study Reveals: 6 in 10 People Misunderst",
+      "new_title": "Study Reveals: 9 in 10 People Misunderst",
+      "cat_id": 16,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 388,
-      "old_title": "How to Actually Fix Dull Skin: A Medihea",
-      "new_title": "7 Things About Mediheal mask review Your",
-      "cat_id": 382,
+      "id": 218,
+      "old_title": "Korean convenience store food ranking vs",
+      "new_title": "A Practical Look at Korean convenience s",
+      "cat_id": 16,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 387,
-      "old_title": "My 4-Week Journey with Korean Inner Beau",
-      "new_title": "Korean inner beauty drink Q&A: Answers F",
-      "cat_id": 382,
+      "id": 216,
+      "old_title": "What Nobody Tells You About cost of livi",
+      "new_title": "What Nobody Tells You About cost of livi",
+      "cat_id": 5,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 386,
-      "old_title": "Korean Inner Beauty Drinks: My 4-Week Ho",
-      "new_title": "5 Mistakes People Make With Korean inner",
-      "cat_id": 382,
+      "id": 214,
+      "old_title": "6 Things About Korean cafe culture Seoul",
+      "new_title": "Behind the Scenes: What 6 Things About K",
+      "cat_id": 16,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 385,
-      "old_title": "My 4-Week Journey with Korean Inner Beau",
-      "new_title": "Behind the Scenes: What Korean inner bea",
-      "cat_id": 382,
+      "id": 212,
+      "old_title": "The Real Cost of BTS latest news 2026 — ",
+      "new_title": "Before You Try The Real Cost of BTS late",
+      "cat_id": 5,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 384,
-      "old_title": "Unlocking K-Immunity: My 4-Week Deep Div",
-      "new_title": "7 Mistakes People Make With Korean immun",
-      "cat_id": 382,
+      "id": 155,
+      "old_title": "How to Actually Plan Your K-drama Filmin",
+      "new_title": "How to Actually Plan Your K-drama Filmin",
+      "cat_id": 5,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 381,
-      "old_title": "My Honest Round Lab Toner Review: 4 Week",
-      "new_title": "Round Lab toner review: Frequently Overl",
-      "cat_id": 382,
+      "id": 153,
+      "old_title": "The Truth About K-pop Fan Culture That M",
+      "new_title": "Study Reveals: 9 in 10 People Misunderst",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 380,
-      "old_title": "Anua Heartleaf Toner Review: Is This K-B",
-      "new_title": "Anua heartleaf toner review Q&A: Answers",
-      "cat_id": 382,
+      "id": 151,
+      "old_title": "The Truth About IVE&#8217;s Rapid Rise T",
+      "new_title": "Behind the Scenes: What The Truth About ",
+      "cat_id": 5,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 379,
-      "old_title": "The Hidden Side of Skin1004 ampoule revi",
-      "new_title": "How Skin1004 ampoule review Has Changed ",
-      "cat_id": 382,
+      "id": 149,
+      "old_title": "The Truth About Jeju Island Travel That ",
+      "new_title": "What Nobody Tells You About The Truth Ab",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 377,
-      "old_title": "Stop Wasting Money on Korean serum best ",
-      "new_title": "Behind the Scenes: What Korean serum bes",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 375,
-      "old_title": "Korean Sleeping Pack Review: Why Your Sk",
-      "new_title": "Study Reveals: 8 in 10 People Misunderst",
-      "cat_id": 363,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 373,
-      "old_title": "I Tested Every Olive Young Eye Cream—Her",
-      "new_title": "Is Olive Young eye cream Really Worth It",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 339,
-      "old_title": "The Uncomfortable Truth About Korean det",
-      "new_title": "What Nobody Tells You About Korean detox",
-      "cat_id": 382,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 313,
-      "old_title": "What a Skin1004 ampoule review Expert Do",
-      "new_title": "Skin1004 ampoule review: A Closer Look a",
-      "cat_id": 382,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 251,
-      "old_title": "The Hidden Side of Purito Centella Serum",
-      "new_title": "8 Things About Purito centella serum rev",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 200,
-      "old_title": "The Best Korean Toner Pad Review: Are Yo",
-      "new_title": "Study Reveals: 4 in 10 People Misunderst",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 196,
-      "old_title": "The Expert Dermatologist&#8217;s Take on",
-      "new_title": "Heimish clean balm review Explained in P",
-      "cat_id": 382,
+      "id": 147,
+      "old_title": "The Truth About K-pop Idol Travel Conten",
+      "new_title": "Rethinking The Truth About K-pop Idol Tr",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
       "id": 145,
-      "old_title": "What Your BBIA Eyeliner Review Misses: A",
-      "new_title": "bbia eyeliner review 101: What First-Tim",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 144,
-      "old_title": "TITLE: Stop Wasting Money on the Wrong L",
-      "new_title": "Rethinking Romand lip tint review: A Fre",
-      "cat_id": 382,
+      "old_title": "How to Actually Master Korean with K-pop",
+      "new_title": "How to Actually Master Korean with K-pop",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
       "id": 143,
-      "old_title": "The Complete BBIA Eyeliner Review Guide ",
-      "new_title": "5 Mistakes People Make With bbia eyeline",
-      "cat_id": 382,
+      "old_title": "The Truth About Basic Korean Phrases for",
+      "new_title": "The Real Cost of The Truth About Basic K",
+      "cat_id": 4,
       "img_added": false,
       "status": 200
     },
     {
       "id": 141,
-      "old_title": "Myth vs. Reality: What Your Manyo Cleans",
-      "new_title": "Manyo cleansing oil review Q&A: Answers ",
-      "cat_id": 382,
+      "old_title": "Mastering the Vibe: Your Ultimate Guide ",
+      "new_title": "Why Does Mastering the Vibe: Your Ultima",
+      "cat_id": 16,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 140,
-      "old_title": "The Complete Purito Centella Serum Revie",
-      "new_title": "Rethinking Purito centella serum review:",
-      "cat_id": 382,
+      "id": 139,
+      "old_title": "K-pop Lyrics Learning Korean: Unlocking ",
+      "new_title": "How K-pop Lyrics Learning Korean: Unlock",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 138,
-      "old_title": "Stop Making This Sunscreen Mistake: An E",
-      "new_title": "The Real Cost of Isntree sun review — Wh",
-      "cat_id": 382,
+      "id": 137,
+      "old_title": "Unpacking the Hottest Tracks: Your Guide",
+      "new_title": "Unpacking the Hottest Tracks: Your Guide",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 132,
-      "old_title": "Wakemake Tint Review: What Nobody Tells ",
-      "new_title": "What Nobody Tells You About Wakemake tin",
-      "cat_id": 382,
+      "id": 135,
+      "old_title": "The 30-Day Korean Dream: Is &#8216;learn",
+      "new_title": "The Real Cost of The 30-Day Korean Dream",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 130,
-      "old_title": "Is Round Lab Moisturizer Really the K-Be",
-      "new_title": "Why Does Round Lab moisturizer review Ca",
-      "cat_id": 382,
+      "id": 133,
+      "old_title": "Unlocking the K-Pop World Plate-by-Plate",
+      "new_title": "Unlocking the K-Pop World Plate-by-Plate",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 128,
-      "old_title": "Stop Making This Cleansing Mistake: A Do",
-      "new_title": "Before You Try Heimish clean balm review",
-      "cat_id": 382,
+      "id": 131,
+      "old_title": "Unpacking the Phenomenon: K-pop Fan Cult",
+      "new_title": "Unpacking the Phenomenon: K-pop Fan Cult",
+      "cat_id": 2,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 129,
+      "old_title": "Decoding the Next Wave: K-pop Rookie Gro",
+      "new_title": "Decoding the Next Wave: K-pop Rookie Gro",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
       "id": 127,
-      "old_title": "Is the Pyunkang Yul Cream Truly a Game-C",
-      "new_title": "Pyunkang Yul cream review: Frequently Ov",
-      "cat_id": 363,
+      "old_title": "Understanding the Pulse of K-Pop: A Deep",
+      "new_title": "Understanding the Pulse of K-Pop: A Deep",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 126,
-      "old_title": "Don&#8217;t Miss Out: Your Urgent Numbuz",
-      "new_title": "Numbuzin serum guide: A Closer Look at W",
-      "cat_id": 363,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 118,
-      "old_title": "Stop Making These Costly Mistakes: A Med",
-      "new_title": "Clio cushion foundation review 101: What",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 117,
-      "old_title": "Don&#8217;t Wait to Read This BBIA Eyeli",
-      "new_title": "A Practical Look at bbia eyeliner review",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 116,
-      "old_title": "Skinfood Mask Review: What Dermatologist",
-      "new_title": "How Skinfood mask review Has Changed in ",
-      "cat_id": 382,
-      "img_added": false,
-      "status": 200
-    },
-    {
-      "id": 114,
-      "old_title": "Peripera Ink Tint Review: What Your Derm",
+      "id": 125,
+      "old_title": "The Next Wave: K-pop Rookie Groups to Wa",
       "new_title": "Study Reveals: 3 in 10 People Misunderst",
-      "cat_id": 382,
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
-      "id": 112,
-      "old_title": "Olive Young Global Shipping: The Hidden ",
-      "new_title": "Olive Young global shipping guide Q&A: A",
-      "cat_id": 382,
+      "id": 123,
+      "old_title": "Mastering Your First Impression: How to ",
+      "new_title": "Mastering Your First Impression: How to ",
+      "cat_id": 2,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 110,
+      "old_title": "Mastering Your First Impression: How to ",
+      "new_title": "Mastering Your First Impression: How to ",
+      "cat_id": 2,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 108,
+      "old_title": "The Unforgettable Symphony: Dissecting t",
+      "new_title": "7 Mistakes People Make With The Unforget",
+      "cat_id": 5,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 106,
+      "old_title": "[K-Pop &#038; Artists] Global Domination",
+      "new_title": "A Practical Look at [K-Pop &#038; Artist",
+      "cat_id": 2,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 104,
+      "old_title": "The Next Wave: K-pop Rookie Groups to Wa",
+      "new_title": "Why Does The Next Wave: K-pop Rookie Gro",
+      "cat_id": 2,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 100,
+      "old_title": "Mastering the Beat: Why Understanding Ko",
+      "new_title": "Study Reveals: 9 in 10 People Misunderst",
+      "cat_id": 16,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 98,
+      "old_title": "Phenomenon: K-pop Fan Culture Explained",
+      "new_title": "Before You Try Phenomenon: K-pop Fan Cul",
+      "cat_id": 2,
       "img_added": false,
       "status": 200
     },
     {
       "id": 97,
-      "old_title": "Is Romand Lip Tint Truly the K-Beauty Ho",
-      "new_title": "Behind the Scenes: What Romand lip tint ",
-      "cat_id": 382,
-      "img_added": true,
+      "old_title": "BLACKPINK Comeback Update: What BLINKs N",
+      "new_title": "Behind the Scenes: What BLACKPINK Comeba",
+      "cat_id": 5,
+      "img_added": false,
       "status": 200
     },
     {
-      "id": 89,
-      "old_title": "Don&#8217;t Miss Out: Why Olive Young Ha",
-      "new_title": "Olive Young hair care top Warning Signs ",
-      "cat_id": 384,
-      "img_added": true,
+      "id": 96,
+      "old_title": "BLACKPINK Comeback Update: What Blinks N",
+      "new_title": "Rethinking BLACKPINK Comeback Update: Wh",
+      "cat_id": 5,
+      "img_added": false,
       "status": 200
     },
     {
-      "id": 85,
-      "old_title": "Don&#8217;t Wait: Why an Olive Young Vit",
-      "new_title": "Study Reveals: 4 in 10 People Misunderst",
-      "cat_id": 363,
-      "img_added": true,
+      "id": 94,
+      "old_title": "The Hidden Side of K-pop Fan Culture Exp",
+      "new_title": "The Hidden Side of K-pop Fan Culture Exp",
+      "cat_id": 2,
+      "img_added": false,
       "status": 200
     },
     {
-      "id": 80,
-      "old_title": "The Unseen Damage: Why Skipping This Oli",
-      "new_title": "The Unseen Damage: Why Skipping This Oli",
-      "cat_id": 382,
-      "img_added": true,
+      "id": 91,
+      "old_title": "What Nobody Tells You About Le Sserafim ",
+      "new_title": "The Real Cost of What Nobody Tells You A",
+      "cat_id": 5,
+      "img_added": false,
       "status": 200
     },
     {
-      "id": 75,
-      "old_title": "Why Ignoring These Olive Young Sheet Mas",
-      "new_title": "Why Ignoring These Olive Young Sheet Mas",
-      "cat_id": 363,
-      "img_added": true,
+      "id": 88,
+      "old_title": "If You&#8217;re Still Ignoring Korean sl",
+      "new_title": "8 Mistakes People Make With If You&#8217",
+      "cat_id": 16,
+      "img_added": false,
       "status": 200
     },
     {
-      "id": 70,
-      "old_title": "Are You Overpaying? Unveiling the Truth ",
-      "new_title": "Why Does Are You Overpaying? Unveiling t",
-      "cat_id": 382,
-      "img_added": true,
+      "id": 84,
+      "old_title": "The Hidden Side of Korean BBQ how to ord",
+      "new_title": "Is The Hidden Side of Korean BBQ how to ",
+      "cat_id": 16,
+      "img_added": false,
       "status": 200
     },
     {
-      "id": 65,
-      "old_title": "The Critical Olive Young Pharmacy Sectio",
-      "new_title": "The Real Cost of The Critical Olive Youn",
-      "cat_id": 382,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 60,
-      "old_title": "Are You Missing Out on the Ultimate Oliv",
-      "new_title": "Are You Missing Out on the Ultimate Oliv",
-      "cat_id": 382,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 55,
-      "old_title": "Don&#8217;t Wait! The Critical Reedle Sh",
-      "new_title": "Don&#8217;t Wait! The Critical Reedle Sh",
-      "cat_id": 382,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 50,
-      "old_title": "Don&#8217;t Wait! The Olive Young Awards",
-      "new_title": "Don&#8217;t Wait! The Olive Young Awards",
-      "cat_id": 363,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 28,
-      "old_title": "Olive Young Product Top 10: Medical Anal",
-      "new_title": "Debunking Common Myths About Olive Young",
-      "cat_id": 384,
-      "img_added": true,
-      "status": 200
-    },
-    {
-      "id": 20,
-      "old_title": "The Rise of Inner Beauty Trends in South",
-      "new_title": "The Truth About The Rise of Inner Beauty",
-      "cat_id": 382,
-      "img_added": true,
+      "id": 51,
+      "old_title": "What Nobody Tells You About Korean sente",
+      "new_title": "How to Actually Handle What Nobody Tells",
+      "cat_id": 16,
+      "img_added": false,
       "status": 200
     }
   ],
-  "total_posts": 47,
-  "images_added": 14,
+  "total_posts": 37,
+  "images_added": 0,
   "failed": 0
 }
