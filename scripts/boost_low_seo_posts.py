@@ -76,6 +76,7 @@ def build_supplement_prompt(keyword, title, lang):
 보충 콘텐츠를 작성하라. HTML만 사용, 마크다운 금지.
 
 요구사항:
+0. 심층 분석 단락 3~4개 추가 작성 (배경/원인/실제 사례/전문가 조언 등, 총 1500자 이상)
 1. 실제 통계 수치 5개 이상 (%, 만 명, 원 등 구체적 숫자)
 2. 출처 인용 3회 이상: "(기관명, 2026)" 형식 (연도는 반드시 2026만, 과거연도 절대 금지)
 3. <table> 1개 이상 (관련 비교/데이터 표, thead/tbody 완전 구조)
@@ -92,6 +93,7 @@ META_DESC: (130~155자 한글, '{keyword}' 포함, 요약형)"""
 titled "{title}" (topic: {keyword}). HTML only, no markdown.
 
 Requirements:
+0. Add 3-4 in-depth analysis paragraphs (background/causes/real cases/expert advice, 1500+ characters total)
 1. At least 5 real statistics (%, numbers, figures)
 2. At least 3 source citations: "(Organization, 2026)" format (year MUST be 2026 only, never past years)
 3. At least 1 <table> (comparison/data table, full thead/tbody structure)
