@@ -1,5 +1,529 @@
 {
-  "site": "https://koreanews365.com",
-  "fatal_error": "HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
-  "traceback": "Traceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 204, in _new_conn\n    sock = connection.create_connection(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/connection.py\", line 85, in create_connection\n    raise err\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/connection.py\", line 73, in create_connection\n    sock.connect(sa)\nOSError: [Errno 101] Network is unreachable\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 788, in urlopen\n    response = self._make_request(\n               ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 488, in _make_request\n    raise new_e\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 464, in _make_request\n    self._validate_conn(conn)\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1106, in _validate_conn\n    conn.connect()\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 759, in connect\n    self.sock = sock = self._new_conn()\n                       ^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 219, in _new_conn\n    raise NewConnectionError(\nurllib3.exceptions.NewConnectionError: HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 696, in send\n    resp = conn.urlopen(\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 842, in urlopen\n    retries = retries.increment(\n              ^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/retry.py\", line 543, in increment\n    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nurllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 126, in <module>\n    fix_dup_privacy(args.site, pw, log)\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 30, in fix_dup_privacy\n    r = _get_with_retry(f\"{site_url}/wp-json/wp/v2/pages\", (WP_USER, pw),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 26, in _get_with_retry\n    raise last_exc\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 22, in _get_with_retry\n    return requests.get(url, auth=auth, params=params, timeout=timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 71, in request\n    return session.request(method=method, url=url, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 651, in request\n    resp = self.send(prep, **send_kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 784, in send\n    r = adapter.send(request, **kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 729, in send\n    raise ConnectionError(e, request=request)\nrequests.exceptions.ConnectionError: HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))\n"
+  "site": "https://theseouljournal.com",
+  "dup_pages": "none",
+  "posts": [
+    {
+      "id": 3239,
+      "old_title": "The Truth About What defines research ex",
+      "new_title": "Behind the Scenes: What What defines res",
+      "cat_id": 1,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3238,
+      "old_title": "K-beauty shopping diversifies beyond Oli",
+      "new_title": "K-beauty shopping diversifies beyond Oli",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3119,
+      "old_title": "Cost of Living in Seoul 2026: Warning Si",
+      "new_title": "Cost of Living in Seoul 2026: A Closer L",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3118,
+      "old_title": "Global Shipping Risks Warning Signs You ",
+      "new_title": "Study Reveals: 9 in 10 People Misunderst",
+      "cat_id": 1,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3117,
+      "old_title": "Warning: Panic Planning for Senior Livin",
+      "new_title": "The transition to senior living is best ",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3116,
+      "old_title": "Inside Korea&#8217;s largest Telegram se",
+      "new_title": "Before You Try Inside Korea's largest Te",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3115,
+      "old_title": "Inside a Korean Hospice, Where Life Begi",
+      "new_title": "What Nobody Tells You About Inside a Kor",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3113,
+      "old_title": "◇ By Robert Park",
+      "new_title": "The Real Cost of China celebrates 65th a",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3112,
+      "old_title": "[MORNING CALM TALES] &#8216;Ppi-ppi&#821",
+      "new_title": "Study Reveals: 4 in 10 People Misunderst",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3111,
+      "old_title": "Busan&#8217;s Industrial Heartbeat Reima",
+      "new_title": "Why Does Busan's oldest industrial zone ",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3110,
+      "old_title": "AI Fortune-Tellers Dictate Newborn Desti",
+      "new_title": "What Nobody Tells You About AI fortune-t",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3108,
+      "old_title": "[K-LIT REVIEW] &#8216;Mrs. Shim is a Kil",
+      "new_title": "[K-LIT REVIEW] 'Mrs. Shim is a Killer' o",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3104,
+      "old_title": "SK hynix&#8217;s Nasdaq ADR Listing Sign",
+      "new_title": "9 Things About SK hynix lists ADRs on Na",
+      "cat_id": 1,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3103,
+      "old_title": "◇ By David Harrison",
+      "new_title": "Debunking Common Myths About Gyeonggi Pr",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3102,
+      "old_title": "Seoul Lifestyle News: Your Essential Gui",
+      "new_title": "What Nobody Tells You About __news__",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3100,
+      "old_title": "The Quiet Shift in Can&#8217;t stop snac",
+      "new_title": "Can't stop snacking? Eat this first to h",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3098,
+      "old_title": "Why Seoul, Tokyo, and Washington Are Dou",
+      "new_title": "3 Things About Top diplomats of Seoul Yo",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 3055,
+      "old_title": "Beyond the Coffee: Unpacking the Evolvin",
+      "new_title": "The Real Cost of Cafes and Co-working Sp",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 3005,
+      "old_title": "Why Love bread? Add one more thing to ev",
+      "new_title": "Love bread? Add one more thing to every ",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2963,
+      "old_title": "The Hallyu Blueprint: How Vietnamese act",
+      "new_title": "Before You Try Vietnamese actor Kaity Ng",
+      "cat_id": 1,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2947,
+      "old_title": "Creating blessings: Seoul&#8217;s Quiet ",
+      "new_title": "The Real Cost of Creating blessings — Wh",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2870,
+      "old_title": "◇ By Emily Crawford",
+      "new_title": "Why Does Korea's World Cup elimination i",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2868,
+      "old_title": "The Unseen Toll: Why Venezuela&#8217;s C",
+      "new_title": "A Practical Look at Frustration grows in",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2867,
+      "old_title": "Despite Record Funding, Are Korean Resea",
+      "new_title": "Korean researchers seek opportunities ov",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2866,
+      "old_title": "What Nobody Tells You About Korea&#8217;",
+      "new_title": "A Practical Look at Korean researchers s",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2864,
+      "old_title": "◇ By James Patterson",
+      "new_title": "Study Reveals: 5 in 10 People Misunderst",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2863,
+      "old_title": "Is Seoul&#8217;s Heart on Hold? Korea Le",
+      "new_title": "8 Mistakes People Make With Korea left t",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2862,
+      "old_title": "Why Preserving Seoul&#8217;s Traditional",
+      "new_title": "The Truth About Seoul anoints masters of",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2860,
+      "old_title": "Is Revisiting the Heavily-Fortified Bord",
+      "new_title": "N. Korean defectors revisit heavily-fort",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2855,
+      "old_title": "K-Beauty Skincare: Separating Hype from ",
+      "new_title": "Before You Try K-beauty Skincare Routine",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2854,
+      "old_title": "How Korea&#8217;s Group A Exit Impacts S",
+      "new_title": "Korea loses to South Africa vs What You ",
+      "cat_id": 20,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2853,
+      "old_title": "Why Korea&#8217;s World Cup Group Stage ",
+      "new_title": "Is Korea loses to South Africa to finish",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2834,
+      "old_title": "Korea University to Launch International",
+      "new_title": "Korea University to launch International",
+      "cat_id": 1,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2833,
+      "old_title": "Is Strengthening Korea-ASEAN Defense Tie",
+      "new_title": "A Practical Look at Korea should strengt",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2831,
+      "old_title": "Korean Pools Aren&#8217;t What You Expec",
+      "new_title": "4 Things About Korean swimming culture e",
+      "cat_id": 573,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2829,
+      "old_title": "Is JoongAng Group&#8217;s Future Hanging",
+      "new_title": "How to Actually Handle JoongAng Group's ",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2826,
+      "old_title": "Can Seoul’s New Botanical Exhibition Har",
+      "new_title": "Before You Try Seoul botanical exhibitio",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2824,
+      "old_title": "Will Busan&#8217;s UNESCO World Heritage",
+      "new_title": "A Practical Look at Foreign diplomats vo",
+      "cat_id": 1,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2823,
+      "old_title": "Don&#8217;t Wait to Understand Why Seoul",
+      "new_title": "Seoul to continue push for MSCI develope",
+      "cat_id": 20,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2822,
+      "old_title": "Don&#8217;t Miss Out: Why Seoul&#8217;s ",
+      "new_title": "7 Things About Seoul Int'l Book Fair set",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2820,
+      "old_title": "Stop Ignoring the Looming Crisis: Nuclea",
+      "new_title": "Behind the Scenes: What Nuclear inspecti",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2819,
+      "old_title": "Stem vs. Leaf: Which Part of Kimchi Reig",
+      "new_title": "Rethinking Stem vs. leaf: Which part of ",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2790,
+      "old_title": "Beyond the Broth: What Nobody Tells You ",
+      "new_title": "Meet Korea’s pioneering ‘instant noodle ",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2789,
+      "old_title": "Can the Taeguk Warriors Secure a Knockou",
+      "new_title": "S. Korea chasing knockout berth in final",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2787,
+      "old_title": "Is Living in Seoul Really Affordable in ",
+      "new_title": "A Practical Look at Cost of Living in Se",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2786,
+      "old_title": "Is Your K-Beauty Skincare Routine Truly ",
+      "new_title": "The Real Cost of K-beauty Skincare Routi",
+      "cat_id": 8,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 2785,
+      "old_title": "Seoul Expat Life: What No One Tells You ",
+      "new_title": "How Seoul expat lifestyle guide Has Chan",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2781,
+      "old_title": "Your Ultimate Co-working Space Seoul Gui",
+      "new_title": "9 Things About co working space Seoul gu",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2777,
+      "old_title": "Is the Seoul Fortress Wall Trail the Ult",
+      "new_title": "Why Does Seoul fortress wall trail Cause",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2773,
+      "old_title": "The Night Photography Spot Seoul Mistake",
+      "new_title": "3 Things About night photography spot Se",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2761,
+      "old_title": "Is a Hanok Renovation in Seoul Truly Wor",
+      "new_title": "Before You Try Hanok renovation guide, R",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2757,
+      "old_title": "The Seoul Rooftop Pool Summer Mistake Ev",
+      "new_title": "How Seoul rooftop pool summer Has Change",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2753,
+      "old_title": "7 Unforgettable Secrets to Mastering the",
+      "new_title": "How to Actually Handle Seoul bike path H",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2748,
+      "old_title": "The Critical Seoul Ice Skating Rink Wint",
+      "new_title": "Rethinking The Critical Seoul Ice Skatin",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2738,
+      "old_title": "Is Finding Your Spiritual Community in S",
+      "new_title": "How Is Finding Your Spiritual Community ",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2703,
+      "old_title": "Seoul Gluten Free Restaurant Guide: Are ",
+      "new_title": "Debunking Common Myths About Seoul Glute",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2693,
+      "old_title": "Are You Missing Out on the Best Seoul In",
+      "new_title": "A Practical Look at Are You Missing Out ",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2688,
+      "old_title": "The Critical Expat Cost of Living Seoul ",
+      "new_title": "The Truth About The Critical Expat Cost ",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2678,
+      "old_title": "Beyond the Calendar: What the Official H",
+      "new_title": "7 Things About Beyond the Calendar: What",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2668,
+      "old_title": "Seoul City Wall Trail Sunset: Beyond the",
+      "new_title": "Seoul City Wall Trail Sunset: Beyond the",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2663,
+      "old_title": "Seoul Pet Friendly Cafe Terraces: Beyond",
+      "new_title": "Seoul Pet Friendly Cafe Terraces: Beyond",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2599,
+      "old_title": "Essential Korea Travel Guide: Master You",
+      "new_title": "The Real Cost of Essential Korea Travel ",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2588,
+      "old_title": "The Truth About Gourmet supermarket food",
+      "new_title": "Study Reveals: 9 in 10 People Misunderst",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 2578,
+      "old_title": "Stop Ignoring Myeongdong alternative sho",
+      "new_title": "Stop Ignoring Myeongdong alternative sho",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 11,
+      "old_title": "North Korea builds memorial for Ukraine ",
+      "new_title": "8 Things About North Korea builds memori",
+      "cat_id": 8,
+      "img_added": true,
+      "status": 200
+    }
+  ],
+  "total_posts": 65,
+  "images_added": 20,
+  "failed": 0
 }
