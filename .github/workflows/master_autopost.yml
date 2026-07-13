@@ -1008,37 +1008,6 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  fix-insurance-invest:
-    needs: determine-slot
-    if: ${{ github.event.inputs.step == 'fixinsinv' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "보험/투자 사이트 보강"
-        env:
-          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
-          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
-          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
-          PIXABAY_KEY:          ${{ secrets.PIXABAY_KEY }}
-          PEXELS_KEY:           ${{ secrets.PEXELS_KEY }}
-        run: python scripts/fix_insurance_invest.py
-      - name: "결과 커밋"
-        if: always()
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add insurance_invest_fix_result.json
-          git commit -m "보험투자보강 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
-
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
