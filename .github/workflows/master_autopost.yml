@@ -1008,6 +1008,33 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
+  eval-korea365org:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'evalkorea365' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml -q
+      - name: "korea365.org 평가"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KOREA365ORG:    ${{ secrets.KOREA365ORG }}
+        run: python scripts/eval_korea365org.py
+      - name: "결과 커밋"
+        run: |
+          git config user.email "huh0303@gmail.com"
+          git config user.name "huh0303-cmyk"
+          git add eval_korea365org.json
+          git commit -m "korea365org평가 (임시)" || echo "변경 없음"
+          git pull --rebase origin main
+          git push
+
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
