@@ -1,0 +1,210 @@
+[
+  {
+    "site": "https://koreamedicaltour.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 85,
+    "log": []
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 57,
+    "log": []
+  },
+  {
+    "site": "https://ki-korea.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 40,
+    "log": []
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 83,
+    "log": []
+  },
+  {
+    "site": "https://kfinance365.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 63,
+    "log": []
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 75,
+    "log": []
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "boosted": 7,
+    "failed": 0,
+    "skipped": 45,
+    "log": [
+      {
+        "id": 2372,
+        "title": "The Costly Oversight: Why Your Korea Cry",
+        "before": 45,
+        "after": 63
+      },
+      {
+        "id": 2367,
+        "title": "Is Your Crypto Safe? Unpacking Korea&#82",
+        "before": 47,
+        "after": 65
+      },
+      {
+        "id": 2362,
+        "title": "The Unseen Risks of Korea Stablecoin Reg",
+        "before": 47,
+        "after": 61
+      },
+      {
+        "id": 2357,
+        "title": "Is Your Korea Crypto Exchange Customer S",
+        "before": 45,
+        "after": 65
+      },
+      {
+        "id": 2352,
+        "title": "Korea Crypto AML KYC Requirements: What ",
+        "before": 45,
+        "after": 63
+      },
+      {
+        "id": 2327,
+        "title": "OTC Crypto Desk Seoul Corporate: Busting",
+        "before": 45,
+        "after": 63
+      },
+      {
+        "id": 2242,
+        "title": "Safeguard Your Digital Wealth: Essential",
+        "before": 34,
+        "after": 58
+      }
+    ]
+  },
+  {
+    "site": "https://krealestate365.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 35,
+    "log": []
+  },
+  {
+    "site": "https://ktech365.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 54,
+    "log": []
+  },
+  {
+    "site": "https://kskin365.com",
+    "boosted": 7,
+    "failed": 0,
+    "skipped": 63,
+    "log": [
+      {
+        "id": 1677,
+        "title": "Why Korean Ginseng Skincare Benefits Are",
+        "before": 49,
+        "after": 65
+      },
+      {
+        "id": 1667,
+        "title": "Are Your Korean Glass Skin Routine Steps",
+        "before": 45,
+        "after": 65
+      },
+      {
+        "id": 1652,
+        "title": "Why Your Blackheads Won&#8217;t Wait: Un",
+        "before": 47,
+        "after": 67
+      },
+      {
+        "id": 1631,
+        "title": "Is Centella Asiatica the Secret Weapon f",
+        "before": 49,
+        "after": 75
+      },
+      {
+        "id": 1610,
+        "title": "The Truth About Peptide complex serum Ko",
+        "before": 47,
+        "after": 70
+      },
+      {
+        "id": 1608,
+        "title": "Why Korean sleeping pack hydration Matte",
+        "before": 42,
+        "after": 65
+      },
+      {
+        "id": 1557,
+        "title": "Unveiling the Secret: Your Ultimate K-Be",
+        "before": 41,
+        "after": 70
+      }
+    ]
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "boosted": 3,
+    "failed": 0,
+    "skipped": 44,
+    "log": [
+      {
+        "id": 80,
+        "title": "The Unseen Damage: Why Skipping This Oli",
+        "before": 49,
+        "after": 75
+      },
+      {
+        "id": 75,
+        "title": "Why Ignoring These Olive Young Sheet Mas",
+        "before": 49,
+        "after": 65
+      },
+      {
+        "id": 60,
+        "title": "Are You Missing Out on the Ultimate Oliv",
+        "before": 49,
+        "after": 65
+      }
+    ]
+  },
+  {
+    "site": "https://kworld365.com",
+    "boosted": 0,
+    "failed": 0,
+    "skipped": 37,
+    "log": []
+  },
+  {
+    "site": "https://k-trip365.com",
+    "error": "HTTPSConnectionPool(host='k-trip365.com', port=443): Read timed out. (read timeout=40)",
+    "boosted": 2,
+    "log": [
+      {
+        "id": 3700,
+        "title": "Korean Apartment Noise Complaints: What ",
+        "before": 45,
+        "after": 65
+      },
+      {
+        "id": 3685,
+        "title": "Navigating Korea Early Lease Termination",
+        "before": 49,
+        "after": 65
+      }
+    ]
+  }
+]
