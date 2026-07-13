@@ -1,5 +1,329 @@
 {
-  "site": "https://kstudy365.com",
-  "fatal_error": "HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
-  "traceback": "Traceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 204, in _new_conn\n    sock = connection.create_connection(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/connection.py\", line 85, in create_connection\n    raise err\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/connection.py\", line 73, in create_connection\n    sock.connect(sa)\nOSError: [Errno 101] Network is unreachable\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 788, in urlopen\n    response = self._make_request(\n               ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 488, in _make_request\n    raise new_e\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 464, in _make_request\n    self._validate_conn(conn)\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1106, in _validate_conn\n    conn.connect()\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 759, in connect\n    self.sock = sock = self._new_conn()\n                       ^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connection.py\", line 219, in _new_conn\n    raise NewConnectionError(\nurllib3.exceptions.NewConnectionError: HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 696, in send\n    resp = conn.urlopen(\n           ^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 842, in urlopen\n    retries = retries.increment(\n              ^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/urllib3/util/retry.py\", line 543, in increment\n    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nurllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 126, in <module>\n    fix_dup_privacy(args.site, pw, log)\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 30, in fix_dup_privacy\n    r = _get_with_retry(f\"{site_url}/wp-json/wp/v2/pages\", (WP_USER, pw),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 26, in _get_with_retry\n    raise last_exc\n  File \"/home/runner/work/-WP-QWEN-autobot/-WP-QWEN-autobot/scripts/full_site_fix.py\", line 22, in _get_with_retry\n    return requests.get(url, auth=auth, params=params, timeout=timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/api.py\", line 71, in request\n    return session.request(method=method, url=url, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 651, in request\n    resp = self.send(prep, **send_kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/sessions.py\", line 784, in send\n    r = adapter.send(request, **kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/requests/adapters.py\", line 729, in send\n    raise ConnectionError(e, request=request)\nrequests.exceptions.ConnectionError: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?per_page=50&_fields=id%2Ctitle%2Clink (Caused by NewConnectionError(\"HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))\n"
+  "site": "https://koreawedding365.com",
+  "dup_pages": "none",
+  "posts": [
+    {
+      "id": 471,
+      "old_title": "marriage interview Korea visa Q&#038;A: ",
+      "new_title": "marriage interview Korea visa Warning Si",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 469,
+      "old_title": "spouse visa Korea requirements vs What Y",
+      "new_title": "Debunking Common Myths About spouse visa",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 396,
+      "old_title": "How to Actually Navigate Dual Citizenshi",
+      "new_title": "How to Actually Handle dual citizenship ",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 395,
+      "old_title": "◇ By Kevin Yoon",
+      "new_title": "The Real Cost of dual citizenship Korea ",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 394,
+      "old_title": "Navigating Your Korean Marriage Journey:",
+      "new_title": "5 Things About marriage interview Korea ",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 393,
+      "old_title": "A Comprehensive Guide to Navigating Kore",
+      "new_title": "Korean child visa foreigner parent Warni",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 392,
+      "old_title": "Your journey to forever in Korea is a be",
+      "new_title": "A Practical Look at F-6 marriage visa Ko",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 386,
+      "old_title": "TITLE: Capturing Your Love Story: A Deep",
+      "new_title": "The Real Cost of wedding photography Kor",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 385,
+      "old_title": "Your Essential Guide to Wedding Venue Co",
+      "new_title": "How to Actually Handle wedding venue cos",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 383,
+      "old_title": "Dual Citizenship Korea for Children: Nav",
+      "new_title": "Why Does dual citizenship Korea child Ca",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 382,
+      "old_title": "The Real Cost of Finding Love: Understan",
+      "new_title": "The Real Cost of marriage agency fee Kor",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 380,
+      "old_title": "The Korean Marriage Document List: What ",
+      "new_title": "Rethinking Korean marriage document list",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 378,
+      "old_title": "The finding Korean spouse foreigner Warn",
+      "new_title": "What Nobody Tells You About finding Kore",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 330,
+      "old_title": "The Unexpected Hurdle in Your marriage r",
+      "new_title": "marriage registration Korea foreigner Q&",
+      "cat_id": 425,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 266,
+      "old_title": "The Hidden Side of wedding ring jewelry ",
+      "new_title": "7 Mistakes People Make With wedding ring",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 215,
+      "old_title": "Why Popular Wedding Guest Etiquette Kore",
+      "new_title": "wedding guest etiquette Korea vs What Yo",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 163,
+      "old_title": "Is Marriage Registration Foreigner Korea",
+      "new_title": "A Practical Look at marriage registratio",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 162,
+      "old_title": "What Nobody Tells You About Hotel Weddin",
+      "new_title": "hotel wedding Seoul cost Explained in Pl",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 160,
+      "old_title": "Why Overlooking the Evolving Average Mar",
+      "new_title": "The Real Cost of average marriage age Ko",
+      "cat_id": 425,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 159,
+      "old_title": "The Complete Bridal Bouquet Trend Korea ",
+      "new_title": "bridal bouquet trend Korea: Frequently O",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 158,
+      "old_title": "Stop Losing Out on Value: Expert Guide t",
+      "new_title": "Rethinking wedding ring jewelry Cheongda",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 157,
+      "old_title": "Are You Maximizing Your Jeju Outdoor Wed",
+      "new_title": "Jeju outdoor wedding photo 101: What Fir",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 150,
+      "old_title": "Is Groom Tuxedo Rental Korea Really Wort",
+      "new_title": "A Practical Look at groom tuxedo rental ",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 148,
+      "old_title": "Is Jeju Island the Perfect Destination f",
+      "new_title": "destination wedding Jeju guide: Frequent",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 145,
+      "old_title": "Are You Choosing the Right Wedding Ring ",
+      "new_title": "The Real Cost of wedding ring brand Kore",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 143,
+      "old_title": "Is Choosing the Right Wedding Makeup Sal",
+      "new_title": "Rethinking wedding makeup salon Seoul: A",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 142,
+      "old_title": "Is the Small Wedding Trend in Seoul the ",
+      "new_title": "small wedding trend Seoul Explained in P",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 141,
+      "old_title": "Is Your Gangnam Wedding Venue Booking St",
+      "new_title": "Gangnam wedding venue booking Warning Si",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 140,
+      "old_title": "Are You Ready to Embrace the Beauty of a",
+      "new_title": "traditional Korean wedding guide 101: Wh",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 139,
+      "old_title": "How Much Does a Wedding Planner Cost in ",
+      "new_title": "Study Reveals: 6 in 10 People Misunderst",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 138,
+      "old_title": "Don&#8217;t Wait: Your Essential Hanbok ",
+      "new_title": "The Real Cost of Hanbok rental wedding g",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 137,
+      "old_title": "Stop Overpaying: Unlocking the Real Wedd",
+      "new_title": "wedding videography Korea cost 101: What",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 136,
+      "old_title": "Are You Overlooking Crucial Steps in You",
+      "new_title": "Rethinking Gangnam wedding venue booking",
+      "cat_id": 413,
+      "img_added": false,
+      "status": 200
+    },
+    {
+      "id": 127,
+      "old_title": "Why Understanding the Average Marriage A",
+      "new_title": "average marriage age Korea Explained in ",
+      "cat_id": 425,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 119,
+      "old_title": "Korea Marriage Counseling for Foreigner ",
+      "new_title": "Korea marriage counseling foreigner coup",
+      "cat_id": 425,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 104,
+      "old_title": "Considering a Korea Couple Photoshoot Lo",
+      "new_title": "How to Actually Handle Considering a Kor",
+      "cat_id": 413,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 79,
+      "old_title": "The Critical F6 Spouse Visa Wedding Cert",
+      "new_title": "The Critical F6 Spouse Visa Wedding Cert",
+      "cat_id": 413,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 69,
+      "old_title": "Beyond the Ballroom: Why Itaewon After P",
+      "new_title": "How Beyond the Ballroom: Why Itaewon Aft",
+      "cat_id": 413,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 39,
+      "old_title": "Step-by-Step Guide to the Korean Marriag",
+      "new_title": "What Nobody Tells You About Step-by-Step",
+      "cat_id": 425,
+      "img_added": true,
+      "status": 200
+    },
+    {
+      "id": 37,
+      "old_title": "외국인 여성 결혼비자 F-6 발급 100% 성공 전략정리",
+      "new_title": "외국인 여성 결혼비자 F-6 발급 100% 성공 전략정리: A Close",
+      "cat_id": 413,
+      "img_added": true,
+      "status": 200
+    }
+  ],
+  "total_posts": 40,
+  "images_added": 8,
+  "failed": 0
 }
