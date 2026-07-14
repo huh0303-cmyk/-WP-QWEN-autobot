@@ -1,0 +1,94 @@
+[
+  {
+    "site": "https://koreamedicaltour.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://k-trip365.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://k-visa365.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://kskin365.com",
+    "added": [],
+    "errors": [
+      "no_primary_menu"
+    ]
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "added": [
+      "about",
+      "contact",
+      "disclaimer",
+      "privacy-policy"
+    ],
+    "errors": []
+  },
+  {
+    "site": "https://koreanews365.com",
+    "added": [],
+    "errors": []
+  }
+]
