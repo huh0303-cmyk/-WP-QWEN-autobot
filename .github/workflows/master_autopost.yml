@@ -1008,11 +1008,11 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  scan-all-pages3:
+  boost-ko-pages:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'scanallpages3' }}
+    if: ${{ github.event.inputs.step == 'boostkopages' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
@@ -1021,43 +1021,22 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "최종 검증"
+      - name: "한국어 사이트 About/Contact 보강"
         env:
-          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
-          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
-          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
-          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
-          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
-          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
-          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
-          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
-          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
-          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
-          KTECH365COM:          ${{ secrets.KTECH365COM }}
-          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
-          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
-          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
-          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
-          KVISA365COM:          ${{ secrets.KVISA365COM }}
-          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
-          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
-          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
-          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
-          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
-          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
-          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
-          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
-          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
-          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
-          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/scan_all_pages.py
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KHEALTH365COM:  ${{ secrets.KHEALTH365COM }}
+          KIKOREACOM:     ${{ secrets.KIKOREACOM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KIECAKOREAORG:  ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:    ${{ secrets.KSAKOREAORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/boost_ko_pages.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add all_pages_scan3.json
-          git commit -m "최종검증 (임시)" || echo "변경 없음"
+          git add boost_ko_pages_result.json
+          git commit -m "한국어페이지보강 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
