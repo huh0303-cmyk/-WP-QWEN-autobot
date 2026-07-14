@@ -1,0 +1,1162 @@
+{
+  "menus_status": 200,
+  "menus": [
+    {
+      "id": 17,
+      "description": "",
+      "name": "Footer Bar - Marketer",
+      "slug": "footer-bar-marketer",
+      "meta": [],
+      "locations": [
+        "primary"
+      ],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus/17",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items?menus=17"
+          }
+        ],
+        "wp:menu-location": [
+          {
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations/primary"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 389,
+      "description": "",
+      "name": "Main Menus",
+      "slug": "main-menus",
+      "meta": [],
+      "locations": [],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus/389",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items?menus=389"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "description": "",
+      "name": "Primary - Marketer",
+      "slug": "primary-marketer",
+      "meta": [],
+      "locations": [],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus/18",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items?menus=18"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 699,
+      "description": "",
+      "name": "Secondary Menu",
+      "slug": "secondary-menu",
+      "meta": [],
+      "locations": [],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus/699",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items?menus=699"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    }
+  ],
+  "menu_items_status": 200,
+  "menu_items": [
+    {
+      "id": 938,
+      "title": {
+        "rendered": "Cosmetic Surgery"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/plastic-dermatology/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 686,
+      "parent": 0,
+      "menu_order": 1,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 389,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/938",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=938"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/686"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 942,
+      "title": {
+        "rendered": "Privacy Policy"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/privacy-policy/",
+      "attr_title": "",
+      "description": "",
+      "type": "post_type",
+      "type_label": "Page",
+      "object": "page",
+      "object_id": 3,
+      "parent": 0,
+      "menu_order": 1,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 699,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/942",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=942"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "post_type": "page",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/pages/3"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 946,
+      "title": {
+        "rendered": "Cosmetic Surgery"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/plastic-dermatology/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 686,
+      "parent": 0,
+      "menu_order": 1,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 17,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/946",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=946"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/686"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 939,
+      "title": {
+        "rendered": "Government Support"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/government-support/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 687,
+      "parent": 0,
+      "menu_order": 2,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 389,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/939",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=939"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/687"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 943,
+      "title": {
+        "rendered": "Disclaimer"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/disclaimer/",
+      "attr_title": "",
+      "description": "",
+      "type": "post_type",
+      "type_label": "Page",
+      "object": "page",
+      "object_id": 651,
+      "parent": 0,
+      "menu_order": 2,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 699,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/943",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=943"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "post_type": "page",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/pages/651"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 947,
+      "title": {
+        "rendered": "Government Support"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/government-support/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 687,
+      "parent": 0,
+      "menu_order": 2,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 17,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/947",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=947"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/687"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 940,
+      "title": {
+        "rendered": "Hospital Costs"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/medical-cost/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 688,
+      "parent": 0,
+      "menu_order": 3,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 389,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/940",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=940"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/688"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 944,
+      "title": {
+        "rendered": "Contact Us"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/contact/",
+      "attr_title": "",
+      "description": "",
+      "type": "post_type",
+      "type_label": "Page",
+      "object": "page",
+      "object_id": 670,
+      "parent": 0,
+      "menu_order": 3,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 699,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/944",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=944"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "post_type": "page",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/pages/670"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 948,
+      "title": {
+        "rendered": "Hospital Costs"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/medical-cost/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 688,
+      "parent": 0,
+      "menu_order": 3,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 17,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/948",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=948"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/688"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 941,
+      "title": {
+        "rendered": "Etc"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/etc/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 689,
+      "parent": 0,
+      "menu_order": 4,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 389,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/941",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=941"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/689"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 945,
+      "title": {
+        "rendered": "About Us"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/about/",
+      "attr_title": "",
+      "description": "",
+      "type": "post_type",
+      "type_label": "Page",
+      "object": "page",
+      "object_id": 671,
+      "parent": 0,
+      "menu_order": 4,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 699,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/945",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=945"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "post_type": "page",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/pages/671"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 949,
+      "title": {
+        "rendered": "Etc"
+      },
+      "status": "publish",
+      "url": "https://koreamedicaltour.com/category/etc/",
+      "attr_title": "",
+      "description": "",
+      "type": "taxonomy",
+      "type_label": "Category",
+      "object": "category",
+      "object_id": 689,
+      "parent": 0,
+      "menu_order": 4,
+      "target": "",
+      "classes": [
+        ""
+      ],
+      "xfn": [
+        ""
+      ],
+      "invalid": false,
+      "meta": [],
+      "menus": 17,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items/949",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-items"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/types/nav_menu_item"
+          }
+        ],
+        "wp:term": [
+          {
+            "taxonomy": "nav_menu",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus?post=949"
+          }
+        ],
+        "wp:menu-item-object": [
+          {
+            "taxonomy": "category",
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/categories/689"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    }
+  ],
+  "menu_locations_status": 200,
+  "menu_locations": {
+    "primary": {
+      "name": "primary",
+      "description": "Primary Menu",
+      "menu": 17,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations/primary",
+            "targetHints": {
+              "allow": [
+                "GET"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations"
+          }
+        ],
+        "wp:menu": [
+          {
+            "embeddable": true,
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menus/17"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    "secondary": {
+      "name": "secondary",
+      "description": "Secondary Menu",
+      "menu": 0,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations/secondary",
+            "targetHints": {
+              "allow": [
+                "GET"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations"
+          }
+        ]
+      }
+    },
+    "slideout": {
+      "name": "slideout",
+      "description": "Off Canvas Menu",
+      "menu": 0,
+      "_links": {
+        "self": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations/slideout",
+            "targetHints": {
+              "allow": [
+                "GET"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://koreamedicaltour.com/wp-json/wp/v2/menu-locations"
+          }
+        ]
+      }
+    }
+  }
+}
