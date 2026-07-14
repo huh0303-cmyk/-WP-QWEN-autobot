@@ -1,0 +1,1109 @@
+[
+  {
+    "site": "https://k-health365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 4018,
+        "link": "https://k-health365.com/about/",
+        "text_len": 414,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 4013,
+        "link": "https://k-health365.com/contact/",
+        "text_len": 265,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 4008,
+        "link": "https://k-health365.com/disclaimer/",
+        "text_len": 731,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 4003,
+        "link": "https://k-health365.com/privacy-policy/",
+        "text_len": 921,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreamedicaltour.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 671,
+        "link": "https://koreamedicaltour.com/about/",
+        "text_len": 1272,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 670,
+        "link": "https://koreamedicaltour.com/contact/",
+        "text_len": 909,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 651,
+        "link": "https://koreamedicaltour.com/disclaimer/",
+        "text_len": 1536,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3,
+        "link": "https://koreamedicaltour.com/privacy-policy/",
+        "text_len": 2855,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://koreainvest365.com/about/",
+        "text_len": 760,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://koreainvest365.com/contact/",
+        "text_len": 548,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2472,
+        "link": "https://koreainvest365.com/disclaimer/",
+        "text_len": 1532,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 2685,
+        "link": "https://koreainvest365.com/privacy-policy/",
+        "text_len": 924,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://ki-korea.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 659,
+        "link": "https://ki-korea.com/about/",
+        "text_len": 421,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 159,
+        "link": "https://ki-korea.com/contact/",
+        "text_len": 265,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 1131,
+        "link": "https://ki-korea.com/disclaimer/",
+        "text_len": 724,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 1147,
+        "link": "https://ki-korea.com/privacy-policy/",
+        "text_len": 911,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 2796,
+        "link": "https://koreainsurance365.com/about/",
+        "text_len": 1274,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 2792,
+        "link": "https://koreainsurance365.com/contact/",
+        "text_len": 911,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2563,
+        "link": "https://koreainsurance365.com/disclaimer/",
+        "text_len": 890,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 2944,
+        "link": "https://koreainsurance365.com/privacy-policy/",
+        "text_len": 927,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://kfinance365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 1324,
+        "link": "https://kfinance365.com/about/",
+        "text_len": 742,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 1328,
+        "link": "https://kfinance365.com/contact/",
+        "text_len": 542,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 3055,
+        "link": "https://kfinance365.com/disclaimer/",
+        "text_len": 1525,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3,
+        "link": "https://kfinance365.com/privacy-policy/",
+        "text_len": 2845,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 2980,
+        "link": "https://koreataxnlaw.com/about/",
+        "text_len": 1276,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 10,
+        "link": "https://koreataxnlaw.com/contact/",
+        "text_len": 550,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2978,
+        "link": "https://koreataxnlaw.com/disclaimer/",
+        "text_len": 1534,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3,
+        "link": "https://koreataxnlaw.com/privacy-policy/",
+        "text_len": 2847,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://koreacrypto365.com/about/",
+        "text_len": 756,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://koreacrypto365.com/contact/",
+        "text_len": 548,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2410,
+        "link": "https://koreacrypto365.com/disclaimer/",
+        "text_len": 1532,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 2409,
+        "link": "https://koreacrypto365.com/privacy-policy-2/",
+        "text_len": 1695,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://krealestate365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 26,
+        "link": "https://krealestate365.com/about/",
+        "text_len": 440,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 25,
+        "link": "https://krealestate365.com/contact/",
+        "text_len": 271,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 24,
+        "link": "https://krealestate365.com/disclaimer/",
+        "text_len": 739,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 36,
+        "link": "https://krealestate365.com/privacy-policy/",
+        "text_len": 932,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://ktech365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 1490,
+        "link": "https://ktech365.com/about/",
+        "text_len": 730,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 1494,
+        "link": "https://ktech365.com/contact/",
+        "text_len": 536,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 3886,
+        "link": "https://ktech365.com/disclaimer/",
+        "text_len": 1519,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3901,
+        "link": "https://ktech365.com/privacy-policy/",
+        "text_len": 1682,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://kskin365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 1717,
+        "link": "https://kskin365.com/about/",
+        "text_len": 1254,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 1716,
+        "link": "https://kskin365.com/contact/",
+        "text_len": 892,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 1715,
+        "link": "https://kskin365.com/disclaimer/",
+        "text_len": 1519,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 1714,
+        "link": "https://kskin365.com/privacy-policy-2/",
+        "text_len": 1682,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 136,
+        "link": "https://oliveyoungkorea.com/about/",
+        "text_len": 1270,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 135,
+        "link": "https://oliveyoungkorea.com/contact/",
+        "text_len": 907,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 134,
+        "link": "https://oliveyoungkorea.com/disclaimer/",
+        "text_len": 1534,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 146,
+        "link": "https://oliveyoungkorea.com/privacy-policy/",
+        "text_len": 1697,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://kworld365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 26,
+        "link": "https://kworld365.com/about/",
+        "text_len": 730,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 25,
+        "link": "https://kworld365.com/contact/",
+        "text_len": 538,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 24,
+        "link": "https://kworld365.com/disclaimer/",
+        "text_len": 882,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3,
+        "link": "https://kworld365.com/privacy-policy/",
+        "text_len": 919,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://k-trip365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 3753,
+        "link": "https://k-trip365.com/about/",
+        "text_len": 1256,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 3750,
+        "link": "https://k-trip365.com/contact/",
+        "text_len": 894,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 3747,
+        "link": "https://k-trip365.com/disclaimer/",
+        "text_len": 1521,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3744,
+        "link": "https://k-trip365.com/privacy-policy/",
+        "text_len": 1684,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://k-visa365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://k-visa365.com/about/",
+        "text_len": 735,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://k-visa365.com/contact/",
+        "text_len": 538,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2468,
+        "link": "https://k-visa365.com/disclaimer/",
+        "text_len": 1521,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 2464,
+        "link": "https://k-visa365.com/privacy-policy-2/",
+        "text_len": 1684,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 154,
+        "link": "https://koreawedding365.com/about/",
+        "text_len": 1270,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 153,
+        "link": "https://koreawedding365.com/contact/",
+        "text_len": 907,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 152,
+        "link": "https://koreawedding365.com/disclaimer/",
+        "text_len": 1534,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 151,
+        "link": "https://koreawedding365.com/privacy-policy/",
+        "text_len": 1697,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://kstudy365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 601,
+        "link": "https://kstudy365.com/about/",
+        "text_len": 1256,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 599,
+        "link": "https://kstudy365.com/contact/",
+        "text_len": 894,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 597,
+        "link": "https://kstudy365.com/disclaimer/",
+        "text_len": 1521,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 595,
+        "link": "https://kstudy365.com/privacy-policy/",
+        "text_len": 1684,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://studyinkorea365.com/about/",
+        "text_len": 777,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://studyinkorea365.com/contact/",
+        "text_len": 550,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2364,
+        "link": "https://studyinkorea365.com/disclaimer/",
+        "text_len": 1535,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 2363,
+        "link": "https://studyinkorea365.com/privacy-policy-2/",
+        "text_len": 1698,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://kieca-korea.org/about/",
+        "text_len": 426,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://kieca-korea.org/contact/",
+        "text_len": 271,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 376,
+        "link": "https://kieca-korea.org/disclaimer/",
+        "text_len": 730,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 374,
+        "link": "https://kieca-korea.org/privacy-policy-2/",
+        "text_len": 920,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://ksa-korea.org",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 287,
+        "link": "https://ksa-korea.org/about/",
+        "text_len": 416,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 286,
+        "link": "https://ksa-korea.org/contact/",
+        "text_len": 267,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 285,
+        "link": "https://ksa-korea.org/disclaimer/",
+        "text_len": 726,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 297,
+        "link": "https://ksa-korea.org/privacy-policy/",
+        "text_len": 914,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://sis-korea.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 495,
+        "link": "https://sis-korea.com/about/",
+        "text_len": 758,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 12,
+        "link": "https://sis-korea.com/contact/",
+        "text_len": 544,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 1360,
+        "link": "https://sis-korea.com/disclaimer/",
+        "text_len": 1520,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 1462,
+        "link": "https://sis-korea.com/privacy-policy/",
+        "text_len": 922,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://jobkorea365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://jobkorea365.com/about/",
+        "text_len": 745,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://jobkorea365.com/contact/",
+        "text_len": 542,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 386,
+        "link": "https://jobkorea365.com/disclaimer/",
+        "text_len": 1526,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 385,
+        "link": "https://jobkorea365.com/privacy-policy/",
+        "text_len": 1689,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://jobinkorea365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://jobinkorea365.com/about/",
+        "text_len": 758,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://jobinkorea365.com/contact/",
+        "text_len": 546,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 396,
+        "link": "https://jobinkorea365.com/disclaimer/",
+        "text_len": 1531,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 408,
+        "link": "https://jobinkorea365.com/privacy-policy/",
+        "text_len": 1694,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://jobkoreaglobal.com/about/",
+        "text_len": 773,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://jobkoreaglobal.com/contact/",
+        "text_len": 554,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 647,
+        "link": "https://jobkoreaglobal.com/disclaimer/",
+        "text_len": 1532,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 659,
+        "link": "https://jobkoreaglobal.com/privacy-policy/",
+        "text_len": 1695,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://korea365.org",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 34,
+        "link": "https://korea365.org/about/",
+        "text_len": 733,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 40,
+        "link": "https://korea365.org/contact/",
+        "text_len": 536,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 1679,
+        "link": "https://korea365.org/disclaimer/",
+        "text_len": 1519,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 1695,
+        "link": "https://korea365.org/privacy-policy/",
+        "text_len": 1682,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://koreanews365.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 3403,
+        "link": "https://koreanews365.com/about/",
+        "text_len": 418,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": false
+      },
+      "contact": {
+        "exists": true,
+        "id": 3660,
+        "link": "https://koreanews365.com/contact-2/",
+        "text_len": 267,
+        "too_short": true,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 3401,
+        "link": "https://koreanews365.com/disclaimer/",
+        "text_len": 726,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 3424,
+        "link": "https://koreanews365.com/privacy-policy/",
+        "text_len": 917,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  },
+  {
+    "site": "https://theseouljournal.com",
+    "pages": {
+      "about": {
+        "exists": true,
+        "id": 2844,
+        "link": "https://theseouljournal.com/about/",
+        "text_len": 1270,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "contact": {
+        "exists": true,
+        "id": 2841,
+        "link": "https://theseouljournal.com/contact/",
+        "text_len": 907,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "disclaimer": {
+        "exists": true,
+        "id": 2838,
+        "link": "https://theseouljournal.com/disclaimer/",
+        "text_len": 1534,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      },
+      "privacy-policy": {
+        "exists": true,
+        "id": 2952,
+        "link": "https://theseouljournal.com/privacy-policy/",
+        "text_len": 928,
+        "too_short": false,
+        "has_lorem": false,
+        "has_correct_email": true
+      }
+    }
+  }
+]
