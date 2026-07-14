@@ -1067,9 +1067,9 @@ jobs:
           git pull --rebase origin main
           git push
 
-  check-kskin-menu-items:
+  fix-kskin-menu:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'checkkskinitems' }}
+    if: ${{ github.event.inputs.step == 'fixkskinmenu' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1080,17 +1080,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "확인"
+      - name: "kskin365 메뉴 수정"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KSKIN365COM: ${{ secrets.KSKIN365COM }}
-        run: python scripts/check_kskin_menu_items.py
+        run: python scripts/fix_kskin_menu.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add kskin365_menu_items.json
-          git commit -m "kskin메뉴아이템확인 (임시)" || echo "변경 없음"
+          git add kskin365_menu_fix_result.json
+          git commit -m "kskin메뉴수정 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
