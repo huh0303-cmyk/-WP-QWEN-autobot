@@ -1392,6 +1392,27 @@ def build_img_html(urls, keyword):
         html+=f'<figure style="margin:20px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);"><img src="{u}" alt="{alt}" loading="lazy" style="width:100%;height:auto;display:block;"><figcaption style="padding:8px 14px;font-size:13px;color:#666;text-align:center;">{alt}</figcaption></figure>\n'
     return html
 
+def build_author_bio_html(site_url, lang, reporter, keyword=""):
+    """
+    구글 EEAT(전문성) 신호 강화: 페르소나(숨은 AI지시)를 독자가 실제로 보는
+    '저자 소개' 박스로 코드가 매 글마다 확정적으로 삽입. AI 의존 없음.
+    """
+    p = SITE_PERSONA.get(site_url, {})
+    bio = p.get("persona_ko" if lang == "ko" else "persona_en", "")
+    if not bio:
+        return ""
+    name = reporter.get("name", "")
+    label = "이 글을 쓴 사람" if lang == "ko" else "About the Author"
+    disclaimer = ("이 글은 정보 제공을 목적으로 하며, 개인의 상황에 따라 다를 수 있습니다."
+                  if lang == "ko" else
+                  "This article is for informational purposes; individual circumstances may vary.")
+    return (f'<div class="author-bio" style="margin:32px 0;padding:20px 24px;'
+            f'background:#f5f6f8;border-left:4px solid #4a5568;border-radius:6px;">'
+            f'<h3 style="margin-top:0;font-size:1rem;">{label}: {name}</h3>'
+            f'<p style="margin:0 0 8px 0;">{bio}</p>'
+            f'<p style="margin:0;font-size:0.85em;color:#666;">{disclaimer}</p></div>')
+
+
 def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter):
     pw=os.getenv(site["wp_pass_env"],"")
     if not pw: return {"ok":False,"error":f"No password: {site['wp_pass_env']}"}
@@ -1416,6 +1437,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         ins=half+pm.end() if pm else half
 
     final=hero+body_html[:ins]+(mid if mid else "")+body_html[ins:]+end+faq_html
+
+    author_bio_html = build_author_bio_html(url, site.get("lang","ko"), reporter, keyword)
+    final += author_bio_html
 
     related_html = build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
