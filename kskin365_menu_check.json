@@ -1,0 +1,169 @@
+{
+  "locations": {
+    "primary": {
+      "name": "primary",
+      "description": "Primary Menu",
+      "menu": 0,
+      "_links": {
+        "self": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menu-locations/primary",
+            "targetHints": {
+              "allow": [
+                "GET"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menu-locations"
+          }
+        ]
+      }
+    }
+  },
+  "menus": [
+    {
+      "id": 412,
+      "description": "",
+      "name": "Footer Menu",
+      "slug": "footer-menu",
+      "meta": [],
+      "locations": [],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menus/412",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menu-items?menus=412"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "description": "",
+      "name": "Primary",
+      "slug": "primary",
+      "meta": [],
+      "locations": [],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menus/12",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menu-items?menus=12"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 413,
+      "description": "",
+      "name": "Secondary Menu",
+      "slug": "secondary-menu",
+      "meta": [],
+      "locations": [],
+      "auto_add": false,
+      "_links": {
+        "self": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menus/413",
+            "targetHints": {
+              "allow": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "collection": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menus"
+          }
+        ],
+        "about": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/taxonomies/nav_menu"
+          }
+        ],
+        "wp:post_type": [
+          {
+            "href": "https://kskin365.com/wp-json/wp/v2/menu-items?menus=413"
+          }
+        ],
+        "curies": [
+          {
+            "name": "wp",
+            "href": "https://api.w.org/{rel}",
+            "templated": true
+          }
+        ]
+      }
+    }
+  ]
+}
