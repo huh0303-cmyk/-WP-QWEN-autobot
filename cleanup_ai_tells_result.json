@@ -1,0 +1,9 @@
+[
+  {
+    "site": "https://k-trip365.com",
+    "title_fixed": [],
+    "content_cleaned": [],
+    "failed": [],
+    "error": "HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&page=1&status=publish&_fields=id%2Ctitle%2Ccontent%2Cmeta (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+  }
+]
