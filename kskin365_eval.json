@@ -1,0 +1,42 @@
+{
+  "site": "https://kskin365.com",
+  "pages_found": [
+    "About Us",
+    "Contact Us",
+    "Disclaimer",
+    "Privacy Policy"
+  ],
+  "duplicate_pages": {},
+  "page_issues": [],
+  "ads_txt_ok": true,
+  "robots_ok": true,
+  "total_posts": 70,
+  "avg_len": 15262,
+  "min_len": 6279,
+  "thin_posts": 0,
+  "zero_image_posts": 0,
+  "uncategorized_posts": 0,
+  "duplicate_titles": 0,
+  "categories": [
+    {
+      "name": "Etc",
+      "count": 26
+    },
+    {
+      "name": "Ingredients",
+      "count": 1
+    },
+    {
+      "name": "Routines",
+      "count": 4
+    },
+    {
+      "name": "Skincare",
+      "count": 39
+    },
+    {
+      "name": "Uncategorized",
+      "count": 0
+    }
+  ]
+}
