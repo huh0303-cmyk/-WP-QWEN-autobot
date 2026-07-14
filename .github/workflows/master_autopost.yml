@@ -1067,9 +1067,9 @@ jobs:
           git pull --rebase origin main
           git push
 
-  check-seoul-journal:
+  check-disclaimer-meta:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'checksj' }}
+    if: ${{ github.event.inputs.step == 'checkdmeta' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1084,13 +1084,13 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/check_seoul_journal.py
+        run: python scripts/check_disclaimer_meta.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add seoul_journal_check.json
-          git commit -m "sj확인 (임시)" || echo "변경 없음"
+          git add disclaimer_meta_check.json
+          git commit -m "메타확인 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
