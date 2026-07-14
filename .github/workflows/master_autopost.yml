@@ -1067,11 +1067,11 @@ jobs:
           git pull --rebase origin main
           git push
 
-  fix-menu-links:
+  check-kskin-menu:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'fixmenulinks' }}
+    if: ${{ github.event.inputs.step == 'checkkskinmenu' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
@@ -1080,27 +1080,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "정책페이지 메뉴 노출 수정"
+      - name: "확인"
         env:
-          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
-          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
-          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
-          KVISA365COM:          ${{ secrets.KVISA365COM }}
-          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
-          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
-          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
-          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
-          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
-          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
-          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
-        run: python scripts/fix_menu_links.py
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+        run: python scripts/check_kskin_menu.py
       - name: "결과 커밋"
-        if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add fix_menu_result.json
-          git commit -m "메뉴링크수정 (임시)" || echo "변경 없음"
+          git add kskin365_menu_check.json
+          git commit -m "kskin메뉴확인 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
