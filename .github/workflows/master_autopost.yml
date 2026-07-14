@@ -1008,9 +1008,9 @@ jobs:
             python scripts/retitle_all_posts.py
           fi
 
-  fix-kieca-pages:
+  verify-kieca:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'fixkieca' }}
+    if: ${{ github.event.inputs.step == 'verifykieca' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1021,17 +1021,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "kieca 페이지 수정"
+      - name: "kieca 검증"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KIECAKOREAORG:  ${{ secrets.KIECAKOREAORG }}
-        run: python scripts/fix_kieca_pages.py
+        run: python scripts/verify_kieca.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add kieca_pages_fix_result.json
-          git commit -m "kieca페이지수정 (임시)" || echo "변경 없음"
+          git add kieca_verify.json
+          git commit -m "kieca검증 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
