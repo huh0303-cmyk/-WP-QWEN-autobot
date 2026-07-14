@@ -1,0 +1,6 @@
+[
+  {
+    "site": "https://k-trip365.com",
+    "error": "HTTPSConnectionPool(host='k-trip365.com', port=443): Read timed out. (read timeout=35)"
+  }
+]
