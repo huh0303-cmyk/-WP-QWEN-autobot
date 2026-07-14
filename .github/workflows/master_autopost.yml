@@ -1067,33 +1067,6 @@ jobs:
           git pull --rebase origin main
           git push
 
-  fix-last-cheesy:
-    needs: determine-slot
-    if: ${{ github.event.inputs.step == 'fixlastcheesy' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "수정"
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
-        run: python scripts/fix_last_cheesy.py
-      - name: "결과 커밋"
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add fix_last_cheesy_result.json
-          git commit -m "마지막클리셰수정 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
-
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
