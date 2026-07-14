@@ -1,0 +1,13 @@
+{
+  "elementor_library_status": 404,
+  "elementor_templates": "{\"code\":\"rest_no_route\",\"message\":\"No route was found matching the URL and request method.\",\"data\":{\"status\":404}}",
+  "sample_post": [
+    {
+      "id": 3239,
+      "link": "https://theseouljournal.com/the-truth-about-what-defines-research-excellence-in-era-of-global-challenges-that-most-people-get-wrong/",
+      "title": {
+        "rendered": "Behind the Scenes: What What defines research excellence in era of global challenges? Actually Involves"
+      }
+    }
+  ]
+}
