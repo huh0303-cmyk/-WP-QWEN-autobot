@@ -1067,9 +1067,9 @@ jobs:
           git pull --rebase origin main
           git push
 
-  check-kskin-menu:
+  check-kskin-menu-items:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'checkkskinmenu' }}
+    if: ${{ github.event.inputs.step == 'checkkskinitems' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1084,13 +1084,13 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KSKIN365COM: ${{ secrets.KSKIN365COM }}
-        run: python scripts/check_kskin_menu.py
+        run: python scripts/check_kskin_menu_items.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add kskin365_menu_check.json
-          git commit -m "kskin메뉴확인 (임시)" || echo "변경 없음"
+          git add kskin365_menu_items.json
+          git commit -m "kskin메뉴아이템확인 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
