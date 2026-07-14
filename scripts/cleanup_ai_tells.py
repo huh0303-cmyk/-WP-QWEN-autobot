@@ -95,8 +95,14 @@ def fix_site(site):
 
 
 if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--site", default="")
+    args = ap.parse_args()
+
+    targets = [s for s in SITES_CONFIG if (not args.site or s["url"] == args.site)]
     results = []
-    for site in SITES_CONFIG:
+    for site in targets:
         res = fix_site(site)
         results.append(res)
         print(f"{res['site']}: 제목수정{len(res.get('title_fixed',[]))} / 본문정리{len(res.get('content_cleaned',[]))} / 실패{len(res.get('failed',[]))} / 오류{res.get('error','')}")

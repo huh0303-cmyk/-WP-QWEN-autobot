@@ -1051,7 +1051,12 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/cleanup_ai_tells.py
+        run: |
+          if [ -n "${{ github.event.inputs.target_site }}" ]; then
+            python scripts/cleanup_ai_tells.py --site "${{ github.event.inputs.target_site }}"
+          else
+            python scripts/cleanup_ai_tells.py
+          fi
       - name: "결과 커밋"
         if: always()
         run: |
