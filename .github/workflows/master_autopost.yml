@@ -1110,7 +1110,12 @@ jobs:
           KOREA365ORG:          ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/backfill_author_bio.py
+        run: |
+          if [ -n "${{ github.event.inputs.target_site }}" ]; then
+            python scripts/backfill_author_bio.py --site "${{ github.event.inputs.target_site }}"
+          else
+            python scripts/backfill_author_bio.py
+          fi
       - name: "결과 커밋"
         if: always()
         run: |

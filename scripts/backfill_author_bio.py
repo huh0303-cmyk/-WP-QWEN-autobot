@@ -60,8 +60,14 @@ def fix_site(site):
 
 
 if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--site", default="")
+    args = ap.parse_args()
+
+    targets = [s for s in SITES_CONFIG if (not args.site or s["url"] == args.site)]
     results = []
-    for site in SITES_CONFIG:
+    for site in targets:
         res = fix_site(site)
         results.append(res)
         print(f"{res['site']}: 추가{res.get('updated',0)} / 스킵{res.get('skipped',0)} / 실패{res.get('failed',0)} / 오류{res.get('error','')}")
