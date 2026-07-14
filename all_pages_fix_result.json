@@ -1,0 +1,660 @@
+[
+  {
+    "site": "https://k-health365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 4018,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 4013,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreamedicaltour.com",
+    "fixed": [],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      },
+      {
+        "slug": "privacy-policy",
+        "id": 2685,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://ki-korea.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 659,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 159,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "fixed": [
+      {
+        "slug": "disclaimer",
+        "id": 2563,
+        "status": 200
+      },
+      {
+        "slug": "privacy-policy",
+        "id": 2944,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://kfinance365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 1324,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 1328,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "fixed": [
+      {
+        "slug": "contact",
+        "id": 10,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://krealestate365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 26,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 25,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://ktech365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 1490,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 1494,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://kskin365.com",
+    "fixed": [],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "fixed": [],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://kworld365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 26,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 25,
+        "status": 200
+      },
+      {
+        "slug": "disclaimer",
+        "id": 24,
+        "status": 200
+      },
+      {
+        "slug": "privacy-policy",
+        "id": 3,
+        "status": 200
+      }
+    ],
+    "skipped": []
+  },
+  {
+    "site": "https://k-trip365.com",
+    "fixed": [],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://k-visa365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "fixed": [],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://kstudy365.com",
+    "fixed": [],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://ksa-korea.org",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 287,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 286,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://sis-korea.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 495,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 12,
+        "status": 200
+      },
+      {
+        "slug": "privacy-policy",
+        "id": 1462,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://jobkorea365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://jobinkorea365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://korea365.org",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 34,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 40,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://koreanews365.com",
+    "fixed": [
+      {
+        "slug": "about",
+        "id": 3403,
+        "status": 200
+      },
+      {
+        "slug": "contact",
+        "id": 3660,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "privacy-policy",
+        "reason": "already_ok"
+      }
+    ]
+  },
+  {
+    "site": "https://theseouljournal.com",
+    "fixed": [
+      {
+        "slug": "privacy-policy",
+        "id": 2952,
+        "status": 200
+      }
+    ],
+    "skipped": [
+      {
+        "slug": "about",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "contact",
+        "reason": "already_ok"
+      },
+      {
+        "slug": "disclaimer",
+        "reason": "already_ok"
+      }
+    ]
+  }
+]
