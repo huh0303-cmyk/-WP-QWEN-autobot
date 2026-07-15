@@ -965,11 +965,9 @@ def make_site_prompt(keyword, site, reporter):
     if lang == "ko":
         persona = p.get("persona_ko","전문 칼럼니스트")
         tone    = p.get("tone","전문적이고 친근한 스타일")
-        byline  = f"◇ {reporter['name']} 기자"
     else:
         persona = p.get("persona_en","Expert writer")
         tone    = p.get("tone","Professional and engaging")
-        byline  = f"◇ By {reporter['name']}"
 
     ext   = get_authority_links(theme)
     ext_s = random.sample(ext, min(3, len(ext)))
@@ -982,82 +980,70 @@ def make_site_prompt(keyword, site, reporter):
 
     medical_note = ""
     if lang=="ko" and ("건강" in theme or "의학" in theme):
-        medical_note = '\n11. ⚠️ 위험 신호 / 병원 가야 할 때 섹션 필수\n12. "이 글은 의학적 참고 정보이며, 진단·치료는 반드시 전문의와 상담하세요." 문구 필수'
+        medical_note = '\n- ⚠️ "위험 신호 / 병원 가야 할 때" 섹션 필수\n- "이 글은 의학적 참고 정보이며, 진단·치료는 반드시 전문의와 상담하세요." 문구 필수'
+
+    # 참고: 제목(TITLE)과 바이라인은 AI 출력에 의존하지 않고 코드가 별도로 확정 생성/삽입한다
+    # (반복 패턴·형식 오류 방지). 그래서 프롬프트에서 관련 지시를 넣지 않아 토큰도 절약한다.
 
     if lang == "ko":
-        return f"""당신은 {persona}입니다.
-주제: '{keyword}' | 사이트: {url} | 카테고리: {theme}
-톤앤매너: {tone}
+        return f"""[역할]
+너는 {persona}야. 톤앤매너는 '{tone}'로, {url} 사이트의 '{theme}' 카테고리 독자를 대상으로 글을 쓴다.
 
-[필수 출력 규칙]
-1. 바이라인: 첫 줄 정확히 '{byline}'
-2. HTML 전용 (h2,h3,p,ul,li,ol,strong,table,blockquote). 마크다운 절대 금지
-3. 최소 {min_chars}자 이상 (공백 제외)
-0. TITLE 작성 규칙 (매우 중요):
-   - 아래 패턴 중 랜덤으로 1개 선택해서 작성 (매번 다른 패턴 사용):
-     a) 질문형: "왜 [키워드]가 [문제]를 일으킬까?"
-     b) 숫자형: "[키워드] [N]가지 핵심 — 전문의가 직접 밝힌다"
-     c) 반전형: "[키워드], 당신이 알고 있던 것은 틀렸다"
-     d) 경험형: "10년 환자가 겪은 [키워드] 실제 증상과 회복법"
-     e) 데이터형: "한국인 [N]명 중 [N]명이 모르는 [키워드] 진실"
-     f) 해결형: "[키워드] 때문에 힘드셨나요? 전문의가 알려주는 해결법"
-     g) 비교형: "[키워드] vs [관련증상], 어떻게 구분하나"
-   - 금지: "모르면 후회", "모르면 손해", "100% 손해", "unlocking", "unveiling", "진짜", "완벽 가이드", "총정리", "다들 잘못 알고" 반복 사용 금지
-   - 제목 길이: 25~45자
-4. 모든 <p>는 2문장 이하. 단락 사이 줄바꿈 필수
-5. '{keyword}' 첫 문장 + 전체 10회 이상
-6. 통계·수치 5개 이상 (%, 만 명, mmHg, 원 등)
-7. 출처 괄호 3회 이상: "(KOSIS, 2026)", "(보건복지부, 2026)" 형식
-7-1. ⚠️ 연도 규칙 (절대 준수): 본문 어디에도 2024, 2025, 2023 등 과거 연도를 쓰지 마라.
-     연도가 필요하면 반드시 2026만 사용. 실제 통계 출처 연도가 2024/2025년이어도
-     "2026" 또는 "최근" "올해"로 표기하고, 확실하지 않으면 연도 자체를 생략하라.
-8. <table> {tables_req}개 이상 (thead/tbody/tr/th/td 완전 구조)
-9. 내부링크 4개 본문에 자연스럽게 삽입:
+[지식/자료]
+- 다룰 주제: '{keyword}'
+- 권위 있는 인용 출처(정부기관/대학교만 사용): {ext_h}
+- 본문에 자연스럽게 녹여 넣을 내부링크 4개:
 {il_str}
-10. 권위 기관 언급 (정부기관/대학교만): {ext_h}{medical_note}
 
-[이 사이트만의 글 구성 — 반드시 이 순서로]
+[제약 — 반드시 지킬 것]
+- 형식: HTML 태그만 사용(h2,h3,p,ul,li,ol,strong,table,blockquote). 마크다운 절대 금지
+- 분량: 최소 {min_chars}자 이상(공백 제외)
+- 문장: 모든 <p>는 2문장 이하로 짧고 간결하게. 단락 사이 줄바꿈 필수
+- 훅: 서론 첫 문장에서 독자의 호기심을나 궁금증을 자극하는 문장으로 시작할 것
+- 전문용어: 등장할 때마다 괄호로 쉽게 풀어서 설명할 것
+- 키워드: '{keyword}'를 첫 문장에 포함하고 전체 10회 이상 자연스럽게 사용
+- 통계: 구체적 수치(%, 만 명, 원 등) 5개 이상 포함
+- 출처: "(KOSIS, 2026)", "(보건복지부, 2026)" 형식으로 3회 이상 인용
+- 연도: 본문에 2024·2025·2023 등 과거 연도 절대 금지. 연도가 필요하면 반드시 2026만 사용, 확실하지 않으면 연도 자체를 생략
+- 표: <table> {tables_req}개 이상(thead/tbody/tr/th/td 완전 구조)
+- 위 내부링크 4개를 본문 흐름에 자연스럽게 삽입{medical_note}
+
+[이 사이트 전용 글 구성 — 반드시 이 순서로]
 {struct_str}
 
-출력: TITLE: → 본문HTML → META_DESC: (정확히 130~140자, '{keyword}' 포함) → FAQ_START~FAQ_END (Q:/A:) → TAGS: ({TAG_COUNT}개 한국어, 첫번째='{keyword}')"""
+[출력 형식]
+본문HTML → META_DESC: (정확히 130~140자, '{keyword}' 포함) → FAQ_START~FAQ_END (Q:/A: 형식) → TAGS: ({TAG_COUNT}개 한국어, 첫번째='{keyword}')
+(TITLE 줄은 쓰지 않아도 된다 — 제목은 별도 시스템이 생성한다)"""
 
     else:
-        return f"""You are {persona}.
-Topic: '{keyword}' | Site: {url} | Category: {theme}
-Tone: {tone}
+        return f"""[ROLE]
+You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' category on {url}.
 
-[MANDATORY OUTPUT RULES]
-0. TITLE RULES (critical — vary every article):
-   Choose ONE pattern randomly (never repeat same pattern twice in a row):
-   a) Question: "Why Does [keyword] Cause [Problem]? Experts Explain"
-   b) Number: "[N] Things About [keyword] Your Doctor Wants You to Know"
-   c) Myth-bust: "The Truth About [keyword] That Most People Get Wrong"
-   d) Data: "Study: [N] in [N] Koreans Misunderstand [keyword]"
-   e) How-to: "How to Actually Fix [keyword]: A Specialist's Guide"
-   f) Warning: "[keyword] Warning Signs You Should Never Ignore"
-   g) Comparison: "[keyword] vs [related]: How to Tell the Difference"
-   FORBIDDEN words in title: "Complete Guide", "Ultimate", "Everything You Need", "comprehensive" — never repeat same structure
-   Title length: 50-80 characters
-1. Byline: First line exactly '{byline}'
-2. HTML only (h2,h3,p,ul,li,ol,strong,table,blockquote). Absolutely no markdown
-3. Minimum {min_chars} characters
-4. Every <p> max 2 sentences. Full paragraph breaks between sections
-5. '{keyword}' in first sentence + 10+ times naturally throughout
-6. Statistics minimum 5 (specific: %, figures, dollar amounts, dates)
-7. Source citations minimum 3: "(OECD, 2026)", "(Ministry of Health Korea)" format
-7-1. ⚠️ YEAR RULE (strict): Never write 2024, 2025, 2023, or any past year anywhere
-     in the body. If a year is needed, use ONLY 2026. Even if the real statistic's
-     source year is 2024/2025, write "2026" or "recently" instead — if unsure, omit
-     the year entirely rather than writing a past year.
-8. <table> minimum {tables_req} (full thead/tbody/tr/th/td structure)
-9. Internal links 4 naturally in body:
+[KNOWLEDGE / SOURCES]
+- Topic to cover: '{keyword}'
+- Authoritative sources to cite (Korean gov/university only): {ext_h}
+- 4 internal links to weave naturally into the body:
 {il_str}
-10. Authority sources (Korean gov/universities only, min 3): {ext_h}
+
+[CONSTRAINTS — must follow]
+- Format: HTML tags only (h2,h3,p,ul,li,ol,strong,table,blockquote). No markdown whatsoever
+- Length: minimum {min_chars} characters
+- Sentences: every <p> max 2 sentences, short and concise. Clear paragraph breaks between sections
+- Hook: open with a first sentence that sparks the reader's curiosity
+- Jargon: explain any technical term in parentheses when first used
+- Keyword: include '{keyword}' in the first sentence and 10+ times naturally throughout
+- Statistics: include 5+ specific figures (%, dollar amounts, counts, etc.)
+- Citations: cite sources 3+ times in "(OECD, 2026)" / "(Ministry of Health Korea)" format
+- Years: never write 2024, 2025, 2023, or any past year anywhere in the body. If a year is needed, use ONLY 2026 — if unsure, omit the year entirely
+- Tables: {tables_req}+ <table> elements with full thead/tbody/tr/th/td structure
+- Weave the 4 internal links above naturally into the body{medical_note}
 
 [THIS SITE'S UNIQUE STRUCTURE — follow exactly in order]
 {struct_str}
 
-Output: TITLE: → body HTML → META_DESC: (exactly 130~155 English chars, include '{keyword}') → FAQ_START~FAQ_END (Q:/A:) → TAGS: ({TAG_COUNT} English tags, first='{keyword}')"""
+[OUTPUT FORMAT]
+body HTML → META_DESC: (exactly 130~155 English chars, include '{keyword}') → FAQ_START~FAQ_END (Q:/A: format) → TAGS: ({TAG_COUNT} English tags, first='{keyword}')
+(No need to write a TITLE line — the title is generated by a separate system)"""
 
 # ============================================================
 # ★ 유틸리티
@@ -1317,12 +1303,33 @@ def get_images_pexels(query, need):
 
 def get_multiple_images(keyword, count=3, theme=""):
     has_ko = any('\uAC00'<=c<='\uD7A3' for c in keyword)
+    # ★ 검색어에 테마 맥락을 붙여 관련성 낮은 스톡사진이 걸릴 확률을 줄임
+    #   (예: "노안 예방" 단독 검색 → 엉뚱한 결과 / "presbyopia eye health Korea" → 훨씬 관련성 높음)
+    theme_ctx = {
+        "건강과 의학": "health Korea", "Korea Medical Tourism": "medical Korea",
+        "Investment": "finance Korea", "Korea Investment": "finance Korea",
+        "Insurance": "insurance Korea", "Finance": "finance Korea",
+        "Tax and Law": "business Korea", "Crypto": "cryptocurrency finance",
+        "Korea Real Estate": "real estate Korea", "Technology": "technology Korea",
+        "K-Beauty": "skincare beauty", "K-Beauty Reviews": "skincare beauty",
+        "K-POP": "Korea culture", "Travel": "Korea travel", "Visa Guide": "Korea immigration",
+        "Wedding": "wedding Korea", "Study in Korea": "university Korea students",
+        "International Students": "university Korea students", "국제교육문화": "education Korea",
+        "Recruitment": "office work Korea", "Employment": "office work Korea",
+        "Seoul Lifestyle": "Seoul Korea lifestyle", "Korea Culture": "Korea culture",
+    }
+    ctx = theme_ctx.get(theme, "Korea")
+
+    def with_ctx(q):
+        return q if ctx.lower() in q.lower() else f"{q} {ctx}"
+
     urls=[]
     if not has_ko:
-        urls.extend(get_images_pixabay(keyword,count))
-        if len(urls)<count: urls.extend(get_images_pexels(keyword,count-len(urls)))
+        q = with_ctx(keyword)
+        urls.extend(get_images_pixabay(q,count))
+        if len(urls)<count: urls.extend(get_images_pexels(q,count-len(urls)))
     if len(urls)<count:
-        en=translate_ko_to_en_for_image(keyword,theme)
+        en=with_ctx(translate_ko_to_en_for_image(keyword,theme))
         urls.extend(get_images_pixabay(en,count-len(urls)))
         if len(urls)<count: urls.extend(get_images_pexels(en,count-len(urls)))
     if len(urls)<count:
