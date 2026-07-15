@@ -1,0 +1,163 @@
+[
+  {
+    "site": "https://k-health365.com",
+    "issues": [
+      "최근글이미지없음:3개"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://koreamedicaltour.com",
+    "issues": [
+      "최근글이미지없음:5개"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://ki-korea.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://kfinance365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "issues": [
+      "메뉴누락:['privacy-policy']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://krealestate365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://ktech365.com",
+    "issues": [
+      "최근글이미지없음:1개"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://kskin365.com",
+    "issues": [
+      "메뉴누락:['privacy-policy']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://kworld365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://k-trip365.com",
+    "issues": [
+      "최근글깨진제목:['◇ By Brian Choi', '◇ By Catherine Han']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://k-visa365.com",
+    "issues": [
+      "메뉴누락:['privacy-policy']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://kstudy365.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "issues": [
+      "메뉴누락:['privacy-policy']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "issues": [
+      "메뉴누락:['privacy-policy']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://ksa-korea.org",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://sis-korea.com",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://jobkorea365.com",
+    "issues": [
+      "최근글이미지없음:1개"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://jobinkorea365.com",
+    "issues": [
+      "최근글이미지없음:4개"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "issues": [
+      "최근글이미지없음:2개"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://korea365.org",
+    "issues": [],
+    "ok": true
+  },
+  {
+    "site": "https://koreanews365.com",
+    "issues": [
+      "메뉴누락:['contact']"
+    ],
+    "ok": false
+  },
+  {
+    "site": "https://theseouljournal.com",
+    "issues": [],
+    "ok": true
+  }
+]
