@@ -1,0 +1,33 @@
+{
+  "slug_fix": [
+    {
+      "site": "https://koreacrypto365.com",
+      "exception": "HTTPSConnectionPool(host='koreacrypto365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='koreacrypto365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    },
+    {
+      "site": "https://k-visa365.com",
+      "exception": "HTTPSConnectionPool(host='k-visa365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='k-visa365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    },
+    {
+      "site": "https://studyinkorea365.com",
+      "exception": "HTTPSConnectionPool(host='studyinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='studyinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    },
+    {
+      "site": "https://kieca-korea.org",
+      "exception": "HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    }
+  ],
+  "kskin365_location_fix": {
+    "exception": "HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/menus/412 (Caused by NewConnectionError(\"HTTPSConnection(host='kskin365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+  },
+  "ktrip365_title_fix": [
+    {
+      "id": 4388,
+      "exception": "HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts/4388?_fields=id%2Ccontent%2Cmeta (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    },
+    {
+      "id": 4386,
+      "exception": "HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts/4386?_fields=id%2Ccontent%2Cmeta (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    }
+  ]
+}
