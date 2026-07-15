@@ -1067,6 +1067,30 @@ jobs:
           git pull --rebase origin main
           git push
 
+  check-crawler-access:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'checkcrawler' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "크롤러 접근성 진단"
+        run: python scripts/check_crawler_access.py
+      - name: "결과 커밋"
+        run: |
+          git config user.email "huh0303@gmail.com"
+          git config user.name "huh0303-cmyk"
+          git add crawler_access_check.json
+          git commit -m "크롤러진단 (임시)" || echo "변경 없음"
+          git pull --rebase origin main
+          git push
+
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
