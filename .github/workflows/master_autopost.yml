@@ -1067,45 +1067,6 @@ jobs:
           git pull --rebase origin main
           git push
 
-  cleanup-demo-widgets:
-    needs: determine-slot
-    if: ${{ github.event.inputs.step == 'cleanupdemo' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "12개 사이트 데모위젯 삭제"
-        env:
-          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
-          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
-          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
-          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
-          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
-          KTECH365COM:          ${{ secrets.KTECH365COM }}
-          KVISA365COM:          ${{ secrets.KVISA365COM }}
-          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
-          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
-          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
-          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
-          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
-          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
-        run: python scripts/cleanup_demo_widgets.py
-      - name: "결과 커밋"
-        if: always()
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add widget_demo_cleanup.json
-          git commit -m "데모위젯정리 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
-
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
