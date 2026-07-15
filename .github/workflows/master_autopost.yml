@@ -1067,9 +1067,9 @@ jobs:
           git pull --rebase origin main
           git push
 
-  check-kskin-widgets:
+  cleanup-kskin-widgets:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'checkwidgets' }}
+    if: ${{ github.event.inputs.step == 'cleanupwidgets' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1080,17 +1080,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "확인"
+      - name: "쇼핑몰 데모 위젯 삭제"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KSKIN365COM: ${{ secrets.KSKIN365COM }}
-        run: python scripts/check_kskin_widgets.py
+        run: python scripts/cleanup_kskin_widgets.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add kskin365_all_widgets.json
-          git commit -m "위젯확인 (임시)" || echo "변경 없음"
+          git add kskin365_widgets_cleanup.json
+          git commit -m "위젯정리 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
