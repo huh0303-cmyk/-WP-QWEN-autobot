@@ -2,32 +2,63 @@
   "slug_fix": [
     {
       "site": "https://koreacrypto365.com",
-      "exception": "HTTPSConnectionPool(host='koreacrypto365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='koreacrypto365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "rename_status": 200,
+      "new_link": "https://koreacrypto365.com/privacy-policy/",
+      "menu_items_updated": [
+        {
+          "id": 2933,
+          "status": 200
+        }
+      ]
     },
     {
       "site": "https://k-visa365.com",
-      "exception": "HTTPSConnectionPool(host='k-visa365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='k-visa365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "rename_status": 200,
+      "new_link": "https://k-visa365.com/privacy-policy/",
+      "menu_items_updated": [
+        {
+          "id": 2971,
+          "status": 200
+        }
+      ]
     },
     {
       "site": "https://studyinkorea365.com",
-      "exception": "HTTPSConnectionPool(host='studyinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='studyinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "rename_status": 200,
+      "new_link": "https://studyinkorea365.com/privacy-policy/",
+      "menu_items_updated": [
+        {
+          "id": 2757,
+          "status": 200
+        }
+      ]
     },
     {
       "site": "https://kieca-korea.org",
-      "exception": "HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/pages?slug=privacy-policy-2 (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "rename_status": 200,
+      "new_link": "https://kieca-korea.org/privacy-policy/",
+      "menu_items_updated": [
+        {
+          "id": 748,
+          "status": 200
+        }
+      ]
     }
   ],
   "kskin365_location_fix": {
-    "exception": "HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/menus/412 (Caused by NewConnectionError(\"HTTPSConnection(host='kskin365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    "status": 200,
+    "body": "{\"id\":412,\"description\":\"\",\"name\":\"Footer Menu\",\"slug\":\"footer-menu\",\"meta\":[],\"locations\":[\"primary\"],\"auto_add\":false,\"_links\":{\"self\":[{\"href\":\"https:\\/\\/kskin365.com\\/wp-json\\/wp\\/v2\\/menus\\/412\",\"targetHints\":{\"allow\":[\"GET\",\"POST\",\"PUT\",\"PATCH\",\"DELETE\"]}}],\"collection\":[{\"href\":\"https:\\/\\/ksk"
   },
   "ktrip365_title_fix": [
     {
       "id": 4388,
-      "exception": "HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts/4388?_fields=id%2Ccontent%2Cmeta (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "new_title": "The Real Cost of Jeju island travel guide — What to Expect",
+      "status": 200
     },
     {
       "id": 4386,
-      "exception": "HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts/4386?_fields=id%2Ccontent%2Cmeta (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "new_title": "7 Things About Korean guesthouse foreigner Your Doctor Wants You to Know",
+      "status": 200
     }
   ]
 }
