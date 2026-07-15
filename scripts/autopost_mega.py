@@ -33,8 +33,8 @@ RUN_SLOT            = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
 
 gemini_client         = genai.Client(api_key=GEMINI_API_KEY)
-GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash"
-GEMINI_MODEL_FALLBACK = "gemini-2.5-flash-lite"
+GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash-lite"
+GEMINI_MODEL_FALLBACK = "gemini-2.5-flash"
 GEMINI_MODEL          = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 
