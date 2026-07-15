@@ -1067,9 +1067,9 @@ jobs:
           git pull --rebase origin main
           git push
 
-  final-investigate:
+  final-fixes:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'finalinvestigate' }}
+    if: ${{ github.event.inputs.step == 'finalfixes' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -1080,23 +1080,23 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "조사"
+      - name: "최종 수정 일괄 적용"
         env:
           GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
           KOREACRYPTO365COM:  ${{ secrets.KOREACRYPTO365COM }}
-          KSKIN365COM:        ${{ secrets.KSKIN365COM }}
           KVISA365COM:        ${{ secrets.KVISA365COM }}
           STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
           KIECAKOREAORG:      ${{ secrets.KIECAKOREAORG }}
-          KOREANEWS365COM:    ${{ secrets.KOREANEWS365COM }}
+          KSKIN365COM:        ${{ secrets.KSKIN365COM }}
           KTRIP365COM:        ${{ secrets.KTRIP365COM }}
-        run: python scripts/final_investigate.py
+        run: python scripts/final_fixes.py
       - name: "결과 커밋"
+        if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add final_investigate_result.json
-          git commit -m "최종조사 (임시)" || echo "변경 없음"
+          git add final_fixes_result.json
+          git commit -m "최종수정 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
