@@ -1067,11 +1067,11 @@ jobs:
           git pull --rebase origin main
           git push
 
-  category-match-check:
+  khealth-recat:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'catmatchcheck' }}
+    if: ${{ github.event.inputs.step == 'khealthrecat' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
@@ -1080,21 +1080,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "카테고리 매칭 확인"
+      - name: "k-health365 재분류"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
-          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
-          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
-          KVISA365COM: ${{ secrets.KVISA365COM }}
-        run: python scripts/category_match_check.py
+        run: python scripts/khealth_recat.py
       - name: "결과 커밋"
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add category_match_check.json
-          git commit -m "카테고리매칭확인 (임시)" || echo "변경 없음"
+          git add khealth_recat_result.json
+          git commit -m "khealth재분류 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
