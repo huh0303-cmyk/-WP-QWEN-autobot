@@ -234,6 +234,29 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
         if score > best_score:
             best, best_score = (cid, name), score
 
+    # ★ 단어/힌트 매칭으로 확신 있는 결과(score>=3)를 못 찾으면, Gemini에게
+    #   딱 카테고리 이름만 보여주고 골라달라고 짧게 물어봄(의미적 매칭).
+    #   토큰 몇 십 개 수준의 초경량 호출이라 비용 부담 거의 없음.
+    if (not best or best_score < 3) and len(real) - (1 if etc_cat else 0) >= 1:
+        try:
+            candidates = [n for cid2, n in real if not (etc_cat and cid2 == etc_cat[0])]
+            cand_str = ", ".join(candidates)
+            gprompt = (f"다음 글 제목/키워드를 아래 카테고리 중 하나로 분류해줘. "
+                       f"카테고리 이름만 정확히 그대로 한 단어(구)로만 답해. 애매하면 가장 가까운 것.\n"
+                       f"카테고리 목록: {cand_str}\n"
+                       f"제목/키워드: {title} {keyword}\n"
+                       f"답(카테고리 이름만):")
+            resp = gemini_client.models.generate_content(
+                model=GEMINI_MODEL_FALLBACK, contents=gprompt,
+                config={"temperature":0.1,"max_output_tokens":20})
+            picked = (resp.text or "").strip().strip('."\'')
+            for cid2, n in real:
+                if n.strip().lower() == picked.lower():
+                    best, best_score = (cid2, n), 99
+                    break
+        except Exception as e:
+            print(f"   ⚠️ 카테고리 AI분류 실패(무시하고 계속): {e}")
+
     if best and best_score > 0:
         return best[0]
     if etc_cat:
