@@ -167,6 +167,18 @@ def load_site_categories(site_url, wp_pass):
     return all_cats
 
 
+# ★ 카테고리 자동매칭이 어려운(공백없는 복합어 등) 카테고리에 한해 수동 힌트 제공.
+#   여기 없는 카테고리는 기존 어간/슬라이딩윈도우 매칭 로직만 사용.
+CATEGORY_HINTS = {
+    "https://k-health365.com": {
+        "건강영양성분소개": ["영양", "성분", "효능", "보충제", "비타민", "미네랄", "홍삼", "오메가",
+                        "프로바이오틱스", "콜라겐", "항산화", "식품", "부작용", "섭취"],
+        "질병별대처법": ["관절염", "당뇨", "고혈압", "신장", "방광", "심장", "질환", "증상", "치료",
+                    "환자", "통증", "탈모", "암", "뇌", "혈관", "소화", "위염", "질병"],
+    },
+}
+
+
 def pick_best_category(site_url, wp_pass, keyword, title=""):
     """
     사이트에 이미 존재하는 카테고리 중에서만 고른다. 새로 생성하지 않는다.
@@ -188,6 +200,9 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
 
     st = f"{keyword} {title}".lower()
     st_words = [w for w in re.split(r'[\s/,\-]+', st) if len(w) > 2]
+    # 공백을 없앤 전체 텍스트도 준비 (한글 복합어 카테고리명 매칭용)
+    st_nospace = re.sub(r'[\s/,\-]+', '', st)
+
     best, best_score = None, 0
     for cid, name in real:
         if etc_cat and cid == etc_cat[0]:
@@ -200,8 +215,22 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
                 if sw.startswith(stem) or stem.startswith(sw[:5]):
                     score += 1
                     break
+        # ★ 한글 복합어(공백 없이 붙은 카테고리명, 예: '건강영양성분소개') 대응:
+        #   단어 분리가 안 되므로, 카테고리명에서 2글자 슬라이딩 윈도우를 뽑아
+        #   본문 키워드/제목(공백 제거본) 안에 등장하는지 직접 확인
+        name_nospace = re.sub(r'[\s/,\-]+', '', name.lower())
+        if len(name_nospace) >= 2:
+            chunks = [name_nospace[i:i+2] for i in range(len(name_nospace)-1)]
+            for ch in chunks:
+                if len(ch) == 2 and ch in st_nospace:
+                    score += 1
         if name.strip().lower() in st:
             score += 10
+        # ★ 수동 힌트 사전 매칭 (있으면 강한 가점)
+        hints = CATEGORY_HINTS.get(site_url, {}).get(name, [])
+        for h in hints:
+            if h.lower() in st:
+                score += 3
         if score > best_score:
             best, best_score = (cid, name), score
 
