@@ -1,0 +1,2415 @@
+[
+  {
+    "site": "https://k-health365.com",
+    "total_checked": 20,
+    "distribution": {
+      "기타": 8,
+      "질병별대처법": 8,
+      "건강영양성분소개": 4
+    },
+    "mismatch_count": 0,
+    "mismatches": []
+  },
+  {
+    "site": "https://koreamedicaltour.com",
+    "total_checked": 20,
+    "distribution": {
+      "Government Support": 3,
+      "Hospital Costs": 2,
+      "Etc": 3,
+      "Uncategorized": 8,
+      "Cosmetic Surgery": 4
+    },
+    "mismatch_count": 16,
+    "mismatches": [
+      {
+        "id": 1272,
+        "title": "Rethinking Korea medical tour package officia",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 1146,
+        "title": "A Practical Look at medical tourism support p",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Government Support"
+      },
+      {
+        "id": 1127,
+        "title": "The Truth About botox filler price Korea That",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 1126,
+        "title": "Is IVF cost Korea foreigner Really Worth It? ",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Hospital Costs"
+      },
+      {
+        "id": 999,
+        "title": "How to Actually Navigate Seoul Hospital Price",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Hospital Costs"
+      },
+      {
+        "id": 998,
+        "title": "How to Actually Navigate KHIDI Medical Touris",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 985,
+        "title": "Navigating Your Facial Contouring Journey: An",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 984,
+        "title": "Busan Medical Tourism Benefits: A Closer Look",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 983,
+        "title": "Navigating World-Class Healthcare: The Power ",
+        "assigned": [
+          "Uncategorized"
+        ],
+        "recommended": "Government Support"
+      },
+      {
+        "id": 978,
+        "title": "Busan medical tourism benefits 101: What Firs",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 977,
+        "title": "Behind the Scenes: What Busan medical tourism",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Government Support"
+      },
+      {
+        "id": 975,
+        "title": "Daegu plastic surgery subsidy: Is it truly ac",
+        "assigned": [
+          "Government Support"
+        ],
+        "recommended": "Cosmetic Surgery"
+      },
+      {
+        "id": 972,
+        "title": "cancer treatment cost Korea vs What You Think",
+        "assigned": [
+          "Hospital Costs"
+        ],
+        "recommended": "Government Support"
+      },
+      {
+        "id": 951,
+        "title": "The truth About medical visa Korea cost Most ",
+        "assigned": [
+          "Cosmetic Surgery"
+        ],
+        "recommended": "Hospital Costs"
+      },
+      {
+        "id": 901,
+        "title": "What a facial contouring Korea review Expert ",
+        "assigned": [
+          "Cosmetic Surgery"
+        ],
+        "recommended": "Government Support"
+      },
+      {
+        "id": 899,
+        "title": "The Real Reason Anti Aging Treatment Korea Yi",
+        "assigned": [
+          "Cosmetic Surgery"
+        ],
+        "recommended": "Government Support"
+      }
+    ]
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Crypto &amp; Digital": 7,
+      "Korea Stocks": 5,
+      "Korea Funds &amp; ETF": 6,
+      "Etc": 2
+    },
+    "mismatch_count": 7,
+    "mismatches": [
+      {
+        "id": 2852,
+        "title": "How to Actually Handle kimchi premium explain",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Korea Stocks"
+      },
+      {
+        "id": 2757,
+        "title": "How to Actually Navigate Upbit Account Foreig",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Crypto &amp; Digital"
+      },
+      {
+        "id": 2752,
+        "title": "An In-Depth Look at Foreigner Stock Account K",
+        "assigned": [
+          "Korea Stocks"
+        ],
+        "recommended": "Korea Funds &amp; ETF"
+      },
+      {
+        "id": 2745,
+        "title": "Korean Mutual Fund Guide for Foreigners: Your",
+        "assigned": [
+          "Crypto &amp; Digital"
+        ],
+        "recommended": "Korea Funds &amp; ETF"
+      },
+      {
+        "id": 2740,
+        "title": "KOSPI Investment Guide Foreign: Why Most Fore",
+        "assigned": [
+          "Korea Stocks"
+        ],
+        "recommended": "Crypto &amp; Digital"
+      },
+      {
+        "id": 2738,
+        "title": "The Real Risk of ethereum staking Korea Most ",
+        "assigned": [
+          "Crypto &amp; Digital"
+        ],
+        "recommended": "Korea Funds &amp; ETF"
+      },
+      {
+        "id": 2725,
+        "title": "KOSDAQ Investment Strategy: The Unseen Edge f",
+        "assigned": [
+          "Korea Stocks"
+        ],
+        "recommended": "Korea Funds &amp; ETF"
+      }
+    ]
+  },
+  {
+    "site": "https://ki-korea.com",
+    "total_checked": 20,
+    "distribution": {
+      "Etc": 20
+    },
+    "mismatch_count": 0,
+    "mismatches": []
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Etc": 1,
+      "Dental Insurance": 5,
+      "Auto Insurance": 4,
+      "Health Insurance": 10
+    },
+    "mismatch_count": 9,
+    "mismatches": [
+      {
+        "id": 3397,
+        "title": "Rethinking driving in Korea foreigner guide: ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Health Insurance"
+      },
+      {
+        "id": 3085,
+        "title": "How to Actually Fix Dental Insurance Foreigne",
+        "assigned": [
+          "Health Insurance"
+        ],
+        "recommended": "Dental Insurance"
+      },
+      {
+        "id": 3082,
+        "title": "Your Essential Guide to Dental Insurance for ",
+        "assigned": [
+          "Health Insurance"
+        ],
+        "recommended": "Dental Insurance"
+      },
+      {
+        "id": 3081,
+        "title": "Your Essential Guide to Car Insurance for For",
+        "assigned": [
+          "Auto Insurance"
+        ],
+        "recommended": "Dental Insurance"
+      },
+      {
+        "id": 3080,
+        "title": "Comprehensive Vehicle Insurance Comparison Ko",
+        "assigned": [
+          "Health Insurance"
+        ],
+        "recommended": "Dental Insurance"
+      },
+      {
+        "id": 3075,
+        "title": "Vehicle Insurance Comparison Korea: Find the ",
+        "assigned": [
+          "Auto Insurance"
+        ],
+        "recommended": "Health Insurance"
+      },
+      {
+        "id": 3064,
+        "title": "What Nobody Tells You About wisdom tooth remo",
+        "assigned": [
+          "Dental Insurance"
+        ],
+        "recommended": "Health Insurance"
+      },
+      {
+        "id": 3014,
+        "title": "The Hidden Side of orthodontics cost Korea fo",
+        "assigned": [
+          "Dental Insurance"
+        ],
+        "recommended": "Health Insurance"
+      },
+      {
+        "id": 2999,
+        "title": "The Hidden Cost of Not Optimizing Your vehicl",
+        "assigned": [
+          "Auto Insurance"
+        ],
+        "recommended": "Health Insurance"
+      }
+    ]
+  },
+  {
+    "site": "https://kfinance365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Investing": 5,
+      "Tax Refund": 6,
+      "Banking": 3,
+      "Etc": 6
+    },
+    "mismatch_count": 8,
+    "mismatches": [
+      {
+        "id": 3340,
+        "title": "The Real Cost of wire transfer Korea overseas",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 3339,
+        "title": "tax deduction foreigner Korea Explained in Pl",
+        "assigned": [
+          "Tax Refund"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 3336,
+        "title": "Why Does stock trading app Korea English Caus",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 3331,
+        "title": "KOSPI stock buy foreigner guide 101: What Fir",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 3330,
+        "title": "income tax filing foreigner Korea Warning Sig",
+        "assigned": [
+          "Tax Refund"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 3328,
+        "title": "7 Things About foreign currency exchange Kore",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Banking"
+      },
+      {
+        "id": 3326,
+        "title": "Why Does Korean government bond foreigner Cau",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 3313,
+        "title": "P2P lending Korea foreigner: A Closer Look at",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      }
+    ]
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "total_checked": 20,
+    "distribution": {
+      "Tax Filing": 9,
+      "Etc": 8,
+      "Visa": 2,
+      "Business Setup": 1
+    },
+    "mismatch_count": 9,
+    "mismatches": [
+      {
+        "id": 3590,
+        "title": "Debunking Common Myths About overstay penalty",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Tax Filing"
+      },
+      {
+        "id": 3397,
+        "title": "ARC card renewal Korea: Frequently Overlooked",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Business Setup"
+      },
+      {
+        "id": 3252,
+        "title": "A Practical Look at labor law Korea foreigner",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Business Setup"
+      },
+      {
+        "id": 3251,
+        "title": "Study Reveals: 5 in 10 People Misunderstand s",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Business Setup"
+      },
+      {
+        "id": 3249,
+        "title": "foreigner CEO Korea requirements 101: What Fi",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Business Setup"
+      },
+      {
+        "id": 3248,
+        "title": "Is immigration office Seoul appointment Reall",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Business Setup"
+      },
+      {
+        "id": 3242,
+        "title": "KIIP program Korea foreigner Explained in Pla",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Tax Filing"
+      },
+      {
+        "id": 3223,
+        "title": "foreigner invest Korea startup vs What You Th",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Business Setup"
+      },
+      {
+        "id": 3158,
+        "title": "The Truth About company acquisition Korea for",
+        "assigned": [
+          "Tax Filing"
+        ],
+        "recommended": "Business Setup"
+      }
+    ]
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Etc": 13,
+      "Regulations": 4,
+      "Exchanges": 3
+    },
+    "mismatch_count": 15,
+    "mismatches": [
+      {
+        "id": 2936,
+        "title": "What Nobody Tells You About Upbit registratio",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Regulations"
+      },
+      {
+        "id": 2935,
+        "title": "Before You Try Korea crypto AML rules, Read T",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2934,
+        "title": "What Nobody Tells You About Coinone signup fo",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2782,
+        "title": "The Real Cost of Upbit English guide foreigne",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Exchanges"
+      },
+      {
+        "id": 2772,
+        "title": "Debunking Common Myths About crypto tax Korea",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2688,
+        "title": "The Real Cost of crypto trading strategy Kore",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2687,
+        "title": "How to Actually Handle how foreigner buy bitc",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2686,
+        "title": "Korean exchange real name verification Q&#038",
+        "assigned": [
+          "Regulations"
+        ],
+        "recommended": "Exchanges"
+      },
+      {
+        "id": 2684,
+        "title": "What Nobody Tells You About crypto trading st",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2683,
+        "title": "Bithumb account foreigner: Frequently Overloo",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2682,
+        "title": "What Nobody Tells You About FSC crypto policy",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Regulations"
+      },
+      {
+        "id": 2677,
+        "title": "8 Things About Upbit registration foreigner g",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Regulations"
+      },
+      {
+        "id": 2676,
+        "title": "Study Reveals: 9 in 10 People Misunderstand c",
+        "assigned": [
+          "Regulations"
+        ],
+        "recommended": "Investing"
+      },
+      {
+        "id": 2606,
+        "title": "How DeFi participation Korea foreigner Has Ch",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Exchanges"
+      },
+      {
+        "id": 2604,
+        "title": "Coinone signup foreigner Korea 101: What Firs",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Investing"
+      }
+    ]
+  },
+  {
+    "site": "https://krealestate365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Etc": 18,
+      "Loans": 1,
+      "Apartments": 1
+    },
+    "mismatch_count": 18,
+    "mismatches": [
+      {
+        "id": 401,
+        "title": "jeonse system Korea foreigner, 당신이 아는 것과 뭐가 다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 400,
+        "title": "industrial property Korea, 제대로 대처하는 법 — 전문가 가",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 399,
+        "title": "foreigner land purchase Korea에 대한 흔한 오해 바로잡기",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 317,
+        "title": "capital gains tax real estate Korea, 정말 중요한 건",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 314,
+        "title": "business location Korea foreigner의 진짜 비용 — 미리",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 257,
+        "title": "real estate registration tax Korea, 정말 효과가 있을",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 256,
+        "title": "절대 놓치면 안 되는 restaurant lease Korea foreigner ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 255,
+        "title": "foreigner land purchase Korea에 대한 흔한 오해, 진실은 ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 252,
+        "title": "REIT investment Korea foreigner에 대해 자주 놓치는 사실",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 251,
+        "title": "acquisition tax Korea foreigner, 정말 효과가 있을까? ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 250,
+        "title": "property inheritance Korea foreigner 궁금증, 현장 ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 248,
+        "title": "HUG jeonse insurance Korea 시작 전에 꼭 읽어야 할 글",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Loans"
+      },
+      {
+        "id": 245,
+        "title": "외국인을 위한 property tax Korea foreigner 실전 가이드",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 243,
+        "title": "foreigner land purchase Korea 시작 전에 꼭 읽어야 할 글",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 236,
+        "title": "real estate fund Korea foreigner 입문 — 처음이라면 꼭",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Commercial"
+      },
+      {
+        "id": 186,
+        "title": "acquisition tax Korea foreigner, 왜 이런 문제가 생길까",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 184,
+        "title": "office rent Seoul foreigner, 정말 중요한 건 따로 있습니다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      },
+      {
+        "id": 171,
+        "title": "REIT investment Korea foreigner에 대해 의사가 꼭 알려주",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Apartments"
+      }
+    ]
+  },
+  {
+    "site": "https://ktech365.com",
+    "total_checked": 20,
+    "distribution": {
+      "AI": 8,
+      "Startups": 6,
+      "Semiconductors": 2,
+      "Etc": 4
+    },
+    "mismatch_count": 7,
+    "mismatches": [
+      {
+        "id": 3780,
+        "title": "South Korea IT Industry Analysis and 2026-202",
+        "assigned": [
+          "AI"
+        ],
+        "recommended": "Semiconductors"
+      },
+      {
+        "id": 4164,
+        "title": "A Practical Look at TSMC vs Samsung competiti",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Semiconductors"
+      },
+      {
+        "id": 4163,
+        "title": "Behind the Scenes: What chip design Korea uni",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Semiconductors"
+      },
+      {
+        "id": 4162,
+        "title": "7 Things About chip design Korea university Y",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Semiconductors"
+      },
+      {
+        "id": 4133,
+        "title": "A Practical Look at Korean startup success st",
+        "assigned": [
+          "AI"
+        ],
+        "recommended": "Startups"
+      },
+      {
+        "id": 4124,
+        "title": "Korea startup ecosystem 2026 Explained in Pla",
+        "assigned": [
+          "Startups"
+        ],
+        "recommended": "AI"
+      },
+      {
+        "id": 4090,
+        "title": "Behind the Scenes: What memory chip price Kor",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Semiconductors"
+      }
+    ]
+  },
+  {
+    "site": "https://kskin365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Routines": 3,
+      "Etc": 6,
+      "Skincare": 11
+    },
+    "mismatch_count": 8,
+    "mismatches": [
+      {
+        "id": 2328,
+        "title": "Debunking Common Myths About sheet mask how t",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Ingredients"
+      },
+      {
+        "id": 2019,
+        "title": "Korean sunscreen best picks Q&#038;A: Answers",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Ingredients"
+      },
+      {
+        "id": 2018,
+        "title": "The Real Cost of essence vs serum order — Wha",
+        "assigned": [
+          "Routines"
+        ],
+        "recommended": "Ingredients"
+      },
+      {
+        "id": 2006,
+        "title": "Rethinking essence vs serum order: A Fresh Pe",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Ingredients"
+      },
+      {
+        "id": 2005,
+        "title": "How to Actually Handle salicylic acid Korean ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Ingredients"
+      },
+      {
+        "id": 1998,
+        "title": "The Real Cost of salicylic acid Korean produc",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Ingredients"
+      },
+      {
+        "id": 1829,
+        "title": "Behind the Scenes: What best Korean cushion f",
+        "assigned": [
+          "Skincare"
+        ],
+        "recommended": "Routines"
+      },
+      {
+        "id": 1828,
+        "title": "What Nobody Tells You About best Korean sunsc",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Routines"
+      }
+    ]
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "total_checked": 20,
+    "distribution": {
+      "Etc": 19,
+      "Skincare": 1
+    },
+    "mismatch_count": 19,
+    "mismatches": [
+      {
+        "id": 613,
+        "title": "Beauty of Joseon review: Frequently Overlooke",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Top Products"
+      },
+      {
+        "id": 612,
+        "title": "Before You Try Korean toner pads review, Read",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 611,
+        "title": "Korean sunscreen no white cast Explained in P",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 467,
+        "title": "How to Actually Handle Anua heartleaf toner r",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 465,
+        "title": "Study Reveals: 8 in 10 People Misunderstand T",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 389,
+        "title": "How Olive Young supplements Korea Has Changed",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 388,
+        "title": "7 Things About Mediheal mask review Your Doct",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 387,
+        "title": "Korean inner beauty drink Q&#038;A: Answers F",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Wellness"
+      },
+      {
+        "id": 386,
+        "title": "5 Mistakes People Make With Korean inner beau",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 385,
+        "title": "Behind the Scenes: What Korean inner beauty d",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Wellness"
+      },
+      {
+        "id": 384,
+        "title": "7 Mistakes People Make With Korean immune sup",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Top Products"
+      },
+      {
+        "id": 381,
+        "title": "Round Lab toner review: Frequently Overlooked",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Top Products"
+      },
+      {
+        "id": 380,
+        "title": "Anua heartleaf toner review Q&#038;A: Answers",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Wellness"
+      },
+      {
+        "id": 379,
+        "title": "How Skin1004 ampoule review Has Changed in 20",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 377,
+        "title": "Behind the Scenes: What Korean serum best pic",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Wellness"
+      },
+      {
+        "id": 373,
+        "title": "Is Olive Young eye cream Really Worth It? An ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Wellness"
+      },
+      {
+        "id": 339,
+        "title": "What Nobody Tells You About Korean detox supp",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Top Products"
+      },
+      {
+        "id": 313,
+        "title": "Skin1004 ampoule review: A Closer Look at Wha",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Skincare"
+      },
+      {
+        "id": 251,
+        "title": "8 Things About Purito centella serum review Y",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Top Products"
+      }
+    ]
+  },
+  {
+    "site": "https://kworld365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Learn Korean": 10,
+      "Etc": 8,
+      "K-Pop": 2
+    },
+    "mismatch_count": 8,
+    "mismatches": [
+      {
+        "id": 400,
+        "title": "Seoul neighborhoods guide for tourists vs Wha",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Learn Korean"
+      },
+      {
+        "id": 396,
+        "title": "Study Reveals: 6 in 10 People Misunderstand c",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Learn Korean"
+      },
+      {
+        "id": 392,
+        "title": "Behind the Scenes: What NCT 127 world tour Ac",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Travel"
+      },
+      {
+        "id": 227,
+        "title": "Is NCT 127 world tour Q&#038;A: Answers From ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Learn Korean"
+      },
+      {
+        "id": 216,
+        "title": "What Nobody Tells You About cost of living Se",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Learn Korean"
+      },
+      {
+        "id": 212,
+        "title": "Before You Try The Real Cost of BTS latest ne",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Learn Korean"
+      },
+      {
+        "id": 155,
+        "title": "How to Actually Plan Your K-drama Filming Loc",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Learn Korean"
+      },
+      {
+        "id": 151,
+        "title": "Behind the Scenes: What The Truth About IVE&#",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Travel"
+      }
+    ]
+  },
+  {
+    "site": "https://k-trip365.com",
+    "total_checked": 20,
+    "distribution": {
+      "AirBnB &amp; 민박": 6,
+      "Hotels &amp; Stays": 3,
+      "기타": 4,
+      "Travel Guides": 6,
+      "Etc": 1
+    },
+    "mismatch_count": 11,
+    "mismatches": [
+      {
+        "id": 4470,
+        "title": "How Agoda Korea best deals Has Changed in 202",
+        "assigned": [
+          "기타"
+        ],
+        "recommended": "Hotels &amp; Stays"
+      },
+      {
+        "id": 4390,
+        "title": "Why Does Your Business Trip to Seoul Need an ",
+        "assigned": [
+          "기타"
+        ],
+        "recommended": "Hotels &amp; Stays"
+      },
+      {
+        "id": 4389,
+        "title": "How to Actually Conquer Your Korean Food Must",
+        "assigned": [
+          "기타"
+        ],
+        "recommended": "Travel Guides"
+      },
+      {
+        "id": 4388,
+        "title": "The Real Cost of Jeju island travel guide — W",
+        "assigned": [
+          "기타"
+        ],
+        "recommended": "Travel Guides"
+      },
+      {
+        "id": 4386,
+        "title": "7 Things About Korean guesthouse foreigner Yo",
+        "assigned": [
+          "Travel Guides"
+        ],
+        "recommended": "Hotels &amp; Stays"
+      },
+      {
+        "id": 4376,
+        "title": "Master Your Trip: Essential Hotel Booking Kor",
+        "assigned": [
+          "AirBnB &amp; 민박"
+        ],
+        "recommended": "Hotels &amp; Stays"
+      },
+      {
+        "id": 4375,
+        "title": "Seoul 3 Day Itinerary: Your Ultimate Guide to",
+        "assigned": [
+          "AirBnB &amp; 민박"
+        ],
+        "recommended": "Travel Guides"
+      },
+      {
+        "id": 4374,
+        "title": "The Uncomfortable Truth About pension stay Ko",
+        "assigned": [
+          "AirBnB &amp; 민박"
+        ],
+        "recommended": "Travel Guides"
+      },
+      {
+        "id": 4372,
+        "title": "The Unexpected Benefit of Choosing a serviced",
+        "assigned": [
+          "AirBnB &amp; 민박"
+        ],
+        "recommended": "Hotels &amp; Stays"
+      },
+      {
+        "id": 4370,
+        "title": "I Tried Every Busan travel tips foreigner Met",
+        "assigned": [
+          "AirBnB &amp; 민박"
+        ],
+        "recommended": "Travel Guides"
+      },
+      {
+        "id": 4266,
+        "title": "Nami Island Day Trip Guide: What Most Tourist",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Travel Guides"
+      }
+    ]
+  },
+  {
+    "site": "https://k-visa365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Student Visa": 6,
+      "Work Visa": 4,
+      "Long-term Visa": 9,
+      "Etc": 1
+    },
+    "mismatch_count": 3,
+    "mismatches": [
+      {
+        "id": 2822,
+        "title": "naturalization Korea process Explained in Pla",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "etc-Uncategorized"
+      },
+      {
+        "id": 2710,
+        "title": "The Real Cost of F-6 marriage visa Korea — Wh",
+        "assigned": [
+          "Work Visa"
+        ],
+        "recommended": "Long-term Visa"
+      },
+      {
+        "id": 2549,
+        "title": "How F6 marriage visa documents Has Changed in",
+        "assigned": [
+          "Long-term Visa"
+        ],
+        "recommended": "Student Visa"
+      }
+    ]
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Marriage": 9,
+      "Etc": 11
+    },
+    "mismatch_count": 11,
+    "mismatches": [
+      {
+        "id": 575,
+        "title": "8 Things About child nationality Korea foreig",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 469,
+        "title": "Debunking Common Myths About spouse visa Kore",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 396,
+        "title": "How to Actually Handle dual citizenship Korea",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Education"
+      },
+      {
+        "id": 395,
+        "title": "The Real Cost of dual citizenship Korea child",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Education"
+      },
+      {
+        "id": 393,
+        "title": "Korean child visa foreigner parent Warning Si",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 386,
+        "title": "The Real Cost of wedding photography Korea co",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 385,
+        "title": "How to Actually Handle wedding venue cost Seo",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 383,
+        "title": "Why Does dual citizenship Korea child Cause P",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Education"
+      },
+      {
+        "id": 378,
+        "title": "What Nobody Tells You About finding Korean sp",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 266,
+        "title": "7 Mistakes People Make With wedding ring jewe",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      },
+      {
+        "id": 215,
+        "title": "wedding guest etiquette Korea vs What You Thi",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Matching"
+      }
+    ]
+  },
+  {
+    "site": "https://kstudy365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Scholarships": 5,
+      "Study Korea": 6,
+      "Student Life": 7,
+      "Etc": 2
+    },
+    "mismatch_count": 11,
+    "mismatches": [
+      {
+        "id": 1036,
+        "title": "dormitory life Korea university Q&#038;A: Ans",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 922,
+        "title": "The Real Cost of SKY university admission — W",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 850,
+        "title": "4 Things About Yonsei university application ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "ETC-Uncategorized"
+      },
+      {
+        "id": 846,
+        "title": "graduate school Korea apply Warning Signs You",
+        "assigned": [
+          "Study Korea"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 845,
+        "title": "Before You Try scholarship essay Korea tips, ",
+        "assigned": [
+          "Study Korea"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 844,
+        "title": "Study Reveals: 9 in 10 People Misunderstand d",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 835,
+        "title": "Why Does dormitory life Korea university Caus",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 834,
+        "title": "The Truth About university hospital Korea stu",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 833,
+        "title": "The Real Cost of campus food Korea affordable",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 832,
+        "title": "Behind the Scenes: What student mental health",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      },
+      {
+        "id": 682,
+        "title": "student discount culture Korea Q&#038;A: Answ",
+        "assigned": [
+          "Student Life"
+        ],
+        "recommended": "Study Korea"
+      }
+    ]
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Scholarships": 4,
+      "Admissions": 5,
+      "Etc": 9,
+      "Campus Life": 2
+    },
+    "mismatch_count": 9,
+    "mismatches": [
+      {
+        "id": 2655,
+        "title": "Before You Try Korean university culture shoc",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 2589,
+        "title": "5 Things About university sports facilities Y",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "ETC-Uncategorized"
+      },
+      {
+        "id": 2588,
+        "title": "research grant Korea Warning Signs You Should",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 2586,
+        "title": "What Nobody Tells You About exchange program ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "ETC-Uncategorized"
+      },
+      {
+        "id": 2579,
+        "title": "How university sports facilities Has Changed ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 2578,
+        "title": "exchange program Korea Warning Signs You Shou",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 2476,
+        "title": "5 Mistakes People Make With TTMIK Talk To Me ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Admissions"
+      },
+      {
+        "id": 2426,
+        "title": "Is KT SKT LG U+ student plan comparison Reall",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 2425,
+        "title": "Why Does Korean resume writing tips foreigner",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      }
+    ]
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "total_checked": 20,
+    "distribution": {
+      "Culture": 5,
+      "Etc": 12,
+      "Careers": 3
+    },
+    "mismatch_count": 12,
+    "mismatches": [
+      {
+        "id": 756,
+        "title": "TOPIK preparation guide, 제대로 대처하는 법 — 전문가 가이드",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 754,
+        "title": "professional network Seoul 궁금증, 현장 전문가가 답하다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 752,
+        "title": "2026년, K-drama learning Korean를 다시 생각해보다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 750,
+        "title": "Korean art appreciation 입문 — 처음이라면 꼭 알아야 할 것",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 749,
+        "title": "Korean festival calendar 궁금증, 현장 전문가가 답하다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 657,
+        "title": "Korean festival calendar에 대한 흔한 오해 바로잡기",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 656,
+        "title": "Korean pronunciation tips, 왜 이런 문제가 생길까? 전문가가",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 653,
+        "title": "2026년 달라진 Korean workplace etiquette, 무엇이 바뀌었",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 651,
+        "title": "Korean art appreciation, 제대로 대처하는 법 — 전문가 가이드",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 616,
+        "title": "Korean vocabulary daily, 쉽게 풀어드립니다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 614,
+        "title": "TOPIK preparation guide 궁금증, 현장 전문가가 답하다",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      },
+      {
+        "id": 612,
+        "title": "Korean pronunciation tips, 왜 이런 문제가 생길까? 전문가가",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Careers"
+      }
+    ]
+  },
+  {
+    "site": "https://ksa-korea.org",
+    "total_checked": 20,
+    "distribution": {
+      "Visa": 3,
+      "Etc": 10,
+      "Scholarships": 6,
+      "Admissions": 1
+    },
+    "mismatch_count": 8,
+    "mismatches": [
+      {
+        "id": 635,
+        "title": "graduate school Korea international, 정말 중요한 건",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 554,
+        "title": "departure confirmation Korea, 실제로는 어떻게 진행될까",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Admissions"
+      },
+      {
+        "id": 502,
+        "title": "2026년 달라진 medical school Korea foreigner, 무엇이",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 495,
+        "title": "departure confirmation Korea, 실제로는 어떻게 진행될까",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Admissions"
+      },
+      {
+        "id": 494,
+        "title": "law school Korea international에 대한 흔한 오해 바로잡기",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 492,
+        "title": "외국인을 위한 business school Korea apply 실전 가이드",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 490,
+        "title": "medical school Korea foreigner, 제대로 대처하는 법 — ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 486,
+        "title": "law school Korea international 시작 전에 꼭 읽어야 할 ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      }
+    ]
+  },
+  {
+    "site": "https://sis-korea.com",
+    "total_checked": 20,
+    "distribution": {
+      "Scholarships": 5,
+      "Etc": 5,
+      "PROGRAMS": 5,
+      "TOPIK": 5
+    },
+    "mismatch_count": 5,
+    "mismatches": [
+      {
+        "id": 1755,
+        "title": "6 Things About professional development Korea",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "PROGRAMS"
+      },
+      {
+        "id": 1568,
+        "title": "How professional development Korea Has Change",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      },
+      {
+        "id": 1432,
+        "title": "A Practical Look at emergency contacts Korea ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "PROGRAMS"
+      },
+      {
+        "id": 1417,
+        "title": "The Truth About international student associa",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "PROGRAMS"
+      },
+      {
+        "id": 1370,
+        "title": "Rethinking vegetarian vegan options Korea cam",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Scholarships"
+      }
+    ]
+  },
+  {
+    "site": "https://jobkorea365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Jobs": 10,
+      "Work Visa": 5,
+      "Etc": 3,
+      "Salaries": 2
+    },
+    "mismatch_count": 7,
+    "mismatches": [
+      {
+        "id": 646,
+        "title": "E-7 visa sponsored job Korea Explained in Pla",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Work Visa"
+      },
+      {
+        "id": 645,
+        "title": "8 Things About change job E-7 visa Your Docto",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Work Visa"
+      },
+      {
+        "id": 644,
+        "title": "bonus culture Korea company vs What You Think",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Salaries"
+      },
+      {
+        "id": 633,
+        "title": "payslip Korea understanding: Frequently Overl",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Work Visa"
+      },
+      {
+        "id": 578,
+        "title": "A Practical Look at marketing job Korea forei",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Salaries"
+      },
+      {
+        "id": 529,
+        "title": "How to Actually Handle probation period Korea",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Salaries"
+      },
+      {
+        "id": 397,
+        "title": "Is relocation package Korea guide Really Wort",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Work Visa"
+      }
+    ]
+  },
+  {
+    "site": "https://jobinkorea365.com",
+    "total_checked": 20,
+    "distribution": {
+      "Interviews": 3,
+      "Jobs": 13,
+      "Etc": 2,
+      "Salaries": 2
+    },
+    "mismatch_count": 12,
+    "mismatches": [
+      {
+        "id": 819,
+        "title": "Debunking Common Myths About meal allowance K",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Salaries"
+      },
+      {
+        "id": 735,
+        "title": "7 Mistakes People Make With group interview K",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 654,
+        "title": "How to Actually Nail Your Interview Dress Cod",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 653,
+        "title": "How to Actually Ace Your Behavioral Interview",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 649,
+        "title": "benefits package Korea company: A Closer Look",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 648,
+        "title": "Navigating the Job Market: My Journey to Secu",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Salaries"
+      },
+      {
+        "id": 643,
+        "title": "Cracking the Code: My Journey and Essential G",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 579,
+        "title": "The Hidden Side of headhunter Korea recommend",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 406,
+        "title": "TITLE: 7 Essential Facts About Overtime Pay L",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Salaries"
+      },
+      {
+        "id": 404,
+        "title": "The Complete E2 Visa Transfer Guide You Need ",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 403,
+        "title": "What Nobody Tells You About Employment Contra",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      },
+      {
+        "id": 402,
+        "title": "E9 to E74 Visa Change Korea: Is It Truly Your",
+        "assigned": [
+          "Jobs"
+        ],
+        "recommended": "Interviews"
+      }
+    ]
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "total_checked": 20,
+    "distribution": {
+      "Foreign Workers": 9,
+      "Salaries": 2,
+      "Etc": 1,
+      "Hiring": 8
+    },
+    "mismatch_count": 10,
+    "mismatches": [
+      {
+        "id": 993,
+        "title": "How performance bonus Korea company Has Chang",
+        "assigned": [
+          "Salaries"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 903,
+        "title": "Behind the Scenes: What relocation allowance ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 887,
+        "title": "Debunking Common Myths About foreigner employ",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 884,
+        "title": "HR Korea foreigner guide Explained in Plain E",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 882,
+        "title": "Is probation period Korea foreigner Really Wo",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 880,
+        "title": "How to Actually Handle workplace harassment K",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 876,
+        "title": "performance bonus Korea company Explained in ",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 826,
+        "title": "Before You Try HR Korea foreigner guide, Read",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 736,
+        "title": "Cross border tax consultant: Frequently Overl",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      },
+      {
+        "id": 727,
+        "title": "Rethinking SaaS sales professional Seoul: A F",
+        "assigned": [
+          "Hiring"
+        ],
+        "recommended": "Foreign Workers"
+      }
+    ]
+  },
+  {
+    "site": "https://korea365.org",
+    "total_checked": 20,
+    "distribution": {
+      "Etc": 14,
+      "Living": 2,
+      "Culture": 2,
+      "Travel": 2
+    },
+    "mismatch_count": 17,
+    "mismatches": [
+      {
+        "id": 2240,
+        "title": "What Nobody Tells You About Korean traditiona",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Travel"
+      },
+      {
+        "id": 2239,
+        "title": "Korean martial arts Taekwondo: Frequently Ove",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 2238,
+        "title": "traditional Korean market 101: What First-Tim",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 2237,
+        "title": "3 Mistakes People Make With Seollal new year ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 2236,
+        "title": "community for expat Seoul vs What You Think Y",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 2108,
+        "title": "4 Mistakes People Make With learning Korean t",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Living"
+      },
+      {
+        "id": 2107,
+        "title": "Korean calligraphy experience vs What You Thi",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Living"
+      },
+      {
+        "id": 1975,
+        "title": "What Makes Korean Street Food So Irresistible",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 1974,
+        "title": "The Truth About Korean Recycling Rules Expats",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Living"
+      },
+      {
+        "id": 1973,
+        "title": "7 Things About Taekwondo Your Doctor Wants Yo",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 1971,
+        "title": "The Unexpected Culinary Delights of Korean Co",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 1969,
+        "title": "Unraveling the Intricacies of Recycling Rules",
+        "assigned": [
+          "Culture"
+        ],
+        "recommended": "Travel"
+      },
+      {
+        "id": 1967,
+        "title": "The Soulful Slurp: Unpacking Korean Ramen vs ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 1966,
+        "title": "learning Korean tips expat Warning Signs You ",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 1965,
+        "title": "Chuseok celebration guide: Frequently Overloo",
+        "assigned": [
+          "Etc"
+        ],
+        "recommended": "Travel"
+      },
+      {
+        "id": 1964,
+        "title": "Jeju Food Specialty Guide: A Culinary Journey",
+        "assigned": [
+          "Travel"
+        ],
+        "recommended": "Culture"
+      },
+      {
+        "id": 1859,
+        "title": "I Scored 80% Off My Insadong Shopping Guide F",
+        "assigned": [
+          "Travel"
+        ],
+        "recommended": "Living"
+      }
+    ]
+  },
+  {
+    "site": "https://koreanews365.com",
+    "total_checked": 20,
+    "distribution": {
+      "기타": 20
+    },
+    "mismatch_count": 1,
+    "mismatches": [
+      {
+        "id": 4016,
+        "title": "설문조사: 10명 중 6명이 [사진]SSG 새 용병 마드리스, 올러와 하이파이브를",
+        "assigned": [
+          "기타"
+        ],
+        "recommended": "Business"
+      }
+    ]
+  },
+  {
+    "site": "https://theseouljournal.com",
+    "total_checked": 20,
+    "distribution": {
+      "Etc.": 19,
+      "GLOBAL": 1
+    },
+    "mismatch_count": 19,
+    "mismatches": [
+      {
+        "id": 3450,
+        "title": "Is 14th Korean oil tanker successfully transi",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3449,
+        "title": "How to Actually Handle Hopes for US-Iran dipl",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "POLITICS"
+      },
+      {
+        "id": 3448,
+        "title": "Is How RESCENE&#8217;s real story broke throu",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3447,
+        "title": "Rethinking Outgoing Irish ambassador reflects",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "ECONOMY"
+      },
+      {
+        "id": 3446,
+        "title": "4 Mistakes People Make With From paralysis to",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "POLITICS"
+      },
+      {
+        "id": 3445,
+        "title": "How RESCENE&#8217;s real story broke through ",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3238,
+        "title": "K-beauty shopping diversifies beyond Olive Yo",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "ECONOMY"
+      },
+      {
+        "id": 3119,
+        "title": "Cost of Living in Seoul 2026: A Closer Look a",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3117,
+        "title": "The transition to senior living is best done ",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "POLITICS"
+      },
+      {
+        "id": 3116,
+        "title": "Before You Try Inside Korea&#8217;s largest T",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "POLITICS"
+      },
+      {
+        "id": 3115,
+        "title": "What Nobody Tells You About Inside a Korean h",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "POLITICS"
+      },
+      {
+        "id": 3113,
+        "title": "The Real Cost of China celebrates 65th annive",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "ECONOMY"
+      },
+      {
+        "id": 3112,
+        "title": "Study Reveals: 4 in 10 People Misunderstand [",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3111,
+        "title": "Why Does Busan&#8217;s oldest industrial zone",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "POLITICS"
+      },
+      {
+        "id": 3110,
+        "title": "What Nobody Tells You About AI fortune-teller",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3108,
+        "title": "[K-LIT REVIEW] &#8216;Mrs. Shim is a Killer&#",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3103,
+        "title": "Debunking Common Myths About Gyeonggi Provinc",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "ECONOMY"
+      },
+      {
+        "id": 3100,
+        "title": "Can&#8217;t stop snacking? Eat this first to ",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      },
+      {
+        "id": 3098,
+        "title": "3 Things About Top diplomats of Seoul Your Do",
+        "assigned": [
+          "Etc."
+        ],
+        "recommended": "CULTURE"
+      }
+    ]
+  }
+]
