@@ -1462,7 +1462,16 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         except: pass
 
     rank_kw=",".join([keyword]+tags[:4])
+    # ★ 발행 시각: 실제 스크립트 실행 시각 그대로 찍히던 걸 KST 기준 ±2시간 랜덤으로 변경
+    #   (하루 3번 고정 시각에 실행되다 보니 매번 똑같은 시각처럼 보이던 문제 해결)
+    jitter_min = random.randint(-120, 120)
+    target_kst = now_kst() + timedelta(minutes=jitter_min)
+    target_gmt = target_kst - timedelta(hours=9)
+    date_str     = target_kst.strftime("%Y-%m-%dT%H:%M:%S")
+    date_gmt_str = target_gmt.strftime("%Y-%m-%dT%H:%M:%S")
+
     data={"title":title,"content":final,"status":"publish",
+          "date":date_str,"date_gmt":date_gmt_str,
           "categories":[cat_id] if cat_id and cat_id>0 else [],
           "tags":tag_ids,
           "meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta,"rank_math_seo_score":str(score)}}
