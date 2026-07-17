@@ -1067,39 +1067,6 @@ jobs:
           git pull --rebase origin main
           git push
 
-  recat-worst-sites:
-    needs: determine-slot
-    if: ${{ github.event.inputs.step == 'recatworst' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "심각한 사이트 재분류"
-        env:
-          GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
-          OLIVEYOUNGKOREACOM:  ${{ secrets.OLIVEYOUNGKOREACOM }}
-          THESEOULJOURNALCOM:  ${{ secrets.THESEOULJOURNALCOM }}
-          KREALESTATE365COM:   ${{ secrets.KREALESTATE365COM }}
-          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
-          KOREACRYPTO365COM:   ${{ secrets.KOREACRYPTO365COM }}
-          KOREA365ORG:         ${{ secrets.KOREA365ORG }}
-        run: python scripts/recat_worst_sites.py
-      - name: "결과 커밋"
-        if: always()
-        run: |
-          git config user.email "huh0303@gmail.com"
-          git config user.name "huh0303-cmyk"
-          git add recat_worst_result.json
-          git commit -m "최악사이트재분류 (임시)" || echo "변경 없음"
-          git pull --rebase origin main
-          git push
-
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}
