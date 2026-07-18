@@ -1067,11 +1067,11 @@ jobs:
           git pull --rebase origin main
           git push
 
-  persona-cta-audit:
+  cta-gap-fill:
     needs: determine-slot
-    if: ${{ github.event.inputs.step == 'personactaaudit' }}
+    if: ${{ github.event.inputs.step == 'ctagapfill' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
@@ -1080,43 +1080,21 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-genai beautifulsoup4 lxml -q
-      - name: "27개 사이트 페르소나/CTA 전수검증"
+      - name: "CTA 누락 보강"
         env:
-          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
-          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
-          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
-          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
-          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
-          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
-          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
-          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
-          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
-          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
-          KTECH365COM:          ${{ secrets.KTECH365COM }}
-          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
-          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
-          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
-          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
-          KVISA365COM:          ${{ secrets.KVISA365COM }}
-          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
-          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
-          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
-          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
-          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
-          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
-          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
-          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
-          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
-          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
-          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/persona_cta_audit.py
+          GEMINI_API_KEY:     ${{ secrets.GEMINI_API_KEY }}
+          KTECH365COM:        ${{ secrets.KTECH365COM }}
+          KTRIP365COM:        ${{ secrets.KTRIP365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          JOBKOREAGLOBALCOM:  ${{ secrets.JOBKOREAGLOBALCOM }}
+        run: python scripts/cta_gap_fill.py
       - name: "결과 커밋"
+        if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add persona_cta_audit.json
-          git commit -m "페르소나CTA검증 (임시)" || echo "변경 없음"
+          git add cta_gap_fill_result.json
+          git commit -m "CTA갭메우기 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
 
