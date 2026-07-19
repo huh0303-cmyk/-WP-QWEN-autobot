@@ -1,0 +1,56 @@
+https://jobinkorea365.com — 총 46건 처리 시작
+로그인 완료: https://jobinkorea365.com/wp-admin/
+  ⚠️ [869] 오류: Page.goto: Timeout 60000ms exceeded.
+Call log:
+  - navigating to "https://jobinkorea365.com/wp-admin — salary expectation Korea negotiation 101
+  ✅ [868] 저장완료: Behind the Scenes: What cover letter Kor
+  ✅ [823] 저장완료: transportation allowance Korea: A Closer
+  ✅ [821] 저장완료: Before You Try interview dress code Kore
+  ✅ [820] 저장완료: 3 Mistakes People Make With Korean compa
+  ✅ [819] 저장완료: Debunking Common Myths About meal allowa
+  ✅ [737] 저장완료: interview question Korea common Explaine
+  ✅ [735] 저장완료: 7 Mistakes People Make With group interv
+  ✅ [654] 저장완료: How to Actually Nail Your Interview Dres
+  ✅ [653] 저장완료: How to Actually Ace Your Behavioral Inte
+  진행: 10/46
+  ✅ [652] 저장완료: Navigating Your LinkedIn Korea Job Searc
+  ✅ [650] 저장완료: group interview Korea tips: Frequently O
+  ✅ [649] 저장완료: benefits package Korea company: A Closer
+  ✅ [648] 저장완료: Navigating the Job Market: My Journey to
+  ✅ [643] 저장완료: Cracking the Code: My Journey and Essent
+  ✅ [642] 저장완료: Health Insurance Salary Korea: Understan
+  ✅ [579] 저장완료: The Hidden Side of headhunter Korea reco
+  ✅ [529] 저장완료: The Uncomfortable Truth About E7 visa sa
+  ✅ [407] 저장완료: Why Most Foreigners Fail to Get a Job in
+  ✅ [406] 저장완료: TITLE: 7 Essential Facts About Overtime 
+  진행: 20/46
+  ✅ [404] 저장완료: The Complete E2 Visa Transfer Guide You 
+  ✅ [403] 저장완료: What Nobody Tells You About Employment C
+  ✅ [402] 저장완료: E9 to E74 Visa Change Korea: Is It Truly
+  ✅ [394] 저장완료: The Complete Korean Resume Format Guide 
+  ✅ [392] 저장완료: Behind the Scenes: What severance pay ca
+  ✅ [391] 저장완료: How to Actually Handle remote job Korea 
+  ✅ [388] 저장완료: Are Foreigners in Korea Fully Protected 
+  ✅ [383] 저장완료: Stop Misunderstanding Korea&#8217;s Part
+  ✅ [382] 저장완료: Why You&#8217;re Failing to Land Your Dr
+  ✅ [381] 저장완료: Why Does translation job Seoul foreigner
+  진행: 30/46
+  ✅ [379] 저장완료: E7 visa salary requirement 101: What Fir
+  ✅ [378] 저장완료: finance job Seoul foreigner Explained in
+  ✅ [377] 저장완료: Is the E7 Visa Salary Requirement a Majo
+  ✅ [372] 저장완료: health insurance for foreign workers vs 
+  ✅ [368] 저장완료: Don&#8217;t Wait to Master Your Korean R
+  ✅ [360] 저장완료: Are You Prepared for the Unique Demands 
+  ✅ [346] 저장완료: The Overlooked Mistakes Making Your Kore
+  ✅ [341] 저장완료: Don&#8217;t Fall Victim: Why Understandi
+  ✅ [336] 저장완료: Don&#8217;t Wait: Essential Updates on K
+  ✅ [331] 저장완료: Korea Housing Allowance Negotiation Kore
+  진행: 40/46
+  ✅ [268] 저장완료: Korea Job Fair Events 2026 Dream Career 
+  ✅ [267] 저장완료: Freelance Work Korea Legal: 7 Steps to L
+  ✅ [265] 저장완료: Finance Jobs Seoul Foreigners: Top 7 Pat
+  ✅ [264] 저장완료: Korea Tech Industry Jobs: Top 7 Roles fo
+  ✅ [262] 저장완료: Salary Negotiation Korea Tips: 7 Ways to
+  ✅ [250] 저장완료: 8 Things About Caregiver Certification Y
+
+완료: 45/46 성공
