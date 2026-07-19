@@ -1,30 +1,17 @@
-Korea AI industry growth
-Naver HyperCLOVA AI update
-Samsung AI chip development
-Korea AI startup investment
-AI regulation Korea policy
-Korea AI research institute
-generative AI Korea application
-AI healthcare Korea
-Korean AI robot technology
-AI education Korea future
-Korea startup ecosystem 2026
-Korean unicorn company list
-startup visa Korea OASIS
-K-Startup global program
-Seoul startup accelerator
-Korean VC investment trend
-startup funding Korea guide
-Pangyo tech valley Korea
-Korean startup success story
-startup coworking Seoul
-SK Hynix HBM memory technology
-Samsung semiconductor fab
-Korea chip export status
-TSMC vs Samsung competition
-Korean NAND flash market
-semiconductor shortage Korea
-memory chip price Korea
-fabless startup Korea
-advanced packaging Korea
-chip design Korea university
+# AI
+Korea AI startups 2026
+Naver AI models
+Korea AI regulation
+Korea AI chip industry
+
+# Semiconductors
+Samsung HBM chips
+SK Hynix news
+Korea chip subsidy
+Korea semiconductor exports
+
+# Startups
+Korea startup visa
+Seoul tech accelerator
+Korea unicorn startups
+Korea startup funding guide
