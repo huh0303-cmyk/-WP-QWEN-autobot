@@ -1,0 +1,30 @@
+name: Retry ktrip365 keyword backfill
+
+on:
+  workflow_dispatch:
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Retry
+        continue-on-error: true
+        env:
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        run: python scripts/retry_ktrip365.py
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add fix_ktrip365_retry_result.txt
+          git diff --staged --quiet || git commit -m "chore: k-trip365 키워드 백필 재시도 [skip ci]"
+          git push
