@@ -15,10 +15,9 @@ on:
         description: "backfilllinks 전용: 특정 사이트 URL만 (비우면 27개 전체) 예) https://k-health365.com"
         required: false
         default: ""
-  schedule:
-    - cron: "10 20 * * *"
-    - cron: "10 4 * * *"
-    - cron: "10 12 * * *"
+  # ⚠️ 고정 cron 제거됨 (2026-07-19) — publish-scheduler.yml이 매일 랜덤 시간에
+  #   이 워크플로우를 workflow_dispatch(step=post, run_slot=1/2/3)로 대신 실행시킴.
+  #   목표시각: 07:25 / 13:07 / 19:50 KST, 매일 ±1시간 랜덤.
 
 concurrency:
   group: master-27sites
