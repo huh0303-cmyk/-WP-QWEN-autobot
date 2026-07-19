@@ -58,12 +58,13 @@ def close_all_existing_posts(url, pw, log):
     closed = 0
     already = 0
     failed = 0
+    ping_closed = 0
     page = 1
     while True:
         try:
             r = requests.get(f"{url}/wp-json/wp/v2/posts", auth=auth(pw),
                               params={"per_page": 100, "page": page, "status": "publish",
-                                      "_fields": "id,comment_status"}, timeout=20)
+                                      "_fields": "id,comment_status,ping_status"}, timeout=20)
         except Exception as e:
             log(f"  ⚠️ 목록조회 실패 page={page}: {e}")
             break
@@ -73,15 +74,24 @@ def close_all_existing_posts(url, pw, log):
         if not isinstance(batch, list) or not batch:
             break
         for p in batch:
-            if p.get("comment_status") == "closed":
+            needs_comment = p.get("comment_status") != "closed"
+            needs_ping = p.get("ping_status") != "closed"
+            if not needs_comment and not needs_ping:
                 already += 1
                 continue
+            payload = {}
+            if needs_comment:
+                payload["comment_status"] = "closed"
+            if needs_ping:
+                payload["ping_status"] = "closed"
             try:
                 rr = requests.post(f"{url}/wp-json/wp/v2/posts/{p['id']}", auth=auth(pw),
-                                    json={"comment_status": "closed", "ping_status": "closed"},
-                                    timeout=15)
+                                    json=payload, timeout=15)
                 if rr.status_code in (200, 201):
-                    closed += 1
+                    if needs_comment:
+                        closed += 1
+                    if needs_ping:
+                        ping_closed += 1
                 else:
                     failed += 1
             except Exception:
@@ -89,7 +99,7 @@ def close_all_existing_posts(url, pw, log):
         if len(batch) < 100:
             break
         page += 1
-    log(f"  📪 기존글 댓글닫기: 신규닫음 {closed}건 | 이미닫힘 {already}건 | 실패 {failed}건")
+    log(f"  📪 댓글닫기: 신규닫음 {closed}건 | 핑백닫음 {ping_closed}건 | 이미완료 {already}건 | 실패 {failed}건")
     return closed, already, failed
 
 
