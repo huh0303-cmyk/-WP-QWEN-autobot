@@ -1777,6 +1777,32 @@ def flush_log():
 # ============================================================
 # ★ 단일 포스트 처리
 # ============================================================
+def build_news_headline(keyword, lang):
+    """뉴스 모드(koreanews365/theseouljournal) 전용: RSS에서 가져온 헤드라인은
+    이미 완성된 문장이므로, 일반 키워드용 22개 제목 템플릿("Rethinking {keyword}:
+    A Fresh Perspective for 2026" 등)에 그대로 끼워 넣으면 "Rethinking Outgoing
+    Irish ambassador reflects on 4 years in Korea: A Fresh Perspective for 2026"
+    처럼 말이 안 되는 제목이 나온다. 대신 같은 의미를 다른 표현으로 재작성한
+    짧고 임팩트 있는 헤드라인을 별도 생성한다(원문 그대로 복사도 방지)."""
+    try:
+        if lang == "ko":
+            prompt = ("다음 뉴스 헤드라인을 같은 의미로, 다른 표현을 사용해 신문 기사 톤으로 "
+                       "짧고 임팩트 있게 재작성하세요. 90자 이내, 따옴표 없이, 설명 없이 헤드라인만.\n"
+                       f"원문: {keyword}\n헤드라인:")
+        else:
+            prompt = ("Rewrite this news headline in fresh, punchy, professional news style "
+                       "(same meaning, different wording, under 90 characters, no quotes, "
+                       "headline only, no explanation).\n"
+                       f"Original: {keyword}\nHeadline:")
+        text = generate_content_gemini(prompt)
+        headline = text.strip().split("\n")[0].strip().strip('"').strip("'").strip()
+        headline = re.sub(r'^(headline|헤드라인)[:\s]*', '', headline, flags=re.IGNORECASE).strip()
+        if headline and 8 <= len(headline) <= 160:
+            return headline
+    except Exception as e:
+        print(f"  ⚠️ 뉴스 헤드라인 재작성 실패: {e}")
+    return keyword  # 실패 시 RSS 원본 헤드라인 그대로 사용(템플릿 왜곡보다 안전)
+
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     p=SITE_PERSONA.get(url,{}); min_chars=p.get("min_chars",2200)
@@ -1806,7 +1832,13 @@ def process_one(site, keyword):
 
         # AI가 만든 제목은 버리고, 코드가 22개 템플릿 중 랜덤으로 뽑아 무조건 교체
         # (반복 패턴이 구글에 "AI 대량생산"으로 보이는 문제 해결)
-        title=build_diverse_title(keyword,lang,site_url=url)
+        # ★ 단, 뉴스 모드는 keyword가 이미 완성된 RSS 헤드라인이므로 템플릿을
+        #   덧씌우면 "Rethinking [완성된 문장]: A Fresh Perspective for 2026" 처럼
+        #   말이 안 되는 제목이 됨 → 뉴스 전용 헤드라인 재작성 함수 사용
+        if mode in ("news", "news_en"):
+            title = build_news_headline(keyword, lang)
+        else:
+            title=build_diverse_title(keyword,lang,site_url=url)
 
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
