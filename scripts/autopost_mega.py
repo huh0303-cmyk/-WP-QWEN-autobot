@@ -749,11 +749,47 @@ THEME_IMAGE_FALLBACK = {
     "Korea Career Programs":"Korea career program","default":"South Korea modern city",
 }
 
+_IMAGE_QUERY_CACHE = {}
+
+def ai_translate_keyword_for_image(keyword, theme=""):
+    """KO_TO_EN_IMAGE 사전에 없는 키워드를 AI로 구체적인 영어 이미지 검색어(2~5단어)로 변환.
+    사전 커버리지가 낮아(30여개) 대부분의 키워드가 테마 뭉뚱그림 폴백으로 빠지며
+    (예: '홍삼 효능과 부작용' → 'medical health Korea doctor' 같은 무관한 사진) 발생하던
+    이미지-본문 미스매치를 막기 위한 안전망."""
+    cache_key = keyword.strip()
+    if cache_key in _IMAGE_QUERY_CACHE:
+        return _IMAGE_QUERY_CACHE[cache_key]
+    try:
+        prompt = (
+            "Translate the following Korean blog topic into a short, CONCRETE English "
+            "stock-photo search query (2-5 words, concrete nouns only, no explanation, "
+            "no quotes, no punctuation). The query must reflect the SPECIFIC subject, "
+            "not a generic category.\n"
+            f"Topic: {keyword}\n"
+            f"Category: {theme}\n"
+            "Query:"
+        )
+        text = generate_content_gemini(prompt)
+        q = text.strip().strip('"').strip("'").split("\n")[0].strip()
+        q = re.sub(r'^(Query|query)[:\s]*', '', q).strip()
+        q = re.sub(r'[^A-Za-z0-9 \-]', '', q).strip()
+        if q and not any('\uAC00' <= c <= '\uD7A3' for c in q):
+            q = re.sub(r'\s+', ' ', q)[:80]
+            _IMAGE_QUERY_CACHE[cache_key] = q
+            return q
+    except Exception as e:
+        print(f"  ⚠️ 이미지 검색어 AI 번역 실패({keyword}): {e}")
+    return None
+
 def translate_ko_to_en_for_image(keyword, theme=""):
     result = keyword
     for ko, en in sorted(KO_TO_EN_IMAGE.items(), key=lambda x: -len(x[0])):
         result = result.replace(ko, en)
     if any('\uAC00' <= c <= '\uD7A3' for c in result):
+        # 사전에 없는 키워드 → 테마로 뭉뚱그리기 전에 AI 번역으로 주제 특정성 유지 시도
+        ai_q = ai_translate_keyword_for_image(keyword, theme)
+        if ai_q:
+            return ai_q
         return THEME_IMAGE_FALLBACK.get(theme, THEME_IMAGE_FALLBACK["default"])
     return re.sub(r'\s+', ' ', result).strip()[:80]
 
@@ -1150,7 +1186,18 @@ def generate_content_gemini(prompt):
             if attempt < 2: time.sleep(10)
     raise RuntimeError("Gemini 3회 실패")
 
+def strip_code_fences(text):
+    """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
+    발행 전 이를 제거한다 (그대로 두면 본문 맨 위에 '```html' 텍스트가 그대로 노출됨)."""
+    t = text.strip()
+    t = re.sub(r'^```[a-zA-Z]*\s*\n', '', t)
+    t = re.sub(r'\n```\s*$', '', t)
+    t = t.strip()
+    t = "\n".join(l for l in t.split("\n") if l.strip() not in ("```", "```html", "```HTML"))
+    return t
+
 def extract_meta_and_faq(text):
+    text = strip_code_fences(text)
     title=""; meta=""; faq=[]
     lines=text.split("\n"); out=[]
     in_faq=False; cur_q=None
