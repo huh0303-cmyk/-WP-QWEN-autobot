@@ -1,0 +1,30 @@
+name: Inspect TSJ GP Elements
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Inspect
+        env:
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/inspect_tsj_gp_elements.py
+      - name: Commit result
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add inspect_tsj_gp_elements_result.txt
+          git commit -m "조사 결과: TSJ GP Elements" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
