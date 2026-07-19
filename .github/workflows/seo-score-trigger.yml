@@ -2,11 +2,10 @@ name: SEO Score Auto-Trigger (발행 직후 27사이트)
 
 on:
   workflow_dispatch:
+  # 발행시각이 매일 랜덤(±1시간)으로 바뀌므로 고정 오프셋 대신 매시간 정각 체크.
+  # lookback=2시간이라 놓치는 글 없이 항상 커버됨.
   schedule:
-    # 자동발행 크론(06:10/14:10/22:10 KST) 40분 후 실행
-    - cron: "50 21 * * *"   # 06:10 KST 발행분 → 06:50 KST = 21:50 UTC(전날)
-    - cron: "50 5  * * *"   # 14:10 KST 발행분 → 14:50 KST = 05:50 UTC
-    - cron: "50 13 * * *"   # 22:10 KST 발행분 → 22:50 KST = 13:50 UTC
+    - cron: "20 * * * *"
 
 jobs:
   trigger:
@@ -30,7 +29,7 @@ jobs:
         timeout-minutes: 60
         env:
           WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
-          SEO_SCORE_LOOKBACK_HOURS: "6"
+          SEO_SCORE_LOOKBACK_HOURS: "2"
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
