@@ -1,0 +1,40 @@
+name: Test Infographic Fallback
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+
+      - name: Run infographic fallback test
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+        run: python scripts/test_infographic_fallback.py
+
+      - name: Commit result log
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add test_infographic_fallback_result.txt
+          git commit -m "테스트 결과: 인포그래픽 폴백 파이프라인 검증" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
