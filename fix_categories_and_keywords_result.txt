@@ -1,0 +1,117 @@
+
+🌐 https://k-health365.com
+  📦 Etc(10건) 중 10건 재분류 완료
+  🔑 포커스키워드 백필: 15건
+
+🌐 https://koreamedicaltour.com
+  📦 Etc(2건) 중 2건 재분류 완료
+  🔑 포커스키워드 백필: 27건
+
+🌐 https://koreainvest365.com
+  🔑 포커스키워드 백필: 12건
+
+🌐 https://ki-korea.com
+  🗑️ 빈 카테고리 삭제: Pension (성공)
+  📦 Etc(44건) 중 44건 재분류 완료
+  🔑 포커스키워드 백필: 0건
+
+🌐 https://koreainsurance365.com
+  🔑 포커스키워드 백필: 11건
+
+🌐 https://kfinance365.com
+  📦 Etc(17건) 중 17건 재분류 완료
+  🔑 포커스키워드 백필: 24건
+
+🌐 https://koreataxnlaw.com
+  📦 Etc(31건) 중 31건 재분류 완료
+  🔑 포커스키워드 백필: 31건
+
+🌐 https://koreacrypto365.com
+  📦 Etc(23건) 중 23건 재분류 완료
+  🔑 포커스키워드 백필: 14건
+
+🌐 https://krealestate365.com
+  📦 Etc(14건) 중 14건 재분류 완료
+  🔑 포커스키워드 백필: 0건
+
+🌐 https://ktech365.com
+  📦 Etc(22건) 중 22건 재분류 완료
+  🔑 포커스키워드 백필: 7건
+
+🌐 https://kskin365.com
+  📦 Etc(20건) 중 20건 재분류 완료
+  🔑 포커스키워드 백필: 33건
+
+🌐 https://oliveyoungkorea.com
+  📦 Etc(18건) 중 18건 재분류 완료
+  🔑 포커스키워드 백필: 9건
+
+🌐 https://kworld365.com
+  📦 Etc(4건) 중 4건 재분류 완료
+  🔑 포커스키워드 백필: 60건
+
+🌐 https://k-trip365.com
+  🗑️ 중복 카테고리 삭제: Etc (성공)
+  📦 Etc(1건) 중 1건 재분류 완료
+  ❌ 사이트 처리 오류: HTTPSConnectionPool(host='k-trip365.com', port=443): Read timed out. (read timeout=15)
+
+🌐 https://k-visa365.com
+  🔀 'etc-Uncategorized'(3건) → 'Etc' 병합
+  🗑️ 중복 카테고리 삭제: etc-Uncategorized (성공)
+  📦 Etc(8건) 중 8건 재분류 완료
+  🔑 포커스키워드 백필: 16건
+
+🌐 https://koreawedding365.com
+  📦 Etc(15건) 중 15건 재분류 완료
+  🔑 포커스키워드 백필: 5건
+
+🌐 https://kstudy365.com
+  🔀 'ETC-Uncategorized'(3건) → 'Etc' 병합
+  🗑️ 중복 카테고리 삭제: ETC-Uncategorized (성공)
+  📦 Etc(5건) 중 5건 재분류 완료
+  🔑 포커스키워드 백필: 7건
+
+🌐 https://studyinkorea365.com
+  🔀 'ETC-Uncategorized'(4건) → 'Etc' 병합
+  🗑️ 중복 카테고리 삭제: ETC-Uncategorized (성공)
+  📦 Etc(17건) 중 17건 재분류 완료
+  🔑 포커스키워드 백필: 6건
+
+🌐 https://kieca-korea.org
+  📦 Etc(11건) 중 11건 재분류 완료
+  🔑 포커스키워드 백필: 0건
+
+🌐 https://ksa-korea.org
+  📦 Etc(18건) 중 18건 재분류 완료
+  🔑 포커스키워드 백필: 0건
+
+🌐 https://sis-korea.com
+  📦 Etc(12건) 중 12건 재분류 완료
+  🔑 포커스키워드 백필: 3건
+
+🌐 https://jobkorea365.com
+  📦 Etc(12건) 중 12건 재분류 완료
+  🔑 포커스키워드 백필: 8건
+
+🌐 https://jobinkorea365.com
+  🔑 포커스키워드 백필: 10건
+
+🌐 https://jobkoreaglobal.com
+  🔑 포커스키워드 백필: 9건
+
+🌐 https://korea365.org
+  📦 Etc(1건) 중 1건 재분류 완료
+  🔑 포커스키워드 백필: 24건
+
+🌐 https://koreanews365.com
+  🗑️ 빈 카테고리 삭제: Health (성공)
+  🗑️ 빈 카테고리 삭제: Newsbeat (성공)
+  🗑️ 빈 카테고리 삭제: Science (성공)
+  🗑️ 빈 카테고리 삭제: Stories (성공)
+  🗑️ 빈 카테고리 삭제: Tech (성공)
+  📦 Etc(57건) 중 57건 재분류 완료
+  🔑 포커스키워드 백필: 26건
+
+🌐 https://theseouljournal.com
+  📦 Etc(35건) 중 35건 재분류 완료
+  🔑 포커스키워드 백필: 8건
