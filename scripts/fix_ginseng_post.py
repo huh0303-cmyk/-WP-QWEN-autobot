@@ -28,6 +28,11 @@ def strip_code_fences(text):
     t = re.sub(r'^```[a-zA-Z]*\s*\n?', '', t)
     t = re.sub(r'\n?```\s*$', '', t)
     t = "\n".join(l for l in t.split("\n") if l.strip() not in ("```", "```html", "```HTML"))
+    # 스마트따옴표+백틱 변형(예: "`html, "'html 등) 및 <p>로 감싸진 잔여 펜스 단독 문단 제거
+    t = re.sub(
+        r'<p>\s*[\u201c\u2018"\']*\s*`{1,3}\s*(html)?\s*</p>\s*',
+        '', t, flags=re.IGNORECASE)
+    t = re.sub(r'^[\u201c\u2018"\']*\s*`{1,3}\s*(html)?\s*$', '', t, flags=re.IGNORECASE | re.MULTILINE)
     return t.strip()
 
 def fetch_all_posts():
@@ -112,13 +117,16 @@ def main():
     fence_removed = cleaned.strip() != raw_content.strip()
     log(f"코드펜스 찌꺼기 제거 필요: {fence_removed}")
 
-    imgs = get_images_pixabay("Korean red ginseng root herbal medicine", 3)
-    if not imgs:
-        imgs = get_images_pexels("ginseng root herbal", 3)
-
+    image_already_fixed = "korean-red-ginseng" in cleaned or "ginseng" in cleaned.lower()
     media = None
-    if imgs:
-        media = upload_image_to_wp(imgs[0], "korean-red-ginseng-benefits")
+    if not image_already_fixed:
+        imgs = get_images_pixabay("Korean red ginseng root herbal medicine", 3)
+        if not imgs:
+            imgs = get_images_pexels("ginseng root herbal", 3)
+        if imgs:
+            media = upload_image_to_wp(imgs[0], "korean-red-ginseng-benefits")
+    else:
+        log("이미지는 이미 홍삼 관련으로 교체되어 있음 — 스킵")
 
     payload = {"content": cleaned}
     if media:
