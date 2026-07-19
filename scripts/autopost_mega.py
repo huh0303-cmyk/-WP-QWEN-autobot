@@ -1733,6 +1733,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     data={"title":title,"content":final,"status":"publish",
           "date":date_str,"date_gmt":date_gmt_str,
+          "comment_status":"closed","ping_status":"closed",
           "categories":[cat_id] if cat_id and cat_id>0 else [],
           "tags":tag_ids,
           "meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta,"rank_math_seo_score":str(score)}}

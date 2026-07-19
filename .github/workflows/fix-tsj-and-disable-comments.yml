@@ -1,0 +1,64 @@
+name: Fix TSJ Header + Disable Comments (27 sites)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+
+      - name: Fix theseouljournal.com broken header elements
+        env:
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/fix_tsj_broken_headers.py
+
+      - name: Disable comments on all 27 sites
+        env:
+          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM:          ${{ secrets.KTECH365COM }}
+          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
+          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
+          KVISA365COM:          ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/disable_comments_all_sites.py
+
+      - name: Commit result logs
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add fix_tsj_broken_headers_result.txt disable_comments_all_sites_result.txt
+          git commit -m "결과: TSJ 헤더 수정 + 27개 사이트 댓글 비활성화 로그" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
