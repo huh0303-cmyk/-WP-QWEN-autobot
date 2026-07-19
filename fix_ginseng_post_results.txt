@@ -1,7 +1,5 @@
 전체 발행글 202건 로드
 대상 글: 홍삼 효능과 부작용, 당신이 아는 것과 뭐가 다를까
 URL: https://k-health365.com/%ed%99%8d%ec%82%bc-%ed%9a%a8%eb%8a%a5%ea%b3%bc-%eb%b6%80%ec%9e%91%ec%9a%a9-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%84%eb%8a%94-%ea%b2%83%ea%b3%bc-%eb%ad%90%ea%b0%80-%eb%8b%a4%eb%a5%bc%ea%b9%8c/
-코드펜스 찌꺼기 제거 필요: True
-이미지는 이미 홍삼 관련으로 교체되어 있음 — 스킵
-⚠️ 새 이미지 확보 실패 — content(코드펜스 제거)만 반영
-✅ 업데이트 성공: https://k-health365.com/%ed%99%8d%ec%82%bc-%ed%9a%a8%eb%8a%a5%ea%b3%bc-%eb%b6%80%ec%9e%91%ec%9a%a9-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%84%eb%8a%94-%ea%b2%83%ea%b3%bc-%eb%ad%90%ea%b0%80-%eb%8b%a4%eb%a5%bc%ea%b9%8c/
+중복 이미지 제거: 본문 인라인의 'korean-red-ginseng-benefits.jpg' (대표이미지와 동일 파일)
+✅ 업데이트 성공: https://k-health365.com/%ed%99%8d%ec%82%bc-%ed%9a%a8%eb%8a%a5%ea%b3%bc-%eb%b6%80%ec%9e%91%ec%9a%a9-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%84%eb%8a%94-%ea%b2%83%ea%b3%bc-%eb%ad%90%ea%b0%80-%eb%8b%a4%eb%a5%bc%ea%b9%8c/ (중복이미지제거=True)
