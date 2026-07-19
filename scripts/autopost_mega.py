@@ -1462,8 +1462,115 @@ def get_multiple_images(keyword, count=3, theme=""):
         fb=THEME_IMAGE_FALLBACK.get(theme,THEME_IMAGE_FALLBACK["default"])
         urls.extend(get_images_pixabay(fb,count-len(urls)))
         if len(urls)<count: urls.extend(get_images_pexels(fb,count-len(urls)))
-    if not urls: urls.extend(get_images_pixabay("South Korea",count))
+    # ★ 주의: 예전엔 여기서 "South Korea" 같은 완전 범용 검색어로 무조건 채워 넣었음.
+    #   그러면 항상 사진이 '있기는' 하지만 본문과 무관한 스톡사진이 채워져
+    #   process_one() 쪽의 인포그래픽 폴백이 절대 발동하지 않는 문제가 있었음.
+    #   → 여기선 억지로 채우지 않고, 못 찾으면 빈 리스트를 그대로 반환해서
+    #   호출부가 인포그래픽 카드로 대체하도록 함.
     return list(dict.fromkeys(urls))[:count]
+
+# ============================================================
+# ★ 최종 안전망: 사진 검색(Pixabay/Pexels)이 모두 실패했을 때
+#   본문 주제와 무관한 사진("South Korea nature" 등) 대신,
+#   키워드를 그대로 텍스트로 담은 인포그래픽 카드를 생성해 사용.
+#   → 이미지-본문 미스매치를 원천 차단(카드에 실제 키워드가 박혀있으므로 항상 100% 관련)
+# ============================================================
+INFOGRAPHIC_THEME_COLORS = {
+    "건강과 의학":("#0F5132","#D1E7DD"), "Korea Medical Tourism":("#0F5132","#D1E7DD"),
+    "Investment":("#1B2A4A","#D6E4FF"), "Korea Investment":("#1B2A4A","#D6E4FF"),
+    "Insurance":("#1B2A4A","#D6E4FF"), "Finance":("#1B2A4A","#D6E4FF"),
+    "Tax and Law":("#332D26","#EFE6D8"), "Crypto":("#3D1B5C","#E9DDF5"),
+    "Korea Real Estate":("#4A2E13","#F1E4D3"), "Technology":("#0B2545","#D6E9FF"),
+    "K-Beauty":("#7A1F4D","#FBE1EE"), "K-Beauty Reviews":("#7A1F4D","#FBE1EE"),
+    "K-POP":("#4B0F6B","#EBD9F7"), "Travel":("#0B4F6C","#D3EEF7"),
+    "Visa Guide":("#1B2A4A","#D6E4FF"), "Wedding":("#7A1F4D","#FBE1EE"),
+    "Study in Korea":("#0B2545","#D6E9FF"), "International Students":("#0B2545","#D6E9FF"),
+    "국제교육문화":("#0B2545","#D6E9FF"), "한국유학정보":("#0B2545","#D6E9FF"),
+    "Recruitment":("#332D26","#EFE6D8"), "Employment":("#332D26","#EFE6D8"),
+    "Jobs in Korea":("#332D26","#EFE6D8"), "Seoul Lifestyle":("#0B4F6C","#D3EEF7"),
+    "Korea Culture":("#4B0F6B","#EBD9F7"), "한국 뉴스":("#1B2A4A","#D6E4FF"),
+    "default":("#26313F","#DCE3EA"),
+}
+_KR_FONT_PATH = "/tmp/_kuac_nanumgothic_bold.ttf"
+_FONT_CACHE = {}
+
+def _get_card_font(size):
+    if size in _FONT_CACHE: return _FONT_CACHE[size]
+    from PIL import ImageFont
+    if not os.path.exists(_KR_FONT_PATH):
+        try:
+            r = requests.get(
+                "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Bold.ttf",
+                timeout=15)
+            if r.status_code == 200:
+                with open(_KR_FONT_PATH, "wb") as f: f.write(r.content)
+        except Exception as e:
+            print(f"  ⚠️ 폰트 다운로드 실패: {e}")
+    try:
+        font = ImageFont.truetype(_KR_FONT_PATH, size)
+    except Exception:
+        font = ImageFont.load_default()
+    _FONT_CACHE[size] = font
+    return font
+
+def generate_infographic_card(keyword, theme, lang):
+    """사진 검색 완전 실패 시, 키워드 텍스트를 담은 카드 이미지를 생성해 반환(로컬 파일 경로)."""
+    from PIL import Image, ImageDraw
+    import textwrap
+    W, H = 1200, 630
+    fg, bg = INFOGRAPHIC_THEME_COLORS.get(theme, INFOGRAPHIC_THEME_COLORS["default"])
+    img = Image.new("RGB", (W, H), bg)
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([0, 0, W, 14], fill=fg)
+    draw.rectangle([0, H - 14, W, H], fill=fg)
+
+    title_font = _get_card_font(64)
+    label_font = _get_card_font(30)
+
+    has_ko = any('\uAC00' <= c <= '\uD7A3' for c in keyword)
+    wrap_width = 14 if has_ko else 22
+    lines = textwrap.wrap(keyword, width=wrap_width)[:4]
+
+    total_h = len(lines) * 78
+    y = (H - total_h) // 2 - 20
+    for line in lines:
+        bbox = draw.textbbox((0, 0), line, font=title_font)
+        w = bbox[2] - bbox[0]
+        draw.text(((W - w) // 2, y), line, font=title_font, fill=fg)
+        y += 78
+
+    badge = theme if theme else ("한대협 KUAC" if lang == "ko" else "KUAC Network")
+    bbox = draw.textbbox((0, 0), badge, font=label_font)
+    w = bbox[2] - bbox[0]
+    draw.text(((W - w) // 2, H - 70), badge, font=label_font, fill=fg)
+
+    path = f"/tmp/infographic_{hashlib.md5(keyword.encode()).hexdigest()[:10]}.png"
+    img.save(path, "PNG")
+    return path
+
+def upload_local_image_to_wp(site_url, pw, filepath, filename):
+    try:
+        with open(filepath, "rb") as f:
+            data = f.read()
+        r = requests.post(f"{site_url}/wp-json/wp/v2/media", auth=(WP_USER, pw),
+                           headers={"Content-Disposition": f'attachment; filename="{filename}.png"',
+                                    "Content-Type": "image/png"}, data=data, timeout=30)
+        if r.status_code in (200, 201):
+            return r.json().get("source_url")
+        print(f"  ⚠️ 인포그래픽 업로드 실패 {r.status_code}: {r.text[:150]}")
+    except Exception as e:
+        print(f"  ⚠️ 인포그래픽 업로드 오류: {e}")
+    return None
+
+def get_fallback_infographic_image(site_url, pw, keyword, theme, lang):
+    try:
+        path = generate_infographic_card(keyword, theme, lang)
+        fname = "infographic-" + re.sub(r'[^a-zA-Z0-9]+', '-', keyword)[:40].strip('-')
+        url = upload_local_image_to_wp(site_url, pw, path, fname or "infographic")
+        return [url] if url else []
+    except Exception as e:
+        print(f"  ⚠️ 인포그래픽 생성 실패: {e}")
+        return []
 
 # ============================================================
 # ★ IndexNow ping
@@ -1737,7 +1844,12 @@ def process_one(site, keyword):
         print(f"  🚫 이미지 없음 (no_image=True)")
     else:
         images=get_multiple_images(keyword,count=3,theme=theme)
-        if not images: images=get_images_pixabay("South Korea nature",3)
+        if not images:
+            print(f"  ⚠️ 사진 검색 완전 실패 → 주제 일치 인포그래픽 카드로 대체")
+            pw_for_img = os.getenv(site["wp_pass_env"], "")
+            images = get_fallback_infographic_image(url, pw_for_img, keyword, theme, lang)
+            if not images:
+                images=get_images_pixabay("South Korea nature",3)
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
