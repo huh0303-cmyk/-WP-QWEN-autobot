@@ -1,0 +1,39 @@
+name: Publish Scheduler (랜덤시간 발행 트리거)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: publish-scheduler
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Check & dispatch if today's random target passed
+        id: check
+        env:
+          GH_DISPATCH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/publish_scheduler.py
+      - name: Commit scheduler state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add scheduler_state.json
+          git diff --staged --quiet || git commit -m "chore: 스케줄러 상태 갱신 [skip ci]"
+          git push
