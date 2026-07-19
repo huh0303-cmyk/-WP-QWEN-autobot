@@ -117,41 +117,32 @@ def main():
 
     raw_content = target["content"].get("raw") or target["content"]["rendered"]
     cleaned = strip_code_fences(raw_content)
-    fence_removed = cleaned.strip() != raw_content.strip()
-    log(f"코드펜스 찌꺼기 제거 필요: {fence_removed}")
 
-    image_already_fixed = "korean-red-ginseng" in cleaned or "ginseng" in cleaned.lower()
-    media = None
-    if not image_already_fixed:
-        imgs = get_images_pixabay("Korean red ginseng root herbal medicine", 3)
-        if not imgs:
-            imgs = get_images_pexels("ginseng root herbal", 3)
-        if imgs:
-            media = upload_image_to_wp(imgs[0], "korean-red-ginseng-benefits")
-    else:
-        log("이미지는 이미 홍삼 관련으로 교체되어 있음 — 스킵")
+    # ★ 중복 이미지 수정: featured_media(대표이미지)와 본문 첫 인라인 이미지가
+    #   완전히 동일한 파일이면(지난 수정 스크립트가 그렇게 저장함), 본문 쪽의
+    #   중복 <figure><img> 블록을 제거한다 (대표이미지는 테마가 상단에 자동 노출하므로).
+    dup_removed = False
+    fig_match = re.search(r'<figure[^>]*>\s*<img[^>]+src="([^"]+)"[^>]*>.*?</figure>\s*', cleaned, re.DOTALL)
+    if fig_match:
+        img_src = fig_match.group(1)
+        img_filename = img_src.rstrip('/').split('/')[-1]
+        # featured_media 조회해서 같은 파일인지 확인
+        fr = requests.get(f"{SITE_URL}/wp-json/wp/v2/posts/{target['id']}", auth=auth,
+                           params={"_fields": "featured_media"}, timeout=15)
+        featured_id = fr.json().get("featured_media") if fr.status_code == 200 else None
+        if featured_id:
+            mr = requests.get(f"{SITE_URL}/wp-json/wp/v2/media/{featured_id}", auth=auth,
+                               params={"_fields": "source_url"}, timeout=15)
+            featured_src = mr.json().get("source_url", "") if mr.status_code == 200 else ""
+            if featured_src.rstrip('/').split('/')[-1] == img_filename:
+                cleaned = cleaned[:fig_match.start()] + cleaned[fig_match.end():]
+                dup_removed = True
+                log(f"중복 이미지 제거: 본문 인라인의 '{img_filename}' (대표이미지와 동일 파일)")
 
-    payload = {"content": cleaned}
-    if media:
-        payload["featured_media"] = media["id"]
-        if re.search(r'<img[^>]+src="[^"]+"', payload["content"]):
-            payload["content"] = re.sub(
-                r'(<img[^>]+src=")[^"]+(")',
-                r'\g<1>' + media["source_url"] + r'\2',
-                payload["content"], count=1)
-        else:
-            payload["content"] = (
-                f'<img src="{media["source_url"]}" alt="홍삼 효능과 부작용" '
-                f'style="width:100%;height:auto;border-radius:8px;margin-bottom:20px;"/>\n'
-                + payload["content"]
-            )
-        log(f"이미지 교체: {media['source_url']}")
-    else:
-        log("⚠️ 새 이미지 확보 실패 — content(코드펜스 제거)만 반영")
-
-    r = requests.post(f"{SITE_URL}/wp-json/wp/v2/posts/{target['id']}", auth=auth, json=payload, timeout=30)
+    r = requests.post(f"{SITE_URL}/wp-json/wp/v2/posts/{target['id']}", auth=auth,
+                       json={"content": cleaned.strip()}, timeout=30)
     if r.status_code in (200, 201):
-        log(f"✅ 업데이트 성공: {target['link']}")
+        log(f"✅ 업데이트 성공: {target['link']} (중복이미지제거={dup_removed})")
     else:
         log(f"❌ 업데이트 실패 {r.status_code}: {r.text[:400]}")
 
