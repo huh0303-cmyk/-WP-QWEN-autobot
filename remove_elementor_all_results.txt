@@ -1,0 +1,112 @@
+
+🌐 https://k-health365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreamedicaltour.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreainvest365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://ki-korea.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreainsurance365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://kfinance365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreataxnlaw.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreacrypto365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://krealestate365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://ktech365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://kskin365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://oliveyoungkorea.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://kworld365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://k-trip365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://k-visa365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreawedding365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://kstudy365.com
+  🔎 발견: ['bosa-elementor-for-woocommerce/bosa-elementor-for-woocommerce', 'elementor/elementor']
+    ✅ 삭제 완료: bosa-elementor-for-woocommerce/bosa-elementor-for-woocommerce
+    ✅ 삭제 완료: elementor/elementor
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://studyinkorea365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://kieca-korea.org
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://ksa-korea.org
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://sis-korea.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://jobkorea365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://jobinkorea365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://jobkoreaglobal.com
+  🔎 발견: ['bosa-elementor-for-woocommerce/bosa-elementor-for-woocommerce', 'elementor/elementor']
+    ✅ 삭제 완료: bosa-elementor-for-woocommerce/bosa-elementor-for-woocommerce
+    ✅ 삭제 완료: elementor/elementor
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://korea365.org
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://koreanews365.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
+
+🌐 https://theseouljournal.com
+  ✅ Elementor 플러그인 없음
+    ⚠️ WPCode 스니펫 API 사용 불가 (HTTP 404) — postmeta/options 수동 정리 필요
