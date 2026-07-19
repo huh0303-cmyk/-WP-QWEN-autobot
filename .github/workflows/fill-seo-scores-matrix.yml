@@ -1,0 +1,82 @@
+name: Fill SEO Scores All Sites (matrix, 일회성 수동 실행)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fill:
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        site:
+          - https://k-health365.com
+          - https://koreamedicaltour.com
+          - https://koreainvest365.com
+          - https://ki-korea.com
+          - https://koreainsurance365.com
+          - https://kfinance365.com
+          - https://koreataxnlaw.com
+          - https://koreacrypto365.com
+          - https://krealestate365.com
+          - https://ktech365.com
+          - https://kskin365.com
+          - https://oliveyoungkorea.com
+          - https://kworld365.com
+          - https://k-trip365.com
+          - https://k-visa365.com
+          - https://koreawedding365.com
+          - https://studyinkorea365.com
+          - https://kieca-korea.org
+          - https://ksa-korea.org
+          - https://sis-korea.com
+          - https://jobkorea365.com
+          - https://jobinkorea365.com
+          - https://jobkoreaglobal.com
+          - https://korea365.org
+          - https://koreanews365.com
+          - https://theseouljournal.com
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install requests playwright -q
+          playwright install --with-deps chromium
+      - name: Fill SEO scores
+        continue-on-error: true
+        timeout-minutes: 90
+        env:
+          SITE_URL: ${{ matrix.site }}
+          WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
+        run: python scripts/fill_seo_scores_single.py
+      - name: Upload result artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-fill-result-${{ strategy.job-index }}
+          path: seo_fill_*.txt
+          if-no-files-found: ignore
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && break
+            sleep $((RANDOM % 10 + 5))
+          done
+          mkdir -p seo_fill_results
+          mv seo_fill_*.txt seo_fill_results/ 2>/dev/null || true
+          git add seo_fill_results/ 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: SEO점수 강제계산 결과 [skip ci]"
+          for i in 1 2 3 4 5; do
+            git push && break
+            git pull --rebase origin main
+            sleep $((RANDOM % 10 + 5))
+          done
