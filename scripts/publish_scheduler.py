@@ -70,15 +70,10 @@ def main():
             changed = True
 
     state["fired"] = fired
-    if changed:
-        with open(STATE_FILE, "w", encoding="utf-8") as f:
-            json.dump(state, f, ensure_ascii=False, indent=2)
-        print("::set-output name=changed::true")
-        with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as gh_out:
-            gh_out.write("changed=true\n")
-    else:
-        with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as gh_out:
-            gh_out.write("changed=false\n")
+    with open(STATE_FILE, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+    with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as gh_out:
+        gh_out.write(f"changed={'true' if changed else 'false'}\n")
 
 
 if __name__ == "__main__":
