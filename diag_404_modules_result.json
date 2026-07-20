@@ -1,0 +1,288 @@
+{
+  "https://koreamedicaltour.com": {
+    "site": "https://koreamedicaltour.com",
+    "secret": "KOREAMEDICALTOURCOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://koreainvest365.com": {
+    "site": "https://koreainvest365.com",
+    "secret": "KOREAINVEST365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://ki-korea.com": {
+    "site": "https://ki-korea.com",
+    "secret": "KIKOREACOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://koreainsurance365.com": {
+    "site": "https://koreainsurance365.com",
+    "secret": "KOREAINSURANCE365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://kfinance365.com": {
+    "site": "https://kfinance365.com",
+    "secret": "KFINANCE365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://koreataxnlaw.com": {
+    "site": "https://koreataxnlaw.com",
+    "secret": "KOREATAXNLAWCOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://koreacrypto365.com": {
+    "site": "https://koreacrypto365.com",
+    "secret": "KOREACRYPTO365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://krealestate365.com": {
+    "site": "https://krealestate365.com",
+    "secret": "KREALESTATE365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://ktech365.com": {
+    "site": "https://ktech365.com",
+    "secret": "KTECH365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://kskin365.com": {
+    "site": "https://kskin365.com",
+    "secret": "KSKIN365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://oliveyoungkorea.com": {
+    "site": "https://oliveyoungkorea.com",
+    "secret": "OLIVEYOUNGKOREACOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://kworld365.com": {
+    "site": "https://kworld365.com",
+    "secret": "KWORLD365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://k-trip365.com": {
+    "site": "https://k-trip365.com",
+    "secret": "KTRIP365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://k-visa365.com": {
+    "site": "https://k-visa365.com",
+    "secret": "KVISA365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://koreawedding365.com": {
+    "site": "https://koreawedding365.com",
+    "secret": "KOREAWEDDING365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://kstudy365.com": {
+    "site": "https://kstudy365.com",
+    "secret": "KSTUDY365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://studyinkorea365.com": {
+    "site": "https://studyinkorea365.com",
+    "secret": "STUDYINKOREA365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://kieca-korea.org": {
+    "site": "https://kieca-korea.org",
+    "secret": "KIECAKOREAORG",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://ksa-korea.org": {
+    "site": "https://ksa-korea.org",
+    "secret": "KSAKOREAORG",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://sis-korea.com": {
+    "site": "https://sis-korea.com",
+    "secret": "SISKOREACOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://jobkorea365.com": {
+    "site": "https://jobkorea365.com",
+    "secret": "JOBKOREA365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://jobinkorea365.com": {
+    "site": "https://jobinkorea365.com",
+    "secret": "JOBINKOREA365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://jobkoreaglobal.com": {
+    "site": "https://jobkoreaglobal.com",
+    "secret": "JOBKOREAGLOBALCOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://korea365.org": {
+    "site": "https://korea365.org",
+    "secret": "KOREA365ORG",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://koreanews365.com": {
+    "site": "https://koreanews365.com",
+    "secret": "KOREANEWS365COM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  },
+  "https://theseouljournal.com": {
+    "site": "https://theseouljournal.com",
+    "secret": "THESEOULJOURNALCOM",
+    "module_activation": {
+      "404-monitor": 200,
+      "redirections": 200
+    },
+    "related_routes": [
+      "/rankmath/v1/updateRedirection"
+    ]
+  }
+}
