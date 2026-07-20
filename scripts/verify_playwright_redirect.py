@@ -74,7 +74,10 @@ with sync_playwright() as p:
     page.wait_for_load_state("networkidle", timeout=30000)
     page.wait_for_timeout(2000)  # React 렌더링 대기
     log(f"클릭 후 URL: {page.url}")
-    page.screenshot(path="after_redirect_click.png", full_page=True)
+    try:
+        page.screenshot(path="after_redirect_click.png", timeout=8000)
+    except Exception as e:
+        log(f"스크린샷 실패(무시): {e}")
 
     # 3) 폼 필드 탐색 (Destination URL 입력창 찾기)
     # Rank Math의 Add New Redirection 폼은 보통 placeholder나 label로 식별 가능
@@ -82,6 +85,35 @@ with sync_playwright() as p:
     with open("redirect_form_snapshot.html", "w", encoding="utf-8") as f:
         f.write(html_snapshot)
     log(f"폼 페이지 HTML 저장 완료 ({len(html_snapshot)} bytes)")
+
+    visible_inputs = page.query_selector_all("input, textarea, select")
+    field_summary = []
+    for el in visible_inputs:
+        try:
+            field_summary.append({
+                "tag": el.evaluate("e=>e.tagName"),
+                "name": el.get_attribute("name"),
+                "id": el.get_attribute("id"),
+                "placeholder": el.get_attribute("placeholder"),
+                "value": el.get_attribute("value"),
+                "type": el.get_attribute("type"),
+            })
+        except Exception:
+            pass
+    result["fields"] = field_summary
+    log(f"입력 필드 {len(field_summary)}개 발견")
+
+    buttons = page.query_selector_all("button")
+    btn_texts = []
+    for b in buttons:
+        try:
+            t = b.inner_text().strip()
+            if t:
+                btn_texts.append(t)
+        except Exception:
+            pass
+    result["buttons"] = btn_texts
+    log(f"버튼 목록: {btn_texts}")
 
     browser.close()
 
