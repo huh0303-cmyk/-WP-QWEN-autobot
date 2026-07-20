@@ -28,18 +28,34 @@ async def main():
         print("로그인 페이지 url:", page.url)
         await page.screenshot(path="step2_loginpage.png", full_page=True)
 
+        # "이메일/판매자 아이디로 로그인" 탭 클릭
+        email_tab = page.locator("text=이메일/판매자 아이디로 로그인")
+        if await email_tab.count() > 0:
+            await email_tab.first.click()
+            await page.wait_for_timeout(1500)
+        await page.screenshot(path="step2b_email_tab.png", full_page=True)
+
+        # 필드 덤프
+        all_inputs = await page.locator("input").all()
+        for i in all_inputs:
+            iid = await i.get_attribute("id")
+            name = await i.get_attribute("name")
+            typ = await i.get_attribute("type")
+            ph = await i.get_attribute("placeholder")
+            print("필드:", iid, name, typ, ph)
+
         # 아이디/비번 입력
-        id_input = page.locator("#id")
-        pw_input = page.locator("#pw")
+        id_input = page.locator('input[type=text], input[type=email]').first
+        pw_input = page.locator('input[type=password]').first
         if await id_input.count() > 0:
             await id_input.click()
             await page.keyboard.type(NAVER_ID, delay=50)
             await pw_input.click()
             await page.keyboard.type(NAVER_PW, delay=50)
             await page.wait_for_timeout(1000)
-            login_submit = page.locator("#log\\.login")
+            login_submit = page.locator('button[type=submit], button:has-text("로그인")')
             if await login_submit.count() > 0:
-                await login_submit.click()
+                await login_submit.first.click()
             await page.wait_for_timeout(4000)
 
         print("로그인 시도 후 url:", page.url)
