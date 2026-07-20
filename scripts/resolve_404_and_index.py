@@ -26,33 +26,7 @@ WP_REAL_PASSWORD = os.getenv("WP_REAL_PASSWORD", "")
 
 # (사이트, GitHub Secret이름) - Application Password 용
 SITES = [
-    ("https://k-health365.com",        "KHEALTH365COM"),
-    ("https://koreamedicaltour.com",   "KOREAMEDICALTOURCOM"),
-    ("https://koreainvest365.com",     "KOREAINVEST365COM"),
-    ("https://ki-korea.com",           "KIKOREACOM"),
-    ("https://koreainsurance365.com",  "KOREAINSURANCE365COM"),
-    ("https://kfinance365.com",        "KFINANCE365COM"),
-    ("https://koreataxnlaw.com",       "KOREATAXNLAWCOM"),
     ("https://koreacrypto365.com",     "KOREACRYPTO365COM"),
-    ("https://krealestate365.com",     "KREALESTATE365COM"),
-    ("https://ktech365.com",           "KTECH365COM"),
-    ("https://kskin365.com",           "KSKIN365COM"),
-    ("https://oliveyoungkorea.com",    "OLIVEYOUNGKOREACOM"),
-    ("https://kworld365.com",          "KWORLD365COM"),
-    ("https://k-trip365.com",          "KTRIP365COM"),
-    ("https://k-visa365.com",          "KVISA365COM"),
-    ("https://koreawedding365.com",    "KOREAWEDDING365COM"),
-    ("https://kstudy365.com",          "KSTUDY365COM"),
-    ("https://studyinkorea365.com",    "STUDYINKOREA365COM"),
-    ("https://kieca-korea.org",        "KIECAKOREAORG"),
-    ("https://ksa-korea.org",          "KSAKOREAORG"),
-    ("https://sis-korea.com",          "SISKOREACOM"),
-    ("https://jobkorea365.com",        "JOBKOREA365COM"),
-    ("https://jobinkorea365.com",      "JOBINKOREA365COM"),
-    ("https://jobkoreaglobal.com",     "JOBKOREAGLOBALCOM"),
-    ("https://korea365.org",           "KOREA365ORG"),
-    ("https://koreanews365.com",       "KOREANEWS365COM"),
-    ("https://theseouljournal.com",    "THESEOULJOURNALCOM"),
 ]
 
 INDEXNOW_KEY = "907ae08aa52b45239490ed2407df835d"
@@ -129,11 +103,16 @@ def fetch_404_rows(session, site, max_pages=15):
     return all_rows
 
 
-def delete_404_row(session, delete_href):
+def delete_404_row(session, delete_href, log=None):
     try:
-        r = session.get(delete_href, timeout=20)
-        return r.status_code == 200
-    except Exception:
+        r = session.get(delete_href, timeout=20, allow_redirects=True)
+        ok = r.status_code == 200
+        if log and not ok:
+            log(f"    delete 실패: status={r.status_code} url={delete_href[:100]}")
+        return ok
+    except Exception as e:
+        if log:
+            log(f"    delete 예외: {e}")
         return False
 
 
@@ -247,8 +226,11 @@ def main():
             slug = row["slug"]
             delete_href = row["actions"].get("delete")
             if JUNK_RE.search(slug):
-                if delete_href and delete_404_row(s, delete_href):
-                    entry["junk_deleted"] += 1
+                if delete_href:
+                    if delete_404_row(s, delete_href, log):
+                        entry["junk_deleted"] += 1
+                else:
+                    log(f"    ⚠️ delete href 없음: {slug[:60]}")
                 time.sleep(0.2)
                 continue
 
@@ -258,7 +240,7 @@ def main():
                 if fixed > 0:
                     entry["real_fixed"] += fixed
                     if delete_href:
-                        delete_404_row(s, delete_href)
+                        delete_404_row(s, delete_href, log)
                         time.sleep(0.2)
                 else:
                     entry["real_flagged"].append(slug)

@@ -54,7 +54,7 @@ jobs:
         run: |
           git config user.name "resolve-bot"
           git config user.email "resolve-bot@users.noreply.github.com"
-          git pull --rebase origin main
           git add resolve_404_and_index_result.json resolve_404_and_index_report.md
           git commit -m "결과: resolve_404_and_index 실행 로그" || echo "no changes"
+          git pull --rebase origin main
           git push
