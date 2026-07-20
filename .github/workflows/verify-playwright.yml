@@ -1,0 +1,29 @@
+name: Verify Playwright Redirect Flow
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - env:
+          WP_REAL_PASSWORD: ${{ secrets.WP_REAL_PASSWORD }}
+        run: python scripts/verify_playwright_redirect.py
+      - if: always()
+        run: |
+          git config user.name "verify-bot"
+          git config user.email "verify-bot@users.noreply.github.com"
+          git add verify_result.json redirect_form_snapshot.html *.png 2>/dev/null || true
+          git commit -m "결과: verify_playwright_redirect" || echo "no changes"
+          git push
