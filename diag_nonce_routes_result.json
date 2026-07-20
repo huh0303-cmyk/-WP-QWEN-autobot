@@ -1,0 +1,26 @@
+{
+  "nonce": "2d2be02b63",
+  "related": [
+    "/rankmath/v1/updateRedirection"
+  ],
+  "all_routes": [
+    "/rankmath/v1",
+    "/rankmath/v1/saveModule",
+    "/rankmath/v1/toolsAction",
+    "/rankmath/v1/updateMode",
+    "/rankmath/v1/dashboardWidget",
+    "/rankmath/v1/updateSeoScore",
+    "/rankmath/v1/updateSettings",
+    "/rankmath/v1/searchPage",
+    "/rankmath/v1/disconnectSite",
+    "/rankmath/v1/getFeaturedImageId",
+    "/rankmath/v1/updateRedirection",
+    "/rankmath/v1/updateMeta",
+    "/rankmath/v1/updateSchemas",
+    "/rankmath/v1/updateMetaBulk",
+    "/rankmath/v1/links/posts",
+    "/rankmath/v1/links/posts-stats",
+    "/rankmath/v1/links/links",
+    "/rankmath/v1/links/links-stats"
+  ]
+}
