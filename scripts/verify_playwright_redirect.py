@@ -25,7 +25,7 @@ with sync_playwright() as p:
     page = browser.new_page()
 
     # 1) 로그인
-    page.goto(f"{SITE}/wp-login.php", timeout=30000)
+    page.goto(f"{SITE}/wp-login.php", timeout=60000, wait_until="domcontentloaded")
     page.fill("#user_login", WP_USER)
     page.fill("#user_pass", WP_PASS)
     page.click("#wp-submit")
