@@ -26,7 +26,33 @@ WP_REAL_PASSWORD = os.getenv("WP_REAL_PASSWORD", "")
 
 # (사이트, GitHub Secret이름) - Application Password 용
 SITES = [
+    ("https://k-health365.com",        "KHEALTH365COM"),
+    ("https://koreamedicaltour.com",   "KOREAMEDICALTOURCOM"),
+    ("https://koreainvest365.com",     "KOREAINVEST365COM"),
+    ("https://ki-korea.com",           "KIKOREACOM"),
+    ("https://koreainsurance365.com",  "KOREAINSURANCE365COM"),
+    ("https://kfinance365.com",        "KFINANCE365COM"),
+    ("https://koreataxnlaw.com",       "KOREATAXNLAWCOM"),
     ("https://koreacrypto365.com",     "KOREACRYPTO365COM"),
+    ("https://krealestate365.com",     "KREALESTATE365COM"),
+    ("https://ktech365.com",           "KTECH365COM"),
+    ("https://kskin365.com",           "KSKIN365COM"),
+    ("https://oliveyoungkorea.com",    "OLIVEYOUNGKOREACOM"),
+    ("https://kworld365.com",          "KWORLD365COM"),
+    ("https://k-trip365.com",          "KTRIP365COM"),
+    ("https://k-visa365.com",          "KVISA365COM"),
+    ("https://koreawedding365.com",    "KOREAWEDDING365COM"),
+    ("https://kstudy365.com",          "KSTUDY365COM"),
+    ("https://studyinkorea365.com",    "STUDYINKOREA365COM"),
+    ("https://kieca-korea.org",        "KIECAKOREAORG"),
+    ("https://ksa-korea.org",          "KSAKOREAORG"),
+    ("https://sis-korea.com",          "SISKOREACOM"),
+    ("https://jobkorea365.com",        "JOBKOREA365COM"),
+    ("https://jobinkorea365.com",      "JOBINKOREA365COM"),
+    ("https://jobkoreaglobal.com",     "JOBKOREAGLOBALCOM"),
+    ("https://korea365.org",           "KOREA365ORG"),
+    ("https://koreanews365.com",       "KOREANEWS365COM"),
+    ("https://theseouljournal.com",    "THESEOULJOURNALCOM"),
 ]
 
 INDEXNOW_KEY = "907ae08aa52b45239490ed2407df835d"
