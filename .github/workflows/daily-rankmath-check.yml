@@ -1,0 +1,34 @@
+name: Daily Rank Math Health Check (27sites)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "10 20 * * *"   # 매일 05:10 KST
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install requests playwright -q
+          python -m playwright install --with-deps chromium
+      - name: Run daily Rank Math check
+        continue-on-error: true
+        timeout-minutes: 90
+        run: python scripts/daily_rankmath_check.py
+      - name: Commit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add daily_rankmath_report.md
+          git diff --staged --quiet || git commit -m "chore: 일일 Rank Math 점검 리포트 [skip ci]"
+          git push
