@@ -1,0 +1,32 @@
+name: Diag Redirection Form
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run diagnostic
+        env:
+          WP_REAL_PASSWORD: ${{ secrets.WP_REAL_PASSWORD }}
+        run: python scripts/diag_redir_form.py
+      - name: Commit results file
+        if: always()
+        run: |
+          git config user.name "diag-bot"
+          git config user.email "diag-bot@users.noreply.github.com"
+          git add redir_add_page.html
+          git commit -m "결과 업데이트: diag_redir_form 실행 로그" || echo "no changes"
+          git push
