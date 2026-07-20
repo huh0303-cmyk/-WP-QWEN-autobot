@@ -820,7 +820,6 @@ jobs:
           path: ~/.cache/pip
           key: pip-autopost-v4
       - run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
-        run: sleep 15
       - name: "📝 오토포스팅 Slot ${{ needs.determine-slot.outputs.slot }}"
         env:
           RUN_SLOT:             ${{ needs.determine-slot.outputs.slot }}
