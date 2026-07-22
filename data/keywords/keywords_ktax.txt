@@ -1,14 +1,12 @@
-Korea business registration foreigner
-Korea LLC setup cost
-foreign startup visa Korea
-Korea branch office setup
-
-Korea income tax foreigner
-HomeTax guide English
-Korea corporate tax rate
-Korea VAT filing guide
-
-Korea D-8 visa
-F-2 visa requirements
-Korea investor visa
-Korea business visa extension
+Korea business registration foreigner	Business Setup
+Korea LLC setup cost	Business Setup
+foreign startup visa Korea	Business Setup
+Korea branch office setup	Business Setup
+Korea income tax foreigner	Tax Filing
+HomeTax guide English	Tax Filing
+Korea corporate tax rate	Tax Filing
+Korea VAT filing guide	Tax Filing
+Korea D-8 visa	Visa
+F-2 visa requirements	Visa
+Korea investor visa	Visa
+Korea business visa extension	Visa
