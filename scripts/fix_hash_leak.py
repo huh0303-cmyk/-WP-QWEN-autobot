@@ -54,7 +54,149 @@ def log(m=""):
     print(m)
     _LOG.append(str(m))
 
-def load_comments(path):
+# 2026-07-22 정리 작업 당시 keywords_*.txt에 있던 '#카테고리명' 주석 원본
+# (정리 스크립트가 파일에서 주석을 이미 제거했기 때문에, 발행완료 글 스캔용으로 하드코딩)
+LEAKED_COMMENTS = {
+    "https://k-health365.com": [
+        "건강영양성분소개",
+        "질병별대처법",
+        "건강정보"
+    ],
+    "https://koreamedicaltour.com": [
+        "Cosmetic Surgery",
+        "Government Support",
+        "Hospital Costs"
+    ],
+    "https://koreainvest365.com": [
+        "Crypto & Digital",
+        "Korea Funds & ETF",
+        "Korea Stocks"
+    ],
+    "https://ki-korea.com": [
+        "연금(Pension)",
+        "부동산(Real Estate)",
+        "주식(Stocks)"
+    ],
+    "https://koreainsurance365.com": [
+        "Auto Insurance",
+        "Dental Insurance",
+        "Health Insurance"
+    ],
+    "https://kfinance365.com": [
+        "Banking",
+        "Investing",
+        "Tax Refund"
+    ],
+    "https://koreataxnlaw.com": [
+        "Business Setup",
+        "Tax Filing",
+        "Visa"
+    ],
+    "https://koreacrypto365.com": [
+        "Exchanges",
+        "Investing",
+        "Regulations"
+    ],
+    "https://krealestate365.com": [
+        "Apartments",
+        "Commercial",
+        "Loans"
+    ],
+    "https://ktech365.com": [
+        "AI",
+        "Semiconductors",
+        "Startups"
+    ],
+    "https://kskin365.com": [
+        "Ingredients",
+        "Routines",
+        "Skincare"
+    ],
+    "https://oliveyoungkorea.com": [
+        "Skincare",
+        "Top Products",
+        "Wellness",
+        "추가"
+    ],
+    "https://kworld365.com": [
+        "K-Pop",
+        "Learn Korean",
+        "Travel"
+    ],
+    "https://k-trip365.com": [
+        "AirBnB & Stays",
+        "Hotels & Stays",
+        "Travel Guides"
+    ],
+    "https://k-visa365.com": [
+        "Long-term Visa",
+        "Student Visa",
+        "Work Visa"
+    ],
+    "https://koreawedding365.com": [
+        "Marriage",
+        "Matching",
+        "Education",
+        "추가"
+    ],
+    "https://kstudy365.com": [
+        "Scholarships",
+        "Study Korea",
+        "Student Life",
+        "추가"
+    ],
+    "https://studyinkorea365.com": [
+        "Admissions",
+        "Campus Life",
+        "Scholarships",
+        "추가"
+    ],
+    "https://kieca-korea.org": [
+        "Careers",
+        "Culture",
+        "Language"
+    ],
+    "https://ksa-korea.org": [
+        "Admissions",
+        "Scholarships",
+        "Visa",
+        "추가"
+    ],
+    "https://sis-korea.com": [
+        "Programs",
+        "Scholarships",
+        "TOPIK",
+        "추가"
+    ],
+    "https://jobkorea365.com": [
+        "Jobs",
+        "Salaries",
+        "Work Visa"
+    ],
+    "https://jobinkorea365.com": [
+        "Interviews",
+        "Jobs",
+        "Salaries",
+        "추가"
+    ],
+    "https://jobkoreaglobal.com": [
+        "Foreign Workers",
+        "Hiring",
+        "Salaries"
+    ],
+    "https://korea365.org": [
+        "Culture",
+        "Living",
+        "Travel",
+        "추가"
+    ],
+    "https://koreanews365.com": [],
+    "https://theseouljournal.com": []
+}
+
+def load_comments(path, site_url=None):
+    if site_url and site_url in LEAKED_COMMENTS:
+        return LEAKED_COMMENTS[site_url]
     if not os.path.exists(path):
         return []
     with open(path, encoding="utf-8") as f:
@@ -109,7 +251,7 @@ def process_site(site):
         return {"site": site_url, "fixed": 0, "reviewed": 0}
 
     auth = requests.auth.HTTPBasicAuth(WP_USER, wp_pass)
-    comments = load_comments(site["keywords_file"])
+    comments = load_comments(site["keywords_file"], site_url=site_url)
     if not comments:
         log(f"⏭️  {site_url}: 주석 키워드 없음")
         return {"site": site_url, "fixed": 0, "reviewed": 0}
