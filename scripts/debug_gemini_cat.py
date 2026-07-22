@@ -18,7 +18,7 @@ for title, cand_str in tests:
     try:
         resp = ap.gemini_client.models.generate_content(
             model=ap.GEMINI_MODEL_FALLBACK, contents=gprompt,
-            config={"temperature":0.1,"max_output_tokens":20})
+            config={"temperature":0.1,"max_output_tokens":300,"thinking_config":{"thinking_budget":0}})
         print(f"제목: {title}")
         print(f"  응답 repr: {repr(resp.text)}")
     except Exception as e:
