@@ -1,20 +1,18 @@
-외국인 취업비자
-한국 인턴십 프로그램
-외국인 채용박람회
-한국 기업 인턴 지원
-외국인 창업비자
-
-한국 전통문화 체험
-한복 체험 프로그램
-사찰 체험 프로그램
-한국 다도 체험
-전통시장 체험 프로그램
-한국 명절 문화
-
-한국어 초급 회화
-TOPIK 단기 완성
-한국어 발음 교정
-한국어 듣기 연습
-한국어 작문 연습
-비즈니스 한국어
-한국어 회화 스터디
+외국인 취업비자	Careers
+한국 인턴십 프로그램	Careers
+외국인 채용박람회	Careers
+한국 기업 인턴 지원	Careers
+외국인 창업비자	Careers
+한국 전통문화 체험	Culture
+한복 체험 프로그램	Culture
+사찰 체험 프로그램	Culture
+한국 다도 체험	Culture
+전통시장 체험 프로그램	Culture
+한국 명절 문화	Culture
+한국어 초급 회화	Language
+TOPIK 단기 완성	Language
+한국어 발음 교정	Language
+한국어 듣기 연습	Language
+한국어 작문 연습	Language
+비즈니스 한국어	Language
+한국어 회화 스터디	Language
