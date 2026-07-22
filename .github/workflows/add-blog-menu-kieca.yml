@@ -1,0 +1,33 @@
+name: Add Blog Menu Item (kieca-korea.org)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  add-menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+
+      - name: "kieca-korea.org 메뉴에 Blog 항목 추가"
+        env:
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+        run: python scripts/add_blog_menu_kieca.py
+
+      - name: "결과 커밋"
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add add_blog_menu_kieca_result.json
+          git commit -m "결과: kieca-korea.org Blog 메뉴 추가 로그" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
