@@ -1,17 +1,15 @@
-IRP 세액공제
-연금저축 세액공제
-퇴직연금 수익률
-국민연금 수령액 계산
-개인연금 추천
-
-청약 당첨 전략
-분양권 전매
-재개발 투자
-갭투자 방법
-전세보증금 반환보증
-
-배당주 추천
-미국주식 세금
-ISA계좌 추천
-공모주 청약방법
-퇴직금 굴리기
+IRP 세액공제	Etc
+연금저축 세액공제	Etc
+퇴직연금 수익률	Etc
+국민연금 수령액 계산	Etc
+개인연금 추천	Etc
+청약 당첨 전략	Real Estate
+분양권 전매	Real Estate
+재개발 투자	Real Estate
+갭투자 방법	Real Estate
+전세보증금 반환보증	Real Estate
+배당주 추천	Stocks
+미국주식 세금	Stocks
+ISA계좌 추천	Stocks
+공모주 청약방법	Stocks
+퇴직금 굴리기	Stocks
