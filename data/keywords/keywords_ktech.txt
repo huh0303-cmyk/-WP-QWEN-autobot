@@ -1,14 +1,12 @@
-Korea AI startups 2026
-Naver AI models
-Korea AI regulation
-Korea AI chip industry
-
-Samsung HBM chips
-SK Hynix news
-Korea chip subsidy
-Korea semiconductor exports
-
-Korea startup visa
-Seoul tech accelerator
-Korea unicorn startups
-Korea startup funding guide
+Korea AI startups 2026	AI
+Naver AI models	AI
+Korea AI regulation	AI
+Korea AI chip industry	AI
+Samsung HBM chips	Semiconductors
+SK Hynix news	Semiconductors
+Korea chip subsidy	Semiconductors
+Korea semiconductor exports	Semiconductors
+Korea startup visa	Startups
+Seoul tech accelerator	Startups
+Korea unicorn startups	Startups
+Korea startup funding guide	Startups
