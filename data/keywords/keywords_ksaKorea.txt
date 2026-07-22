@@ -1,15 +1,12 @@
-대학원 입학 서류
-편입학 조건
-학사편입 절차
-
-국비장학생 조건
-대학 전액장학금
-지자체 유학생 장학금
-
-D-2비자 연장
-유학생 비자 조건
-출국확인서 발급
-
+대학원 입학 서류	Admissions
+편입학 조건	Admissions
+학사편입 절차	Admissions
+국비장학생 조건	Scholarships
+대학 전액장학금	Scholarships
+지자체 유학생 장학금	Scholarships
+D-2비자 연장	Visa
+유학생 비자 조건	Visa
+출국확인서 발급	Visa
 어학연수 준비물
 학위과정 유학 절차
 유학생 아르바이트 비자
