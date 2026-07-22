@@ -1,12 +1,10 @@
-F-4 visa Korea
-F-2 visa points system
-Korea marriage visa
-Korea permanent residency F-5
-
-D-4 visa Korea
-D-2 student visa guide
-Korea visa extension student
-
-E-7 visa Korea
-Korea work visa sponsorship
-E-9 visa Korea guide
+F-4 visa Korea	Long-term Visa
+F-2 visa points system	Long-term Visa
+Korea marriage visa	Long-term Visa
+Korea permanent residency F-5	Long-term Visa
+D-4 visa Korea	Student Visa
+D-2 student visa guide	Student Visa
+Korea visa extension student	Student Visa
+E-7 visa Korea	Work Visa
+Korea work visa sponsorship	Work Visa
+E-9 visa Korea guide	Work Visa
