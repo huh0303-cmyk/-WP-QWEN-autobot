@@ -1,0 +1,37 @@
+name: Recategorize Fallback Posts (Etc/기타 재분류)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  recat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml -q
+
+      - name: "Etc/기타 카테고리 글 재분류"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/recategorize_fallback_posts.py
+
+      - name: "결과 커밋"
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add recategorize_fallback_result.json
+          git commit -m "결과: Etc/기타 재분류 로그" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
