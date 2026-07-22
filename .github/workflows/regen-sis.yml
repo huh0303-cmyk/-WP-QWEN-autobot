@@ -1,0 +1,36 @@
+name: Regenerate SIS Placeholder Post (sis-korea.com)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml -q
+
+      - name: "sis-korea.com 플레이스홀더 글 재작성 (Scholarships)"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PIXABAY_KEY:    ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY:     ${{ secrets.PEXELS_KEY }}
+          SISKOREACOM:    ${{ secrets.SISKOREACOM }}
+        run: python scripts/regenerate_sis_placeholder.py
+
+      - name: "결과 커밋"
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add regenerate_sis_placeholder_result.txt
+          git commit -m "결과: sis-korea 플레이스홀더 글 재작성 로그" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
