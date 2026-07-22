@@ -1,14 +1,11 @@
-# AirBnB & Stays
 Seoul Airbnb guide
 Korea guesthouse booking
 
-# Hotels & Stays
 best Seoul hotels
 Busan hotel recommendations
 Korea hanok stay
 Jeju resort guide
 
-# Travel Guides
 Seoul itinerary 3 days
 Jeju travel guide
 Korea train pass guide
