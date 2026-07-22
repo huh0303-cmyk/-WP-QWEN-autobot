@@ -1,32 +1,152 @@
-⏭️  https://k-health365.com: 주석 키워드 없음
-⏭️  https://koreamedicaltour.com: 주석 키워드 없음
-⏭️  https://koreainvest365.com: 주석 키워드 없음
-⏭️  https://ki-korea.com: 주석 키워드 없음
-⏭️  https://koreainsurance365.com: 주석 키워드 없음
-⏭️  https://kfinance365.com: 주석 키워드 없음
-⏭️  https://koreataxnlaw.com: 주석 키워드 없음
-⏭️  https://koreacrypto365.com: 주석 키워드 없음
-⏭️  https://krealestate365.com: 주석 키워드 없음
-⏭️  https://ktech365.com: 주석 키워드 없음
-⏭️  https://kskin365.com: 주석 키워드 없음
-⏭️  https://oliveyoungkorea.com: 주석 키워드 없음
-⏭️  https://kworld365.com: 주석 키워드 없음
-⏭️  https://k-trip365.com: 주석 키워드 없음
-⏭️  https://k-visa365.com: 주석 키워드 없음
-⏭️  https://koreawedding365.com: 주석 키워드 없음
-⏭️  https://kstudy365.com: 주석 키워드 없음
-⏭️  https://studyinkorea365.com: 주석 키워드 없음
-⏭️  https://kieca-korea.org: 주석 키워드 없음
-⏭️  https://ksa-korea.org: 주석 키워드 없음
-⏭️  https://sis-korea.com: 주석 키워드 없음
-⏭️  https://jobkorea365.com: 주석 키워드 없음
-⏭️  https://jobinkorea365.com: 주석 키워드 없음
-⏭️  https://jobkoreaglobal.com: 주석 키워드 없음
-⏭️  https://korea365.org: 주석 키워드 없음
+
+=== https://k-health365.com (주석 3개: ['건강영양성분소개', '질병별대처법', '건강정보']) ===
+  발행글 208건 로드
+    🏷️ 태그 정리: '# 건강영양성분소개' -> '건강영양성분소개'
+  ✅ 수정완료 ('건강영양성분소개'): https://k-health365.com/%ea%b1%b4%ea%b0%95%ec%98%81%ec%96%91%ec%84%b1%eb%b6%84%ec%86%8c%ea%b0%9c%ec%97%90%ec%84%9c-%ec%82%ac%eb%9e%8c%eb%93%a4%ec%9d%b4-%ec%9e%90%ec%a3%bc-%ed%95%98%eb%8a%94-3%ea%b0%80%ec%a7%80-%ec%8b%a4/
+
+=== https://koreamedicaltour.com (주석 3개: ['Cosmetic Surgery', 'Government Support', 'Hospital Costs']) ===
+  발행글 96건 로드
+    🏷️ 태그 정리: '# Hospital Costs' -> 'Hospital Costs'
+  ✅ 수정완료 ('Hospital Costs'): https://koreamedicaltour.com/debunking-common-myths-about-hospital-costs/
+
+=== https://koreainvest365.com (주석 3개: ['Crypto & Digital', 'Korea Funds & ETF', 'Korea Stocks']) ===
+  발행글 68건 로드
+  ✅ 수정완료 ('Korea Funds & ETF'): https://koreainvest365.com/how-to-actually-handle-korea-funds-etf-a-specialists-guide/
+
+=== https://ki-korea.com (주석 3개: ['연금(Pension)', '부동산(Real Estate)', '주식(Stocks)']) ===
+  발행글 51건 로드
+
+=== https://koreainsurance365.com (주석 3개: ['Auto Insurance', 'Dental Insurance', 'Health Insurance']) ===
+  발행글 90건 로드
+
+=== https://kfinance365.com (주석 3개: ['Banking', 'Investing', 'Tax Refund']) ===
+  발행글 75건 로드
+    🏷️ 태그 정리: '# Investing' -> 'Investing'
+    🏷️ 태그 정리: '#Investing' -> 'Investing'
+  ✅ 수정완료 ('Investing'): https://kfinance365.com/before-you-try-investing-read-this-first/
+
+=== https://koreataxnlaw.com (주석 3개: ['Business Setup', 'Tax Filing', 'Visa']) ===
+  발행글 86건 로드
+    🏷️ 태그 정리: '# Business Setup' -> 'Business Setup'
+  ✅ 수정완료 ('Business Setup'): https://koreataxnlaw.com/business-setup-frequently-overlooked-facts/
+  ✅ 수정완료 ('Business Setup'): https://koreataxnlaw.com/business-setup-warning-signs-you-should-never-ignore/
+
+=== https://koreacrypto365.com (주석 3개: ['Exchanges', 'Investing', 'Regulations']) ===
+  발행글 63건 로드
+    🏷️ 태그 정리: '# Regulations' -> 'Regulations'
+    🏷️ 태그 정리: '#Regulations' -> 'Regulations'
+  ✅ 수정완료 ('Regulations'): https://koreacrypto365.com/why-does-regulations-cause-problems-experts-explain/
+
+=== https://krealestate365.com (주석 3개: ['Apartments', 'Commercial', 'Loans']) ===
+  발행글 47건 로드
+    🏷️ 태그 정리: '# Loans' -> 'Loans'
+  ✅ 수정완료 ('Loans'): https://krealestate365.com/how-to-actually-handle-loans-a-specialists-guide/
+
+=== https://ktech365.com (주석 3개: ['AI', 'Semiconductors', 'Startups']) ===
+  발행글 61건 로드
+    🏷️ 태그 정리: '# Semiconductors' -> 'Semiconductors'
+    🏷️ 태그 정리: '# Semiconductors 2026' -> 'Semiconductors 2026'
+    🏷️ 태그 정리: '# Semiconductors benefits' -> 'Semiconductors benefits'
+    🏷️ 태그 정리: '# Semiconductors best' -> 'Semiconductors best'
+    🏷️ 태그 정리: '# Semiconductors comparison' -> 'Semiconductors comparison'
+    🏷️ 태그 정리: '# Semiconductors guide' -> 'Semiconductors guide'
+    🏷️ 태그 정리: '# Semiconductors how to' -> 'Semiconductors how to'
+    🏷️ 태그 정리: '# Semiconductors Korea' -> 'Semiconductors Korea'
+    🏷️ 태그 정리: '# Semiconductors review' -> 'Semiconductors review'
+    🏷️ 태그 정리: '# Semiconductors tips' -> 'Semiconductors tips'
+  ✅ 수정완료 ('Semiconductors'): https://ktech365.com/semiconductors-warning-signs-you-should-never-ignore/
+  ✅ 수정완료 ('AI'): https://ktech365.com/how-ai-is-revolutionizing-the-korean-edtech-market/
+
+=== https://kskin365.com (주석 3개: ['Ingredients', 'Routines', 'Skincare']) ===
+  발행글 80건 로드
+    🏷️ 태그 정리: '# Skincare' -> 'Skincare'
+    🏷️ 태그 정리: '#Skincare' -> 'Skincare'
+  ✅ 수정완료 ('Skincare'): https://kskin365.com/skincare-warning-signs-you-should-never-ignore/
+  ✅ 수정완료 ('Skincare'): https://kskin365.com/korean-glass-skin-guide/
+
+=== https://oliveyoungkorea.com (주석 4개: ['Skincare', 'Top Products', 'Wellness', '추가']) ===
+  발행글 58건 로드
+    🏷️ 태그 정리: '# Wellness' -> 'Wellness'
+  ✅ 수정완료 ('Wellness'): https://oliveyoungkorea.com/behind-the-scenes-what-wellness-actually-involves/
+  ✅ 수정완료 ('Wellness'): https://oliveyoungkorea.com/the-rise-of-inner-beauty-trends-in-south-korea/
+
+=== https://kworld365.com (주석 3개: ['K-Pop', 'Learn Korean', 'Travel']) ===
+  발행글 72건 로드
+    🏷️ 태그 정리: '# ═══ [K-Pop &amp; Artists] ═══' -> '═══ [K-Pop &amp; Artists] ═══'
+    🏷️ 태그 정리: '# K-Pop' -> 'K-Pop'
+  ✅ 수정완료 ('K-Pop'): https://kworld365.com/before-you-try-korean-phrases-for-beginners-read-this-first/
+  ✅ 수정완료 ('K-Pop'): https://kworld365.com/k-pop-explained-in-plain-english/
+
+=== https://k-trip365.com (주석 3개: ['AirBnB & Stays', 'Hotels & Stays', 'Travel Guides']) ===
+  발행글 61건 로드
+  ✅ 수정완료 ('Hotels & Stays'): https://k-trip365.com/8-things-about-hotels-stays-your-doctor-wants-you-to-know/
+
+=== https://k-visa365.com (주석 3개: ['Long-term Visa', 'Student Visa', 'Work Visa']) ===
+  발행글 64건 로드
+    🏷️ 태그 정리: '# Long-term Visa' -> 'Long-term Visa'
+  ✅ 수정완료 ('Long-term Visa'): https://k-visa365.com/the-truth-about-long-term-visa-that-most-people-get-wrong/
+
+=== https://koreawedding365.com (주석 4개: ['Marriage', 'Matching', 'Education', '추가']) ===
+  발행글 50건 로드
+
+=== https://kstudy365.com (주석 4개: ['Scholarships', 'Study Korea', 'Student Life', '추가']) ===
+  발행글 52건 로드
+
+=== https://studyinkorea365.com (주석 4개: ['Admissions', 'Campus Life', 'Scholarships', '추가']) ===
+  발행글 42건 로드
+
+=== https://kieca-korea.org (주석 3개: ['Careers', 'Culture', 'Language']) ===
+  발행글 61건 로드
+
+=== https://ksa-korea.org (주석 4개: ['Admissions', 'Scholarships', 'Visa', '추가']) ===
+  발행글 38건 로드
+
+=== https://sis-korea.com (주석 4개: ['Programs', 'Scholarships', 'TOPIK', '추가']) ===
+  발행글 46건 로드
+    🏷️ 태그 정리: '# 추가' -> '추가'
+  🟡 REVIEW(플레이스홀더 '추가'): https://sis-korea.com/topik-vocabulary-list-101-what-first-timers-should-know/
+  🟡 REVIEW(플레이스홀더 '추가'): https://sis-korea.com/why-does-%ec%b6%94%ea%b0%80-cause-problems-experts-explain/
+    🏷️ 태그 정리: '# TOPIK' -> 'TOPIK'
+  ✅ 수정완료 ('TOPIK'): https://sis-korea.com/the-truth-about-topik-that-most-people-get-wrong/
+  ✅ 수정완료 ('Scholarships'): https://sis-korea.com/strategic-preparation-for-international-students-12-year-track/
+
+=== https://jobkorea365.com (주석 3개: ['Jobs', 'Salaries', 'Work Visa']) ===
+  발행글 53건 로드
+    🏷️ 태그 정리: '# Work Visa' -> 'Work Visa'
+  ✅ 수정완료 ('Work Visa'): https://jobkorea365.com/study-reveals-9-in-10-people-misunderstand-work-visa/
+  ✅ 수정완료 ('Work Visa'): https://jobkorea365.com/debunking-common-myths-about-work-visa/
+
+=== https://jobinkorea365.com (주석 4개: ['Interviews', 'Jobs', 'Salaries', '추가']) ===
+  발행글 47건 로드
+
+=== https://jobkoreaglobal.com (주석 3개: ['Foreign Workers', 'Hiring', 'Salaries']) ===
+  발행글 58건 로드
+
+=== https://korea365.org (주석 4개: ['Culture', 'Living', 'Travel', '추가']) ===
+  발행글 79건 로드
+  ✅ 수정완료 ('Travel'): https://korea365.org/comprehensive-guide-to-south-koreas-visa-categories/
+  ✅ 수정완료 ('Travel'): https://korea365.org/a-guide-to-korean-table-etiquette-and-dining-manners/
+  ✅ 수정완료 ('Living'): https://korea365.org/how-to-find-and-rent-an-apartment-in-south-korea/
 ⏭️  https://koreanews365.com: 주석 키워드 없음
 ⏭️  https://theseouljournal.com: 주석 키워드 없음
 
 
 ========== 최종 요약 ==========
+  https://k-health365.com: 수정 1건, 검토필요 0건
+  https://koreamedicaltour.com: 수정 1건, 검토필요 0건
+  https://koreainvest365.com: 수정 1건, 검토필요 0건
+  https://kfinance365.com: 수정 1건, 검토필요 0건
+  https://koreataxnlaw.com: 수정 2건, 검토필요 0건
+  https://koreacrypto365.com: 수정 1건, 검토필요 0건
+  https://krealestate365.com: 수정 1건, 검토필요 0건
+  https://ktech365.com: 수정 2건, 검토필요 0건
+  https://kskin365.com: 수정 2건, 검토필요 0건
+  https://oliveyoungkorea.com: 수정 2건, 검토필요 0건
+  https://kworld365.com: 수정 2건, 검토필요 0건
+  https://k-trip365.com: 수정 1건, 검토필요 0건
+  https://k-visa365.com: 수정 1건, 검토필요 0건
+  https://sis-korea.com: 수정 2건, 검토필요 2건
+  https://jobkorea365.com: 수정 2건, 검토필요 0건
+  https://korea365.org: 수정 3건, 검토필요 0건
 
-총 수정: 0건 / 검토필요(플레이스홀더): 0건
+총 수정: 25건 / 검토필요(플레이스홀더): 2건
