@@ -1,12 +1,10 @@
-Seoul apartment for foreigners
-jeonse vs monthly rent
-Korea apartment buying guide
-Korea apartment deposit scam
-
-Korea office lease guide
-commercial real estate Seoul
-Korea retail lease contract
-
-Korea mortgage foreigner
-Korea housing loan rate
-Korea real estate loan LTV
+Seoul apartment for foreigners	Apartments
+jeonse vs monthly rent	Apartments
+Korea apartment buying guide	Apartments
+Korea apartment deposit scam	Apartments
+Korea office lease guide	Commercial
+commercial real estate Seoul	Commercial
+Korea retail lease contract	Commercial
+Korea mortgage foreigner	Loans
+Korea housing loan rate	Loans
+Korea real estate loan LTV	Loans
