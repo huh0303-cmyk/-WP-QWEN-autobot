@@ -1,29 +1,27 @@
-rhinoplasty Korea cost
-double eyelid surgery Korea
-liposuction Korea price
-facial contouring Korea
-Botox Korea price
-Gangnam plastic surgery
-laser skin treatment Korea
-jaw surgery Korea
-breast surgery Korea cost
-non-surgical facelift Korea
-acne scar treatment Korea
-hair transplant Korea cost
-
-KHIDI medical tourism
-foreigner health subsidy Korea
-medical tourism agency Korea
-Korea global healthcare center
-medical interpreter Korea
-insurance for medical tourists Korea
-Korea medical visa support
-
-Korea hospital price comparison
-health checkup package Korea
-Severance Hospital cost
-Samsung Medical Center price
-cancer treatment cost Korea
-IVF cost Korea
-dental implant cost Korea
-knee replacement cost Korea
+rhinoplasty Korea cost	Cosmetic Surgery
+double eyelid surgery Korea	Cosmetic Surgery
+liposuction Korea price	Cosmetic Surgery
+facial contouring Korea	Cosmetic Surgery
+Botox Korea price	Cosmetic Surgery
+Gangnam plastic surgery	Cosmetic Surgery
+laser skin treatment Korea	Cosmetic Surgery
+jaw surgery Korea	Cosmetic Surgery
+breast surgery Korea cost	Cosmetic Surgery
+non-surgical facelift Korea	Cosmetic Surgery
+acne scar treatment Korea	Cosmetic Surgery
+hair transplant Korea cost	Cosmetic Surgery
+KHIDI medical tourism	Government Support
+foreigner health subsidy Korea	Government Support
+medical tourism agency Korea	Government Support
+Korea global healthcare center	Government Support
+medical interpreter Korea	Government Support
+insurance for medical tourists Korea	Government Support
+Korea medical visa support	Government Support
+Korea hospital price comparison	Hospital Costs
+health checkup package Korea	Hospital Costs
+Severance Hospital cost	Hospital Costs
+Samsung Medical Center price	Hospital Costs
+cancer treatment cost Korea	Hospital Costs
+IVF cost Korea	Hospital Costs
+dental implant cost Korea	Hospital Costs
+knee replacement cost Korea	Hospital Costs
