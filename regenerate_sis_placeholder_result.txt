@@ -1,0 +1,2 @@
+target_old_url=https://sis-korea.com/why-does-%ec%b6%94%ea%b0%80-cause-problems-experts-explain/
+result={'ok': True, 'post_id': 1838, 'url': 'https://sis-korea.com/is-scholarships-really-worth-it-an-honest-breakdown/', 'author': 'Catherine Han', 'category': 'Career Programs'}
