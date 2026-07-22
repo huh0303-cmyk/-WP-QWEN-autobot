@@ -1595,7 +1595,7 @@ def load_keyword(filename, site_url, fallback):
     try:
         if os.path.exists(filename):
             with open(filename,'r',encoding='utf-8') as f:
-                kws=[l.strip() for l in f if l.strip()]
+                kws=[l.strip() for l in f if l.strip() and not l.strip().startswith('#')]
             pool=[k for k in kws if k not in used] or kws
             ch=random.choice(pool); used.add(ch); return ch
     except: pass
