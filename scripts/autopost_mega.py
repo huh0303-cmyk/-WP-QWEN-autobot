@@ -1601,6 +1601,33 @@ def load_keyword(filename, site_url, fallback):
     except: pass
     return fallback
 
+_PLACEHOLDER_KEYWORDS = {"추가", "add", "tbd", "todo", "n/a"}
+
+def sanitize_keyword(kw, fallback):
+    """
+    2026-07-22: keywords_*.txt의 '#카테고리명' 주석 줄이 load_keyword()에 그대로
+    뽑혀서 제목/본문/이미지alt/태그에 '#'이 그대로 노출되는 사고가 있었음.
+    load_keyword() 자체는 주석 줄을 걸러내도록 고쳤지만, 혹시 모를 재발(수동으로
+    키워드 파일에 '#'를 다시 넣거나, 다른 경로로 오염된 keyword가 들어오는 경우)에
+    대비해 사용 직전에 한 번 더 방어적으로 검증한다.
+    """
+    if not isinstance(kw, str):
+        return fallback
+    kw = kw.strip()
+    if kw.startswith('#'):
+        kw = kw.lstrip('#').strip()
+    if not kw or kw.lower() in _PLACEHOLDER_KEYWORDS:
+        return fallback
+    return kw
+
+def strip_hash_artifacts(text):
+    """발행 직전 최종 방어선: 본문/제목/메타/태그에 '# 단어' 형태로 남은
+    주석·플레이스홀더 잔재를 제거한다. hex color(#eee, #fff 등)나 '#1' 같은
+    숫자 목록 표기는 '#' 뒤에 한글/영문자가 바로 붙는 패턴이 아니므로 건드리지 않는다."""
+    if not isinstance(text, str) or not text:
+        return text
+    return re.sub(r'#[ \t]+(?=[가-힣A-Za-z])', '', text)
+
 def is_site_reachable(site_url, timeout=8):
     try:
         r=requests.head(f"{site_url}/wp-json/",timeout=timeout,allow_redirects=True)
@@ -1868,6 +1895,16 @@ def process_one(site, keyword):
             time.sleep(5)
 
     body,title,meta,faq,tags=best_result
+
+    # ★ 발행 직전 최종 방어선: '#' 잔재 강제 제거 (재발 방지 안전장치)
+    title = strip_hash_artifacts(title)
+    body = strip_hash_artifacts(body)
+    meta = strip_hash_artifacts(meta)
+    if faq:
+        faq = [(strip_hash_artifacts(q), strip_hash_artifacts(a)) for q, a in faq]
+    if tags:
+        tags = [strip_hash_artifacts(t) for t in tags]
+
     if best_score<SEO_TARGET:
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
@@ -1954,6 +1991,8 @@ def main():
         for i in range(n):
             kw=("__news__" if site["mode"] in ("news","news_en")
                 else load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
+            if site["mode"] not in ("news","news_en"):
+                kw=sanitize_keyword(kw, f"{theme} guide 2026")
             if process_one(site,kw): ok+=1
             else: fail+=1
             if i<n-1: time.sleep(random.uniform(10,18))
