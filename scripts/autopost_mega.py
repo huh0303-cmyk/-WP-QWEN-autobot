@@ -193,6 +193,15 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
     if not real:
         return cats[0][0]
 
+    # ★ 키워드 파일에 명시된 카테고리 태그가 있으면 최우선으로 사용 (2026-07-22)
+    #   (기존엔 이 정보 자체가 없어서 매번 눈먼 텍스트매칭/AI호출에 의존했음)
+    hint = _last_keyword_category.get(site_url)
+    if hint:
+        hint_norm = re.sub(r'[\s/,\-]+', '', hint.strip().lower())
+        for cid, n in real:
+            if re.sub(r'[\s/,\-]+', '', n.strip().lower()) == hint_norm:
+                return cid
+
     etc_cat = None
     for cid, n in real:
         if n.strip().lower() in ("etc", "기타", "etc.", "other", "others"):
@@ -1590,15 +1599,48 @@ def ping_indexnow(url, site_url):
 # ============================================================
 _used_kw: dict = {}
 
+_PLACEHOLDER_SECTIONS = {"추가", "add", "tbd", "todo", "n/a", "etc", "기타", "misc", "other", "others"}
+_last_keyword_category = {}  # site_url -> 이번에 뽑힌 키워드의 카테고리 힌트 (있으면)
+
 def load_keyword(filename, site_url, fallback):
+    """
+    2026-07-22: keywords_*.txt 포맷을 '# 카테고리' 주석 방식에서
+    '키워드<TAB>카테고리명' 명시적 태그 방식으로 변경.
+    - 예전 방식은 주석 줄을 실제 키워드로 잘못 뽑아버리는 사고(load_keyword 오염 버그)로
+      이어졌고, 설령 그 버그를 막아도 카테고리 정보 자체가 통째로 유실되어
+      pick_best_category()가 영어 카테고리명 vs 한글 키워드를 억지로 매칭해야 했음
+      (예: kieca-korea.org 글의 18%가 전부 'Etc'로 잘못 분류됨).
+    - 새 포맷은 탭으로 카테고리를 명시하므로 '#'이 파일에 아예 없어 원천적으로
+      안전하고, 카테고리 정보도 유실되지 않는다.
+    - 탭이 없는 줄(기존 파일과 100% 호환)은 그냥 키워드로만 취급.
+    """
     used = _used_kw.setdefault(site_url, set())
+    _last_keyword_category.pop(site_url, None)
     try:
         if os.path.exists(filename):
-            with open(filename,'r',encoding='utf-8') as f:
-                kws=[l.strip() for l in f if l.strip() and not l.strip().startswith('#')]
-            pool=[k for k in kws if k not in used] or kws
-            ch=random.choice(pool); used.add(ch); return ch
-    except: pass
+            entries = []  # (keyword, category_or_None)
+            with open(filename, 'r', encoding='utf-8') as f:
+                for line in f:
+                    s = line.strip()
+                    if not s or s.startswith('#'):
+                        continue
+                    if '\t' in s:
+                        kw_part, cat_part = s.split('\t', 1)
+                        kw_part = kw_part.strip()
+                        cat_part = cat_part.strip()
+                        cat = cat_part if (cat_part and cat_part.lower() not in _PLACEHOLDER_SECTIONS) else None
+                        entries.append((kw_part, cat))
+                    else:
+                        entries.append((s, None))
+            if entries:
+                pool = [e for e in entries if e[0] not in used] or entries
+                ch = random.choice(pool)
+                used.add(ch[0])
+                if ch[1]:
+                    _last_keyword_category[site_url] = ch[1]
+                return ch[0]
+    except Exception:
+        pass
     return fallback
 
 _PLACEHOLDER_KEYWORDS = {"추가", "add", "tbd", "todo", "n/a"}
