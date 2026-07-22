@@ -1,15 +1,13 @@
-Korea bank account foreigner
-best bank Korea expats
-Korea money transfer app
-Wise Korea remittance
-Korea credit card foreigner
-
-Korea stock account foreigner
-best robo advisor Korea
-Korea ETF for foreigners
-Korea gold investment
-
-Korea tax refund foreigner
-VAT refund Korea shopping
-Korea year end tax settlement
-Korea tax deduction guide
+Korea bank account foreigner	Banking
+best bank Korea expats	Banking
+Korea money transfer app	Banking
+Wise Korea remittance	Banking
+Korea credit card foreigner	Banking
+Korea stock account foreigner	Investing
+best robo advisor Korea	Investing
+Korea ETF for foreigners	Investing
+Korea gold investment	Investing
+Korea tax refund foreigner	Tax Refund
+VAT refund Korea shopping	Tax Refund
+Korea year end tax settlement	Tax Refund
+Korea tax deduction guide	Tax Refund
