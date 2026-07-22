@@ -36,8 +36,12 @@ def main():
     # location이 매핑된(=실제로 화면에 노출되는) 메뉴를 우선 타겟으로 삼는다.
     # 여러 개면 전부에 추가 (상단 메뉴 + 혹시 있는 다른 메뉴 전부 커버)
     used_location_ids = set()
-    for loc, menu_id in (locations.items() if isinstance(locations, dict) else []):
-        used_location_ids.add(menu_id)
+    for loc, loc_data in (locations.items() if isinstance(locations, dict) else []):
+        # loc_data 예: {"name":"primary","menu":2,...} - 실제 menu id는 loc_data["menu"]
+        if isinstance(loc_data, dict) and "menu" in loc_data:
+            used_location_ids.add(loc_data["menu"])
+        elif isinstance(loc_data, int):
+            used_location_ids.add(loc_data)
 
     targets = [m for m in menus if m["id"] in used_location_ids] or menus
 
