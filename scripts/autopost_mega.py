@@ -257,7 +257,11 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
                        f"답(카테고리 이름만):")
             resp = gemini_client.models.generate_content(
                 model=GEMINI_MODEL_FALLBACK, contents=gprompt,
-                config={"temperature":0.1,"max_output_tokens":20})
+                config={"temperature":0.1,"max_output_tokens":300,
+                        "thinking_config":{"thinking_budget":0}})
+            # ★ 버그수정(2026-07-22): max_output_tokens=20이 너무 작아서
+            #   gemini-2.5-flash가 내부 thinking 토큰만 쓰다가 실제 답변 텍스트가
+            #   None으로 나오던 문제. thinking 끄고 토큰 여유를 넉넉히 줌.
             picked = (resp.text or "").strip().strip('."\'')
             for cid2, n in real:
                 if n.strip().lower() == picked.lower():
