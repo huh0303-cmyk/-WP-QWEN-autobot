@@ -1799,8 +1799,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     rank_kw=",".join([keyword]+tags[:4])
     # ★ 발행 시각: 실제 스크립트 실행 시각 그대로 찍히던 걸 KST 기준 ±2시간 랜덤으로 변경
     #   (하루 3번 고정 시각에 실행되다 보니 매번 똑같은 시각처럼 보이던 문제 해결)
-    jitter_min = random.randint(-120, 120)
+    # ★ 2026-07-24 수정: jitter가 +(미래)로 나오면 WP가 status=publish를 무시하고
+    #   강제로 future(예약)로 바꿔버려 "발행 안 됨" 버그의 근본 원인이었음.
+    #   과거 방향으로만 흔들어서 절대 미래 시각이 되지 않도록 수정.
+    jitter_min = random.randint(-120, 0)
     target_kst = now_kst() + timedelta(minutes=jitter_min)
+    if target_kst > now_kst():
+        target_kst = now_kst()
     target_gmt = target_kst - timedelta(hours=9)
     date_str     = target_kst.strftime("%Y-%m-%dT%H:%M:%S")
     date_gmt_str = target_gmt.strftime("%Y-%m-%dT%H:%M:%S")
