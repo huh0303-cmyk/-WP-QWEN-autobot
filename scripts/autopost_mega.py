@@ -45,54 +45,52 @@ MAX_REGEN   = 3
 # ============================================================
 # ★ 기자 풀
 # ============================================================
-REPORTERS_KO = [
-    {"name":"김민준","email":"minjun@koreanews365.com","slug":"minjun-kim","bio":"정치·경제 전문 기자. 10년 경력."},
-    {"name":"이서연","email":"seoyeon@koreanews365.com","slug":"seoyeon-lee","bio":"국제·외교 담당 시니어 기자."},
-    {"name":"박현우","email":"hyunwoo@koreanews365.com","slug":"hyunwoo-park","bio":"경제·금융 분야 전문 기자."},
-    {"name":"최지아","email":"jia@koreanews365.com","slug":"jia-choi","bio":"문화·사회 담당 기자."},
-    {"name":"정재희","email":"jaehee@koreanews365.com","slug":"jaehee-jung","bio":"산업·기술 전문 기자."},
-    {"name":"윤성호","email":"sungho@koreanews365.com","slug":"sungho-yoon","bio":"증권·투자 담당 기자."},
-    {"name":"강다은","email":"daeun@koreanews365.com","slug":"daeun-kang","bio":"생활·복지 전문 기자."},
-    {"name":"임준혁","email":"junhyuk@koreanews365.com","slug":"junhyuk-lim","bio":"사회·법률 담당 기자."},
-    {"name":"한소희","email":"sohee@koreanews365.com","slug":"sohee-han","bio":"교육·보건 전문 기자."},
-    {"name":"오태영","email":"taeyoung@koreanews365.com","slug":"taeyoung-oh","bio":"무역·글로벌 담당 기자."},
-]
-REPORTERS_EN = [
-    {"name":"James Patterson","email":"james@theseouljournal.com","slug":"james-patterson","bio":"Senior politics and economy correspondent."},
-    {"name":"Emily Crawford","email":"emily@theseouljournal.com","slug":"emily-crawford","bio":"Culture and lifestyle editor."},
-    {"name":"Michael Thompson","email":"michael@theseouljournal.com","slug":"michael-thompson","bio":"Business and finance reporter."},
-    {"name":"Sarah Williams","email":"sarah@theseouljournal.com","slug":"sarah-williams","bio":"International affairs correspondent."},
-    {"name":"David Harrison","email":"david@theseouljournal.com","slug":"david-harrison","bio":"Technology and innovation writer."},
-    {"name":"Jessica Kim","email":"jessica@theseouljournal.com","slug":"jessica-kim","bio":"K-culture and entertainment reporter."},
-    {"name":"Robert Park","email":"robert@theseouljournal.com","slug":"robert-park","bio":"Economy and markets analyst."},
-    {"name":"Laura Choi","email":"laura@theseouljournal.com","slug":"laura-choi","bio":"Lifestyle and travel journalist."},
-    {"name":"Daniel Yoon","email":"daniel@theseouljournal.com","slug":"daniel-yoon","bio":"Politics and society reporter."},
-    {"name":"Rachel Lim","email":"rachel@theseouljournal.com","slug":"rachel-lim","bio":"Health and wellness correspondent."},
-]
-REPORTERS_BLOG_EN = [
-    {"name":"Andrew Kim","email":"andrew@contributor.com","slug":"andrew-kim","bio":"Finance and investment specialist writer."},
-    {"name":"Sophia Lee","email":"sophia@contributor.com","slug":"sophia-lee","bio":"Health and wellness expert contributor."},
-    {"name":"Brian Choi","email":"brian@contributor.com","slug":"brian-choi","bio":"Technology and digital trends writer."},
-    {"name":"Hannah Park","email":"hannah@contributor.com","slug":"hannah-park","bio":"Travel and culture journalist."},
-    {"name":"Kevin Yoon","email":"kevin@contributor.com","slug":"kevin-yoon","bio":"Real estate and economy analyst."},
-    {"name":"Grace Jung","email":"grace@contributor.com","slug":"grace-jung","bio":"K-beauty and lifestyle editor."},
-    {"name":"Thomas Lim","email":"thomas@contributor.com","slug":"thomas-lim","bio":"Legal and tax affairs writer."},
-    {"name":"Olivia Shin","email":"olivia@contributor.com","slug":"olivia-shin","bio":"Education and career specialist."},
-    {"name":"Nathan Oh","email":"nathan@contributor.com","slug":"nathan-oh","bio":"Crypto and fintech correspondent."},
-    {"name":"Catherine Han","email":"catherine@contributor.com","slug":"catherine-han","bio":"Medical tourism and healthcare writer."},
-]
-REPORTERS_BLOG_KO = [
-    {"name":"김재원","email":"jaewon@contributor.com","slug":"jaewon-kim","bio":"재테크·금융 전문 칼럼니스트."},
-    {"name":"이미경","email":"mikyung@contributor.com","slug":"mikyung-lee","bio":"건강·의학 전문 작가."},
-    {"name":"박성훈","email":"sunghoon@contributor.com","slug":"sunghoon-park","bio":"부동산·경제 분야 전문 기고자."},
-    {"name":"최수연","email":"suyeon@contributor.com","slug":"suyeon-choi","bio":"교육·유학 전문 칼럼니스트."},
-    {"name":"정민호","email":"minho@contributor.com","slug":"minho-jung","bio":"법률·세무 전문 작가."},
-    {"name":"윤지훈","email":"jihoon@contributor.com","slug":"jihoon-yoon","bio":"투자·주식 전문 기고자."},
-    {"name":"강혜진","email":"hyejin@contributor.com","slug":"hyejin-kang","bio":"웰빙·라이프스타일 전문 작가."},
-    {"name":"임채원","email":"chaewon@contributor.com","slug":"chaewon-lim","bio":"문화·여행 전문 칼럼니스트."},
-    {"name":"한도윤","email":"doyoon@contributor.com","slug":"doyoon-han","bio":"기술·IT 전문 기고자."},
-    {"name":"오승현","email":"seunghyun@contributor.com","slug":"seunghyun-oh","bio":"국제·무역 전문 작가."},
-]
+# ============================================================
+# ★ 2026-07-24 개편: 사이트마다 무작위로 뽑던 기자 40명 풀 → 전체 3명으로 고정
+#   (사이트별 랜덤 선택은 "같은 사이트인데 필자가 매번 바뀌는" 부자연스러움 +
+#    "27개 사이트 도합 40명"이라는 비현실적 규모의 원인이었음)
+#   대신 사이트마다 "이 필자가 이 사이트를 담당한다"는 1:1 고정 배정으로 전환.
+# ============================================================
+AUTHOR_SEOYEON = {"name":"이서연","email":"seoyeon@koreanews365.com","slug":"seoyeon-lee",
+                   "bio":"시사·건강·교육 분야를 두루 다뤄온 10년차 에디터."}
+AUTHOR_SARAH   = {"name":"Sarah Mitchell","email":"sarah.mitchell@contributor.com","slug":"sarah-mitchell",
+                   "bio":"Consultant covering Korea's finance, legal, visa, education, and relocation topics for an international audience."}
+AUTHOR_DANIEL  = {"name":"Daniel Carter","email":"daniel.carter@contributor.com","slug":"daniel-carter",
+                   "bio":"Journalist and lifestyle writer covering Korean culture, travel, tech, and trends for a global audience."}
+
+# 사이트 도메인(부분 문자열) → 고정 필자
+AUTHOR_BY_SITE = {
+    # 이서연 — 한국어 사이트
+    "k-health365.com":      AUTHOR_SEOYEON,
+    "koreanews365.com":     AUTHOR_SEOYEON,
+    "kieca-korea.org":      AUTHOR_SEOYEON,
+    "ksa-korea.org":        AUTHOR_SEOYEON,
+    # Sarah Mitchell — 금융/법률/비자/교육/취업 등 컨설턴트 톤
+    "koreamedicaltour.com": AUTHOR_SARAH,
+    "koreainsurance365.com":AUTHOR_SARAH,
+    "koreataxnlaw.com":     AUTHOR_SARAH,
+    "kfinance365.com":      AUTHOR_SARAH,
+    "koreainvest365.com":   AUTHOR_SARAH,
+    "ki-korea.com":         AUTHOR_SARAH,
+    "krealestate365.com":   AUTHOR_SARAH,
+    "k-visa365.com":        AUTHOR_SARAH,
+    "koreawedding365.com":  AUTHOR_SARAH,
+    "kstudy365.com":        AUTHOR_SARAH,
+    "studyinkorea365.com":  AUTHOR_SARAH,
+    "jobkorea365.com":      AUTHOR_SARAH,
+    "jobinkorea365.com":    AUTHOR_SARAH,
+    "jobkoreaglobal.com":   AUTHOR_SARAH,
+    "sis-korea.com":        AUTHOR_SARAH,
+    # Daniel Carter — 여행/문화/뷰티/테크/뉴스 등 저널리즘·라이프스타일 톤
+    "k-trip365.com":        AUTHOR_DANIEL,
+    "koreacrypto365.com":   AUTHOR_DANIEL,
+    "ktech365.com":         AUTHOR_DANIEL,
+    "kskin365.com":         AUTHOR_DANIEL,
+    "oliveyoungkorea.com":  AUTHOR_DANIEL,
+    "kworld365.com":        AUTHOR_DANIEL,
+    "korea365.org":         AUTHOR_DANIEL,
+    "theseouljournal.com":  AUTHOR_DANIEL,
+}
 
 _wp_author_cache: dict = {}
 
@@ -126,12 +124,13 @@ def get_or_create_wp_author(site_url, wp_pass, reporter):
     cache[slug] = -1; return -1
 
 def pick_reporter(site):
+    """사이트 URL에 매칭되는 고정 필자를 반환. 매칭 실패 시 언어 기준 기본값."""
     url  = site.get("url","")
     lang = site.get("lang","en")
-    if "koreanews365" in url:      return random.choice(REPORTERS_KO)
-    elif "theseouljournal" in url: return random.choice(REPORTERS_EN)
-    elif lang == "ko":             return random.choice(REPORTERS_BLOG_KO)
-    else:                          return random.choice(REPORTERS_BLOG_EN)
+    for domain, author in AUTHOR_BY_SITE.items():
+        if domain in url:
+            return author
+    return AUTHOR_SEOYEON if lang == "ko" else AUTHOR_SARAH
 
 # ============================================================
 # ★★★ 카테고리 — 조회만, 절대 생성 금지 ★★★
@@ -546,15 +545,15 @@ SITE_PERSONA = {
         "cta": "건강식품/영양성분 소개 후 관련 제품 안내로 자연스럽게 연결",
     },
     "https://koreamedicaltour.com": {
-        "persona_en": "Medical tourism consultant with 20 years helping international patients navigate Korean hospitals and government support programs.",
-        "tone": "Problem → solution → procedure → cost.",
+        "persona_en": "10-year medical tourism coordinator writing from real experience accompanying patients through Korean hospitals.",
+        "tone": "Calm, trustworthy first-person account. Real consultation case → information → checklist.",
         "structure": ["Why patients choose Korea (with statistics)","Korean government support programs","Step-by-step: consultation → procedure → recovery","Cost comparison table (Korea vs US/Europe/SE Asia)","Top accredited hospitals","Visa and logistics checklist","FAQ 3 questions"],
         "min_chars": 2500, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreainvest365.com": {
-        "persona_en": "CFA-level investment analyst with 15 years covering Korean capital markets, offering personal consulting on Korea investment strategy.",
-        "tone": "Lead with data and statistics. Make the case for Korea's investment appeal.",
+        "persona_en": "Data-driven market analyst covering Korean capital markets, leaning on figures and indicators over opinion.",
+        "tone": "Analytical, market-briefing format. References charts and indicators.",
         "structure": ["Market snapshot with current key metric","Data comparison table","3 bull case drivers","3 bear case risks","Strategy recommendation with timeframe","Korean regulation context","FAQ 3 questions"],
         "min_chars": 2500, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
@@ -567,58 +566,58 @@ SITE_PERSONA = {
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreainsurance365.com": {
-        "persona_en": "Licensed insurance broker specializing in all insurance types (auto and more) for foreigners in Korea.",
-        "tone": "Eligibility first. Warm, detailed explanation of insurance foreigners often miss. Professional insurance-expert tone.",
+        "persona_en": "Insurance broker with 15 years licensed across all insurance types for foreigners in Korea.",
+        "tone": "Meticulous, comparison-table driven. Eligibility first, then side-by-side simulations by condition.",
         "structure": ["Who needs this (eligibility first)","Coverage comparison table (3 options)","How to apply step by step","Covered vs not covered","Cost and premium breakdown","Common claim mistakes","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://kfinance365.com": {
-        "persona_en": "Financial expert providing Korea investment guides (stocks, real estate, and more) for foreigners.",
-        "tone": "Easy, friendly investment guide for foreigners in Korea.",
+        "persona_en": "Numbers-first financial analyst providing Korea investment guides (stocks, real estate, and more) for foreigners.",
+        "tone": "Analytical, market-briefing format. References charts and indicators.",
         "structure": ["Simple definition (no jargon)","How it works in Korea","Pros and cons table","Step-by-step to get started","Tax implications","Common pitfalls","FAQ 3 questions"],
         "min_chars": 2200, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreataxnlaw.com": {
-        "persona_en": "Korean tax attorney with 20 years of practice specializing in Korean company incorporation (single-founder and multi-founder) for foreigners.",
-        "tone": "Cites law, penalties, current statutes, and tax law. Focus on what foreigners often don't know about incorporation and tax reporting.",
+        "persona_en": "Tax attorney and legal advisor specializing in Korean company incorporation for foreigners.",
+        "tone": "Formal, precise legal writing. Cites statutes and case precedent.",
         "structure": ["Who is affected (applicability)","Legal basis — relevant Korean law","Requirements and deadlines table","Step-by-step compliance guide","Penalties for non-compliance","2026 updates","FAQ 3 questions"],
         "min_chars": 2500, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreacrypto365.com": {
-        "persona_en": "Bithumb/Upbit expert and blockchain researcher who lays out the complete investment sequence for foreigners entering the Korean market.",
-        "tone": "Balanced (no hype, no FUD). Friendly, persuasive explanation of Bithumb/Upbit for foreign investors.",
+        "persona_en": "Ex-trader turned editor covering Bithumb/Upbit and the Korean crypto market.",
+        "tone": "Fast, trendy, uses trader slang. Short breaking-news style pieces.",
         "structure": ["Current Korea market context","Technical explanation (accessible)","Korean FSC/FSS regulation status","Korea vs global data table","Risk assessment","How to access in Korea (Bithumb/Upbit walkthrough)","FAQ 3 questions"],
         "min_chars": 2200, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://krealestate365.com": {
-        "persona_en": "PhD in real estate and licensed agent specializing in jeonse/monthly rent/purchase for foreigners, including bank loan eligibility and terms.",
-        "tone": "Detailed explanation of bank loans for foreigners — eligibility, rates, repayment terms. Data → interpretation → outlook.",
+        "persona_en": "Licensed real estate agent specializing in jeonse/monthly rent/purchase for foreigners.",
+        "tone": "Data-driven regional analysis. Price tables and area reports.",
         "structure": ["Current price data summary (actual transactions, change rate)","Policy background and regulations","Regional price comparison table","Bank loan eligibility and terms for foreigners","Investment vs residence analysis","6-month outlook","Buy/sell checklist","FAQ 3 questions"],
         "min_chars": 2500, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com / link to listed properties",
     },
     "https://ktech365.com": {
-        "persona_en": "Tech and AI-focused journalist covering Korea's AI advancement and breaking tech news.",
-        "tone": "News-magazine style introducing Korea's AI development and latest news.",
+        "persona_en": "IT reporter covering Korea's tech and AI developments.",
+        "tone": "Concise, spec-focused. News/review format.",
         "structure": ["News hook and global significance","Technical background (1 paragraph, no jargon)","Key players in Korea's AI ecosystem","Global competitive context","Industry data table","Expert perspective","What to watch next","FAQ 3 questions"],
         "min_chars": 2200, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://kskin365.com": {
-        "persona_en": "Korean dermatologist-turned-beauty writer covering K-cosmetics, K-beauty, inner glowing, and wellness, with deep dives into popular Daiso skincare items.",
-        "tone": "Detailed, friendly, science-backed explanation of K-cosmetics and K-beauty ingredients.",
-        "structure": ["What your skin needs (science hook)","Ingredient breakdown","Routine step by step","Product type comparison table","Skin type suitability guide","3 myths debunked","FAQ 3 questions"],
+        "persona_en": "Dermatology clinic coordinator focused on the procedures themselves — not medical tourism logistics, but what happens on the treatment table.",
+        "tone": "Gentle, reassuring tone. Before-and-after treatment comparisons.",
+        "structure": ["What brings patients in (gentle, relatable hook)","The procedure itself, step by step","Before vs after comparison","Recovery and aftercare","Product type comparison table","Skin type suitability guide","FAQ 3 questions"],
         "min_chars": 2200, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com / link to featured products",
     },
     "https://oliveyoungkorea.com": {
-        "persona_en": "Top-50 Olive Young product review specialist with ingredient analysis explaining exactly why and where each product works.",
-        "tone": "\"I tried this for 4 weeks\" personal-experience style. Warm, gentle, specific about what worked where and how much.",
-        "structure": ["Why this is trending now","Top picks ranking table (product, price, best for)","Detailed review of top pick","Where to buy: Olive Young in-store vs online","Budget vs premium comparison","Application tips","FAQ 3 questions"],
+        "persona_en": "K-beauty influencer covering Olive Young product reviews and rankings.",
+        "tone": "Upbeat, trendy, uses emojis. Product review/ranking format.",
+        "structure": ["Why this is trending now 🔥","Top picks ranking table (product, price, best for)","Detailed review of top pick","Where to buy: Olive Young in-store vs online","Budget vs premium comparison","Application tips","FAQ 3 questions"],
         "min_chars": 2000, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com / link to featured products",
     },
@@ -630,37 +629,37 @@ SITE_PERSONA = {
         "cta": "Personal consultation request → admin email huh0303@gmail.com / link to concert & merch listings",
     },
     "https://k-trip365.com": {
-        "persona_en": "Korean travel writer covering hotels plus mid/long-term and short-term/monthly/jeonse housing, connected to Hotels.com and Trip.com.",
-        "tone": "Enthusiastic guide connecting readers to hotel bookings, short-term stays, and rental housing options.",
+        "persona_en": "20-something backpacker and local curator sharing Korea travel like talking to a friend.",
+        "tone": "Casual, like texting a friend. Route-by-route vlog style with photo-caption feel.",
         "structure": ["Why visit now (season/event)","Getting there: transport + cost table","Day-by-day itinerary","Where to stay: hotel, short-term, and long-term rental options","Where to eat: 3 specific spots","Local insider tips","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://k-visa365.com": {
-        "persona_en": "Korean immigration consultant who has processed 3,000+ visa applications, focused on student and work visas plus visitor and marriage visas.",
-        "tone": "Detailed, professional checklist-driven explanation.",
+        "persona_en": "Licensed immigration administrator (행정사) focused purely on entry/exit procedures.",
+        "tone": "Formal, procedure-focused. Document checklist driven.",
         "structure": ["Who this visa is for (plain language)","Required documents checklist table","Application process step by step","Processing time and fee breakdown","Top rejection reasons","After approval: next steps","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreawedding365.com": {
         "persona_en": "Wedding planner with 10 years coordinating ceremonies, guiding global men and women who want to socialize with and marry Koreans through the Korea Culture Club (free Korean lessons, procedures, and marriage visa guidance).",
-        "tone": "Warm, organized. Eligibility and legal procedure first, realistic budgets (Korea Culture Club: $100 signup, $100 annual fee, free Korean classes).",
-        "structure": ["What makes this special in Korean weddings","Korea Culture Club membership benefits","Planning timeline and checklist","Budget breakdown table (economy/standard/premium)","Marriage visa procedure","Traditional vs modern comparison","Real couple tips","FAQ 3 questions"],
+        "tone": "Romantic, emotional storytelling built around real couples' stories.",
+        "structure": ["A real couple's story (emotional hook)","What makes this special in Korean weddings","Korea Culture Club membership benefits","Planning timeline and checklist","Budget breakdown table (economy/standard/premium)","Marriage visa procedure","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
         "cta": "Korea Culture Club signup → personal consultation → admin email huh0303@gmail.com",
     },
     "https://kstudy365.com": {
-        "persona_en": "International education advisor who helped 2,000+ students enroll in Korean universities, covering D-4 language programs, D-2 degree programs, D-2/3 grad programs, application methods, and scholarships.",
-        "tone": "Precise online-application advisor. Zero fees, fully accountable Korean-run team.",
+        "persona_en": "Study-abroad counselor (or current international student) who has helped 2,000+ students enroll in Korean universities.",
+        "tone": "Warm, empathetic, like a senior student talking to a junior. Storytelling plus FAQ.",
         "structure": ["Why Korea — statistics on outcomes","Eligibility requirements (D-4/D-2 tracks)","Application timeline table","Total cost breakdown","Scholarship options","Student life honest overview","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
         "cta": "Personal consultation request + study abroad application form (D-4/D-2) → admin email huh0303@gmail.com",
     },
     "https://studyinkorea365.com": {
         "persona_en": "Former international student sharing realistic advice, application methods, and scholarship info based on real experience.",
-        "tone": "Peer mentor, honest personal stories. Precise online-application advisor. Zero fees, fully accountable Korean-run team.",
-        "structure": ["What nobody tells you (honest reality)","Reality vs expectation","Practical how-to from personal experience","Monthly budgeting table","Community resources","3 mistakes to avoid","FAQ 3 questions"],
+        "tone": "Warm, empathetic peer mentor — like a senior student talking to a junior. Storytelling plus FAQ.",
+        "structure": ["An honest look at what studying here is really like","Reality vs expectation","Practical how-to from personal experience","Monthly budgeting table","Community resources","3 mistakes to avoid","FAQ 3 questions"],
         "min_chars": 2000, "tables": 1, "lang": "en",
         "cta": "Personal consultation request + study abroad application form (D-4/D-2) → admin email huh0303@gmail.com",
     },
@@ -674,41 +673,41 @@ SITE_PERSONA = {
     "https://ksa-korea.org": {
         "persona_ko": "한국유학협회(Korea Study Association). 전 세계 모든 나라 학생이 대한민국으로 유학 오기 위한 실질적 자료 및 수속을 도와주는 사이트. 한국유학 전문 선배 컨설턴트.",
         "tone": "선배 조언 스타일. '이것만큼은 꼭 알고 가세요.' 한국유학협회로서 전 세계 학생 대상 실질적 수속 안내.",
-        "structure": ["아무도 안 알려주는 현실 (경험담)","단계별 준비 가이드","비용 및 일정 표","꼭 주의해야 할 사항 3가지","유용한 공식 기관 링크","FAQ 3문항"],
+        "structure": ["실제로 준비하며 겪는 현실 (경험담)","단계별 준비 가이드","비용 및 일정 표","꼭 주의해야 할 사항 3가지","유용한 공식 기관 링크","FAQ 3문항"],
         "min_chars": 2000, "tables": 1, "lang": "ko",
         "cta": "개인상담신청→관리자 이메일 huh0303@gmail.com",
     },
     "https://sis-korea.com": {
-        "persona_en": "Seoul International School (SIS) career coach with 500+ placements, providing detailed guidance for students aiming for TOPIK level 2+ in the shortest time, linked to YouTube content.",
-        "tone": "Action-oriented TOPIK coach. Fast, free, step-by-step study guidance paired with YouTube lessons.",
-        "structure": ["Why TOPIK level 2+ is the gateway to study and work in Korea","Free 4-week TOPIK 2+ study plan (day by day)","Section-by-section score strategy table (listening/reading/writing)","YouTube-paired daily practice routine","Common TOPIK 2 mistakes and quick fixes","Free mock test and resource list","FAQ 3 questions"],
+        "persona_en": "Official voice of Seoul International School (SIS) — institutional announcements and academic information.",
+        "tone": "Trustworthy institutional tone. Notice/academic-info format.",
+        "structure": ["Official announcement or program overview","Eligibility and academic requirements","Section-by-section program details table","Application procedure step by step","Important dates and deadlines","Official resource links","FAQ 3 questions"],
         "min_chars": 2000, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://jobkorea365.com": {
-        "persona_en": "Former HR director providing a practical guide for foreigners job-hunting in Korea — eligibility, process, cost, resume upload guidance, free consulting, for job seekers worldwide, linked to free Korean classes, YouTube, and TikTok community.",
-        "tone": "Insider HR perspective for a global foreign job-seeker audience. 'This is what Korean recruiters actually look for.'",
+        "persona_en": "Career coach and former HR director helping foreign job-seekers in Korea.",
+        "tone": "Practical, cites data and statistics. Q&A format with job-posting breakdowns.",
         "structure": ["Job market data: which sectors are growing","What Korean employers really want","Strategy by industry table","Resume and cover letter Korean style","Interview culture surprises","Top platforms and how to use them","FAQ 3 questions"],
         "min_chars": 2000, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://jobinkorea365.com": {
-        "persona_en": "Covers E-7/E-8/E-9 visa routes and real success stories of foreigners who found jobs in Korea — costs and cautions included.",
-        "tone": "Peer/colleague job-seeker perspective. Success and failure stories.",
+        "persona_en": "Career coach and former HR director, this time focused on E-7/E-8/E-9 visa routes and real placement stories.",
+        "tone": "Practical, cites data and statistics. Q&A format with job-posting breakdowns.",
         "structure": ["Is this realistic for foreigners? (honest)","E-7/E-8/E-9 visa requirements first (deal-breaker check)","Where to find jobs: ranked platforms","Salary and benefits table","Application walkthrough","Workplace culture heads-up","FAQ 3 questions"],
         "min_chars": 2000, "tables": 1, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://jobkoreaglobal.com": {
-        "persona_en": "International recruitment specialist covering E-7/E-8/E-9 visa routes and Korean job-search success stories for a global audience — costs and cautions included.",
-        "tone": "Recruitment professional perspective, useful for both employers and candidates.",
+        "persona_en": "Headhunter specializing in international recruitment into Korea, formal international tone.",
+        "tone": "International, formal English guidance. Step-by-step guide combining visa and job placement.",
         "structure": ["Market demand with data","Talent requirements and visa table","End-to-end recruitment timeline","Legal compliance requirements","Compensation benchmarks by role","Best practices from successful placements","FAQ 3 questions"],
         "min_chars": 2000, "tables": 2, "lang": "en",
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://korea365.org": {
-        "persona_en": "A portal covering study, work, marriage, accommodation booking, SIM cards and more in Korea — the essential Korea travel/life guide for people worldwide who want to make Korean friends.",
-        "tone": "Storyteller introducing Korean life to foreigners as an engaging portal guide.",
+        "persona_en": "Institutional voice of a comprehensive Korea information portal, nonprofit-organization tone.",
+        "tone": "Formal, information-forward, archive-style by category.",
         "structure": ["Cultural hook: introduce the phenomenon","Historical or social background","How it is experienced in modern Korea","Regional or generational variations","How to experience as a visitor","Global influence and hallyu connection","FAQ 3 questions"],
         "min_chars": 2200, "tables": 1, "lang": "en",
         "cta": "Go to booking/purchase site for needed products (hotel, transport, K-pop tickets, medical tourism, investment) / personal consultation → admin email huh0303@gmail.com",
@@ -721,9 +720,9 @@ SITE_PERSONA = {
         "cta": "개인 구독신청/제보→관리자 이메일 huh0303@gmail.com",
     },
     "https://theseouljournal.com": {
-        "persona_en": "Senior foreign correspondent based in Seoul (The Seoul Journal) covering international affairs, politics, economy, education, sports, and military news for global readers.",
-        "tone": "Quality, concise newspaper English. Inverted pyramid.",
-        "structure": ["News lead: what happened and global significance","Korean context for international readers","Key data and statistics table","Expert or official quote","Regional or global implications","What to watch next","FAQ 3 questions"],
+        "persona_en": "A foreign resident-editor living in Seoul, writing as an observer of Korean life for a global readership.",
+        "tone": "Essay-style, observational first-person voice. Column/essay format, not hard news.",
+        "structure": ["Observational opening — a scene or moment","Personal context for international readers","Key data and statistics table","A local voice or quote","What this says about life in Korea now","Closing reflection","FAQ 3 questions"],
         "min_chars": 2000, "tables": 1, "lang": "en",
         "cta": "Personal subscription/tip submission → admin email huh0303@gmail.com",
     },
@@ -1250,63 +1249,87 @@ def extract_meta_and_faq(text):
 #      키워드만 채워 넣는 방식으로 강제 (내부링크 수정과 동일한 원칙)
 # ============================================================
 TITLE_TEMPLATES_KO = [
-    "{keyword}, 왜 이런 문제가 생길까? 전문가가 답하다",
-    "{keyword}에 대해 의사가 꼭 알려주고 싶은 {n}가지",
-    "{keyword}에 대한 흔한 오해, 진실은 이렇습니다",
-    "설문조사: 10명 중 {n}명이 {keyword}를 잘못 알고 있다",
-    "{keyword}, 제대로 대처하는 법 — 전문가 가이드",
-    "절대 놓치면 안 되는 {keyword} 경고 신호",
-    "{keyword}, 당신이 아는 것과 뭐가 다를까",
-    "아무도 말해주지 않는 {keyword}의 진실",
-    "{keyword}, 정말 중요한 건 따로 있습니다",
-    "{keyword}, 정말 효과가 있을까? 솔직한 분석",
-    "{keyword}에서 사람들이 자주 하는 {n}가지 실수",
-    "{keyword}, 실제로는 어떻게 진행될까",
+    "{keyword}, 이것부터 확인하세요",
+    "{keyword} 관리, 이 {n}가지만 지켜도 달라집니다",
+    "{keyword}에 대해 알아두면 좋은 것들",
+    "{keyword}, 어디서부터 시작해야 할까",
+    "{keyword} 제대로 준비하는 법",
+    "놓치기 쉬운 {keyword} 체크포인트",
+    "{keyword}, 실제로는 이렇게 진행됩니다",
+    "{keyword} 하기 전에 알아두면 좋은 것들",
+    "{keyword}, 핵심만 짚어드립니다",
+    "{keyword}, 얼마나 준비해야 할까",
+    "{keyword}에서 자주 나오는 질문 {n}가지",
+    "{keyword} 첫걸음 — 순서대로 정리",
     "{keyword}, 쉽게 풀어드립니다",
-    "{year}년, {keyword}를 다시 생각해보다",
-    "{keyword}의 진짜 비용 — 미리 알아야 할 것들",
+    "{year}년 {keyword}, 이렇게 달라졌습니다",
+    "{keyword}의 실제 비용 — 미리 알아야 할 것들",
     "{keyword} 시작 전에 꼭 읽어야 할 글",
-    "{keyword}에 대해 자주 놓치는 사실들",
+    "{keyword}에서 놓치기 쉬운 부분들",
     "외국인을 위한 {keyword} 실전 가이드",
     "{keyword} 입문 — 처음이라면 꼭 알아야 할 것",
-    "{keyword}에 대한 흔한 오해 바로잡기",
+    "{keyword} 준비할 때 헷갈리는 부분 정리",
     "{year}년 달라진 {keyword}, 무엇이 바뀌었나",
-    "{keyword} 궁금증, 현장 전문가가 답하다",
+    "{keyword} 궁금증, 하나씩 풀어봅니다",
+    "{keyword}, 순서대로 따라 하면 됩니다",
+    "{keyword} 고를 때 살펴봐야 할 {n}가지",
+    "{keyword}, 요즘 이렇게 준비합니다",
+    "{keyword} 관련 자주 헷갈리는 부분",
+    "{keyword}, 시간과 비용을 아끼는 방법",
+    "{keyword} 살펴보기 — 알아두면 유용한 정보",
+    "{keyword} 계획하고 계신가요? 이것부터",
+    "{keyword}, 현지에서 실제로 겪는 것들",
 ]
 TITLE_TEMPLATES_EN = [
-    "Why Does {keyword} Cause Problems? Experts Explain",
-    "{n} Things About {keyword} Your Doctor Wants You to Know",
-    "The Truth About {keyword} That Most People Get Wrong",
-    "Study Reveals: {n} in 10 People Misunderstand {keyword}",
-    "How to Actually Handle {keyword}: A Specialist's Guide",
-    "{keyword} Warning Signs You Should Never Ignore",
-    "{keyword} vs What You Think You Know: Key Differences",
-    "What Nobody Tells You About {keyword}",
-    "{keyword}: A Closer Look at What Really Matters",
-    "Is {keyword} Really Worth It? An Honest Breakdown",
-    "{n} Mistakes People Make With {keyword}",
-    "Behind the Scenes: What {keyword} Actually Involves",
-    "{keyword} Explained in Plain English",
-    "Rethinking {keyword}: A Fresh Perspective for {year}",
+    "{keyword}: Where to Start",
+    "{n} Things to Check Before {keyword}",
+    "A Practical Look at {keyword}",
+    "{keyword}, Step by Step",
+    "Getting {keyword} Right the First Time",
+    "{keyword} Checklist You Shouldn't Skip",
+    "How {keyword} Actually Works",
+    "{keyword}: What to Prepare First",
+    "{keyword}, Explained Simply",
+    "How Much Should You Budget for {keyword}?",
+    "{n} Questions People Ask About {keyword}",
+    "{keyword} 101: Where First-Timers Should Begin",
+    "{keyword} Made Simple",
+    "{keyword} in {year}: What's Changed",
     "The Real Cost of {keyword} — What to Expect",
     "Before You Try {keyword}, Read This First",
-    "{keyword}: Frequently Overlooked Facts",
-    "A Practical Look at {keyword} for International Patients",
-    "{keyword} 101: What First-Timers Should Know",
-    "Debunking Common Myths About {keyword}",
+    "{keyword}: Details That Are Easy to Miss",
+    "A Practical Look at {keyword} for International Readers",
+    "{keyword}: A Beginner's Starting Point",
+    "{keyword} — Common Points of Confusion, Cleared Up",
     "How {keyword} Has Changed in {year}",
     "{keyword} Q&A: Answers From the Field",
+    "{keyword}, Broken Down Step by Step",
+    "{n} Things to Look For When Choosing {keyword}",
+    "How People Are Approaching {keyword} This Year",
+    "{keyword}: Frequently Confused Points",
+    "Save Time and Money on {keyword}",
+    "{keyword}: A Closer Look",
+    "Planning for {keyword}? Start Here",
+    "{keyword}, From Someone Who's Been There",
 ]
 _last_title_idx: dict = {}  # 사이트별 직전 사용 인덱스 (연속 반복 방지)
+_recent_titles_global: list = []  # 전체 사이트 공통 — 최근 사용된 템플릿 인덱스(언어별) 기록해 교차 사이트 반복도 줄임
+_GLOBAL_RECENT_MAX = 6
 
 def build_diverse_title(keyword, lang, site_url=""):
     pool = TITLE_TEMPLATES_KO if lang == "ko" else TITLE_TEMPLATES_EN
     prev = _last_title_idx.get(site_url, -1)
-    idx = random.randrange(len(pool))
-    if len(pool) > 1:
-        while idx == prev:
-            idx = random.randrange(len(pool))
+    recent_global = {i for (l, i) in _recent_titles_global if l == lang}
+    candidates = [i for i in range(len(pool)) if i != prev and i not in recent_global]
+    if not candidates:
+        candidates = [i for i in range(len(pool)) if i != prev]
+    if not candidates:
+        candidates = list(range(len(pool)))
+    idx = random.choice(candidates)
     _last_title_idx[site_url] = idx
+    _recent_titles_global.append((lang, idx))
+    while len(_recent_titles_global) > _GLOBAL_RECENT_MAX:
+        _recent_titles_global.pop(0)
     n = random.choice([3, 4, 5, 6, 7, 8, 9])
     year = str(datetime.now().year)
     return pool[idx].format(keyword=keyword, n=n, year=year)
