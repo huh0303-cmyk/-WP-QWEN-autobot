@@ -46,51 +46,46 @@ MAX_REGEN   = 3
 # ★ 기자 풀
 # ============================================================
 # ============================================================
-# ★ 2026-07-24 개편: 사이트마다 무작위로 뽑던 기자 40명 풀 → 전체 3명으로 고정
-#   (사이트별 랜덤 선택은 "같은 사이트인데 필자가 매번 바뀌는" 부자연스러움 +
-#    "27개 사이트 도합 40명"이라는 비현실적 규모의 원인이었음)
-#   대신 사이트마다 "이 필자가 이 사이트를 담당한다"는 1:1 고정 배정으로 전환.
+# ★ 2026-07-24 재개편: k-health365.com 외 26개 사이트는 구글 애드센스 승인이 목표.
+#   "동일 운영자가 굴리는 사이트 네트워크"처럼 보이면 승인에 불리하므로,
+#   3명 공유 방식을 폐기하고 27개 사이트 전부 서로 다른 고유 필자로 배정.
+#   (사이트 내부에서 매번 랜덤으로 바뀌던 예전 방식의 문제 — 필자가 안 바뀌는 것 —
+#    도 동시에 해결: 사이트당 1명, 그 사이트 안에서는 항상 동일 인물 고정)
 # ============================================================
-AUTHOR_SEOYEON = {"name":"이서연","email":"seoyeon@koreanews365.com","slug":"seoyeon-lee",
-                   "bio":"시사·건강·교육 분야를 두루 다뤄온 10년차 에디터."}
-AUTHOR_SARAH   = {"name":"Sarah Mitchell","email":"sarah.mitchell@contributor.com","slug":"sarah-mitchell",
-                   "bio":"Consultant covering Korea's finance, legal, visa, education, and relocation topics for an international audience."}
-AUTHOR_DANIEL  = {"name":"Daniel Carter","email":"daniel.carter@contributor.com","slug":"daniel-carter",
-                   "bio":"Journalist and lifestyle writer covering Korean culture, travel, tech, and trends for a global audience."}
-
-# 사이트 도메인(부분 문자열) → 고정 필자
-AUTHOR_BY_SITE = {
-    # 이서연 — 한국어 사이트
-    "k-health365.com":      AUTHOR_SEOYEON,
-    "koreanews365.com":     AUTHOR_SEOYEON,
-    "kieca-korea.org":      AUTHOR_SEOYEON,
-    "ksa-korea.org":        AUTHOR_SEOYEON,
-    # Sarah Mitchell — 금융/법률/비자/교육/취업 등 컨설턴트 톤
-    "koreamedicaltour.com": AUTHOR_SARAH,
-    "koreainsurance365.com":AUTHOR_SARAH,
-    "koreataxnlaw.com":     AUTHOR_SARAH,
-    "kfinance365.com":      AUTHOR_SARAH,
-    "koreainvest365.com":   AUTHOR_SARAH,
-    "ki-korea.com":         AUTHOR_SARAH,
-    "krealestate365.com":   AUTHOR_SARAH,
-    "k-visa365.com":        AUTHOR_SARAH,
-    "koreawedding365.com":  AUTHOR_SARAH,
-    "kstudy365.com":        AUTHOR_SARAH,
-    "studyinkorea365.com":  AUTHOR_SARAH,
-    "jobkorea365.com":      AUTHOR_SARAH,
-    "jobinkorea365.com":    AUTHOR_SARAH,
-    "jobkoreaglobal.com":   AUTHOR_SARAH,
-    "sis-korea.com":        AUTHOR_SARAH,
-    # Daniel Carter — 여행/문화/뷰티/테크/뉴스 등 저널리즘·라이프스타일 톤
-    "k-trip365.com":        AUTHOR_DANIEL,
-    "koreacrypto365.com":   AUTHOR_DANIEL,
-    "ktech365.com":         AUTHOR_DANIEL,
-    "kskin365.com":         AUTHOR_DANIEL,
-    "oliveyoungkorea.com":  AUTHOR_DANIEL,
-    "kworld365.com":        AUTHOR_DANIEL,
-    "korea365.org":         AUTHOR_DANIEL,
-    "theseouljournal.com":  AUTHOR_DANIEL,
+AUTHOR_BY_SITE_DEF = {
+    # ---- 한국어 사이트 ----
+    "k-health365.com":      {"name":"박정민","email":"jungmin.park@k-health365.com","slug":"jungmin-park","bio":"임상경력 30년 내과 전문의."},
+    "koreanews365.com":     {"name":"김도현","email":"dohyun.kim@koreanews365.com","slug":"dohyun-kim","bio":"주요 일간지 10년 경력 시니어 취재기자."},
+    "kieca-korea.org":      {"name":"최윤아","email":"yoona.choi@kieca-korea.org","slug":"yoona-choi","bio":"국제교육 전문가, 25년 경력."},
+    "ksa-korea.org":        {"name":"서지훈","email":"jihoon.seo@ksa-korea.org","slug":"jihoon-seo","bio":"한국유학협회 소속 유학 컨설턴트."},
+    # ---- 영어 사이트 ----
+    "koreamedicaltour.com": {"name":"Grace Anderson","email":"grace.anderson@koreamedicaltour.com","slug":"grace-anderson","bio":"Medical tourism coordinator, 10 years accompanying international patients."},
+    "koreainvest365.com":   {"name":"Marcus Webb","email":"marcus.webb@koreainvest365.com","slug":"marcus-webb","bio":"Market analyst covering Korean capital markets."},
+    "ki-korea.com":         {"name":"Olivia Bennett","email":"olivia.bennett@ki-korea.com","slug":"olivia-bennett","bio":"Former research center director, Korea investment statistics."},
+    "koreainsurance365.com":{"name":"Ethan Brooks","email":"ethan.brooks@koreainsurance365.com","slug":"ethan-brooks","bio":"Licensed insurance broker, 15 years, foreigner insurance specialist."},
+    "kfinance365.com":      {"name":"Natalie Cross","email":"natalie.cross@kfinance365.com","slug":"natalie-cross","bio":"Financial analyst, Korea investment guides for foreigners."},
+    "koreataxnlaw.com":     {"name":"Richard Hale","email":"richard.hale@koreataxnlaw.com","slug":"richard-hale","bio":"Tax attorney, Korean company incorporation specialist."},
+    "koreacrypto365.com":   {"name":"Tyler Nash","email":"tyler.nash@koreacrypto365.com","slug":"tyler-nash","bio":"Former trader turned crypto markets editor."},
+    "krealestate365.com":   {"name":"Diana Foster","email":"diana.foster@krealestate365.com","slug":"diana-foster","bio":"Licensed real estate agent, foreigner housing specialist."},
+    "ktech365.com":         {"name":"Kevin Suh","email":"kevin.suh@ktech365.com","slug":"kevin-suh","bio":"IT reporter covering Korea's tech and AI scene."},
+    "kskin365.com":         {"name":"Chloe Reyes","email":"chloe.reyes@kskin365.com","slug":"chloe-reyes","bio":"Dermatology clinic coordinator."},
+    "oliveyoungkorea.com":  {"name":"Mia Sanders","email":"mia.sanders@oliveyoungkorea.com","slug":"mia-sanders","bio":"K-beauty influencer, Olive Young product reviewer."},
+    "kworld365.com":        {"name":"Jordan Lee","email":"jordan.lee@kworld365.com","slug":"jordan-lee","bio":"K-pop and K-culture analyst."},
+    "k-trip365.com":        {"name":"Alex Turner","email":"alex.turner@k-trip365.com","slug":"alex-turner","bio":"Backpacker and local Korea travel curator."},
+    "k-visa365.com":        {"name":"Patricia Moore","email":"patricia.moore@k-visa365.com","slug":"patricia-moore","bio":"Licensed immigration administrator (행정사)."},
+    "koreawedding365.com":  {"name":"Sophie Callahan","email":"sophie.callahan@koreawedding365.com","slug":"sophie-callahan","bio":"Wedding planner, 10 years coordinating ceremonies."},
+    "kstudy365.com":        {"name":"Rachel Kim","email":"rachel.kim@kstudy365.com","slug":"rachel-kim","bio":"Study-abroad counselor, 2,000+ students placed."},
+    "studyinkorea365.com":  {"name":"Josh Bailey","email":"josh.bailey@studyinkorea365.com","slug":"josh-bailey","bio":"Former international student sharing firsthand advice."},
+    "sis-korea.com":        {"name":"Karen Whitfield","email":"karen.whitfield@sis-korea.com","slug":"karen-whitfield","bio":"Seoul International School administration."},
+    "jobkorea365.com":      {"name":"Brian Coleman","email":"brian.coleman@jobkorea365.com","slug":"brian-coleman","bio":"Career coach, former HR director."},
+    "jobinkorea365.com":    {"name":"Samantha Reed","email":"samantha.reed@jobinkorea365.com","slug":"samantha-reed","bio":"Career coach covering E-7/E-8/E-9 visa job routes."},
+    "jobkoreaglobal.com":   {"name":"Nathaniel Grant","email":"nathaniel.grant@jobkoreaglobal.com","slug":"nathaniel-grant","bio":"International recruitment headhunter."},
+    "korea365.org":         {"name":"Henry Walsh","email":"henry.walsh@korea365.org","slug":"henry-walsh","bio":"Editor of a comprehensive Korea life and culture portal."},
+    "theseouljournal.com":  {"name":"Isabella Chen","email":"isabella.chen@theseouljournal.com","slug":"isabella-chen","bio":"Seoul-based foreign resident-editor, essayist."},
 }
+AUTHOR_BY_SITE = AUTHOR_BY_SITE_DEF
+_DEFAULT_AUTHOR_KO = AUTHOR_BY_SITE_DEF["k-health365.com"]
+_DEFAULT_AUTHOR_EN = AUTHOR_BY_SITE_DEF["koreamedicaltour.com"]
 
 _wp_author_cache: dict = {}
 
@@ -130,7 +125,7 @@ def pick_reporter(site):
     for domain, author in AUTHOR_BY_SITE.items():
         if domain in url:
             return author
-    return AUTHOR_SEOYEON if lang == "ko" else AUTHOR_SARAH
+    return _DEFAULT_AUTHOR_KO if lang == "ko" else _DEFAULT_AUTHOR_EN
 
 # ============================================================
 # ★★★ 카테고리 — 조회만, 절대 생성 금지 ★★★
