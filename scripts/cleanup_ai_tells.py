@@ -6,6 +6,19 @@ from autopost_mega import SITES_CONFIG, WP_USER, build_diverse_title, pick_best_
 BROKEN_TITLE_RE = re.compile(r'(\bin\s*\?$|\bfor\s*\?$|\bin$|\bfor\s*and\s*beyond$|^\s*◇|^sure,|^certainly!)',
                               re.IGNORECASE)
 
+# ★ 2026-07-28: audit_27sites_ai_tells.py가 찾아낸 3개 카테고리(진부제목/연도포함/
+#   중복제목)를 이 스크립트도 그대로 잡아서 고치도록 확장. 감사 스크립트와 패턴을
+#   동일하게 유지해야 "감사에서 몇 건 → 정리 후 0건"이 정확히 맞아떨어진다.
+CLICHE_TITLE_PATTERNS = [
+    r'complete guide to', r'ultimate guide', r'your complete guide',
+    r'everything you need to know', r'a to z', r'a-to-z',
+    r'총정리', r'완벽\s*가이드', r'모든\s*것을\s*알아',
+    r'top \d+ (?:reasons|tips|ways|things)',
+    r'\d+ essential (?:tips|insights|reasons|things)',
+    r'the essential guide', r'your essential guide', r'\*\*',
+]
+YEAR_TITLE_PATTERNS = [r'\b202[0-5]\b', r'202[0-5]년']
+
 # (검색패턴, 치환문자열) - 문장 자체를 자연스럽게 다듬음
 CLEANUP_RULES = [
     (re.compile(r'<p>\s*◇\s*By\s+[A-Za-z\s]+</p>', re.IGNORECASE), ''),
@@ -64,6 +77,20 @@ def fix_site(site, dry_run=False):
             break
         page += 1
 
+    # ★ 2026-07-28: audit_27sites_ai_tells.py와 동일한 방식(제목 앞 20자, 공백제거,
+    #   소문자 정규화)으로 같은 사이트 내 중복 제목을 먼저 한 번에 찾아둔다.
+    #   API 기본 정렬(date desc)이 감사 스크립트와 동일하므로 "가장 최근 글이
+    #   원제목 유지, 그 이전 중복글들만 재작성" 기준도 감사 결과와 정확히 일치한다.
+    title_prefix_seen = set()
+    dup_ids = set()
+    for p in posts:
+        t = p["title"]["rendered"]
+        key = re.sub(r'\s+', '', t[:20].lower())
+        if key in title_prefix_seen:
+            dup_ids.add(p["id"])
+        else:
+            title_prefix_seen.add(key)
+
     for p in posts:
         pid = p["id"]
         title = p["title"]["rendered"]
@@ -71,8 +98,13 @@ def fix_site(site, dry_run=False):
         meta_obj = p.get("meta", {}) or {}
 
         payload = {}
+        tl = title.strip().lower()
         title_broken = bool(BROKEN_TITLE_RE.search(title.strip()))
-        if title_broken:
+        title_cliche = any(re.search(pat, tl, re.IGNORECASE) for pat in CLICHE_TITLE_PATTERNS)
+        title_year   = any(re.search(pat, title, re.IGNORECASE) for pat in YEAR_TITLE_PATTERNS)
+        title_dup    = pid in dup_ids
+        needs_retitle = title_broken or title_cliche or title_year or title_dup
+        if needs_retitle:
             keyword = meta_obj.get("rank_math_focus_keyword", "") or title
             kw = keyword.split(",")[0].strip()
             if len(kw) < 4 or re.match(r'^[◇\s]*By\s', kw, re.IGNORECASE):
@@ -91,7 +123,10 @@ def fix_site(site, dry_run=False):
 
         if dry_run:
             entry = {"id": pid, "link": p.get("link", ""), "old_title": title[:60]}
-            if title_broken:
+            if needs_retitle:
+                reasons = [r for r, flag in [("broken", title_broken), ("cliche", title_cliche),
+                                              ("year", title_year), ("dup", title_dup)] if flag]
+                entry["reason"] = ",".join(reasons)
                 entry["new_title"] = payload.get("title", "")[:60]
                 log["title_fixed"].append(entry)
             if content_changed:
@@ -102,7 +137,7 @@ def fix_site(site, dry_run=False):
             pr = requests.patch(f"{site_url}/wp-json/wp/v2/posts/{pid}", auth=(WP_USER, pw),
                                  json=payload, timeout=25)
             entry = {"id": pid, "old_title": title[:40], "status": pr.status_code}
-            if title_broken:
+            if needs_retitle:
                 entry["new_title"] = payload.get("title", "")[:40]
                 log["title_fixed"].append(entry)
             if content_changed:
