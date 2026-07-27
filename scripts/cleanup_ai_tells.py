@@ -16,22 +16,34 @@ CLEANUP_RULES = [
     (re.compile(r'\bin the ever-evolving\s+', re.IGNORECASE), 'in the changing '),
 ]
 
+# 마크다운 코드펜스 잔존물 제거 — audit_27sites_ai_tells.py의 FENCE_PATTERNS와 짝을 이루는 규칙.
+# 펜스 마커만 벗겨내고 안의 실제 본문은 그대로 남긴다 (콘텐츠 삭제 아님, 래핑만 제거).
+FENCE_CLEANUP_RULES = [
+    (re.compile(r'<p>\s*```[a-zA-Z]*\s*</p>', re.IGNORECASE), ''),   # <p>```html</p> 형태
+    (re.compile(r'```[a-zA-Z]*\n?', re.IGNORECASE), ''),              # 오프닝 펜스 (```html, ```markdown 등)
+    (re.compile(r'```'), ''),                                          # 잔여 백틱 3연속 (클로징 펜스 포함)
+    (re.compile(r'[“‘]`'), ''),                              # 스마트따옴표+백틱 조합 잔재
+    (re.compile(r'&#8220;`'), ''),                                     # 엔티티화된 스마트따옴표+백틱 잔재
+]
+
 
 def clean_content(html):
     for pat, repl in CLEANUP_RULES:
+        html = pat.sub(repl, html)
+    for pat, repl in FENCE_CLEANUP_RULES:
         html = pat.sub(repl, html)
     # 문장 시작 대문자 정리 (치환으로 소문자 시작된 경우 보정은 스킵 - 리스크 최소화)
     return html
 
 
-def fix_site(site):
+def fix_site(site, dry_run=False):
     site_url = site["url"]
     pw = os.getenv(site["wp_pass_env"], "")
     if not pw:
         return {"site": site_url, "error": "no_password"}
 
     lang = site.get("lang", "en")
-    log = {"site": site_url, "title_fixed": [], "content_cleaned": [], "failed": []}
+    log = {"site": site_url, "title_fixed": [], "content_cleaned": [], "failed": [], "dry_run": dry_run}
 
     posts, page = [], 1
     while True:
@@ -77,6 +89,15 @@ def fix_site(site):
         if not payload:
             continue
 
+        if dry_run:
+            entry = {"id": pid, "link": p.get("link", ""), "old_title": title[:60]}
+            if title_broken:
+                entry["new_title"] = payload.get("title", "")[:60]
+                log["title_fixed"].append(entry)
+            if content_changed:
+                log["content_cleaned"].append({"id": pid, "link": p.get("link", "")})
+            continue
+
         try:
             pr = requests.patch(f"{site_url}/wp-json/wp/v2/posts/{pid}", auth=(WP_USER, pw),
                                  json=payload, timeout=25)
@@ -98,13 +119,17 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--site", default="")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="실제 PATCH 없이 무엇이 바뀔지만 리포트 (사이트 수정 없음)")
     args = ap.parse_args()
 
     targets = [s for s in SITES_CONFIG if (not args.site or s["url"] == args.site)]
     results = []
+    out_file = "cleanup_ai_tells_dryrun.json" if args.dry_run else "cleanup_ai_tells_result.json"
     for site in targets:
-        res = fix_site(site)
+        res = fix_site(site, dry_run=args.dry_run)
         results.append(res)
-        print(f"{res['site']}: 제목수정{len(res.get('title_fixed',[]))} / 본문정리{len(res.get('content_cleaned',[]))} / 실패{len(res.get('failed',[]))} / 오류{res.get('error','')}")
-        with open("cleanup_ai_tells_result.json", "w", encoding="utf-8") as f:
+        tag = "[DRY-RUN] " if args.dry_run else ""
+        print(f"{tag}{res['site']}: 제목수정{len(res.get('title_fixed',[]))} / 본문정리{len(res.get('content_cleaned',[]))} / 실패{len(res.get('failed',[]))} / 오류{res.get('error','')}")
+        with open(out_file, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)

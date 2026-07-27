@@ -15,6 +15,10 @@ on:
         description: "backfilllinks 전용: 특정 사이트 URL만 (비우면 27개 전체) 예) https://k-health365.com"
         required: false
         default: ""
+      dry_run:
+        description: "cleanupai 전용: true면 실제 수정 없이 리포트만 (기본값 true, 안전)"
+        required: false
+        default: "true"
   # ⚠️ 고정 cron 제거됨 (2026-07-19) — publish-scheduler.yml이 매일 랜덤 시간에
   #   이 워크플로우를 workflow_dispatch(step=post, run_slot=1/2/3)로 대신 실행시킴.
   #   목표시각: 07:25 / 13:07 / 19:50 KST, 매일 ±1시간 랜덤.
@@ -1049,17 +1053,20 @@ jobs:
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: |
+          ARGS=""
           if [ -n "${{ github.event.inputs.target_site }}" ]; then
-            python scripts/cleanup_ai_tells.py --site "${{ github.event.inputs.target_site }}"
-          else
-            python scripts/cleanup_ai_tells.py
+            ARGS="--site ${{ github.event.inputs.target_site }}"
           fi
+          if [ "${{ github.event.inputs.dry_run }}" != "false" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python scripts/cleanup_ai_tells.py $ARGS
       - name: "결과 커밋"
         if: always()
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add cleanup_ai_tells_result.json
+          git add cleanup_ai_tells_result.json cleanup_ai_tells_dryrun.json 2>/dev/null || true
           git commit -m "AI티정리 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push
