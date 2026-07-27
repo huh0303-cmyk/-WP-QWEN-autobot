@@ -1687,6 +1687,18 @@ _used_kw: dict = {}
 _PLACEHOLDER_SECTIONS = {"추가", "add", "tbd", "todo", "n/a", "etc", "기타", "misc", "other", "others"}
 _last_keyword_category = {}  # site_url -> 이번에 뽑힌 키워드의 카테고리 힌트 (있으면)
 
+def _keyword_recently_covered(keyword, site_url):
+    """키워드가 이 사이트에 최근 발행된 글 제목(최대 50개, fetch_recent_wp_titles로
+    캐싱됨) 안에 이미 등장하는지 확인. 부분 문자열 매칭이라 "갑상선기능저하증"처럼
+    제목 템플릿에 그대로 들어가는 한국어/영어 키워드 모두에서 잘 잡힌다."""
+    titles = _wp_title_cache.get(site_url)
+    if not titles:
+        return False
+    kw = keyword.strip().lower()
+    if not kw:
+        return False
+    return any(kw in t for t in titles)
+
 def load_keyword(filename, site_url, fallback):
     """
     2026-07-22: keywords_*.txt 포맷을 '# 카테고리' 주석 방식에서
@@ -1718,7 +1730,16 @@ def load_keyword(filename, site_url, fallback):
                     else:
                         entries.append((s, None))
             if entries:
-                pool = [e for e in entries if e[0] not in used] or entries
+                # ★ 2026-07-28: 프로세스 내 used셋만으론 실행(=워크플로우) 간
+                #   중복을 못 막음 — 매 실행마다 프로세스가 새로 뜨면서 used가
+                #   초기화되어, "갑상선기능저하증"이 이틀 안에 3편, "4th generation
+                #   K-pop groups"가 당일 2편 나오는 등 사이트 안 주제 재탕이
+                #   반복됐음(실사이트 감사로 확인). 실제 WP에 이미 발행된 최근
+                #   제목(fetch_recent_wp_titles, main()에서 전체 사이트 사전로드)에
+                #   키워드가 이미 등장하면 이번 회차 후보에서 제외해 재발행을 막는다.
+                fresh = [e for e in entries
+                         if e[0] not in used and not _keyword_recently_covered(e[0], site_url)]
+                pool = fresh or [e for e in entries if e[0] not in used] or entries
                 ch = random.choice(pool)
                 used.add(ch[0])
                 if ch[1]:
@@ -2101,11 +2122,13 @@ def main():
 
     ok=fail=skip=0
 
-    print("📋 뉴스 사이트 제목 사전 로드...")
+    # ★ 2026-07-28: 예전엔 뉴스모드 2개 사이트만 최근 제목을 미리 불러왔음.
+    #   블로그모드 26개 사이트는 이 캐시가 없어 load_keyword()의 중복주제
+    #   방지(_keyword_recently_covered)가 작동하지 않았다 — 전체 사이트로 확장.
+    print("📋 전체 사이트 최근 발행 제목 사전 로드 (중복 주제 방지)...")
     for s in SITES_CONFIG:
-        if s.get("mode") in ("news","news_en"):
-            pw=os.getenv(s["wp_pass_env"],"")
-            if pw: fetch_recent_wp_titles(s["url"],pw)
+        pw=os.getenv(s["wp_pass_env"],"")
+        if pw: fetch_recent_wp_titles(s["url"],pw)
 
     for site in SITES_CONFIG:
         url=site["url"]; theme=site["theme"]
