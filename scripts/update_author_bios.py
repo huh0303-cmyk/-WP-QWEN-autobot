@@ -18,10 +18,11 @@ def find_user_id(site_url, pw, reporter):
             r = requests.get(f"{site_url}/wp-json/wp/v2/users", auth=(WP_USER, pw),
                               params=params, timeout=8)
             if r.status_code == 200 and r.json():
-                return r.json()[0]["id"], r.json()[0].get("description", "")
+                u = r.json()[0]
+                return u["id"], u.get("description", ""), u.get("name", "")
         except Exception:
             pass
-    return None, None
+    return None, None, None
 
 
 def fix_site(site, dry_run=False):
@@ -34,24 +35,32 @@ def fix_site(site, dry_run=False):
 
     reporter = pick_reporter(site)
 
-    uid, current_desc = find_user_id(site_url, pw, reporter)
+    uid, current_desc, current_name = find_user_id(site_url, pw, reporter)
     if uid is None:
         log["skipped"].append({"reason": "user_not_found", "slug": reporter["slug"]})
         return log
 
     new_bio = reporter.get("bio", "")
-    if (current_desc or "").strip() == new_bio.strip():
+    new_name = reporter.get("name", "")
+    payload = {}
+    if (current_desc or "").strip() != new_bio.strip():
+        payload["description"] = new_bio
+    if (current_name or "").strip() != new_name.strip():
+        payload["name"] = new_name
+
+    if not payload:
         log["skipped"].append({"reason": "already_up_to_date", "id": uid})
         return log
 
-    entry = {"id": uid, "old_desc": (current_desc or "")[:120], "new_desc": new_bio[:120]}
+    entry = {"id": uid, "old_desc": (current_desc or "")[:120], "new_desc": new_bio[:120],
+             "old_name": current_name, "new_name": new_name}
     if dry_run:
         log["updated"].append(entry)
         return log
 
     try:
         r = requests.patch(f"{site_url}/wp-json/wp/v2/users/{uid}", auth=(WP_USER, pw),
-                            json={"description": new_bio}, timeout=20)
+                            json=payload, timeout=20)
         entry["status"] = r.status_code
         if r.status_code == 200:
             log["updated"].append(entry)

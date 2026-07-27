@@ -59,8 +59,8 @@ AUTHOR_BY_SITE_DEF = {
     #   기존 WP 계정과의 연결을 유지하기 위해 변경하지 않음(이미 생성된 계정 매칭용).
     "k-health365.com":      {"name":"박정민","email":"jungmin.park@k-health365.com","slug":"jungmin-park","bio":"건강 정보 콘텐츠 에디터. 공신력 있는 의료·보건 기관 자료를 바탕으로 알기 쉽게 정리합니다."},
     "koreanews365.com":     {"name":"김도현","email":"dohyun.kim@koreanews365.com","slug":"dohyun-kim","bio":"한국 뉴스를 정리해 전달하는 뉴스 에디터."},
-    "kieca-korea.org":      {"name":"최윤아","email":"yoona.choi@kieca-korea.org","slug":"yoona-choi","bio":"국제교육·문화 콘텐츠 에디터."},
-    "ksa-korea.org":        {"name":"서지훈","email":"jihoon.seo@ksa-korea.org","slug":"jihoon-seo","bio":"한국 유학 정보 콘텐츠 에디터."},
+    "kieca-korea.org":      {"name":"기획팀","email":"yoona.choi@kieca-korea.org","slug":"yoona-choi","bio":"한국국제교육문화협회(KIECA) 기획팀. 국제교육·문화 콘텐츠를 정리해 전달합니다."},
+    "ksa-korea.org":        {"name":"행정팀","email":"jihoon.seo@ksa-korea.org","slug":"jihoon-seo","bio":"한국유학협회(KSA) 행정팀. 한국 유학 수속 정보를 정리해 전달합니다."},
     # ---- 영어 사이트 ----
     "koreamedicaltour.com": {"name":"Grace Anderson","email":"grace.anderson@koreamedicaltour.com","slug":"grace-anderson","bio":"Korea medical tourism content editor, curating patient-friendly guides."},
     "koreainvest365.com":   {"name":"Marcus Webb","email":"marcus.webb@koreainvest365.com","slug":"marcus-webb","bio":"Content editor covering Korean capital markets news and trends."},
