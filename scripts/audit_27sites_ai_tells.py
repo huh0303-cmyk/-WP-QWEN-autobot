@@ -76,12 +76,22 @@ for site_url, env_key in SITES:
                               params={"per_page": 100, "page": page, "status": "publish",
                                       "_fields": "id,title,link,date,content,slug"}, timeout=25)
         except Exception as e:
-            print(f"⚠️  {site_url} 요청 실패: {e}")
+            print(f"⚠️  {site_url} 요청 실패(예외): {e}")
             break
         if r.status_code != 200:
+            print(f"⚠️  {site_url} HTTP {r.status_code} — 본문: {r.text[:300]!r}")
             break
-        batch = r.json()
-        if not isinstance(batch, list) or not batch:
+        try:
+            batch = r.json()
+        except Exception as e:
+            print(f"⚠️  {site_url} JSON 파싱 실패: {e} — 본문: {r.text[:300]!r}")
+            break
+        if not isinstance(batch, list):
+            print(f"⚠️  {site_url} 배열이 아닌 응답: {str(batch)[:300]!r}")
+            break
+        if not batch:
+            if page == 1:
+                print(f"⚠️  {site_url} page=1인데 빈 배열 응답 (실제 발행글 있음이 확인된 사이트인데 0건)")
             break
         posts.extend(batch)
         if len(batch) < 100:
