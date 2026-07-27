@@ -1,0 +1,82 @@
+name: Update Author Bios (Remove Misrepresentation Risk)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_site:
+        description: "특정 사이트만 (예: https://k-health365.com) — 비우면 27개 전체"
+        required: false
+        default: ""
+      dry_run:
+        description: "true면 실제 수정 없이 리포트만 (기본값 true, 안전)"
+        required: false
+        default: "true"
+
+permissions:
+  contents: write
+
+jobs:
+  update-bios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests google-genai beautifulsoup4 lxml -q
+
+      - name: Run update
+        env:
+          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
+          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM:          ${{ secrets.KTECH365COM }}
+          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
+          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
+          KVISA365COM:          ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.target_site }}" ]; then
+            ARGS="--site ${{ github.event.inputs.target_site }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" != "false" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python scripts/update_author_bios.py $ARGS
+
+      - name: Commit result files
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add update_author_bios_result.json update_author_bios_dryrun.json 2>/dev/null || true
+          git commit -m "결과: 필자 bio 사칭문구 제거 반영 로그" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
