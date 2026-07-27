@@ -1,7 +1,382 @@
-전체 0건 검사
-코드펜스 찌꺼기: 0건
+전체 2073건 검사
+코드펜스 찌꺼기: 40건
 단문(500자 미만): 0건
-진부한 제목 패턴: 0건
-제목에 연도(2020~2025) 포함: 0건
-중복 제목(앞 20자 기준): 0건
+진부한 제목 패턴: 8건
+제목에 연도(2020~2025) 포함: 7건
+중복 제목(앞 20자 기준): 225건
 
+
+### https://k-health365.com (전체 220건)
+  [코드펜스] 4건
+    - ('홍삼 효능과 부작용, 당신이 아는 것과 뭐가 다를까', 'https://k-health365.com/%ed%99%8d%ec%82%bc-%ed%9a%a8%eb%8a%a5%ea%b3%bc-%eb%b6%80%ec%9e%91%ec%9a%a9-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%84%eb%8a%94-%ea%b2%83%ea%b3%bc-%eb%ad%90%ea%b0%80-%eb%8b%a4%eb%a5%bc%ea%b9%8c/')
+    - ('소화불량 빠른 해결법에 대해 자주 놓치는 사실들', 'https://k-health365.com/%ec%86%8c%ed%99%94%eb%b6%88%eb%9f%89-%eb%b9%a0%eb%a5%b8-%ed%95%b4%ea%b2%b0%eb%b2%95%ec%97%90-%eb%8c%80%ed%95%b4-%ec%9e%90%ec%a3%bc-%eb%86%93%ec%b9%98%eb%8a%94-%ec%82%ac%ec%8b%a4%eb%93%a4/')
+    - ('당뇨병 혈당 관리 식단 궁금증, 현장 전문가가 답하다', 'https://k-health365.com/%eb%8b%b9%eb%87%a8%eb%b3%91-%ed%98%88%eb%8b%b9-%ea%b4%80%eb%a6%ac-%ec%8b%9d%eb%8b%a8-%ea%b6%81%ea%b8%88%ec%a6%9d-%ed%98%84%ec%9e%a5-%ec%a0%84%eb%ac%b8%ea%b0%80%ea%b0%80-%eb%8b%b5%ed%95%98%eb%8b%a4/')
+    - ('임상경력 20년 내과 전문의가 알려주는 안전한 의약품 복용, ‘의약품 리콜 확인법', 'https://k-health365.com/%ec%9e%84%ec%83%81%ea%b2%bd%eb%a0%a5-20%eb%85%84-%eb%82%b4%ea%b3%bc-%ec%a0%84%eb%ac%b8%ec%9d%98%ea%b0%80-%ec%95%8c%eb%a0%a4%ec%a3%bc%eb%8a%94-%ec%95%88%ec%a0%84%ed%95%9c-%ec%9d%98%ec%95%bd%ed%92%88/')
+  [중복제목] 1건
+    - ('스트레스 해소법, 실제로는 이렇게 진행됩니다', 'https://k-health365.com/%ec%8a%a4%ed%8a%b8%eb%a0%88%ec%8a%a4-%ed%95%b4%ec%86%8c%eb%b2%95-%ec%8b%a4%ec%a0%9c%eb%a1%9c%eb%8a%94-%ec%9d%b4%eb%a0%87%ea%b2%8c-%ec%a7%84%ed%96%89%eb%90%a9%eb%8b%88%eb%8b%a4/')
+
+### https://koreamedicaltour.com (전체 102건)
+  [코드펜스] 2건
+    - ('Rethinking Korea medical tour package official: A Fresh Perspective for 2026', 'https://koreamedicaltour.com/rethinking-korea-medical-tour-package-official-a-fresh-perspective-for-2026/')
+    - ('Why Pigmentation treatment Korea Matters: A Complete Expert Breakdown', 'https://koreamedicaltour.com/why-pigmentation-treatment-korea-matters-a-complete-expert-breakdown/')
+  [중복제목] 6건
+    - ('A Practical Look at Korea medical tour package official for International Patients', 'https://koreamedicaltour.com/a-practical-look-at-korea-medical-tour-package-official-for-international-patients/')
+    - ('A Practical Look at medical tourism support program Korea for International Patients', 'https://koreamedicaltour.com/a-practical-look-at-medical-tourism-support-program-korea-for-international-patients/')
+    - ('How to Actually Navigate KHIDI Medical Tourism Korea: A Specialist’s Guide', 'https://koreamedicaltour.com/how-to-actually-navigate-khidi-medical-tourism-korea-a-specialists-guide/')
+    - ('Busan medical tourism benefits 101: What First-Timers Should Know', 'https://koreamedicaltour.com/navigating-your-health-journey-unlocking-busan-medical-tourism-benefits-with-expert-guidance/')
+    - ('A Practical Look at Choosing an Anti-Aging Clinic in Gangnam: Separating Hype from Clinical Excellence', 'https://koreamedicaltour.com/what-nobody-tells-you-about-choosing-an-anti-aging-clinic-in-gangnam-separating-hype-from-clinical-excellence/')
+    - ('scalp treatment Korea clinic vs What You Think You Know: Key Differences', 'https://koreamedicaltour.com/dont-wait-why-a-scalp-treatment-korea-clinic-is-your-best-investment-in-2024/')
+
+### https://koreainvest365.com (전체 74건)
+  [중복제목] 7건
+    - ('A Practical Look at Korea crypto regulation 2026 for International Patients', 'https://koreainvest365.com/a-practical-look-at-korea-crypto-regulation-2026-for-international-patients/')
+    - ('How to Actually Handle kimchi premium explained: A Specialist’s Guide', 'https://koreainvest365.com/how-to-actually-handle-kimchi-premium-explained-a-specialists-guide/')
+    - ('Korean pension fund investment: Frequently Overlooked Facts', 'https://koreainvest365.com/unlocking-global-opportunities-a-deep-dive-into-korean-pension-fund-investment-strategies/')
+    - ('Korea Crypto Regulation 2026: The Unforeseen Impact on Digital Asset Investments', 'https://koreainvest365.com/korea-crypto-regulation-2026-the-unforeseen-impact-on-digital-asset-investments/')
+    - ('How to Actually Handle gold investment Korea guide: A Specialist’s Guide', 'https://koreainvest365.com/is-gold-investment-in-korea-really-worth-it-in-2024/')
+    - ('What Nobody Tells You About Wealth Management for Foreigners in Korea', 'https://koreainvest365.com/what-nobody-tells-you-about-wealth-management-for-foreigners-in-korea/')
+    - ('What Nobody Tells You About robo advisor Korea guide', 'https://koreainvest365.com/dont-miss-out-why-a-robo-advisor-korea-guide-is-critical-for-your-investments-in-2024/')
+
+### https://ki-korea.com (전체 57건)
+  [중복제목] 2건
+    - ('연금저축 세액공제: Frequently Overlooked Facts', 'https://ki-korea.com/%ec%97%b0%ea%b8%88%ec%a0%80%ec%b6%95-%ec%84%b8%ec%95%a1%ea%b3%b5%ec%a0%9c-frequently-overlooked-facts/')
+    - ('설문조사: 10명 중 5명이 부동산 경매 입문를 잘못 알고 있다', 'https://ki-korea.com/%ec%84%b1%ea%b3%b5%ec%a0%81%ec%9d%b8-%eb%82%b4-%ec%a7%91-%eb%a7%88%eb%a0%a8-%eb%b6%80%eb%8f%99%ec%82%b0-%ea%b2%bd%eb%a7%a4-%ec%9e%85%eb%ac%b8%ec%9c%bc%eb%a1%9c-%ec%8b%9c%ec%9e%91/')
+
+### https://koreainsurance365.com (전체 95건)
+  [코드펜스] 1건
+    - ('How to Actually Handle dental checkup Korea foreigner: A Specialist’s Guide', 'https://koreainsurance365.com/how-to-actually-handle-dental-checkup-korea-foreigner-a-specialists-guide/')
+  [진부제목] 4건
+    - ('Navigating National Health Insurance Foreigner Korea: Your Essential Guide', 'https://koreainsurance365.com/navigating-national-health-insurance-foreigner-korea-your-essential-guide/')
+    - ('Your Essential Guide to Dental Insurance for Foreigners in Korea', 'https://koreainsurance365.com/your-essential-guide-to-dental-insurance-for-foreigners-in-korea/')
+    - ('Your Essential Guide to Car Insurance for Foreigners in Korea', 'https://koreainsurance365.com/your-essential-guide-to-car-insurance-for-foreigners-in-korea/')
+    - ('Navigating Health Insurance Exemptions for Foreigners in the US: Your Essential Guide', 'https://koreainsurance365.com/navigating-health-insurance-exemptions-for-foreigners-in-the-us-your-essential-guide/')
+  [중복제목] 1건
+    - ('Your Essential Guide to Car Insurance for Foreigners in Korea', 'https://koreainsurance365.com/your-essential-guide-to-car-insurance-for-foreigners-in-korea/')
+
+### https://kfinance365.com (전체 81건)
+  [코드펜스] 2건
+    - ('startup investment Korea foreigner: A Closer Look at What Really Matters', 'https://kfinance365.com/startup-investment-korea-foreigner-a-closer-look-at-what-really-matters/')
+    - ('3 Mistakes People Make With tax refund foreigner Korea', 'https://kfinance365.com/3-mistakes-people-make-with-tax-refund-foreigner-korea/')
+  [중복제목] 11건
+    - ('tax deduction foreigner Korea Q&A: Answers From the Field', 'https://kfinance365.com/tax-deduction-for-foreigners-in-korea-what-they-dont-tell-you/')
+    - ('How to Actually Handle best credit card foreigner Korea: A Specialist’s Guide', 'https://kfinance365.com/what-a-best-credit-card-foreigner-korea-expert-does-differently-and-you-can-too/')
+    - ('Before You Try real estate Seoul foreigner buy, Read This First', 'https://kfinance365.com/my-15-year-seoul-property-journey-unpacking-the-nuances-of-real-estate-seoul-foreigner-buy/')
+    - ('angel investor network Seoul Explained in Plain English', 'https://kfinance365.com/why-your-startup-is-failing-to-attract-an-angel-investor-network-in-seoul/')
+    - ('How to Actually Handle Seoul financial center guide: A Specialist’s Guide', 'https://kfinance365.com/stop-overlooking-seoul-why-your-financial-future-depends-on-this-asian-hub/')
+    - ('How Much Should You Budget for Is Your Money Truly Safe? A Crucial Korea Phishing Scam Foreigner Warning You Can’t Afford to Ignore?', 'https://kfinance365.com/is-your-money-truly-safe-a-crucial-korea-phishing-scam-foreigner-warning-you-cant-afford-to-ignore/')
+    - ('Behind the Scenes: What Don’t Underestimate Corporate Governance Reform Korea: What Investors Need to Know NOW in Actually Involves', 'https://kfinance365.com/dont-underestimate-corporate-governance-reform-korea-what-investors-need-to-know-now-in-2024/')
+    - ('A Practical Look at Navigating the Korea Finance Market: Complete 2026 Expat Guide for International Patients', 'https://kfinance365.com/navigating-the-korea-finance-market-complete-2026-expat-guide/')
+    - ('How to Actually Handle Differences in Tax Structures Between Foreign Individual and Corporate Businesses and Selection Criteria You Must Understand: A Specialist’s Guide', 'https://kfinance365.com/differences-in-tax-structures-between-foreign-individual-and-corporate-businesses-and-selection-criteria-you-must-understand/')
+    - ('5 Mistakes People Make With Optimal Visa Selection Strategies for Foreigners Starting a Business in Korea Essential Guide for Smart Entry', 'https://kfinance365.com/optimal-visa-selection-strategies-for-foreigners-starting-a-business-in-korea-essential-guide-for-smart-entry/')
+    - ('A Practical Look at Analysis of Tax Issues for Global Asset Inheritance of Foreign Residents in Korea Essential Insights You Must Know for International Patients', 'https://kfinance365.com/analysis-of-tax-issues-for-global-asset-inheritance-of-foreign-residents-in-korea-essential-insights-you-must-know/')
+
+### https://koreataxnlaw.com (전체 92건)
+  [코드펜스] 2건
+    - ('The Real Cost of income tax report foreigner Korea — What to Expect', 'https://koreataxnlaw.com/debunking-common-myths-about-income-tax-report-foreigner-korea/')
+    - ('Overstay penalty Korea, Explained Simply', 'https://koreataxnlaw.com/debunking-common-myths-about-overstay-penalty-korea/')
+  [중복제목] 13건
+    - ('A Practical Look at HomeTax Korea English guide', 'https://koreataxnlaw.com/navigating-hometax-korea-a-comprehensive-english-guide-for-foreign-taxpayers/')
+    - ('foreigner CEO Korea requirements 101: What First-Timers Should Know', 'https://koreataxnlaw.com/foreigner-ceo-korea-requirements-navigating-your-path-to-leading-a-korean-business/')
+    - ('Withholding tax Korea foreigner: Details That Are Easy to Miss', 'https://koreataxnlaw.com/the-unexpected-nuance-in-withholding-tax-korea-foreigner-compliance/')
+    - ('A Practical Look at Korea expat housing tips 2026 for International Patients', 'https://koreataxnlaw.com/why-popular-korea-expat-housing-tips-2026-advice-fails-most-people/')
+    - ('officetels for rent in Korea: Frequently Overlooked Facts', 'https://koreataxnlaw.com/officetels-for-rent-in-korea-the-hidden-costs-of-mismanaging-your-lease-agreement/')
+    - ('Behind the Scenes: What tax residence status Korea Actually Involves', 'https://koreataxnlaw.com/are-you-truly-understanding-your-tax-residence-status-korea-in-2024/')
+    - ('A Practical Look at VAT refund tourist Korea for International Patients', 'https://koreataxnlaw.com/dont-miss-out-maximizing-your-vat-refund-tourist-korea-experience-in-2024/')
+    - ('A Practical Look at Are You Truly Prepared for the Intricate Korea Visa Extension Legal Requirements? for International Patients', 'https://koreataxnlaw.com/are-you-truly-prepared-for-the-intricate-korea-visa-extension-legal-requirements/')
+    - ('A Practical Look at Alternative Financial Services for Foreigners Whose Card Applications Were Denied Smart Solutions You Can Use Immediately for International Patients', 'https://koreataxnlaw.com/alternative-financial-services-for-foreigners-whose-card-applications-were-denied-smart-solutions-you-can-use-immediately/')
+    - ('Behind the Scenes: What Checklist for Documents and How to Enroll in Car Insurance in Korea Step by Step Practical Guide Actually Involves', 'https://koreataxnlaw.com/checklist-for-documents-and-how-to-enroll-in-car-insurance-in-korea-step-by-step-practical-guide/')
+    - ('Behind the Scenes: What Income Tax Reporting Actually Involves', 'https://koreataxnlaw.com/income-tax-reporting/')
+    - ('How to Actually Handle Company Formation Steps: A Specialist’s Guide', 'https://koreataxnlaw.com/company-formation-steps/')
+    - ('7 Mistakes People Make With Essential Guide for Foreigners in Korea: Part 1 – Tax and Legal Fundamentals', 'https://koreataxnlaw.com/essential-guide-for-foreigners-in-korea-part-1-tax-legal-fundamentals/')
+
+### https://koreacrypto365.com (전체 69건)
+  [중복제목] 21건
+    - ('A Practical Look at Korea stablecoin law', 'https://koreacrypto365.com/a-practical-look-at-korea-stablecoin-law/')
+    - ('The Real Cost of Korea crypto staking — What to Expect', 'https://koreacrypto365.com/the-real-cost-of-korea-crypto-staking-what-to-expect/')
+    - ('What Nobody Tells You About Upbit registration foreigner guide', 'https://koreacrypto365.com/what-nobody-tells-you-about-upbit-registration-foreigner-guide-2/')
+    - ('What Nobody Tells You About Upbit registration foreigner guide', 'https://koreacrypto365.com/what-nobody-tells-you-about-upbit-registration-foreigner-guide/')
+    - ('What Nobody Tells You About Coinone signup foreigner Korea', 'https://koreacrypto365.com/what-nobody-tells-you-about-coinone-signup-foreigner-korea/')
+    - ('What Nobody Tells You About stablecoin regulation Korea', 'https://koreacrypto365.com/stablecoin-regulation-korea-frequently-overlooked-facts/')
+    - ('What Nobody Tells You About crypto trading strategy Korea', 'https://koreacrypto365.com/unlocking-potential-a-deep-dive-into-crypto-trading-strategy-korea/')
+    - ('What Nobody Tells You About FSC crypto policy Korea', 'https://koreacrypto365.com/navigating-the-landscape-of-fsc-crypto-policy-korea-a-2024-update/')
+    - ('A Practical Look at Korean exchange withdrawal guide for International Patients', 'https://koreacrypto365.com/the-uncomfortable-truth-about-korean-exchange-withdrawal-guide-most-people-ignore/')
+    - ('How to Actually Handle stablecoin regulation Korea: A Specialist’s Guide', 'https://koreacrypto365.com/what-3-months-of-stablecoin-regulation-korea-research-taught-me-that-no-one-talks-about/')
+    - ('What Nobody Tells You About Korea crypto regulation 2026', 'https://koreacrypto365.com/the-unforeseen-impact-of-korea-crypto-regulation-2026-on-global-digital-assets/')
+    - ('A Practical Look at DAO legal status Korea for International Patients', 'https://koreacrypto365.com/dao-legal-status-korea-why-unclear-frameworks-jeopardize-your-decentralized-future/')
+    - ('A Practical Look at staking regulation Korea for International Patients', 'https://koreacrypto365.com/the-staking-regulation-korea-warning-signs-most-people-miss-until-its-too-late/')
+    - ('Debunking Common Myths About day trading crypto Korea guide', 'https://koreacrypto365.com/the-complete-day-trading-crypto-korea-guide-you-need-now-for-2026-success/')
+    - ('Before You Try Korea crypto tax guide, Read This First', 'https://koreacrypto365.com/stop-losing-money-your-essential-korea-crypto-tax-guide/')
+
+### https://krealestate365.com (전체 53건)
+  [코드펜스] 1건
+    - ('설문조사: 10명 중 9명이 utility setup apartment Korea를 잘못 알고 있다', 'https://krealestate365.com/%ec%84%a4%eb%ac%b8%ec%a1%b0%ec%82%ac-10%eb%aa%85-%ec%a4%91-9%eb%aa%85%ec%9d%b4-utility-setup-apartment-korea%eb%a5%bc-%ec%9e%98%eb%aa%bb-%ec%95%8c%ea%b3%a0-%ec%9e%88%eb%8b%a4/')
+  [중복제목] 5건
+    - ('How commercial real estate Seoul Has Changed in 2026', 'https://krealestate365.com/how-commercial-real-estate-seoul-has-changed-in-2026/')
+    - ('foreigner land purchase Korea에 대한 흔한 오해, 진실은 이렇습니다', 'https://krealestate365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%99%b8%ea%b5%ad%ec%9d%b8-%ed%86%a0%ec%a7%80-%eb%a7%a4%ec%88%98-%ed%98%84%ed%99%a9%ea%b3%bc-%ec%a0%84%eb%a7%9d-foreigner-land-purchase-korea-%ec%8b%ac/')
+    - ('foreigner land purchase Korea 시작 전에 꼭 읽어야 할 글', 'https://krealestate365.com/the-unforeseen-hurdles-in-foreigner-land-purchase-korea-what-experts-know/')
+    - ('acquisition tax Korea foreigner, 왜 이런 문제가 생길까? 전문가가 답하다', 'https://krealestate365.com/the-unforeseen-complexity-of-acquisition-tax-korea-foreigner-for-global-investors/')
+    - ('REIT investment Korea foreigner에 대해 의사가 꼭 알려주고 싶은 8가지', 'https://krealestate365.com/reit-investment-korea-foreigner-unveiling-the-hidden-opportunities-youre-missing/')
+
+### https://ktech365.com (전체 67건)
+  [코드펜스] 2건
+    - ('Seoul startup accelerator Q&A: Answers From the Field', 'https://ktech365.com/seoul-startup-accelerator-qa-answers-from-the-field/')
+    - ('Korea AI research institute Warning Signs You Should Never Ignore', 'https://ktech365.com/korea-ai-research-institute-warning-signs-you-should-never-ignore/')
+  [중복제목] 14건
+    - ('A Practical Look at TSMC vs Samsung competition for International Patients', 'https://ktech365.com/tsmc-vs-samsung-competition-vs-foundry-giants-how-to-tell-the-difference/')
+    - ('A Practical Look at Korean startup success story for International Patients', 'https://ktech365.com/from-seoul-to-global-stage-the-unfolding-korean-startup-success-story-in-ai-healthcare/')
+    - ('Behind the Scenes: What startup funding Korea guide Actually Involves', 'https://ktech365.com/what-3-months-of-startup-funding-korea-guide-research-taught-me-that-no-one-talks-about/')
+    - ('Behind the Scenes: What memory chip price Korea Actually Involves', 'https://ktech365.com/the-hidden-factor-influencing-memory-chip-price-korea-youre-likely-overlooking/')
+    - ('Korea startup ecosystem 2026 101: What First-Timers Should Know', 'https://ktech365.com/the-uncomfortable-truth-about-korea-startup-ecosystem-2026-most-people-ignore/')
+    - ('Debunking Common Myths About nuclear fusion KSTAR guide', 'https://ktech365.com/the-hidden-side-of-nuclear-fusion-kstar-guide-that-changes-how-you-should-approach-it/')
+    - ('What Nobody Tells You About wearable health tracker Korea', 'https://ktech365.com/wearable-health-tracker-korea-what-nobody-tells-you-about-its-true-potential/')
+    - ('Debunking Common Myths About fintech sandbox Korea result', 'https://ktech365.com/the-complete-fintech-sandbox-korea-result-guide-you-need-now-why-its-impact-matters-more-than-ever-in-2026/')
+    - ('What Nobody Tells You About smart city Songdo guide', 'https://ktech365.com/stop-overlooking-songdo-your-smart-city-songdo-guide-is-missing-this-crucial-insight/')
+    - ('Behind the Scenes: What LG rollable display guide Actually Involves', 'https://ktech365.com/is-the-lg-rollable-display-guide-a-glimpse-into-the-future-of-personal-tech/')
+    - ('nuclear fusion KSTAR guide Warning Signs You Should Never Ignore', 'https://ktech365.com/is-the-kstar-nuclear-fusion-reactor-guiding-us-towards-infinite-energy/')
+    - ('How to Actually Handle plastic recycling tech Korea: A Specialist’s Guide', 'https://ktech365.com/the-urgent-imperative-why-plastic-recycling-tech-korea-matters-more-than-ever-in-2024/')
+    - ('Debunking Common Myths About The Critical Oversight in Korea Drone Technology Korea Regulation That’s Costing Innovators', 'https://ktech365.com/the-critical-oversight-in-korea-drone-technology-korea-regulation-thats-costing-innovators/')
+    - ('A Practical Look at Voice Recognition Processor Dialect Handling: What Nobody Tells You About Its Real Challenges and Breakthroughs for International Patients', 'https://ktech365.com/voice-recognition-processor-dialect-handling-what-nobody-tells-you-about-its-real-challenges-and-breakthroughs/')
+
+### https://kskin365.com (전체 86건)
+  [코드펜스] 6건
+    - ('sensitive skin K-beauty routine: A Closer Look at What Really Matters', 'https://kskin365.com/sensitive-skin-k-beauty-routine-a-closer-look-at-what-really-matters/')
+    - ('Debunking Common Myths About sheet mask how to use', 'https://kskin365.com/debunking-common-myths-about-sheet-mask-how-to-use/')
+    - ('Before You Try The Truth About Peptide complex serum Korea: 2026 Expert Analysis, Read This First', 'https://kskin365.com/the-truth-about-peptide-complex-serum-korea-2026-expert-analysis/')
+    - ('How Why Korean sleeping pack hydration Matters: A Complete Expert Breakdown Has Changed in 2026', 'https://kskin365.com/why-korean-sleeping-pack-hydration-matters-a-complete-expert-breakdown/')
+    - ('Why Snail mucin serum review Matters: A Complete Expert Breakdown: A Closer Look at What Really Matters', 'https://kskin365.com/why-snail-mucin-serum-review-matters-a-complete-expert-breakdown/')
+    - ('Why Does K-Beauty for Oily Skin: Top 7 Secrets to a Flawless Cause Problems? Experts Explain', 'https://kskin365.com/k-beauty-for-oily-skin-top-7-secrets-to-a-flawless-shine-free-glow/')
+  [중복제목] 19건
+    - ('Debunking Common Myths About sheet mask how to use', 'https://kskin365.com/debunking-common-myths-about-sheet-mask-how-to-use/')
+    - ('What Nobody Tells You About AHA BHA Korean skincare', 'https://kskin365.com/the-truth-about-aha-bha-korean-skincare-that-most-people-get-wrong/')
+    - ('Behind the Scenes: What best Korean cushion foundation Actually Involves', 'https://kskin365.com/the-best-korean-cushion-foundation-unveiling-skin-transformation-secrets-dermatologists-observe/')
+    - ('What Nobody Tells You About best Korean sunscreen no white cast', 'https://kskin365.com/the-hidden-side-of-best-korean-sunscreen-no-white-cast-that-changes-how-you-should-approach-it/')
+    - ('Debunking Common Myths About Korean skincare routine order', 'https://kskin365.com/the-complete-korean-skincare-routine-order-guide-you-need-now-for-flawless-skin-in-2026/')
+    - ('A Practical Look at Korean skincare for acne scars for International Patients', 'https://kskin365.com/what-nobody-tells-you-about-korean-skincare-for-acne-scars-a-clinical-perspective/')
+    - ('Behind the Scenes: What best eye cream for dark circles Actually Involves', 'https://kskin365.com/dark-circles-what-nobody-tells-you-about-the-best-eye-cream-for-dark-circles-and-why-k-beauty-wins/')
+    - ('Study Reveals: 7 in 10 People Misunderstand best Korean brightening serum', 'https://kskin365.com/stop-wasting-money-on-ineffective-brightening-serums-your-expert-guide-to-k-beauty-radiance/')
+    - ('Debunking Common Myths About best eye cream for dark circles', 'https://kskin365.com/are-you-using-the-best-eye-cream-for-dark-circles-in-your-k-beauty-routine/')
+    - ('A Practical Look at double cleansing method Korea for International Patients', 'https://kskin365.com/is-the-double-cleansing-method-koreas-secret-to-flawless-skin-really-worth-it/')
+    - ('What Nobody Tells You About best toner for oily skin Korea', 'https://kskin365.com/dont-wait-discover-the-best-toner-for-oily-skin-from-korea-in-2024-best-toner-for-oily-skin-korea/')
+    - ('How to Actually Handle Are Your Korean Glass Skin Routine Steps Truly Delivering That Flawless Glow?: A Specialist’s Guide', 'https://kskin365.com/are-your-korean-glass-skin-routine-steps-truly-delivering-that-flawless-glow/')
+    - ('Behind the Scenes: What Top 7 Korean Eye Cream Recommendations for Youthful Radiance Actually Involves', 'https://kskin365.com/top-7-korean-eye-cream-recommendations-for-youthful-radiance/')
+    - ('A Practical Look at Vitamin C Serum Korea Review: Top 7 Picks for Radiant Skin Secrets! for International Patients', 'https://kskin365.com/vitamin-c-serum-korea-review-top-7-picks-for-radiant-skin-secrets/')
+    - ('5 Mistakes People Make With Fermented Skincare Korea Brands: Top 7 Secrets to Radiant Skin', 'https://kskin365.com/fermented-skincare-korea-brands-top-7-secrets-to-radiant-skin/')
+
+### https://oliveyoungkorea.com (전체 64건)
+  [중복제목] 11건
+    - ('Olive Young sunscreen review: Details That Are Easy to Miss', 'https://oliveyoungkorea.com/olive-young-sunscreen-review-details-that-are-easy-to-miss/')
+    - ('Olive Young sunscreen review Warning Signs You Should Never Ignore', 'https://oliveyoungkorea.com/olive-young-sunscreen-review-warning-signs-you-should-never-ignore/')
+    - ('Before You Try Korean toner pads review, Read This First', 'https://oliveyoungkorea.com/before-you-try-korean-toner-pads-review-read-this-first/')
+    - ('How to Actually Handle Anua heartleaf toner review: A Specialist’s Guide', 'https://oliveyoungkorea.com/anua-heartleaf-toner-review-explained-in-plain-english/')
+    - ('Behind the Scenes: What Korean inner beauty drink Actually Involves', 'https://oliveyoungkorea.com/my-4-week-journey-with-korean-inner-beauty-drinks-glow-from-within/')
+    - ('Behind the Scenes: What Korean serum best pick Actually Involves', 'https://oliveyoungkorea.com/stop-wasting-money-on-korean-serum-best-pick-what-actually-works-in-practice/')
+    - ('How Much Should You Budget for Purito centella serum review?', 'https://oliveyoungkorea.com/the-hidden-side-of-purito-centella-serum-review-that-changes-how-you-should-approach-it/')
+    - ('5 Mistakes People Make With bbia eyeliner review', 'https://oliveyoungkorea.com/the-complete-bbia-eyeliner-review-guide-you-need-now-why-eye-safety-matters-more-than-ever-in-2026/')
+    - ('How Much Should You Budget for Wakemake tint review?', 'https://oliveyoungkorea.com/wakemake-tint-review-what-nobody-tells-you-about-its-clinical-impact/')
+    - ('A Practical Look at bbia eyeliner review for International Patients', 'https://oliveyoungkorea.com/dont-wait-to-read-this-bbia-eyeliner-review-your-guide-to-flawless-k-beauty-eyes-in-2024/')
+    - ('Behind the Scenes: What Romand lip tint review Actually Involves', 'https://oliveyoungkorea.com/is-romand-lip-tint-truly-the-k-beauty-holy-grail-you-need-romand-lip-tint-review/')
+
+### https://kworld365.com (전체 94건)
+  [코드펜스] 1건
+    - ('Behind the Scenes: What NCT 127 world tour Actually Involves', 'https://kworld365.com/behind-the-scenes-what-nct-127-world-tour-actually-involves/')
+  [진부제목] 1건
+    - ('Why Does Mastering the Vibe: Your Ultimate Guide to Korean Cultural Etiquette Do and Don’t Cause Problems? Experts Explain', 'https://kworld365.com/mastering-the-vibe-your-ultimate-guide-to-korean-cultural-etiquette-do-and-dont/')
+  [연도포함] 1건
+    - ('Why Does The Next Wave: K-pop Rookie Groups to Watch in 2025 Cause Problems? Experts Explain', 'https://kworld365.com/the-next-wave-k-pop-rookie-groups-to-watch-in-2025/')
+  [중복제목] 16건
+    - ('Save Time and Money on K-pop world tour 2026', 'https://kworld365.com/save-time-and-money-on-k-pop-world-tour-2026/')
+    - ('K-pop fan meeting guide Q&A: Answers From the Field', 'https://kworld365.com/k-pop-fan-meeting-guide-qa-answers-from-the-field/')
+    - ('Behind the Scenes: What HYBE building tour Actually Involves', 'https://kworld365.com/behind-the-scenes-what-hybe-building-tour-actually-involves/')
+    - ('K-pop concert tickets Korea Q&A: Answers From the Field', 'https://kworld365.com/k-pop-concert-tickets-korea-qa-answers-from-the-field/')
+    - ('Behind the Scenes: What NCT 127 world tour Actually Involves', 'https://kworld365.com/behind-the-scenes-what-nct-127-world-tour-actually-involves/')
+    - ('Free Korean apps recommendation Made Simple', 'https://kworld365.com/study-reveals-6-in-10-people-misunderstand-free-korean-apps-recommendation/')
+    - ('A Practical Look at Korean convenience store food ranking vs What You Think You Know: Key Differences for International Patients', 'https://kworld365.com/korean-convenience-store-food-ranking-vs-what-you-think-you-know-key-differences/')
+    - ('5 Things to Check Before cost of living Seoul 2026: A Closer Look at What Really Matters', 'https://kworld365.com/what-nobody-tells-you-about-cost-of-living-seoul-2026/')
+    - ('8 Questions People Ask About IVE’s Rapid Rise', 'https://kworld365.com/the-truth-about-ives-rapid-rise-that-most-people-get-wrong/')
+    - ('How to Actually Handle the K-Pop World Plate-by-Plate Essential Korean Food: A Specialist’s Guide', 'https://kworld365.com/unlocking-the-k-pop-world-plate-by-plate-essential-korean-food-vocabulary-words-for-every-fan/')
+    - ('Mastering Your First Impression: How to Introduce Yourself Korean Style 101: What First-Timers Should Know', 'https://kworld365.com/mastering-your-first-impression-how-to-introduce-yourself-korean-style-the-k-pop-fans-essential-guide/')
+    - ('7 Mistakes People Make With The Unforgettable Symphony: Dissecting the TWICE Concert Experience', 'https://kworld365.com/the-unforgettable-symphony-dissecting-the-twice-concert-experience/')
+    - ('A Practical Look at [K-Pop & Artists] Global Domination for International Patients', 'https://kworld365.com/the-unseen-architect-decoding-the-mechanics-behind-%e2%95%90%e2%95%90%e2%95%90-k-pop-artists-%e2%95%90%e2%95%90%e2%95%90s-global-domination/')
+    - ('Behind the Scenes: What BLACKPINK Comeback Update: What BLINKs Need to Know About Their Next Move Actually Involves', 'https://kworld365.com/blackpink-comeback-update-what-blinks-need-to-know-about-their-next-move/')
+    - ('A Practical Look at Le Sserafim debut story', 'https://kworld365.com/what-nobody-tells-you-about-le-sserafim-debut-story-and-why-it-matters/')
+
+### https://k-trip365.com (전체 67건)
+  [코드펜스] 3건
+    - ('Trip.com Korea hotel booking Q&A: Answers From the Field', 'https://k-trip365.com/trip-com-korea-hotel-booking-qa-answers-from-the-field/')
+    - ('How to Actually Handle best hotels Seoul foreigner: A Specialist’s Guide', 'https://k-trip365.com/how-to-actually-handle-best-hotels-seoul-foreigner-a-specialists-guide/')
+    - ('Before You Try hotel near Incheon airport, Read This First', 'https://k-trip365.com/debunking-common-myths-about-hotel-near-incheon-airport/')
+  [진부제목] 1건
+    - ('Seoul 3 Day Itinerary: Your Ultimate Guide to Exploring the Korean Capital', 'https://k-trip365.com/seoul-3-day-itinerary-your-ultimate-guide-to-exploring-the-korean-capital/')
+  [연도포함] 6건
+    - ('Is Myeongdong Street Food Still Worth the Hype in 2024?', 'https://k-trip365.com/is-myeongdong-street-food-still-worth-the-hype-in-2024/')
+    - ('The Complete Dongdaemun Shopping Guide You Need Now for 2024', 'https://k-trip365.com/the-complete-dongdaemun-shopping-guide-you-need-now-for-2024/')
+    - ('Is Your Gangneung Coffee Street Guide Up-to-Date for an Unforgettable 2024 Trip?', 'https://k-trip365.com/is-your-gangneung-coffee-street-guide-up-to-date-for-an-unforgettable-2024-trip/')
+    - ('Don’t Miss Out: Essential Bukchon Hanok Village Tips You Need to Know Before 2025', 'https://k-trip365.com/dont-miss-out-essential-bukchon-hanok-village-tips-you-need-to-know-before-2025/')
+    - ('Is a Hostel Hongdae Recommendation Still the Best Bet for Seoul Travelers in 2024?', 'https://k-trip365.com/is-a-hostel-hongdae-recommendation-still-the-best-bet-for-seoul-travelers-in-2024/')
+    - ('Is a Nami Island Day Trip Guide Still Essential in 2024? Uncover the Secrets to a Perfect Getaway!', 'https://k-trip365.com/is-a-nami-island-day-trip-guide-still-essential-in-2024-uncover-the-secrets-to-a-perfect-getaway/')
+  [중복제목] 1건
+    - ('A Practical Look at Seoul hidden spots guide for International Patients', 'https://k-trip365.com/unlocking-seouls-secrets-your-ultimate-seoul-hidden-spots-guide/')
+
+### https://k-visa365.com (전체 70건)
+  [중복제목] 7건
+    - ('A Practical Look at D-10 job seeker visa guide for International Patients', 'https://k-visa365.com/how-to-actually-secure-your-d-10-job-seeker-visa-a-specialists-guide/')
+    - ('F-4 overseas Korean visa 101: What First-Timers Should Know', 'https://k-visa365.com/navigating-the-f-4-overseas-korean-visa-your-essential-guide/')
+    - ('Rethinking part time work student visa: A Fresh Perspective for 2026', 'https://k-visa365.com/part-time-work-student-visa-your-comprehensive-guide-to-earning-while-studying-abroad/')
+    - ('A Practical Look at D10 job seeker visa points for International Patients', 'https://k-visa365.com/d10-job-seeker-visa-points-the-hidden-factors-most-applicants-miss/')
+    - ('The Real Cost of working holiday visa Korea — What to Expect', 'https://k-visa365.com/the-complete-working-holiday-visa-korea-guide-you-need-now/')
+    - ('D2 student visa documents: Frequently Overlooked Facts', 'https://k-visa365.com/dont-risk-your-future-the-essential-d2-student-visa-documents-you-must-master-in-2024/')
+    - ('A Practical Look at Understanding the National Pension Scheme and Refund for Foreigners for International Patients', 'https://k-visa365.com/understanding-the-national-pension-scheme-and-refund-for-foreigners/')
+
+### https://koreawedding365.com (전체 56건)
+  [코드펜스] 1건
+    - ('Study Reveals: 7 in 10 People Misunderstand Korean marriage document list', 'https://koreawedding365.com/2026/07/17/study-reveals-7-in-10-people-misunderstand-korean-marriage-document-list/')
+  [중복제목] 10건
+    - ('Korea wedding planner foreigner Explained in Plain English', 'https://koreawedding365.com/2026/07/23/korea-wedding-planner-foreigner-explained-in-plain-english/')
+    - ('Debunking Common Myths About spouse visa Korea requirements', 'https://koreawedding365.com/2026/07/12/spouse-visa-korea-requirements-vs-what-you-think-you-know-key-differences/')
+    - ('How to Actually Handle dual citizenship Korea child: A Specialist’s Guide', 'https://koreawedding365.com/2026/07/12/how-to-actually-navigate-dual-citizenship-for-your-korean-child-a-specialists-guide/')
+    - ('A Practical Look at F-6 marriage visa Korea for International Patients', 'https://koreawedding365.com/2026/07/11/your-journey-to-forever-in-korea-is-a-beautiful-one-and-navigating-the-f-6-marriage-visa-korea-can-feel-like-a-signific/')
+    - ('How to Actually Handle wedding venue cost Seoul: A Specialist’s Guide', 'https://koreawedding365.com/2026/07/10/your-essential-guide-to-wedding-venue-cost-seoul-a-planners-perspective/')
+    - ('A Practical Look at marriage registration foreigner Korea for International Patients', 'https://koreawedding365.com/2026/06/28/is-marriage-registration-foreigner-korea-an-overwhelming-process-in-2024/')
+    - ('A Practical Look at groom tuxedo rental Korea for International Patients', 'https://koreawedding365.com/2026/06/25/is-groom-tuxedo-rental-korea-really-worth-it-for-your-2026-wedding/')
+    - ('The Real Cost of wedding ring brand Korea — What to Expect', 'https://koreawedding365.com/2026/06/24/are-you-choosing-the-right-wedding-ring-brand-korea-in-2024-an-experts-guide/')
+    - ('How to Actually Handle Considering a Korea Couple Photoshoot Location Korea Wedding? Are You Missing These Hidden Gems?: A Specialist’s Guide', 'https://koreawedding365.com/2026/06/19/considering-a-korea-couple-photoshoot-location-korea-wedding-are-you-missing-these-hidden-gems/')
+    - ('What Nobody Tells You About Step-by-Step Guide to the Korean Marriage Visa (F-6)', 'https://koreawedding365.com/2026/06/17/step-by-step-guide-to-the-korean-marriage-visa-f-6/')
+
+### https://kstudy365.com (전체 58건)
+  [진부제목] 1건
+    - ('Korean Academic Calendar Schedule Complete Guide to Dream: What to Prepare First', 'https://kstudy365.com/korean-academic-calendar-schedule-complete-guide-2024-to-unlock-your-dream/')
+  [중복제목] 11건
+    - ('KGSP scholarship guide 101: Where First-Timers Should Begin', 'https://kstudy365.com/what-nobody-tells-you-about-kgsp-scholarship-guide/')
+    - ('Before You Try Korean government scholarship 2026, Read This First', 'https://kstudy365.com/before-you-try-korean-government-scholarship-2026-read-this-first/')
+    - ('Dormitory life Korea university: What to Prepare First', 'https://kstudy365.com/navigating-dormitory-life-at-a-korea-university-your-essential-guide/')
+    - ('A Practical Look at university hospital Korea student', 'https://kstudy365.com/university-hospital-korea-student-your-gateway-to-world-class-medical-education-healthcare/')
+    - ('university scholarship Korea: A Closer Look at What Really Matters', 'https://kstudy365.com/i-found-a-hidden-university-scholarship-korea-secret-heres-how-it-unlocked-my-dreams/')
+    - ('A Practical Look at Korean university semester schedule for International Patients', 'https://kstudy365.com/what-nobody-tells-you-about-the-korean-university-semester-schedule/')
+    - ('How to Actually Handle K-pop dance club university Korea: A Specialist’s Guide', 'https://kstudy365.com/the-essential-k-pop-dance-club-university-korea-guide-you-need-now/')
+    - ('How to Actually Handle Study in Korea: A Specialist’s Guide', 'https://kstudy365.com/the-unseen-mistakes-costing-international-students-their-dream-to-study-in-korea/')
+    - ('A Practical Look at Don’t Get Stuck with Your D4 Visa: The Critical Steps for a Seamless D4 visa to D2 visa change for International Patients', 'https://kstudy365.com/dont-get-stuck-with-your-d4-visa-the-critical-steps-for-a-seamless-d4-visa-to-d2-visa-change/')
+    - ('Before You Try Korean Community College Guide Dream Career in, Read This First', 'https://kstudy365.com/korean-community-college-guide-unlock-your-dream-career-in-2024/')
+    - ('How to Actually Handle How to Apply for a Korean Student Visa D-2 or D-4: A Specialist’s Guide', 'https://kstudy365.com/how-to-apply-for-a-korean-student-visa-d-2-or-d-4/')
+
+### https://studyinkorea365.com (전체 47건)
+  [코드펜스] 1건
+    - ('Transfer admission Korea 101: Where First-Timers Should Begin', 'https://studyinkorea365.com/the-brutal-truth-about-transfer-admission-korea-what-nobody-tells-you/')
+  [중복제목] 8건
+    - ('A Practical Look at Korea university admission foreigner for International Patients', 'https://studyinkorea365.com/a-practical-look-at-korea-university-admission-foreigner-for-international-patients/')
+    - ('A Practical Look at MBA scholarship Korea for International Patients', 'https://studyinkorea365.com/the-truth-about-mba-scholarship-korea-that-most-people-get-wrong/')
+    - ('How admission interview Korea tips Actually Works', 'https://studyinkorea365.com/how-to-actually-ace-your-korea-admission-interview-a-students-guide/')
+    - ('exchange program Korea Warning Signs You Should Never Ignore', 'https://studyinkorea365.com/exchange-program-korea-your-gateway-to-unforgettable-academic-cultural-adventures/')
+    - ('A Practical Look at MBA scholarship Korea for International Patients', 'https://studyinkorea365.com/what-nobody-tells-you-about-mba-scholarship-korea-and-why-it-matters/')
+    - ('5 Mistakes People Make With TTMIK Talk To Me In Korean resource', 'https://studyinkorea365.com/dont-make-this-ttmik-talk-to-me-in-korean-resource-mistake-its-more-common-than-you-think/')
+    - ('How to Actually Handle graduate student life Korea: A Specialist’s Guide', 'https://studyinkorea365.com/is-graduate-student-life-in-korea-really-worth-the-investment-in-2026/')
+    - ('Behind the Scenes: What Are You Making These Critical Mistakes with National Health Insurance for Foreign Students? Actually Involves', 'https://studyinkorea365.com/are-you-making-these-critical-mistakes-with-national-health-insurance-for-foreign-students/')
+
+### https://kieca-korea.org (전체 79건)
+  [코드펜스] 3건
+    - ('Korean music culture 시작 전에 꼭 읽어야 할 글', 'https://kieca-korea.org/korean-music-culture-%ec%8b%9c%ec%9e%91-%ec%a0%84%ec%97%90-%ea%bc%ad-%ec%9d%bd%ec%96%b4%ec%95%bc-%ed%95%a0-%ea%b8%80/')
+    - ('절대 놓치면 안 되는 Korean music culture 경고 신호', 'https://kieca-korea.org/%ec%a0%88%eb%8c%80-%eb%86%93%ec%b9%98%eb%a9%b4-%ec%95%88-%eb%90%98%eb%8a%94-korean-music-culture-%ea%b2%bd%ea%b3%a0-%ec%8b%a0%ed%98%b8/')
+    - ('Korean art appreciation 입문 — 처음이라면 꼭 알아야 할 것', 'https://kieca-korea.org/korean-art-appreciation-%ec%9e%85%eb%ac%b8-%ec%b2%98%ec%9d%8c%ec%9d%b4%eb%9d%bc%eb%a9%b4-%ea%bc%ad-%ec%95%8c%ec%95%84%ec%95%bc-%ed%95%a0-%ea%b2%83/')
+  [중복제목] 15건
+    - ('temple visit Korea etiquette, 쉽게 풀어드립니다', 'https://kieca-korea.org/temple-visit-korea-etiquette-%ec%89%bd%ea%b2%8c-%ed%92%80%ec%96%b4%eb%93%9c%eb%a6%bd%eb%8b%88%eb%8b%a4/')
+    - ('Korean music culture 시작 전에 꼭 읽어야 할 글', 'https://kieca-korea.org/korean-music-culture-%ec%8b%9c%ec%9e%91-%ec%a0%84%ec%97%90-%ea%bc%ad-%ec%9d%bd%ec%96%b4%ec%95%bc-%ed%95%a0-%ea%b8%80/')
+    - ('Korean festival calendar에 대한 흔한 오해 바로잡기', 'https://kieca-korea.org/korean-festival-calendar%ec%97%90-%eb%8c%80%ed%95%b4-%ec%9d%98%ec%82%ac%ea%b0%80-%ea%bc%ad-%ec%95%8c%eb%a0%a4%ec%a3%bc%ea%b3%a0-%ec%8b%b6%ec%9d%80-5%ea%b0%80%ec%a7%80/')
+    - ('Korean art appreciation, 제대로 대처하는 법 — 전문가 가이드', 'https://kieca-korea.org/korean-art-appreciation-%ec%99%9c-%ec%9d%b4%eb%9f%b0-%eb%ac%b8%ec%a0%9c%ea%b0%80-%ec%83%9d%ea%b8%b8%ea%b9%8c-%ec%a0%84%eb%ac%b8%ea%b0%80%ea%b0%80-%eb%8b%b5%ed%95%98%eb%8b%a4/')
+    - ('Korean music culture에 대해 의사가 꼭 알려주고 싶은 9가지', 'https://kieca-korea.org/korean-music-culture-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%8c%eb%8d%98-k-pop%eb%a7%8c%ec%9d%b4-%ec%95%84%eb%8b%88%eb%8b%a4/')
+    - ('TOPIK preparation guide 궁금증, 현장 전문가가 답하다', 'https://kieca-korea.org/topik-%eb%95%8c%eb%ac%b8%ec%97%90-%ed%9e%98%eb%93%9c%ec%85%a8%eb%82%98%ec%9a%94-%ec%a0%84%eb%ac%b8%ea%b0%80%ea%b0%80-%ec%95%8c%eb%a0%a4%ec%a3%bc%eb%8a%94-%ed%95%b4%ea%b2%b0%eb%b2%95/')
+    - ('career fair Korea international, 제대로 대처하는 법 — 전문가 가이드', 'https://kieca-korea.org/career-fair-korea-international-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%8c%ea%b3%a0-%ec%9e%88%eb%8d%98-%ea%b2%83%ec%9d%80-%ed%8b%80%eb%a0%b8%eb%8b%a4/')
+    - ('Korean pronunciation tips, 왜 이런 문제가 생길까? 전문가가 답하다', 'https://kieca-korea.org/korean-pronunciation-tips-%eb%95%8c%eb%ac%b8%ec%97%90-%ed%9e%98%eb%93%9c%ec%85%a8%eb%82%98%ec%9a%94-%ec%a0%84%eb%ac%b8%ea%b0%80%ea%b0%80-%ec%95%8c%eb%a0%a4%ec%a3%bc%eb%8a%94-%ed%95%b4%ea%b2%b0/')
+    - ('career fair Korea international, 실제로는 어떻게 진행될까', 'https://kieca-korea.org/%ea%b5%ad%ec%a0%9c%ea%b5%90%ec%9c%a1-%ec%84%a0%eb%8f%84%eb%a5%bc-%ec%9c%84%ed%95%9c-kieca%ec%9d%98-career-fair-korea-international-%ec%a0%84%eb%9e%b5%ea%b3%bc-%eb%b9%84%ec%a0%84/')
+    - ('freelance work Korea, 왜 이런 문제가 생길까? 전문가가 답하다', 'https://kieca-korea.org/%ea%b5%ad%ec%a0%9c%ea%b5%90%ec%9c%a1%eb%ac%b8%ed%99%94-%ea%b5%90%eb%a5%98%eb%a5%bc-%ed%86%b5%ed%95%9c-%ed%95%9c%ea%b5%ad-%ed%94%84%eb%a6%ac%eb%9e%9c%ec%84%9c-%ed%99%9c%eb%8f%99-%ec%a7%80%ec%9b%90/')
+    - ('Korean food culture understanding 시작 전에 꼭 읽어야 할 글', 'https://kieca-korea.org/%ed%95%9c%ea%b5%ad-%ec%9d%8c%ec%8b%9d-%eb%ac%b8%ed%99%94-%ec%9d%b4%ed%95%b4korean-food-culture-understanding-%ec%8b%ac%ed%99%94-%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%a8-%ea%b5%ad%ec%a0%9c-%ea%b5%90/')
+    - ('Hanbok wearing guide 시작 전에 꼭 읽어야 할 글', 'https://kieca-korea.org/%ea%b5%ad%ec%a0%9c%ea%b5%90%ec%9c%a1%eb%ac%b8%ed%99%94-%ea%b5%90%eb%a5%98%ec%9d%98-%ed%95%b5%ec%8b%ac-%ed%95%9c%eb%b3%b5-%ec%b0%a9%ec%9a%a9-%ea%b0%80%ec%9d%b4%eb%93%9chanbok-wearing-guide-%ed%94%84/')
+    - ('Korean traditional culture experience에 대해 의사가 꼭 알려주고 싶은 6가지', 'https://kieca-korea.org/%ea%b5%ad%ec%a0%9c%ea%b5%90%ec%9c%a1%eb%ac%b8%ed%99%94-%ea%b5%90%eb%a5%98%ec%9d%98-%ed%95%b5%ec%8b%ac-korean-traditional-culture-experience-%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%a8-%ec%8b%ac%ec%b8%b5/')
+    - ('professional network Seoul, 당신이 아는 것과 뭐가 다를까', 'https://kieca-korea.org/unlock-your-potential-building-your-professional-network-in-seoul/')
+    - ('expat career Korea guide 궁금증, 현장 전문가가 답하다', 'https://kieca-korea.org/the-unforeseen-challenges-in-your-expat-career-korea-guide/')
+
+### https://ksa-korea.org (전체 44건)
+  [코드펜스] 4건
+    - ('visa rejection Korea reason에 대한 흔한 오해 바로잡기', 'https://ksa-korea.org/visa-rejection-korea-reason%ec%97%90-%eb%8c%80%ed%95%9c-%ed%9d%94%ed%95%9c-%ec%98%a4%ed%95%b4-%eb%b0%94%eb%a1%9c%ec%9e%a1%ea%b8%b0/')
+    - ('아무도 말해주지 않는 Vietnam student scholarship Korea의 진실', 'https://ksa-korea.org/%ec%95%84%eb%ac%b4%eb%8f%84-%eb%a7%90%ed%95%b4%ec%a3%bc%ec%a7%80-%ec%95%8a%eb%8a%94-vietnam-student-scholarship-korea%ec%9d%98-%ec%a7%84%ec%8b%a4/')
+    - ('절대 놓치면 안 되는 Korean language scholarship 경고 신호', 'https://ksa-korea.org/korean-language-scholarship-7%ea%b0%80%ec%a7%80-%ed%95%b5%ec%8b%ac-%ec%9c%a0%ed%95%99-%ec%84%a0%eb%b0%b0%ea%b0%80-%ec%a7%81%ec%a0%91-%eb%b0%9d%ed%9e%8c%eb%8b%a4/')
+    - ('2026년 달라진 medical school Korea foreigner, 무엇이 바뀌었나', 'https://ksa-korea.org/%ec%99%9c-medical-school-korea-foreigner-%ec%9e%85%ed%95%99%ec%9d%b4-%ec%88%98%eb%a7%8e%ec%9d%80-%eb%82%9c%ea%b4%80%ec%9d%84-%ec%b4%88%eb%9e%98%ed%95%a0%ea%b9%8c/')
+  [중복제목] 3건
+    - ('departure confirmation Korea, 실제로는 어떻게 진행될까', 'https://ksa-korea.org/departure-confirmation-korea-%ed%95%9c%ea%b5%ad-%ec%9c%a0%ed%95%99-%ec%9d%b4%ea%b1%b0-%eb%aa%a8%eb%a5%b4%eb%a9%b4-%eb%a7%9d%ed%95%9c%eb%8b%a4-10%eb%85%84-%ec%84%a0%eb%b0%b0%ec%9d%98-%ec%86%94/')
+    - ('ASEAN scholarship Korea, 정말 중요한 건 따로 있습니다', 'https://ksa-korea.org/asean-scholarship-korea-the-experts-strategic-approach-to-securing-funding/')
+    - ('law school Korea international 시작 전에 꼭 읽어야 할 글', 'https://ksa-korea.org/the-law-school-korea-international-advice-experts-actually-follow-not-what-you-read-online/')
+
+### https://sis-korea.com (전체 52건)
+  [코드펜스] 2건
+    - ('How professional development Korea Has Changed in 2026', 'https://sis-korea.com/6-things-about-professional-development-korea-your-doctor-wants-you-to-know/')
+    - ('5 Questions People Ask About winter program Korea international', 'https://sis-korea.com/the-truth-about-winter-program-korea-international-that-most-people-get-wrong/')
+  [중복제목] 7건
+    - ('How professional development Korea Has Changed in 2026', 'https://sis-korea.com/the-professional-development-korea-strategy-nobody-talks-about-that-actually-works/')
+    - ('A Practical Look at TOPIK level 3 preparation for International Patients', 'https://sis-korea.com/stop-wasting-money-on-topik-level-3-preparation-what-actually-works-in-practice/')
+    - ('A Practical Look at emergency contacts Korea student for International Patients', 'https://sis-korea.com/emergency-contacts-korea-student-unveiling-hidden-support-networks-you-might-overlook/')
+    - ('A Practical Look at international student association Korea', 'https://sis-korea.com/beyond-the-brochure-what-an-international-student-association-in-korea-really-offers/')
+    - ('Behind the Scenes: What Korean food adjustment tips foreigners Actually Involves', 'https://sis-korea.com/7-essential-korean-food-adjustment-tips-foreigners-need-for-a-seamless-transition/')
+    - ('How to Actually Handle swimming pool Korea campus: A Specialist’s Guide', 'https://sis-korea.com/swimming-pool-korea-campus-what-nobody-tells-you-about-aquatic-fitness-and-career-programs/')
+    - ('Behind the Scenes: What Building a Balanced College List: Reach Actually Involves', 'https://sis-korea.com/building-a-balanced-college-list-reach-match-and-safety/')
+
+### https://jobkorea365.com (전체 59건)
+  [중복제목] 12건
+    - ('Behind the Scenes: What visa status check Korea work Actually Involves', 'https://jobkorea365.com/visa-status-check-korea-work-frequently-overlooked-facts/')
+    - ('Behind the Scenes: What work permit application Korea Actually Involves', 'https://jobkorea365.com/the-counterintuitive-truths-about-your-work-permit-application-korea/')
+    - ('A Practical Look at marketing job Korea foreigner for International Patients', 'https://jobkorea365.com/beyond-the-stereotypes-what-a-marketing-job-in-korea-for-foreigners-truly-entails/')
+    - ('How to Actually Handle probation period Korea law: A Specialist’s Guide', 'https://jobkorea365.com/the-unseen-nuances-of-probation-period-korea-law-what-employers-and-employees-miss/')
+    - ('A Practical Look at entry level job Seoul foreigner for International Patients', 'https://jobkorea365.com/unlocking-your-career-in-seoul-the-hidden-hurdles-for-entry-level-job-seoul-foreigner/')
+    - ('Behind the Scenes: What company dinner culture Korea Actually Involves', 'https://jobkorea365.com/stop-misunderstanding-company-dinner-culture-in-korea-your-career-depends-on-it/')
+    - ('probation period Korea law Warning Signs You Should Never Ignore', 'https://jobkorea365.com/navigating-the-probation-period-korea-law-are-you-fully-prepared-for-korean-employment/')
+    - ('Behind the Scenes: What high paying job Korea foreigner Actually Involves', 'https://jobkorea365.com/high-paying-jobs-in-korea-for-foreigners-what-nobody-tells-you-about-success-high-paying-job-korea-foreigner/')
+    - ('Behind the Scenes: What Why Ignoring Trade Union Membership as a Foreigner Could Be Your Biggest Workplace Blunder (Trade union membership foreigners) Actually Involves', 'https://jobkorea365.com/why-ignoring-trade-union-membership-as-a-foreigner-could-be-your-biggest-workplace-blunder-trade-union-membership-foreigners/')
+    - ('Behind the Scenes: What Korean Automotive Industry Careers: Top 7 Thriving Opportunities Actually Involves', 'https://jobkorea365.com/korean-automotive-industry-careers-top-7-thriving-opportunities-2024/')
+    - ('Before You Try Korean Government Internship: Top 7 Paths to Your Dream Career, Read This First', 'https://jobkorea365.com/korean-government-internship-top-7-paths-to-your-dream-career/')
+    - ('Behind the Scenes: What Korea HR Jobs English Speaking: Your Top 7 Steps to Land a Dream Role Actually Involves', 'https://jobkorea365.com/korea-hr-jobs-english-speaking-your-top-7-steps-to-land-a-dream-role/')
+
+### https://jobinkorea365.com (전체 52건)
+  [중복제목] 3건
+    - ('Korea LinkedIn profile foreigner, Step by Step', 'https://jobinkorea365.com/korea-linkedin-profile-foreigner-step-by-step/')
+    - ('Korea LinkedIn profile foreigner 101: What First-Timers Should Know', 'https://jobinkorea365.com/korea-linkedin-profile-foreigner-101-what-first-timers-should-know/')
+    - ('Behind the Scenes: What severance pay calculation Korea Actually Involves', 'https://jobinkorea365.com/dont-wait-crucial-updates-for-severance-pay-calculation-korea-you-need-to-know-in-2024/')
+
+### https://jobkoreaglobal.com (전체 64건)
+  [중복제목] 6건
+    - ('Korea severance pay calculation 101: What First-Timers Should Know', 'https://jobkoreaglobal.com/korea-severance-pay-calculation-101-what-first-timers-should-know/')
+    - ('Korea headhunter foreigner Warning Signs You Should Never Ignore', 'https://jobkoreaglobal.com/korea-headhunter-foreigner-warning-signs-you-should-never-ignore/')
+    - ('E-9 visa worker Korea vs What You Think You Know: Key Differences', 'https://jobkoreaglobal.com/e-9-visa-worker-korea-why-most-employers-get-it-wrong-and-what-actually-works/')
+    - ('How to Actually Handle International event coordinator Seoul: A Specialist’s Guide', 'https://jobkoreaglobal.com/stop-losing-out-why-your-international-event-coordinator-seoul-career-needs-a-strategic-re-evaluation/')
+    - ('Behind the Scenes: What Global supply chain expert recruitment Actually Involves', 'https://jobkoreaglobal.com/global-supply-chain-expert-recruitment-the-untapped-talent-pool-vs-the-obvious-candidates/')
+    - ('A Practical Look at International Law Firms Korea for International Patients', 'https://jobkoreaglobal.com/international-law-firms-korea-top-7-to-unlock-your-dream-career/')
+
+### https://korea365.org (전체 87건)
+  [코드펜스] 3건
+    - ('Before You Try Korean restaurant etiquette, Read This First', 'https://korea365.org/before-you-try-korean-restaurant-etiquette-read-this-first/')
+    - ('Before You Try K-drama filming location tour, Read This First', 'https://korea365.org/before-you-try-k-drama-filming-location-tour-read-this-first/')
+    - ('Korean martial arts Taekwondo: Frequently Overlooked Facts', 'https://korea365.org/korean-martial-arts-taekwondo-frequently-overlooked-facts/')
+  [진부제목] 1건
+    - ('DMZ Tour from Seoul: Complete Guide to Uncover History', 'https://korea365.org/dmz-tour-from-seoul-complete-guide-2024-to-uncover-history/')
+  [중복제목] 3건
+    - ('How Much Should You Budget for Korean ramen vs Japanese ramen?', 'https://korea365.org/what-nobody-tells-you-about-korean-ramen-vs-japanese-ramen/')
+    - ('Before You Try Korean traditional music, Read This First', 'https://korea365.org/what-nobody-tells-you-about-korean-traditional-music/')
+    - ('Before You Try Korean Traditional Music: Its Modern Revival and Global Impact, Read This First', 'https://korea365.org/korean-traditional-music-what-nobody-tells-you-about-its-modern-revival-and-global-impact/')
+
+### https://koreanews365.com (전체 99건)
+  [코드펜스] 1건
+    - ('종료 10여일 앞두고 김태효 구속…막판 속도 내는 종합특검 ‘기간 연장’ 변수 입문 — 처음이라면 꼭 알아야 할 것', 'https://koreanews365.com/2026%eb%85%84-%eb%8b%ac%eb%9d%bc%ec%a7%84-%ec%a2%85%eb%a3%8c-10%ec%97%ac%ec%9d%bc-%ec%95%9e%eb%91%90%ea%b3%a0-%ea%b9%80%ed%83%9c%ed%9a%a8-%ea%b5%ac%ec%86%8d%eb%a7%89%ed%8c%90-%ec%86%8d/')
+  [중복제목] 2건
+    - ('대한민국 최신 경제 및 사회 변화 트렌드 분석, 제대로 대처하는 법 — 전문가 가이드', 'https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%a7%80%ea%b8%88-%ec%96%b4%eb%96%a4-%eb%b3%80%ed%99%94%ec%9d%98-%ed%8c%8c%ea%b3%a0%eb%a5%bc-%eb%84%98%ea%b3%a0-%ec%9e%88%ec%9d%84%ea%b9%8c-%eb%8c%80%ed%95%9c/')
+    - ('대한민국 최신 경제 및 사회 변화 트렌드 분석 입문 — 처음이라면 꼭 알아야 할 것', 'https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c%eb%93%9c-%eb%b6%84%ec%84%9d-%eb%8b%b9%ec%8b%a0%ec%9d%98/')
+
+### https://theseouljournal.com (전체 85건)
+  [코드펜스] 1건
+    - ('4 Mistakes People Make With From paralysis to national team: Former soldier rows toward Paralympic glory', 'https://theseouljournal.com/4-mistakes-people-make-with-from-paralysis-to-national-team-former-soldier-rows-toward-paralympic-glory/')
+  [중복제목] 10건
+    - ('Behind the Scenes: What What defines research excellence in era of global challenges? Actually Involves', 'https://theseouljournal.com/the-truth-about-what-defines-research-excellence-in-era-of-global-challenges-that-most-people-get-wrong/')
+    - ('Before You Try Inside a Korean hospice, Read This First', 'https://theseouljournal.com/inside-a-korean-hospice-where-life-begins-again/')
+    - ('A Practical Look at Korean researchers seek opportunities overseas despite record funding for International Patients', 'https://theseouljournal.com/what-nobody-tells-you-about-koreas-rd-brain-drain-a-paradox-of-funding-and-exodus/')
+    - ('A Practical Look at Korea should strengthen defense ties with Southeast Asia for International Patients', 'https://theseouljournal.com/is-strengthening-korea-asean-defense-ties-essential-for-regional-stability/')
+    - ('How to Actually Handle JoongAng Group’s fate split between court: A Specialist’s Guide', 'https://theseouljournal.com/is-joongang-groups-future-hanging-by-a-thread-between-court-and-creditors/')
+    - ('A Practical Look at Foreign diplomats voice support for UNESCO World Heritage session in Busan for International Patients', 'https://theseouljournal.com/will-busans-unesco-world-heritage-session-elevate-koreas-global-cultural-stature/')
+    - ('Behind the Scenes: What Nuclear inspection dispute clouds US-Iran deal to finalize war Actually Involves', 'https://theseouljournal.com/stop-ignoring-the-looming-crisis-nuclear-inspection-dispute-threatens-us-iran-peace-deal/')
+    - ('A Practical Look at Cost of Living in Seoul 2026: Honest Breakdown for International Patients', 'https://theseouljournal.com/is-living-in-seoul-really-affordable-in-2026-an-honest-breakdown/')
+    - ('How to Actually Handle Seoul bike path Han River: A Specialist’s Guide', 'https://theseouljournal.com/7-unforgettable-secrets-to-mastering-the-seoul-bike-path-han-river/')
+    - ('A Practical Look at Are You Missing Out on the Best Seoul International Church Services Group Experiences for Spiritual Growth and Community? for International Patients', 'https://theseouljournal.com/are-you-missing-out-on-the-best-seoul-international-church-services-group-experiences-for-spiritual-growth-and-community/')
