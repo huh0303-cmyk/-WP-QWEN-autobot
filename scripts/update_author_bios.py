@@ -8,7 +8,7 @@ autopost_mega.py의 AUTHOR_BY_SITE_DEF에 이미 반영된 새 bio(면허/자격
 """
 import os, sys, json, time, random, requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from autopost_mega import SITES_CONFIG, AUTHOR_BY_SITE_DEF, WP_USER
+from autopost_mega import SITES_CONFIG, WP_USER, pick_reporter
 
 
 def find_user_id(site_url, pw, reporter):
@@ -32,10 +32,7 @@ def fix_site(site, dry_run=False):
         log["error"] = "no_password"
         return log
 
-    reporter = AUTHOR_BY_SITE_DEF.get(site_url)
-    if not reporter:
-        log["error"] = "no_reporter_def"
-        return log
+    reporter = pick_reporter(site)
 
     uid, current_desc = find_user_id(site_url, pw, reporter)
     if uid is None:
