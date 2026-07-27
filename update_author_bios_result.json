@@ -1,0 +1,376 @@
+[
+  {
+    "site": "https://k-health365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "임상경력 30년 내과 전문의.",
+        "new_desc": "건강 정보 콘텐츠 에디터. 공신력 있는 의료·보건 기관 자료를 바탕으로 알기 쉽게 정리합니다.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreamedicaltour.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Medical tourism coordinator, 10 years accompanying international patients.",
+        "new_desc": "Korea medical tourism content editor, curating patient-friendly guides.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Market analyst covering Korean capital markets.",
+        "new_desc": "Content editor covering Korean capital markets news and trends.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://ki-korea.com",
+    "updated": [
+      {
+        "id": 21,
+        "old_desc": "Former research center director, Korea investment statistics.",
+        "new_desc": "Content editor covering Korea investment statistics and trends.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Licensed insurance broker, 15 years, foreigner insurance specialist.",
+        "new_desc": "Insurance information content editor for foreigners in Korea.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kfinance365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Financial analyst, Korea investment guides for foreigners.",
+        "new_desc": "Content editor curating Korea finance guides for foreigners.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Tax attorney, Korean company incorporation specialist.",
+        "new_desc": "Content editor covering Korea tax and business-registration information.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Former trader turned crypto markets editor.",
+        "new_desc": "Crypto markets content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://krealestate365.com",
+    "updated": [
+      {
+        "id": 21,
+        "old_desc": "Licensed real estate agent, foreigner housing specialist.",
+        "new_desc": "Korea real estate content editor for foreign residents.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://ktech365.com",
+    "updated": [
+      {
+        "id": 13,
+        "old_desc": "IT reporter covering Korea's tech and AI scene.",
+        "new_desc": "Tech content editor covering Korea's IT and AI scene.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kskin365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Dermatology clinic coordinator.",
+        "new_desc": "K-beauty and skincare content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "K-beauty influencer, Olive Young product reviewer.",
+        "new_desc": "K-beauty content editor, independent product reviews.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kworld365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "K-pop and K-culture analyst.",
+        "new_desc": "K-pop and K-culture content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://k-trip365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Backpacker and local Korea travel curator.",
+        "new_desc": "Korea travel content curator.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://k-visa365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Licensed immigration administrator (행정사).",
+        "new_desc": "Korea visa information content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Wedding planner, 10 years coordinating ceremonies.",
+        "new_desc": "Korea wedding content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kstudy365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Study-abroad counselor, 2,000+ students placed.",
+        "new_desc": "Study-in-Korea content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "updated": [
+      {
+        "id": 17,
+        "old_desc": "국제교육 전문가, 25년 경력.",
+        "new_desc": "국제교육·문화 콘텐츠 에디터.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://ksa-korea.org",
+    "updated": [
+      {
+        "id": 18,
+        "old_desc": "한국유학협회 소속 유학 컨설턴트.",
+        "new_desc": "한국 유학 정보 콘텐츠 에디터.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://sis-korea.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Seoul International School administration.",
+        "new_desc": "Korea international-school and study-program content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://jobkorea365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Career coach, former HR director.",
+        "new_desc": "Korea employment content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://jobinkorea365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Career coach covering E-7/E-8/E-9 visa job routes.",
+        "new_desc": "Content editor covering Korea work-visa job routes (E-7/E-8/E-9).",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "International recruitment headhunter.",
+        "new_desc": "Korea recruitment content editor.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://korea365.org",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 13
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreanews365.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "주요 일간지 10년 경력 시니어 취재기자.",
+        "new_desc": "한국 뉴스를 정리해 전달하는 뉴스 에디터.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://theseouljournal.com",
+    "updated": [
+      {
+        "id": 12,
+        "old_desc": "Seoul-based foreign resident-editor, essayist.",
+        "new_desc": "Seoul-based content editor and essayist.",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  }
+]
