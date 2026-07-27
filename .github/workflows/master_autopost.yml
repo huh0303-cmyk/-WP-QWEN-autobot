@@ -15,6 +15,10 @@ on:
         description: "backfilllinks 전용: 특정 사이트 URL만 (비우면 27개 전체) 예) https://k-health365.com"
         required: false
         default: ""
+      exclude_site:
+        description: "cleanupai 전용: 제외할 사이트 URL, 쉼표구분 (예 이미 승인된 사이트 보호) 예) https://k-health365.com"
+        required: false
+        default: ""
       dry_run:
         description: "cleanupai 전용: true면 실제 수정 없이 리포트만 (기본값 true, 안전)"
         required: false
@@ -1056,6 +1060,9 @@ jobs:
           ARGS=""
           if [ -n "${{ github.event.inputs.target_site }}" ]; then
             ARGS="--site ${{ github.event.inputs.target_site }}"
+          fi
+          if [ -n "${{ github.event.inputs.exclude_site }}" ]; then
+            ARGS="$ARGS --exclude ${{ github.event.inputs.exclude_site }}"
           fi
           if [ "${{ github.event.inputs.dry_run }}" != "false" ]; then
             ARGS="$ARGS --dry-run"

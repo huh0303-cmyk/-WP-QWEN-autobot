@@ -154,11 +154,18 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--site", default="")
+    ap.add_argument("--exclude", default="",
+                    help="쉼표로 구분된 제외할 사이트 URL 목록 (예: 이미 애드센스 승인된 사이트는 안 건드리고 싶을 때)")
     ap.add_argument("--dry-run", action="store_true",
                     help="실제 PATCH 없이 무엇이 바뀔지만 리포트 (사이트 수정 없음)")
     args = ap.parse_args()
 
-    targets = [s for s in SITES_CONFIG if (not args.site or s["url"] == args.site)]
+    exclude_set = {u.strip().rstrip("/") for u in args.exclude.split(",") if u.strip()}
+    targets = [s for s in SITES_CONFIG
+               if (not args.site or s["url"] == args.site)
+               and s["url"].rstrip("/") not in exclude_set]
+    if exclude_set:
+        print(f"⏭  제외: {', '.join(exclude_set)}")
     results = []
     out_file = "cleanup_ai_tells_dryrun.json" if args.dry_run else "cleanup_ai_tells_result.json"
     for site in targets:
