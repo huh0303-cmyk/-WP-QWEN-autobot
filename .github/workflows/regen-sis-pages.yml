@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
+      - run: pip install requests google-genai beautifulsoup4 lxml -q
       - name: "sis-korea.com 고정 페이지(홈/소개/학사/연락처) 재작성"
         env:
           SISKOREACOM: ${{ secrets.SISKOREACOM }}
