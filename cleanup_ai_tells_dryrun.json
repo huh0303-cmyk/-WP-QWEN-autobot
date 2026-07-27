@@ -2,9 +2,29 @@
   {
     "site": "https://k-health365.com",
     "title_fixed": [],
-    "content_cleaned": [],
+    "content_cleaned": [
+      {
+        "id": 5786,
+        "link": ""
+      },
+      {
+        "id": 5531,
+        "link": ""
+      },
+      {
+        "id": 5328,
+        "link": ""
+      },
+      {
+        "id": 5320,
+        "link": ""
+      },
+      {
+        "id": 4844,
+        "link": ""
+      }
+    ],
     "failed": [],
-    "dry_run": true,
-    "error": "HTTPSConnectionPool(host='k-health365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&page=1&status=publish&_fields=id%2Ctitle%2Ccontent%2Cmeta (Caused by NewConnectionError(\"HTTPSConnection(host='k-health365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+    "dry_run": true
   }
 ]
