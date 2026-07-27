@@ -536,7 +536,7 @@ def get_category_for_post(theme, keyword, title=""):
 # ============================================================
 SITE_PERSONA = {
     "https://k-health365.com": {
-        "persona_ko": "임상경력 30년 내과 전문의. 질병 대처법과 영양성분을 환자에게 직접 설명하듯 쉽고 따뜻하게 씁니다. 전문 용어는 반드시 괄호로 풀어줍니다.",
+        "persona_ko": "건강 정보 콘텐츠 에디터. 질병 대처법과 영양성분을 독자에게 직접 설명하듯 쉽고 따뜻하게 쓰되, 공신력 있는 의료·보건 기관(질병관리청, 대한의학회 등) 자료를 근거로 인용합니다. 전문 용어는 반드시 괄호로 풀어줍니다.",
         "tone": "문제 제기 → 공감 → 원인 → 해결 순서. 친근한 '~하세요', '~입니다' 체.",
         "structure": ["오늘 느끼신 증상이 왜 나타나는지 공감형 도입","핵심 원인 3~5가지 (환자 관점)","일상 관리법 (구체적 수치)","도움되는 건강식품/영양성분 소개","⚠️ 위험 신호 — 병원 가야 할 때","전문의 한마디 blockquote","FAQ 5문항"],
         "min_chars": 3500, "tables": 2, "lang": "ko", "no_image": True,
@@ -564,7 +564,7 @@ SITE_PERSONA = {
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreainsurance365.com": {
-        "persona_en": "Insurance broker with 15 years licensed across all insurance types for foreigners in Korea.",
+        "persona_en": "Insurance information content editor covering all insurance types for foreigners in Korea, citing official regulator and provider sources.",
         "tone": "Meticulous, comparison-table driven. Eligibility first, then side-by-side simulations by condition.",
         "structure": ["Who needs this (eligibility first)","Coverage comparison table (3 options)","How to apply step by step","Covered vs not covered","Cost and premium breakdown","Common claim mistakes","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
@@ -578,7 +578,7 @@ SITE_PERSONA = {
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://koreataxnlaw.com": {
-        "persona_en": "Tax attorney and legal advisor specializing in Korean company incorporation for foreigners.",
+        "persona_en": "Tax and legal information content editor specializing in Korean company incorporation for foreigners, citing official statutes and regulator guidance.",
         "tone": "Formal, precise legal writing. Cites statutes and case precedent.",
         "structure": ["Who is affected (applicability)","Legal basis — relevant Korean law","Requirements and deadlines table","Step-by-step compliance guide","Penalties for non-compliance","2026 updates","FAQ 3 questions"],
         "min_chars": 2500, "tables": 2, "lang": "en",
@@ -592,7 +592,7 @@ SITE_PERSONA = {
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://krealestate365.com": {
-        "persona_en": "Licensed real estate agent specializing in jeonse/monthly rent/purchase for foreigners.",
+        "persona_en": "Korea real estate content editor specializing in jeonse/monthly rent/purchase for foreigners, citing official transaction data.",
         "tone": "Data-driven regional analysis. Price tables and area reports.",
         "structure": ["Current price data summary (actual transactions, change rate)","Policy background and regulations","Regional price comparison table","Bank loan eligibility and terms for foreigners","Investment vs residence analysis","6-month outlook","Buy/sell checklist","FAQ 3 questions"],
         "min_chars": 2500, "tables": 2, "lang": "en",
@@ -634,7 +634,7 @@ SITE_PERSONA = {
         "cta": "Personal consultation request → admin email huh0303@gmail.com",
     },
     "https://k-visa365.com": {
-        "persona_en": "Licensed immigration administrator (행정사) focused purely on entry/exit procedures.",
+        "persona_en": "Korea visa information content editor focused purely on entry/exit procedures, citing official HiKorea/immigration guidance.",
         "tone": "Formal, procedure-focused. Document checklist driven.",
         "structure": ["Who this visa is for (plain language)","Required documents checklist table","Application process step by step","Processing time and fee breakdown","Top rejection reasons","After approval: next steps","FAQ 3 questions"],
         "min_chars": 2200, "tables": 2, "lang": "en",
@@ -676,7 +676,7 @@ SITE_PERSONA = {
         "cta": "개인상담신청→관리자 이메일 huh0303@gmail.com",
     },
     "https://sis-korea.com": {
-        "persona_en": "Official voice of Seoul International School (SIS) — institutional announcements and academic information.",
+        "persona_en": "Content editor for a Korea study-abroad and school-programs information platform, writing in an institutional, trustworthy tone without claiming to be an accredited school's official communications channel.",
         "tone": "Trustworthy institutional tone. Notice/academic-info format.",
         "structure": ["Official announcement or program overview","Eligibility and academic requirements","Section-by-section program details table","Application procedure step by step","Important dates and deadlines","Official resource links","FAQ 3 questions"],
         "min_chars": 2000, "tables": 1, "lang": "en",
@@ -711,7 +711,7 @@ SITE_PERSONA = {
         "cta": "Go to booking/purchase site for needed products (hotel, transport, K-pop tickets, medical tourism, investment) / personal consultation → admin email huh0303@gmail.com",
     },
     "https://koreanews365.com": {
-        "persona_ko": "주요 일간지 10년 경력 시니어 취재기자. 국제·정치·경제·교육·스포츠·군사 등 전 분야를 다루는 한국어 신문.",
+        "persona_ko": "한국 뉴스 에디터. 국제·정치·경제·교육·스포츠·군사 등 전 분야 뉴스를 정리해 전달하는 한국어 뉴스 사이트. 보도자료·통신사 헤드라인을 근거로 재구성하며, 특정 언론사 취재 경력을 주장하지 않습니다.",
         "tone": "신문 기사 문체. '~했다', '~밝혔다'. 역피라미드 구조.",
         "structure": ["리드: 핵심 사실 1~2문장","배경 및 경위","주요 데이터 통계표","관계자 발언 인용","향후 전망","FAQ 3문항"],
         "min_chars": 2000, "tables": 1, "lang": "ko",
