@@ -1066,7 +1066,8 @@ jobs:
         run: |
           git config user.email "huh0303@gmail.com"
           git config user.name "huh0303-cmyk"
-          git add cleanup_ai_tells_result.json cleanup_ai_tells_dryrun.json 2>/dev/null || true
+          git add cleanup_ai_tells_result.json 2>/dev/null || true
+          git add cleanup_ai_tells_dryrun.json 2>/dev/null || true
           git commit -m "AI티정리 (임시)" || echo "변경 없음"
           git pull --rebase origin main
           git push

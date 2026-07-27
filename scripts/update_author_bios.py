@@ -16,7 +16,7 @@ def find_user_id(site_url, pw, reporter):
                    {"slug": reporter["slug"], "per_page": 1}):
         try:
             r = requests.get(f"{site_url}/wp-json/wp/v2/users", auth=(WP_USER, pw),
-                              params=params, timeout=15)
+                              params=params, timeout=8)
             if r.status_code == 200 and r.json():
                 return r.json()[0]["id"], r.json()[0].get("description", "")
         except Exception:

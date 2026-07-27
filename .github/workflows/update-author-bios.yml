@@ -77,6 +77,7 @@ jobs:
           git config user.name "cleanup-bot"
           git config user.email "cleanup-bot@users.noreply.github.com"
           git pull --rebase origin main || true
-          git add update_author_bios_result.json update_author_bios_dryrun.json 2>/dev/null || true
+          git add update_author_bios_result.json 2>/dev/null || true
+          git add update_author_bios_dryrun.json 2>/dev/null || true
           git commit -m "결과: 필자 bio 사칭문구 제거 반영 로그" || echo "no changes"
           git push || (git pull --rebase origin main && git push)
