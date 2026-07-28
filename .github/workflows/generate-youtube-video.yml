@@ -1,0 +1,55 @@
+name: Generate YouTube Video (주제어 → 최종 mp4)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "영상 주제어"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies (ffmpeg + Korean font for subtitles)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-nanum
+
+      - name: Install Python dependencies
+        run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: Run pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.GDRIVE_SERVICE_ACCOUNT_JSON }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: python scripts/youtube_video_pipeline.py "${{ inputs.topic }}"
+
+      - name: Upload result as artifact (backup)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-video-${{ github.run_id }}
+          path: |
+            yt_output/final.mp4
+            yt_output/thumbnail.png
+            yt_output/subtitles.srt
+          retention-days: 7
+          if-no-files-found: ignore
