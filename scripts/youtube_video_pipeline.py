@@ -101,7 +101,11 @@ def gemini_generate_text(prompt, temperature=0.9):
     r = requests.post(url, json=body, timeout=60)
     r.raise_for_status()
     data = r.json()
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+    candidates = data.get("candidates") or []
+    if not candidates or not candidates[0].get("content", {}).get("parts"):
+        reason = candidates[0].get("finishReason") if candidates else data.get("promptFeedback")
+        raise RuntimeError(f"Gemini 응답에 콘텐츠가 없습니다 (finishReason/피드백: {reason})")
+    return candidates[0]["content"]["parts"][0]["text"]
 
 
 def generate_script(topic):
@@ -129,13 +133,20 @@ def generate_script(topic):
         segments = paragraphs
 
     # 정확히 10개로 맞추기 (모자라면 마지막 문단 재분할, 넘치면 자르기)
-    while len(segments) < NUM_IMAGES and segments:
+    while len(segments) < NUM_IMAGES and any(len(s) > 20 for s in segments):
         longest_idx = max(range(len(segments)), key=lambda i: len(segments[i]))
         s = segments[longest_idx]
         mid = len(s) // 2
         split_at = s.rfind(".", 0, mid)
         split_at = split_at + 1 if split_at != -1 else mid
-        segments[longest_idx:longest_idx + 1] = [s[:split_at].strip(), s[split_at:].strip()]
+        left, right = s[:split_at].strip(), s[split_at:].strip()
+        if left and right:
+            segments[longest_idx:longest_idx + 1] = [left, right]
+        else:
+            break
+    # 그래도 모자라면(응답이 지나치게 짧았던 경우) 주제 기반 채움 문구로 패딩
+    while len(segments) < NUM_IMAGES:
+        segments.append(f"{topic}에 대해 조금 더 살펴보겠습니다.")
     segments = segments[:NUM_IMAGES]
 
     return segments, text
@@ -217,26 +228,28 @@ def elevenlabs_tts(text, out_path):
 # ════════════════════════════════════════════════════════════
 def make_kenburns_clip(image_path, out_path, duration, fps=25):
     frames = max(int(duration * fps), 1)
-    vf = (f"scale=8000:-1,zoompan=z='min(zoom+0.0012,1.25)':d={frames}:"
+    vf = (f"scale=2560:-1,zoompan=z='min(zoom+0.0012,1.25)':d={frames}:"
           f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={VIDEO_W}x{VIDEO_H}:fps={fps},"
           f"format=yuv420p")
     run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", image_path, "-vf", vf,
-                "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p", out_path])
+                "-r", str(fps), "-t", str(duration), "-c:v", "libx264",
+                "-pix_fmt", "yuv420p", out_path])
 
 
-def make_still_clip(image_path, out_path, duration):
+def make_still_clip(image_path, out_path, duration, fps=25):
     vf = (f"scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=decrease,"
           f"pad={VIDEO_W}:{VIDEO_H}:(ow-iw)/2:(oh-ih)/2,format=yuv420p")
     run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", image_path, "-vf", vf,
-                "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p", out_path])
+                "-r", str(fps), "-t", str(duration), "-c:v", "libx264",
+                "-pix_fmt", "yuv420p", out_path])
 
 
-def make_still_clip_with_silence(image_path, out_path, duration):
+def make_still_clip_with_silence(image_path, out_path, duration, fps=25):
     vf = (f"scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=decrease,"
           f"pad={VIDEO_W}:{VIDEO_H}:(ow-iw)/2:(oh-ih)/2,format=yuv420p")
     run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", image_path,
                 "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=44100",
-                "-vf", vf, "-t", str(duration),
+                "-vf", vf, "-r", str(fps), "-t", str(duration),
                 "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p", "-shortest", out_path])
 
 
@@ -257,6 +270,16 @@ def concat_reencode(inputs, out_path):
     filter_complex = "".join(f"[{i}:v:0][{i}:a:0]" for i in range(n)) + f"concat=n={n}:v=1:a=1[outv][outa]"
     cmd += ["-filter_complex", filter_complex, "-map", "[outv]", "-map", "[outa]",
             "-c:v", "libx264", "-c:a", "aac", out_path]
+    run_ffmpeg(cmd)
+
+
+def concat_audio_reencode(audio_paths, out_path):
+    cmd = ["ffmpeg", "-y"]
+    for p in audio_paths:
+        cmd += ["-i", p]
+    n = len(audio_paths)
+    filter_complex = "".join(f"[{i}:a:0]" for i in range(n)) + f"concat=n={n}:v=0:a=1[outa]"
+    cmd += ["-filter_complex", filter_complex, "-map", "[outa]", out_path]
     run_ffmpeg(cmd)
 
 
@@ -447,7 +470,7 @@ def main():
     concat_stream_copy(clip_paths, video_only)
 
     full_audio = os.path.join(WORKDIR, "narration_full.mp3")
-    concat_stream_copy(audio_paths, full_audio)
+    concat_audio_reencode(audio_paths, full_audio)
 
     muxed = os.path.join(WORKDIR, "muxed.mp4")
     mux_video_audio(video_only, full_audio, muxed)
