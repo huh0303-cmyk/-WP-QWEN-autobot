@@ -57,17 +57,27 @@ def main():
         print(f"슬롯{slot} 오늘 목표={int(target_minutes)//60:02d}:{int(target_minutes)%60:02d} KST "
               f"(기준 {h:02d}:{m:02d} {'+' if offset>=0 else ''}{offset:.0f}분) 현재={now.strftime('%H:%M')} diff={diff:.1f}분")
 
-        if 0 <= diff <= 14:
-            r = requests.post(
-                f"https://api.github.com/repos/{REPO}/actions/workflows/master_autopost.yml/dispatches",
-                headers={"Authorization": f"token {GH_TOKEN}",
-                         "Accept": "application/vnd.github+json"},
-                json={"ref": "main", "inputs": {"step": "post", "run_slot": slot}},
-                timeout=20,
-            )
-            print(f"  ▶ 슬롯{slot} 발행 트리거 → HTTP {r.status_code}")
-            fired[slot] = True
-            changed = True
+        # 목표시각이 지났고 오늘 아직 발행 안 됐으면 무조건 발사.
+        # (예전엔 diff<=14 로 좁은 창을 뒀는데, GitHub cron이 */15분 설정과 달리
+        #  실제로는 1.5~2.5시간 간격으로만 도는 경우가 많아서 그 창을 계속 놓쳐
+        #  27개 사이트가 최대 39시간 발행 중단되는 사고가 있었음. 상한 제거로 해결.)
+        if diff >= 0:
+            try:
+                r = requests.post(
+                    f"https://api.github.com/repos/{REPO}/actions/workflows/master_autopost.yml/dispatches",
+                    headers={"Authorization": f"token {GH_TOKEN}",
+                             "Accept": "application/vnd.github+json"},
+                    json={"ref": "main", "inputs": {"step": "post", "run_slot": slot}},
+                    timeout=20,
+                )
+                print(f"  ▶ 슬롯{slot} 발행 트리거 → HTTP {r.status_code}")
+                if r.status_code in (200, 201, 204):
+                    fired[slot] = True
+                    changed = True
+                else:
+                    print(f"  ⚠️ 슬롯{slot} 디스패치 실패 (HTTP {r.status_code}) — 다음 실행에서 재시도")
+            except Exception as e:
+                print(f"  ⚠️ 슬롯{slot} 디스패치 예외: {e} — 다음 실행에서 재시도")
 
     state["fired"] = fired
     with open(STATE_FILE, "w", encoding="utf-8") as f:
