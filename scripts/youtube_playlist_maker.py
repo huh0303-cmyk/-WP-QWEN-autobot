@@ -85,6 +85,9 @@ IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".webp")
 
 FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Bold.ttf"
 FONT_PATH = "/tmp/_playlist_nanumgothic_bold.ttf"
+# 썸네일 "Playlist" 타이틀용 우아한 세리프 폰트 (한글 캡션바는 나눔고딕 유지)
+TITLE_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf"
+TITLE_FONT_PATH = "/tmp/_playlist_playfair.ttf"
 
 
 def log(msg):
@@ -113,6 +116,18 @@ def ensure_font():
         with open(FONT_PATH, "wb") as f:
             f.write(r.content)
     return FONT_PATH
+
+
+def ensure_title_font():
+    if not os.path.exists(TITLE_FONT_PATH):
+        try:
+            r = requests.get(TITLE_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(TITLE_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return ensure_font()  # 실패 시 나눔고딕으로 폴백
+    return TITLE_FONT_PATH
 
 
 # ════════════════════════════════════════════════════════════
@@ -420,14 +435,32 @@ def add_lower_third_bar(video_path, caption_text, out_path):
                 "-c:a", "copy", "-c:v", "libx264", "-pix_fmt", "yuv420p", out_path])
 
 
+def _resize_cover(img, w, h):
+    """원본 비율을 유지한 채 (w,h)를 꽉 채우고 넘치는 부분만 가운데 기준으로
+    잘라낸다 (찌그러짐 없는 썸네일용 크롭)."""
+    from PIL import Image
+
+    src_w, src_h = img.size
+    scale = max(w / src_w, h / src_h)
+    new_w, new_h = int(src_w * scale + 0.5), int(src_h * scale + 0.5)
+    img = img.resize((new_w, new_h), Image.LANCZOS)
+    left = (new_w - w) // 2
+    top = (new_h - h) // 2
+    return img.crop((left, top, left + w, top + h))
+
+
 def make_caption_thumbnail(image_path, out_path, w=1280, h=720):
     """레퍼런스처럼 이미지 위에 큼직한 'Playlist' 타이틀을 얹은 썸네일 생성"""
     from PIL import Image, ImageDraw, ImageFont
 
-    ensure_font()
-    img = Image.open(image_path).convert("RGB").resize((w, h))
+    title_font_path = ensure_title_font()
+    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h)
     draw = ImageDraw.Draw(img, "RGBA")
-    font = ImageFont.truetype(FONT_PATH, 140)
+    font = ImageFont.truetype(title_font_path, 150)
+    try:
+        font.set_variation_by_axes([700])  # 가변폰트 굵기(wght)를 Bold로 고정
+    except Exception:
+        pass
     title = "Playlist"
 
     bbox = draw.textbbox((0, 0), title, font=font, stroke_width=6)
