@@ -31,10 +31,18 @@ social_stats_daily.py
 
 import os
 import re
+import sys
 import json
 from datetime import datetime, timezone, timedelta
 
 import requests
+
+# Windows 로컬 콘솔(cp949 등)에서 이모지/한글 출력 시 죽지 않도록 UTF-8 강제
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 KST = timezone(timedelta(hours=9))
 

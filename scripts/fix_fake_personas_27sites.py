@@ -16,9 +16,17 @@ Gemini로 "그 부분만" 기관명 인용으로 안전하게 재작성한다.
 """
 import os
 import re
+import sys
 import json
 import time
 import requests
+
+# Windows 로컬 콘솔(cp949 등)에서 이모지/한글 출력 시 죽지 않도록 UTF-8 강제
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 APPLY_FIX = os.environ.get("APPLY_FIX", "true").lower() != "false"
 
