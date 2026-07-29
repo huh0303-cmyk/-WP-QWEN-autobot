@@ -123,7 +123,9 @@ def get_drive_service():
     return build("drive", "v3", credentials=creds)
 
 
-def list_folder_files(service, folder_id, exts):
+def list_folder_files(service, folder_id, exts, mime_prefix):
+    """exts(확장자) 또는 mime_prefix(예: 'audio/','image/')로 매칭되는 파일만 반환.
+    다른 종류(예: 오디오 폴더에 섞여 들어간 이미지 파일)는 제외한다."""
     files = []
     page_token = None
     while True:
@@ -136,14 +138,12 @@ def list_folder_files(service, folder_id, exts):
         for f in resp.get("files", []):
             name = f.get("name", "")
             mime = f.get("mimeType", "")
-            if mime.startswith("audio/") or mime.startswith("image/") or \
-               name.lower().endswith(exts):
+            if mime.startswith(mime_prefix) or name.lower().endswith(exts):
                 files.append(f)
         page_token = resp.get("nextPageToken")
         if not page_token:
             break
-    return [f for f in files if f.get("name", "").lower().endswith(exts)
-            or f.get("mimeType", "").startswith(("audio/", "image/"))]
+    return files
 
 
 def download_drive_file(service, file_id, out_path):
@@ -275,6 +275,8 @@ def build_playlist_audio(service, tracks_meta, out_path):
         try:
             download_drive_file(service, meta["id"], local_path)
             dur = get_duration(local_path)
+            if dur < 1.0:
+                raise ValueError(f"재생시간 {dur:.2f}초 — 오디오 파일이 아닌 것으로 판단")
         except Exception as e:
             log(f"   ⚠️ 스킵({meta['name']}): {e}")
             if os.path.exists(local_path):
@@ -282,8 +284,11 @@ def build_playlist_audio(service, tracks_meta, out_path):
             continue
 
         if accumulated >= TARGET_MIN_SEC and accumulated + dur > TARGET_MAX_SEC:
+            # 목표 구간 안에 이미 들어와 있고 이 곡을 더하면 넘침 -> 나머지는
+            # 안 맞을 때마다 계속 찾아 헤매지 않고 여기서 바로 종료 (다운로드 낭비 방지)
             os.remove(local_path)
-            continue
+            log(f"   (목표 구간 도달 — 나머지 트랙 스캔 중단)")
+            break
 
         selected_paths.append(local_path)
         accumulated += dur
@@ -442,7 +447,7 @@ def main():
     service = get_drive_service()
 
     log("1/5 원곡 폴더에서 음악 목록 조회 중...")
-    tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS)
+    tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS, "audio/")
     if not tracks:
         log("❌ 원곡 폴더에 음원이 없습니다")
         raise SystemExit(1)
@@ -472,7 +477,7 @@ def main():
         add_lower_third_bar(muxed_path, caption_text, final_path)
     else:
         log("3/5 주제어 없음 — 썸네일창고에서 이미지 무작위 선택(폴백)...")
-        thumbs = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS)
+        thumbs = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
         if not thumbs:
             log("❌ 썸네일창고에 이미지가 없습니다")
             raise SystemExit(1)
