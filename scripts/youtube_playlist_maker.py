@@ -168,13 +168,32 @@ def download_drive_file(service, file_id, out_path):
 
 
 def upload_to_drive(service, file_path, folder_id, name):
+    """큰 파일도 안정적으로 올라가도록 청크 단위 업로드 + 재시도 처리.
+    (파일 전체를 한 번에 보내면 도중 짧은 네트워크 끊김에도 통째로 실패함)"""
+    import time
     from googleapiclient.http import MediaFileUpload
 
     metadata = {"name": name, "parents": [folder_id]}
-    media = MediaFileUpload(file_path, resumable=True)
-    f = service.files().create(body=metadata, media_body=media,
-                                fields="id,webViewLink").execute()
-    return f.get("webViewLink"), f.get("id")
+    media = MediaFileUpload(file_path, resumable=True, chunksize=5 * 1024 * 1024)
+    request = service.files().create(body=metadata, media_body=media,
+                                      fields="id,webViewLink")
+
+    response = None
+    retries = 0
+    while response is None:
+        try:
+            status, response = request.next_chunk(num_retries=5)
+            if status:
+                log(f"   업로드 진행률: {int(status.progress() * 100)}%")
+        except Exception as e:
+            retries += 1
+            if retries > 8:
+                raise
+            wait = min(2 ** retries, 60)
+            log(f"   ⚠️ 업로드 청크 오류, {wait}초 후 재시도 ({retries}/8): {e}")
+            time.sleep(wait)
+
+    return response.get("webViewLink"), response.get("id")
 
 
 # ════════════════════════════════════════════════════════════
