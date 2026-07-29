@@ -112,10 +112,18 @@ def gemini_generate_text(prompt, temperature=0.9):
     return candidates[0]["content"]["parts"][0]["text"]
 
 
-def generate_script(topic):
+def generate_script(topic, style_reference=""):
+    style_block = ""
+    if style_reference.strip():
+        style_block = f"""
+아래는 참고할 레퍼런스 영상의 "포맷/스타일 패턴 분석" 요약입니다.
+내용을 그대로 베끼지 말고, 이 패턴(훅 방식/구성 순서/톤)만 참고해서
+완전히 새로운 오리지널 대본을 쓰세요:
+{style_reference[:4000]}
+"""
     prompt = f"""당신은 유튜브 나레이션 대본 작가입니다.
 주제: "{topic}"
-
+{style_block}
 약 10분 분량(한국어 기준 약 1500~1700자, 자연스러운 구어체)의
 유튜브 방송용 나레이션 대본을 작성하세요.
 
@@ -167,11 +175,18 @@ IMAGE_STYLE_SUFFIX = (
 )
 
 
-def generate_image_prompts(topic, segments):
+def generate_image_prompts(topic, segments, style_reference=""):
     joined = "\n".join(f"{i + 1}. {s}" for i, s in enumerate(segments))
+    style_block = ""
+    if style_reference.strip():
+        style_block = f"""
+참고할 레퍼런스 영상의 영상미 스타일 분석(구도/색감/편집 톤)도 반영하세요
+(내용 복제 아님, 스타일만 참고):
+{style_reference[:2000]}
+"""
     prompt = f"""다음은 "{topic}"에 대한 유튜브 대본 10개 문단입니다.
 {joined}
-
+{style_block}
 각 문단에 어울리는 유튜브 영상용 이미지 생성 프롬프트를 영어로 10개 작성하세요.
 - 반드시 16:9 가로(와이드스크린) 구도로 명시할 것 — 인물/사물이 정중앙에 작게 몰리지 않고
   프레임 전체를 채우는 가로 구도
@@ -415,11 +430,26 @@ def send_email(subject, body):
 # ════════════════════════════════════════════════════════════
 # 메인 파이프라인
 # ════════════════════════════════════════════════════════════
+def load_style_reference():
+    """STYLE_REFERENCE 환경변수(텍스트 그대로) 우선, 없으면 레퍼런스 분석기가
+    남긴 youtube_reference_style_report.md 파일이 있으면 그걸 사용."""
+    text = os.environ.get("STYLE_REFERENCE", "")
+    if text.strip():
+        return text
+    default_path = "youtube_reference_style_report.md"
+    if os.path.exists(default_path):
+        with open(default_path, encoding="utf-8") as f:
+            return f.read()
+    return ""
+
+
 def main():
     topic = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("VIDEO_TOPIC", "")
     if not topic:
         log("❌ 주제어가 없습니다. (인자 1개 또는 VIDEO_TOPIC 환경변수)")
         sys.exit(1)
+
+    style_reference = load_style_reference()
 
     required = {"GEMINI_API_KEY": GEMINI_API_KEY, "ELEVENLABS_API_KEY": ELEVENLABS_API_KEY,
                 "GMAIL_APP_PASSWORD": GMAIL_APP_PASSWORD,
@@ -435,13 +465,15 @@ def main():
     os.makedirs(WORKDIR, exist_ok=True)
     ensure_font()
     log(f"🎬 주제: {topic}")
+    if style_reference.strip():
+        log("   📎 레퍼런스 스타일 참고자료 적용됨")
 
     log("1/8 대본 생성 중...")
-    segments, full_script = generate_script(topic)
+    segments, full_script = generate_script(topic, style_reference)
     log(f"   -> {len(segments)}개 문단 생성 완료")
 
     log("2/8 이미지 프롬프트 생성 중...")
-    img_prompts = generate_image_prompts(topic, segments)
+    img_prompts = generate_image_prompts(topic, segments, style_reference)
     for i, p in enumerate(img_prompts, 1):
         log(f"   [{i:02d}] {p}")
 
