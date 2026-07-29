@@ -1,0 +1,25 @@
+{
+  "date": "2026-07-30",
+  "platforms": {
+    "YouTube": {
+      "count": 5720,
+      "error": null
+    },
+    "TikTok": {
+      "count": 28000,
+      "error": null
+    },
+    "Facebook": {
+      "count": null,
+      "error": "Any of the pages_read_engagement, pages_manage_metadata,\n        pages_read_user_content, pages_manage_ads, pages_show_list or\n        pages_messaging permission(s) must be granted before impersonatin"
+    },
+    "Instagram": {
+      "count": null,
+      "error": "Any of the pages_read_engagement, pages_manage_metadata,\n        pages_read_user_content, pages_manage_ads, pages_show_list or\n        pages_messaging permission(s) must be granted before impersonatin"
+    },
+    "Threads": {
+      "count": null,
+      "error": "THREADS_ACCESS_TOKEN 또는 THREADS_USER_ID 없음"
+    }
+  }
+}
