@@ -1,0 +1,49 @@
+name: Daily SNS Stats (YouTube + TikTok + Facebook + Instagram + Threads)
+
+on:
+  schedule:
+    - cron: "30 22 * * *"   # 07:30 KST (여유 있는 1차 시도)
+    - cron: "0 23 * * *"    # 08:00 KST (목표 시각)
+    - cron: "30 23 * * *"   # 08:30 KST (지연 대비 안전망)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+
+      - name: "SNS 팔로워/구독자 수집 및 시트 전송"
+        env:
+          SHEETS_WEBHOOK_SOCIAL: ${{ secrets.SHEETS_WEBHOOK_SOCIAL }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          TIKTOK_USERNAME: ${{ secrets.TIKTOK_USERNAME }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+        run: python scripts/social_stats_daily.py
+
+      - name: "결과 커밋"
+        if: always()
+        run: |
+          git config user.name "sns-stats-bot"
+          git config user.email "sns-stats-bot@users.noreply.github.com"
+          git add social_stats_result.json last_success_date.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "결과: $(date -u +%Y-%m-%d) SNS 통계 수집"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && break
+            sleep 5
+          done
