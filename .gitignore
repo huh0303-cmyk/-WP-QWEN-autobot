@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 yt_output/
+ref_analysis_tmp/
+playlist_output/

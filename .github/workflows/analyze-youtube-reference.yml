@@ -1,0 +1,50 @@
+name: Analyze YouTube Reference (포맷/스타일 벤치마킹)
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "분석할 유튜브 URL (여러 개면 콤마로 구분)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies (ffmpeg + yt-dlp)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg
+          pip install -U yt-dlp -q
+
+      - name: Install Python dependencies
+        run: pip install requests -q
+
+      - name: Run reference analyzer
+        env:
+          REFERENCE_URLS: ${{ github.event.inputs.urls }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/analyze_youtube_reference.py
+
+      - name: Commit result files
+        if: always()
+        run: |
+          git config user.name "cleanup-bot"
+          git config user.email "cleanup-bot@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add youtube_reference_style_report.json youtube_reference_style_report.md 2>/dev/null || true
+          git commit -m "결과: 유튜브 레퍼런스 스타일 분석" || echo "no changes"
+          git push || (git pull --rebase origin main && git push)
