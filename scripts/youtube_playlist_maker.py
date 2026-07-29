@@ -303,16 +303,26 @@ def build_playlist_audio(service, tracks_meta, out_path):
     if not selected_paths:
         raise RuntimeError("사용 가능한 음원이 없습니다")
 
+    # 곡 사이마다 1~3초 랜덤 무음을 끼워넣어 기계적으로 딱딱 붙는 느낌을 없앰
     cmd = ["ffmpeg", "-y"]
-    for p in selected_paths:
+    gap_seconds_total = 0.0
+    n_inputs = 0
+    for i, p in enumerate(selected_paths):
         cmd += ["-i", p]
-    n = len(selected_paths)
-    filter_complex = "".join(f"[{i}:a:0]" for i in range(n)) + f"concat=n={n}:v=0:a=1[outa]"
+        n_inputs += 1
+        if i < len(selected_paths) - 1:
+            gap = round(random.uniform(1.0, 3.0), 2)
+            gap_seconds_total += gap
+            cmd += ["-f", "lavfi", "-i", f"anullsrc=r=44100:cl=stereo:d={gap}"]
+            n_inputs += 1
+
+    filter_complex = "".join(f"[{i}:a:0]" for i in range(n_inputs)) + \
+        f"concat=n={n_inputs}:v=0:a=1[outa]"
     cmd += ["-filter_complex", filter_complex, "-map", "[outa]",
             "-c:a", "aac", "-b:a", "192k", out_path]
     run_ffmpeg(cmd)
 
-    return accumulated
+    return accumulated + gap_seconds_total
 
 
 # ════════════════════════════════════════════════════════════
