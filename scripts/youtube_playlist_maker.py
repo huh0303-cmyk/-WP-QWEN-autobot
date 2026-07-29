@@ -34,7 +34,7 @@ from datetime import datetime, timezone, timedelta
 GOOGLE_CREDENTIALS_JSON = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
 MUSIC_SOURCE_FOLDER_ID = os.environ.get("MUSIC_SOURCE_FOLDER_ID") or "1RqL44lM5oUSW5_PAZLHHlevrVkr1ibxd"
 THUMBNAIL_FOLDER_ID = os.environ.get("THUMBNAIL_FOLDER_ID") or "1jVDuCjTVJPnNSIBEXjnU6DPSzZO56d68"
-OUTPUT_FOLDER_ID = os.environ.get("OUTPUT_FOLDER_ID") or "11OrhFj1r0XFu4IAxUmZ29hiA8wExOUfe"
+OUTPUT_FOLDER_ID = os.environ.get("OUTPUT_FOLDER_ID") or "1srQUiWOk6UruujYSy2S0ogN3FvxVTSBN"
 
 # 영어 키워드 → 파일명에 박힌 한글 언어 태그 매핑
 LANGUAGE_TAG_MAP = {
