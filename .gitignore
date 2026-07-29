@@ -3,3 +3,4 @@ __pycache__/
 yt_output/
 ref_analysis_tmp/
 playlist_output/
+.env
