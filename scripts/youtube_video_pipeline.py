@@ -4,7 +4,7 @@
 youtube_video_pipeline.py
 ──────────────────────────────────────────────────────────────────
 주제어 입력 → 10분 대본 생성 → 이미지 10장 프롬프트/생성 →
-1~3번 이미지 팬줌(Ken Burns) 동영상 변환, 4~10번 정지컷 →
+1~10번 이미지 전부 팬줌(Ken Burns) 동영상 변환(나레이션 길이에 맞춤) →
 ElevenLabs TTS 나레이션 → 자막(SRT) 생성 → 시니어용 큰글씨 썸네일(PNG) →
 썸네일+본편 결합 최종 mp4 완성 → 구글드라이브 업로드 → 이메일 통보
 
@@ -53,7 +53,6 @@ GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", "")
 
 WORKDIR = "yt_output"
 NUM_IMAGES = 10
-NUM_VIDEO_CLIPS = 3          # 앞 N장은 팬줌 동영상, 나머지는 정지컷
 VIDEO_W, VIDEO_H = 1920, 1080
 FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Bold.ttf"
 FONT_PATH = "/tmp/_yt_nanumgothic_bold.ttf"
@@ -231,14 +230,6 @@ def make_kenburns_clip(image_path, out_path, duration, fps=25):
     vf = (f"scale=2560:-1,zoompan=z='min(zoom+0.0012,1.25)':d={frames}:"
           f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={VIDEO_W}x{VIDEO_H}:fps={fps},"
           f"format=yuv420p")
-    run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", image_path, "-vf", vf,
-                "-r", str(fps), "-t", str(duration), "-c:v", "libx264",
-                "-pix_fmt", "yuv420p", out_path])
-
-
-def make_still_clip(image_path, out_path, duration, fps=25):
-    vf = (f"scale={VIDEO_W}:{VIDEO_H}:force_original_aspect_ratio=decrease,"
-          f"pad={VIDEO_W}:{VIDEO_H}:(ow-iw)/2:(oh-ih)/2,format=yuv420p")
     run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", image_path, "-vf", vf,
                 "-r", str(fps), "-t", str(duration), "-c:v", "libx264",
                 "-pix_fmt", "yuv420p", out_path])
@@ -454,14 +445,11 @@ def main():
         durations.append(dur)
         log(f"   ✅ seg_{i:02d}.mp3 ({dur:.1f}초)")
 
-    log("5/8 이미지 → 동영상 변환 중 (1~3번 팬줌, 4~10번 정지컷)...")
+    log("5/8 이미지 → 동영상 변환 중 (1~10번 전부 팬줌, 나레이션/자막 길이에 맞춤)...")
     clip_paths = []
     for i, (img, dur) in enumerate(zip(image_paths, durations), 1):
         cpath = os.path.join(WORKDIR, f"clip_{i:02d}.mp4")
-        if i <= NUM_VIDEO_CLIPS:
-            make_kenburns_clip(img, cpath, duration=dur)
-        else:
-            make_still_clip(img, cpath, duration=dur)
+        make_kenburns_clip(img, cpath, duration=dur)
         clip_paths.append(cpath)
         log(f"   ✅ clip_{i:02d}.mp4")
 
