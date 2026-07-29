@@ -17,7 +17,7 @@ ElevenLabs TTS 나레이션 → 자막(SRT) 생성 → 시니어용 큰글씨 �
     ELEVENLABS_API_KEY          - TTS 나레이션
     ELEVENLABS_VOICE_ID         - (선택) 보이스 ID, 기본값 있음
     GMAIL_APP_PASSWORD          - 완료 알림 메일 발송용 (huh0303@gmail.com)
-    GDRIVE_SERVICE_ACCOUNT_JSON - 구글드라이브 업로드용 서비스계정 JSON(문자열 그대로)
+    GOOGLE_CREDENTIALS_JSON     - 구글드라이브 업로드용 서비스계정 JSON(문자열 그대로)
     GDRIVE_FOLDER_ID            - 업로드 대상 드라이브 폴더 ID
 
 필요 시스템 도구: ffmpeg, ffprobe (GitHub Actions ubuntu-latest에 기본 포함)
@@ -48,7 +48,7 @@ ELEVENLABS_MODEL = "eleven_multilingual_v2"
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
-GDRIVE_SERVICE_ACCOUNT_JSON = os.environ.get("GDRIVE_SERVICE_ACCOUNT_JSON", "")
+GOOGLE_CREDENTIALS_JSON = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
 GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", "")
 
 WORKDIR = "yt_output"
@@ -368,7 +368,7 @@ def upload_to_drive(file_path, folder_id):
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
 
-    sa_info = json.loads(GDRIVE_SERVICE_ACCOUNT_JSON)
+    sa_info = json.loads(GOOGLE_CREDENTIALS_JSON)
     creds = service_account.Credentials.from_service_account_info(
         sa_info, scopes=["https://www.googleapis.com/auth/drive"])
     service = build("drive", "v3", credentials=creds)
@@ -406,7 +406,7 @@ def main():
 
     required = {"GEMINI_API_KEY": GEMINI_API_KEY, "ELEVENLABS_API_KEY": ELEVENLABS_API_KEY,
                 "GMAIL_APP_PASSWORD": GMAIL_APP_PASSWORD,
-                "GDRIVE_SERVICE_ACCOUNT_JSON": GDRIVE_SERVICE_ACCOUNT_JSON,
+                "GOOGLE_CREDENTIALS_JSON": GOOGLE_CREDENTIALS_JSON,
                 "GDRIVE_FOLDER_ID": GDRIVE_FOLDER_ID}
     missing = [k for k, v in required.items() if not v]
     if missing:
