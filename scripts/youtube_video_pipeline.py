@@ -42,7 +42,7 @@ GEMINI_TEXT_MODEL = "gemini-2.5-flash"
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]  # 나노바나나
 
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
-ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID") or "21m00Tcm4TlvDq8ikWAM"
 ELEVENLABS_MODEL = "eleven_multilingual_v2"
 
 GMAIL_USER = "huh0303@gmail.com"
