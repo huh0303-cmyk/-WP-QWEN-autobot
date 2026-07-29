@@ -357,10 +357,24 @@ def _get_font(size):
     return font
 
 
+def _resize_cover(img, w, h):
+    """원본 비율을 유지한 채 (w,h)를 꽉 채우고 넘치는 부분만 가운데 기준으로
+    잘라낸다 (찌그러짐 없는 썸네일용 크롭)."""
+    from PIL import Image
+
+    src_w, src_h = img.size
+    scale = max(w / src_w, h / src_h)
+    new_w, new_h = int(src_w * scale + 0.5), int(src_h * scale + 0.5)
+    img = img.resize((new_w, new_h), Image.LANCZOS)
+    left = (new_w - w) // 2
+    top = (new_h - h) // 2
+    return img.crop((left, top, left + w, top + h))
+
+
 def make_thumbnail(image_path, title, out_path, w=1280, h=720):
     from PIL import Image, ImageDraw
 
-    img = Image.open(image_path).convert("RGB").resize((w, h))
+    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h)
     lines = textwrap.wrap(title, width=10)[:3]
     font = _get_font(88)
 
