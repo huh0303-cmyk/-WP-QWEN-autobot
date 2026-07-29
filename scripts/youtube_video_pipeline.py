@@ -159,21 +159,32 @@ def generate_script(topic):
 # ════════════════════════════════════════════════════════════
 # 2) 이미지 프롬프트 생성 (Gemini)
 # ════════════════════════════════════════════════════════════
+IMAGE_STYLE_SUFFIX = (
+    ", 16:9 widescreen landscape framing, horizontal composition filling the "
+    "entire frame edge to edge, candid real-life photo taken on a good camera, "
+    "natural lighting, realistic texture and detail, no illustration or 3D render "
+    "look, no text, no watermark, no logos"
+)
+
+
 def generate_image_prompts(topic, segments):
     joined = "\n".join(f"{i + 1}. {s}" for i, s in enumerate(segments))
     prompt = f"""다음은 "{topic}"에 대한 유튜브 대본 10개 문단입니다.
 {joined}
 
 각 문단에 어울리는 유튜브 영상용 이미지 생성 프롬프트를 영어로 10개 작성하세요.
-- 사실적인 사진 스타일(photorealistic), 자극적이지 않고 안전한 이미지
+- 반드시 16:9 가로(와이드스크린) 구도로 명시할 것 — 인물/사물이 정중앙에 작게 몰리지 않고
+  프레임 전체를 채우는 가로 구도
+- 실제 카메라로 찍은 듯한 사실적인 사진 스타일(생성형 티가 나는 매끈한 일러스트/렌더 느낌 금지),
+  자극적이지 않고 안전한 이미지
 - 각 줄은 "1. ..." 형식의 번호로 시작
-- 텍스트/워터마크 없이, 유튜브 콘텐츠 정책에 위배되지 않는 이미지
+- 텍스트/워터마크/로고 없이, 유튜브 콘텐츠 정책에 위배되지 않는 이미지
 """
     text = gemini_generate_text(prompt)
-    prompts = [m.group(1).strip() for m in
+    prompts = [m.group(1).strip() + IMAGE_STYLE_SUFFIX for m in
                re.finditer(r'^\s*\d+[\.\)]\s*(.+)$', text, re.MULTILINE)]
     while len(prompts) < NUM_IMAGES:
-        prompts.append(f"{topic}, photorealistic illustrative photo, safe for work")
+        prompts.append(f"{topic}, photorealistic photo, safe for work" + IMAGE_STYLE_SUFFIX)
     return prompts[:NUM_IMAGES]
 
 
@@ -431,6 +442,8 @@ def main():
 
     log("2/8 이미지 프롬프트 생성 중...")
     img_prompts = generate_image_prompts(topic, segments)
+    for i, p in enumerate(img_prompts, 1):
+        log(f"   [{i:02d}] {p}")
 
     log("3/8 이미지 10장 생성 중 (나노바나나)...")
     image_paths = []
