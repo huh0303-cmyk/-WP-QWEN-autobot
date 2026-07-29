@@ -3,8 +3,16 @@ name: Generate YouTube Playlist (음악 60-80분 + 썸네일 → 최종 mp4)
 on:
   workflow_dispatch:
     inputs:
+      topic:
+        description: "주제어 (예: Tokyo, New York, tropical beach EDM — 비워두면 썸네일창고 랜덤 폴백)"
+        required: false
+        type: string
       language:
         description: "언어 키워드 (예: Japanese, French, German — 비워두면 Mixed 전체)"
+        required: false
+        type: string
+      caption:
+        description: "캡션 문구 (비워두면 주제어 기반으로 자동 생성)"
         required: false
         type: string
 
@@ -24,18 +32,21 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install system dependencies (ffmpeg)
+      - name: Install system dependencies (ffmpeg + Korean font)
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q ffmpeg
+          sudo apt-get install -y -q ffmpeg fonts-nanum
 
       - name: Install Python dependencies
-        run: pip install google-api-python-client google-auth google-auth-httplib2 -q
+        run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
 
       - name: Run playlist maker
         env:
+          TOPIC_KEYWORD: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
+          CAPTION_TEXT: ${{ github.event.inputs.caption }}
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/youtube_playlist_maker.py
 
       - name: Upload result as artifact (backup)
