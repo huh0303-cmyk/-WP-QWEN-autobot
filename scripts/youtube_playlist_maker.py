@@ -25,25 +25,30 @@ Gemini가 짧은 감성 문구를 자동 생성한다.
     (또는 TOPIC_KEYWORD / LANGUAGE_KEYWORD / CAPTION_TEXT 환경변수)
 
 필요 환경변수(Secrets):
-    GOOGLE_CREDENTIALS_JSON - 구글드라이브 서비스계정 JSON(문자열 그대로)
-    GEMINI_API_KEY          - 주제어 기반 이미지 생성(나노바나나). 없으면 B폴더 폴백
-    MUSIC_SOURCE_FOLDER_ID  - (선택) 원곡 폴더 ID, 기본값 있음
-    THUMBNAIL_FOLDER_ID     - (선택) 썸네일창고 폴더 ID, 기본값 있음(폴백용)
-    OUTPUT_FOLDER_ID        - (선택) 최종파일 폴더 ID, 기본값 있음
+    GOOGLE_OAUTH_CLIENT_ID      - 구글드라이브 업로드용 OAuth 클라이언트 ID
+    GOOGLE_OAUTH_CLIENT_SECRET  - 구글드라이브 업로드용 OAuth 클라이언트 시크릿
+    GOOGLE_OAUTH_REFRESH_TOKEN  - 구글드라이브 업로드용 OAuth 리프레시 토큰
+                                  (서비스 계정은 개인 드라이브 업로드 시 저장공간
+                                  할당량이 없어 실패하므로 실제 사용자 계정 OAuth 사용)
+    GEMINI_API_KEY              - 주제어 기반 이미지 생성(나노바나나). 없으면 B폴더 폴백
+    MUSIC_SOURCE_FOLDER_ID      - (선택) 원곡 폴더 ID, 기본값 있음
+    THUMBNAIL_FOLDER_ID         - (선택) 썸네일창고 폴더 ID, 기본값 있음(폴백용)
+    OUTPUT_FOLDER_ID            - (선택) 최종파일 폴더 ID, 기본값 있음
 
 필요 시스템 도구: ffmpeg, ffprobe
 """
 
 import os
 import sys
-import json
 import random
 import base64
 import requests
 import subprocess
 from datetime import datetime, timezone, timedelta
 
-GOOGLE_CREDENTIALS_JSON = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+GOOGLE_OAUTH_REFRESH_TOKEN = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
@@ -114,12 +119,17 @@ def ensure_font():
 # 구글드라이브
 # ════════════════════════════════════════════════════════════
 def get_drive_service():
-    from google.oauth2 import service_account
+    from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
-    sa_info = json.loads(GOOGLE_CREDENTIALS_JSON)
-    creds = service_account.Credentials.from_service_account_info(
-        sa_info, scopes=["https://www.googleapis.com/auth/drive"])
+    creds = Credentials(
+        token=None,
+        refresh_token=GOOGLE_OAUTH_REFRESH_TOKEN,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=GOOGLE_OAUTH_CLIENT_ID,
+        client_secret=GOOGLE_OAUTH_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/drive"],
+    )
     return build("drive", "v3", credentials=creds)
 
 
@@ -445,8 +455,13 @@ def filter_tracks_by_language(tracks, keyword):
 # 메인
 # ════════════════════════════════════════════════════════════
 def main():
-    if not GOOGLE_CREDENTIALS_JSON:
-        log("❌ GOOGLE_CREDENTIALS_JSON 없음")
+    missing = [k for k, v in {
+        "GOOGLE_OAUTH_CLIENT_ID": GOOGLE_OAUTH_CLIENT_ID,
+        "GOOGLE_OAUTH_CLIENT_SECRET": GOOGLE_OAUTH_CLIENT_SECRET,
+        "GOOGLE_OAUTH_REFRESH_TOKEN": GOOGLE_OAUTH_REFRESH_TOKEN,
+    }.items() if not v]
+    if missing:
+        log(f"❌ 환경변수 누락: {missing}")
         raise SystemExit(1)
 
     topic_keyword = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("TOPIC_KEYWORD", "")

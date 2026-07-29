@@ -17,7 +17,11 @@ ElevenLabs TTS 나레이션 → 자막(SRT) 생성 → 시니어용 큰글씨 �
     ELEVENLABS_API_KEY          - TTS 나레이션
     ELEVENLABS_VOICE_ID         - (선택) 보이스 ID, 기본값 있음
     GMAIL_APP_PASSWORD          - 완료 알림 메일 발송용 (huh0303@gmail.com)
-    GOOGLE_CREDENTIALS_JSON     - 구글드라이브 업로드용 서비스계정 JSON(문자열 그대로)
+    GOOGLE_OAUTH_CLIENT_ID      - 구글드라이브 업로드용 OAuth 클라이언트 ID
+    GOOGLE_OAUTH_CLIENT_SECRET  - 구글드라이브 업로드용 OAuth 클라이언트 시크릿
+    GOOGLE_OAUTH_REFRESH_TOKEN  - 구글드라이브 업로드용 OAuth 리프레시 토큰
+                                  (서비스 계정은 개인 드라이브에 업로드 시 저장공간
+                                  할당량이 없어 실패하므로, 실제 사용자 계정 OAuth로 업로드)
     GDRIVE_FOLDER_ID            - 업로드 대상 드라이브 폴더 ID
 
 필요 시스템 도구: ffmpeg, ffprobe (GitHub Actions ubuntu-latest에 기본 포함)
@@ -26,7 +30,6 @@ ElevenLabs TTS 나레이션 → 자막(SRT) 생성 → 시니어용 큰글씨 �
 import os
 import sys
 import re
-import json
 import time
 import base64
 import textwrap
@@ -48,7 +51,9 @@ ELEVENLABS_MODEL = "eleven_multilingual_v2"
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
-GOOGLE_CREDENTIALS_JSON = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+GOOGLE_OAUTH_REFRESH_TOKEN = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
 GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", "")
 
 WORKDIR = "yt_output"
@@ -354,15 +359,25 @@ def make_thumbnail(image_path, title, out_path, w=1280, h=720):
 # ════════════════════════════════════════════════════════════
 # 8) 구글드라이브 업로드
 # ════════════════════════════════════════════════════════════
-def upload_to_drive(file_path, folder_id):
-    from google.oauth2 import service_account
+def get_drive_service():
+    from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
+
+    creds = Credentials(
+        token=None,
+        refresh_token=GOOGLE_OAUTH_REFRESH_TOKEN,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=GOOGLE_OAUTH_CLIENT_ID,
+        client_secret=GOOGLE_OAUTH_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/drive"],
+    )
+    return build("drive", "v3", credentials=creds)
+
+
+def upload_to_drive(file_path, folder_id):
     from googleapiclient.http import MediaFileUpload
 
-    sa_info = json.loads(GOOGLE_CREDENTIALS_JSON)
-    creds = service_account.Credentials.from_service_account_info(
-        sa_info, scopes=["https://www.googleapis.com/auth/drive"])
-    service = build("drive", "v3", credentials=creds)
+    service = get_drive_service()
     metadata = {"name": os.path.basename(file_path), "parents": [folder_id]}
     media = MediaFileUpload(file_path, resumable=True)
     f = service.files().create(body=metadata, media_body=media,
@@ -397,7 +412,9 @@ def main():
 
     required = {"GEMINI_API_KEY": GEMINI_API_KEY, "ELEVENLABS_API_KEY": ELEVENLABS_API_KEY,
                 "GMAIL_APP_PASSWORD": GMAIL_APP_PASSWORD,
-                "GOOGLE_CREDENTIALS_JSON": GOOGLE_CREDENTIALS_JSON,
+                "GOOGLE_OAUTH_CLIENT_ID": GOOGLE_OAUTH_CLIENT_ID,
+                "GOOGLE_OAUTH_CLIENT_SECRET": GOOGLE_OAUTH_CLIENT_SECRET,
+                "GOOGLE_OAUTH_REFRESH_TOKEN": GOOGLE_OAUTH_REFRESH_TOKEN,
                 "GDRIVE_FOLDER_ID": GDRIVE_FOLDER_ID}
     missing = [k for k, v in required.items() if not v]
     if missing:

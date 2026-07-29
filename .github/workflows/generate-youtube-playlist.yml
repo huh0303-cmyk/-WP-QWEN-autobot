@@ -45,7 +45,9 @@ jobs:
           TOPIC_KEYWORD: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
           CAPTION_TEXT: ${{ github.event.inputs.caption }}
-          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/youtube_playlist_maker.py
 
