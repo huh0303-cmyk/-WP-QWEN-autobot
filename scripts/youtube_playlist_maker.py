@@ -216,24 +216,29 @@ def gemini_generate_text(prompt, temperature=0.9):
 def build_caption_text(topic, caption_text):
     if caption_text and caption_text.strip():
         return caption_text.strip()
-    prompt = (f"'{topic}' 분위기의 감성 음악 플레이리스트 유튜브 영상에 어울리는 "
-              f"짧은 한글 소개 문구를 20자 이내로 하나만 만들어줘. "
-              f"이모지 1개 포함, 따옴표나 설명 없이 문구만 출력해줘.")
-    text = gemini_generate_text(prompt)
+    prompt = (f"'{topic}' 느낌의 플레이리스트 영상 캡션 한 줄을 써줘. "
+              f"조건: 광고 카피처럼 매끈하게 쓰지 말고, 그냥 이 영상을 만든 사람이 "
+              f"직접 툭 던지듯 적은 것처럼 자연스럽고 담백하게. 완벽한 문장보다 구어체 느낌으로. "
+              f"이모지는 넣어도 1개까지만, 20자 이내. 따옴표나 설명 없이 문구만 출력해줘.")
+    text = gemini_generate_text(prompt, temperature=1.0)
     text = text.strip().strip('"').strip("'")
-    return text or f"{topic} 감성 플레이리스트"
+    return text or f"{topic} 들으면서 잠깐 쉬어가기"
 
 
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
+    style = (
+        "candid snapshot taken on a phone camera, natural unposed moment caught "
+        "mid-motion, slightly imperfect framing, soft natural light, realistic skin "
+        "texture with visible pores and minor blemishes, subtle film grain, no "
+        "obvious retouching, not overly symmetrical, amateur travel-photo aesthetic, "
+        "no text, no watermark, 16:9"
+    )
     prompts = [
-        f"Aesthetic lifestyle photo of a joyful young woman with arms raised, "
-        f"candid pose, background: {topic}, golden hour sunset lighting, "
-        f"cinematic photorealistic, vibrant colors, high quality influencer photo, "
-        f"no text, no watermark, 16:9",
-        f"Aesthetic lifestyle photo of a joyful young woman, candid pose, "
-        f"background: {topic}, bright daylight, cinematic photorealistic, "
-        f"vibrant colors, high quality influencer photo, no text, no watermark, 16:9",
+        f"A young woman caught laughing mid-moment with arms raised, "
+        f"background: {topic}, golden hour sunset lighting, {style}",
+        f"A young woman glancing slightly off-camera, relaxed candid pose, "
+        f"background: {topic}, bright overcast daylight, {style}",
     ]
     paths = []
     for i, prompt in enumerate(prompts, 1):
