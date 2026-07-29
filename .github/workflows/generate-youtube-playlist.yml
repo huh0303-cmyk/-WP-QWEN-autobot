@@ -1,0 +1,49 @@
+name: Generate YouTube Playlist (음악 60-80분 + 썸네일 → 최종 mp4)
+
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        description: "언어 키워드 (예: Japanese, French, German — 비워두면 Mixed 전체)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies (ffmpeg)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg
+
+      - name: Install Python dependencies
+        run: pip install google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: Run playlist maker
+        env:
+          LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+        run: python scripts/youtube_playlist_maker.py
+
+      - name: Upload result as artifact (backup)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-playlist-${{ github.run_id }}
+          path: |
+            playlist_output/final.mp4
+          retention-days: 3
+          if-no-files-found: ignore
