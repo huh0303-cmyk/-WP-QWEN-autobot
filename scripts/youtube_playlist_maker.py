@@ -303,6 +303,14 @@ PRESET_TOPIC_EN_MAP = {
     "카페 감성": "Cozy Cafe",
 }
 
+# 썸네일 타이틀은 영문(예: TOKYO)으로 크게, 그 아래 작게 현지어 표기를 곁들인다
+# (한자 대신 가타카나처럼, 그 도시/나라에서 실제로 쓰는 표기를 살짝 얹는 감성 포인트)
+NATIVE_SUBTITLE_MAP = {
+    "Tokyo": "トーキョー",
+    "Sapporo": "サッポロ",
+    "Seoul": "서울",
+}
+
 
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
@@ -637,9 +645,22 @@ def make_caption_thumbnail(image_path, out_path, topic="", w=1280, h=720):
     title_y = (h - th) // 2 - int(h * 0.03)
     draw.text(((w - tw) // 2, title_y - bbox[1]), title, font=font,
                fill=(255, 255, 255, 255))
+    cursor_y = title_y + th
 
-    # 타이틀 바로 아래: 얇은 점선 구분선
-    _dotted_hline(draw, w // 2, title_y + th + int(h * 0.05), int(w * 0.5))
+    # 타이틀 아래: 도시별 현지어 소제목(가나/한글 등) — NATIVE_SUBTITLE_MAP에 있을 때만
+    subtitle = NATIVE_SUBTITLE_MAP.get((topic or "").strip(), "")
+    if subtitle:
+        sub_font_path = ensure_jp_font() if any(
+            '぀' <= c <= 'ヿ' or '一' <= c <= '鿿' for c in subtitle) else label_font_path
+        sub_font = _font(sub_font_path, 34)
+        sub_bbox = draw.textbbox((0, 0), subtitle, font=sub_font)
+        sub_y = cursor_y + int(h * 0.02)
+        draw.text(((w - (sub_bbox[2] - sub_bbox[0])) // 2, sub_y - sub_bbox[1]),
+                   subtitle, font=sub_font, fill=(255, 255, 255, 230))
+        cursor_y = sub_y + (sub_bbox[3] - sub_bbox[1])
+
+    # 그 아래: 얇은 점선 구분선
+    _dotted_hline(draw, w // 2, cursor_y + int(h * 0.05), int(w * 0.5))
 
     img.convert("RGB").save(out_path, "PNG")
 
