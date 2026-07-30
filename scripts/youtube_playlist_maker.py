@@ -95,6 +95,10 @@ FONT_PATH = "/tmp/_playlist_nanumgothic_bold.ttf"
 # 썸네일 "Playlist" 타이틀용 우아한 세리프 폰트 (한글 캡션바는 나눔고딕 유지)
 TITLE_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf"
 TITLE_FONT_PATH = "/tmp/_playlist_playfair.ttf"
+# 東京/札幌처럼 한자·가나가 섞인 주제어용 — 나눔고딕엔 한자 글리프가 없어서
+# Playfair 자리를 대신할 일본어 지원 세리프 폰트가 따로 필요하다
+JP_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifjp/NotoSerifJP%5Bwght%5D.ttf"
+JP_FONT_PATH = "/tmp/_playlist_notoserifjp.ttf"
 
 
 def log(msg):
@@ -135,6 +139,18 @@ def ensure_title_font():
         except Exception:
             return ensure_font()  # 실패 시 나눔고딕으로 폴백
     return TITLE_FONT_PATH
+
+
+def ensure_jp_font():
+    if not os.path.exists(JP_FONT_PATH):
+        try:
+            r = requests.get(JP_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(JP_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return ensure_font()  # 실패 시 나눔고딕으로 폴백(한자는 깨질 수 있음)
+    return JP_FONT_PATH
 
 
 # ════════════════════════════════════════════════════════════
@@ -291,9 +307,11 @@ PRESET_TOPIC_EN_MAP = {
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
     style = (
-        "professional travel-magazine photography, ultra sharp, cinematic wide 16:9 "
-        "composition, natural light, vivid but realistic color grading, no text, "
-        "no watermark, no illustration or 3D-render look"
+        "real photograph shot on a professional DSLR camera, not a painting, not "
+        "digital art, not an illustration, not 3D-rendered — genuine travel-magazine "
+        "photojournalism, ultra sharp focus, cinematic wide 16:9 composition, natural "
+        "light, realistic color grading, authentic architectural and environmental "
+        "detail, no text, no watermark"
     )
     prompts = [
         f"A breathtaking aerial or street-level travel photo capturing the essence of "
@@ -596,10 +614,20 @@ def make_caption_thumbnail(image_path, out_path, topic="", w=1280, h=720):
 
     # 중앙: 주제어를 초대형 세리프로 — 폭의 92%를 채우도록 자동 축소
     title = (topic or THUMBNAIL_BRAND_LABEL).strip().upper() or "PLAYLIST"
+    # Playfair Display엔 한글/한자 글리프가 없어서, 스크립트에 맞는 폰트로 대체:
+    # 한글이 섞이면 나눔고딕, 한자/가나(일본어)가 섞이면 Noto Serif JP
+    has_hangul = any('가' <= c <= '힣' for c in title)
+    has_cjk = any('一' <= c <= '鿿' or '぀' <= c <= 'ヿ' for c in title)
+    if has_hangul:
+        title_render_font_path, title_render_weight = label_font_path, None
+    elif has_cjk:
+        title_render_font_path, title_render_weight = ensure_jp_font(), 700
+    else:
+        title_render_font_path, title_render_weight = title_font_path, 500
     max_w = int(w * 0.92)
     size = 220
     while size > 40:
-        font = _font(title_font_path, size, 500)
+        font = _font(title_render_font_path, size, title_render_weight)
         bbox = draw.textbbox((0, 0), title, font=font)
         if bbox[2] - bbox[0] <= max_w:
             break

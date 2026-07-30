@@ -20,6 +20,16 @@ on:
           - "도시 야경"
           - "시골 마을"
           - "카페 감성"
+          - "Seoul"
+          - "London"
+          - "Paris"
+          - "東京"
+          - "New York"
+          - "札幌"
+          - "Miami"
+          - "LA"
+          - "Prague"
+          - "Switzerland"
       topic:
         description: "도시/주제명 직접 입력 (예: Tokyo, New York — 위 프리셋을 '직접입력'으로 두면 이 값 사용. 여행 매거진 톤 배경사진+타이틀로 생성. 둘 다 비워두면 썸네일창고 랜덤 폴백)"
         required: false
