@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: "주제어 (예: Tokyo, New York, tropical beach EDM — 비워두면 썸네일창고 랜덤 폴백)"
+        description: "도시/주제명 (예: Tokyo, New York — 여행 매거진 톤 배경사진+타이틀로 생성. 비워두면 썸네일창고 랜덤 폴백)"
         required: false
         type: string
       language:
-        description: "언어 키워드 (예: Japanese, French, German — 비워두면 Mixed 전체)"
+        description: "음악 언어 (예: Japanese, French, German — 그 언어 태그 곡만 선곡. 비워두면 Mixed 무작위)"
         required: false
         type: string
       caption:
