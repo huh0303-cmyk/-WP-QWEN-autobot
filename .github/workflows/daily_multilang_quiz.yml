@@ -1,0 +1,120 @@
+name: Multilang Quiz Daily Auto-Publish
+
+on:
+  schedule:
+    # 목표: 07:00 KST ±1시간 랜덤 (06:00~08:00 KST 사이 실제 실행)
+    - cron: '0 21 * * *'
+    # 목표: 19:00 KST ±1시간 랜덤 (18:00~20:00 KST 사이 실제 실행)
+    - cron: '0 9 * * *'
+  workflow_dispatch: {}   # Actions 탭에서 수동 실행 버튼도 사용 가능
+
+permissions:
+  contents: write   # GitHub Release 생성(인스타/스레드용 공개 URL) 위해 필요
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: multilang_quiz
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies (폰트 + ffmpeg)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk fonts-dejavu-core
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Random delay (목표 시각 기준 ±1시간 랜덤 분산)
+        run: |
+          DELAY=$((RANDOM % 7200))
+          echo "랜덤 대기: ${DELAY}초 (트리거 시각 -1h 기준이므로 최종 실행은 목표시각 ±1h 사이)"
+          sleep $DELAY
+
+      - name: Generate 5-language quiz videos (한국어/영어/일본어/스페인어/베트남어 각 5문항)
+        run: |
+          for lang in ko en ja es vi; do
+            python3 scripts/make_quiz_short_multi.py --lang $lang --n 5 --out_dir outputs
+          done
+
+      - name: Save to Google Drive (언어별 폴더)
+        env:
+          ML_GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.ML_GDRIVE_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/upload_drive.py
+        continue-on-error: true
+
+      - name: Upload to YouTube
+        env:
+          ML_YT_CLIENT_ID: ${{ secrets.ML_YT_CLIENT_ID }}
+          ML_YT_CLIENT_SECRET: ${{ secrets.ML_YT_CLIENT_SECRET }}
+          ML_YT_REFRESH_TOKEN: ${{ secrets.ML_YT_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+        run: python3 scripts/upload_youtube.py
+        continue-on-error: true
+
+      - name: Upload to TikTok (초안함으로 전송 - 최종 게시는 본인이)
+        env:
+          ML_TIKTOK_CLIENT_KEY: ${{ secrets.ML_TIKTOK_CLIENT_KEY }}
+          ML_TIKTOK_CLIENT_SECRET: ${{ secrets.ML_TIKTOK_CLIENT_SECRET }}
+          ML_TIKTOK_ACCESS_TOKEN: ${{ secrets.ML_TIKTOK_ACCESS_TOKEN }}
+        run: python3 scripts/upload_tiktok.py
+        continue-on-error: true
+
+      - name: Upload to Facebook Page
+        env:
+          ML_FB_PAGE_ID: ${{ secrets.ML_FB_PAGE_ID }}
+          ML_FB_PAGE_ACCESS_TOKEN: ${{ secrets.ML_FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: python3 scripts/upload_facebook.py
+        continue-on-error: true
+
+      - name: Prepare public URLs for Instagram/Threads (GitHub Release 업로드)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python3 scripts/prepare_public_urls.py
+        continue-on-error: true
+
+      - name: Upload to Instagram (Business 계정 + 앱 심사 필요)
+        env:
+          ML_IG_USER_ID: ${{ secrets.ML_IG_USER_ID }}
+          ML_IG_ACCESS_TOKEN: ${{ secrets.ML_IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python3 scripts/upload_instagram.py
+        continue-on-error: true
+
+      - name: Upload to Threads (앱 심사 필요)
+        env:
+          ML_THREADS_USER_ID: ${{ secrets.ML_THREADS_USER_ID }}
+          ML_THREADS_ACCESS_TOKEN: ${{ secrets.ML_THREADS_ACCESS_TOKEN }}
+        run: python3 scripts/upload_threads.py
+        continue-on-error: true
+
+      - name: Save outputs as workflow artifact (백업/수동 확인용)
+        uses: actions/upload-artifact@v4
+        with:
+          name: multilang-quiz-videos-${{ github.run_id }}
+          path: multilang_quiz/outputs/*.mp4
+          retention-days: 14
+
+      - name: Send report email (성공/실패 내역 요약)
+        if: always()
+        env:
+          ML_GMAIL_SENDER: ${{ secrets.ML_GMAIL_SENDER }}
+          ML_GMAIL_APP_PASSWORD: ${{ secrets.ML_GMAIL_APP_PASSWORD }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ML_REPORT_TO: huh0303@gmail.com
+        run: python3 scripts/send_report_email.py
