@@ -1,0 +1,31 @@
+word,category,image_query,concept
+manzana,food,red apple fruit photo,apple
+plátano,food,banana fruit photo,banana
+perro,animal,dog photo,dog
+gato,animal,cat photo,cat
+libro,object,open book photo,book
+silla,object,wooden chair photo,chair
+mesa,object,wooden table photo,table
+agua,food,glass of water photo,water
+pan,food,loaf of bread photo,bread
+leche,food,glass of milk photo,milk
+casa,place,small house photo,house
+coche,object,car photo,car
+árbol,nature,tree photo,tree
+flor,nature,flower photo,flower
+sol,nature,sun sky photo,sun
+luna,nature,moon photo,moon
+estrella,nature,star night sky photo,star
+pájaro,animal,bird photo,bird
+pez,animal,fish photo,fish
+huevo,food,egg photo,egg
+zapato,clothing,shoe photo,shoe
+sombrero,clothing,hat photo,hat
+paraguas,object,umbrella photo,umbrella
+bolsa,object,bag photo,bag
+lápiz,object,pencil photo,pencil
+teléfono,object,smartphone photo,phone
+reloj,object,clock photo,clock
+puerta,object,door photo,door
+ventana,object,window photo,window
+llave,object,key photo,key
