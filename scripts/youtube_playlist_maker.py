@@ -563,7 +563,7 @@ def add_spinning_vinyl_and_waveform(visual_path, audio_path, out_path,
     filter_complex = (
         f"[1:v]format=rgba,rotate=2*PI*t/{rotation_period_sec}:c=none:"
         f"ow={rot_canvas}:oh={rot_canvas}[vinylrot];"
-        f"[2:a]showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white@0.8:rate=25,format=rgba[wave];"
+        f"[2:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white@0.9:rate=25,format=rgba[wave];"
         f"[0:v][vinylrot]overlay=x=(W-w)/2:y=(H-h)/2:shortest=1[v1];"
         f"[v1][wave]overlay=x=(W-w)/2:y=H-h-60[vout]"
     )
@@ -576,6 +576,55 @@ def add_spinning_vinyl_and_waveform(visual_path, audio_path, out_path,
         "-map", "[vout]", "-map", "2:a",
         "-c:v", "libx264", "-c:a", "aac", "-b:a", "192k",
         "-pix_fmt", "yuv420p", "-shortest",
+        out_path,
+    ])
+
+
+def make_intro_clip(intro_still_path, audio_path, out_path, duration=6.0):
+    """썸네일과 같은 매거진 표지 디자인(단, 타이틀은 큼직하게 'Playlist')을
+    그대로 살려서, 살짝 줌인되고 실제 재생될 음악에 반응하는 파형이 움직이는
+    인트로 클립을 만든다. 최종 영상 맨 앞에 붙여서 "이 영상이 플레이리스트"라는
+    걸 시청자가 바로 알아보게 한다."""
+    intro_audio = os.path.join(WORKDIR, "intro_audio.m4a")
+    run_ffmpeg(["ffmpeg", "-y", "-i", audio_path, "-t", str(duration),
+                "-c:a", "aac", intro_audio])
+
+    frames = int(duration * 25)
+    zoom_vf = (f"scale=2400:-1,zoompan=z='min(zoom+0.0015,1.08)':d={frames}:"
+               f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={VIDEO_W}x{VIDEO_H}:fps=25,"
+               f"format=yuv420p")
+    zoomed = os.path.join(WORKDIR, "intro_zoomed.mp4")
+    run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", intro_still_path, "-vf", zoom_vf,
+                "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p", zoomed])
+
+    wave_w, wave_h = 760, 130
+    bar_w, bar_h = wave_w + 60, wave_h + 50
+    bar_y = VIDEO_H - bar_h - 60
+    filter_complex = (
+        f"[1:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white:rate=25,"
+        f"format=rgba[wave];"
+        f"[0:v]drawbox=x=(iw-{bar_w})/2:y={bar_y}:w={bar_w}:h={bar_h}:"
+        f"color=black@0.45:t=fill[bg];"
+        f"[bg][wave]overlay=x=(W-w)/2:y={bar_y + (bar_h - wave_h) // 2}[vout]"
+    )
+    run_ffmpeg([
+        "ffmpeg", "-y", "-i", zoomed, "-i", intro_audio,
+        "-filter_complex", filter_complex,
+        "-map", "[vout]", "-map", "1:a",
+        "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p", "-shortest",
+        out_path,
+    ])
+
+
+def concat_intro_and_main(intro_path, main_path, out_path):
+    """서로 다른 단계에서 만들어진 두 영상(인트로/본편)을 안전하게 이어붙인다.
+    concat 데먹서는 코덱 파라미터가 조금만 달라도 깨지기 쉬워서, 필터 기반
+    concat을 쓴다."""
+    run_ffmpeg([
+        "ffmpeg", "-y", "-i", intro_path, "-i", main_path,
+        "-filter_complex", "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]",
+        "-map", "[v]", "-map", "[a]",
+        "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p",
         out_path,
     ])
 
@@ -791,7 +840,15 @@ def main():
         build_alternating_visual(image_paths, total_sec, visual_path)
         muxed_path = os.path.join(WORKDIR, "muxed.mp4")
         add_spinning_vinyl_and_waveform(visual_path, audio_path, muxed_path)
-        add_lower_third_bar(muxed_path, caption_text, final_path)
+        body_path = os.path.join(WORKDIR, "body.mp4")
+        add_lower_third_bar(muxed_path, caption_text, body_path)
+
+        log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
+        intro_still = os.path.join(WORKDIR, "intro_still.png")
+        make_caption_thumbnail(image_paths[0], intro_still, topic="Playlist")
+        intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
+        make_intro_clip(intro_still, audio_path, intro_clip)
+        concat_intro_and_main(intro_clip, body_path, final_path)
     else:
         log("3/5 주제어 없음 — 썸네일창고에서 이미지 무작위 선택(폴백)...")
         thumbs = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
