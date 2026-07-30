@@ -180,7 +180,7 @@ def list_folder_files(service, folder_id, exts, mime_prefix):
     while True:
         resp = service.files().list(
             q=f"'{folder_id}' in parents and trashed=false",
-            fields="nextPageToken, files(id, name, mimeType)",
+            fields="nextPageToken, files(id, name, mimeType, size)",
             pageToken=page_token,
             pageSize=200,
         ).execute()
@@ -762,6 +762,25 @@ LANGUAGE_SCRIPT_RANGES = {
 }
 
 
+def _bring_longest_to_front(items):
+    """인트로에서 처음 들리는 곡이 가장 임팩트 있게, 재생시간이 가장 긴 곡을
+    맨 앞으로 보낸다(파일 크기를 재생시간 근사치로 사용 — 다운로드 없이 알 수
+    있는 값이라 전체 목록을 미리 받아볼 필요가 없다). 나머지는 무작위 순서 유지."""
+    if not items:
+        return items
+
+    def _size(t):
+        try:
+            return int(t.get("size", 0) or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    longest = max(items, key=_size)
+    rest = [t for t in items if t is not longest]
+    random.shuffle(rest)
+    return [longest] + rest
+
+
 def filter_tracks_by_language(tracks, keyword):
     """keyword가 Mixed/빈값이면 전체를 무작위 순서로 반환.
     아니면 파일명에 해당 언어 태그가 있거나(명시적), 그 언어 특유의 발음구별기호/
@@ -771,9 +790,7 @@ def filter_tracks_by_language(tracks, keyword):
     매칭되는 곡이 하나도 없으면 전체를 무작위 순서로 반환(폴백)."""
     if not keyword or keyword.strip().lower() in MIXED_KEYWORDS:
         log("   (필터 없음 — Mixed, 전체 곡에서 무작위 선택)")
-        shuffled_all = list(tracks)
-        random.shuffle(shuffled_all)
-        return shuffled_all
+        return _bring_longest_to_front(list(tracks))
 
     tag = LANGUAGE_TAG_MAP.get(keyword.strip().lower(), keyword.strip())
     hint_chars = LANGUAGE_HINT_CHARS.get(tag, set())
@@ -793,14 +810,13 @@ def filter_tracks_by_language(tracks, keyword):
 
     matched = [t for t in tracks if is_match(t["name"])]
     others = [t for t in tracks if not is_match(t["name"])]
-    random.shuffle(matched)
-    random.shuffle(others)
 
     if not matched:
         log(f"   ⚠️ '{keyword}'({tag}) 태그/제목 매칭 곡이 없어서 전체 곡으로 진행")
-        return others
+        return _bring_longest_to_front(others)
     log(f"   '{keyword}'({tag}) 매칭 {len(matched)}개를 우선 배치, 나머지 {len(others)}개는 뒤에서 채움")
-    return matched + others
+    random.shuffle(others)
+    return _bring_longest_to_front(matched) + others
 
 
 # ════════════════════════════════════════════════════════════
