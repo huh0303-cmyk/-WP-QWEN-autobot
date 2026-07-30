@@ -692,13 +692,21 @@ LANGUAGE_HINT_CHARS = {
     "포르투갈어": set("ãõâêôáéíóúçÃÕÂÊÔÁÉÍÓÚÇ"),
 }
 
+# 일본어/중국어/한국어처럼 라틴 발음구별기호가 아니라 아예 다른 문자 체계를 쓰는
+# 언어는 개별 글자가 아니라 유니코드 스크립트 범위로 판별한다
+LANGUAGE_SCRIPT_RANGES = {
+    "일본어": [(0x3040, 0x30FF), (0x4E00, 0x9FFF)],   # 히라가나/가타카나 + 한자
+    "중국어": [(0x4E00, 0x9FFF)],                       # 한자(간체/번체 공용 대역)
+    "한국어": [(0xAC00, 0xD7A3)],                       # 한글 음절
+}
+
 
 def filter_tracks_by_language(tracks, keyword):
     """keyword가 Mixed/빈값이면 전체를 무작위 순서로 반환.
-    아니면 파일명에 해당 언어 태그가 있거나(명시적) 그 언어 특유의 발음구별기호가
-    제목에 섞여 있는(암묵적) 곡을 먼저 앞에 배치하고, 나머지 곡을 뒤에 이어붙여
-    돌려준다 — build_playlist_audio가 앞에서부터 채우므로 매칭곡이 최우선으로
-    들어가고, 목표 재생시간을 못 채우면 자연스럽게 나머지로 채워진다.
+    아니면 파일명에 해당 언어 태그가 있거나(명시적), 그 언어 특유의 발음구별기호/
+    문자 체계가 제목에 섞여 있는(암묵적) 곡을 먼저 앞에 배치하고, 나머지 곡을
+    뒤에 이어붙여 돌려준다 — build_playlist_audio가 앞에서부터 채우므로 매칭곡이
+    최우선으로 들어가고, 목표 재생시간을 못 채우면 자연스럽게 나머지로 채워진다.
     매칭되는 곡이 하나도 없으면 전체를 무작위 순서로 반환(폴백)."""
     if not keyword or keyword.strip().lower() in MIXED_KEYWORDS:
         log("   (필터 없음 — Mixed, 전체 곡에서 무작위 선택)")
@@ -708,11 +716,19 @@ def filter_tracks_by_language(tracks, keyword):
 
     tag = LANGUAGE_TAG_MAP.get(keyword.strip().lower(), keyword.strip())
     hint_chars = LANGUAGE_HINT_CHARS.get(tag, set())
+    script_ranges = LANGUAGE_SCRIPT_RANGES.get(tag, [])
 
     def is_match(name):
         if tag.lower() in name.lower():
             return True
-        return bool(hint_chars) and any(c in hint_chars for c in name)
+        if hint_chars and any(c in hint_chars for c in name):
+            return True
+        if script_ranges:
+            for c in name:
+                cp = ord(c)
+                if any(lo <= cp <= hi for lo, hi in script_ranges):
+                    return True
+        return False
 
     matched = [t for t in tracks if is_match(t["name"])]
     others = [t for t in tracks if not is_match(t["name"])]
