@@ -14,7 +14,8 @@ def upload_one(page_id, token, path, title, desc):
         files = {"source": f}
         data = {"access_token": token, "description": f"{title}\n\n{desc}"}
         r = requests.post(url, data=data, files=files, timeout=600)
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"{r.status_code} {r.text[:400]}")
     return r.json().get("id")
 
 def main():
