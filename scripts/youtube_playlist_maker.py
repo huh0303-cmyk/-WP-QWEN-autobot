@@ -277,40 +277,21 @@ def build_caption_text(topic, caption_text):
 
 
 THUMBNAIL_BRAND_LABEL = os.environ.get("THUMBNAIL_BRAND_LABEL", "Playlist")
-THUMBNAIL_TAGLINE = os.environ.get("THUMBNAIL_TAGLINE", "stay slow, stay you")
-FALLBACK_QUOTES = [
-    "In that moment, what did you feel?",
-    "Some days just need a little quiet.",
-    "Let the moment linger a bit longer.",
-    "Nothing to prove, just here for now.",
-]
-
-
-def build_quote_line(topic):
-    """썸네일 상단에 얹을 짧은 영문 감성 문구 (레퍼런스의 인용구 스타일)."""
-    prompt = (f"Write one short, wistful English one-liner (under 8 words) that could sit "
-              f"as a quiet overlay quote on a '{topic}' themed lifestyle playlist thumbnail. "
-              f"No hashtags, no marketing tone, just a quiet human thought. "
-              f"Output only the line itself, no quotation marks.")
-    text = gemini_generate_text(prompt, temperature=1.0)
-    text = text.strip().strip('"').strip("'")
-    return text or random.choice(FALLBACK_QUOTES)
 
 
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
     style = (
-        "candid snapshot taken on a phone camera, natural unposed moment caught "
-        "mid-motion, slightly imperfect framing, soft natural light, realistic skin "
-        "texture with visible pores and minor blemishes, subtle film grain, no "
-        "obvious retouching, not overly symmetrical, amateur travel-photo aesthetic, "
-        "no text, no watermark, 16:9"
+        "professional travel-magazine photography, ultra sharp, cinematic wide 16:9 "
+        "composition, natural light, vivid but realistic color grading, no text, "
+        "no watermark, no illustration or 3D-render look"
     )
     prompts = [
-        f"A young woman caught laughing mid-moment with arms raised, "
-        f"background: {topic}, golden hour sunset lighting, {style}",
-        f"A young woman glancing slightly off-camera, relaxed candid pose, "
-        f"background: {topic}, bright overcast daylight, {style}",
+        f"A breathtaking aerial or street-level travel photo capturing the essence of "
+        f"{topic}, golden hour warm lighting, dramatic skyline or landscape composition, "
+        f"{style}",
+        f"A different iconic view of {topic} from another angle or time of day, "
+        f"cooler blue-hour or daylight tone, {style}",
     ]
     paths = []
     for i, prompt in enumerate(prompts, 1):
@@ -562,11 +543,20 @@ def add_spinning_vinyl_and_waveform(visual_path, audio_path, out_path,
     ])
 
 
-def make_caption_thumbnail(image_path, out_path, caption_text="", topic="", w=1280, h=720):
-    """레퍼런스(시네마틱 배경 + 세리프 'Playlist' 타이틀 + 인용구 + 브랜드 라벨 +
-    LP판/파형 아이콘) 스타일로 썸네일을 합성한다. 배경 사진만 AI 생성이고
-    나머지 그래픽 요소는 전부 PIL로 직접 그려서 무료로 자동 생성된다."""
+def _dotted_hline(draw, cx, y, total_w, dash_w=6, gap=8, fill=(255, 255, 255, 220)):
+    x = cx - total_w // 2
+    end = cx + total_w // 2
+    while x < end:
+        draw.line([(x, y), (min(x + dash_w, end), y)], fill=fill, width=2)
+        x += dash_w + gap
+
+
+def make_caption_thumbnail(image_path, out_path, topic="", w=1280, h=720):
+    """여행 잡지 표지 스타일 썸네일: 상단 좌우에 작은 브랜드 라벨/볼륨 표기,
+    화면 대부분을 채우는 초대형 세리프 주제어 타이틀, 그 아래 얇은 점선 구분선.
+    배경 사진만 AI 생성이고 나머지는 전부 PIL로 직접 그려서 무료로 자동 생성된다."""
     from PIL import Image, ImageDraw, ImageFont
+    from datetime import datetime as _dt
 
     title_font_path = ensure_title_font()
     label_font_path = ensure_font()
@@ -580,51 +570,39 @@ def make_caption_thumbnail(image_path, out_path, caption_text="", topic="", w=12
                 pass
         return f
 
-    has_ko_caption = any('가' <= c <= '힣' for c in caption_text)
-
-    title_font = _font(title_font_path, 140, 700)
-    quote_font = _font(title_font_path, 30, 500)
-    # Playfair Display엔 한글 글리프가 없어서 캡션이 한글이면 나눔고딕으로 대체
-    caption_font = _font(label_font_path, 40) if has_ko_caption else _font(title_font_path, 46, 500)
-    label_font = _font(label_font_path, 26)
-
     img = _resize_cover(Image.open(image_path).convert("RGB"), w, h).convert("RGBA")
-    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.28), True, 110))
-    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.5), False, 175))
+    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.30), True, 70))
+    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.22), False, 60))
     draw = ImageDraw.Draw(img, "RGBA")
 
-    def center_text(text, font, y, fill=(255, 255, 255, 255), stroke_width=0,
-                    stroke_fill=(0, 0, 0, 0)):
-        bbox = draw.textbbox((0, 0), text, font=font, stroke_width=stroke_width)
-        tw = bbox[2] - bbox[0]
-        draw.text(((w - tw) // 2, y), text, font=font, fill=fill,
-                   stroke_width=stroke_width, stroke_fill=stroke_fill)
-        return bbox[3] - bbox[1]
+    label_font = _font(label_font_path, 24)
 
-    # 상단: 브랜드 라벨(좌) / 태그라인(우) / 인용구(중앙)
-    draw.text((36, 34), THUMBNAIL_BRAND_LABEL, font=label_font, fill=(255, 255, 255, 230))
-    tag_bbox = draw.textbbox((0, 0), THUMBNAIL_TAGLINE, font=label_font)
-    draw.text((w - 36 - (tag_bbox[2] - tag_bbox[0]), 34), THUMBNAIL_TAGLINE,
-               font=label_font, fill=(255, 255, 255, 230))
+    # 상단: 브랜드 라벨(좌) / VOL. 표기(우) — 잡지 표지 느낌의 작은 캡션
+    brand = " ".join(list(THUMBNAIL_BRAND_LABEL.upper()))  # 글자 사이 여백을 둔 스몰캡스 느낌
+    draw.text((36, 30), brand, font=label_font, fill=(255, 255, 255, 235))
+    vol_text = f"VOL. {_dt.now().timetuple().tm_yday:02d}"
+    vol_bbox = draw.textbbox((0, 0), vol_text, font=label_font)
+    draw.text((w - 36 - (vol_bbox[2] - vol_bbox[0]), 30), vol_text,
+               font=label_font, fill=(255, 255, 255, 235))
 
-    quote = build_quote_line(topic)
-    center_text(f'"{quote}"', quote_font, 40, fill=(235, 235, 225, 235))
+    # 중앙: 주제어를 초대형 세리프로 — 폭의 92%를 채우도록 자동 축소
+    title = (topic or THUMBNAIL_BRAND_LABEL).strip().upper() or "PLAYLIST"
+    max_w = int(w * 0.92)
+    size = 220
+    while size > 40:
+        font = _font(title_font_path, size, 500)
+        bbox = draw.textbbox((0, 0), title, font=font)
+        if bbox[2] - bbox[0] <= max_w:
+            break
+        size -= 6
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    title_y = (h - th) // 2 - int(h * 0.03)
+    draw.text(((w - tw) // 2, title_y - bbox[1]), title, font=font,
+               fill=(255, 255, 255, 255))
 
-    # 중앙: 큼직한 세리프 "Playlist" 타이틀
-    title_y = int(h * 0.36)
-    center_text("Playlist", title_font, title_y, stroke_width=5,
-                stroke_fill=(0, 0, 0, 150))
-
-    # 타이틀 아래: 캡션 문구 + LP판 아이콘
-    if caption_text:
-        cap_y = int(h * 0.66)
-        th = center_text(caption_text, caption_font, cap_y, stroke_width=2,
-                          stroke_fill=(0, 0, 0, 140))
-        cap_bbox = draw.textbbox((0, 0), caption_text, font=caption_font, stroke_width=2)
-        cap_w = cap_bbox[2] - cap_bbox[0]
-        _draw_vinyl_icon(draw, (w + cap_w) // 2 + 46, cap_y + th // 2, 26)
-
-    _draw_waveform(draw, w // 2, h - 34)
+    # 타이틀 바로 아래: 얇은 점선 구분선
+    _dotted_hline(draw, w // 2, title_y + th + int(h * 0.05), int(w * 0.5))
 
     img.convert("RGB").save(out_path, "PNG")
 
@@ -701,8 +679,7 @@ def main():
         image_paths = build_ai_images(topic_keyword, WORKDIR)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
-        make_caption_thumbnail(image_paths[0], thumbnail_out,
-                                caption_text=caption_text, topic=topic_keyword)
+        make_caption_thumbnail(image_paths[0], thumbnail_out, topic=topic_keyword)
 
         log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
         visual_path = os.path.join(WORKDIR, "visual.mp4")
