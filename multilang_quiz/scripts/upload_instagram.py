@@ -26,7 +26,8 @@ def upload_one(ig_user_id, token, video_url, caption):
     r = requests.post(f"https://graph.facebook.com/v19.0/{ig_user_id}/media", data={
         "media_type": "REELS", "video_url": video_url, "caption": caption, "access_token": token,
     }, timeout=60)
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"{r.status_code} {r.text[:400]}")
     creation_id = r.json()["id"]
 
     for _ in range(30):
@@ -39,7 +40,8 @@ def upload_one(ig_user_id, token, video_url, caption):
     r2 = requests.post(f"https://graph.facebook.com/v19.0/{ig_user_id}/media_publish", data={
         "creation_id": creation_id, "access_token": token,
     }, timeout=60)
-    r2.raise_for_status()
+    if not r2.ok:
+        raise RuntimeError(f"{r2.status_code} {r2.text[:400]}")
     return r2.json().get("id")
 
 def main():
