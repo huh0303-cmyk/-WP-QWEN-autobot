@@ -276,6 +276,27 @@ def build_caption_text(topic, caption_text):
     return text or f"{topic} 들으면서 잠깐 쉬어가기"
 
 
+THUMBNAIL_BRAND_LABEL = os.environ.get("THUMBNAIL_BRAND_LABEL", "Playlist")
+THUMBNAIL_TAGLINE = os.environ.get("THUMBNAIL_TAGLINE", "stay slow, stay you")
+FALLBACK_QUOTES = [
+    "In that moment, what did you feel?",
+    "Some days just need a little quiet.",
+    "Let the moment linger a bit longer.",
+    "Nothing to prove, just here for now.",
+]
+
+
+def build_quote_line(topic):
+    """썸네일 상단에 얹을 짧은 영문 감성 문구 (레퍼런스의 인용구 스타일)."""
+    prompt = (f"Write one short, wistful English one-liner (under 8 words) that could sit "
+              f"as a quiet overlay quote on a '{topic}' themed lifestyle playlist thumbnail. "
+              f"No hashtags, no marketing tone, just a quiet human thought. "
+              f"Output only the line itself, no quotation marks.")
+    text = gemini_generate_text(prompt, temperature=1.0)
+    text = text.strip().strip('"').strip("'")
+    return text or random.choice(FALLBACK_QUOTES)
+
+
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
     style = (
@@ -456,27 +477,108 @@ def _resize_cover(img, w, h):
     return img.crop((left, top, left + w, top + h))
 
 
-def make_caption_thumbnail(image_path, out_path, w=1280, h=720):
-    """레퍼런스처럼 이미지 위에 큼직한 'Playlist' 타이틀을 얹은 썸네일 생성"""
+def _gradient_band(w, h, band_h, at_top, max_alpha):
+    """상단 또는 하단에 텍스트 가독성을 위한 반투명 검정 그라데이션 밴드 생성"""
+    from PIL import Image, ImageDraw
+
+    overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    for i in range(band_h):
+        frac = (band_h - i) / band_h if at_top else i / band_h
+        alpha = int(max_alpha * frac)
+        y = i if at_top else h - band_h + i
+        draw.line([(0, y), (w, y)], fill=(0, 0, 0, alpha))
+    return overlay
+
+
+def _draw_vinyl_icon(draw, cx, cy, r, fill=(20, 20, 20, 230)):
+    """레퍼런스의 작은 LP판 아이콘 (검정 원반 + 중앙 홀)"""
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fill,
+                 outline=(255, 255, 255, 90), width=2)
+    inner_r = max(int(r * 0.42), 8)
+    draw.ellipse([cx - inner_r, cy - inner_r, cx + inner_r, cy + inner_r],
+                 fill=(70, 70, 70, 255))
+    hole_r = max(int(r * 0.1), 3)
+    draw.ellipse([cx - hole_r, cy - hole_r, cx + hole_r, cy + hole_r],
+                 fill=(0, 0, 0, 255))
+
+
+def _draw_waveform(draw, cx, cy, n_bars=17, gap=6, max_h=26, color=(255, 255, 255, 180)):
+    """하단 중앙의 작은 오디오 파형 아이콘 (고정 시드로 매번 같은 모양)"""
+    rnd = random.Random("thumbnail_waveform")
+    heights = [max(3, int(max_h * (0.3 + 0.7 * rnd.random()))) for _ in range(n_bars)]
+    total_w = n_bars * gap
+    x0 = cx - total_w // 2
+    for i, hgt in enumerate(heights):
+        x = x0 + i * gap
+        draw.line([(x, cy - hgt // 2), (x, cy + hgt // 2)], fill=color, width=2)
+
+
+def make_caption_thumbnail(image_path, out_path, caption_text="", topic="", w=1280, h=720):
+    """레퍼런스(시네마틱 배경 + 세리프 'Playlist' 타이틀 + 인용구 + 브랜드 라벨 +
+    LP판/파형 아이콘) 스타일로 썸네일을 합성한다. 배경 사진만 AI 생성이고
+    나머지 그래픽 요소는 전부 PIL로 직접 그려서 무료로 자동 생성된다."""
     from PIL import Image, ImageDraw, ImageFont
 
     title_font_path = ensure_title_font()
-    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h)
-    draw = ImageDraw.Draw(img, "RGBA")
-    font = ImageFont.truetype(title_font_path, 150)
-    try:
-        font.set_variation_by_axes([700])  # 가변폰트 굵기(wght)를 Bold로 고정
-    except Exception:
-        pass
-    title = "Playlist"
+    label_font_path = ensure_font()
 
-    bbox = draw.textbbox((0, 0), title, font=font, stroke_width=6)
-    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    x = (w - tw) // 2
-    y = int(h * 0.62)
-    draw.text((x, y), title, font=font, fill=(255, 255, 255, 255),
-               stroke_width=6, stroke_fill=(0, 0, 0, 160))
-    img.save(out_path, "PNG")
+    def _font(path, size, weight=None):
+        f = ImageFont.truetype(path, size)
+        if weight is not None:
+            try:
+                f.set_variation_by_axes([weight])
+            except Exception:
+                pass
+        return f
+
+    has_ko_caption = any('가' <= c <= '힣' for c in caption_text)
+
+    title_font = _font(title_font_path, 140, 700)
+    quote_font = _font(title_font_path, 30, 500)
+    # Playfair Display엔 한글 글리프가 없어서 캡션이 한글이면 나눔고딕으로 대체
+    caption_font = _font(label_font_path, 40) if has_ko_caption else _font(title_font_path, 46, 500)
+    label_font = _font(label_font_path, 26)
+
+    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h).convert("RGBA")
+    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.28), True, 110))
+    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.5), False, 175))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    def center_text(text, font, y, fill=(255, 255, 255, 255), stroke_width=0,
+                    stroke_fill=(0, 0, 0, 0)):
+        bbox = draw.textbbox((0, 0), text, font=font, stroke_width=stroke_width)
+        tw = bbox[2] - bbox[0]
+        draw.text(((w - tw) // 2, y), text, font=font, fill=fill,
+                   stroke_width=stroke_width, stroke_fill=stroke_fill)
+        return bbox[3] - bbox[1]
+
+    # 상단: 브랜드 라벨(좌) / 태그라인(우) / 인용구(중앙)
+    draw.text((36, 34), THUMBNAIL_BRAND_LABEL, font=label_font, fill=(255, 255, 255, 230))
+    tag_bbox = draw.textbbox((0, 0), THUMBNAIL_TAGLINE, font=label_font)
+    draw.text((w - 36 - (tag_bbox[2] - tag_bbox[0]), 34), THUMBNAIL_TAGLINE,
+               font=label_font, fill=(255, 255, 255, 230))
+
+    quote = build_quote_line(topic)
+    center_text(f'"{quote}"', quote_font, 40, fill=(235, 235, 225, 235))
+
+    # 중앙: 큼직한 세리프 "Playlist" 타이틀
+    title_y = int(h * 0.36)
+    center_text("Playlist", title_font, title_y, stroke_width=5,
+                stroke_fill=(0, 0, 0, 150))
+
+    # 타이틀 아래: 캡션 문구 + LP판 아이콘
+    if caption_text:
+        cap_y = int(h * 0.66)
+        th = center_text(caption_text, caption_font, cap_y, stroke_width=2,
+                          stroke_fill=(0, 0, 0, 140))
+        cap_bbox = draw.textbbox((0, 0), caption_text, font=caption_font, stroke_width=2)
+        cap_w = cap_bbox[2] - cap_bbox[0]
+        _draw_vinyl_icon(draw, (w + cap_w) // 2 + 46, cap_y + th // 2, 26)
+
+    _draw_waveform(draw, w // 2, h - 34)
+
+    img.convert("RGB").save(out_path, "PNG")
 
 
 def mux_video_audio(video_path, audio_path, out_path):
@@ -551,7 +653,8 @@ def main():
         image_paths = build_ai_images(topic_keyword, WORKDIR)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
-        make_caption_thumbnail(image_paths[0], thumbnail_out)
+        make_caption_thumbnail(image_paths[0], thumbnail_out,
+                                caption_text=caption_text, topic=topic_keyword)
 
         log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
         visual_path = os.path.join(WORKDIR, "visual.mp4")
