@@ -1,5 +1,12 @@
 [
   {
+    "site": "https://k-health365.com",
+    "title_fixed": [],
+    "content_cleaned": [],
+    "failed": [],
+    "dry_run": true
+  },
+  {
     "site": "https://koreamedicaltour.com",
     "title_fixed": [],
     "content_cleaned": [],
@@ -14,14 +21,14 @@
         "link": "",
         "old_title": "A Practical Look at kimchi premium explained for Internation",
         "reason": "dup",
-        "new_title": "7 Things to Look For When Choosing kimchi premium explained"
+        "new_title": "kimchi premium explained: Frequently Confused Points"
       },
       {
         "id": 2746,
         "link": "",
         "old_title": "Korean pension fund investment 101: Where First-Timers Shoul",
         "reason": "dup",
-        "new_title": "How People Are Approaching Korean pension fund investment Th"
+        "new_title": "Korean pension fund investment: A Closer Look"
       }
     ],
     "content_cleaned": [],
@@ -43,7 +50,7 @@
         "link": "",
         "old_title": "A Practical Look at wisdom tooth removal Korea cost",
         "reason": "dup",
-        "new_title": "How wisdom tooth removal Korea cost Actually Works"
+        "new_title": "How wisdom tooth removal Korea cost Has Changed in 2026"
       }
     ],
     "content_cleaned": [],
@@ -58,21 +65,21 @@
         "link": "",
         "old_title": "startup investment Korea foreigner Checklist You Shouldn&#82",
         "reason": "dup",
-        "new_title": "startup investment Korea foreigner: Where to Start"
+        "new_title": "The Real Cost of startup investment Korea foreigner — What t"
       },
       {
         "id": 3131,
         "link": "",
         "old_title": "How Much Should You Budget for Korea corporate tax rate guid",
         "reason": "dup",
-        "new_title": "Korea corporate tax rate guide Checklist You Shouldn't Skip"
+        "new_title": "Korea corporate tax rate guide, Explained Simply"
       },
       {
         "id": 3070,
         "link": "",
         "old_title": "real estate Seoul foreigner buy: A Closer Look at What Reall",
         "reason": "dup",
-        "new_title": "real estate Seoul foreigner buy, From Someone Who's Been The"
+        "new_title": "Getting real estate Seoul foreigner buy Right the First Time"
       },
       {
         "id": 3051,
@@ -86,7 +93,7 @@
         "link": "",
         "old_title": "A Practical Look at Seoul financial center guide for Interna",
         "reason": "dup",
-        "new_title": "6 Questions People Ask About Seoul financial center guide"
+        "new_title": "Seoul financial center guide, Broken Down Step by Step"
       }
     ],
     "content_cleaned": [],
@@ -101,21 +108,21 @@
         "link": "",
         "old_title": "foreigner CEO Korea requirements Checklist You Shouldn&#8217",
         "reason": "dup",
-        "new_title": "Save Time and Money on foreigner CEO Korea requirements"
+        "new_title": "foreigner CEO Korea requirements: Details That Are Easy to M"
       },
       {
         "id": 3173,
         "link": "",
         "old_title": "withholding tax Korea foreigner in 2026: What&#8217;s Change",
         "reason": "dup",
-        "new_title": "How Much Should You Budget for withholding tax Korea foreign"
+        "new_title": "8 Things to Check Before withholding tax Korea foreigner"
       },
       {
         "id": 2967,
         "link": "",
         "old_title": "A Practical Look at tax residence status Korea",
         "reason": "dup",
-        "new_title": "tax residence status Korea, Step by Step"
+        "new_title": "A Practical Look at tax residence status Korea for Internati"
       }
     ],
     "content_cleaned": [],
@@ -130,7 +137,7 @@
         "link": "",
         "old_title": "A Practical Look at Upbit registration foreigner guide",
         "reason": "dup",
-        "new_title": "Upbit registration foreigner guide, Broken Down Step by Step"
+        "new_title": "Upbit registration foreigner guide Q&A: Answers From the Fie"
       },
       {
         "id": 2577,
@@ -144,7 +151,7 @@
         "link": "",
         "old_title": "The Real Cost of Korea crypto tax guide — What to Expect",
         "reason": "dup",
-        "new_title": "8 Things to Look For When Choosing Korea crypto tax guide"
+        "new_title": "Korea crypto tax guide, From Someone Who's Been There"
       },
       {
         "id": 2357,
@@ -158,7 +165,7 @@
         "link": "",
         "old_title": "Debunking Common Myths About Safeguard Your Digital Wealth:,",
         "reason": "dup",
-        "new_title": "A Practical Look at Debunking Common Myths About Safeguard Y"
+        "new_title": "Debunking Common Myths About Safeguard Your Digital Wealth: "
       }
     ],
     "content_cleaned": [],
@@ -173,35 +180,35 @@
         "link": "",
         "old_title": "commercial real estate Seoul, Explained Simply",
         "reason": "dup",
-        "new_title": "commercial real estate Seoul, From Someone Who's Been There"
+        "new_title": "Getting commercial real estate Seoul Right the First Time"
       },
       {
         "id": 255,
         "link": "",
         "old_title": "foreigner land purchase Korea: Frequently Confused Points",
         "reason": "dup",
-        "new_title": "Save Time and Money on foreigner land purchase Korea"
+        "new_title": "foreigner land purchase Korea Checklist You Shouldn't Skip"
       },
       {
         "id": 243,
         "link": "",
         "old_title": "foreigner land purchase Korea: Details That Are Easy to Miss",
         "reason": "dup",
-        "new_title": "Planning for foreigner land purchase Korea? Start Here"
+        "new_title": "A Practical Look at foreigner land purchase Korea"
       },
       {
         "id": 186,
         "link": "",
         "old_title": "acquisition tax Korea foreigner: A Beginner&#8217;s Starting",
         "reason": "dup",
-        "new_title": "acquisition tax Korea foreigner: A Beginner's Starting Point"
+        "new_title": "acquisition tax Korea foreigner 101: Where First-Timers Shou"
       },
       {
         "id": 171,
         "link": "",
         "old_title": "REIT investment Korea foreigner in 2026: What&#8217;s Change",
         "reason": "dup",
-        "new_title": "REIT investment Korea foreigner — Common Points of Confusion"
+        "new_title": "How REIT investment Korea foreigner Has Changed in 2026"
       }
     ],
     "content_cleaned": [],
@@ -216,14 +223,14 @@
         "link": "",
         "old_title": "A Practical Look at memory chip price Korea for Internationa",
         "reason": "dup",
-        "new_title": "memory chip price Korea Q&A: Answers From the Field"
+        "new_title": "memory chip price Korea: Where to Start"
       },
       {
         "id": 3879,
         "link": "",
         "old_title": "A Practical Look at smart city Songdo guide",
         "reason": "dup",
-        "new_title": "smart city Songdo guide Made Simple"
+        "new_title": "How Much Should You Budget for smart city Songdo guide?"
       },
       {
         "id": 3812,
@@ -245,28 +252,28 @@
         "link": "",
         "old_title": "A Practical Look at best Korean cushion foundation",
         "reason": "dup",
-        "new_title": "How Much Should You Budget for best Korean cushion foundatio"
+        "new_title": "best Korean cushion foundation — Common Points of Confusion,"
       },
       {
         "id": 1704,
         "link": "",
         "old_title": "best eye cream for dark circles Checklist You Shouldn&#8217;",
         "reason": "dup",
-        "new_title": "best eye cream for dark circles 101: Where First-Timers Shou"
+        "new_title": "A Practical Look at best eye cream for dark circles for Inte"
       },
       {
         "id": 1690,
         "link": "",
         "old_title": "A Practical Look at best toner for oily skin Korea",
         "reason": "dup",
-        "new_title": "Getting best toner for oily skin Korea Right the First Time"
+        "new_title": "How best toner for oily skin Korea Actually Works"
       },
       {
         "id": 1578,
         "link": "",
         "old_title": "Korean Skincare for Acne: 7 Steps to Clear Skin Secrets! War",
         "reason": "dup",
-        "new_title": "Korean Skincare for Acne: 7 Steps to Clear Skin Secrets!, Ex"
+        "new_title": "Korean Skincare for Acne: 7 Steps to Clear Skin Secrets!: A "
       }
     ],
     "content_cleaned": [],
@@ -281,28 +288,28 @@
         "link": "",
         "old_title": "Olive Young sunscreen review: Where to Start",
         "reason": "dup",
-        "new_title": "Planning for Olive Young sunscreen review? Start Here"
+        "new_title": "Olive Young sunscreen review: Frequently Confused Points"
       },
       {
         "id": 380,
         "link": "",
         "old_title": "Anua heartleaf toner review Q&amp;A: Answers From the Field",
         "reason": "dup",
-        "new_title": "Anua heartleaf toner review: What to Prepare First"
+        "new_title": "Save Time and Money on Anua heartleaf toner review"
       },
       {
         "id": 377,
         "link": "",
         "old_title": "Before You Try Korean serum best pick, Read This First",
         "reason": "dup",
-        "new_title": "How Korean serum best pick Has Changed in 2026"
+        "new_title": "Korean serum best pick, Broken Down Step by Step"
       },
       {
         "id": 143,
         "link": "",
         "old_title": "A Practical Look at bbia eyeliner review",
         "reason": "dup",
-        "new_title": "bbia eyeliner review Checklist You Shouldn't Skip"
+        "new_title": "7 Things to Look For When Choosing bbia eyeliner review"
       }
     ],
     "content_cleaned": [],
@@ -313,39 +320,53 @@
     "site": "https://kworld365.com",
     "title_fixed": [
       {
+        "id": 656,
+        "link": "",
+        "old_title": "Save Time and Money on learn Hangul fast",
+        "reason": "dup",
+        "new_title": "Save Time and Money on learn Hangul fast, Step by Step"
+      },
+      {
         "id": 636,
         "link": "",
         "old_title": "Save Time and Money on K-pop world tour 2026: A Closer Look",
         "reason": "dup",
-        "new_title": "Save Time and Money on K-pop world tour 2026: A Closer Look "
+        "new_title": "Save Time and Money on K-pop world tour 2026: A Closer Look,"
       },
       {
         "id": 627,
         "link": "",
         "old_title": "K-pop fan meeting guide Q&amp;A: Answers From the Field: A B",
         "reason": "dup",
-        "new_title": "How People Are Approaching K-pop fan meeting guide Q&amp;A: "
+        "new_title": "K-pop fan meeting guide Q&amp;A: Answers From the Field: A B"
       },
       {
         "id": 396,
         "link": "",
         "old_title": "5 Things to Check Before cost of living Seoul 2026: Frequent",
         "reason": "dup",
-        "new_title": "The Real Cost of 5 Things to Check Before cost of living Seo"
+        "new_title": "5 Things to Check Before cost of living Seoul 2026: Frequent"
+      },
+      {
+        "id": 394,
+        "link": "",
+        "old_title": "8 Questions People Ask About Korean food vocabulary words",
+        "reason": "dup",
+        "new_title": "Save Time and Money on 8 Questions People Ask About Korean f"
       },
       {
         "id": 392,
         "link": "",
         "old_title": "Behind the Scenes: What NCT 127 world tour Actually Involves",
         "reason": "dup",
-        "new_title": "How Behind the Scenes: What NCT 127 world tour Actually Invo"
+        "new_title": "Behind the Scenes: What NCT 127 world tour Actually Involves"
       },
       {
         "id": 223,
         "link": "",
         "old_title": "Free Korean apps recommendation Made Simple: A Closer Look",
         "reason": "dup",
-        "new_title": "Free Korean apps recommendation Made Simple: A Closer Look Q"
+        "new_title": "9 Things to Look For When Choosing Free Korean apps recommen"
       },
       {
         "id": 216,
@@ -359,41 +380,41 @@
         "link": "",
         "old_title": "8 Questions People Ask About IVE’s Rapid Rise, Step by Step",
         "reason": "dup",
-        "new_title": "8 Questions People Ask About IVE’s Rapid Rise: A Beginner's "
+        "new_title": "8 Questions People Ask About IVE’s Rapid Rise, Explained Sim"
       },
       {
         "id": 141,
         "link": "",
         "old_title": "Before You Try Why Does Mastering the Vibe: Your Ultimate Gu",
         "reason": "cliche",
-        "new_title": "4 Things to Look For When Choosing Before You Try Why Does M"
+        "new_title": "Before You Try Why Does Mastering the Vibe: Your Ultimate Gu"
       },
       {
         "id": 133,
         "link": "",
         "old_title": "How to Actually Handle the K-Pop World Plate-by-Plate Essent",
         "reason": "dup",
-        "new_title": "Before You Try How to Actually Handle the K-Pop World Plate-"
+        "new_title": "How to Actually Handle the K-Pop World Plate-by-Plate Essent"
       },
       {
         "id": 110,
         "link": "",
         "old_title": "Mastering Your First Impression: How to Introduce Yourself K",
         "reason": "dup",
-        "new_title": "Mastering Your First Impression: How to Introduce Yourself K"
+        "new_title": "9 Things to Check Before Mastering Your First Impression: Ho"
       },
       {
         "id": 106,
         "link": "",
         "old_title": "A Practical Look at [K-Pop &#038; Artists] Global Domination",
         "reason": "dup",
-        "new_title": "Planning for A Practical Look at [K-Pop &#038; Artists] Glob"
+        "new_title": "How A Practical Look at [K-Pop &#038; Artists] Global Domina"
       },
       {
         "id": 104,
         "link": "",
         "old_title": "How People Are Approaching Why Does The Next Wave: K-pop Roo",
-        "reason": "year",
+        "reason": "year,dup",
         "new_title": "How People Are Approaching Why Does The Next Wave: K-pop Roo"
       },
       {
@@ -401,7 +422,7 @@
         "link": "",
         "old_title": "A Practical Look at Le Sserafim debut story in 2026: What&#8",
         "reason": "dup",
-        "new_title": "How A Practical Look at Le Sserafim debut story in 2026: Wha"
+        "new_title": "5 Things to Look For When Choosing A Practical Look at Le Ss"
       },
       {
         "id": 51,
@@ -423,7 +444,7 @@
         "link": "",
         "old_title": "How Much Should You Budget for Gyeongju: Unearthing the Real",
         "reason": "dup",
-        "new_title": "Gyeongju must see places: What to Prepare First"
+        "new_title": "Planning for Gyeongju must see places? Start Here"
       },
       {
         "id": 3762,
@@ -445,7 +466,7 @@
         "link": "",
         "old_title": "A Practical Look at D10 job seeker visa points for Internati",
         "reason": "dup",
-        "new_title": "D10 job seeker visa points, From Someone Who's Been There"
+        "new_title": "D10 job seeker visa points Made Simple"
       }
     ],
     "content_cleaned": [],
@@ -460,14 +481,14 @@
         "link": "",
         "old_title": "Korea wedding planner foreigner Checklist You Shouldn&#8217;",
         "reason": "dup",
-        "new_title": "Korea wedding planner foreigner: A Beginner's Starting Point"
+        "new_title": "Korea wedding planner foreigner: What to Prepare First"
       },
       {
         "id": 104,
         "link": "",
         "old_title": "A Practical Look at Considering a Korea Couple Photoshoot Lo",
         "reason": "dup",
-        "new_title": "How Considering a Korea Couple Photoshoot Location Korea Wed"
+        "new_title": "Considering a Korea Couple Photoshoot Location Korea Wedding"
       }
     ],
     "content_cleaned": [],
@@ -482,14 +503,21 @@
         "link": "",
         "old_title": "KGSP scholarship guide, Broken Down Step by Step",
         "reason": "dup",
-        "new_title": "Save Time and Money on KGSP scholarship guide"
+        "new_title": "Getting KGSP scholarship guide Right the First Time"
       },
       {
         "id": 826,
         "link": "",
         "old_title": "university scholarship Korea Q&#038;A: Answers From the Fiel",
         "reason": "dup",
-        "new_title": "A Practical Look at university scholarship Korea for Interna"
+        "new_title": "How university scholarship Korea Has Changed in 2026"
+      },
+      {
+        "id": 517,
+        "link": "",
+        "old_title": "Save Time and Money on Don’t Get Stuck with Your D4 Visa: Th",
+        "reason": "dup",
+        "new_title": "Don’t Get Stuck with Your D4 Visa: The Critical Steps for a "
       }
     ],
     "content_cleaned": [],
@@ -500,32 +528,39 @@
     "site": "https://studyinkorea365.com",
     "title_fixed": [
       {
+        "id": 2879,
+        "link": "",
+        "old_title": "A Practical Look at Korea dorm life international student fo",
+        "reason": "dup",
+        "new_title": "Korea dorm life international student: A Beginner's Starting"
+      },
+      {
         "id": 2591,
         "link": "",
         "old_title": "MBA scholarship Korea, Explained Simply",
         "reason": "dup",
-        "new_title": "A Practical Look at MBA scholarship Korea"
+        "new_title": "MBA scholarship Korea: Where to Start"
       },
       {
         "id": 2590,
         "link": "",
         "old_title": "A Practical Look at admission interview Korea tips",
         "reason": "dup",
-        "new_title": "How People Are Approaching admission interview Korea tips Th"
+        "new_title": "4 Questions People Ask About admission interview Korea tips"
       },
       {
         "id": 2578,
         "link": "",
         "old_title": "exchange program Korea: Where to Start",
         "reason": "dup",
-        "new_title": "Getting exchange program Korea Right the First Time"
+        "new_title": "exchange program Korea Q&A: Answers From the Field"
       },
       {
         "id": 2476,
         "link": "",
         "old_title": "Save Time and Money on TTMIK Talk To Me In Korean resource",
         "reason": "dup",
-        "new_title": "TTMIK Talk To Me In Korean resource: What to Prepare First"
+        "new_title": "Planning for TTMIK Talk To Me In Korean resource? Start Here"
       }
     ],
     "content_cleaned": [],
@@ -540,112 +575,112 @@
         "link": "",
         "old_title": "2026년 한국 명절 문화, 이렇게 달라졌습니다",
         "reason": "dup",
-        "new_title": "놓치기 쉬운 한국 명절 문화 체크포인트"
+        "new_title": "한국 명절 문화, 순서대로 따라 하면 됩니다"
       },
       {
         "id": 813,
         "link": "",
         "old_title": "temple visit Korea etiquette, 요즘 이렇게 준비합니다",
         "reason": "dup",
-        "new_title": "temple visit Korea etiquette 살펴보기 — 알아두면 유용한 정보"
+        "new_title": "temple visit Korea etiquette 하기 전에 알아두면 좋은 것들"
       },
       {
         "id": 757,
         "link": "",
         "old_title": "2026년 달라진 Korean music culture, 무엇이 바뀌었나",
         "reason": "dup",
-        "new_title": "Korean music culture, 실제로는 이렇게 진행됩니다"
+        "new_title": "Korean music culture 준비할 때 헷갈리는 부분 정리"
       },
       {
         "id": 657,
         "link": "",
         "old_title": "Korean festival calendar 시작 전에 꼭 읽어야 할 글",
         "reason": "dup",
-        "new_title": "Korean festival calendar 제대로 준비하는 법"
+        "new_title": "Korean festival calendar, 어디서부터 시작해야 할까"
       },
       {
         "id": 651,
         "link": "",
         "old_title": "Korean art appreciation, 실제로는 이렇게 진행됩니다",
         "reason": "dup",
-        "new_title": "Korean art appreciation에서 자주 나오는 질문 5가지"
+        "new_title": "Korean art appreciation 관리, 이 5가지만 지켜도 달라집니다"
       },
       {
         "id": 615,
         "link": "",
         "old_title": "Korean music culture 입문 — 처음이라면 꼭 알아야 할 것",
         "reason": "dup",
-        "new_title": "Korean music culture 고를 때 살펴봐야 할 9가지"
+        "new_title": "Korean music culture, 쉽게 풀어드립니다"
       },
       {
         "id": 614,
         "link": "",
         "old_title": "TOPIK preparation guide 관리, 이 8가지만 지켜도 달라집니다",
         "reason": "dup",
-        "new_title": "2026년 달라진 TOPIK preparation guide, 무엇이 바뀌었나"
+        "new_title": "놓치기 쉬운 TOPIK preparation guide 체크포인트"
       },
       {
         "id": 613,
         "link": "",
         "old_title": "career fair Korea international 하기 전에 알아두면 좋은 것들",
         "reason": "dup",
-        "new_title": "career fair Korea international 관련 자주 헷갈리는 부분"
+        "new_title": "career fair Korea international의 실제 비용 — 미리 알아야 할 것들"
       },
       {
         "id": 612,
         "link": "",
         "old_title": "Korean pronunciation tips에서 자주 나오는 질문 3가지",
         "reason": "dup",
-        "new_title": "Korean pronunciation tips, 쉽게 풀어드립니다"
+        "new_title": "Korean pronunciation tips 관련 자주 헷갈리는 부분"
       },
       {
         "id": 606,
         "link": "",
         "old_title": "career fair Korea international, 핵심만 짚어드립니다",
         "reason": "dup",
-        "new_title": "career fair Korea international 입문 — 처음이라면 꼭 알아야 할 것"
+        "new_title": "career fair Korea international, 순서대로 따라 하면 됩니다"
       },
       {
         "id": 604,
         "link": "",
         "old_title": "freelance work Korea 첫걸음 — 순서대로 정리",
         "reason": "dup",
-        "new_title": "freelance work Korea, 이것부터 확인하세요"
+        "new_title": "freelance work Korea에서 놓치기 쉬운 부분들"
       },
       {
         "id": 598,
         "link": "",
         "old_title": "Korean food culture understanding, 얼마나 준비해야 할까",
         "reason": "dup",
-        "new_title": "Korean food culture understanding 살펴보기 — 알아두면 유용한 정보"
+        "new_title": "Korean food culture understanding에 대해 알아두면 좋은 것들"
       },
       {
         "id": 592,
         "link": "",
         "old_title": "Hanbok wearing guide 고를 때 살펴봐야 할 6가지",
         "reason": "dup",
-        "new_title": "Hanbok wearing guide 준비할 때 헷갈리는 부분 정리"
+        "new_title": "Hanbok wearing guide, 현지에서 실제로 겪는 것들"
       },
       {
         "id": 587,
         "link": "",
         "old_title": "Korean traditional culture experience, 이것부터 확인하세요",
         "reason": "dup",
-        "new_title": "Korean traditional culture experience, 어디서부터 시작해야 할까"
+        "new_title": "Korean traditional culture experience, 실제로는 이렇게 진행됩니다"
       },
       {
         "id": 585,
         "link": "",
         "old_title": "professional network Seoul 살펴보기 — 알아두면 유용한 정보",
         "reason": "dup",
-        "new_title": "2026년 달라진 professional network Seoul, 무엇이 바뀌었나"
+        "new_title": "professional network Seoul 계획하고 계신가요? 이것부터"
       },
       {
         "id": 582,
         "link": "",
         "old_title": "expat career Korea guide 계획하고 계신가요? 이것부터",
         "reason": "dup",
-        "new_title": "expat career Korea guide에서 놓치기 쉬운 부분들"
+        "new_title": "expat career Korea guide, 이것부터 확인하세요"
       }
     ],
     "content_cleaned": [],
@@ -682,7 +717,7 @@
         "link": "",
         "old_title": "international student newsletter Korea: A Closer Look at Wha",
         "reason": "dup",
-        "new_title": "How People Are Approaching international student newsletter "
+        "new_title": "international student newsletter Korea: Details That Are Eas"
       }
     ],
     "content_cleaned": [],
@@ -697,21 +732,21 @@
         "link": "",
         "old_title": "A Practical Look at marketing job Korea foreigner",
         "reason": "dup",
-        "new_title": "marketing job Korea foreigner Checklist You Shouldn't Skip"
+        "new_title": "marketing job Korea foreigner — Common Points of Confusion, "
       },
       {
         "id": 626,
         "link": "",
         "old_title": "Before You Try work permit application Korea, Read This Firs",
         "reason": "dup",
-        "new_title": "work permit application Korea: A Beginner's Starting Point"
+        "new_title": "Before You Try work permit application Korea, Read This Firs"
       },
       {
         "id": 372,
         "link": "",
         "old_title": "probation period Korea law: A Closer Look",
         "reason": "dup",
-        "new_title": "Save Time and Money on probation period Korea law"
+        "new_title": "How probation period Korea law Actually Works"
       }
     ],
     "content_cleaned": [],
@@ -741,21 +776,28 @@
         "link": "",
         "old_title": "Korea severance pay calculation: A Closer Look",
         "reason": "dup",
-        "new_title": "Korea severance pay calculation — Common Points of Confusion"
+        "new_title": "4 Things to Check Before Korea severance pay calculation"
       },
       {
         "id": 904,
         "link": "",
         "old_title": "5 Questions People Ask About H-2 visa worker guide",
         "reason": "dup",
-        "new_title": "H-2 visa worker guide in 2026: What's Changed"
+        "new_title": "5 Things to Look For When Choosing H-2 visa worker guide"
+      },
+      {
+        "id": 886,
+        "link": "",
+        "old_title": "A Practical Look at E-9 visa worker Korea for International ",
+        "reason": "dup",
+        "new_title": "E-9 visa worker Korea: A Beginner's Starting Point"
       },
       {
         "id": 657,
         "link": "",
         "old_title": "A Practical Look at Crypto exchange international hiring for",
         "reason": "dup",
-        "new_title": "How Much Should You Budget for Crypto exchange international"
+        "new_title": "Crypto exchange international hiring — Common Points of Conf"
       }
     ],
     "content_cleaned": [],
@@ -766,11 +808,18 @@
     "site": "https://korea365.org",
     "title_fixed": [
       {
+        "id": 2424,
+        "link": "",
+        "old_title": "How Korea cherry blossom spots Has Changed in 2026",
+        "reason": "dup",
+        "new_title": "Korea cherry blossom spots: A Closer Look"
+      },
+      {
         "id": 1647,
         "link": "",
         "old_title": "Korean traditional music guide Made Simple",
         "reason": "dup",
-        "new_title": "How Korean traditional music guide Actually Works"
+        "new_title": "Korean traditional music guide Made Simple"
       }
     ],
     "content_cleaned": [],
@@ -785,7 +834,7 @@
         "link": "",
         "old_title": "대한민국 최신 경제 및 사회 변화 트렌드 분석, 순서대로 따라 하면 됩니다",
         "reason": "dup",
-        "new_title": "대한민국 최신 경제 및 사회 변화 트렌드 분석 살펴보기 — 알아두면 유용한 정보"
+        "new_title": "대한민국 최신 경제 및 사회 변화 트렌드 분석에서 자주 나오는 질문 7가지"
       }
     ],
     "content_cleaned": [],
@@ -800,21 +849,21 @@
         "link": "",
         "old_title": "Korean researchers seek opportunities overseas despite recor",
         "reason": "dup",
-        "new_title": "Before You Try Korean researchers seek opportunities oversea"
+        "new_title": "6 Questions People Ask About Korean researchers seek opportu"
       },
       {
         "id": 2787,
         "link": "",
         "old_title": "Cost of Living in Seoul 2026: Honest Breakdown in 2026: What",
         "reason": "dup",
-        "new_title": "Cost of Living in Seoul 2026: Honest Breakdown, Explained Si"
+        "new_title": "Planning for Cost of Living in Seoul 2026: Honest Breakdown?"
       },
       {
         "id": 2753,
         "link": "",
         "old_title": "A Practical Look at Seoul bike path Han River for Internatio",
         "reason": "dup",
-        "new_title": "A Practical Look at Seoul bike path Han River for Internatio"
+        "new_title": "A Practical Look at Seoul bike path Han River"
       }
     ],
     "content_cleaned": [],
