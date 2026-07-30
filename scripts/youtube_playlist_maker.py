@@ -86,6 +86,7 @@ TARGET_MIN_SEC = 60 * 60
 TARGET_MAX_SEC = 80 * 60
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
+INTRO_DURATION_SEC = 6.0          # 인트로가 쓰는 음악 앞부분 길이 — 본편은 이 지점부터 이어서 재생
 
 AUDIO_EXTS = (".mp3", ".wav", ".m4a", ".flac", ".aac", ".ogg")
 IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".webp")
@@ -580,7 +581,14 @@ def add_spinning_vinyl_and_waveform(visual_path, audio_path, out_path,
     ])
 
 
-def make_intro_clip(intro_still_path, audio_path, out_path, duration=6.0):
+def trim_audio_from(src_path, start_sec, out_path):
+    """오디오를 start_sec 지점부터 끝까지 자른다 — 인트로가 곡 앞부분을 쓴 뒤,
+    본편이 그 이어지는 지점부터 재생하도록 해서 같은 구간이 겹쳐 들리지 않게 한다."""
+    run_ffmpeg(["ffmpeg", "-y", "-i", src_path, "-ss", str(start_sec),
+                "-c:a", "aac", out_path])
+
+
+def make_intro_clip(intro_still_path, audio_path, out_path, duration=INTRO_DURATION_SEC):
     """썸네일과 같은 매거진 표지 디자인(단, 타이틀은 큼직하게 'Playlist')을
     그대로 살려서, 살짝 줌인되고 실제 재생될 음악에 반응하는 파형이 움직이는
     인트로 클립을 만든다. 최종 영상 맨 앞에 붙여서 "이 영상이 플레이리스트"라는
@@ -840,10 +848,16 @@ def main():
         make_caption_thumbnail(image_paths[0], thumbnail_out, topic=topic_keyword)
 
         log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
+        # 인트로가 곡 앞부분(INTRO_DURATION_SEC)을 쓰므로, 본편은 그 이어지는
+        # 지점부터 재생해서 같은 구간이 겹쳐 들리지 않고 자연스럽게 이어지게 한다
+        body_audio_path = os.path.join(WORKDIR, "body_audio.m4a")
+        trim_audio_from(audio_path, INTRO_DURATION_SEC, body_audio_path)
+        body_total_sec = total_sec - INTRO_DURATION_SEC
+
         visual_path = os.path.join(WORKDIR, "visual.mp4")
-        build_alternating_visual(image_paths, total_sec, visual_path)
+        build_alternating_visual(image_paths, body_total_sec, visual_path)
         muxed_path = os.path.join(WORKDIR, "muxed.mp4")
-        add_spinning_vinyl_and_waveform(visual_path, audio_path, muxed_path)
+        add_spinning_vinyl_and_waveform(visual_path, body_audio_path, muxed_path)
         body_path = os.path.join(WORKDIR, "body.mp4")
         add_lower_third_bar(muxed_path, caption_text, body_path)
 
