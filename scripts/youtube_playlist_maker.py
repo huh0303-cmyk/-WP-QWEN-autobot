@@ -637,7 +637,7 @@ def _dotted_hline(draw, cx, y, total_w, dash_w=6, gap=8, fill=(255, 255, 255, 22
         x += dash_w + gap
 
 
-def make_caption_thumbnail(image_path, out_path, topic="", w=1280, h=720):
+def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=None, w=1280, h=720):
     """여행 잡지 표지 스타일 썸네일: 상단 좌우에 작은 브랜드 라벨/볼륨 표기,
     화면 대부분을 채우는 초대형 세리프 주제어 타이틀, 그 아래 얇은 점선 구분선.
     배경 사진만 AI 생성이고 나머지는 전부 PIL로 직접 그려서 무료로 자동 생성된다."""
@@ -698,8 +698,12 @@ def make_caption_thumbnail(image_path, out_path, topic="", w=1280, h=720):
                fill=(255, 255, 255, 255))
     cursor_y = title_y + th
 
-    # 타이틀 아래: 도시별 현지어 소제목(가나/한글 등) — NATIVE_SUBTITLE_MAP에 있을 때만
-    subtitle = NATIVE_SUBTITLE_MAP.get((topic or "").strip(), "")
+    # 타이틀 아래 소제목: 명시적으로 지정되면 그걸 쓰고(예: 인트로의 "Playlist"),
+    # 아니면 도시별 현지어 소제목(가나/한글 등)이 NATIVE_SUBTITLE_MAP에 있을 때만 표시
+    if subtitle_override is not None:
+        subtitle = subtitle_override
+    else:
+        subtitle = NATIVE_SUBTITLE_MAP.get((topic or "").strip(), "")
     if subtitle:
         sub_font_path = ensure_jp_font() if any(
             '぀' <= c <= 'ヿ' or '一' <= c <= '鿿' for c in subtitle) else label_font_path
@@ -845,7 +849,8 @@ def main():
 
         log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
         intro_still = os.path.join(WORKDIR, "intro_still.png")
-        make_caption_thumbnail(image_paths[0], intro_still, topic="Playlist")
+        make_caption_thumbnail(image_paths[0], intro_still, topic=topic_keyword,
+                                subtitle_override="Playlist")
         intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
         make_intro_clip(intro_still, audio_path, intro_clip)
         concat_intro_and_main(intro_clip, body_path, final_path)
