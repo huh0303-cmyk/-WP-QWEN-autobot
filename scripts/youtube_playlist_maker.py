@@ -60,6 +60,15 @@ GOOGLE_OAUTH_REFRESH_TOKEN = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
+# 유튜브 실제 업로드/공개 승인 파이프라인용 — 구글드라이브 업로드용 OAuth와는
+# 스코프가 달라서(youtube.upload) 별도로 발급받은 값을 쓴다
+YOUTUBE_OAUTH_CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID", "")
+YOUTUBE_OAUTH_CLIENT_SECRET = os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET", "")
+YOUTUBE_OAUTH_REFRESH_TOKEN = os.environ.get("YOUTUBE_OAUTH_REFRESH_TOKEN", "")
+
+GMAIL_USER = "huh0303@gmail.com"
+GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
+
 MUSIC_SOURCE_FOLDER_ID = os.environ.get("MUSIC_SOURCE_FOLDER_ID") or "1RqL44lM5oUSW5_PAZLHHlevrVkr1ibxd"
 THUMBNAIL_FOLDER_ID = os.environ.get("THUMBNAIL_FOLDER_ID") or "1jVDuCjTVJPnNSIBEXjnU6DPSzZO56d68"
 OUTPUT_FOLDER_ID = os.environ.get("OUTPUT_FOLDER_ID") or "1srQUiWOk6UruujYSy2S0ogN3FvxVTSBN"
@@ -294,6 +303,48 @@ def build_caption_text(topic, caption_text):
     text = gemini_generate_text(prompt, temperature=1.0)
     text = text.strip().strip('"').strip("'")
     return text or f"{topic} 들으면서 잠깐 쉬어가기"
+
+
+def generate_youtube_title_description(topic, caption_text, duration_min):
+    """유튜브 업로드용 제목+설명을 Gemini로 생성. 광고 카피처럼 매끈하지 않게,
+    실제 채널 운영자가 쓴 것 같은 톤으로("AI 흔적 최소화" 원칙 동일 적용)."""
+    prompt = f"""'{topic}' 분위기의 {duration_min:.0f}분짜리 플레이리스트 유튜브 영상의
+제목과 설명을 만들어줘. 이 영상의 한 줄 캡션은 "{caption_text}"야.
+
+조건:
+- 제목: 70자 이내, 과장된 광고 카피 아니고 자연스럽게, 이모지 최대 1개
+- 설명: 3~4문장, 역시 담백한 구어체로(광고 카피처럼 매끈하지 않게), 마지막 줄에
+  관련 해시태그 4~5개 (#playlist #{topic.replace(' ', '')} 같은 형식)
+- 아래 형식 그대로, 다른 설명 없이:
+TITLE: (제목)
+DESCRIPTION: (설명, 줄바꿈 포함 가능)
+"""
+    text = gemini_generate_text(prompt, temperature=0.9)
+    title, description = f"{topic} Playlist | {caption_text}", caption_text
+    if "TITLE:" in text and "DESCRIPTION:" in text:
+        try:
+            title_part = text.split("TITLE:")[1].split("DESCRIPTION:")[0].strip()
+            desc_part = text.split("DESCRIPTION:")[1].strip()
+            if title_part:
+                title = title_part
+            if desc_part:
+                description = desc_part
+        except Exception:
+            pass
+    return title[:100], description
+
+
+def send_email(subject, body):
+    import smtplib
+    from email.mime.text import MIMEText
+
+    msg = MIMEText(body, _charset="utf-8")
+    msg["Subject"] = subject
+    msg["From"] = GMAIL_USER
+    msg["To"] = GMAIL_USER
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=20) as s:
+        s.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+        s.sendmail(GMAIL_USER, [GMAIL_USER], msg.as_string())
 
 
 THUMBNAIL_BRAND_LABEL = os.environ.get("THUMBNAIL_BRAND_LABEL", "Playlist")
@@ -967,13 +1018,46 @@ def main():
     filename = f"{now.year}_{now.month}_{now.day}_{rand_suffix}.mp4"
     thumb_filename = f"{now.year}_{now.month}_{now.day}_{rand_suffix}_thumbnail.png"
 
-    link, _ = upload_to_drive(service, final_path, OUTPUT_FOLDER_ID, filename)
-    thumb_link, _ = upload_to_drive(service, thumbnail_out, OUTPUT_FOLDER_ID, thumb_filename)
+    link, video_drive_id = upload_to_drive(service, final_path, OUTPUT_FOLDER_ID, filename)
+    thumb_link, thumb_drive_id = upload_to_drive(service, thumbnail_out, OUTPUT_FOLDER_ID, thumb_filename)
 
     log("🎉 완료")
     log(f"   파일명: {filename}")
     log(f"   링크: {link}")
     log(f"   썸네일: {thumb_link}")
+
+    # 유튜브 실제 업로드는 별도 승인 게이트(publish 잡)에서 진행하므로, 여기서는
+    # 제목/설명만 미리 만들어 다음 잡이 쓸 수 있게 메타데이터로 남겨둔다
+    upload_topic = topic_keyword.strip() or "Chill"
+    upload_caption = caption_text if topic_keyword.strip() else ""
+    yt_title, yt_description = generate_youtube_title_description(
+        upload_topic, upload_caption or filename, total_sec / 60)
+    log(f"   유튜브 제목(예정): {yt_title}")
+
+    meta = {
+        "video_drive_id": video_drive_id,
+        "thumb_drive_id": thumb_drive_id,
+        "filename": filename,
+        "title": yt_title,
+        "description": yt_description,
+        "topic": upload_topic,
+        "duration_min": round(total_sec / 60, 1),
+    }
+    with open(os.path.join(WORKDIR, "upload_meta.json"), "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    if GMAIL_APP_PASSWORD:
+        try:
+            send_email(
+                f"[플레이리스트 준비완료] {yt_title[:60]}",
+                f"영상이 만들어졌어요. 유튜브 업로드 승인은 곧 이어지는 GitHub 알림 메일에서 "
+                f"'Approve and deploy' 버튼 한 번이면 돼요.\n\n"
+                f"제목: {yt_title}\n\n설명:\n{yt_description}\n\n"
+                f"재생시간: {total_sec/60:.0f}분\n\n"
+                f"미리보기(드라이브): {link}\n썸네일: {thumb_link}\n",
+            )
+        except Exception as e:
+            log(f"   ⚠️ 이메일 발송 실패(무시하고 진행): {e}")
 
 
 if __name__ == "__main__":

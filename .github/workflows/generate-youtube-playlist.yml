@@ -42,6 +42,10 @@ on:
         description: "캡션 문구 (비워두면 주제어 기반으로 자동 생성)"
         required: false
         type: string
+      publish_delay_hours:
+        description: "승인 후 유튜브 예약발행까지 걸리는 시간(시간 단위). 비우면 승인 즉시 공개"
+        required: false
+        type: string
   schedule:
     # 매일 00:00 KST(전날 15:00 UTC) 자동 실행 — 사람이 주제를 안 골라줘도
     # 스크립트가 최근에 안 쓴 주제를 무작위로 골라서 자동 생성한다
@@ -51,9 +55,14 @@ permissions:
   contents: write
 
 jobs:
-  generate:
+  prepare:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    outputs:
+      video_drive_id: ${{ steps.meta.outputs.video_drive_id }}
+      thumb_drive_id: ${{ steps.meta.outputs.thumb_drive_id }}
+      yt_title: ${{ steps.meta.outputs.yt_title }}
+      yt_description: ${{ steps.meta.outputs.yt_description }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -82,6 +91,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
           if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then
             export TOPIC_KEYWORD="$PRESET_THEME"
@@ -90,6 +100,21 @@ jobs:
           fi
           echo "사용할 주제어: $TOPIC_KEYWORD (자동선택 모드: $AUTO_TOPIC)"
           python scripts/youtube_playlist_maker.py
+
+      - name: Export upload metadata for the publish job
+        id: meta
+        run: |
+          python - <<'EOF'
+          import json, os
+          with open("playlist_output/upload_meta.json", encoding="utf-8") as f:
+              m = json.load(f)
+          out = os.environ["GITHUB_OUTPUT"]
+          with open(out, "a", encoding="utf-8") as f:
+              f.write(f"video_drive_id={m['video_drive_id']}\n")
+              f.write(f"thumb_drive_id={m['thumb_drive_id']}\n")
+              f.write("yt_title<<EOM\n" + m['title'] + "\nEOM\n")
+              f.write("yt_description<<EOM\n" + m['description'] + "\nEOM\n")
+          EOF
 
       - name: Upload result as artifact (backup)
         if: always()
@@ -112,3 +137,36 @@ jobs:
           git add playlist_recent_topics.json 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: 플레이리스트 자동선택 최근주제 갱신 [skip ci]"
           git push
+
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: youtube-publish
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: Upload approved video to YouTube
+        env:
+          VIDEO_DRIVE_ID: ${{ needs.prepare.outputs.video_drive_id }}
+          THUMB_DRIVE_ID: ${{ needs.prepare.outputs.thumb_drive_id }}
+          YT_TITLE: ${{ needs.prepare.outputs.yt_title }}
+          YT_DESCRIPTION: ${{ needs.prepare.outputs.yt_description }}
+          PUBLISH_AT_HOURS_FROM_NOW: ${{ github.event.inputs.publish_delay_hours }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python scripts/youtube_publish_approved.py
