@@ -53,6 +53,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload to YouTube
+        if: false  # TEMP: FB/IG 진단 테스트 중 임시 비활성화
         env:
           ML_YT_CLIENT_ID: ${{ secrets.ML_YT_CLIENT_ID }}
           ML_YT_CLIENT_SECRET: ${{ secrets.ML_YT_CLIENT_SECRET }}
