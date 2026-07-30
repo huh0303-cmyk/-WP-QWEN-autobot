@@ -33,7 +33,8 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      - name: Random delay (목표 시각 기준 ±1시간 랜덤 분산)
+      - name: Random delay (목표 시각 기준 ±1시간 랜덤 분산, 수동 실행 시 건너뜀)
+        if: github.event_name == 'schedule'
         run: |
           DELAY=$((RANDOM % 7200))
           echo "랜덤 대기: ${DELAY}초 (트리거 시각 -1h 기준이므로 최종 실행은 목표시각 ±1h 사이)"
