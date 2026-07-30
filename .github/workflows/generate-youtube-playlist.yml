@@ -3,8 +3,25 @@ name: Generate YouTube Playlist (음악 60-80분 + 썸네일 → 최종 mp4)
 on:
   workflow_dispatch:
     inputs:
+      preset_theme:
+        description: "빠른 선택 프리셋 (고르면 아래 topic 직접입력보다 우선 적용됨)"
+        required: false
+        type: choice
+        default: "직접입력(topic 사용)"
+        options:
+          - "직접입력(topic 사용)"
+          - "봄"
+          - "여름"
+          - "가을"
+          - "겨울"
+          - "바다"
+          - "산"
+          - "호수"
+          - "도시 야경"
+          - "시골 마을"
+          - "카페 감성"
       topic:
-        description: "도시/주제명 (예: Tokyo, New York — 여행 매거진 톤 배경사진+타이틀로 생성. 비워두면 썸네일창고 랜덤 폴백)"
+        description: "도시/주제명 직접 입력 (예: Tokyo, New York — 위 프리셋을 '직접입력'으로 두면 이 값 사용. 여행 매거진 톤 배경사진+타이틀로 생성. 둘 다 비워두면 썸네일창고 랜덤 폴백)"
         required: false
         type: string
       language:
@@ -42,14 +59,22 @@ jobs:
 
       - name: Run playlist maker
         env:
-          TOPIC_KEYWORD: ${{ github.event.inputs.topic }}
+          PRESET_THEME: ${{ github.event.inputs.preset_theme }}
+          TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
           CAPTION_TEXT: ${{ github.event.inputs.caption }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python scripts/youtube_playlist_maker.py
+        run: |
+          if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then
+            export TOPIC_KEYWORD="$PRESET_THEME"
+          else
+            export TOPIC_KEYWORD="$TOPIC_INPUT"
+          fi
+          echo "사용할 주제어: $TOPIC_KEYWORD"
+          python scripts/youtube_playlist_maker.py
 
       - name: Upload result as artifact (backup)
         if: always()

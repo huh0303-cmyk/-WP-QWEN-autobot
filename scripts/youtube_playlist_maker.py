@@ -278,6 +278,15 @@ def build_caption_text(topic, caption_text):
 
 THUMBNAIL_BRAND_LABEL = os.environ.get("THUMBNAIL_BRAND_LABEL", "Playlist")
 
+# 워크플로우의 프리셋 드롭다운(한글)을 영문으로 치환 — 썸네일 타이틀 폰트(Playfair
+# Display)에 한글 글리프가 없어서, 한글 그대로 넘기면 빈 네모(tofu)로 깨져 보인다.
+PRESET_TOPIC_EN_MAP = {
+    "봄": "Spring", "여름": "Summer", "가을": "Autumn", "겨울": "Winter",
+    "바다": "Ocean", "산": "Mountain", "호수": "Lake",
+    "도시 야경": "City Night Lights", "시골 마을": "Countryside Village",
+    "카페 감성": "Cozy Cafe",
+}
+
 
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
@@ -652,6 +661,7 @@ def main():
         raise SystemExit(1)
 
     topic_keyword = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("TOPIC_KEYWORD", "")
+    topic_keyword = PRESET_TOPIC_EN_MAP.get(topic_keyword.strip(), topic_keyword)
     language_keyword = sys.argv[2] if len(sys.argv) > 2 else os.environ.get("LANGUAGE_KEYWORD", "")
     caption_text_input = sys.argv[3] if len(sys.argv) > 3 else os.environ.get("CAPTION_TEXT", "")
 
