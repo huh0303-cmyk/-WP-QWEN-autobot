@@ -40,6 +40,7 @@ Gemini가 짧은 감성 문구를 자동 생성한다.
 
 import os
 import sys
+import json
 import random
 import base64
 import requests
@@ -82,8 +83,10 @@ MIXED_KEYWORDS = {"mixed", "mix", "all", ""}
 
 KST = timezone(timedelta(hours=9))
 WORKDIR = "playlist_output"
-TARGET_MIN_SEC = 60 * 60
-TARGET_MAX_SEC = 80 * 60
+# 매번 똑같이 60~80분짜리만 나오면 그 자체가 "정형화된 AI 생성물" 티가 나서,
+# 실행마다 목표 재생시간 구간 자체를 무작위로 골라 영상 길이가 매번 다르게 한다
+DURATION_POOL_MIN_SEC = 30 * 60
+DURATION_POOL_MAX_SEC = 100 * 60
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
 INTRO_DURATION_SEC = 6.0          # 인트로가 쓰는 음악 앞부분 길이 — 본편은 이 지점부터 이어서 재생
@@ -312,6 +315,44 @@ NATIVE_SUBTITLE_MAP = {
     "Seoul": "서울",
 }
 
+# 자동 실행(스케줄러 등, 사람이 매번 주제를 골라주지 않는 경우)에서 무작위로
+# 뽑을 주제 후보 목록 — 워크플로우 드롭다운 프리셋과 동일한 구성
+AUTO_TOPIC_POOL = [
+    "봄", "여름", "가을", "겨울", "바다", "산", "호수", "도시 야경", "시골 마을", "카페 감성",
+    "Seoul", "London", "Paris", "Tokyo", "New York", "Sapporo", "Miami", "LA", "Prague", "Switzerland",
+]
+# 주제가 정해지면 그 나라 말 음악을 우선 배치하도록 자동으로 짝지어주는 언어
+AUTO_TOPIC_LANGUAGE_HINTS = {
+    "Tokyo": "Japanese", "Sapporo": "Japanese",
+    "Paris": "French", "Seoul": "Korean",
+}
+RECENT_TOPICS_FILE = "playlist_recent_topics.json"
+RECENT_TOPICS_MEMORY = 8  # 최근 이만큼은 다시 안 뽑히게 피함
+
+
+def pick_auto_topic():
+    """사람이 주제를 안 정해준 자동 실행에서, 최근에 쓴 것과 겹치지 않게
+    무작위로 주제를 고르고 상태 파일에 기록해서 다음 실행 때도 반복을 피한다."""
+    recent = []
+    if os.path.exists(RECENT_TOPICS_FILE):
+        try:
+            with open(RECENT_TOPICS_FILE, encoding="utf-8") as f:
+                recent = json.load(f).get("recent", [])
+        except Exception:
+            recent = []
+
+    candidates = [t for t in AUTO_TOPIC_POOL if t not in recent] or list(AUTO_TOPIC_POOL)
+    topic = random.choice(candidates)
+
+    recent = ([topic] + [t for t in recent if t != topic])[:RECENT_TOPICS_MEMORY]
+    try:
+        with open(RECENT_TOPICS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"recent": recent}, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        log(f"   ⚠️ 최근 주제 기록 실패(무시하고 진행): {e}")
+
+    return topic, AUTO_TOPIC_LANGUAGE_HINTS.get(topic, "")
+
 
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
@@ -347,14 +388,26 @@ def build_ai_images(topic, workdir):
     return paths
 
 
+def pick_duration_target():
+    """실행할 때마다 목표 재생시간 구간 자체를 무작위로 골라서, 영상 길이가
+    매번 달라지게 한다(항상 60~80분처럼 똑같으면 그 자체가 AI 생성 티가 남)."""
+    lo_min = random.randint(DURATION_POOL_MIN_SEC // 60, (DURATION_POOL_MAX_SEC - 20 * 60) // 60)
+    span_min = random.randint(10, 25)
+    hi_min = min(lo_min + span_min, DURATION_POOL_MAX_SEC // 60)
+    return lo_min * 60, hi_min * 60
+
+
 # ════════════════════════════════════════════════════════════
-# 오디오 조합 (무작위 60~80분)
+# 오디오 조합 (실행마다 다른 목표 재생시간, 30~100분 범위 내)
 # ════════════════════════════════════════════════════════════
 def build_playlist_audio(service, tracks_meta, out_path):
     # tracks_meta는 filter_tracks_by_language가 이미 "언어 매칭곡을 앞에,
     # 나머지를 뒤에" 순서로 정렬해서 넘겨준 리스트이므로, 여기서 다시 섞으면
     # 그 우선순위가 깨진다 — 순서 그대로 앞에서부터 채운다.
     shuffled = list(tracks_meta)
+
+    target_min_sec, target_max_sec = pick_duration_target()
+    log(f"   이번 목표 재생시간: {target_min_sec/60:.0f}~{target_max_sec/60:.0f}분")
 
     selected_paths = []
     accumulated = 0.0
@@ -374,7 +427,7 @@ def build_playlist_audio(service, tracks_meta, out_path):
                 os.remove(local_path)
             continue
 
-        if accumulated >= TARGET_MIN_SEC and accumulated + dur > TARGET_MAX_SEC:
+        if accumulated >= target_min_sec and accumulated + dur > target_max_sec:
             # 목표 구간 안에 이미 들어와 있고 이 곡을 더하면 넘침 -> 나머지는
             # 안 맞을 때마다 계속 찾아 헤매지 않고 여기서 바로 종료 (다운로드 낭비 방지)
             os.remove(local_path)
@@ -385,11 +438,11 @@ def build_playlist_audio(service, tracks_meta, out_path):
         accumulated += dur
         log(f"   ✅ 추가: {meta['name']} ({dur/60:.1f}분) — 누적 {accumulated/60:.1f}분")
 
-        if accumulated >= TARGET_MAX_SEC:
+        if accumulated >= target_max_sec:
             break
 
-    if accumulated < TARGET_MIN_SEC:
-        log(f"   ⚠️ 보유한 음원을 다 써도 {accumulated/60:.1f}분 (목표 60분 미만)")
+    if accumulated < target_min_sec:
+        log(f"   ⚠️ 보유한 음원을 다 써도 {accumulated/60:.1f}분 (목표 {target_min_sec/60:.0f}분 미만)")
 
     if not selected_paths:
         raise RuntimeError("사용 가능한 음원이 없습니다")
@@ -836,6 +889,13 @@ def main():
     topic_keyword = PRESET_TOPIC_EN_MAP.get(topic_keyword.strip(), topic_keyword)
     language_keyword = sys.argv[2] if len(sys.argv) > 2 else os.environ.get("LANGUAGE_KEYWORD", "")
     caption_text_input = sys.argv[3] if len(sys.argv) > 3 else os.environ.get("CAPTION_TEXT", "")
+
+    auto_mode = os.environ.get("AUTO_TOPIC", "").strip().lower() == "true"
+    if auto_mode and not topic_keyword.strip():
+        topic_keyword, auto_lang = pick_auto_topic()
+        if not language_keyword.strip():
+            language_keyword = auto_lang
+        log(f"🤖 자동 선택된 주제: {topic_keyword} (언어: {language_keyword or 'Mixed'})")
 
     os.makedirs(WORKDIR, exist_ok=True)
     service = get_drive_service()

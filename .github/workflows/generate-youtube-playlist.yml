@@ -42,9 +42,13 @@ on:
         description: "캡션 문구 (비워두면 주제어 기반으로 자동 생성)"
         required: false
         type: string
+  schedule:
+    # 매일 00:00 KST(전날 15:00 UTC) 자동 실행 — 사람이 주제를 안 골라줘도
+    # 스크립트가 최근에 안 쓴 주제를 무작위로 골라서 자동 생성한다
+    - cron: "0 15 * * *"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate:
@@ -69,6 +73,7 @@ jobs:
 
       - name: Run playlist maker
         env:
+          AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
@@ -83,7 +88,7 @@ jobs:
           else
             export TOPIC_KEYWORD="$TOPIC_INPUT"
           fi
-          echo "사용할 주제어: $TOPIC_KEYWORD"
+          echo "사용할 주제어: $TOPIC_KEYWORD (자동선택 모드: $AUTO_TOPIC)"
           python scripts/youtube_playlist_maker.py
 
       - name: Upload result as artifact (backup)
@@ -95,3 +100,15 @@ jobs:
             playlist_output/final.mp4
           retention-days: 3
           if-no-files-found: ignore
+
+      - name: Commit recent-topics state (auto mode anti-repeat)
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add playlist_recent_topics.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 플레이리스트 자동선택 최근주제 갱신 [skip ci]"
+          git push
