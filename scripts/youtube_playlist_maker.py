@@ -350,8 +350,10 @@ def build_ai_images(topic, workdir):
 # 오디오 조합 (무작위 60~80분)
 # ════════════════════════════════════════════════════════════
 def build_playlist_audio(service, tracks_meta, out_path):
+    # tracks_meta는 filter_tracks_by_language가 이미 "언어 매칭곡을 앞에,
+    # 나머지를 뒤에" 순서로 정렬해서 넘겨준 리스트이므로, 여기서 다시 섞으면
+    # 그 우선순위가 깨진다 — 순서 그대로 앞에서부터 채운다.
     shuffled = list(tracks_meta)
-    random.shuffle(shuffled)
 
     selected_paths = []
     accumulated = 0.0
@@ -680,20 +682,48 @@ def make_static_video(image_path, audio_path, out_path):
                 "-shortest", out_path])
 
 
+# 파일명에 "프랑스어" 같은 명시적 태그가 없어도, 제목 자체에 그 언어 특유의
+# 발음구별기호가 섞여 있으면(예: Suno가 붙인 실제 프랑스어 제목) 같은 언어로 간주
+LANGUAGE_HINT_CHARS = {
+    "프랑스어": set("éèêëàâçîïôùûüœÉÈÊËÀÂÇÎÏÔÙÛÜŒ"),
+    "독일어": set("äöüßÄÖÜ"),
+    "스페인어": set("áéíóúñ¿¡ÁÉÍÓÚÑ"),
+    "이탈리아어": set("àèéìòùÀÈÉÌÒÙ"),
+    "포르투갈어": set("ãõâêôáéíóúçÃÕÂÊÔÁÉÍÓÚÇ"),
+}
+
+
 def filter_tracks_by_language(tracks, keyword):
-    """keyword가 Mixed/빈값이면 전체 반환, 아니면 파일명에 해당 언어 태그가
-    포함된 곡만 골라 반환. 매칭되는 곡이 하나도 없으면 전체로 폴백."""
+    """keyword가 Mixed/빈값이면 전체를 무작위 순서로 반환.
+    아니면 파일명에 해당 언어 태그가 있거나(명시적) 그 언어 특유의 발음구별기호가
+    제목에 섞여 있는(암묵적) 곡을 먼저 앞에 배치하고, 나머지 곡을 뒤에 이어붙여
+    돌려준다 — build_playlist_audio가 앞에서부터 채우므로 매칭곡이 최우선으로
+    들어가고, 목표 재생시간을 못 채우면 자연스럽게 나머지로 채워진다.
+    매칭되는 곡이 하나도 없으면 전체를 무작위 순서로 반환(폴백)."""
     if not keyword or keyword.strip().lower() in MIXED_KEYWORDS:
         log("   (필터 없음 — Mixed, 전체 곡에서 무작위 선택)")
-        return tracks
+        shuffled_all = list(tracks)
+        random.shuffle(shuffled_all)
+        return shuffled_all
 
     tag = LANGUAGE_TAG_MAP.get(keyword.strip().lower(), keyword.strip())
-    matched = [t for t in tracks if tag.lower() in t["name"].lower()]
+    hint_chars = LANGUAGE_HINT_CHARS.get(tag, set())
+
+    def is_match(name):
+        if tag.lower() in name.lower():
+            return True
+        return bool(hint_chars) and any(c in hint_chars for c in name)
+
+    matched = [t for t in tracks if is_match(t["name"])]
+    others = [t for t in tracks if not is_match(t["name"])]
+    random.shuffle(matched)
+    random.shuffle(others)
+
     if not matched:
-        log(f"   ⚠️ '{keyword}'({tag}) 태그가 포함된 곡이 없어서 전체 곡으로 진행")
-        return tracks
-    log(f"   '{keyword}'({tag}) 태그 매칭: {len(matched)}개")
-    return matched
+        log(f"   ⚠️ '{keyword}'({tag}) 태그/제목 매칭 곡이 없어서 전체 곡으로 진행")
+        return others
+    log(f"   '{keyword}'({tag}) 매칭 {len(matched)}개를 우선 배치, 나머지 {len(others)}개는 뒤에서 채움")
+    return matched + others
 
 
 # ════════════════════════════════════════════════════════════
