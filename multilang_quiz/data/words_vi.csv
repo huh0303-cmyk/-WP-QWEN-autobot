@@ -1,0 +1,31 @@
+word,category,image_query,concept
+quả táo,food,red apple fruit photo,apple
+quả chuối,food,banana fruit photo,banana
+con chó,animal,dog photo,dog
+con mèo,animal,cat photo,cat
+quyển sách,object,open book photo,book
+cái ghế,object,wooden chair photo,chair
+cái bàn,object,wooden table photo,table
+nước,food,glass of water photo,water
+bánh mì,food,loaf of bread photo,bread
+sữa,food,glass of milk photo,milk
+ngôi nhà,place,small house photo,house
+xe hơi,object,car photo,car
+cây,nature,tree photo,tree
+hoa,nature,flower photo,flower
+mặt trời,nature,sun sky photo,sun
+mặt trăng,nature,moon photo,moon
+ngôi sao,nature,star night sky photo,star
+con chim,animal,bird photo,bird
+con cá,animal,fish photo,fish
+quả trứng,food,egg photo,egg
+giày,clothing,shoe photo,shoe
+mũ,clothing,hat photo,hat
+cái ô,object,umbrella photo,umbrella
+cái túi,object,bag photo,bag
+cây bút chì,object,pencil photo,pencil
+điện thoại,object,smartphone photo,phone
+đồng hồ,object,clock photo,clock
+cửa,object,door photo,door
+cửa sổ,object,window photo,window
+chìa khóa,object,key photo,key
