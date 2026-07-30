@@ -514,6 +514,54 @@ def _draw_waveform(draw, cx, cy, n_bars=17, gap=6, max_h=26, color=(255, 255, 25
         draw.line([(x, cy - hgt // 2), (x, cy + hgt // 2)], fill=color, width=2)
 
 
+def make_vinyl_overlay_png(out_path, r=90):
+    """영상 위에 겹칠 투명 배경 LP판 PNG. 완전 대칭이면 회전해도 티가 안 나서
+    가장자리에 비대칭 하이라이트 호를 하나 그려 회전이 눈에 보이게 한다."""
+    from PIL import Image, ImageDraw
+
+    size = r * 2 + 12
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+    cx = cy = size // 2
+    _draw_vinyl_icon(draw, cx, cy, r)
+    draw.arc([cx - r + 10, cy - r + 10, cx + r - 10, cy + r - 10],
+              start=200, end=260, fill=(255, 255, 255, 110), width=3)
+    img.save(out_path, "PNG")
+
+
+def add_spinning_vinyl_and_waveform(visual_path, audio_path, out_path,
+                                     vinyl_r=90, rotation_period_sec=4.0):
+    """팬줌 영상 위에 (1) 실제로 계속 회전하는 LP판 아이콘과 (2) 재생 중인
+    음악 파형을 실시간으로 그려주는 오디오 비주얼라이저를 겹쳐서(overlay),
+    영상 내내 화면이 정적이지 않고 살아있는 느낌을 준다. 이 단계에서 오디오도
+    함께 입혀서 최종 출력하므로 별도 mux_video_audio 호출이 필요 없다."""
+    import math
+    vinyl_png = os.path.join(WORKDIR, "vinyl_icon.png")
+    make_vinyl_overlay_png(vinyl_png, r=vinyl_r)
+    icon_size = vinyl_r * 2 + 12
+    rot_canvas = math.ceil(icon_size * 1.4143) + 2  # 회전해도 안 잘리도록 대각선 크기로 캔버스 확보
+
+    wave_w, wave_h = 640, 90
+    filter_complex = (
+        f"[1:v]format=rgba,rotate=2*PI*t/{rotation_period_sec}:c=none:"
+        f"ow={rot_canvas}:oh={rot_canvas}[vinylrot];"
+        f"[2:a]showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white@0.8:rate=25,format=rgba[wave];"
+        f"[0:v][vinylrot]overlay=x=(W-w)/2:y=(H-h)/2:shortest=1[v1];"
+        f"[v1][wave]overlay=x=(W-w)/2:y=H-h-60[vout]"
+    )
+    run_ffmpeg([
+        "ffmpeg", "-y",
+        "-i", visual_path,
+        "-loop", "1", "-i", vinyl_png,
+        "-i", audio_path,
+        "-filter_complex", filter_complex,
+        "-map", "[vout]", "-map", "2:a",
+        "-c:v", "libx264", "-c:a", "aac", "-b:a", "192k",
+        "-pix_fmt", "yuv420p", "-shortest",
+        out_path,
+    ])
+
+
 def make_caption_thumbnail(image_path, out_path, caption_text="", topic="", w=1280, h=720):
     """레퍼런스(시네마틱 배경 + 세리프 'Playlist' 타이틀 + 인용구 + 브랜드 라벨 +
     LP판/파형 아이콘) 스타일로 썸네일을 합성한다. 배경 사진만 AI 생성이고
@@ -660,7 +708,7 @@ def main():
         visual_path = os.path.join(WORKDIR, "visual.mp4")
         build_alternating_visual(image_paths, total_sec, visual_path)
         muxed_path = os.path.join(WORKDIR, "muxed.mp4")
-        mux_video_audio(visual_path, audio_path, muxed_path)
+        add_spinning_vinyl_and_waveform(visual_path, audio_path, muxed_path)
         add_lower_third_bar(muxed_path, caption_text, final_path)
     else:
         log("3/5 주제어 없음 — 썸네일창고에서 이미지 무작위 선택(폴백)...")
