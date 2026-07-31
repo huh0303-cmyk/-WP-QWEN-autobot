@@ -32,15 +32,13 @@ jobs:
               scopes=["https://www.googleapis.com/auth/youtube.upload"],
           )
           youtube = build("youtube", "v3", credentials=creds)
-          resp = youtube.channels().list(part="snippet,statistics", mine=True).execute()
+          resp = youtube.channels().list(part="snippet", mine=True).execute()
           for ch in resp.get("items", []):
               sn = ch["snippet"]
-              st = ch.get("statistics", {})
               handle = sn.get("customUrl", "(핸들 없음)")
               print(f"채널명: {sn['title']}")
               print(f"핸들/커스텀URL: {handle}")
               print(f"채널 ID: {ch['id']}")
-              print(f"구독자수: {st.get('subscriberCount', '?')}")
               print(f"URL: https://www.youtube.com/channel/{ch['id']}")
           if not resp.get("items"):
               print("연결된 채널을 찾을 수 없음 — 토큰/권한 확인 필요")
