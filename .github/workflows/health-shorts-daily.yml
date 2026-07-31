@@ -1,0 +1,99 @@
+name: 건강 상식 쇼츠 (자동 생성 → 유튜브/틱톡/페북 발행대기 + 인스타/쓰레드 캡션 메일)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "주제 (비우면 무작위: 수면/수분섭취/스트레칭/자세/스트레스관리 등)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "30 22 * * *"   # 07:30 KST
+
+concurrency:
+  group: health-shorts-daily
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "시스템 의존성 (ffmpeg + 한글 폰트)"
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-nanum
+
+      - name: "패키지 캐시"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-healthshorts-v1
+
+      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: "건강 상식 쇼츠 생성"
+        env:
+          HEALTH_TOPIC: ${{ github.event.inputs.topic }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: python scripts/health_shorts.py
+
+      - name: "영상+메타데이터 업로드 (다음 게시 잡에서 사용)"
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-shorts-${{ github.run_id }}
+          path: |
+            health_shorts_output/final.mp4
+            health_shorts_output/meta.json
+          retention-days: 3
+
+  # ══════════════════════════════════════════════════════════
+  # 실제 게시 — GitHub Environment 승인이 있어야 실행됨.
+  # 저장소 Settings → Environments → social-publish 에 필수 검토자를
+  # 등록해두면, 사람이 "Approve and deploy"를 눌러야만 아래 게시 단계가
+  # 시작된다. (등록 안 해도 유튜브는 private로만 올라가서 자동 공개는
+  # 안 되지만, 안전하게 승인 게이트를 걸어두는 걸 권장)
+  # ══════════════════════════════════════════════════════════
+  publish:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: social-publish
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: "생성된 영상 다운로드"
+        uses: actions/download-artifact@v4
+        with:
+          name: health-shorts-${{ github.run_id }}
+          path: health_shorts_output
+
+      - name: "멀티플랫폼 발행대기 처리"
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_PRIVACY_LEVEL: ${{ secrets.TIKTOK_PRIVACY_LEVEL }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python scripts/social_publish.py health_shorts_output/meta.json

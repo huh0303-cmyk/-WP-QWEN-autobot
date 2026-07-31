@@ -1,39 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-social_publish_quiz.py
+social_publish.py
 ─────────────────────────────────────────────────────────────
-topik_quiz_shorts.py가 만든 단어 퀴즈 쇼츠(final.mp4 + meta_{lang}.json)를
-유튜브 / 틱톡 / 페이스북 / 인스타그램 / 쓰레드에 직접 업로드한다.
+topik_quiz_shorts.py / health_shorts.py 등이 만든 쇼츠(final.mp4 + meta.json)를
+유튜브/틱톡/페이스북에 "발행 대기" 상태로 올리고, 인스타그램/쓰레드는
+캡션+영상 링크만 준비한다. 어떤 생성 스크립트가 만든 쇼츠든 meta.json
+포맷(youtube_title/youtube_description/short_caption/hashtags/video_path/
+public_video_url)만 맞으면 그대로 쓸 수 있다.
 
-각 플랫폼은 독립적으로 실패해도 나머지 플랫폼 게시에 영향을 주지 않는다
+원칙: 자동화는 예약/준비까지만 하고, 실제 공개(퍼블리시)는 항상 사람이
+마지막에 직접 누른다.
+    - 유튜브: private로 업로드 → 스튜디오에서 직접 공개
+    - 틱톡: 앱 미감사 상태라 원래 본인 계정 비공개 초안으로만 올라감(자연히 만족)
+    - 페이스북: DRAFT로 업로드 → Meta Business Suite에서 직접 게시
+    - 인스타그램/쓰레드: API에 진짜 임시저장이 없어서(컨테이너 24시간 뒤 만료)
+      아예 API 호출 안 하고 캡션+영상 링크만 결과에 담아 이메일로 보냄 → 앱에서 직접 업로드
+
+각 플랫폼은 독립적으로 실패해도 나머지 플랫폼에 영향을 주지 않는다
 (social_stats_daily.py와 동일한 원칙). 필요한 시크릿이 없는 플랫폼은
 에러 없이 건너뛴다.
 
 사용법:
-    python scripts/social_publish_quiz.py <lang>
-    (topik_quiz_output/meta_{lang}.json 과 final.mp4 를 읽는다)
+    python scripts/social_publish.py <lang>              # 단어퀴즈: topik_quiz_output/meta_{lang}.json
+    python scripts/social_publish.py <meta.json 경로>      # 건강채널 등: 경로 그대로 사용
 
 필요 환경변수(플랫폼별로 없으면 해당 플랫폼만 스킵):
     YOUTUBE_OAUTH_CLIENT_ID/SECRET/REFRESH_TOKEN   - 유튜브 업로드(스코프: youtube.upload)
 
     TIKTOK_ACCESS_TOKEN                            - 틱톡 Content Posting API 액세스 토큰
-                                                      (video.publish 스코프. 앱이 감사 전이면
-                                                      PUBLIC_TO_EVERYONE 대신 SELF_ONLY로만 게시됨)
+                                                      (video.publish 스코프)
     TIKTOK_PRIVACY_LEVEL                           - (선택) 기본 SELF_ONLY
 
     FB_PAGE_ACCESS_TOKEN, FB_PAGE_ID               - 페이스북 릴스 업로드(pages_manage_posts,
                                                       pages_read_engagement 권한 필요)
 
-    IG_ACCESS_TOKEN, IG_USER_ID                    - 인스타그램 릴스 업로드
-                                                      (instagram_content_publish 권한 필요,
-                                                      비즈니스/크리에이터 계정만 가능,
-                                                      meta.json의 public_video_url 필요)
-
-    THREADS_ACCESS_TOKEN, THREADS_USER_ID          - 쓰레드 업로드(threads_content_publish
-                                                      권한 필요, public_video_url 필요)
-
-    GMAIL_APP_PASSWORD                             - 완료 요약 메일(선택)
+    GMAIL_APP_PASSWORD                             - 완료 요약 메일(선택, 인스타/쓰레드
+                                                      캡션은 이 메일로만 전달됨)
 """
 
 import os
@@ -60,12 +63,6 @@ TIKTOK_PRIVACY_LEVEL = os.environ.get("TIKTOK_PRIVACY_LEVEL") or "SELF_ONLY"
 
 FB_PAGE_ACCESS_TOKEN = os.environ.get("FB_PAGE_ACCESS_TOKEN", "")
 FB_PAGE_ID = os.environ.get("FB_PAGE_ID", "")
-
-IG_ACCESS_TOKEN = os.environ.get("IG_ACCESS_TOKEN", "")
-IG_USER_ID = os.environ.get("IG_USER_ID", "")
-
-THREADS_ACCESS_TOKEN = os.environ.get("THREADS_ACCESS_TOKEN", "")
-THREADS_USER_ID = os.environ.get("THREADS_USER_ID", "")
 
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
@@ -127,7 +124,9 @@ def publish_youtube(video_path, meta):
 
     body = {
         "snippet": {"title": title, "description": description, "categoryId": "27"},  # Education
-        "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
+        # 비공개로 업로드만 해둔다 — 실제 공개(퍼블리시)는 사용자가 유튜브 스튜디오에서
+        # 검수 후 직접 누른다. 자동화가 공개 버튼까지 누르지 않는다.
+        "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False},
     }
     media = MediaFileUpload(video_path, resumable=True, chunksize=5 * 1024 * 1024, mimetype="video/mp4")
     request = service.videos().insert(part="snippet,status", body=body, media_body=media)
@@ -144,7 +143,8 @@ def publish_youtube(video_path, meta):
             time.sleep(min(2 ** retries, 60))
 
     video_id = response["id"]
-    return {"ok": True, "url": f"https://www.youtube.com/watch?v={video_id}"}
+    return {"ok": True, "note": "비공개 업로드 완료 — 스튜디오에서 검수 후 직접 공개 필요",
+            "url": f"https://studio.youtube.com/video/{video_id}/edit"}
 
 
 # ════════════════════════════════════════════════════════════
@@ -228,91 +228,48 @@ def publish_facebook(video_path, meta):
     )
     up.raise_for_status()
 
+    # DRAFT로 올려두고 실제 게시는 Meta Business Suite에서 사용자가 직접 누른다.
     finish = requests.post(f"{base}/video_reels", params={
         "upload_phase": "finish",
         "video_id": video_id,
-        "video_state": "PUBLISHED",
+        "video_state": "DRAFT",
         "description": caption,
         "access_token": FB_PAGE_ACCESS_TOKEN,
     }, timeout=30)
     finish.raise_for_status()
 
-    return {"ok": True, "video_id": video_id, "url": f"https://www.facebook.com/reel/{video_id}"}
+    return {"ok": True, "note": "초안(DRAFT) 업로드 완료 — Meta Business Suite에서 직접 게시 필요",
+            "video_id": video_id}
 
 
 # ════════════════════════════════════════════════════════════
-# Instagram — Reels (공개 video_url 필요)
+# Instagram / Threads — 두 플랫폼 다 API로 만든 컨테이너는 "초안"으로
+# 앱에 남지 않고 24시간 뒤 그냥 만료돼버린다(진짜 임시저장 기능이 없음).
+# 그래서 여기서는 API로 대신 올려버리지 않고, 캡션+영상 링크만 준비해서
+# 사용자가 앱에서 직접 업로드하게 한다("최종 업로드는 내가 함" 원칙).
 # ════════════════════════════════════════════════════════════
-def _poll_container(url_base, container_id, token, status_field="status_code", done_value="FINISHED"):
-    for _ in range(30):
-        r = requests.get(f"{url_base}/{container_id}", params={"fields": status_field, "access_token": token}, timeout=20)
-        r.raise_for_status()
-        status = r.json().get(status_field)
-        if status == done_value:
-            return True
-        if status in ("ERROR", "EXPIRED"):
-            raise RuntimeError(f"컨테이너 처리 실패: {status}")
-        time.sleep(5)
-    raise RuntimeError("컨테이너 처리 타임아웃")
-
-
 def publish_instagram(meta):
-    if not all([IG_ACCESS_TOKEN, IG_USER_ID]):
-        return {"ok": False, "skipped": True, "reason": "IG_ACCESS_TOKEN/IG_USER_ID 없음"}
-    video_url = meta.get("public_video_url")
-    if not video_url:
-        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음(드라이브 공개 업로드 실패했을 가능성)"}
-
-    base = f"https://graph.facebook.com/{GRAPH_VERSION}/{IG_USER_ID}"
+    if not meta.get("public_video_url"):
+        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
     caption = build_caption(meta)
-
-    create = requests.post(f"{base}/media", data={
-        "media_type": "REELS", "video_url": video_url, "caption": caption,
-        "access_token": IG_ACCESS_TOKEN,
-    }, timeout=30)
-    create.raise_for_status()
-    creation_id = create.json()["id"]
-
-    _poll_container(f"https://graph.facebook.com/{GRAPH_VERSION}", creation_id, IG_ACCESS_TOKEN)
-
-    publish = requests.post(f"{base}/media_publish", data={
-        "creation_id": creation_id, "access_token": IG_ACCESS_TOKEN,
-    }, timeout=30)
-    publish.raise_for_status()
-    media_id = publish.json()["id"]
-
-    return {"ok": True, "media_id": media_id}
+    return {
+        "ok": True,
+        "note": "인스타그램 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 릴스 업로드 필요",
+        "video_url": meta["public_video_url"],
+        "caption": caption,
+    }
 
 
-# ════════════════════════════════════════════════════════════
-# Threads (공개 video_url 필요)
-# ════════════════════════════════════════════════════════════
 def publish_threads(meta):
-    if not all([THREADS_ACCESS_TOKEN, THREADS_USER_ID]):
-        return {"ok": False, "skipped": True, "reason": "THREADS_ACCESS_TOKEN/THREADS_USER_ID 없음"}
-    video_url = meta.get("public_video_url")
-    if not video_url:
-        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음(드라이브 공개 업로드 실패했을 가능성)"}
-
-    base = f"https://graph.threads.net/v1.0/{THREADS_USER_ID}"
+    if not meta.get("public_video_url"):
+        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
     caption = build_caption(meta, max_hashtags=3)
-
-    create = requests.post(f"{base}/threads", data={
-        "media_type": "VIDEO", "video_url": video_url, "text": caption,
-        "access_token": THREADS_ACCESS_TOKEN,
-    }, timeout=30)
-    create.raise_for_status()
-    container_id = create.json()["id"]
-
-    _poll_container("https://graph.threads.net/v1.0", container_id, THREADS_ACCESS_TOKEN, status_field="status", done_value="FINISHED")
-
-    publish = requests.post(f"{base}/threads_publish", data={
-        "creation_id": container_id, "access_token": THREADS_ACCESS_TOKEN,
-    }, timeout=30)
-    publish.raise_for_status()
-    thread_id = publish.json()["id"]
-
-    return {"ok": True, "thread_id": thread_id}
+    return {
+        "ok": True,
+        "note": "쓰레드 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 업로드 필요",
+        "video_url": meta["public_video_url"],
+        "caption": caption,
+    }
 
 
 PLATFORMS = {
@@ -325,20 +282,28 @@ PLATFORMS = {
 
 
 def main():
-    lang = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("TARGET_LANG", "ko")
-    meta_path = os.path.join(WORKDIR, f"meta_{lang}.json")
+    # 인자가 meta json 경로 그대로면(예: health_shorts_output/meta.json) 그걸 바로 쓰고,
+    # 아니면 기존 단어퀴즈 방식대로 "언어 코드"로 보고 topik_quiz_output/meta_{lang}.json을 찾는다.
+    arg = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("TARGET_LANG", "ko")
+    if arg.endswith(".json"):
+        meta_path = arg
+        label = os.path.dirname(meta_path) or arg
+    else:
+        meta_path = os.path.join(WORKDIR, f"meta_{arg}.json")
+        label = arg
+
     if not os.path.exists(meta_path):
-        log(f"❌ {meta_path} 없음 — 먼저 topik_quiz_shorts.py를 실행해야 함")
+        log(f"❌ {meta_path} 없음 — 먼저 생성 스크립트를 실행해야 함")
         raise SystemExit(1)
 
     with open(meta_path, encoding="utf-8") as f:
         meta = json.load(f)
-    video_path = meta.get("video_path") or os.path.join(WORKDIR, "final.mp4")
+    video_path = meta.get("video_path") or os.path.join(os.path.dirname(meta_path), "final.mp4")
     if not os.path.exists(video_path):
         log(f"❌ 영상 파일 없음: {video_path}")
         raise SystemExit(1)
 
-    log(f"게시 시작 — 언어: {lang}, 영상: {video_path}")
+    log(f"게시 시작 — {label}, 영상: {video_path}")
     results = {}
     for name, fn in PLATFORMS.items():
         log(f"  → {name} 게시 중...")
@@ -350,11 +315,11 @@ def main():
         if result.get("skipped"):
             log(f"     ⏭️  건너뜀: {result.get('reason')}")
         elif result.get("ok"):
-            log(f"     ✅ 성공: {result.get('url') or result.get('media_id') or result.get('thread_id') or result.get('publish_id') or ''}")
+            log(f"     ✅ {result.get('note') or '완료'} — {result.get('url') or result.get('video_id') or result.get('publish_id') or ''}")
         else:
             log(f"     ❌ 실패: {result.get('error')}")
 
-    result_path = os.path.join(WORKDIR, f"publish_result_{lang}.json")
+    result_path = os.path.join(os.path.dirname(meta_path) or WORKDIR, f"publish_result_{os.path.basename(meta_path)}")
     with open(result_path, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
@@ -362,16 +327,21 @@ def main():
     skip_count = sum(1 for r in results.values() if r.get("skipped"))
     fail_count = len(results) - ok_count - skip_count
 
-    summary_lines = [f"[{lang}] {meta.get('youtube_title', '')}", ""]
+    summary_lines = [f"[{label}] {meta.get('youtube_title', '')}", "", "※ 전부 발행 대기 상태입니다 — 최종 공개는 직접 눌러야 합니다.", ""]
     for name, r in results.items():
         if r.get("ok"):
-            summary_lines.append(f"✅ {name}: {r.get('url') or r.get('media_id') or r.get('thread_id') or r.get('publish_id') or '완료'}")
+            line = f"✅ {name}: {r.get('note') or '완료'}"
+            if r.get("url"):
+                line += f"\n   {r['url']}"
+            if r.get("caption"):
+                line += f"\n   영상: {r.get('video_url')}\n   캡션:\n   {r['caption']}"
+            summary_lines.append(line)
         elif r.get("skipped"):
             summary_lines.append(f"⏭️ {name}: 스킵 ({r.get('reason')})")
         else:
             summary_lines.append(f"❌ {name}: {r.get('error')}")
     send_email(
-        f"[퀴즈 쇼츠 게시 결과] {lang} — 성공 {ok_count} / 스킵 {skip_count} / 실패 {fail_count}",
+        f"[쇼츠 게시 결과] {label} — 성공 {ok_count} / 스킵 {skip_count} / 실패 {fail_count}",
         "\n".join(summary_lines),
     )
 

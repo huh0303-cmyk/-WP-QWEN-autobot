@@ -4,4 +4,6 @@ yt_output/
 ref_analysis_tmp/
 playlist_output/
 topik_quiz_output/
+health_shorts_output/
+ambient_output/
 .env

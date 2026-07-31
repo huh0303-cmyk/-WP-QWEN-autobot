@@ -1,4 +1,4 @@
-name: TOPIK 단어 퀴즈 쇼츠 (5개 언어 → 유튜브/틱톡/페북/인스타/쓰레드)
+name: TOPIK 단어 퀴즈 쇼츠 (5개 언어 → 유튜브/틱톡/페북 발행대기 + 인스타/쓰레드 캡션 메일)
 
 on:
   workflow_dispatch:
@@ -137,9 +137,5 @@ jobs:
           TIKTOK_PRIVACY_LEVEL: ${{ secrets.TIKTOK_PRIVACY_LEVEL }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: python scripts/social_publish_quiz.py "${{ matrix.lang }}"
+        run: python scripts/social_publish.py "${{ matrix.lang }}"

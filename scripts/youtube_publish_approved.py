@@ -110,12 +110,12 @@ def get_youtube_service():
 def upload_to_youtube(service, video_path, thumb_path, title, description, publish_at_iso=None):
     from googleapiclient.http import MediaFileUpload
 
-    status = {"selfDeclaredMadeForKids": False}
+    # 기본은 항상 private — PUBLISH_AT_HOURS_FROM_NOW로 명시적으로 예약 시각을
+    # 준 경우에만 그 시각에 자동 공개되도록 스케줄을 건다. 스케줄도 안 주면
+    # private로 올려두기만 하고, 실제 공개는 사람이 스튜디오에서 직접 누른다.
+    status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
     if publish_at_iso:
-        status["privacyStatus"] = "private"
         status["publishAt"] = publish_at_iso
-    else:
-        status["privacyStatus"] = "public"
 
     body = {
         "snippet": {
@@ -192,15 +192,15 @@ def main():
     youtube = get_youtube_service()
     video_id = upload_to_youtube(youtube, video_path, thumb_path if thumb_drive_id else None,
                                   title, description, publish_at_iso)
-    video_url = f"https://www.youtube.com/watch?v={video_id}"
+    studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
 
     log("3/3 완료 메일 발송 중...")
-    when = f"{hours_from_now}시간 뒤 예약 공개" if publish_at_iso else "즉시 공개"
+    when = f"{hours_from_now}시간 뒤 예약 공개(private→public 자동전환)" if publish_at_iso else "비공개 업로드만 됨 — 스튜디오에서 직접 공개 필요"
     send_email(
-        f"[유튜브 업로드 완료] {title[:60]}",
-        f"승인하신 영상이 유튜브에 올라갔어요 ({when}).\n\n{video_url}\n\n제목: {title}\n",
+        f"[유튜브 업로드 대기] {title[:60]}",
+        f"승인하신 영상이 유튜브에 올라갔어요 ({when}).\n\n{studio_url}\n\n제목: {title}\n",
     )
-    log(f"✅ 완료: {video_url}")
+    log(f"✅ 완료(비공개): {studio_url}")
 
 
 if __name__ == "__main__":

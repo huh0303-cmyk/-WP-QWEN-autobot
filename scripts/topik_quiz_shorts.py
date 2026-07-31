@@ -65,7 +65,7 @@ LANG_CONFIG = {
     "ja": {"name": "日本語", "header": "TOPIK単語（初級）"},
     "en": {"name": "English", "header": "TOPIK Words (Beginner)"},
     "es": {"name": "Español", "header": "Palabras TOPIK (Básico)"},
-    "zh": {"name": "中文", "header": "TOPIK生词（初级）"},
+    "vi": {"name": "Tiếng Việt", "header": "Từ vựng TOPIK (Sơ cấp)"},
 }
 
 WORKDIR = "topik_quiz_output"
@@ -78,6 +78,9 @@ FONT_PATH = os.path.join(_tempfile.gettempdir(), "_topik_nanumgothic_bold.ttf")
 # 나눔고딕엔 한자 글리프가 없어서 일본어 헤더("TOPIK単語（初級）")용으로 별도 필요
 JP_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf"
 JP_FONT_PATH = os.path.join(_tempfile.gettempdir(), "_topik_notosansjp.ttf")
+# 나눔고딕은 베트남어 성조부호(ệ/ồ/ữ 등) 글리프가 불완전해서 별도 폰트 필요
+VI_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosans/NotoSans%5Bwdth,wght%5D.ttf"
+VI_FONT_PATH = os.path.join(_tempfile.gettempdir(), "_topik_notosans.ttf")
 
 PINK_HEADER = (247, 168, 200, 255)
 PINK_HIGHLIGHT = (249, 190, 212, 255)
@@ -123,6 +126,27 @@ def ensure_jp_font():
         except Exception:
             return ensure_font()
     return JP_FONT_PATH
+
+
+def ensure_vi_font():
+    if not os.path.exists(VI_FONT_PATH):
+        try:
+            r = requests.get(VI_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(VI_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return ensure_font()
+    return VI_FONT_PATH
+
+
+def _needs_vi_font(text):
+    return any(
+        'Ḁ' <= c <= 'ỿ'  # Latin Extended Additional (베트남어 성조 결합 글자 대부분)
+        or c in 'đĐăĂơƠưƯ'
+        or '̀' <= c <= 'ͯ'  # 결합 발음부호
+        for c in text
+    )
 
 
 # ════════════════════════════════════════════════════════════
@@ -259,11 +283,16 @@ def draw_quiz_card(icon_path, item, idx, total, reveal, out_path, header_text="�
     draw = ImageDraw.Draw(img, "RGBA")
 
     # 상단 핑크 헤더 — 언어별로 길이가 달라서 900px 폭에 맞게 폰트 크기 자동 축소.
-    # 나눔고딕엔 한자 글리프가 없어서, 헤더에 한자/가나가 섞이면 일본어 폰트로 대체
+    # 나눔고딕엔 한자/베트남어 성조 글리프가 없어서, 섞이면 전용 폰트로 대체
     _rounded_rect(draw, [90, 60, 990, 270], 45, fill=PINK_HEADER)
     title = header_text
     has_jp = any('぀' <= c <= 'ヿ' or '一' <= c <= '鿿' for c in title)
-    header_font_path = ensure_jp_font() if has_jp else font_path
+    if has_jp:
+        header_font_path = ensure_jp_font()
+    elif _needs_vi_font(title):
+        header_font_path = ensure_vi_font()
+    else:
+        header_font_path = font_path
     size = 72
     while size > 30:
         tf = ImageFont.truetype(header_font_path, size)
@@ -299,10 +328,15 @@ def draw_quiz_card(icon_path, item, idx, total, reveal, out_path, header_text="�
         draw.text((cx - (nb[2] - nb[0]) // 2, cy - (nb[1] + nb[3]) // 2), num,
                    font=nf, fill=BLACK)
 
-    # 질문 문구 — 여기도 한자/가나가 섞이면(일본어 질문) 일본어 폰트로 대체
+    # 질문 문구 — 여기도 한자/가나(일본어) 또는 베트남어 성조가 섞이면 전용 폰트로 대체
     question = item["question"]
     q_has_jp = any('぀' <= c <= 'ヿ' or '一' <= c <= '鿿' for c in question)
-    qf = ImageFont.truetype(ensure_jp_font(), 58) if q_has_jp else F(58)
+    if q_has_jp:
+        qf = ImageFont.truetype(ensure_jp_font(), 58)
+    elif _needs_vi_font(question):
+        qf = ImageFont.truetype(ensure_vi_font(), 58)
+    else:
+        qf = F(58)
     qb = draw.textbbox((0, 0), question, font=qf)
     draw.text(((W - (qb[2] - qb[0])) // 2, 895 - (qb[1] + qb[3]) // 2),
                question, font=qf, fill=BLACK)
