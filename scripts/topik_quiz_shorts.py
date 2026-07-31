@@ -65,16 +65,19 @@ LANG_CONFIG = {
     "ja": {"name": "日本語", "header": "TOPIK単語（初級）"},
     "en": {"name": "English", "header": "TOPIK Words (Beginner)"},
     "es": {"name": "Español", "header": "Palabras TOPIK (Básico)"},
+    "zh": {"name": "中文", "header": "TOPIK生词（初级）"},
 }
 
 WORKDIR = "topik_quiz_output"
 W, H = 1080, 1920
 
+import tempfile as _tempfile
+
 FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Bold.ttf"
-FONT_PATH = "/tmp/_topik_nanumgothic_bold.ttf"
+FONT_PATH = os.path.join(_tempfile.gettempdir(), "_topik_nanumgothic_bold.ttf")
 # 나눔고딕엔 한자 글리프가 없어서 일본어 헤더("TOPIK単語（初級）")용으로 별도 필요
 JP_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf"
-JP_FONT_PATH = "/tmp/_topik_notosansjp.ttf"
+JP_FONT_PATH = os.path.join(_tempfile.gettempdir(), "_topik_notosansjp.ttf")
 
 PINK_HEADER = (247, 168, 200, 255)
 PINK_HIGHLIGHT = (249, 190, 212, 255)
@@ -204,6 +207,36 @@ def generate_quiz_items(category, n, target_lang="ko"):
         random.shuffle(it["options"])
         it["correct_index"] = it["options"].index(it["correct"])
     return items
+
+
+def generate_social_copy(category, items, target_lang="ko"):
+    """플랫폼(유튜브/틱톡/인스타/페이스북/쓰레드)에 올릴 제목·설명·해시태그를
+    Gemini로 생성한다. 사람이 직접 쓴 것처럼 자연스러운 톤을 요구하고,
+    상투적인 AI 말투("Unlock your potential!", 과도한 이모지 나열, 뻔한
+    질문형 후킹 등)는 피하도록 명시한다."""
+    lang_name = LANG_CONFIG.get(target_lang, LANG_CONFIG["ko"])["name"]
+    words = ", ".join(it["correct"] for it in items)
+    prompt = f"""너는 한국어 학습 콘텐츠를 운영하는 SNS 담당자다. 아래 단어 퀴즈 쇼츠 영상을
+{lang_name}권 시청자에게 올릴 소셜 게시글을 써줘. 다루는 단어: {words} (카테고리: {category or '초급 어휘'}).
+
+조건:
+- 문체는 {lang_name}로, 실제 사람이 캐주얼하게 쓴 것처럼. AI가 쓴 티가 나는 상투적 표현
+  (예: "Unlock your potential", "Ready to level up?", 이모지 남발, 뻔한 감탄사 나열) 금지.
+- 과장 광고 문구, 클릭베이트성 허위 약속 금지.
+- youtube_title: 60자 이내
+- youtube_description: 2~3문장, 자연스럽게
+- short_caption: 틱톡/인스타/페이스북/쓰레드에 공통으로 쓸 짧은 캡션 (2~3문장, 100자 내외)
+- hashtags: 5~8개, # 없이 단어만 배열로 (플랫폼에서 조합)
+
+JSON만 응답(설명 없이):
+{{"youtube_title": "...", "youtube_description": "...", "short_caption": "...", "hashtags": ["...", "..."]}}
+"""
+    text = gemini_generate_text(prompt, temperature=0.8).strip()
+    if text.startswith("```"):
+        text = text.split("```")[1]
+        if text.startswith("json"):
+            text = text[4:]
+    return json.loads(text.strip())
 
 
 # ════════════════════════════════════════════════════════════
@@ -422,7 +455,7 @@ def get_drive_service():
     return build("drive", "v3", credentials=creds)
 
 
-def upload_to_drive(service, file_path, folder_id, name):
+def upload_to_drive(service, file_path, folder_id, name, make_public=False):
     import time as _time
     from googleapiclient.http import MediaFileUpload
 
@@ -441,7 +474,21 @@ def upload_to_drive(service, file_path, folder_id, name):
             wait = min(2 ** retries, 60)
             log(f"   ⚠️ 업로드 재시도({retries}/8): {e}")
             _time.sleep(wait)
-    return response.get("webViewLink")
+
+    file_id = response.get("id")
+    if make_public and file_id:
+        try:
+            service.permissions().create(
+                fileId=file_id, body={"type": "anyone", "role": "reader"}
+            ).execute()
+        except Exception as e:
+            log(f"   ⚠️ 공개 권한 설정 실패(무시): {e}")
+
+    return {
+        "id": file_id,
+        "webViewLink": response.get("webViewLink"),
+        "directLink": f"https://drive.google.com/uc?export=download&id={file_id}" if file_id else None,
+    }
 
 
 # ════════════════════════════════════════════════════════════
@@ -478,17 +525,45 @@ def main():
     dur = get_duration(final_path)
     log(f"   ✅ 완성: {final_path} ({dur:.1f}초)")
 
+    log("소셜 게시용 제목/캡션 생성 중...")
+    try:
+        copy = generate_social_copy(category, items, target_lang)
+    except Exception as e:
+        log(f"   ⚠️ 소셜 카피 생성 실패(무시, 빈 값으로 대체): {e}")
+        copy = {"youtube_title": header_text, "youtube_description": "",
+                "short_caption": "", "hashtags": ["Korean", "TOPIK", "LearnKorean"]}
+
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone(timedelta(hours=9)))
+
+    public_video_url = None
     if all([GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET,
             GOOGLE_OAUTH_REFRESH_TOKEN, GDRIVE_FOLDER_ID]):
         log("업로드 중...")
         service = get_drive_service()
-        from datetime import datetime, timezone, timedelta
-        now = datetime.now(timezone(timedelta(hours=9)))
         name = f"topik_quiz_{target_lang}_{now.strftime('%Y%m%d_%H%M%S')}.mp4"
-        link = upload_to_drive(service, final_path, GDRIVE_FOLDER_ID, name)
-        log(f"🎉 완료 — 링크: {link}")
+        drive_info = upload_to_drive(service, final_path, GDRIVE_FOLDER_ID, name, make_public=True)
+        public_video_url = drive_info.get("directLink")
+        log(f"🎉 드라이브 업로드 완료 — {drive_info.get('webViewLink')}")
     else:
-        log("🎉 완료 (드라이브 업로드 설정 없음 — 로컬 파일만 생성됨)")
+        log("드라이브 업로드 설정 없음 — 로컬 파일만 생성됨")
+
+    meta = {
+        "lang": target_lang,
+        "category": category,
+        "created_at": now.isoformat(),
+        "video_path": final_path,
+        "duration_sec": dur,
+        "public_video_url": public_video_url,
+        "youtube_title": copy.get("youtube_title", header_text),
+        "youtube_description": copy.get("youtube_description", ""),
+        "short_caption": copy.get("short_caption", ""),
+        "hashtags": copy.get("hashtags", []),
+    }
+    meta_path = os.path.join(WORKDIR, f"meta_{target_lang}.json")
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+    log(f"🎉 완료 — 메타데이터: {meta_path}")
 
 
 if __name__ == "__main__":
