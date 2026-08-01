@@ -3,21 +3,51 @@
     "site_clicks": 0,
     "site_indexed": 0,
     "youtube": {
-      "한국어(TOPIK)": 5720,
-      "영어(Survival English)": 0,
-      "일본어(Survival Japanese)": 1,
-      "스페인어(Survival Spanish)": 5,
-      "베트남어(Survival Vietnamese)": 2,
-      "음악(globalmusic)": 8,
-      "힐링(healing)": 11,
-      "건강(Studio_Health)": 0,
-      "건강(Clinic_Health_EN)": 0,
-      "여분(Studio_Global)": 0
+      "한국어(TOPIK)": {
+        "subs": 5730,
+        "views": 337754
+      },
+      "영어(Survival English)": {
+        "subs": 0,
+        "views": 0
+      },
+      "일본어(Survival Japanese)": {
+        "subs": 1,
+        "views": 0
+      },
+      "스페인어(Survival Spanish)": {
+        "subs": 5,
+        "views": 956
+      },
+      "베트남어(Survival Vietnamese)": {
+        "subs": 2,
+        "views": 5
+      },
+      "음악(globalmusic)": {
+        "subs": 8,
+        "views": 1776
+      },
+      "힐링(healing)": {
+        "subs": 11,
+        "views": 996
+      },
+      "건강(Studio_Health)": {
+        "subs": 0,
+        "views": 27
+      },
+      "건강(Clinic_Health_EN)": {
+        "subs": 0,
+        "views": 1
+      },
+      "여분(Studio_Global)": {
+        "subs": 0,
+        "views": 0
+      }
     },
     "tiktok": 28200,
     "facebook": null,
     "instagram": null,
     "threads": null
   },
-  "updated_at": "2026-08-01 22:15:59"
+  "updated_at": "2026-08-02 03:57:24"
 }
