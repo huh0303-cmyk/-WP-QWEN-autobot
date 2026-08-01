@@ -196,6 +196,7 @@ def main():
     if accessible_resp.status_code == 200:
         accessible = {s.get("siteUrl") for s in accessible_resp.json().get("siteEntry", [])}
     log(f"접근 가능한 GSC 사이트: {len(accessible)}개 / 전체 {len(SITES)}개")
+    log(f"[디버그] 실제 접근 가능 사이트 URL 목록: {sorted(accessible)}")
 
     checked_at = datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S")
     records = []

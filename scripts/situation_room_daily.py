@@ -94,6 +94,7 @@ def collect_site_summary():
         return {"total_clicks": None, "total_indexed": None, "error_sites": [], "error": str(e)[:200]}
 
     accessible_resp = gsc_get(token, "/sites")
+    log(f"   [디버그] /sites 응답 HTTP {accessible_resp.status_code}: {accessible_resp.text[:300]}")
     accessible = set()
     if accessible_resp.status_code == 200:
         accessible = {s.get("siteUrl") for s in accessible_resp.json().get("siteEntry", [])}
