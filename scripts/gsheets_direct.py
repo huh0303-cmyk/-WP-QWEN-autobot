@@ -72,21 +72,21 @@ def ensure_tab(service, spreadsheet_id, tab_name, header):
 
 
 def replace_tab_rows(spreadsheet_id, tab_name, header, rows):
-    """탭을 "현재 상태 스냅샷" 표로 유지 — 헤더 아래 데이터 전체를 매번
-    지우고 새로 쓴다(계속 쌓이는 로그가 아니라 27개 사이트처럼 매일 같은
-    행 수를 유지하는 현황판에 적합)."""
+    """탭을 "현재 상태 스냅샷" 표로 유지 — 헤더 포함 전체를 매번 지우고
+    새로 쓴다(계속 쌓이는 로그가 아니라 27개 사이트처럼 매일 같은 행
+    수를 유지하는 현황판에 적합). 헤더도 매번 다시 쓰므로 컬럼 구성이
+    바뀌어도(예: 컬럼 축소) 예전 헤더/데이터가 옆에 남지 않는다."""
     service = get_sheets_service()
     ensure_tab(service, spreadsheet_id, tab_name, header)
     service.spreadsheets().values().clear(
-        spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A2:Z",
+        spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:Z",
     ).execute()
-    if rows:
-        service.spreadsheets().values().update(
-            spreadsheetId=spreadsheet_id,
-            range=f"'{tab_name}'!A2",
-            valueInputOption="RAW",
-            body={"values": rows},
-        ).execute()
+    service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id,
+        range=f"'{tab_name}'!A1",
+        valueInputOption="RAW",
+        body={"values": [header] + rows},
+    ).execute()
 
 
 def append_tab_row(spreadsheet_id, tab_name, header, row):
