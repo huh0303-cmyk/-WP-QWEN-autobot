@@ -162,6 +162,16 @@ def get_index_coverage(token, site_url):
     return {"indexed": total_indexed, "submitted_urls": total_submitted}, None
 
 
+WEEKDAY_KR = ["월", "화", "수", "목", "금", "토", "일"]
+
+
+def weekday_kr(date_str):
+    if not date_str:
+        return ""
+    y, m, d = (int(x) for x in date_str.split("-"))
+    return WEEKDAY_KR[date(y, m, d).weekday()]
+
+
 def send_to_sheets(records):
     if not SHEETS_WEBHOOK:
         log("⚠️ SHEETS_WEBHOOK 없음 — 시트 전송 스킵")
@@ -191,12 +201,14 @@ def main():
     records = []
     no_access = []
 
-    base_row = {"checked_at": "", "domain": "", "date": "", "clicks": "", "impressions": "",
-                "ctr": "", "position": "", "indexed": "", "submitted_urls": "", "status": ""}
+    # 시트에 사이트당 한 줄씩(27줄), 왼쪽부터 도메인 - 날짜 - 요일 - 방문자수(클릭) -
+    # 색인수 순서로 열이 채워지도록 필드 순서를 고정한다(딕셔너리 순서 = 시트 열 순서 가정).
+    base_row = {"domain": "", "date": "", "weekday": "", "clicks": "", "indexed": "",
+                "impressions": "", "status": "", "checked_at": ""}
 
     for i, site_url in enumerate(SITES, 1):
         domain = site_url.rstrip("/").replace("https://", "")
-        row = dict(base_row, checked_at=checked_at, domain=domain)
+        row = dict(base_row, domain=domain, checked_at=checked_at)
 
         if site_url not in accessible:
             no_access.append(domain)
@@ -209,14 +221,14 @@ def main():
             log(f"  [{i}/{len(SITES)}] {domain}: {err}")
             row["status"] = err
         else:
-            row.update(date=stats["date"], clicks=stats["clicks"], impressions=stats["impressions"],
-                       ctr=stats["ctr"], position=stats["position"], status="정상")
+            row.update(date=stats["date"], weekday=weekday_kr(stats["date"]),
+                       clicks=stats["clicks"], impressions=stats["impressions"], status="정상")
 
         coverage, cov_err = get_index_coverage(token, site_url)
         if coverage:
-            row.update(indexed=coverage["indexed"], submitted_urls=coverage["submitted_urls"])
-        log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 노출 {row['impressions']} / "
-            f"색인 {row['indexed']}{'' if coverage else f' ({cov_err})'}")
+            row["indexed"] = coverage["indexed"]
+        log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인 {row['indexed']}"
+            f"{'' if coverage else f' ({cov_err})'}")
 
         records.append(row)
         time.sleep(0.3)
