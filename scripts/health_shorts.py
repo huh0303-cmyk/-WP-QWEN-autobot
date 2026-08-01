@@ -54,10 +54,22 @@ GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
 GOOGLE_OAUTH_REFRESH_TOKEN = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
 GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", "")
 
-BRAND_TEXT = os.environ.get("HEALTH_BRAND_TEXT", "K-Health 365")
-DISCLAIMER = ("이 영상은 일반적인 건강 정보 제공 목적이며 의학적 진단·치료 조언이 "
-              "아닙니다. 개인 건강 상태에 따라 다를 수 있으니 증상이 있다면 "
-              "전문의와 상담하세요.")
+LANG = (os.environ.get("HEALTH_LANG") or "ko").strip().lower()
+
+_BRAND_DEFAULT = {"ko": "K-Health 365", "en": "Global Health Tips"}
+BRAND_TEXT = os.environ.get("HEALTH_BRAND_TEXT", _BRAND_DEFAULT.get(LANG, "K-Health 365"))
+
+_DISCLAIMER = {
+    "ko": ("이 영상은 일반적인 건강 정보 제공 목적이며 의학적 진단·치료 조언이 "
+           "아닙니다. 개인 건강 상태에 따라 다를 수 있으니 증상이 있다면 "
+           "전문의와 상담하세요."),
+    "en": ("This video is for general health information only and is not medical "
+           "diagnosis or treatment advice. Individual conditions vary, so please "
+           "consult a doctor if you have symptoms."),
+}
+DISCLAIMER = _DISCLAIMER.get(LANG, _DISCLAIMER["ko"])
+
+_CARD_LABEL = {"ko": "건강 상식", "en": "Health Tip"}
 
 WORKDIR = "health_shorts_output"
 W, H = 1080, 1920
@@ -137,10 +149,34 @@ def gemini_generate_image(prompt, out_path):
 def generate_health_tips(topic):
     """Gemini에게 생활 건강 팁 3개를 JSON으로 받아온다. 진단/치료/복용량 안내는
     다루지 않고 누구나 실천할 수 있는 일반 상식 수준으로 제한한다."""
-    topic_instr = (f"주제는 '{topic}'로 고정." if topic.strip()
-                   else "주제는 수면/수분섭취/스트레칭/바른자세/스트레스관리/식습관/눈건강 "
-                        "중 하나를 무작위로 골라라.")
-    prompt = f"""건강 유튜브 쇼츠에 쓸 생활 건강 팁 3가지를 만들어줘.
+    if LANG == "en":
+        topic_instr = (f"Fix the topic as '{topic}'." if topic.strip()
+                       else "Randomly pick one topic among: sleep, hydration, "
+                            "stretching, posture, stress management, eating habits, eye health.")
+        prompt = f"""Create 3 everyday health tips for a health YouTube Short.
+{topic_instr}
+
+Rules:
+- Never give diagnosis/treatment/medication-dosage advice for a specific disease.
+  Only general lifestyle-habit-level common knowledge anyone can practice.
+- Each tip: one short, clear sentence (roughly 4-8 words).
+- Add one sentence explaining why it helps.
+- image_prompt_en: a simple English image description for that tip (flat icon style, noun phrase).
+
+Respond with JSON only (no explanation):
+{{
+  "topic": "topic name (English)",
+  "tips": [
+    {{"tip": "...", "detail": "...", "image_prompt_en": "..."}},
+    ...
+  ]
+}}
+"""
+    else:
+        topic_instr = (f"주제는 '{topic}'로 고정." if topic.strip()
+                       else "주제는 수면/수분섭취/스트레칭/바른자세/스트레스관리/식습관/눈건강 "
+                            "중 하나를 무작위로 골라라.")
+        prompt = f"""건강 유튜브 쇼츠에 쓸 생활 건강 팁 3가지를 만들어줘.
 {topic_instr}
 
 조건:
@@ -170,7 +206,25 @@ JSON만 응답(설명 없이):
 
 def generate_social_copy(topic, tips):
     tip_list = " / ".join(t["tip"] for t in tips)
-    prompt = f"""너는 건강 정보 유튜브 채널의 SNS 담당자다. 아래 쇼츠 영상 게시글을 써줘.
+    if LANG == "en":
+        prompt = f"""You run social media for a health-info YouTube channel. Write the
+post copy for this Short.
+Topic: {topic}. Tips covered: {tip_list}.
+
+Rules:
+- Sound like a real person wrote it casually. No stock ad phrases like "We protect
+  your health!", no emoji spam, no exaggerated exclamations.
+- Don't assert medical efficacy as fact — keep a "this may help" tone.
+- youtube_title: under 60 characters
+- youtube_description: 2-3 sentences
+- short_caption: shared caption for TikTok/Instagram/Facebook/Threads (2-3 sentences, ~100 chars)
+- hashtags: 5-8 words, no # symbol
+
+JSON only:
+{{"youtube_title": "...", "youtube_description": "...", "short_caption": "...", "hashtags": ["...", "..."]}}
+"""
+    else:
+        prompt = f"""너는 건강 정보 유튜브 채널의 SNS 담당자다. 아래 쇼츠 영상 게시글을 써줘.
 주제: {topic}. 다루는 팁: {tip_list}.
 
 조건:
@@ -208,7 +262,7 @@ def draw_tip_card(icon_path, topic, tip, idx, total, out_path):
     draw = ImageDraw.Draw(img, "RGBA")
 
     draw.rounded_rectangle([90, 60, 990, 230], 40, fill=HEADER_COLOR)
-    title = f"건강 상식 · {topic}"
+    title = f"{_CARD_LABEL.get(LANG, _CARD_LABEL['ko'])} · {topic}"
     size = 56
     while size > 28:
         tf = F(size)
@@ -431,8 +485,12 @@ def main():
         copy = generate_social_copy(topic, tips)
     except Exception as e:
         log(f"   ⚠️ 소셜 카피 생성 실패(무시): {e}")
-        copy = {"youtube_title": f"건강 상식 - {topic}", "youtube_description": "",
-                "short_caption": "", "hashtags": ["건강", "건강상식", "헬스팁"]}
+        if LANG == "en":
+            copy = {"youtube_title": f"Health Tips - {topic}", "youtube_description": "",
+                    "short_caption": "", "hashtags": ["health", "healthtips", "wellness"]}
+        else:
+            copy = {"youtube_title": f"건강 상식 - {topic}", "youtube_description": "",
+                    "short_caption": "", "hashtags": ["건강", "건강상식", "헬스팁"]}
 
     from datetime import datetime, timezone, timedelta
     now = datetime.now(timezone(timedelta(hours=9)))

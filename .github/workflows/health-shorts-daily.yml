@@ -18,6 +18,10 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [ko, en]
     steps:
       - uses: actions/checkout@v4
 
@@ -38,9 +42,10 @@ jobs:
 
       - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
 
-      - name: "건강 상식 쇼츠 생성"
+      - name: "건강 상식 쇼츠 생성 (${{ matrix.lang }})"
         env:
-          HEALTH_TOPIC: ${{ github.event.inputs.topic }}
+          HEALTH_LANG: ${{ matrix.lang }}
+          HEALTH_TOPIC: ${{ matrix.lang == 'ko' && github.event.inputs.topic || '' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
@@ -53,7 +58,7 @@ jobs:
       - name: "영상+메타데이터 업로드 (다음 게시 잡에서 사용)"
         uses: actions/upload-artifact@v4
         with:
-          name: health-shorts-${{ github.run_id }}
+          name: health-shorts-${{ matrix.lang }}-${{ github.run_id }}
           path: |
             health_shorts_output/final.mp4
             health_shorts_output/meta.json
@@ -71,6 +76,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: social-publish
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [ko, en]
     steps:
       - uses: actions/checkout@v4
 
@@ -80,17 +89,21 @@ jobs:
 
       - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
 
-      - name: "생성된 영상 다운로드"
+      - name: "생성된 영상 다운로드 (${{ matrix.lang }})"
         uses: actions/download-artifact@v4
         with:
-          name: health-shorts-${{ github.run_id }}
+          name: health-shorts-${{ matrix.lang }}-${{ github.run_id }}
           path: health_shorts_output
 
-      - name: "멀티플랫폼 발행대기 처리"
+      - name: "멀티플랫폼 발행대기 처리 (${{ matrix.lang }})"
         env:
+          # 건강채널은 언어별 별도 채널(한국어: Studio_Health, 영어: Clinic_Health_EN)에
+          # 올라가야 하므로, 단어퀴즈와 같은 기본 토큰을 그대로 재사용하지 않고
+          # 언어별로 발급받은 전용 리프레시 토큰을 사용한다. 아직 등록 전이면
+          # get_secret 없이도 social_publish.py가 "시크릿 없음"으로 안전하게 스킵한다.
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ matrix.lang == 'ko' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALTH_KO || secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALTH_EN }}
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
           TIKTOK_PRIVACY_LEVEL: ${{ secrets.TIKTOK_PRIVACY_LEVEL }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
