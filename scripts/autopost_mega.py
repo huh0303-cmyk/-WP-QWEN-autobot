@@ -1552,15 +1552,13 @@ def get_multiple_images(keyword, count=3, theme=""):
         en=with_ctx(translate_ko_to_en_for_image(keyword,theme))
         urls.extend(get_images_pixabay(en,count-len(urls)))
         if len(urls)<count: urls.extend(get_images_pexels(en,count-len(urls)))
-    if len(urls)<count:
-        fb=THEME_IMAGE_FALLBACK.get(theme,THEME_IMAGE_FALLBACK["default"])
-        urls.extend(get_images_pixabay(fb,count-len(urls)))
-        if len(urls)<count: urls.extend(get_images_pexels(fb,count-len(urls)))
-    # ★ 주의: 예전엔 여기서 "South Korea" 같은 완전 범용 검색어로 무조건 채워 넣었음.
-    #   그러면 항상 사진이 '있기는' 하지만 본문과 무관한 스톡사진이 채워져
-    #   process_one() 쪽의 인포그래픽 폴백이 절대 발동하지 않는 문제가 있었음.
-    #   → 여기선 억지로 채우지 않고, 못 찾으면 빈 리스트를 그대로 반환해서
-    #   호출부가 인포그래픽 카드로 대체하도록 함.
+    # ★ 주의: 예전엔 여기서 못 채운 나머지 슬롯을 THEME_IMAGE_FALLBACK(주제 뭉뚱그림 검색어,
+    #   예: "medical health Korea doctor")로 억지로 채웠음. 그 결과 한 글에 키워드에 맞는
+    #   사진 1~2장 + 본문과 무관한 범용 사진 1장이 섞여 들어가는 문제가 있었음
+    #   (사용자 피드백: "이럴때는 이미지가 없는게 차라리 낫음").
+    #   → 이제 키워드 특정 검색(위 두 단계)에서 못 찾은 슬롯은 억지로 채우지 않고
+    #   빈 채로 반환. 호출부가 부족한 만큼 인포그래픽 카드로 대체하거나, 그마저
+    #   실패하면 그냥 이미지 없이 발행한다.
     return list(dict.fromkeys(urls))[:count]
 
 # ============================================================
@@ -2073,7 +2071,11 @@ def process_one(site, keyword):
             pw_for_img = os.getenv(site["wp_pass_env"], "")
             images = get_fallback_infographic_image(url, pw_for_img, keyword, theme, lang)
             if not images:
-                images=get_images_pixabay("South Korea nature",3)
+                # ★ 인포그래픽 생성마저 실패해도 "South Korea nature" 같은 본문과
+                #   무관한 범용 사진으로 억지로 채우지 않는다. 관련 없는 이미지보다
+                #   이미지가 없는 편이 낫다는 판단(사용자 피드백).
+                print(f"  🚫 인포그래픽 대체도 실패 → 이미지 없이 발행")
+                images=[]
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
