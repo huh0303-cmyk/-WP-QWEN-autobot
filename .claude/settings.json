@@ -2,6 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(git fetch *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push)",
+      "Bash(git push origin main)",
+      "Bash(git pull*)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(curl *)",
       "Bash(env)",
       "mcp__claude-in-chrome__find",
       "mcp__claude-in-chrome__get_page_text",
