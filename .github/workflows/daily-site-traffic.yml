@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - run: pip install requests pyjwt -q
+      - run: pip install requests pyjwt cryptography -q
 
       - name: "사이트 트래픽/색인 현황 조회 → 구글시트 전송"
         env:
