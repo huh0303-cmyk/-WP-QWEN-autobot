@@ -239,14 +239,6 @@ def main():
             records.append(row)
             continue
 
-        if domain == "k-health365.com":
-            debug_body = {"startDate": (date.today() - timedelta(days=30)).isoformat(),
-                          "endDate": date.today().isoformat(), "dimensions": ["date"], "rowLimit": 31}
-            debug_r = gsc_post(token, f"/sites/{requests.utils.quote(query_site, safe='')}/searchAnalytics/query", debug_body)
-            log(f"[디버그-khealth] 30일 searchAnalytics 응답: {debug_r.status_code} {debug_r.text[:1500]}")
-            debug_sm = gsc_get(token, f"/sites/{requests.utils.quote(query_site, safe='')}/sitemaps")
-            log(f"[디버그-khealth] sitemaps 응답: {debug_sm.status_code} {debug_sm.text[:1500]}")
-
         stats, err = latest_daily_stats(token, query_site)
         if err:
             log(f"  [{i}/{len(SITES)}] {domain}: {err}")
