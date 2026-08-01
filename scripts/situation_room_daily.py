@@ -34,7 +34,7 @@ from datetime import datetime, timezone, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from daily_site_traffic import (  # noqa: E402
-    get_gsc_token, gsc_get, latest_daily_stats, get_index_coverage, SITES,
+    get_gsc_token, gsc_get, latest_daily_stats, get_index_coverage, SITES, weekday_kr,
 )
 from social_stats_daily import (  # noqa: E402
     get_tiktok_followers, get_facebook_followers,
@@ -239,7 +239,7 @@ def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
         return
     try:
         now = datetime.now(KST)
-        date_label = f"{now.year}-{now.month}-{now.day}"
+        date_label = f"{now.year}-{now.month}-{now.day}-{weekday_kr(now.strftime('%Y-%m-%d'))}"
         channel_names = [label for label, _ in YOUTUBE_CHANNELS]
         values_by_channel = {}
         for label in channel_names:
