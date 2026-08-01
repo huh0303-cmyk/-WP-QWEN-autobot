@@ -58,7 +58,7 @@ def log(msg):
 
 
 def check_auth(site_url, auth):
-    r = requests.get(f"{site_url}/wp-json/wp/v2/users/me", auth=auth, timeout=15)
+    r = requests.get(f"{site_url}/wp-json/wp/v2/users/me", auth=auth, timeout=20)
     if r.status_code != 200:
         return None, f"users/me HTTP {r.status_code}: {r.text[:150]}"
     data = r.json()
@@ -84,41 +84,56 @@ def deploy_site(site_url, secret_name):
 
     auth = requests.auth.HTTPBasicAuth(WP_USER, pw)
 
-    roles, err = check_auth(site_url, auth)
-    if err:
-        return f"[{site_url}] ⚠️ 인증 확인 실패: {err}"
+    try:
+        roles, err = check_auth(site_url, auth)
+        if err:
+            return f"[{site_url}] ⚠️ 인증 확인 실패: {err}"
 
-    existing, err = find_existing(site_url, auth)
-    if err:
-        return f"[{site_url}] ⚠️ 스니펫 목록 조회 실패 (roles={roles}): {err}"
+        existing, err = find_existing(site_url, auth)
+        if err:
+            return f"[{site_url}] ⚠️ 스니펫 목록 조회 실패 (roles={roles}): {err}"
 
-    if existing:
-        sid = existing["id"]
-        if existing.get("active"):
-            return f"[{site_url}] ✅ 이미 배포+활성화됨 (id={sid}, roles={roles})"
-        r = requests.put(f"{site_url}/wp-json/code-snippets/v1/snippets/{sid}",
-                          auth=auth, json={"active": True}, timeout=20)
+        if existing:
+            sid = existing["id"]
+            if existing.get("active"):
+                return f"[{site_url}] ✅ 이미 배포+활성화됨 (id={sid}, roles={roles})"
+            r = requests.put(f"{site_url}/wp-json/code-snippets/v1/snippets/{sid}",
+                              auth=auth, json={"active": True}, timeout=20)
+            if r.status_code in (200, 201):
+                return f"[{site_url}] ✅ 기존 스니펫 활성화 완료 (id={sid})"
+            return f"[{site_url}] ⚠️ 활성화 실패 HTTP {r.status_code}: {r.text[:150]}"
+
+        payload = {
+            "name": SNIPPET_NAME,
+            "desc": "Rank Math SEO 점수를 WP REST API meta에 노출 (전수조사/모니터링 스크립트용)",
+            "code": SNIPPET_CODE,
+            "scope": "global",
+            "active": True,
+        }
+        r = requests.post(f"{site_url}/wp-json/code-snippets/v1/snippets",
+                           auth=auth, json=payload, timeout=20)
         if r.status_code in (200, 201):
-            return f"[{site_url}] ✅ 기존 스니펫 활성화 완료 (id={sid})"
-        return f"[{site_url}] ⚠️ 활성화 실패 HTTP {r.status_code}: {r.text[:150]}"
-
-    payload = {
-        "name": SNIPPET_NAME,
-        "desc": "Rank Math SEO 점수를 WP REST API meta에 노출 (전수조사/모니터링 스크립트용)",
-        "code": SNIPPET_CODE,
-        "scope": "global",
-        "active": True,
-    }
-    r = requests.post(f"{site_url}/wp-json/code-snippets/v1/snippets",
-                       auth=auth, json=payload, timeout=20)
-    if r.status_code in (200, 201):
-        return f"[{site_url}] ✅ 신규 배포+활성화 완료 (roles={roles})"
-    return f"[{site_url}] ⚠️ 생성 실패 HTTP {r.status_code} (roles={roles}): {r.text[:200]}"
+            return f"[{site_url}] ✅ 신규 배포+활성화 완료 (roles={roles})"
+        return f"[{site_url}] ⚠️ 생성 실패 HTTP {r.status_code} (roles={roles}): {r.text[:200]}"
+    except Exception as e:
+        return f"[{site_url}] ⚠️ 오류: {str(e)[:200]}"
 
 
 def main():
+    results = []
     for site_url, secret_name in SITES:
-        log(deploy_site(site_url, secret_name))
+        line = deploy_site(site_url, secret_name)
+        log(line)
+        results.append(line)
+
+    ok = sum(1 for l in results if "✅" in l)
+    log("\n" + "=" * 60)
+    log(f"완료: {ok}/{len(SITES)}개 사이트 배포 성공")
+    fails = [l for l in results if "✅" not in l]
+    if fails:
+        log("실패/건너뜀 목록:")
+        for l in fails:
+            log(f"  {l}")
 
 
 if __name__ == "__main__":
