@@ -1,26 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-다국어 초급 단어 퀴즈 숏폼 자동 생성기 (무료 파이프라인) v2
+다국어 초급 단어 퀴즈 숏폼 자동 생성기 (무료 파이프라인) v3
 - 대상 언어: en(영어) / ja(일본어) / es(스페인어) / vi(베트남어)
-- 이미지: Wikimedia Commons API (무료, 키 불필요) + 재시도 + 폴백 카드
+- 이미지: canva_assets/(concept) 우선, 없으면 Wikimedia Commons 검색 + 폴백 카드
 - TTS: gTTS (무료, 구글 번역 TTS)
 - 효과음: 카운트다운 틱 + 정답 차임 (ffmpeg 합성음, 무료)
 - 합성: PIL(프레임 생성) + ffmpeg(인코딩)
 
-v2 변경사항 (사용자 피드백 반영):
-  - 카운트다운 5초 기본값, 숫자를 항상 크게 표시(스타일 무관)
-  - 초당 틱 효과음 + 정답 시 차임 효과음 추가
-  - 상단 고정 브랜드 바 "서울국제대학교" 추가
-  - 이미지 소싱 재시도(쿼리 변형) + 실패 시 폴백 카드(빈 화면 방지)
+v3 변경사항 (디자인 리뉴얼 — 기존 topik_quiz_shorts.py 카드 스타일 참고):
+  - 문항마다 배경색/타이머모양/보기모양이 무작위로 바뀌던 것을 없애고, 영상 하나당
+    테마(배경+포인트색) 하나로 고정 — 뒤죽박죽 섞여 보이는 "AI가 대충 조립한" 느낌 제거
+  - 카드에 그림자 대신 두꺼운 검정 테두리(카툰풍 플랫 디자인)로 통일
+  - 보기(선택지)는 캡슐형 + 원형 A/B/C 뱃지로 통일, 정답 공개 시 보기 자체를 강조색으로
+    하이라이트(별도 "정답이에요!" 배너 제거로 화면 단순화)
+  - 카운트다운은 사진 카드 모서리의 작은 원형 뱃지로 표시(숫자만, 링/바/점 애니메이션 제거)
+  - 라틴 문자 언어(en/es/vi) 폰트를 시스템 기본 DejaVu 대신 무료 구글 폰트
+    Poppins-ExtraBold로 교체(다운로드 실패 시 자동 폴백)
 
 사용법:
   python3 make_quiz_short_multi.py --lang en --n 5
 """
 
-import os, csv, json, random, argparse, subprocess, urllib.request, urllib.parse
+import os, csv, json, random, argparse, subprocess, urllib.request, urllib.parse, tempfile
 from PIL import Image, ImageDraw, ImageFont
 from gtts import gTTS
+import requests
 
 def resolve_font(candidates):
     for path in candidates:
@@ -39,42 +44,75 @@ CJK_FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
 ]
 
+# 기본 DejaVu Sans는 딱 봐도 시스템 폰트라 "AI가 대충 만든 티"가 나서, 라틴 문자
+# 언어(en/es/vi)는 더 개성 있는 무료 구글 폰트(Poppins ExtraBold, 고정 굵기 정적
+# 폰트)를 받아서 대신 쓴다. 다운로드 실패 시에만 DejaVu로 조용히 폴백.
+LATIN_HEADLINE_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-ExtraBold.ttf"
+LATIN_HEADLINE_FONT_PATH = os.path.join(tempfile.gettempdir(), "_quiz_poppins_extrabold.ttf")
+
+def ensure_latin_headline_font():
+    if not os.path.exists(LATIN_HEADLINE_FONT_PATH):
+        try:
+            r = requests.get(LATIN_HEADLINE_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(LATIN_HEADLINE_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return None
+    return LATIN_HEADLINE_FONT_PATH if os.path.exists(LATIN_HEADLINE_FONT_PATH) else None
+
+# Poppins엔 베트남어 성조 결합 글자(ế/ệ/ả 등) 글리프가 없어서 전부 네모(tofu)로
+# 깨진다. 베트남어는 폭넓은 유니코드 커버리지를 가진 Noto Sans(가변 폰트)로 별도 처리.
+VI_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosans/NotoSans%5Bwdth,wght%5D.ttf"
+VI_FONT_PATH = os.path.join(tempfile.gettempdir(), "_quiz_notosans_vi.ttf")
+
+def ensure_vi_font():
+    if not os.path.exists(VI_FONT_PATH):
+        try:
+            r = requests.get(VI_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(VI_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return None
+    return VI_FONT_PATH if os.path.exists(VI_FONT_PATH) else None
+
 # ------------------------- 언어별 설정 -------------------------
 LANG_CONFIG = {
     "en": {
         "name": "English", "gtts_lang": "en",
-        "question_text": "What is this?", "correct_text": "Correct!",
+        "question_text": "What is this?",
         "font": LATIN_FONT_CANDIDATES,
         "csv": "data/words_en.csv", "brand": "English Basic Words",
-        "top_brand": "서울국제대학교",
+        "top_brand": "KIECA(한국국제교육문화협회)",
     },
     "ja": {
         "name": "日本語", "gtts_lang": "ja",
-        "question_text": "これは何ですか？", "correct_text": "正解！",
+        "question_text": "これは何ですか？",
         "font": CJK_FONT_CANDIDATES,
         "csv": "data/words_ja.csv", "brand": "日本語 基礎単語",
-        "top_brand": "서울국제대학교",
+        "top_brand": "KIECA(한국국제교육문화협회)",
     },
     "es": {
         "name": "Español", "gtts_lang": "es",
-        "question_text": "¿Qué es esto?", "correct_text": "¡Correcto!",
+        "question_text": "¿Qué es esto?",
         "font": LATIN_FONT_CANDIDATES,
         "csv": "data/words_es.csv", "brand": "Español Básico",
-        "top_brand": "서울국제대학교",
+        "top_brand": "KIECA(한국국제교육문화협회)",
     },
     "vi": {
         "name": "Tiếng Việt", "gtts_lang": "vi",
-        "question_text": "Đây là cái gì?", "correct_text": "Chính xác!",
+        "question_text": "Đây là cái gì?",
         "font": LATIN_FONT_CANDIDATES,
         "csv": "data/words_vi.csv", "brand": "Tiếng Việt Cơ Bản",
-        "top_brand": "서울국제대학교",
+        "top_brand": "KIECA(한국국제교육문화협회)",
     },
     "ko": {
         "name": "한국어", "gtts_lang": "ko",
-        "question_text": "이게 뭐예요?", "correct_text": "정답이에요!",
+        "question_text": "이게 뭐예요?",
         "font": CJK_FONT_CANDIDATES,
         "csv": "data/words_ko.csv", "brand": "TOPIK 초급 단어",
-        "top_brand": "TOPIK어휘(초급)",
+        "top_brand": "KIECA(한국국제교육문화협회)",
     },
 }
 
@@ -82,16 +120,33 @@ W, H = 1080, 1920
 FPS = 30
 WORKDIR = "build"
 ASSETS = "assets"
-BADGE_COLORS = ["#FFD6E8", "#E4D6FF", "#D6F0FF", "#D6FFE4", "#FFF0D6", "#D6FFF7",
-                "#FFE0C2", "#E0FFE0", "#F0D6FF", "#D6E4FF", "#FFF5B8", "#C2F5E9"]
-TIMER_STYLES = ["ring", "bar", "dots"]
-OPTION_STYLES = ["rounded", "pill", "square"]
 KO_FONT = resolve_font(CJK_FONT_CANDIDATES)
 
-def next_bg_color(prev_color):
-    """직전 문항과 겹치지 않게 매번 배경색을 바꿔서 반환."""
-    choices = [c for c in BADGE_COLORS if c != prev_color]
-    return random.choice(choices)
+# 영상 하나당 테마(배경색 + 포인트/하이라이트색) 하나를 고정으로 쓴다.
+# 문항마다 색이 바뀌면 뒤죽박죽으로 보여서 일부러 통일감을 준다.
+THEMES = [
+    {"bg": "#8BC34A", "highlight": "#DFF08A"},   # 그린
+    {"bg": "#F06292", "highlight": "#FBD3E1"},   # 로즈핑크
+    {"bg": "#4FC3F7", "highlight": "#D3EFFD"},   # 스카이블루
+    {"bg": "#FFB74D", "highlight": "#FFE3B8"},   # 오렌지
+    {"bg": "#BA68C8", "highlight": "#E9CDEE"},   # 퍼플
+    {"bg": "#4DB6AC", "highlight": "#C8ECE8"},   # 틸
+    {"bg": "#FF8A65", "highlight": "#FFDCC9"},   # 코럴
+    {"bg": "#7986CB", "highlight": "#DCE0F7"},   # 인디고
+    {"bg": "#AED581", "highlight": "#EAF5D0"},   # 라임
+    {"bg": "#FFD54F", "highlight": "#FFF3C4"},   # 앰버
+    {"bg": "#D81B60", "highlight": "#F8BBD0"},   # 딥핑크
+    {"bg": "#26C6DA", "highlight": "#C7F0F5"},   # 시안
+    {"bg": "#9575CD", "highlight": "#E1D5F5"},   # 딥퍼플
+    {"bg": "#4DD0E1", "highlight": "#CFF3F7"},   # 터콰이즈
+    {"bg": "#FF7043", "highlight": "#FFD9CC"},   # 살몬
+    {"bg": "#7E57C2", "highlight": "#DBCEF0"},   # 바이올렛
+    {"bg": "#66BB6A", "highlight": "#D2ECD3"},   # 그래스그린
+    {"bg": "#FDD835", "highlight": "#FFF6BF"},   # 선플라워옐로
+    {"bg": "#42A5F5", "highlight": "#D2E9FD"},   # 블루
+    {"bg": "#EC407A", "highlight": "#FBD9E6"},   # 마젠타
+]
+BLACK = "#141414"
 
 def load_words(csv_path):
     with open(csv_path, encoding="utf-8") as f:
@@ -188,139 +243,129 @@ def tts(text, out_path, gtts_lang, slow=False, max_retries=5):
             time.sleep(2 * (attempt + 1))
     raise last_err
 
-def load_font(path, size):
-    return ImageFont.truetype(path, size)
+def load_font(path, size, weight=800):
+    font = ImageFont.truetype(path, size)
+    try:
+        # 가변 폰트면 축 이름으로 Weight만 찾아서 굵기 고정(나머지 축은 기본값 유지).
+        # 축 순서를 가정하고 [weight]만 넘기면 폭(Width) 등 다른 축에 잘못 적용될 수 있음.
+        axes = font.get_variation_axes()
+        values = []
+        for ax in axes:
+            name = ax["name"].decode() if isinstance(ax["name"], bytes) else ax["name"]
+            values.append(weight if name.lower() in ("weight", "wght") else ax["default"])
+        font.set_variation_by_axes(values)
+    except Exception:
+        pass  # 정적 폰트면 가변 축이 없어서 예외 발생 -> 조용히 무시
+    return font
 
-def rounded_rect(draw, xy, radius, fill, outline=None, width=0):
+def rounded_rect(draw, xy, radius, fill=None, outline=None, width=0):
     draw.rounded_rectangle(xy, radius=radius, fill=fill, outline=outline, width=width)
 
 def fit_image(img, box_w, box_h):
+    """짧은 변 기준으로 확대한 뒤 중앙을 crop해서 항상 box_w x box_h를 정확히 채운다."""
     img = img.convert("RGB")
-    ratio = min(box_w / img.width, box_h / img.height)
+    ratio = max(box_w / img.width, box_h / img.height)
     new_size = (max(1, int(img.width * ratio)), max(1, int(img.height * ratio)))
-    return img.resize(new_size, Image.LANCZOS)
+    img = img.resize(new_size, Image.LANCZOS)
+    left = (img.width - box_w) // 2
+    top = (img.height - box_h) // 2
+    return img.crop((left, top, left + box_w, top + box_h))
 
-def draw_top_bar(draw, font_top, top_brand):
-    rounded_rect(draw, (0, 0, W, 130), 0, fill="#1B2A4A")
-    bbox = draw.textbbox((0, 0), top_brand, font=font_top)
-    draw.text(((W-(bbox[2]-bbox[0]))//2, 34), top_brand, font=font_top, fill="#FFFFFF")
+# ------------------------- 레이아웃 상수 -------------------------
+HEADER_BOX = (90, 50, 990, 200)
+DIVIDER_Y = 232
+PIC_BOX_W, PIC_BOX_H = 760, 500
+PIC_TOP_Y = 270
+QUESTION_Y = 815
+OPT_TOP_Y = 940
+OPT_H, OPT_GAP = 120, 22
+BOTTOM_BRAND_Y = 1850
 
-# 사진 카드 크기/위치 - 사진과 보기(선택지) 사이 여백을 좁히기 위해 컴팩트하게 조정
-PIC_BOX_W, PIC_BOX_H = 760, 600
-PIC_TOP_Y = 300
+def draw_header(draw, font_path, brand_text, highlight):
+    rounded_rect(draw, HEADER_BOX, 40, fill=highlight)
+    size = 68
+    while size > 30:
+        tf = load_font(font_path, size)
+        tb = draw.textbbox((0, 0), brand_text, font=tf)
+        if tb[2] - tb[0] <= HEADER_BOX[2] - HEADER_BOX[0] - 80:
+            break
+        size -= 4
+    cx = (HEADER_BOX[0] + HEADER_BOX[2]) // 2
+    cy = (HEADER_BOX[1] + HEADER_BOX[3]) // 2
+    draw.text((cx - (tb[2]-tb[0])//2, cy - (tb[1]+tb[3])//2), brand_text, font=tf, fill=BLACK)
+    draw.line([(HEADER_BOX[0], DIVIDER_Y), (HEADER_BOX[2], DIVIDER_Y)], fill=BLACK, width=4)
 
-def draw_picture_card(img, draw, image_path):
+def draw_picture_card(img, draw, image_path, countdown=None, font_countdown=None):
+    px = (W - PIC_BOX_W) // 2
+    py = PIC_TOP_Y
+    card_xy = (px, py, px + PIC_BOX_W, py + PIC_BOX_H)
+    rounded_rect(draw, card_xy, 40, fill="#FFFFFF", outline=BLACK, width=6)
     if os.path.exists(image_path):
         try:
             pic = Image.open(image_path)
-            pic = fit_image(pic, PIC_BOX_W, PIC_BOX_H)
-            px = (W - pic.width) // 2
-            py = PIC_TOP_Y
-            rounded_rect(draw, (px - 30, py - 30, px + pic.width + 30, py + pic.height + 30), 40, fill="#FFFFFF")
-            img.paste(pic, (px, py))
+            pic = fit_image(pic, PIC_BOX_W - 30, PIC_BOX_H - 30)
+            img.paste(pic, (px + 15, py + 15))
+            rounded_rect(draw, card_xy, 40, outline=BLACK, width=6)  # 사진 위로 테두리 다시 그려서 깔끔하게
         except Exception:
             pass
+    if countdown is not None:
+        cx, cy, r = px + PIC_BOX_W - 60, py + PIC_BOX_H - 60, 46
+        draw.ellipse((cx-r, cy-r, cx+r, cy+r), fill="#FFFFFF", outline=BLACK, width=5)
+        num = str(countdown)
+        nb = draw.textbbox((0, 0), num, font=font_countdown)
+        draw.text((cx-(nb[2]-nb[0])//2, cy-(nb[1]+nb[3])//2-6), num, font=font_countdown, fill="#E53935")
 
-def draw_question_frame(idx, total, item, cfg, bg_color, timer_style, option_style, image_path, seconds, fonts):
+def draw_options(draw, options, font_opt, font_label, highlight=None, correct_idx=None):
+    for i, opt in enumerate(options):
+        oy = OPT_TOP_Y + i * (OPT_H + OPT_GAP)
+        box = (90, oy, W - 90, oy + OPT_H)
+        is_correct = correct_idx is not None and i == correct_idx
+        fill_c = highlight if is_correct else "#FFFFFF"
+        rounded_rect(draw, box, OPT_H // 2, fill=fill_c, outline=BLACK, width=5 if is_correct else 4)
+        lcx, lcy, lr = 175, oy + OPT_H // 2, 40
+        draw.ellipse((lcx-lr, lcy-lr, lcx+lr, lcy+lr), fill="#FFFFFF", outline=BLACK, width=3)
+        label = chr(65 + i)
+        lb = draw.textbbox((0, 0), label, font=font_label)
+        draw.text((lcx-(lb[2]-lb[0])//2, lcy-(lb[1]+lb[3])//2), label, font=font_label, fill=BLACK)
+        ob = draw.textbbox((0, 0), opt, font=font_opt)
+        draw.text((lcx + 90, lcy - (ob[1]+ob[3])//2), opt, font=font_opt, fill=BLACK)
+
+def draw_base_frame(bg_color, cfg, theme, fonts):
+    brand_font_path, font_q, font_opt, font_label, font_countdown, font_ko_small = fonts
+    img = Image.new("RGB", (W, H), bg_color)
+    draw = ImageDraw.Draw(img)
+    draw_header(draw, brand_font_path, cfg["brand"], theme["highlight"])
+    # top_brand("서울국제대학교" 등)는 항상 한국어라 언어별 폰트가 아니라 한글 폰트로 고정
+    bb = draw.textbbox((0, 0), cfg["top_brand"], font=font_ko_small)
+    draw.text(((W-(bb[2]-bb[0]))//2, BOTTOM_BRAND_Y), cfg["top_brand"], font=font_ko_small, fill=BLACK)
+    return img, draw
+
+def draw_question_frame(item, cfg, theme, image_path, seconds, fonts):
+    brand_font_path, font_q, font_opt, font_label, font_countdown, font_ko_small = fonts
     frames = []
-    font_q, font_opt, font_badge, font_top, font_timer_num = fonts
-
     for sec_left in range(seconds, 0, -1):
-        img = Image.new("RGB", (W, H), bg_color)
-        draw = ImageDraw.Draw(img)
-        draw_top_bar(draw, font_top, cfg["top_brand"])
-
-        badge_txt = f"{idx}/{total}"
-        rounded_rect(draw, (W - 190, 150, W - 40, 220), 25, fill="#FFFFFF")
-        bbox = draw.textbbox((0, 0), badge_txt, font=font_badge)
-        draw.text((W - 115 - (bbox[2]-bbox[0])//2, 160), badge_txt, font=font_badge, fill="#333333")
+        img, draw = draw_base_frame(theme["bg"], cfg, theme, fonts)
+        draw_picture_card(img, draw, image_path, countdown=sec_left, font_countdown=font_countdown)
 
         q_bbox = draw.textbbox((0, 0), cfg["question_text"], font=font_q)
-        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, 200), cfg["question_text"], font=font_q, fill="#222222")
+        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, QUESTION_Y), cfg["question_text"], font=font_q, fill=BLACK)
 
-        draw_picture_card(img, draw, image_path)
-
-        cx, cy = W // 2, 1050
-        r = 70
-        if timer_style == "ring":
-            draw.ellipse((cx-r, cy-r, cx+r, cy+r), outline="#DDDDDD", width=14)
-            angle = 360 * (sec_left / seconds)
-            draw.arc((cx-r, cy-r, cx+r, cy+r), -90, -90+angle, fill="#FF5A5A", width=14)
-        elif timer_style == "bar":
-            bar_w = 560
-            draw.rounded_rectangle((cx-bar_w//2, cy+r-24, cx+bar_w//2, cy+r+16), 20, fill="#DDDDDD")
-            fill_w = int(bar_w * (sec_left/seconds))
-            draw.rounded_rectangle((cx-bar_w//2, cy+r-24, cx-bar_w//2+fill_w, cy+r+16), 20, fill="#FF5A5A")
-            draw.ellipse((cx-r, cy-r, cx+r, cy+r), fill="#FFFFFF", outline="#FF5A5A", width=6)
-        else:
-            for i in range(seconds):
-                dot_x = cx - (seconds*36)//2 + i*36
-                color = "#FF5A5A" if i < sec_left else "#DDDDDD"
-                draw.ellipse((dot_x-10, cy+r, dot_x+10, cy+r+20), fill=color)
-            draw.ellipse((cx-r, cy-r, cx+r, cy+r), fill="#FFFFFF", outline="#FF5A5A", width=6)
-
-        t_bbox = draw.textbbox((0, 0), str(sec_left), font=font_timer_num)
-        draw.text((cx-(t_bbox[2]-t_bbox[0])//2, cy-(t_bbox[3]-t_bbox[1])//2-14), str(sec_left),
-                   font=font_timer_num, fill="#FF3B3B")
-
-        opt_y = 1180
-        opt_h = 120
-        gap = 22
-        for i, opt in enumerate(item["options"]):
-            oy = opt_y + i*(opt_h+gap)
-            box = (90, oy, W-90, oy+opt_h)
-            if option_style == "pill":
-                rounded_rect(draw, box, opt_h//2, fill="#FFFFFF", outline="#333333", width=4)
-            elif option_style == "square":
-                draw.rectangle(box, fill="#FFFFFF", outline="#333333", width=4)
-            else:
-                rounded_rect(draw, box, 24, fill="#FFFFFF", outline="#333333", width=4)
-            label = chr(65+i)
-            draw.text((130, oy+opt_h//2-28), label, font=font_opt, fill="#888888")
-            o_bbox = draw.textbbox((0,0), opt, font=font_opt)
-            draw.text((240, oy+opt_h//2-(o_bbox[3]-o_bbox[1])//2-8), opt, font=font_opt, fill="#222222")
-
+        draw_options(draw, item["options"], font_opt, font_label)
         frames.append(img)
     return frames
 
-def draw_answer_frame(idx, total, item, cfg, bg_color, option_style, image_path, seconds, fonts):
+def draw_answer_frame(item, cfg, theme, image_path, seconds, fonts):
+    brand_font_path, font_q, font_opt, font_label, font_countdown, font_ko_small = fonts
     frames = []
-    font_q, font_opt, font_badge, font_top, font_correct = fonts
-
     for _ in range(seconds):
-        img = Image.new("RGB", (W, H), bg_color)
-        draw = ImageDraw.Draw(img)
-        draw_top_bar(draw, font_top, cfg["top_brand"])
-
-        q_bbox = draw.textbbox((0, 0), cfg["question_text"], font=font_q)
-        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, 200), cfg["question_text"], font=font_q, fill="#222222")
-
+        img, draw = draw_base_frame(theme["bg"], cfg, theme, fonts)
         draw_picture_card(img, draw, image_path)
 
-        c_bbox = draw.textbbox((0,0), cfg["correct_text"], font=font_correct)
-        rounded_rect(draw, (W//2-(c_bbox[2]-c_bbox[0])//2-40, 990, W//2+(c_bbox[2]-c_bbox[0])//2+40, 1080), 30, fill="#4CAF50")
-        draw.text((W//2-(c_bbox[2]-c_bbox[0])//2, 1010), cfg["correct_text"], font=font_correct, fill="#FFFFFF")
+        q_bbox = draw.textbbox((0, 0), cfg["question_text"], font=font_q)
+        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, QUESTION_Y), cfg["question_text"], font=font_q, fill=BLACK)
 
-        opt_y = 1180
-        opt_h = 120
-        gap = 22
-        for i, opt in enumerate(item["options"]):
-            oy = opt_y + i*(opt_h+gap)
-            box = (90, oy, W-90, oy+opt_h)
-            is_correct = (i == item["answer_idx"])
-            fill_c = "#D6FFE4" if is_correct else "#FFFFFF"
-            outline_c = "#4CAF50" if is_correct else "#CCCCCC"
-            if option_style == "pill":
-                rounded_rect(draw, box, opt_h//2, fill=fill_c, outline=outline_c, width=5 if is_correct else 3)
-            elif option_style == "square":
-                draw.rectangle(box, fill=fill_c, outline=outline_c, width=5 if is_correct else 3)
-            else:
-                rounded_rect(draw, box, 24, fill=fill_c, outline=outline_c, width=5 if is_correct else 3)
-            label = chr(65+i)
-            draw.text((130, oy+opt_h//2-28), label, font=font_opt, fill="#888888")
-            o_bbox = draw.textbbox((0,0), opt, font=font_opt)
-            draw.text((240, oy+opt_h//2-(o_bbox[3]-o_bbox[1])//2-8), opt, font=font_opt, fill="#222222")
-
+        draw_options(draw, item["options"], font_opt, font_label,
+                     highlight=theme["highlight"], correct_idx=item["answer_idx"])
         frames.append(img)
     return frames
 
@@ -339,33 +384,30 @@ def main():
 
     words = load_words(cfg["csv"])
     items = build_quiz_items(words, args.n)
+    theme = random.choice(THEMES)  # 영상 전체에서 테마 하나로 고정
 
     lang_font_path = resolve_font(cfg["font"])
+    if args.lang == "vi":
+        lang_font_path = ensure_vi_font() or lang_font_path
+    elif cfg["font"] is LATIN_FONT_CANDIDATES:
+        lang_font_path = ensure_latin_headline_font() or lang_font_path
+
     font_q = load_font(lang_font_path, 56)
     font_opt = load_font(lang_font_path, 50)
-    font_badge = load_font(lang_font_path, 38)
-    font_top = load_font(KO_FONT, 52)
-    font_timer_num = load_font(lang_font_path, 84)
-    font_correct = load_font(lang_font_path, 60)
-
-    q_fonts = (font_q, font_opt, font_badge, font_top, font_timer_num)
-    a_fonts = (font_q, font_opt, font_badge, font_top, font_correct)
+    font_label = load_font(lang_font_path, 40)
+    font_countdown = load_font(lang_font_path, 56)
+    font_ko_small = load_font(KO_FONT, 38)
+    fonts = (lang_font_path, font_q, font_opt, font_label, font_countdown, font_ko_small)
 
     # 질문 프롬프트 음성 ("이게 뭐예요?" 등) - 언어당 1회만 생성해서 재사용
     question_audio = os.path.join(WORKDIR, f"question_prompt_{args.lang}.mp3")
-    q_prompt_dur = tts(cfg["question_text"], question_audio, cfg["gtts_lang"])
+    tts(cfg["question_text"], question_audio, cfg["gtts_lang"])
 
     frame_i = 0
     audio_events = []
     cur_time = 0.0
-    prev_bg_color = None
 
     for idx, item in enumerate(items, start=1):
-        bg_color = next_bg_color(prev_bg_color)
-        prev_bg_color = bg_color
-        timer_style = random.choice(TIMER_STYLES)
-        option_style = random.choice(OPTION_STYLES)
-
         img_path = os.path.join(WORKDIR, f"img_{args.lang}_{idx}.jpg")
         canva_asset = os.path.join("canva_assets", f"{item['concept']}.png")
         if item["concept"] and os.path.exists(canva_asset):
@@ -386,12 +428,12 @@ def main():
         answer_audio_span = 0.4 + (word_dur * 3 + gap * 2) + 0.6
         answer_seconds = max(args.answer_seconds, int(answer_audio_span) + 1)
 
-        q_frames = draw_question_frame(idx, len(items), item, cfg, bg_color, timer_style, option_style, img_path, args.question_seconds, q_fonts)
+        q_frames = draw_question_frame(item, cfg, theme, img_path, args.question_seconds, fonts)
         for f in q_frames:
             f.save(os.path.join(WORKDIR, f"frame_{frame_i:05d}.jpg"), quality=90)
             frame_i += 1
 
-        a_frames = draw_answer_frame(idx, len(items), item, cfg, bg_color, option_style, img_path, answer_seconds, a_fonts)
+        a_frames = draw_answer_frame(item, cfg, theme, img_path, answer_seconds, fonts)
         for f in a_frames:
             f.save(os.path.join(WORKDIR, f"frame_{frame_i:05d}.jpg"), quality=90)
             frame_i += 1

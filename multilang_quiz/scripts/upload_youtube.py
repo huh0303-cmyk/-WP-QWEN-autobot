@@ -13,11 +13,17 @@ import report
 
 PUBLISH_DELAY_MINUTES = int(os.environ.get("YT_PUBLISH_DELAY_MINUTES", "15"))
 
-def get_access_token():
+def get_access_token(lang):
+    # 언어별로 별도 채널에 올리기 위해 YOUTUBE_OAUTH_REFRESH_TOKEN_EN/_JA/_ES/_VI처럼
+    # 언어 접미사가 붙은 토큰을 우선 사용. Client ID/Secret은 채널 공용으로 재사용.
+    refresh_token = get_secret(
+        f"YOUTUBE_OAUTH_REFRESH_TOKEN_{lang.upper()}",
+        "ML_YT_REFRESH_TOKEN", "YOUTUBE_OAUTH_REFRESH_TOKEN",
+    )
     r = requests.post("https://oauth2.googleapis.com/token", data={
         "client_id": get_secret("ML_YT_CLIENT_ID", "YOUTUBE_OAUTH_CLIENT_ID"),
         "client_secret": get_secret("ML_YT_CLIENT_SECRET", "YOUTUBE_OAUTH_CLIENT_SECRET"),
-        "refresh_token": get_secret("ML_YT_REFRESH_TOKEN", "YOUTUBE_OAUTH_REFRESH_TOKEN"),
+        "refresh_token": refresh_token,
         "grant_type": "refresh_token",
     }, timeout=30)
     r.raise_for_status()
@@ -59,9 +65,9 @@ def main():
     if not get_secret("ML_YT_CLIENT_ID", "YOUTUBE_OAUTH_CLIENT_ID"):
         print("유튜브 토큰 미설정 - 유튜브 업로드 건너뜀")
         return
-    token = get_access_token()
     for lang, path, title, desc in videos:
         try:
+            token = get_access_token(lang)
             vid = upload_one(token, path, title, desc)
             print(f"[YouTube][{lang}] 업로드 완료 (약 {PUBLISH_DELAY_MINUTES}분 뒤 자동 공개): https://youtube.com/watch?v={vid}")
             report.add("YouTube", lang, "success", f"https://youtube.com/watch?v={vid}")

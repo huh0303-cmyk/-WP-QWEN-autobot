@@ -1,5 +1,9 @@
-name: TOPIK 단어 퀴즈 쇼츠 (5개 언어 → 유튜브/틱톡/페북 발행대기 + 인스타/쓰레드 캡션 메일)
+name: TOPIK 단어 퀴즈 쇼츠 (한국어 → 유튜브/틱톡/페북/인스타/쓰레드)
 
+# 원래는 5개 언어를 다 만들었지만, 일본어/영어/스페인어/베트남어는
+# daily_multilang_quiz.yml이 각자 전용 채널로 이미 담당하고 있어서 중복이라
+# 여기서는 한국어만 만든다(같은 유튜브 채널에 다른 언어 영상이 섞여 올라가는
+# 문제 방지).
 on:
   workflow_dispatch:
     inputs:
@@ -12,9 +16,9 @@ on:
         required: false
         default: "5"
       langs:
-        description: "생성할 언어 (쉼표구분, 예: ko,ja,en,es,zh)"
+        description: "생성할 언어 (쉼표구분, 기본 한국어만)"
         required: false
-        default: "ko,ja,en,es,zh"
+        default: "ko"
   schedule:
     - cron: "0 23 * * *"   # 08:00 KST (아침)
     - cron: "0 11 * * *"   # 20:00 KST (저녁)
@@ -38,7 +42,7 @@ jobs:
       - id: resolve
         run: |
           RAW="${{ github.event.inputs.langs }}"
-          if [ -z "$RAW" ]; then RAW="ko,ja,en,es,zh"; fi
+          if [ -z "$RAW" ]; then RAW="ko"; fi
           JSON=$(python3 -c "import json,sys; print(json.dumps([s.strip() for s in sys.argv[1].split(',') if s.strip()]))" "$RAW")
           echo "langs_json=$JSON" >> "$GITHUB_OUTPUT"
           echo "▶ 이번 실행 언어: $JSON"
