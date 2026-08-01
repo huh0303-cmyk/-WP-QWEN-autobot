@@ -1,0 +1,23 @@
+{
+  "latest": {
+    "site_clicks": 0,
+    "site_indexed": 0,
+    "youtube": {
+      "한국어(TOPIK)": 5720,
+      "영어(Survival English)": 0,
+      "일본어(Survival Japanese)": 1,
+      "스페인어(Survival Spanish)": 5,
+      "베트남어(Survival Vietnamese)": 2,
+      "음악(globalmusic)": 8,
+      "힐링(healing)": 11,
+      "건강(Studio_Health)": 0,
+      "건강(Clinic_Health_EN)": 0,
+      "여분(Studio_Global)": 0
+    },
+    "tiktok": 28200,
+    "facebook": null,
+    "instagram": null,
+    "threads": null
+  },
+  "updated_at": "2026-08-01 21:59:14"
+}
