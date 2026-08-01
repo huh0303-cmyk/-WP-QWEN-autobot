@@ -20,10 +20,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - run: pip install requests pyjwt cryptography -q
+      - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
 
       - name: "사이트 트래픽/색인 현황 조회 → 구글시트 전송"
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: python scripts/daily_site_traffic.py

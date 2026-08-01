@@ -201,13 +201,27 @@ def gemini_analysis(summary_text):
 # ════════════════════════════════════════════════════════════
 def send_to_sheets(record):
     if not SHEETS_WEBHOOK:
-        log("⚠️ SHEETS_WEBHOOK 없음 — 시트 전송 스킵")
+        log("⚠️ SHEETS_WEBHOOK 없음 — 웹훅 전송 스킵")
+    else:
+        try:
+            r = requests.post(SHEETS_WEBHOOK, json={"type": "situation_room", "records": [record]}, timeout=20)
+            log(f"📊 구글시트 웹훅 전송 완료 HTTP {r.status_code}")
+        except Exception as e:
+            log(f"⚠️ 구글시트 웹훅 전송 실패: {e}")
+
+    # 웹훅(Apps Script)이 situation_room 타입을 실제로는 어느 탭에도 기록하지
+    # 않는 것으로 확인되어, 같은 스프레드시트에 Sheets API로 직접 쓴다.
+    import gsheets_direct
+    if not SHEET_ID or not gsheets_direct.has_credentials():
+        log("⚠️ SHEET_ID 또는 GOOGLE_OAUTH_* 시크릿 없음 — 시트 직접 쓰기 스킵")
         return
     try:
-        r = requests.post(SHEETS_WEBHOOK, json={"type": "situation_room", "records": [record]}, timeout=20)
-        log(f"📊 구글시트 전송 완료 HTTP {r.status_code}")
+        header = list(record.keys())
+        row = [record[k] for k in header]
+        gsheets_direct.append_tab_row(SHEET_ID, "종합상황실_기록", header, row)
+        log("📊 구글시트 직접 쓰기 완료 — 탭: 종합상황실_기록")
     except Exception as e:
-        log(f"⚠️ 구글시트 전송 실패: {e}")
+        log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
 
 def send_email(subject, body):

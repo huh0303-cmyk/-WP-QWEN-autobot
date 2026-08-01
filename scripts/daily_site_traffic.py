@@ -25,6 +25,7 @@ from datetime import date, timedelta, datetime, timezone
 
 GSC_KEY_JSON = os.environ.get("GSC_SERVICE_ACCOUNT_JSON", "")
 SHEETS_WEBHOOK = os.environ.get("SHEETS_WEBHOOK", "")
+SHEET_ID = os.environ.get("SHEET_ID", "")
 KST = timezone(timedelta(hours=9))
 
 SITES = [
@@ -174,13 +175,28 @@ def weekday_kr(date_str):
 
 def send_to_sheets(records):
     if not SHEETS_WEBHOOK:
-        log("⚠️ SHEETS_WEBHOOK 없음 — 시트 전송 스킵")
+        log("⚠️ SHEETS_WEBHOOK 없음 — 웹훅 전송 스킵")
+    else:
+        try:
+            r = requests.post(SHEETS_WEBHOOK, json={"type": "site_traffic_daily", "records": records}, timeout=20)
+            log(f"📊 구글시트 웹훅 전송 완료 ({len(records)}건) HTTP {r.status_code}")
+        except Exception as e:
+            log(f"⚠️ 구글시트 웹훅 전송 실패: {e}")
+
+    # 웹훅(Apps Script)이 site_traffic_daily 타입을 실제로는 어느 탭에도 기록하지
+    # 않는 것으로 확인되어, 같은 스프레드시트에 Sheets API로 직접 쓴다.
+    import gsheets_direct
+    if not SHEET_ID or not gsheets_direct.has_credentials():
+        log("⚠️ SHEET_ID 또는 GOOGLE_OAUTH_* 시크릿 없음 — 시트 직접 쓰기 스킵")
         return
     try:
-        r = requests.post(SHEETS_WEBHOOK, json={"type": "site_traffic_daily", "records": records}, timeout=20)
-        log(f"📊 구글시트 전송 완료 ({len(records)}건) HTTP {r.status_code}")
+        header = ["도메인", "날짜", "요일", "방문자수(클릭)", "색인수", "노출수", "상태", "확인시각"]
+        rows = [[r["domain"], r["date"], r["weekday"], r["clicks"], r["indexed"],
+                 r["impressions"], r["status"], r["checked_at"]] for r in records]
+        gsheets_direct.replace_tab_rows(SHEET_ID, "27개사이트_트래픽", header, rows)
+        log(f"📊 구글시트 직접 쓰기 완료 ({len(rows)}행) — 탭: 27개사이트_트래픽")
     except Exception as e:
-        log(f"⚠️ 구글시트 전송 실패: {e}")
+        log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
 
 def main():

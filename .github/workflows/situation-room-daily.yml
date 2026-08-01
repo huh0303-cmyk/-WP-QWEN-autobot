@@ -23,10 +23,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - run: pip install requests pyjwt cryptography -q
+      - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
 
       - name: "종합상황실 수집 → 분석 → 발송"
         env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           TIKTOK_USERNAME: ${{ secrets.TIKTOK_USERNAME }}
