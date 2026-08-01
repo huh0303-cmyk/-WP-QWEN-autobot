@@ -219,8 +219,14 @@ def send_to_sheets(record):
         log("⚠️ SHEET_ID 또는 GOOGLE_OAUTH_* 시크릿 없음 — 시트 직접 쓰기 스킵")
         return
     try:
-        header = list(record.keys())
-        row = [record[k] for k in header]
+        # 기존 "Youtube-tiktok" 탭과 같은 구조(날짜가 아래로 쌓이고, 오른쪽으로
+        # YouTube/TikTok/Facebook/Instagram/Threads가 나열)로 단순화해서 기록.
+        # YouTube는 대표 채널(한국어 TOPIK)의 구독자수를 사용.
+        now = datetime.now(KST)
+        date_label = f"{now.year}-{now.month}-{now.day}-{weekday_kr(now.strftime('%Y-%m-%d'))}"
+        header = ["날짜", "YouTube", "TikTok", "Facebook", "Instagram", "Threads"]
+        row = [date_label, record.get("yt_한국어(TOPIK)_subs"), record.get("tiktok"),
+               record.get("facebook"), record.get("instagram"), record.get("threads")]
         gsheets_direct.append_tab_row(SHEET_ID, "종합상황실_기록", header, row)
         log("📊 구글시트 직접 쓰기 완료 — 탭: 종합상황실_기록")
     except Exception as e:
