@@ -345,10 +345,20 @@ def main():
 
     # 증감 계산
     yesterday_yt = yesterday.get("youtube", {})
+
+    def _yesterday_metric(label, key):
+        # situation_room_history.json의 예전 기록은 채널당 값이 dict가 아니라
+        # 구독자수 정수 하나였다(조회수 구분 이전 형식) — dict가 아니면 구독자수로
+        # 취급하고 조회수는 그 시절엔 기록이 없었으므로 None으로 처리한다.
+        y = yesterday_yt.get(label)
+        if isinstance(y, dict):
+            return y.get(key)
+        return y if key == "subs" else None
+
     yt_diffs = {
         label: {
-            "subs": diff(v.get("subs"), (yesterday_yt.get(label) or {}).get("subs")),
-            "views": diff(v.get("views"), (yesterday_yt.get(label) or {}).get("views")),
+            "subs": diff(v.get("subs"), _yesterday_metric(label, "subs")),
+            "views": diff(v.get("views"), _yesterday_metric(label, "views")),
         }
         for label, v in today["youtube"].items()
     }
