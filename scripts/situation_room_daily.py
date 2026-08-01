@@ -224,6 +224,25 @@ def send_to_sheets(record):
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
 
+def send_youtube_status_to_sheets(yt_stats, checked_at):
+    import gsheets_direct
+    if not SHEET_ID or not gsheets_direct.has_credentials():
+        return
+    try:
+        now = datetime.now(KST)
+        date_label = f"{now.year}-{now.month}-{now.day}"
+        channel_names = [label for label, _ in YOUTUBE_CHANNELS]
+        values_by_channel = {label: [yt_stats.get(label)] for label in channel_names}
+        # 27개사이트_트래픽과 같은 구조 — A열에 채널 이름을 세로로 고정,
+        # 실행할 때마다 오른쪽에 그날 날짜용 구독자수 컬럼을 추가한다.
+        gsheets_direct.append_dated_metric_columns(
+            SHEET_ID, "유튜브채널현황", channel_names, date_label, ["구독자수"], values_by_channel,
+        )
+        log("📊 구글시트 직접 쓰기 완료 — 탭: 유튜브채널현황")
+    except Exception as e:
+        log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
+
+
 def send_email(subject, body):
     if not GMAIL_APP_PASSWORD:
         log("⚠️ GMAIL_APP_PASSWORD 없음 — 이메일 스킵")
@@ -350,6 +369,7 @@ def main():
     for label, cnt in today["youtube"].items():
         record[f"yt_{label}"] = cnt
     send_to_sheets(record)
+    send_youtube_status_to_sheets(yt_stats, checked_at)
 
     send_email(f"[종합상황실] {checked_at[:10]} 현황 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
