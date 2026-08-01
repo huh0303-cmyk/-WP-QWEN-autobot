@@ -247,20 +247,17 @@ def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
         now = datetime.now(KST)
         date_label = f"{now.year}-{now.month}-{now.day}-{weekday_kr(now.strftime('%Y-%m-%d'))}"
         channel_names = [label for label, _ in YOUTUBE_CHANNELS]
-        values_by_channel = {}
+        # Youtube-tiktok/종합상황실_기록과 같은 방향 — 날짜가 아래로 쌓이고(행),
+        # 채널명은 오른쪽으로(열) 나열. 채널마다 구독자수/증가/조회수/증가 4컬럼.
+        header = ["날짜"]
+        row = [date_label]
         for label in channel_names:
             v = yt_stats.get(label, {})
             d = yt_diffs.get(label, {})
-            values_by_channel[label] = [
-                v.get("subs"), _fmt_diff_cell(d.get("subs")),
-                v.get("views"), _fmt_diff_cell(d.get("views")),
-            ]
-        # 27개사이트_트래픽과 같은 구조 — A열에 채널 이름을 세로로 고정,
-        # 실행할 때마다 오른쪽에 그날 날짜용 구독자수/증가/조회수/증가 컬럼을 추가한다.
-        gsheets_direct.append_dated_metric_columns(
-            SHEET_ID, "유튜브채널현황", channel_names, date_label,
-            ["구독자수", "증가", "조회수", "증가"], values_by_channel,
-        )
+            header += [f"{label} 구독자", f"{label} 증가", f"{label} 조회수", f"{label} 증가"]
+            row += [v.get("subs"), _fmt_diff_cell(d.get("subs")),
+                    v.get("views"), _fmt_diff_cell(d.get("views"))]
+        gsheets_direct.append_tab_row(SHEET_ID, "유튜브채널현황", header, row)
         log("📊 구글시트 직접 쓰기 완료 — 탭: 유튜브채널현황")
     except Exception as e:
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
