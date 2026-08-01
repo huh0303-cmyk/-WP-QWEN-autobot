@@ -20,7 +20,9 @@ import os
 import sys
 import json
 import time
+import random
 import requests
+import xml.etree.ElementTree as ET
 from datetime import date, timedelta, datetime, timezone
 
 GSC_KEY_JSON = os.environ.get("GSC_SERVICE_ACCOUNT_JSON", "")
@@ -163,6 +165,97 @@ def get_index_coverage(token, site_url):
     return {"indexed": total_indexed, "submitted_urls": total_submitted}, None
 
 
+def fetch_sitemap_urls(sitemap_url, max_urls=100, _depth=0):
+    """사이트맵(또는 사이트맵 인덱스) XML을 받아 실제 페이지 URL(<loc>) 목록을 반환.
+    sitemap_index.xml처럼 하위 사이트맵을 가리키기만 하는 경우 재귀적으로 하나씩
+    열어서 실제 URL이 나올 때까지 따라간다."""
+    if _depth > 3 or max_urls <= 0:
+        return []
+    try:
+        r = requests.get(sitemap_url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+        if r.status_code != 200:
+            return []
+        root = ET.fromstring(r.content)
+    except Exception:
+        return []
+
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locs = [el.text.strip() for el in root.findall(".//sm:url/sm:loc", ns) if el.text and el.text.strip()]
+    if locs:
+        return locs[:max_urls]
+
+    sub_sitemaps = [el.text.strip() for el in root.findall(".//sm:sitemap/sm:loc", ns) if el.text and el.text.strip()]
+    urls = []
+    for sub in sub_sitemaps:
+        urls += fetch_sitemap_urls(sub, max_urls=max_urls - len(urls), _depth=_depth + 1)
+        if len(urls) >= max_urls:
+            break
+    return urls[:max_urls]
+
+
+def inspect_url_index_status(token, site_url, page_url):
+    """URL 검사 API로 낱개 URL 하나의 실제 색인 여부(PASS=색인됨)를 확인.
+    이 결과가 Search Console 화면의 "색인 생성" 리포트와 같은 원천 데이터다
+    (사이트맵 API의 indexed 필드보다 훨씬 정확하지만, URL 하나씩만 조회 가능)."""
+    try:
+        r = requests.post(
+            "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={"inspectionUrl": page_url, "siteUrl": site_url},
+            timeout=20,
+        )
+        if r.status_code != 200:
+            return None
+        verdict = r.json()["inspectionResult"]["indexStatusResult"]["verdict"]
+        return verdict == "PASS"
+    except Exception:
+        return None
+
+
+def get_index_status_sample(token, site_url, sample_size=20):
+    """Search Console UI의 "색인 생성" 리포트(색인생성됨/안됨) 집계는 어떤
+    API로도 직접 제공되지 않아서, 사이트맵에서 URL을 모아 무작위로 표본을
+    뽑고 URL 검사 API로 하나씩 실제 색인 여부를 확인해 비율로 근사치를 낸다.
+    사이트맵 전체가 아니라 표본 기준이라 정확한 값은 아니지만, 사이트맵
+    API의 "indexed" 필드(항상 0으로 나오기로 악명 높음)보다는 실제에 훨씬 가깝다."""
+    encoded = requests.utils.quote(site_url, safe="")
+    r = gsc_get(token, f"/sites/{encoded}/sitemaps")
+    if r.status_code != 200:
+        return None, "사이트맵 목록 조회 실패"
+    sitemaps = r.json().get("sitemap", [])
+    if not sitemaps:
+        return None, "제출된 사이트맵 없음"
+
+    all_urls = []
+    for sm in sitemaps:
+        path = sm.get("path", "")
+        if not path:
+            continue
+        all_urls += fetch_sitemap_urls(path, max_urls=sample_size * 3 - len(all_urls))
+        if len(all_urls) >= sample_size * 3:
+            break
+
+    if not all_urls:
+        return None, "사이트맵에서 URL을 못 가져옴"
+
+    sample = random.sample(all_urls, min(sample_size, len(all_urls)))
+    indexed, checked = 0, 0
+    for u in sample:
+        result = inspect_url_index_status(token, site_url, u)
+        if result is None:
+            continue
+        checked += 1
+        if result:
+            indexed += 1
+        time.sleep(0.2)
+
+    if checked == 0:
+        return None, "URL 검사 결과 없음"
+    estimated_indexed = round(indexed / checked * len(all_urls))
+    return {"indexed_sample": indexed, "checked_sample": checked,
+            "total_urls": len(all_urls), "estimated_indexed": estimated_indexed}, None
+
+
 WEEKDAY_KR = ["월", "화", "수", "목", "금", "토", "일"]
 
 
@@ -254,11 +347,14 @@ def main():
             row.update(date=stats["date"], weekday=weekday_kr(stats["date"]),
                        clicks=stats["clicks"], impressions=stats["impressions"], status="정상")
 
-        coverage, cov_err = get_index_coverage(token, query_site)
+        coverage, cov_err = get_index_status_sample(token, query_site)
         if coverage:
-            row["indexed"] = coverage["indexed"]
-        log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인 {row['indexed']}"
-            f"{'' if coverage else f' ({cov_err})'}")
+            row["indexed"] = coverage["estimated_indexed"]
+            log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인(표본추정) "
+                f"{coverage['estimated_indexed']} (표본 {coverage['indexed_sample']}/"
+                f"{coverage['checked_sample']}, 전체 URL {coverage['total_urls']}개)")
+        else:
+            log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인 확인 실패 ({cov_err})")
 
         records.append(row)
         time.sleep(0.3)
