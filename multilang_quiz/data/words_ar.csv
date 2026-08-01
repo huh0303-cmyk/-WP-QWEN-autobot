@@ -1,0 +1,31 @@
+word,category,image_query,concept
+تفاحة,food,red apple fruit photo,apple
+موزة,food,banana fruit photo,banana
+كلب,animal,dog photo,dog
+قطة,animal,cat photo,cat
+كتاب,object,open book photo,book
+كرسي,object,wooden chair photo,chair
+طاولة,object,wooden table photo,table
+ماء,food,glass of water photo,water
+خبز,food,loaf of bread photo,bread
+حليب,food,glass of milk photo,milk
+منزل,place,small house photo,house
+سيارة,object,car photo,car
+شجرة,nature,tree photo,tree
+زهرة,nature,flower photo,flower
+شمس,nature,sun sky photo,sun
+قمر,nature,moon photo,moon
+نجمة,nature,star night sky photo,star
+طائر,animal,bird photo,bird
+سمكة,animal,fish photo,fish
+بيضة,food,egg photo,egg
+حذاء,clothing,shoe photo,shoe
+قبعة,clothing,hat photo,hat
+مظلة,object,umbrella photo,umbrella
+حقيبة,object,bag photo,bag
+قلم رصاص,object,pencil photo,pencil
+هاتف,object,smartphone photo,phone
+ساعة,object,clock photo,clock
+باب,object,door photo,door
+نافذة,object,window photo,window
+مفتاح,object,key photo,key

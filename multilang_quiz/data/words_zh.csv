@@ -1,0 +1,31 @@
+word,category,image_query,concept
+苹果,food,red apple fruit photo,apple
+香蕉,food,banana fruit photo,banana
+狗,animal,dog photo,dog
+猫,animal,cat photo,cat
+书,object,open book photo,book
+椅子,object,wooden chair photo,chair
+桌子,object,wooden table photo,table
+水,food,glass of water photo,water
+面包,food,loaf of bread photo,bread
+牛奶,food,glass of milk photo,milk
+房子,place,small house photo,house
+汽车,object,car photo,car
+树,nature,tree photo,tree
+花,nature,flower photo,flower
+太阳,nature,sun sky photo,sun
+月亮,nature,moon photo,moon
+星星,nature,star night sky photo,star
+鸟,animal,bird photo,bird
+鱼,animal,fish photo,fish
+鸡蛋,food,egg photo,egg
+鞋,clothing,shoe photo,shoe
+帽子,clothing,hat photo,hat
+雨伞,object,umbrella photo,umbrella
+包,object,bag photo,bag
+铅笔,object,pencil photo,pencil
+手机,object,smartphone photo,phone
+时钟,object,clock photo,clock
+门,object,door photo,door
+窗户,object,window photo,window
+钥匙,object,key photo,key

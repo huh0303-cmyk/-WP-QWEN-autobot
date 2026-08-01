@@ -40,9 +40,9 @@ jobs:
           echo "랜덤 대기: ${DELAY}초 (트리거 시각 -1h 기준이므로 최종 실행은 목표시각 ±1h 사이)"
           sleep $DELAY
 
-      - name: Generate 5-language quiz videos (한국어/영어/일본어/스페인어/베트남어 각 5문항)
+      - name: Generate 10-language quiz videos (한/영/일/스/베/불/독/중/아랍/러 각 5문항)
         run: |
-          for lang in ko en ja es vi; do
+          for lang in ko en ja es vi fr de zh ar ru; do
             python3 scripts/make_quiz_short_multi.py --lang $lang --n 5 --out_dir outputs
           done
 

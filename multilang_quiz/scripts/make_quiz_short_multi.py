@@ -27,6 +27,23 @@ from PIL import Image, ImageDraw, ImageFont
 from gtts import gTTS
 import requests
 
+try:
+    import arabic_reshaper
+    from bidi.algorithm import get_display as _bidi_display
+except ImportError:
+    arabic_reshaper = None
+    _bidi_display = None
+
+# 아랍어는 PIL이 문자를 그냥 순서대로만 그려서 글자 연결(shaping)과 방향(RTL)이
+# 깨지기 때문에, 화면에 그리기 직전에만 reshape+bidi 처리를 거친다(TTS/데이터
+# 원문은 그대로 둬야 하므로 draw 호출부에서만 이 함수를 통과시킨다).
+CURRENT_LANG = "en"
+
+def disp(text):
+    if CURRENT_LANG == "ar" and arabic_reshaper is not None:
+        return _bidi_display(arabic_reshaper.reshape(text))
+    return text
+
 def resolve_font(candidates):
     for path in candidates:
         if os.path.exists(path):
@@ -77,6 +94,24 @@ def ensure_vi_font():
             return None
     return VI_FONT_PATH if os.path.exists(VI_FONT_PATH) else None
 
+# Noto Sans는 키릴 문자(러시아어)도 폭넓게 커버해서 베트남어와 동일한 폰트를
+# 재사용한다(ensure_vi_font 이름은 그대로지만 실제로는 두 언어가 공유).
+
+# 아랍어는 Noto Sans에 글리프가 아예 없어서 전용 아랍 문자 폰트가 필요하다.
+AR_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansarabic/NotoSansArabic%5Bwdth,wght%5D.ttf"
+AR_FONT_PATH = os.path.join(tempfile.gettempdir(), "_quiz_notosans_arabic.ttf")
+
+def ensure_ar_font():
+    if not os.path.exists(AR_FONT_PATH):
+        try:
+            r = requests.get(AR_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(AR_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return None
+    return AR_FONT_PATH if os.path.exists(AR_FONT_PATH) else None
+
 # ------------------------- 언어별 설정 -------------------------
 LANG_CONFIG = {
     "en": {
@@ -113,6 +148,41 @@ LANG_CONFIG = {
         "font": CJK_FONT_CANDIDATES,
         "csv": "data/words_ko.csv", "brand": "TOPIK 초급 단어",
         "top_brand": "KIECA(한국국제교육문화협회)",
+    },
+    "fr": {
+        "name": "Français", "gtts_lang": "fr",
+        "question_text": "Qu'est-ce que c'est ?",
+        "font": LATIN_FONT_CANDIDATES,
+        "csv": "data/words_fr.csv", "brand": "Français de Base",
+        "top_brand": "Survival French",
+    },
+    "de": {
+        "name": "Deutsch", "gtts_lang": "de",
+        "question_text": "Was ist das?",
+        "font": LATIN_FONT_CANDIDATES,
+        "csv": "data/words_de.csv", "brand": "Deutsch Grundwortschatz",
+        "top_brand": "Survival German",
+    },
+    "zh": {
+        "name": "中文", "gtts_lang": "zh-CN",
+        "question_text": "这是什么？",
+        "font": CJK_FONT_CANDIDATES,
+        "csv": "data/words_zh.csv", "brand": "中文基础词汇",
+        "top_brand": "Survival Chinese",
+    },
+    "ar": {
+        "name": "العربية", "gtts_lang": "ar",
+        "question_text": "ما هذا؟",
+        "font": LATIN_FONT_CANDIDATES,  # ensure_ar_font()가 실패할 때만 쓰이는 폴백
+        "csv": "data/words_ar.csv", "brand": "العربية الأساسية",
+        "top_brand": "Survival Arabic",
+    },
+    "ru": {
+        "name": "Русский", "gtts_lang": "ru",
+        "question_text": "Что это?",
+        "font": LATIN_FONT_CANDIDATES,
+        "csv": "data/words_ru.csv", "brand": "Базовая лексика",
+        "top_brand": "Survival Russian",
     },
 }
 
@@ -282,6 +352,7 @@ OPT_H, OPT_GAP = 120, 22
 BOTTOM_BRAND_Y = 1850
 
 def draw_header(draw, font_path, brand_text, highlight):
+    brand_text = disp(brand_text)
     rounded_rect(draw, HEADER_BOX, 40, fill=highlight)
     size = 68
     while size > 30:
@@ -317,6 +388,7 @@ def draw_picture_card(img, draw, image_path, countdown=None, font_countdown=None
 
 def draw_options(draw, options, font_opt, font_label, highlight=None, correct_idx=None):
     for i, opt in enumerate(options):
+        opt = disp(opt)
         oy = OPT_TOP_Y + i * (OPT_H + OPT_GAP)
         box = (90, oy, W - 90, oy + OPT_H)
         is_correct = correct_idx is not None and i == correct_idx
@@ -347,8 +419,9 @@ def draw_question_frame(item, cfg, theme, image_path, seconds, fonts):
         img, draw = draw_base_frame(theme["bg"], cfg, theme, fonts)
         draw_picture_card(img, draw, image_path, countdown=sec_left, font_countdown=font_countdown)
 
-        q_bbox = draw.textbbox((0, 0), cfg["question_text"], font=font_q)
-        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, QUESTION_Y), cfg["question_text"], font=font_q, fill=BLACK)
+        q_text = disp(cfg["question_text"])
+        q_bbox = draw.textbbox((0, 0), q_text, font=font_q)
+        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, QUESTION_Y), q_text, font=font_q, fill=BLACK)
 
         draw_options(draw, item["options"], font_opt, font_label)
         frames.append(img)
@@ -361,8 +434,9 @@ def draw_answer_frame(item, cfg, theme, image_path, seconds, fonts):
         img, draw = draw_base_frame(theme["bg"], cfg, theme, fonts)
         draw_picture_card(img, draw, image_path)
 
-        q_bbox = draw.textbbox((0, 0), cfg["question_text"], font=font_q)
-        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, QUESTION_Y), cfg["question_text"], font=font_q, fill=BLACK)
+        q_text = disp(cfg["question_text"])
+        q_bbox = draw.textbbox((0, 0), q_text, font=font_q)
+        draw.text(((W - (q_bbox[2]-q_bbox[0])) // 2, QUESTION_Y), q_text, font=font_q, fill=BLACK)
 
         draw_options(draw, item["options"], font_opt, font_label,
                      highlight=theme["highlight"], correct_idx=item["answer_idx"])
@@ -386,11 +460,18 @@ def main():
     items = build_quiz_items(words, args.n)
     theme = random.choice(THEMES)  # 영상 전체에서 테마 하나로 고정
 
-    lang_font_path = resolve_font(cfg["font"])
-    if args.lang == "vi":
-        lang_font_path = ensure_vi_font() or lang_font_path
-    elif cfg["font"] is LATIN_FONT_CANDIDATES:
-        lang_font_path = ensure_latin_headline_font() or lang_font_path
+    global CURRENT_LANG
+    CURRENT_LANG = args.lang
+
+    if args.lang == "ar":
+        lang_font_path = ensure_ar_font() or resolve_font(cfg["font"])
+    elif args.lang in ("vi", "ru"):
+        # Noto Sans(가변 폰트)가 베트남어 성조 결합기호와 키릴 문자를 둘 다 커버해서 공유
+        lang_font_path = ensure_vi_font() or resolve_font(cfg["font"])
+    else:
+        lang_font_path = resolve_font(cfg["font"])
+        if cfg["font"] is LATIN_FONT_CANDIDATES:
+            lang_font_path = ensure_latin_headline_font() or lang_font_path
 
     font_q = load_font(lang_font_path, 56)
     font_opt = load_font(lang_font_path, 50)
