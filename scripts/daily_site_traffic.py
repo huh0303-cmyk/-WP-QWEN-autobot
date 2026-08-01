@@ -190,8 +190,8 @@ def send_to_sheets(records):
         log("⚠️ SHEET_ID 또는 GOOGLE_OAUTH_* 시크릿 없음 — 시트 직접 쓰기 스킵")
         return
     try:
-        header = ["도메인", "일일방문자수", "색인수"]
-        rows = [[r["domain"], r["clicks"], r["indexed"]] for r in records]
+        header = ["도메인", "날짜", "일일방문자수", "색인수"]
+        rows = [[r["domain"], r["date"], r["clicks"], r["indexed"]] for r in records]
         gsheets_direct.replace_tab_rows(SHEET_ID, "27개사이트_트래픽", header, rows)
         log(f"📊 구글시트 직접 쓰기 완료 ({len(rows)}행) — 탭: 27개사이트_트래픽")
     except Exception as e:
