@@ -211,13 +211,20 @@ def main():
         domain = site_url.rstrip("/").replace("https://", "")
         row = dict(base_row, domain=domain, checked_at=checked_at)
 
-        if site_url not in accessible:
+        # 같은 사이트라도 서치콘솔에 "URL 접두어(https://...)"가 아니라
+        # "도메인 속성(sc-domain:...)"으로 등록돼 있을 수 있어서 둘 다 확인한다.
+        domain_property = f"sc-domain:{domain}"
+        if site_url in accessible:
+            query_site = site_url
+        elif domain_property in accessible:
+            query_site = domain_property
+        else:
             no_access.append(domain)
             row["status"] = "권한없음"
             records.append(row)
             continue
 
-        stats, err = latest_daily_stats(token, site_url)
+        stats, err = latest_daily_stats(token, query_site)
         if err:
             log(f"  [{i}/{len(SITES)}] {domain}: {err}")
             row["status"] = err
@@ -225,7 +232,7 @@ def main():
             row.update(date=stats["date"], weekday=weekday_kr(stats["date"]),
                        clicks=stats["clicks"], impressions=stats["impressions"], status="정상")
 
-        coverage, cov_err = get_index_coverage(token, site_url)
+        coverage, cov_err = get_index_coverage(token, query_site)
         if coverage:
             row["indexed"] = coverage["indexed"]
         log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인 {row['indexed']}"

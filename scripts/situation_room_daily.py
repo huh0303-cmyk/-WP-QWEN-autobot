@@ -94,25 +94,30 @@ def collect_site_summary():
         return {"total_clicks": None, "total_indexed": None, "error_sites": [], "error": str(e)[:200]}
 
     accessible_resp = gsc_get(token, "/sites")
-    log(f"   [디버그] /sites 응답 HTTP {accessible_resp.status_code}: {accessible_resp.text[:300]}")
     accessible = set()
     if accessible_resp.status_code == 200:
         accessible = {s.get("siteUrl") for s in accessible_resp.json().get("siteEntry", [])}
+    log(f"   접근 가능한 GSC 사이트: {len(accessible)}개 / 전체 {len(SITES)}개")
 
     total_clicks = 0
     total_indexed = 0
     error_sites = []
     for site_url in SITES:
         domain = site_url.rstrip("/").replace("https://", "")
-        if site_url not in accessible:
+        domain_property = f"sc-domain:{domain}"
+        if site_url in accessible:
+            query_site = site_url
+        elif domain_property in accessible:
+            query_site = domain_property
+        else:
             error_sites.append(domain)
             continue
-        stats, err = latest_daily_stats(token, site_url)
+        stats, err = latest_daily_stats(token, query_site)
         if stats:
             total_clicks += stats["clicks"]
         else:
             error_sites.append(domain)
-        coverage, _ = get_index_coverage(token, site_url)
+        coverage, _ = get_index_coverage(token, query_site)
         if coverage:
             total_indexed += coverage["indexed"]
         time.sleep(0.2)
