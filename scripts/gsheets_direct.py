@@ -128,3 +128,89 @@ def append_tab_rows(spreadsheet_id, tab_name, header, rows):
         insertDataOption="INSERT_ROWS",
         body={"values": rows},
     ).execute()
+
+
+def _col_letter(idx0):
+    """0-기준 컬럼 인덱스를 A1 표기 문자로 변환 (0->A, 1->B, 26->AA ...)."""
+    s = ""
+    idx = idx0 + 1
+    while idx:
+        idx, rem = divmod(idx - 1, 26)
+        s = chr(65 + rem) + s
+    return s
+
+
+def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, metric_labels, values_by_domain):
+    """기존 "Youtube-tiktok" 탭과 같은 구조 — A열에 항목(사이트 도메인)을
+    세로로 한 번만 고정해두고, 새 날짜가 생길 때마다 오른쪽에 그 날짜용
+    컬럼 묶음(metric_labels 개수만큼, 예: 일일방문자수/색인수)을 추가한다.
+    1행=날짜(병합), 2행=지표 라벨, 3행부터=도메인별 값.
+
+    values_by_domain: {도메인: [지표1값, 지표2값, ...]} — domains 순서와
+    무관하게 딕셔너리로 넘기면 도메인 순서에 맞춰 정렬해서 채운다."""
+    service = get_sheets_service()
+    n_metrics = len(metric_labels)
+    tab_id = _get_tab_id(service, spreadsheet_id, tab_name)
+
+    if tab_id is not None:
+        # 이전 구조(행 기반 로그 등)가 남아있으면 A1이 비어있지 않다 — 이 구조는
+        # A1을 항상 비워두므로, A1에 값이 있으면 옛날 구조로 보고 통째로 다시 만든다.
+        a1 = service.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1",
+        ).execute().get("values", [[]])
+        if a1 and a1[0] and a1[0][0]:
+            service.spreadsheets().batchUpdate(
+                spreadsheetId=spreadsheet_id,
+                body={"requests": [{"deleteSheet": {"sheetId": tab_id}}]},
+            ).execute()
+            tab_id = None
+
+    if tab_id is None:
+        resp = service.spreadsheets().batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body={"requests": [{"addSheet": {"properties": {"title": tab_name}}}]},
+        ).execute()
+        tab_id = resp["replies"][0]["addSheet"]["properties"]["sheetId"]
+        service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{tab_name}'!A3",
+            valueInputOption="RAW",
+            body={"values": [[d] for d in domains]},
+        ).execute()
+        start_col = 1  # B열(0-기준 인덱스 1)부터 시작
+    else:
+        row1 = service.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!1:1",
+        ).execute().get("values", [[]])
+        existing_width = len(row1[0]) if row1 else 0
+        start_col = max(existing_width, 1)
+
+    end_col = start_col + n_metrics - 1
+    start_letter = _col_letter(start_col)
+
+    if n_metrics > 1:
+        service.spreadsheets().batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body={"requests": [{
+                "mergeCells": {
+                    "range": {"sheetId": tab_id, "startRowIndex": 0, "endRowIndex": 1,
+                              "startColumnIndex": start_col, "endColumnIndex": end_col + 1},
+                    "mergeType": "MERGE_ALL",
+                },
+            }]},
+        ).execute()
+
+    service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!{start_letter}1",
+        valueInputOption="RAW", body={"values": [[date_label]]},
+    ).execute()
+    service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!{start_letter}2",
+        valueInputOption="RAW", body={"values": [metric_labels]},
+    ).execute()
+
+    data_rows = [values_by_domain.get(d, [""] * n_metrics) for d in domains]
+    service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!{start_letter}3",
+        valueInputOption="RAW", body={"values": data_rows},
+    ).execute()
