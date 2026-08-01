@@ -148,9 +148,12 @@ def collect_youtube_all():
     for label, cid in YOUTUBE_CHANNELS:
         it = items.get(cid)
         if it:
-            result[label] = int(it["statistics"].get("subscriberCount", 0))
+            result[label] = {
+                "subs": int(it["statistics"].get("subscriberCount", 0)),
+                "views": int(it["statistics"].get("viewCount", 0)),
+            }
         else:
-            result[label] = None
+            result[label] = {"subs": None, "views": None}
     return result, None
 
 
@@ -224,7 +227,13 @@ def send_to_sheets(record):
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
 
-def send_youtube_status_to_sheets(yt_stats, checked_at):
+def _fmt_diff_cell(d):
+    if d is None:
+        return ""
+    return f"+{d}" if d >= 0 else str(d)
+
+
+def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
     import gsheets_direct
     if not SHEET_ID or not gsheets_direct.has_credentials():
         return
@@ -232,11 +241,19 @@ def send_youtube_status_to_sheets(yt_stats, checked_at):
         now = datetime.now(KST)
         date_label = f"{now.year}-{now.month}-{now.day}"
         channel_names = [label for label, _ in YOUTUBE_CHANNELS]
-        values_by_channel = {label: [yt_stats.get(label)] for label in channel_names}
+        values_by_channel = {}
+        for label in channel_names:
+            v = yt_stats.get(label, {})
+            d = yt_diffs.get(label, {})
+            values_by_channel[label] = [
+                v.get("subs"), _fmt_diff_cell(d.get("subs")),
+                v.get("views"), _fmt_diff_cell(d.get("views")),
+            ]
         # 27개사이트_트래픽과 같은 구조 — A열에 채널 이름을 세로로 고정,
-        # 실행할 때마다 오른쪽에 그날 날짜용 구독자수 컬럼을 추가한다.
+        # 실행할 때마다 오른쪽에 그날 날짜용 구독자수/증가/조회수/증가 컬럼을 추가한다.
         gsheets_direct.append_dated_metric_columns(
-            SHEET_ID, "유튜브채널현황", channel_names, date_label, ["구독자수"], values_by_channel,
+            SHEET_ID, "유튜브채널현황", channel_names, date_label,
+            ["구독자수", "증가", "조회수", "증가"], values_by_channel,
         )
         log("📊 구글시트 직접 쓰기 완료 — 탭: 유튜브채널현황")
     except Exception as e:
@@ -309,8 +326,8 @@ def main():
 
     log("2/4 유튜브 전 채널 구독자 수집 중...")
     yt_stats, yt_err = collect_youtube_all()
-    for label, cnt in yt_stats.items():
-        log(f"   {label}: {cnt}")
+    for label, v in yt_stats.items():
+        log(f"   {label}: 구독자 {v['subs']} / 조회수 {v['views']}")
 
     log("3/4 기타 SNS 수집 중...")
     tiktok, _ = get_tiktok_followers()
@@ -327,8 +344,14 @@ def main():
     }
 
     # 증감 계산
-    yt_diffs = {label: diff(today["youtube"].get(label), yesterday.get("youtube", {}).get(label))
-                for label in today["youtube"]}
+    yesterday_yt = yesterday.get("youtube", {})
+    yt_diffs = {
+        label: {
+            "subs": diff(v.get("subs"), (yesterday_yt.get(label) or {}).get("subs")),
+            "views": diff(v.get("views"), (yesterday_yt.get(label) or {}).get("views")),
+        }
+        for label, v in today["youtube"].items()
+    }
     d_site_clicks = diff(today["site_clicks"], yesterday.get("site_clicks"))
     d_site_indexed = diff(today["site_indexed"], yesterday.get("site_indexed"))
     d_tiktok = diff(today["tiktok"], yesterday.get("tiktok"))
@@ -346,8 +369,10 @@ def main():
         f"사이트 클릭 합계: {today['site_clicks']} {fmt_diff(d_site_clicks)}",
         f"사이트 색인 합계: {today['site_indexed']} {fmt_diff(d_site_indexed)}",
     ]
-    for label, cnt in today["youtube"].items():
-        summary_lines.append(f"유튜브 {label}: {cnt} {fmt_diff(yt_diffs.get(label))}")
+    for label, v in today["youtube"].items():
+        d = yt_diffs.get(label, {})
+        summary_lines.append(f"유튜브 {label}: 구독자 {v['subs']} {fmt_diff(d.get('subs'))} "
+                              f"/ 조회수 {v['views']} {fmt_diff(d.get('views'))}")
     summary_lines.append(f"TikTok: {today['tiktok']} {fmt_diff(d_tiktok)}")
     summary_lines.append(f"Facebook: {today['facebook']} {fmt_diff(d_facebook)}")
     summary_lines.append(f"Instagram: {today['instagram']} {fmt_diff(d_instagram)}")
@@ -366,10 +391,11 @@ def main():
               "site_indexed": today["site_indexed"], "tiktok": today["tiktok"],
               "facebook": today["facebook"], "instagram": today["instagram"],
               "threads": today["threads"], "analysis": analysis}
-    for label, cnt in today["youtube"].items():
-        record[f"yt_{label}"] = cnt
+    for label, v in today["youtube"].items():
+        record[f"yt_{label}_subs"] = v["subs"]
+        record[f"yt_{label}_views"] = v["views"]
     send_to_sheets(record)
-    send_youtube_status_to_sheets(yt_stats, checked_at)
+    send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at)
 
     send_email(f"[종합상황실] {checked_at[:10]} 현황 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
