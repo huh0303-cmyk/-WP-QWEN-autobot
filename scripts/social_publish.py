@@ -346,7 +346,11 @@ def main():
     )
 
     log(f"완료 — 성공 {ok_count} / 스킵 {skip_count} / 실패 {fail_count}")
-    if fail_count > 0:
+    # 플랫폼별 실패는 서로 독립적이라는 설계 원칙(파일 상단 docstring 참고)대로,
+    # 개별 플랫폼 실패(예: 페이스북 권한 문제)가 워크플로 전체를 매일 "실패"로
+    # 표시하게 만들지 않는다 — 결과는 이미 이메일/publish_result_*.json으로 보고됨.
+    # 유튜브(핵심 플랫폼)조차 아무것도 성공 못 했을 때만 CI를 실패로 표시한다.
+    if ok_count == 0:
         raise SystemExit(1)
 
 
