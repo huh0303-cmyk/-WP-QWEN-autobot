@@ -23,19 +23,19 @@ SOCIAL_LANGS = ["en", "ja", "es", "vi"]
 META = {
     "en": {
         "title": "5-Second English Word Quiz | Beginner Vocabulary",
-        "desc": "Test your English vocabulary in 5 seconds! Beginner-level words with pictures.\n#EnglishQuiz #LearnEnglish #Vocabulary #SeoulInternationalUniversity",
+        "desc": "Test your English vocabulary in 5 seconds! Beginner-level words with pictures.\n#EnglishQuiz #LearnEnglish #Vocabulary #SurvivalEnglish",
     },
     "ja": {
         "title": "5秒で答える日本語単語クイズ | 初級ボキャブラリー",
-        "desc": "5秒以内に答えてみよう！写真で覚える初級日本語単語。\n#日本語クイズ #日本語勉強 #JLPT #서울국제대학교",
+        "desc": "5秒以内に答えてみよう！写真で覚える初級日本語単語。\n#日本語クイズ #日本語勉強 #JLPT #SurvivalJapanese",
     },
     "es": {
         "title": "Quiz de Vocabulario en Español en 5 Segundos | Nivel Básico",
-        "desc": "¡Responde en 5 segundos! Vocabulario básico en español con imágenes.\n#EspañolQuiz #AprenderEspañol #Vocabulario #SeoulInternationalUniversity",
+        "desc": "¡Responde en 5 segundos! Vocabulario básico en español con imágenes.\n#EspañolQuiz #AprenderEspañol #Vocabulario #SurvivalSpanish",
     },
     "vi": {
         "title": "Đố Từ Vựng Tiếng Việt Trong 5 Giây | Trình Độ Cơ Bản",
-        "desc": "Trả lời trong 5 giây! Từ vựng tiếng Việt cơ bản kèm hình ảnh.\n#TiengVietQuiz #HocTiengViet #TuVung #SeoulInternationalUniversity",
+        "desc": "Trả lời trong 5 giây! Từ vựng tiếng Việt cơ bản kèm hình ảnh.\n#TiengVietQuiz #HocTiengViet #TuVung #SurvivalVietnamese",
     },
     "ko": {
         "title": "5초 안에 맞히는 TOPIK 초급 단어 퀴즈",
