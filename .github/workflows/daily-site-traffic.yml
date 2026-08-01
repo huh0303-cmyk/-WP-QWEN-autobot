@@ -1,0 +1,29 @@
+name: 27개 사이트 방문자/색인 현황 (매일 아침 구글시트 업데이트)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 22 * * *"   # 07:00 KST (전날 22:00 UTC)
+
+concurrency:
+  group: daily-site-traffic
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests pyjwt -q
+
+      - name: "사이트 트래픽/색인 현황 조회 → 구글시트 전송"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+        run: python scripts/daily_site_traffic.py
