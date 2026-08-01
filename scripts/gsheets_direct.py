@@ -36,7 +36,10 @@ def get_sheets_service():
         token_uri="https://oauth2.googleapis.com/token",
         client_id=GOOGLE_OAUTH_CLIENT_ID,
         client_secret=GOOGLE_OAUTH_CLIENT_SECRET,
-        scopes=["https://www.googleapis.com/auth/spreadsheets"],
+        # 이 리프레시 토큰은 원래 "drive" 스코프로만 발급됨(youtube_playlist_maker.py
+        # 등 다른 스크립트와 공용) — 여기서 다른 스코프를 지정하면 리프레시 자체가
+        # invalid_scope로 거부된다. Sheets API는 drive 스코프도 유효하게 인정한다.
+        scopes=["https://www.googleapis.com/auth/drive"],
     )
     return build("sheets", "v4", credentials=creds)
 
