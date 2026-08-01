@@ -190,10 +190,18 @@ def send_to_sheets(records):
         log("⚠️ SHEET_ID 또는 GOOGLE_OAUTH_* 시크릿 없음 — 시트 직접 쓰기 스킵")
         return
     try:
-        header = ["도메인", "날짜", "요일", "일일방문자수", "색인수"]
-        rows = [[r["domain"], r["date"], r["weekday"], r["clicks"], r["indexed"]] for r in records]
-        gsheets_direct.replace_tab_rows(SHEET_ID, "27개사이트_트래픽", header, rows)
-        log(f"📊 구글시트 직접 쓰기 완료 ({len(rows)}행) — 탭: 27개사이트_트래픽")
+        def fmt_date(r):
+            if not r["date"]:
+                return ""
+            y, m, d = (int(x) for x in r["date"].split("-"))
+            return f"{y}-{m}-{d}-{r['weekday']}"
+
+        header = ["도메인", "날짜", "일일방문자수", "색인수"]
+        rows = [[r["domain"], fmt_date(r), r["clicks"], r["indexed"]] for r in records]
+        # 스냅샷(매번 덮어쓰기)이 아니라 날짜별로 계속 쌓이는 기록으로 남겨서
+        # 날짜를 쭉 나열하며 추세를 비교할 수 있게 한다(종합상황실_기록과 동일 방식).
+        gsheets_direct.append_tab_rows(SHEET_ID, "27개사이트_트래픽", header, rows)
+        log(f"📊 구글시트 직접 쓰기 완료 ({len(rows)}행 추가) — 탭: 27개사이트_트래픽")
     except Exception as e:
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 

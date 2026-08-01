@@ -53,10 +53,28 @@ def _get_tab_id(service, spreadsheet_id, tab_name):
 
 
 def ensure_tab(service, spreadsheet_id, tab_name, header):
-    """탭이 없으면 새로 만들고 헤더 행을 써넣는다. 이미 있으면 아무것도 하지 않는다."""
+    """탭이 없으면 새로 만들고 헤더 행을 써넣는다. 이미 있는데 헤더 구성이
+    바뀌었으면(컬럼 추가/삭제 등) 예전 데이터와 안 섞이게 탭을 통째로
+    비우고 새 헤더로 다시 시작한다."""
     tab_id = _get_tab_id(service, spreadsheet_id, tab_name)
     if tab_id is not None:
+        existing = service.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:Z1",
+        ).execute().get("values", [[]])
+        existing_header = existing[0] if existing else []
+        if existing_header == header:
+            return tab_id
+        service.spreadsheets().values().clear(
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:Z",
+        ).execute()
+        service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{tab_name}'!A1",
+            valueInputOption="RAW",
+            body={"values": [header]},
+        ).execute()
         return tab_id
+
     resp = service.spreadsheets().batchUpdate(
         spreadsheetId=spreadsheet_id,
         body={"requests": [{"addSheet": {"properties": {"title": tab_name}}}]},
@@ -92,12 +110,21 @@ def replace_tab_rows(spreadsheet_id, tab_name, header, rows):
 def append_tab_row(spreadsheet_id, tab_name, header, row):
     """탭을 계속 쌓이는 로그로 유지 — 종합상황실처럼 어제 대비 증감을
     비교해야 하는 일별 기록에 적합."""
+    append_tab_rows(spreadsheet_id, tab_name, header, [row])
+
+
+def append_tab_rows(spreadsheet_id, tab_name, header, rows):
+    """append_tab_row의 여러 행 버전 — 27개 사이트처럼 하루에 여러 행을
+    한 번에 쌓아서, 날짜별로 쭉 이어지는 기록으로 날짜 간 비교가
+    가능하게 한다."""
     service = get_sheets_service()
     ensure_tab(service, spreadsheet_id, tab_name, header)
+    if not rows:
+        return
     service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
         range=f"'{tab_name}'!A1",
         valueInputOption="RAW",
         insertDataOption="INSERT_ROWS",
-        body={"values": [row]},
+        body={"values": rows},
     ).execute()
