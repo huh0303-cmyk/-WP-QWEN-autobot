@@ -7,7 +7,13 @@ health_longform.py
 
 주제 하나를 받아서: 대본(JSON, beats 단위) → 앞 3개 AI 영상 클립(Veo) +
 나머지 정지 이미지(Ken Burns 효과) → TTS 내레이션 → 최종 mp4 조립 →
-음식 이미지 포함 썸네일까지 만든다.
+자막(SRT, 유튜브 업로드용) → 음식 이미지 포함 썸네일까지 만든다.
+
+자막은 burn-in이 아니라 표준 SRT 파일로 만든다 — 실제 조회수 100만대
+건강 채널(닥터딩요 등) 벤치마킹 결과, 화려한 애니메이션 자막보다 유튜브
+기본 스타일(흰 글씨 + 반투명 검은 박스, 하단 중앙, 한 줄)이 신뢰감 있는
+건강 채널의 표준이었음 (2026-08-03 확인). 유튜브 자막 업로드 시 자동으로
+그 스타일로 렌더링된다.
 
 이 스크립트가 지켜야 하는 고정 규칙은 scripts/health_longform_rules.py에
 있다 (대본에 음식 섹션 필수, 썸네일에 음식 이미지 필수, 언어별 순서 셔플 등).
@@ -255,6 +261,45 @@ def normalize_intro_clip(raw_path, audio_path, out_path):
         "-shortest" if audio_dur < video_dur else "-y",
         out_path,
     ])
+    return max(audio_dur, video_dur)
+
+
+# ════════════════════════════════════════════════════════════
+# 자막(SRT) — 잘 나가는 건강 채널 벤치마킹 결과: 화려한 애니메이션 자막이 아니라
+# 유튜브 기본 스타일(흰 글씨 + 반투명 검은 박스, 하단 중앙, 한 줄) 그대로 감.
+# 그래서 burn-in 대신 표준 SRT를 만들어 유튜브 자막 업로드로 사용한다 —
+# 유튜브가 그 기본 스타일로 알아서 렌더링해준다.
+# ════════════════════════════════════════════════════════════
+def format_srt_timestamp(seconds):
+    ms = int(round(seconds * 1000))
+    h, ms = divmod(ms, 3600000)
+    m, ms = divmod(ms, 60000)
+    s, ms = divmod(ms, 1000)
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+
+def split_narration_for_captions(text, duration, max_chars=32):
+    """긴 나레이션 한 덩어리를 문장 단위로 쪼개고, 길이 비례로 구간 시간을 나눈다.
+    한 화면에 너무 많은 글자가 몰리지 않게(가독성) max_chars 기준으로 줄바꿈."""
+    import re
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?。！？])\s+", text.strip()) if s.strip()]
+    if not sentences:
+        return [(text.strip(), duration)]
+    total_len = sum(len(s) for s in sentences) or 1
+    return [(s, duration * len(s) / total_len) for s in sentences]
+
+
+def append_srt_entries(srt_entries, cursor, narration, duration):
+    for sentence, seg_dur in split_narration_for_captions(narration, duration):
+        srt_entries.append((cursor, cursor + seg_dur, sentence))
+        cursor += seg_dur
+    return cursor
+
+
+def write_srt(srt_entries, out_path):
+    with open(out_path, "w", encoding="utf-8") as f:
+        for i, (start, end, text) in enumerate(srt_entries, 1):
+            f.write(f"{i}\n{format_srt_timestamp(start)} --> {format_srt_timestamp(end)}\n{text}\n\n")
 
 
 # ════════════════════════════════════════════════════════════
@@ -469,6 +514,9 @@ def main():
         json.dump(data, f, ensure_ascii=False, indent=2)
     log(f"   총 {len(beats)}개 비트, 음식: {data.get('foods')}")
 
+    srt_entries = []
+    cursor = 0.0
+
     log("2/5 앞부분 AI 영상 클립 생성 중 (Veo)...")
     clip_paths = []
     intro_beats = [b for b in beats if b["type"] == "intro_video"]
@@ -480,14 +528,16 @@ def main():
         if os.path.exists(clip):
             log("      (이미 생성됨, 재사용)")
             clip_paths.append(clip)
+            cursor = append_srt_entries(srt_entries, cursor, beat["narration"], get_duration(clip))
             continue
         if not elevenlabs_tts(beat["narration"], audio):
             audio = audio.replace(".mp3", ".m4a")
             make_silence(audio, RULES.INTRO_VIDEO_DURATION_SECONDS)
         if not os.path.exists(raw):
             generate_intro_video(beat["video_prompt"], raw)
-        normalize_intro_clip(raw, audio, clip)
+        clip_dur = normalize_intro_clip(raw, audio, clip)
         clip_paths.append(clip)
+        cursor = append_srt_entries(srt_entries, cursor, beat["narration"], clip_dur)
 
     log("3/5 나머지 정지 이미지(Ken Burns) 생성 중...")
     image_beats = [b for b in beats if b["type"] == "image"]
@@ -502,8 +552,9 @@ def main():
             audio = audio.replace(".mp3", ".m4a")
             make_silence(audio, 6.0)
         clip = os.path.join(workdir, f"img_clip_{idx}.mp4")
-        ken_burns_clip(img_path, audio, clip, zoom_in=(idx % 2 == 0))
+        clip_dur = ken_burns_clip(img_path, audio, clip, zoom_in=(idx % 2 == 0))
         clip_paths.append(clip)
+        cursor = append_srt_entries(srt_entries, cursor, beat["narration"], clip_dur)
         time.sleep(2)  # 이미지 생성 API 레이트리밋 방지용 페이싱
 
     log("4/5 최종 영상 이어붙이는 중...")
@@ -511,6 +562,11 @@ def main():
     concat_clips(clip_paths, final_path, workdir)
     dur = get_duration(final_path)
     log(f"   ✅ 영상 완성: {final_path} ({dur/60:.1f}분)")
+
+    srt_path = os.path.join(workdir, f"subtitles_{lang}.srt")
+    write_srt(srt_entries, srt_path)
+    log(f"   ✅ 자막 완성: {srt_path} (유튜브 자막 업로드용 - 잘 나가는 건강채널 벤치마킹한 "
+        f"기본 흰글씨/검은박스 스타일로 유튜브가 렌더링함)")
 
     log("5/5 썸네일 생성 중...")
     thumb_path = build_thumbnail(topic, lang, data.get("thumbnail_lines", {}), data.get("foods", []), workdir)
@@ -522,6 +578,7 @@ def main():
         "duration_sec": dur,
         "video_path": final_path,
         "thumbnail_path": thumb_path,
+        "subtitle_path": srt_path,
         "foods": data.get("foods", []),
     }
     with open(os.path.join(workdir, "meta.json"), "w", encoding="utf-8") as f:
