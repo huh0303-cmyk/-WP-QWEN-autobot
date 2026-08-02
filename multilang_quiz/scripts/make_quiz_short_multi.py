@@ -190,7 +190,34 @@ W, H = 1080, 1920
 FPS = 30
 WORKDIR = "build"
 ASSETS = "assets"
-KO_FONT = resolve_font(CJK_FONT_CANDIDATES)
+
+# CJK(한/일/중) 폰트 - GitHub Actions(Ubuntu, fonts-noto-cjk 설치됨)에선 시스템
+# 경로를 바로 쓰고, 그 경로가 없는 환경(로컬 Windows 등)에서는 언어별 무료
+# 구글 폰트를 다운로드해서 대체한다 (ensure_vi_font/ensure_ar_font와 동일 패턴).
+CJK_FONT_URLS = {
+    "ko": ("https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-ExtraBold.ttf",
+           "_quiz_nanumgothic_ko.ttf"),
+    "ja": ("https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf",
+           "_quiz_notosans_ja.ttf"),
+    "zh": ("https://raw.githubusercontent.com/google/fonts/main/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+           "_quiz_notosans_zh.ttf"),
+}
+
+def ensure_cjk_font(lang="ko"):
+    for path in CJK_FONT_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    url, fname = CJK_FONT_URLS.get(lang, CJK_FONT_URLS["ko"])
+    path = os.path.join(tempfile.gettempdir(), fname)
+    if not os.path.exists(path):
+        try:
+            r = requests.get(url, timeout=30)
+            r.raise_for_status()
+            with open(path, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return None
+    return path if os.path.exists(path) else None
 
 # 영상 하나당 테마(배경색 + 포인트/하이라이트색) 하나를 고정으로 쓴다.
 # 문항마다 색이 바뀌면 뒤죽박죽으로 보여서 일부러 통일감을 준다.
@@ -290,7 +317,7 @@ def make_fallback_card(word, out_path, size=(900, 900)):
     draw = ImageDraw.Draw(img)
     draw.ellipse((size[0]//2-260, size[1]//2-260, size[0]//2+260, size[1]//2+260), fill="#D8D8D8")
     try:
-        font = ImageFont.truetype(KO_FONT, 160)
+        font = ImageFont.truetype(ensure_cjk_font("ko"), 160)
         ch = word[0] if word else "?"
         bbox = draw.textbbox((0, 0), ch, font=font)
         draw.text(((size[0]-(bbox[2]-bbox[0]))//2, (size[1]-(bbox[3]-bbox[1]))//2-40), ch, font=font, fill="#999999")
@@ -468,16 +495,18 @@ def main():
     elif args.lang in ("vi", "ru"):
         # Noto Sans(가변 폰트)가 베트남어 성조 결합기호와 키릴 문자를 둘 다 커버해서 공유
         lang_font_path = ensure_vi_font() or resolve_font(cfg["font"])
+    elif cfg["font"] is CJK_FONT_CANDIDATES:
+        lang_font_path = ensure_cjk_font(args.lang) or resolve_font(cfg["font"])
+    elif cfg["font"] is LATIN_FONT_CANDIDATES:
+        lang_font_path = ensure_latin_headline_font() or resolve_font(cfg["font"])
     else:
         lang_font_path = resolve_font(cfg["font"])
-        if cfg["font"] is LATIN_FONT_CANDIDATES:
-            lang_font_path = ensure_latin_headline_font() or lang_font_path
 
     font_q = load_font(lang_font_path, 56)
     font_opt = load_font(lang_font_path, 50)
     font_label = load_font(lang_font_path, 40)
     font_countdown = load_font(lang_font_path, 56)
-    font_ko_small = load_font(KO_FONT, 38)
+    font_ko_small = load_font(ensure_cjk_font("ko") or lang_font_path, 38)
     fonts = (lang_font_path, font_q, font_opt, font_label, font_countdown, font_ko_small)
 
     # 질문 프롬프트 음성 ("이게 뭐예요?" 등) - 언어당 1회만 생성해서 재사용
