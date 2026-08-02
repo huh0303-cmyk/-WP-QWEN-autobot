@@ -88,7 +88,8 @@ jobs:
         run: python3 scripts/prepare_public_urls.py
         continue-on-error: true
 
-      - name: Upload to Instagram (Business 계정 + 앱 심사 필요)
+      - name: Upload to Instagram (Business 계정 + 앱 심사 필요, 수동 실행 시에만 - API에 임시저장 기능이 없어 자동실행에서 제외)
+        if: github.event_name == 'workflow_dispatch'
         env:
           ML_IG_USER_ID: ${{ secrets.ML_IG_USER_ID }}
           ML_IG_ACCESS_TOKEN: ${{ secrets.ML_IG_ACCESS_TOKEN }}
@@ -97,7 +98,8 @@ jobs:
         run: python3 scripts/upload_instagram.py
         continue-on-error: true
 
-      - name: Upload to Threads (앱 심사 필요)
+      - name: Upload to Threads (앱 심사 필요, 수동 실행 시에만 - API에 임시저장 기능이 없어 자동실행에서 제외)
+        if: github.event_name == 'workflow_dispatch'
         env:
           ML_THREADS_USER_ID: ${{ secrets.ML_THREADS_USER_ID }}
           ML_THREADS_ACCESS_TOKEN: ${{ secrets.ML_THREADS_ACCESS_TOKEN }}

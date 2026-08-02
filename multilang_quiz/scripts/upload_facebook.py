@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Facebook 페이지 영상 업로드 (완전 자동, 바로 공개됨)
+Facebook 페이지 영상 업로드 — 미게시(published=false) 상태로 올려서
+페이지 콘텐츠 도구에 임시글로만 저장되고, 사람이 직접 게시해야 실제로 보임.
 필요 Secrets: ML_FB_PAGE_ID, ML_FB_PAGE_ACCESS_TOKEN
 """
 import os, requests
@@ -12,7 +13,7 @@ def upload_one(page_id, token, path, title, desc):
     url = f"https://graph-video.facebook.com/v19.0/{page_id}/videos"
     with open(path, "rb") as f:
         files = {"source": f}
-        data = {"access_token": token, "description": f"{title}\n\n{desc}"}
+        data = {"access_token": token, "description": f"{title}\n\n{desc}", "published": "false"}
         r = requests.post(url, data=data, files=files, timeout=600)
     if not r.ok:
         raise RuntimeError(f"{r.status_code} {r.text[:400]}")

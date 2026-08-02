@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-YouTube 자동 업로드 + 자동 예약 발행 (완전 자동, 수동 검토 불필요)
-- privacyStatus='private' + publishAt 지정 -> 업로드 후 YT_PUBLISH_DELAY_MINUTES(기본 15분) 뒤
-  유튜브가 알아서 공개로 전환함. 스튜디오에서 사람이 버튼 누를 필요 없음.
+YouTube 업로드 — 항상 비공개로 올리고 자동 공개 전환은 하지 않는다.
+사용자가 스튜디오에서 직접 확인하고 공개 버튼을 눌러야만 실제로 게시된다
+(예전엔 publishAt을 지정해 업로드 후 일정 시간 뒤 자동 공개되도록 되어
+있었는데, 이게 사용자 승인 없이 그대로 발행돼버리는 문제라 제거함).
 필요 Secrets: ML_YT_CLIENT_ID, ML_YT_CLIENT_SECRET, ML_YT_REFRESH_TOKEN
-선택 env: YT_PUBLISH_DELAY_MINUTES (기본 15)
 """
 import os, sys, datetime, requests
 from common import list_videos, SOCIAL_LANGS, get_secret
 import report
-
-PUBLISH_DELAY_MINUTES = int(os.environ.get("YT_PUBLISH_DELAY_MINUTES", "15"))
 
 def get_access_token(lang):
     # 언어별로 별도 채널에 올리기 위해 YOUTUBE_OAUTH_REFRESH_TOKEN_EN/_JA/_ES/_VI처럼
@@ -31,15 +29,12 @@ def get_access_token(lang):
 
 def upload_one(access_token, path, title, desc):
     size = os.path.getsize(path)
-    publish_at = (datetime.datetime.now(datetime.timezone.utc)
-                  + datetime.timedelta(minutes=PUBLISH_DELAY_MINUTES)
-                  ).strftime("%Y-%m-%dT%H:%M:%SZ")
     metadata = {
         "snippet": {"title": title, "description": desc, "categoryId": "27",
                     "tags": ["language learning", "vocabulary quiz", "shorts"]},
-        # private로 업로드하되 publishAt을 지정하면 그 시각에 유튜브가 자동으로 공개 전환함
-        # -> 스튜디오에서 수동으로 공개 버튼을 누를 필요가 없는 완전 자동 예약 발행
-        "status": {"privacyStatus": "private", "publishAt": publish_at, "selfDeclaredMadeForKids": False},
+        # publishAt을 지정하지 않음 -> 계속 비공개로 남아있고, 사람이 스튜디오에서
+        # 직접 확인 후 공개 버튼을 눌러야만 실제로 게시된다.
+        "status": {"privacyStatus": "private", "selfDeclaredMadeForKids": False},
     }
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -69,7 +64,7 @@ def main():
         try:
             token = get_access_token(lang)
             vid = upload_one(token, path, title, desc)
-            print(f"[YouTube][{lang}] 업로드 완료 (약 {PUBLISH_DELAY_MINUTES}분 뒤 자동 공개): https://youtube.com/watch?v={vid}")
+            print(f"[YouTube][{lang}] 업로드 완료 (비공개 - 스튜디오에서 직접 공개 승인 필요): https://youtube.com/watch?v={vid}")
             report.add("YouTube", lang, "success", f"https://youtube.com/watch?v={vid}")
         except Exception as e:
             print(f"[YouTube][{lang}] 업로드 실패: {e}")
