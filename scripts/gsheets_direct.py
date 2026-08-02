@@ -210,8 +210,20 @@ def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, m
         row1 = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!1:1",
         ).execute().get("values", [[]])
-        existing_width = len(row1[0]) if row1 else 0
-        start_col = max(existing_width, 1)
+        row1_vals = row1[0] if row1 else []
+        existing_width = len(row1_vals)
+
+        # 마지막 날짜 블록 라벨이 이번 date_label과 같으면(워크플로가 같은 날
+        # 여러 번 실행됨) 새 컬럼을 추가하지 않고 그 블록을 그대로 덮어쓴다.
+        last_label_col = None
+        for idx in range(len(row1_vals) - 1, -1, -1):
+            if row1_vals[idx]:
+                last_label_col = idx
+                break
+        if last_label_col is not None and row1_vals[last_label_col] == date_label:
+            start_col = last_label_col
+        else:
+            start_col = max(existing_width, 1)
 
     end_col = start_col + n_metrics - 1
     start_letter = _col_letter(start_col)
