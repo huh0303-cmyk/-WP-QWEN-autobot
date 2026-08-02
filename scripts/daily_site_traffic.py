@@ -107,7 +107,11 @@ def gsc_post(token, endpoint, body):
 
 
 def latest_daily_stats(token, site_url, window_days=10):
-    end = date.today()
+    # GSC 데이터는 보통 2~3일 처리 지연이 있어서, end를 오늘로 두면 아직
+    # 처리 안 된 "오늘" 행이 클릭 0으로 섞여 들어와 그게 최신 행으로 잡혀버린다
+    # (그래서 거의 모든 사이트가 방문자수 0으로 보이는 원인이었음).
+    # 지연을 감안해 3일 전까지만 조회해서 확정된 데이터를 가져온다.
+    end = date.today() - timedelta(days=3)
     start = end - timedelta(days=window_days)
     body = {
         "startDate": start.isoformat(),

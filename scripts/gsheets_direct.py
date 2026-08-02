@@ -113,6 +113,34 @@ def append_tab_row(spreadsheet_id, tab_name, header, row):
     append_tab_rows(spreadsheet_id, tab_name, header, [row])
 
 
+def append_or_update_tab_row(spreadsheet_id, tab_name, header, row, key_col_idx=0):
+    """append_tab_row와 같지만, 마지막 행의 key_col_idx 값이 이번 row의 같은
+    값과 일치하면(=같은 날짜에 워크플로가 여러 번 실행됨) 새로 추가하지 않고
+    그 행을 덮어쓴다. 수동 재실행/재시도로 같은 날짜 행이 중복 쌓이는 것을 막는다."""
+    service = get_sheets_service()
+    ensure_tab(service, spreadsheet_id, tab_name, header)
+
+    existing = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:Z",
+    ).execute().get("values", [])
+
+    key = row[key_col_idx]
+    if len(existing) > 1:
+        last_row = existing[-1]
+        last_key = last_row[key_col_idx] if len(last_row) > key_col_idx else None
+        if last_key == key:
+            last_row_num = len(existing)
+            service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id,
+                range=f"'{tab_name}'!A{last_row_num}",
+                valueInputOption="RAW",
+                body={"values": [row]},
+            ).execute()
+            return
+
+    append_tab_rows(spreadsheet_id, tab_name, header, [row])
+
+
 def append_tab_rows(spreadsheet_id, tab_name, header, rows):
     """append_tab_row의 여러 행 버전 — 27개 사이트처럼 하루에 여러 행을
     한 번에 쌓아서, 날짜별로 쭉 이어지는 기록으로 날짜 간 비교가

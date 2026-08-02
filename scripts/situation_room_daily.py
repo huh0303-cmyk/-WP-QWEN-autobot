@@ -227,7 +227,7 @@ def send_to_sheets(record):
         header = ["날짜", "YouTube", "TikTok", "Facebook", "Instagram", "Threads"]
         row = [date_label, record.get("yt_한국어(TOPIK)_subs"), record.get("tiktok"),
                record.get("facebook"), record.get("instagram"), record.get("threads")]
-        gsheets_direct.append_tab_row(SHEET_ID, "종합상황실_기록", header, row)
+        gsheets_direct.append_or_update_tab_row(SHEET_ID, "종합상황실_기록", header, row)
         log("📊 구글시트 직접 쓰기 완료 — 탭: 종합상황실_기록")
     except Exception as e:
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
