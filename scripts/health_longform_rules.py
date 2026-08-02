@@ -56,8 +56,13 @@ TOPIC_STRATEGY = "shared_topic_same_phase"  # 다음 단계: "per_country_unique
 SAME_TOPIC_DIFFERENTIATION_RULES = {
     "narration": "always_fully_distinct_per_language",   # 번역 아니고 새로 집필
     "image_set": "may_reuse_but_shuffle_order_per_language",  # 이미지 재사용 가능, 순서만 변경
+    "intro_video_clips": "may_reuse_but_shuffle_order_per_language",  # 앞 3장 AI 영상 클립도 동일 원칙 (2026-08-02)
     "thumbnail": "always_fully_distinct",  # 사진/카피/폰트/색상 전부 다르게 (예외 없음)
 }
+
+# 앞부분 AI 생성 영상 클립 (Veo 3.1 Lite, ~$0.20~0.25/클립) 관련 설정.
+INTRO_VIDEO_CLIP_COUNT = 3
+INTRO_VIDEO_MODEL = "veo-3.1-lite-generate-preview"  # 가장 저렴, 기존 GEMINI_API_KEY로 사용 가능
 
 # 발행 규칙 ------------------------------------------------------------
 
