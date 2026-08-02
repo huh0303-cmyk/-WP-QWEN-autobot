@@ -60,9 +60,11 @@ SAME_TOPIC_DIFFERENTIATION_RULES = {
     "thumbnail": "always_fully_distinct",  # 사진/카피/폰트/색상 전부 다르게 (예외 없음)
 }
 
-# 앞부분 AI 생성 영상 클립 (Veo 3.1 Lite, ~$0.20~0.25/클립) 관련 설정.
+# 앞부분 AI 생성 영상 클립 (Veo 3.1 Lite, 기존 GEMINI_API_KEY로 사용 가능) 관련 설정.
 INTRO_VIDEO_CLIP_COUNT = 3
-INTRO_VIDEO_MODEL = "veo-3.1-lite-generate-preview"  # 가장 저렴, 기존 GEMINI_API_KEY로 사용 가능
+INTRO_VIDEO_MODEL = "veo-3.1-lite-generate-preview"  # 가장 저렴한 티어
+# 이 모델은 duration_seconds로 5,6,7 등 임의값을 받지 않고 4 또는 8만 허용됨 (2026-08-02 실측 확인).
+INTRO_VIDEO_DURATION_SECONDS = 8  # 8초 선택 (4초보다 자연스러움), 클립당 약 $0.40~0.50
 
 # 발행 규칙 ------------------------------------------------------------
 
