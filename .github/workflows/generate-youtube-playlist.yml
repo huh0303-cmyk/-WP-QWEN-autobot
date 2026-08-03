@@ -3,6 +3,17 @@ name: Generate YouTube Playlist (음악 60-80분 + 썸네일 → 최종 mp4)
 on:
   workflow_dispatch:
     inputs:
+      channel:
+        description: "플리 채널 선택 (2026-08-03 5개 채널 분리 - 채널마다 전용 음악폴더+유튜브토큰 필요)"
+        required: false
+        type: choice
+        default: "globalmusic"
+        options:
+          - "globalmusic"
+          - "healing"
+          - "starbucks"
+          - "mbb"
+          - "kpop"
       preset_theme:
         description: "빠른 선택 프리셋 (고르면 아래 topic 직접입력보다 우선 적용됨)"
         required: false
@@ -48,7 +59,10 @@ on:
         type: string
   schedule:
     # 매일 00:00 KST(전날 15:00 UTC) 자동 실행 — 사람이 주제를 안 골라줘도
-    # 스크립트가 최근에 안 쓴 주제를 무작위로 골라서 자동 생성한다
+    # 스크립트가 최근에 안 쓴 주제를 무작위로 골라서 자동 생성한다.
+    # schedule 트리거는 inputs가 없어서 channel을 고를 수 없으므로 기본
+    # globalmusic으로 고정(기존 단일 채널 자동화 동작 유지). 나머지 4개
+    # 채널은 당분간 workflow_dispatch로 수동 실행.
     - cron: "0 15 * * *"
 
 permissions:
@@ -63,6 +77,7 @@ jobs:
       thumb_drive_id: ${{ steps.meta.outputs.thumb_drive_id }}
       yt_title: ${{ steps.meta.outputs.yt_title }}
       yt_description: ${{ steps.meta.outputs.yt_description }}
+      channel_key_upper: ${{ steps.meta.outputs.channel_key_upper }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -83,6 +98,7 @@ jobs:
       - name: Run playlist maker
         env:
           AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || 'globalmusic' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
@@ -92,6 +108,23 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # 채널별 전용 폴더 - 아직 안 만든 채널은 시크릿이 없어서 공용 기본값으로
+          # 자동 폴백된다(youtube_playlist_maker.py의 _channel_env 참고)
+          MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}
+          MUSIC_SOURCE_FOLDER_ID_HEALING: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_HEALING }}
+          MUSIC_SOURCE_FOLDER_ID_STARBUCKS: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_STARBUCKS }}
+          MUSIC_SOURCE_FOLDER_ID_MBB: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_MBB }}
+          MUSIC_SOURCE_FOLDER_ID_KPOP: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_KPOP }}
+          THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+          THUMBNAIL_FOLDER_ID_HEALING: ${{ secrets.THUMBNAIL_FOLDER_ID_HEALING }}
+          THUMBNAIL_FOLDER_ID_STARBUCKS: ${{ secrets.THUMBNAIL_FOLDER_ID_STARBUCKS }}
+          THUMBNAIL_FOLDER_ID_MBB: ${{ secrets.THUMBNAIL_FOLDER_ID_MBB }}
+          THUMBNAIL_FOLDER_ID_KPOP: ${{ secrets.THUMBNAIL_FOLDER_ID_KPOP }}
+          OUTPUT_FOLDER_ID_GLOBALMUSIC: ${{ secrets.OUTPUT_FOLDER_ID_GLOBALMUSIC }}
+          OUTPUT_FOLDER_ID_HEALING: ${{ secrets.OUTPUT_FOLDER_ID_HEALING }}
+          OUTPUT_FOLDER_ID_STARBUCKS: ${{ secrets.OUTPUT_FOLDER_ID_STARBUCKS }}
+          OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
+          OUTPUT_FOLDER_ID_KPOP: ${{ secrets.OUTPUT_FOLDER_ID_KPOP }}
         run: |
           if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then
             export TOPIC_KEYWORD="$PRESET_THEME"
@@ -103,6 +136,8 @@ jobs:
 
       - name: Export upload metadata for the publish job
         id: meta
+        env:
+          CHANNEL_KEY: ${{ github.event.inputs.channel || 'globalmusic' }}
         run: |
           python - <<'EOF'
           import json, os
@@ -114,6 +149,7 @@ jobs:
               f.write(f"thumb_drive_id={m['thumb_drive_id']}\n")
               f.write("yt_title<<EOM\n" + m['title'] + "\nEOM\n")
               f.write("yt_description<<EOM\n" + m['description'] + "\nEOM\n")
+              f.write(f"channel_key_upper={os.environ['CHANNEL_KEY'].upper()}\n")
           EOF
 
       - name: Upload result as artifact (backup)
@@ -167,6 +203,8 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          # 채널 전용 토큰이 있으면 그걸 쓰고(뒤섞임 사고 방지), 없으면(아직
+          # 그 채널 OAuth 발급 전) 기존 공용 토큰으로 폴백한다.
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/youtube_publish_approved.py

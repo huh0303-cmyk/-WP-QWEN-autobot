@@ -69,9 +69,37 @@ YOUTUBE_OAUTH_REFRESH_TOKEN = os.environ.get("YOUTUBE_OAUTH_REFRESH_TOKEN", "")
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
-MUSIC_SOURCE_FOLDER_ID = os.environ.get("MUSIC_SOURCE_FOLDER_ID") or "1RqL44lM5oUSW5_PAZLHHlevrVkr1ibxd"
-THUMBNAIL_FOLDER_ID = os.environ.get("THUMBNAIL_FOLDER_ID") or "1jVDuCjTVJPnNSIBEXjnU6DPSzZO56d68"
-OUTPUT_FOLDER_ID = os.environ.get("OUTPUT_FOLDER_ID") or "1srQUiWOk6UruujYSy2S0ogN3FvxVTSBN"
+# 플리 채널 5개(2026-08-03 확정): 채널마다 곡 소스/썸네일/출력 폴더와 유튜브
+# 업로드 토큰이 전부 달라야 한다 — 안 그러면 언어퀴즈 때처럼 다른 채널로
+# 뒤섞여 올라가는 사고가 재발한다. CHANNEL_KEY로 채널을 고르면 그 채널 전용
+# *_{KEY} 환경변수(Secrets)를 사용하고, 없으면 기존 공용 기본값으로 폴백한다
+# (CHANNEL_KEY를 아예 안 주는 기존 실행 방식과 호환 유지).
+PLAYLIST_CHANNELS = ["globalmusic", "healing", "starbucks", "mbb", "kpop"]
+CHANNEL_KEY = (os.environ.get("CHANNEL_KEY") or "").strip().lower()
+
+_DEFAULT_MUSIC_FOLDER = "1RqL44lM5oUSW5_PAZLHHlevrVkr1ibxd"
+_DEFAULT_THUMB_FOLDER = "1jVDuCjTVJPnNSIBEXjnU6DPSzZO56d68"
+_DEFAULT_OUTPUT_FOLDER = "1srQUiWOk6UruujYSy2S0ogN3FvxVTSBN"
+
+
+def _channel_env(base_name, fallback):
+    if CHANNEL_KEY:
+        per_channel = os.environ.get(f"{base_name}_{CHANNEL_KEY.upper()}")
+        if per_channel:
+            return per_channel
+    return os.environ.get(base_name) or fallback
+
+
+MUSIC_SOURCE_FOLDER_ID = _channel_env("MUSIC_SOURCE_FOLDER_ID", _DEFAULT_MUSIC_FOLDER)
+THUMBNAIL_FOLDER_ID = _channel_env("THUMBNAIL_FOLDER_ID", _DEFAULT_THUMB_FOLDER)
+OUTPUT_FOLDER_ID = _channel_env("OUTPUT_FOLDER_ID", _DEFAULT_OUTPUT_FOLDER)
+
+# 유튜브 업로드 토큰도 채널 전용 - 없으면 그 채널은 발행을 건너뛰어야 하므로
+# youtube_publish_approved.py에서 별도로 검사한다(공용 토큰으로 조용히 폴백 금지).
+YOUTUBE_TOKEN_ENV_NAME = (
+    f"YOUTUBE_OAUTH_REFRESH_TOKEN_{CHANNEL_KEY.upper()}" if CHANNEL_KEY
+    else "YOUTUBE_OAUTH_REFRESH_TOKEN"
+)
 
 # 영어 키워드 → 파일명에 박힌 한글 언어 태그 매핑
 LANGUAGE_TAG_MAP = {
