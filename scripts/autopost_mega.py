@@ -1018,18 +1018,32 @@ _used_news_ko: set = set()
 _used_news_en: set = set()
 _wp_title_cache: dict = {}
 
-def fetch_recent_wp_titles(site_url, wp_pass, count=50):
+def _title_dup_key(t):
+    # 완전히 똑같은 제목만 잡던 걸 앞 20자 기준 fuzzy 매칭으로 강화
+    # (2026-08-03: 중복 제목 125건이 대부분 살짝 다른 표현이라 exact match로는 못 잡았음)
+    return re.sub(r'\s+', '', t[:20].lower())
+
+def fetch_recent_wp_titles(site_url, wp_pass, count=None):
     if site_url in _wp_title_cache: return _wp_title_cache[site_url]
     titles = set()
     try:
-        r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
-                         params={"per_page": count, "orderby":"date","order":"desc","_fields":"title","status":"publish"}, timeout=12)
-        if r.status_code == 200:
-            for p in r.json():
+        page = 1
+        while True:
+            r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+                             params={"per_page": 100, "page": page, "orderby":"date","order":"desc",
+                                     "_fields":"title","status":"publish"}, timeout=15)
+            if r.status_code != 200: break
+            batch = r.json()
+            if not isinstance(batch, list) or not batch: break
+            for p in batch:
                 raw = p.get("title",{})
                 t = raw.get("rendered","") if isinstance(raw,dict) else str(raw)
                 t = re.sub(r'<[^>]+>','',t).strip().lower()
-                if t: titles.add(t)
+                if t:
+                    titles.add(t)
+                    titles.add(_title_dup_key(t))
+            if len(batch) < 100: break
+            page += 1
     except: pass
     _wp_title_cache[site_url] = titles
     return titles
@@ -1066,12 +1080,14 @@ def crawl_rss_news(lang="ko", site_url=""):
         ch = random.choice(candidates)
         used.add(ch[0].strip().lower())
         print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
-        return ch[0], ch[1]
+        return ch[0], ch[1], ch[2]
 
     pool = [x for x in fallback if not is_dup(x[0])] or fallback
     ch = random.choice(pool)
     used.add(ch[0].strip().lower())
-    return ch
+    # ★ 폴백 주제는 특정 외부 보도를 재가공한 게 아니라 자체 생성 상시주제라
+    #   출처 표기 대상이 아님(source=None)
+    return ch[0], ch[1], None
 
 # ============================================================
 # ★★★ make_site_prompt — 사이트별 완전 분리 프롬프트 ★★★
@@ -2009,9 +2025,12 @@ def process_one(site, keyword):
     reporter=pick_reporter(site)
     print(f"\n  🖊  [{theme}] {keyword[:50]} | {reporter['name']}")
 
+    news_source = None
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
+        if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
+            news_source=kw_tuple[2]
 
     base_prompt=make_site_prompt(keyword,site,reporter)
     prompt=base_prompt
@@ -2077,6 +2096,16 @@ def process_one(site, keyword):
     if tags:
         tags = [strip_hash_artifacts(t) for t in tags]
 
+    # ★ 뉴스모드 출처 표기(2026-08-03 사용자 지시): 언론사 등록 요건상 타 언론
+    #   보도를 재가공했으면 출처를 밝혀야 함. AI 프롬프트 지시에만 의존하면
+    #   누락되거나 표현이 매번 달라질 수 있어, 실제 RSS 원문 출처가 있을 때만
+    #   코드가 본문 끝에 고정 문구를 확정 삽입한다(제목/의학디스클레이머와 동일 원칙).
+    if mode in ("news","news_en") and news_source:
+        if lang=="ko":
+            body += f'<p><em>※ 이 기사는 {news_source}의 보도를 참고하여 재구성되었습니다.</em></p>'
+        else:
+            body += f'<p><em>※ This article was adapted based on reporting from {news_source}.</em></p>'
+
     if best_score<SEO_TARGET:
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
@@ -2110,14 +2139,18 @@ def process_one(site, keyword):
     cat_name=get_category_for_post(theme,keyword,title)
     print(f"  📁 카테고리: {cat_name}")
 
-    if mode in ("news","news_en") and title:
+    # ★ 2026-08-03: 예전엔 뉴스모드 2개 사이트만 중복 제목을 걸렀음(그것도 완전
+    #   일치만). 실제로는 27개 사이트 전체에서 살짝 다른 표현의 중복 제목이
+    #   125건 쌓였던 게 확인돼서, 전체 사이트 + fuzzy(앞 20자) 매칭으로 강화.
+    if title:
         tl=title.strip().lower()
+        tl_key=_title_dup_key(title)
         sc=_wp_title_cache.get(url,set())
-        if tl in sc:
-            print(f"  ⛔ 중복 → 스킵")
+        if tl in sc or tl_key in sc:
+            print(f"  ⛔ 중복(유사 제목 포함) → 스킵")
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_dup")
             return False
-        sc.add(tl); _wp_title_cache[url]=sc
+        sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
     result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
     if result["ok"]:

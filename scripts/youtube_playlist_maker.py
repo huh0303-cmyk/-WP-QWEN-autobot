@@ -976,6 +976,14 @@ def main():
             language_keyword = auto_lang
         log(f"🤖 자동 선택된 주제: {topic_keyword} (언어: {language_keyword or 'Mixed'})")
 
+    # 2026-08-03: 스타벅스 채널 시청자 국가 분포가 일본/미국 위주로 나와서,
+    # 언어를 명시로 안 주는 실행(자동/수동 둘 다)에서는 일본어 쪽으로
+    # 기본값을 둔다. 명시적으로 다른 언어를 주면 그게 항상 우선.
+    CHANNEL_DEFAULT_LANGUAGE = {"starbucks": "Japanese"}
+    if not language_keyword.strip() and CHANNEL_KEY in CHANNEL_DEFAULT_LANGUAGE:
+        language_keyword = CHANNEL_DEFAULT_LANGUAGE[CHANNEL_KEY]
+        log(f"   (채널 기본 언어 적용: {CHANNEL_KEY} → {language_keyword})")
+
     os.makedirs(WORKDIR, exist_ok=True)
     service = get_drive_service()
 
