@@ -259,6 +259,8 @@ def normalize_intro_clip(raw_path, audio_path, out_path):
         "-c:v", "libx264", "-c:a", "aac",
         "-t", str(max(audio_dur, video_dur)),
         "-shortest" if audio_dur < video_dur else "-y",
+        "-map_metadata", "-1", "-fflags", "+bitexact",
+        "-flags:v", "+bitexact", "-flags:a", "+bitexact",
         out_path,
     ])
     return max(audio_dur, video_dur)
@@ -326,7 +328,8 @@ def elevenlabs_tts(text, out_path):
 
 def make_silence(out_path, duration):
     run_ffmpeg(["ffmpeg", "-y", "-f", "lavfi", "-i",
-                f"anullsrc=r=44100:cl=stereo:d={duration}", "-c:a", "aac", out_path])
+                f"anullsrc=r=44100:cl=stereo:d={duration}", "-c:a", "aac",
+                "-map_metadata", "-1", "-fflags", "+bitexact", out_path])
 
 
 # ════════════════════════════════════════════════════════════
@@ -353,7 +356,10 @@ def ken_burns_clip(image_path, audio_path, out_path, zoom_in=True):
         "ffmpeg", "-y", "-loop", "1", "-i", image_path, "-i", audio_path,
         "-t", str(dur), "-vf", vf,
         "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p",
-        "-shortest", out_path,
+        "-shortest",
+        "-map_metadata", "-1", "-fflags", "+bitexact",
+        "-flags:v", "+bitexact", "-flags:a", "+bitexact",
+        out_path,
     ])
     return dur
 
@@ -364,7 +370,10 @@ def concat_clips(clip_paths, out_path, workdir):
         for p in clip_paths:
             f.write(f"file '{os.path.abspath(p)}'\n")
     run_ffmpeg(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", list_file,
-                "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p", out_path])
+                "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p",
+                "-map_metadata", "-1", "-fflags", "+bitexact",
+                "-flags:v", "+bitexact", "-flags:a", "+bitexact",
+                out_path])
 
 
 # ════════════════════════════════════════════════════════════
