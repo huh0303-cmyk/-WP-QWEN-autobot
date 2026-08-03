@@ -5,5 +5,7 @@ ref_analysis_tmp/
 playlist_output/
 topik_quiz_output/
 health_shorts_output/
+health_longform_output/
+scripts/.font_cache/
 ambient_output/
 .env

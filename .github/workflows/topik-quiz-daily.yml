@@ -19,9 +19,16 @@ on:
         description: "생성할 언어 (쉼표구분, 기본 한국어만)"
         required: false
         default: "ko"
-  schedule:
-    - cron: "0 23 * * *"   # 08:00 KST (아침)
-    - cron: "0 11 * * *"   # 20:00 KST (저녁)
+  # ⚠️ 2026-08-03: 스케줄 실행 시 resolve-langs가 (langs 입력이 비어있으니)
+  # ko/ja/en/es/vi 5개 전부로 폴백하고, social_publish.py의 publish_youtube가
+  # 언어별 토큰 라우팅 없이 공용 YOUTUBE_OAUTH_REFRESH_TOKEN(스타벅스 플리
+  # 채널 토큰) 하나로 전부 올려버려서 영/일/스페인어 퀴즈가 스타벅스 채널에
+  # 뒤섞여 올라간 사고 발생. en/ja/es/vi는 이미 daily_multilang_quiz.yml이
+  # 전용 채널로 담당하므로, 여기서는 스케줄을 완전히 껐다(중복 원천 차단).
+  # 한국어만 수동 테스트하려면 아래 workflow_dispatch로 langs=ko만 실행할 것.
+  # schedule:
+  #   - cron: "0 23 * * *"   # 08:00 KST (아침)
+  #   - cron: "0 11 * * *"   # 20:00 KST (저녁)
 
 concurrency:
   group: topik-quiz-daily
