@@ -15,9 +15,16 @@ YouTube 업로드 — 항상 비공개로 올리고 자동 공개 전환은 하�
 필요 Secrets: ML_YT_CLIENT_ID/ML_YT_CLIENT_SECRET (또는 YOUTUBE_OAUTH_CLIENT_ID/SECRET,
 공용 재사용 가능) + 언어별 YOUTUBE_OAUTH_REFRESH_TOKEN_{EN,JA,ES,VI,FR,DE,ZH,AR,RU}
 """
-import os, sys, datetime, requests
+import os, sys, datetime, random, time, requests
 from common import list_videos, SOCIAL_LANGS, get_secret
 import report
+
+# 채널별 업로드 시각을 서로 다르게 분산시킨다 (2026-08-03 사용자 지시:
+# "다 각각 채널로 가는거다. 시간도 다 다르게.." - 여러 채널이 똑같은 순간에
+# 몰아서 업로드되면 봇처럼 보이므로, 언어 사이마다 랜덤 대기를 둔다).
+# 수동 실행(workflow_dispatch)일 때는 빠른 확인을 위해 대기를 건너뛴다.
+UPLOAD_GAP_MIN_SEC = 300    # 5분
+UPLOAD_GAP_MAX_SEC = 2700   # 45분
 
 def get_access_token(lang):
     # 언어별 전용 채널 토큰만 사용한다 — 공용 fallback 토큰 사용 금지
@@ -67,6 +74,8 @@ def main():
     if not get_secret("ML_YT_CLIENT_ID", "YOUTUBE_OAUTH_CLIENT_ID"):
         print("유튜브 토큰 미설정 - 유튜브 업로드 건너뜀")
         return
+    is_scheduled_run = os.environ.get("GITHUB_EVENT_NAME") == "schedule"
+    uploaded_count = 0
     for lang, path, title, desc in videos:
         try:
             token = get_access_token(lang)
@@ -75,7 +84,12 @@ def main():
                       f"미설정 - 다른 채널로 잘못 올라가지 않도록 건너뜀")
                 report.add("YouTube", lang, "skipped", "전용 채널 토큰 미설정")
                 continue
+            if uploaded_count > 0 and is_scheduled_run:
+                delay = random.randint(UPLOAD_GAP_MIN_SEC, UPLOAD_GAP_MAX_SEC)
+                print(f"[YouTube] 채널별 업로드 시간 분산을 위해 {delay}초 대기 후 [{lang}] 업로드")
+                time.sleep(delay)
             vid = upload_one(token, path, title, desc)
+            uploaded_count += 1
             print(f"[YouTube][{lang}] 업로드 완료 (비공개 - 스튜디오에서 직접 공개 승인 필요): https://youtube.com/watch?v={vid}")
             report.add("YouTube", lang, "success", f"https://youtube.com/watch?v={vid}")
         except Exception as e:
