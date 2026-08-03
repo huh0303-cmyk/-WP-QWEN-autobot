@@ -1,11 +1,11 @@
 {
   "latest": {
-    "site_clicks": 2,
+    "site_clicks": 3,
     "site_indexed": 0,
     "youtube": {
       "한국어(TOPIK)": {
         "subs": 5730,
-        "views": 337754
+        "views": 339928
       },
       "영어(Survival English)": {
         "subs": 0,
@@ -17,7 +17,7 @@
       },
       "스페인어(Survival Spanish)": {
         "subs": 7,
-        "views": 956
+        "views": 1982
       },
       "베트남어(Survival Vietnamese)": {
         "subs": 2,
@@ -49,5 +49,5 @@
     "instagram": null,
     "threads": null
   },
-  "updated_at": "2026-08-03 08:16:01"
+  "updated_at": "2026-08-04 08:30:31"
 }
