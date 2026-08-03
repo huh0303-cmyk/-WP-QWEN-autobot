@@ -359,7 +359,9 @@ def main():
             row.update(date=stats["date"], weekday=weekday_kr(stats["date"]),
                        clicks=stats["clicks"], impressions=stats["impressions"], status="정상")
 
-        coverage, cov_err = get_index_status_sample(token, query_site)
+        # ★ sample_size=20이면 사이트당 ~2분씩 걸려서 27개 사이트 처리에
+        #   60분 타임아웃을 거의 다 채움 - 8개로 줄여 여유 확보(2026-08-04)
+        coverage, cov_err = get_index_status_sample(token, query_site, sample_size=8)
         if coverage:
             row["indexed"] = coverage["estimated_indexed"]
             log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인(표본추정) "
@@ -369,6 +371,12 @@ def main():
             log(f"  [{i}/{len(SITES)}] {domain}: 클릭 {row['clicks']} / 색인 확인 실패 ({cov_err})")
 
         records.append(row)
+        # ★ 타임아웃으로 중간에 잘려도 지금까지 모은 결과는 남도록 매 사이트마다
+        #   저장(2026-08-04: 첫 실행이 URL검사 표본추출이 느려서 27개 다 못 돌고
+        #   20분 타임아웃 - 끝에서만 저장하다 보니 부분결과까지 전부 날아갔었음).
+        with open("daily_site_traffic_result.json", "w", encoding="utf-8") as f:
+            json.dump({"checked_at": checked_at, "records": records, "partial": i < len(SITES)},
+                       f, ensure_ascii=False, indent=2)
         time.sleep(0.3)
 
     if no_access:
@@ -376,12 +384,10 @@ def main():
 
     send_to_sheets(records)
 
-    # ★ 2026-08-04: 결과가 구글시트로만 가서 사람이 시트를 직접 열어봐야만
-    # 확인 가능했음. 저장소에도 JSON으로 커밋해서 언제든 코드/CI에서 바로
-    # 읽을 수 있게 함(사용자 지시: "방문자수도 모르는거지? ... 나는 그걸
-    # 알아야 뭔 결정방향을 정하지").
+    # 최종 완료본(partial=False)으로 한 번 더 덮어써서 확정
     with open("daily_site_traffic_result.json", "w", encoding="utf-8") as f:
-        json.dump({"checked_at": checked_at, "records": records}, f, ensure_ascii=False, indent=2)
+        json.dump({"checked_at": checked_at, "records": records, "partial": False},
+                   f, ensure_ascii=False, indent=2)
     log("완료")
 
 
