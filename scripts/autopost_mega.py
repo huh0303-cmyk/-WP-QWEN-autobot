@@ -804,33 +804,33 @@ def translate_ko_to_en_for_image(keyword, theme=""):
     return re.sub(r'\s+', ' ', result).strip()[:80]
 
 SITES_CONFIG = [
-    {"url":"https://k-health365.com",       "lang":"ko","theme":"건강과 의학",         "mode":"health_blog","keywords_file":"data/keywords/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":6},
-    {"url":"https://koreamedicaltour.com",   "lang":"en","theme":"Korea Medical Tourism","mode":"blog",      "keywords_file":"data/keywords/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":3},
-    {"url":"https://koreainvest365.com",     "lang":"en","theme":"Investment",           "mode":"blog",      "keywords_file":"data/keywords/keywords_kinvest.txt",        "wp_pass_env":"KOREAINVEST365COM",    "daily":3},
-    {"url":"https://ki-korea.com",           "lang":"en","theme":"Korea Investment",     "mode":"blog",      "keywords_file":"data/keywords/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":3},
-    {"url":"https://koreainsurance365.com",  "lang":"en","theme":"Insurance",            "mode":"blog",      "keywords_file":"data/keywords/keywords_kinsurance.txt",     "wp_pass_env":"KOREAINSURANCE365COM", "daily":3},
-    {"url":"https://kfinance365.com",        "lang":"en","theme":"Finance",              "mode":"blog",      "keywords_file":"data/keywords/keywords_kfinance.txt",       "wp_pass_env":"KFINANCE365COM",       "daily":3},
-    {"url":"https://koreataxnlaw.com",       "lang":"en","theme":"Tax and Law",          "mode":"blog",      "keywords_file":"data/keywords/keywords_ktax.txt",           "wp_pass_env":"KOREATAXNLAWCOM",      "daily":3},
-    {"url":"https://koreacrypto365.com",     "lang":"en","theme":"Crypto",               "mode":"blog",      "keywords_file":"data/keywords/keywords_kcrypto.txt",        "wp_pass_env":"KOREACRYPTO365COM",    "daily":3},
-    {"url":"https://krealestate365.com",     "lang":"en","theme":"Korea Real Estate",    "mode":"blog",      "keywords_file":"data/keywords/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":3},
-    {"url":"https://ktech365.com",           "lang":"en","theme":"Technology",           "mode":"blog",      "keywords_file":"data/keywords/keywords_ktech.txt",          "wp_pass_env":"KTECH365COM",          "daily":3},
-    {"url":"https://kskin365.com",           "lang":"en","theme":"K-Beauty",             "mode":"blog",      "keywords_file":"data/keywords/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":3},
-    {"url":"https://oliveyoungkorea.com",    "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",      "keywords_file":"data/keywords/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":3},
-    {"url":"https://kworld365.com",          "lang":"en","theme":"K-POP",               "mode":"blog",      "keywords_file":"data/keywords/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":10},
-    {"url":"https://k-trip365.com",          "lang":"en","theme":"Travel",              "mode":"blog",      "keywords_file":"data/keywords/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":3},
-    {"url":"https://k-visa365.com",          "lang":"en","theme":"Visa Guide",          "mode":"blog",      "keywords_file":"data/keywords/keywords_kvisa.txt",          "wp_pass_env":"KVISA365COM",          "daily":3},
-    {"url":"https://koreawedding365.com",    "lang":"en","theme":"Wedding",             "mode":"blog",      "keywords_file":"data/keywords/keywords_kwedding.txt",       "wp_pass_env":"KOREAWEDDING365COM",   "daily":3},
-    {"url":"https://kstudy365.com",          "lang":"en","theme":"Study in Korea",      "mode":"blog",      "keywords_file":"data/keywords/keywords_kstudy365.txt",      "wp_pass_env":"KSTUDY365COM",         "daily":3},
-    {"url":"https://studyinkorea365.com",    "lang":"en","theme":"International Students","mode":"blog",    "keywords_file":"data/keywords/keywords_studyinkorea365.txt","wp_pass_env":"STUDYINKOREA365COM",   "daily":3},
-    {"url":"https://kieca-korea.org",        "lang":"ko","theme":"국제교육문화",          "mode":"blog",      "keywords_file":"data/keywords/keywords_kieca.txt",          "wp_pass_env":"KIECAKOREAORG",        "daily":8},
-    {"url":"https://ksa-korea.org",          "lang":"ko","theme":"한국유학정보",          "mode":"blog",      "keywords_file":"data/keywords/keywords_ksaKorea.txt",       "wp_pass_env":"KSAKOREAORG",          "daily":3},
-    {"url":"https://sis-korea.com",          "lang":"en","theme":"Korea Career Programs","mode":"blog",     "keywords_file":"data/keywords/keywords_sisKorea.txt",       "wp_pass_env":"SISKOREACOM",          "daily":3},
-    {"url":"https://jobkorea365.com",        "lang":"en","theme":"Employment",          "mode":"blog",      "keywords_file":"data/keywords/keywords_jobkorea365.txt",    "wp_pass_env":"JOBKOREA365COM",       "daily":3},
-    {"url":"https://jobinkorea365.com",      "lang":"en","theme":"Jobs in Korea",       "mode":"blog",      "keywords_file":"data/keywords/keywords_jobinkorea365.txt",  "wp_pass_env":"JOBINKOREA365COM",     "daily":3},
-    {"url":"https://jobkoreaglobal.com",     "lang":"en","theme":"Recruitment",         "mode":"blog",      "keywords_file":"data/keywords/keywords_jobkoreaglobal.txt", "wp_pass_env":"JOBKOREAGLOBALCOM",    "daily":3},
-    {"url":"https://korea365.org",           "lang":"en","theme":"Korea Culture",       "mode":"blog",      "keywords_file":"data/keywords/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":4},
-    {"url":"https://koreanews365.com",       "lang":"ko","theme":"한국 뉴스",            "mode":"news",      "keywords_file":"data/keywords/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":5},
-    {"url":"https://theseouljournal.com",    "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",   "keywords_file":"data/keywords/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":5},
+    {"url":"https://k-health365.com",       "lang":"ko","theme":"건강과 의학",         "mode":"health_blog","keywords_file":"data/keywords/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":1},
+    {"url":"https://koreamedicaltour.com",   "lang":"en","theme":"Korea Medical Tourism","mode":"blog",      "keywords_file":"data/keywords/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":1},
+    {"url":"https://koreainvest365.com",     "lang":"en","theme":"Investment",           "mode":"blog",      "keywords_file":"data/keywords/keywords_kinvest.txt",        "wp_pass_env":"KOREAINVEST365COM",    "daily":1},
+    {"url":"https://ki-korea.com",           "lang":"en","theme":"Korea Investment",     "mode":"blog",      "keywords_file":"data/keywords/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":1},
+    {"url":"https://koreainsurance365.com",  "lang":"en","theme":"Insurance",            "mode":"blog",      "keywords_file":"data/keywords/keywords_kinsurance.txt",     "wp_pass_env":"KOREAINSURANCE365COM", "daily":1},
+    {"url":"https://kfinance365.com",        "lang":"en","theme":"Finance",              "mode":"blog",      "keywords_file":"data/keywords/keywords_kfinance.txt",       "wp_pass_env":"KFINANCE365COM",       "daily":1},
+    {"url":"https://koreataxnlaw.com",       "lang":"en","theme":"Tax and Law",          "mode":"blog",      "keywords_file":"data/keywords/keywords_ktax.txt",           "wp_pass_env":"KOREATAXNLAWCOM",      "daily":1},
+    {"url":"https://koreacrypto365.com",     "lang":"en","theme":"Crypto",               "mode":"blog",      "keywords_file":"data/keywords/keywords_kcrypto.txt",        "wp_pass_env":"KOREACRYPTO365COM",    "daily":1},
+    {"url":"https://krealestate365.com",     "lang":"en","theme":"Korea Real Estate",    "mode":"blog",      "keywords_file":"data/keywords/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":1},
+    {"url":"https://ktech365.com",           "lang":"en","theme":"Technology",           "mode":"blog",      "keywords_file":"data/keywords/keywords_ktech.txt",          "wp_pass_env":"KTECH365COM",          "daily":1},
+    {"url":"https://kskin365.com",           "lang":"en","theme":"K-Beauty",             "mode":"blog",      "keywords_file":"data/keywords/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":1},
+    {"url":"https://oliveyoungkorea.com",    "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",      "keywords_file":"data/keywords/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":1},
+    {"url":"https://kworld365.com",          "lang":"en","theme":"K-POP",               "mode":"blog",      "keywords_file":"data/keywords/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":1},
+    {"url":"https://k-trip365.com",          "lang":"en","theme":"Travel",              "mode":"blog",      "keywords_file":"data/keywords/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":1},
+    {"url":"https://k-visa365.com",          "lang":"en","theme":"Visa Guide",          "mode":"blog",      "keywords_file":"data/keywords/keywords_kvisa.txt",          "wp_pass_env":"KVISA365COM",          "daily":1},
+    {"url":"https://koreawedding365.com",    "lang":"en","theme":"Wedding",             "mode":"blog",      "keywords_file":"data/keywords/keywords_kwedding.txt",       "wp_pass_env":"KOREAWEDDING365COM",   "daily":1},
+    {"url":"https://kstudy365.com",          "lang":"en","theme":"Study in Korea",      "mode":"blog",      "keywords_file":"data/keywords/keywords_kstudy365.txt",      "wp_pass_env":"KSTUDY365COM",         "daily":1},
+    {"url":"https://studyinkorea365.com",    "lang":"en","theme":"International Students","mode":"blog",    "keywords_file":"data/keywords/keywords_studyinkorea365.txt","wp_pass_env":"STUDYINKOREA365COM",   "daily":1},
+    {"url":"https://kieca-korea.org",        "lang":"ko","theme":"국제교육문화",          "mode":"blog",      "keywords_file":"data/keywords/keywords_kieca.txt",          "wp_pass_env":"KIECAKOREAORG",        "daily":1},
+    {"url":"https://ksa-korea.org",          "lang":"ko","theme":"한국유학정보",          "mode":"blog",      "keywords_file":"data/keywords/keywords_ksaKorea.txt",       "wp_pass_env":"KSAKOREAORG",          "daily":1},
+    {"url":"https://sis-korea.com",          "lang":"en","theme":"Korea Career Programs","mode":"blog",     "keywords_file":"data/keywords/keywords_sisKorea.txt",       "wp_pass_env":"SISKOREACOM",          "daily":1},
+    {"url":"https://jobkorea365.com",        "lang":"en","theme":"Employment",          "mode":"blog",      "keywords_file":"data/keywords/keywords_jobkorea365.txt",    "wp_pass_env":"JOBKOREA365COM",       "daily":1},
+    {"url":"https://jobinkorea365.com",      "lang":"en","theme":"Jobs in Korea",       "mode":"blog",      "keywords_file":"data/keywords/keywords_jobinkorea365.txt",  "wp_pass_env":"JOBINKOREA365COM",     "daily":1},
+    {"url":"https://jobkoreaglobal.com",     "lang":"en","theme":"Recruitment",         "mode":"blog",      "keywords_file":"data/keywords/keywords_jobkoreaglobal.txt", "wp_pass_env":"JOBKOREAGLOBALCOM",    "daily":1},
+    {"url":"https://korea365.org",           "lang":"en","theme":"Korea Culture",       "mode":"blog",      "keywords_file":"data/keywords/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":1},
+    {"url":"https://koreanews365.com",       "lang":"ko","theme":"한국 뉴스",            "mode":"news",      "keywords_file":"data/keywords/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":1},
+    {"url":"https://theseouljournal.com",    "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",   "keywords_file":"data/keywords/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":1},
 ]
 
 # ============================================================
@@ -1823,8 +1823,10 @@ def split_slots(daily, num=3):
     return parts
 
 def get_slot_posts(site, slot):
-    parts=split_slots(site["daily"],3)
-    return parts[max(0,min(slot-1,len(parts)-1))]
+    # 2026-08-04: 하루 3슬롯(고정 3앵커 ±60분) → 하루 1회 완전랜덤시각으로
+    # 변경(publish_scheduler.py 참고). 이제 슬롯이 1개뿐이라 분할 없이
+    # 그 사이트의 하루치(daily=1)를 그대로 반환.
+    return site["daily"]
 
 # ============================================================
 # ★ WP 포스팅
@@ -2135,6 +2137,19 @@ def process_one(site, keyword):
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
+
+    # ★ 2026-08-04 사용자 지시("SEO 90점 이상만 올려"): 예전엔 SEO_TARGET(90)을
+    #   재생성 목표로만 쓰고, MAX_REGEN 다 써도 90 미달이면 postprocess로 보정만
+    #   하고 그냥 발행했음. 이제는 하드 게이트 — 90 미달이면 발행 자체를 스킵.
+    #   (주의: 이 score는 이 스크립트 자체 추정치이고, WP에 저장되는
+    #   rank_math_seo_score도 이 값을 그대로 씀 — RankMath 플러그인이 REST로
+    #   만든 글을 다시 분석해서 갱신해주는 게 아니라서, 실제 RankMath 분석
+    #   점수와는 다를 수 있음. 그래도 현재 유일하게 있는 사전 품질 신호라
+    #   이걸 게이트로 쓴다.)
+    if score < SEO_TARGET:
+        print(f"  ⛔ SEO {score}점 < 목표 {SEO_TARGET}점 → 발행 스킵")
+        log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
+        return False
 
     cat_name=get_category_for_post(theme,keyword,title)
     print(f"  📁 카테고리: {cat_name}")
