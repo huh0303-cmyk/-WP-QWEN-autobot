@@ -11,9 +11,19 @@ resolve_duplicate_titles.py가 만든 duplicate_titles_manifest.json을 읽어�
 secrets.<SITE> 환경변수로 주입해서 실행.
 """
 import os
+import socket
 import json
 import requests
 from collections import defaultdict
+
+# ★ 2026-08-03: GitHub Actions 러너에서 27개 사이트 전체가 "Network is
+#   unreachable"로 동시에 실패하는 사고 발생 - IPv6 라우팅이 막혀있는데
+#   DNS가 AAAA(IPv6)를 먼저 주는 전형적인 러너 버그. urllib3가 쓰는 소켓
+#   생성을 IPv4로 강제해서 회피한다.
+_orig_getaddrinfo = socket.getaddrinfo
+def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _ipv4_only_getaddrinfo
 
 WP_USER = "huh0303@gmail.com"
 MANIFEST_PATH = "duplicate_titles_manifest.json"
