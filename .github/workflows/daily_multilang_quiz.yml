@@ -5,9 +5,11 @@ on:
   # env로 전달되지 않아 9개 언어가 전부 fallback 토큰으로 몰렸었음.
   # 2026-08-03 env 배선 수정 완료 + 전용 토큰 있는 언어(EN/ES/JA/VI) 확인 후 재개.
   # 토큰 없는 언어(FR/DE/ZH/AR/RU)는 upload_youtube.py가 자동 스킵(경고만 출력).
-  schedule:
-    - cron: '0 21 * * *'  # 목표 07:00 KST ±1h
-    - cron: '0 9 * * *'   # 목표 19:00 KST ±1h
+  # ⚠️ 2026-08-03: 사용자가 결과물 품질 문제(이미지 누락 등)로 전체 중단 지시.
+  # 원인 파악/수정 전까지 스케줄 끔 — workflow_dispatch로만 수동 테스트.
+  # schedule:
+  #   - cron: '0 21 * * *'  # 목표 07:00 KST ±1h
+  #   - cron: '0 9 * * *'   # 목표 19:00 KST ±1h
   workflow_dispatch: {}   # Actions 탭에서 수동 실행 버튼도 사용 가능
 
 permissions:
