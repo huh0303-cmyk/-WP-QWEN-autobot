@@ -18,12 +18,20 @@ daily_site_traffic.py
 """
 import os
 import sys
+import socket
 import json
 import time
 import random
 import requests
 import xml.etree.ElementTree as ET
 from datetime import date, timedelta, datetime, timezone
+
+# ★ 2026-08-03: GitHub Actions 러너 IPv6 라우팅 버그로 27개 사이트(sitemap
+#   조회 등 직접 접속하는 부분) 전체 접속실패 사고 발생 - IPv4 강제로 우회.
+_orig_getaddrinfo = socket.getaddrinfo
+def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _ipv4_only_getaddrinfo
 
 GSC_KEY_JSON = os.environ.get("GSC_SERVICE_ACCOUNT_JSON", "")
 SHEETS_WEBHOOK = os.environ.get("SHEETS_WEBHOOK", "")
@@ -367,6 +375,13 @@ def main():
         log(f"\n⚠️ GSC 권한 없는 사이트 {len(no_access)}개: {', '.join(no_access)}")
 
     send_to_sheets(records)
+
+    # ★ 2026-08-04: 결과가 구글시트로만 가서 사람이 시트를 직접 열어봐야만
+    # 확인 가능했음. 저장소에도 JSON으로 커밋해서 언제든 코드/CI에서 바로
+    # 읽을 수 있게 함(사용자 지시: "방문자수도 모르는거지? ... 나는 그걸
+    # 알아야 뭔 결정방향을 정하지").
+    with open("daily_site_traffic_result.json", "w", encoding="utf-8") as f:
+        json.dump({"checked_at": checked_at, "records": records}, f, ensure_ascii=False, indent=2)
     log("완료")
 
 

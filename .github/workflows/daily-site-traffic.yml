@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 22 * * *"   # 07:00 KST (전날 22:00 UTC)
 
+permissions:
+  contents: write
+
 concurrency:
   group: daily-site-traffic
   cancel-in-progress: false
@@ -31,3 +34,15 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: python scripts/daily_site_traffic.py
+
+      - name: "결과 JSON 저장소에 커밋 (시트 없이도 바로 확인 가능하게)"
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add daily_site_traffic_result.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 27사이트 방문자/색인 현황 갱신 [skip ci]"
+          git push
