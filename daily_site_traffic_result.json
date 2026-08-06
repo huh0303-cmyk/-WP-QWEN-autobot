@@ -1,115 +1,115 @@
 {
-  "checked_at": "2026-08-04 05:59:55",
+  "checked_at": "2026-08-06 08:04:10",
   "records": [
     {
       "domain": "k-health365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 0,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreamedicaltour.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
-      "impressions": 8,
+      "indexed": "",
+      "impressions": 16,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreainvest365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 24,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "ki-korea.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
+      "indexed": "",
       "impressions": 3,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreainsurance365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "kfinance365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
-      "clicks": 0,
-      "indexed": 3,
-      "impressions": 10,
+      "date": "2026-08-02",
+      "weekday": "일",
+      "clicks": 1,
+      "indexed": "",
+      "impressions": 11,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreataxnlaw.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 0,
-      "impressions": 1,
+      "indexed": "",
+      "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreacrypto365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
-      "clicks": 2,
-      "indexed": 15,
-      "impressions": 15,
+      "date": "2026-08-02",
+      "weekday": "일",
+      "clicks": 0,
+      "indexed": "",
+      "impressions": 7,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "krealestate365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "ktech365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 0,
-      "impressions": 1,
+      "indexed": "",
+      "impressions": 2,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "kskin365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 9,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "oliveyoungkorea.com",
@@ -119,157 +119,157 @@
       "indexed": "",
       "impressions": "",
       "status": "권한없음",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "kworld365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 0,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "k-trip365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "k-visa365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
-      "clicks": 0,
-      "indexed": 15,
-      "impressions": 23,
+      "date": "2026-08-02",
+      "weekday": "일",
+      "clicks": 1,
+      "indexed": "",
+      "impressions": 25,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreawedding365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
-      "clicks": 0,
-      "indexed": 15,
-      "impressions": 14,
+      "date": "2026-08-02",
+      "weekday": "일",
+      "clicks": 1,
+      "indexed": "",
+      "impressions": 17,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "kstudy365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
-      "impressions": 11,
+      "indexed": "",
+      "impressions": 2,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "studyinkorea365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 24,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "kieca-korea.org",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 0,
+      "indexed": "",
       "impressions": 3,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "ksa-korea.org",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 0,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "sis-korea.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
-      "impressions": 0,
+      "indexed": "",
+      "impressions": 2,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "jobkorea365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 12,
-      "impressions": 8,
+      "indexed": "",
+      "impressions": 14,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "jobinkorea365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
-      "clicks": 1,
-      "indexed": 15,
-      "impressions": 11,
+      "date": "2026-08-02",
+      "weekday": "일",
+      "clicks": 0,
+      "indexed": "",
+      "impressions": 17,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "jobkoreaglobal.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 6,
-      "impressions": 53,
+      "indexed": "",
+      "impressions": 36,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "korea365.org",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "koreanews365.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 3,
+      "indexed": "",
       "impressions": 0,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     },
     {
       "domain": "theseouljournal.com",
-      "date": "2026-07-31",
-      "weekday": "금",
+      "date": "2026-08-02",
+      "weekday": "일",
       "clicks": 0,
-      "indexed": 24,
-      "impressions": 21,
+      "indexed": "",
+      "impressions": 16,
       "status": "정상",
-      "checked_at": "2026-08-04 05:59:55"
+      "checked_at": "2026-08-06 08:04:10"
     }
   ],
   "partial": false

@@ -1,11 +1,11 @@
 {
   "latest": {
-    "site_clicks": 2,
+    "site_clicks": 3,
     "site_indexed": 0,
     "youtube": {
       "한국어(TOPIK)": {
         "subs": 5730,
-        "views": 337754
+        "views": 342039
       },
       "영어(Survival English)": {
         "subs": 0,
@@ -16,8 +16,8 @@
         "views": 0
       },
       "스페인어(Survival Spanish)": {
-        "subs": 7,
-        "views": 956
+        "subs": 12,
+        "views": 3370
       },
       "베트남어(Survival Vietnamese)": {
         "subs": 2,
@@ -44,10 +44,10 @@
         "views": 0
       }
     },
-    "tiktok": 28300,
+    "tiktok": 28500,
     "facebook": null,
     "instagram": null,
     "threads": null
   },
-  "updated_at": "2026-08-03 08:16:01"
+  "updated_at": "2026-08-06 08:26:05"
 }
