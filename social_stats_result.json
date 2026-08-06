@@ -6,8 +6,8 @@
       "error": null
     },
     "TikTok": {
-      "count": 28500,
-      "error": null
+      "count": null,
+      "error": "followerCount 파싱 실패 (틱톡 페이지 구조 변경 가능성)"
     },
     "Facebook": {
       "count": null,
