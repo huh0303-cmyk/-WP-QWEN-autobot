@@ -1,13 +1,13 @@
 {
-  "date": "2026-08-06",
+  "date": "2026-08-07",
   "platforms": {
     "YouTube": {
-      "count": 5730,
+      "count": 5740,
       "error": null
     },
     "TikTok": {
-      "count": null,
-      "error": "followerCount 파싱 실패 (틱톡 페이지 구조 변경 가능성)"
+      "count": 28600,
+      "error": null
     },
     "Facebook": {
       "count": null,
