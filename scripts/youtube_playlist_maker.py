@@ -124,6 +124,11 @@ WORKDIR = "playlist_output"
 # 실행마다 목표 재생시간 구간 자체를 무작위로 골라 영상 길이가 매번 다르게 한다
 DURATION_POOL_MIN_SEC = 30 * 60
 DURATION_POOL_MAX_SEC = 100 * 60
+# 채널별로 재생시간 구간을 다르게 두고 싶을 때만 여기에 추가 — 없으면 위 기본값 사용.
+# starbucks(=카페음악, 2026-08-06부터 연주곡 전용 채널로 재배정): 56~190분 확정.
+CHANNEL_DURATION_POOL_SEC = {
+    "starbucks": (56 * 60, 190 * 60),
+}
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
 INTRO_DURATION_SEC = 6.0          # 인트로가 쓰는 음악 앞부분 길이 — 본편은 이 지점부터 이어서 재생
@@ -349,17 +354,22 @@ DESCRIPTION: (설명, 줄바꿈 포함 가능)
 """
     text = gemini_generate_text(prompt, temperature=0.9)
     title, description = f"{topic} Playlist | {caption_text}", caption_text
+    used_fallback = True
     if "TITLE:" in text and "DESCRIPTION:" in text:
         try:
             title_part = text.split("TITLE:")[1].split("DESCRIPTION:")[0].strip()
             desc_part = text.split("DESCRIPTION:")[1].strip()
             if title_part:
                 title = title_part
+                used_fallback = False
             if desc_part:
                 description = desc_part
         except Exception:
             pass
-    return title[:100], description
+    # used_fallback=True는 Gemini 제목생성이 실패해서 기계적인 폴백 문구가 쓰였다는
+    # 뜻 — "AI 흔적 없어야 한다"는 원칙상 이런 영상은 자동으로 공개하면 안 되므로
+    # publish 단계에서 이 플래그를 보고 비공개로 남겨둔다(youtube_publish_approved.py 참고).
+    return title[:100], description, used_fallback
 
 
 def send_email(subject, body):
@@ -470,9 +480,11 @@ def build_ai_images(topic, workdir):
 def pick_duration_target():
     """실행할 때마다 목표 재생시간 구간 자체를 무작위로 골라서, 영상 길이가
     매번 달라지게 한다(항상 60~80분처럼 똑같으면 그 자체가 AI 생성 티가 남)."""
-    lo_min = random.randint(DURATION_POOL_MIN_SEC // 60, (DURATION_POOL_MAX_SEC - 20 * 60) // 60)
+    pool_min_sec, pool_max_sec = CHANNEL_DURATION_POOL_SEC.get(
+        CHANNEL_KEY, (DURATION_POOL_MIN_SEC, DURATION_POOL_MAX_SEC))
+    lo_min = random.randint(pool_min_sec // 60, (pool_max_sec - 20 * 60) // 60)
     span_min = random.randint(10, 25)
-    hi_min = min(lo_min + span_min, DURATION_POOL_MAX_SEC // 60)
+    hi_min = min(lo_min + span_min, pool_max_sec // 60)
     return lo_min * 60, hi_min * 60
 
 
@@ -759,12 +771,16 @@ def make_intro_clip(intro_still_path, audio_path, out_path, duration=INTRO_DURAT
 def concat_intro_and_main(intro_path, main_path, out_path):
     """서로 다른 단계에서 만들어진 두 영상(인트로/본편)을 안전하게 이어붙인다.
     concat 데먹서는 코덱 파라미터가 조금만 달라도 깨지기 쉬워서, 필터 기반
-    concat을 쓴다."""
+    concat을 쓴다. 이 함수가 실제 업로드될 최종 파일(final.mp4)을 만드는
+    지점이므로, ffmpeg/Lavf 같은 인코더 시그니처가 메타데이터에 안 남게
+    지운다("AI 흔적 최소화" 원칙 — [[feedback_minimize_ai_tells]])."""
     run_ffmpeg([
         "ffmpeg", "-y", "-i", intro_path, "-i", main_path,
         "-filter_complex", "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]",
         "-map", "[v]", "-map", "[a]",
         "-c:v", "libx264", "-c:a", "aac", "-pix_fmt", "yuv420p",
+        "-map_metadata", "-1", "-fflags", "+bitexact",
+        "-flags:v", "+bitexact", "-flags:a", "+bitexact",
         out_path,
     ])
 
@@ -866,12 +882,15 @@ def mux_video_audio(video_path, audio_path, out_path):
 
 
 def make_static_video(image_path, audio_path, out_path):
-    """주제어 없을 때 폴백: 정지 이미지 1장 + 음악"""
+    """주제어 없을 때 폴백: 정지 이미지 1장 + 음악. 이 함수도 최종 업로드
+    파일을 직접 만들 수 있는 경로라 인코더 시그니처를 지운다."""
     vf = ("scale=1920:1080:force_original_aspect_ratio=decrease,"
           "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p")
     run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", image_path, "-i", audio_path,
                 "-vf", vf, "-c:v", "libx264", "-tune", "stillimage",
                 "-c:a", "aac", "-b:a", "192k", "-pix_fmt", "yuv420p",
+                "-map_metadata", "-1", "-fflags", "+bitexact",
+                "-flags:v", "+bitexact", "-flags:a", "+bitexact",
                 "-shortest", out_path])
 
 
@@ -976,13 +995,9 @@ def main():
             language_keyword = auto_lang
         log(f"🤖 자동 선택된 주제: {topic_keyword} (언어: {language_keyword or 'Mixed'})")
 
-    # 2026-08-03: 스타벅스 채널 시청자 국가 분포가 일본/미국 위주로 나와서,
-    # 언어를 명시로 안 주는 실행(자동/수동 둘 다)에서는 일본어 쪽으로
-    # 기본값을 둔다. 명시적으로 다른 언어를 주면 그게 항상 우선.
-    CHANNEL_DEFAULT_LANGUAGE = {"starbucks": "Japanese"}
-    if not language_keyword.strip() and CHANNEL_KEY in CHANNEL_DEFAULT_LANGUAGE:
-        language_keyword = CHANNEL_DEFAULT_LANGUAGE[CHANNEL_KEY]
-        log(f"   (채널 기본 언어 적용: {CHANNEL_KEY} → {language_keyword})")
+    # (2026-08-03에 넣었던 "starbucks 채널은 일본어 기본값" 규칙은 2026-08-06
+    # starbucks 채널이 보컬없는 카페 연주곡 전용으로 재배정되면서 더 이상 맞지
+    # 않아 제거함 — 연주곡은 언어 태그로 고를 대상이 아니라 항상 Mixed로 둔다.)
 
     os.makedirs(WORKDIR, exist_ok=True)
     service = get_drive_service()
@@ -1062,13 +1077,13 @@ def main():
     log(f"   링크: {link}")
     log(f"   썸네일: {thumb_link}")
 
-    # 유튜브 실제 업로드는 별도 승인 게이트(publish 잡)에서 진행하므로, 여기서는
-    # 제목/설명만 미리 만들어 다음 잡이 쓸 수 있게 메타데이터로 남겨둔다
+    # 유튜브 실제 업로드는 별도 잡(publish)에서 진행하므로, 여기서는 제목/설명만
+    # 미리 만들어 다음 잡이 쓸 수 있게 메타데이터로 남겨둔다
     upload_topic = topic_keyword.strip() or "Chill"
     upload_caption = caption_text if topic_keyword.strip() else ""
-    yt_title, yt_description = generate_youtube_title_description(
+    yt_title, yt_description, title_is_fallback = generate_youtube_title_description(
         upload_topic, upload_caption or filename, total_sec / 60)
-    log(f"   유튜브 제목(예정): {yt_title}")
+    log(f"   유튜브 제목(예정): {yt_title}" + (" ⚠️ 폴백 제목(Gemini 생성 실패)" if title_is_fallback else ""))
 
     meta = {
         "video_drive_id": video_drive_id,
@@ -1076,6 +1091,7 @@ def main():
         "filename": filename,
         "title": yt_title,
         "description": yt_description,
+        "title_is_fallback": title_is_fallback,
         "topic": upload_topic,
         "duration_min": round(total_sec / 60, 1),
     }

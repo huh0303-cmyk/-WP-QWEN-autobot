@@ -81,6 +81,7 @@ jobs:
       yt_title: ${{ steps.meta.outputs.yt_title }}
       yt_description: ${{ steps.meta.outputs.yt_description }}
       channel_key_upper: ${{ steps.meta.outputs.channel_key_upper }}
+      title_is_fallback: ${{ steps.meta.outputs.title_is_fallback }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -153,6 +154,7 @@ jobs:
               f.write("yt_title<<EOM\n" + m['title'] + "\nEOM\n")
               f.write("yt_description<<EOM\n" + m['description'] + "\nEOM\n")
               f.write(f"channel_key_upper={os.environ['CHANNEL_KEY'].upper()}\n")
+              f.write(f"title_is_fallback={'true' if m.get('title_is_fallback') else 'false'}\n")
           EOF
 
       - name: Upload result as artifact (backup)
@@ -199,6 +201,7 @@ jobs:
           THUMB_DRIVE_ID: ${{ needs.prepare.outputs.thumb_drive_id }}
           YT_TITLE: ${{ needs.prepare.outputs.yt_title }}
           YT_DESCRIPTION: ${{ needs.prepare.outputs.yt_description }}
+          TITLE_IS_FALLBACK: ${{ needs.prepare.outputs.title_is_fallback }}
           PUBLISH_AT_HOURS_FROM_NOW: ${{ github.event.inputs.publish_delay_hours }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}

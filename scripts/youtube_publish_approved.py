@@ -110,17 +110,24 @@ def get_youtube_service():
     return build("youtube", "v3", credentials=creds)
 
 
-def upload_to_youtube(service, video_path, thumb_path, title, description, publish_at_iso=None):
+def upload_to_youtube(service, video_path, thumb_path, title, description,
+                       publish_at_iso=None, force_private=False):
     from googleapiclient.http import MediaFileUpload
 
     # PUBLISH_AT_HOURS_FROM_NOW로 명시적 예약 시각을 준 경우에만 그 시각에
     # 자동 공개되도록 예약(private→public)을 걸고, 안 주면(스케줄 자동실행은
     # 항상 안 줌) 즉시 공개로 올린다 — 완전자동 운영이라 사람이 스튜디오에서
     # 따로 공개 버튼을 누르는 단계가 없다.
-    status = {"selfDeclaredMadeForKids": False,
-              "privacyStatus": "private" if publish_at_iso else "public"}
-    if publish_at_iso:
-        status["publishAt"] = publish_at_iso
+    # force_private: Gemini 제목생성이 실패해서 기계적인 폴백 제목이 쓰인 경우.
+    # "AI 흔적이 남으면 안 된다"는 원칙상 이런 영상은 자동공개 대상에서 제외하고
+    # 비공개로만 올려서 사람이 직접 확인/수정 후 공개하게 한다.
+    if force_private:
+        status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
+    else:
+        status = {"selfDeclaredMadeForKids": False,
+                  "privacyStatus": "private" if publish_at_iso else "public"}
+        if publish_at_iso:
+            status["publishAt"] = publish_at_iso
 
     body = {
         "snippet": {
@@ -176,6 +183,7 @@ def main():
     thumb_drive_id = os.environ.get("THUMB_DRIVE_ID", "")
     title = os.environ["YT_TITLE"]
     description = os.environ.get("YT_DESCRIPTION", "")
+    title_is_fallback = os.environ.get("TITLE_IS_FALLBACK", "").strip().lower() == "true"
     hours_from_now = os.environ.get("PUBLISH_AT_HOURS_FROM_NOW", "").strip()
 
     publish_at_iso = None
@@ -193,17 +201,22 @@ def main():
     if thumb_drive_id:
         download_drive_file(drive, thumb_drive_id, thumb_path)
 
-    log("2/3 유튜브 업로드 중...")
+    log("2/3 유튜브 업로드 중..." + (" ⚠️ 폴백 제목 — 비공개로만 업로드" if title_is_fallback else ""))
     youtube = get_youtube_service()
     video_id = upload_to_youtube(youtube, video_path, thumb_path if thumb_drive_id else None,
-                                  title, description, publish_at_iso)
+                                  title, description, publish_at_iso, force_private=title_is_fallback)
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
 
     log("3/3 완료 메일 발송 중...")
-    when = f"{hours_from_now}시간 뒤 예약 공개(private→public 자동전환)" if publish_at_iso else "즉시 공개로 업로드 완료"
+    if title_is_fallback:
+        when = "비공개로만 업로드됨 — 제목 자동생성 실패로 폴백 문구가 쓰여서 자동공개 안 함. 스튜디오에서 제목 확인 후 직접 공개해주세요."
+    elif publish_at_iso:
+        when = f"{hours_from_now}시간 뒤 예약 공개(private→public 자동전환)"
+    else:
+        when = "즉시 공개로 업로드 완료"
     send_email(
-        f"[유튜브 자동업로드 완료] {title[:60]}",
-        f"영상이 유튜브에 자동으로 올라갔어요 ({when}).\n\n{studio_url}\n\n제목: {title}\n",
+        f"[유튜브 자동업로드{'-확인필요' if title_is_fallback else '완료'}] {title[:60]}",
+        f"영상이 유튜브에 올라갔어요 ({when}).\n\n{studio_url}\n\n제목: {title}\n",
     )
     log(f"✅ 완료: {studio_url}")
 
