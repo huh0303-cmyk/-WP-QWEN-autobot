@@ -59,14 +59,17 @@ on:
         type: string
   schedule:
     # 2026-08-07: 승인 게이트를 없애고 완전자동(생성→업로드→공개)으로 전환.
-    # 단, 채널별로 "YOUTUBE_OAUTH_REFRESH_TOKEN_<채널명>" 시크릿이 있어야
-    # 그 채널 계정으로 업로드된다 — 없으면 공용 YOUTUBE_OAUTH_REFRESH_TOKEN으로
-    # 폴백되는데, 그 공용 토큰은 globalmusic 채널 계정 것이라 healing/mbb/kpop을
-    # 여기 넣으면 그 세 채널 영상이 전부 globalmusic 채널에 잘못 올라간다.
-    # → healing/mbb/kpop은 각자 전용 토큰(get_youtube_refresh_token.py로 발급)이
-    # 등록되기 전까지 스케줄에서 뺀다. 현재 전용 토큰이 있는 건 starbucks뿐.
-    - cron: "0 15 * * *"      # globalmusic — 매일 00:00 KST (공용 토큰 = 이 채널 것)
-    - cron: "0 15 */3 * *"    # starbucks — 3일 간격 00:00 KST(56~190분/자동선곡+중복회피, 전용 토큰 있음)
+    # 채널별 전용 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_<채널명>)이 없으면 publish
+    # 잡이 공용 토큰으로 엉뚱한 채널에 잘못 올리지 않고 그냥 실패하도록
+    # 고쳐뒀다(아래 publish 잡 참고) — 그래서 mbb/kpop도 미리 스케줄에 넣어도
+    # 안전하다. 토큰 없는 채널은 그냥 그 회차만 실패로 로그에 남고, 영상은
+    # Google Drive에 남아있다가 get_youtube_refresh_token.py로 mbb/kpop 토큰을
+    # 발급해서 시크릿에 등록하는 순간부터 자동으로 정상 작동한다.
+    - cron: "0 15 * * *"      # globalmusic — 매일 00:00 KST
+    - cron: "15 15 * * *"     # healing — 매일 00:15 KST
+    - cron: "0 15 */3 * *"    # starbucks — 3일 간격 00:00 KST(56~190분/자동선곡+중복회피)
+    - cron: "30 15 */2 * *"   # mbb — 2일 간격 00:30 KST (전용 토큰 등록 전까진 실패만 남음)
+    - cron: "45 15 */2 * *"   # kpop — 2일 간격 00:45 KST (전용 토큰 등록 전까진 실패만 남음)
 
 permissions:
   contents: write
@@ -102,7 +105,7 @@ jobs:
       - name: Run playlist maker
         env:
           AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '15 15 * * *' && 'healing') || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || (github.event.schedule == '30 15 */2 * *' && 'mbb') || (github.event.schedule == '45 15 */2 * *' && 'kpop') || 'globalmusic' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
@@ -141,7 +144,7 @@ jobs:
       - name: Export upload metadata for the publish job
         id: meta
         env:
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '15 15 * * *' && 'healing') || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || (github.event.schedule == '30 15 */2 * *' && 'mbb') || (github.event.schedule == '45 15 */2 * *' && 'kpop') || 'globalmusic' }}
         run: |
           python - <<'EOF'
           import json, os
@@ -208,8 +211,11 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-          # 채널 전용 토큰이 있으면 그걸 쓰고(뒤섞임 사고 방지), 없으면(아직
-          # 그 채널 OAuth 발급 전) 기존 공용 토큰으로 폴백한다.
-          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          # 채널 전용 토큰이 있으면 그걸 쓴다. globalmusic만 공용 토큰이 곧
+          # 자기 채널 것이라 폴백 허용 — 그 외 채널은 전용 토큰이 없으면 절대
+          # 폴백하지 않고 그냥 비워서 다음 스텝에서 실패시킨다(뒤섞임 사고 방지:
+          # 예전엔 여기서 공용 토큰으로 폴백해서 healing/mbb/kpop 영상이 엉뚱한
+          # 채널로 올라갈 뻔한 적이 있었음).
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || (needs.prepare.outputs.channel_key_upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/youtube_publish_approved.py
