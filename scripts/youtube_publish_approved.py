@@ -4,9 +4,12 @@
 youtube_publish_approved.py
 ─────────────────────────────────────────────────────────────
 generate-youtube-playlist.yml의 "prepare" 잡이 만들어둔 영상(구글드라이브에
-이미 업로드됨)을, 사람이 GitHub Environment 승인("Approve and deploy")을
-누른 뒤에 실제로 유튜브에 업로드/공개하는 단계. 승인 전까지는 아무것도
-유튜브에 올라가지 않는다.
+이미 업로드됨)을 유튜브에 업로드/공개하는 단계.
+
+2026-08-07: 5개 채널 전부 완전자동 운영으로 전환하면서 사람이 눌러야 했던
+GitHub Environment 승인 게이트를 제거했다 — prepare 잡이 끝나면 이 잡이 바로
+이어서 실행되고, PUBLISH_AT_HOURS_FROM_NOW를 안 주면(스케줄 실행은 항상
+안 줌) 즉시 공개로 올라간다. 사람 개입 없이 끝까지 자동으로 흘러간다.
 
 필요 환경변수:
     VIDEO_DRIVE_ID, THUMB_DRIVE_ID, YT_TITLE, YT_DESCRIPTION
@@ -110,10 +113,12 @@ def get_youtube_service():
 def upload_to_youtube(service, video_path, thumb_path, title, description, publish_at_iso=None):
     from googleapiclient.http import MediaFileUpload
 
-    # 기본은 항상 private — PUBLISH_AT_HOURS_FROM_NOW로 명시적으로 예약 시각을
-    # 준 경우에만 그 시각에 자동 공개되도록 스케줄을 건다. 스케줄도 안 주면
-    # private로 올려두기만 하고, 실제 공개는 사람이 스튜디오에서 직접 누른다.
-    status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
+    # PUBLISH_AT_HOURS_FROM_NOW로 명시적 예약 시각을 준 경우에만 그 시각에
+    # 자동 공개되도록 예약(private→public)을 걸고, 안 주면(스케줄 자동실행은
+    # 항상 안 줌) 즉시 공개로 올린다 — 완전자동 운영이라 사람이 스튜디오에서
+    # 따로 공개 버튼을 누르는 단계가 없다.
+    status = {"selfDeclaredMadeForKids": False,
+              "privacyStatus": "private" if publish_at_iso else "public"}
     if publish_at_iso:
         status["publishAt"] = publish_at_iso
 
@@ -195,12 +200,12 @@ def main():
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
 
     log("3/3 완료 메일 발송 중...")
-    when = f"{hours_from_now}시간 뒤 예약 공개(private→public 자동전환)" if publish_at_iso else "비공개 업로드만 됨 — 스튜디오에서 직접 공개 필요"
+    when = f"{hours_from_now}시간 뒤 예약 공개(private→public 자동전환)" if publish_at_iso else "즉시 공개로 업로드 완료"
     send_email(
-        f"[유튜브 업로드 대기] {title[:60]}",
-        f"승인하신 영상이 유튜브에 올라갔어요 ({when}).\n\n{studio_url}\n\n제목: {title}\n",
+        f"[유튜브 자동업로드 완료] {title[:60]}",
+        f"영상이 유튜브에 자동으로 올라갔어요 ({when}).\n\n{studio_url}\n\n제목: {title}\n",
     )
-    log(f"✅ 완료(비공개): {studio_url}")
+    log(f"✅ 완료: {studio_url}")
 
 
 if __name__ == "__main__":

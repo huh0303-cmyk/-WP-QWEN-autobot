@@ -58,12 +58,15 @@ on:
         required: false
         type: string
   schedule:
-    # 매일 00:00 KST(전날 15:00 UTC) 자동 실행 — 사람이 주제를 안 골라줘도
-    # 스크립트가 최근에 안 쓴 주제를 무작위로 골라서 자동 생성한다.
-    # schedule 트리거는 inputs가 없어서 channel을 고를 수 없으므로 기본
-    # globalmusic으로 고정(기존 단일 채널 자동화 동작 유지). 나머지 4개
-    # 채널은 당분간 workflow_dispatch로 수동 실행.
-    - cron: "0 15 * * *"
+    # 2026-08-07: 승인 게이트를 없애고 완전자동(생성→업로드→공개)으로 전환.
+    # 단, 채널별로 "YOUTUBE_OAUTH_REFRESH_TOKEN_<채널명>" 시크릿이 있어야
+    # 그 채널 계정으로 업로드된다 — 없으면 공용 YOUTUBE_OAUTH_REFRESH_TOKEN으로
+    # 폴백되는데, 그 공용 토큰은 globalmusic 채널 계정 것이라 healing/mbb/kpop을
+    # 여기 넣으면 그 세 채널 영상이 전부 globalmusic 채널에 잘못 올라간다.
+    # → healing/mbb/kpop은 각자 전용 토큰(get_youtube_refresh_token.py로 발급)이
+    # 등록되기 전까지 스케줄에서 뺀다. 현재 전용 토큰이 있는 건 starbucks뿐.
+    - cron: "0 15 * * *"      # globalmusic — 매일 00:00 KST (공용 토큰 = 이 채널 것)
+    - cron: "0 15 */3 * *"    # starbucks — 3일 간격 00:00 KST(56~190분/자동선곡+중복회피, 전용 토큰 있음)
 
 permissions:
   contents: write
@@ -98,7 +101,7 @@ jobs:
       - name: Run playlist maker
         env:
           AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
-          CHANNEL_KEY: ${{ github.event.inputs.channel || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || 'globalmusic' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
@@ -137,7 +140,7 @@ jobs:
       - name: Export upload metadata for the publish job
         id: meta
         env:
-          CHANNEL_KEY: ${{ github.event.inputs.channel || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || 'globalmusic' }}
         run: |
           python - <<'EOF'
           import json, os
@@ -178,7 +181,6 @@ jobs:
     needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    environment: youtube-publish
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
