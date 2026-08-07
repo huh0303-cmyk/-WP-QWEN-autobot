@@ -64,15 +64,21 @@ KAKAO_REFRESH_TOKEN = os.environ.get("KAKAO_REFRESH_TOKEN", "")
 # (예: "스페인어(Survival Spanish)" 라벨이 실제로는 starbucks 채널을 가리키는 등) —
 # 채널ID는 표시이름이 바뀌어도 안 바뀌므로 항상 ID를 기준으로 매칭한다.
 # 상세 내역: memory project_playlist_channels / project_youtube_language_channels.
+#
+# 2026-08-07: MBB/K-pop을 원래 채널(Mozart-Bach-Beethoven/K-pop Studio, 둘 다
+# 2026-08-02 개설)에서 더 오래된(2025-05-10 개설) 완전 빈 채널로 교체 —
+# 새로 만든 채널 OAuth 인증 시 전화번호 재인증 벽에 막혀서, 오래된 채널이
+# 그 벽에 덜 걸릴 거라는 가설로 바꿈. 실제 채널 표시이름은 아직
+# "Studio-K7"/"Studio_Global"로 남아있어 리네임 필요(기능엔 지장 없음).
 YOUTUBE_CHANNELS = [
     ("한국어(TOPIK)", "UCdA24IuR-JE7qButWv5jLqA"),
     ("영어(English Survival)", "UCrjkKWMHzAAvpLIFgHnwcWg"),
     ("다국어(Language, 10개국어)", "UCOWoNH_d6p45ywQ6W0Z1Jng"),
     ("플리-수노달달로맨틱(globalmusic)", "UCbJfEtsffpgI5MsKkB7BYvQ"),
     ("플리-힐링(healing)", "UC7yEsLM-HoXudngrD-4FIqg"),
-    ("플리-MBB", "UC7jOhyMa-FIrzZuea97z1Pw"),
+    ("플리-MBB(Studio-K7 재배정)", "UCKZsfAWyCmY0jckf4IWZrqw"),
     ("플리-카페음악(starbucks)", "UC_e-sbLkVgwJNYEeobolNog"),
-    ("플리-K-pop", "UCgNj-yS93A_fOHXXvG49fww"),
+    ("플리-K-pop(Studio_Global 재배정)", "UCRZ0uc_bxKDMwz3noBBi9KQ"),
 ]
 
 # 3개 언어 브랜드(TOPIK/English/Language)의 SNS 계정 표시용 이름 + 확인된 핸들.
