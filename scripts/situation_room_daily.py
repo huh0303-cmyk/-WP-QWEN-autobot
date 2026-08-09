@@ -33,6 +33,28 @@ from datetime import datetime, timezone, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+
+def _load_dotenv():
+    """CI(깃허브 액션)에서는 시크릿이 이미 환경변수로 들어와 있지만, 로컬에서
+    직접 실행할 때는 .env를 안 읽으면 아무 것도 안 채워진다 — 이미 설정된
+    실제 환경변수는 덮어쓰지 않고, 없는 것만 .env에서 채운다."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env_path = os.path.join(repo_root, ".env")
+    if not os.path.exists(env_path):
+        return
+    with open(env_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, _, v = line.partition("=")
+            k = k.strip()
+            if k and k not in os.environ:
+                os.environ[k] = v.strip()
+
+
+_load_dotenv()
+
 from daily_site_traffic import (  # noqa: E402
     get_gsc_token, gsc_get, latest_daily_stats, get_index_coverage, SITES, weekday_kr,
 )
@@ -65,20 +87,42 @@ KAKAO_REFRESH_TOKEN = os.environ.get("KAKAO_REFRESH_TOKEN", "")
 # 채널ID는 표시이름이 바뀌어도 안 바뀌므로 항상 ID를 기준으로 매칭한다.
 # 상세 내역: memory project_playlist_channels / project_youtube_language_channels.
 #
-# 2026-08-07: MBB/K-pop을 원래 채널(Mozart-Bach-Beethoven/K-pop Studio, 둘 다
-# 2026-08-02 개설)에서 더 오래된(2025-05-10 개설) 완전 빈 채널로 교체 —
-# 새로 만든 채널 OAuth 인증 시 전화번호 재인증 벽에 막혀서, 오래된 채널이
-# 그 벽에 덜 걸릴 거라는 가설로 바꿈. 실제 채널 표시이름은 아직
-# "Studio-K7"/"Studio_Global"로 남아있어 리네임 필요(기능엔 지장 없음).
+# 2026-08-07~08 최종 확정 (OAuth 브랜드계정 선택 화면 이름과 실제 유튜브
+# 채널명이 서로 안 맞는 문제로 밤새 하나씩 실제 업로드해서 검증함):
+# - MBB는 원래 의도한 실제 "Mozart-Bach-Beethoven" 채널(UC7jOhyMa...)이 맞음
+#   — OAuth 계정목록에서는 "K-ISSUE"라는 이름으로 나타남.
+# - K-pop도 원래 의도한 실제 "K-pop Studio" 채널(UCgNj-yS93A...)이 맞음
+#   — OAuth 계정목록에서는 그대로 "K-pop Studio"로 나타남.
+# - healing은 원래 채널(UC7yEsLM..., @Studio_k3)의 브랜드계정을 OAuth 계정
+#   목록 16개에서 하나도 못 찾음(전부 다른 채널로 연결됨) — 그래서 완전 빈
+#   채널 "Studio-K7"(UCKZsfAWyCmY0jckf4IWZrqw, OAuth 목록엔 "Studio_K3"로 나타남)
+#   로 healing을 재배정함. 원래 healing 채널(@Studio_k3, 21개 영상 보유)은
+#   당분간 자동화 대상에서 제외 — 나중에 다른 방법으로 브랜드계정을 찾으면 되돌릴 것.
+# 2026-08-09: 21개 채널 전수 재조사 후 확정 — 브랜드계정 내부이름(피커에 뜨는 이름)과
+# 실제 채널명이 계속 어긋나 있던 문제를 API로 하나씩 다 확인해서 바로잡음. 자세한 매칭
+# 근거는 memory/project_playlist_channels.md 참고.
 YOUTUBE_CHANNELS = [
     ("한국어(TOPIK)", "UCdA24IuR-JE7qButWv5jLqA"),
     ("영어(English Survival)", "UCrjkKWMHzAAvpLIFgHnwcWg"),
-    ("다국어(Language, 10개국어)", "UCOWoNH_d6p45ywQ6W0Z1Jng"),
-    ("플리-수노달달로맨틱(globalmusic)", "UCbJfEtsffpgI5MsKkB7BYvQ"),
-    ("플리-힐링(healing)", "UC7yEsLM-HoXudngrD-4FIqg"),
-    ("플리-MBB(Studio-K7 재배정)", "UCKZsfAWyCmY0jckf4IWZrqw"),
-    ("플리-카페음악(starbucks)", "UC_e-sbLkVgwJNYEeobolNog"),
-    ("플리-K-pop(Studio_Global 재배정)", "UCRZ0uc_bxKDMwz3noBBi9KQ"),
+    ("다국어(Studio_starbucks,10개국어)", "UCOWoNH_d6p45ywQ6W0Z1Jng"),
+    ("플리-로맨틱글로벌(globalmusic)", "UCbJfEtsffpgI5MsKkB7BYvQ"),
+    ("플리-힐링(실채널@Studio_k3)", "UC7yEsLM-HoXudngrD-4FIqg"),
+    ("플리-MBB", "UC7jOhyMa-FIrzZuea97z1Pw"),
+    ("플리-카페음악(Starbucksvibes)", "UC_e-sbLkVgwJNYEeobolNog"),
+    ("발명(INVENTION_TIMES)", "UCgNj-yS93A_fOHXXvG49fww"),
+    ("건강-영어(HealthClinicTV)", "UC91BpNSb4nUwD6jrpthK7FQ"),
+    ("건강-한국어(HealthClinic_Seoul)", "UCAizx0tPkRSol8sIhanN_QQ"),
+    ("일본어퀴즈(Studio_Quiz_JP)", "UCC_PcHMv-Uxpr00Pjw_J2Wg"),
+    ("우주(NASA_SPACE_TIMES)", "UCtNLZO07Oh3UnXPI2CjOgNg"),
+    ("역사(HISTORY_TODAY_TIMES)", "UCVBvZwodUF4s57KeNicxQ3w"),
+    ("과학(SCIENCE_FACTS_TIMES)", "UCKvKhETLGPaRV3qfWv2bM2g"),
+    ("클래식인물(CLASSICAL_TIMES)", "UCRZ0uc_bxKDMwz3noBBi9KQ"),
+    ("신화(MYTH_LEGEND_TIMES)", "UC9mvVEdL9Tllkit5v2Qv8UQ"),
+    ("미국아카이브(AMERICAN_ARCHIVE_TIMES)", "UCmt8f9yUT6iTxBys8eH4-Cg"),
+    ("고전낭독(CLASSIC_READS_TIMES)", "UCKF98zgzm7YRWlyMaoJJKIQ"),
+    ("레트로릴스(RETRO_REELS_TIMES)", "UCwh49EokdWFJqYFE_zA6XDQ"),
+    ("무성영화(SILENT_ERA_TIMES)", "UCLvy6kSpC8-7o3hnSrfQ47g"),
+    ("휴면-구힐링(Studio-K7)", "UCKZsfAWyCmY0jckf4IWZrqw"),
 ]
 
 # 3개 언어 브랜드(TOPIK/English/Language)의 SNS 계정 표시용 이름 + 확인된 핸들.
@@ -196,19 +240,61 @@ def collect_site_summary():
 # 2) 유튜브 전 채널 구독자 (한 번의 API 호출로 전부 조회)
 # ════════════════════════════════════════════════════════════
 def collect_youtube_all():
-    if not YOUTUBE_API_KEY:
-        return {}, "YOUTUBE_API_KEY 없음"
-    ids = ",".join(cid for _, cid in YOUTUBE_CHANNELS)
-    try:
-        r = requests.get(
-            "https://www.googleapis.com/youtube/v3/channels",
-            params={"part": "statistics,snippet", "id": ids, "key": YOUTUBE_API_KEY},
-            timeout=15,
-        )
-        r.raise_for_status()
-        items = {it["id"]: it for it in r.json().get("items", [])}
-    except Exception as e:
-        return {}, str(e)[:200]
+    """유튜브 채널 통계는 공개정보라, 21개 채널 개별 토큰이 없어도
+    아무 채널이나 하나의 broad-scope OAuth 토큰으로 channels().list(id=...)
+    조회가 가능하다 — YOUTUBE_API_KEY 없이도 동작하도록 이 방식을 우선 쓴다."""
+    ids = [cid for _, cid in YOUTUBE_CHANNELS]
+
+    # 우선 OAuth(broad-scope) 토큰으로 시도 — 채널 소유 여부와 무관하게 공개 통계 조회 가능.
+    oauth_token_env = None
+    for env_name in os.environ:
+        if env_name.startswith("YOUTUBE_OAUTH_REFRESH_TOKEN_") and env_name.endswith("_BROAD"):
+            oauth_token_env = env_name
+            break
+
+    items = {}
+    if oauth_token_env:
+        try:
+            from google.oauth2.credentials import Credentials
+            from googleapiclient.discovery import build
+
+            creds = Credentials(
+                token=None,
+                refresh_token=os.environ[oauth_token_env],
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=os.environ["YOUTUBE_OAUTH_CLIENT_ID"],
+                client_secret=os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"],
+                scopes=["https://www.googleapis.com/auth/youtube"],
+            )
+            youtube = build("youtube", "v3", credentials=creds)
+            # channels.list는 id 파라미터에 최대 50개까지 콤마로 묶어 한 번에 조회 가능.
+            for i in range(0, len(ids), 50):
+                chunk = ids[i:i + 50]
+                resp = youtube.channels().list(part="statistics,snippet", id=",".join(chunk)).execute()
+                for it in resp.get("items", []):
+                    items[it["id"]] = it
+        except Exception as e:
+            items = {}
+            oauth_err = str(e)[:200]
+        else:
+            oauth_err = None
+    else:
+        oauth_err = "broad-scope YOUTUBE_OAUTH_REFRESH_TOKEN_*_BROAD 없음"
+
+    if not items and YOUTUBE_API_KEY:
+        try:
+            r = requests.get(
+                "https://www.googleapis.com/youtube/v3/channels",
+                params={"part": "statistics,snippet", "id": ",".join(ids), "key": YOUTUBE_API_KEY},
+                timeout=15,
+            )
+            r.raise_for_status()
+            items = {it["id"]: it for it in r.json().get("items", [])}
+        except Exception as e:
+            return {}, f"OAuth 실패({oauth_err}) / API키 실패({str(e)[:150]})"
+
+    if not items:
+        return {}, oauth_err or "YOUTUBE_API_KEY 없음"
 
     result = {}
     for label, cid in YOUTUBE_CHANNELS:
@@ -477,6 +563,8 @@ def main():
 
     def _sns_diffs(platform_key, today_m):
         yesterday_m = yesterday.get(platform_key, {})
+        if not isinstance(yesterday_m, dict):
+            yesterday_m = {}
         out = {}
         for b in BRANDS:
             y = yesterday_m.get(b, {})
