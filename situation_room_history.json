@@ -1,53 +1,298 @@
 {
   "latest": {
-    "site_clicks": 3,
+    "site_clicks": 0,
     "site_indexed": 0,
+    "site_details": {
+      "k-health365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreamedicaltour.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreainvest365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "ki-korea.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreainsurance365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "kfinance365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreataxnlaw.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreacrypto365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "krealestate365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "ktech365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "kskin365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "oliveyoungkorea.com": {
+        "clicks": null,
+        "indexed": null,
+        "status": "권한없음"
+      },
+      "kworld365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "k-trip365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "k-visa365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreawedding365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "kstudy365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "studyinkorea365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "kieca-korea.org": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "ksa-korea.org": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "sis-korea.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "jobkorea365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "jobinkorea365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "jobkoreaglobal.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "korea365.org": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "koreanews365.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      },
+      "theseouljournal.com": {
+        "clicks": 0,
+        "indexed": 0,
+        "status": "정상"
+      }
+    },
     "youtube": {
       "한국어(TOPIK)": {
-        "subs": 5730,
-        "views": 342039
+        "subs": 5740,
+        "views": 345968
       },
-      "영어(Survival English)": {
-        "subs": 0,
-        "views": 0
+      "영어(English Survival)": {
+        "subs": 3,
+        "views": 201
       },
-      "일본어(Survival Japanese)": {
-        "subs": 1,
-        "views": 0
+      "다국어(Studio_starbucks,10개국어)": {
+        "subs": 14,
+        "views": 6645
       },
-      "스페인어(Survival Spanish)": {
-        "subs": 12,
-        "views": 3370
-      },
-      "베트남어(Survival Vietnamese)": {
-        "subs": 2,
-        "views": 5
-      },
-      "음악(globalmusic)": {
+      "플리-로맨틱글로벌(globalmusic)": {
         "subs": 8,
-        "views": 1776
+        "views": 1786
       },
-      "힐링(healing)": {
-        "subs": 11,
-        "views": 996
+      "플리-힐링(실채널@Studio_k3)": {
+        "subs": 12,
+        "views": 1000
       },
-      "건강(Studio_Health)": {
+      "플리-MBB": {
         "subs": 0,
-        "views": 27
+        "views": 0
       },
-      "건강(Clinic_Health_EN)": {
+      "플리-카페음악(Starbucksvibes)": {
+        "subs": 0,
+        "views": 8
+      },
+      "발명(INVENTION_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "건강-영어(HealthClinicTV)": {
         "subs": 0,
         "views": 1
       },
-      "여분(Studio_Global)": {
+      "건강-한국어(HealthClinic_Seoul)": {
+        "subs": 0,
+        "views": 27
+      },
+      "일본어퀴즈(Studio_Quiz_JP)": {
+        "subs": 1,
+        "views": 6
+      },
+      "우주(NASA_SPACE_TIMES)": {
+        "subs": 2,
+        "views": 5
+      },
+      "역사(HISTORY_TODAY_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "과학(SCIENCE_FACTS_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "클래식인물(CLASSICAL_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "신화(MYTH_LEGEND_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "미국아카이브(AMERICAN_ARCHIVE_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "고전낭독(CLASSIC_READS_TIMES)": {
+        "subs": 1,
+        "views": 0
+      },
+      "레트로릴스(RETRO_REELS_TIMES)": {
+        "subs": 1,
+        "views": 0
+      },
+      "무성영화(SILENT_ERA_TIMES)": {
+        "subs": 0,
+        "views": 0
+      },
+      "휴면-구힐링(Studio-K7)": {
         "subs": 0,
         "views": 0
       }
     },
-    "tiktok": 28500,
-    "facebook": null,
-    "instagram": null,
-    "threads": null
+    "tiktok": {
+      "TOPIK": {
+        "count": 28900,
+        "username": "sis_topik",
+        "error": null
+      },
+      "ENGLISH": {
+        "count": null,
+        "username": null,
+        "error": "TIKTOK_USERNAME_ENGLISH 없음(계정 미설정)"
+      },
+      "LANGUAGE": {
+        "count": null,
+        "username": null,
+        "error": "TIKTOK_USERNAME_LANGUAGE 없음(계정 미설정)"
+      }
+    },
+    "facebook": {
+      "TOPIK": {
+        "count": null,
+        "page_id": "1128119143729384",
+        "error": "Any of the pages_read_engagement, pages_manage_metadata,\n        pages_read_user_content, pages_manage_ads, pages_show_list or\n        pages_messaging permission(s) must be granted before impersonatin"
+      },
+      "ENGLISH": {
+        "count": null,
+        "page_id": null,
+        "error": "FB_PAGE_ID_ENGLISH/FB_PAGE_ACCESS_TOKEN_ENGLISH 없음(계정 미설정)"
+      },
+      "LANGUAGE": {
+        "count": null,
+        "page_id": null,
+        "error": "FB_PAGE_ID_LANGUAGE/FB_PAGE_ACCESS_TOKEN_LANGUAGE 없음(계정 미설정)"
+      }
+    },
+    "instagram": {
+      "TOPIK": {
+        "count": null,
+        "user_id": "17841410825136018",
+        "error": "Any of the pages_read_engagement, pages_manage_metadata,\n        pages_read_user_content, pages_manage_ads, pages_show_list or\n        pages_messaging permission(s) must be granted before impersonatin"
+      },
+      "ENGLISH": {
+        "count": null,
+        "user_id": null,
+        "error": "IG_USER_ID_ENGLISH/IG_ACCESS_TOKEN_ENGLISH 없음(계정 미설정)"
+      },
+      "LANGUAGE": {
+        "count": null,
+        "user_id": null,
+        "error": "IG_USER_ID_LANGUAGE/IG_ACCESS_TOKEN_LANGUAGE 없음(계정 미설정)"
+      }
+    },
+    "threads": {
+      "TOPIK": {
+        "count": null,
+        "user_id": null,
+        "error": "THREADS_USER_ID_TOPIK/THREADS_ACCESS_TOKEN_TOPIK 없음(계정 미설정)"
+      },
+      "ENGLISH": {
+        "count": null,
+        "user_id": null,
+        "error": "THREADS_USER_ID_ENGLISH/THREADS_ACCESS_TOKEN_ENGLISH 없음(계정 미설정)"
+      },
+      "LANGUAGE": {
+        "count": null,
+        "user_id": null,
+        "error": "THREADS_USER_ID_LANGUAGE/THREADS_ACCESS_TOKEN_LANGUAGE 없음(계정 미설정)"
+      }
+    }
   },
-  "updated_at": "2026-08-06 08:26:05"
+  "updated_at": "2026-08-09 18:51:08"
 }
