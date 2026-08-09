@@ -161,6 +161,126 @@ def get_threads_followers():
 
 
 # ════════════════════════════════════════════════════════════
+# 브랜드별(TOPIK/English/Language) 멀티 계정 수집 — 2026-08-06 종합상황실
+# 확장용. 기존 위 단일 계정 함수(get_tiktok_followers 등)는 그대로 두고
+# (social_stats_daily.py 자체 실행과 하위호환 유지), situation_room_daily.py가
+# 이 멀티 버전을 가져다 쓴다. 계정이 아직 안 만들어졌거나 시크릿이 없는
+# 브랜드는 조용히 실패하지 않고 "미설정"으로 명시적으로 리포트에 남는다.
+BRANDS = ["TOPIK", "ENGLISH", "LANGUAGE"]
+
+
+def get_tiktok_followers_multi():
+    results = {}
+    for brand in BRANDS:
+        username = os.getenv(f"TIKTOK_USERNAME_{brand}", "")
+        if not username and brand == "TOPIK":
+            username = os.getenv("TIKTOK_USERNAME", "")  # 기존 단일 계정 시크릿을 TOPIK 기본값으로 폴백
+        if not username:
+            results[brand] = {"count": None, "username": None, "error": f"TIKTOK_USERNAME_{brand} 없음(계정 미설정)"}
+            continue
+        try:
+            r = requests.get(
+                f"https://www.tiktok.com/@{username}",
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+                timeout=15,
+            )
+            r.raise_for_status()
+            m = re.search(r'"followerCount":(\d+)', r.text)
+            if not m:
+                results[brand] = {"count": None, "username": username, "error": "followerCount 파싱 실패(계정 없음/구조변경)"}
+                continue
+            results[brand] = {"count": int(m.group(1)), "username": username, "error": None}
+        except Exception as e:
+            results[brand] = {"count": None, "username": username, "error": str(e)[:200]}
+    return results
+
+
+def get_facebook_followers_multi():
+    results = {}
+    for brand in BRANDS:
+        token = os.getenv(f"FB_PAGE_ACCESS_TOKEN_{brand}", "")
+        page_id = os.getenv(f"FB_PAGE_ID_{brand}", "")
+        if brand == "TOPIK":
+            token = token or os.getenv("FB_PAGE_ACCESS_TOKEN", "")
+            page_id = page_id or os.getenv("FB_PAGE_ID", "")
+        if not token or not page_id:
+            results[brand] = {"count": None, "page_id": page_id or None, "error": f"FB_PAGE_ID_{brand}/FB_PAGE_ACCESS_TOKEN_{brand} 없음(계정 미설정)"}
+            continue
+        try:
+            r = requests.get(
+                f"https://graph.facebook.com/v21.0/{page_id}",
+                params={"fields": "followers_count,fan_count", "access_token": token},
+                timeout=15,
+            )
+            data = r.json()
+            if "error" in data:
+                results[brand] = {"count": None, "page_id": page_id, "error": data["error"].get("message", "알 수 없는 오류")[:200]}
+                continue
+            results[brand] = {"count": data.get("followers_count", data.get("fan_count")), "page_id": page_id, "error": None}
+        except Exception as e:
+            results[brand] = {"count": None, "page_id": page_id, "error": str(e)[:200]}
+    return results
+
+
+def get_instagram_followers_multi():
+    results = {}
+    for brand in BRANDS:
+        token = os.getenv(f"IG_ACCESS_TOKEN_{brand}", "")
+        ig_user_id = os.getenv(f"IG_USER_ID_{brand}", "")
+        if brand == "TOPIK":
+            token = token or os.getenv("IG_ACCESS_TOKEN", "") or os.getenv("FB_PAGE_ACCESS_TOKEN", "")
+            ig_user_id = ig_user_id or os.getenv("IG_USER_ID", "")
+        if not token or not ig_user_id:
+            results[brand] = {"count": None, "user_id": ig_user_id or None, "error": f"IG_USER_ID_{brand}/IG_ACCESS_TOKEN_{brand} 없음(계정 미설정)"}
+            continue
+        try:
+            r = requests.get(
+                f"https://graph.facebook.com/v21.0/{ig_user_id}",
+                params={"fields": "followers_count", "access_token": token},
+                timeout=15,
+            )
+            data = r.json()
+            if "error" in data:
+                results[brand] = {"count": None, "user_id": ig_user_id, "error": data["error"].get("message", "알 수 없는 오류")[:200]}
+                continue
+            results[brand] = {"count": data.get("followers_count"), "user_id": ig_user_id, "error": None}
+        except Exception as e:
+            results[brand] = {"count": None, "user_id": ig_user_id, "error": str(e)[:200]}
+    return results
+
+
+def get_threads_followers_multi():
+    results = {}
+    for brand in BRANDS:
+        token = os.getenv(f"THREADS_ACCESS_TOKEN_{brand}", "")
+        user_id = os.getenv(f"THREADS_USER_ID_{brand}", "")
+        if brand == "TOPIK":
+            token = token or os.getenv("THREADS_ACCESS_TOKEN", "")
+            user_id = user_id or os.getenv("THREADS_USER_ID", "")
+        if not token or not user_id:
+            results[brand] = {"count": None, "user_id": user_id or None, "error": f"THREADS_USER_ID_{brand}/THREADS_ACCESS_TOKEN_{brand} 없음(계정 미설정)"}
+            continue
+        try:
+            r = requests.get(
+                f"https://graph.threads.net/v1.0/{user_id}/threads_insights",
+                params={"metric": "followers_count", "access_token": token},
+                timeout=15,
+            )
+            data = r.json()
+            if "error" in data:
+                results[brand] = {"count": None, "user_id": user_id, "error": data["error"].get("message", "알 수 없는 오류")[:200]}
+                continue
+            values = data.get("data", [])
+            if values and values[0].get("total_value"):
+                results[brand] = {"count": values[0]["total_value"].get("value"), "user_id": user_id, "error": None}
+            else:
+                results[brand] = {"count": None, "user_id": user_id, "error": "followers_count 값 없음"}
+        except Exception as e:
+            results[brand] = {"count": None, "user_id": user_id, "error": str(e)[:200]}
+    return results
+
+
+# ════════════════════════════════════════════════════════════
 # 시트 전송
 # ════════════════════════════════════════════════════════════
 def send_to_sheets(records):
