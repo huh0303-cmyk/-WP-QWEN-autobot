@@ -228,18 +228,12 @@ def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, m
     end_col = start_col + n_metrics - 1
     start_letter = _col_letter(start_col)
 
-    if n_metrics > 1:
-        service.spreadsheets().batchUpdate(
-            spreadsheetId=spreadsheet_id,
-            body={"requests": [{
-                "mergeCells": {
-                    "range": {"sheetId": tab_id, "startRowIndex": 0, "endRowIndex": 1,
-                              "startColumnIndex": start_col, "endColumnIndex": end_col + 1},
-                    "mergeType": "MERGE_ALL",
-                },
-            }]},
-        ).execute()
-
+    # ★ 2026-08-09: mergeCells가 기존에 남아있던 다른 병합범위와 "부분적으로만"
+    #   겹치면 400 에러를 던지는데, 이게 배치 요청 안에서 터지면 뒤에 있는 실제
+    #   값 쓰기까지 통째로 실행이 안 돼서 그날 데이터가 시트에 한 줄도 안
+    #   들어가는 사고로 이어졌다(27개사이트_트래픽 탭에서 실제 발생).
+    #   그래서 병합은 맨 마지막으로 옮기고, 실패해도 실제 값 쓰기는 이미
+    #   끝난 뒤라 영향이 없도록 try/except로 감싼다.
     service.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!{start_letter}1",
         valueInputOption="RAW", body={"values": [[date_label]]},
@@ -254,3 +248,28 @@ def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, m
         spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!{start_letter}3",
         valueInputOption="RAW", body={"values": data_rows},
     ).execute()
+
+    if n_metrics > 1:
+        try:
+            meta = service.spreadsheets().get(
+                spreadsheetId=spreadsheet_id, ranges=[f"'{tab_name}'!1:1"],
+                fields="sheets(merges)",
+            ).execute()
+            merges = meta.get("sheets", [{}])[0].get("merges", [])
+            unmerge_requests = []
+            for m in merges:
+                if m.get("startRowIndex", 0) == 0 and m.get("endRowIndex", 1) == 1:
+                    if m.get("startColumnIndex", 0) < end_col + 1 and m.get("endColumnIndex", 0) > start_col:
+                        unmerge_requests.append({"unmergeCells": {"range": m}})
+            requests_batch = unmerge_requests + [{
+                "mergeCells": {
+                    "range": {"sheetId": tab_id, "startRowIndex": 0, "endRowIndex": 1,
+                              "startColumnIndex": start_col, "endColumnIndex": end_col + 1},
+                    "mergeType": "MERGE_ALL",
+                },
+            }]
+            service.spreadsheets().batchUpdate(
+                spreadsheetId=spreadsheet_id, body={"requests": requests_batch},
+            ).execute()
+        except Exception:
+            pass
