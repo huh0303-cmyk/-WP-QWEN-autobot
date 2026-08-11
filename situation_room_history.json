@@ -1,6 +1,6 @@
 {
   "latest": {
-    "site_clicks": 1,
+    "site_clicks": 0,
     "site_indexed": 0,
     "site_details": {
       "k-health365.com": {
@@ -94,7 +94,7 @@
         "status": "정상"
       },
       "kieca-korea.org": {
-        "clicks": 1,
+        "clicks": 0,
         "indexed": 0,
         "status": "정상"
       },
@@ -142,23 +142,23 @@
     "youtube": {
       "한국어(TOPIK)": {
         "subs": 5750,
-        "views": 347602
+        "views": 348606
       },
       "영어(English Survival)": {
-        "subs": 5,
+        "subs": 7,
         "views": 200
       },
       "다국어(Studio_starbucks,10개국어)": {
         "subs": 16,
-        "views": 6679
+        "views": 6670
       },
       "플리-로맨틱글로벌(globalmusic)": {
         "subs": 8,
-        "views": 1787
+        "views": 1788
       },
       "플리-힐링(실채널@Studio_k3)": {
         "subs": 12,
-        "views": 517
+        "views": 521
       },
       "플리-MBB": {
         "subs": 0,
@@ -194,7 +194,7 @@
       },
       "과학(SCIENCE_FACTS_TIMES)": {
         "subs": 0,
-        "views": 2
+        "views": 3
       },
       "클래식인물(CLASSICAL_TIMES)": {
         "subs": 0,
@@ -294,5 +294,5 @@
       }
     }
   },
-  "updated_at": "2026-08-11 07:59:27"
+  "updated_at": "2026-08-12 08:06:38"
 }
