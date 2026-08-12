@@ -444,6 +444,22 @@ CHANNEL_TOPIC_POOLS = {
 def _composer_from_topic(topic: str) -> str:
     """'Mozart — Eine kleine Nachtmusik' 형태에서 작곡가 성만 뽑아 썸네일 히어로 텍스트로 쓴다."""
     return (topic or "").split("—")[0].strip() or "Classical"
+
+
+def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, topic: str,
+                            hero_override: str = None):
+    """채널별 썸네일 포맷 분기를 한 곳에 모아둔 공용 헬퍼.
+    본 파이프라인(build_playlist)과 주간 썸네일 리프레시 스크립트가 공유해서 쓴다."""
+    if hero_override == "playlist_only":
+        make_caption_thumbnail(image_path, out_path, topic="Playlist", show_waveform=True)
+    elif channel_key in PLAYLIST_HERO_CHANNELS:
+        make_caption_thumbnail(image_path, out_path, topic="Playlist",
+                                subtitle_override=topic, show_waveform=True)
+    elif channel_key == "mbb":
+        make_caption_thumbnail(image_path, out_path, topic=_composer_from_topic(topic),
+                                subtitle_override=topic, show_waveform=False)
+    else:
+        make_caption_thumbnail(image_path, out_path, topic=topic)
 RECENT_TOPICS_FILE = "playlist_recent_topics.json"
 RECENT_TOPICS_MEMORY = 8  # 최근 이만큼은 다시 안 뽑히게 피함
 
@@ -1139,18 +1155,9 @@ def main():
         image_paths = build_ai_images(topic_keyword, WORKDIR)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
-        if CHANNEL_KEY in PLAYLIST_HERO_CHANNELS:
-            # globalmusic/healing/starbucks/kpop: 지명/계절이 아니라 "Playlist"를
-            # 메인 타이틀로 크게, 파형과 함께 (구독자 50만+ 플리 채널 벤치마킹 공통 포맷)
-            make_caption_thumbnail(image_paths[0], thumbnail_out, topic="Playlist",
-                                    subtitle_override=topic_keyword, show_waveform=True)
-        elif CHANNEL_KEY == "mbb":
-            # 클래식: 작곡가 성을 메인 타이틀로, 곡명을 부제로 (파형 없음 — 초상화 앨범아트 톤)
-            make_caption_thumbnail(image_paths[0], thumbnail_out,
-                                    topic=_composer_from_topic(topic_keyword),
-                                    subtitle_override=topic_keyword, show_waveform=False)
-        else:
-            make_caption_thumbnail(image_paths[0], thumbnail_out, topic=topic_keyword)
+        # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
+        # 플리 채널 벤치마킹 공통 포맷 — 주간 썸네일 리프레시 스크립트와 로직 공유)
+        make_channel_thumbnail(CHANNEL_KEY, image_paths[0], thumbnail_out, topic_keyword)
 
         log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
         # 인트로가 곡 앞부분(INTRO_DURATION_SEC)을 쓰므로, 본편은 그 이어지는
@@ -1168,16 +1175,7 @@ def main():
 
         log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
         intro_still = os.path.join(WORKDIR, "intro_still.png")
-        if CHANNEL_KEY in PLAYLIST_HERO_CHANNELS:
-            make_caption_thumbnail(image_paths[0], intro_still, topic="Playlist",
-                                    subtitle_override=topic_keyword, show_waveform=True)
-        elif CHANNEL_KEY == "mbb":
-            make_caption_thumbnail(image_paths[0], intro_still,
-                                    topic=_composer_from_topic(topic_keyword),
-                                    subtitle_override=topic_keyword, show_waveform=False)
-        else:
-            make_caption_thumbnail(image_paths[0], intro_still, topic=topic_keyword,
-                                    subtitle_override="Playlist")
+        make_channel_thumbnail(CHANNEL_KEY, image_paths[0], intro_still, topic_keyword)
         intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
         make_intro_clip(intro_still, audio_path, intro_clip)
         concat_intro_and_main(intro_clip, body_path, final_path)

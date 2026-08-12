@@ -1,0 +1,51 @@
+name: 플리 채널 썸네일 주간 리프레시 (5개 채널 x 5장)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 6 * * 3"   # 매주 수요일 15:47 KST
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 시스템 패키지 설치 (한글 폰트)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q fonts-nanum
+
+      - name: 패키지 설치
+        run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: 채널별 썸네일 5장씩 생성 + 드라이브 업로드
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+          THUMBNAIL_FOLDER_ID_HEALING: ${{ secrets.THUMBNAIL_FOLDER_ID_HEALING }}
+          THUMBNAIL_FOLDER_ID_STARBUCKS: ${{ secrets.THUMBNAIL_FOLDER_ID_STARBUCKS }}
+          THUMBNAIL_FOLDER_ID_MBB: ${{ secrets.THUMBNAIL_FOLDER_ID_MBB }}
+          THUMBNAIL_FOLDER_ID_KPOP: ${{ secrets.THUMBNAIL_FOLDER_ID_KPOP }}
+        run: python scripts/refresh_playlist_thumbnails.py
+
+      - name: 생성된 썸네일 GitHub에 커밋
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add thumbnail_bank/ 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 플리 채널 썸네일 주간 리프레시 [skip ci]"
+          git pull --rebase origin main
+          git push
