@@ -46,7 +46,7 @@ def _produce_from_parsed(parsed: dict, lang: str, steps: list[str], publish_dela
     video_local_path = f"/tmp/{topic_slug}_{lang}.mp4"
     if "video" in steps:
         audio_path, timeline = synthesize_dialogue_with_timeline(script_text, lang)
-        video_builder.build_video(script_text, scene_keywords, audio_path, timeline, lang, video_local_path)
+        video_builder.build_video(script_text, scene_keywords, audio_path, timeline, lang, video_local_path, title=title)
 
         service = get_drive_service()
         lang_root = get_or_create_folder(service, f"HealthClinic_{lang}", DRIVE_FOLDER_ID)

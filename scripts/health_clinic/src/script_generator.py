@@ -53,11 +53,12 @@ SYSTEM_PROMPT_TEMPLATE = """당신은 유튜브 건강 채널 'Health Clinic'의
 (본문 전체 대사. 모든 줄 맨 앞에 "[A] " 또는 "[B] " 태그를 붙여 화자를 구분한다.)
 
 [SCENE_KEYWORDS]
-(영상/이미지 매칭용 키워드를 **최소 45개, 최대 60개** 쉼표로 구분해서 나열한다. 대본 전체 흐름을 따라
- 문장/문단이 바뀔 때마다 새 키워드를 하나씩 배정한다는 느낌으로 촘촘하게 뽑는다 — 한 키워드가
- 영상에서 너무 오래 반복되지 않고 자주 바뀌도록 하기 위함이다. 같은 키워드를 반복하지 말고
- 구체적인 장면으로 뽑는다 (예: senior stretching, knee pain closeup, morning walk, doctor consultation,
- healthy breakfast plate, blood pressure monitor, senior couple laughing, stairs climbing, yoga mat, ...)
+(영상/이미지 매칭용 키워드를 **최소 220개, 최대 230개** 쉼표로 구분해서 나열한다. 영상 15분 동안
+ 이미지가 4초 미만으로 자주 바뀌도록 하기 위한 개수이니 반드시 이 범위를 지킨다. 대본을 문장 단위로
+ 훑으면서 그 문장에 어울리는 구체적 장면을 하나씩 배정하는 느낌으로 촘촘하게 뽑는다 — 같은 키워드를
+ 반복하지 말고 매번 다른 구체적 장면으로 뽑는다 (예: senior stretching, knee pain closeup, morning walk,
+ doctor consultation, healthy breakfast plate, blood pressure monitor, senior couple laughing,
+ stairs climbing, yoga mat, senior smiling outdoors, medication pills closeup, water glass, ...)
 """
 
 USER_PROMPT_TEMPLATE = """주제: {topic}

@@ -3,23 +3,34 @@
               나레이션에 맞춰 자주 컷 전환) + 화자 타임라인 기반 정밀 자막(SRT, 크고 굵게 번인)을
               합쳐 최종 MP4를 만듭니다.
 
+처음 AI_IMAGE_COUNT(6)장은 스톡사진 대신 Gemini 이미지 생성으로 대본 맥락에 맞는 고퀄리티
+이미지를 직접 만든다 (도입부 강한 인상을 위함, API 비용 발생 — 승인됨). 나머지는 Pexels/Pixabay
+무료 스톡으로 채운다.
+
 ffmpeg를 직접 호출하는 방식입니다 (moviepy보다 이 환경에서 훨씬 빠르고 안정적으로 검증됨).
 """
+import base64
 import glob
 import json
 import os
 import re
 import subprocess
 import tempfile
+import time
 
 import requests
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image"
+GEMINI_IMAGE_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_IMAGE_MODEL}:generateContent"
+
 VIDEO_SIZE = (1280, 720)
-INTRO_CLIP_COUNT = 4            # 도입부에 쓸 이미지 수 (각각 켄번즈 클립으로)
+AI_IMAGE_COUNT = 6              # 대본 맥락 기반 AI 생성 이미지 수 (도입부 퀄리티용)
+INTRO_CLIP_COUNT = 4            # 도입부에 쓸 이미지 수 (각각 켄번즈 클립으로) — AI 생성 이미지 중 앞 4장 사용
 INTRO_CLIP_DURATION_SEC = 6.0   # 도입부 클립 1개당 길이
-MIN_IMAGE_DURATION_SEC = 3.0    # 본편에서 이미지 1장이 화면에 남는 최소 시간 (너무 빨리 안 바뀌게)
+MIN_IMAGE_DURATION_SEC = 2.0    # 본편에서 이미지 1장이 화면에 남는 최소 시간 (목표: 장당 4초 미만)
 
 FONT_PATH_LATIN = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 FONT_PATH_CJK = "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
@@ -80,11 +91,63 @@ def _fetch_from_pixabay(keyword: str, out_path: str) -> bool:
     return True
 
 
-def _fetch_images(keywords: list, out_dir: str) -> list:
-    """Pexels 우선 검색, 실패하면 Pixabay로 자동 폴백."""
+def _generate_ai_image(prompt: str, out_path: str, max_retries: int = 3) -> bool:
+    """Gemini 이미지 생성으로 대본 맥락에 맞는 고퀄리티 이미지 1장 생성 (도입부용, 유료 API)."""
+    for attempt in range(max_retries + 1):
+        try:
+            resp = requests.post(
+                GEMINI_IMAGE_URL,
+                params={"key": GEMINI_API_KEY},
+                json={
+                    "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                    "generationConfig": {"responseModalities": ["IMAGE"]},
+                },
+                timeout=120,
+            )
+            if resp.status_code in (429, 500, 502, 503, 504) and attempt < max_retries:
+                wait = min(60, (2 ** attempt) * 4)
+                print(f"[Video] Gemini 이미지 생성 {resp.status_code} — {wait}초 대기 후 재시도...")
+                time.sleep(wait)
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+            for cand in data.get("candidates", []):
+                for part in cand.get("content", {}).get("parts", []):
+                    inline = part.get("inlineData") or part.get("inline_data")
+                    if inline and inline.get("data"):
+                        with open(out_path, "wb") as f:
+                            f.write(base64.b64decode(inline["data"]))
+                        return True
+            print(f"[Video] Gemini 응답에 이미지 데이터 없음: {prompt[:60]}...")
+            return False
+        except Exception as e:
+            print(f"[Video] AI 이미지 생성 실패 ('{prompt[:60]}...'): {e}")
+            if attempt >= max_retries:
+                return False
+    return False
+
+
+def _fetch_images(keywords: list, out_dir: str, title: str = "", ai_count: int = 0) -> list:
+    """
+    처음 ai_count장은 대본 제목+키워드를 반영한 프롬프트로 Gemini AI 이미지 생성(고퀄리티, 도입부용).
+    나머지는 Pexels 우선 검색, 실패하면 Pixabay로 자동 폴백. AI 생성이 실패하면 스톡으로 대체.
+    """
     paths = []
     for i, kw in enumerate(keywords):
         path = os.path.join(out_dir, f"{i:02d}_{re.sub(r'[^a-z0-9]+', '_', kw.lower())}.jpg")
+
+        if i < ai_count:
+            prompt = (
+                f"Photorealistic, cinematic, high quality 16:9 image for a health education video "
+                f"titled '{title}'. Scene: {kw}. Warm natural lighting, authentic senior-friendly mood, "
+                f"no text or watermark."
+            )
+            print(f"[Video] AI 이미지 생성 중 ({i+1}/{ai_count}, 도입부 고퀄리티): {kw}")
+            if _generate_ai_image(prompt, path):
+                paths.append(path)
+                continue
+            print(f"[Video] AI 이미지 생성 실패 → 스톡으로 대체: {kw}")
+
         try:
             if _fetch_from_pexels(kw, path):
                 paths.append(path)
@@ -100,10 +163,10 @@ def _fetch_images(keywords: list, out_dir: str) -> list:
         except Exception as e:
             print(f"[Video] Pixabay도 실패 ('{kw}'): {e}")
 
-        print(f"[Video] 경고: '{kw}' 이미지를 찾지 못해 건너뜀 (Pexels/Pixabay 둘 다 실패)")
+        print(f"[Video] 경고: '{kw}' 이미지를 찾지 못해 건너뜀 (AI/Pexels/Pixabay 모두 실패)")
 
     if not paths:
-        raise RuntimeError("배경 이미지를 하나도 가져오지 못했습니다. Pexels/Pixabay API 키를 확인하세요.")
+        raise RuntimeError("배경 이미지를 하나도 가져오지 못했습니다. GEMINI/Pexels/Pixabay API 키를 확인하세요.")
     return paths
 
 
@@ -194,11 +257,13 @@ def build_video(
     timeline: list,
     lang: str,
     out_path: str,
+    title: str = "",
 ) -> str:
     """
     최종 MP4 생성 파이프라인:
-    1) Pexels/Pixabay에서 장면별 이미지 다수 확보 (스크립트당 45~60개 키워드 → 이미지 다수)
-    2) 첫 INTRO_CLIP_COUNT(4)장 → 각각 INTRO_CLIP_DURATION_SEC(6초) 켄번즈 클립 → 도입부
+    1) 첫 AI_IMAGE_COUNT(6)장은 대본 제목/키워드 맥락 반영한 Gemini AI 이미지 생성(고퀄리티, 도입부용).
+       나머지는 Pexels/Pixabay 무료 스톡 다수 확보 (스크립트당 220~230개 키워드 → 장당 4초 미만 전환)
+    2) 그 중 첫 INTRO_CLIP_COUNT(4)장(=AI 생성분) → 각각 INTRO_CLIP_DURATION_SEC(6초) 켄번즈 클립 → 도입부
     3) 나머지 이미지 전부 → 켄번즈 클립 (남은 시간을 이미지 수만큼 균등 분할, 나레이션 흐름에 맞춰
        자주 컷 전환되도록 함 — 정지 슬라이드쇼가 아니라 이미지 하나하나가 다 살아 움직임)
     4) 모든 클립 이어붙이기 → 오디오 합성 (정확히 오디오 길이로 클리핑)
@@ -208,8 +273,8 @@ def build_video(
     keywords = [k.strip() for k in scene_keywords.split(",") if k.strip()] or ["senior healthy lifestyle"]
 
     with tempfile.TemporaryDirectory() as tmp:
-        print(f"[Video] Pexels/Pixabay 이미지 다운로드 중... (키워드 {len(keywords)}개)")
-        images = _fetch_images(keywords, tmp)
+        print(f"[Video] 이미지 확보 중... (키워드 {len(keywords)}개, 앞 {AI_IMAGE_COUNT}장은 AI 생성)")
+        images = _fetch_images(keywords, tmp, title=title, ai_count=AI_IMAGE_COUNT)
         print(f"[Video] 이미지 {len(images)}장 확보")
 
         intro_images = images[:INTRO_CLIP_COUNT]
