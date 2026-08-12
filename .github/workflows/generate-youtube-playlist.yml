@@ -211,8 +211,11 @@ jobs:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          # healing/kpop은 전용 OAuth 클라이언트로 재발급한 토큰이라(공용 클라이언트로
+          # 재사용하면 다른 채널로 잘못 올라가는 계정선택 버그가 있었음, 2026-08-12)
+          # 반드시 그 채널 전용 client_id/secret과 짝을 맞춰야 한다.
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           # 채널 전용 토큰이 있으면 그걸 쓴다. globalmusic만 공용 토큰이 곧
           # 자기 채널 것이라 폴백 허용 — 그 외 채널은 전용 토큰이 없으면 절대
           # 폴백하지 않고 그냥 비워서 다음 스텝에서 실패시킨다(뒤섞임 사고 방지:
