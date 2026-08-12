@@ -126,8 +126,10 @@ DURATION_POOL_MIN_SEC = 30 * 60
 DURATION_POOL_MAX_SEC = 100 * 60
 # 채널별로 재생시간 구간을 다르게 두고 싶을 때만 여기에 추가 — 없으면 위 기본값 사용.
 # starbucks(=카페음악, 2026-08-06부터 연주곡 전용 채널로 재배정): 56~190분 확정.
+# globalmusic(=로맨틱글로벌): 2026-08-12부터 64~132분 확정.
 CHANNEL_DURATION_POOL_SEC = {
     "starbucks": (56 * 60, 190 * 60),
+    "globalmusic": (64 * 60, 132 * 60),
 }
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
@@ -445,20 +447,38 @@ def pick_auto_topic():
 
 def build_ai_images(topic, workdir):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
-    style = (
-        "real photograph shot on a professional DSLR camera, not a painting, not "
-        "digital art, not an illustration, not 3D-rendered — genuine travel-magazine "
-        "photojournalism, ultra sharp focus, cinematic wide 16:9 composition, natural "
-        "light, realistic color grading, authentic architectural and environmental "
-        "detail, no text, no watermark"
-    )
-    prompts = [
-        f"A breathtaking aerial or street-level travel photo capturing the essence of "
-        f"{topic}, golden hour warm lighting, dramatic skyline or landscape composition, "
-        f"{style}",
-        f"A different iconic view of {topic} from another angle or time of day, "
-        f"cooler blue-hour or daylight tone, {style}",
-    ]
+
+    if CHANNEL_KEY == "globalmusic":
+        # 로맨틱글로벌 채널: 여행지 풍경이 아니라 커플이 주인공인 로맨틱한 장면이 핵심
+        style = (
+            "real photograph shot on a professional DSLR camera with a warm cinematic "
+            "color grade, golden-hour or string-light evening lighting, soft romantic "
+            "mood, shallow depth of field, no text, no watermark"
+        )
+        prompts = [
+            f"A romantic couple (their faces not clearly identifiable as any real person) "
+            f"sharing an intimate moment — holding hands, dancing, or laughing together — "
+            f"in a setting inspired by '{topic}', warm golden hour light, dreamy and tender "
+            f"atmosphere, {style}",
+            f"A different romantic couple moment inspired by '{topic}', evening string "
+            f"lights or sunset backdrop, candid joyful embrace or a quiet close moment, "
+            f"{style}",
+        ]
+    else:
+        style = (
+            "real photograph shot on a professional DSLR camera, not a painting, not "
+            "digital art, not an illustration, not 3D-rendered — genuine travel-magazine "
+            "photojournalism, ultra sharp focus, cinematic wide 16:9 composition, natural "
+            "light, realistic color grading, authentic architectural and environmental "
+            "detail, no text, no watermark"
+        )
+        prompts = [
+            f"A breathtaking aerial or street-level travel photo capturing the essence of "
+            f"{topic}, golden hour warm lighting, dramatic skyline or landscape composition, "
+            f"{style}",
+            f"A different iconic view of {topic} from another angle or time of day, "
+            f"cooler blue-hour or daylight tone, {style}",
+        ]
     paths = []
     for i, prompt in enumerate(prompts, 1):
         path = os.path.join(workdir, f"ai_image_{i}.png")
@@ -793,7 +813,8 @@ def _dotted_hline(draw, cx, y, total_w, dash_w=6, gap=8, fill=(255, 255, 255, 22
         x += dash_w + gap
 
 
-def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=None, w=1280, h=720):
+def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=None,
+                            show_waveform=False, w=1280, h=720):
     """여행 잡지 표지 스타일 썸네일: 상단 좌우에 작은 브랜드 라벨/볼륨 표기,
     화면 대부분을 채우는 초대형 세리프 주제어 타이틀, 그 아래 얇은 점선 구분선.
     배경 사진만 AI 생성이고 나머지는 전부 PIL로 직접 그려서 무료로 자동 생성된다."""
@@ -871,7 +892,13 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
         cursor_y = sub_y + (sub_bbox[3] - sub_bbox[1])
 
     # 그 아래: 얇은 점선 구분선
-    _dotted_hline(draw, w // 2, cursor_y + int(h * 0.05), int(w * 0.5))
+    line_y = cursor_y + int(h * 0.05)
+    _dotted_hline(draw, w // 2, line_y, int(w * 0.5))
+
+    # 로맨틱글로벌 등: 감성 강조용으로 구분선 아래 오디오 파형 아이콘 추가
+    if show_waveform:
+        _draw_waveform(draw, w // 2, line_y + 34, n_bars=27, gap=10, max_h=40,
+                        color=(255, 255, 255, 220))
 
     img.convert("RGB").save(out_path, "PNG")
 
@@ -1023,7 +1050,12 @@ def main():
         image_paths = build_ai_images(topic_keyword, WORKDIR)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
-        make_caption_thumbnail(image_paths[0], thumbnail_out, topic=topic_keyword)
+        if CHANNEL_KEY == "globalmusic":
+            # 로맨틱글로벌: 지명/계절이 아니라 "Playlist"를 메인 타이틀로 크게, 파형과 함께
+            make_caption_thumbnail(image_paths[0], thumbnail_out, topic="Playlist",
+                                    subtitle_override=topic_keyword, show_waveform=True)
+        else:
+            make_caption_thumbnail(image_paths[0], thumbnail_out, topic=topic_keyword)
 
         log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
         # 인트로가 곡 앞부분(INTRO_DURATION_SEC)을 쓰므로, 본편은 그 이어지는
@@ -1041,8 +1073,12 @@ def main():
 
         log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
         intro_still = os.path.join(WORKDIR, "intro_still.png")
-        make_caption_thumbnail(image_paths[0], intro_still, topic=topic_keyword,
-                                subtitle_override="Playlist")
+        if CHANNEL_KEY == "globalmusic":
+            make_caption_thumbnail(image_paths[0], intro_still, topic="Playlist",
+                                    subtitle_override=topic_keyword, show_waveform=True)
+        else:
+            make_caption_thumbnail(image_paths[0], intro_still, topic=topic_keyword,
+                                    subtitle_override="Playlist")
         intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
         make_intro_clip(intro_still, audio_path, intro_clip)
         concat_intro_and_main(intro_clip, body_path, final_path)
