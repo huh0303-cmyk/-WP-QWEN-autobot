@@ -201,10 +201,14 @@ def main():
     if thumb_drive_id:
         download_drive_file(drive, thumb_drive_id, thumb_path)
 
-    log("2/3 유튜브 업로드 중..." + (" ⚠️ 폴백 제목 — 비공개로만 업로드" if title_is_fallback else ""))
+    # 2026-08-12: 기본값을 "완전자동 즉시공개"에서 "기본 비공개, 사람이 검토 후
+    # 직접 공개"로 전환. PUBLISH_AT_HOURS_FROM_NOW를 명시적으로 준 경우에만
+    # 예약공개를 걸고, 안 주면(스케줄 자동실행 포함 전부) 비공개로만 올리고 끝난다.
+    stay_private = title_is_fallback or not hours_from_now
+    log("2/3 유튜브 업로드 중..." + (" ⚠️ 비공개로만 업로드 (검토 후 직접 공개해주세요)" if stay_private else ""))
     youtube = get_youtube_service()
     video_id = upload_to_youtube(youtube, video_path, thumb_path if thumb_drive_id else None,
-                                  title, description, publish_at_iso, force_private=title_is_fallback)
+                                  title, description, publish_at_iso, force_private=stay_private)
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
 
     log("3/3 완료 메일 발송 중...")
