@@ -8,7 +8,7 @@ on:
         required: false
         default: ""
   schedule:
-    - cron: "30 22 * * *"   # 07:30 KST
+    - cron: "0 4 * * *"   # 13:00 KST (07시대 Gemini 동시요청 분산)
 
 concurrency:
   group: health-shorts-daily
