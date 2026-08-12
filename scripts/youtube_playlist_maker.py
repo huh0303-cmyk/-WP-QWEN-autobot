@@ -151,6 +151,9 @@ TITLE_FONT_PATH = "/tmp/_playlist_playfair.ttf"
 # Playfair 자리를 대신할 일본어 지원 세리프 폰트가 따로 필요하다
 JP_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifjp/NotoSerifJP%5Bwght%5D.ttf"
 JP_FONT_PATH = "/tmp/_playlist_notoserifjp.ttf"
+# healing 채널 전용: 차분하고 얇은 세리프(Cormorant) — Playfair보다 명상적/우아한 느낌
+HEALING_TITLE_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf"
+HEALING_TITLE_FONT_PATH = "/tmp/_playlist_cormorant.ttf"
 
 
 def log(msg):
@@ -191,6 +194,18 @@ def ensure_title_font():
         except Exception:
             return ensure_font()  # 실패 시 나눔고딕으로 폴백
     return TITLE_FONT_PATH
+
+
+def ensure_healing_title_font():
+    if not os.path.exists(HEALING_TITLE_FONT_PATH):
+        try:
+            r = requests.get(HEALING_TITLE_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(HEALING_TITLE_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return ensure_title_font()  # 실패 시 기본 세리프로 폴백
+    return HEALING_TITLE_FONT_PATH
 
 
 def ensure_jp_font():
@@ -452,6 +467,12 @@ def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, top
     본 파이프라인(build_playlist)과 주간 썸네일 리프레시 스크립트가 공유해서 쓴다."""
     if hero_override == "playlist_only":
         make_caption_thumbnail(image_path, out_path, topic="Playlist", show_waveform=True)
+    elif channel_key == "healing":
+        # healing만 소제목을 원곡 주제어 대신 고정 문구 "Healing Sound"로 표시하고,
+        # 타이틀 폰트도 차분한 전용 세리프(Cormorant)로 바꾼다 (2026-08-13 사용자 요청).
+        make_caption_thumbnail(image_path, out_path, topic="Playlist",
+                                subtitle_override="Healing Sound", show_waveform=True,
+                                title_font_override=ensure_healing_title_font())
     elif channel_key in PLAYLIST_HERO_CHANNELS:
         make_caption_thumbnail(image_path, out_path, topic="Playlist",
                                 subtitle_override=topic, show_waveform=True)
@@ -517,9 +538,10 @@ def build_ai_images(topic, workdir):
         prompts = [
             f"A misty forest or mountain stream scene evoking '{topic}', rain droplets on "
             f"leaves or gentle mist between trees, tranquil and meditative, {style}",
-            f"A different quiet nature close-up related to '{topic}' — a temple wind chime, "
-            f"flowing creek water over rocks, or a rainy window looking out at forest, "
-            f"{style}",
+            f"A different quiet nature close-up related to '{topic}' — a traditional Korean "
+            f"temple's curved roof tile edge (giwa) or wooden eaves (cheoma) against a misty "
+            f"forest backdrop, rain falling past the eaves, a flowing creek over rocks, or a "
+            f"rainy window looking out at forest, {style}",
         ]
     elif CHANNEL_KEY == "starbucks":
         # 카페음악 채널: 우드톤 카페 인테리어, 실제 브랜드 로고는 넣지 않음(상표권)
@@ -913,14 +935,14 @@ def _dotted_hline(draw, cx, y, total_w, dash_w=6, gap=8, fill=(255, 255, 255, 22
 
 
 def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=None,
-                            show_waveform=False, w=1280, h=720):
+                            show_waveform=False, w=1280, h=720, title_font_override=None):
     """여행 잡지 표지 스타일 썸네일: 상단 좌우에 작은 브랜드 라벨/볼륨 표기,
     화면 대부분을 채우는 초대형 세리프 주제어 타이틀, 그 아래 얇은 점선 구분선.
     배경 사진만 AI 생성이고 나머지는 전부 PIL로 직접 그려서 무료로 자동 생성된다."""
     from PIL import Image, ImageDraw, ImageFont
     from datetime import datetime as _dt
 
-    title_font_path = ensure_title_font()
+    title_font_path = title_font_override or ensure_title_font()
     label_font_path = ensure_font()
 
     def _font(path, size, weight=None):
