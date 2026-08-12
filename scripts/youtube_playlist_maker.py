@@ -136,6 +136,7 @@ CHANNEL_DURATION_POOL_SEC = {
 }
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
+THUMBNAIL_UPSCALE_SIZE = (3840, 2160)  # 썸네일 최종 저장 해상도(4K) — 요청사항
 INTRO_DURATION_SEC = 6.0          # 인트로가 쓰는 음악 앞부분 길이 — 본편은 이 지점부터 이어서 재생
 
 AUDIO_EXTS = (".mp3", ".wav", ".m4a", ".flac", ".aac", ".ogg")
@@ -982,7 +983,13 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
         _draw_waveform(draw, w // 2, line_y + 34, n_bars=27, gap=10, max_h=40,
                         color=(255, 255, 255, 220))
 
-    img.convert("RGB").save(out_path, "PNG")
+    # 4K로 업스케일해서 저장 (레이아웃 좌표는 1280x720 캔버스에 맞춰져 있어서
+    # 그 비율 그대로 유지한 채, 마지막에 해상도만 4K로 끌어올린다 — 유튜브 썸네일
+    # 화질 요구사항 대응, Lanczos로 최대한 선명하게).
+    final_img = img.convert("RGB")
+    if (w, h) != THUMBNAIL_UPSCALE_SIZE:
+        final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
+    final_img.save(out_path, "PNG")
 
 
 def mux_video_audio(video_path, audio_path, out_path):
