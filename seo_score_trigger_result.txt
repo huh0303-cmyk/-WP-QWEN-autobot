@@ -30,7 +30,7 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-12T16%3A12%3A16.177511&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-12T17%3A32%3A02.332613&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
