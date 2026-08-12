@@ -157,11 +157,14 @@ def upload_to_youtube(service, video_path, thumb_path, title, description,
 
     video_id = response["id"]
 
-    if thumb_path and os.path.exists(thumb_path):
+    if thumb_path and os.path.exists(thumb_path) and os.path.getsize(thumb_path) > 0:
         try:
             service.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
+            log(f"   ✅ 썸네일 설정 완료")
         except Exception as e:
             log(f"   ⚠️ 썸네일 설정 실패(무시): {e}")
+    else:
+        log(f"   ⚠️ 썸네일 파일 없음/비어있음(thumb_path={thumb_path}) — 썸네일 없이 업로드됨")
 
     return video_id
 
@@ -200,6 +203,8 @@ def main():
     thumb_path = os.path.join(WORKDIR, "thumbnail.png")
     if thumb_drive_id:
         download_drive_file(drive, thumb_drive_id, thumb_path)
+        size = os.path.getsize(thumb_path) if os.path.exists(thumb_path) else -1
+        log(f"   썸네일 다운로드: {thumb_path} ({size} bytes)")
 
     # 2026-08-12: 기본값을 "완전자동 즉시공개"에서 "기본 비공개, 사람이 검토 후
     # 직접 공개"로 전환. PUBLISH_AT_HOURS_FROM_NOW를 명시적으로 준 경우에만
