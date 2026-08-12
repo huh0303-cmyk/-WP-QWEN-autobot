@@ -65,13 +65,13 @@ on:
     # 안전하다. 토큰 없는 채널은 그냥 그 회차만 실패로 로그에 남고, 영상은
     # Google Drive에 남아있다가 get_youtube_refresh_token.py로 mbb/kpop 토큰을
     # 발급해서 시크릿에 등록하는 순간부터 자동으로 정상 작동한다.
-    - cron: "0 15 * * *"      # globalmusic — 매일 00:00 KST
-    # 2026-08-12: healing/starbucks/mbb/kpop 전부 전용 OAuth 토큰 재발급 완료
-    # (새 OAuth 클라이언트로 채널별 브랜드계정 각각 재인증) — 크론 복구.
-    - cron: "15 15 * * *"     # healing — 매일 00:15 KST
-    - cron: "0 15 */3 * *"    # starbucks — 3일 간격 00:00 KST
-    - cron: "30 15 */2 * *"   # mbb — 2일 간격 00:30 KST
-    - cron: "45 15 */2 * *"   # kpop — 2일 간격 00:45 KST
+    # 2026-08-12: 5개 채널 전부 주3회(월/수/금)로 통일, 정각 피해서 15~20분씩 분산.
+    # KST 00시대라 UTC로는 전날 15시대라서 요일이 하루 당겨짐(월요일 KST → 일요일 UTC 등).
+    - cron: "7 15 * * 0,2,4"    # globalmusic — 00:07 KST 월/수/금
+    - cron: "24 15 * * 0,2,4"   # healing — 00:24 KST 월/수/금
+    - cron: "38 15 * * 0,2,4"   # starbucks — 00:38 KST 월/수/금
+    - cron: "52 15 * * 0,2,4"   # mbb — 00:52 KST 월/수/금
+    - cron: "9 16 * * 0,2,4"    # kpop — 01:09 KST 월/수/금
 
 permissions:
   contents: write
@@ -107,7 +107,7 @@ jobs:
       - name: Run playlist maker
         env:
           AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '15 15 * * *' && 'healing') || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || (github.event.schedule == '30 15 */2 * *' && 'mbb') || (github.event.schedule == '45 15 */2 * *' && 'kpop') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4' && 'kpop') || 'globalmusic' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
@@ -146,7 +146,7 @@ jobs:
       - name: Export upload metadata for the publish job
         id: meta
         env:
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '15 15 * * *' && 'healing') || (github.event.schedule == '0 15 */3 * *' && 'starbucks') || (github.event.schedule == '30 15 */2 * *' && 'mbb') || (github.event.schedule == '45 15 */2 * *' && 'kpop') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4' && 'kpop') || 'globalmusic' }}
         run: |
           python - <<'EOF'
           import json, os
