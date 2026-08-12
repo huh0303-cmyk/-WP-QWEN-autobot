@@ -68,11 +68,12 @@ jobs:
             TOPIC_IN=""
           fi
 
+          # 언어별 주제 목록은 서로 직역이 아니라 각 나라 문화/제도에 맞게 다르게 구성 (중복 컨텐츠 방지)
           if [ -z "$TOPIC_IN" ]; then
             case "$LANG_IN" in
-              kr) TOPICS=("무릎 통증 완화 스트레칭" "갱년기 증상 관리법" "시니어 근력 운동 루틴" "혈압 관리 생활습관" "숙면을 위한 저녁 루틴" "관절 건강 지키는 습관" "장수를 위한 식습관" "당뇨 예방 식단" "치매 예방 두뇌운동") ;;
-              jp) TOPICS=("シニアの健康な老化のヒント" "更年期の症状緩和" "膝の痛みを和らげるストレッチ" "シニアの筋力トレーニング" "質の良い睡眠習慣" "関節の健康を守る習慣" "長寿のための食習慣" "認知症予防の脳トレ" "血圧管理の生活習慣") ;;
-              *)  TOPICS=("healthy aging tips for seniors" "menopause symptom relief for women over 50" "joint pain relief exercises for seniors" "senior strength training basics" "better sleep habits after 50" "habits for healthy joints" "eating habits for longevity" "diabetes prevention diet for seniors" "brain exercises to prevent dementia") ;;
+              kr) TOPICS=("국민건강검진 200% 활용법" "무릎 통증 완화 스트레칭" "갱년기 극복한 선배들의 조언" "혈압 낮추는 집밥 반찬" "화투로 치매 예방하는 이유" "장수마을 어르신들의 아침 습관" "당뇨 잡는 나물 반찬 5가지" "허리디스크 예방 앉는 자세" "명절 스트레스 관리법") ;;
+              jp) TOPICS=("ラジオ体操で健康寿命を延ばす" "更年期の症状緩和" "温泉入浴と血行促進の関係" "和食で血糖値をコントロールする方法" "認知症予防の脳トレ習慣" "膝痛を防ぐ正しい歩き方" "一人暮らしシニアの孤独対策" "高齢者の熱中症対策" "腰痛を防ぐ布団と寝方") ;;
+              *)  TOPICS=("healthy aging tips for seniors" "menopause symptom relief for women over 50" "how Medicare covers preventive checkups" "gardening as low-impact exercise for seniors" "grandparent-grandchild bonding activities" "managing arthritis pain in cold weather" "heart-healthy comfort food swaps" "staying social after retirement" "fall-prevention home safety tips") ;;
             esac
             IDX=$((RANDOM % ${#TOPICS[@]}))
             TOPIC_IN="${TOPICS[$IDX]}"
