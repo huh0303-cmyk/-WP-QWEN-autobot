@@ -75,6 +75,9 @@ GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 # *_{KEY} 환경변수(Secrets)를 사용하고, 없으면 기존 공용 기본값으로 폴백한다
 # (CHANNEL_KEY를 아예 안 주는 기존 실행 방식과 호환 유지).
 PLAYLIST_CHANNELS = ["globalmusic", "healing", "starbucks", "mbb", "kpop"]
+# 구독자 50만+ 플리 채널 벤치마킹 공통 포맷("Playlist" 대형 히어로 + 파형) 적용 채널.
+# mbb는 예외 — 작곡가 초상화+이름 포맷을 따로 쓴다(아래 build_ai_images/썸네일 호출부 참고).
+PLAYLIST_HERO_CHANNELS = {"globalmusic", "healing", "starbucks", "kpop"}
 CHANNEL_KEY = (os.environ.get("CHANNEL_KEY") or "").strip().lower()
 
 _DEFAULT_MUSIC_FOLDER = "1RqL44lM5oUSW5_PAZLHHlevrVkr1ibxd"
@@ -417,6 +420,29 @@ AUTO_TOPIC_LANGUAGE_HINTS = {
     "Tokyo": "Japanese", "Sapporo": "Japanese",
     "Paris": "French", "Seoul": "Korean",
 }
+
+# 채널 성격상 위 여행지/계절 주제풀이 안 맞는 채널은 여기서 전용 주제풀을 쓴다.
+# mbb: 작곡가+대표곡 (썸네일에도 그대로 쓰임 — 작곡가 성을 대문자 히어로 텍스트로).
+# kpop: 곡 없이도 자연스러운 무드 키워드(플리 콘셉트).
+CHANNEL_TOPIC_POOLS = {
+    "mbb": [
+        "Mozart — Eine kleine Nachtmusik", "Mozart — The Marriage of Figaro Overture",
+        "Bach — Air on the G String", "Bach — Brandenburg Concerto No. 3",
+        "Beethoven — Moonlight Sonata", "Beethoven — Symphony No. 7",
+        "Mozart — Symphony No. 40", "Bach — Cello Suite No. 1",
+        "Beethoven — Egmont Overture", "Mozart — Requiem",
+        "Bach — Goldberg Variations", "Beethoven — Pathetique Sonata",
+    ],
+    "kpop": [
+        "study playlist", "workout playlist", "driving at night", "chill dance practice",
+        "rainy day mix", "morning motivation", "late night vibes", "concert energy",
+    ],
+}
+
+
+def _composer_from_topic(topic: str) -> str:
+    """'Mozart — Eine kleine Nachtmusik' 형태에서 작곡가 성만 뽑아 썸네일 히어로 텍스트로 쓴다."""
+    return (topic or "").split("—")[0].strip() or "Classical"
 RECENT_TOPICS_FILE = "playlist_recent_topics.json"
 RECENT_TOPICS_MEMORY = 8  # 최근 이만큼은 다시 안 뽑히게 피함
 
@@ -432,7 +458,8 @@ def pick_auto_topic():
         except Exception:
             recent = []
 
-    candidates = [t for t in AUTO_TOPIC_POOL if t not in recent] or list(AUTO_TOPIC_POOL)
+    pool = CHANNEL_TOPIC_POOLS.get(CHANNEL_KEY, AUTO_TOPIC_POOL)
+    candidates = [t for t in pool if t not in recent] or list(pool)
     topic = random.choice(candidates)
 
     recent = ([topic] + [t for t in recent if t != topic])[:RECENT_TOPICS_MEMORY]
@@ -463,6 +490,61 @@ def build_ai_images(topic, workdir):
             f"A different romantic couple moment inspired by '{topic}', evening string "
             f"lights or sunset backdrop, candid joyful embrace or a quiet close moment, "
             f"{style}",
+        ]
+    elif CHANNEL_KEY == "healing":
+        # 힐링 채널: 안개 낀 숲/시냇물/풍경소리 — 차분한 청록 톤, 사람 없음
+        style = (
+            "real photograph, cinematic, moody desaturated blue-green color grade, "
+            "misty and quiet atmosphere, soft natural light, no people, no text, no watermark"
+        )
+        prompts = [
+            f"A misty forest or mountain stream scene evoking '{topic}', rain droplets on "
+            f"leaves or gentle mist between trees, tranquil and meditative, {style}",
+            f"A different quiet nature close-up related to '{topic}' — a temple wind chime, "
+            f"flowing creek water over rocks, or a rainy window looking out at forest, "
+            f"{style}",
+        ]
+    elif CHANNEL_KEY == "starbucks":
+        # 카페음악 채널: 우드톤 카페 인테리어, 실제 브랜드 로고는 넣지 않음(상표권)
+        style = (
+            "real photograph shot on a professional DSLR camera, warm wood-tone cafe "
+            "interior, cozy ambient lighting, shallow depth of field, no visible brand "
+            "logos or storefront signage, no text, no watermark"
+        )
+        prompts = [
+            f"A cozy upscale cafe interior inspired by '{topic}', warm wood tones, soft "
+            f"pendant lighting, a coffee cup on a wooden table, quiet studying/working "
+            f"atmosphere, {style}",
+            f"A different cozy cafe corner related to '{topic}', large window with warm "
+            f"afternoon light, plants and wood furniture, relaxed atmosphere, {style}",
+        ]
+    elif CHANNEL_KEY == "kpop":
+        # K-pop 플리: 실존 아이돌 특정 불가 — 화려한 조명/무대 분위기의 실루엣 컨셉
+        style = (
+            "real photograph, vibrant neon concert lighting, high energy, dynamic "
+            "composition, silhouette figures (no identifiable real person), no text, "
+            "no watermark"
+        )
+        prompts = [
+            f"A vibrant K-pop concert stage atmosphere evoking '{topic}', colorful neon "
+            f"stage lights, silhouette of a dancer, energetic and glossy mood, {style}",
+            f"A different vibrant nightlife/stage scene related to '{topic}', laser lights, "
+            f"crowd energy, saturated pink-purple-blue color palette, {style}",
+        ]
+    elif CHANNEL_KEY == "mbb":
+        # 클래식(MBB): 작곡가 유화 초상화 스타일 — 실사진이 아니라 고전 회화 톤
+        composer = _composer_from_topic(topic)
+        style = (
+            "classical oil painting style portrait, museum quality, warm sepia and dark "
+            "tones, dramatic chiaroscuro lighting, 18th-19th century European painting "
+            "aesthetic, no text, no watermark"
+        )
+        prompts = [
+            f"A classical oil painting portrait of a composer in the style of {composer}'s "
+            f"era, formal period clothing, holding sheet music or a quill, dignified "
+            f"expression, {style}",
+            f"A different classical painting scene evoking {composer}'s music — an ornate "
+            f"period concert hall, piano, or manuscript close-up, {style}",
         ]
     else:
         style = (
@@ -1050,10 +1132,16 @@ def main():
         image_paths = build_ai_images(topic_keyword, WORKDIR)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
-        if CHANNEL_KEY == "globalmusic":
-            # 로맨틱글로벌: 지명/계절이 아니라 "Playlist"를 메인 타이틀로 크게, 파형과 함께
+        if CHANNEL_KEY in PLAYLIST_HERO_CHANNELS:
+            # globalmusic/healing/starbucks/kpop: 지명/계절이 아니라 "Playlist"를
+            # 메인 타이틀로 크게, 파형과 함께 (구독자 50만+ 플리 채널 벤치마킹 공통 포맷)
             make_caption_thumbnail(image_paths[0], thumbnail_out, topic="Playlist",
                                     subtitle_override=topic_keyword, show_waveform=True)
+        elif CHANNEL_KEY == "mbb":
+            # 클래식: 작곡가 성을 메인 타이틀로, 곡명을 부제로 (파형 없음 — 초상화 앨범아트 톤)
+            make_caption_thumbnail(image_paths[0], thumbnail_out,
+                                    topic=_composer_from_topic(topic_keyword),
+                                    subtitle_override=topic_keyword, show_waveform=False)
         else:
             make_caption_thumbnail(image_paths[0], thumbnail_out, topic=topic_keyword)
 
@@ -1073,9 +1161,13 @@ def main():
 
         log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
         intro_still = os.path.join(WORKDIR, "intro_still.png")
-        if CHANNEL_KEY == "globalmusic":
+        if CHANNEL_KEY in PLAYLIST_HERO_CHANNELS:
             make_caption_thumbnail(image_paths[0], intro_still, topic="Playlist",
                                     subtitle_override=topic_keyword, show_waveform=True)
+        elif CHANNEL_KEY == "mbb":
+            make_caption_thumbnail(image_paths[0], intro_still,
+                                    topic=_composer_from_topic(topic_keyword),
+                                    subtitle_override=topic_keyword, show_waveform=False)
         else:
             make_caption_thumbnail(image_paths[0], intro_still, topic=topic_keyword,
                                     subtitle_override="Playlist")
