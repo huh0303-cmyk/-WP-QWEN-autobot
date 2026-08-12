@@ -63,7 +63,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
           git add seo_score_trigger_result.txt
           git diff --staged --quiet || git commit -m "chore: SEO점수 자동트리거 결과 [skip ci]"
+          git pull --rebase origin main
           git push
