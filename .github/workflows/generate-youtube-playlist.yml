@@ -66,18 +66,12 @@ on:
     # Google Drive에 남아있다가 get_youtube_refresh_token.py로 mbb/kpop 토큰을
     # 발급해서 시크릿에 등록하는 순간부터 자동으로 정상 작동한다.
     - cron: "0 15 * * *"      # globalmusic — 매일 00:00 KST
-    # 2026-08-11: healing/starbucks 크론 일시 중단. YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING이
-    # 실제로는 Studio-K7(오늘부로 K-pop 채널로 확정)을 가리키고 있어서 이 크론이 계속
-    # 돌면 K-pop 채널에 힐링 영상이 잘못 올라간다. YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS도
-    # 카페음악(Starbucksvibes)이 아니라 다국어 채널(Studio_starbucks)을 가리키고 있어서
-    # 로파이 플레이리스트가 3일마다 언어퀴즈 채널에 잘못 업로드되고 있었음(실제 발생 확인:
-    # 2026-08-08~11 호수/시골마을/여름/도시야경 4개). 두 시크릿을 각각 올바른 채널로
-    # 재발급(get_youtube_refresh_token.py)해서 GitHub 저장소 Secrets에 새로 등록하기
-    # 전까지는 아래 두 줄을 주석 처리한 채로 둘 것 — 되살릴 때는 시크릿 교체가 먼저다.
-    # - cron: "15 15 * * *"     # healing — 매일 00:15 KST (HEALING 시크릿이 K-pop 채널로 오배송 중이라 중단)
-    # - cron: "0 15 */3 * *"    # starbucks — 3일 간격 00:00 KST (STARBUCKS 시크릿이 다국어 채널로 오배송 중이라 중단)
-    - cron: "30 15 */2 * *"   # mbb — 2일 간격 00:30 KST (전용 토큰 등록 전까진 실패만 남음)
-    - cron: "45 15 */2 * *"   # kpop — 2일 간격 00:45 KST (전용 토큰 등록 전까진 실패만 남음)
+    # 2026-08-12: healing/starbucks/mbb/kpop 전부 전용 OAuth 토큰 재발급 완료
+    # (새 OAuth 클라이언트로 채널별 브랜드계정 각각 재인증) — 크론 복구.
+    - cron: "15 15 * * *"     # healing — 매일 00:15 KST
+    - cron: "0 15 */3 * *"    # starbucks — 3일 간격 00:00 KST
+    - cron: "30 15 */2 * *"   # mbb — 2일 간격 00:30 KST
+    - cron: "45 15 */2 * *"   # kpop — 2일 간격 00:45 KST
 
 permissions:
   contents: write
