@@ -127,20 +127,30 @@ def _generate_ai_image(prompt: str, out_path: str, max_retries: int = 3) -> bool
     return False
 
 
-def _fetch_images(keywords: list, out_dir: str, title: str = "", ai_count: int = 0) -> list:
+# 채널 언어에 맞는 인물 인종을 이미지 검색/생성에 명시 — 시청자와 다른 인종이 나오면 몰입이 깨짐
+_ETHNICITY_HINT = {"kr": "Korean", "jp": "Japanese", "en": ""}
+
+
+def _fetch_images(keywords: list, out_dir: str, title: str = "", ai_count: int = 0, lang: str = "") -> list:
     """
     처음 ai_count장은 대본 제목+키워드를 반영한 프롬프트로 Gemini AI 이미지 생성(고퀄리티, 도입부용).
     나머지는 Pexels 우선 검색, 실패하면 Pixabay로 자동 폴백. AI 생성이 실패하면 스톡으로 대체.
+    lang에 맞춰 인물 인종을 검색어/프롬프트에 명시한다 (kr/jp는 동양인, en은 서구권 기본값 그대로).
     """
+    ethnicity = _ETHNICITY_HINT.get(lang, "")
+    search_kw_prefix = f"{ethnicity} " if ethnicity else ""
+
     paths = []
     for i, kw in enumerate(keywords):
         path = os.path.join(out_dir, f"{i:02d}_{re.sub(r'[^a-z0-9]+', '_', kw.lower())}.jpg")
+        search_kw = f"{search_kw_prefix}{kw}"
 
         if i < ai_count:
+            ethnicity_clause = f"The people shown must look {ethnicity}. " if ethnicity else ""
             prompt = (
                 f"Photorealistic, cinematic, high quality 16:9 image for a health education video "
-                f"titled '{title}'. Scene: {kw}. Warm natural lighting, authentic senior-friendly mood, "
-                f"no text or watermark."
+                f"titled '{title}'. Scene: {kw}. {ethnicity_clause}"
+                f"Warm natural lighting, authentic senior-friendly mood, no text or watermark."
             )
             print(f"[Video] AI 이미지 생성 중 ({i+1}/{ai_count}, 도입부 고퀄리티): {kw}")
             if _generate_ai_image(prompt, path):
@@ -149,21 +159,21 @@ def _fetch_images(keywords: list, out_dir: str, title: str = "", ai_count: int =
             print(f"[Video] AI 이미지 생성 실패 → 스톡으로 대체: {kw}")
 
         try:
-            if _fetch_from_pexels(kw, path):
+            if _fetch_from_pexels(search_kw, path):
                 paths.append(path)
                 continue
         except Exception as e:
-            print(f"[Video] Pexels 실패 ('{kw}'): {e}")
+            print(f"[Video] Pexels 실패 ('{search_kw}'): {e}")
 
         try:
-            if _fetch_from_pixabay(kw, path):
-                print(f"[Video] '{kw}' → Pixabay로 대체 성공")
+            if _fetch_from_pixabay(search_kw, path):
+                print(f"[Video] '{search_kw}' → Pixabay로 대체 성공")
                 paths.append(path)
                 continue
         except Exception as e:
-            print(f"[Video] Pixabay도 실패 ('{kw}'): {e}")
+            print(f"[Video] Pixabay도 실패 ('{search_kw}'): {e}")
 
-        print(f"[Video] 경고: '{kw}' 이미지를 찾지 못해 건너뜀 (AI/Pexels/Pixabay 모두 실패)")
+        print(f"[Video] 경고: '{search_kw}' 이미지를 찾지 못해 건너뜀 (AI/Pexels/Pixabay 모두 실패)")
 
     if not paths:
         raise RuntimeError("배경 이미지를 하나도 가져오지 못했습니다. GEMINI/Pexels/Pixabay API 키를 확인하세요.")
@@ -274,7 +284,7 @@ def build_video(
 
     with tempfile.TemporaryDirectory() as tmp:
         print(f"[Video] 이미지 확보 중... (키워드 {len(keywords)}개, 앞 {AI_IMAGE_COUNT}장은 AI 생성)")
-        images = _fetch_images(keywords, tmp, title=title, ai_count=AI_IMAGE_COUNT)
+        images = _fetch_images(keywords, tmp, title=title, ai_count=AI_IMAGE_COUNT, lang=lang)
         print(f"[Video] 이미지 {len(images)}장 확보")
 
         intro_images = images[:INTRO_CLIP_COUNT]

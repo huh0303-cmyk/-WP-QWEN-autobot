@@ -24,6 +24,9 @@ COLOR_WHITE = (255, 255, 255)
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
 
+# 채널 언어에 맞는 인물 인종 명시 — 시청자와 다른 인종이 썸네일에 나오면 클릭률/신뢰도 저하
+_ETHNICITY_HINT = {"kr": "Korean", "jp": "Japanese", "en": ""}
+
 
 def _fetch_background_photo(keyword: str) -> "Image.Image | None":
     """벤치마킹 결과: 스톡 일러스트보다 실사진 배경이 클릭률이 훨씬 높음. Pexels 우선, 실패 시 Pixabay."""
@@ -129,7 +132,9 @@ def _split_title_into_lines(title: str, lang: str) -> list:
 
 def generate_thumbnail(title: str, main_keyword: str, lang: str, out_path: str, kicker: str = None) -> str:
     print(f"[Thumbnail] 배경 실사진 검색 중... (키워드: {main_keyword})")
-    photo = _fetch_background_photo(main_keyword)
+    ethnicity = _ETHNICITY_HINT.get(lang, "")
+    search_keyword = f"{ethnicity} {main_keyword}".strip() if ethnicity else main_keyword
+    photo = _fetch_background_photo(search_keyword)
 
     if photo:
         print("[Thumbnail] 실사진 배경으로 생성 중 (벤치마킹 스타일)...")
