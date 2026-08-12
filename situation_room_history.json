@@ -141,16 +141,16 @@
     },
     "youtube": {
       "한국어(TOPIK)": {
-        "subs": 5750,
-        "views": 348606
+        "subs": 5760,
+        "views": 349472
       },
       "영어(English Survival)": {
-        "subs": 7,
-        "views": 200
+        "subs": 8,
+        "views": 1122
       },
       "다국어(Studio_starbucks,10개국어)": {
-        "subs": 16,
-        "views": 6670
+        "subs": 17,
+        "views": 7660
       },
       "플리-로맨틱글로벌(globalmusic)": {
         "subs": 8,
@@ -158,15 +158,15 @@
       },
       "플리-힐링(실채널@Studio_k3)": {
         "subs": 12,
-        "views": 521
+        "views": 524
       },
       "플리-MBB": {
         "subs": 0,
-        "views": 4
+        "views": 11
       },
       "플리-카페음악(Starbucksvibes)": {
         "subs": 0,
-        "views": 23
+        "views": 24
       },
       "발명(INVENTION_TIMES)": {
         "subs": 0,
@@ -174,7 +174,7 @@
       },
       "건강-영어(HealthClinicTV)": {
         "subs": 0,
-        "views": 2
+        "views": 4
       },
       "건강-한국어(HealthClinic_Seoul)": {
         "subs": 0,
@@ -227,7 +227,7 @@
     },
     "tiktok": {
       "TOPIK": {
-        "count": 29100,
+        "count": 29200,
         "username": "sis_topik",
         "error": null
       },
@@ -294,5 +294,5 @@
       }
     }
   },
-  "updated_at": "2026-08-12 08:06:38"
+  "updated_at": "2026-08-13 08:05:14"
 }
