@@ -92,22 +92,33 @@ def get_drive_service():
 
 
 def get_youtube_service():
+    from google.auth.exceptions import RefreshError
+    from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
-    creds = Credentials(
-        token=None, refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
-        token_uri="https://oauth2.googleapis.com/token",
-        client_id=YOUTUBE_OAUTH_CLIENT_ID, client_secret=YOUTUBE_OAUTH_CLIENT_SECRET,
-        # 2026-08-13: force-ssl로 바꿔봤다가 도로 되돌림 — 실제 테스트 결과
-        # (AMERICAN_ARCHIVE_TIMES) 이 토큰들은 애초에 upload 스코프로만 발급돼서
-        # force-ssl을 요청하면 "invalid_scope"로 아예 갱신이 실패한다. 원래
-        # 403("doesn't have permissions to upload and set custom video thumbnails")은
-        # 스코프 문제가 아니라 진짜 그 채널 계정의 폰인증 여부 문제였다(NASA_SPACE_TIMES는
-        # 동일 코드로 성공했다는 게 대조군 — 인증된 계정만 통과함).
-        scopes=["https://www.googleapis.com/auth/youtube.upload"],
-    )
-    return build("youtube", "v3", credentials=creds)
+    # 2026-08-14: 채널마다 실제로 발급받은 스코프가 다르다는 게 확인됐다 —
+    # 어떤 토큰은 force-ssl로만 갱신되고(upload 요청 시 invalid_scope), 다른
+    # 토큰은 반대로 upload로만 갱신된다(force-ssl 요청 시 invalid_scope). 왜
+    # 갈리는지는 불명(구글의 미인증 앱 스코프 처리 방식 추정)이라, 코드에서
+    # 둘 다 시도해서 되는 쪽을 쓴다.
+    last_err = None
+    for scope in ("https://www.googleapis.com/auth/youtube.force-ssl",
+                  "https://www.googleapis.com/auth/youtube.upload"):
+        creds = Credentials(
+            token=None, refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=YOUTUBE_OAUTH_CLIENT_ID, client_secret=YOUTUBE_OAUTH_CLIENT_SECRET,
+            scopes=[scope],
+        )
+        try:
+            creds.refresh(Request())
+            log(f"   (OAuth 스코프: {scope.rsplit('/', 1)[-1]})")
+            return build("youtube", "v3", credentials=creds)
+        except RefreshError as e:
+            last_err = e
+            continue
+    raise last_err
 
 
 def find_next_unpublished(drive):
