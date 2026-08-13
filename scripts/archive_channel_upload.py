@@ -248,8 +248,8 @@ def main():
 
     title = video_file["name"].replace("_captioned", "").rsplit(".", 1)[0].replace("_", " ")
     description = (
-        f"{title}\n\nPublic domain archival footage, part of the {CHANNEL_KEY.replace('_', ' ').title()} "
-        f"collection.\n\n#archive #history #documentary"
+        f"{title}\n\nPart of the {CHANNEL_KEY.replace('_', ' ').title()} collection.\n\n"
+        f"#archive #history #documentary"
     )
 
     hours_from_now = os.environ.get("PUBLISH_AT_HOURS_FROM_NOW", "").strip()
