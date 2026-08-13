@@ -1075,13 +1075,33 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
         _draw_waveform(draw, w // 2, line_y + 34, n_bars=27, gap=10, max_h=40,
                         color=(255, 255, 255, 220))
 
-    # 4K로 업스케일해서 저장 (레이아웃 좌표는 1280x720 캔버스에 맞춰져 있어서
-    # 그 비율 그대로 유지한 채, 마지막에 해상도만 4K로 끌어올린다 — 유튜브 썸네일
+    # 5K로 업스케일해서 저장 (레이아웃 좌표는 1280x720 캔버스에 맞춰져 있어서
+    # 그 비율 그대로 유지한 채, 마지막에 해상도만 5K로 끌어올린다 — 유튜브 썸네일
     # 화질 요구사항 대응, Lanczos로 최대한 선명하게).
     final_img = img.convert("RGB")
     if (w, h) != THUMBNAIL_UPSCALE_SIZE:
         final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
-    final_img.save(out_path, "PNG")
+    _save_thumbnail_capped(final_img, out_path)
+
+
+def _save_thumbnail_capped(img, out_path, max_bytes=2 * 1024 * 1024):
+    """유튜브 썸네일 API 2MB 제한 대응. 5K로 올린 뒤로 디테일이 많은 사진(특히
+    아카이브 원본 프레임)은 트루컬러 PNG로 저장하면 2MB를 쉽게 넘는다 — 화질
+    저하가 거의 안 보이는 adaptive 팔레트 단계부터 순서대로 시도해서 제한 안에
+    맞춘다(2026-08-14, 5K 적용 직후 실제로 걸려서 발견)."""
+    from PIL import Image
+
+    img.save(out_path, "PNG", optimize=True)
+    if os.path.getsize(out_path) <= max_bytes:
+        return
+    for colors in (256, 192, 128, 96, 64):
+        quantized = img.quantize(colors=colors, method=Image.MEDIANCUT, dither=Image.FLOYDSTEINBERG)
+        quantized.save(out_path, "PNG", optimize=True)
+        if os.path.getsize(out_path) <= max_bytes:
+            return
+    # 최후 수단: 팔레트로도 안 되면 해상도를 살짝 낮춘다(4K로)
+    smaller = img.resize((3840, int(3840 * img.height / img.width)), Image.LANCZOS)
+    smaller.save(out_path, "PNG", optimize=True)
 
 
 def make_photo_thumbnail(image_path, out_path, w=1280, h=720):
@@ -1102,7 +1122,7 @@ def make_photo_thumbnail(image_path, out_path, w=1280, h=720):
     final_img = img.convert("RGB")
     if (w, h) != THUMBNAIL_UPSCALE_SIZE:
         final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
-    final_img.save(out_path, "PNG")
+    _save_thumbnail_capped(final_img, out_path)
 
 
 def mux_video_audio(video_path, audio_path, out_path):
