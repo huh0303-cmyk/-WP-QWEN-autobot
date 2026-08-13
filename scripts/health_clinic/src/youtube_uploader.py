@@ -1,6 +1,7 @@
 """
 4단계: 완성된 MP4 + 썸네일을 유튜브에 업로드하고 예약 발행(private → publishAt)합니다.
 """
+import json
 import os
 
 from google.oauth2.credentials import Credentials
@@ -15,15 +16,24 @@ from config import LANGUAGES
 # 아무리 넘겨도 videos().insert()엔 그런 파라미터 자체가 없음 — 라우팅 불가능한
 # 설계였음). 그래서 언어별로 완전히 별도의 refresh token을 쓰도록 고쳤다 —
 # 이 리포의 다른 모든 유튜브 파이프라인(플리 5채널, 아카이브 8채널)과 동일한 패턴.
+# 시크릿 슬롯(저장소당 100개 한도)을 아끼려고 3개를 JSON 하나로 묶어서 저장한다
+# (아카이브 채널들의 ARCHIVE_OUTPUT_FOLDER_IDS_JSON과 동일한 패턴).
 YOUTUBE_OAUTH_CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID_NEW") or os.environ.get("YOUTUBE_OAUTH_CLIENT_ID", "")
 YOUTUBE_OAUTH_CLIENT_SECRET = os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET_NEW") or os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET", "")
 
+try:
+    _REFRESH_TOKENS = json.loads(os.environ.get("HEALTH_CLINIC_YOUTUBE_REFRESH_TOKENS_JSON", "{}"))
+except Exception:
+    _REFRESH_TOKENS = {}
+
 
 def get_youtube_service(lang: str):
-    refresh_token_env = f"HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_{lang.upper()}"
-    refresh_token = os.environ.get(refresh_token_env, "")
+    refresh_token = (
+        os.environ.get(f"HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_{lang.upper()}", "")
+        or _REFRESH_TOKENS.get(lang.upper(), "")
+    )
     if not refresh_token:
-        raise RuntimeError(f"{refresh_token_env} 시크릿이 없습니다 — 이 언어 채널은 아직 OAuth 미발급")
+        raise RuntimeError(f"{lang.upper()} 언어의 refresh token이 없습니다 — 이 언어 채널은 아직 OAuth 미발급")
     creds = Credentials(
         token=None,
         refresh_token=refresh_token,
