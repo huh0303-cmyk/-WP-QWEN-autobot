@@ -6,7 +6,10 @@
 ✅ https://koreainvest365.com | 점수:78 | 키워드백필:0 | 404:None | 리디렉션:1 | 헬스:None
 ✅ https://ki-korea.com | 점수:None | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
 ✅ https://koreainsurance365.com | 점수:61 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
-✅ https://kfinance365.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:1 | 헬스:⚠️심각
+⚠️ https://kfinance365.com 오류: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://kfinance365.com/wp-login.php", waiting until "load"
+
 ✅ https://koreataxnlaw.com | 점수:79 | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
 ✅ https://koreacrypto365.com | 점수:84 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
 ✅ https://krealestate365.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
