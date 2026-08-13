@@ -3,15 +3,36 @@
 """
 import os
 
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 from config import LANGUAGES
-from src.drive_utils import get_credentials
+
+# 2026-08-13: 예전엔 Drive와 같은 공용 token.json 하나를 3개 채널(kr/en/jp)에
+# 다 쓰려고 했는데, YouTube OAuth는 동의 시점에 고른 "브랜드 계정" 하나로
+# 고정되기 때문에 토큰 1개로는 실제로 그 중 한 채널에만 업로드된다(channel_id를
+# 아무리 넘겨도 videos().insert()엔 그런 파라미터 자체가 없음 — 라우팅 불가능한
+# 설계였음). 그래서 언어별로 완전히 별도의 refresh token을 쓰도록 고쳤다 —
+# 이 리포의 다른 모든 유튜브 파이프라인(플리 5채널, 아카이브 8채널)과 동일한 패턴.
+YOUTUBE_OAUTH_CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID_NEW") or os.environ.get("YOUTUBE_OAUTH_CLIENT_ID", "")
+YOUTUBE_OAUTH_CLIENT_SECRET = os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET_NEW") or os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET", "")
 
 
-def get_youtube_service():
-    return build("youtube", "v3", credentials=get_credentials())
+def get_youtube_service(lang: str):
+    refresh_token_env = f"HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_{lang.upper()}"
+    refresh_token = os.environ.get(refresh_token_env, "")
+    if not refresh_token:
+        raise RuntimeError(f"{refresh_token_env} 시크릿이 없습니다 — 이 언어 채널은 아직 OAuth 미발급")
+    creds = Credentials(
+        token=None,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=YOUTUBE_OAUTH_CLIENT_ID,
+        client_secret=YOUTUBE_OAUTH_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/youtube.force-ssl"],
+    )
+    return build("youtube", "v3", credentials=creds)
 
 
 def upload_and_schedule(
@@ -27,7 +48,7 @@ def upload_and_schedule(
     publish_at_iso 예: '2026-07-28T09:00:00Z' (UTC, RFC3339 형식)
     반환값: 업로드된 유튜브 영상 URL
     """
-    youtube = get_youtube_service()
+    youtube = get_youtube_service(lang)
     lang_cfg = LANGUAGES[lang]
 
     body = {
