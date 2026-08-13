@@ -133,6 +133,8 @@ DURATION_POOL_MAX_SEC = 100 * 60
 CHANNEL_DURATION_POOL_SEC = {
     "starbucks": (56 * 60, 190 * 60),
     "globalmusic": (64 * 60, 132 * 60),
+    # healing: 2~3시간짜리 긴 수면/이완용 재생목록으로 고정(2026-08-13 사용자 요청).
+    "healing": (120 * 60, 180 * 60),
 }
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
@@ -507,11 +509,10 @@ def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, top
     if hero_override == "playlist_only":
         make_caption_thumbnail(image_path, out_path, topic="Playlist", show_waveform=True)
     elif channel_key == "healing":
-        # healing만 소제목을 원곡 주제어 대신 고정 문구 "Healing Sound"로 표시하고,
-        # 타이틀 폰트도 차분한 전용 세리프(Cormorant)로 바꾼다 (2026-08-13 사용자 요청).
-        make_caption_thumbnail(image_path, out_path, topic="Playlist",
-                                subtitle_override="Healing Sound", show_waveform=True,
-                                title_font_override=ensure_healing_title_font())
+        # healing은 다른 4개 히어로 채널과 달리 "사진 썸네일" 포맷 — 큰 타이틀도
+        # "Playlist" 문구도 없이 사진이 주인공, 작은 파형 아이콘 하나만 (2026-08-13
+        # 사용자 명시적 요청: "썸네일 음파만 작게 하나 Playlist 글씨 없다").
+        make_photo_thumbnail(image_path, out_path)
     elif channel_key in PLAYLIST_HERO_CHANNELS:
         make_caption_thumbnail(image_path, out_path, topic="Playlist",
                                 subtitle_override=topic, show_waveform=True)
@@ -1075,6 +1076,27 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
     # 4K로 업스케일해서 저장 (레이아웃 좌표는 1280x720 캔버스에 맞춰져 있어서
     # 그 비율 그대로 유지한 채, 마지막에 해상도만 4K로 끌어올린다 — 유튜브 썸네일
     # 화질 요구사항 대응, Lanczos로 최대한 선명하게).
+    final_img = img.convert("RGB")
+    if (w, h) != THUMBNAIL_UPSCALE_SIZE:
+        final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
+    final_img.save(out_path, "PNG")
+
+
+def make_photo_thumbnail(image_path, out_path, w=1280, h=720):
+    """healing 전용 '사진 썸네일' 포맷 (2026-08-13 사용자 요청): 큰 타이틀/'Playlist'
+    문구 없이 사진 자체가 주인공이고, 이 영상이 플레이리스트라는 것만 알아볼 수 있게
+    작은 파형 아이콘 하나만 하단 구석에 조용히 얹는다. 나머지 4개 히어로 채널(글로벌뮤직/
+    스타벅스/kpop)의 큼직한 매거진 표지 스타일과는 완전히 다른, 조용한 포맷."""
+    from PIL import Image, ImageDraw
+
+    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h).convert("RGBA")
+    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.16), False, 50))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # 하단 우측 구석에 작은 파형 아이콘만 — 큰 타이틀도, "Playlist" 문구도 없음
+    _draw_waveform(draw, w - 90, h - 40, n_bars=15, gap=6, max_h=22,
+                   color=(255, 255, 255, 200))
+
     final_img = img.convert("RGB")
     if (w, h) != THUMBNAIL_UPSCALE_SIZE:
         final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
