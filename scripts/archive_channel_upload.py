@@ -64,9 +64,12 @@ YOUTUBE_OAUTH_REFRESH_TOKEN = os.environ.get(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{CK}"
 _FOLDER_IDS_JSON = os.environ.get("ARCHIVE_OUTPUT_FOLDER_IDS_JSON", "{}")
 try:
     _FOLDER_IDS = json.loads(_FOLDER_IDS_JSON)
-except Exception:
+except Exception as _e:
+    print(f"⚠️ ARCHIVE_OUTPUT_FOLDER_IDS_JSON 파싱 실패: {_e!r} raw(len={len(_FOLDER_IDS_JSON)})={_FOLDER_IDS_JSON!r}", flush=True)
     _FOLDER_IDS = {}
 OUTPUT_FOLDER_ID = os.environ.get(f"OUTPUT_FOLDER_ID_{CK}", "") or _FOLDER_IDS.get(CK, "")
+if not OUTPUT_FOLDER_ID:
+    print(f"⚠️ OUTPUT_FOLDER_ID 못찾음. CK={CK!r} keys={list(_FOLDER_IDS.keys())!r}", flush=True)
 
 WORKDIR = "archive_publish_output"
 
