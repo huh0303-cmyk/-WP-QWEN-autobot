@@ -197,8 +197,12 @@ def fix_thumbnail_only(video_id, thumb_name):
     download_drive_file(drive, files[0]["id"], thumb_path)
     from googleapiclient.http import MediaFileUpload
     youtube = get_youtube_service()
-    youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
-    log(f"✅ 썸네일 적용 완료: video_id={video_id} thumb={thumb_name}")
+    try:
+        youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
+        log(f"✅ 썸네일 적용 완료: video_id={video_id} thumb={thumb_name}")
+    except Exception as e:
+        log(f"⚠️ 썸네일 설정 실패(계정 폰인증 필요할 수 있음): {e}")
+        raise SystemExit(0)
 
 
 def main():
