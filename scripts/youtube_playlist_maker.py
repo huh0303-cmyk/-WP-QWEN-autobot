@@ -138,7 +138,7 @@ CHANNEL_DURATION_POOL_SEC = {
 }
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
-THUMBNAIL_UPSCALE_SIZE = (3840, 2160)  # 썸네일 최종 저장 해상도(4K) — 요청사항
+THUMBNAIL_UPSCALE_SIZE = (5120, 2880)  # 썸네일 최종 저장 해상도(5K 기본) — 2026-08-14 사용자 요청
 INTRO_DURATION_SEC = 6.0          # 인트로가 쓰는 음악 앞부분 길이 — 본편은 이 지점부터 이어서 재생
 
 AUDIO_EXTS = (".mp3", ".wav", ".m4a", ".flac", ".aac", ".ogg")
@@ -1033,8 +1033,10 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
         title_render_font_path, title_render_weight = ensure_jp_font(), 700
     else:
         title_render_font_path, title_render_weight = title_font_path, 500
-    max_w = int(w * 0.95)
-    size = 240
+    # 2026-08-14 사용자 요청: "제목과 자막이 커야해.. 이탈자 없어야 하니까" — 시청자
+    # 이탈 방지를 위해 타이틀을 화면폭에 최대한 꽉 채운다(5K 기본 해상도와 함께 표준).
+    max_w = int(w * 0.97)
+    size = 260
     while size > 40:
         font = _font(title_render_font_path, size, title_render_weight)
         bbox = draw.textbbox((0, 0), title, font=font)
