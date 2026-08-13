@@ -99,11 +99,13 @@ def get_youtube_service():
         token=None, refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
         token_uri="https://oauth2.googleapis.com/token",
         client_id=YOUTUBE_OAUTH_CLIENT_ID, client_secret=YOUTUBE_OAUTH_CLIENT_SECRET,
-        # youtube.upload만 요청하면 실제 발급받은(force-ssl) 권한이 있어도 이 access
-        # token은 upload로 다운스코프되어 썸네일 설정(thumbnails().set())이 403으로
-        # 막힌다 — "폰인증 필요"처럼 보이지만 실은 스코프 다운그레이드 버그였음
-        # (2026-08-13 발견, 여러 아카이브 채널에서 반복 확인).
-        scopes=["https://www.googleapis.com/auth/youtube.force-ssl"],
+        # 2026-08-13: force-ssl로 바꿔봤다가 도로 되돌림 — 실제 테스트 결과
+        # (AMERICAN_ARCHIVE_TIMES) 이 토큰들은 애초에 upload 스코프로만 발급돼서
+        # force-ssl을 요청하면 "invalid_scope"로 아예 갱신이 실패한다. 원래
+        # 403("doesn't have permissions to upload and set custom video thumbnails")은
+        # 스코프 문제가 아니라 진짜 그 채널 계정의 폰인증 여부 문제였다(NASA_SPACE_TIMES는
+        # 동일 코드로 성공했다는 게 대조군 — 인증된 계정만 통과함).
+        scopes=["https://www.googleapis.com/auth/youtube.upload"],
     )
     return build("youtube", "v3", credentials=creds)
 
