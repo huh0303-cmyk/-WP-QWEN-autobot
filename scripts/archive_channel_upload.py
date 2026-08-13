@@ -99,7 +99,11 @@ def get_youtube_service():
         token=None, refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
         token_uri="https://oauth2.googleapis.com/token",
         client_id=YOUTUBE_OAUTH_CLIENT_ID, client_secret=YOUTUBE_OAUTH_CLIENT_SECRET,
-        scopes=["https://www.googleapis.com/auth/youtube.upload"],
+        # youtube.upload만 요청하면 실제 발급받은(force-ssl) 권한이 있어도 이 access
+        # token은 upload로 다운스코프되어 썸네일 설정(thumbnails().set())이 403으로
+        # 막힌다 — "폰인증 필요"처럼 보이지만 실은 스코프 다운그레이드 버그였음
+        # (2026-08-13 발견, 여러 아카이브 채널에서 반복 확인).
+        scopes=["https://www.googleapis.com/auth/youtube.force-ssl"],
     )
     return build("youtube", "v3", credentials=creds)
 
