@@ -924,23 +924,32 @@ def make_intro_clip(intro_still_path, audio_path, out_path, duration=INTRO_DURAT
     run_ffmpeg(["ffmpeg", "-y", "-i", audio_path, "-t", str(duration),
                 "-c:a", "aac", intro_audio])
 
+    # scale 단계에서 lanczos를 명시해야 AI 초상화 같은 소스가 확대될 때
+    # 흐릿해지지 않는다(기본 flags는 bilinear라 4K로 늘렸을 때 뭉개짐 — 2026-08-13
+    # 사용자 피드백: "모짜르트 초상화 업스케일 4K" 이후 표준 적용).
     frames = int(duration * 25)
-    zoom_vf = (f"scale=2400:-1,zoompan=z='min(zoom+0.0015,1.08)':d={frames}:"
+    zoom_vf = (f"scale=2400:-1:flags=lanczos,zoompan=z='min(zoom+0.0015,1.08)':d={frames}:"
                f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={VIDEO_W}x{VIDEO_H}:fps=25,"
                f"format=yuv420p")
     zoomed = os.path.join(WORKDIR, "intro_zoomed.mp4")
     run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-i", intro_still_path, "-vf", zoom_vf,
                 "-t", str(duration), "-c:v", "libx264", "-pix_fmt", "yuv420p", zoomed])
 
-    wave_w, wave_h = 760, 130
+    # 파형: 밋밋한 흰색 오실로스코프 선(cline) 대신, 골드 톤 두꺼운 막대(p2p)로
+    # 채널 브랜드 톤과 어울리게 + 은은한 그림자를 한 겹 더 깔아 입체감을 준다
+    # (2026-08-13 사용자 피드백: "음파가 넘 멋이없어 - 교체" 이후 표준 적용).
+    wave_w, wave_h = 760, 140
     bar_w, bar_h = wave_w + 60, wave_h + 50
     bar_y = VIDEO_H - bar_h - 60
     filter_complex = (
-        f"[1:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white:rate=25,"
+        f"[1:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=p2p:colors=0x000000:rate=25,"
+        f"format=rgba,colorchannelmixer=aa=0.35[waveshadow];"
+        f"[1:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=p2p:colors=0xF3D27A|0xE0A93E:rate=25,"
         f"format=rgba[wave];"
         f"[0:v]drawbox=x=(iw-{bar_w})/2:y={bar_y}:w={bar_w}:h={bar_h}:"
-        f"color=black@0.45:t=fill[bg];"
-        f"[bg][wave]overlay=x=(W-w)/2:y={bar_y + (bar_h - wave_h) // 2}[vout]"
+        f"color=black@0.5:t=fill[bg];"
+        f"[bg][waveshadow]overlay=x=(W-w)/2+3:y={bar_y + (bar_h - wave_h) // 2 + 3}[bg2];"
+        f"[bg2][wave]overlay=x=(W-w)/2:y={bar_y + (bar_h - wave_h) // 2}[vout]"
     )
     run_ffmpeg([
         "ffmpeg", "-y", "-i", zoomed, "-i", intro_audio,
@@ -1023,8 +1032,8 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
         title_render_font_path, title_render_weight = ensure_jp_font(), 700
     else:
         title_render_font_path, title_render_weight = title_font_path, 500
-    max_w = int(w * 0.92)
-    size = 220
+    max_w = int(w * 0.95)
+    size = 240
     while size > 40:
         font = _font(title_render_font_path, size, title_render_weight)
         bbox = draw.textbbox((0, 0), title, font=font)

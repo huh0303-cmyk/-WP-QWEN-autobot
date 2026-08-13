@@ -57,6 +57,18 @@ on:
         description: "승인 후 유튜브 예약발행까지 걸리는 시간(시간 단위). 비우면 승인 즉시 공개"
         required: false
         type: string
+      fix_video_id:
+        description: "(선택) 이미 올라간 영상의 제목/설명을 다시 생성해서 고칠 때: 유튜브 영상 ID (channel 입력도 그 영상 채널로 맞춰야 함)"
+        required: false
+        type: string
+      fix_topic:
+        description: "(선택) fix_video_id와 함께: 새 제목/설명 생성에 쓸 주제어"
+        required: false
+        type: string
+      fix_duration_min:
+        description: "(선택) fix_video_id와 함께: 영상 길이(분)"
+        required: false
+        type: string
   schedule:
     # 2026-08-07: 승인 게이트를 없애고 완전자동(생성→업로드→공개)으로 전환.
     # 채널별 전용 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_<채널명>)이 없으면 publish
@@ -78,6 +90,7 @@ permissions:
 
 jobs:
   prepare:
+    if: ${{ !inputs.fix_video_id }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     outputs:
@@ -185,6 +198,7 @@ jobs:
           git push
 
   publish:
+    if: ${{ !inputs.fix_video_id }}
     needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -224,3 +238,35 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || (needs.prepare.outputs.channel_key_upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/youtube_publish_approved.py
+
+  fix_metadata:
+    if: ${{ inputs.fix_video_id }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: 채널 결정
+        id: ch
+        run: echo "upper=$(echo '${{ inputs.channel }}' | tr '[:lower:]' '[:upper:]')" >> "$GITHUB_OUTPUT"
+
+      - name: 제목/설명 재생성 + 적용
+        env:
+          CHANNEL_KEY: ${{ inputs.channel }}
+          FIX_VIDEO_ID: ${{ inputs.fix_video_id }}
+          FIX_TOPIC: ${{ inputs.fix_topic }}
+          FIX_DURATION_MIN: ${{ inputs.fix_duration_min }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', steps.ch.outputs.upper)] || (steps.ch.outputs.upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
+        run: python scripts/fix_video_metadata.py
