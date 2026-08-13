@@ -181,7 +181,33 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, publi
     return video_id
 
 
+def fix_thumbnail_only(video_id, thumb_name):
+    """이미 업로드된 영상에 완성 폴더의 썸네일을 나중에 붙일 때 쓰는 1회성 모드."""
+    drive = get_drive_service()
+    resp = drive.files().list(
+        q=f"'{OUTPUT_FOLDER_ID}' in parents and trashed=false and name='{thumb_name}'",
+        fields="files(id,name)", pageSize=5,
+    ).execute()
+    files = resp.get("files", [])
+    if not files:
+        log(f"❌ 썸네일 파일을 완성 폴더에서 못 찾음: {thumb_name}")
+        raise SystemExit(1)
+    os.makedirs(WORKDIR, exist_ok=True)
+    thumb_path = os.path.join(WORKDIR, "fix_thumb.png")
+    download_drive_file(drive, files[0]["id"], thumb_path)
+    from googleapiclient.http import MediaFileUpload
+    youtube = get_youtube_service()
+    youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
+    log(f"✅ 썸네일 적용 완료: video_id={video_id} thumb={thumb_name}")
+
+
 def main():
+    fix_video_id = os.environ.get("FIX_VIDEO_ID", "").strip()
+    fix_thumb_name = os.environ.get("FIX_THUMB_NAME", "").strip()
+    if fix_video_id and fix_thumb_name:
+        fix_thumbnail_only(fix_video_id, fix_thumb_name)
+        return
+
     missing = [k for k, v in {
         "GOOGLE_OAUTH_CLIENT_ID": GOOGLE_OAUTH_CLIENT_ID,
         "GOOGLE_OAUTH_REFRESH_TOKEN": GOOGLE_OAUTH_REFRESH_TOKEN,
