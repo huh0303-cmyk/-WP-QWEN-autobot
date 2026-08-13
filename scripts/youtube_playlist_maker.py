@@ -583,18 +583,21 @@ def build_ai_images(topic, workdir):
             f"rainy window looking out at forest, {style}",
         ]
     elif CHANNEL_KEY == "starbucks":
-        # 카페음악 채널: 우드톤 카페 인테리어, 실제 브랜드 로고는 넣지 않음(상표권)
+        # 카페음악 채널 (2026-08-13 레트로 컨셉으로 갱신): 빈티지 턴테이블/레코드,
+        # 오래된 잡지표지 톤, 오래된 카페 외벽/간판, 꽃집 외부 — 실제 브랜드 로고는 넣지 않음(상표권)
         style = (
-            "real photograph shot on a professional DSLR camera, warm wood-tone cafe "
-            "interior, cozy ambient lighting, shallow depth of field, no visible brand "
-            "logos or storefront signage, no text, no watermark"
+            "real photograph shot on a professional DSLR camera, warm nostalgic retro "
+            "color grade like an old magazine cover, soft golden afternoon light, "
+            "shallow depth of field, no visible brand logos or storefront signage, "
+            "no text, no watermark"
         )
         prompts = [
-            f"A cozy upscale cafe interior inspired by '{topic}', warm wood tones, soft "
-            f"pendant lighting, a coffee cup on a wooden table, quiet studying/working "
-            f"atmosphere, {style}",
-            f"A different cozy cafe corner related to '{topic}', large window with warm "
-            f"afternoon light, plants and wood furniture, relaxed atmosphere, {style}",
+            f"A vintage vinyl record player (turntable) spinning on a cozy wooden shelf "
+            f"beside a fresh flower in a vase, inspired by '{topic}', warm retro interior, "
+            f"soft afternoon light through a window, {style}",
+            f"A charming old-fashioned cafe street corner or flower shop storefront "
+            f"related to '{topic}', potted plants and flowers out front, warm string "
+            f"lights, cozy retro European alley mood, {style}",
         ]
     elif CHANNEL_KEY == "kpop":
         # K-pop 플리: 실존 아이돌 특정 불가 — 화려한 조명/무대 분위기의 실루엣 컨셉
