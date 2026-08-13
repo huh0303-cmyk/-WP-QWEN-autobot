@@ -331,15 +331,18 @@ def make_placeholder_image(out_path):
     Image.new("RGB", (VIDEO_W, VIDEO_H), (20, 25, 40)).save(out_path, "PNG")
 
 
-def gemini_generate_text(prompt, temperature=0.9):
+def gemini_generate_text(prompt, temperature=0.9, max_output_tokens=None):
     if not GEMINI_API_KEY:
         return ""
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}")
+    gen_config = {"temperature": temperature}
+    if max_output_tokens:
+        gen_config["maxOutputTokens"] = max_output_tokens
     body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": temperature}}
+            "generationConfig": gen_config}
     try:
-        r = requests.post(url, json=body, timeout=30)
+        r = requests.post(url, json=body, timeout=60)
         r.raise_for_status()
         data = r.json()
         return data["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -359,22 +362,45 @@ def build_caption_text(topic, caption_text):
     return text or f"{topic} 들으면서 잠깐 쉬어가기"
 
 
+# 채널별 설명 톤/컨셉 — Gemini 프롬프트에 채널 정체성을 반영해서 전부 똑같은
+# 문구가 나오지 않게 한다 (2026-08-13, 사용자 요청: "이제부터 파이프라인에 박제")
+CHANNEL_DESC_CONTEXT = {
+    "globalmusic": "a warm, romantic lofi/acoustic playlist channel (couples, golden-hour mood, gentle piano/guitar)",
+    "healing": "an ambient nature-sounds channel for relaxation and sleep (rain, wind, birdsong, temple wind chimes — no lyrics, pure atmosphere)",
+    "starbucks": "an instrumental cafe/focus-music channel for working and studying (no lyrics, warm wood-tone cafe mood)",
+    "mbb": "a classical music channel centered on Mozart, Bach and Beethoven (and other classical composers)",
+    "kpop": "a K-pop playlist channel (study/workout/driving/chill mixes of K-pop tracks)",
+}
+
+
 def generate_youtube_title_description(topic, caption_text, duration_min):
     """유튜브 업로드용 제목+설명을 Gemini로 생성. 광고 카피처럼 매끈하지 않게,
-    실제 채널 운영자가 쓴 것 같은 톤으로("AI 흔적 최소화" 원칙 동일 적용)."""
-    prompt = f"""'{topic}' 분위기의 {duration_min:.0f}분짜리 플레이리스트 유튜브 영상의
-제목과 설명을 만들어줘. 이 영상의 한 줄 캡션은 "{caption_text}"야.
+    실제 채널 운영자가 쓴 것 같은 톤으로("AI 흔적 최소화" 원칙 동일 적용).
+    설명은 영어+한국어를 섞어서(약 50:50) 총 5000자 내외의 긴 설명으로 생성한다
+    (2026-08-13 사용자 요청 — SEO/시청자 정보성 강화, 모든 채널 공통 적용)."""
+    channel_context = CHANNEL_DESC_CONTEXT.get(CHANNEL_KEY, "a curated playlist channel")
+    prompt = f"""You are writing the YouTube title and description for a {duration_min:.0f}-minute
+playlist video on {channel_context}. The video's mood/topic is "{topic}", one-line caption: "{caption_text}".
 
-조건:
-- 제목: 70자 이내, 과장된 광고 카피 아니고 자연스럽게, 이모지 최대 1개
-- 설명: 3~4문장, 역시 담백한 구어체로(광고 카피처럼 매끈하지 않게), 마지막 줄에
-  관련 해시태그 4~5개 (#playlist #{topic.replace(' ', '')} 같은 형식)
-- 아래 형식 그대로, 다른 설명 없이:
-TITLE: (제목)
-DESCRIPTION: (설명, 줄바꿈 포함 가능)
+Write:
+1. TITLE: under 70 characters, natural (not hypey ad-copy), at most 1 emoji.
+2. DESCRIPTION: a long, genuinely useful description of about 5000 characters total,
+   written in a natural MIX of English and Korean (roughly 50/50 — alternate by
+   paragraph, writing the same content in both languages, not just translating
+   word-for-word but writing naturally in each language). Cover: what kind of
+   listening experience this is, when/how to use it (studying, sleeping, working,
+   relaxing, etc. as fits the topic), why this type of music/sound helps, and a
+   warm closing note inviting the listener to subscribe. End with 8-10 relevant
+   hashtags (mix of English and Korean tags).
+   Sound like a real channel owner wrote it — conversational, not a marketing
+   template, no exaggerated claims.
+
+Respond in exactly this format, nothing else:
+TITLE: (title)
+DESCRIPTION: (the long bilingual description, with blank lines between paragraphs)
 """
-    text = gemini_generate_text(prompt, temperature=0.9)
-    title, description = f"{topic} Playlist | {caption_text}", caption_text
+    text = gemini_generate_text(prompt, temperature=0.9, max_output_tokens=4096)
+    title, description = f"{topic} Playlist | {caption_text}", _fallback_description(topic, duration_min)
     used_fallback = True
     if "TITLE:" in text and "DESCRIPTION:" in text:
         try:
@@ -383,7 +409,7 @@ DESCRIPTION: (설명, 줄바꿈 포함 가능)
             if title_part:
                 title = title_part
                 used_fallback = False
-            if desc_part:
+            if desc_part and len(desc_part) > 200:
                 description = desc_part
         except Exception:
             pass
@@ -391,6 +417,19 @@ DESCRIPTION: (설명, 줄바꿈 포함 가능)
     # 뜻 — "AI 흔적 없어야 한다"는 원칙상 이런 영상은 자동으로 공개하면 안 되므로
     # publish 단계에서 이 플래그를 보고 비공개로 남겨둔다(youtube_publish_approved.py 참고).
     return title[:100], description, used_fallback
+
+
+def _fallback_description(topic, duration_min):
+    """Gemini 호출이 실패했을 때 쓰는 채널별 템플릿 설명(영/한 혼합) — 최소한
+    파일명만 덜렁 올라가는 것보다는 훨씬 나은 기본값을 보장한다."""
+    ctx = CHANNEL_DESC_CONTEXT.get(CHANNEL_KEY, "a curated playlist")
+    return (
+        f"A {duration_min:.0f}-minute playlist themed around '{topic}', part of {ctx}. "
+        f"Sit back, let it play in the background, and enjoy.\n\n"
+        f"'{topic}' 주제로 구성된 {duration_min:.0f}분짜리 플레이리스트입니다. "
+        f"편하게 배경에 틀어두고 즐겨주세요.\n\n"
+        f"#playlist #{topic.replace(' ', '')} #플레이리스트"
+    )
 
 
 def send_email(subject, body):
