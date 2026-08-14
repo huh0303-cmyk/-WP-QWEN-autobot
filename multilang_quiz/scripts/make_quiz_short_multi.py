@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-다국어 초급 단어 퀴즈 숏폼 자동 생성기 (무료 파이프라인) v3
-- 대상 언어: en(영어) / ja(일본어) / es(스페인어) / vi(베트남어)
-- 이미지: canva_assets/(concept) 우선, 없으면 Wikimedia Commons 검색 + 폴백 카드
-- TTS: gTTS (무료, 구글 번역 TTS)
+다국어 초급 단어 퀴즈 숏폼 자동 생성기 v4
+- 한국어를 원소스로: 매 실행 배치에서 첫 언어가 오늘의 단어(concept) 세트를 정하면
+  나머지 언어는 그 세트를 그대로 따라간다(WORKDIR/selected_concepts.json)
+- 이미지: canva_assets/(concept) 우선 → 언어 간 공유 캐시(WORKDIR/img_cache) →
+  없으면 Wikimedia Commons 검색 + 폴백 카드
+- TTS: ElevenLabs(eleven_multilingual_v2, 보이스 1개로 전 언어 커버)
 - 효과음: 카운트다운 틱 + 정답 차임 (ffmpeg 합성음, 무료)
 - 합성: PIL(프레임 생성) + ffmpeg(인코딩)
 
@@ -22,9 +24,8 @@ v3 변경사항 (디자인 리뉴얼 — 기존 topik_quiz_shorts.py 카드 스�
   python3 make_quiz_short_multi.py --lang en --n 5
 """
 
-import os, csv, json, random, argparse, subprocess, urllib.request, urllib.parse, tempfile
+import os, csv, json, random, argparse, subprocess, urllib.request, urllib.parse, tempfile, hashlib
 from PIL import Image, ImageDraw, ImageFont
-from gtts import gTTS
 import requests
 
 try:
@@ -285,10 +286,20 @@ def load_words(csv_path):
     with open(csv_path, encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
-def build_quiz_items(words, n):
-    pool = words[:]
-    random.shuffle(pool)
-    chosen = pool[:n]
+def build_quiz_items(words, n, concepts=None):
+    """concepts가 주어지면(다른 언어가 이미 고른 concept 목록) 그 순서/구성 그대로
+    이 언어의 단어로 맞춰 뽑는다 — 한국어를 원소스로 나머지 언어를 만들 때
+    모든 언어가 같은 단어 세트(예: 사과/바나나/강아지)를 다루게 하기 위함."""
+    if concepts:
+        by_concept = {w.get("concept", ""): w for w in words}
+        chosen = [by_concept[c] for c in concepts if c in by_concept]
+        if len(chosen) < len(concepts):
+            missing = [c for c in concepts if c not in by_concept]
+            print(f"[경고] 이 언어 CSV에 없는 concept {len(missing)}개 스킵: {missing}")
+    else:
+        pool = words[:]
+        random.shuffle(pool)
+        chosen = pool[:n]
     items = []
     for w in chosen:
         distractors = [x for x in words if x["category"] == w["category"] and x["word"] != w["word"]]
@@ -361,16 +372,56 @@ def make_fallback_card(word, out_path, size=(900, 900)):
         pass
     img.save(out_path, quality=90)
 
-def tts(text, out_path, gtts_lang, slow=False, max_retries=5):
+# ★ 2026-08-14 사용자 지시: 무료 gTTS 대신 ElevenLabs로 교체 — 훨씬 자연스러운
+#   음성이 필요하다는 판단. eleven_multilingual_v2 모델은 보이스 하나로 이
+#   퀴즈가 다루는 12개 언어를 전부 커버해서 언어별로 다른 보이스를 관리할
+#   필요가 없다. 텍스트+보이스 해시로 캐싱해서 같은 단어("사과", "apple" 등)를
+#   여러 영상에서 재사용할 때 API 호출을 아낀다(health_clinic의 tts_elevenlabs.py와
+#   동일한 캐싱 패턴).
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
+ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID_QUIZ") or os.environ.get("ELEVENLABS_VOICE_ID", "")
+_TTS_CACHE_DIR = os.path.join(tempfile.gettempdir(), "quiz_tts_cache")
+os.makedirs(_TTS_CACHE_DIR, exist_ok=True)
+
+
+def _ffprobe_duration(path):
+    return float(subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", path],
+        capture_output=True, text=True).stdout.strip())
+
+
+def tts(text, out_path, gtts_lang=None, slow=False, max_retries=5):
     import time
+    if not ELEVENLABS_API_KEY or not ELEVENLABS_VOICE_ID:
+        raise RuntimeError("ELEVENLABS_API_KEY / ELEVENLABS_VOICE_ID_QUIZ 환경변수 없음 — TTS 불가")
+
+    cache_key = hashlib.sha256((ELEVENLABS_VOICE_ID + text).encode("utf-8")).hexdigest()[:20]
+    cache_path = os.path.join(_TTS_CACHE_DIR, f"{cache_key}.mp3")
+    if os.path.exists(cache_path):
+        import shutil
+        shutil.copyfile(cache_path, out_path)
+        return _ffprobe_duration(out_path)
+
     last_err = None
     for attempt in range(max_retries):
         try:
-            gTTS(text, lang=gtts_lang, slow=slow).save(out_path)
-            return float(subprocess.run(
-                ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-                 "-of", "default=noprint_wrappers=1:nokey=1", out_path],
-                capture_output=True, text=True).stdout.strip())
+            resp = requests.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}",
+                headers={"xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json"},
+                json={
+                    "text": text,
+                    "model_id": "eleven_multilingual_v2",
+                    "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
+                },
+                timeout=60,
+            )
+            resp.raise_for_status()
+            with open(out_path, "wb") as f:
+                f.write(resp.content)
+            with open(cache_path, "wb") as f:
+                f.write(resp.content)
+            return _ffprobe_duration(out_path)
         except Exception as e:
             last_err = e
             time.sleep(2 * (attempt + 1))
@@ -520,7 +571,22 @@ def main():
     os.makedirs(args.out_dir, exist_ok=True)
 
     words = load_words(cfg["csv"])
-    items = build_quiz_items(words, args.n)
+
+    # ★ 2026-08-14 사용자 지시: 한국어를 원소스로, 나머지 11개 언어는 같은
+    #   단어 세트(concept)를 그대로 따라가게 한다 — 언어마다 완전히 다른
+    #   단어를 무작위로 뽑던 것을 없앰. 같은 실행 배치(daily_multilang_quiz.yml의
+    #   for-loop) 안에서 가장 먼저 도는 언어가 오늘의 concept 목록을 정하고
+    #   파일로 남기면, 이후 언어들은 그 파일을 읽어서 그대로 따라간다.
+    concepts_path = os.path.join(WORKDIR, "selected_concepts.json")
+    if os.path.exists(concepts_path):
+        with open(concepts_path, encoding="utf-8") as f:
+            concepts = json.load(f)
+        items = build_quiz_items(words, args.n, concepts=concepts)
+    else:
+        items = build_quiz_items(words, args.n)
+        with open(concepts_path, "w", encoding="utf-8") as f:
+            json.dump([it["concept"] for it in items], f, ensure_ascii=False)
+
     theme = random.choice(THEMES)  # 영상 전체에서 테마 하나로 고정
 
     global CURRENT_LANG
@@ -555,14 +621,29 @@ def main():
     audio_events = []
     cur_time = 0.0
 
+    # ★ 2026-08-14: 이미지는 concept 단위로 언어 간 공유 캐시(WORKDIR/img_cache)에
+    #   재사용한다 — "사과" 사진과 "apple" 사진은 어차피 같은 사진이어야 하므로,
+    #   한국어 실행에서 받아둔 파일을 나머지 11개 언어가 그대로 복사해 쓴다.
+    #   Commons 검색을 언어마다 반복 호출하지 않아 실패 확률(=이미지 누락)도 줄어든다.
+    img_cache_dir = os.path.join(WORKDIR, "img_cache")
+    os.makedirs(img_cache_dir, exist_ok=True)
+
     for idx, item in enumerate(items, start=1):
         img_path = os.path.join(WORKDIR, f"img_{args.lang}_{idx}.jpg")
-        canva_asset = os.path.join("canva_assets", f"{item['concept']}.png")
-        if item["concept"] and os.path.exists(canva_asset):
-            Image.open(canva_asset).convert("RGB").save(img_path, quality=95)
+        cache_path = os.path.join(img_cache_dir, f"{item['concept']}.jpg") if item["concept"] else None
+
+        if cache_path and os.path.exists(cache_path):
+            Image.open(cache_path).convert("RGB").save(img_path, quality=95)
             ok = True
         else:
-            ok = fetch_commons_image(item["image_query"], item["word"], img_path)
+            canva_asset = os.path.join("canva_assets", f"{item['concept']}.png")
+            if item["concept"] and os.path.exists(canva_asset):
+                Image.open(canva_asset).convert("RGB").save(img_path, quality=95)
+                ok = True
+            else:
+                ok = fetch_commons_image(item["image_query"], item["word"], img_path)
+            if ok and cache_path:
+                Image.open(img_path).convert("RGB").save(cache_path, quality=95)
         if not ok:
             print(f"[정보] 이미지 소싱 실패 -> 폴백 카드 사용: {item['image_query']}")
             make_fallback_card(item["word"], img_path)
