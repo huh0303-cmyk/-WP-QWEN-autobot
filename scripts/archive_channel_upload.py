@@ -80,85 +80,165 @@ WORKDIR = "archive_publish_output"
 # 넣지 않는다 — 시청자에게 굳이 알릴 필요 없는 법적 디테일이고 클릭만 깎아먹는다.
 CHANNEL_HOOKS = {
     "AMERICAN_ARCHIVE_TIMES": {
-        "title_fmt": "{topic} — Lost American Footage Almost No One Has Seen",
-        "hook": "🇺🇸 Real footage America almost forgot.",
-        "body": "Restored film reels from a piece of American history you won't find in any textbook.",
-        "tags": "#AmericanHistory #ArchiveFootage #History #Documentary #RareFootage",
+        "title_fmt": "{topic} — The Lost American Footage Almost No One Has Seen In Over 70 Years (Restored)",
+        "hook": "🇺🇸 Real footage America almost forgot — rescued from deteriorating reels and restored so a new generation can finally see it.",
+        "body": (
+            "This is genuine archival film, not a reenactment and not a dramatization — the actual faces, "
+            "the actual moments, the world exactly as it looked when the camera was rolling. Most people alive "
+            "today have never seen these images move, and you won't find this particular story in any textbook. "
+            "It's the raw, unscripted side of American history that the big TV specials always skip over: the "
+            "ordinary people who lived through extraordinary times."
+        ),
+        "engage": "What decade of American history do you want us to dig up next? Tell us in the comments — we're always searching the archive.",
+        "tags": "#AmericanHistory #ArchiveFootage #History #Documentary #RareFootage #USHistory #RestoredFilm",
     },
     "CLASSIC_READS_TIMES": {
-        "title_fmt": "{topic} — The Classic Everyone Quotes But Almost No One Has Read",
-        "hook": "📖 The story everyone name-drops but nobody's actually finished.",
-        "body": "A timeless classic, brought to life — sit back and let the story unfold.",
-        "tags": "#ClassicLiterature #Audiobook #ClassicReads #Storytime #Literature",
+        "title_fmt": "{topic} — The Classic Novel Everyone Quotes But Almost Nobody Has Actually Finished",
+        "hook": "📖 The story everyone name-drops at dinner parties but almost nobody has actually sat down and finished.",
+        "body": (
+            "This is a timeless piece of classic literature, read aloud and brought to life so you can finally "
+            "experience it the way it was meant to be heard — not skimmed for a school assignment, but told like "
+            "a real story. Put this on during a commute, a workout, or before bed, and let the plot pull you in "
+            "the way it pulled in readers a century or more ago. These stories became classics for a reason, and "
+            "once you actually hear them, you'll understand why they never went away."
+        ),
+        "engage": "Which classic should we read next? Drop your request below and we'll add it to the queue.",
+        "tags": "#ClassicLiterature #Audiobook #ClassicReads #Storytime #Literature #BookTok #ClassicNovels",
     },
     "NASA_SPACE_TIMES": {
-        "title_fmt": "{topic} — What NASA Saw Out There",
-        "hook": "🚀 What NASA saw... and almost never showed the public.",
-        "body": "Real space footage and the untold science behind it — the universe is stranger than fiction.",
-        "tags": "#NASA #Space #Universe #Astronomy #SpaceExploration",
+        "title_fmt": "{topic} — What NASA Actually Saw Out There (Real Footage, Not CGI)",
+        "hook": "🚀 What NASA actually saw out there — and almost never showed the public.",
+        "body": (
+            "Real space footage, real mission data, and the untold science behind it — no CGI, no exaggeration, "
+            "just what actually happened when humans and machines pushed past the edge of what we thought was "
+            "possible. The universe turns out to be far stranger, and far more beautiful, than science fiction "
+            "ever managed to invent. If you've ever looked up at the night sky and wondered what's really out "
+            "there, this is the closest you'll get to seeing it for yourself."
+        ),
+        "engage": "Which mission or planet should we cover next? Let us know in the comments.",
+        "tags": "#NASA #Space #Universe #Astronomy #SpaceExploration #Cosmos #ScienceDocumentary",
     },
     "SCIENCE_FACTS_TIMES": {
-        "title_fmt": "{topic} — The Science Fact That Breaks Your Brain",
-        "hook": "🧠 The science fact that breaks your brain.",
-        "body": "Mind-bending facts, explained simply — you'll never see the world the same way again.",
-        "tags": "#ScienceFacts #DidYouKnow #Science #Education #Facts",
+        "title_fmt": "{topic} — The Science Fact That Sounds Fake But Is 100% Real",
+        "hook": "🧠 The science fact that sounds completely fake — until you check the sources.",
+        "body": (
+            "Mind-bending, genuinely verified science, broken down so it's easy to follow even if you slept "
+            "through class. No clickbait pseudoscience here — every fact in this video is real, sourced, and "
+            "checked, and once you hear the explanation, you'll never look at the everyday world the same way "
+            "again. These are the facts that make you stop mid-sentence and say 'wait, really?' — the kind "
+            "worth remembering, worth repeating at dinner, and worth telling your friends about before they "
+            "hear it from someone else first."
+        ),
+        "engage": "Which science fact blew your mind the most? Tell us below — and let us know what topic to cover next.",
+        "tags": "#ScienceFacts #DidYouKnow #Science #Education #Facts #Mindblown #ScienceDocumentary",
     },
     "INVENTION_TIMES": {
-        "title_fmt": "{topic} — The Invention That Changed Everything By Accident",
-        "hook": "💡 The invention that changed everything — almost by accident.",
-        "body": "The untold story behind an invention that quietly reshaped the modern world.",
-        "tags": "#Inventions #History #Innovation #HowItWasMade #Technology",
+        "title_fmt": "{topic} — The Invention That Changed Everything, Almost By Accident",
+        "hook": "💡 The invention that changed everything — and very nearly never happened at all.",
+        "body": (
+            "Every object you rely on today started as somebody's stubborn obsession, and most of history's "
+            "biggest inventions came from a mix of genius, luck, and outright failure. This is the real, "
+            "often messy story behind an invention that quietly reshaped the modern world — the false starts, "
+            "the skeptics who said it would never work, and the moment it finally clicked. History remembers "
+            "the invention. It rarely remembers how close it came to never existing at all."
+        ),
+        "engage": "What everyday invention do you want us to trace back to its origin story next? Comment below.",
+        "tags": "#Inventions #History #Innovation #HowItWasMade #Technology #HistoryOfScience",
     },
     "MYTH_LEGEND_TIMES": {
-        "title_fmt": "{topic} — The Myth The Greeks Were Almost Afraid To Finish",
-        "hook": "⚡ The legend the ancients were almost afraid to finish telling.",
-        "body": "An ancient myth, retold — gods, monsters, and mortals caught in between.",
-        "tags": "#GreekMythology #Mythology #AncientLegends #Storytime #RomanMythology",
+        "title_fmt": "{topic} — The Ancient Myth They Were Almost Too Afraid To Finish Telling",
+        "hook": "⚡ The legend the ancients were almost too afraid to finish telling around the fire.",
+        "body": (
+            "An ancient myth, retold in full — gods with tempers, monsters with grudges, and mortals caught "
+            "helplessly in between. Long before movies and television, these stories were how entire "
+            "civilizations explained the world, warned their children, and passed down what they valued most. "
+            "They've survived thousands of years for a reason: once you actually hear the whole story, not the "
+            "watered-down version, you understand exactly why it still gives people chills today."
+        ),
+        "engage": "Which god, hero, or monster should we cover in the next episode? Let us know in the comments.",
+        "tags": "#GreekMythology #Mythology #AncientLegends #Storytime #RomanMythology #MythologyExplained",
     },
     "RETRO_REELS_TIMES": {
-        "title_fmt": "{topic} — Rewind To A Simpler Time",
-        "hook": "📼 Rewind to a simpler time.",
-        "body": "Nostalgic footage from a bygone era — grab some popcorn and take a trip back.",
-        "tags": "#Retro #Nostalgia #Vintage #ThrowbackFootage #History",
+        "title_fmt": "{topic} — Rewind To A Simpler Time (Nostalgic Footage You Forgot Existed)",
+        "hook": "📼 Rewind to a simpler time — the kind of footage you didn't know you missed until you saw it again.",
+        "body": (
+            "Nostalgic footage from a bygone era, the kind that instantly transports you back regardless of "
+            "whether you actually lived through it. Grab something to drink, settle in, and take a trip back to "
+            "a time that felt slower, warmer, and a little more fun — before everything was quite so loud and "
+            "quite so fast. There's a reason nostalgia hits this hard, and once this video starts, you'll "
+            "remember exactly why people still talk about the good old days."
+        ),
+        "engage": "What era should we bring back next? Tell us in the comments and we'll dig through the archive.",
+        "tags": "#Retro #Nostalgia #Vintage #ThrowbackFootage #History #GoodOldDays",
     },
     "HISTORY_TODAY_TIMES": {
-        "title_fmt": "On This Day: {topic}",
-        "hook": "📅 On this day, history quietly changed forever.",
-        "body": "The real story behind what happened on this date — the part school skipped.",
-        "tags": "#OnThisDay #HistoryToday #ThisDayInHistory #History #Facts",
+        "title_fmt": "On This Day: {topic} — The Full Story Your History Class Skipped",
+        "hook": "📅 On this day, history quietly changed forever — and almost nobody remembers exactly how.",
+        "body": (
+            "The real story behind what actually happened on this exact date, told in full — not the one-line "
+            "summary from a textbook footnote, but the actual chain of events, the people involved, and why it "
+            "mattered far more than most people realize. This channel is building a complete day-by-day archive "
+            "of history, one date at a time, so you can finally understand what really happened on the day you "
+            "were born, married, or simply curious about."
+        ),
+        "engage": "Check back tomorrow for the next date in history — and tell us which date you want us to cover.",
+        "tags": "#OnThisDay #HistoryToday #ThisDayInHistory #History #Facts #TodayInHistory",
     },
     "SILENT_ERA_TIMES": {
-        "title_fmt": "{topic} — Silent Film Comedy That Still Lands 100 Years Later",
-        "hook": "🎬 Before sound, before color — pure comic genius.",
-        "body": "A classic silent-era film moment, restored — comedy that still lands a century later.",
-        "tags": "#SilentFilm #CharlieChaplin #ClassicComedy #FilmHistory #SilentEra",
+        "title_fmt": "{topic} — Silent Film Comedy That Still Lands Perfectly 100 Years Later",
+        "hook": "🎬 Before sound, before color, before CGI — just pure comic timing that still lands a century later.",
+        "body": (
+            "A classic silent-era film moment, restored and preserved, proving that great physical comedy never "
+            "actually goes out of style. No dialogue, no soundtrack tricks, no modern editing — just perfect "
+            "timing, real stunts, and a level of comic genius that modern comedy still tries to copy. Watch "
+            "closely and you'll see exactly why audiences a hundred years ago were laughing just as hard as "
+            "we still do today."
+        ),
+        "engage": "Which silent-era scene should we restore next? Let us know in the comments below.",
+        "tags": "#SilentFilm #CharlieChaplin #ClassicComedy #FilmHistory #SilentEra #ClassicCinema",
     },
     "CLASSICAL_JOURNAL": {
         "title_fmt": "{topic} — The Genius Behind The Music, And The Chaos Behind The Genius",
-        "hook": "🎼 The genius behind the music — and the chaos behind the genius.",
-        "body": "The real life story of a legendary composer — triumph, tragedy, and the music that outlived them all.",
-        "tags": "#ClassicalMusic #ComposerBiography #Mozart #Bach #Beethoven",
+        "hook": "🎼 The genius behind the music — and the chaos, heartbreak, and stubbornness behind the genius.",
+        "body": (
+            "The real life story of a legendary composer, told in full — not just the music everyone already "
+            "knows, but the triumphs, the rivalries, the poverty, the deafness, the scandal, and the sheer "
+            "stubbornness it took to create something that would outlive them by centuries. Behind every famous "
+            "symphony is a very human story of struggle, and once you know it, you'll never hear the music the "
+            "same way again."
+        ),
+        "engage": "Which composer's story should we tell next? Let us know in the comments.",
+        "tags": "#ClassicalMusic #ComposerBiography #Mozart #Bach #Beethoven #MusicHistory",
     },
+}
+_DEFAULT_HOOK = {
+    "title_fmt": "{topic} — The Story You Didn't Expect (Full Story Inside)",
+    "hook": "This is a story worth your full attention — stick around, it's not what you think.",
+    "body": (
+        "Every video on this channel is researched and put together to give you the real story, not just the "
+        "headline version. Sit back, watch the whole thing, and you'll walk away knowing something you didn't "
+        "know ten minutes ago."
+    ),
+    "engage": "Let us know what you think in the comments, and tell us what to cover next.",
+    "tags": "#Archive #History #Documentary",
 }
 
 
 def build_title_and_description(channel_key, raw_topic):
-    hook_info = CHANNEL_HOOKS.get(channel_key, {
-        "title_fmt": "{topic} — The Story You Didn't Expect",
-        "hook": f"{raw_topic} — a story worth your time.",
-        "body": "Stick around to the end — it's not what you think.",
-        "tags": "#Archive #History #Documentary",
-    })
+    hook_info = CHANNEL_HOOKS.get(channel_key, _DEFAULT_HOOK)
     title = hook_info["title_fmt"].format(topic=raw_topic)
-    if len(title) > 95:  # 유튜브 제목 100자 제한 여유 두고 자르기
-        title = title[:92].rsplit(" ", 1)[0] + "..."
+    if len(title) > 100:  # 유튜브 제목 하드 리밋
+        title = title[:97].rsplit(" ", 1)[0] + "..."
     description = (
         f"{hook_info['hook']}\n\n"
         f"{raw_topic}\n\n"
         f"{hook_info['body']}\n\n"
-        f"🔔 Subscribe for more — new stories every week.\n\n"
+        f"🔔 Subscribe and turn on notifications — new videos every week, and you don't want to miss what's coming next.\n\n"
+        f"{hook_info['engage']}\n\n"
         f"{hook_info['tags']}"
     )
+    if len(description) > 5000:  # 유튜브 설명 하드 리밋(여유있게 체크만)
+        description = description[:4990] + "..."
     return title, description
 
 
