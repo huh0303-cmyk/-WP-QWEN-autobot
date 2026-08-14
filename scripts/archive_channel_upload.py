@@ -162,6 +162,27 @@ def download_drive_file(service, file_id, out_path):
             _, done = downloader.next_chunk()
 
 
+def strip_ai_fingerprint(video_path):
+    """업로드 직전에 인코더/제작 흔적(메타데이터)을 강제로 지운다 — 2026-08-14
+    사용자 요청: "AI 흔적 없어야 한다"는 원칙을 파이프라인 자체에 박아서, 준비
+    단계 스크립트가 이 플래그를 빠뜨려도 업로드 직전에 항상 한 번 더 걸러지게
+    한다. 스트림 그대로 복사(재인코딩 없음)라 화질 손실도, 시간도 거의 없다."""
+    import subprocess
+    tmp_path = video_path + ".stripped.mp4"
+    try:
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", video_path, "-map_metadata", "-1",
+             "-c", "copy", "-movflags", "+faststart", tmp_path],
+            check=True, capture_output=True, timeout=120,
+        )
+        os.replace(tmp_path, video_path)
+        log("   메타데이터 제거 완료(AI 흔적 최소화)")
+    except Exception as e:
+        log(f"   ⚠️ 메타데이터 제거 실패(무시하고 원본 그대로 업로드): {e}")
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
 def mark_uploaded(drive, file_id, old_name):
     new_name = old_name.rsplit(".", 1)[0] + "_UPLOADED." + old_name.rsplit(".", 1)[1]
     drive.files().update(fileId=file_id, body={"name": new_name}).execute()
@@ -255,6 +276,7 @@ def main():
     log("2/4 다운로드 중...")
     video_path = os.path.join(WORKDIR, "video.mp4")
     download_drive_file(drive, video_file["id"], video_path)
+    strip_ai_fingerprint(video_path)
     thumb_path = None
     if thumb_file:
         thumb_path = os.path.join(WORKDIR, "thumb.png")
