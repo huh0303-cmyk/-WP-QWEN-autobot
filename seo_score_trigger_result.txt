@@ -1,110 +1,84 @@
 
 🌐 https://k-health365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='k-health365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A49%3A21.329449&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='k-health365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [5857] 수면무호흡증 치료, 순서대로 따라 하면 됩니다
 
 🌐 https://koreamedicaltour.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreamedicaltour.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A49%3A41.400558&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreamedicaltour.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1619] 8 Things to Check Before Korea hospital 
 
 🌐 https://koreainvest365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreainvest365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A50%3A01.521099&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreainvest365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ki-korea.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A50%3A21.608971&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='ki-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreainsurance365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreainsurance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A50%3A41.768566&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreainsurance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3631] cheap car insurance Korea in 2026: What&
 
 🌐 https://kfinance365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kfinance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A51%3A01.898290&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='kfinance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3850] Getting Korea money transfer app Right t
 
 🌐 https://koreataxnlaw.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreataxnlaw.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A51%3A21.970936&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreataxnlaw.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreacrypto365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreacrypto365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A51%3A42.090794&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreacrypto365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://krealestate365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='krealestate365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A52%3A02.213564&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='krealestate365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ktech365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='ktech365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A52%3A22.286387&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='ktech365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A52%3A42.614021&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T13%3A12%3A48.503980&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='oliveyoungkorea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A52%3A42.633018&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='oliveyoungkorea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kworld365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kworld365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A53%3A02.758712&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='kworld365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [782] TOPIK study guide: Details That Are Easy
 
 🌐 https://k-trip365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A53%3A42.837394&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://k-visa365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='k-visa365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A54%3A03.160795&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='k-visa365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreawedding365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreawedding365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A54%3A23.280823&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreawedding365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kstudy365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A54%3A43.393134&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://studyinkorea365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='studyinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A55%3A03.524982&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='studyinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kieca-korea.org
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A55%3A23.646796&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ksa-korea.org
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A55%3A43.809071&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='ksa-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [761] 대학원 입학 서류 관리, 이 4가지만 지켜도 달라집니다
 
 🌐 https://sis-korea.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A56%3A04.032849&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='sis-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1918] Korea winter camp international students
 
 🌐 https://jobkorea365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A56%3A24.091222&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='jobkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://jobinkorea365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A56%3A44.272390&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='jobinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A57%3A04.374979&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='korea365.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A57%3A24.450934&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='korea365.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreanews365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A57%3A44.601144&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://theseouljournal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T11%3A58%3A04.892975&_fields=id%2Ctitle (Caused by NewConnectionError("HTTPSConnection(host='theseouljournal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable"))
   (최근 2시간 내 신규 발행 없음)
 
-총 0건 SEO점수 갱신
+총 7건 SEO점수 갱신
