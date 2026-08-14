@@ -9,15 +9,24 @@ YouTube 업로드 — 항상 비공개로 올리고 자동 공개 전환은 하�
 2026-08-02: 언어별 전용 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_{LANG})이 없을 때
 공용 fallback 토큰으로 조용히 넘어가던 로직을 제거했다. 그 fallback이 엉뚱한
 채널(스타벅스 플리 채널)을 가리키고 있어서 9개 언어가 전부 그 채널 하나로
-뒤섞여 올라간 사고가 있었음. 이제 언어별 토큰이 없으면 그 언어는 그냥
-건너뛴다 — "각 언어는 반드시 그 언어 전용 채널에만 발행" 원칙을 코드로 강제.
+뒤섞여 올라간 사고가 있었음. 이제 채널 토큰이 없으면 그 언어는 그냥
+건너뛴다 — "정해진 채널에만 발행" 원칙을 코드로 강제.
+
+2026-08-14 채널 구조 확정(사용자 확인): 언어마다 별도 채널이 아니라 딱 2개
+채널로 나뉜다 — 영어는 English_Survival 전용 채널, 나머지 8개 언어
+(일본어/스페인어/베트남어/프랑스어/독일어/중국어/아랍어/러시아어)는 전부
+SIS-Language Center 채널 하나로 합쳐서 올린다.
 
 필요 Secrets: ML_YT_CLIENT_ID/ML_YT_CLIENT_SECRET (또는 YOUTUBE_OAUTH_CLIENT_ID/SECRET,
-공용 재사용 가능) + 언어별 YOUTUBE_OAUTH_REFRESH_TOKEN_{EN,JA,ES,VI,FR,DE,ZH,AR,RU}
+공용 재사용 가능) + YOUTUBE_OAUTH_REFRESH_TOKEN_EN(English_Survival) +
+YOUTUBE_OAUTH_REFRESH_TOKEN_SIS(SIS-Language Center, 나머지 8개 언어 공용)
 """
 import os, sys, datetime, random, time, requests
 from common import list_videos, SOCIAL_LANGS, get_secret
 import report
+
+# 언어 → 실제 채널 토큰 시크릿 이름 매핑 (영어만 자기 채널, 나머지는 전부 SIS로)
+CHANNEL_TOKEN_KEY = {"en": "EN"}
 
 # 채널별 업로드 시각을 서로 다르게 분산시킨다 (2026-08-03 사용자 지시:
 # "다 각각 채널로 가는거다. 시간도 다 다르게.." - 여러 채널이 똑같은 순간에
@@ -27,9 +36,10 @@ UPLOAD_GAP_MIN_SEC = 300    # 5분
 UPLOAD_GAP_MAX_SEC = 2700   # 45분
 
 def get_access_token(lang):
-    # 언어별 전용 채널 토큰만 사용한다 — 공용 fallback 토큰 사용 금지
-    # (엉뚱한 채널로 뒤섞여 올라가는 사고를 코드 차원에서 원천 차단).
-    refresh_token = get_secret(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{lang.upper()}")
+    # 정해진 채널의 토큰만 사용한다 — 엉뚱한 채널로 뒤섞여 올라가는 사고를
+    # 코드 차원에서 원천 차단(2026-08-14: en→English_Survival, 나머지 전부→SIS).
+    token_key = CHANNEL_TOKEN_KEY.get(lang, "SIS")
+    refresh_token = get_secret(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{token_key}")
     if not refresh_token:
         return None
     r = requests.post("https://oauth2.googleapis.com/token", data={
@@ -80,9 +90,10 @@ def main():
         try:
             token = get_access_token(lang)
             if not token:
-                print(f"[YouTube][{lang}] 이 언어 전용 채널 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_{lang.upper()}) "
+                token_key = CHANNEL_TOKEN_KEY.get(lang, "SIS")
+                print(f"[YouTube][{lang}] 채널 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_{token_key}) "
                       f"미설정 - 다른 채널로 잘못 올라가지 않도록 건너뜀")
-                report.add("YouTube", lang, "skipped", "전용 채널 토큰 미설정")
+                report.add("YouTube", lang, "skipped", "채널 토큰 미설정")
                 continue
             if uploaded_count > 0 and is_scheduled_run:
                 delay = random.randint(UPLOAD_GAP_MIN_SEC, UPLOAD_GAP_MAX_SEC)

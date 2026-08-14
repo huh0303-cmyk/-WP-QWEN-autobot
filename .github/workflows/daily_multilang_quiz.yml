@@ -72,17 +72,11 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          # 언어별 전용 채널 토큰 - 없으면 upload_youtube.py가 해당 언어를 스킵함
-          # (공용 토큰으로 폴백하지 않음, 2026-08-02 뒤섞임 사고 재발 방지)
+          # 2026-08-14 채널 구조 확정: 영어만 English_Survival 전용 채널,
+          # 나머지 8개 언어(일/스/베/불/독/중/아랍/러)는 전부 SIS-Language Center
+          # 채널 하나로 합쳐서 올린다(언어별 8개 채널 아님) — 없으면 그 언어는 스킵.
           YOUTUBE_OAUTH_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_EN }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_JA }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_ES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_ES }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_VI: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_VI }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_FR: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_FR }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_DE: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_DE }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_ZH }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_AR: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_AR }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_RU: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RU }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SIS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SIS }}
         run: python3 scripts/upload_youtube.py
         continue-on-error: true
 
