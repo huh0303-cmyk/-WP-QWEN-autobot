@@ -75,8 +75,8 @@ jobs:
           # 2026-08-14 채널 구조 확정: 영어만 English_Survival 전용 채널,
           # 나머지 8개 언어(일/스/베/불/독/중/아랍/러)는 전부 SIS-Language Center
           # 채널 하나로 합쳐서 올린다(언어별 8개 채널 아님) — 없으면 그 언어는 스킵.
-          YOUTUBE_OAUTH_REFRESH_TOKEN_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_EN }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_SIS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SIS }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_ENGLISH_BROAD: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_ENGLISH_BROAD }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_STUDIOSTARBUCKS_BROAD: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STUDIOSTARBUCKS_BROAD }}
         run: python3 scripts/upload_youtube.py
         continue-on-error: true
 

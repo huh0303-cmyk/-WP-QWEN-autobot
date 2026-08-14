@@ -18,15 +18,21 @@ YouTube 업로드 — 항상 비공개로 올리고 자동 공개 전환은 하�
 SIS-Language Center 채널 하나로 합쳐서 올린다.
 
 필요 Secrets: ML_YT_CLIENT_ID/ML_YT_CLIENT_SECRET (또는 YOUTUBE_OAUTH_CLIENT_ID/SECRET,
-공용 재사용 가능) + YOUTUBE_OAUTH_REFRESH_TOKEN_EN(English_Survival) +
-YOUTUBE_OAUTH_REFRESH_TOKEN_SIS(SIS-Language Center, 나머지 8개 언어 공용)
+공용 재사용 가능) + YOUTUBE_OAUTH_REFRESH_TOKEN_ENGLISH_BROAD(English_Survival) +
+YOUTUBE_OAUTH_REFRESH_TOKEN_STUDIOSTARBUCKS_BROAD(SIS-Language Center — 옛 코드네임
+"Studio_starbucks" 그대로 시크릿명에 남아있음, 나머지 8개 언어 공용).
+2026-08-14 실제 토큰으로 채널 신원 직접 검증 완료(channels.list API 호출) —
+TOPIK_BROAD→@seoultopik, ENGLISH_BROAD→@english_survival,
+STUDIOSTARBUCKS_BROAD→@sis_languagecenter, STARBUCKS_BROAD(다른 것!)→@starbucksvibes
+(플레이리스트 채널, 이 퀴즈 파이프라인과 무관 — 이름이 비슷해서 헷갈리기 쉬움).
 """
 import os, sys, datetime, random, time, requests
 from common import list_videos, SOCIAL_LANGS, get_secret
 import report
 
 # 언어 → 실제 채널 토큰 시크릿 이름 매핑 (영어만 자기 채널, 나머지는 전부 SIS로)
-CHANNEL_TOKEN_KEY = {"en": "EN"}
+CHANNEL_TOKEN_KEY = {"en": "ENGLISH_BROAD"}
+_DEFAULT_TOKEN_KEY = "STUDIOSTARBUCKS_BROAD"
 
 # 채널별 업로드 시각을 서로 다르게 분산시킨다 (2026-08-03 사용자 지시:
 # "다 각각 채널로 가는거다. 시간도 다 다르게.." - 여러 채널이 똑같은 순간에
@@ -38,7 +44,7 @@ UPLOAD_GAP_MAX_SEC = 2700   # 45분
 def get_access_token(lang):
     # 정해진 채널의 토큰만 사용한다 — 엉뚱한 채널로 뒤섞여 올라가는 사고를
     # 코드 차원에서 원천 차단(2026-08-14: en→English_Survival, 나머지 전부→SIS).
-    token_key = CHANNEL_TOKEN_KEY.get(lang, "SIS")
+    token_key = CHANNEL_TOKEN_KEY.get(lang, _DEFAULT_TOKEN_KEY)
     refresh_token = get_secret(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{token_key}")
     if not refresh_token:
         return None
@@ -90,7 +96,7 @@ def main():
         try:
             token = get_access_token(lang)
             if not token:
-                token_key = CHANNEL_TOKEN_KEY.get(lang, "SIS")
+                token_key = CHANNEL_TOKEN_KEY.get(lang, _DEFAULT_TOKEN_KEY)
                 print(f"[YouTube][{lang}] 채널 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_{token_key}) "
                       f"미설정 - 다른 채널로 잘못 올라가지 않도록 건너뜀")
                 report.add("YouTube", lang, "skipped", "채널 토큰 미설정")
