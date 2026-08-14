@@ -126,7 +126,10 @@ def upload_one(item):
     youtube = get_youtube_service(refresh_token)
     body = {
         "snippet": {"title": title, "description": description, "categoryId": "10"},
-        "status": {"selfDeclaredMadeForKids": False, "privacyStatus": "public"},
+        # 처음엔 항상 private로 올려서 채널이 맞는지 확인한 뒤에만 공개로 바꾼다
+        # (전화인증 우회용으로 여러 브랜드계정 중 하나를 추측으로 골라야 했어서,
+        # 엉뚱한 채널에 바로 공개되는 사고를 막기 위한 안전장치).
+        "status": {"selfDeclaredMadeForKids": False, "privacyStatus": "private"},
     }
     media = MediaFileUpload(item["video"], resumable=True, chunksize=5 * 1024 * 1024, mimetype="video/mp4")
     request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)

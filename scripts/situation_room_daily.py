@@ -122,7 +122,7 @@ YOUTUBE_CHANNELS = [
     ("고전낭독(CLASSIC_READS_TIMES)", "UCKF98zgzm7YRWlyMaoJJKIQ"),
     ("레트로릴스(RETRO_REELS_TIMES)", "UCwh49EokdWFJqYFE_zA6XDQ"),
     ("무성영화(SILENT_ERA_TIMES)", "UCLvy6kSpC8-7o3hnSrfQ47g"),
-    ("휴면-구힐링(Studio-K7)", "UCKZsfAWyCmY0jckf4IWZrqw"),
+    ("K-pop(kpop_studio7)", "UCKZsfAWyCmY0jckf4IWZrqw"),
 ]
 
 # 3개 언어 브랜드(TOPIK/English/Language)의 SNS 계정 표시용 이름 + 확인된 핸들.

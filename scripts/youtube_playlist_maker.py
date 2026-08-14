@@ -144,18 +144,21 @@ INTRO_DURATION_SEC = 6.0          # 인트로가 쓰는 음악 앞부분 길이 
 AUDIO_EXTS = (".mp3", ".wav", ".m4a", ".flac", ".aac", ".ogg")
 IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".webp")
 
+import tempfile
+_TMPDIR = tempfile.gettempdir()  # "/tmp" 하드코딩은 Windows 로컬 실행에서 항상 깨짐
+
 FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Bold.ttf"
-FONT_PATH = "/tmp/_playlist_nanumgothic_bold.ttf"
+FONT_PATH = os.path.join(_TMPDIR, "_playlist_nanumgothic_bold.ttf")
 # 썸네일 "Playlist" 타이틀용 우아한 세리프 폰트 (한글 캡션바는 나눔고딕 유지)
 TITLE_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf"
-TITLE_FONT_PATH = "/tmp/_playlist_playfair.ttf"
+TITLE_FONT_PATH = os.path.join(_TMPDIR, "_playlist_playfair.ttf")
 # 東京/札幌처럼 한자·가나가 섞인 주제어용 — 나눔고딕엔 한자 글리프가 없어서
 # Playfair 자리를 대신할 일본어 지원 세리프 폰트가 따로 필요하다
 JP_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifjp/NotoSerifJP%5Bwght%5D.ttf"
-JP_FONT_PATH = "/tmp/_playlist_notoserifjp.ttf"
+JP_FONT_PATH = os.path.join(_TMPDIR, "_playlist_notoserifjp.ttf")
 # healing 채널 전용: 차분하고 얇은 세리프(Cormorant) — Playfair보다 명상적/우아한 느낌
 HEALING_TITLE_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf"
-HEALING_TITLE_FONT_PATH = "/tmp/_playlist_cormorant.ttf"
+HEALING_TITLE_FONT_PATH = os.path.join(_TMPDIR, "_playlist_cormorant.ttf")
 
 
 def log(msg):
@@ -163,7 +166,11 @@ def log(msg):
 
 
 def run_ffmpeg(cmd):
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    # capture_output=True + text=True는 OS 기본 로케일 인코딩(Windows 한글판이면
+    # cp949)으로 ffmpeg의 stderr를 디코딩하려다 곡 파일명 등에 섞인 비-cp949
+    # 바이트를 만나면 UnicodeDecodeError로 죽는다 — 항상 UTF-8로 강제한다.
+    proc = subprocess.run(cmd, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
     if proc.returncode != 0:
         raise RuntimeError(f"ffmpeg 실패: {' '.join(cmd)}\n{proc.stderr[-2000:]}")
 
@@ -173,6 +180,7 @@ def get_duration(path):
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", path],
         capture_output=True, text=True, check=True,
+        encoding="utf-8", errors="replace",
     )
     return float(out.stdout.strip())
 
@@ -880,6 +888,20 @@ def _escape_drawtext(text):
     return text.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
 
 
+def _ffmpeg_path_escape(path):
+    """ffmpeg 필터 문자열(-vf/-filter_complex) 안에 파일 경로를 넣을 때 쓴다.
+    Windows 절대경로(C:\\Users\\...)는 드라이브 문자 뒤 콜론이 필터의 key=value
+    구분자 콜론과 충돌한다 — `\\:`로 이스케이프해도 이 ffmpeg 빌드의 파서가
+    "No option name" 에러를 내며 거부하는 걸 직접 테스트로 확인했다. run_ffmpeg가
+    항상 저장소 루트를 cwd로 실행되므로, 그 기준 상대경로로 바꾸면 콜론 자체가
+    안 나와서 이 문제를 근본적으로 피할 수 있다."""
+    try:
+        rel = os.path.relpath(path)
+    except ValueError:
+        rel = path  # 드라이브가 다르면(cwd와 다른 드라이브) 상대경로 자체가 불가능 — 원본 사용
+    return rel.replace("\\", "/")
+
+
 def add_lower_third_bar(video_path, caption_text, out_path):
     """영상 하단에 반투명 바 + 'Playlist | 캡션' 텍스트를 영상 내내 표시"""
     ensure_font()
@@ -887,7 +909,7 @@ def add_lower_third_bar(video_path, caption_text, out_path):
     bar_h = 70
     vf = (
         f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black@0.45:t=fill,"
-        f"drawtext=fontfile={FONT_PATH}:text='{text}':"
+        f"drawtext=fontfile={_ffmpeg_path_escape(FONT_PATH)}:text='{text}':"
         f"fontsize=30:fontcolor=white:x=30:y=h-{bar_h}+({bar_h}-th)/2"
     )
     run_ffmpeg(["ffmpeg", "-y", "-i", video_path, "-vf", vf,

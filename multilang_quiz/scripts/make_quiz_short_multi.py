@@ -112,6 +112,21 @@ def ensure_ar_font():
             return None
     return AR_FONT_PATH if os.path.exists(AR_FONT_PATH) else None
 
+# 태국어는 라틴/키릴/아랍 폰트 어디에도 글리프가 없어서 전용 타이 문자 폰트가 필요하다.
+TH_FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansthai/NotoSansThai%5Bwdth,wght%5D.ttf"
+TH_FONT_PATH = os.path.join(tempfile.gettempdir(), "_quiz_notosans_thai.ttf")
+
+def ensure_th_font():
+    if not os.path.exists(TH_FONT_PATH):
+        try:
+            r = requests.get(TH_FONT_URL, timeout=30)
+            r.raise_for_status()
+            with open(TH_FONT_PATH, "wb") as f:
+                f.write(r.content)
+        except Exception:
+            return None
+    return TH_FONT_PATH if os.path.exists(TH_FONT_PATH) else None
+
 # ------------------------- 언어별 설정 -------------------------
 LANG_CONFIG = {
     "en": {
@@ -183,6 +198,27 @@ LANG_CONFIG = {
         "font": LATIN_FONT_CANDIDATES,
         "csv": "data/words_ru.csv", "brand": "Базовая лексика",
         "top_brand": "Survival Russian",
+    },
+    "pt": {
+        "name": "Português", "gtts_lang": "pt",
+        "question_text": "O que é isto?",
+        "font": LATIN_FONT_CANDIDATES,
+        "csv": "data/words_pt.csv", "brand": "Português Básico",
+        "top_brand": "Survival Portuguese",
+    },
+    "it": {
+        "name": "Italiano", "gtts_lang": "it",
+        "question_text": "Cos'è questo?",
+        "font": LATIN_FONT_CANDIDATES,
+        "csv": "data/words_it.csv", "brand": "Italiano di Base",
+        "top_brand": "Survival Italian",
+    },
+    "th": {
+        "name": "ไทย", "gtts_lang": "th",
+        "question_text": "นี่คืออะไร",
+        "font": LATIN_FONT_CANDIDATES,  # ensure_th_font()가 실패할 때만 쓰이는 폴백
+        "csv": "data/words_th.csv", "brand": "คำศัพท์ไทยพื้นฐาน",
+        "top_brand": "Survival Thai",
     },
 }
 
@@ -492,6 +528,8 @@ def main():
 
     if args.lang == "ar":
         lang_font_path = ensure_ar_font() or resolve_font(cfg["font"])
+    elif args.lang == "th":
+        lang_font_path = ensure_th_font() or resolve_font(cfg["font"])
     elif args.lang in ("vi", "ru"):
         # Noto Sans(가변 폰트)가 베트남어 성조 결합기호와 키릴 문자를 둘 다 커버해서 공유
         lang_font_path = ensure_vi_font() or resolve_font(cfg["font"])

@@ -37,6 +37,7 @@ import json
 import time
 import base64
 import random
+import shutil
 import subprocess
 
 import requests
@@ -49,6 +50,25 @@ for _stream in (sys.stdout, sys.stderr):
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import health_longform_rules as RULES  # noqa: E402
+
+
+def _load_dotenv():
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env_path = os.path.join(repo_root, ".env")
+    if not os.path.exists(env_path):
+        return
+    with open(env_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            if key and key not in os.environ:
+                os.environ[key] = value.strip()
+
+
+_load_dotenv()
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_TEXT_MODEL = "gemini-2.5-flash"
@@ -502,6 +522,37 @@ def build_thumbnail(topic, lang, thumbnail_lines, foods, workdir):
 # ════════════════════════════════════════════════════════════
 # 7. 메인
 # ════════════════════════════════════════════════════════════
+def reuse_visuals_from(source_lang, workdir, n_intro, n_images):
+    """SAME_TOPIC_DIFFERENTIATION_RULES: 이미지/인트로영상클립은 언어간 재사용 가능,
+    순서만 섞기. source_lang의 workdir에서 raw Veo 클립과 이미지 파일을 복사해와서
+    이 workdir에 채워두면, 이후 생성 루프의 '이미 있으면 재사용' 체크에 걸려서
+    Gemini/Veo 재호출 없이 그대로 재사용된다 (TTS/썸네일만 새로 생성됨)."""
+    src_dir = os.path.join("health_longform_output", source_lang)
+    if not os.path.isdir(src_dir):
+        log(f"   ⚠️ 재사용 소스 언어 폴더 없음: {src_dir} — 전부 새로 생성함")
+        return
+
+    src_raws = [os.path.join(src_dir, f"intro_raw_{i}.mp4") for i in range(n_intro)]
+    src_raws = [p for p in src_raws if os.path.exists(p)]
+    order = list(range(len(src_raws)))
+    random.shuffle(order)
+    for new_idx, src_idx in enumerate(order):
+        dst = os.path.join(workdir, f"intro_raw_{new_idx}.mp4")
+        if not os.path.exists(dst):
+            shutil.copyfile(src_raws[src_idx], dst)
+    log(f"   {len(src_raws)}개 인트로 영상 클립 재사용 (순서 셔플)")
+
+    src_imgs = [os.path.join(src_dir, f"img_{i}.png") for i in range(n_images)]
+    src_imgs = [p for p in src_imgs if os.path.exists(p)]
+    order = list(range(len(src_imgs)))
+    random.shuffle(order)
+    for new_idx, src_idx in enumerate(order):
+        dst = os.path.join(workdir, f"img_{new_idx}.png")
+        if not os.path.exists(dst):
+            shutil.copyfile(src_imgs[src_idx], dst)
+    log(f"   {len(src_imgs)}개 본문 이미지 재사용 (순서 셔플)")
+
+
 def main():
     if not GEMINI_API_KEY:
         log("❌ GEMINI_API_KEY 없음")
@@ -509,12 +560,17 @@ def main():
 
     topic = sys.argv[1] if len(sys.argv) > 1 else ""
     lang = (sys.argv[2] if len(sys.argv) > 2 else "ko").strip().lower()
+    reuse_from = sys.argv[3] if len(sys.argv) > 3 else ""
     if not topic:
-        log("❌ 사용법: python health_longform.py \"주제\" [ko|en|ja]")
+        log("❌ 사용법: python health_longform.py \"주제\" [ko|en|ja] [재사용할언어]")
         raise SystemExit(1)
 
     workdir = os.path.join("health_longform_output", lang)
     os.makedirs(workdir, exist_ok=True)
+
+    if reuse_from:
+        log(f"0/5 {reuse_from} 버전에서 이미지/영상클립 재사용 준비 중...")
+        reuse_visuals_from(reuse_from, workdir, RULES.INTRO_VIDEO_CLIP_COUNT, TARGET_IMAGE_COUNT)
 
     log(f"1/5 대본 생성 중 (주제: {topic}, 언어: {lang})...")
     data = generate_script(topic, lang)
@@ -553,7 +609,9 @@ def main():
     for idx, beat in enumerate(image_beats):
         log(f"   [{idx+1}/{len(image_beats)}] ({beat['section']}) {beat['image_prompt'][:50]}...")
         img_path = os.path.join(workdir, f"img_{idx}.png")
-        if not gemini_generate_image(beat["image_prompt"], img_path):
+        if os.path.exists(img_path):
+            log("      (재사용된 이미지, 생성 스킵)")
+        elif not gemini_generate_image(beat["image_prompt"], img_path):
             log(f"   ⚠️ 이미지 생성 실패, 스킵: beat {idx}")
             continue
         audio = os.path.join(workdir, f"img_audio_{idx}.mp3")
