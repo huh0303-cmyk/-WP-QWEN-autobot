@@ -73,6 +73,94 @@ if not OUTPUT_FOLDER_ID:
 
 WORKDIR = "archive_publish_output"
 
+# 2026-08-14 사용자 지적: "Public domain..." 같은 설명 문구는 후킹력이 없고,
+# 제목/설명 다 구독자 50만+ 채널 벤치마킹해서 클릭 유도하게 써야 함. 채널별로
+# 후킹 타이틀 접두/접미와 본문 톤을 고정해서, 파일명만 있어도 항상 "장사가 되는"
+# 제목+설명이 나오게 한다. "public domain"/"저작권 만료" 류 문구는 여기 어디에도
+# 넣지 않는다 — 시청자에게 굳이 알릴 필요 없는 법적 디테일이고 클릭만 깎아먹는다.
+CHANNEL_HOOKS = {
+    "AMERICAN_ARCHIVE_TIMES": {
+        "title_fmt": "{topic} — Lost American Footage Almost No One Has Seen",
+        "hook": "🇺🇸 Real footage America almost forgot.",
+        "body": "Restored film reels from a piece of American history you won't find in any textbook.",
+        "tags": "#AmericanHistory #ArchiveFootage #History #Documentary #RareFootage",
+    },
+    "CLASSIC_READS_TIMES": {
+        "title_fmt": "{topic} — The Classic Everyone Quotes But Almost No One Has Read",
+        "hook": "📖 The story everyone name-drops but nobody's actually finished.",
+        "body": "A timeless classic, brought to life — sit back and let the story unfold.",
+        "tags": "#ClassicLiterature #Audiobook #ClassicReads #Storytime #Literature",
+    },
+    "NASA_SPACE_TIMES": {
+        "title_fmt": "{topic} — What NASA Saw Out There",
+        "hook": "🚀 What NASA saw... and almost never showed the public.",
+        "body": "Real space footage and the untold science behind it — the universe is stranger than fiction.",
+        "tags": "#NASA #Space #Universe #Astronomy #SpaceExploration",
+    },
+    "SCIENCE_FACTS_TIMES": {
+        "title_fmt": "{topic} — The Science Fact That Breaks Your Brain",
+        "hook": "🧠 The science fact that breaks your brain.",
+        "body": "Mind-bending facts, explained simply — you'll never see the world the same way again.",
+        "tags": "#ScienceFacts #DidYouKnow #Science #Education #Facts",
+    },
+    "INVENTION_TIMES": {
+        "title_fmt": "{topic} — The Invention That Changed Everything By Accident",
+        "hook": "💡 The invention that changed everything — almost by accident.",
+        "body": "The untold story behind an invention that quietly reshaped the modern world.",
+        "tags": "#Inventions #History #Innovation #HowItWasMade #Technology",
+    },
+    "MYTH_LEGEND_TIMES": {
+        "title_fmt": "{topic} — The Myth The Greeks Were Almost Afraid To Finish",
+        "hook": "⚡ The legend the ancients were almost afraid to finish telling.",
+        "body": "An ancient myth, retold — gods, monsters, and mortals caught in between.",
+        "tags": "#GreekMythology #Mythology #AncientLegends #Storytime #RomanMythology",
+    },
+    "RETRO_REELS_TIMES": {
+        "title_fmt": "{topic} — Rewind To A Simpler Time",
+        "hook": "📼 Rewind to a simpler time.",
+        "body": "Nostalgic footage from a bygone era — grab some popcorn and take a trip back.",
+        "tags": "#Retro #Nostalgia #Vintage #ThrowbackFootage #History",
+    },
+    "HISTORY_TODAY_TIMES": {
+        "title_fmt": "On This Day: {topic}",
+        "hook": "📅 On this day, history quietly changed forever.",
+        "body": "The real story behind what happened on this date — the part school skipped.",
+        "tags": "#OnThisDay #HistoryToday #ThisDayInHistory #History #Facts",
+    },
+    "SILENT_ERA_TIMES": {
+        "title_fmt": "{topic} — Silent Film Comedy That Still Lands 100 Years Later",
+        "hook": "🎬 Before sound, before color — pure comic genius.",
+        "body": "A classic silent-era film moment, restored — comedy that still lands a century later.",
+        "tags": "#SilentFilm #CharlieChaplin #ClassicComedy #FilmHistory #SilentEra",
+    },
+    "CLASSICAL_JOURNAL": {
+        "title_fmt": "{topic} — The Genius Behind The Music, And The Chaos Behind The Genius",
+        "hook": "🎼 The genius behind the music — and the chaos behind the genius.",
+        "body": "The real life story of a legendary composer — triumph, tragedy, and the music that outlived them all.",
+        "tags": "#ClassicalMusic #ComposerBiography #Mozart #Bach #Beethoven",
+    },
+}
+
+
+def build_title_and_description(channel_key, raw_topic):
+    hook_info = CHANNEL_HOOKS.get(channel_key, {
+        "title_fmt": "{topic} — The Story You Didn't Expect",
+        "hook": f"{raw_topic} — a story worth your time.",
+        "body": "Stick around to the end — it's not what you think.",
+        "tags": "#Archive #History #Documentary",
+    })
+    title = hook_info["title_fmt"].format(topic=raw_topic)
+    if len(title) > 95:  # 유튜브 제목 100자 제한 여유 두고 자르기
+        title = title[:92].rsplit(" ", 1)[0] + "..."
+    description = (
+        f"{hook_info['hook']}\n\n"
+        f"{raw_topic}\n\n"
+        f"{hook_info['body']}\n\n"
+        f"🔔 Subscribe for more — new stories every week.\n\n"
+        f"{hook_info['tags']}"
+    )
+    return title, description
+
 
 def log(msg):
     print(msg, flush=True)
@@ -285,11 +373,8 @@ def main():
     else:
         log("   ⚠️ 짝 맞는 썸네일을 못 찾음 — 기본 썸네일로 업로드됨")
 
-    title = video_file["name"].replace("_captioned", "").rsplit(".", 1)[0].replace("_", " ")
-    description = (
-        f"{title}\n\nPart of the {CHANNEL_KEY.replace('_', ' ').title()} collection.\n\n"
-        f"#archive #history #documentary"
-    )
+    raw_topic = video_file["name"].replace("_captioned", "").rsplit(".", 1)[0].replace("_", " ").strip()
+    title, description = build_title_and_description(CHANNEL_KEY, raw_topic)
 
     hours_from_now = os.environ.get("PUBLISH_AT_HOURS_FROM_NOW", "").strip()
     publish_at_iso = None
