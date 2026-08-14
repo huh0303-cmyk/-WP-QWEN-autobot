@@ -155,11 +155,11 @@ def main():
     log("1/2 업로드 직전 메타데이터 스트리핑...")
     strip_ai_fingerprint(video_path)
 
-    title = f"{topic}"
-    description = (
-        f"{topic}\n\n"
-        "A deep dive into a topic worth knowing. Sit back and learn something new today.\n\n"
-        "#education #didyouknow #knowledge"
+    # curio_longform.py가 실제 대본 내용 기반으로 생성한 제목/설명(1000자 내외).
+    # (2026-08-15 추가 — 없으면 구버전 meta.json 대비 최소 폴백)
+    title = meta.get("title") or topic
+    description = meta.get("description") or (
+        f"{topic}\n\nA deep dive into a topic worth knowing.\n\n#education #didyouknow #knowledge"
     )
 
     log(f"2/2 유튜브 업로드 중 (채널: {secret_key})...")
