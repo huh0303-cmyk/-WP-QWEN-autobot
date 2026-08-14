@@ -74,7 +74,7 @@
         "status": "정상"
       },
       "k-visa365.com": {
-        "clicks": 1,
+        "clicks": 0,
         "indexed": 0,
         "status": "정상"
       },
@@ -109,7 +109,7 @@
         "status": "정상"
       },
       "jobkorea365.com": {
-        "clicks": 0,
+        "clicks": 1,
         "indexed": 0,
         "status": "정상"
       },
@@ -142,35 +142,35 @@
     "youtube": {
       "한국어(TOPIK)": {
         "subs": 5770,
-        "views": 351104
+        "views": 352918
       },
       "영어(English Survival)": {
         "subs": 9,
-        "views": 1830
+        "views": 1980
       },
       "다국어(Studio_starbucks,10개국어)": {
-        "subs": 17,
-        "views": 8542
+        "subs": 18,
+        "views": 8595
       },
       "플리-로맨틱글로벌(globalmusic)": {
         "subs": 8,
-        "views": 1788
+        "views": 1793
       },
       "플리-힐링(실채널@Studio_k3)": {
         "subs": 12,
-        "views": 537
+        "views": 527
       },
       "플리-MBB": {
         "subs": 0,
-        "views": 17
+        "views": 31
       },
       "플리-카페음악(Starbucksvibes)": {
         "subs": 0,
-        "views": 26
+        "views": 35
       },
       "발명(INVENTION_TIMES)": {
         "subs": 0,
-        "views": 0
+        "views": 1
       },
       "건강-영어(HealthClinicTV)": {
         "subs": 0,
@@ -182,19 +182,19 @@
       },
       "일본어퀴즈(Studio_Quiz_JP)": {
         "subs": 2,
-        "views": 9
+        "views": 14
       },
       "우주(NASA_SPACE_TIMES)": {
         "subs": 2,
-        "views": 5
+        "views": 4
       },
       "역사(HISTORY_TODAY_TIMES)": {
         "subs": 0,
         "views": 0
       },
       "과학(SCIENCE_FACTS_TIMES)": {
-        "subs": 0,
-        "views": 3
+        "subs": 1,
+        "views": 4
       },
       "클래식인물(CLASSICAL_TIMES)": {
         "subs": 0,
@@ -210,24 +210,24 @@
       },
       "고전낭독(CLASSIC_READS_TIMES)": {
         "subs": 1,
-        "views": 0
+        "views": 2
       },
       "레트로릴스(RETRO_REELS_TIMES)": {
         "subs": 1,
         "views": 0
       },
       "무성영화(SILENT_ERA_TIMES)": {
-        "subs": 0,
+        "subs": 1,
         "views": 0
       },
-      "휴면-구힐링(Studio-K7)": {
+      "K-pop(kpop_studio7)": {
         "subs": 0,
-        "views": 1
+        "views": 4
       }
     },
     "tiktok": {
       "TOPIK": {
-        "count": 29300,
+        "count": 29400,
         "username": "sis_topik",
         "error": null
       },
@@ -294,5 +294,5 @@
       }
     }
   },
-  "updated_at": "2026-08-14 08:06:07"
+  "updated_at": "2026-08-15 07:43:46"
 }
