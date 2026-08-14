@@ -374,6 +374,100 @@ CHANNEL_DESC_CONTEXT = {
     "kpop": "a K-pop playlist channel (study/workout/driving/chill mixes of K-pop tracks)",
 }
 
+# 2026-08-14: Gemini 생성이 실패했을 때(쿼터 소진 등, 이날 자주 발생) 쓰던 기존
+# 폴백이 너무 dry했고, 주제어가 없는 자동실행에선 raw 파일명까지 제목에 그대로
+# 새는 버그가 있었다(예: "Chill Playlist | 2026_8_13_2338.mp4") — 사용자가 직접
+# 발견해서 지적함. 이제 채널별로 제목 100자/설명 1000자 가까이 채우는 후킹성
+# 정적 템플릿을 갖춰서, Gemini가 죽어도 절대 이런 식으로 올라가지 않게 한다.
+PLAYLIST_FALLBACK_HOOKS = {
+    "globalmusic": {
+        "title_fmt": "{topic} — A Romantic Lofi Playlist For Golden-Hour Moments Together",
+        "hook": "A warm, romantic lofi mix for the moments that deserve a soundtrack.",
+        "body": (
+            "Gentle piano, soft acoustic guitar, and that golden-hour glow — this playlist is built for slow "
+            "mornings, quiet evenings, and everything in between. Put it on during a date night in, a long "
+            "drive, or just when you want the room to feel a little warmer. No sudden drops, no jarring "
+            "transitions — just a steady, romantic mood that carries you through the whole thing."
+        ),
+        "engage": "What mood should the next playlist chase? Let us know in the comments.",
+        "tags": "#LofiMusic #RomanticPlaylist #ChillMusic #LofiPlaylist #StudyMusic #RelaxingMusic",
+    },
+    "healing": {
+        "title_fmt": "{topic} — Pure Nature Sounds For Deep Sleep And Total Relaxation",
+        "hook": "Real, layered nature ambience — the kind that quiets a busy mind almost instantly.",
+        "body": (
+            "No music, no lyrics, no distractions — just rain, wind, birdsong, and the kind of quiet atmosphere "
+            "that's genuinely hard to find anywhere else. This is built to run for hours in the background "
+            "while you sleep, study, meditate, or just need the world to feel a little softer for a while. "
+            "Put it on, dim the lights, and let it do the work."
+        ),
+        "engage": "Which soundscape should we record next — rain, forest, or ocean? Tell us below.",
+        "tags": "#NatureSounds #SleepSounds #RainSounds #Relaxation #AmbientSounds #WhiteNoise",
+    },
+    "starbucks": {
+        "title_fmt": "{topic} — Instrumental Cafe Music To Focus, Study, And Get Things Done",
+        "hook": "The instrumental cafe playlist built to disappear into the background while you actually focus.",
+        "body": (
+            "No vocals, no lyrics to pull your attention away — just warm, wood-tone instrumental music that "
+            "sounds like your favorite coffee shop on a quiet afternoon. Perfect for deep work, studying, "
+            "reading, or just needing a steady, unobtrusive soundtrack that never distracts. Put it on, get "
+            "your coffee, and get into flow."
+        ),
+        "engage": "What are you working on while this plays? Tell us in the comments.",
+        "tags": "#StudyMusic #CafeMusic #FocusMusic #InstrumentalMusic #WorkMusic #CoffeeShopMusic",
+    },
+    "mbb": {
+        "title_fmt": "{topic} — Timeless Classical Music From Mozart, Bach And Beethoven",
+        "hook": "The classical pieces that have outlasted every trend for over two centuries — and still hit just as hard.",
+        "body": (
+            "A curated mix of Mozart, Bach, Beethoven, and the composers who defined what music could be. "
+            "Whether you're studying, working, or just want something genuinely beautiful playing in the "
+            "background, this is music built to last — no algorithm needed, just centuries of proof. Put it "
+            "on and hear exactly why it's still being played today."
+        ),
+        "engage": "Which composer or piece should we feature next? Let us know in the comments.",
+        "tags": "#ClassicalMusic #Mozart #Bach #Beethoven #StudyMusic #PianoMusic",
+    },
+    "kpop": {
+        "title_fmt": "{topic} — A K-Pop Playlist Mix To Study, Work Out, Or Drive To",
+        "hook": "The K-pop mix built for whatever you're doing right now — studying, driving, or just vibing.",
+        "body": (
+            "A curated run of K-pop tracks picked for energy and flow, not just what's trending this week. "
+            "Whether you're powering through a workout, cruising with the windows down, or just need something "
+            "to keep you moving through a study session, this playlist is built to keep the momentum going "
+            "from the first track to the last."
+        ),
+        "engage": "Which group or track should we feature in the next mix? Drop it in the comments.",
+        "tags": "#KpopPlaylist #Kpop #StudyMusic #WorkoutMusic #KpopMix #DrivingMusic",
+    },
+}
+_PLAYLIST_DEFAULT_HOOK = {
+    "title_fmt": "{topic} — A Playlist Built To Play In The Background All Day",
+    "hook": "A playlist built to just play — no skipping, no thinking, just good background sound.",
+    "body": (
+        "Put this on and let it run — it's built to carry a whole session from start to finish without "
+        "pulling your attention away from whatever you're actually doing."
+    ),
+    "engage": "Let us know what you'd like to hear next in the comments.",
+    "tags": "#Playlist #ChillMusic #BackgroundMusic",
+}
+
+
+def _build_fallback_title_and_description(topic, duration_min):
+    hook_info = PLAYLIST_FALLBACK_HOOKS.get(CHANNEL_KEY, _PLAYLIST_DEFAULT_HOOK)
+    title = hook_info["title_fmt"].format(topic=topic)
+    if len(title) > 100:
+        title = title[:97].rsplit(" ", 1)[0] + "..."
+    description = (
+        f"{hook_info['hook']}\n\n"
+        f"A {duration_min:.0f}-minute playlist themed around '{topic}'.\n\n"
+        f"{hook_info['body']}\n\n"
+        f"🔔 Subscribe and turn on notifications — new playlists every week.\n\n"
+        f"{hook_info['engage']}\n\n"
+        f"{hook_info['tags']}"
+    )
+    return title, description
+
 
 def generate_youtube_title_description(topic, caption_text, duration_min):
     """유튜브 업로드용 제목+설명을 Gemini로 생성. 광고 카피처럼 매끈하지 않게,
@@ -385,7 +479,8 @@ def generate_youtube_title_description(topic, caption_text, duration_min):
 playlist video on {channel_context}. The video's mood/topic is "{topic}", one-line caption: "{caption_text}".
 
 Write:
-1. TITLE: under 70 characters, natural (not hypey ad-copy), at most 1 emoji.
+1. TITLE: an emotionally engaging, hooky title close to YouTube's 100-character limit
+   (aim for 85-100 characters) — not a dry label, make someone want to click. At most 1 emoji.
 2. DESCRIPTION: a long, genuinely useful description of about 5000 characters total,
    written in a natural MIX of English and Korean (roughly 50/50 — alternate by
    paragraph, writing the same content in both languages, not just translating
@@ -402,7 +497,7 @@ TITLE: (title)
 DESCRIPTION: (the long bilingual description, with blank lines between paragraphs)
 """
     text = gemini_generate_text(prompt, temperature=0.9, max_output_tokens=4096)
-    title, description = f"{topic} Playlist | {caption_text}", _fallback_description(topic, duration_min)
+    title, description = _build_fallback_title_and_description(topic, duration_min)
     used_fallback = True
     if "TITLE:" in text and "DESCRIPTION:" in text:
         try:
@@ -421,17 +516,6 @@ DESCRIPTION: (the long bilingual description, with blank lines between paragraph
     return title[:100], description, used_fallback
 
 
-def _fallback_description(topic, duration_min):
-    """Gemini 호출이 실패했을 때 쓰는 채널별 템플릿 설명(영/한 혼합) — 최소한
-    파일명만 덜렁 올라가는 것보다는 훨씬 나은 기본값을 보장한다."""
-    ctx = CHANNEL_DESC_CONTEXT.get(CHANNEL_KEY, "a curated playlist")
-    return (
-        f"A {duration_min:.0f}-minute playlist themed around '{topic}', part of {ctx}. "
-        f"Sit back, let it play in the background, and enjoy.\n\n"
-        f"'{topic}' 주제로 구성된 {duration_min:.0f}분짜리 플레이리스트입니다. "
-        f"편하게 배경에 틀어두고 즐겨주세요.\n\n"
-        f"#playlist #{topic.replace(' ', '')} #플레이리스트"
-    )
 
 
 def send_email(subject, body):
@@ -1332,7 +1416,7 @@ def main():
     upload_topic = topic_keyword.strip() or "Chill"
     upload_caption = caption_text if topic_keyword.strip() else ""
     yt_title, yt_description, title_is_fallback = generate_youtube_title_description(
-        upload_topic, upload_caption or filename, total_sec / 60)
+        upload_topic, upload_caption, total_sec / 60)
     log(f"   유튜브 제목(예정): {yt_title}" + (" ⚠️ 폴백 제목(Gemini 생성 실패)" if title_is_fallback else ""))
 
     meta = {
