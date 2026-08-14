@@ -177,6 +177,19 @@ def get_index_coverage(token, site_url):
     return {"indexed": total_indexed, "submitted_urls": total_submitted}, None
 
 
+# ★ 2026-08-14: bare "Mozilla/5.0" 하나만 있는 User-Agent는 어떤 실제 브라우저도
+#   보내지 않는 값이라 Wordfence 등 보안 플러그인이 봇으로 즉시 차단하기 쉽다.
+#   REST API(/wp-json/...)는 이 헤더가 없어도 27개 사이트 전부 문제없이 응답했는데
+#   사이트맵 XML 요청만 27개 전체 동시다발로 실패한 게 이 헤더 때문일 가능성이 커서
+#   실제 크롬이 보내는 헤더 세트로 교체.
+_BROWSER_HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
+    "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,*/*;q=0.8",
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+}
+
+
 def fetch_sitemap_urls(sitemap_url, max_urls=100, _depth=0):
     """사이트맵(또는 사이트맵 인덱스) XML을 받아 실제 페이지 URL(<loc>) 목록을 반환.
     sitemap_index.xml처럼 하위 사이트맵을 가리키기만 하는 경우 재귀적으로 하나씩
@@ -184,11 +197,13 @@ def fetch_sitemap_urls(sitemap_url, max_urls=100, _depth=0):
     if _depth > 3 or max_urls <= 0:
         return []
     try:
-        r = requests.get(sitemap_url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+        r = requests.get(sitemap_url, timeout=15, headers=_BROWSER_HEADERS)
         if r.status_code != 200:
+            log(f"    [사이트맵] {sitemap_url} → HTTP {r.status_code}")
             return []
         root = ET.fromstring(r.content)
-    except Exception:
+    except Exception as e:
+        log(f"    [사이트맵] {sitemap_url} → 예외: {e}")
         return []
 
     ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
