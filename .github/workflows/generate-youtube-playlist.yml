@@ -193,6 +193,14 @@ jobs:
           git stash --include-untracked || true
           git pull --rebase origin main
           git stash pop || true
+          # 동시에 여러 채널 워크플로우가 겹쳐 돌면 stash pop이 충돌 마커를
+          # 그대로 남길 수 있다(2026-08-14 실제로 발생, JSON이 깨진 채 커밋됨) —
+          # 충돌 마커가 남아있으면 절대 커밋하지 않고 그냥 건너뛴다.
+          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null; then
+            echo "⚠️ playlist_recent_topics.json에 병합 충돌 마커 발견 — 커밋 건너뜀"
+            git checkout -- playlist_recent_topics.json
+            exit 0
+          fi
           git add playlist_recent_topics.json 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: 플레이리스트 자동선택 최근주제 갱신 [skip ci]"
           git push
