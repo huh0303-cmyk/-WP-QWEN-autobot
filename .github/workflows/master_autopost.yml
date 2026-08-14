@@ -1079,6 +1079,71 @@ jobs:
           git pull --rebase origin main
           git push
 
+# ══════════════════════════════════════════════════════════
+# JOB: AI 티 심한 과거 글 비공개 전환 (수정이 아니라 숨김 — 사용자 지시
+# "AI티 나는건 비공개나 삭제로, 글 수 적은게 낫다" 2026-08-14)
+# ══════════════════════════════════════════════════════════
+  hide-ai-toned-posts:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'hideaiposts' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "AI 티 글 탐지 + 비공개 전환"
+        env:
+          KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM:           ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM:       ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM:      ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM:    ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM:    ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM:          ${{ secrets.KTECH365COM }}
+          KSKIN365COM:          ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM:   ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM:         ${{ secrets.KWORLD365COM }}
+          KTRIP365COM:          ${{ secrets.KTRIP365COM }}
+          KVISA365COM:          ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM:   ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM:         ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM:   ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG:        ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG:          ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM:          ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM:       ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM:     ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM:    ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG:          ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.target_site }}" ]; then
+            ARGS="--site=${{ github.event.inputs.target_site }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
+            ARGS="$ARGS --execute"
+          fi
+          python scripts/cleanup_ai_toned_posts.py $ARGS
+      - name: "결과 커밋"
+        if: always()
+        run: |
+          git config user.email "huh0303@gmail.com"
+          git config user.name "huh0303-cmyk"
+          git add ai_toned_posts_manifest.json 2>/dev/null || true
+          git commit -m "chore: AI 티 글 탐지/비공개 전환 결과 [skip ci]" || echo "변경 없음"
+          git pull --rebase origin main
+          git push
+
   fix-rankmath-noindex:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'noindex' }}

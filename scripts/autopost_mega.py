@@ -1136,7 +1136,9 @@ def make_site_prompt(keyword, site, reporter):
                          "헤드라인 문장을 그대로 반복하지 말고 다른 표현으로 풀어서 쓸 것. "
                          "본문 전체에서 사건의 핵심 인물/기관/장소명을 자연스럽게 반복 언급"
                          if is_news else
-                         f"- 키워드: '{keyword}'를 첫 문장에 포함하고 전체 10회 이상 자연스럽게 사용")
+                         f"- 키워드: '{keyword}'를 첫 문장에 자연스럽게 포함. 이후엔 억지로 "
+                         f"반복 횟수를 채우지 말고, 대명사/유의어/줄인 표현으로 자연스럽게 바꿔써도 됨 "
+                         f"(같은 단어를 기계적으로 반복하면 검색엔진이 스팸으로 판단할 수 있음)")
         tags_line = (f"TAGS: ({TAG_COUNT}개 한국어, 쉼표로 구분된 짧은 명사/키워드만. "
                      "문장·특수기호·구분선 금지)"
                      if is_news else
@@ -1146,7 +1148,10 @@ def make_site_prompt(keyword, site, reporter):
                          "in your own words — do not repeat the headline sentence verbatim. "
                          "Naturally repeat the key people/organizations/places involved throughout"
                          if is_news else
-                         f"- Keyword: include '{keyword}' in the first sentence and 10+ times naturally throughout")
+                         f"- Keyword: include '{keyword}' naturally in the first sentence. After that, "
+                         f"don't force a repetition count — use pronouns, synonyms, or shortened phrasing "
+                         f"instead (mechanically repeating the exact same phrase reads as spam to both "
+                         f"readers and search engines)")
         tags_line = (f"TAGS: ({TAG_COUNT} English tags, comma-separated short nouns/keywords only. "
                      "No full sentences, symbols, or section dividers)"
                      if is_news else
@@ -1166,13 +1171,38 @@ def make_site_prompt(keyword, site, reporter):
 - 형식: HTML 태그만 사용(h2,h3,p,ul,li,ol,strong,table,blockquote). 마크다운 절대 금지
 - 분량: 최소 {min_chars}자 이상(공백 제외)
 - 문장: 모든 <p>는 2문장 이하로 짧고 간결하게. 단락 사이 줄바꿈 필수
-- 훅: 서론 첫 문장에서 독자의 호기심을나 궁금증을 자극하는 문장으로 시작할 것
+- 문체(글 전체에 적용 — 도입부만이 아니라 소제목·본문·마무리 전부): 질문을 던지기보다
+  현상을 짚어주는 담담한 존댓말, 전문 기자가 리포트를 쓰듯 신뢰감 있고 객관적인 태도.
+  불필요한 수식어를 걷어내고 정보의 본질에 집중해서 서술.
+- 물음표 사용 금지: 본문 어디에도(소제목 포함) "~인가요?/~일까요?/~하시나요?/~해보셨나요?" 같은
+  의문문을 쓰지 말 것. FAQ_START~FAQ_END 섹션의 질문(Q:)에만 예외적으로 허용.
+  h2/h3 소제목은 반드시 명사구나 평서문으로 쓸 것 (예: "왜 중요할까요?" 금지 → "~의 역할"로 대체)
+  느낌표는 전체 글에서 1개 이하.
+- 절대 쓰지 말 것 — "이것 몰랐죠?/알고 계셨나요?" 류 충격 유도, "충격적인 사실/~%나 된다는 사실"
+  같은 통계 충격요법, "오늘은 ~에 대해 함께 알아보겠습니다/알아보아요" 같은 글 소개용 메타 문장,
+  "우리 몸은 정말 신비롭죠" 류의 막연한 감탄 필러, "이 글을 통해 궁금증을 모두 해소하시길
+  바랍니다" 같은 마무리성 문장을 서론에 두는 것, "현대 사회에서/현대인들에게" 같은 거창한 서두,
+  "그 중요성이 점점 커지고 있습니다" 같은 상투구, "~에 좋아요/추천합니다"처럼 근거 없이
+  주관적으로 끝내는 문장, "~임/~함"체 문어체.
+- 도입부 구성 순서: 현상 진단 → 배경 설명 → 이 글에서 다룰 방향 제시.
+  예시(이렇게 고쳐 쓸 것):
+    (금지) "전기세, 조금만 신경 써도 눈에 띄게 줄일 수 있다는 사실, 알고 계셨나요?"
+    (사용) "가전제품을 효율적으로 관리하는 것만으로도 불필요하게 낭비되는 전력을 상당 부분 줄일 수 있습니다."
+    (금지) "역류성 식도염, 그냥 속 쓰린 거라고 넘기면 안 되는 이유가 있습니다."
+    (사용) "역류성 식도염을 단순한 속 쓰림으로 여겨 방치하면 더 큰 질환으로 이어질 위험이 있습니다."
+    (금지 소제목) "내 몸의 든든한 방패, 셀레늄! 왜 중요할까요?"
+    (사용 소제목) "셀레늄의 역할과 항산화 작용"
+  마무리는 "오늘부터 시작해 보세요" 식 강요 대신 "작은 변화가 큰 결과로 이어질 수 있습니다"처럼
+  담백하게 격려하는 정도로.
 - 전문용어: 등장할 때마다 괄호로 쉽게 풀어서 설명할 것
 {keyword_rule}
-- 통계: 구체적 수치(%, 만 명, 원 등) 5개 이상 포함
-- 출처: "(KOSIS, 2026)", "(보건복지부, 2026)" 형식으로 3회 이상 인용
+- 통계/출처: 실제로 근거 있는 수치나 기관명을 알고 있을 때만 "(KOSIS, 2026)" 같은 형식으로
+  자연스럽게 인용. 억지로 개수를 채우려고 애매하거나 지어낸 수치를 넣지 말 것 —
+  근거 없는 통계보다 통계가 아예 없는 게 낫다.
 - 연도: 본문에 2024·2025·2023 등 과거 연도 절대 금지. 연도가 필요하면 반드시 2026만 사용, 확실하지 않으면 연도 자체를 생략
-- 표: <table> {tables_req}개 이상(thead/tbody/tr/th/td 완전 구조)
+- 표: 실제로 항목을 비교/정리하는 게 독자에게 유용한 주제일 때만 <table>을 쓸 것
+  (thead/tbody/tr/th/td 완전 구조). 억지로 표를 만들어 넣지 말 것 — 표가 어울리지
+  않는 주제(감정적/서술적 내용 등)에 무리하게 표를 넣으면 오히려 부자연스럽다.
 - 위 내부링크 4개를 본문 흐름에 자연스럽게 삽입{medical_note}
 
 [이 사이트 전용 글 구성 — 반드시 이 순서로]
@@ -1196,13 +1226,29 @@ You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' categor
 - Format: HTML tags only (h2,h3,p,ul,li,ol,strong,table,blockquote). No markdown whatsoever
 - Length: minimum {min_chars} characters
 - Sentences: every <p> max 2 sentences, short and concise. Clear paragraph breaks between sections
-- Hook: open with a first sentence that sparks the reader's curiosity
+- Opening: start with a concrete fact or situation related to the topic, stated plainly.
+  Never use — rhetorical questions ("Have you ever wondered...?", "Did you know...?",
+  "What if I told you..."), especially chained back-to-back; shock-stat openers
+  ("a staggering X%", "surprisingly, X% of..."); throat-clearing meta-sentences about
+  the article itself ("In this article, we'll explore...", "Today, let's dive into...");
+  vague filler sentences ("Navigating the complexities of X can seem daunting, yet...",
+  "In today's fast-paced world...", "its importance is only growing"); or wrap-up-style sentences placed in the intro
+  ("By the end of this article, you'll..."). Max 1 exclamation point in the whole piece.
+- Opening structure: diagnose the situation → give context → state what this piece covers
+  (never lead with a question). Rewrite like this:
+    (banned) "Have you ever wondered how much you could save by managing your appliances better?"
+    (use) "Managing household appliances more efficiently can meaningfully cut wasted electricity."
+    (banned) "Acid reflux — just some heartburn, right? Actually, there's a reason not to ignore it."
+    (use) "Dismissing acid reflux as ordinary heartburn can let it develop into a more serious condition."
+  Keep the overall voice closer to a calm, factual news reporter than a hype blogger.
 - Jargon: explain any technical term in parentheses when first used
 {keyword_rule}
-- Statistics: include 5+ specific figures (%, dollar amounts, counts, etc.)
-- Citations: cite sources 3+ times in "(OECD, 2026)" / "(Ministry of Health Korea)" format
+- Statistics/citations: only cite a figure or source (e.g. "(OECD, 2026)") when you actually
+  have something grounded to reference. Don't pad the piece with vague or invented numbers just
+  to hit a count — no statistic beats a fabricated one.
 - Years: never write 2024, 2025, 2023, or any past year anywhere in the body. If a year is needed, use ONLY 2026 — if unsure, omit the year entirely
-- Tables: {tables_req}+ <table> elements with full thead/tbody/tr/th/td structure
+- Tables: only use a <table> (full thead/tbody/tr/th/td structure) when the topic genuinely
+  benefits from a side-by-side comparison. Don't force a table into a topic that doesn't call for one.
 - Weave the 4 internal links above naturally into the body{medical_note}
 
 [THIS SITE'S UNIQUE STRUCTURE — follow exactly in order]
@@ -1454,9 +1500,7 @@ def estimate_seo_score(title, body, meta, tags, faq, images, keyword):
     elif 100<=ml<130: score+=7
     elif 80<=ml<100: score+=4
     ic=len(images)
-    if ic>=3: score+=10
-    elif ic==2: score+=7
-    elif ic==1: score+=4
+    if ic>=1: score+=10
     il=len(re.findall(r'<a\s+href=["\']https?://[^"\']+["\']',body,re.IGNORECASE))
     if il>=4: score+=10
     elif il>=3: score+=7
@@ -1495,18 +1539,12 @@ def postprocess(body, meta, title, keyword, lang, min_chars, gemini_fn):
     body = re.sub(r'\b(2023|2024|2025)\b', '2026', body)
     meta = re.sub(r'\b(2023|2024|2025)\b', '2026', meta)
 
-    # 통계 보완
-    if count_stats(body) < 3:
-        if lang=="ko":
-            body += f'<h3>{keyword} 관련 주요 통계</h3><ul><li>관련 인구 약 <strong>500만 명</strong> (통계청, 2026)</li><li>전년 대비 <strong>12.3%</strong> 증가 (KOSIS, 2026)</li><li>시장 규모 <strong>3조 2,000억 원</strong> (산업연구원, 2026)</li></ul>'
-        else:
-            body += f'<h3>Key Statistics: {keyword}</h3><ul><li>Approximately <strong>5 million people</strong> affected (Statistics Korea, 2026)</li><li><strong>12.3% increase</strong> year-on-year (KOSIS, 2026)</li><li>Market size reached <strong>$2.8 billion</strong> in 2026</li></ul>'
-    # TABLE 보완
-    if not re.search(r'<table[\s>]',body,re.IGNORECASE):
-        if lang=="ko":
-            body += f'<h3>{keyword} 비교 정리</h3><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#0066cc;color:#fff;"><th style="padding:10px;border:1px solid #ddd;">구분</th><th style="padding:10px;border:1px solid #ddd;">일반 방법</th><th style="padding:10px;border:1px solid #ddd;">권장 방법</th></tr></thead><tbody><tr><td style="padding:10px;border:1px solid #ddd;">효과</td><td style="padding:10px;border:1px solid #ddd;">단기적</td><td style="padding:10px;border:1px solid #ddd;">장기·지속적</td></tr><tr><td style="padding:10px;border:1px solid #ddd;">안전성</td><td style="padding:10px;border:1px solid #ddd;">검증 필요</td><td style="padding:10px;border:1px solid #ddd;">전문가 검증</td></tr></tbody></table>'
-        else:
-            body += f'<h3>{keyword}: Quick Comparison</h3><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#0066cc;color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Aspect</th><th style="padding:10px;border:1px solid #ddd;">Standard</th><th style="padding:10px;border:1px solid #ddd;">Recommended</th></tr></thead><tbody><tr><td style="padding:10px;border:1px solid #ddd;">Effectiveness</td><td style="padding:10px;border:1px solid #ddd;">Short-term</td><td style="padding:10px;border:1px solid #ddd;">Long-term</td></tr><tr><td style="padding:10px;border:1px solid #ddd;">Safety</td><td style="padding:10px;border:1px solid #ddd;">Unverified</td><td style="padding:10px;border:1px solid #ddd;">Expert-verified</td></tr></tbody></table>'
+    # ★ 2026-08-14 제거: 통계/표가 부족하면 지어낸 가짜 수치("약 500만 명", "12.3%
+    #   증가", "3조 2,000억 원" 등)와 매번 똑같은 템플릿 표를 강제로 붙여넣던 로직을
+    #   삭제했다. 사용자 지시("애드센스가 좋아할 구조로") + 근거 없는 통계가 27개
+    #   사이트 수백 개 글에 토씨 하나 안 틀리고 반복되는 게 오히려 스팸/저품질
+    #   신호로 잡힐 수 있음 — 통계나 표가 부족하면 그냥 없이 발행하는 게 낫다.
+
     # META 보완
     if len(meta) < 100:
         prompt = f"SEO 메타 디스크립션 {'130~140자(한글)' if lang=='ko' else '130~155 English chars'}로 작성. 키워드 '{keyword}' 포함. 제목: {title}\n순수 텍스트만 출력."
@@ -1516,8 +1554,10 @@ def postprocess(body, meta, title, keyword, lang, min_chars, gemini_fn):
             if 80<=len(result)<=200: meta=result
         except: pass
         if len(meta)<100:
-            if lang=="ko": meta=f"{keyword}에 대한 완전한 가이드. 전문가 검증 최신 정보와 실용적 조언을 한 곳에서 확인하세요."[:140]
-            else: meta=f"Complete guide to {keyword}. Expert-verified information and practical advice for 2026."[:155]
+            # ★ "전문가 검증"은 실제로 검증한 적 없는 근거 없는 신뢰 주장이라 제거—
+            #   최후 폴백은 담백한 사실 서술로만 채운다.
+            if lang=="ko": meta=f"{keyword}에 대해 알아두면 좋은 내용을 정리했습니다."[:140]
+            else: meta=f"A practical look at {keyword} — what's worth knowing."[:155]
     return body, meta
 
 # ============================================================
@@ -2116,7 +2156,7 @@ def process_one(site, keyword):
         images=[]
         print(f"  🚫 이미지 없음 (no_image=True)")
     else:
-        images=get_multiple_images(keyword,count=3,theme=theme)
+        images=get_multiple_images(keyword,count=1,theme=theme)
         if not images:
             print(f"  ⚠️ 사진 검색 완전 실패 → 주제 일치 인포그래픽 카드로 대체")
             pw_for_img = os.getenv(site["wp_pass_env"], "")
