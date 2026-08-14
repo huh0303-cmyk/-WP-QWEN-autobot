@@ -1,9 +1,12 @@
 name: Curio/Times 지식채널 장편 자동생성 (주3회)
 
 # NASA_SPACE_TIMES / HISTORY_TODAY_TIMES / SCIENCE_FACTS_TIMES / CLASSICAL_JOURNAL /
-# MYTH_LEGEND_TIMES / INVENTION_TIMES 6개 채널 공용. scripts/curio_longform.py로
+# MYTH_LEGEND_TIMES / INVENTION_TIMES / AMERICAN_ARCHIVE_TIMES / SILENT_ERA_TIMES /
+# RETRO_REELS_TIMES / CLASSIC_READS_TIMES 10개 채널 공용. scripts/curio_longform.py로
 # 8분 내외 장편 영상을 만들고 scripts/curio_upload.py로 비공개 업로드까지 자동 진행.
 # 2026-08-14: 기존엔 생성기만 있고 업로드/스케줄이 없어서 완전 자동화가 안 돼있었음 — 연결.
+# 2026-08-15: 원래 실제 영상소스 큐레이션으로 기획됐던 archive/times 4채널(AMERICAN_ARCHIVE_TIMES
+# 등)도 소싱 속도/저작권 리스크 때문에 이 대본+AI이미지 파이프라인으로 편입, 10채널 완전자동화.
 
 on:
   workflow_dispatch:
@@ -20,17 +23,25 @@ on:
           - "classical"
           - "myth"
           - "invention"
+          - "american_archive"
+          - "silent_era"
+          - "retro_reels"
+          - "classic_reads"
       topic:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
   schedule:
-    # 월/수/금, KST 새벽~아침 시간대로 6채널 분산(전부 어중간한 분 단위)
+    # 월/수/금, KST 새벽~아침 시간대로 10채널 분산(전부 어중간한 분 단위)
     - cron: "17 20 * * 1,3,5"  # nasa - 05:17 KST
     - cron: "34 20 * * 1,3,5"  # history - 05:34 KST
     - cron: "51 20 * * 1,3,5"  # science - 05:51 KST
     - cron: "8 21 * * 1,3,5"   # classical - 06:08 KST
     - cron: "26 21 * * 1,3,5"  # myth - 06:26 KST
     - cron: "43 21 * * 1,3,5"  # invention - 06:43 KST
+    - cron: "1 22 * * 1,3,5"   # american_archive - 07:01 KST
+    - cron: "19 22 * * 1,3,5"  # silent_era - 07:19 KST
+    - cron: "37 22 * * 1,3,5"  # retro_reels - 07:37 KST
+    - cron: "55 22 * * 1,3,5"  # classic_reads - 07:55 KST
 
 concurrency:
   group: curio-longform-daily
@@ -57,6 +68,10 @@ jobs:
               "8 21 * * 1,3,5")  CH="classical" ;;
               "26 21 * * 1,3,5") CH="myth" ;;
               "43 21 * * 1,3,5") CH="invention" ;;
+              "1 22 * * 1,3,5")  CH="american_archive" ;;
+              "19 22 * * 1,3,5") CH="silent_era" ;;
+              "37 22 * * 1,3,5") CH="retro_reels" ;;
+              "55 22 * * 1,3,5") CH="classic_reads" ;;
               *) CH="nasa" ;;
             esac
             TOPIC_IN=""
@@ -70,6 +85,10 @@ jobs:
               classical) TOPICS=("Mozart — a child prodigy's short life" "Beethoven composing while going deaf" "Bach's devotion to music and faith" "Chopin's delicate genius" "Tchaikovsky's emotional symphonies" "Vivaldi and The Four Seasons" "Brahms' lifelong friendship with the Schumanns" "Handel's Messiah and its legacy") ;;
               myth) TOPICS=("The myth of Icarus" "Norse mythology's Ragnarok" "The legend of King Arthur" "Greek gods of Olympus" "The tale of Pandora's Box" "Egyptian myths of the afterlife" "The legend of Atlantis" "Celtic tales of the fae") ;;
               invention) TOPICS=("The invention of the light bulb" "How the telephone was invented" "The history of the printing press" "The invention of penicillin" "How the internet began" "The story of the steam engine" "The invention of photography" "How GPS was developed") ;;
+              american_archive) TOPICS=("The Apollo 11 moon landing" "The Civil Rights March on Washington" "The signing of the Declaration of Independence" "The Louisiana Purchase" "The Wright Brothers' first flight" "The construction of the Hoover Dam" "The Emancipation Proclamation" "The building of the transcontinental railroad") ;;
+              silent_era) TOPICS=("Charlie Chaplin and The Tramp" "Buster Keaton's death-defying stunts" "The making of Metropolis (1927)" "How silent films used live orchestras" "The first horror film, Nosferatu" "Georges Melies and A Trip to the Moon" "The rise and fall of silent film stars" "How title cards told the story") ;;
+              retro_reels) TOPICS=("The rise of the drive-in movie theater" "How the jukebox took over America" "The golden age of the diner" "1950s home appliances that changed daily life" "The birth of the shopping mall" "Vintage arcade games and their legacy" "How television changed family life in the 1950s" "The story of the classic American road trip") ;;
+              classic_reads) TOPICS=("Why Pride and Prejudice still resonates" "The world behind Charles Dickens' novels" "What makes Moby-Dick a masterpiece" "The real history behind War and Peace" "Jane Austen's life and writing" "The gothic world of Frankenstein" "Mark Twain and the American novel" "The enduring mystery of Sherlock Holmes") ;;
               *) TOPICS=("a fascinating topic worth knowing") ;;
             esac
             IDX=$((RANDOM % ${#TOPICS[@]}))
@@ -115,6 +134,10 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES }}
         run: python scripts/curio_upload.py "${{ needs.determine-channel.outputs.channel }}" en
 
       - name: "결과물 아티팩트 백업"

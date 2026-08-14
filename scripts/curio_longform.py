@@ -131,6 +131,17 @@ CHANNEL_TOPICS = {
     "classical": "classical composers and their lives",
     "myth": "world mythology and legends",
     "invention": "the history of inventions and who really invented them",
+    # 2026-08-15: 원래 실제 아카이브 영상소스 큐레이션으로 기획됐던 4채널 —
+    # 소싱 속도/저작권 리스크 때문에 이 대본+AI이미지 파이프라인으로 편입.
+    "american_archive": "American history told through its public archives — "
+                         "pivotal moments, presidents, and turning points",
+    "silent_era": "the story behind classic silent films and the early days "
+                  "of cinema — the stars, the stunts, the studios",
+    "retro_reels": "nostalgic retrospectives on 20th-century pop culture — "
+                   "fads, fashion, technology, and iconic moments people remember",
+    "classic_reads": "the stories and ideas behind beloved classic novels — "
+                     "what makes them endure, the authors who wrote them, the "
+                     "world that shaped them",
 }
 
 

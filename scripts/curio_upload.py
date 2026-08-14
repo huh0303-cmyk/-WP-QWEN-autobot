@@ -41,6 +41,10 @@ CHANNEL_SECRET_MAP = {
     "classical": "CLASSICAL_JOURNAL",
     "myth": "MYTH_LEGEND_TIMES",
     "invention": "INVENTION_TIMES",
+    "american_archive": "AMERICAN_ARCHIVE_TIMES",
+    "silent_era": "SILENT_ERA_TIMES",
+    "retro_reels": "RETRO_REELS_TIMES",
+    "classic_reads": "CLASSIC_READS_TIMES",
 }
 
 

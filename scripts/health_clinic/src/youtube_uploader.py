@@ -51,11 +51,13 @@ def upload_and_schedule(
     title: str,
     description: str,
     lang: str,
-    publish_at_iso: str,
+    publish_at_iso: str = None,
     tags: list[str] | None = None,
 ) -> str:
     """
-    publish_at_iso 예: '2026-07-28T09:00:00Z' (UTC, RFC3339 형식)
+    2026-08-15: publishAt 자동예약 제거 — 항상 비공개로만 올리고, 실제 공개
+    전환은 사람이 검수 후 직접 하도록 통일(다른 모든 파이프라인과 동일 정책).
+    publish_at_iso 인자는 이제 사용 안 하지만 호출부 호환을 위해 남겨둠.
     반환값: 업로드된 유튜브 영상 URL
     """
     youtube = get_youtube_service(lang)
@@ -71,8 +73,7 @@ def upload_and_schedule(
             "defaultAudioLanguage": lang_cfg["code"],
         },
         "status": {
-            "privacyStatus": "private",  # 예약 발행은 private + publishAt 조합
-            "publishAt": publish_at_iso,
+            "privacyStatus": "private",
             "selfDeclaredMadeForKids": False,
         },
     }
@@ -91,7 +92,12 @@ def upload_and_schedule(
     print(f"[YouTube] 업로드 완료: https://youtu.be/{video_id}")
 
     if thumbnail_path and os.path.exists(thumbnail_path):
-        youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumbnail_path)).execute()
-        print("[YouTube] 썸네일 설정 완료")
+        try:
+            youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumbnail_path)).execute()
+            print("[YouTube] 썸네일 설정 완료")
+        except Exception as e:
+            # 채널 폰인증 안 됐거나 스코프 부족하면 403 — 영상 자체는 이미 올라갔으니
+            # 여기서 죽지 않고 넘어간다(archive_channel_upload.py와 동일 패턴, 2026-08-15).
+            print(f"[YouTube] ⚠️ 썸네일 설정 실패(무시하고 계속): {e}")
 
     return f"https://youtu.be/{video_id}"

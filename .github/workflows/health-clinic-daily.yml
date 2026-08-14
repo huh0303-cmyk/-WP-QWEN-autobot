@@ -46,11 +46,6 @@ jobs:
       - name: 패키지 설치
         run: pip install -r requirements.txt
 
-      - name: 인증정보 파일 복원
-        run: |
-          echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > credentials.json
-          echo '${{ secrets.HEALTH_CLINIC_GOOGLE_TOKEN_JSON }}' > token.json
-
       - name: 언어/주제 결정 (스케줄 실행 시 cron별로 언어 매핑 + 주제 무작위 선택)
         id: pick
         shell: bash
@@ -96,16 +91,21 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_KEY }}
           GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
-          YOUTUBE_CHANNEL_ID_KR: ${{ secrets.HEALTH_CLINIC_CHANNEL_ID_KR }}
-          YOUTUBE_CHANNEL_ID_EN: ${{ secrets.HEALTH_CLINIC_CHANNEL_ID_EN }}
-          YOUTUBE_CHANNEL_ID_JP: ${{ secrets.HEALTH_CLINIC_CHANNEL_ID_JP }}
+          # 2026-08-15: Drive 접근은 이 리포 공용 GOOGLE_OAUTH_* 토큰으로 통일
+          # (기존 HEALTH_CLINIC_GOOGLE_TOKEN_JSON 시크릿은 애초에 등록된 적이 없어서
+          # 항상 빈 파일이었음 — drive_utils.py 쪽에서 이 토큰을 우선 사용하도록 수정함).
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           # 2026-08-13: 언어별 실제 업로드 채널을 구분하려면 언어마다 별도 OAuth
           # refresh token이 필요하다(공유 token.json 1개로는 3채널 라우팅 불가 — 위
           # youtube_uploader.py 주석 참고). 셋 중 아직 발급 안 된 언어는 빈 값이라
           # 그 언어 실행만 조용히 건너뛴다.
           YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
           YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
-          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKENS_JSON: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKENS_JSON }}
+          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR }}
+          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN }}
+          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP }}
           NOTIFY_EMAIL_TO: huh0303@gmail.com
           NOTIFY_EMAIL_FROM: huh0303@gmail.com
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}

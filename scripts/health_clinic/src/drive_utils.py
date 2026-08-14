@@ -26,7 +26,27 @@ TOKEN_FILE = os.getenv("GOOGLE_TOKEN_FILE", "token.json")
 
 
 def get_credentials() -> Credentials:
-    """공용 Google OAuth 자격증명을 반환. 없으면 브라우저 인증 흐름을 실행."""
+    """공용 Google OAuth 자격증명을 반환.
+    2026-08-15: CI(GitHub Actions)에는 브라우저가 없어서 token.json 파일 방식이
+    원래 안 되던 상태였음(HEALTH_CLINIC_GOOGLE_TOKEN_JSON 시크릿 자체가 없었음) —
+    이 리포의 다른 파이프라인들과 동일하게, 이미 등록되어 있는 공용
+    GOOGLE_OAUTH_CLIENT_ID/SECRET/REFRESH_TOKEN 시크릿으로 바로 인증하도록 우선순위를
+    바꿈. 로컬 최초 인증(token.json 생성)용 브라우저 흐름은 폴백으로 남겨둠."""
+    google_refresh_token = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
+    if google_refresh_token:
+        client_id = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
+        client_secret = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+        creds = Credentials(
+            token=None,
+            refresh_token=google_refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=client_id,
+            client_secret=client_secret,
+            scopes=SCOPES,
+        )
+        creds.refresh(Request())
+        return creds
+
     creds = None
     if os.path.exists(TOKEN_FILE):
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)

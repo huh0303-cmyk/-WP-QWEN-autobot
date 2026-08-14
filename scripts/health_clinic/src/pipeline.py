@@ -66,13 +66,10 @@ def _produce_from_parsed(parsed: dict, lang: str, steps: list[str], publish_dela
         thumb_file_id = upload_file(thumbnail_path, thumb_folder)
         drive_links["thumbnail"] = f"https://drive.google.com/file/d/{thumb_file_id}/view"
 
-    # ── 4. 유튜브 예약 발행 ────────────────────
+    # ── 4. 유튜브 비공개 업로드 (자동공개 없음 — 2026-08-15) ────────────────────
     video_url = None
     publish_at_iso = None
     if "upload" in steps:
-        publish_at = datetime.now(timezone.utc) + timedelta(hours=publish_delay_hours)
-        publish_at_iso = publish_at.strftime("%Y-%m-%dT%H:%M:%SZ")
-
         description = (
             f"{parsed['hook']}\n\n"
             f"이 콘텐츠는 일반 정보 제공 목적이며 의학적 진단이나 치료를 대체하지 않습니다.\n"

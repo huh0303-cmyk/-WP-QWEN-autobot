@@ -21,11 +21,10 @@ def send_publish_notification(
     from_addr = os.getenv("NOTIFY_EMAIL_FROM", to_addr)
     app_password = os.getenv("GMAIL_APP_PASSWORD")
 
-    body = f"""Health Clinic 자동 파이프라인 - 예약 발행 완료 보고
+    body = f"""Health Clinic 자동 파이프라인 - 비공개 업로드 완료 보고 (검수 후 직접 공개해주세요)
 
 ■ 채널 언어: {lang.upper()}
 ■ 영상 제목: {title}
-■ 예약 발행 시각(UTC): {publish_at_iso}
 ■ 유튜브 링크: {video_url}
 
 ■ Drive 저장 위치
@@ -36,7 +35,7 @@ def send_publish_notification(
 이 메일은 자동 발송되었습니다.
 """
     msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = f"[Health Clinic-{lang.upper()}] 예약 발행 완료: {title}"
+    msg["Subject"] = f"[Health Clinic-{lang.upper()}] 비공개 업로드 완료: {title}"
     msg["From"] = from_addr
     msg["To"] = to_addr
 
