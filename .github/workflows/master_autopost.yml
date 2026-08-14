@@ -1095,9 +1095,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
+      - run: pip install requests pyjwt cryptography -q
       - name: "AI 티 글 탐지 + 비공개 전환"
         env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           KHEALTH365COM:        ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
