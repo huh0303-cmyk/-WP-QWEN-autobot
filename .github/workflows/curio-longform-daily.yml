@@ -1,0 +1,127 @@
+name: Curio/Times 지식채널 장편 자동생성 (주3회)
+
+# NASA_SPACE_TIMES / HISTORY_TODAY_TIMES / SCIENCE_FACTS_TIMES / CLASSICAL_JOURNAL /
+# MYTH_LEGEND_TIMES / INVENTION_TIMES 6개 채널 공용. scripts/curio_longform.py로
+# 8분 내외 장편 영상을 만들고 scripts/curio_upload.py로 비공개 업로드까지 자동 진행.
+# 2026-08-14: 기존엔 생성기만 있고 업로드/스케줄이 없어서 완전 자동화가 안 돼있었음 — 연결.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "채널 (비우면 스케줄 슬롯 기준 자동 선택)"
+        required: false
+        type: choice
+        default: "nasa"
+        options:
+          - "nasa"
+          - "history"
+          - "science"
+          - "classical"
+          - "myth"
+          - "invention"
+      topic:
+        description: "주제 (비우면 채널별 주제풀에서 무작위)"
+        required: false
+  schedule:
+    # 월/수/금, KST 새벽~아침 시간대로 6채널 분산(전부 어중간한 분 단위)
+    - cron: "17 20 * * 1,3,5"  # nasa - 05:17 KST
+    - cron: "34 20 * * 1,3,5"  # history - 05:34 KST
+    - cron: "51 20 * * 1,3,5"  # science - 05:51 KST
+    - cron: "8 21 * * 1,3,5"   # classical - 06:08 KST
+    - cron: "26 21 * * 1,3,5"  # myth - 06:26 KST
+    - cron: "43 21 * * 1,3,5"  # invention - 06:43 KST
+
+concurrency:
+  group: curio-longform-daily
+  cancel-in-progress: false
+
+jobs:
+  determine-channel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      channel: ${{ steps.pick.outputs.channel }}
+      topic: ${{ steps.pick.outputs.topic }}
+    steps:
+      - id: pick
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            CH="${{ github.event.inputs.channel }}"
+            TOPIC_IN="${{ github.event.inputs.topic }}"
+          else
+            case "${{ github.event.schedule }}" in
+              "17 20 * * 1,3,5") CH="nasa" ;;
+              "34 20 * * 1,3,5") CH="history" ;;
+              "51 20 * * 1,3,5") CH="science" ;;
+              "8 21 * * 1,3,5")  CH="classical" ;;
+              "26 21 * * 1,3,5") CH="myth" ;;
+              "43 21 * * 1,3,5") CH="invention" ;;
+              *) CH="nasa" ;;
+            esac
+            TOPIC_IN=""
+          fi
+
+          if [ -z "$TOPIC_IN" ]; then
+            case "$CH" in
+              nasa) TOPICS=("The Voyager Golden Record" "How black holes bend light" "The first footprints on the Moon" "Why Mars is red" "The James Webb Space Telescope's first images" "What a day looks like on the ISS" "The search for exoplanets" "How rockets escape gravity" "The Hubble Deep Field photo" "Saturn's rings explained") ;;
+              history) TOPICS=("The day the Berlin Wall fell" "The first flight of the Wright Brothers" "How the printing press changed the world" "The signing of the Magna Carta" "The discovery of Tutankhamun's tomb" "The moon landing broadcast" "The fall of the Roman Empire" "The invention of the telegraph" "The first Olympic Games" "The construction of the Great Wall") ;;
+              science) TOPICS=("Why the sky is blue" "How vaccines train the immune system" "The physics of black holes" "Why we dream" "How photosynthesis works" "The science of earthquakes" "How the brain stores memories" "Why ice floats" "The discovery of DNA's structure" "How antibiotics work") ;;
+              classical) TOPICS=("Mozart — a child prodigy's short life" "Beethoven composing while going deaf" "Bach's devotion to music and faith" "Chopin's delicate genius" "Tchaikovsky's emotional symphonies" "Vivaldi and The Four Seasons" "Brahms' lifelong friendship with the Schumanns" "Handel's Messiah and its legacy") ;;
+              myth) TOPICS=("The myth of Icarus" "Norse mythology's Ragnarok" "The legend of King Arthur" "Greek gods of Olympus" "The tale of Pandora's Box" "Egyptian myths of the afterlife" "The legend of Atlantis" "Celtic tales of the fae") ;;
+              invention) TOPICS=("The invention of the light bulb" "How the telephone was invented" "The history of the printing press" "The invention of penicillin" "How the internet began" "The story of the steam engine" "The invention of photography" "How GPS was developed") ;;
+              *) TOPICS=("a fascinating topic worth knowing") ;;
+            esac
+            IDX=$((RANDOM % ${#TOPICS[@]}))
+            TOPIC_IN="${TOPICS[$IDX]}"
+          fi
+
+          echo "channel=$CH" >> "$GITHUB_OUTPUT"
+          echo "topic=$TOPIC_IN" >> "$GITHUB_OUTPUT"
+          echo "선택됨: channel=$CH / topic=$TOPIC_IN"
+
+  generate-and-publish:
+    needs: determine-channel
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "시스템 의존성 (ffmpeg + 폰트)"
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-nanum fonts-dejavu-core
+
+      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: "장편 영상 생성"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python scripts/curio_longform.py "${{ needs.determine-channel.outputs.topic }}" en "" "${{ needs.determine-channel.outputs.channel }}"
+
+      - name: "유튜브 업로드(비공개)"
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+        run: python scripts/curio_upload.py "${{ needs.determine-channel.outputs.channel }}" en
+
+      - name: "결과물 아티팩트 백업"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: curio-longform-${{ github.run_id }}
+          path: curio_longform_output/**/final.mp4
+          retention-days: 3
+          if-no-files-found: ignore

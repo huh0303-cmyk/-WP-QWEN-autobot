@@ -375,11 +375,17 @@ def build_caption_text(topic, caption_text):
 # 채널별 설명 톤/컨셉 — Gemini 프롬프트에 채널 정체성을 반영해서 전부 똑같은
 # 문구가 나오지 않게 한다 (2026-08-13, 사용자 요청: "이제부터 파이프라인에 박제")
 CHANNEL_DESC_CONTEXT = {
-    "globalmusic": "a warm, romantic lofi/acoustic playlist channel (couples, golden-hour mood, gentle piano/guitar)",
-    "healing": "an ambient nature-sounds channel for relaxation and sleep (rain, wind, birdsong, temple wind chimes — no lyrics, pure atmosphere)",
-    "starbucks": "an instrumental cafe/focus-music channel for working and studying (no lyrics, warm wood-tone cafe mood)",
+    # 2026-08-14 사용자 명시적 지시("확실히"): Cafe_K(=globalmusic 코드키) 채널은
+    # 로파이 인스트루멘탈이 아니라 영어/불어/독일어 등 전 세계 모든 언어의
+    # 달달한(로맨틱/스위트) 보컬곡 채널로 확정.
+    "globalmusic": "a sweet, romantic global music channel featuring vocal love songs in many different languages (English, French, German, and more — warm, tender, feel-good mood)",
+    # healing: 빗소리/물소리(시냇물)/새소리 등 자연음 위주, 2~3시간 롱폼(사용자 지시 그대로)
+    "healing": "an ambient nature-sounds channel for relaxation and sleep (rain sounds, water/stream sounds, birdsong, temple wind chimes — no lyrics, pure atmosphere, long-form 2-3 hour sessions)",
+    # starbucks(=starbucksvibes 채널): 편한 카페 재즈, 보컬 없음(사용자 지시 그대로)
+    "starbucks": "a relaxing instrumental cafe jazz channel (no vocals, smooth jazz, warm laid-back cafe mood)",
     "mbb": "a classical music channel centered on Mozart, Bach and Beethoven (and other classical composers)",
-    "kpop": "a K-pop playlist channel (study/workout/driving/chill mixes of K-pop tracks)",
+    # kpop: 특정 무드로 좁히지 않고 K-pop 전반(사용자 지시: "Kpop음악 전부")
+    "kpop": "a K-pop playlist channel featuring all kinds of K-pop music",
 }
 
 # 2026-08-14: Gemini 생성이 실패했을 때(쿼터 소진 등, 이날 자주 발생) 쓰던 기존
@@ -389,40 +395,39 @@ CHANNEL_DESC_CONTEXT = {
 # 정적 템플릿을 갖춰서, Gemini가 죽어도 절대 이런 식으로 올라가지 않게 한다.
 PLAYLIST_FALLBACK_HOOKS = {
     "globalmusic": {
-        "title_fmt": "{topic} — A Romantic Lofi Playlist For Golden-Hour Moments Together",
-        "hook": "A warm, romantic lofi mix for the moments that deserve a soundtrack.",
+        "title_fmt": "{topic} — Sweet Love Songs From Around The World",
+        "hook": "A sweet, romantic global mix — love songs in different languages, one warm feeling.",
         "body": (
-            "Gentle piano, soft acoustic guitar, and that golden-hour glow — this playlist is built for slow "
-            "mornings, quiet evenings, and everything in between. Put it on during a date night in, a long "
-            "drive, or just when you want the room to feel a little warmer. No sudden drops, no jarring "
-            "transitions — just a steady, romantic mood that carries you through the whole thing."
+            "English, French, German, and more — this playlist brings together tender, feel-good vocal love "
+            "songs from around the world. Put it on during a date night in, a long drive, or just when you "
+            "want the room to feel a little warmer. No sudden drops, no jarring transitions — just a steady, "
+            "sweet mood that carries you through the whole thing, no matter what language it's in."
         ),
-        "engage": "What mood should the next playlist chase? Let us know in the comments.",
-        "tags": "#LofiMusic #RomanticPlaylist #ChillMusic #LofiPlaylist #StudyMusic #RelaxingMusic",
+        "engage": "Which language should the next mix feature? Let us know in the comments.",
+        "tags": "#GlobalMusic #LoveSongs #RomanticPlaylist #WorldMusic #ChillMusic #RelaxingMusic",
     },
     "healing": {
         "title_fmt": "{topic} — Pure Nature Sounds For Deep Sleep And Total Relaxation",
         "hook": "Real, layered nature ambience — the kind that quiets a busy mind almost instantly.",
         "body": (
-            "No music, no lyrics, no distractions — just rain, wind, birdsong, and the kind of quiet atmosphere "
-            "that's genuinely hard to find anywhere else. This is built to run for hours in the background "
-            "while you sleep, study, meditate, or just need the world to feel a little softer for a while. "
-            "Put it on, dim the lights, and let it do the work."
+            "No music, no lyrics, no distractions — just rain, flowing water, birdsong, and the kind of quiet "
+            "atmosphere that's genuinely hard to find anywhere else. This is built to run for 2-3 hours in the "
+            "background while you sleep, study, meditate, or just need the world to feel a little softer for "
+            "a while. Put it on, dim the lights, and let it do the work."
         ),
-        "engage": "Which soundscape should we record next — rain, forest, or ocean? Tell us below.",
-        "tags": "#NatureSounds #SleepSounds #RainSounds #Relaxation #AmbientSounds #WhiteNoise",
+        "engage": "Which soundscape should we record next — rain, a stream, or the ocean? Tell us below.",
+        "tags": "#NatureSounds #SleepSounds #RainSounds #WaterSounds #Relaxation #AmbientSounds #WhiteNoise",
     },
     "starbucks": {
-        "title_fmt": "{topic} — Instrumental Cafe Music To Focus, Study, And Get Things Done",
-        "hook": "The instrumental cafe playlist built to disappear into the background while you actually focus.",
+        "title_fmt": "{topic} — Relaxing Instrumental Cafe Jazz",
+        "hook": "The instrumental cafe jazz mix built to just play in the background while you relax.",
         "body": (
-            "No vocals, no lyrics to pull your attention away — just warm, wood-tone instrumental music that "
-            "sounds like your favorite coffee shop on a quiet afternoon. Perfect for deep work, studying, "
-            "reading, or just needing a steady, unobtrusive soundtrack that never distracts. Put it on, get "
-            "your coffee, and get into flow."
+            "No vocals, no lyrics — just warm, smooth jazz that sounds like your favorite coffee shop on a "
+            "quiet afternoon. Perfect for unwinding, reading, working, or just needing a steady, unobtrusive "
+            "soundtrack in the background. Put it on, get your coffee, and relax."
         ),
-        "engage": "What are you working on while this plays? Tell us in the comments.",
-        "tags": "#StudyMusic #CafeMusic #FocusMusic #InstrumentalMusic #WorkMusic #CoffeeShopMusic",
+        "engage": "What's your go-to way to unwind with this playing? Tell us in the comments.",
+        "tags": "#CafeJazz #JazzMusic #InstrumentalMusic #RelaxingMusic #CoffeeShopMusic #ChillJazz",
     },
     "mbb": {
         "title_fmt": "{topic} — Timeless Classical Music From Mozart, Bach And Beethoven",
