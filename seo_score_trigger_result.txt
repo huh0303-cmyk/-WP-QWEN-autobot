@@ -30,11 +30,11 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T18%3A51%3A31.959460&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-14T19%3A46%3A15.022764&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [856] Save Time and Money on Olive Young lip t
 
 🌐 https://kworld365.com
     ✅ [782] TOPIK study guide: Details That Are Easy
@@ -55,7 +55,7 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kieca-korea.org
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1103] 비즈니스 한국어, 요즘 이렇게 준비합니다
 
 🌐 https://ksa-korea.org
     ✅ [761] 대학원 입학 서류 관리, 이 4가지만 지켜도 달라집니다
@@ -81,4 +81,4 @@
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 7건 SEO점수 갱신
+총 9건 SEO점수 갱신
