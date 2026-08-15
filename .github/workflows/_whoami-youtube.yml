@@ -1,7 +1,14 @@
 name: (임시) YouTube 채널 확인
 
+# 2026-08-15: channel_key 입력 추가 — 영상 생성 없이 GitHub에 저장된 특정
+# 채널의 refresh token이 실제로 유효한지(+어느 채널로 인증되는지) 1분 내로
+# 저비용 확인하기 위함. kpop unauthorized_client 반복 디버깅용.
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      channel_key:
+        description: "확인할 채널 시크릿 접미사 (비우면 공용 YOUTUBE_OAUTH_REFRESH_TOKEN). 예: KPOP, HEALING, STARBUCKS"
+        required: false
 
 jobs:
   whoami:
@@ -11,35 +18,41 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install google-api-python-client google-auth google-auth-httplib2 -q
-      - name: "연결된 유튜브 채널 조회 (읽기 전용, 아무것도 올리지 않음)"
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 requests -q
+      - name: "refresh token 자체가 유효한지 저비용 확인 (raw grant, youtube.upload 스코프 제약 없이)"
         env:
+          CHANNEL_KEY: ${{ github.event.inputs.channel_key }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_MBB: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
         run: |
           python - <<'EOF'
           import os
-          from google.oauth2.credentials import Credentials
-          from googleapiclient.discovery import build
+          import hashlib
+          import requests
 
-          creds = Credentials(
-              token=None,
-              refresh_token=os.environ["YOUTUBE_OAUTH_REFRESH_TOKEN"],
-              token_uri="https://oauth2.googleapis.com/token",
-              client_id=os.environ["YOUTUBE_OAUTH_CLIENT_ID"],
-              client_secret=os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"],
-              scopes=["https://www.googleapis.com/auth/youtube.upload"],
-          )
-          youtube = build("youtube", "v3", credentials=creds)
-          resp = youtube.channels().list(part="snippet", mine=True).execute()
-          for ch in resp.get("items", []):
-              sn = ch["snippet"]
-              handle = sn.get("customUrl", "(핸들 없음)")
-              print(f"채널명: {sn['title']}")
-              print(f"핸들/커스텀URL: {handle}")
-              print(f"채널 ID: {ch['id']}")
-              print(f"URL: https://www.youtube.com/channel/{ch['id']}")
-          if not resp.get("items"):
-              print("연결된 채널을 찾을 수 없음 — 토큰/권한 확인 필요")
+          key = os.environ.get("CHANNEL_KEY", "").strip().upper()
+          token_env_name = f"YOUTUBE_OAUTH_REFRESH_TOKEN_{key}" if key else "YOUTUBE_OAUTH_REFRESH_TOKEN"
+          refresh_token = os.environ.get(token_env_name, "")
+          cid = os.environ["YOUTUBE_OAUTH_CLIENT_ID"]
+          print(f"확인 대상 시크릿: {token_env_name}")
+          print(f"토큰 길이: {len(refresh_token)}자 / sha256 앞 12자: "
+                f"{hashlib.sha256(refresh_token.encode()).hexdigest()[:12] if refresh_token else '(비어있음)'}")
+          print(f"client_id 앞 20자: {cid[:20]}...")
+
+          # channels.list는 youtube.upload 스코프 토큰에선 403 나므로(2026-08-14 확인된
+          # 하드 제약) 여기선 raw refresh grant만 확인 — 200이면 이 저장소 시크릿 조합
+          # (client_id/secret + 이 refresh token)이 GitHub Actions에서 실제로 유효하다는 뜻.
+          r = requests.post("https://oauth2.googleapis.com/token", data={
+              "client_id": cid,
+              "client_secret": os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"],
+              "refresh_token": refresh_token,
+              "grant_type": "refresh_token",
+          })
+          print(f"refresh grant 결과: HTTP {r.status_code}")
+          print(r.text[:300])
           EOF
