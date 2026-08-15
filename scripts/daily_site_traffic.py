@@ -220,10 +220,18 @@ def fetch_sitemap_urls(sitemap_url, max_urls=100, _depth=0):
     return urls[:max_urls]
 
 
-def inspect_url_index_status(token, site_url, page_url):
+def inspect_url_index_status(token, site_url, page_url, _retry=0):
     """URL 검사 API로 낱개 URL 하나의 실제 색인 여부(PASS=색인됨)를 확인.
     이 결과가 Search Console 화면의 "색인 생성" 리포트와 같은 원천 데이터다
-    (사이트맵 API의 indexed 필드보다 훨씬 정확하지만, URL 하나씩만 조회 가능)."""
+    (사이트맵 API의 indexed 필드보다 훨씬 정확하지만, URL 하나씩만 조회 가능).
+
+    반환값은 dict: {"indexed": True/False/None, "verdict": str|None,
+    "coverageState": str|None, "error": str|None}.
+    indexed=None(API 호출 자체가 실패 — 할당량 초과/네트워크 오류 등)과
+    indexed=False(API는 성공했지만 Google이 "색인 안 됨"으로 응답)를 절대
+    같은 값으로 취급하면 안 된다 — 호출부에서 None을 False로 뭉개면 API
+    할당량 초과 시 멀쩡히 색인된 글까지 전부 "미색인"으로 오판하게 된다
+    (2026-08-15 k-health365.com 0/243 오탐의 실제 원인)."""
     try:
         r = requests.post(
             "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
@@ -231,12 +239,18 @@ def inspect_url_index_status(token, site_url, page_url):
             json={"inspectionUrl": page_url, "siteUrl": site_url},
             timeout=20,
         )
+        if r.status_code == 429 and _retry < 2:
+            time.sleep(5 * (_retry + 1))
+            return inspect_url_index_status(token, site_url, page_url, _retry=_retry + 1)
         if r.status_code != 200:
-            return None
-        verdict = r.json()["inspectionResult"]["indexStatusResult"]["verdict"]
-        return verdict == "PASS"
-    except Exception:
-        return None
+            return {"indexed": None, "verdict": None, "coverageState": None,
+                    "error": f"HTTP {r.status_code}: {r.text[:200]}"}
+        isr = r.json()["inspectionResult"]["indexStatusResult"]
+        verdict = isr.get("verdict")
+        return {"indexed": verdict == "PASS", "verdict": verdict,
+                "coverageState": isr.get("coverageState"), "error": None}
+    except Exception as e:
+        return {"indexed": None, "verdict": None, "coverageState": None, "error": str(e)}
 
 
 def get_index_status_sample(token, site_url, sample_size=20):
@@ -269,10 +283,10 @@ def get_index_status_sample(token, site_url, sample_size=20):
     indexed, checked = 0, 0
     for u in sample:
         result = inspect_url_index_status(token, site_url, u)
-        if result is None:
+        if result["indexed"] is None:
             continue
         checked += 1
-        if result:
+        if result["indexed"]:
             indexed += 1
         time.sleep(0.2)
 

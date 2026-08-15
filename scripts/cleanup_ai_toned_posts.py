@@ -13,10 +13,20 @@ cleanup_ai_toned_posts.py
 단순화했다: 색인된 글만 남기고, 나머지는 전부(AI 티가 있든 없든) 비공개 전환.
 색인 안 된 글은 어차피 검색 유입에 기여를 못 하고 있으니 품질과 무관하게 정리
 대상 — daily_site_traffic.py와 동일한 Search Console URL 검사 API로 낱개 URL의
-실제 색인 여부를 확인하고, 확인 자체가 실패하면(권한 없음 등) 안전하게
-"색인 안 됨"으로 간주해 정리 대상에 포함한다(불확실을 이유로 저품질 글을
-방치하지 않기 위함). AI 티 패턴 매칭은 이제 게이트가 아니라 리포트에 참고
+실제 색인 여부를 확인한다. AI 티 패턴 매칭은 게이트가 아니라 리포트에 참고
 정보로만 같이 남긴다.
+
+2026-08-15 정정: 이전 버전은 "확인 자체가 실패하면(할당량 초과/네트워크 오류
+등) 안전하게 색인 안 됨으로 간주"했으나, 이게 오히려 위험한 것으로 드러남 —
+Search Console URL 검사 API는 분당/일일 호출 한도가 낮아서 27개 사이트를
+한 번에 훑으면 중간에 429(할당량 초과)가 나기 시작하고, 그 뒤로는 모든 글이
+"확인 실패"가 되어 전부 "미색인"으로 뭉개진다(k-health365.com이 실제로는
+색인된 글이 있는데도 0/243으로 오탐된 사고의 원인). 그래서 지금은 API
+호출 실패(None)와 "API는 성공했지만 Google이 색인 안 됨이라 응답"(False)을
+명확히 분리한다 — 실패는 uncertain 버킷으로 따로 모으고, --execute에서도
+**절대 자동으로 비공개 전환하지 않는다**(색인 확인이 안 됐다는 이유로 멀쩡한
+글을 지우는 사고를 막기 위함). 또한 429가 연속으로 감지되면 이후 나머지는
+호출 자체를 건너뛰고 전부 uncertain으로 표시한다(의미 없는 API 호출 낭비 방지).
 
 삭제보다 안전한 '비공개(private) 전환'을 기본 동작으로 한다 — 복구 가능,
 검색엔진에서도 즉시 빠짐.
@@ -192,7 +202,11 @@ def main():
     manifest = {}
     total_flagged = 0
     total_kept_indexed = 0
+    total_uncertain = 0
     total_checked = 0
+    quota_exhausted = False
+    consecutive_quota_errors = 0
+    QUOTA_ABORT_THRESHOLD = 5
 
     for site_url, secret_name in SITE_SECRET_MAP.items():
         if only_site and only_site not in site_url:
@@ -217,6 +231,7 @@ def main():
 
         flagged = []
         kept_indexed = []
+        uncertain = []
         for p in posts:
             title = p.get("title", {}).get("rendered", "")
             content = p.get("content", {}).get("rendered", "")
@@ -224,24 +239,42 @@ def main():
             score, hits, heading_hits = score_ai_tell(title, content)
             total_checked += 1
 
-            verdict = inspect_url_index_status(gsc_token, query_site, link) if link else None
-            indexed = bool(verdict)  # None(확인실패)/False 는 모두 "정리 대상"으로
+            if quota_exhausted:
+                result = {"indexed": None, "verdict": None, "coverageState": None,
+                          "error": "할당량 소진 이후 미확인"}
+            elif link:
+                result = inspect_url_index_status(gsc_token, query_site, link)
+                if result["error"] and "429" in result["error"]:
+                    consecutive_quota_errors += 1
+                    if consecutive_quota_errors >= QUOTA_ABORT_THRESHOLD:
+                        quota_exhausted = True
+                        log("   🛑 GSC 429(할당량 초과) 연속 감지 — 이후 전부 '확인실패'로 표시하고 API 호출 중단")
+                else:
+                    consecutive_quota_errors = 0
+            else:
+                result = {"indexed": None, "verdict": None, "coverageState": None, "error": "링크없음"}
 
             entry = {
                 "id": p["id"], "title": title, "link": link,
                 "ai_tell_score": score, "matched": hits, "question_headings": heading_hits,
+                "verdict": result.get("verdict"), "coverageState": result.get("coverageState"),
             }
-            if indexed:
+            if result["indexed"] is True:
                 kept_indexed.append(entry)
-            else:
+            elif result["indexed"] is False:
                 flagged.append(entry)
-            time.sleep(0.15)
+            else:
+                entry["check_error"] = result.get("error")
+                uncertain.append(entry)
+            if not quota_exhausted:
+                time.sleep(0.4)
 
         total_flagged += len(flagged)
         total_kept_indexed += len(kept_indexed)
-        manifest[site_url] = {"to_hide": flagged, "kept_indexed": kept_indexed}
+        total_uncertain += len(uncertain)
+        manifest[site_url] = {"to_hide": flagged, "kept_indexed": kept_indexed, "uncertain": uncertain}
         log(f"   → 색인 확인 {len(posts)}건: 색인됨(유지) {len(kept_indexed)}건 / "
-            f"미색인(정리 대상) {len(flagged)}건")
+            f"미색인(정리 대상) {len(flagged)}건 / 확인실패(uncertain, 손대지 않음) {len(uncertain)}건")
         for f in flagged[:5]:
             tell = f" [AI티 {f['ai_tell_score']}점: {f['matched']}]" if f['ai_tell_score'] else ""
             log(f"      {f['title'][:50]}{tell}")
@@ -260,8 +293,10 @@ def main():
 
     log(f"{'='*60}")
     log(f"✅ 완료 — 조사 {total_checked}건 / 색인됨(유지) {total_kept_indexed}건 / "
-        f"미색인(정리 대상) {total_flagged}건")
-    log(f"   {'실제 비공개 전환 완료' if execute else '리포트만 저장됨 (ai_toned_posts_manifest.json) — 실행하려면 --execute 추가'}")
+        f"미색인(정리 대상) {total_flagged}건 / 확인실패(uncertain) {total_uncertain}건")
+    if quota_exhausted:
+        log("   ⚠️ 이번 실행은 GSC 할당량 초과로 중간에 확인이 중단됐다 — uncertain 건수는 재조사 필요, 절대 정리 대상 아님")
+    log(f"   {'실제 비공개 전환 완료(uncertain은 건드리지 않음)' if execute else '리포트만 저장됨 (ai_toned_posts_manifest.json) — 실행하려면 --execute 추가'}")
     log(f"{'='*60}")
 
 
