@@ -88,6 +88,13 @@ on:
 permissions:
   contents: write
 
+# 2026-08-15: 오늘 5채널 OAuth 재발급 검증차 workflow_dispatch로 여러 채널을
+# 한 번에 몰아서 트리거할 일이 생겨서, GitHub이 자동으로 순차 큐잉하도록
+# concurrency 그룹 추가(겹쳐 돌면 Drive/Gemini 리소스 경합 가능성 있음).
+concurrency:
+  group: generate-youtube-playlist
+  cancel-in-progress: false
+
 jobs:
   prepare:
     if: ${{ !inputs.fix_video_id }}
