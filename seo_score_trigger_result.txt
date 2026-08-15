@@ -19,19 +19,21 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreataxnlaw.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3894] Korea corporate tax rate — Common Points
 
 🌐 https://koreacrypto365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://krealestate365.com
-  (최근 2시간 내 신규 발행 없음)
+    ⚠️ [516] 오류: Locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator(".editor-post-title__inpu
 
 🌐 https://ktech365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-15T13%3A40%3A48.076476&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-15T14%3A47%3A34.844269&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='kskin365.com', port=443): Failed to resolve 'kskin365.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
@@ -41,10 +43,10 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://k-trip365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [4620] How Busan travel guide Has Changed in 20
 
 🌐 https://k-visa365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3169] How People Are Approaching Korea permane
 
 🌐 https://koreawedding365.com
   (최근 2시간 내 신규 발행 없음)
@@ -82,4 +84,4 @@
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 4건 SEO점수 갱신
+총 7건 SEO점수 갱신
