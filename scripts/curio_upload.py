@@ -81,10 +81,15 @@ def get_youtube_service(secret_key):
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
+    # 2026-08-15: _NEW 변형을 먼저 시도하던 순서가 문제였음 — YOUTUBE_OAUTH_CLIENT_ID_NEW는
+    # 예전 세션에서 만들어진 폐기된 클라이언트였고, 오늘 15채널 unauthorized_client를
+    # 고치면서 확정한 올바른 클라이언트는 plain YOUTUBE_OAUTH_CLIENT_ID 쪽이었음
+    # (raw refresh grant로 직접 검증 완료, [[project_21_channels_pipeline_status]] 참고).
+    # _NEW를 우선하면 이 수정이 무시돼서 다시 unauthorized_client가 남 — 순서 반대로.
     client_id = _env_fallback(
-        f"YOUTUBE_OAUTH_CLIENT_ID_{secret_key}", "YOUTUBE_OAUTH_CLIENT_ID_NEW", "YOUTUBE_OAUTH_CLIENT_ID")
+        f"YOUTUBE_OAUTH_CLIENT_ID_{secret_key}", "YOUTUBE_OAUTH_CLIENT_ID", "YOUTUBE_OAUTH_CLIENT_ID_NEW")
     client_secret = _env_fallback(
-        f"YOUTUBE_OAUTH_CLIENT_SECRET_{secret_key}", "YOUTUBE_OAUTH_CLIENT_SECRET_NEW", "YOUTUBE_OAUTH_CLIENT_SECRET")
+        f"YOUTUBE_OAUTH_CLIENT_SECRET_{secret_key}", "YOUTUBE_OAUTH_CLIENT_SECRET", "YOUTUBE_OAUTH_CLIENT_SECRET_NEW")
     refresh_token = os.environ.get(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_key}", "")
     if not refresh_token:
         log(f"❌ YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_key} 시크릿이 없습니다.")

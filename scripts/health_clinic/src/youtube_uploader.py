@@ -18,8 +18,11 @@ from config import LANGUAGES
 # 이 리포의 다른 모든 유튜브 파이프라인(플리 5채널, 아카이브 8채널)과 동일한 패턴.
 # 시크릿 슬롯(저장소당 100개 한도)을 아끼려고 3개를 JSON 하나로 묶어서 저장한다
 # (아카이브 채널들의 ARCHIVE_OUTPUT_FOLDER_IDS_JSON과 동일한 패턴).
-YOUTUBE_OAUTH_CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID_NEW") or os.environ.get("YOUTUBE_OAUTH_CLIENT_ID", "")
-YOUTUBE_OAUTH_CLIENT_SECRET = os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET_NEW") or os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET", "")
+# 2026-08-15: _NEW를 우선하던 순서가 실제로는 폐기된 클라이언트를 골라서
+# unauthorized_client를 유발하는 버그였음(curio_upload.py와 동일 문제, 확인/수정됨) —
+# plain YOUTUBE_OAUTH_CLIENT_ID가 오늘 검증된 올바른 값이라 순서를 바꿈.
+YOUTUBE_OAUTH_CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID") or os.environ.get("YOUTUBE_OAUTH_CLIENT_ID_NEW", "")
+YOUTUBE_OAUTH_CLIENT_SECRET = os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET") or os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET_NEW", "")
 
 try:
     _REFRESH_TOKENS = json.loads(os.environ.get("HEALTH_CLINIC_YOUTUBE_REFRESH_TOKENS_JSON", "{}"))

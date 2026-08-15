@@ -54,10 +54,13 @@ def _env_fallback(*names):
     return ""
 
 
+# 2026-08-15: _NEW를 우선하던 순서가 폐기된 클라이언트를 골라 unauthorized_client를
+# 유발하는 버그였음(curio_upload.py와 동일 문제) — plain YOUTUBE_OAUTH_CLIENT_ID가
+# 오늘 검증된 올바른 값이라 순서를 바꿈.
 YOUTUBE_OAUTH_CLIENT_ID = _env_fallback(
-    f"YOUTUBE_OAUTH_CLIENT_ID_{CK}", "YOUTUBE_OAUTH_CLIENT_ID_NEW", "YOUTUBE_OAUTH_CLIENT_ID")
+    f"YOUTUBE_OAUTH_CLIENT_ID_{CK}", "YOUTUBE_OAUTH_CLIENT_ID", "YOUTUBE_OAUTH_CLIENT_ID_NEW")
 YOUTUBE_OAUTH_CLIENT_SECRET = _env_fallback(
-    f"YOUTUBE_OAUTH_CLIENT_SECRET_{CK}", "YOUTUBE_OAUTH_CLIENT_SECRET_NEW", "YOUTUBE_OAUTH_CLIENT_SECRET")
+    f"YOUTUBE_OAUTH_CLIENT_SECRET_{CK}", "YOUTUBE_OAUTH_CLIENT_SECRET", "YOUTUBE_OAUTH_CLIENT_SECRET_NEW")
 YOUTUBE_OAUTH_REFRESH_TOKEN = os.environ.get(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{CK}", "")
 
 # 시크릿 슬롯(저장소당 100개 한도)을 아끼려고 채널별 완성폴더 ID를 JSON 하나로 묶어서 저장

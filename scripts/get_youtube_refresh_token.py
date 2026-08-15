@@ -74,6 +74,16 @@ EXTRA_CHANNELS = {
     "classic_reads": "CLASSIC_READS_TIMES",
 }
 
+# 2026-08-15: Health Clinic 3채널도 같은 client_id 불일치로 unauthorized_client였음.
+# 이 셋은 시크릿 이름 접두어 자체가 다름(YOUTUBE_OAUTH_REFRESH_TOKEN_ 아니라
+# HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_) — 값은 EXTRA_CHANNELS_FULL_NAME에 전체
+# 시크릿 이름을 직접 넣어서 처리.
+EXTRA_CHANNELS_FULL_NAME = {
+    "health_kr": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR",
+    "health_en": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN",
+    "health_jp": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP",
+}
+
 
 def log(msg):
     print(msg, flush=True)
@@ -101,7 +111,7 @@ def main():
         }
     }
 
-    all_keys = CHANNELS + list(EXTRA_CHANNELS.keys())
+    all_keys = CHANNELS + list(EXTRA_CHANNELS.keys()) + list(EXTRA_CHANNELS_FULL_NAME.keys())
     log(f"채널 {len(all_keys)}개 각각에 대해 순서대로 진행합니다. 그 채널이 연결된 구글 계정으로 로그인해서 승인해주세요.")
     log("(다른 채널 차례에는 반드시 그 채널 계정으로 다시 로그인/전환해야 합니다)\n")
 
@@ -136,8 +146,11 @@ def main():
     log("발급된 리프레시 토큰 (GitHub Secrets에 아래 이름으로 등록하세요):")
     log("=" * 60)
     for key, token in results.items():
-        secret_suffix = EXTRA_CHANNELS.get(key, key.upper())
-        log(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_suffix} = {token}")
+        if key in EXTRA_CHANNELS_FULL_NAME:
+            log(f"{EXTRA_CHANNELS_FULL_NAME[key]} = {token}")
+        else:
+            secret_suffix = EXTRA_CHANNELS.get(key, key.upper())
+            log(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_suffix} = {token}")
 
 
 if __name__ == "__main__":
