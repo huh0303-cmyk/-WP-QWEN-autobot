@@ -1,0 +1,62 @@
+name: (임시) GSC k-health365 진단
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: "k-health365.com GSC 속성/URL검사 원본 응답 확인"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python - <<'EOF'
+          import sys, json, requests
+          sys.path.insert(0, "scripts")
+          from daily_site_traffic import get_gsc_token, gsc_get
+
+          token = get_gsc_token()
+          r = gsc_get(token, "/sites")
+          entries = r.json().get("siteEntry", [])
+          print("전체 GSC 계정에 연결된 property 수:", len(entries))
+          matches = [s for s in entries if "khealth" in (s.get("siteUrl") or "")]
+          print("khealth 관련 property:", matches)
+
+          wp_r = requests.get(
+              "https://k-health365.com/wp-json/wp/v2/posts",
+              params={"per_page": 3, "_fields": "id,title,link"},
+          )
+          posts = wp_r.json()
+          print("\n테스트 대상 글:")
+          for p in posts:
+              print(" -", p["link"])
+
+          candidates = ["https://k-health365.com", "https://k-health365.com/",
+                        "sc-domain:k-health365.com", "http://k-health365.com"]
+          for post in posts[:2]:
+              url = post["link"]
+              print(f"\n=== URL: {url} ===")
+              for site_prop in candidates:
+                  resp = requests.post(
+                      "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+                      headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                      json={"inspectionUrl": url, "siteUrl": site_prop},
+                      timeout=20,
+                  )
+                  print(f"  property='{site_prop}' -> HTTP {resp.status_code}")
+                  if resp.status_code == 200:
+                      body = resp.json()
+                      isr = body.get("inspectionResult", {}).get("indexStatusResult", {})
+                      print(f"     verdict={isr.get('verdict')} coverageState={isr.get('coverageState')} "
+                            f"robotsTxtState={isr.get('robotsTxtState')} indexingState={isr.get('indexingState')} "
+                            f"lastCrawlTime={isr.get('lastCrawlTime')}")
+                  else:
+                      print(f"     body: {resp.text[:300]}")
+          EOF
