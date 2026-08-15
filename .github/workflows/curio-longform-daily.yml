@@ -1,4 +1,4 @@
-name: Curio/Times 지식채널 장편 자동생성 (주3회)
+name: Curio/Times 지식채널 장편 자동생성 (채널당 주1회, 하루 2채널)
 
 # NASA_SPACE_TIMES / HISTORY_TODAY_TIMES / SCIENCE_FACTS_TIMES / CLASSICAL_JOURNAL /
 # MYTH_LEGEND_TIMES / INVENTION_TIMES / AMERICAN_ARCHIVE_TIMES / SILENT_ERA_TIMES /
@@ -31,17 +31,21 @@ on:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
   schedule:
-    # 월/수/금, KST 새벽~아침 시간대로 10채널 분산(전부 어중간한 분 단위)
-    - cron: "17 20 * * 1,3,5"  # nasa - 05:17 KST
-    - cron: "34 20 * * 1,3,5"  # history - 05:34 KST
-    - cron: "51 20 * * 1,3,5"  # science - 05:51 KST
-    - cron: "8 21 * * 1,3,5"   # classical - 06:08 KST
-    - cron: "26 21 * * 1,3,5"  # myth - 06:26 KST
-    - cron: "43 21 * * 1,3,5"  # invention - 06:43 KST
-    - cron: "1 22 * * 1,3,5"   # american_archive - 07:01 KST
-    - cron: "19 22 * * 1,3,5"  # silent_era - 07:19 KST
-    - cron: "37 22 * * 1,3,5"  # retro_reels - 07:37 KST
-    - cron: "55 22 * * 1,3,5"  # classic_reads - 07:55 KST
+    # 2026-08-15 재설계: Veo 3 Lite Generate가 Tier 1 기준 일일 10회 한도인데,
+    # 영상 1개당 인트로클립 4개=Veo 4회 필요함. 원래 스케줄은 월/수/금마다 10채널이
+    # 전부 동시에 발동해서 하루 40회가 필요했음(한도의 4배 초과, 그날 바로
+    # RESOURCE_EXHAUSTED 남). 하루 2채널(Veo 8회, 여유 2회)로 낮추고 월~금 5일에
+    # 나눠서 10채널을 주 1회씩 커버하도록 재분배 — [[feedback_dont_batch_trigger_pipelines]].
+    - cron: "17 20 * * 1"  # 월: nasa - 05:17 KST
+    - cron: "34 20 * * 1"  # 월: history - 05:34 KST
+    - cron: "17 20 * * 2"  # 화: science - 05:17 KST
+    - cron: "34 20 * * 2"  # 화: classical - 05:34 KST
+    - cron: "17 20 * * 3"  # 수: myth - 05:17 KST
+    - cron: "34 20 * * 3"  # 수: invention - 05:34 KST
+    - cron: "17 20 * * 4"  # 목: american_archive - 05:17 KST
+    - cron: "34 20 * * 4"  # 목: silent_era - 05:34 KST
+    - cron: "17 20 * * 5"  # 금: retro_reels - 05:17 KST
+    - cron: "34 20 * * 5"  # 금: classic_reads - 05:34 KST
 
 concurrency:
   group: curio-longform-daily
@@ -62,16 +66,16 @@ jobs:
             TOPIC_IN="${{ github.event.inputs.topic }}"
           else
             case "${{ github.event.schedule }}" in
-              "17 20 * * 1,3,5") CH="nasa" ;;
-              "34 20 * * 1,3,5") CH="history" ;;
-              "51 20 * * 1,3,5") CH="science" ;;
-              "8 21 * * 1,3,5")  CH="classical" ;;
-              "26 21 * * 1,3,5") CH="myth" ;;
-              "43 21 * * 1,3,5") CH="invention" ;;
-              "1 22 * * 1,3,5")  CH="american_archive" ;;
-              "19 22 * * 1,3,5") CH="silent_era" ;;
-              "37 22 * * 1,3,5") CH="retro_reels" ;;
-              "55 22 * * 1,3,5") CH="classic_reads" ;;
+              "17 20 * * 1") CH="nasa" ;;
+              "34 20 * * 1") CH="history" ;;
+              "17 20 * * 2") CH="science" ;;
+              "34 20 * * 2") CH="classical" ;;
+              "17 20 * * 3") CH="myth" ;;
+              "34 20 * * 3") CH="invention" ;;
+              "17 20 * * 4") CH="american_archive" ;;
+              "34 20 * * 4") CH="silent_era" ;;
+              "17 20 * * 5") CH="retro_reels" ;;
+              "34 20 * * 5") CH="classic_reads" ;;
               *) CH="nasa" ;;
             esac
             TOPIC_IN=""
