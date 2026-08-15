@@ -37,11 +37,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 class RULES:
-    # 2026-08-15: Veo는 Tier 1 기준 하루 10회로 타이트하지만 이미지(Nano Banana)는
-    # 하루 2000회로 여유가 넘쳐서, 영상클립 비중을 줄이고 이미지 비중을 늘려
-    # 재배분함 — 4개(Veo 4회/영상)에서 2개(Veo 2회/영상)로. 초반 후킹용 실제
-    # 모션이 있는 클립은 최소한으로 유지하고, 나머지는 여유 자원인 이미지로 보강.
-    INTRO_VIDEO_CLIP_COUNT = 2
+    # 2026-08-15: 인트로 영상클립 개수는 시청유지율에 실제로 중요해서 4개로
+    # 유지(사용자 확정) — 대신 Veo 하루 10회 한도(Tier 1)에 맞춰 스케줄 쪽을
+    # 하루 2채널(Veo 8회, 여유 2회)로 분산해서 무료량을 최대 활용함
+    # (curio-longform-daily.yml 참고).
+    INTRO_VIDEO_CLIP_COUNT = 4
     INTRO_VIDEO_MODEL = "veo-3.1-lite-generate-preview"
     INTRO_VIDEO_DURATION_SECONDS = 8
 
@@ -73,9 +73,7 @@ ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID") or "21m00Tcm4TlvDq8i
 ELEVENLABS_MODEL = "eleven_multilingual_v2"
 
 W, H = 1920, 1080
-# 2026-08-15: Veo 클립을 4→2로 줄인 만큼(RULES 주석 참고) 이미지로 보강 —
-# 여유 자원(Nano Banana) 쪽으로 재배분, 총 비트 수/영상 길이는 비슷하게 유지.
-TARGET_IMAGE_COUNT = 29
+TARGET_IMAGE_COUNT = 27
 
 LANG_NAMES = {"ko": "Korean", "en": "English", "ja": "Japanese"}
 
