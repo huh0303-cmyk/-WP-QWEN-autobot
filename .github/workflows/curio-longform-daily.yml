@@ -114,7 +114,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum fonts-dejavu-core
 
-      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 google-genai -q
 
       - name: "장편 영상 생성"
         env:
