@@ -165,9 +165,12 @@ def resolve_query_site(domain, accessible):
 def main():
     execute = "--execute" in sys.argv
     only_site = None
+    exclude_sites = set()
     for a in sys.argv[1:]:
         if a.startswith("--site="):
             only_site = a.split("=", 1)[1]
+        elif a.startswith("--exclude="):
+            exclude_sites = {s.strip() for s in a.split("=", 1)[1].split(",") if s.strip()}
 
     mode = "실행(비공개 전환)" if execute else "리포트만(DRY RUN)"
     log(f"{'='*60}")
@@ -193,6 +196,9 @@ def main():
 
     for site_url, secret_name in SITE_SECRET_MAP.items():
         if only_site and only_site not in site_url:
+            continue
+        if site_url in exclude_sites:
+            log(f"⏭  {site_url} — 제외 대상, 스킵")
             continue
         wp_pass = os.getenv(secret_name, "")
         if not wp_pass:

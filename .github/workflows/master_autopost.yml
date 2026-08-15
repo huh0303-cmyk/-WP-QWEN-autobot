@@ -1131,6 +1131,9 @@ jobs:
           if [ -n "${{ github.event.inputs.target_site }}" ]; then
             ARGS="--site=${{ github.event.inputs.target_site }}"
           fi
+          if [ -n "${{ github.event.inputs.exclude_site }}" ]; then
+            ARGS="$ARGS --exclude=${{ github.event.inputs.exclude_site }}"
+          fi
           if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
             ARGS="$ARGS --execute"
           fi
