@@ -58,6 +58,22 @@ SCOPE = "https://www.googleapis.com/auth/youtube.upload"
 
 CHANNELS = ["globalmusic", "healing", "starbucks", "mbb", "kpop"]
 
+# 2026-08-15: 위 5개 플리채널과 똑같이 공용 client_id 불일치로 깨져있던 걸 확인한
+# 지식/아카이브 10채널도 추가. 짧은 키와 실제 GitHub Secret 접미사가 다른
+# 채널들이 있어서(예: nasa → NASA_SPACE_TIMES) 별도 매핑 사용.
+EXTRA_CHANNELS = {
+    "nasa": "NASA_SPACE_TIMES",
+    "history": "HISTORY_TODAY_TIMES",
+    "science": "SCIENCE_FACTS_TIMES",
+    "classical": "CLASSICAL_JOURNAL",
+    "myth": "MYTH_LEGEND_TIMES",
+    "invention": "INVENTION_TIMES",
+    "american_archive": "AMERICAN_ARCHIVE_TIMES",
+    "silent_era": "SILENT_ERA_TIMES",
+    "retro_reels": "RETRO_REELS_TIMES",
+    "classic_reads": "CLASSIC_READS_TIMES",
+}
+
 
 def log(msg):
     print(msg, flush=True)
@@ -85,11 +101,12 @@ def main():
         }
     }
 
-    log("채널 5개 각각에 대해 순서대로 진행합니다. 그 채널이 연결된 구글 계정으로 로그인해서 승인해주세요.")
+    all_keys = CHANNELS + list(EXTRA_CHANNELS.keys())
+    log(f"채널 {len(all_keys)}개 각각에 대해 순서대로 진행합니다. 그 채널이 연결된 구글 계정으로 로그인해서 승인해주세요.")
     log("(다른 채널 차례에는 반드시 그 채널 계정으로 다시 로그인/전환해야 합니다)\n")
 
     results = {}
-    for key in CHANNELS:
+    for key in all_keys:
         go = input(f"=== [{key}] 채널 인증 시작 — 진행하려면 엔터, 건너뛰려면 s+엔터: ").strip().lower()
         if go == "s":
             log(f"   ⏭️  {key} 건너뜀\n")
@@ -119,7 +136,8 @@ def main():
     log("발급된 리프레시 토큰 (GitHub Secrets에 아래 이름으로 등록하세요):")
     log("=" * 60)
     for key, token in results.items():
-        log(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{key.upper()} = {token}")
+        secret_suffix = EXTRA_CHANNELS.get(key, key.upper())
+        log(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_suffix} = {token}")
 
 
 if __name__ == "__main__":
