@@ -19,40 +19,51 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install google-api-python-client google-auth google-auth-httplib2 requests -q
-      - name: "refresh token 자체가 유효한지 저비용 확인 (raw grant, youtube.upload 스코프 제약 없이)"
+      - name: "공용 client_id를 쓰는 모든 채널 refresh token을 한 번에 저비용 확인"
         env:
-          CHANNEL_KEY: ${{ github.event.inputs.channel_key }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_MBB: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES }}
         run: |
           python - <<'EOF'
           import os
-          import hashlib
           import requests
 
-          key = os.environ.get("CHANNEL_KEY", "").strip().upper()
-          token_env_name = f"YOUTUBE_OAUTH_REFRESH_TOKEN_{key}" if key else "YOUTUBE_OAUTH_REFRESH_TOKEN"
-          refresh_token = os.environ.get(token_env_name, "")
           cid = os.environ["YOUTUBE_OAUTH_CLIENT_ID"]
-          print(f"확인 대상 시크릿: {token_env_name}")
-          print(f"토큰 길이: {len(refresh_token)}자 / sha256 앞 12자: "
-                f"{hashlib.sha256(refresh_token.encode()).hexdigest()[:12] if refresh_token else '(비어있음)'}")
-          print(f"client_id 앞 20자: {cid[:20]}...")
+          csec = os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"]
+          print(f"client_id 앞 20자: {cid[:20]}...\n")
 
-          # channels.list는 youtube.upload 스코프 토큰에선 403 나므로(2026-08-14 확인된
-          # 하드 제약) 여기선 raw refresh grant만 확인 — 200이면 이 저장소 시크릿 조합
-          # (client_id/secret + 이 refresh token)이 GitHub Actions에서 실제로 유효하다는 뜻.
-          r = requests.post("https://oauth2.googleapis.com/token", data={
-              "client_id": cid,
-              "client_secret": os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"],
-              "refresh_token": refresh_token,
-              "grant_type": "refresh_token",
-          })
-          print(f"refresh grant 결과: HTTP {r.status_code}")
-          print(r.text[:300])
+          keys = [
+              "GLOBALMUSIC", "HEALING", "STARBUCKS", "MBB", "KPOP",
+              "NASA_SPACE_TIMES", "HISTORY_TODAY_TIMES", "SCIENCE_FACTS_TIMES",
+              "CLASSICAL_JOURNAL", "MYTH_LEGEND_TIMES", "INVENTION_TIMES",
+              "AMERICAN_ARCHIVE_TIMES", "SILENT_ERA_TIMES", "RETRO_REELS_TIMES",
+              "CLASSIC_READS_TIMES",
+          ]
+          for key in keys:
+              tok = os.environ.get(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{key}", "")
+              if not tok:
+                  print(f"{key}: (시크릿 없음)")
+                  continue
+              r = requests.post("https://oauth2.googleapis.com/token", data={
+                  "client_id": cid, "client_secret": csec,
+                  "refresh_token": tok, "grant_type": "refresh_token",
+              })
+              status = "OK" if r.status_code == 200 else r.json().get("error", r.status_code)
+              print(f"{key}: HTTP {r.status_code} ({status})")
           EOF
