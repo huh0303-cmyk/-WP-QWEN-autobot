@@ -571,6 +571,22 @@ jobs:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
         run: python scripts/gsc_indexed_ranking.py
 
+  gsc-indexed-sample-ranking:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'indexranksample' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: "27개 사이트 표본 URL 검사 기반 실제 색인율 순위"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/gsc_indexed_sample_ranking.py
+
   check-sites:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'check' }}
