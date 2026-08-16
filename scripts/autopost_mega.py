@@ -1265,6 +1265,16 @@ Do not write a TITLE line (a separate system generates the title). Do not restat
 # ★ 유틸리티
 # ============================================================
 def generate_content_gemini(prompt):
+    # 2026-08-17: OPENAI_API_KEY가 있으면 ChatGPT로 라우팅 — 27개 사이트 글쓰기
+    # 엔진 "대수술" 결정. 이미지(Pixabay/Pexels)는 그대로 유지, 텍스트만 교체.
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from openai_text import openai_available, openai_generate_text
+        if openai_available():
+            return openai_generate_text(prompt, temperature=0.85, max_retries=3)
+    except ImportError:
+        pass
+
     global GEMINI_MODEL, _gemini_fallback_active
     for attempt in range(3):
         try:

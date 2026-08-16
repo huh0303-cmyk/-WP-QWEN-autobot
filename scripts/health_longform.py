@@ -107,6 +107,15 @@ def get_duration(path):
 # 1. 대본 생성 (Gemini) — beats 단위 JSON
 # ════════════════════════════════════════════════════════════
 def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
+    # 2026-08-17: OPENAI_API_KEY가 있으면 ChatGPT로 라우팅 (curio_longform.py와 동일 원칙).
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from openai_text import openai_available, openai_generate_text
+        if openai_available():
+            return openai_generate_text(prompt, temperature=temperature, max_retries=max_retries)
+    except ImportError:
+        pass
+
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{GEMINI_TEXT_MODEL}:generateContent?key={GEMINI_API_KEY}")
     body = {"contents": [{"parts": [{"text": prompt}]}],

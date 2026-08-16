@@ -112,6 +112,16 @@ def _is_billing_exhausted(status_code, body_text):
 
 
 def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
+    # 2026-08-17: OPENAI_API_KEY가 있으면 텍스트 생성은 ChatGPT로 라우팅
+    # (이미지/영상은 그대로 Gemini — 비용 주범이 아니었음). 이 함수를 가져다
+    # 쓰는 classic_reads/nasa/archive_footage 등 전부에 자동 적용됨.
+    try:
+        from openai_text import openai_available, openai_generate_text
+        if openai_available():
+            return openai_generate_text(prompt, temperature=temperature, max_retries=max_retries)
+    except ImportError:
+        pass
+
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{GEMINI_TEXT_MODEL}:generateContent?key={GEMINI_API_KEY}")
     body = {"contents": [{"parts": [{"text": prompt}]}],
@@ -161,11 +171,21 @@ CHANNEL_TOPICS = {
                      "world that shaped them",
 }
 
+# 2026-08-17: 원래 목표가 "무료 실물 영상/이미지 우선"이었는데, Veo 인트로클립을
+# 계속 쓰던 채널이 남아있었음 — classical(작곡가 초상화)/myth(신화 소재 미술품)는
+# 실제 퍼블릭도메인 미술관 이미지가 풍부해서 Veo 없이도 된다(사용자 지시).
+# science는 추상적 개념이 많아 당장은 보류 — 나중에 시도 가능.
+NO_VEO_CHANNELS = {"classical", "myth"}
+MUSEUM_QUERY_HINT = {
+    "classical": "classical composer portrait painting",
+    "myth": "mythology art",
+}
+
 
 def generate_script(topic, lang, channel_key="nasa"):
     lang_name = LANG_NAMES.get(lang, "English")
-    n_intro = RULES.INTRO_VIDEO_CLIP_COUNT
-    n_images = TARGET_IMAGE_COUNT
+    n_intro = 0 if channel_key in NO_VEO_CHANNELS else RULES.INTRO_VIDEO_CLIP_COUNT
+    n_images = TARGET_IMAGE_COUNT + (RULES.INTRO_VIDEO_CLIP_COUNT if channel_key in NO_VEO_CHANNELS else 0)
     domain = CHANNEL_TOPICS.get(channel_key, "general knowledge")
 
     prompt = f"""You are writing a narration script for an ~7-minute YouTube educational
@@ -657,11 +677,28 @@ def main():
 
     log("3/5 나머지 정지 이미지(Ken Burns) 생성 중...")
     image_beats = [b for b in beats if b["type"] == "image"]
+
+    # 2026-08-17: classical/myth는 AI 생성 대신 실제 퍼블릭도메인 박물관
+    # 소장품(초상화/신화미술)을 우선 쓴다 — 부족한 만큼만 Gemini로 채운다.
+    museum_pool = []
+    if channel_key in MUSEUM_QUERY_HINT:
+        try:
+            from museum_sources import fetch_museum_images
+            query = f"{topic} {MUSEUM_QUERY_HINT[channel_key]}"
+            museum_pool = fetch_museum_images(query, workdir, len(image_beats), prefix="museum")
+            if museum_pool:
+                log(f"   실제 미술관 이미지 {len(museum_pool)}장 확보 (검색어: {query!r})")
+        except Exception as e:
+            log(f"   ⚠️ 미술관 이미지 소싱 실패, AI 생성으로 대체: {e}")
+
     for idx, beat in enumerate(image_beats):
         log(f"   [{idx+1}/{len(image_beats)}] {beat['image_prompt'][:50]}...")
         img_path = os.path.join(workdir, f"img_{idx}.png")
         if os.path.exists(img_path):
             log("      (재사용된 이미지, 생성 스킵)")
+        elif idx < len(museum_pool):
+            shutil.copyfile(museum_pool[idx], img_path)
+            log("      (실제 미술관 이미지 사용)")
         elif not gemini_generate_image(beat["image_prompt"], img_path):
             log(f"   ⚠️ 이미지 생성 실패, 스킵: beat {idx}")
             continue
