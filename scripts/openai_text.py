@@ -17,7 +17,7 @@ import os
 import requests
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-luna")
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 
 
@@ -28,18 +28,29 @@ def openai_available():
 def openai_generate_text(prompt, temperature=0.9, max_retries=5):
     """curio_longform.py의 gemini_generate_text와 동일한 계약(플레인 텍스트
     문자열 반환, 실패시 RuntimeError) — 호출부를 바꾸지 않고 내부 구현만
-    바꿔치기할 수 있게 시그니처를 맞췄다."""
+    바꿔치기할 수 있게 시그니처를 맞췄다.
+
+    2026-08-17: gpt-5.6 계열은 temperature 커스텀 값을 아예 지원 안 함
+    (기본값 1만 허용, 다른 값 주면 400) — 이 모델일 땐 아예 안 보내고,
+    혹시 다른 모델로 바뀌어도 안전하게 같은 400을 만나면 temperature
+    없이 한 번 더 시도한다."""
     import time as _time
 
     headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}
-    body = {
-        "model": OPENAI_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": temperature,
-    }
+    send_temperature = not OPENAI_MODEL.startswith("gpt-5.6")
+
+    def _body(with_temp):
+        b = {"model": OPENAI_MODEL, "messages": [{"role": "user", "content": prompt}]}
+        if with_temp:
+            b["temperature"] = temperature
+        return b
+
     last_err = None
     for attempt in range(max_retries):
-        r = requests.post(OPENAI_URL, headers=headers, json=body, timeout=60)
+        r = requests.post(OPENAI_URL, headers=headers, json=_body(send_temperature), timeout=60)
+        if r.status_code == 400 and send_temperature and "temperature" in r.text.lower():
+            send_temperature = False
+            r = requests.post(OPENAI_URL, headers=headers, json=_body(False), timeout=60)
         if r.status_code == 429 or r.status_code >= 500:
             last_err = f"{r.status_code}: {r.text[:200]}"
             wait = min(15 * (2 ** attempt), 120)
