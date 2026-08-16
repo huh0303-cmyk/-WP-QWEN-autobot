@@ -133,8 +133,9 @@ DURATION_POOL_MAX_SEC = 100 * 60
 CHANNEL_DURATION_POOL_SEC = {
     "starbucks": (56 * 60, 190 * 60),
     "globalmusic": (64 * 60, 132 * 60),
-    # healing: 2~3시간짜리 긴 수면/이완용 재생목록으로 고정(2026-08-13 사용자 요청).
-    "healing": (120 * 60, 180 * 60),
+    # healing: 3~4시간짜리 긴 수면/이완용 재생목록으로 고정(2026-08-16 사용자 요청,
+    # 기존 2~3시간에서 연장).
+    "healing": (180 * 60, 240 * 60),
 }
 IMAGE_SWAP_SEC = 15 * 60          # AI 이미지 2장 전환 간격
 VIDEO_W, VIDEO_H = 1920, 1080
@@ -379,8 +380,8 @@ CHANNEL_DESC_CONTEXT = {
     # 로파이 인스트루멘탈이 아니라 영어/불어/독일어 등 전 세계 모든 언어의
     # 달달한(로맨틱/스위트) 보컬곡 채널로 확정.
     "globalmusic": "a sweet, romantic global music channel featuring vocal love songs in many different languages (English, French, German, and more — warm, tender, feel-good mood)",
-    # healing: 빗소리/물소리(시냇물)/새소리 등 자연음 위주, 2~3시간 롱폼(사용자 지시 그대로)
-    "healing": "an ambient nature-sounds channel for relaxation and sleep (rain sounds, water/stream sounds, birdsong, temple wind chimes — no lyrics, pure atmosphere, long-form 2-3 hour sessions)",
+    # healing: 빗소리/물소리(시냇물)/새소리/천둥 등 자연음 위주, 3~4시간 롱폼(2026-08-16 연장)
+    "healing": "an ambient nature-sounds channel for relaxation and sleep (rain sounds, thunderstorms, water/stream sounds, wind, birdsong, temple wind chimes — no lyrics, pure atmosphere, long-form 3-4 hour sessions)",
     # starbucks(=starbucksvibes 채널): 편한 카페 재즈, 보컬 없음(사용자 지시 그대로)
     "starbucks": "a relaxing instrumental cafe jazz channel (no vocals, smooth jazz, warm laid-back cafe mood)",
     "mbb": "a classical music channel centered on Mozart, Bach and Beethoven (and other classical composers)",
@@ -411,7 +412,7 @@ PLAYLIST_FALLBACK_HOOKS = {
         "hook": "Real, layered nature ambience — the kind that quiets a busy mind almost instantly.",
         "body": (
             "No music, no lyrics, no distractions — just rain, flowing water, birdsong, and the kind of quiet "
-            "atmosphere that's genuinely hard to find anywhere else. This is built to run for 2-3 hours in the "
+            "atmosphere that's genuinely hard to find anywhere else. This is built to run for 3-4 hours in the "
             "background while you sleep, study, meditate, or just need the world to feel a little softer for "
             "a while. Put it on, dim the lights, and let it do the work."
         ),
@@ -667,18 +668,20 @@ def build_ai_images(topic, workdir):
             f"{style}",
         ]
     elif CHANNEL_KEY == "healing":
-        # 힐링 채널: 안개 낀 숲/시냇물/풍경소리 — 차분한 청록 톤, 사람 없음
+        # 힐링 채널: 2026-08-16 사용자 지시("썸네일이 정글같이 멋있어야 함")로
+        # 안개낀 차분한 톤에서 더 드라마틱하고 웅장한 정글/우림 톤으로 전환 —
+        # 조용함은 유지하되(사람 없음, 텍스트 없음), 임팩트 있는 비주얼로.
         style = (
-            "real photograph, cinematic, moody desaturated blue-green color grade, "
-            "misty and quiet atmosphere, soft natural light, no people, no text, no watermark"
+            "real photograph, cinematic and dramatic lighting, lush deep-green rainforest "
+            "or jungle color grade, epic and immersive atmosphere, no people, no text, no watermark"
         )
         prompts = [
-            f"A misty forest or mountain stream scene evoking '{topic}', rain droplets on "
-            f"leaves or gentle mist between trees, tranquil and meditative, {style}",
-            f"A different quiet nature close-up related to '{topic}' — a traditional Korean "
-            f"temple's curved roof tile edge (giwa) or wooden eaves (cheoma) against a misty "
-            f"forest backdrop, rain falling past the eaves, a flowing creek over rocks, or a "
-            f"rainy window looking out at forest, {style}",
+            f"A dramatic, epic lush rainforest or jungle scene evoking '{topic}', dense "
+            f"greenery, shafts of light breaking through the canopy or heavy rain falling "
+            f"through the trees, striking and cinematic composition, {style}",
+            f"A different epic nature scene related to '{topic}' — a powerful waterfall in "
+            f"a jungle gorge, a moody storm-lit forest with lightning in the distance, or a "
+            f"dramatic misty mountain stream framed by dense tropical foliage, {style}",
         ]
     elif CHANNEL_KEY == "starbucks":
         # 카페음악 채널 (2026-08-13 레트로 컨셉으로 갱신): 빈티지 턴테이블/레코드,

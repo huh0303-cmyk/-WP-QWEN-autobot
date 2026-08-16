@@ -138,6 +138,31 @@ def make_stream(dur, workdir, out_path):
     _scatter_over_bed(bed, plink, dur, out_path, min_gap=0.6, max_gap=1.8)
 
 
+def make_thunderstorm(dur, workdir, out_path):
+    """무거운 비 배경 위에 가끔(25~75초 간격) 천둥(크랙+낮은 우르릉거림)이 치는
+    폭풍우 사운드. 2026-08-16 사용자 요청("번개천둥있는것도")."""
+    bed = os.path.join(workdir, "_storm_bed.m4a")
+    run_ffmpeg(["ffmpeg", "-y", "-f", "lavfi", "-i",
+                f"anoisesrc=color=white:amplitude=0.4:duration={dur}",
+                "-af", "highpass=f=250,lowpass=f=8000,"
+                        "tremolo=f=4.1:d=0.18,tremolo=f=6.7:d=0.12,tremolo=f=0.15:d=0.1",
+                "-c:a", "aac", "-b:a", "192k", bed])
+
+    thunder = os.path.join(workdir, "_thunder_crack.wav")
+    # 날카로운 크랙(임팩트)과 낮게 우르릉대는 럼블 두 레이어를 합성해 천둥 한 번을 만든다.
+    run_ffmpeg(["ffmpeg", "-y",
+                "-f", "lavfi", "-i", "anoisesrc=color=white:amplitude=1.0:duration=0.35",
+                "-f", "lavfi", "-i", "anoisesrc=color=brown:amplitude=1.0:duration=4.5",
+                "-filter_complex",
+                "[0:a]highpass=f=800,lowpass=f=4000,afade=t=out:st=0.03:d=0.32,volume=0.9[crack];"
+                "[1:a]lowpass=f=120,tremolo=f=7:d=0.5,tremolo=f=2.3:d=0.4,"
+                "afade=t=in:st=0:d=0.3,afade=t=out:st=3.5:d=1.0,volume=0.7[rumble];"
+                "[crack][rumble]amix=inputs=2:duration=longest:normalize=0[out]",
+                "-map", "[out]", thunder])
+
+    _scatter_over_bed(bed, thunder, dur, out_path, min_gap=25.0, max_gap=75.0)
+
+
 def make_wind(dur, workdir, out_path):
     run_ffmpeg(["ffmpeg", "-y", "-f", "lavfi", "-i",
                 f"anoisesrc=color=brown:amplitude=0.32:duration={dur}",
