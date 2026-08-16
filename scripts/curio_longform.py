@@ -100,6 +100,17 @@ def get_duration(path):
 # ════════════════════════════════════════════════════════════
 # 1. 대본 생성 (Gemini) — beats 단위 JSON
 # ════════════════════════════════════════════════════════════
+def _is_billing_exhausted(status_code, body_text):
+    """결제/크레딧 고갈 에러는 몇 번을 재시도해도 절대 성공하지 않는다 —
+    재시도할수록 시간과 API 요청수만 낭비된다(2026-08-16, 실제로 5회 재시도x
+    최대 120초 백오프로 호출 하나당 5분 넘게 낭비되는 게 발견됨). 이런 에러는
+    즉시 포기하고 위로 올려서, 호출부가 "이 실행은 크레딧부터 채워야 한다"는
+    걸 바로 알 수 있게 한다."""
+    if status_code != 429:
+        return False
+    return "prepayment credits are depleted" in body_text.lower() or "billing" in body_text.lower()
+
+
 def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{GEMINI_TEXT_MODEL}:generateContent?key={GEMINI_API_KEY}")
@@ -110,6 +121,8 @@ def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
         r = requests.post(url, json=body, timeout=60)
         if r.status_code == 429 or r.status_code >= 500:
             last_err = f"{r.status_code}: {r.text[:200]}"
+            if _is_billing_exhausted(r.status_code, r.text):
+                raise RuntimeError(f"Gemini 결제/크레딧 고갈 — 재시도 없이 즉시 중단: {last_err}")
             wait = min(15 * (2 ** attempt), 120)
             log(f"   (텍스트 생성 재시도 대기 {wait}초 - {last_err})")
             time.sleep(wait)
@@ -257,6 +270,10 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
                 r = requests.post(url, json=body, timeout=90)
                 if r.status_code == 429 or r.status_code >= 500:
                     last_err = f"{r.status_code}: {r.text[:200]}"
+                    # 결제/크레딧 고갈은 재시도로는 절대 안 풀린다 — 즉시 중단해서
+                    # 5회x2모델 재시도 낭비(최대 몇 분)를 막는다(2026-08-16).
+                    if _is_billing_exhausted(r.status_code, r.text):
+                        raise RuntimeError(f"Gemini 결제/크레딧 고갈 — 재시도 없이 즉시 중단: {last_err}")
                     continue
                 if r.status_code != 200:
                     last_err = f"{r.status_code}: {r.text[:200]}"
@@ -269,6 +286,8 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
                             f.write(base64.b64decode(inline["data"]))
                         return True
                 last_err = "응답에 이미지 데이터 없음"
+            except RuntimeError:
+                raise  # 결제 고갈 신호는 그대로 위로 전파 — 재시도 루프에 먹히면 안 됨
             except Exception as e:
                 last_err = str(e)
         # 두 모델 다 실패 -> 레이트리밋일 가능성 높으니 지수 백오프 후 재시도
