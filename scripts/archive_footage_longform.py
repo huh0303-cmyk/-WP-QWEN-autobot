@@ -48,6 +48,7 @@ from nasa_archive_longform import (  # noqa: E402
 
 IA_SEARCH = "https://archive.org/advancedsearch.php"
 IA_METADATA = "https://archive.org/metadata"
+LOC_SEARCH = "https://www.loc.gov/collections/national-screening-room/"
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 CHANNEL_ARCHIVE_CONFIG = {
@@ -126,6 +127,78 @@ def download_file(url, out_path, timeout=180):
             f.write(chunk)
 
 
+# ════════════════════════════════════════════════════════════
+# 1b. 미국 의회도서관(Library of Congress) National Screening Room —
+#     Internet Archive를 보조하는 2차 소스. 컬렉션 자체가 작아서(검색어당
+#     결과가 몇 개 안 됨) 주력 소스로는 안 쓰지만, 사용자가 명시적으로
+#     "미의회도서관에서"라고 지시했으므로 매번 같이 시도해서 실제로
+#     섞어 쓴다. 항목마다 rights 상태가 다를 수 있어 access_restricted/
+#     download_restricted 플래그가 False인 것만 사용한다.
+# ════════════════════════════════════════════════════════════
+def search_loc(query, count):
+    try:
+        r = requests.get(LOC_SEARCH, params={"fo": "json", "q": query, "c": count}, timeout=30)
+        r.raise_for_status()
+        return (r.json().get("results") or [])[:count]
+    except Exception as e:
+        log(f"   ⚠️ LOC 검색 실패({query}): {e}")
+        return []
+
+
+def fetch_loc_clip_info(item_url):
+    if not item_url:
+        return None
+    try:
+        r = requests.get(item_url, params={"fo": "json"}, timeout=30)
+        r.raise_for_status()
+        d = r.json()
+    except Exception:
+        return None
+    item = d.get("item", {}) or {}
+    if item.get("access_restricted"):
+        return None
+    resources = d.get("resources") or []
+    if not resources:
+        return None
+    res = resources[0]
+    if res.get("download_restricted"):
+        return None
+    video_url = res.get("video")
+    if not video_url:
+        return None
+    return {"video_url": video_url, "title": item.get("title", ""),
+            "date": item.get("date") or "", "identifier": item_url}
+
+
+def fetch_loc_clips(query, workdir, n_target=4):
+    docs = search_loc(query, n_target * 2)
+    clips = []
+    for d in docs:
+        if len(clips) >= n_target:
+            break
+        info = fetch_loc_clip_info(d.get("id", ""))
+        if not info:
+            continue
+        safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", info["identifier"])[-60:]
+        raw_path = os.path.join(workdir, f"raw_loc_{safe_name}.mp4")
+        try:
+            if not os.path.exists(raw_path):
+                download_file(info["video_url"], raw_path)
+            dur = get_duration(raw_path)
+            if dur < 3:
+                continue
+            clips.append({
+                "path": raw_path, "title": info["title"], "duration": dur,
+                "identifier": f"LOC:{info['identifier']}",
+                "year": info["date"][:4] if info["date"] else "",
+                "description": "",
+            })
+        except Exception as e:
+            log(f"   ⚠️ LOC 다운로드 실패({info['identifier']}): {e}")
+            continue
+    return clips
+
+
 # 채널별 도메인만으로 재검색할 때 쓸 단순 키워드(구체적 주제로 결과가 없을 때의 폴백).
 _FALLBACK_QUERY = {
     "american_archive": "American history newsreel",
@@ -194,6 +267,15 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=8):
         except Exception as e:
             log(f"   ⚠️ 다운로드 실패({identifier}): {e}")
             continue
+
+    # 미의회도서관(LOC) National Screening Room도 항상 같이 시도해서 섞는다
+    # (Internet Archive만으로 충분해도 사용자가 명시적으로 요청한 소스라 매번 시도).
+    if len(clips) < n_target:
+        loc_clips = fetch_loc_clips(used_query, workdir, n_target=n_target - len(clips))
+        if loc_clips:
+            log(f"   + LOC(미의회도서관)에서 {len(loc_clips)}개 클립 추가 확보")
+        clips.extend(loc_clips)
+
     return clips
 
 
