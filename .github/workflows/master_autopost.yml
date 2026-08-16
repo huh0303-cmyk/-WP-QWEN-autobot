@@ -725,6 +725,34 @@ jobs:
 # ══════════════════════════════════════════════════════════
 # JOB: k-health365 색인 완전 복구 (긴급)
 # ══════════════════════════════════════════════════════════
+  hide-weak-posts:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'hideweak' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+      - name: "지정 사이트 약한 글 비공개 전환"
+        env:
+          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
+          KOREAINVEST365COM:    ${{ secrets.KOREAINVEST365COM }}
+          KOREAMEDICALTOURCOM:  ${{ secrets.KOREAMEDICALTOURCOM }}
+        run: |
+          case "${{ github.event.inputs.target_site }}" in
+            "https://koreainvest365.com") PW_ENV="KOREAINVEST365COM" ;;
+            "https://koreamedicaltour.com") PW_ENV="KOREAMEDICALTOURCOM" ;;
+            *) echo "❌ 알 수 없는 target_site — hide-weak-posts는 아직 koreainvest365/koreamedicaltour만 지원"; exit 1 ;;
+          esac
+          ARGS=""
+          if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
+            ARGS="--execute"
+          fi
+          python scripts/hide_weak_posts.py "${{ github.event.inputs.target_site }}" "$PW_ENV" $ARGS
+
   hide-khealth-weak-posts:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'hidekhealthweak' }}
