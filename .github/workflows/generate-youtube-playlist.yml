@@ -208,8 +208,13 @@ jobs:
             git checkout -- playlist_recent_topics.json
             exit 0
           fi
-          git add playlist_recent_topics.json 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "chore: 플레이리스트 자동선택 최근주제 갱신 [skip ci]"
+          if grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then
+            echo "⚠️ playlist_recent_tracks.json에 병합 충돌 마커 발견 — 커밋 건너뜀"
+            git checkout -- playlist_recent_tracks.json
+            exit 0
+          fi
+          git add playlist_recent_topics.json playlist_recent_tracks.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 플레이리스트 자동선택 최근주제/최근트랙 갱신 [skip ci]"
           git push
 
   publish:

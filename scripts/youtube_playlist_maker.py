@@ -1273,10 +1273,35 @@ LANGUAGE_SCRIPT_RANGES = {
 }
 
 
+PLAYLIST_RECENT_TRACKS_FILE = "playlist_recent_tracks.json"
+PLAYLIST_RECENT_TRACKS_MEMORY = 5  # 채널별로 최근 이만큼의 "1번 곡"은 다시 안 뽑히게 피함
+
+
+def _load_recent_tracks():
+    if os.path.exists(PLAYLIST_RECENT_TRACKS_FILE):
+        try:
+            with open(PLAYLIST_RECENT_TRACKS_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_recent_tracks(data):
+    try:
+        with open(PLAYLIST_RECENT_TRACKS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        log(f"   ⚠️ 최근 트랙 기록 실패(무시하고 진행): {e}")
+
+
 def _bring_longest_to_front(items):
-    """인트로에서 처음 들리는 곡이 가장 임팩트 있게, 재생시간이 가장 긴 곡을
-    맨 앞으로 보낸다(파일 크기를 재생시간 근사치로 사용 — 다운로드 없이 알 수
-    있는 값이라 전체 목록을 미리 받아볼 필요가 없다). 나머지는 무작위 순서 유지."""
+    """인트로에서 처음 들리는 곡이 가장 임팩트 있게, 재생시간이 긴 곡 중 하나를
+    맨 앞으로 보낸다(파일 크기를 재생시간 근사치로 사용). 예전엔 "가장 긴 파일
+    하나"를 결정적으로 골라서 소스 풀이 그대로면 몇 번을 돌려도 1번 곡이 항상
+    똑같았음(2026-08-16 사용자 지적: "첫곡이 같으면 절대 안되지") — 이제 상위
+    후보(길이 상위 20%, 최소 5개) 중 채널별 최근 사용곡(playlist_recent_tracks.json)을
+    피해서 무작위로 고른다. 나머지는 무작위 순서 유지."""
     if not items:
         return items
 
@@ -1286,10 +1311,23 @@ def _bring_longest_to_front(items):
         except (TypeError, ValueError):
             return 0
 
-    longest = max(items, key=_size)
-    rest = [t for t in items if t is not longest]
+    recent_data = _load_recent_tracks()
+    recent = recent_data.get(CHANNEL_KEY, [])
+
+    sorted_items = sorted(items, key=_size, reverse=True)
+    top_n = max(5, len(sorted_items) // 5)
+    candidates = sorted_items[:top_n]
+    fresh_candidates = [t for t in candidates if t.get("name") not in recent] or candidates
+
+    front = random.choice(fresh_candidates)
+    rest = [t for t in items if t is not front]
     random.shuffle(rest)
-    return [longest] + rest
+
+    new_recent = ([front.get("name", "")] + [n for n in recent if n != front.get("name", "")])[:PLAYLIST_RECENT_TRACKS_MEMORY]
+    recent_data[CHANNEL_KEY] = new_recent
+    _save_recent_tracks(recent_data)
+
+    return [front] + rest
 
 
 def filter_tracks_by_language(tracks, keyword):
