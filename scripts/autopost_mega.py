@@ -2250,11 +2250,20 @@ def main():
         pw=os.getenv(s["wp_pass_env"],"")
         if pw: fetch_recent_wp_titles(s["url"],pw)
 
+    # 2026-08-17: 특정 사이트 하나만 지금 바로 글 1건 발행하고 싶을 때
+    # (예: k-health365.com 단발 테스트) 슬롯 로직을 무시하고 강제 발행.
+    target_site_url = os.getenv("TARGET_SITE_URL", "").strip()
+
     for site in SITES_CONFIG:
         url=site["url"]; theme=site["theme"]
-        n=get_slot_posts(site,RUN_SLOT)
-        if n==0:
-            print(f"⏭  {url} — 이번 슬롯 없음"); continue
+        if target_site_url:
+            if url != target_site_url:
+                continue
+            n = 1
+        else:
+            n=get_slot_posts(site,RUN_SLOT)
+            if n==0:
+                print(f"⏭  {url} — 이번 슬롯 없음"); continue
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url} [{theme}] 슬롯{RUN_SLOT} → {n}건")
