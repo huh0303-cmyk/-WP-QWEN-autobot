@@ -16,19 +16,28 @@ THUMBNAILS_PER_CHANNEL장짜리 신선한 썸네일 뱅크를 한 번만 만들�
 필요 환경변수:
     GEMINI_API_KEY, GOOGLE_OAUTH_CLIENT_ID/SECRET/REFRESH_TOKEN (이미지 생성용)
     YOUTUBE_OAUTH_CLIENT_ID/SECRET, YOUTUBE_OAUTH_REFRESH_TOKEN (채널별 주입,
-    thumbnails().set 에는 youtube.upload 스코프 필요)
+    thumbnails().set 쓰기 전용 — 이 리프레시 토큰들은 youtube.upload 스코프로만
+    발급돼 있어서(get_youtube_refresh_token.py 확인) channels.list/playlistItems.list
+    같은 읽기 호출엔 insufficientPermissions로 막힌다. 그래서 영상 목록 조회는
+    OAuth가 아니라 공개 YOUTUBE_API_KEY로 한다).
+    YOUTUBE_API_KEY (영상 목록 공개 조회용 — situation_room_daily.py 등과 공용)
+    CHANNEL_HANDLE (해당 채널의 @핸들, 예: Studio_k3 — channels.list(forHandle=) 조회용)
 """
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import requests
+
 import youtube_playlist_maker as pm
 
 THUMBNAILS_PER_CHANNEL = 6
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
 
 
 def get_youtube_service():
+    """thumbnails().set() 쓰기 전용 — OAuth(youtube.upload 스코프)."""
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
@@ -65,17 +74,35 @@ def build_fresh_bank(channel_key):
     return paths
 
 
-def list_all_video_ids(youtube):
-    ch = youtube.channels().list(part="contentDetails", mine=True).execute()
-    uploads_playlist = ch["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+def list_all_video_ids(channel_handle):
+    """OAuth 토큰이 읽기 스코프가 없어서(위 설명 참고), 공개 API 키로 채널의
+    업로드 재생목록을 조회한다 — 인증 불필요, 공개 데이터라 스코프 문제 없음."""
+    if not YOUTUBE_API_KEY:
+        raise RuntimeError("YOUTUBE_API_KEY 없음 — 영상 목록 조회 불가")
+
+    r = requests.get(
+        "https://www.googleapis.com/youtube/v3/channels",
+        params={"part": "contentDetails", "forHandle": channel_handle, "key": YOUTUBE_API_KEY},
+        timeout=20,
+    )
+    data = r.json()
+    if "error" in data:
+        raise RuntimeError(f"channels.list 실패: {data['error']}")
+    if not data.get("items"):
+        raise RuntimeError(f"핸들 '{channel_handle}'로 채널을 못 찾음")
+    uploads_playlist = data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
     video_ids = []
     page_token = None
     while True:
-        resp = youtube.playlistItems().list(
-            part="contentDetails", playlistId=uploads_playlist,
-            maxResults=50, pageToken=page_token,
-        ).execute()
+        params = {"part": "contentDetails", "playlistId": uploads_playlist,
+                   "maxResults": 50, "key": YOUTUBE_API_KEY}
+        if page_token:
+            params["pageToken"] = page_token
+        r = requests.get("https://www.googleapis.com/youtube/v3/playlistItems", params=params, timeout=20)
+        resp = r.json()
+        if "error" in resp:
+            raise RuntimeError(f"playlistItems.list 실패: {resp['error']}")
         video_ids += [item["contentDetails"]["videoId"] for item in resp.get("items", [])]
         page_token = resp.get("nextPageToken")
         if not page_token:
@@ -83,11 +110,21 @@ def list_all_video_ids(youtube):
     return video_ids
 
 
+CHANNEL_HANDLES = {
+    "globalmusic": "cafe_K1",
+    "healing": "Studio_k3",
+    "starbucks": "Starbucksvibes",
+    "mbb": "Mozart_Bach_Beethoven",
+    "kpop": "kpop_studio7",
+}
+
+
 def apply_to_channel(channel_key):
     pm.log(f"\n{'='*50}\n[{channel_key}] 라이브 영상 썸네일 전체 교체 시작\n{'='*50}")
     youtube = get_youtube_service()
 
-    video_ids = list_all_video_ids(youtube)
+    handle = os.environ.get("CHANNEL_HANDLE") or CHANNEL_HANDLES.get(channel_key)
+    video_ids = list_all_video_ids(handle)
     pm.log(f"   [{channel_key}] 대상 영상 {len(video_ids)}개")
     if not video_ids:
         return 0, 0

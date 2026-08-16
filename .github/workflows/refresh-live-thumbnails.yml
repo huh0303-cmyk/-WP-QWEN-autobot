@@ -29,6 +29,7 @@ jobs:
       - name: "${{ matrix.channel }} 라이브 썸네일 교체"
         env:
           CHANNEL_KEY: ${{ matrix.channel }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
