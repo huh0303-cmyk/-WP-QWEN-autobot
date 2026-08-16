@@ -735,6 +735,8 @@ KO_TO_EN_IMAGE = {
     "탈모":"hair loss","피부":"skin care","불면증":"insomnia","스트레스":"stress",
     "면역력":"immune system","영양제":"supplements","비타민":"vitamins","다이어트":"diet weight loss",
     "암":"cancer","심장":"heart cardiovascular","경제":"Korea economy","정치":"Korean politics",
+    "파킨슨":"senior patient doctor consultation","치매":"senior patient doctor consultation",
+    "뇌졸중":"senior patient doctor consultation","알츠하이머":"senior patient doctor consultation",
     "부동산":"Korea real estate","금융":"Korea finance","취업":"employment Korea",
     "교육":"education Korea","기술":"technology Korea","문화":"Korean culture",
     "서울":"Seoul Korea","여행":"Korea travel","투자":"Korea investment","주식":"stock market",
@@ -773,8 +775,15 @@ def ai_translate_keyword_for_image(keyword, theme=""):
         prompt = (
             "Translate the following Korean blog topic into a short, CONCRETE English "
             "stock-photo search query (2-5 words, concrete nouns only, no explanation, "
-            "no quotes, no punctuation). The query must reflect the SPECIFIC subject, "
-            "not a generic category.\n"
+            "no quotes, no punctuation).\n"
+            "IMPORTANT: free stock-photo libraries (Pixabay/Pexels) do not have photos of "
+            "specific disease symptoms, so never describe a symptom literally (e.g. NOT "
+            "'tremor hands', NOT 'shaking hands') — a lone body-part word like 'hands' will "
+            "match unrelated stock photos (e.g. handwashing) instead of anything medical. "
+            "For any specific disease/symptom topic, describe a safe, genuinely photographable "
+            "scene instead: a patient consulting a doctor, an elderly person in a clinic, a "
+            "medical checkup — something a stock library actually has and that will still read "
+            "as relevant next to the article.\n"
             f"Topic: {keyword}\n"
             f"Category: {theme}\n"
             "Query:"
