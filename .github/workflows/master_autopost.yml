@@ -693,6 +693,28 @@ jobs:
 # ══════════════════════════════════════════════════════════
 # JOB: k-health365 색인 완전 복구 (긴급)
 # ══════════════════════════════════════════════════════════
+  hide-khealth-weak-posts:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'hidekhealthweak' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+      - name: "k-health365 약한 글 비공개 전환"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KHEALTH365COM:  ${{ secrets.KHEALTH365COM }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
+            python scripts/hide_khealth_weak_posts.py --execute
+          else
+            python scripts/hide_khealth_weak_posts.py
+          fi
+
   fix-khealth-index:
     needs: determine-slot
     if: ${{ github.event.inputs.step == 'fixindex' }}
