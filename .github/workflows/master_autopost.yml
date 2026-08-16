@@ -923,6 +923,22 @@ jobs:
           KOREANEWS365COM:      ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM:   ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/autopost_mega.py
+      - name: "발행 간격 랜덤상태 커밋 (publish_every_n_days 사이트용)"
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          if grep -q "^<<<<<<< " scripts/data/publish_gap_state.json 2>/dev/null; then
+            echo "⚠️ publish_gap_state.json에 병합 충돌 마커 발견 — 커밋 건너뜀"
+            git checkout -- scripts/data/publish_gap_state.json
+            exit 0
+          fi
+          git add scripts/data/publish_gap_state.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 발행 간격 랜덤상태 갱신 [skip ci]"
+          git push
 
 # ══════════════════════════════════════════════════════════
 # JOB: 기존 발행글에 '관련 글' 내부링크 블록 소급 적용 (수동 실행 전용, 스케줄 없음)

@@ -1894,17 +1894,58 @@ def split_slots(daily, num=3):
     for i in range(rem): parts[i]+=1
     return parts
 
+_PUBLISH_GAP_STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                        "data", "publish_gap_state.json")
+
+
+def _load_publish_gap_state():
+    try:
+        with open(_PUBLISH_GAP_STATE_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_publish_gap_state(state):
+    os.makedirs(os.path.dirname(_PUBLISH_GAP_STATE_PATH), exist_ok=True)
+    with open(_PUBLISH_GAP_STATE_PATH, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+
+
 def get_slot_posts(site, slot):
     # 2026-08-04: 하루 3슬롯(고정 3앵커 ±60분) → 하루 1회 완전랜덤시각으로
     # 변경(publish_scheduler.py 참고). 이제 슬롯이 1개뿐이라 분할 없이
     # 그 사이트의 하루치(daily=1)를 그대로 반환.
-    # 2026-08-17: publish_every_n_days가 있으면 그 주기가 아닌 날엔 0을 반환해서
-    # 발행 자체를 건너뛴다(k-health365 폭탄발행 이후 회복용 감속, 사용자 지시).
+    # 2026-08-17: publish_every_n_days가 있으면 "정확히 N일마다"가 아니라
+    # 매번 목표간격±1일 랜덤 목표를 새로 뽑아서 다음 발행일을 정한다 —
+    # 정확히 이틀마다 딱딱 맞춰 발행하는 것 자체가 봇처럼 보이는 패턴이라서
+    # (사용자 지시: "발행시간도 랜덤으로 해야해 - AI흔적 최소").
+    # 마지막 발행일은 data/publish_gap_state.json에 사이트별로 저장(git 커밋 필요).
     every_n = site.get("publish_every_n_days")
     if every_n and every_n > 1:
-        day_of_year = now_kst().timetuple().tm_yday
-        if day_of_year % every_n != 0:
+        state = _load_publish_gap_state()
+        url = site["url"]
+        rec = state.get(url, {})
+        today = now_kst().date()
+        last_str = rec.get("last_published")
+        target_gap = rec.get("target_gap")
+        if target_gap is None:
+            target_gap = random.randint(max(1, every_n - 1), every_n + 1)
+        if last_str:
+            last_date = __import__("datetime").date.fromisoformat(last_str)
+            days_since = (today - last_date).days
+        else:
+            days_since = target_gap  # 기록 없으면 오늘 발행 허용
+
+        if days_since < target_gap:
+            state[url] = {"last_published": last_str, "target_gap": target_gap}
+            _save_publish_gap_state(state)
             return 0
+
+        # 오늘 발행 허용 — 다음 목표간격을 새로 랜덤 추첨해서 저장
+        next_gap = random.randint(max(1, every_n - 1), every_n + 1)
+        state[url] = {"last_published": today.isoformat(), "target_gap": next_gap}
+        _save_publish_gap_state(state)
     return site["daily"]
 
 # ============================================================
