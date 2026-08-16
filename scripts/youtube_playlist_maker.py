@@ -779,44 +779,55 @@ def build_playlist_audio(service, tracks_meta, out_path):
     # 나머지를 뒤에" 순서로 정렬해서 넘겨준 리스트이므로, 여기서 다시 섞으면
     # 그 우선순위가 깨진다 — 순서 그대로 앞에서부터 채운다.
     shuffled = list(tracks_meta)
+    if not shuffled:
+        raise RuntimeError("사용 가능한 음원이 없습니다")
 
     target_min_sec, target_max_sec = pick_duration_target()
     log(f"   이번 목표 재생시간: {target_min_sec/60:.0f}~{target_max_sec/60:.0f}분")
 
     selected_paths = []
     accumulated = 0.0
+    downloaded = {}  # track id -> (local_path, duration) — 풀이 작아 반복 사용할 때 재다운로드 방지
+    # 트랙 풀이 목표 재생시간보다 훨씬 짧으면(예: healing 3곡뿐인데 3~4시간 채워야 함)
+    # 예전엔 풀을 한 바퀴 돌고 그냥 끝나서 영상이 목표보다 훨씬 짧게 나왔다
+    # (2026-08-16 사용자 지적) — 이제 목표에 도달할 때까지 풀을 반복해서 순회한다.
+    # 무한루프 방지용 안전 상한만 걸어둔다.
+    max_passes = 40
+    i = 0
 
-    for i, meta in enumerate(shuffled):
-        ext = os.path.splitext(meta["name"])[1] or ".mp3"
-        local_path = os.path.join(WORKDIR, f"track_{i:03d}{ext}")
-        log(f"   다운로드 중: {meta['name']}")
-        try:
-            download_drive_file(service, meta["id"], local_path)
-            dur = get_duration(local_path)
-            if dur < 1.0:
-                raise ValueError(f"재생시간 {dur:.2f}초 — 오디오 파일이 아닌 것으로 판단")
-        except Exception as e:
-            log(f"   ⚠️ 스킵({meta['name']}): {e}")
-            if os.path.exists(local_path):
-                os.remove(local_path)
-            continue
+    while accumulated < target_max_sec and i < len(shuffled) * max_passes:
+        meta = shuffled[i % len(shuffled)]
+        i += 1
+
+        if meta["id"] in downloaded:
+            local_path, dur = downloaded[meta["id"]]
+        else:
+            ext = os.path.splitext(meta["name"])[1] or ".mp3"
+            local_path = os.path.join(WORKDIR, f"track_{len(downloaded):03d}{ext}")
+            log(f"   다운로드 중: {meta['name']}")
+            try:
+                download_drive_file(service, meta["id"], local_path)
+                dur = get_duration(local_path)
+                if dur < 1.0:
+                    raise ValueError(f"재생시간 {dur:.2f}초 — 오디오 파일이 아닌 것으로 판단")
+            except Exception as e:
+                log(f"   ⚠️ 스킵({meta['name']}): {e}")
+                if os.path.exists(local_path):
+                    os.remove(local_path)
+                continue
+            downloaded[meta["id"]] = (local_path, dur)
 
         if accumulated >= target_min_sec and accumulated + dur > target_max_sec:
-            # 목표 구간 안에 이미 들어와 있고 이 곡을 더하면 넘침 -> 나머지는
-            # 안 맞을 때마다 계속 찾아 헤매지 않고 여기서 바로 종료 (다운로드 낭비 방지)
-            os.remove(local_path)
-            log(f"   (목표 구간 도달 — 나머지 트랙 스캔 중단)")
+            # 목표 구간 안에 이미 들어와 있고 이 곡을 더하면 넘침 -> 여기서 종료
+            log(f"   (목표 구간 도달 — 반복 추가 중단)")
             break
 
         selected_paths.append(local_path)
         accumulated += dur
         log(f"   ✅ 추가: {meta['name']} ({dur/60:.1f}분) — 누적 {accumulated/60:.1f}분")
 
-        if accumulated >= target_max_sec:
-            break
-
     if accumulated < target_min_sec:
-        log(f"   ⚠️ 보유한 음원을 다 써도 {accumulated/60:.1f}분 (목표 {target_min_sec/60:.0f}분 미만)")
+        log(f"   ⚠️ 풀을 {max_passes}바퀴 돌려도 {accumulated/60:.1f}분 (목표 {target_min_sec/60:.0f}분 미만) — 음원이 극단적으로 적은 경우")
 
     if not selected_paths:
         raise RuntimeError("사용 가능한 음원이 없습니다")
