@@ -200,8 +200,15 @@ def main():
     log("1/3 드라이브에서 영상/썸네일 다운로드 중...")
     video_path = os.path.join(WORKDIR, "final.mp4")
     download_drive_file(drive, video_drive_id, video_path)
-    thumb_path = os.path.join(WORKDIR, "thumbnail.png")
+    thumb_path = None
     if thumb_drive_id:
+        # 드라이브에 저장된 실제 파일명의 확장자를 그대로 써야 한다 — 썸네일이
+        # 2MB 제한 때문에 .jpg로 저장됐을 수 있는데 로컬 경로를 무조건 .png로
+        # 고정하면, thumbnails().set()의 MediaFileUpload가 확장자만 보고
+        # image/png로 잘못 추정해 실제 JPEG 바이트와 어긋난다.
+        meta = drive.files().get(fileId=thumb_drive_id, fields="name").execute()
+        thumb_ext = os.path.splitext(meta.get("name", ""))[1] or ".png"
+        thumb_path = os.path.join(WORKDIR, f"thumbnail{thumb_ext}")
         download_drive_file(drive, thumb_drive_id, thumb_path)
         size = os.path.getsize(thumb_path) if os.path.exists(thumb_path) else -1
         log(f"   썸네일 다운로드: {thumb_path} ({size} bytes)")

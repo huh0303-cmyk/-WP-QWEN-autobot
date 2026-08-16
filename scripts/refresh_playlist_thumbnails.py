@@ -46,10 +46,11 @@ def refresh_channel(channel_key: str):
             continue
 
         out_path = os.path.join(out_dir, f"{i+1:02d}.png")
-        pm.make_channel_thumbnail(channel_key, image_paths[0], out_path, topic)
+        out_path = pm.make_channel_thumbnail(channel_key, image_paths[0], out_path, topic)
 
         try:
-            pm.upload_to_drive(drive, out_path, thumb_folder_id, f"refresh_{i+1:02d}.png")
+            thumb_ext = os.path.splitext(out_path)[1] or ".png"
+            pm.upload_to_drive(drive, out_path, thumb_folder_id, f"refresh_{i+1:02d}{thumb_ext}")
             pm.log(f"   ✅ 드라이브 업로드 완료")
         except Exception as e:
             pm.log(f"   ⚠️ 드라이브 업로드 실패(로컬 파일은 유지됨): {e}")

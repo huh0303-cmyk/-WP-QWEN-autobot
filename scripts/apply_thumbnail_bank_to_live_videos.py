@@ -67,7 +67,7 @@ def build_fresh_bank(channel_key):
             pm.log(f"      ⚠️ 이미지 생성 실패, 건너뜀: {e}")
             continue
         out_path = os.path.join(workdir, "thumb.png")
-        pm.make_channel_thumbnail(channel_key, image_paths[0], out_path, topic)
+        out_path = pm.make_channel_thumbnail(channel_key, image_paths[0], out_path, topic)
         paths.append(out_path)
     if not paths:
         raise RuntimeError(f"[{channel_key}] 썸네일을 한 장도 못 만들었음")
@@ -131,17 +131,34 @@ def apply_to_channel(channel_key):
 
     bank = build_fresh_bank(channel_key)
 
+    import time
+    from googleapiclient.http import MediaFileUpload
+
     ok, fail = 0, 0
     for i, video_id in enumerate(video_ids):
-        from googleapiclient.http import MediaFileUpload
         thumb_path = bank[i % len(bank)]
-        try:
-            youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
-            ok += 1
-            pm.log(f"   ✅ {i+1}/{len(video_ids)} {video_id} 썸네일 교체 완료")
-        except Exception as e:
-            fail += 1
-            pm.log(f"   ❌ {i+1}/{len(video_ids)} {video_id} 실패: {str(e)[:200]}")
+        # 채널당 영상이 많으면(globalmusic 28개) 유튜브 썸네일 교체 자체에도
+        # 짧은 시간 내 요청 수 제한이 있어서 429("uploaded too many thumbnails
+        # recently")가 난다(2026-08-16 실제 확인, 28개 중 14개가 이 에러로 실패).
+        # 매 호출 사이에 살짝 텀을 두고, 429가 나면 지수 백오프로 재시도한다.
+        for attempt in range(5):
+            try:
+                youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb_path)).execute()
+                ok += 1
+                pm.log(f"   ✅ {i+1}/{len(video_ids)} {video_id} 썸네일 교체 완료")
+                break
+            except Exception as e:
+                msg = str(e)
+                is_rate_limit = "429" in msg or "too many thumbnails" in msg.lower() or "quota" in msg.lower()
+                if is_rate_limit and attempt < 4:
+                    wait = 15 * (attempt + 1)
+                    pm.log(f"   ⏳ {i+1}/{len(video_ids)} {video_id} 할당량/속도제한, {wait}초 대기 후 재시도({attempt+1}/4)")
+                    time.sleep(wait)
+                    continue
+                fail += 1
+                pm.log(f"   ❌ {i+1}/{len(video_ids)} {video_id} 실패: {msg[:200]}")
+                break
+        time.sleep(2)
     return ok, fail
 
 

@@ -601,23 +601,25 @@ def _composer_from_topic(topic: str) -> str:
 
 def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, topic: str,
                             hero_override: str = None):
-    """채널별 썸네일 포맷 분기를 한 곳에 모아둔 공용 헬퍼.
+    """채널별 썸네일 포맷 분기를 한 곳에 모아둔 공용 헬퍼. 반환값은 실제로 저장된
+    최종 경로(_save_thumbnail_capped가 JPEG로 폴백하면 .jpg로 바뀔 수 있음) —
+    호출부는 out_path가 아니라 이 반환값을 이후 업로드에 써야 한다.
     본 파이프라인(build_playlist)과 주간 썸네일 리프레시 스크립트가 공유해서 쓴다."""
     if hero_override == "playlist_only":
-        make_caption_thumbnail(image_path, out_path, topic="Playlist", show_waveform=True)
+        return make_caption_thumbnail(image_path, out_path, topic="Playlist", show_waveform=True)
     elif channel_key == "healing":
         # healing은 다른 4개 히어로 채널과 달리 "사진 썸네일" 포맷 — 큰 타이틀도
         # "Playlist" 문구도 없이 사진이 주인공, 작은 파형 아이콘 하나만 (2026-08-13
         # 사용자 명시적 요청: "썸네일 음파만 작게 하나 Playlist 글씨 없다").
-        make_photo_thumbnail(image_path, out_path)
+        return make_photo_thumbnail(image_path, out_path)
     elif channel_key in PLAYLIST_HERO_CHANNELS:
-        make_caption_thumbnail(image_path, out_path, topic="Playlist",
-                                subtitle_override=topic, show_waveform=True)
+        return make_caption_thumbnail(image_path, out_path, topic="Playlist",
+                                       subtitle_override=topic, show_waveform=True)
     elif channel_key == "mbb":
-        make_caption_thumbnail(image_path, out_path, topic=_composer_from_topic(topic),
-                                subtitle_override=topic, show_waveform=False)
+        return make_caption_thumbnail(image_path, out_path, topic=_composer_from_topic(topic),
+                                       subtitle_override=topic, show_waveform=False)
     else:
-        make_caption_thumbnail(image_path, out_path, topic=topic)
+        return make_caption_thumbnail(image_path, out_path, topic=topic)
 RECENT_TOPICS_FILE = "playlist_recent_topics.json"
 RECENT_TOPICS_MEMORY = 8  # 최근 이만큼은 다시 안 뽑히게 피함
 
@@ -1205,27 +1207,44 @@ def make_caption_thumbnail(image_path, out_path, topic="", subtitle_override=Non
     final_img = img.convert("RGB")
     if (w, h) != THUMBNAIL_UPSCALE_SIZE:
         final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
-    _save_thumbnail_capped(final_img, out_path)
+    return _save_thumbnail_capped(final_img, out_path)
 
 
 def _save_thumbnail_capped(img, out_path, max_bytes=2 * 1024 * 1024):
-    """유튜브 썸네일 API 2MB 제한 대응. 5K로 올린 뒤로 디테일이 많은 사진(특히
-    아카이브 원본 프레임)은 트루컬러 PNG로 저장하면 2MB를 쉽게 넘는다 — 화질
-    저하가 거의 안 보이는 adaptive 팔레트 단계부터 순서대로 시도해서 제한 안에
-    맞춘다(2026-08-14, 5K 적용 직후 실제로 걸려서 발견)."""
+    """유튜브 썸네일 API 2MB 제한 대응. 5K로 올린 뒤로 디테일이 많은 사진은
+    트루컬러 PNG로 저장하면 2MB를 쉽게 넘는다.
+
+    2026-08-14엔 PNG 팔레트 양자화 단계로 대응했었는데, 최후 수단(4K로 리사이즈
+    후 트루컬러 PNG 저장)이 결과를 다시 max_bytes 이하인지 검증하지 않아서
+    실패를 그냥 조용히 통과시켰다 — 실제로 라이브 영상 72개 중 59개가 "Media
+    larger than 2097152" 에러로 썸네일 교체에 실패한 원인(2026-08-16 확인).
+    이제 사진 콘텐츠에 훨씬 효율적인 JPEG 품질 단계로 대응하고, 매 단계마다
+    실제 파일 크기를 확인해서 확실히 max_bytes 이하가 될 때까지 반복한다.
+    반환값은 실제로 저장된 최종 경로(확장자가 .jpg로 바뀔 수 있음) — 호출부는
+    반드시 이 반환값을 이후 업로드 경로로 써야 한다."""
     from PIL import Image
 
-    img.save(out_path, "PNG", optimize=True)
-    if os.path.getsize(out_path) <= max_bytes:
-        return
-    for colors in (256, 192, 128, 96, 64):
-        quantized = img.quantize(colors=colors, method=Image.MEDIANCUT, dither=Image.FLOYDSTEINBERG)
-        quantized.save(out_path, "PNG", optimize=True)
-        if os.path.getsize(out_path) <= max_bytes:
-            return
-    # 최후 수단: 팔레트로도 안 되면 해상도를 살짝 낮춘다(4K로)
-    smaller = img.resize((3840, int(3840 * img.height / img.width)), Image.LANCZOS)
-    smaller.save(out_path, "PNG", optimize=True)
+    jpg_path = os.path.splitext(out_path)[0] + ".jpg"
+    rgb = img.convert("RGB")
+
+    for quality in (95, 90, 85, 80, 75, 70, 60, 50, 40):
+        rgb.save(jpg_path, "JPEG", quality=quality, optimize=True)
+        if os.path.getsize(jpg_path) <= max_bytes:
+            if jpg_path != out_path and os.path.exists(out_path):
+                os.remove(out_path)
+            return jpg_path
+
+    # 품질을 최대한 낮춰도 안 되면(극히 드묾) 해상도까지 낮춘다 — 그래도 반드시
+    # 결과를 검증해서 max_bytes를 확실히 지킨다.
+    for target_w in (3840, 2560, 1920, 1280):
+        smaller = rgb.resize((target_w, int(target_w * rgb.height / rgb.width)), Image.LANCZOS)
+        smaller.save(jpg_path, "JPEG", quality=70, optimize=True)
+        if os.path.getsize(jpg_path) <= max_bytes:
+            if jpg_path != out_path and os.path.exists(out_path):
+                os.remove(out_path)
+            return jpg_path
+
+    raise RuntimeError(f"썸네일을 {max_bytes}바이트 이하로 못 줄임: {jpg_path}")
 
 
 def make_photo_thumbnail(image_path, out_path, w=1280, h=720):
@@ -1246,7 +1265,7 @@ def make_photo_thumbnail(image_path, out_path, w=1280, h=720):
     final_img = img.convert("RGB")
     if (w, h) != THUMBNAIL_UPSCALE_SIZE:
         final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
-    _save_thumbnail_capped(final_img, out_path)
+    return _save_thumbnail_capped(final_img, out_path)
 
 
 def mux_video_audio(video_path, audio_path, out_path):
@@ -1436,7 +1455,9 @@ def main():
         log(f"   캡션 문구: {caption_text}")
         # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
         # 플리 채널 벤치마킹 공통 포맷 — 주간 썸네일 리프레시 스크립트와 로직 공유)
-        make_channel_thumbnail(CHANNEL_KEY, image_paths[0], thumbnail_out, topic_keyword)
+        # _save_thumbnail_capped가 2MB 제한 때문에 .jpg로 폴백할 수 있어서, 반환된
+        # 실제 경로로 thumbnail_out을 갱신해야 이후 업로드가 올바른 파일을 가리킨다.
+        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, image_paths[0], thumbnail_out, topic_keyword)
 
         log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
         # 인트로가 곡 앞부분(INTRO_DURATION_SEC)을 쓰므로, 본편은 그 이어지는
@@ -1454,7 +1475,7 @@ def main():
 
         log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
         intro_still = os.path.join(WORKDIR, "intro_still.png")
-        make_channel_thumbnail(CHANNEL_KEY, image_paths[0], intro_still, topic_keyword)
+        intro_still = make_channel_thumbnail(CHANNEL_KEY, image_paths[0], intro_still, topic_keyword)
         intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
         make_intro_clip(intro_still, audio_path, intro_clip)
         concat_intro_and_main(intro_clip, body_path, final_path)
@@ -1473,13 +1494,18 @@ def main():
         log("4/5 정지 이미지 + 음악으로 영상 생성 중...")
         make_static_video(thumb_path, audio_path, final_path)
         from PIL import Image
-        Image.open(thumb_path).convert("RGB").save(thumbnail_out, "PNG")
+        thumbnail_out = _save_thumbnail_capped(Image.open(thumb_path).convert("RGB"), thumbnail_out)
 
     log("5/5 구글드라이브 업로드 중...")
     now = datetime.now(KST)
     rand_suffix = f"{random.randint(0, 9999):04d}"
     filename = f"{now.year}_{now.month}_{now.day}_{rand_suffix}.mp4"
-    thumb_filename = f"{now.year}_{now.month}_{now.day}_{rand_suffix}_thumbnail.png"
+    # thumbnail_out의 실제 확장자를 그대로 써야 한다 — _save_thumbnail_capped가
+    # 2MB 제한 때문에 .jpg로 저장했는데 파일명만 .png로 올리면, 나중에
+    # youtube_publish_approved.py가 이 파일을 받아 thumbnails().set()할 때
+    # 확장자 기반 mimetype 추정이 실제 내용과 어긋나 업로드가 실패할 수 있다.
+    thumb_ext = os.path.splitext(thumbnail_out)[1] or ".png"
+    thumb_filename = f"{now.year}_{now.month}_{now.day}_{rand_suffix}_thumbnail{thumb_ext}"
 
     link, video_drive_id = upload_to_drive(service, final_path, OUTPUT_FOLDER_ID, filename)
     thumb_link, thumb_drive_id = upload_to_drive(service, thumbnail_out, OUTPUT_FOLDER_ID, thumb_filename)
