@@ -23,6 +23,14 @@ on:
         description: "cleanupai 전용: true면 실제 수정 없이 리포트만 (기본값 true, 안전)"
         required: false
         default: "true"
+      batch_offset:
+        description: "hideaiposts 전용: GSC 일일 할당량 보호를 위해 사이트 몇 번째부터 처리할지 (0부터 시작, 비우면 전체)"
+        required: false
+        default: ""
+      batch_limit:
+        description: "hideaiposts 전용: 이번 배치에서 몇 개 사이트만 처리할지 (예: 3)"
+        required: false
+        default: ""
   # ⚠️ 고정 cron 제거됨 (2026-07-19) — publish-scheduler.yml이 매일 랜덤 시간에
   #   이 워크플로우를 workflow_dispatch(step=post, run_slot=1/2/3)로 대신 실행시킴.
   #   목표시각: 07:25 / 13:07 / 19:50 KST, 매일 ±1시간 랜덤.
@@ -1136,6 +1144,12 @@ jobs:
           fi
           if [ "${{ github.event.inputs.dry_run }}" == "false" ]; then
             ARGS="$ARGS --execute"
+          fi
+          if [ -n "${{ github.event.inputs.batch_offset }}" ]; then
+            ARGS="$ARGS --offset=${{ github.event.inputs.batch_offset }}"
+          fi
+          if [ -n "${{ github.event.inputs.batch_limit }}" ]; then
+            ARGS="$ARGS --limit=${{ github.event.inputs.batch_limit }}"
           fi
           python scripts/cleanup_ai_toned_posts.py $ARGS
       - name: "결과 커밋"

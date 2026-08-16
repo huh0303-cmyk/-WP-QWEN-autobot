@@ -176,11 +176,28 @@ def main():
     execute = "--execute" in sys.argv
     only_site = None
     exclude_sites = set()
+    offset = None
+    limit = None
     for a in sys.argv[1:]:
         if a.startswith("--site="):
             only_site = a.split("=", 1)[1]
         elif a.startswith("--exclude="):
             exclude_sites = {s.strip() for s in a.split("=", 1)[1].split(",") if s.strip()}
+        elif a.startswith("--offset="):
+            offset = int(a.split("=", 1)[1])
+        elif a.startswith("--limit="):
+            limit = int(a.split("=", 1)[1])
+
+    # 2026-08-17: GSC URL 검사 일일 할당량이 27개 사이트를 한 번에 훑기엔
+    # 부족한 것으로 보여서(4번째 사이트부터 연속 429, 1시간 넘게 회복 안 됨 —
+    # 분당 제한이 아니라 일일 할당량 소진으로 추정) 사용자 지시로 사이트를
+    # --offset/--limit로 잘라서 하루 3개씩 나눠 돈다.
+    site_items = list(SITE_SECRET_MAP.items())
+    if offset is not None or limit is not None:
+        start = offset or 0
+        end = start + limit if limit is not None else len(site_items)
+        site_items = site_items[start:end]
+        log(f"📦 배치 모드: 사이트 {start}~{end-1}번째만 처리 ({len(site_items)}개)")
 
     mode = "실행(비공개 전환)" if execute else "리포트만(DRY RUN)"
     log(f"{'='*60}")
@@ -208,7 +225,7 @@ def main():
     consecutive_quota_errors = 0
     QUOTA_ABORT_THRESHOLD = 5
 
-    for site_url, secret_name in SITE_SECRET_MAP.items():
+    for site_url, secret_name in site_items:
         if only_site and only_site not in site_url:
             continue
         if site_url in exclude_sites:
