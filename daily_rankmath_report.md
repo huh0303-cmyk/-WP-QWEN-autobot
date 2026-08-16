@@ -11,9 +11,9 @@
 ✅ https://koreacrypto365.com | 점수:84 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
 ✅ https://krealestate365.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
 ✅ https://ktech365.com | 점수:61 | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
-⚠️ https://kskin365.com 오류: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://kskin365.com/wp-login.php
+⚠️ https://kskin365.com 오류: Page.fill: Timeout 30000ms exceeded.
 Call log:
-  - navigating to "https://kskin365.com/wp-login.php", waiting until "load"
+  - waiting for locator("#user_login")
 
 ✅ https://oliveyoungkorea.com | 점수:90 | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
 ✅ https://kworld365.com | 점수:87 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
@@ -27,8 +27,19 @@ Call log:
 ✅ https://sis-korea.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:0 | 헬스:⚠️심각
 ✅ https://jobkorea365.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:7 | 헬스:⚠️심각
 ✅ https://jobinkorea365.com | 점수:79 | 키워드백필:0 | 404:None | 리디렉션:7 | 헬스:⚠️심각
-✅ https://jobkoreaglobal.com | 점수:None | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
-✅ https://korea365.org | 점수:61 | 키워드백필:0 | 404:None | 리디렉션:20 | 헬스:⚠️심각
-✅ https://koreanews365.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
-✅ https://theseouljournal.com | 점수:61 | 키워드백필:0 | 404:None | 리디렉션:38 | 헬스:⚠️심각
+⚠️ https://jobkoreaglobal.com 오류: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobkoreaglobal.com/wp-login.php
+Call log:
+  - navigating to "https://jobkoreaglobal.com/wp-login.php", waiting until "load"
+
+⚠️ https://korea365.org 오류: Page.goto: net::ERR_QUIC_PROTOCOL_ERROR at https://korea365.org/wp-admin/admin.php?page=rank-math-404-monitor
+Call log:
+  - navigating to "https://korea365.org/wp-admin/admin.php?page=rank-math-404-mo
+⚠️ https://koreanews365.com 오류: Page.goto: net::ERR_CONNECTION_REFUSED at https://koreanews365.com/wp-login.php
+Call log:
+  - navigating to "https://koreanews365.com/wp-login.php", waiting until "load"
+
+⚠️ https://theseouljournal.com 오류: Page.goto: net::ERR_CONNECTION_REFUSED at https://theseouljournal.com/wp-login.php
+Call log:
+  - navigating to "https://theseouljournal.com/wp-login.php", waiting until "load"
+
 ```
