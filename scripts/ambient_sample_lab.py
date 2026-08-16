@@ -36,8 +36,13 @@ def run_ffmpeg(cmd):
 
 
 def _decaying_tone_path(freq, ratios, amps, decay_rate, dur, out_path, volume=0.6):
-    terms = [f"{amp}*exp(-{decay_rate}*t)*sin(2*PI*{freq*ratio}*t)"
-              for ratio, amp in zip(ratios, amps)]
+    # decay_rate가 숫자 하나면 모든 배음이 똑같은 속도로 사그라드는데, 실제
+    # 종/풍경소리는 상위 배음일수록 훨씬 빨리 죽고 기본음만 따뜻하게 남는다.
+    # 전부 같은 속도로 유지하면 높은 배음이 끝까지 남아서 "쨍~" 하고 계속
+    # 갈리는 쇳소리로 들린다 — 배음별 감쇠속도를 리스트로도 받을 수 있게 함.
+    decay_rates = [decay_rate] * len(ratios) if isinstance(decay_rate, (int, float)) else decay_rate
+    terms = [f"{amp}*exp(-{dr}*t)*sin(2*PI*{freq*ratio}*t)"
+              for ratio, amp, dr in zip(ratios, amps, decay_rates)]
     expr = "+".join(terms)
     run_ffmpeg(["ffmpeg", "-y", "-f", "lavfi", "-i", f"aevalsrc='{expr}':d={dur}",
                 "-af", f"volume={volume}", out_path])
@@ -148,7 +153,10 @@ def make_temple_chime(dur, workdir, out_path):
                 "-af", "bandpass=f=500:width_type=h:w=900,tremolo=f=0.12:d=0.2",
                 "-c:a", "aac", bed])
     chime = os.path.join(workdir, "_chime_tone.wav")
-    _decaying_tone_path(1100, [1, 2.76, 5.4], [0.5, 0.25, 0.12], 2.2, 3.0, chime, volume=0.55)
+    # 상위 배음(2.76배/5.4배)을 기본음보다 훨씬 빨리 죽여서 "쨍" 하고 밝게
+    # 시작했다가 금방 따뜻한 기본음만 남게 — 예전엔 셋 다 같은 속도(2.2)로
+    # 감쇠해서 날카로운 5940Hz대 배음이 3초 내내 안 죽고 쇳소리로 들렸음.
+    _decaying_tone_path(1100, [1, 2.76, 5.4], [0.5, 0.18, 0.07], [1.6, 4.5, 8.0], 3.0, chime, volume=0.5)
     _scatter_over_bed(bed, chime, dur, out_path, min_gap=2.5, max_gap=6.0)
 
 
