@@ -486,8 +486,9 @@ def _build_fallback_title_and_description(topic, duration_min):
 def generate_youtube_title_description(topic, caption_text, duration_min):
     """유튜브 업로드용 제목+설명을 Gemini로 생성. 광고 카피처럼 매끈하지 않게,
     실제 채널 운영자가 쓴 것 같은 톤으로("AI 흔적 최소화" 원칙 동일 적용).
-    설명은 영어+한국어를 섞어서(약 50:50) 총 5000자 내외의 긴 설명으로 생성한다
-    (2026-08-13 사용자 요청 — SEO/시청자 정보성 강화, 모든 채널 공통 적용)."""
+    2026-08-16 사용자 지시로 변경: 제목 100자 영어 후킹성(기존과 동일), 설명은
+    영어 단독으로 1000자 내외에 SEO 키워드를 최대한 채워서 — 예전(2026-08-13)의
+    영어+한국어 50:50 5000자 방식을 대체한다."""
     channel_context = CHANNEL_DESC_CONTEXT.get(CHANNEL_KEY, "a curated playlist channel")
     prompt = f"""You are writing the YouTube title and description for a {duration_min:.0f}-minute
 playlist video on {channel_context}. The video's mood/topic is "{topic}", one-line caption: "{caption_text}".
@@ -495,20 +496,18 @@ playlist video on {channel_context}. The video's mood/topic is "{topic}", one-li
 Write:
 1. TITLE: an emotionally engaging, hooky title close to YouTube's 100-character limit
    (aim for 85-100 characters) — not a dry label, make someone want to click. At most 1 emoji.
-2. DESCRIPTION: a long, genuinely useful description of about 5000 characters total,
-   written in a natural MIX of English and Korean (roughly 50/50 — alternate by
-   paragraph, writing the same content in both languages, not just translating
-   word-for-word but writing naturally in each language). Cover: what kind of
-   listening experience this is, when/how to use it (studying, sleeping, working,
-   relaxing, etc. as fits the topic), why this type of music/sound helps, and a
-   warm closing note inviting the listener to subscribe. End with 8-10 relevant
-   hashtags (mix of English and Korean tags).
+2. DESCRIPTION: entirely in English, about 1000 characters total, packed densely with
+   relevant SEO keywords and search terms someone would actually type (the type of
+   sound/music, mood, use cases like sleep/study/focus/relax, genre terms) — but still
+   readable, natural sentences, not a keyword-stuffed word salad. Cover: what kind of
+   listening experience this is, when/how to use it, and a short closing line inviting
+   the listener to subscribe. End with 8-10 relevant English hashtags.
    Sound like a real channel owner wrote it — conversational, not a marketing
    template, no exaggerated claims.
 
 Respond in exactly this format, nothing else:
 TITLE: (title)
-DESCRIPTION: (the long bilingual description, with blank lines between paragraphs)
+DESCRIPTION: (the ~1000-character English description, with blank lines between paragraphs)
 """
     text = gemini_generate_text(prompt, temperature=0.9, max_output_tokens=4096)
     title, description = _build_fallback_title_and_description(topic, duration_min)
