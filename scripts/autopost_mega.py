@@ -813,7 +813,9 @@ def translate_ko_to_en_for_image(keyword, theme=""):
     return re.sub(r'\s+', ' ', result).strip()[:80]
 
 SITES_CONFIG = [
-    {"url":"https://k-health365.com",       "lang":"ko","theme":"건강과 의학",         "mode":"health_blog","keywords_file":"data/keywords/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":1},
+    # 2026-08-17: 폭탄발행(7월 74건) 이후 회복 위해 이틀에 1건으로 감속(사용자 지시).
+    # publish_every_n_days가 있으면 get_slot_posts()가 이 주기를 지켜서 격일에만 1건 반환.
+    {"url":"https://k-health365.com",       "lang":"ko","theme":"건강과 의학",         "mode":"health_blog","keywords_file":"data/keywords/keywords_khealth.txt",        "wp_pass_env":"KHEALTH365COM",        "daily":1,"publish_every_n_days":2},
     {"url":"https://koreamedicaltour.com",   "lang":"en","theme":"Korea Medical Tourism","mode":"blog",      "keywords_file":"data/keywords/keywords_medicaltour.txt",    "wp_pass_env":"KOREAMEDICALTOURCOM",  "daily":1},
     {"url":"https://koreainvest365.com",     "lang":"en","theme":"Investment",           "mode":"blog",      "keywords_file":"data/keywords/keywords_kinvest.txt",        "wp_pass_env":"KOREAINVEST365COM",    "daily":1},
     {"url":"https://ki-korea.com",           "lang":"en","theme":"Korea Investment",     "mode":"blog",      "keywords_file":"data/keywords/keywords_kikorea.txt",        "wp_pass_env":"KIKOREACOM",           "daily":1},
@@ -1896,6 +1898,13 @@ def get_slot_posts(site, slot):
     # 2026-08-04: 하루 3슬롯(고정 3앵커 ±60분) → 하루 1회 완전랜덤시각으로
     # 변경(publish_scheduler.py 참고). 이제 슬롯이 1개뿐이라 분할 없이
     # 그 사이트의 하루치(daily=1)를 그대로 반환.
+    # 2026-08-17: publish_every_n_days가 있으면 그 주기가 아닌 날엔 0을 반환해서
+    # 발행 자체를 건너뛴다(k-health365 폭탄발행 이후 회복용 감속, 사용자 지시).
+    every_n = site.get("publish_every_n_days")
+    if every_n and every_n > 1:
+        day_of_year = now_kst().timetuple().tm_yday
+        if day_of_year % every_n != 0:
+            return 0
     return site["daily"]
 
 # ============================================================
