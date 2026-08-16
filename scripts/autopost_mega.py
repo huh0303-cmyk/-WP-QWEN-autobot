@@ -1200,9 +1200,14 @@ def make_site_prompt(keyword, site, reporter):
   자연스럽게 인용. 억지로 개수를 채우려고 애매하거나 지어낸 수치를 넣지 말 것 —
   근거 없는 통계보다 통계가 아예 없는 게 낫다.
 - 연도: 본문에 2024·2025·2023 등 과거 연도 절대 금지. 연도가 필요하면 반드시 2026만 사용, 확실하지 않으면 연도 자체를 생략
-- 표: 실제로 항목을 비교/정리하는 게 독자에게 유용한 주제일 때만 <table>을 쓸 것
-  (thead/tbody/tr/th/td 완전 구조). 억지로 표를 만들어 넣지 말 것 — 표가 어울리지
-  않는 주제(감정적/서술적 내용 등)에 무리하게 표를 넣으면 오히려 부자연스럽다.
+- 표: 실제로 항목을 비교/정리하는 게 독자에게 유용한 주제일 때는 <table>을 쓸 것
+  (thead/tbody/tr/th/td 완전 구조). 이 글의 주제라면 대부분 비교표(원인별/유형별/
+  단계별/전후 비교 등)를 최소 1개는 자연스럽게 만들 수 있다 — 정말 표로 정리할
+  항목이 하나도 없는 극히 예외적인 경우만 생략하고, 그럴 때도 <table> 대신 잘
+  구조화된 <ul> 목록으로 핵심 정보를 정리할 것(구조 없이 문단으로만 끝내지 말 것).
+- META_DESC 글자수는 타협 불가 항목이다 — 반드시 130~140자(공백 포함) 사이여야
+  하며, 120자 미만이거나 150자를 넘으면 실패로 간주된다. 짧게 쓰고 끝내지 말고
+  '{keyword}' 관련 구체적인 이유/이점을 한 문장 더 보태서라도 130자를 채울 것.
 - 위 내부링크 4개를 본문 흐름에 자연스럽게 삽입{medical_note}
 
 [이 사이트 전용 글 구성 — 반드시 이 순서로]
@@ -1247,8 +1252,14 @@ You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' categor
   have something grounded to reference. Don't pad the piece with vague or invented numbers just
   to hit a count — no statistic beats a fabricated one.
 - Years: never write 2024, 2025, 2023, or any past year anywhere in the body. If a year is needed, use ONLY 2026 — if unsure, omit the year entirely
-- Tables: only use a <table> (full thead/tbody/tr/th/td structure) when the topic genuinely
-  benefits from a side-by-side comparison. Don't force a table into a topic that doesn't call for one.
+- Tables: use a <table> (full thead/tbody/tr/th/td structure) whenever the topic can support
+  a side-by-side comparison (by type/stage/option/before-after/cost, etc.) — most topics here
+  can. Only skip it in the rare case there's truly nothing to compare, and even then replace it
+  with a well-structured <ul> summarizing the key points (never end a section with plain
+  paragraphs only when a list or table would organize it better).
+- META_DESC length is non-negotiable — it must be 130-155 characters, not shorter. If your first
+  draft is short, add one more concrete reason/benefit related to '{keyword}' rather than
+  stopping early.
 - Weave the 4 internal links above naturally into the body{medical_note}
 
 [THIS SITE'S UNIQUE STRUCTURE — follow exactly in order]
