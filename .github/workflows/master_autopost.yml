@@ -525,6 +525,34 @@ jobs:
         run: python scripts/fix_homepage.py
 
 # ══════════════════════════════════════════════════════════
+# JOB: 발행된 글 하나의 대표이미지만 재검색해서 교체 (수동 1회성 수정용)
+# ══════════════════════════════════════════════════════════
+  fix-post-image:
+    needs: determine-slot
+    if: ${{ github.event.inputs.step == 'fiximage' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-genai -q
+      - name: "🖼 대표이미지 재검색+교체"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PIXABAY_KEY:    ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY:     ${{ secrets.PEXELS_KEY }}
+          KHEALTH365COM:  ${{ secrets.KHEALTH365COM }}
+        run: |
+          python scripts/fix_post_image.py \
+            "https://k-health365.com" \
+            "파킨슨병-초기증상-시간과-비용을-아끼는-방법" \
+            "파킨슨병 초기증상" \
+            "건강과 의학"
+
+# ══════════════════════════════════════════════════════════
 # JOB: 전체 사이트 상태 확인
 # ══════════════════════════════════════════════════════════
   check-sites:
