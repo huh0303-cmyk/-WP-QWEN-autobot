@@ -230,20 +230,23 @@ def write_srt(srt_entries, out_path):
 # ════════════════════════════════════════════════════════════
 # 3. 이미지 생성 + 고정 4초 Ken Burns 컷 순환
 # ════════════════════════════════════════════════════════════
-N_MUSEUM_IMAGES = 6  # N_UNIQUE_IMAGES(18) 중 실제 박물관 소장품으로 채우는 목표치
+N_MUSEUM_IMAGES = 12  # N_UNIQUE_IMAGES(18) 중 실제 박물관 소장품으로 채우는 목표치
+# 2026-08-16: 시카고미술관(키불필요, 13만+점)+Met(키불필요)+스미소니언(CC0) 3소스
+# 통합으로 성공률이 크게 올라가서 6→12로 상향(사용자 지시: "콘텐츠 많고 받기 쉬운 것").
 
 
 def generate_book_images(book, image_prompts, workdir):
-    """가능하면 스미소니언 실물 소장품 사진(CC0)을 우선 섞어 넣고, 나머지만
-    Gemini AI 이미지로 채운다 — AI 흔적을 줄이고 진짜 유물/미술품을 보여주는 게
-    문학/역사 채널에 더 어울린다는 사용자 지시(2026-08-16)."""
-    from museum_sources import fetch_smithsonian_images
+    """가능하면 실제 미술관 소장품 사진(퍼블릭도메인/CC0, 시카고미술관+Met+스미소니언
+    통합 검색)을 우선 섞어 넣고, 부족한 만큼만 Gemini AI 이미지로 채운다 — AI 흔적을
+    줄이고 진짜 유물/미술품을 보여주는 게 문학/역사 채널에 더 어울린다는 사용자
+    지시(2026-08-16)."""
+    from museum_sources import fetch_museum_images
 
     paths = []
     query = f"{book['author']} {book['region']} art"
-    museum_paths = fetch_smithsonian_images(query, workdir, N_MUSEUM_IMAGES, prefix="museum")
+    museum_paths = fetch_museum_images(query, workdir, N_MUSEUM_IMAGES, prefix="museum")
     if museum_paths:
-        log(f"   스미소니언 실물 소장품 이미지 {len(museum_paths)}장 확보 (검색어: {query!r})")
+        log(f"   실제 미술관 소장품 이미지 {len(museum_paths)}장 확보 (검색어: {query!r})")
     paths.extend(museum_paths)
 
     remaining_prompts = image_prompts[:max(0, N_UNIQUE_IMAGES - len(paths))]
