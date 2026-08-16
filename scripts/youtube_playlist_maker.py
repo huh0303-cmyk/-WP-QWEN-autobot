@@ -1431,7 +1431,12 @@ HEALING_THEME_DURATION_SEC = {
 
 
 def pick_healing_theme():
-    """healing 3테마 중 최근 것과 안 겹치게 무작위로 하나 고른다."""
+    """healing 3테마 중 최근 것과 안 겹치게 무작위로 하나 고른다.
+    HEALING_THEME 환경변수가 지정돼 있으면(수동 실행에서 테마 지정용) 그걸 그대로 쓴다."""
+    override = os.environ.get("HEALING_THEME", "").strip()
+    if override in HEALING_THEMES:
+        return override
+
     recent = []
     if os.path.exists(HEALING_THEME_STATE_FILE):
         try:

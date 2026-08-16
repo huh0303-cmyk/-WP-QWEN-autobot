@@ -57,6 +57,16 @@ on:
         description: "승인 후 유튜브 예약발행까지 걸리는 시간(시간 단위). 비우면 승인 즉시 공개"
         required: false
         type: string
+      healing_theme:
+        description: "healing 채널 전용: 테마 강제 지정(strong_rain/stream_calm/weak_rain). 비우면 최근 안 쓴 것 중 무작위"
+        required: false
+        type: choice
+        default: "(무작위)"
+        options:
+          - "(무작위)"
+          - "strong_rain"
+          - "stream_calm"
+          - "weak_rain"
       fix_video_id:
         description: "(선택) 이미 올라간 영상의 제목/설명을 다시 생성해서 고칠 때: 유튜브 영상 ID (channel 입력도 그 영상 채널로 맞춰야 함)"
         required: false
@@ -132,6 +142,7 @@ jobs:
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
           CAPTION_TEXT: ${{ github.event.inputs.caption }}
+          HEALING_THEME: ${{ (github.event.inputs.healing_theme != '(무작위)' && github.event.inputs.healing_theme) || '' }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
