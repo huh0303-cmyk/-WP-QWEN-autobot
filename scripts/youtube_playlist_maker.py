@@ -776,7 +776,7 @@ def pick_duration_target():
 # ════════════════════════════════════════════════════════════
 # 오디오 조합 (실행마다 다른 목표 재생시간, 30~100분 범위 내)
 # ════════════════════════════════════════════════════════════
-def build_playlist_audio(service, tracks_meta, out_path):
+def build_playlist_audio(service, tracks_meta, out_path, duration_range=None):
     # tracks_meta는 filter_tracks_by_language가 이미 "언어 매칭곡을 앞에,
     # 나머지를 뒤에" 순서로 정렬해서 넘겨준 리스트이므로, 여기서 다시 섞으면
     # 그 우선순위가 깨진다 — 순서 그대로 앞에서부터 채운다.
@@ -784,7 +784,9 @@ def build_playlist_audio(service, tracks_meta, out_path):
     if not shuffled:
         raise RuntimeError("사용 가능한 음원이 없습니다")
 
-    target_min_sec, target_max_sec = pick_duration_target()
+    # duration_range를 명시로 주면(예: healing 테마별 목표시간) pick_duration_target()의
+    # 채널별 무작위 구간 대신 그걸 그대로 쓴다.
+    target_min_sec, target_max_sec = duration_range if duration_range else pick_duration_target()
     log(f"   이번 목표 재생시간: {target_min_sec/60:.0f}~{target_max_sec/60:.0f}분")
 
     selected_paths = []
@@ -1401,6 +1403,98 @@ def filter_tracks_by_language(tracks, keyword):
 
 
 # ════════════════════════════════════════════════════════════
+# healing 전용 3테마 (2026-08-16 사용자 명시적 지시 — "3가지 종류의 힐링 파일로
+# 하라는 거야, 한 파일에 다 올리라는게 아냐": 하나의 영상에 여러 소리를 섞는
+# 게 아니라, 매번 아래 3가지 중 하나를 골라 그 소리 하나로만 영상 하나를 만든다)
+#   1) strong_rain — 강한 빗소리만, ~2시간 30분
+#   2) stream_calm — 시냇물소리(졸졸) 위주, 가끔(드물게) 새소리, 2~3시간
+#   3) weak_rain   — 약한 빗소리만, 2~3시간
+# ════════════════════════════════════════════════════════════
+HEALING_THEME_STATE_FILE = "healing_theme_recent.json"
+# 새소리.mp3는 일반 원곡 풀에서는 격리 폴더로 빼뒀지만(2026-08-16, 종소리/천둥과
+# 함께 "3가지로만" 지시 때 격리) stream_calm 테마의 "가끔 새소리" 용으로는 여전히
+# 필요해서 파일ID로 직접 참조한다 — 격리 폴더에 있어도 상관없음(폴더 목록이 아니라
+# ID로 바로 다운로드).
+HEALING_BIRDS_FILE_ID = "1ee6GxyDLLAhVR1mwPW6VhKDM2EQu52YX"
+
+HEALING_THEMES = ["strong_rain", "stream_calm", "weak_rain"]
+HEALING_THEME_TOPICS = {
+    "strong_rain": "Heavy Rain Sounds for Deep Sleep and Relaxation",
+    "stream_calm": "Calming Stream Sounds with Gentle Birdsong",
+    "weak_rain": "Soft Light Rain Sounds for Sleep and Focus",
+}
+HEALING_THEME_DURATION_SEC = {
+    "strong_rain": (145 * 60, 155 * 60),   # "2시간 30분" 목표
+    "stream_calm": (120 * 60, 180 * 60),   # "2~3시간"
+    "weak_rain": (120 * 60, 180 * 60),     # "2~3시간"
+}
+
+
+def pick_healing_theme():
+    """healing 3테마 중 최근 것과 안 겹치게 무작위로 하나 고른다."""
+    recent = []
+    if os.path.exists(HEALING_THEME_STATE_FILE):
+        try:
+            with open(HEALING_THEME_STATE_FILE, encoding="utf-8") as f:
+                recent = json.load(f).get("recent", [])
+        except Exception:
+            recent = []
+    candidates = [t for t in HEALING_THEMES if t not in recent[:1]] or list(HEALING_THEMES)
+    theme = random.choice(candidates)
+    recent = ([theme] + [t for t in recent if t != theme])[:2]
+    try:
+        with open(HEALING_THEME_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump({"recent": recent}, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        log(f"   ⚠️ healing 테마 기록 실패(무시): {e}")
+    return theme
+
+
+def _extract_random_clip(src_path, clip_sec, out_path):
+    """긴 오디오 파일에서 clip_sec만큼 임의 구간을 잘라낸다(가끔 등장하는 이벤트음용)."""
+    dur = get_duration(src_path)
+    start = random.uniform(0, max(0.0, dur - clip_sec))
+    run_ffmpeg(["ffmpeg", "-y", "-ss", f"{start:.2f}", "-t", str(clip_sec), "-i", src_path,
+                "-c:a", "aac", "-b:a", "192k", out_path])
+
+
+def build_healing_theme_audio(service, theme, out_path):
+    """healing 전용 오디오 빌드 — 3테마 중 하나만 쓴다(섞지 않음)."""
+    tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS, "audio/")
+    by_name = {t["name"]: t for t in tracks}
+    duration_range = HEALING_THEME_DURATION_SEC[theme]
+
+    if theme == "strong_rain":
+        meta = by_name.get("빗소리_강하게.mp3")
+    elif theme == "weak_rain":
+        meta = by_name.get("빗소리_약하게.mp3")
+    else:
+        meta = next((t for t in tracks if "시냇물" in t["name"]), None)
+
+    if not meta:
+        raise RuntimeError(f"[healing:{theme}] 원곡 폴더에서 필요한 음원을 못 찾음 (현재 {len(tracks)}개: "
+                            f"{[t['name'] for t in tracks]})")
+
+    base_sec = build_playlist_audio(service, [meta], out_path, duration_range=duration_range)
+
+    if theme != "stream_calm":
+        return base_sec
+
+    # stream_calm: 시냇물소리 위로 새소리를 "가끔"(8~18분 간격) 짧게(20~35초) 얹는다.
+    log("   [healing:stream_calm] 가끔 새소리 얹는 중...")
+    import ambient_sample_lab as _asl
+    birds_full = os.path.join(WORKDIR, "_healing_birds_full.mp3")
+    download_drive_file(service, HEALING_BIRDS_FILE_ID, birds_full)
+    birds_clip = os.path.join(WORKDIR, "_healing_birds_clip.m4a")
+    _extract_random_clip(birds_full, random.uniform(20, 35), birds_clip)
+
+    with_birds = os.path.join(WORKDIR, "_healing_stream_with_birds.m4a")
+    _asl._scatter_over_bed(out_path, birds_clip, base_sec, with_birds, min_gap=480.0, max_gap=1080.0)
+    run_ffmpeg(["ffmpeg", "-y", "-i", with_birds, "-c", "copy", out_path])
+    return base_sec
+
+
+# ════════════════════════════════════════════════════════════
 # 메인
 # ════════════════════════════════════════════════════════════
 def main():
@@ -1418,12 +1512,21 @@ def main():
     language_keyword = sys.argv[2] if len(sys.argv) > 2 else os.environ.get("LANGUAGE_KEYWORD", "")
     caption_text_input = sys.argv[3] if len(sys.argv) > 3 else os.environ.get("CAPTION_TEXT", "")
 
-    auto_mode = os.environ.get("AUTO_TOPIC", "").strip().lower() == "true"
-    if auto_mode and not topic_keyword.strip():
-        topic_keyword, auto_lang = pick_auto_topic()
-        if not language_keyword.strip():
-            language_keyword = auto_lang
-        log(f"🤖 자동 선택된 주제: {topic_keyword} (언어: {language_keyword or 'Mixed'})")
+    healing_theme = None
+    if CHANNEL_KEY == "healing":
+        # healing은 여행지/도시명 같은 일반 AUTO_TOPIC_POOL이 애초에 안 맞는 채널이라
+        # (자연음 채널인데 "Tokyo" 같은 주제가 나가고 있었음) 3테마 전용 로직을 쓴다.
+        healing_theme = pick_healing_theme()
+        topic_keyword = HEALING_THEME_TOPICS[healing_theme]
+        language_keyword = ""
+        log(f"🌧️ [healing] 테마 선택: {healing_theme} — {topic_keyword}")
+    else:
+        auto_mode = os.environ.get("AUTO_TOPIC", "").strip().lower() == "true"
+        if auto_mode and not topic_keyword.strip():
+            topic_keyword, auto_lang = pick_auto_topic()
+            if not language_keyword.strip():
+                language_keyword = auto_lang
+            log(f"🤖 자동 선택된 주제: {topic_keyword} (언어: {language_keyword or 'Mixed'})")
 
     # (2026-08-03에 넣었던 "starbucks 채널은 일본어 기본값" 규칙은 2026-08-06
     # starbucks 채널이 보컬없는 카페 연주곡 전용으로 재배정되면서 더 이상 맞지
@@ -1432,17 +1535,21 @@ def main():
     os.makedirs(WORKDIR, exist_ok=True)
     service = get_drive_service()
 
-    log("1/5 원곡 폴더에서 음악 목록 조회 중...")
-    tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS, "audio/")
-    if not tracks:
-        log("❌ 원곡 폴더에 음원이 없습니다")
-        raise SystemExit(1)
-    log(f"   -> {len(tracks)}개 트랙 발견")
-    tracks = filter_tracks_by_language(tracks, language_keyword)
-
-    log("2/5 음악 60~80분 분량으로 무작위 이어붙이는 중...")
     audio_path = os.path.join(WORKDIR, "playlist_audio.m4a")
-    total_sec = build_playlist_audio(service, tracks, audio_path)
+    if healing_theme:
+        log(f"1-2/5 healing 테마({healing_theme}) 오디오 생성 중...")
+        total_sec = build_healing_theme_audio(service, healing_theme, audio_path)
+    else:
+        log("1/5 원곡 폴더에서 음악 목록 조회 중...")
+        tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS, "audio/")
+        if not tracks:
+            log("❌ 원곡 폴더에 음원이 없습니다")
+            raise SystemExit(1)
+        log(f"   -> {len(tracks)}개 트랙 발견")
+        tracks = filter_tracks_by_language(tracks, language_keyword)
+
+        log("2/5 음악 60~80분 분량으로 무작위 이어붙이는 중...")
+        total_sec = build_playlist_audio(service, tracks, audio_path)
     log(f"   ✅ 총 재생시간: {total_sec/60:.1f}분")
 
     final_path = os.path.join(WORKDIR, "final.mp4")
