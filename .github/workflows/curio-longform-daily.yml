@@ -124,7 +124,22 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-        run: python scripts/curio_longform.py "${{ needs.determine-channel.outputs.topic }}" en "" "${{ needs.determine-channel.outputs.channel }}"
+        run: |
+          CH="${{ needs.determine-channel.outputs.channel }}"
+          # 2026-08-16: myth/science는 실제 영상 자료가 존재하지 않는 주제라
+          # 계속 curio_longform.py(Gemini 이미지) 그대로. 나머지는 실제 퍼블릭도메인
+          # 영상 소싱 파이프라인으로 전환(사용자 지시 — AI생성 대신 실제 무료 영상,
+          # 흑백/짧은 클립도 허용).
+          if [ "$CH" = "classic_reads" ]; then
+            # 주제 인자 없이 100선 리스트에서 알아서 다음 책을 고른다.
+            python scripts/classic_reads_longform.py
+          elif [ "$CH" = "nasa" ]; then
+            python scripts/nasa_archive_longform.py
+          elif [ "$CH" = "american_archive" ] || [ "$CH" = "history" ] || [ "$CH" = "invention" ] || [ "$CH" = "silent_era" ] || [ "$CH" = "retro_reels" ]; then
+            python scripts/archive_footage_longform.py "${{ needs.determine-channel.outputs.topic }}" en "" "$CH"
+          else
+            python scripts/curio_longform.py "${{ needs.determine-channel.outputs.topic }}" en "" "$CH"
+          fi
 
       - name: "유튜브 업로드(비공개)"
         env:
@@ -152,3 +167,21 @@ jobs:
           path: curio_longform_output/**/final.mp4
           retention-days: 3
           if-no-files-found: ignore
+
+      - name: "Commit classic_reads/nasa 순환상태 갱신 (anti-repeat)"
+        if: ${{ always() && (needs.determine-channel.outputs.channel == 'classic_reads' || needs.determine-channel.outputs.channel == 'nasa') }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          for f in scripts/data/classic_reads_state.json scripts/data/nasa_archive_state.json; do
+            if grep -q "^<<<<<<< " "$f" 2>/dev/null; then
+              echo "⚠️ $f 에 병합 충돌 마커 발견 — 커밋 건너뜀"
+              git checkout -- "$f"
+            fi
+          done
+          git add scripts/data/classic_reads_state.json scripts/data/nasa_archive_state.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: classic_reads/nasa 순환 상태 갱신 [skip ci]"
+          git push
