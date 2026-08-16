@@ -230,9 +230,24 @@ def write_srt(srt_entries, out_path):
 # ════════════════════════════════════════════════════════════
 # 3. 이미지 생성 + 고정 4초 Ken Burns 컷 순환
 # ════════════════════════════════════════════════════════════
-def generate_book_images(image_prompts, workdir):
+N_MUSEUM_IMAGES = 6  # N_UNIQUE_IMAGES(18) 중 실제 박물관 소장품으로 채우는 목표치
+
+
+def generate_book_images(book, image_prompts, workdir):
+    """가능하면 스미소니언 실물 소장품 사진(CC0)을 우선 섞어 넣고, 나머지만
+    Gemini AI 이미지로 채운다 — AI 흔적을 줄이고 진짜 유물/미술품을 보여주는 게
+    문학/역사 채널에 더 어울린다는 사용자 지시(2026-08-16)."""
+    from museum_sources import fetch_smithsonian_images
+
     paths = []
-    for idx, prompt in enumerate(image_prompts):
+    query = f"{book['author']} {book['region']} art"
+    museum_paths = fetch_smithsonian_images(query, workdir, N_MUSEUM_IMAGES, prefix="museum")
+    if museum_paths:
+        log(f"   스미소니언 실물 소장품 이미지 {len(museum_paths)}장 확보 (검색어: {query!r})")
+    paths.extend(museum_paths)
+
+    remaining_prompts = image_prompts[:max(0, N_UNIQUE_IMAGES - len(paths))]
+    for idx, prompt in enumerate(remaining_prompts):
         img_path = os.path.join(workdir, f"img_{idx}.png")
         if os.path.exists(img_path):
             paths.append(img_path)
@@ -466,7 +481,7 @@ def main():
     write_srt(srt_entries, srt_path)
 
     log(f"3/6 책 삽화 이미지 {N_UNIQUE_IMAGES}장 생성 중 (Gemini, Veo 미사용)...")
-    image_paths = generate_book_images(data["image_prompts"], workdir)
+    image_paths = generate_book_images(book, data["image_prompts"], workdir)
     log(f"   {len(image_paths)}장 생성 완료")
 
     log(f"4/6 {IMAGE_SLIDE_SECONDS:.0f}초 간격 Ken Burns 컷 순환 영상 조립 중...")

@@ -124,6 +124,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
         run: |
           CH="${{ needs.determine-channel.outputs.channel }}"
           # 2026-08-16: myth/science는 실제 영상 자료가 존재하지 않는 주제라
