@@ -46,6 +46,17 @@ on:
     - cron: "34 20 * * 4"  # 목: silent_era - 05:34 KST
     - cron: "17 20 * * 5"  # 금: retro_reels - 05:17 KST
     - cron: "34 20 * * 5"  # 금: classic_reads - 05:34 KST
+    # 2026-08-18 사용자 지시("토일도 좀 넣어봐.. 무료에 가장 쉬운거로"): 주말엔
+    # 실제 아카이브 영상 소싱이라 이미지 생성 비용이 0인 6개 채널(nasa/history/
+    # invention/american_archive/silent_era/retro_reels)만 골라 3개씩 나눠
+    # 주2회로 늘림. Gemini 이미지 여러 장 필요한 4개(science/classical/myth/
+    # classic_reads)는 비용 문제로 주말엔 안 넣음.
+    - cron: "17 20 * * 6"  # 토: nasa(2회차) - 05:17 KST
+    - cron: "34 20 * * 6"  # 토: invention(2회차) - 05:34 KST
+    - cron: "50 20 * * 6"  # 토: silent_era(2회차) - 05:50 KST
+    - cron: "17 20 * * 0"  # 일: history(2회차) - 05:17 KST
+    - cron: "34 20 * * 0"  # 일: american_archive(2회차) - 05:34 KST
+    - cron: "50 20 * * 0"  # 일: retro_reels(2회차) - 05:50 KST
 
 concurrency:
   # 2026-08-17 사고: 그룹명이 전체 워크플로우 공용 하나였어서, 짧은 간격으로
@@ -82,6 +93,12 @@ jobs:
               "34 20 * * 4") CH="silent_era" ;;
               "17 20 * * 5") CH="retro_reels" ;;
               "34 20 * * 5") CH="classic_reads" ;;
+              "17 20 * * 6") CH="nasa" ;;
+              "34 20 * * 6") CH="invention" ;;
+              "50 20 * * 6") CH="silent_era" ;;
+              "17 20 * * 0") CH="history" ;;
+              "34 20 * * 0") CH="american_archive" ;;
+              "50 20 * * 0") CH="retro_reels" ;;
               *) CH="nasa" ;;
             esac
             TOPIC_IN=""

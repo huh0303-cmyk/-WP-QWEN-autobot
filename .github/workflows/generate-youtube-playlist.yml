@@ -87,19 +87,19 @@ on:
     # 안전하다. 토큰 없는 채널은 그냥 그 회차만 실패로 로그에 남고, 영상은
     # Google Drive에 남아있다가 get_youtube_refresh_token.py로 mbb/kpop 토큰을
     # 발급해서 시크릿에 등록하는 순간부터 자동으로 정상 작동한다.
-    # 2026-08-12: 5개 채널 전부 주3회(월/수/금)로 통일, 정각 피해서 15~20분씩 분산.
+    # 2026-08-12: 5개 채널 전부 월/수/금 3회+토 1회로 통일, 정각 피해서 15~20분씩 분산.
     # KST 00시대라 UTC로는 전날 15시대라서 요일이 하루 당겨짐(월요일 KST → 일요일 UTC 등).
-    - cron: "7 15 * * 0,2,4"    # globalmusic — 00:07 KST 월/수/금
-    - cron: "24 15 * * 0,2,4"   # healing — 00:24 KST 월/수/금
+    - cron: "7 15 * * 0,2,4,5"    # globalmusic — 00:07 KST 월/수/금/토
+    - cron: "24 15 * * 0,2,4,5"   # healing — 00:24 KST 월/수/금/토
     # 2026-08-17: 잠깐 중단했다가 재개 — SIS-Language Center 채널(구 starbucks,
     # UCOWoNH..., 2026-08-12에 이름/핸들만 바뀜)에서 카페음악을 발견해서 라우팅
     # 사고로 오인, 스케줄을 껐었음. 실제로는 진짜 "Starbucks vibes"(@Starbucksvibes)
     # 채널에 최근(4시간 전 포함) 영상이 정상적으로 계속 올라오고 있는 걸 확인 —
     # SIS-Language Center의 옛날 영상들은 8/12 이전 라우팅이 고쳐지기 전 남은
     # 잔재일 뿐, 지금은 정상 작동 중이라 재개함.
-    - cron: "38 15 * * 0,2,4"   # starbucks — 00:38 KST 월/수/금
-    - cron: "52 15 * * 0,2,4"   # mbb — 00:52 KST 월/수/금
-    - cron: "9 16 * * 0,2,4"    # kpop — 01:09 KST 월/수/금
+    - cron: "38 15 * * 0,2,4,5"   # starbucks — 00:38 KST 월/수/금/토
+    - cron: "52 15 * * 0,2,4,5"   # mbb — 00:52 KST 월/수/금/토
+    - cron: "9 16 * * 0,2,4,5"    # kpop — 01:09 KST 월/수/금/토
 
 permissions:
   contents: write
@@ -107,8 +107,11 @@ permissions:
 # 2026-08-15: 오늘 5채널 OAuth 재발급 검증차 workflow_dispatch로 여러 채널을
 # 한 번에 몰아서 트리거할 일이 생겨서, GitHub이 자동으로 순차 큐잉하도록
 # concurrency 그룹 추가(겹쳐 돌면 Drive/Gemini 리소스 경합 가능성 있음).
+# 2026-08-18: 채널 구분 없이 그룹 하나였던 게 curio-longform-daily.yml에서
+# 똑같은 패턴으로 실제 사고(짧은 간격 dispatch가 서로를 취소)를 낸 걸 확인해서
+# 여기도 채널별로 분리 — 서로 다른 채널은 절대 서로를 취소하지 못하게.
 concurrency:
-  group: generate-youtube-playlist
+  group: generate-youtube-playlist-${{ github.event.inputs.channel || github.event.schedule || 'default' }}
   cancel-in-progress: false
 
 jobs:
@@ -143,7 +146,7 @@ jobs:
       - name: Run playlist maker
         env:
           AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4' && 'kpop') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4,5' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4,5' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4,5' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4,5' && 'kpop') || 'globalmusic' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
@@ -183,7 +186,7 @@ jobs:
       - name: Export upload metadata for the publish job
         id: meta
         env:
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4' && 'kpop') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4,5' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4,5' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4,5' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4,5' && 'kpop') || 'globalmusic' }}
         run: |
           python - <<'EOF'
           import json, os
