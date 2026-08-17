@@ -1529,6 +1529,13 @@ def main():
         auto_mode = os.environ.get("AUTO_TOPIC", "").strip().lower() == "true"
         if auto_mode and not topic_keyword.strip():
             topic_keyword, auto_lang = pick_auto_topic()
+            # 2026-08-17 버그수정: pick_auto_topic()이 AUTO_TOPIC_POOL에서 한글
+            # 주제("봄"/"호수"/"시골 마을" 등)를 그대로 반환하는데, 이 값이
+            # PRESET_TOPIC_EN_MAP 변환을 안 거치고 그대로 썸네일/제목에 들어가서
+            # 한글 노출 + 폰트에 한글 글리프 없어서 깨지는 사고로 이어졌음
+            # (수동 드롭다운 입력 경로는 위 1516번 줄에서 이미 변환되지만, 자동
+            # 선택 경로는 그 이후에 값을 새로 덮어써서 변환이 다시 필요함).
+            topic_keyword = PRESET_TOPIC_EN_MAP.get(topic_keyword.strip(), topic_keyword)
             if not language_keyword.strip():
                 language_keyword = auto_lang
             log(f"🤖 자동 선택된 주제: {topic_keyword} (언어: {language_keyword or 'Mixed'})")
