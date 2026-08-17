@@ -10,14 +10,18 @@ hide_weak_posts.py
   - AI 티 문구 1개 이상 검출
   - 같은 제목 앞 2단어가 3회 이상 반복(대량생산 패턴)
 
-cleanup_ai_toned_posts.py와 달리 GSC 색인 확인을 게이트로 걸지 않는다 —
-사용자가 오늘 "엄격히 적용, 무조건"이라고 명시(2026-08-17). 삭제 아님,
-언제든 복구 가능. 기본값은 DRY RUN.
+2026-08-17 추가 정정: 사용자 확인 — "저품질 기준에 걸려도 이미 구글에 색인된
+글은 남겨둬야지". scripts/data/protected_indexed_posts.json에 있는 글 ID는
+cleanup_ai_toned_posts.py가 실제 GSC urlInspection API로 확인해 "색인됨"이라고
+검증한 것들 — 점수/AI티가 뭐가 나오든 이 목록에 있으면 절대 비공개 전환 안 함.
+이 파일이 아직 없는 사이트는 보호 목록이 비어 있으므로(=색인 확인을 아직
+못한 사이트) 기존처럼 점수/AI티 기준만으로 판단한다.
 
 사용법:
     python scripts/hide_weak_posts.py [--site=<url>] [--offset=N] [--limit=N] [--execute]
     (사이트 미지정이면 27개 전체)
 """
+import json
 import os
 import re
 import sys
@@ -31,6 +35,16 @@ from cleanup_ai_toned_posts import (  # noqa: E402
 )
 
 SEO_THRESHOLD = 80
+PROTECTED_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "data", "protected_indexed_posts.json")
+
+
+def load_protected():
+    try:
+        with open(PROTECTED_PATH, encoding="utf-8") as f:
+            return {site: set(ids) for site, ids in json.load(f).items()}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 
 def log(msg):
@@ -83,7 +97,7 @@ def scan(posts):
     return results
 
 
-def process_site(site_url, pw_env, execute):
+def process_site(site_url, pw_env, execute, protected):
     pw = os.environ.get(pw_env, "")
     if not pw:
         log(f"⏭  {site_url} — 비밀번호 없음(secret {pw_env}), 스킵")
@@ -92,9 +106,13 @@ def process_site(site_url, pw_env, execute):
     log(f"🌐 {site_url}")
     posts = fetch_all_posts(site_url)
     results = scan(posts)
-    targets = [r for r in results if r["score"] < SEO_THRESHOLD or r["ai_tell"] or r["dup_title_pattern"]]
+    site_protected = protected.get(site_url, set())
+    candidates = [r for r in results if r["score"] < SEO_THRESHOLD or r["ai_tell"] or r["dup_title_pattern"]]
+    targets = [r for r in candidates if r["id"] not in site_protected]
+    n_protected_skipped = len(candidates) - len(targets)
     log(f"   전체 {len(results)}개 중 대상 {len(targets)}개 "
-        f"(SEO<{SEO_THRESHOLD} 또는 AI티 또는 제목반복)")
+        f"(SEO<{SEO_THRESHOLD} 또는 AI티 또는 제목반복"
+        + (f", 색인확인돼서 보호한 {n_protected_skipped}개 제외" if site_protected else "") + ")")
     for r in targets[:8]:
         reason = []
         if r["score"] < SEO_THRESHOLD:
@@ -143,7 +161,8 @@ def main():
 
     site_items = list(SITE_SECRET_MAP.items())
     if only_site:
-        site_items = [(u, s) for u, s in site_items if only_site in u]
+        needles = [s.strip() for s in only_site.split(",") if s.strip()]
+        site_items = [(u, s) for u, s in site_items if any(n in u for n in needles)]
         if not site_items:
             log(f"❌ 알 수 없는 site: {only_site}")
             raise SystemExit(1)
@@ -153,15 +172,18 @@ def main():
         site_items = site_items[start:end]
         log(f"📦 배치 모드: 사이트 {start}~{end - 1}번째만 처리 ({len(site_items)}개)")
 
+    protected = load_protected()
+
     mode = "실행(비공개 전환)" if execute else "리포트만(DRY RUN)"
     log(f"{'=' * 60}")
-    log(f"🔍 저품질 글 정리 — SEO<{SEO_THRESHOLD} 또는 AI흔적 또는 제목반복 → 무조건 비공개 — {mode}")
+    log(f"🔍 저품질 글 정리 — SEO<{SEO_THRESHOLD} 또는 AI흔적 또는 제목반복 → 무조건 비공개 "
+        f"(단, 색인 확인된 글은 보호) — {mode}")
     log(f"{'=' * 60}\n")
 
     total_posts = total_targets = 0
     for site_url, pw_env in site_items:
         try:
-            n_posts, n_targets = process_site(site_url, pw_env, execute)
+            n_posts, n_targets = process_site(site_url, pw_env, execute, protected)
         except Exception as e:
             log(f"   ⚠️ {site_url} 처리 중 오류(스킵하고 계속): {e}\n")
             continue
