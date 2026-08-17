@@ -1,0 +1,38 @@
+name: (임시) healing 클릭음 영상 비공개 전환
+
+on:
+  workflow_dispatch:
+    inputs:
+      execute:
+        description: "true면 실제 비공개 전환, 비우면 리포트만(DRY RUN)"
+        required: false
+        default: "false"
+      include_stream:
+        description: "true면 시냇물(stream_calm) 테마도 같이 대상에 포함"
+        required: false
+        default: "false"
+
+jobs:
+  hide:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 -q
+      - name: "healing 클릭음 영상 비공개 전환"
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.execute }}" == "true" ]; then
+            ARGS="--execute"
+          fi
+          if [ "${{ github.event.inputs.include_stream }}" == "true" ]; then
+            ARGS="$ARGS --include-stream"
+          fi
+          python scripts/hide_healing_click_videos.py $ARGS
