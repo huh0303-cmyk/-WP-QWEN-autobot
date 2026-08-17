@@ -6,7 +6,8 @@ curio_longform.py
 "Curio/Times" 지식채널(NASA_SPACE_TIMES/HISTORY_TODAY_TIMES/SCIENCE_FACTS_TIMES/
 CLASSICAL_TIMES/MYTH_LEGEND_TIMES/INVENTION_TIMES) 공용 장편(8분 내외, 16:9)
 영상 자동 생성기. health_longform.py를 베이스로 음식/증상 관련 로직만 제거하고
-범용 교양 대본 구조로 바꿈 — Veo/이미지/TTS/자막/썸네일 파이프라인은 동일.
+범용 교양 대본 구조로 바꿈 — 이미지/TTS/자막/썸네일 파이프라인은 동일. Veo는
+2026-08-18 완전 제거(비용 문제) — 정지이미지(Ken Burns)만 사용.
 
 사용법:
     python scripts/curio_longform.py "주제" en [재사용할언어] [채널힌트]
@@ -34,16 +35,6 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-
-class RULES:
-    # 2026-08-15: 인트로 영상클립 개수는 시청유지율에 실제로 중요해서 4개로
-    # 유지(사용자 확정) — 대신 Veo 하루 10회 한도(Tier 1)에 맞춰 스케줄 쪽을
-    # 하루 2채널(Veo 8회, 여유 2회)로 분산해서 무료량을 최대 활용함
-    # (curio-longform-daily.yml 참고).
-    INTRO_VIDEO_CLIP_COUNT = 4
-    INTRO_VIDEO_MODEL = "veo-3.1-lite-generate-preview"
-    INTRO_VIDEO_DURATION_SECONDS = 8
 
 
 def _load_dotenv():
@@ -171,14 +162,11 @@ CHANNEL_TOPICS = {
                      "world that shaped them",
 }
 
-# 2026-08-17: 원래 목표가 "무료 실물 영상/이미지 우선"이었는데, Veo 인트로클립을
-# 계속 쓰던 채널이 남아있었음 — classical(작곡가 초상화)/myth(신화 소재 미술품)는
-# 실제 퍼블릭도메인 미술관 이미지가 풍부해서 Veo 없이도 된다(사용자 지시).
-# science도 같은 날 마저 편입 — 사용자가 Veo 비용에 강하게 문제 제기("돈먹는
-# 하마", "낭비하지 말고")해서, 이제 Veo를 쓰는 채널이 하나도 안 남는다. 스미소니언
-# Open Access에 과학/자연사 소장품이 꽤 있어서 검색은 시도하되(museum_sources.py),
-# 추상적인 주제라 못 찾으면 기존처럼 Gemini 정지이미지로 자동 대체(코드 그대로 재사용).
-NO_VEO_CHANNELS = {"classical", "myth", "science"}
+# 2026-08-18: Veo를 파이프라인 전체에서 완전히 제거(사용자 지시 — 비용 문제로
+# 여러 차례 강하게 문제 제기됨, "완전 VEO 제거해"). 모든 채널이 정지이미지
+# (Ken Burns) 기반이고, classical(작곡가 초상화)/myth(신화 소재 미술품)/science
+# (자연사 소장품)는 실제 퍼블릭도메인 미술관 이미지를 우선 검색(museum_sources.py),
+# 추상적인 주제라 못 찾으면 Gemini 정지이미지로 자동 대체.
 MUSEUM_QUERY_HINT = {
     "classical": "classical composer portrait painting",
     "myth": "mythology art",
@@ -188,8 +176,7 @@ MUSEUM_QUERY_HINT = {
 
 def generate_script(topic, lang, channel_key="nasa"):
     lang_name = LANG_NAMES.get(lang, "English")
-    n_intro = 0 if channel_key in NO_VEO_CHANNELS else RULES.INTRO_VIDEO_CLIP_COUNT
-    n_images = TARGET_IMAGE_COUNT + (RULES.INTRO_VIDEO_CLIP_COUNT if channel_key in NO_VEO_CHANNELS else 0)
+    n_images = TARGET_IMAGE_COUNT
     domain = CHANNEL_TOPICS.get(channel_key, "general knowledge")
 
     prompt = f"""You are writing a narration script for an ~7-minute YouTube educational
@@ -199,20 +186,16 @@ Tone: engaging, documentary-style, factual but conversational — like a good
 history/science YouTuber, not a dry lecture. Hook viewers in the first 10 seconds.
 
 The script MUST be broken into "beats" that will each become one video shot:
-- The first {n_intro} beats have type "intro_video": short (1-2 sentence) narration
-  each, paired with an English text-to-video prompt describing a short cinematic
-  visual moment relevant to the topic (archival-style footage feel, or a dramatic
-  establishing shot). These are the hook — fast-paced, must grab attention
-  immediately, no text overlays needed in the prompt itself.
-- The remaining beats have type "image": each pairs one narration chunk (1-3
-  sentences, natural spoken pacing, keep individual images from staying on screen
-  too long — shorter chunks are better for retention) with an English
-  image-generation prompt (realistic/documentary photography style or historical
-  illustration style as fits the topic, no text/watermark in the image).
-- Total beats (intro_video + image) must be exactly {n_intro + n_images}.
+- Each beat has type "image": pairs one narration chunk (1-3 sentences, natural
+  spoken pacing, keep individual images from staying on screen too long — shorter
+  chunks are better for retention) with an English image-generation prompt
+  (realistic/documentary photography style or historical illustration style as
+  fits the topic, no text/watermark in the image).
+- Total beats must be exactly {n_images}.
 - Structure: hook → context/background → the core interesting facts (the bulk of
   the video) → a surprising twist or lesser-known detail → a memorable closing line.
-- Vary pacing: front beats short/punchy, later beats can breathe more.
+- Vary pacing: front beats short/punchy, later beats can breathe more. The first
+  beat especially must grab attention immediately.
 
 Also return:
 - "thumbnail_lines": {{"line1": "short hook line 1", "line2": "short punchy hook line 2",
@@ -224,8 +207,6 @@ Respond with JSON only, no explanation, no markdown fences:
   "topic": "...",
   "thumbnail_lines": {{"line1": "...", "line2": "...", "line3": "...", "line4": "..."}},
   "beats": [
-    {{"type": "intro_video", "narration": "...", "video_prompt": "..."}},
-    ...,
     {{"type": "image", "narration": "...", "image_prompt": "..."}},
     ...
   ]
@@ -320,57 +301,6 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
         time.sleep(wait)
     log(f"      ⚠️ 최종 실패({max_retries}회 재시도 후): {last_err}")
     return False
-
-
-# ════════════════════════════════════════════════════════════
-# 3. 앞부분 AI 영상 클립 (Veo)
-# ════════════════════════════════════════════════════════════
-def generate_intro_video(prompt, out_path):
-    from google import genai
-    from google.genai import types
-
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    operation = client.models.generate_videos(
-        model=RULES.INTRO_VIDEO_MODEL,
-        prompt=prompt,
-        config=types.GenerateVideosConfig(
-            number_of_videos=1,
-            duration_seconds=RULES.INTRO_VIDEO_DURATION_SECONDS,
-        ),
-    )
-    waited = 0
-    while not operation.done:
-        time.sleep(10)
-        waited += 10
-        if waited > 300:
-            raise RuntimeError("Veo 영상 생성 타임아웃(5분)")
-        operation = client.operations.get(operation)
-
-    if not (operation.response and operation.response.generated_videos):
-        raise RuntimeError(f"Veo 영상 생성 실패: {operation}")
-
-    video = operation.response.generated_videos[0]
-    client.files.download(file=video.video)
-    video.video.save(out_path)
-
-
-def normalize_intro_clip(raw_path, audio_path, out_path):
-    """Veo 클립 자체 오디오는 버리고, 해당 구간 내레이션 오디오로 교체 +
-    나머지 이미지 클립과 이어붙일 수 있게 코덱/해상도 통일."""
-    audio_dur = get_duration(audio_path)
-    video_dur = get_duration(raw_path)
-    run_ffmpeg([
-        "ffmpeg", "-y", "-i", raw_path, "-i", audio_path,
-        "-map", "0:v:0", "-map", "1:a:0",
-        "-vf", f"scale={W}:{H},format=yuv420p,fps=30",
-        "-c:v", "libx264", "-c:a", "aac",
-        "-t", str(max(audio_dur, video_dur)),
-        "-shortest" if audio_dur < video_dur else "-y",
-        "-map_metadata", "-1", "-fflags", "+bitexact",
-        "-flags:v", "+bitexact", "-flags:a", "+bitexact",
-        out_path,
-    ])
-    return max(audio_dur, video_dur)
 
 
 # ════════════════════════════════════════════════════════════
@@ -618,24 +548,13 @@ def build_thumbnail(topic, lang, thumbnail_lines, channel_key, workdir):
 # ════════════════════════════════════════════════════════════
 # 7. 메인
 # ════════════════════════════════════════════════════════════
-def reuse_visuals_from(src_dir, workdir, n_intro, n_images):
-    """언어간 이미지/인트로영상클립 재사용, 순서만 셔플. src_dir의 raw Veo 클립과
-    이미지 파일을 복사해와서 이 workdir에 채워두면, 이후 생성 루프의
-    '이미 있으면 재사용' 체크에 걸려서 Gemini/Veo 재호출 없이 재사용된다
-    (TTS/썸네일만 새로 생성됨)."""
+def reuse_visuals_from(src_dir, workdir, n_images):
+    """언어간 이미지 재사용, 순서만 셔플. src_dir의 이미지 파일을 복사해와서 이
+    workdir에 채워두면, 이후 생성 루프의 '이미 있으면 재사용' 체크에 걸려서
+    Gemini 재호출 없이 재사용된다(TTS/썸네일만 새로 생성됨)."""
     if not os.path.isdir(src_dir):
         log(f"   ⚠️ 재사용 소스 언어 폴더 없음: {src_dir} — 전부 새로 생성함")
         return
-
-    src_raws = [os.path.join(src_dir, f"intro_raw_{i}.mp4") for i in range(n_intro)]
-    src_raws = [p for p in src_raws if os.path.exists(p)]
-    order = list(range(len(src_raws)))
-    random.shuffle(order)
-    for new_idx, src_idx in enumerate(order):
-        dst = os.path.join(workdir, f"intro_raw_{new_idx}.mp4")
-        if not os.path.exists(dst):
-            shutil.copyfile(src_raws[src_idx], dst)
-    log(f"   {len(src_raws)}개 인트로 영상 클립 재사용 (순서 셔플)")
 
     src_imgs = [os.path.join(src_dir, f"img_{i}.png") for i in range(n_images)]
     src_imgs = [p for p in src_imgs if os.path.exists(p)]
@@ -666,47 +585,26 @@ def main():
 
     if reuse_from:
         reuse_dir = os.path.join("curio_longform_output", channel_key, reuse_from)
-        log(f"0/5 {reuse_from} 버전에서 이미지/영상클립 재사용 준비 중...")
-        reuse_visuals_from(reuse_dir, workdir, RULES.INTRO_VIDEO_CLIP_COUNT, TARGET_IMAGE_COUNT)
+        log(f"0/4 {reuse_from} 버전에서 이미지 재사용 준비 중...")
+        reuse_visuals_from(reuse_dir, workdir, TARGET_IMAGE_COUNT)
 
-    log(f"1/5 대본 생성 중 (주제: {topic}, 언어: {lang}, 채널: {channel_key})...")
+    log(f"1/4 대본 생성 중 (주제: {topic}, 언어: {lang}, 채널: {channel_key})...")
     data = generate_script(topic, lang, channel_key)
     beats = data["beats"]
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     log(f"   총 {len(beats)}개 비트")
 
-    log("1.5/5 유튜브 제목/설명(1000자 내외) 생성 중...")
+    log("1.5/4 유튜브 제목/설명(1000자 내외) 생성 중...")
     yt_meta = generate_youtube_metadata(topic, lang, channel_key, beats)
     log(f"   제목: {yt_meta['title']}")
     log(f"   설명 길이: {len(yt_meta['description'])}자")
 
     srt_entries = []
     cursor = 0.0
-
-    log("2/5 앞부분 AI 영상 클립 생성 중 (Veo)...")
     clip_paths = []
-    intro_beats = [b for b in beats if b["type"] == "intro_video"]
-    for idx, beat in enumerate(intro_beats):
-        log(f"   [{idx+1}/{len(intro_beats)}] {beat['video_prompt'][:60]}...")
-        raw = os.path.join(workdir, f"intro_raw_{idx}.mp4")
-        audio = os.path.join(workdir, f"intro_audio_{idx}.mp3")
-        clip = os.path.join(workdir, f"intro_clip_{idx}.mp4")
-        if os.path.exists(clip):
-            log("      (이미 생성됨, 재사용)")
-            clip_paths.append(clip)
-            cursor = append_srt_entries(srt_entries, cursor, beat["narration"], get_duration(clip))
-            continue
-        if not elevenlabs_tts(beat["narration"], audio):
-            audio = audio.replace(".mp3", ".m4a")
-            make_silence(audio, RULES.INTRO_VIDEO_DURATION_SECONDS)
-        if not os.path.exists(raw):
-            generate_intro_video(beat["video_prompt"], raw)
-        clip_dur = normalize_intro_clip(raw, audio, clip)
-        clip_paths.append(clip)
-        cursor = append_srt_entries(srt_entries, cursor, beat["narration"], clip_dur)
 
-    log("3/5 나머지 정지 이미지(Ken Burns) 생성 중...")
+    log("2/4 정지 이미지(Ken Burns) 생성 중...")
     image_beats = [b for b in beats if b["type"] == "image"]
 
     # 2026-08-17: classical/myth는 AI 생성 대신 실제 퍼블릭도메인 박물관
@@ -743,7 +641,7 @@ def main():
         cursor = append_srt_entries(srt_entries, cursor, beat["narration"], clip_dur)
         time.sleep(2)  # 이미지 생성 API 레이트리밋 방지용 페이싱
 
-    log("4/5 최종 영상 이어붙이는 중...")
+    log("3/4 최종 영상 이어붙이는 중...")
     final_path = os.path.join(workdir, "final.mp4")
     concat_clips(clip_paths, final_path, workdir)
     dur = get_duration(final_path)
@@ -754,7 +652,7 @@ def main():
     log(f"   ✅ 자막 완성: {srt_path} (유튜브 자막 업로드용 - 잘 나가는 건강채널 벤치마킹한 "
         f"기본 흰글씨/검은박스 스타일로 유튜브가 렌더링함)")
 
-    log("5/5 썸네일 생성 중...")
+    log("4/4 썸네일 생성 중...")
     thumb_path = build_thumbnail(topic, lang, data.get("thumbnail_lines", {}), channel_key, workdir)
     log(f"   ✅ 썸네일 완성: {thumb_path}")
 

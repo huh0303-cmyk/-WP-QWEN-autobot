@@ -73,15 +73,13 @@ FUTURE_EXPANSION_LANGUAGES = ["es", "fr", "de", "it"]
 SAME_TOPIC_DIFFERENTIATION_RULES = {
     "narration": "always_fully_distinct_per_language",   # 번역 아니고 새로 집필
     "image_set": "may_reuse_but_shuffle_order_per_language",  # 이미지 재사용 가능, 순서만 변경
-    "intro_video_clips": "may_reuse_but_shuffle_order_per_language",  # 앞 3장 AI 영상 클립도 동일 원칙 (2026-08-02)
     "thumbnail": "always_fully_distinct",  # 사진/카피/폰트/색상 전부 다르게 (예외 없음)
 }
 
-# 앞부분 AI 생성 영상 클립 (Veo 3.1 Lite, 기존 GEMINI_API_KEY로 사용 가능) 관련 설정.
-INTRO_VIDEO_CLIP_COUNT = 3
-INTRO_VIDEO_MODEL = "veo-3.1-lite-generate-preview"  # 가장 저렴한 티어
-# 이 모델은 duration_seconds로 5,6,7 등 임의값을 받지 않고 4 또는 8만 허용됨 (2026-08-02 실측 확인).
-INTRO_VIDEO_DURATION_SECONDS = 8  # 8초 선택 (4초보다 자연스러움), 클립당 약 $0.40~0.50
+# 2026-08-18: Veo 인트로클립 완전 제거(사용자 지시 — 비용 문제). 이 스크립트는
+# 어떤 워크플로우에도 연결돼있지 않은 미사용 프로토타입이지만, "Veo 완전 차단"
+# 지시를 코드 전체에 일관되게 반영하기 위해 여기도 정리함. 앞으로 인트로클립이
+# 필요하면 curio_longform.py처럼 정지이미지(Ken Burns) 기반으로 만들 것.
 
 # 발행 규칙 ------------------------------------------------------------
 

@@ -145,7 +145,6 @@ def _strip_json_fence(text):
 
 def generate_script(topic, lang):
     lang_name = LANG_NAMES.get(lang, "Korean")
-    n_intro = RULES.INTRO_VIDEO_CLIP_COUNT
     n_images = TARGET_IMAGE_COUNT
     sections = RULES.REQUIRED_SCRIPT_SECTIONS
 
@@ -158,20 +157,16 @@ that this is general info, not medical advice, and viewers with symptoms should 
 a doctor.
 
 The script MUST be broken into "beats" that will each become one video shot:
-- The first {n_intro} beats have type "intro_video": short (1-2 sentence) narration
-  each, paired with an English text-to-video prompt describing realistic natural
-  human motion (e.g. a person gently rubbing/pressing the painful area, sitting down
-  slowly, walking with slight discomfort). These are the hook — fast-paced, must grab
-  attention in the first 10 seconds, no text overlays needed in the prompt itself.
-- The remaining beats have type "image": each pairs one narration chunk (2-4
-  sentences, natural spoken pacing) with an English image-generation prompt
-  (realistic photography style, no text/watermark in the image).
-- Total beats (intro_video + image) must be exactly {n_intro + n_images}.
+- Each beat has type "image": pairs one narration chunk (2-4 sentences, natural
+  spoken pacing) with an English image-generation prompt (realistic photography
+  style, no text/watermark in the image).
+- Total beats must be exactly {n_images}.
 - Every beat must be tagged with a "section" from this fixed list, covering ALL of
   them across the script in a sensible order: {sections}.
   The "food_recommend" section is MANDATORY and must cover several consecutive
   beats with real, specific recommended foods for this condition (not generic).
-- Vary pacing: front beats can be short/punchy, later beats can be longer.
+- Vary pacing: front beats can be short/punchy, later beats can be longer. The
+  first beat especially must grab attention in the first 10 seconds.
 
 Also return:
 - "foods": a list of 3-5 specific recommended foods for this condition, in {lang_name}
@@ -187,7 +182,7 @@ Respond with JSON only, no explanation, no markdown fences:
   "foods": ["...", ...],
   "thumbnail_lines": {{"line1": "...", "line2": "...", "line3": "...", "line4": "..."}},
   "beats": [
-    {{"type": "intro_video", "section": "hook_intro", "narration": "...", "video_prompt": "..."}},
+    {{"type": "image", "section": "hook_intro", "narration": "...", "image_prompt": "..."}},
     ...,
     {{"type": "image", "section": "symptom_explain", "narration": "...", "image_prompt": "..."}},
     ...
@@ -242,57 +237,6 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
         time.sleep(wait)
     log(f"      ⚠️ 최종 실패({max_retries}회 재시도 후): {last_err}")
     return False
-
-
-# ════════════════════════════════════════════════════════════
-# 3. 앞부분 AI 영상 클립 (Veo)
-# ════════════════════════════════════════════════════════════
-def generate_intro_video(prompt, out_path):
-    from google import genai
-    from google.genai import types
-
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    operation = client.models.generate_videos(
-        model=RULES.INTRO_VIDEO_MODEL,
-        prompt=prompt,
-        config=types.GenerateVideosConfig(
-            number_of_videos=1,
-            duration_seconds=RULES.INTRO_VIDEO_DURATION_SECONDS,
-        ),
-    )
-    waited = 0
-    while not operation.done:
-        time.sleep(10)
-        waited += 10
-        if waited > 300:
-            raise RuntimeError("Veo 영상 생성 타임아웃(5분)")
-        operation = client.operations.get(operation)
-
-    if not (operation.response and operation.response.generated_videos):
-        raise RuntimeError(f"Veo 영상 생성 실패: {operation}")
-
-    video = operation.response.generated_videos[0]
-    client.files.download(file=video.video)
-    video.video.save(out_path)
-
-
-def normalize_intro_clip(raw_path, audio_path, out_path):
-    """Veo 클립 자체 오디오는 버리고, 해당 구간 내레이션 오디오로 교체 +
-    나머지 이미지 클립과 이어붙일 수 있게 코덱/해상도 통일."""
-    audio_dur = get_duration(audio_path)
-    video_dur = get_duration(raw_path)
-    run_ffmpeg([
-        "ffmpeg", "-y", "-i", raw_path, "-i", audio_path,
-        "-map", "0:v:0", "-map", "1:a:0",
-        "-vf", f"scale={W}:{H},format=yuv420p,fps=30",
-        "-c:v", "libx264", "-c:a", "aac",
-        "-t", str(max(audio_dur, video_dur)),
-        "-shortest" if audio_dur < video_dur else "-y",
-        "-map_metadata", "-1", "-fflags", "+bitexact",
-        "-flags:v", "+bitexact", "-flags:a", "+bitexact",
-        out_path,
-    ])
-    return max(audio_dur, video_dur)
 
 
 # ════════════════════════════════════════════════════════════
@@ -531,25 +475,15 @@ def build_thumbnail(topic, lang, thumbnail_lines, foods, workdir):
 # ════════════════════════════════════════════════════════════
 # 7. 메인
 # ════════════════════════════════════════════════════════════
-def reuse_visuals_from(source_lang, workdir, n_intro, n_images):
-    """SAME_TOPIC_DIFFERENTIATION_RULES: 이미지/인트로영상클립은 언어간 재사용 가능,
-    순서만 섞기. source_lang의 workdir에서 raw Veo 클립과 이미지 파일을 복사해와서
-    이 workdir에 채워두면, 이후 생성 루프의 '이미 있으면 재사용' 체크에 걸려서
-    Gemini/Veo 재호출 없이 그대로 재사용된다 (TTS/썸네일만 새로 생성됨)."""
+def reuse_visuals_from(source_lang, workdir, n_images):
+    """SAME_TOPIC_DIFFERENTIATION_RULES: 이미지는 언어간 재사용 가능, 순서만 섞기.
+    source_lang의 workdir에서 이미지 파일을 복사해와서 이 workdir에 채워두면,
+    이후 생성 루프의 '이미 있으면 재사용' 체크에 걸려서 Gemini 재호출 없이
+    그대로 재사용된다 (TTS/썸네일만 새로 생성됨)."""
     src_dir = os.path.join("health_longform_output", source_lang)
     if not os.path.isdir(src_dir):
         log(f"   ⚠️ 재사용 소스 언어 폴더 없음: {src_dir} — 전부 새로 생성함")
         return
-
-    src_raws = [os.path.join(src_dir, f"intro_raw_{i}.mp4") for i in range(n_intro)]
-    src_raws = [p for p in src_raws if os.path.exists(p)]
-    order = list(range(len(src_raws)))
-    random.shuffle(order)
-    for new_idx, src_idx in enumerate(order):
-        dst = os.path.join(workdir, f"intro_raw_{new_idx}.mp4")
-        if not os.path.exists(dst):
-            shutil.copyfile(src_raws[src_idx], dst)
-    log(f"   {len(src_raws)}개 인트로 영상 클립 재사용 (순서 셔플)")
 
     src_imgs = [os.path.join(src_dir, f"img_{i}.png") for i in range(n_images)]
     src_imgs = [p for p in src_imgs if os.path.exists(p)]
@@ -578,10 +512,10 @@ def main():
     os.makedirs(workdir, exist_ok=True)
 
     if reuse_from:
-        log(f"0/5 {reuse_from} 버전에서 이미지/영상클립 재사용 준비 중...")
-        reuse_visuals_from(reuse_from, workdir, RULES.INTRO_VIDEO_CLIP_COUNT, TARGET_IMAGE_COUNT)
+        log(f"0/4 {reuse_from} 버전에서 이미지 재사용 준비 중...")
+        reuse_visuals_from(reuse_from, workdir, TARGET_IMAGE_COUNT)
 
-    log(f"1/5 대본 생성 중 (주제: {topic}, 언어: {lang})...")
+    log(f"1/4 대본 생성 중 (주제: {topic}, 언어: {lang})...")
     data = generate_script(topic, lang)
     beats = data["beats"]
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
@@ -590,30 +524,9 @@ def main():
 
     srt_entries = []
     cursor = 0.0
-
-    log("2/5 앞부분 AI 영상 클립 생성 중 (Veo)...")
     clip_paths = []
-    intro_beats = [b for b in beats if b["type"] == "intro_video"]
-    for idx, beat in enumerate(intro_beats):
-        log(f"   [{idx+1}/{len(intro_beats)}] {beat['video_prompt'][:60]}...")
-        raw = os.path.join(workdir, f"intro_raw_{idx}.mp4")
-        audio = os.path.join(workdir, f"intro_audio_{idx}.mp3")
-        clip = os.path.join(workdir, f"intro_clip_{idx}.mp4")
-        if os.path.exists(clip):
-            log("      (이미 생성됨, 재사용)")
-            clip_paths.append(clip)
-            cursor = append_srt_entries(srt_entries, cursor, beat["narration"], get_duration(clip))
-            continue
-        if not elevenlabs_tts(beat["narration"], audio):
-            audio = audio.replace(".mp3", ".m4a")
-            make_silence(audio, RULES.INTRO_VIDEO_DURATION_SECONDS)
-        if not os.path.exists(raw):
-            generate_intro_video(beat["video_prompt"], raw)
-        clip_dur = normalize_intro_clip(raw, audio, clip)
-        clip_paths.append(clip)
-        cursor = append_srt_entries(srt_entries, cursor, beat["narration"], clip_dur)
 
-    log("3/5 나머지 정지 이미지(Ken Burns) 생성 중...")
+    log("2/4 정지 이미지(Ken Burns) 생성 중...")
     image_beats = [b for b in beats if b["type"] == "image"]
     for idx, beat in enumerate(image_beats):
         log(f"   [{idx+1}/{len(image_beats)}] ({beat['section']}) {beat['image_prompt'][:50]}...")
@@ -633,7 +546,7 @@ def main():
         cursor = append_srt_entries(srt_entries, cursor, beat["narration"], clip_dur)
         time.sleep(2)  # 이미지 생성 API 레이트리밋 방지용 페이싱
 
-    log("4/5 최종 영상 이어붙이는 중...")
+    log("3/4 최종 영상 이어붙이는 중...")
     final_path = os.path.join(workdir, "final.mp4")
     concat_clips(clip_paths, final_path, workdir)
     dur = get_duration(final_path)
@@ -644,7 +557,7 @@ def main():
     log(f"   ✅ 자막 완성: {srt_path} (유튜브 자막 업로드용 - 잘 나가는 건강채널 벤치마킹한 "
         f"기본 흰글씨/검은박스 스타일로 유튜브가 렌더링함)")
 
-    log("5/5 썸네일 생성 중...")
+    log("4/4 썸네일 생성 중...")
     thumb_path = build_thumbnail(topic, lang, data.get("thumbnail_lines", {}), data.get("foods", []), workdir)
     log(f"   ✅ 썸네일 완성: {thumb_path}")
 
