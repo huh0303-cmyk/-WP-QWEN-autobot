@@ -1,36 +1,38 @@
 
 🌐 https://k-health365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [5866] 2026년 당뇨 초기증상, 이렇게 달라졌습니다
 
 🌐 https://koreamedicaltour.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1621] How People Are Approaching IVF cost Kore
 
 🌐 https://koreainvest365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3157] foreign investor Korea stocks, Step by S
 
 🌐 https://ki-korea.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1722] 전세보증금 반환보증, From Someone Who&#8217;s Bee
 
 🌐 https://koreainsurance365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3634] How Korea auto insurance comparison Actu
 
 🌐 https://kfinance365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3853] VAT refund Korea shopping: Details That 
 
 🌐 https://koreataxnlaw.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3897] Planning for Korea business visa extensi
 
 🌐 https://koreacrypto365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3187] How Upbit foreigner signup Has Changed i
 
 🌐 https://krealestate365.com
-  (최근 2시간 내 신규 발행 없음)
+    ⚠️ [531] 오류: Locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator(".editor-post-title__inpu
 
 🌐 https://ktech365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T05%3A27%3A34.945319&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T07%3A09%3A27.722992&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
@@ -40,16 +42,16 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://k-trip365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [4622] Busan hotel recommendations, Broken Down
 
 🌐 https://k-visa365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3171] Korea permanent residency F-5 Q&#038;A: 
 
 🌐 https://koreawedding365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kstudy365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1241] best university Korea ranking in 2026: W
 
 🌐 https://studyinkorea365.com
   (최근 2시간 내 신규 발행 없음)
@@ -58,10 +60,10 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ksa-korea.org
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [763] 편입학 조건, 현지에서 실제로 겪는 것들
 
 🌐 https://sis-korea.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1920] Korea graduate school application: Frequ
 
 🌐 https://jobkorea365.com
   (최근 2시간 내 신규 발행 없음)
@@ -70,7 +72,7 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T05%3A27%3A55.551896&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T07%3A12%3A43.109539&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
@@ -82,4 +84,4 @@
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 0건 SEO점수 갱신
+총 13건 SEO점수 갱신
