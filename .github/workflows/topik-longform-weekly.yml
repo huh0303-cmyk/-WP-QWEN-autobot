@@ -1,0 +1,54 @@
+name: TOPIK 단어 퀴즈 롱폼 (주1회, ~30분)
+
+# topik_basic_500 시트에서 단어를 뽑아 순수 타이포그래피 카드(Gemini 이미지
+# 생성 없음, 비용 절감 지시 2026-08-17 반영) + TTS로 ~30분 퀴즈 롱폼을
+# 만들어 TOPIK 채널에 비공개로 올린다. 매주 한 번(일요일)이면 500단어 풀을
+# 너무 빨리 소진하지 않으면서도 채널에 꾸준히 새 롱폼이 쌓인다.
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "15 3 * * 0"   # 12:15 KST 일요일
+
+concurrency:
+  group: topik-longform-weekly
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 시스템 패키지 설치 (ffmpeg, 한글 폰트)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-nanum
+
+      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: TOPIK 롱폼 생성 + 업로드
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_TOPIK_BROAD: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_TOPIK_BROAD }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/topik_quiz_longform.py
+
+      - name: 결과물 아카이브
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: topik-longform-${{ github.run_id }}
+          path: |
+            topik_longform_output/result.json
+            topik_longform_output/thumbnail.jpg
+          retention-days: 14
+          if-no-files-found: ignore
