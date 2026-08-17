@@ -160,7 +160,11 @@ def main():
 
     total_posts = total_targets = 0
     for site_url, pw_env in site_items:
-        n_posts, n_targets = process_site(site_url, pw_env, execute)
+        try:
+            n_posts, n_targets = process_site(site_url, pw_env, execute)
+        except Exception as e:
+            log(f"   ⚠️ {site_url} 처리 중 오류(스킵하고 계속): {e}\n")
+            continue
         total_posts += n_posts
         total_targets += n_targets
 
