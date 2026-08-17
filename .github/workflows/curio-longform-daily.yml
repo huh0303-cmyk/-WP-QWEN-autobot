@@ -48,7 +48,13 @@ on:
     - cron: "34 20 * * 5"  # 금: classic_reads - 05:34 KST
 
 concurrency:
-  group: curio-longform-daily
+  # 2026-08-17 사고: 그룹명이 전체 워크플로우 공용 하나였어서, 짧은 간격으로
+  # 여러 채널을 연달아 workflow_dispatch하면 뒤에 것이 앞에 대기중이던 걸
+  # 취소시켜버림(cancel-in-progress:false여도 "같은 그룹의 대기중 실행"은
+  # 새 실행이 들어오면 밀려서 취소되는 GitHub Actions 동작) — 10채널 샘플
+  # 테스트 중 8개가 통째로 cancelled됨. 채널별로 그룹을 분리해서 서로 다른
+  # 채널은 절대 서로를 취소하지 못하게 하고, 같은 채널끼리 중복 실행만 방지.
+  group: curio-longform-${{ github.event.inputs.channel || github.event.schedule || 'default' }}
   cancel-in-progress: false
 
 jobs:
