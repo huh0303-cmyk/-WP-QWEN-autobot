@@ -1,50 +1,32 @@
 {
-  "https://koreacrypto365.com": {
+  "https://koreanews365.com": {
     "to_hide": [
       {
-        "id": 3183,
-        "title": "Korea crypto staking Q&amp;A: Answers From the Field",
-        "link": "https://koreacrypto365.com/korea-crypto-staking-qa-answers-from-the-field/",
+        "id": 4394,
+        "title": "남부지방 찜통더위, 열대야까지 기승… 폭염 절정",
+        "link": "https://koreanews365.com/%eb%82%a8%eb%b6%80%ec%a7%80%eb%b0%a9-%ec%b0%9c%ed%86%b5%eb%8d%94%ec%9c%84-%ec%97%b4%eb%8c%80%ec%95%bc%ea%b9%8c%ec%a7%80-%ea%b8%b0%ec%8a%b9-%ed%8f%ad%ec%97%bc-%ec%a0%88%ec%a0%95/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 4,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3170,
-        "title": "Korea crypto tax guide 101: Where First-Timers Should Begin",
-        "link": "https://koreacrypto365.com/korea-crypto-tax-guide-101-where-first-timers-should-begin/",
-        "ai_tell_score": 1,
-        "matched": [],
+        "id": 4395,
+        "title": "꼭지 &#8216;육각형&#8217; 피망, 단맛의 비밀 담았다",
+        "link": "https://koreanews365.com/%ea%bc%ad%ec%a7%80-%ec%9c%a1%ea%b0%81%ed%98%95-%ed%94%bc%eb%a7%9d-%eb%8b%a8%eb%a7%9b%ec%9d%98-%eb%b9%84%eb%b0%80-%eb%8b%b4%ec%95%98%eb%8b%a4/",
+        "ai_tell_score": 2,
+        "matched": [
+          "알고 계셨나요?"
+        ],
         "question_headings": 4,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3166,
-        "title": "Korea crypto AML rules Checklist You Shouldn&#8217;t Skip",
-        "link": "https://koreacrypto365.com/korea-crypto-aml-rules-checklist-you-shouldnt-skip/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 9,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3164,
-        "title": "How Korea crypto exchange comparison Has Changed in 2026",
-        "link": "https://koreacrypto365.com/how-korea-crypto-exchange-comparison-has-changed-in-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3162,
-        "title": "How People Are Approaching Bithumb vs Upbit This Year",
-        "link": "https://koreacrypto365.com/how-people-are-approaching-bithumb-vs-upbit-this-year/",
+        "id": 4392,
+        "title": "충주찰옥수수버거, 이물질 논란에 판매 중단",
+        "link": "https://koreanews365.com/%ec%b6%a9%ec%a3%bc%ec%b0%b0%ec%98%a5%ec%88%98%ec%88%98%eb%b2%84%ea%b1%b0-%ec%9d%b4%eb%ac%bc%ec%a7%88-%eb%85%bc%eb%9e%80%ec%97%90-%ed%8c%90%eb%a7%a4-%ec%a4%91%eb%8b%a8/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 5,
@@ -52,79 +34,19 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3160,
-        "title": "best crypto Korea 2026: Frequently Confused Points",
-        "link": "https://koreacrypto365.com/best-crypto-korea-2026-frequently-confused-points/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3158,
-        "title": "8 Things to Check Before Travel Rule Korea crypto",
-        "link": "https://koreacrypto365.com/8-things-to-check-before-travel-rule-korea-crypto/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3156,
-        "title": "Upbit foreigner signup — Common Points of Confusion, Cleared Up",
-        "link": "https://koreacrypto365.com/upbit-foreigner-signup-common-points-of-confusion-cleared-up/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3149,
-        "title": "Korea crypto exchange comparison Checklist You Shouldn&#8217;t Skip",
-        "link": "https://koreacrypto365.com/korea-crypto-exchange-comparison-checklist-you-shouldnt-skip/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 3125,
-        "title": "Korea NFT market — Common Points of Confusion, Cleared Up",
-        "link": "https://koreacrypto365.com/korea-nft-market-common-points-of-confusion-cleared-up/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3122,
-        "title": "A Practical Look at Korea NFT market",
-        "link": "https://koreacrypto365.com/a-practical-look-at-korea-nft-market/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3120,
-        "title": "Bithumb vs Upbit: Frequently Confused Points",
-        "link": "https://koreacrypto365.com/bithumb-vs-upbit-frequently-confused-points/",
+        "id": 4389,
+        "title": "집안 곳곳 출몰하는 ‘하트벌레’ 정체 미스터리",
+        "link": "https://koreanews365.com/%ec%a7%91%ec%95%88-%ea%b3%b3%ea%b3%b3-%ec%b6%9c%eb%aa%b0%ed%95%98%eb%8a%94-%ed%95%98%ed%8a%b8%eb%b2%8c%eb%a0%88-%ec%a0%95%ec%b2%b4-%eb%af%b8%ec%8a%a4%ed%84%b0%eb%a6%ac/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 7,
         "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3118,
-        "title": "Korea stablecoin law, Broken Down Step by Step",
-        "link": "https://koreacrypto365.com/a-practical-look-at-korea-stablecoin-law/",
+        "id": 4388,
+        "title": "축구계 궐기, 월드컵 이권 매각 불발",
+        "link": "https://koreanews365.com/%ec%b6%95%ea%b5%ac%ea%b3%84-%ea%b6%90%ea%b8%b0-%ec%9b%94%eb%93%9c%ec%bb%b5-%ec%9d%b4%ea%b6%8c-%eb%a7%a4%ea%b0%81-%eb%b6%88%eb%b0%9c/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -132,1109 +54,61 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3116,
-        "title": "The Real Cost of Korea crypto staking — What to Expect",
-        "link": "https://koreacrypto365.com/the-real-cost-of-korea-crypto-staking-what-to-expect-2/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3113,
-        "title": "Study Reveals: 7 in 10 People Misunderstand Korea crypto regulation 2026",
-        "link": "https://koreacrypto365.com/study-reveals-7-in-10-people-misunderstand-korea-crypto-regulation-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3108,
-        "title": "Why Does Regulations Cause Problems? Experts Explain",
-        "link": "https://koreacrypto365.com/why-does-regulations-cause-problems-experts-explain/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3001,
-        "title": "Why Does crypto exchange license Korea Cause Problems? Experts Explain",
-        "link": "https://koreacrypto365.com/why-does-crypto-exchange-license-korea-cause-problems-experts-explain/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2999,
-        "title": "9 Things About Korea crypto AML rules Your Doctor Wants You to Know",
-        "link": "https://koreacrypto365.com/9-things-about-korea-crypto-aml-rules-your-doctor-wants-you-to-know/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2774,
-        "title": "stablecoin regulation Korea Made Simple",
-        "link": "https://koreacrypto365.com/stablecoin-regulation-korea-frequently-overlooked-facts/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2688,
-        "title": "The Real Cost of crypto trading strategy Korea — What to Expect",
-        "link": "https://koreacrypto365.com/the-truth-about-crypto-trading-strategy-korea-that-most-people-get-wrong/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2687,
-        "title": "How to Actually Handle how foreigner buy bitcoin Korea: A Specialist&#8217;s Guide",
-        "link": "https://koreacrypto365.com/how-to-actually-buy-bitcoin-in-korea-as-a-foreigner-a-specialists-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2673,
-        "title": "Korean exchange withdrawal guide, Broken Down Step by Step",
-        "link": "https://koreacrypto365.com/the-uncomfortable-truth-about-korean-exchange-withdrawal-guide-most-people-ignore/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 2664,
-        "title": "4 Things to Look For When Choosing stablecoin regulation Korea",
-        "link": "https://koreacrypto365.com/what-3-months-of-stablecoin-regulation-korea-research-taught-me-that-no-one-talks-about/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2464,
-        "title": "How Ethereum staking Korea guide Has Changed in 2026",
-        "link": "https://koreacrypto365.com/unlocking-ethereum-staking-in-korea-an-experts-contrarian-view/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2401,
-        "title": "How crypto deposit insurance Korea Has Changed in 2026",
-        "link": "https://koreacrypto365.com/crypto-deposit-insurance-korea-the-myth-of-safety-and-whats-really-protecting-your-digital-assets/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 2393,
-        "title": "The Real Cost of Ethereum staking Korea guide — What to Expect",
-        "link": "https://koreacrypto365.com/title-are-you-ready-to-unlock-passive-income-with-ethereum-staking-in-korea-ethereum-staking-korea-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 1,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 2362,
-        "title": "Rethinking The Unseen Risks of Korea Stablecoin Regulation for Foreigners: What You’re Missing (Korea stablecoin regulation foreigner): A Fresh Perspective for 2026",
-        "link": "https://koreacrypto365.com/the-unseen-risks-of-korea-stablecoin-regulation-for-foreigners-what-youre-missing-korea-stablecoin-regulation-foreigner/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 2277,
-        "title": "How to Open a Korean Crypto Exchange Account as a Foreigner Warning Signs You Should Never Ignore",
-        "link": "https://koreacrypto365.com/how-to-open-a-korean-crypto-exchange-account-as-a-foreigner/",
-        "ai_tell_score": 0,
-        "matched": [],
-        "question_headings": 0,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 2242,
-        "title": "How Debunking Common Myths About Safeguard Your Digital Wealth: Has Changed in 2026",
-        "link": "https://koreacrypto365.com/safeguard-your-digital-wealth-essential-crypto-security-tips-for-every-investor/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      }
-    ],
-    "kept_indexed": [
-      {
-        "id": 3110,
-        "title": "Why Does Korea stablecoin law Cause Problems? Experts Explain",
-        "link": "https://koreacrypto365.com/why-does-korea-stablecoin-law-cause-problems-experts-explain/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 3056,
-        "title": "What Nobody Tells You About Coinone signup guide",
-        "link": "https://koreacrypto365.com/what-nobody-tells-you-about-coinone-signup-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 3002,
-        "title": "Save Time and Money on Upbit registration foreigner guide",
-        "link": "https://koreacrypto365.com/what-nobody-tells-you-about-upbit-registration-foreigner-guide-2/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2940,
-        "title": "Study Reveals: 3 in 10 People Misunderstand crypto trading strategy Korea",
-        "link": "https://koreacrypto365.com/study-reveals-3-in-10-people-misunderstand-crypto-trading-strategy-korea/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2936,
-        "title": "Upbit registration foreigner guide — Common Points of Confusion, Cleared Up",
-        "link": "https://koreacrypto365.com/what-nobody-tells-you-about-upbit-registration-foreigner-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2935,
-        "title": "Before You Try Korea crypto AML rules, Read This First",
-        "link": "https://koreacrypto365.com/before-you-try-korea-crypto-aml-rules-read-this-first/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2934,
-        "title": "Before You Try Coinone signup foreigner Korea, Read This First",
-        "link": "https://koreacrypto365.com/what-nobody-tells-you-about-coinone-signup-foreigner-korea/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2782,
-        "title": "The Real Cost of Upbit English guide foreigner — What to Expect",
-        "link": "https://koreacrypto365.com/upbit-english-guide-foreigner-warning-signs-you-should-never-ignore/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2772,
-        "title": "Debunking Common Myths About crypto tax Korea reporting",
-        "link": "https://koreacrypto365.com/crypto-tax-korea-reporting-qa-answers-from-the-field/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2686,
-        "title": "Korean exchange real name verification Q&amp;A: Answers From the Field",
-        "link": "https://koreacrypto365.com/unpacking-korean-exchange-real-name-verification-regulations-and-market-dynamics/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2684,
-        "title": "crypto trading strategy Korea in 2026: What&#8217;s Changed",
-        "link": "https://koreacrypto365.com/unlocking-potential-a-deep-dive-into-crypto-trading-strategy-korea/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2683,
-        "title": "Bithumb account foreigner: Frequently Overlooked Facts",
-        "link": "https://koreacrypto365.com/navigating-bithumb-account-access-for-foreigners-in-koreas-evolving-crypto-landscape/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2682,
-        "title": "FSC crypto policy Korea, Explained Simply",
-        "link": "https://koreacrypto365.com/navigating-the-landscape-of-fsc-crypto-policy-korea-a-2024-update/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2677,
-        "title": "8 Things About Upbit registration foreigner guide Your Doctor Wants You to Know",
-        "link": "https://koreacrypto365.com/upbit-registration-foreigner-guide-navigating-koreas-crypto-landscape/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2676,
-        "title": "Study Reveals: 9 in 10 People Misunderstand crypto tax Korea reporting",
-        "link": "https://koreacrypto365.com/crypto-tax-korea-reporting-your-comprehensive-guide-to-navigating-korean-digital-asset-regulations/",
-        "ai_tell_score": 1,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 0,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2675,
-        "title": "crypto exchange license Korea 101: What First-Timers Should Know",
-        "link": "https://koreacrypto365.com/the-hidden-costs-of-skipping-due-diligence-for-a-crypto-exchange-license-korea/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2656,
-        "title": "Study Reveals: 6 in 10 People Misunderstand Korean exchange withdrawal guide",
-        "link": "https://koreacrypto365.com/what-a-korean-exchange-withdrawal-guide-expert-does-differently-and-you-can-too/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2606,
-        "title": "How DeFi participation Korea foreigner Has Changed in 2026",
-        "link": "https://koreacrypto365.com/the-untapped-defi-participation-korea-foreigner-advantage-what-youre-missing/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2604,
-        "title": "Coinone signup foreigner Korea 101: What First-Timers Should Know",
-        "link": "https://koreacrypto365.com/the-unexpected-hurdles-of-coinone-signup-for-foreigners-in-korea-a-15-year-experts-unvarnished-truth/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2591,
-        "title": "Korea crypto regulation 2026: What to Prepare First",
-        "link": "https://koreacrypto365.com/the-unforeseen-impact-of-korea-crypto-regulation-2026-on-global-digital-assets/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2577,
-        "title": "DAO legal status Korea 101: Where First-Timers Should Begin",
-        "link": "https://koreacrypto365.com/dao-legal-status-korea-why-unclear-frameworks-jeopardize-your-decentralized-future/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2527,
-        "title": "Study Reveals: 5 in 10 People Misunderstand crypto scam recovery Korea",
-        "link": "https://koreacrypto365.com/what-nobody-tells-you-about-crypto-scam-recovery-korea-and-why-it-matters/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2513,
-        "title": "How Web3 gaming Korea trend Has Changed in 2026",
-        "link": "https://koreacrypto365.com/web3-gaming-korea-trend-why-most-developers-miss-the-player-centric-revolution/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2485,
-        "title": "staking regulation Korea — Common Points of Confusion, Cleared Up",
-        "link": "https://koreacrypto365.com/the-staking-regulation-korea-warning-signs-most-people-miss-until-its-too-late/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2481,
-        "title": "The Truth About blockchain hub Busan guide That Most People Get Wrong",
-        "link": "https://koreacrypto365.com/the-blockchain-hub-busan-guide-what-15-years-in-crypto-taught-me-about-its-real-potential/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2418,
-        "title": "How day trading crypto Korea guide Actually Works",
-        "link": "https://koreacrypto365.com/the-complete-day-trading-crypto-korea-guide-you-need-now-for-2026-success/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2417,
-        "title": "Getting Korea crypto tax guide Right the First Time",
-        "link": "https://koreacrypto365.com/stop-losing-money-your-essential-korea-crypto-tax-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2415,
-        "title": "crypto venture capital Seoul Warning Signs You Should Never Ignore",
-        "link": "https://koreacrypto365.com/seouls-crypto-vc-scene-the-myths-vs-the-untapped-potential/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2414,
-        "title": "Is crypto tax return form Korea Really Worth It? An Honest Breakdown",
-        "link": "https://koreacrypto365.com/stop-losing-money-navigating-the-complex-crypto-tax-return-form-korea/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2413,
-        "title": "Why Does Bitcoin price Korea premium Cause Problems? Experts Explain",
-        "link": "https://koreacrypto365.com/is-the-bitcoin-price-korea-premium-a-sustainable-opportunity-in-2024/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2412,
-        "title": "Rethinking DeFi adoption Korea trend: A Fresh Perspective for 2026",
-        "link": "https://koreacrypto365.com/the-urgency-of-understanding-the-defi-adoption-korea-trend-in-2024/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2406,
-        "title": "NFT market Korea trend: A Closer Look",
-        "link": "https://koreacrypto365.com/stop-underestimating-the-volatile-nft-market-korea-trend-expert-strategies-you-need-now/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2404,
-        "title": "crypto hacking Korea cases Explained in Plain English",
-        "link": "https://koreacrypto365.com/warning-the-escalating-threat-of-crypto-hacking-korea-cases-and-how-to-protect-your-assets/",
-        "ai_tell_score": 3,
-        "matched": [
-          "a staggering 95%",
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2402,
-        "title": "Planning for crypto exchange real name account? Start Here",
-        "link": "https://koreacrypto365.com/dont-wait-to-understand-why-a-crypto-exchange-real-name-account-is-critical-for-your-digital-assets-in-2024/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2400,
-        "title": "Before You Try kimchi premium explained, Read This First",
-        "link": "https://koreacrypto365.com/dont-miss-out-understanding-the-kimchi-premium-explained-before-your-next-crypto-trade/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2389,
-        "title": "Rethinking blockchain hub Busan guide: A Fresh Perspective for 2026",
-        "link": "https://koreacrypto365.com/unveiling-busans-blockchain-ambition-what-nobody-tells-you-about-the-crypto-mecca-guide-blockchain-hub-busan-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2385,
-        "title": "cold wallet security guide: Frequently Overlooked Facts",
-        "link": "https://koreacrypto365.com/why-cold-wallet-security-matters-more-than-ever-in-2024-dont-wait-to-protect-your-crypto-assets-cold-wallet-security-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2381,
-        "title": "crypto mining Korea guide 101: What First-Timers Should Know",
-        "link": "https://koreacrypto365.com/dont-miss-out-your-essential-crypto-mining-korea-guide-for-2024-and-beyond/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2372,
-        "title": "The Costly Oversight: Why Your Korea Crypto Hardware Wallet Purchase Korea Strategy is Failing: A Closer Look at What Really Matters",
-        "link": "https://koreacrypto365.com/the-costly-oversight-why-your-korea-crypto-hardware-wallet-purchase-korea-strategy-is-failing/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2367,
-        "title": "Is Your Crypto Safe? Unpacking Korea’s Exchange Hacking History (Korea crypto exchange hacking history) Q&amp;A: Answers From the Field",
-        "link": "https://koreacrypto365.com/is-your-crypto-safe-unpacking-koreas-exchange-hacking-history-korea-crypto-exchange-hacking-history/",
+        "id": 4385,
+        "title": "심장 건강, 아침보다 저녁 산책이 답?",
+        "link": "https://koreanews365.com/%ec%8b%ac%ec%9e%a5-%ea%b1%b4%ea%b0%95-%ec%95%84%ec%b9%a8%eb%b3%b4%eb%8b%a4-%ec%a0%80%eb%85%81-%ec%82%b0%ec%b1%85%ec%9d%b4-%eb%8b%b5/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 7,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 2352,
-        "title": "Korea Crypto AML KYC Requirements: What Nobody Tells You About Surviving the Regulatory Maze: Frequently Overlooked Facts",
-        "link": "https://koreacrypto365.com/korea-crypto-aml-kyc-requirements-what-nobody-tells-you-about-surviving-the-regulatory-maze/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2347,
-        "title": "Behind the Scenes: What Act Fast: What You Need to Know About the Surging Korea Web3 Startup Ecosystem Korea in and Beyond Actually Involves",
-        "link": "https://koreacrypto365.com/act-fast-what-you-need-to-know-about-the-surging-korea-web3-startup-ecosystem-korea-in-2024-and-beyond/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2342,
-        "title": "Before You Try Why Your Korea Crypto Savings Account Interest Might Not Be What You Expect, Read This First",
-        "link": "https://koreacrypto365.com/why-your-korea-crypto-savings-account-interest-might-not-be-what-you-expect/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2332,
-        "title": "The Truth About Are You Overlooking the Nuances of Upbit vs Bithumb Trading Volume for Smarter Crypto Decisions? That Most People Get Wrong",
-        "link": "https://koreacrypto365.com/are-you-overlooking-the-nuances-of-upbit-vs-bithumb-trading-volume-for-smarter-crypto-decisions/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2327,
-        "title": "How OTC Crypto Desk Seoul Corporate Busting Myths and Unveiling Has Changed in 2026",
-        "link": "https://koreacrypto365.com/otc-crypto-desk-seoul-corporate-busting-myths-and-unveiling-real-opportunities/",
+        "id": 4384,
+        "title": "아이유, 건강 회복 후 공식 석상 복귀…청룡시리즈어워즈서 빛나는 미모",
+        "link": "https://koreanews365.com/%ec%95%84%ec%9d%b4%ec%9c%a0-%ea%b1%b4%ea%b0%95-%ed%9a%8c%eb%b3%b5-%ed%9b%84-%ea%b3%b5%ec%8b%9d-%ec%84%9d%ec%83%81-%eb%b3%b5%ea%b7%80%ec%b2%ad%eb%a3%a1%ec%8b%9c%eb%a6%ac%ec%a6%88%ec%96%b4/",
         "ai_tell_score": 2,
         "matched": [
-          "navigating the complexities"
+          "현대 사회에서"
         ],
-        "question_headings": 6,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2302,
-        "title": "Rethinking South Korea Crypto Market Trends: Evolution: A Fresh Perspective for 2026",
-        "link": "https://koreacrypto365.com/south-korea-crypto-market-trends-evolution-regulations-and-expert-analysis-2/",
-        "ai_tell_score": 0,
-        "matched": [],
-        "question_headings": 0,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2283,
-        "title": "9 Things to Look For When Choosing Top Korean Blockchain Projects to Watch in 2026 Actually Inv",
-        "link": "https://koreacrypto365.com/top-korean-blockchain-projects-to-watch-in-2026/",
-        "ai_tell_score": 0,
-        "matched": [],
-        "question_headings": 0,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 2279,
-        "title": "7 Mistakes People Make With What is Kimchi Premium and Why Does It Happen",
-        "link": "https://koreacrypto365.com/what-is-kimchi-premium-and-why-does-it-happen/",
-        "ai_tell_score": 0,
-        "matched": [],
-        "question_headings": 0,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      }
-    ],
-    "uncertain": []
-  },
-  "https://krealestate365.com": {
-    "to_hide": [
-      {
-        "id": 516,
-        "title": "How Korea real estate loan LTV Has Changed in 2026",
-        "link": "https://krealestate365.com/how-korea-real-estate-loan-ltv-has-changed-in-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
+        "question_headings": 5,
         "verdict": "NEUTRAL",
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 506,
-        "title": "Korea real estate loan LTV, Explained Simply",
-        "link": "https://krealestate365.com/korea-real-estate-loan-ltv-explained-simply/",
+        "id": 4382,
+        "title": "충주맨 김선태, &#8216;돈선태&#8217; 하차 선언… 리센느 사투리 논란에 &#8220;능력 부족",
+        "link": "https://koreanews365.com/%ec%b6%a9%ec%a3%bc%eb%a7%a8-%ea%b9%80%ec%84%a0%ed%83%9c-%eb%8f%88%ec%84%a0%ed%83%9c-%ed%95%98%ec%b0%a8-%ec%84%a0%ec%96%b8-%eb%a6%ac%ec%84%bc%eb%8a%90-%ec%82%ac%ed%88%ac%eb%a6%ac/",
         "ai_tell_score": 1,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 4,
         "verdict": "NEUTRAL",
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 505,
-        "title": "Korea mortgage foreigner Q&#038;A: Answers From the Field",
-        "link": "https://krealestate365.com/korea-mortgage-foreigner-qa-answers-from-the-field/",
+        "id": 4379,
+        "title": "여성 절반, 관리직은 0명…사업장 10곳, 고용 불균형 실태 고발",
+        "link": "https://koreanews365.com/%ec%97%ac%ec%84%b1-%ec%a0%88%eb%b0%98-%ea%b4%80%eb%a6%ac%ec%a7%81%ec%9d%80-0%eb%aa%85%ec%82%ac%ec%97%85%ec%9e%a5-10%ea%b3%b3-%ea%b3%a0%ec%9a%a9-%eb%b6%88%ea%b7%a0%ed%98%95-%ec%8b%a4/",
         "ai_tell_score": 1,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 4,
         "verdict": "NEUTRAL",
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 503,
-        "title": "4 Things to Look For When Choosing jeonse vs monthly rent",
-        "link": "https://krealestate365.com/4-things-to-look-for-when-choosing-jeonse-vs-monthly-rent/",
+        "id": 4378,
+        "title": "정부, 주52시간 유연화 메가특구 도입…기간제도 열린다",
+        "link": "https://koreanews365.com/%ec%a0%95%eb%b6%80-%ec%a3%bc52%ec%8b%9c%ea%b0%84-%ec%9c%a0%ec%97%b0%ed%99%94-%eb%a9%94%ea%b0%80%ed%8a%b9%ea%b5%ac-%eb%8f%84%ec%9e%85%ea%b8%b0%ea%b0%84%ec%a0%9c%eb%8f%84-%ec%97%b4%eb%a6%b0/",
         "ai_tell_score": 1,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 5,
         "verdict": "NEUTRAL",
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 501,
-        "title": "Save Time and Money on Korea office lease guide",
-        "link": "https://krealestate365.com/save-time-and-money-on-korea-office-lease-guide/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 500,
-        "title": "Korea retail lease contract: Where to Start",
-        "link": "https://krealestate365.com/korea-retail-lease-contract-where-to-start/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 494,
-        "title": "7 Things to Look For When Choosing Korea real estate loan LTV",
-        "link": "https://krealestate365.com/7-things-to-look-for-when-choosing-korea-real-estate-loan-ltv/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 493,
-        "title": "5 Things to Look For When Choosing Seoul apartment for foreigners",
-        "link": "https://krealestate365.com/5-things-to-look-for-when-choosing-seoul-apartment-for-foreigners/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 486,
-        "title": "Getting Korea apartment buying guide Right the First Time",
-        "link": "https://krealestate365.com/getting-korea-apartment-buying-guide-right-the-first-time/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 484,
-        "title": "7 Questions People Ask About jeonse vs monthly rent",
-        "link": "https://krealestate365.com/7-questions-people-ask-about-jeonse-vs-monthly-rent/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 483,
-        "title": "Korea housing loan rate Q&#038;A: Answers From the Field",
-        "link": "https://krealestate365.com/korea-housing-loan-rate-qa-answers-from-the-field/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 482,
-        "title": "commercial real estate Seoul, Explained Simply",
-        "link": "https://krealestate365.com/commercial-real-estate-seoul-explained-simply/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 481,
-        "title": "The Truth About Korea apartment deposit scam That Most People Get Wrong",
-        "link": "https://krealestate365.com/the-truth-about-korea-apartment-deposit-scam-that-most-people-get-wrong/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 479,
-        "title": "Study Reveals: 4 in 10 People Misunderstand commercial real estate Seoul",
-        "link": "https://krealestate365.com/study-reveals-4-in-10-people-misunderstand-commercial-real-estate-seoul/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 477,
-        "title": "Rethinking jeonse vs monthly rent: A Fresh Perspective for 2026",
-        "link": "https://krealestate365.com/rethinking-jeonse-vs-monthly-rent-a-fresh-perspective-for-2026/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 475,
-        "title": "Before You Try Korea mortgage foreigner, Read This First",
-        "link": "https://krealestate365.com/before-you-try-korea-mortgage-foreigner-read-this-first/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 473,
-        "title": "How commercial real estate Seoul Actually Works",
-        "link": "https://krealestate365.com/how-commercial-real-estate-seoul-has-changed-in-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 471,
-        "title": "How to Actually Handle Loans: A Specialist&#8217;s Guide",
-        "link": "https://krealestate365.com/how-to-actually-handle-loans-a-specialists-guide/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 449,
-        "title": "아무도 말해주지 않는 jeonse system Korea foreigner의 진실",
-        "link": "https://krealestate365.com/%ec%95%84%eb%ac%b4%eb%8f%84-%eb%a7%90%ed%95%b4%ec%a3%bc%ec%a7%80-%ec%95%8a%eb%8a%94-jeonse-system-korea-foreigner%ec%9d%98-%ec%a7%84%ec%8b%a4/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 448,
-        "title": "monthly rent Seoul foreigner에서 사람들이 자주 하는 7가지 실수",
-        "link": "https://krealestate365.com/monthly-rent-seoul-foreigner%ec%97%90%ec%84%9c-%ec%82%ac%eb%9e%8c%eb%93%a4%ec%9d%b4-%ec%9e%90%ec%a3%bc-%ed%95%98%eb%8a%94-7%ea%b0%80%ec%a7%80-%ec%8b%a4%ec%88%98/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 447,
-        "title": "2026년 달라진 industrial property Korea, 무엇이 바뀌었나",
-        "link": "https://krealestate365.com/2026%eb%85%84-%eb%8b%ac%eb%9d%bc%ec%a7%84-industrial-property-korea-%eb%ac%b4%ec%97%87%ec%9d%b4-%eb%b0%94%eb%80%8c%ec%97%88%eb%82%98/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 405,
-        "title": "설문조사: 10명 중 9명이 utility setup apartment Korea를 잘못 알고 있다",
-        "link": "https://krealestate365.com/%ec%84%a4%eb%ac%b8%ec%a1%b0%ec%82%ac-10%eb%aa%85-%ec%a4%91-9%eb%aa%85%ec%9d%b4-utility-setup-apartment-korea%eb%a5%bc-%ec%9e%98%eb%aa%bb-%ec%95%8c%ea%b3%a0-%ec%9e%88%eb%8b%a4/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 401,
-        "title": "jeonse system Korea foreigner, 당신이 아는 것과 뭐가 다를까",
-        "link": "https://krealestate365.com/jeonse-system-korea-foreigner-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%95%84%eb%8a%94-%ea%b2%83%ea%b3%bc-%eb%ad%90%ea%b0%80-%eb%8b%a4%eb%a5%bc%ea%b9%8c/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 400,
-        "title": "industrial property Korea, 제대로 대처하는 법 — 전문가 가이드",
-        "link": "https://krealestate365.com/industrial-property-korea-%ec%a0%9c%eb%8c%80%eb%a1%9c-%eb%8c%80%ec%b2%98%ed%95%98%eb%8a%94-%eb%b2%95-%ec%a0%84%eb%ac%b8%ea%b0%80-%ea%b0%80%ec%9d%b4%eb%93%9c/",
-        "ai_tell_score": 0,
-        "matched": [],
-        "question_headings": 0,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 317,
-        "title": "capital gains tax real estate Korea, 정말 중요한 건 따로 있습니다",
-        "link": "https://krealestate365.com/2026%eb%85%84-capital-gains-tax-real-estate-korea%eb%a5%bc-%eb%8b%a4%ec%8b%9c-%ec%83%9d%ea%b0%81%ed%95%b4%eb%b3%b4%eb%8b%a4/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 316,
-        "title": "bank loan foreigner Korea에서 사람들이 자주 하는 7가지 실수",
-        "link": "https://krealestate365.com/%ec%a0%88%eb%8c%80-%eb%86%93%ec%b9%98%eb%a9%b4-%ec%95%88-%eb%90%98%eb%8a%94-bank-loan-foreigner-korea-%ea%b2%bd%ea%b3%a0-%ec%8b%a0%ed%98%b8/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 314,
-        "title": "business location Korea foreigner의 진짜 비용 — 미리 알아야 할 것들",
-        "link": "https://krealestate365.com/%ec%99%b8%ea%b5%ad%ec%9d%b8%ec%9d%84-%ec%9c%84%ed%95%9c-business-location-korea-foreigner-%ec%8b%a4%ec%a0%84-%ea%b0%80%ec%9d%b4%eb%93%9c/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 257,
-        "title": "real estate registration tax Korea, 정말 효과가 있을까? 솔직한 분석",
-        "link": "https://krealestate365.com/real-estate-registration-tax-korea-%eb%95%8c%eb%ac%b8%ec%97%90-%ed%9e%98%eb%93%9c%ec%85%a8%eb%82%98%ec%9a%94-%ec%a0%84%eb%ac%b8%ea%b0%80%ea%b0%80-%ec%95%8c%eb%a0%a4%ec%a3%bc%eb%8a%94-%ed%95%b4/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 256,
-        "title": "절대 놓치면 안 되는 restaurant lease Korea foreigner 경고 신호",
-        "link": "https://krealestate365.com/restaurant-lease-korea-foreigner-3%ea%b0%80%ec%a7%80-%ed%95%b5%ec%8b%ac-%ec%a0%84%eb%ac%b8%ec%9d%98%ea%b0%80-%ec%a7%81%ec%a0%91-%eb%b0%9d%ed%9e%8c%eb%8b%a4/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 255,
-        "title": "8 Questions People Ask About foreigner land purchase Korea",
-        "link": "https://krealestate365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%99%b8%ea%b5%ad%ec%9d%b8-%ed%86%a0%ec%a7%80-%eb%a7%a4%ec%88%98-%ed%98%84%ed%99%a9%ea%b3%bc-%ec%a0%84%eb%a7%9d-foreigner-land-purchase-korea-%ec%8b%ac/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 250,
-        "title": "property inheritance Korea foreigner 궁금증, 현장 전문가가 답하다",
-        "link": "https://krealestate365.com/property-inheritance-korea-foreigner-%ec%84%9c%ec%9a%b8%c2%b7%ec%88%98%eb%8f%84%ea%b6%8c-%ec%83%81%ec%86%8d-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%8b%9c%ec%9e%a5-%ec%99%b8%ea%b5%ad%ec%9d%b8-%ed%88%ac/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 248,
-        "title": "HUG jeonse insurance Korea 시작 전에 꼭 읽어야 할 글",
-        "link": "https://krealestate365.com/hug-jeonse-insurance-korea-your-ultimate-guide-to-securing-your-deposit/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 1,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 247,
-        "title": "apartment contract Korea English 궁금증, 현장 전문가가 답하다",
-        "link": "https://krealestate365.com/the-crucial-apartment-contract-korea-english-error-most-expats-miss/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 245,
-        "title": "외국인을 위한 property tax Korea foreigner 실전 가이드",
-        "link": "https://krealestate365.com/property-tax-korea-foreigner-expert-insights-on-ownership-and-obligations/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 243,
-        "title": "foreigner land purchase Korea: Where to Start",
-        "link": "https://krealestate365.com/the-unforeseen-hurdles-in-foreigner-land-purchase-korea-what-experts-know/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 236,
-        "title": "real estate fund Korea foreigner 입문 — 처음이라면 꼭 알아야 할 것",
-        "link": "https://krealestate365.com/real-estate-fund-korea-foreigner-navigating-regulatory-shifts-you-might-be-missing/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 186,
-        "title": "acquisition tax Korea foreigner, Explained Simply",
-        "link": "https://krealestate365.com/the-unforeseen-complexity-of-acquisition-tax-korea-foreigner-for-global-investors/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 184,
-        "title": "office rent Seoul foreigner, 정말 중요한 건 따로 있습니다",
-        "link": "https://krealestate365.com/what-a-office-rent-seoul-foreigner-expert-does-differently-and-you-can-too/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 171,
-        "title": "REIT investment Korea foreigner: A Closer Look",
-        "link": "https://krealestate365.com/reit-investment-korea-foreigner-unveiling-the-hidden-opportunities-youre-missing/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 107,
-        "title": "Korea real estate transaction process에 대한 흔한 오해, 진실은 이렇습니다",
-        "link": "https://krealestate365.com/unveiling-the-nuances-of-korea-real-estate-transaction-process-an-experts-insider-view/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 93,
-        "title": "2026년, where to stay in Seoul for a month를 다시 생각해보다",
-        "link": "https://krealestate365.com/the-hidden-costs-of-not-knowing-where-to-stay-in-seoul-for-a-month/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 65,
-        "title": "how to pay rent in Korea foreigner에 대해 자주 놓치는 사실들",
-        "link": "https://krealestate365.com/the-hidden-side-of-how-to-pay-rent-in-korea-foreigner-that-changes-how-you-should-approach-it/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
-      },
-      {
-        "id": 60,
-        "title": "short term housing Seoul expat 입문 — 처음이라면 꼭 알아야 할 것",
-        "link": "https://krealestate365.com/%ed%95%9c%ea%b5%ad-%ec%a0%95%ec%b0%a9-%ec%99%b8%ea%b5%ad%ec%9d%b8-%ec%84%9c%ec%9a%b8-%eb%8b%a8%ea%b8%b0-%ec%88%99%ec%86%8c-%ec%88%a8%ea%b2%a8%ec%a7%84-%ed%95%a8%ec%a0%95-10%eb%85%84-%ea%b2%bd/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 31,
-        "title": "Korea jeonse explained for foreigners, 정말 효과가 있을까? 솔직한 분석",
-        "link": "https://krealestate365.com/%ec%99%b8%ea%b5%ad%ec%9d%b8%ec%9d%84-%ec%9c%84%ed%95%9c-%ed%95%9c%ea%b5%ad-%ec%a0%84%ec%84%b8-%eb%8b%b9%ec%8b%a0%eb%8f%84-%ec%9d%b4%ed%95%b4%ed%95%98%ea%b3%a0-%ec%a0%9c%eb%8c%80%eb%a1%9c-%ed%99%9c/",
+        "id": 4375,
+        "title": "정청래 김민석, 표심 잡기 총력…충청·영남 민심 향방은?",
+        "link": "https://koreanews365.com/%ec%a0%95%ec%b2%ad%eb%9e%98-%ea%b9%80%eb%af%bc%ec%84%9d-%ed%91%9c%ec%8b%ac-%ec%9e%a1%ea%b8%b0-%ec%b4%9d%eb%a0%a5%ec%b6%a9%ec%b2%ad%c2%b7%ec%98%81%eb%82%a8-%eb%af%bc%ec%8b%ac-%ed%96%a5/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 8,
@@ -1242,9 +116,19 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 30,
-        "title": "2026년 달라진 capital gains tax Korea property sale, 무엇이 바뀌었나",
-        "link": "https://krealestate365.com/capital-gains-tax-korea-property-sale-%eb%8b%b9%ec%8b%a0%ec%9d%80-%ec%96%bc%eb%a7%88%eb%82%98-%ec%95%8c%ea%b3%a0-%ec%9e%88%eb%82%98%ec%9a%94/",
+        "id": 4374,
+        "title": "이란 F-35 격추 주장은 거짓, 미군기 무사…미 국방부 반박",
+        "link": "https://koreanews365.com/%ec%9d%b4%eb%9e%80-f-35-%ea%b2%a9%ec%b6%94-%ec%a3%bc%ec%9e%a5%ec%9d%80-%ea%b1%b0%ec%a7%93-%eb%af%b8%ea%b5%b0%ea%b8%b0-%eb%ac%b4%ec%82%ac%eb%af%b8-%ea%b5%ad%eb%b0%a9%eb%b6%80-%eb%b0%98/",
+        "ai_tell_score": 0,
+        "matched": [],
+        "question_headings": 0,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4372,
+        "title": "미국 2분기 성장 1.5% 둔화, 물가 3.7% 여전한 고공행진",
+        "link": "https://koreanews365.com/%eb%af%b8%ea%b5%ad-2%eb%b6%84%ea%b8%b0-%ec%84%b1%ec%9e%a5-1-5-%eb%91%94%ed%99%94-%eb%ac%bc%ea%b0%80-3-7-%ec%97%ac%ec%a0%84%ed%95%9c-%ea%b3%a0%ea%b3%b5%ed%96%89%ec%a7%84/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 5,
@@ -1252,9 +136,31 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 28,
-        "title": "how to find goshiwon in Seoul 궁금증, 현장 전문가가 답하다",
-        "link": "https://krealestate365.com/%ec%84%9c%ec%9a%b8%ec%97%90%ec%84%9c-%ea%b3%a0%ec%8b%9c%ec%9b%90%ec%9d%84-%ec%b0%be%eb%8a%94-7%ea%b0%80%ec%a7%80-%ed%98%84%eb%aa%85%ed%95%9c-%eb%b0%a9%eb%b2%95-%ec%b5%9c%ea%b3%a0%ec%9d%98-%ea%b0%80/",
+        "id": 4369,
+        "title": "매일 식이섬유 2알, 변비 탈출! 화장실 고민 끝.",
+        "link": "https://koreanews365.com/%eb%a7%a4%ec%9d%bc-%ec%8b%9d%ec%9d%b4%ec%84%ac%ec%9c%a0-2%ec%95%8c-%eb%b3%80%eb%b9%84-%ed%83%88%ec%b6%9c-%ed%99%94%ec%9e%a5%ec%8b%a4-%ea%b3%a0%eb%af%bc-%eb%81%9d/",
+        "ai_tell_score": 2,
+        "matched": [
+          "현대인들에게"
+        ],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4367,
+        "title": "친정 복귀 9년 만, 5안타 맹타…3할 타율 복귀? 201안타 &#8216;진짜 부활",
+        "link": "https://koreanews365.com/%ec%b9%9c%ec%a0%95-%eb%b3%b5%ea%b7%80-9%eb%85%84-%eb%a7%8c-5%ec%95%88%ed%83%80-%eb%a7%b9%ed%83%803%ed%95%a0-%ed%83%80%ec%9c%a8-%eb%b3%b5%ea%b7%80-201%ec%95%88%ed%83%80-%ec%a7%84%ec%a7%9c/",
+        "ai_tell_score": 0,
+        "matched": [],
+        "question_headings": 0,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4364,
+        "title": "중국어 한마디: &#8216;물이 스며들다&#8217;는 중국어로?",
+        "link": "https://koreanews365.com/%ec%a4%91%ea%b5%ad%ec%96%b4-%ed%95%9c%eb%a7%88%eb%94%94-%eb%ac%bc%ec%9d%b4-%ec%8a%a4%eb%a9%b0%eb%93%a4%eb%8b%a4%eb%8a%94-%ec%a4%91%ea%b5%ad%ec%96%b4%eb%a1%9c/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 4,
@@ -1262,9 +168,9 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 22,
-        "title": "설문조사: 10명 중 8명이 Korea digital nomad accommodation를 잘못 알고 있다",
-        "link": "https://krealestate365.com/korea-digital-nomad-accommodation-%eb%8b%b9%ec%8b%a0%ec%9d%b4-%ec%9e%98%eb%aa%bb-%ec%95%8c%ea%b3%a0-%ec%9e%88%eb%8a%94-%eb%b9%84%ec%9a%a9-%ec%a0%88%ea%b0%90%ea%b3%bc-%ec%b5%9c%ec%a0%81%ec%9d%98/",
+        "id": 4363,
+        "title": "이필립 발언 논란, 김-정 격돌: &#8220;노코멘트 왜?&#8221; vs &#8220;친명은 누구를 욕해야?",
+        "link": "https://koreanews365.com/%ec%9d%b4%ed%95%84%eb%a6%bd-%eb%b0%9c%ec%96%b8-%eb%85%bc%eb%9e%80-%ea%b9%80-%ec%a0%95-%ea%b2%a9%eb%8f%8c-%eb%85%b8%ec%bd%94%eb%a9%98%ed%8a%b8-%ec%99%9c-vs-%ec%b9%9c%eb%aa%85%ec%9d%80/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 5,
@@ -1272,29 +178,9 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 21,
-        "title": "GTX 노선 수혜 지역, 제대로 대처하는 법 — 전문가 가이드",
-        "link": "https://krealestate365.com/gtx-%eb%85%b8%ec%84%a0-%ec%88%98%ed%98%9c-%ec%a7%80%ec%97%ad-%eb%86%93%ec%b9%98%eb%a9%b4-%ed%9b%84%ed%9a%8c%ed%95%a0-7%ea%b0%80%ec%a7%80-%ed%95%b5%ec%8b%ac-%ed%88%ac%ec%9e%90-%ed%8f%ac%ec%9d%b8/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 20,
-        "title": "한국 인구감소 부동산 영향에서 사람들이 자주 하는 4가지 실수",
-        "link": "https://krealestate365.com/%ed%95%9c%ea%b5%ad-%ec%9d%b8%ea%b5%ac%ea%b0%90%ec%86%8c-%eb%8b%b9%ec%8b%a0%ec%9d%98-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%9e%90%ec%82%b0%ec%97%90%eb%8f%84-%ec%b9%98%eb%aa%85%ec%a0%81%ec%9d%b8-%ec%98%81/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 19,
-        "title": "용산 개발 계획 분석의 진짜 비용 — 미리 알아야 할 것들",
-        "link": "https://krealestate365.com/%ec%9a%a9%ec%82%b0-%ea%b0%9c%eb%b0%9c-%ea%b3%84%ed%9a%8d-%eb%b6%84%ec%84%9d-%ea%b3%bc%ec%97%b0-%eb%8b%b9%ec%8b%a0%ec%9d%98-%ed%88%ac%ec%9e%90-%ec%a7%80%eb%8f%84%eb%a5%bc-%eb%b0%94%ea%bf%80-%ec%a7%80/",
+        "id": 4357,
+        "title": "손담비, 억까에 폭발…무개념 편견에 분노",
+        "link": "https://koreanews365.com/%ec%86%90%eb%8b%b4%eb%b9%84-%ec%96%b5%ea%b9%8c%ec%97%90-%ed%8f%ad%eb%b0%9c%eb%ac%b4%ea%b0%9c%eb%85%90-%ed%8e%b8%ea%b2%ac%ec%97%90-%eb%b6%84%eb%85%b8/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 5,
@@ -1302,9 +188,19 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 18,
-        "title": "강남 아파트 시세 분석, 정말 중요한 건 따로 있습니다",
-        "link": "https://krealestate365.com/%ea%b0%95%eb%82%a8-%ec%95%84%ed%8c%8c%ed%8a%b8-%ec%8b%9c%ec%84%b8-%ea%b3%bc%ec%97%b0-%ec%a7%80%ea%b8%88%ec%9d%b4-%ea%b8%b0%ed%9a%8c%ec%9d%bc%ea%b9%8c%ec%9a%94-%eb%8b%b9%ec%8b%a0%ec%9d%98-%ed%88%ac/",
+        "id": 4356,
+        "title": "코스피 5% 폭락, 6400선 붕괴 후속 조치 마련 시급",
+        "link": "https://koreanews365.com/%ec%bd%94%ec%8a%a4%ed%94%bc-5-%ed%8f%ad%eb%9d%bd-6400%ec%84%a0-%eb%b6%95%ea%b4%b4-%ed%9b%84%ec%86%8d-%ec%a1%b0%ec%b9%98-%eb%a7%88%eb%a0%a8-%ec%8b%9c%ea%b8%89/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4352,
+        "title": "폭염 경고, 장마 끝…숨 막히는 더위 시작",
+        "link": "https://koreanews365.com/%ed%8f%ad%ec%97%bc-%ea%b2%bd%ea%b3%a0-%ec%9e%a5%eb%a7%88-%eb%81%9d%ec%88%a8-%eb%a7%89%ed%9e%88%eb%8a%94-%eb%8d%94%ec%9c%84-%ec%8b%9c%ec%9e%91/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1312,19 +208,9 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 16,
-        "title": "2026년, 수도권 공급 부족 지역를 다시 생각해보다",
-        "link": "https://krealestate365.com/%eb%8b%a4%eb%93%a4-%ec%9e%98%eb%aa%bb-%ec%95%8c%ea%b3%a0-%ec%9e%88%eb%8a%94-%ec%88%98%eb%8f%84%ea%b6%8c-%ea%b3%b5%ea%b8%89-%eb%b6%80%ec%a1%b1-%ec%a7%80%ec%97%ad%ec%9d%98-%ec%a7%84%ec%8b%a4-%ec%95%84/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 15,
-        "title": "분당 아파트 리모델링 투자, 실제로는 어떻게 진행될까",
-        "link": "https://krealestate365.com/%eb%b6%84%eb%8b%b9-%ec%95%84%ed%8c%8c%ed%8a%b8-%eb%a6%ac%eb%aa%a8%eb%8d%b8%eb%a7%81-%ed%88%ac%ec%9e%90-%ec%9d%b4%ea%b2%83%eb%a7%8c-%eb%aa%a8%eb%a5%b4%eb%a9%b4-100-%ed%9b%84%ed%9a%8c%ed%95%a9%eb%8b%88/",
+        "id": 4353,
+        "title": "강북아리수 위생 최고 등급 획득, 전국 정수장 기준 제시",
+        "link": "https://koreanews365.com/%ea%b0%95%eb%b6%81%ec%95%84%eb%a6%ac%ec%88%98-%ec%9c%84%ec%83%9d-%ec%b5%9c%ea%b3%a0-%eb%93%b1%ea%b8%89-%ed%9a%8d%eb%93%9d-%ec%a0%84%ea%b5%ad-%ec%a0%95%ec%88%98%ec%9e%a5-%ea%b8%b0%ec%a4%80-%ec%a0%9c/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1332,245 +218,69 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 14,
-        "title": "2026년, 숲세권 아파트 프리미엄를 다시 생각해보다",
-        "link": "https://krealestate365.com/%ec%88%b2%ec%84%b8%ea%b6%8c-%ec%95%84%ed%8c%8c%ed%8a%b8-%ed%94%84%eb%a6%ac%eb%af%b8%ec%97%84-%ea%b7%b8%ec%a0%80-%eb%82%ad%eb%a7%8c%ec%9d%bc%ea%b9%8c-%ec%a0%84%eb%ac%b8%ea%b0%80%ea%b0%80-%eb%b0%9d/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 13,
-        "title": "일산 부동산 전망 분석 궁금증, 현장 전문가가 답하다",
-        "link": "https://krealestate365.com/%ec%9d%bc%ec%82%b0-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%a0%84%eb%a7%9d-%eb%b6%84%ec%84%9d-%eb%8b%b9%ec%8b%a0%ec%9d%98-%ed%88%ac%ec%9e%90-%ec%a0%84%eb%9e%b5%ec%9d%80-%ec%a0%95%eb%a7%90-%ec%95%88%ec%a0%84/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 12,
-        "title": "고양 창릉 부동산 분석에 대한 흔한 오해 바로잡기",
-        "link": "https://krealestate365.com/%ea%b3%a0%ec%96%91-%ec%b0%bd%eb%a6%89-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%a7%80%ea%b8%88-%ed%88%ac%ec%9e%90%ed%95%b4%eb%8f%84-%ed%9b%84%ed%9a%8c%ed%95%98%ec%a7%80-%ec%95%8a%ec%9d%84%ea%b9%8c%ec%9a%94/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 11,
-        "title": "한국 상가 투자 수익률 시작 전에 꼭 읽어야 할 글",
-        "link": "https://krealestate365.com/%ed%95%9c%ea%b5%ad-%ec%83%81%ea%b0%80-%ed%88%ac%ec%9e%90-%ec%88%98%ec%9d%b5%eb%a5%a0-%eb%8b%b9%ec%8b%a0%ec%9d%80-%ec%a0%9c%eb%8c%80%eb%a1%9c-%ec%95%8c%ea%b3%a0-%ed%88%ac%ec%9e%90%ed%95%98%ea%b3%a0/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 9,
-        "title": "2026년 달라진 서울역 주변 부동산 전망, 무엇이 바뀌었나",
-        "link": "https://krealestate365.com/%ec%84%9c%ec%9a%b8%ec%97%ad-%ec%a3%bc%eb%b3%80-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%a7%80%ea%b8%88-%ed%88%ac%ec%9e%90%ed%95%b4%eb%8f%84-%ea%b4%9c%ec%b0%ae%ec%9d%84%ea%b9%8c%ec%9a%94-%eb%af%b8%eb%9e%98/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      }
-    ],
-    "kept_indexed": [],
-    "uncertain": []
-  },
-  "https://ktech365.com": {
-    "to_hide": [
-      {
-        "id": 4606,
-        "title": "Planning for Seoul tech accelerator? Start Here",
-        "link": "https://ktech365.com/planning-for-seoul-tech-accelerator-start-here/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4602,
-        "title": "9 Things to Look For When Choosing Korea AI chip industry",
-        "link": "https://ktech365.com/9-things-to-look-for-when-choosing-korea-ai-chip-industry/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4595,
-        "title": "Korea AI regulation in 2026: What&#8217;s Changed",
-        "link": "https://ktech365.com/korea-ai-regulation-in-2026-whats-changed/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4591,
-        "title": "SK Hynix news, Broken Down Step by Step",
-        "link": "https://ktech365.com/sk-hynix-news-broken-down-step-by-step/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4588,
-        "title": "Naver AI models: A Beginner&#8217;s Starting Point",
-        "link": "https://ktech365.com/naver-ai-models-a-beginners-starting-point/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4580,
-        "title": "Korea unicorn startups 101: Where First-Timers Should Begin",
-        "link": "https://ktech365.com/korea-unicorn-startups-101-where-first-timers-should-begin/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4579,
-        "title": "5 Questions People Ask About Korea startup visa",
-        "link": "https://ktech365.com/5-questions-people-ask-about-korea-startup-visa/",
+        "id": 4348,
+        "title": "집에서 공항까지 럭셔리 동행: 백화점 VIP 서비스, 경계를 허물다",
+        "link": "https://koreanews365.com/%ec%a7%91%ec%97%90%ec%84%9c-%ea%b3%b5%ed%95%ad%ea%b9%8c%ec%a7%80-%eb%9f%ad%ec%85%94%eb%a6%ac-%eb%8f%99%ed%96%89-%eb%b0%b1%ed%99%94%ec%a0%90-vip-%ec%84%9c%eb%b9%84%ec%8a%a4-%ea%b2%bd%ea%b3%84/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 6,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4576,
-        "title": "Seoul tech accelerator Checklist You Shouldn&#8217;t Skip",
-        "link": "https://ktech365.com/seoul-tech-accelerator-checklist-you-shouldnt-skip/",
+        "id": 4349,
+        "title": "이 대통령, 샌프란 AI 선언: 대한민국, 대체불가 공급망 리더로 도약",
+        "link": "https://koreanews365.com/%ec%9d%b4-%eb%8c%80%ed%86%b5%eb%a0%b9-%ec%83%8c%ed%94%84%eb%9e%80-ai-%ec%84%a0%ec%96%b8-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%eb%8c%80%ec%b2%b4%eb%b6%88%ea%b0%80-%ea%b3%b5%ea%b8%89%eb%a7%9d/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4345,
+        "title": "냉장고 꽉 채우면 전기세 폭탄? 여름철 올바른 냉장고 사용법",
+        "link": "https://koreanews365.com/%eb%83%89%ec%9e%a5%ea%b3%a0-%ea%bd%89-%ec%b1%84%ec%9a%b0%eb%a9%b4-%ec%a0%84%ea%b8%b0%ec%84%b8-%ed%8f%ad%ed%83%84-%ec%97%ac%eb%a6%84%ec%b2%a0-%ec%98%ac%eb%b0%94%eb%a5%b8-%eb%83%89%ec%9e%a5%ea%b3%a0/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4344,
+        "title": "한국 갯벌, 부산서 세계유산 확대…여수·고흥·무안·서산 신규 포함",
+        "link": "https://koreanews365.com/%ed%95%9c%ea%b5%ad-%ea%b0%af%eb%b2%8c-%eb%b6%80%ec%82%b0%ec%84%9c-%ec%84%b8%ea%b3%84%ec%9c%a0%ec%82%b0-%ed%99%95%eb%8c%80%ec%97%ac%ec%88%98%c2%b7%ea%b3%a0%ed%9d%a5%c2%b7%eb%ac%b4%ec%95%88/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4324,
+        "title": "AI 쓴 후기, 이제 무신사에서 못 봐요",
+        "link": "https://koreanews365.com/ai-%ec%93%b4-%ed%9b%84%ea%b8%b0-%ec%9d%b4%ec%a0%9c-%eb%ac%b4%ec%8b%a0%ec%82%ac%ec%97%90%ec%84%9c-%eb%aa%bb-%eb%b4%90%ec%9a%94/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4323,
+        "title": "다저스 좌절 김혜성, 트리플A도 막막…강정호 전철 밟나",
+        "link": "https://koreanews365.com/%eb%8b%a4%ec%a0%80%ec%8a%a4-%ec%a2%8c%ec%a0%88-%ea%b9%80%ed%98%9c%ec%84%b1-%ed%8a%b8%eb%a6%ac%ed%94%8ca%eb%8f%84-%eb%a7%89%eb%a7%89%ea%b0%95%ec%a0%95%ed%98%b8-%ec%a0%84%ec%b2%a0-%eb%b0%9f/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 7,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4568,
-        "title": "Korea AI startups 2026, Explained Simply",
-        "link": "https://ktech365.com/korea-ai-startups-2026-explained-simply/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4549,
-        "title": "Korea chip subsidy: Details That Are Easy to Miss",
-        "link": "https://ktech365.com/korea-chip-subsidy-details-that-are-easy-to-miss/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4542,
-        "title": "Korea AI regulation, Step by Step",
-        "link": "https://ktech365.com/korea-ai-regulation-step-by-step/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4541,
-        "title": "Samsung HBM chips, Step by Step",
-        "link": "https://ktech365.com/samsung-hbm-chips-step-by-step/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4538,
-        "title": "9 Things About Samsung HBM chips Your Doctor Wants You to Know",
-        "link": "https://ktech365.com/9-things-about-samsung-hbm-chips-your-doctor-wants-you-to-know/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4536,
-        "title": "Korea semiconductor exports Q&#038;A: Answers From the Field",
-        "link": "https://ktech365.com/korea-semiconductor-exports-qa-answers-from-the-field/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4534,
-        "title": "Korea startup funding guide 101: What First-Timers Should Know",
-        "link": "https://ktech365.com/korea-startup-funding-guide-101-what-first-timers-should-know/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4499,
-        "title": "Semiconductors Warning Signs You Should Never Ignore",
-        "link": "https://ktech365.com/semiconductors-warning-signs-you-should-never-ignore/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4448,
-        "title": "Is Korean NAND flash market Really Worth It? An Honest Breakdown",
-        "link": "https://ktech365.com/is-korean-nand-flash-market-really-worth-it-an-honest-breakdown/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4447,
-        "title": "Is K-Startup global program Really Worth It? An Honest Breakdown",
-        "link": "https://ktech365.com/is-k-startup-global-program-really-worth-it-an-honest-breakdown/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4444,
-        "title": "Study Reveals: 3 in 10 People Misunderstand Korea AI startup investment",
-        "link": "https://ktech365.com/study-reveals-3-in-10-people-misunderstand-korea-ai-startup-investment/",
+        "id": 4320,
+        "title": "36주 낙태 산모, 2심서 무죄 뒤집혀",
+        "link": "https://koreanews365.com/36%ec%a3%bc-%eb%82%99%ed%83%9c-%ec%82%b0%eb%aa%a8-2%ec%8b%ac%ec%84%9c-%eb%ac%b4%ec%a3%84-%eb%92%a4%ec%a7%91%ed%98%80/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1578,69 +288,19 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4389,
-        "title": "Rethinking Korea chip export status: A Fresh Perspective for 2026",
-        "link": "https://ktech365.com/rethinking-korea-chip-export-status-a-fresh-perspective-for-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4388,
-        "title": "Rethinking AI regulation Korea policy: A Fresh Perspective for 2026",
-        "link": "https://ktech365.com/rethinking-ai-regulation-korea-policy-a-fresh-perspective-for-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4387,
-        "title": "Seoul startup accelerator Q&amp;A: Answers From the Field",
-        "link": "https://ktech365.com/seoul-startup-accelerator-qa-answers-from-the-field/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4386,
-        "title": "Korea AI research institute Warning Signs You Should Never Ignore",
-        "link": "https://ktech365.com/korea-ai-research-institute-warning-signs-you-should-never-ignore/",
+        "id": 4319,
+        "title": "동아시아, AI·고령화·패권 3중고… 공동 해법 시급",
+        "link": "https://koreanews365.com/%eb%8f%99%ec%95%84%ec%8b%9c%ec%95%84-ai%c2%b7%ea%b3%a0%eb%a0%b9%ed%99%94%c2%b7%ed%8c%a8%ea%b6%8c-3%ec%a4%91%ea%b3%a0-%ea%b3%b5%eb%8f%99-%ed%95%b4%eb%b2%95-%ec%8b%9c%ea%b8%89/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 6,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4245,
-        "title": "3 Things About Samsung semiconductor fab Your Doctor Wants You to Know",
-        "link": "https://ktech365.com/3-mistakes-people-make-with-samsung-semiconductor-fab/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4164,
-        "title": "4 Things to Look For When Choosing TSMC vs Samsung competition",
-        "link": "https://ktech365.com/tsmc-vs-samsung-competition-vs-foundry-giants-how-to-tell-the-difference/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4162,
-        "title": "7 Things About chip design Korea university Your Doctor Wants You to Know",
-        "link": "https://ktech365.com/south-koreas-strategic-push-how-universities-are-forging-the-future-of-global-chip-design/",
+        "id": 4315,
+        "title": "삼성전자, 로봇 사업 드라이브 건다",
+        "link": "https://koreanews365.com/%ec%82%bc%ec%84%b1%ec%a0%84%ec%9e%90-%eb%a1%9c%eb%b4%87-%ec%82%ac%ec%97%85-%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b8%8c-%ea%b1%b4%eb%8b%a4/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1648,39 +308,9 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4159,
-        "title": "K-Startup global program 101: What First-Timers Should Know",
-        "link": "https://ktech365.com/k-startup-global-program-fueling-koreas-next-gen-tech-revolution/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4158,
-        "title": "4 Mistakes People Make With Korean AI robot technology",
-        "link": "https://ktech365.com/koreas-ai-robot-revolution-from-smart-factories-to-daily-life/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 4132,
-        "title": "3 Mistakes People Make With Korea AI industry growth",
-        "link": "https://ktech365.com/korea-ai-industry-growth-charting-the-nations-rise-as-a-global-ai-powerhouse/",
-        "ai_tell_score": 0,
-        "matched": [],
-        "question_headings": 0,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 4130,
-        "title": "startup funding Korea guide: Where to Start",
-        "link": "https://ktech365.com/what-3-months-of-startup-funding-korea-guide-research-taught-me-that-no-one-talks-about/",
+        "id": 4312,
+        "title": "축구 영웅 케빈 키건, 투병 끝 75세로 영면",
+        "link": "https://koreanews365.com/%ec%b6%95%ea%b5%ac-%ec%98%81%ec%9b%85-%ec%bc%80%eb%b9%88-%ed%82%a4%ea%b1%b4-%ed%88%ac%eb%b3%91-%eb%81%9d-75%ec%84%b8%eb%a1%9c-%ec%98%81%eb%a9%b4/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1688,79 +318,121 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4126,
-        "title": "Korean startup success story Warning Signs You Should Never Ignore",
-        "link": "https://ktech365.com/the-korean-startup-success-story-what-top-vcs-look-for-in-seed-rounds/",
+        "id": 4309,
+        "title": "중동 긴장 고조, 국제 유가 폭등 비상",
+        "link": "https://koreanews365.com/%ec%a4%91%eb%8f%99-%ea%b8%b4%ec%9e%a5-%ea%b3%a0%ec%a1%b0-%ea%b5%ad%ec%a0%9c-%ec%9c%a0%ea%b0%80-%ed%8f%ad%eb%93%b1-%eb%b9%84%ec%83%81/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4124,
-        "title": "Korea startup ecosystem 2026 Explained in Plain English",
-        "link": "https://ktech365.com/korea-startup-ecosystem-2026-the-hidden-barriers-to-global-scaling/",
+        "id": 4308,
+        "title": "TSMC, 3년 만에 본격 가동…日·대만 반도체 경쟁 점화",
+        "link": "https://koreanews365.com/tsmc-3%eb%85%84-%eb%a7%8c%ec%97%90-%eb%b3%b8%ea%b2%a9-%ea%b0%80%eb%8f%99%e6%97%a5%c2%b7%eb%8c%80%eb%a7%8c-%eb%b0%98%eb%8f%84%ec%b2%b4-%ea%b2%bd%ec%9f%81-%ec%a0%90%ed%99%94/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4090,
-        "title": "memory chip price Korea: Frequently Confused Points",
-        "link": "https://ktech365.com/the-hidden-factor-influencing-memory-chip-price-korea-youre-likely-overlooking/",
+        "id": 4182,
+        "title": "월드컵 16강 좌절, BTS·정호연이 빛낸 K컬처의 힘",
+        "link": "https://koreanews365.com/%ec%9b%94%eb%93%9c%ec%bb%b5-16%ea%b0%95-%ec%a2%8c%ec%a0%88-bts%c2%b7%ec%a0%95%ed%98%b8%ec%97%b0%ec%9d%b4-%eb%b9%9b%eb%82%b8-k%ec%bb%ac%ec%b2%98%ec%9d%98-%ed%9e%98/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 4076,
-        "title": "The Real Cost of Korea startup ecosystem 2026 — What to Expect",
-        "link": "https://ktech365.com/the-uncomfortable-truth-about-korea-startup-ecosystem-2026-most-people-ignore/",
+        "id": 4104,
+        "title": "인천 쿠팡 물류센터, 9시간째 화염…소방청, 국가소방동원령 발령, 핵심만 짚어드립니다",
+        "link": "https://koreanews365.com/%ec%95%84%eb%ac%b4%eb%8f%84-%eb%a7%90%ed%95%b4%ec%a3%bc%ec%a7%80-%ec%95%8a%eb%8a%94-%ec%9d%b8%ec%b2%9c-%ec%bf%a0%ed%8c%a1-%eb%ac%bc%eb%a5%98%ec%84%bc%ed%84%b0-9%ec%8b%9c%ea%b0%84%ec%a7%b8-%ed%99%94/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4102,
+        "title": "&#8216;피의 게임X&#8217; 이상민, 성수동 아파트 경매에 &#8220;집이 없다&#8221;…솔직 고백, 제대로 대처하는 법 — 전문가 가이드",
+        "link": "https://koreanews365.com/%ed%94%bc%ec%9d%98-%ea%b2%8c%ec%9e%84x-%ec%9d%b4%ec%83%81%eb%af%bc-%ec%84%b1%ec%88%98%eb%8f%99-%ec%95%84%ed%8c%8c%ed%8a%b8-%ea%b2%bd%eb%a7%a4%ec%97%90-%ec%a7%91%ec%9d%b4-%ec%97%86%eb%8b%a4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4103,
+        "title": "최휘영 장관 “K컬처는 투자해야 할 ‘산업’…2030년 수출 1100억달러 달성할 것”, 왜 이런 문제가 생길까? 전문가가 답하다",
+        "link": "https://koreanews365.com/%ec%b5%9c%ed%9c%98%ec%98%81-%ec%9e%a5%ea%b4%80-k%ec%bb%ac%ec%b2%98%eb%8a%94-%ed%88%ac%ec%9e%90%ed%95%b4%ec%95%bc-%ed%95%a0-%ec%82%b0%ec%97%852030%eb%85%84-%ec%88%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4100,
+        "title": "2026년, “매출? 대기업 연봉 이상”..‘돌싱’ 김상혁, 테일러숍→요식업 대박났다 (‘신랑수업2’)[순간포착]를 다시 생각해보다",
+        "link": "https://koreanews365.com/2026%eb%85%84-%eb%a7%a4%ec%b6%9c-%eb%8c%80%ea%b8%b0%ec%97%85-%ec%97%b0%eb%b4%89-%ec%9d%b4%ec%83%81-%eb%8f%8c%ec%8b%b1-%ea%b9%80%ec%83%81%ed%98%81-%ed%85%8c/",
+        "ai_tell_score": 2,
+        "matched": [
+          "하시나요?"
+        ],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4101,
+        "title": "“1년 동안 프랑스어 독학, 한강 작품 원작 무대 각별해”…한국 배우 최초, 아비뇽 교황청 무대 선 이혜영, 당신이 아는 것과 뭐가 다를까",
+        "link": "https://koreanews365.com/1%eb%85%84-%eb%8f%99%ec%95%88-%ed%94%84%eb%9e%91%ec%8a%a4%ec%96%b4-%eb%8f%85%ed%95%99-%ed%95%9c%ea%b0%95-%ec%9e%91%ed%92%88-%ec%9b%90%ec%9e%91-%eb%ac%b4%eb%8c%80-%ea%b0%81%eb%b3%84%ed%95%b4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4017,
+        "title": "꼴찌팀 초대형 특급 계약 터졌다! → NO 옵션! 전액 보장 역대 최대 규모. 23세 유망주 7년 묶기 성공 입문 — 처음이라면 꼭 알아야 할 것",
+        "link": "https://koreanews365.com/%ea%bc%b4%ec%b0%8c%ed%8c%80-%ec%b4%88%eb%8c%80%ed%98%95-%ed%8a%b9%ea%b8%89-%ea%b3%84%ec%95%bd-%ed%84%b0%ec%a1%8c%eb%8b%a4-%e2%86%92-no-%ec%98%b5%ec%85%98-%ec%a0%84%ec%95%a1-%eb%b3%b4%ec%9e%a5/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4016,
+        "title": "[사진]SSG 새 용병 마드리스, 올러와 하이파이브 궁금증, 하나씩 풀어봅니다",
+        "link": "https://koreanews365.com/%ec%84%a4%eb%ac%b8%ec%a1%b0%ec%82%ac-10%eb%aa%85-%ec%a4%91-6%eb%aa%85%ec%9d%b4-%ec%82%ac%ec%a7%84ssg-%ec%83%88-%ec%9a%a9%eb%b3%91-%eb%a7%88%eb%93%9c%eb%a6%ac%ec%8a%a4-%ec%98%ac%eb%9f%ac%ec%99%80/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 4015,
+        "title": "청와대, 유시민 ‘필패론’에 “반응도 안 하겠다” 속 ‘부글부글’에 대해 자주 놓치는 사실들",
+        "link": "https://koreanews365.com/%ec%b2%ad%ec%99%80%eb%8c%80-%ec%9c%a0%ec%8b%9c%eb%af%bc-%ed%95%84%ed%8c%a8%eb%a1%a0%ec%97%90-%eb%b0%98%ec%9d%91%eb%8f%84-%ec%95%88-%ed%95%98%ea%b2%a0%eb%8b%a4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
       },
       {
         "id": 4014,
-        "title": "Getting nuclear fusion KSTAR guide Right the First Time",
-        "link": "https://ktech365.com/the-hidden-side-of-nuclear-fusion-kstar-guide-that-changes-how-you-should-approach-it/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3964,
-        "title": "K-battery technology trend Warning Signs You Should Never Ignore",
-        "link": "https://ktech365.com/the-hidden-side-of-k-battery-technology-trend-that-changes-how-you-should-approach-it/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3963,
-        "title": "Naver AI HyperCLOVA guide: Frequently Overlooked Facts",
-        "link": "https://ktech365.com/the-naver-ai-hyperclova-guide-expert-insights-you-wont-find-elsewhere/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3959,
-        "title": "Hyundai robot factory guide: A Closer Look at What Really Matters",
-        "link": "https://ktech365.com/unveiling-the-hyundai-robot-factory-what-industry-insiders-know/",
+        "title": "외부인 통행 막는 아파트에 ‘이행강제금’, 실제로는 이렇게 진행됩니다",
+        "link": "https://koreanews365.com/%ec%99%b8%eb%b6%80%ec%9d%b8-%ed%86%b5%ed%96%89-%eb%a7%89%eb%8a%94-%ec%95%84%ed%8c%8c%ed%8a%b8%ec%97%90-%ec%9d%b4%ed%96%89%ea%b0%95%ec%a0%9c%ea%b8%88%ec%97%90-%eb%8c%80%ed%95%9c/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1768,173 +440,9 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3900,
-        "title": "How to Actually Handle virtual idol technology Korea: A Specialist&#8217;s Guide",
-        "link": "https://ktech365.com/what-nobody-tells-you-about-virtual-idol-technology-korea/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3899,
-        "title": "How Korea web browser platform Has Changed in 2026",
-        "link": "https://ktech365.com/is-the-korea-web-browser-platform-monoculture-sustainable-an-experts-view/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3898,
-        "title": "What Nobody Tells You About Korea 6G network plan",
-        "link": "https://ktech365.com/dont-underestimate-the-strategic-imperative-of-the-korea-6g-network-plan/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3897,
-        "title": "The Truth About small modular reactor Korea That Most People Get Wrong",
-        "link": "https://ktech365.com/is-small-modular-reactor-koreas-energy-future-truly-modular-by-2030/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3896,
-        "title": "wearable health tracker Korea: Frequently Confused Points",
-        "link": "https://ktech365.com/wearable-health-tracker-korea-what-nobody-tells-you-about-its-true-potential/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3895,
-        "title": "How metaverse Zepeto guide Has Changed in 2026",
-        "link": "https://ktech365.com/are-you-missing-out-your-ultimate-metaverse-zepeto-guide-for-brand-dominance/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3894,
-        "title": "fintech sandbox Korea result, From Someone Who&#8217;s Been There",
-        "link": "https://ktech365.com/the-complete-fintech-sandbox-korea-result-guide-you-need-now-why-its-impact-matters-more-than-ever-in-2026/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3893,
-        "title": "Is webtoon AI tool Korea Really Worth It? An Honest Breakdown",
-        "link": "https://ktech365.com/is-the-webtoon-ai-tool-korea-market-poised-for-unprecedented-growth/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3883,
-        "title": "How delivery drone Korea test Has Changed in 2026",
-        "link": "https://ktech365.com/stop-underestimating-the-impact-of-delivery-drone-korea-tests-on-logistics/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3882,
-        "title": "The Real Cost of cybersecurity Korea threat report — What to Expect",
-        "link": "https://ktech365.com/what-the-cybersecurity-korea-threat-report-hides-unmasking-the-real-dangers/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3881,
-        "title": "Is wearable health tracker Korea Really Worth It? An Honest Breakdown",
-        "link": "https://ktech365.com/stop-overlooking-these-critical-trends-in-wearable-health-tracker-korea-market/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3880,
-        "title": "9 Mistakes People Make With fintech sandbox Korea result",
-        "link": "https://ktech365.com/fintech-sandbox-korea-results-what-the-official-reports-dont-tell-you/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3878,
-        "title": "Is K-battery technology trend Really Worth It? An Honest Breakdown",
-        "link": "https://ktech365.com/is-the-k-battery-technology-trend-poised-for-unprecedented-global-leadership/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3876,
-        "title": "The Real Cost of Naver AI HyperCLOVA guide — What to Expect",
-        "link": "https://ktech365.com/naver-ai-hyperclova-unpacking-the-hype-vs-reality-in-the-global-ai-race/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3870,
-        "title": "nuclear fusion KSTAR guide: Frequently Overlooked Facts",
-        "link": "https://ktech365.com/stop-ignoring-the-future-of-energy-your-essential-nuclear-fusion-kstar-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3868,
-        "title": "Why Does delivery drone Korea test Cause Problems? Experts Explain",
-        "link": "https://ktech365.com/are-delivery-drone-korea-test-initiatives-paving-the-way-for-a-global-logistics-revolution/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "URL is unknown to Google"
-      },
-      {
-        "id": 3867,
-        "title": "LG rollable display guide: Where to Start",
-        "link": "https://ktech365.com/is-the-lg-rollable-display-guide-a-glimpse-into-the-future-of-personal-tech/",
+        "id": 4013,
+        "title": "8기 영수, 갈팡질팡하더니 여자 2호 선택···여자 3호 &#8220;갈등 필요 없어, 끝이야&#8221;(&#8216;나솔사계&#8217;)에서 사람들이 자주 하는 8가지 실수",
+        "link": "https://koreanews365.com/8%ea%b8%b0-%ec%98%81%ec%88%98-%ea%b0%88%ed%8c%a1%ec%a7%88%ed%8c%a1%ed%95%98%eb%8d%94%eb%8b%88-%ec%97%ac%ec%9e%90-2%ed%98%b8-%ec%84%a0%ed%83%9d%c2%b7%c2%b7%c2%b7%ec%97%ac%ec%9e%90-3%ed%98%b8/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
@@ -1942,61 +450,29 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3866,
-        "title": "9 Questions People Ask About nuclear fusion KSTAR guide",
-        "link": "https://ktech365.com/is-the-kstar-nuclear-fusion-reactor-guiding-us-towards-infinite-energy/",
+        "id": 4012,
+        "title": "野 중진도, 차기 주자들도… 사법 리스크에 발목 잡혔다, 당신이 아는 것과 뭐가 다를까",
+        "link": "https://koreanews365.com/%e9%87%8e-%ec%a4%91%ec%a7%84%eb%8f%84-%ec%b0%a8%ea%b8%b0-%ec%a3%bc%ec%9e%90%eb%93%a4%eb%8f%84-%ec%82%ac%eb%b2%95-%eb%a6%ac%ec%8a%a4%ed%81%ac%ec%97%90-%eb%b0%9c%eb%aa%a9-%ec%9e%a1%ed%98%94/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3853,
-        "title": "The Truth About Korea supercomputer guide That Most People Get Wrong",
-        "link": "https://ktech365.com/dont-wait-to-understand-why-koreas-supercomputing-prowess-matters-more-than-ever-in-2025-korea-supercomputer-guide/",
+        "id": 3786,
+        "title": "2026년 달라진 김주형, 2년 9개월 만에 PGA 투어 우승 ◇ 윤성호 기자 김주형 선수, 무엇이 바뀌었나",
+        "link": "https://koreanews365.com/%ea%b9%80%ec%a3%bc%ed%98%95-2%eb%85%84-9%ea%b0%9c%ec%9b%94-%eb%a7%8c%ec%97%90-pga-%ed%88%ac%ec%96%b4-%ec%9a%b0%ec%8a%b9-%ea%b6%81%ea%b8%88%ec%a6%9d-%ed%98%84%ec%9e%a5-%ec%a0%84%eb%ac%b8%ea%b0%80/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3845,
-        "title": "8 Things to Check Before plastic recycling tech Korea",
-        "link": "https://ktech365.com/the-urgent-imperative-why-plastic-recycling-tech-korea-matters-more-than-ever-in-2024/",
-        "ai_tell_score": 2,
-        "matched": [
-          "navigating the complexities"
-        ],
-        "question_headings": 3,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3841,
-        "title": "Rethinking hydrogen car Korea guide: A Fresh Perspective for 2026",
-        "link": "https://ktech365.com/is-a-hydrogen-car-in-korea-the-smart-choice-for-your-sustainable-future-hydrogen-car-korea-guide/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3827,
-        "title": "The Critical Mistake Undermining Your Korea Cloud Computing Career Korea Potential Warning Signs You Should Never Ignore",
-        "link": "https://ktech365.com/the-critical-mistake-undermining-your-korea-cloud-computing-career-korea-potential/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 6,
-        "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
-      },
-      {
-        "id": 3807,
-        "title": "Superconductor Research Update Laboratory: What They Won’t Tell You About the Race for Practical Applications: Frequently Overlooked Facts",
-        "link": "https://ktech365.com/superconductor-research-update-laboratory-what-they-wont-tell-you-about-the-race-for-practical-applications/",
+        "id": 3785,
+        "title": "종료 10여일 앞두고 김태효 구속…막판 속도 내는 종합특검 ‘기간 연장’ 변수 입문 — 처음이라면 꼭 알아야 할 것",
+        "link": "https://koreanews365.com/2026%eb%85%84-%eb%8b%ac%eb%9d%bc%ec%a7%84-%ec%a2%85%eb%a3%8c-10%ec%97%ac%ec%9d%bc-%ec%95%9e%eb%91%90%ea%b3%a0-%ea%b9%80%ed%83%9c%ed%9a%a8-%ea%b5%ac%ec%86%8d%eb%a7%89%ed%8c%90-%ec%86%8d/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 6,
@@ -2004,91 +480,613 @@
         "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3802,
-        "title": "Getting Voice Recognition Processor Dialect Handling: What Nobody Te Right the First Time",
-        "link": "https://ktech365.com/voice-recognition-processor-dialect-handling-what-nobody-tells-you-about-its-real-challenges-and-breakthroughs/",
+        "id": 3675,
+        "title": "2026년 달라진 안철수 “한동훈, 무엇이 바뀌었나",
+        "link": "https://koreanews365.com/%ec%99%9c-%ec%95%88%ec%b2%a0%ec%88%98%ec%99%80-%ed%95%9c%eb%8f%99%ed%9b%88%ec%9d%98-%eb%b3%b5%eb%8b%b9-%ea%b0%88%eb%93%b1%ec%9d%b4-%ec%a6%9d%ed%8f%ad%eb%90%a0%ea%b9%8c/",
         "ai_tell_score": 1,
         "matched": [],
         "question_headings": 3,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3748,
-        "title": "The Truth About The Rise of Collaborative Robots (Cobots) in Korean Manufacturing That Most People Get Wrong",
-        "link": "https://ktech365.com/the-rise-of-collaborative-robots-cobots-in-korean-manufacturing/",
+        "id": 3674,
+        "title": "월드컵 역사상 이런 퇴장 없었다&#8230;&#8221;역대급 황당 사례&#8221; 눈물 펑펑 쏟았지만 그대로 탈락→&#8217;헐리웃&#8217; 한 번으로 역적 됐다에서 사람들이 자주 하는 3가지 실수",
+        "link": "https://koreanews365.com/%ed%95%9c%ea%b5%ad%ec%9d%b8-10%eb%aa%85-%ec%a4%91-7%eb%aa%85%ec%9d%b4-%eb%aa%a8%eb%a5%b4%eb%8a%94-%ec%9b%94%eb%93%9c%ec%bb%b5-%ed%87%b4%ec%9e%a5-%ed%8c%90%ec%a0%95%ec%9d%98-%ec%a7%84%ec%8b%a4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3673,
+        "title": "2026년, 임원들이 美공장 반대하자를 다시 생각해보다",
+        "link": "https://koreanews365.com/%ec%99%9c-%ec%a0%95%eb%aa%bd%ea%b5%ac-%ed%9a%8c%ec%9e%a5%ec%9d%80-%ec%9e%84%ec%9b%90%eb%93%a4%ec%9d%98-%e7%be%8e%ea%b3%b5%ec%9e%a5-%eb%b0%98%eb%8c%80%eb%a5%bc-%eb%ac%b4%eb%a6%85%ec%8d%bc%eb%82%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3672,
+        "title": "대충격! ‘한국전 교체출전’ 남아공 MF 애덤스의 실제 비용 — 미리 알아야 할 것들",
+        "link": "https://koreanews365.com/%eb%8c%80%ec%b6%a9%ea%b2%a9-%ed%95%9c%ea%b5%ad%ec%a0%84-%ea%b5%90%ec%b2%b4%ec%b6%9c%ec%a0%84-%eb%82%a8%ec%95%84%ea%b3%b5-mf-%ec%95%a0%eb%8d%a4%ec%8a%a4-%ed%98%b8%ed%85%94%ec%84%9c-%ec%88%a8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3671,
+        "title": "진료 예약해주고 간병인도 지원… 헬스케어 강화하는 보험사, 쉽게 풀어드립니다",
+        "link": "https://koreanews365.com/%ec%a7%84%eb%a3%8c-%ec%98%88%ec%95%bd%ed%95%b4%ec%a3%bc%ea%b3%a0-%ea%b0%84%eb%b3%91%ec%9d%b8%eb%8f%84-%ec%a7%80%ec%9b%90-%ed%97%ac%ec%8a%a4%ec%bc%80%ec%96%b4-%ea%b0%95%ed%99%94%ed%95%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3669,
+        "title": "[톡톡 30초 건강학]위고비·마운자로…다이어트약 아닌 환자용 ‘전문의약품’입니다에 대해 자주 놓치는 사실들",
+        "link": "https://koreanews365.com/%ed%86%a1%ed%86%a1-30%ec%b4%88-%ea%b1%b4%ea%b0%95%ed%95%99%ec%9c%84%ea%b3%a0%eb%b9%84%c2%b7%eb%a7%88%ec%9a%b4%ec%9e%90%eb%a1%9c%eb%8b%a4%ec%9d%b4%ec%96%b4%ed%8a%b8%ec%95%bd-%ec%95%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3668,
+        "title": "키키, 8월 가요계 귀환..글로벌 상승세 정조준 ◇ 임준혁 기자 키키, , 정말 중요한 건 따로 있습니다",
+        "link": "https://koreanews365.com/%ed%82%a4%ed%82%a4-8%ec%9b%94-%ea%b0%80%ec%9a%94%ea%b3%84-%ea%b7%80%ed%99%98-%ea%b8%80%eb%a1%9c%eb%b2%8c-%ec%83%81%ec%8a%b9%ec%84%b8-%ec%a0%95%ec%a1%b0%ec%a4%80/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3667,
+        "title": "2026년, 이승철이 품은 신예 이산를 다시 생각해보다",
+        "link": "https://koreanews365.com/%ec%9d%b4%ec%8a%b9%ec%b2%a0-40%ec%a3%bc%eb%85%84-%ed%88%ac%ec%96%b4%ec%97%90-%ec%8b%a0%ec%98%88-%ec%9d%b4%ec%82%b0-%eb%8f%99%ed%96%89%eb%8d%94-%ec%8b%9c%ec%a6%8c%ec%a6%88-%eb%b9%9b/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3666,
+        "title": "‘수퍼 조커’ 메리노의 결승골&#8230; 스페인 시작 전에 꼭 읽어야 할 글",
+        "link": "https://koreanews365.com/%ec%88%98%ed%8d%bc-%ec%a1%b0%ec%bb%a4-%eb%a9%94%eb%a6%ac%eb%85%b8%ec%9d%98-%ea%b2%b0%ec%8a%b9%ea%b3%a8-%ec%8a%a4%ed%8e%98%ec%9d%b8-4%ea%b0%95%ec%84%9c-%ed%94%84%eb%9e%91%ec%8a%a4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3665,
+        "title": "2026년 달라진 &#8220;멋지다 고우석! 꿈이 이뤄진 순간, 무엇이 바뀌었나",
+        "link": "https://koreanews365.com/%ea%b3%a0%ec%9a%b0%ec%84%9d-%eb%af%b8%eb%84%a4%ec%86%8c%ed%83%80-%ec%a0%84%ec%84%a4%eb%8f%84-%eb%86%80%eb%9e%80-%ea%bf%88%ec%9d%98-%ed%88%ac%ea%b5%ack-%ec%95%bc%ea%b5%ac-%ec%9c%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 6,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3664,
+        "title": "마약 정보원에 수사 정보 넘긴 경찰관 직위 해제에서 사람들이 자주 하는 4가지 실수",
+        "link": "https://koreanews365.com/%eb%a7%88%ec%95%bd-%ec%a0%95%eb%b3%b4%ec%9b%90%ec%97%90-%ec%88%98%ec%82%ac-%ec%a0%95%eb%b3%b4-%eb%84%98%ea%b8%b4-%ea%b2%bd%ec%b0%b0%ea%b4%80-%ec%a7%81%ec%9c%84-%ed%95%b4%ec%a0%9c-%ea%b2%bd%ec%b0%b0/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3663,
+        "title": "[속보]중국의 진짜 비용 — 미리 알아야 할 것들",
+        "link": "https://koreanews365.com/%ec%86%8d%eb%b3%b4%ec%a4%91%ea%b5%ad-%eb%b0%98%eb%8f%84%ec%b2%b4-%ec%83%9d%ec%82%b0-%ed%95%b5%ec%8b%ac-%ec%86%8c%ec%9e%ac-%ed%97%ac%eb%a5%a8-%ec%88%98%ec%b6%9c-%ec%9d%bc%ec%8b%9c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3621,
+        "title": "외국인을 위한 [사진]연장 승부에 고민 깊은 니콜라스 마줄스 한국 남자농구대표팀 감독 실전 가이드",
+        "link": "https://koreanews365.com/%ec%8a%b9%eb%b6%80%ec%b2%98%eb%a7%88%eb%8b%a4-%ea%b3%a0%eb%af%bc-%eb%8b%88%ec%bd%9c%eb%9d%bc%ec%8a%a4-%eb%a7%88%ec%a4%84%ec%8a%a4-%ea%b0%90%eb%8f%85-%ed%95%9c%ea%b5%ad-%eb%82%a8%ec%9e%90%eb%86%8d/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3529,
+        "title": "전임 유정복이 임명한 공기업 수장 수두룩…박찬대 인천시장, 실제로는 어떻게 진행될까",
+        "link": "https://koreanews365.com/%ec%9d%b8%ec%b2%9c%ec%8b%9c%ec%9e%a5-%ea%b5%90%ec%b2%b4-%ed%9b%84%ed%8f%ad%ed%92%8d-%ec%9c%a0%ec%a0%95%eb%b3%b5-%ec%9e%84%eb%aa%85-%ea%b3%b5%ea%b8%b0%ec%97%85-%ec%88%98%ec%9e%a5%eb%93%a4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3422,
+        "title": "[사진] 비슬리 시작 전에 꼭 읽어야 할 글",
+        "link": "https://koreanews365.com/%eb%b9%84%ec%8a%ac%eb%a6%ac-%ec%82%ac%ec%a7%81%ec%84%a4-%eb%8b%a8%ec%88%9c-%ed%95%b4%ed%94%84%eb%8b%9d%ec%9d%b8%ea%b0%80-%ea%b5%ac%ec%a1%b0%ec%a0%81-%eb%ac%b8%ec%a0%9c%ec%9d%b8%ea%b0%80/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3420,
+        "title": "절대 놓치면 안 되는 이 대통령 &#8216;호남 물 부족론&#8217; 정면 반박…&#8221;100만톤 공급 가능&#8221; 경고 신호",
+        "link": "https://koreanews365.com/%ed%98%b8%eb%82%a8-%eb%ac%bc-%eb%b6%80%ec%a1%b1%eb%a1%a0-%ea%b3%bc%ec%97%b0-%ed%95%b4%ec%86%8c%eb%90%a0-%ec%88%98-%ec%9e%88%ec%9d%84%ea%b9%8c-%eb%8c%80%ed%86%b5%eb%a0%b9%ec%9d%98-100%eb%a7%8c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3419,
+        "title": "2026년, 점점 더 멀어져간다 ‘한국 32강’ 조 3위간 경쟁 7위까지 밀려···세네갈를 다시 생각해보다",
+        "link": "https://koreanews365.com/%ed%95%9c%ea%b5%ad-32%ea%b0%95-%ed%9d%ac%eb%a7%9d-%ec%b0%a9%ea%b0%81%ec%9d%b8%ea%b0%80-%ec%a1%b0-3%ec%9c%84-%ea%b2%bd%ec%9f%81-7%ec%9c%84-%ec%b6%94%eb%9d%bd-%ec%84%b8%eb%84%a4%ea%b0%88-5%eb%8c%800/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 5,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3418,
+        "title": "뉴욕증시 3대 지수 일제히 약세 마감…나스닥 닷새째 하락 입문 — 처음이라면 꼭 알아야 할 것",
+        "link": "https://koreanews365.com/%eb%89%b4%ec%9a%95%ec%a6%9d%ec%8b%9c-%ea%b8%b0%ec%88%a0%ec%a3%bc-%ec%95%bd%ec%84%b8-%ec%a7%80%ec%86%8d%eb%82%98%ec%8a%a4%eb%8b%a5-%eb%8b%b7%ec%83%88%ec%a7%b8-%ed%95%98%eb%9d%bd%ec%84%b8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3415,
+        "title": "&#8216;매관매직&#8217; 공여자들도 모두 유죄…&#8221;영부인 연결고리 확보&#8221;에 대해 자주 놓치는 사실들",
+        "link": "https://koreanews365.com/%eb%a7%a4%ea%b4%80%eb%a7%a4%ec%a7%81-%ea%b3%b5%ec%97%ac%ec%9e%90%eb%93%a4%eb%8f%84-%eb%aa%a8%eb%91%90-%ec%9c%a0%ec%a3%84-%ec%9d%b4%ea%b2%83-%eb%aa%a8%eb%a5%b4%eb%a9%b4-100-%ed%9b%84%ed%9a%8c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3414,
+        "title": "[사설] ‘매관매직’ 김건희 징역 7년에 대해 의사가 꼭 알려주고 싶은 8가지",
+        "link": "https://koreanews365.com/%ec%82%ac%ec%84%a4-%eb%a7%a4%ea%b4%80%eb%a7%a4%ec%a7%81-%ec%a7%95%ec%97%ad-7%eb%85%84-%ec%84%a0%ea%b3%a0-%ec%a3%bc%ec%9e%a5-%ea%b5%ad%ec%a0%95%ec%82%ac%ec%9c%a0%ed%99%94-%eb%8b%a8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3413,
+        "title": "[사진]&#8217;하나 코리아&#8217; 탈북민 연기로 돌아온 김민하에 대해 자주 놓치는 사실들",
+        "link": "https://koreanews365.com/%ea%b9%80%eb%af%bc%ed%95%98-%ed%95%98%eb%82%98-%ec%bd%94%eb%a6%ac%ec%95%84-%ed%83%88%eb%b6%81%eb%af%bc-%ec%97%b0%ea%b8%b0-%ec%9d%b4%ea%b2%83-%eb%aa%a8%eb%a5%b4%ea%b3%a0-%eb%b3%b4%eb%a9%b4-100/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3410,
+        "title": "[베네수엘라 강진]굉음·비명 ‘아수라장’…“내가 있던 건물서 한 가족만 탈출”, 실제로는 어떻게 진행될까",
+        "link": "https://koreanews365.com/%eb%b2%a0%eb%84%a4%ec%88%98%ec%97%98%eb%9d%bc-%ea%b0%95%ec%a7%84-%ec%9e%8a%ed%9e%8c-%ec%9e%ac%ec%95%99%ec%9d%98-%ec%a7%84%ec%8b%a4-%eb%8b%a8%ec%88%9c%ed%95%9c-%ec%a7%80%ec%a7%84-%ec%95%84%eb%8b%8c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3408,
+        "title": "한혜진, 고구마 심기 첫 도전 “방귀 많이 껴도 괜찮아, 어차의 진짜 비용 — 미리 알아야 할 것들",
+        "link": "https://koreanews365.com/%ed%95%9c%ed%98%9c%ec%a7%84-%ea%b3%a0%ea%b5%ac%eb%a7%88-%eb%86%8d%ec%82%ac-%ec%9d%b4-%ec%a0%90-%eb%aa%a8%eb%a5%b4%eb%a9%b4-100-%ec%8b%a4%ed%8c%a8-%eb%8b%a8%eb%8f%85-%ec%a3%bc%ed%83%9d-%eb%9d%bc/",
+        "ai_tell_score": 2,
+        "matched": [
+          "현대인들에게"
+        ],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3398,
+        "title": "2026년, 金총리 “檢 보완수사권 폐지를 다시 생각해보다",
+        "link": "https://koreanews365.com/%ea%b2%80%ec%b0%b0-%eb%b3%b4%ec%99%84%ec%88%98%ec%82%ac%ea%b6%8c-%ed%8f%90%ec%a7%80-%ec%a0%95%eb%b6%80-%ec%b5%9c%ec%a2%85-%ec%9e%85%ec%9e%a5-%eb%b0%9c%ed%91%9c%eb%a1%9c-%ec%a3%bc%eb%aa%a9%eb%90%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3396,
+        "title": "마이크론 예상 넘는 최대 실적&#8230; 국제유가, 실제로는 어떻게 진행될까",
+        "link": "https://koreanews365.com/%ec%a7%80%ea%b8%88-%eb%86%93%ec%b9%98%eb%a9%b4-%ed%9b%84%ed%9a%8c%ed%95%a0-2026%eb%85%84-%ea%b2%bd%ec%a0%9c-%eb%8c%80%eb%b3%80%eb%8f%99-%eb%a7%88%ec%9d%b4%ed%81%ac%eb%a1%a0-%ec%97%ad%eb%8c%80/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3395,
+        "title": "김용범 청 실장 “부동산 관리, 이 6가지만 지켜도 달라집니다",
+        "link": "https://koreanews365.com/%ea%b9%80%ec%9a%a9%eb%b2%94-%ec%b2%ad-%ec%8b%a4%ec%9e%a5-%eb%b0%9c%ec%96%b8-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%8b%9c%ec%9e%a5%ec%9d%98-%ea%b7%bc%eb%b3%b8%ec%a0%81-%ed%95%b4%eb%b2%95-%eb%90%a0-%ec%88%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3393,
+        "title": "“통일 되면 다시 올 게요” 했는데… 4차례 한국 찾은 마이클 잭슨, 제대로 대처하는 법 — 전문가 가이드",
+        "link": "https://koreanews365.com/%ed%86%b5%ec%9d%bc%eb%90%98%eb%a9%b4-%eb%8b%a4%ec%8b%9c-%ec%98%ac%ea%b2%8c%ec%9a%94-%eb%a7%88%ec%9d%b4%ed%81%b4-%ec%9e%ad%ec%8a%a8%ec%9d%98-%ec%95%bd%ec%86%8d-4%ec%b0%a8%eb%a1%80/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3392,
+        "title": "‘히잡 대신 드레스 입고 공연한 죄’…이란, 정말 중요한 건 따로 있습니다",
+        "link": "https://koreanews365.com/%ed%9e%88%ec%9e%a1-%eb%b2%97%ec%9d%80-%ec%a3%84-%ec%9d%b4%eb%9e%80-%ec%97%ac%ec%84%b1-%ea%b0%80%ec%88%98%ec%97%90-%ed%83%9c%ed%98%95-74%eb%8c%80%ea%b5%ad%ec%a0%9c%ec%82%ac/",
         "ai_tell_score": 0,
         "matched": [],
         "question_headings": 0,
         "verdict": "NEUTRAL",
-        "coverageState": "Discovered - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3746,
-        "title": "South Koreas Roadmap to Solid State Battery Dominance by Q&amp;A: Answers From the Field",
-        "link": "https://ktech365.com/south-koreas-roadmap-to-solid-state-battery-dominance-by-2030/",
+        "id": 3391,
+        "title": "SK하이닉스 ‘ADR’, 당신이 아는 것과 뭐가 다를까",
+        "link": "https://koreanews365.com/sk%ed%95%98%ec%9d%b4%eb%8b%89%ec%8a%a4-adr-%eb%82%98%ec%8a%a4%eb%8b%a5-%ec%83%81%ec%9e%a5-%ec%9e%a5%eb%b0%8b%eb%b9%9b-%ec%a0%84%eb%a7%9d-%eb%92%a4-%ec%88%a8%ea%b2%a8%ec%a7%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3390,
+        "title": "절대 놓치면 안 되는 ‘통합 미래’ 논의는 없고 ‘주청사’ 갈등만···전남광주통합시 출범도 전에 ‘시끌’ 경고 신호",
+        "link": "https://koreanews365.com/%ec%a0%84%eb%82%a8%ea%b4%91%ec%a3%bc%ed%86%b5%ed%95%a9%ec%8b%9c-%ec%b6%9c%eb%b2%94-%ec%a0%84%eb%b6%80%ed%84%b0-%ec%a3%bc%ec%b2%ad%ec%82%ac-%ea%b0%88%eb%93%b1%ec%9c%bc%eb%a1%9c-%ec%8b%9c%eb%81%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3387,
+        "title": "부산서 유흥 업소와 유착 의혹 경찰관 직위해제, 어디서부터 시작해야 할까",
+        "link": "https://koreanews365.com/%eb%b6%80%ec%82%b0-%ea%b2%bd%ec%b0%b0-%ec%9c%a0%ec%b0%a9-%ec%9d%98%ed%98%b9-%ec%9d%b4%ea%b2%83-%eb%aa%a8%eb%a5%b4%ea%b3%a0-%eb%84%98%ec%96%b4%ea%b0%80%eb%a9%b4-%ec%82%ac%ed%9a%8c-%ec%a0%84%ec%b2%b4/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3384,
+        "title": "2026년, 카메라 보고 “돌아왔다” 외친 호날두&#8230; 41세 라스트 댄스를 다시 생각해보다",
+        "link": "https://koreanews365.com/%eb%aa%a8%eb%91%90%ea%b0%80-%eb%81%9d%ec%9d%b4%eb%9d%bc-%eb%a7%90%ed%95%a0-%eb%95%8c-%ed%98%b8%eb%82%a0%eb%91%90-41%ec%84%b8%ec%97%90-%eb%a7%88%ec%a7%80%eb%a7%89-%ec%b6%a4-%ec%95%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3382,
+        "title": "7월 말까지 방 등록하는 호스트 시작 전에 꼭 읽어야 할 글",
+        "link": "https://koreanews365.com/%eb%aa%a8%eb%91%90%ea%b0%80-%eb%86%93%ec%b9%9c-%ea%b8%b0%ed%9a%8c-7%ec%9b%94-%eb%a7%90-%eb%b0%a9-%eb%93%b1%eb%a1%9d-%ed%98%b8%ec%8a%a4%ed%8a%b8-%ec%b2%ab-%ea%b3%84%ec%95%bd-%ec%88%98%ec%88%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3380,
+        "title": "[포토] 박승규, 쉽게 풀어드립니다",
+        "link": "https://koreanews365.com/%eb%b0%95%ec%8a%b9%ea%b7%9c-%ea%b2%ac%ec%a0%9c-%ec%95%84%ec%9b%83-%eb%8b%a8%ec%88%9c%ed%95%9c-%ec%8b%a4%ec%88%98%ec%9d%b8%ea%b0%80-%ec%a0%84%eb%9e%b5%ec%a0%81-%eb%85%b8%eb%a6%bc%ec%88%98%ec%9d%b8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3330,
+        "title": "최저임금 인상률 논의 본격화…”1만 2천원” vs “지금도 부담” 하기 전에 알아두면 좋은 것들",
+        "link": "https://koreanews365.com/%ec%b5%9c%ec%a0%80%ec%9e%84%ea%b8%88-%ec%9f%81%ec%a0%90-5%ea%b0%80%ec%a7%80-1%eb%a7%8c-2%ec%b2%9c%ec%9b%90-%ec%9a%94%ea%b5%ac%ec%99%80-%ec%a7%80%ea%b8%88%eb%8f%84-%eb%b6%80%eb%8b%b4-%ec%82%ac/",
         "ai_tell_score": 0,
         "matched": [],
         "question_headings": 0,
         "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       },
       {
-        "id": 3744,
-        "title": "The Real Cost of How AI is Revolutionizing the Korean EdTech Market — What to Expect",
-        "link": "https://ktech365.com/how-ai-is-revolutionizing-the-korean-edtech-market/",
+        "id": 3328,
+        "title": "외국인을 위한 남녀 정원 없앤 순경 실전 가이드",
+        "link": "https://koreanews365.com/%eb%82%a8%eb%85%80-%ec%a0%95%ec%9b%90-%ed%8f%90%ec%a7%80-%ec%88%9c%ea%b2%bd-%ec%b1%84%ec%9a%a9%ec%9d%98-%ec%88%a8%ea%b2%a8%ec%a7%84-%ed%8c%8c%ec%9e%a5-%ec%97%ac%ec%84%b1-%ed%95%a9%ea%b2%a9%eb%a5%a0/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3327,
+        "title": "반도체 수출 실적 역대 최고치, 실제로는 어떻게 진행될까",
+        "link": "https://koreanews365.com/%eb%b0%98%eb%8f%84%ec%b2%b4-%ec%88%98%ec%b6%9c-%ec%8b%a4%ec%a0%81-%ec%97%ad%eb%8c%80-%ec%b5%9c%ea%b3%a0%ec%b9%98-%ed%95%9c%ea%b5%ad-%ea%b2%bd%ec%a0%9c%ec%9d%98-%ec%83%88%eb%a1%9c%ec%9a%b4-%eb%8f%99/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3325,
+        "title": "기후변화 대응 탄소중립 시작 전에 꼭 읽어야 할 글",
+        "link": "https://koreanews365.com/%ea%b8%b0%ed%9b%84%eb%b3%80%ed%99%94-%eb%8c%80%ec%9d%91-%ed%83%84%ec%86%8c%ec%a4%91%eb%a6%bd%ec%9d%80-%ea%b3%bc%ec%97%b0-%ec%8b%a4%ed%98%84-%ea%b0%80%eb%8a%a5%ed%95%9c-%eb%aa%a9%ed%91%9c%ec%9d%b8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3314,
+        "title": "기후변화 대응 탄소중립, 쉽게 풀어드립니다",
+        "link": "https://koreanews365.com/%ed%83%84%ec%86%8c%ec%a4%91%eb%a6%bd-%ea%b3%bc%ec%97%b0-%ed%95%9c%ea%b5%ad-%ec%82%ac%ed%9a%8c%ec%9d%98-%ec%a7%80%ec%86%8d-%ea%b0%80%eb%8a%a5%ed%95%9c-%eb%af%b8%eb%9e%98%eb%a5%bc-%eb%b3%b4%ec%9e%a5/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3306,
+        "title": "한국 부동산 정책 동향에 대해 자주 놓치는 사실들",
+        "link": "https://koreanews365.com/%ed%95%9c%ea%b5%ad-%eb%b6%80%eb%8f%99%ec%82%b0-%ec%a0%95%ec%b1%85-%ea%b3%bc%ec%97%b0-%ec%8b%9c%ec%9e%a5-%ec%95%88%ec%a0%95%ea%b3%bc-%ec%84%9c%eb%af%bc-%ec%a3%bc%ea%b1%b0-%eb%91%90-%eb%a7%88/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3302,
+        "title": "기후변화 대응 탄소중립에서 사람들이 자주 하는 5가지 실수",
+        "link": "https://koreanews365.com/%ed%83%84%ec%86%8c%ec%a4%91%eb%a6%bd-%ec%a7%80%ea%b5%ac%eb%a5%bc-%ec%9c%84%ed%95%9c-%eb%b6%88%ea%b0%80%ed%94%bc%ed%95%9c-%ec%84%a0%ed%83%9d%ec%9d%b8%ea%b0%80-%ea%b8%b0%ed%9b%84%eb%b3%80%ed%99%94/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3298,
+        "title": "2026년 달라진 청년 창업 지원 프로그램, 무엇이 바뀌었나",
+        "link": "https://koreanews365.com/%ec%b2%ad%eb%85%84-%ec%b0%bd%ec%97%85-%ec%a7%80%ec%9b%90-%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%a8-%ec%9d%b4%ea%b2%83-%eb%aa%a8%eb%a5%b4%ea%b3%a0-%ec%8b%9c%ec%9e%91%ed%95%98%eb%a9%b4-100-%ed%9b%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 4,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3294,
+        "title": "2026년 달라진 국내 물가 동향 및 전망, 무엇이 바뀌었나",
+        "link": "https://koreanews365.com/%ea%b5%ad%eb%82%b4-%eb%ac%bc%ea%b0%80-%ec%9d%b4-%ea%b2%bd%ea%b3%a0-%eb%ac%b4%ec%8b%9c%ed%95%98%eb%a9%b4-%ec%84%9c%eb%af%bc-%ea%b0%80%ea%b3%84-%ec%b9%98%eb%aa%85%ed%83%80-%ec%9e%85%ec%9d%84/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3280,
+        "title": "대한민국 최신 경제 및 사회 변화 트렌드 분석, 이것부터 확인하세요",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%a7%80%ea%b8%88-%ec%96%b4%eb%96%a4-%eb%b3%80%ed%99%94%ec%9d%98-%ed%8c%8c%ea%b3%a0%eb%a5%bc-%eb%84%98%ea%b3%a0-%ec%9e%88%ec%9d%84%ea%b9%8c-%eb%8c%80%ed%95%9c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 5,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3273,
+        "title": "지속가능한 성장 위한 변화의 기로에 서 있는가?의 진짜 비용 — 미리 알아야 할 것들",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%a7%80%ec%86%8d%ea%b0%80%eb%8a%a5%ed%95%9c-%ec%84%b1%ec%9e%a5-%ec%9c%84%ed%95%9c-%eb%b3%80%ed%99%94%ec%9d%98-%ea%b8%b0%eb%a1%9c%ec%97%90-%ec%84%9c-%ec%9e%88/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 6,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3268,
+        "title": "외국인을 위한 대한민국 실전 가이드",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%a7%80%ea%b8%88-%ec%96%b4%eb%94%94%eb%a1%9c-%ea%b0%80%ea%b3%a0-%ec%9e%88%eb%8a%94%ea%b0%80-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c%c2%b7%ec%82%ac%ed%9a%8c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3263,
+        "title": "경제·사회 지형을 뒤흔드는 5가지 메가트렌드 심층 분석에서 사람들이 자주 하는 5가지 실수",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-2024%eb%85%84-%ea%b2%bd%ec%a0%9c%c2%b7%ec%82%ac%ed%9a%8c-%ec%a7%80%ed%98%95%ec%9d%84-%eb%92%a4%ed%9d%94%eb%93%9c%eb%8a%94-5%ea%b0%80%ec%a7%80-%eb%a9%94%ea%b0%80/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3258,
+        "title": "3가지 경제 동력과 5대 사회 트렌드 속 복합 전환기 진입, 정말 중요한 건 따로 있습니다",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-3%ea%b0%80%ec%a7%80-%ea%b2%bd%ec%a0%9c-%eb%8f%99%eb%a0%a5%ea%b3%bc-5%eb%8c%80-%ec%82%ac%ed%9a%8c-%ed%8a%b8%eb%a0%8c%eb%93%9c-%ec%86%8d-%eb%b3%b5%ed%95%a9/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3253,
+        "title": "2026년 달라진 당신은 격동의 대한민국 최신 경제 및 사회 변화 트렌드 분석을 놓치고 있지 않은가?, 무엇이 바뀌었나",
+        "link": "https://koreanews365.com/%eb%8b%b9%ec%8b%a0%ec%9d%80-%ea%b2%a9%eb%8f%99%ec%9d%98-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3251,
+        "title": "예측불허의 시대, 당신이 아는 것과 뭐가 다를까",
+        "link": "https://koreanews365.com/%ec%98%88%ec%b8%a1%eb%b6%88%ed%97%88%ec%9d%98-%ec%8b%9c%eb%8c%80-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3247,
+        "title": "격변의 대한민국 제대로 준비하는 법",
+        "link": "https://koreanews365.com/%ea%b2%a9%eb%b3%80%ec%9d%98-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c%eb%93%9c-%eb%b6%84%ec%84%9d/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3245,
+        "title": "MZ세대가 주도하는 새로운 질서? 대한민국 최신 경제 및 사회 변화 트렌드 분석, 실제로는 어떻게 진행될까",
+        "link": "https://koreanews365.com/mz%ec%84%b8%eb%8c%80%ea%b0%80-%ec%a3%bc%eb%8f%84%ed%95%98%eb%8a%94-%ec%83%88%eb%a1%9c%ec%9a%b4-%ec%a7%88%ec%84%9c-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3243,
+        "title": "저성장 시대? 대한민국의 진짜 비용 — 미리 알아야 할 것들",
+        "link": "https://koreanews365.com/%ec%a0%80%ec%84%b1%ec%9e%a5-%ec%8b%9c%eb%8c%80-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%97%ad%ec%84%a4%ec%a0%81-%ec%86%8c%eb%b9%84-%ec%96%91%ea%b7%b9%ed%99%94%ec%99%80-%ec%83%9d%ed%99%9c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3241,
+        "title": "경제 및 사회 변화 트렌드 분석: 이것 모르면 미래 경쟁력 잃는다 입문 — 처음이라면 꼭 알아야 할 것",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c%eb%93%9c-%eb%b6%84%ec%84%9d-%ec%9d%b4%ea%b2%83-%eb%aa%a8/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3239,
+        "title": "절대 놓치면 안 되는 불확실성 시대 경고 신호",
+        "link": "https://koreanews365.com/%eb%b6%88%ed%99%95%ec%8b%a4%ec%84%b1-%ec%8b%9c%eb%8c%80-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3237,
+        "title": "외국인을 위한 대한민국 최신 경제 및 사회 변화 트렌드 분석 입문 — 처음이라면 꼭 알아야 할 것 실전 가이드",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c%eb%93%9c-%eb%b6%84%ec%84%9d-%eb%8b%b9%ec%8b%a0%ec%9d%98/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3229,
+        "title": "겉으로 보는 안정과 속으로 끓는 변화: 대한민국 최신 경제 및 사회 변화 트렌드 분석, 정말 중요한 건 따로 있습니다",
+        "link": "https://koreanews365.com/%ea%b2%89%ec%9c%bc%eb%a1%9c-%eb%b3%b4%eb%8a%94-%ec%95%88%ec%a0%95%ea%b3%bc-%ec%86%8d%ec%9c%bc%eb%a1%9c-%eb%81%93%eb%8a%94-%eb%b3%80%ed%99%94-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3227,
+        "title": "경제 및 사회 ‘이것’ 모르면 미래 놓친다!의 실제 비용 — 미리 알아야 할 것들",
+        "link": "https://koreanews365.com/%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c%eb%93%9c-%eb%b6%84%ec%84%9d-%ec%9d%b4%ea%b2%83/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3220,
+        "title": "놓치기 쉬운 [속보] 대한민국 최신 경제 및 사회 변화 트렌드 분석 체크포인트",
+        "link": "https://koreanews365.com/%ec%86%8d%eb%b3%b4-%eb%8c%80%ed%95%9c%eb%af%bc%ea%b5%ad-%ec%b5%9c%ec%8b%a0-%ea%b2%bd%ec%a0%9c-%eb%b0%8f-%ec%82%ac%ed%9a%8c-%eb%b3%80%ed%99%94-%ed%8a%b8%eb%a0%8c%eb%93%9c-%eb%b6%84%ec%84%9d-13/",
+        "ai_tell_score": 1,
+        "matched": [],
+        "question_headings": 3,
+        "verdict": "NEUTRAL",
+        "coverageState": "URL is unknown to Google"
+      },
+      {
+        "id": 3152,
+        "title": "디지털 전환과 세대 교체 바람: 2026년 한국 정치 궁금증, 현장 전문가가 답하다",
+        "link": "https://koreanews365.com/%eb%94%94%ec%a7%80%ed%84%b8-%ec%a0%84%ed%99%98%ea%b3%bc-%ec%84%b8%eb%8c%80-%ea%b5%90%ec%b2%b4-%eb%b0%94%eb%9e%8c-2026%eb%85%84-%ed%95%9c%ea%b5%ad-%ec%a0%95%ec%b9%98-%eb%af%b8%eb%9e%98-%ed%96%a5/",
         "ai_tell_score": 0,
         "matched": [],
         "question_headings": 0,
         "verdict": "NEUTRAL",
-        "coverageState": "Crawled - currently not indexed"
+        "coverageState": "URL is unknown to Google"
       }
     ],
     "kept_indexed": [
       {
-        "id": 4587,
-        "title": "Samsung HBM chips: A Closer Look",
-        "link": "https://ktech365.com/samsung-hbm-chips-a-closer-look/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 5,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 4569,
-        "title": "A Practical Look at SK Hynix news for International Readers",
-        "link": "https://ktech365.com/a-practical-look-at-sk-hynix-news-for-international-readers/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 4,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 4527,
-        "title": "Korea chip subsidy Explained in Plain English",
-        "link": "https://ktech365.com/korea-chip-subsidy-explained-in-plain-english/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 4525,
-        "title": "Naver AI models Warning Signs You Should Never Ignore",
-        "link": "https://ktech365.com/naver-ai-models-warning-signs-you-should-never-ignore/",
-        "ai_tell_score": 1,
-        "matched": [],
-        "question_headings": 3,
-        "verdict": "PASS",
-        "coverageState": "Submitted and indexed"
-      },
-      {
-        "id": 3780,
-        "title": "South Korea IT Industry Analysis and 2026-2027 Outlook",
-        "link": "https://ktech365.com/south-korea-it-industry-analysis-and-2026-2027-outlook/",
+        "id": 3822,
+        "title": "Google hit with record EU fine over Shopping service에서 사람들이 자주 하는 9가지 실수",
+        "link": "https://koreanews365.com/google-hit-with-record-eu-fine-over-shopping-service/",
         "ai_tell_score": 0,
         "matched": [],
         "question_headings": 0,
@@ -2096,69 +1094,89 @@
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 4247,
-        "title": "Debunking Common Myths About AI healthcare Korea",
-        "link": "https://ktech365.com/the-real-cost-of-ai-healthcare-korea-what-to-expect/",
-        "ai_tell_score": 1,
+        "id": 3821,
+        "title": "외국인을 위한 Musk’s SpaceX: Starship lands safely… then explodes 실전 가이드",
+        "link": "https://koreanews365.com/musks-spacex-starship-lands-safely-then-explodes/",
+        "ai_tell_score": 0,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 0,
         "verdict": "PASS",
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 4163,
-        "title": "Behind the Scenes: What chip design Korea university Actually Involves",
-        "link": "https://ktech365.com/warning-chip-design-korea-university-warning-signs-you-should-never-ignore/",
-        "ai_tell_score": 1,
+        "id": 3820,
+        "title": "Why are QAnon believers obsessed with 4 March?, 쉽게 풀어드립니다",
+        "link": "https://koreanews365.com/why-are-qanon-believers-obsessed-with-4-march/",
+        "ai_tell_score": 0,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 0,
         "verdict": "PASS",
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 4160,
-        "title": "AI education Korea future Q&amp;A: Answers From the Field",
-        "link": "https://ktech365.com/south-koreas-ai-ambition-charting-the-course-for-ai-education-korea-future/",
-        "ai_tell_score": 1,
+        "id": 3819,
+        "title": "외국인을 위한 Fisherman swap petrol motors for electric engines 실전 가이드",
+        "link": "https://koreanews365.com/fisherman-swap-petrol-motors-for-electric-engines/",
+        "ai_tell_score": 0,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 0,
         "verdict": "PASS",
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 4133,
-        "title": "How Korean startup success story Has Changed in 2026",
-        "link": "https://ktech365.com/from-seoul-to-global-stage-the-unfolding-korean-startup-success-story-in-ai-healthcare/",
-        "ai_tell_score": 1,
+        "id": 3818,
+        "title": "Getting Searching for the forgotten heroes of World War Two Right the First Time",
+        "link": "https://koreanews365.com/searching-for-the-forgotten-heroes-of-world-war-two/",
+        "ai_tell_score": 0,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 0,
         "verdict": "PASS",
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 4128,
-        "title": "advanced packaging Korea 101: What First-Timers Should Know",
-        "link": "https://ktech365.com/what-15-years-in-semiconductor-packaging-taught-me-about-advanced-packaging-korea/",
-        "ai_tell_score": 1,
+        "id": 3817,
+        "title": "The man who saved thousands of people from Covid에 대해 의사가 꼭 알려주고 싶은 6가지",
+        "link": "https://koreanews365.com/the-man-who-saved-thousands-of-people-from-covid/",
+        "ai_tell_score": 0,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 0,
         "verdict": "PASS",
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 3879,
-        "title": "smart city Songdo guide: Details That Are Easy to Miss",
-        "link": "https://ktech365.com/stop-overlooking-songdo-your-smart-city-songdo-guide-is-missing-this-crucial-insight/",
-        "ai_tell_score": 1,
+        "id": 3816,
+        "title": "All you need to know about penalty shootouts, 실제로는 어떻게 진행될까",
+        "link": "https://koreanews365.com/all-you-need-to-know-about-penalty-shootouts/",
+        "ai_tell_score": 0,
         "matched": [],
-        "question_headings": 3,
+        "question_headings": 0,
         "verdict": "PASS",
         "coverageState": "Submitted and indexed"
       },
       {
-        "id": 3769,
-        "title": "South Korea’s AI Era: A Closer Look at What Really Matters",
-        "link": "https://ktech365.com/the-dawn-of-south-koreas-ai-era-key-trends-and-strategic-milestones-in-2026/",
+        "id": 3815,
+        "title": "외국인을 위한 Searching for the ‘angel’ who held me on Westminster Bridge 실전 가이드",
+        "link": "https://koreanews365.com/searching-for-the-angel-who-held-me-on-westminster-bridge/",
+        "ai_tell_score": 0,
+        "matched": [],
+        "question_headings": 0,
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed"
+      },
+      {
+        "id": 3814,
+        "title": "Why local US newspapers are sounding the alarm, Step by Step",
+        "link": "https://koreanews365.com/why-local-us-newspapers-are-sounding-the-alarm/",
+        "ai_tell_score": 0,
+        "matched": [],
+        "question_headings": 0,
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed"
+      },
+      {
+        "id": 100,
+        "title": "The full story of Thailand’s extraordinary cave rescue에 대해 의사가 꼭 알려주고 싶은 6가지",
+        "link": "https://koreanews365.com/the-full-story-of-thailands-extraordinary-cave-rescue/",
         "ai_tell_score": 0,
         "matched": [],
         "question_headings": 0,
