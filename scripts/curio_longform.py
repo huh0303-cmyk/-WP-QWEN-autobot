@@ -492,6 +492,30 @@ _FONT_URLS = {
 }
 
 
+THUMBNAIL_UPSCALE_SIZE = (5120, 2880)  # 5K — 플리채널과 동일 기준(2026-08-17 사용자 지시)
+
+
+def _save_thumbnail_capped(img, out_path, max_bytes=2 * 1024 * 1024):
+    """5K로 저장하되 유튜브 썸네일 API의 2MB 제한을 확실히 지킨다 — JPEG 품질을
+    단계적으로 낮추면서 매번 실제 파일크기를 검증(youtube_playlist_maker.py의
+    동일 함수와 같은 방식, 2026-08-16 그 쪽에서 검증되지 않은 폴백 때문에 실제
+    사고가 났던 걸 여기도 같이 반영)."""
+    from PIL import Image
+
+    jpg_path = os.path.splitext(out_path)[0] + ".jpg"
+    rgb = img.convert("RGB")
+    for quality in (95, 90, 85, 80, 75, 70, 60, 50, 40):
+        rgb.save(jpg_path, "JPEG", quality=quality, optimize=True)
+        if os.path.getsize(jpg_path) <= max_bytes:
+            return jpg_path
+    for target_w in (3840, 2560, 1920, 1280):
+        smaller = rgb.resize((target_w, int(target_w * rgb.height / rgb.width)), Image.LANCZOS)
+        smaller.save(jpg_path, "JPEG", quality=70, optimize=True)
+        if os.path.getsize(jpg_path) <= max_bytes:
+            return jpg_path
+    raise RuntimeError(f"썸네일을 {max_bytes}바이트 이하로 못 줄임: {jpg_path}")
+
+
 def ensure_thumbnail_font(lang, workdir):
     fname, url = _FONT_URLS.get(lang, _FONT_URLS["ko"])
     cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".font_cache")
@@ -579,9 +603,12 @@ def build_thumbnail(topic, lang, thumbnail_lines, channel_key, workdir):
     if thumbnail_lines.get("line4"):
         box_text(draw, TW // 2, TH - 30, thumbnail_lines.get("line4", ""), ImageFont.truetype(font_path, 38), RED, WHITE)
 
+    # 1280x720 캔버스에서 텍스트 레이아웃/폰트크기를 그대로 유지한 채, 저장
+    # 직전에만 5K로 업스케일한다(2026-08-17 사용자 지시: "썸네일 5K 이상") —
+    # 좌표/폰트 크기를 다시 계산할 필요 없이 비율 그대로 유지.
+    canvas = canvas.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
     out_path = os.path.join(workdir, f"thumbnail_{lang}.png")
-    canvas.save(out_path, quality=95)
-    return out_path
+    return _save_thumbnail_capped(canvas, out_path)
 
 
 # ════════════════════════════════════════════════════════════
