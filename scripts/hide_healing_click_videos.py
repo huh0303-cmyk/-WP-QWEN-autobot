@@ -32,7 +32,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import requests  # noqa: E402
 
-HEALING_CHANNEL_ID = "UCKZsfAWyCmY0jckf4IWZrqw"  # situation_room_daily.py 확정 매핑(Studio-K7)
+HEALING_CHANNEL_ID = "UC7yEsLM-HoXudngrD-4FIqg"  # Studio_healing (RSS 피드로 2026-08-17 직접 확인.
+# situation_room_daily.py의 8/9 코멘트가 가리키던 UCKZsfAWyCmY0jckf4IWZrqw는
+# 실제로는 kpop_studio7(kpop 채널)이었음 — 낡은 코멘트, 새 오배송 버그 아님.
 MIN_DURATION_SEC = 30 * 60  # 롱폼(30분+)만 검사 대상 — 쇼츠/다른 실험영상 제외
 
 # anullsrc 갭은 random.uniform(1.0, 3.0)초였음 — 검출 여유를 좀 두고 판정
@@ -107,7 +109,11 @@ def has_click_bug(video_id, sample_seconds, workdir):
     audio_tmpl = os.path.join(workdir, f"{video_id}.%(ext)s")
     dl = subprocess.run(
         ["yt-dlp", "-f", "bestaudio", "--download-sections", f"*0-{sample_seconds}",
-         "--no-playlist", "-o", audio_tmpl, url],
+         "--no-playlist",
+         # GH Actions 러너 IP가 YouTube 로그인 요구(봇 감지)에 걸리는 경우가 있어
+         # android 클라이언트로 우회(쿠키 불필요, 공개 영상 한정)
+         "--extractor-args", "youtube:player_client=android,web",
+         "-o", audio_tmpl, url],
         capture_output=True, text=True, timeout=180,
     )
     audio_file = None
