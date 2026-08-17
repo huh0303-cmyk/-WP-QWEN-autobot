@@ -39,6 +39,25 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          # 2026-08-18: social_stats_daily.py의 _multi 함수(situation_room_daily.py가
+          # 이미 import해서 씀)는 브랜드별(TOPIK/ENGLISH/LANGUAGE) 시크릿을 찾는데,
+          # 여기 배선이 빠져있어서 TOPIK 외엔 항상 "미설정"으로만 나왔음 — 연결.
+          # 실제 시크릿 값은 아직 등록 안 돼있을 수 있고, 없으면 _multi 함수가
+          # 조용히 "계정 미설정"으로 리포트에 남길 뿐 에러는 아니다.
+          TIKTOK_USERNAME_ENGLISH: ${{ secrets.TIKTOK_USERNAME_ENGLISH }}
+          TIKTOK_USERNAME_LANGUAGE: ${{ secrets.TIKTOK_USERNAME_LANGUAGE }}
+          FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
+          FB_PAGE_ID_ENGLISH: ${{ secrets.FB_PAGE_ID_ENGLISH }}
+          FB_PAGE_ACCESS_TOKEN_LANGUAGE: ${{ secrets.FB_PAGE_ACCESS_TOKEN_LANGUAGE }}
+          FB_PAGE_ID_LANGUAGE: ${{ secrets.FB_PAGE_ID_LANGUAGE }}
+          IG_ACCESS_TOKEN_ENGLISH: ${{ secrets.IG_ACCESS_TOKEN_ENGLISH }}
+          IG_USER_ID_ENGLISH: ${{ secrets.IG_USER_ID_ENGLISH }}
+          IG_ACCESS_TOKEN_LANGUAGE: ${{ secrets.IG_ACCESS_TOKEN_LANGUAGE }}
+          IG_USER_ID_LANGUAGE: ${{ secrets.IG_USER_ID_LANGUAGE }}
+          THREADS_ACCESS_TOKEN_ENGLISH: ${{ secrets.THREADS_ACCESS_TOKEN_ENGLISH }}
+          THREADS_USER_ID_ENGLISH: ${{ secrets.THREADS_USER_ID_ENGLISH }}
+          THREADS_ACCESS_TOKEN_LANGUAGE: ${{ secrets.THREADS_ACCESS_TOKEN_LANGUAGE }}
+          THREADS_USER_ID_LANGUAGE: ${{ secrets.THREADS_USER_ID_LANGUAGE }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
