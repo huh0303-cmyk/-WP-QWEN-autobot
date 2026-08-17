@@ -1,13 +1,12 @@
 
 🌐 https://k-health365.com
     ✅ [5868] 고혈압 관리법 고를 때 살펴봐야 할 8가지
-    ✅ [5866] 2026년 당뇨 초기증상, 이렇게 달라졌습니다
 
 🌐 https://koreamedicaltour.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreainvest365.com
-    ✅ [3157] foreign investor Korea stocks, Step by S
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ki-korea.com
     ✅ [1724] 7 Things to Check Before 연금저축 세액공제
@@ -33,7 +32,7 @@ Call log:
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T17%3A05%3A52.021586&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T17%3A49%3A20.980494&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
@@ -44,7 +43,6 @@ Call log:
 
 🌐 https://k-trip365.com
     ✅ [4624] How People Are Approaching Korea hanok s
-    ✅ [4622] Busan hotel recommendations, Broken Down
 
 🌐 https://k-visa365.com
     ✅ [3173] E-9 visa Korea guide, From Someone Who&#
@@ -74,7 +72,7 @@ Call log:
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T17%3A08%3A12.867658&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T17%3A51%3A38.242088&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
@@ -86,4 +84,4 @@ Call log:
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 15건 SEO점수 갱신
+총 12건 SEO점수 갱신
