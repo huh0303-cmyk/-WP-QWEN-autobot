@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       channel:
-        description: "플리 채널 선택 (2026-08-03 5개 채널 분리 - 채널마다 전용 음악폴더+유튜브토큰 필요) ⚠️ starbucks는 2026-08-17 토큰이 엉뚱한 채널(구 starbucks, 현 SIS-Language Center)을 가리키고 있어 수동 실행 금지 — YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS 교체 전까지"
+        description: "플리 채널 선택 (2026-08-03 5개 채널 분리 - 채널마다 전용 음악폴더+유튜브토큰 필요)"
         required: false
         type: choice
         default: "globalmusic"
@@ -91,12 +91,13 @@ on:
     # KST 00시대라 UTC로는 전날 15시대라서 요일이 하루 당겨짐(월요일 KST → 일요일 UTC 등).
     - cron: "7 15 * * 0,2,4"    # globalmusic — 00:07 KST 월/수/금
     - cron: "24 15 * * 0,2,4"   # healing — 00:24 KST 월/수/금
-    # starbucks 자동 스케줄 2026-08-17 임시 중단: YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS가
-    # 실제 "Starbucks vibes"(@Starbucksvibes) 채널이 아니라, 2026-08-12에 이름/핸들만
-    # "SIS-Language Center"로 바뀌고 채널ID는 그대로인 옛날 starbucks 채널(UCOWoNH...)을
-    # 계속 가리키고 있어서 카페음악이 SIS-Language Center 채널에 계속 잘못 올라가고
-    # 있었음(사용자가 직접 발견). 올바른 채널용 토큰으로 시크릿을 교체하기 전까지 중단.
-    # - cron: "38 15 * * 0,2,4"   # starbucks — 00:38 KST 월/수/금 (중단됨)
+    # 2026-08-17: 잠깐 중단했다가 재개 — SIS-Language Center 채널(구 starbucks,
+    # UCOWoNH..., 2026-08-12에 이름/핸들만 바뀜)에서 카페음악을 발견해서 라우팅
+    # 사고로 오인, 스케줄을 껐었음. 실제로는 진짜 "Starbucks vibes"(@Starbucksvibes)
+    # 채널에 최근(4시간 전 포함) 영상이 정상적으로 계속 올라오고 있는 걸 확인 —
+    # SIS-Language Center의 옛날 영상들은 8/12 이전 라우팅이 고쳐지기 전 남은
+    # 잔재일 뿐, 지금은 정상 작동 중이라 재개함.
+    - cron: "38 15 * * 0,2,4"   # starbucks — 00:38 KST 월/수/금
     - cron: "52 15 * * 0,2,4"   # mbb — 00:52 KST 월/수/금
     - cron: "9 16 * * 0,2,4"    # kpop — 01:09 KST 월/수/금
 
