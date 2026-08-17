@@ -7,32 +7,34 @@ on:
         description: "true면 실제 비공개 전환, 비우면 리포트만(DRY RUN)"
         required: false
         default: "false"
-      include_stream:
-        description: "true면 시냇물(stream_calm) 테마도 같이 대상에 포함"
+      sample_seconds:
+        description: "영상당 검사할 앞부분 길이(초)"
         required: false
-        default: "false"
+        default: "1080"
 
 jobs:
   hide:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install google-api-python-client google-auth google-auth-httplib2 -q
-      - name: "healing 클릭음 영상 비공개 전환"
+      - name: Install system dependencies (ffmpeg)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 requests yt-dlp -q
+      - name: "healing 클릭음 영상 오디오 검사 후 비공개 전환"
         env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
         run: |
-          ARGS=""
+          ARGS="--sample-seconds ${{ github.event.inputs.sample_seconds }}"
           if [ "${{ github.event.inputs.execute }}" == "true" ]; then
-            ARGS="--execute"
-          fi
-          if [ "${{ github.event.inputs.include_stream }}" == "true" ]; then
-            ARGS="$ARGS --include-stream"
+            ARGS="$ARGS --execute"
           fi
           python scripts/hide_healing_click_videos.py $ARGS

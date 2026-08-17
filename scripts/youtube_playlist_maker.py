@@ -669,20 +669,20 @@ def build_ai_images(topic, workdir):
             f"{style}",
         ]
     elif CHANNEL_KEY == "healing":
-        # 힐링 채널: 2026-08-16 사용자 지시("썸네일이 정글같이 멋있어야 함")로
-        # 안개낀 차분한 톤에서 더 드라마틱하고 웅장한 정글/우림 톤으로 전환 —
-        # 조용함은 유지하되(사람 없음, 텍스트 없음), 임팩트 있는 비주얼로.
+        # 힐링 채널: 2026-08-17 사용자 지시 — 텍스트/그래픽 전혀 없이 순수하게
+        # "비 내리는 열대 우림" 사진 한 장이 전부. 이전(2026-08-16)의 폭포/번개/
+        # 안개 산 등 여러 변형은 "비오는 열대 숲"이라는 요청 범위를 벗어나서 제외.
         style = (
-            "real photograph, cinematic and dramatic lighting, lush deep-green rainforest "
-            "or jungle color grade, epic and immersive atmosphere, no people, no text, no watermark"
+            "real photograph, cinematic natural lighting, lush deep-green tropical "
+            "rainforest color grade, no people, no text, no watermark, no graphic overlays"
         )
         prompts = [
-            f"A dramatic, epic lush rainforest or jungle scene evoking '{topic}', dense "
-            f"greenery, shafts of light breaking through the canopy or heavy rain falling "
-            f"through the trees, striking and cinematic composition, {style}",
-            f"A different epic nature scene related to '{topic}' — a powerful waterfall in "
-            f"a jungle gorge, a moody storm-lit forest with lightning in the distance, or a "
-            f"dramatic misty mountain stream framed by dense tropical foliage, {style}",
+            f"A lush tropical rainforest with visible rain falling through dense green "
+            f"canopy leaves, evoking '{topic}', wet foliage glistening, calm and immersive "
+            f"jungle-in-the-rain atmosphere, {style}",
+            f"A different view of the same rainy tropical rainforest scene related to "
+            f"'{topic}' — dense wet jungle greenery with rain visibly falling, soft natural "
+            f"light filtering through the canopy, {style}",
         ]
     elif CHANNEL_KEY == "starbucks":
         # 카페음악 채널 (2026-08-13 레트로 컨셉으로 갱신): 빈티지 턴테이블/레코드,
@@ -1258,21 +1258,15 @@ def _save_thumbnail_capped(img, out_path, max_bytes=2 * 1024 * 1024):
 
 
 def make_photo_thumbnail(image_path, out_path, w=1280, h=720):
-    """healing 전용 '사진 썸네일' 포맷 (2026-08-13 사용자 요청): 큰 타이틀/'Playlist'
-    문구 없이 사진 자체가 주인공이고, 이 영상이 플레이리스트라는 것만 알아볼 수 있게
-    작은 파형 아이콘 하나만 하단 구석에 조용히 얹는다. 나머지 4개 히어로 채널(글로벌뮤직/
-    스타벅스/kpop)의 큼직한 매거진 표지 스타일과는 완전히 다른, 조용한 포맷."""
-    from PIL import Image, ImageDraw
+    """healing 전용 '사진 썸네일' 포맷 (2026-08-17 사용자 지시로 완전 무-텍스트/
+    무-그래픽으로 재확정): 타이틀도, "Playlist" 문구도, 파형 아이콘도 전혀 없이
+    비 내리는 열대 숲 사진 그 자체만 5K로 얹는다. 나머지 4개 히어로 채널(글로벌뮤직/
+    스타벅스/kpop)의 큼직한 매거진 표지 스타일과는 완전히 다른 포맷."""
+    from PIL import Image
 
-    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h).convert("RGBA")
-    img = Image.alpha_composite(img, _gradient_band(w, h, int(h * 0.16), False, 50))
-    draw = ImageDraw.Draw(img, "RGBA")
+    img = _resize_cover(Image.open(image_path).convert("RGB"), w, h)
 
-    # 하단 우측 구석에 작은 파형 아이콘만 — 큰 타이틀도, "Playlist" 문구도 없음
-    _draw_waveform(draw, w - 90, h - 40, n_bars=15, gap=6, max_h=22,
-                   color=(255, 255, 255, 200))
-
-    final_img = img.convert("RGB")
+    final_img = img
     if (w, h) != THUMBNAIL_UPSCALE_SIZE:
         final_img = final_img.resize(THUMBNAIL_UPSCALE_SIZE, Image.LANCZOS)
     return _save_thumbnail_capped(final_img, out_path)
