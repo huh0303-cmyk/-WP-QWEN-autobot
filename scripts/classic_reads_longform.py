@@ -158,7 +158,13 @@ Respond with JSON only, no explanation, no markdown fences:
 # ════════════════════════════════════════════════════════════
 # 2. TTS (Adam 보이스) + 문장 단위 캡션
 # ════════════════════════════════════════════════════════════
-def elevenlabs_tts_voice(text, out_path, voice_id):
+def elevenlabs_tts_voice(text, out_path, voice_id, max_retries=5):
+    """2026-08-17: 문장 단위로 수십~수백 번 호출되다 보니(archive_footage_longform.py
+    등 7분 내레이션이면 문장 70개 이상) ElevenLabs 429(레이트리밋)를 실제로 맞는
+    걸 확인함 — 이전엔 429가 나면 그냥 그 문장만 무음으로 대체하고 넘어갔는데,
+    재시도 없이 그러면 나레이션 전체가 뭉텅뭉텅 무음으로 나갈 수 있다(healing
+    채널 검은화면 사고와 같은 유형 — 다른 이유로 조용히 콘텐츠가 빠지는 것).
+    429만 지수백오프로 재시도하고, 그 외 에러는 기존처럼 즉시 무음 폴백."""
     if not ELEVENLABS_API_KEY:
         return False
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -166,15 +172,25 @@ def elevenlabs_tts_voice(text, out_path, voice_id):
                "Content-Type": "application/json", "Accept": "audio/mpeg"}
     body = {"text": text, "model_id": ELEVENLABS_MODEL,
             "voice_settings": {"stability": 0.55, "similarity_boost": 0.75}}
-    try:
-        r = requests.post(url, headers=headers, json=body, timeout=90)
-        r.raise_for_status()
-        with open(out_path, "wb") as f:
-            f.write(r.content)
-        return True
-    except Exception as e:
-        log(f"   ⚠️ TTS 실패: {e}")
-        return False
+    for attempt in range(max_retries):
+        try:
+            r = requests.post(url, headers=headers, json=body, timeout=90)
+            if r.status_code == 429:
+                wait = 5 * (attempt + 1)
+                log(f"   ⚠️ TTS 429(레이트리밋) — {wait}초 대기 후 재시도({attempt + 1}/{max_retries})")
+                time.sleep(wait)
+                continue
+            r.raise_for_status()
+            with open(out_path, "wb") as f:
+                f.write(r.content)
+            return True
+        except Exception as e:
+            if attempt == max_retries - 1:
+                log(f"   ⚠️ TTS 실패: {e}")
+                return False
+            time.sleep(3)
+    log("   ⚠️ TTS 실패: 429 재시도 소진")
+    return False
 
 
 def _normalize_audio(in_path, out_path):
@@ -203,8 +219,9 @@ def build_narration_track(narration_text, workdir):
         norm_paths.append(norm)
         srt_entries.append((cursor, cursor + dur, sent))
         cursor += dur
-        if i % 5 == 0:
-            time.sleep(1)  # TTS 레이트리밋 페이싱
+        # 2026-08-17: 5문장마다 몰아서 1초씩 쉬는 버스트 패턴이 오히려 429를
+        # 유발하는 걸 확인 — 매 호출마다 고르게 짧은 간격을 두는 게 더 안전.
+        time.sleep(0.6)
 
     list_file = os.path.join(workdir, "audio_concat_list.txt")
     with open(list_file, "w", encoding="utf-8") as f:
