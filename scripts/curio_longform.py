@@ -174,11 +174,15 @@ CHANNEL_TOPICS = {
 # 2026-08-17: 원래 목표가 "무료 실물 영상/이미지 우선"이었는데, Veo 인트로클립을
 # 계속 쓰던 채널이 남아있었음 — classical(작곡가 초상화)/myth(신화 소재 미술품)는
 # 실제 퍼블릭도메인 미술관 이미지가 풍부해서 Veo 없이도 된다(사용자 지시).
-# science는 추상적 개념이 많아 당장은 보류 — 나중에 시도 가능.
-NO_VEO_CHANNELS = {"classical", "myth"}
+# science도 같은 날 마저 편입 — 사용자가 Veo 비용에 강하게 문제 제기("돈먹는
+# 하마", "낭비하지 말고")해서, 이제 Veo를 쓰는 채널이 하나도 안 남는다. 스미소니언
+# Open Access에 과학/자연사 소장품이 꽤 있어서 검색은 시도하되(museum_sources.py),
+# 추상적인 주제라 못 찾으면 기존처럼 Gemini 정지이미지로 자동 대체(코드 그대로 재사용).
+NO_VEO_CHANNELS = {"classical", "myth", "science"}
 MUSEUM_QUERY_HINT = {
     "classical": "classical composer portrait painting",
     "myth": "mythology art",
+    "science": "science natural history illustration",
 }
 
 
