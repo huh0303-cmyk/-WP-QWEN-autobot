@@ -64,7 +64,13 @@ ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID") or "21m00Tcm4TlvDq8i
 ELEVENLABS_MODEL = "eleven_multilingual_v2"
 
 W, H = 1920, 1080
-TARGET_IMAGE_COUNT = 27
+# 2026-08-18: 27 -> 18로 하향(사용자 지적: "건강채널도 아닌데.."). 이 27은
+# health_longform.py(건강채널 - 짧은 컷으로 몰아치는 게 유리한 콘텐츠)에서
+# 그대로 복사된 값이었고, 정작 같은 다큐 계열인 classic_reads_longform.py는
+# 이미 N_UNIQUE_IMAGES=18로 낮춰서 쓰고 있었음(그마저 12장은 박물관 무료
+# 이미지). 7분 다큐에 18장(평균 23초/장)이 27장(평균 15초/장)보다 다큐
+# 호흡에 더 맞고, Nano Banana 이미지 비용도 33% 줄어든다.
+TARGET_IMAGE_COUNT = 18
 
 LANG_NAMES = {"ko": "Korean", "en": "English", "ja": "Japanese"}
 
