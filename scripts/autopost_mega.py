@@ -39,8 +39,11 @@ GEMINI_MODEL          = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
 
 TAG_COUNT   = 10
-SEO_TARGET  = 90
-MAX_REGEN   = 3
+# 2026-08-17 사용자 지시: "SEO점수 80점 이상, 두번시도 해서 안되면 발행하지 말것"
+# — 예전 90/3회(4번 시도)보다 기준은 낮췄지만 시도 횟수를 줄여 ChatGPT 전환 후
+# 비용을 통제. 80점도 여전히 하드 게이트(미달이면 발행 자체 스킵, process_one 참고).
+SEO_TARGET  = 80
+MAX_REGEN   = 1
 
 # ============================================================
 # ★ 기자 풀
