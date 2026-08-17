@@ -31,15 +31,7 @@ Call log:
 Call log:
   - navigating to "https://jobkoreaglobal.com/wp-login.php", waiting until "load"
 
-⚠️ https://korea365.org 오류: Page.goto: net::ERR_QUIC_PROTOCOL_ERROR at https://korea365.org/wp-admin/admin.php?page=rank-math-404-monitor
-Call log:
-  - navigating to "https://korea365.org/wp-admin/admin.php?page=rank-math-404-mo
-⚠️ https://koreanews365.com 오류: Page.goto: net::ERR_CONNECTION_REFUSED at https://koreanews365.com/wp-login.php
-Call log:
-  - navigating to "https://koreanews365.com/wp-login.php", waiting until "load"
-
-⚠️ https://theseouljournal.com 오류: Page.goto: net::ERR_CONNECTION_REFUSED at https://theseouljournal.com/wp-login.php
-Call log:
-  - navigating to "https://theseouljournal.com/wp-login.php", waiting until "load"
-
+✅ https://korea365.org | 점수:61 | 키워드백필:0 | 404:None | 리디렉션:20 | 헬스:⚠️심각
+✅ https://koreanews365.com | 점수:83 | 키워드백필:0 | 404:None | 리디렉션:None | 헬스:None
+✅ https://theseouljournal.com | 점수:61 | 키워드백필:0 | 404:None | 리디렉션:38 | 헬스:⚠️심각
 ```
