@@ -41,6 +41,7 @@ Gemini가 짧은 감성 문구를 자동 생성한다.
 import os
 import sys
 import json
+import time
 import random
 import base64
 import requests
@@ -380,8 +381,8 @@ CHANNEL_DESC_CONTEXT = {
     # 로파이 인스트루멘탈이 아니라 영어/불어/독일어 등 전 세계 모든 언어의
     # 달달한(로맨틱/스위트) 보컬곡 채널로 확정.
     "globalmusic": "a sweet, romantic global music channel featuring vocal love songs in many different languages (English, French, German, and more — warm, tender, feel-good mood)",
-    # healing: 빗소리/물소리(시냇물)/새소리/천둥 등 자연음 위주, 3~4시간 롱폼(2026-08-16 연장)
-    "healing": "an ambient nature-sounds channel for relaxation and sleep (rain sounds, thunderstorms, water/stream sounds, wind, birdsong, temple wind chimes — no lyrics, pure atmosphere, long-form 3-4 hour sessions)",
+    # healing: 3가지 테마 중 하나만(섞지 않음) — 강한비/시냇물+가끔새소리/약한비, 2~4시간 롱폼(2026-08-16 재설계)
+    "healing": "an ambient nature-sounds channel for relaxation and sleep — each video is ONE single sound only (either heavy rain, or a calm stream with occasional birdsong, or light rain — never mixed together), no lyrics, pure atmosphere, long-form 2-4 hour sessions",
     # starbucks(=starbucksvibes 채널): 편한 카페 재즈, 보컬 없음(사용자 지시 그대로)
     "starbucks": "a relaxing instrumental cafe jazz channel (no vocals, smooth jazz, warm laid-back cafe mood)",
     "mbb": "a classical music channel centered on Mozart, Bach and Beethoven (and other classical composers)",
@@ -408,15 +409,18 @@ PLAYLIST_FALLBACK_HOOKS = {
         "tags": "#GlobalMusic #LoveSongs #RomanticPlaylist #WorldMusic #ChillMusic #RelaxingMusic",
     },
     "healing": {
-        "title_fmt": "{topic} — Pure Nature Sounds For Deep Sleep And Total Relaxation",
-        "hook": "Real, layered nature ambience — the kind that quiets a busy mind almost instantly.",
+        # topic 자체가 이미 테마별 완결된 문구(예: "Heavy Rain Sounds for Deep Sleep
+        # and Relaxation")라서 뒤에 또 비슷한 문구를 덧붙이면 어색하게 겹친다
+        # (2026-08-17 실제로 발생: "...Relaxation — Pure Nature Sounds For Deep
+        # Sleep And Total...") — topic을 그대로 제목으로 쓰고 길이/CTA만 덧붙인다.
+        "title_fmt": "{topic} 🌙 One Continuous Sound, No Loops",
+        "hook": "One real, uninterrupted soundscape — the kind that quiets a busy mind almost instantly.",
         "body": (
-            "No music, no lyrics, no distractions — just rain, flowing water, birdsong, and the kind of quiet "
-            "atmosphere that's genuinely hard to find anywhere else. This is built to run for 3-4 hours in the "
-            "background while you sleep, study, meditate, or just need the world to feel a little softer for "
-            "a while. Put it on, dim the lights, and let it do the work."
+            "No music, no lyrics, no distractions — just one continuous natural sound, exactly as it is. "
+            "This is built to run for hours in the background while you sleep, study, meditate, or just "
+            "need the world to feel a little softer for a while. Put it on, dim the lights, and let it do the work."
         ),
-        "engage": "Which soundscape should we record next — rain, a stream, or the ocean? Tell us below.",
+        "engage": "Which sound should we record next? Tell us below.",
         "tags": "#NatureSounds #SleepSounds #RainSounds #WaterSounds #Relaxation #AmbientSounds #WhiteNoise",
     },
     "starbucks": {
@@ -649,7 +653,7 @@ def pick_auto_topic():
     return topic, AUTO_TOPIC_LANGUAGE_HINTS.get(topic, "")
 
 
-def build_ai_images(topic, workdir):
+def build_ai_images(topic, workdir, service=None):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
 
     if CHANNEL_KEY == "globalmusic":
@@ -747,16 +751,37 @@ def build_ai_images(topic, workdir):
     paths = []
     for i, prompt in enumerate(prompts, 1):
         path = os.path.join(workdir, f"ai_image_{i}.png")
-        ok = False
+        source = None  # "gemini" | "bank" | "placeholder"
+
         if GEMINI_API_KEY:
-            for _ in range(3):
+            for attempt in range(4):
                 if gemini_generate_image(prompt, path):
-                    ok = True
+                    source = "gemini"
                     break
-        if not ok:
+                if attempt < 3:
+                    time.sleep(5 * (attempt + 1))
+
+        if source is None and service:
+            # 2026-08-17: Gemini가 완전히 실패하면 무지 남색(20,25,40) 단색 이미지로
+            # 대체했었는데, 이게 사실상 "검은 화면"으로 보여서 영상 내내(150분+)
+            # 화면 없이 소리만 나가는 사고가 났음(사용자 지적: "썸네일이 제일
+            # 중요하댔지? 음악 내내 나와야지") — 이제 그 채널의 드라이브
+            # 썸네일창고에서 무작위로 진짜 사진 하나를 받아와 대체한다.
+            try:
+                bank_images = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
+                if bank_images:
+                    pick = random.choice(bank_images)
+                    download_drive_file(service, pick["id"], path)
+                    source = "bank"
+                    log(f"   ⚠️ AI 이미지 {i} 생성 실패 → 썸네일창고 사진으로 대체({pick['name']})")
+            except Exception as e:
+                log(f"   ⚠️ 썸네일창고 대체도 실패: {e}")
+
+        if source is None:
             make_placeholder_image(path)
-            log(f"   ⚠️ AI 이미지 {i} 생성 실패 → 플레이스홀더 대체")
-        else:
+            source = "placeholder"
+            log(f"   ❌ AI 이미지 {i} 생성 실패, 썸네일창고도 없음 → 단색 플레이스홀더(최후수단)")
+        elif source == "gemini":
             log(f"   ✅ AI 이미지 {i} 생성 완료")
         paths.append(path)
     return paths
@@ -1571,7 +1596,7 @@ def main():
 
     if topic_keyword.strip():
         log(f"3/5 주제어 '{topic_keyword}' 기반 AI 이미지 2장 생성 중...")
-        image_paths = build_ai_images(topic_keyword, WORKDIR)
+        image_paths = build_ai_images(topic_keyword, WORKDIR, service=service)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
         # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
