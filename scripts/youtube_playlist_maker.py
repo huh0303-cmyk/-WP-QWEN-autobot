@@ -837,13 +837,21 @@ def build_playlist_audio(service, tracks_meta, out_path, duration_range=None):
         raise RuntimeError("사용 가능한 음원이 없습니다")
 
     # 곡 사이마다 1~3초 랜덤 무음을 끼워넣어 기계적으로 딱딱 붙는 느낌을 없앰
+    # — 단, 2026-08-17 버그수정: healing처럼 음원 풀이 1곡뿐이라 그 곡을 그대로
+    # 반복(루프)해서 채우는 경우엔 이 무음을 넣지 않는다. 지속적인 배경 노이즈
+    # (빗소리/시냇물 등)가 매 반복마다 완전무음으로 뚝 끊겼다 다시 시작하면
+    # 그 전환 지점이 "쇳소리 띡띡" 클릭음처럼 들려서, 3~4시간짜리 healing
+    # 영상 전체에 반복적인 클릭 아티팩트가 들어가는 사고로 이어졌음
+    # (사용자 리포트). 서로 다른 곡들 사이의 무음은 여전히 자연스러운 전환
+    # 용도로 유효하므로 풀이 2곡 이상일 때만 적용.
+    insert_gaps = len(shuffled) > 1
     cmd = ["ffmpeg", "-y"]
     gap_seconds_total = 0.0
     n_inputs = 0
     for i, p in enumerate(selected_paths):
         cmd += ["-i", p]
         n_inputs += 1
-        if i < len(selected_paths) - 1:
+        if insert_gaps and i < len(selected_paths) - 1:
             gap = round(random.uniform(1.0, 3.0), 2)
             gap_seconds_total += gap
             cmd += ["-f", "lavfi", "-i", f"anullsrc=r=44100:cl=stereo:d={gap}"]
