@@ -38,14 +38,31 @@ def main():
         log("❌ healing 채널 OAuth 환경변수 없음")
         raise SystemExit(1)
 
-    creds = Credentials(
-        token=None, refresh_token=refresh_token,
-        token_uri="https://oauth2.googleapis.com/token",
-        client_id=client_id, client_secret=client_secret,
-        scopes=["https://www.googleapis.com/auth/youtube"],
-    )
-    creds.refresh(Request())
-    yt = build("youtube", "v3", credentials=creds)
+    # 2026-08-17: 채널마다 실제 발급된 스코프가 다를 수 있어서(narrow
+    # youtube.upload만 되는 토큰도 있음) 넓은 스코프부터 순서대로 시도한다
+    # (curio_upload.py의 get_youtube_service와 동일 패턴).
+    last_err = None
+    yt = None
+    for scope in ("https://www.googleapis.com/auth/youtube",
+                  "https://www.googleapis.com/auth/youtube.force-ssl",
+                  "https://www.googleapis.com/auth/youtube.upload"):
+        creds = Credentials(
+            token=None, refresh_token=refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=client_id, client_secret=client_secret,
+            scopes=[scope],
+        )
+        try:
+            creds.refresh(Request())
+            yt = build("youtube", "v3", credentials=creds)
+            log(f"   (OAuth 스코프: {scope.rsplit('/', 1)[-1]})")
+            break
+        except Exception as e:
+            last_err = e
+            continue
+    if yt is None:
+        log(f"❌ 모든 스코프로 인증 실패: {last_err}")
+        raise SystemExit(1)
 
     ch = yt.channels().list(part="contentDetails", mine=True).execute()
     uploads_playlist = ch["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
