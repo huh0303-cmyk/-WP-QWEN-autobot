@@ -78,15 +78,32 @@ def _build_query(topic, cfg):
     return q
 
 
-def search_archive_org(topic, cfg, count):
+def search_archive_org(topic, cfg, count, max_retries=3):
+    """2026-08-17: 여러 채널이 짧은 간격으로 동시에 검색하면 archive.org가
+    가끔 정상 JSON이 아닌 응답(과부하/일시 오류)을 줘서 KeyError로 전체가
+    죽는 사고가 있었음 — 재시도 + 안전한 폴백으로 방어."""
     q = _build_query(topic, cfg)
     params = {
         "q": q, "rows": count, "output": "json",
         "fl[]": ["identifier", "title", "year", "licenseurl", "description"],
     }
-    r = requests.get(IA_SEARCH, params=params, timeout=30)
-    r.raise_for_status()
-    docs = r.json()["response"]["docs"]
+    for attempt in range(max_retries):
+        try:
+            r = requests.get(IA_SEARCH, params=params, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+            docs = data.get("response", {}).get("docs")
+            if docs is not None:
+                break
+            log(f"   ⚠️ archive.org 응답 형식 이상(response 없음) — 재시도({attempt + 1}/{max_retries})")
+        except Exception as e:
+            log(f"   ⚠️ archive.org 검색 실패({e}) — 재시도({attempt + 1}/{max_retries})")
+        docs = []
+        if attempt < max_retries - 1:
+            import time as _time
+            _time.sleep(5 * (attempt + 1))
+    else:
+        log("   ⚠️ archive.org 검색 계속 실패 — 이번 시도는 결과 없음으로 처리")
     # licenseurl이 없어도 1929년 이전(법적으로 확실한 PD)이면 통과시킨다(silent_era 등).
     max_year = cfg.get("max_year")
     out = []
