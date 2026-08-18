@@ -41,15 +41,17 @@ def main():
 
     youtube = get_youtube_service(secret_key)
 
-    current = youtube.videos().list(part="snippet", id=video_id).execute()
-    items = current.get("items", [])
-    if not items:
-        log(f"❌ 영상을 찾을 수 없음: {video_id}")
-        raise SystemExit(1)
-    snippet = items[0]["snippet"]
-    snippet["title"] = title
-    snippet["description"] = description
-
+    # 2026-08-18: 이 채널들 토큰이 youtube.upload 스코프로만 발급된 경우가 있어서
+    # (force-ssl 시도가 실패하고 upload로 폴백되면) videos().list()(읽기)가
+    # insufficientPermissions로 막힌다 — 기존 snippet을 안 읽고, update에
+    # 필요한 최소 필드만 직접 채워서 보낸다(categoryId=27은 이 지식채널들이
+    # 업로드 시 항상 쓰는 값과 동일, archive_footage_longform.py/curio_upload.py 참고).
+    snippet = {
+        "title": title,
+        "description": description,
+        "categoryId": "27",
+        "defaultLanguage": "en",
+    }
     youtube.videos().update(part="snippet", body={"id": video_id, "snippet": snippet}).execute()
     log(f"✅ 업데이트 완료: https://youtu.be/{video_id}")
 
