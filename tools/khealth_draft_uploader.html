@@ -248,19 +248,30 @@
   }
 
   async function getOrCreateTag(name) {
-    const auth = wpAuthHeader();
-    let r = await fetch(`${SITE_URL}/wp-json/wp/v2/tags?search=${encodeURIComponent(name)}&per_page=10`,
-      { headers: { "Authorization": auth } });
-    let list = await r.json();
-    const found = list.find(t => t.name.trim().toLowerCase() === name.trim().toLowerCase());
-    if (found) return found.id;
-    r = await fetch(`${SITE_URL}/wp-json/wp/v2/tags`, {
-      method: "POST",
-      headers: { "Authorization": auth, "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-    const created = await r.json();
-    return created.id;
+    // 태그 하나가 실패해도(중복 slug 등) 전체 등록이 깨지지 않도록, 실패 시
+    // null을 반환하고 호출부에서 걸러낸다.
+    try {
+      const auth = wpAuthHeader();
+      let r = await fetch(`${SITE_URL}/wp-json/wp/v2/tags?search=${encodeURIComponent(name)}&per_page=10`,
+        { headers: { "Authorization": auth } });
+      if (r.ok) {
+        let list = await r.json();
+        const found = list.find(t => t.name.trim().toLowerCase() === name.trim().toLowerCase());
+        if (found) return found.id;
+      }
+      r = await fetch(`${SITE_URL}/wp-json/wp/v2/tags`, {
+        method: "POST",
+        headers: { "Authorization": auth, "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const created = await r.json();
+      if (r.ok && typeof created.id === "number") return created.id;
+      console.warn("태그 생성 실패, 건너뜀:", name, created);
+      return null;
+    } catch (e) {
+      console.warn("태그 처리 중 오류, 건너뜀:", name, e);
+      return null;
+    }
   }
 
   async function uploadImage(file, altText) {
@@ -307,15 +318,22 @@
       status("info", "태그 확인 중... / Checking tags...");
       const tagNames = parsed.tags.split(",").map(t => t.trim()).filter(Boolean);
       const tagIds = [];
-      for (const name of tagNames) tagIds.push(await getOrCreateTag(name));
+      for (const name of tagNames) {
+        const id = await getOrCreateTag(name);
+        if (typeof id === "number") tagIds.push(id);
+      }
 
       status("info", "이미지 업로드 중... / Uploading images...");
       const mediaList = [];
       for (let i = 0; i < 3; i++) {
         if (imageSlots[i]) {
-          const alt = (parsed.images[i] && parsed.images[i].alt) || "";
-          const media = await uploadImage(imageSlots[i], alt);
-          mediaList.push(media);
+          try {
+            const alt = (parsed.images[i] && parsed.images[i].alt) || "";
+            const media = await uploadImage(imageSlots[i], alt);
+            mediaList.push(media);
+          } catch (e) {
+            console.warn("이미지 업로드 실패, 건너뜀:", i, e);
+          }
         }
       }
 
