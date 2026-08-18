@@ -22,7 +22,7 @@
     width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
     font-size: 14px; font-family: inherit; background: var(--card); color: var(--ink);
   }
-  textarea#raw { height: 260px; resize: vertical; }
+  textarea#raw { height: 220px; resize: vertical; }
   .btn {
     margin-top: 20px; background: var(--sage); color: #fff; border: none; border-radius: 10px;
     padding: 12px 22px; font-size: 15px; font-weight: 700; cursor: pointer;
@@ -41,42 +41,41 @@
   .field { margin-bottom: 12px; }
   .field .k { font-size: 11.5px; font-weight: 700; color: var(--sage); text-transform: uppercase; letter-spacing: 0.04em; }
   .field .v { font-size: 13.5px; white-space: pre-wrap; margin-top: 2px; max-height: 160px; overflow-y: auto; }
-  .status { margin-top: 18px; padding: 12px 16px; border-radius: 10px; font-size: 13.5px; display: none; }
+  .status { margin-top: 18px; padding: 12px 16px; border-radius: 10px; font-size: 13.5px; display: none; white-space: pre-wrap; }
   .status.show { display: block; }
   .status.info { background: var(--sage-soft); color: var(--sage); }
   .status.error { background: var(--err-soft); color: var(--err); }
   .row { display: flex; gap: 10px; align-items: center; }
   .hint { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
   a { color: var(--sage); }
+
+  .imgSlots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .slot {
+    border: 2px dashed var(--line); border-radius: 12px; background: var(--card);
+    padding: 10px; text-align: center; font-size: 12px; color: var(--ink-soft);
+    min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; overflow: hidden;
+  }
+  .slot.filled { border-style: solid; border-color: var(--sage); color: var(--ink); }
+  .slot img { max-width: 100%; max-height: 70px; border-radius: 6px; margin-bottom: 6px; }
+  .slot .alt { font-size: 10.5px; color: var(--ink-soft); margin-top: 4px; }
+  .slot input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="page">
   <h1>K-health365.com 초안 등록기</h1>
-  <div class="sub">Gem 결과물 전체를 붙여넣고 검토한 뒤, 초안으로 등록합니다. 발행은 WP에서 직접 누르세요.</div>
+  <div class="sub">Gem 결과물 전체를 붙여넣고 검토한 뒤, 이미지까지 함께 초안으로 등록합니다. 발행은 WP에서 직접 누르세요.</div>
 
-  <label>1. GitHub 토큰 (최초 1회만 입력, 이후 이 브라우저에 저장됨)</label>
+  <label>1. WP 앱 비밀번호 (k-health365.com 전용, 최초 1회만 입력)</label>
   <div class="row">
-    <input id="token" type="password" placeholder="ghp_... 또는 github_pat_..." />
-    <button class="btn secondary" onclick="saveToken()">저장</button>
+    <input id="wpPass" type="password" placeholder="xxxx xxxx xxxx xxxx xxxx xxxx" />
+    <button class="btn secondary" onclick="saveWpPass()">저장</button>
   </div>
-  <div class="hint" id="tokenStatus"></div>
+  <div class="hint" id="wpPassStatus"></div>
 
-  <label>2. Gem 출력 전체 붙여넣기 (1~5번, 6번 이미지 제외)</label>
-  <textarea id="raw" placeholder="## 1. 제목
-...
-
-## 2. 본문
-...
-
-## 3. 태그
-...
-
-## 4. 메타 디스크립션
-...
-
-## 5. 포커스 키워드
-..."></textarea>
+  <label>2. Gem 출력 전체 붙여넣기 (1~6번 전부)</label>
+  <textarea id="raw" placeholder="## 1. 제목 ... ## 2. 본문 ... ## 6. 이미지 ..."></textarea>
 
   <button class="btn big" onclick="pasteFromClipboard()">📋 클립보드에서 붙여넣기 + 자동 확인</button>
   <div class="hint">Gemini 답변 맨 아래 '대답 복사' 아이콘 누른 다음, 여기 와서 위 버튼 한 번만 누르면 돼요.</div>
@@ -92,34 +91,62 @@
     <div class="field"><div class="k">포커스 키워드</div><div class="v" id="p_focus"></div></div>
   </div>
 
-  <button class="btn" id="submitBtn" onclick="submitDraft()" disabled>초안으로 등록</button>
+  <label>3. 이미지 3장 (Gemini에서 우클릭 저장한 파일을 각 칸에 드래그하거나 클릭해서 선택)</label>
+  <div class="imgSlots" id="imgSlots"></div>
+
+  <button class="btn" id="submitBtn" onclick="submitDraft()" disabled>초안으로 등록 (글+이미지)</button>
 
   <div class="status" id="status"></div>
 </div>
 
 <script>
-  const OWNER = "huh0303-cmyk";
-  const REPO = "-WP-QWEN-autobot";
-  const WORKFLOW = "wp-create-draft.yml";
-  const SITE_KEY = "KHEALTH365COM";
   const SITE_URL = "https://k-health365.com";
+  const WP_USER = "huh0303@gmail.com";
 
   let parsed = null;
+  let imageSlots = [null, null, null];
 
-  function saveToken() {
-    const t = document.getElementById("token").value.trim();
+  function saveWpPass() {
+    const t = document.getElementById("wpPass").value.trim();
     if (!t) return;
-    localStorage.setItem("gh_token", t);
-    document.getElementById("token").value = "";
-    showTokenStatus();
+    localStorage.setItem("wp_pass_khealth365", t);
+    document.getElementById("wpPass").value = "";
+    showWpPassStatus();
   }
-  function showTokenStatus() {
-    const t = localStorage.getItem("gh_token");
-    document.getElementById("tokenStatus").textContent = t
-      ? "토큰 저장됨 (마지막 4자리: " + t.slice(-4) + ")"
-      : "토큰이 아직 저장되지 않았어요.";
+  function showWpPassStatus() {
+    const t = localStorage.getItem("wp_pass_khealth365");
+    document.getElementById("wpPassStatus").textContent = t
+      ? "저장됨 (마지막 4자리: " + t.slice(-4) + ")"
+      : "아직 저장되지 않았어요.";
   }
-  showTokenStatus();
+  showWpPassStatus();
+
+  function initImgSlots() {
+    const wrap = document.getElementById("imgSlots");
+    wrap.innerHTML = "";
+    for (let i = 0; i < 3; i++) {
+      const div = document.createElement("div");
+      div.className = "slot";
+      div.id = "slot" + i;
+      div.innerHTML = `<div class="lbl">이미지 ${i + 1}</div><input type="file" accept="image/*" onchange="onSlotFile(${i}, this.files[0])" />`;
+      wrap.appendChild(div);
+    }
+  }
+  initImgSlots();
+
+  function onSlotFile(i, file) {
+    if (!file) return;
+    imageSlots[i] = file;
+    const slot = document.getElementById("slot" + i);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const altText = (parsed && parsed.images && parsed.images[i]) ? parsed.images[i].alt : "";
+      slot.innerHTML = `<img src="${e.target.result}" /><div>이미지 ${i + 1} ✓</div><div class="alt">${altText}</div>
+        <input type="file" accept="image/*" onchange="onSlotFile(${i}, this.files[0])" />`;
+      slot.classList.add("filled");
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function pasteFromClipboard() {
     try {
@@ -136,8 +163,6 @@
   }
 
   function section(text, startLabel, endLabels) {
-    // Gemini 화면에서 마우스로 직접 드래그해 복사하면 마크다운 기호(##)가
-    // 사라지는 경우가 있어 — #가 있어도 없어도, 줄 맨 앞이면 라벨로 인정한다.
     const startRe = new RegExp("^[ \\t]*#{0,2}[ \\t]*" + startLabel, "im");
     const startMatch = text.match(startRe);
     if (!startMatch) return "";
@@ -151,6 +176,25 @@
     return text.slice(from, to).trim();
   }
 
+  function parseImages(text) {
+    // "Prompt: ..." / "alt: ..." 쌍을 순서대로 최대 3개 추출
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    const images = [];
+    let cur = null;
+    for (const line of lines) {
+      const pm = line.match(/^(?:\d+[\.\)]\s*)?prompt\s*:\s*(.+)$/i);
+      const am = line.match(/^alt\s*:\s*(.+)$/i);
+      if (pm) {
+        if (cur) images.push(cur);
+        cur = { prompt: pm[1].trim(), alt: "" };
+      } else if (am && cur) {
+        cur.alt = am[1].trim();
+      }
+    }
+    if (cur) images.push(cur);
+    return images.slice(0, 3);
+  }
+
   function parseInput() {
     const raw = document.getElementById("raw").value;
     const title = section(raw, "1\\.\\s*제목", ["2\\.\\s*본문"]);
@@ -158,14 +202,16 @@
     const tags = section(raw, "3\\.\\s*태그", ["4\\.\\s*메타"]);
     const meta = section(raw, "4\\.\\s*메타", ["5\\.\\s*포커스"]);
     const focus = section(raw, "5\\.\\s*포커스", ["6\\.\\s*이미지"]);
+    const imgSection = section(raw, "6\\.\\s*이미지", ["$^"]); // to end of text
+    const images = parseImages(imgSection || raw.slice(raw.search(/6\.\s*이미지/i)));
 
     if (!title || !body || !tags || !meta || !focus) {
-      status("error", "일부 항목을 못 읽었어요 — Gemini 답변 아래 '복사' 아이콘으로 복사했는지 확인해주세요 (마우스 드래그 복사는 서식이 깨질 수 있어요).");
+      status("error", "일부 항목을 못 읽었어요 — Gemini 답변 아래 '복사' 아이콘으로 복사했는지 확인해주세요.");
       document.getElementById("submitBtn").disabled = true;
       return;
     }
 
-    parsed = { title, body, tags, meta, focus };
+    parsed = { title, body, tags, meta, focus, images };
     document.getElementById("p_title").textContent = title;
     document.getElementById("p_body").textContent = body.slice(0, 400) + (body.length > 400 ? " ..." : "");
     document.getElementById("p_tags").textContent = tags;
@@ -173,7 +219,15 @@
     document.getElementById("p_focus").textContent = focus;
     document.getElementById("preview").classList.add("show");
     document.getElementById("submitBtn").disabled = false;
-    status("info", "내용 확인됐어요. 위 미리보기 훑어보고 이상 없으면 등록하세요.");
+
+    // 이미지 슬롯에 alt 텍스트 라벨 갱신
+    for (let i = 0; i < 3; i++) {
+      const slot = document.getElementById("slot" + i);
+      const label = slot.querySelector(".lbl");
+      if (label && images[i]) label.textContent = "이미지 " + (i + 1) + " — " + images[i].prompt.slice(0, 40) + "...";
+    }
+
+    status("info", "내용 확인됐어요. 미리보기 훑어보고, 이미지 3장도 넣은 뒤 등록하세요.");
   }
 
   function status(kind, msg) {
@@ -182,74 +236,120 @@
     el.textContent = msg;
   }
 
+  function wpAuthHeader() {
+    const pass = localStorage.getItem("wp_pass_khealth365");
+    return "Basic " + btoa(WP_USER + ":" + pass);
+  }
+
+  async function getOrCreateTag(name) {
+    const auth = wpAuthHeader();
+    let r = await fetch(`${SITE_URL}/wp-json/wp/v2/tags?search=${encodeURIComponent(name)}&per_page=10`,
+      { headers: { "Authorization": auth } });
+    let list = await r.json();
+    const found = list.find(t => t.name.trim().toLowerCase() === name.trim().toLowerCase());
+    if (found) return found.id;
+    r = await fetch(`${SITE_URL}/wp-json/wp/v2/tags`, {
+      method: "POST",
+      headers: { "Authorization": auth, "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    const created = await r.json();
+    return created.id;
+  }
+
+  async function uploadImage(file, altText) {
+    const auth = wpAuthHeader();
+    const r = await fetch(`${SITE_URL}/wp-json/wp/v2/media`, {
+      method: "POST",
+      headers: {
+        "Authorization": auth,
+        "Content-Disposition": `attachment; filename="${file.name.replace(/[^A-Za-z0-9_.-]/g, "_")}"`,
+        "Content-Type": file.type || "image/jpeg",
+      },
+      body: file,
+    });
+    if (!r.ok) throw new Error("이미지 업로드 실패: " + (await r.text()));
+    const media = await r.json();
+    if (altText) {
+      await fetch(`${SITE_URL}/wp-json/wp/v2/media/${media.id}`, {
+        method: "POST",
+        headers: { "Authorization": auth, "Content-Type": "application/json" },
+        body: JSON.stringify({ alt_text: altText }),
+      });
+    }
+    return media;
+  }
+
+  function markdownToHtml(text) {
+    return text.split("\n").map(line => {
+      const s = line.trim();
+      if (s.startsWith("### ")) return `<h3>${s.slice(4)}</h3>`;
+      if (s.startsWith("## ")) return `<h2>${s.slice(3)}</h2>`;
+      if (s.startsWith("- ")) return `<li>${s.slice(2)}</li>`;
+      if (s) return `<p>${s}</p>`;
+      return "";
+    }).join("\n");
+  }
+
   async function submitDraft() {
-    const token = localStorage.getItem("gh_token");
-    if (!token) { status("error", "GitHub 토큰을 먼저 저장해주세요."); return; }
+    const pass = localStorage.getItem("wp_pass_khealth365");
+    if (!pass) { status("error", "WP 앱 비밀번호를 먼저 저장해주세요."); return; }
     if (!parsed) { status("error", "먼저 '내용 확인'을 눌러주세요."); return; }
 
     document.getElementById("submitBtn").disabled = true;
-    status("info", "GitHub에 등록 요청 보내는 중...");
+    try {
+      status("info", "태그 확인 중...");
+      const tagNames = parsed.tags.split(",").map(t => t.trim()).filter(Boolean);
+      const tagIds = [];
+      for (const name of tagNames) tagIds.push(await getOrCreateTag(name));
 
-    const dispatchedAt = new Date().toISOString();
-    const res = await fetch(
-      `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Accept": "application/vnd.github+json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ref: "main",
-          inputs: {
-            site_key: SITE_KEY,
-            site_url: SITE_URL,
-            title: parsed.title,
-            body: parsed.body,
-            tags: parsed.tags,
-            meta_description: parsed.meta,
-            focus_keyword: parsed.focus,
-          },
-        }),
-      }
-    );
-
-    if (res.status !== 204) {
-      const errText = await res.text();
-      status("error", "요청 실패 (" + res.status + "): " + errText);
-      document.getElementById("submitBtn").disabled = false;
-      return;
-    }
-
-    status("info", "요청 보냄. 진행 상황 확인 중... (최대 1분)");
-    await pollRun(token, dispatchedAt);
-  }
-
-  async function pollRun(token, dispatchedAt) {
-    for (let i = 0; i < 20; i++) {
-      await new Promise(r => setTimeout(r, 3000));
-      const res = await fetch(
-        `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=5`,
-        { headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" } }
-      );
-      const data = await res.json();
-      const run = (data.workflow_runs || []).find(r => new Date(r.created_at) >= new Date(dispatchedAt) - 15000);
-      if (!run) continue;
-      if (run.status === "completed") {
-        if (run.conclusion === "success") {
-          status("info", "✅ 초안 등록 완료! WP 관리자 → 글 목록에서 방금 올린 초안을 확인하세요: " +
-            SITE_URL + "/wp-admin/edit.php?post_status=draft");
-        } else {
-          status("error", "❌ 실패했어요 (" + run.conclusion + "). 로그 확인: " + run.html_url);
+      status("info", "이미지 업로드 중...");
+      const mediaList = [];
+      for (let i = 0; i < 3; i++) {
+        if (imageSlots[i]) {
+          const alt = (parsed.images[i] && parsed.images[i].alt) || "";
+          const media = await uploadImage(imageSlots[i], alt);
+          mediaList.push(media);
         }
-        document.getElementById("submitBtn").disabled = false;
-        return;
       }
-      status("info", "진행 중... (" + run.status + ")");
+
+      let bodyHtml = markdownToHtml(parsed.body);
+      if (mediaList.length) {
+        const imgHtml = mediaList.map(m =>
+          `<figure><img src="${m.source_url}" alt="${(m.alt_text || "").replace(/"/g, "&quot;")}" /></figure>`
+        ).join("\n");
+        bodyHtml = imgHtml + "\n" + bodyHtml;
+      }
+
+      status("info", "초안 등록 중...");
+      const auth = wpAuthHeader();
+      const payload = {
+        title: parsed.title,
+        content: bodyHtml,
+        status: "draft",
+        tags: tagIds,
+        meta: {
+          rank_math_description: parsed.meta,
+          rank_math_focus_keyword: parsed.focus,
+        },
+      };
+      if (mediaList.length) payload.featured_media = mediaList[0].id;
+
+      const r = await fetch(`${SITE_URL}/wp-json/wp/v2/posts`, {
+        method: "POST",
+        headers: { "Authorization": auth, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      const post = await r.json();
+
+      status("info", "✅ 초안 등록 완료! (이미지 " + mediaList.length + "장 포함)\n편집 화면: " +
+        SITE_URL + "/wp-admin/post.php?post=" + post.id + "&action=edit");
+    } catch (e) {
+      status("error", "❌ 실패: " + e.message);
+    } finally {
+      document.getElementById("submitBtn").disabled = false;
     }
-    status("error", "시간이 오래 걸리네요 — GitHub Actions에서 직접 확인해주세요.");
-    document.getElementById("submitBtn").disabled = false;
   }
 </script>
 </body>
