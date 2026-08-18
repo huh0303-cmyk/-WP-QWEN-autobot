@@ -29,6 +29,10 @@
   }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn.secondary { background: transparent; color: var(--sage); border: 1px solid var(--sage); }
+  .btn.big {
+    display: block; width: 100%; font-size: 20px; padding: 22px 24px; border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(47,110,92,0.35);
+  }
   .preview {
     margin-top: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 12px;
     padding: 16px 18px; display: none;
@@ -74,11 +78,11 @@
 ## 5. 포커스 키워드
 ..."></textarea>
 
-  <div class="row">
-    <button class="btn" onclick="pasteFromClipboard()">📋 클립보드에서 붙여넣기 + 자동 확인</button>
-    <button class="btn secondary" onclick="parseInput()">내용 확인만</button>
+  <button class="btn big" onclick="pasteFromClipboard()">📋 클립보드에서 붙여넣기 + 자동 확인</button>
+  <div class="hint">Gemini 답변 맨 아래 '대답 복사' 아이콘 누른 다음, 여기 와서 위 버튼 한 번만 누르면 돼요.</div>
+  <div style="margin-top:10px;">
+    <button class="btn secondary" onclick="parseInput()">(직접 붙여넣기 했다면) 내용 확인만</button>
   </div>
-  <div class="hint">Gemini 답변의 '복사' 아이콘 누른 다음 여기 와서 위 버튼 한 번만 누르면 돼요.</div>
 
   <div class="preview" id="preview">
     <div class="field"><div class="k">제목</div><div class="v" id="p_title"></div></div>
