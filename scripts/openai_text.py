@@ -3,22 +3,33 @@
 """
 openai_text.py
 ─────────────────────────────────────────────────────────────
-ChatGPT(OpenAI) 텍스트 생성 공용 헬퍼. 2026-08-17 "대수술" 결정 —
-Gemini 텍스트 생성 대신 여기로 라우팅한다(이미지/영상은 그대로 Gemini 유지,
-비용 주범이 아니었던 걸로 확인됨). OPENAI_API_KEY가 설정돼 있으면 이 모듈이
-쓰이고, 없으면 각 스크립트가 기존 Gemini 경로로 폴백한다 — 그래서 이 파일이
+ChatGPT(OpenAI) 텍스트/이미지 생성 공용 헬퍼.
+
+2026-08-17 "대수술" 결정 — Gemini 텍스트 생성 대신 여기로 라우팅
+(openai_generate_text). OPENAI_API_KEY가 설정돼 있으면 이 모듈이 쓰이고,
+없으면 각 스크립트가 기존 Gemini 경로로 폴백한다 — 그래서 이 파일이
 없거나 키가 없어도 기존 파이프라인은 그대로 돌아간다.
+
+2026-08-18 확장 — 사용자 지시("API문제 머리아프고 싫어.. 돈들어가는거
+OPEN AI써.. 제미나이는 진짜 무료 범위내에서만.. 나노 바나나도"): 이미지
+생성도 같은 원칙으로 확장(openai_generate_image, gpt-image-1 사용) —
+Gemini 월간 지출한도 초과로 하루 종일 파이프라인이 막혔던 사고 이후,
+돈이 드는 생성(텍스트+이미지)은 OpenAI를 우선으로 쓰고 Gemini/Nano
+Banana는 OPENAI_API_KEY가 없을 때의 폴백으로만 남긴다.
 
 모델명은 계속 바뀌므로 하드코딩하지 않고 환경변수로 오버라이드 가능하게
 해둠(기본값은 2026-08 기준 가장 저렴한 축인 gpt-4o-mini).
 """
+import base64
 import os
 
 import requests
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-luna")
+OPENAI_IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1")
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+OPENAI_IMAGE_URL = "https://api.openai.com/v1/images/generations"
 
 
 def openai_available():
@@ -59,3 +70,32 @@ def openai_generate_text(prompt, temperature=0.9, max_retries=5):
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"].strip()
     raise RuntimeError(f"OpenAI 텍스트 생성 최종 실패({max_retries}회 재시도 후): {last_err}")
+
+
+def openai_generate_image(prompt, out_path, size="1024x1024", max_retries=3):
+    """gemini_generate_image(prompt, out_path) -> bool 과 동일한 계약 —
+    호출부를 바꾸지 않고 내부 구현만 바꿔치기할 수 있게 시그니처를 맞췄다.
+    실패해도 예외를 던지지 않고 False를 반환한다(호출부가 Gemini 폴백으로
+    넘어갈 수 있게)."""
+    import time as _time
+
+    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}
+    body = {"model": OPENAI_IMAGE_MODEL, "prompt": prompt, "size": size, "n": 1}
+
+    last_err = None
+    for attempt in range(max_retries):
+        try:
+            r = requests.post(OPENAI_IMAGE_URL, headers=headers, json=body, timeout=90)
+            if r.status_code == 429 or r.status_code >= 500:
+                last_err = f"{r.status_code}: {r.text[:200]}"
+                _time.sleep(min(10 * (2 ** attempt), 60))
+                continue
+            r.raise_for_status()
+            b64 = r.json()["data"][0]["b64_json"]
+            with open(out_path, "wb") as f:
+                f.write(base64.b64decode(b64))
+            return True
+        except Exception as e:
+            last_err = str(e)[:200]
+            _time.sleep(5)
+    return False

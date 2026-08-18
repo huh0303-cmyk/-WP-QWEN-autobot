@@ -156,6 +156,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           # 채널별 전용 폴더 - 아직 안 만든 채널은 시크릿이 없어서 공용 기본값으로
           # 자동 폴백된다(youtube_playlist_maker.py의 _channel_env 참고)
@@ -306,6 +307,7 @@ jobs:
           FIX_TOPIC: ${{ inputs.fix_topic }}
           FIX_DURATION_MIN: ${{ inputs.fix_duration_min }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', steps.ch.outputs.upper)] || (steps.ch.outputs.upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}

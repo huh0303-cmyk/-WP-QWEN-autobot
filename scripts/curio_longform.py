@@ -272,6 +272,18 @@ Respond with JSON only, no explanation, no markdown fences:
 # 2. 이미지 생성 (Gemini 2.5 Flash Image)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path, max_retries=5):
+    # 2026-08-18: 텍스트와 동일한 원칙 — OPENAI_API_KEY가 있으면 이미지도
+    # OpenAI(gpt-image-1)로 먼저 시도한다(사용자 지시: "돈들어가는거 OPEN AI
+    # 써.. 제미나이는 진짜 무료 범위내에서만.. 나노 바나나도"). 실패하면(또는
+    # 키가 없으면) 기존 Gemini/Nano Banana 경로로 폴백 — 무료 한도 내에서는
+    # 여전히 쓸모 있으므로 완전히 막지는 않는다.
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
+
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     last_err = None
     for attempt in range(max_retries):

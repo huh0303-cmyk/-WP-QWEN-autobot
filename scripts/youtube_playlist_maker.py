@@ -317,6 +317,15 @@ def upload_to_drive(service, file_path, folder_id, name):
 # 주제어 기반 AI 이미지 생성 (나노바나나)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path):
+    # 2026-08-18: OPENAI_API_KEY 있으면 이미지도 OpenAI(gpt-image-1) 우선
+    # (사용자 지시: "돈들어가는거 OPEN AI써.. 제미나이는 진짜 무료 범위내에서만").
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
+
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     for model in GEMINI_IMAGE_MODELS:
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
