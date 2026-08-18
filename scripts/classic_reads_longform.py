@@ -136,9 +136,11 @@ Here is the actual narration script, so you write about what's really in it:
 ---
 
 Write:
-1. "title": a natural, curiosity-driven YouTube title under 90 characters that
-   naturally includes the book title. No clickbait lies, no ALL CAPS spam.
-2. "description": roughly 900-1000 characters (not bytes), in English.
+1. "title": a warm, friendly, curiosity-driven YouTube title, under 100
+   characters, that naturally includes the book title — like a real person
+   who loves this book sharing it with you, not a clickbait template. No ALL
+   CAPS spam, no emoji-stuffing, no lies.
+2. "description": around 1000 characters (not bytes), always in English.
    - Open with 2-3 sentences on why this book matters, plain natural prose
      (no "In this video, we will explore..." or similar generic AI opener).
    - A short paragraph pulling out 3-5 concrete, specific points actually in

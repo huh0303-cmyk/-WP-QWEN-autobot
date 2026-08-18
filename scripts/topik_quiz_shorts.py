@@ -244,12 +244,17 @@ def generate_social_copy(category, items, target_lang="ko"):
 {lang_name}권 시청자에게 올릴 소셜 게시글을 써줘. 다루는 단어: {words} (카테고리: {category or '초급 어휘'}).
 
 조건:
-- 문체는 {lang_name}로, 실제 사람이 캐주얼하게 쓴 것처럼. AI가 쓴 티가 나는 상투적 표현
-  (예: "Unlock your potential", "Ready to level up?", 이모지 남발, 뻔한 감탄사 나열) 금지.
-- 과장 광고 문구, 클릭베이트성 허위 약속 금지.
-- youtube_title: 60자 이내
-- youtube_description: 2~3문장, 자연스럽게
-- short_caption: 틱톡/인스타/페이스북/쓰레드에 공통으로 쓸 짧은 캡션 (2~3문장, 100자 내외)
+- short_caption(틱톡/인스타/페이스북/쓰레드 공통)은 {lang_name}로, 실제 사람이 캐주얼하게
+  쓴 것처럼(2~3문장, 100자 내외). AI가 쓴 티가 나는 상투적 표현(예: "Unlock your
+  potential", "Ready to level up?", 이모지 남발, 뻔한 감탄사 나열) 금지. 과장 광고 문구,
+  클릭베이트성 허위 약속 금지.
+- youtube_title / youtube_description은 시청 언어와 무관하게 항상 영어로, 검색 노출을
+  위해서다. 따뜻하고 친절한 톤으로 — 이 주제를 좋아하는 실제 사람이 소개해주는 느낌,
+  광고 문구 아님.
+  - youtube_title: 100자 이내
+  - youtube_description: 1000자 내외, 이 회차에서 다루는 단어들이 왜 유용한지,
+    TOPIK 학습자에게 어떻게 도움되는지 자연스럽게 풀어쓰고, 구독 유도 한 문장 +
+    관련 해시태그 6~8개로 마무리
 - hashtags: 5~8개, # 없이 단어만 배열로 (플랫폼에서 조합)
 
 JSON만 응답(설명 없이):

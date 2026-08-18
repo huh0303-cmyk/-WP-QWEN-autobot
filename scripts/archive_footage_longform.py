@@ -341,9 +341,10 @@ Narration script:
 ---
 
 Write:
-1. "title": natural, curiosity-driven YouTube title under 90 characters. No
-   clickbait lies, no ALL CAPS spam.
-2. "description": roughly 900-1000 characters (not bytes), English.
+1. "title": a warm, friendly, curiosity-driven YouTube title, under 100
+   characters — like a real person who loves this topic sharing it with you,
+   not a clickbait template. No ALL CAPS spam, no emoji-stuffing, no lies.
+2. "description": around 1000 characters (not bytes), always in English.
    - Open with 2-3 sentences on why this moment/topic matters, plain natural
      prose (no "In this video, we will explore..." or similar AI-sounding
      opener).

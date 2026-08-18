@@ -344,8 +344,9 @@ def generate_copy(word_count, categories):
     cat_str = ", ".join(categories[:6]) if categories else "everyday vocabulary"
     if openai_available():
         try:
-            prompt = (f"Write a YouTube title (under 100 chars, hooky, English) and a ~600-char English "
-                      f"description (SEO keyword-dense) for a TOPIK Korean vocabulary quiz compilation video "
+            prompt = (f"Write a warm, friendly YouTube title (under 100 chars, English) and an "
+                      f"around-1000-character English description (SEO keyword-dense but still warm "
+                      f"and natural, not robotic) for a TOPIK Korean vocabulary quiz compilation video "
                       f"with {word_count} words covering categories: {cat_str}. Format each word as: "
                       f"Korean word shown, then its English meaning revealed after a short pause — good for "
                       f"listening/pronunciation practice for TOPIK level 1-2 learners. "

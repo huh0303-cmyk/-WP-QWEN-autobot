@@ -241,11 +241,12 @@ really in it (don't invent facts not in the script):
 ---
 
 Write:
-1. "title": a natural, curiosity-driven YouTube title, under 90 characters. No
-   clickbait lies, no ALL CAPS spam, no emoji-stuffing. Should read like a real
-   channel wrote it, not a template.
-2. "description": a YouTube description of roughly 900-1000 characters (not
-   bytes) in {lang_name}. Structure it like a real educational channel would:
+1. "title": a warm, friendly, curiosity-driven YouTube title, under 100
+   characters — like a real person who loves this topic sharing it with you,
+   not a clickbait template. No ALL CAPS spam, no emoji-stuffing, no lies.
+2. "description": a YouTube description of around 1000 characters (not
+   bytes), always in English regardless of the video's narration language.
+   Structure it like a real educational channel would:
    - Open with 2-3 sentences expanding on the hook, written in plain natural
      prose (NOT a bullet list, NOT "In this video, we will explore..." /
      "Dive into..." / "Unlock the secrets of..." or any similar generic
