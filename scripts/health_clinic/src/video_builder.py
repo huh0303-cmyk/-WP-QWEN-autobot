@@ -244,22 +244,6 @@ def _timeline_to_srt(timeline: list, srt_path: str, max_words_per_cue: int = 8):
     return idx - 1
 
 
-def _burn_subtitles(video_in: str, srt_path: str, video_out: str, lang: str):
-    """시니어 채널용 큼직하고 가독성 높은 자막 번인 (흰 글씨 + 두꺼운 검은 테두리 + 그림자)."""
-    font_name = "DejaVu Sans Bold" if lang == "en" else "Noto Sans CJK Black"
-    style = (
-        f"FontName={font_name},Bold=1,FontSize=38,"
-        "PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BackColour=&H80000000,"
-        "BorderStyle=1,Outline=4,Shadow=2,Alignment=2,MarginV=60"
-    )
-    _run([
-        "ffmpeg", "-y", "-i", video_in,
-        "-vf", f"subtitles={srt_path}:force_style='{style}'",
-        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24", "-c:a", "copy",
-        video_out,
-    ])
-
-
 def build_video(
     script_text: str,
     scene_keywords: str,
@@ -277,7 +261,7 @@ def build_video(
     3) 나머지 이미지 전부 → 켄번즈 클립 (남은 시간을 이미지 수만큼 균등 분할, 나레이션 흐름에 맞춰
        자주 컷 전환되도록 함 — 정지 슬라이드쇼가 아니라 이미지 하나하나가 다 살아 움직임)
     4) 모든 클립 이어붙이기 → 오디오 합성 (정확히 오디오 길이로 클리핑)
-    5) 타임라인 기반 SRT 생성 → 시니어용 큰 굵은 글씨로 번인
+    5) 타임라인 기반 SRT 생성 (번인하지 않음 — 화면을 가리므로 유튜브 자체 토글형 자막에 맡김)
     """
     total_duration = _ffprobe_duration(audio_path)
     keywords = [k.strip() for k in scene_keywords.split(",") if k.strip()] or ["senior healthy lifestyle"]
@@ -326,13 +310,17 @@ def build_video(
             "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", with_audio,
         ])
 
-        print("[Video] 자막(SRT) 생성 중...")
+        print("[Video] 자막(SRT) 생성 중... (번인 없이 유튜브 자체 자막으로 대체 — 화면 가림 방지)")
         srt_path = os.path.join(tmp, "captions.srt")
         n_cues = _timeline_to_srt(timeline, srt_path)
         print(f"[Video] 자막 큐 {n_cues}개 생성됨")
 
-        print("[Video] 자막 번인 중 (최종 인코딩)...")
-        _burn_subtitles(with_audio, srt_path, out_path, lang)
+        print("[Video] 최종 인코딩 중...")
+        _run([
+            "ffmpeg", "-y", "-i", with_audio,
+            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24", "-c:a", "copy",
+            out_path,
+        ])
 
     print(f"[Video] 완료: {out_path}")
     return out_path

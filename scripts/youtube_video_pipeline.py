@@ -349,14 +349,6 @@ def build_srt(segments, durations, out_path):
         f.write("\n".join(lines))
 
 
-def burn_subtitles(video_path, srt_path, out_path):
-    srt_escaped = os.path.abspath(srt_path).replace("\\", "/").replace(":", "\\:")
-    style = "FontName=NanumGothic,FontSize=26,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2"
-    run_ffmpeg(["ffmpeg", "-y", "-i", video_path,
-                "-vf", f"subtitles='{srt_escaped}':force_style='{style}'",
-                "-c:a", "copy", out_path])
-
-
 # ════════════════════════════════════════════════════════════
 # 7) 썸네일 (시니어용 큰 글씨, PNG)
 # ════════════════════════════════════════════════════════════
@@ -576,8 +568,6 @@ def main():
 
     srt_path = os.path.join(WORKDIR, "subtitles.srt")
     build_srt(segments, durations, srt_path)
-    subtitled = os.path.join(WORKDIR, "with_subs.mp4")
-    burn_subtitles(muxed, srt_path, subtitled)
 
     log("7/8 썸네일 생성 및 최종 mp4 결합 중...")
     thumb_title = topic if len(topic) <= 24 else topic[:24]
@@ -588,7 +578,7 @@ def main():
     make_still_clip_with_silence(thumb_path, intro_clip, duration=2.5)
 
     final_video = os.path.join(WORKDIR, "final.mp4")
-    concat_reencode([intro_clip, subtitled], final_video)
+    concat_reencode([intro_clip, muxed], final_video)
     log(f"   ✅ 최종 영상: {final_video}")
 
     log("8/8 구글드라이브 업로드 + 이메일 발송 중...")
