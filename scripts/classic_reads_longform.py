@@ -333,16 +333,21 @@ def build_visual_track(image_paths, total_duration, workdir):
 
 
 def mux_final(visual_path, audio_path, srt_path, out_path, workdir):
-    """자막을 영상에 번인하고 나레이션 오디오를 입힌다. subtitles 필터가
-    콜론 포함 절대경로(윈도우 드라이브 문자 등)에서 깨지는 걸 피하려고
-    workdir로 cd한 뒤 전부 상대경로로 넘긴다."""
+    """나레이션 오디오를 영상에 입힌다.
+
+    2026-08-18 사용자 지적("유튜브 자동자막 있는데 굳이 넣을 필요있나?
+    그리고 이러니까 화면을 보기가 힘들어") — 예전엔 여기서 SRT를 화면에
+    번인(subtitles 필터 + 불투명 박스, BorderStyle=3)해서, 유튜브 자체
+    자동생성 자막(끄고 켤 수 있음)과 중복인 데다 항상 화면 하단을 가려서
+    끌 수도 없었음. 번인 완전히 제거 — srt_path는 호출부 캡션 타이밍
+    계산용으로만 남겨두고(파일 자체는 만들어지되 화면엔 안 들어감),
+    영상은 순수 비디오+오디오만 합성한다."""
     cwd = os.getcwd()
     os.chdir(workdir)
     try:
-        vf = f"subtitles={os.path.basename(srt_path)}:force_style='{CAPTION_STYLE}'"
         run_ffmpeg([
             "ffmpeg", "-y", "-i", os.path.basename(visual_path), "-i", os.path.basename(audio_path),
-            "-map", "0:v", "-map", "1:a", "-vf", vf,
+            "-map", "0:v", "-map", "1:a",
             "-c:v", "libx264", "-c:a", "aac", "-shortest",
             "-map_metadata", "-1", "-fflags", "+bitexact",
             "-flags:v", "+bitexact", "-flags:a", "+bitexact",
