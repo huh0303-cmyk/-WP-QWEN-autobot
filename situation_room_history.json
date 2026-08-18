@@ -1,6 +1,6 @@
 {
   "latest": {
-    "site_clicks": 1,
+    "site_clicks": 0,
     "site_indexed": 0,
     "site_details": {
       "k-health365.com": {
@@ -119,7 +119,7 @@
         "status": "정상"
       },
       "jobkoreaglobal.com": {
-        "clicks": 1,
+        "clicks": 0,
         "indexed": 0,
         "status": "정상"
       },
@@ -142,35 +142,35 @@
     "youtube": {
       "한국어(TOPIK)": {
         "subs": 5780,
-        "views": 356903
+        "views": 359295
       },
       "영어(English Survival)": {
         "subs": 9,
-        "views": 1967
+        "views": 1974
       },
       "다국어(Studio_starbucks,10개국어)": {
-        "subs": 18,
-        "views": 8539
+        "subs": 19,
+        "views": 8540
       },
       "플리-로맨틱글로벌(globalmusic)": {
         "subs": 9,
-        "views": 1796
+        "views": 1801
       },
       "플리-힐링(실채널@Studio_k3)": {
         "subs": 12,
-        "views": 533
+        "views": 534
       },
       "플리-MBB": {
-        "subs": 0,
-        "views": 35
+        "subs": 1,
+        "views": 47
       },
       "플리-카페음악(Starbucksvibes)": {
         "subs": 3,
-        "views": 38
+        "views": 45
       },
       "발명(INVENTION_TIMES)": {
-        "subs": 0,
-        "views": 1
+        "subs": 1,
+        "views": 3
       },
       "건강-영어(HealthClinicTV)": {
         "subs": 0,
@@ -186,15 +186,15 @@
       },
       "우주(NASA_SPACE_TIMES)": {
         "subs": 2,
-        "views": 5
+        "views": 8
       },
       "역사(HISTORY_TODAY_TIMES)": {
         "subs": 0,
-        "views": 2
+        "views": 3
       },
       "과학(SCIENCE_FACTS_TIMES)": {
         "subs": 1,
-        "views": 16
+        "views": 20
       },
       "클래식인물(CLASSICAL_TIMES)": {
         "subs": 0,
@@ -206,7 +206,7 @@
       },
       "미국아카이브(AMERICAN_ARCHIVE_TIMES)": {
         "subs": 0,
-        "views": 3
+        "views": 4
       },
       "고전낭독(CLASSIC_READS_TIMES)": {
         "subs": 1,
@@ -222,7 +222,7 @@
       },
       "K-pop(kpop_studio7)": {
         "subs": 1,
-        "views": 112
+        "views": 141
       }
     },
     "tiktok": {
@@ -294,5 +294,5 @@
       }
     }
   },
-  "updated_at": "2026-08-18 01:15:42"
+  "updated_at": "2026-08-19 07:44:25"
 }
