@@ -25,15 +25,13 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://krealestate365.com
-    ⚠️ [534] 오류: Locator.click: Timeout 10000ms exceeded.
-Call log:
-  - waiting for locator(".editor-post-title__inpu
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ktech365.com
     ✅ [4618] Korea startup visa — Common Points of Co
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-18T20%3A48%3A07.865839&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-18T21%3A44%3A54.966506&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
@@ -73,7 +71,7 @@ Call log:
     ✅ [971] Korea bonus culture explained: A Closer 
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-18T20%3A50%3A20.194382&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-18T21%3A47%3A10.342777&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
