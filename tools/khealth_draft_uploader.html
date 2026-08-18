@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>K-health365.com 초안 등록기</title>
+<style>
+  :root {
+    --bg: #F1F3F1; --card: #FFFFFF; --ink: #16211D; --ink-soft: #4B5952;
+    --line: #D8E0DB; --sage: #2F6E5C; --sage-soft: #E4EFEA;
+    --amber: #C77D3D; --err: #B3413A; --err-soft: #FBEAE8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+  .page { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--ink-soft); font-size: 13.5px; margin-bottom: 24px; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 18px 0 6px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+  textarea, input {
+    width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+    font-size: 14px; font-family: inherit; background: var(--card); color: var(--ink);
+  }
+  textarea#raw { height: 260px; resize: vertical; }
+  .btn {
+    margin-top: 20px; background: var(--sage); color: #fff; border: none; border-radius: 10px;
+    padding: 12px 22px; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn.secondary { background: transparent; color: var(--sage); border: 1px solid var(--sage); }
+  .preview {
+    margin-top: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; display: none;
+  }
+  .preview.show { display: block; }
+  .field { margin-bottom: 12px; }
+  .field .k { font-size: 11.5px; font-weight: 700; color: var(--sage); text-transform: uppercase; letter-spacing: 0.04em; }
+  .field .v { font-size: 13.5px; white-space: pre-wrap; margin-top: 2px; max-height: 160px; overflow-y: auto; }
+  .status { margin-top: 18px; padding: 12px 16px; border-radius: 10px; font-size: 13.5px; display: none; }
+  .status.show { display: block; }
+  .status.info { background: var(--sage-soft); color: var(--sage); }
+  .status.error { background: var(--err-soft); color: var(--err); }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+  a { color: var(--sage); }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>K-health365.com 초안 등록기</h1>
+  <div class="sub">Gem 결과물 전체를 붙여넣고 검토한 뒤, 초안으로 등록합니다. 발행은 WP에서 직접 누르세요.</div>
+
+  <label>1. GitHub 토큰 (최초 1회만 입력, 이후 이 브라우저에 저장됨)</label>
+  <div class="row">
+    <input id="token" type="password" placeholder="ghp_... 또는 github_pat_..." />
+    <button class="btn secondary" onclick="saveToken()">저장</button>
+  </div>
+  <div class="hint" id="tokenStatus"></div>
+
+  <label>2. Gem 출력 전체 붙여넣기 (1~5번, 6번 이미지 제외)</label>
+  <textarea id="raw" placeholder="## 1. 제목
+...
+
+## 2. 본문
+...
+
+## 3. 태그
+...
+
+## 4. 메타 디스크립션
+...
+
+## 5. 포커스 키워드
+..."></textarea>
+
+  <button class="btn secondary" onclick="parseInput()">내용 확인</button>
+
+  <div class="preview" id="preview">
+    <div class="field"><div class="k">제목</div><div class="v" id="p_title"></div></div>
+    <div class="field"><div class="k">본문 (앞부분만 표시)</div><div class="v" id="p_body"></div></div>
+    <div class="field"><div class="k">태그</div><div class="v" id="p_tags"></div></div>
+    <div class="field"><div class="k">메타 디스크립션</div><div class="v" id="p_meta"></div></div>
+    <div class="field"><div class="k">포커스 키워드</div><div class="v" id="p_focus"></div></div>
+  </div>
+
+  <button class="btn" id="submitBtn" onclick="submitDraft()" disabled>초안으로 등록</button>
+
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+  const OWNER = "huh0303-cmyk";
+  const REPO = "-WP-QWEN-autobot";
+  const WORKFLOW = "wp-create-draft.yml";
+  const SITE_KEY = "KHEALTH365COM";
+  const SITE_URL = "https://k-health365.com";
+
+  let parsed = null;
+
+  function saveToken() {
+    const t = document.getElementById("token").value.trim();
+    if (!t) return;
+    localStorage.setItem("gh_token", t);
+    document.getElementById("token").value = "";
+    showTokenStatus();
+  }
+  function showTokenStatus() {
+    const t = localStorage.getItem("gh_token");
+    document.getElementById("tokenStatus").textContent = t
+      ? "토큰 저장됨 (마지막 4자리: " + t.slice(-4) + ")"
+      : "토큰이 아직 저장되지 않았어요.";
+  }
+  showTokenStatus();
+
+  function section(text, startLabel, endLabels) {
+    const startRe = new RegExp("##\\s*" + startLabel, "i");
+    const startMatch = text.match(startRe);
+    if (!startMatch) return "";
+    let from = startMatch.index + startMatch[0].length;
+    let to = text.length;
+    for (const label of endLabels) {
+      const endRe = new RegExp("##\\s*" + label, "i");
+      const m = text.slice(from).match(endRe);
+      if (m) { to = from + m.index; break; }
+    }
+    return text.slice(from, to).trim();
+  }
+
+  function parseInput() {
+    const raw = document.getElementById("raw").value;
+    const title = section(raw, "1\\.\\s*제목", ["2\\.\\s*본문"]);
+    const body = section(raw, "2\\.\\s*본문", ["3\\.\\s*태그"]);
+    const tags = section(raw, "3\\.\\s*태그", ["4\\.\\s*메타"]);
+    const meta = section(raw, "4\\.\\s*메타", ["5\\.\\s*포커스"]);
+    const focus = section(raw, "5\\.\\s*포커스", ["6\\.\\s*이미지"]);
+
+    if (!title || !body || !tags || !meta || !focus) {
+      status("error", "일부 항목을 못 읽었어요 — Gem 출력 형식(## 1. 제목 등)이 그대로인지 확인해주세요.");
+      document.getElementById("submitBtn").disabled = true;
+      return;
+    }
+
+    parsed = { title, body, tags, meta, focus };
+    document.getElementById("p_title").textContent = title;
+    document.getElementById("p_body").textContent = body.slice(0, 400) + (body.length > 400 ? " ..." : "");
+    document.getElementById("p_tags").textContent = tags;
+    document.getElementById("p_meta").textContent = meta;
+    document.getElementById("p_focus").textContent = focus;
+    document.getElementById("preview").classList.add("show");
+    document.getElementById("submitBtn").disabled = false;
+    status("info", "내용 확인됐어요. 위 미리보기 훑어보고 이상 없으면 등록하세요.");
+  }
+
+  function status(kind, msg) {
+    const el = document.getElementById("status");
+    el.className = "status show " + kind;
+    el.textContent = msg;
+  }
+
+  async function submitDraft() {
+    const token = localStorage.getItem("gh_token");
+    if (!token) { status("error", "GitHub 토큰을 먼저 저장해주세요."); return; }
+    if (!parsed) { status("error", "먼저 '내용 확인'을 눌러주세요."); return; }
+
+    document.getElementById("submitBtn").disabled = true;
+    status("info", "GitHub에 등록 요청 보내는 중...");
+
+    const dispatchedAt = new Date().toISOString();
+    const res = await fetch(
+      `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ref: "main",
+          inputs: {
+            site_key: SITE_KEY,
+            site_url: SITE_URL,
+            title: parsed.title,
+            body: parsed.body,
+            tags: parsed.tags,
+            meta_description: parsed.meta,
+            focus_keyword: parsed.focus,
+          },
+        }),
+      }
+    );
+
+    if (res.status !== 204) {
+      const errText = await res.text();
+      status("error", "요청 실패 (" + res.status + "): " + errText);
+      document.getElementById("submitBtn").disabled = false;
+      return;
+    }
+
+    status("info", "요청 보냄. 진행 상황 확인 중... (최대 1분)");
+    await pollRun(token, dispatchedAt);
+  }
+
+  async function pollRun(token, dispatchedAt) {
+    for (let i = 0; i < 20; i++) {
+      await new Promise(r => setTimeout(r, 3000));
+      const res = await fetch(
+        `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=5`,
+        { headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" } }
+      );
+      const data = await res.json();
+      const run = (data.workflow_runs || []).find(r => new Date(r.created_at) >= new Date(dispatchedAt) - 15000);
+      if (!run) continue;
+      if (run.status === "completed") {
+        if (run.conclusion === "success") {
+          status("info", "✅ 초안 등록 완료! WP 관리자 → 글 목록에서 방금 올린 초안을 확인하세요: " +
+            SITE_URL + "/wp-admin/edit.php?post_status=draft");
+        } else {
+          status("error", "❌ 실패했어요 (" + run.conclusion + "). 로그 확인: " + run.html_url);
+        }
+        document.getElementById("submitBtn").disabled = false;
+        return;
+      }
+      status("info", "진행 중... (" + run.status + ")");
+    }
+    status("error", "시간이 오래 걸리네요 — GitHub Actions에서 직접 확인해주세요.");
+    document.getElementById("submitBtn").disabled = false;
+  }
+</script>
+</body>
+</html>
