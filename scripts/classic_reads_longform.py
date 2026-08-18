@@ -203,11 +203,20 @@ def _normalize_audio(in_path, out_path):
 def build_narration_track(narration_text, workdir):
     """나레이션을 문장 단위로 쪼개 각각 TTS -> 정규화된 오디오로 저장하고,
     실제 오디오 길이 기준으로 SRT 캡션 타이밍을 만든 뒤, 전부 이어붙여
-    하나의 연속 오디오 트랙으로 합친다."""
+    하나의 연속 오디오 트랙으로 합친다.
+
+    2026-08-18 사고: Invention 영상(zZ-SkcHU3bQ 아님, _scG62MN0PE)이 문장
+    전부(70개+) ElevenLabs 400을 맞아서 8.1분 전체가 무음으로 업로드됨 —
+    문장당 5회 재시도는 이미 하고 있었지만(429 대응으로 8/17에 추가), 그날
+    ElevenLabs 쪽이 지속적으로 막혀있어서 재시도로도 못 뚫었음. 재시도만으론
+    부족하다는 게 드러나서, 무음으로 대체된 비율이 너무 높으면(30% 이상)
+    "일부만 조용히 무음 처리"가 아니라 파이프라인 자체를 중단시켜 무음
+    영상이 업로드되는 사고를 원천 차단한다."""
     sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", narration_text.strip()) if s.strip()]
     norm_paths = []
     srt_entries = []
     cursor = 0.0
+    silent_count = 0
     for i, sent in enumerate(sentences):
         raw = os.path.join(workdir, f"narr_raw_{i}.mp3")
         norm = os.path.join(workdir, f"narr_{i}.m4a")
@@ -216,6 +225,7 @@ def build_narration_track(narration_text, workdir):
             if ok:
                 _normalize_audio(raw, norm)
             else:
+                silent_count += 1
                 make_silence(norm, max(2.0, len(sent) / 15))
         dur = get_duration(norm)
         norm_paths.append(norm)
@@ -224,6 +234,14 @@ def build_narration_track(narration_text, workdir):
         # 2026-08-17: 5문장마다 몰아서 1초씩 쉬는 버스트 패턴이 오히려 429를
         # 유발하는 걸 확인 — 매 호출마다 고르게 짧은 간격을 두는 게 더 안전.
         time.sleep(0.6)
+
+    silent_ratio = silent_count / len(sentences) if sentences else 0
+    if silent_ratio > 0.3:
+        raise RuntimeError(
+            f"TTS 실패율이 너무 높음({silent_count}/{len(sentences)}, {silent_ratio:.0%}) — "
+            f"ElevenLabs 쪽 문제로 보이며, 이대로 진행하면 대부분 무음인 영상이 나간다. "
+            f"업로드 직전까지 안 가고 여기서 중단."
+        )
 
     list_file = os.path.join(workdir, "audio_concat_list.txt")
     with open(list_file, "w", encoding="utf-8") as f:
