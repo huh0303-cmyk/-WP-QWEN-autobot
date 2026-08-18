@@ -1,0 +1,31 @@
+word,category,image_query,concept
+maçã,food,red apple fruit photo,apple
+banana,food,banana fruit photo,banana
+cachorro,animal,dog photo,dog
+gato,animal,cat photo,cat
+livro,object,open book photo,book
+cadeira,object,wooden chair photo,chair
+mesa,object,wooden table photo,table
+água,food,glass of water photo,water
+pão,food,loaf of bread photo,bread
+leite,food,glass of milk photo,milk
+casa,place,small house photo,house
+carro,object,car photo,car
+árvore,nature,tree photo,tree
+flor,nature,flower photo,flower
+sol,nature,sun sky photo,sun
+lua,nature,moon photo,moon
+estrela,nature,star night sky photo,star
+pássaro,animal,bird photo,bird
+peixe,animal,fish photo,fish
+ovo,food,egg photo,egg
+sapato,clothing,shoe photo,shoe
+chapéu,clothing,hat photo,hat
+guarda-chuva,object,umbrella photo,umbrella
+bolsa,object,bag photo,bag
+lápis,object,pencil photo,pencil
+telefone,object,smartphone photo,phone
+relógio,object,clock photo,clock
+porta,object,door photo,door
+janela,object,window photo,window
+chave,object,key photo,key
