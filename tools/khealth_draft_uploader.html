@@ -114,13 +114,15 @@
   showTokenStatus();
 
   function section(text, startLabel, endLabels) {
-    const startRe = new RegExp("##\\s*" + startLabel, "i");
+    // Gemini 화면에서 마우스로 직접 드래그해 복사하면 마크다운 기호(##)가
+    // 사라지는 경우가 있어 — #가 있어도 없어도, 줄 맨 앞이면 라벨로 인정한다.
+    const startRe = new RegExp("^[ \\t]*#{0,2}[ \\t]*" + startLabel, "im");
     const startMatch = text.match(startRe);
     if (!startMatch) return "";
     let from = startMatch.index + startMatch[0].length;
     let to = text.length;
     for (const label of endLabels) {
-      const endRe = new RegExp("##\\s*" + label, "i");
+      const endRe = new RegExp("^[ \\t]*#{0,2}[ \\t]*" + label, "im");
       const m = text.slice(from).match(endRe);
       if (m) { to = from + m.index; break; }
     }
@@ -136,7 +138,7 @@
     const focus = section(raw, "5\\.\\s*포커스", ["6\\.\\s*이미지"]);
 
     if (!title || !body || !tags || !meta || !focus) {
-      status("error", "일부 항목을 못 읽었어요 — Gem 출력 형식(## 1. 제목 등)이 그대로인지 확인해주세요.");
+      status("error", "일부 항목을 못 읽었어요 — Gemini 답변 아래 '복사' 아이콘으로 복사했는지 확인해주세요 (마우스 드래그 복사는 서식이 깨질 수 있어요).");
       document.getElementById("submitBtn").disabled = true;
       return;
     }
