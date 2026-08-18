@@ -148,6 +148,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+          # 2026-08-18 사고 수정: curio_longform.py의 gemini_generate_text()는
+          # OPENAI_API_KEY가 있으면 텍스트 생성을 GPT로 우회하도록 이미 코드가
+          # 돼있었는데(8/17), 이 키가 워크플로우에 안 넘어가고 있어서 매번
+          # Gemini로만 호출되다가 월간 지출한도(429)에 그대로 막혀 실패했음.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           CH="${{ needs.determine-channel.outputs.channel }}"
           # 2026-08-16: myth/science는 실제 영상 자료가 존재하지 않는 주제라
