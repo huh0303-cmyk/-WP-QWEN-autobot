@@ -177,13 +177,16 @@
   }
 
   function parseImages(text) {
-    // "Prompt: ..." / "alt: ..." 쌍을 순서대로 최대 3개 추출
+    // "Prompt: ...", "**Prompt:** ...", "* **Prompt:** ..." 등 Gem마다 조금씩
+    // 다르게 나오는 굵게/불릿 표기를 다 허용해서 prompt/alt 쌍을 추출한다.
     const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
     const images = [];
     let cur = null;
-    for (const line of lines) {
+    const stripDeco = (s) => s.replace(/^[-*]\s*/, "").replace(/\*\*/g, "").trim();
+    for (const rawLine of lines) {
+      const line = stripDeco(rawLine);
       const pm = line.match(/^(?:\d+[\.\)]\s*)?prompt\s*:\s*(.+)$/i);
-      const am = line.match(/^alt\s*:\s*(.+)$/i);
+      const am = line.match(/^alt(?:\s*text)?\s*:\s*(.+)$/i);
       if (pm) {
         if (cur) images.push(cur);
         cur = { prompt: pm[1].trim(), alt: "" };
