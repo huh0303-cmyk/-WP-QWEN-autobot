@@ -1,66 +1,69 @@
 
 🌐 https://k-health365.com
-    ✅ [5868] 고혈압 관리법 고를 때 살펴봐야 할 8가지
+  ⚠️ 로그인 실패: Timeout 30000ms exceeded.
 
 🌐 https://koreamedicaltour.com
-  (최근 2시간 내 신규 발행 없음)
+  ⚠️ 로그인 실패: Timeout 30000ms exceeded.
 
 🌐 https://koreainvest365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ki-korea.com
-    ✅ [1724] 7 Things to Check Before 연금저축 세액공제
+    ⚠️ [1726] 오류: Page.goto: Timeout 45000ms exceeded.
+Call log:
+  - navigating to "https://ki-korea.com/wp-admin/post
 
 🌐 https://koreainsurance365.com
-    ✅ [3636] Save Time and Money on Korea car insuran
+    ✅ [3638] 4 Things to Look For When Choosing Korea
 
 🌐 https://kfinance365.com
-    ✅ [3855] 4 Questions People Ask About Wise Korea 
+    ✅ [3857] Korea year end tax settlement: A Beginne
 
 🌐 https://koreataxnlaw.com
-    ✅ [3899] Korea D-8 visa Made Simple
+    ✅ [3901] How Korea LLC setup cost Actually Works
 
 🌐 https://koreacrypto365.com
-    ✅ [3189] How Korea crypto staking Has Changed in 
+    ✅ [3192] Upbit: Inside South Korea&#8217;s Domina
+    ✅ [3191] Bithumb vs Upbit: What to Prepare First
 
 🌐 https://krealestate365.com
-    ⚠️ [532] 오류: Locator.click: Timeout 10000ms exceeded.
+    ⚠️ [533] 오류: Locator.click: Timeout 10000ms exceeded.
 Call log:
   - waiting for locator(".editor-post-title__inpu
 
 🌐 https://ktech365.com
-    ✅ [4615] Korea unicorn startups Checklist You Sho
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T21%3A44%3A27.863058&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-18T06%3A00%3A05.046870&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
-    ✅ [858] Olive Young lip tint review: Details Tha
+    ✅ [860] How Olive Young lip tint review Has Chan
 
 🌐 https://kworld365.com
-    ✅ [785] Hongdae K-pop shopping, Explained Simply
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://k-trip365.com
-    ✅ [4624] How People Are Approaching Korea hanok s
+    ✅ [4626] Korea autumn foliage spots in 2026: What
 
 🌐 https://k-visa365.com
-    ✅ [3173] E-9 visa Korea guide, From Someone Who&#
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreawedding365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kstudy365.com
-    ✅ [1243] Korea dormitory guide in 2026: What&#821
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://studyinkorea365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kieca-korea.org
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1105] 전통시장 체험 프로그램에서 자주 나오는 질문 5가지
 
 🌐 https://ksa-korea.org
-    ✅ [765] 유학생 아르바이트 비자 관련 자주 헷갈리는 부분
+    ✅ [767] 지자체 유학생 장학금, 순서대로 따라 하면 됩니다
 
 🌐 https://sis-korea.com
   (최근 2시간 내 신규 발행 없음)
@@ -69,10 +72,10 @@ Call log:
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://jobinkorea365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [969] A Practical Look at Korea internship vis
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-17T21%3A46%3A35.476687&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-18T06%3A03%3A43.999042&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
@@ -84,4 +87,4 @@ Call log:
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 13건 SEO점수 갱신
+총 10건 SEO점수 갱신
