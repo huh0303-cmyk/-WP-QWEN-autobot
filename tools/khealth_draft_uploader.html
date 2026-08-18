@@ -74,7 +74,11 @@
 ## 5. 포커스 키워드
 ..."></textarea>
 
-  <button class="btn secondary" onclick="parseInput()">내용 확인</button>
+  <div class="row">
+    <button class="btn" onclick="pasteFromClipboard()">📋 클립보드에서 붙여넣기 + 자동 확인</button>
+    <button class="btn secondary" onclick="parseInput()">내용 확인만</button>
+  </div>
+  <div class="hint">Gemini 답변의 '복사' 아이콘 누른 다음 여기 와서 위 버튼 한 번만 누르면 돼요.</div>
 
   <div class="preview" id="preview">
     <div class="field"><div class="k">제목</div><div class="v" id="p_title"></div></div>
@@ -112,6 +116,20 @@
       : "토큰이 아직 저장되지 않았어요.";
   }
   showTokenStatus();
+
+  async function pasteFromClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) {
+        status("error", "클립보드가 비어있어요 — Gemini 답변의 '복사' 아이콘을 먼저 눌러주세요.");
+        return;
+      }
+      document.getElementById("raw").value = text;
+      parseInput();
+    } catch (e) {
+      status("error", "클립보드 읽기 권한이 필요해요 — 브라우저가 권한 팝업을 띄우면 '허용'을 눌러주세요.");
+    }
+  }
 
   function section(text, startLabel, endLabels) {
     // Gemini 화면에서 마우스로 직접 드래그해 복사하면 마크다운 기호(##)가
