@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<title>K-health365.com 초안 등록기</title>
+<title>K-health365.com 초안 등록기 / Draft Uploader</title>
 <style>
   :root {
     --bg: #F1F3F1; --card: #FFFFFF; --ink: #16211D; --ink-soft: #4B5952;
@@ -64,37 +64,40 @@
 </head>
 <body>
 <div class="page">
-  <h1>K-health365.com 초안 등록기</h1>
-  <div class="sub">Gem 결과물 전체를 붙여넣고 검토한 뒤, 이미지까지 함께 초안으로 등록합니다. 발행은 WP에서 직접 누르세요.</div>
+  <h1>K-health365.com 초안 등록기 <span style="font-weight:400;color:var(--ink-soft);font-size:15px;">/ Draft Uploader</span></h1>
+  <div class="sub">
+    Gem 결과물 전체를 붙여넣고 검토한 뒤, 이미지까지 함께 초안으로 등록합니다. 발행은 WP에서 직접 누르세요.<br/>
+    Paste the full Gem output, review it, and register it as a draft with images. You still click Publish yourself in WP.
+  </div>
 
-  <label>1. WP 앱 비밀번호 (k-health365.com 전용, 최초 1회만 입력)</label>
+  <label>1. WP 앱 비밀번호 (k-health365.com 전용, 최초 1회만 입력) / WP App Password (k-health365.com only, enter once)</label>
   <div class="row">
     <input id="wpPass" type="password" placeholder="xxxx xxxx xxxx xxxx xxxx xxxx" />
-    <button class="btn secondary" onclick="saveWpPass()">저장</button>
+    <button class="btn secondary" onclick="saveWpPass()">저장 / Save</button>
   </div>
   <div class="hint" id="wpPassStatus"></div>
 
-  <label>2. Gem 출력 전체 붙여넣기 (1~6번 전부)</label>
+  <label>2. Gem 출력 전체 붙여넣기 (1~6번 전부) / Paste the full Gem output (sections 1–6)</label>
   <textarea id="raw" placeholder="## 1. 제목 ... ## 2. 본문 ... ## 6. 이미지 ..."></textarea>
 
-  <button class="btn big" onclick="pasteFromClipboard()">📋 클립보드에서 붙여넣기 + 자동 확인</button>
-  <div class="hint">Gemini 답변 맨 아래 '대답 복사' 아이콘 누른 다음, 여기 와서 위 버튼 한 번만 누르면 돼요.</div>
+  <button class="btn big" onclick="pasteFromClipboard()">📋 클립보드에서 붙여넣기 + 자동 확인 / Paste from clipboard + auto-check</button>
+  <div class="hint">Gemini 답변 맨 아래 '대답 복사' 아이콘 누른 다음, 여기 와서 위 버튼 한 번만 누르면 돼요.<br/>Click the "Copy" icon at the bottom of the Gemini reply, then click the button above.</div>
   <div style="margin-top:10px;">
-    <button class="btn secondary" onclick="parseInput()">(직접 붙여넣기 했다면) 내용 확인만</button>
+    <button class="btn secondary" onclick="parseInput()">(직접 붙여넣기 했다면) 내용 확인만 / (If pasted manually) Check content only</button>
   </div>
 
   <div class="preview" id="preview">
-    <div class="field"><div class="k">제목</div><div class="v" id="p_title"></div></div>
-    <div class="field"><div class="k">본문 (앞부분만 표시)</div><div class="v" id="p_body"></div></div>
-    <div class="field"><div class="k">태그</div><div class="v" id="p_tags"></div></div>
-    <div class="field"><div class="k">메타 디스크립션</div><div class="v" id="p_meta"></div></div>
-    <div class="field"><div class="k">포커스 키워드</div><div class="v" id="p_focus"></div></div>
+    <div class="field"><div class="k">제목 / Title</div><div class="v" id="p_title"></div></div>
+    <div class="field"><div class="k">본문 (앞부분만 표시) / Body (preview only)</div><div class="v" id="p_body"></div></div>
+    <div class="field"><div class="k">태그 / Tags</div><div class="v" id="p_tags"></div></div>
+    <div class="field"><div class="k">메타 디스크립션 / Meta Description</div><div class="v" id="p_meta"></div></div>
+    <div class="field"><div class="k">포커스 키워드 / Focus Keyword</div><div class="v" id="p_focus"></div></div>
   </div>
 
-  <label>3. 이미지 3장 (Gemini에서 우클릭 저장한 파일을 각 칸에 드래그하거나 클릭해서 선택)</label>
+  <label>3. 이미지 3장 (Gemini에서 우클릭 저장한 파일을 각 칸에 드래그하거나 클릭해서 선택) / 3 images (drag or click to select the files you saved from Gemini)</label>
   <div class="imgSlots" id="imgSlots"></div>
 
-  <button class="btn" id="submitBtn" onclick="submitDraft()" disabled>초안으로 등록 (글+이미지)</button>
+  <button class="btn" id="submitBtn" onclick="submitDraft()" disabled>초안으로 등록 (글+이미지) / Register as Draft (post + images)</button>
 
   <div class="status" id="status"></div>
 </div>
@@ -116,8 +119,8 @@
   function showWpPassStatus() {
     const t = localStorage.getItem("wp_pass_khealth365");
     document.getElementById("wpPassStatus").textContent = t
-      ? "저장됨 (마지막 4자리: " + t.slice(-4) + ")"
-      : "아직 저장되지 않았어요.";
+      ? "저장됨 (마지막 4자리: " + t.slice(-4) + ") / Saved (last 4: " + t.slice(-4) + ")"
+      : "아직 저장되지 않았어요. / Not saved yet.";
   }
   showWpPassStatus();
 
@@ -128,7 +131,7 @@
       const div = document.createElement("div");
       div.className = "slot";
       div.id = "slot" + i;
-      div.innerHTML = `<div class="lbl">이미지 ${i + 1}</div><input type="file" accept="image/*" onchange="onSlotFile(${i}, this.files[0])" />`;
+      div.innerHTML = `<div class="lbl">이미지 ${i + 1} / Image ${i + 1}</div><input type="file" accept="image/*" onchange="onSlotFile(${i}, this.files[0])" />`;
       wrap.appendChild(div);
     }
   }
@@ -141,7 +144,7 @@
     const reader = new FileReader();
     reader.onload = (e) => {
       const altText = (parsed && parsed.images && parsed.images[i]) ? parsed.images[i].alt : "";
-      slot.innerHTML = `<img src="${e.target.result}" /><div>이미지 ${i + 1} ✓</div><div class="alt">${altText}</div>
+      slot.innerHTML = `<img src="${e.target.result}" /><div>이미지 ${i + 1} ✓ / Image ${i + 1} ✓</div><div class="alt">${altText}</div>
         <input type="file" accept="image/*" onchange="onSlotFile(${i}, this.files[0])" />`;
       slot.classList.add("filled");
     };
@@ -152,13 +155,13 @@
     try {
       const text = await navigator.clipboard.readText();
       if (!text.trim()) {
-        status("error", "클립보드가 비어있어요 — Gemini 답변의 '복사' 아이콘을 먼저 눌러주세요.");
+        status("error", "클립보드가 비어있어요 — Gemini 답변의 '복사' 아이콘을 먼저 눌러주세요.\nClipboard is empty — click the 'Copy' icon on the Gemini reply first.");
         return;
       }
       document.getElementById("raw").value = text;
       parseInput();
     } catch (e) {
-      status("error", "클립보드 읽기 권한이 필요해요 — 브라우저가 권한 팝업을 띄우면 '허용'을 눌러주세요.");
+      status("error", "클립보드 읽기 권한이 필요해요 — 브라우저가 권한 팝업을 띄우면 '허용'을 눌러주세요.\nClipboard permission needed — click 'Allow' if your browser asks.");
     }
   }
 
@@ -209,7 +212,7 @@
     const images = parseImages(imgSection || raw.slice(raw.search(/6\.\s*이미지/i)));
 
     if (!title || !body || !tags || !meta || !focus) {
-      status("error", "일부 항목을 못 읽었어요 — Gemini 답변 아래 '복사' 아이콘으로 복사했는지 확인해주세요.");
+      status("error", "일부 항목을 못 읽었어요 — Gemini 답변 아래 '복사' 아이콘으로 복사했는지 확인해주세요.\nCouldn't read some fields — make sure you used the 'Copy' icon on the Gemini reply.");
       document.getElementById("submitBtn").disabled = true;
       return;
     }
@@ -230,7 +233,7 @@
       if (label && images[i]) label.textContent = "이미지 " + (i + 1) + " — " + images[i].prompt.slice(0, 40) + "...";
     }
 
-    status("info", "내용 확인됐어요. 미리보기 훑어보고, 이미지 3장도 넣은 뒤 등록하세요.");
+    status("info", "내용 확인됐어요. 미리보기 훑어보고, 이미지 3장도 넣은 뒤 등록하세요.\nChecked. Review the preview, add the 3 images, then register.");
   }
 
   function status(kind, msg) {
@@ -296,17 +299,17 @@
 
   async function submitDraft() {
     const pass = localStorage.getItem("wp_pass_khealth365");
-    if (!pass) { status("error", "WP 앱 비밀번호를 먼저 저장해주세요."); return; }
-    if (!parsed) { status("error", "먼저 '내용 확인'을 눌러주세요."); return; }
+    if (!pass) { status("error", "WP 앱 비밀번호를 먼저 저장해주세요.\nSave your WP app password first."); return; }
+    if (!parsed) { status("error", "먼저 '내용 확인'을 눌러주세요.\nClick 'Check content' first."); return; }
 
     document.getElementById("submitBtn").disabled = true;
     try {
-      status("info", "태그 확인 중...");
+      status("info", "태그 확인 중... / Checking tags...");
       const tagNames = parsed.tags.split(",").map(t => t.trim()).filter(Boolean);
       const tagIds = [];
       for (const name of tagNames) tagIds.push(await getOrCreateTag(name));
 
-      status("info", "이미지 업로드 중...");
+      status("info", "이미지 업로드 중... / Uploading images...");
       const mediaList = [];
       for (let i = 0; i < 3; i++) {
         if (imageSlots[i]) {
@@ -324,7 +327,7 @@
         bodyHtml = imgHtml + "\n" + bodyHtml;
       }
 
-      status("info", "초안 등록 중...");
+      status("info", "초안 등록 중... / Creating draft...");
       const auth = wpAuthHeader();
       const payload = {
         title: parsed.title,
@@ -346,10 +349,10 @@
       if (!r.ok) throw new Error(await r.text());
       const post = await r.json();
 
-      status("info", "✅ 초안 등록 완료! (이미지 " + mediaList.length + "장 포함)\n편집 화면: " +
+      status("info", "✅ 초안 등록 완료! (이미지 " + mediaList.length + "장 포함) / Draft created! (" + mediaList.length + " image(s) included)\n편집 화면 / Edit page: " +
         SITE_URL + "/wp-admin/post.php?post=" + post.id + "&action=edit");
     } catch (e) {
-      status("error", "❌ 실패: " + e.message);
+      status("error", "❌ 실패 / Failed: " + e.message);
     } finally {
       document.getElementById("submitBtn").disabled = false;
     }
