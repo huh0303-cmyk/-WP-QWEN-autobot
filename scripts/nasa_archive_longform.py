@@ -23,6 +23,7 @@ import re
 import sys
 import json
 import time
+import random
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -229,15 +230,28 @@ def build_visual_track(clips, total_duration, workdir):
             normalize_clip(c["path"], norm_path, CLIP_TRIM_SECONDS)
         norm_clips.append(norm_path)
 
+    # 2026-08-18: 클립이 적은 주제는 그래도 매번 똑같은 순서(0,1,2...,0,1,2...)로
+    # 돌려쓰면 반복이 눈에 확 띈다(사용자 지적) — 한 바퀴 다 쓸 때마다 순서를
+    # 섞고, 직전에 쓴 클립이 다음 바퀴 맨 앞에 바로 다시 나오지 않게만 피한다.
     segments = []
     covered = 0.0
-    i = 0
+    order = list(range(len(norm_clips)))
+    random.shuffle(order)
+    pos = 0
+    last_clip = None
     while covered < total_duration:
-        clip = norm_clips[i % len(norm_clips)]
+        if pos >= len(order):
+            order = list(range(len(norm_clips)))
+            random.shuffle(order)
+            if len(order) > 1 and norm_clips[order[0]] == last_clip:
+                order[0], order[-1] = order[-1], order[0]
+            pos = 0
+        clip = norm_clips[order[pos]]
+        pos += 1
+        last_clip = clip
         seg_dur = min(get_duration(clip), total_duration - covered)
         segments.append((clip, seg_dur))
         covered += seg_dur
-        i += 1
 
     list_file = os.path.join(workdir, "visual_concat_list.txt")
     trimmed_paths = []
@@ -389,7 +403,7 @@ def main():
     log("4/6 실제 NASA 클립으로 영상 트랙 조립 중 (트림+정규화+순환)...")
     visual_path = build_visual_track(clips, total_dur, workdir)
 
-    log("5/6 자막 번인 + 오디오 합성 중...")
+    log("5/6 영상+오디오 합성 중...")
     final_path = os.path.join(workdir, "final.mp4")
     mux_final(visual_path, audio_path, srt_path, final_path, workdir)
     dur = get_duration(final_path)

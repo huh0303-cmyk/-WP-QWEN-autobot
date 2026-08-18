@@ -532,7 +532,7 @@ def main():
     log(f"4/6 {IMAGE_SLIDE_SECONDS:.0f}초 간격 Ken Burns 컷 순환 영상 조립 중...")
     visual_path = build_visual_track(image_paths, total_dur, workdir)
 
-    log("5/6 자막 번인 + 오디오 합성 중...")
+    log("5/6 영상+오디오 합성 중...")
     final_path = os.path.join(workdir, "final.mp4")
     mux_final(visual_path, audio_path, srt_path, final_path, workdir)
     dur = get_duration(final_path)

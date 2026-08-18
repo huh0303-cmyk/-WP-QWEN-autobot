@@ -226,12 +226,17 @@ _FALLBACK_QUERY = {
 }
 
 
-def fetch_archive_clips(topic, channel_key, workdir, n_target=8):
+def fetch_archive_clips(topic, channel_key, workdir, n_target=20):
     """실제 영상을 반드시 확보하는 게 우선이라(사용자 지시: 짧아도, 흑백이어도
     상관없음), 특정 주제로 결과가 없으면 점점 검색 범위를 넓혀서 재시도한다:
     1) 정확한 주제 그대로 검색
     2) 주제에서 핵심 단어만 남겨 재검색
-    3) 채널 도메인 공통 키워드로 재검색(사실상 무조건 결과가 나오는 폴백)."""
+    3) 채널 도메인 공통 키워드로 재검색(사실상 무조건 결과가 나오는 폴백).
+
+    2026-08-18 사고: n_target이 8이었는데 클립당 최대 22초(CLIP_TRIM_SECONDS)라
+    8분 나레이션 채우려면 같은 8개를 2.5바퀴나 돌려써서 눈에 띄게 반복 재생됨
+    (History Today 영상, 사용자가 "계속 반복된다"고 지적). 20으로 올려 반복을
+    거의 없애거나 최소화."""
     cfg = CHANNEL_ARCHIVE_CONFIG[channel_key]
 
     attempts = [topic]
@@ -492,7 +497,7 @@ def main():
     log("4/6 실제 아카이브 클립으로 영상 트랙 조립 중 (트림+정규화+순환)...")
     visual_path = build_visual_track(clips, total_dur, workdir)
 
-    log("5/6 자막 번인 + 오디오 합성 중...")
+    log("5/6 영상+오디오 합성 중...")
     final_path = os.path.join(workdir, "final.mp4")
     mux_final(visual_path, audio_path, srt_path, final_path, workdir)
     dur = get_duration(final_path)
