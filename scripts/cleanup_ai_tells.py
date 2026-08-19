@@ -27,6 +27,14 @@ CLEANUP_RULES = [
     (re.compile(r'\bin conclusion,\s*', re.IGNORECASE), ''),
     (re.compile(r'현대\s*사회에서\s*', re.IGNORECASE), ''),
     (re.compile(r'\bin the ever-evolving\s+', re.IGNORECASE), 'in the changing '),
+    # 2026-08-19: 루테인 글(젬스→복붙, 파이프라인 미경유) 검토에서 발견 —
+    # 내부링크로 치환됐어야 할 대괄호 자리표시자가 그대로 발행된 사례.
+    # 자동화 파이프라인은 SITE_INTERNAL_LINKS의 실제 URL을 바로 삽입하므로
+    # 원래 이런 게 안 생기지만, 사람이 다른 경로로 올린 글까지 이 스크립트가
+    # 훑으므로 안전망으로 추가. 실제 링크로 무엇을 넣을지는 모르므로 통째로
+    # 제거만 한다(임의 URL을 지어내 채워 넣지 않음).
+    (re.compile(r'\[내부링크[^\]]*\]\s*', re.IGNORECASE), ''),
+    (re.compile(r'\[TODO[^\]]*\]\s*', re.IGNORECASE), ''),
 ]
 
 # 마크다운 코드펜스 잔존물 제거 — audit_27sites_ai_tells.py의 FENCE_PATTERNS와 짝을 이루는 규칙.

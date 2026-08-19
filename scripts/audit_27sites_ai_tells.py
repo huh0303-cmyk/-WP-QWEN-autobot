@@ -53,13 +53,21 @@ CLICHE_PATTERNS = [
 YEAR_PATTERNS = [r'\b202[0-5]\b', r'202[0-5]년']
 FENCE_PATTERNS = [r'```', r'&#8220;`', r'[\u201c\u2018]`']
 
+PLACEHOLDER_PATTERNS = [
+    r'\[내부링크[^\]]*\]', r'\[LINK[^\]]*\]', r'\[link[^\]]*\]',
+    r'\{keyword\}', r'\{title\}', r'\[TODO[^\]]*\]',
+]
+STRAY_GLUE_PATTERN = r'다\.[가-힣]{2,8}</p>'
+DUP_FAQ_HEADING_PATTERN = r'(?:자주\s*묻는\s*질문|<h[23][^>]*>\s*FAQ\s*</h[23]>)'
+
 MIN_CONTENT_LEN = 500
 
 def strip_tags(html_str):
     return re.sub(r'<[^>]+>', '', html_str or '').strip()
 
 results = {}
-grand = {"fence": 0, "short": 0, "cliche_title": 0, "year_title": 0, "dup_title": 0, "total": 0}
+grand = {"fence": 0, "short": 0, "cliche_title": 0, "year_title": 0, "dup_title": 0,
+         "placeholder": 0, "stray_glue": 0, "dup_faq": 0, "total": 0}
 
 for site_url, env_key in SITES:
     pw = os.getenv(env_key, "")
@@ -98,7 +106,8 @@ for site_url, env_key in SITES:
             break
         page += 1
 
-    site_issues = {"fence": [], "short": [], "cliche_title": [], "year_title": [], "dup_title": []}
+    site_issues = {"fence": [], "short": [], "cliche_title": [], "year_title": [], "dup_title": [],
+                    "placeholder": [], "stray_glue": [], "dup_faq": []}
     title_seen = {}
 
     for p in posts:
@@ -122,9 +131,16 @@ for site_url, env_key in SITES:
             site_issues["dup_title"].append((title, link))
         else:
             title_seen[key] = link
+        if any(re.search(pat, content_html, re.IGNORECASE) for pat in PLACEHOLDER_PATTERNS):
+            site_issues["placeholder"].append((title, link))
+        if re.search(STRAY_GLUE_PATTERN, content_html):
+            site_issues["stray_glue"].append((title, link))
+        if len(re.findall(DUP_FAQ_HEADING_PATTERN, content_html, re.IGNORECASE)) >= 2:
+            site_issues["dup_faq"].append((title, link))
 
     grand["total"] += len(posts)
-    for k in ("fence", "short", "cliche_title", "year_title", "dup_title"):
+    for k in ("fence", "short", "cliche_title", "year_title", "dup_title",
+              "placeholder", "stray_glue", "dup_faq"):
         grand[k] += len(site_issues[k])
 
     if any(site_issues.values()):
@@ -132,7 +148,8 @@ for site_url, env_key in SITES:
     print(f"✅ {site_url}: {len(posts)}건 검사 완료 "
           f"(펜스={len(site_issues['fence'])}, 단문={len(site_issues['short'])}, "
           f"진부제목={len(site_issues['cliche_title'])}, 연도포함={len(site_issues['year_title'])}, "
-          f"중복제목={len(site_issues['dup_title'])})")
+          f"중복제목={len(site_issues['dup_title'])}, 플레이스홀더={len(site_issues['placeholder'])}, "
+          f"태그누수={len(site_issues['stray_glue'])}, FAQ중복={len(site_issues['dup_faq'])})")
 
 print("\n" + "=" * 60)
 print("전체 요약")
@@ -149,12 +166,16 @@ with open("audit_27sites_ai_tells_result.txt", "w", encoding="utf-8") as f:
     f.write(f"단문(500자 미만): {grand['short']}건\n")
     f.write(f"진부한 제목 패턴: {grand['cliche_title']}건\n")
     f.write(f"제목에 연도(2020~2025) 포함: {grand['year_title']}건\n")
-    f.write(f"중복 제목(앞 20자 기준): {grand['dup_title']}건\n\n")
+    f.write(f"중복 제목(앞 20자 기준): {grand['dup_title']}건\n")
+    f.write(f"미해결 플레이스홀더([내부링크: ...] 등): {grand['placeholder']}건\n")
+    f.write(f"태그/카테고리 텍스트 누수(문장에 붙은 채 노출): {grand['stray_glue']}건\n")
+    f.write(f"FAQ 중복 노출: {grand['dup_faq']}건\n\n")
     for site_url, data in results.items():
         f.write(f"\n### {site_url} (전체 {data['post_count']}건)\n")
         for cat, label in [("fence", "코드펜스"), ("short", "단문"),
                             ("cliche_title", "진부제목"), ("year_title", "연도포함"),
-                            ("dup_title", "중복제목")]:
+                            ("dup_title", "중복제목"), ("placeholder", "플레이스홀더"),
+                            ("stray_glue", "태그누수"), ("dup_faq", "FAQ중복")]:
             items = data["issues"][cat]
             if items:
                 f.write(f"  [{label}] {len(items)}건\n")

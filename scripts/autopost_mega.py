@@ -12,11 +12,12 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
   ✅ 구글시트 로깅 / Rank Math 메타 주입
 """
 
-import os, sys, time, random, re, json, hashlib
+import os, sys, time, random, re, json, hashlib, base64
 import requests
 from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
+from google.genai import types as genai_types
 
 KST = timezone(timedelta(hours=9))
 def now_kst():
@@ -37,6 +38,9 @@ GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash-lite"
 GEMINI_MODEL_FALLBACK = "gemini-2.5-flash"
 GEMINI_MODEL          = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
+# 나노바나나(Nano Banana) — Pixabay/Pexels 검색이 실패했을 때 인포그래픽 카드 대신
+# 프롬프트로 실제 사진풍 이미지를 생성하는 폴백 (다른 파이프라인들과 동일한 모델 목록)
+GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
 TAG_COUNT   = 10
 # 2026-08-17 사용자 지시: "SEO점수 80점 이상, 두번시도 해서 안되면 발행하지 말것"
@@ -1104,18 +1108,35 @@ def crawl_rss_news(lang="ko", site_url=""):
     return ch[0], ch[1], None
 
 # ============================================================
+# ★ 구성표 숫자 랜덤화 — "FAQ 5문항"처럼 매번 똑같은 개수로 고정돼 있으면
+#   그 자체가 AI/자동화 패턴으로 읽힌다(사용자 피드백, 2026-08-19). 범위 표현
+#   ("3~5가지")은 이미 매번 달라질 여지가 있으니 건드리지 않고, 단일 고정
+#   숫자("5문항","4 questions","3가지")만 원래 값 근처(±2)에서 다시 뽑는다.
+# ============================================================
+_STRUCT_COUNT_RE = re.compile(r'(?<![~\-\d])(\d+)(\s*(?:가지|개|문항|questions|reasons|tips|ways))\b')
+
+def randomize_structure_counts(structure):
+    def repl(m):
+        orig = int(m.group(1))
+        suffix = m.group(2)
+        lo, hi = max(2, orig - 2), orig + 2
+        return f"{random.randint(lo, hi)}{suffix}"
+    return [_STRUCT_COUNT_RE.sub(repl, item) for item in structure]
+
+# ============================================================
 # ★★★ make_site_prompt — 사이트별 완전 분리 프롬프트 ★★★
 # ============================================================
-def make_site_prompt(keyword, site, reporter):
+def make_site_prompt(keyword, site, reporter, tag_count=None):
     url   = site["url"]
     theme = site["theme"]
     lang  = site["lang"]
     mode  = site.get("mode","blog")
+    tag_count = tag_count or TAG_COUNT
 
     p = SITE_PERSONA.get(url, {})
     min_chars  = p.get("min_chars", 2200)
     tables_req = p.get("tables", 1)
-    structure  = p.get("structure", [])
+    structure  = randomize_structure_counts(p.get("structure", []))
 
     if lang == "ko":
         persona = p.get("persona_ko","전문 칼럼니스트")
@@ -1153,10 +1174,10 @@ def make_site_prompt(keyword, site, reporter):
                          f"- 키워드: '{keyword}'를 첫 문장에 자연스럽게 포함. 이후엔 억지로 "
                          f"반복 횟수를 채우지 말고, 대명사/유의어/줄인 표현으로 자연스럽게 바꿔써도 됨 "
                          f"(같은 단어를 기계적으로 반복하면 검색엔진이 스팸으로 판단할 수 있음)")
-        tags_line = (f"TAGS: ({TAG_COUNT}개 한국어, 쉼표로 구분된 짧은 명사/키워드만. "
+        tags_line = (f"TAGS: ({tag_count}개 한국어, 쉼표로 구분된 짧은 명사/키워드만. "
                      "문장·특수기호·구분선 금지)"
                      if is_news else
-                     f"TAGS: ({TAG_COUNT}개 한국어, 첫번째='{keyword}')")
+                     f"TAGS: ({tag_count}개 한국어, 첫번째='{keyword}')")
     else:
         keyword_rule = ("- Intro: introduce the event this headline covers in the first sentence, "
                          "in your own words — do not repeat the headline sentence verbatim. "
@@ -1166,10 +1187,10 @@ def make_site_prompt(keyword, site, reporter):
                          f"don't force a repetition count — use pronouns, synonyms, or shortened phrasing "
                          f"instead (mechanically repeating the exact same phrase reads as spam to both "
                          f"readers and search engines)")
-        tags_line = (f"TAGS: ({TAG_COUNT} English tags, comma-separated short nouns/keywords only. "
+        tags_line = (f"TAGS: ({tag_count} English tags, comma-separated short nouns/keywords only. "
                      "No full sentences, symbols, or section dividers)"
                      if is_news else
-                     f"TAGS: ({TAG_COUNT} English tags, first='{keyword}')")
+                     f"TAGS: ({tag_count} English tags, first='{keyword}')")
 
     if lang == "ko":
         return f"""[역할]
@@ -1223,8 +1244,13 @@ def make_site_prompt(keyword, site, reporter):
   하며, 120자 미만이거나 150자를 넘으면 실패로 간주된다. 짧게 쓰고 끝내지 말고
   '{keyword}' 관련 구체적인 이유/이점을 한 문장 더 보태서라도 130자를 채울 것.
 - 위 내부링크 4개를 본문 흐름에 자연스럽게 삽입{medical_note}
+- FAQ는 본문(본문HTML) 안에 절대 작성하지 말 것. 아래 구성표에 "FAQ"가 언급되어 있어도
+  그건 이 글에 FAQ가 필요하다는 표시일 뿐, 실제 질문·답변은 반드시 FAQ_START~FAQ_END
+  섹션에서만 작성한다. 본문에 "자주 묻는 질문"이나 "FAQ" 같은 소제목, Q&A 형식을
+  직접 쓰면 발행 시 시스템이 추가하는 FAQ 박스와 겹쳐서 같은 내용이 두 번 노출된다.
 
-[이 사이트 전용 글 구성 — 반드시 이 순서로]
+[이 사이트 전용 글 구성 — 반드시 이 순서로. 목록의 "FAQ"는 본문이 아니라
+FAQ_START~FAQ_END에서 작성하라는 뜻]
 {struct_str}
 
 [출력 형식]
@@ -1275,8 +1301,14 @@ You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' categor
   draft is short, add one more concrete reason/benefit related to '{keyword}' rather than
   stopping early.
 - Weave the 4 internal links above naturally into the body{medical_note}
+- Never write the FAQ inside the article body itself. If the structure list below mentions
+  "FAQ", that only marks that this article needs one — the actual questions/answers belong
+  exclusively in the FAQ_START~FAQ_END section. Writing an "FAQ" or "Frequently Asked
+  Questions" heading with Q&A pairs directly in the body will duplicate the FAQ box the
+  system appends automatically at publish time.
 
-[THIS SITE'S UNIQUE STRUCTURE — follow exactly in order]
+[THIS SITE'S UNIQUE STRUCTURE — follow exactly in order. Where the list says "FAQ", that
+belongs in FAQ_START~FAQ_END, not the body]
 {struct_str}
 
 [OUTPUT FORMAT — write ONLY these parts, back to back, with nothing else]
@@ -1475,7 +1507,8 @@ def sanitize_tag(t, lang):
         return ""
     return t
 
-def extract_tags(text, keyword, theme, lang, is_news=False):
+def extract_tags(text, keyword, theme, lang, is_news=False, tag_count=None):
+    TAG_COUNT = tag_count or globals()["TAG_COUNT"]
     lines=text.strip().split("\n"); tags=[]; body_lines=[]
     for line in lines:
         if line.strip().upper().startswith("TAGS:"):
@@ -1656,6 +1689,55 @@ def get_multiple_images(keyword, count=3, theme=""):
     return list(dict.fromkeys(urls))[:count]
 
 # ============================================================
+# ★ 이미지-본문 관련성 실시간 검증 (2026-08-19 사용자 지시: "alt값 안 맞으면
+#   그냥 패싱" — 예전엔 발행 후 audit_image_relevance.py가 나중에 훑어서
+#   찾아냈는데, 그건 이미 공개된 상태로 한참 방치된다는 뜻이었다. 이제는
+#   발행 전에 같은 Gemini Vision 판정을 그 자리에서 돌려서, 안 맞으면 그
+#   이미지를 버리고(패싱) 나노바나나→인포그래픽 폴백 체인으로 넘어간다.
+# ============================================================
+def _download_image_bytes(url):
+    try:
+        r = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+        ctype = r.headers.get("Content-Type", "")
+        if r.status_code == 200 and ctype.startswith("image"):
+            return r.content, ctype.split(";")[0].strip()
+    except Exception:
+        pass
+    return None, None
+
+def _classify_image_relevance(image_bytes, mime_type, title, keyword):
+    prompt = (
+        "You are QA-checking whether a stock photo actually matches a blog article's topic.\n"
+        f"Article title: {title}\n"
+        f"Article focus keyword/subject: {keyword}\n"
+        "Look at the attached image. Does it visually and topically relate to this SPECIFIC "
+        "subject (not just a vaguely-similar generic photo of the same broad category)? "
+        "Respond with exactly one word: RELEVANT or MISMATCH."
+    )
+    try:
+        resp = gemini_client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=[genai_types.Part.from_bytes(data=image_bytes, mime_type=mime_type), prompt],
+            config={"temperature": 0.0, "max_output_tokens": 10},
+        )
+        return (resp.text or "").strip().upper().startswith("RELEVANT")
+    except Exception as e:
+        print(f"  ⚠️ 이미지 관련성 판정 실패(통과 처리): {e}")
+        return True  # 판정 자체가 실패하면(할당량 등) 억지로 버리지 않고 통과시킴
+
+def filter_relevant_images(urls, title, keyword):
+    kept = []
+    for u in urls:
+        img_bytes, mime = _download_image_bytes(u)
+        if not img_bytes:
+            continue
+        if _classify_image_relevance(img_bytes, mime, title, keyword):
+            kept.append(u)
+        else:
+            print(f"  🚫 이미지 관련성 불일치로 패싱: {u[:80]}")
+    return kept
+
+# ============================================================
 # ★ 최종 안전망: 사진 검색(Pixabay/Pexels)이 모두 실패했을 때
 #   본문 주제와 무관한 사진("South Korea nature" 등) 대신,
 #   키워드를 그대로 텍스트로 담은 인포그래픽 카드를 생성해 사용.
@@ -1747,6 +1829,55 @@ def upload_local_image_to_wp(site_url, pw, filepath, filename):
     except Exception as e:
         print(f"  ⚠️ 인포그래픽 업로드 오류: {e}")
     return None
+
+# ============================================================
+# ★ 나노바나나(Gemini 2.5 Flash Image) — 스톡사진 실패 시 1차 폴백
+#   기존엔 스톡사진 실패 → 곧바로 텍스트 인포그래픽 카드였는데, 실제 사진처럼
+#   보이는 이미지가 나을 때가 많아 카드보다 먼저 시도한다. 카드는 이마저
+#   실패했을 때의 최종 안전망으로 유지.
+# ============================================================
+def gemini_generate_image(prompt, out_path, max_retries=3):
+    body = {"contents": [{"parts": [{"text": prompt}]}]}
+    last_err = None
+    for attempt in range(max_retries):
+        for model in GEMINI_IMAGE_MODELS:
+            url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+                   f"{model}:generateContent?key={GEMINI_API_KEY}")
+            try:
+                r = requests.post(url, json=body, timeout=90)
+                if r.status_code != 200:
+                    last_err = f"{r.status_code}: {r.text[:150]}"
+                    continue
+                parts = r.json()["candidates"][0]["content"]["parts"]
+                for part in parts:
+                    inline = part.get("inlineData") or part.get("inline_data")
+                    if inline and inline.get("data"):
+                        with open(out_path, "wb") as f:
+                            f.write(base64.b64decode(inline["data"]))
+                        return True
+                last_err = "응답에 이미지 데이터 없음"
+            except Exception as e:
+                last_err = str(e)
+        wait = min(4 * (2 ** attempt), 30)
+        time.sleep(wait)
+    print(f"  ⚠️ 나노바나나 이미지 생성 최종 실패: {last_err}")
+    return False
+
+def get_fallback_nanobanana_image(site_url, pw, keyword, theme, lang):
+    try:
+        en_concept = translate_ko_to_en_for_image(keyword, theme) if lang == "ko" else keyword
+        prompt = (f"A realistic, editorial-style photograph representing '{en_concept}'. "
+                  "Natural lighting, no text or logos in the image, no watermarks, "
+                  "suitable as a blog article header photo, high quality, 16:9 composition.")
+        path = f"/tmp/nanobanana_{hashlib.md5(keyword.encode()).hexdigest()[:10]}.png"
+        if not gemini_generate_image(prompt, path):
+            return []
+        fname = "nanobanana-" + re.sub(r'[^a-zA-Z0-9]+', '-', keyword)[:40].strip('-')
+        url = upload_local_image_to_wp(site_url, pw, path, fname or "nanobanana")
+        return [url] if url else []
+    except Exception as e:
+        print(f"  ⚠️ 나노바나나 폴백 실패: {e}")
+        return []
 
 def get_fallback_infographic_image(site_url, pw, keyword, theme, lang):
     try:
@@ -2157,7 +2288,9 @@ def process_one(site, keyword):
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
 
-    base_prompt=make_site_prompt(keyword,site,reporter)
+    # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
+    tag_count = random.randint(10, 13)
+    base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count)
     prompt=base_prompt
     best_score=0; best_result=None
 
@@ -2171,7 +2304,7 @@ def process_one(site, keyword):
 
         time.sleep(SLEEP_BETWEEN_POSTS)
         body_raw,title,meta,faq=extract_meta_and_faq(raw)
-        body,tags=extract_tags(body_raw,keyword,theme,lang,is_news=(mode in ("news","news_en")))
+        body,tags=extract_tags(body_raw,keyword,theme,lang,is_news=(mode in ("news","news_en")),tag_count=tag_count)
 
         # AI가 만든 제목은 버리고, 코드가 22개 템플릿 중 랜덤으로 뽑아 무조건 교체
         # (반복 패턴이 구글에 "AI 대량생산"으로 보이는 문제 해결)
@@ -2240,10 +2373,15 @@ def process_one(site, keyword):
         print(f"  🚫 이미지 없음 (no_image=True)")
     else:
         images=get_multiple_images(keyword,count=1,theme=theme)
+        if images:
+            images = filter_relevant_images(images, title, keyword)
         if not images:
-            print(f"  ⚠️ 사진 검색 완전 실패 → 주제 일치 인포그래픽 카드로 대체")
+            print(f"  ⚠️ 사진 검색 완전 실패(또는 관련성 불일치로 전부 패싱) → 나노바나나(Gemini 이미지 생성)로 대체 시도")
             pw_for_img = os.getenv(site["wp_pass_env"], "")
-            images = get_fallback_infographic_image(url, pw_for_img, keyword, theme, lang)
+            images = get_fallback_nanobanana_image(url, pw_for_img, keyword, theme, lang)
+            if not images:
+                print(f"  ⚠️ 나노바나나도 실패 → 주제 일치 인포그래픽 카드로 대체")
+                images = get_fallback_infographic_image(url, pw_for_img, keyword, theme, lang)
             if not images:
                 # ★ 인포그래픽 생성마저 실패해도 "South Korea nature" 같은 본문과
                 #   무관한 범용 사진으로 억지로 채우지 않는다. 관련 없는 이미지보다
@@ -2326,9 +2464,17 @@ def main():
     # 2026-08-17: 특정 사이트 하나만 지금 바로 글 1건 발행하고 싶을 때
     # (예: k-health365.com 단발 테스트) 슬롯 로직을 무시하고 강제 발행.
     target_site_url = os.getenv("TARGET_SITE_URL", "").strip()
+    # 2026-08-19: 27개 사이트가 하루 한 순간에 몰려서 발행되면 "같은 운영자가
+    # 굴리는 네트워크"라는 신호를 구글에 그대로 주는 꼴이라(사용자 지적),
+    # publish_scheduler.py가 사이트마다 각자 다른 랜덤 시각을 잡아 이 스크립트를
+    # 사이트 하나씩 개별 디스패치한다. TARGET_SITE_URL(강제발행, n=1로 슬롯 무시)과
+    # 달리 이건 get_slot_posts의 주기/페이싱 로직은 그대로 존중하고 대상 사이트만 좁힌다.
+    site_filter_url = os.getenv("SITE_FILTER_URL", "").strip()
 
     for site in SITES_CONFIG:
         url=site["url"]; theme=site["theme"]
+        if site_filter_url and url != site_filter_url:
+            continue
         if target_site_url:
             if url != target_site_url:
                 continue

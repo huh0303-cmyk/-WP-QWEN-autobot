@@ -31,6 +31,10 @@ on:
         description: "hideaiposts 전용: 이번 배치에서 몇 개 사이트만 처리할지 (예: 3)"
         required: false
         default: ""
+      publish_site:
+        description: "post 전용(publish_scheduler.py가 사용): 이 사이트 하나만 발행 대상으로 좁힘 (주기/페이싱 로직은 유지, target_site의 강제발행과 다름)"
+        required: false
+        default: ""
   # ⚠️ 고정 cron 제거됨 (2026-07-19) — publish-scheduler.yml이 매일 랜덤 시간에
   #   이 워크플로우를 workflow_dispatch(step=post, run_slot=1/2/3)로 대신 실행시킴.
   #   목표시각: 07:25 / 13:07 / 19:50 KST, 매일 ±1시간 랜덤.
@@ -1003,6 +1007,7 @@ jobs:
         env:
           RUN_SLOT:             ${{ needs.determine-slot.outputs.slot }}
           TARGET_SITE_URL:      ${{ github.event.inputs.target_site }}
+          SITE_FILTER_URL:      ${{ github.event.inputs.publish_site }}
           GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY:       ${{ secrets.OPENAI_API_KEY }}
           PIXABAY_KEY:          ${{ secrets.PIXABAY_KEY }}
