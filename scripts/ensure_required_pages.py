@@ -9,7 +9,7 @@ ensure_required_pages.py
 이미 있는 페이지는 절대 건드리지 않습니다.
 """
 
-import os, time
+import os, re, time
 import requests
 
 WP_USER = "huh0303@gmail.com"
@@ -65,10 +65,23 @@ def get_pages(site_url, wp_pass):
 
 
 def find_page(pages, kws):
+    # 1) slug 정확/접두 매칭을 최우선으로 본다 — about/contact/privacy-policy/
+    #    disclaimer처럼 깔끔한 slug가 있으면 그게 진짜 해당 페이지일 확률이 높다.
     for p in pages:
-        t = p.get("title", {}).get("rendered", "").lower()
         s = p.get("slug", "").lower()
-        if any(k in t or k in s for k in kws):
+        if any(s == k or s.startswith(k + "-") for k in kws):
+            return p.get("link")
+    # 2) slug로 못 찾으면 제목으로 보되, HTML 태그를 벗기고 앞 60자만 본다.
+    #    2026-08-19: 페이지빌더가 본문 전체(수천 자 HTML/CSS)를 제목 필드에
+    #    통째로 넣어버린 사고 페이지가 있었는데(kieca-korea.org의 "proposal"
+    #    페이지 — ".kc-contact-box" CSS 클래스명 때문에 Contact로, "한교협
+    #    소개"라는 본문 문구 때문에 About으로 오탐됨), 제목 전체를 그대로
+    #    substring 검사하면 이런 페이지가 진짜 About/Contact 페이지보다 먼저
+    #    걸려버린다. 진짜 페이지 제목은 항상 짧으므로 앞 60자만 보면 안전하다.
+    for p in pages:
+        raw_title = p.get("title", {}).get("rendered", "")
+        clean = re.sub(r'<[^>]+>', '', raw_title).strip()[:60].lower()
+        if any(k in clean for k in kws):
             return p.get("link")
     return None
 
