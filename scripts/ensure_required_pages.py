@@ -148,11 +148,14 @@ information, and we are not liable for any losses arising from the use of this c
 
 
 def create_page(site_url, wp_pass, title, slug, content):
-    r = requests.post(f"{site_url}/wp-json/wp/v2/pages",
-                      auth=(WP_USER, wp_pass),
-                      json={"title": title, "slug": slug, "content": content, "status": "publish"},
-                      timeout=20)
-    return r.status_code, (r.json() if r.status_code in (200, 201) else r.text[:200])
+    try:
+        r = requests.post(f"{site_url}/wp-json/wp/v2/pages",
+                          auth=(WP_USER, wp_pass),
+                          json={"title": title, "slug": slug, "content": content, "status": "publish"},
+                          timeout=20)
+        return r.status_code, (r.json() if r.status_code in (200, 201) else r.text[:200])
+    except Exception as e:
+        return 0, str(e)[:200]
 
 
 def main():
@@ -176,34 +179,43 @@ def main():
             log(f"   ⚠️ 비밀번호 없음 → 건너뜀")
             continue
 
-        pages = get_pages(url, wp_pass)
-        for page_type, kws in REQUIRED_KEYWORDS.items():
-            existing = find_page(pages, kws)
-            if existing:
-                log(f"   ✅ {page_type}: 이미 있음 ({existing})")
-                total_ok += 1
-                continue
+        try:
+            pages = get_pages(url, wp_pass)
+            for page_type, kws in REQUIRED_KEYWORDS.items():
+                existing = find_page(pages, kws)
+                if existing:
+                    log(f"   ✅ {page_type}: 이미 있음 ({existing})")
+                    total_ok += 1
+                    continue
 
-            title = {
-                "About": "소개" if lang == "ko" else "About Us",
-                "Contact": "문의하기" if lang == "ko" else "Contact Us",
-                "Privacy": "개인정보처리방침" if lang == "ko" else "Privacy Policy",
-                "Disclaimer": "면책조항" if lang == "ko" else "Disclaimer",
-            }[page_type]
-            slug = {
-                "About": "about", "Contact": "contact",
-                "Privacy": "privacy-policy", "Disclaimer": "disclaimer",
-            }[page_type]
-            content = make_content(page_type, lang, url, theme, is_health)
+                title = {
+                    "About": "소개" if lang == "ko" else "About Us",
+                    "Contact": "문의하기" if lang == "ko" else "Contact Us",
+                    "Privacy": "개인정보처리방침" if lang == "ko" else "Privacy Policy",
+                    "Disclaimer": "면책조항" if lang == "ko" else "Disclaimer",
+                }[page_type]
+                slug = {
+                    "About": "about", "Contact": "contact",
+                    "Privacy": "privacy-policy", "Disclaimer": "disclaimer",
+                }[page_type]
+                content = make_content(page_type, lang, url, theme, is_health)
 
-            code, result = create_page(url, wp_pass, title, slug, content)
-            if code in (200, 201):
-                log(f"   🆕 {page_type} 생성 완료 → {result.get('link')}")
-                total_created += 1
-            else:
-                log(f"   ❌ {page_type} 생성 실패 ({code}): {str(result)[:150]}")
-                total_error += 1
-            time.sleep(0.5)
+                code, result = create_page(url, wp_pass, title, slug, content)
+                if code in (200, 201):
+                    log(f"   🆕 {page_type} 생성 완료 → {result.get('link')}")
+                    total_created += 1
+                else:
+                    log(f"   ❌ {page_type} 생성 실패 ({code}): {str(result)[:150]}")
+                    total_error += 1
+                time.sleep(0.5)
+        except Exception as e:
+            # 2026-08-19: kskin365.com의 SSL 인증서 호스트네임 불일치처럼 사이트
+            # 하나가 네트워크 레벨에서 완전히 막혀있으면 예외가 여기까지 올라오는데,
+            # 이걸 안 잡으면 스크립트 전체가 죽어서 아직 처리 안 한 나머지 사이트는
+            # 물론 이미 처리한 사이트 결과까지도(파일 저장이 맨 끝에서만 일어나서)
+            # 통째로 날아갔었다(실제로 이 사고로 4페이지 점검 1회차가 통째로 실패함).
+            log(f"   ❌ {url} 처리 중 오류(스킵하고 계속): {str(e)[:200]}")
+            total_error += 1
 
         time.sleep(0.5)
 
