@@ -1,76 +1,83 @@
 
 🌐 https://k-health365.com
+    ✅ [5891] 글루타치온 효능, 실제로는 이렇게 진행됩니다
     ✅ [5889] 비오틴 효능, 순서대로 따라 하면 됩니다
 
 🌐 https://koreamedicaltour.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1627] Korea medical visa support, From Someone
 
 🌐 https://koreainvest365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://ki-korea.com
+    ✅ [1732] 국민연금 수령액 계산: Frequently Confused Points
     ✅ [1730] 공모주 청약방법, Step by Step
 
 🌐 https://koreainsurance365.com
     ✅ [3642] Korea insurance premium calculator 101: 
 
 🌐 https://kfinance365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3861] VAT refund Korea shopping: A Closer Look
 
 🌐 https://koreataxnlaw.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3905] 5 Things to Look For When Choosing Korea
 
 🌐 https://koreacrypto365.com
+    ✅ [3202] How Much Should You Budget for Upbit for
     ✅ [3200] Bithumb vs Upbit: A Beginner&#8217;s Sta
 
 🌐 https://krealestate365.com
-  (최근 2시간 내 신규 발행 없음)
+    ⚠️ [539] 오류: Locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator(".editor-post-title__inpu
 
 🌐 https://ktech365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T12%3A03%3A14.893057&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T13%3A12%3A11.701923&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [862] How Olive Young sunscreen review Has Cha
 
 🌐 https://kworld365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://k-trip365.com
+    ✅ [4632] Korea hanok stay: Frequently Confused Po
     ✅ [4630] Seoul Airbnb guide: What to Prepare Firs
 
 🌐 https://k-visa365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [3179] Getting E-9 visa Korea guide Right the F
 
 🌐 https://koreawedding365.com
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kstudy365.com
+    ✅ [1249] Korea dormitory guide: A Closer Look
     ✅ [1247] Korea university scholarship foreigner, 
 
 🌐 https://studyinkorea365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [2932] Korea university admission foreigner, Ex
 
 🌐 https://kieca-korea.org
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1109] 한국 기업 인턴 지원 입문 — 처음이라면 꼭 알아야 할 것
 
 🌐 https://ksa-korea.org
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [769] 국비장학생 조건, 어디서부터 시작해야 할까
 
 🌐 https://sis-korea.com
     ✅ [1922] How summer program Korea university Has 
 
 🌐 https://jobkorea365.com
-  (최근 2시간 내 신규 발행 없음)
+    ✅ [1066] The Real Cost of Korea average salary 20
 
 🌐 https://jobinkorea365.com
     ✅ [973] IT jobs Korea foreigner, Broken Down Ste
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T12%3A04%3A55.543330&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T13%3A17%3A09.945821&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
@@ -82,4 +89,4 @@
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 8건 SEO점수 갱신
+총 22건 SEO점수 갱신
