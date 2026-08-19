@@ -182,14 +182,30 @@ def now_kst_str():
 # ════════════════════════════════════════════════════════════
 # 1) 27개 사이트 요약 (상세 아니라 합계만)
 # ════════════════════════════════════════════════════════════
+def get_total_published(site_url):
+    """공개 글 수(status=publish) — 인증 없이 조회 가능한 공개 REST 엔드포인트라
+    사이트별 WP 비밀번호가 없어도 된다. 2026-08-19: AI티/미색인 글을 대량으로
+    비공개 전환하는 작업을 시작해서, 이 숫자가 0에 가깝게 나오는 사이트가
+    생길 수 있음 — 버그가 아니라 의도된 결과이니 리포트에도 그대로 노출한다."""
+    try:
+        r = requests.get(f"{site_url}/wp-json/wp/v2/posts",
+                          params={"per_page": 1, "status": "publish"},
+                          headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+        if r.status_code == 200:
+            return int(r.headers.get("X-WP-Total", "0"))
+    except Exception:
+        pass
+    return None
+
+
 def collect_site_summary():
     if not os.environ.get("GSC_SERVICE_ACCOUNT_JSON"):
-        return {"total_clicks": None, "total_indexed": None, "error_sites": [],
+        return {"total_clicks": None, "total_indexed": None, "total_posts": None, "error_sites": [],
                 "error": "GSC_SERVICE_ACCOUNT_JSON 없음", "site_details": []}
     try:
         token = get_gsc_token()
     except Exception as e:
-        return {"total_clicks": None, "total_indexed": None, "error_sites": [],
+        return {"total_clicks": None, "total_indexed": None, "total_posts": None, "error_sites": [],
                 "error": str(e)[:200], "site_details": []}
 
     accessible_resp = gsc_get(token, "/sites")
@@ -200,10 +216,14 @@ def collect_site_summary():
 
     total_clicks = 0
     total_indexed = 0
+    total_posts = 0
     error_sites = []
     site_details = []
     for site_url in SITES:
         domain = site_url.rstrip("/").replace("https://", "")
+        total_published = get_total_published(site_url)
+        if total_published is not None:
+            total_posts += total_published
         domain_property = f"sc-domain:{domain}"
         if site_url in accessible:
             query_site = site_url
@@ -212,7 +232,7 @@ def collect_site_summary():
         else:
             error_sites.append(domain)
             site_details.append({"domain": domain, "url": site_url, "clicks": None,
-                                  "indexed": None, "status": "권한없음"})
+                                  "indexed": None, "total_posts": total_published, "status": "권한없음"})
             continue
         status = "정상"
         clicks = None
@@ -229,10 +249,11 @@ def collect_site_summary():
             total_indexed += coverage["indexed"]
             indexed = coverage["indexed"]
         site_details.append({"domain": domain, "url": site_url, "clicks": clicks,
-                              "indexed": indexed, "status": status})
+                              "indexed": indexed, "total_posts": total_published, "status": status})
         time.sleep(0.2)
 
     return {"total_clicks": total_clicks, "total_indexed": total_indexed,
+            "total_posts": total_posts,
             "error_sites": error_sites, "error": None, "site_details": site_details}
 
 
@@ -489,8 +510,8 @@ def main():
 
     log("1/4 사이트 트래픽 요약 수집 중...")
     site_summary = collect_site_summary()
-    log(f"   클릭 합계 {site_summary['total_clicks']} / 색인 합계 {site_summary['total_indexed']} "
-        f"/ 오류사이트 {len(site_summary['error_sites'])}개")
+    log(f"   전체글수 합계 {site_summary['total_posts']} / 클릭 합계 {site_summary['total_clicks']} "
+        f"/ 색인 합계 {site_summary['total_indexed']} / 오류사이트 {len(site_summary['error_sites'])}개")
 
     log("2/4 유튜브 전 채널 구독자 수집 중...")
     yt_stats, yt_err = collect_youtube_all()
@@ -511,7 +532,9 @@ def main():
     today = {
         "site_clicks": site_summary["total_clicks"],
         "site_indexed": site_summary["total_indexed"],
-        "site_details": {d["domain"]: {"clicks": d["clicks"], "indexed": d["indexed"], "status": d["status"]}
+        "site_posts": site_summary["total_posts"],
+        "site_details": {d["domain"]: {"clicks": d["clicks"], "indexed": d["indexed"],
+                                        "total_posts": d.get("total_posts"), "status": d["status"]}
                           for d in site_details_list},
         "youtube": yt_stats,
         "tiktok": tiktok_m, "facebook": facebook_m,
@@ -539,11 +562,14 @@ def main():
     }
     d_site_clicks = diff(today["site_clicks"], yesterday.get("site_clicks"))
     d_site_indexed = diff(today["site_indexed"], yesterday.get("site_indexed"))
+    d_site_posts = diff(today["site_posts"], yesterday.get("site_posts"))
     yesterday_sites = yesterday.get("site_details", {})
 
-    def _site_comment(status, clicks, d_clicks, indexed):
+    def _site_comment(status, clicks, d_clicks, indexed, total_posts):
         if status != "정상":
             return "⚠️ 접근 오류/권한 확인 필요"
+        if total_posts == 0:
+            return "🚫 공개글 0건 (비공개 정리 진행 중이거나 완료됨)"
         if clicks is None:
             return "데이터 없음(신규 사이트 또는 검색 유입 없음)"
         if d_clicks is None:
@@ -593,22 +619,28 @@ def main():
         f"[{checked_at}] 종합상황실",
         "",
         "📊 한눈에 보기",
-        f"  사이트 {ok_sites}/27 정상 | 클릭합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
+        f"  사이트 {ok_sites}/27 정상 | 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} | "
+        f"클릭합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
         f"색인합계 {today['site_indexed']} {fmt_diff(d_site_indexed)}",
         f"  유튜브 8채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
         f"  SNS 연결계정 {sns_connected}/12개",
         "",
-        f"■ 사이트 27개 — 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
+        f"■ 사이트 27개 — 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} / "
+        f"클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
         f"색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)}",
     ]
     for d in site_details_list:
         domain = d["domain"]
         y = yesterday_sites.get(domain, {})
         d_clicks = diff(d["clicks"], y.get("clicks"))
-        comment = _site_comment(d["status"], d["clicks"], d_clicks, d["indexed"])
+        d_posts = diff(d.get("total_posts"), y.get("total_posts"))
+        comment = _site_comment(d["status"], d["clicks"], d_clicks, d["indexed"], d.get("total_posts"))
         clicks_str = d["clicks"] if d["clicks"] is not None else "-"
+        posts_str = d.get("total_posts") if d.get("total_posts") is not None else "-"
+        indexed_str = d["indexed"] if d["indexed"] is not None else "-"
         summary_lines.append(
-            f"  - {domain} | {d['url']} | 방문자 {clicks_str}{fmt_diff(d_clicks)} | {comment}")
+            f"  - {domain} | {d['url']} | 전체글 {posts_str}{fmt_diff(d_posts)} | "
+            f"색인 {indexed_str} | 방문자 {clicks_str}{fmt_diff(d_clicks)} | {comment}")
     summary_lines += [
         "",
         "■ 유튜브 (언어채널 3 + 플리채널 5, 총 8개)",
@@ -679,7 +711,7 @@ def main():
     # 기존 시트 탭 구조(단일 채널 시절)와 호환을 위해 TOPIK 브랜드 값을 대표로 넣고,
     # 브랜드별 상세는 별도 키로 전부 남긴다.
     record = {"checked_at": checked_at, "site_clicks": today["site_clicks"],
-              "site_indexed": today["site_indexed"],
+              "site_indexed": today["site_indexed"], "site_posts": today["site_posts"],
               "tiktok": today["tiktok"]["TOPIK"]["count"],
               "facebook": today["facebook"]["TOPIK"]["count"],
               "instagram": today["instagram"]["TOPIK"]["count"],
@@ -700,7 +732,8 @@ def main():
                (f"\n\n시트: {sheet_link}" if sheet_link else ""))
 
     kakao_text = (summary_lines[0] + "\n" +
-                  f"사이트 {ok_sites}/27정상 클릭{today['site_clicks']}{fmt_diff(d_site_clicks)} / "
+                  f"사이트 {ok_sites}/27정상 전체글{today['site_posts']}{fmt_diff(d_site_posts)} "
+                  f"클릭{today['site_clicks']}{fmt_diff(d_site_clicks)} / "
                   f"색인{today['site_indexed']}{fmt_diff(d_site_indexed)}\n" +
                   f"[원포인트레슨] {one_point_lesson}"[:80])
     send_kakao(kakao_text, sheet_link or "https://github.com/huh0303-cmyk/-WP-QWEN-autobot")
