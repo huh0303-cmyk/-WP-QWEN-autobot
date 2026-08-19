@@ -30,7 +30,7 @@
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kskin365.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T11%3A17%3A47.760895&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T12%3A03%3A14.893057&_fields=id%2Ctitle (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'kskin365.com'. (_ssl.c:1016)")))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://oliveyoungkorea.com
@@ -43,10 +43,10 @@
     ✅ [4630] Seoul Airbnb guide: What to Prepare Firs
 
 🌐 https://k-visa365.com
-    ✅ [3177] Before You Try E-7 visa Korea, Read This
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://koreawedding365.com
-    ✅ [776] 9 Questions People Ask About Korea weddi
+  (최근 2시간 내 신규 발행 없음)
 
 🌐 https://kstudy365.com
     ✅ [1247] Korea university scholarship foreigner, 
@@ -70,7 +70,7 @@
     ✅ [973] IT jobs Korea foreigner, Broken Down Ste
 
 🌐 https://jobkoreaglobal.com
-  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T11%3A20%3A25.401125&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
+  ⚠️ 최근글 조회 실패: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=50&status=publish&after=2026-08-19T12%3A04%3A55.543330&_fields=id%2Ctitle (Caused by NameResolutionError("HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to resolve 'jobkoreaglobal.com' ([Errno -2] Name or service not known)"))
   (최근 2시간 내 신규 발행 없음)
 
 🌐 https://korea365.org
@@ -82,4 +82,4 @@
 🌐 https://theseouljournal.com
   (최근 2시간 내 신규 발행 없음)
 
-총 10건 SEO점수 갱신
+총 8건 SEO점수 갱신
