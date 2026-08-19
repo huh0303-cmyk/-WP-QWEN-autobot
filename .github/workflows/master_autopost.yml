@@ -40,7 +40,12 @@ on:
   #   목표시각: 07:25 / 13:07 / 19:50 KST, 매일 ±1시간 랜덤.
 
 concurrency:
-  group: master-27sites
+  # 2026-08-19: 예전엔 이 워크플로우의 모든 step(post/hideaiposts/ensurepages/...)이
+  # 동시성 그룹 하나를 공유해서, 사이트별 랜덤시각 스케줄러가 하루종일 쏘는 발행
+  # 디스패치가 관리자 작업(4페이지 점검 등) 대기열을 계속 밀어내 취소시키는 사고가
+  # 있었음(ensurepages가 몇 초 간격 재디스패치에 연쇄로 취소됨). step별로 큐를
+  # 분리해서 서로 안 건드리게 함 — 같은 step끼리는 여전히 순서대로 대기(중복실행 방지).
+  group: master-27sites-${{ github.event.inputs.step || 'post' }}
   cancel-in-progress: false
 
 jobs:
