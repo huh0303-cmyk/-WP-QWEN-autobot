@@ -1,4 +1,19 @@
 {
   "date": "2026-08-19",
-  "fired": {}
+  "fired": {
+    "https://koreamedicaltour.com": true,
+    "https://koreainvest365.com": true,
+    "https://kfinance365.com": true,
+    "https://koreataxnlaw.com": true,
+    "https://krealestate365.com": true,
+    "https://ktech365.com": true,
+    "https://kskin365.com": true,
+    "https://kworld365.com": true,
+    "https://studyinkorea365.com": true,
+    "https://kieca-korea.org": true,
+    "https://ksa-korea.org": true,
+    "https://jobkorea365.com": true,
+    "https://jobkoreaglobal.com": true,
+    "https://korea365.org": true
+  }
 }
