@@ -2443,6 +2443,12 @@ def process_one(site, keyword):
 # ★ 메인
 # ============================================================
 def main():
+    # Global publication freeze: index/quality recovery takes priority.
+    # Publishing stays disabled unless a future reviewed workflow explicitly opts in.
+    if os.getenv("WP_AUTOPUBLISH_ENABLED", "false").strip().lower() != "true":
+        print("⛔ WordPress 자동발행 전면 중지: WP_AUTOPUBLISH_ENABLED=true가 아니므로 종료합니다.")
+        print("   현재 운영 모드: 색인·품질 감사 우선 / 신규 발행 금지")
+        return
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
     print(f"   Gemini: {GEMINI_MODEL} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
