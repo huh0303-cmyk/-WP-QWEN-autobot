@@ -1,4 +1,9 @@
 {
   "date": "2026-08-21",
-  "fired": {}
+  "fired": {
+    "https://k-trip365.com": true,
+    "https://k-visa365.com": true,
+    "https://ksa-korea.org": true,
+    "https://korea365.org": true
+  }
 }
