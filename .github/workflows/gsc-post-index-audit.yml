@@ -1,0 +1,41 @@
+name: "GSC Post Index Audit (read-only)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Optional domain filter; blank audits all 27"
+        required: false
+        default: ""
+      max_per_site:
+        description: "0 = all published posts"
+        required: false
+        default: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: Run evidence-only GSC audit
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python scripts/audit_gsc_post_index.py \
+            --site "${{ github.event.inputs.site }}" \
+            --max-per-site "${{ github.event.inputs.max_per_site }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gsc-index-audit-${{ github.run_id }}
+          path: index_audit_manifest.json
+          if-no-files-found: warn
+          retention-days: 30
