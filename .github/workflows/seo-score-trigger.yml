@@ -1,69 +1,18 @@
-name: SEO Score Auto-Trigger (발행 직후 27사이트)
+name: "SEO Score Auto-Trigger — DISABLED (index-first recovery)"
 
+# Automatic WordPress writes are intentionally frozen.
+# Original workflow is preserved in git history. Re-enable only through a reviewed PR.
 on:
   workflow_dispatch:
-  # 발행시각이 매일 랜덤(±1시간)으로 바뀌므로 고정 오프셋 대신 매시간 정각 체크.
-  # lookback=2시간이라 놓치는 글 없이 항상 커버됨.
-  schedule:
-    - cron: "20 * * * *"
+
+permissions:
+  contents: read
 
 jobs:
-  trigger:
+  disabled:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    concurrency:
-      group: seo-score-trigger
-      cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install dependencies
+      - name: Publication freeze notice
         run: |
-          pip install requests playwright -q
-          python -m playwright install --with-deps chromium
-      - name: Trigger SEO score calc for recent posts
-        continue-on-error: true
-        timeout-minutes: 60
-        env:
-          WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
-          SEO_SCORE_LOOKBACK_HOURS: "2"
-          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
-          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
-          KIKOREACOM: ${{ secrets.KIKOREACOM }}
-          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
-          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
-          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
-          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
-          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
-          KTECH365COM: ${{ secrets.KTECH365COM }}
-          KSKIN365COM: ${{ secrets.KSKIN365COM }}
-          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
-          KWORLD365COM: ${{ secrets.KWORLD365COM }}
-          KTRIP365COM: ${{ secrets.KTRIP365COM }}
-          KVISA365COM: ${{ secrets.KVISA365COM }}
-          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
-          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
-          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
-          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
-          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
-          SISKOREACOM: ${{ secrets.SISKOREACOM }}
-          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
-          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
-          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
-          KOREA365ORG: ${{ secrets.KOREA365ORG }}
-          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/seo_score_trigger.py
-      - name: Commit results
-        if: always()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add seo_score_trigger_result.txt
-          git diff --staged --quiet || git commit -m "chore: SEO점수 자동트리거 결과 [skip ci]"
-          git pull --rebase origin main
-          git push
+          echo "WordPress automatic publishing/writes are disabled."
+          echo "Current mode: Google indexing and content-quality recovery only."
