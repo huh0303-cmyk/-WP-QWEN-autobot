@@ -1,6 +1,8 @@
 name: "Two Newsrooms — 5 Daily Editions"
 
 on:
+  push:
+    branches: [main]
   schedule:
     # Five distributed editions per newsroom: 09:43, 12:17, 15:29, 18:41, 21:53 KST.
     - cron: "43 0 * * *"
@@ -38,7 +40,7 @@ jobs:
             url: https://koreanews365.com
           - key: theseouljournal
             url: https://theseouljournal.com
-    if: ${{ github.event_name == 'schedule' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[newsroom-launch]')) || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
