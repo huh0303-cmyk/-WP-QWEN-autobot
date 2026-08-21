@@ -5,6 +5,7 @@ image)가 없는 글은 GPT(gpt-image-1)로 생성해서 채운다."""
 import os
 import re
 import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import requests  # noqa: E402
@@ -14,14 +15,15 @@ SITE = "https://koreanews365.com"
 USER = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
 PW = os.getenv("KOREANEWS365COM", "").strip()
 
+# 2026-08-21 1차 실행에서 34건 전부 공개전환은 이미 성공. 대표이미지만
+# 실패한 15건 재시도용으로 목록 축소(나머지 19건은 이미 이미지 있거나
+# 신규생성 완료됨). 호출 사이 텀이 전혀 없어서 OpenAI 이미지 생성 RPM
+# 한도에 걸린 것으로 보여 이번엔 간격을 둔다.
 POST_IDS = [
-    # 과거 구글색인 확인됨(7)
-    3822, 3821, 3819, 3818, 3817, 3815, 100,
-    # SEO점수 80점 이상(27)
-    3382, 3390, 3671, 3666, 3422, 3418, 3414, 3674, 3668, 3413, 3387, 3314,
-    4017, 4016, 3395, 3785, 4101, 4012, 3408, 3380, 4104, 4103, 4100, 4013,
-    3415, 3327, 3280,
+    3387, 4017, 4016, 3395, 3785, 4101, 4012, 3408, 3380,
+    4104, 4103, 4100, 4013, 3415, 3327,
 ]
+IMAGE_CALL_DELAY_SEC = 15
 
 
 def api(method, path, **kwargs):
@@ -92,6 +94,7 @@ def main():
             print(f"    대표이미지 이미 있음(id={post['featured_media']}), 스킵")
             continue
 
+        time.sleep(IMAGE_CALL_DELAY_SEC)
         img_path = make_image(pid, title)
         if not img_path:
             image_failed += 1
