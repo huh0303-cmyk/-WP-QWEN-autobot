@@ -40,7 +40,7 @@ jobs:
             url: https://koreanews365.com
           - key: theseouljournal
             url: https://theseouljournal.com
-    if: ${{ github.event_name == 'schedule' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[newsroom-launch]')) || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[newsroom-launch]')) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,6 +53,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
         run: sleep $((RANDOM % 721))
       - name: Publish one source-checked edition
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
           TARGET_SITE_URL: ${{ matrix.url }}
