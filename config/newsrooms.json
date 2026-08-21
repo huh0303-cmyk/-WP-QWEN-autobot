@@ -72,57 +72,57 @@
           "slug": "breaking"
         },
         {
-          "name": "정치",
+          "name": "정치 (POLITICS)",
           "slug": "politics"
         },
         {
-          "name": "경제",
+          "name": "경제 (ECONOMY)",
           "slug": "economy"
         },
         {
-          "name": "사회",
+          "name": "사회 (SOCIETY)",
           "slug": "society"
         },
         {
-          "name": "글로벌",
+          "name": "글로벌 (GLOBAL)",
           "slug": "world"
         },
         {
-          "name": "문화",
+          "name": "문화 (CULTURE)",
           "slug": "culture"
         },
         {
-          "name": "금융",
+          "name": "금융 (FINANCE)",
           "slug": "finance"
         },
         {
-          "name": "부동산",
+          "name": "부동산 (REAL ESTATE)",
           "slug": "real-estate"
         },
         {
-          "name": "국방",
+          "name": "국방 (DEFENSE)",
           "slug": "military"
         },
         {
-          "name": "Art",
+          "name": "예술 (ART)",
           "slug": "art"
         },
         {
-          "name": "스포츠",
+          "name": "스포츠 (SPORTS)",
           "slug": "sports"
         }
       ],
       "primary_menu": [
-        "정치",
-        "경제",
-        "사회",
-        "문화",
-        "금융",
-        "부동산",
-        "국방",
-        "Art",
-        "스포츠",
-        "글로벌",
+        "정치 (POLITICS)",
+        "경제 (ECONOMY)",
+        "사회 (SOCIETY)",
+        "문화 (CULTURE)",
+        "금융 (FINANCE)",
+        "부동산 (REAL ESTATE)",
+        "국방 (DEFENSE)",
+        "예술 (ART)",
+        "스포츠 (SPORTS)",
+        "글로벌 (GLOBAL)",
         "기사제보",
         "신문사 소개"
       ],

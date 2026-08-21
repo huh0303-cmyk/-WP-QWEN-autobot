@@ -2,7 +2,7 @@
 /** Build the Koreanews365 editorial desks and assign a clean primary menu. */
 
 add_action('init', function () {
-    $version = '2026-08-21-v2';
+    $version = '2026-08-21-v3-bilingual';
     if ($version === get_option('kn365_category_menu_version')) {
         return;
     }
@@ -12,16 +12,16 @@ add_action('init', function () {
     set_transient('kn365_category_menu_building', 1, MINUTE_IN_SECONDS);
 
     $desks = array(
-        array('name' => '정치', 'slug' => 'politics'),
-        array('name' => '경제', 'slug' => 'economy'),
-        array('name' => '사회', 'slug' => 'society'),
-        array('name' => '문화', 'slug' => 'culture'),
-        array('name' => '금융', 'slug' => 'finance'),
-        array('name' => '부동산', 'slug' => 'real-estate'),
-        array('name' => '국방', 'slug' => 'military'),
-        array('name' => 'Art', 'slug' => 'art'),
-        array('name' => '스포츠', 'slug' => 'sports'),
-        array('name' => '글로벌', 'slug' => 'world'),
+        array('name' => '정치 (POLITICS)', 'slug' => 'politics'),
+        array('name' => '경제 (ECONOMY)', 'slug' => 'economy'),
+        array('name' => '사회 (SOCIETY)', 'slug' => 'society'),
+        array('name' => '문화 (CULTURE)', 'slug' => 'culture'),
+        array('name' => '금융 (FINANCE)', 'slug' => 'finance'),
+        array('name' => '부동산 (REAL ESTATE)', 'slug' => 'real-estate'),
+        array('name' => '국방 (DEFENSE)', 'slug' => 'military'),
+        array('name' => '예술 (ART)', 'slug' => 'art'),
+        array('name' => '스포츠 (SPORTS)', 'slug' => 'sports'),
+        array('name' => '글로벌 (GLOBAL)', 'slug' => 'world'),
     );
 
     $term_ids = array();
@@ -29,7 +29,9 @@ add_action('init', function () {
         $term = get_term_by('slug', $desk['slug'], 'category');
         if ($term) {
             if ($term->name !== $desk['name']) {
-                wp_update_term($term->term_id, 'category', array('name' => $desk['name']));
+                wp_update_term($term->term_id, 'category', array('name' => $desk['name'], 'description' => ''));
+            } elseif ('' !== $term->description) {
+                wp_update_term($term->term_id, 'category', array('description' => ''));
             }
             $term_ids[$desk['slug']] = (int) $term->term_id;
             continue;
@@ -80,8 +82,12 @@ add_action('init', function () {
 add_action('wp_head', function () {
     ?>
     <style id="kn365-category-menu-style">
-      .mg-headwidget .navbar-wp .navbar-nav>li>a{padding-left:13px!important;padding-right:13px!important;white-space:nowrap}
-      @media(min-width:992px) and (max-width:1280px){.mg-headwidget .navbar-wp .navbar-nav>li>a{font-size:12px!important;padding-left:8px!important;padding-right:8px!important}}
+      .mg-headwidget .navbar-wp .navbar-nav>li>a{font-size:12px!important;padding-left:9px!important;padding-right:9px!important;white-space:nowrap}
+      @media(min-width:992px) and (max-width:1280px){.mg-headwidget .navbar-wp .navbar-nav>li>a{font-size:11px!important;padding-left:6px!important;padding-right:6px!important}}
     </style>
     <?php
 }, 30);
+
+add_filter('get_the_archive_title', function ($title) {
+    return is_category() ? single_cat_title('', false) : $title;
+}, 20);
