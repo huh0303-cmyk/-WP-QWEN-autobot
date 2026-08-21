@@ -78,6 +78,38 @@ def _build_query(topic, cfg):
     return q
 
 
+_STOPWORDS = {
+    "the", "and", "for", "with", "from", "that", "this", "was", "were",
+    "his", "her", "its", "into", "over", "under", "about", "when", "how",
+    "why", "what", "who", "which", "became", "become", "becomes", "first",
+    "day", "the", "and",
+}
+
+
+def _extract_keywords(topic):
+    """검색 결과가 실제로 주제와 관련 있는지 확인하기 위한 핵심 단어 추출.
+    2026-08-21 사고: 릴리번스 검증 없이 archive.org 전문검색 결과를 그대로
+    받아쓰다 보니 "Hawaii becomes the" 검색에 Baywatch/사탕광고/감옥 다큐 같은
+    완전 무관한 영상이 섞여 들어감(느슨한 단어 매칭이라 "the" 하나로도 걸림).
+    제목/연도/날짜 숫자 등 topic의 고유명사·핵심어가 최소 하나는 클립 제목이나
+    설명에 실제로 들어있어야 통과시킨다."""
+    words = re.findall(r"[A-Za-z']+|\d+", topic)
+    keywords = set()
+    for w in words:
+        wl = w.lower()
+        if wl in _STOPWORDS or len(w) < 3:
+            continue
+        keywords.add(wl)
+    return keywords
+
+
+def _is_relevant(doc, keywords):
+    if not keywords:
+        return True
+    haystack = f"{doc.get('title') or ''} {doc.get('description') or ''}".lower()
+    return any(kw in haystack for kw in keywords)
+
+
 def search_archive_org(topic, cfg, count, max_retries=3):
     """2026-08-17: 여러 채널이 짧은 간격으로 동시에 검색하면 archive.org가
     가끔 정상 JSON이 아닌 응답(과부하/일시 오류)을 줘서 KeyError로 전체가
@@ -245,11 +277,24 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=40):
         attempts.append(core_words)
     attempts.append(_FALLBACK_QUERY.get(channel_key, channel_key))
 
+    # 2026-08-21: topic/core_words 단계는 주제와 실제로 무관한 결과(느슨한 텍스트
+    # 매칭 때문에 Baywatch, 사탕광고, 감옥 다큐 같은 게 섞여 들어옴)를 걸러내야
+    # 함 — 클립 제목/설명에 주제 핵심어가 하나도 없으면 버린다. 마지막 단계인
+    # 채널 도메인 폴백 쿼리(_FALLBACK_QUERY)는 애초에 주제-불특정 범용 키워드라
+    # 이 필터를 적용하면 안 됨(항상 걸러져서 빈 결과가 됨).
+    keywords = _extract_keywords(topic)
     docs = []
     used_query = None
-    for q in attempts:
-        docs = search_archive_org(q, cfg, n_target * 3)
-        if docs:
+    for i, q in enumerate(attempts):
+        is_fallback_tier = (i == len(attempts) - 1)
+        found = search_archive_org(q, cfg, n_target * 3)
+        if not is_fallback_tier:
+            before = len(found)
+            found = [d for d in found if _is_relevant(d, keywords)]
+            if before and not found:
+                log(f"   (검색은 됐지만 주제와 무관한 결과뿐이라 버림: \"{q}\", {before}건 전부 제외)")
+        if found:
+            docs = found
             used_query = q
             break
         log(f"   (검색 결과 없음: \"{q}\" — 범위를 넓혀 재시도)")
