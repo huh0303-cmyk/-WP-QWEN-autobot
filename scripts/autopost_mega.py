@@ -1114,40 +1114,40 @@ SITE_PERSONA = {
         "cta": "Continue through the newcomer checklist"
     },
     "https://koreanews365.com": {
-        "persona_ko": "한국 정책뉴스 편집 데스크.",
-        "scope": "정부 발표와 공식 통계에 기반한 한국 정책·경제 뉴스 해설",
-        "tone": "간결한 역피라미드 기사체. 사실·발표·해설을 구분하고 독자 취재를 주장하지 않습니다.",
+        "persona_ko": "Koreanews365 한국신문 편집국. 국내 주요 언론의 공개 헤드라인과 공식 발표를 모니터링하고, 사실확인·추가 자료·독자적 해설을 더해 한국어 기사를 제작합니다.",
+        "scope": "한국 독자를 위한 국내외 속보·정치·경제·사회 주요 뉴스. 조선일보·연합뉴스 등 허가된 공개 피드와 정부·공공기관 원문을 출발점으로 사용하되 주간 기사의 30% 이상은 자체 취재·독자 분석 기사로 구성",
+        "tone": "한국 인터넷신문 기사체. 사실·타사 보도·편집국 분석을 명확히 구분하고 역피라미드 구조로 씁니다. 원문을 문장 단위로 치환하는 기사 세탁은 금지합니다.",
         "structure": [
-            "핵심 사실",
-            "발표 주체와 시점",
-            "배경",
-            "공식 데이터",
-            "영향",
-            "확인되지 않은 부분",
-            "원문 출처"
+            "제목과 리드: 새로 확인한 핵심 사실",
+            "발생 시점·장소·주체",
+            "복수 출처 대조",
+            "공식 자료 또는 자체 분석",
+            "독자에게 미치는 영향",
+            "확인된 사실과 미확인 사항",
+            "원문 출처 링크·작성 시각·수정 이력"
         ],
         "min_chars": 2000,
         "tables": 1,
         "lang": "ko",
-        "cta": "관련 정책뉴스 보기"
+        "cta": "관련 한국신문 기사 보기"
     },
     "https://theseouljournal.com": {
-        "persona_en": "Seoul Urban Life editorial desk.",
-        "scope": "Evidence-based essays on Seoul neighborhoods, public space and changing urban life",
-        "tone": "Observational essay voice grounded in verifiable scenes and sources, without claiming the writer personally lives in Seoul.",
+        "persona_en": "The Seoul Journal English News Desk. It monitors licensed or public headline feeds from major international outlets such as CNN and The New York Times, then produces original English reporting, context and analysis for a global audience.",
+        "scope": "English-language coverage of major world breaking news and top stories, with an Asia or Korea relevance angle where material. Source headlines are leads, not article text to disguise or substitute.",
+        "tone": "Professional English newspaper style. Distinguish sourced facts, direct quotations and newsroom analysis. Never imitate a source article paragraph by paragraph.",
         "structure": [
-            "Documented scene",
-            "Urban context",
-            "Data or policy",
-            "Public voices from attributable sources",
-            "Interpretation",
-            "Limitations",
-            "Source note"
+            "Original headline and concise lede",
+            "What happened and when",
+            "Facts confirmed across multiple sources",
+            "Primary-source or official-record context",
+            "Why it matters internationally and to Asia or Korea",
+            "What remains unconfirmed",
+            "Linked source note, publication time and correction record"
         ],
         "min_chars": 2200,
         "tables": 1,
         "lang": "en",
-        "cta": "Read the related Seoul urban essay"
+        "cta": "Read the related English news coverage"
     }
 }
 
@@ -1492,11 +1492,9 @@ def crawl_rss_news(lang="ko", site_url=""):
     def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
 
     RSS_KO = [("조선일보","https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml"),
-               ("연합뉴스","https://www.yonhapnewstv.co.kr/category/news/headline/feed/"),
-               ("경향신문","https://www.khan.co.kr/rss/rssdata/total_news.xml")]
-    RSS_EN = [("Korea Herald","http://www.koreaherald.com/rss/020100000000.xml"),
-               ("Korea JoongAng Daily","https://koreajoongangdaily.joins.com/rss/feed"),
-               ("The Korea Times","https://www.koreatimes.co.kr/www/rss/rss.xml")]
+               ("연합뉴스TV","https://www.yonhapnewstv.co.kr/category/news/headline/feed/")]
+    RSS_EN = [("CNN","http://rss.cnn.com/rss/edition.rss"),
+               ("The New York Times","https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml")]
 
     sources = RSS_KO if lang=="ko" else RSS_EN
     random.shuffle(sources)
@@ -1508,8 +1506,9 @@ def crawl_rss_news(lang="ko", site_url=""):
             for it in soup.find_all('item'):
                 t = re.sub(r'<[^>]+>','', it.title.text.strip() if it.title else "")
                 d = re.sub(r'<[^>]+>','', it.description.text.strip() if it.description else "")
+                link = it.link.text.strip() if it.link else ""
                 if t and len(t)>=5 and not is_dup(t):
-                    candidates.append((t, d, src))
+                    candidates.append((t, d, src, link))
         except: pass
 
     if candidates:
@@ -1584,6 +1583,14 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
     #   헤드라인이 본문 첫 문장·태그에 통째로 복붙되는 문제가 생긴다(제보로 확인됨).
     #   뉴스모드는 별도 지시문을 쓴다.
     is_news = mode in ("news", "news_en")
+    news_integrity_note = ""
+    if is_news:
+        news_integrity_note = (
+            "\n- NEWSROOM RULE: use the source headline only as a reporting lead. Do not copy, translate, spin, or paraphrase the source article paragraph by paragraph. Build the article from independently verified facts, primary records, and at least one additional source. Keep direct quotations short, exact, attributed, and necessary. Never bypass a paywall. Clearly label analysis and unresolved claims."
+            if lang != "ko" else
+            "\n- 편집국 규칙: 타사 헤드라인은 취재 단서로만 사용합니다. 원문 기사를 문단별로 복사·번역·단어 치환·재서술하지 않습니다. 공식 원문과 최소 1개의 추가 출처로 사실을 독립 확인하고, 직접 인용은 짧고 정확하게 출처를 표시합니다. 유료벽을 우회하지 않으며 분석과 미확인 주장을 명확히 구분합니다."
+        )
+
     if lang == "ko":
         keyword_rule = ("- 사건 소개: 이 헤드라인이 다루는 사건을 첫 문장에서 소개하되, "
                          "헤드라인 문장을 그대로 반복하지 말고 다른 표현으로 풀어서 쓸 것. "
@@ -1648,7 +1655,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
   마무리는 "오늘부터 시작해 보세요" 식 강요 대신 "작은 변화가 큰 결과로 이어질 수 있습니다"처럼
   담백하게 격려하는 정도로.
 - 전문용어: 등장할 때마다 괄호로 쉽게 풀어서 설명할 것
-{keyword_rule}
+{keyword_rule}{news_integrity_note}
 - 통계/출처: 실제로 근거 있는 수치나 기관명을 알고 있을 때만 "(KOSIS, 2026)" 같은 형식으로
   자연스럽게 인용. 억지로 개수를 채우려고 애매하거나 지어낸 수치를 넣지 말 것 —
   근거 없는 통계보다 통계가 아예 없는 게 낫다.
@@ -2700,11 +2707,14 @@ def process_one(site, keyword):
     print(f"\n  🖊  [{theme}] {keyword[:50]} | {reporter['name']}")
 
     news_source = None
+    news_source_url = None
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
+        if isinstance(kw_tuple,tuple) and len(kw_tuple)>=4:
+            news_source_url=kw_tuple[3]
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(10, 13)
@@ -2777,10 +2787,17 @@ def process_one(site, keyword):
     #   누락되거나 표현이 매번 달라질 수 있어, 실제 RSS 원문 출처가 있을 때만
     #   코드가 본문 끝에 고정 문구를 확정 삽입한다(제목/의학디스클레이머와 동일 원칙).
     if mode in ("news","news_en") and news_source:
-        if lang=="ko":
-            body += f'<p><em>※ 이 기사는 {news_source}의 보도를 참고하여 재구성되었습니다.</em></p>'
+        safe_url = news_source_url if news_source_url and news_source_url.startswith(("http://","https://")) else ""
+        if safe_url and lang=="ko":
+            source_label = f'<a href="{safe_url}" rel="nofollow noopener" target="_blank">{news_source} 원문</a>'
+        elif safe_url:
+            source_label = f'<a href="{safe_url}" rel="nofollow noopener" target="_blank">original {news_source} report</a>'
         else:
-            body += f'<p><em>※ This article was adapted based on reporting from {news_source}.</em></p>'
+            source_label = news_source
+        if lang=="ko":
+            body += f'<p><em>출처: {source_label}. 헤드라인과 공개 사실을 참고했으며, 본문은 Koreanews365 편집국이 독자적으로 작성했습니다.</em></p>'
+        else:
+            body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
 
     if best_score<SEO_TARGET:
         print(f"  🔧 {best_score}점 → post-processing")
