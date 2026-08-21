@@ -2,6 +2,12 @@ name: Deploy The Seoul Journal dashboard
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/theseouljournal_newsroom_dashboard.php
+      - scripts/deploy_theseouljournal_dashboard.py
+      - .github/workflows/seouljournal-dashboard-deploy.yml
 
 permissions:
   contents: read
