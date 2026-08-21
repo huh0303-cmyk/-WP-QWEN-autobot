@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Guarded install/activation of Twenty Twenty-Five through the authenticated Code Snippets REST API."""
+"""Guarded install/activation of the free Newsup theme for Koreanews365."""
 from __future__ import annotations
 import argparse,json,os,time
 from datetime import datetime,timezone
@@ -7,13 +7,13 @@ from pathlib import Path
 import requests
 
 USER=os.getenv("WP_USER","").strip() or "huh0303@gmail.com"
-ENV={"koreanews365.com":"KOREANEWS365COM","theseouljournal.com":"THESEOULJOURNALCOM"}
-CONFIRM="ACTIVATE-TWENTY-TWENTY-FIVE"
-TARGET="twentytwentyfive"
+ENV={"koreanews365.com":"KOREANEWS365COM"}
+CONFIRM="ACTIVATE-NEWSUP-KOREANEWS"
+TARGET="newsup"
 PHP=r"""
 add_action('init', function () {
-    if (get_option('newsroom_theme_migration_v1') === 'done') { return; }
-    $slug = 'twentytwentyfive';
+    if (get_option('koreanews_newsup_migration_v1') === 'done') { return; }
+    $slug = 'newsup';
     $theme = wp_get_theme($slug);
     if (!$theme->exists()) {
         require_once ABSPATH . 'wp-admin/includes/theme.php';
@@ -21,21 +21,21 @@ add_action('init', function () {
         require_once ABSPATH . 'wp-admin/includes/theme-install.php';
         $info = themes_api('theme_information', array('slug' => $slug));
         if (is_wp_error($info) || empty($info->download_link)) {
-            update_option('newsroom_theme_migration_v1', 'theme-api-error');
+            update_option('koreanews_newsup_migration_v1', 'theme-api-error');
             return;
         }
         $upgrader = new Theme_Upgrader(new Automatic_Upgrader_Skin());
         $result = $upgrader->install($info->download_link);
         if (is_wp_error($result) || !$result) {
-            update_option('newsroom_theme_migration_v1', 'install-error');
+            update_option('koreanews_newsup_migration_v1', 'install-error');
             return;
         }
     }
     switch_theme($slug);
     if (get_stylesheet() === $slug) {
-        update_option('newsroom_theme_migration_v1', 'done');
+        update_option('koreanews_newsup_migration_v1', 'done');
     } else {
-        update_option('newsroom_theme_migration_v1', 'activate-error');
+        update_option('koreanews_newsup_migration_v1', 'activate-error');
     }
 }, 1);
 """
@@ -54,8 +54,8 @@ def migrate(site):
     pw=os.getenv(ENV[site],"").strip()
     if not pw: raise RuntimeError(f"Missing secret {ENV[site]}")
     before=active_theme(site,pw)
-    payload={"name":"Newsroom theme migration v1","desc":"One-time guarded TT5 activation; removed after verification.",
-      "code":PHP,"scope":"global","active":True,"priority":1,"tags":["newsroom","migration"]}
+    payload={"name":"Koreanews Newsup migration v1","desc":"One-time guarded Newsup activation; removed after verification.",
+      "code":PHP,"scope":"global","active":True,"priority":1,"tags":["koreanews","newsup","migration"]}
     created=call("POST",site,"code-snippets/v1/snippets",pw,payload)
     sid=created.get("id") or created.get("snippet",{}).get("id")
     if not sid: raise RuntimeError(f"{site}: snippet id missing in {created}")
