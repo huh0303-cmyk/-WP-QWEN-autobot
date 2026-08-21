@@ -11,6 +11,44 @@ add_action('wp_head', function () {
     if (!is_home()) return;
     ?>
     <style id="kn365-home-two-column">
+      html,body,.wrapper,.container-fluid.home,.mg-posts-sec,.mg-posts-sec-inner{
+        background:#fff!important;
+      }
+      .mg-nav-widget-area-back,.mg-nav-widget-area-back .overlay,.mg-headwidget,.mg-menu-full,.navbar-wp{
+        background-color:#fff!important;
+      }
+      .bn_title{
+        width:142px!important;
+        min-width:142px!important;
+        height:40px!important;
+        background:#cf142b!important;
+      }
+      .bn_title .title{
+        display:flex!important;
+        flex-direction:row!important;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:8px!important;
+        width:142px!important;
+        min-width:142px!important;
+        height:40px!important;
+        margin:0!important;
+        color:#fff!important;
+        white-space:nowrap!important;
+      }
+      .bn_title .kn365-breaking-word{
+        display:inline-block!important;
+        width:auto!important;
+        height:auto!important;
+        color:#fff!important;
+        font-size:15px!important;
+        font-weight:800!important;
+        line-height:1!important;
+        letter-spacing:.14em!important;
+        opacity:1!important;
+        visibility:visible!important;
+      }
+      .bn_title .kn365-breaking-bolt{display:inline-block!important;font-size:17px!important;line-height:1!important}
       .mg-posts-sec-inner{
         display:grid!important;
         grid-template-columns:repeat(2,minmax(0,1fr))!important;
