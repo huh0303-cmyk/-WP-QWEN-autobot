@@ -1,0 +1,28 @@
+name: "(1회성) Koreanews 비공개글 상위 30개 공개전환"
+
+on:
+  workflow_dispatch:
+    inputs:
+      top_n:
+        description: "공개 전환할 개수"
+        required: false
+        default: "30"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - env:
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/publish_top_koreanews_private_posts.py "${{ github.event.inputs.top_n || '30' }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: koreanews-publish-result-${{ github.run_id }}
+          path: koreanews_publish_result.json
+          retention-days: 14
