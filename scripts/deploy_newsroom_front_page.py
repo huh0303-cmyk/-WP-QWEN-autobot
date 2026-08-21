@@ -112,8 +112,7 @@ def main():
     if a.confirm!=CONFIRM: raise SystemExit(f"Use --confirm {CONFIRM}")
     sites=list(ENV) if a.site=="ALL" else [a.site]
     out={"schema":1,"applied_at":datetime.now(timezone.utc).isoformat(),"results":[deploy(s) for s in sites]}
-    Path(a.receipt).write_text(json.dumps(out,ensure_ascii=False,indent=2)+"
-",encoding="utf-8")
+    Path(a.receipt).write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
     print(json.dumps(out,ensure_ascii=False,indent=2))
 
 if __name__=="__main__":main()
