@@ -4,7 +4,7 @@
  * Paste into the Code Snippets plugin without an opening PHP tag.
  */
 
-function kn365_kbo_standings_v2() {
+function kn365_kbo_standings_v4() {
     $cached = get_transient('kn365_kbo_standings_v1');
     if (is_array($cached) && count($cached) === 10) {
         return $cached;
@@ -63,7 +63,7 @@ add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
-    $standings = kn365_kbo_standings_v2();
+    $standings = kn365_kbo_standings_v4();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -92,14 +92,29 @@ add_action('wp_footer', function () {
       <section class="kn365-panel kn365-market">
         <div class="kn365-panel-head"><h2>주요 시세</h2><span>지연 시세</span></div>
         <?php
+        $korean_stocks = array(
+            array('s' => 'KRX:005930', 'd' => '삼성전자'),
+            array('s' => 'KRX:000660', 'd' => 'SK하이닉스'),
+            array('s' => 'KRX:005380', 'd' => '현대차'),
+            array('s' => 'KRX:017670', 'd' => 'SK텔레콤'),
+            array('s' => 'KRX:068270', 'd' => '셀트리온'),
+        );
+        ?>
+        <div class="kn365-market-group kn365-korean-quotes">
+          <h3>한국 주식 · KRW</h3>
+          <?php foreach ($korean_stocks as $stock) : ?>
+            <div class="kn365-korean-quote" aria-label="<?php echo esc_attr($stock['d']); ?> 현재가와 등락률">
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+              <?php echo wp_json_encode(array(
+                  'symbol' => $stock['s'], 'width' => '100%', 'locale' => 'kr',
+                  'colorTheme' => 'light', 'isTransparent' => true,
+              ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+              </script>
+            </div>
+          <?php endforeach; ?>
+        </div>
+        <?php
         $market_groups = array(
-            '한국 주식' => array(
-                array('s' => 'KRX:005930', 'd' => '삼성전자'),
-                array('s' => 'KRX:000660', 'd' => 'SK하이닉스'),
-                array('s' => 'KRX:005380', 'd' => '현대차'),
-                array('s' => 'KRX:017670', 'd' => 'SK텔레콤'),
-                array('s' => 'KRX:068270', 'd' => '셀트리온'),
-            ),
             '미국 주식 · USD' => array(
                 array('s' => 'NASDAQ:AAPL', 'd' => 'Apple'),
                 array('s' => 'NASDAQ:MSFT', 'd' => 'Microsoft'),
@@ -157,6 +172,7 @@ add_action('wp_footer', function () {
       .kn365-kbo tbody tr:nth-child(6) td:first-child::before{content:"가을야구 커트라인";position:absolute;top:2px;left:0;width:240px;text-align:center;color:#c91421;font-size:10px;font-weight:800;letter-spacing:.08em}
       .kn365-source,.kn365-disclaimer,.kn365-muted{display:block;margin:9px 0 0;font-size:10px;color:#7a8495}.kn365-source{text-decoration:none}
       .kn365-market-group{margin:0 0 14px}.kn365-market-group h3{margin:0 0 5px!important;font-size:13px!important;color:#26334a;letter-spacing:.04em}
+      .kn365-korean-quote{height:116px;margin:0;border-bottom:1px solid #edf0f4;overflow:hidden}.kn365-korean-quote:last-child{border-bottom:0}
       .kn365-world ul{list-style:none;margin:0;padding:0}.kn365-world li{display:grid;grid-template-columns:1fr 58px 45px;gap:6px;padding:7px 2px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-world time,.kn365-world .temp{text-align:right;font-variant-numeric:tabular-nums}.kn365-world .temp{font-weight:700;color:#b5121b}
       @media(max-width:767px){.kn365-dashboard{margin-top:18px}.kn365-panel{border-radius:12px}}
     </style>
