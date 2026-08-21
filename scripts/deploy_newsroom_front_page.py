@@ -13,12 +13,12 @@ THEME="twentytwentyfive"
 
 DATA={
 "koreanews365.com":{
-"name":"한국신문","tag":"사실을 확인하고 맥락을 더하는 한국 뉴스","edition":"2026 · SEOUL",
+"name":"한국신문","tag":"한국뉴스 균형잡힌 정론지","edition":"2026 · SEOUL",
 "breaking":"주요 뉴스","latest":"최신 기사","more":"전체 기사 보기","read":"기사 읽기",
 "nav":[("속보","/category/breaking/"),("정치","/category/politics/"),("경제","/category/economy/"),("사회","/category/society/"),("국제","/category/world/")],
 "sections":[("정치","politics"),("경제","economy"),("사회","society"),("국제","world")],
 "footer":[("신문사 소개","/about/"),("편집 원칙","/editorial-standards/"),("정정·반론 보도","/corrections/"),("기사제보","/tips/"),("출처 및 저작권","/source-copyright-policy/")],
-"css":"--ink:#0B1F3A;--accent:#B42318;--wash:#EEF2F6;--serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif"
+"css":"--ink:#0B1F3A;--accent:#B42318;--wash:#EEF2F6;--serif:'Noto Serif KR','Nanum Myeongjo','Batang',serif;--sans:'Noto Sans KR','Malgun Gothic',sans-serif"
 },
 "theseouljournal.com":{
 "name":"THE SEOUL JOURNAL","tag":"Korea in Context. Asia in Focus.","edition":"2026 · SEOUL",
@@ -68,7 +68,7 @@ def build(site,cats):
 :root{{{d["css"]}}}body{{font-family:var(--sans);color:var(--ink);background:#fff}}.wp-site-blocks{{padding:0!important}}
 .newsroom-wrap{{max-width:1240px;margin:auto;padding:0 24px}}.news-mast{{border-top:6px solid var(--ink);border-bottom:1px solid var(--ink);padding:18px 0 12px}}
 .news-topline{{display:flex;justify-content:space-between;font:700 12px var(--sans);letter-spacing:.08em;text-transform:uppercase}}
-.news-brand{{font:800 clamp(36px,7vw,76px)/1 var(--serif);text-align:center;margin:18px 0 8px;letter-spacing:-.04em}}
+.news-brand{{font:900 clamp(36px,7vw,76px)/1 var(--serif);text-align:center;margin:18px 0 8px;letter-spacing:-.04em}}
 .news-tag{{text-align:center;margin:0 0 16px;color:#4b5563}}.news-nav{{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;border-top:1px solid #ccd3db;padding-top:12px}}
 .news-nav a,.news-footer a,.desk-head a{{color:var(--ink);text-decoration:none;font-weight:700}}.breaking{{margin:20px 0;background:var(--ink);color:#fff;padding:10px 14px;font-weight:800;letter-spacing:.05em}}
 .news-lead .wp-block-post-template,.news-grid .wp-block-post-template{{list-style:none;padding:0;display:grid;gap:24px}}.news-lead .wp-block-post-template{{grid-template-columns:repeat(2,minmax(0,1fr))}}
