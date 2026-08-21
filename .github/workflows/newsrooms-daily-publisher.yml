@@ -1,14 +1,19 @@
-name: "Two Newsrooms — 5 Daily Editions"
+name: "Two Newsrooms — 3–10 Daily Editions"
 
 on:
   push:
     branches: [main]
   schedule:
-    # Five distributed editions per newsroom: 09:43, 12:17, 15:29, 18:41, 21:53 KST.
+    # Ten opportunities; a stable random daily cap and fresh-source gate decide publication.
+    - cron: "31 22 * * *"
     - cron: "43 0 * * *"
+    - cron: "8 2 * * *"
     - cron: "17 3 * * *"
+    - cron: "46 4 * * *"
     - cron: "29 6 * * *"
+    - cron: "6 8 * * *"
     - cron: "41 9 * * *"
+    - cron: "22 11 * * *"
     - cron: "53 12 * * *"
   workflow_dispatch:
     inputs:
