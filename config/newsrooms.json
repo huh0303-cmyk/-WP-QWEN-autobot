@@ -84,12 +84,28 @@
           "slug": "society"
         },
         {
-          "name": "국제",
+          "name": "글로벌",
           "slug": "world"
         },
         {
-          "name": "군사",
+          "name": "문화",
+          "slug": "culture"
+        },
+        {
+          "name": "금융",
+          "slug": "finance"
+        },
+        {
+          "name": "부동산",
+          "slug": "real-estate"
+        },
+        {
+          "name": "국방",
           "slug": "military"
+        },
+        {
+          "name": "Art",
+          "slug": "art"
         },
         {
           "name": "스포츠",
@@ -97,13 +113,16 @@
         }
       ],
       "primary_menu": [
-        "속보",
         "정치",
         "경제",
         "사회",
-        "국제",
-        "군사",
+        "문화",
+        "금융",
+        "부동산",
+        "국방",
+        "Art",
         "스포츠",
+        "글로벌",
         "기사제보",
         "신문사 소개"
       ],
