@@ -14,6 +14,7 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
 
 import os, sys, time, random, re, json, hashlib, base64
 import requests
+from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
@@ -212,16 +213,16 @@ AUTHOR_BY_SITE_DEF = {
         "bio": "Korea Newcomer Guide Desk. Source-checked information within this site's stated editorial scope."
     },
     "koreanews365.com": {
-        "name": "한국 정책뉴스 편집 데스크",
+        "name": "한국신문 편집국",
         "email": "editor@koreanews365.com",
         "slug": "koreanews365-com-desk",
-        "bio": "한국 정책뉴스 편집 데스크. Source-checked information within this site's stated editorial scope."
+        "bio": "한국신문 편집국. 공식 자료와 복수 출처를 확인해 보도합니다."
     },
     "theseouljournal.com": {
-        "name": "Seoul Urban Life Desk",
+        "name": "SJ Editor",
         "email": "editor@theseouljournal.com",
         "slug": "theseouljournal-com-desk",
-        "bio": "Seoul Urban Life Desk. Source-checked information within this site's stated editorial scope."
+        "bio": "The Seoul Journal editorial desk. Source-checked reporting with Korea and Asia in context."
     }
 }
 AUTHOR_BY_SITE = AUTHOR_BY_SITE_DEF
@@ -427,28 +428,30 @@ THEME_CATEGORY_MAP = {
         (["소화","위장","장","변비","대장"],"소화기건강"),
         (["간","지방간","간염","간수치"],"간·소화기"),
     ]},
-    "한국 뉴스": {"default":"국제-INTERNATIONAL","keyword_map":[
-        (["정치","대통령","국회","선거","여당","야당","탄핵"],"정치-POLITICS"),
-        (["경제","금리","물가","GDP","수출","무역","코스피"],"경제-ECONOMY"),
-        (["기업","삼성","현대","SK","LG","스타트업","IPO"],"비즈니스-BUSINESS"),
-        (["사회","범죄","복지","노동","청년","저출산"],"사회-SOCIETY"),
-        (["기술","AI","반도체","IT","디지털","로봇"],"기술-TECH"),
-        (["문화","K-pop","드라마","영화","예술"],"문화-CULTURE"),
-        (["교육","대학","입시","유학","학교"],"교육-EDUCATION"),
-        (["부동산","아파트","주택","집값","전세"],"부동산-REALESTATE"),
-        (["국제","미국","중국","일본","EU","UN","외교","북한"],"국제-INTERNATIONAL"),
+    "한국 뉴스": {"default":"글로벌 (GLOBAL)","keyword_map":[
+        (["정치","대통령","국회","선거","여당","야당","탄핵"],"정치 (POLITICS)"),
+        (["경제","금리","물가","GDP","수출","무역","코스피","기업","삼성","현대","SK","LG"],"경제 (ECONOMY)"),
+        (["사회","범죄","복지","노동","청년","저출산"],"사회 (SOCIETY)"),
+        (["문화","K-pop","드라마","영화"],"문화 (CULTURE)"),
+        (["금융","주가","증시","은행"],"금융 (FINANCE)"),
+        (["부동산","아파트","주택","집값","전세"],"부동산 (REAL ESTATE)"),
+        (["국방","군사","군대","국방부"],"국방 (MILITARY)"),
+        (["예술","미술","전시"],"예술 (ART)"),
+        (["스포츠","야구","축구","올림픽"],"스포츠 (SPORTS)"),
+        (["국제","미국","중국","일본","EU","UN","외교","북한"],"글로벌 (GLOBAL)"),
     ]},
-    "Seoul Lifestyle": {"default":"LIFESTYLE","keyword_map":[
+    "Seoul Lifestyle": {"default":"Global","keyword_map":[
         (["politics","election","president","government"],"POLITICS"),
         (["economy","GDP","inflation","stock"],"ECONOMY"),
-        (["business","startup","company","CEO"],"BUSINESS"),
-        (["global","international","US","China","UN"],"GLOBAL"),
-        (["culture","K-pop","drama","music","food"],"CULTURE"),
-        (["education","university","student","scholarship"],"EDUCATION"),
-        (["tech","AI","semiconductor","IT"],"TECH"),
-        (["health","medical","wellness","beauty"],"HEALTH"),
-        (["travel","tourism","hiking","hotel"],"TRAVEL"),
-        (["expat","foreigner","visa","immigration"],"EXPAT LIFE"),
+        (["business","startup","company","CEO"],"Economy"),
+        (["global","international","US","China","UN"],"Global"),
+        (["culture","K-pop","drama","music","food"],"Culture"),
+        (["tech","AI","semiconductor","IT"],"Economy"),
+        (["finance","stock","bank","market"],"Finance"),
+        (["property","housing","real estate"],"Real Estate"),
+        (["military","defense","army","navy"],"Military"),
+        (["art","museum","exhibition"],"Art"),
+        (["sports","baseball","football","Olympics"],"Sports"),
     ]},
     "Finance": {"default":"Finance Tips","keyword_map":[
         (["stock","market","invest","dividend"],"Stock Market"),
@@ -1468,7 +1471,7 @@ def fetch_recent_wp_titles(site_url, wp_pass, count=None):
         while True:
             r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
                              params={"per_page": 100, "page": page, "orderby":"date","order":"desc",
-                                     "_fields":"title","status":"publish"}, timeout=15)
+                                     "_fields":"title,content","status":"publish"}, timeout=15)
             if r.status_code != 200: break
             batch = r.json()
             if not isinstance(batch, list) or not batch: break
@@ -1479,6 +1482,9 @@ def fetch_recent_wp_titles(site_url, wp_pass, count=None):
                 if t:
                     titles.add(t)
                     titles.add(_title_dup_key(t))
+                content = p.get("content", {}).get("rendered", "") if isinstance(p.get("content"), dict) else ""
+                for href in re.findall(r'href=["\'](https?://[^"\']+)', content, re.IGNORECASE):
+                    titles.add("source:" + href.split("#", 1)[0].rstrip("/"))
             if len(batch) < 100: break
             page += 1
     except: pass
@@ -1507,7 +1513,17 @@ def crawl_rss_news(lang="ko", site_url=""):
                 t = re.sub(r'<[^>]+>','', it.title.text.strip() if it.title else "")
                 d = re.sub(r'<[^>]+>','', it.description.text.strip() if it.description else "")
                 link = it.link.text.strip() if it.link else ""
-                if t and len(t)>=5 and not is_dup(t):
+                raw_date = (it.pubDate.text.strip() if it.pubDate else "") or (it.find("dc:date").text.strip() if it.find("dc:date") else "")
+                recent = True
+                if raw_date:
+                    try:
+                        published = parsedate_to_datetime(raw_date) if "," in raw_date else datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
+                        if published.tzinfo is None: published = published.replace(tzinfo=timezone.utc)
+                        recent = datetime.now(timezone.utc) - published.astimezone(timezone.utc) <= timedelta(hours=72)
+                    except Exception:
+                        recent = False
+                source_key = "source:" + link.split("#", 1)[0].rstrip("/") if link else ""
+                if t and len(t)>=5 and recent and not is_dup(t) and (not source_key or source_key not in cache):
                     candidates.append((t, d, src, link))
         except: pass
 
@@ -1515,14 +1531,10 @@ def crawl_rss_news(lang="ko", site_url=""):
         ch = random.choice(candidates)
         used.add(ch[0].strip().lower())
         print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
-        return ch[0], ch[1], ch[2]
+        return ch
 
-    pool = [x for x in fallback if not is_dup(x[0])] or fallback
-    ch = random.choice(pool)
-    used.add(ch[0].strip().lower())
-    # ★ 폴백 주제는 특정 외부 보도를 재가공한 게 아니라 자체 생성 상시주제라
-    #   출처 표기 대상이 아님(source=None)
-    return ch[0], ch[1], None
+    print(f"   NEWS SOURCE GATE: no eligible story published within 72 hours for lang={lang}")
+    return "", "", None, ""
 
 # ============================================================
 # ★ 구성표 숫자 랜덤화 — "FAQ 5문항"처럼 매번 똑같은 개수로 고정돼 있으면
@@ -1553,7 +1565,8 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
     p = SITE_PERSONA.get(url, {})
     min_chars  = p.get("min_chars", 2200)
     tables_req = p.get("tables", 1)
-    structure  = randomize_structure_counts(p.get("structure", []))\n    scope      = p.get("scope", theme)
+    structure  = randomize_structure_counts(p.get("structure", []))
+    scope      = p.get("scope", theme)
 
     if lang == "ko":
         persona = p.get("persona_ko","전문 칼럼니스트")
@@ -2708,6 +2721,7 @@ def process_one(site, keyword):
 
     news_source = None
     news_source_url = None
+    news_source_summary = None
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
@@ -2716,12 +2730,24 @@ def process_one(site, keyword):
             return False
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
+        if isinstance(kw_tuple,tuple) and len(kw_tuple)>=2:
+            news_source_summary=kw_tuple[1]
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=4:
             news_source_url=kw_tuple[3]
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(10, 13)
     base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count)
+    if mode in ("news", "news_en"):
+        base_prompt += (
+            "\n\nSOURCE LEAD FOR FACTUAL GROUNDING:\n"
+            f"- Publisher: {news_source or 'Primary-source lead'}\n"
+            f"- Source URL: {news_source_url or 'not supplied'}\n"
+            f"- Feed summary: {news_source_summary or 'No summary supplied'}\n"
+            "Use only facts supported by this lead or clearly identified primary records. "
+            "Do not invent quotations, statistics, witnesses, dates, locations, reactions, or additional sources. "
+            "If the available facts are limited, write a concise brief rather than padding the article."
+        )
     prompt=base_prompt
     best_score=0; best_result=None
 
