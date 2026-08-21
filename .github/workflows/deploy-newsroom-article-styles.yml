@@ -1,0 +1,26 @@
+name: "Deploy Newsroom Article Styles"
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[newsroom-article-style]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Koreanews article typography
+        env:
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/deploy_koreanews_sidebar_dashboard.py
+      - name: Seoul Journal article typography
+        env:
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/deploy_theseouljournal_dashboard.py

@@ -924,8 +924,9 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Next scheduled milestone"
         ],
-        "min_chars": 2000,
-        "tables": 1,
+        "min_chars": 1500,
+        "max_chars": 2000,
+        "tables": 0,
         "lang": "en",
         "cta": "See the related verified entertainment brief"
     },
@@ -1159,7 +1160,7 @@ SITE_PERSONA = {
         "min_chars": 2000,
         "tables": 1,
         "lang": "ko",
-        "cta": "관련 한국신문 기사 보기"
+        "cta": ""
     },
     "https://theseouljournal.com": {
         "persona_en": "The Seoul Journal English News Desk. It monitors no-contact CC BY feeds, eligible VOA material, and primary public records, then produces original English reporting, context and analysis.",
@@ -1174,10 +1175,11 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Linked source note, publication time and correction record"
         ],
-        "min_chars": 2200,
-        "tables": 1,
+        "min_chars": 1500,
+        "max_chars": 2000,
+        "tables": 0,
         "lang": "en",
-        "cta": "Read the related English news coverage"
+        "cta": ""
     }
 }
 
@@ -1629,6 +1631,29 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
             if lang != "ko" else
             "\n- 편집국 규칙: 타사 헤드라인은 취재 단서로만 사용합니다. 원문 기사를 문단별로 복사·번역·단어 치환·재서술하지 않습니다. 공식 원문과 최소 1개의 추가 출처로 사실을 독립 확인하고, 직접 인용은 짧고 정확하게 출처를 표시합니다. 유료벽을 우회하지 않으며 분석과 미확인 주장을 명확히 구분합니다."
         )
+        if lang == "ko":
+            return f"""[한국신문 뉴스룸 전용]\n역할: {persona}\n취재 단서: {keyword}\n편집 범위: {scope}\n
+- HTML은 p, h2, blockquote, ul, li만 사용한다.
+- 본문은 공백 제외 1,500~2,000자이며 2,000자를 절대 넘기지 않는다.
+- 역피라미드 구조: 핵심 사실 리드, 확인된 경위, 배경·맥락, 영향, 미확인 사항.
+- 첫 문단은 2~3문장, 각 문단은 1~3문장으로 짧게 쓴다. 소제목은 최대 2개다.
+- 표, FAQ, 체크리스트, 상담 CTA, 결론 요약을 쓰지 않는다.
+- '알아보겠습니다·추천·꿀팁·총정리·도움이 되셨다면' 같은 블로그 표현과 독자 질문을 금지한다.
+- 간결한 신문 기사체를 사용하고 과장, 감탄, 지어낸 인용·수치·인명·날짜·반응을 금지한다.
+- RSS 원문을 문단별로 번역·치환·재서술하지 않는다. 과거 연도와 수치를 현재 값으로 바꾸지 않는다.
+- 정보가 부족하면 억지로 늘리지 말고 확인된 범위의 짧은 기사로 쓴다.
+- 끝에 META_DESC: 100~140자와 TAGS: 짧은 명사 6~10개를 쓴다. FAQ와 TITLE은 출력하지 않는다."""
+        return f"""[THE SEOUL JOURNAL NEWSROOM ONLY]\nRole: {persona}\nReporting lead: {keyword}\nEditorial scope: {scope}\n
+- Use only p, h2, blockquote, ul and li HTML tags.
+- Body length is 1,500–2,000 characters excluding spaces; never exceed 2,000.
+- Use an inverted pyramid: concise lede, verified developments, context, significance, unresolved facts.
+- Write a 2–3 sentence lede and 1–3 sentence paragraphs. Use no more than two subheads.
+- No tables, FAQ, checklist, CTA or summary conclusion.
+- Ban blog language such as 'in this article', 'let's explore', 'tips', 'ultimate guide' and reader questions.
+- Use restrained newspaper prose. Never invent quotes, figures, dates, witnesses or reactions.
+- Do not translate, spin or paraphrase a source article paragraph by paragraph. Preserve historical dates exactly.
+- If facts are thin, write a shorter verified brief instead of padding.
+- End with META_DESC: 120–155 characters and TAGS: 6–10 short nouns. Do not output FAQ or TITLE."""
 
     if lang == "ko":
         keyword_rule = ("- 사건 소개: 이 헤드라인이 다루는 사건을 첫 문장에서 소개하되, "
@@ -2687,7 +2712,8 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     hero=build_img_html(images[:1],keyword)
     mid =build_img_html(images[1:2],keyword) if len(images)>1 else ""
     end =build_img_html(images[2:3],keyword) if len(images)>2 else ""
-    faq_html=build_faq_html(faq)
+    is_newsroom = site.get("mode") in ("news", "news_en")
+    faq_html="" if is_newsroom else build_faq_html(faq)
 
     h2ends=[m.end() for m in re.finditer(r'</h2>',body_html,re.IGNORECASE)]
     ins=-1
@@ -2701,10 +2727,10 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     final=hero+body_html[:ins]+(mid if mid else "")+body_html[ins:]+end+faq_html
 
-    cta_html = build_cta_html(url, site.get("lang","ko"))
+    cta_html = "" if is_newsroom else build_cta_html(url, site.get("lang","ko"))
     final += cta_html
 
-    author_bio_html = build_author_bio_html(url, site.get("lang","ko"), reporter, keyword)
+    author_bio_html = "" if is_newsroom else build_author_bio_html(url, site.get("lang","ko"), reporter, keyword)
     final += author_bio_html
 
     related_html = build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
@@ -2824,7 +2850,7 @@ def build_news_headline(keyword, lang):
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
-    p=SITE_PERSONA.get(url,{}); min_chars=p.get("min_chars",2200)
+    p=SITE_PERSONA.get(url,{}); min_chars=p.get("min_chars",2200); max_chars=p.get("max_chars")
 
     reporter=pick_reporter(site)
     print(f"\n  🖊  [{theme}] {keyword[:50]} | {reporter['name']}")
@@ -2889,7 +2915,7 @@ def process_one(site, keyword):
         if pre>best_score:
             best_score=pre; best_result=(body,title,meta,faq,tags)
 
-        if pre>=SEO_TARGET:
+        if pre>=quality_target:
             print(f"  ✅ {pre}점 달성"); break
 
         if attempt<MAX_REGEN:
@@ -2898,11 +2924,13 @@ def process_one(site, keyword):
             plain=re.sub(r'<[^>]+>','',body)
             blen=len(plain.replace(' ','').replace('\n',''))
             if blen<min_chars: issues.append(f"본문 {blen}자→{min_chars}자 증량")
-            if count_stats(body)<5: issues.append("통계 5개 이상 추가")
-            if len(re.findall(r'\([^)]{3,40},\s*20[0-9]{2}\)',body))<3: issues.append("출처 괄호 3개 이상")
-            if len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))<4: issues.append("내부링크 4개 이상")
-            if not re.search(r'<table[\s>]',body,re.IGNORECASE): issues.append("<table> 1개 이상")
-            if len(re.findall(r'<h2[\s>]',body,re.IGNORECASE))<4: issues.append("h2 4개 이상")
+            if max_chars and blen>max_chars: issues.append(f"본문 {blen}자→{max_chars}자 이하로 축약")
+            if mode not in ("news", "news_en"):
+                if count_stats(body)<5: issues.append("통계 5개 이상 추가")
+                if len(re.findall(r'\([^)]{3,40},\s*20[0-9]{2}\)',body))<3: issues.append("출처 괄호 3개 이상")
+                if len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))<4: issues.append("내부링크 4개 이상")
+                if not re.search(r'<table[\s>]',body,re.IGNORECASE): issues.append("<table> 1개 이상")
+                if len(re.findall(r'<h2[\s>]',body,re.IGNORECASE))<4: issues.append("h2 4개 이상")
             if len(meta)<100: issues.append(f"META_DESC {len(meta)}자→130자 이상")
             suffix=f"\n\n[SEO {pre}점 미달 보완]\n"+"".join(f"{i+1}. {x}\n" for i,x in enumerate(issues))
             suffix+="\n위 항목 모두 충족하여 처음부터 다시 작성."
@@ -2911,6 +2939,10 @@ def process_one(site, keyword):
             time.sleep(5)
 
     body,title,meta,faq,tags=best_result
+    newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    if mode in ("news","news_en") and max_chars and newsroom_len>max_chars:
+        print(f"  ⛔ 뉴스 본문 {newsroom_len}자 > {max_chars}자 → 발행 스킵")
+        return False
 
     # ★ 발행 직전 최종 방어선: '#' 잔재 강제 제거 (재발 방지 안전장치)
     title = strip_hash_artifacts(title)
@@ -2938,7 +2970,7 @@ def process_one(site, keyword):
         else:
             body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
 
-    if best_score<quality_target:
+    if best_score<quality_target and mode not in ("news", "news_en"):
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 

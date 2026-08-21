@@ -293,6 +293,9 @@ add_action('wp_footer', function () {
     </aside>
     <style>
       #secondary .widget {display:none!important} #secondary{display:block!important}
+      body.single-post .entry-title{font-family:"Noto Serif KR","Nanum Myeongjo",serif!important;font-weight:800!important;letter-spacing:-.035em!important;line-height:1.35!important}
+      body.single-post .entry-content{font-family:"Noto Serif KR","Nanum Myeongjo",serif!important;font-size:18px!important;line-height:1.95!important;letter-spacing:-.012em!important;color:#202020!important}
+      body.single-post .entry-content p{margin:0 0 1.2em!important}body.single-post .entry-content h2{font-family:"Noto Serif KR","Nanum Myeongjo",serif!important;font-size:25px!important;line-height:1.45!important;margin:1.8em 0 .65em!important}
       .kn365-dashboard{display:grid;gap:16px;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#172033}
       .kn365-panel{background:#fff;border:1px solid #e4e9f1;border-radius:14px;box-shadow:0 7px 22px rgba(20,39,70,.07);padding:15px;overflow:hidden}
       .kn365-panel-head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #b5121b;margin:-2px 0 10px;padding:0 0 8px}
