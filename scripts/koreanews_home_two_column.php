@@ -57,6 +57,8 @@ add_action('wp_head', function () {
         margin:0!important;
       }
       .mg-posts-sec-inner>article.mg-posts-sec-post{
+        display:flex!important;
+        flex-direction:column!important;
         float:none!important;
         width:auto!important;
         max-width:none!important;
@@ -64,22 +66,40 @@ add_action('wp_head', function () {
         box-sizing:border-box!important;
         height:auto!important;
         margin:0!important;
-        padding:24px!important;
+        padding:0!important;
         align-items:flex-start!important;
         background:#fff!important;
         border:1px solid #e5e7eb!important;
         border-radius:14px!important;
+        overflow:hidden!important;
         box-shadow:0 7px 22px rgba(15,23,42,.055)!important;
+      }
+      .mg-posts-sec-inner>article.mg-posts-sec-post>.col-12.col-md-6{
+        flex:0 0 100%!important;
+        width:100%!important;
+        max-width:none!important;
+        padding:0!important;
+      }
+      .mg-posts-sec-inner>article .mg-post-thumb{
+        width:100%!important;
+        height:auto!important;
+        min-height:0!important;
+        aspect-ratio:16/9!important;
+        background-size:cover!important;
+        background-position:center!important;
+        border-radius:0!important;
       }
       .mg-posts-sec-inner>article .mg-sec-top-post{
         width:100%!important;
+        flex:0 0 auto!important;
+        padding:20px 22px 22px!important;
       }
       .mg-posts-sec-inner>article .title{font-size:21px!important;line-height:1.42!important}
       .mg-posts-sec-inner>article .mg-blog-meta{font-size:12px!important}
       .mg-posts-sec-inner>article .mg-content{font-size:15px!important;line-height:1.85!important}
       @media(max-width:820px){
         .mg-posts-sec-inner{grid-template-columns:1fr!important;gap:16px!important}
-        .mg-posts-sec-inner>article.mg-posts-sec-post{padding:20px!important}
+        .mg-posts-sec-inner>article .mg-sec-top-post{padding:18px!important}
       }
     </style>
     <?php
