@@ -86,10 +86,6 @@ add_action('wp_footer', function () {
     $mlb = sj26_mlb_standings();
     $quotes = sj26_market_quotes();
     $fx = sj26_fx_rates();
-    $post_dates = array();
-    foreach (get_posts(array('numberposts' => 30, 'post_status' => 'publish', 'orderby' => 'date', 'order' => 'DESC')) as $recent_post) {
-        $post_dates[(string) $recent_post->ID] = get_the_date('F j, Y', $recent_post);
-    }
     $cities = array(
         array('Seoul', 'Asia/Seoul', 37.5665, 126.9780), array('New York', 'America/New_York', 40.7128, -74.0060),
         array('London', 'Europe/London', 51.5072, -0.1276), array('Los Angeles', 'America/Los_Angeles', 34.0522, -118.2437),
@@ -143,10 +139,8 @@ add_action('wp_footer', function () {
       .newsroom-wrap h2,.newsroom-wrap h3,.newsroom-wrap .wp-block-post-title{font-family:Georgia,"Times New Roman",serif!important;word-break:normal!important;overflow-wrap:break-word!important}.sj26-layout{width:100%!important;max-width:none!important;margin:19px 0 0!important;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:30px;align-items:start;padding:0 28px 35px}.sj26-main{min-width:0}.sj26-main>.breaking{margin-left:0!important;margin-right:0!important}.sj26-dashboard{display:grid;gap:16px;position:sticky;top:16px;font-family:Inter,Arial,sans-serif}.sj26-panel{background:var(--sj-paper);border:1px solid #deddd8;padding:14px;box-shadow:0 4px 16px rgba(0,0,0,.045)}.sj26-panel header{display:flex;align-items:end;justify-content:space-between;border-bottom:2px solid var(--sj-ink);padding-bottom:7px;margin-bottom:9px}.sj26-panel h2{margin:0!important;font:700 19px Inter,Arial,sans-serif!important}.sj26-panel header span,.sj26-source{font-size:10px;color:var(--sj-muted)}.sj26-panel h3{margin:12px 0 5px!important;padding-bottom:3px;border-bottom:1px solid #e4e2dc;font:700 12px Inter,Arial,sans-serif!important;text-transform:uppercase;letter-spacing:.08em}.sj26-mlb ol{margin:0;padding:0;list-style:none}.sj26-mlb li{display:grid;grid-template-columns:1fr 45px 38px;gap:5px;padding:4px 2px;border-bottom:1px solid #efeee9;font-size:11px}.sj26-mlb li b,.sj26-mlb li em{text-align:right;font-style:normal;font-variant-numeric:tabular-nums}.sj26-quote{display:grid;grid-template-columns:minmax(90px,1fr) 83px 55px;gap:6px;align-items:center;padding:8px 2px;border-bottom:1px solid #ecebe6;font-size:11px}.sj26-quote strong small,.sj26-quote span small,.sj26-fx strong small{display:block;color:var(--sj-muted);font-size:9px;font-weight:400}.sj26-quote span,.sj26-quote b{text-align:right;font-variant-numeric:tabular-nums}.sj26-quote.up b{color:#18743c}.sj26-quote.down b{color:#b3261e}.sj26-fx>div{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid #ecebe6;font-size:12px}.sj26-fx>div>span{font-weight:700;font-variant-numeric:tabular-nums}.sj26-world ul{list-style:none;margin:0;padding:0}.sj26-world li{display:grid;grid-template-columns:1fr 52px 38px;gap:5px;padding:7px 2px;border-bottom:1px solid #ecebe6;font-size:11px}.sj26-world time,.sj26-world .temp{text-align:right;font-variant-numeric:tabular-nums}.sj26-world .temp{font-weight:700}.sj26-source{display:block;margin-top:8px;text-decoration:none}
       @media(max-width:1180px){.sj26-layout{grid-template-columns:1fr;padding:0 20px 28px}.sj26-dashboard{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.newsroom-wrap{width:100%!important}}
       @media(max-width:720px){.sj26-layout{padding:0 14px 24px}.sj26-dashboard{grid-template-columns:1fr}.news-mast{padding:8px 14px 0!important}.news-brand{font-size:48px!important;margin-top:11px!important}.news-tag{font-size:9px!important;letter-spacing:.11em!important}.news-nav{justify-content:flex-start!important;overflow-x:auto}}
-      <?php foreach ($post_dates as $post_id => $post_date) : ?>
-      body.wp-theme-mission-news .post-<?php echo esc_attr($post_id); ?> .post-byline{font-size:0!important}
-      body.wp-theme-mission-news .post-<?php echo esc_attr($post_id); ?> .post-byline:after{content:"SJ편집실 · <?php echo esc_attr($post_date); ?>";color:#6b6258;font:700 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.045em}
-      <?php endforeach; ?>
+      body.wp-theme-mission-news .post-byline{font-size:0!important}
+      body.wp-theme-mission-news .post-byline:after{content:"SJ편집실";color:#6b6258;font:700 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.045em}
     </style>
     <script id="sj26-newsroom-script">
       document.addEventListener('DOMContentLoaded',()=>{
