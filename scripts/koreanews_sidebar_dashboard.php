@@ -110,7 +110,6 @@ add_action('wp_footer', function () {
             '암호화폐 · USD' => array(
                 array('s' => 'COINBASE:BTCUSD', 'd' => 'Bitcoin'),
                 array('s' => 'COINBASE:ETHUSD', 'd' => 'Ethereum'),
-                array('s' => 'COINBASE:SOLUSD', 'd' => 'Solana'),
             ),
         );
         foreach ($market_groups as $group_title => $symbols) :
