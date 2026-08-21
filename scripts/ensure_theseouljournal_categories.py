@@ -19,6 +19,8 @@ def request(method, path, **kwargs):
 
 def main():
     if not PASSWORD: raise SystemExit("Missing THESEOULJOURNALCOM")
+    request("POST", "settings", json={"description": "Seoul’s Perspective, Connected to the World."})
+    print("updated site description")
     current = request("GET", "categories", params={"per_page": 100, "hide_empty": False})
     by_slug = {item["slug"]: item for item in current}
     for name, slug in CATEGORIES:

@@ -8,6 +8,8 @@ on:
       - scripts/theseouljournal_newsroom_dashboard.php
       - scripts/deploy_theseouljournal_dashboard.py
       - scripts/ensure_theseouljournal_categories.py
+      - scripts/fill_theseouljournal_featured_images.py
+      - scripts/fill_koreanews_featured_images.py
       - .github/workflows/seouljournal-dashboard-deploy.yml
 
 permissions:
@@ -32,3 +34,11 @@ jobs:
           WP_USER: ${{ secrets.WP_USER }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/ensure_theseouljournal_categories.py
+      - name: Fill missing licensed featured images
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_KEY }}
+        run: python scripts/fill_theseouljournal_featured_images.py

@@ -12,6 +12,7 @@ PEXELS = os.getenv("PEXELS_API_KEY", "").strip() or os.getenv("PEXELS_KEY", "").
 PIXABAY = os.getenv("PIXABAY_API_KEY", "").strip() or os.getenv("PIXABAY_KEY", "").strip()
 SESSION = requests.Session()
 SESSION.headers["User-Agent"] = "Koreanews365-ImageDesk/1.0"
+ALT_SUFFIX = "관련 뉴스 이미지"
 
 KEYWORDS = [
     (("옥수수", "버거", "피망", "식품"), "Korean food market vegetables"),
@@ -70,7 +71,7 @@ def upload(post, photo, index):
         headers={"Content-Disposition": f'attachment; filename="{filename}"', "Content-Type": "image/jpeg"}, data=content)
     response.raise_for_status()
     media_id = response.json()["id"]
-    alt = f"{title} 관련 뉴스 이미지"
+    alt = f"{title} {ALT_SUFFIX}"
     caption = f"{photo['credit']} · Source: {photo['page']}"
     api("POST", f"media/{media_id}", json={"alt_text": alt, "caption": caption,
         "description": f"{alt}. {caption}"})
