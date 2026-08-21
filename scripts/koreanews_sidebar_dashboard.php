@@ -4,8 +4,8 @@
  * Paste into the Code Snippets plugin without an opening PHP tag.
  */
 
-function kn365_kbo_standings_v7() {
-    $cached = get_transient('kn365_kbo_standings_v7');
+function kn365_kbo_standings_v8() {
+    $cached = get_transient('kn365_kbo_standings_v8');
     if (is_array($cached) && count($cached) === 10) {
         return $cached;
     }
@@ -92,13 +92,13 @@ function kn365_kbo_standings_v7() {
     unset($standing);
 
     if (10 === count($standings)) {
-        set_transient('kn365_kbo_standings_v7', $standings, DAY_IN_SECONDS);
+        set_transient('kn365_kbo_standings_v8', $standings, DAY_IN_SECONDS);
     }
     return $standings;
 }
 
-function kn365_korean_stock_quotes_v7() {
-    $cached = get_transient('kn365_korean_stock_quotes_v7');
+function kn365_korean_stock_quotes_v8() {
+    $cached = get_transient('kn365_korean_stock_quotes_v8');
     if (is_array($cached) && count($cached) === 5) {
         return $cached;
     }
@@ -132,7 +132,7 @@ function kn365_korean_stock_quotes_v7() {
         );
     }
     if (count($quotes) === 5) {
-        set_transient('kn365_korean_stock_quotes_v7', $quotes, 10 * MINUTE_IN_SECONDS);
+        set_transient('kn365_korean_stock_quotes_v8', $quotes, DAY_IN_SECONDS);
     }
     return $quotes;
 }
@@ -141,8 +141,8 @@ add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
-    $standings = kn365_kbo_standings_v7();
-    $korean_quotes = kn365_korean_stock_quotes_v7();
+    $standings = kn365_kbo_standings_v8();
+    $korean_quotes = kn365_korean_stock_quotes_v8();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -183,7 +183,7 @@ add_action('wp_footer', function () {
       </section>
 
       <section class="kn365-panel kn365-market">
-        <div class="kn365-panel-head"><h2>주요 시세</h2><span>지연 시세</span></div>
+        <div class="kn365-panel-head"><h2>주요 시세</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
         <?php
         ?>
         <div class="kn365-market-group kn365-korean-quotes">
@@ -199,7 +199,7 @@ add_action('wp_footer', function () {
                 <span class="change"><?php echo esc_html(sprintf('%+.2f%%', $quote['percent'])); ?></span>
               </div>
             <?php endforeach; ?>
-            <a class="kn365-source" href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">시세: Yahoo Finance · 10분 간격</a>
+            <a class="kn365-source" href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">시세: Yahoo Finance · 하루 1회 갱신</a>
           <?php else : ?>
             <p class="kn365-muted">한국 주식 시세를 불러오는 중입니다.</p>
           <?php endif; ?>
@@ -240,7 +240,7 @@ add_action('wp_footer', function () {
       </section>
 
       <section class="kn365-panel kn365-gold">
-        <div class="kn365-panel-head"><h2>국제 금 시세</h2><span>USD/oz · 지연 시세</span></div>
+        <div class="kn365-panel-head"><h2>국제 금 시세</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> · USD/oz</span></div>
         <div class="kn365-gold-quote" aria-label="트로이온스당 국제 금 현물가와 등락률">
           <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
           <?php echo wp_json_encode(array(
