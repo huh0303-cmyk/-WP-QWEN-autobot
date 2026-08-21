@@ -20,9 +20,10 @@ add_action('wp_head', function () {
       }
       .mg-posts-sec-inner>article.mg-posts-sec-post{
         float:none!important;
-        width:100%!important;
+        width:auto!important;
         max-width:none!important;
         min-width:0!important;
+        box-sizing:border-box!important;
         height:auto!important;
         margin:0!important;
         padding:24px!important;
