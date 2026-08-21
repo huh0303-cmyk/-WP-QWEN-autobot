@@ -137,12 +137,38 @@ function kn365_korean_stock_quotes_v9() {
     return $quotes;
 }
 
+function kn365_gold_quote_v1() {
+    $cached = get_transient('kn365_gold_quote_v1');
+    if (is_array($cached) && !empty($cached['usd_oz']) && !empty($cached['krw_don'])) {
+        return $cached;
+    }
+    $read_quote = static function ($symbol) {
+        $url = 'https://query1.finance.yahoo.com/v8/finance/chart/' . rawurlencode($symbol) . '?range=5d&interval=1d';
+        $response = wp_remote_get($url, array('timeout' => 7, 'user-agent' => 'Koreanews365/1.0'));
+        if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) return 0;
+        $payload = json_decode(wp_remote_retrieve_body($response), true);
+        return (float) ($payload['chart']['result'][0]['meta']['regularMarketPrice'] ?? 0);
+    };
+    $gold_usd_oz = $read_quote('GC=F');
+    $usd_krw = $read_quote('KRW=X');
+    if ($gold_usd_oz <= 0 || $usd_krw <= 0) return array();
+    $grams_per_troy_ounce = 31.1034768;
+    $grams_per_don = 3.75;
+    $quote = array(
+        'usd_oz' => $gold_usd_oz,
+        'krw_don' => ($gold_usd_oz / $grams_per_troy_ounce) * $grams_per_don * $usd_krw,
+    );
+    set_transient('kn365_gold_quote_v1', $quote, DAY_IN_SECONDS);
+    return $quote;
+}
+
 add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
     $standings = kn365_kbo_standings_v9();
     $korean_quotes = kn365_korean_stock_quotes_v9();
+    $gold_quote = kn365_gold_quote_v1();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -240,16 +266,17 @@ add_action('wp_footer', function () {
       </section>
 
       <section class="kn365-panel kn365-gold">
-        <div class="kn365-panel-head"><h2>국제 금 시세</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> · USD/oz</span></div>
-        <div class="kn365-gold-quote" aria-label="트로이온스당 국제 금 현물가와 등락률">
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
-          <?php echo wp_json_encode(array(
-              'symbol' => 'OANDA:XAUUSD', 'width' => '100%', 'locale' => 'kr',
-              'colorTheme' => 'light', 'isTransparent' => true,
-          ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
-          </script>
-        </div>
-        <p class="kn365-disclaimer">금 현물 1트로이온스당 미국 달러 기준입니다.</p>
+        <div class="kn365-panel-head"><h2>금 시세</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
+        <?php if ($gold_quote) : ?>
+          <dl class="kn365-gold-grid" aria-label="국제 금값과 한국 돈 단위 환산값">
+            <div class="primary"><dt>현재 시세 / oz</dt><dd>$<?php echo esc_html(number_format($gold_quote['usd_oz'], 2)); ?></dd></div>
+            <div><dt>1oz</dt><dd>31.1035g</dd></div>
+            <div><dt>1돈</dt><dd>3.75g</dd></div>
+            <div class="don"><dt>1돈 환산</dt><dd>약 <?php echo esc_html(number_format($gold_quote['krw_don'], 0)); ?>원</dd></div>
+          </dl>
+          <a class="kn365-source" href="https://finance.yahoo.com/quote/GC=F/" target="_blank" rel="noopener noreferrer">금·환율: Yahoo Finance · 하루 1회 갱신</a>
+        <?php else : ?><p class="kn365-muted">금 시세를 불러오는 중입니다.</p><?php endif; ?>
+        <p class="kn365-disclaimer">국제 금 선물과 USD/KRW 환율의 단순 환산값입니다. 부가세·거래 수수료·매장 가격은 다를 수 있습니다.</p>
       </section>
 
       <section class="kn365-panel kn365-world">
@@ -279,7 +306,11 @@ add_action('wp_footer', function () {
       .kn365-korean-quote-head,.kn365-korean-quote{display:grid;grid-template-columns:minmax(90px,1fr) 84px 58px;gap:7px;align-items:center}
       .kn365-korean-quote-head{padding:5px 3px;color:#8a93a2;font-size:10px}.kn365-korean-quote-head span:not(:first-child){text-align:right}
       .kn365-korean-quote{min-height:42px;padding:8px 3px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-korean-quote strong{font-size:12px;white-space:nowrap}.kn365-korean-quote .price,.kn365-korean-quote .change{text-align:right;font-variant-numeric:tabular-nums}.kn365-korean-quote .price{font-weight:700}.kn365-korean-quote.up .change{color:#d71920}.kn365-korean-quote.down .change{color:#1769d2}.kn365-korean-quote.flat .change{color:#657080}
-      .kn365-gold-quote{height:116px;overflow:hidden}
+      .kn365-gold-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0;border:1px solid #e8ebf0;border-radius:10px;overflow:hidden}
+      .kn365-gold-grid>div{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:9px 11px;border-right:1px solid #edf0f4;border-bottom:1px solid #edf0f4}
+      .kn365-gold-grid>div:nth-child(2n){border-right:0}.kn365-gold-grid>div:nth-last-child(-n+2){border-bottom:0}
+      .kn365-gold-grid dt{margin:0;color:#6f7888;font-size:11px;font-weight:600}.kn365-gold-grid dd{margin:0;color:#172033;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+      .kn365-gold-grid .primary{grid-column:1/-1;background:#fffaf0;border-right:0}.kn365-gold-grid .primary dd{color:#9b6500;font-size:16px}.kn365-gold-grid .don dd{color:#b5121b}
       .kn365-world ul{list-style:none;margin:0;padding:0}.kn365-world li{display:grid;grid-template-columns:1fr 58px 45px;gap:6px;padding:7px 2px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-world time,.kn365-world .temp{text-align:right;font-variant-numeric:tabular-nums}.kn365-world .temp{font-weight:700;color:#b5121b}
       @media(max-width:767px){.kn365-dashboard{margin-top:18px}.kn365-panel{border-radius:12px}}
     </style>
