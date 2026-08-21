@@ -1,0 +1,18 @@
+name: "(1회성) koreanews365 34개 글 공개전환 + GPT 대표이미지"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - env:
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/publish_and_gpt_image_koreanews_posts.py
