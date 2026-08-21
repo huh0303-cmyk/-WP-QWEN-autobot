@@ -2610,8 +2610,16 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     url=site["url"]; theme=site["theme"]
 
     author_id=get_or_create_wp_author(url,pw,reporter)
-    cat_id=pick_best_category(url,pw,keyword,title)
-    cat_name=get_category_for_post(theme,keyword,title)  # ★ 버그수정: 미정의 변수로 return에서 NameError→모든 발행이 '실패'로 오기록되던 문제
+    cat_name=get_category_for_post(theme,keyword,title)
+    cat_id=0
+    if site.get("mode") in ("news", "news_en"):
+        wanted = re.sub(r'[\s/,\-]+', '', cat_name.lower())
+        for existing_id, existing_name in load_site_categories(url, pw):
+            if re.sub(r'[\s/,\-]+', '', existing_name.lower()) == wanted:
+                cat_id = existing_id
+                break
+    if not cat_id:
+        cat_id=pick_best_category(url,pw,keyword,title)
 
     hero=build_img_html(images[:1],keyword)
     mid =build_img_html(images[1:2],keyword) if len(images)>1 else ""
