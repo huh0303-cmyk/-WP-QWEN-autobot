@@ -1,0 +1,65 @@
+name: "Two Newsrooms — 5 Daily Editions"
+
+on:
+  schedule:
+    # Five distributed editions per newsroom: 09:43, 12:17, 15:29, 18:41, 21:53 KST.
+    - cron: "43 0 * * *"
+    - cron: "17 3 * * *"
+    - cron: "29 6 * * *"
+    - cron: "41 9 * * *"
+    - cron: "53 12 * * *"
+  workflow_dispatch:
+    inputs:
+      newsroom:
+        description: "both / koreanews365 / theseouljournal"
+        required: false
+        default: "both"
+      random_delay:
+        description: "Apply 0-12 minute random delay"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: newsroom-edition-${{ github.ref }}-${{ github.event.schedule || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: koreanews365
+            url: https://koreanews365.com
+          - key: theseouljournal
+            url: https://theseouljournal.com
+    if: ${{ github.event_name == 'schedule' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install publisher dependencies
+        run: pip install requests google-genai beautifulsoup4 lxml -q
+      - name: Randomize edition time
+        if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
+        run: sleep $((RANDOM % 721))
+      - name: Publish one source-checked edition
+        env:
+          WP_AUTOPUBLISH_ENABLED: "true"
+          TARGET_SITE_URL: ${{ matrix.url }}
+          RUN_SLOT: "1"
+          SLEEP_BETWEEN_POSTS: "2"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/autopost_mega.py

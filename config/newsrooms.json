@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "publishing_enabled": false,
+  "publishing_enabled": true,
   "shared": {
     "theme_target": "twentytwentyfive",
     "featured_image": {
@@ -48,7 +48,7 @@
     },
     "ai_image_rule": "Never simulate documentary photography of a real event. Use labelled illustration, map, timeline or data graphic only.",
     "source_rule": "Original reporting/analysis first. Attribute and link every external lead. Never copy, translate line-by-line, spin, bypass paywalls or use sources requiring separate written permission.",
-    "quality_gate": "No automatic publication. Human editorial approval remains required."
+    "quality_gate": "Automatic publication is limited to the two approved newsroom workflows and requires source, recency, duplication, image-rights and SEO gates."
   },
   "sites": {
     "koreanews365.com": {
@@ -158,7 +158,7 @@
         }
       ],
       "cadence": {
-        "daily_total": "3-5 after launch",
+        "daily_total": 5,
         "original_daily_min": 2,
         "original_weekly_share_min": 0.3
       }
@@ -166,7 +166,7 @@
     "theseouljournal.com": {
       "language": "en-US",
       "name": "The Seoul Journal",
-      "tagline": "Korea in Context. Asia in Focus.",
+      "tagline": "Seoul’s Perspective, Connected to the World.",
       "mission": "An independent English-language publication explaining Korea and Asia with verified sources, original context and transparent corrections.",
       "palette": {
         "ink": "#111111",
@@ -245,7 +245,7 @@
         }
       ],
       "cadence": {
-        "daily_total": "3-5 after launch",
+        "daily_total": 5,
         "original_daily_min": 2,
         "original_weekly_share_min": 0.3
       }
