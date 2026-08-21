@@ -89,6 +89,8 @@ def main():
             if old.get("state") in ("indexed","unindexed"): continue
             result=inspect(tok,prop,p["link"])
             published=dt.datetime.fromisoformat(p["date_gmt"].replace("Z","+00:00"))
+            if published.tzinfo is None:
+                published=published.replace(tzinfo=dt.timezone.utc)
             age=(today-published).days
             result.update({"id":p["id"],"url":p["link"],"slug":p["slug"],"title":p["title"]["rendered"],
                 "published_gmt":p["date_gmt"],"modified_gmt":p["modified_gmt"],"age_days":age,
