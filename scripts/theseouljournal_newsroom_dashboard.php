@@ -140,11 +140,25 @@ add_action('wp_footer', function () {
       @media(max-width:1180px){.sj26-layout{grid-template-columns:1fr;padding:0 20px 28px}.sj26-dashboard{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.newsroom-wrap{width:100%!important}}
       @media(max-width:720px){.sj26-layout{padding:0 14px 24px}.sj26-dashboard{grid-template-columns:1fr}.news-mast{padding:8px 14px 0!important}.news-brand{font-size:48px!important;margin-top:11px!important}.news-tag{font-size:9px!important;letter-spacing:.11em!important}.news-nav{justify-content:flex-start!important;overflow-x:auto}}
       body.wp-theme-mission-news .post-byline{font-size:0!important}
-      body.wp-theme-mission-news .post-byline:after{content:"SJ편집실";color:#6b6258;font:700 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.045em}
+      body.wp-theme-mission-news .post-byline:after{content:attr(data-sj-byline);color:#6b6258;font:700 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.045em}
+      body.wp-theme-mission-news #loop-container{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:30px 26px!important;align-items:start!important;height:auto!important}
+      body.wp-theme-mission-news #loop-container>.entry{position:static!important;left:auto!important;top:auto!important;float:none!important;width:auto!important;margin:0!important;padding:0 0 24px!important;border-bottom:1px solid #d8d4ca!important;box-shadow:none!important}
+      body.wp-theme-mission-news #loop-container>.entry article{height:auto!important}
+      body.wp-theme-mission-news #loop-container .featured-image{margin:0 0 15px!important;overflow:hidden;background:#ece9e1}
+      body.wp-theme-mission-news #loop-container .featured-image a{display:block;font-size:0!important}
+      body.wp-theme-mission-news #loop-container .featured-image img{display:block;width:100%!important;height:230px!important;object-fit:cover!important}
+      body.wp-theme-mission-news #loop-container .post-header{padding:0 2px!important}
+      body.wp-theme-mission-news #loop-container .post-title{margin:0!important;font-size:clamp(24px,2.25vw,35px)!important;line-height:1.08!important;letter-spacing:-.025em!important}
+      body.wp-theme-mission-news #loop-container .post-content{padding:0 2px!important;font:400 14px/1.65 Inter,Arial,sans-serif!important;color:#36332e!important}
+      body.wp-theme-mission-news #loop-container .read-more{padding:0!important;background:transparent!important;color:#9f1423!important;border:0!important;font-size:11px!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase}
+      body.wp-theme-mission-news .site-footer{width:calc(100% - 24px)!important;max-width:1600px!important;margin:0 auto!important;background:#fff!important;border-top:4px double #111!important;color:#333!important}
+      body.wp-theme-mission-news .site-footer a[href*="competethemes.com"],body.wp-theme-mission-news .site-footer .design-credit{display:none!important}
+      @media(max-width:720px){body.wp-theme-mission-news #loop-container{grid-template-columns:1fr!important;gap:24px!important}body.wp-theme-mission-news #loop-container .featured-image img{height:auto!important;aspect-ratio:16/9}.sj26-latest-label{padding:0 11px!important;font-size:9px!important}.sj26-category-nav{justify-content:flex-start!important;gap:24px!important}}
     </style>
     <script id="sj26-newsroom-script">
       document.addEventListener('DOMContentLoaded',()=>{
         if(document.body.classList.contains('wp-theme-mission-news'))document.querySelectorAll('.site-title a').forEach(el=>el.textContent='The Seoul Journal');
+        if(document.body.classList.contains('wp-theme-mission-news'))document.querySelectorAll('.post-byline').forEach(el=>{const match=el.textContent.trim().match(/\bon\s+(.+)$/i);el.dataset.sjByline=match?'SJ편집실 · '+match[1]:'SJ편집실';});
         const dash=document.getElementById('sj26-dashboard'),wrap=document.querySelector('.newsroom-wrap')||document.querySelector('#content.container-fluid.home')||document.querySelector('body.wp-theme-covernews #content.container')||document.querySelector('body.wp-theme-mission-news #main'); if(!wrap||!dash)return;
         const isNewsTheme=document.body.classList.contains('wp-theme-newsup')||document.body.classList.contains('wp-theme-covernews')||document.body.classList.contains('wp-theme-mission-news');
         const children=[...wrap.children].filter(el=>!el.classList.contains('news-mast')&&!el.classList.contains('sj26-layout'));
