@@ -49,8 +49,8 @@ def audit(site: str) -> dict:
         "recent_posts_have_featured_image": not missing_featured,
         "recent_featured_images_have_descriptive_alt": not weak_alt,
         "homepage_has_single_h1": len(re.findall(r"<h1\\b", html, re.I)) == 1,
-        "canonical_present": bool(re.search(r'<link[^>]+rel=["\\\']canonical["\\\']', html, re.I)),
-        "indexable": not bool(re.search(r'<meta[^>]+name=["\\\']robots["\\\'][^>]+noindex', html, re.I)),
+        "canonical_present": bool(re.search(r"<link[^>]+rel=[\\\"\']canonical[\\\"\']", html, re.I)),
+        "indexable": not bool(re.search(r"<meta[^>]+name=[\\\"\']robots[\\\"\'][^>]+noindex", html, re.I)),
     }
     return {
         "site": site, "audited_at": datetime.now(timezone.utc).isoformat(),
