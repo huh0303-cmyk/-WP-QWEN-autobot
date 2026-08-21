@@ -15,6 +15,7 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
 import os, sys, time, random, re, json, hashlib, base64
 import requests
 from email.utils import parsedate_to_datetime
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
@@ -2675,7 +2676,12 @@ def log(site_url,theme,keyword,title,post_url,score,imgs,status,error="",author=
     _log_buf.append({"timestamp":now_kst().strftime("%Y-%m-%d %H:%M:%S"),"site":site_url,"theme":theme,"keyword":keyword,"title":title,"status":status,"seo_score":score,"images":imgs,"url":post_url,"error":error,"slot":str(RUN_SLOT),"model":GEMINI_MODEL,"author":author,"category":category})
 
 def flush_log():
-    if not SHEETS_WEBHOOK or not _log_buf: return
+    if not _log_buf: return
+    Path("newsroom_publish_result.json").write_text(
+        json.dumps({"records": _log_buf}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    if not SHEETS_WEBHOOK: return
     try:
         r=requests.post(SHEETS_WEBHOOK,json={"records":_log_buf},timeout=15)
         print(f"  📊 구글시트 {len(_log_buf)}건: HTTP {r.status_code}")
