@@ -1,0 +1,17 @@
+name: "(1회성) koreanews365 비공개글 색인+SEO80 집계"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests beautifulsoup4 google-genai -q
+      - env:
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/audit_koreanews_private_posts.py
