@@ -1,12 +1,10 @@
-"""Copyright-aware source and cadence policy for the two newsrooms.
+"""No-contact, copyright-aware source policy for the two newsrooms.
 
-A feed being technically reachable is not permission to republish it. Third-party
-publisher feeds stay disabled until the operator records written commercial-use
-permission in a GitHub secret.
+Only sources with an explicit public-domain, CC BY, or primary-government basis
+are eligible. A feed is used as a story lead; source text and media are not
+copied. Item-level third-party credits still override the source-level policy.
 """
 from __future__ import annotations
-
-import os
 
 NEWSROOMS = {
     "https://koreanews365.com": {
@@ -31,70 +29,87 @@ NEWSROOMS = {
     },
 }
 
-# license:
-# - primary_public: primary government/public information; facts still require verification.
-# - kogl_item_check: reuse depends on the individual item's KOGL type.
-# - written_permission_required: never ingest until commercial syndication permission is recorded.
+# use=headline_fact_lead means the feed title/link can trigger independent
+# reporting. It never authorizes copying article paragraphs or media.
 NEWS_SOURCES = [
     {
-        "key": "chosun",
-        "name": "조선일보",
+        "key": "globalvoices_ko",
+        "name": "Global Voices 한국어 (CC BY 3.0)",
         "language": "ko",
-        "category": "종합",
-        "feed": "https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml",
-        "license": "written_permission_required",
-        "permission_env": "NEWS_RIGHTS_CHOSUN",
-        "use": "headline_monitor_only",
+        "category": "국제",
+        "feed": "https://ko.globalvoices.org/feed/",
+        "license": "cc_by_3",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "use": "headline_fact_lead",
     },
     {
-        "key": "yonhapnewstv",
-        "name": "연합뉴스TV",
+        "key": "globalvoices_korea",
+        "name": "Global Voices South Korea (CC BY 3.0)",
         "language": "ko",
-        "category": "속보",
-        "feed": "https://www.yonhapnewstv.co.kr/category/news/headline/feed/",
-        "license": "written_permission_required",
-        "permission_env": "NEWS_RIGHTS_YONHAPNEWSTV",
-        "use": "headline_monitor_only",
+        "category": "국제",
+        "feed": "https://globalvoices.org/-/world/east-asia/south-korea/feed/",
+        "license": "cc_by_3",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "use": "headline_fact_lead_translate",
     },
     {
-        "key": "korea_policy",
-        "name": "대한민국 정책브리핑",
+        "key": "voa_east_asia_ko",
+        "name": "Voice of America East Asia",
         "language": "ko",
-        "category": "정책",
-        "feed": "",
-        "license": "kogl_item_check",
-        "permission_env": "",
-        "use": "primary_source_manual_item_check",
-        "note": "RSS service discontinued; check each item's copyright/KOGL label.",
+        "category": "국제",
+        "feed": "https://www.voanews.com/api/zobo_l-vomx-tpepvmv",
+        "license": "voa_public_domain_item_check",
+        "license_url": "https://www.voanews.com/p/5338.html",
+        "use": "headline_fact_lead_translate",
     },
     {
-        "key": "cnn",
-        "name": "CNN",
+        "key": "globalvoices_stories",
+        "name": "Global Voices (CC BY 3.0)",
+        "language": "en",
+        "category": "World",
+        "feed": "https://globalvoices.org/feed/?cat=-28",
+        "license": "cc_by_3",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "use": "headline_fact_lead",
+    },
+    {
+        "key": "globalvoices_east_asia",
+        "name": "Global Voices East Asia (CC BY 3.0)",
+        "language": "en",
+        "category": "Asia & Korea",
+        "feed": "https://globalvoices.org/-/world/east-asia/feed/",
+        "license": "cc_by_3",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "use": "headline_fact_lead",
+    },
+    {
+        "key": "voa_usa",
+        "name": "Voice of America",
         "language": "en",
         "category": "Top Stories",
-        "feed": "http://rss.cnn.com/rss/edition.rss",
-        "license": "written_permission_required",
-        "permission_env": "NEWS_RIGHTS_CNN",
-        "use": "headline_monitor_only",
+        "feed": "https://www.voanews.com/api/zqboml-vomx-tpeivmy",
+        "license": "voa_public_domain_item_check",
+        "license_url": "https://www.voanews.com/p/5338.html",
+        "use": "headline_fact_lead",
     },
     {
-        "key": "nyt",
-        "name": "The New York Times",
+        "key": "voa_east_asia",
+        "name": "Voice of America East Asia",
         "language": "en",
-        "category": "Top Stories",
-        "feed": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-        "license": "written_permission_required",
-        "permission_env": "NEWS_RIGHTS_NYT",
-        "use": "headline_monitor_only",
+        "category": "Asia & Korea",
+        "feed": "https://www.voanews.com/api/zobo_l-vomx-tpepvmv",
+        "license": "voa_public_domain_item_check",
+        "license_url": "https://www.voanews.com/p/5338.html",
+        "use": "headline_fact_lead",
     },
     {
         "key": "nasa",
         "name": "NASA",
         "language": "en",
-        "category": "Science & Technology",
+        "category": "Technology",
         "feed": "https://www.nasa.gov/rss/dyn/breaking_news.rss",
-        "license": "primary_public",
-        "permission_env": "",
+        "license": "us_federal_primary_item_check",
+        "license_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
         "use": "primary_fact_lead",
     },
     {
@@ -103,8 +118,8 @@ NEWS_SOURCES = [
         "language": "en",
         "category": "Business",
         "feed": "https://www.federalreserve.gov/feeds/press_all.xml",
-        "license": "primary_public",
-        "permission_env": "",
+        "license": "us_federal_primary_item_check",
+        "license_url": "https://www.usa.gov/government-copyright",
         "use": "primary_fact_lead",
     },
     {
@@ -113,28 +128,29 @@ NEWS_SOURCES = [
         "language": "en",
         "category": "Business",
         "feed": "https://www.sec.gov/news/pressreleases.rss",
-        "license": "primary_public",
-        "permission_env": "",
+        "license": "us_federal_primary_item_check",
+        "license_url": "https://www.usa.gov/government-copyright",
         "use": "primary_fact_lead",
     },
 ]
 
-
-def _confirmed(source: dict) -> bool:
-    if source["license"] == "primary_public":
-        return True
-    env = source.get("permission_env", "")
-    return bool(env) and os.getenv(env, "").strip().lower() == "true"
+BLOCKED_SOURCES = [
+    "조선일보",
+    "연합뉴스TV",
+    "CNN",
+    "The New York Times",
+    "BBC",
+    "Reuters",
+    "AP",
+]
 
 
 def get_enabled_rss_sources(language: str) -> list[tuple[str, str]]:
-    """Return only sources whose reuse gate is satisfied."""
+    """All returned feeds have a no-contact reuse basis recorded above."""
     return [
         (source["name"], source["feed"])
         for source in NEWS_SOURCES
-        if source["language"] == language
-        and source.get("feed")
-        and _confirmed(source)
+        if source["language"] == language and source.get("feed")
     ]
 
 
@@ -145,8 +161,9 @@ def source_audit() -> list[dict]:
             "name": source["name"],
             "language": source["language"],
             "license": source["license"],
+            "license_url": source["license_url"],
             "use": source["use"],
-            "enabled": bool(source.get("feed")) and _confirmed(source),
+            "enabled": True,
         }
         for source in NEWS_SOURCES
     ]
