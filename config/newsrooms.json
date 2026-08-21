@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "publishing_enabled": false,
+  "shared": {
+    "theme_target": "twentytwentyfive",
+    "featured_image": {
+      "ratio": "16:9",
+      "min_width": 1600,
+      "alt_rule": "Describe the specific visual and its editorial relevance; never stuff keywords.",
+      "metadata": [
+        "creator",
+        "source_url",
+        "license",
+        "retrieved_at"
+      ]
+    },
+    "ai_image_rule": "Never simulate documentary photography of a real event. Use labelled illustration, map, timeline or data graphic only.",
+    "source_rule": "Original reporting/analysis first. Attribute and link every external lead. Never copy, translate line-by-line, spin, bypass paywalls or use sources requiring separate written permission.",
+    "quality_gate": "No automatic publication. Human editorial approval remains required."
+  },
+  "sites": {
+    "koreanews365.com": {
+      "language": "ko-KR",
+      "name": "한국신문",
+      "tagline": "사실을 확인하고 맥락을 더하는 한국 뉴스",
+      "mission": "한국 독자를 위한 독립 종합 인터넷신문. 속보보다 검증, 단순 요약보다 설명을 우선한다.",
+      "palette": {
+        "ink": "#0B1F3A",
+        "paper": "#FFFFFF",
+        "muted": "#EEF2F6",
+        "breaking": "#B42318"
+      },
+      "typography": {
+        "headline": "Noto Serif KR",
+        "body": "Noto Sans KR"
+      },
+      "categories": [
+        {
+          "name": "속보",
+          "slug": "breaking"
+        },
+        {
+          "name": "정치",
+          "slug": "politics"
+        },
+        {
+          "name": "경제",
+          "slug": "economy"
+        },
+        {
+          "name": "사회",
+          "slug": "society"
+        },
+        {
+          "name": "국제",
+          "slug": "world"
+        }
+      ],
+      "primary_menu": [
+        "속보",
+        "정치",
+        "경제",
+        "사회",
+        "국제",
+        "기사제보",
+        "신문사 소개"
+      ],
+      "homepage": [
+        "breaking_strip",
+        "lead_story",
+        "top_stories_4",
+        "politics_3",
+        "economy_3",
+        "society_3",
+        "world_3"
+      ],
+      "editorial_pages": [
+        {
+          "title": "신문사 소개",
+          "slug": "about"
+        },
+        {
+          "title": "편집 원칙",
+          "slug": "editorial-standards"
+        },
+        {
+          "title": "정정·반론 보도",
+          "slug": "corrections"
+        },
+        {
+          "title": "기사제보",
+          "slug": "tips"
+        },
+        {
+          "title": "출처 및 저작권 정책",
+          "slug": "source-copyright-policy"
+        }
+      ],
+      "cadence": {
+        "daily_total": "3-5 after launch",
+        "original_daily_min": 2,
+        "original_weekly_share_min": 0.3
+      }
+    },
+    "theseouljournal.com": {
+      "language": "en-US",
+      "name": "The Seoul Journal",
+      "tagline": "Korea in Context. Asia in Focus.",
+      "mission": "An independent English-language publication explaining Korea and Asia with verified sources, original context and transparent corrections.",
+      "palette": {
+        "ink": "#111111",
+        "paper": "#FFFFFF",
+        "muted": "#F2F0EB",
+        "accent": "#173B65"
+      },
+      "typography": {
+        "headline": "Source Serif 4",
+        "body": "Inter"
+      },
+      "categories": [
+        {
+          "name": "Top Stories",
+          "slug": "top-stories"
+        },
+        {
+          "name": "Korea",
+          "slug": "korea"
+        },
+        {
+          "name": "Asia",
+          "slug": "asia"
+        },
+        {
+          "name": "World",
+          "slug": "world"
+        },
+        {
+          "name": "Business",
+          "slug": "business"
+        },
+        {
+          "name": "Technology",
+          "slug": "technology"
+        }
+      ],
+      "primary_menu": [
+        "Top Stories",
+        "Korea",
+        "Asia",
+        "World",
+        "Business",
+        "Technology",
+        "About",
+        "Contact"
+      ],
+      "homepage": [
+        "lead_story",
+        "top_stories_4",
+        "korea_3",
+        "asia_3",
+        "business_3",
+        "technology_3"
+      ],
+      "editorial_pages": [
+        {
+          "title": "About",
+          "slug": "about"
+        },
+        {
+          "title": "Editorial Standards",
+          "slug": "editorial-standards"
+        },
+        {
+          "title": "Corrections & Right of Reply",
+          "slug": "corrections"
+        },
+        {
+          "title": "Submit a Tip",
+          "slug": "tips"
+        },
+        {
+          "title": "Sources & Copyright",
+          "slug": "source-copyright-policy"
+        }
+      ],
+      "cadence": {
+        "daily_total": "3-5 after launch",
+        "original_daily_min": 2,
+        "original_weekly_share_min": 0.3
+      }
+    }
+  }
+}
