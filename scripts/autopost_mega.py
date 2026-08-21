@@ -18,6 +18,7 @@ from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
 from google.genai import types as genai_types
+from news_source_registry import get_enabled_rss_sources
 
 KST = timezone(timedelta(hours=9))
 def now_kst():
@@ -1491,12 +1492,12 @@ def crawl_rss_news(lang="ko", site_url=""):
 
     def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
 
-    RSS_KO = [("조선일보","https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml"),
-               ("연합뉴스TV","https://www.yonhapnewstv.co.kr/category/news/headline/feed/")]
-    RSS_EN = [("CNN","http://rss.cnn.com/rss/edition.rss"),
-               ("The New York Times","https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml")]
-
-    sources = RSS_KO if lang=="ko" else RSS_EN
+    # Third-party feeds are enabled only after written commercial-use permission
+    # is recorded in the corresponding NEWS_RIGHTS_* repository secret.
+    sources = get_enabled_rss_sources(lang)
+    if not sources:
+        print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
+        return "", "", None, ""
     random.shuffle(sources)
     candidates = []
     for src, url in sources:
@@ -2711,6 +2712,9 @@ def process_one(site, keyword):
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
+        if not keyword:
+            print("  NEWS SOURCE GATE: no licensed/approved story lead; skipping")
+            return False
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=4:
