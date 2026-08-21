@@ -715,7 +715,19 @@ SITE_PERSONA = {
             "핵심 요약",
             "FAQ"
         ],
-        "min_chars": 3500,
+        # 2026-08-22 사용자 지시: 매번 정확히 같은 분량으로 나오면 그 자체가
+        # AI 대량생산 흔적으로 보인다("변화를 주자.. 카테고리에 맞게.. 넘 AI흔적
+        # 남기지 말것"). 고정 3500자 대신 카테고리별로 다른 밴드 + 밴드 안에서
+        # 랜덤 — 영양성분 소개는 비교적 짧게, 질병 대처법(YMYL 특성상 더 꼼꼼해야
+        # 함)은 길게, 나머지 일반 건강정보는 중간. 전체 평균은 사용자가 말한
+        # "2500자 전후"에 맞춰져 있다. 카테고리명은 keywords_khealth.txt의 탭
+        # 구분 2번째 컬럼과 정확히 일치해야 매칭된다.
+        "min_chars": {
+            "건강영양성분소개": (2000, 2400),
+            "질병별대처법": (2600, 3000),
+            "건강정보": (2200, 2600),
+            "_default": (2200, 2800),
+        },
         "tables": 1,
         "lang": "ko",
         "cta": "관련 건강정보 더 보기"
@@ -734,7 +746,7 @@ SITE_PERSONA = {
             "Official sources and checked date",
             "FAQ"
         ],
-        "min_chars": 2600,
+        "min_chars": (2300, 2900),
         "tables": 1,
         "lang": "en",
         "cta": "Use the checklist to prepare questions for licensed providers"
@@ -752,7 +764,7 @@ SITE_PERSONA = {
             "Source list and data date",
             "FAQ"
         ],
-        "min_chars": 2400,
+        "min_chars": (2100, 2700),
         "tables": 1,
         "lang": "en",
         "cta": "Read the next Korea market brief"
@@ -770,7 +782,7 @@ SITE_PERSONA = {
             "Official contacts and checked date",
             "FAQ"
         ],
-        "min_chars": 2400,
+        "min_chars": (2100, 2700),
         "tables": 1,
         "lang": "en",
         "cta": "Download the official-agency checklist"
@@ -788,7 +800,7 @@ SITE_PERSONA = {
             "Official sources and checked date",
             "FAQ"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Compare policy documents before applying"
@@ -806,7 +818,7 @@ SITE_PERSONA = {
             "Official sources and checked date",
             "FAQ"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Continue to the next banking guide"
@@ -824,7 +836,7 @@ SITE_PERSONA = {
             "Official source links",
             "When to obtain professional advice"
         ],
-        "min_chars": 2500,
+        "min_chars": (2200, 2800),
         "tables": 1,
         "lang": "en",
         "cta": "Verify the current rule with the responsible authority"
@@ -842,7 +854,7 @@ SITE_PERSONA = {
             "Primary sources",
             "FAQ"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "en",
         "cta": "Follow official regulatory updates"
@@ -860,7 +872,7 @@ SITE_PERSONA = {
             "Risk and dispute channels",
             "Official sources"
         ],
-        "min_chars": 2400,
+        "min_chars": (2100, 2700),
         "tables": 1,
         "lang": "en",
         "cta": "Use the contract-verification checklist"
@@ -878,7 +890,7 @@ SITE_PERSONA = {
             "What remains unknown",
             "Primary sources"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "en",
         "cta": "Read the related technology explainer"
@@ -906,7 +918,7 @@ SITE_PERSONA = {
             "Purchase logistics",
             "Sources and checked date"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "en",
         "cta": "Check the current label and store listing"
@@ -924,7 +936,7 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Next scheduled milestone"
         ],
-        "min_chars": 1500,
+        "min_chars": (1200, 1800),
         "max_chars": 2000,
         "tables": 0,
         "lang": "en",
@@ -942,7 +954,7 @@ SITE_PERSONA = {
             "Accessibility and seasonal cautions",
             "Official links and checked date"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "en",
         "cta": "Save the route checklist"
@@ -960,7 +972,7 @@ SITE_PERSONA = {
             "Rejection or change scenarios",
             "Official source and checked date"
         ],
-        "min_chars": 2400,
+        "min_chars": (2100, 2700),
         "tables": 1,
         "lang": "en",
         "cta": "Confirm the current requirement on HiKorea or the embassy"
@@ -978,7 +990,7 @@ SITE_PERSONA = {
             "Marriage-visa document handoff",
             "Official sources"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Use the wedding and document timeline"
@@ -996,7 +1008,7 @@ SITE_PERSONA = {
             "Decision and enrollment",
             "Official sources"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Check the university's current admissions notice"
@@ -1014,7 +1026,7 @@ SITE_PERSONA = {
             "Problem-solving contacts",
             "Official sources"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "en",
         "cta": "Save the arrival checklist"
@@ -1031,7 +1043,7 @@ SITE_PERSONA = {
             "공식 통계와 기준일",
             "향후 과제"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "ko",
         "cta": "관련 국제교육시장 보고서 보기"
@@ -1049,7 +1061,7 @@ SITE_PERSONA = {
             "주의사항",
             "공식 출처"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "ko",
         "cta": "한국유학 준비 체크리스트 보기"
@@ -1067,7 +1079,7 @@ SITE_PERSONA = {
             "Accreditation checks",
             "Official program source"
         ],
-        "min_chars": 2100,
+        "min_chars": (1800, 2400),
         "tables": 1,
         "lang": "en",
         "cta": "Verify details with the program provider"
@@ -1085,7 +1097,7 @@ SITE_PERSONA = {
             "Official source and checked date",
             "FAQ"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Check the official labor guidance"
@@ -1103,7 +1115,7 @@ SITE_PERSONA = {
             "Scam warning",
             "Official resources"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Use the job-search checklist"
@@ -1121,7 +1133,7 @@ SITE_PERSONA = {
             "Onboarding",
             "Official resources"
         ],
-        "min_chars": 2300,
+        "min_chars": (2000, 2600),
         "tables": 1,
         "lang": "en",
         "cta": "Verify recruiter and sponsorship requirements"
@@ -1139,7 +1151,7 @@ SITE_PERSONA = {
             "Official service link",
             "Related next task"
         ],
-        "min_chars": 2200,
+        "min_chars": (1900, 2500),
         "tables": 1,
         "lang": "en",
         "cta": "Continue through the newcomer checklist"
@@ -1157,7 +1169,7 @@ SITE_PERSONA = {
             "확인된 사실과 미확인 사항",
             "원문 출처 링크·작성 시각·수정 이력"
         ],
-        "min_chars": 1500,
+        "min_chars": (1200, 1800),
         "max_chars": 2000,
         "tables": 0,
         "lang": "ko",
@@ -1176,7 +1188,7 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Linked source note, publication time and correction record"
         ],
-        "min_chars": 1500,
+        "min_chars": (1200, 1800),
         "max_chars": 2000,
         "tables": 0,
         "lang": "en",
@@ -1582,9 +1594,26 @@ def randomize_structure_counts(structure):
     return [_STRUCT_COUNT_RE.sub(repl, item) for item in structure]
 
 # ============================================================
+# ★ min_chars 해석 — 사이트별 값이 int(고정) / (lo,hi)(랜덤 범위) /
+#   {카테고리: (lo,hi) 또는 int}(카테고리별 밴드, "_default"는 카테고리 매칭
+#   실패 시 폴백) 중 무엇이든 최종 정수로 풀어준다. 같은 글을 프롬프트
+#   생성(make_site_prompt)과 발행 게이트(process_one)에서 각각 다시 계산하면
+#   서로 다른 랜덤값이 나와 불일치할 수 있으므로, process_one()이 딱 한 번만
+#   호출해 값을 고정하고 make_site_prompt()에는 그 값을 그대로 넘긴다.
+# ============================================================
+def resolve_min_chars(url):
+    val = SITE_PERSONA.get(url, {}).get("min_chars", 2200)
+    if isinstance(val, dict):
+        cat = _last_keyword_category.get(url)
+        val = val.get(cat, val.get("_default", 2200))
+    if isinstance(val, (tuple, list)) and len(val) == 2:
+        return random.randint(val[0], val[1])
+    return val
+
+# ============================================================
 # ★★★ make_site_prompt — 사이트별 완전 분리 프롬프트 ★★★
 # ============================================================
-def make_site_prompt(keyword, site, reporter, tag_count=None):
+def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override=None):
     url   = site["url"]
     theme = site["theme"]
     lang  = site["lang"]
@@ -1592,7 +1621,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
     tag_count = tag_count or TAG_COUNT
 
     p = SITE_PERSONA.get(url, {})
-    min_chars  = p.get("min_chars", 2200)
+    min_chars  = min_chars_override if min_chars_override is not None else resolve_min_chars(url)
     tables_req = p.get("tables", 1)
     structure  = randomize_structure_counts(p.get("structure", []))
     scope      = p.get("scope", theme)
@@ -1730,6 +1759,13 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
   단계별/전후 비교 등)를 최소 1개는 자연스럽게 만들 수 있다 — 정말 표로 정리할
   항목이 하나도 없는 극히 예외적인 경우만 생략하고, 그럴 때도 <table> 대신 잘
   구조화된 <ul> 목록으로 핵심 정보를 정리할 것(구조 없이 문단으로만 끝내지 말 것).
+- "항목: 설명. 항목: 설명. 항목: 설명." 식으로 같은 패턴이 3개 이상 반복되는 내용을
+  한 문단에 욱여넣지 말 것 — 반드시 <ul><li><strong>항목:</strong> 설명</li></ul> 형태의
+  실제 목록으로 풀어 쓸 것. 독자가 훑어보기만 해도 구조가 눈에 들어와야 한다.
+- 특정 시점의 수치(지수, 종가, 거래량, 환율 등 매일 바뀌는 값)를 마치 항상 "오늘"의
+  값인 것처럼 단정적으로 쓰지 말 것 — 이 글은 발행 후 몇 주, 몇 달이 지나도 계속
+  읽힌다. "작성 시점 기준", "최근 거래일 기준"처럼 특정 시점의 스냅샷임을 밝히고,
+  글 전체를 하나의 순간적 수치에만 의존해 구성하지 말 것.
 - META_DESC 글자수는 타협 불가 항목이다 — 반드시 130~140자(공백 포함) 사이여야
   하며, 120자 미만이거나 150자를 넘으면 실패로 간주된다. 짧게 쓰고 끝내지 말고
   '{keyword}' 관련 구체적인 이유/이점을 한 문장 더 보태서라도 130자를 채울 것.
@@ -1787,6 +1823,18 @@ You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' categor
   can. Only skip it in the rare case there's truly nothing to compare, and even then replace it
   with a well-structured <ul> summarizing the key points (never end a section with plain
   paragraphs only when a list or table would organize it better).
+- Never cram a repeating "Label: description" pattern (3+ items) into a single run-on
+  paragraph — convert it into a real <ul><li><strong>Label:</strong> description</li></ul>.
+    (banned) "Flow indicator: net buying or selling. Price indicator: index performance.
+    Currency indicator: the exchange rate. Position indicator: ownership by sector."
+    (use) <ul><li><strong>Flow indicator:</strong> net buying or selling.</li>
+    <li><strong>Price indicator:</strong> index performance.</li>...</ul>
+  A reader should be able to scan the section in 2 seconds, not parse a wall of text.
+- Point-in-time figures (an index level, closing price, trading volume, exchange rate, or
+  any number that changes daily) must never be stated as if permanently current — this page
+  will still be read weeks or months after publication. State it as a dated snapshot
+  ("as of the article's writing", "in a recent session") rather than implying it is today's
+  live number, and never build the whole piece around one moment-in-time figure.
 - META_DESC length is non-negotiable — it must be 130-155 characters, not shorter. If your first
   draft is short, add one more concrete reason/benefit related to '{keyword}' rather than
   stopping early.
@@ -1962,6 +2010,30 @@ _last_title_idx: dict = {}  # 사이트별 직전 사용 인덱스 (연속 반�
 _recent_titles_global: list = []  # 전체 사이트 공통 — 최근 사용된 템플릿 인덱스(언어별) 기록해 교차 사이트 반복도 줄임
 _GLOBAL_RECENT_MAX = 6
 
+# 2026-08-22: 영문 키워드가 키워드 파일에 소문자로 저장돼 있어("foreign investor
+# Korea stocks") Title Case 템플릿에 그대로 꽂으면 "foreign investor Korea stocks,
+# Step by Step"처럼 부자연스럽게 나왔음. AI가 매번 자유롭게 제목을 새로 쓰게 하면
+# 이전에 겪은 "반복 패턴이 구글에 AI 대량생산으로 보이는 문제"가 재발하므로, 템플릿
+# 풀(반복 방지 로직 포함)은 그대로 두고 키워드만 자연스러운 Title Case로 다듬는다.
+_TITLE_CASE_SMALL_WORDS = {"a","an","the","and","but","or","for","nor","on","at",
+                            "to","from","by","of","in","with","as","vs","vs."}
+
+def _titlecase_keyword(keyword):
+    words = keyword.split(" ")
+    out = []
+    for i, w in enumerate(words):
+        if not w:
+            out.append(w)
+            continue
+        lw = w.lower()
+        if 0 < i < len(words) - 1 and lw in _TITLE_CASE_SMALL_WORDS:
+            out.append(lw)
+        elif w.isupper() and len(w) > 1:
+            out.append(w)  # 이미 대문자 약어(KOSPI, ETF 등)는 그대로 유지
+        else:
+            out.append(w[:1].upper() + w[1:])
+    return " ".join(out)
+
 def build_diverse_title(keyword, lang, site_url=""):
     pool = TITLE_TEMPLATES_KO if lang == "ko" else TITLE_TEMPLATES_EN
     prev = _last_title_idx.get(site_url, -1)
@@ -1978,7 +2050,8 @@ def build_diverse_title(keyword, lang, site_url=""):
         _recent_titles_global.pop(0)
     n = random.choice([3, 4, 5, 6, 7, 8, 9])
     year = str(datetime.now().year)
-    return pool[idx].format(keyword=keyword, n=n, year=year)
+    display_keyword = _titlecase_keyword(keyword) if lang != "ko" else keyword
+    return pool[idx].format(keyword=display_keyword, n=n, year=year)
 
 def sanitize_tag(t, lang):
     """AI가 TAGS: 줄에 문장 전체·구분선(═══ 등)·잘린 조각을 그대로 흘려보내는
@@ -2381,10 +2454,12 @@ def ensure_featured_media(site_url, pw, image_url, title):
     return media_id
 
 # ============================================================
-# ★ 나노바나나(Gemini 2.5 Flash Image) — 스톡사진 실패 시 1차 폴백
+# ★ AI 이미지 생성 — 스톡사진(Pixabay/Pexels) 실패 시 1차 폴백
 #   기존엔 스톡사진 실패 → 곧바로 텍스트 인포그래픽 카드였는데, 실제 사진처럼
 #   보이는 이미지가 나을 때가 많아 카드보다 먼저 시도한다. 카드는 이마저
 #   실패했을 때의 최종 안전망으로 유지.
+#   2026-08-22: 텍스트 생성과 동일한 원칙(OPENAI_API_KEY 있으면 GPT 우선,
+#   Gemini/나노바나나는 키 없거나 실패했을 때만) — gpt-image-1을 1순위로 시도.
 # ============================================================
 def gemini_generate_image(prompt, out_path, max_retries=3):
     body = {"contents": [{"parts": [{"text": prompt}]}]}
@@ -2420,13 +2495,28 @@ def get_fallback_nanobanana_image(site_url, pw, keyword, theme, lang):
                   "Natural lighting, no text or logos in the image, no watermarks, "
                   "suitable as a blog article header photo, high quality, 16:9 composition.")
         path = f"/tmp/nanobanana_{hashlib.md5(keyword.encode()).hexdigest()[:10]}.png"
-        if not gemini_generate_image(prompt, path):
+
+        generated = False
+        engine = "gemini"
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from openai_text import openai_available, openai_generate_image
+            if openai_available():
+                generated = openai_generate_image(prompt, path)
+                engine = "gpt-image"
+        except ImportError:
+            pass
+        if not generated:
+            generated = gemini_generate_image(prompt, path)
+            engine = "gemini"
+        if not generated:
             return []
-        fname = "nanobanana-" + re.sub(r'[^a-zA-Z0-9]+', '-', keyword)[:40].strip('-')
-        url = upload_local_image_to_wp(site_url, pw, path, fname or "nanobanana")
+
+        fname = f"{engine}-" + re.sub(r'[^a-zA-Z0-9]+', '-', keyword)[:40].strip('-')
+        url = upload_local_image_to_wp(site_url, pw, path, fname or engine)
         return [url] if url else []
     except Exception as e:
-        print(f"  ⚠️ 나노바나나 폴백 실패: {e}")
+        print(f"  ⚠️ AI 이미지 폴백 실패: {e}")
         return []
 
 def get_fallback_infographic_image(site_url, pw, keyword, theme, lang):
@@ -2640,10 +2730,14 @@ def build_faq_html(faq):
     items="".join(f'<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">{q}</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">{a}</p></div></div>' for q,a in faq)
     return f'<div itemscope itemtype="https://schema.org/FAQPage"><h2>자주 묻는 질문 (FAQ)</h2>{items}</div>'
 
-def build_img_html(urls, keyword):
+def build_img_html(urls, keyword, alt_text=None):
+    # 2026-08-22: 이전엔 한 글에 이미지 여러 장이 들어가도 전부 동일한 alt(키워드
+    # 단독)를 썼음 — 사진마다 실제로 다른 걸 담고 있는데 alt는 똑같은 게 반복되는
+    # 건 AI 대량생산 흔적으로 읽힐 수 있어, 호출부가 사진의 위치/역할에 맞는
+    # alt_text를 넘겨주면 그걸 쓰고, 안 넘기면 keyword로 폴백한다.
     html=""
-    for i,u in enumerate(urls):
-        alt=f"{keyword} 관련 이미지 {i+1}" if i>0 else keyword
+    for u in urls:
+        alt = alt_text or keyword
         html+=f'<figure style="margin:20px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);"><img src="{u}" alt="{alt}" loading="lazy" style="width:100%;height:auto;display:block;"><figcaption style="padding:8px 14px;font-size:13px;color:#666;text-align:center;">{alt}</figcaption></figure>\n'
     return html
 
@@ -2710,9 +2804,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if not cat_id:
         cat_id=pick_best_category(url,pw,keyword,title)
 
-    hero=build_img_html(images[:1],keyword)
-    mid =build_img_html(images[1:2],keyword) if len(images)>1 else ""
-    end =build_img_html(images[2:3],keyword) if len(images)>2 else ""
+    hero=build_img_html(images[:1],keyword,alt_text=title)
+    mid =build_img_html(images[1:2],keyword,alt_text=keyword) if len(images)>1 else ""
+    end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}") if len(images)>2 else ""
     is_newsroom = site.get("mode") in ("news", "news_en")
     faq_html="" if is_newsroom else build_faq_html(faq)
 
@@ -2851,7 +2945,7 @@ def build_news_headline(keyword, lang):
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
-    p=SITE_PERSONA.get(url,{}); min_chars=p.get("min_chars",2200); max_chars=p.get("max_chars")
+    p=SITE_PERSONA.get(url,{}); min_chars=resolve_min_chars(url); max_chars=p.get("max_chars")
 
     reporter=pick_reporter(site)
     print(f"\n  🖊  [{theme}] {keyword[:50]} | {reporter['name']}")
@@ -2874,7 +2968,7 @@ def process_one(site, keyword):
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(10, 13)
-    base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count)
+    base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count,min_chars_override=min_chars)
     if mode in ("news", "news_en"):
         base_prompt += (
             "\n\nSOURCE LEAD FOR FACTUAL GROUNDING:\n"
@@ -2979,11 +3073,14 @@ def process_one(site, keyword):
         images=[]
         print(f"  🚫 이미지 없음 (no_image=True)")
     else:
-        images=get_multiple_images(keyword,count=2,theme=theme)
+        # 2026-08-22: 전 사이트가 매번 정확히 2장으로 고정돼 있던 것도 글자수와
+        # 같은 이유(매 글 동일 패턴 = AI 대량생산 흔적)로 2~3장 랜덤화.
+        img_target = random.randint(2, 3)
+        images=get_multiple_images(keyword,count=img_target,theme=theme)
         if images:
             images = filter_relevant_images(images, title, keyword)
         if not images:
-            print(f"  ⚠️ 사진 검색 완전 실패(또는 관련성 불일치로 전부 패싱) → 나노바나나(Gemini 이미지 생성)로 대체 시도")
+            print(f"  ⚠️ 사진 검색 완전 실패(또는 관련성 불일치로 전부 패싱) → AI 이미지 생성(GPT 우선)으로 대체 시도")
             pw_for_img = os.getenv(site["wp_pass_env"], "")
             images = get_fallback_nanobanana_image(url, pw_for_img, keyword, theme, lang)
             if not images:
