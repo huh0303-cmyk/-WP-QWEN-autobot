@@ -2277,6 +2277,8 @@ def generate_infographic_card(keyword, theme, lang):
     img.save(path, "PNG")
     return path
 
+_uploaded_media_ids = {}
+
 def upload_local_image_to_wp(site_url, pw, filepath, filename):
     try:
         with open(filepath, "rb") as f:
@@ -2285,11 +2287,47 @@ def upload_local_image_to_wp(site_url, pw, filepath, filename):
                            headers={"Content-Disposition": f'attachment; filename="{filename}.png"',
                                     "Content-Type": "image/png"}, data=data, timeout=30)
         if r.status_code in (200, 201):
-            return r.json().get("source_url")
+            media = r.json()
+            source_url = media.get("source_url")
+            if source_url and media.get("id"):
+                _uploaded_media_ids[source_url] = media["id"]
+            return source_url
         print(f"  ⚠️ 인포그래픽 업로드 실패 {r.status_code}: {r.text[:150]}")
     except Exception as e:
         print(f"  ⚠️ 인포그래픽 업로드 오류: {e}")
     return None
+
+def ensure_featured_media(site_url, pw, image_url, title):
+    if not image_url:
+        return 0
+    if image_url in _uploaded_media_ids:
+        media_id = _uploaded_media_ids[image_url]
+    else:
+        try:
+            image = requests.get(image_url, timeout=25, headers={"User-Agent": "Mozilla/5.0"})
+            image.raise_for_status()
+            mime = image.headers.get("Content-Type", "image/jpeg").split(";", 1)[0]
+            extension = ".png" if "png" in mime else ".webp" if "webp" in mime else ".jpg"
+            filename = "news-" + hashlib.md5(image_url.encode()).hexdigest()[:12] + extension
+            uploaded = requests.post(
+                f"{site_url}/wp-json/wp/v2/media", auth=(WP_USER, pw),
+                headers={"Content-Disposition": f'attachment; filename="{filename}"', "Content-Type": mime},
+                data=image.content, timeout=35,
+            )
+            uploaded.raise_for_status()
+            media_id = uploaded.json().get("id", 0)
+        except Exception as e:
+            print(f"  ⚠️ 대표이미지 업로드 실패: {e}")
+            return 0
+    if media_id:
+        try:
+            requests.post(
+                f"{site_url}/wp-json/wp/v2/media/{media_id}", auth=(WP_USER, pw),
+                json={"alt_text": title, "caption": ""}, timeout=15,
+            ).raise_for_status()
+        except Exception as e:
+            print(f"  ⚠️ 대표이미지 alt 저장 실패: {e}")
+    return media_id
 
 # ============================================================
 # ★ 나노바나나(Gemini 2.5 Flash Image) — 스톡사진 실패 시 1차 폴백
@@ -2677,6 +2715,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
           "categories":[cat_id] if cat_id and cat_id>0 else [],
           "tags":tag_ids,
           "meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta,"rank_math_seo_score":str(score)}}
+    featured_media_id = ensure_featured_media(url, pw, images[0] if images else "", title)
+    if featured_media_id:
+        data["featured_media"] = featured_media_id
     if author_id and author_id>0: data["author"]=author_id
 
     try:
