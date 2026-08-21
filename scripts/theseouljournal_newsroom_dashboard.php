@@ -77,13 +77,6 @@ function sj26_fx_rates() {
     return $rates;
 }
 
-add_filter('the_author', function ($name) {
-    return is_admin() ? $name : 'SJ편집실';
-}, 99);
-add_filter('get_the_author_display_name', function ($name) {
-    return is_admin() ? $name : 'SJ편집실';
-}, 99);
-
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('sj26-libre-caslon', 'https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:wght@400;700&family=Playfair+Display:wght@700;800;900&display=swap', array(), null);
 }, 20);
