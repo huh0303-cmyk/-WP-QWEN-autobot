@@ -182,6 +182,20 @@ def now_kst_str():
 # ════════════════════════════════════════════════════════════
 # 1) 27개 사이트 요약 (상세 아니라 합계만)
 # ════════════════════════════════════════════════════════════
+def get_visitor_count(site_url):
+    """일일 방문자수 — 2026-08-21 배포한 daily_visitor_counter.php 스니펫의
+    공개 REST 엔드포인트(site-stats/v1/visitors)에서 오늘 카운트를 가져온다.
+    스니펫이 아직 배포 안 된 사이트는 404가 나므로 None으로 처리."""
+    try:
+        r = requests.get(f"{site_url}/wp-json/site-stats/v1/visitors",
+                          headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+        if r.status_code == 200:
+            return int(r.json().get("count", 0))
+    except Exception:
+        pass
+    return None
+
+
 def get_total_published(site_url):
     """공개 글 수(status=publish) — 인증 없이 조회 가능한 공개 REST 엔드포인트라
     사이트별 WP 비밀번호가 없어도 된다. 2026-08-19: AI티/미색인 글을 대량으로
@@ -224,6 +238,7 @@ def collect_site_summary():
         total_published = get_total_published(site_url)
         if total_published is not None:
             total_posts += total_published
+        visitor_count = get_visitor_count(site_url)
         domain_property = f"sc-domain:{domain}"
         if site_url in accessible:
             query_site = site_url
@@ -232,7 +247,8 @@ def collect_site_summary():
         else:
             error_sites.append(domain)
             site_details.append({"domain": domain, "url": site_url, "clicks": None,
-                                  "indexed": None, "total_posts": total_published, "status": "권한없음"})
+                                  "indexed": None, "total_posts": total_published,
+                                  "visitor_count": visitor_count, "status": "권한없음"})
             continue
         status = "정상"
         clicks = None
@@ -249,7 +265,8 @@ def collect_site_summary():
             total_indexed += coverage["indexed"]
             indexed = coverage["indexed"]
         site_details.append({"domain": domain, "url": site_url, "clicks": clicks,
-                              "indexed": indexed, "total_posts": total_published, "status": status})
+                              "indexed": indexed, "total_posts": total_published,
+                              "visitor_count": visitor_count, "status": status})
         time.sleep(0.2)
 
     return {"total_clicks": total_clicks, "total_indexed": total_indexed,
@@ -615,19 +632,22 @@ def main():
         if m[b]["count"] is not None
     )
 
+    total_real_visitors = sum(d.get("visitor_count") or 0 for d in site_details_list)
     summary_lines = [
         f"[{checked_at}] 종합상황실",
         "",
         "📊 한눈에 보기",
         f"  사이트 {ok_sites}/27 정상 | 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} | "
         f"클릭합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
-        f"색인합계 {today['site_indexed']} {fmt_diff(d_site_indexed)}",
+        f"색인합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} | "
+        f"실제방문자 합계(오늘) {total_real_visitors}명",
         f"  유튜브 8채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
         f"  SNS 연결계정 {sns_connected}/12개",
         "",
         f"■ 사이트 27개 — 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} / "
         f"클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
-        f"색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)}",
+        f"색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} / "
+        f"실제방문자 합계(오늘) {total_real_visitors}명",
     ]
     for d in site_details_list:
         domain = d["domain"]
@@ -638,9 +658,11 @@ def main():
         clicks_str = d["clicks"] if d["clicks"] is not None else "-"
         posts_str = d.get("total_posts") if d.get("total_posts") is not None else "-"
         indexed_str = d["indexed"] if d["indexed"] is not None else "-"
+        visitors_str = d.get("visitor_count") if d.get("visitor_count") is not None else "미배포"
         summary_lines.append(
             f"  - {domain} | {d['url']} | 전체글 {posts_str}{fmt_diff(d_posts)} | "
-            f"색인 {indexed_str} | 방문자 {clicks_str}{fmt_diff(d_clicks)} | {comment}")
+            f"색인 {indexed_str} | GSC방문 {clicks_str}{fmt_diff(d_clicks)} | "
+            f"실제방문자(오늘) {visitors_str} | {comment}")
     summary_lines += [
         "",
         "■ 유튜브 (언어채널 3 + 플리채널 5, 총 8개)",
