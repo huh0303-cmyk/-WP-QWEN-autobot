@@ -1,0 +1,22 @@
+name: Deploy The Seoul Journal dashboard
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Deploy active Code Snippet
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/deploy_theseouljournal_dashboard.py
