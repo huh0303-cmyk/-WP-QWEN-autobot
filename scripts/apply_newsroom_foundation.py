@@ -8,7 +8,7 @@ import requests
 
 ROOT=Path(__file__).resolve().parents[1]
 CFG=json.loads((ROOT/"config/newsrooms.json").read_text(encoding="utf-8"))
-USER=os.getenv("WP_USER","huh0303@gmail.com")
+USER=os.getenv("WP_USER","").strip() or "huh0303@gmail.com"
 ENV={"koreanews365.com":"KOREANEWS365COM","theseouljournal.com":"THESEOULJOURNALCOM"}
 CONFIRM="APPLY-NEWSROOM-FOUNDATION"
 
