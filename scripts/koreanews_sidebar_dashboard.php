@@ -54,7 +54,7 @@ function kn365_kbo_standings() {
     libxml_use_internal_errors($previous);
 
     if (10 === count($standings)) {
-        set_transient('kn365_kbo_standings_v1', $standings, 3 * HOUR_IN_SECONDS);
+        set_transient('kn365_kbo_standings_v1', $standings, DAY_IN_SECONDS);
     }
     return $standings;
 }
@@ -76,7 +76,7 @@ add_action('wp_footer', function () {
     ?>
     <aside id="kn365-dashboard" class="kn365-dashboard" aria-label="실시간 정보">
       <section class="kn365-panel kn365-kbo">
-        <div class="kn365-panel-head"><h2>KBO 순위</h2><span>3시간 간격</span></div>
+        <div class="kn365-panel-head"><h2>KBO 순위</h2><span>2026.8.21 기준</span></div>
         <?php if ($standings) : ?>
           <table><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승률</th></tr></thead><tbody>
           <?php foreach ($standings as $row) : ?>
@@ -137,6 +137,9 @@ add_action('wp_footer', function () {
       .kn365-panel-head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #b5121b;margin:-2px 0 10px;padding:0 0 8px}
       .kn365-panel-head h2{font-size:18px!important;margin:0!important;color:#101c35}.kn365-panel-head span{font-size:11px;color:#778196}
       .kn365-kbo table{width:100%;border-collapse:collapse;font-size:12px}.kn365-kbo th,.kn365-kbo td{padding:5px 4px;border-bottom:1px solid #edf0f4;text-align:center}.kn365-kbo th:nth-child(2),.kn365-kbo td:nth-child(2){text-align:left;font-weight:700}
+      .kn365-kbo tbody tr:nth-child(6) td{border-top:2px dashed #c91421;padding-top:18px}
+      .kn365-kbo tbody tr:nth-child(6) td:first-child{position:relative}
+      .kn365-kbo tbody tr:nth-child(6) td:first-child::before{content:"가을야구 커트라인";position:absolute;top:2px;left:0;width:240px;text-align:center;color:#c91421;font-size:10px;font-weight:800;letter-spacing:.08em}
       .kn365-source,.kn365-disclaimer,.kn365-muted{display:block;margin:9px 0 0;font-size:10px;color:#7a8495}.kn365-source{text-decoration:none}
       .kn365-world ul{list-style:none;margin:0;padding:0}.kn365-world li{display:grid;grid-template-columns:1fr 58px 45px;gap:6px;padding:7px 2px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-world time,.kn365-world .temp{text-align:right;font-variant-numeric:tabular-nums}.kn365-world .temp{font-weight:700;color:#b5121b}
       @media(max-width:767px){.kn365-dashboard{margin-top:18px}.kn365-panel{border-radius:12px}}
