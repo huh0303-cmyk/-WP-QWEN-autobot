@@ -46,9 +46,11 @@ token, or daily usage quota. Therefore continuity is handled by checkpoints:
 - The rebuilt flow is audit -> draft -> quality gate -> human approval -> publish.
 - All site personas are neutral editorial desks with one explicit topic scope.
 - Images must be relevant; relevance-check failure is a rejection, not a pass.
-- News publisher feeds requiring commercial permission remain disabled until
-  written rights are recorded outside GitHub and the corresponding secret gate
-  is deliberately enabled.
+- Sources requiring written commercial permission or a separate syndication
+  agreement are excluded entirely. News automation uses only recorded CC BY,
+  eligible public-domain, and primary-government feeds with item-level checks.
+- Chosun, Yonhap News TV, CNN, The New York Times, BBC, Reuters, and AP are
+  blocked from automatic ingestion unless this policy is changed by a reviewed PR.
 - Koreanews365 and The Seoul Journal start at 3-5 total articles per site per
   day, not 3-5 per category, with at least two original articles per day and at
   least 30 percent original articles per week.
