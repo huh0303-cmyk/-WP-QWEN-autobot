@@ -1,0 +1,42 @@
+name: "Newsrooms — guarded foundation setup"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "적용할 신문사"
+        required: true
+        type: choice
+        options: [koreanews365.com, theseouljournal.com, ALL]
+        default: koreanews365.com
+      confirm:
+        description: "정확히 APPLY-NEWSROOM-FOUNDATION 입력"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "백업 영수증 생성 후 신문사 기반 설정 적용"
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/apply_newsroom_foundation.py --site "${{ inputs.site }}" --confirm "${{ inputs.confirm }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newsroom-foundation-receipt-${{ github.run_id }}
+          path: newsroom_foundation_receipt.json
+          if-no-files-found: warn
+          retention-days: 90

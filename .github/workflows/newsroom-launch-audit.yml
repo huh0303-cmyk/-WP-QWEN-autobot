@@ -1,0 +1,35 @@
+name: "Newsrooms — launch audit"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "점검할 신문사"
+        required: true
+        type: choice
+        options: [ALL, koreanews365.com, theseouljournal.com]
+        default: ALL
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "두 신문사 공개 상태 읽기 전용 점검"
+        continue-on-error: true
+        run: python scripts/audit_newsrooms.py --site "${{ inputs.site }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newsroom-audit-${{ github.run_id }}
+          path: newsroom_audit.json
+          if-no-files-found: error
+          retention-days: 30

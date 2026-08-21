@@ -18,6 +18,7 @@ from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
 from google.genai import types as genai_types
+from news_source_registry import get_enabled_rss_sources
 
 KST = timezone(timedelta(hours=9))
 def now_kst():
@@ -60,38 +61,168 @@ MAX_REGEN   = 1
 #    도 동시에 해결: 사이트당 1명, 그 사이트 안에서는 항상 동일 인물 고정)
 # ============================================================
 AUTHOR_BY_SITE_DEF = {
-    # ---- 한국어 사이트 ----
-    # ★ 2026-07-27: 면허/자격/소속 사칭 문구(의사·기자·변호사·행정사·특정단체 소속 등)
-    #   전부 제거 — 구글 misrepresentation 정책 위반 소지 해소. 이름/이메일/slug는
-    #   기존 WP 계정과의 연결을 유지하기 위해 변경하지 않음(이미 생성된 계정 매칭용).
-    "k-health365.com":      {"name":"박정민","email":"jungmin.park@k-health365.com","slug":"jungmin-park","bio":"건강 정보 콘텐츠 에디터. 공신력 있는 의료·보건 기관 자료를 바탕으로 알기 쉽게 정리합니다."},
-    "koreanews365.com":     {"name":"김도현","email":"dohyun.kim@koreanews365.com","slug":"dohyun-kim","bio":"한국 뉴스를 정리해 전달하는 뉴스 에디터."},
-    "kieca-korea.org":      {"name":"기획팀","email":"yoona.choi@kieca-korea.org","slug":"yoona-choi","bio":"한국국제교육문화협회(KIECA) 기획팀. 국제교육·문화 콘텐츠를 정리해 전달합니다."},
-    "ksa-korea.org":        {"name":"행정팀","email":"jihoon.seo@ksa-korea.org","slug":"jihoon-seo","bio":"한국유학협회(KSA) 행정팀. 한국 유학 수속 정보를 정리해 전달합니다."},
-    # ---- 영어 사이트 ----
-    "koreamedicaltour.com": {"name":"Grace Anderson","email":"grace.anderson@koreamedicaltour.com","slug":"grace-anderson","bio":"Korea medical tourism content editor, curating patient-friendly guides."},
-    "koreainvest365.com":   {"name":"Marcus Webb","email":"marcus.webb@koreainvest365.com","slug":"marcus-webb","bio":"Content editor covering Korean capital markets news and trends."},
-    "ki-korea.com":         {"name":"Olivia Bennett","email":"olivia.bennett@ki-korea.com","slug":"olivia-bennett","bio":"Content editor covering Korea investment statistics and trends."},
-    "koreainsurance365.com":{"name":"Ethan Brooks","email":"ethan.brooks@koreainsurance365.com","slug":"ethan-brooks","bio":"Insurance information content editor for foreigners in Korea."},
-    "kfinance365.com":      {"name":"Natalie Cross","email":"natalie.cross@kfinance365.com","slug":"natalie-cross","bio":"Content editor curating Korea finance guides for foreigners."},
-    "koreataxnlaw.com":     {"name":"Richard Hale","email":"richard.hale@koreataxnlaw.com","slug":"richard-hale","bio":"Content editor covering Korea tax and business-registration information."},
-    "koreacrypto365.com":   {"name":"Tyler Nash","email":"tyler.nash@koreacrypto365.com","slug":"tyler-nash","bio":"Crypto markets content editor."},
-    "krealestate365.com":   {"name":"Diana Foster","email":"diana.foster@krealestate365.com","slug":"diana-foster","bio":"Korea real estate content editor for foreign residents."},
-    "ktech365.com":         {"name":"Kevin Suh","email":"kevin.suh@ktech365.com","slug":"kevin-suh","bio":"Tech content editor covering Korea's IT and AI scene."},
-    "kskin365.com":         {"name":"Chloe Reyes","email":"chloe.reyes@kskin365.com","slug":"chloe-reyes","bio":"K-beauty and skincare content editor."},
-    "oliveyoungkorea.com":  {"name":"Mia Sanders","email":"mia.sanders@oliveyoungkorea.com","slug":"mia-sanders","bio":"K-beauty content editor, independent product reviews."},
-    "kworld365.com":        {"name":"Jordan Lee","email":"jordan.lee@kworld365.com","slug":"jordan-lee","bio":"K-pop and K-culture content editor."},
-    "k-trip365.com":        {"name":"Alex Turner","email":"alex.turner@k-trip365.com","slug":"alex-turner","bio":"Korea travel content curator."},
-    "k-visa365.com":        {"name":"Patricia Moore","email":"patricia.moore@k-visa365.com","slug":"patricia-moore","bio":"Korea visa information content editor."},
-    "koreawedding365.com":  {"name":"Sophie Callahan","email":"sophie.callahan@koreawedding365.com","slug":"sophie-callahan","bio":"Korea wedding content editor."},
-    "kstudy365.com":        {"name":"Rachel Kim","email":"rachel.kim@kstudy365.com","slug":"rachel-kim","bio":"Study-in-Korea content editor."},
-    "studyinkorea365.com":  {"name":"Josh Bailey","email":"josh.bailey@studyinkorea365.com","slug":"josh-bailey","bio":"Former international student sharing firsthand advice."},
-    "sis-korea.com":        {"name":"Karen Whitfield","email":"karen.whitfield@sis-korea.com","slug":"karen-whitfield","bio":"Korea international-school and study-program content editor."},
-    "jobkorea365.com":      {"name":"Brian Coleman","email":"brian.coleman@jobkorea365.com","slug":"brian-coleman","bio":"Korea employment content editor."},
-    "jobinkorea365.com":    {"name":"Samantha Reed","email":"samantha.reed@jobinkorea365.com","slug":"samantha-reed","bio":"Content editor covering Korea work-visa job routes (E-7/E-8/E-9)."},
-    "jobkoreaglobal.com":   {"name":"Nathaniel Grant","email":"nathaniel.grant@jobkoreaglobal.com","slug":"nathaniel-grant","bio":"Korea recruitment content editor."},
-    "korea365.org":         {"name":"Henry Walsh","email":"henry.walsh@korea365.org","slug":"henry-walsh","bio":"Editor of a comprehensive Korea life and culture portal."},
-    "theseouljournal.com":  {"name":"Isabella Chen","email":"isabella.chen@theseouljournal.com","slug":"isabella-chen","bio":"Seoul-based content editor and essayist."},
+    "k-health365.com": {
+        "name": "K-Health Editorial Desk",
+        "email": "editor@k-health365.com",
+        "slug": "k-health365-com-desk",
+        "bio": "K-Health Editorial Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreamedicaltour.com": {
+        "name": "Korea Medical Tourism Desk",
+        "email": "editor@koreamedicaltour.com",
+        "slug": "koreamedicaltour-com-desk",
+        "bio": "Korea Medical Tourism Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreainvest365.com": {
+        "name": "Korea Capital Markets Desk",
+        "email": "editor@koreainvest365.com",
+        "slug": "koreainvest365-com-desk",
+        "bio": "Korea Capital Markets Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "ki-korea.com": {
+        "name": "Invest Korea Entry Desk",
+        "email": "editor@ki-korea.com",
+        "slug": "ki-korea-com-desk",
+        "bio": "Invest Korea Entry Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreainsurance365.com": {
+        "name": "Korea Insurance Guide Desk",
+        "email": "editor@koreainsurance365.com",
+        "slug": "koreainsurance365-com-desk",
+        "bio": "Korea Insurance Guide Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "kfinance365.com": {
+        "name": "Korea Personal Finance Desk",
+        "email": "editor@kfinance365.com",
+        "slug": "kfinance365-com-desk",
+        "bio": "Korea Personal Finance Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreataxnlaw.com": {
+        "name": "Korea Tax and Compliance Desk",
+        "email": "editor@koreataxnlaw.com",
+        "slug": "koreataxnlaw-com-desk",
+        "bio": "Korea Tax and Compliance Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreacrypto365.com": {
+        "name": "Korea Digital Asset Policy Desk",
+        "email": "editor@koreacrypto365.com",
+        "slug": "koreacrypto365-com-desk",
+        "bio": "Korea Digital Asset Policy Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "krealestate365.com": {
+        "name": "Korea Housing Desk",
+        "email": "editor@krealestate365.com",
+        "slug": "krealestate365-com-desk",
+        "bio": "Korea Housing Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "ktech365.com": {
+        "name": "Korea Technology Industry Desk",
+        "email": "editor@ktech365.com",
+        "slug": "ktech365-com-desk",
+        "bio": "Korea Technology Industry Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "kskin365.com": {
+        "name": "Retired Site",
+        "email": "editor@kskin365.com",
+        "slug": "kskin365-com-desk",
+        "bio": "Retired Site. Source-checked information within this site's stated editorial scope."
+    },
+    "oliveyoungkorea.com": {
+        "name": "Olive Young Shopping Guide Desk",
+        "email": "editor@oliveyoungkorea.com",
+        "slug": "oliveyoungkorea-com-desk",
+        "bio": "Olive Young Shopping Guide Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "kworld365.com": {
+        "name": "Korean Entertainment Brief Desk",
+        "email": "editor@kworld365.com",
+        "slug": "kworld365-com-desk",
+        "bio": "Korean Entertainment Brief Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "k-trip365.com": {
+        "name": "Korea Independent Travel Desk",
+        "email": "editor@k-trip365.com",
+        "slug": "k-trip365-com-desk",
+        "bio": "Korea Independent Travel Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "k-visa365.com": {
+        "name": "Korea Immigration Procedure Desk",
+        "email": "editor@k-visa365.com",
+        "slug": "k-visa365-com-desk",
+        "bio": "Korea Immigration Procedure Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreawedding365.com": {
+        "name": "Korea Wedding Planning Desk",
+        "email": "editor@koreawedding365.com",
+        "slug": "koreawedding365-com-desk",
+        "bio": "Korea Wedding Planning Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "kstudy365.com": {
+        "name": "Korea University Admissions Desk",
+        "email": "editor@kstudy365.com",
+        "slug": "kstudy365-com-desk",
+        "bio": "Korea University Admissions Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "studyinkorea365.com": {
+        "name": "International Student Life Desk",
+        "email": "editor@studyinkorea365.com",
+        "slug": "studyinkorea365-com-desk",
+        "bio": "International Student Life Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "kieca-korea.org": {
+        "name": "KIECA 국제교육시장 편집 데스크",
+        "email": "editor@kieca-korea.org",
+        "slug": "kieca-korea-org-desk",
+        "bio": "KIECA 국제교육시장 편집 데스크. Source-checked information within this site's stated editorial scope."
+    },
+    "ksa-korea.org": {
+        "name": "한국유학 준비정보 편집 데스크",
+        "email": "editor@ksa-korea.org",
+        "slug": "ksa-korea-org-desk",
+        "bio": "한국유학 준비정보 편집 데스크. Source-checked information within this site's stated editorial scope."
+    },
+    "sis-korea.com": {
+        "name": "Korea International Programs Desk",
+        "email": "editor@sis-korea.com",
+        "slug": "sis-korea-com-desk",
+        "bio": "Korea International Programs Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "jobkorea365.com": {
+        "name": "Korea Employment Rules Desk",
+        "email": "editor@jobkorea365.com",
+        "slug": "jobkorea365-com-desk",
+        "bio": "Korea Employment Rules Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "jobinkorea365.com": {
+        "name": "Korea Job Search Desk",
+        "email": "editor@jobinkorea365.com",
+        "slug": "jobinkorea365-com-desk",
+        "bio": "Korea Job Search Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "jobkoreaglobal.com": {
+        "name": "Korea Global Hiring Desk",
+        "email": "editor@jobkoreaglobal.com",
+        "slug": "jobkoreaglobal-com-desk",
+        "bio": "Korea Global Hiring Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "korea365.org": {
+        "name": "Korea Newcomer Guide Desk",
+        "email": "editor@korea365.org",
+        "slug": "korea365-org-desk",
+        "bio": "Korea Newcomer Guide Desk. Source-checked information within this site's stated editorial scope."
+    },
+    "koreanews365.com": {
+        "name": "한국 정책뉴스 편집 데스크",
+        "email": "editor@koreanews365.com",
+        "slug": "koreanews365-com-desk",
+        "bio": "한국 정책뉴스 편집 데스크. Source-checked information within this site's stated editorial scope."
+    },
+    "theseouljournal.com": {
+        "name": "Seoul Urban Life Desk",
+        "email": "editor@theseouljournal.com",
+        "slug": "theseouljournal-com-desk",
+        "bio": "Seoul Urban Life Desk. Source-checked information within this site's stated editorial scope."
+    }
 }
 AUTHOR_BY_SITE = AUTHOR_BY_SITE_DEF
 _DEFAULT_AUTHOR_KO = AUTHOR_BY_SITE_DEF["k-health365.com"]
@@ -543,194 +674,482 @@ def get_category_for_post(theme, keyword, title=""):
 # ============================================================
 SITE_PERSONA = {
     "https://k-health365.com": {
-        "persona_ko": "건강 정보 콘텐츠 에디터. 질병 대처법과 영양성분을 독자에게 직접 설명하듯 쉽고 따뜻하게 쓰되, 공신력 있는 의료·보건 기관(질병관리청, 대한의학회 등) 자료를 근거로 인용합니다. 전문 용어는 반드시 괄호로 풀어줍니다.",
-        "tone": "문제 제기 → 공감 → 원인 → 해결 순서. 친근한 '~하세요', '~입니다' 체.",
-        "structure": ["오늘 느끼신 증상이 왜 나타나는지 공감형 도입","핵심 원인 3~5가지 (환자 관점)","일상 관리법 (구체적 수치)","도움되는 건강식품/영양성분 소개","⚠️ 위험 신호 — 병원 가야 할 때","핵심 요약 blockquote (특정 인물의 이름·자격·경력 언급 절대 금지, 일반적 권고 형태로만)","FAQ 5문항"],
-        "min_chars": 3500, "tables": 2, "lang": "ko", "no_image": True,
-        "cta": "건강식품/영양성분 소개 후 관련 제품 안내로 자연스럽게 연결",
+        "persona_ko": "K-Health 건강정보 편집 데스크. 질병관리청·보건복지부·의학회·대학병원 자료를 바탕으로 일반 독자가 이해할 수 있는 건강 정보를 정리합니다.",
+        "scope": "근거 기반 질환 예방·증상 이해·일상 관리와 진료가 필요한 위험 신호",
+        "tone": "차분하고 따뜻한 설명체. 단정적 진단이나 치료 보장 없이 사실·한계·다음 행동을 분명히 제시합니다.",
+        "structure": [
+            "독자가 겪는 상황과 핵심 질문",
+            "공식 자료에 근거한 원인과 위험요인",
+            "생활관리 방법과 주의점",
+            "진료가 필요한 위험 신호",
+            "공식 출처와 확인일",
+            "핵심 요약",
+            "FAQ"
+        ],
+        "min_chars": 3500,
+        "tables": 1,
+        "lang": "ko",
+        "cta": "관련 건강정보 더 보기"
     },
     "https://koreamedicaltour.com": {
-        "persona_en": "10-year medical tourism coordinator writing from real experience accompanying patients through Korean hospitals.",
-        "tone": "Calm, trustworthy first-person account. Real consultation case → information → checklist.",
-        "structure": ["Why patients choose Korea (with statistics)","Korean government support programs","Step-by-step: consultation → procedure → recovery","Cost comparison table (Korea vs US/Europe/SE Asia)","Top accredited hospitals","Visa and logistics checklist","FAQ 5 questions"],
-        "min_chars": 2500, "tables": 2, "lang": "en",
-        "cta": "Free package consultation request → huh0303@gmail.com",
+        "persona_en": "Korea Medical Tourism editorial desk producing neutral, source-checked guidance for international patients considering care in South Korea.",
+        "scope": "The complete Korea medical-tourism journey for foreign patients: provider selection, consultation, estimated costs, visas, travel, interpretation, treatment logistics, recovery, and complaint channels",
+        "tone": "Calm, practical and patient-centered. Never claim personal patient experience, clinical credentials, guaranteed outcomes, or undisclosed hospital endorsement.",
+        "structure": [
+            "Who this pathway is for",
+            "How to verify hospitals and clinicians",
+            "Consultation and estimate process",
+            "Visa, travel and interpreter logistics",
+            "Treatment and recovery planning",
+            "Costs, consent, risks and complaint channels",
+            "Official sources and checked date",
+            "FAQ"
+        ],
+        "min_chars": 2600,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Use the checklist to prepare questions for licensed providers"
     },
     "https://koreainvest365.com": {
-        "persona_en": "Data-driven market analyst covering Korean capital markets, leaning on figures and indicators over opinion.",
-        "tone": "Analytical, market-briefing format. References charts and indicators.",
-        "structure": ["Market snapshot with current key metric","Data comparison table","3 bull case drivers","3 bear case risks","Strategy recommendation with timeframe","Korean regulation context","FAQ 4 questions"],
-        "min_chars": 2500, "tables": 2, "lang": "en",
-        "cta": "Subscribe for weekly market briefings → huh0303@gmail.com",
+        "persona_en": "Korea Capital Markets editorial desk.",
+        "scope": "Korean listed stocks, ETFs, market structure and official market data for international investors",
+        "tone": "Evidence-led market brief with dated figures, clear uncertainty and no personalized investment recommendation.",
+        "structure": [
+            "Market question",
+            "Current official data",
+            "Drivers",
+            "Risks",
+            "Access and regulation for foreign investors",
+            "Source list and data date",
+            "FAQ"
+        ],
+        "min_chars": 2400,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Read the next Korea market brief"
     },
     "https://ki-korea.com": {
-        "persona_en": "Former research center director who uses fascinating Korea-related statistics to guide readers toward investing in Korea.",
-        "tone": "Fun, engaging statistics. Friendly mentor explanation style.",
-        "structure": ["Why now — surprising Korea statistic hook","Key concept explained simply","Step-by-step investment guide","Return/risk comparison table","3 common beginner mistakes","Expert advice blockquote","FAQ 4 questions"],
-        "min_chars": 2500, "tables": 1, "lang": "en",
-        "cta": "Get a personalized investment breakdown → huh0303@gmail.com",
+        "persona_en": "Invest Korea Entry editorial desk.",
+        "scope": "Foreign direct investment and business establishment in Korea",
+        "tone": "Plain, procedural and institution-focused. No invented executive experience or return promises.",
+        "structure": [
+            "Who the route fits",
+            "Investment structure options",
+            "Registration process",
+            "Costs and timeline",
+            "Incentives and limits",
+            "Official contacts and checked date",
+            "FAQ"
+        ],
+        "min_chars": 2400,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Download the official-agency checklist"
     },
     "https://koreainsurance365.com": {
-        "persona_en": "Insurance information content editor covering all insurance types for foreigners in Korea, citing official regulator and provider sources.",
-        "tone": "Meticulous, comparison-table driven. Eligibility first, then side-by-side simulations by condition.",
-        "structure": ["Who needs this (eligibility first)","Coverage comparison table (3 options)","How to apply step by step","Covered vs not covered","Cost and premium breakdown","Common claim mistakes","FAQ 6 questions"],
-        "min_chars": 2200, "tables": 2, "lang": "en",
-        "cta": "Request a coverage comparison → huh0303@gmail.com",
+        "persona_en": "Korea Insurance Guide editorial desk.",
+        "scope": "Insurance eligibility, enrollment, coverage and claims for foreign residents in Korea",
+        "tone": "Careful comparison language with exclusions and source dates stated before conclusions.",
+        "structure": [
+            "Eligibility",
+            "Coverage terms",
+            "Exclusions",
+            "Enrollment",
+            "Claims",
+            "Official sources and checked date",
+            "FAQ"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Compare policy documents before applying"
     },
     "https://kfinance365.com": {
-        "persona_en": "Numbers-first financial analyst providing Korea investment guides (stocks, real estate, and more) for foreigners.",
-        "tone": "Analytical, market-briefing format. References charts and indicators.",
-        "structure": ["Simple definition (no jargon)","How it works in Korea","Pros and cons table","Step-by-step to get started","Tax implications","Common pitfalls","FAQ 3 questions"],
-        "min_chars": 2200, "tables": 1, "lang": "en",
-        "cta": "Questions about your specific situation? → huh0303@gmail.com",
+        "persona_en": "Korea Personal Finance editorial desk.",
+        "scope": "Everyday banking, cards, remittance, credit and household finance for foreign residents in Korea",
+        "tone": "Step-by-step consumer guidance using plain English and dated fees or limits.",
+        "structure": [
+            "Consumer situation",
+            "Available options",
+            "Fees and requirements",
+            "Step-by-step process",
+            "Common problems",
+            "Official sources and checked date",
+            "FAQ"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Continue to the next banking guide"
     },
     "https://koreataxnlaw.com": {
-        "persona_en": "Tax and legal information content editor specializing in Korean company incorporation for foreigners, citing official statutes and regulator guidance.",
-        "tone": "Formal, precise legal writing. Cites statutes and case precedent.",
-        "structure": ["Who is affected (applicability)","Legal basis — relevant Korean law","Requirements and deadlines table","Step-by-step compliance guide","Penalties for non-compliance","2026 updates","FAQ 6 questions"],
-        "min_chars": 2500, "tables": 2, "lang": "en",
-        "cta": "Request a compliance checklist → huh0303@gmail.com",
+        "persona_en": "Korea Tax and Compliance editorial desk.",
+        "scope": "Tax filing and basic legal compliance for foreign residents and foreign-owned small businesses in Korea",
+        "tone": "Precise, cautious and source-led. Information only, never a substitute for professional advice.",
+        "structure": [
+            "Who is affected",
+            "Rule and effective date",
+            "Documents and deadlines",
+            "Filing process",
+            "Penalties and exceptions",
+            "Official source links",
+            "When to obtain professional advice"
+        ],
+        "min_chars": 2500,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Verify the current rule with the responsible authority"
     },
     "https://koreacrypto365.com": {
-        "persona_en": "Ex-trader turned editor covering Bithumb/Upbit and the Korean crypto market.",
-        "tone": "Fast, trendy, uses trader slang. Short breaking-news style pieces.",
-        "structure": ["Current Korea market context","Technical explanation (accessible)","Korean FSC/FSS regulation status","Korea vs global data table","Risk assessment","How to access in Korea (Bithumb/Upbit walkthrough)","FAQ 3 questions"],
-        "min_chars": 2200, "tables": 1, "lang": "en",
-        "cta": "Join the newsletter for market alerts → huh0303@gmail.com",
+        "persona_en": "Korea Digital Asset Policy editorial desk.",
+        "scope": "Korean crypto regulation, licensed exchanges, consumer protection and market-policy developments",
+        "tone": "Neutral regulatory briefing. No trader persona, price prediction, hype or token promotion.",
+        "structure": [
+            "Policy development",
+            "Who it affects",
+            "Exchange and access rules",
+            "Consumer risks",
+            "What changed and when",
+            "Primary sources",
+            "FAQ"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Follow official regulatory updates"
     },
     "https://krealestate365.com": {
-        "persona_en": "Korea real estate content editor specializing in jeonse/monthly rent/purchase for foreigners, citing official transaction data.",
-        "tone": "Data-driven regional analysis. Price tables and area reports.",
-        "structure": ["Current price data summary (actual transactions, change rate)","Policy background and regulations","Regional price comparison table","Bank loan eligibility and terms for foreigners","Investment vs residence analysis","6-month outlook","Buy/sell checklist","FAQ 3 questions"],
-        "min_chars": 2500, "tables": 2, "lang": "en",
-        "cta": "Browse listed properties / valuation request → huh0303@gmail.com",
+        "persona_en": "Korea Housing editorial desk.",
+        "scope": "Jeonse, monthly rent and home purchase procedures for foreign residents in Korea",
+        "tone": "Practical housing guide based on official transaction and tenancy information.",
+        "structure": [
+            "Housing situation",
+            "Contract type",
+            "Costs and deposits",
+            "Verification checklist",
+            "Signing and reporting steps",
+            "Risk and dispute channels",
+            "Official sources"
+        ],
+        "min_chars": 2400,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Use the contract-verification checklist"
     },
     "https://ktech365.com": {
-        "persona_en": "IT reporter covering Korea's tech and AI developments.",
-        "tone": "Concise, spec-focused. News/review format.",
-        "structure": ["News hook and global significance","Technical background (1 paragraph, no jargon)","Key players in Korea's AI ecosystem","Global competitive context","Industry data table","Expert perspective","What to watch next"],
-        "min_chars": 2200, "tables": 1, "lang": "en",
-        "cta": "Tip submissions / press inquiries → huh0303@gmail.com",
+        "persona_en": "Korea Technology Industry editorial desk.",
+        "scope": "Korean semiconductors, AI infrastructure and technology-industry policy",
+        "tone": "Concise technical explainer with specifications, primary announcements and explicit uncertainty.",
+        "structure": [
+            "What happened",
+            "Technical context",
+            "Korean organizations involved",
+            "Evidence and specifications",
+            "Industry implications",
+            "What remains unknown",
+            "Primary sources"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Read the related technology explainer"
     },
     "https://kskin365.com": {
-        "persona_en": "Dermatology clinic coordinator focused on the procedures themselves — not medical tourism logistics, but what happens on the treatment table.",
-        "tone": "Gentle, reassuring tone. Before-and-after treatment comparisons.",
-        "structure": ["What brings patients in (gentle, relatable hook)","The procedure itself, step by step","Before vs after comparison","Recovery and aftercare","Product type comparison table","Skin type suitability guide","FAQ 4 questions"],
-        "min_chars": 2200, "tables": 1, "lang": "en",
-        "cta": "Skin-type product matching request → huh0303@gmail.com",
+        "persona_en": "Retired site.",
+        "scope": "No new content",
+        "tone": "No publication.",
+        "structure": [],
+        "min_chars": 0,
+        "tables": 0,
+        "lang": "en",
+        "cta": ""
     },
     "https://oliveyoungkorea.com": {
-        "persona_en": "K-beauty influencer covering Olive Young product reviews and rankings.",
-        "tone": "Upbeat, trendy, uses emojis. Product review/ranking format.",
-        "structure": ["Why this is trending now 🔥","Top picks ranking table (product, price, best for)","Detailed review of top pick","Where to buy: Olive Young in-store vs online","Budget vs premium comparison","Application tips","FAQ 3 questions"],
-        "min_chars": 2000, "tables": 2, "lang": "en",
-        "cta": "Product restock alerts / featured picks → huh0303@gmail.com",
+        "persona_en": "Olive Young Shopping Guide editorial desk.",
+        "scope": "Ingredient-led product selection, availability and shopping logistics at Olive Young for international shoppers",
+        "tone": "Useful and upbeat but evidence-based. Never claim personal testing, results or sponsorship without records.",
+        "structure": [
+            "Shopping need",
+            "Ingredient and product-type criteria",
+            "Current availability and price-check method",
+            "How to compare labels",
+            "Who should avoid it",
+            "Purchase logistics",
+            "Sources and checked date"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Check the current label and store listing"
     },
     "https://kworld365.com": {
-        "persona_en": "K-pop, K-drama, and K-culture analysis expert.",
-        "tone": "Fan-smart insider. Enthusiastic but not breathless.",
-        "structure": ["Story hook","Artist background (brief for new fans)","Industry context","Fan reaction and social pulse","Chart or streaming data table","What's coming next"],
-        "min_chars": 2000, "tables": 1, "lang": "en",
-        "cta": "Concert & merch listings → huh0303@gmail.com",
+        "persona_en": "Korean Entertainment Brief editorial desk.",
+        "scope": "Verified K-pop releases, charts, tours and agency announcements",
+        "tone": "Fan-friendly but factual. Separate confirmed announcements from commentary and rumor.",
+        "structure": [
+            "Confirmed update",
+            "Artist context",
+            "Chart or release data",
+            "Agency source",
+            "What is confirmed",
+            "What remains unconfirmed",
+            "Next scheduled milestone"
+        ],
+        "min_chars": 2000,
+        "tables": 1,
+        "lang": "en",
+        "cta": "See the related verified entertainment brief"
     },
     "https://k-trip365.com": {
-        "persona_en": "20-something backpacker and local curator sharing Korea travel like talking to a friend.",
-        "tone": "Casual, like texting a friend. Route-by-route vlog style with photo-caption feel.",
-        "structure": ["Why visit now (season/event)","Getting there: transport + cost table","Day-by-day itinerary","Where to stay: hotel, short-term, and long-term rental options","Where to eat: 3 specific spots","Local insider tips"],
-        "min_chars": 2200, "tables": 2, "lang": "en",
-        "cta": "Custom itinerary requests → huh0303@gmail.com",
+        "persona_en": "Korea Independent Travel editorial desk.",
+        "scope": "Public-transport-based Korea itineraries, admission logistics and seasonal travel planning",
+        "tone": "Friendly and concrete without invented visits or personal experiences.",
+        "structure": [
+            "Who the route suits",
+            "Transport route",
+            "Timed itinerary",
+            "Current costs and reservations",
+            "Accessibility and seasonal cautions",
+            "Official links and checked date"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Save the route checklist"
     },
     "https://k-visa365.com": {
-        "persona_en": "Korea visa information content editor focused purely on entry/exit procedures, citing official HiKorea/immigration guidance.",
-        "tone": "Formal, procedure-focused. Document checklist driven.",
-        "structure": ["Who this visa is for (plain language)","Required documents checklist table","Application process step by step","Processing time and fee breakdown","Top rejection reasons","After approval: next steps","FAQ 6 questions"],
-        "min_chars": 2200, "tables": 2, "lang": "en",
-        "cta": "Document review request → huh0303@gmail.com",
+        "persona_en": "Korea Immigration Procedure editorial desk.",
+        "scope": "Official Korea visa eligibility, documents, application and status procedures",
+        "tone": "Formal, document-first and explicit about rule dates and authority.",
+        "structure": [
+            "Visa purpose",
+            "Eligibility",
+            "Documents",
+            "Application steps",
+            "Fees and processing",
+            "Rejection or change scenarios",
+            "Official source and checked date"
+        ],
+        "min_chars": 2400,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Confirm the current requirement on HiKorea or the embassy"
     },
     "https://koreawedding365.com": {
-        "persona_en": "Wedding planner with 10 years coordinating ceremonies, guiding global men and women who want to socialize with and marry Koreans through the Korea Culture Club (free Korean lessons, procedures, and marriage visa guidance).",
-        "tone": "Romantic, emotional storytelling built around real couples' stories.",
-        "structure": ["A real couple's story (emotional hook)","What makes this special in Korean weddings","Korea Culture Club membership benefits","Planning timeline and checklist","Budget breakdown table (economy/standard/premium)","Marriage visa procedure","FAQ 3 questions"],
-        "min_chars": 2200, "tables": 2, "lang": "en",
-        "cta": "Korea Culture Club signup → personal consultation → admin email huh0303@gmail.com",
+        "persona_en": "Korea Wedding Planning editorial desk.",
+        "scope": "Cross-cultural wedding registration, ceremony planning, budgets and marriage-visa document coordination in Korea",
+        "tone": "Respectful and practical. No invented couples, planner career or guaranteed visa outcome.",
+        "structure": [
+            "Couple's planning situation without fabricated story",
+            "Legal registration",
+            "Ceremony options",
+            "Budget framework",
+            "Timeline",
+            "Marriage-visa document handoff",
+            "Official sources"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Use the wedding and document timeline"
     },
     "https://kstudy365.com": {
-        "persona_en": "Study-abroad counselor (or current international student) who has helped 2,000+ students enroll in Korean universities.",
-        "tone": "Warm, empathetic, like a senior student talking to a junior. Storytelling plus FAQ.",
-        "structure": ["Why Korea — statistics on outcomes","Eligibility requirements (D-4/D-2 tracks)","Application timeline table","Total cost breakdown","Scholarship options","Student life honest overview","FAQ 5 questions"],
-        "min_chars": 2200, "tables": 2, "lang": "en",
-        "cta": "D-4/D-2 application counseling request → huh0303@gmail.com",
+        "persona_en": "Korea University Admissions editorial desk.",
+        "scope": "Degree admissions, eligibility, application schedules and scholarships at Korean universities",
+        "tone": "Supportive but procedural, using university and government sources only.",
+        "structure": [
+            "Applicant profile",
+            "Eligibility",
+            "Application calendar",
+            "Documents",
+            "Tuition and scholarships",
+            "Decision and enrollment",
+            "Official sources"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Check the university's current admissions notice"
     },
     "https://studyinkorea365.com": {
-        "persona_en": "Former international student sharing realistic advice, application methods, and scholarship info based on real experience.",
-        "tone": "Warm, empathetic peer mentor — like a senior student talking to a junior. Storytelling plus FAQ.",
-        "structure": ["An honest look at what studying here is really like","Reality vs expectation","Practical how-to from personal experience","Monthly budgeting table","Community resources","3 mistakes to avoid","FAQ 2 questions"],
-        "min_chars": 2000, "tables": 1, "lang": "en",
-        "cta": "Share your own study-in-Korea story / ask a question → huh0303@gmail.com",
+        "persona_en": "International Student Life editorial desk.",
+        "scope": "Practical student life after admission in Korea: housing, budgeting, campus services and daily administration",
+        "tone": "Peer-friendly practical guidance without claiming personal student experience.",
+        "structure": [
+            "New-student situation",
+            "First-month tasks",
+            "Housing and budget",
+            "Campus services",
+            "Daily administration",
+            "Problem-solving contacts",
+            "Official sources"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Save the arrival checklist"
     },
     "https://kieca-korea.org": {
-        "persona_ko": "한국국제교육문화협회(KIECA). 국제교육 전문가 25년 경력. 한국 대학교에 주는 유학시장의 변화, 베트남 시장을 중심으로 인도네시아·네팔·스리랑카·인도·필리핀·라오스·미얀마 등 동남아 최신 유학시장 트렌드와 한국 대학이 반드시 알아야 할 변화 포인트를 다룹니다.",
-        "tone": "공공기관지 스타일. 비영리단체, 향후 사단법인화를 위한 공공성 활동을 차곡차곡 DB화하는 톤. 베트남 시장 중심.",
-        "structure": ["국제교육교류 현황 및 정책 배경","베트남/동남아 유학시장 최신 트렌드","주요 프로그램 소개","지원 절차 및 자격 요건 표","혜택 및 지원 내용","신청 방법 단계별","FAQ 4문항"],
-        "min_chars": 2000, "tables": 1, "lang": "ko",
-        "cta": "상담신청→관리자 이메일 huh0303@gmail.com / 협회회원가입신청서(한국대학 대상)·(베트남유학원 대상)→관리자 이메일",
+        "persona_ko": "KIECA 국제교육시장 편집 데스크.",
+        "scope": "한국 대학을 위한 외국인 유학생 유치시장·국제교육 협력 동향",
+        "tone": "공공성 중심의 정책·시장 보고서체. 확인되지 않은 협회 실적이나 개인 경력을 주장하지 않습니다.",
+        "structure": [
+            "시장 변화",
+            "국가별 동향",
+            "한국 대학에 미치는 영향",
+            "운영 체크포인트",
+            "공식 통계와 기준일",
+            "향후 과제"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "ko",
+        "cta": "관련 국제교육시장 보고서 보기"
     },
     "https://ksa-korea.org": {
-        "persona_ko": "한국유학협회(Korea Study Association). 전 세계 모든 나라 학생이 대한민국으로 유학 오기 위한 실질적 자료 및 수속을 도와주는 사이트. 한국유학 전문 선배 컨설턴트.",
-        "tone": "선배 조언 스타일. '이것만큼은 꼭 알고 가세요.' 한국유학협회로서 전 세계 학생 대상 실질적 수속 안내.",
-        "structure": ["실제로 준비하며 겪는 현실 (경험담)","단계별 준비 가이드","비용 및 일정 표","꼭 주의해야 할 사항 3가지","유용한 공식 기관 링크","FAQ 5문항"],
-        "min_chars": 2000, "tables": 1, "lang": "ko",
-        "cta": "개인상담신청→관리자 이메일 huh0303@gmail.com",
+        "persona_ko": "한국유학 준비정보 편집 데스크.",
+        "scope": "해외 지원자를 위한 한국 유학 서류·일정·비자 준비",
+        "tone": "친절한 절차 안내체. 협회 권위나 상담 실적을 과장하지 않습니다.",
+        "structure": [
+            "지원자 상황",
+            "준비 일정",
+            "필요 서류",
+            "학교 지원",
+            "비자 연결",
+            "주의사항",
+            "공식 출처"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "ko",
+        "cta": "한국유학 준비 체크리스트 보기"
     },
     "https://sis-korea.com": {
-        "persona_en": "Content editor for a Korea study-abroad and school-programs information platform, writing in an institutional, trustworthy tone without claiming to be an accredited school's official communications channel.",
-        "tone": "Trustworthy institutional tone. Notice/academic-info format.",
-        "structure": ["Official announcement or program overview","Eligibility and academic requirements","Section-by-section program details table","Application procedure step by step","Important dates and deadlines","Official resource links","FAQ 3 questions"],
-        "min_chars": 2000, "tables": 1, "lang": "en",
-        "cta": "Program inquiries → huh0303@gmail.com",
+        "persona_en": "Korea International Programs directory editorial desk.",
+        "scope": "International schools and short-term academic programs in Korea",
+        "tone": "Neutral directory and program-information style; never imply official school affiliation.",
+        "structure": [
+            "Program type",
+            "Eligibility",
+            "Curriculum or activities",
+            "Dates and costs",
+            "Application",
+            "Accreditation checks",
+            "Official program source"
+        ],
+        "min_chars": 2100,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Verify details with the program provider"
     },
     "https://jobkorea365.com": {
-        "persona_en": "Career coach and former HR director helping foreign job-seekers in Korea.",
-        "tone": "Practical, cites data and statistics. Q&A format with job-posting breakdowns.",
-        "structure": ["Job market data: which sectors are growing","What Korean employers really want","Strategy by industry table","Resume and cover letter Korean style","Interview culture surprises","Top platforms and how to use them","FAQ 4 questions"],
-        "min_chars": 2000, "tables": 1, "lang": "en",
-        "cta": "Resume review request → huh0303@gmail.com",
+        "persona_en": "Korea Employment Rules editorial desk.",
+        "scope": "Korean employment conditions, labor rules, salary data and workplace rights for foreign workers",
+        "tone": "Practical rights-and-data explainer without invented HR credentials.",
+        "structure": [
+            "Worker situation",
+            "Current labor rule",
+            "Salary or hours data",
+            "Rights and duties",
+            "Problem resolution",
+            "Official source and checked date",
+            "FAQ"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Check the official labor guidance"
     },
     "https://jobinkorea365.com": {
-        "persona_en": "Career coach and former HR director, this time focused on E-7/E-8/E-9 visa routes and real placement stories.",
-        "tone": "Practical, cites data and statistics. Q&A format with job-posting breakdowns.",
-        "structure": ["Is this realistic for foreigners? (honest)","E-7/E-8/E-9 visa requirements first (deal-breaker check)","Where to find jobs: ranked platforms","Salary and benefits table","Application walkthrough","Workplace culture heads-up","FAQ 6 questions"],
-        "min_chars": 2000, "tables": 1, "lang": "en",
-        "cta": "Visa-eligible job matching inquiries → huh0303@gmail.com",
+        "persona_en": "Korea Job Search editorial desk.",
+        "scope": "Job-search channels, applications, interviews and work-visa compatibility for foreign candidates",
+        "tone": "Actionable job-search guide without invented placement stories or recruiter experience.",
+        "structure": [
+            "Candidate goal",
+            "Visa compatibility checkpoint",
+            "Where to search",
+            "Application materials",
+            "Interview process",
+            "Scam warning",
+            "Official resources"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Use the job-search checklist"
     },
     "https://jobkoreaglobal.com": {
-        "persona_en": "Headhunter specializing in international recruitment into Korea, formal international tone.",
-        "tone": "International, formal English guidance. Step-by-step guide combining visa and job placement.",
-        "structure": ["Market demand with data","Talent requirements and visa table","End-to-end recruitment timeline","Legal compliance requirements","Compensation benchmarks by role","Best practices from successful placements","FAQ 3 questions"],
-        "min_chars": 2000, "tables": 2, "lang": "en",
-        "cta": "Talent placement inquiries → huh0303@gmail.com",
+        "persona_en": "Korea Global Hiring editorial desk.",
+        "scope": "Employer-facing international recruitment, sponsorship workflow and onboarding compliance in Korea",
+        "tone": "Formal employer operations guide; never present the site as a licensed recruiter unless verified.",
+        "structure": [
+            "Employer need",
+            "Role and sponsorship fit",
+            "Recruitment process",
+            "Compliance",
+            "Compensation framework",
+            "Onboarding",
+            "Official resources"
+        ],
+        "min_chars": 2300,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Verify recruiter and sponsorship requirements"
     },
     "https://korea365.org": {
-        "persona_en": "Institutional voice of a comprehensive Korea information portal, nonprofit-organization tone.",
-        "tone": "Formal, information-forward, archive-style by category.",
-        "structure": ["Cultural hook: introduce the phenomenon","Historical or social background","How it is experienced in modern Korea","Regional or generational variations","How to experience as a visitor","Global influence and hallyu connection"],
-        "min_chars": 2200, "tables": 1, "lang": "en",
-        "cta": "Go to booking/purchase site for needed products (hotel, transport, K-pop tickets, medical tourism, investment) / personal consultation → admin email huh0303@gmail.com",
+        "persona_en": "Korea Newcomer Guide editorial desk.",
+        "scope": "Essential public services, daily administration and cultural orientation for newcomers to Korea",
+        "tone": "Neutral public-information style without claiming nonprofit or government status.",
+        "structure": [
+            "Newcomer task",
+            "What is required",
+            "Step-by-step",
+            "Cost and timing",
+            "Common obstacle",
+            "Official service link",
+            "Related next task"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Continue through the newcomer checklist"
     },
     "https://koreanews365.com": {
-        "persona_ko": "한국 뉴스 에디터. 국제·정치·경제·교육·스포츠·군사 등 전 분야 뉴스를 정리해 전달하는 한국어 뉴스 사이트. 보도자료·통신사 헤드라인을 근거로 재구성하며, 특정 언론사 취재 경력을 주장하지 않습니다.",
-        "tone": "신문 기사 문체. '~했다', '~밝혔다'. 역피라미드 구조.",
-        "structure": ["리드: 핵심 사실 1~2문장","배경 및 경위","주요 데이터 통계표","관계자 발언 인용","향후 전망"],
-        "min_chars": 2000, "tables": 1, "lang": "ko",
-        "cta": "개인 구독신청/제보→관리자 이메일 huh0303@gmail.com",
+        "persona_ko": "Koreanews365 한국신문 편집국. 별도 계약 없이 활용 가능한 CC BY 뉴스와 공공·1차 자료를 모니터링하고, 복수 출처 확인과 독자적 해설을 더해 한국어 기사를 제작합니다.",
+        "scope": "한국 독자를 위한 국내외 속보·정치·경제·사회 주요 뉴스. Global Voices·VOA의 이용 가능한 공개 피드와 정부·공공기관 원문을 취재 단서로 사용하며 주간 기사의 30% 이상은 자체 취재·독자 분석 기사로 구성",
+        "tone": "한국 인터넷신문 기사체. 사실·타사 보도·편집국 분석을 명확히 구분하고 역피라미드 구조로 씁니다. 원문을 문장 단위로 치환하는 기사 세탁은 금지합니다.",
+        "structure": [
+            "제목과 리드: 새로 확인한 핵심 사실",
+            "발생 시점·장소·주체",
+            "복수 출처 대조",
+            "공식 자료 또는 자체 분석",
+            "독자에게 미치는 영향",
+            "확인된 사실과 미확인 사항",
+            "원문 출처 링크·작성 시각·수정 이력"
+        ],
+        "min_chars": 2000,
+        "tables": 1,
+        "lang": "ko",
+        "cta": "관련 한국신문 기사 보기"
     },
     "https://theseouljournal.com": {
-        "persona_en": "A foreign resident-editor living in Seoul, writing as an observer of Korean life for a global readership.",
-        "tone": "Essay-style, observational first-person voice. Column/essay format, not hard news.",
-        "structure": ["Observational opening — a scene or moment","Personal context for international readers","Key data and statistics table","A local voice or quote","What this says about life in Korea now","Closing reflection"],
-        "min_chars": 2000, "tables": 1, "lang": "en",
-        "cta": "Personal subscription/tip submission → admin email huh0303@gmail.com",
-    },
+        "persona_en": "The Seoul Journal English News Desk. It monitors no-contact CC BY feeds, eligible VOA material, and primary public records, then produces original English reporting, context and analysis.",
+        "scope": "English-language world, business, technology, and Asia or Korea news built from Global Voices, eligible VOA leads, and primary government records. Source headlines are leads, never text to disguise or substitute.",
+        "tone": "Professional English newspaper style. Distinguish sourced facts, direct quotations and newsroom analysis. Never imitate a source article paragraph by paragraph.",
+        "structure": [
+            "Original headline and concise lede",
+            "What happened and when",
+            "Facts confirmed across multiple sources",
+            "Primary-source or official-record context",
+            "Why it matters internationally and to Asia or Korea",
+            "What remains unconfirmed",
+            "Linked source note, publication time and correction record"
+        ],
+        "min_chars": 2200,
+        "tables": 1,
+        "lang": "en",
+        "cta": "Read the related English news coverage"
+    }
 }
 
 # ============================================================
@@ -1073,14 +1492,11 @@ def crawl_rss_news(lang="ko", site_url=""):
 
     def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
 
-    RSS_KO = [("조선일보","https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml"),
-               ("연합뉴스","https://www.yonhapnewstv.co.kr/category/news/headline/feed/"),
-               ("경향신문","https://www.khan.co.kr/rss/rssdata/total_news.xml")]
-    RSS_EN = [("Korea Herald","http://www.koreaherald.com/rss/020100000000.xml"),
-               ("Korea JoongAng Daily","https://koreajoongangdaily.joins.com/rss/feed"),
-               ("The Korea Times","https://www.koreatimes.co.kr/www/rss/rss.xml")]
-
-    sources = RSS_KO if lang=="ko" else RSS_EN
+    # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
+    sources = get_enabled_rss_sources(lang)
+    if not sources:
+        print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
+        return "", "", None, ""
     random.shuffle(sources)
     candidates = []
     for src, url in sources:
@@ -1090,8 +1506,9 @@ def crawl_rss_news(lang="ko", site_url=""):
             for it in soup.find_all('item'):
                 t = re.sub(r'<[^>]+>','', it.title.text.strip() if it.title else "")
                 d = re.sub(r'<[^>]+>','', it.description.text.strip() if it.description else "")
+                link = it.link.text.strip() if it.link else ""
                 if t and len(t)>=5 and not is_dup(t):
-                    candidates.append((t, d, src))
+                    candidates.append((t, d, src, link))
         except: pass
 
     if candidates:
@@ -1136,7 +1553,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
     p = SITE_PERSONA.get(url, {})
     min_chars  = p.get("min_chars", 2200)
     tables_req = p.get("tables", 1)
-    structure  = randomize_structure_counts(p.get("structure", []))
+    structure  = randomize_structure_counts(p.get("structure", []))\n    scope      = p.get("scope", theme)
 
     if lang == "ko":
         persona = p.get("persona_ko","전문 칼럼니스트")
@@ -1166,6 +1583,14 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
     #   헤드라인이 본문 첫 문장·태그에 통째로 복붙되는 문제가 생긴다(제보로 확인됨).
     #   뉴스모드는 별도 지시문을 쓴다.
     is_news = mode in ("news", "news_en")
+    news_integrity_note = ""
+    if is_news:
+        news_integrity_note = (
+            "\n- NEWSROOM RULE: use the source headline only as a reporting lead. Do not copy, translate, spin, or paraphrase the source article paragraph by paragraph. Build the article from independently verified facts, primary records, and at least one additional source. Keep direct quotations short, exact, attributed, and necessary. Never bypass a paywall. Clearly label analysis and unresolved claims."
+            if lang != "ko" else
+            "\n- 편집국 규칙: 타사 헤드라인은 취재 단서로만 사용합니다. 원문 기사를 문단별로 복사·번역·단어 치환·재서술하지 않습니다. 공식 원문과 최소 1개의 추가 출처로 사실을 독립 확인하고, 직접 인용은 짧고 정확하게 출처를 표시합니다. 유료벽을 우회하지 않으며 분석과 미확인 주장을 명확히 구분합니다."
+        )
+
     if lang == "ko":
         keyword_rule = ("- 사건 소개: 이 헤드라인이 다루는 사건을 첫 문장에서 소개하되, "
                          "헤드라인 문장을 그대로 반복하지 말고 다른 표현으로 풀어서 쓸 것. "
@@ -1197,7 +1622,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
 너는 {persona}야. 톤앤매너는 '{tone}'로, {url} 사이트의 '{theme}' 카테고리 독자를 대상으로 글을 쓴다.
 
 [지식/자료]
-- 다룰 주제: '{keyword}'
+- 이 사이트의 단일 편집 범위(절대 이탈 금지): '{scope}'\n- 위 범위 안에서 다룰 주제: '{keyword}'
 - 권위 있는 인용 출처(정부기관/대학교만 사용): {ext_h}
 - 본문에 자연스럽게 녹여 넣을 내부링크 4개:
 {il_str}
@@ -1230,7 +1655,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None):
   마무리는 "오늘부터 시작해 보세요" 식 강요 대신 "작은 변화가 큰 결과로 이어질 수 있습니다"처럼
   담백하게 격려하는 정도로.
 - 전문용어: 등장할 때마다 괄호로 쉽게 풀어서 설명할 것
-{keyword_rule}
+{keyword_rule}{news_integrity_note}
 - 통계/출처: 실제로 근거 있는 수치나 기관명을 알고 있을 때만 "(KOSIS, 2026)" 같은 형식으로
   자연스럽게 인용. 억지로 개수를 채우려고 애매하거나 지어낸 수치를 넣지 말 것 —
   근거 없는 통계보다 통계가 아예 없는 게 낫다.
@@ -1262,7 +1687,7 @@ FAQ_START~FAQ_END에서 작성하라는 뜻]
 You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' category on {url}.
 
 [KNOWLEDGE / SOURCES]
-- Topic to cover: '{keyword}'
+- Single-site editorial scope (never leave this subject): '{scope}'\n- Topic to cover within that scope: '{keyword}'
 - Authoritative sources to cite (Korean gov/university only): {ext_h}
 - 4 internal links to weave naturally into the body:
 {il_str}
@@ -1723,7 +2148,7 @@ def _classify_image_relevance(image_bytes, mime_type, title, keyword):
         return (resp.text or "").strip().upper().startswith("RELEVANT")
     except Exception as e:
         print(f"  ⚠️ 이미지 관련성 판정 실패(통과 처리): {e}")
-        return True  # 판정 자체가 실패하면(할당량 등) 억지로 버리지 않고 통과시킴
+        return False  # 판정 실패 이미지는 공개 글에 사용하지 않음
 
 def filter_relevant_images(urls, title, keyword):
     kept = []
@@ -2282,11 +2707,17 @@ def process_one(site, keyword):
     print(f"\n  🖊  [{theme}] {keyword[:50]} | {reporter['name']}")
 
     news_source = None
+    news_source_url = None
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
+        if not keyword:
+            print("  NEWS SOURCE GATE: no licensed/approved story lead; skipping")
+            return False
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
+        if isinstance(kw_tuple,tuple) and len(kw_tuple)>=4:
+            news_source_url=kw_tuple[3]
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(10, 13)
@@ -2359,10 +2790,17 @@ def process_one(site, keyword):
     #   누락되거나 표현이 매번 달라질 수 있어, 실제 RSS 원문 출처가 있을 때만
     #   코드가 본문 끝에 고정 문구를 확정 삽입한다(제목/의학디스클레이머와 동일 원칙).
     if mode in ("news","news_en") and news_source:
-        if lang=="ko":
-            body += f'<p><em>※ 이 기사는 {news_source}의 보도를 참고하여 재구성되었습니다.</em></p>'
+        safe_url = news_source_url if news_source_url and news_source_url.startswith(("http://","https://")) else ""
+        if safe_url and lang=="ko":
+            source_label = f'<a href="{safe_url}" rel="nofollow noopener" target="_blank">{news_source} 원문</a>'
+        elif safe_url:
+            source_label = f'<a href="{safe_url}" rel="nofollow noopener" target="_blank">original {news_source} report</a>'
         else:
-            body += f'<p><em>※ This article was adapted based on reporting from {news_source}.</em></p>'
+            source_label = news_source
+        if lang=="ko":
+            body += f'<p><em>출처: {source_label}. 헤드라인과 공개 사실을 참고했으며, 본문은 Koreanews365 편집국이 독자적으로 작성했습니다.</em></p>'
+        else:
+            body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
 
     if best_score<SEO_TARGET:
         print(f"  🔧 {best_score}점 → post-processing")
@@ -2372,7 +2810,7 @@ def process_one(site, keyword):
         images=[]
         print(f"  🚫 이미지 없음 (no_image=True)")
     else:
-        images=get_multiple_images(keyword,count=1,theme=theme)
+        images=get_multiple_images(keyword,count=2,theme=theme)
         if images:
             images = filter_relevant_images(images, title, keyword)
         if not images:
