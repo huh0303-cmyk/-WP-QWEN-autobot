@@ -66,3 +66,11 @@ jobs:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/autopost_mega.py
+      - name: Save publication result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-result-${{ matrix.key }}
+          path: newsroom_publish_result.json
+          if-no-files-found: warn
+          retention-days: 7
