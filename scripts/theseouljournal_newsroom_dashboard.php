@@ -86,6 +86,10 @@ add_action('wp_footer', function () {
     $mlb = sj26_mlb_standings();
     $quotes = sj26_market_quotes();
     $fx = sj26_fx_rates();
+    $post_dates = array();
+    foreach (get_posts(array('numberposts' => 30, 'post_status' => 'publish', 'orderby' => 'date', 'order' => 'DESC')) as $recent_post) {
+        $post_dates[(string) $recent_post->ID] = get_the_date('F j, Y', $recent_post);
+    }
     $cities = array(
         array('Seoul', 'Asia/Seoul', 37.5665, 126.9780), array('New York', 'America/New_York', 40.7128, -74.0060),
         array('London', 'Europe/London', 51.5072, -0.1276), array('Los Angeles', 'America/Los_Angeles', 34.0522, -118.2437),
@@ -143,7 +147,7 @@ add_action('wp_footer', function () {
     <script id="sj26-newsroom-script">
       document.addEventListener('DOMContentLoaded',()=>{
         if(document.body.classList.contains('wp-theme-mission-news'))document.querySelectorAll('.site-title a').forEach(el=>el.textContent='The Seoul Journal');
-        if(document.body.classList.contains('wp-theme-mission-news'))document.querySelectorAll('.post-byline').forEach(el=>{const match=el.textContent.match(/on\s+(.+)$/i);el.textContent='SJ편집실 · '+(match?match[1]:el.textContent);});
+        if(document.body.classList.contains('wp-theme-mission-news')){const postDates=<?php echo wp_json_encode($post_dates); ?>;document.querySelectorAll('#loop-container .entry').forEach(entry=>{const match=entry.className.match(/post-(\d+)/),el=entry.querySelector('.post-byline');if(el)el.textContent='SJ편집실 · '+(match&&postDates[match[1]]?postDates[match[1]]:'');});}
         const dash=document.getElementById('sj26-dashboard'),wrap=document.querySelector('.newsroom-wrap')||document.querySelector('#content.container-fluid.home')||document.querySelector('body.wp-theme-covernews #content.container')||document.querySelector('body.wp-theme-mission-news #main'); if(!wrap||!dash)return;
         const isNewsTheme=document.body.classList.contains('wp-theme-newsup')||document.body.classList.contains('wp-theme-covernews')||document.body.classList.contains('wp-theme-mission-news');
         const children=[...wrap.children].filter(el=>!el.classList.contains('news-mast')&&!el.classList.contains('sj26-layout'));
