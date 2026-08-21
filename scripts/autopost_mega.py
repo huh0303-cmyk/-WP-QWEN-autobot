@@ -2153,6 +2153,28 @@ def _classify_image_relevance(image_bytes, mime_type, title, keyword):
         "subject (not just a vaguely-similar generic photo of the same broad category)? "
         "Respond with exactly one word: RELEVANT or MISMATCH."
     )
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if openai_key:
+        try:
+            encoded = base64.b64encode(image_bytes).decode("ascii")
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                json={
+                    "model": os.getenv("OPENAI_VISION_MODEL", "gpt-4o-mini"),
+                    "messages": [{"role": "user", "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}},
+                    ]}],
+                    "max_tokens": 10,
+                },
+                timeout=60,
+            )
+            response.raise_for_status()
+            verdict = response.json()["choices"][0]["message"]["content"].strip().upper()
+            return verdict.startswith("RELEVANT")
+        except Exception as e:
+            print(f"  ⚠️ OpenAI 이미지 관련성 판정 실패, Gemini 재시도: {e}")
     try:
         resp = gemini_client.models.generate_content(
             model="gemini-2.5-flash-lite",
@@ -2713,13 +2735,21 @@ def build_news_headline(keyword, lang):
         headline = text.strip().split("\n")[0].strip().strip('"').strip("'").strip()
         headline = re.sub(r'^(headline|헤드라인)[:\s]*', '', headline, flags=re.IGNORECASE).strip()
         if headline and 8 <= len(headline) <= 160:
-            return headline
+            if lang != "ko" or re.search(r"[가-힣]", headline):
+                return headline
+            translated = generate_content_gemini(
+                "Translate this headline into concise, natural Korean newspaper Korean. "
+                "Return only the Korean headline, no explanation:\n" + headline
+            ).strip().strip('"').strip("'")
+            if re.search(r"[가-힣]", translated):
+                return translated[:90]
     except Exception as e:
         print(f"  ⚠️ 뉴스 헤드라인 재작성 실패: {e}")
     return keyword  # 실패 시 RSS 원본 헤드라인 그대로 사용(템플릿 왜곡보다 안전)
 
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
+    quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
     p=SITE_PERSONA.get(url,{}); min_chars=p.get("min_chars",2200)
 
     reporter=pick_reporter(site)
@@ -2834,7 +2864,7 @@ def process_one(site, keyword):
         else:
             body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
 
-    if best_score<SEO_TARGET:
+    if best_score<quality_target:
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
@@ -2877,8 +2907,8 @@ def process_one(site, keyword):
     #   만든 글을 다시 분석해서 갱신해주는 게 아니라서, 실제 RankMath 분석
     #   점수와는 다를 수 있음. 그래도 현재 유일하게 있는 사전 품질 신호라
     #   이걸 게이트로 쓴다.)
-    if score < SEO_TARGET:
-        print(f"  ⛔ SEO {score}점 < 목표 {SEO_TARGET}점 → 발행 스킵")
+    if score < quality_target:
+        print(f"  ⛔ 품질점수 {score}점 < 뉴스/콘텐츠 목표 {quality_target}점 → 발행 스킵")
         log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
         return False
 
