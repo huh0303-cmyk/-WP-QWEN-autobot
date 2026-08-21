@@ -34,7 +34,8 @@ jobs:
       - name: "명조체 제호와 두 신문사 신뢰 페이지 상단 재배포"
         env:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-        run: python scripts/deploy_newsroom_front_page.py --site koreanews365.com --confirm DEPLOY-NEWSROOM-FRONT-PAGE --receipt koreanews_front_page_receipt.json
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/deploy_newsroom_front_page.py --site ALL --confirm DEPLOY-NEWSROOM-FRONT-PAGE --receipt koreanews_front_page_receipt.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
