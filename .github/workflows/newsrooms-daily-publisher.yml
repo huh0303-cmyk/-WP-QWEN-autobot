@@ -52,6 +52,12 @@ jobs:
       - name: Randomize edition time
         if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
         run: sleep $((RANDOM % 721))
+      - name: Repair recent source-based categories
+        env:
+          TARGET_SITE_URL: ${{ matrix.url }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/repair_recent_newsroom_categories.py
       - name: Publish one source-checked edition
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
         env:
