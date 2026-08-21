@@ -68,26 +68,37 @@ def build(site,cats):
 <div class="wp-block-group desk-section"><div class="desk-head"><h2>{html.escape(label)}</h2><a href="/category/{slug}/">{html.escape(d["more"])}</a></div>
 {query_block(3,cid)}</div><!-- /wp:group -->''')
     css=f'''<style>
-:root{{{d["css"]}}}body{{font-family:var(--sans);color:var(--ink);background:#fff}}.wp-site-blocks{{padding:0!important}}
-.newsroom-wrap{{max-width:1240px;margin:auto;padding:0 24px}}.news-mast{{border-top:6px solid var(--ink);border-bottom:1px solid var(--ink);padding:18px 0 12px}}
-.news-topline{{display:flex;justify-content:space-between;align-items:center;gap:18px;font:700 12px var(--sans);letter-spacing:.04em}}.news-utility{{display:flex;gap:14px;flex-wrap:wrap;justify-content:flex-end}}.news-utility a{{color:var(--ink);text-decoration:none;font-weight:600}}
-.news-brand{{font:900 clamp(36px,7vw,76px)/1 var(--serif);text-align:center;margin:18px 0 8px;letter-spacing:-.04em}}
-.news-tag{{text-align:center;margin:0 0 16px;color:#4b5563}}.news-nav{{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;border-top:1px solid #ccd3db;padding-top:12px}}
-.news-nav a,.news-footer a,.desk-head a{{color:var(--ink);text-decoration:none;font-weight:700}}.breaking{{margin:20px 0;background:var(--ink);color:#fff;padding:10px 14px;font-weight:800;letter-spacing:.05em}}
-.news-lead .wp-block-post-template,.news-grid .wp-block-post-template{{list-style:none;padding:0;display:grid;gap:24px}}.news-lead .wp-block-post-template{{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.news-grid .wp-block-post-template{{grid-template-columns:repeat(3,minmax(0,1fr))}}.wp-block-post-featured-image img{{width:100%;object-fit:cover;background:var(--wash)}}
-.story-copy{{padding-top:10px}}.wp-block-post-date{{font-size:12px;color:#667085}}.wp-block-post-title{{font:700 clamp(21px,2.4vw,34px)/1.15 var(--serif);margin:8px 0}}
-.wp-block-post-title a{{color:var(--ink);text-decoration:none}}.wp-block-post-excerpt{{color:#475467;line-height:1.65}}.desk-section{{border-top:3px solid var(--ink);margin-top:44px;padding-top:10px}}
-.desk-head{{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}}.desk-head h2{{font:800 28px var(--serif);margin:0}}.news-footer{{margin-top:60px;background:var(--ink);color:#fff;padding:34px 24px}}
-.news-footer-inner{{max-width:1240px;margin:auto}}.news-footer a{{color:#fff;margin-right:20px;display:inline-block;margin-bottom:10px}}.news-footer p{{color:#cbd5e1;font-size:13px}}
-@media(max-width:760px){{.newsroom-wrap{{padding:0 16px}}.news-brand{{font-size:39px}}.news-topline{{align-items:flex-start}}.news-utility{{gap:8px;font-size:10px}}.news-nav{{gap:13px;font-size:12px}}.news-lead .wp-block-post-template,.news-grid .wp-block-post-template{{grid-template-columns:1fr}}.wp-block-post-title{{font-size:25px}}}}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Noto+Serif+KR:wght@600;700;900&display=swap');
+:root{{{d["css"]}}}
+*{{box-sizing:border-box}}body{{font-family:var(--sans);color:var(--ink);background:#f7f6f2;margin:0}}.wp-site-blocks{{padding:0!important}}
+.newsroom-wrap{{width:min(1180px,calc(100% - 48px))!important;max-width:1180px!important;margin:0 auto!important;padding:0!important;background:#fff}}
+.newsroom-wrap>*,.newsroom-wrap .wp-block-query,.newsroom-wrap .wp-block-post-template{{max-width:none!important;width:100%!important}}
+.news-mast{{border-top:7px solid var(--ink);border-bottom:1px solid var(--ink);padding:16px 28px 13px;background:#fff}}
+.news-topline{{display:flex;justify-content:space-between;align-items:center;gap:18px;font:700 11px var(--sans);letter-spacing:.04em;color:#475467}}
+.news-utility{{display:flex;gap:15px;flex-wrap:wrap;justify-content:flex-end}}.news-utility a{{color:#475467;text-decoration:none;font-weight:600}}
+.news-brand{{font:900 clamp(46px,6vw,72px)/.98 var(--serif);text-align:center;margin:17px 0 7px;letter-spacing:-.065em;word-break:keep-all}}
+.news-tag{{text-align:center;margin:0 0 17px;color:#667085;font-size:14px}}.news-nav{{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;border-top:1px solid #d0d5dd;padding-top:13px}}
+.news-nav a,.news-footer a,.desk-head a{{color:var(--ink);text-decoration:none;font-weight:700}}.news-nav a:hover,.desk-head a:hover{{color:var(--accent)}}
+.breaking{{margin:24px 28px 0;background:var(--ink);color:#fff;padding:9px 14px;font:800 13px var(--sans);letter-spacing:.08em}}
+.news-lead,.desk-section{{padding-left:28px!important;padding-right:28px!important}}.news-lead{{padding-top:22px!important}}
+.news-lead .wp-block-post-template{{list-style:none;padding:0;display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(280px,.85fr);gap:0 28px}}
+.news-lead .wp-block-post{{min-width:0;padding:16px 0;border-bottom:1px solid #d9dde3}}.news-lead .wp-block-post:first-child{{grid-row:span 4;padding-top:0;border-right:1px solid #d9dde3;padding-right:28px}}
+.news-lead .wp-block-post:first-child .wp-block-post-title{{font-size:clamp(34px,4vw,52px);line-height:1.08}}.news-lead .wp-block-post:not(:first-child) .wp-block-post-excerpt{{display:none}}
+.news-lead .wp-block-post:not(:first-child) .wp-block-post-title{{font-size:23px;line-height:1.25;margin:5px 0}}.news-lead .wp-block-post-featured-image{{margin:0 0 14px}}
+.news-grid .wp-block-post-template{{list-style:none;padding:0;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}}
+.news-grid .wp-block-post{{min-width:0;border-right:1px solid #e1e4e8;padding-right:24px}}.news-grid .wp-block-post:nth-child(3n){{border-right:0;padding-right:0}}
+.wp-block-post-featured-image img{{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--wash)}}.story-copy{{padding-top:7px!important;max-width:none!important}}
+.wp-block-post-date{{font-size:11px;color:#98a2b3}}.wp-block-post-title{{font:700 25px/1.22 var(--serif);margin:7px 0;word-break:keep-all;overflow-wrap:break-word;letter-spacing:-.025em}}
+.wp-block-post-title a{{color:var(--ink);text-decoration:none}}.wp-block-post-title a:hover{{color:var(--accent)}}.wp-block-post-excerpt{{color:#667085;line-height:1.6;font-size:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}}
+.desk-section{{border-top:3px solid var(--ink);margin-top:38px!important;padding-top:12px!important}}.desk-head{{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:17px}}
+.desk-head h2{{font:900 27px var(--serif);margin:0;letter-spacing:-.04em}}.desk-head a{{font-size:12px}}.news-footer{{margin-top:52px;background:var(--ink);color:#fff;padding:30px 24px}}
+.news-footer-inner{{max-width:1124px;margin:auto}}.news-footer a{{color:#fff;margin-right:20px;display:inline-block;margin-bottom:10px;font-size:13px}}.news-footer p{{color:#aeb9c8;font-size:11px}}
+@media(max-width:780px){{body{{background:#fff}}.newsroom-wrap{{width:100%!important}}.news-mast{{padding:13px 16px}}.news-brand{{font-size:43px}}.news-topline{{align-items:flex-start}}.news-utility{{gap:7px;font-size:9px;max-width:230px}}.news-nav{{gap:16px;font-size:12px}}.breaking{{margin:18px 16px 0}}.news-lead,.desk-section{{padding-left:16px!important;padding-right:16px!important}}.news-lead .wp-block-post-template,.news-grid .wp-block-post-template{{grid-template-columns:1fr!important}}.news-lead .wp-block-post:first-child{{grid-row:auto;border-right:0;padding-right:0}}.news-grid .wp-block-post{{border-right:0;padding:0 0 18px;border-bottom:1px solid #e1e4e8}}.wp-block-post-title,.news-lead .wp-block-post:not(:first-child) .wp-block-post-title{{font-size:24px}}}}
 </style>'''
     return f'''<!-- wp:html -->{css}<!-- /wp:html -->
 <!-- wp:group {{"className":"newsroom-wrap","layout":{{"type":"constrained"}}}} --><div class="wp-block-group newsroom-wrap">
 <!-- wp:html --><header class="news-mast"><div class="news-topline"><span>{d["edition"]}</span><nav class="news-utility">{utility}</nav></div><h1 class="news-brand">{html.escape(d["name"])}</h1><p class="news-tag">{html.escape(d["tag"])}</p><nav class="news-nav">{nav}</nav></header><div class="breaking">{html.escape(d["breaking"])}</div><!-- /wp:html -->
-{query_block(4,None,True)}
-<!-- wp:heading {{"level":2,"className":"latest-title"}} --><h2 class="wp-block-heading latest-title">{html.escape(d["latest"])}</h2><!-- /wp:heading -->
-{query_block(6)}
+{query_block(5,None,True)}
 {''.join(sections)}
 </div><!-- /wp:group -->
 <!-- wp:html --><footer class="news-footer"><div class="news-footer-inner"><nav>{foot}</nav><p>© 2026 {html.escape(d["name"])} · Independent editorial operation · Corrections are recorded transparently.</p></div></footer><!-- /wp:html -->'''
