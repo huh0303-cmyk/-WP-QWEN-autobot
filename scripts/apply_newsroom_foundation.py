@@ -47,7 +47,7 @@ def ensure_cat(site,pw,item):
     if found:
         current=found[0]
         if current.get("name") != item["name"]:
-            updated=req(\"POST\",site,f'categories/{current[\"id\"]}',pw,{\"name\":item[\"name\"]})
+            updated=req("POST",site,f"categories/{current['id']}",pw,{"name":item["name"]})
             return {"id":updated["id"],"action":"renamed","slug":item["slug"]}
         return {"id":current["id"],"action":"kept","slug":item["slug"]}
     x=req("POST",site,"categories",pw,{"name":item["name"],"slug":item["slug"],"description":f'{item["name"]} newsroom desk'})
