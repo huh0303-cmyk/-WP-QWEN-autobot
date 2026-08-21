@@ -14,7 +14,7 @@ THEME="twentytwentyfive"
 DATA={
 "koreanews365.com":{
 "name":"한국신문","tag":"한국뉴스 균형잡힌 정론지","edition":"2026 · SEOUL",
-"breaking":"주요 뉴스","latest":"최신 기사","more":"전체 기사 보기","read":"기사 읽기",
+"breaking":"주요 뉴스","latest":"주요 기사","more":"전체 기사 보기","read":"기사 읽기",
 "nav":[("속보","/category/breaking/"),("정치","/category/politics/"),("경제","/category/economy/"),("사회","/category/society/"),("국제","/category/world/")],
 "sections":[("정치","politics"),("경제","economy"),("사회","society"),("국제","world")],
 "footer":[("신문사 소개","/about/"),("편집 원칙","/editorial-standards/"),("정정·반론 보도","/corrections/"),("기사제보","/tips/"),("출처 및 저작권","/source-copyright-policy/")],
