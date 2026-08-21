@@ -100,7 +100,7 @@
           "slug": "real-estate"
         },
         {
-          "name": "국방 (DEFENSE)",
+          "name": "국방 (MILITARY)",
           "slug": "military"
         },
         {
@@ -119,7 +119,7 @@
         "문화 (CULTURE)",
         "금융 (FINANCE)",
         "부동산 (REAL ESTATE)",
-        "국방 (DEFENSE)",
+        "국방 (MILITARY)",
         "예술 (ART)",
         "스포츠 (SPORTS)",
         "글로벌 (GLOBAL)",

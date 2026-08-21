@@ -17,15 +17,11 @@ add_action('wp_head', function () {
     ?>
     <style id="kn365-modern-masthead">
       .mg-nav-widget-area-back{
-        background-color:#f4efe3!important;
-        background-image:
-          radial-gradient(circle at 17% 24%,rgba(78,64,44,.045) 0 1px,transparent 1.4px),
-          radial-gradient(circle at 78% 67%,rgba(78,64,44,.035) 0 1px,transparent 1.3px),
-          repeating-linear-gradient(0deg,rgba(60,48,32,.016) 0,rgba(60,48,32,.016) 1px,transparent 1px,transparent 4px)!important;
-        background-size:23px 19px,31px 27px,100% 4px!important;
-        border-top:1px solid #28241d;
-        border-bottom:3px double #28241d;
-        box-shadow:inset 0 1px rgba(255,255,255,.72),inset 0 -1px rgba(45,38,28,.08);
+        background:#fff!important;
+        background-image:none!important;
+        border:0!important;
+        border-bottom:1px solid #e7e7e7!important;
+        box-shadow:none!important;
       }
       .mg-nav-widget-area-back .overlay{background:transparent!important;padding:26px 0 24px!important}
       .mg-nav-widget-area .navbar-header,.mg-nav-widget-area .site-branding-text{float:none!important;width:100%!important;text-align:center!important}
@@ -49,6 +45,11 @@ add_action('wp_head', function () {
         letter-spacing:.22em!important;
         text-shadow:none!important;
       }
+      .mg-head-detail,.mg-head-detail .container-fluid,.mg-headwidget,.mg-headwidget .navbar-wp,.mg-headwidget .navbar-wp .navbar-nav,.mg-headwidget .navbar-wp .navbar-header{background:#fff!important;background-image:none!important}
+      .mg-head-detail{border-bottom:1px solid #eeeeee!important}
+      .mg-head-detail,.mg-head-detail a,.mg-head-detail li,.mg-headwidget .navbar-wp .navbar-nav>li>a,.mg-headwidget .navbar-wp .navbar-brand{color:#171717!important;text-shadow:none!important}
+      .mg-headwidget .navbar-wp .navbar-nav>.active>a,.mg-headwidget .navbar-wp .navbar-nav>li>a:hover,.mg-headwidget .navbar-wp .navbar-nav>li>a:focus{background:#fff!important;color:#111!important;box-shadow:inset 0 -2px #111!important}
+      .mg-headwidget .navbar-wp{border-top:0!important;border-bottom:1px solid #e7e7e7!important;box-shadow:none!important}
       @media(max-width:767px){
         .mg-nav-widget-area-back .overlay{padding:20px 0 18px!important}
         .mg-nav-widget-area .site-title,.mg-nav-widget-area .site-title a{font-size:32px!important;letter-spacing:.11em!important}
@@ -56,4 +57,4 @@ add_action('wp_head', function () {
       }
     </style>
     <?php
-}, 25);
+}, 35);

@@ -2,7 +2,7 @@
 /** Build the Koreanews365 editorial desks and assign a clean primary menu. */
 
 add_action('init', function () {
-    $version = '2026-08-21-v3-bilingual';
+    $version = '2026-08-21-v4-military';
     if ($version === get_option('kn365_category_menu_version')) {
         return;
     }
@@ -18,7 +18,7 @@ add_action('init', function () {
         array('name' => '문화 (CULTURE)', 'slug' => 'culture'),
         array('name' => '금융 (FINANCE)', 'slug' => 'finance'),
         array('name' => '부동산 (REAL ESTATE)', 'slug' => 'real-estate'),
-        array('name' => '국방 (DEFENSE)', 'slug' => 'military'),
+        array('name' => '국방 (MILITARY)', 'slug' => 'military'),
         array('name' => '예술 (ART)', 'slug' => 'art'),
         array('name' => '스포츠 (SPORTS)', 'slug' => 'sports'),
         array('name' => '글로벌 (GLOBAL)', 'slug' => 'world'),
