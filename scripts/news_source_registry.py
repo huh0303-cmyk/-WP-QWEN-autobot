@@ -10,7 +10,7 @@ NEWSROOMS = {
     "https://koreanews365.com": {
         "publication": "Koreanews365 한국신문",
         "language": "ko",
-        "categories": ["속보", "정치", "경제", "사회", "국제"],
+        "categories": ["속보", "정치", "경제", "사회", "국제", "군사", "스포츠"],
         "daily_total_min": 3,
         "daily_total_max": 5,
         "daily_original_min": 2,
@@ -143,6 +143,101 @@ BLOCKED_SOURCES = [
     "Reuters",
     "AP",
 ]
+
+# Images are eligible only when the individual asset carries one of these
+# licenses. A site-wide public-sector label is never treated as permission for
+# an unmarked photo, and any third-party credit blocks automatic reuse.
+IMAGE_LICENSE_ALLOWLIST = {"kogl_0", "kogl_1", "cc0", "public_domain", "cc_by"}
+IMAGE_BLOCKED_CREDITS = (
+    "연합뉴스", "뉴시스", "뉴스1", "reuters", "associated press", "ap photo",
+    "getty", "게티이미지", "공동취재", "자료사진", "제공",
+)
+
+IMAGE_SOURCES = [
+    {
+        "key": "kogl_portal",
+        "name": "공공누리",
+        "domains": ["kogl.or.kr"],
+        "categories": ["정치", "경제", "사회", "국제", "군사", "스포츠"],
+        "allowed_licenses": ["kogl_0", "kogl_1"],
+        "policy_url": "https://www.kogl.or.kr/info/license.do",
+        "use": "download_original_with_attribution",
+    },
+    {
+        "key": "ktv",
+        "name": "KTV 국민방송",
+        "domains": ["ktv.go.kr"],
+        "categories": ["정치", "경제", "사회", "군사"],
+        "allowed_licenses": ["kogl_0", "kogl_1"],
+        "policy_url": "https://www.ktv.go.kr/",
+        "use": "item_level_license_only",
+    },
+    {
+        "key": "national_assembly",
+        "name": "대한민국 국회",
+        "domains": ["assembly.go.kr"],
+        "categories": ["정치", "사회"],
+        "allowed_licenses": ["kogl_0", "kogl_1"],
+        "policy_url": "https://www.assembly.go.kr/",
+        "use": "item_level_license_only",
+    },
+    {
+        "key": "mnd",
+        "name": "대한민국 국방부",
+        "domains": ["mnd.go.kr", "opendata.mnd.go.kr"],
+        "categories": ["군사", "정치"],
+        "allowed_licenses": ["kogl_0", "kogl_1"],
+        "policy_url": "https://opendata.mnd.go.kr/",
+        "use": "item_level_license_only",
+    },
+    {
+        "key": "arirang",
+        "name": "Arirang TV",
+        "domains": ["arirang.com"],
+        "categories": ["국제", "정치", "경제", "사회"],
+        "allowed_licenses": ["kogl_0", "kogl_1"],
+        "policy_url": "https://company.arirang.com/policy/copyright/?lang=en",
+        "use": "item_level_license_only",
+    },
+    {
+        "key": "nanet",
+        "name": "대한민국 국회도서관",
+        "domains": ["nanet.go.kr"],
+        "categories": ["정치", "사회"],
+        "allowed_licenses": ["kogl_0", "kogl_1", "cc0", "public_domain", "cc_by"],
+        "policy_url": "https://www.nanet.go.kr/libintroduce/etc/libCoypRightView.do",
+        "use": "item_level_license_only",
+    },
+    {
+        "key": "natv",
+        "name": "국회방송",
+        "domains": ["natv.go.kr"],
+        "categories": ["정치"],
+        "allowed_licenses": ["kogl_0", "kogl_1"],
+        "policy_url": "https://www.natv.go.kr/",
+        "use": "embed_only_unless_item_level_license",
+    },
+]
+
+
+def image_source_audit(license_code: str, credit: str = "", *, media_marked: bool = True) -> dict:
+    """Return a conservative reuse decision for a single image asset."""
+    normalized_license = license_code.strip().lower()
+    normalized_credit = credit.strip().lower()
+    blocked_credit = next(
+        (token for token in IMAGE_BLOCKED_CREDITS if token.lower() in normalized_credit),
+        None,
+    )
+    allowed = media_marked and normalized_license in IMAGE_LICENSE_ALLOWLIST and not blocked_credit
+    return {
+        "allowed": allowed,
+        "reason": (
+            "eligible_with_attribution" if allowed else
+            "third_party_credit" if blocked_credit else
+            "missing_or_ineligible_item_level_license"
+        ),
+        "blocked_credit": blocked_credit,
+    }
 
 
 def get_enabled_rss_sources(language: str) -> list[tuple[str, str]]:

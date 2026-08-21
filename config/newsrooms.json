@@ -9,9 +9,41 @@
       "alt_rule": "Describe the specific visual and its editorial relevance; never stuff keywords.",
       "metadata": [
         "creator",
+        "institution",
+        "work_title",
         "source_url",
         "license",
+        "license_evidence_url",
         "retrieved_at"
+      ],
+      "allowed_licenses": [
+        "KOGL_0",
+        "KOGL_1",
+        "CC0",
+        "PUBLIC_DOMAIN",
+        "CC_BY"
+      ],
+      "require_item_level_license": true,
+      "reject_text_only_license_for_media": true,
+      "hotlink": false,
+      "blocked_credit_patterns": [
+        "연합뉴스",
+        "뉴시스",
+        "뉴스1",
+        "Reuters",
+        "AP",
+        "Getty",
+        "게티이미지",
+        "공동취재",
+        "제공"
+      ],
+      "preferred_public_sources": [
+        "공공누리",
+        "KTV 국민방송",
+        "대한민국 국회",
+        "국방부",
+        "아리랑TV",
+        "국회도서관"
       ]
     },
     "ai_image_rule": "Never simulate documentary photography of a real event. Use labelled illustration, map, timeline or data graphic only.",
@@ -22,7 +54,7 @@
     "koreanews365.com": {
       "language": "ko-KR",
       "name": "한국신문",
-      "tagline": "한국뉴스 균형잡힌 정론지",
+      "tagline": "한국뉴스정론지",
       "mission": "한국 독자를 위한 독립 종합 인터넷신문. 속보보다 검증, 단순 요약보다 설명을 우선한다.",
       "palette": {
         "ink": "#0B1F3A",
@@ -54,6 +86,14 @@
         {
           "name": "국제",
           "slug": "world"
+        },
+        {
+          "name": "군사",
+          "slug": "military"
+        },
+        {
+          "name": "스포츠",
+          "slug": "sports"
         }
       ],
       "primary_menu": [
@@ -62,6 +102,8 @@
         "경제",
         "사회",
         "국제",
+        "군사",
+        "스포츠",
         "기사제보",
         "신문사 소개"
       ],

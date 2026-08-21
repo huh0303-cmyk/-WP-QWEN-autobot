@@ -4,7 +4,7 @@
  * Paste into the Code Snippets plugin without an opening PHP tag.
  */
 
-function kn365_kbo_standings() {
+function kn365_kbo_standings_v2() {
     $cached = get_transient('kn365_kbo_standings_v1');
     if (is_array($cached) && count($cached) === 10) {
         return $cached;
@@ -63,7 +63,7 @@ add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
-    $standings = kn365_kbo_standings();
+    $standings = kn365_kbo_standings_v2();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -91,30 +91,46 @@ add_action('wp_footer', function () {
 
       <section class="kn365-panel kn365-market">
         <div class="kn365-panel-head"><h2>주요 시세</h2><span>지연 시세</span></div>
-        <div class="tradingview-widget-container">
-          <div class="tradingview-widget-container__widget"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-          <?php echo wp_json_encode(array(
-              'colorTheme' => 'light', 'dateRange' => '1D', 'showChart' => false,
-              'locale' => 'kr', 'width' => '100%', 'height' => 570,
-              'isTransparent' => true, 'showSymbolLogo' => true, 'showFloatingTooltip' => false,
-              'tabs' => array(
-                  array('title' => '한국', 'symbols' => array(
-                      array('s' => 'KRX:005930', 'd' => '삼성전자'), array('s' => 'KRX:000660', 'd' => 'SK하이닉스'),
-                      array('s' => 'KRX:373220', 'd' => 'LG에너지솔루션'), array('s' => 'KRX:005380', 'd' => '현대차'),
-                      array('s' => 'KRX:207940', 'd' => '삼성바이오로직스'))),
-                  array('title' => '미국', 'symbols' => array(
-                      array('s' => 'NASDAQ:AAPL', 'd' => 'Apple'), array('s' => 'NASDAQ:MSFT', 'd' => 'Microsoft'),
-                      array('s' => 'NASDAQ:AMZN', 'd' => 'Amazon'), array('s' => 'NASDAQ:TSLA', 'd' => 'Tesla'),
-                      array('s' => 'NASDAQ:NVDA', 'd' => 'Nvidia'))),
-                  array('title' => '코인', 'symbols' => array(
-                      array('s' => 'COINBASE:BTCUSD', 'd' => 'Bitcoin / USD'),
-                      array('s' => 'COINBASE:ETHUSD', 'd' => 'Ethereum / USD'),
-                      array('s' => 'COINBASE:SOLUSD', 'd' => 'Solana / USD'))),
-              ),
-          ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
-          </script>
-        </div>
+        <?php
+        $market_groups = array(
+            '한국 주식' => array(
+                array('s' => 'KRX:005930', 'd' => '삼성전자'),
+                array('s' => 'KRX:000660', 'd' => 'SK하이닉스'),
+                array('s' => 'KRX:005380', 'd' => '현대차'),
+                array('s' => 'KRX:017670', 'd' => 'SK텔레콤'),
+                array('s' => 'KRX:068270', 'd' => '셀트리온'),
+            ),
+            '미국 주식 · USD' => array(
+                array('s' => 'NASDAQ:AAPL', 'd' => 'Apple'),
+                array('s' => 'NASDAQ:MSFT', 'd' => 'Microsoft'),
+                array('s' => 'NASDAQ:AMZN', 'd' => 'Amazon'),
+                array('s' => 'NASDAQ:TSLA', 'd' => 'Tesla'),
+                array('s' => 'NASDAQ:NVDA', 'd' => 'Nvidia'),
+            ),
+            '암호화폐 · USD' => array(
+                array('s' => 'COINBASE:BTCUSD', 'd' => 'Bitcoin'),
+                array('s' => 'COINBASE:ETHUSD', 'd' => 'Ethereum'),
+                array('s' => 'COINBASE:SOLUSD', 'd' => 'Solana'),
+            ),
+        );
+        foreach ($market_groups as $group_title => $symbols) :
+            $market_height = count($symbols) > 3 ? 335 : 245;
+        ?>
+          <div class="kn365-market-group">
+            <h3><?php echo esc_html($group_title); ?></h3>
+            <div class="tradingview-widget-container">
+              <div class="tradingview-widget-container__widget"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+              <?php echo wp_json_encode(array(
+                  'colorTheme' => 'light', 'dateRange' => '1D', 'showChart' => false,
+                  'locale' => 'kr', 'width' => '100%', 'height' => $market_height,
+                  'isTransparent' => true, 'showSymbolLogo' => true, 'showFloatingTooltip' => false,
+                  'tabs' => array(array('title' => $group_title, 'symbols' => $symbols)),
+              ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+              </script>
+            </div>
+          </div>
+        <?php endforeach; ?>
         <p class="kn365-disclaimer">투자 참고용 지연 정보이며 투자 권유가 아닙니다.</p>
       </section>
 
@@ -141,6 +157,7 @@ add_action('wp_footer', function () {
       .kn365-kbo tbody tr:nth-child(6) td:first-child{position:relative}
       .kn365-kbo tbody tr:nth-child(6) td:first-child::before{content:"가을야구 커트라인";position:absolute;top:2px;left:0;width:240px;text-align:center;color:#c91421;font-size:10px;font-weight:800;letter-spacing:.08em}
       .kn365-source,.kn365-disclaimer,.kn365-muted{display:block;margin:9px 0 0;font-size:10px;color:#7a8495}.kn365-source{text-decoration:none}
+      .kn365-market-group{margin:0 0 14px}.kn365-market-group h3{margin:0 0 5px!important;font-size:13px!important;color:#26334a;letter-spacing:.04em}
       .kn365-world ul{list-style:none;margin:0;padding:0}.kn365-world li{display:grid;grid-template-columns:1fr 58px 45px;gap:6px;padding:7px 2px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-world time,.kn365-world .temp{text-align:right;font-variant-numeric:tabular-nums}.kn365-world .temp{font-weight:700;color:#b5121b}
       @media(max-width:767px){.kn365-dashboard{margin-top:18px}.kn365-panel{border-radius:12px}}
     </style>
