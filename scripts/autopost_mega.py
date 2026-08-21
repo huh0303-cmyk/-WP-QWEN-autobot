@@ -1693,10 +1693,12 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
                          f"- 키워드: '{keyword}'를 첫 문장에 자연스럽게 포함. 이후엔 억지로 "
                          f"반복 횟수를 채우지 말고, 대명사/유의어/줄인 표현으로 자연스럽게 바꿔써도 됨 "
                          f"(같은 단어를 기계적으로 반복하면 검색엔진이 스팸으로 판단할 수 있음)")
-        tags_line = (f"TAGS: ({tag_count}개 한국어, 쉼표로 구분된 짧은 명사/키워드만. "
+        tags_line = (f"TAGS: ({tag_count}개, 쉼표로 구분된 짧은 명사/키워드만. "
                      "문장·특수기호·구분선 금지)"
                      if is_news else
-                     f"TAGS: ({tag_count}개 한국어, 첫번째='{keyword}')")
+                     f"TAGS: ({tag_count}개, 쉼표로 구분된 짧은 명사형 단어/구만(각 2~15자). "
+                     f"문장·조사가 붙은 서술형·특수기호 금지, 서로 다른 단어로. "
+                     f"'{keyword}'와 관련되되 그 문구를 그대로 반복 재사용하지 말 것)")
     else:
         keyword_rule = ("- Intro: introduce the event this headline covers in the first sentence, "
                          "in your own words — do not repeat the headline sentence verbatim. "
@@ -1709,7 +1711,9 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
         tags_line = (f"TAGS: ({tag_count} English tags, comma-separated short nouns/keywords only. "
                      "No full sentences, symbols, or section dividers)"
                      if is_news else
-                     f"TAGS: ({tag_count} English tags, first='{keyword}')")
+                     f"TAGS: ({tag_count} English tags, comma-separated short noun phrases only "
+                     f"(2-25 characters each, no full sentences, no symbols, each one distinct). "
+                     f"Related to '{keyword}' but don't just repeat that whole phrase in every tag)")
 
     if lang == "ko":
         return f"""[역할]
@@ -2099,15 +2103,32 @@ def extract_tags(text, keyword, theme, lang, is_news=False, tag_count=None):
             if f.lower() not in [x.lower() for x in tags]: tags.append(f)
         return body, tags[:TAG_COUNT]
 
-    tags=tags[:TAG_COUNT-1]
-    tags=[keyword]+tags
-    fb=(["효능","방법","원인","예방","관리","가이드","추천","총정리","비교","주의사항","체크리스트","2026"] if lang=="ko"
-        else ["guide","tips","review","comparison","benefits","how to","best","2026","Korea","FAQ","checklist","overview"])
-    while len(tags)<TAG_COUNT:
-        for f in fb:
-            t=f"{keyword} {f}"
-            if t.lower() not in [x.lower() for x in tags]: tags.append(t)
-            if len(tags)>=TAG_COUNT: break
+    # 2026-08-22: 예전엔 부족분을 "{keyword} 효능"/"{keyword} guide"처럼 키워드
+    # 전체 문구를 태그마다 그대로 반복 삽입해서 채웠음(사용자 지적: "태그값이
+    # 너무 많고 긴것들이 많아.. 깔끔한 명사형태로") — 키워드가 여러 단어짜리
+    # 구문(예: "foreign investor Korea stocks")이면 태그 절반이 사실상 같은
+    # 문구의 변주가 되어 길고 반복적이었다. 이제는 키워드를 통째로 태그마다
+    # 붙이지 않고, ① 키워드 자체가 짧으면 태그 하나로만 그대로 두고 ② 키워드를
+    # 구성하는 개별 단어 중 짧고 깨끗한 것만 명사 태그 후보로 뽑고 ③ 그래도
+    # 부족하면 사이트 테마의 범용 명사만 채운다(키워드 접두 없이).
+    tags=tags[:TAG_COUNT]
+    kw_tag = sanitize_tag(keyword, lang)
+    if kw_tag and kw_tag.lower() not in [x.lower() for x in tags]:
+        tags = [kw_tag] + tags
+    seps = r'[\s/,\-]+' if lang != "ko" else r'\s+'
+    for word in re.split(seps, keyword):
+        if len(tags) >= TAG_COUNT: break
+        w = sanitize_tag(word, lang)
+        if w and len(w) > 1 and w.lower() not in [x.lower() for x in tags]:
+            tags.append(w)
+    fb=(["효능","방법","원인","예방","관리","가이드","추천","총정리","비교","주의사항","체크리스트","기초상식"] if lang=="ko"
+        else ["guide","tips","review","comparison","benefits","checklist","basics","overview","FAQ","essentials","Korea","2026"])
+    fb = fb[:]
+    random.shuffle(fb)
+    while len(tags)<TAG_COUNT and fb:
+        f = fb.pop()
+        if f.lower() not in [x.lower() for x in tags]:
+            tags.append(f)
     return body, tags[:TAG_COUNT]
 
 def count_stats(body):
@@ -2741,17 +2762,24 @@ def build_img_html(urls, keyword, alt_text=None):
         html+=f'<figure style="margin:20px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);"><img src="{u}" alt="{alt}" loading="lazy" style="width:100%;height:auto;display:block;"><figcaption style="padding:8px 14px;font-size:13px;color:#666;text-align:center;">{alt}</figcaption></figure>\n'
     return html
 
-def build_cta_html(site_url, lang):
+def build_cta_html(site_url, lang, reporter=None):
     """
     사이트별 CTA(상담신청/구매유도 등)를 독자가 실제로 보는 박스로 코드가
     매 글마다 확정 삽입. 실제 이커머스 연동은 없으므로 이메일 상담 중심으로
     구성하고, '판매제품' 언급이 있는 사이트는 안내 문구만 자연스럽게 추가한다.
+
+    2026-08-22 버그 수정: 이 함수가 사이트/필자와 무관하게 운영자 개인 지메일을
+    그대로 박아넣고 있었음 — AUTHOR_BY_SITE가 "동일 운영자 네트워크로 보이면
+    애드센스에 불리하다"는 이유로 사이트마다 서로 다른 editor@{도메인} 이메일을
+    이미 만들어놨는데(2026-07-24), 이 CTA 박스만 그걸 무시하고 27개 사이트
+    수천 개 글 전부에 완전히 동일한 개인 이메일을 노출시키고 있었다. 사이트별
+    브랜드 이메일이 있으면 그걸 쓰고, 없을 때만(레거시 호출부 등) 예전 값으로 폴백.
     """
     p = SITE_PERSONA.get(site_url, {})
     cta_desc = p.get("cta", "")
     if not cta_desc:
         return ""
-    email = "huh0303@gmail.com"
+    email = (reporter or {}).get("email") or "huh0303@gmail.com"
     if lang == "ko":
         title = "문의 및 상담 신청"
         body = (f"이 글의 내용과 관련해 개인 맞춤 상담이 필요하시면 언제든 편하게 문의해 주세요.<br>"
@@ -2822,7 +2850,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 
     final=hero+body_html[:ins]+(mid if mid else "")+body_html[ins:]+end+faq_html
 
-    cta_html = "" if is_newsroom else build_cta_html(url, site.get("lang","ko"))
+    cta_html = "" if is_newsroom else build_cta_html(url, site.get("lang","ko"), reporter)
     final += cta_html
 
     author_bio_html = "" if is_newsroom else build_author_bio_html(url, site.get("lang","ko"), reporter, keyword)
@@ -2967,7 +2995,7 @@ def process_one(site, keyword):
             news_source_url=kw_tuple[3]
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
-    tag_count = random.randint(10, 13)
+    tag_count = random.randint(10, 14)
     base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count,min_chars_override=min_chars)
     if mode in ("news", "news_en"):
         base_prompt += (
