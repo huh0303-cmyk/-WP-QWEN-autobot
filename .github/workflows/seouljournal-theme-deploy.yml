@@ -1,0 +1,27 @@
+name: Activate The Seoul Journal Newsup theme
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/activate_theseouljournal_theme.py
+      - .github/workflows/seouljournal-theme-deploy.yml
+
+permissions:
+  contents: read
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Install and activate free Newsup
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/activate_theseouljournal_theme.py
