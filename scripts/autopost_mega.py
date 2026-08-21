@@ -2161,7 +2161,7 @@ def _classify_image_relevance(image_bytes, mime_type, title, keyword):
         )
         return (resp.text or "").strip().upper().startswith("RELEVANT")
     except Exception as e:
-        print(f"  ⚠️ 이미지 관련성 판정 실패(통과 처리): {e}")
+        print(f"  ⚠️ 이미지 관련성 판정 실패(안전상 사용 금지): {e}")
         return False  # 판정 실패 이미지는 공개 글에 사용하지 않음
 
 def filter_relevant_images(urls, title, keyword):
