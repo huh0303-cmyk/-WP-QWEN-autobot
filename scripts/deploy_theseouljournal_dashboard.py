@@ -18,7 +18,7 @@ def request(method: str, path: str, **kwargs):
         method,
         f"{SITE}/wp-json/code-snippets/v1/{path}",
         auth=(USER, PASSWORD),
-        timeout=120,
+        timeout=300,
         **kwargs,
     )
     response.raise_for_status()
