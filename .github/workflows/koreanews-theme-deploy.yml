@@ -1,0 +1,27 @@
+name: Activate Mission News theme for koreanews365 (match theseouljournal)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/activate_koreanews_mission_news_theme.py
+      - .github/workflows/koreanews-theme-deploy.yml
+
+permissions:
+  contents: read
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Install and activate Mission News
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/activate_koreanews_mission_news_theme.py
