@@ -15,7 +15,8 @@ DATA={
 "koreanews365.com":{
 "name":"한국신문","tag":"한국뉴스 균형잡힌 정론지","edition":"2026 · SEOUL",
 "breaking":"주요 뉴스","latest":"주요 기사","more":"전체 기사 보기","read":"기사 읽기",
-"utility":[("신문사 소개","/about/"),("문의하기","/contact/"),("개인정보처리방침","/privacy-policy/"),("면책공고","/disclaimer/")],\n"nav":[("속보","/category/breaking/"),("정치","/category/politics/"),("경제","/category/economy/"),("사회","/category/society/"),("국제","/category/world/")],
+"utility":[("신문사 소개","/about/"),("문의하기","/contact/"),("개인정보처리방침","/privacy-policy/"),("면책공고","/disclaimer/")],
+"nav":[("속보","/category/breaking/"),("정치","/category/politics/"),("경제","/category/economy/"),("사회","/category/society/"),("국제","/category/world/")],
 "sections":[("정치","politics"),("경제","economy"),("사회","society"),("국제","world")],
 "footer":[("신문사 소개","/about/"),("편집 원칙","/editorial-standards/"),("정정·반론 보도","/corrections/"),("기사제보","/tips/"),("출처 및 저작권","/source-copyright-policy/")],
 "css":"--ink:#0B1F3A;--accent:#B42318;--wash:#EEF2F6;--serif:'Noto Serif KR','Nanum Myeongjo','Batang',serif;--sans:'Noto Sans KR','Malgun Gothic',sans-serif"
@@ -23,7 +24,8 @@ DATA={
 "theseouljournal.com":{
 "name":"THE SEOUL JOURNAL","tag":"Korea in Context. Asia in Focus.","edition":"2026 · SEOUL",
 "breaking":"TOP STORIES","latest":"Latest","more":"View all stories","read":"Read story",
-"utility":[("About","/about/"),("Contact","/contact/"),("Privacy Policy","/privacy-policy/"),("Disclaimer","/disclaimer/")],\n"nav":[("TOP STORIES","/category/top-stories/"),("KOREA","/category/korea/"),("ASIA","/category/asia/"),("WORLD","/category/world/"),("BUSINESS","/category/business/"),("TECHNOLOGY","/category/technology/")],
+"utility":[("About","/about/"),("Contact","/contact/"),("Privacy Policy","/privacy-policy/"),("Disclaimer","/disclaimer/")],
+"nav":[("TOP STORIES","/category/top-stories/"),("KOREA","/category/korea/"),("ASIA","/category/asia/"),("WORLD","/category/world/"),("BUSINESS","/category/business/"),("TECHNOLOGY","/category/technology/")],
 "sections":[("Korea","korea"),("Asia","asia"),("Business","business"),("Technology","technology")],
 "footer":[("About","/about/"),("Editorial Standards","/editorial-standards/"),("Corrections","/corrections/"),("Submit a Tip","/tips/"),("Sources & Copyright","/source-copyright-policy/")],
 "css":"--ink:#111111;--accent:#173B65;--wash:#F2F0EB;--serif:'Source Serif 4',Georgia,serif;--sans:Inter,Arial,sans-serif"
@@ -56,7 +58,8 @@ def query_block(per_page=5,cat_id=None,lead=False):
 
 def build(site,cats):
     d=DATA[site]
-    nav="".join(link(a,b) for a,b in d["nav"])\n    utility="".join(link(a,b) for a,b in d["utility"])
+    nav="".join(link(a,b) for a,b in d["nav"])
+    utility="".join(link(a,b) for a,b in d["utility"])
     foot="".join(link(a,b) for a,b in d["footer"])
     sections=[]
     for label,slug in d["sections"]:
@@ -109,7 +112,8 @@ def main():
     if a.confirm!=CONFIRM: raise SystemExit(f"Use --confirm {CONFIRM}")
     sites=list(ENV) if a.site=="ALL" else [a.site]
     out={"schema":1,"applied_at":datetime.now(timezone.utc).isoformat(),"results":[deploy(s) for s in sites]}
-    Path(a.receipt).write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    Path(a.receipt).write_text(json.dumps(out,ensure_ascii=False,indent=2)+"
+",encoding="utf-8")
     print(json.dumps(out,ensure_ascii=False,indent=2))
 
 if __name__=="__main__":main()
