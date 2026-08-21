@@ -14,4 +14,5 @@ jobs:
       - run: pip install requests beautifulsoup4 google-genai -q
       - env:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/audit_koreanews_private_posts.py
