@@ -1115,8 +1115,8 @@ SITE_PERSONA = {
         "cta": "Continue through the newcomer checklist"
     },
     "https://koreanews365.com": {
-        "persona_ko": "Koreanews365 한국신문 편집국. 국내 주요 언론의 공개 헤드라인과 공식 발표를 모니터링하고, 사실확인·추가 자료·독자적 해설을 더해 한국어 기사를 제작합니다.",
-        "scope": "한국 독자를 위한 국내외 속보·정치·경제·사회 주요 뉴스. 조선일보·연합뉴스 등 허가된 공개 피드와 정부·공공기관 원문을 출발점으로 사용하되 주간 기사의 30% 이상은 자체 취재·독자 분석 기사로 구성",
+        "persona_ko": "Koreanews365 한국신문 편집국. 별도 계약 없이 활용 가능한 CC BY 뉴스와 공공·1차 자료를 모니터링하고, 복수 출처 확인과 독자적 해설을 더해 한국어 기사를 제작합니다.",
+        "scope": "한국 독자를 위한 국내외 속보·정치·경제·사회 주요 뉴스. Global Voices·VOA의 이용 가능한 공개 피드와 정부·공공기관 원문을 취재 단서로 사용하며 주간 기사의 30% 이상은 자체 취재·독자 분석 기사로 구성",
         "tone": "한국 인터넷신문 기사체. 사실·타사 보도·편집국 분석을 명확히 구분하고 역피라미드 구조로 씁니다. 원문을 문장 단위로 치환하는 기사 세탁은 금지합니다.",
         "structure": [
             "제목과 리드: 새로 확인한 핵심 사실",
@@ -1133,8 +1133,8 @@ SITE_PERSONA = {
         "cta": "관련 한국신문 기사 보기"
     },
     "https://theseouljournal.com": {
-        "persona_en": "The Seoul Journal English News Desk. It monitors licensed or public headline feeds from major international outlets such as CNN and The New York Times, then produces original English reporting, context and analysis for a global audience.",
-        "scope": "English-language coverage of major world breaking news and top stories, with an Asia or Korea relevance angle where material. Source headlines are leads, not article text to disguise or substitute.",
+        "persona_en": "The Seoul Journal English News Desk. It monitors no-contact CC BY feeds, eligible VOA material, and primary public records, then produces original English reporting, context and analysis.",
+        "scope": "English-language world, business, technology, and Asia or Korea news built from Global Voices, eligible VOA leads, and primary government records. Source headlines are leads, never text to disguise or substitute.",
         "tone": "Professional English newspaper style. Distinguish sourced facts, direct quotations and newsroom analysis. Never imitate a source article paragraph by paragraph.",
         "structure": [
             "Original headline and concise lede",
@@ -1492,8 +1492,7 @@ def crawl_rss_news(lang="ko", site_url=""):
 
     def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
 
-    # Third-party feeds are enabled only after written commercial-use permission
-    # is recorded in the corresponding NEWS_RIGHTS_* repository secret.
+    # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
     sources = get_enabled_rss_sources(lang)
     if not sources:
         print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
