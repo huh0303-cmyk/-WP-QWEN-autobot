@@ -1,10 +1,10 @@
-name: "Koreanews — remove legacy dummy content and restyle"
+name: "Koreanews — curate archive and restyle"
 
 on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: "정확히 APPLY-KOREANEWS-HOTFIX 입력"
+        description: "정확히 APPLY-KOREANEWS-CURATION 입력"
         required: true
         default: ""
 
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  hotfix:
+  curate:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -22,12 +22,11 @@ jobs:
       - run: pip install requests -q
       - name: "확인 토큰 검사"
         shell: bash
-        run: |
-          test "${{ inputs.confirm }}" = "APPLY-KOREANEWS-HOTFIX"
-      - name: "2026-08-21 이전 더미 글 비공개 격리"
+        run: test "${{ inputs.confirm }}" = "APPLY-KOREANEWS-CURATION"
+      - name: "기존 글 선별·제목/발췌 정리·카테고리 5개씩 배치"
         env:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-        run: python scripts/quarantine_legacy_news.py --site koreanews365.com --confirm QUARANTINE-LEGACY-NEWS
+        run: python scripts/curate_koreanews_archive.py --confirm CURATE-KOREANEWS-5X5
       - name: "새 슬로건과 신문사 기반 설정 적용"
         env:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
@@ -39,9 +38,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: koreanews-hotfix-receipts-${{ github.run_id }}
+          name: koreanews-curation-receipts-${{ github.run_id }}
           path: |
-            newsroom_legacy_quarantine_receipt.json
+            koreanews_curation_receipt.json
             koreanews_foundation_receipt.json
             koreanews_front_page_receipt.json
           if-no-files-found: warn
