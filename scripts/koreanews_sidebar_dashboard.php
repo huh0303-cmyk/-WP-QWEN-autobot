@@ -4,8 +4,8 @@
  * Paste into the Code Snippets plugin without an opening PHP tag.
  */
 
-function kn365_kbo_standings_v6() {
-    $cached = get_transient('kn365_kbo_standings_v1');
+function kn365_kbo_standings_v7() {
+    $cached = get_transient('kn365_kbo_standings_v7');
     if (is_array($cached) && count($cached) === 10) {
         return $cached;
     }
@@ -53,14 +53,52 @@ function kn365_kbo_standings_v6() {
     libxml_clear_errors();
     libxml_use_internal_errors($previous);
 
+    $previous_ranks = array();
+    $yesterday = wp_date('Y-m-d', current_time('timestamp') - DAY_IN_SECONDS);
+    $previous_response = wp_remote_get(
+        'https://www.koreabaseball.com/Record/TeamRank/TeamRankDaily.aspx?searchDate=' . rawurlencode($yesterday),
+        array('timeout' => 8, 'user-agent' => 'Koreanews365/1.0 (+https://koreanews365.com/)')
+    );
+    if (!is_wp_error($previous_response) && 200 === wp_remote_retrieve_response_code($previous_response)) {
+        $previous_dom = new DOMDocument();
+        $previous_dom->loadHTML('<?xml encoding="utf-8" ?>' . wp_remote_retrieve_body($previous_response));
+        $previous_xpath = new DOMXPath($previous_dom);
+        foreach ($previous_xpath->query("//table[contains(@class,'tData')]//tbody/tr") as $previous_row) {
+            $previous_cells = $previous_xpath->query('./td', $previous_row);
+            if ($previous_cells->length >= 2) {
+                $previous_rank = (int) trim($previous_cells->item(0)->textContent);
+                $previous_team = trim($previous_cells->item(1)->textContent);
+                if ($previous_rank >= 1 && $previous_rank <= 10 && $previous_team) {
+                    $previous_ranks[$previous_team] = $previous_rank;
+                }
+            }
+        }
+    }
+
+    $logo_base = 'https://6ptotvmi5753.edge.naverncp.com/KBO_IMAGE/KBOHome/resources/images/emblem/regular/';
+    $logos = array(
+        'KT' => $logo_base . '2022/KT.png', '삼성' => $logo_base . '2022/SS.png',
+        'KIA' => $logo_base . '2022/HT.png', 'LG' => $logo_base . '2022/LG.png',
+        '두산' => $logo_base . '2025/OB.png', 'NC' => $logo_base . '2022/NC.png',
+        '롯데' => $logo_base . '2022/LT.png', '한화' => $logo_base . '2025/HH.png',
+        'SSG' => $logo_base . '2024/SK.png', '키움' => $logo_base . '2022/WO.png',
+    );
+    foreach ($standings as &$standing) {
+        $current_rank = (int) $standing['rank'];
+        $previous_rank = $previous_ranks[$standing['team']] ?? $current_rank;
+        $standing['movement'] = $previous_rank - $current_rank;
+        $standing['logo'] = $logos[$standing['team']] ?? '';
+    }
+    unset($standing);
+
     if (10 === count($standings)) {
-        set_transient('kn365_kbo_standings_v1', $standings, DAY_IN_SECONDS);
+        set_transient('kn365_kbo_standings_v7', $standings, DAY_IN_SECONDS);
     }
     return $standings;
 }
 
-function kn365_korean_stock_quotes_v6() {
-    $cached = get_transient('kn365_korean_stock_quotes_v6');
+function kn365_korean_stock_quotes_v7() {
+    $cached = get_transient('kn365_korean_stock_quotes_v7');
     if (is_array($cached) && count($cached) === 5) {
         return $cached;
     }
@@ -94,7 +132,7 @@ function kn365_korean_stock_quotes_v6() {
         );
     }
     if (count($quotes) === 5) {
-        set_transient('kn365_korean_stock_quotes_v6', $quotes, 10 * MINUTE_IN_SECONDS);
+        set_transient('kn365_korean_stock_quotes_v7', $quotes, 10 * MINUTE_IN_SECONDS);
     }
     return $quotes;
 }
@@ -103,8 +141,8 @@ add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
-    $standings = kn365_kbo_standings_v6();
-    $korean_quotes = kn365_korean_stock_quotes_v6();
+    $standings = kn365_kbo_standings_v7();
+    $korean_quotes = kn365_korean_stock_quotes_v7();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -117,11 +155,25 @@ add_action('wp_footer', function () {
     ?>
     <aside id="kn365-dashboard" class="kn365-dashboard" aria-label="실시간 정보">
       <section class="kn365-panel kn365-kbo">
-        <div class="kn365-panel-head"><h2>KBO 순위</h2><span>2026.8.21 기준</span></div>
+        <div class="kn365-panel-head"><h2>KBO 순위</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
         <?php if ($standings) : ?>
           <table><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승률</th></tr></thead><tbody>
           <?php foreach ($standings as $row) : ?>
-            <tr><td><?php echo esc_html($row['rank']); ?></td><td><?php echo esc_html($row['team']); ?></td><td><?php echo esc_html($row['games']); ?></td><td><?php echo esc_html($row['rate']); ?></td></tr>
+            <?php
+              $movement = (int) ($row['movement'] ?? 0);
+              $move_class = $movement > 0 ? 'up' : ($movement < 0 ? 'down' : 'flat');
+              $move_text = $movement > 0 ? '▲' . $movement : ($movement < 0 ? '▼' . abs($movement) : '─');
+              $move_label = $movement > 0 ? '어제보다 순위 상승' : ($movement < 0 ? '어제보다 순위 하락' : '어제와 순위 유지');
+            ?>
+            <tr>
+              <td class="rank"><?php echo esc_html($row['rank']); ?></td>
+              <td class="team">
+                <?php if (!empty($row['logo'])) : ?><img src="<?php echo esc_url($row['logo']); ?>" alt="" loading="lazy" width="28" height="28"><?php endif; ?>
+                <strong><?php echo esc_html($row['team']); ?></strong>
+                <span class="movement <?php echo esc_attr($move_class); ?>" title="<?php echo esc_attr($move_label); ?>" aria-label="<?php echo esc_attr($move_label); ?>"><?php echo esc_html($move_text); ?></span>
+              </td>
+              <td><?php echo esc_html($row['games']); ?></td><td><?php echo esc_html($row['rate']); ?></td>
+            </tr>
           <?php endforeach; ?>
           </tbody></table>
           <a class="kn365-source" href="https://www.koreabaseball.com/Record/TeamRank/TeamRank.aspx" target="_blank" rel="noopener noreferrer">출처: KBO 공식 기록</a>
@@ -218,7 +270,7 @@ add_action('wp_footer', function () {
       .kn365-panel{background:#fff;border:1px solid #e4e9f1;border-radius:14px;box-shadow:0 7px 22px rgba(20,39,70,.07);padding:15px;overflow:hidden}
       .kn365-panel-head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #b5121b;margin:-2px 0 10px;padding:0 0 8px}
       .kn365-panel-head h2{font-size:18px!important;margin:0!important;color:#101c35}.kn365-panel-head span{font-size:11px;color:#778196}
-      .kn365-kbo table{width:100%;border-collapse:collapse;font-size:12px}.kn365-kbo th,.kn365-kbo td{padding:5px 4px;border-bottom:1px solid #edf0f4;text-align:center}.kn365-kbo th:nth-child(2),.kn365-kbo td:nth-child(2){text-align:left;font-weight:700}
+      .kn365-kbo table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #e5eaf1;border-radius:10px;font-size:12px}.kn365-kbo thead th{background:#f5f7fa;color:#536075;font-size:10px;letter-spacing:.04em}.kn365-kbo th,.kn365-kbo td{height:42px;padding:6px;border:0;border-bottom:1px solid #edf0f4;text-align:center}.kn365-kbo tbody tr:last-child td{border-bottom:0}.kn365-kbo tbody tr:hover{background:#fafbfd}.kn365-kbo td.team{display:flex;align-items:center;gap:7px;text-align:left}.kn365-kbo td.team img{width:28px;height:28px;object-fit:contain}.kn365-kbo td.team strong{font-size:12px}.kn365-kbo .movement{margin-left:auto;min-width:22px;text-align:right;font-size:10px;font-weight:800}.kn365-kbo .movement.up{color:#d71920}.kn365-kbo .movement.down{color:#1769d2}.kn365-kbo .movement.flat{color:#9aa3b1}
       .kn365-kbo tbody tr:nth-child(6) td{border-top:2px dashed #c91421;padding-top:18px}
       .kn365-kbo tbody tr:nth-child(6) td:first-child{position:relative}
       .kn365-kbo tbody tr:nth-child(6) td:first-child::before{content:"가을야구 커트라인";position:absolute;top:2px;left:0;width:240px;text-align:center;color:#c91421;font-size:10px;font-weight:800;letter-spacing:.08em}
