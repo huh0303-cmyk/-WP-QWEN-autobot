@@ -158,7 +158,9 @@
         }
       ],
       "cadence": {
-        "daily_total": 5,
+        "daily_total_min": 3,
+        "daily_total_max": 10,
+        "mode": "daily_deterministic_random_with_source_gate",
         "original_daily_min": 2,
         "original_weekly_share_min": 0.3
       }
@@ -202,6 +204,14 @@
         {
           "name": "Technology",
           "slug": "technology"
+        },
+        {
+          "name": "Military",
+          "slug": "military"
+        },
+        {
+          "name": "Sports",
+          "slug": "sports"
         }
       ],
       "primary_menu": [
@@ -211,6 +221,8 @@
         "World",
         "Business",
         "Technology",
+        "Military",
+        "Sports",
         "About",
         "Contact"
       ],
@@ -245,7 +257,9 @@
         }
       ],
       "cadence": {
-        "daily_total": 5,
+        "daily_total_min": 3,
+        "daily_total_max": 10,
+        "mode": "daily_deterministic_random_with_source_gate",
         "original_daily_min": 2,
         "original_weekly_share_min": 0.3
       }

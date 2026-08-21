@@ -26,6 +26,31 @@ KST = timezone(timedelta(hours=9))
 def now_kst():
     return datetime.now(KST)
 
+NEWSROOM_DAILY_MIN = 3
+NEWSROOM_DAILY_MAX = 10
+
+def newsroom_daily_target(site_url, day=None):
+    """Stable per-site target for one KST day; changes automatically next day."""
+    day = day or now_kst().date()
+    seed = hashlib.sha256(f"{site_url}|{day.isoformat()}".encode()).digest()
+    return NEWSROOM_DAILY_MIN + int.from_bytes(seed[:4], "big") % 8
+
+def count_published_today(site_url, wp_pass):
+    """Count posts published since KST midnight; fail closed on API errors."""
+    midnight = datetime.combine(now_kst().date(), datetime.min.time(), tzinfo=KST)
+    after_utc = midnight.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    try:
+        response = requests.get(
+            f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+            params={"status":"publish", "after":after_utc, "per_page":1, "_fields":"id"},
+            timeout=12,
+        )
+        response.raise_for_status()
+        return int(response.headers.get("X-WP-Total", len(response.json())))
+    except Exception as exc:
+        print(f"  NEWSROOM DAILY GATE: publication count unavailable ({exc})")
+        return None
+
 GEMINI_API_KEY  = os.getenv("GEMINI_API_KEY")
 PIXABAY_KEY     = os.getenv("PIXABAY_KEY")
 PEXELS_KEY      = os.getenv("PEXELS_KEY")
@@ -3043,6 +3068,19 @@ def main():
             n=get_slot_posts(site,RUN_SLOT)
             if n==0:
                 print(f"⏭  {url} — 이번 슬롯 없음"); continue
+
+        if site["mode"] in ("news", "news_en"):
+            daily_target = newsroom_daily_target(url)
+            published_today = count_published_today(url, os.getenv(site["wp_pass_env"], ""))
+            if published_today is None:
+                print(f"⏭  {url} — 오늘 발행량 확인 실패, 안전 중지")
+                skip += n
+                continue
+            print(f"  🗓️ 오늘 발행 {published_today}/{daily_target}건 (3~10건 자동 선정)")
+            if published_today >= daily_target:
+                print(f"⏭  {url} — 오늘의 무작위 발행 목표 달성")
+                skip += n
+                continue
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url} [{theme}] 슬롯{RUN_SLOT} → {n}건")
