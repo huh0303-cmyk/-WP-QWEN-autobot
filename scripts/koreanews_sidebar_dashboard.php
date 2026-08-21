@@ -4,7 +4,7 @@
  * Paste into the Code Snippets plugin without an opening PHP tag.
  */
 
-function kn365_kbo_standings_v4() {
+function kn365_kbo_standings_v5() {
     $cached = get_transient('kn365_kbo_standings_v1');
     if (is_array($cached) && count($cached) === 10) {
         return $cached;
@@ -63,7 +63,7 @@ add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
-    $standings = kn365_kbo_standings_v4();
+    $standings = kn365_kbo_standings_v5();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -148,6 +148,19 @@ add_action('wp_footer', function () {
         <p class="kn365-disclaimer">투자 참고용 지연 정보이며 투자 권유가 아닙니다.</p>
       </section>
 
+      <section class="kn365-panel kn365-gold">
+        <div class="kn365-panel-head"><h2>국제 금 시세</h2><span>USD/oz · 지연 시세</span></div>
+        <div class="kn365-gold-quote" aria-label="트로이온스당 국제 금 현물가와 등락률">
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+          <?php echo wp_json_encode(array(
+              'symbol' => 'OANDA:XAUUSD', 'width' => '100%', 'locale' => 'kr',
+              'colorTheme' => 'light', 'isTransparent' => true,
+          ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+          </script>
+        </div>
+        <p class="kn365-disclaimer">금 현물 1트로이온스당 미국 달러 기준입니다.</p>
+      </section>
+
       <section class="kn365-panel kn365-world">
         <div class="kn365-panel-head"><h2>세계 시각·기온</h2><span id="kn365-weather-time">갱신 중</span></div>
         <ul>
@@ -173,6 +186,7 @@ add_action('wp_footer', function () {
       .kn365-source,.kn365-disclaimer,.kn365-muted{display:block;margin:9px 0 0;font-size:10px;color:#7a8495}.kn365-source{text-decoration:none}
       .kn365-market-group{margin:0 0 14px}.kn365-market-group h3{margin:0 0 5px!important;font-size:13px!important;color:#26334a;letter-spacing:.04em}
       .kn365-korean-quote{height:116px;margin:0;border-bottom:1px solid #edf0f4;overflow:hidden}.kn365-korean-quote:last-child{border-bottom:0}
+      .kn365-gold-quote{height:116px;overflow:hidden}
       .kn365-world ul{list-style:none;margin:0;padding:0}.kn365-world li{display:grid;grid-template-columns:1fr 58px 45px;gap:6px;padding:7px 2px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-world time,.kn365-world .temp{text-align:right;font-variant-numeric:tabular-nums}.kn365-world .temp{font-weight:700;color:#b5121b}
       @media(max-width:767px){.kn365-dashboard{margin-top:18px}.kn365-panel{border-radius:12px}}
     </style>
