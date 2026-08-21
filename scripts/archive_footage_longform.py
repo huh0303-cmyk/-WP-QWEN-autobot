@@ -226,7 +226,7 @@ _FALLBACK_QUERY = {
 }
 
 
-def fetch_archive_clips(topic, channel_key, workdir, n_target=20):
+def fetch_archive_clips(topic, channel_key, workdir, n_target=40):
     """실제 영상을 반드시 확보하는 게 우선이라(사용자 지시: 짧아도, 흑백이어도
     상관없음), 특정 주제로 결과가 없으면 점점 검색 범위를 넓혀서 재시도한다:
     1) 정확한 주제 그대로 검색
@@ -309,7 +309,7 @@ def generate_script(topic, channel_key, clips):
     clip_notes = "\n".join(
         f"- {c['title']} ({c['year'] or 'year unknown'}): {c['description']}" for c in clips
     )
-    prompt = f"""You are writing a narration script for a ~7-minute YouTube documentary
+    prompt = f"""You are writing a narration script for a ~14-minute YouTube documentary
 video about: "{topic}". This channel's domain is: {domain}. The video uses real
 public-domain archival footage (not AI-generated visuals).
 
@@ -320,7 +320,7 @@ not invent specific details not backed by well-known public facts):
 {clip_notes[:3000]}
 ---
 
-Write "narration": ~950-1050 words, English, engaging documentary tone (a good
+Write "narration": ~1900-2000 words, English, engaging documentary tone (a good
 history/culture YouTuber, not a dry lecture). Hook in the first two sentences.
 Structure: hook -> context -> core interesting facts/story -> a surprising or
 lesser-known detail -> a memorable closing line. Do not fabricate quotes or
