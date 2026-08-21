@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Guarded install/activation of the free CoverNews theme for The Seoul Journal."""
+"""Guarded install/activation of Mission News for The Seoul Journal."""
 from __future__ import annotations
 import json, os, time
 from datetime import datetime, timezone
@@ -7,12 +7,12 @@ from pathlib import Path
 import requests
 
 SITE = "theseouljournal.com"
-TARGET = "covernews"
+TARGET = "mission-news"
 USER = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
 PHP = r"""
 add_action('init', function () {
-    if (get_option('sj26_covernews_migration_v1') === 'done') return;
-    $slug = 'covernews';
+    if (get_option('sj26_mission_news_migration_v1') === 'done') return;
+    $slug = 'mission-news';
     $theme = wp_get_theme($slug);
     if (!$theme->exists()) {
         require_once ABSPATH . 'wp-admin/includes/theme.php';
@@ -20,15 +20,15 @@ add_action('init', function () {
         require_once ABSPATH . 'wp-admin/includes/theme-install.php';
         $info = themes_api('theme_information', array('slug' => $slug));
         if (is_wp_error($info) || empty($info->download_link)) {
-            update_option('sj26_covernews_migration_v1', 'theme-api-error'); return;
+            update_option('sj26_mission_news_migration_v1', 'theme-api-error'); return;
         }
         $result = (new Theme_Upgrader(new Automatic_Upgrader_Skin()))->install($info->download_link);
         if (is_wp_error($result) || !$result) {
-            update_option('sj26_covernews_migration_v1', 'install-error'); return;
+            update_option('sj26_mission_news_migration_v1', 'install-error'); return;
         }
     }
     switch_theme($slug);
-    update_option('sj26_covernews_migration_v1', get_stylesheet() === $slug ? 'done' : 'activate-error');
+    update_option('sj26_mission_news_migration_v1', get_stylesheet() === $slug ? 'done' : 'activate-error');
 }, 1);
 """
 
@@ -47,9 +47,9 @@ def main():
     password = os.getenv("THESEOULJOURNALCOM", "").strip()
     if not password: raise SystemExit("Missing THESEOULJOURNALCOM")
     before = active_theme(password)
-    payload = {"name": "The Seoul Journal CoverNews migration v1", "desc": "One-time guarded CoverNews activation.",
+    payload = {"name": "The Seoul Journal Mission News migration v1", "desc": "One-time guarded Mission News activation.",
         "code": PHP, "scope": "global", "active": True, "priority": 1,
-        "tags": ["theseouljournal", "covernews", "migration"]}
+        "tags": ["theseouljournal", "mission-news", "migration"]}
     created = call("POST", "code-snippets/v1/snippets", password, data=payload)
     snippet_id = created.get("id") or created.get("snippet", {}).get("id")
     if not snippet_id: raise RuntimeError(f"Snippet id missing: {created}")

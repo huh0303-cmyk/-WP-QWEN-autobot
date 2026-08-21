@@ -1,4 +1,4 @@
-name: Activate The Seoul Journal CoverNews theme
+name: Activate The Seoul Journal Mission News theme
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install requests
-      - name: Install and activate free CoverNews
+      - name: Install and activate Mission News
         env:
           WP_USER: ${{ secrets.WP_USER }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
