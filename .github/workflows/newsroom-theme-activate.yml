@@ -1,0 +1,41 @@
+name: "Newsrooms — activate newspaper theme"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "테마를 적용할 신문사"
+        required: true
+        type: choice
+        options: [koreanews365.com, theseouljournal.com, ALL]
+        default: ALL
+      confirm:
+        description: "정확히 ACTIVATE-TWENTY-TWENTY-FIVE 입력"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "현재 테마 기록 후 Twenty Twenty-Five 설치·활성화·검증"
+        env:
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/activate_newsroom_theme.py --site "${{ inputs.site }}" --confirm "${{ inputs.confirm }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newsroom-theme-receipt-${{ github.run_id }}
+          path: newsroom_theme_receipt.json
+          if-no-files-found: warn
+          retention-days: 90
