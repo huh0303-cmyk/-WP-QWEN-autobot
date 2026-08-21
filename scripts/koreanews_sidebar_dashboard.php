@@ -319,7 +319,10 @@ add_action('wp_footer', function () {
     </style>
     <script>
     (()=>{
-      const dash=document.getElementById('kn365-dashboard'), side=document.getElementById('secondary');
+      const dash=document.getElementById('kn365-dashboard');
+      const side=document.getElementById('secondary')
+        || document.querySelector('aside.sidebar-sticky')
+        || document.querySelector('aside.col-md-4');
       if(!dash||!side)return; side.innerHTML=''; side.appendChild(dash);
       const cities=<?php echo wp_json_encode($cities, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
       const tick=()=>document.querySelectorAll('#kn365-dashboard [data-zone]').forEach(el=>{
