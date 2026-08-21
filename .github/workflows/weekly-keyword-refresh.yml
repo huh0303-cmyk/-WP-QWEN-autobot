@@ -1,0 +1,42 @@
+name: "Weekly Keyword Pool Refresh (Sunday)"
+
+# 2026-08-22 사용자 지시: "키워드가 가장 중요해.. 매주 일요일마다 재검색해서
+# 키워드 pool을 업데이트해줘." Gemini의 Google 검색 그라운딩으로 그 주에
+# 실제로 화제인 키워드를 리서치해 data/keywords/*.txt를 갱신하고 커밋한다.
+on:
+  schedule:
+    # 매주 일요일 22:00 UTC = 월요일 07:00 KST(주가 시작 전 새 키워드 준비)
+    - cron: "0 22 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-keyword-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install google-genai -q
+      - name: Research this week's keywords
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/refresh_keyword_pool.py
+      - name: Commit updated keyword pool
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/keywords/
+          git diff --staged --quiet || git commit -m "chore: 주간 키워드 풀 갱신 [skip ci]"
+          git pull --rebase origin main
+          git push
