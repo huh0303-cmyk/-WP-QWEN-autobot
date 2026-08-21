@@ -1,0 +1,18 @@
+name: "(1회성) koreanews365 테마 원복 (newsup)"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  revert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+        run: python scripts/revert_koreanews_theme.py
