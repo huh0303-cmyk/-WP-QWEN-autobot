@@ -1157,8 +1157,9 @@ SITE_PERSONA = {
             "확인된 사실과 미확인 사항",
             "원문 출처 링크·작성 시각·수정 이력"
         ],
-        "min_chars": 2000,
-        "tables": 1,
+        "min_chars": 1500,
+        "max_chars": 2000,
+        "tables": 0,
         "lang": "ko",
         "cta": ""
     },
