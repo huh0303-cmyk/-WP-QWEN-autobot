@@ -4,8 +4,8 @@
  * Paste into the Code Snippets plugin without an opening PHP tag.
  */
 
-function kn365_kbo_standings_v8() {
-    $cached = get_transient('kn365_kbo_standings_v8');
+function kn365_kbo_standings_v9() {
+    $cached = get_transient('kn365_kbo_standings_v9');
     if (is_array($cached) && count($cached) === 10) {
         return $cached;
     }
@@ -92,13 +92,13 @@ function kn365_kbo_standings_v8() {
     unset($standing);
 
     if (10 === count($standings)) {
-        set_transient('kn365_kbo_standings_v8', $standings, DAY_IN_SECONDS);
+        set_transient('kn365_kbo_standings_v9', $standings, DAY_IN_SECONDS);
     }
     return $standings;
 }
 
-function kn365_korean_stock_quotes_v8() {
-    $cached = get_transient('kn365_korean_stock_quotes_v8');
+function kn365_korean_stock_quotes_v9() {
+    $cached = get_transient('kn365_korean_stock_quotes_v9');
     if (is_array($cached) && count($cached) === 5) {
         return $cached;
     }
@@ -132,7 +132,7 @@ function kn365_korean_stock_quotes_v8() {
         );
     }
     if (count($quotes) === 5) {
-        set_transient('kn365_korean_stock_quotes_v8', $quotes, DAY_IN_SECONDS);
+        set_transient('kn365_korean_stock_quotes_v9', $quotes, DAY_IN_SECONDS);
     }
     return $quotes;
 }
@@ -141,8 +141,8 @@ add_action('wp_footer', function () {
     if (is_admin()) {
         return;
     }
-    $standings = kn365_kbo_standings_v8();
-    $korean_quotes = kn365_korean_stock_quotes_v8();
+    $standings = kn365_kbo_standings_v9();
+    $korean_quotes = kn365_korean_stock_quotes_v9();
     $cities = array(
         array('서울', 'Asia/Seoul', 37.5665, 126.9780),
         array('뉴욕', 'America/New_York', 40.7128, -74.0060),
@@ -157,7 +157,7 @@ add_action('wp_footer', function () {
       <section class="kn365-panel kn365-kbo">
         <div class="kn365-panel-head"><h2>KBO 순위</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
         <?php if ($standings) : ?>
-          <table><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승률</th></tr></thead><tbody>
+          <table><thead><tr><th>순위</th><th>팀명</th><th>경기</th><th>승률(%)</th></tr></thead><tbody>
           <?php foreach ($standings as $row) : ?>
             <?php
               $movement = (int) ($row['movement'] ?? 0);
@@ -172,7 +172,7 @@ add_action('wp_footer', function () {
                 <strong><?php echo esc_html($row['team']); ?></strong>
                 <span class="movement <?php echo esc_attr($move_class); ?>" title="<?php echo esc_attr($move_label); ?>" aria-label="<?php echo esc_attr($move_label); ?>"><?php echo esc_html($move_text); ?></span>
               </td>
-              <td><?php echo esc_html($row['games']); ?></td><td><?php echo esc_html($row['rate']); ?></td>
+              <td><?php echo esc_html($row['games'] . '/144'); ?></td><td><?php echo esc_html(number_format((float) $row['rate'] * 100, 1) . '%'); ?></td>
             </tr>
           <?php endforeach; ?>
           </tbody></table>
