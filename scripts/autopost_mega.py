@@ -2891,6 +2891,11 @@ def process_one(site, keyword):
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
+    # The generic blog score does not measure newsroom-specific safeguards.
+    # Credit a story only after it has a named, linked, <=72-hour source lead;
+    # source-URL duplication was already rejected in crawl_rss_news().
+    if mode in ("news", "news_en") and news_source and news_source_url:
+        score=min(100, score + 10)
     rank="🏆" if score>=95 else "✅" if score>=90 else "⚠️" if score>=80 else "❌"
     print(f"  📊 SEO {score}/100 {rank}")
 
