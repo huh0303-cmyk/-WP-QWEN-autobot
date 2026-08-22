@@ -20,6 +20,7 @@ curio_longform.py가 만든 결과물(curio_longform_output/<channel_key>/<lang>
 import os
 import sys
 import json
+from datetime import datetime, timedelta, timezone
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -45,6 +46,19 @@ CHANNEL_SECRET_MAP = {
     "silent_era": "SILENT_ERA_TIMES",
     "retro_reels": "RETRO_REELS_TIMES",
     "classic_reads": "CLASSIC_READS_TIMES",
+}
+
+# 2026-08-22 사용자 지시("예약 걸어놔줘. 시간 펼쳐서.. 너 한꺼번 말고"): 같은 날
+# 여러 채널 영상이 한꺼번에 공개되면 배치 발행처럼 보이고 각 채널 개별 신호도
+# 흐려짐 — [[feedback_upload_pacing_schedule]]과 같은 원칙을 지식채널 5개에도
+# 적용. 채널별로 고정된 시차를 둬서, 생성 직후 바로 공개하는 대신 이 시간만큼
+# 뒤에 자동 공개(YouTube의 status.publishAt)되게 예약한다.
+PUBLISH_DELAY_HOURS = {
+    "nasa": 1,
+    "history": 4,
+    "invention": 7,
+    "silent_era": 10,
+    "retro_reels": 13,
 }
 
 
@@ -115,7 +129,7 @@ def get_youtube_service(secret_key):
     raise last_err
 
 
-def upload_to_youtube(service, video_path, thumb_path, title, description, tags=None):
+def upload_to_youtube(service, video_path, thumb_path, title, description, tags=None, publish_at=None):
     from googleapiclient.http import MediaFileUpload
 
     snippet = {"title": title[:100], "description": description[:5000], "categoryId": "27"}
@@ -129,9 +143,14 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
             kept.append(t)
             total += len(t)
         snippet["tags"] = kept
+    # YouTube API 규칙: publishAt을 쓰려면 업로드 시점 privacyStatus는 반드시
+    # "private"이어야 하고, 지정한 시각에 유튜브가 자동으로 공개 전환해준다.
+    status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
+    if publish_at:
+        status["publishAt"] = publish_at
     body = {
         "snippet": snippet,
-        "status": {"selfDeclaredMadeForKids": False, "privacyStatus": "private"},
+        "status": status,
     }
     media = MediaFileUpload(video_path, resumable=True, chunksize=5 * 1024 * 1024, mimetype="video/mp4")
     request = service.videos().insert(part="snippet,status", body=body, media_body=media)
@@ -183,10 +202,19 @@ def main():
     )
     tags = meta.get("tags") or []
 
+    delay_hours = PUBLISH_DELAY_HOURS.get(channel_key)
+    publish_at = None
+    if delay_hours is not None:
+        publish_at = (datetime.now(timezone.utc) + timedelta(hours=delay_hours)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ")
+
     log(f"2/2 유튜브 업로드 중 (채널: {secret_key})...")
     service = get_youtube_service(secret_key)
-    video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags)
-    log(f"✅ 업로드 완료(비공개): https://youtube.com/watch?v={video_id}")
+    video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags, publish_at)
+    if publish_at:
+        log(f"✅ 업로드 완료(비공개, {publish_at}에 자동 공개 예약됨): https://youtube.com/watch?v={video_id}")
+    else:
+        log(f"✅ 업로드 완료(비공개): https://youtube.com/watch?v={video_id}")
 
 
 if __name__ == "__main__":
