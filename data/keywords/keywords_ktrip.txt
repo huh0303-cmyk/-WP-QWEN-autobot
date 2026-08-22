@@ -1,11 +1,50 @@
-Seoul Airbnb guide	AirBnB & 민박
-Korea guesthouse booking	AirBnB & 민박
-best Seoul hotels	Hotels & Stays
-Busan hotel recommendations	Hotels & Stays
-Korea hanok stay	Hotels & Stays
-Jeju resort guide	Hotels & Stays
-Seoul itinerary 3 days	Travel Guides
-Jeju travel guide	Travel Guides
-Korea train pass guide	Travel Guides
-Busan travel guide	Travel Guides
-Korea autumn foliage spots	Travel Guides
+T-money card guide 2026	Transport & Admission
+KR Pass unlimited rail 2026	Transport & Admission
+KTX booking foreigner guide	Transport & Admission
+Korea Travel Card prepaid	Transport & Admission
+Namane Card KB Bank	Transport & Admission
+Gyeongbokgung admission price 2026	Transport & Admission
+Gyeongbokgung night viewing tickets	Transport & Admission
+Gyeongbokgung guided tour reservation	Transport & Admission
+Seoul subway line 2 3 4 5 guide	Transport & Admission
+Korail Talk app booking	Transport & Admission
+Changdeokgung Secret Garden reservation	Transport & Admission
+Korea airport limousine bus guide	Transport & Admission
+Seoul city tour bus pass	Transport & Admission
+Seoul 3 day subway itinerary	Itineraries
+Busan 2 day itinerary train	Itineraries
+Jeju 4 day itinerary	Itineraries
+Gyeongju day trip itinerary	Itineraries
+Incheon airport to Seoul itinerary	Itineraries
+Nami Island day trip guide	Itineraries
+DMZ tour from Seoul	Itineraries
+Suwon Hwaseong day trip	Itineraries
+Jeonju hanok village itinerary	Itineraries
+Gangneung coastal itinerary	Itineraries
+Seoraksan hiking itinerary	Itineraries
+Everland day trip guide	Itineraries
+Korea autumn foliage 2026 forecast	Seasonal Travel
+Seoul autumn foliage peak dates	Seasonal Travel
+Seoraksan autumn foliage October	Seasonal Travel
+Nami Island ginkgo season	Seasonal Travel
+Olympic Park autumn foliage	Seasonal Travel
+Bukhansan autumn hike guide	Seasonal Travel
+Garden of Morning Calm autumn	Seasonal Travel
+Korea winter light festival 2026	Seasonal Travel
+Deoksugung stone wall walk autumn	Seasonal Travel
+Korea foliage advance booking tips	Seasonal Travel
+Gapyeong autumn day trip	Seasonal Travel
+Korea Chuseok holiday travel 2026	Seasonal Travel
+Chuseok train ticket booking tips	Seasonal Travel
+Seoul hanok stay guide	Stays & Lodging
+Busan hotel recommendations 2026	Stays & Lodging
+Jeju resort guide 2026	Stays & Lodging
+Seoul Airbnb regulation guide	Stays & Lodging
+Korea guesthouse booking tips	Stays & Lodging
+Myeongdong hotel guide	Stays & Lodging
+Gangnam hotel guide	Stays & Lodging
+Hongdae hostel guide	Stays & Lodging
+Jeonju hanok village stay	Stays & Lodging
+Yeosu hotel guide	Stays & Lodging
+Sokcho stay near Seoraksan	Stays & Lodging
+Korea pension stay guide	Stays & Lodging
