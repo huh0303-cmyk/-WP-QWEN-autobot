@@ -279,26 +279,34 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=40):
 
     # 2026-08-21: topic/core_words 단계는 주제와 실제로 무관한 결과(느슨한 텍스트
     # 매칭 때문에 Baywatch, 사탕광고, 감옥 다큐 같은 게 섞여 들어옴)를 걸러내야
-    # 함 — 클립 제목/설명에 주제 핵심어가 하나도 없으면 버린다. 마지막 단계인
-    # 채널 도메인 폴백 쿼리(_FALLBACK_QUERY)는 애초에 주제-불특정 범용 키워드라
-    # 이 필터를 적용하면 안 됨(항상 걸러져서 빈 결과가 됨).
+    # 함 — 클립 제목/설명에 주제 핵심어가 하나도 없으면 버린다.
+    # 2026-08-22 수정: 예전엔 마지막 단계(채널 도메인 폴백 쿼리)에는 이 필터를
+    # 아예 안 걸었음("항상 걸러져서 빈 결과가 됨"이 이유였음) — 그런데 그 결과,
+    # 특정 날짜의 아주 구체적인 사건("모나리자 도난 1911년 8월21일" 등)처럼
+    # archive.org에 실제 자료가 없는 주제는 폴백에서 완전히 무관한 영상(예:
+    # "부패방지 변호사" 다큐멘터리)이 그대로 나레이션 밑에 깔려서 나갔음
+    # (사용자 지적: "동영상하고 멘트하고 완전 안맞고.. 쓰레기잖아"). 이제 폴백
+    # 단계도 동일한 관련성 필터를 통과해야 하고, 그래도 하나도 안 남으면
+    # (즉 이 주제로 쓸 수 있는 실제 자료가 진짜 하나도 없으면) 빈 리스트를
+    # 반환해서 main()이 그대로 중단하게 한다 — 무관한 영상을 억지로 쓰는 것보다
+    # 그 주제를 스킵하는 게 낫다.
     keywords = _extract_keywords(topic)
     docs = []
     used_query = None
     for i, q in enumerate(attempts):
-        is_fallback_tier = (i == len(attempts) - 1)
         found = search_archive_org(q, cfg, n_target * 3)
-        if not is_fallback_tier:
-            before = len(found)
-            found = [d for d in found if _is_relevant(d, keywords)]
-            if before and not found:
-                log(f"   (검색은 됐지만 주제와 무관한 결과뿐이라 버림: \"{q}\", {before}건 전부 제외)")
+        before = len(found)
+        found = [d for d in found if _is_relevant(d, keywords)]
+        if before and not found:
+            log(f"   (검색은 됐지만 주제와 무관한 결과뿐이라 버림: \"{q}\", {before}건 전부 제외)")
         if found:
             docs = found
             used_query = q
             break
         log(f"   (검색 결과 없음: \"{q}\" — 범위를 넓혀 재시도)")
     if not docs:
+        log("   ❌ 모든 검색 단계에서 이 주제와 실제로 관련된 퍼블릭도메인 영상을 못 찾음 "
+            "— 무관한 영상을 억지로 쓰지 않고 여기서 포기함")
         return []
     if used_query != topic:
         log(f"   ℹ️ 정확한 주제로는 못 찾아서 \"{used_query}\"로 대체 검색함")
