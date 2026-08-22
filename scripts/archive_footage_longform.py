@@ -43,7 +43,7 @@ from classic_reads_longform import (  # noqa: E402
     build_narration_track, write_srt, mux_final, _save_thumbnail_capped,
 )
 from nasa_archive_longform import (  # noqa: E402
-    normalize_clip, build_visual_track, extract_hero_frame, W, H,
+    normalize_clip, build_visual_track, extract_hero_frame, W, H, CLIP_TRIM_SECONDS,
 )
 
 IA_SEARCH = "https://archive.org/advancedsearch.php"
@@ -349,12 +349,29 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=40):
 # ════════════════════════════════════════════════════════════
 # 2. 대본 + 메타데이터 (사실기반)
 # ════════════════════════════════════════════════════════════
-def generate_script(topic, channel_key, clips):
+def generate_script(topic, channel_key, clips, target_seconds=None):
+    """target_seconds가 주어지면(2026-08-22, silent_era 전용 — 사용자 지시: "몇분을
+    억지로 만들지 말고 있는대로, 길이도 있는그대로") 그 길이에 맞는 단어수로 나레이션을
+    쓴다 — 실제 확보한 퍼블릭도메인 필름 분량이 짧으면 영상도 그만큼만 짧게 나가고,
+    build_visual_track()의 순환(loop)이 사실상 발동 안 해서 같은 장면이 반복되지 않는다.
+    None이면(다른 채널들) 기존처럼 고정 ~14분/~2000단어 그대로 유지."""
     domain = CHANNEL_ARCHIVE_CONFIG[channel_key]["domain"]
     clip_notes = "\n".join(
         f"- {c['title']} ({c['year'] or 'year unknown'}): {c['description']}" for c in clips
     )
-    prompt = f"""You are writing a narration script for a ~14-minute YouTube documentary
+    if target_seconds is not None:
+        target_minutes = target_seconds / 60
+        target_words = max(int(target_minutes * 135), 150)
+        length_line = (
+            f"a ~{target_minutes:.1f}-minute YouTube documentary (this length is "
+            f"deliberately short/natural — it matches the real archival footage actually "
+            f"available for this topic, do not pad or ramble to reach a longer runtime)"
+        )
+        word_line = f'~{target_words} words'
+    else:
+        length_line = "a ~14-minute YouTube documentary"
+        word_line = "~1900-2000 words"
+    prompt = f"""You are writing a narration script for {length_line}
 video about: "{topic}". This channel's domain is: {domain}. The video uses real
 public-domain archival footage (not AI-generated visuals).
 
@@ -365,7 +382,7 @@ not invent specific details not backed by well-known public facts):
 {clip_notes[:3000]}
 ---
 
-Write "narration": ~1900-2000 words, English, engaging documentary tone (a good
+Write "narration": {word_line}, English, engaging documentary tone (a good
 history/culture YouTuber, not a dry lecture). Hook in the first two sentences.
 Structure: hook -> context -> core interesting facts/story -> a surprising or
 lesser-known detail -> a memorable closing line. Do not fabricate quotes or
@@ -522,8 +539,16 @@ def main():
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보 (전부 퍼블릭도메인 검증됨)")
 
+    target_seconds = None
+    if channel_key == "silent_era":
+        # 실제 사용될 필름 분량(클립당 최대 CLIP_TRIM_SECONDS) 그대로 영상 길이로
+        # 쓴다 — 억지로 14분 채우려고 짧은 무성영화 클립 몇 개를 계속 순환시키지 않는다.
+        target_seconds = sum(min(c["duration"], CLIP_TRIM_SECONDS) for c in clips)
+        log(f"   silent_era: 실제 확보 필름 분량 {target_seconds/60:.1f}분 — "
+            f"이 길이 그대로 나레이션을 맞춘다(고정 14분 강제 안 함)")
+
     log("2/6 사실기반 대본 생성 중...")
-    data = generate_script(topic, channel_key, clips)
+    data = generate_script(topic, channel_key, clips, target_seconds=target_seconds)
     narration = data["narration"]
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
         json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
