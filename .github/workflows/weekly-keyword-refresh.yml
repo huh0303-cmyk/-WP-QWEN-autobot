@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: pip install google-genai -q
+      - run: pip install google-genai requests -q
       - name: Research this week's keywords
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
