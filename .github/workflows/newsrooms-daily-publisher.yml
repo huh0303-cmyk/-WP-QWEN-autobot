@@ -53,7 +53,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install publisher dependencies
-        run: pip install requests google-genai beautifulsoup4 lxml -q
+        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
       - name: Randomize edition time
         if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
         run: sleep $((RANDOM % 721))
