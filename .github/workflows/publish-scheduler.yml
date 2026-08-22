@@ -1,18 +1,44 @@
-name: "Publish Scheduler — DISABLED (index-first recovery)"
+name: Publish Scheduler (랜덤시간 발행 트리거)
 
-# Automatic WordPress writes are intentionally frozen.
-# Original workflow is preserved in git history. Re-enable only through a reviewed PR.
+# 2026-08-22 사용자 지시로 재개: "25개 블로그사이트는 1일 1포스팅 시간
+# 랜덤... 지금 실행해줘." 15분마다 돌면서 사이트마다 오늘의 랜덤 목표시각이
+# 지난 것만 daily-network-publish.yml로 개별 디스패치한다.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
+
+concurrency:
+  group: publish-scheduler
+  cancel-in-progress: false
 
 jobs:
-  disabled:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Publication freeze notice
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Check & dispatch if today's random target passed
+        id: check
+        env:
+          GH_DISPATCH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/publish_scheduler.py
+      - name: Commit scheduler state
+        if: always()
         run: |
-          echo "WordPress automatic publishing/writes are disabled."
-          echo "Current mode: Google indexing and content-quality recovery only."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add scheduler_state.json
+          git diff --staged --quiet || git commit -m "chore: 스케줄러 상태 갱신 [skip ci]"
+          git push

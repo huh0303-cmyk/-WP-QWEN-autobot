@@ -1,0 +1,75 @@
+name: "Daily Network Publish — Single Site (dispatched by scheduler)"
+
+# 2026-08-22 사용자 지시로 재개: "오늘부터 25개 블로그사이트는 1일 1포스팅
+# 시간 랜덤... 지금 실행해줘." publish_scheduler.py가 사이트마다 각자 다른
+# 랜덤 시각을 잡아 이 워크플로우를 사이트 하나씩 개별 디스패치한다(같은
+# 시각에 몰아서 발행하면 "동일 운영자 네트워크" 신호가 되는 문제를
+# 2026-08-19에 이미 겪어서 확정한 구조). 뉴스 2개 사이트(koreanews365/
+# theseouljournal)는 별도 시간규칙(newsrooms-daily-publisher.yml, 하루
+# 3~10건)으로 이미 운영 중이라 이 워크플로우 대상이 아니다.
+on:
+  workflow_dispatch:
+    inputs:
+      target_site_url:
+        description: "발행 대상 사이트 1개 URL (publish_scheduler.py가 채움)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish-one:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install publisher dependencies
+        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+      - name: Publish one post
+        env:
+          WP_AUTOPUBLISH_ENABLED: "true"
+          TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          RUN_SLOT: "1"
+          SLEEP_BETWEEN_POSTS: "2"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: python scripts/autopost_mega.py
+      - name: Save publication result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-publish-result-${{ github.run_id }}
+          path: newsroom_publish_result.json
+          if-no-files-found: warn
+          retention-days: 14
