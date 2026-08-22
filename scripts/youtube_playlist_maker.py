@@ -640,7 +640,10 @@ def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, top
         # 제목(무드)은 YouTube 타이틀 텍스트로만 전달한다.
         return make_photo_thumbnail(image_path, out_path)
     elif channel_key in PLAYLIST_HERO_CHANNELS:
-        return make_caption_thumbnail(image_path, out_path, topic="Playlist",
+        # 2026-08-22: globalmusic는 실제 채널 브랜드명이 Cafe_K라서(CHANNEL_DESC_CONTEXT
+        # 참고) 히어로 텍스트도 제네릭 "Playlist" 대신 브랜드명을 그대로 쓴다.
+        hero_text = "Cafe_K" if channel_key == "globalmusic" else "Playlist"
+        return make_caption_thumbnail(image_path, out_path, topic=hero_text,
                                        subtitle_override=topic, show_waveform=True)
     else:
         return make_caption_thumbnail(image_path, out_path, topic=topic)
@@ -677,20 +680,41 @@ def build_ai_images(topic, workdir, service=None):
     topic = (topic or "").strip() or "tropical beachside vibe, aesthetic lifestyle"
 
     if CHANNEL_KEY == "globalmusic":
-        # 로맨틱글로벌 채널: 여행지 풍경이 아니라 커플이 주인공인 로맨틱한 장면이 핵심
-        style = (
-            "real photograph shot on a professional DSLR camera with a warm cinematic "
-            "color grade, golden-hour or string-light evening lighting, soft romantic "
-            "mood, shallow depth of field, no text, no watermark"
-        )
+        # Cafe_K(로맨틱글로벌) 채널: 여행지 풍경이 아니라 커플이 주인공인 로맨틱한
+        # 장면이 핵심. 2026-08-22 사용자 요청 — 매번 같은 톤이 아니라 실제 벤치마크
+        # 채널들처럼 영화포스터/빈티지 흑백/모던 감성 등 스타일을 섞어서 써야 함.
+        style_variant = random.choice([
+            "modern_candid", "vintage_sepia", "cinematic_poster", "night_indie",
+        ])
+        if style_variant == "vintage_sepia":
+            style = (
+                "vintage sepia-toned or black-and-white photograph, 1950s-1960s film "
+                "grain, nostalgic old romance movie still aesthetic, soft focus, no text, "
+                "no watermark"
+            )
+        elif style_variant == "cinematic_poster":
+            style = (
+                "cinematic romance movie poster style photograph, dramatic warm backlight, "
+                "rich color grade, professional film still composition, no text, no watermark"
+            )
+        elif style_variant == "night_indie":
+            style = (
+                "moody blue-hour or night city photograph, indie film grain, candid warm "
+                "streetlight or rooftop ambiance, intimate low-key lighting, no text, "
+                "no watermark"
+            )
+        else:
+            style = (
+                "real photograph shot on a professional DSLR camera with a warm cinematic "
+                "color grade, golden-hour or string-light evening lighting, soft romantic "
+                "mood, shallow depth of field, no text, no watermark"
+            )
         prompts = [
             f"A romantic couple (their faces not clearly identifiable as any real person) "
             f"sharing an intimate moment — holding hands, dancing, or laughing together — "
-            f"in a setting inspired by '{topic}', warm golden hour light, dreamy and tender "
-            f"atmosphere, {style}",
-            f"A different romantic couple moment inspired by '{topic}', evening string "
-            f"lights or sunset backdrop, candid joyful embrace or a quiet close moment, "
-            f"{style}",
+            f"in a setting inspired by '{topic}', dreamy and tender atmosphere, {style}",
+            f"A different romantic couple moment inspired by '{topic}', candid joyful "
+            f"embrace or a quiet close moment, {style}",
         ]
     elif CHANNEL_KEY == "healing":
         # 힐링 채널: 2026-08-17 사용자 지시 — 텍스트/그래픽 전혀 없이 순수하게
