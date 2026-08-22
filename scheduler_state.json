@@ -1,19 +1,22 @@
 {
-  "date": "2026-08-21",
+  "date": "2026-08-22",
   "fired": {
+    "https://koreamedicaltour.com": true,
+    "https://koreainsurance365.com": true,
+    "https://kfinance365.com": true,
+    "https://koreataxnlaw.com": true,
+    "https://koreacrypto365.com": true,
+    "https://krealestate365.com": true,
+    "https://ktech365.com": true,
+    "https://oliveyoungkorea.com": true,
     "https://k-trip365.com": true,
     "https://k-visa365.com": true,
+    "https://kieca-korea.org": true,
     "https://ksa-korea.org": true,
-    "https://korea365.org": true,
-    "https://ktech365.com": true,
-    "https://jobinkorea365.com": true,
     "https://sis-korea.com": true,
-    "https://ki-korea.com": true,
-    "https://koreainsurance365.com": true,
     "https://jobkorea365.com": true,
-    "https://theseouljournal.com": true,
-    "https://koreacrypto365.com": true,
-    "https://koreamedicaltour.com": true,
-    "https://krealestate365.com": true
+    "https://jobinkorea365.com": true,
+    "https://jobkoreaglobal.com": true,
+    "https://korea365.org": true
   }
 }
