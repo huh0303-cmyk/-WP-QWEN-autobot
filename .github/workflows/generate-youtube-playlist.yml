@@ -224,14 +224,17 @@ jobs:
           # 동시에 여러 채널 워크플로우가 겹쳐 돌면 stash pop이 충돌 마커를
           # 그대로 남길 수 있다(2026-08-14 실제로 발생, JSON이 깨진 채 커밋됨) —
           # 충돌 마커가 남아있으면 절대 커밋하지 않고 그냥 건너뛴다.
-          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null; then
-            echo "⚠️ playlist_recent_topics.json에 병합 충돌 마커 발견 — 커밋 건너뜀"
-            git checkout -- playlist_recent_topics.json
-            exit 0
-          fi
-          if grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then
-            echo "⚠️ playlist_recent_tracks.json에 병합 충돌 마커 발견 — 커밋 건너뜀"
-            git checkout -- playlist_recent_tracks.json
+          # 2026-08-22 수정: 'git checkout -- <file>'은 인덱스에 unmerged stage가
+          # 남아있으면 "path is unmerged" 에러로 그 자체가 실패해서 잡 전체가
+          # exit 1로 죽는 버그가 있었음(8/18~8/20 절반가량 실패 원인). 'git
+          # checkout HEAD -- <file>'로 명시적으로 HEAD 기준 복원해야 충돌 상태와
+          # 무관하게 항상 성공한다. 두 파일 다 저장가치 낮은 재생성 가능한
+          # 상태값이라, 둘 중 하나라도 충돌나면 둘 다 HEAD로 리셋하고 이번
+          # 실행의 커밋은 스킵한다.
+          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null || \
+             grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then
+            echo "⚠️ 병합 충돌 마커 발견 — 두 상태파일 다 HEAD로 리셋하고 커밋 건너뜀"
+            git checkout HEAD -- playlist_recent_topics.json playlist_recent_tracks.json
             exit 0
           fi
           git add playlist_recent_topics.json playlist_recent_tracks.json 2>/dev/null || true
