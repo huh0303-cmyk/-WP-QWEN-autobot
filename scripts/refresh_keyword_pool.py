@@ -439,7 +439,11 @@ def main():
     for target in TARGETS:
         path = target["file"]
         print(f"=== {path} 리서치 시작 ({today_str} 기준) ===")
-        accepted, grounded_any = research_one_site(client, target, today_str, corpus_norms, corpus_wordsets)
+        try:
+            accepted, grounded_any = research_one_site(client, target, today_str, corpus_norms, corpus_wordsets)
+        except Exception as e:
+            print(f"  ❌ 리서치 실패({e}) — 이 사이트만 스킵, 기존 파일 유지\n")
+            continue
 
         if len(accepted) < 50:
             # 부족분은 기존 파일에서 코퍼스와 안 겹치는 항목만 살려서 채운다.

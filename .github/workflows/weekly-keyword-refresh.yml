@@ -29,6 +29,7 @@ jobs:
       - run: pip install google-genai requests -q
       - name: Research this week's keywords
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/refresh_keyword_pool.py
       - name: Commit updated keyword pool
