@@ -607,27 +607,23 @@ AUTO_TOPIC_LANGUAGE_HINTS = {
 }
 
 # 채널 성격상 위 여행지/계절 주제풀이 안 맞는 채널은 여기서 전용 주제풀을 쓴다.
-# mbb: 작곡가+대표곡 (썸네일에도 그대로 쓰임 — 작곡가 성을 대문자 히어로 텍스트로).
+# mbb: 2026-08-22 개편 — 작곡가 초상화+이름 텍스트 포맷을 버리고, 벤치마크
+# 채널들처럼 "시간대/활동 무드" 기반으로 전환(아침/점심/근무/저녁/로맨틱 등).
+# 썸네일엔 글씨 없이 분위기 사진만 쓰고, 제목(YouTube title)에 무드를 담는다.
 # kpop: 곡 없이도 자연스러운 무드 키워드(플리 콘셉트).
 CHANNEL_TOPIC_POOLS = {
     "mbb": [
-        "Mozart — Eine kleine Nachtmusik", "Mozart — The Marriage of Figaro Overture",
-        "Bach — Air on the G String", "Bach — Brandenburg Concerto No. 3",
-        "Beethoven — Moonlight Sonata", "Beethoven — Symphony No. 7",
-        "Mozart — Symphony No. 40", "Bach — Cello Suite No. 1",
-        "Beethoven — Egmont Overture", "Mozart — Requiem",
-        "Bach — Goldberg Variations", "Beethoven — Pathetique Sonata",
+        "Morning Piano", "Violin & Cello Morning", "Piano for Lunch Break",
+        "Cello for Deep Focus & Work", "Violin for Afternoon Tea",
+        "Piano & Violin Dinner", "Romantic Cello & Piano", "Evening Violin Serenade",
+        "Rain & Piano for Sleep", "Morning Chamber Music", "Candlelight Piano Dinner",
+        "Cello for Reading & Studying",
     ],
     "kpop": [
         "study playlist", "workout playlist", "driving at night", "chill dance practice",
         "rainy day mix", "morning motivation", "late night vibes", "concert energy",
     ],
 }
-
-
-def _composer_from_topic(topic: str) -> str:
-    """'Mozart — Eine kleine Nachtmusik' 형태에서 작곡가 성만 뽑아 썸네일 히어로 텍스트로 쓴다."""
-    return (topic or "").split("—")[0].strip() or "Classical"
 
 
 def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, topic: str,
@@ -638,17 +634,14 @@ def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, top
     본 파이프라인(build_playlist)과 주간 썸네일 리프레시 스크립트가 공유해서 쓴다."""
     if hero_override == "playlist_only":
         return make_caption_thumbnail(image_path, out_path, topic="Playlist", show_waveform=True)
-    elif channel_key == "healing":
-        # healing은 다른 4개 히어로 채널과 달리 "사진 썸네일" 포맷 — 큰 타이틀도
-        # "Playlist" 문구도 없이 사진이 주인공, 작은 파형 아이콘 하나만 (2026-08-13
-        # 사용자 명시적 요청: "썸네일 음파만 작게 하나 Playlist 글씨 없다").
+    elif channel_key in ("healing", "mbb"):
+        # healing(2026-08-13)과 mbb(2026-08-22 개편, 작곡가 초상화+텍스트 포맷 폐기)
+        # 둘 다 "사진 썸네일" 포맷 — 글씨/그래픽 없이 분위기 사진 자체가 주인공.
+        # 제목(무드)은 YouTube 타이틀 텍스트로만 전달한다.
         return make_photo_thumbnail(image_path, out_path)
     elif channel_key in PLAYLIST_HERO_CHANNELS:
         return make_caption_thumbnail(image_path, out_path, topic="Playlist",
                                        subtitle_override=topic, show_waveform=True)
-    elif channel_key == "mbb":
-        return make_caption_thumbnail(image_path, out_path, topic=_composer_from_topic(topic),
-                                       subtitle_override=topic, show_waveform=False)
     else:
         return make_caption_thumbnail(image_path, out_path, topic=topic)
 RECENT_TOPICS_FILE = "playlist_recent_topics.json"
@@ -746,19 +739,21 @@ def build_ai_images(topic, workdir, service=None):
             f"crowd energy, saturated pink-purple-blue color palette, {style}",
         ]
     elif CHANNEL_KEY == "mbb":
-        # 클래식(MBB): 작곡가 유화 초상화 스타일 — 실사진이 아니라 고전 회화 톤
-        composer = _composer_from_topic(topic)
+        # 클래식(MBB, 2026-08-22 개편): 작곡가 초상화 대신 벤치마크 채널들처럼
+        # 시간대/활동 무드(아침/점심/근무/저녁/로맨틱)에 맞는 우아한 실사 인테리어
+        # 분위기 사진 — 글씨는 썸네일에 안 넣고 유튜브 제목으로만 전달한다.
         style = (
-            "classical oil painting style portrait, museum quality, warm sepia and dark "
-            "tones, dramatic chiaroscuro lighting, 18th-19th century European painting "
-            "aesthetic, no text, no watermark"
+            "real photograph shot on a professional camera, elegant tasteful interior or "
+            "quiet nature setting, soft cinematic natural or candlelight, shallow depth of "
+            "field, no people's faces clearly identifiable, no text, no watermark"
         )
         prompts = [
-            f"A classical oil painting portrait of a composer in the style of {composer}'s "
-            f"era, formal period clothing, holding sheet music or a quill, dignified "
-            f"expression, {style}",
-            f"A different classical painting scene evoking {composer}'s music — an ornate "
-            f"period concert hall, piano, or manuscript close-up, {style}",
+            f"An elegant scene with a grand piano, violin, or cello evoking '{topic}', warm "
+            f"inviting light matching the mood (bright morning light / soft afternoon glow / "
+            f"warm evening candlelight as fits the mood), tasteful classical-music ambiance, {style}",
+            f"A different tasteful classical-music interior or nature scene evoking '{topic}' "
+            f"— sheet music, an instrument resting nearby, or a cozy reading corner, calm and "
+            f"sophisticated atmosphere, {style}",
         ]
     else:
         style = (
