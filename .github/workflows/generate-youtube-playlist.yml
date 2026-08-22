@@ -164,6 +164,10 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # healing 채널 실사 빗물/숲 영상 소스 (2026-08-22 추가)
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           # 채널별 전용 폴더 - 아직 안 만든 채널은 시크릿이 없어서 공용 기본값으로
           # 자동 폴백된다(youtube_playlist_maker.py의 _channel_env 참고)
           MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}

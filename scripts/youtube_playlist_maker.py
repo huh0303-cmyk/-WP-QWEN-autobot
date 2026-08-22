@@ -61,6 +61,12 @@ GOOGLE_OAUTH_REFRESH_TOKEN = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
+# 2026-08-22: healing 채널 전용 — AI 정지이미지+가짜 파형 오버레이로는 벤치마크
+# 채널들(실제 4K 숲/빗물 "동영상" 촬영본)의 진짜 움직이는 빗방울/흐르는 물을
+# 흉내낼 수 없음(ffmpeg 합성 시도 결과 부자연스러움 확인) — 실사 스톡영상으로 대체.
+PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "") or os.environ.get("PEXELS_KEY", "")
+PIXABAY_KEY = os.environ.get("PIXABAY_KEY", "")
+
 # 유튜브 실제 업로드/공개 승인 파이프라인용 — 구글드라이브 업로드용 OAuth와는
 # 스코프가 달라서(youtube.upload) 별도로 발급받은 값을 쓴다
 YOUTUBE_OAUTH_CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID", "")
@@ -960,6 +966,133 @@ def build_alternating_visual(image_paths, total_duration, out_path):
     concat_stream_copy(clips, out_path)
 
 
+# ════════════════════════════════════════════════════════════
+# healing 전용: 실사 스톡영상(비/시냇물) 소스 — AI 정지이미지 대신 사용
+# ════════════════════════════════════════════════════════════
+def _search_pexels_video(query):
+    if not PEXELS_API_KEY:
+        return None
+    r = requests.get(
+        "https://api.pexels.com/videos/search",
+        headers={"Authorization": PEXELS_API_KEY},
+        params={"query": query, "per_page": 5, "orientation": "landscape", "size": "large"},
+        timeout=30,
+    )
+    r.raise_for_status()
+    videos = r.json().get("videos", [])
+    best_url, best_w = None, 0
+    for v in videos:
+        for f in v.get("video_files", []):
+            w = f.get("width") or 0
+            # 너무 큰 원본(8K 등)은 다운로드/인코딩 시간이 폭증하므로 4K 언저리로 상한
+            if f.get("file_type") == "video/mp4" and 0 < w <= 3840 and w > best_w:
+                best_w, best_url = w, f.get("link")
+    return best_url
+
+
+def _search_pixabay_video(query):
+    if not PIXABAY_KEY:
+        return None
+    r = requests.get(
+        "https://pixabay.com/api/videos/",
+        params={"key": PIXABAY_KEY, "q": query, "per_page": 5},
+        timeout=30,
+    )
+    r.raise_for_status()
+    hits = r.json().get("hits", [])
+    for h in hits:
+        vids = h.get("videos", {})
+        for tier in ("large", "medium", "small"):
+            u = vids.get(tier, {}).get("url")
+            if u:
+                return u
+    return None
+
+
+def _download_file(url, out_path):
+    r = requests.get(url, timeout=90, stream=True)
+    r.raise_for_status()
+    with open(out_path, "wb") as f:
+        for chunk in r.iter_content(chunk_size=1 << 20):
+            f.write(chunk)
+
+
+def fetch_healing_footage_clips(theme, workdir):
+    """테마별 검색어로 Pexels→Pixabay 순으로 실사 영상을 찾아 다운로드한다.
+    하나도 못 구하면 빈 리스트를 반환 — 호출부가 기존 AI 정지이미지 방식으로
+    안전하게 폴백한다."""
+    queries = HEALING_FOOTAGE_QUERIES.get(theme, HEALING_FOOTAGE_QUERIES["weak_rain"])
+    clips = []
+    for i, q in enumerate(queries):
+        path = os.path.join(workdir, f"footage_{i}.mp4")
+        url = None
+        try:
+            url = _search_pexels_video(q)
+            src = "Pexels"
+        except Exception as e:
+            log(f"   ⚠️ Pexels 검색 실패('{q}'): {e}")
+        if not url:
+            try:
+                url = _search_pixabay_video(q)
+                src = "Pixabay"
+            except Exception as e:
+                log(f"   ⚠️ Pixabay 검색 실패('{q}'): {e}")
+        if not url:
+            log(f"   ⚠️ '{q}' 실사영상 없음 — 스킵")
+            continue
+        try:
+            _download_file(url, path)
+            if get_duration(path) < 1.0:
+                raise ValueError("다운로드된 파일이 영상이 아님")
+            clips.append(path)
+            log(f"   ✅ 실사영상 확보('{q}', {src})")
+        except Exception as e:
+            log(f"   ⚠️ '{q}' 다운로드 실패: {e}")
+    return clips
+
+
+def make_footage_segment(clip_path, out_path, duration, fps=25):
+    """짧은 실사 클립을 duration만큼 반복 재생(loop)해서 VIDEO_W x VIDEO_H로 채운다.
+    Ken Burns 방식과 달리 클립 자체가 이미 움직이는 영상(빗방울/물살)이라
+    확대/축소는 아주 미세하게만 얹어 화면이 완전히 정지된 느낌만 없앤다."""
+    frames = max(int(duration * fps), 1)
+    vf = (f"scale=2560:-2:force_original_aspect_ratio=increase,crop=2560:1440,"
+          f"zoompan=z='min(zoom+0.00015,1.06)':d={frames}:"
+          f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={VIDEO_W}x{VIDEO_H}:fps={fps},"
+          f"format=yuv420p")
+    run_ffmpeg(["ffmpeg", "-y", "-stream_loop", "-1", "-i", clip_path, "-vf", vf,
+                "-r", str(fps), "-t", str(duration), "-an", "-c:v", "libx264",
+                "-pix_fmt", "yuv420p", out_path])
+
+
+def build_footage_visual(clip_paths, total_duration, out_path):
+    """clip_paths를 IMAGE_SWAP_SEC 간격으로 번갈아 채워 이어붙인다(build_alternating_visual과
+    동일한 전환 리듬 — 실사영상 버전)."""
+    clips = []
+    t = 0.0
+    idx = 0
+    i = 0
+    while t < total_duration - 0.05:
+        dur = min(IMAGE_SWAP_SEC, total_duration - t)
+        clip = clip_paths[idx % len(clip_paths)]
+        cpath = os.path.join(WORKDIR, f"footage_visual_{i:03d}.mp4")
+        make_footage_segment(clip, cpath, duration=dur)
+        clips.append(cpath)
+        t += dur
+        idx += 1
+        i += 1
+    concat_stream_copy(clips, out_path)
+
+
+def extract_representative_frame(clip_path, out_path, at_sec=2.0):
+    """썸네일/인트로 정지화면용으로 실사 클립에서 프레임 한 장을 뽑는다."""
+    dur = get_duration(clip_path)
+    ss = min(at_sec, max(dur - 0.5, 0.0))
+    run_ffmpeg(["ffmpeg", "-y", "-ss", str(ss), "-i", clip_path,
+                "-frames:v", "1", "-update", "1", out_path])
+    return out_path
+
+
 def _escape_drawtext(text):
     return text.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
 
@@ -1471,6 +1604,16 @@ HEALING_THEME_TOPICS = {
     "stream_calm": "Calming Stream Sounds with Gentle Birdsong",
     "weak_rain": "Soft Light Rain Sounds for Sleep and Focus",
 }
+# 2026-08-22: 벤치마크 채널들(실사 4K 숲/빗물 영상) 스타일에 맞춘 실사 스톡영상
+# 검색어 — 테마당 3개, IMAGE_SWAP_SEC 간격으로 번갈아 나온다.
+HEALING_FOOTAGE_QUERIES = {
+    "strong_rain": ["heavy rain forest", "rain falling on green leaves close up",
+                     "rainy forest path mist"],
+    "weak_rain": ["light rain forest mist", "gentle rain on leaves",
+                  "misty pine forest rain"],
+    "stream_calm": ["forest stream flowing rocks", "calm river forest sunlight",
+                     "green forest stream nature"],
+}
 HEALING_THEME_DURATION_SEC = {
     "strong_rain": (145 * 60, 155 * 60),   # "2시간 30분" 목표
     "stream_calm": (120 * 60, 180 * 60),   # "2~3시간"
@@ -1615,7 +1758,42 @@ def main():
     final_path = os.path.join(WORKDIR, "final.mp4")
     thumbnail_out = os.path.join(WORKDIR, "thumbnail.png")
 
-    if topic_keyword.strip():
+    footage_clips = []
+    if healing_theme:
+        log(f"3/5 healing 실사 스톡영상 확보 시도 중({healing_theme})...")
+        footage_clips = fetch_healing_footage_clips(healing_theme, WORKDIR)
+        if not footage_clips:
+            log("   ⚠️ 실사영상을 하나도 못 구함 — AI 정지이미지 방식으로 폴백")
+
+    if footage_clips:
+        log(f"   ✅ 실사영상 {len(footage_clips)}개 확보 — AI 정지이미지 대신 사용")
+        caption_text = build_caption_text(topic_keyword, caption_text_input)
+        log(f"   캡션 문구: {caption_text}")
+        thumb_source = os.path.join(WORKDIR, "footage_thumb_src.png")
+        extract_representative_frame(footage_clips[0], thumb_source)
+        # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
+        # 플리 채널 벤치마킹 공통 포맷 — 주간 썸네일 리프레시 스크립트와 로직 공유)
+        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, thumb_source, thumbnail_out, topic_keyword)
+
+        log("4/5 실사영상 조립 + 하단 캡션바 삽입 중...")
+        body_audio_path = os.path.join(WORKDIR, "body_audio.m4a")
+        trim_audio_from(audio_path, INTRO_DURATION_SEC, body_audio_path)
+        body_total_sec = total_sec - INTRO_DURATION_SEC
+
+        visual_path = os.path.join(WORKDIR, "visual.mp4")
+        build_footage_visual(footage_clips, body_total_sec, visual_path)
+        muxed_path = os.path.join(WORKDIR, "muxed.mp4")
+        add_spinning_vinyl_and_waveform(visual_path, body_audio_path, muxed_path)
+        body_path = os.path.join(WORKDIR, "body.mp4")
+        add_lower_third_bar(muxed_path, caption_text, body_path)
+
+        log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
+        intro_still = os.path.join(WORKDIR, "intro_still.png")
+        intro_still = make_channel_thumbnail(CHANNEL_KEY, thumb_source, intro_still, topic_keyword)
+        intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
+        make_intro_clip(intro_still, audio_path, intro_clip)
+        concat_intro_and_main(intro_clip, body_path, final_path)
+    elif topic_keyword.strip():
         log(f"3/5 주제어 '{topic_keyword}' 기반 AI 이미지 2장 생성 중...")
         image_paths = build_ai_images(topic_keyword, WORKDIR, service=service)
         caption_text = build_caption_text(topic_keyword, caption_text_input)
