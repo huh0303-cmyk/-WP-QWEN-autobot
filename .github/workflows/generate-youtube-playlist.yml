@@ -145,7 +145,13 @@ jobs:
 
       - name: Run playlist maker
         env:
-          AUTO_TOPIC: ${{ github.event_name == 'schedule' && 'true' || '' }}
+          # 2026-08-22: 예전엔 schedule 트리거일 때만 켜져서, 수동(workflow_dispatch)
+          # 실행에서 topic/preset을 안 넣으면 조용히 "썸네일창고 랜덤 폴백" 경로로
+          # 빠져버렸음(여행잡지 표지 스타일/움직이는 파형 없이 나감 — 실제로 4채널
+          # 테스트에서 이 사고 발생). 항상 켜두면 topic_keyword가 실제로 비어있을
+          # 때만 자동선택이 개입하고, topic/preset을 명시하면 그게 그대로 우선되니
+          # 안전하게 이 사고 클래스를 원천 차단한다.
+          AUTO_TOPIC: "true"
           CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4,5' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4,5' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4,5' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4,5' && 'kpop') || 'globalmusic' }}
           PRESET_THEME: ${{ github.event.inputs.preset_theme }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
