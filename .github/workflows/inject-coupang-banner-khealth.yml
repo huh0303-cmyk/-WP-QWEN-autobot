@@ -1,0 +1,25 @@
+name: "Inject Coupang Partners Banner — k-health365.com (manual, one-off)"
+
+# 2026-08-22: 쿠팡파트너스 최종승인용 스크린샷 증빙을 위해 사용자가 직접
+# 생성한 배너 링크를 k-health365.com 최신 발행글에 삽입.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install requests -q
+      - name: Inject banner
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/inject_coupang_banner_khealth.py
