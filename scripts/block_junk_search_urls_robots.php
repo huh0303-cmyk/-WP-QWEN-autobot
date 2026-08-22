@@ -11,5 +11,9 @@ add_filter('robots_txt', function ($output, $public) {
     $output .= "\n# Block internal search / search+feed combo URLs (crawl budget waste)\n";
     $output .= "Disallow: /*?s=\n";
     $output .= "Disallow: /*?*&s=\n";
+    $output .= "\n# Block other low-value auto-generated URLs (crawl budget waste)\n";
+    $output .= "Disallow: /*?attachment_id=\n";
+    $output .= "Disallow: /*/trackback/\n";
+    $output .= "Disallow: /*?replytocom=\n";
     return $output;
 }, 20, 2);
