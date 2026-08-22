@@ -1,3 +1,16 @@
+Jeonse safety trust program	Apartments
+Jeonse deposit management by HUG	Commercial
+Safe Trust for Jeonse tenants	Loans
+Jeonse deposit protection measures	Apartments
+HUG's Jeonse deposit custody	Commercial
+Jeonse-Wolse Ansim Trust details	Loans
+Jeonse deposit return process	Apartments
+Jeonse deposit safety trust benefits	Commercial
+Jeonse deposit management by public institution	Loans
+Jeonse-Wolse Ansim Trust programApartments	Apartments
+Safe Trust program for Jeonse tenantsApartments	Commercial
+Jeonse loan residency rule 2027Apartments	Loans
+Jeonse loan residency rule enforcement dateApartments	Apartments
 Seoul apartment prices 2026 record high	Apartments
 Gangnam apartment price trend 2026	Apartments
 Seoul apartment completions drop 2026	Apartments
@@ -35,16 +48,3 @@ Korea mortgage rate 2026	Loans
 Korea household lending cap 2026	Loans
 Korea mortgage foreigner eligibility	Loans
 Korea housing loan LTV ratio 2026	Loans
-Korea group loan cap changes 2026	Loans
-Korea jeonse loan eligibility rules	Loans
-Korea bank mortgage refinancing 2026	Loans
-Korea real estate loan regulation 2026	Loans
-Korea comprehensive real estate tax 2026	Loans
-Korea multi-home owner tax rate 2026	Loans
-Korea capital gains tax property sale	Loans
-Korea property tax fair market value ratio	Loans
-Korea non-resident homeowner tax 2026	Loans
-Korea mortgage interest rate cut forecast	Loans
-Korea housing finance corporation loan	Loans
-Korea DSR debt service ratio 2026	Loans
-Korea first-time homebuyer loan program	Loans

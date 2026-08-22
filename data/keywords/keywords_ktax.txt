@@ -1,3 +1,38 @@
+foreign corporation tax Korea	Business Setup
+K-ETA exemption countries August 2026	Tax Filing
+Seoul resident tax payment August 2026	Visa
+F-2-R visa language requirement reduction	Business Setup
+VAT registration foreign-owned companies Korea	Tax Filing
+reverse-charge VAT foreign corporation Korea	Visa
+Korean tax law amendments August 2026	Business Setup
+foreign land purchase residency requirement Korea	Tax Filing
+K-ETA entry rules by nationality August 2026	Visa
+foreign trust reporting obligation Korea	Business Setup
+exit tax expansion South Korea 2026	Tax Filing
+residency rules update South Korea 2026	Visa
+automated immigration screening 42 nationalities	Business Setup
+foreign worker visa policy changes Korea	Tax Filing
+regional visa policy amendments August 2026	Visa
+Top-Tier visa expansion Korea 2026	Business Setup
+E-7-M visa experience waiver	Tax Filing
+Manufacturing visa route Korea	Visa
+Regional residence track Korea	Business Setup
+e-visa processing Korea 2026	Tax Filing
+Digital Nomad Visa F-1-D South Korea	Visa
+Corporate tax deadline extension Geoje Tongyeong August 2026	Business Setup
+Corporate tax payment deadline extension November 2026	Tax Filing
+Corporate tax payment deadline extension small businesses	Visa
+Corporate tax payment deadline extension heavy rain	Business Setup
+Corporate tax payment deadline extension National Tax Service	Tax Filing
+Corporate tax payment deadline extension without application	Visa
+Corporate tax payment deadline extension for 1200 companies	Business Setup
+Corporate tax payment deadline extension for small and midsize companies	Tax Filing
+Corporate tax payment deadline extension for rain-hit companies	Visa
+Corporate tax payment deadline extension for affected SMEs	Business Setup
+Corporate tax payment deadline extension for companies in Geoje and Tongyeong	Tax Filing
+Corporate tax payment deadline extension for companies affected by heavy rain	Visa
+Corporate tax payment deadline extension for SMEs affected by disaster	Business Setup
+Corporate tax payment deadline extension for SMEs affected by torrential rain	Tax Filing
 Korea LLC setup cost 2026	Business Setup
 Korea branch office registration foreigner	Business Setup
 Korea business registration foreigner 2026	Business Setup
@@ -13,38 +48,3 @@ Korea Foreign Investment Promotion Act 2026	Business Setup
 Korea small business registration foreigner	Business Setup
 Korea e-commerce business license foreigner	Business Setup
 Korea import export business license	Business Setup
-Korea company seal registration foreigner	Business Setup
-Korea business registration certificate documents	Business Setup
-Korea comprehensive income tax May 2026 deadline	Tax Filing
-HomeTax English guide 2026	Tax Filing
-Korea corporate tax rate 2026 changes	Tax Filing
-Korea VAT filing guide foreigner	Tax Filing
-Korea 2026 tax reform foreign residents	Tax Filing
-Korea tax residency 183 day rule	Tax Filing
-Korea flat tax rate 19 percent foreign workers	Tax Filing
-Korea year-end tax settlement foreigner	Tax Filing
-Korea foreign asset reporting threshold 2026	Tax Filing
-Korea withholding tax foreign employee	Tax Filing
-Korea global income tax return foreigner	Tax Filing
-Korea US double tax treaty	Tax Filing
-Korea capital gains tax real estate foreigner	Tax Filing
-Korea National Tax Service English hotline	Tax Filing
-Korea tax refund foreigner guide	Tax Filing
-Korea payroll tax foreign employer 2026	Tax Filing
-Korea corporate tax bracket increase 2026	Tax Filing
-Korea D-8 investor visa 2026 requirements	Visa
-Korea F-2-7 point system 2026 changes	Visa
-Korea F-2-R regional residency visa	Visa
-Korea E-7 visa foreign worker	Visa
-Korea business visa extension guide	Visa
-Korea startup visa OASIS program	Visa
-Korea D-8-4 startup visa	Visa
-Korea investor visa minimum investment amount	Visa
-Korea F-5 permanent residency requirements	Visa
-Korea D-9 trade management visa	Visa
-Korea visa income requirement GNI 2026	Visa
-Korea TOPIK visa points requirement	Visa
-Korea digital nomad visa F-1-D	Visa
-Korea E-7-4 skilled worker visa	Visa
-Korea visa renewal foreign business owner	Visa
-Korea long-term residency investment visa	Visa
