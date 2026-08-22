@@ -272,21 +272,19 @@ Respond with JSON only, no explanation, no markdown fences:
 # 2. 이미지 생성 (Gemini 2.5 Flash Image)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path, max_retries=5):
-    # 2026-08-18: 텍스트와 동일한 원칙 — OPENAI_API_KEY가 있으면 이미지도
-    # OpenAI(gpt-image-1)로 먼저 시도한다(사용자 지시: "돈들어가는거 OPEN AI
-    # 써.. 제미나이는 진짜 무료 범위내에서만.. 나노 바나나도"). 실패하면(또는
-    # 키가 없으면) 기존 Gemini/Nano Banana 경로로 폴백 — 무료 한도 내에서는
-    # 여전히 쓸모 있으므로 완전히 막지는 않는다.
-    try:
-        from openai_text import openai_available, openai_generate_image
-        if openai_available() and openai_generate_image(prompt, out_path):
-            return True
-    except ImportError:
-        pass
-
+    # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): 영상 1개당
+    # 이미지 소요량이 블로그 글 1개보다 훨씬 많아서(장당 비용이 누적됨), 블로그
+    # 쪽과 반대로 여기는 무료(Gemini 무료범위)를 먼저 쓰고, 그게 실패했을 때만
+    # 유료(OpenAI gpt-image-1)로 폴백한다. 8/18엔 반대(OpenAI 우선)로 돼있었는데,
+    # 그날의 실제 지시 취지("제미나이는 진짜 무료 범위내에서만") 자체가 "돈 드는
+    # 순간 OpenAI로 넘어가라"는 뜻이었지 "항상 먼저 유료부터 써라"가 아니었음 —
+    # 구현이 취지와 반대로 돼있던 걸 바로잡음.
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     last_err = None
+    billing_exhausted = False
     for attempt in range(max_retries):
+        if billing_exhausted:
+            break
         for model in GEMINI_IMAGE_MODELS:
             url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
                    f"{model}:generateContent?key={GEMINI_API_KEY}")
@@ -294,10 +292,11 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
                 r = requests.post(url, json=body, timeout=90)
                 if r.status_code == 429 or r.status_code >= 500:
                     last_err = f"{r.status_code}: {r.text[:200]}"
-                    # 결제/크레딧 고갈은 재시도로는 절대 안 풀린다 — 즉시 중단해서
-                    # 5회x2모델 재시도 낭비(최대 몇 분)를 막는다(2026-08-16).
+                    # 결제/크레딧 고갈은 재시도로는 절대 안 풀린다 — 재시도 루프를
+                    # 즉시 끊고 아래에서 OpenAI 유료 폴백으로 넘어간다.
                     if _is_billing_exhausted(r.status_code, r.text):
-                        raise RuntimeError(f"Gemini 결제/크레딧 고갈 — 재시도 없이 즉시 중단: {last_err}")
+                        billing_exhausted = True
+                        break
                     continue
                 if r.status_code != 200:
                     last_err = f"{r.status_code}: {r.text[:200]}"
@@ -310,15 +309,23 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
                             f.write(base64.b64decode(inline["data"]))
                         return True
                 last_err = "응답에 이미지 데이터 없음"
-            except RuntimeError:
-                raise  # 결제 고갈 신호는 그대로 위로 전파 — 재시도 루프에 먹히면 안 됨
             except Exception as e:
                 last_err = str(e)
+        if billing_exhausted:
+            break
         # 두 모델 다 실패 -> 레이트리밋일 가능성 높으니 지수 백오프 후 재시도
         wait = min(5 * (2 ** attempt), 60)
         log(f"      (이미지 생성 재시도 대기 {wait}초 - 마지막 오류: {last_err})")
         time.sleep(wait)
-    log(f"      ⚠️ 최종 실패({max_retries}회 재시도 후): {last_err}")
+
+    log(f"      ⚠️ Gemini 이미지 생성 실패({last_err}) → OpenAI(gpt-image-1) 유료 폴백 시도")
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
+    log(f"      ⚠️ 최종 실패(Gemini+OpenAI 둘 다 안 됨): {last_err}")
     return False
 
 

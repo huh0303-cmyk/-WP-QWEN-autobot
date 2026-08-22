@@ -59,6 +59,8 @@ def get_duration(path):
 
 
 def gemini_generate_image(prompt, out_path):
+    # 2026-08-22: 무료(Gemini) 우선, 실패하면 OpenAI 유료 폴백(사용자 지시
+    # "이미지도 돈안드는것 최우선" — curio_longform.py와 동일 원칙).
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     for model in GEMINI_IMAGE_MODELS:
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
@@ -77,6 +79,13 @@ def gemini_generate_image(prompt, out_path):
                     return True
         except Exception:
             continue
+
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
     return False
 
 

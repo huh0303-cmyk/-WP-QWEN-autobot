@@ -105,6 +105,14 @@ def get_duration(path):
 # 1) 대본 생성 (Gemini)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_text(prompt, temperature=0.9):
+    # 2026-08-22: GPT 우선 라우팅 추가(사용자 지시 "모두 OpenAI GPT로 교체").
+    try:
+        from openai_text import openai_available, openai_generate_text
+        if openai_available():
+            return openai_generate_text(prompt, temperature=temperature, max_retries=3)
+    except Exception:
+        pass
+
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{GEMINI_TEXT_MODEL}:generateContent?key={GEMINI_API_KEY}")
     body = {"contents": [{"parts": [{"text": prompt}]}],
@@ -214,15 +222,8 @@ def generate_image_prompts(topic, segments, style_reference=""):
 # 3) 이미지 생성 (Gemini 2.5 Flash Image / 나노바나나)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path):
-    # 2026-08-18: OPENAI_API_KEY 있으면 이미지도 OpenAI(gpt-image-1) 우선
-    # (사용자 지시: "돈들어가는거 OPEN AI써.. 제미나이는 진짜 무료 범위내에서만").
-    try:
-        from openai_text import openai_available, openai_generate_image
-        if openai_available() and openai_generate_image(prompt, out_path):
-            return True
-    except ImportError:
-        pass
-
+    # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): Gemini
+    # 무료범위 먼저, 실패하면 OpenAI(gpt-image-1) 유료 폴백.
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     for model in GEMINI_IMAGE_MODELS:
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
@@ -241,6 +242,13 @@ def gemini_generate_image(prompt, out_path):
                     return True
         except Exception:
             continue
+
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
     return False
 
 

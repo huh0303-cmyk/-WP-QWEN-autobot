@@ -317,15 +317,9 @@ def upload_to_drive(service, file_path, folder_id, name):
 # 주제어 기반 AI 이미지 생성 (나노바나나)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path):
-    # 2026-08-18: OPENAI_API_KEY 있으면 이미지도 OpenAI(gpt-image-1) 우선
-    # (사용자 지시: "돈들어가는거 OPEN AI써.. 제미나이는 진짜 무료 범위내에서만").
-    try:
-        from openai_text import openai_available, openai_generate_image
-        if openai_available() and openai_generate_image(prompt, out_path):
-            return True
-    except ImportError:
-        pass
-
+    # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): Gemini
+    # 무료범위를 먼저 쓰고, 실패했을 때만 OpenAI(gpt-image-1) 유료로 폴백
+    # (curio_longform.py와 동일 원칙 — 8/18엔 순서가 반대였음, 취지에 안 맞아 정정).
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     for model in GEMINI_IMAGE_MODELS:
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
@@ -344,6 +338,13 @@ def gemini_generate_image(prompt, out_path):
                     return True
         except Exception:
             continue
+
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
     return False
 
 
@@ -353,6 +354,17 @@ def make_placeholder_image(out_path):
 
 
 def gemini_generate_text(prompt, temperature=0.9, max_output_tokens=None):
+    # 2026-08-22: 이 함수는 OpenAI 라우팅이 아예 없이 Gemini 실패 시 그냥
+    # 빈 문자열을 조용히 반환하던 상태였음(사용자 지시 "모두 OpenAI GPT로
+    # 교체" 대상) — autopost_mega.py/curio_longform.py와 동일하게 GPT 우선,
+    # Gemini는 폴백으로.
+    try:
+        from openai_text import openai_available, openai_generate_text
+        if openai_available():
+            return openai_generate_text(prompt, temperature=temperature, max_retries=3)
+    except Exception:
+        pass
+
     if not GEMINI_API_KEY:
         return ""
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"

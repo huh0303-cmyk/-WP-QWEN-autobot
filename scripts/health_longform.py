@@ -235,7 +235,19 @@ def gemini_generate_image(prompt, out_path, max_retries=5):
         wait = min(5 * (2 ** attempt), 60)
         log(f"      (이미지 생성 재시도 대기 {wait}초 - 마지막 오류: {last_err})")
         time.sleep(wait)
-    log(f"      ⚠️ 최종 실패({max_retries}회 재시도 후): {last_err}")
+
+    # 2026-08-22: 이 함수는 Gemini 전용이라 실패하면 그냥 이미지 없이 끝났음
+    # (사용자 지시: "이미지도 돈안드는것 최우선" — 무료를 먼저 쓰되, 그게
+    # 실패했을 때 최소한의 안전망은 있어야 함). curio_longform.py와 동일 원칙으로
+    # OpenAI(gpt-image-1) 유료 폴백 추가.
+    log(f"      ⚠️ Gemini 이미지 생성 실패({last_err}) → OpenAI(gpt-image-1) 유료 폴백 시도")
+    try:
+        from openai_text import openai_available, openai_generate_image
+        if openai_available() and openai_generate_image(prompt, out_path):
+            return True
+    except ImportError:
+        pass
+    log(f"      ⚠️ 최종 실패(Gemini+OpenAI 둘 다 안 됨): {last_err}")
     return False
 
 
