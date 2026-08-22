@@ -3330,8 +3330,14 @@ def main():
             skip+=n; continue
 
         for i in range(n):
-            kw=("__news__" if site["mode"] in ("news","news_en")
-                else load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
+            # 2026-08-22: 랜덤 키워드풀에서 뽑는 대신, 지금 당장 특정 키워드로
+            # 강제 발행하고 싶을 때(TARGET_SITE_URL과 함께 사용) 쓰는 오버라이드.
+            force_kw = os.getenv("FORCE_KEYWORD", "").strip()
+            if force_kw and target_site_url:
+                kw = force_kw
+            else:
+                kw=("__news__" if site["mode"] in ("news","news_en")
+                    else load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
             if site["mode"] not in ("news","news_en"):
                 kw=sanitize_keyword(kw, f"{theme} guide 2026")
             if process_one(site,kw): ok+=1

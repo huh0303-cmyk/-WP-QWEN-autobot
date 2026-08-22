@@ -23,6 +23,10 @@ on:
           - "https://ktech365.com"
           - "https://k-trip365.com"
           - "https://koreataxnlaw.com"
+      force_keyword:
+        description: "(선택) 랜덤풀 대신 이 키워드로 강제 발행"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -43,6 +47,7 @@ jobs:
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          FORCE_KEYWORD: ${{ inputs.force_keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
