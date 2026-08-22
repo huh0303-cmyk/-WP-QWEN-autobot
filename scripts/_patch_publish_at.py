@@ -17,14 +17,27 @@ VIDEOS = [
 def main():
     for video_id, secret_key, hours in VIDEOS:
         refresh_token = os.environ[f"YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_key}"]
-        creds = Credentials(
-            token=None, refresh_token=refresh_token,
-            token_uri="https://oauth2.googleapis.com/token",
-            client_id=os.environ["YOUTUBE_OAUTH_CLIENT_ID"],
-            client_secret=os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"],
-            scopes=["https://www.googleapis.com/auth/youtube.force-ssl"],
-        )
-        yt = build("youtube", "v3", credentials=creds)
+        yt = None
+        last_err = None
+        for scope in ("https://www.googleapis.com/auth/youtube.force-ssl",
+                      "https://www.googleapis.com/auth/youtube.upload"):
+            creds = Credentials(
+                token=None, refresh_token=refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=os.environ["YOUTUBE_OAUTH_CLIENT_ID"],
+                client_secret=os.environ["YOUTUBE_OAUTH_CLIENT_SECRET"],
+                scopes=[scope],
+            )
+            try:
+                from google.auth.transport.requests import Request
+                creds.refresh(Request())
+                yt = build("youtube", "v3", credentials=creds)
+                break
+            except Exception as e:
+                last_err = e
+                continue
+        if yt is None:
+            raise last_err
         publish_at = (datetime.now(timezone.utc) + timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
         yt.videos().update(part="status", body={
             "id": video_id,
