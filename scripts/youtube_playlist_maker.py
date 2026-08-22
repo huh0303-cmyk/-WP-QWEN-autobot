@@ -750,17 +750,23 @@ def build_ai_images(topic, workdir, service=None):
             f"lights, cozy retro European alley mood, {style}",
         ]
     elif CHANNEL_KEY == "kpop":
-        # K-pop 플리: 실존 아이돌 특정 불가 — 화려한 조명/무대 분위기의 실루엣 컨셉
+        # K-pop 플리 (2026-08-22 개편): 실존 아이돌은 여전히 안 됨(초상권+소속사
+        # 저작권 사진) — 하지만 사용자 확인: AI로 지어낸 가상의 젊은 한국 아티스트/
+        # 인물 얼굴은 OK("공정사용 가능한... 참신하면 됨"). 실루엣에서 K-pop
+        # 컨셉포토 스타일(클로즈업, 과감한 메이크업/패션, 화려한 조명)로 전환.
         style = (
-            "real photograph, vibrant neon concert lighting, high energy, dynamic "
-            "composition, silhouette figures (no identifiable real person), no text, "
-            "no watermark"
+            "real photograph, professional K-pop style concept photo, vibrant neon or "
+            "studio lighting, bold trendy fashion and makeup, high energy glossy mood, "
+            "a completely fictional/AI-generated young Korean person or couple (not any "
+            "real celebrity or identifiable public figure), no text, no watermark"
         )
         prompts = [
-            f"A vibrant K-pop concert stage atmosphere evoking '{topic}', colorful neon "
-            f"stage lights, silhouette of a dancer, energetic and glossy mood, {style}",
-            f"A different vibrant nightlife/stage scene related to '{topic}', laser lights, "
-            f"crowd energy, saturated pink-purple-blue color palette, {style}",
+            f"A stylish K-pop concept-photo close-up of a fictional young Korean artist "
+            f"evoking '{topic}', vibrant colorful lighting, confident dynamic pose, bold "
+            f"fashion, {style}",
+            f"A different vibrant K-pop concept-photo scene evoking '{topic}' — could be a "
+            f"fictional young Korean woman, artist, or couple, saturated pink-purple-blue "
+            f"neon palette, editorial fashion energy, {style}",
         ]
     elif CHANNEL_KEY == "mbb":
         # 클래식(MBB, 2026-08-22 개편): 작곡가 초상화 대신 벤치마크 채널들처럼
