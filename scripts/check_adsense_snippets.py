@@ -13,7 +13,7 @@ def main():
     if not PW:
         raise SystemExit("Missing KHEALTH365COM secret")
     r = requests.get(f"{SITE}/wp-json/code-snippets/v1/snippets", auth=(USER, PW),
-                      params={"per_page": 200}, timeout=45)
+                      params={"per_page": 100}, timeout=45)
     r.raise_for_status()
     snippets = r.json()
     snippets = snippets if isinstance(snippets, list) else snippets.get("data", snippets.get("items", []))
