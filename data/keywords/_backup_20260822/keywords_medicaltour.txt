@@ -1,27 +1,50 @@
-rhinoplasty Korea cost	Cosmetic Surgery
-double eyelid surgery Korea	Cosmetic Surgery
-liposuction Korea price	Cosmetic Surgery
-facial contouring Korea	Cosmetic Surgery
-Botox Korea price	Cosmetic Surgery
-Gangnam plastic surgery	Cosmetic Surgery
-laser skin treatment Korea	Cosmetic Surgery
-jaw surgery Korea	Cosmetic Surgery
-breast surgery Korea cost	Cosmetic Surgery
-non-surgical facelift Korea	Cosmetic Surgery
-acne scar treatment Korea	Cosmetic Surgery
-hair transplant Korea cost	Cosmetic Surgery
-KHIDI medical tourism	Government Support
-foreigner health subsidy Korea	Government Support
-medical tourism agency Korea	Government Support
-Korea global healthcare center	Government Support
-medical interpreter Korea	Government Support
-insurance for medical tourists Korea	Government Support
-Korea medical visa support	Government Support
-Korea hospital price comparison	Hospital Costs
-health checkup package Korea	Hospital Costs
-Severance Hospital cost	Hospital Costs
-Samsung Medical Center price	Hospital Costs
-cancer treatment cost Korea	Hospital Costs
-IVF cost Korea	Hospital Costs
-dental implant cost Korea	Hospital Costs
+Seoul dermatology clinic 2026	Cosmetic Surgery
+rhinoplasty revision Korea cost	Cosmetic Surgery
+double eyelid surgery recovery	Cosmetic Surgery
+non-surgical facelift Korea 2026	Cosmetic Surgery
+Botox filler price Seoul	Cosmetic Surgery
+laser skin resurfacing Korea	Cosmetic Surgery
+acne scar treatment Gangnam	Cosmetic Surgery
+facial contouring cost 2026	Cosmetic Surgery
+liposuction Korea recovery time	Cosmetic Surgery
+jaw reduction surgery Korea	Cosmetic Surgery
+breast augmentation Korea cost	Cosmetic Surgery
+hair transplant Korea 2026	Cosmetic Surgery
+thread lift Korea price	Cosmetic Surgery
+skin whitening treatment Korea	Cosmetic Surgery
+Gangnam plastic surgery clinic	Cosmetic Surgery
+dermatology package foreign patients	Cosmetic Surgery
+cosmetic VAT refund ended 2026	Cosmetic Surgery
+Smart Medical Visa Korea 2026	Government Support
+C-3-3 medical visa Korea	Government Support
+e-Arrival Card Korea foreigners	Government Support
+KHIDI medical tourism support	Government Support
+Korea Global Healthcare Center	Government Support
+medical interpreter service Korea	Government Support
+Korea medical tourism agency license	Government Support
+foreign patient insurance Korea 2026	Government Support
+K-ETA medical exemption 2026	Government Support
+Korea 700000 foreign patients goal	Government Support
+medical tourism visa extension Korea	Government Support
+Korea international patient hotline	Government Support
+medical tourism agency registration Korea	Government Support
+Korea healthcare hub strategy 2026	Government Support
+foreign patient complaint center Korea	Government Support
+medical tourism insurance claim Korea	Government Support
+Korea medical tourism refund policy	Government Support
+health checkup package Korea 2026	Hospital Costs
+Severance Hospital international cost	Hospital Costs
+Samsung Medical Center price 2026	Hospital Costs
+cancer treatment cost Korea foreigners	Hospital Costs
+IVF cost Korea foreigners	Hospital Costs
+dental implant cost Korea 2026	Hospital Costs
 knee replacement cost Korea	Hospital Costs
+stem cell therapy cost Korea	Hospital Costs
+robotic surgery cost Korea	Hospital Costs
+full body checkup Korea price	Hospital Costs
+hospital price comparison Korea 2026	Hospital Costs
+VIP hospital package Korea	Hospital Costs
+cardiac surgery cost Korea	Hospital Costs
+spine surgery cost Korea	Hospital Costs
+Asan Medical Center cost 2026	Hospital Costs
+international patient center cost	Hospital Costs

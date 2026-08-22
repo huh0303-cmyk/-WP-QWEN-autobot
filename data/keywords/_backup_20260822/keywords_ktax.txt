@@ -1,12 +1,50 @@
-Korea business registration foreigner	Business Setup
-Korea LLC setup cost	Business Setup
-foreign startup visa Korea	Business Setup
-Korea branch office setup	Business Setup
-Korea income tax foreigner	Tax Filing
-HomeTax guide English	Tax Filing
-Korea corporate tax rate	Tax Filing
-Korea VAT filing guide	Tax Filing
-Korea D-8 visa	Visa
-F-2 visa requirements	Visa
-Korea investor visa	Visa
-Korea business visa extension	Visa
+Korea LLC setup cost 2026	Business Setup
+Korea branch office registration foreigner	Business Setup
+Korea business registration foreigner 2026	Business Setup
+Korea sole proprietorship vs corporation	Business Setup
+Korea foreign-invested company FDI registration	Business Setup
+Korea startup visa business plan requirements	Business Setup
+Korea online business registration foreigners	Business Setup
+Korea corporate bank account foreigner	Business Setup
+Korea business license renewal 2026	Business Setup
+Korea representative office setup	Business Setup
+Korea free economic zone foreign business	Business Setup
+Korea Foreign Investment Promotion Act 2026	Business Setup
+Korea small business registration foreigner	Business Setup
+Korea e-commerce business license foreigner	Business Setup
+Korea import export business license	Business Setup
+Korea company seal registration foreigner	Business Setup
+Korea business registration certificate documents	Business Setup
+Korea comprehensive income tax May 2026 deadline	Tax Filing
+HomeTax English guide 2026	Tax Filing
+Korea corporate tax rate 2026 changes	Tax Filing
+Korea VAT filing guide foreigner	Tax Filing
+Korea 2026 tax reform foreign residents	Tax Filing
+Korea tax residency 183 day rule	Tax Filing
+Korea flat tax rate 19 percent foreign workers	Tax Filing
+Korea year-end tax settlement foreigner	Tax Filing
+Korea foreign asset reporting threshold 2026	Tax Filing
+Korea withholding tax foreign employee	Tax Filing
+Korea global income tax return foreigner	Tax Filing
+Korea US double tax treaty	Tax Filing
+Korea capital gains tax real estate foreigner	Tax Filing
+Korea National Tax Service English hotline	Tax Filing
+Korea tax refund foreigner guide	Tax Filing
+Korea payroll tax foreign employer 2026	Tax Filing
+Korea corporate tax bracket increase 2026	Tax Filing
+Korea D-8 investor visa 2026 requirements	Visa
+Korea F-2-7 point system 2026 changes	Visa
+Korea F-2-R regional residency visa	Visa
+Korea E-7 visa foreign worker	Visa
+Korea business visa extension guide	Visa
+Korea startup visa OASIS program	Visa
+Korea D-8-4 startup visa	Visa
+Korea investor visa minimum investment amount	Visa
+Korea F-5 permanent residency requirements	Visa
+Korea D-9 trade management visa	Visa
+Korea visa income requirement GNI 2026	Visa
+Korea TOPIK visa points requirement	Visa
+Korea digital nomad visa F-1-D	Visa
+Korea E-7-4 skilled worker visa	Visa
+Korea visa renewal foreign business owner	Visa
+Korea long-term residency investment visa	Visa
