@@ -2853,26 +2853,37 @@ def build_cta_html(site_url, lang, reporter=None):
     그대로 박아넣고 있었음 — AUTHOR_BY_SITE가 "동일 운영자 네트워크로 보이면
     애드센스에 불리하다"는 이유로 사이트마다 서로 다른 editor@{도메인} 이메일을
     이미 만들어놨는데(2026-07-24), 이 CTA 박스만 그걸 무시하고 27개 사이트
-    수천 개 글 전부에 완전히 동일한 개인 이메일을 노출시키고 있었다. 사이트별
-    브랜드 이메일이 있으면 그걸 쓰고, 없을 때만(레거시 호출부 등) 예전 값으로 폴백.
+    수천 개 글 전부에 완전히 동일한 개인 이메일을 노출시키고 있었다.
+
+    2026-08-22 2차 수정(사용자 지시: "Get in touch 꼭 넣어야 하나.. 이메일
+    CTA버튼 넣고.. 거기 클릭하면 westlake.ceo@gmail.com로 오게.. 이메일 굳이
+    안 보여도 되고 저 이메일(editor@도메인)은 가짜잖아"): editor@{도메인}은
+    실제로 확인 안 하는 형식용 주소였으므로, 실제 받는 실주소(westlake.ceo@
+    gmail.com)로 mailto 걸되 텍스트로 주소를 노출하지 않고 버튼만 보여준다.
+    (mailto: href 자체엔 주소가 남아 페이지 소스 보면 나오긴 하지만, 본문에
+    평문으로 찍혀서 사이트마다 대조되던 huh0303@gmail.com 사고와는 다름 —
+    그건 겉으로 그대로 보여서 5초 안에 대조 가능했던 게 문제였음.)
     """
     p = SITE_PERSONA.get(site_url, {})
     cta_desc = p.get("cta", "")
     if not cta_desc:
         return ""
-    email = (reporter or {}).get("email") or "huh0303@gmail.com"
+    contact_email = "westlake.ceo@gmail.com"
     if lang == "ko":
         title = "문의 및 상담 신청"
-        body = (f"이 글의 내용과 관련해 개인 맞춤 상담이 필요하시면 언제든 편하게 문의해 주세요.<br>"
-                f'<strong>이메일:</strong> <a href="mailto:{email}">{email}</a>')
+        body = "이 글의 내용과 관련해 개인 맞춤 상담이 필요하시면 언제든 편하게 문의해 주세요."
+        btn_label = "문의하기"
     else:
         title = "Get in Touch"
-        body = (f"Have questions about your specific situation? Reach out anytime for a personal consultation.<br>"
-                f'<strong>Email:</strong> <a href="mailto:{email}">{email}</a>')
+        body = "Have questions about your specific situation? Reach out anytime for a personal consultation."
+        btn_label = "Contact Us"
+    button = (f'<a href="mailto:{contact_email}" style="display:inline-block;margin-top:10px;'
+              f'padding:9px 18px;background:#2f6fed;color:#fff;border-radius:6px;'
+              f'text-decoration:none;font-size:0.9rem;">{btn_label}</a>')
     return (f'<div class="cta-box" style="margin:28px 0;padding:20px 24px;'
             f'background:#eef4ff;border:1px solid #c7d9f5;border-radius:8px;">'
             f'<h3 style="margin-top:0;font-size:1rem;">{title}</h3>'
-            f'<p style="margin:0;">{body}</p></div>')
+            f'<p style="margin:0;">{body}</p>{button}</div>')
 
 
 def build_author_bio_html(site_url, lang, reporter, keyword=""):
