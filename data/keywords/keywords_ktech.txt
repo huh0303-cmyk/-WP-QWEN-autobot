@@ -1,12 +1,50 @@
-Korea AI startups 2026	AI
-Naver AI models	AI
-Korea AI regulation	AI
-Korea AI chip industry	AI
-Samsung HBM chips	Semiconductors
-SK Hynix news	Semiconductors
-Korea chip subsidy	Semiconductors
-Korea semiconductor exports	Semiconductors
-Korea startup visa	Startups
-Seoul tech accelerator	Startups
-Korea unicorn startups	Startups
-Korea startup funding guide	Startups
+Naver Nvidia 1 billion investment 2026	AI
+Naver AI factory gigawatt 2026	AI
+Korea sovereign AI infrastructure 2026	AI
+Naver Nvidia Brookfield AI factory	AI
+Samsung Naver Mach 1 chip deal	AI
+Korea AI data center investment 2026	AI
+Korea K-Nvidia initiative	AI
+Korea National Growth Fund AI semiconductor	AI
+Naver AI agent monetization 2026	AI
+Korea generative AI adoption 2026	AI
+SK Group GS Group AI data center	AI
+Korea AI regulation framework 2026	AI
+Korea AI chip export strategy	AI
+Naver Clova AI model 2026	AI
+Korea AI computing demand 2026	AI
+Korea government AI investment trillion won	AI
+Korea sovereign AI model development	AI
+Samsung SK Hynix 520 billion chip investment	Semiconductors
+Samsung HBM4 mass production 2026	Semiconductors
+SK Hynix AI memory chip demand 2026	Semiconductors
+Korea DRAM market share 2026	Semiconductors
+US chip equipment export approval Korea 2026	Semiconductors
+Samsung SK Hynix China chip equipment license	Semiconductors
+Korea semiconductor mega cluster investment	Semiconductors
+Korea NAND flash market share 2026	Semiconductors
+Samsung foundry news 2026	Semiconductors
+SK Hynix HBM supply Nvidia	Semiconductors
+Korea chip subsidy policy 2026	Semiconductors
+Korea semiconductor export data 2026	Semiconductors
+Samsung Electronics chip plant expansion	Semiconductors
+Korea memory chip price 2026	Semiconductors
+Korea semiconductor equipment tariff news	Semiconductors
+Rebellions AI chip IPO KOSPI 2026	Startups
+FuriosaAI Europe expansion 2026	Startups
+Korea AI chip startup trinity Rebellions FuriosaAI DeepX	Startups
+Rebellions Mistral AI chip supply deal	Startups
+Korea NPU startup funding 2026	Startups
+Korea startup visa OASIS program tech	Startups
+Seoul tech accelerator 2026	Startups
+Korea unicorn startup list 2026	Startups
+Korea deep tech startup funding 2026	Startups
+Korea startup IPO KOSDAQ 2026	Startups
+Korea AI startup government grant 2026	Startups
+Korea semiconductor startup funding round	Startups
+Korea robotics startup 2026	Startups
+Korea biotech startup funding 2026	Startups
+Korea fintech startup regulation 2026	Startups
+Korea startup accelerator Y Combinator Korea	Startups
+Korea deep tech unicorn valuation 2026	Startups
+Korea startup ecosystem ranking 2026	Startups
