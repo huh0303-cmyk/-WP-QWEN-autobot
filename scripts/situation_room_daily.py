@@ -551,7 +551,8 @@ def main():
         "site_indexed": site_summary["total_indexed"],
         "site_posts": site_summary["total_posts"],
         "site_details": {d["domain"]: {"clicks": d["clicks"], "indexed": d["indexed"],
-                                        "total_posts": d.get("total_posts"), "status": d["status"]}
+                                        "total_posts": d.get("total_posts"), "status": d["status"],
+                                        "visitor_count": d.get("visitor_count")}
                           for d in site_details_list},
         "youtube": yt_stats,
         "tiktok": tiktok_m, "facebook": facebook_m,
@@ -654,6 +655,8 @@ def main():
         y = yesterday_sites.get(domain, {})
         d_clicks = diff(d["clicks"], y.get("clicks"))
         d_posts = diff(d.get("total_posts"), y.get("total_posts"))
+        d_indexed = diff(d["indexed"], y.get("indexed"))
+        d_visitors = diff(d.get("visitor_count"), y.get("visitor_count"))
         comment = _site_comment(d["status"], d["clicks"], d_clicks, d["indexed"], d.get("total_posts"))
         clicks_str = d["clicks"] if d["clicks"] is not None else "-"
         posts_str = d.get("total_posts") if d.get("total_posts") is not None else "-"
@@ -661,8 +664,8 @@ def main():
         visitors_str = d.get("visitor_count") if d.get("visitor_count") is not None else "미배포"
         summary_lines.append(
             f"  - {domain} | {d['url']} | 전체글 {posts_str}{fmt_diff(d_posts)} | "
-            f"색인 {indexed_str} | GSC방문 {clicks_str}{fmt_diff(d_clicks)} | "
-            f"실제방문자(오늘) {visitors_str} | {comment}")
+            f"색인 {indexed_str}{fmt_diff(d_indexed)} | GSC방문 {clicks_str}{fmt_diff(d_clicks)} | "
+            f"실제방문자(오늘) {visitors_str}{fmt_diff(d_visitors)} | {comment}")
     summary_lines += [
         "",
         "■ 유튜브 (언어채널 3 + 플리채널 5, 총 8개)",
