@@ -1,8 +1,17 @@
 # 27-site WordPress clean rebuild
 
+> **⚠️ SUPERSEDED 2026-08-22**: rule 1 below ("automatic publishing stays
+> locked") was reversed on 2026-08-22 — daily auto-publish for the 25 blog
+> sites was reactivated by explicit user direction after a full engine
+> rebuild (GPT-first generation, dedup/diversity fixes, PII-leak fixes).
+> See [2026-08-22-network-rebuild-report.md](2026-08-22-network-rebuild-report.md)
+> for what changed and what's still open. The rest of this file (rules 2-8)
+> describes the historical audit→apply workflow tooling, which is still the
+> correct pattern to reuse for future manual cleanups.
+
 ## Non-negotiable rules
 
-1. Legacy automatic publishing stays locked.
+1. ~~Legacy automatic publishing stays locked.~~ Reactivated 2026-08-22.
 2. New content is created as `draft`; publication requires editorial approval.
 3. No fabricated first-person experience, credentials, testing, patient/client story, or source.
 4. Every factual/YMYL claim must be traceable to a current primary or authoritative source.
