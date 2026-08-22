@@ -1,0 +1,21 @@
+name: "(1회성) 지식채널 첫 영상 3개 publishAt 패치"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install google-api-python-client google-auth -q
+      - env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+        run: python scripts/_patch_publish_at.py
