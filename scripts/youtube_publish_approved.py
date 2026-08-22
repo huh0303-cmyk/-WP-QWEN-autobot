@@ -111,7 +111,7 @@ def get_youtube_service():
 
 
 def upload_to_youtube(service, video_path, thumb_path, title, description,
-                       publish_at_iso=None, force_private=False):
+                       publish_at_iso=None, tags=None, force_private=False):
     from googleapiclient.http import MediaFileUpload
 
     # PUBLISH_AT_HOURS_FROM_NOW로 명시적 예약 시각을 준 경우에만 그 시각에
@@ -129,12 +129,22 @@ def upload_to_youtube(service, video_path, thumb_path, title, description,
         if publish_at_iso:
             status["publishAt"] = publish_at_iso
 
+    snippet = {
+        "title": title,
+        "description": description,
+        "categoryId": "10",  # Music
+    }
+    if tags:
+        kept, total = [], 0
+        for t in tags:
+            t = str(t).strip()
+            if not t or total + len(t) > 480:
+                continue
+            kept.append(t)
+            total += len(t)
+        snippet["tags"] = kept
     body = {
-        "snippet": {
-            "title": title,
-            "description": description,
-            "categoryId": "10",  # Music
-        },
+        "snippet": snippet,
         "status": status,
     }
     media = MediaFileUpload(video_path, resumable=True, chunksize=5 * 1024 * 1024, mimetype="video/mp4")
@@ -186,6 +196,7 @@ def main():
     thumb_drive_id = os.environ.get("THUMB_DRIVE_ID", "")
     title = os.environ["YT_TITLE"]
     description = os.environ.get("YT_DESCRIPTION", "")
+    tags = [t.strip() for t in os.environ.get("YT_TAGS", "").split(",") if t.strip()]
     title_is_fallback = os.environ.get("TITLE_IS_FALLBACK", "").strip().lower() == "true"
     hours_from_now = os.environ.get("PUBLISH_AT_HOURS_FROM_NOW", "").strip()
 
@@ -220,7 +231,7 @@ def main():
     log("2/3 유튜브 업로드 중..." + (" ⚠️ 비공개로만 업로드 (검토 후 직접 공개해주세요)" if stay_private else ""))
     youtube = get_youtube_service()
     video_id = upload_to_youtube(youtube, video_path, thumb_path if thumb_drive_id else None,
-                                  title, description, publish_at_iso, force_private=stay_private)
+                                  title, description, publish_at_iso, tags=tags, force_private=stay_private)
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
 
     log("3/3 완료 메일 발송 중...")

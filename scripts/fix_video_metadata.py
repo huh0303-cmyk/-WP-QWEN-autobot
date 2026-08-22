@@ -29,10 +29,11 @@ DURATION_MIN = float(os.environ.get("FIX_DURATION_MIN", "60"))
 
 pm.CHANNEL_KEY = os.environ["CHANNEL_KEY"]
 
-title, description, is_fallback = pm.generate_youtube_title_description(TOPIC, TOPIC, DURATION_MIN)
+title, description, tags, is_fallback = pm.generate_youtube_title_description(TOPIC, TOPIC, DURATION_MIN)
 print(f"새 제목: {title}")
 print(f"폴백 여부: {is_fallback}")
 print(f"설명 길이: {len(description)}자")
+print(f"태그: {tags}")
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -54,6 +55,8 @@ if not existing.get("items"):
 snippet = existing["items"][0]["snippet"]
 snippet["title"] = title[:100]
 snippet["description"] = description
+if tags:
+    snippet["tags"] = tags
 
 yt.videos().update(part="snippet", body={"id": VIDEO_ID, "snippet": snippet}).execute()
 print(f"✅ 완료: https://studio.youtube.com/video/{VIDEO_ID}/edit")

@@ -535,29 +535,38 @@ Write:
    the listener to subscribe. End with 8-10 relevant English hashtags.
    Sound like a real channel owner wrote it — conversational, not a marketing
    template, no exaggerated claims.
+3. TAGS: 10-15 YouTube search tags (not hashtags) — specific mood/genre/use-case
+   terms someone would actually search, each a short lowercase phrase, no #
+   symbol, comma-separated on one line.
 
 Respond in exactly this format, nothing else:
 TITLE: (title)
 DESCRIPTION: (the ~1000-character English description, with blank lines between paragraphs)
+TAGS: (comma-separated tags)
 """
     text = gemini_generate_text(prompt, temperature=0.9, max_output_tokens=4096)
     title, description = _build_fallback_title_and_description(topic, duration_min)
+    tags = []
     used_fallback = True
     if "TITLE:" in text and "DESCRIPTION:" in text:
         try:
             title_part = text.split("TITLE:")[1].split("DESCRIPTION:")[0].strip()
-            desc_part = text.split("DESCRIPTION:")[1].strip()
+            rest = text.split("DESCRIPTION:")[1].strip()
+            desc_part = rest.split("TAGS:")[0].strip() if "TAGS:" in rest else rest
             if title_part:
                 title = title_part
                 used_fallback = False
             if desc_part and len(desc_part) > 200:
                 description = desc_part
+            if "TAGS:" in rest:
+                tags_part = rest.split("TAGS:")[1].strip()
+                tags = [t.strip() for t in tags_part.split(",") if t.strip()]
         except Exception:
             pass
     # used_fallback=True는 Gemini 제목생성이 실패해서 기계적인 폴백 문구가 쓰였다는
     # 뜻 — "AI 흔적 없어야 한다"는 원칙상 이런 영상은 자동으로 공개하면 안 되므로
     # publish 단계에서 이 플래그를 보고 비공개로 남겨둔다(youtube_publish_approved.py 참고).
-    return title[:100], description, used_fallback
+    return title[:100], description, tags, used_fallback
 
 
 
@@ -1889,7 +1898,7 @@ def main():
     # 미리 만들어 다음 잡이 쓸 수 있게 메타데이터로 남겨둔다
     upload_topic = topic_keyword.strip() or "Chill"
     upload_caption = caption_text if topic_keyword.strip() else ""
-    yt_title, yt_description, title_is_fallback = generate_youtube_title_description(
+    yt_title, yt_description, yt_tags, title_is_fallback = generate_youtube_title_description(
         upload_topic, upload_caption, total_sec / 60)
     log(f"   유튜브 제목(예정): {yt_title}" + (" ⚠️ 폴백 제목(Gemini 생성 실패)" if title_is_fallback else ""))
 
@@ -1899,6 +1908,7 @@ def main():
         "filename": filename,
         "title": yt_title,
         "description": yt_description,
+        "tags": yt_tags,
         "title_is_fallback": title_is_fallback,
         "topic": upload_topic,
         "duration_min": round(total_sec / 60, 1),
