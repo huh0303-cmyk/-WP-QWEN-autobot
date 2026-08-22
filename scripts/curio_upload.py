@@ -115,11 +115,22 @@ def get_youtube_service(secret_key):
     raise last_err
 
 
-def upload_to_youtube(service, video_path, thumb_path, title, description):
+def upload_to_youtube(service, video_path, thumb_path, title, description, tags=None):
     from googleapiclient.http import MediaFileUpload
 
+    snippet = {"title": title[:100], "description": description[:5000], "categoryId": "27"}
+    if tags:
+        # 유튜브 태그 전체 문자열 합 500자 제한 — 넘는 태그부터 잘라낸다.
+        kept, total = [], 0
+        for t in tags:
+            t = str(t).strip()
+            if not t or total + len(t) > 480:
+                continue
+            kept.append(t)
+            total += len(t)
+        snippet["tags"] = kept
     body = {
-        "snippet": {"title": title[:100], "description": description[:5000], "categoryId": "27"},
+        "snippet": snippet,
         "status": {"selfDeclaredMadeForKids": False, "privacyStatus": "private"},
     }
     media = MediaFileUpload(video_path, resumable=True, chunksize=5 * 1024 * 1024, mimetype="video/mp4")
@@ -170,10 +181,11 @@ def main():
     description = meta.get("description") or (
         f"{topic}\n\nA deep dive into a topic worth knowing.\n\n#education #didyouknow #knowledge"
     )
+    tags = meta.get("tags") or []
 
     log(f"2/2 유튜브 업로드 중 (채널: {secret_key})...")
     service = get_youtube_service(secret_key)
-    video_id = upload_to_youtube(service, video_path, thumb_path, title, description)
+    video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags)
     log(f"✅ 업로드 완료(비공개): https://youtube.com/watch?v={video_id}")
 
 

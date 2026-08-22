@@ -1,12 +1,24 @@
-name: Curio/Times 지식채널 장편 자동생성 (채널당 주1회, 하루 2채널)
+name: Curio/Times 지식채널 장편 자동생성 (5채널, 채널당 주3회)
 
-# NASA_SPACE_TIMES / HISTORY_TODAY_TIMES / SCIENCE_FACTS_TIMES / CLASSICAL_JOURNAL /
-# MYTH_LEGEND_TIMES / INVENTION_TIMES / AMERICAN_ARCHIVE_TIMES / SILENT_ERA_TIMES /
-# RETRO_REELS_TIMES / CLASSIC_READS_TIMES 10개 채널 공용. scripts/curio_longform.py로
-# 8분 내외 장편 영상을 만들고 scripts/curio_upload.py로 비공개 업로드까지 자동 진행.
+# 2026-08-22 대개편: "지식채널"을 실물 무료 자료가 확실한 5개로 확정.
+#   nasa(NASA_SPACE_TIMES) / history(HISTORY_TODAY_TIMES, 미국사+세계사 통합)
+#   / invention(INVENTION_TIMES) / silent_era(SILENT_ERA_TIMES) /
+#   retro_reels(RETRO_REELS_TIMES) — 전부 archive_footage_longform.py 또는
+#   nasa_archive_longform.py(실제 퍼블릭도메인 영상, 이미지 생성비 0원).
+# AMERICAN_ARCHIVE_TIMES는 history와 톤이 같아(둘 다 "진지한 역사 다큐" —
+# Retro Reels의 가벼운 노스탤지어 톤과는 안 맞음) 주제풀을 history로 통합.
+# science/myth/classical/classic_reads는 실물자료가 없어 AI이미지 생성비가
+# 계속 나가서 정리(사용자 판단, 2026-08-22) — 스크립트/시크릿/채널 자체는
+# 안 지웠으니 나중에 되살리려면 아래 workflow_dispatch options에 다시 추가하면
+# 된다(choice 타입이라 목록에 없는 값은 지금 dispatch 자체가 안 됨).
+# 이 5채널은 Veo/Gemini 이미지 생성이 아예 없어서(텍스트+TTS만 필요) 예전
+# 10채널 시절의 Veo 일일 10회 한도 문제가 적용 안 됨 — 그래서 채널당 주1회
+# 제약 없이 주3회(월/수/금)로 올렸다.
+#
 # 2026-08-14: 기존엔 생성기만 있고 업로드/스케줄이 없어서 완전 자동화가 안 돼있었음 — 연결.
-# 2026-08-15: 원래 실제 영상소스 큐레이션으로 기획됐던 archive/times 4채널(AMERICAN_ARCHIVE_TIMES
-# 등)도 소싱 속도/저작권 리스크 때문에 이 대본+AI이미지 파이프라인으로 편입, 10채널 완전자동화.
+# 2026-08-15: 원래 실제 영상소스 큐레이션으로 기획됐던 archive/times 4채널도
+# 소싱 속도/저작권 리스크 때문에 대본+AI이미지 파이프라인으로 잠깐 편입됐었으나
+# 위 개편으로 다시 실물자료 전용 5채널 체제로 정리.
 
 on:
   workflow_dispatch:
@@ -19,44 +31,21 @@ on:
         options:
           - "nasa"
           - "history"
-          - "science"
-          - "classical"
-          - "myth"
           - "invention"
-          - "american_archive"
           - "silent_era"
           - "retro_reels"
-          - "classic_reads"
       topic:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
   schedule:
-    # 2026-08-15 재설계: Veo 3 Lite Generate가 Tier 1 기준 일일 10회 한도인데,
-    # 영상 1개당 인트로클립 4개=Veo 4회 필요함. 원래 스케줄은 월/수/금마다 10채널이
-    # 전부 동시에 발동해서 하루 40회가 필요했음(한도의 4배 초과, 그날 바로
-    # RESOURCE_EXHAUSTED 남). 하루 2채널(Veo 8회, 여유 2회)로 낮추고 월~금 5일에
-    # 나눠서 10채널을 주 1회씩 커버하도록 재분배 — [[feedback_dont_batch_trigger_pipelines]].
-    - cron: "17 20 * * 1"  # 월: nasa - 05:17 KST
-    - cron: "34 20 * * 1"  # 월: history - 05:34 KST
-    - cron: "17 20 * * 2"  # 화: science - 05:17 KST
-    - cron: "34 20 * * 2"  # 화: classical - 05:34 KST
-    - cron: "17 20 * * 3"  # 수: myth - 05:17 KST
-    - cron: "34 20 * * 3"  # 수: invention - 05:34 KST
-    - cron: "17 20 * * 4"  # 목: american_archive - 05:17 KST
-    - cron: "34 20 * * 4"  # 목: silent_era - 05:34 KST
-    - cron: "17 20 * * 5"  # 금: retro_reels - 05:17 KST
-    - cron: "34 20 * * 5"  # 금: classic_reads - 05:34 KST
-    # 2026-08-18 사용자 지시("토일도 좀 넣어봐.. 무료에 가장 쉬운거로"): 주말엔
-    # 실제 아카이브 영상 소싱이라 이미지 생성 비용이 0인 6개 채널(nasa/history/
-    # invention/american_archive/silent_era/retro_reels)만 골라 3개씩 나눠
-    # 주2회로 늘림. Gemini 이미지 여러 장 필요한 4개(science/classical/myth/
-    # classic_reads)는 비용 문제로 주말엔 안 넣음.
-    - cron: "17 20 * * 6"  # 토: nasa(2회차) - 05:17 KST
-    - cron: "34 20 * * 6"  # 토: invention(2회차) - 05:34 KST
-    - cron: "50 20 * * 6"  # 토: silent_era(2회차) - 05:50 KST
-    - cron: "17 20 * * 0"  # 일: history(2회차) - 05:17 KST
-    - cron: "34 20 * * 0"  # 일: american_archive(2회차) - 05:34 KST
-    - cron: "50 20 * * 0"  # 일: retro_reels(2회차) - 05:50 KST
+    # 5채널 × 주3회(월/수/금), 15분 간격으로 순차 발동 — 같은 시각에 몰리면
+    # archive.org 검색이 겹쳐서 일시 오류가 늘어난 전례(2026-08-17)가 있어
+    # 계속 시차를 둔다.
+    - cron: "0 20 * * 1,3,5"    # nasa - 05:00 KST
+    - cron: "15 20 * * 1,3,5"   # history - 05:15 KST
+    - cron: "30 20 * * 1,3,5"   # invention - 05:30 KST
+    - cron: "45 20 * * 1,3,5"   # silent_era - 05:45 KST
+    - cron: "0 21 * * 1,3,5"    # retro_reels - 06:00 KST
 
 concurrency:
   # 2026-08-17 사고: 그룹명이 전체 워크플로우 공용 하나였어서, 짧은 간격으로
@@ -83,39 +72,25 @@ jobs:
             TOPIC_IN="${{ github.event.inputs.topic }}"
           else
             case "${{ github.event.schedule }}" in
-              "17 20 * * 1") CH="nasa" ;;
-              "34 20 * * 1") CH="history" ;;
-              "17 20 * * 2") CH="science" ;;
-              "34 20 * * 2") CH="classical" ;;
-              "17 20 * * 3") CH="myth" ;;
-              "34 20 * * 3") CH="invention" ;;
-              "17 20 * * 4") CH="american_archive" ;;
-              "34 20 * * 4") CH="silent_era" ;;
-              "17 20 * * 5") CH="retro_reels" ;;
-              "34 20 * * 5") CH="classic_reads" ;;
-              "17 20 * * 6") CH="nasa" ;;
-              "34 20 * * 6") CH="invention" ;;
-              "50 20 * * 6") CH="silent_era" ;;
-              "17 20 * * 0") CH="history" ;;
-              "34 20 * * 0") CH="american_archive" ;;
-              "50 20 * * 0") CH="retro_reels" ;;
+              "0 20 * * 1,3,5") CH="nasa" ;;
+              "15 20 * * 1,3,5") CH="history" ;;
+              "30 20 * * 1,3,5") CH="invention" ;;
+              "45 20 * * 1,3,5") CH="silent_era" ;;
+              "0 21 * * 1,3,5") CH="retro_reels" ;;
               *) CH="nasa" ;;
             esac
             TOPIC_IN=""
           fi
 
+          # 2026-08-22: 미국/영어권 시청자 어필 기준으로 다시 선정한 주제풀
+          # (american_archive 주제는 history로 통합됨).
           if [ -z "$TOPIC_IN" ]; then
             case "$CH" in
-              nasa) TOPICS=("The Voyager Golden Record" "How black holes bend light" "The first footprints on the Moon" "Why Mars is red" "The James Webb Space Telescope's first images" "What a day looks like on the ISS" "The search for exoplanets" "How rockets escape gravity" "The Hubble Deep Field photo" "Saturn's rings explained") ;;
-              history) TOPICS=("The day the Berlin Wall fell" "The first flight of the Wright Brothers" "How the printing press changed the world" "The signing of the Magna Carta" "The discovery of Tutankhamun's tomb" "The moon landing broadcast" "The fall of the Roman Empire" "The invention of the telegraph" "The first Olympic Games" "The construction of the Great Wall") ;;
-              science) TOPICS=("Why the sky is blue" "How vaccines train the immune system" "The physics of black holes" "Why we dream" "How photosynthesis works" "The science of earthquakes" "How the brain stores memories" "Why ice floats" "The discovery of DNA's structure" "How antibiotics work") ;;
-              classical) TOPICS=("Mozart — a child prodigy's short life" "Beethoven composing while going deaf" "Bach's devotion to music and faith" "Chopin's delicate genius" "Tchaikovsky's emotional symphonies" "Vivaldi and The Four Seasons" "Brahms' lifelong friendship with the Schumanns" "Handel's Messiah and its legacy") ;;
-              myth) TOPICS=("The myth of Icarus" "Norse mythology's Ragnarok" "The legend of King Arthur" "Greek gods of Olympus" "The tale of Pandora's Box" "Egyptian myths of the afterlife" "The legend of Atlantis" "Celtic tales of the fae") ;;
-              invention) TOPICS=("The invention of the light bulb" "How the telephone was invented" "The history of the printing press" "The invention of penicillin" "How the internet began" "The story of the steam engine" "The invention of photography" "How GPS was developed") ;;
-              american_archive) TOPICS=("The Apollo 11 moon landing" "The Civil Rights March on Washington" "The signing of the Declaration of Independence" "The Louisiana Purchase" "The Wright Brothers' first flight" "The construction of the Hoover Dam" "The Emancipation Proclamation" "The building of the transcontinental railroad") ;;
-              silent_era) TOPICS=("Charlie Chaplin and The Tramp" "Buster Keaton's death-defying stunts" "The making of Metropolis (1927)" "How silent films used live orchestras" "The first horror film, Nosferatu" "Georges Melies and A Trip to the Moon" "The rise and fall of silent film stars" "How title cards told the story") ;;
-              retro_reels) TOPICS=("The rise of the drive-in movie theater" "How the jukebox took over America" "The golden age of the diner" "1950s home appliances that changed daily life" "The birth of the shopping mall" "Vintage arcade games and their legacy" "How television changed family life in the 1950s" "The story of the classic American road trip") ;;
-              classic_reads) TOPICS=("Why Pride and Prejudice still resonates" "The world behind Charles Dickens' novels" "What makes Moby-Dick a masterpiece" "The real history behind War and Peace" "Jane Austen's life and writing" "The gothic world of Frankenstein" "Mark Twain and the American novel" "The enduring mystery of Sherlock Holmes") ;;
+              nasa) TOPICS=("The Apollo 11 moon landing" "The Voyager Golden Record" "The Challenger disaster and what NASA learned" "Neil Armstrong's first steps on the Moon" "The Hubble Space Telescope's greatest discoveries" "How the Mercury Seven became America's first astronauts" "The Apollo 13 rescue" "Life aboard the International Space Station" "The first images from Mars" "JFK's Moon speech and the Space Race") ;;
+              history) TOPICS=("The attack on Pearl Harbor" "D-Day and the Normandy landings" "The fall of the Berlin Wall" "The Cuban Missile Crisis" "The Civil Rights March on Washington" "The fall of Saigon and the end of the Vietnam War" "The assassination of John F. Kennedy" "The signing of the Declaration of Independence" "V-J Day and the end of World War II" "The Wright Brothers' first flight") ;;
+              invention) TOPICS=("How the telephone was invented" "The invention of the light bulb" "How the assembly line changed America" "The invention of the airplane" "How radio broadcasting began" "The invention of photography" "How the printing press changed the world" "Edison and the invention of the phonograph" "How the electric refrigerator changed home life" "The invention of television") ;;
+              silent_era) TOPICS=("Charlie Chaplin and the birth of The Tramp" "Buster Keaton's death-defying stunts" "The making of King Kong's earliest special effects" "How silent films used live orchestras" "The first horror film, Nosferatu" "The rise and fall of silent film stars" "The birth of Hollywood's silent studios" "Charlie Chaplin's Modern Times and the machine age" "America's first movie palaces" "How title cards told the story before sound") ;;
+              retro_reels) TOPICS=("The rise of the drive-in movie theater" "How the jukebox took over America" "The golden age of the roadside diner" "1950s home appliances that changed daily life" "The birth of the American shopping mall" "Vintage arcade games and their legacy" "How television changed 1950s family life" "The story of the classic American road trip" "How the drive-in became a teenage hangout" "The rise of the American motel") ;;
               *) TOPICS=("a fascinating topic worth knowing") ;;
             esac
             IDX=$((RANDOM % ${#TOPICS[@]}))

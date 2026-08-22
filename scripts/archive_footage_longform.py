@@ -427,9 +427,13 @@ Write:
    - Mention the footage is real public-domain archival footage.
    - One natural sentence inviting people to subscribe for more.
    - End with 4-6 relevant hashtags on the last line.
+3. "tags": a JSON array of 10-15 YouTube search tags (not hashtags) —
+   specific names/places/dates/events from this topic plus a few broader
+   category terms (e.g. "history", "documentary"), each a short lowercase
+   phrase, no # symbol.
 
 Respond with JSON only, no explanation, no markdown fences:
-{{"title": "...", "description": "..."}}
+{{"title": "...", "description": "...", "tags": ["...", "..."]}}
 """
     text = gemini_generate_text(prompt, temperature=0.8)
     return json.loads(_strip_json_fence(text))
@@ -596,6 +600,7 @@ def main():
         "thumbnail_path": thumb_path,
         "title": yt_meta["title"],
         "description": yt_meta["description"],
+        "tags": yt_meta.get("tags", []),
         "source_clips": [{"identifier": c["identifier"], "title": c["title"]} for c in clips],
     }
     with open(os.path.join(workdir, "meta.json"), "w", encoding="utf-8") as f:
