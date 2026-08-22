@@ -1,8 +1,50 @@
 E-9 visa worker rights	Foreign Workers
 foreign worker insurance Korea	Foreign Workers
 Korea migrant worker support	Foreign Workers
+Korea E-9 quota cut 2026	Foreign Workers
+Korea E-8 seasonal worker quota	Foreign Workers
+Korea foreign worker national pension	Foreign Workers
+Korea EPS employment permit system	Foreign Workers
+Korea foreign worker equal treatment law	Foreign Workers
 Korea recruitment agency foreigner	Hiring
 global talent visa Korea	Hiring
 Korea headhunter foreigner	Hiring
+Korea K-Core visa skilled worker	Hiring
+Korea foreign hiring AI software roles	Hiring
+Korea rolling hiring practices survey	Hiring
+Korea labor shortage foreign talent 2026	Hiring
+Korea hiring foreign engineers manufacturing	Hiring
+Korea global sales recruitment foreigner	Hiring
+Korea internal hiring border expansion	Hiring
 Korea severance pay calculation	Salaries
 Korea overtime pay law	Salaries
+Korea minimum wage 2026	Salaries
+Korea E-7 visa salary standard 2026	Salaries
+Korea payroll compliance guide	Salaries
+Korea national pension contribution rate 2026	Salaries
+Korea employer social insurance cost	Salaries
+E-9 sponsorship process employer guide	Sponsorship
+E-7 visa sponsorship employer requirements	Sponsorship
+Korea employment authorization no suitable worker	Sponsorship
+Korea labor office employment contract filing	Sponsorship
+Korea sponsor foreign worker housing rules	Sponsorship
+Korea visa sponsorship documentation checklist	Sponsorship
+Korea employer visa sponsorship cost 2026	Sponsorship
+Korea rules of employment 10 employees	Compliance
+Korea labor inspection foreign worker	Compliance
+Korea immigration reporting HiKorea online	Compliance
+Korea foreign worker tax withholding compliance	Compliance
+Korea workplace safety law foreign employee	Compliance
+Korea employment contract translation requirement	Compliance
+Korea labor law violation penalties employer	Compliance
+Korea onboarding checklist foreign employee	Onboarding
+Korea alien registration employer support	Onboarding
+Korea housing arrangement foreign employee	Onboarding
+Korea health insurance enrollment new hire	Onboarding
+Korea bank account setup employer assistance	Onboarding
+Korea work visa 39 categories reform	Sponsorship
+Korea F-4 visa overseas Korean hiring	Hiring
+Korea wage committee visa reform 2026	Compliance
+Korea foreign worker retention strategy	Hiring
+Korea global 500 company visa track	Sponsorship
+Korea D-10-T E-7-T F-2-T visa stages	Sponsorship
