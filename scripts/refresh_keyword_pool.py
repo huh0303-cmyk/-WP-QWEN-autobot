@@ -28,11 +28,13 @@ RSS 기반이라 이 스크립트 대상이 아님) 전체를 대상으로, 매 
    부족하면 기존 파일에서 코퍼스와 안 겹치는 항목만 살려서 채운다 — 어떤
    경우에도 항상 정확히 50개를 유지한다.
 
-Gemini의 Google 검색 그라운딩(google_search 툴)을 이용해 실제 최신 웹 검색
-결과에 기반한 키워드를 생성한다 — 별도 검색 API 키 없이(이미 있는
-GEMINI_API_KEY만으로) "지금 진짜 화제인 주제"를 반영할 수 있는 유일한
-현실적 경로. 검색 그라운딩이 실패하면(모델/SDK 버전 이슈 등) 모델 자체
-지식 기반 생성으로 폴백하되, 그 사실을 로그에 명확히 남긴다.
+2026-08-22 3차 수정 — 사용자 지시: "지침을 분명히 줬잖아.. 모든 Gemini →
+GPT로." 검색그라운딩을 Gemini(google_search 툴)로만 짜놨던 게 바로 이
+스크립트가 실제로 못 돌아가는 원인이었음(GEMINI_API_KEY가 월 지출한도
+초과 상태 — 8/2부터 미해결). OpenAI Responses API의 web_search 툴로
+교체(실사용 테스트로 응답 형식 확인 완료) — 이제 OPENAI_API_KEY가 1순위,
+Gemini 검색그라운딩은 OPENAI_API_KEY가 아예 없을 때만 쓰는 최후 폴백으로
+격하(autopost_mega.py의 텍스트/이미지 생성과 동일한 원칙).
 
 기존 파일은 항상 data/keywords/_backup_YYYYMMDD/에 백업 후 교체(기존
 27개 사이트 삭제작업 원칙과 동일 — 조사 결과를 덮어쓰기 전에 항상 보존).
@@ -44,18 +46,19 @@ import sys
 import time
 
 import requests
-from google import genai
-from google.genai import types as genai_types
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_SEARCH_MODEL = os.environ.get("OPENAI_SEARCH_MODEL", "gpt-4o-mini")
+OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+MODEL = os.environ.get("KEYWORD_RESEARCH_MODEL", "gemini-2.5-flash")
+MAX_ROUNDS = 3  # 부족분을 다시 채우려는 최대 리서치 재시도 횟수
 
 for _stream in (sys.stdout, sys.stderr):
     try:
         _stream.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
         pass
-
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODEL = os.environ.get("KEYWORD_RESEARCH_MODEL", "gemini-2.5-flash")
-MAX_ROUNDS = 3  # 부족분을 다시 채우려는 최대 리서치 재시도 횟수
 
 # ============================================================
 # 25개 사이트(뉴스 2개 제외) — autopost_mega.py SITES_CONFIG/SITE_PERSONA와
@@ -249,16 +252,25 @@ def build_network_corpus(all_titles_by_site):
 
 
 def parse_lines(text, valid_categories):
+    """2026-08-22 실사용 테스트로 확인: gpt-4o-mini의 web_search 출력은
+    "keyword<TAB>category" 지시를 거의 안 지키고 한 줄에 키워드만 던지는
+    경우가 대부분이었다(탭 없으면 전부 버리던 예전 로직 탓에 다수 사이트가
+    "후보 0개"로 나온 원인). 탭이 있으면 그대로 쓰고, 없으면 키워드만
+    받아서 category=None으로 두고 호출부가 라운드로빈으로 배정하게 한다."""
     lines = []
     for raw in text.strip().split("\n"):
         raw = raw.strip()
-        if not raw or "\t" not in raw:
+        raw = re.sub(r'^[-*\d.\)\s]+', '', raw)  # "1. ", "- " 같은 목록기호 제거
+        if not raw:
             continue
-        kw, cat = raw.split("\t", 1)
-        kw, cat = kw.strip(), cat.strip()
-        if not kw or cat not in valid_categories:
-            continue
-        if len(kw) < 3 or len(kw) > 80:
+        if "\t" in raw:
+            kw, cat = raw.split("\t", 1)
+            kw, cat = kw.strip(), cat.strip()
+            if cat not in valid_categories:
+                cat = None
+        else:
+            kw, cat = raw, None
+        if not kw or len(kw) < 3 or len(kw) > 80:
             continue
         lines.append((kw, cat))
     seen = set()
@@ -272,7 +284,45 @@ def parse_lines(text, valid_categories):
     return deduped
 
 
+def _extract_responses_text(data):
+    """OpenAI Responses API 응답에서 실제 텍스트만 뽑아낸다. 실사용 테스트로
+    확인한 형식: output 배열 안에 type=web_search_call(검색 자체) 항목과
+    type=message(최종 답변) 항목이 섞여 있고, message.content[].type=
+    output_text.text가 실제 결과."""
+    chunks = []
+    for item in data.get("output", []):
+        if item.get("type") != "message":
+            continue
+        for c in item.get("content", []):
+            if c.get("type") == "output_text" and c.get("text"):
+                chunks.append(c["text"])
+    return "\n".join(chunks)
+
+
+def call_openai_search(prompt):
+    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}
+    body = {"model": OPENAI_SEARCH_MODEL, "tools": [{"type": "web_search"}], "input": prompt}
+    last_err = None
+    for attempt in range(3):
+        try:
+            r = requests.post(OPENAI_RESPONSES_URL, headers=headers, json=body, timeout=90)
+            if r.status_code == 429 or r.status_code >= 500:
+                last_err = f"{r.status_code}: {r.text[:200]}"
+                time.sleep(min(10 * (2 ** attempt), 60))
+                continue
+            r.raise_for_status()
+            text = _extract_responses_text(r.json())
+            if text.strip():
+                return text
+            last_err = "empty output_text"
+        except Exception as e:
+            last_err = str(e)[:200]
+        time.sleep(3)
+    raise RuntimeError(f"OpenAI 웹서치 리서치 실패: {last_err}")
+
+
 def call_gemini(client, prompt):
+    from google.genai import types as genai_types
     try:
         resp = client.models.generate_content(
             model=MODEL, contents=prompt,
@@ -291,11 +341,31 @@ def call_gemini(client, prompt):
         return resp.text, False
 
 
+def call_search_llm(client, prompt):
+    """2026-08-22: OpenAI(웹서치 툴)가 1순위, Gemini 검색그라운딩은
+    OPENAI_API_KEY가 아예 없을 때만 쓰는 최후 폴백 — autopost_mega.py의
+    텍스트/이미지 생성 라우팅과 동일한 원칙."""
+    if OPENAI_API_KEY:
+        try:
+            return call_openai_search(prompt), True
+        except Exception as e:
+            print(f"    ⚠️ OpenAI 웹서치 실패({e}) → Gemini 폴백 시도")
+    if client is not None:
+        return call_gemini(client, prompt)
+    raise RuntimeError("OPENAI_API_KEY도 GEMINI_API_KEY도 사용 불가")
+
+
 def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
     categories_str = " / ".join(target["categories"])
     lang_label = "Korean" if target["lang"] == "ko" else "English"
     accepted = []
     accepted_lower = set()
+    # 2026-08-22: web_search 모델이 "2026 minimum wage and overtime pay/regulations/
+    # updates..."처럼 살짝만 다른 문구를 수십 개 뱉는 경우가 실사용 테스트로 확인됨 —
+    # 정확히 같은 문자열이 아니라서 accepted_lower만으론 못 걸러진다. 코퍼스 중복
+    # 체크와 같은 어간(stemming) 방식으로 "이미 채택한 것들끼리"도 함께 확인한다.
+    accepted_norms, accepted_wordsets = [], []
+    cat_rr = 0  # 카테고리 미지정 후보를 라운드로빈으로 배정하기 위한 카운터
     grounded_any = False
     avoid_block = ""
 
@@ -307,7 +377,7 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
             today=today_str, domain=target["domain_desc"], count=need + 10,  # 여유분 요청(필터링 손실 대비)
             categories=categories_str, lang_label=lang_label, avoid_block=avoid_block,
         )
-        text, grounded = call_gemini(client, prompt)
+        text, grounded = call_search_llm(client, prompt)
         grounded_any = grounded_any or grounded
         candidates = parse_lines(text, target["categories"])
 
@@ -315,10 +385,15 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
             kl = kw.lower()
             if kl in accepted_lower:
                 continue
-            if overlaps_corpus(kw, corpus_norms, corpus_wordsets):
+            if overlaps_corpus(kw, corpus_norms + accepted_norms, corpus_wordsets + accepted_wordsets):
                 continue
+            if cat is None:
+                cat = target["categories"][cat_rr % len(target["categories"])]
+                cat_rr += 1
             accepted.append((kw, cat))
             accepted_lower.add(kl)
+            accepted_norms.append(re.sub(r"[^a-z0-9가-힣]+", "", kl))
+            accepted_wordsets.append(_sig_words(kw))
             if len(accepted) >= 50:
                 break
 
@@ -335,10 +410,18 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
 
 
 def main():
-    if not GEMINI_API_KEY:
-        print("❌ GEMINI_API_KEY 없음")
+    if not OPENAI_API_KEY and not GEMINI_API_KEY:
+        print("❌ OPENAI_API_KEY, GEMINI_API_KEY 둘 다 없음")
         sys.exit(1)
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    client = None
+    if GEMINI_API_KEY:
+        from google import genai as _genai
+        client = _genai.Client(api_key=GEMINI_API_KEY)
+    if OPENAI_API_KEY:
+        print(f"검색 엔진: OpenAI({OPENAI_SEARCH_MODEL}) 1순위" +
+              (", Gemini 폴백 가능" if client else ""))
+    else:
+        print("검색 엔진: Gemini만 사용 가능(OPENAI_API_KEY 없음)")
     today = datetime.datetime.now()
     today_str = today.strftime("%Y-%m-%d")
     backup_dir = f"data/keywords/_backup_{today.strftime('%Y%m%d')}"
