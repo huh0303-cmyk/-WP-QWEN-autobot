@@ -383,18 +383,23 @@ def generate_script(topic, channel_key, clips, target_seconds=None):
 video about: "{topic}". This channel's domain is: {domain}. The video uses real
 public-domain archival footage (not AI-generated visuals).
 
-Real archival clips that will play under this narration (ground your script in
-real, well-documented facts — reference what these clips likely show, but do
-not invent specific details not backed by well-known public facts):
+Real archival clips that will play under this narration, IN THE EXACT ORDER
+they will appear on screen (clip 1 plays first, then clip 2, and so on,
+looping back to clip 1 if the narration runs longer than the clips):
 ---
 {clip_notes[:3000]}
 ---
 
 Write "narration": {word_line}, English, engaging documentary tone (a good
-history/culture YouTuber, not a dry lecture). Hook in the first two sentences.
-Structure: hook -> context -> core interesting facts/story -> a surprising or
-lesser-known detail -> a memorable closing line. Do not fabricate quotes or
-specific statistics beyond well-established public knowledge.
+history/culture YouTuber, not a dry lecture). CRITICAL: structure the
+narration to move through the clips in the SAME ORDER listed above — write
+roughly one section per clip (proportional to how many clips there are), and
+make each section actually be about what that clip shows/depicts (use its
+title/year/description), so a viewer watching clip N on screen hears narration
+about clip N at that moment. Open the first section with a hook in its first
+two sentences. Close the final section with a memorable closing line. Do not
+fabricate quotes or specific statistics beyond well-established public
+knowledge.
 
 Also write "title_hint": a short natural phrase capturing the video's angle.
 

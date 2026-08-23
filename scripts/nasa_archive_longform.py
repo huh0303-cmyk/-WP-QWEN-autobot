@@ -23,7 +23,6 @@ import re
 import sys
 import json
 import time
-import random
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -153,21 +152,24 @@ def generate_script(topic, clips):
 video about: "{topic}", for a channel that uses real NASA archival footage
 (not AI-generated visuals).
 
-Here are the actual NASA archive clips that will play under this narration —
-ground your script in real, well-documented facts about this topic, and feel
-free to reference what these clips likely show, but do not invent specific
-technical details not backed by well-known public facts:
+Here are the actual NASA archive clips that will play under this narration, IN
+THE EXACT ORDER they will appear on screen (clip 1 plays first, then clip 2,
+and so on, looping back to clip 1 if the narration runs longer than the clips):
 ---
 {clip_notes[:3000]}
 ---
 
 Write "narration": a single continuous narration script, approximately 950-1050
 words, in English, engaging documentary tone (like a good space/science
-YouTuber — factual, vivid, not a dry lecture). Hook the viewer in the first
-two sentences. Structure: hook -> context -> the core interesting facts/story
--> a surprising or lesser-known detail -> a memorable closing line. Do not
-fabricate quotes or invent specific statistics that aren't well-established
-public knowledge about NASA history.
+YouTuber — factual, vivid, not a dry lecture). CRITICAL: structure the
+narration to move through the clips in the SAME ORDER listed above — write
+roughly one section per clip (proportional to how many clips there are), and
+make each section actually be about what that clip shows/depicts (use its
+title/date/description), so a viewer watching clip N on screen hears narration
+about clip N at that moment. Open the first section with a hook in its first
+two sentences. Close the final section with a memorable closing line. Do not
+fabricate quotes or invent specific technical details/statistics that aren't
+well-established public knowledge about NASA history.
 
 Also write "title_hint": a short natural phrase capturing the video's angle.
 
@@ -234,25 +236,21 @@ def build_visual_track(clips, total_duration, workdir):
             normalize_clip(c["path"], norm_path, CLIP_TRIM_SECONDS)
         norm_clips.append(norm_path)
 
-    # 2026-08-18: 클립이 적은 주제는 그래도 매번 똑같은 순서(0,1,2...,0,1,2...)로
-    # 돌려쓰면 반복이 눈에 확 띈다(사용자 지적) — 한 바퀴 다 쓸 때마다 순서를
-    # 섞고, 직전에 쓴 클립이 다음 바퀴 맨 앞에 바로 다시 나오지 않게만 피한다.
+    # 2026-08-23: 예전엔 한 바퀴 다 쓸 때마다 클립 순서를 무작위로 섞었는데,
+    # generate_script()가 이제 나레이션을 clips 리스트 순서 그대로(클립1 얘기 ->
+    # 클립2 얘기 -> ...) 쓰도록 바뀌었으므로, 화면도 반드시 같은 순서로 재생돼야
+    # 나레이션 내용과 화면이 맞는다(사용자 지적: "화면과 나레이션 전혀 안 맞아").
+    # 무작위 셔플을 없애고 clips 원래 순서를 그대로 반복 재생한다 — 한 바퀴를 다
+    # 돌면 다시 처음(클립0)부터, 인접 반복(마지막 클립 바로 다음에 또 그 클립)은
+    # 애초에 발생하지 않는다(다음 바퀴 시작은 항상 클립0).
     segments = []
     covered = 0.0
-    order = list(range(len(norm_clips)))
-    random.shuffle(order)
     pos = 0
-    last_clip = None
     while covered < total_duration:
-        if pos >= len(order):
-            order = list(range(len(norm_clips)))
-            random.shuffle(order)
-            if len(order) > 1 and norm_clips[order[0]] == last_clip:
-                order[0], order[-1] = order[-1], order[0]
+        if pos >= len(norm_clips):
             pos = 0
-        clip = norm_clips[order[pos]]
+        clip = norm_clips[pos]
         pos += 1
-        last_clip = clip
         seg_dur = min(get_duration(clip), total_duration - covered)
         segments.append((clip, seg_dur))
         covered += seg_dur
