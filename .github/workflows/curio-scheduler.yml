@@ -1,0 +1,44 @@
+name: Curio Scheduler (지식채널 5개, 2-3일 간격 랜덤시간 발행 트리거)
+
+# 2026-08-23 사용자 지시로 "채널당 주3회 고정 요일" → "채널당 2~3일 간격으로
+# 하나씩, 랜덤 시각"으로 변경. curio-longform-daily.yml의 schedule: cron을
+# 대체 — 이제 이 워크플로우가 15분마다 scripts/curio_scheduler.py를 돌려서
+# 채널별 다음 예정일이 지난 것만 curio-longform-daily.yml을 dispatch한다.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: curio-scheduler
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Check & dispatch channels whose next due date/time passed
+        env:
+          GH_DISPATCH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/curio_scheduler.py
+      - name: Commit scheduler state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add curio_scheduler_state.json
+          git diff --staged --quiet || git commit -m "chore: curio 스케줄러 상태 갱신 [skip ci]"
+          git push

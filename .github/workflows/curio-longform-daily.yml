@@ -1,4 +1,4 @@
-name: Curio/Times 지식채널 장편 자동생성 (5채널, 채널당 주3회)
+name: Curio/Times 지식채널 장편 자동생성 (5채널, 채널당 2-3일 간격 랜덤시간)
 
 # 2026-08-22 대개편: "지식채널"을 실물 무료 자료가 확실한 5개로 확정.
 #   nasa(NASA_SPACE_TIMES) / history(HISTORY_TODAY_TIMES, 미국사+세계사 통합)
@@ -11,9 +11,16 @@ name: Curio/Times 지식채널 장편 자동생성 (5채널, 채널당 주3회)
 # 계속 나가서 정리(사용자 판단, 2026-08-22) — 스크립트/시크릿/채널 자체는
 # 안 지웠으니 나중에 되살리려면 아래 workflow_dispatch options에 다시 추가하면
 # 된다(choice 타입이라 목록에 없는 값은 지금 dispatch 자체가 안 됨).
-# 이 5채널은 Veo/Gemini 이미지 생성이 아예 없어서(텍스트+TTS만 필요) 예전
-# 10채널 시절의 Veo 일일 10회 한도 문제가 적용 안 됨 — 그래서 채널당 주1회
-# 제약 없이 주3회(월/수/금)로 올렸다.
+#
+# 2026-08-23 채널명 최종 확정(내부 키/시크릿명은 그대로 유지, 브랜딩명만 확정):
+#   nasa → NASA_XFILES / history → HISTORY_TV_TODAY / invention → INVENTION_STORY
+#   / silent_era → SILENT_ERA_FILM(잠정 — OLD_HOLLYWOOD로 바꿀지 6일 뒤 재확인
+#   예정) / retro_reels → RETRO_USA1
+# 같은 날, 스케줄도 "5채널×주3회 고정 요일"에서 "채널당 2~3일 간격으로
+# 한 번에 하나씩, 랜덤 시각"으로 변경 — 이 워크플로우 자체의 schedule: cron은
+# 제거하고, curio-scheduler.yml(scripts/curio_scheduler.py)이 15분마다 돌면서
+# 채널별 다음 예정일이 지난 것만 이 워크플로우를 channel 입력과 함께
+# workflow_dispatch로 호출한다.
 #
 # 2026-08-14: 기존엔 생성기만 있고 업로드/스케줄이 없어서 완전 자동화가 안 돼있었음 — 연결.
 # 2026-08-15: 원래 실제 영상소스 큐레이션으로 기획됐던 archive/times 4채널도
@@ -24,7 +31,7 @@ on:
   workflow_dispatch:
     inputs:
       channel:
-        description: "채널 (비우면 스케줄 슬롯 기준 자동 선택)"
+        description: "채널"
         required: false
         type: choice
         default: "nasa"
@@ -37,15 +44,6 @@ on:
       topic:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
-  schedule:
-    # 5채널 × 주3회(월/수/금), 15분 간격으로 순차 발동 — 같은 시각에 몰리면
-    # archive.org 검색이 겹쳐서 일시 오류가 늘어난 전례(2026-08-17)가 있어
-    # 계속 시차를 둔다.
-    - cron: "0 20 * * 1,3,5"    # nasa - 05:00 KST
-    - cron: "15 20 * * 1,3,5"   # history - 05:15 KST
-    - cron: "30 20 * * 1,3,5"   # invention - 05:30 KST
-    - cron: "45 20 * * 1,3,5"   # silent_era - 05:45 KST
-    - cron: "0 21 * * 1,3,5"    # retro_reels - 06:00 KST
 
 concurrency:
   # 2026-08-17 사고: 그룹명이 전체 워크플로우 공용 하나였어서, 짧은 간격으로
@@ -54,7 +52,7 @@ concurrency:
   # 새 실행이 들어오면 밀려서 취소되는 GitHub Actions 동작) — 10채널 샘플
   # 테스트 중 8개가 통째로 cancelled됨. 채널별로 그룹을 분리해서 서로 다른
   # 채널은 절대 서로를 취소하지 못하게 하고, 같은 채널끼리 중복 실행만 방지.
-  group: curio-longform-${{ github.event.inputs.channel || github.event.schedule || 'default' }}
+  group: curio-longform-${{ github.event.inputs.channel || 'default' }}
   cancel-in-progress: false
 
 jobs:
@@ -67,20 +65,8 @@ jobs:
     steps:
       - id: pick
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            CH="${{ github.event.inputs.channel }}"
-            TOPIC_IN="${{ github.event.inputs.topic }}"
-          else
-            case "${{ github.event.schedule }}" in
-              "0 20 * * 1,3,5") CH="nasa" ;;
-              "15 20 * * 1,3,5") CH="history" ;;
-              "30 20 * * 1,3,5") CH="invention" ;;
-              "45 20 * * 1,3,5") CH="silent_era" ;;
-              "0 21 * * 1,3,5") CH="retro_reels" ;;
-              *) CH="nasa" ;;
-            esac
-            TOPIC_IN=""
-          fi
+          CH="${{ github.event.inputs.channel }}"
+          TOPIC_IN="${{ github.event.inputs.topic }}"
 
           # 2026-08-22: 미국/영어권 시청자 어필 기준으로 다시 선정한 주제풀
           # (american_archive 주제는 history로 통합됨).
