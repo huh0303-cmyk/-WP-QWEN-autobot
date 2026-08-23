@@ -33,7 +33,7 @@ from curio_longform import (  # noqa: E402
     log, GEMINI_API_KEY, ensure_thumbnail_font,
 )
 from classic_reads_longform import (  # noqa: E402
-    build_narration_track, write_srt, mux_final, CAPTION_STYLE, _save_thumbnail_capped,
+    build_narration_track, write_srt, mux_final, CAPTION_STYLE, _save_thumbnail_capped, VOICE_ID,
 )
 
 CHANNEL_KEY = "nasa"
@@ -396,7 +396,7 @@ def main():
     yt_meta = generate_youtube_metadata(topic, narration)
     log(f"   제목: {yt_meta['title']}")
 
-    log("3/6 나레이션 TTS + 캡션 타이밍 생성 중...")
+    log(f"3/6 나레이션 TTS + 캡션 타이밍 생성 중 (ElevenLabs voice_id={VOICE_ID})...")
     audio_path, srt_entries, total_dur = build_narration_track(narration, workdir)
     log(f"   총 나레이션 길이: {total_dur/60:.1f}분")
     srt_path = os.path.join(workdir, "captions.srt")
