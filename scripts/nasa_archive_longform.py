@@ -226,7 +226,13 @@ def normalize_clip(raw_path, out_path, max_dur):
     return dur
 
 
-def build_visual_track(clips, total_duration, workdir):
+def build_visual_track(clips, total_duration, workdir, initial_order=None):
+    """initial_order: 첫 바퀴에 클립을 재생할 순서(클립 인덱스 리스트, 옵션).
+    2026-08-23 추가 — 나레이션 문장 순서와 실제 화면에 나오는 클립 순서가
+    아무 관계 없이 완전 무작위였던 문제(사용자 지적: "동영상과 나레이션이
+    안맞아") 대응. archive_footage_longform.py가 나레이션과 클립을 매칭시켜
+    이 순서를 넘겨주면 그대로 쓰고, 안 넘겨주면(기존 호출부들) 이전과 동일하게
+    무작위 순서를 쓴다 — 기존 동작에 영향 없음."""
     norm_clips = []
     for i, c in enumerate(clips):
         norm_path = os.path.join(workdir, f"norm_{i}.mp4")
@@ -237,10 +243,14 @@ def build_visual_track(clips, total_duration, workdir):
     # 2026-08-18: 클립이 적은 주제는 그래도 매번 똑같은 순서(0,1,2...,0,1,2...)로
     # 돌려쓰면 반복이 눈에 확 띈다(사용자 지적) — 한 바퀴 다 쓸 때마다 순서를
     # 섞고, 직전에 쓴 클립이 다음 바퀴 맨 앞에 바로 다시 나오지 않게만 피한다.
+    # (initial_order가 있는 첫 바퀴는 예외 — 나레이션 흐름 순서를 그대로 지킨다.)
     segments = []
     covered = 0.0
-    order = list(range(len(norm_clips)))
-    random.shuffle(order)
+    if initial_order is not None and len(initial_order) == len(norm_clips):
+        order = list(initial_order)
+    else:
+        order = list(range(len(norm_clips)))
+        random.shuffle(order)
     pos = 0
     last_clip = None
     while covered < total_duration:

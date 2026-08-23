@@ -405,6 +405,73 @@ Respond with JSON only, no explanation, no markdown fences:
     return json.loads(_strip_json_fence(text))
 
 
+def derive_clip_order(narration, clips, channel_key):
+    """2026-08-23 추가 — 사용자 지적("Invention 동영상과 나레이션이 안맞아"):
+    generate_script()는 실제 클립의 제목/설명을 참고해서 대본을 쓰지만, 그 뒤
+    build_visual_track()이 클립을 완전 무작위(random.shuffle) 순서로 이어붙여서
+    나레이션이 A를 말하는 순간 화면엔 전혀 무관한 클립이 뜨는 구조였음. 이미
+    쓰고 있는 gemini_generate_text()(OPENAI_API_KEY 있으면 GPT로, 없으면 무료
+    범위 Gemini 2.5 Flash로 자동 라우팅 — 다른 API 추가 비용 없음) 한 번 더
+    호출해서 나레이션 문장 각각이 실제로 어느 클립 내용을 말하는지 맞히고,
+    그 클립이 '처음 언급되는' 문장 순서대로 재생 순서를 정한다. 문장 단위로
+    화면을 잘라 붙이는 정밀 동기화보다 훨씬 단순하고 안전하면서도, 영상 전체
+    흐름이 나레이션 흐름과 같은 방향으로 진행되게 만든다.
+
+    실패하거나 응답이 이상하면 예외를 삼키고 None을 반환 — 호출부가 기존
+    무작위 순서로 안전하게 폴백한다(파이프라인이 이 매칭 실패로 죽지 않게)."""
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", narration.strip()) if s.strip()]
+    if not sentences or len(clips) <= 1:
+        return None
+
+    clip_list = "\n".join(
+        f"{i}: {c['title']} ({c['year'] or 'year unknown'}) — {(c['description'] or '')[:200]}"
+        for i, c in enumerate(clips)
+    )
+    sentence_list = "\n".join(f"{i}: {s}" for i, s in enumerate(sentences))
+    prompt = f"""You are aligning narration to real archival video clips for a
+documentary about {channel_key!r} ("{CHANNEL_ARCHIVE_CONFIG[channel_key]['domain']}").
+
+Numbered list of the real archival clips available (their actual titles/descriptions):
+---
+{clip_list[:4000]}
+---
+
+Numbered narration sentences, in the order they are spoken:
+---
+{sentence_list[:6000]}
+---
+
+For each sentence, which clip index does it most plausibly describe? Use -1 if
+no clip clearly relates to that specific sentence (e.g. a general transition
+line). Respond with JSON only: an array of exactly {len(sentences)} integers,
+one per sentence in order, no explanation, no markdown fences.
+Example: [0, 0, 2, -1, 1]
+"""
+    try:
+        text = gemini_generate_text(prompt, temperature=0.2)
+        mapping = json.loads(_strip_json_fence(text))
+        if not isinstance(mapping, list):
+            raise ValueError("응답이 배열이 아님")
+    except Exception as e:
+        log(f"   ⚠️ 나레이션-클립 매칭 실패({e}) — 재생 순서는 기존 방식(무작위) 사용")
+        return None
+
+    order, seen = [], set()
+    for idx in mapping:
+        if isinstance(idx, int) and 0 <= idx < len(clips) and idx not in seen:
+            order.append(idx)
+            seen.add(idx)
+    # 나레이션에서 특별히 언급되지 않은 클립도 버리지 않고 뒤에 이어붙인다
+    # (실제 확보한 필름 분량을 줄이지 않기 위해 — 순서만 뒤로 밀림).
+    for idx in range(len(clips)):
+        if idx not in seen:
+            order.append(idx)
+    if len(order) != len(clips):
+        log("   ⚠️ 나레이션-클립 매칭 결과 이상 — 재생 순서는 기존 방식(무작위) 사용")
+        return None
+    return order
+
+
 def generate_youtube_metadata(topic, channel_key, narration):
     prompt = f"""You are writing the YouTube title and description for a documentary
 video about "{topic}", on a channel using real public-domain archival footage
@@ -566,6 +633,11 @@ def main():
         json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
     log(f"   나레이션 {len(narration.split())}단어")
 
+    log("2.4/6 나레이션 흐름에 맞춰 클립 재생 순서 정렬 중...")
+    clip_order = derive_clip_order(narration, clips, channel_key)
+    if clip_order is not None:
+        log("   ✅ 클립 재생 순서를 나레이션 언급 순서에 맞춤")
+
     log("2.5/6 유튜브 제목/설명 생성 중...")
     yt_meta = generate_youtube_metadata(topic, channel_key, narration)
     log(f"   제목: {yt_meta['title']}")
@@ -577,7 +649,7 @@ def main():
     write_srt(srt_entries, srt_path)
 
     log("4/6 실제 아카이브 클립으로 영상 트랙 조립 중 (트림+정규화+순환)...")
-    visual_path = build_visual_track(clips, total_dur, workdir)
+    visual_path = build_visual_track(clips, total_dur, workdir, initial_order=clip_order)
 
     log("5/6 영상+오디오 합성 중...")
     final_path = os.path.join(workdir, "final.mp4")
