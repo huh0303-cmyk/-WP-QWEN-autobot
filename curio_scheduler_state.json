@@ -1,0 +1,27 @@
+{
+  "nasa": {
+    "due_date": "2026-08-23",
+    "target_h": 20,
+    "target_m": 37
+  },
+  "history": {
+    "due_date": "2026-08-26",
+    "target_h": 17,
+    "target_m": 7
+  },
+  "invention": {
+    "due_date": "2026-08-23",
+    "target_h": 23,
+    "target_m": 26
+  },
+  "silent_era": {
+    "due_date": "2026-08-25",
+    "target_h": 11,
+    "target_m": 59
+  },
+  "retro_reels": {
+    "due_date": "2026-08-23",
+    "target_h": 21,
+    "target_m": 17
+  }
+}
