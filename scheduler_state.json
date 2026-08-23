@@ -1,4 +1,7 @@
 {
   "date": "2026-08-24",
-  "fired": {}
+  "fired": {
+    "https://k-health365.com": true,
+    "https://kieca-korea.org": true
+  }
 }
