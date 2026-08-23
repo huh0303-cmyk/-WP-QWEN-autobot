@@ -1001,46 +1001,42 @@ def build_alternating_visual(image_paths, total_duration, out_path):
 
 
 # ════════════════════════════════════════════════════════════
-# healing 전용: 실사 스톡영상(비/시냇물) 소스 — AI 정지이미지 대신 사용
+# healing 전용: 실사 고해상도 사진(비/숲) 한 장 — AI 정지이미지 대신 사용.
+# 2026-08-23 사용자 피드백("썸네일 하나면 된다고, 왜 자꾸 다른 이미지가 있어")
+# 이후 영상 하나를 전부 이 사진 한 장으로만 채운다 — 여러 장을 갈아끼우던
+# 이전 실사영상(fetch_healing_footage_clips/build_footage_visual) 방식은 폐기.
 # ════════════════════════════════════════════════════════════
-def _search_pexels_video(query):
+def _search_pexels_photo(query):
     if not PEXELS_API_KEY:
         return None
     r = requests.get(
-        "https://api.pexels.com/videos/search",
+        "https://api.pexels.com/v1/search",
         headers={"Authorization": PEXELS_API_KEY},
         params={"query": query, "per_page": 5, "orientation": "landscape", "size": "large"},
         timeout=30,
     )
     r.raise_for_status()
-    videos = r.json().get("videos", [])
-    best_url, best_w = None, 0
-    for v in videos:
-        for f in v.get("video_files", []):
-            w = f.get("width") or 0
-            # 너무 큰 원본(8K 등)은 다운로드/인코딩 시간이 폭증하므로 4K 언저리로 상한
-            if f.get("file_type") == "video/mp4" and 0 < w <= 3840 and w > best_w:
-                best_w, best_url = w, f.get("link")
-    return best_url
+    photos = r.json().get("photos", [])
+    if not photos:
+        return None
+    # "original"이 Pexels가 주는 가장 큰 원본 해상도(대체로 4K~6K급)
+    return photos[0].get("src", {}).get("original")
 
 
-def _search_pixabay_video(query):
+def _search_pixabay_photo(query):
     if not PIXABAY_KEY:
         return None
     r = requests.get(
-        "https://pixabay.com/api/videos/",
-        params={"key": PIXABAY_KEY, "q": query, "per_page": 5},
+        "https://pixabay.com/api/",
+        params={"key": PIXABAY_KEY, "q": query, "image_type": "photo",
+                "orientation": "horizontal", "per_page": 5},
         timeout=30,
     )
     r.raise_for_status()
     hits = r.json().get("hits", [])
-    for h in hits:
-        vids = h.get("videos", {})
-        for tier in ("large", "medium", "small"):
-            u = vids.get(tier, {}).get("url")
-            if u:
-                return u
-    return None
+    if not hits:
+        return None
+    return hits[0].get("largeImageURL")
 
 
 def _download_file(url, out_path):
@@ -1051,80 +1047,34 @@ def _download_file(url, out_path):
             f.write(chunk)
 
 
-def fetch_healing_footage_clips(theme, workdir):
-    """테마별 검색어로 Pexels→Pixabay 순으로 실사 영상을 찾아 다운로드한다.
-    하나도 못 구하면 빈 리스트를 반환 — 호출부가 기존 AI 정지이미지 방식으로
+def fetch_healing_photo(theme, workdir):
+    """테마별 검색어로 Pexels→Pixabay 순으로 고해상도 실사 사진 한 장을 찾아
+    다운로드한다. 못 구하면 None을 반환 — 호출부가 기존 AI 정지이미지 방식으로
     안전하게 폴백한다."""
     queries = HEALING_FOOTAGE_QUERIES.get(theme, HEALING_FOOTAGE_QUERIES["weak_rain"])
-    clips = []
-    for i, q in enumerate(queries):
-        path = os.path.join(workdir, f"footage_{i}.mp4")
-        url = None
+    for q in queries:
+        url, src = None, None
         try:
-            url = _search_pexels_video(q)
+            url = _search_pexels_photo(q)
             src = "Pexels"
         except Exception as e:
-            log(f"   ⚠️ Pexels 검색 실패('{q}'): {e}")
+            log(f"   ⚠️ Pexels 사진 검색 실패('{q}'): {e}")
         if not url:
             try:
-                url = _search_pixabay_video(q)
+                url = _search_pixabay_photo(q)
                 src = "Pixabay"
             except Exception as e:
-                log(f"   ⚠️ Pixabay 검색 실패('{q}'): {e}")
+                log(f"   ⚠️ Pixabay 사진 검색 실패('{q}'): {e}")
         if not url:
-            log(f"   ⚠️ '{q}' 실사영상 없음 — 스킵")
             continue
+        path = os.path.join(workdir, "healing_photo.jpg")
         try:
             _download_file(url, path)
-            if get_duration(path) < 1.0:
-                raise ValueError("다운로드된 파일이 영상이 아님")
-            clips.append(path)
-            log(f"   ✅ 실사영상 확보('{q}', {src})")
+            log(f"   ✅ 실사 사진 확보('{q}', {src})")
+            return path
         except Exception as e:
-            log(f"   ⚠️ '{q}' 다운로드 실패: {e}")
-    return clips
-
-
-def make_footage_segment(clip_path, out_path, duration, fps=25):
-    """짧은 실사 클립을 duration만큼 반복 재생(loop)해서 VIDEO_W x VIDEO_H로 채운다.
-    Ken Burns 방식과 달리 클립 자체가 이미 움직이는 영상(빗방울/물살)이라
-    확대/축소는 아주 미세하게만 얹어 화면이 완전히 정지된 느낌만 없앤다."""
-    frames = max(int(duration * fps), 1)
-    vf = (f"scale=2560:-2:force_original_aspect_ratio=increase,crop=2560:1440,"
-          f"zoompan=z='min(zoom+0.00015,1.06)':d={frames}:"
-          f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={VIDEO_W}x{VIDEO_H}:fps={fps},"
-          f"format=yuv420p")
-    run_ffmpeg(["ffmpeg", "-y", "-stream_loop", "-1", "-i", clip_path, "-vf", vf,
-                "-r", str(fps), "-t", str(duration), "-an", "-c:v", "libx264",
-                "-pix_fmt", "yuv420p", out_path])
-
-
-def build_footage_visual(clip_paths, total_duration, out_path):
-    """clip_paths를 IMAGE_SWAP_SEC 간격으로 번갈아 채워 이어붙인다(build_alternating_visual과
-    동일한 전환 리듬 — 실사영상 버전)."""
-    clips = []
-    t = 0.0
-    idx = 0
-    i = 0
-    while t < total_duration - 0.05:
-        dur = min(IMAGE_SWAP_SEC, total_duration - t)
-        clip = clip_paths[idx % len(clip_paths)]
-        cpath = os.path.join(WORKDIR, f"footage_visual_{i:03d}.mp4")
-        make_footage_segment(clip, cpath, duration=dur)
-        clips.append(cpath)
-        t += dur
-        idx += 1
-        i += 1
-    concat_stream_copy(clips, out_path)
-
-
-def extract_representative_frame(clip_path, out_path, at_sec=2.0):
-    """썸네일/인트로 정지화면용으로 실사 클립에서 프레임 한 장을 뽑는다."""
-    dur = get_duration(clip_path)
-    ss = min(at_sec, max(dur - 0.5, 0.0))
-    run_ffmpeg(["ffmpeg", "-y", "-ss", str(ss), "-i", clip_path,
-                "-frames:v", "1", "-update", "1", out_path])
-    return out_path
+            log(f"   ⚠️ '{q}' 사진 다운로드 실패: {e}")
+    return None
 
 
 def _escape_drawtext(text):
@@ -1187,18 +1137,6 @@ def _gradient_band(w, h, band_h, at_top, max_alpha):
     return overlay
 
 
-def _draw_vinyl_icon(draw, cx, cy, r, fill=(20, 20, 20, 230)):
-    """레퍼런스의 작은 LP판 아이콘 (검정 원반 + 중앙 홀)"""
-    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fill,
-                 outline=(255, 255, 255, 90), width=2)
-    inner_r = max(int(r * 0.42), 8)
-    draw.ellipse([cx - inner_r, cy - inner_r, cx + inner_r, cy + inner_r],
-                 fill=(70, 70, 70, 255))
-    hole_r = max(int(r * 0.1), 3)
-    draw.ellipse([cx - hole_r, cy - hole_r, cx + hole_r, cy + hole_r],
-                 fill=(0, 0, 0, 255))
-
-
 def _draw_waveform(draw, cx, cy, n_bars=17, gap=6, max_h=26, color=(255, 255, 255, 180)):
     """하단 중앙의 작은 오디오 파형 아이콘 (고정 시드로 매번 같은 모양)"""
     rnd = random.Random("thumbnail_waveform")
@@ -1210,48 +1148,24 @@ def _draw_waveform(draw, cx, cy, n_bars=17, gap=6, max_h=26, color=(255, 255, 25
         draw.line([(x, cy - hgt // 2), (x, cy + hgt // 2)], fill=color, width=2)
 
 
-def make_vinyl_overlay_png(out_path, r=90):
-    """영상 위에 겹칠 투명 배경 LP판 PNG. 완전 대칭이면 회전해도 티가 안 나서
-    가장자리에 비대칭 하이라이트 호를 하나 그려 회전이 눈에 보이게 한다."""
-    from PIL import Image, ImageDraw
-
-    size = r * 2 + 12
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
-    cx = cy = size // 2
-    _draw_vinyl_icon(draw, cx, cy, r)
-    draw.arc([cx - r + 10, cy - r + 10, cx + r - 10, cy + r - 10],
-              start=200, end=260, fill=(255, 255, 255, 110), width=3)
-    img.save(out_path, "PNG")
-
-
-def add_spinning_vinyl_and_waveform(visual_path, audio_path, out_path,
-                                     vinyl_r=90, rotation_period_sec=4.0):
-    """팬줌 영상 위에 (1) 실제로 계속 회전하는 LP판 아이콘과 (2) 재생 중인
-    음악 파형을 실시간으로 그려주는 오디오 비주얼라이저를 겹쳐서(overlay),
-    영상 내내 화면이 정적이지 않고 살아있는 느낌을 준다. 이 단계에서 오디오도
-    함께 입혀서 최종 출력하므로 별도 mux_video_audio 호출이 필요 없다."""
-    import math
-    vinyl_png = os.path.join(WORKDIR, "vinyl_icon.png")
-    make_vinyl_overlay_png(vinyl_png, r=vinyl_r)
-    icon_size = vinyl_r * 2 + 12
-    rot_canvas = math.ceil(icon_size * 1.4143) + 2  # 회전해도 안 잘리도록 대각선 크기로 캔버스 확보
-
+def add_waveform_overlay(visual_path, audio_path, out_path):
+    """팬줌 영상 위에 재생 중인 음악 파형을 실시간으로 그려주는 오디오
+    비주얼라이저를 겹쳐서(overlay), 영상 내내 화면이 정적이지 않고 살아있는
+    느낌을 준다. 이 단계에서 오디오도 함께 입혀서 최종 출력하므로 별도
+    mux_video_audio 호출이 필요 없다.
+    2026-08-23: 회전하는 LP판 아이콘은 사용자 피드백("음파장 하나면 되니까
+    거기 도너스 LP판 돌아가는 모양 삭제")으로 제거 — 파형만 남긴다."""
     wave_w, wave_h = 640, 90
     filter_complex = (
-        f"[1:v]format=rgba,rotate=2*PI*t/{rotation_period_sec}:c=none:"
-        f"ow={rot_canvas}:oh={rot_canvas}[vinylrot];"
-        f"[2:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white@0.9:rate=25,format=rgba[wave];"
-        f"[0:v][vinylrot]overlay=x=(W-w)/2:y=(H-h)/2:shortest=1[v1];"
-        f"[v1][wave]overlay=x=(W-w)/2:y=H-h-60[vout]"
+        f"[1:a]volume=3.0,showwaves=s={wave_w}x{wave_h}:mode=cline:colors=white@0.9:rate=25,format=rgba[wave];"
+        f"[0:v][wave]overlay=x=(W-w)/2:y=H-h-60[vout]"
     )
     run_ffmpeg([
         "ffmpeg", "-y",
         "-i", visual_path,
-        "-loop", "1", "-i", vinyl_png,
         "-i", audio_path,
         "-filter_complex", filter_complex,
-        "-map", "[vout]", "-map", "2:a",
+        "-map", "[vout]", "-map", "1:a",
         "-c:v", "libx264", "-c:a", "aac", "-b:a", "192k",
         "-pix_fmt", "yuv420p", "-shortest",
         out_path,
@@ -1792,38 +1706,38 @@ def main():
     final_path = os.path.join(WORKDIR, "final.mp4")
     thumbnail_out = os.path.join(WORKDIR, "thumbnail.png")
 
-    footage_clips = []
+    healing_photo = None
     if healing_theme:
-        log(f"3/5 healing 실사 스톡영상 확보 시도 중({healing_theme})...")
-        footage_clips = fetch_healing_footage_clips(healing_theme, WORKDIR)
-        if not footage_clips:
-            log("   ⚠️ 실사영상을 하나도 못 구함 — AI 정지이미지 방식으로 폴백")
+        log(f"3/5 healing 실사 사진(5K급) 확보 시도 중({healing_theme})...")
+        healing_photo = fetch_healing_photo(healing_theme, WORKDIR)
+        if not healing_photo:
+            log("   ⚠️ 실사 사진을 못 구함 — AI 정지이미지 방식으로 폴백")
 
-    if footage_clips:
-        log(f"   ✅ 실사영상 {len(footage_clips)}개 확보 — AI 정지이미지 대신 사용")
+    if healing_photo:
+        log("   ✅ 실사 사진 확보 — 영상 내내 이 사진 한 장만 사용(교체/전환 없음)")
         caption_text = build_caption_text(topic_keyword, caption_text_input)
         log(f"   캡션 문구: {caption_text}")
-        thumb_source = os.path.join(WORKDIR, "footage_thumb_src.png")
-        extract_representative_frame(footage_clips[0], thumb_source)
         # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
         # 플리 채널 벤치마킹 공통 포맷 — 주간 썸네일 리프레시 스크립트와 로직 공유)
-        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, thumb_source, thumbnail_out, topic_keyword)
+        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, healing_photo, thumbnail_out, topic_keyword)
 
-        log("4/5 실사영상 조립 + 하단 캡션바 삽입 중...")
+        log("4/5 정지사진 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
         body_audio_path = os.path.join(WORKDIR, "body_audio.m4a")
         trim_audio_from(audio_path, INTRO_DURATION_SEC, body_audio_path)
         body_total_sec = total_sec - INTRO_DURATION_SEC
 
         visual_path = os.path.join(WORKDIR, "visual.mp4")
-        build_footage_visual(footage_clips, body_total_sec, visual_path)
+        # 이미지 1장만 넘기면 build_alternating_visual이 매 구간마다 같은
+        # 사진을 재사용한다 — 다른 사진으로 안 바뀌면서도 기존 코드 재사용.
+        build_alternating_visual([healing_photo], body_total_sec, visual_path)
         muxed_path = os.path.join(WORKDIR, "muxed.mp4")
-        add_spinning_vinyl_and_waveform(visual_path, body_audio_path, muxed_path)
+        add_waveform_overlay(visual_path, body_audio_path, muxed_path)
         body_path = os.path.join(WORKDIR, "body.mp4")
         add_lower_third_bar(muxed_path, caption_text, body_path)
 
         log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
         intro_still = os.path.join(WORKDIR, "intro_still.png")
-        intro_still = make_channel_thumbnail(CHANNEL_KEY, thumb_source, intro_still, topic_keyword)
+        intro_still = make_channel_thumbnail(CHANNEL_KEY, healing_photo, intro_still, topic_keyword)
         intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
         make_intro_clip(intro_still, audio_path, intro_clip)
         concat_intro_and_main(intro_clip, body_path, final_path)
@@ -1848,7 +1762,7 @@ def main():
         visual_path = os.path.join(WORKDIR, "visual.mp4")
         build_alternating_visual(image_paths, body_total_sec, visual_path)
         muxed_path = os.path.join(WORKDIR, "muxed.mp4")
-        add_spinning_vinyl_and_waveform(visual_path, body_audio_path, muxed_path)
+        add_waveform_overlay(visual_path, body_audio_path, muxed_path)
         body_path = os.path.join(WORKDIR, "body.mp4")
         add_lower_third_bar(muxed_path, caption_text, body_path)
 
