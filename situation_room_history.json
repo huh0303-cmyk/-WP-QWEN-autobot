@@ -1,78 +1,78 @@
 {
   "latest": {
-    "site_clicks": 1,
+    "site_clicks": 6,
     "site_indexed": 0,
-    "site_posts": 1187,
+    "site_posts": 1204,
     "site_details": {
       "k-health365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 1,
+        "total_posts": 2,
         "status": "정상",
-        "visitor_count": 183
+        "visitor_count": 44
       },
       "koreamedicaltour.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 24,
         "status": "정상",
-        "visitor_count": 44
+        "visitor_count": 29
       },
       "koreainvest365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 74,
+        "total_posts": 75,
         "status": "정상",
-        "visitor_count": 106
+        "visitor_count": 74
       },
       "ki-korea.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 0,
+        "total_posts": 1,
         "status": "정상",
-        "visitor_count": 158
+        "visitor_count": 61
       },
       "koreainsurance365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 11,
         "status": "정상",
-        "visitor_count": 74
+        "visitor_count": 29
       },
       "kfinance365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 45,
         "status": "정상",
-        "visitor_count": 467
+        "visitor_count": 147
       },
       "koreataxnlaw.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 3,
+        "total_posts": 4,
         "status": "정상",
-        "visitor_count": 97
+        "visitor_count": 50
       },
       "koreacrypto365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 47,
+        "total_posts": 48,
         "status": "정상",
-        "visitor_count": 129
+        "visitor_count": 64
       },
       "krealestate365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 1,
         "status": "정상",
-        "visitor_count": 44
+        "visitor_count": 39
       },
       "ktech365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 13,
+        "total_posts": 14,
         "status": "정상",
-        "visitor_count": 65
+        "visitor_count": 74
       },
       "kskin365.com": {
         "clicks": 0,
@@ -84,148 +84,148 @@
       "oliveyoungkorea.com": {
         "clicks": null,
         "indexed": null,
-        "total_posts": 75,
+        "total_posts": 76,
         "status": "권한없음",
-        "visitor_count": 159
+        "visitor_count": 149
       },
       "kworld365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 0,
+        "total_posts": 2,
         "status": "정상",
-        "visitor_count": 189
+        "visitor_count": 128
       },
       "k-trip365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 6,
+        "total_posts": 7,
         "status": "정상",
-        "visitor_count": 248
+        "visitor_count": 220
       },
       "k-visa365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 52,
         "status": "정상",
-        "visitor_count": 124
+        "visitor_count": 82
       },
       "koreawedding365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 60,
+        "total_posts": 61,
         "status": "정상",
-        "visitor_count": 145
+        "visitor_count": 131
       },
       "kstudy365.com": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 14,
+        "total_posts": 15,
         "status": "정상",
-        "visitor_count": 69
+        "visitor_count": 57
       },
       "studyinkorea365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 44,
         "status": "정상",
-        "visitor_count": 37
+        "visitor_count": 16
       },
       "kieca-korea.org": {
-        "clicks": 0,
+        "clicks": 1,
         "indexed": 0,
-        "total_posts": 98,
+        "total_posts": 99,
         "status": "정상",
-        "visitor_count": 60
+        "visitor_count": 44
       },
       "ksa-korea.org": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 61,
+        "total_posts": 63,
         "status": "정상",
-        "visitor_count": 47
+        "visitor_count": 23
       },
       "sis-korea.com": {
-        "clicks": 0,
+        "clicks": 2,
         "indexed": 0,
         "total_posts": 63,
         "status": "정상",
-        "visitor_count": 87
+        "visitor_count": 75
       },
       "jobkorea365.com": {
-        "clicks": 0,
+        "clicks": 1,
         "indexed": 0,
-        "total_posts": 66,
+        "total_posts": 67,
         "status": "정상",
-        "visitor_count": 150
+        "visitor_count": 121
       },
       "jobinkorea365.com": {
-        "clicks": 0,
+        "clicks": 2,
         "indexed": 0,
         "total_posts": 68,
         "status": "정상",
-        "visitor_count": 123
+        "visitor_count": 115
       },
       "jobkoreaglobal.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 69,
         "status": "정상",
-        "visitor_count": 328
+        "visitor_count": 334
       },
       "korea365.org": {
         "clicks": 0,
         "indexed": 0,
-        "total_posts": 102,
+        "total_posts": 103,
         "status": "정상",
-        "visitor_count": 293
+        "visitor_count": 193
       },
       "koreanews365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 87,
         "status": "정상",
-        "visitor_count": 124
+        "visitor_count": 18
       },
       "theseouljournal.com": {
-        "clicks": 1,
+        "clicks": 0,
         "indexed": 0,
         "total_posts": 103,
         "status": "정상",
-        "visitor_count": 313
+        "visitor_count": 96
       }
     },
     "youtube": {
       "한국어(TOPIK)": {
         "subs": 5790,
-        "views": 362816
+        "views": 363326
       },
       "영어(English Survival)": {
-        "subs": 9,
-        "views": 3002
+        "subs": 10,
+        "views": 3077
       },
       "다국어(Studio_starbucks,10개국어)": {
         "subs": 21,
-        "views": 9982
+        "views": 10026
       },
       "플리-로맨틱글로벌(globalmusic)": {
         "subs": 10,
-        "views": 1800
+        "views": 1806
       },
       "플리-힐링(실채널@Studio_k3)": {
-        "subs": 12,
-        "views": 435
+        "subs": 13,
+        "views": 448
       },
       "플리-MBB": {
-        "subs": 1,
-        "views": 49
+        "subs": 2,
+        "views": 52
       },
       "플리-카페음악(Starbucksvibes)": {
-        "subs": 3,
-        "views": 51
+        "subs": 4,
+        "views": 52
       },
       "발명(INVENTION_TIMES)": {
         "subs": 1,
-        "views": 12
+        "views": 15
       },
       "건강-영어(HealthClinicTV)": {
         "subs": 0,
@@ -240,8 +240,8 @@
         "views": 14
       },
       "우주(NASA_SPACE_TIMES)": {
-        "subs": 2,
-        "views": 5
+        "subs": 3,
+        "views": 7
       },
       "역사(HISTORY_TODAY_TIMES)": {
         "subs": 0,
@@ -273,11 +273,11 @@
       },
       "무성영화(SILENT_ERA_TIMES)": {
         "subs": 1,
-        "views": 6
+        "views": 9
       },
       "K-pop(kpop_studio7)": {
-        "subs": 3,
-        "views": 227
+        "subs": 4,
+        "views": 266
       }
     },
     "tiktok": {
@@ -349,5 +349,5 @@
       }
     }
   },
-  "updated_at": "2026-08-23 07:42:24"
+  "updated_at": "2026-08-24 07:41:48"
 }
