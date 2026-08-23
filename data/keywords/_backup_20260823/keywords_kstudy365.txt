@@ -1,18 +1,6 @@
-Ajou University Frontier Scholarship S	Admissions
-Ajou University Global Scholarship 1	Scholarships
-Ajou University Special Scholarship E	Application Process
-Ajou University Academic Excellence Scholarship 1	Admissions
-AISA 200,000 Won Scholarship	Scholarships
-AISA International Student Grant	Application Process
-KAIST Electrical Engineering Scholarship	Admissions
-KAIST EE Scholarship Application	Scholarships
-KAIST EE Scholarship Financial Need	Application Process
-KAIST EE Scholarship Academic Performance	Admissions
-Korea University Result Announcement	Scholarships
-Korea University Registration Period	Application Process
-Korea University Application Form	Admissions
 Korea University Spring 2027 international admissions	Admissions
 Korea University application deadline August 31, 2026	Scholarships
+Korea University document submission deadline September 7, 2026	Application Process
 Korea University admission results November 27, 2026	Admissions
 Korea University application fee payment	Scholarships
 Korea University international admissions office hours	Application Process
@@ -48,3 +36,15 @@ Chungbuk National University scholarship for international students	Scholarships
 Chungbuk National University scholarship amount KRW 1,000,000	Application Process
 Chungbuk National University tuition waiver scholarship	Admissions
 Korea University Informatics Global Excellence Scholarship	Scholarships
+Korea University Informatics scholarship selection schedule	Application Process
+Korea University Informatics scholarship grade requirements	Admissions
+Korea University Informatics scholarship application deadline	Scholarships
+Korea University Informatics scholarship office hours	Application Process
+Korea University Informatics scholarship eligibility criteria	Admissions
+Kyungpook National University scholarship eligibility criteria	Scholarships
+Kyungpook National University scholarship application process	Application Process
+Ajou University GKS-UIC Scholarship	Admissions
+Ajou University GKS-UIC scholarship application deadline	Scholarships
+Ajou University GKS-UIC scholarship eligibility criteria	Application Process
+Gyeongsang National University Future Global Leaders Program	Admissions
+Gyeongsang National University scholarship application deadline	Scholarships

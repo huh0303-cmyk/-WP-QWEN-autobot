@@ -1,50 +1,50 @@
-Samsung Electronics shareholder return plan	Korea Stocks
-KOSPI index above 7,000	Korea Funds & ETF
-KOSDAQ market volatility	Crypto & Digital
-South Korea single-stock leveraged ETFs	Korea Stocks
-Korea Exchange buy sidecar	Korea Funds & ETF
-Bitcoin price surge	Crypto & Digital
-Korea crypto stocks rally	Korea Stocks
-Samsung Electronics stock performance	Korea Funds & ETF
-SK hynix stock performance	Crypto & Digital
-KOSPI index near 8,000	Korea Stocks
-South Korea AI financial services	Korea Funds & ETF
-KOSPI index record high	Crypto & Digital
-Korea Exchange market intervention	Korea Stocks
-Bitcoin price above $70,000	Korea Funds & ETF
-Korea crypto market growth	Crypto & Digital
-Samsung Electronics dividend announcement	Korea Stocks
-SK hynix earnings report	Korea Funds & ETF
-Korea Exchange trading halt	Crypto & Digital
-KOSDAQ outperforms KOSPI after ETF rule changes	Korea Stocks
-KOSDAQ index hits 780.72 points	Korea Funds & ETF
-KOSDAQ gains 5.88% amid ETF regulation	Crypto & Digital
-KOSDAQ rallies on tightened ETF rules	Korea Stocks
-KOSDAQ leads market after ETF restrictions	Korea Funds & ETF
-KOSDAQ index rises 5.88% amid ETF regulation	Crypto & Digital
-KOSDAQ gains 5.88% on ETF rule changes	Korea Stocks
-KOSDAQ index hits 780.72 points amid ETF regulation	Korea Funds & ETF
-KOSDAQ index hits 854.47 points	Crypto & Digital
-Samsung Electronics stock up 7.07%	Korea Stocks
-SK hynix shares rise 10.60%	Korea Funds & ETF
-KOSPI index at 6,806.03 points	Crypto & Digital
-KOSDAQ index rises 5.88% on ETF rule changes	Korea Stocks
-KOSDAQ rebounds sharply as leverage funds exit 'Samsung Electronics-Nix'	Korea Funds & ETF
-KOSPI stabilizes around 6,900 level	Crypto & Digital
-KOSDAQ turns lower after initial gains	Korea Stocks
-KOSPI sinks below 6,300 as institutions sell	Korea Funds & ETF
-KOSDAQ jumps over 5% amid market volatility	Crypto & Digital
-KOSPI rebounds as AI, semiconductor rally lift Korea stocks	Korea Stocks
-KOSPI jumps as AI, semiconductor rally and foreign buying lift Korea stocks	Korea Funds & ETF
-KOSPI index surges 4.8%, triggering buy sidecar	Crypto & Digital
-KOSPI index surges 4.8%, prompting buy sidecar activation	Korea Stocks
-KOSPI bull market 2026	Korea Stocks
-Korea semiconductor export data	Korea Stocks
-Kosdaq biotech stocks	Korea Stocks
-Hanwha Aerospace stock	Korea Stocks
-Hanwha Ocean shipbuilding stock	Korea Stocks
-HD Hyundai Heavy Industries stock	Korea Stocks
-Korea nuclear power stocks	Korea Stocks
-KB Financial Group stock	Korea Stocks
-Shinhan Financial Group stock	Korea Stocks
-Korea circuit breaker trading halt	Korea Stocks
+Samsung Electronics share buyback	Korea Stocks
+SK Hynix shareholder return	Korea Funds & ETF
+KOSPI 6,900-point threshold	Crypto & Digital
+KOSDAQ 800-point support	Korea Stocks
+KOSPI 5.89% surge	Korea Funds & ETF
+KOSPI 4.58% decline	Crypto & Digital
+KOSPI 3.76% increase	Korea Stocks
+KOSPI 0.74% gain	Korea Funds & ETF
+KOSPI 0.88% rise	Crypto & Digital
+KOSPI 0.9% drop	Korea Stocks
+KOSDAQ 4.63% fall	Korea Funds & ETF
+KOSDAQ 0.12% rise	Crypto & Digital
+KOSDAQ 0.30% decline	Korea Stocks
+KOSDAQ 0.49% increase	Korea Funds & ETF
+KOSDAQ 7.3% drop	Crypto & Digital
+KOSDAQ 6.14% gain	Korea Stocks
+SK Hynix announces $28.8 billion buyback	Korea Funds & ETF
+KOSPI nears 7,000-point threshold	Crypto & Digital
+KOSDAQ maintains 800-point level	Korea Stocks
+Foreign investors net sell KOSPI	Korea Funds & ETF
+KOSPI declines 4.58% amid sell-off	Crypto & Digital
+KOSPI rises 3.76% on foreign buying	Korea Stocks
+KOSPI triggers buy-sidecar mechanism	Korea Funds & ETF
+KOSPI surges nearly 5% in July	Crypto & Digital
+KOSDAQ regains 840-point level	Korea Stocks
+KOSPI hits 7,643.04 in July	Korea Funds & ETF
+South Korea blocks Polymarket	Crypto & Digital
+Polymarket labeled illegal gambling	Korea Stocks
+South Korea deploys AI crypto surveillance	Korea Funds & ETF
+FSC tightens VASP registration rules	Crypto & Digital
+South Korea eliminates crypto travel rule threshold	Korea Stocks
+FSC strengthens VASP registration requirements	Korea Funds & ETF
+South Korea's crypto regulation updates	Crypto & Digital
+KOSPI falls to 2,519.85 on August 17, 2023	Korea Stocks
+KOSDAQ surges over 5% amid KOSPI decline	Korea Funds & ETF
+HLB, SPG, Peptron stocks surge over 50% in KOSDAQ	Crypto & Digital
+Samsung Electronics and SK Hynix decline amid AI sell-off	Korea Stocks
+Kiwoom Asset Management launches AI and Power Semiconductors ETFs	Korea Funds & ETF
+Kiwoom Asset Management introduces AI-focused semiconductor ETFs	Crypto & Digital
+South Korea's ETF investors shift funds abroad amid leverage rules	Korea Stocks
+South Korea tightens single-stock leverage rules affecting ETFs	Korea Funds & ETF
+South Korea's KOSPI index at 2,562.1 in August 2023	Crypto & Digital
+South Korea's KOSDAQ index at 904.5 in August 2023	Korea Stocks
+South Korea's foreign stock ownership at 31.6% in August 2023	Korea Funds & ETF
+South Korea's foreign exchange rate at 1,321.8 won per USD in August 2023	Crypto & Digital
+South Korea's foreign exchange rate at 181.2 won per 100 JPY in August 2023	Korea Stocks
+South Korea's foreign exchange rate at 905.5 won per 100 CNY in August 2023	Korea Funds & ETF
+South Korea's KOSPI index at 2,525.64 on August 16, 2023	Crypto & Digital
+South Korea's KOSPI index at 2,537.68 on August 24, 2023	Korea Stocks
+South Korea's KOSPI index at 2,570.87 on August 14, 2023	Korea Funds & ETF

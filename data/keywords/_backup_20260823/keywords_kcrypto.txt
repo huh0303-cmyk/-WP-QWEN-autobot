@@ -1,10 +1,3 @@
-BitGo Korea VASP registration	Exchanges
-Coinbase Bithumb acquisition	Investing
-Upbit Bithumb revenue decline	Regulations
-South Korea crypto tax 2027	Exchanges
-Polymarket banned Korea	Investing
-FSC VASP registration rules	Regulations
-Korean crypto market volume drop	Exchanges
 BitGo Korea VASP license approval	Exchanges
 BitGo Korea institutional custody services	Exchanges
 BitGo Korea Hana Financial SK Telecom partnership	Exchanges
@@ -16,6 +9,7 @@ South Korea VASP registration updates August 202	Regulations
 Upbit trading volume surge August 2026	Exchanges
 Upbit 273% trading volume increase	Investing
 Upbit South Korea crypto market rebound	Regulations
+Mirae Asset Korbit acquisition August 2026	Exchanges
 Mirae Asset $35 million Korbit investment	Investing
 Mirae Asset Korbit capital increase August 2026	Regulations
 Ripple Jeonbuk Bank partnership August 2026	Exchanges
@@ -48,3 +42,9 @@ Korea crypto exchange real-name account bank	Exchanges
 Korea won stablecoin issuer license	Exchanges
 Upbit token listing review process	Exchanges
 Korea crypto exchange customer protection fund	Exchanges
+Bithumb Vietnam expansion SSI Digital	Exchanges
+Korea crypto exchange KYC requirements	Exchanges
+Korea five major bank crypto exchange partnership	Exchanges
+Korea crypto exchange trading fee comparison	Exchanges
+Upbit Bithumb market share 2026	Exchanges
+Korea Bitcoin spot ETF approval status	Investing

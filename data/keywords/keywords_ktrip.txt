@@ -1,50 +1,50 @@
-Climate Card Plus replacement	Transport & Admission
-Climate Card Plus K-Pass system	Itineraries
-Climate Card Plus tourist passes	Seasonal Travel
-Climate Card Plus short-term passes	Stays & Lodging
-Climate Card Plus 2026 updates	Transport & Admission
-Climate Card Plus Seoul transit	Itineraries
-Climate Card Plus K-Pass customer service	Seasonal Travel
-Climate Card Plus K-Pass press release	Stays & Lodging
-Climate Card Plus K-Pass official website	Transport & Admission
-Climate Card Plus K-Pass support center	Itineraries
-Climate Card Plus K-Pass troubleshooting guide	Seasonal Travel
-Climate Card Plus K-Pass user manual	Stays & Lodging
-Climate Card Plus K-Pass features list	Transport & Admission
-Climate Card Plus K-Pass activation code	Itineraries
-Climate Card Plus K-Pass loyalty program	Seasonal Travel
-Climate Card Plus K-Pass case study	Stays & Lodging
-Climate Card Plus K-Pass success story	Transport & Admission
-Climate Card Plus K-Pass feedback form	Itineraries
-KTX SRT 통합 운행	Seasonal Travel
-KTX SRT 운임 인하	Stays & Lodging
-KTX SRT 좌석 증가	Transport & Admission
-KTX SRT 환승 할인	Itineraries
-KTX SRT 마일리지 적립	Seasonal Travel
-KTX SRT 예매 앱 통합	Stays & Lodging
-KTX SRT 노선 조정	Transport & Admission
-KTX SRT 운행 횟수 증가	Itineraries
-KTX SRT 열차 증편	Seasonal Travel
-KTX SRT 출발역 유연성	Stays & Lodging
-KTX SRT 운행 차량 효율화	Transport & Admission
-KTX SRT 공급 좌석 확대	Itineraries
-KTX SRT 열차 운행 계획	Seasonal Travel
-T-money card guide 2026	Transport & Admission
-KR Pass unlimited rail 2026	Transport & Admission
-KTX booking foreigner guide	Transport & Admission
-Korea Travel Card prepaid	Transport & Admission
-Namane Card KB Bank	Transport & Admission
-Gyeongbokgung admission price 2026	Transport & Admission
-Gyeongbokgung night viewing tickets	Transport & Admission
-Gyeongbokgung guided tour reservation	Transport & Admission
-Seoul subway line 2 3 4 5 guide	Transport & Admission
-Korail Talk app booking	Transport & Admission
-Changdeokgung Secret Garden reservation	Transport & Admission
-Korea airport limousine bus guide	Transport & Admission
-Seoul city tour bus pass	Transport & Admission
-Seoul 3 day subway itinerary	Itineraries
-Busan 2 day itinerary train	Itineraries
-Jeju 4 day itinerary	Itineraries
-Gyeongju day trip itinerary	Itineraries
-Incheon airport to Seoul itinerary	Itineraries
-Nami Island day trip guide	Itineraries
+KORAIL Chuseok ticket sales	Transport & Admission
+KORAIL+ app train reservations	Itineraries
+Chuseok holiday train schedules	Seasonal Travel
+KORAIL priority ticketing for seniors	Stays & Lodging
+Pregnant women Chuseok train tickets	Transport & Admission
+Gyeongbokgung Palace free admission	Itineraries
+Hanbok rental discounts Gyeongbokgung	Seasonal Travel
+August 15 Liberation Day events	Stays & Lodging
+Seoul Philharmonic Beethoven performance	Transport & Admission
+Banpo Hangang Park Moonlight Rainbow Fountain	Itineraries
+Jeju Island August travel tips	Seasonal Travel
+KTX to Busan flight comparison	Stays & Lodging
+Late August Korea travel advantages	Transport & Admission
+August 2026 Korea weather forecast	Itineraries
+Korea summer monsoon season	Seasonal Travel
+Korea Liberation Day holiday closures	Stays & Lodging
+August 2026 Korea travel advisories	Transport & Admission
+Korea August 2026 hotel prices	Itineraries
+Korea August 2026 flight deals	Seasonal Travel
+Korea August 2026 tourist attractions	Stays & Lodging
+Korea August 2026 cultural events	Transport & Admission
+Korea August 2026 food festivals	Itineraries
+Korea August 2026 beach activities	Seasonal Travel
+Korea August 2026 hiking trails	Stays & Lodging
+Korea August 2026 art exhibitions	Transport & Admission
+Korea August 2026 theater performances	Itineraries
+Korea August 2026 film screenings	Seasonal Travel
+Korea August 2026 fireworks displays	Stays & Lodging
+Korea August 2026 night markets	Transport & Admission
+Korea August 2026 cooking classes	Itineraries
+Korea August 2026 language courses	Seasonal Travel
+Korea August 2026 photography tours	Stays & Lodging
+Korea August 2026 tea ceremonies	Transport & Admission
+Korea August 2026 kimchi making classes	Itineraries
+Korea August 2026 hanbok wearing experience	Seasonal Travel
+Korea August 2026 temple stays	Stays & Lodging
+Korea August 2026 fishing trips	Transport & Admission
+Korea August 2026 river cruises	Itineraries
+Korea August 2026 hot air balloon rides	Seasonal Travel
+Korea August 2026 zip line adventures	Stays & Lodging
+Korea August 2026 bungee jumping	Transport & Admission
+Korea August 2026 scuba diving	Itineraries
+Korea August 2026 surfing lessons	Seasonal Travel
+Korea August 2026 rock climbing	Stays & Lodging
+Korea August 2026 horseback riding	Transport & Admission
+Korea August 2026 table tennis	Itineraries
+KTX 호남선 증편 운행	Seasonal Travel
+KTX·SRT 통합 운임 인하	Stays & Lodging
+코레일+ 앱 출시	Transport & Admission
+코레일+ 앱 외국인 예매	Itineraries

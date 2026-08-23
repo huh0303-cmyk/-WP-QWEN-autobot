@@ -1,50 +1,50 @@
-foreign corporation tax Korea	Business Setup
-K-ETA exemption countries August 2026	Tax Filing
-Seoul resident tax payment August 2026	Visa
-F-2-R visa language requirement reduction	Business Setup
-VAT registration foreign-owned companies Korea	Tax Filing
-reverse-charge VAT foreign corporation Korea	Visa
-Korean tax law amendments August 2026	Business Setup
-foreign land purchase residency requirement Korea	Tax Filing
-K-ETA entry rules by nationality August 2026	Visa
-foreign trust reporting obligation Korea	Business Setup
-exit tax expansion South Korea 2026	Tax Filing
-residency rules update South Korea 2026	Visa
-automated immigration screening 42 nationalities	Business Setup
-foreign worker visa policy changes Korea	Tax Filing
-regional visa policy amendments August 2026	Visa
-Top-Tier visa expansion Korea 2026	Business Setup
+Top-Tier visa expansion	Business Setup
 E-7-M visa experience waiver	Tax Filing
-Manufacturing visa route Korea	Visa
-Regional residence track Korea	Business Setup
-e-visa processing Korea 2026	Tax Filing
-Digital Nomad Visa F-1-D South Korea	Visa
-Corporate tax deadline extension Geoje Tongyeong August 2026	Business Setup
-Corporate tax payment deadline extension November 2026	Tax Filing
-Corporate tax payment deadline extension small businesses	Visa
-Corporate tax payment deadline extension heavy rain	Business Setup
-Corporate tax payment deadline extension National Tax Service	Tax Filing
-Corporate tax payment deadline extension without application	Visa
-Corporate tax payment deadline extension for 1200 companies	Business Setup
-Corporate tax payment deadline extension for small and midsize companies	Tax Filing
-Corporate tax payment deadline extension for rain-hit companies	Visa
-Corporate tax payment deadline extension for affected SMEs	Business Setup
-Corporate tax payment deadline extension for companies in Geoje and Tongyeong	Tax Filing
-Corporate tax payment deadline extension for companies affected by heavy rain	Visa
-Corporate tax payment deadline extension for SMEs affected by disaster	Business Setup
-Corporate tax payment deadline extension for SMEs affected by torrential rain	Tax Filing
-Korea LLC setup cost 2026	Business Setup
-Korea branch office registration foreigner	Business Setup
-Korea business registration foreigner 2026	Business Setup
-Korea sole proprietorship vs corporation	Business Setup
-Korea foreign-invested company FDI registration	Business Setup
-Korea startup visa business plan requirements	Business Setup
-Korea online business registration foreigners	Business Setup
-Korea corporate bank account foreigner	Business Setup
-Korea business license renewal 2026	Business Setup
-Korea representative office setup	Business Setup
-Korea free economic zone foreign business	Business Setup
-Korea Foreign Investment Promotion Act 2026	Business Setup
-Korea small business registration foreigner	Business Setup
-Korea e-commerce business license foreigner	Business Setup
-Korea import export business license	Business Setup
+New manufacturing visa route	Visa
+Regional residence visa track	Business Setup
+E-visa processing for foreign workers	Tax Filing
+F-2-R visa for foreign residents	Visa
+F-1-D workation visa launch	Business Setup
+Eased D-4 visa requirements	Tax Filing
+F-2-R visa for depopulated areas	Visa
+Automated immigration screening expansion	Business Setup
+Top-Tier visa for science professors	Tax Filing
+F-2-R visa for skilled workers	Visa
+Digital nomad visa income threshold	Business Setup
+F-1-D visa for remote workers	Tax Filing
+F-2-R visa for small businesses	Visa
+Automated immigration for EU citizens	Business Setup
+Top-Tier visa for tech talent	Tax Filing
+E-7-M visa for corporate personnel	Visa
+Manufacturing visa for foreign investors	Business Setup
+Digital nomad visa for young applicants	Tax Filing
+F-1-D visa for international students	Visa
+Eased D-4 visa for language learners	Business Setup
+Automated immigration for 42 nationalities	Tax Filing
+Top-Tier visa for international researchers	Visa
+E-7-M visa for foreign engineers	Business Setup
+Regional residence visa for foreign investors	Tax Filing
+Digital nomad visa for remote workers	Visa
+F-1-D visa for digital nomads	Business Setup
+Eased D-4 visa for cultural trainees	Tax Filing
+Top-Tier visa for foreign scientists	Visa
+Digital nomad visa for foreign employees	Business Setup
+Eased D-4 visa for foreign students	Tax Filing
+Automated immigration for foreign nationals	Visa
+F-1-D visa for foreign professionals	Business Setup
+Foreigners' unpaid taxes in Seoul	Tax Filing
+Virtual assets in overseas accounts	Visa
+Illegal property transactions by foreigners	Business Setup
+Revised tax laws for overseas earnings	Tax Filing
+Tax revenue decline amid property slump	Visa
+Installment payment of local income tax	Business Setup
+Tax reform proposals for 2023	Tax Filing
+VAT registration for foreign suppliers	Visa
+Tax compliance tightening in Korea	Business Setup
+Overseas fund inflow violations	Tax Filing
+Visa leasing business violations	Visa
+Corporate tax revision bill announced	Business Setup
+Tax reform bill submitted to National Assembly	Tax Filing
+Tax reform bill approved by Cabinet	Visa
+Korea's 2026 Tax Reform Clarifies VAT on Foreign-Company Services	Business Setup
+Korea's 2026 Tax Reform Plan Reworks Cross-Border VAT	Tax Filing

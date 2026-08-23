@@ -1,11 +1,46 @@
+Ulsan underwater data center	AI
+KIOST AI data center	Semiconductors
+SK Telecom GPU servers	Startups
+SK Telecom AI investment	AI
+Anthropic AI funding	Semiconductors
+SK Telecom Anthropic partnership	Startups
+South Korea AI chip industry	AI
+Ulsan subsea servers	Semiconductors
+Ulsan AI data center project	Startups
+Samsung AI6 chip production	AI
+Samsung Pyeongtaek facility	Semiconductors
+Samsung Texas foundry	Startups
+Nvidia H200 export controls	AI
+SMIC record revenues	Semiconductors
+LG LDI tool shipment	Startups
+Optical component market growth	AI
+AMD South Korea partnership	Semiconductors
+AMD AI Center of Excellence	Startups
+AMD heterogeneous computing	AI
+South Korea AI research GPU	Semiconductors
+South Korea AI data center race	Startups
+South Korea AI data center power efficiency	AI
+Ulsan AI data center cooling system	AI
+Ulsan AI data center modular design	AI
+Ulsan AI data center carbon neutrality	AI
+Ulsan AI data center GPU operations	AI
+Ulsan AI data center server management	AI
+Ulsan AI data center ocean temperatures	AI
+Ulsan AI data center KIOST partnership	AI
+Ulsan AI data center SK Telecom role	AI
+Ulsan AI data center expansion plans	AI
+Ulsan AI data center environmental impact	AI
+Ulsan AI data center technological innovation	AI
+Ulsan AI data center industry collaboration	AI
+Ulsan AI data center research and development	AI
+Ulsan AI data center operational efficiency	AI
+Ulsan AI data center sustainability efforts	AI
+Ulsan AI data center project future plans	AI
 Samsung SK hynix $520 billion investment	AI
 South Korea AI data centers	Semiconductors
 AMD Korea AI partnership	Startups
-Korea AI chip boom	AI
 Korea AI action plan	Semiconductors
 Korea AI computing ecosystem	Startups
-Korea semiconductor fund	AI
-Korea AI infrastructure investment	Semiconductors
 Korea AI talent development	Startups
 Korea AI standards development centers	AI
 South Korea GPU reliance	Semiconductors
@@ -13,38 +48,3 @@ South Korea launches open AI computing ecosystem	Startups
 Korean-US tech giants $950B semiconductor AI pact	AI
 South Korea $3.5B semiconductor fund	Semiconductors
 South Korea semiconductor special law	Startups
-South Korea AI action plan 2026-2028	AI
-Bank of Korea semiconductor boom	Semiconductors
-South Korea semiconductor cluster development	Startups
-Naver Nvidia 1 billion investment 2026	AI
-Naver AI factory gigawatt 2026	AI
-Korea sovereign AI infrastructure 2026	AI
-Naver Nvidia Brookfield AI factory	AI
-Samsung Naver Mach 1 chip deal	AI
-Korea AI data center investment 2026	AI
-Korea K-Nvidia initiative	AI
-Korea National Growth Fund AI semiconductor	AI
-Naver AI agent monetization 2026	AI
-Korea generative AI adoption 2026	AI
-SK Group GS Group AI data center	AI
-Korea AI regulation framework 2026	AI
-Korea AI chip export strategy	AI
-Naver Clova AI model 2026	AI
-Korea AI computing demand 2026	AI
-Korea government AI investment trillion won	AI
-Korea sovereign AI model development	AI
-Samsung SK Hynix 520 billion chip investment	Semiconductors
-Samsung HBM4 mass production 2026	Semiconductors
-SK Hynix AI memory chip demand 2026	Semiconductors
-Korea DRAM market share 2026	Semiconductors
-US chip equipment export approval Korea 2026	Semiconductors
-Samsung SK Hynix China chip equipment license	Semiconductors
-Korea semiconductor mega cluster investment	Semiconductors
-Korea NAND flash market share 2026	Semiconductors
-Samsung foundry news 2026	Semiconductors
-SK Hynix HBM supply Nvidia	Semiconductors
-Korea chip subsidy policy 2026	Semiconductors
-Korea semiconductor export data 2026	Semiconductors
-Samsung Electronics chip plant expansion	Semiconductors
-Korea memory chip price 2026	Semiconductors
-Korea semiconductor equipment tariff news	Semiconductors
