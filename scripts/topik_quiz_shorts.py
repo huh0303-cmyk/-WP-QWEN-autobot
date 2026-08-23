@@ -483,7 +483,9 @@ def build_item_clip(item, idx, total, workdir, header_text="토픽 단어 (초�
     ding_clip = os.path.join(workdir, f"clip_ding_{idx}.mp4")
     still_clip(a_frame, ding_path, ding_clip)
 
-    return [q_clip, ding_clip, a_clip]
+    # a_frame(정답 공개 카드)은 문제+정답이 한 장에 다 보여서, 인스타그램/쓰레드
+    # 카드뉴스(캐러셀) 게시용 정지 이미지로 그대로 재사용한다.
+    return [q_clip, ding_clip, a_clip], a_frame
 
 
 def concat_clips(clip_paths, out_path, workdir):
@@ -573,9 +575,12 @@ def main():
 
     log("2/3 문항별 이미지+나레이션+카드 생성 중...")
     all_clips = []
+    card_image_paths = []
     for idx, item in enumerate(items):
         log(f"   [{idx+1}/{n}] {item['correct']}")
-        all_clips.extend(build_item_clip(item, idx, n, WORKDIR, header_text=header_text))
+        clips, card_path = build_item_clip(item, idx, n, WORKDIR, header_text=header_text)
+        all_clips.extend(clips)
+        card_image_paths.append(card_path)
 
     log("3/3 최종 영상 이어붙이는 중...")
     final_path = os.path.join(WORKDIR, "final.mp4")
@@ -595,6 +600,7 @@ def main():
     now = datetime.now(timezone(timedelta(hours=9)))
 
     public_video_url = None
+    card_image_urls = []
     if all([GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET,
             GOOGLE_OAUTH_REFRESH_TOKEN, GDRIVE_FOLDER_ID]):
         log("업로드 중...")
@@ -603,6 +609,13 @@ def main():
         drive_info = upload_to_drive(service, final_path, GDRIVE_FOLDER_ID, name, make_public=True)
         public_video_url = drive_info.get("directLink")
         log(f"🎉 드라이브 업로드 완료 — {drive_info.get('webViewLink')}")
+
+        log("카드뉴스 이미지 업로드 중... (인스타그램/쓰레드 캐러셀용)")
+        for i, card_path in enumerate(card_image_paths):
+            card_name = f"topik_quiz_{target_lang}_{now.strftime('%Y%m%d_%H%M%S')}_card{i+1}.png"
+            card_info = upload_to_drive(service, card_path, GDRIVE_FOLDER_ID, card_name, make_public=True)
+            if card_info.get("directLink"):
+                card_image_urls.append(card_info["directLink"])
     else:
         log("드라이브 업로드 설정 없음 — 로컬 파일만 생성됨")
 
@@ -613,6 +626,8 @@ def main():
         "video_path": final_path,
         "duration_sec": dur,
         "public_video_url": public_video_url,
+        "card_image_paths": card_image_paths,
+        "card_image_urls": card_image_urls,
         "youtube_title": copy.get("youtube_title", header_text),
         "youtube_description": copy.get("youtube_description", ""),
         "short_caption": copy.get("short_caption", ""),
