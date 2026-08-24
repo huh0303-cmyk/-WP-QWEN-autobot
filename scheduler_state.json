@@ -1,4 +1,6 @@
 {
   "date": "2026-08-25",
-  "fired": {}
+  "fired": {
+    "https://k-health365.com": true
+  }
 }
