@@ -148,12 +148,6 @@ AUTHOR_BY_SITE_DEF = {
         "slug": "ktech365-com-desk",
         "bio": "Korea Technology Industry Desk. Source-checked information within this site's stated editorial scope."
     },
-    "kskin365.com": {
-        "name": "Retired Site",
-        "email": "editor@kskin365.com",
-        "slug": "kskin365-com-desk",
-        "bio": "Retired Site. Source-checked information within this site's stated editorial scope."
-    },
     "oliveyoungkorea.com": {
         "name": "Olive Young Shopping Guide Desk",
         "email": "editor@oliveyoungkorea.com",
@@ -895,16 +889,6 @@ SITE_PERSONA = {
         "lang": "en",
         "cta": "Read the related technology explainer"
     },
-    "https://kskin365.com": {
-        "persona_en": "Retired site.",
-        "scope": "No new content",
-        "tone": "No publication.",
-        "structure": [],
-        "min_chars": 0,
-        "tables": 0,
-        "lang": "en",
-        "cta": ""
-    },
     "https://oliveyoungkorea.com": {
         "persona_en": "Olive Young Shopping Guide editorial desk.",
         "scope": "Ingredient-led product selection, availability and shopping logistics at Olive Young for international shoppers",
@@ -1295,7 +1279,6 @@ SITES_CONFIG = [
     {"url":"https://koreacrypto365.com",     "lang":"en","theme":"Crypto",               "mode":"blog",      "keywords_file":"data/keywords/keywords_kcrypto.txt",        "wp_pass_env":"KOREACRYPTO365COM",    "daily":1,"publish_every_n_days":1},
     {"url":"https://krealestate365.com",     "lang":"en","theme":"Korea Real Estate",    "mode":"blog",      "keywords_file":"data/keywords/keywords_krealestate.txt",    "wp_pass_env":"KREALESTATE365COM",    "daily":1,"publish_every_n_days":1},
     {"url":"https://ktech365.com",           "lang":"en","theme":"Technology",           "mode":"blog",      "keywords_file":"data/keywords/keywords_ktech.txt",          "wp_pass_env":"KTECH365COM",          "daily":1,"publish_every_n_days":1},
-    {"url":"https://kskin365.com",           "lang":"en","theme":"K-Beauty",             "mode":"blog",      "keywords_file":"data/keywords/keywords_kskin.txt",          "wp_pass_env":"KSKIN365COM",          "daily":1,"publish_every_n_days":1},
     {"url":"https://oliveyoungkorea.com",    "lang":"en","theme":"K-Beauty Reviews",     "mode":"blog",      "keywords_file":"data/keywords/keywords_oliveyoung.txt",     "wp_pass_env":"OLIVEYOUNGKOREACOM",   "daily":1,"publish_every_n_days":1},
     {"url":"https://kworld365.com",          "lang":"en","theme":"K-POP",               "mode":"blog",      "keywords_file":"data/keywords/keywords_kworld.txt",         "wp_pass_env":"KWORLD365COM",         "daily":1,"publish_every_n_days":1},
     {"url":"https://k-trip365.com",          "lang":"en","theme":"Travel",              "mode":"blog",      "keywords_file":"data/keywords/keywords_ktrip.txt",          "wp_pass_env":"KTRIP365COM",          "daily":1,"publish_every_n_days":1},
@@ -1363,7 +1346,6 @@ SITE_INTERNAL_LINKS = {
     "https://koreacrypto365.com":[("Crypto Guide","https://koreacrypto365.com"),("Bitcoin","https://koreacrypto365.com/?s=bitcoin"),("Regulation","https://koreacrypto365.com/?s=regulation"),("DeFi","https://koreacrypto365.com/?s=DeFi"),("Exchanges","https://koreacrypto365.com/?s=exchange")],
     "https://krealestate365.com":[("부동산 정보","https://krealestate365.com"),("아파트","https://krealestate365.com/?s=아파트"),("청약","https://krealestate365.com/?s=청약"),("전세","https://krealestate365.com/?s=전세"),("정책","https://krealestate365.com/?s=정책")],
     "https://ktech365.com":[("Tech News","https://ktech365.com"),("AI","https://ktech365.com/?s=AI"),("Semiconductor","https://ktech365.com/?s=semiconductor"),("Startup","https://ktech365.com/?s=startup"),("EV Battery","https://ktech365.com/?s=EV")],
-    "https://kskin365.com":[("K-Beauty Guide","https://kskin365.com"),("Skincare","https://kskin365.com/?s=skincare"),("Products","https://kskin365.com/?s=products"),("Anti-Aging","https://kskin365.com/?s=anti-aging"),("Ingredients","https://kskin365.com/?s=ingredients")],
     "https://oliveyoungkorea.com":[("K-Beauty Reviews","https://oliveyoungkorea.com"),("Skincare Reviews","https://oliveyoungkorea.com/?s=skincare"),("Makeup","https://oliveyoungkorea.com/?s=makeup"),("Budget Picks","https://oliveyoungkorea.com/?s=budget"),("Olive Young","https://oliveyoungkorea.com/?s=olive+young")],
     "https://kworld365.com":[("K-POP News","https://kworld365.com"),("BTS","https://kworld365.com/?s=BTS"),("BLACKPINK","https://kworld365.com/?s=BLACKPINK"),("New Releases","https://kworld365.com/?s=new+release"),("Concert","https://kworld365.com/?s=concert")],
     "https://k-trip365.com":[("Korea Travel","https://k-trip365.com"),("Seoul","https://k-trip365.com/?s=Seoul"),("Jeju","https://k-trip365.com/?s=Jeju"),("Hiking","https://k-trip365.com/?s=hiking"),("Food","https://k-trip365.com/?s=food")],
@@ -1397,12 +1379,11 @@ CROSS_LINKS = {
     "https://koreataxnlaw.com":[("Finance","https://kfinance365.com"),("Insurance","https://koreainsurance365.com"),("Visa","https://k-visa365.com")],
     "https://koreacrypto365.com":[("Finance","https://kfinance365.com"),("Investment","https://koreainvest365.com"),("Tax","https://koreataxnlaw.com")],
     "https://krealestate365.com":[("한국 투자","https://koreainvest365.com"),("한국 금융","https://kfinance365.com"),("한국 뉴스","https://koreanews365.com")],
-    "https://korea365.org":[("Travel","https://k-trip365.com"),("K-Beauty","https://kskin365.com"),("K-POP","https://kworld365.com"),("Wedding","https://koreawedding365.com")],
+    "https://korea365.org":[("Travel","https://k-trip365.com"),("K-POP","https://kworld365.com"),("Wedding","https://koreawedding365.com")],
     "https://k-trip365.com":[("Korea Culture","https://korea365.org"),("Visa","https://k-visa365.com"),("Medical Tourism","https://koreamedicaltour.com"),("Wedding","https://koreawedding365.com")],
-    "https://koreawedding365.com":[("Travel","https://k-trip365.com"),("K-Beauty","https://kskin365.com"),("Korea Culture","https://korea365.org")],
-    "https://kskin365.com":[("K-Beauty Reviews","https://oliveyoungkorea.com"),("Medical Tourism","https://koreamedicaltour.com"),("Korea Culture","https://korea365.org")],
-    "https://oliveyoungkorea.com":[("K-Beauty Guide","https://kskin365.com"),("Korea Culture","https://korea365.org"),("Medical Tourism","https://koreamedicaltour.com")],
-    "https://kworld365.com":[("Korea Culture","https://korea365.org"),("K-Beauty","https://kskin365.com"),("Travel","https://k-trip365.com")],
+    "https://koreawedding365.com":[("Travel","https://k-trip365.com"),("Korea Culture","https://korea365.org")],
+    "https://oliveyoungkorea.com":[("Korea Culture","https://korea365.org"),("Medical Tourism","https://koreamedicaltour.com")],
+    "https://kworld365.com":[("Korea Culture","https://korea365.org"),("Travel","https://k-trip365.com")],
     "https://k-health365.com":[("의료관광","https://koreamedicaltour.com"),("보험","https://koreainsurance365.com"),("한국 뉴스","https://koreanews365.com")],
     "https://koreamedicaltour.com":[("K-Health 365","https://k-health365.com"),("Visa","https://k-visa365.com"),("Travel","https://k-trip365.com"),("Insurance","https://koreainsurance365.com")],
     "https://ktech365.com":[("Finance","https://kfinance365.com"),("Investment","https://koreainvest365.com"),("Seoul Journal","https://theseouljournal.com")],

@@ -145,12 +145,6 @@ SITES = [
    ["semiconductor","chip","TSMC","fab","wafer","memory"],
    False, True, True),
 
-  ("https://kskin365.com","KSKIN365COM","en","K-뷰티","KSkin365 K-Beauty",
-   "Skincare","Ingredients","Routines",
-   ["ingredient","niacinamide","hyaluronic","retinol","vitamin C","peptide"],
-   ["routine","steps","morning","night","layering"],
-   False, True, True),
-
   ("https://oliveyoungkorea.com","OLIVEYOUNGKOREACOM","en","K-뷰티리뷰","Olive Young Korea",
    "인기상품 TOP30","Skincare","Wellness",
    ["skincare","toner","serum","moisturizer","sunscreen","essence","ampoule","cream"],
@@ -996,7 +990,6 @@ def audit_and_clean_posts(site_url: str, pw: str, lang: str, dry_run: bool = Fal
         "koreacrypto365.com": ["crypto","bitcoin","upbit","bithumb","exchange","거래소","blockchain","regulation","DeFi","NFT","coin","투자"],
         "krealestate365.com": ["부동산","아파트","전세","월세","매매","임대","대출","세금","상가","foreigner","real estate","property"],
         "ktech365.com": ["AI","tech","startup","semiconductor","chip","innovation","korea","technology","robot","digital","software"],
-        "kskin365.com": ["skincare","skin","beauty","K-beauty","ingredient","routine","serum","toner","moisturizer","sunscreen","korean"],
         "oliveyoungkorea.com": ["olive young","skincare","beauty","K-beauty","product","wellness","supplement","makeup","review","korean"],
         "kworld365.com": ["K-pop","artist","music","concert","tour","idol","album","BTS","BLACKPINK","kpop","entertainment"],
         "k-trip365.com": ["hotel","travel","korea","airbnb","accommodation","stay","trip","tour","tourism","booking","숙박","여행"],

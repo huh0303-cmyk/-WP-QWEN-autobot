@@ -35,7 +35,6 @@ SITES = [
     {"url": "https://koreacrypto365.com",     "wp_pass_env": "KOREACRYPTO365COM"},
     {"url": "https://krealestate365.com",     "wp_pass_env": "KREALESTATE365COM"},
     {"url": "https://ktech365.com",           "wp_pass_env": "KTECH365COM"},
-    {"url": "https://kskin365.com",           "wp_pass_env": "KSKIN365COM"},
     {"url": "https://oliveyoungkorea.com",    "wp_pass_env": "OLIVEYOUNGKOREACOM"},
     {"url": "https://kworld365.com",          "wp_pass_env": "KWORLD365COM"},
     {"url": "https://k-trip365.com",          "wp_pass_env": "KTRIP365COM"},
