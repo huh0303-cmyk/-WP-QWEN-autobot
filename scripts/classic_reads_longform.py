@@ -48,13 +48,19 @@ TARGET_WORD_COUNT = 1400  # ~9-10분 분량(영어 낭독 기준 ~150wpm)
 
 # 2026-08-23: 예전엔 Adam 목소리 하나로 고정이라, classic_reads/nasa/아카이브
 # 영상 채널(american_archive/history/invention/silent_era/retro_reels) 전부가
-# 항상 똑같은 목소리로 나갔음(사용자 지시로 다양성을 위해 3개 중 매 영상마다
-# 랜덤 하나로 변경). CLASSIC_READS_ELEVENLABS_VOICE_ID를 명시적으로 지정하면
-# 그 목소리로 강제 고정(기존 동작 유지), 안 지정하면 아래 3개 중 랜덤.
+# 항상 똑같은 목소리로 나갔음. 사용자 지시로, 다큐멘터리/히스토리 채널 톤에
+# 어울리는 ElevenLabs 프리메이드 보이스 5개 중 영상 하나 만들 때마다 랜덤
+# 하나로 변경. CLASSIC_READS_ELEVENLABS_VOICE_ID를 명시적으로 지정하면 그
+# 목소리로 강제 고정(기존 동작 유지), 안 지정하면 아래 5개 중 랜덤.
+# ⚠️ 전부 ElevenLabs 기본 제공 프리메이드 보이스 ID이지만, 이 계정에 실제로
+# 남아있는지는 이 세션에서 API 키로 직접 확인 못 했다 — 워크플로우 실행 로그에서
+# "TTS 실패"가 뜨는 보이스가 있으면 그 줄만 빼고 나머지로 계속 쓰면 됨.
 NARRATOR_VOICE_IDS = [
-    "pNInz6obpgDQGcFmaJgB",  # Adam — 깊고 차분한 남성
-    "ErXwobaYiN019PkySvjV",  # Antoni — 밸런스 잡힌 남성
-    "EXAVITQu4vr4xnSDxMaL",  # Bella — 부드러운 여성
+    "pNInz6obpgDQGcFmaJgB",  # Adam — 깊고 차분한 미국식 남성. 히스토리/다큐 나레이션 정석
+    "onwK4e9ZLuTAKqWW03F9",  # Daniel — 영국식, 중후한 뉴스앵커/다큐 톤
+    "N2lVS1w4EtoT3dr4eOWO",  # Callum — 허스키하고 강렬한 톤, 전쟁/사건 다큐에 어울림
+    "VR6AewLTigWG4xSOukaG",  # Arnold — 또렷하고 권위 있는 남성
+    "ErXwobaYiN019PkySvjV",  # Antoni — 밸런스 잡힌 따뜻한 남성
 ]
 VOICE_ID = os.environ.get("CLASSIC_READS_ELEVENLABS_VOICE_ID") or random.choice(NARRATOR_VOICE_IDS)
 
