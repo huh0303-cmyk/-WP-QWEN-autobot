@@ -10,7 +10,6 @@ SITES = [
     ("https://koreacrypto365.com", "KOREACRYPTO365COM", "active"),
     ("https://krealestate365.com", "KREALESTATE365COM", "active"),
     ("https://ktech365.com", "KTECH365COM", "active"),
-    ("https://kskin365.com", "KSKIN365COM", "retired"),
     ("https://oliveyoungkorea.com", "OLIVEYOUNGKOREACOM", "active"),
     ("https://kworld365.com", "KWORLD365COM", "active"),
     ("https://k-trip365.com", "KTRIP365COM", "active"),

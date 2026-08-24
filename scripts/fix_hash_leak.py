@@ -27,7 +27,6 @@ SITES = [
     {"url":"https://koreacrypto365.com","keywords_file":"data/keywords/keywords_kcrypto.txt","wp_pass_env":"KOREACRYPTO365COM"},
     {"url":"https://krealestate365.com","keywords_file":"data/keywords/keywords_krealestate.txt","wp_pass_env":"KREALESTATE365COM"},
     {"url":"https://ktech365.com","keywords_file":"data/keywords/keywords_ktech.txt","wp_pass_env":"KTECH365COM"},
-    {"url":"https://kskin365.com","keywords_file":"data/keywords/keywords_kskin.txt","wp_pass_env":"KSKIN365COM"},
     {"url":"https://oliveyoungkorea.com","keywords_file":"data/keywords/keywords_oliveyoung.txt","wp_pass_env":"OLIVEYOUNGKOREACOM"},
     {"url":"https://kworld365.com","keywords_file":"data/keywords/keywords_kworld.txt","wp_pass_env":"KWORLD365COM"},
     {"url":"https://k-trip365.com","keywords_file":"data/keywords/keywords_ktrip.txt","wp_pass_env":"KTRIP365COM"},
@@ -106,11 +105,6 @@ LEAKED_COMMENTS = {
         "AI",
         "Semiconductors",
         "Startups"
-    ],
-    "https://kskin365.com": [
-        "Ingredients",
-        "Routines",
-        "Skincare"
     ],
     "https://oliveyoungkorea.com": [
         "Skincare",

@@ -31,7 +31,7 @@ SITES = [
     ("https://koreainsurance365.com", "KOREAINSURANCE365COM"), ("https://kfinance365.com", "KFINANCE365COM"),
     ("https://koreataxnlaw.com", "KOREATAXNLAWCOM"), ("https://koreacrypto365.com", "KOREACRYPTO365COM"),
     ("https://krealestate365.com", "KREALESTATE365COM"), ("https://ktech365.com", "KTECH365COM"),
-    ("https://kskin365.com", "KSKIN365COM"), ("https://oliveyoungkorea.com", "OLIVEYOUNGKOREACOM"),
+    ("https://oliveyoungkorea.com", "OLIVEYOUNGKOREACOM"),
     ("https://kworld365.com", "KWORLD365COM"), ("https://k-trip365.com", "KTRIP365COM"),
     ("https://k-visa365.com", "KVISA365COM"), ("https://koreawedding365.com", "KOREAWEDDING365COM"),
     ("https://kstudy365.com", "KSTUDY365COM"), ("https://studyinkorea365.com", "STUDYINKOREA365COM"),
