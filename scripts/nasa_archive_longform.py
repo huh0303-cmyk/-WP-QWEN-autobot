@@ -143,12 +143,31 @@ def fetch_nasa_clips(query, workdir, n_target=N_CLIPS_TARGET):
 # ════════════════════════════════════════════════════════════
 # 2. 대본 (실제 확보된 클립 정보를 근거로, 사실기반)
 # ════════════════════════════════════════════════════════════
-def generate_script(topic, clips):
+def generate_script(topic, clips, target_seconds=None):
+    """2026-08-24 사용자 지시: "우선순위는 클립" — 대본 길이를 먼저 정하고 화면을
+    거기에 억지로 채워넣지 않는다. target_seconds(실제 확보한 필름 분량)가 주어지면
+    그 길이에 맞는 단어수로 나레이션을 쓴다 — 클립이 적으면 영상도 그만큼만 짧게
+    나가고, build_visual_track()의 순환(loop)이 거의/전혀 발동 안 해서 같은 장면이
+    반복되지 않는다. None이면(호출자가 안 넘기면) 기존처럼 고정 ~7분/~1000단어."""
     clip_notes = "\n".join(
         f"- {c['title']} ({c['date'][:10] if c['date'] else 'date unknown'}): {c['description']}"
         for c in clips
     )
-    prompt = f"""You are writing a narration script for a ~7-minute YouTube documentary
+    if target_seconds is not None:
+        target_minutes = target_seconds / 60
+        target_words = max(int(target_minutes * 135), 150)
+        length_line = (
+            f"a ~{target_minutes:.1f}-minute YouTube documentary (this length is "
+            f"deliberately short/natural — it matches the real NASA archival footage "
+            f"actually available for this topic, do not pad or ramble to reach a "
+            f"longer runtime)"
+        )
+        word_line = f"~{target_words} words"
+    else:
+        length_line = "a ~7-minute YouTube documentary"
+        word_line = "approximately 950-1050 words"
+
+    prompt = f"""You are writing a narration script for {length_line}
 video about: "{topic}", for a channel that uses real NASA archival footage
 (not AI-generated visuals).
 
@@ -159,8 +178,8 @@ and so on, looping back to clip 1 if the narration runs longer than the clips):
 {clip_notes[:3000]}
 ---
 
-Write "narration": a single continuous narration script, approximately 950-1050
-words, in English, engaging documentary tone (like a good space/science
+Write "narration": a single continuous narration script, {word_line},
+in English, engaging documentary tone (like a good space/science
 YouTuber — factual, vivid, not a dry lecture). CRITICAL: structure the
 narration to move through the clips in the SAME ORDER listed above — write
 roughly one section per clip (proportional to how many clips there are), and
@@ -385,8 +404,13 @@ def main():
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보")
 
+    # 우선순위는 클립: 실제 확보한 필름 분량이 곧 영상 길이가 되고, 대본이
+    # 거기 맞춰진다(고정 ~7분 강제 안 함 — 클립이 적으면 짧게, 많으면 길게).
+    target_seconds = sum(min(c["duration"], CLIP_TRIM_SECONDS) for c in clips)
+    log(f"   실제 확보 필름 분량 {target_seconds/60:.1f}분 — 이 길이 그대로 나레이션을 맞춘다")
+
     log("2/6 사실기반 대본 생성 중 (실제 확보한 클립 정보 근거)...")
-    data = generate_script(topic, clips)
+    data = generate_script(topic, clips, target_seconds=target_seconds)
     narration = data["narration"]
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
         json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)

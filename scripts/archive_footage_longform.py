@@ -556,13 +556,15 @@ def main():
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보 (전부 퍼블릭도메인 검증됨)")
 
-    target_seconds = None
-    if channel_key == "silent_era":
-        # 실제 사용될 필름 분량(클립당 최대 CLIP_TRIM_SECONDS) 그대로 영상 길이로
-        # 쓴다 — 억지로 14분 채우려고 짧은 무성영화 클립 몇 개를 계속 순환시키지 않는다.
-        target_seconds = sum(min(c["duration"], CLIP_TRIM_SECONDS) for c in clips)
-        log(f"   silent_era: 실제 확보 필름 분량 {target_seconds/60:.1f}분 — "
-            f"이 길이 그대로 나레이션을 맞춘다(고정 14분 강제 안 함)")
+    # 2026-08-24 사용자 지시: "우선순위는 클립" — 대본 길이를 먼저 정하고 화면을
+    # 거기에 억지로 채워넣는(=클립 수가 적으면 같은 클립을 수십 번 반복) 게 아니라,
+    # 실제로 확보한 필름 분량이 곧 영상 길이가 되고 대본이 그 길이에 맞춰진다.
+    # (예전엔 silent_era만 이렇게 하고 나머지 4채널은 고정 ~14분을 강제해서, invention
+    # 채널에서 클립 1개(22초)짜리를 11.5분 내내 반복 재생하는 사고가 있었음 — 이제
+    # 5채널 전부 동일하게 적용.)
+    target_seconds = sum(min(c["duration"], CLIP_TRIM_SECONDS) for c in clips)
+    log(f"   실제 확보 필름 분량 {target_seconds/60:.1f}분 — "
+        f"이 길이 그대로 나레이션을 맞춘다(고정 길이 강제 안 함, 클립이 우선)")
 
     log("2/6 사실기반 대본 생성 중...")
     data = generate_script(topic, channel_key, clips, target_seconds=target_seconds)
