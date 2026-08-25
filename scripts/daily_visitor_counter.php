@@ -12,8 +12,9 @@ add_action('wp_footer', function () {
         return;
     }
 
-    // Respect the site's WordPress timezone instead of the hosting server timezone.
-    $today = current_time('Y-m-d');
+    // The whole network reports one consistent KST business day even when an
+    // individual WordPress installation still has UTC configured.
+    $today = wp_date('Y-m-d', null, new DateTimeZone('Asia/Seoul'));
     $day_key = 'daily_visitor_count_' . $today;
     $total_key = 'daily_visitor_total_all_time';
     $cookie_key = 'dvc_counted_' . str_replace('-', '', $today);
@@ -48,7 +49,7 @@ add_action('rest_api_init', function () {
     register_rest_route('site-stats/v1', '/visitors', array(
         'methods' => 'GET',
         'callback' => function () {
-            $today = current_time('Y-m-d');
+            $today = wp_date('Y-m-d', null, new DateTimeZone('Asia/Seoul'));
             return array(
                 'date' => $today,
                 'count' => (int) get_option('daily_visitor_count_' . $today, 0),
