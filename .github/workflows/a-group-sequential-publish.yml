@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: a-group-sequential-publish
@@ -30,6 +31,6 @@ jobs:
       - run: pip install requests -q
       - name: "Dispatch current A-group site and queue the next"
         env:
-          GH_DISPATCH_TOKEN: ${{ secrets.GH_DISPATCH_TOKEN }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
           A_GROUP_INDEX: ${{ github.event.inputs.index || '0' }}
         run: python scripts/a_group_sequential_dispatch.py
