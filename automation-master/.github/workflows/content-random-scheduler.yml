@@ -1,0 +1,34 @@
+name: Content Random Scheduler
+on:
+  schedule:
+    - cron: '17 0 * * *'
+    - cron: '43 5 * * *'
+    - cron: '11 11 * * *'
+  workflow_dispatch:
+concurrency:
+  group: content-random-scheduler
+  cancel-in-progress: false
+jobs:
+  schedule-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Randomized policy gate
+        run: |
+          python - <<'PY'
+          import datetime, hashlib, json, pathlib, random
+          now=datetime.datetime.now(datetime.timezone.utc)
+          seed=int(hashlib.sha256(now.strftime('%G-%V-%Y-%m-%d-%H').encode()).hexdigest()[:12],16)
+          r=random.Random(seed)
+          channels=['K-pop','Starbucks Vibes','Global','Healing','MBB']
+          out={'generated_at':now.isoformat(),'mode':'DRAFT_ONLY','playlist':{}}
+          for c in channels:
+              weekly_target=2+r.randint(0,1)
+              out['playlist'][c]={'weekly_target':weekly_target,'run_this_gate':r.random()<0.34}
+          out['knowledge']={'channel_count':5,'narration_video_match_required':True,'run_this_gate':r.random()<0.34}
+          out['language']={'groups':['korean','english','other_languages'],'distribution':['YouTube_Shorts','TikTok','Facebook','Instagram','Threads'],'run_this_gate':r.random()<0.50}
+          pathlib.Path('scheduler-plan.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - name: Safety notice
+        run: echo 'Generation/distribution connectors remain draft/private until owner approval; duplicate ledger must be checked before publish.'
