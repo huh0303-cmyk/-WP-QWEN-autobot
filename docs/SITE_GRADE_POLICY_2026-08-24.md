@@ -2,7 +2,7 @@
 
 ## 확정 운영 원칙
 
-### A급 — 최우선 집중 육성
+### A급 — 최우선 집중 육성 (17개)
 - 지극정성으로 집중 육성한다.
 - 콘텐츠 품질, SEO, 색인, 내부링크, 이미지, EEAT, 사이트 구조를 최우선 관리한다.
 - Google/AdSense 테스트(승인) 30일 이내 통과를 운영 목표로 한다.
@@ -24,39 +24,39 @@ A급 현재 목록:
 - koreamedicaltour.com
 - studyinkorea365.com
 - jobinkorea365.com
+- kworld365.com
+- koreawedding365.com
+- jobkoreaglobal.com
 
-### B급 — 적극 육성
+### B급 — 적극 육성 (8개)
 - Google/AdSense 테스트(승인) 60일 이내 통과를 운영 목표로 한다.
 - 성과가 확인되면 A급으로 승격한다.
 
 B급 현재 목록:
 - koreainvest365.com
-- korearealestate365.com
+- krealestate365.com
 - koreacrypto365.com
-- koreawedding365.com
 - ktech365.com
-- kworld365.com
-- jobkoreaglobal.com
-- theseouljournal.com
-- koreanews365.com
-
-### C급 — 기타 전략 목적
-- Google/AdSense 승인이 핵심 KPI가 아니다.
-- 협회·기관·학교·브랜드 목적을 우선한다.
-
-C급 현재 목록:
 - kieca-korea.org
 - ksa-korea.org
 - sis-korea.com
 - ki-korea.com
 
+### 별도 인터넷신문 (2개)
+- koreanews365.com
+- theseouljournal.com
+
+일반 블로그 A/B 문법과 분리하고 뉴스룸 전용 기사 문법·소스·발행 로직을 적용한다.
+
 ## 고정 규칙
-- 운영 사이트는 A/B/C 3개 그룹으로만 관리한다. D/HOLD 등 새 등급을 임의로 만들지 않는다.
+- 운영 사이트는 A/B와 별도 인터넷신문으로만 관리한다. C/D/HOLD 등 새 등급을 임의로 만들지 않는다.
 - HyundaiJournal.com은 사용자 운영 사이트가 아니며 어떠한 등급표에도 포함하지 않는다.
 - 실제 목록에 없는 도메인을 추측으로 추가하지 않는다.
 - 과거 후보 도메인을 현재 운영 사이트로 자동 간주하지 않는다.
-- A급은 30일, B급은 60일 Google/AdSense 승인 목표를 기본 KPI로 한다.
-- C급은 승인보다 기관·사업 목적을 KPI로 한다.
+- 모든 일반 블로그는 Google/AdSense 최단기 승인을 최우선 KPI로 한다.
+- k-health365.com은 현재 유일한 승인 사이트다.
+- A급은 주 3~4회, B급은 주 2~3회 랜덤 발행하며 토·일을 운영일에 포함한다.
+- 같은 문장 구조·제목 패턴·키워드·발행시각의 반복을 금지한다.
 
 ## 변경 관리
 핵심 분류 변경은 사용자 의사결정 후 이 문서에 즉시 기록한다.
