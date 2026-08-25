@@ -1,0 +1,35 @@
+name: "A Group — Ordered Publish Every 40–55 Minutes"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      index:
+        description: "Zero-based A-group site index"
+        required: true
+        default: "0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a-group-sequential-publish
+  cancel-in-progress: false
+
+jobs:
+  dispatch-current-and-queue-next:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[a-group-sequence]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "Dispatch current A-group site and queue the next"
+        env:
+          GH_DISPATCH_TOKEN: ${{ secrets.GH_DISPATCH_TOKEN }}
+          A_GROUP_INDEX: ${{ github.event.inputs.index || '0' }}
+        run: python scripts/a_group_sequential_dispatch.py
