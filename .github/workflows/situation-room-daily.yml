@@ -1,6 +1,8 @@
 name: 종합상황실 (사이트+유튜브+SNS 통합 → 시트/이메일/카카오톡)
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
   schedule:
     - cron: "20 22 * * *"   # 07:20 KST (site-traffic 이후)
@@ -14,6 +16,7 @@ permissions:
 
 jobs:
   report:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[situation-room-refresh]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
