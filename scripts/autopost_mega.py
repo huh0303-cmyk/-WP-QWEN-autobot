@@ -3062,6 +3062,27 @@ def build_news_headline(keyword, lang):
         print(f"  ⚠️ 뉴스 헤드라인 재작성 실패: {e}")
     return keyword  # 실패 시 RSS 원본 헤드라인 그대로 사용(템플릿 왜곡보다 안전)
 
+def resize_newsroom_body(body, lang, source_summary, min_chars=1500, max_chars=2000):
+    """Bring a sourced newsroom draft into the promised article-length band."""
+    target_lo, target_hi = max(min_chars + 100, 1600), min(max_chars - 150, 1850)
+    instruction = (
+        "아래 뉴스 기사 HTML을 공백 제외 " if lang == "ko" else
+        "Edit the news article HTML below to "
+    )
+    instruction += (
+        f"{target_lo}~{target_hi}자로 편집하세요. 기존 확인 사실만 유지하고 새로운 사실·수치·인용을 만들지 마세요. "
+        "역피라미드 기사체와 HTML 태그를 유지하고, 설명 없이 기사 HTML만 출력하세요."
+        if lang == "ko" else
+        f"{target_lo}-{target_hi} non-whitespace characters. Preserve only confirmed facts; invent no facts, figures, quotes, or sources. "
+        "Keep readable newspaper style and HTML tags. Return article HTML only, with no commentary."
+    )
+    grounding = source_summary or "No additional source summary is available."
+    prompt = f"{instruction}\n\nSOURCE SUMMARY (fact boundary):\n{grounding}\n\nARTICLE HTML:\n{body}"
+    revised = strip_code_fences(generate_content_gemini(prompt)).strip()
+    # Guard against an occasional model-added metadata tail.
+    revised = re.split(r'\n\s*META_DESC:', revised, maxsplit=1, flags=re.IGNORECASE)[0].strip()
+    return revised if re.search(r'<(?:p|h2|h3)[\s>]', revised, re.IGNORECASE) else body
+
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
@@ -3165,6 +3186,14 @@ def process_one(site, keyword):
 
     body,title,meta,faq,tags=best_result
     newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    if mode in ("news", "news_en") and not (min_chars <= newsroom_len <= (max_chars or newsroom_len)):
+        print(f"  ✂️ 뉴스 원고 길이 교정: {newsroom_len}자 → 목표 1600~1850자")
+        try:
+            body = resize_newsroom_body(body, lang, news_source_summary, min_chars, max_chars or 2000)
+            newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+            print(f"  ✂️ 교정 결과: {newsroom_len}자")
+        except Exception as exc:
+            print(f"  ⚠️ 뉴스 원고 길이 교정 실패: {exc}")
     if mode in ("news","news_en") and newsroom_len < min_chars:
         print(f"  ⛔ 뉴스 본문 {newsroom_len}자 < {min_chars}자 → 발행 스킵")
         log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_short",
