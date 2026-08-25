@@ -35,8 +35,23 @@ public_video_url)만 맞으면 그대로 쓸 수 있다.
     FB_PAGE_ACCESS_TOKEN, FB_PAGE_ID               - 페이스북 릴스 업로드(pages_manage_posts,
                                                       pages_read_engagement 권한 필요)
 
-    GMAIL_APP_PASSWORD                             - 완료 요약 메일(선택, 인스타/쓰레드
-                                                      캡션은 이 메일로만 전달됨)
+    IG_ACCESS_TOKEN, IG_USER_ID                    - 인스타그램 비즈니스 계정(캐러셀 카드뉴스
+                                                      게시, instagram_content_publish 권한 필요)
+    IG_AUTO_PUBLISH                                 - "true"일 때만 실제로 라이브 게시함(기본 꺼짐)
+
+    THREADS_ACCESS_TOKEN, THREADS_USER_ID          - 쓰레드 계정(캐러셀 카드뉴스 게시)
+    THREADS_AUTO_PUBLISH                            - "true"일 때만 실제로 라이브 게시함(기본 꺼짐)
+
+    GMAIL_APP_PASSWORD                             - 완료 요약 메일(선택). IG_AUTO_PUBLISH/
+                                                      THREADS_AUTO_PUBLISH가 꺼져있으면 인스타/
+                                                      쓰레드 캡션+카드이미지는 이 메일로만 전달됨
+
+2026-08-23: 인스타그램/쓰레드는 API 컨테이너에 진짜 임시저장이 없어서(24시간
+뒤 만료), 기본값은 여전히 "자동 게시 안 함, 캡션+카드이미지만 준비" 원칙을
+유지한다. IG_AUTO_PUBLISH/THREADS_AUTO_PUBLISH를 명시적으로 "true"로 켠
+경우에만 카드뉴스 이미지들(topik_quiz_shorts.py가 만드는 card_image_urls)을
+캐러셀로 실제 라이브 게시한다 — 이 경우 사람의 최종 확인 없이 바로
+공개되므로, 콘텐츠 품질에 확신이 있을 때만 켤 것.
 """
 
 import os
@@ -63,6 +78,14 @@ TIKTOK_PRIVACY_LEVEL = os.environ.get("TIKTOK_PRIVACY_LEVEL") or "SELF_ONLY"
 
 FB_PAGE_ACCESS_TOKEN = os.environ.get("FB_PAGE_ACCESS_TOKEN", "")
 FB_PAGE_ID = os.environ.get("FB_PAGE_ID", "")
+
+IG_ACCESS_TOKEN = os.environ.get("IG_ACCESS_TOKEN", "")
+IG_USER_ID = os.environ.get("IG_USER_ID", "")
+IG_AUTO_PUBLISH = os.environ.get("IG_AUTO_PUBLISH", "").strip().lower() == "true"
+
+THREADS_ACCESS_TOKEN = os.environ.get("THREADS_ACCESS_TOKEN", "")
+THREADS_USER_ID = os.environ.get("THREADS_USER_ID", "")
+THREADS_AUTO_PUBLISH = os.environ.get("THREADS_AUTO_PUBLISH", "").strip().lower() == "true"
 
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
@@ -243,33 +266,125 @@ def publish_facebook(video_path, meta):
 
 
 # ════════════════════════════════════════════════════════════
-# Instagram / Threads — 두 플랫폼 다 API로 만든 컨테이너는 "초안"으로
-# 앱에 남지 않고 24시간 뒤 그냥 만료돼버린다(진짜 임시저장 기능이 없음).
-# 그래서 여기서는 API로 대신 올려버리지 않고, 캡션+영상 링크만 준비해서
-# 사용자가 앱에서 직접 업로드하게 한다("최종 업로드는 내가 함" 원칙).
+# Instagram / Threads — 카드뉴스(캐러셀) 게시.
+# 두 플랫폼 다 API로 만든 컨테이너는 "초안"으로 앱에 남지 않고 24시간 뒤
+# 그냥 만료돼버린다(진짜 임시저장 기능이 없음) — 그래서 기본값은 여전히
+# API 호출 없이 캡션+카드이미지 링크만 준비해서 사람이 앱에서 직접
+# 업로드하게 한다("최종 공개는 사람이 누른다" 원칙). IG_AUTO_PUBLISH /
+# THREADS_AUTO_PUBLISH를 명시적으로 켠 경우에만 카드뉴스 이미지들을
+# 캐러셀로 실제 라이브 게시한다.
 # ════════════════════════════════════════════════════════════
+def _poll_container_ready(status_url, params, tries=10, wait=3):
+    """미디어 컨테이너가 FINISHED 상태가 될 때까지 잠깐 기다린다(이미지는
+    보통 즉시 끝나지만, 드물게 처리 지연이 있어 바로 publish하면 실패할 수 있음)."""
+    for _ in range(tries):
+        r = requests.get(status_url, params=params, timeout=20)
+        if r.ok:
+            status = r.json().get("status_code")
+            if status == "FINISHED":
+                return True
+            if status == "ERROR":
+                return False
+        time.sleep(wait)
+    return True  # 상태를 못 받아도 일단 publish 시도(대부분 이미지는 이미 끝나있음)
+
+
 def publish_instagram(meta):
-    if not meta.get("public_video_url"):
-        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
+    image_urls = meta.get("card_image_urls") or []
+    if not image_urls:
+        return {"ok": False, "skipped": True, "reason": "card_image_urls 없음 — 카드뉴스 이미지 생성/드라이브 업로드 설정 확인 필요"}
     caption = build_caption(meta)
-    return {
-        "ok": True,
-        "note": "인스타그램 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 릴스 업로드 필요",
-        "video_url": meta["public_video_url"],
-        "caption": caption,
-    }
+
+    if not (IG_AUTO_PUBLISH and IG_ACCESS_TOKEN and IG_USER_ID):
+        return {
+            "ok": True,
+            "note": "IG_AUTO_PUBLISH 꺼짐(기본값) — 인스타그램은 임시저장이 없어 자동 게시 안 함. 아래 카드이미지로 직접 캐러셀 업로드 필요",
+            "image_urls": image_urls,
+            "caption": caption,
+        }
+
+    base = f"https://graph.facebook.com/{GRAPH_VERSION}/{IG_USER_ID}"
+    try:
+        if len(image_urls) == 1:
+            r = requests.post(f"{base}/media", data={
+                "image_url": image_urls[0], "caption": caption, "access_token": IG_ACCESS_TOKEN,
+            }, timeout=30)
+            r.raise_for_status()
+            creation_id = r.json()["id"]
+        else:
+            child_ids = []
+            for url in image_urls[:10]:  # 인스타그램 캐러셀 최대 10장
+                r = requests.post(f"{base}/media", data={
+                    "image_url": url, "is_carousel_item": "true", "access_token": IG_ACCESS_TOKEN,
+                }, timeout=30)
+                r.raise_for_status()
+                child_ids.append(r.json()["id"])
+            r = requests.post(f"{base}/media", data={
+                "media_type": "CAROUSEL", "children": ",".join(child_ids),
+                "caption": caption, "access_token": IG_ACCESS_TOKEN,
+            }, timeout=30)
+            r.raise_for_status()
+            creation_id = r.json()["id"]
+
+        _poll_container_ready(f"https://graph.facebook.com/{GRAPH_VERSION}/{creation_id}",
+                               {"fields": "status_code", "access_token": IG_ACCESS_TOKEN})
+        pub = requests.post(f"{base}/media_publish", data={
+            "creation_id": creation_id, "access_token": IG_ACCESS_TOKEN,
+        }, timeout=30)
+        pub.raise_for_status()
+        return {"ok": True, "note": "카드뉴스 캐러셀 실시간 게시 완료", "media_id": pub.json().get("id")}
+    except Exception as e:
+        return {"ok": False, "error": f"인스타그램 게시 실패: {e}"}
 
 
 def publish_threads(meta):
-    if not meta.get("public_video_url"):
-        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
+    image_urls = meta.get("card_image_urls") or []
+    if not image_urls:
+        return {"ok": False, "skipped": True, "reason": "card_image_urls 없음 — 카드뉴스 이미지 생성/드라이브 업로드 설정 확인 필요"}
     caption = build_caption(meta, max_hashtags=3)
-    return {
-        "ok": True,
-        "note": "쓰레드 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 업로드 필요",
-        "video_url": meta["public_video_url"],
-        "caption": caption,
-    }
+
+    if not (THREADS_AUTO_PUBLISH and THREADS_ACCESS_TOKEN and THREADS_USER_ID):
+        return {
+            "ok": True,
+            "note": "THREADS_AUTO_PUBLISH 꺼짐(기본값) — 쓰레드는 임시저장이 없어 자동 게시 안 함. 아래 카드이미지로 직접 캐러셀 업로드 필요",
+            "image_urls": image_urls,
+            "caption": caption,
+        }
+
+    base = f"https://graph.threads.net/v1.0/{THREADS_USER_ID}"
+    try:
+        if len(image_urls) == 1:
+            r = requests.post(f"{base}/threads", data={
+                "media_type": "IMAGE", "image_url": image_urls[0],
+                "text": caption, "access_token": THREADS_ACCESS_TOKEN,
+            }, timeout=30)
+            r.raise_for_status()
+            creation_id = r.json()["id"]
+        else:
+            child_ids = []
+            for url in image_urls[:10]:  # 쓰레드 캐러셀 최대 10장
+                r = requests.post(f"{base}/threads", data={
+                    "media_type": "IMAGE", "image_url": url,
+                    "is_carousel_item": "true", "access_token": THREADS_ACCESS_TOKEN,
+                }, timeout=30)
+                r.raise_for_status()
+                child_ids.append(r.json()["id"])
+            r = requests.post(f"{base}/threads", data={
+                "media_type": "CAROUSEL", "children": ",".join(child_ids),
+                "text": caption, "access_token": THREADS_ACCESS_TOKEN,
+            }, timeout=30)
+            r.raise_for_status()
+            creation_id = r.json()["id"]
+
+        _poll_container_ready(f"https://graph.threads.net/v1.0/{creation_id}",
+                               {"fields": "status", "access_token": THREADS_ACCESS_TOKEN})
+        pub = requests.post(f"{base}/threads_publish", data={
+            "creation_id": creation_id, "access_token": THREADS_ACCESS_TOKEN,
+        }, timeout=30)
+        pub.raise_for_status()
+        return {"ok": True, "note": "카드뉴스 캐러셀 실시간 게시 완료", "post_id": pub.json().get("id")}
+    except Exception as e:
+        return {"ok": False, "error": f"쓰레드 게시 실패: {e}"}
 
 
 PLATFORMS = {
@@ -315,7 +430,8 @@ def main():
         if result.get("skipped"):
             log(f"     ⏭️  건너뜀: {result.get('reason')}")
         elif result.get("ok"):
-            log(f"     ✅ {result.get('note') or '완료'} — {result.get('url') or result.get('video_id') or result.get('publish_id') or ''}")
+            log(f"     ✅ {result.get('note') or '완료'} — "
+                f"{result.get('url') or result.get('video_id') or result.get('publish_id') or result.get('media_id') or result.get('post_id') or ''}")
         else:
             log(f"     ❌ 실패: {result.get('error')}")
 
@@ -327,14 +443,17 @@ def main():
     skip_count = sum(1 for r in results.values() if r.get("skipped"))
     fail_count = len(results) - ok_count - skip_count
 
-    summary_lines = [f"[{label}] {meta.get('youtube_title', '')}", "", "※ 전부 발행 대기 상태입니다 — 최종 공개는 직접 눌러야 합니다.", ""]
+    summary_lines = [f"[{label}] {meta.get('youtube_title', '')}", "",
+                      "※ 유튜브/틱톡/페이스북은 발행 대기 상태 — 최종 공개는 직접 눌러야 합니다. "
+                      "인스타그램/쓰레드는 IG_AUTO_PUBLISH/THREADS_AUTO_PUBLISH가 켜진 경우에만 바로 라이브 게시됩니다.", ""]
     for name, r in results.items():
         if r.get("ok"):
             line = f"✅ {name}: {r.get('note') or '완료'}"
             if r.get("url"):
                 line += f"\n   {r['url']}"
             if r.get("caption"):
-                line += f"\n   영상: {r.get('video_url')}\n   캡션:\n   {r['caption']}"
+                media_line = r.get("video_url") or ", ".join(r.get("image_urls") or [])
+                line += f"\n   미디어: {media_line}\n   캡션:\n   {r['caption']}"
             summary_lines.append(line)
         elif r.get("skipped"):
             summary_lines.append(f"⏭️ {name}: 스킵 ({r.get('reason')})")
