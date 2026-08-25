@@ -72,7 +72,7 @@ def load_state():
                 return s
         except Exception:
             pass
-    return {"date": today, "fired": {}}
+    return {"date": today, "fired": {}, "last_dispatch_at": null}
 
 
 def main():
@@ -81,7 +81,35 @@ def main():
     now_minutes = now.hour * 60 + now.minute
     changed = False
 
-    for site_url, (h, m) in SLOTS.items():
+    # 모든 블로그 디스패치 사이를 최소 30분 띄운다. 예전 방식은 각 사이트의
+    # 목표시각만 독립 랜덤이라 우연히 같은 시각에 여러 사이트가 몰릴 수 있었다.
+    last_dispatch_raw = state.get("last_dispatch_at")
+    if last_dispatch_raw:
+        try:
+            last_dispatch = datetime.datetime.fromisoformat(last_dispatch_raw)
+            if last_dispatch.tzinfo is None:
+                last_dispatch = last_dispatch.replace(tzinfo=KST)
+            elapsed_minutes = (now - last_dispatch.astimezone(KST)).total_seconds() / 60
+        except Exception:
+            elapsed_minutes = 30
+    else:
+        elapsed_minutes = 30
+
+    if elapsed_minutes < 30:
+        print(f"⏳ 마지막 디스패치 후 {elapsed_minutes:.1f}분 — 최소 30분 간격 대기")
+        state["fired"] = fired
+        with open(STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+        return
+
+    # 목표시각이 지난 사이트를 시간순으로 처리하되 한 실행당 최대 1개만 발사한다.
+    # 워크플로가 15분마다 실행되므로 실제 사이트 간격은 항상 30분 이상이다.
+    due_sites = sorted(
+        SLOTS.items(),
+        key=lambda item: item[1][0] * 60 + item[1][1],
+    )
+
+    for site_url, (h, m) in due_sites:
         if fired.get(site_url):
             continue
         target_minutes = h * 60 + m
@@ -107,7 +135,9 @@ def main():
                 print(f"  ▶ {site_url} 발행 트리거 → HTTP {r.status_code}")
                 if r.status_code in (200, 201, 204):
                     fired[site_url] = True
+                    state["last_dispatch_at"] = now.isoformat()
                     changed = True
+                    break
                 else:
                     print(f"  ⚠️ {site_url} 디스패치 실패 (HTTP {r.status_code}) — 다음 실행에서 재시도")
             except Exception as e:
