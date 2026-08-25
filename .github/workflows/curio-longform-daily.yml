@@ -172,6 +172,15 @@ jobs:
               git checkout -- "$f"
             fi
           done
-          git add scripts/data/classic_reads_state.json scripts/data/nasa_archive_state.json 2>/dev/null || true
+          # 2026-08-25 버그 수정: git add에 여러 pathspec을 한번에 넘기면 그 중
+          # 하나라도 파일이 없을 때 전체가 fatal로 실패해서(2>/dev/null || true로
+          # 조용히 삼켜짐) 존재하는 파일까지 같이 add 안 됨 — classic_reads 채널이
+          # 폐지돼 classic_reads_state.json이 항상 없다보니 nasa_archive_state.json도
+          # 매번 커밋이 안 되고, 그 결과 pick_topic()이 매번 last_idx=-1로 리셋되어
+          # NASA_XFILES가 계속 "Apollo 11 moon landing"만 반복 생성하고 있었음.
+          # 파일별로 개별 add해서 서로 영향 없게 수정.
+          for f in scripts/data/classic_reads_state.json scripts/data/nasa_archive_state.json; do
+            [ -f "$f" ] && git add "$f"
+          done
           git diff --staged --quiet || git commit -m "chore: classic_reads/nasa 순환 상태 갱신 [skip ci]"
           git push
