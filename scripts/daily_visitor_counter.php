@@ -49,10 +49,14 @@ add_action('rest_api_init', function () {
     register_rest_route('site-stats/v1', '/visitors', array(
         'methods' => 'GET',
         'callback' => function () {
-            $today = wp_date('Y-m-d', null, new DateTimeZone('Asia/Seoul'));
+            $kst = new DateTimeZone('Asia/Seoul');
+            $today = wp_date('Y-m-d', null, $kst);
+            $yesterday = wp_date('Y-m-d', time() - DAY_IN_SECONDS, $kst);
             return array(
                 'date' => $today,
                 'count' => (int) get_option('daily_visitor_count_' . $today, 0),
+                'yesterday_date' => $yesterday,
+                'yesterday_count' => (int) get_option('daily_visitor_count_' . $yesterday, 0),
                 'total' => (int) get_option('daily_visitor_total_all_time', 0),
             );
         },
