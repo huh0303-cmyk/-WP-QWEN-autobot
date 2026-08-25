@@ -3381,6 +3381,11 @@ def main():
             else: fail+=1
             if i<n-1: time.sleep(random.uniform(10,18))
 
+    failed_records = [r for r in _log_buf if r.get("status") != "✅ OK"]
+    for record in failed_records:
+        detail = (record.get("error") or record.get("status") or "unknown failure")
+        detail = str(detail).replace("\n", " ").replace("\r", " ")[:500]
+        print(f"::error title=Newsroom gate::{record.get('site')} | {record.get('status')} | {detail}")
     flush_log()
     print(f"\n{'='*60}")
     print(f"✅ 완료 — 성공:{ok} / 실패:{fail} / 스킵:{skip}")
