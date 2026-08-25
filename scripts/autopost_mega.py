@@ -461,7 +461,7 @@ THEME_CATEGORY_MAP = {
         (["문화","K-pop","드라마","영화"],"문화 (CULTURE)"),
         (["금융","주가","증시","은행"],"금융 (FINANCE)"),
         (["부동산","아파트","주택","집값","전세"],"부동산 (REAL ESTATE)"),
-        (["국방","군사","군대","국방부"],"국방 (MILITARY)"),
+        (["국방","군사","군대","국방부","defense","department of defense","war.gov"],"국방 (MILITARY)"),
         (["예술","미술","전시"],"예술 (ART)"),
         (["스포츠","야구","축구","올림픽"],"스포츠 (SPORTS)"),
         (["국제","미국","중국","일본","EU","UN","외교","북한"],"글로벌 (GLOBAL)"),
@@ -2907,13 +2907,13 @@ def build_author_bio_html(site_url, lang, reporter, keyword=""):
             f'<p style="margin:0;font-size:0.85em;color:#666;">{disclaimer}</p></div>')
 
 
-def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter):
+def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter, category_hint=""):
     pw=os.getenv(site["wp_pass_env"],"")
     if not pw: return {"ok":False,"error":f"No password: {site['wp_pass_env']}"}
     url=site["url"]; theme=site["theme"]
 
     author_id=get_or_create_wp_author(url,pw,reporter)
-    cat_name=get_category_for_post(theme,keyword,title)
+    cat_name=get_category_for_post(theme,f"{category_hint} {keyword}".strip(),title)
     cat_id=0
     if site.get("mode") in ("news", "news_en"):
         wanted = re.sub(r'[\s/,\-]+', '', cat_name.lower())
@@ -3237,8 +3237,8 @@ def process_one(site, keyword):
         except Exception as exc:
             print(f"  ⚠️ 뉴스 원고 길이 교정 실패: {exc}")
     # The fixed source/attribution note is appended later, so reserve room for it.
-    if mode in ("news", "news_en") and max_chars and newsroom_len > max_chars - 250:
-        body = trim_newsroom_html(body, target_chars=max_chars - 250)
+    if mode in ("news", "news_en") and max_chars and newsroom_len > max_chars - 450:
+        body = trim_newsroom_html(body, target_chars=max_chars - 450)
         newsroom_len = newsroom_char_count(body)
         print(f"  ✂️ HTML 보존 상한 교정 결과: {newsroom_len}자")
     if mode in ("news","news_en") and newsroom_len < min_chars:
@@ -3359,7 +3359,7 @@ def process_one(site, keyword):
         log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
         return False
 
-    cat_name=get_category_for_post(theme,keyword,title)
+    cat_name=get_category_for_post(theme,f"{news_source or ''} {keyword}".strip(),title)
     print(f"  📁 카테고리: {cat_name}")
 
     # ★ 2026-08-03: 예전엔 뉴스모드 2개 사이트만 중복 제목을 걸렀음(그것도 완전
@@ -3375,7 +3375,7 @@ def process_one(site, keyword):
             return False
         sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
-    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
+    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,category_hint=news_source or "")
     if result["ok"]:
         print(f"  ✅ 발행: {result.get('url','')} | {result.get('author','')} | {result.get('category','')}")
         log(url,theme,keyword,title,result.get("url",""),score,len(images),"✅ OK",author=result.get("author",""),category=result.get("category",""))
