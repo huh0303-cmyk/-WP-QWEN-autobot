@@ -36,7 +36,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
     strategy:
       fail-fast: false
       matrix:
@@ -57,6 +57,9 @@ jobs:
       - name: Randomize edition time
         if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
         run: sleep $((RANDOM % 721))
+      - name: Keep newsrooms at least 30 minutes apart
+        if: ${{ matrix.key == 'theseouljournal' }}
+        run: sleep $((1800 + RANDOM % 901))
       - name: Repair recent source-based categories
         env:
           TARGET_SITE_URL: ${{ matrix.url }}
