@@ -23,6 +23,9 @@ A_GROUP_SITES = [
     "https://koreamedicaltour.com",
     "https://studyinkorea365.com",
     "https://jobinkorea365.com",
+    "https://kworld365.com",
+    "https://koreawedding365.com",
+    "https://jobkoreaglobal.com",
 ]
 
 API = "https://api.github.com"
