@@ -18,7 +18,7 @@
 5. Each article must pass `content_quality_gate.py`: at least 900 meaningful words/eojeol, four H2/H3 sections, two relevant images, complete descriptive ALT text, and two external sources.
 6. ALT describes what is visible and why it matters in the surrounding section. It is not a keyword list and must not duplicate the title.
 7. Existing posts are never deleted. Failed posts become recoverable `private` posts only after a manifest review and exact confirmation token.
-8. `kskin365.com` remains retired. `k-health365.com` is rebuilt first. `jobkoreaglobal.com` remains review-only until ownership/status is resolved.
+8. `kskin365.com` is active again and included in the 27-site network. `k-health365.com` is rebuilt first. `jobkoreaglobal.com` remains review-only until ownership/status is resolved.
 
 ## Safe operating order
 

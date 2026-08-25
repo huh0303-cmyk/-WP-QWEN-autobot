@@ -41,7 +41,7 @@ token, or daily usage quota. Therefore continuity is handled by checkpoints:
 ## Current durable decisions
 
 - k-health365.com is the first recovery and validation site.
-- kskin365.com is retired and receives no new content.
+- kskin365.com is active again and is included in the 27-site registry, visitor counter rollout, audits, and daily blog scheduler.
 - Legacy automatic WordPress publishing remains disabled.
 - The rebuilt flow is audit -> draft -> quality gate -> human approval -> publish.
 - All site personas are neutral editorial desks with one explicit topic scope.

@@ -50,6 +50,7 @@ jobs:
           KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
           KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
           KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}

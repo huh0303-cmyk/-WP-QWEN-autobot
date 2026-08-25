@@ -20,8 +20,7 @@ master_autopost.yml을 workflow_dispatch(step=post, publish_site=<url>)로 발�
 2026-08-22 재개: master_autopost.yml/publish-scheduler.yml이 품질복구를
 이유로 한동안 꺼져 있다가, 사용자 지시("25개 블로그사이트는 1일 1포스팅
 시간 랜덤... 지금 실행해줘")로 다시 켬. 디스패치 대상을 새 워크플로우
-daily-network-publish.yml로 바꿨고, SITES 목록에서 퇴역한 kskin365.com과
-뉴스 2개 사이트(koreanews365/theseouljournal — newsrooms-daily-publisher.yml이
+daily-network-publish.yml로 바꿨고, 뉴스 2개 사이트(koreanews365/theseouljournal — newsrooms-daily-publisher.yml이
 이미 별도 시간규칙으로 하루 3~10건 처리 중이라 이 스케줄러 대상이 아님)를
 뺐다.
 """
@@ -35,16 +34,16 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 now = datetime.datetime.now(KST)
 today = now.strftime("%Y-%m-%d")
 
-# autopost_mega.py의 SITES_CONFIG 중 이 스케줄러가 담당하는 24개 사이트.
-# kskin365.com(퇴역)과 koreanews365/theseouljournal(별도 뉴스 스케줄러 사용
-# 중)은 제외 — 무거운 google-genai 등 의존성 없이 순수 requests만 쓰는 이
+# autopost_mega.py의 SITES_CONFIG 중 이 스케줄러가 담당하는 25개 블로그 사이트.
+# koreanews365/theseouljournal(별도 뉴스 스케줄러 사용 중)은 제외 — 무거운
+# google-genai 등 의존성 없이 순수 requests만 쓰는 이
 # 스케줄러 워크플로우에서 autopost_mega.py를 그대로 import하지 않으려고
 # 독립 목록 유지(다른 스케줄/감사 스크립트들과 동일한 관례).
 SITES = [
     "https://k-health365.com", "https://koreamedicaltour.com", "https://koreainvest365.com",
     "https://ki-korea.com", "https://koreainsurance365.com", "https://kfinance365.com",
     "https://koreataxnlaw.com", "https://koreacrypto365.com", "https://krealestate365.com",
-    "https://ktech365.com", "https://oliveyoungkorea.com",
+    "https://ktech365.com", "https://kskin365.com", "https://oliveyoungkorea.com",
     "https://kworld365.com", "https://k-trip365.com", "https://k-visa365.com",
     "https://koreawedding365.com", "https://kstudy365.com", "https://studyinkorea365.com",
     "https://kieca-korea.org", "https://ksa-korea.org", "https://sis-korea.com",

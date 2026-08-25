@@ -1,4 +1,4 @@
-name: 26개 활성 사이트 일일 방문자수 카운터 배포
+name: 27개 활성 사이트 일일 방문자수 카운터 배포
 
 on:
   push:
@@ -31,6 +31,7 @@ jobs:
           KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
           KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
           KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
