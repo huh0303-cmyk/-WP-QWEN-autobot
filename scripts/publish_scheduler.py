@@ -18,6 +18,9 @@ master_autopost.yml을 workflow_dispatch(step=post, publish_site=<url>)로 발�
 사이트별로 기록한다.
 
 2026-08-26 최소 30분 간격 안전장치 적용.
+2026-08-26 최종 등급/빈도 정책 적용: A 17개는 주 3~4회, B 8개는
+주 2~3회. 사이트별 ISO 주차 시드로 요일을 매주 다시 뽑고 각 사이트마다
+토/일 중 하루를 반드시 포함한다. 뉴스 2개는 계속 별도 워크플로우가 담당한다.
 
 2026-08-22 재개: master_autopost.yml/publish-scheduler.yml이 품질복구를
 이유로 한동안 꺼져 있다가, 사용자 지시("25개 블로그사이트는 1일 1포스팅
@@ -41,23 +44,50 @@ today = now.strftime("%Y-%m-%d")
 # google-genai 등 의존성 없이 순수 requests만 쓰는 이
 # 스케줄러 워크플로우에서 autopost_mega.py를 그대로 import하지 않으려고
 # 독립 목록 유지(다른 스케줄/감사 스크립트들과 동일한 관례).
-SITES = [
-    "https://k-health365.com", "https://koreamedicaltour.com", "https://koreainvest365.com",
-    "https://ki-korea.com", "https://koreainsurance365.com", "https://kfinance365.com",
-    "https://koreataxnlaw.com", "https://koreacrypto365.com", "https://krealestate365.com",
-    "https://ktech365.com", "https://kskin365.com", "https://oliveyoungkorea.com",
-    "https://kworld365.com", "https://k-trip365.com", "https://k-visa365.com",
-    "https://koreawedding365.com", "https://kstudy365.com", "https://studyinkorea365.com",
-    "https://kieca-korea.org", "https://ksa-korea.org", "https://sis-korea.com",
-    "https://jobkorea365.com", "https://jobinkorea365.com", "https://jobkoreaglobal.com",
-    "https://korea365.org",
+A_GROUP = [
+    "https://korea365.org", "https://kstudy365.com", "https://oliveyoungkorea.com",
+    "https://jobkorea365.com", "https://k-visa365.com", "https://k-health365.com",
+    "https://kskin365.com", "https://k-trip365.com", "https://kfinance365.com",
+    "https://koreainsurance365.com", "https://koreataxnlaw.com",
+    "https://koreamedicaltour.com", "https://studyinkorea365.com",
+    "https://jobinkorea365.com", "https://kworld365.com",
+    "https://koreawedding365.com", "https://jobkoreaglobal.com",
 ]
+B_GROUP = [
+    "https://koreainvest365.com", "https://krealestate365.com",
+    "https://koreacrypto365.com", "https://ktech365.com",
+    "https://kieca-korea.org", "https://ksa-korea.org",
+    "https://sis-korea.com", "https://ki-korea.com",
+]
+SITES = A_GROUP + B_GROUP
 
-# 사이트마다 오늘 날짜+URL로 독립 시드 → 서로 다른 랜덤 시각(00:00~23:59), 매일 재추첨
+
+def weekly_publish_days(site_url):
+    """Return 0=Mon..6=Sun days for this site's current weekly plan."""
+    iso = now.date().isocalendar()
+    rng = random.Random(f"{iso.year}-W{iso.week}-{site_url}-weekly-cadence-v1")
+    count = rng.randint(3, 4) if site_url in A_GROUP else rng.randint(2, 3)
+    weekend_day = rng.choice([5, 6])
+    remaining = [day for day in range(7) if day != weekend_day]
+    return sorted([weekend_day] + rng.sample(remaining, count - 1))
+
+
+WEEKLY_PLANS = {site: weekly_publish_days(site) for site in SITES}
+TODAY_SITES = [site for site in SITES if now.weekday() in WEEKLY_PLANS[site]]
+
+# 오늘 대상만 순서를 섞고 45~75분 간격의 랜덤 슬롯에 배치한다. API 디스패치
+# 자체에도 최소 30분 안전장치가 있어 우연히 같은 시각에 몰릴 수 없다.
+_daily_rng = random.Random(f"{today}-network-spread-v2")
+_daily_rng.shuffle(TODAY_SITES)
+_minute_cursor = _daily_rng.randint(4 * 60, 7 * 60 + 30)
 SLOTS = {}
-for _site in SITES:
-    _seed = random.Random(f"{today}-{_site}-fullrandom-persite")
-    SLOTS[_site] = (_seed.randint(0, 23), _seed.randint(0, 59))
+_latest_minute = 23 * 60 + 15
+_max_gap = ((_latest_minute - _minute_cursor) // max(1, len(TODAY_SITES) - 1)
+            if len(TODAY_SITES) > 1 else 75)
+for _index, _site in enumerate(TODAY_SITES):
+    SLOTS[_site] = divmod(_minute_cursor, 60)
+    if _index < len(TODAY_SITES) - 1:
+        _minute_cursor += _daily_rng.randint(35, max(35, min(75, _max_gap)))
 
 STATE_FILE = "scheduler_state.json"
 
@@ -74,7 +104,7 @@ def load_state():
                 return s
         except Exception:
             pass
-    return {"date": today, "fired": {}, "last_dispatch_at": null}
+    return {"date": today, "fired": {}, "last_dispatch_at": None}
 
 
 def main():
@@ -82,6 +112,8 @@ def main():
     fired = state.get("fired", {})
     now_minutes = now.hour * 60 + now.minute
     changed = False
+    print(f"오늘 발행 대상 {len(TODAY_SITES)}/{len(SITES)}개 "
+          f"(A 주3~4회, B 주2~3회, 주말 포함)")
 
     # 모든 블로그 디스패치 사이를 최소 30분 띄운다. 예전 방식은 각 사이트의
     # 목표시각만 독립 랜덤이라 우연히 같은 시각에 여러 사이트가 몰릴 수 있었다.
