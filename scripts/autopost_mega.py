@@ -3083,6 +3083,48 @@ def resize_newsroom_body(body, lang, source_summary, min_chars=1500, max_chars=2
     revised = re.split(r'\n\s*META_DESC:', revised, maxsplit=1, flags=re.IGNORECASE)[0].strip()
     return revised if re.search(r'<(?:p|h2|h3)[\s>]', revised, re.IGNORECASE) else body
 
+def newsroom_char_count(body):
+    """Editorial character count: visible text including ordinary spaces."""
+    plain = BeautifulSoup(body, "html.parser").get_text(" ", strip=True)
+    return len(re.sub(r'\s+', ' ', plain))
+
+def trim_newsroom_html(body, target_chars=1900):
+    """Trim visible text from the end while preserving valid HTML."""
+    soup = BeautifulSoup(body, "html.parser")
+    excess = newsroom_char_count(str(soup)) - target_chars
+    if excess <= 0:
+        return body
+    for node in reversed(list(soup.find_all(string=True))):
+        if excess <= 0:
+            break
+        text = str(node)
+        visible = len(text)
+        if not text.strip():
+            continue
+        if visible <= excess:
+            excess -= visible
+            node.extract()
+            continue
+        keep = max(0, visible - excess)
+        shortened = text[:keep].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        if shortened and shortened[-1] not in ".!?。！？다요":
+            shortened += "."
+        node.replace_with(shortened)
+        excess = 0
+    for tag in list(soup.find_all(["p", "h2", "h3", "li"])):
+        if not tag.get_text(" ", strip=True):
+            tag.decompose()
+    return str(soup)
+
+def build_newsroom_meta(title, source_summary, lang):
+    prompt = (
+        f"다음 기사 제목과 출처 요약을 바탕으로 사실을 추가하지 말고 100~140자의 한국어 메타 설명만 작성하세요.\n제목: {title}\n요약: {source_summary or ''}"
+        if lang == "ko" else
+        f"Write only a factual 120-155 character English meta description from this title and source summary. Add no new facts.\nTitle: {title}\nSummary: {source_summary or ''}"
+    )
+    text = generate_content_gemini(prompt).strip().strip('"').strip("'")
+    return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
+
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
@@ -3185,15 +3227,20 @@ def process_one(site, keyword):
             time.sleep(5)
 
     body,title,meta,faq,tags=best_result
-    newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    newsroom_len=newsroom_char_count(body)
     if mode in ("news", "news_en") and not (min_chars <= newsroom_len <= (max_chars or newsroom_len)):
         print(f"  ✂️ 뉴스 원고 길이 교정: {newsroom_len}자 → 목표 1600~1850자")
         try:
             body = resize_newsroom_body(body, lang, news_source_summary, min_chars, max_chars or 2000)
-            newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+            newsroom_len=newsroom_char_count(body)
             print(f"  ✂️ 교정 결과: {newsroom_len}자")
         except Exception as exc:
             print(f"  ⚠️ 뉴스 원고 길이 교정 실패: {exc}")
+    # The fixed source/attribution note is appended later, so reserve room for it.
+    if mode in ("news", "news_en") and max_chars and newsroom_len > max_chars - 250:
+        body = trim_newsroom_html(body, target_chars=max_chars - 250)
+        newsroom_len = newsroom_char_count(body)
+        print(f"  ✂️ HTML 보존 상한 교정 결과: {newsroom_len}자")
     if mode in ("news","news_en") and newsroom_len < min_chars:
         print(f"  ⛔ 뉴스 본문 {newsroom_len}자 < {min_chars}자 → 발행 스킵")
         log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_short",
@@ -3230,6 +3277,13 @@ def process_one(site, keyword):
             body += f'<p><em>출처: {source_label}. 헤드라인과 공개 사실을 참고했으며, 본문은 Koreanews365 편집국이 독자적으로 작성했습니다.</em></p>'
         else:
             body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
+
+    if mode in ("news", "news_en") and len(meta.strip()) < 80:
+        try:
+            meta = build_newsroom_meta(title, news_source_summary, lang)
+            print(f"  📝 뉴스 메타 보완: {len(meta)}자")
+        except Exception as exc:
+            print(f"  ⚠️ 뉴스 메타 보완 실패: {exc}")
 
     if best_score<quality_target and mode not in ("news", "news_en"):
         print(f"  🔧 {best_score}점 → post-processing")
@@ -3269,7 +3323,7 @@ def process_one(site, keyword):
     rank="🏆" if score>=95 else "✅" if score>=90 else "⚠️" if score>=80 else "❌"
     print(f"  📊 SEO {score}/100 {rank}")
 
-    plain_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
