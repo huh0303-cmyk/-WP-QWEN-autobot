@@ -17,6 +17,8 @@ master_autopost.yml을 workflow_dispatch(step=post, publish_site=<url>)로 발�
 같은 사이트를 하루에 두 번 쏘지 않도록 scheduler_state.json으로 발사 여부를
 사이트별로 기록한다.
 
+2026-08-26 최소 30분 간격 안전장치 적용.
+
 2026-08-22 재개: master_autopost.yml/publish-scheduler.yml이 품질복구를
 이유로 한동안 꺼져 있다가, 사용자 지시("25개 블로그사이트는 1일 1포스팅
 시간 랜덤... 지금 실행해줘")로 다시 켬. 디스패치 대상을 새 워크플로우
