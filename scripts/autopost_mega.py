@@ -1169,7 +1169,7 @@ SITE_PERSONA = {
             "확인된 사실과 미확인 사항",
             "원문 출처 링크·작성 시각·수정 이력"
         ],
-        "min_chars": (1200, 1800),
+        "min_chars": 1500,
         "max_chars": 2000,
         "tables": 0,
         "lang": "ko",
@@ -1188,7 +1188,7 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Linked source note, publication time and correction record"
         ],
-        "min_chars": (1200, 1800),
+        "min_chars": 1500,
         "max_chars": 2000,
         "tables": 0,
         "lang": "en",
@@ -3078,6 +3078,7 @@ def process_one(site, keyword):
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
         if not keyword:
             print("  NEWS SOURCE GATE: no licensed/approved story lead; skipping")
+            log(url,theme,"__news__","","",0,0,"⛔ skip_no_fresh_source")
             return False
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
@@ -3155,8 +3156,15 @@ def process_one(site, keyword):
 
     body,title,meta,faq,tags=best_result
     newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    if mode in ("news","news_en") and newsroom_len < min_chars:
+        print(f"  ⛔ 뉴스 본문 {newsroom_len}자 < {min_chars}자 → 발행 스킵")
+        log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_short",
+            f"length={newsroom_len}, required={min_chars}-{max_chars}")
+        return False
     if mode in ("news","news_en") and max_chars and newsroom_len>max_chars:
         print(f"  ⛔ 뉴스 본문 {newsroom_len}자 > {max_chars}자 → 발행 스킵")
+        log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_long",
+            f"length={newsroom_len}, required={min_chars}-{max_chars}")
         return False
 
     # ★ 발행 직전 최종 방어선: '#' 잔재 강제 제거 (재발 방지 안전장치)
@@ -3236,7 +3244,25 @@ def process_one(site, keyword):
     #   만든 글을 다시 분석해서 갱신해주는 게 아니라서, 실제 RankMath 분석
     #   점수와는 다를 수 있음. 그래도 현재 유일하게 있는 사전 품질 신호라
     #   이걸 게이트로 쓴다.)
-    if score < quality_target:
+    # 뉴스룸은 일반 블로그용 SEO 채점표(FAQ, 표, 4개 내부링크, 3천자에 가점)를
+    # 그대로 적용하면 1,500~2,000자 기사체 원고가 구조적으로 70점에 도달하기
+    # 어렵다. 출처·길이·메타·태그·제목을 별도 하드 게이트로 검증한다.
+    newsroom_gate_ok = (
+        mode in ("news", "news_en")
+        and bool(news_source and news_source_url)
+        and min_chars <= plain_len <= (max_chars or plain_len)
+        and bool(title.strip())
+        and len(meta.strip()) >= 80
+        and len(tags) >= 6
+    )
+    if mode in ("news", "news_en"):
+        if not newsroom_gate_ok:
+            reason = (f"source={bool(news_source and news_source_url)}, length={plain_len}/"
+                      f"{min_chars}-{max_chars}, meta={len(meta)}, tags={len(tags)}")
+            print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
+            log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
+            return False
+    elif score < quality_target:
         print(f"  ⛔ 품질점수 {score}점 < 뉴스/콘텐츠 목표 {quality_target}점 → 발행 스킵")
         log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
         return False
@@ -3359,6 +3385,9 @@ def main():
     print(f"\n{'='*60}")
     print(f"✅ 완료 — 성공:{ok} / 실패:{fail} / 스킵:{skip}")
     print(f"{'='*60}\n")
+    if os.getenv("NEWSROOM_REQUIRE_PUBLICATION", "false").strip().lower() == "true" and fail and not ok:
+        print(f"::error title=Newsroom publication failed::No post was published; failed={fail}, skipped={skip}. See newsroom_publish_result.json")
+        raise SystemExit(1)
 
 if __name__=="__main__":
     main()

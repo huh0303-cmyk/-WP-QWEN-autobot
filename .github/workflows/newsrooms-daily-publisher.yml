@@ -67,6 +67,7 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ matrix.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
