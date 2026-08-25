@@ -5,6 +5,10 @@ name: Publish Scheduler (랜덤시간 발행 트리거)
 # 지난 것만 daily-network-publish.yml로 개별 디스패치한다.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/publish_scheduler.py"
   schedule:
     - cron: "*/15 * * * *"
 
