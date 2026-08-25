@@ -71,6 +71,7 @@ for _stream in (sys.stdout, sys.stderr):
 
 KST = timezone(timedelta(hours=9))
 HISTORY_FILE = "situation_room_history.json"
+DAILY_SITE_RESULT_FILE = "daily_site_traffic_result.json"
 
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
@@ -231,6 +232,9 @@ def collect_site_summary():
     total_clicks = 0
     total_indexed = 0
     total_posts = 0
+    clicks_sites = 0
+    indexed_sites = 0
+    posts_sites = 0
     error_sites = []
     site_details = []
     for site_url in SITES:
@@ -238,6 +242,7 @@ def collect_site_summary():
         total_published = get_total_published(site_url)
         if total_published is not None:
             total_posts += total_published
+            posts_sites += 1
         visitor_count = get_visitor_count(site_url)
         domain_property = f"sc-domain:{domain}"
         if site_url in accessible:
@@ -256,6 +261,7 @@ def collect_site_summary():
         stats, err = latest_daily_stats(token, query_site)
         if stats:
             total_clicks += stats["clicks"]
+            clicks_sites += 1
             clicks = stats["clicks"]
         else:
             error_sites.append(domain)
@@ -263,14 +269,19 @@ def collect_site_summary():
         coverage, _ = get_index_coverage(token, query_site)
         if coverage:
             total_indexed += coverage["indexed"]
+            indexed_sites += 1
             indexed = coverage["indexed"]
         site_details.append({"domain": domain, "url": site_url, "clicks": clicks,
                               "indexed": indexed, "total_posts": total_published,
                               "visitor_count": visitor_count, "status": status})
         time.sleep(0.2)
 
-    return {"total_clicks": total_clicks, "total_indexed": total_indexed,
-            "total_posts": total_posts,
+    return {"total_clicks": total_clicks if clicks_sites else None,
+            "total_indexed": total_indexed if indexed_sites else None,
+            "total_posts": total_posts if posts_sites else None,
+            "coverage": {"clicks": clicks_sites, "indexed": indexed_sites,
+                         "posts": posts_sites, "visitors": sum(
+                             1 for d in site_details if d.get("visitor_count") is not None)},
             "error_sites": error_sites, "error": None, "site_details": site_details}
 
 
@@ -625,6 +636,10 @@ def main():
 
     yt_channel_id = dict(YOUTUBE_CHANNELS)
 
+    site_count = len(SITES)
+    youtube_count = len(YOUTUBE_CHANNELS)
+    sns_platform_count = 4
+    sns_account_count = len(BRANDS) * sns_platform_count
     ok_sites = sum(1 for d in site_details_list if d["status"] == "정상")
     total_yt_subs = sum(v["subs"] for v in today["youtube"].values() if v.get("subs") is not None)
     total_yt_views = sum(v["views"] for v in today["youtube"].values() if v.get("views") is not None)
@@ -633,22 +648,25 @@ def main():
         if m[b]["count"] is not None
     )
 
-    total_real_visitors = sum(d.get("visitor_count") or 0 for d in site_details_list)
+    visitor_sites = sum(1 for d in site_details_list if d.get("visitor_count") is not None)
+    total_real_visitors = sum(
+        d["visitor_count"] for d in site_details_list if d.get("visitor_count") is not None
+    )
     summary_lines = [
         f"[{checked_at}] 종합상황실",
         "",
         "📊 한눈에 보기",
-        f"  사이트 {ok_sites}/27 정상 | 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} | "
-        f"클릭합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
-        f"색인합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} | "
-        f"실제방문자 합계(오늘) {total_real_visitors}명",
-        f"  유튜브 8채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
-        f"  SNS 연결계정 {sns_connected}/12개",
+        f"  사이트 {ok_sites}/{site_count} 정상 | 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} | "
+        f"Google 검색 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
+        f"사이트맵 색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} | "
+        f"실제방문자 합계(오늘) {total_real_visitors}명(수집 {visitor_sites}/{site_count})",
+        f"  유튜브 {youtube_count}채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
+        f"  SNS 연결계정 {sns_connected}/{sns_account_count}개",
         "",
-        f"■ 사이트 27개 — 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} / "
-        f"클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
-        f"색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} / "
-        f"실제방문자 합계(오늘) {total_real_visitors}명",
+        f"■ 사이트 {site_count}개 — 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} / "
+        f"Google 검색 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
+        f"사이트맵 색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} / "
+        f"실제방문자 합계(오늘) {total_real_visitors}명(수집 {visitor_sites}/{site_count})",
     ]
     for d in site_details_list:
         domain = d["domain"]
@@ -664,11 +682,11 @@ def main():
         visitors_str = d.get("visitor_count") if d.get("visitor_count") is not None else "미배포"
         summary_lines.append(
             f"  - {domain} | {d['url']} | 전체글 {posts_str}{fmt_diff(d_posts)} | "
-            f"색인 {indexed_str}{fmt_diff(d_indexed)} | GSC방문 {clicks_str}{fmt_diff(d_clicks)} | "
+            f"사이트맵 색인 {indexed_str}{fmt_diff(d_indexed)} | Google 검색 클릭 {clicks_str}{fmt_diff(d_clicks)} | "
             f"실제방문자(오늘) {visitors_str}{fmt_diff(d_visitors)} | {comment}")
     summary_lines += [
         "",
-        "■ 유튜브 (언어채널 3 + 플리채널 5, 총 8개)",
+        f"■ 유튜브 전체 운영채널 (총 {youtube_count}개)",
     ]
     for label, v in today["youtube"].items():
         d = yt_diffs.get(label, {})
@@ -677,7 +695,7 @@ def main():
         summary_lines.append(
             f"  - {label} | {url} | 구독자 {v['subs']} {fmt_diff(d.get('subs'))} | 조회수 {v['views']} {fmt_diff(d.get('views'))}")
     yt_configured = sum(1 for v in today["youtube"].values() if v.get("subs") is not None)
-    summary_lines.append(f"  => 총평: {yt_configured}/8개 채널 수집됨. "
+    summary_lines.append(f"  => 총평: {yt_configured}/{youtube_count}개 채널 수집됨. "
                           f"{'TOPIK이 압도적 1위, 나머지는 초기 단계' if yt_configured else '수집 실패'}")
 
     def _sns_section(title, platform_key, today_m, url_platform):
@@ -704,10 +722,10 @@ def main():
     summary_lines += _sns_section("Threads", "threads", threads_m, "threads")
 
     summary_lines += ["", "■ 전체 계정 URL 모음"]
-    summary_lines.append("  [사이트 27개]")
+    summary_lines.append(f"  [사이트 {site_count}개]")
     for d in site_details_list:
         summary_lines.append(f"    - {d['domain']}: {d['url']}")
-    summary_lines.append("  [유튜브 8채널]")
+    summary_lines.append(f"  [유튜브 {youtube_count}채널]")
     for label, cid in YOUTUBE_CHANNELS:
         summary_lines.append(f"    - {label}: https://www.youtube.com/channel/{cid}")
     for title, platform_key, url_platform in (
@@ -757,7 +775,7 @@ def main():
                (f"\n\n시트: {sheet_link}" if sheet_link else ""))
 
     kakao_text = (summary_lines[0] + "\n" +
-                  f"사이트 {ok_sites}/27정상 전체글{today['site_posts']}{fmt_diff(d_site_posts)} "
+                  f"사이트 {ok_sites}/{site_count}정상 전체글{today['site_posts']}{fmt_diff(d_site_posts)} "
                   f"클릭{today['site_clicks']}{fmt_diff(d_site_clicks)} / "
                   f"색인{today['site_indexed']}{fmt_diff(d_site_indexed)}\n" +
                   f"[원포인트레슨] {one_point_lesson}"[:80])
