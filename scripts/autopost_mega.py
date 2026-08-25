@@ -3101,7 +3101,7 @@ def process_one(site, keyword):
             "If the available facts are limited, write a concise brief rather than padding the article."
         )
     prompt=base_prompt
-    best_score=0; best_result=None
+    best_score=0; best_result=None; best_length_valid=False
 
     for attempt in range(MAX_REGEN+1):
         try:
@@ -3128,8 +3128,17 @@ def process_one(site, keyword):
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
 
-        if pre>best_score:
+        candidate_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+        candidate_length_valid = not (
+            mode in ("news", "news_en")
+        ) or (candidate_len >= min_chars and (not max_chars or candidate_len <= max_chars))
+        # 뉴스룸에서는 일반 블로그 SEO 점수보다 약속한 기사 길이를 우선한다.
+        # 그렇지 않으면 재생성된 정상 길이 기사보다 짧은 초안이 선택될 수 있다.
+        if (candidate_length_valid and not best_length_valid) or (
+            candidate_length_valid == best_length_valid and pre > best_score
+        ):
             best_score=pre; best_result=(body,title,meta,faq,tags)
+            best_length_valid=candidate_length_valid
 
         if pre>=quality_target:
             print(f"  ✅ {pre}점 달성"); break
@@ -3377,8 +3386,14 @@ def main():
                     else load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
             if site["mode"] not in ("news","news_en"):
                 kw=sanitize_keyword(kw, f"{theme} guide 2026")
-            if process_one(site,kw): ok+=1
-            else: fail+=1
+            try:
+                if process_one(site,kw): ok+=1
+                else: fail+=1
+            except Exception as exc:
+                detail=f"{type(exc).__name__}: {exc}"[:500]
+                print(f"  ❌ 처리 중 예외: {detail}")
+                log(url,theme,kw,"","",0,0,"❌ unhandled_exception",detail)
+                fail+=1
             if i<n-1: time.sleep(random.uniform(10,18))
 
     failed_records = [r for r in _log_buf if r.get("status") != "✅ OK"]
