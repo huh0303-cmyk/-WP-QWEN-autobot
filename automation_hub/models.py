@@ -44,9 +44,9 @@ class SiteConfig:
     category_mode: str = "existing_only"
     default_category: str = ""
     allowed_categories: list[str] = field(default_factory=list)
-    image_mode: str = "mixed"
-    image_min: int = 1
-    image_max: int = 2
+    image_mode: str = "none"
+    image_min: int = 0
+    image_max: int = 0
     keyword_mode: str = "golden_keyword"
     keyword_rules: dict[str, Any] = field(default_factory=dict)
     rss_sources: list[str] = field(default_factory=list)

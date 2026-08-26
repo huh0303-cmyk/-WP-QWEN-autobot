@@ -3,8 +3,6 @@ name: Multilang Quiz — 검수용 생성만
 # 자동 생성물은 먼저 검수 상태로 보관한다. YouTube/Facebook/Instagram/Threads/TikTok
 # 자동 게시 단계는 제거했다. 최종 게시 여부는 사용자가 검수 후 별도 실행한다.
 on:
-  schedule:
-    - cron: "17 21 * * 1,3,5"   # 06:17 KST 월/수/금
   workflow_dispatch: {}
 
 permissions:

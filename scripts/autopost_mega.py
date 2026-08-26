@@ -68,6 +68,7 @@ WP_USER         = "huh0303@gmail.com"
 
 RUN_SLOT            = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
+AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
 
 gemini_client         = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash-lite"
@@ -3331,9 +3332,9 @@ def process_one(site, keyword):
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
-    if site.get("no_image"):
+    if not AUTOMATED_IMAGE_PUBLISHING_ENABLED or site.get("no_image"):
         images=[]
-        print(f"  🚫 이미지 없음 (no_image=True)")
+        print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
         # 2026-08-22: 전 사이트가 매번 정확히 2장으로 고정돼 있던 것도 글자수와
         # 같은 이유(매 글 동일 패턴 = AI 대량생산 흔적)로 2~3장 랜덤화.

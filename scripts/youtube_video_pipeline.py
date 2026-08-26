@@ -222,6 +222,8 @@ def generate_image_prompts(topic, segments, style_reference=""):
 # 3) 이미지 생성 (Gemini 2.5 Flash Image / 나노바나나)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path):
+    log("   BLOCKED: legacy automated image generation is disabled")
+    return False
     # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): Gemini
     # 무료범위 먼저, 실패하면 OpenAI(gpt-image-1) 유료 폴백.
     body = {"contents": [{"parts": [{"text": prompt}]}]}

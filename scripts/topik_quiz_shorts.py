@@ -173,6 +173,8 @@ def gemini_generate_text(prompt, temperature=0.9):
 
 
 def gemini_generate_image(prompt, out_path):
+    print("   BLOCKED: legacy automated image generation is disabled")
+    return False
     # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): Gemini
     # 무료범위 먼저, 실패하면 OpenAI(gpt-image-1) 유료 폴백 — 순서가 반대였음.
     body = {"contents": [{"parts": [{"text": prompt}]}]}

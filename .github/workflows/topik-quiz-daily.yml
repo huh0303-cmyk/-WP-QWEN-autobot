@@ -13,8 +13,6 @@ on:
         description: "문항 수"
         required: false
         default: "5"
-  schedule:
-    - cron: "27 2 * * *"   # 매일 11:27 KST — 초급 TOPIK 5개 검수본 생성
 
 permissions:
   contents: read
@@ -47,6 +45,8 @@ jobs:
           NUM_ITEMS: ${{ inputs.num_items || '5' }}
           TARGET_LANG: "ko"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "false"
+          OPENAI_IMAGE_ENABLED: "false"
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}

@@ -43,7 +43,10 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 - `OPENAI_IMAGE_ENABLED=false`
 - `PAID_IMAGE_GENERATION_ENABLED=false`
 - 새 플랫폼 발행 흐름은 이미지 API를 호출하지 않음
-- 무료 스톡 이미지 또는 로컬 인포그래픽만 별도 승인된 흐름에서 사용
+- WordPress 27개는 본문·대표이미지 모두 `none / 0 / 0`
+- 기존 예약 이미지·썸네일 생성 워크플로는 자동 일정 비활성화
+- OpenAI 이미지 함수는 기존 환경변수 값과 관계없이 항상 차단
+- 현재 함께 만드는 유튜브 허브만 보유 원본·무료 공개자료를 사용할 수 있으며 AI 이미지 API는 금지
 
 ## Blogger 최초 1회 준비
 

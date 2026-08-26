@@ -2,8 +2,6 @@ name: 플리 채널 썸네일 주간 리프레시 (5개 채널 x 5장)
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "47 6 * * 3"   # 매주 수요일 15:47 KST
 
 permissions:
   contents: write
@@ -30,6 +28,8 @@ jobs:
       - name: 채널별 썸네일 5장씩 생성 + 드라이브 업로드
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "false"
+          OPENAI_IMAGE_ENABLED: "false"
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}

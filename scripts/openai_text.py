@@ -32,7 +32,7 @@ def openai_image_available():
 
     Text generation being enabled must never silently authorize image spend.
     """
-    return openai_available() and OPENAI_IMAGE_ENABLED
+    return False
 
 
 def openai_generate_text(prompt, temperature=0.9, max_retries=5):

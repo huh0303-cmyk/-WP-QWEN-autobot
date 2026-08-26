@@ -64,6 +64,7 @@ class RegistryTests(unittest.TestCase):
         self.assertEqual("테스트 주제", sites[0]["theme"])
         self.assertEqual("편집국", personas["https://example.com"]["persona_ko"])
         self.assertEqual(2100, personas["https://example.com"]["min_chars"])
+        self.assertTrue(sites[0]["no_image"])
 
     def test_wordpress_dashboard_rejects_unprofiled_destination(self):
         registry = SiteRegistry([

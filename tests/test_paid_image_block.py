@@ -19,6 +19,15 @@ class PaidImageBlockTests(unittest.TestCase):
             self.assertFalse(openai_text.openai_generate_image("test", str(output)))
             post.assert_not_called()
 
+    def test_legacy_image_opt_in_is_still_blocked(self):
+        with patch.object(openai_text, "OPENAI_API_KEY", "test"), \
+             patch.object(openai_text, "OPENAI_ENABLED", True), \
+             patch.object(openai_text, "OPENAI_IMAGE_ENABLED", True), \
+             patch("openai_text.requests.post") as post:
+            output = Path(tempfile.gettempdir()) / "must-not-exist-opt-in-image.png"
+            self.assertFalse(openai_text.openai_generate_image("test", str(output)))
+            post.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

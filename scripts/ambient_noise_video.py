@@ -59,6 +59,8 @@ def get_duration(path):
 
 
 def gemini_generate_image(prompt, out_path):
+    print("BLOCKED: legacy automated image generation is disabled")
+    return False
     # 2026-08-22: 무료(Gemini) 우선, 실패하면 OpenAI 유료 폴백(사용자 지시
     # "이미지도 돈안드는것 최우선" — curio_longform.py와 동일 원칙).
     body = {"contents": [{"parts": [{"text": prompt}]}]}
