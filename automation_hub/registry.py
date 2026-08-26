@@ -23,6 +23,11 @@ class SiteRegistry:
             raise ValueError("registry must be a list or an object containing sites")
         return cls(SiteConfig.from_dict(record) for record in records)
 
+    @classmethod
+    def from_sheet_rows(cls, header: list[str], rows: list[list[object]]) -> "SiteRegistry":
+        sites = [SiteConfig.from_sheet_row(header, row) for row in rows if row and str(row[0]).strip()]
+        return cls(sites)
+
     def validate(self) -> dict[str, list[str]]:
         problems: dict[str, list[str]] = {}
         seen_ids: set[str] = set()

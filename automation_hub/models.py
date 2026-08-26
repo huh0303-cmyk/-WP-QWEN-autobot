@@ -119,3 +119,26 @@ class SiteConfig:
             self.affiliate_profile,
             self.secret_name,
         ]
+
+    @classmethod
+    def from_sheet_row(cls, header: list[str], row: list[Any]) -> "SiteConfig":
+        """Build a destination from a Google Sheets row.
+
+        Empty trailing cells are allowed. Values controlled through the Korean
+        dashboard are normalized here so the publishing engine receives typed
+        values instead of spreadsheet strings.
+        """
+        raw = dict(zip(header, [*row, *([""] * max(0, len(header) - len(row)))]))
+        bool_value = str(raw.get("enabled", "ON")).strip().upper()
+        raw["enabled"] = bool_value in {"ON", "TRUE", "1", "YES", "Y"}
+        for name in (
+            "daily_min", "daily_max", "weekly_min", "weekly_max",
+            "min_gap_minutes", "min_chars", "target_chars", "max_chars",
+            "image_min", "image_max",
+        ):
+            value = raw.get(name, "")
+            if value != "":
+                raw[name] = int(value)
+            else:
+                raw.pop(name, None)
+        return cls.from_dict({key: value for key, value in raw.items() if value != ""})
