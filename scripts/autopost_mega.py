@@ -1944,13 +1944,18 @@ Do not write a TITLE line (a separate system generates the title). Do not restat
 def generate_content_gemini(prompt):
     # 2026-08-17: OPENAI_API_KEY가 있으면 ChatGPT로 라우팅 — 27개 사이트 글쓰기
     # 엔진 "대수술" 결정. 이미지(Pixabay/Pexels)는 그대로 유지, 텍스트만 교체.
+    provider = os.getenv("AI_TEXT_PROVIDER", "auto").strip().lower()
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from openai_text import openai_available, openai_generate_text
         if openai_available():
             return openai_generate_text(prompt, temperature=0.85, max_retries=3)
     except ImportError:
-        pass
+        if provider == "openai":
+            raise
+
+    if provider == "openai":
+        raise RuntimeError("OpenAI-only mode is enabled, but OPENAI_API_KEY/OPENAI_ENABLED is unavailable")
 
     global GEMINI_MODEL, _gemini_fallback_active
     for attempt in range(3):
@@ -3427,7 +3432,9 @@ def main():
         return
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
-    print(f"   Gemini: {GEMINI_MODEL} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
+    provider = os.getenv("AI_TEXT_PROVIDER", "auto").strip().lower()
+    model = os.getenv("OPENAI_MODEL", "gpt-5.6-luna") if provider == "openai" else GEMINI_MODEL
+    print(f"   AI: {provider}/{model} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
     print(f"   ✅ 카테고리 생성 금지 — 기존 카테고리 중에서만 매칭 (pick_best_category)")
     print(f"   ✅ 27개 사이트별 독립 페르소나 (SITE_PERSONA)")
     print(f"   ✅ IndexNow 발행 즉시 ping")

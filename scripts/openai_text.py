@@ -15,7 +15,7 @@ import requests
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_ENABLED = os.environ.get("OPENAI_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-luna")
 OPENAI_IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1")
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 OPENAI_IMAGE_URL = "https://api.openai.com/v1/images/generations"

@@ -54,7 +54,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+      - run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
       - name: Resolve newsroom
         id: target
         shell: bash
@@ -80,17 +80,25 @@ jobs:
       - name: Publish one source-checked edition
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          AUTOMATION_HUB_SOURCE: "sheets"
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5.6-luna"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/autopost_mega.py
+        run: python scripts/autopost_current.py
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4
