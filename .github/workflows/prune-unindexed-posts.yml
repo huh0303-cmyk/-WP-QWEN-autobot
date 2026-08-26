@@ -1,18 +1,19 @@
 name: "25개 블로그 — GSC 비색인 글 전수 비공개"
 
 on:
-  workflow_dispatch: {}
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/prune-unindexed-posts.yml"
-      - "scripts/prune_unindexed_all_sites.py"
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "실행하려면 정확히 PRUNE-UNINDEXED 입력"
+        required: true
+        default: ""
 
 permissions:
   contents: read
 
 jobs:
   prune:
+    if: ${{ inputs.confirm == 'PRUNE-UNINDEXED' }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests PyJWT cryptography -q
-      - name: "25개 블로그 GSC URL Inspection 전수검사 + 비색인 비공개"
+      - name: "25개 블로그 GSC URL Inspection 전수검사 + 확정 비색인만 private 전환"
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           WP_USER: ${{ secrets.WP_USER }}
