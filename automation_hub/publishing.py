@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
 from typing import Any, Protocol
+
+from .time_utils import iso_kst
 
 
 @dataclass(slots=True)
@@ -39,7 +40,7 @@ class PublishResult:
     remote_id: str = ""
     error_code: str = ""
     message: str = ""
-    completed_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    completed_at: str = field(default_factory=iso_kst)
     extra: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -48,4 +49,3 @@ class PublishResult:
 
 class Publisher(Protocol):
     def publish(self, job: PublishJob) -> PublishResult: ...
-

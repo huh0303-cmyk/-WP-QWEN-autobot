@@ -29,6 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.time_utils import display_kst
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -248,7 +249,8 @@ def main():
     if title_is_fallback:
         when = "비공개로만 업로드됨 — 제목 자동생성 실패로 폴백 문구가 쓰여서 자동공개 안 함. 스튜디오에서 제목 확인 후 직접 공개해주세요."
     elif publish_at_iso:
-        when = f"{hours_from_now}시간 뒤 예약 공개(private→public 자동전환)"
+        publish_dt = datetime.fromisoformat(publish_at_iso.replace("Z", "+00:00"))
+        when = f"한국시간 {display_kst(publish_dt)} 예약 공개(private→public 자동전환)"
     else:
         when = "즉시 공개로 업로드 완료"
     send_email(

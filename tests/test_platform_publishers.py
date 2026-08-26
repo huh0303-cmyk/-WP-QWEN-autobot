@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 from unittest.mock import Mock, patch
 
 from automation_hub.blogger_adapter import BloggerPublisher
@@ -37,6 +38,11 @@ class PlatformPublisherTests(unittest.TestCase):
         result = InteractiveEditorPublisher("tistory", "site-1", "https://www.tistory.com").publish(self.job)
         self.assertFalse(result.ok)
         self.assertEqual("local_login_required", result.status)
+
+    def test_result_timestamp_is_korean_time(self):
+        result = InteractiveEditorPublisher("naver", "site-1", "https://blog.naver.com").publish(self.job)
+        completed = datetime.fromisoformat(result.completed_at)
+        self.assertEqual(9 * 60, int(completed.utcoffset().total_seconds() / 60))
 
 
 if __name__ == "__main__":

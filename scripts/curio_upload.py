@@ -26,6 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.time_utils import display_kst
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -220,7 +221,8 @@ def main():
     log(f"   ✅ OAuth 채널 일치 확인: {channel_key} ({verified_id})")
     video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags, publish_at)
     if publish_at:
-        log(f"✅ 업로드 완료(비공개, {publish_at}에 자동 공개 예약됨): https://youtube.com/watch?v={video_id}")
+        publish_dt = datetime.fromisoformat(publish_at.replace("Z", "+00:00"))
+        log(f"✅ 업로드 완료(비공개, 한국시간 {display_kst(publish_dt)} 자동 공개 예약): https://youtube.com/watch?v={video_id}")
     else:
         log(f"✅ 업로드 완료(비공개): https://youtube.com/watch?v={video_id}")
 
