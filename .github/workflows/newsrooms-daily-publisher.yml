@@ -83,6 +83,8 @@ jobs:
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "openai"
           OPENAI_ENABLED: "true"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_MODEL: "gpt-5.6-luna"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"

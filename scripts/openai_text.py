@@ -15,6 +15,7 @@ import requests
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_ENABLED = os.environ.get("OPENAI_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
+OPENAI_IMAGE_ENABLED = os.environ.get("OPENAI_IMAGE_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-luna")
 OPENAI_IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1")
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
@@ -24,6 +25,14 @@ OPENAI_IMAGE_URL = "https://api.openai.com/v1/images/generations"
 def openai_available():
     """OpenAI는 키 + 명시적 활성화가 둘 다 있을 때만 사용한다."""
     return bool(OPENAI_API_KEY) and OPENAI_ENABLED
+
+
+def openai_image_available():
+    """Paid image generation requires a separate explicit opt-in.
+
+    Text generation being enabled must never silently authorize image spend.
+    """
+    return openai_available() and OPENAI_IMAGE_ENABLED
 
 
 def openai_generate_text(prompt, temperature=0.9, max_retries=5):
@@ -79,7 +88,8 @@ def _looks_like_model_unavailable(status_code, text):
 def openai_generate_image(prompt, out_path, size="1024x1024", max_retries=3):
     import time as _time
     global _image_model_fallback_active
-    if not openai_available():
+    if not openai_image_available():
+        print("  BLOCKED: OpenAI paid image generation is disabled (OPENAI_IMAGE_ENABLED=false)")
         return False
 
     headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}

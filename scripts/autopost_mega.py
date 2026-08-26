@@ -2566,6 +2566,9 @@ def ensure_featured_media(site_url, pw, image_url, title):
 #   Gemini/나노바나나는 키 없거나 실패했을 때만) — gpt-image-1을 1순위로 시도.
 # ============================================================
 def gemini_generate_image(prompt, out_path, max_retries=3):
+    if os.getenv("PAID_IMAGE_GENERATION_ENABLED", "false").strip().lower() != "true":
+        print("  ⛔ Gemini/OpenAI 유료 이미지 생성 차단됨")
+        return False
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     last_err = None
     for attempt in range(max_retries):
@@ -2593,6 +2596,9 @@ def gemini_generate_image(prompt, out_path, max_retries=3):
     return False
 
 def get_fallback_nanobanana_image(site_url, pw, keyword, theme, lang):
+    if os.getenv("PAID_IMAGE_GENERATION_ENABLED", "false").strip().lower() != "true":
+        print("  ⛔ AI 이미지 폴백 차단 — 무료 스톡/로컬 인포그래픽만 사용")
+        return []
     try:
         en_concept = translate_ko_to_en_for_image(keyword, theme) if lang == "ko" else keyword
         prompt = (f"A realistic, editorial-style photograph representing '{en_concept}'. "
