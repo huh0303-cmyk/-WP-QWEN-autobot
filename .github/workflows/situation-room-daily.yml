@@ -1,12 +1,10 @@
 name: 종합상황실 (사이트+유튜브+SNS 통합 → 시트/이메일/카카오톡)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
   schedule:
-    # 27개 사이트 작업은 최대 60분이므로 07:00 작업과 겹치지 않게 70분 뒤 실행.
-    - cron: "10 23 * * *"   # 08:10 KST (site-traffic 완료 이후)
+    # 방문자 스냅샷(05:20 KST) 이후 충분한 여유를 두고 아침 종합보고 발송.
+    - cron: "10 23 * * *"   # 08:10 KST
 
 concurrency:
   group: situation-room-daily
@@ -17,18 +15,14 @@ permissions:
 
 jobs:
   report:
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[situation-room-refresh]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
-
       - name: "종합상황실 수집 → 분석 → 발송"
         env:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -43,11 +37,6 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
-          # 2026-08-18: social_stats_daily.py의 _multi 함수(situation_room_daily.py가
-          # 이미 import해서 씀)는 브랜드별(TOPIK/ENGLISH/LANGUAGE) 시크릿을 찾는데,
-          # 여기 배선이 빠져있어서 TOPIK 외엔 항상 "미설정"으로만 나왔음 — 연결.
-          # 실제 시크릿 값은 아직 등록 안 돼있을 수 있고, 없으면 _multi 함수가
-          # 조용히 "계정 미설정"으로 리포트에 남길 뿐 에러는 아니다.
           TIKTOK_USERNAME_ENGLISH: ${{ secrets.TIKTOK_USERNAME_ENGLISH }}
           TIKTOK_USERNAME_LANGUAGE: ${{ secrets.TIKTOK_USERNAME_LANGUAGE }}
           FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
@@ -69,11 +58,14 @@ jobs:
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
         run: python scripts/situation_room_daily.py
-
       - name: "다음날 비교용 기록 커밋"
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add situation_room_history.json
-          git diff --cached --quiet && echo "변경 없음" || git commit -m "chore: 종합상황실 기록 갱신 [skip ci]"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add situation_room_history.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: 종합상황실 기록 갱신 [skip ci]"
           git push
