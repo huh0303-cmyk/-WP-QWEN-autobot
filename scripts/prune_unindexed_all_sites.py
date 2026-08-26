@@ -8,12 +8,25 @@
 - PASS가 아닌 확인된 비색인 글은 WordPress status=private 로 전환.
 - API 오류/쿼터/권한 문제처럼 판정이 불확실한 글은 건드리지 않는다.
 - 삭제는 하지 않는다.
+- GitHub hosted runner에서 Hostinger 계열 도메인의 IPv6 경로가 막히는 경우가 있어
+  WordPress/GSC HTTP 연결을 IPv4로 강제한다.
 """
 
 import json
 import os
 import sys
 import time
+import socket
+
+# GitHub Actions hosted runner 일부 리전에서 대상 사이트 AAAA(IPv6) 경로가
+# [Errno 101] Network is unreachable 로 실패하는 문제가 있어 IPv4만 사용한다.
+_original_getaddrinfo = socket.getaddrinfo
+
+def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+socket.getaddrinfo = _ipv4_getaddrinfo
+
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +45,7 @@ def fetch_posts(site_url):
         r = requests.get(
             f"{site_url}/wp-json/wp/v2/posts",
             params={"status": "publish", "per_page": 100, "page": page, "_fields": "id,link,title"},
-            headers={"User-Agent": "Mozilla/5.0"}, timeout=35,
+            headers={"User-Agent": "Mozilla/5.0 (GitHubActions; WP-Index-Pruner/1.1)"}, timeout=35,
         )
         if r.status_code == 400 and "rest_post_invalid_page_number" in r.text:
             break
@@ -56,7 +69,8 @@ def title_of(post):
 def set_private(site_url, pw, post_id):
     r = requests.post(
         f"{site_url}/wp-json/wp/v2/posts/{post_id}",
-        auth=(WP_USER, pw), json={"status": "private"}, timeout=35,
+        auth=(WP_USER, pw), json={"status": "private"},
+        headers={"User-Agent": "Mozilla/5.0 (GitHubActions; WP-Index-Pruner/1.1)"}, timeout=35,
     )
     return r.status_code in (200, 201), r.status_code, r.text[:180]
 
@@ -92,7 +106,6 @@ def property_for(domain, site_url, accessible):
         return prefix
     if domain_prop in accessible:
         return domain_prop
-    # 일부 등록은 https://domain 형식으로 슬래시 없이 저장된 경우 방어
     if site_url in accessible:
         return site_url
     return None
@@ -112,7 +125,7 @@ def main():
     accessible = {x.get("siteUrl") for x in resp.json().get("siteEntry", []) if x.get("siteUrl")}
 
     targets = [row for row in ACTIVE_SITES if row[0].replace("https://", "").rstrip("/") not in NEWS_DOMAINS]
-    print(f"대상 블로그 {len(targets)}개 / 뉴스 2개 제외")
+    print(f"대상 블로그 {len(targets)}개 / 뉴스 2개 제외 / IPv4 강제")
 
     for site_url, env_key, lifecycle in targets:
         site_url = site_url.rstrip("/")
