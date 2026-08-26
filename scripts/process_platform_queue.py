@@ -48,6 +48,9 @@ def main() -> int:
     spreadsheet_id = os.environ.get("SHEET_ID", "").strip()
     selected_job = os.environ.get("JOB_ID", "").strip()
     max_jobs = max(1, int(os.environ.get("MAX_JOBS", "1")))
+    platform_filter = os.environ.get("PLATFORM_FILTER", "").strip().lower()
+    if platform_filter in {"all", "*"}:
+        platform_filter = ""
     if not spreadsheet_id:
         raise SystemExit("SHEET_ID is required")
 
@@ -67,12 +70,14 @@ def main() -> int:
         if not account:
             print(json.dumps({"job_id": row.get("job_id"), "status": "skipped", "error": "enabled account not found"}, ensure_ascii=False))
             continue
+        platform = account.get("platform", "").lower()
+        if platform_filter and platform != platform_filter:
+            continue
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
             publish_now=row.get("publish_now", "TRUE").upper() in {"TRUE", "ON", "1", "YES"}, source_keyword=row.get("source_keyword", ""),
         )
-        platform = account.get("platform", "").lower()
         if platform == "blogger":
             try:
                 token = _access_token(account.get("auth_profile", ""))

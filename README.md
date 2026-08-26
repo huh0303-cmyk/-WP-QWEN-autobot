@@ -38,6 +38,8 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 
 `자동화_발행대기`에서 `status`를 `ready`로 설정하면 수동 GitHub Action **Automation Hub — platform publish**가 처리합니다. `publish_now=FALSE`이면 Blogger 초안으로 저장합니다.
 
+블로그스팟 자동 일정은 매시간 17분(UTC cron, 실제 표시는 KST)에 대기열을 확인하고 한 번에 최대 1건만 처리합니다. 저장소 변수 `BLOGGER_AUTOPUBLISH_ENABLED=true`일 때만 예약 실행되므로, 먼저 `scripts/blogger_verify_account.py` 또는 수동 Action으로 OAuth·blog ID를 검증한 뒤 켭니다. 예약 실행은 `PLATFORM_FILTER=blogger`로 고정되어 네이버·티스토리 행을 변경하지 않습니다. 발행 성공은 Blogger가 돌려준 URL을 실제로 열어 제목까지 확인한 뒤에만 시트에 기록합니다.
+
 ## 네이버 블로그 최초 1회 준비와 실행
 
 네이버 로그인 비밀번호는 시트나 저장소에 넣지 않습니다. Google Cloud에서 OAuth 클라이언트를 `데스크톱 앱` 유형으로 하나 만들고 JSON을 내려받은 뒤 로컬 연결 도구를 실행합니다. 연결 파일은 `.local/google_sheets_oauth.json`에 저장되어 GitHub에 올라가지 않습니다. `SHEET_ID`만 PC 환경변수로 지정합니다.

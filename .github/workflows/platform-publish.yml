@@ -1,8 +1,19 @@
 name: "Automation Hub — platform publish"
 
 on:
+  schedule:
+    # GitHub cron is UTC. Every hour at :17; Sheets/operator timestamps remain KST.
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
+      platform:
+        description: "Platform to process"
+        required: true
+        default: "blogger"
+        type: choice
+        options:
+          - blogger
+          - all
       job_id:
         description: "Optional exact job_id from 자동화_발행대기"
         required: false
@@ -16,8 +27,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: automation-hub-platform-publish
+  cancel-in-progress: false
+
 jobs:
   publish:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.BLOGGER_AUTOPUBLISH_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -34,9 +50,9 @@ jobs:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          JOB_ID: ${{ inputs.job_id }}
-          MAX_JOBS: ${{ inputs.max_jobs }}
+          JOB_ID: ${{ inputs.job_id || '' }}
+          MAX_JOBS: ${{ inputs.max_jobs || '1' }}
+          PLATFORM_FILTER: ${{ github.event_name == 'schedule' && 'blogger' || inputs.platform || 'blogger' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
         run: python scripts/process_platform_queue.py
-
