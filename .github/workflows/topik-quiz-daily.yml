@@ -1,98 +1,52 @@
-name: TOPIK 단어 퀴즈 쇼츠 (한국어 → 유튜브/틱톡/페북/인스타/쓰레드)
+name: TOPIK 단어 퀴즈 쇼츠 — 검수용 생성만
 
-# 원래는 5개 언어를 다 만들었지만, 일본어/영어/스페인어/베트남어는
-# daily_multilang_quiz.yml이 각자 전용 채널로 이미 담당하고 있어서 중복이라
-# 여기서는 한국어만 만든다(같은 유튜브 채널에 다른 언어 영상이 섞여 올라가는
-# 문제 방지).
+# 운영 원칙: 자동 생성 콘텐츠는 먼저 비공개/검수 상태로 만들고,
+# 사용자가 최종 검수한 뒤 별도 게시한다. 이 워크플로는 게시 API를 호출하지 않는다.
 on:
   workflow_dispatch:
     inputs:
       category:
-        description: "카테고리 (비우면 무작위: 동물/음식/직업/색깔 등)"
+        description: "카테고리 (비우면 무작위)"
         required: false
         default: ""
       num_items:
         description: "문항 수"
         required: false
         default: "5"
-      langs:
-        description: "생성할 언어 (쉼표구분, 기본 한국어만)"
-        required: false
-        default: "ko"
-  # ⚠️ 2026-08-03 사고 이력: 스케줄 실행 시 resolve-langs가 (langs 입력이 비어있으니)
-  # ko/ja/en/es/vi 5개 전부로 폴백하고, social_publish.py의 publish_youtube가
-  # 언어별 토큰 라우팅 없이 공용 YOUTUBE_OAUTH_REFRESH_TOKEN(스타벅스 플리
-  # 채널 토큰) 하나로 전부 올려버려서 영/일/스페인어 퀴즈가 스타벅스 채널에
-  # 뒤섞여 올라간 사고 발생 → 원인 파악 후 스케줄 껐었음.
-  # 2026-08-14 재개: resolve-langs가 이제 빈 입력이면 무조건 "ko" 하나로만
-  # 고정 폴백하도록 이미 고쳐져 있는 걸 코드로 확인(위 job 참고) — 5개 언어로
-  # 새는 경로 자체가 없어졌으므로 안전. 다른 파이프라인들과 같은 패턴으로
-  # 주3회(월/수/금), 부담없이 분산된 시각에 재개(2026-08-14 사용자 지시).
   schedule:
-    - cron: "27 2 * * 1,3,5"   # 11:27 KST 월/수/금 — 기존 파이프라인들 시간대와 안 겹치게
+    - cron: "27 2 * * *"   # 매일 11:27 KST — 초급 TOPIK 5개 검수본 생성
+
+permissions:
+  contents: read
 
 concurrency:
-  group: topik-quiz-daily
+  group: topik-quiz-review-generation
   cancel-in-progress: false
 
 jobs:
-  # ══════════════════════════════════════════════════════════
-  # JOB 0: 이번 실행에서 만들 언어 목록 계산.
-  # workflow_dispatch면 langs 입력을 그대로 쓰고(수동 테스트 시 1개만
-  # 지정 가능), 스케줄 실행이면 5개 전부.
-  # ══════════════════════════════════════════════════════════
-  resolve-langs:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      langs_json: ${{ steps.resolve.outputs.langs_json }}
-    steps:
-      - id: resolve
-        run: |
-          RAW="${{ github.event.inputs.langs }}"
-          if [ -z "$RAW" ]; then RAW="ko"; fi
-          JSON=$(python3 -c "import json,sys; print(json.dumps([s.strip() for s in sys.argv[1].split(',') if s.strip()]))" "$RAW")
-          echo "langs_json=$JSON" >> "$GITHUB_OUTPUT"
-          echo "▶ 이번 실행 언어: $JSON"
-
-  # ══════════════════════════════════════════════════════════
-  # JOB 1: 언어별 영상 생성 (승인 없이 실행 — 아직 아무 데도 게시 안 됨)
-  # ══════════════════════════════════════════════════════════
   generate:
-    needs: resolve-langs
-    strategy:
-      fail-fast: false
-      matrix:
-        lang: ${{ fromJson(needs.resolve-langs.outputs.langs_json) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: "시스템 의존성 (ffmpeg + 한글/일본어 폰트)"
+      - name: "시스템 의존성"
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum fonts-noto-cjk
-
-      - name: "패키지 캐시"
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: pip-topikquiz-v1
-
+          key: pip-topikquiz-v2
       - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
-
-      - name: "퀴즈 쇼츠 생성 (${{ matrix.lang }})"
+      - name: "초급 TOPIK 퀴즈 5개 검수본 생성"
         env:
-          TOPIC_CATEGORY: ${{ github.event.inputs.category }}
-          NUM_ITEMS: ${{ github.event.inputs.num_items || '5' }}
-          TARGET_LANG: ${{ matrix.lang }}
+          TOPIC_CATEGORY: ${{ inputs.category }}
+          NUM_ITEMS: ${{ inputs.num_items || '5' }}
+          TARGET_LANG: "ko"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -100,55 +54,13 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: python scripts/topik_quiz_shorts.py
-
-      - name: "영상+메타데이터 업로드 (다음 게시 잡에서 사용)"
+      - name: "검수용 영상/메타데이터 보관"
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: quiz-${{ matrix.lang }}-${{ github.run_id }}
+          name: topik-review-${{ github.run_id }}
           path: |
-            topik_quiz_output/final.mp4
-            topik_quiz_output/meta_${{ matrix.lang }}.json
-          retention-days: 3
-
-  # ══════════════════════════════════════════════════════════
-  # JOB 2: 실제 게시 — GitHub Environment 승인이 있어야 실행됨.
-  # 저장소 Settings → Environments → social-publish 에 필수 검토자를
-  # 등록해두면, 사람이 "Approve and deploy"를 눌러야만 아래 게시 단계가
-  # 시작된다. 등록해두지 않으면 승인 없이 바로 게시되니 주의.
-  # ══════════════════════════════════════════════════════════
-  publish:
-    needs: [resolve-langs, generate]
-    strategy:
-      fail-fast: false
-      matrix:
-        lang: ${{ fromJson(needs.resolve-langs.outputs.langs_json) }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    environment: social-publish
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
-
-      - name: "생성된 영상 다운로드"
-        uses: actions/download-artifact@v4
-        with:
-          name: quiz-${{ matrix.lang }}-${{ github.run_id }}
-          path: topik_quiz_output
-
-      - name: "멀티플랫폼 게시 (${{ matrix.lang }})"
-        env:
-          TARGET_LANG: ${{ matrix.lang }}
-          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
-          TIKTOK_PRIVACY_LEVEL: ${{ secrets.TIKTOK_PRIVACY_LEVEL }}
-          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: python scripts/social_publish.py "${{ matrix.lang }}"
+            topik_quiz_output/*.mp4
+            topik_quiz_output/*.json
+          retention-days: 14
+          if-no-files-found: warn
