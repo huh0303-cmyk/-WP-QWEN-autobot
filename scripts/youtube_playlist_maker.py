@@ -820,7 +820,7 @@ def build_ai_images(topic, workdir, service=None):
         path = os.path.join(workdir, f"ai_image_{i}.png")
         source = None  # "gemini" | "bank" | "placeholder"
 
-        if GEMINI_API_KEY:
+        if GEMINI_API_KEY and os.environ.get("AUTOMATED_IMAGE_PUBLISHING_ENABLED", "false").lower() == "true":
             for attempt in range(4):
                 if gemini_generate_image(prompt, path):
                     source = "gemini"
