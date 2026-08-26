@@ -34,3 +34,10 @@ jobs:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           FORCE_SEED: ${{ inputs.force_seed }}
         run: python scripts/sync_automation_hub_to_sheets.py
+      - name: Read back and validate runtime settings
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python scripts/load_automation_hub_from_sheets.py
