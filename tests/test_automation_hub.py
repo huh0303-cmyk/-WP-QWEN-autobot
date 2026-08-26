@@ -59,6 +59,8 @@ class RegistryTests(unittest.TestCase):
         sites, personas = apply_wordpress_registry(legacy, {}, SiteRegistry([site]))
         self.assertEqual("EXAMPLECOM", sites[0]["wp_pass_env"])
         self.assertEqual(3, sites[0]["daily"])
+        self.assertEqual(0, sites[0]["daily_min"])
+        self.assertEqual(3, sites[0]["daily_max"])
         self.assertEqual("테스트 주제", sites[0]["theme"])
         self.assertEqual("편집국", personas["https://example.com"]["persona_ko"])
         self.assertEqual(2100, personas["https://example.com"]["min_chars"])

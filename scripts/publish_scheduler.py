@@ -35,30 +35,20 @@ import os
 import random
 import requests
 
+from load_automation_hub_from_sheets import load_runtime_registry
+
 KST = datetime.timezone(datetime.timedelta(hours=9))
 now = datetime.datetime.now(KST)
 today = now.strftime("%Y-%m-%d")
 
-# autopost_mega.py의 SITES_CONFIG 중 이 스케줄러가 담당하는 25개 블로그 사이트.
-# koreanews365/theseouljournal(별도 뉴스 스케줄러 사용 중)은 제외 — 무거운
-# google-genai 등 의존성 없이 순수 requests만 쓰는 이
-# 스케줄러 워크플로우에서 autopost_mega.py를 그대로 import하지 않으려고
-# 독립 목록 유지(다른 스케줄/감사 스크립트들과 동일한 관례).
-A_GROUP = [
-    "https://korea365.org", "https://kstudy365.com", "https://oliveyoungkorea.com",
-    "https://jobkorea365.com", "https://k-visa365.com", "https://k-health365.com",
-    "https://kskin365.com", "https://k-trip365.com", "https://kfinance365.com",
-    "https://koreainsurance365.com", "https://koreataxnlaw.com",
-    "https://koreamedicaltour.com", "https://studyinkorea365.com",
-    "https://jobinkorea365.com", "https://kworld365.com",
-    "https://koreawedding365.com", "https://jobkoreaglobal.com",
-]
-B_GROUP = [
-    "https://koreainvest365.com", "https://krealestate365.com",
-    "https://koreacrypto365.com", "https://ktech365.com",
-    "https://kieca-korea.org", "https://ksa-korea.org",
-    "https://sis-korea.com", "https://ki-korea.com",
-]
+_registry = load_runtime_registry()
+BLOG_CONFIG = {
+    site.url.rstrip("/"): site
+    for site in _registry.enabled("wordpress")
+    if site.content_type == "blog" and site.publish_mode == "automatic"
+}
+A_GROUP = [url for url, site in BLOG_CONFIG.items() if site.group == "A"]
+B_GROUP = [url for url, site in BLOG_CONFIG.items() if site.group == "B"]
 SITES = A_GROUP + B_GROUP
 
 
@@ -66,7 +56,8 @@ def weekly_publish_days(site_url):
     """Return 0=Mon..6=Sun days for this site's current weekly plan."""
     iso = now.date().isocalendar()
     rng = random.Random(f"{iso.year}-W{iso.week}-{site_url}-weekly-cadence-v1")
-    count = rng.randint(3, 4) if site_url in A_GROUP else rng.randint(2, 3)
+    config = BLOG_CONFIG[site_url]
+    count = rng.randint(config.weekly_min, config.weekly_max)
     weekend_day = rng.choice([5, 6])
     remaining = [day for day in range(7) if day != weekend_day]
     return sorted([weekend_day] + rng.sample(remaining, count - 1))

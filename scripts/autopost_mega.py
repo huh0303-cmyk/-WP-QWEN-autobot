@@ -35,11 +35,13 @@ def now_kst():
 NEWSROOM_DAILY_MIN = 3
 NEWSROOM_DAILY_MAX = 10
 
-def newsroom_daily_target(site_url, day=None):
+def newsroom_daily_target(site_url, day=None, daily_min=NEWSROOM_DAILY_MIN, daily_max=NEWSROOM_DAILY_MAX):
     """Stable per-site target for one KST day; changes automatically next day."""
     day = day or now_kst().date()
     seed = hashlib.sha256(f"{site_url}|{day.isoformat()}".encode()).digest()
-    return NEWSROOM_DAILY_MIN + int.from_bytes(seed[:4], "big") % 8
+    if daily_max < daily_min:
+        raise ValueError(f"invalid newsroom daily range: {daily_min}-{daily_max}")
+    return daily_min + int.from_bytes(seed[:4], "big") % (daily_max - daily_min + 1)
 
 def count_published_today(site_url, wp_pass):
     """Count posts published since KST midnight; fail closed on API errors."""
@@ -3480,7 +3482,11 @@ def main():
                 print(f"⏭  {url} — 이번 슬롯 없음"); continue
 
         if site["mode"] in ("news", "news_en"):
-            daily_target = newsroom_daily_target(url)
+            daily_target = newsroom_daily_target(
+                url,
+                daily_min=site.get("daily_min", NEWSROOM_DAILY_MIN),
+                daily_max=site.get("daily_max", NEWSROOM_DAILY_MAX),
+            )
             published_today = count_published_today(url, os.getenv(site["wp_pass_env"], ""))
             if published_today is None:
                 print(f"⏭  {url} — 오늘 발행량 확인 실패, 안전 중지")
