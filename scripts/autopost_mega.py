@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 51329)
-Total output lines: 3504
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -1633,7 +1630,96 @@ def resolve_min_chars(url):
 # ============================================================
 _RHYTHM_PROFILES = [
     {"name": "punchy",
-     "ko": "문장: 모든 <p>는 1문장만. 짧고 단정적으로 끊어 쓸 것 — 접속사로 문장을 길게 잇지 말 것.…1329 tokens truncated….
+     "ko": "문장: 모든 <p>는 1문장만. 짧고 단정적으로 끊어 쓸 것 — 접속사로 문장을 길게 잇지 말 것.",
+     "en": "Sentences: every <p> is exactly 1 sentence. Short and declarative — never chain "
+           "clauses together with conjunctions into a longer sentence."},
+    {"name": "flowing",
+     "ko": "문장: 대부분의 <p>는 2~3문장으로, 앞 문장과 자연스럽게 이어지는 연결어를 써서 리듬감 있게.",
+     "en": "Sentences: most <p> run 2-3 sentences, connected with natural transitional phrasing "
+           "rather than choppy fragments."},
+    {"name": "scannable",
+     "ko": "문장: 모든 <p>는 2문장 이하. 나열할 정보가 나오면 문장으로 풀지 말고 즉시 <ul>/<table>로 전환.",
+     "en": "Sentences: every <p> max 2 sentences. The moment content becomes list-like, break "
+           "immediately into <ul>/<table> instead of writing it out as prose."},
+    {"name": "formal",
+     "ko": "문장: 모든 <p>는 2문장. 축약 표현 없이 신중하고 정확한 어조를 유지할 것.",
+     "en": "Sentences: every <p> is 2 sentences, measured and precise — avoid contractions and "
+           "casual asides."},
+    {"name": "conversational",
+     "ko": "문장: 대부분 <p>는 2문장이되, 강조하고 싶은 지점에서는 1문장짜리 짧은 단락을 섞어 리듬을 준다.",
+     "en": "Sentences: most <p> run 2 sentences, but mix in occasional 1-sentence paragraphs "
+           "for emphasis and pacing rather than a uniform rhythm throughout."},
+]
+
+_SITE_RHYTHM_ASSIGNMENT = {
+    "https://koreainvest365.com": "scannable",
+    "https://ki-korea.com": "formal",
+    "https://koreainsurance365.com": "conversational",
+    "https://kfinance365.com": "punchy",
+    "https://koreataxnlaw.com": "formal",
+    "https://koreacrypto365.com": "flowing",
+    "https://krealestate365.com": "punchy",
+    "https://ktech365.com": "scannable",
+    "https://k-health365.com": "flowing",
+    "https://koreamedicaltour.com": "conversational",
+    "https://kstudy365.com": "formal",
+    "https://studyinkorea365.com": "conversational",
+    "https://kieca-korea.org": "punchy",
+    "https://ksa-korea.org": "scannable",
+    "https://sis-korea.com": "flowing",
+    "https://jobkorea365.com": "formal",
+    "https://jobinkorea365.com": "punchy",
+    "https://jobkoreaglobal.com": "conversational",
+    "https://oliveyoungkorea.com": "punchy",
+    "https://kworld365.com": "conversational",
+    "https://k-trip365.com": "flowing",
+    "https://k-visa365.com": "formal",
+    "https://koreawedding365.com": "scannable",
+    "https://korea365.org": "flowing",
+}
+_RHYTHM_BY_NAME = {p["name"]: p for p in _RHYTHM_PROFILES}
+
+
+def get_rhythm_for_site(url):
+    name = _SITE_RHYTHM_ASSIGNMENT.get(url)
+    if name:
+        return _RHYTHM_BY_NAME[name]
+    idx = int(hashlib.md5(url.encode()).hexdigest(), 16) % len(_RHYTHM_PROFILES)
+    return _RHYTHM_PROFILES[idx]
+
+
+def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override=None):
+    url   = site["url"]
+    theme = site["theme"]
+    lang  = site["lang"]
+    mode  = site.get("mode", "blog")
+    tag_count = tag_count or TAG_COUNT
+
+    p = SITE_PERSONA.get(url, {})
+    min_chars = min_chars_override if min_chars_override is not None else resolve_min_chars(url)
+    tables_req = p.get("tables", 1)
+    rhythm = get_rhythm_for_site(url)
+    structure = randomize_structure_counts(p.get("structure", []))
+    scope = p.get("scope", theme)
+
+    if lang == "ko":
+        persona = p.get("persona_ko", "전문 칼럼니스트")
+        tone = p.get("tone", "전문적이고 친근한 스타일")
+    else:
+        persona = p.get("persona_en", "Expert writer")
+        tone = p.get("tone", "Professional and engaging")
+
+    ext = get_authority_links(theme)
+    ext_s = random.sample(ext, min(3, len(ext)))
+    ext_h = ", ".join(f"{n}({u})" for n, u in ext_s)
+
+    ilinks = get_internal_links(url, count=4)
+    il_str = "\n".join(f'  - <a href="{u}" title="{n}">{n}</a>' for n, u in ilinks)
+    struct_str = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(structure))
+
+    medical_note = ""
+    if lang == "ko" and ("건강" in theme or "의학" in theme):
+        medical_note = '\n- ⚠️ "위험 신호 / 병원 가야 할 때" 섹션 필수\n- "이 글은 의학적 참고 정보이며, 진단·치료는 반드시 전문의와 상담하세요." 문구 필수'
 
     # ★ 뉴스모드(news/news_en)는 keyword가 RSS 헤드라인 "문장 전체"라서, 블로그용
     #   "keyword를 첫 문장에 포함 + 10회 반복" / "TAGS 첫번째=keyword" 지시를 그대로 쓰면
