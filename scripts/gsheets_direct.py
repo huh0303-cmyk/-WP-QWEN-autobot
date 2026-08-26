@@ -59,13 +59,13 @@ def ensure_tab(service, spreadsheet_id, tab_name, header):
     tab_id = _get_tab_id(service, spreadsheet_id, tab_name)
     if tab_id is not None:
         existing = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:Z1",
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:AZ1",
         ).execute().get("values", [[]])
         existing_header = existing[0] if existing else []
         if existing_header == header:
             return tab_id
         service.spreadsheets().values().clear(
-            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:Z",
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A1:AZ",
         ).execute()
         service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,

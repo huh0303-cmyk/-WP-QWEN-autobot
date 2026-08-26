@@ -27,10 +27,11 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install publisher dependencies
-        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+        run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
       - name: Publish one quality-gated post
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          AUTOMATION_HUB_SOURCE: "sheets"
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           RUN_SLOT: "1"
@@ -39,6 +40,10 @@ jobs:
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}

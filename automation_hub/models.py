@@ -118,6 +118,8 @@ class SiteConfig:
             self.keyword_mode,
             self.affiliate_profile,
             self.secret_name,
+            self.language,
+            self.timezone,
         ]
 
     @classmethod

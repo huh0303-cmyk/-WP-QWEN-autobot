@@ -25,7 +25,7 @@ def load_runtime_registry() -> SiteRegistry:
     service = get_sheets_service()
     values = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range=f"'{SETTINGS_TAB}'!A1:AA",
+        range=f"'{SETTINGS_TAB}'!A1:AC",
     ).execute().get("values", [])
     if not values:
         raise RuntimeError(f"{SETTINGS_TAB} is empty")

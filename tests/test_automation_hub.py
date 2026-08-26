@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from automation_hub.models import SiteConfig
 from automation_hub.public_verifier import verify_publication
 from automation_hub.registry import SiteRegistry
+from automation_hub.wordpress_adapter import apply_wordpress_registry
 
 
 class RegistryTests(unittest.TestCase):
@@ -28,19 +29,43 @@ class RegistryTests(unittest.TestCase):
             "min_gap_minutes", "content_profile", "min_chars", "target_chars", "max_chars",
             "persona", "tone", "category_mode", "default_category", "image_mode",
             "image_min", "image_max", "keyword_mode", "affiliate_profile", "secret_name",
+            "language", "timezone",
         ]
         row = [
             "wp_one", "wordpress", "One", "https://example.com", "blog", "A", "OFF",
             "review", "1", "2", "3", "4", "60", "option_2", "1500", "2000", "2500",
             "editor", "calm", "existing_only", "General", "mixed", "1", "2",
-            "golden_keyword", "none", "EXAMPLECOM",
+            "golden_keyword", "none", "EXAMPLECOM", "ko", "Asia/Seoul",
         ]
         registry = SiteRegistry.from_sheet_rows(header, [row])
         site = registry.by_id("wp_one")
         self.assertFalse(site.enabled)
         self.assertEqual(2, site.daily_max)
         self.assertEqual("option_2", site.content_profile)
+        self.assertEqual("ko", site.language)
         self.assertEqual({}, registry.validate())
+
+    def test_wordpress_dashboard_overlays_engine_settings(self):
+        site = SiteConfig(
+            site_id="wp_one", platform="wordpress", name="One", url="https://example.com",
+            secret_name="EXAMPLECOM", language="ko", daily_max=3, target_chars=2100,
+            max_chars=2600, persona="편집국", tone="차분한 문체",
+            keyword_rules={"theme": "테스트 주제"},
+        )
+        legacy = [{"url": "https://example.com", "theme": "old", "wp_pass_env": "OLD"}]
+        sites, personas = apply_wordpress_registry(legacy, {}, SiteRegistry([site]))
+        self.assertEqual("EXAMPLECOM", sites[0]["wp_pass_env"])
+        self.assertEqual(3, sites[0]["daily"])
+        self.assertEqual("테스트 주제", sites[0]["theme"])
+        self.assertEqual("편집국", personas["https://example.com"]["persona_ko"])
+        self.assertEqual(2100, personas["https://example.com"]["min_chars"])
+
+    def test_wordpress_dashboard_rejects_unprofiled_destination(self):
+        registry = SiteRegistry([
+            SiteConfig(site_id="new", platform="wordpress", name="New", url="https://new.example")
+        ])
+        with self.assertRaisesRegex(ValueError, "no engine profile"):
+            apply_wordpress_registry([], {}, registry)
 
 
 class PublicVerifierTests(unittest.TestCase):
