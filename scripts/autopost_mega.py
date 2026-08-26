@@ -2749,11 +2749,31 @@ def strip_hash_artifacts(text):
         text = re.sub(pat, '', text, flags=re.IGNORECASE | re.MULTILINE)
     return text
 
-def is_site_reachable(site_url, timeout=8):
-    try:
-        r=requests.head(f"{site_url}/wp-json/",timeout=timeout,allow_redirects=True)
-        return r.status_code not in (403,503)
-    except: return False
+def is_site_reachable(site_url, timeout=12):
+    """Check WordPress REST availability without trusting a single HEAD request.
+
+    Some hosts and CDNs intermittently reject HEAD requests from GitHub runners even
+    though the REST API is healthy. Retry with GET and only treat persistent 5xx or
+    transport errors as unreachable. Authentication errors still prove reachability.
+    """
+    endpoint = f"{site_url.rstrip('/')}/wp-json/wp/v2/types/post"
+    headers = {"User-Agent": "WP-QWEN-autobot/2.0 (+GitHub Actions)"}
+    for attempt in range(3):
+        try:
+            response = requests.get(
+                endpoint,
+                timeout=timeout,
+                allow_redirects=True,
+                headers=headers,
+            )
+            if response.status_code < 500:
+                return True
+            print(f"  ⚠️ REST 연결 확인 {attempt + 1}/3: HTTP {response.status_code}")
+        except requests.RequestException as exc:
+            print(f"  ⚠️ REST 연결 확인 {attempt + 1}/3 실패: {exc}")
+        if attempt < 2:
+            time.sleep(2 ** attempt)
+    return False
 
 def split_slots(daily, num=3):
     base=daily//num; rem=daily%num
@@ -3479,8 +3499,8 @@ def main():
     print(f"\n{'='*60}")
     print(f"✅ 완료 — 성공:{ok} / 실패:{fail} / 스킵:{skip}")
     print(f"{'='*60}\n")
-    if os.getenv("NEWSROOM_REQUIRE_PUBLICATION", "false").strip().lower() == "true" and fail and not ok:
-        print(f"::error title=Newsroom publication failed::No post was published; failed={fail}, skipped={skip}. See newsroom_publish_result.json")
+    if os.getenv("NEWSROOM_REQUIRE_PUBLICATION", "false").strip().lower() == "true" and (fail or skip) and not ok:
+        print(f"::error title=Publication failed::No post was published; failed={fail}, skipped={skip}. See newsroom_publish_result.json")
         raise SystemExit(1)
 
 if __name__=="__main__":

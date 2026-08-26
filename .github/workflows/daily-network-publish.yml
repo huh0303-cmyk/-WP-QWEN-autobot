@@ -32,6 +32,7 @@ jobs:
       - name: Publish one post
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
