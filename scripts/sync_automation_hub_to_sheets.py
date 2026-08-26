@@ -17,7 +17,10 @@ if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
 
 from automation_hub.registry import SiteRegistry
-from automation_hub.sheet_schema import KEYWORD_HEADER, RSS_HEADER, RUN_LOG_HEADER, SITE_SETTINGS_HEADER
+from automation_hub.sheet_schema import (
+    KEYWORD_HEADER, PLATFORM_ACCOUNT_HEADER, PUBLISH_QUEUE_HEADER, RSS_HEADER,
+    RUN_LOG_HEADER, SITE_SETTINGS_HEADER,
+)
 from gsheets_direct import ensure_tab, get_sheets_service
 
 
@@ -25,6 +28,8 @@ SETTINGS_TAB = "자동화_사이트설정"
 RUNS_TAB = "자동화_실행현황"
 KEYWORDS_TAB = "자동화_황금키워드"
 RSS_TAB = "자동화_RSS"
+ACCOUNTS_TAB = "자동화_플랫폼계정"
+QUEUE_TAB = "자동화_발행대기"
 
 
 def _ensure_log_tab(service, spreadsheet_id: str, tab_name: str, header: list[str]) -> None:
@@ -67,7 +72,9 @@ def main() -> int:
     _ensure_log_tab(service, spreadsheet_id, RUNS_TAB, RUN_LOG_HEADER)
     _ensure_log_tab(service, spreadsheet_id, KEYWORDS_TAB, KEYWORD_HEADER)
     _ensure_log_tab(service, spreadsheet_id, RSS_TAB, RSS_HEADER)
-    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}")
+    _ensure_log_tab(service, spreadsheet_id, ACCOUNTS_TAB, PLATFORM_ACCOUNT_HEADER)
+    _ensure_log_tab(service, spreadsheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
+    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}")
     return 0
 
 

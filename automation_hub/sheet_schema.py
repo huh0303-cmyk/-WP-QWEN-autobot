@@ -23,3 +23,14 @@ RSS_HEADER = [
     "source_id", "newsroom_site_id", "publisher", "feed_url", "language",
     "trust_level", "enabled", "max_age_hours", "last_checked_at", "last_error",
 ]
+
+PLATFORM_ACCOUNT_HEADER = [
+    "account_id", "platform", "site_id", "display_name", "destination_id",
+    "editor_url", "auth_profile", "enabled", "notes",
+]
+
+PUBLISH_QUEUE_HEADER = [
+    "created_at", "job_id", "site_id", "status", "publish_now", "title",
+    "content_html", "labels", "source_keyword", "public_url", "remote_id",
+    "error_code", "message", "completed_at",
+]

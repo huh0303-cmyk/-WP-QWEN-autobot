@@ -1,0 +1,42 @@
+name: "Automation Hub — platform publish"
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: "Optional exact job_id from 자동화_발행대기"
+        required: false
+        type: string
+      max_jobs:
+        description: "Maximum ready jobs to process"
+        required: true
+        default: "1"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install google-api-python-client google-auth requests -q
+      - name: Process queue
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          JOB_ID: ${{ inputs.job_id }}
+          MAX_JOBS: ${{ inputs.max_jobs }}
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          OPENAI_IMAGE_ENABLED: "false"
+        run: python scripts/process_platform_queue.py
+
