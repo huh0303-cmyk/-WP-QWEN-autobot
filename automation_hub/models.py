@@ -120,6 +120,8 @@ class SiteConfig:
             self.secret_name,
             self.language,
             self.timezone,
+            ",".join(self.allowed_categories),
+            ",".join(self.rss_sources),
         ]
 
     @classmethod
@@ -133,6 +135,9 @@ class SiteConfig:
         raw = dict(zip(header, [*row, *([""] * max(0, len(header) - len(row)))]))
         bool_value = str(raw.get("enabled", "ON")).strip().upper()
         raw["enabled"] = bool_value in {"ON", "TRUE", "1", "YES", "Y"}
+        for name in ("allowed_categories", "rss_sources"):
+            value = str(raw.get(name, "")).strip()
+            raw[name] = [item.strip() for item in value.split(",") if item.strip()]
         for name in (
             "daily_min", "daily_max", "weekly_min", "weekly_max",
             "min_gap_minutes", "min_chars", "target_chars", "max_chars",

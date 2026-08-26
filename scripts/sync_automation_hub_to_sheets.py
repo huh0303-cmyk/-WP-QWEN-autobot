@@ -45,13 +45,13 @@ def main() -> int:
     ensure_tab(service, spreadsheet_id, SETTINGS_TAB, SITE_SETTINGS_HEADER)
     current = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range=f"'{SETTINGS_TAB}'!A2:AC",
+        range=f"'{SETTINGS_TAB}'!A2:AE",
     ).execute().get("values", [])
     force_seed = os.environ.get("FORCE_SEED", "false").strip().lower() == "true"
     if force_seed or not current:
         service.spreadsheets().values().clear(
             spreadsheetId=spreadsheet_id,
-            range=f"'{SETTINGS_TAB}'!A2:AC",
+            range=f"'{SETTINGS_TAB}'!A2:AE",
         ).execute()
         rows = [site.to_sheet_row() for site in registry.sites]
         service.spreadsheets().values().update(

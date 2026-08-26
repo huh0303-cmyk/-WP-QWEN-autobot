@@ -29,13 +29,14 @@ class RegistryTests(unittest.TestCase):
             "min_gap_minutes", "content_profile", "min_chars", "target_chars", "max_chars",
             "persona", "tone", "category_mode", "default_category", "image_mode",
             "image_min", "image_max", "keyword_mode", "affiliate_profile", "secret_name",
-            "language", "timezone",
+            "language", "timezone", "allowed_categories", "rss_sources",
         ]
         row = [
             "wp_one", "wordpress", "One", "https://example.com", "blog", "A", "OFF",
             "review", "1", "2", "3", "4", "60", "option_2", "1500", "2000", "2500",
             "editor", "calm", "existing_only", "General", "mixed", "1", "2",
             "golden_keyword", "none", "EXAMPLECOM", "ko", "Asia/Seoul",
+            "General,News", "registry:korean",
         ]
         registry = SiteRegistry.from_sheet_rows(header, [row])
         site = registry.by_id("wp_one")
@@ -43,6 +44,8 @@ class RegistryTests(unittest.TestCase):
         self.assertEqual(2, site.daily_max)
         self.assertEqual("option_2", site.content_profile)
         self.assertEqual("ko", site.language)
+        self.assertEqual(["General", "News"], site.allowed_categories)
+        self.assertEqual(["registry:korean"], site.rss_sources)
         self.assertEqual({}, registry.validate())
 
     def test_wordpress_dashboard_overlays_engine_settings(self):

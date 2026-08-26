@@ -4,7 +4,7 @@ SITE_SETTINGS_HEADER = [
     "min_gap_minutes", "content_profile", "min_chars", "target_chars", "max_chars",
     "persona", "tone", "category_mode", "default_category", "image_mode",
     "image_min", "image_max", "keyword_mode", "affiliate_profile", "secret_name",
-    "language", "timezone",
+    "language", "timezone", "allowed_categories", "rss_sources",
 ]
 
 RUN_LOG_HEADER = [
