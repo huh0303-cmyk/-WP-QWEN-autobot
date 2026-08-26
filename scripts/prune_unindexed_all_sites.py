@@ -1,77 +1,29 @@
 #!/usr/bin/env python3
-"""2026-08-26 사용자 지시 — 25개 블로그를 '승인 재도전용 깨끗한 상태'로 정리.
+"""25개 블로그 색인 정리.
 
-원칙
-- 뉴스 2개(koreanews365.com, theseouljournal.com)는 대상에서 제외.
-- kskin365.com / oliveyoungkorea.com 은 기존 글을 전면 리셋: 현재 공개글 전부 비공개.
-  (두 사이트는 이전 색인 정리에서 누락됐고, 공개 샘플에서 대량 AI 템플릿 흔적이 확인됨.)
-- 나머지 23개 블로그는 '색인 여부'보다 '품질'을 우선한다. 아래 강한 휴리스틱에서
-  저품질/대량생산 흔적/이미지 부실이 명확한 글만 비공개로 전환한다.
-- 삭제는 하지 않고 WordPress status=private 로만 바꾼다. 언제든 복구 가능하다.
-- 외부 유료 LLM/API를 호출하지 않는다. 정리 자체에 추가 API 비용이 들지 않는다.
+- 뉴스 2개는 제외.
+- kskin365.com / oliveyoungkorea.com 은 사용자 지시대로 기존 공개글 전부 비공개.
+- 나머지 블로그는 Google Search Console URL Inspection API로 공개글을 하나씩 검사.
+- verdict == PASS 인 글만 공개 유지.
+- PASS가 아닌 확인된 비색인 글은 WordPress status=private 로 전환.
+- API 오류/쿼터/권한 문제처럼 판정이 불확실한 글은 건드리지 않는다.
+- 삭제는 하지 않는다.
 """
 
 import json
 import os
-import re
 import sys
-from collections import Counter
-from html import unescape
-
+import time
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from site_registry import ACTIVE_SITES  # noqa: E402
+from daily_site_traffic import get_gsc_token, gsc_get  # noqa: E402
 
 WP_USER = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
 RESULTS_PATH = "prune_unindexed_result.json"
-
 NEWS_DOMAINS = {"koreanews365.com", "theseouljournal.com"}
 FULL_RESET_DOMAINS = {"kskin365.com", "oliveyoungkorea.com"}
-
-# 대량 AI/SEO 자동생산에서 반복적으로 보였던 흔적. 하나만으로 자르지 않고 누적 점수로 판단.
-AI_TRACE_PATTERNS = [
-    r"SEO\s*Meta",
-    r"Meta\s*Description\s*:",
-    r"Labels\s*:",
-    r"Hashtags\s*:",
-    r"About the Author",
-    r"Get in Touch",
-    r"Extensive Industry Report",
-    r"crafted by an industry expert with \d+ years",
-    r"Why This Is Trending Now",
-    r"Why this is trending now",
-    r"Answers From the Field",
-    r"Frequently Confused Points",
-    r"Frequently Overlooked Facts",
-    r"Where First-Timers Should Begin",
-    r"A Beginner.?s Starting Point",
-    r"Read This First",
-    r"Ultimate Guide",
-    r"Ultimate .* Review",
-    r"Unlocking Your",
-    r"Get Ready for Your",
-]
-
-GENERIC_IMAGE_WORDS = {
-    "image", "photo", "picture", "pexels", "pixabay", "unsplash", "stock",
-    "default", "placeholder", "featured", "thumbnail", "related", "관련", "이미지",
-}
-
-
-def strip_html(value):
-    if isinstance(value, dict):
-        value = value.get("rendered", "")
-    value = value or ""
-    value = re.sub(r"<script\b[^>]*>.*?</script>", " ", value, flags=re.I | re.S)
-    value = re.sub(r"<style\b[^>]*>.*?</style>", " ", value, flags=re.I | re.S)
-    value = re.sub(r"<[^>]+>", " ", value)
-    return re.sub(r"\s+", " ", unescape(value)).strip()
-
-
-def tokenize(s):
-    # 영문/숫자/한글 단어 모두 추출. 너무 짧은 토큰은 제외.
-    return [x.lower() for x in re.findall(r"[A-Za-z0-9가-힣]{3,}", s or "")]
 
 
 def fetch_posts(site_url):
@@ -79,16 +31,13 @@ def fetch_posts(site_url):
     while True:
         r = requests.get(
             f"{site_url}/wp-json/wp/v2/posts",
-            params={
-                "status": "publish", "per_page": 100, "page": page,
-                "_fields": "id,link,date,title,content,excerpt,featured_media,categories,tags",
-            },
+            params={"status": "publish", "per_page": 100, "page": page, "_fields": "id,link,title"},
             headers={"User-Agent": "Mozilla/5.0"}, timeout=35,
         )
         if r.status_code == 400 and "rest_post_invalid_page_number" in r.text:
             break
         if r.status_code != 200:
-            raise RuntimeError(f"글목록 HTTP {r.status_code}: {r.text[:160]}")
+            raise RuntimeError(f"글목록 HTTP {r.status_code}: {r.text[:180]}")
         batch = r.json()
         if not batch:
             break
@@ -99,15 +48,9 @@ def fetch_posts(site_url):
     return posts
 
 
-def fetch_media(site_url, media_id):
-    if not media_id:
-        return None
-    r = requests.get(
-        f"{site_url}/wp-json/wp/v2/media/{media_id}",
-        params={"_fields": "id,alt_text,caption,title,description,source_url,media_type,mime_type"},
-        headers={"User-Agent": "Mozilla/5.0"}, timeout=25,
-    )
-    return r.json() if r.status_code == 200 else None
+def title_of(post):
+    t = post.get("title") or ""
+    return t.get("rendered", "") if isinstance(t, dict) else str(t)
 
 
 def set_private(site_url, pw, post_id):
@@ -118,167 +61,150 @@ def set_private(site_url, pw, post_id):
     return r.status_code in (200, 201), r.status_code, r.text[:180]
 
 
-def quality_reasons(site_url, post):
-    title = strip_html(post.get("title"))
-    body = strip_html(post.get("content"))
-    reasons = []
-    score = 0
+def inspect_url(token, prop, url, retries=3):
+    for attempt in range(retries):
+        r = requests.post(
+            "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={"inspectionUrl": url, "siteUrl": prop}, timeout=30,
+        )
+        if r.status_code == 200:
+            s = r.json().get("inspectionResult", {}).get("indexStatusResult", {})
+            return {
+                "ok": True,
+                "verdict": s.get("verdict"),
+                "coverageState": s.get("coverageState"),
+                "indexingState": s.get("indexingState"),
+                "robotsTxtState": s.get("robotsTxtState"),
+                "lastCrawlTime": s.get("lastCrawlTime"),
+            }
+        if r.status_code == 429:
+            time.sleep(5 * (attempt + 1))
+            continue
+        return {"ok": False, "error": f"HTTP {r.status_code}: {r.text[:180]}"}
+    return {"ok": False, "error": "429 재시도 소진"}
 
-    words = tokenize(body)
-    wc = len(words)
-    # 너무 짧거나 너무 길게 기계적으로 찍힌 글 모두 감점. 승인용 기반 글은 실질 정보량을 요구.
-    if wc < 650:
-        score += 3
-        reasons.append(f"본문 짧음({wc}단어)")
-    if wc > 4200:
-        score += 1
-        reasons.append(f"본문 과도하게 김({wc}단어)")
 
-    # AI/SEO 템플릿 흔적
-    trace_hits = [p for p in AI_TRACE_PATTERNS if re.search(p, body + " " + title, flags=re.I)]
-    if trace_hits:
-        score += min(5, len(trace_hits))
-        reasons.append(f"AI/SEO 템플릿 흔적 {len(trace_hits)}개")
+def property_for(domain, site_url, accessible):
+    prefix = site_url.rstrip("/") + "/"
+    domain_prop = f"sc-domain:{domain}"
+    if prefix in accessible:
+        return prefix
+    if domain_prop in accessible:
+        return domain_prop
+    # 일부 등록은 https://domain 형식으로 슬래시 없이 저장된 경우 방어
+    if site_url in accessible:
+        return site_url
+    return None
 
-    # 이모지 과다: 자동 생성 K-beauty 글에서 특히 강하게 확인된 패턴
-    emoji_count = len(re.findall(r"[\U0001F300-\U0001FAFF]", body + title))
-    if emoji_count >= 5:
-        score += 2
-        reasons.append(f"이모지 과다({emoji_count})")
 
-    # 키워드 반복/스팸성
-    if words:
-        counts = Counter(words)
-        top_word, top_count = counts.most_common(1)[0]
-        ratio = top_count / max(1, len(words))
-        if top_count >= 18 and ratio >= 0.035:
-            score += 3
-            reasons.append(f"키워드 과반복({top_word}:{top_count})")
-
-    # 제목 자체가 자동 변형 템플릿처럼 보이는 경우
-    title_templates = [
-        r"Q&A\s*:", r"Frequently .* Points", r"Where to Start", r"Read This First",
-        r"Right the First Time", r"How People Are Approaching", r"The Real Cost of",
-        r"101\s*:", r"Beginner.?s Starting Point",
-    ]
-    if any(re.search(p, title, re.I) for p in title_templates):
-        score += 2
-        reasons.append("제목 자동변형 템플릿")
-
-    # 본문에 동일 문구/링크 앵커가 비정상적으로 반복되는 흔적
-    if body.lower().count("extensive industry report") >= 2:
-        score += 4
-        reasons.append("동일 관련링크 문구 반복")
-
-    # 대표이미지: 없으면 강한 감점. 있더라도 메타가 완전 비어 있으면 승인용 품질 기준에서 부실로 판단.
-    media_id = post.get("featured_media") or 0
-    if not media_id:
-        score += 4
-        reasons.append("대표이미지 없음")
-    else:
-        media = fetch_media(site_url, media_id)
-        if not media:
-            score += 2
-            reasons.append("대표이미지 조회 실패")
-        else:
-            meta = " ".join([
-                str(media.get("alt_text") or ""),
-                strip_html(media.get("title")),
-                strip_html(media.get("caption")),
-                strip_html(media.get("description")),
-                str(media.get("source_url") or ""),
-            ])
-            meta_tokens = set(tokenize(meta)) - GENERIC_IMAGE_WORDS
-            title_tokens = set(tokenize(title))
-            if not str(media.get("alt_text") or "").strip():
-                score += 2
-                reasons.append("대표이미지 ALT 없음")
-            # 제목과 이미지 메타의 의미 단서가 전혀 겹치지 않으면 '상관없는 이미지' 가능성을 강하게 봄.
-            if title_tokens and meta_tokens and not (title_tokens & meta_tokens):
-                score += 2
-                reasons.append("대표이미지-제목 연관 단서 없음")
-
-    # 구조적 노이즈: 빈 H2/H3가 반복된 글
-    raw = (post.get("content") or {}).get("rendered", "") if isinstance(post.get("content"), dict) else str(post.get("content") or "")
-    empty_headings = len(re.findall(r"<h[23][^>]*>\s*</h[23]>", raw, re.I))
-    if empty_headings >= 2:
-        score += 2
-        reasons.append(f"빈 소제목 반복({empty_headings})")
-
-    # 5점 이상이면 '명확히 저품질/대량생산 흔적'로 비공개.
-    return score, reasons, wc
+def save(data):
+    with open(RESULTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 def main():
-    all_results = {}
-    targets = [row for row in ACTIVE_SITES if row[0].replace("https://", "") not in NEWS_DOMAINS]
+    results = {}
+    token = get_gsc_token()
+    resp = gsc_get(token, "/sites")
+    if resp.status_code != 200:
+        raise RuntimeError(f"GSC 사이트 목록 실패 HTTP {resp.status_code}: {resp.text[:180]}")
+    accessible = {x.get("siteUrl") for x in resp.json().get("siteEntry", []) if x.get("siteUrl")}
 
-    print(f"대상 블로그: {len(targets)}개 (뉴스 2개 제외)")
+    targets = [row for row in ACTIVE_SITES if row[0].replace("https://", "").rstrip("/") not in NEWS_DOMAINS]
+    print(f"대상 블로그 {len(targets)}개 / 뉴스 2개 제외")
+
     for site_url, env_key, lifecycle in targets:
-        domain = site_url.replace("https://", "")
-        pw = os.environ.get(env_key, "").strip()
+        site_url = site_url.rstrip("/")
+        domain = site_url.replace("https://", "").rstrip("/")
+        pw = os.getenv(env_key, "").strip()
         if not pw:
-            all_results[domain] = {"status": "SKIP_NO_SECRET", "secret": env_key}
-            print(f"\n=== {domain}: {env_key} 시크릿 없음, 스킵 ===")
+            results[domain] = {"status": "SKIP_NO_SECRET", "secret": env_key}
+            save(results)
+            print(f"SKIP {domain}: {env_key} 없음")
             continue
 
         try:
             posts = fetch_posts(site_url)
         except Exception as e:
-            all_results[domain] = {"status": "FETCH_FAILED", "error": str(e)}
-            print(f"\n=== {domain}: {e} ===")
+            results[domain] = {"status": "FETCH_FAILED", "error": str(e)}
+            save(results)
+            print(f"FAIL {domain}: {e}")
+            continue
+
+        prop = property_for(domain, site_url, accessible)
+        if domain not in FULL_RESET_DOMAINS and not prop:
+            results[domain] = {"status": "SKIP_NO_GSC_PROPERTY", "total_public_before": len(posts)}
+            save(results)
+            print(f"SKIP {domain}: GSC property 접근 없음")
             continue
 
         summary = {
-            "status": "OK", "total_public_before": len(posts),
-            "kept_public": 0, "made_private": 0, "private_failed": 0,
-            "mode": "FULL_RESET" if domain in FULL_RESET_DOMAINS else "QUALITY_FILTER",
-            "private_items": [], "kept_items": [],
+            "status": "OK",
+            "mode": "FULL_RESET" if domain in FULL_RESET_DOMAINS else "GSC_URL_INSPECTION",
+            "gsc_property": prop,
+            "total_public_before": len(posts),
+            "indexed_kept": 0,
+            "made_private": 0,
+            "inspection_uncertain_kept": 0,
+            "private_failed": 0,
+            "items": [],
         }
-        print(f"\n=== {domain}: 공개글 {len(posts)}개 / {summary['mode']} ===")
+        print(f"\n=== {domain}: 공개 {len(posts)}개 / {summary['mode']} ===")
 
-        for p in posts:
-            title = strip_html(p.get("title"))
+        for post in posts:
+            title = title_of(post)
+            url = post.get("link")
+
             if domain in FULL_RESET_DOMAINS:
-                should_private = True
-                score, reasons, wc = 99, ["사용자 승인 전면 리셋 대상"], len(tokenize(strip_html(p.get("content"))))
+                decision = "PRIVATE_FULL_RESET"
+                inspection = None
             else:
-                score, reasons, wc = quality_reasons(site_url, p)
-                should_private = score >= 5
+                inspection = inspect_url(token, prop, url)
+                if not inspection.get("ok"):
+                    decision = "KEEP_UNCERTAIN"
+                elif inspection.get("verdict") == "PASS":
+                    decision = "KEEP_INDEXED"
+                else:
+                    decision = "PRIVATE_UNINDEXED"
 
-            if should_private:
-                ok, status_code, detail = set_private(site_url, pw, p["id"])
-                item = {"id": p["id"], "title": title, "score": score, "words": wc, "reasons": reasons}
+            item = {"id": post["id"], "url": url, "title": title, "decision": decision, "inspection": inspection}
+
+            if decision.startswith("PRIVATE"):
+                ok, code, detail = set_private(site_url, pw, post["id"])
                 if ok:
                     summary["made_private"] += 1
-                    summary["private_items"].append(item)
-                    print(f"  PRIVATE [{score}] {title[:85]} :: {', '.join(reasons)}")
+                    print(f"PRIVATE {domain} #{post['id']} {title[:80]}")
                 else:
                     summary["private_failed"] += 1
-                    item["http"] = status_code
-                    item["error"] = detail
-                    summary["private_items"].append(item)
-                    print(f"  FAIL {status_code} {title[:85]}")
+                    item["private_http"] = code
+                    item["private_error"] = detail
+                    print(f"PRIVATE FAIL {domain} #{post['id']} HTTP {code}")
+            elif decision == "KEEP_INDEXED":
+                summary["indexed_kept"] += 1
+                print(f"KEEP INDEXED {domain} #{post['id']} {title[:80]}")
             else:
-                summary["kept_public"] += 1
-                summary["kept_items"].append({"id": p["id"], "title": title, "score": score, "words": wc, "reasons": reasons})
-                print(f"  KEEP    [{score}] {title[:85]}")
+                summary["inspection_uncertain_kept"] += 1
+                print(f"KEEP UNCERTAIN {domain} #{post['id']} {inspection.get('error')}")
 
-        all_results[domain] = summary
-        with open(RESULTS_PATH, "w", encoding="utf-8") as f:
-            json.dump(all_results, f, ensure_ascii=False, indent=2)
+            summary["items"].append(item)
+            save(results | {domain: summary})
+            time.sleep(1.05)
+
+        results[domain] = summary
+        save(results)
 
     totals = {
-        "sites_processed": sum(1 for x in all_results.values() if x.get("status") == "OK"),
-        "sites_skipped": sum(1 for x in all_results.values() if x.get("status") != "OK"),
-        "public_before": sum(x.get("total_public_before", 0) for x in all_results.values()),
-        "made_private": sum(x.get("made_private", 0) for x in all_results.values()),
-        "kept_public": sum(x.get("kept_public", 0) for x in all_results.values()),
-        "private_failed": sum(x.get("private_failed", 0) for x in all_results.values()),
+        "sites_processed": sum(1 for x in results.values() if x.get("status") == "OK"),
+        "sites_skipped_or_failed": sum(1 for x in results.values() if x.get("status") != "OK"),
+        "public_before": sum(x.get("total_public_before", 0) for x in results.values()),
+        "indexed_kept": sum(x.get("indexed_kept", 0) for x in results.values()),
+        "made_private": sum(x.get("made_private", 0) for x in results.values()),
+        "uncertain_kept": sum(x.get("inspection_uncertain_kept", 0) for x in results.values()),
+        "private_failed": sum(x.get("private_failed", 0) for x in results.values()),
     }
-    all_results["_TOTALS"] = totals
-    with open(RESULTS_PATH, "w", encoding="utf-8") as f:
-        json.dump(all_results, f, ensure_ascii=False, indent=2)
+    results["_TOTALS"] = totals
+    save(results)
     print("\n=== 전체 요약 ===")
     print(json.dumps(totals, ensure_ascii=False, indent=2))
 
