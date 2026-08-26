@@ -3204,8 +3204,8 @@ def process_one(site, keyword):
         try:
             raw=generate_content_gemini(prompt)
         except Exception as e:
-            print(f"  ❌ Gemini 실패: {e}")
-            log(url,theme,keyword,"","",0,0,"❌ Gemini 실패",str(e))
+            print(f"  ❌ AI 생성 실패: {e}")
+            log(url,theme,keyword,"","",0,0,"❌ AI 생성 실패",str(e))
             return False
 
         time.sleep(SLEEP_BETWEEN_POSTS)
