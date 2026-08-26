@@ -1,8 +1,8 @@
-name: Publish Scheduler (랜덤시간 발행 트리거)
+name: Publish Scheduler (A/B 랜덤 발행 트리거)
 
-# 2026-08-22 사용자 지시로 재개: "25개 블로그사이트는 1일 1포스팅 시간
-# 랜덤... 지금 실행해줘." 15분마다 돌면서 사이트마다 오늘의 랜덤 목표시각이
-# 지난 것만 daily-network-publish.yml로 개별 디스패치한다.
+# 실제 주간 대상/순서는 scripts/publish_scheduler.py가 결정한다.
+# 15분 폴링은 하루 96회 실행되어 Actions 소모와 로그 혼잡이 커서,
+# 2026-08-26부터 매시 37분 한 번만 확인한다. 한 번에 최대 1개 사이트만 디스패치한다.
 on:
   workflow_dispatch:
   push:
@@ -10,7 +10,7 @@ on:
     paths:
       - "scripts/publish_scheduler.py"
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "37 * * * *"
 
 permissions:
   contents: write
@@ -23,16 +23,16 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install requests -q
-      - name: Check & dispatch if today's random target passed
-        id: check
+      - name: Check & dispatch due site
         env:
-          GH_DISPATCH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python scripts/publish_scheduler.py
       - name: Commit scheduler state
@@ -43,6 +43,6 @@ jobs:
           git stash --include-untracked || true
           git pull --rebase origin main
           git stash pop || true
-          git add scheduler_state.json
+          git add scheduler_state.json 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: 스케줄러 상태 갱신 [skip ci]"
           git push
