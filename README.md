@@ -13,7 +13,7 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 | 네이버 블로그 | 로컬 로그인 필요 | 사용자 PC | 현재 공식 글쓰기 API가 없어 서버 무인발행 불가 |
 | 티스토리 | 로컬 로그인 필요 | 사용자 PC | 공식 Open API가 2024년 종료됨 |
 
-네이버와 티스토리는 준비된 글을 대기열에 보존하고 `local_login_required`로 표시합니다. 로그인 브라우저에서 실제 제출하고 공개 URL을 확인하기 전에는 성공으로 기록하지 않습니다.
+네이버는 PC의 Playwright 브라우저 프로필에 사용자가 최초 1회 직접 로그인한 뒤 `scripts/naver_blog_local_runner.py`가 대기열을 처리합니다. 공개 URL을 확인하기 전에는 성공으로 기록하지 않습니다. 티스토리는 아직 `local_login_required`로 보존합니다.
 
 ## Google Sheets 운영 탭
 
@@ -37,6 +37,19 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 `자동화_플랫폼계정`에는 `account_id`, `platform`, `site_id`, `display_name`, `destination_id`, `editor_url`, `auth_profile`, `enabled`, `notes`를 입력합니다. Blogger의 `destination_id`는 숫자 blog ID이고 `auth_profile`은 OAuth 비밀키 묶음의 이름입니다.
 
 `자동화_발행대기`에서 `status`를 `ready`로 설정하면 수동 GitHub Action **Automation Hub — platform publish**가 처리합니다. `publish_now=FALSE`이면 Blogger 초안으로 저장합니다.
+
+## 네이버 블로그 최초 1회 준비와 실행
+
+네이버 로그인 비밀번호는 시트나 저장소에 넣지 않습니다. Google Sheets 연결용 `SHEET_ID`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`을 PC 환경변수로 설정한 뒤 실행합니다.
+
+```powershell
+pip install playwright google-api-python-client google-auth
+python -m playwright install chromium
+python scripts/naver_blog_local_runner.py login --site-id naver_main
+python scripts/naver_blog_local_runner.py run --site-id naver_main --max-jobs 1
+```
+
+`자동화_플랫폼계정`에 플랫폼 `naver`, 고유 `site_id`, 블로그 ID인 `destination_id`, 글쓰기 주소인 `editor_url`, `enabled=ON`을 입력합니다. 계정을 추가할 때마다 다른 `site_id` 행을 추가하면 수 제한 없이 별도 로그인 프로필로 관리됩니다. `자동화_발행대기`에는 같은 `site_id`와 `status=ready`인 글을 넣습니다. 첫 실전은 `publish_now=FALSE`로 편집기 입력만 확인하고, 검토가 끝난 뒤 `TRUE`로 1건만 시험하는 것을 권장합니다.
 
 ## 비용 안전장치
 
