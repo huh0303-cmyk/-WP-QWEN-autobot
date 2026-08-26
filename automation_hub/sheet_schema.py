@@ -34,3 +34,15 @@ PUBLISH_QUEUE_HEADER = [
     "content_html", "labels", "source_keyword", "public_url", "remote_id",
     "error_code", "message", "completed_at",
 ]
+
+YOUTUBE_CHANNEL_HEADER = [
+    "channel_key", "channel_type", "display_name", "channel_id", "secret_profile",
+    "workflow", "enabled", "interval_days_min", "interval_days_max",
+    "publish_delay_hours", "allowed_hour_start", "allowed_hour_end", "topic_mode",
+    "language", "tone", "next_run_at", "last_dispatched_at", "last_run_status",
+]
+
+YOUTUBE_RUN_HEADER = [
+    "requested_at", "channel_key", "channel_type", "workflow", "status",
+    "github_run_url", "scheduled_publish_at", "video_url", "error_message",
+]

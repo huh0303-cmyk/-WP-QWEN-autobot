@@ -323,6 +323,9 @@ def upload_to_drive(service, file_path, folder_id, name):
 # 주제어 기반 AI 이미지 생성 (나노바나나)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path):
+    if os.environ.get("PAID_IMAGE_GENERATION_ENABLED", "false").lower() != "true" or os.environ.get("OPENAI_IMAGE_ENABLED", "false").lower() != "true":
+        log("   유료/AI 이미지 생성 차단됨 — 무료 스톡/기존 이미지 경로 사용")
+        return False
     # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): Gemini
     # 무료범위를 먼저 쓰고, 실패했을 때만 OpenAI(gpt-image-1) 유료로 폴백
     # (curio_longform.py와 동일 원칙 — 8/18엔 순서가 반대였음, 취지에 안 맞아 정정).
@@ -370,6 +373,9 @@ def gemini_generate_text(prompt, temperature=0.9, max_output_tokens=None):
             return openai_generate_text(prompt, temperature=temperature, max_retries=3)
     except Exception:
         pass
+
+    if os.environ.get("AI_TEXT_PROVIDER", "openai").strip().lower() == "openai":
+        raise RuntimeError("OpenAI text generation unavailable; Gemini fallback is disabled")
 
     if not GEMINI_API_KEY:
         return ""

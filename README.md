@@ -21,6 +21,16 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 - `자동화_실행현황`: 실행 이력
 - `자동화_황금키워드`: 키워드 후보와 점수
 - `자동화_RSS`: 신문사별 RSS 출처
+- `자동화_유튜브채널`: 플리 5개·지식 5개의 채널 ID, 주기, 예약 지연, 주제·언어·톤, 다음 실행
+- `자동화_유튜브실행`: 중앙 스케줄러의 디스패치 및 영상 공개 URL 기록
+
+## YouTube 10채널 자동화
+
+플레이리스트 채널 `globalmusic`, `healing`, `starbucks`, `mbb`, `kpop`과 지식채널 `nasa`, `history`, `invention`, `silent_era`, `retro_reels`를 기본 등록합니다. 등록 행을 추가하면 같은 구조로 채널 수를 늘릴 수 있습니다.
+
+**YouTube Hub — 10 channel scheduler**가 매시간 시트를 읽고 실행 예정 채널을 한 번에 최대 1개만 호출합니다. 채널별 2~3일 간격, 허용 시간대와 예약 공개 지연을 따로 설정하므로 영상이 한꺼번에 공개되지 않습니다. 예전 플리 고정 cron과 지식채널 cron은 비활성화해 중복 생성·발행을 막았습니다.
+
+업로드 직전 OAuth 계정의 실제 YouTube channel ID를 시트/등록부의 기대 ID와 비교합니다. 다르면 `OAuth channel mismatch`로 즉시 중단하므로 다른 채널에 잘못 올리지 않습니다. 텍스트는 `AI_TEXT_PROVIDER=openai`, AI 이미지 생성은 차단 상태이며 무료 스톡·퍼블릭도메인·기존 이미지 소스만 허용됩니다.
 
 `자동화_플랫폼계정`에는 `account_id`, `platform`, `site_id`, `display_name`, `destination_id`, `editor_url`, `auth_profile`, `enabled`, `notes`를 입력합니다. Blogger의 `destination_id`는 숫자 blog ID이고 `auth_profile`은 OAuth 비밀키 묶음의 이름입니다.
 

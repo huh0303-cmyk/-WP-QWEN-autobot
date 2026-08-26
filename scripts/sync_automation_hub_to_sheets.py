@@ -19,8 +19,9 @@ if str(ROOT / "scripts") not in sys.path:
 from automation_hub.registry import SiteRegistry
 from automation_hub.sheet_schema import (
     KEYWORD_HEADER, PLATFORM_ACCOUNT_HEADER, PUBLISH_QUEUE_HEADER, RSS_HEADER,
-    RUN_LOG_HEADER, SITE_SETTINGS_HEADER,
+    RUN_LOG_HEADER, SITE_SETTINGS_HEADER, YOUTUBE_CHANNEL_HEADER, YOUTUBE_RUN_HEADER,
 )
+from automation_hub.youtube_registry import load_channels
 from gsheets_direct import ensure_tab, get_sheets_service
 
 
@@ -30,6 +31,8 @@ KEYWORDS_TAB = "자동화_황금키워드"
 RSS_TAB = "자동화_RSS"
 ACCOUNTS_TAB = "자동화_플랫폼계정"
 QUEUE_TAB = "자동화_발행대기"
+YOUTUBE_CHANNEL_TAB = "자동화_유튜브채널"
+YOUTUBE_RUN_TAB = "자동화_유튜브실행"
 
 
 def _ensure_log_tab(service, spreadsheet_id: str, tab_name: str, header: list[str]) -> None:
@@ -74,7 +77,19 @@ def main() -> int:
     _ensure_log_tab(service, spreadsheet_id, RSS_TAB, RSS_HEADER)
     _ensure_log_tab(service, spreadsheet_id, ACCOUNTS_TAB, PLATFORM_ACCOUNT_HEADER)
     _ensure_log_tab(service, spreadsheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
-    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}")
+    _ensure_log_tab(service, spreadsheet_id, YOUTUBE_CHANNEL_TAB, YOUTUBE_CHANNEL_HEADER)
+    _ensure_log_tab(service, spreadsheet_id, YOUTUBE_RUN_TAB, YOUTUBE_RUN_HEADER)
+    youtube_rows = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=f"'{YOUTUBE_CHANNEL_TAB}'!A2:R",
+    ).execute().get("values", [])
+    if not youtube_rows:
+        rows = [channel.to_row() for channel in load_channels()]
+        service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id, range=f"'{YOUTUBE_CHANNEL_TAB}'!A2",
+            valueInputOption="RAW", body={"values": rows},
+        ).execute()
+        print(f"Seeded {len(rows)} YouTube channels")
+    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}, {YOUTUBE_CHANNEL_TAB}, {YOUTUBE_RUN_TAB}")
     return 0
 
 

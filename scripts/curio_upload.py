@@ -22,6 +22,11 @@ import sys
 import json
 from datetime import datetime, timedelta, timezone
 
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+from automation_hub.youtube_identity import verify_authenticated_channel
+
 for _stream in (sys.stdout, sys.stderr):
     try:
         _stream.reconfigure(encoding="utf-8", errors="replace")
@@ -202,7 +207,8 @@ def main():
     )
     tags = meta.get("tags") or []
 
-    delay_hours = PUBLISH_DELAY_HOURS.get(channel_key)
+    configured_delay = os.environ.get("PUBLISH_AT_HOURS_FROM_NOW", "").strip()
+    delay_hours = float(configured_delay) if configured_delay else PUBLISH_DELAY_HOURS.get(channel_key)
     publish_at = None
     if delay_hours is not None:
         publish_at = (datetime.now(timezone.utc) + timedelta(hours=delay_hours)).strftime(
@@ -210,6 +216,8 @@ def main():
 
     log(f"2/2 유튜브 업로드 중 (채널: {secret_key})...")
     service = get_youtube_service(secret_key)
+    verified_id = verify_authenticated_channel(service, channel_key)
+    log(f"   ✅ OAuth 채널 일치 확인: {channel_key} ({verified_id})")
     video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags, publish_at)
     if publish_at:
         log(f"✅ 업로드 완료(비공개, {publish_at}에 자동 공개 예약됨): https://youtube.com/watch?v={video_id}")

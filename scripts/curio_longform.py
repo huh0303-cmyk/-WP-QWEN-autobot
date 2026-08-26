@@ -119,6 +119,9 @@ def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
     except ImportError:
         pass
 
+    if os.environ.get("AI_TEXT_PROVIDER", "openai").strip().lower() == "openai":
+        raise RuntimeError("OpenAI text generation unavailable; Gemini fallback is disabled")
+
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{GEMINI_TEXT_MODEL}:generateContent?key={GEMINI_API_KEY}")
     body = {"contents": [{"parts": [{"text": prompt}]}],
@@ -272,6 +275,9 @@ Respond with JSON only, no explanation, no markdown fences:
 # 2. 이미지 생성 (Gemini 2.5 Flash Image)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path, max_retries=5):
+    if os.environ.get("PAID_IMAGE_GENERATION_ENABLED", "false").lower() != "true" or os.environ.get("OPENAI_IMAGE_ENABLED", "false").lower() != "true":
+        log("      AI 이미지 생성 차단됨 — 퍼블릭도메인/아카이브 이미지만 허용")
+        return False
     # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): 영상 1개당
     # 이미지 소요량이 블로그 글 1개보다 훨씬 많아서(장당 비용이 누적됨), 블로그
     # 쪽과 반대로 여기는 무료(Gemini 무료범위)를 먼저 쓰고, 그게 실패했을 때만

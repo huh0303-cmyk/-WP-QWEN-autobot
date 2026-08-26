@@ -4,8 +4,8 @@ name: Curio Scheduler (지식채널 5개, 2-3일 간격 랜덤시간 발행 트�
 # 15분 폴링은 Actions 사용량만 크게 늘려 2026-08-26부터 매시 17분 1회 확인한다.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 * * * *"
+  # 자동 일정은 youtube-control-scheduler.yml로 통합했다. 이 워크플로는
+  # 상태 복구/수동 점검용으로만 남겨 중복 발행을 막는다.
 
 permissions:
   contents: write

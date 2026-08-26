@@ -25,6 +25,11 @@ import time
 
 import requests
 
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+from automation_hub.youtube_identity import verify_authenticated_channel
+
 for _stream in (sys.stdout, sys.stderr):
     try:
         _stream.reconfigure(encoding="utf-8", errors="replace")
@@ -230,6 +235,11 @@ def main():
     stay_private = title_is_fallback or not hours_from_now
     log("2/3 유튜브 업로드 중..." + (" ⚠️ 비공개로만 업로드 (검토 후 직접 공개해주세요)" if stay_private else ""))
     youtube = get_youtube_service()
+    channel_key = os.environ.get("CHANNEL_KEY", "").strip().lower()
+    if not channel_key:
+        raise RuntimeError("CHANNEL_KEY is required for OAuth channel identity verification")
+    verified_id = verify_authenticated_channel(youtube, channel_key)
+    log(f"   ✅ OAuth 채널 일치 확인: {channel_key} ({verified_id})")
     video_id = upload_to_youtube(youtube, video_path, thumb_path if thumb_drive_id else None,
                                   title, description, publish_at_iso, tags=tags, force_private=stay_private)
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"

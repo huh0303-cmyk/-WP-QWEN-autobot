@@ -79,27 +79,7 @@ on:
         description: "(선택) fix_video_id와 함께: 영상 길이(분)"
         required: false
         type: string
-  schedule:
-    # 2026-08-07: 승인 게이트를 없애고 완전자동(생성→업로드→공개)으로 전환.
-    # 채널별 전용 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_<채널명>)이 없으면 publish
-    # 잡이 공용 토큰으로 엉뚱한 채널에 잘못 올리지 않고 그냥 실패하도록
-    # 고쳐뒀다(아래 publish 잡 참고) — 그래서 mbb/kpop도 미리 스케줄에 넣어도
-    # 안전하다. 토큰 없는 채널은 그냥 그 회차만 실패로 로그에 남고, 영상은
-    # Google Drive에 남아있다가 get_youtube_refresh_token.py로 mbb/kpop 토큰을
-    # 발급해서 시크릿에 등록하는 순간부터 자동으로 정상 작동한다.
-    # 2026-08-12: 5개 채널 전부 월/수/금 3회+토 1회로 통일, 정각 피해서 15~20분씩 분산.
-    # KST 00시대라 UTC로는 전날 15시대라서 요일이 하루 당겨짐(월요일 KST → 일요일 UTC 등).
-    - cron: "7 15 * * 0,2,4,5"    # globalmusic — 00:07 KST 월/수/금/토
-    - cron: "24 15 * * 0,2,4,5"   # healing — 00:24 KST 월/수/금/토
-    # 2026-08-17: 잠깐 중단했다가 재개 — SIS-Language Center 채널(구 starbucks,
-    # UCOWoNH..., 2026-08-12에 이름/핸들만 바뀜)에서 카페음악을 발견해서 라우팅
-    # 사고로 오인, 스케줄을 껐었음. 실제로는 진짜 "Starbucks vibes"(@Starbucksvibes)
-    # 채널에 최근(4시간 전 포함) 영상이 정상적으로 계속 올라오고 있는 걸 확인 —
-    # SIS-Language Center의 옛날 영상들은 8/12 이전 라우팅이 고쳐지기 전 남은
-    # 잔재일 뿐, 지금은 정상 작동 중이라 재개함.
-    - cron: "38 15 * * 0,2,4,5"   # starbucks — 00:38 KST 월/수/금/토
-    - cron: "52 15 * * 0,2,4,5"   # mbb — 00:52 KST 월/수/금/토
-    - cron: "9 16 * * 0,2,4,5"    # kpop — 01:09 KST 월/수/금/토
+  # 자동 일정은 youtube-control-scheduler.yml의 Google Sheets 설정으로 통합했다.
 
 permissions:
   contents: write
@@ -164,6 +144,9 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           # healing 채널 실사 빗물/숲 영상 소스 (2026-08-22 추가)
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -279,6 +262,7 @@ jobs:
           YT_TAGS: ${{ needs.prepare.outputs.yt_tags }}
           TITLE_IS_FALLBACK: ${{ needs.prepare.outputs.title_is_fallback }}
           PUBLISH_AT_HOURS_FROM_NOW: ${{ github.event.inputs.publish_delay_hours }}
+          CHANNEL_KEY: ${{ github.event.inputs.channel || 'globalmusic' }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
@@ -324,6 +308,9 @@ jobs:
           FIX_DURATION_MIN: ${{ inputs.fix_duration_min }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', steps.ch.outputs.upper)] || (steps.ch.outputs.upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}

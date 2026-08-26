@@ -17,6 +17,10 @@ on:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
         default: ""
+      publish_delay_hours:
+        description: "업로드 후 예약 공개까지 시간"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -59,6 +63,10 @@ jobs:
       - name: Generate longform from public-domain/archive material
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
         run: |
@@ -80,6 +88,8 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+          PUBLISH_AT_HOURS_FROM_NOW: ${{ inputs.publish_delay_hours }}
+          CHANNEL_KEY: ${{ inputs.channel }}
         run: python scripts/curio_upload.py "${{ inputs.channel }}" en
       - name: Backup artifact
         if: always()
