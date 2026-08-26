@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/prune-unindexed-posts.yml"
+      - "scripts/prune_unindexed_all_sites.py"
 
 permissions:
   contents: read
