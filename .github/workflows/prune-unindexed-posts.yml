@@ -1,4 +1,4 @@
-name: "25개 블로그 — 승인 재도전용 품질 리셋"
+name: "25개 블로그 — GSC 비색인 글 전수 비공개"
 
 on:
   workflow_dispatch: {}
@@ -19,9 +19,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
-      - name: "25개 블로그 품질 리셋 — 뉴스 2개 제외"
+      - run: pip install requests PyJWT cryptography -q
+      - name: "25개 블로그 GSC URL Inspection 전수검사 + 비색인 비공개"
         env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           WP_USER: ${{ secrets.WP_USER }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -52,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: quality-reset-result-${{ github.run_id }}
+          name: prune-unindexed-result-${{ github.run_id }}
           path: prune_unindexed_result.json
           if-no-files-found: warn
           retention-days: 30
