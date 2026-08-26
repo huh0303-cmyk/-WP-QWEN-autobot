@@ -854,6 +854,23 @@ def build_ai_images(topic, workdir, service=None):
     return paths
 
 
+def select_single_bank_image(workdir, service):
+    """Use exactly one existing channel image for the entire playlist video.
+
+    Playlist uploads are audio with a single still background. The same source
+    image is resized into the separate YouTube thumbnail; no image API is used.
+    """
+    bank_images = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
+    if not bank_images:
+        raise RuntimeError("채널 썸네일창고에 사용할 기존 이미지가 없습니다")
+    picked = random.choice(bank_images)
+    extension = os.path.splitext(picked["name"])[1] or ".jpg"
+    path = os.path.join(workdir, f"playlist_background{extension}")
+    download_drive_file(service, picked["id"], path)
+    log(f"   ✅ 기존 이미지 한 장 선택: {picked['name']}")
+    return path
+
+
 def pick_duration_target():
     """실행할 때마다 목표 재생시간 구간 자체를 무작위로 골라서, 영상 길이가
     매번 달라지게 한다(항상 60~80분처럼 똑같으면 그 자체가 AI 생성 티가 남)."""
@@ -1720,64 +1737,18 @@ def main():
             log("   ⚠️ 실사 사진을 못 구함 — AI 정지이미지 방식으로 폴백")
 
     if healing_photo:
-        log("   ✅ 실사 사진 확보 — 영상 내내 이 사진 한 장만 사용(교체/전환 없음)")
-        caption_text = build_caption_text(topic_keyword, caption_text_input)
-        log(f"   캡션 문구: {caption_text}")
-        # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
-        # 플리 채널 벤치마킹 공통 포맷 — 주간 썸네일 리프레시 스크립트와 로직 공유)
+        log("   ✅ 실사 사진 한 장을 음악 전체 배경과 썸네일 원본으로 사용")
+        caption_text = ""
         thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, healing_photo, thumbnail_out, topic_keyword)
-
-        log("4/5 정지사진 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
-        body_audio_path = os.path.join(WORKDIR, "body_audio.m4a")
-        trim_audio_from(audio_path, INTRO_DURATION_SEC, body_audio_path)
-        body_total_sec = total_sec - INTRO_DURATION_SEC
-
-        visual_path = os.path.join(WORKDIR, "visual.mp4")
-        # 이미지 1장만 넘기면 build_alternating_visual이 매 구간마다 같은
-        # 사진을 재사용한다 — 다른 사진으로 안 바뀌면서도 기존 코드 재사용.
-        build_alternating_visual([healing_photo], body_total_sec, visual_path)
-        muxed_path = os.path.join(WORKDIR, "muxed.mp4")
-        add_waveform_overlay(visual_path, body_audio_path, muxed_path)
-        body_path = os.path.join(WORKDIR, "body.mp4")
-        add_lower_third_bar(muxed_path, caption_text, body_path)
-
-        log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
-        intro_still = os.path.join(WORKDIR, "intro_still.png")
-        intro_still = make_channel_thumbnail(CHANNEL_KEY, healing_photo, intro_still, topic_keyword)
-        intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
-        make_intro_clip(intro_still, audio_path, intro_clip)
-        concat_intro_and_main(intro_clip, body_path, final_path)
+        log("4/5 정지 이미지 한 장 + 음악으로 영상 파일 생성 중...")
+        make_static_video(healing_photo, audio_path, final_path)
     elif topic_keyword.strip():
-        log(f"3/5 주제어 '{topic_keyword}' 기반 AI 이미지 2장 생성 중...")
-        image_paths = build_ai_images(topic_keyword, WORKDIR, service=service)
-        caption_text = build_caption_text(topic_keyword, caption_text_input)
-        log(f"   캡션 문구: {caption_text}")
-        # 채널별 썸네일 포맷 분기는 make_channel_thumbnail()에 모아둠(구독자 50만+
-        # 플리 채널 벤치마킹 공통 포맷 — 주간 썸네일 리프레시 스크립트와 로직 공유)
-        # _save_thumbnail_capped가 2MB 제한 때문에 .jpg로 폴백할 수 있어서, 반환된
-        # 실제 경로로 thumbnail_out을 갱신해야 이후 업로드가 올바른 파일을 가리킨다.
-        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, image_paths[0], thumbnail_out, topic_keyword)
-
-        log("4/5 팬줌 영상 조립 + 하단 캡션바 삽입 중...")
-        # 인트로가 곡 앞부분(INTRO_DURATION_SEC)을 쓰므로, 본편은 그 이어지는
-        # 지점부터 재생해서 같은 구간이 겹쳐 들리지 않고 자연스럽게 이어지게 한다
-        body_audio_path = os.path.join(WORKDIR, "body_audio.m4a")
-        trim_audio_from(audio_path, INTRO_DURATION_SEC, body_audio_path)
-        body_total_sec = total_sec - INTRO_DURATION_SEC
-
-        visual_path = os.path.join(WORKDIR, "visual.mp4")
-        build_alternating_visual(image_paths, body_total_sec, visual_path)
-        muxed_path = os.path.join(WORKDIR, "muxed.mp4")
-        add_waveform_overlay(visual_path, body_audio_path, muxed_path)
-        body_path = os.path.join(WORKDIR, "body.mp4")
-        add_lower_third_bar(muxed_path, caption_text, body_path)
-
-        log("   인트로(줌인 + 실시간 파형) 붙이는 중...")
-        intro_still = os.path.join(WORKDIR, "intro_still.png")
-        intro_still = make_channel_thumbnail(CHANNEL_KEY, image_paths[0], intro_still, topic_keyword)
-        intro_clip = os.path.join(WORKDIR, "intro_clip.mp4")
-        make_intro_clip(intro_still, audio_path, intro_clip)
-        concat_intro_and_main(intro_clip, body_path, final_path)
+        log(f"3/5 주제 '{topic_keyword}' — 채널 기존 이미지 한 장 선택 중...")
+        background_path = select_single_bank_image(WORKDIR, service)
+        caption_text = ""
+        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, background_path, thumbnail_out, topic_keyword)
+        log("4/5 같은 정지 이미지 한 장 + 음악으로 영상 파일 생성 중...")
+        make_static_video(background_path, audio_path, final_path)
     else:
         log("3/5 주제어 없음 — 썸네일창고에서 이미지 무작위 선택(폴백)...")
         thumbs = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
