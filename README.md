@@ -40,11 +40,14 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 
 ## 네이버 블로그 최초 1회 준비와 실행
 
-네이버 로그인 비밀번호는 시트나 저장소에 넣지 않습니다. Google Sheets 연결용 `SHEET_ID`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`을 PC 환경변수로 설정한 뒤 실행합니다.
+네이버 로그인 비밀번호는 시트나 저장소에 넣지 않습니다. Google Cloud에서 OAuth 클라이언트를 `데스크톱 앱` 유형으로 하나 만들고 JSON을 내려받은 뒤 로컬 연결 도구를 실행합니다. 연결 파일은 `.local/google_sheets_oauth.json`에 저장되어 GitHub에 올라가지 않습니다. `SHEET_ID`만 PC 환경변수로 지정합니다.
 
 ```powershell
 pip install playwright google-api-python-client google-auth
 python -m playwright install chromium
+pip install google-auth-oauthlib
+python scripts/setup_google_sheets_local.py "C:\Users\사용자\Downloads\client_secret.json"
+$env:SHEET_ID="12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI"
 python scripts/naver_blog_local_runner.py login --site-id naver_main
 python scripts/naver_blog_local_runner.py run --site-id naver_main --max-jobs 1
 ```

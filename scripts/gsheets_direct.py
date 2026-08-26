@@ -16,6 +16,8 @@ GOOGLE_OAUTH_* 자격증명으로 Sheets API에 바로 쓰도록 만든 모듈.
     SHEET_ID - 대상 스프레드시트 ID
 """
 import os
+import json
+from pathlib import Path
 
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
@@ -23,19 +25,39 @@ GOOGLE_OAUTH_REFRESH_TOKEN = os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
 
 
 def has_credentials():
-    return bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET and GOOGLE_OAUTH_REFRESH_TOKEN)
+    return bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET and GOOGLE_OAUTH_REFRESH_TOKEN) or _local_credentials_path().exists()
+
+
+def _local_credentials_path():
+    configured = os.environ.get("GOOGLE_LOCAL_OAUTH_FILE", "").strip()
+    if configured:
+        return Path(configured).expanduser().resolve()
+    return Path(__file__).resolve().parents[1] / ".local" / "google_sheets_oauth.json"
+
+
+def _credential_values():
+    if GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET and GOOGLE_OAUTH_REFRESH_TOKEN:
+        return GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REFRESH_TOKEN
+    path = _local_credentials_path()
+    if not path.exists():
+        return "", "", ""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data.get("client_id", ""), data.get("client_secret", ""), data.get("refresh_token", "")
 
 
 def get_sheets_service():
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
+    client_id, client_secret, refresh_token = _credential_values()
+    if not all((client_id, client_secret, refresh_token)):
+        raise RuntimeError("Google Sheets OAuth가 없습니다. scripts/setup_google_sheets_local.py를 먼저 실행하세요.")
     creds = Credentials(
         token=None,
-        refresh_token=GOOGLE_OAUTH_REFRESH_TOKEN,
+        refresh_token=refresh_token,
         token_uri="https://oauth2.googleapis.com/token",
-        client_id=GOOGLE_OAUTH_CLIENT_ID,
-        client_secret=GOOGLE_OAUTH_CLIENT_SECRET,
+        client_id=client_id,
+        client_secret=client_secret,
         # 이 리프레시 토큰은 원래 "drive" 스코프로만 발급됨(youtube_playlist_maker.py
         # 등 다른 스크립트와 공용) — 여기서 다른 스코프를 지정하면 리프레시 자체가
         # invalid_scope로 거부된다. Sheets API는 drive 스코프도 유효하게 인정한다.
