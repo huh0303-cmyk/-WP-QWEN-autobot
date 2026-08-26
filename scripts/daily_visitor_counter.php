@@ -1,8 +1,7 @@
-// Daily visitor counter v2 — footer display + read-only REST endpoint.
-// 2026-08-21 최초 배포, 2026-08-22 강화(사용자 지시 "일일방문자 세게 해주고"):
-// 봇 트래픽 제외, 일일 수치와 함께 누적 총 방문자수도 같이 노출(신뢰 신호 강화),
-// 눈에 띄는 배지 스타일로 교체(기존 opacity:0.6 회색 텍스트는 존재감이 없었음).
-// 쿠키 기반 중복방지(완벽하진 않지만 페이지뷰가 아닌 방문자 근사치로 충분).
+// Daily visitor counter v3 — footer display + read-only REST endpoint.
+// 2026-08-21 최초 배포, 2026-08-22 강화, 2026-08-26 일일 종합상황실용
+// 전날/전전날 확정 방문자수 추가. Footer 표시는 기존처럼 오늘/누적을 유지한다.
+// 봇 트래픽 제외, 쿠키 기반 일일 중복방지(페이지뷰가 아닌 방문자 근사치).
 
 add_action('wp_footer', function () {
     if (is_admin()) return;
@@ -12,8 +11,7 @@ add_action('wp_footer', function () {
         return;
     }
 
-    // The whole network reports one consistent KST business day even when an
-    // individual WordPress installation still has UTC configured.
+    // 전체 네트워크는 WordPress 개별 timezone 설정과 무관하게 KST 기준으로 집계한다.
     $today = wp_date('Y-m-d', null, new DateTimeZone('Asia/Seoul'));
     $day_key = 'daily_visitor_count_' . $today;
     $total_key = 'daily_visitor_total_all_time';
@@ -52,11 +50,15 @@ add_action('rest_api_init', function () {
             $kst = new DateTimeZone('Asia/Seoul');
             $today = wp_date('Y-m-d', null, $kst);
             $yesterday = wp_date('Y-m-d', time() - DAY_IN_SECONDS, $kst);
+            $day_before_yesterday = wp_date('Y-m-d', time() - (2 * DAY_IN_SECONDS), $kst);
             return array(
+                // 기존 소비 코드 호환: count는 오늘 현재값 유지.
                 'date' => $today,
                 'count' => (int) get_option('daily_visitor_count_' . $today, 0),
                 'yesterday_date' => $yesterday,
                 'yesterday_count' => (int) get_option('daily_visitor_count_' . $yesterday, 0),
+                'day_before_yesterday_date' => $day_before_yesterday,
+                'day_before_yesterday_count' => (int) get_option('daily_visitor_count_' . $day_before_yesterday, 0),
                 'total' => (int) get_option('daily_visitor_total_all_time', 0),
             );
         },
