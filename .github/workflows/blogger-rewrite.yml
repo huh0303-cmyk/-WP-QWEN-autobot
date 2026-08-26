@@ -1,0 +1,74 @@
+name: "Automation Hub — WordPress to Blogger rewrite"
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_wp_url:
+        description: "Source WordPress site URL"
+        required: true
+        type: string
+      blogger_site_id:
+        description: "site_id from 자동화_플랫폼계정"
+        required: true
+        type: string
+      language:
+        description: "Output language"
+        required: true
+        default: "ko"
+        type: string
+      persona:
+        description: "Blog-specific persona"
+        required: true
+        default: "helpful specialist editor"
+        type: string
+      tone:
+        description: "Blog-specific tone"
+        required: true
+        default: "practical and clear"
+        type: string
+      target_chars:
+        description: "Approximate output characters"
+        required: true
+        default: "1800"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blogger-rewrite-queue
+  cancel-in-progress: false
+
+jobs:
+  rewrite-and-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install requests google-api-python-client google-auth -q
+      - name: Rewrite and add one-image review job
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          SOURCE_WP_URL: ${{ inputs.source_wp_url }}
+          BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
+          BLOGGER_LANGUAGE: ${{ inputs.language }}
+          BLOGGER_PERSONA: ${{ inputs.persona }}
+          BLOGGER_TONE: ${{ inputs.tone }}
+          BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
+          BLOGGER_MAX_SIMILARITY: "0.68"
+        run: python scripts/queue_blogger_rewrite.py

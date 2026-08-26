@@ -40,6 +40,8 @@ Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 �
 
 블로그스팟 자동 일정은 매시간 17분(UTC cron, 실제 표시는 KST)에 대기열을 확인하고 한 번에 최대 1건만 처리합니다. 저장소 변수 `BLOGGER_AUTOPUBLISH_ENABLED=true`일 때만 예약 실행되므로, 먼저 `scripts/blogger_verify_account.py` 또는 수동 Action으로 OAuth·blog ID를 검증한 뒤 켭니다. 예약 실행은 `PLATFORM_FILTER=blogger`로 고정되어 네이버·티스토리 행을 변경하지 않습니다. 발행 성공은 Blogger가 돌려준 URL을 실제로 열어 제목까지 확인한 뒤에만 시트에 기록합니다.
 
+**Automation Hub — WordPress to Blogger rewrite**는 최근 WordPress 공개글 중 아직 사용하지 않은 원문을 골라 문장 치환이 아닌 새 검색의도·목차·사례·체크리스트·FAQ 구조로 다시 작성합니다. 원문과의 텍스트 유사도가 `0.68`을 넘으면 차단하고, Pexels 또는 Pixabay 무료 사진을 정확히 1장만 넣어 출처를 표시합니다. 무료 사진이 없으면 유료/AI 이미지로 폴백하지 않고 실패합니다. 생성 결과는 항상 `publish_now=FALSE` 검토 대기열로 시작합니다.
+
 ## 네이버 블로그 최초 1회 준비와 실행
 
 네이버 로그인 비밀번호는 시트나 저장소에 넣지 않습니다. Google Cloud에서 OAuth 클라이언트를 `데스크톱 앱` 유형으로 하나 만들고 JSON을 내려받은 뒤 로컬 연결 도구를 실행합니다. 연결 파일은 `.local/google_sheets_oauth.json`에 저장되어 GitHub에 올라가지 않습니다. `SHEET_ID`만 PC 환경변수로 지정합니다.

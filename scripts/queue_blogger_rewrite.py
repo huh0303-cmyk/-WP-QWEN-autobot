@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+"""Rewrite one public WordPress post and queue it for Blogger with one free image."""
+from __future__ import annotations
+
+import json
+import os
+import sys
+import uuid
+from pathlib import Path
+
+import requests
+
+ROOT = Path(__file__).resolve().parents[1]
+for candidate in (ROOT, ROOT / "scripts"):
+    if str(candidate) not in sys.path:
+        sys.path.insert(0, str(candidate))
+
+from automation_hub.blogger_rewriter import attach_single_image, find_one_free_image, parse_rewrite_json, rewrite_prompt, similarity
+from automation_hub.time_utils import iso_kst
+from gsheets_direct import get_sheets_service
+from openai_text import openai_generate_text
+from sync_automation_hub_to_sheets import QUEUE_TAB
+
+
+def main():
+    sheet_id = os.environ.get("SHEET_ID", "").strip()
+    source_url = os.environ.get("SOURCE_WP_URL", "").rstrip("/")
+    blogger_site_id = os.environ.get("BLOGGER_SITE_ID", "").strip()
+    if not all((sheet_id, source_url, blogger_site_id)):
+        raise SystemExit("SHEET_ID, SOURCE_WP_URL and BLOGGER_SITE_ID are required")
+    posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
+    posts.raise_for_status()
+    service = get_sheets_service()
+    existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
+    used_sources = {row[8] for row in existing[1:] if len(row) > 8}
+    source = next((post for post in posts.json() if post.get("link") not in used_sources), None)
+    if not source:
+        print("새로운 WordPress 원문이 없습니다.")
+        return 0
+    prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=os.environ.get("BLOGGER_LANGUAGE", "ko"), persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=int(os.environ.get("BLOGGER_TARGET_CHARS", "1800")))
+    rewritten = parse_rewrite_json(openai_generate_text(prompt, temperature=0.7))
+    score = similarity(source["content"]["rendered"], rewritten["content_html"])
+    maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
+    if score > maximum:
+        raise RuntimeError(f"재작성 유사도 {score:.3f}가 제한 {maximum:.3f}보다 높아 발행을 차단했습니다.")
+    image = find_one_free_image(rewritten["image_query"], pexels_key=os.environ.get("PEXELS_API_KEY", ""), pixabay_key=os.environ.get("PIXABAY_API_KEY", ""))
+    if image is None:
+        raise RuntimeError("무료 이미지 1장을 찾지 못했습니다. AI 이미지 생성 없이 중단합니다.")
+    content = attach_single_image(rewritten["content_html"], image, rewritten["title"])
+    job_id = f"blogger-rewrite-{uuid.uuid4().hex[:12]}"
+    labels = rewritten.get("labels", [])
+    if isinstance(labels, str):
+        labels = [x.strip() for x in labels.split(",") if x.strip()]
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "FALSE", rewritten["title"], content, ",".join(labels[:10]), source["link"], "", "", "", f"rewritten_similarity={score:.3f}; image={image.provider}", ""]
+    service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
+    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "similarity": round(score, 3), "image_provider": image.provider, "publish_now": False}, ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
