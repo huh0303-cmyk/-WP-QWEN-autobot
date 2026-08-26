@@ -8,6 +8,10 @@ on:
       target_site_url:
         description: "발행 대상 블로그 URL"
         required: true
+      force_keyword:
+        description: "시험/수동 발행 키워드 (비우면 사이트 키워드 풀 사용)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -34,6 +38,7 @@ jobs:
           AUTOMATION_HUB_SOURCE: "sheets"
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          FORCE_KEYWORD: ${{ inputs.force_keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
