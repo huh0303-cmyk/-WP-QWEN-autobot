@@ -1,10 +1,20 @@
 name: "Two Newsrooms — 3–10 Daily Editions"
 
+# 각 신문사에 하루 10번의 짧은 발행 기회를 주되 두 사이트는 약 30분 이상 분리한다.
+# 예전 matrix 방식은 TheSeoulJournal job이 매회 30~45분 sleep하여 Actions 시간을 낭비했다.
+# 이제 cron 자체를 엇갈리게 하므로 runner 대기 시간이 없다. 실제 발행량은
+# autopost_mega.py의 3~10건 일일 cap + fresh-source gate가 결정한다.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      newsroom:
+        description: "koreanews365 / theseouljournal"
+        required: true
+        type: choice
+        options: [koreanews365, theseouljournal]
+        default: koreanews365
   schedule:
-    # Ten opportunities; a stable random daily cap and fresh-source gate decide publication.
+    # KoreaNews365 opportunities
     - cron: "31 22 * * *"
     - cron: "43 0 * * *"
     - cron: "8 2 * * *"
@@ -15,67 +25,66 @@ on:
     - cron: "41 9 * * *"
     - cron: "22 11 * * *"
     - cron: "53 12 * * *"
-  workflow_dispatch:
-    inputs:
-      newsroom:
-        description: "both / koreanews365 / theseouljournal"
-        required: false
-        default: "both"
-      random_delay:
-        description: "Apply 0-12 minute random delay"
-        required: false
-        default: "false"
+    # TheSeoulJournal opportunities, 32분 이상 뒤
+    - cron: "3 23 * * *"
+    - cron: "15 1 * * *"
+    - cron: "40 2 * * *"
+    - cron: "49 3 * * *"
+    - cron: "18 5 * * *"
+    - cron: "1 7 * * *"
+    - cron: "38 8 * * *"
+    - cron: "13 10 * * *"
+    - cron: "54 11 * * *"
+    - cron: "25 13 * * *"
 
 permissions:
   contents: read
 
 concurrency:
-  group: newsroom-edition-${{ github.ref }}-${{ github.event.schedule || github.run_id }}
+  group: newsroom-${{ github.event.schedule || inputs.newsroom || github.run_id }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - key: koreanews365
-            url: https://koreanews365.com
-          - key: theseouljournal
-            url: https://theseouljournal.com
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[newsroom-launch]')) }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install publisher dependencies
-        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
-      - name: Randomize edition time
-        if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
-        run: sleep $((RANDOM % 721))
-      - name: Keep newsrooms at least 30 minutes apart
-        if: ${{ matrix.key == 'theseouljournal' }}
-        run: sleep $((1800 + RANDOM % 901))
+      - run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
+      - name: Resolve newsroom
+        id: target
+        shell: bash
+        run: |
+          S="${{ github.event.schedule }}"
+          MANUAL="${{ inputs.newsroom }}"
+          if [ -n "$MANUAL" ]; then
+            KEY="$MANUAL"
+          elif [[ "$S" == "3 23 * * *" || "$S" == "15 1 * * *" || "$S" == "40 2 * * *" || "$S" == "49 3 * * *" || "$S" == "18 5 * * *" || "$S" == "1 7 * * *" || "$S" == "38 8 * * *" || "$S" == "13 10 * * *" || "$S" == "54 11 * * *" || "$S" == "25 13 * * *" ]]; then
+            KEY="theseouljournal"
+          else
+            KEY="koreanews365"
+          fi
+          if [ "$KEY" = "theseouljournal" ]; then URL="https://theseouljournal.com"; else URL="https://koreanews365.com"; fi
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
       - name: Repair recent source-based categories
         env:
-          TARGET_SITE_URL: ${{ matrix.url }}
+          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/repair_recent_newsroom_categories.py
       - name: Publish one source-checked edition
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
           NEWSROOM_REQUIRE_PUBLICATION: "true"
-          TARGET_SITE_URL: ${{ matrix.url }}
+          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
@@ -86,7 +95,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: newsroom-result-${{ matrix.key }}
+          name: newsroom-result-${{ steps.target.outputs.key }}-${{ github.run_id }}
           path: newsroom_publish_result.json
           if-no-files-found: warn
           retention-days: 7
