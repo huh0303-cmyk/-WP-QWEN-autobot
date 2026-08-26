@@ -1,94 +1,32 @@
-name: Curio/Times 지식채널 장편 자동생성 (5채널, 채널당 2-3일 간격 랜덤시간)
+name: Curio 지식채널 장편 자동생성 — 5 active channels
 
-# 2026-08-22 대개편: "지식채널"을 실물 무료 자료가 확실한 5개로 확정.
-#   nasa(NASA_SPACE_TIMES) / history(HISTORY_TODAY_TIMES, 미국사+세계사 통합)
-#   / invention(INVENTION_TIMES) / silent_era(SILENT_ERA_TIMES) /
-#   retro_reels(RETRO_REELS_TIMES) — 전부 archive_footage_longform.py 또는
-#   nasa_archive_longform.py(실제 퍼블릭도메인 영상, 이미지 생성비 0원).
-# AMERICAN_ARCHIVE_TIMES는 history와 톤이 같아(둘 다 "진지한 역사 다큐" —
-# Retro Reels의 가벼운 노스탤지어 톤과는 안 맞음) 주제풀을 history로 통합.
-# science/myth/classical/classic_reads는 실물자료가 없어 AI이미지 생성비가
-# 계속 나가서 정리(사용자 판단, 2026-08-22) — 스크립트/시크릿/채널 자체는
-# 안 지웠으니 나중에 되살리려면 아래 workflow_dispatch options에 다시 추가하면
-# 된다(choice 타입이라 목록에 없는 값은 지금 dispatch 자체가 안 됨).
-#
-# 2026-08-23 채널명 최종 확정(내부 키/시크릿명은 그대로 유지, 브랜딩명만 확정):
-#   nasa → NASA_XFILES / history → HISTORY_TV_TODAY / invention → INVENTION_STORY
-#   / silent_era → SILENT_ERA_FILM(잠정 — OLD_HOLLYWOOD로 바꿀지 6일 뒤 재확인
-#   예정) / retro_reels → RETRO_USA1
-# 같은 날, 스케줄도 "5채널×주3회 고정 요일"에서 "채널당 2~3일 간격으로
-# 한 번에 하나씩, 랜덤 시각"으로 변경 — 이 워크플로우 자체의 schedule: cron은
-# 제거하고, curio-scheduler.yml(scripts/curio_scheduler.py)이 15분마다 돌면서
-# 채널별 다음 예정일이 지난 것만 이 워크플로우를 channel 입력과 함께
-# workflow_dispatch로 호출한다.
-#
-# 2026-08-14: 기존엔 생성기만 있고 업로드/스케줄이 없어서 완전 자동화가 안 돼있었음 — 연결.
-# 2026-08-15: 원래 실제 영상소스 큐레이션으로 기획됐던 archive/times 4채널도
-# 소싱 속도/저작권 리스크 때문에 대본+AI이미지 파이프라인으로 잠깐 편입됐었으나
-# 위 개편으로 다시 실물자료 전용 5채널 체제로 정리.
-
+# 활성 채널만 유지:
+# nasa / history / invention / silent_era / retro_reels
+# 폐기된 science, myth, classical, classic_reads, american_archive 경로와 시크릿 참조는 제거.
+# curio-scheduler.yml이 채널별 2~3일 간격/랜덤 시각을 계산해 이 워크플로를 dispatch한다.
 on:
   workflow_dispatch:
     inputs:
       channel:
         description: "채널"
-        required: false
+        required: true
         type: choice
         default: "nasa"
-        options:
-          - "nasa"
-          - "history"
-          - "invention"
-          - "silent_era"
-          - "retro_reels"
+        options: [nasa, history, invention, silent_era, retro_reels]
       topic:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
+        default: ""
+
+permissions:
+  contents: write
 
 concurrency:
-  # 2026-08-17 사고: 그룹명이 전체 워크플로우 공용 하나였어서, 짧은 간격으로
-  # 여러 채널을 연달아 workflow_dispatch하면 뒤에 것이 앞에 대기중이던 걸
-  # 취소시켜버림(cancel-in-progress:false여도 "같은 그룹의 대기중 실행"은
-  # 새 실행이 들어오면 밀려서 취소되는 GitHub Actions 동작) — 10채널 샘플
-  # 테스트 중 8개가 통째로 cancelled됨. 채널별로 그룹을 분리해서 서로 다른
-  # 채널은 절대 서로를 취소하지 못하게 하고, 같은 채널끼리 중복 실행만 방지.
-  group: curio-longform-${{ github.event.inputs.channel || 'default' }}
+  group: curio-longform-${{ inputs.channel }}
   cancel-in-progress: false
 
 jobs:
-  determine-channel:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      channel: ${{ steps.pick.outputs.channel }}
-      topic: ${{ steps.pick.outputs.topic }}
-    steps:
-      - id: pick
-        run: |
-          CH="${{ github.event.inputs.channel }}"
-          TOPIC_IN="${{ github.event.inputs.topic }}"
-
-          # 2026-08-22: 미국/영어권 시청자 어필 기준으로 다시 선정한 주제풀
-          # (american_archive 주제는 history로 통합됨).
-          if [ -z "$TOPIC_IN" ]; then
-            case "$CH" in
-              nasa) TOPICS=("The Apollo 11 moon landing" "The Voyager Golden Record" "The Challenger disaster and what NASA learned" "Neil Armstrong's first steps on the Moon" "The Hubble Space Telescope's greatest discoveries" "How the Mercury Seven became America's first astronauts" "The Apollo 13 rescue" "Life aboard the International Space Station" "The first images from Mars" "JFK's Moon speech and the Space Race") ;;
-              history) TOPICS=("The attack on Pearl Harbor" "D-Day and the Normandy landings" "The fall of the Berlin Wall" "The Cuban Missile Crisis" "The Civil Rights March on Washington" "The fall of Saigon and the end of the Vietnam War" "The assassination of John F. Kennedy" "The signing of the Declaration of Independence" "V-J Day and the end of World War II" "The Wright Brothers' first flight") ;;
-              invention) TOPICS=("How the telephone was invented" "The invention of the light bulb" "How the assembly line changed America" "The invention of the airplane" "How radio broadcasting began" "The invention of photography" "How the printing press changed the world" "Edison and the invention of the phonograph" "How the electric refrigerator changed home life" "The invention of television") ;;
-              silent_era) TOPICS=("Charlie Chaplin and the birth of The Tramp" "Buster Keaton's death-defying stunts" "The making of King Kong's earliest special effects" "How silent films used live orchestras" "The first horror film, Nosferatu" "The rise and fall of silent film stars" "The birth of Hollywood's silent studios" "Charlie Chaplin's Modern Times and the machine age" "America's first movie palaces" "How title cards told the story before sound") ;;
-              retro_reels) TOPICS=("The rise of the drive-in movie theater" "How the jukebox took over America" "The golden age of the roadside diner" "1950s home appliances that changed daily life" "The birth of the American shopping mall" "Vintage arcade games and their legacy" "How television changed 1950s family life" "The story of the classic American road trip" "How the drive-in became a teenage hangout" "The rise of the American motel") ;;
-              *) TOPICS=("a fascinating topic worth knowing") ;;
-            esac
-            IDX=$((RANDOM % ${#TOPICS[@]}))
-            TOPIC_IN="${TOPICS[$IDX]}"
-          fi
-
-          echo "channel=$CH" >> "$GITHUB_OUTPUT"
-          echo "topic=$TOPIC_IN" >> "$GITHUB_OUTPUT"
-          echo "선택됨: channel=$CH / topic=$TOPIC_IN"
-
-  generate-and-publish:
-    needs: determine-channel
+  generate-and-upload-private:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -96,42 +34,42 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: "시스템 의존성 (ffmpeg + 폰트)"
+      - name: Install dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum fonts-dejavu-core
-
-      - run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 google-genai -q
-
-      - name: "장편 영상 생성"
+          pip install requests pillow google-api-python-client google-auth google-auth-httplib2 google-genai -q
+      - name: Pick topic
+        id: pick
+        shell: bash
+        run: |
+          CH="${{ inputs.channel }}"
+          TOPIC="${{ inputs.topic }}"
+          if [ -z "$TOPIC" ]; then
+            case "$CH" in
+              nasa) TOPICS=("The Apollo 11 moon landing" "The Voyager Golden Record" "The Challenger disaster and what NASA learned" "Neil Armstrong's first steps on the Moon" "The Hubble Space Telescope's greatest discoveries" "How the Mercury Seven became America's first astronauts" "The Apollo 13 rescue" "Life aboard the International Space Station" "The first images from Mars" "JFK's Moon speech and the Space Race") ;;
+              history) TOPICS=("The attack on Pearl Harbor" "D-Day and the Normandy landings" "The fall of the Berlin Wall" "The Cuban Missile Crisis" "The Civil Rights March on Washington" "The fall of Saigon and the end of the Vietnam War" "The assassination of John F. Kennedy" "The signing of the Declaration of Independence" "V-J Day and the end of World War II" "The Wright Brothers' first flight") ;;
+              invention) TOPICS=("How the telephone was invented" "The invention of the light bulb" "How the assembly line changed America" "The invention of the airplane" "How radio broadcasting began" "The invention of photography" "How the printing press changed the world" "Edison and the invention of the phonograph" "How the electric refrigerator changed home life" "The invention of television") ;;
+              silent_era) TOPICS=("Charlie Chaplin and the birth of The Tramp" "Buster Keaton's death-defying stunts" "How silent films used live orchestras" "The first horror film, Nosferatu" "The rise and fall of silent film stars" "The birth of Hollywood's silent studios" "Charlie Chaplin's Modern Times and the machine age" "America's first movie palaces" "How title cards told the story before sound") ;;
+              retro_reels) TOPICS=("The rise of the drive-in movie theater" "How the jukebox took over America" "The golden age of the roadside diner" "1950s home appliances that changed daily life" "The birth of the American shopping mall" "Vintage arcade games and their legacy" "How television changed 1950s family life" "The story of the classic American road trip" "How the drive-in became a teenage hangout" "The rise of the American motel") ;;
+            esac
+            TOPIC="${TOPICS[$((RANDOM % ${#TOPICS[@]}))]}"
+          fi
+          echo "topic=$TOPIC" >> "$GITHUB_OUTPUT"
+      - name: Generate longform from public-domain/archive material
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
-          # 2026-08-18 사고 수정: curio_longform.py의 gemini_generate_text()는
-          # OPENAI_API_KEY가 있으면 텍스트 생성을 GPT로 우회하도록 이미 코드가
-          # 돼있었는데(8/17), 이 키가 워크플로우에 안 넘어가고 있어서 매번
-          # Gemini로만 호출되다가 월간 지출한도(429)에 그대로 막혀 실패했음.
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          CH="${{ needs.determine-channel.outputs.channel }}"
-          # 2026-08-16: myth/science는 실제 영상 자료가 존재하지 않는 주제라
-          # 계속 curio_longform.py(Gemini 이미지) 그대로. 나머지는 실제 퍼블릭도메인
-          # 영상 소싱 파이프라인으로 전환(사용자 지시 — AI생성 대신 실제 무료 영상,
-          # 흑백/짧은 클립도 허용).
-          if [ "$CH" = "classic_reads" ]; then
-            # 주제 인자 없이 100선 리스트에서 알아서 다음 책을 고른다.
-            python scripts/classic_reads_longform.py
-          elif [ "$CH" = "nasa" ]; then
+          CH="${{ inputs.channel }}"
+          TOPIC="${{ steps.pick.outputs.topic }}"
+          if [ "$CH" = "nasa" ]; then
             python scripts/nasa_archive_longform.py
-          elif [ "$CH" = "american_archive" ] || [ "$CH" = "history" ] || [ "$CH" = "invention" ] || [ "$CH" = "silent_era" ] || [ "$CH" = "retro_reels" ]; then
-            python scripts/archive_footage_longform.py "${{ needs.determine-channel.outputs.topic }}" en "" "$CH"
           else
-            python scripts/curio_longform.py "${{ needs.determine-channel.outputs.topic }}" en "" "$CH"
+            python scripts/archive_footage_longform.py "$TOPIC" en "" "$CH"
           fi
-
-      - name: "유튜브 업로드(비공개)"
+      - name: Upload to YouTube PRIVATE only
         env:
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
@@ -139,48 +77,26 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSICAL_JOURNAL }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES }}
-        run: python scripts/curio_upload.py "${{ needs.determine-channel.outputs.channel }}" en
-
-      - name: "결과물 아티팩트 백업"
+        run: python scripts/curio_upload.py "${{ inputs.channel }}" en
+      - name: Backup artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: curio-longform-${{ github.run_id }}
+          name: curio-longform-${{ inputs.channel }}-${{ github.run_id }}
           path: curio_longform_output/**/final.mp4
           retention-days: 3
           if-no-files-found: ignore
-
-      - name: "Commit classic_reads/nasa 순환상태 갱신 (anti-repeat)"
-        if: ${{ always() && (needs.determine-channel.outputs.channel == 'classic_reads' || needs.determine-channel.outputs.channel == 'nasa') }}
+      - name: Commit NASA anti-repeat state
+        if: ${{ always() && inputs.channel == 'nasa' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git stash --include-untracked || true
           git pull --rebase origin main
           git stash pop || true
-          for f in scripts/data/classic_reads_state.json scripts/data/nasa_archive_state.json; do
-            if grep -q "^<<<<<<< " "$f" 2>/dev/null; then
-              echo "⚠️ $f 에 병합 충돌 마커 발견 — 커밋 건너뜀"
-              git checkout -- "$f"
-            fi
-          done
-          # 2026-08-25 버그 수정: git add에 여러 pathspec을 한번에 넘기면 그 중
-          # 하나라도 파일이 없을 때 전체가 fatal로 실패해서(2>/dev/null || true로
-          # 조용히 삼켜짐) 존재하는 파일까지 같이 add 안 됨 — classic_reads 채널이
-          # 폐지돼 classic_reads_state.json이 항상 없다보니 nasa_archive_state.json도
-          # 매번 커밋이 안 되고, 그 결과 pick_topic()이 매번 last_idx=-1로 리셋되어
-          # NASA_XFILES가 계속 "Apollo 11 moon landing"만 반복 생성하고 있었음.
-          # 파일별로 개별 add해서 서로 영향 없게 수정.
-          for f in scripts/data/classic_reads_state.json scripts/data/nasa_archive_state.json; do
-            [ -f "$f" ] && git add "$f"
-          done
-          git diff --staged --quiet || git commit -m "chore: classic_reads/nasa 순환 상태 갱신 [skip ci]"
+          [ -f scripts/data/nasa_archive_state.json ] && git add scripts/data/nasa_archive_state.json || true
+          git diff --staged --quiet || git commit -m "chore: nasa 순환 상태 갱신 [skip ci]"
           git push
