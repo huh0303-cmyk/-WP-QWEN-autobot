@@ -1,0 +1,36 @@
+name: "Automation Hub — Google Sheets setup"
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_seed:
+        description: "Replace the existing site-settings rows from GitHub config"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Google API dependencies
+        run: pip install google-api-python-client google-auth requests -q
+      - name: Validate unlimited destination registry
+        run: python -m automation_hub.cli validate
+      - name: Create Google Sheets control tabs
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          FORCE_SEED: ${{ inputs.force_seed }}
+        run: python scripts/sync_automation_hub_to_sheets.py

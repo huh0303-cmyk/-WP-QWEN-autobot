@@ -14,6 +14,12 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
 
 import os, sys, time, random, re, json, hashlib, base64
 import requests
+# Direct workflow execution uses `python scripts/autopost_mega.py`, which makes
+# scripts/ (not the repository root) sys.path[0]. Add the root for shared modules.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+from automation_hub.public_verifier import verify_publication
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -3000,16 +3006,28 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     try:
         r=requests.post(f"{url}/wp-json/wp/v2/posts",auth=(WP_USER,pw),json=data,timeout=30)
         if r.status_code in (200,201):
-            pid=r.json().get("id"); purl=r.json().get("link","")
+            response_data=r.json()
+            pid=response_data.get("id"); purl=response_data.get("link","")
+            wp_status=response_data.get("status","")
+            if wp_status != "publish":
+                return {"ok":False,"post_id":pid,"status":wp_status,
+                        "error":f"WordPress returned non-public status: {wp_status or 'missing'}"}
             # Rank Math 메타 확인
             time.sleep(2)
             vr=requests.get(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),timeout=10)
             if vr.status_code==200 and not vr.json().get("meta",{}).get("rank_math_focus_keyword"):
                 requests.patch(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),
                                json={"meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta}},timeout=15)
-            # IndexNow ping
+            verification = verify_publication(purl, title, site_url=url)
+            if not verification.ok:
+                return {"ok":False,"post_id":pid,"status":wp_status,"url":purl,
+                        "error":f"public verification failed [{verification.error_code}]: {verification.error_message}",
+                        "verification":verification.to_dict()}
+            # IndexNow ping only after the public page is verified.
             ping_indexnow(purl, url)
-            return {"ok":True,"post_id":pid,"url":purl,"author":reporter["name"],"category":cat_name}
+            return {"ok":True,"post_id":pid,"url":verification.final_url or purl,
+                    "author":reporter["name"],"category":cat_name,
+                    "verification":verification.to_dict()}
         else:
             return {"ok":False,"status":r.status_code,"error":r.text[:300]}
     except Exception as e:
