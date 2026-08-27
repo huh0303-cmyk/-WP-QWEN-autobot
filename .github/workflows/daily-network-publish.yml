@@ -12,6 +12,11 @@ on:
         description: "시험/수동 발행 키워드 (비우면 사이트 키워드 풀 사용)"
         required: false
         default: ""
+      publication_approved:
+        description: "Explicit approval to publish publicly (false keeps a review draft)"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -35,8 +40,8 @@ jobs:
       - name: Create one quality-gated review draft
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
-          WP_POST_STATUS: "draft"
-          WP_PUBLICATION_APPROVED: "false"
+          WP_POST_STATUS: ${{ inputs.publication_approved && 'publish' || 'draft' }}
+          WP_PUBLICATION_APPROVED: ${{ inputs.publication_approved && 'true' || 'false' }}
           AUTOMATION_HUB_SOURCE: "sheets"
           NEWSROOM_REQUIRE_PUBLICATION: "false"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}

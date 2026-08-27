@@ -56,8 +56,14 @@ def main() -> None:
     wp = workflow_text.get("daily-network-publish.yml", "")
     if 'AI_TEXT_PROVIDER: "openai"' not in wp:
         fail("WordPress publisher is not hard-routed to OpenAI text")
-    if 'WP_POST_STATUS: "draft"' not in wp or 'WP_PUBLICATION_APPROVED: "false"' not in wp:
-        fail("ordinary WordPress workflow is not fail-closed to draft")
+    wp_public_gate = (
+        'publication_approved:' in wp
+        and 'default: false' in wp
+        and "inputs.publication_approved && 'publish' || 'draft'" in wp
+        and "inputs.publication_approved && 'true' || 'false'" in wp
+    )
+    if not wp_public_gate:
+        fail("ordinary WordPress workflow is not fail-closed behind explicit approval")
 
     newsroom = workflow_text.get("newsrooms-daily-publisher.yml", "")
     if 'WP_POST_STATUS: "publish"' not in newsroom or 'WP_PUBLICATION_APPROVED: "true"' not in newsroom:
