@@ -45,11 +45,11 @@ jobs:
           OPENAI_ENABLED: "true"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
-          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           OPENAI_MODEL: "gpt-5.6-luna"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
