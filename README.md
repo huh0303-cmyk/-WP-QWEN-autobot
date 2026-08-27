@@ -71,9 +71,20 @@ python scripts/naver_blog_local_runner.py run --site-id naver_main --max-jobs 1
 ## Blogger 최초 1회 준비
 
 1. Google Cloud에서 Blogger API를 활성화합니다.
-2. OAuth 동의 범위에 `https://www.googleapis.com/auth/blogger`를 포함해 refresh token을 발급합니다.
-3. GitHub Secrets에 `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`을 저장합니다.
-4. 시트의 계정 행에 Blogger blog ID를 입력하고 `enabled=ON`으로 설정합니다.
+2. 공용 Drive/Sheets refresh token을 덮어쓰지 말고, 데스크톱 OAuth JSON으로 Blogger 전용 토큰을 발급합니다.
+
+   ```bash
+   python scripts/setup_blogger_oauth_local.py /path/to/desktop-oauth-client.json
+   ```
+
+3. 생성된 `.local/blogger_oauth.json`의 값을 GitHub Secrets
+   `BLOGGER_GOOGLE_CLIENT_ID`, `BLOGGER_GOOGLE_CLIENT_SECRET`,
+   `BLOGGER_GOOGLE_REFRESH_TOKEN`에 각각 저장합니다. 토큰 값을 로그, 시트,
+   문서 또는 저장소에 붙여넣지 않습니다.
+4. `자동화_플랫폼계정`의 Blogger 행에서 `auth_profile=blogger`, blog ID,
+   `enabled=ON`을 확인합니다.
+5. 기존 ready 행 하나만 `publish_now=FALSE` 상태로 전송해 실제 Blogger
+   DRAFT ID와 편집 URL을 확인합니다. PUBLIC 전환은 별도 승인 없이는 금지합니다.
 
 여러 Google 계정은 `auth_profile`을 예를 들어 `BRAND2`로 지정하고 `BRAND2_GOOGLE_CLIENT_ID`, `BRAND2_GOOGLE_CLIENT_SECRET`, `BRAND2_GOOGLE_REFRESH_TOKEN` 형태로 별도 secret을 연결할 수 있습니다. GitHub Actions에는 사용할 프로필 secret을 명시적으로 추가해야 합니다.
 

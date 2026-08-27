@@ -43,6 +43,18 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertNotIn("BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}", workflow)
         self.assertIn('BLOGGER_PUBLISH_NOW: "false"', workflow)
 
+    def test_blogger_oauth_is_separate_from_shared_drive_token(self):
+        workflow = (ROOT / ".github" / "workflows" / "platform-publish.yml").read_text(encoding="utf-8")
+        setup = (ROOT / "scripts" / "setup_blogger_oauth_local.py").read_text(encoding="utf-8")
+        for name in (
+            "BLOGGER_GOOGLE_CLIENT_ID",
+            "BLOGGER_GOOGLE_CLIENT_SECRET",
+            "BLOGGER_GOOGLE_REFRESH_TOKEN",
+        ):
+            self.assertIn(name, workflow)
+        self.assertIn('SCOPES = ["https://www.googleapis.com/auth/blogger"]', setup)
+        self.assertNotIn("print(credentials.refresh_token)", setup)
+
     def test_newsroom_trim_cannot_cross_minimum(self):
         helpers = load_autopost_functions("newsroom_char_count", "trim_newsroom_html")
         body = "<p>" + ("검증된 사실 문장입니다. " * 180) + "</p>"
