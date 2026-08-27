@@ -1,9 +1,7 @@
 name: Curio 지식채널 장편 자동생성 — 5 active channels
 
-# 활성 채널만 유지:
-# nasa / history / invention / silent_era / retro_reels
-# 폐기된 science, myth, classical, classic_reads, american_archive 경로와 시크릿 참조는 제거.
-# curio-scheduler.yml이 채널별 2~3일 간격/랜덤 시각을 계산해 이 워크플로를 dispatch한다.
+# 활성 채널: nasa / history / invention / silent_era / retro_reels
+# 영상은 실제 NASA/퍼블릭도메인 아카이브를 유지하고, YouTube 썸네일만 FLUX로 통일.
 on:
   workflow_dispatch:
     inputs:
@@ -68,6 +66,7 @@ jobs:
           AI_TEXT_PROVIDER: "openai"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
         run: |
