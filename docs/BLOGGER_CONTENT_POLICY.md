@@ -32,6 +32,7 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 24. Blogger quality scoring never awards or deducts points merely for having an image. A stock image is attached only when provider metadata has clear topic overlap; otherwise publish the article with zero images.
 25. All Blogger articles are uploaded as private drafts. Automation must never press the final publish action. After draft creation, record the authenticated Blogger edit URL and email it to the owner for human reading, editing, and manual publication.
 26. The platform worker forcibly converts every Blogger queue item to draft mode, including an older row that accidentally contains a publish flag. Final Blogger publication is manual-only.
+27. When AI image generation is later enabled for any associated network channel, follow `config/network_image_generation_policy.json`: FLUX.1 Schnell first, SDXL-Lightning 4-step second, and SDXL Turbo third. Blogger still permits zero images and remains human-review-only.
 
 ## Publishing order for the first six Blogger sites
 

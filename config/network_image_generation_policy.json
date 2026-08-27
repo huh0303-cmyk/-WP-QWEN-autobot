@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "scope": ["wordpress", "youtube", "sns"],
+  "enabled_when_provider_credentials_exist": true,
+  "model_priority": [
+    {
+      "priority": 1,
+      "model": "FLUX.1 Schnell",
+      "model_id": "black-forest-labs/FLUX.1-schnell",
+      "role": "primary",
+      "license_gate": "Apache-2.0 or provider terms"
+    },
+    {
+      "priority": 2,
+      "model": "SDXL-Lightning 4-step",
+      "model_id": "ByteDance/SDXL-Lightning-4step",
+      "role": "low-cost fallback",
+      "license_gate": "OpenRAIL++ and provider terms"
+    },
+    {
+      "priority": 3,
+      "model": "SDXL Turbo",
+      "model_id": "stabilityai/sdxl-turbo",
+      "role": "final generation fallback",
+      "license_gate": "current Stability AI and provider commercial terms"
+    }
+  ],
+  "hard_rules": {
+    "require_article_or_video_topic_relevance": true,
+    "allow_zero_images_when_all_candidates_fail": true,
+    "never_insert_generic_filler_image": true,
+    "require_license_and_provider_cost_log": true,
+    "forbid_fabricated_official_documents": true,
+    "forbid_misleading_medical_legal_financial_evidence": true,
+    "human_review_required_before_blogger_publication": true
+  },
+  "notes": "This file defines network policy and routing order. A model is skipped when its approved provider or credential is unavailable. Pricing is provider- and resolution-dependent and must not be hard-coded as a universal per-image price."
+}

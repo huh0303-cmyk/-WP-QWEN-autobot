@@ -10,3 +10,15 @@ This policy applies to Blogger, WordPress, and YouTube scripts, descriptions, ti
 6. Images and thumbnails must be genuinely related to the specific item. When no suitable licensed image exists, text articles may use zero images; never insert a generic decorative substitute merely to fill a slot.
 7. Automated quality scores are internal pre-publication signals, not Google, AdSense, Rank Math, or human-review scores and never guarantee approval or reach.
 8. Blogger remains human-review-first: create a private draft and require the owner to make the final publication decision.
+
+## Network image-generation order
+
+This order applies to all WordPress, YouTube, and SNS image-generation pipelines:
+
+1. `FLUX.1 Schnell` — primary and preferred model.
+2. `SDXL-Lightning 4-step` — low-cost fallback. Do not substitute the less stable 1-step checkpoint.
+3. `SDXL Turbo` — final generation fallback.
+
+The order is mandatory only when approved provider credentials are available. Skip an unavailable model instead of silently substituting Gemini, OpenAI, or another generator. Every output must pass topic-relevance and usage-rights checks. If all three models fail or produce misleading/weakly related output, use zero images for text content and stop the image job for visual-first content pending human review.
+
+Do not hard-code a universal per-image price. Record the provider, endpoint, resolution, actual billed amount when available, model ID, prompt, license basis, and output receipt because hosting prices and commercial terms can change.
