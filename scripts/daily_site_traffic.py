@@ -168,7 +168,7 @@ def latest_daily_stats(token, site_url, window_days=10):
 
 
 def get_index_coverage(token, site_url):
-    """Search Console에 제출된 사이트맵들의 indexed/submitted 값을 합산."""
+    """Return sitemap-reported counts; this is not a URL Inspection census."""
     encoded = requests.utils.quote(site_url, safe="")
     r = gsc_get(token, f"/sites/{encoded}/sitemaps")
     if r.status_code != 200:
@@ -193,7 +193,13 @@ def get_index_coverage(token, site_url):
             total_submitted += int(c.get("submitted", 0) or 0)
     if not found:
         return None, "사이트맵 색인 데이터 없음"
-    return {"indexed": total_indexed, "submitted_urls": total_submitted}, None
+    return {
+        "sitemap_indexed": total_indexed,
+        "sitemap_submitted": total_submitted,
+        # Compatibility alias for older history readers. Never label this as an
+        # exact URL Inspection count in a dashboard.
+        "indexed": total_indexed,
+    }, None
 
 
 WEEKDAY_KR = ["월", "화", "수", "목", "금", "토", "일"]
@@ -240,7 +246,7 @@ def send_to_sheets(records):
                 r.get("daily_visitors"),
                 fmt_delta(r.get("visitor_delta")),
                 r.get("total_visitors"),
-                r.get("indexed"),
+                r.get("sitemap_indexed"),
                 r.get("gsc_clicks"),
             ]
             for r in records
@@ -250,7 +256,7 @@ def send_to_sheets(records):
             "27개사이트_트래픽",
             domains,
             date_label,
-            ["일일방문자수", "증감", "누적방문자", "색인수", "Google검색클릭"],
+            ["일일방문자수", "증감", "누적방문자", "사이트맵 보고 색인수", "Google검색클릭"],
             values_by_domain,
         )
         log(f"📊 시트 갱신 완료 — {date_label} / footer 방문자 기준")
@@ -291,6 +297,8 @@ def main():
             "clicks": None,
             "impressions": None,
             "indexed": None,
+            "sitemap_indexed": None,
+            "sitemap_submitted": None,
             "status": "",
             "checked_at": checked_at,
         }
@@ -319,7 +327,9 @@ def main():
                     row["impressions"] = stats["impressions"]
                 coverage, _ = get_index_coverage(token, query_site)
                 if coverage:
-                    row["indexed"] = coverage["indexed"]
+                    row["sitemap_indexed"] = coverage["sitemap_indexed"]
+                    row["sitemap_submitted"] = coverage["sitemap_submitted"]
+                    row["indexed"] = coverage["sitemap_indexed"]  # history compatibility
 
         if visitor:
             row["status"] = "정상"

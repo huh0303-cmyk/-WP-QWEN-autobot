@@ -158,10 +158,10 @@ AUTHOR_BY_SITE_DEF = {
         "bio": "Korea Technology Industry Desk. Source-checked information within this site's stated editorial scope."
     },
     "kskin365.com": {
-        "name": "Retired Site",
+        "name": "Korea Skincare Guide Desk",
         "email": "editor@kskin365.com",
         "slug": "kskin365-com-desk",
-        "bio": "Retired Site. Source-checked information within this site's stated editorial scope."
+        "bio": "Korea Skincare Guide Desk. Source-checked information within this site's stated editorial scope."
     },
     "oliveyoungkorea.com": {
         "name": "Olive Young Shopping Guide Desk",
@@ -3279,9 +3279,17 @@ def process_one(site, keyword):
             print(f"  ✂️ 교정 결과: {newsroom_len}자")
         except Exception as exc:
             print(f"  ⚠️ 뉴스 원고 길이 교정 실패: {exc}")
-    # The fixed source/attribution note is appended later, so reserve room for it.
-    if mode in ("news", "news_en") and max_chars and newsroom_len > max_chars - 450:
-        body = trim_newsroom_html(body, target_chars=max_chars - 450)
+    # Reserve a bounded amount for the fixed source note appended below.  The
+    # former 450-character reserve could force a valid 1,750+ draft down to
+    # 1,550 characters, below the configured minimum.  Never choose a trim
+    # target below the newsroom minimum.
+    if mode in ("news", "news_en") and max_chars:
+        attribution_reserve = min(220, max(120, max_chars - min_chars))
+        trim_target = max(min_chars, max_chars - attribution_reserve)
+    else:
+        trim_target = None
+    if trim_target and newsroom_len > trim_target:
+        body = trim_newsroom_html(body, target_chars=trim_target)
         newsroom_len = newsroom_char_count(body)
         print(f"  ✂️ HTML 보존 상한 교정 결과: {newsroom_len}자")
     if mode in ("news","news_en") and newsroom_len < min_chars:

@@ -30,9 +30,6 @@ jobs:
           sudo apt-get install -y -q ffmpeg fonts-noto-cjk fonts-dejavu-core
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Random delay
-        if: github.event_name == 'schedule'
-        run: sleep $((RANDOM % 1801))
       - name: Generate multilingual quiz review videos
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}

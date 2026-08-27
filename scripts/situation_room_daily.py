@@ -30,8 +30,12 @@ import json
 import time
 import requests
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, SCRIPT_DIR)
+sys.path.insert(0, REPO_ROOT)
 
 
 def _load_dotenv():
@@ -62,6 +66,7 @@ from social_stats_daily import (  # noqa: E402
     get_tiktok_followers_multi, get_facebook_followers_multi,
     get_instagram_followers_multi, get_threads_followers_multi, BRANDS,
 )
+from automation_hub.youtube_registry import load_channels  # noqa: E402
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -82,49 +87,20 @@ GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 KAKAO_REST_API_KEY = os.environ.get("KAKAO_REST_API_KEY", "")
 KAKAO_REFRESH_TOKEN = os.environ.get("KAKAO_REFRESH_TOKEN", "")
 
-# 2026-08-06 확정: 언어 채널 3개(TOPIK/English/10개국어) + 플리 채널 5개.
-# 예전 목록은 채널이 리네임/재배정되면서 라벨과 실제 채널이 어긋나 있었다
-# (예: "스페인어(Survival Spanish)" 라벨이 실제로는 starbucks 채널을 가리키는 등) —
-# 채널ID는 표시이름이 바뀌어도 안 바뀌므로 항상 ID를 기준으로 매칭한다.
-# 상세 내역: memory project_playlist_channels / project_youtube_language_channels.
-#
-# 2026-08-07~08 최종 확정 (OAuth 브랜드계정 선택 화면 이름과 실제 유튜브
-# 채널명이 서로 안 맞는 문제로 밤새 하나씩 실제 업로드해서 검증함):
-# - MBB는 원래 의도한 실제 "Mozart-Bach-Beethoven" 채널(UC7jOhyMa...)이 맞음
-#   — OAuth 계정목록에서는 "K-ISSUE"라는 이름으로 나타남.
-# - K-pop도 원래 의도한 실제 "K-pop Studio" 채널(UCgNj-yS93A...)이 맞음
-#   — OAuth 계정목록에서는 그대로 "K-pop Studio"로 나타남.
-# - healing은 원래 채널(UC7yEsLM..., @Studio_k3)의 브랜드계정을 OAuth 계정
-#   목록 16개에서 하나도 못 찾음(전부 다른 채널로 연결됨) — 그래서 완전 빈
-#   채널 "Studio-K7"(UCKZsfAWyCmY0jckf4IWZrqw, OAuth 목록엔 "Studio_K3"로 나타남)
-#   로 healing을 재배정함. 원래 healing 채널(@Studio_k3, 21개 영상 보유)은
-#   당분간 자동화 대상에서 제외 — 나중에 다른 방법으로 브랜드계정을 찾으면 되돌릴 것.
-# 2026-08-09: 21개 채널 전수 재조사 후 확정 — 브랜드계정 내부이름(피커에 뜨는 이름)과
-# 실제 채널명이 계속 어긋나 있던 문제를 API로 하나씩 다 확인해서 바로잡음. 자세한 매칭
-# 근거는 memory/project_playlist_channels.md 참고.
-YOUTUBE_CHANNELS = [
-    ("한국어(TOPIK)", "UCdA24IuR-JE7qButWv5jLqA"),
-    ("영어(English Survival)", "UCrjkKWMHzAAvpLIFgHnwcWg"),
-    ("다국어(Studio_starbucks,10개국어)", "UCOWoNH_d6p45ywQ6W0Z1Jng"),
-    ("플리-로맨틱글로벌(globalmusic)", "UCbJfEtsffpgI5MsKkB7BYvQ"),
-    ("플리-힐링(실채널@Studio_k3)", "UC7yEsLM-HoXudngrD-4FIqg"),
-    ("플리-MBB", "UC7jOhyMa-FIrzZuea97z1Pw"),
-    ("플리-카페음악(Starbucksvibes)", "UC_e-sbLkVgwJNYEeobolNog"),
-    ("발명(INVENTION_TIMES)", "UCgNj-yS93A_fOHXXvG49fww"),
-    ("건강-영어(HealthClinicTV)", "UC91BpNSb4nUwD6jrpthK7FQ"),
-    ("건강-한국어(HealthClinic_Seoul)", "UCAizx0tPkRSol8sIhanN_QQ"),
-    ("일본어퀴즈(Studio_Quiz_JP)", "UCC_PcHMv-Uxpr00Pjw_J2Wg"),
-    ("우주(NASA_SPACE_TIMES)", "UCtNLZO07Oh3UnXPI2CjOgNg"),
-    ("역사(HISTORY_TODAY_TIMES)", "UCVBvZwodUF4s57KeNicxQ3w"),
-    ("과학(SCIENCE_FACTS_TIMES)", "UCKvKhETLGPaRV3qfWv2bM2g"),
-    ("클래식인물(CLASSICAL_TIMES)", "UCRZ0uc_bxKDMwz3noBBi9KQ"),
-    ("신화(MYTH_LEGEND_TIMES)", "UC9mvVEdL9Tllkit5v2Qv8UQ"),
-    ("미국아카이브(AMERICAN_ARCHIVE_TIMES)", "UCmt8f9yUT6iTxBys8eH4-Cg"),
-    ("고전낭독(CLASSIC_READS_TIMES)", "UCKF98zgzm7YRWlyMaoJJKIQ"),
-    ("레트로릴스(RETRO_REELS_TIMES)", "UCwh49EokdWFJqYFE_zA6XDQ"),
-    ("무성영화(SILENT_ERA_TIMES)", "UCLvy6kSpC8-7o3hnSrfQ47g"),
-    ("K-pop(kpop_studio7)", "UCKZsfAWyCmY0jckf4IWZrqw"),
-]
+def load_reporting_channels():
+    """Combine the canonical scheduler registry with explicit strategic-only channels."""
+    channels = [(c.display_name, c.channel_id) for c in load_channels() if c.enabled]
+    path = Path(__file__).resolve().parents[1] / "config" / "youtube_reporting_channels.json"
+    extra = json.loads(path.read_text(encoding="utf-8"))["channels"]
+    channels.extend((c["display_name"], c["channel_id"]) for c in extra if c.get("enabled", True))
+    labels = [label for label, _ in channels]
+    ids = [channel_id for _, channel_id in channels]
+    if len(labels) != len(set(labels)) or len(ids) != len(set(ids)):
+        raise ValueError("duplicate YouTube label/channel_id in reporting registries")
+    return channels
+
+
+YOUTUBE_CHANNELS = load_reporting_channels()
 
 # 3개 언어 브랜드(TOPIK/English/Language)의 SNS 계정 표시용 이름 + 확인된 핸들.
 # 핸들을 모르는(아직 안 만들었거나 미확인인) 항목은 None으로 두고 리포트에
