@@ -1,7 +1,8 @@
 name: TOPIK 단어 퀴즈 쇼츠 — 검수용 생성만
 
 # 운영 원칙: 자동 생성 콘텐츠는 먼저 비공개/검수 상태로 만들고,
-# 사용자가 최종 검수한 뒤 별도 게시한다. 이 워크플로는 게시 API를 호출하지 않는다.
+# 사용자가 최종 검수한 뒤 별도 게시한다. 기본값은 생성만 하며, 명시적인
+# 소액 E2E 검증 때만 PRIVATE/DRAFT/준비 상태의 플랫폼 업로드를 1회 실행한다.
 on:
   workflow_dispatch:
     inputs:
@@ -13,6 +14,11 @@ on:
         description: "문항 수"
         required: false
         default: "5"
+      run_social_review:
+        description: "SNS/YouTube 검토본 업로드 실행 (PRIVATE/DRAFT, 기본 꺼짐)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -53,6 +59,17 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: python scripts/topik_quiz_shorts.py
+      - name: "SNS/YouTube 검토본 1세트 업로드"
+        if: ${{ inputs.run_social_review == true }}
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_PRIVACY_LEVEL: SELF_ONLY
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+        run: python scripts/social_publish.py topik_quiz_output/meta_ko.json
       - name: "검수용 영상/메타데이터 보관"
         if: always()
         uses: actions/upload-artifact@v4
