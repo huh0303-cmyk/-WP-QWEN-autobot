@@ -35,6 +35,9 @@ concurrency:
 
 jobs:
   publish:
+    # Dedicated environment avoids the repository-level 100-secret ceiling and
+    # isolates Blogger write credentials from Sheets/Drive OAuth credentials.
+    environment: blogger
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
