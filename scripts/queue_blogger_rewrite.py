@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Rewrite one verified WordPress post with Gemini and queue it for Blogger."""
+"""Rewrite one verified WordPress post with Gemini and queue it for Blogger.
+
+Text policy: Blogger = Gemini only.
+Image policy: Replicate approved 3-model gateway only; one image maximum.
+"""
 from __future__ import annotations
 
+import html
 import json
 import os
 import sys
@@ -15,11 +20,23 @@ for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from automation_hub.blogger_rewriter import attach_single_image, blogger_quality_score, find_one_free_image, image_is_relevant, parse_rewrite_json, rewrite_prompt
+from automation_hub.blogger_rewriter import blogger_quality_score, parse_rewrite_json, rewrite_prompt
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
+from replicate_image_provider import generate_image_url
 from sync_automation_hub_to_sheets import QUEUE_TAB
+
+
+def _attach_replicate_image(content: str, image_url: str, title: str) -> str:
+    safe_url = html.escape(image_url, quote=True)
+    safe_alt = html.escape(title, quote=True)
+    figure = (
+        f'<figure class="blogger-replicate-image">'
+        f'<img src="{safe_url}" alt="{safe_alt}" loading="lazy" />'
+        f'</figure>'
+    )
+    return figure + content
 
 
 def main():
@@ -63,21 +80,23 @@ def main():
             print(json.dumps({"attempt": attempt, "quality_score": 0, "failures": failures}, ensure_ascii=False))
     if rewritten is None:
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: 2회 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
+
     content = rewritten["content_html"]
-    image_providers = []
-    for query in rewritten["image_queries"]:
-        image = find_one_free_image(query, pexels_key=os.environ.get("PEXELS_API_KEY", ""), pixabay_key=os.environ.get("PIXABAY_API_KEY", ""))
-        if image is not None and image_is_relevant(image, query=query, title=rewritten["title"]) and image.url not in content:
-            content = attach_single_image(content, image, rewritten["title"])
-            image_providers.append(image.provider)
+    image_model = "0"
+    # One image maximum. No Pexels/Pixabay/OpenAI/Gemini-image fallback.
+    image_url = generate_image_url(rewritten["title"], theme="Blogger")
+    if image_url and image_url not in content:
+        content = _attach_replicate_image(content, image_url, rewritten["title"])
+        image_model = "replicate-approved"
+
     job_id = f"blogger-rewrite-{uuid.uuid4().hex[:12]}"
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
     publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "y", "on"}
-    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={','.join(image_providers) or '0'}; meta_description={rewritten['meta_description']}", ""]
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={image_model}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": len(image_providers), "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini"}, ensure_ascii=False))
+    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini", "image_provider": image_model}, ensure_ascii=False))
     return 0
 
 
