@@ -65,6 +65,8 @@ BROWSER_HEADERS = {
     "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
+RESULT_PATH = "daily_site_traffic_result.json"
+
 
 def log(msg):
     print(msg, flush=True)
@@ -100,6 +102,41 @@ def get_footer_visitor_stats(site_url):
         }, None
     except Exception as e:
         return None, f"visitor API 예외: {str(e)[:160]}"
+
+
+def get_published_post_count(site_url):
+    """Read the public WordPress count without downloading post bodies."""
+    try:
+        url = site_url.rstrip("/") + "/wp-json/wp/v2/posts"
+        r = requests.get(url, params={"per_page": 1, "_fields": "id"}, headers=BROWSER_HEADERS, timeout=15)
+        if r.status_code != 200:
+            return None, f"posts API HTTP {r.status_code}"
+        return int(r.headers.get("X-WP-Total", 0)), None
+    except Exception as e:
+        return None, f"posts API 예외: {str(e)[:160]}"
+
+
+def derive_index_metrics(indexed, submitted, previous_indexed=None):
+    """Derive dashboard values only from official sitemap counts."""
+    if indexed is None or submitted is None:
+        return {"unindexed": None, "index_rate": None, "recent_index_increase": None}
+    unindexed = max(int(submitted) - int(indexed), 0)
+    rate = round((int(indexed) / int(submitted)) * 100, 2) if int(submitted) > 0 else None
+    increase = None if previous_indexed is None else int(indexed) - int(previous_indexed)
+    return {"unindexed": unindexed, "index_rate": rate, "recent_index_increase": increase}
+
+
+def load_previous_index_counts(path=RESULT_PATH):
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+        return {
+            row["domain"]: row.get("sitemap_indexed")
+            for row in payload.get("records", [])
+            if row.get("domain") and row.get("sitemap_indexed") is not None
+        }
+    except (OSError, ValueError, TypeError):
+        return {}
 
 
 def get_gsc_token():
@@ -250,11 +287,16 @@ def send_to_sheets(records):
                 r.get("total_visitors"),
                 r.get("sitemap_indexed"),
                 r.get("sitemap_submitted"),
+                r.get("unindexed"),
+                r.get("index_rate"),
+                fmt_delta(r.get("recent_index_increase")),
+                r.get("total_posts"),
                 r.get("gsc_clicks"),
                 r.get("impressions"),
                 r.get("ctr"),
                 r.get("position"),
                 r.get("gsc_date"),
+                r.get("status"),
             ]
             for r in records
         }
@@ -265,7 +307,9 @@ def send_to_sheets(records):
             date_label,
             [
                 "일일방문자수", "증감", "누적방문자", "사이트맵 보고 색인수", "사이트맵 제출URL수",
+                "미색인수", "색인율(%)", "최근 색인 증가", "총 발행글",
                 "GSC클릭", "GSC노출", "GSC CTR(%)", "GSC평균순위", "GSC기준일",
+                "오류/연결상태",
             ],
             values_by_domain,
         )
@@ -291,6 +335,7 @@ def main():
         log("⚠️ GSC_SERVICE_ACCOUNT_JSON 없음 — 방문자 수집만 진행")
 
     checked_at = datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S")
+    previous_indexed = load_previous_index_counts()
     records = []
 
     for i, site_url in enumerate(SITES, 1):
@@ -312,8 +357,13 @@ def main():
             "indexed": None,
             "sitemap_indexed": None,
             "sitemap_submitted": None,
+            "unindexed": None,
+            "index_rate": None,
+            "recent_index_increase": None,
+            "total_posts": None,
             "gsc_property": "",
             "status": "",
+            "errors": [],
             "checked_at": checked_at,
         }
 
@@ -322,7 +372,12 @@ def main():
             row.update(visitor)
             row["weekday"] = weekday_kr(row["date"])
         else:
-            row["status"] = visitor_err or "방문자 API 실패"
+            row["errors"].append(visitor_err or "방문자 API 실패")
+
+        post_count, post_err = get_published_post_count(site_url)
+        row["total_posts"] = post_count
+        if post_err:
+            row["errors"].append(post_err)
 
         if token:
             domain_property = f"sc-domain:{domain}"
@@ -335,7 +390,7 @@ def main():
 
             if query_site:
                 row["gsc_property"] = query_site
-                stats, _ = latest_daily_stats(token, query_site)
+                stats, stats_err = latest_daily_stats(token, query_site)
                 if stats:
                     row["gsc_clicks"] = stats["clicks"]
                     row["clicks"] = stats["clicks"]  # 기존 코드 호환
@@ -343,14 +398,26 @@ def main():
                     row["ctr"] = stats["ctr"]
                     row["position"] = stats["position"]
                     row["gsc_date"] = stats["date"]
-                coverage, _ = get_index_coverage(token, query_site)
+                elif stats_err:
+                    row["errors"].append(stats_err)
+                coverage, coverage_err = get_index_coverage(token, query_site)
                 if coverage:
                     row["sitemap_indexed"] = coverage["sitemap_indexed"]
                     row["sitemap_submitted"] = coverage["sitemap_submitted"]
                     row["indexed"] = coverage["sitemap_indexed"]  # history compatibility
+                    row.update(derive_index_metrics(
+                        coverage["sitemap_indexed"], coverage["sitemap_submitted"],
+                        previous_indexed.get(domain),
+                    ))
+                elif coverage_err:
+                    row["errors"].append(coverage_err)
+            else:
+                row["errors"].append("GSC 속성 연결 필요")
+        else:
+            row["errors"].append("GSC 연결 필요")
 
+        row["status"] = "정상" if not row["errors"] else " | ".join(row["errors"])
         if visitor:
-            row["status"] = "정상"
             log(
                 f"[{i:02d}/{len(SITES)}] {domain}: 전일 {row['daily_visitors']} "
                 f"({fmt_delta(row['visitor_delta']) or '비교없음'}) / 누적 {row['total_visitors']} "
@@ -361,7 +428,7 @@ def main():
             log(f"[{i:02d}/{len(SITES)}] {domain}: {row['status']}")
 
         records.append(row)
-        with open("daily_site_traffic_result.json", "w", encoding="utf-8") as f:
+        with open(RESULT_PATH, "w", encoding="utf-8") as f:
             json.dump(
                 {"checked_at": checked_at, "records": records, "partial": i < len(SITES)},
                 f, ensure_ascii=False, indent=2,
@@ -370,7 +437,7 @@ def main():
 
     send_to_sheets(records)
 
-    with open("daily_site_traffic_result.json", "w", encoding="utf-8") as f:
+    with open(RESULT_PATH, "w", encoding="utf-8") as f:
         json.dump(
             {"checked_at": checked_at, "records": records, "partial": False},
             f, ensure_ascii=False, indent=2,
