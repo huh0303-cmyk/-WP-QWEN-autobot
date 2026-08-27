@@ -1,9 +1,5 @@
 name: "Two Newsrooms — 3–10 Daily Editions"
 
-# 각 신문사에 하루 10번의 짧은 발행 기회를 주되 두 사이트는 약 30분 이상 분리한다.
-# 예전 matrix 방식은 TheSeoulJournal job이 매회 30~45분 sleep하여 Actions 시간을 낭비했다.
-# 이제 cron 자체를 엇갈리게 하므로 runner 대기 시간이 없다. 실제 발행량은
-# autopost_mega.py의 3~10건 일일 cap + fresh-source gate가 결정한다.
 on:
   workflow_dispatch:
     inputs:
@@ -14,7 +10,6 @@ on:
         options: [koreanews365, theseouljournal]
         default: koreanews365
   schedule:
-    # KoreaNews365 opportunities
     - cron: "31 22 * * *"
     - cron: "43 0 * * *"
     - cron: "8 2 * * *"
@@ -25,7 +20,6 @@ on:
     - cron: "41 9 * * *"
     - cron: "22 11 * * *"
     - cron: "53 12 * * *"
-    # TheSeoulJournal opportunities, 32분 이상 뒤
     - cron: "3 23 * * *"
     - cron: "15 1 * * *"
     - cron: "40 2 * * *"
@@ -85,9 +79,11 @@ jobs:
           OPENAI_ENABLED: "true"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
-          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           OPENAI_MODEL: "gpt-5.6-luna"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
@@ -96,8 +92,6 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
-          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
