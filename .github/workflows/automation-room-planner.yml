@@ -1,0 +1,32 @@
+name: "Automation Rooms — Build Daily Plan"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+
+env:
+  TZ: Asia/Seoul
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate room skeleton
+        run: python -m automation_hub.rooms
+      - name: Build safe execution plan
+        run: python -m automation_hub.room_scheduler --output artifacts/automation-room-plan.json
+      - name: Upload execution plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-room-plan
+          path: artifacts/automation-room-plan.json
+          retention-days: 7
