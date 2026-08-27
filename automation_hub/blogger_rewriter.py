@@ -69,7 +69,7 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
         required: list[str] = []
         for block in blocks:
             lower = plain_text(block).lower()
-            if (source_url and source_url in block) or (ymyl and re.search(r"\b(as of|subject to change|can change|disclaimer|consult)\b", lower)):
+            if (source_url and source_url in block) or (ymyl and re.search(r"\b(as of|subject to change|rules can change|requirements can change|disclaimer|not medical advice|not legal advice)\b", lower)):
                 required.append(block)
         required = list(dict.fromkeys(required))
         required_chars = len(re.sub(r"\s+", "", plain_text("".join(required))))
@@ -104,7 +104,8 @@ meta_description must be a natural search description of about 120 characters (1
 labels must contain 3-5 specific, relevant labels. image_queries must contain 0-2 free-stock search queries; use an empty list when no image is genuinely relevant.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
 For visa, insurance or medical-tourism topics, cite official sources, state an as-of date, warn that rules can change, and add a non-advisory/non-diagnostic disclaimer.
-Link naturally to the owned detailed source using this exact URL: {source_url}
+Link naturally to the owned detailed source using this exact URL in one of the first two paragraphs so it survives length editing: {source_url}
+For visa, insurance or medical-tourism topics, place the as-of date, change warning and disclaimer within the first three paragraphs, not only at the end.
 Use additional internal WordPress or authoritative primary-source links only from the verified list below. Include only links that materially support the article; never invent or guess URLs. Prefer government, regulator, university, hospital, insurer, and other primary sources for factual or time-sensitive claims.
 Verified link candidates from the source article:
 {verified_link_text}
