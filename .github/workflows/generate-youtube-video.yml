@@ -18,25 +18,23 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install system dependencies (ffmpeg + Korean font for subtitles)
+      - name: Install system dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum
-
       - name: Install Python dependencies
         run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
-
       - name: Run pipeline
         env:
           VIDEO_TOPIC: ${{ github.event.inputs.topic }}
+          # Gemini is retained only for legacy text fallback; active image code cannot call it.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
@@ -45,7 +43,6 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: python scripts/youtube_video_pipeline.py
-
       - name: Upload result as artifact (backup)
         if: always()
         uses: actions/upload-artifact@v4
