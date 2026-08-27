@@ -66,8 +66,9 @@ def main():
         None,
     )
     if not source:
-        print("새로운 WordPress 원문이 없습니다.")
-        return 0
+        raise RuntimeError(
+            "새로운 WordPress 원문이 없어 Blogger 검토 대기 행을 만들지 못했습니다."
+        )
     language = os.environ.get("BLOGGER_LANGUAGE", "en").strip().lower()
     korean_source_hosts = {"koreanews365.com", "www.koreanews365.com", "k-health365.com", "www.k-health365.com"}
     source_host = requests.utils.urlparse(source_url).netloc.lower()
