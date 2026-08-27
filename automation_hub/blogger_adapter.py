@@ -43,9 +43,9 @@ class BloggerPublisher:
         public_url = payload.get("url", "")
         remote_id = str(payload.get("id", ""))
         if not job.publish_now:
-            return PublishResult(True, "blogger", self.site_id, job.job_id, "drafted", remote_id=remote_id, message="Blogger draft created")
+            review_url = f"https://www.blogger.com/blog/post/edit/{self.blog_id}/{remote_id}"
+            return PublishResult(True, "blogger", self.site_id, job.job_id, "drafted", public_url=review_url, remote_id=remote_id, message="Blogger draft created; human review and manual publish required")
         verification = verify_publication(public_url, job.title, site_url=self.site_url, attempts=3)
         if not verification.ok:
             return PublishResult(False, "blogger", self.site_id, job.job_id, "verification_failed", public_url=public_url, remote_id=remote_id, error_code=verification.error_code, message=verification.error_message)
         return PublishResult(True, "blogger", self.site_id, job.job_id, "published", public_url=verification.final_url, remote_id=remote_id)
-

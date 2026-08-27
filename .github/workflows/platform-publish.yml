@@ -33,7 +33,6 @@ concurrency:
 
 jobs:
   publish:
-    if: ${{ github.event_name == 'workflow_dispatch' || vars.BLOGGER_AUTOPUBLISH_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -55,4 +54,7 @@ jobs:
           PLATFORM_FILTER: ${{ github.event_name == 'schedule' && 'blogger' || inputs.platform || 'blogger' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
+          BLOGGER_REVIEW_EMAIL_TO: "huh0303@gmail.com"
+          BLOGGER_REVIEW_EMAIL_FROM: "huh0303@gmail.com"
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/process_platform_queue.py

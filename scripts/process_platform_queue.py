@@ -15,6 +15,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.blogger_adapter import BloggerPublisher
+from automation_hub.draft_notifier import notify_blogger_draft
 from automation_hub.interactive_adapters import InteractiveEditorPublisher
 from automation_hub.publishing import PublishJob
 from gsheets_direct import get_sheets_service
@@ -76,7 +77,7 @@ def main() -> int:
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
-            publish_now=row.get("publish_now", "TRUE").upper() in {"TRUE", "ON", "1", "YES"}, source_keyword=row.get("source_keyword", ""),
+            publish_now=(False if platform == "blogger" else row.get("publish_now", "TRUE").upper() in {"TRUE", "ON", "1", "YES"}), source_keyword=row.get("source_keyword", ""),
         )
         if platform == "blogger":
             try:
@@ -91,6 +92,8 @@ def main() -> int:
             print(json.dumps({"job_id": job.job_id, "status": "skipped", "error": f"unsupported platform {platform}"}, ensure_ascii=False))
             continue
         result = publisher.publish(job)
+        if platform == "blogger" and result.ok and result.status == "drafted":
+            notify_blogger_draft(site_id=job.site_id, title=job.title, review_url=result.public_url, quality_note=row.get("message", ""))
         service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
             body={"values": [[result.status]]},

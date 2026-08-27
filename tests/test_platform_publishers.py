@@ -30,6 +30,15 @@ class PlatformPublisherTests(unittest.TestCase):
         self.assertFalse(result.ok)
         self.assertEqual("auth_required", result.status)
 
+    def test_blogger_draft_returns_human_review_link(self):
+        session = Mock()
+        session.post.return_value = Mock(status_code=200, json=lambda: {"id": "44"}, text="")
+        draft = PublishJob("job-2", "site-1", "Draft title", "<p>Draft</p>", ["guide"], publish_now=False)
+        result = BloggerPublisher("site-1", "123", "token", session=session).publish(draft)
+        self.assertEqual("drafted", result.status)
+        self.assertEqual("https://www.blogger.com/blog/post/edit/123/44", result.public_url)
+        self.assertEqual("true", session.post.call_args.kwargs["params"]["isDraft"])
+
     def test_naver_never_claims_false_api_success(self):
         result = InteractiveEditorPublisher("naver", "site-1", "https://blog.naver.com").publish(self.job)
         self.assertFalse(result.ok)
