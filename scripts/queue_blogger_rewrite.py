@@ -114,7 +114,7 @@ def main():
         raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
     target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
-    minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "80"))
+    minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "75"))
     ymyl = any(word in (source["title"]["rendered"] + " " + source_url).lower() for word in ("visa", "immigration", "insurance", "medical", "hospital", "treatment"))
     rewritten = None
     quality_score = 0
