@@ -14,7 +14,7 @@ on:
       language:
         description: "Output language"
         required: true
-        default: "ko"
+        default: "en"
         type: string
       persona:
         description: "Blog-specific persona"

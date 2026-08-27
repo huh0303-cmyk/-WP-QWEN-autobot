@@ -37,7 +37,12 @@ def main():
     if not source:
         print("새로운 WordPress 원문이 없습니다.")
         return 0
-    prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=os.environ.get("BLOGGER_LANGUAGE", "ko"), persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=int(os.environ.get("BLOGGER_TARGET_CHARS", "1800")))
+    language = os.environ.get("BLOGGER_LANGUAGE", "en").strip().lower()
+    korean_source_hosts = {"koreanews365.com", "www.koreanews365.com", "k-health365.com", "www.k-health365.com"}
+    source_host = requests.utils.urlparse(source_url).netloc.lower()
+    if language == "ko" and source_host not in korean_source_hosts:
+        raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
+    prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=int(os.environ.get("BLOGGER_TARGET_CHARS", "1800")))
     rewritten = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
     score = similarity(source["content"]["rendered"], rewritten["content_html"])
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
