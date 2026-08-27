@@ -15,6 +15,11 @@ def plain_text(value: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"(?s)<[^>]+>", " ", value))).strip()
 
 
+def extract_http_links(value: str) -> list[str]:
+    links = re.findall(r'''(?is)href=["'](https?://[^"'#\s]+)''', value)
+    return list(dict.fromkeys(html.unescape(link) for link in links))[:30]
+
+
 def similarity(source_html: str, rewritten_html: str) -> float:
     return SequenceMatcher(None, plain_text(source_html).lower(), plain_text(rewritten_html).lower()).ratio()
 
@@ -39,16 +44,24 @@ def parse_rewrite_json(raw: str) -> dict[str, Any]:
 
 
 def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, language: str, persona: str, tone: str, target_chars: int) -> str:
+    verified_links = extract_http_links(source_html)
+    verified_link_text = "\n".join(f"- {link}" for link in verified_links) or "- No additional verified links supplied"
     return f"""You are adapting an owned WordPress article for a different Blogspot audience.
 Do not paraphrase sentence by sentence. Choose a different search intent and rebuild the outline, examples, checklist and FAQ.
 Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
+The article must feel individually edited for this site's persona, not mass-produced. Avoid AI-signaling phrases, generic filler, keyword stuffing, repetitive templates, fake freshness, exaggerated claims, and unnecessary FAQs.
+Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.
+Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
 Return JSON only with keys title, meta_description, content_html, image_queries, labels.
 meta_description must be a natural search description of about 120 characters (110-130 characters).
 labels must contain 3-5 specific, relevant labels. image_queries must contain 0-2 free-stock search queries; use an empty list when no image is genuinely relevant.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
 For visa, insurance or medical-tourism topics, cite official sources, state an as-of date, warn that rules can change, and add a non-advisory/non-diagnostic disclaimer.
-End with a short paragraph linking to the owned detailed source using this exact URL: {source_url}
+Link naturally to the owned detailed source using this exact URL: {source_url}
+Use additional internal WordPress or authoritative primary-source links only from the verified list below. Include only links that materially support the article; never invent or guess URLs. Prefer government, regulator, university, hospital, insurer, and other primary sources for factual or time-sensitive claims.
+Verified link candidates from the source article:
+{verified_link_text}
 Source title: {source_title}
 Source article:
 {plain_text(source_html)[:18000]}

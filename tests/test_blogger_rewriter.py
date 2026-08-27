@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from automation_hub.blogger_rewriter import attach_single_image, find_one_free_image, parse_rewrite_json, similarity
+from automation_hub.blogger_rewriter import attach_single_image, extract_http_links, find_one_free_image, parse_rewrite_json, similarity
 
 
 class BloggerRewriterTests(unittest.TestCase):
@@ -11,6 +11,10 @@ class BloggerRewriterTests(unittest.TestCase):
 
     def test_similarity_catches_near_copy(self):
         self.assertGreater(similarity("<p>The same useful article</p>", "<div>The same useful article</div>"), 0.95)
+
+    def test_verified_links_are_extracted_without_duplicates(self):
+        html = '<a href="https://example.gov/a">A</a><a href="https://example.gov/a">Again</a>'
+        self.assertEqual(["https://example.gov/a"], extract_http_links(html))
 
     def test_exactly_one_free_image_is_attached(self):
         session = Mock()

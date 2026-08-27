@@ -14,6 +14,14 @@ Default publishing language is English. Korean is allowed only for Blogger desti
 8. Change structure, examples, headings, and framing to prevent duplicate content.
 9. Do not upload the generated profile logo. The profile photo remains user-managed.
 10. Do not schedule creation or publishing at repetitive round-clock times. Distribute runs across different, non-round times within approved operating windows.
+11. Write for a real reader's task, not for search-engine manipulation. Every post must add original synthesis, a complete answer, and practical next steps beyond the WordPress source.
+12. Use a descriptive, non-clickbait title; a direct-answer introduction; logically ordered H2/H3 sections; and checklists, comparisons, tables, or FAQs only when they materially help.
+13. Make authorship and scope clear. Never invent credentials, first-hand experience, statistics, quotations, case studies, or sources.
+14. Link naturally to the verified source WordPress article and, when available in the source, one or more genuinely related WordPress guides. Do not create keyword-stuffed or repetitive anchor text.
+15. For factual and time-sensitive claims, link to relevant official government, regulator, university, hospital, insurer, or other primary sources already verified in the WordPress source. Never invent or guess a URL.
+16. Reject thin, generic, mass-produced-looking output, repeated templates, filler introductions, keyword stuffing, fake freshness, excessive FAQs, and unsupported claims before publication.
+17. Before applying for AdSense, every Blogger site must have useful published content plus clear About, Contact, Privacy Policy, and editorial/disclaimer pages appropriate to its topic.
+18. AdSense approval is never guaranteed. Optimize for Google Publisher Policies, people-first usefulness, originality, trust, and a good reader experience rather than writing "for approval" or manipulating rankings.
 
 ## Publishing order for the first six Blogger sites
 
