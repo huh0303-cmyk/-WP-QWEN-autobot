@@ -12,6 +12,7 @@ must not regress to legacy labels retained in the large historical module.
   and OpenAI/Gemini image-relevance calls are blocked from the active WP entrypoint.
 """
 import os
+import socket
 import sys
 from pathlib import Path
 
@@ -27,6 +28,17 @@ os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "true"
+
+# Hostinger sites can advertise IPv6 while GitHub-hosted runners have an
+# intermittently unusable IPv6 route.  Prefer IPv4 at the client only; this
+# does not alter site DNS and keeps REST reads/writes on the verified A path.
+if os.environ.get("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes", "on"}:
+    _original_getaddrinfo = socket.getaddrinfo
+
+    def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+    socket.getaddrinfo = _ipv4_only_getaddrinfo
 
 import autopost_mega as base
 
