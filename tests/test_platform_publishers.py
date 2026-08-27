@@ -73,6 +73,23 @@ class PlatformPublisherTests(unittest.TestCase):
         self.assertEqual("client", sent["client_id"])
         self.assertEqual("refresh", sent["refresh_token"])
 
+    @patch.dict(os.environ, {
+        "BLOGGER_GOOGLE_CLIENT_ID": "blogger-client",
+        "BLOGGER_GOOGLE_CLIENT_SECRET": "blogger-secret",
+        "BLOGGER_GOOGLE_REFRESH_TOKEN": "blogger-refresh",
+        "GOOGLE_OAUTH_CLIENT_ID": "general-client",
+        "GOOGLE_OAUTH_CLIENT_SECRET": "general-secret",
+        "GOOGLE_OAUTH_REFRESH_TOKEN": "general-refresh",
+    }, clear=False)
+    @patch("scripts.process_platform_queue.requests.post")
+    def test_default_blogger_profile_never_falls_back_to_general_oauth(self, post):
+        post.return_value = Mock(status_code=200, json=lambda: {"access_token": "token"})
+        post.return_value.raise_for_status.return_value = None
+        self.assertEqual("token", process_platform_queue._access_token("default"))
+        sent = post.call_args.kwargs["data"]
+        self.assertEqual("blogger-client", sent["client_id"])
+        self.assertEqual("blogger-refresh", sent["refresh_token"])
+
 
 if __name__ == "__main__":
     unittest.main()

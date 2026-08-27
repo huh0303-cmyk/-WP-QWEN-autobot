@@ -31,10 +31,15 @@ def _records(values: list[list[str]]) -> list[dict[str, str]]:
 
 
 def _access_token(auth_profile: str) -> str:
+    # Blogger writes must use the dedicated OAuth client/token. Falling back to
+    # the general Sheets/Drive token can mint a valid access token without the
+    # Blogger write scope and then fail late with 403 scope insufficient.
     prefix = auth_profile.strip().upper().replace("-", "_")
-    refresh_token = os.environ.get(f"{prefix}_GOOGLE_REFRESH_TOKEN", "") or os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN", "")
-    client_id = os.environ.get(f"{prefix}_GOOGLE_CLIENT_ID", "") or os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
-    client_secret = os.environ.get(f"{prefix}_GOOGLE_CLIENT_SECRET", "") or os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+    if prefix in {"", "DEFAULT"}:
+        prefix = "BLOGGER"
+    refresh_token = os.environ.get(f"{prefix}_GOOGLE_REFRESH_TOKEN", "")
+    client_id = os.environ.get(f"{prefix}_GOOGLE_CLIENT_ID", "")
+    client_secret = os.environ.get(f"{prefix}_GOOGLE_CLIENT_SECRET", "")
     if not all((refresh_token, client_id, client_secret)):
         return ""
     response = requests.post(
