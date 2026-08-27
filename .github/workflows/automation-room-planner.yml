@@ -20,13 +20,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate room skeleton
-        run: python -m automation_hub.rooms
+      - name: Validate room skeleton and workflow contracts
+        run: |
+          python -m automation_hub.rooms
+          python -m automation_hub.workflow_contracts
       - name: Build safe execution plan
         run: python -m automation_hub.room_scheduler --output artifacts/automation-room-plan.json
-      - name: Upload execution plan
+      - name: Build dry-run workflow dispatch payloads
+        run: python -m automation_hub.dispatch_builder --output artifacts/automation-dispatch-plan.json
+      - name: Upload planning artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: automation-room-plan
-          path: artifacts/automation-room-plan.json
+          name: automation-room-plans
+          path: |
+            artifacts/automation-room-plan.json
+            artifacts/automation-dispatch-plan.json
           retention-days: 7
