@@ -63,6 +63,7 @@ def main() -> int:
     accounts = {record["site_id"]: record for record in _records(account_values) if record.get("enabled", "ON").upper() in {"ON", "TRUE", "1"}}
     queue = _records(queue_values)
     processed = 0
+    failed = 0
 
     for index, row in enumerate(queue, start=2):
         if row.get("status", "").strip().lower() not in {"ready", "대기"}:
@@ -154,11 +155,15 @@ def main() -> int:
         ).execute()
         print(json.dumps(result.to_dict(), ensure_ascii=False))
         processed += 1
+        if not result.ok:
+            failed += 1
         if processed >= max_jobs:
             break
     print(f"Processed {processed} queue job(s)")
     if fail_on_empty and processed == 0:
         raise SystemExit("No eligible queue job was processed")
+    if failed:
+        raise SystemExit(f"{failed} of {processed} processed queue job(s) failed")
     return 0
 
 

@@ -27,6 +27,11 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         block = source.split("def generate_content_gemini(prompt):", 1)[1].split("def strip_code_fences", 1)[0]
         self.assertNotIn("gemini_client.models.generate_content", block)
         self.assertIn("Gemini fallback is prohibited", block)
+
+    def test_platform_queue_fails_workflow_when_publisher_fails(self):
+        source = (ROOT / "scripts" / "process_platform_queue.py").read_text(encoding="utf-8")
+        self.assertIn("if not result.ok:", source)
+        self.assertIn("processed queue job(s) failed", source)
     def test_newsroom_trim_cannot_cross_minimum(self):
         helpers = load_autopost_functions("newsroom_char_count", "trim_newsroom_html")
         body = "<p>" + ("검증된 사실 문장입니다. " * 180) + "</p>"
