@@ -73,6 +73,9 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
                 required.append(block)
         required = list(dict.fromkeys(required))
         required_chars = len(re.sub(r"\s+", "", plain_text("".join(required))))
+        needs_attribution = bool(source_url and not any(source_url in block for block in required))
+        if needs_attribution:
+            required_chars += 160
         kept: list[str] = []
         for block in blocks:
             if block in required:
@@ -84,6 +87,9 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
         while kept and re.match(r"(?is)^<h[23]", kept[-1]):
             kept.pop()
         final_blocks = kept + [block for block in required if block not in kept]
+        if needs_attribution:
+            safe_url = html.escape(source_url, quote=True)
+            final_blocks.append(f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>')
         if final_blocks:
             normalized["content_html"] = "".join(final_blocks)
     return normalized
