@@ -13,6 +13,8 @@ on:
         type: choice
         options:
           - blogger
+          - tistory
+          - naver
           - all
       job_id:
         description: "Optional exact job_id from 자동화_발행대기"
@@ -52,6 +54,7 @@ jobs:
           JOB_ID: ${{ inputs.job_id || '' }}
           MAX_JOBS: ${{ inputs.max_jobs || '1' }}
           PLATFORM_FILTER: ${{ github.event_name == 'schedule' && 'blogger' || inputs.platform || 'blogger' }}
+          FAIL_ON_EMPTY: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
           BLOGGER_REVIEW_EMAIL_TO: "huh0303@gmail.com"

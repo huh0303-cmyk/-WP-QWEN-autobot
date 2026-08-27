@@ -15,7 +15,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.blogger_adapter import BloggerPublisher
-from automation_hub.content_identity import active_duplicate, is_same_content
+from automation_hub.content_identity import active_duplicate, is_same_content, is_similar_content
 from automation_hub.draft_notifier import notify_blogger_draft
 from automation_hub.interactive_adapters import InteractiveEditorPublisher
 from automation_hub.publishing import PublishJob
@@ -51,6 +51,7 @@ def main() -> int:
     selected_job = os.environ.get("JOB_ID", "").strip()
     max_jobs = max(1, int(os.environ.get("MAX_JOBS", "1")))
     platform_filter = os.environ.get("PLATFORM_FILTER", "").strip().lower()
+    fail_on_empty = os.environ.get("FAIL_ON_EMPTY", "false").strip().lower() in {"1", "true", "yes", "on"}
     if platform_filter in {"all", "*"}:
         platform_filter = ""
     if not spreadsheet_id:
@@ -70,12 +71,20 @@ def main() -> int:
             continue
         account = accounts.get(row.get("site_id", ""))
         if not account:
+            service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
+                body={"values": [["account_missing"]]},
+            ).execute()
+            service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!L{index}:N{index}", valueInputOption="RAW",
+                body={"values": [["ACCOUNT_MISSING", "enabled platform account not found", ""]]},
+            ).execute()
             print(json.dumps({"job_id": row.get("job_id"), "status": "skipped", "error": "enabled account not found"}, ensure_ascii=False))
             continue
         platform = account.get("platform", "").lower()
         if platform_filter and platform != platform_filter:
             continue
-        if platform == "blogger":
+        if platform in {"blogger", "tistory"}:
             completed_duplicate = active_duplicate(
                 [candidate for candidate in queue if candidate is not row and candidate.get("status", "").strip().lower() in {"processing", "drafted", "published"}],
                 site_id=row.get("site_id", ""), source_id=row.get("source_keyword", ""),
@@ -86,9 +95,14 @@ def main() -> int:
                 and is_same_content(candidate, site_id=row.get("site_id", ""), source_id=row.get("source_keyword", ""))
                 for candidate_index, candidate in enumerate(queue, start=2)
             )
-            if completed_duplicate or earlier_ready:
+            similar = next((candidate for candidate in queue if candidate is not row
+                            and candidate.get("status", "").strip().lower() in {"ready", "대기", "processing", "drafted", "published", "review_ready"}
+                            and is_similar_content(candidate, site_id=row.get("site_id", ""),
+                                                   title=row.get("title", ""), content_html=row.get("content_html", ""))), None)
+            if completed_duplicate or earlier_ready or similar:
                 reason = "same target/source already owned by " + (
-                    completed_duplicate.get("job_id", "another job") if completed_duplicate else "an earlier ready row"
+                    completed_duplicate.get("job_id", "another job") if completed_duplicate else
+                    ("an earlier ready row" if earlier_ready else similar.get("job_id", "similar content"))
                 )
                 service.spreadsheets().values().update(
                     spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
@@ -103,7 +117,7 @@ def main() -> int:
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
-            publish_now=(False if platform == "blogger" else row.get("publish_now", "TRUE").upper() in {"TRUE", "ON", "1", "YES"}), source_keyword=row.get("source_keyword", ""),
+            publish_now=(False if platform in {"blogger", "tistory"} else row.get("publish_now", "FALSE").upper() in {"TRUE", "ON", "1", "YES"}), source_keyword=row.get("source_keyword", ""),
         )
         if platform == "blogger":
             try:
@@ -115,6 +129,10 @@ def main() -> int:
         elif platform in {"naver", "tistory"}:
             publisher = InteractiveEditorPublisher(platform, job.site_id, account.get("editor_url", ""))
         else:
+            service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
+                body={"values": [["unsupported_platform"]]},
+            ).execute()
             print(json.dumps({"job_id": job.job_id, "status": "skipped", "error": f"unsupported platform {platform}"}, ensure_ascii=False))
             continue
         # Claim before the external API call. A crash leaves a reviewable
@@ -139,6 +157,8 @@ def main() -> int:
         if processed >= max_jobs:
             break
     print(f"Processed {processed} queue job(s)")
+    if fail_on_empty and processed == 0:
+        raise SystemExit("No eligible queue job was processed")
     return 0
 
 

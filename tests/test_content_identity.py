@@ -1,9 +1,13 @@
 import unittest
 
-from automation_hub.content_identity import active_duplicate, canonical_source_id, stable_content_id
+from automation_hub.content_identity import active_duplicate, canonical_source_id, is_similar_content, stable_content_id
 
 
 class ContentIdentityTests(unittest.TestCase):
+    def test_similar_title_or_body_is_blocked_per_destination(self):
+        row = {"site_id": "tistory-a", "title": "Korea Visa Renewal Checklist", "content_html": "<p>Keep every required document and verify the current deadline.</p>"}
+        self.assertTrue(is_similar_content(row, site_id="tistory-a", title="Korea Visa Renewal Checklist!", content_html="<p>Different</p>"))
+        self.assertFalse(is_similar_content(row, site_id="tistory-b", title=row["title"], content_html=row["content_html"]))
     def test_url_fragment_and_trailing_slash_do_not_change_identity(self):
         left = canonical_source_id("HTTPS://Example.COM/post/#section")
         right = canonical_source_id("https://example.com/post")

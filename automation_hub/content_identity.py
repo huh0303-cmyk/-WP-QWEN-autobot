@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import re
+from difflib import SequenceMatcher
 from urllib.parse import urlsplit, urlunsplit
 
 
@@ -38,3 +40,18 @@ def active_duplicate(rows: list[dict[str, str]], *, site_id: str, source_id: str
         ):
             return row
     return None
+
+
+def _plain(value: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", value or "")).strip().casefold()
+
+
+def is_similar_content(row: dict[str, str], *, site_id: str, title: str, content_html: str, threshold: float = 0.92) -> bool:
+    """Catch same-destination title/body copies even when source URLs differ."""
+    if row.get("site_id", "").strip().lower() != site_id.strip().lower():
+        return False
+    old_title, new_title = _plain(row.get("title", "")), _plain(title)
+    old_body, new_body = _plain(row.get("content_html", "")), _plain(content_html)
+    title_match = bool(old_title and new_title and SequenceMatcher(None, old_title, new_title).ratio() >= threshold)
+    body_match = bool(old_body and new_body and SequenceMatcher(None, old_body[:5000], new_body[:5000]).ratio() >= threshold)
+    return title_match or body_match
