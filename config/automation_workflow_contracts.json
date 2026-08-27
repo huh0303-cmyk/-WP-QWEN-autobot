@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "description": "Workflow input contracts used by the central room scheduler. PUBLIC is never implied by this file.",
+  "contracts": {
+    "daily-network-publish.yml": {
+      "platforms": ["wordpress"],
+      "mode": "workflow_dispatch",
+      "inputs": {
+        "target_site_url": "room.name_url",
+        "force_keyword": "",
+        "publication_approved": false
+      },
+      "safe_policy": "draft",
+      "artifact_kind": "wordpress_post_id"
+    },
+    "blogger-daily-scheduler.yml": {
+      "platforms": ["blogger"],
+      "mode": "scheduler_managed",
+      "inputs": {},
+      "safe_policy": "draft",
+      "artifact_kind": "blogger_draft_id"
+    },
+    "platform-publish.yml": {
+      "platforms": ["blogger", "tistory"],
+      "mode": "workflow_dispatch",
+      "inputs": {
+        "platform": "room.platform",
+        "job_id": "",
+        "max_jobs": "1"
+      },
+      "safe_policy": "awaiting_approval",
+      "artifact_kind": "platform_draft_or_queue_id"
+    },
+    "generate-youtube-playlist.yml": {
+      "platforms": ["youtube"],
+      "mode": "workflow_dispatch",
+      "channel_groups": ["PLAYLIST"],
+      "inputs": {
+        "channel": "room.account_id",
+        "topic": "",
+        "language": "room.language",
+        "publish_delay_hours": ""
+      },
+      "safe_policy": "private",
+      "artifact_kind": "youtube_video_id"
+    },
+    "curio-longform-daily.yml": {
+      "platforms": ["youtube"],
+      "mode": "workflow_dispatch",
+      "channel_groups": ["KNOWLEDGE"],
+      "inputs": {
+        "channel": "room.account_id",
+        "topic": "",
+        "publish_delay_hours": ""
+      },
+      "safe_policy": "private",
+      "artifact_kind": "youtube_video_id"
+    }
+  }
+}
