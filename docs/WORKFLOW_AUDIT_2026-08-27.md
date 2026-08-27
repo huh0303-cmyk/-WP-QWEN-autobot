@@ -18,7 +18,7 @@
 
 ## High-risk unresolved items (not deleted)
 
-- Blogger duplicate ownership between daily scheduler and Sheet queue lacks a cross-path stable content lock.
+- Blogger daily generation and Sheet queue now share a destination/source identity lock. Existing historical rows remain compatible through `site_id + source_keyword` matching.
 - Ordinary WP direct publishing remains enabled in `daily-network-publish.yml`; whether this is an approved production path versus review-first requires owner confirmation. `wp-create-draft.yml` exists for explicit draft tests.
 - The newsroom workflow has 20 daily cron entries across two newsrooms. This matches the configured maximum of 10/site/day but is cost/volume sensitive; no schedule was removed without business confirmation.
 - Registry count is 25 ordinary WP + 2 newsrooms while owner planning language says 26 + 2. No site was invented or deleted.

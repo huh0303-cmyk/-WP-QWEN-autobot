@@ -21,6 +21,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.blogger_rewriter import blogger_quality_score, normalize_rewrite_format, parse_rewrite_json, rewrite_prompt
+from automation_hub.content_identity import active_duplicate, canonical_source_id, stable_content_id
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
@@ -39,6 +40,13 @@ def _attach_replicate_image(content: str, image_url: str, title: str) -> str:
     return figure + content
 
 
+def _records(values: list[list[str]]) -> list[dict[str, str]]:
+    if not values:
+        return []
+    header = values[0]
+    return [dict(zip(header, [*row, *([""] * (len(header) - len(row)))])) for row in values[1:] if row]
+
+
 def main():
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     source_url = os.environ.get("SOURCE_WP_URL", "").rstrip("/")
@@ -49,8 +57,14 @@ def main():
     posts.raise_for_status()
     service = get_sheets_service()
     existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
-    used_sources = {row[8] for row in existing[1:] if len(row) > 8 and len(row) > 3 and row[3] in {"ready", "drafted", "published"}}
-    source = next((post for post in posts.json() if post.get("link") not in used_sources), None)
+    queue_records = _records(existing)
+    source = next(
+        (
+            post for post in posts.json()
+            if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))
+        ),
+        None,
+    )
     if not source:
         print("새로운 WordPress 원문이 없습니다.")
         return 0
@@ -94,14 +108,27 @@ def main():
         content = _attach_replicate_image(content, image_url, rewritten["title"])
         image_model = "replicate-approved"
 
-    job_id = f"blogger-rewrite-{uuid.uuid4().hex[:12]}"
+    content_id = stable_content_id(
+        "blogger", blogger_site_id, source["link"],
+        version=os.environ.get("BLOGGER_CONTENT_VERSION", "v1"),
+    )
+    job_id = f"blogger-{content_id}"
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
     publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "y", "on"}
-    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={image_model}; meta_description={rewritten['meta_description']}", ""]
+    # Re-read immediately before append. Workflow concurrency serializes the
+    # normal scheduler path; this second check also blocks a queue/operator race.
+    latest = service.spreadsheets().values().get(
+        spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N"
+    ).execute().get("values", [])
+    duplicate = active_duplicate(_records(latest), site_id=blogger_site_id, source_id=source["link"])
+    if duplicate:
+        print(json.dumps({"queued": False, "duplicate_blocked": True, "existing_job_id": duplicate.get("job_id"), "content_id": content_id}, ensure_ascii=False))
+        return 0
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), canonical_source_id(source["link"]), "", "", "", f"content_id={content_id}; quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={image_model}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini", "image_provider": image_model}, ensure_ascii=False))
+    print(json.dumps({"queued": True, "job_id": job_id, "content_id": content_id, "source": canonical_source_id(source["link"]), "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini", "image_provider": image_model}, ensure_ascii=False))
     return 0
 
 

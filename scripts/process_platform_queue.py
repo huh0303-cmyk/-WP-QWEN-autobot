@@ -15,6 +15,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.blogger_adapter import BloggerPublisher
+from automation_hub.content_identity import active_duplicate, is_same_content
 from automation_hub.draft_notifier import notify_blogger_draft
 from automation_hub.interactive_adapters import InteractiveEditorPublisher
 from automation_hub.publishing import PublishJob
@@ -74,6 +75,31 @@ def main() -> int:
         platform = account.get("platform", "").lower()
         if platform_filter and platform != platform_filter:
             continue
+        if platform == "blogger":
+            completed_duplicate = active_duplicate(
+                [candidate for candidate in queue if candidate is not row and candidate.get("status", "").strip().lower() in {"processing", "drafted", "published"}],
+                site_id=row.get("site_id", ""), source_id=row.get("source_keyword", ""),
+            )
+            earlier_ready = any(
+                candidate_index < index
+                and candidate.get("status", "").strip().lower() in {"ready", "대기"}
+                and is_same_content(candidate, site_id=row.get("site_id", ""), source_id=row.get("source_keyword", ""))
+                for candidate_index, candidate in enumerate(queue, start=2)
+            )
+            if completed_duplicate or earlier_ready:
+                reason = "same target/source already owned by " + (
+                    completed_duplicate.get("job_id", "another job") if completed_duplicate else "an earlier ready row"
+                )
+                service.spreadsheets().values().update(
+                    spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
+                    body={"values": [["duplicate_blocked"]]},
+                ).execute()
+                service.spreadsheets().values().update(
+                    spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!L{index}:N{index}", valueInputOption="RAW",
+                    body={"values": [["DUPLICATE_CONTENT", reason, ""]]},
+                ).execute()
+                print(json.dumps({"job_id": row.get("job_id"), "status": "duplicate_blocked", "reason": reason}, ensure_ascii=False))
+                continue
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
@@ -91,6 +117,12 @@ def main() -> int:
         else:
             print(json.dumps({"job_id": job.job_id, "status": "skipped", "error": f"unsupported platform {platform}"}, ensure_ascii=False))
             continue
+        # Claim before the external API call. A crash leaves a reviewable
+        # `processing` row instead of retrying blindly and creating two drafts.
+        service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
+            body={"values": [["processing"]]},
+        ).execute()
         result = publisher.publish(job)
         if platform == "blogger" and result.ok and result.status == "drafted":
             notify_blogger_draft(site_id=job.site_id, title=job.title, review_url=result.public_url, quality_note=row.get("message", ""))
