@@ -24,6 +24,9 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 16. Reject thin, generic, mass-produced-looking output, repeated templates, filler introductions, keyword stuffing, fake freshness, excessive FAQs, and unsupported claims before publication.
 17. Before applying for AdSense, every Blogger site must have useful published content plus clear About, Contact, Privacy Policy, and editorial/disclaimer pages appropriate to its topic.
 18. AdSense approval is never guaranteed. Optimize for Google Publisher Policies, people-first usefulness, originality, trust, and a good reader experience rather than writing "for approval" or manipulating rankings.
+19. Each connected Blogger destination publishes at most one post per KST calendar day. Its daily target time is a site-specific baseline plus deterministic random jitter of up to four hours in either direction, with round-clock times avoided.
+20. A scheduled Blogger run is skipped when no new, publicly published WordPress source article is available. It must never fabricate a source or republish an already-used WordPress URL.
+21. The scheduler runs every 20 minutes, dispatches at most one site per run, and keeps at least 20 minutes between network dispatches. New Blogger sites enter the schedule only after their registry record is connected and explicitly set to automatic daily publishing.
 
 ## Publishing order for the first six Blogger sites
 

@@ -59,9 +59,10 @@ def main():
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
-    row = [iso_kst(), job_id, blogger_site_id, "ready", "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"rewritten_similarity={score:.3f}; images={','.join(image_providers) or '0'}; meta_description={rewritten['meta_description']}", ""]
+    publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "y", "on"}
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"rewritten_similarity={score:.3f}; images={','.join(image_providers) or '0'}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "similarity": round(score, 3), "image_count": len(image_providers), "meta_description": rewritten["meta_description"], "publish_now": False, "text_provider": "gemini"}, ensure_ascii=False))
+    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "similarity": round(score, 3), "image_count": len(image_providers), "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini"}, ensure_ascii=False))
     return 0
 
 

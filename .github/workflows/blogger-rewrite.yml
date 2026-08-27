@@ -31,6 +31,11 @@ on:
         required: true
         default: "1800"
         type: string
+      publish_now:
+        description: "Publish after all rewrite checks pass"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -70,4 +75,5 @@ jobs:
           BLOGGER_TONE: ${{ inputs.tone }}
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
           BLOGGER_MAX_SIMILARITY: "0.68"
+          BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
         run: python scripts/queue_blogger_rewrite.py
