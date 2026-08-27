@@ -32,6 +32,17 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         source = (ROOT / "scripts" / "process_platform_queue.py").read_text(encoding="utf-8")
         self.assertIn("if not result.ok:", source)
         self.assertIn("processed queue job(s) failed", source)
+
+    def test_blogger_generation_is_draft_only_and_logs_prequeue_failures(self):
+        source = (ROOT / "scripts" / "queue_blogger_rewrite.py").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github" / "workflows" / "blogger-rewrite.yml").read_text(encoding="utf-8")
+        self.assertIn("publish_now = False", source)
+        self.assertIn('error_code="NO_NEW_SOURCE"', source)
+        self.assertIn('error_code="SOURCE_FETCH"', source)
+        self.assertIn('error_code="IMAGE_GENERATION"', source)
+        self.assertNotIn("BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}", workflow)
+        self.assertIn('BLOGGER_PUBLISH_NOW: "false"', workflow)
+
     def test_newsroom_trim_cannot_cross_minimum(self):
         helpers = load_autopost_functions("newsroom_char_count", "trim_newsroom_html")
         body = "<p>" + ("검증된 사실 문장입니다. " * 180) + "</p>"

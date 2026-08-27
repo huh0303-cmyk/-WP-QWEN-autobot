@@ -48,6 +48,21 @@ def _records(values: list[list[str]]) -> list[dict[str, str]]:
     return [dict(zip(header, [*row, *([""] * (len(header) - len(row)))])) for row in values[1:] if row]
 
 
+def _append_failure(service, sheet_id: str, blogger_site_id: str, *,
+                    error_code: str, message: str, source_url: str = "") -> None:
+    """Record a blocked rewrite without inventing a draft or public URL."""
+    row = [
+        iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id,
+        "failed", "FALSE", "", "", "", canonical_source_id(source_url),
+        "", "", error_code, message[:1000], iso_kst(),
+    ]
+    service.spreadsheets().values().append(
+        spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1",
+        valueInputOption="RAW", insertDataOption="INSERT_ROWS",
+        body={"values": [row]},
+    ).execute()
+
+
 def force_ipv4_dns_if_requested():
     """Avoid an unroutable AAAA path without changing authoritative DNS."""
     if os.environ.get("FORCE_SOURCE_IPV4", "false").strip().lower() not in {"1", "true", "yes", "on"}:
@@ -70,9 +85,13 @@ def main():
     blogger_site_id = os.environ.get("BLOGGER_SITE_ID", "").strip()
     if not all((sheet_id, source_url, blogger_site_id)):
         raise SystemExit("SHEET_ID, SOURCE_WP_URL and BLOGGER_SITE_ID are required")
-    posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
-    posts.raise_for_status()
     service = get_sheets_service()
+    try:
+        posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
+        posts.raise_for_status()
+    except requests.RequestException as exc:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
+        raise
     existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
     queue_records = _records(existing)
     source = next(
@@ -83,6 +102,7 @@ def main():
         None,
     )
     if not source:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="NO_NEW_SOURCE", message="새로운 WordPress 원문이 없어 생성과 유료 API 호출을 시작하지 않았습니다.", source_url=source_url)
         raise RuntimeError(
             "새로운 WordPress 원문이 없어 Blogger 검토 대기 행을 만들지 못했습니다."
         )
@@ -90,6 +110,7 @@ def main():
     korean_source_hosts = {"koreanews365.com", "www.koreanews365.com", "k-health365.com", "www.k-health365.com"}
     source_host = requests.utils.urlparse(source_url).netloc.lower()
     if language == "ko" and source_host not in korean_source_hosts:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="LANGUAGE_POLICY", message="Korean Blogger output is allowed only for approved Korean source sites.", source_url=source["link"])
         raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
     target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
@@ -121,10 +142,17 @@ def main():
     content = rewritten["content_html"]
     image_model = "0"
     # One image maximum. No Pexels/Pixabay/OpenAI/Gemini-image fallback.
-    image_url = generate_image_url(rewritten["title"], theme="Blogger")
-    if image_url and image_url not in content:
+    try:
+        image_url = generate_image_url(rewritten["title"], theme="Blogger")
+    except Exception as exc:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="IMAGE_GENERATION", message=f"Approved Replicate image generation failed: {exc}", source_url=source["link"])
+        raise
+    if not image_url:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="IMAGE_GENERATION", message="Approved Replicate provider returned no image; draft queueing blocked.", source_url=source["link"])
+        raise RuntimeError("Approved Replicate provider returned no image")
+    if image_url not in content:
         content = _attach_replicate_image(content, image_url, rewritten["title"])
-        image_model = "replicate-approved"
+    image_model = "replicate-approved"
 
     content_id = stable_content_id(
         "blogger", blogger_site_id, source["link"],
@@ -134,7 +162,9 @@ def main():
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
-    publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "y", "on"}
+    # MASTER policy: generation only creates a review queue item. Publishing
+    # requires a separate, explicitly approved platform-publish action.
+    publish_now = False
     # Re-read immediately before append. Workflow concurrency serializes the
     # normal scheduler path; this second check also blocks a queue/operator race.
     latest = service.spreadsheets().values().get(

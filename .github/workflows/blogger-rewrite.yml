@@ -32,7 +32,7 @@ on:
         default: "1800"
         type: string
       publish_now:
-        description: "Publish after all rewrite checks pass"
+        description: "Compatibility input only; generation is always queued with publish_now=FALSE"
         required: true
         default: false
         type: boolean
@@ -73,6 +73,6 @@ jobs:
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
           BLOGGER_MAX_SIMILARITY: "0.68"
           BLOGGER_MIN_QUALITY_SCORE: "80"
-          BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
+          BLOGGER_PUBLISH_NOW: "false"
           FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py
