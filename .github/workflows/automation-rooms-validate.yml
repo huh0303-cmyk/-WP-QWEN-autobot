@@ -5,7 +5,9 @@ on:
   push:
     paths:
       - "config/automation_rooms.json"
+      - "config/automation_workflow_contracts.json"
       - "automation_hub/rooms.py"
+      - "automation_hub/workflow_contracts.py"
 
 permissions:
   contents: read
@@ -21,3 +23,5 @@ jobs:
           python-version: "3.11"
       - name: Validate room counts and safety policies
         run: python -m automation_hub.rooms
+      - name: Validate room to workflow contracts
+        run: python -m automation_hub.workflow_contracts
