@@ -43,6 +43,40 @@ def parse_rewrite_json(raw: str) -> dict[str, Any]:
     return data
 
 
+def _clip_words(value: str, maximum: int) -> str:
+    """Clip generated prose at a word boundary without adding new text."""
+    value = re.sub(r"\s+", " ", value).strip()
+    if len(value) <= maximum:
+        return value
+    clipped = value[: maximum + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return clipped or value[:maximum].rstrip()
+
+
+def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int) -> dict[str, Any]:
+    """Fit Gemini output to Blogger's hard format limits before scoring.
+
+    This only removes Gemini-generated words/HTML blocks. It never authors or
+    invents replacement copy, so Blogger prose remains Gemini-written.
+    """
+    normalized = dict(article)
+    normalized["title"] = _clip_words(str(article.get("title", "")), 70)
+    normalized["meta_description"] = _clip_words(str(article.get("meta_description", "")), 130)
+
+    content = str(article.get("content_html", ""))
+    maximum = int(target_chars * 1.35)
+    if len(re.sub(r"\s+", "", plain_text(content))) > maximum:
+        blocks = re.findall(r"(?is)<(?:h[23]|p|ul|ol|blockquote)(?:\s[^>]*)?>.*?</(?:h[23]|p|ul|ol|blockquote)>", content)
+        kept: list[str] = []
+        for block in blocks:
+            candidate = "".join(kept + [block])
+            if len(re.sub(r"\s+", "", plain_text(candidate))) > maximum:
+                break
+            kept.append(block)
+        if kept:
+            normalized["content_html"] = "".join(kept)
+    return normalized
+
+
 def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, language: str, persona: str, tone: str, target_chars: int, prior_feedback: str = "") -> str:
     verified_links = extract_http_links(source_html)
     verified_link_text = "\n".join(f"- {link}" for link in verified_links) or "- No additional verified links supplied"

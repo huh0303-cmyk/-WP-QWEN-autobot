@@ -1,10 +1,23 @@
+import re
 import unittest
 from unittest.mock import Mock
 
-from automation_hub.blogger_rewriter import FreeImage, attach_single_image, blogger_quality_score, extract_http_links, find_one_free_image, image_is_relevant, parse_rewrite_json, similarity
+from automation_hub.blogger_rewriter import FreeImage, attach_single_image, blogger_quality_score, extract_http_links, find_one_free_image, image_is_relevant, normalize_rewrite_format, parse_rewrite_json, plain_text, similarity
 
 
 class BloggerRewriterTests(unittest.TestCase):
+    def test_normalize_rewrite_format_clips_generated_fields(self):
+        paragraph = "<p>" + ("useful Korea planning detail " * 30) + "</p>"
+        article = {
+            "title": "A very long Korea planning title " * 4,
+            "meta_description": "A practical source-led description " * 8,
+            "content_html": "<h2>Plan</h2>" + paragraph * 8,
+        }
+        result = normalize_rewrite_format(article, target_chars=1200)
+        self.assertLessEqual(len(result["title"]), 70)
+        self.assertLessEqual(len(result["meta_description"]), 130)
+        self.assertLessEqual(len(re.sub(r"\s+", "", plain_text(result["content_html"]))), 1620)
+
     def test_parse_json_code_fence(self):
         value = parse_rewrite_json('```json\n{"title":"New","meta_description":"A practical Korea guide with current steps, source-led checks, and clear details for readers planning their next move.","content_html":"<p>Body</p>","image_queries":[],"labels":["Korea","Guide","Planning"]}\n```')
         self.assertEqual("New", value["title"])

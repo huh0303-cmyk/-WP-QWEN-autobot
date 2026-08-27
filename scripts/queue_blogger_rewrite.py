@@ -20,7 +20,7 @@ for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from automation_hub.blogger_rewriter import blogger_quality_score, parse_rewrite_json, rewrite_prompt
+from automation_hub.blogger_rewriter import blogger_quality_score, normalize_rewrite_format, parse_rewrite_json, rewrite_prompt
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
@@ -70,6 +70,7 @@ def main():
         prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
         try:
             candidate = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
+            candidate = normalize_rewrite_format(candidate, target_chars=target_chars)
             quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
             if quality_score >= minimum_quality:
