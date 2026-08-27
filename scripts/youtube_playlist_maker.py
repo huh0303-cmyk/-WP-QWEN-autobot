@@ -8,6 +8,7 @@ No SDXL, Gemini image, OpenAI image, Pexels, or Pixabay fallback is allowed.
 from __future__ import annotations
 
 import os
+import random
 import sys
 from pathlib import Path
 
@@ -29,6 +30,16 @@ from flux_thumbnail_provider import generate_flux_thumbnail_url
 base.GEMINI_IMAGE_MODELS = []
 base.PEXELS_API_KEY = ""
 base.PIXABAY_KEY = ""
+
+# Compatibility exports used by tests and utility callers. These are Drive/local helpers,
+# not external image providers.
+list_folder_files = base.list_folder_files
+download_drive_file = base.download_drive_file
+IMAGE_EXTS = base.IMAGE_EXTS
+THUMBNAIL_FOLDER_ID = base.THUMBNAIL_FOLDER_ID
+log = base.log
+PLAYLIST_CHANNELS = base.PLAYLIST_CHANNELS
+CHANNEL_KEY = base.CHANNEL_KEY
 
 
 def _download(url: str, out_path: str) -> None:
@@ -68,6 +79,18 @@ def _flux_healing_photo(theme: str, workdir: str):
     except Exception as exc:
         base.log(f"   ⚠️ FLUX healing image download failed: {exc}")
         return None
+
+
+def select_single_bank_image(workdir, service):
+    """Compatibility utility: select exactly one existing Drive image, no API generation."""
+    bank_images = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
+    if not bank_images:
+        raise RuntimeError("채널 썸네일창고에 사용할 기존 이미지가 없습니다")
+    picked = random.choice(bank_images)
+    extension = os.path.splitext(picked["name"])[1] or ".jpg"
+    path = os.path.join(workdir, f"playlist_background{extension}")
+    download_drive_file(service, picked["id"], path)
+    return path
 
 
 base.gemini_generate_image = _flux_image
