@@ -13,6 +13,7 @@ Default publishing language is English. Korean is allowed only for Blogger desti
 7. Visa, insurance, and medical-tourism posts require official sources, an as-of date, a change-warning, and an appropriate informational disclaimer.
 8. Change structure, examples, headings, and framing to prevent duplicate content.
 9. Do not upload the generated profile logo. The profile photo remains user-managed.
+10. Do not schedule creation or publishing at repetitive round-clock times. Distribute runs across different, non-round times within approved operating windows.
 
 ## Publishing order for the first six Blogger sites
 
