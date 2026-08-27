@@ -22,7 +22,7 @@
     {
       "priority": 3,
       "model": "SDXL Turbo",
-      "model_id": "bytonylee/sdxl-turbo",
+      "model_id": "jyoung105/sdxl-turbo",
       "role": "final generation fallback",
       "license_gate": "current Stability AI and provider commercial terms"
     }

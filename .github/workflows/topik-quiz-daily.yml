@@ -45,8 +45,7 @@ jobs:
           NUM_ITEMS: ${{ inputs.num_items || '5' }}
           TARGET_LANG: "ko"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "false"
-          OPENAI_IMAGE_ENABLED: "false"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}

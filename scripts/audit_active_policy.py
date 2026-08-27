@@ -78,13 +78,26 @@ def main() -> None:
         fail("Blogger workflow lost its Gemini text route")
 
     provider = (ROOT / "scripts" / "replicate_image_provider.py").read_text(encoding="utf-8")
-    for model in (
+    approved_models = (
         "black-forest-labs/flux-schnell",
         "bytedance/sdxl-lightning-4step",
         "jyoung105/sdxl-turbo",
-    ):
+    )
+    for model in approved_models:
         if model not in provider:
             fail(f"approved image model missing: {model}")
+
+    image_policy = json.loads((ROOT / "config" / "network_image_generation_policy.json").read_text(encoding="utf-8"))
+    configured_models = tuple(item["model_id"] for item in image_policy["model_priority"])
+    if configured_models != approved_models:
+        fail(f"Replicate model policy drift: {configured_models}")
+
+    topik = (ROOT / "scripts" / "topik_quiz_shorts.py").read_text(encoding="utf-8")
+    if "generate_approved_image" not in topik or "openai_generate_image" in topik or "GEMINI_IMAGE_MODELS" in topik:
+        fail("TOPIK review generator can escape the approved Replicate image gateway")
+    topik_workflow = workflow_text.get("topik-quiz-daily.yml", "")
+    if "REPLICATE_API_TOKEN" not in topik_workflow:
+        fail("TOPIK review workflow lacks the shared Replicate token")
 
     registry = json.loads((ROOT / "config" / "youtube_channels.json").read_text(encoding="utf-8"))
     keys = {c["channel_key"] for c in registry["channels"] if c.get("enabled", True)}
