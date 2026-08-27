@@ -56,6 +56,12 @@ def main() -> None:
     wp = workflow_text.get("daily-network-publish.yml", "")
     if 'AI_TEXT_PROVIDER: "openai"' not in wp:
         fail("WordPress publisher is not hard-routed to OpenAI text")
+    if 'WP_POST_STATUS: "draft"' not in wp or 'WP_PUBLICATION_APPROVED: "false"' not in wp:
+        fail("ordinary WordPress workflow is not fail-closed to draft")
+
+    newsroom = workflow_text.get("newsrooms-daily-publisher.yml", "")
+    if 'WP_POST_STATUS: "publish"' not in newsroom or 'WP_PUBLICATION_APPROVED: "true"' not in newsroom:
+        fail("newsroom workflow lacks explicit public-publication approval")
 
     blogger = workflow_text.get("blogger-rewrite.yml", "")
     if "REPLICATE_API_TOKEN" not in blogger:

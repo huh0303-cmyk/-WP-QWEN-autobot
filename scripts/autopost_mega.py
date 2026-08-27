@@ -3006,7 +3006,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     date_str     = target_kst.strftime("%Y-%m-%dT%H:%M:%S")
     date_gmt_str = target_gmt.strftime("%Y-%m-%dT%H:%M:%S")
 
-    data={"title":title,"content":final,"status":"publish",
+    from automation_hub.wordpress_policy import resolve_wordpress_post_status
+    requested_status = os.getenv("WP_POST_STATUS", "draft")
+    public_approved = os.getenv("WP_PUBLICATION_APPROVED", "false").strip().lower() == "true"
+    post_status = resolve_wordpress_post_status(
+        site, requested_status=requested_status, public_approved=public_approved
+    )
+    data={"title":title,"content":final,"status":post_status,
           "date":date_str,"date_gmt":date_gmt_str,
           "comment_status":"closed","ping_status":"closed",
           "categories":[cat_id] if cat_id and cat_id>0 else [],
@@ -3023,15 +3029,19 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
             response_data=r.json()
             pid=response_data.get("id"); purl=response_data.get("link","")
             wp_status=response_data.get("status","")
-            if wp_status != "publish":
+            if wp_status != post_status:
                 return {"ok":False,"post_id":pid,"status":wp_status,
-                        "error":f"WordPress returned non-public status: {wp_status or 'missing'}"}
+                        "error":f"WordPress returned unexpected status: {wp_status or 'missing'}; expected {post_status}"}
             # Rank Math 메타 확인
             time.sleep(2)
             vr=requests.get(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),timeout=10)
             if vr.status_code==200 and not vr.json().get("meta",{}).get("rank_math_focus_keyword"):
                 requests.patch(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),
                                json={"meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta}},timeout=15)
+            if post_status == "draft":
+                return {"ok":True,"post_id":pid,"url":purl,"status":"draft",
+                        "author":reporter["name"],"category":cat_name,
+                        "verification":{"ok":True,"mode":"draft_review"}}
             verification = verify_publication(purl, title, site_url=url)
             if not verification.ok:
                 return {"ok":False,"post_id":pid,"status":wp_status,"url":purl,
@@ -3039,7 +3049,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
                         "verification":verification.to_dict()}
             # IndexNow ping only after the public page is verified.
             ping_indexnow(purl, url)
-            return {"ok":True,"post_id":pid,"url":verification.final_url or purl,
+            return {"ok":True,"post_id":pid,"url":verification.final_url or purl,"status":"publish",
                     "author":reporter["name"],"category":cat_name,
                     "verification":verification.to_dict()}
         else:
@@ -3428,8 +3438,11 @@ def process_one(site, keyword):
 
     result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,category_hint=news_source or "")
     if result["ok"]:
-        print(f"  ✅ 발행: {result.get('url','')} | {result.get('author','')} | {result.get('category','')}")
-        log(url,theme,keyword,title,result.get("url",""),score,len(images),"✅ OK",author=result.get("author",""),category=result.get("category",""))
+        is_draft = result.get("status") == "draft"
+        outcome = "초안 생성" if is_draft else "공개 발행"
+        log_status = "✅ DRAFT" if is_draft else "✅ OK"
+        print(f"  ✅ {outcome}: {result.get('url','')} | {result.get('author','')} | {result.get('category','')}")
+        log(url,theme,keyword,title,result.get("url",""),score,len(images),log_status,author=result.get("author",""),category=result.get("category",""))
         return True
     else:
         err=result.get("error","")
@@ -3536,7 +3549,7 @@ def main():
                 fail+=1
             if i<n-1: time.sleep(random.uniform(10,18))
 
-    failed_records = [r for r in _log_buf if r.get("status") != "✅ OK"]
+    failed_records = [r for r in _log_buf if r.get("status") not in {"✅ OK", "✅ DRAFT"}]
     for record in failed_records:
         detail = (record.get("error") or record.get("status") or "unknown failure")
         detail = str(detail).replace("\n", " ").replace("\r", " ")[:500]

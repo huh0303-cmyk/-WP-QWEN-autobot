@@ -74,6 +74,8 @@ jobs:
       - name: Publish one source-checked edition
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          WP_POST_STATUS: "publish"
+          WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "openai"
           OPENAI_ENABLED: "true"

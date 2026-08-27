@@ -32,11 +32,13 @@ jobs:
           cache: pip
       - name: Install publisher dependencies
         run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
-      - name: Publish one quality-gated post
+      - name: Create one quality-gated review draft
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          WP_POST_STATUS: "draft"
+          WP_PUBLICATION_APPROVED: "false"
           AUTOMATION_HUB_SOURCE: "sheets"
-          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          NEWSROOM_REQUIRE_PUBLICATION: "false"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           FORCE_KEYWORD: ${{ inputs.force_keyword }}
           RUN_SLOT: "1"
