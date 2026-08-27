@@ -22,6 +22,11 @@ def load_autopost_functions(*names):
 
 
 class MasterPolicyRegressionTests(unittest.TestCase):
+    def test_wordpress_text_generator_has_no_gemini_fallback(self):
+        source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
+        block = source.split("def generate_content_gemini(prompt):", 1)[1].split("def strip_code_fences", 1)[0]
+        self.assertNotIn("gemini_client.models.generate_content", block)
+        self.assertIn("Gemini fallback is prohibited", block)
     def test_newsroom_trim_cannot_cross_minimum(self):
         helpers = load_autopost_functions("newsroom_char_count", "trim_newsroom_html")
         body = "<p>" + ("검증된 사실 문장입니다. " * 180) + "</p>"

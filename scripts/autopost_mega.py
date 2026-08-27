@@ -1945,42 +1945,15 @@ Do not write a TITLE line (a separate system generates the title). Do not restat
 # ★ 유틸리티
 # ============================================================
 def generate_content_gemini(prompt):
-    # 2026-08-17: OPENAI_API_KEY가 있으면 ChatGPT로 라우팅 — 27개 사이트 글쓰기
-    # 엔진 "대수술" 결정. 이미지(Pixabay/Pexels)는 그대로 유지, 텍스트만 교체.
-    provider = os.getenv("AI_TEXT_PROVIDER", "auto").strip().lower()
+    """Legacy call name retained; WordPress text is strictly GPT-only."""
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from openai_text import openai_available, openai_generate_text
         if openai_available():
             return openai_generate_text(prompt, temperature=0.85, max_retries=3)
-    except ImportError:
-        if provider == "openai":
-            raise
-
-    if provider == "openai":
-        raise RuntimeError("OpenAI-only mode is enabled, but OPENAI_API_KEY/OPENAI_ENABLED is unavailable")
-
-    global GEMINI_MODEL, _gemini_fallback_active
-    for attempt in range(3):
-        try:
-            resp = gemini_client.models.generate_content(
-                model=GEMINI_MODEL, contents=prompt,
-                config={"temperature":0.85,"max_output_tokens":8192}
-            )
-            return resp.text
-        except Exception as e:
-            err = str(e).lower()
-            if "429" in err or "quota" in err:
-                if not _gemini_fallback_active:
-                    print(f"  ⚠️ Quota → fallback")
-                    GEMINI_MODEL = GEMINI_MODEL_FALLBACK
-                    _gemini_fallback_active = True
-                    time.sleep(15); continue
-                else:
-                    time.sleep(60); raise
-            print(f"  ⚠️ Gemini 오류 ({attempt+1}): {e}")
-            if attempt < 2: time.sleep(10)
-    raise RuntimeError("Gemini 3회 실패")
+    except ImportError as exc:
+        raise RuntimeError("WordPress GPT provider module is unavailable; Gemini fallback is prohibited") from exc
+    raise RuntimeError("WordPress GPT credentials are unavailable; Gemini fallback is prohibited")
 
 def strip_code_fences(text):
     """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
