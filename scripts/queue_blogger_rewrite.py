@@ -49,7 +49,7 @@ def main():
     posts.raise_for_status()
     service = get_sheets_service()
     existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
-    used_sources = {row[8] for row in existing[1:] if len(row) > 8}
+    used_sources = {row[8] for row in existing[1:] if len(row) > 8 and len(row) > 3 and row[3] in {"ready", "drafted", "published"}}
     source = next((post for post in posts.json() if post.get("link") not in used_sources), None)
     if not source:
         print("새로운 WordPress 원문이 없습니다.")
@@ -62,6 +62,7 @@ def main():
     target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
     minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "80"))
+    ymyl = any(word in (source["title"]["rendered"] + " " + source_url).lower() for word in ("visa", "immigration", "insurance", "medical", "hospital", "treatment"))
     rewritten = None
     quality_score = 0
     failures = []
@@ -70,10 +71,11 @@ def main():
         prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
         try:
             candidate = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
-            candidate = normalize_rewrite_format(candidate, target_chars=target_chars)
+            candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
             quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
-            if quality_score >= minimum_quality:
+            critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL"))]
+            if quality_score >= minimum_quality and not critical_failures:
                 rewritten = candidate
                 break
         except Exception as exc:

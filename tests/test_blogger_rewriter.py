@@ -18,6 +18,19 @@ class BloggerRewriterTests(unittest.TestCase):
         self.assertLessEqual(len(result["meta_description"]), 130)
         self.assertLessEqual(len(re.sub(r"\s+", "", plain_text(result["content_html"]))), 1620)
 
+    def test_normalize_preserves_source_and_ymyl_tail(self):
+        source_url = "https://example.com/source"
+        filler = "<p>" + ("recovery planning detail " * 25) + "</p>"
+        article = {
+            "title": "Medical recovery planning in Korea",
+            "meta_description": "A practical medical recovery guide for international patients planning safe accommodation and follow-up care in Korea.",
+            "content_html": "<h2>Plan</h2>" + filler * 8 + f'<p>Read the <a href="{source_url}">original guide</a>.</p><p>As of 2026, rules can change. Consult your clinician. This is not medical advice.</p>',
+        }
+        result = normalize_rewrite_format(article, target_chars=1200, source_url=source_url, ymyl=True)
+        self.assertIn(source_url, result["content_html"])
+        self.assertIn("As of 2026", result["content_html"])
+        self.assertFalse(result["content_html"].rstrip().endswith("</h2>"))
+
     def test_parse_json_code_fence(self):
         value = parse_rewrite_json('```json\n{"title":"New","meta_description":"A practical Korea guide with current steps, source-led checks, and clear details for readers planning their next move.","content_html":"<p>Body</p>","image_queries":[],"labels":["Korea","Guide","Planning"]}\n```')
         self.assertEqual("New", value["title"])

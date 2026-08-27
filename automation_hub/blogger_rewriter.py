@@ -52,7 +52,7 @@ def _clip_words(value: str, maximum: int) -> str:
     return clipped or value[:maximum].rstrip()
 
 
-def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int) -> dict[str, Any]:
+def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, source_url: str = "", ymyl: bool = False) -> dict[str, Any]:
     """Fit Gemini output to Blogger's hard format limits before scoring.
 
     This only removes Gemini-generated words/HTML blocks. It never authors or
@@ -66,14 +66,26 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int) -> d
     maximum = int(target_chars * 1.35)
     if len(re.sub(r"\s+", "", plain_text(content))) > maximum:
         blocks = re.findall(r"(?is)<(?:h[23]|p|ul|ol|blockquote)(?:\s[^>]*)?>.*?</(?:h[23]|p|ul|ol|blockquote)>", content)
+        required: list[str] = []
+        for block in blocks:
+            lower = plain_text(block).lower()
+            if (source_url and source_url in block) or (ymyl and re.search(r"\b(as of|subject to change|can change|disclaimer|consult)\b", lower)):
+                required.append(block)
+        required = list(dict.fromkeys(required))
+        required_chars = len(re.sub(r"\s+", "", plain_text("".join(required))))
         kept: list[str] = []
         for block in blocks:
+            if block in required:
+                continue
             candidate = "".join(kept + [block])
-            if len(re.sub(r"\s+", "", plain_text(candidate))) > maximum:
+            if len(re.sub(r"\s+", "", plain_text(candidate))) + required_chars > maximum:
                 break
             kept.append(block)
-        if kept:
-            normalized["content_html"] = "".join(kept)
+        while kept and re.match(r"(?is)^<h[23]", kept[-1]):
+            kept.pop()
+        final_blocks = kept + [block for block in required if block not in kept]
+        if final_blocks:
+            normalized["content_html"] = "".join(final_blocks)
     return normalized
 
 
