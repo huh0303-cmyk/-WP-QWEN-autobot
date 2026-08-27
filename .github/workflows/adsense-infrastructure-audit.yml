@@ -1,0 +1,33 @@
+name: "AdSense ads.txt — 26-site read-only audit"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adsense-infrastructure-read-only-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install read-only audit dependencies
+        run: pip install requests dnspython -q
+      - name: Audit 26 sites without changing DNS, hosting, or WordPress
+        run: python scripts/audit_adsense_sites.py
+      - name: Upload JSON CSV and Markdown reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: adsense-infrastructure-audit-${{ github.run_id }}
+          path: artifacts/adsense-audit/*
+          retention-days: 30
+          if-no-files-found: error
