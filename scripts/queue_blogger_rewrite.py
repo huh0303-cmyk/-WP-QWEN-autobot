@@ -9,6 +9,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import socket
 import sys
 import uuid
 from pathlib import Path
@@ -47,7 +48,23 @@ def _records(values: list[list[str]]) -> list[dict[str, str]]:
     return [dict(zip(header, [*row, *([""] * (len(header) - len(row)))])) for row in values[1:] if row]
 
 
+def force_ipv4_dns_if_requested():
+    """Avoid an unroutable AAAA path without changing authoritative DNS."""
+    if os.environ.get("FORCE_SOURCE_IPV4", "false").strip().lower() not in {"1", "true", "yes", "on"}:
+        return
+    original = socket.getaddrinfo
+
+    def ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+        rows = original(host, port, socket.AF_INET, type, proto, flags)
+        if not rows:
+            raise OSError(f"no IPv4 address for {host}")
+        return rows
+
+    socket.getaddrinfo = ipv4_only
+
+
 def main():
+    force_ipv4_dns_if_requested()
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     source_url = os.environ.get("SOURCE_WP_URL", "").rstrip("/")
     blogger_site_id = os.environ.get("BLOGGER_SITE_ID", "").strip()

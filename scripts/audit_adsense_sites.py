@@ -135,6 +135,7 @@ def audit_domain(domain: str) -> dict:
     if robots_blocks(robots["body"]): issues.append("robots_blocks_google")
     if not root["status"] or not rest["status"]: issues.append("site_or_rest_unreachable")
     if ads["response_ms"] and ads["response_ms"] > 5000: issues.append("slow_ads_response")
+    if dns["AAAA"] and ipv6["status"] != 200: issues.append("ipv6_probe_failed_from_runner")
     severity = "FAIL" if any(x in issues for x in ("ads_status", "publisher_line_mismatch", "ads_format", "robots_blocks_google")) else ("WARN" if issues else "OK")
     return {
         "domain": domain, "reported_adsense_group": "approved" if domain in APPROVED_GROUP else "not_found",

@@ -74,4 +74,5 @@ jobs:
           BLOGGER_MAX_SIMILARITY: "0.68"
           BLOGGER_MIN_QUALITY_SCORE: "80"
           BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
+          FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py
