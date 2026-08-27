@@ -1,0 +1,75 @@
+name: Deploy 27-site Visitor API
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests -q
+
+      - name: Deploy footer visitor counter and REST API to 27 sites
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KHEALTH_PW: ${{ secrets.KHEALTH_PW }}
+          MEDICALTOUR_PW: ${{ secrets.MEDICALTOUR_PW }}
+          KINVEST_PW: ${{ secrets.KINVEST_PW }}
+          KIKOREA_PW: ${{ secrets.KIKOREA_PW }}
+          KINSURANCE_PW: ${{ secrets.KINSURANCE_PW }}
+          KFINANCE_PW: ${{ secrets.KFINANCE_PW }}
+          KTAX_PW: ${{ secrets.KTAX_PW }}
+          KCRYPTO_PW: ${{ secrets.KCRYPTO_PW }}
+          KREALESTATE_PW: ${{ secrets.KREALESTATE_PW }}
+          KTECH_PW: ${{ secrets.KTECH_PW }}
+          KSKIN_PW: ${{ secrets.KSKIN_PW }}
+          OLIVEYOUNG_PW: ${{ secrets.OLIVEYOUNG_PW }}
+          KWORLD_PW: ${{ secrets.KWORLD_PW }}
+          KTRIP_PW: ${{ secrets.KTRIP_PW }}
+          KVISA_PW: ${{ secrets.KVISA_PW }}
+          KWEDDING_PW: ${{ secrets.KWEDDING_PW }}
+          KSTUDY365_PW: ${{ secrets.KSTUDY365_PW }}
+          STUDYINKOREA365_PW: ${{ secrets.STUDYINKOREA365_PW }}
+          KIECA_PW: ${{ secrets.KIECA_PW }}
+          KSA_PW: ${{ secrets.KSA_PW }}
+          SIS_PW: ${{ secrets.SIS_PW }}
+          JOBKOREA365_PW: ${{ secrets.JOBKOREA365_PW }}
+          JOBINKOREA365_PW: ${{ secrets.JOBINKOREA365_PW }}
+          JOBKOREAGLOBAL_PW: ${{ secrets.JOBKOREAGLOBAL_PW }}
+          KOREA365_PW: ${{ secrets.KOREA365_PW }}
+          KOREANEWS_PW: ${{ secrets.KOREANEWS_PW }}
+          SEOULJOURNAL_PW: ${{ secrets.SEOULJOURNAL_PW }}
+        run: python scripts/deploy_daily_visitor_counter.py
+
+      - name: Verify all public visitor endpoints
+        run: |
+          python - <<'PY'
+          import sys, requests
+          sys.path.insert(0, 'scripts')
+          from site_registry import ACTIVE_SITES
+          failed=[]
+          for site, _, _ in ACTIVE_SITES:
+              url=site.rstrip('/')+'/wp-json/site-stats/v1/visitors'
+              try:
+                  r=requests.get(url, timeout=20, headers={'User-Agent':'Mozilla/5.0 visitor-api-verifier'})
+                  data=r.json() if r.ok else {}
+                  ok=r.status_code==200 and all(k in data for k in ('count','yesterday_count','day_before_yesterday_count','total'))
+                  print(site, r.status_code, 'OK' if ok else 'FAIL')
+                  if not ok: failed.append(f'{site}: HTTP {r.status_code}')
+              except Exception as e:
+                  print(site, 'FAIL', e)
+                  failed.append(f'{site}: {e}')
+          if failed:
+              raise SystemExit('Visitor API verification failed:\n'+'\n'.join(failed))
+          print(f'All {len(ACTIVE_SITES)} visitor APIs verified.')
+          PY
