@@ -141,7 +141,9 @@ def gsc_post(token, endpoint, body):
 
 def latest_daily_stats(token, site_url, window_days=10):
     """GSC는 2~3일 지연되므로 3일 전까지의 가장 최근 확정 검색 통계."""
-    end = date.today() - timedelta(days=3)
+    # GitHub runner는 UTC다. 05:20 KST 실행 시 date.today()를 쓰면 한국 날짜보다
+    # 하루 전을 기준으로 조회할 수 있으므로 반드시 KST 날짜를 사용한다.
+    end = datetime.now(KST).date() - timedelta(days=3)
     start = end - timedelta(days=window_days)
     body = {
         "startDate": start.isoformat(),
@@ -247,7 +249,12 @@ def send_to_sheets(records):
                 fmt_delta(r.get("visitor_delta")),
                 r.get("total_visitors"),
                 r.get("sitemap_indexed"),
+                r.get("sitemap_submitted"),
                 r.get("gsc_clicks"),
+                r.get("impressions"),
+                r.get("ctr"),
+                r.get("position"),
+                r.get("gsc_date"),
             ]
             for r in records
         }
@@ -256,7 +263,10 @@ def send_to_sheets(records):
             "27개사이트_트래픽",
             domains,
             date_label,
-            ["일일방문자수", "증감", "누적방문자", "사이트맵 보고 색인수", "Google검색클릭"],
+            [
+                "일일방문자수", "증감", "누적방문자", "사이트맵 보고 색인수", "사이트맵 제출URL수",
+                "GSC클릭", "GSC노출", "GSC CTR(%)", "GSC평균순위", "GSC기준일",
+            ],
             values_by_domain,
         )
         log(f"📊 시트 갱신 완료 — {date_label} / footer 방문자 기준")
@@ -296,9 +306,13 @@ def main():
             "gsc_clicks": None,
             "clicks": None,
             "impressions": None,
+            "ctr": None,
+            "position": None,
+            "gsc_date": "",
             "indexed": None,
             "sitemap_indexed": None,
             "sitemap_submitted": None,
+            "gsc_property": "",
             "status": "",
             "checked_at": checked_at,
         }
@@ -320,11 +334,15 @@ def main():
                 query_site = None
 
             if query_site:
+                row["gsc_property"] = query_site
                 stats, _ = latest_daily_stats(token, query_site)
                 if stats:
                     row["gsc_clicks"] = stats["clicks"]
                     row["clicks"] = stats["clicks"]  # 기존 코드 호환
                     row["impressions"] = stats["impressions"]
+                    row["ctr"] = stats["ctr"]
+                    row["position"] = stats["position"]
+                    row["gsc_date"] = stats["date"]
                 coverage, _ = get_index_coverage(token, query_site)
                 if coverage:
                     row["sitemap_indexed"] = coverage["sitemap_indexed"]
@@ -336,7 +354,8 @@ def main():
             log(
                 f"[{i:02d}/{len(SITES)}] {domain}: 전일 {row['daily_visitors']} "
                 f"({fmt_delta(row['visitor_delta']) or '비교없음'}) / 누적 {row['total_visitors']} "
-                f"/ GSC클릭 {row['gsc_clicks']}"
+                f"/ GSC 클릭 {row['gsc_clicks']} · 노출 {row['impressions']} "
+                f"· CTR {row['ctr']}% · 평균순위 {row['position']}"
             )
         else:
             log(f"[{i:02d}/{len(SITES)}] {domain}: {row['status']}")

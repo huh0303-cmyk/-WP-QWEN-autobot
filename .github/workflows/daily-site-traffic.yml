@@ -27,7 +27,7 @@ jobs:
 
       - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
 
-      - name: "Footer 방문자 확정치 + GSC 보조지표 조회 → 구글시트 전송"
+      - name: "27개 Footer 방문자 + GSC 클릭·노출·CTR·평균순위 → 종합상황실"
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
