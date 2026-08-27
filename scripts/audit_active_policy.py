@@ -63,6 +63,14 @@ def main() -> None:
     if 'WP_POST_STATUS: "publish"' not in newsroom or 'WP_PUBLICATION_APPROVED: "true"' not in newsroom:
         fail("newsroom workflow lacks explicit public-publication approval")
 
+    rankmath = workflow_text.get("daily-rankmath-check.yml", "")
+    if "continue-on-error: true" in rankmath:
+        fail("Rank Math health check can report workflow success after check failure")
+
+    approved_upload = (ROOT / "scripts" / "youtube_publish_approved.py").read_text(encoding="utf-8")
+    if "next_chunk(num_retries=0)" not in approved_upload or "max_retries = 3" not in approved_upload:
+        fail("approved YouTube uploader lost its bounded single-owner retry policy")
+
     blogger = workflow_text.get("blogger-rewrite.yml", "")
     if "REPLICATE_API_TOKEN" not in blogger:
         fail("Blogger workflow is not wired to Replicate images")

@@ -524,15 +524,16 @@ def upload_to_drive(service, file_path, folder_id, name, make_public=False):
     request = service.files().create(body=metadata, media_body=media, fields="id,webViewLink")
     response = None
     retries = 0
+    max_retries = 3
     while response is None:
         try:
-            _, response = request.next_chunk(num_retries=5)
+            _, response = request.next_chunk(num_retries=0)
         except Exception as e:
             retries += 1
-            if retries > 8:
+            if retries >= max_retries:
                 raise
-            wait = min(2 ** retries, 60)
-            log(f"   ⚠️ 업로드 재시도({retries}/8): {e}")
+            wait = min(2 ** retries, 8)
+            log(f"   ⚠️ 업로드 재시도({retries}/{max_retries}): {e}")
             _time.sleep(wait)
 
     file_id = response.get("id")

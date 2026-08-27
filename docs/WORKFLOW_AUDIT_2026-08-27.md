@@ -7,6 +7,8 @@
 3. Situation-room reporting hard-coded 21 historical YouTube channels, including retired families. It now combines the canonical 10-channel scheduler registry with a separate six-channel strategic reporting registry and rejects duplicate labels/IDs.
 4. Search Console sitemap aggregates were displayed as generic `색인수`. New writes identify them as `사이트맵 보고 색인수`; result records expose `sitemap_indexed` and `sitemap_submitted`. Compatibility alias remains temporarily for old readers.
 5. A dead schedule-only random-delay step was removed from the manual-only multilingual review workflow.
+6. The weekly Rank Math health check could fail while the workflow continued as successful. The core check now fails closed; report commit remains available through `if: always()`.
+7. The approved YouTube uploader and TOPIK review uploader nested five client retries inside an eight-attempt outer loop. Each now has one retry owner, a three-attempt ceiling, and an eight-second maximum backoff.
 
 ## Provider/model policy findings
 
@@ -24,6 +26,8 @@
 - Registry count is 25 ordinary WP + 2 newsrooms while owner planning language says 26 + 2. No site was invented or deleted.
 - AdSense, YouTube revenue/watch time, platform engagement, and provider billing credentials are not connected in the repository; control Sheet marks these `연결 필요`.
 - `continue-on-error` remains on non-core notification/Drive-review upload steps. Core publishers themselves must continue to fail closed; each remaining case needs path-specific review.
+- Retired/manual upload scripts still contain older retry implementations. They were not deleted or rewritten because they are outside the active scheduler graph and their business retention status is not established.
+- A thumbnail-set failure can occur after a YouTube video has already uploaded. The uploader records the error, but automatic rollback/re-upload was not added because that could create duplicate publications; this needs an explicit recovery policy.
 
 ## Workflow classification
 
@@ -34,6 +38,7 @@
 
 ## Validation performed
 
-- Full local unit suite: 36 tests.
-- Python compilation: `autopost_mega.py`, `situation_room_daily.py`, `daily_site_traffic.py`.
+- Full local unit suite: 46 tests.
+- Python compilation: active approved YouTube uploader, TOPIK review uploader, and active-policy auditor.
+- Active-policy audit: PASS. Automation Hub configuration validation: PASS.
 - No production content generation, image generation, public posting, or paid API call was made.

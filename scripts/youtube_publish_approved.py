@@ -158,17 +158,20 @@ def upload_to_youtube(service, video_path, thumb_path, title, description,
 
     response = None
     retries = 0
+    max_retries = 3
     while response is None:
         try:
-            status_obj, response = request.next_chunk(num_retries=5)
+            # Keep one retry owner. Nesting googleapiclient's five retries inside
+            # an eight-try outer loop could multiply a single chunk to 54 calls.
+            status_obj, response = request.next_chunk(num_retries=0)
             if status_obj:
                 log(f"   유튜브 업로드 진행률: {int(status_obj.progress() * 100)}%")
         except Exception as e:
             retries += 1
-            if retries > 8:
+            if retries >= max_retries:
                 raise
-            wait = min(2 ** retries, 60)
-            log(f"   ⚠️ 업로드 재시도({retries}/8): {e}")
+            wait = min(2 ** retries, 8)
+            log(f"   ⚠️ 업로드 재시도({retries}/{max_retries}): {e}")
             time.sleep(wait)
 
     video_id = response["id"]
