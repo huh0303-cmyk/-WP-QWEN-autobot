@@ -5,16 +5,17 @@ on:
     branches: [main]
     paths:
       - "automation_hub/**"
-      - "scripts/process_platform_queue.py"
-      - "scripts/sync_automation_hub_to_sheets.py"
+      - "config/**"
+      - "scripts/**"
       - "tests/**"
-      - ".github/workflows/automation-hub-tests.yml"
+      - ".github/workflows/**"
   pull_request:
     paths:
       - "automation_hub/**"
-      - "scripts/process_platform_queue.py"
-      - "scripts/sync_automation_hub_to_sheets.py"
+      - "config/**"
+      - "scripts/**"
       - "tests/**"
+      - ".github/workflows/**"
 
 permissions:
   contents: read
@@ -33,3 +34,4 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python -m automation_hub.cli validate
       - run: python -c "from automation_hub.youtube_registry import load_channels; assert len(load_channels()) == 10"
+      - run: python scripts/audit_active_policy.py
