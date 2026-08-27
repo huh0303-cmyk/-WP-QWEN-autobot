@@ -4,6 +4,8 @@ This policy applies to every current and future Blogger destination.
 
 Default publishing language is English. Korean is allowed only for Blogger destinations mapped to `koreanews365.com` or `K-health365.com`.
 
+Default address rule: use the WordPress domain stem as the Blogspot subdomain (`example.com` -> `example.blogspot.com`). The official Blogger host is `blogspot.com`, not `blogpost.com`. Preserve meaningful hyphens, remove only the top-level domain, and do not add `guide`, `blog`, numbers, or other suffixes unless the exact domain-stem address is unavailable and the user explicitly approves an alternative. Availability checks do not reserve an address; only successful blog creation does.
+
 1. Publish and verify the matching WordPress article first.
 2. Reuse the primary keyword, but rebuild the Blogger article instead of copying or sentence-level paraphrasing.
 3. WordPress text is generated with GPT. Blogger text is generated only with Gemini.
