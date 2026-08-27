@@ -1,26 +1,28 @@
 {
-  "version": 1,
-  "scope": ["wordpress", "youtube", "sns"],
+  "version": 2,
+  "scope": ["wordpress_27", "blogger_27", "youtube", "sns"],
+  "provider": "replicate",
+  "credential_secret": "REPLICATE_API_TOKEN",
   "enabled_when_provider_credentials_exist": true,
   "model_priority": [
     {
       "priority": 1,
       "model": "FLUX.1 Schnell",
-      "model_id": "black-forest-labs/FLUX.1-schnell",
+      "model_id": "black-forest-labs/flux-schnell",
       "role": "primary",
       "license_gate": "Apache-2.0 or provider terms"
     },
     {
       "priority": 2,
       "model": "SDXL-Lightning 4-step",
-      "model_id": "ByteDance/SDXL-Lightning-4step",
+      "model_id": "bytedance/sdxl-lightning-4step",
       "role": "low-cost fallback",
       "license_gate": "OpenRAIL++ and provider terms"
     },
     {
       "priority": 3,
       "model": "SDXL Turbo",
-      "model_id": "stabilityai/sdxl-turbo",
+      "model_id": "bytonylee/sdxl-turbo",
       "role": "final generation fallback",
       "license_gate": "current Stability AI and provider commercial terms"
     }
@@ -34,5 +36,5 @@
     "forbid_misleading_medical_legal_financial_evidence": true,
     "human_review_required_before_blogger_publication": true
   },
-  "notes": "This file defines network policy and routing order. A model is skipped when its approved provider or credential is unavailable. Pricing is provider- and resolution-dependent and must not be hard-coded as a universal per-image price."
+  "notes": "All generated images for the 27 WordPress sites, 27 Blogger sites, YouTube and SNS must route through Replicate in this order. A model is skipped when its credential or endpoint is unavailable. Pricing is provider- and resolution-dependent and must not be hard-coded as a universal per-image price."
 }

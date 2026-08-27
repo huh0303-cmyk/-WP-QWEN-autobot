@@ -13,12 +13,12 @@ This policy applies to Blogger, WordPress, and YouTube scripts, descriptions, ti
 
 ## Network image-generation order
 
-This order applies to all WordPress, YouTube, and SNS image-generation pipelines:
+This order applies to every generated image for all 27 WordPress sites, all 27 Blogger sites, YouTube, and every SNS channel. Replicate is the single approved image-generation provider and must be accessed through the GitHub Actions secret `REPLICATE_API_TOKEN`:
 
 1. `FLUX.1 Schnell` — primary and preferred model.
 2. `SDXL-Lightning 4-step` — low-cost fallback. Do not substitute the less stable 1-step checkpoint.
 3. `SDXL Turbo` — final generation fallback.
 
-The order is mandatory only when approved provider credentials are available. Skip an unavailable model instead of silently substituting Gemini, OpenAI, or another generator. Every output must pass topic-relevance and usage-rights checks. If all three models fail or produce misleading/weakly related output, use zero images for text content and stop the image job for visual-first content pending human review.
+The order is mandatory. Skip an unavailable model and move to the next approved Replicate model instead of silently substituting Gemini, OpenAI, stock imagery, or another generator. Every output must pass topic-relevance and usage-rights checks. If all three models fail or produce misleading/weakly related output, use zero images for text content and stop the image job for visual-first content pending human review.
 
 Do not hard-code a universal per-image price. Record the provider, endpoint, resolution, actual billed amount when available, model ID, prompt, license basis, and output receipt because hosting prices and commercial terms can change.

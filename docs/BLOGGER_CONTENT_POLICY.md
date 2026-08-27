@@ -11,7 +11,7 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 3. WordPress text is generated with GPT. Blogger text is generated only with Gemini.
 4. Each Blogger destination inherits the persona and tone of its matching WordPress site.
 5. Optimize the title, primary keyword, search description (about 120 characters), and 3-5 relevant Blogger labels.
-6. Use only relevant, license-checked free-stock images. Use 0-2 images; use zero when no relevant image is available. Never generate paid/AI images for Blogger.
+6. Use 0-2 genuinely relevant images generated through the approved Replicate routing policy. Use zero when no generated candidate is sufficiently relevant or safe. Never insert a generic filler image merely to occupy a slot.
 7. Visa, insurance, and medical-tourism posts require official sources, an as-of date, a change-warning, and an appropriate informational disclaimer.
 8. Change structure, examples, headings, and framing to prevent duplicate content.
 9. Do not upload the generated profile logo. The profile photo remains user-managed.
@@ -29,10 +29,10 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 21. The scheduler runs every 20 minutes, dispatches at most one site per run, and keeps at least 20 minutes between network dispatches. New Blogger sites enter the schedule only after their registry record is connected and explicitly set to review-mode daily drafting.
 22. Before publication, Blogger uses its own 100-point pre-publication quality/SEO rubric. This internal score is not a score issued by Google and does not guarantee AdSense approval. A post must score at least 80/100.
 23. Gemini receives at most two full writing attempts. The second attempt receives the first attempt's failed checks. If both attempts score below 80, the job fails closed and nothing is queued or published.
-24. Blogger quality scoring never awards or deducts points merely for having an image. A stock image is attached only when provider metadata has clear topic overlap; otherwise publish the article with zero images.
+24. Blogger quality scoring never awards or deducts points merely for having an image. A generated image is attached only when it has clear topic overlap and passes the rights and safety checks; otherwise keep the article at zero images.
 25. All Blogger articles are uploaded as private drafts. Automation must never press the final publish action. After draft creation, record the authenticated Blogger edit URL and email it to the owner for human reading, editing, and manual publication.
 26. The platform worker forcibly converts every Blogger queue item to draft mode, including an older row that accidentally contains a publish flag. Final Blogger publication is manual-only.
-27. When AI image generation is later enabled for any associated network channel, follow `config/network_image_generation_policy.json`: FLUX.1 Schnell first, SDXL-Lightning 4-step second, and SDXL Turbo third. Blogger still permits zero images and remains human-review-only.
+27. All 27 Blogger image pipelines follow `config/network_image_generation_policy.json` through Replicate: FLUX.1 Schnell first, SDXL-Lightning 4-step second, and SDXL Turbo third. Blogger still permits zero images and remains human-review-only.
 
 ## Publishing order for the first six Blogger sites
 
