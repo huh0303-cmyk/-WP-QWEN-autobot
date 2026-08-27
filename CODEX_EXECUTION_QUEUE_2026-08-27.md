@@ -4,6 +4,19 @@ Status: READY FOR WORK/CODEX
 Authority: MASTER_MONETIZATION_STRATEGY_2026.md + PM_CURRENT_STATUS.md
 Execution rule: complete and verify in order. Do not skip ahead because a later feature is more interesting.
 
+## PRE-FLIGHT — Read verified PM findings first
+Before Ticket 1, read:
+- `docs/PM_PREWORK_AUDIT_2026-08-27.md`
+
+Fix the verified blockers in this exact order before doing a broad refactor:
+1. newsroom length-normalization conflict causing scheduled Koreanews365 failure;
+2. stale hard-coded YouTube channel list in `situation_room_daily.py` vs canonical registry;
+3. Blogger duplicate-suspect ownership between daily scheduler and Sheet queue;
+4. verify ordinary WP direct-publish vs draft/private semantics;
+5. clean dead/manual workflow conditionals only after behavior is understood.
+
+Do not run the full production portfolio while fixing these.
+
 ## Ticket 1 — Repository normalization audit
 Goal: make active automation topology understandable and safe before adding features.
 
@@ -75,6 +88,8 @@ Required output:
 - Sheet tabs/ranges updated without destroying existing data
 - one-site / one-channel sample verification before scaling
 - commit SHA
+
+Important: reuse and normalize the existing `daily-site-traffic.yml`, `situation-room-daily.yml`, and GSC audit paths instead of creating a competing second measurement stack.
 
 ## Ticket 3 — Content routing conformance
 Goal: enforce frozen model/provider policy.
