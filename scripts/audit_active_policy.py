@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Fail CI when active automation paths drift from the 2026-08-27 operating policy."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+WF = ROOT / ".github" / "workflows"
+
+BANNED_IMAGE_SECRET_REFS = (
+    "secrets.PEXELS_API_KEY",
+    "secrets.PEXELS_KEY",
+    "secrets.PIXABAY_KEY",
+    "secrets.STABILITY_API_KEY",
+)
+BANNED_DEPRECATED_CHANNEL_REFS = (
+    "SCIENCE_FACTS_TIMES",
+    "MYTH_LEGEND_TIMES",
+    "CLASSIC_READS_TIMES",
+    "CLASSICAL_JOURNAL",
+    "AMERICAN_ARCHIVE_TIMES",
+)
+YOUTUBE_IMAGE_WORKFLOWS = (
+    "generate-youtube-playlist.yml",
+    "generate-youtube-video.yml",
+    "refresh-playlist-thumbnails.yml",
+    "health-clinic-daily.yml",
+    "curio-longform-daily.yml",
+)
+
+
+def fail(msg: str) -> None:
+    raise SystemExit(f"POLICY ERROR: {msg}")
+
+
+def main() -> None:
+    workflow_text = {}
+    for path in WF.glob("*.yml"):
+        text = path.read_text(encoding="utf-8")
+        workflow_text[path.name] = text
+        for token in BANNED_IMAGE_SECRET_REFS:
+            if token in text:
+                fail(f"{path.name} still references banned image secret {token}")
+        for token in BANNED_DEPRECATED_CHANNEL_REFS:
+            if token in text:
+                fail(f"{path.name} still references deprecated channel {token}")
+
+    for name in YOUTUBE_IMAGE_WORKFLOWS:
+        text = workflow_text.get(name, "")
+        if not text:
+            fail(f"missing expected workflow {name}")
+        if "REPLICATE_API_TOKEN" not in text:
+            fail(f"{name} does not receive REPLICATE_API_TOKEN")
+
+    wp = workflow_text.get("daily-network-publish.yml", "")
+    if 'AI_TEXT_PROVIDER: "openai"' not in wp:
+        fail("WordPress publisher is not hard-routed to OpenAI text")
+
+    blogger = workflow_text.get("blogger-rewrite.yml", "")
+    if "REPLICATE_API_TOKEN" not in blogger:
+        fail("Blogger workflow is not wired to Replicate images")
+    if "BLOGGER_GEMINI_MODEL" not in blogger:
+        fail("Blogger workflow lost its Gemini text route")
+
+    provider = (ROOT / "scripts" / "replicate_image_provider.py").read_text(encoding="utf-8")
+    for model in (
+        "black-forest-labs/flux-schnell",
+        "bytedance/sdxl-lightning-4step",
+        "jyoung105/sdxl-turbo",
+    ):
+        if model not in provider:
+            fail(f"approved image model missing: {model}")
+
+    registry = json.loads((ROOT / "config" / "youtube_channels.json").read_text(encoding="utf-8"))
+    keys = {c["channel_key"] for c in registry["channels"] if c.get("enabled", True)}
+    expected = {"globalmusic", "healing", "starbucks", "mbb", "kpop", "nasa", "history", "invention", "silent_era", "retro_reels"}
+    if keys != expected:
+        fail(f"enabled YouTube registry drift: {sorted(keys)}")
+
+    print("Active automation policy audit: PASS")
+
+
+if __name__ == "__main__":
+    main()
