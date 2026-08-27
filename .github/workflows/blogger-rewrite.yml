@@ -51,15 +51,14 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install requests google-api-python-client google-auth -q
-      - name: Rewrite and add one-image review job
+      - name: Rewrite with Gemini and add a 0-2 free-image review job
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: "true"
-          AI_TEXT_PROVIDER: "openai"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}

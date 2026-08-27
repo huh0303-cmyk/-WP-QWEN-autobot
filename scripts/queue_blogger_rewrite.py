@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rewrite one public WordPress post and queue it for Blogger with one free image."""
+"""Rewrite one verified WordPress post with Gemini and queue it for Blogger."""
 from __future__ import annotations
 
 import json
@@ -18,7 +18,7 @@ for candidate in (ROOT, ROOT / "scripts"):
 from automation_hub.blogger_rewriter import attach_single_image, find_one_free_image, parse_rewrite_json, rewrite_prompt, similarity
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
-from openai_text import openai_generate_text
+from gemini_text import gemini_generate_text
 from sync_automation_hub_to_sheets import QUEUE_TAB
 
 
@@ -38,22 +38,25 @@ def main():
         print("새로운 WordPress 원문이 없습니다.")
         return 0
     prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=os.environ.get("BLOGGER_LANGUAGE", "ko"), persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=int(os.environ.get("BLOGGER_TARGET_CHARS", "1800")))
-    rewritten = parse_rewrite_json(openai_generate_text(prompt, temperature=0.7))
+    rewritten = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
     score = similarity(source["content"]["rendered"], rewritten["content_html"])
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
     if score > maximum:
         raise RuntimeError(f"재작성 유사도 {score:.3f}가 제한 {maximum:.3f}보다 높아 발행을 차단했습니다.")
-    image = find_one_free_image(rewritten["image_query"], pexels_key=os.environ.get("PEXELS_API_KEY", ""), pixabay_key=os.environ.get("PIXABAY_API_KEY", ""))
-    if image is None:
-        raise RuntimeError("무료 이미지 1장을 찾지 못했습니다. AI 이미지 생성 없이 중단합니다.")
-    content = attach_single_image(rewritten["content_html"], image, rewritten["title"])
+    content = rewritten["content_html"]
+    image_providers = []
+    for query in rewritten["image_queries"]:
+        image = find_one_free_image(query, pexels_key=os.environ.get("PEXELS_API_KEY", ""), pixabay_key=os.environ.get("PIXABAY_API_KEY", ""))
+        if image is not None and image.url not in content:
+            content = attach_single_image(content, image, rewritten["title"])
+            image_providers.append(image.provider)
     job_id = f"blogger-rewrite-{uuid.uuid4().hex[:12]}"
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
-    row = [iso_kst(), job_id, blogger_site_id, "ready", "FALSE", rewritten["title"], content, ",".join(labels[:10]), source["link"], "", "", "", f"rewritten_similarity={score:.3f}; image={image.provider}", ""]
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"rewritten_similarity={score:.3f}; images={','.join(image_providers) or '0'}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "similarity": round(score, 3), "image_provider": image.provider, "publish_now": False}, ensure_ascii=False))
+    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "similarity": round(score, 3), "image_count": len(image_providers), "meta_description": rewritten["meta_description"], "publish_now": False, "text_provider": "gemini"}, ensure_ascii=False))
     return 0
 
 

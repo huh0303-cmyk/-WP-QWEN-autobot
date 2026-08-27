@@ -6,7 +6,7 @@ from automation_hub.blogger_rewriter import attach_single_image, find_one_free_i
 
 class BloggerRewriterTests(unittest.TestCase):
     def test_parse_json_code_fence(self):
-        value = parse_rewrite_json('```json\n{"title":"New","content_html":"<p>Body</p>","image_query":"market","labels":[]}\n```')
+        value = parse_rewrite_json('```json\n{"title":"New","meta_description":"A practical Korea guide with current steps, source-led checks, and clear details for readers planning their next move.","content_html":"<p>Body</p>","image_queries":[],"labels":["Korea","Guide","Planning"]}\n```')
         self.assertEqual("New", value["title"])
 
     def test_similarity_catches_near_copy(self):

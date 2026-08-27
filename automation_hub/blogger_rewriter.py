@@ -23,8 +23,18 @@ def parse_rewrite_json(raw: str) -> dict[str, Any]:
     cleaned = raw.strip()
     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", cleaned, flags=re.I)
     data = json.loads(cleaned)
-    if not all(str(data.get(key, "")).strip() for key in ("title", "content_html", "image_query")):
-        raise ValueError("rewrite output must include title, content_html and image_query")
+    if not all(str(data.get(key, "")).strip() for key in ("title", "content_html", "meta_description")):
+        raise ValueError("rewrite output must include title, content_html and meta_description")
+    labels = data.get("labels", [])
+    if isinstance(labels, str):
+        labels = [item.strip() for item in labels.split(",") if item.strip()]
+    data["labels"] = labels[:5]
+    if len(data["labels"]) < 3:
+        raise ValueError("rewrite output must include 3-5 relevant labels")
+    queries = data.get("image_queries", [])
+    if isinstance(queries, str):
+        queries = [queries] if queries.strip() else []
+    data["image_queries"] = [str(query).strip() for query in queries if str(query).strip()][:2]
     return data
 
 
@@ -33,8 +43,11 @@ def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, lang
 Do not paraphrase sentence by sentence. Choose a different search intent and rebuild the outline, examples, checklist and FAQ.
 Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
-Return JSON only with keys title, content_html, image_query, labels.
+Return JSON only with keys title, meta_description, content_html, image_queries, labels.
+meta_description must be a natural search description of about 120 characters (110-130 characters).
+labels must contain 3-5 specific, relevant labels. image_queries must contain 0-2 free-stock search queries; use an empty list when no image is genuinely relevant.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
+For visa, insurance or medical-tourism topics, cite official sources, state an as-of date, warn that rules can change, and add a non-advisory/non-diagnostic disclaimer.
 End with a short paragraph linking to the owned detailed source using this exact URL: {source_url}
 Source title: {source_title}
 Source article:
