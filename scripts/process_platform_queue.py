@@ -30,6 +30,13 @@ def _records(values: list[list[str]]) -> list[dict[str, str]]:
     return [dict(zip(header, [*row, *([""] * (len(header) - len(row)))])) for row in values[1:] if row]
 
 
+def _account_indexes(records: list[dict[str, str]]) -> tuple[dict[str, dict[str, str]], dict[str, dict[str, str]]]:
+    enabled = [r for r in records if r.get("enabled", "ON").upper() in {"ON", "TRUE", "1"}]
+    by_site = {r["site_id"]: r for r in enabled}
+    by_destination = {r.get("destination_id", ""): r for r in enabled if r.get("destination_id", "")}
+    return by_site, by_destination
+
+
 def _access_token(auth_profile: str) -> str:
     # Blogger writes must use the dedicated OAuth client/token. Falling back to
     # the general Sheets/Drive token can mint a valid access token without the
@@ -65,7 +72,10 @@ def main() -> int:
     service = get_sheets_service()
     account_values = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=f"'{ACCOUNTS_TAB}'!A1:I").execute().get("values", [])
     queue_values = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
-    accounts = {record["site_id"]: record for record in _records(account_values) if record.get("enabled", "ON").upper() in {"ON", "TRUE", "1"}}
+    # New queue rows use the canonical site_id, while legacy Blogger rows may
+    # contain the numeric Blogger blog ID. Resolve both to the same account so
+    # an already quality-approved row can be retried without regeneration.
+    accounts, accounts_by_destination = _account_indexes(_records(account_values))
     queue = _records(queue_values)
     processed = 0
     failed = 0
@@ -75,7 +85,7 @@ def main() -> int:
             continue
         if selected_job and row.get("job_id") != selected_job:
             continue
-        account = accounts.get(row.get("site_id", ""))
+        account = accounts.get(row.get("site_id", "")) or accounts_by_destination.get(row.get("site_id", ""))
         if not account:
             service.spreadsheets().values().update(
                 spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",

@@ -60,6 +60,12 @@ class PlatformPublisherTests(unittest.TestCase):
         platform_filter = "blogger"
         self.assertNotEqual(platform_filter, account["platform"])
 
+    def test_blogger_account_can_be_resolved_by_numeric_destination_id(self):
+        account = {"site_id": "blogger_medical", "destination_id": "270775542645307723", "enabled": "ON"}
+        by_site, by_destination = process_platform_queue._account_indexes([account])
+        self.assertIs(account, by_site["blogger_medical"])
+        self.assertIs(account, by_destination["270775542645307723"])
+
     @patch.dict(os.environ, {
         "BRAND2_GOOGLE_CLIENT_ID": "client", "BRAND2_GOOGLE_CLIENT_SECRET": "secret",
         "BRAND2_GOOGLE_REFRESH_TOKEN": "refresh",
