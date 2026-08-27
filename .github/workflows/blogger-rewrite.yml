@@ -75,5 +75,6 @@ jobs:
           BLOGGER_TONE: ${{ inputs.tone }}
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
           BLOGGER_MAX_SIMILARITY: "0.68"
+          BLOGGER_MIN_QUALITY_SCORE: "80"
           BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
         run: python scripts/queue_blogger_rewrite.py

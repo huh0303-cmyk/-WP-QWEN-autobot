@@ -27,6 +27,9 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 19. Each connected Blogger destination publishes at most one post per KST calendar day. Its daily target time is a site-specific baseline plus deterministic random jitter of up to four hours in either direction, with round-clock times avoided.
 20. A scheduled Blogger run is skipped when no new, publicly published WordPress source article is available. It must never fabricate a source or republish an already-used WordPress URL.
 21. The scheduler runs every 20 minutes, dispatches at most one site per run, and keeps at least 20 minutes between network dispatches. New Blogger sites enter the schedule only after their registry record is connected and explicitly set to automatic daily publishing.
+22. Before publication, Blogger uses its own 100-point pre-publication quality/SEO rubric. This internal score is not a score issued by Google and does not guarantee AdSense approval. A post must score at least 80/100.
+23. Gemini receives at most two full writing attempts. The second attempt receives the first attempt's failed checks. If both attempts score below 80, the job fails closed and nothing is queued or published.
+24. Blogger quality scoring never awards or deducts points merely for having an image. A stock image is attached only when provider metadata has clear topic overlap; otherwise publish the article with zero images.
 
 ## Publishing order for the first six Blogger sites
 

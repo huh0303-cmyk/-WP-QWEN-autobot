@@ -10,9 +10,12 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 class RegistryTests(unittest.TestCase):
     def test_initial_registry_has_correct_wordpress_topology(self):
         registry = SiteRegistry.load()
-        self.assertEqual(27, len(registry.sites))
-        self.assertEqual(25, len([s for s in registry.sites if s.content_type == "blog"]))
-        self.assertEqual(2, len([s for s in registry.sites if s.content_type.startswith("news")]))
+        wordpress = [s for s in registry.sites if s.platform == "wordpress"]
+        blogger = [s for s in registry.sites if s.platform == "blogger"]
+        self.assertEqual(27, len(wordpress))
+        self.assertEqual(6, len(blogger))
+        self.assertEqual(25, len([s for s in wordpress if s.content_type == "blog"]))
+        self.assertEqual(2, len([s for s in wordpress if s.content_type.startswith("news")]))
         self.assertEqual({}, registry.validate())
 
     def test_registry_has_no_fixed_site_limit(self):

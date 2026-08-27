@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from automation_hub.blogger_rewriter import attach_single_image, extract_http_links, find_one_free_image, parse_rewrite_json, similarity
+from automation_hub.blogger_rewriter import FreeImage, attach_single_image, blogger_quality_score, extract_http_links, find_one_free_image, image_is_relevant, parse_rewrite_json, similarity
 
 
 class BloggerRewriterTests(unittest.TestCase):
@@ -26,6 +26,23 @@ class BloggerRewriterTests(unittest.TestCase):
 
     def test_no_free_key_means_no_image_not_ai_fallback(self):
         self.assertIsNone(find_one_free_image("market"))
+
+    def test_irrelevant_stock_image_is_rejected(self):
+        image = FreeImage("https://img", "https://page", "credit", "Pexels", "snowy mountain landscape")
+        self.assertFalse(image_is_relevant(image, query="Korea visa application", title="Korea Visa Application Steps"))
+
+    def test_blogger_quality_gate_can_pass_without_images(self):
+        source_url = "https://example.com/korea-travel"
+        content = (
+            '<p>A direct answer for Korea travel planning.</p>'
+            '<h2>Before departure</h2><p>' + ('Check current official requirements carefully. ' * 20) + '</p>'
+            '<h2>Transport planning</h2><p>' + ('Compare routes, timing, and costs before booking. ' * 20) + '</p>'
+            '<h2>Final checklist</h2><p>' + ('Confirm reservations and keep the official details accessible. ' * 20) + '</p>'
+            f'<p><a href="{source_url}">Detailed Korea travel source</a></p>'
+        )
+        article = {"title": "Korea Travel Planning: Practical Steps", "meta_description": "Plan a Korea trip with practical transport, booking, timing, and official-information checks for a smoother journey today.", "content_html": content, "labels": ["Korea Travel", "Planning", "Transport"]}
+        score, failures, _ = blogger_quality_score(article, source_title="Korea Travel Planning", source_url=source_url, source_html="<p>Short original source.</p>", target_chars=2400)
+        self.assertGreaterEqual(score, 80, failures)
 
 
 if __name__ == "__main__":

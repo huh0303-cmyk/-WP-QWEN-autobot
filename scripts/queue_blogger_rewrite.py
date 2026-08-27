@@ -15,7 +15,7 @@ for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from automation_hub.blogger_rewriter import attach_single_image, find_one_free_image, parse_rewrite_json, rewrite_prompt, similarity
+from automation_hub.blogger_rewriter import attach_single_image, blogger_quality_score, find_one_free_image, image_is_relevant, parse_rewrite_json, rewrite_prompt
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
@@ -42,17 +42,32 @@ def main():
     source_host = requests.utils.urlparse(source_url).netloc.lower()
     if language == "ko" and source_host not in korean_source_hosts:
         raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
-    prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=int(os.environ.get("BLOGGER_TARGET_CHARS", "1800")))
-    rewritten = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
-    score = similarity(source["content"]["rendered"], rewritten["content_html"])
+    target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
-    if score > maximum:
-        raise RuntimeError(f"재작성 유사도 {score:.3f}가 제한 {maximum:.3f}보다 높아 발행을 차단했습니다.")
+    minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "80"))
+    rewritten = None
+    quality_score = 0
+    failures = []
+    similarity_score = 1.0
+    for attempt in range(1, 3):
+        prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
+        try:
+            candidate = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
+            quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
+            print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
+            if quality_score >= minimum_quality:
+                rewritten = candidate
+                break
+        except Exception as exc:
+            failures = [f"invalid output: {exc}"]
+            print(json.dumps({"attempt": attempt, "quality_score": 0, "failures": failures}, ensure_ascii=False))
+    if rewritten is None:
+        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: 2회 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
     content = rewritten["content_html"]
     image_providers = []
     for query in rewritten["image_queries"]:
         image = find_one_free_image(query, pexels_key=os.environ.get("PEXELS_API_KEY", ""), pixabay_key=os.environ.get("PIXABAY_API_KEY", ""))
-        if image is not None and image.url not in content:
+        if image is not None and image_is_relevant(image, query=query, title=rewritten["title"]) and image.url not in content:
             content = attach_single_image(content, image, rewritten["title"])
             image_providers.append(image.provider)
     job_id = f"blogger-rewrite-{uuid.uuid4().hex[:12]}"
@@ -60,9 +75,9 @@ def main():
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
     publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "y", "on"}
-    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"rewritten_similarity={score:.3f}; images={','.join(image_providers) or '0'}; meta_description={rewritten['meta_description']}", ""]
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), source["link"], "", "", "", f"quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={','.join(image_providers) or '0'}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "similarity": round(score, 3), "image_count": len(image_providers), "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini"}, ensure_ascii=False))
+    print(json.dumps({"queued": True, "job_id": job_id, "source": source["link"], "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": len(image_providers), "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini"}, ensure_ascii=False))
     return 0
 
 

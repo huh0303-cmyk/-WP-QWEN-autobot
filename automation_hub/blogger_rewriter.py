@@ -43,7 +43,7 @@ def parse_rewrite_json(raw: str) -> dict[str, Any]:
     return data
 
 
-def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, language: str, persona: str, tone: str, target_chars: int) -> str:
+def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, language: str, persona: str, tone: str, target_chars: int, prior_feedback: str = "") -> str:
     verified_links = extract_http_links(source_html)
     verified_link_text = "\n".join(f"- {link}" for link in verified_links) or "- No additional verified links supplied"
     return f"""You are adapting an owned WordPress article for a different Blogspot audience.
@@ -65,7 +65,80 @@ Verified link candidates from the source article:
 Source title: {source_title}
 Source article:
 {plain_text(source_html)[:18000]}
+{f"Previous attempt failed these checks; rebuild it and correct every item: {prior_feedback}" if prior_feedback else ""}
 """
+
+
+def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_url: str,
+                          source_html: str, target_chars: int, maximum_similarity: float = 0.68) -> tuple[int, list[str], float]:
+    """Pre-publication Blogger score. This is an internal gate, not a Google score."""
+    title = str(article.get("title", "")).strip()
+    meta = str(article.get("meta_description", "")).strip()
+    content = str(article.get("content_html", ""))
+    labels = article.get("labels", [])
+    text = plain_text(content)
+    score = 0
+    failures: list[str] = []
+
+    source_terms = {word.lower() for word in re.findall(r"[A-Za-z0-9가-힣]{3,}", plain_text(source_title))}
+    title_terms = {word.lower() for word in re.findall(r"[A-Za-z0-9가-힣]{3,}", title)}
+    if source_terms & title_terms:
+        score += 10
+    else:
+        failures.append("title does not preserve the source topic/primary keyword")
+    if 20 <= len(title) <= 70:
+        score += 10
+    else:
+        failures.append("title length must be 20-70 characters")
+
+    body_chars = len(re.sub(r"\s+", "", text))
+    minimum = max(1200, int(target_chars * 0.78))
+    maximum = int(target_chars * 1.35)
+    if minimum <= body_chars <= maximum:
+        score += 20
+    else:
+        failures.append(f"body length {body_chars} is outside {minimum}-{maximum} characters")
+    if 110 <= len(meta) <= 130:
+        score += 10
+    else:
+        failures.append("meta description must be 110-130 characters")
+    if 3 <= len(labels) <= 5:
+        score += 10
+    else:
+        failures.append("labels must contain 3-5 relevant items")
+
+    heading_count = len(re.findall(r"(?is)<h[23](?:\s[^>]*)?>", content))
+    if heading_count >= 3:
+        score += 10
+    else:
+        failures.append("at least three useful H2/H3 headings are required")
+    links = extract_http_links(content)
+    if source_url in links:
+        score += 5
+    else:
+        failures.append("verified WordPress source link is missing")
+    verified = set(extract_http_links(source_html))
+    if not verified or verified.intersection(links):
+        score += 5
+    else:
+        failures.append("available verified supporting link is not used")
+
+    copy_similarity = similarity(source_html, content)
+    if copy_similarity <= maximum_similarity:
+        score += 10
+    else:
+        failures.append(f"source similarity {copy_similarity:.3f} exceeds {maximum_similarity:.2f}")
+    banned = re.findall(r"(?i)\b(as an ai|language model|in conclusion|delve into|unlock the secrets)\b", text)
+    if not banned:
+        score += 5
+    else:
+        failures.append("AI/filler phrasing detected")
+    ymyl = bool(re.search(r"(?i)(visa|immigration|insurance|medical|hospital|treatment|비자|보험|의료)", source_title + " " + text))
+    if not ymyl or (re.search(r"(?i)(as of|기준일)", text) and re.search(r"(?i)(can change|subject to change|confirm|disclaimer|consult|변경|확인|면책|상담)", text)):
+        score += 5
+    else:
+        failures.append("YMYL as-of date/change warning/disclaimer is incomplete")
+    return min(score, 100), failures, copy_similarity
 
 
 @dataclass(slots=True)
@@ -74,6 +147,7 @@ class FreeImage:
     page_url: str
     credit: str
     provider: str
+    description: str = ""
 
 
 def find_one_free_image(query: str, *, pexels_key: str = "", pixabay_key: str = "", session=requests) -> FreeImage | None:
@@ -82,13 +156,20 @@ def find_one_free_image(query: str, *, pexels_key: str = "", pixabay_key: str = 
         response = session.get("https://api.pexels.com/v1/search", headers={"Authorization": pexels_key}, params={"query": query, "per_page": 1, "orientation": "landscape"}, timeout=25)
         if response.status_code == 200 and response.json().get("photos"):
             photo = response.json()["photos"][0]
-            return FreeImage(photo["src"].get("large2x") or photo["src"]["large"], photo["url"], f"Photo by {photo.get('photographer', 'Pexels contributor')} on Pexels", "Pexels")
+            return FreeImage(photo["src"].get("large2x") or photo["src"]["large"], photo["url"], f"Photo by {photo.get('photographer', 'Pexels contributor')} on Pexels", "Pexels", photo.get("alt", ""))
     if pixabay_key:
         response = session.get("https://pixabay.com/api/", params={"key": pixabay_key, "q": query, "image_type": "photo", "orientation": "horizontal", "per_page": 3, "safesearch": "true"}, timeout=25)
         if response.status_code == 200 and response.json().get("hits"):
             photo = response.json()["hits"][0]
-            return FreeImage(photo.get("largeImageURL") or photo["webformatURL"], photo["pageURL"], f"Image by {photo.get('user', 'Pixabay contributor')} on Pixabay", "Pixabay")
+            return FreeImage(photo.get("largeImageURL") or photo["webformatURL"], photo["pageURL"], f"Image by {photo.get('user', 'Pixabay contributor')} on Pixabay", "Pixabay", photo.get("tags", ""))
     return None
+
+
+def image_is_relevant(image: FreeImage, *, query: str, title: str) -> bool:
+    """Reject stock results whose provider description has no topic overlap."""
+    topic = {x.lower() for x in re.findall(r"[A-Za-z0-9가-힣]{3,}", f"{query} {title}")}
+    description = {x.lower() for x in re.findall(r"[A-Za-z0-9가-힣]{3,}", image.description)}
+    return bool(description and topic.intersection(description))
 
 
 def attach_single_image(content_html: str, image: FreeImage, alt: str) -> str:
