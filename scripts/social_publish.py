@@ -44,6 +44,7 @@ import sys
 import json
 import time
 import hashlib
+import re
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -74,6 +75,21 @@ GRAPH_VERSION = "v21.0"
 
 def log(msg):
     print(msg, flush=True)
+
+
+def sanitize_error(error):
+    """Keep credentials out of logs, emails, and uploaded result artifacts."""
+    message = str(error)
+    for secret in (
+        YOUTUBE_OAUTH_CLIENT_ID,
+        YOUTUBE_OAUTH_CLIENT_SECRET,
+        YOUTUBE_OAUTH_REFRESH_TOKEN,
+        TIKTOK_ACCESS_TOKEN,
+        FB_PAGE_ACCESS_TOKEN,
+    ):
+        if secret:
+            message = message.replace(secret, "[REDACTED]")
+    return re.sub(r"(?i)(access_token=)[^&\\s'\"]+", r"\1[REDACTED]", message)
 
 
 def send_email(subject, body):
@@ -342,7 +358,7 @@ def main():
         try:
             result = fn(video_path, meta)
         except Exception as e:
-            result = {"ok": False, "error": str(e)}
+            result = {"ok": False, "error": sanitize_error(e)}
         results[name] = result
         result["recommended_publish_at"] = publish_times[name]
         if result.get("ok"):
@@ -384,11 +400,9 @@ def main():
     )
 
     log(f"완료 — 성공 {ok_count} / 스킵 {skip_count} / 실패 {fail_count}")
-    # 플랫폼별 실패는 서로 독립적이라는 설계 원칙(파일 상단 docstring 참고)대로,
-    # 개별 플랫폼 실패(예: 페이스북 권한 문제)가 워크플로 전체를 매일 "실패"로
-    # 표시하게 만들지 않는다 — 결과는 이미 이메일/publish_result_*.json으로 보고됨.
-    # 유튜브(핵심 플랫폼)조차 아무것도 성공 못 했을 때만 CI를 실패로 표시한다.
-    if ok_count == 0:
+    # 플랫폼은 독립적으로 끝까지 시도하되, 실제 실패가 하나라도 있으면
+    # 워크플로도 실패시켜 실패를 성공으로 기록하지 않는다.
+    if fail_count:
         raise SystemExit(1)
 
 
