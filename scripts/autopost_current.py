@@ -7,7 +7,7 @@ must not regress to legacy labels retained in the large historical module.
 
 2026-08-27 hard policy:
 - WordPress text generation is OpenAI/GPT only. Never fall back to Gemini for WP text.
-- Image generation is Replicate only, through scripts/replicate_image_provider.py.
+- Paid image generation is disabled. Publishing must continue without an image.
 - Pixabay, Pexels, OpenAI image, Gemini image/Nano Banana, local infographic fallbacks,
   and OpenAI/Gemini image-relevance calls are blocked from the active WP entrypoint.
 """
@@ -27,7 +27,7 @@ os.environ["OPENAI_ENABLED"] = "true"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "false"
-os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "true"
+os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "false"
 
 # Hostinger sites can advertise IPv6 while GitHub-hosted runners have an
 # intermittently unusable IPv6 route.  Prefer IPv4 at the client only; this
@@ -43,7 +43,6 @@ if os.environ.get("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true",
 import autopost_mega as base
 
 from automation_hub.wordpress_adapter import apply_wordpress_registry
-from replicate_image_provider import generate_image_urls
 
 # ---------------------------------------------------------------------------
 # HARD ROUTING GUARDS
@@ -60,15 +59,15 @@ if hasattr(base, "gemini_client"):
 base.PIXABAY_KEY = None
 base.PEXELS_KEY = None
 base.GEMINI_IMAGE_MODELS = []
-base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
+base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
 
 
 def _blocked_stock(*args, **kwargs):
     return []
 
 
-def _replicate_images(keyword, count=1, theme=""):
-    return generate_image_urls(keyword, count=1, theme=theme)
+def _no_paid_images(keyword, count=1, theme=""):
+    return []
 
 
 def _pass_generated_images(urls, *args, **kwargs):
@@ -79,7 +78,7 @@ def _pass_generated_images(urls, *args, **kwargs):
 
 base.get_images_pixabay = _blocked_stock
 base.get_images_pexels = _blocked_stock
-base.get_multiple_images = _replicate_images
+base.get_multiple_images = _no_paid_images
 base.filter_relevant_images = _pass_generated_images
 base.gemini_generate_image = lambda *args, **kwargs: False
 base.get_fallback_nanobanana_image = _blocked_stock

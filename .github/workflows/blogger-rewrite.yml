@@ -32,9 +32,9 @@ on:
         default: "1800"
         type: string
       publish_now:
-        description: "Compatibility input only; generation is always queued with publish_now=FALSE"
+        description: "Publish automatically after quality checks"
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -56,7 +56,7 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install requests google-api-python-client google-auth -q
-      - name: Rewrite with Gemini and add one Replicate-approved image
+      - name: Rewrite with Gemini without paid image generation
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -64,7 +64,6 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"
-          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           SOURCE_WP_URL: ${{ inputs.source_wp_url }}
           BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
           BLOGGER_LANGUAGE: ${{ inputs.language }}
@@ -73,6 +72,6 @@ jobs:
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
           BLOGGER_MAX_SIMILARITY: "0.68"
           BLOGGER_MIN_QUALITY_SCORE: "75"
-          BLOGGER_PUBLISH_NOW: "false"
+          BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now && 'true' || 'false' }}
           FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py

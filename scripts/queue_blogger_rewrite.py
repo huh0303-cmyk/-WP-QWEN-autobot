@@ -2,11 +2,10 @@
 """Rewrite one verified WordPress post with Gemini and queue it for Blogger.
 
 Text policy: Blogger = Gemini only.
-Image policy: Replicate approved 3-model gateway only; one image maximum.
+Image policy: paid image generation is disabled; image absence never blocks publishing.
 """
 from __future__ import annotations
 
-import html
 import json
 import os
 import socket
@@ -26,19 +25,7 @@ from automation_hub.content_identity import active_duplicate, canonical_source_i
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
-from replicate_image_provider import generate_image_url
 from sync_automation_hub_to_sheets import QUEUE_TAB
-
-
-def _attach_replicate_image(content: str, image_url: str, title: str) -> str:
-    safe_url = html.escape(image_url, quote=True)
-    safe_alt = html.escape(title, quote=True)
-    figure = (
-        f'<figure class="blogger-replicate-image">'
-        f'<img src="{safe_url}" alt="{safe_alt}" loading="lazy" />'
-        f'</figure>'
-    )
-    return figure + content
 
 
 def _records(values: list[list[str]]) -> list[dict[str, str]]:
@@ -140,19 +127,9 @@ def main():
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: 2회 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
 
     content = rewritten["content_html"]
+    # Stability/cost rule: article publication must never depend on a paid image API.
+    # Images can be attached later from existing owned media without blocking the post.
     image_model = "0"
-    # One image maximum. No Pexels/Pixabay/OpenAI/Gemini-image fallback.
-    try:
-        image_url = generate_image_url(rewritten["title"], theme="Blogger")
-    except Exception as exc:
-        _append_failure(service, sheet_id, blogger_site_id, error_code="IMAGE_GENERATION", message=f"Approved Replicate image generation failed: {exc}", source_url=source["link"])
-        raise
-    if not image_url:
-        _append_failure(service, sheet_id, blogger_site_id, error_code="IMAGE_GENERATION", message="Approved Replicate provider returned no image; draft queueing blocked.", source_url=source["link"])
-        raise RuntimeError("Approved Replicate provider returned no image")
-    if image_url not in content:
-        content = _attach_replicate_image(content, image_url, rewritten["title"])
-    image_model = "replicate-approved"
 
     content_id = stable_content_id(
         "blogger", blogger_site_id, source["link"],
@@ -162,9 +139,7 @@ def main():
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
-    # MASTER policy: generation only creates a review queue item. Publishing
-    # requires a separate, explicitly approved platform-publish action.
-    publish_now = False
+    publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "on"}
     # Re-read immediately before append. Workflow concurrency serializes the
     # normal scheduler path; this second check also blocks a queue/operator race.
     latest = service.spreadsheets().values().get(
