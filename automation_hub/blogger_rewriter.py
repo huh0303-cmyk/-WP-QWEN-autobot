@@ -33,9 +33,9 @@ def parse_rewrite_json(raw: str) -> dict[str, Any]:
     labels = data.get("labels", [])
     if isinstance(labels, str):
         labels = [item.strip() for item in labels.split(",") if item.strip()]
-    data["labels"] = labels[:5]
-    if len(data["labels"]) < 3:
-        raise ValueError("rewrite output must include 3-5 relevant labels")
+    data["labels"] = labels[:14]
+    if len(data["labels"]) < 10:
+        raise ValueError("rewrite output must include 10-14 relevant labels")
     queries = data.get("image_queries", [])
     if isinstance(queries, str):
         queries = [queries] if queries.strip() else []
@@ -107,7 +107,7 @@ Write for the reader's real task: open with a concise direct answer, then use de
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
 Return JSON only with keys title, meta_description, content_html, image_queries, labels.
 meta_description must be a natural search description of about 120 characters (110-130 characters).
-labels must contain 3-5 specific, relevant labels. image_queries must contain 0-2 free-stock search queries; use an empty list when no image is genuinely relevant.
+labels must contain 10-14 specific, relevant, single-topic labels (not full phrases). image_queries must contain 0-2 free-stock search queries; use an empty list when no image is genuinely relevant.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
 For visa, insurance, or medical/health topics (YMYL), within the first three paragraphs include: (1) a reference-date sentence using the literal words "as of" (English) or "기준" (Korean) followed by a real month/year, e.g. "2026년 8월 기준" or "as of August 2026"; (2) a change-warning sentence using words like "can change"/"subject to change" or "변경될 수 있으니"/"확인하세요"; (3) a short non-advisory disclaimer ("consult a professional"/"전문가와 상담" or "not medical/legal advice"/"의료/법률 자문이 아닙니다"). These three must appear as real sentences, not a heading label alone, or the article fails the quality gate.
 Link naturally to the owned detailed source using this exact URL in one of the first two paragraphs so it survives length editing: {source_url}
@@ -154,10 +154,10 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
         score += 10
     else:
         failures.append("meta description must be 110-130 characters")
-    if 3 <= len(labels) <= 5:
+    if 10 <= len(labels) <= 14:
         score += 10
     else:
-        failures.append("labels must contain 3-5 relevant items")
+        failures.append("labels must contain 10-14 relevant items")
 
     heading_count = len(re.findall(r"(?is)<h[23](?:\s[^>]*)?>", content))
     if heading_count >= 3:

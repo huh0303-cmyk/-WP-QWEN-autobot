@@ -10,7 +10,7 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 2. Reuse the primary keyword, but rebuild the Blogger article instead of copying or sentence-level paraphrasing.
 3. WordPress text is generated with GPT. Blogger text is generated only with Gemini.
 4. Each Blogger destination inherits the persona and tone of its matching WordPress site.
-5. Optimize the title, primary keyword, per-post search description (about 120 characters), a short descriptive English permalink, and 8-10 relevant noun-form Blogger labels.
+5. Optimize the title, primary keyword, per-post search description (about 120 characters, 110-130 range), a short descriptive English permalink, and 10-14 relevant single-topic Blogger labels.
 6. Use 0-2 genuinely relevant images generated through the approved Replicate routing policy. Use zero when no generated candidate is sufficiently relevant or safe. Never insert a generic filler image merely to occupy a slot.
 7. Visa, insurance, and medical-tourism posts require official sources, an as-of date, a change-warning, and an appropriate informational disclaimer.
 8. Change structure, examples, headings, and framing to prevent duplicate content.
