@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
-"""Rewrite one verified WordPress post with Gemini and queue it for Blogger.
-
-Text policy: Blogger = Gemini only.
-Image policy: paid (Replicate/AI) image generation is disabled for Blogger.
-At most one free-stock image (Pexels, then Pixabay) is attached when the
-rewrite names a relevant image query and a topic-matching photo is found;
-image absence never blocks publishing.
-"""
+"""Create one original Blogger review draft under the locked common policy."""
 from __future__ import annotations
 
 import json
+import html
 import os
 import socket
 import sys
@@ -24,10 +18,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.blogger_rewriter import (
-    attach_single_image,
     blogger_quality_score,
-    find_one_free_image,
-    image_is_relevant,
     normalize_rewrite_format,
     parse_rewrite_json,
     rewrite_prompt,
@@ -36,6 +27,9 @@ from automation_hub.content_identity import active_duplicate, canonical_source_i
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
+from openai_text import openai_available, openai_generate_text
+from claude_text import claude_available, claude_generate_text
+from replicate_image_provider import generate_image_url
 from sync_automation_hub_to_sheets import QUEUE_TAB
 
 
@@ -92,13 +86,13 @@ def main():
         raise
     existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
     queue_records = _records(existing)
-    source = next(
-        (
-            post for post in posts.json()
-            if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))
-        ),
-        None,
-    )
+    def golden_source_score(post):
+        title = post.get("title", {}).get("rendered", "").lower()
+        intent = os.environ.get("BLOGGER_SEARCH_INTENT", "").lower().split(",")
+        persona = os.environ.get("BLOGGER_PERSONA", "").lower().split()
+        return 40 + min(30, 10 * sum(x.strip() in title for x in intent if x.strip())) + min(20, 4 * sum(x in title for x in persona if len(x) > 3)) + min(10, len(title) // 12)
+    eligible = [post for post in posts.json() if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))]
+    source = max(eligible, key=golden_source_score, default=None)
     if not source:
         _append_failure(service, sheet_id, blogger_site_id, error_code="NO_NEW_SOURCE", message="새로운 WordPress 원문이 없어 생성과 유료 API 호출을 시작하지 않았습니다.", source_url=source_url)
         raise RuntimeError(
@@ -112,22 +106,30 @@ def main():
         raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
     target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
-    minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "75"))
+    minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "70"))
     ymyl = any(word in (source["title"]["rendered"] + " " + source_url).lower() for word in ("visa", "immigration", "insurance", "medical", "hospital", "treatment"))
     rewritten = None
     quality_score = 0
     failures = []
     similarity_score = 1.0
-    for attempt in range(1, 3):
+    text_provider = ""
+    for attempt, provider in enumerate(("gemini", "gpt"), start=1):
         prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
         try:
-            candidate = parse_rewrite_json(gemini_generate_text(prompt, temperature=0.7))
+            if provider == "gemini":
+                raw = gemini_generate_text(prompt, temperature=0.7)
+            else:
+                if not openai_available():
+                    raise RuntimeError("GPT fallback unavailable")
+                raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
+            candidate = parse_rewrite_json(raw)
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
             quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
             critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL"))]
             if quality_score >= minimum_quality and not critical_failures:
                 rewritten = candidate
+                text_provider = provider
                 break
         except Exception as exc:
             failures = [f"invalid output: {exc}"]
@@ -135,27 +137,29 @@ def main():
     if rewritten is None:
         failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source["link"], "", "", "QUALITY_GATE", f"quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
-        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: 2회 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
+        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: Gemini와 GPT 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
+
+    if not claude_available():
+        _append_failure(service, sheet_id, blogger_site_id, error_code="AUDIT_UNAVAILABLE", message="Claude final audit is mandatory.", source_url=source["link"])
+        raise RuntimeError("Claude final audit is mandatory")
+    audit_prompt = json.dumps({"rules": "Check factual support, grammar, natural human tone, search intent, AI-like phrasing, repeated/similar title and cross-platform copying. Return strict JSON with ok and issues.", "source_title": source["title"]["rendered"], "draft": rewritten}, ensure_ascii=False)
+    try:
+        audit_raw = claude_generate_text(audit_prompt, system="You are a blocking editorial auditor. Return only JSON: {\"ok\": bool, \"issues\": [str]}", temperature=0.0)
+        audit_text = audit_raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        audit_result = json.loads(audit_text)
+    except Exception as exc:
+        audit_result = {"ok": False, "issues": [str(exc)]}
+    if audit_result.get("ok") is not True:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="AUDIT_FAILED", message=json.dumps(audit_result, ensure_ascii=False), source_url=source["link"])
+        raise RuntimeError("Claude final audit failed")
 
     content = rewritten["content_html"]
-    # Stability/cost rule: article publication must never depend on a paid (AI)
-    # image API. A free-stock photo is attached best-effort when the rewrite
-    # named a relevant query and a topic-matching result is found; the image
-    # never blocks publishing either way.
     image_model = "0"
-    pexels_key = os.environ.get("PEXELS_KEY", "").strip()
-    pixabay_key = os.environ.get("PIXABAY_KEY", "").strip()
-    for query in rewritten.get("image_queries", []):
-        if not (pexels_key or pixabay_key):
-            break
-        try:
-            candidate_image = find_one_free_image(query, pexels_key=pexels_key, pixabay_key=pixabay_key)
-        except requests.RequestException:
-            candidate_image = None
-        if candidate_image and image_is_relevant(candidate_image, query=query, title=rewritten["title"]):
-            content = attach_single_image(content, candidate_image, alt=query)
-            image_model = candidate_image.provider
-            break
+    image_subject = (rewritten.get("image_queries") or [rewritten["title"]])[0]
+    image_url = generate_image_url(image_subject, theme=rewritten["title"])
+    if image_url:
+        content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(rewritten["title"], quote=True)}" /></p>' + content
+        image_model = "approved_image_chain"
 
     content_id = stable_content_id(
         "blogger", blogger_site_id, source["link"],
@@ -177,7 +181,7 @@ def main():
         return 0
     row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:5]), canonical_source_id(source["link"]), "", "", "", f"content_id={content_id}; quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={image_model}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "content_id": content_id, "source": canonical_source_id(source["link"]), "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": "gemini", "image_provider": image_model}, ensure_ascii=False))
+    print(json.dumps({"queued": True, "job_id": job_id, "content_id": content_id, "source": canonical_source_id(source["link"]), "golden_keyword_score": golden_source_score(source), "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": text_provider, "image_provider": image_model}, ensure_ascii=False))
     return 0
 
 
