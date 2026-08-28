@@ -114,7 +114,7 @@ jobs:
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
           REPORT_EMAIL_TO: "huh0303@gmail.com"
           REPORT_EMAIL_FROM: "huh0303@gmail.com"
-          REPORT_TITLE: "[뉴스룸 비공개 초안] 모바일 검수 요청"
+          REPORT_TITLE: "[뉴스룸 작성 완료] 글 확인 후 승인 또는 비승인"
           REPORT_BODY: "뉴스룸 비공개 초안 작업이 끝났습니다. 아래 링크에서 결과와 초안 주소를 확인한 뒤 직접 최종 공개해 주세요."
           REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}

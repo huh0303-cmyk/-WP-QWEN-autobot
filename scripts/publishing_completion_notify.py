@@ -14,6 +14,7 @@ import os
 import re
 import smtplib
 import sys
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 from urllib.parse import urlparse
@@ -62,7 +63,7 @@ def _resolve_post_id(site_url: str, post_url: str, wp_pass: str) -> int:
         return 0
 
 
-def build_draft_review_lines() -> list:
+def build_draft_reviews() -> list[dict]:
     if not Path(RESULT_FILE).exists():
         return []
     try:
@@ -84,18 +85,60 @@ def build_draft_review_lines() -> list:
             continue
         edit_url = _admin_edit_url(site_url, post_id)
         title = rec.get("title", "(제목 없음)")
-        lines.append(f"- {title}\n  {edit_url}\n  (열어서 '발행' 누르면 즉시 공개, '즉시'를 누르면 예약 시간 지정 가능)")
+        lines.append({"title": title, "edit_url": edit_url, "post_url": rec["url"]})
     return lines
 
 
-def send_email(subject: str, body: str) -> bool:
+def _plain_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
+    if not reviews:
+        return base_body + f"\n\n작업 기록: {fallback_link}"
+    blocks = []
+    for review in reviews:
+        blocks.append(
+            f"{review['title']}\n"
+            f"글 확인·승인·비승인: {review['edit_url']}"
+        )
+    return base_body + "\n\n" + "\n\n".join(blocks) + f"\n\n작업 기록: {fallback_link}"
+
+
+def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
+    import html
+
+    cards = []
+    for review in reviews:
+        title = html.escape(str(review["title"]))
+        edit_url = html.escape(str(review["edit_url"]), quote=True)
+        cards.append(f"""
+        <section style="margin:18px 0;padding:20px;border:1px solid #dfe5ec;border-radius:14px;background:#fff">
+          <h2 style="margin:0 0 16px;font-size:20px;line-height:1.45;color:#172033">{title}</h2>
+          <a href="{edit_url}" style="display:block;margin:8px 0;padding:14px;border-radius:9px;background:#eef3f8;color:#172033;text-align:center;text-decoration:none;font-weight:700">글 먼저 보기</a>
+          <table role="presentation" width="100%"><tr>
+            <td width="50%" style="padding:4px 4px 0 0"><a href="{edit_url}#submitdiv" style="display:block;padding:14px;border-radius:9px;background:#16794b;color:#fff;text-align:center;text-decoration:none;font-weight:800">승인(공개)</a></td>
+            <td width="50%" style="padding:4px 0 0 4px"><a href="{edit_url}#delete-action" style="display:block;padding:14px;border-radius:9px;background:#a93333;color:#fff;text-align:center;text-decoration:none;font-weight:800">비승인(보류·삭제)</a></td>
+          </tr></table>
+        </section>""")
+    escaped_base = html.escape(base_body)
+    escaped_log = html.escape(fallback_link, quote=True)
+    return f"""<html><body style="margin:0;background:#f3f5f7;font-family:Arial,'Noto Sans KR',sans-serif;color:#172033">
+    <main style="max-width:640px;margin:auto;padding:24px 14px">
+      <h1 style="font-size:24px;margin:0 0 8px">오늘 작성된 글</h1>
+      <p style="line-height:1.6;margin:0 0 14px">{escaped_base}<br>글을 읽은 뒤 초록색 승인 또는 빨간색 비승인을 선택하세요.</p>
+      {''.join(cards) if cards else '<p>확인할 글이 없습니다.</p>'}
+      <p style="font-size:12px;color:#697386"><a href="{escaped_log}">작업 기록</a></p>
+    </main></body></html>"""
+
+
+def send_email(subject: str, body: str, html_body: str = "") -> bool:
     password = os.getenv("GMAIL_APP_PASSWORD", "").strip()
     recipient = os.getenv("REPORT_EMAIL_TO", "huh0303@gmail.com").strip()
     sender = os.getenv("REPORT_EMAIL_FROM", "huh0303@gmail.com").strip()
     if not password:
         print("email skipped: GMAIL_APP_PASSWORD missing")
         return False
-    message = MIMEText(body, "plain", "utf-8")
+    message = MIMEMultipart("alternative")
+    message.attach(MIMEText(body, "plain", "utf-8"))
+    if html_body:
+        message.attach(MIMEText(html_body, "html", "utf-8"))
     message["Subject"], message["From"], message["To"] = subject, sender, recipient
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
         smtp.login(sender, password)
@@ -103,7 +146,7 @@ def send_email(subject: str, body: str) -> bool:
     return True
 
 
-def send_kakao(text: str, link: str) -> bool:
+def send_kakao_review(review: dict) -> bool:
     key = os.getenv("KAKAO_REST_API_KEY", "").strip()
     refresh = os.getenv("KAKAO_REFRESH_TOKEN", "").strip()
     if not key or not refresh:
@@ -112,26 +155,29 @@ def send_kakao(text: str, link: str) -> bool:
     token = requests.post("https://kauth.kakao.com/oauth/token", data={"grant_type": "refresh_token", "client_id": key, "refresh_token": refresh}, timeout=20)
     token.raise_for_status()
     access = token.json()["access_token"]
-    template = {"object_type": "text", "text": text[:180], "link": {"web_url": link, "mobile_web_url": link}}
+    link = review["edit_url"]
+    template = {
+        "object_type": "text",
+        "text": f"{str(review['title'])[:100]}\n\n글을 읽은 뒤 승인(공개) 또는 비승인(보류·삭제)을 선택하세요.",
+        "link": {"web_url": link, "mobile_web_url": link},
+        "button_title": "글 보기 · 승인/비승인",
+    }
     response = requests.post("https://kapi.kakao.com/v2/api/talk/memo/default/send", headers={"Authorization": f"Bearer {access}"}, data={"template_object": json.dumps(template, ensure_ascii=False)}, timeout=20)
     response.raise_for_status()
     return True
 
 
 def main() -> int:
-    title = os.getenv("REPORT_TITLE", "자동발행 작업 완료")
+    title = os.getenv("REPORT_TITLE", "[작성 완료] 글 확인 후 승인 또는 비승인")
     fallback_link = os.getenv("REPORT_URL", "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions")
     base_body = os.getenv("REPORT_BODY", "자동발행 결과를 확인하세요.")
 
-    draft_lines = build_draft_review_lines()
-    if draft_lines:
-        body = base_body + "\n\n검수 대기 글 (링크 열어서 바로 발행 또는 예약):\n\n" + "\n\n".join(draft_lines)
-        body += f"\n\n실행 로그: {fallback_link}"
-    else:
-        body = base_body + f"\n\n모바일 확인·업로드: {fallback_link}"
-
-    results = {"email": send_email(title, body), "kakao": send_kakao(body, fallback_link), "url": fallback_link,
-               "draft_links_found": len(draft_lines)}
+    reviews = build_draft_reviews()
+    body = _plain_body(base_body, reviews, fallback_link)
+    email_html = _html_body(base_body, reviews, fallback_link)
+    kakao_results = [send_kakao_review(review) for review in reviews]
+    results = {"email": send_email(title, body, email_html), "kakao": bool(kakao_results) and all(kakao_results),
+               "url": fallback_link, "draft_links_found": len(reviews)}
     print(json.dumps(results, ensure_ascii=False))
     return 0
 
