@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import urllib.parse
 import urllib.request
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -40,24 +42,75 @@ def _status(run: dict) -> str:
     return "READY"
 
 
-def collect(repo: str, token: str, per_workflow: int = 5) -> dict:
+def _room_tokens(room) -> set[str]:
+    values = {
+        room.room_id,
+        room.name,
+        room.source_id,
+        room.account_id,
+        room.destination_id,
+    }
+    tokens: set[str] = set()
+    for value in values:
+        raw = str(value or "").strip().lower()
+        if not raw:
+            continue
+        tokens.add(raw)
+        if raw.startswith("http://") or raw.startswith("https://"):
+            host = urllib.parse.urlparse(raw).netloc.lower().removeprefix("www.")
+            if host:
+                tokens.add(host)
+        elif "." in raw and "/" not in raw:
+            tokens.add(raw.removeprefix("www."))
+    return {t for t in tokens if len(t) >= 4}
+
+
+def _run_text(run: dict) -> str:
+    return " ".join(
+        str(run.get(key) or "").lower()
+        for key in ("name", "display_title", "head_branch", "path")
+    )
+
+
+def _match_run(room, runs: list[dict], workflow_room_count: int) -> tuple[dict | None, str]:
+    if not runs:
+        return None, "none"
+    if workflow_room_count == 1:
+        return runs[0], "unique_workflow"
+    tokens = _room_tokens(room)
+    for run in runs:
+        text = _run_text(run)
+        if any(token in text for token in tokens):
+            return run, "run_metadata_match"
+    return None, "shared_workflow_unattributed"
+
+
+def collect(repo: str, token: str, per_workflow: int = 10) -> dict:
     registry = RoomRegistry.load()
-    workflows = sorted({r.workflow for r in registry.rooms if r.workflow})
-    latest_by_workflow: dict[str, dict] = {}
+    workflow_counts = Counter(r.workflow for r in registry.rooms if r.workflow)
+    workflows = sorted(workflow_counts)
+    runs_by_workflow: dict[str, list[dict]] = {}
     for workflow in workflows:
         payload = _request(
             f"{API}/repos/{repo}/actions/workflows/{workflow}/runs?event=workflow_dispatch&per_page={per_workflow}",
             token,
         )
-        runs = payload.get("workflow_runs") or []
-        if runs:
-            latest_by_workflow[workflow] = runs[0]
+        runs_by_workflow[workflow] = payload.get("workflow_runs") or []
 
     rows = []
+    unattributed_shared = 0
     for room in registry.rooms:
-        run = latest_by_workflow.get(room.workflow)
+        runs = runs_by_workflow.get(room.workflow) or []
+        run, match_method = _match_run(room, runs, workflow_counts.get(room.workflow, 0))
         if not run:
+            if match_method == "shared_workflow_unattributed" and runs:
+                unattributed_shared += 1
             status = "EMPTY" if not room.enabled and room.status == "EMPTY" else ("PAUSED" if not room.enabled else "READY")
+            details = {"name": room.name, "result_source": match_method}
+            if runs:
+                details["latest_workflow_run_id"] = str(runs[0].get("id") or "")
+                details["latest_workflow_run_url"] = runs[0].get("html_url") or ""
+                details["note"] = "Shared workflow run exists but was not safely attributable to this room."
             rows.append(
                 make_status(
                     room_id=room.room_id,
@@ -66,26 +119,29 @@ def collect(repo: str, token: str, per_workflow: int = 5) -> dict:
                     workflow=room.workflow,
                     publish_policy=room.publish_policy,
                     next_run=room.next_run,
-                    details={"name": room.name, "result_source": "none"},
+                    details=details,
                 ).to_dict()
             )
             continue
+
+        mapped_status = _status(run)
         rows.append(
             make_status(
                 room_id=room.room_id,
                 platform=room.platform,
-                status=_status(run),
+                status=mapped_status,
                 workflow=room.workflow,
                 run_id=str(run.get("id") or ""),
                 started_at=run.get("run_started_at") or run.get("created_at") or "",
                 completed_at=run.get("updated_at") or "",
                 artifact_url=run.get("html_url") or "",
                 publish_policy=room.publish_policy,
-                failure_reason=(run.get("conclusion") or "") if _status(run) == "FAILED" else "",
+                failure_reason=(run.get("conclusion") or "") if mapped_status == "FAILED" else "",
                 next_run=room.next_run,
                 details={
                     "name": room.name,
                     "result_source": "github_actions",
+                    "match_method": match_method,
                     "event": run.get("event") or "",
                     "run_number": run.get("run_number") or "",
                 },
@@ -97,7 +153,11 @@ def collect(repo: str, token: str, per_workflow: int = 5) -> dict:
         counts[row["status"]] = counts.get(row["status"], 0) + 1
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "summary": {"total": len(rows), "by_status": counts},
+        "summary": {
+            "total": len(rows),
+            "by_status": counts,
+            "shared_workflow_unattributed_rooms": unattributed_shared,
+        },
         "rows": rows,
     }
 
