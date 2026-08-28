@@ -1,6 +1,7 @@
 # 통합 블로그 자동발행 허브
 
 > 프로젝트의 고정 운영 범위와 비용 안전 원칙은 [OPERATING_MANDATE.md](OPERATING_MANDATE.md)를 최우선 기준으로 따릅니다.
+> 글·제목·이미지·카드뉴스·완료 알림은 [docs/EDITORIAL_AND_MEDIA_MANDATE.md](docs/EDITORIAL_AND_MEDIA_MANDATE.md)를 필수로 따릅니다.
 
 모든 운영 화면, 스케줄 계산과 실행 로그는 한국시간 `Asia/Seoul` 기준입니다. GitHub Actions의 cron 문법과 YouTube API의 `publishAt` 전송값만 서비스 규칙상 UTC를 사용하며, 코드가 자동 변환하므로 사용자는 구글시트에 한국시간만 입력합니다.
 

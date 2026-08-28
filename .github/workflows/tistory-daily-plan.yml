@@ -62,6 +62,8 @@ jobs:
               assert draft.get('publish_policy') in (None, 'awaiting_approval')
           print('TISTORY DRAFT SAFETY PASS')
           PY
+      - name: Build mobile card-news screens without image APIs
+        run: python scripts/tistory_card_news.py --drafts artifacts/tistory-daily-drafts.json --output-dir artifacts/tistory-card-news
       - name: Upload plan + draft artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -69,4 +71,17 @@ jobs:
           path: |
             artifacts/tistory-daily-plan.json
             artifacts/tistory-daily-drafts.json
+            artifacts/tistory-card-news/*.html
           retention-days: 7
+      - name: Send mobile completion report
+        if: always()
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          REPORT_EMAIL_TO: "huh0303@gmail.com"
+          REPORT_EMAIL_FROM: "huh0303@gmail.com"
+          REPORT_TITLE: "[Tistory] 오늘의 5채널 글·카드뉴스 준비 완료"
+          REPORT_BODY: "Tistory 5채널 글과 모바일 카드뉴스 화면 생성이 끝났습니다. 아래 링크에서 결과물을 내려받아 업로드할 수 있습니다."
+          REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python scripts/publishing_completion_notify.py

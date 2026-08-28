@@ -3,7 +3,7 @@
   "scope": ["wordpress_27", "blogger_27", "youtube", "sns"],
   "provider": "replicate",
   "credential_secret": "REPLICATE_API_TOKEN",
-  "enabled_when_provider_credentials_exist": true,
+  "enabled_when_provider_credentials_exist": false,
   "model_priority": [
     {
       "priority": 1,
@@ -30,6 +30,11 @@
   "hard_rules": {
     "require_article_or_video_topic_relevance": true,
     "allow_zero_images_when_all_candidates_fail": true,
+    "images_per_article_min": 0,
+    "images_per_article_max": 2,
+    "free_stock_images_forbidden": true,
+    "playlist_thumbnail_existing_frame_only": true,
+    "thumbnail_video_generation_forbidden": true,
     "never_insert_generic_filler_image": true,
     "require_license_and_provider_cost_log": true,
     "forbid_fabricated_official_documents": true,

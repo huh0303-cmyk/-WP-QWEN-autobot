@@ -53,6 +53,20 @@
     "on_missing_verification": "QUALITY_FAIL",
     "rule": "Do not generate or queue publish-ready content when current official-source verification is missing."
   },
+  "daily_keyword_research": {
+    "enabled": true,
+    "frequency": "daily",
+    "goal": "Discover current high-intent golden keywords before drafting",
+    "require_current_search_signals": true,
+    "require_official_source_for_ymyl_and_schedules": true
+  },
+  "human_editorial_style": {
+    "forbid_model_or_prompt_mentions": true,
+    "forbid_ai_process_disclosure_in_article_body": true,
+    "forbid_repetitive_template_titles": true,
+    "title_style": "specific, emotional, natural, curiosity-led, accurate",
+    "never_hide_sources_or_material_corrections": true
+  },
   "safety": {
     "auto_public": false,
     "allowed_publish_states": ["draft", "private", "awaiting_approval"],

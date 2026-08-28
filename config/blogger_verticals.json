@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "verticals": [
+    {
+      "vertical_id": "blogger_korean_benefits",
+      "platform": "blogger",
+      "language": "ko",
+      "title": "한국 지원금·장려금 생활정보",
+      "status": "DESTINATION_ID_REQUIRED",
+      "cadence": "daily",
+      "topics": ["정부지원금", "근로장려금", "자녀장려금", "청년지원", "지자체지원금", "신청기간", "지급일"],
+      "official_source_required": true,
+      "as_of_date_required": true,
+      "image_policy": "no_image_or_local_card_news",
+      "paid_image_api": false
+    }
+  ]
+}
