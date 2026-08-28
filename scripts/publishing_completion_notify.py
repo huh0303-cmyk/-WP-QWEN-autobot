@@ -117,13 +117,15 @@ def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
             <td width="50%" style="padding:4px 0 0 4px"><a href="{edit_url}#delete-action" style="display:block;padding:14px;border-radius:9px;background:#a93333;color:#fff;text-align:center;text-decoration:none;font-weight:800">비승인(보류·삭제)</a></td>
           </tr></table>
         </section>""")
+    if not cards:
+        return ""
     escaped_base = html.escape(base_body)
     escaped_log = html.escape(fallback_link, quote=True)
     return f"""<html><body style="margin:0;background:#f3f5f7;font-family:Arial,'Noto Sans KR',sans-serif;color:#172033">
     <main style="max-width:640px;margin:auto;padding:24px 14px">
-      <h1 style="font-size:24px;margin:0 0 8px">오늘 작성된 글</h1>
-      <p style="line-height:1.6;margin:0 0 14px">{escaped_base}<br>글을 읽은 뒤 초록색 승인 또는 빨간색 비승인을 선택하세요.</p>
-      {''.join(cards) if cards else '<p>확인할 글이 없습니다.</p>'}
+      <h1 style="font-size:24px;margin:0 0 8px">오늘 작성된 글 검토</h1>
+      <p style="line-height:1.6;margin:0 0 14px">{escaped_base}<br>아래 글 제목을 눌러 내용을 확인한 뒤 WordPress 화면에서 공개 또는 보류하세요.</p>
+      {''.join(cards)}
       <p style="font-size:12px;color:#697386"><a href="{escaped_log}">작업 기록</a></p>
     </main></body></html>"""
 
@@ -173,6 +175,16 @@ def main() -> int:
     base_body = os.getenv("REPORT_BODY", "자동발행 결과를 확인하세요.")
 
     reviews = build_draft_reviews()
+    if not reviews:
+        # Never send an empty "review" message. A mobile review notice is valid
+        # only when it contains at least one real draft editor URL.
+        print(json.dumps({
+            "email": False, "kakao": False, "url": fallback_link,
+            "draft_links_found": 0, "sheet_synced": False,
+            "notification_skipped": "no_reviewable_drafts",
+        }, ensure_ascii=False))
+        return 0
+
     try:
         from scripts.review_sheet import append_review_rows
         sheet_synced = append_review_rows([
