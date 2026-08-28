@@ -40,7 +40,6 @@ def apply_wordpress_registry(
             image_mode=site.image_mode,
             image_min=site.image_min,
             image_max=site.image_max,
-            no_image=True,
         )
         configured.append(current)
 
