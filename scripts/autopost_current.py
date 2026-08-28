@@ -32,7 +32,7 @@ os.environ["OPENAI_ENABLED"] = "false"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "false"
-os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "true"
+os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "false"
 
 # Hostinger sites can advertise IPv6 while GitHub-hosted runners have an
 # intermittently unusable IPv6 route.  Prefer IPv4 at the client only; this
@@ -61,7 +61,7 @@ base.AI_TEXT_PROVIDER = "gemini"
 base.PIXABAY_KEY = None
 base.PEXELS_KEY = None
 base.GEMINI_IMAGE_MODELS = []
-base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
+base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
 
 
 def _blocked_stock(*args, **kwargs):
