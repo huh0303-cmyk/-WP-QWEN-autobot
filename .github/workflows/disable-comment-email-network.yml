@@ -2,6 +2,10 @@ name: "WordPress — Disable Comment Emails Network-Wide"
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "scripts/disable_comments_everywhere.php"
+      - ".github/workflows/disable-comment-email-network.yml"
 
 permissions:
   contents: read
