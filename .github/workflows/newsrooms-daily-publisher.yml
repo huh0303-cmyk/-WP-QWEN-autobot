@@ -78,7 +78,9 @@ jobs:
           WP_PUBLICATION_APPROVED: "false"
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "gemini"
-          OPENAI_ENABLED: "false"
+          OPENAI_ENABLED: "true"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_ENABLED: "true"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_IMAGE_ENABLED: "false"
