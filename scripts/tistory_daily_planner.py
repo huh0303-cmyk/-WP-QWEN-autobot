@@ -31,11 +31,34 @@ def _pick_time(site: dict, day: str) -> str:
     return f"{hour:02d}:{minute:02d}"
 
 
-def _pick_seed_topic(site: dict, day: str) -> str:
+def _golden_keyword_score(topic: str, site: dict) -> tuple[int, dict[str, int]]:
+    """Deterministic common keyword gate; never pick a topic at random."""
+    low = topic.lower()
+    intents = [str(x).lower() for x in site.get("intent", [])]
+    categories = [str(x).lower() for x in site.get("categories", [])]
+    freshness_words = ("오늘", "신청", "기간", "지급", "시간표", "예매", "deadline", "schedule", "booking")
+    value_words = ("비용", "보험", "대출", "금리", "청구", "예약", "cost", "hotel", "booking")
+    breakdown = {
+        "search_intent": min(35, 15 + 10 * sum(word in low for word in intents)),
+        "site_fit": min(25, 15 + 5 * sum(word in low for word in categories)),
+        "freshness": 20 if any(word in low for word in freshness_words) else 8,
+        "value": 10 if any(word in low for word in value_words) else 5,
+        "specificity": 10 if len(topic.replace(" ", "")) >= 14 else 6,
+    }
+    return sum(breakdown.values()), breakdown
+
+
+def _pick_seed_topic(site: dict, day: str) -> tuple[str, int, dict[str, int]]:
     topics = site.get("seed_topics") or []
     if not topics:
-        return ""
-    return _daily_rng(site["site_id"], day + ":topic").choice(topics)
+        return "", 0, {}
+    ranked = []
+    for topic in topics:
+        score, breakdown = _golden_keyword_score(topic, site)
+        tie = hashlib.sha256(f"{site['site_id']}:{day}:{topic}".encode()).hexdigest()
+        ranked.append((score, tie, topic, breakdown))
+    score, _, topic, breakdown = max(ranked)
+    return topic, score, breakdown
 
 
 def build_plan(now: datetime | None = None) -> dict:
@@ -48,6 +71,7 @@ def build_plan(now: datetime | None = None) -> dict:
         key=lambda site: int(site.get("launch_order", 999)),
     )
     for site in enabled_sites:
+        seed_topic, keyword_score, keyword_breakdown = _pick_seed_topic(site, day)
         jobs.append({
             "job_id": f"{site['site_id']}:{day}",
             "site_id": site["site_id"],
@@ -64,10 +88,13 @@ def build_plan(now: datetime | None = None) -> dict:
             "official_source_required": bool(site.get("official_source_required")),
             "categories": site.get("categories", []),
             "intent": site.get("intent", []),
-            "seed_topic": _pick_seed_topic(site, day),
+            "seed_topic": seed_topic,
+            "keyword_selection": "golden_keyword_score",
+            "keyword_score": keyword_score,
+            "keyword_score_breakdown": keyword_breakdown,
             "status": "PLANNED",
             "public_allowed": False,
-            "notes": "Generate an original article brief/content. Never copy another site. Queue for review; no automatic public publishing."
+            "notes": "Create a new search intent, title, outline, examples and FAQ for this platform. Copying sentences, paragraphs or another platform's outline is forbidden. Queue for review; no automatic public publishing."
         })
     return {
         "generated_at": now.isoformat(),
