@@ -2036,7 +2036,10 @@ def generate_content_gemini(prompt, use_gpt=False):
 
     if decision.provider == "openai":
         if not openai_available():
-            raise RuntimeError("GPT escalation requested but OpenAI credentials are unavailable")
+            # Paid escalation is intentionally disabled in routine automation.
+            # Retry with Gemini instead of turning an otherwise publishable daily
+            # article into a false-success workflow with no post.
+            return _gemini_generate_text_raw(prompt)
         return openai_generate_text(prompt, temperature=0.85, max_retries=3)
 
     return _gemini_generate_text_raw(prompt)
