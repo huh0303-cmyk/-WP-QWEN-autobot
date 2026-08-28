@@ -10,7 +10,7 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 2. Reuse the primary keyword, but rebuild the Blogger article instead of copying or sentence-level paraphrasing.
 3. WordPress text is generated with GPT. Blogger text is generated only with Gemini.
 4. Each Blogger destination inherits the persona and tone of its matching WordPress site.
-5. Optimize the title, primary keyword, search description (about 120 characters), and 3-5 relevant Blogger labels.
+5. Optimize the title, primary keyword, per-post search description (about 120 characters), a short descriptive English permalink, and 8-10 relevant noun-form Blogger labels.
 6. Use 0-2 genuinely relevant images generated through the approved Replicate routing policy. Use zero when no generated candidate is sufficiently relevant or safe. Never insert a generic filler image merely to occupy a slot.
 7. Visa, insurance, and medical-tourism posts require official sources, an as-of date, a change-warning, and an appropriate informational disclaimer.
 8. Change structure, examples, headings, and framing to prevent duplicate content.
@@ -33,6 +33,9 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 25. All Blogger articles are uploaded as private drafts. Automation must never press the final publish action. After draft creation, record the authenticated Blogger edit URL and email it to the owner for human reading, editing, and manual publication.
 26. The platform worker forcibly converts every Blogger queue item to draft mode, including an older row that accidentally contains a publish flag. Final Blogger publication is manual-only.
 27. All 27 Blogger image pipelines follow `config/network_image_generation_policy.json` through Replicate: FLUX.1 Schnell first, SDXL-Lightning 4-step second, and SDXL Turbo third. Blogger still permits zero images and remains human-review-only.
+28. `k-health365.com` WordPress and `k-health365.blogspot.com` Blogger are separate editorial properties. WordPress is the source-side site, but Blogger must receive a newly written article with a distinct search intent, outline, examples, wording, and generated image rather than copied or lightly paraphrased WordPress text.
+29. `k-health365.blogspot.com` remains a Korean-language Blogger property. Its custom-domain field must not claim `www.k-health365.com`, which belongs to the WordPress property. DNS and the approved AdSense account/site records are outside Blogger automation scope and must never be changed by the publishing worker.
+30. Every Blogger image that is used must include a useful topic-specific ALT description. Image generation follows the approved Replicate-to-FLUX route; irrelevant or unsafe images are rejected.
 
 ## Publishing order for the first six Blogger sites
 
