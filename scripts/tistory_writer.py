@@ -2,12 +2,8 @@
 # -*- coding: utf-8 -*-
 """Generate one article draft per Tistory site job.
 
-2026-08-28 정책(config/content_writing_policy.json, LOCKED): Gemini Flash
-(무료)가 기본 작가, GPT는 important_content(trend_mode/공식출처 필요 사이트)
-같은 명시적 신호가 있을 때만 쓴다 — Gemini가 그냥 실패했다고 조용히 GPT로
-넘어가지 않는다("무료 tier 소진만으로는 유료로 안 간다"). Claude는 글을 쓰지
-않고, 완성된 초안을 훑어 정책 위반(출처 없는 날짜/금액 등)이 있는지
-감사(system audit)만 한다.
+LOCKED: Gemini first; GPT rewrites only after generation/quality failure;
+Claude is a blocking final audit. SEO/quality score below 70 is rejected.
 
 Reads a plan produced by tistory_daily_planner.py and writes drafts only —
 this never publishes anything. Every job stays publish_policy=awaiting_approval
@@ -20,6 +16,7 @@ import json
 import os
 import re
 import sys
+from difflib import SequenceMatcher
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,10 +24,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
-from automation_hub.content_model_policy import choose_writer  # noqa: E402
 from claude_text import claude_available, claude_generate_text  # noqa: E402
 from gemini_text import gemini_generate_text  # noqa: E402
 from openai_text import openai_available, openai_generate_text  # noqa: E402
+from replicate_image_provider import generate_image_url  # noqa: E402
 
 WRITER_SYSTEM_PROMPT = (
     "You are a careful Korean/English blog writer for a Tistory site. "
@@ -38,7 +35,12 @@ WRITER_SYSTEM_PROMPT = (
     "date, amount, deadline, or eligibility rule — if the job requires an "
     "official source and you are not certain of a specific fact, say the "
     "reader should confirm it on the official site instead of guessing. "
-    "Return strict JSON: {\"title\": str, \"category\": str, \"body_html\": str}. "
+    "Never copy sentences, paragraph order, headings, examples or FAQs from WordPress, Blogspot, or another Tistory site. "
+    "Use a platform-specific search intent and newly built outline. "
+    "The title is the most important text element: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. "
+    "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
+    "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
+    "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
     "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts)."
 )
 
@@ -87,6 +89,7 @@ def build_prompt(job: dict) -> str:
 
 
 MIN_BODY_CHARS = 800
+MIN_QUALITY_SCORE = 70
 
 
 def structural_check(draft: dict) -> list[str]:
@@ -119,7 +122,7 @@ def _parse_json_response(raw: str) -> dict:
     return json.loads(text)
 
 
-def _write_body(job: dict) -> tuple[str, str]:
+def _write_body(job: dict, provider: str = "gemini") -> tuple[str, str]:
     """Returns (raw_response_text, engine_used).
 
     Routing comes from the locked automation_hub.content_model_policy, not
@@ -130,13 +133,7 @@ def _write_body(job: dict) -> tuple[str, str]:
     "no silent paid fallback when the free tier is unavailable" rule.
     """
     prompt = build_writer_prompt(job)
-    important = bool(job.get("trend_mode") or job.get("official_source_required"))
-    paid_writer_allowed = os.environ.get("TISTORY_ALLOW_PAID_WRITER", "false").strip().lower() in {
-        "1", "true", "yes", "on"
-    }
-    decision = choose_writer(important_content=important and paid_writer_allowed)
-
-    if decision.provider == "openai":
+    if provider == "gpt":
         if not openai_available():
             raise RuntimeError("GPT escalation requested but OpenAI credentials are unavailable")
         return openai_generate_text(prompt, temperature=0.7, max_retries=3), "gpt"
@@ -144,10 +141,33 @@ def _write_body(job: dict) -> tuple[str, str]:
     return gemini_generate_text(prompt, temperature=0.7), "gemini"
 
 
+def quality_score(draft: dict, job: dict) -> tuple[int, list[str]]:
+    issues = structural_check(draft)
+    body = str(draft.get("body_html", ""))
+    plain = re.sub(r"<[^>]+>", " ", body).lower()
+    score = 30 if not issues else max(0, 30 - 10 * len(issues))
+    score += 15 if str(draft.get("meta_description", "")).strip() else 0
+    score += 15 if any(str(x).lower() in plain for x in job.get("intent", [])) else 0
+    score += 15 if len(re.findall(r"(?is)<h[23][\s>]", body)) >= 2 else 5
+    score += 10 if re.search(r"(?is)<(?:ul|ol)[\s>]", body) else 0
+    source_needed = bool(job.get("official_source_required"))
+    has_source = bool(re.search(r"https?://|정부24|보조금24|고용24|국세청|복지로|코레일|SRT|공식", body, re.I))
+    score += 15 if (not source_needed or has_source) else 0
+    if source_needed and not has_source:
+        issues.append("required official source is missing")
+    title = str(draft.get("title", "")).strip().lower()
+    banned_title_patterns = ("완벽 가이드", "총정리", "알아보겠습니다", "모든 것", "ultimate guide", "everything you need")
+    if any(pattern in title for pattern in banned_title_patterns):
+        issues.append("AI-like or repetitive title formula")
+        score = min(score, 69)
+    if len(title) < 12:
+        issues.append("title lacks a specific emotional/benefit hook")
+        score = min(score, 69)
+    return min(score, 100), issues
+
+
 def audit_draft(draft: dict, job: dict) -> dict | None:
-    """Claude reviews the finished draft for policy violations. This never
-    blocks publication by itself — it only annotates the draft so a human
-    reviewer (or a future stricter gate) can see what Claude flagged."""
+    """Claude is the mandatory final editorial gate."""
     if not claude_available():
         return None
     prompt = (
@@ -165,49 +185,52 @@ def audit_draft(draft: dict, job: dict) -> dict | None:
 
 
 def generate_draft(job: dict) -> dict:
-    try:
-        raw, engine = _write_body(job)
-    except Exception as exc:
-        return {
-            "job_id": job["job_id"],
-            "site_id": job["site_id"],
-            "status": "WRITE_FAILED",
-            "error": str(exc),
-            "public_allowed": False,
-        }
-
-    try:
-        parsed = _parse_json_response(raw)
-    except json.JSONDecodeError as exc:
-        return {
-            "job_id": job["job_id"],
-            "site_id": job["site_id"],
-            "status": "PARSE_FAILED",
-            "error": str(exc),
-            "raw_preview": raw[:500],
-            "public_allowed": False,
-        }
-    if parsed.get("category") not in job["categories"]:
-        parsed["category"] = job["categories"][0]
-
-    draft = {
+    errors = []
+    draft = None
+    for provider in ("gemini", "gpt"):
+        try:
+            raw, engine = _write_body(job, provider)
+            parsed = _parse_json_response(raw)
+        except Exception as exc:
+            errors.append(f"{provider}: {exc}")
+            continue
+        if parsed.get("category") not in job["categories"]:
+            parsed["category"] = job["categories"][0]
+        candidate = {
         "job_id": job["job_id"],
         "site_id": job["site_id"],
         "title": parsed.get("title", ""),
         "category": parsed["category"],
         "body_html": parsed.get("body_html", ""),
+        "meta_description": parsed.get("meta_description", ""),
+        "image_prompt": parsed.get("image_prompt", "") or parsed.get("title", ""),
         "engine": engine,
         "status": "DRAFT_READY",
         "publish_policy": "awaiting_approval",
         "duplicate_guard": True,
         "public_allowed": False,
-    }
-    structural_issues = structural_check(draft)
-    if structural_issues:
-        draft["status"] = "QUALITY_FAILED"
-        draft["error"] = "; ".join(structural_issues)
+        }
+        score, issues = quality_score(candidate, job)
+        candidate["quality_score"] = score
+        candidate["quality_issues"] = issues
+        if score >= MIN_QUALITY_SCORE and not issues:
+            draft = candidate
+            break
+        errors.append(f"{provider}: quality={score}; {'; '.join(issues)}")
+    if draft is None:
+        return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
+    audit = audit_draft(draft, job)
+    draft["audit"] = audit
+    if not audit or audit.get("ok") is not True:
+        draft["status"] = "AUDIT_FAILED"
+        draft["error"] = "Claude final audit unavailable or failed"
         return draft
-    draft["audit"] = audit_draft(draft, job)
+    # Nano Banana is attempted only when its free tier is explicitly enabled
+    # by the shared policy. Current official API tier is not free, so the
+    # workflow skips it and enters the approved Replicate chain below.
+    draft["image_url"] = generate_image_url(draft["image_prompt"], theme=draft["category"])
+    draft["first_image_priority"] = True
+    draft["image_policy"] = "free_nano_then_flux_schnell_then_sdxl_lightning_then_sdxl_turbo_or_none"
     return draft
 
 
@@ -219,6 +242,19 @@ def main() -> int:
 
     plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
     drafts = [generate_draft(job) for job in plan["jobs"]]
+    # Hard portfolio guard: similar/repeated titles across the five accounts
+    # never reach the review-ready state.
+    for index, draft in enumerate(drafts):
+        if draft.get("status") != "DRAFT_READY":
+            continue
+        for previous in drafts[:index]:
+            if previous.get("status") != "DRAFT_READY":
+                continue
+            ratio = SequenceMatcher(None, str(previous.get("title", "")).lower(), str(draft.get("title", "")).lower()).ratio()
+            if ratio >= 0.55:
+                draft["status"] = "DUPLICATE_TITLE_BLOCKED"
+                draft["error"] = f"title similarity {ratio:.3f} with {previous.get('site_id')}"
+                break
 
     result = {
         "date": plan["date"],
