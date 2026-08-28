@@ -14,12 +14,14 @@ env:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install Google Sheets dependencies
+        run: pip install google-api-python-client google-auth requests -q
       - name: Validate room skeleton and workflow contracts
         run: |
           python -m automation_hub.rooms
@@ -30,7 +32,16 @@ jobs:
         run: python -m automation_hub.dispatch_builder --output artifacts/automation-dispatch-plan.json
       - name: Build unified room status snapshot
         run: python -m automation_hub.status_snapshot --output artifacts/automation-room-status.json
+      - name: Sync unified room status to Google Sheets
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          ROOM_STATUS_PATH: artifacts/automation-room-status.json
+        run: python scripts/sync_room_status_to_sheets.py
       - name: Upload planning artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: automation-room-plans
