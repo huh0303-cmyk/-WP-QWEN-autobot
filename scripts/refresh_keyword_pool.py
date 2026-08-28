@@ -167,6 +167,19 @@ distinct {lang_label} SEO keyword phrases a blog would target this week, split a
 these categories: {categories}.
 
 Rules:
+- Start from terms repeatedly exposed in current news/media and official announcements.
+- Cluster aliases and near-identical headlines into one underlying event, entity, policy,
+  accident, season or issue before proposing a search phrase.
+- Validate each idea using observable Google/Naver trend signals and GSC demand when those
+  signals are available. Never invent unavailable evidence.
+- Apply this locked 100-point rubric: GSC demand 25, media repetition 20,
+  Google/Naver trend 20, site fit 15, actionable intent 10, official source 10.
+- Keep only ideas that can credibly reach 70/100. Prefer 80+, and rank 90+ first.
+- Policy, accident, medical, finance, legal and visa/immigration topics require a current
+  official source; without one, omit the idea regardless of its apparent popularity.
+- Convert the verified signal into this site's practical intent (cost, method, eligibility,
+  schedule, comparison or precautions) instead of copying a news headline.
+- Never copy headline wording or article text.
 - Each keyword is a short search-style phrase (3-6 words), not a full sentence.
 - Ground them in what's actually happening right now (specific companies, specific policy
   developments, specific product names, specific market/regulatory events) — not vague
