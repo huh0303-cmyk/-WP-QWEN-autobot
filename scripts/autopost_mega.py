@@ -27,6 +27,7 @@ from bs4 import BeautifulSoup
 from google import genai
 from google.genai import types as genai_types
 from news_source_registry import get_enabled_rss_sources
+import replicate_image_provider
 
 KST = timezone(timedelta(hours=9))
 def now_kst():
@@ -68,7 +69,11 @@ WP_USER         = "huh0303@gmail.com"
 
 RUN_SLOT            = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
-AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
+# 2026-08-28: 하드코딩된 False였던 걸 env로 실제 제어되게 수정 — 워크플로에서
+# 이 값을 넘겨도 무시되고 있었음(항상 이미지 0장 발행). 스톡사진(Pexels/Pixabay)은
+# 무료 이미지 금지 정책 때문에 여기서 쓰지 않고, 켜지면 replicate_image_provider
+# (FLUX 등 승인된 3개 모델만, 글당 최대 1장, 실패해도 다른 폴백 없음)만 사용한다.
+AUTOMATED_IMAGE_PUBLISHING_ENABLED = os.getenv("AUTOMATED_IMAGE_PUBLISHING_ENABLED", "false").strip().lower() == "true"
 
 gemini_client         = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash-lite"
@@ -3419,25 +3424,14 @@ def process_one(site, keyword):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
-        # 2026-08-22: 전 사이트가 매번 정확히 2장으로 고정돼 있던 것도 글자수와
-        # 같은 이유(매 글 동일 패턴 = AI 대량생산 흔적)로 2~3장 랜덤화.
-        img_target = random.randint(2, 3)
-        images=get_multiple_images(keyword,count=img_target,theme=theme)
-        if images:
-            images = filter_relevant_images(images, title, keyword)
+        # 2026-08-28 사용자 지시: 무료 스톡 이미지(Pexels/Pixabay) 사용 금지 —
+        # 켜져 있으면 replicate_image_provider(FLUX 등 승인된 3개 모델, 글당
+        # 최대 1장, 실패 시 다른 폴백 없음)만 사용한다. 스톡 검색·나노바나나·
+        # 인포그래픽 카드 경로는 전부 제거.
+        img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
+        images = [img_url] if img_url else []
         if not images:
-            print(f"  ⚠️ 사진 검색 완전 실패(또는 관련성 불일치로 전부 패싱) → AI 이미지 생성(GPT 우선)으로 대체 시도")
-            pw_for_img = os.getenv(site["wp_pass_env"], "")
-            images = get_fallback_nanobanana_image(url, pw_for_img, keyword, theme, lang)
-            if not images:
-                print(f"  ⚠️ 나노바나나도 실패 → 주제 일치 인포그래픽 카드로 대체")
-                images = get_fallback_infographic_image(url, pw_for_img, keyword, theme, lang)
-            if not images:
-                # ★ 인포그래픽 생성마저 실패해도 "South Korea nature" 같은 본문과
-                #   무관한 범용 사진으로 억지로 채우지 않는다. 관련 없는 이미지보다
-                #   이미지가 없는 편이 낫다는 판단(사용자 피드백).
-                print(f"  🚫 인포그래픽 대체도 실패 → 이미지 없이 발행")
-                images=[]
+            print("  🚫 Replicate 이미지 생성 실패 → 이미지 없이 발행")
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
