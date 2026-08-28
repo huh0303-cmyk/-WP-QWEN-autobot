@@ -43,13 +43,20 @@ def build_plan(now: datetime | None = None) -> dict:
     cfg = load_config()
     day = now.date().isoformat()
     jobs = []
-    for site in cfg["sites"]:
+    enabled_sites = sorted(
+        (site for site in cfg["sites"] if site.get("launch_enabled") is True),
+        key=lambda site: int(site.get("launch_order", 999)),
+    )
+    for site in enabled_sites:
         jobs.append({
             "job_id": f"{site['site_id']}:{day}",
             "site_id": site["site_id"],
             "title": site["title"],
             "language": site["language"],
             "audience": site["audience"],
+            "description": site.get("description", ""),
+            "url": site.get("url", ""),
+            "launch_order": site.get("launch_order"),
             "scheduled_local_time": _pick_time(site, day),
             "publish_policy": cfg.get("default_publish_policy", "awaiting_approval"),
             "duplicate_guard": True,
@@ -67,6 +74,8 @@ def build_plan(now: datetime | None = None) -> dict:
         "date": day,
         "timezone": "Asia/Seoul",
         "daily_posts_per_site": 1,
+        "portfolio_sites": len(cfg["sites"]),
+        "enabled_sites": len(enabled_sites),
         "public_allowed": False,
         "jobs": jobs,
     }

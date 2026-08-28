@@ -33,7 +33,9 @@ jobs:
           import json
           p=json.load(open('artifacts/tistory-daily-plan.json', encoding='utf-8'))
           assert p['public_allowed'] is False
-          assert len(p['jobs']) == 5
+          assert p['portfolio_sites'] == 5
+          assert len(p['jobs']) == p['enabled_sites']
+          assert len(p['jobs']) <= 5
           assert all(j['publish_policy']=='awaiting_approval' for j in p['jobs'])
           assert all(j['duplicate_guard'] is True for j in p['jobs'])
           print('TISTORY PLAN SAFETY PASS')
