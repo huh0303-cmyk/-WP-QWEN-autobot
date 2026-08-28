@@ -48,6 +48,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
+          TISTORY_ALLOW_PAID_WRITER: "false"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_ENABLED: ${{ github.event.inputs.enable_claude_audit || 'false' }}
         run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json

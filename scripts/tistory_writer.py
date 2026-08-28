@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -105,7 +106,10 @@ def _write_body(job: dict) -> tuple[str, str]:
     """
     prompt = build_writer_prompt(job)
     important = bool(job.get("trend_mode") or job.get("official_source_required"))
-    decision = choose_writer(important_content=important)
+    paid_writer_allowed = os.environ.get("TISTORY_ALLOW_PAID_WRITER", "false").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
+    decision = choose_writer(important_content=important and paid_writer_allowed)
 
     if decision.provider == "openai":
         if not openai_available():

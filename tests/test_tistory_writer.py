@@ -40,12 +40,25 @@ def test_gemini_primary_is_used_when_it_succeeds():
     assert draft["public_allowed"] is False
 
 
-def test_important_content_sites_use_gpt_directly_not_gemini():
-    # trend_mode/official_source_required = "important_content" per the
-    # locked content_writing_policy — this routes to GPT from the start,
-    # Gemini is never even attempted.
+def test_important_content_sites_stay_on_gemini_without_paid_opt_in():
     job = {**JOB, "trend_mode": True, "official_source_required": True}
-    with patch("tistory_writer.gemini_generate_text") as gemini_call, \
+    with patch.dict("tistory_writer.os.environ", {"TISTORY_ALLOW_PAID_WRITER": "false"}), \
+         patch("tistory_writer.gemini_generate_text", return_value=VALID_PAYLOAD) as gemini_call, \
+         patch.object(openai_text, "OPENAI_API_KEY", "test"), \
+         patch.object(openai_text, "OPENAI_ENABLED", True), \
+         patch("tistory_writer.openai_generate_text") as gpt_call, \
+         patch.object(claude_text, "CLAUDE_ENABLED", False):
+        draft = tistory_writer.generate_draft(job)
+    gemini_call.assert_called_once()
+    gpt_call.assert_not_called()
+    assert draft["status"] == "DRAFT_READY"
+    assert draft["engine"] == "gemini"
+
+
+def test_important_content_can_use_gpt_only_with_explicit_paid_opt_in():
+    job = {**JOB, "trend_mode": True, "official_source_required": True}
+    with patch.dict("tistory_writer.os.environ", {"TISTORY_ALLOW_PAID_WRITER": "true"}), \
+         patch("tistory_writer.gemini_generate_text") as gemini_call, \
          patch.object(openai_text, "OPENAI_API_KEY", "test"), \
          patch.object(openai_text, "OPENAI_ENABLED", True), \
          patch("tistory_writer.openai_generate_text", return_value=VALID_PAYLOAD) as gpt_call, \
@@ -53,7 +66,6 @@ def test_important_content_sites_use_gpt_directly_not_gemini():
         draft = tistory_writer.generate_draft(job)
     gemini_call.assert_not_called()
     gpt_call.assert_called_once()
-    assert draft["status"] == "DRAFT_READY"
     assert draft["engine"] == "gpt"
 
 
