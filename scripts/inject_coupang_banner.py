@@ -45,20 +45,20 @@ def inject(site_url: str, wp_pass_env: str) -> dict:
     r = requests.get(
         f"{site_url}/wp-json/wp/v2/posts",
         auth=(WP_USER, wp_pass),
-        params={"per_page": 1, "status": "publish,private", "orderby": "date", "order": "desc",
-                "_fields": "id,link,content,title"},
+        params={"per_page": 5, "status": "publish", "orderby": "date", "order": "desc",
+                "_fields": "id,link,content,title,status"},
         timeout=20,
     )
     r.raise_for_status()
     posts = r.json()
     if not posts:
-        return {"site": site_url, "ok": False, "error": "발행된 글이 없음"}
+        return {"site": site_url, "ok": False, "error": "발행된(publish) 글이 없음"}
     post = posts[0]
     content = post["content"]["rendered"]
 
     if "coupang-partners-banner" in content:
         return {"site": site_url, "ok": True, "skipped": True, "url": post["link"],
-                "note": "이미 배너가 삽입되어 있음"}
+                "status": post.get("status"), "note": "이미 배너가 삽입되어 있음"}
 
     content = BANNER_HTML + content
     patch = requests.post(
@@ -67,7 +67,8 @@ def inject(site_url: str, wp_pass_env: str) -> dict:
     )
     patch.raise_for_status()
     title = post["title"]["rendered"]
-    return {"site": site_url, "ok": True, "skipped": False, "url": post["link"], "title": title}
+    return {"site": site_url, "ok": True, "skipped": False, "url": post["link"],
+            "status": post.get("status"), "title": title}
 
 
 def main():
@@ -76,9 +77,9 @@ def main():
         if not res.get("ok"):
             print(f"❌ {res['site']}: {res.get('error')}")
         elif res.get("skipped"):
-            print(f"⏭️  {res['site']}: {res.get('note')} — {res['url']}")
+            print(f"⏭️  {res['site']}: {res.get('note')} [status={res.get('status')}] — {res['url']}")
         else:
-            print(f"✅ {res['site']}: 배너 삽입 완료 — {res['url']}")
+            print(f"✅ {res['site']}: 배너 삽입 완료 [status={res.get('status')}] — {res['url']}")
     if any(not r.get("ok") for r in results):
         sys.exit(1)
 
