@@ -98,8 +98,10 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
 def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, language: str, persona: str, tone: str, target_chars: int, prior_feedback: str = "") -> str:
     verified_links = extract_http_links(source_html)
     verified_link_text = "\n".join(f"- {link}" for link in verified_links) or "- No additional verified links supplied"
-    return f"""You are adapting an owned WordPress article for a different Blogspot audience.
-Do not paraphrase sentence by sentence. Choose a different search intent and rebuild the outline, examples, checklist and FAQ.
+    return f"""Write a new standalone Blogspot article using only verified facts from the owned source.
+Never copy or paraphrase sentence by sentence. Reusing sentences, paragraph order, headings, examples, checklist or FAQ is forbidden. Choose a different search intent and rebuild everything.
+The title is the highest-priority text: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. Never use AI-sounding stock phrases, a repeated title formula, or a title similar to another article.
+The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
 The article must feel individually edited for this site's persona, not mass-produced. Avoid AI-signaling phrases, generic filler, keyword stuffing, repetitive templates, fake freshness, exaggerated claims, and unnecessary FAQs.
