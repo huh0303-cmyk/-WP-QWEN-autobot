@@ -28,6 +28,7 @@ from claude_text import claude_available, claude_generate_text  # noqa: E402
 from gemini_text import gemini_generate_text  # noqa: E402
 from openai_text import openai_available, openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
+from three_model_consensus import three_model_consensus  # noqa: E402
 
 WRITER_SYSTEM_PROMPT = (
     "You are a careful Korean/English blog writer for a Tistory site. "
@@ -219,11 +220,14 @@ def generate_draft(job: dict) -> dict:
         errors.append(f"{provider}: quality={score}; {'; '.join(issues)}")
     if draft is None:
         return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
-    audit = audit_draft(draft, job)
-    draft["audit"] = audit
-    if not audit or audit.get("ok") is not True:
-        draft["status"] = "AUDIT_FAILED"
-        draft["error"] = "Claude final audit unavailable or failed"
+    consensus = three_model_consensus(
+        title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
+        keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
+    )
+    draft["three_model_consensus"] = consensus
+    if consensus.get("ok") is not True:
+        draft["status"] = "CONSENSUS_FAILED"
+        draft["error"] = "Gemini, GPT and Claude did not all approve"
         return draft
     # Nano Banana is attempted only when its free tier is explicitly enabled
     # by the shared policy. Current official API tier is not free, so the
