@@ -9,14 +9,14 @@
         "indexed": 0,
         "total_posts": 307,
         "status": "정상",
-        "visitor_count": 117
+        "visitor_count": 122
       },
       "koreamedicaltour.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 1,
         "status": "정상",
-        "visitor_count": 13
+        "visitor_count": 14
       },
       "koreainvest365.com": {
         "clicks": 0,
@@ -58,7 +58,7 @@
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 25
+        "visitor_count": 26
       },
       "krealestate365.com": {
         "clicks": 0,
@@ -93,7 +93,7 @@
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 70
+        "visitor_count": 71
       },
       "k-trip365.com": {
         "clicks": 0,
@@ -114,7 +114,7 @@
         "indexed": 0,
         "total_posts": 1,
         "status": "정상",
-        "visitor_count": 55
+        "visitor_count": 63
       },
       "kstudy365.com": {
         "clicks": 0,
@@ -142,28 +142,28 @@
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 7
+        "visitor_count": 13
       },
       "sis-korea.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 34
+        "visitor_count": 37
       },
       "jobkorea365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 49
+        "visitor_count": 50
       },
       "jobinkorea365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 66
+        "visitor_count": 67
       },
       "jobkoreaglobal.com": {
         "clicks": 0,
@@ -177,7 +177,7 @@
         "indexed": 0,
         "total_posts": 2,
         "status": "정상",
-        "visitor_count": 98
+        "visitor_count": 102
       },
       "koreanews365.com": {
         "clicks": 0,
@@ -245,7 +245,7 @@
       },
       "다국어(Studio_starbucks)": {
         "subs": 21,
-        "views": 10080
+        "views": 10077
       },
       "건강-영어(HealthClinicTV)": {
         "subs": 0,
@@ -329,5 +329,5 @@
       }
     }
   },
-  "updated_at": "2026-08-28 13:32:21"
+  "updated_at": "2026-08-28 13:58:04"
 }
