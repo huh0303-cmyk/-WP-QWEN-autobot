@@ -15,6 +15,7 @@ class PublishJob:
     labels: list[str] = field(default_factory=list)
     publish_now: bool = True
     source_keyword: str = ""
+    search_description: str = ""
 
     def validate(self) -> list[str]:
         errors: list[str] = []
@@ -26,6 +27,11 @@ class PublishJob:
             errors.append("title is required")
         if not self.content_html.strip():
             errors.append("content_html is required")
+        if self.site_id.startswith("blogger_"):
+            if not 100 <= len(self.search_description.split()) <= 120:
+                errors.append("Blogger search_description must be 100-120 words")
+            if not 8 <= len(self.labels) <= 14:
+                errors.append("Blogger labels must contain 8-14 items")
         return errors
 
 
