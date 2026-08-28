@@ -8,7 +8,7 @@ pw = os.environ["KHEALTH365COM"]
 r = requests.get(
     "https://k-health365.com/wp-json/wp/v2/posts",
     auth=(WP_USER, pw),
-    params={"per_page": 1, "status": "private", "_fields": "id,link,title"},
+    params={"per_page": 1, "status": "draft,private,pending,future", "_fields": "id,link,title,status"},
     timeout=15,
 )
 posts = r.json()
