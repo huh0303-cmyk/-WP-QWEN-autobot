@@ -77,8 +77,9 @@ jobs:
           WP_POST_STATUS: "draft"
           WP_PUBLICATION_APPROVED: "false"
           AUTOMATION_HUB_SOURCE: "sheets"
-          AI_TEXT_PROVIDER: "openai"
-          OPENAI_ENABLED: "true"
+          AI_TEXT_PROVIDER: "gemini"
+          OPENAI_ENABLED: "false"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
           GEMINI_IMAGE_GENERATION_ENABLED: "false"
