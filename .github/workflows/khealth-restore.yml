@@ -1,0 +1,36 @@
+name: "k-health365.com — Restore Hidden Posts"
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply_changes:
+        description: "Actually restore posts to publish (false = dry-run report only, no changes)"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Restore private/pending/draft posts to publish
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          APPLY_CHANGES: ${{ inputs.apply_changes }}
+        run: python scripts/restore_khealth_public.py --output artifacts/khealth-restore-report.json
+      - name: Upload restore report
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth-restore-report-${{ github.run_id }}
+          path: artifacts/khealth-restore-report.json
+          retention-days: 14
