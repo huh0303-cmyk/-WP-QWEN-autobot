@@ -1,70 +1,82 @@
 {
-  "version": 1,
+  "version": 2,
   "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
   "status": "LOCKED",
+  "scope": ["wordpress", "blogger", "tistory", "news", "youtube_scripts", "sns_copy"],
   "primary_writer": {
     "provider": "gemini",
-    "model_family": "Gemini Flash",
+    "model": "Gemini 2.5 Flash",
+    "role": "first_draft_writer_for_all_content",
     "cost_policy": "free_tier_first",
-    "role": "default_blog_writer",
     "rules": [
-      "Use Gemini Flash as the default writer for routine blog content.",
-      "Do not silently switch to a paid Gemini tier when free-tier quota/auth fails.",
-      "If the free tier is unavailable, return AWAITING_APPROVAL or follow the explicit fallback rules below."
+      "All first drafts are written by Gemini 2.5 Flash by default.",
+      "Gemini must follow the site-specific persona, language, search intent, SEO structure, labels/categories and metadata rules.",
+      "Do not silently upgrade to a paid Gemini tier when quota or authentication fails."
     ]
   },
   "fallback_writer": {
     "provider": "openai",
-    "model_family": "GPT",
-    "role": "quality_rewrite_and_high_value_writer",
+    "model_family": "ChatGPT/GPT",
+    "role": "failed_draft_recovery_and_rewrite",
     "allowed_when": [
-      "quality_fail",
+      "gemini_generation_failure",
+      "gemini_quality_fail",
+      "gemini_policy_or_format_fail",
       "important_content",
       "high_value_content",
       "manual_override"
     ],
     "rules": [
-      "GPT must not be the default writer for bulk routine content.",
-      "GPT calls must be tied to an explicit quality or importance signal.",
-      "No paid fallback is allowed merely because the primary free tier was exhausted."
+      "ChatGPT is the second-line writer, not the routine first-draft engine.",
+      "When Gemini fails quality, factual, structural or formatting gates, ChatGPT rewrites the draft rather than automatically publishing it.",
+      "No public publishing occurs from fallback output without the normal approval flow."
     ]
   },
   "auditor": {
     "provider": "anthropic",
     "model_family": "Claude",
-    "role": "development_code_system_audit",
+    "role": "editorial_grammar_and_quality_auditor",
+    "checks": [
+      "grammar_and_spelling",
+      "awkward_or_ai_sounding_phrasing",
+      "readability_and_sentence_flow",
+      "title_naturalness",
+      "heading_structure",
+      "repetition_and_template_pattern",
+      "site_persona_and_tone_consistency",
+      "search_intent_alignment",
+      "metadata_label_category_consistency",
+      "unsupported_or_suspicious_claims",
+      "internal_contradictions",
+      "final_quality_gate"
+    ],
     "rules": [
-      "Claude is not the default bulk blog writer.",
-      "Use Claude primarily for development, code review, system audit, policy review, and complex editorial QA when explicitly requested."
+      "Claude audits and flags or minimally corrects editorial problems; it is not the routine bulk first-draft writer.",
+      "Claude must not invent new facts while correcting grammar or style.",
+      "Material factual uncertainty must be returned for source verification, not silently rewritten.",
+      "A failed audit returns QUALITY_FAIL or REWRITE_REQUIRED and routes back to the writer before approval."
     ]
   },
+  "pipeline": [
+    "keyword_and_search_intent",
+    "official_source_verification_when_required",
+    "gemini_2_5_flash_first_draft",
+    "quality_gate",
+    "chatgpt_fallback_if_generation_or_quality_fails",
+    "claude_editorial_grammar_quality_audit",
+    "seo_and_metadata_validation",
+    "draft_private_awaiting_approval"
+  ],
   "freshness_sensitive_content": {
-    "types": [
-      "government_support",
-      "benefits",
-      "ticketing",
-      "timetables",
-      "application_deadlines",
-      "policy_changes",
-      "transport_schedules",
-      "seasonal_events"
-    ],
+    "types": ["government_support", "benefits", "ticketing", "timetables", "application_deadlines", "policy_changes", "transport_schedules", "seasonal_events", "medical", "legal", "finance", "visa_immigration"],
     "official_source_verification_required": true,
-    "on_missing_verification": "QUALITY_FAIL",
-    "rule": "Do not generate or queue publish-ready content when current official-source verification is missing."
-  },
-  "daily_keyword_research": {
-    "enabled": true,
-    "frequency": "daily",
-    "goal": "Discover current high-intent golden keywords before drafting",
-    "require_current_search_signals": true,
-    "require_official_source_for_ymyl_and_schedules": true
+    "on_missing_verification": "QUALITY_FAIL"
   },
   "human_editorial_style": {
     "forbid_model_or_prompt_mentions": true,
     "forbid_ai_process_disclosure_in_article_body": true,
     "forbid_repetitive_template_titles": true,
-    "title_style": "specific, emotional, natural, curiosity-led, accurate",
+    "title_style": "specific, natural, useful, curiosity-aware, accurate",
     "never_hide_sources_or_material_corrections": true
   },
   "safety": {
