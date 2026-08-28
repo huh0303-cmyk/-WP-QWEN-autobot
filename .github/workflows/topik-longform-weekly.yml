@@ -6,8 +6,6 @@ name: TOPIK 단어 퀴즈 롱폼 (주1회, ~30분)
 # 너무 빨리 소진하지 않으면서도 채널에 꾸준히 새 롱폼이 쌓인다.
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: "15 3 * * 0"   # 12:15 KST 일요일
 
 concurrency:
   group: topik-longform-weekly

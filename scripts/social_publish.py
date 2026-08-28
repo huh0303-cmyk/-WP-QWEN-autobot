@@ -43,6 +43,9 @@ import os
 import sys
 import json
 import time
+import hashlib
+import re
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -74,6 +77,21 @@ def log(msg):
     print(msg, flush=True)
 
 
+def sanitize_error(error):
+    """Keep credentials out of logs, emails, and uploaded result artifacts."""
+    message = str(error)
+    for secret in (
+        YOUTUBE_OAUTH_CLIENT_ID,
+        YOUTUBE_OAUTH_CLIENT_SECRET,
+        YOUTUBE_OAUTH_REFRESH_TOKEN,
+        TIKTOK_ACCESS_TOKEN,
+        FB_PAGE_ACCESS_TOKEN,
+    ):
+        if secret:
+            message = message.replace(secret, "[REDACTED]")
+    return re.sub(r"(?i)(access_token=)[^&\\s'\"]+", r"\1[REDACTED]", message)
+
+
 def send_email(subject, body):
     if not GMAIL_APP_PASSWORD:
         return
@@ -92,10 +110,27 @@ def send_email(subject, body):
         log(f"   ⚠️ 이메일 발송 실패(무시): {e}")
 
 
-def build_caption(meta, max_hashtags=8):
-    tags = " ".join(f"#{h}" for h in meta.get("hashtags", [])[:max_hashtags])
-    caption = meta.get("short_caption", "").strip()
-    return f"{caption}\n\n{tags}".strip()
+def platform_copy(meta, platform, max_hashtags=8):
+    native = (meta.get("platform_copy") or {}).get(platform) or {}
+    tags = " ".join(f"#{h}" for h in native.get("hashtags", [])[:max_hashtags])
+    parts = [native.get("hook", ""), native.get("caption", ""), native.get("cta", "")]
+    caption = "\n".join(part.strip() for part in parts if part and part.strip())
+    return {"title": native.get("title", "").strip(), "caption": f"{caption}\n\n{tags}".strip()}
+
+
+def content_fingerprint(meta, platform):
+    identity = {"platform": platform, "video": meta.get("public_video_url") or meta.get("video_path"),
+                "copy": (meta.get("platform_copy") or {}).get(platform),
+                "youtube_title": meta.get("youtube_title") if platform == "youtube" else None}
+    return hashlib.sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+
+
+def recommended_publish_times(meta):
+    """Deterministic stagger suggestions; no simultaneous mechanical publishing."""
+    created = datetime.fromisoformat(meta["created_at"]) if meta.get("created_at") else datetime.now(timezone.utc)
+    offsets = {"youtube": 37, "tiktok": 83, "instagram": 149, "facebook": 221, "threads": 307}
+    seed = int(hashlib.sha256((meta.get("youtube_title") or "content").encode()).hexdigest()[:8], 16)
+    return {name: (created + timedelta(minutes=minutes + seed % 23)).isoformat() for name, minutes in offsets.items()}
 
 
 # ════════════════════════════════════════════════════════════
@@ -135,12 +170,12 @@ def publish_youtube(video_path, meta):
     retries = 0
     while response is None:
         try:
-            _, response = request.next_chunk(num_retries=5)
+            _, response = request.next_chunk(num_retries=0)
         except Exception as e:
             retries += 1
-            if retries > 8:
+            if retries >= 3:
                 raise
-            time.sleep(min(2 ** retries, 60))
+            time.sleep(min(2 ** retries, 8))
 
     video_id = response["id"]
     return {"ok": True, "note": "비공개 업로드 완료 — 스튜디오에서 검수 후 직접 공개 필요",
@@ -157,7 +192,7 @@ def publish_tiktok(video_path, meta):
     size = os.path.getsize(video_path)
     init_body = {
         "post_info": {
-            "title": meta.get("short_caption", "")[:150],
+            "title": (platform_copy(meta, "tiktok")["title"] or platform_copy(meta, "tiktok")["caption"])[:150],
             "privacy_level": TIKTOK_PRIVACY_LEVEL,
             "disable_duet": False,
             "disable_comment": False,
@@ -203,7 +238,7 @@ def publish_facebook(video_path, meta):
         return {"ok": False, "skipped": True, "reason": "FB_PAGE_ACCESS_TOKEN/FB_PAGE_ID 없음"}
 
     base = f"https://graph.facebook.com/{GRAPH_VERSION}/{FB_PAGE_ID}"
-    caption = build_caption(meta)
+    caption = platform_copy(meta, "facebook")["caption"]
 
     start = requests.post(f"{base}/video_reels",
                            params={"upload_phase": "start", "access_token": FB_PAGE_ACCESS_TOKEN},
@@ -251,7 +286,7 @@ def publish_facebook(video_path, meta):
 def publish_instagram(meta):
     if not meta.get("public_video_url"):
         return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
-    caption = build_caption(meta)
+    caption = platform_copy(meta, "instagram")["caption"]
     return {
         "ok": True,
         "note": "인스타그램 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 릴스 업로드 필요",
@@ -263,7 +298,7 @@ def publish_instagram(meta):
 def publish_threads(meta):
     if not meta.get("public_video_url"):
         return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
-    caption = build_caption(meta, max_hashtags=3)
+    caption = platform_copy(meta, "threads", max_hashtags=3)["caption"]
     return {
         "ok": True,
         "note": "쓰레드 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 업로드 필요",
@@ -298,6 +333,7 @@ def main():
 
     with open(meta_path, encoding="utf-8") as f:
         meta = json.load(f)
+    publish_times = recommended_publish_times(meta)
     video_path = meta.get("video_path") or os.path.join(os.path.dirname(meta_path), "final.mp4")
     if not os.path.exists(video_path):
         log(f"❌ 영상 파일 없음: {video_path}")
@@ -305,19 +341,37 @@ def main():
 
     log(f"게시 시작 — {label}, 영상: {video_path}")
     results = {}
+    state_path = os.path.join(os.path.dirname(meta_path) or WORKDIR, "social_publish_state.json")
+    try:
+        with open(state_path, encoding="utf-8") as f:
+            state = json.load(f)
+    except (OSError, ValueError):
+        state = {}
     for name, fn in PLATFORMS.items():
         log(f"  → {name} 게시 중...")
+        fingerprint = content_fingerprint(meta, name)
+        if state.get(name) == fingerprint:
+            result = {"ok": False, "skipped": True, "reason": "동일 플랫폼 중복 콘텐츠 차단"}
+            results[name] = result
+            log(f"     ⏭️  건너뜀: {result['reason']}")
+            continue
         try:
             result = fn(video_path, meta)
         except Exception as e:
-            result = {"ok": False, "error": str(e)}
+            result = {"ok": False, "error": sanitize_error(e)}
         results[name] = result
+        result["recommended_publish_at"] = publish_times[name]
+        if result.get("ok"):
+            state[name] = fingerprint
         if result.get("skipped"):
             log(f"     ⏭️  건너뜀: {result.get('reason')}")
         elif result.get("ok"):
             log(f"     ✅ {result.get('note') or '완료'} — {result.get('url') or result.get('video_id') or result.get('publish_id') or ''}")
         else:
             log(f"     ❌ 실패: {result.get('error')}")
+
+    with open(state_path, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
 
     result_path = os.path.join(os.path.dirname(meta_path) or WORKDIR, f"publish_result_{os.path.basename(meta_path)}")
     with open(result_path, "w", encoding="utf-8") as f:
@@ -346,11 +400,9 @@ def main():
     )
 
     log(f"완료 — 성공 {ok_count} / 스킵 {skip_count} / 실패 {fail_count}")
-    # 플랫폼별 실패는 서로 독립적이라는 설계 원칙(파일 상단 docstring 참고)대로,
-    # 개별 플랫폼 실패(예: 페이스북 권한 문제)가 워크플로 전체를 매일 "실패"로
-    # 표시하게 만들지 않는다 — 결과는 이미 이메일/publish_result_*.json으로 보고됨.
-    # 유튜브(핵심 플랫폼)조차 아무것도 성공 못 했을 때만 CI를 실패로 표시한다.
-    if ok_count == 0:
+    # 플랫폼은 독립적으로 끝까지 시도하되, 실제 실패가 하나라도 있으면
+    # 워크플로도 실패시켜 실패를 성공으로 기록하지 않는다.
+    if fail_count:
         raise SystemExit(1)
 
 

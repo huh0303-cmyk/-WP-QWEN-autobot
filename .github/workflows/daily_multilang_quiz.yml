@@ -1,136 +1,58 @@
-name: Multilang Quiz Daily Auto-Publish
+name: Multilang Quiz — 검수용 생성만
 
+# 자동 생성물은 먼저 검수 상태로 보관한다. YouTube/Facebook/Instagram/Threads/TikTok
+# 자동 게시 단계는 제거했다. 최종 게시 여부는 사용자가 검수 후 별도 실행한다.
 on:
-  # 2026-08-02 뒤섞임 사고: 언어별 전용 YOUTUBE_OAUTH_REFRESH_TOKEN_* 가 워크플로
-  # env로 전달되지 않아 9개 언어가 전부 fallback 토큰으로 몰렸었음.
-  # 2026-08-03 env 배선 수정 완료 + 전용 토큰 있는 언어(EN/ES/JA/VI) 확인 후 재개.
-  # 토큰 없는 언어(FR/DE/ZH/AR/RU)는 upload_youtube.py가 자동 스킵(경고만 출력).
-  # ⚠️ 2026-08-03: 사용자가 결과물 품질 문제(이미지 누락 등)로 전체 중단 지시.
-  # 2026-08-14 원인 수정 + 재개: 이미지 누락은 언어마다 Wikimedia Commons를
-  # 따로 검색하다 실패하던 게 원인 중 하나였음 — 이제 한국어 실행이 concept별
-  # 이미지를 한 번만 받아 캐시에 저장하고 나머지 11개 언어는 그 파일을 그대로
-  # 재사용(make_quiz_short_multi.py 참고), 검색 자체가 줄어 실패 확률도 감소.
-  # 음성도 gTTS→ElevenLabs로 교체(자연스러움 개선). 다른 파이프라인과 동일하게
-  # 매일이 아니라 주3회, 부담없이 분산된 시각으로 재개(2026-08-14 사용자 지시).
-  schedule:
-    - cron: "17 21 * * 1,3,5"   # 06:17 KST 월/수/금
-  workflow_dispatch: {}   # Actions 탭에서 수동 실행 버튼도 사용 가능
+  workflow_dispatch: {}
 
 permissions:
-  contents: write   # GitHub Release 생성(인스타/스레드용 공개 URL) 위해 필요
+  contents: read
+
+concurrency:
+  group: multilang-quiz-review-generation
+  cancel-in-progress: false
 
 jobs:
-  generate-and-publish:
+  generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: multilang_quiz
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Install system dependencies (폰트 + ffmpeg)
+          python-version: "3.11"
+      - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-cjk fonts-dejavu-core
-
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-noto-cjk fonts-dejavu-core
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-
-      - name: Random delay (목표 시각 기준 ±1시간 랜덤 분산, 수동 실행 시 건너뜀)
-        if: github.event_name == 'schedule'
-        run: |
-          DELAY=$((RANDOM % 7200))
-          echo "랜덤 대기: ${DELAY}초 (트리거 시각 -1h 기준이므로 최종 실행은 목표시각 ±1h 사이)"
-          sleep $DELAY
-
-      - name: Generate 10-language quiz videos (한/영/일/스/베/불/독/중/아랍/러 각 5문항)
+      - name: Generate multilingual quiz review videos
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID_QUIZ: ${{ secrets.ELEVENLABS_VOICE_ID_QUIZ }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
         run: |
           for lang in ko en ja es vi fr de zh ar ru; do
-            python3 scripts/make_quiz_short_multi.py --lang $lang --n 5 --out_dir outputs
+            python3 scripts/make_quiz_short_multi.py --lang "$lang" --n 5 --out_dir outputs
           done
-
-      - name: Save to Google Drive (언어별 폴더)
+      - name: Save to Google Drive for review
         env:
           ML_GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.ML_GDRIVE_SERVICE_ACCOUNT_JSON }}
         run: python3 scripts/upload_drive.py
         continue-on-error: true
-
-      - name: Upload to YouTube
-        env:
-          ML_YT_CLIENT_ID: ${{ secrets.ML_YT_CLIENT_ID }}
-          ML_YT_CLIENT_SECRET: ${{ secrets.ML_YT_CLIENT_SECRET }}
-          ML_YT_REFRESH_TOKEN: ${{ secrets.ML_YT_REFRESH_TOKEN }}
-          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
-          # 2026-08-14 채널 구조 확정: 영어만 English_Survival 전용 채널,
-          # 나머지 8개 언어(일/스/베/불/독/중/아랍/러)는 전부 SIS-Language Center
-          # 채널 하나로 합쳐서 올린다(언어별 8개 채널 아님) — 없으면 그 언어는 스킵.
-          YOUTUBE_OAUTH_REFRESH_TOKEN_ENGLISH_BROAD: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_ENGLISH_BROAD }}
-          YOUTUBE_OAUTH_REFRESH_TOKEN_STUDIOSTARBUCKS_BROAD: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STUDIOSTARBUCKS_BROAD }}
-        run: python3 scripts/upload_youtube.py
-        continue-on-error: true
-
-      - name: Upload to TikTok (초안함으로 전송 - 최종 게시는 본인이)
-        env:
-          ML_TIKTOK_CLIENT_KEY: ${{ secrets.ML_TIKTOK_CLIENT_KEY }}
-          ML_TIKTOK_CLIENT_SECRET: ${{ secrets.ML_TIKTOK_CLIENT_SECRET }}
-          ML_TIKTOK_ACCESS_TOKEN: ${{ secrets.ML_TIKTOK_ACCESS_TOKEN }}
-        run: python3 scripts/upload_tiktok.py
-        continue-on-error: true
-
-      - name: Upload to Facebook Page
-        env:
-          ML_FB_PAGE_ID: ${{ secrets.ML_FB_PAGE_ID }}
-          ML_FB_PAGE_ACCESS_TOKEN: ${{ secrets.ML_FB_PAGE_ACCESS_TOKEN }}
-          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
-          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-        run: python3 scripts/upload_facebook.py
-        continue-on-error: true
-
-      - name: Prepare public URLs for Instagram/Threads (GitHub Release 업로드)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python3 scripts/prepare_public_urls.py
-        continue-on-error: true
-
-      - name: Upload to Instagram (Business 계정 + 앱 심사 필요, 수동 실행 시에만 - API에 임시저장 기능이 없어 자동실행에서 제외)
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          ML_IG_USER_ID: ${{ secrets.ML_IG_USER_ID }}
-          ML_IG_ACCESS_TOKEN: ${{ secrets.ML_IG_ACCESS_TOKEN }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-        run: python3 scripts/upload_instagram.py
-        continue-on-error: true
-
-      - name: Upload to Threads (앱 심사 필요, 수동 실행 시에만 - API에 임시저장 기능이 없어 자동실행에서 제외)
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          ML_THREADS_USER_ID: ${{ secrets.ML_THREADS_USER_ID }}
-          ML_THREADS_ACCESS_TOKEN: ${{ secrets.ML_THREADS_ACCESS_TOKEN }}
-        run: python3 scripts/upload_threads.py
-        continue-on-error: true
-
-      - name: Save outputs as workflow artifact (백업/수동 확인용)
+      - name: Save review artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: multilang-quiz-videos-${{ github.run_id }}
+          name: multilang-quiz-review-${{ github.run_id }}
           path: multilang_quiz/outputs/*.mp4
           retention-days: 14
-
-      - name: Send report email (성공/실패 내역 요약)
+          if-no-files-found: warn
+      - name: Send generation report
         if: always()
         env:
           ML_GMAIL_SENDER: ${{ secrets.ML_GMAIL_SENDER }}
@@ -138,3 +60,4 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           ML_REPORT_TO: huh0303@gmail.com
         run: python3 scripts/send_report_email.py
+        continue-on-error: true

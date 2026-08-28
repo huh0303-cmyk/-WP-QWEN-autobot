@@ -1,21 +1,33 @@
-name: "Daily Network Publish — Single Site (dispatched by scheduler)"
+name: "Blog Publish — Single Site (dispatched by A/B scheduler)"
 
-# 2026-08-22 사용자 지시로 재개: "오늘부터 25개 블로그사이트는 1일 1포스팅
-# 시간 랜덤... 지금 실행해줘." publish_scheduler.py가 사이트마다 각자 다른
-# 랜덤 시각을 잡아 이 워크플로우를 사이트 하나씩 개별 디스패치한다(같은
-# 시각에 몰아서 발행하면 "동일 운영자 네트워크" 신호가 되는 문제를
-# 2026-08-19에 이미 겪어서 확정한 구조). 뉴스 2개 사이트(koreanews365/
-# theseouljournal)는 별도 시간규칙(newsrooms-daily-publisher.yml, 하루
-# 3~10건)으로 이미 운영 중이라 이 워크플로우 대상이 아니다.
+# publish_scheduler.py가 A17/B8 중 오늘 대상 사이트를 하나씩 분산 dispatch한다.
+# 뉴스 2개는 newsrooms-daily-publisher.yml이 별도로 담당한다.
 on:
   workflow_dispatch:
     inputs:
+      room_id:
+        description: "Automation room id for result tracking"
+        required: false
+        default: ""
       target_site_url:
-        description: "발행 대상 사이트 1개 URL (publish_scheduler.py가 채움)"
+        description: "발행 대상 블로그 URL"
         required: true
+      force_keyword:
+        description: "시험/수동 발행 키워드 (비우면 사이트 키워드 풀 사용)"
+        required: false
+        default: ""
+      publication_approved:
+        description: "Explicit approval to publish publicly (false keeps a review draft)"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
+
+concurrency:
+  group: blog-publish-${{ inputs.target_site_url }}
+  cancel-in-progress: false
 
 jobs:
   publish-one:
@@ -28,18 +40,33 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install publisher dependencies
-        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
-      - name: Publish one post
+        run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+      - name: Create one quality-gated review draft
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
+          WP_POST_STATUS: ${{ inputs.publication_approved && 'publish' || 'draft' }}
+          WP_PUBLICATION_APPROVED: ${{ inputs.publication_approved && 'true' || 'false' }}
+          AUTOMATION_HUB_SOURCE: "sheets"
+          NEWSROOM_REQUIRE_PUBLICATION: "false"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          FORCE_SOURCE_IPV4: "true"
+          FORCE_KEYWORD: ${{ inputs.force_keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_ENABLED: "true"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5.6-luna"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
@@ -50,6 +77,7 @@ jobs:
           KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
           KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
           KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
@@ -64,12 +92,28 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/autopost_mega.py
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log
+      - name: Normalize room result
+        if: always()
+        env:
+          ROOM_ID: ${{ inputs.room_id }}
+        run: |
+          source_path="artifacts/wordpress-worker.log"
+          if [ -f newsroom_publish_result.json ]; then source_path="newsroom_publish_result.json"; fi
+          outcome="failure"
+          if [ "${{ job.status }}" = "success" ]; then outcome="success"; fi
+          python scripts/normalize_room_result.py --platform wordpress --workflow daily-network-publish.yml --source "$source_path" --outcome "$outcome" --output artifacts/automation-room-result.json
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: daily-publish-result-${{ github.run_id }}
-          path: newsroom_publish_result.json
+          name: blog-publish-result-${{ github.run_id }}
+          path: |
+            newsroom_publish_result.json
+            artifacts/automation-room-result.json
+            artifacts/wordpress-worker.log
           if-no-files-found: warn
           retention-days: 14

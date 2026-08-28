@@ -18,6 +18,8 @@ multilang_quiz/outputs/
 baby_video_output/
 curio_longform_output/
 weekly_thumb_work/
+artifacts/
+.local/
 gemini_audio_desc.txt
 khealth_noindex_full_check.json
 mbb_uploads.json

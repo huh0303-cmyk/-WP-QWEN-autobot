@@ -1,117 +1,64 @@
-name: Generate YouTube Playlist (음악 60-80분 + 썸네일 → 최종 mp4)
+name: Generate YouTube Playlist (음악 60-80분 + 승인 이미지 → 최종 mp4)
 
 on:
   workflow_dispatch:
     inputs:
       channel:
-        description: "플리 채널 선택 (2026-08-03 5개 채널 분리 - 채널마다 전용 음악폴더+유튜브토큰 필요)"
+        description: "플리 채널"
         required: false
         type: choice
         default: "globalmusic"
-        options:
-          - "globalmusic"
-          - "healing"
-          - "starbucks"
-          - "mbb"
-          - "kpop"
+        options: [globalmusic, healing, starbucks, mbb, kpop]
       preset_theme:
-        description: "빠른 선택 프리셋 (고르면 아래 topic 직접입력보다 우선 적용됨)"
+        description: "빠른 선택 프리셋"
         required: false
         type: choice
         default: "직접입력(topic 사용)"
-        options:
-          - "직접입력(topic 사용)"
-          - "봄"
-          - "여름"
-          - "가을"
-          - "겨울"
-          - "바다"
-          - "산"
-          - "호수"
-          - "도시 야경"
-          - "시골 마을"
-          - "카페 감성"
-          - "Seoul"
-          - "London"
-          - "Paris"
-          - "Tokyo"
-          - "New York"
-          - "Sapporo"
-          - "Miami"
-          - "LA"
-          - "Prague"
-          - "Switzerland"
+        options: ["직접입력(topic 사용)", "봄", "여름", "가을", "겨울", "바다", "산", "호수", "도시 야경", "시골 마을", "카페 감성", "Seoul", "London", "Paris", "Tokyo", "New York", "Sapporo", "Miami", "LA", "Prague", "Switzerland"]
       topic:
-        description: "도시/주제명 직접 입력 (예: Tokyo, New York — 위 프리셋을 '직접입력'으로 두면 이 값 사용. 여행 매거진 톤 배경사진+타이틀로 생성. 둘 다 비워두면 썸네일창고 랜덤 폴백)"
+        description: "도시/주제명 직접 입력"
         required: false
         type: string
       language:
-        description: "음악 언어 (예: Japanese, French, German — 그 언어 태그 곡만 선곡. 비워두면 Mixed 무작위)"
+        description: "음악 언어"
         required: false
         type: string
       caption:
-        description: "캡션 문구 (비워두면 주제어 기반으로 자동 생성)"
+        description: "캡션 문구"
         required: false
         type: string
       publish_delay_hours:
-        description: "승인 후 유튜브 예약발행까지 걸리는 시간(시간 단위). 비우면 승인 즉시 공개"
+        description: "DEPRECATED: 자동공개 금지 정책으로 무시됨"
+        required: false
+        type: string
+      room_id:
+        description: "Automation Hub room id"
         required: false
         type: string
       healing_theme:
-        description: "healing 채널 전용: 테마 강제 지정(strong_rain/stream_calm/weak_rain). 비우면 최근 안 쓴 것 중 무작위"
+        description: "healing 테마"
         required: false
         type: choice
         default: "(무작위)"
-        options:
-          - "(무작위)"
-          - "strong_rain"
-          - "stream_calm"
-          - "weak_rain"
+        options: ["(무작위)", strong_rain, stream_calm, weak_rain]
       fix_video_id:
-        description: "(선택) 이미 올라간 영상의 제목/설명을 다시 생성해서 고칠 때: 유튜브 영상 ID (channel 입력도 그 영상 채널로 맞춰야 함)"
+        description: "기존 영상 메타데이터 수정용 ID"
         required: false
         type: string
       fix_topic:
-        description: "(선택) fix_video_id와 함께: 새 제목/설명 생성에 쓸 주제어"
+        description: "메타데이터 수정용 주제"
         required: false
         type: string
       fix_duration_min:
-        description: "(선택) fix_video_id와 함께: 영상 길이(분)"
+        description: "메타데이터 수정용 영상 길이(분)"
         required: false
         type: string
-  schedule:
-    # 2026-08-07: 승인 게이트를 없애고 완전자동(생성→업로드→공개)으로 전환.
-    # 채널별 전용 토큰(YOUTUBE_OAUTH_REFRESH_TOKEN_<채널명>)이 없으면 publish
-    # 잡이 공용 토큰으로 엉뚱한 채널에 잘못 올리지 않고 그냥 실패하도록
-    # 고쳐뒀다(아래 publish 잡 참고) — 그래서 mbb/kpop도 미리 스케줄에 넣어도
-    # 안전하다. 토큰 없는 채널은 그냥 그 회차만 실패로 로그에 남고, 영상은
-    # Google Drive에 남아있다가 get_youtube_refresh_token.py로 mbb/kpop 토큰을
-    # 발급해서 시크릿에 등록하는 순간부터 자동으로 정상 작동한다.
-    # 2026-08-12: 5개 채널 전부 월/수/금 3회+토 1회로 통일, 정각 피해서 15~20분씩 분산.
-    # KST 00시대라 UTC로는 전날 15시대라서 요일이 하루 당겨짐(월요일 KST → 일요일 UTC 등).
-    - cron: "7 15 * * 0,2,4,5"    # globalmusic — 00:07 KST 월/수/금/토
-    - cron: "24 15 * * 0,2,4,5"   # healing — 00:24 KST 월/수/금/토
-    # 2026-08-17: 잠깐 중단했다가 재개 — SIS-Language Center 채널(구 starbucks,
-    # UCOWoNH..., 2026-08-12에 이름/핸들만 바뀜)에서 카페음악을 발견해서 라우팅
-    # 사고로 오인, 스케줄을 껐었음. 실제로는 진짜 "Starbucks vibes"(@Starbucksvibes)
-    # 채널에 최근(4시간 전 포함) 영상이 정상적으로 계속 올라오고 있는 걸 확인 —
-    # SIS-Language Center의 옛날 영상들은 8/12 이전 라우팅이 고쳐지기 전 남은
-    # 잔재일 뿐, 지금은 정상 작동 중이라 재개함.
-    - cron: "38 15 * * 0,2,4,5"   # starbucks — 00:38 KST 월/수/금/토
-    - cron: "52 15 * * 0,2,4,5"   # mbb — 00:52 KST 월/수/금/토
-    - cron: "9 16 * * 0,2,4,5"    # kpop — 01:09 KST 월/수/금/토
 
 permissions:
   contents: write
 
-# 2026-08-15: 오늘 5채널 OAuth 재발급 검증차 workflow_dispatch로 여러 채널을
-# 한 번에 몰아서 트리거할 일이 생겨서, GitHub이 자동으로 순차 큐잉하도록
-# concurrency 그룹 추가(겹쳐 돌면 Drive/Gemini 리소스 경합 가능성 있음).
-# 2026-08-18: 채널 구분 없이 그룹 하나였던 게 curio-longform-daily.yml에서
-# 똑같은 패턴으로 실제 사고(짧은 간격 dispatch가 서로를 취소)를 낸 걸 확인해서
-# 여기도 채널별로 분리 — 서로 다른 채널은 절대 서로를 취소하지 못하게.
 concurrency:
-  group: generate-youtube-playlist-${{ github.event.inputs.channel || github.event.schedule || 'default' }}
+  group: generate-youtube-playlist-${{ inputs.channel || 'default' }}
   cancel-in-progress: false
 
 jobs:
@@ -128,49 +75,35 @@ jobs:
       channel_key_upper: ${{ steps.meta.outputs.channel_key_upper }}
       title_is_fallback: ${{ steps.meta.outputs.title_is_fallback }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install system dependencies (ffmpeg + Korean font)
+      - name: Install system dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum
-
       - name: Install Python dependencies
         run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
-
-      - name: Run playlist maker
+      - name: Run playlist maker — GPT text + Replicate-only image
         env:
-          # 2026-08-22: 예전엔 schedule 트리거일 때만 켜져서, 수동(workflow_dispatch)
-          # 실행에서 topic/preset을 안 넣으면 조용히 "썸네일창고 랜덤 폴백" 경로로
-          # 빠져버렸음(여행잡지 표지 스타일/움직이는 파형 없이 나감 — 실제로 4채널
-          # 테스트에서 이 사고 발생). 항상 켜두면 topic_keyword가 실제로 비어있을
-          # 때만 자동선택이 개입하고, topic/preset을 명시하면 그게 그대로 우선되니
-          # 안전하게 이 사고 클래스를 원천 차단한다.
           AUTO_TOPIC: "true"
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4,5' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4,5' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4,5' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4,5' && 'kpop') || 'globalmusic' }}
-          PRESET_THEME: ${{ github.event.inputs.preset_theme }}
-          TOPIC_INPUT: ${{ github.event.inputs.topic }}
-          LANGUAGE_KEYWORD: ${{ github.event.inputs.language }}
-          CAPTION_TEXT: ${{ github.event.inputs.caption }}
-          HEALING_THEME: ${{ (github.event.inputs.healing_theme != '(무작위)' && github.event.inputs.healing_theme) || '' }}
+          CHANNEL_KEY: ${{ inputs.channel || 'globalmusic' }}
+          PRESET_THEME: ${{ inputs.preset_theme }}
+          TOPIC_INPUT: ${{ inputs.topic }}
+          LANGUAGE_KEYWORD: ${{ inputs.language }}
+          CAPTION_TEXT: ${{ inputs.caption }}
+          HEALING_THEME: ${{ (inputs.healing_theme != '(무작위)' && inputs.healing_theme) || '' }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          # healing 채널 실사 빗물/숲 영상 소스 (2026-08-22 추가)
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
-          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-          # 채널별 전용 폴더 - 아직 안 만든 채널은 시크릿이 없어서 공용 기본값으로
-          # 자동 폴백된다(youtube_playlist_maker.py의 _channel_env 참고)
           MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}
           MUSIC_SOURCE_FOLDER_ID_HEALING: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_HEALING }}
           MUSIC_SOURCE_FOLDER_ID_STARBUCKS: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_STARBUCKS }}
@@ -187,71 +120,38 @@ jobs:
           OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
           OUTPUT_FOLDER_ID_KPOP: ${{ secrets.OUTPUT_FOLDER_ID_KPOP }}
         run: |
-          if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then
-            export TOPIC_KEYWORD="$PRESET_THEME"
-          else
-            export TOPIC_KEYWORD="$TOPIC_INPUT"
-          fi
-          echo "사용할 주제어: $TOPIC_KEYWORD (자동선택 모드: $AUTO_TOPIC)"
+          if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then export TOPIC_KEYWORD="$PRESET_THEME"; else export TOPIC_KEYWORD="$TOPIC_INPUT"; fi
           python scripts/youtube_playlist_maker.py
-
-      - name: Export upload metadata for the publish job
+      - name: Export upload metadata
         id: meta
         env:
-          CHANNEL_KEY: ${{ github.event.inputs.channel || (github.event.schedule == '24 15 * * 0,2,4,5' && 'healing') || (github.event.schedule == '38 15 * * 0,2,4,5' && 'starbucks') || (github.event.schedule == '52 15 * * 0,2,4,5' && 'mbb') || (github.event.schedule == '9 16 * * 0,2,4,5' && 'kpop') || 'globalmusic' }}
+          CHANNEL_KEY: ${{ inputs.channel || 'globalmusic' }}
         run: |
           python - <<'EOF'
           import json, os
-          with open("playlist_output/upload_meta.json", encoding="utf-8") as f:
-              m = json.load(f)
-          out = os.environ["GITHUB_OUTPUT"]
-          with open(out, "a", encoding="utf-8") as f:
-              f.write(f"video_drive_id={m['video_drive_id']}\n")
-              f.write(f"thumb_drive_id={m['thumb_drive_id']}\n")
-              f.write("yt_title<<EOM\n" + m['title'] + "\nEOM\n")
-              f.write("yt_description<<EOM\n" + m['description'] + "\nEOM\n")
-              f.write("yt_tags<<EOM\n" + ",".join(m.get('tags') or []) + "\nEOM\n")
-              f.write(f"channel_key_upper={os.environ['CHANNEL_KEY'].upper()}\n")
+          with open("playlist_output/upload_meta.json", encoding="utf-8") as f: m=json.load(f)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"video_drive_id={m['video_drive_id']}\n"); f.write(f"thumb_drive_id={m['thumb_drive_id']}\n")
+              f.write("yt_title<<EOM\n"+m['title']+"\nEOM\n"); f.write("yt_description<<EOM\n"+m['description']+"\nEOM\n")
+              f.write("yt_tags<<EOM\n"+",".join(m.get('tags') or [])+"\nEOM\n"); f.write(f"channel_key_upper={os.environ['CHANNEL_KEY'].upper()}\n")
               f.write(f"title_is_fallback={'true' if m.get('title_is_fallback') else 'false'}\n")
           EOF
-
-      - name: Upload result as artifact (backup)
+      - name: Upload result artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: youtube-playlist-${{ github.run_id }}
-          path: |
-            playlist_output/final.mp4
+          path: playlist_output/final.mp4
           retention-days: 3
           if-no-files-found: ignore
-
-      - name: Commit recent-topics state (auto mode anti-repeat)
+      - name: Commit anti-repeat state
         if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git stash --include-untracked || true
-          git pull --rebase origin main
-          git stash pop || true
-          # 동시에 여러 채널 워크플로우가 겹쳐 돌면 stash pop이 충돌 마커를
-          # 그대로 남길 수 있다(2026-08-14 실제로 발생, JSON이 깨진 채 커밋됨) —
-          # 충돌 마커가 남아있으면 절대 커밋하지 않고 그냥 건너뛴다.
-          # 2026-08-22 수정: 'git checkout -- <file>'은 인덱스에 unmerged stage가
-          # 남아있으면 "path is unmerged" 에러로 그 자체가 실패해서 잡 전체가
-          # exit 1로 죽는 버그가 있었음(8/18~8/20 절반가량 실패 원인). 'git
-          # checkout HEAD -- <file>'로 명시적으로 HEAD 기준 복원해야 충돌 상태와
-          # 무관하게 항상 성공한다. 두 파일 다 저장가치 낮은 재생성 가능한
-          # 상태값이라, 둘 중 하나라도 충돌나면 둘 다 HEAD로 리셋하고 이번
-          # 실행의 커밋은 스킵한다.
-          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null || \
-             grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then
-            echo "⚠️ 병합 충돌 마커 발견 — 두 상태파일 다 HEAD로 리셋하고 커밋 건너뜀"
-            git checkout HEAD -- playlist_recent_topics.json playlist_recent_tracks.json
-            exit 0
-          fi
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true; git pull --rebase origin main; git stash pop || true
+          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null || grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then git checkout HEAD -- playlist_recent_topics.json playlist_recent_tracks.json; exit 0; fi
           git add playlist_recent_topics.json playlist_recent_tracks.json 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "chore: 플레이리스트 자동선택 최근주제/최근트랙 갱신 [skip ci]"
-          git push
+          git diff --staged --quiet || git commit -m "chore: 플레이리스트 최근 상태 갱신 [skip ci]"; git push
 
   publish:
     if: ${{ !inputs.fix_video_id }}
@@ -259,18 +159,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install Python dependencies
-        run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
-
-      - name: Upload approved video to YouTube
+      - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+      - name: Upload video to YouTube PRIVATE only
         env:
           VIDEO_DRIVE_ID: ${{ needs.prepare.outputs.video_drive_id }}
           THUMB_DRIVE_ID: ${{ needs.prepare.outputs.thumb_drive_id }}
@@ -278,52 +172,53 @@ jobs:
           YT_DESCRIPTION: ${{ needs.prepare.outputs.yt_description }}
           YT_TAGS: ${{ needs.prepare.outputs.yt_tags }}
           TITLE_IS_FALLBACK: ${{ needs.prepare.outputs.title_is_fallback }}
-          PUBLISH_AT_HOURS_FROM_NOW: ${{ github.event.inputs.publish_delay_hours }}
+          CHANNEL_KEY: ${{ inputs.channel || 'globalmusic' }}
+          ROOM_RESULT_SOURCE: artifacts/youtube_playlist_result.json
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          # healing/kpop은 전용 OAuth 클라이언트로 재발급한 토큰이라(공용 클라이언트로
-          # 재사용하면 다른 채널로 잘못 올라가는 계정선택 버그가 있었음, 2026-08-12)
-          # 반드시 그 채널 전용 client_id/secret과 짝을 맞춰야 한다.
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
-          # 채널 전용 토큰이 있으면 그걸 쓴다. globalmusic만 공용 토큰이 곧
-          # 자기 채널 것이라 폴백 허용 — 그 외 채널은 전용 토큰이 없으면 절대
-          # 폴백하지 않고 그냥 비워서 다음 스텝에서 실패시킨다(뒤섞임 사고 방지:
-          # 예전엔 여기서 공용 토큰으로 폴백해서 healing/mbb/kpop 영상이 엉뚱한
-          # 채널로 올라갈 뻔한 적이 있었음).
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || (needs.prepare.outputs.channel_key_upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/youtube_publish_approved.py
+      - name: Normalize room result
+        if: always()
+        run: |
+          python scripts/normalize_room_result.py --room-id "${{ inputs.room_id }}" --platform youtube --workflow generate-youtube-playlist.yml --source artifacts/youtube_playlist_result.json --outcome "${{ job.status == 'success' && 'success' || 'failure' }}"
+      - name: Upload room result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-room-result-${{ github.run_id }}
+          path: artifacts/automation-room-result.json
+          retention-days: 7
+          if-no-files-found: error
 
   fix_metadata:
     if: ${{ inputs.fix_video_id }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install Python dependencies
-        run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
-
-      - name: 채널 결정
+      - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+      - name: Resolve channel
         id: ch
         run: echo "upper=$(echo '${{ inputs.channel }}' | tr '[:lower:]' '[:upper:]')" >> "$GITHUB_OUTPUT"
-
-      - name: 제목/설명 재생성 + 적용
+      - name: Regenerate metadata with GPT and apply
         env:
           CHANNEL_KEY: ${{ inputs.channel }}
           FIX_VIDEO_ID: ${{ inputs.fix_video_id }}
           FIX_TOPIC: ${{ inputs.fix_topic }}
           FIX_DURATION_MIN: ${{ inputs.fix_duration_min }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', steps.ch.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', steps.ch.outputs.upper)] || (steps.ch.outputs.upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}

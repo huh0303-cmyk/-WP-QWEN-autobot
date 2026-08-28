@@ -1,9 +1,11 @@
-name: 종합상황실 (사이트+유튜브+SNS 통합 → 시트/이메일/카카오톡)
+name: 종합상황실 우선수집 (GSC+방문자+유튜브 → 시트/보고)
 
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "20 22 * * *"   # 07:20 KST (site-traffic 이후)
+    # 1순위 통계 작업: 사이트 상세 스냅샷(05:20 KST)이 끝난 직후 실행한다.
+    # GSC·방문자·유튜브를 콘텐츠 발행 작업보다 먼저 집계한다.
+    - cron: "50 20 * * *"   # 05:50 KST (전날 20:50 UTC)
 
 concurrency:
   group: situation-room-daily
@@ -18,13 +20,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
-
       - name: "종합상황실 수집 → 분석 → 발송"
         env:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -39,11 +38,6 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
-          # 2026-08-18: social_stats_daily.py의 _multi 함수(situation_room_daily.py가
-          # 이미 import해서 씀)는 브랜드별(TOPIK/ENGLISH/LANGUAGE) 시크릿을 찾는데,
-          # 여기 배선이 빠져있어서 TOPIK 외엔 항상 "미설정"으로만 나왔음 — 연결.
-          # 실제 시크릿 값은 아직 등록 안 돼있을 수 있고, 없으면 _multi 함수가
-          # 조용히 "계정 미설정"으로 리포트에 남길 뿐 에러는 아니다.
           TIKTOK_USERNAME_ENGLISH: ${{ secrets.TIKTOK_USERNAME_ENGLISH }}
           TIKTOK_USERNAME_LANGUAGE: ${{ secrets.TIKTOK_USERNAME_LANGUAGE }}
           FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
@@ -65,11 +59,14 @@ jobs:
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
         run: python scripts/situation_room_daily.py
-
       - name: "다음날 비교용 기록 커밋"
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add situation_room_history.json
-          git diff --cached --quiet && echo "변경 없음" || git commit -m "chore: 종합상황실 기록 갱신 [skip ci]"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add situation_room_history.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: 종합상황실 기록 갱신 [skip ci]"
           git push

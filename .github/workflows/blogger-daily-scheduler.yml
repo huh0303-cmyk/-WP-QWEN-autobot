@@ -1,0 +1,41 @@
+name: Blogger Daily - Gemini staggered publishing
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "8,28,48 * * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: blogger-daily-scheduler
+  cancel-in-progress: false
+
+jobs:
+  schedule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Dispatch one due Blogger site
+        env:
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/blogger_daily_scheduler.py
+      - name: Save daily dispatch state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add blogger_scheduler_state.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: Blogger daily scheduler state [skip ci]"
+          git push

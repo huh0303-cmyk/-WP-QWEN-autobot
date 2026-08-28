@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""27개 사이트 전체에 daily_visitor_counter.php를 Code Snippets 플러그인
+"""kskin365.com을 포함한 27개 활성 사이트에 daily_visitor_counter.php를 Code Snippets 플러그인
 REST API로 배포(생성 또는 업데이트)한다. 사용자 지시(2026-08-21) — 푸터에
 일일 방문자수 표시 + 종합상황실이 조회할 공개 REST 엔드포인트."""
 import os
@@ -10,7 +10,7 @@ import requests
 from site_registry import ACTIVE_SITES
 
 WP_USER = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
-NAME = "Daily visitor counter v1"
+NAME = "Daily visitor counter v2"
 SOURCE = Path(__file__).with_name("daily_visitor_counter.php")
 
 
@@ -59,6 +59,8 @@ def main():
         else:
             fail += 1
     print(f"\n완료: 성공 {ok} / 스킵 {skip} / 실패 {fail} (총 {len(ACTIVE_SITES)}개)")
+    if ok != len(ACTIVE_SITES) or skip or fail:
+        raise SystemExit(f"27개 전체 배포 미완료: 성공={ok}, 스킵={skip}, 실패={fail}")
 
 
 if __name__ == "__main__":

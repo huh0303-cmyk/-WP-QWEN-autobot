@@ -1,10 +1,15 @@
 name: "Two Newsrooms — 3–10 Daily Editions"
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      newsroom:
+        description: "koreanews365 / theseouljournal"
+        required: true
+        type: choice
+        options: [koreanews365, theseouljournal]
+        default: koreanews365
   schedule:
-    # Ten opportunities; a stable random daily cap and fresh-source gate decide publication.
     - cron: "31 22 * * *"
     - cron: "43 0 * * *"
     - cron: "8 2 * * *"
@@ -15,74 +20,89 @@ on:
     - cron: "41 9 * * *"
     - cron: "22 11 * * *"
     - cron: "53 12 * * *"
-  workflow_dispatch:
-    inputs:
-      newsroom:
-        description: "both / koreanews365 / theseouljournal"
-        required: false
-        default: "both"
-      random_delay:
-        description: "Apply 0-12 minute random delay"
-        required: false
-        default: "false"
+    - cron: "3 23 * * *"
+    - cron: "15 1 * * *"
+    - cron: "40 2 * * *"
+    - cron: "49 3 * * *"
+    - cron: "18 5 * * *"
+    - cron: "1 7 * * *"
+    - cron: "38 8 * * *"
+    - cron: "13 10 * * *"
+    - cron: "54 11 * * *"
+    - cron: "25 13 * * *"
 
 permissions:
   contents: read
 
 concurrency:
-  group: newsroom-edition-${{ github.ref }}-${{ github.event.schedule || github.run_id }}
+  group: newsroom-${{ github.event.schedule || inputs.newsroom || github.run_id }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - key: koreanews365
-            url: https://koreanews365.com
-          - key: theseouljournal
-            url: https://theseouljournal.com
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[newsroom-launch]')) }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install publisher dependencies
-        run: pip install requests google-genai beautifulsoup4 lxml Pillow -q
-      - name: Randomize edition time
-        if: ${{ github.event_name == 'schedule' || inputs.random_delay == 'true' }}
-        run: sleep $((RANDOM % 721))
+      - run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+      - name: Resolve newsroom
+        id: target
+        shell: bash
+        run: |
+          S="${{ github.event.schedule }}"
+          MANUAL="${{ inputs.newsroom }}"
+          if [ -n "$MANUAL" ]; then
+            KEY="$MANUAL"
+          elif [[ "$S" == "3 23 * * *" || "$S" == "15 1 * * *" || "$S" == "40 2 * * *" || "$S" == "49 3 * * *" || "$S" == "18 5 * * *" || "$S" == "1 7 * * *" || "$S" == "38 8 * * *" || "$S" == "13 10 * * *" || "$S" == "54 11 * * *" || "$S" == "25 13 * * *" ]]; then
+            KEY="theseouljournal"
+          else
+            KEY="koreanews365"
+          fi
+          if [ "$KEY" = "theseouljournal" ]; then URL="https://theseouljournal.com"; else URL="https://koreanews365.com"; fi
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
       - name: Repair recent source-based categories
         env:
-          TARGET_SITE_URL: ${{ matrix.url }}
+          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/repair_recent_newsroom_categories.py
       - name: Publish one source-checked edition
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.newsroom == 'both' || inputs.newsroom == matrix.key }}
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
-          TARGET_SITE_URL: ${{ matrix.url }}
+          WP_POST_STATUS: "publish"
+          WP_PUBLICATION_APPROVED: "true"
+          AUTOMATION_HUB_SOURCE: "sheets"
+          AI_TEXT_PROVIDER: "openai"
+          OPENAI_ENABLED: "true"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5.6-luna"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/autopost_mega.py
+        run: python scripts/autopost_current.py
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: newsroom-result-${{ matrix.key }}
+          name: newsroom-result-${{ steps.target.outputs.key }}-${{ github.run_id }}
           path: newsroom_publish_result.json
           if-no-files-found: warn
           retention-days: 7

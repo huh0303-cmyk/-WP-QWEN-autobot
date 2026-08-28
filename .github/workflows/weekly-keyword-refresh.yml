@@ -1,12 +1,11 @@
-name: "Weekly Keyword Pool Refresh (Sunday)"
+name: "Weekly Keyword Pool Refresh — 25 blogs"
 
-# 2026-08-22 사용자 지시: "키워드가 가장 중요해.. 매주 일요일마다 재검색해서
-# 키워드 pool을 업데이트해줘." Gemini의 Google 검색 그라운딩으로 그 주에
-# 실제로 화제인 키워드를 리서치해 data/keywords/*.txt를 갱신하고 커밋한다.
+# 매주 실제 검색수요를 다시 조사해 25개 블로그의 키워드 풀을 갱신한다.
+# 뉴스 2개는 RSS/뉴스 소스 기반이라 대상에서 제외한다.
+# 2026-08-26: kskin365 누락(24/25) 수정, OpenAI 잔액 0 상태의 불필요한 429 재시도 제거.
 on:
   schedule:
-    # 매주 일요일 22:00 UTC = 월요일 07:00 KST(주가 시작 전 새 키워드 준비)
-    - cron: "0 22 * * 0"
+    - cron: "0 22 * * 0"   # 월요일 07:00 KST
   workflow_dispatch:
 
 permissions:
@@ -19,7 +18,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,17 +26,18 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install google-genai requests -q
-      - name: Research this week's keywords
+      - name: Research current keywords for all 25 blogs
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python scripts/refresh_keyword_pool.py
-      - name: Commit updated keyword pool
+        run: python scripts/refresh_keyword_pool_current.py
+      - name: Commit updated keyword pools
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/keywords/
-          git diff --staged --quiet || git commit -m "chore: 주간 키워드 풀 갱신 [skip ci]"
+          git stash --include-untracked || true
           git pull --rebase origin main
+          git stash pop || true
+          git add data/keywords/ 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 25블로그 주간 키워드 풀 갱신 [skip ci]"
           git push

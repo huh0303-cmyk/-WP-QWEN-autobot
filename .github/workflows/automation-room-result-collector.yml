@@ -1,0 +1,57 @@
+name: "Automation Rooms — Result Collector"
+
+on:
+  workflow_run:
+    workflows:
+      - "Blog Publish — Single Site (dispatched by A/B scheduler)"
+      - "Automation Hub — platform publish"
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Google API dependencies
+        run: pip install google-api-python-client google-auth requests -q
+      - name: Download worker artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: collected-artifacts
+      - name: Locate standardized room result
+        id: locate
+        shell: bash
+        run: |
+          result="$(find collected-artifacts -type f -name automation-room-result.json | head -n 1)"
+          if [ -z "$result" ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "path=$result" >> "$GITHUB_OUTPUT"
+      - name: Apply result to Google Sheet situation room
+        if: steps.locate.outputs.found == 'true'
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python scripts/apply_room_result_to_sheets.py --result "${{ steps.locate.outputs.path }}"
+      - name: Preserve collector evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: room-result-collector-${{ github.event.workflow_run.id }}
+          path: collected-artifacts/**
+          retention-days: 14
+          if-no-files-found: ignore

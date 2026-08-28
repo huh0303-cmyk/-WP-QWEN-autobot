@@ -14,6 +14,12 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
 
 import os, sys, time, random, re, json, hashlib, base64
 import requests
+# Direct workflow execution uses `python scripts/autopost_mega.py`, which makes
+# scripts/ (not the repository root) sys.path[0]. Add the root for shared modules.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+from automation_hub.public_verifier import verify_publication
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -29,11 +35,13 @@ def now_kst():
 NEWSROOM_DAILY_MIN = 3
 NEWSROOM_DAILY_MAX = 10
 
-def newsroom_daily_target(site_url, day=None):
+def newsroom_daily_target(site_url, day=None, daily_min=NEWSROOM_DAILY_MIN, daily_max=NEWSROOM_DAILY_MAX):
     """Stable per-site target for one KST day; changes automatically next day."""
     day = day or now_kst().date()
     seed = hashlib.sha256(f"{site_url}|{day.isoformat()}".encode()).digest()
-    return NEWSROOM_DAILY_MIN + int.from_bytes(seed[:4], "big") % 8
+    if daily_max < daily_min:
+        raise ValueError(f"invalid newsroom daily range: {daily_min}-{daily_max}")
+    return daily_min + int.from_bytes(seed[:4], "big") % (daily_max - daily_min + 1)
 
 def count_published_today(site_url, wp_pass):
     """Count posts published since KST midnight; fail closed on API errors."""
@@ -60,8 +68,9 @@ WP_USER         = "huh0303@gmail.com"
 
 RUN_SLOT            = int(os.getenv("RUN_SLOT", "1"))
 SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
+AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
 
-gemini_client         = genai.Client(api_key=GEMINI_API_KEY)
+gemini_client         = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash-lite"
 GEMINI_MODEL_FALLBACK = "gemini-2.5-flash"
 GEMINI_MODEL          = GEMINI_MODEL_PRIMARY
@@ -71,10 +80,10 @@ _gemini_fallback_active = False
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
 TAG_COUNT   = 10
-# 2026-08-17 사용자 지시: "SEO점수 80점 이상, 두번시도 해서 안되면 발행하지 말것"
+# 2026-08-28 사용자 지시: "발행기준 SEO 75점"
 # — 예전 90/3회(4번 시도)보다 기준은 낮췄지만 시도 횟수를 줄여 ChatGPT 전환 후
-# 비용을 통제. 80점도 여전히 하드 게이트(미달이면 발행 자체 스킵, process_one 참고).
-SEO_TARGET  = 80
+# 비용을 통제. 75점은 하드 게이트(미달이면 발행 자체 스킵, process_one 참고).
+SEO_TARGET  = 75
 MAX_REGEN   = 1
 
 # ============================================================
@@ -149,10 +158,10 @@ AUTHOR_BY_SITE_DEF = {
         "bio": "Korea Technology Industry Desk. Source-checked information within this site's stated editorial scope."
     },
     "kskin365.com": {
-        "name": "Retired Site",
+        "name": "Korea Skincare Guide Desk",
         "email": "editor@kskin365.com",
         "slug": "kskin365-com-desk",
-        "bio": "Retired Site. Source-checked information within this site's stated editorial scope."
+        "bio": "Korea Skincare Guide Desk. Source-checked information within this site's stated editorial scope."
     },
     "oliveyoungkorea.com": {
         "name": "Olive Young Shopping Guide Desk",
@@ -461,7 +470,7 @@ THEME_CATEGORY_MAP = {
         (["문화","K-pop","드라마","영화"],"문화 (CULTURE)"),
         (["금융","주가","증시","은행"],"금융 (FINANCE)"),
         (["부동산","아파트","주택","집값","전세"],"부동산 (REAL ESTATE)"),
-        (["국방","군사","군대","국방부"],"국방 (MILITARY)"),
+        (["국방","군사","군대","국방부","defense","department of defense","war.gov"],"국방 (MILITARY)"),
         (["예술","미술","전시"],"예술 (ART)"),
         (["스포츠","야구","축구","올림픽"],"스포츠 (SPORTS)"),
         (["국제","미국","중국","일본","EU","UN","외교","북한"],"글로벌 (GLOBAL)"),
@@ -896,14 +905,22 @@ SITE_PERSONA = {
         "cta": "Read the related technology explainer"
     },
     "https://kskin365.com": {
-        "persona_en": "Retired site.",
-        "scope": "No new content",
-        "tone": "No publication.",
-        "structure": [],
-        "min_chars": 0,
-        "tables": 0,
+        "persona_en": "K-Beauty Skin Science editorial desk.",
+        "scope": "Evidence-led Korean skincare ingredients, routines, product categories and skin-safety guidance for international readers",
+        "tone": "Clear, ingredient-first and cautious. Never claim personal product testing, medical credentials, guaranteed results or undisclosed sponsorship.",
+        "structure": [
+            "Skin concern and reader goal",
+            "Ingredient or product-category evidence",
+            "How to read the label",
+            "Routine placement and compatibility",
+            "Irritation risks and who should avoid it",
+            "Regulatory or manufacturer sources and checked date",
+            "Practical comparison checklist"
+        ],
+        "min_chars": (1900, 2500),
+        "tables": 1,
         "lang": "en",
-        "cta": ""
+        "cta": "Compare the ingredient list and patch-test guidance"
     },
     "https://oliveyoungkorea.com": {
         "persona_en": "Olive Young Shopping Guide editorial desk.",
@@ -1169,7 +1186,7 @@ SITE_PERSONA = {
             "확인된 사실과 미확인 사항",
             "원문 출처 링크·작성 시각·수정 이력"
         ],
-        "min_chars": (1200, 1800),
+        "min_chars": 1500,
         "max_chars": 2000,
         "tables": 0,
         "lang": "ko",
@@ -1188,7 +1205,7 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Linked source note, publication time and correction record"
         ],
-        "min_chars": (1200, 1800),
+        "min_chars": 1500,
         "max_chars": 2000,
         "tables": 0,
         "lang": "en",
@@ -1643,13 +1660,7 @@ _RHYTHM_PROFILES = [
            "for emphasis and pacing rather than a uniform rhythm throughout."},
 ]
 
-
-# 해시값을 그대로 5로 나누면 특정 리듬에 절반 가까이 몰리는 경우가 생겨서
-# (실측: flowing만 24개 중 10개) 주제가 인접한 사이트끼리는 반드시 다른
-# 리듬이 되도록 수동으로 고르게 배정. 새 사이트를 추가할 때는 여기 없으면
-# get_rhythm_for_site()가 해시 폴백으로 안전하게 처리한다.
 _SITE_RHYTHM_ASSIGNMENT = {
-    # 금융/투자 인접군 — 전부 서로 다르게
     "https://koreainvest365.com": "scannable",
     "https://ki-korea.com": "formal",
     "https://koreainsurance365.com": "conversational",
@@ -1658,20 +1669,16 @@ _SITE_RHYTHM_ASSIGNMENT = {
     "https://koreacrypto365.com": "flowing",
     "https://krealestate365.com": "punchy",
     "https://ktech365.com": "scannable",
-    # 건강 인접군
     "https://k-health365.com": "flowing",
     "https://koreamedicaltour.com": "conversational",
-    # 교육 인접군
     "https://kstudy365.com": "formal",
     "https://studyinkorea365.com": "conversational",
     "https://kieca-korea.org": "punchy",
     "https://ksa-korea.org": "scannable",
     "https://sis-korea.com": "flowing",
-    # 구직 인접군
     "https://jobkorea365.com": "formal",
     "https://jobinkorea365.com": "punchy",
     "https://jobkoreaglobal.com": "conversational",
-    # 라이프스타일/여행/뷰티
     "https://oliveyoungkorea.com": "punchy",
     "https://kworld365.com": "conversational",
     "https://k-trip365.com": "flowing",
@@ -1690,45 +1697,38 @@ def get_rhythm_for_site(url):
     return _RHYTHM_PROFILES[idx]
 
 
-# ============================================================
-# ★★★ make_site_prompt — 사이트별 완전 분리 프롬프트 ★★★
-# ============================================================
 def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override=None):
     url   = site["url"]
     theme = site["theme"]
     lang  = site["lang"]
-    mode  = site.get("mode","blog")
+    mode  = site.get("mode", "blog")
     tag_count = tag_count or TAG_COUNT
 
     p = SITE_PERSONA.get(url, {})
-    min_chars  = min_chars_override if min_chars_override is not None else resolve_min_chars(url)
+    min_chars = min_chars_override if min_chars_override is not None else resolve_min_chars(url)
     tables_req = p.get("tables", 1)
     rhythm = get_rhythm_for_site(url)
-    structure  = randomize_structure_counts(p.get("structure", []))
-    scope      = p.get("scope", theme)
+    structure = randomize_structure_counts(p.get("structure", []))
+    scope = p.get("scope", theme)
 
     if lang == "ko":
-        persona = p.get("persona_ko","전문 칼럼니스트")
-        tone    = p.get("tone","전문적이고 친근한 스타일")
+        persona = p.get("persona_ko", "전문 칼럼니스트")
+        tone = p.get("tone", "전문적이고 친근한 스타일")
     else:
-        persona = p.get("persona_en","Expert writer")
-        tone    = p.get("tone","Professional and engaging")
+        persona = p.get("persona_en", "Expert writer")
+        tone = p.get("tone", "Professional and engaging")
 
-    ext   = get_authority_links(theme)
+    ext = get_authority_links(theme)
     ext_s = random.sample(ext, min(3, len(ext)))
-    ext_h = ", ".join(f"{n}({u})" for n,u in ext_s)
+    ext_h = ", ".join(f"{n}({u})" for n, u in ext_s)
 
     ilinks = get_internal_links(url, count=4)
-    il_str = "\n".join(f'  - <a href="{u}" title="{n}">{n}</a>' for n,u in ilinks)
-
-    struct_str = "\n".join(f"  {i+1}. {s}" for i,s in enumerate(structure))
+    il_str = "\n".join(f'  - <a href="{u}" title="{n}">{n}</a>' for n, u in ilinks)
+    struct_str = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(structure))
 
     medical_note = ""
-    if lang=="ko" and ("건강" in theme or "의학" in theme):
+    if lang == "ko" and ("건강" in theme or "의학" in theme):
         medical_note = '\n- ⚠️ "위험 신호 / 병원 가야 할 때" 섹션 필수\n- "이 글은 의학적 참고 정보이며, 진단·치료는 반드시 전문의와 상담하세요." 문구 필수'
-
-    # 참고: 제목(TITLE)과 바이라인은 AI 출력에 의존하지 않고 코드가 별도로 확정 생성/삽입한다
-    # (반복 패턴·형식 오류 방지). 그래서 프롬프트에서 관련 지시를 넣지 않아 토큰도 절약한다.
 
     # ★ 뉴스모드(news/news_en)는 keyword가 RSS 헤드라인 "문장 전체"라서, 블로그용
     #   "keyword를 첫 문장에 포함 + 10회 반복" / "TAGS 첫번째=keyword" 지시를 그대로 쓰면
@@ -1945,37 +1945,15 @@ Do not write a TITLE line (a separate system generates the title). Do not restat
 # ★ 유틸리티
 # ============================================================
 def generate_content_gemini(prompt):
-    # 2026-08-17: OPENAI_API_KEY가 있으면 ChatGPT로 라우팅 — 27개 사이트 글쓰기
-    # 엔진 "대수술" 결정. 이미지(Pixabay/Pexels)는 그대로 유지, 텍스트만 교체.
+    """Legacy call name retained; WordPress text is strictly GPT-only."""
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from openai_text import openai_available, openai_generate_text
         if openai_available():
             return openai_generate_text(prompt, temperature=0.85, max_retries=3)
-    except ImportError:
-        pass
-
-    global GEMINI_MODEL, _gemini_fallback_active
-    for attempt in range(3):
-        try:
-            resp = gemini_client.models.generate_content(
-                model=GEMINI_MODEL, contents=prompt,
-                config={"temperature":0.85,"max_output_tokens":8192}
-            )
-            return resp.text
-        except Exception as e:
-            err = str(e).lower()
-            if "429" in err or "quota" in err:
-                if not _gemini_fallback_active:
-                    print(f"  ⚠️ Quota → fallback")
-                    GEMINI_MODEL = GEMINI_MODEL_FALLBACK
-                    _gemini_fallback_active = True
-                    time.sleep(15); continue
-                else:
-                    time.sleep(60); raise
-            print(f"  ⚠️ Gemini 오류 ({attempt+1}): {e}")
-            if attempt < 2: time.sleep(10)
-    raise RuntimeError("Gemini 3회 실패")
+    except ImportError as exc:
+        raise RuntimeError("WordPress GPT provider module is unavailable; Gemini fallback is prohibited") from exc
+    raise RuntimeError("WordPress GPT credentials are unavailable; Gemini fallback is prohibited")
 
 def strip_code_fences(text):
     """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
@@ -2564,6 +2542,9 @@ def ensure_featured_media(site_url, pw, image_url, title):
 #   Gemini/나노바나나는 키 없거나 실패했을 때만) — gpt-image-1을 1순위로 시도.
 # ============================================================
 def gemini_generate_image(prompt, out_path, max_retries=3):
+    if os.getenv("PAID_IMAGE_GENERATION_ENABLED", "false").strip().lower() != "true":
+        print("  ⛔ Gemini/OpenAI 유료 이미지 생성 차단됨")
+        return False
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     last_err = None
     for attempt in range(max_retries):
@@ -2591,6 +2572,9 @@ def gemini_generate_image(prompt, out_path, max_retries=3):
     return False
 
 def get_fallback_nanobanana_image(site_url, pw, keyword, theme, lang):
+    if os.getenv("PAID_IMAGE_GENERATION_ENABLED", "false").strip().lower() != "true":
+        print("  ⛔ AI 이미지 폴백 차단 — 무료 스톡/로컬 인포그래픽만 사용")
+        return []
     try:
         en_concept = translate_ko_to_en_for_image(keyword, theme) if lang == "ko" else keyword
         prompt = (f"A realistic, editorial-style photograph representing '{en_concept}'. "
@@ -2758,11 +2742,31 @@ def strip_hash_artifacts(text):
         text = re.sub(pat, '', text, flags=re.IGNORECASE | re.MULTILINE)
     return text
 
-def is_site_reachable(site_url, timeout=8):
-    try:
-        r=requests.head(f"{site_url}/wp-json/",timeout=timeout,allow_redirects=True)
-        return r.status_code not in (403,503)
-    except: return False
+def is_site_reachable(site_url, timeout=12):
+    """Check WordPress REST availability without trusting a single HEAD request.
+
+    Some hosts and CDNs intermittently reject HEAD requests from GitHub runners even
+    though the REST API is healthy. Retry with GET and only treat persistent 5xx or
+    transport errors as unreachable. Authentication errors still prove reachability.
+    """
+    endpoint = f"{site_url.rstrip('/')}/wp-json/wp/v2/types/post"
+    headers = {"User-Agent": "WP-QWEN-autobot/2.0 (+GitHub Actions)"}
+    for attempt in range(3):
+        try:
+            response = requests.get(
+                endpoint,
+                timeout=timeout,
+                allow_redirects=True,
+                headers=headers,
+            )
+            if response.status_code < 500:
+                return True
+            print(f"  ⚠️ REST 연결 확인 {attempt + 1}/3: HTTP {response.status_code}")
+        except requests.RequestException as exc:
+            print(f"  ⚠️ REST 연결 확인 {attempt + 1}/3 실패: {exc}")
+        if attempt < 2:
+            time.sleep(2 ** attempt)
+    return False
 
 def split_slots(daily, num=3):
     base=daily//num; rem=daily%num
@@ -2907,13 +2911,13 @@ def build_author_bio_html(site_url, lang, reporter, keyword=""):
             f'<p style="margin:0;font-size:0.85em;color:#666;">{disclaimer}</p></div>')
 
 
-def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter):
+def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, reporter, category_hint=""):
     pw=os.getenv(site["wp_pass_env"],"")
     if not pw: return {"ok":False,"error":f"No password: {site['wp_pass_env']}"}
     url=site["url"]; theme=site["theme"]
 
     author_id=get_or_create_wp_author(url,pw,reporter)
-    cat_name=get_category_for_post(theme,keyword,title)
+    cat_name=get_category_for_post(theme,f"{category_hint} {keyword}".strip(),title)
     cat_id=0
     if site.get("mode") in ("news", "news_en"):
         wanted = re.sub(r'[\s/,\-]+', '', cat_name.lower())
@@ -2975,7 +2979,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     date_str     = target_kst.strftime("%Y-%m-%dT%H:%M:%S")
     date_gmt_str = target_gmt.strftime("%Y-%m-%dT%H:%M:%S")
 
-    data={"title":title,"content":final,"status":"publish",
+    from automation_hub.wordpress_policy import resolve_wordpress_post_status
+    requested_status = os.getenv("WP_POST_STATUS", "draft")
+    public_approved = os.getenv("WP_PUBLICATION_APPROVED", "false").strip().lower() == "true"
+    post_status = resolve_wordpress_post_status(
+        site, requested_status=requested_status, public_approved=public_approved
+    )
+    data={"title":title,"content":final,"status":post_status,
           "date":date_str,"date_gmt":date_gmt_str,
           "comment_status":"closed","ping_status":"closed",
           "categories":[cat_id] if cat_id and cat_id>0 else [],
@@ -2989,16 +2999,32 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     try:
         r=requests.post(f"{url}/wp-json/wp/v2/posts",auth=(WP_USER,pw),json=data,timeout=30)
         if r.status_code in (200,201):
-            pid=r.json().get("id"); purl=r.json().get("link","")
+            response_data=r.json()
+            pid=response_data.get("id"); purl=response_data.get("link","")
+            wp_status=response_data.get("status","")
+            if wp_status != post_status:
+                return {"ok":False,"post_id":pid,"status":wp_status,
+                        "error":f"WordPress returned unexpected status: {wp_status or 'missing'}; expected {post_status}"}
             # Rank Math 메타 확인
             time.sleep(2)
             vr=requests.get(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),timeout=10)
             if vr.status_code==200 and not vr.json().get("meta",{}).get("rank_math_focus_keyword"):
                 requests.patch(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),
                                json={"meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta}},timeout=15)
-            # IndexNow ping
+            if post_status == "draft":
+                return {"ok":True,"post_id":pid,"url":purl,"status":"draft",
+                        "author":reporter["name"],"category":cat_name,
+                        "verification":{"ok":True,"mode":"draft_review"}}
+            verification = verify_publication(purl, title, site_url=url)
+            if not verification.ok:
+                return {"ok":False,"post_id":pid,"status":wp_status,"url":purl,
+                        "error":f"public verification failed [{verification.error_code}]: {verification.error_message}",
+                        "verification":verification.to_dict()}
+            # IndexNow ping only after the public page is verified.
             ping_indexnow(purl, url)
-            return {"ok":True,"post_id":pid,"url":purl,"author":reporter["name"],"category":cat_name}
+            return {"ok":True,"post_id":pid,"url":verification.final_url or purl,"status":"publish",
+                    "author":reporter["name"],"category":cat_name,
+                    "verification":verification.to_dict()}
         else:
             return {"ok":False,"status":r.status_code,"error":r.text[:300]}
     except Exception as e:
@@ -3062,6 +3088,69 @@ def build_news_headline(keyword, lang):
         print(f"  ⚠️ 뉴스 헤드라인 재작성 실패: {e}")
     return keyword  # 실패 시 RSS 원본 헤드라인 그대로 사용(템플릿 왜곡보다 안전)
 
+def resize_newsroom_body(body, lang, source_summary, min_chars=1500, max_chars=2000):
+    """Bring a sourced newsroom draft into the promised article-length band."""
+    target_lo, target_hi = max(min_chars + 100, 1600), min(max_chars - 150, 1850)
+    instruction = (
+        "아래 뉴스 기사 HTML을 공백 제외 " if lang == "ko" else
+        "Edit the news article HTML below to "
+    )
+    instruction += (
+        f"{target_lo}~{target_hi}자로 편집하세요. 기존 확인 사실만 유지하고 새로운 사실·수치·인용을 만들지 마세요. "
+        "역피라미드 기사체와 HTML 태그를 유지하고, 설명 없이 기사 HTML만 출력하세요."
+        if lang == "ko" else
+        f"{target_lo}-{target_hi} non-whitespace characters. Preserve only confirmed facts; invent no facts, figures, quotes, or sources. "
+        "Keep readable newspaper style and HTML tags. Return article HTML only, with no commentary."
+    )
+    grounding = source_summary or "No additional source summary is available."
+    prompt = f"{instruction}\n\nSOURCE SUMMARY (fact boundary):\n{grounding}\n\nARTICLE HTML:\n{body}"
+    revised = strip_code_fences(generate_content_gemini(prompt)).strip()
+    # Guard against an occasional model-added metadata tail.
+    revised = re.split(r'\n\s*META_DESC:', revised, maxsplit=1, flags=re.IGNORECASE)[0].strip()
+    return revised if re.search(r'<(?:p|h2|h3)[\s>]', revised, re.IGNORECASE) else body
+
+def newsroom_char_count(body):
+    """Editorial character count: visible text including ordinary spaces."""
+    plain = BeautifulSoup(body, "html.parser").get_text(" ", strip=True)
+    return len(re.sub(r'\s+', ' ', plain))
+
+def trim_newsroom_html(body, target_chars=1900):
+    """Trim visible text from the end while preserving valid HTML."""
+    soup = BeautifulSoup(body, "html.parser")
+    excess = newsroom_char_count(str(soup)) - target_chars
+    if excess <= 0:
+        return body
+    for node in reversed(list(soup.find_all(string=True))):
+        if excess <= 0:
+            break
+        text = str(node)
+        visible = len(text)
+        if not text.strip():
+            continue
+        if visible <= excess:
+            excess -= visible
+            node.extract()
+            continue
+        keep = max(0, visible - excess)
+        shortened = text[:keep].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        if shortened and shortened[-1] not in ".!?。！？다요":
+            shortened += "."
+        node.replace_with(shortened)
+        excess = 0
+    for tag in list(soup.find_all(["p", "h2", "h3", "li"])):
+        if not tag.get_text(" ", strip=True):
+            tag.decompose()
+    return str(soup)
+
+def build_newsroom_meta(title, source_summary, lang):
+    prompt = (
+        f"다음 기사 제목과 출처 요약을 바탕으로 사실을 추가하지 말고 100~140자의 한국어 메타 설명만 작성하세요.\n제목: {title}\n요약: {source_summary or ''}"
+        if lang == "ko" else
+        f"Write only a factual 120-155 character English meta description from this title and source summary. Add no new facts.\nTitle: {title}\nSummary: {source_summary or ''}"
+    )
+    text = generate_content_gemini(prompt).strip().strip('"').strip("'")
+    return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
+
 def process_one(site, keyword):
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
@@ -3078,6 +3167,7 @@ def process_one(site, keyword):
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
         if not keyword:
             print("  NEWS SOURCE GATE: no licensed/approved story lead; skipping")
+            log(url,theme,"__news__","","",0,0,"⛔ skip_no_fresh_source")
             return False
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=3:
             news_source=kw_tuple[2]
@@ -3100,14 +3190,14 @@ def process_one(site, keyword):
             "If the available facts are limited, write a concise brief rather than padding the article."
         )
     prompt=base_prompt
-    best_score=0; best_result=None
+    best_score=0; best_result=None; best_length_valid=False
 
     for attempt in range(MAX_REGEN+1):
         try:
             raw=generate_content_gemini(prompt)
         except Exception as e:
-            print(f"  ❌ Gemini 실패: {e}")
-            log(url,theme,keyword,"","",0,0,"❌ Gemini 실패",str(e))
+            print(f"  ❌ AI 생성 실패: {e}")
+            log(url,theme,keyword,"","",0,0,"❌ AI 생성 실패",str(e))
             return False
 
         time.sleep(SLEEP_BETWEEN_POSTS)
@@ -3127,8 +3217,17 @@ def process_one(site, keyword):
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
 
-        if pre>best_score:
+        candidate_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+        candidate_length_valid = not (
+            mode in ("news", "news_en")
+        ) or (candidate_len >= min_chars and (not max_chars or candidate_len <= max_chars))
+        # 뉴스룸에서는 일반 블로그 SEO 점수보다 약속한 기사 길이를 우선한다.
+        # 그렇지 않으면 재생성된 정상 길이 기사보다 짧은 초안이 선택될 수 있다.
+        if (candidate_length_valid and not best_length_valid) or (
+            candidate_length_valid == best_length_valid and pre > best_score
+        ):
             best_score=pre; best_result=(body,title,meta,faq,tags)
+            best_length_valid=candidate_length_valid
 
         if pre>=quality_target:
             print(f"  ✅ {pre}점 달성"); break
@@ -3154,9 +3253,37 @@ def process_one(site, keyword):
             time.sleep(5)
 
     body,title,meta,faq,tags=best_result
-    newsroom_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    newsroom_len=newsroom_char_count(body)
+    if mode in ("news", "news_en") and not (min_chars <= newsroom_len <= (max_chars or newsroom_len)):
+        print(f"  ✂️ 뉴스 원고 길이 교정: {newsroom_len}자 → 목표 1600~1850자")
+        try:
+            body = resize_newsroom_body(body, lang, news_source_summary, min_chars, max_chars or 2000)
+            newsroom_len=newsroom_char_count(body)
+            print(f"  ✂️ 교정 결과: {newsroom_len}자")
+        except Exception as exc:
+            print(f"  ⚠️ 뉴스 원고 길이 교정 실패: {exc}")
+    # Reserve a bounded amount for the fixed source note appended below.  The
+    # former 450-character reserve could force a valid 1,750+ draft down to
+    # 1,550 characters, below the configured minimum.  Never choose a trim
+    # target below the newsroom minimum.
+    if mode in ("news", "news_en") and max_chars:
+        attribution_reserve = min(220, max(120, max_chars - min_chars))
+        trim_target = max(min_chars, max_chars - attribution_reserve)
+    else:
+        trim_target = None
+    if trim_target and newsroom_len > trim_target:
+        body = trim_newsroom_html(body, target_chars=trim_target)
+        newsroom_len = newsroom_char_count(body)
+        print(f"  ✂️ HTML 보존 상한 교정 결과: {newsroom_len}자")
+    if mode in ("news","news_en") and newsroom_len < min_chars:
+        print(f"  ⛔ 뉴스 본문 {newsroom_len}자 < {min_chars}자 → 발행 스킵")
+        log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_short",
+            f"length={newsroom_len}, required={min_chars}-{max_chars}")
+        return False
     if mode in ("news","news_en") and max_chars and newsroom_len>max_chars:
         print(f"  ⛔ 뉴스 본문 {newsroom_len}자 > {max_chars}자 → 발행 스킵")
+        log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_long",
+            f"length={newsroom_len}, required={min_chars}-{max_chars}")
         return False
 
     # ★ 발행 직전 최종 방어선: '#' 잔재 강제 제거 (재발 방지 안전장치)
@@ -3185,13 +3312,20 @@ def process_one(site, keyword):
         else:
             body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
 
+    if mode in ("news", "news_en") and len(meta.strip()) < 80:
+        try:
+            meta = build_newsroom_meta(title, news_source_summary, lang)
+            print(f"  📝 뉴스 메타 보완: {len(meta)}자")
+        except Exception as exc:
+            print(f"  ⚠️ 뉴스 메타 보완 실패: {exc}")
+
     if best_score<quality_target and mode not in ("news", "news_en"):
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
-    if site.get("no_image"):
+    if not AUTOMATED_IMAGE_PUBLISHING_ENABLED or site.get("no_image"):
         images=[]
-        print(f"  🚫 이미지 없음 (no_image=True)")
+        print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
         # 2026-08-22: 전 사이트가 매번 정확히 2장으로 고정돼 있던 것도 글자수와
         # 같은 이유(매 글 동일 패턴 = AI 대량생산 흔적)로 2~3장 랜덤화.
@@ -3223,7 +3357,7 @@ def process_one(site, keyword):
     rank="🏆" if score>=95 else "✅" if score>=90 else "⚠️" if score>=80 else "❌"
     print(f"  📊 SEO {score}/100 {rank}")
 
-    plain_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
@@ -3236,12 +3370,30 @@ def process_one(site, keyword):
     #   만든 글을 다시 분석해서 갱신해주는 게 아니라서, 실제 RankMath 분석
     #   점수와는 다를 수 있음. 그래도 현재 유일하게 있는 사전 품질 신호라
     #   이걸 게이트로 쓴다.)
-    if score < quality_target:
+    # 뉴스룸은 일반 블로그용 SEO 채점표(FAQ, 표, 4개 내부링크, 3천자에 가점)를
+    # 그대로 적용하면 1,500~2,000자 기사체 원고가 구조적으로 70점에 도달하기
+    # 어렵다. 출처·길이·메타·태그·제목을 별도 하드 게이트로 검증한다.
+    newsroom_gate_ok = (
+        mode in ("news", "news_en")
+        and bool(news_source and news_source_url)
+        and min_chars <= plain_len <= (max_chars or plain_len)
+        and bool(title.strip())
+        and len(meta.strip()) >= 80
+        and len(tags) >= 6
+    )
+    if mode in ("news", "news_en"):
+        if not newsroom_gate_ok:
+            reason = (f"source={bool(news_source and news_source_url)}, length={plain_len}/"
+                      f"{min_chars}-{max_chars}, meta={len(meta)}, tags={len(tags)}")
+            print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
+            log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
+            return False
+    elif score < quality_target:
         print(f"  ⛔ 품질점수 {score}점 < 뉴스/콘텐츠 목표 {quality_target}점 → 발행 스킵")
         log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
         return False
 
-    cat_name=get_category_for_post(theme,keyword,title)
+    cat_name=get_category_for_post(theme,f"{news_source or ''} {keyword}".strip(),title)
     print(f"  📁 카테고리: {cat_name}")
 
     # ★ 2026-08-03: 예전엔 뉴스모드 2개 사이트만 중복 제목을 걸렀음(그것도 완전
@@ -3257,10 +3409,13 @@ def process_one(site, keyword):
             return False
         sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
-    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
+    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,category_hint=news_source or "")
     if result["ok"]:
-        print(f"  ✅ 발행: {result.get('url','')} | {result.get('author','')} | {result.get('category','')}")
-        log(url,theme,keyword,title,result.get("url",""),score,len(images),"✅ OK",author=result.get("author",""),category=result.get("category",""))
+        is_draft = result.get("status") == "draft"
+        outcome = "초안 생성" if is_draft else "공개 발행"
+        log_status = "✅ DRAFT" if is_draft else "✅ OK"
+        print(f"  ✅ {outcome}: {result.get('url','')} | {result.get('author','')} | {result.get('category','')}")
+        log(url,theme,keyword,title,result.get("url",""),score,len(images),log_status,author=result.get("author",""),category=result.get("category",""))
         return True
     else:
         err=result.get("error","")
@@ -3280,7 +3435,9 @@ def main():
         return
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
-    print(f"   Gemini: {GEMINI_MODEL} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
+    provider = os.getenv("AI_TEXT_PROVIDER", "auto").strip().lower()
+    model = os.getenv("OPENAI_MODEL", "gpt-5.6-luna") if provider == "openai" else GEMINI_MODEL
+    print(f"   AI: {provider}/{model} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
     print(f"   ✅ 카테고리 생성 금지 — 기존 카테고리 중에서만 매칭 (pick_best_category)")
     print(f"   ✅ 27개 사이트별 독립 페르소나 (SITE_PERSONA)")
     print(f"   ✅ IndexNow 발행 즉시 ping")
@@ -3320,7 +3477,11 @@ def main():
                 print(f"⏭  {url} — 이번 슬롯 없음"); continue
 
         if site["mode"] in ("news", "news_en"):
-            daily_target = newsroom_daily_target(url)
+            daily_target = newsroom_daily_target(
+                url,
+                daily_min=site.get("daily_min", NEWSROOM_DAILY_MIN),
+                daily_max=site.get("daily_max", NEWSROOM_DAILY_MAX),
+            )
             published_today = count_published_today(url, os.getenv(site["wp_pass_env"], ""))
             if published_today is None:
                 print(f"⏭  {url} — 오늘 발행량 확인 실패, 안전 중지")
@@ -3351,14 +3512,28 @@ def main():
                     else load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
             if site["mode"] not in ("news","news_en"):
                 kw=sanitize_keyword(kw, f"{theme} guide 2026")
-            if process_one(site,kw): ok+=1
-            else: fail+=1
+            try:
+                if process_one(site,kw): ok+=1
+                else: fail+=1
+            except Exception as exc:
+                detail=f"{type(exc).__name__}: {exc}"[:500]
+                print(f"  ❌ 처리 중 예외: {detail}")
+                log(url,theme,kw,"","",0,0,"❌ unhandled_exception",detail)
+                fail+=1
             if i<n-1: time.sleep(random.uniform(10,18))
 
+    failed_records = [r for r in _log_buf if r.get("status") not in {"✅ OK", "✅ DRAFT"}]
+    for record in failed_records:
+        detail = (record.get("error") or record.get("status") or "unknown failure")
+        detail = str(detail).replace("\n", " ").replace("\r", " ")[:500]
+        print(f"::error title=Newsroom gate::{record.get('site')} | {record.get('status')} | {detail}")
     flush_log()
     print(f"\n{'='*60}")
     print(f"✅ 완료 — 성공:{ok} / 실패:{fail} / 스킵:{skip}")
     print(f"{'='*60}\n")
+    if os.getenv("NEWSROOM_REQUIRE_PUBLICATION", "false").strip().lower() == "true" and (fail or skip) and not ok:
+        print(f"::error title=Publication failed::No post was published; failed={fail}, skipped={skip}. See newsroom_publish_result.json")
+        raise SystemExit(1)
 
 if __name__=="__main__":
     main()

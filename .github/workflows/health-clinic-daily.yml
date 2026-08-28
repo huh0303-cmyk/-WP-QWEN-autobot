@@ -1,15 +1,8 @@
-name: Health Clinic 장편 자동생성 (한/영/일, 주3회)
+name: Health Clinic 장편 자동생성 (한/영/일, 수동 검수)
 
+# 자동 schedule은 비용/Drive 안정성 검증 전까지 중단.
+# 이미지 정책: REPLICATE_API_TOKEN + 승인 3모델만 사용.
 on:
-  # 2026-08-17 자동 스케줄 일시 중단: 9번 실행 전부 Drive 업로드 단계(JSONDecodeError,
-  # OAuth 토큰 문제)에서 실패했는데, 그 실패 지점이 대본/TTS/이미지 생성(Gemini/ElevenLabs
-  # 비용 발생)을 이미 다 끝낸 "뒤"라서 매번 돈만 쓰고 결과물은 0이었음(사용자 지시:
-  # "낭비 안되게 다 막아"). 근본 원인(Drive 인증) 고쳐서 실제로 성공하는 거 확인 전까지
-  # 자동 실행 중단 — 수동 실행(workflow_dispatch)은 테스트용으로 남겨둠.
-  # schedule:
-  #   - cron: "13 0 * * 1,3,5"    # 09:13 KST — 한국어 (중단됨)
-  #   - cron: "38 5 * * 1,3,5"    # 14:38 KST — 영어 (중단됨)
-  #   - cron: "52 11 * * 1,3,5"   # 20:52 KST — 일본어 (중단됨)
   workflow_dispatch:
     inputs:
       lang:
@@ -20,7 +13,7 @@ on:
         description: "영상 주제 (비우면 언어별 주제풀에서 무작위 선택)"
         required: false
       only:
-        description: "테스트용: 실행할 단계만 쉼표로 (예: script,video,thumbnail,notify — 업로드 제외 테스트). 비우면 전체 실행"
+        description: "테스트용 실행 단계 (예: script,video,thumbnail,notify)"
         required: false
 
 concurrency:
@@ -36,55 +29,36 @@ jobs:
         working-directory: scripts/health_clinic
     steps:
       - uses: actions/checkout@v4
-
-      - name: Python 설치
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: 시스템 패키지 설치 (ffmpeg, 한글/일본어/영어 자막·썸네일용 폰트)
+      - name: 시스템 패키지 설치
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q ffmpeg fonts-nanum fonts-noto-cjk fonts-dejavu-core
-
       - name: 패키지 설치
         run: pip install -r requirements.txt
-
-      - name: 언어/주제 결정 (스케줄 실행 시 cron별로 언어 매핑 + 주제 무작위 선택)
+      - name: 언어/주제 결정
         id: pick
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            LANG_IN="${{ github.event.inputs.lang }}"
-            TOPIC_IN="${{ github.event.inputs.topic }}"
-          else
-            case "${{ github.event.schedule }}" in
-              "13 0 * * 1,3,5")  LANG_IN="kr" ;;
-              "38 5 * * 1,3,5")  LANG_IN="en" ;;
-              "52 11 * * 1,3,5") LANG_IN="jp" ;;
-              *) LANG_IN="en" ;;
-            esac
-            TOPIC_IN=""
-          fi
-
-          # 언어별 주제 목록은 서로 직역이 아니라 각 나라 문화/제도에 맞게 다르게 구성 (중복 컨텐츠 방지)
+          LANG_IN="${{ github.event.inputs.lang }}"
+          TOPIC_IN="${{ github.event.inputs.topic }}"
           if [ -z "$TOPIC_IN" ]; then
             case "$LANG_IN" in
               kr) TOPICS=("국민건강검진 200% 활용법" "무릎 통증 완화 스트레칭" "갱년기 극복한 선배들의 조언" "혈압 낮추는 집밥 반찬" "화투로 치매 예방하는 이유" "장수마을 어르신들의 아침 습관" "당뇨 잡는 나물 반찬 5가지" "허리디스크 예방 앉는 자세" "명절 스트레스 관리법") ;;
               jp) TOPICS=("ラジオ体操で健康寿命を延ばす" "更年期の症状緩和" "温泉入浴と血行促進の関係" "和食で血糖値をコントロールする方法" "認知症予防の脳トレ習慣" "膝痛を防ぐ正しい歩き方" "一人暮らしシニアの孤独対策" "高齢者の熱中症対策" "腰痛を防ぐ布団と寝方") ;;
-              *)  TOPICS=("healthy aging tips for seniors" "menopause symptom relief for women over 50" "how Medicare covers preventive checkups" "gardening as low-impact exercise for seniors" "grandparent-grandchild bonding activities" "managing arthritis pain in cold weather" "heart-healthy comfort food swaps" "staying social after retirement" "fall-prevention home safety tips") ;;
+              *) TOPICS=("healthy aging tips for seniors" "menopause symptom relief for women over 50" "how Medicare covers preventive checkups" "gardening as low-impact exercise for seniors" "grandparent-grandchild bonding activities" "managing arthritis pain in cold weather" "heart-healthy comfort food swaps" "staying social after retirement" "fall-prevention home safety tips") ;;
             esac
-            IDX=$((RANDOM % ${#TOPICS[@]}))
-            TOPIC_IN="${TOPICS[$IDX]}"
+            TOPIC_IN="${TOPICS[$((RANDOM % ${#TOPICS[@]}))]}"
           fi
-
           echo "lang=$LANG_IN" >> "$GITHUB_OUTPUT"
           echo "topic=$TOPIC_IN" >> "$GITHUB_OUTPUT"
-          echo "선택됨: lang=$LANG_IN / topic=$TOPIC_IN"
-
       - name: 파이프라인 실행
         env:
+          # 텍스트용 Gemini 키는 이미지 생성에 사용되지 않는다.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID_KR_A: ${{ secrets.HEALTH_CLINIC_VOICE_ID_KR_A }}
           ELEVENLABS_VOICE_ID_KR_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_KR_B }}
@@ -92,19 +66,10 @@ jobs:
           ELEVENLABS_VOICE_ID_EN_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_B }}
           ELEVENLABS_VOICE_ID_JP_A: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_A }}
           ELEVENLABS_VOICE_ID_JP_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_B }}
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_KEY }}
           GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
-          # 2026-08-15: Drive 접근은 이 리포 공용 GOOGLE_OAUTH_* 토큰으로 통일
-          # (기존 HEALTH_CLINIC_GOOGLE_TOKEN_JSON 시크릿은 애초에 등록된 적이 없어서
-          # 항상 빈 파일이었음 — drive_utils.py 쪽에서 이 토큰을 우선 사용하도록 수정함).
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          # 2026-08-13: 언어별 실제 업로드 채널을 구분하려면 언어마다 별도 OAuth
-          # refresh token이 필요하다(공유 token.json 1개로는 3채널 라우팅 불가 — 위
-          # youtube_uploader.py 주석 참고). 셋 중 아직 발급 안 된 언어는 빈 값이라
-          # 그 언어 실행만 조용히 건너뛴다.
           YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
           YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
           HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR }}
@@ -119,5 +84,5 @@ jobs:
             ONLY_ARG="--only ${{ github.event.inputs.only }}"
           fi
           python main.py --lang "${{ steps.pick.outputs.lang }}" \
-                          --topic "${{ steps.pick.outputs.topic }}" \
-                          $ONLY_ARG
+                         --topic "${{ steps.pick.outputs.topic }}" \
+                         $ONLY_ARG

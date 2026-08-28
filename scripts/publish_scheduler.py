@@ -17,11 +17,15 @@ master_autopost.yml을 workflow_dispatch(step=post, publish_site=<url>)로 발�
 같은 사이트를 하루에 두 번 쏘지 않도록 scheduler_state.json으로 발사 여부를
 사이트별로 기록한다.
 
+2026-08-26 최소 30분 간격 안전장치 적용.
+2026-08-26 최종 등급/빈도 정책 적용: A 17개는 주 3~4회, B 8개는
+주 2~3회. 사이트별 ISO 주차 시드로 요일을 매주 다시 뽑고 각 사이트마다
+토/일 중 하루를 반드시 포함한다. 뉴스 2개는 계속 별도 워크플로우가 담당한다.
+
 2026-08-22 재개: master_autopost.yml/publish-scheduler.yml이 품질복구를
 이유로 한동안 꺼져 있다가, 사용자 지시("25개 블로그사이트는 1일 1포스팅
 시간 랜덤... 지금 실행해줘")로 다시 켬. 디스패치 대상을 새 워크플로우
-daily-network-publish.yml로 바꿨고, SITES 목록에서 퇴역한 kskin365.com과
-뉴스 2개 사이트(koreanews365/theseouljournal — newsrooms-daily-publisher.yml이
+daily-network-publish.yml로 바꿨고, 뉴스 2개 사이트(koreanews365/theseouljournal — newsrooms-daily-publisher.yml이
 이미 별도 시간규칙으로 하루 3~10건 처리 중이라 이 스케줄러 대상이 아님)를
 뺐다.
 """
@@ -31,32 +35,50 @@ import os
 import random
 import requests
 
+from load_automation_hub_from_sheets import load_runtime_registry
+
 KST = datetime.timezone(datetime.timedelta(hours=9))
 now = datetime.datetime.now(KST)
 today = now.strftime("%Y-%m-%d")
 
-# autopost_mega.py의 SITES_CONFIG 중 이 스케줄러가 담당하는 24개 사이트.
-# kskin365.com(퇴역)과 koreanews365/theseouljournal(별도 뉴스 스케줄러 사용
-# 중)은 제외 — 무거운 google-genai 등 의존성 없이 순수 requests만 쓰는 이
-# 스케줄러 워크플로우에서 autopost_mega.py를 그대로 import하지 않으려고
-# 독립 목록 유지(다른 스케줄/감사 스크립트들과 동일한 관례).
-SITES = [
-    "https://k-health365.com", "https://koreamedicaltour.com", "https://koreainvest365.com",
-    "https://ki-korea.com", "https://koreainsurance365.com", "https://kfinance365.com",
-    "https://koreataxnlaw.com", "https://koreacrypto365.com", "https://krealestate365.com",
-    "https://ktech365.com", "https://oliveyoungkorea.com",
-    "https://kworld365.com", "https://k-trip365.com", "https://k-visa365.com",
-    "https://koreawedding365.com", "https://kstudy365.com", "https://studyinkorea365.com",
-    "https://kieca-korea.org", "https://ksa-korea.org", "https://sis-korea.com",
-    "https://jobkorea365.com", "https://jobinkorea365.com", "https://jobkoreaglobal.com",
-    "https://korea365.org",
-]
+_registry = load_runtime_registry()
+BLOG_CONFIG = {
+    site.url.rstrip("/"): site
+    for site in _registry.enabled("wordpress")
+    if site.content_type == "blog" and site.publish_mode == "automatic"
+}
+A_GROUP = [url for url, site in BLOG_CONFIG.items() if site.group == "A"]
+B_GROUP = [url for url, site in BLOG_CONFIG.items() if site.group == "B"]
+SITES = A_GROUP + B_GROUP
 
-# 사이트마다 오늘 날짜+URL로 독립 시드 → 서로 다른 랜덤 시각(00:00~23:59), 매일 재추첨
+
+def weekly_publish_days(site_url):
+    """Return 0=Mon..6=Sun days for this site's current weekly plan."""
+    iso = now.date().isocalendar()
+    rng = random.Random(f"{iso.year}-W{iso.week}-{site_url}-weekly-cadence-v1")
+    config = BLOG_CONFIG[site_url]
+    count = rng.randint(config.weekly_min, config.weekly_max)
+    weekend_day = rng.choice([5, 6])
+    remaining = [day for day in range(7) if day != weekend_day]
+    return sorted([weekend_day] + rng.sample(remaining, count - 1))
+
+
+WEEKLY_PLANS = {site: weekly_publish_days(site) for site in SITES}
+TODAY_SITES = [site for site in SITES if now.weekday() in WEEKLY_PLANS[site]]
+
+# 오늘 대상만 순서를 섞고 45~75분 간격의 랜덤 슬롯에 배치한다. API 디스패치
+# 자체에도 최소 30분 안전장치가 있어 우연히 같은 시각에 몰릴 수 없다.
+_daily_rng = random.Random(f"{today}-network-spread-v2")
+_daily_rng.shuffle(TODAY_SITES)
+_minute_cursor = _daily_rng.randint(4 * 60, 7 * 60 + 30)
 SLOTS = {}
-for _site in SITES:
-    _seed = random.Random(f"{today}-{_site}-fullrandom-persite")
-    SLOTS[_site] = (_seed.randint(0, 23), _seed.randint(0, 59))
+_latest_minute = 23 * 60 + 15
+_max_gap = ((_latest_minute - _minute_cursor) // max(1, len(TODAY_SITES) - 1)
+            if len(TODAY_SITES) > 1 else 75)
+for _index, _site in enumerate(TODAY_SITES):
+    SLOTS[_site] = divmod(_minute_cursor, 60)
+    if _index < len(TODAY_SITES) - 1:
+        _minute_cursor += _daily_rng.randint(35, max(35, min(75, _max_gap)))
 
 STATE_FILE = "scheduler_state.json"
 
@@ -73,7 +95,7 @@ def load_state():
                 return s
         except Exception:
             pass
-    return {"date": today, "fired": {}}
+    return {"date": today, "fired": {}, "last_dispatch_at": None}
 
 
 def main():
@@ -81,8 +103,38 @@ def main():
     fired = state.get("fired", {})
     now_minutes = now.hour * 60 + now.minute
     changed = False
+    print(f"오늘 발행 대상 {len(TODAY_SITES)}/{len(SITES)}개 "
+          f"(A 주3~4회, B 주2~3회, 주말 포함)")
 
-    for site_url, (h, m) in SLOTS.items():
+    # 모든 블로그 디스패치 사이를 최소 30분 띄운다. 예전 방식은 각 사이트의
+    # 목표시각만 독립 랜덤이라 우연히 같은 시각에 여러 사이트가 몰릴 수 있었다.
+    last_dispatch_raw = state.get("last_dispatch_at")
+    if last_dispatch_raw:
+        try:
+            last_dispatch = datetime.datetime.fromisoformat(last_dispatch_raw)
+            if last_dispatch.tzinfo is None:
+                last_dispatch = last_dispatch.replace(tzinfo=KST)
+            elapsed_minutes = (now - last_dispatch.astimezone(KST)).total_seconds() / 60
+        except Exception:
+            elapsed_minutes = 30
+    else:
+        elapsed_minutes = 30
+
+    if elapsed_minutes < 30:
+        print(f"⏳ 마지막 디스패치 후 {elapsed_minutes:.1f}분 — 최소 30분 간격 대기")
+        state["fired"] = fired
+        with open(STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+        return
+
+    # 목표시각이 지난 사이트를 시간순으로 처리하되 한 실행당 최대 1개만 발사한다.
+    # 워크플로가 15분마다 실행되므로 실제 사이트 간격은 항상 30분 이상이다.
+    due_sites = sorted(
+        SLOTS.items(),
+        key=lambda item: item[1][0] * 60 + item[1][1],
+    )
+
+    for site_url, (h, m) in due_sites:
         if fired.get(site_url):
             continue
         target_minutes = h * 60 + m
@@ -108,7 +160,9 @@ def main():
                 print(f"  ▶ {site_url} 발행 트리거 → HTTP {r.status_code}")
                 if r.status_code in (200, 201, 204):
                     fired[site_url] = True
+                    state["last_dispatch_at"] = now.isoformat()
                     changed = True
+                    break
                 else:
                     print(f"  ⚠️ {site_url} 디스패치 실패 (HTTP {r.status_code}) — 다음 실행에서 재시도")
             except Exception as e:

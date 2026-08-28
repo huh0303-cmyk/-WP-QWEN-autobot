@@ -1,14 +1,17 @@
 import bcrypt
 import base64
+import os
 import time
 import requests
 
-NAVER_CLIENT_ID = "yoin1sTxAM3nZRlNWOURG"
-NAVER_CLIENT_SECRET = "$2a$04$2SMgfLZ6KshRNtu3zZBv/e"
-DOMEGGOOK_API_KEY = "6158ceeaf61ef5f74464e1059c699984"
+NAVER_CLIENT_ID = os.environ.get("NAVER_COMMERCE_CLIENT_ID", "").strip()
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_COMMERCE_CLIENT_SECRET", "").strip()
+DOMEGGOOK_API_KEY = os.environ.get("DOMEGGOOK_API_KEY", "").strip()
 
 
 def get_naver_token():
+    if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
+        raise RuntimeError("NAVER_COMMERCE_CLIENT_ID and NAVER_COMMERCE_CLIENT_SECRET are required")
     timestamp = str(int(time.time() * 1000))
     password = f"{NAVER_CLIENT_ID}_{timestamp}"
     hashed = bcrypt.hashpw(password.encode("utf-8"), NAVER_CLIENT_SECRET.encode("utf-8"))
@@ -31,6 +34,8 @@ def get_naver_token():
 
 
 def test_domeggook():
+    if not DOMEGGOOK_API_KEY:
+        raise RuntimeError("DOMEGGOOK_API_KEY is required")
     resp = requests.get(
         "https://domeggook.com/ssl/api/",
         params={

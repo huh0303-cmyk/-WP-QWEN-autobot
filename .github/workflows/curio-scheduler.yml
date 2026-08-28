@@ -1,13 +1,11 @@
 name: Curio Scheduler (지식채널 5개, 2-3일 간격 랜덤시간 발행 트리거)
 
-# 2026-08-23 사용자 지시로 "채널당 주3회 고정 요일" → "채널당 2~3일 간격으로
-# 하나씩, 랜덤 시각"으로 변경. curio-longform-daily.yml의 schedule: cron을
-# 대체 — 이제 이 워크플로우가 15분마다 scripts/curio_scheduler.py를 돌려서
-# 채널별 다음 예정일이 지난 것만 curio-longform-daily.yml을 dispatch한다.
+# 채널별 다음 예정일/랜덤 시각은 scripts/curio_scheduler.py가 결정한다.
+# 15분 폴링은 Actions 사용량만 크게 늘려 2026-08-26부터 매시 17분 1회 확인한다.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/15 * * * *"
+  # 자동 일정은 youtube-control-scheduler.yml로 통합했다. 이 워크플로는
+  # 상태 복구/수동 점검용으로만 남겨 중복 발행을 막는다.
 
 permissions:
   contents: write
@@ -20,6 +18,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +27,7 @@ jobs:
       - run: pip install requests -q
       - name: Check & dispatch channels whose next due date/time passed
         env:
-          GH_DISPATCH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python scripts/curio_scheduler.py
       - name: Commit scheduler state

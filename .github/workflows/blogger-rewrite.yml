@@ -1,0 +1,78 @@
+name: "Automation Hub — WordPress to Blogger rewrite"
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_wp_url:
+        description: "Source WordPress site URL"
+        required: true
+        type: string
+      blogger_site_id:
+        description: "site_id from 자동화_플랫폼계정"
+        required: true
+        type: string
+      language:
+        description: "Output language"
+        required: true
+        default: "en"
+        type: string
+      persona:
+        description: "Blog-specific persona"
+        required: true
+        default: "helpful specialist editor"
+        type: string
+      tone:
+        description: "Blog-specific tone"
+        required: true
+        default: "practical and clear"
+        type: string
+      target_chars:
+        description: "Approximate output characters"
+        required: true
+        default: "1800"
+        type: string
+      publish_now:
+        description: "Compatibility input only; generation is always queued with publish_now=FALSE"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blogger-rewrite-queue
+  cancel-in-progress: false
+
+jobs:
+  rewrite-and-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install requests google-api-python-client google-auth -q
+      - name: Rewrite with Gemini and add one Replicate-approved image
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          SOURCE_WP_URL: ${{ inputs.source_wp_url }}
+          BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
+          BLOGGER_LANGUAGE: ${{ inputs.language }}
+          BLOGGER_PERSONA: ${{ inputs.persona }}
+          BLOGGER_TONE: ${{ inputs.tone }}
+          BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
+          BLOGGER_MAX_SIMILARITY: "0.68"
+          BLOGGER_MIN_QUALITY_SCORE: "75"
+          BLOGGER_PUBLISH_NOW: "false"
+          FORCE_SOURCE_IPV4: "true"
+        run: python scripts/queue_blogger_rewrite.py

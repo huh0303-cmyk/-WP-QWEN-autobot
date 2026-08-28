@@ -1,13 +1,19 @@
-name: "26개 사이트 — 색인된 글만 남기고 나머지 비공개 전환"
+name: "25개 블로그 — GSC 비색인 글 전수 비공개"
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "실행하려면 정확히 PRUNE-UNINDEXED 입력"
+        required: true
+        default: ""
 
 permissions:
   contents: read
 
 jobs:
   prune:
+    if: ${{ inputs.confirm == 'PRUNE-UNINDEXED' }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -15,8 +21,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests pyjwt cryptography -q
-      - name: "urlInspection 기반 비공개 전환"
+      - run: pip install requests PyJWT cryptography -q
+      - name: "25개 블로그 GSC URL Inspection 전수검사 + 확정 비색인만 private 전환"
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           WP_USER: ${{ secrets.WP_USER }}
@@ -30,6 +36,7 @@ jobs:
           KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
           KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
           KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
           KWORLD365COM: ${{ secrets.KWORLD365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
@@ -44,8 +51,6 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/prune_unindexed_all_sites.py
       - uses: actions/upload-artifact@v4
         if: always()

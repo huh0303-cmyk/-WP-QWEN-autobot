@@ -9,11 +9,11 @@ SITES = (
     ("https://koreanews365.com", "KOREANEWS365COM", {
         "sec.gov": "금융 (FINANCE)", "federalreserve.gov": "금융 (FINANCE)",
         "nasa.gov": "경제 (ECONOMY)", "globalvoices.org": "글로벌 (GLOBAL)",
-        "voanews.com": "글로벌 (GLOBAL)",
+        "voanews.com": "글로벌 (GLOBAL)", "war.gov": "국방 (MILITARY)",
     }),
     ("https://theseouljournal.com", "THESEOULJOURNALCOM", {
         "sec.gov": "Finance", "federalreserve.gov": "Finance", "nasa.gov": "Economy",
-        "globalvoices.org": "Global", "voanews.com": "Global",
+        "globalvoices.org": "Global", "voanews.com": "Global", "war.gov": "Military",
     }),
 )
 

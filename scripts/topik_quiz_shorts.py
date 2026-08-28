@@ -18,7 +18,8 @@ sis-korea.com에서 받은 샘플 숏폼(토픽 단어(초급) 카드 + 3지선�
     카테고리를 비우면 Gemini가 무작위로 초급 어휘 카테고리를 고른다.
 
 필요 환경변수(Secrets):
-    GEMINI_API_KEY              - 단어/문항 생성 + 이미지 생성(나노바나나)
+    GEMINI_API_KEY              - 단어/문항 및 플랫폼별 카피 생성
+    REPLICATE_API_TOKEN         - 승인된 3모델 이미지 게이트웨이
     ELEVENLABS_API_KEY          - TTS 나레이션 (없으면 무음으로 진행)
     ELEVENLABS_VOICE_ID         - (선택) 보이스 ID
     GOOGLE_OAUTH_CLIENT_ID/SECRET/REFRESH_TOKEN, GDRIVE_FOLDER_ID
@@ -30,7 +31,6 @@ sis-korea.com에서 받은 샘플 숏폼(토픽 단어(초급) 카드 + 3지선�
 import os
 import sys
 import json
-import base64
 import random
 import subprocess
 
@@ -45,7 +45,6 @@ for _stream in (sys.stdout, sys.stderr):
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_TEXT_MODEL = "gemini-2.5-flash"
-GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.environ.get("ELEVENLABS_VOICE_ID") or "21m00Tcm4TlvDq8ikWAM"
@@ -150,7 +149,7 @@ def _needs_vi_font(text):
 
 
 # ════════════════════════════════════════════════════════════
-# Gemini: 문항 생성 + 이미지 생성
+# Text generation and MASTER-approved Replicate imagery
 # ════════════════════════════════════════════════════════════
 def gemini_generate_text(prompt, temperature=0.9):
     # 2026-08-22: TOPIK은 이미 수익화된 우선순위 채널이라 텍스트 생성 안정성이
@@ -172,35 +171,22 @@ def gemini_generate_text(prompt, temperature=0.9):
     return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 
-def gemini_generate_image(prompt, out_path):
-    # 2026-08-22 재조정(사용자 지시: "이미지도 돈안드는것 최우선"): Gemini
-    # 무료범위 먼저, 실패하면 OpenAI(gpt-image-1) 유료 폴백 — 순서가 반대였음.
-    body = {"contents": [{"parts": [{"text": prompt}]}]}
-    for model in GEMINI_IMAGE_MODELS:
-        url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
-               f"{model}:generateContent?key={GEMINI_API_KEY}")
-        try:
-            r = requests.post(url, json=body, timeout=90)
-            if r.status_code != 200:
-                continue
-            data = r.json()
-            parts = data["candidates"][0]["content"]["parts"]
-            for part in parts:
-                inline = part.get("inlineData") or part.get("inline_data")
-                if inline and inline.get("data"):
-                    with open(out_path, "wb") as f:
-                        f.write(base64.b64decode(inline["data"]))
-                    return True
-        except Exception:
-            continue
+def generate_approved_image(prompt, out_path):
+    """Use the shared Replicate gateway; never chain to a legacy provider."""
+    from replicate_image_provider import generate_image_url
 
+    url = generate_image_url(prompt, theme="TOPIK beginner vocabulary quiz")
+    if not url:
+        return False
     try:
-        from openai_text import openai_available, openai_generate_image
-        if openai_available() and openai_generate_image(prompt, out_path):
-            return True
-    except ImportError:
-        pass
-    return False
+        response = requests.get(url, timeout=45)
+        response.raise_for_status()
+        with open(out_path, "wb") as f:
+            f.write(response.content)
+        return True
+    except Exception as exc:
+        log(f"   ⚠️ 승인 이미지 다운로드 실패: {exc}")
+        return False
 
 
 def generate_quiz_items(category, n, target_lang="ko"):
@@ -263,8 +249,9 @@ def generate_social_copy(category, items, target_lang="ko"):
 {lang_name}권 시청자에게 올릴 소셜 게시글을 써줘. 다루는 단어: {words} (카테고리: {category or '초급 어휘'}).
 
 조건:
-- short_caption(틱톡/인스타/페이스북/쓰레드 공통)은 {lang_name}로, 실제 사람이 캐주얼하게
-  쓴 것처럼(2~3문장, 100자 내외). AI가 쓴 티가 나는 상투적 표현(예: "Unlock your
+- 각 플랫폼은 같은 텍스트를 복제하지 말고 platform_copy 안에 별도 hook/caption/cta/hashtags를 쓴다.
+- TikTok은 빠른 문제 도전 hook, Instagram은 저장/공유 CTA, Facebook은 설명형 문장,
+  Threads는 대화형 질문으로 각각 {lang_name}로 작성한다. AI가 쓴 티가 나는 상투적 표현(예: "Unlock your
   potential", "Ready to level up?", 이모지 남발, 뻔한 감탄사 나열) 금지. 과장 광고 문구,
   클릭베이트성 허위 약속 금지.
 - youtube_title / youtube_description은 시청 언어와 무관하게 항상 영어로, 검색 노출을
@@ -274,10 +261,15 @@ def generate_social_copy(category, items, target_lang="ko"):
   - youtube_description: 1000자 내외, 이 회차에서 다루는 단어들이 왜 유용한지,
     TOPIK 학습자에게 어떻게 도움되는지 자연스럽게 풀어쓰고, 구독 유도 한 문장 +
     관련 해시태그 6~8개로 마무리
-- hashtags: 5~8개, # 없이 단어만 배열로 (플랫폼에서 조합)
+- 플랫폼별 hashtags는 # 없이 배열로 작성한다. 제목·hook·caption·CTA가 플랫폼끼리 같으면 안 된다.
 
 JSON만 응답(설명 없이):
-{{"youtube_title": "...", "youtube_description": "...", "short_caption": "...", "hashtags": ["...", "..."]}}
+{{"youtube_title":"...","youtube_description":"...","platform_copy":{{
+"tiktok":{{"title":"...","hook":"...","caption":"...","cta":"...","hashtags":["..."]}},
+"instagram":{{"title":"...","hook":"...","caption":"...","cta":"...","hashtags":["..."]}},
+"facebook":{{"title":"...","hook":"...","caption":"...","cta":"...","hashtags":["..."]}},
+"threads":{{"title":"...","hook":"...","caption":"...","cta":"...","hashtags":["..."]}}
+}}}}
 """
     text = gemini_generate_text(prompt, temperature=0.8).strip()
     if text.startswith("```"):
@@ -285,6 +277,26 @@ JSON만 응답(설명 없이):
         if text.startswith("json"):
             text = text[4:]
     return json.loads(text.strip())
+
+
+def normalize_platform_copy(copy, header_text):
+    """Fail closed to distinct, useful review copy when generation is incomplete."""
+    defaults = {
+        "tiktok": {"title": header_text, "hook": "정답을 바로 맞힐 수 있나요?", "caption": "짧게 풀어보는 TOPIK 초급 어휘 퀴즈입니다.", "cta": "몇 개 맞혔는지 확인해 보세요.", "hashtags": ["TOPIK", "한국어퀴즈"]},
+        "instagram": {"title": f"{header_text} 저장용 퀴즈", "hook": "오늘 복습할 한국어 단어", "caption": "초급 어휘를 한 문제씩 천천히 확인해 보세요.", "cta": "나중에 다시 풀 수 있도록 저장해 두세요.", "hashtags": ["LearnKorean", "TOPIKStudy"]},
+        "facebook": {"title": f"{header_text} 학습 영상", "hook": "초급 학습자를 위한 짧은 어휘 확인입니다.", "caption": "보기 세 개 중 알맞은 한국어 단어를 고르는 연습 영상입니다.", "cta": "학습 중인 분과 함께 풀어보세요.", "hashtags": ["KoreanLearning", "TOPIK"]},
+        "threads": {"title": f"{header_text} 오늘의 문제", "hook": "첫 문제, 바로 답이 떠오르나요?", "caption": "헷갈린 단어가 있었다면 어떤 것이었나요?", "cta": "답을 보기 전에 예상한 단어를 남겨보세요.", "hashtags": ["TOPIK", "한국어"]},
+    }
+    supplied = copy.get("platform_copy") if isinstance(copy, dict) else None
+    supplied = supplied if isinstance(supplied, dict) else {}
+    normalized = {}
+    for platform, fallback in defaults.items():
+        candidate = supplied.get(platform) if isinstance(supplied.get(platform), dict) else {}
+        normalized[platform] = {
+            key: candidate.get(key) or value for key, value in fallback.items()
+        }
+    copy["platform_copy"] = normalized
+    return copy
 
 
 # ════════════════════════════════════════════════════════════
@@ -441,16 +453,11 @@ def still_clip(image_path, audio_path, out_path):
 
 def build_item_clip(item, idx, total, workdir, header_text="토픽 단어 (초급)"):
     icon_path = os.path.join(workdir, f"icon_{idx}.png")
-    ok = False
-    if GEMINI_API_KEY:
-        prompt = (f"A simple flat vector clip-art illustration of "
-                  f"{item['image_prompt_en']}, isolated on plain white background, "
-                  f"cute minimalist icon style, bold clean outlines, bright flat colors, "
-                  f"no text, no watermark, no shadow, no gradient")
-        for _ in range(3):
-            if gemini_generate_image(prompt, icon_path):
-                ok = True
-                break
+    prompt = (f"A simple flat vector clip-art illustration of "
+              f"{item['image_prompt_en']}, isolated on plain white background, "
+              f"cute minimalist icon style, bold clean outlines, bright flat colors, "
+              f"no text, no watermark, no shadow, no gradient")
+    ok = generate_approved_image(prompt, icon_path)
     if not ok:
         from PIL import Image
         Image.new("RGB", (600, 400), (200, 200, 200)).save(icon_path)
@@ -522,15 +529,16 @@ def upload_to_drive(service, file_path, folder_id, name, make_public=False):
     request = service.files().create(body=metadata, media_body=media, fields="id,webViewLink")
     response = None
     retries = 0
+    max_retries = 3
     while response is None:
         try:
-            _, response = request.next_chunk(num_retries=5)
+            _, response = request.next_chunk(num_retries=0)
         except Exception as e:
             retries += 1
-            if retries > 8:
+            if retries >= max_retries:
                 raise
-            wait = min(2 ** retries, 60)
-            log(f"   ⚠️ 업로드 재시도({retries}/8): {e}")
+            wait = min(2 ** retries, 8)
+            log(f"   ⚠️ 업로드 재시도({retries}/{max_retries}): {e}")
             _time.sleep(wait)
 
     file_id = response.get("id")
@@ -588,8 +596,8 @@ def main():
         copy = generate_social_copy(category, items, target_lang)
     except Exception as e:
         log(f"   ⚠️ 소셜 카피 생성 실패(무시, 빈 값으로 대체): {e}")
-        copy = {"youtube_title": header_text, "youtube_description": "",
-                "short_caption": "", "hashtags": ["Korean", "TOPIK", "LearnKorean"]}
+        copy = {"youtube_title": header_text, "youtube_description": "", "platform_copy": {}}
+    copy = normalize_platform_copy(copy, header_text)
 
     from datetime import datetime, timezone, timedelta
     now = datetime.now(timezone(timedelta(hours=9)))
@@ -615,8 +623,7 @@ def main():
         "public_video_url": public_video_url,
         "youtube_title": copy.get("youtube_title", header_text),
         "youtube_description": copy.get("youtube_description", ""),
-        "short_caption": copy.get("short_caption", ""),
-        "hashtags": copy.get("hashtags", []),
+        "platform_copy": copy.get("platform_copy", {}),
     }
     meta_path = os.path.join(WORKDIR, f"meta_{target_lang}.json")
     with open(meta_path, "w", encoding="utf-8") as f:

@@ -1,11 +1,14 @@
 import asyncio
+import os
 from playwright.async_api import async_playwright
 
-NAVER_ID = "westlake.ceo@gmail.com"
-NAVER_PW = "Huh556423$"
+NAVER_ID = os.environ.get("NAVER_SELLER_ID", "").strip()
+NAVER_PW = os.environ.get("NAVER_SELLER_PASSWORD", "").strip()
 
 
 async def main():
+    if not NAVER_ID or not NAVER_PW:
+        raise SystemExit("NAVER_SELLER_ID and NAVER_SELLER_PASSWORD are required")
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(
