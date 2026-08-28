@@ -1,0 +1,36 @@
+name: "TEST notify"
+on:
+  workflow_dispatch: {}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: fabricate result + run notify
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          REPORT_EMAIL_TO: "huh0303@gmail.com"
+          REPORT_EMAIL_FROM: "huh0303@gmail.com"
+          REPORT_TITLE: "[TEST] mobile review link"
+          REPORT_BODY: "Test run of the fixed review-link email."
+          REPORT_URL: "https://example.com/fallback"
+        run: |
+          python -c "
+import json, os, requests
+WP_USER='huh0303@gmail.com'
+pw=os.environ['KHEALTH365COM']
+r=requests.get('https://k-health365.com/wp-json/wp/v2/posts',auth=(WP_USER,pw),params={'per_page':1,'status':'draft','_fields':'id,link,title'},timeout=15)
+posts=r.json()
+if not posts:
+    r=requests.get('https://k-health365.com/wp-json/wp/v2/posts',auth=(WP_USER,pw),params={'per_page':1,'status':'private','_fields':'id,link,title'},timeout=15)
+    posts=r.json()
+print('found post:', posts)
+rec={'title': posts[0]['title']['rendered'] if posts else 'no post', 'status':'draft','url': posts[0]['link'] if posts else ''}
+json.dump({'records':[rec]}, open('newsroom_publish_result.json','w'))
+"
+          python scripts/publishing_completion_notify.py
