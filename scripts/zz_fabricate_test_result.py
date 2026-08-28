@@ -4,9 +4,9 @@ import os
 import requests
 
 WP_USER = "huh0303@gmail.com"
-pw = os.environ["KHEALTH365COM"]
+pw = os.environ["KOREAMEDICALTOURCOM"]
 r = requests.get(
-    "https://k-health365.com/wp-json/wp/v2/posts",
+    "https://koreamedicaltour.com/wp-json/wp/v2/posts",
     auth=(WP_USER, pw),
     params={"per_page": 1, "status": "draft,private,pending,future", "_fields": "id,link,title,status"},
     timeout=15,

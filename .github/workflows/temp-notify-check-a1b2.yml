@@ -12,7 +12,7 @@ jobs:
       - run: pip install requests -q
       - name: fabricate result + run notify
         env:
-          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           REPORT_EMAIL_TO: "huh0303@gmail.com"
           REPORT_EMAIL_FROM: "huh0303@gmail.com"
