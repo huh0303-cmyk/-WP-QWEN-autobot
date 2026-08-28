@@ -1,0 +1,63 @@
+{
+  "target_date": "2026-08-29",
+  "timezone": "Asia/Seoul",
+  "public_allowed": false,
+  "publish_policy": "awaiting_approval",
+  "drafts": [
+    {
+      "site_id": "tistory_insurance_lab",
+      "title": "소액 실손보험 청구인데 처방전을 다시 요구받는 이유",
+      "category": "보험금청구",
+      "permalink": "small-medical-claim",
+      "meta_description": "소액 통원 실손보험 청구의 기본 서류와 보험사가 추가 증빙을 요청할 수 있는 상황을 정리했습니다.",
+      "labels": ["실손보험", "소액청구", "통원치료", "처방전", "진료비영수증", "질병분류기호", "보험금", "청구서류", "보험상식"],
+      "body_html": "<p>진료비가 적으면 영수증만 보내면 된다고 생각하기 쉽지만, 청구 금액과 진료과목에 따라 처방전이나 진료확인서를 추가로 요구받을 수 있습니다.</p><h2>금액 구간별 기본 서류</h2><p>손해보험협회 소비자포털 안내상 3만원 이하 통원 청구는 보험금청구서와 병원 영수증이 기본입니다. 3만원 초과 10만원 이하라면 질병분류기호가 기재된 처방전이 필요할 수 있습니다.</p><h2>추가 서류가 생기는 경우</h2><p>일부 진료과목이나 짧은 기간에 청구가 반복되는 경우 등 추가 심사가 필요하다고 판단되면 별도 증빙을 요청받을 수 있습니다. 병원에서 나오기 전에 처방전의 질병분류기호를 확인하고, 보험사 앱의 최신 제출 목록을 확인하는 편이 안전합니다.</p><p>계약별 요구 서류가 다를 수 있으므로 최종 기준은 가입 보험사의 공식 안내를 따르세요.</p>",
+      "sources": ["https://consumer.knia.or.kr/m/consumer/insurance-guide/0202.do"],
+      "status": "DRAFT_READY"
+    },
+    {
+      "site_id": "tistory_dental_cost",
+      "title": "치과 비급여 가격, 집 근처 병원끼리 비교하는 가장 빠른 방법",
+      "category": "비급여·진료비",
+      "permalink": "dental-noncovered-price",
+      "meta_description": "심평원 비급여 진료비 정보에서 지역과 의료기관별 치과 비용을 비교하고 실제 견적과 대조하는 방법입니다.",
+      "labels": ["치과비급여", "치과비용", "심평원", "건강e음", "임플란트", "진료비", "가격비교", "치과선택", "의료정보"],
+      "body_html": "<p>치과 상담을 예약하기 전에 건강보험심사평가원의 비급여 진료비 정보를 확인하면 지역별 가격대를 먼저 파악할 수 있습니다.</p><h2>조회할 때 입력할 조건</h2><p>심평원 누리집이나 건강e음 앱에서 비급여 진료비 정보 메뉴를 열고 지역, 의료기관 규모, 진료 항목을 선택합니다. 병원명으로 찾거나 임플란트처럼 항목별로 비교할 수 있습니다.</p><h2>표시 가격과 최종 견적이 다른 이유</h2><p>공개 가격은 비교의 출발점입니다. 재료, 치료 난이도, 뼈이식 여부, 검사와 사후관리 범위에 따라 실제 금액은 달라질 수 있습니다. 상담 때에는 포함 항목과 추가비용 발생 조건을 서면으로 확인하세요.</p><p>가격만으로 치료 방법을 결정하지 말고 의료진의 진단과 설명을 함께 검토해야 합니다.</p>",
+      "sources": ["https://www.hira.or.kr/rb/npay/rbtasm/list.do?pgmi="],
+      "status": "DRAFT_READY"
+    },
+    {
+      "site_id": "tistory_finance_housing",
+      "title": "원리금균등과 원금균등, 월 납입액이 달라지는 지점",
+      "category": "대출",
+      "permalink": "mortgage-repayment-types",
+      "meta_description": "주택대출의 원리금균등·원금균등·체증식 상환방식이 초기 부담과 총이자에 미치는 차이를 설명합니다.",
+      "labels": ["주택대출", "원리금균등", "원금균등", "체증식상환", "월상환액", "대출이자", "디딤돌대출", "상환계획", "주택금융"],
+      "body_html": "<p>같은 금액과 금리로 빌려도 상환방식이 다르면 첫 달 납입액과 전체 이자 부담이 달라집니다.</p><h2>원리금균등</h2><p>원금과 이자를 합친 월 납입액을 비교적 일정하게 관리하는 방식입니다. 가계 예산을 계획하기 편하지만 초반에는 이자 비중이 상대적으로 큽니다.</p><h2>원금균등</h2><p>매달 같은 원금을 갚고 남은 원금에 대한 이자를 내므로 초반 부담이 크고 시간이 지나면서 납입액이 줄어드는 구조입니다.</p><h2>체증식 상환</h2><p>초기 납입액을 낮추고 점차 늘리는 방식입니다. 미래 소득 증가를 기대할 때 검토할 수 있지만 뒤로 갈수록 부담이 커질 수 있습니다.</p><p>한국주택금융공사의 상품 안내와 금융기관 상환계산기를 이용해 월 납입액과 총이자를 함께 비교하세요. 실제 조건은 신청 시점의 공식 설명서를 기준으로 확인해야 합니다.</p>",
+      "sources": ["https://hf.go.kr/ko/sub01/sub01_02_01.do"],
+      "status": "DRAFT_READY"
+    },
+    {
+      "site_id": "tistory_life365",
+      "title": "SRT 표 예매 전에 확인하면 환불할 일을 줄이는 네 가지",
+      "category": "예매·티켓",
+      "permalink": "srt-ticket-checklist",
+      "meta_description": "SRT 승차권 예매 전 출발역·시간·할인조건·환불경로를 확인해 잘못된 결제와 일정 착오를 줄이는 방법입니다.",
+      "labels": ["SRT", "승차권예매", "기차표", "열차시간표", "환불", "수서역", "SRT앱", "교통정보", "표예매"],
+      "body_html": "<p>SRT를 급하게 예매하면 수서 출발이라는 점이나 할인승차권의 변경 조건을 놓치기 쉽습니다.</p><h2>출발역과 도착역</h2><p>KTX와 SRT는 일부 구간과 역이 다릅니다. 출발역 이름을 먼저 확인하고 이동시간까지 계산해야 합니다.</p><h2>공식 예매처</h2><p>SR 공식 안내상 승차권은 SR 홈페이지, SRT 앱, 자동발매기와 역에서 구입할 수 있습니다. 출처가 불분명한 문자 링크보다 공식 앱이나 주소를 직접 여는 편이 안전합니다.</p><h2>할인 조건</h2><p>온라인 할인이나 공공할인은 적용 대상과 이용 조건이 다릅니다. 할인승차권은 변경 과정에서 혜택이 취소될 수 있으므로 결제 전 조건을 읽어야 합니다.</p><h2>환불 경로</h2><p>SRT 앱이나 홈페이지에서 예매한 승차권은 같은 공식 채널에서 직접 환불할 수 있습니다. 출발 시각과 환불 시점에 따라 조건이 달라지므로 결제 화면의 최신 안내를 확인하세요.</p>",
+      "sources": ["https://www.srail.or.kr/cms/archive.do?pageId=TK0402010000", "https://www.srail.or.kr/cms/archive.do?category=pbs&pageId=TK0401010000"],
+      "status": "DRAFT_READY"
+    },
+    {
+      "site_id": "tistory_ktrip365",
+      "title": "KTX or SRT? Pick the Right High-Speed Train Before You Book",
+      "category": "Transport",
+      "permalink": "ktx-vs-srt-guide",
+      "meta_description": "A first-time visitor’s guide to choosing between KTX and SRT by departure station, route, booking channel and payment options.",
+      "labels": ["KTX", "SRT", "KoreaTrain", "TrainTickets", "SeoulStation", "SuseoStation", "KoreaTransport", "TravelPlanning", "KoreaTravel"],
+      "body_html": "<p>KTX and SRT are both high-speed trains, but the best choice often depends on where you are staying rather than the train name.</p><h2>Start with the departure station</h2><p>KTX commonly serves Seoul Station and Yongsan Station, while many SRT services start at Suseo Station in southeastern Seoul. Check the complete station name before comparing departure times.</p><h2>Use the official booking channel</h2><p>Book KTX through Korail’s official services and SRT through the official SRT website or app. The Korea Tourism Organization’s 2026 transportation guide lists KTX and SRT among the rail services available to international visitors and notes multilingual booking support.</p><h2>Compare the whole journey</h2><p>A train that leaves later may still be faster overall if its station is closer to your hotel. Compare the subway or taxi trip to the station, the train schedule and the transfer at your destination.</p><p>Routes, fares and foreign-card acceptance can change. Confirm the final details on the official booking screen before payment.</p>",
+      "sources": ["https://english.visitkorea.or.kr/public/contents/travel/KoreaTransportationGuide_enu.pdf", "https://www.srail.or.kr/cms/archive.do?pageId=TK0402010000"],
+      "status": "DRAFT_READY"
+    }
+  ]
+}
