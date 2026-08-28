@@ -1,50 +1,50 @@
-Digital Nomad Visa F-1-D	Long-term Visa
-K-ETA exemption 2026	Student Visa
-E-7-4R dependent visa	Work Visa
-F-2-R dependent visa	Immigration Policy Updates
-K-ETA application fee	Long-term Visa
-K-ETA approval time	Student Visa
-K-ETA validity period	Work Visa
-K-ETA eligible countries	Immigration Policy Updates
-K-ETA application processing time	Long-term Visa
-K-ETA application status check	Student Visa
-K-ETA application form download	Work Visa
-K-ETA waiver extension 2026	Immigration Policy Updates
-e-Arrival Card requirement 2026	Long-term Visa
-South Korea visa policy changes	Student Visa
-Top-Tier visa expansion 2026	Work Visa
-E-7-M visa updates	Immigration Policy Updates
-F-2-R regional track	Long-term Visa
-Automated immigration screening 2026	Student Visa
-D-2 D-4 visa services	Work Visa
-International student visa quotas	Immigration Policy Updates
-K-ETA exemption until December 2026	Long-term Visa
-K-ETA application fee 10,000 KRW	Student Visa
-K-ETA processing time up to 72 hours	Work Visa
-K-ETA validity period 3 years	Immigration Policy Updates
-K-ETA unlimited entries	Long-term Visa
-K-ETA required for visa-free countries	Student Visa
-K-ETA not required for exempt countries	Work Visa
-K-ETA online application process	Immigration Policy Updates
-K-ETA approval not guarantee of entry	Long-term Visa
-K-ETA for short-term tourism	Student Visa
-K-ETA for business visits	Work Visa
-K-ETA for attending events	Immigration Policy Updates
-K-ETA for visiting relatives	Long-term Visa
-K-ETA for citizens of non-exempt countries	Student Visa
-K-ETA for citizens of countries with visa waiver agreements	Work Visa
-K-ETA for citizens of countries without visa exemption	Immigration Policy Updates
-K-ETA for citizens of countries with visa-free entry	Long-term Visa
-K-ETA for citizens of countries without visa-free access	Student Visa
-```	Work Visa
-K-ETA application fee payment methods	Student Visa
-K-ETA application fee payment confirmation email	Work Visa
-K-ETA application fee payment confirmation best practices	Immigration Policy Updates
-K-ETA application fee payment confirmation contact information	Long-term Visa
-K-ETA application fee payment confirmation customer service	Student Visa
-K-ETA application fee payment confirmation terms and conditions	Work Visa
-K-ETA application fee payment confirmation privacy policy	Immigration Policy Updates
-K-ETA application fee payment confirmation case studies	Long-term Visa
-K-ETA application fee payment confirmation success stories	Student Visa
-Top-Tier Visa Korea eligibility	Long-term Visa
-Top-Tier Visa 8 strategic industries	Long-term Visa
+Korea Digital Nomad visa 2026	Long-term Visa
+F-1-D workcation visa rules	Long-term Visa
+South Korea F-2-R requirements	Long-term Visa
+Regional specialization visa Korea	Long-term Visa
+F-2 residency visa update	Long-term Visa
+Korea permanent residency pathway E-7-4	Long-term Visa
+Spouse visa Korea F-3	Long-term Visa
+Long-term stay visa benefits	Long-term Visa
+Korea investment immigration program	Long-term Visa
+F-5 permanent residency criteria	Long-term Visa
+Population decline region visa Korea	Long-term Visa
+F-2 visa income threshold	Long-term Visa
+Korea skilled talent F-2	Long-term Visa
+F-2-R regional talent residency	Long-term Visa
+F-2-7 visa TOPIK 4	Long-term Visa
+D-2 student visa requirements 2026	Student Visa
+South Korea university visa ban list	Student Visa
+Korea D-10 job seeker extended	Student Visa
+Student visa part-time work rules	Student Visa
+D-4 language visa transfer D-2	Student Visa
+Korea study visa financial proof	Student Visa
+Post-study work options Korea	Student Visa
+International student visa Korea	Student Visa
+D-2 visa application process	Student Visa
+South Korea student health insurance	Student Visa
+University admission letter visa	Student Visa
+D-2-2 undergraduate visa Korea	Student Visa
+Korea graduate visa changes	Student Visa
+Student visa processing time 2026	Student Visa
+TOPIK for student work permit	Student Visa
+E-7-4 skilled worker visa 2026	Work Visa
+Korea E-9 visa quota cut	Work Visa
+E-8 seasonal work visa expansion	Work Visa
+Top-Tier visa science technology	Work Visa
+Korea IT worker visa 2026	Work Visa
+E-2 English teacher visa processing	Work Visa
+E-7 professional visa categories	Work Visa
+South Korea tech talent visa	Work Visa
+D-10 visa maximum stay 3 years	Work Visa
+Work visa sponsorship Korea 2026	Work Visa
+E-7-M K-CORE visa	Work Visa
+Agricultural skilled worker visa Korea	Work Visa
+E-7-4 family invitation requirements	Work Visa
+Work permit Korea E-series	Work Visa
+K-ETA exemption extension 2026	Immigration Policy Updates
+Mandatory e-Arrival Card Korea	Immigration Policy Updates
+South Korea immigration strategy 2030	Immigration Policy Updates
+Visa processing fees Korea 2026	Immigration Policy Updates
+Online employment reporting HiKorea	Immigration Policy Updates
+H-2 to F-4 visa transition	Immigration Policy Updates

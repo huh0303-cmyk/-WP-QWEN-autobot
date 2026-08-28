@@ -1,50 +1,50 @@
-외국인 유학생 유치 정책 강화	Careers
-한국 대학 국제화 전략 발표	Culture
-한국 대학 해외 캠퍼스 설립 계획	Language
-한국 대학 해외 인턴십 프로그램 확대	Careers
-한국 대학 해외 교환학생 프로그램 활성화	Culture
-한국 대학 해외 취업 지원 프로그램 도입	Language
-한국 대학 해외 취업 박람회 개최	Careers
-한국 대학 해외 취업 멘토링 프로그램 운영	Culture
-한국 대학 해외 취업 연계 교육 과정 개설	Language
-한국 대학 해외 취업 지원 센터 설립	Careers
-한국 대학 해외 취업 정보 제공 플랫폼 구축	Culture
-한국 대학 해외 취업 네트워킹 이벤트 개최	Language
-한국 대학 해외 취업 관련 세미나 개최	Careers
-한국 대학 해외 취업 관련 팟캐스트 제작	Culture
-한국 대학 해외 취업 관련 유튜브 채널 운영	Language
-한국 대학 해외 취업 관련 인스타그램 계정 운영	Careers
-한국 대학 해외 취업 관련 페이스북 페이지 운영	Culture
-한국 대학 해외 취업 관련 디스코드 서버 운영	Language
-한국 대학 해외 취업 관련 줌 회의 개최	Careers
-한국 대학 해외 취업 관련 구글 미트 회의 개최	Culture
-한국 대학 해외 취업 관련 마이크로소프트 팀즈 회의 개최	Language
-한국 대학 해외 취업 관련 스카이프 웨비나 개최	Careers
-한국 대학 해외 취업 관련 구글 미트 팟캐스트 제작	Culture
-한국 대학 해외 취업 관련 마이크로소프트 팀즈 팟캐스트 제작	Language
-한국 대학 해외 취업 관련 구글 미트 유튜브 채널 운영	Careers
-한국 대학 해외 취업 관련 마이크로소프트 팀즈 유튜브 채널 운영	Culture
-한국 대학 해외 취업 관련 줌 블로그 운영	Language
-한국 대학 해외 취업 관련 구글 미트 인스타그램 계정 운영	Careers
-한국 대학 해외 취업 관련 마이크로소프트 팀즈 인스타그램 계정 운영	Culture
-신촌 글로벌대학문화축제 참가자 모집<TAB>Culture	Language
-고려대 국제하계대학 수료식 개최<TAB>Culture	Careers
-AISA 외국인 유학생 장학금 지원<TAB>Culture	Culture
-서울여대 외국인 유학생 비자 단체접수<TAB>Culture	Language
-동국대 외국인 유학생 체류자격 변경 접수<TAB>Culture	Careers
-세종대 외국인 유학생 단체접수 일정<TAB>Culture	Culture
-년 외국인 유학생 수 25만 명 돌파<TAB>Culture	Language
-한국 유학 수입국 전환 현황<TAB>Culture	Careers
-해연유학 코엑스 유학박람회 개최<TAB>Culture	Culture
-미국 국토안보부 유학생 체류기간 제한 규정 발표<TAB>Culture	Language
-정부 초청 외국인 학부 장학생 선발 계획<TAB>Culture	Careers
-고려대 국제하계대학 한국 문화 체험 프로그램<TAB>Culture	Culture
-AISA 외국인 유학생 장학금 신청 기간<TAB>Culture	Language
-서울여대 외국인 유학생 체류기간 연장 접수<TAB>Culture	Careers
-동국대 외국인 유학생 신규등록 접수 시작<TAB>Culture	Culture
-세종대 외국인 유학생 D-2 연장 접수<TAB>Culture	Language
-년 외국인 유학생 수 증가 추이<TAB>Culture	Careers
-한국 유학 수입국 전환 배경 분석<TAB>Culture	Culture
-해연유학 코엑스 유학박람회 참가 신청 방법<TAB>Culture	Language
-미국 국토안보부 유학생 체류기간 변경 사항<TAB>Culture	Careers
-정부 초청 외국인 학부 장학생 지원 자격<TAB>Culture	Culture
+외국인 유학생 창업 지원	Careers
+광역형 비자 외국인 정착	Careers
+Study Korea 300K 프로젝트	Careers
+유학생 취업 연계 프로그램	Careers
+지역 산업 연계 유학	Careers
+유학생 인턴십 인건비 지원	Careers
+STEM 전공 유학생 취업	Careers
+해외 인재 유치 정책	Careers
+외국인 유학생 취업 통계	Careers
+K-Startup 유학생 프로그램	Careers
+이화여자대학교 국제학생 취업	Careers
+졸업 후 한국 정착	Careers
+글로벌 희망 장학금	Careers
+부영그룹 외국인 장학금	Careers
+과학기술인재 패스트트랙	Careers
+외국인 유학생 지역 정착	Careers
+한국 유학 박람회	Culture
+K-컬처 체험 프로그램	Culture
+외국인 유학생 문화 체험	Culture
+한강 K-컬쳐 체험	Culture
+전통 공예 체험 외국인	Culture
+국제교육후견인협회 문화	Culture
+이화여대 한국 문화	Culture
+상명대 K-컬쳐 프로그램	Culture
+All That Travel 2026	Culture
+코엑스 외국인 문화행사	Culture
+국제공동수업 해외	Culture
+서울시 교육청 국제교류	Culture
+한일 학술문화 교류	Culture
+APEC 교육협력 네트워크	Culture
+베트남 유학생 한국 문화	Culture
+한국 생활 적응 지원	Culture
+국제 학생 공동체 형성	Culture
+인천 외국인 한국생활 교육	Culture
+TOPIK 시험 일정	Language
+TOPIK IBT 시험 확대	Language
+한국어능력시험 AI 부정행위	Language
+토픽 말하기 평가	Language
+한국어 교육 프로그램	Language
+외국인 유학생 한국어 멘토링	Language
+KDI 한국어 능력	Language
+한국어 학습 열기	Language
+TOPIK 2급 이상 필수	Language
+한국어 능력 부족 유학생	Language
+TOPIK 국내 시험장	Language
+한국어 교육 수강생 모집	Language
+TOPIK 성적 유학 활용	Language
+한국어능력시험 응시 수요	Language
+토픽 시험 온라인 접수	Language
+TOPIK 규정 신분증	Language

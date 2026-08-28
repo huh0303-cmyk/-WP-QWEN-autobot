@@ -1,50 +1,50 @@
-Ulsan underwater data center	AI
-KIOST AI data center	Semiconductors
-SK Telecom GPU servers	Startups
-SK Telecom AI investment	AI
-Anthropic AI funding	Semiconductors
-SK Telecom Anthropic partnership	Startups
-South Korea AI chip industry	AI
-Ulsan subsea servers	Semiconductors
-Ulsan AI data center project	Startups
-Samsung AI6 chip production	AI
-Samsung Pyeongtaek facility	Semiconductors
-Samsung Texas foundry	Startups
-Nvidia H200 export controls	AI
-SMIC record revenues	Semiconductors
-LG LDI tool shipment	Startups
-Optical component market growth	AI
-AMD South Korea partnership	Semiconductors
-AMD AI Center of Excellence	Startups
-AMD heterogeneous computing	AI
-South Korea AI research GPU	Semiconductors
-South Korea AI data center race	Startups
-South Korea AI data center power efficiency	AI
-Ulsan AI data center cooling system	AI
-Ulsan AI data center modular design	AI
-Ulsan AI data center carbon neutrality	AI
-Ulsan AI data center GPU operations	AI
-Ulsan AI data center server management	AI
-Ulsan AI data center ocean temperatures	AI
-Ulsan AI data center KIOST partnership	AI
-Ulsan AI data center SK Telecom role	AI
-Ulsan AI data center expansion plans	AI
-Ulsan AI data center environmental impact	AI
-Ulsan AI data center technological innovation	AI
-Ulsan AI data center industry collaboration	AI
-Ulsan AI data center research and development	AI
-Ulsan AI data center operational efficiency	AI
-Ulsan AI data center sustainability efforts	AI
-Ulsan AI data center project future plans	AI
-Samsung SK hynix $520 billion investment	AI
-South Korea AI data centers	Semiconductors
-AMD Korea AI partnership	Startups
-Korea AI action plan	Semiconductors
-Korea AI computing ecosystem	Startups
-Korea AI talent development	Startups
-Korea AI standards development centers	AI
-South Korea GPU reliance	Semiconductors
-South Korea launches open AI computing ecosystem	Startups
-Korean-US tech giants $950B semiconductor AI pact	AI
-South Korea $3.5B semiconductor fund	Semiconductors
-South Korea semiconductor special law	Startups
+OpenAI Jalapeño chip performance AI	AI
+Broadcom OpenAI custom silicon	AI
+LLM inference accelerator development	AI
+South Korea AI for All strategy	AI
+Domestic Korean AI chatbot launch	AI
+Sovereign AI foundation model data	AI
+AI training data free access Korea	AI
+National AI Computing Center Korea	AI
+Korean GPU expansion plan 2030	AI
+AI ethics principles South Korea	AI
+Ministry of Science ICT AI guidelines	AI
+Global AI Governance Summit 2026	AI
+Korea AI Framework Act impact	AI
+High-impact AI systems regulation Korea	AI
+Generative AI output labeling policy	AI
+Quantum Reframing Challenge 2026	AI
+KISTI 100-qubit IonQ computer	AI
+Korea quantum computing investment	AI
+Edge AI computing solutions Korea	AI
+SK Hynix Indiana HBM factory	Semiconductors
+SK Hynix HBM4E production 2029	Semiconductors
+Advanced packaging technology HBM	Semiconductors
+Samsung Foundry SF2 2nm roadmap	Semiconductors
+Samsung SF1.4 1.4nm mass production	Semiconductors
+High-NA EUV lithography adoption	Semiconductors
+ASML EXE:5200B Intel Foundry	Semiconductors
+Korean semiconductor exports August 2026	Semiconductors
+Samsung Foundry utilization rates	Semiconductors
+HBM4 base dies demand surge	Semiconductors
+Korean government chip subsidies 2026	Semiconductors
+Yongin semiconductor cluster power	Semiconductors
+US Korea chip supply chain	Semiconductors
+Semiconductor material startups Korea	Semiconductors
+Memory chip market forecast 2026	Semiconductors
+Advanced node profitability Samsung	Semiconductors
+Korea-US alliance semiconductor cooperation	Semiconductors
+Chip industry talent shortage Korea	Semiconductors
+Deep tech semiconductor manufacturing	Semiconductors
+Korean venture investment H1 2026	Startups
+AI startup funding South Korea	Startups
+Semiconductor startup investment boom	Startups
+Deep tech startup capital Korea	Startups
+Riiid Technologies unicorn status	Startups
+Rebellions AI semiconductor unicorn	Startups
+FuriosaAI funding rounds 2026	Startups
+Forbes Asia 100 Korean startups	Startups
+Robotics startups investment Korea	Startups
+Venture capital semiconductor materials	Startups
+Early-stage corporations funding Korea	Startups
+Tech startup growth outside Seoul	Startups

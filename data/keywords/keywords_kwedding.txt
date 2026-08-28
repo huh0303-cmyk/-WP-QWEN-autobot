@@ -1,50 +1,50 @@
-VOWLY cross-border marriage	Legal Registration
-VOWLY digital document management	Visa & Documents
-VOWLY wedding extras	Ceremony Planning
-VOWLY smart country selection	Budget
-VOWLY online booking	Legal Registration
-VOWLY all-in-one payment	Visa & Documents
-VOWLY marriage certificate duplicates	Ceremony Planning
-VOWLY marriage registration process	Budget
-혼인신고 절차 변경	Legal Registration
-혼인신고서 제출 서류 안내	Visa & Documents
-혼인신고서 증인 서명 필요	Ceremony Planning
-혼인신고서 대리 제출 시 주의사항	Budget
-혼인신고서 접수 후 취소 불가	Legal Registration
-```	Visa & Documents
-Required documents for foreign marriage in Korea	Legal Registration
-Marriage visa application steps in Korea	Visa & Documents
-Marriage visa requirements for foreign spouses	Visa & Documents
-Marriage visa approval rate in Korea	Visa & Documents
-Marriage visa medical examination in Korea	Visa & Documents
-Marriage visa sponsorship requirements in Korea	Visa & Documents
-Marriage visa denial reasons in Korea	Visa & Documents
-Marriage visa appeal process in Korea	Visa & Documents
-Marriage visa for Korean citizens in Korea	Visa & Documents
-Marriage visa for foreign nationals in Korea	Visa & Documents
-Marriage visa for international couples in Korea	Visa & Documents
-Marriage visa for foreign fiancés in Korea	Visa & Documents
-Marriage visa for foreign spouses of Korean citizens in Korea	Visa & Documents
-Certified translation requirements	Visa & Documents
-Apostille process for documents	Ceremony Planning
-Korean marriage certificate translation	Budget
-Marriage registration delay reasons	Legal Registration
-Young couples postponing marriage registration	Visa & Documents
-Housing eligibility after marriage	Ceremony Planning
-Welfare benefits and marriage registration	Budget
-Marriage registration at district office	Visa & Documents
-Marriage registration documents required	Budget
-Marriage registration form details	Legal Registration
-Marriage registration for foreign nationals	Visa & Documents
-Marriage registration for foreign fiancés	Ceremony Planning
-Marriage registration for foreign partners in Korea	Budget
-Marriage registration for foreign partners in Gyeonggi Province	Legal Registration
-Marriage registration for foreign partners in Jeju Island	Visa & Documents
-Marriage registration for foreign partners in Sejong City	Ceremony Planning
-Marriage registration for foreign partners in Seoul Metropolitan Area	Budget
-Cheongmo gatherings driving wedding costs up	Legal Registration
-Songpa District's pre-consultation for marriage registration	Visa & Documents
-Automated immigration screening expanded to 42 countries	Ceremony Planning
-Ethnic Korean laborers securing long-term visas	Budget
-International students added to visa quota analysis	Legal Registration
-Multicultural marriages reach post-pandemic high	Visa & Documents
+Korea marriage registration foreigner 2026	Legal Registration
+Korean marriage-friendly policy reforms	Legal Registration
+International marriage family registry Korea	Legal Registration
+Required documents Korea marriage 2026	Legal Registration
+Notarized Affidavit of Eligibility Korea	Legal Registration
+Korean Family Relations Registration Act	Legal Registration
+Marriage certificate apostille Korea	Legal Registration
+Foreign spouse home-country marriage proof	Legal Registration
+Registering foreign marriage Korea deadline	Legal Registration
+Korean district office marriage guide	Legal Registration
+Seoul marriage benefits newlyweds 2026	Legal Registration
+Busan Saha District marriage incentives	Legal Registration
+Kakao Pay Securities wedding stocks	Legal Registration
+Delayed marriage registration penalty Korea	Legal Registration
+Korean marriage tax credit replacement 2026	Legal Registration
+F-6 visa income thresholds 2026	Visa & Documents
+Korean marriage visa combined income	Visa & Documents
+F-6 visa asset conversion rules	Visa & Documents
+Documents for F-6 marriage visa 2026	Visa & Documents
+Updated F-6 visa policy Ministry Justice	Visa & Documents
+Marriage immigration visa exemptions Korea	Visa & Documents
+Sponsor requirements F-6 visa 2026	Visa & Documents
+HiKorea income change reporting F-6	Visa & Documents
+F-6 visa ₩1,000,000 penalty 2026	Visa & Documents
+KVAC visa processing fee adjustment	Visa & Documents
+F-6 spouse visa processing time	Visa & Documents
+Korean immigration F-6 language communication	Visa & Documents
+Family dependent visa improvements Korea	Visa & Documents
+F-6 permanent residency pathway	Visa & Documents
+F-6 visa work rights Korea	Visa & Documents
+Cross-cultural wedding planner Seoul 2026	Ceremony Planning
+Traditional Korean wedding surge trends	Ceremony Planning
+Experiential wedding planning Korea	Ceremony Planning
+Hotel wedding personalized designs 2026	Ceremony Planning
+Hanbok K-bridal shower ideas	Ceremony Planning
+Small intimate wedding Korea trends	Ceremony Planning
+Self-wedding planning Korea 2026	Ceremony Planning
+Digital wedding gift kiosks Korea	Ceremony Planning
+Modern Korean wedding traditions changes	Ceremony Planning
+Destination wedding Korea Explera	Ceremony Planning
+Hanok palace wedding venues Korea	Ceremony Planning
+Jeju ocean view wedding planning	Ceremony Planning
+Bilingual wedding planner Sarah's Weddings	Ceremony Planning
+Off-season wedding cost savings Korea	Ceremony Planning
+Ethical Korean wedding vendor compliance	Ceremony Planning
+Korean wedding cost breakdown 2026	Budget
+Average cost international wedding Korea	Budget
+F-6 visa application fees 2026	Budget
+Saving money Korean wedding foreigner	Budget
+Affordable wedding packages Seoul 2026	Budget
