@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
   "status": "LOCKED",
   "scope": ["wordpress", "blogger", "tistory", "news", "youtube_scripts", "sns_copy"],
@@ -76,8 +76,32 @@
     "forbid_model_or_prompt_mentions": true,
     "forbid_ai_process_disclosure_in_article_body": true,
     "forbid_repetitive_template_titles": true,
-    "title_style": "specific, natural, useful, curiosity-aware, accurate",
+    "title_style": "emotionally resonant, curiosity-driving, benefit-led, specific, natural and accurate",
+    "title_priority": "highest_text_priority",
+    "first_image_priority": "equal_to_title_and_must_visualize_the_titles_specific_situation_emotion_and_benefit",
+    "forbid_ai_sounding_title_formulas": true,
+    "forbid_repeated_or_similar_titles": true,
+    "forbid_clickbait_or_false_promises": true,
     "never_hide_sources_or_material_corrections": true
+  },
+  "golden_keyword_selection": {
+    "applies_to": ["wordpress", "blogger", "tistory"],
+    "news_exception": "two_newsrooms_use_latest_rss_headlines_as_reporting_topics",
+    "dimensions": ["search_intent", "site_fit", "freshness", "value", "specificity"],
+    "selection": "highest_score_only_no_random_choice"
+  },
+  "cross_platform_originality": {
+    "copy_paste_allowed": false,
+    "forbid_reused_sentences_paragraphs_heading_order_examples_and_faq": true,
+    "require_distinct_search_intent_title_outline_examples_and_faq_per_platform": true,
+    "similar_or_repeated_title_action": "QUALITY_FAIL"
+  },
+  "quality_gate": {"minimum_score": 70, "below_minimum_action": "QUALITY_FAIL"},
+  "image_generation": {
+    "maximum_images_per_content": 1,
+    "order": ["Nano Banana only when explicitly confirmed free", "black-forest-labs/flux-schnell", "bytedance/sdxl-lightning-4step", "jyoung105/sdxl-turbo"],
+    "attempts_per_model": 1,
+    "all_failed_action": "no_image_no_substitute"
   },
   "safety": {
     "auto_public": false,
