@@ -28,7 +28,7 @@
     {"order":14,"batch":3,"room_id":"blogger_kstudy365","title":"Study in Korea 365","language":"en","topic":"Studying in Korea","status":"EXISTING"},
     {"order":15,"batch":3,"room_id":"blogger_studyinkorea365","title":"Korea Study Guide","language":"en","topic":"Admissions and student life","status":"CREATED_SHELL","destination_id":"2107448954473357757","url":"https://studyinkorea365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
 
-    {"order":16,"batch":4,"room_id":"blogger_sis","title":"Seoul International School Guide","language":"en","topic":"International education in Korea","status":"CREATE_REQUIRED"},
+    {"order":16,"batch":4,"room_id":"blogger_sis","title":"Seoul International School Guide","language":"en","topic":"International education in Korea","status":"CREATED_SHELL","destination_id":"8077962392257357260","url":"https://seoulintlschoolguide.blogspot.com","created_on":"2026-08-28","language_fixed":true},
     {"order":17,"batch":4,"room_id":"blogger_kieca","title":"한국유학·교육정보","language":"ko","topic":"유학·교육기관·진학정보","status":"CREATE_REQUIRED"},
     {"order":18,"batch":4,"room_id":"blogger_ksa","title":"한국교육기관정보","language":"ko","topic":"교육기관·학교생활·교육정책","status":"CREATE_REQUIRED"},
     {"order":19,"batch":4,"room_id":"blogger_kskin365","title":"K-Beauty Skin Guide","language":"en","topic":"Korean skincare","status":"CREATE_REQUIRED"},
