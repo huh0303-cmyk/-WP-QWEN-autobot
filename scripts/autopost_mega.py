@@ -2634,9 +2634,9 @@ def ensure_featured_media(site_url, pw, image_url, title):
 #   2026-08-22: 텍스트 생성과 동일한 원칙(OPENAI_API_KEY 있으면 GPT 우선,
 #   Gemini/나노바나나는 키 없거나 실패했을 때만) — gpt-image-1을 1순위로 시도.
 # ============================================================
-def gemini_generate_image(prompt, out_path, max_retries=3):
-    if os.getenv("PAID_IMAGE_GENERATION_ENABLED", "false").strip().lower() != "true":
-        print("  ⛔ Gemini/OpenAI 유료 이미지 생성 차단됨")
+def gemini_generate_image(prompt, out_path, max_retries=1):
+    if os.getenv("NANO_BANANA_FREE_TIER_ENABLED", "false").strip().lower() != "true":
+        print("  ℹ️ Nano Banana 무료 사용이 확인되지 않아 건너뜀")
         return False
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     last_err = None
@@ -2665,8 +2665,8 @@ def gemini_generate_image(prompt, out_path, max_retries=3):
     return False
 
 def get_fallback_nanobanana_image(site_url, pw, keyword, theme, lang):
-    if os.getenv("PAID_IMAGE_GENERATION_ENABLED", "false").strip().lower() != "true":
-        print("  ⛔ AI 이미지 폴백 차단 — 무료 스톡/로컬 인포그래픽만 사용")
+    if os.getenv("NANO_BANANA_FREE_TIER_ENABLED", "false").strip().lower() != "true":
+        print("  ℹ️ Nano Banana 무료 사용이 확인되지 않아 Replicate로 이동")
         return []
     try:
         en_concept = translate_ko_to_en_for_image(keyword, theme) if lang == "ko" else keyword
@@ -2675,19 +2675,11 @@ def get_fallback_nanobanana_image(site_url, pw, keyword, theme, lang):
                   "suitable as a blog article header photo, high quality, 16:9 composition.")
         path = f"/tmp/nanobanana_{hashlib.md5(keyword.encode()).hexdigest()[:10]}.png"
 
-        generated = False
-        engine = "gemini"
-        try:
-            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-            from openai_text import openai_available, openai_generate_image
-            if openai_available():
-                generated = openai_generate_image(prompt, path)
-                engine = "gpt-image"
-        except ImportError:
-            pass
-        if not generated:
-            generated = gemini_generate_image(prompt, path)
-            engine = "gemini"
+        # Free Nano Banana is the only first-stage provider. Never call a paid
+        # OpenAI image endpoint here. If free use is unavailable/fails, the
+        # caller continues to the approved Replicate chain.
+        generated = gemini_generate_image(prompt, path, max_retries=1)
+        engine = "nano-banana"
         if not generated:
             return []
 
@@ -3423,14 +3415,16 @@ def process_one(site, keyword):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
-        # 2026-08-28 사용자 지시: 무료 스톡 이미지(Pexels/Pixabay) 사용 금지 —
-        # 켜져 있으면 replicate_image_provider(FLUX 등 승인된 3개 모델, 글당
-        # 최대 1장, 실패 시 다른 폴백 없음)만 사용한다. 스톡 검색·나노바나나·
-        # 인포그래픽 카드 경로는 전부 제거.
-        img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
-        images = [img_url] if img_url else []
+        # 2026-08-29 GitHub-pinned order:
+        # 1) Nano Banana only when free-tier use is explicitly confirmed.
+        # 2) Replicate: FLUX Schnell -> SDXL Lightning 4-step -> SDXL Turbo.
+        # 3) If all fail, no other image fallback.
+        images = get_fallback_nanobanana_image(url, site["pw"], keyword, theme, lang)
         if not images:
-            print("  🚫 Replicate 이미지 생성 실패 → 이미지 없이 발행")
+            img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
+            images = [img_url] if img_url else []
+        if not images:
+            print("  🚫 Nano Banana + approved Replicate chain failed → 이미지 없이 발행")
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
