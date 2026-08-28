@@ -62,30 +62,56 @@ def _resolve_post_id(site_url: str, post_url: str, wp_pass: str) -> int:
         return 0
 
 
-def build_draft_review_lines() -> list:
+def _is_draft_status(value: object) -> bool:
+    status = str(value or "").strip().lower()
+    return status == "draft" or "draft" in status
+
+
+def build_report() -> tuple[list[str], list[str], str]:
     if not Path(RESULT_FILE).exists():
-        return []
+        return [], ["결과 파일이 생성되지 않았습니다."], ""
     try:
         records = json.loads(Path(RESULT_FILE).read_text(encoding="utf-8")).get("records", [])
     except Exception:
-        return []
+        return [], ["결과 파일을 읽지 못했습니다."], ""
 
     key_map = _site_key_map()
-    lines = []
+    lines: list[str] = []
+    failures: list[str] = []
+    first_action_url = ""
     for rec in records:
-        if rec.get("status") != "draft" or not rec.get("url"):
+        status = rec.get("status", "")
+        if not _is_draft_status(status):
+            if status not in {"✅ OK", "publish", "published"}:
+                site = rec.get("site", "사이트 미상")
+                reason = rec.get("error") or status or "원인 미상"
+                failures.append(f"- {site}: {reason}")
             continue
-        site_url = "https://" + urlparse(rec["url"]).netloc
+        post_url = rec.get("url", "")
+        site_url = rec.get("site", "").rstrip("/")
+        if not site_url and post_url:
+            site_url = "https://" + urlparse(post_url).netloc
+        if not site_url:
+            failures.append("- 초안은 생성됐지만 사이트 주소가 결과에 없습니다.")
+            continue
         wp_pass = os.environ.get(key_map.get(site_url.rstrip("/"), ""), "")
         if not wp_pass:
+            failures.append(f"- {site_url}: 초안은 생성됐지만 사이트 인증값을 찾지 못했습니다.")
             continue
-        post_id = _resolve_post_id(site_url, rec["url"], wp_pass)
+        post_id = int(rec.get("post_id") or 0) or _resolve_post_id(site_url, post_url, wp_pass)
         if not post_id:
+            failures.append(f"- {site_url}: 초안은 생성됐지만 글 ID를 찾지 못했습니다.")
             continue
         edit_url = _admin_edit_url(site_url, post_id)
         title = rec.get("title", "(제목 없음)")
-        lines.append(f"- {title}\n  {edit_url}\n  (열어서 '발행' 누르면 즉시 공개, '즉시'를 누르면 예약 시간 지정 가능)")
-    return lines
+        lines.append(
+            f"사이트: {urlparse(site_url).netloc}\n"
+            f"제목: {title}\n"
+            f"검수·승인: {edit_url}\n"
+            "상태: 비공개 초안 (아직 공개되지 않음)"
+        )
+        first_action_url = first_action_url or edit_url
+    return lines, failures, first_action_url
 
 
 def send_email(subject: str, body: str) -> bool:
@@ -123,14 +149,19 @@ def main() -> int:
     fallback_link = os.getenv("REPORT_URL", "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions")
     base_body = os.getenv("REPORT_BODY", "자동발행 결과를 확인하세요.")
 
-    draft_lines = build_draft_review_lines()
+    draft_lines, failures, action_link = build_report()
     if draft_lines:
-        body = base_body + "\n\n검수 대기 글 (링크 열어서 바로 발행 또는 예약):\n\n" + "\n\n".join(draft_lines)
-        body += f"\n\n실행 로그: {fallback_link}"
+        title = f"[초안 검수 {len(draft_lines)}건] WordPress 승인 필요"
+        body = "초안 생성이 완료됐습니다. 아래 '검수·승인' 링크를 누르세요.\n\n" + "\n\n".join(draft_lines)
+        if failures:
+            body += "\n\n주의 사항:\n" + "\n".join(failures)
     else:
-        body = base_body + f"\n\n모바일 확인·업로드: {fallback_link}"
+        title = "[자동발행 확인 필요] 검수 링크 생성 실패"
+        body = base_body + "\n\n" + ("\n".join(failures) if failures else "생성된 초안이 없습니다.")
+        body += f"\n\n문제 확인용 실행 로그: {fallback_link}"
 
-    results = {"email": send_email(title, body), "kakao": send_kakao(body, fallback_link), "url": fallback_link,
+    notification_link = action_link or fallback_link
+    results = {"email": send_email(title, body), "kakao": send_kakao(body, notification_link), "url": notification_link,
                "draft_links_found": len(draft_lines)}
     print(json.dumps(results, ensure_ascii=False))
     return 0
