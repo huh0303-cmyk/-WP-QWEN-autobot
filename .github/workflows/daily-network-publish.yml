@@ -1,4 +1,5 @@
 name: "Blog Publish — Single Site (dispatched by A/B scheduler)"
+run-name: "초안 생성 | ${{ inputs.target_site_url }}${{ inputs.force_keyword && format(' | {0}', inputs.force_keyword) || '' }}"
 
 # publish_scheduler.py가 A17/B8 중 오늘 대상 사이트를 하나씩 분산 dispatch한다.
 # 뉴스 2개는 newsrooms-daily-publisher.yml이 별도로 담당한다.
