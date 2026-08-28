@@ -8,6 +8,13 @@ on:
       - "config/automation_workflow_contracts.json"
       - "automation_hub/rooms.py"
       - "automation_hub/workflow_contracts.py"
+      - "automation_hub/dispatch_builder.py"
+      - "automation_hub/room_scheduler.py"
+      - "scripts/youtube_publish_approved.py"
+      - "scripts/curio_upload.py"
+      - "tests/test_room_safety_contract.py"
+      - ".github/workflows/generate-youtube-playlist.yml"
+      - ".github/workflows/curio-longform-daily.yml"
 
 permissions:
   contents: read
@@ -15,13 +22,19 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install test dependency
+        run: pip install pytest -q
       - name: Validate room counts and safety policies
         run: python -m automation_hub.rooms
       - name: Validate room to workflow contracts
         run: python -m automation_hub.workflow_contracts
+      - name: Build dry-run dispatch payloads
+        run: python -m automation_hub.dispatch_builder --output /tmp/automation-dispatch-plan.json
+      - name: Run room safety regression tests
+        run: pytest -q tests/test_room_safety_contract.py
