@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 
 import requests
@@ -52,12 +53,22 @@ def fetch_hidden_posts(status: str) -> list[dict]:
     return posts
 
 
-def restore_post(post_id: int) -> tuple[bool, int]:
-    resp = requests.post(
-        f"{SITE}/wp-json/wp/v2/posts/{post_id}", auth=(USER, PASSWORD),
-        json={"status": "publish"}, timeout=30,
-    )
-    return resp.status_code in (200, 201), resp.status_code
+def restore_post(post_id: int, max_retries: int = 3) -> tuple[bool, int]:
+    """307개를 연달아 빠르게 POST하면 호스팅 쪽 보안 플러그인/레이트리밋이
+    연결을 그냥 끊어버리는 경우가 있었다(RemoteDisconnected) — 그 경우
+    한 건 실패로 전체 배치가 죽지 않도록 지수 백오프로 재시도한다."""
+    last_code = 0
+    for attempt in range(max_retries):
+        try:
+            resp = requests.post(
+                f"{SITE}/wp-json/wp/v2/posts/{post_id}", auth=(USER, PASSWORD),
+                json={"status": "publish"}, timeout=30,
+            )
+            return resp.status_code in (200, 201), resp.status_code
+        except requests.exceptions.RequestException:
+            last_code = -1
+            time.sleep(min(2 ** attempt, 10))
+    return False, last_code
 
 
 def run(apply_changes: bool = APPLY_CHANGES) -> dict:
@@ -84,6 +95,7 @@ def run(apply_changes: bool = APPLY_CHANGES) -> dict:
         ok, code = restore_post(item["id"])
         results.append({**item, "action": "PUBLISHED" if ok else "FAILED", "http_status": code})
         print(f"  {'OK' if ok else 'FAIL'} ({code}) id={item['id']} {item['link']}")
+        time.sleep(0.4)  # 307건 연타로 호스팅 레이트리밋에 걸리지 않게 페이싱
 
     return {
         "site": SITE,

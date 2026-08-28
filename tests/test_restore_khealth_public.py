@@ -56,6 +56,35 @@ def test_failed_publish_call_is_reported_not_hidden():
     assert all(r["action"] == "FAILED" for r in report["results"])
 
 
+def test_restore_post_retries_transient_connection_errors_instead_of_dying():
+    # The real run hit RemoteDisconnected on the very first post and the
+    # whole 307-post batch died with it. restore_post must retry instead.
+    import requests
+
+    with patch.object(restore, "PASSWORD", "x"), \
+         patch("restore_khealth_public.time.sleep"), \
+         patch("restore_khealth_public.requests.post", side_effect=[
+             requests.exceptions.ConnectionError("boom"),
+             requests.exceptions.ConnectionError("boom"),
+             type("R", (), {"status_code": 200})(),
+         ]) as post_call:
+        ok, code = restore.restore_post(1)
+    assert ok is True
+    assert code == 200
+    assert post_call.call_count == 3
+
+
+def test_restore_post_gives_up_after_max_retries():
+    import requests
+
+    with patch.object(restore, "PASSWORD", "x"), \
+         patch("restore_khealth_public.time.sleep"), \
+         patch("restore_khealth_public.requests.post", side_effect=requests.exceptions.ConnectionError("boom")):
+        ok, code = restore.restore_post(1, max_retries=3)
+    assert ok is False
+    assert code == -1
+
+
 def test_script_never_issues_a_delete_request():
     source = Path(restore.__file__).read_text(encoding="utf-8")
     assert "requests.delete" not in source
