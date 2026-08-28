@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
+  "status": "LOCKED",
+  "primary_writer": {
+    "provider": "gemini",
+    "model_family": "Gemini Flash",
+    "cost_policy": "free_tier_first",
+    "role": "default_blog_writer",
+    "rules": [
+      "Use Gemini Flash as the default writer for routine blog content.",
+      "Do not silently switch to a paid Gemini tier when free-tier quota/auth fails.",
+      "If the free tier is unavailable, return AWAITING_APPROVAL or follow the explicit fallback rules below."
+    ]
+  },
+  "fallback_writer": {
+    "provider": "openai",
+    "model_family": "GPT",
+    "role": "quality_rewrite_and_high_value_writer",
+    "allowed_when": [
+      "quality_fail",
+      "important_content",
+      "high_value_content",
+      "manual_override"
+    ],
+    "rules": [
+      "GPT must not be the default writer for bulk routine content.",
+      "GPT calls must be tied to an explicit quality or importance signal.",
+      "No paid fallback is allowed merely because the primary free tier was exhausted."
+    ]
+  },
+  "auditor": {
+    "provider": "anthropic",
+    "model_family": "Claude",
+    "role": "development_code_system_audit",
+    "rules": [
+      "Claude is not the default bulk blog writer.",
+      "Use Claude primarily for development, code review, system audit, policy review, and complex editorial QA when explicitly requested."
+    ]
+  },
+  "freshness_sensitive_content": {
+    "types": [
+      "government_support",
+      "benefits",
+      "ticketing",
+      "timetables",
+      "application_deadlines",
+      "policy_changes",
+      "transport_schedules",
+      "seasonal_events"
+    ],
+    "official_source_verification_required": true,
+    "on_missing_verification": "QUALITY_FAIL",
+    "rule": "Do not generate or queue publish-ready content when current official-source verification is missing."
+  },
+  "safety": {
+    "auto_public": false,
+    "allowed_publish_states": ["draft", "private", "awaiting_approval"],
+    "new_paid_service_without_approval": false,
+    "silent_paid_tier_upgrade": false
+  }
+}
