@@ -1,0 +1,24 @@
+name: "쿠팡파트너스 — 배너 증빙 삽입 (koreamedicaltour / k-trip365)"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Insert Coupang Partners banner into latest post
+        env:
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        run: python scripts/inject_coupang_banner.py
