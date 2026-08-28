@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -83,6 +84,30 @@ def build_writer_prompt(job: dict) -> str:
 def build_prompt(job: dict) -> str:
     """Backward-compatible alias kept for existing tests/callers."""
     return build_writer_prompt(job)
+
+
+MIN_BODY_CHARS = 800
+
+
+def structural_check(draft: dict) -> list[str]:
+    """Minimum viability floor before a draft is treated as DRAFT_READY.
+
+    This is not an SEO score — it only catches obviously broken output
+    (near-empty body, no title, no real structure) that the writer or
+    Claude audit could otherwise let through silently.
+    """
+    issues: list[str] = []
+    title = str(draft.get("title", "")).strip()
+    body = str(draft.get("body_html", ""))
+    plain = re.sub(r"<[^>]+>", "", body)
+    plain = re.sub(r"\s+", "", plain)
+    if not title:
+        issues.append("title is empty")
+    if len(plain) < MIN_BODY_CHARS:
+        issues.append(f"body length {len(plain)} is below the {MIN_BODY_CHARS}-character floor")
+    if not re.search(r"(?is)<h[23][\s>]", body):
+        issues.append("body has no h2/h3 headings")
+    return issues
 
 
 def _parse_json_response(raw: str) -> dict:
@@ -177,6 +202,11 @@ def generate_draft(job: dict) -> dict:
         "duplicate_guard": True,
         "public_allowed": False,
     }
+    structural_issues = structural_check(draft)
+    if structural_issues:
+        draft["status"] = "QUALITY_FAILED"
+        draft["error"] = "; ".join(structural_issues)
+        return draft
     draft["audit"] = audit_draft(draft, job)
     return draft
 

@@ -109,9 +109,8 @@ Return JSON only with keys title, meta_description, content_html, image_queries,
 meta_description must be a natural search description of about 120 characters (110-130 characters).
 labels must contain 3-5 specific, relevant labels. image_queries must contain 0-2 free-stock search queries; use an empty list when no image is genuinely relevant.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
-For visa, insurance or medical-tourism topics, cite official sources, state an as-of date, warn that rules can change, and add a non-advisory/non-diagnostic disclaimer.
+For visa, insurance, or medical/health topics (YMYL), within the first three paragraphs include: (1) a reference-date sentence using the literal words "as of" (English) or "기준" (Korean) followed by a real month/year, e.g. "2026년 8월 기준" or "as of August 2026"; (2) a change-warning sentence using words like "can change"/"subject to change" or "변경될 수 있으니"/"확인하세요"; (3) a short non-advisory disclaimer ("consult a professional"/"전문가와 상담" or "not medical/legal advice"/"의료/법률 자문이 아닙니다"). These three must appear as real sentences, not a heading label alone, or the article fails the quality gate.
 Link naturally to the owned detailed source using this exact URL in one of the first two paragraphs so it survives length editing: {source_url}
-For visa, insurance or medical-tourism topics, place the as-of date, change warning and disclaimer within the first three paragraphs, not only at the end.
 Use additional internal WordPress or authoritative primary-source links only from the verified list below. Include only links that materially support the article; never invent or guess URLs. Prefer government, regulator, university, hospital, insurer, and other primary sources for factual or time-sensitive claims.
 Verified link candidates from the source article:
 {verified_link_text}
@@ -187,7 +186,7 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
     else:
         failures.append("AI/filler phrasing detected")
     ymyl = bool(re.search(r"(?i)(visa|immigration|insurance|medical|hospital|treatment|비자|보험|의료)", source_title + " " + text))
-    if not ymyl or (re.search(r"(?i)(as of|기준일)", text) and re.search(r"(?i)(can change|subject to change|confirm|disclaimer|consult|변경|확인|면책|상담)", text)):
+    if not ymyl or (re.search(r"(?i)(as of|effective|기준일|[0-9]{4}년\s*[0-9]{1,2}월[^.]{0,10}기준)", text) and re.search(r"(?i)(can change|subject to change|confirm|disclaimer|consult|변경|확인|면책|상담)", text)):
         score += 5
     else:
         failures.append("YMYL as-of date/change warning/disclaimer is incomplete")

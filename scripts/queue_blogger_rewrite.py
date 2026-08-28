@@ -2,7 +2,10 @@
 """Rewrite one verified WordPress post with Gemini and queue it for Blogger.
 
 Text policy: Blogger = Gemini only.
-Image policy: paid image generation is disabled; image absence never blocks publishing.
+Image policy: paid (Replicate/AI) image generation is disabled for Blogger.
+At most one free-stock image (Pexels, then Pixabay) is attached when the
+rewrite names a relevant image query and a topic-matching photo is found;
+image absence never blocks publishing.
 """
 from __future__ import annotations
 
@@ -20,7 +23,15 @@ for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from automation_hub.blogger_rewriter import blogger_quality_score, normalize_rewrite_format, parse_rewrite_json, rewrite_prompt
+from automation_hub.blogger_rewriter import (
+    attach_single_image,
+    blogger_quality_score,
+    find_one_free_image,
+    image_is_relevant,
+    normalize_rewrite_format,
+    parse_rewrite_json,
+    rewrite_prompt,
+)
 from automation_hub.content_identity import active_duplicate, canonical_source_id, stable_content_id
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
@@ -127,9 +138,24 @@ def main():
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: 2회 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
 
     content = rewritten["content_html"]
-    # Stability/cost rule: article publication must never depend on a paid image API.
-    # Images can be attached later from existing owned media without blocking the post.
+    # Stability/cost rule: article publication must never depend on a paid (AI)
+    # image API. A free-stock photo is attached best-effort when the rewrite
+    # named a relevant query and a topic-matching result is found; the image
+    # never blocks publishing either way.
     image_model = "0"
+    pexels_key = os.environ.get("PEXELS_KEY", "").strip()
+    pixabay_key = os.environ.get("PIXABAY_KEY", "").strip()
+    for query in rewritten.get("image_queries", []):
+        if not (pexels_key or pixabay_key):
+            break
+        try:
+            candidate_image = find_one_free_image(query, pexels_key=pexels_key, pixabay_key=pixabay_key)
+        except requests.RequestException:
+            candidate_image = None
+        if candidate_image and image_is_relevant(candidate_image, query=query, title=rewritten["title"]):
+            content = attach_single_image(content, candidate_image, alt=query)
+            image_model = candidate_image.provider
+            break
 
     content_id = stable_content_id(
         "blogger", blogger_site_id, source["link"],

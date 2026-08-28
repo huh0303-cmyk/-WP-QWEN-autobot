@@ -63,6 +63,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"
           SOURCE_WP_URL: ${{ inputs.source_wp_url }}
           BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
