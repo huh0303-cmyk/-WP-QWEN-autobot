@@ -26,6 +26,7 @@ concurrency:
 
 jobs:
   dispatch:
+    if: ${{ false }} # EMERGENCY LOCK: all YouTube/video automation disabled
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
