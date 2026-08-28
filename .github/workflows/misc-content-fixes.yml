@@ -1,0 +1,40 @@
+name: "잡다한 콘텐츠 수정 (AI티나는 이미지 교체 + kworld365 공개)"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  fix-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Replace AI-looking featured images with real stock photos
+        env:
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+        run: python scripts/fix_ai_looking_images.py
+
+  publish-kworld:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Publish kworld365.com posts (1 today, rest staggered)
+        env:
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+        run: python scripts/publish_kworld_posts.py
