@@ -207,6 +207,9 @@ Respond with JSON only, no explanation, no markdown fences:
 # 2. 이미지 생성 (Gemini 2.5 Flash Image)
 # ════════════════════════════════════════════════════════════
 def gemini_generate_image(prompt, out_path, max_retries=5):
+    if os.environ.get("PAID_IMAGE_GENERATION_ENABLED", "false").lower() != "true" or os.environ.get("OPENAI_IMAGE_ENABLED", "false").lower() != "true":
+        log("      AI 이미지 생성 차단됨 — 퍼블릭도메인/아카이브 이미지만 허용")
+        return False
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     last_err = None
     for attempt in range(max_retries):
