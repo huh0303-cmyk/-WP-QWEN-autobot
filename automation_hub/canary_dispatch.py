@@ -8,6 +8,7 @@ from pathlib import Path
 
 DEFAULT_PLAN = Path("artifacts/automation-room-dispatch.json")
 ALLOWED_PLATFORMS = {"wordpress", "blogger", "youtube", "tistory"}
+PUBLIC_TRUE_KEYS = {"publication_approved", "publish_now", "public", "is_public", "auto_publish"}
 
 
 def load_items(path: Path) -> list[dict]:
@@ -20,6 +21,42 @@ def load_items(path: Path) -> list[dict]:
     return []
 
 
+def _truthy(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on", "public", "publish"}
+
+
+def _sanitize_inputs(platform: str, inputs: dict) -> dict:
+    safe = dict(inputs)
+    # Non-negotiable public safety guards.
+    for key in PUBLIC_TRUE_KEYS:
+        if key in safe:
+            safe[key] = False
+    # YouTube automation must never request a scheduled/public transition.
+    if platform == "youtube":
+        safe["publish_delay_hours"] = ""
+        for key in ("publish_at", "publishAt", "privacy_status", "privacyStatus"):
+            if key in safe:
+                safe[key] = "private" if "privacy" in key.lower() else ""
+    return safe
+
+
+def _unsafe_payload(platform: str, inputs: dict) -> str:
+    for key in PUBLIC_TRUE_KEYS:
+        if key in inputs and _truthy(inputs[key]):
+            return f"unsafe public input: {key}"
+    if platform == "youtube":
+        for key in ("publish_at", "publishAt"):
+            if str(inputs.get(key, "")).strip():
+                return f"youtube scheduled publication blocked: {key}"
+        for key in ("privacy_status", "privacyStatus"):
+            value = str(inputs.get(key, "")).strip().lower()
+            if value and value != "private":
+                return f"youtube privacy must be private: {key}={value}"
+    return ""
+
+
 def choose_canaries(items: list[dict], platforms: set[str], limit_per_platform: int = 1) -> list[dict]:
     chosen: list[dict] = []
     counts: dict[str, int] = {}
@@ -27,20 +64,29 @@ def choose_canaries(items: list[dict], platforms: set[str], limit_per_platform: 
         platform = str(item.get("platform") or "")
         if platform not in platforms or counts.get(platform, 0) >= limit_per_platform:
             continue
-        inputs = dict(item.get("inputs") or {})
-        # Non-negotiable public safety guard.
-        if "publication_approved" in inputs:
-            inputs["publication_approved"] = False
-        item = dict(item)
-        item["inputs"] = inputs
-        chosen.append(item)
+        publish_policy = str(item.get("publish_policy") or "")
+        expected = {"wordpress": "draft", "blogger": "draft", "youtube": "private", "tistory": "awaiting_approval"}.get(platform)
+        if expected and publish_policy != expected:
+            continue
+        inputs = _sanitize_inputs(platform, dict(item.get("inputs") or {}))
+        if _unsafe_payload(platform, inputs):
+            continue
+        candidate = dict(item)
+        candidate["inputs"] = inputs
+        chosen.append(candidate)
         counts[platform] = counts.get(platform, 0) + 1
     return chosen
 
 
 def dispatch(repo: str, item: dict, token: str) -> None:
+    platform = str(item.get("platform") or "")
+    inputs = _sanitize_inputs(platform, dict(item.get("inputs") or {}))
+    unsafe = _unsafe_payload(platform, inputs)
+    if unsafe:
+        raise RuntimeError(unsafe)
     workflow = item["workflow"]
-    payload = json.dumps({"ref": "main", "inputs": item.get("inputs") or {}}).encode()
+    ref = os.environ.get("GITHUB_REF_NAME", "main") or "main"
+    payload = json.dumps({"ref": ref, "inputs": inputs}).encode()
     req = urllib.request.Request(
         f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches",
         data=payload,
