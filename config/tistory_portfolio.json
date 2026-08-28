@@ -82,6 +82,15 @@
       "trend_mode": true,
       "official_source_required": true,
       "freshness_required": true,
+      "daily_required_slot": {
+        "enabled": true,
+        "topic_family": "government_benefits_and_support",
+        "minimum_posts_per_active_day": 1,
+        "candidate_terms": ["정부지원금", "보조금", "근로장려금", "자녀장려금", "청년지원금", "주거지원", "지자체지원금"],
+        "ranking_order": ["search_demand", "deadline_proximity", "official_announcement_freshness", "eligible_audience_size"],
+        "official_source_gate": true,
+        "no_official_source_action": "skip_instead_of_guess"
+      },
       "rss_output": {"visibility": "full", "items": 50},
       "source_policy": {
         "rss_is_discovery_only": true,
