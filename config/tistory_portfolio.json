@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "Five Tistory properties. One original post brief per site per day after launch. No automatic public publishing.",
+  "default_timezone": "Asia/Seoul",
+  "default_publish_policy": "awaiting_approval",
+  "duplicate_guard": true,
+  "daily_posts_per_site": 1,
+  "sites": [
+    {
+      "site_id": "tistory_dental_cost",
+      "current_label": "K-덴탈보험연구소",
+      "title": "K-치과비용연구소",
+      "language": "ko",
+      "audience": "한국인",
+      "description": "임플란트·교정·치아보험·비급여 진료비를 실제 비용 구조와 제도 기준으로 쉽게 풀어보는 치과비용 정보 블로그입니다.",
+      "categories": ["임플란트", "치아보험", "교정·보철", "비급여·진료비", "치과상식"],
+      "intent": ["비용", "보험적용", "비급여", "청구", "치료 전 체크"],
+      "seed_topics": ["임플란트 비용이 병원마다 다른 이유", "치아보험에서 임플란트 보장 확인하는 법", "치과 비급여 진료비 확인할 때 보는 항목"],
+      "daily_window": [7, 9]
+    },
+    {
+      "site_id": "tistory_insurance_lab",
+      "current_label": "K-보험분석연구소",
+      "title": "K-보험분석연구소",
+      "language": "ko",
+      "audience": "한국인",
+      "description": "실손·암·자동차·간병보험의 보장 구조와 보험금 청구, 가입 전 확인사항을 생활 사례 중심으로 정리하는 보험 분석 블로그입니다.",
+      "categories": ["실손보험", "암·건강보험", "자동차보험", "간병·노후보험", "보험금청구"],
+      "intent": ["보장", "보험금", "청구", "갱신", "가입 전 체크"],
+      "seed_topics": ["실손보험 청구 전 준비해야 할 서류", "자동차보험 갱신 전에 확인할 항목", "간병보험 가입 전 꼭 보는 보장 조건"],
+      "daily_window": [10, 12]
+    },
+    {
+      "site_id": "tistory_finance_housing",
+      "current_label": "K-보건의료자격증",
+      "title": "K-부동산·금융생활",
+      "language": "ko",
+      "audience": "한국인",
+      "description": "전월세·청약·대출·신용점수·세금처럼 일상에서 바로 필요한 부동산과 금융 정보를 이해하기 쉽게 정리합니다.",
+      "categories": ["전월세", "청약·주택", "대출", "신용·카드", "세금·생활금융"],
+      "intent": ["신청", "조건", "한도", "비용", "절세", "계약 전 체크"],
+      "seed_topics": ["전세 계약 전 등기부등본에서 확인할 항목", "신용점수가 갑자기 떨어지는 주요 이유", "주택담보대출 비교할 때 금리 외에 볼 것"],
+      "daily_window": [13, 15]
+    },
+    {
+      "site_id": "tistory_life365",
+      "current_label": "K-Petcare",
+      "title": "오늘의 생활정보365",
+      "language": "ko",
+      "audience": "한국인",
+      "description": "정부지원금·신청기간·지급일·기차와 버스 시간표·티켓예매·축제·시즌 일정처럼 지금 검색량이 오르는 생활 실용정보를 빠르게 정리합니다.",
+      "categories": ["정부지원금", "신청·지급일", "예매·티켓", "교통·시간표", "축제·시즌정보"],
+      "intent": ["오늘", "이번주", "신청방법", "대상", "지급일", "예매일정", "시간표", "교통통제"],
+      "trend_mode": true,
+      "official_source_required": true,
+      "seed_topics": ["정부지원금 신청 전 확인해야 할 공통 항목", "KTX·SRT 명절 예매 전에 확인할 사항", "지역축제 일정 확인할 때 공식 정보 찾는 법"],
+      "daily_window": [16, 18]
+    },
+    {
+      "site_id": "tistory_ktrip365",
+      "current_label": "K-trip365",
+      "title": "K-Trip365",
+      "language": "en",
+      "audience": "Foreign visitors to Korea",
+      "description": "Practical Korea travel guides for hotels, transport, local routes, booking, seasonal trips and first-time visitors.",
+      "categories": ["Transport", "Hotels", "Seoul", "Regional Travel", "Seasonal Trips"],
+      "intent": ["how to", "schedule", "route", "booking", "cost", "first-time"],
+      "seed_topics": ["How to use intercity buses in Korea", "What first-time visitors should know about Korean hotels", "How to plan a day trip from Seoul by train"],
+      "daily_window": [19, 21]
+    }
+  ]
+}
