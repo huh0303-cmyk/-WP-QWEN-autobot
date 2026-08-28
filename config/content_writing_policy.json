@@ -97,6 +97,16 @@
     "similar_or_repeated_title_action": "QUALITY_FAIL"
   },
   "quality_gate": {"minimum_score": 70, "below_minimum_action": "QUALITY_FAIL"},
+  "three_model_checks_and_balances": {
+    "status": "LOCKED_MANDATORY",
+    "applies_to": ["wordpress", "blogger", "tistory", "news"],
+    "gemini": "first_draft_and_independent_self_check",
+    "gpt": "independent_fact_structure_seo_originality_check_and_rewrite_when_required",
+    "claude": "independent_final_editorial_fact_and_policy_audit",
+    "approval_rule": "all_three_must_return_ok_true",
+    "single_model_approval_allowed": false,
+    "missing_or_failed_checker_action": "CONSENSUS_FAILED_NO_DRAFT"
+  },
   "blogger_metadata": {
     "labels": {"minimum": 8, "maximum": 14, "count_mode": "varied_per_article", "format": "short_noun_search_terms", "sentences_forbidden": true},
     "search_description": {"required": true, "minimum_words": 100, "maximum_words": 120, "missing_or_out_of_range_action": "QUALITY_FAIL"}
