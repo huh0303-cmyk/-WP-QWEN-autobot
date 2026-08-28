@@ -159,15 +159,23 @@ def now_kst_str():
 # ════════════════════════════════════════════════════════════
 # 1) 27개 사이트 요약 (상세 아니라 합계만)
 # ════════════════════════════════════════════════════════════
-def get_visitor_count(site_url):
-    """일일 방문자수 — 2026-08-21 배포한 daily_visitor_counter.php 스니펫의
-    공개 REST 엔드포인트(site-stats/v1/visitors)에서 오늘 카운트를 가져온다.
-    스니펫이 아직 배포 안 된 사이트는 404가 나므로 None으로 처리."""
+def get_visitor_metrics(site_url):
+    """Return today's, yesterday's and cumulative first-party visitor counts."""
     try:
         r = requests.get(f"{site_url}/wp-json/site-stats/v1/visitors",
                           headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
         if r.status_code == 200:
-            return int(r.json().get("count", 0))
+            data = r.json()
+            today_count = int(data.get("count", 0))
+            yesterday_count = int(data.get("yesterday_count", 0))
+            total_count = int(data.get("total", today_count))
+            return {
+                "today": today_count,
+                "yesterday": yesterday_count,
+                "daily_delta": today_count - yesterday_count,
+                "total": total_count,
+                "total_delta": today_count,
+            }
     except Exception:
         pass
     return None
@@ -219,7 +227,8 @@ def collect_site_summary():
         if total_published is not None:
             total_posts += total_published
             posts_sites += 1
-        visitor_count = get_visitor_count(site_url)
+        visitor_metrics = get_visitor_metrics(site_url)
+        visitor_count = visitor_metrics.get("today") if visitor_metrics else None
         domain_property = f"sc-domain:{domain}"
         if site_url in accessible:
             query_site = site_url
@@ -229,7 +238,8 @@ def collect_site_summary():
             error_sites.append(domain)
             site_details.append({"domain": domain, "url": site_url, "clicks": None,
                                   "indexed": None, "total_posts": total_published,
-                                  "visitor_count": visitor_count, "status": "권한없음"})
+                                  "visitor_count": visitor_count, "visitor_metrics": visitor_metrics,
+                                  "status": "권한없음"})
             continue
         status = "정상"
         clicks = None
@@ -249,7 +259,8 @@ def collect_site_summary():
             indexed = coverage["indexed"]
         site_details.append({"domain": domain, "url": site_url, "clicks": clicks,
                               "indexed": indexed, "total_posts": total_published,
-                              "visitor_count": visitor_count, "status": status})
+                              "visitor_count": visitor_count, "visitor_metrics": visitor_metrics,
+                              "status": status})
         time.sleep(0.2)
 
     return {"total_clicks": total_clicks if clicks_sites else None,
@@ -453,6 +464,66 @@ def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
 
+def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats, sns_diffs,
+                                 totals, checked_at):
+    """Write one compact summary plus per-asset daily comparison tables."""
+    import gsheets_direct
+    if not SHEET_ID or not gsheets_direct.has_credentials():
+        return
+    now = datetime.now(KST)
+    date_label = f"{now.year}-{now.month:02d}-{now.day:02d} {weekday_kr(now.strftime('%Y-%m-%d'))}"
+    try:
+        summary_header = [
+            "기준일(KST)", "수집시각(KST)", "WP수집", "WP전체", "오늘방문자합계",
+            "누적방문자합계", "검색클릭합계", "색인합계", "공개글합계",
+            "YouTube수집", "YouTube전체", "구독자합계", "조회수합계",
+            "SNS수집", "SNS전체", "Blogger연결", "Blogger목표", "Tistory연결",
+            "Tistory목표", "상태"
+        ]
+        summary_row = [
+            date_label, checked_at, totals["wp_collected"], totals["wp_total"],
+            totals["daily_visitors"], totals["cumulative_visitors"], totals["search_clicks"],
+            totals["indexed"], totals["posts"], totals["youtube_collected"],
+            totals["youtube_total"], totals["youtube_subscribers"], totals["youtube_views"],
+            totals["sns_collected"], totals["sns_total"], totals["blogger_connected"], 27,
+            totals["tistory_connected"], 5, totals["status"],
+        ]
+        gsheets_direct.append_or_update_tab_row(
+            SHEET_ID, "아침_자산요약", summary_header, summary_row
+        )
+
+        wp_values = {}
+        for item in site_details:
+            vm = item.get("visitor_metrics") or {}
+            wp_values[item["domain"]] = [
+                vm.get("today"), _fmt_diff_cell(vm.get("daily_delta")),
+                vm.get("total"), _fmt_diff_cell(vm.get("total_delta")),
+                item.get("clicks"), item.get("indexed"), item.get("total_posts"), item.get("status"),
+            ]
+        gsheets_direct.append_dated_metric_columns(
+            SHEET_ID, "아침_WP상세", [item["domain"] for item in site_details], date_label,
+            ["일방문자", "전일대비", "누적방문자", "누적증가", "검색클릭", "색인", "공개글", "수집상태"],
+            wp_values,
+        )
+
+        sns_values = {}
+        for platform_key, platform_label in (
+            ("tiktok", "TikTok"), ("facebook", "Facebook"),
+            ("instagram", "Instagram"), ("threads", "Threads"),
+        ):
+            for brand in BRANDS:
+                key = f"{platform_label} · {BRAND_LABELS_KR[brand]}"
+                info = social_stats[platform_key][brand]
+                sns_values[key] = [info.get("count"), _fmt_diff_cell(sns_diffs[platform_key].get(brand)), info.get("error", "")]
+        gsheets_direct.append_dated_metric_columns(
+            SHEET_ID, "아침_SNS상세", list(sns_values), date_label,
+            ["팔로워", "전일대비", "상태"], sns_values,
+        )
+        log("📊 아침 통합 대시보드 3개 탭 갱신 완료")
+    except Exception as exc:
+        log(f"⚠️ 아침 통합 대시보드 갱신 실패: {exc}")
+
+
 def send_email(subject, body):
     if not GMAIL_APP_PASSWORD:
         log("⚠️ GMAIL_APP_PASSWORD 없음 — 이메일 스킵")
@@ -628,6 +699,9 @@ def main():
     total_real_visitors = sum(
         d["visitor_count"] for d in site_details_list if d.get("visitor_count") is not None
     )
+    total_cumulative_visitors = sum(
+        (d.get("visitor_metrics") or {}).get("total", 0) for d in site_details_list
+    )
     summary_lines = [
         f"[{checked_at}] 종합상황실",
         "",
@@ -636,6 +710,7 @@ def main():
         f"Google 검색 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
         f"사이트맵 색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} | "
         f"실제방문자 합계(오늘) {total_real_visitors}명(수집 {visitor_sites}/{site_count})",
+        f"  WP 누적방문자 합계 {total_cumulative_visitors}명",
         f"  유튜브 {youtube_count}채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
         f"  SNS 연결계정 {sns_connected}/{sns_account_count}개",
         "",
@@ -744,6 +819,44 @@ def main():
             record[f"{platform_key}_{b}_count"] = today[platform_key][b]["count"]
     send_to_sheets(record)
     send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at)
+
+    registry_path = Path(REPO_ROOT) / "config" / "automation_hub_sites.json"
+    tistory_path = Path(REPO_ROOT) / "config" / "tistory_portfolio.json"
+    try:
+        registry_sites = json.loads(registry_path.read_text(encoding="utf-8")).get("sites", [])
+        blogger_connected = sum(1 for site in registry_sites if site.get("platform") == "blogger")
+    except Exception:
+        blogger_connected = 0
+    try:
+        tistory_connected = sum(
+            1 for site in json.loads(tistory_path.read_text(encoding="utf-8")).get("sites", [])
+            if site.get("launch_enabled") is True
+        )
+    except Exception:
+        tistory_connected = 0
+    dashboard_totals = {
+        "wp_collected": visitor_sites,
+        "wp_total": site_count,
+        "daily_visitors": total_real_visitors,
+        "cumulative_visitors": total_cumulative_visitors,
+        "search_clicks": today["site_clicks"],
+        "indexed": today["site_indexed"],
+        "posts": today["site_posts"],
+        "youtube_collected": yt_configured,
+        "youtube_total": youtube_count,
+        "youtube_subscribers": total_yt_subs,
+        "youtube_views": total_yt_views,
+        "sns_collected": sns_connected,
+        "sns_total": sns_account_count,
+        "blogger_connected": blogger_connected,
+        "tistory_connected": tistory_connected,
+        "status": "정상" if visitor_sites == site_count and yt_configured == youtube_count else "일부수집",
+    }
+    send_morning_asset_dashboard(
+        site_details_list, yt_stats, yt_diffs,
+        {"tiktok": tiktok_m, "facebook": facebook_m, "instagram": instagram_m, "threads": threads_m},
+        sns_diffs, dashboard_totals, checked_at,
+    )
 
     send_email(f"[종합상황실] {checked_at[:10]} 현황 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
