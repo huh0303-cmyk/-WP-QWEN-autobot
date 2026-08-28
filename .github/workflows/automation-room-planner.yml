@@ -28,6 +28,8 @@ jobs:
         run: python -m automation_hub.room_scheduler --output artifacts/automation-room-plan.json
       - name: Build dry-run workflow dispatch payloads
         run: python -m automation_hub.dispatch_builder --output artifacts/automation-dispatch-plan.json
+      - name: Build unified room status snapshot
+        run: python -m automation_hub.status_snapshot --output artifacts/automation-room-status.json
       - name: Upload planning artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -35,4 +37,5 @@ jobs:
           path: |
             artifacts/automation-room-plan.json
             artifacts/automation-dispatch-plan.json
+            artifacts/automation-room-status.json
           retention-days: 7
