@@ -30,8 +30,11 @@ def test_life365_replaces_the_stale_petcare_label():
     assert site["title"] == "한국생활정보"
     assert site["url"] == "https://huh0303.tistory.com/"
     assert site["official_source_required"] is True
-    assert "정부지원금" in site["categories"]
+    assert "장려금·지원금" in site["categories"]
     assert "교통·시간표" in site["categories"]
+    assert site["rss_output"] == {"visibility": "full", "items": 50}
+    assert site["source_policy"]["copy_feed_content"] is False
+    assert "대한민국 정책브리핑 RSS (2026-07-01 종료)" in site["source_policy"]["discontinued_sources"]
 
 
 def test_finance_site_replaces_the_stale_healthcare_label():
