@@ -6,8 +6,12 @@
 
 add_filter('comments_open', '__return_false', 20, 2);
 add_filter('pings_open', '__return_false', 20, 2);
+add_filter('notify_post_author', '__return_false');
+add_filter('notify_moderator', '__return_false');
 
 add_action('init', function () {
     update_option('default_comment_status', 'closed');
     update_option('default_ping_status', 'closed');
+    update_option('comments_notify', 0);
+    update_option('moderation_notify', 0);
 });
