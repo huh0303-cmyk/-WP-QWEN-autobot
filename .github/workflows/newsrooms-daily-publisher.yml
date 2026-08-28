@@ -1,6 +1,10 @@
 name: "Two Newsrooms — 3–10 Daily Editions"
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/newsrooms-daily-publisher.yml"
   workflow_dispatch:
     inputs:
       newsroom:
@@ -55,7 +59,9 @@ jobs:
         run: |
           S="${{ github.event.schedule }}"
           MANUAL="${{ inputs.newsroom }}"
-          if [ -n "$MANUAL" ]; then
+          if [ "${{ github.event_name }}" = "push" ]; then
+            KEY="theseouljournal"
+          elif [ -n "$MANUAL" ]; then
             KEY="$MANUAL"
           elif [[ "$S" == "3 23 * * *" || "$S" == "15 1 * * *" || "$S" == "40 2 * * *" || "$S" == "49 3 * * *" || "$S" == "18 5 * * *" || "$S" == "1 7 * * *" || "$S" == "38 8 * * *" || "$S" == "13 10 * * *" || "$S" == "54 11 * * *" || "$S" == "25 13 * * *" ]]; then
             KEY="theseouljournal"
