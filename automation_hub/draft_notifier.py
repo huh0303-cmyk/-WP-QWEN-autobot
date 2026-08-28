@@ -7,6 +7,15 @@ from email.mime.text import MIMEText
 
 def notify_blogger_draft(*, site_id: str, title: str, review_url: str, quality_note: str = "") -> bool:
     """Email a private Blogger review link when Gmail credentials are configured."""
+    try:
+        from scripts.review_sheet import append_review_rows
+        append_review_rows([{
+            "platform": "Blogger", "channel": site_id, "title": title,
+            "review_url": review_url, "status": "비공개 초안",
+            "decision": "검토대기", "note": quality_note,
+        }])
+    except Exception as exc:
+        print(f"Blogger review sheet sync skipped without affecting draft: {exc}")
     password = os.environ.get("GMAIL_APP_PASSWORD", "").strip()
     recipient = os.environ.get("BLOGGER_REVIEW_EMAIL_TO", "huh0303@gmail.com").strip()
     sender = os.environ.get("BLOGGER_REVIEW_EMAIL_FROM", recipient).strip()

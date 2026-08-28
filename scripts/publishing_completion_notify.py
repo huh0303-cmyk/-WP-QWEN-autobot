@@ -173,11 +173,22 @@ def main() -> int:
     base_body = os.getenv("REPORT_BODY", "자동발행 결과를 확인하세요.")
 
     reviews = build_draft_reviews()
+    try:
+        from scripts.review_sheet import append_review_rows
+        sheet_synced = append_review_rows([
+            {"platform": "WordPress", "channel": urlparse(r["post_url"]).netloc,
+             "title": r["title"], "review_url": r["edit_url"], "status": "비공개 초안",
+             "decision": "검토대기", "run_url": fallback_link}
+            for r in reviews
+        ])
+    except Exception as exc:
+        print(f"review sheet sync failed without affecting notifications: {exc}")
+        sheet_synced = False
     body = _plain_body(base_body, reviews, fallback_link)
     email_html = _html_body(base_body, reviews, fallback_link)
     kakao_results = [send_kakao_review(review) for review in reviews]
     results = {"email": send_email(title, body, email_html), "kakao": bool(kakao_results) and all(kakao_results),
-               "url": fallback_link, "draft_links_found": len(reviews)}
+               "url": fallback_link, "draft_links_found": len(reviews), "sheet_synced": sheet_synced}
     print(json.dumps(results, ensure_ascii=False))
     return 0
 
