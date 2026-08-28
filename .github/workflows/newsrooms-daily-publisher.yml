@@ -74,8 +74,8 @@ jobs:
       - name: Publish one source-checked edition
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
-          WP_POST_STATUS: "publish"
-          WP_PUBLICATION_APPROVED: "true"
+          WP_POST_STATUS: "draft"
+          WP_PUBLICATION_APPROVED: "false"
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "openai"
           OPENAI_ENABLED: "true"
@@ -86,7 +86,7 @@ jobs:
           OPENAI_MODEL: "gpt-5.6-luna"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
-          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          NEWSROOM_REQUIRE_PUBLICATION: "false"
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"

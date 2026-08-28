@@ -17,9 +17,9 @@ on:
         required: false
         default: ""
       publication_approved:
-        description: "Publish publicly (scheduled production default)"
+        description: "Explicit approval to publish publicly (default keeps a review draft)"
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:

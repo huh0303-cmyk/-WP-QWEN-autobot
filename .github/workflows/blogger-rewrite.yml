@@ -32,9 +32,9 @@ on:
         default: "1800"
         type: string
       publish_now:
-        description: "Publish automatically after quality checks"
+        description: "Explicit approval to publish; default creates a review draft"
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -72,6 +72,6 @@ jobs:
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
           BLOGGER_MAX_SIMILARITY: "0.68"
           BLOGGER_MIN_QUALITY_SCORE: "75"
-          BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now && 'true' || 'false' }}
+          BLOGGER_PUBLISH_NOW: "false"
           FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py

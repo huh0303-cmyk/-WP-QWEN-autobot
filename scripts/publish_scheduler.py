@@ -155,7 +155,7 @@ def main():
                              "Accept": "application/vnd.github+json"},
                     json={"ref": "main",
                           "inputs": {"target_site_url": site_url,
-                                     "publication_approved": "true"}},
+                                     "publication_approved": "false"}},
                     timeout=20,
                 )
                 print(f"  ▶ {site_url} 발행 트리거 → HTTP {r.status_code}")
