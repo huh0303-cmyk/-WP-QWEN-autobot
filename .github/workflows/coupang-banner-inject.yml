@@ -1,7 +1,13 @@
 name: "쿠팡파트너스 — 배너 증빙 삽입 (koreamedicaltour / k-trip365)"
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      report_pending:
+        description: "발행글 외에 draft/private 대기글 목록도 참고용으로 출력"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -21,4 +27,5 @@ jobs:
         env:
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          REPORT_PENDING: ${{ inputs.report_pending }}
         run: python scripts/inject_coupang_banner.py

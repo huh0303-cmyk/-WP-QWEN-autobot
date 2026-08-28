@@ -71,6 +71,29 @@ def inject(site_url: str, wp_pass_env: str) -> dict:
             "status": post.get("status"), "title": title}
 
 
+def list_pending(site_url: str, wp_pass_env: str, limit: int = 5) -> None:
+    """Report-only: show the most recent draft/private posts (not touched)."""
+    wp_pass = os.environ.get(wp_pass_env, "")
+    if not wp_pass:
+        return
+    r = requests.get(
+        f"{site_url}/wp-json/wp/v2/posts",
+        auth=(WP_USER, wp_pass),
+        params={"per_page": limit, "status": "draft,private,pending", "orderby": "date",
+                "order": "desc", "_fields": "id,slug,date,status,title"},
+        timeout=20,
+    )
+    if r.status_code != 200:
+        return
+    posts = r.json()
+    if not posts:
+        print(f"   (draft/private 대기글 없음)")
+        return
+    for p in posts:
+        title = p["title"]["rendered"]
+        print(f"   - [{p.get('status')}] {p.get('date','')[:10]} {title} (id={p['id']})")
+
+
 def main():
     results = [inject(url, env_var) for url, env_var in SITES]
     for res in results:
@@ -82,6 +105,12 @@ def main():
             print(f"✅ {res['site']}: 배너 삽입 완료 [status={res.get('status')}] — {res['url']}")
     if any(not r.get("ok") for r in results):
         sys.exit(1)
+
+    if os.environ.get("REPORT_PENDING", "").strip().lower() == "true":
+        print("\n--- 최근 draft/private 대기글 (참고용, 변경 없음) ---")
+        for url, env_var in SITES:
+            print(f"{url}:")
+            list_pending(url, env_var)
 
 
 if __name__ == "__main__":
