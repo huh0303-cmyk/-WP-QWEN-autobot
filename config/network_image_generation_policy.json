@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "scope": ["wordpress_27", "blogger_27", "youtube", "sns"],
   "provider": "replicate",
   "credential_secret": "REPLICATE_API_TOKEN",
@@ -9,15 +9,27 @@
       "priority": 1,
       "model": "FLUX.1 Schnell",
       "model_id": "black-forest-labs/flux-schnell",
-      "role": "required_primary_and_only_generation_model",
+      "role": "primary",
       "license_gate": "Apache-2.0 or provider terms"
+    },
+    {
+      "priority": 2,
+      "model": "SDXL-Lightning 4-step",
+      "model_id": "bytedance/sdxl-lightning-4step",
+      "role": "low-cost fallback",
+      "license_gate": "OpenRAIL++ and provider terms"
+    },
+    {
+      "priority": 3,
+      "model": "SDXL Turbo",
+      "model_id": "jyoung105/sdxl-turbo",
+      "role": "final generation fallback",
+      "license_gate": "current Stability AI and provider commercial terms"
     }
   ],
   "hard_rules": {
-    "flux_required": true,
-    "non_flux_generation_forbidden": true,
     "require_article_or_video_topic_relevance": true,
-    "allow_zero_images_when_flux_fails": true,
+    "allow_zero_images_when_all_candidates_fail": true,
     "images_per_article_min": 0,
     "images_per_article_max": 2,
     "free_stock_images_forbidden": true,
@@ -30,10 +42,10 @@
     "human_review_required_before_blogger_publication": true
   },
   "failure_policy": {
-    "on_flux_unavailable": "QUALITY_FAIL_OR_ZERO_IMAGE",
-    "fallback_to_sdxl": false,
+    "fallback_order": ["FLUX.1 Schnell", "SDXL-Lightning 4-step", "SDXL Turbo"],
     "fallback_to_free_stock": false,
-    "fallback_to_generic_image": false
+    "fallback_to_generic_image": false,
+    "when_all_generation_models_fail": "QUALITY_FAIL_OR_ZERO_IMAGE"
   },
-  "notes": "MASTER IMAGE POLICY. All newly generated content images for WordPress, Blogger, YouTube and SNS must use Replicate FLUX.1 Schnell only. No SDXL fallback and no free-stock fallback. If FLUX is unavailable or the result is irrelevant/unsafe, produce zero images or QUALITY_FAIL and send for review. Existing-frame-only exception remains for playlist thumbnails."
+  "notes": "MASTER IMAGE POLICY. For WordPress, Blogger, YouTube and SNS, generated images must route through Replicate in this strict order: FLUX.1 Schnell -> SDXL-Lightning 4-step -> SDXL Turbo. Free-stock and generic filler fallbacks remain forbidden. If all three generation models fail or results are irrelevant/unsafe, produce zero images or QUALITY_FAIL and send for review. Existing-frame-only exception remains for playlist thumbnails."
 }
