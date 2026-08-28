@@ -30,19 +30,25 @@ SITES = [
     ("https://k-trip365.com", "KTRIP365COM"),
 ]
 
-# 사용자가 새로 생성한 삼성 갤럭시북5 링크 — 이미지 CDN URL을 못 구해서
-# (iframe 방식은 승인 전 사이트에서 빈 칸으로 렌더링되는 걸 이미 확인했으므로)
-# 외부 리소스 의존 없는 텍스트형 배너로 구성, 항상 렌더링 보장.
+# 사용자가 새로 생성한 삼성 갤럭시북5 링크. 실제 상품 이미지는 iframe 리다이렉트
+# Location 헤더의 image= 파라미터에서 추출한 CDN 경로(vendor_inventory/...).
 BANNER_HTML = (
     '<div class="coupang-partners-banner" '
     'style="margin:20px 0;padding:16px;border:1px solid #eee;border-radius:8px;'
-    'text-align:center;max-width:280px;">'
-    '<div style="font-weight:bold;color:#111;margin-bottom:4px;">coupang</div>'
+    'text-align:center;max-width:240px;">'
+    '<div style="font-weight:bold;color:#111;margin-bottom:8px;">coupang</div>'
+    '<a href="https://link.coupang.com/a/gzPzPsdM4W" target="_blank" '
+    'rel="nofollow noopener" referrerpolicy="unsafe-url">'
+    '<img src="https://image1.coupangcdn.com/image/vendor_inventory/34bb/'
+    '38c01cdb6310146361fa09c3026a64ab5736dd150f2cd416bca9589e6c3e.jpg" '
+    'alt="삼성 갤럭시북5 인텔 울트라5 15.6인치" width="200" '
+    'style="border-radius:6px;max-width:100%;height:auto;"></a>'
+    '<div style="font-size:13px;color:#333;margin-top:8px;">삼성 갤럭시북5&hellip;</div>'
     '<a href="https://link.coupang.com/a/gzPzPsdM4W" target="_blank" '
     'rel="nofollow noopener" referrerpolicy="unsafe-url" '
-    'style="display:inline-block;margin-top:6px;padding:8px 20px;background:#0074e8;'
+    'style="display:inline-block;margin-top:8px;padding:8px 20px;background:#0074e8;'
     'color:#fff;border-radius:20px;text-decoration:none;font-size:14px;">'
-    '삼성 갤럭시북5 보러가기</a>'
+    '쇼핑하기</a>'
     '<p style="font-size:12px;color:#888;margin-top:8px;margin-bottom:0;">'
     '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>'
     '</div>'
@@ -54,19 +60,34 @@ def inject(site_url: str, wp_pass_env: str) -> dict:
     if not wp_pass:
         return {"site": site_url, "ok": False, "error": f"{wp_pass_env} 시크릿 없음"}
 
-    # "오늘 쓴 글"처럼 보이도록, 가장 최근 private 글 하나를 오늘 날짜로 공개 전환
+    # 이전 실행에서 이미 오늘 날짜로 공개 전환+배너 삽입된 글이 있으면 그 글의
+    # 배너만 최신 BANNER_HTML로 교체. 없으면 가장 최근 private 글을 승격.
     r = requests.get(
         f"{site_url}/wp-json/wp/v2/posts",
         auth=(WP_USER, wp_pass),
-        params={"per_page": 1, "status": "private", "orderby": "date", "order": "desc",
+        params={"per_page": 1, "status": "publish", "orderby": "date", "order": "desc",
                 "_fields": "id,link,content,title,status"},
         timeout=20,
     )
     r.raise_for_status()
-    posts = r.json()
-    if not posts:
-        return {"site": site_url, "ok": False, "error": "승격할 private 글이 없음"}
-    post = posts[0]
+    latest_publish = r.json()
+    post = None
+    if latest_publish and "coupang-partners-banner" in latest_publish[0]["content"]["rendered"]:
+        post = latest_publish[0]
+
+    if post is None:
+        r = requests.get(
+            f"{site_url}/wp-json/wp/v2/posts",
+            auth=(WP_USER, wp_pass),
+            params={"per_page": 1, "status": "private", "orderby": "date", "order": "desc",
+                    "_fields": "id,link,content,title,status"},
+            timeout=20,
+        )
+        r.raise_for_status()
+        posts = r.json()
+        if not posts:
+            return {"site": site_url, "ok": False, "error": "승격할 private 글이 없음"}
+        post = posts[0]
     content = post["content"]["rendered"]
 
     if "coupang-partners-banner" in content:
