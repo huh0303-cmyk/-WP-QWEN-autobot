@@ -1,5 +1,7 @@
 # 통합 블로그 자동발행 허브
 
+> 프로젝트의 고정 운영 범위와 비용 안전 원칙은 [OPERATING_MANDATE.md](OPERATING_MANDATE.md)를 최우선 기준으로 따릅니다.
+
 모든 운영 화면, 스케줄 계산과 실행 로그는 한국시간 `Asia/Seoul` 기준입니다. GitHub Actions의 cron 문법과 YouTube API의 `publishAt` 전송값만 서비스 규칙상 UTC를 사용하며, 코드가 자동 변환하므로 사용자는 구글시트에 한국시간만 입력합니다.
 
 Google Sheets를 운영 화면으로, GitHub Actions를 서버로 사용하는 다계정 발행기입니다. 기존 WordPress 27개(A그룹 17, B그룹 8, 신문사 2)는 각 사이트의 발행량·카테고리·페르소나·톤·글자 수·키워드·RSS 설정을 독립적으로 사용합니다. 사이트와 계정 수를 코드에서 제한하지 않습니다.
