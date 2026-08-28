@@ -16,10 +16,10 @@
     {"order":4,"batch":1,"room_id":"blogger_koreamedicaltour365","title":"Korea Medical Tour 365","language":"en","topic":"Korea medical travel","status":"EXISTING"},
     {"order":5,"batch":1,"room_id":"blogger_koreainsurance365","title":"Korea Insurance 365","language":"en","topic":"Insurance in Korea for foreigners","status":"EXISTING"},
 
-    {"order":6,"batch":2,"room_id":"blogger_kfinance365","title":"Korea Finance 365","language":"en","topic":"Personal finance in Korea","status":"CREATED_SHELL","destination_id":"1687098888954822322","url":"https://kfinance365.blogspot.com","created_on":"2026-08-28"},
-    {"order":7,"batch":2,"room_id":"blogger_krealestate365","title":"Korea Real Estate 365","language":"en","topic":"Housing and property in Korea","status":"CREATED_SHELL","destination_id":"6980941479069687285","url":"https://krealestate365.blogspot.com","created_on":"2026-08-28"},
-    {"order":8,"batch":2,"room_id":"blogger_koreataxnlaw","title":"Korea Tax & Law Guide","language":"en","topic":"Korean tax and practical law","status":"CREATE_REQUIRED"},
-    {"order":9,"batch":2,"room_id":"blogger_koreainvest365","title":"Korea Investment 365","language":"en","topic":"Investing and business in Korea","status":"CREATE_REQUIRED"},
+    {"order":6,"batch":2,"room_id":"blogger_kfinance365","title":"Korea Finance 365","language":"en","topic":"Personal finance in Korea","status":"CREATED_SHELL","destination_id":"1687098888954822322","url":"https://kfinance365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
+    {"order":7,"batch":2,"room_id":"blogger_krealestate365","title":"Korea Real Estate 365","language":"en","topic":"Housing and property in Korea","status":"CREATED_SHELL","destination_id":"6980941479069687285","url":"https://krealestate365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
+    {"order":8,"batch":2,"room_id":"blogger_koreataxnlaw","title":"Korea Tax & Law Guide","language":"en","topic":"Korean tax and practical law","status":"CREATED_SHELL","destination_id":"8654603097966481527","url":"https://koreataxnlaw.blogspot.com","created_on":"2026-08-28","language_fixed":true},
+    {"order":9,"batch":2,"room_id":"blogger_koreainvest365","title":"Korea Investment 365","language":"en","topic":"Investing and business in Korea","status":"CREATED_SHELL","destination_id":"4890361213499831195","url":"https://koreainvest365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
     {"order":10,"batch":2,"room_id":"blogger_kvisa365","title":"K-Visa365","language":"en","topic":"Korean visas and immigration","status":"EXISTING"},
 
     {"order":11,"batch":3,"room_id":"blogger_jobkorea365","title":"Jobs in Korea 365","language":"en","topic":"Jobs and careers in Korea","status":"EXISTING"},
