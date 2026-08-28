@@ -5,6 +5,10 @@ name: "Blog Publish — Single Site (dispatched by A/B scheduler)"
 on:
   workflow_dispatch:
     inputs:
+      room_id:
+        description: "Automation room id for result tracking"
+        required: false
+        default: ""
       target_site_url:
         description: "발행 대상 블로그 URL"
         required: true
@@ -88,12 +92,28 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/autopost_current.py
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log
+      - name: Normalize room result
+        if: always()
+        env:
+          ROOM_ID: ${{ inputs.room_id }}
+        run: |
+          source_path="artifacts/wordpress-worker.log"
+          if [ -f newsroom_publish_result.json ]; then source_path="newsroom_publish_result.json"; fi
+          outcome="failure"
+          if [ "${{ job.status }}" = "success" ]; then outcome="success"; fi
+          python scripts/normalize_room_result.py --platform wordpress --workflow daily-network-publish.yml --source "$source_path" --outcome "$outcome" --output artifacts/automation-room-result.json
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: blog-publish-result-${{ github.run_id }}
-          path: newsroom_publish_result.json
+          path: |
+            newsroom_publish_result.json
+            artifacts/automation-room-result.json
+            artifacts/wordpress-worker.log
           if-no-files-found: warn
           retention-days: 14
