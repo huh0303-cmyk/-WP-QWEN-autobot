@@ -19,9 +19,19 @@ def main() -> int:
     for index, draft in enumerate(payload.get("drafts", []), start=1):
         title = html.escape(str(draft.get("title") or draft.get("site_title") or "오늘의 생활정보"))
         description = html.escape(str(draft.get("meta_description") or draft.get("summary") or "본문에서 신청 조건과 확인 방법을 확인하세요."))
-        source = html.escape(str(draft.get("source_url") or "공식 출처 확인 필수"))
-        page = f"""<!doctype html><html lang='ko'><meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>{title}</title><style>body{{margin:0;background:#eef3f8;font-family:Arial,'Noto Sans KR',sans-serif}}main{{box-sizing:border-box;max-width:720px;min-height:900px;margin:auto;padding:72px 48px;background:linear-gradient(145deg,#102a43,#246b86);color:white;display:flex;flex-direction:column;justify-content:space-between}}h1{{font-size:54px;line-height:1.2;margin:0}}p{{font-size:28px;line-height:1.55}}small{{font-size:18px;color:#d9edf3}}</style><main><div><small>오늘 확인한 생활정보</small><h1>{title}</h1></div><p>{description}</p><small>기준일과 신청 조건은 본문 및 공식 출처에서 다시 확인하세요.<br>{source}</small></main></html>"""
+        language = str(draft.get("language") or "ko")
+        kicker = html.escape(str(draft.get("card_kicker") or ("QUICK GUIDE" if language == "en" else "오늘의 핵심 정보")))
+        points = draft.get("card_points") or []
+        if not points:
+            points = [description]
+        points_html = "".join(f"<li>{html.escape(str(point))}</li>" for point in points[:4])
+        sources = draft.get("sources") or []
+        source_label = html.escape(str(draft.get("card_source_label") or ("Official source in article" if language == "en" else "본문의 공식 출처에서 최종 확인")))
+        if sources:
+            source_label += " · " + html.escape(sources[0].split("/")[2])
+        lang = "en" if language == "en" else "ko"
+        page = f"""<!doctype html><html lang='{lang}'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>{title}</title><style>*{{box-sizing:border-box}}body{{margin:0;background:#e9eff5;font-family:Arial,'Noto Sans KR',sans-serif}}main{{width:720px;min-height:900px;margin:auto;padding:58px 50px;background:linear-gradient(150deg,#09263d 0%,#145d75 58%,#1d8290 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between}}.kicker{{display:inline-block;padding:9px 16px;border:1px solid rgba(255,255,255,.5);border-radius:999px;font-size:18px;letter-spacing:.05em}}h1{{font-size:50px;line-height:1.18;margin:25px 0 30px;word-break:keep-all}}.summary{{font-size:23px;line-height:1.5;color:#dff4f7}}ul{{list-style:none;margin:30px 0;padding:0;display:grid;gap:15px}}li{{padding:18px 20px;border-radius:15px;background:rgba(255,255,255,.12);font-size:24px;line-height:1.38}}li:before{{content:'✓';font-weight:bold;margin-right:12px;color:#9ff2c8}}footer{{border-top:1px solid rgba(255,255,255,.3);padding-top:20px;font-size:17px;line-height:1.45;color:#d8edf1}}</style><main><section><span class='kicker'>{kicker}</span><h1>{title}</h1><p class='summary'>{description}</p><ul>{points_html}</ul></section><footer>{source_label}<br>기준일: {html.escape(str(payload.get('date') or payload.get('target_date') or ''))} · 저장상태: 검토 대기</footer></main></html>"""
         (out / f"card-{index:02d}.html").write_text(page, encoding="utf-8")
     print(json.dumps({"cards": len(payload.get("drafts", [])), "output_dir": str(out)}, ensure_ascii=False))
     return 0
