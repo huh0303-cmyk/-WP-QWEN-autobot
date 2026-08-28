@@ -5,8 +5,8 @@
 Keeps the mature autopost_mega engine while applying current operational metadata that
 must not regress to legacy labels retained in the large historical module.
 
-2026-08-27 hard policy:
-- WordPress text generation is OpenAI/GPT only. Never fall back to Gemini for WP text.
+Current hard policy:
+- WordPress text generation uses Gemini as the primary writer.
 - Paid image generation is disabled. Publishing must continue without an image.
 - Pixabay, Pexels, OpenAI image, Gemini image/Nano Banana, local infographic fallbacks,
   and OpenAI/Gemini image-relevance calls are blocked from the active WP entrypoint.
@@ -22,8 +22,8 @@ if str(ROOT) not in sys.path:
 
 # Set provider policy before importing the legacy engine so import-time defaults cannot
 # silently route WordPress back to Gemini or enable legacy paid image generation.
-os.environ["AI_TEXT_PROVIDER"] = "openai"
-os.environ["OPENAI_ENABLED"] = "true"
+os.environ["AI_TEXT_PROVIDER"] = "gemini"
+os.environ["OPENAI_ENABLED"] = "false"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "false"
@@ -47,11 +47,9 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # ---------------------------------------------------------------------------
 # HARD ROUTING GUARDS
 # ---------------------------------------------------------------------------
-# WordPress text: GPT/OpenAI only. Clear the Gemini client after import so even stale
-# fallback branches cannot spend Gemini quota or write WP copy.
-base.AI_TEXT_PROVIDER = "openai"
-if hasattr(base, "gemini_client"):
-    base.gemini_client = None
+# WordPress text: Gemini primary. Paid OpenAI fallback stays disabled unless the user
+# explicitly authorizes it in a separate change.
+base.AI_TEXT_PROVIDER = "gemini"
 
 # Images: only the approved Replicate gateway may return an image URL. The legacy module
 # still contains old provider functions for historical compatibility, but every active

@@ -57,7 +57,7 @@ jobs:
           # 재작성/중요글(뉴스룸) escalation 전용으로 되돌림(사용자 지시).
           AI_TEXT_PROVIDER: "gemini"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_ENABLED: "true"
+          OPENAI_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
           GEMINI_IMAGE_GENERATION_ENABLED: "false"
