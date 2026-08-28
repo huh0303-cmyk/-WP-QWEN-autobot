@@ -31,8 +31,9 @@ os.environ["AI_TEXT_PROVIDER"] = "gemini"
 os.environ["OPENAI_ENABLED"] = "false"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
-os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "false"
-os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "false"
+os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "true"
+os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "true"
+os.environ.setdefault("NANO_BANANA_FREE_TIER_ENABLED", "false")
 
 # Hostinger sites can advertise IPv6 while GitHub-hosted runners have an
 # intermittently unusable IPv6 route.  Prefer IPv4 at the client only; this
@@ -55,13 +56,10 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # All WordPress and newsroom draft text uses Gemini.
 base.AI_TEXT_PROVIDER = "gemini"
 
-# Images: only the approved Replicate gateway may return an image URL. The legacy module
-# still contains old provider functions for historical compatibility, but every active
-# WP entry through this file replaces those call sites before base.main() starts.
+# Images: free-confirmed Nano Banana first, then the approved Replicate chain.
 base.PIXABAY_KEY = None
 base.PEXELS_KEY = None
-base.GEMINI_IMAGE_MODELS = []
-base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
+base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
 
 
 def _blocked_stock(*args, **kwargs):
@@ -82,8 +80,6 @@ base.get_images_pixabay = _blocked_stock
 base.get_images_pexels = _blocked_stock
 base.get_multiple_images = _no_paid_images
 base.filter_relevant_images = _pass_generated_images
-base.gemini_generate_image = lambda *args, **kwargs: False
-base.get_fallback_nanobanana_image = _blocked_stock
 base.get_fallback_infographic_image = _blocked_stock
 
 # kskin365.com was restored to the active 25-blog network. The legacy module still carried
