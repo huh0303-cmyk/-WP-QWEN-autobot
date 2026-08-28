@@ -69,8 +69,12 @@ def run(apply_changes: bool = APPLY_CHANGES) -> dict:
         for post in fetch_hidden_posts(status):
             plan.append({"id": post["id"], "status": post["status"], "link": post.get("link", "")})
 
-    print(f"{'[DRY RUN] ' if not apply_changes else ''}복구 대상 {len(plan)}개 "
-          f"({', '.join(f'{s}:{sum(1 for p in plan if p['status'] == s)}' for s in HIDDEN_STATUSES)})")
+    # Python 3.11 CI 러너는 f-string 안에서 같은 종류 따옴표를 중첩하면
+    # SyntaxError를 낸다(3.12+에서만 허용) — 카운트를 미리 문자열로 만들어둔다.
+    per_status_counts = {status: sum(1 for p in plan if p["status"] == status) for status in HIDDEN_STATUSES}
+    counts_str = ", ".join(f"{status}:{count}" for status, count in per_status_counts.items())
+    prefix = "[DRY RUN] " if not apply_changes else ""
+    print(f"{prefix}복구 대상 {len(plan)}개 ({counts_str})")
 
     results = []
     for item in plan:
