@@ -11,6 +11,7 @@ fix_ai_looking_images.py
 """
 import hashlib
 import os
+import re
 import sys
 
 import requests
@@ -59,7 +60,7 @@ def search_pexels(query: str) -> str:
     return src.get("large") or src.get("medium", "")
 
 
-def upload_media(site_url: str, wp_pass: str, image_url: str, title: str) -> int:
+def upload_media(site_url: str, wp_pass: str, image_url: str, title: str) -> tuple:
     image = requests.get(image_url, timeout=25, headers={"User-Agent": "Mozilla/5.0"})
     image.raise_for_status()
     mime = image.headers.get("Content-Type", "image/jpeg").split(";", 1)[0]
@@ -71,13 +72,15 @@ def upload_media(site_url: str, wp_pass: str, image_url: str, title: str) -> int
         data=image.content, timeout=35,
     )
     uploaded.raise_for_status()
-    media_id = uploaded.json().get("id", 0)
+    media_json = uploaded.json()
+    media_id = media_json.get("id", 0)
+    source_url = media_json.get("source_url", "")
     if media_id:
         requests.post(
             f"{site_url}/wp-json/wp/v2/media/{media_id}", auth=(WP_USER, wp_pass),
             json={"alt_text": title, "caption": ""}, timeout=15,
         )
-    return media_id
+    return media_id, source_url
 
 
 def fix_one(target: dict) -> None:
@@ -92,16 +95,35 @@ def fix_one(target: dict) -> None:
     if not image_url:
         print(f"❌ {site}: Pexels 검색 실패 ('{query}')")
         return
-    media_id = upload_media(site, wp_pass, image_url, title)
+    media_id, source_url = upload_media(site, wp_pass, image_url, title)
     if not media_id:
         print(f"❌ {site}: 미디어 업로드 실패")
         return
-    r = requests.post(
+
+    # 본문에 직접 박혀 있는 gpt-image-*.png 인라인 히어로 이미지도 교체
+    r = requests.get(
         f"{site}/wp-json/wp/v2/posts/{post_id}", auth=(WP_USER, wp_pass),
-        json={"featured_media": media_id}, timeout=30,
+        params={"_fields": "content"}, timeout=20,
     )
     r.raise_for_status()
-    print(f"✅ {site}: 대표이미지 교체 완료 (media_id={media_id}, query='{query}')")
+    content = r.json()["content"]["rendered"]
+    new_content, n = re.subn(
+        r'<img[^>]*src="[^"]*gpt-image-[^"]*"[^>]*>',
+        f'<img decoding="async" src="{source_url}" alt="{title}" '
+        f'loading="lazy" style="width:100%;height:auto;display:block;">',
+        content, count=1,
+    )
+
+    patch = {"featured_media": media_id}
+    if n:
+        patch["content"] = new_content
+    r = requests.post(
+        f"{site}/wp-json/wp/v2/posts/{post_id}", auth=(WP_USER, wp_pass),
+        json=patch, timeout=30,
+    )
+    r.raise_for_status()
+    inline_note = "본문 인라인 이미지도 교체" if n else "본문 인라인 이미지 없음(featured만 교체)"
+    print(f"✅ {site}: 대표이미지 교체 완료 (media_id={media_id}, query='{query}') — {inline_note}")
 
 
 def main():
