@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "name": "GOLDEN_KEYWORD_SELECTION_POLICY",
+  "status": "LOCKED",
+  "scope": ["wordpress", "blogger", "tistory", "news"],
+  "signal_pipeline": [
+    "collect_current_news_and_media_terms",
+    "cluster_repeated_event_entity_and_issue_terms",
+    "validate_with_google_trends_naver_and_gsc_when_available",
+    "convert_to_site_specific_search_intent",
+    "score_and_apply_hard_gates"
+  ],
+  "sources": {
+    "discovery": ["current_rss_headlines", "news_and_media_exposure", "official_announcements"],
+    "validation": ["google_trends", "naver_search_signal", "google_search_console"],
+    "rules": [
+      "Never copy a headline or article body.",
+      "Unavailable signals receive zero points and must be listed as missing; never fabricate evidence.",
+      "Use the date, source URL and observed entity or issue for every freshness claim."
+    ]
+  },
+  "score": {
+    "gsc_demand": 25,
+    "media_repetition": 20,
+    "google_naver_trend": 20,
+    "site_fit": 15,
+    "actionable_search_intent": 10,
+    "official_source_available": 10,
+    "maximum": 100
+  },
+  "thresholds": {
+    "candidate": 70,
+    "priority": 80,
+    "top": 90,
+    "below_candidate_action": "REJECT"
+  },
+  "hard_gate": {
+    "topics": ["policy", "accident", "medical", "finance", "legal", "visa_immigration"],
+    "official_source_required": true,
+    "missing_official_source_action": "HOLD_REGARDLESS_OF_SCORE"
+  },
+  "routing": {
+    "newsrooms": "The two newsrooms use the latest RSS headlines as reporting topics, verify the underlying event, and write an original report.",
+    "general_blogs": "Convert the same verified signal into practical site-fit intent such as cost, method, eligibility, schedule, comparison or precautions.",
+    "categories": ["politics", "economy", "society", "culture_and_arts", "sports", "education", "travel", "health", "technology"]
+  },
+  "selection": "highest_verified_score_first_no_random_choice"
+}
