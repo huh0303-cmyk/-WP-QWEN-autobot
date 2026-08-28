@@ -97,6 +97,10 @@
     "similar_or_repeated_title_action": "QUALITY_FAIL"
   },
   "quality_gate": {"minimum_score": 70, "below_minimum_action": "QUALITY_FAIL"},
+  "blogger_metadata": {
+    "labels": {"minimum": 8, "maximum": 14, "count_mode": "varied_per_article", "format": "short_noun_search_terms", "sentences_forbidden": true},
+    "search_description": {"required": true, "minimum_words": 100, "maximum_words": 120, "missing_or_out_of_range_action": "QUALITY_FAIL"}
+  },
   "image_generation": {
     "maximum_images_per_content": 1,
     "order": ["Nano Banana only when explicitly confirmed free", "black-forest-labs/flux-schnell", "bytedance/sdxl-lightning-4step", "jyoung105/sdxl-turbo"],
