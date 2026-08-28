@@ -21,6 +21,8 @@ def _room_url(room) -> str:
 def _resolve_value(expr, room):
     if not isinstance(expr, str):
         return expr
+    if expr == "room.room_id":
+        return room.room_id
     if expr == "room.platform":
         return room.platform
     if expr == "room.account_id":
