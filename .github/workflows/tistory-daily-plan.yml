@@ -1,0 +1,38 @@
+name: "Tistory — Daily 5-Site Plan"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "11 21 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build one-post-per-site safe plan
+        run: python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
+      - name: Validate public publishing is disabled
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('artifacts/tistory-daily-plan.json', encoding='utf-8'))
+          assert p['public_allowed'] is False
+          assert len(p['jobs']) == 5
+          assert all(j['publish_policy']=='awaiting_approval' for j in p['jobs'])
+          assert all(j['duplicate_guard'] is True for j in p['jobs'])
+          print('TISTORY PLAN SAFETY PASS')
+          PY
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tistory-daily-plan-${{ github.run_id }}
+          path: artifacts/tistory-daily-plan.json
+          retention-days: 7
