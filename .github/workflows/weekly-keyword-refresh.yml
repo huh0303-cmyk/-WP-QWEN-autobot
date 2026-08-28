@@ -1,18 +1,18 @@
-name: "Weekly Keyword Pool Refresh — 25 blogs"
+name: "Daily Golden Keyword Refresh — 25 blogs"
 
-# 매주 실제 검색수요를 다시 조사해 25개 블로그의 키워드 풀을 갱신한다.
+# 매일 최신 검색수요와 공식 출처 후보를 조사해 25개 블로그의 키워드 풀을 갱신한다.
 # 뉴스 2개는 RSS/뉴스 소스 기반이라 대상에서 제외한다.
 # 2026-08-26: kskin365 누락(24/25) 수정, OpenAI 잔액 0 상태의 불필요한 429 재시도 제거.
 on:
   schedule:
-    - cron: "0 22 * * 0"   # 월요일 07:00 KST
+    - cron: "0 22 * * *"   # 매일 07:00 KST
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: weekly-keyword-refresh
+  group: daily-golden-keyword-refresh
   cancel-in-progress: false
 
 jobs:
