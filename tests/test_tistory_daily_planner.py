@@ -11,11 +11,11 @@ def test_tistory_portfolio_is_five_distinct_sites():
     assert len({s["title"] for s in cfg["sites"]}) == 5
 
 
-def test_daily_plan_stays_empty_until_sites_are_explicitly_launched():
+def test_daily_plan_includes_all_five_launched_sites():
     plan = build_plan(datetime(2026, 8, 28, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
     assert plan["portfolio_sites"] == 5
-    assert plan["enabled_sites"] == 0
-    assert len(plan["jobs"]) == 0
+    assert plan["enabled_sites"] == 5
+    assert len(plan["jobs"]) == 5
     assert plan["daily_posts_per_site"] == 1
     assert plan["public_allowed"] is False
     assert all(j["publish_policy"] == "awaiting_approval" for j in plan["jobs"])
@@ -46,10 +46,10 @@ def test_finance_site_replaces_the_stale_healthcare_label():
     assert "국가자격" not in site["categories"]
 
 
-def test_all_sites_are_guarded_for_staged_relaunch():
+def test_all_sites_are_enabled_for_staged_relaunch():
     cfg = load_config()
     assert [s["launch_order"] for s in sorted(cfg["sites"], key=lambda x: x["launch_order"])] == [1, 2, 3, 4, 5]
-    assert all(s["launch_enabled"] is False for s in cfg["sites"])
+    assert all(s["launch_enabled"] is True for s in cfg["sites"])
     assert all(s["preserve_identity"] is True for s in cfg["sites"])
 
 

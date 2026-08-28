@@ -9,10 +9,10 @@
         "room_id": "room.room_id",
         "target_site_url": "room.name_url",
         "force_keyword": "",
-        "publication_approved": false
+        "publication_approved": true
       },
       "required_inputs": ["room_id", "target_site_url"],
-      "safe_policy": "draft",
+      "safe_policy": "publish",
       "artifact_kind": "wordpress_post_id"
     },
     "blogger-daily-scheduler.yml": {
@@ -20,7 +20,7 @@
       "mode": "scheduler_managed",
       "inputs": {},
       "required_inputs": [],
-      "safe_policy": "draft",
+      "safe_policy": "publish",
       "artifact_kind": "blogger_draft_id"
     },
     "platform-publish.yml": {
