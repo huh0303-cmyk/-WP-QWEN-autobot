@@ -130,10 +130,12 @@ def main() -> int:
                 ).execute()
                 print(json.dumps({"job_id": row.get("job_id"), "status": "duplicate_blocked", "reason": reason}, ensure_ascii=False))
                 continue
+        message = row.get("message", "")
+        search_description = message.split("meta_description=", 1)[1].strip() if "meta_description=" in message else ""
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
-            publish_now=False, source_keyword=row.get("source_keyword", ""),
+            publish_now=False, source_keyword=row.get("source_keyword", ""), search_description=search_description,
         )
         if platform == "blogger":
             try:
