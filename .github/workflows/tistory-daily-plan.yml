@@ -2,6 +2,12 @@ name: "Tistory — Daily 5-Site Plan"
 
 on:
   workflow_dispatch:
+    inputs:
+      enable_claude_writer:
+        description: "Actually call Claude to draft the 5 articles (false = plan only, no API spend)"
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: "11 21 * * *"
 
@@ -11,12 +17,14 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
       - name: Build one-post-per-site safe plan
         run: python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
       - name: Validate public publishing is disabled
@@ -30,9 +38,29 @@ jobs:
           assert all(j['duplicate_guard'] is True for j in p['jobs'])
           print('TISTORY PLAN SAFETY PASS')
           PY
-      - name: Upload plan artifact
+      - name: Draft articles with Claude (writes drafts only, never publishes)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Scheduled runs never spend API credits unless explicitly enabled
+          # via workflow_dispatch — schedule triggers have no "inputs".
+          CLAUDE_ENABLED: ${{ github.event.inputs.enable_claude_writer || 'false' }}
+        run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
+      - name: Validate drafts never authorize public publication
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('artifacts/tistory-daily-drafts.json', encoding='utf-8'))
+          assert d['public_allowed'] is False
+          for draft in d['drafts']:
+              assert draft['public_allowed'] is False
+              assert draft.get('publish_policy') in (None, 'awaiting_approval')
+          print('TISTORY DRAFT SAFETY PASS')
+          PY
+      - name: Upload plan + draft artifacts
         uses: actions/upload-artifact@v4
         with:
           name: tistory-daily-plan-${{ github.run_id }}
-          path: artifacts/tistory-daily-plan.json
+          path: |
+            artifacts/tistory-daily-plan.json
+            artifacts/tistory-daily-drafts.json
           retention-days: 7
