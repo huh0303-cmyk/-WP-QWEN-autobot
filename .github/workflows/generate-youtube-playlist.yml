@@ -28,7 +28,11 @@ on:
         required: false
         type: string
       publish_delay_hours:
-        description: "승인 후 예약발행까지 시간"
+        description: "DEPRECATED: 자동공개 금지 정책으로 무시됨"
+        required: false
+        type: string
+      room_id:
+        description: "Automation Hub room id"
         required: false
         type: string
       healing_theme:
@@ -116,11 +120,7 @@ jobs:
           OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
           OUTPUT_FOLDER_ID_KPOP: ${{ secrets.OUTPUT_FOLDER_ID_KPOP }}
         run: |
-          if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then
-            export TOPIC_KEYWORD="$PRESET_THEME"
-          else
-            export TOPIC_KEYWORD="$TOPIC_INPUT"
-          fi
+          if [ -n "$PRESET_THEME" ] && [ "$PRESET_THEME" != "직접입력(topic 사용)" ]; then export TOPIC_KEYWORD="$PRESET_THEME"; else export TOPIC_KEYWORD="$TOPIC_INPUT"; fi
           python scripts/youtube_playlist_maker.py
       - name: Export upload metadata
         id: meta
@@ -129,15 +129,11 @@ jobs:
         run: |
           python - <<'EOF'
           import json, os
-          with open("playlist_output/upload_meta.json", encoding="utf-8") as f:
-              m = json.load(f)
+          with open("playlist_output/upload_meta.json", encoding="utf-8") as f: m=json.load(f)
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-              f.write(f"video_drive_id={m['video_drive_id']}\n")
-              f.write(f"thumb_drive_id={m['thumb_drive_id']}\n")
-              f.write("yt_title<<EOM\n" + m['title'] + "\nEOM\n")
-              f.write("yt_description<<EOM\n" + m['description'] + "\nEOM\n")
-              f.write("yt_tags<<EOM\n" + ",".join(m.get('tags') or []) + "\nEOM\n")
-              f.write(f"channel_key_upper={os.environ['CHANNEL_KEY'].upper()}\n")
+              f.write(f"video_drive_id={m['video_drive_id']}\n"); f.write(f"thumb_drive_id={m['thumb_drive_id']}\n")
+              f.write("yt_title<<EOM\n"+m['title']+"\nEOM\n"); f.write("yt_description<<EOM\n"+m['description']+"\nEOM\n")
+              f.write("yt_tags<<EOM\n"+",".join(m.get('tags') or [])+"\nEOM\n"); f.write(f"channel_key_upper={os.environ['CHANNEL_KEY'].upper()}\n")
               f.write(f"title_is_fallback={'true' if m.get('title_is_fallback') else 'false'}\n")
           EOF
       - name: Upload result artifact
@@ -151,18 +147,11 @@ jobs:
       - name: Commit anti-repeat state
         if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git stash --include-untracked || true
-          git pull --rebase origin main
-          git stash pop || true
-          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null || grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then
-            git checkout HEAD -- playlist_recent_topics.json playlist_recent_tracks.json
-            exit 0
-          fi
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true; git pull --rebase origin main; git stash pop || true
+          if grep -q "^<<<<<<< " playlist_recent_topics.json 2>/dev/null || grep -q "^<<<<<<< " playlist_recent_tracks.json 2>/dev/null; then git checkout HEAD -- playlist_recent_topics.json playlist_recent_tracks.json; exit 0; fi
           git add playlist_recent_topics.json playlist_recent_tracks.json 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "chore: 플레이리스트 최근 상태 갱신 [skip ci]"
-          git push
+          git diff --staged --quiet || git commit -m "chore: 플레이리스트 최근 상태 갱신 [skip ci]"; git push
 
   publish:
     if: ${{ !inputs.fix_video_id }}
@@ -175,7 +164,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
-      - name: Upload approved video to YouTube
+      - name: Upload video to YouTube PRIVATE only
         env:
           VIDEO_DRIVE_ID: ${{ needs.prepare.outputs.video_drive_id }}
           THUMB_DRIVE_ID: ${{ needs.prepare.outputs.thumb_drive_id }}
@@ -183,8 +172,8 @@ jobs:
           YT_DESCRIPTION: ${{ needs.prepare.outputs.yt_description }}
           YT_TAGS: ${{ needs.prepare.outputs.yt_tags }}
           TITLE_IS_FALLBACK: ${{ needs.prepare.outputs.title_is_fallback }}
-          PUBLISH_AT_HOURS_FROM_NOW: ${{ inputs.publish_delay_hours }}
           CHANNEL_KEY: ${{ inputs.channel || 'globalmusic' }}
+          ROOM_RESULT_SOURCE: artifacts/youtube_playlist_result.json
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
@@ -193,6 +182,18 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || (needs.prepare.outputs.channel_key_upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python scripts/youtube_publish_approved.py
+      - name: Normalize room result
+        if: always()
+        run: |
+          python scripts/normalize_room_result.py --room-id "${{ inputs.room_id }}" --platform youtube --workflow generate-youtube-playlist.yml --source artifacts/youtube_playlist_result.json --outcome "${{ job.status == 'success' && 'success' || 'failure' }}"
+      - name: Upload room result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-room-result-${{ github.run_id }}
+          path: artifacts/automation-room-result.json
+          retention-days: 7
+          if-no-files-found: error
 
   fix_metadata:
     if: ${{ inputs.fix_video_id }}
