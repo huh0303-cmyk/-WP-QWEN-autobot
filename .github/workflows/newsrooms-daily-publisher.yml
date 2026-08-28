@@ -106,3 +106,15 @@ jobs:
           path: newsroom_publish_result.json
           if-no-files-found: warn
           retention-days: 7
+      - name: Send private-draft review link
+        if: always()
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          REPORT_EMAIL_TO: "huh0303@gmail.com"
+          REPORT_EMAIL_FROM: "huh0303@gmail.com"
+          REPORT_TITLE: "[뉴스룸 비공개 초안] 모바일 검수 요청"
+          REPORT_BODY: "뉴스룸 비공개 초안 작업이 끝났습니다. 아래 링크에서 결과와 초안 주소를 확인한 뒤 직접 최종 공개해 주세요."
+          REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python scripts/publishing_completion_notify.py
