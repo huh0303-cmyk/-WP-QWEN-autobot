@@ -1665,6 +1665,15 @@ def build_healing_theme_audio(service, theme, out_path):
 # 메인
 # ════════════════════════════════════════════════════════════
 def main():
+    # 2026-08-28 사용자 지시: "플리 썸네일 동영상 제작... 싹 정지시켜" — 누가/무엇이
+    # 이 워크플로우를 트리거하든(workflow_dispatch 수동 실행 포함) 실제 영상 렌더링이
+    # 절대 시작되지 않도록 코드 레벨 킬스위치를 건다. WP_AUTOPUBLISH_ENABLED와 동일한
+    # 패턴 — 기본값 false, 명시적으로 true를 준 실행에서만 통과.
+    if os.environ.get("PLAYLIST_VIDEO_GENERATION_ENABLED", "false").strip().lower() != "true":
+        log("⛔ 플리 채널 영상 제작 전면 중지: PLAYLIST_VIDEO_GENERATION_ENABLED=true가 아니므로 종료합니다.")
+        log("   (사용자 지시로 정지됨 — 재개하려면 이 플래그를 명시적으로 켜야 함)")
+        return
+
     missing = [k for k, v in {
         "GOOGLE_OAUTH_CLIENT_ID": GOOGLE_OAUTH_CLIENT_ID,
         "GOOGLE_OAUTH_CLIENT_SECRET": GOOGLE_OAUTH_CLIENT_SECRET,
