@@ -1,7 +1,5 @@
 name: Curio 지식채널 장편 자동생성 — 5 active channels
 
-# 활성 채널: nasa / history / invention / silent_era / retro_reels
-# 영상은 실제 NASA/퍼블릭도메인 아카이브를 유지하고, YouTube 썸네일만 FLUX로 통일.
 on:
   workflow_dispatch:
     inputs:
@@ -16,7 +14,11 @@ on:
         required: false
         default: ""
       publish_delay_hours:
-        description: "업로드 후 예약 공개까지 시간"
+        description: "DEPRECATED: 자동공개 금지 정책으로 무시됨"
+        required: false
+        default: ""
+      room_id:
+        description: "Automation Hub room id"
         required: false
         default: ""
 
@@ -88,9 +90,21 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
           YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
-          PUBLISH_AT_HOURS_FROM_NOW: ${{ inputs.publish_delay_hours }}
+          ROOM_RESULT_SOURCE: artifacts/youtube_curio_result.json
           CHANNEL_KEY: ${{ inputs.channel }}
         run: python scripts/curio_upload.py "${{ inputs.channel }}" en
+      - name: Normalize room result
+        if: always()
+        run: |
+          python scripts/normalize_room_result.py --room-id "${{ inputs.room_id }}" --platform youtube --workflow curio-longform-daily.yml --source artifacts/youtube_curio_result.json --outcome "${{ job.status == 'success' && 'success' || 'failure' }}"
+      - name: Upload room result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-room-result-${{ github.run_id }}
+          path: artifacts/automation-room-result.json
+          retention-days: 7
+          if-no-files-found: error
       - name: Backup artifact
         if: always()
         uses: actions/upload-artifact@v4
