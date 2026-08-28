@@ -9,6 +9,7 @@ inject_coupang_banner_khealth.py를 여러 사이트에 재사용할 수 있게 
 "파트너스 링크/배너가 게시된 페이지"임을 인증할 수 있게 한다.
 """
 import os
+import re
 import sys
 
 import requests
@@ -29,8 +30,11 @@ SITES = [
 
 BANNER_HTML = (
     '<div class="coupang-partners-banner" style="margin:20px 0;text-align:center;">'
-    '<iframe src="https://coupa.ng/co45VZ" width="120" height="240" frameborder="0" '
-    'scrolling="no" referrerpolicy="unsafe-url"></iframe>'
+    '<a href="https://link.coupang.com/a/gpMjNZBSBo" target="_blank" rel="nofollow noopener" '
+    'referrerpolicy="unsafe-url">'
+    '<img src="https://image1.coupangcdn.com/image/affiliate/banner/'
+    '1d716c803d6989b32ce370369a986a8e@2x.jpg" '
+    'alt="프론트 오픈 캐리어기 18인치 20인치내용 하드 캐리어" width="120" height="240"></a>'
     '<p style="font-size:12px;color:#888;margin-top:6px;">'
     '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>'
     '</div>'
@@ -57,10 +61,16 @@ def inject(site_url: str, wp_pass_env: str) -> dict:
     content = post["content"]["rendered"]
 
     if "coupang-partners-banner" in content:
-        return {"site": site_url, "ok": True, "skipped": True, "url": post["link"],
-                "status": post.get("status"), "note": "이미 배너가 삽입되어 있음"}
-
-    content = BANNER_HTML + content
+        replaced = re.sub(
+            r'<div class="coupang-partners-banner"[\s\S]*?</div>',
+            BANNER_HTML, content, count=1,
+        )
+        if replaced == content:
+            content = BANNER_HTML + content
+        else:
+            content = replaced
+    else:
+        content = BANNER_HTML + content
     patch = requests.post(
         f"{site_url}/wp-json/wp/v2/posts/{post['id']}",
         auth=(WP_USER, wp_pass), json={"content": content}, timeout=30,
