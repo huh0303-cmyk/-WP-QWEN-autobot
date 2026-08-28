@@ -98,6 +98,7 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
     request = service.videos().insert(part="snippet,status", body={"snippet": snippet, "status": status},
         media_body=MediaFileUpload(video_path, resumable=True, chunksize=5*1024*1024, mimetype="video/mp4"))
     response, retries = None, 0
+    max_retries = 3
     while response is None:
         try:
             status_obj, response = request.next_chunk(num_retries=0)
@@ -105,7 +106,7 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
                 log(f"   유튜브 업로드 진행률: {int(status_obj.progress()*100)}%")
         except Exception as e:
             retries += 1
-            if retries >= 3: raise
+            if retries >= max_retries: raise
             time.sleep(min(2 ** retries, 8))
     video_id = response["id"]
     if thumb_path and os.path.exists(thumb_path) and os.path.getsize(thumb_path) > 0:

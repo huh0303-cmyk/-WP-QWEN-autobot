@@ -2,97 +2,70 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime
 from pathlib import Path
-from urllib.parse import urlparse
+from zoneinfo import ZoneInfo
 
+from .eligibility import evaluate_room
 from .rooms import RoomRegistry
 from .workflow_contracts import load_contracts
 
-
-def _room_url(room) -> str:
-    raw = (room.name or "").strip()
-    if not raw:
-        return ""
-    if urlparse(raw).scheme in {"http", "https"}:
-        return raw
-    return f"https://{raw}"
+KST = ZoneInfo("Asia/Seoul")
 
 
-def _resolve_value(expr, room):
-    if not isinstance(expr, str):
-        return expr
-    if expr == "room.room_id":
-        return room.room_id
-    if expr == "room.platform":
-        return room.platform
-    if expr == "room.account_id":
-        return room.account_id
-    if expr == "room.destination_id":
-        return room.destination_id
-    if expr == "room.language":
-        return room.language
-    if expr == "room.name":
-        return room.name
-    if expr == "room.name_url":
-        return _room_url(room)
-    return expr
+def _selected_room_ids(plan_path: str | Path | None) -> set[str] | None:
+    """Rooms room_scheduler already marked eligible, if a plan file is given.
+    Returns None when no plan was passed (dispatch_builder then judges every
+    room itself, using the exact same eligibility function)."""
+    if not plan_path:
+        return None
+    path = Path(plan_path)
+    if not path.exists():
+        return None
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    selected = raw.get("selected")
+    if not isinstance(selected, list):
+        return None
+    return {row.get("room_id") for row in selected if isinstance(row, dict)}
 
 
-def build_dispatch_plan(registry: RoomRegistry | None = None) -> dict:
+def build_dispatch_plan(
+    registry: RoomRegistry | None = None,
+    now: datetime | None = None,
+    plan_path: str | Path | None = None,
+) -> dict:
     registry = registry or RoomRegistry.load()
+    now = now or datetime.now(KST)
     contracts = load_contracts()
+    allowed_room_ids = _selected_room_ids(plan_path)
+
     dispatches = []
     managed = []
     skipped = []
 
     for room in registry.rooms:
-        if not room.enabled:
-            skipped.append({"room_id": room.room_id, "reason": "disabled"})
-            continue
-        if room.publish_policy == "paused":
-            skipped.append({"room_id": room.room_id, "reason": "paused"})
-            continue
-        if not room.workflow:
-            skipped.append({"room_id": room.room_id, "reason": "missing_workflow"})
-            continue
-        contract = contracts.get(room.workflow)
-        if not contract:
-            skipped.append({"room_id": room.room_id, "reason": "missing_contract"})
+        if allowed_room_ids is not None and room.room_id not in allowed_room_ids:
+            skipped.append({"room_id": room.room_id, "reason": "not_in_scheduler_plan"})
             continue
 
-        safe_policy = contract.get("safe_policy")
-        if room.publish_policy not in {safe_policy, "awaiting_approval"}:
-            skipped.append({"room_id": room.room_id, "reason": "policy_mismatch"})
+        result = evaluate_room(room, contracts, now)
+        if not result.eligible:
+            skipped.append({"room_id": room.room_id, "reason": result.reason})
             continue
 
-        mode = contract.get("mode", "")
         entry = {
             "room_id": room.room_id,
             "platform": room.platform,
             "workflow": room.workflow,
             "publish_policy": room.publish_policy,
-            "artifact_kind": contract.get("artifact_kind", ""),
+            "artifact_kind": result.artifact_kind,
+            "mode": result.mode,
         }
-
-        if mode == "scheduler_managed":
-            entry["mode"] = "scheduler_managed"
+        if result.mode == "scheduler_managed":
             managed.append(entry)
-            continue
-
-        if mode != "workflow_dispatch":
-            entry["reason"] = f"unsupported_mode:{mode}"
-            skipped.append(entry)
-            continue
-
-        inputs = {
-            key: _resolve_value(value, room)
-            for key, value in (contract.get("inputs") or {}).items()
-        }
-        # Hard safety gate: no room-generated payload may approve public publication.
-        if "publication_approved" in inputs:
-            inputs["publication_approved"] = False
-        entry.update({"mode": "workflow_dispatch", "inputs": inputs})
-        dispatches.append(entry)
+        else:
+            entry["inputs"] = result.inputs
+            dispatches.append(entry)
 
     return {
         "mode": "DRY_RUN",
@@ -111,6 +84,7 @@ def build_dispatch_plan(registry: RoomRegistry | None = None) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build safe GitHub workflow_dispatch payloads from automation rooms")
+    parser.add_argument("--plan", default=None, help="Optional room_scheduler plan.json to restrict rooms to")
     parser.add_argument("--output", default="artifacts/automation-dispatch-plan.json")
     args = parser.parse_args()
 
@@ -120,7 +94,7 @@ def main() -> int:
         print(json.dumps({"registry_errors": problems}, ensure_ascii=False, indent=2))
         return 1
 
-    plan = build_dispatch_plan(registry)
+    plan = build_dispatch_plan(registry, plan_path=args.plan)
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")

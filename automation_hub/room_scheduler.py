@@ -2,49 +2,24 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from .eligibility import evaluate_room
 from .rooms import RoomRegistry
+from .workflow_contracts import load_contracts
 
 KST = ZoneInfo("Asia/Seoul")
-SAFE_POLICIES = {"draft", "private", "awaiting_approval", "paused"}
-
-
-def _allowed_now(room, now: datetime) -> bool:
-    policy = room.schedule_policy or {}
-    hours = policy.get("allowed_hours")
-    if hours and now.hour not in {int(h) for h in hours}:
-        return False
-    weekdays = policy.get("weekdays")
-    if weekdays and now.weekday() not in {int(d) for d in weekdays}:
-        return False
-    return True
 
 
 def build_plan(registry: RoomRegistry, now: datetime | None = None) -> dict:
     now = now or datetime.now(KST)
+    contracts = load_contracts()
     selected = []
     skipped = []
     for room in registry.rooms:
-        reason = None
-        if not room.enabled:
-            reason = "disabled"
-        elif room.publish_policy not in SAFE_POLICIES:
-            reason = "unsafe_policy"
-        elif room.publish_policy == "paused":
-            reason = "paused"
-        elif not room.workflow:
-            reason = "missing_workflow"
-        elif room.platform in {"blogger", "tistory", "youtube"} and not room.destination_id:
-            reason = "missing_destination"
-        elif not room.duplicate_guard:
-            reason = "duplicate_guard_off"
-        elif not _allowed_now(room, now):
-            reason = "outside_schedule_window"
-
+        result = evaluate_room(room, contracts, now)
         row = {
             "room_id": room.room_id,
             "platform": room.platform,
@@ -53,11 +28,11 @@ def build_plan(registry: RoomRegistry, now: datetime | None = None) -> dict:
             "publish_policy": room.publish_policy,
             "status": room.status,
         }
-        if reason:
-            row["reason"] = reason
-            skipped.append(row)
-        else:
+        if result.eligible:
             selected.append(row)
+        else:
+            row["reason"] = result.reason
+            skipped.append(row)
 
     return {
         "generated_at": now.isoformat(),
