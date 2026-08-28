@@ -34,6 +34,38 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertIn("openai_generate_text(prompt", block)
         self.assertIn("use_gpt", block)
 
+    def test_wordpress_gemini_failure_does_not_silently_upgrade_to_gpt(self):
+        # Locked policy (config/content_writing_policy.json): "No paid
+        # fallback is allowed merely because the primary free tier was
+        # exhausted." A Gemini exception must raise, not quietly call GPT.
+        import sys
+        from unittest.mock import patch
+
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import autopost_mega as am
+
+        with patch.object(am, "_gemini_generate_text_raw", side_effect=RuntimeError("quota exhausted")), \
+             patch("openai_text.openai_available", return_value=True), \
+             patch("openai_text.openai_generate_text") as gpt_call:
+            with self.assertRaises(RuntimeError):
+                am.generate_content_gemini("prompt", use_gpt=False)
+        gpt_call.assert_not_called()
+
+    def test_wordpress_use_gpt_true_goes_straight_to_gpt_never_calls_gemini(self):
+        import sys
+        from unittest.mock import patch
+
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import autopost_mega as am
+
+        with patch.object(am, "_gemini_generate_text_raw") as gemini_call, \
+             patch("openai_text.openai_available", return_value=True), \
+             patch("openai_text.openai_generate_text", return_value="gpt output") as gpt_call:
+            result = am.generate_content_gemini("prompt", use_gpt=True)
+        gemini_call.assert_not_called()
+        gpt_call.assert_called_once()
+        self.assertEqual(result, "gpt output")
+
     def test_platform_queue_fails_workflow_when_publisher_fails(self):
         source = (ROOT / "scripts" / "process_platform_queue.py").read_text(encoding="utf-8")
         self.assertIn("if not result.ok:", source)

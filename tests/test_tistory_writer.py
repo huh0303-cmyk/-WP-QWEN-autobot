@@ -40,23 +40,32 @@ def test_gemini_primary_is_used_when_it_succeeds():
     assert draft["public_allowed"] is False
 
 
-def test_gpt_escalation_when_gemini_fails():
-    with patch("tistory_writer.gemini_generate_text", side_effect=RuntimeError("quota")), \
+def test_important_content_sites_use_gpt_directly_not_gemini():
+    # trend_mode/official_source_required = "important_content" per the
+    # locked content_writing_policy — this routes to GPT from the start,
+    # Gemini is never even attempted.
+    job = {**JOB, "trend_mode": True, "official_source_required": True}
+    with patch("tistory_writer.gemini_generate_text") as gemini_call, \
          patch.object(openai_text, "OPENAI_API_KEY", "test"), \
          patch.object(openai_text, "OPENAI_ENABLED", True), \
          patch("tistory_writer.openai_generate_text", return_value=VALID_PAYLOAD) as gpt_call, \
          patch.object(claude_text, "CLAUDE_ENABLED", False):
-        draft = tistory_writer.generate_draft(JOB)
+        draft = tistory_writer.generate_draft(job)
+    gemini_call.assert_not_called()
     gpt_call.assert_called_once()
     assert draft["status"] == "DRAFT_READY"
-    assert draft["engine"] == "gpt-rewrite"
+    assert draft["engine"] == "gpt"
 
 
-def test_write_failed_when_both_gemini_and_gpt_are_unavailable():
+def test_gemini_failure_fails_the_job_without_a_silent_gpt_fallback():
+    # Locked policy: "no paid fallback merely because the primary free tier
+    # was exhausted." A Gemini error must not silently upgrade to GPT.
     with patch("tistory_writer.gemini_generate_text", side_effect=RuntimeError("quota")), \
-         patch.object(openai_text, "OPENAI_API_KEY", ""), \
-         patch.object(openai_text, "OPENAI_ENABLED", False):
+         patch("tistory_writer.openai_generate_text") as gpt_call, \
+         patch.object(openai_text, "OPENAI_API_KEY", "test"), \
+         patch.object(openai_text, "OPENAI_ENABLED", True):
         draft = tistory_writer.generate_draft(JOB)
+    gpt_call.assert_not_called()
     assert draft["status"] == "WRITE_FAILED"
     assert draft["public_allowed"] is False
 

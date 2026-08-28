@@ -2017,26 +2017,29 @@ def generate_content_gemini(prompt, use_gpt=False):
     (직전엔 'Gemini 폴백 금지, GPT만'으로 하드락돼 있었음 — 사용자가 그 잠금을
     알고서 명시적으로 뒤집으라고 지시함.)
 
-    use_gpt=True: 품질 재작성/중요글 경로 — GPT로 직접 간다(Gemini 거치지 않음).
-    use_gpt=False(기본): Gemini를 먼저 시도하고, 실패(크레딧 고갈/오류/빈 응답)
-    하면 그 자리에서 GPT로 넘어간다(둘 다 실패하면 예외를 그대로 올린다 —
-    조용히 낮은 품질로 발행하지 않는다).
+    automation_hub.content_model_policy.choose_writer()가 이 라우팅의 유일한
+    기준이다 — 특히 "무료 tier가 소진됐다는 이유만으로 조용히 유료로 넘어가지
+    않는다"는 잠긴 규칙: Gemini 호출이 실패(크레딧 고갈 포함)하면 GPT로
+    자동 전환하지 않고 그대로 실패시킨다(=이 글은 스킵, AWAITING_APPROVAL과
+    동급). GPT는 quality_fail/important_content 같은 명시적 신호가 있을
+    때만(use_gpt=True) 쓴다.
     """
+    from automation_hub.content_model_policy import choose_writer
+
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from openai_text import openai_available, openai_generate_text
 
-    if use_gpt:
+    decision = choose_writer(quality_fail=use_gpt, primary_available=bool(gemini_client))
+
+    if decision.provider == "none":
+        raise RuntimeError(f"writer blocked by content policy: {decision.reason} ({decision.status})")
+
+    if decision.provider == "openai":
         if not openai_available():
             raise RuntimeError("GPT escalation requested but OpenAI credentials are unavailable")
         return openai_generate_text(prompt, temperature=0.85, max_retries=3)
 
-    try:
-        return _gemini_generate_text_raw(prompt)
-    except Exception as gemini_err:
-        if openai_available():
-            print(f"  ⚠️ Gemini 생성 실패({gemini_err}) → GPT로 즉시 전환")
-            return openai_generate_text(prompt, temperature=0.85, max_retries=3)
-        raise RuntimeError(f"Gemini failed and GPT escalation is unavailable: {gemini_err}") from gemini_err
+    return _gemini_generate_text_raw(prompt)
 
 def strip_code_fences(text):
     """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,

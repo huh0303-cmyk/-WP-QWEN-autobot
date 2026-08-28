@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 """Generate one article draft per Tistory site job.
 
-2026-08-28 정책(사용자 지시): Gemini Flash(무료)가 주력 작가, GPT는 Gemini가
-실패했을 때만 쓰는 escalation. Claude는 글을 쓰지 않고, 완성된 초안을 훑어
-정책 위반(출처 없는 날짜/금액 등)이 있는지 감사(system audit)만 한다.
+2026-08-28 정책(config/content_writing_policy.json, LOCKED): Gemini Flash
+(무료)가 기본 작가, GPT는 important_content(trend_mode/공식출처 필요 사이트)
+같은 명시적 신호가 있을 때만 쓴다 — Gemini가 그냥 실패했다고 조용히 GPT로
+넘어가지 않는다("무료 tier 소진만으로는 유료로 안 간다"). Claude는 글을 쓰지
+않고, 완성된 초안을 훑어 정책 위반(출처 없는 날짜/금액 등)이 있는지
+감사(system audit)만 한다.
 
 Reads a plan produced by tistory_daily_planner.py and writes drafts only —
 this never publishes anything. Every job stays publish_policy=awaiting_approval
@@ -18,8 +21,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
+from automation_hub.content_model_policy import choose_writer  # noqa: E402
 from claude_text import claude_available, claude_generate_text  # noqa: E402
 from gemini_text import gemini_generate_text  # noqa: E402
 from openai_text import openai_available, openai_generate_text  # noqa: E402
@@ -88,16 +94,25 @@ def _parse_json_response(raw: str) -> dict:
 
 
 def _write_body(job: dict) -> tuple[str, str]:
-    """Returns (raw_response_text, engine_used). Gemini first; GPT only if
-    Gemini fails outright (never silently — every fallback is logged)."""
+    """Returns (raw_response_text, engine_used).
+
+    Routing comes from the locked automation_hub.content_model_policy, not
+    from ad-hoc exception handling: important_content (trend/official-source
+    sites) goes to GPT directly; everything else is Gemini-only. If Gemini
+    fails, that is NOT treated as a reason to silently upgrade to a paid
+    tier — the job just fails (WRITE_FAILED), same as the policy's
+    "no silent paid fallback when the free tier is unavailable" rule.
+    """
     prompt = build_writer_prompt(job)
-    try:
-        return gemini_generate_text(prompt, temperature=0.7), "gemini"
-    except Exception as gemini_err:
+    important = bool(job.get("trend_mode") or job.get("official_source_required"))
+    decision = choose_writer(important_content=important)
+
+    if decision.provider == "openai":
         if not openai_available():
-            raise RuntimeError(f"Gemini failed and GPT escalation is unavailable: {gemini_err}") from gemini_err
-        print(f"   ⚠️ Gemini 실패({gemini_err}) → GPT로 재작성")
-        return openai_generate_text(prompt, temperature=0.7, max_retries=3), "gpt-rewrite"
+            raise RuntimeError("GPT escalation requested but OpenAI credentials are unavailable")
+        return openai_generate_text(prompt, temperature=0.7, max_retries=3), "gpt"
+
+    return gemini_generate_text(prompt, temperature=0.7), "gemini"
 
 
 def audit_draft(draft: dict, job: dict) -> dict | None:
