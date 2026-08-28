@@ -3,8 +3,8 @@ name: "Tistory — Daily 5-Site Plan"
 on:
   workflow_dispatch:
     inputs:
-      enable_claude_writer:
-        description: "Actually call Claude to draft the 5 articles (false = plan only, no API spend)"
+      enable_claude_audit:
+        description: "Have Claude audit the 5 drafts for fabricated dates/amounts (false = Gemini/GPT draft only, no Claude spend)"
         required: false
         default: false
         type: boolean
@@ -38,12 +38,16 @@ jobs:
           assert all(j['duplicate_guard'] is True for j in p['jobs'])
           print('TISTORY PLAN SAFETY PASS')
           PY
-      - name: Draft articles with Claude (writes drafts only, never publishes)
+      - name: Draft articles — Gemini primary, GPT escalation, Claude audit-only
         env:
+          # Gemini(무료)가 주력 작가라 게이트 없이 항상 시도한다. GPT는 Gemini가
+          # 실패했을 때만 쓰는 유료 escalation. Claude는 절대 글을 쓰지 않고
+          # 완성된 초안만 감사한다 — 그래서 Claude만 명시적 opt-in 뒤에 둔다.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Scheduled runs never spend API credits unless explicitly enabled
-          # via workflow_dispatch — schedule triggers have no "inputs".
-          CLAUDE_ENABLED: ${{ github.event.inputs.enable_claude_writer || 'false' }}
+          CLAUDE_ENABLED: ${{ github.event.inputs.enable_claude_audit || 'false' }}
         run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
       - name: Validate drafts never authorize public publication
         run: |

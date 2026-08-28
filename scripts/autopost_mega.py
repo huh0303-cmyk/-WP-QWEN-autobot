@@ -350,6 +350,43 @@ CATEGORY_HINTS = {
 }
 
 
+_wp_category_count_cache = {}
+
+# ★ 2026-08-28: The Seoul Journal은 10개 편집 데스크
+#   (POLITICS/ECONOMY/SOCIETY/CULTURE/FINANCE/REAL ESTATE/MILITARY/ART/
+#   SPORTS/GLOBAL) 중 일부가 글이 0~2개뿐이라 편중이 심함. 관련성 있는
+#   카테고리가 여러 개 비슷하게 매칭될 때만(=억지 분류 아님) 그 중 글이
+#   가장 적은 쪽으로 밀어주는 균형 로직을 여기서만 켠다(다른 26개 사이트는
+#   기존 동작 그대로 유지).
+CATEGORY_BALANCE_SITES = {"https://theseouljournal.com"}
+
+
+def _get_category_counts(site_url, wp_pass):
+    if site_url in _wp_category_count_cache:
+        return _wp_category_count_cache[site_url]
+    counts = {}
+    try:
+        page = 1
+        while True:
+            r = requests.get(f"{site_url}/wp-json/wp/v2/categories",
+                             auth=(WP_USER, wp_pass),
+                             params={"per_page": 100, "page": page}, timeout=12)
+            if r.status_code != 200:
+                break
+            cats = r.json()
+            if not cats:
+                break
+            for cat in cats:
+                counts[cat.get("id")] = int(cat.get("count", 0))
+            page += 1
+            if len(cats) < 100:
+                break
+    except Exception as e:
+        print(f"   ⚠️ 카테고리 게시물 수 로드 실패(균형 로직 스킵): {e}")
+    _wp_category_count_cache[site_url] = counts
+    return counts
+
+
 def pick_best_category(site_url, wp_pass, keyword, title=""):
     """
     사이트에 이미 존재하는 카테고리 중에서만 고른다. 새로 생성하지 않는다.
@@ -384,6 +421,7 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
     st_nospace = re.sub(r'[\s/,\-]+', '', st)
 
     best, best_score = None, 0
+    scores = {}
     for cid, name in real:
         if etc_cat and cid == etc_cat[0]:
             continue  # etc는 최후수단이므로 매칭 후보에서 제외
@@ -411,8 +449,24 @@ def pick_best_category(site_url, wp_pass, keyword, title=""):
         for h in hints:
             if h.lower() in st:
                 score += 3
+        scores[cid] = score
         if score > best_score:
             best, best_score = (cid, name), score
+
+    # ★ 균형 배정(The Seoul Journal 전용): 진짜로 관련 있는(score>=3) 카테고리가
+    #   여러 개 경쟁하는 경우에만, 그 중 실제 게시물이 가장 적은 곳으로 밀어준다.
+    #   관련 카테고리가 하나뿐이거나 아예 없으면 절대 건드리지 않는다(억지 분류 금지).
+    if site_url in CATEGORY_BALANCE_SITES and best_score >= 3:
+        confident = [cid for cid, sc in scores.items() if sc >= 3]
+        if len(confident) > 1:
+            counts = _get_category_counts(site_url, wp_pass)
+            name_by_id = dict(real)
+            confident.sort(key=lambda cid: (counts.get(cid, 0), -scores[cid]))
+            chosen_cid = confident[0]
+            if chosen_cid != best[0]:
+                print(f"   ⚖️ 카테고리 균형 배정: {best[1]}({counts.get(best[0], '?')}건) → "
+                      f"{name_by_id[chosen_cid]}({counts.get(chosen_cid, '?')}건)")
+            best = (chosen_cid, name_by_id[chosen_cid])
 
     # ★ 단어/힌트 매칭으로 확신 있는 결과(score>=3)를 못 찾으면, Gemini에게
     #   딱 카테고리 이름만 보여주고 골라달라고 짧게 물어봄(의미적 매칭).
@@ -1944,16 +1998,45 @@ Do not write a TITLE line (a separate system generates the title). Do not restat
 # ============================================================
 # ★ 유틸리티
 # ============================================================
-def generate_content_gemini(prompt):
-    """Legacy call name retained; WordPress text is strictly GPT-only."""
+def _gemini_generate_text_raw(prompt, temperature=0.85):
+    if not gemini_client:
+        raise RuntimeError("GEMINI_API_KEY is not configured")
+    resp = gemini_client.models.generate_content(
+        model=GEMINI_MODEL, contents=prompt,
+        config={"temperature": temperature},
+    )
+    text = (resp.text or "").strip()
+    if not text:
+        raise RuntimeError("Gemini returned an empty response")
+    return text
+
+
+def generate_content_gemini(prompt, use_gpt=False):
+    """2026-08-28 정책 변경(사용자 지시): Gemini Flash(무료)를 주력 작가로,
+    GPT는 품질 실패 재작성/중요글(뉴스룸) 전용 escalation으로 되돌렸다.
+    (직전엔 'Gemini 폴백 금지, GPT만'으로 하드락돼 있었음 — 사용자가 그 잠금을
+    알고서 명시적으로 뒤집으라고 지시함.)
+
+    use_gpt=True: 품질 재작성/중요글 경로 — GPT로 직접 간다(Gemini 거치지 않음).
+    use_gpt=False(기본): Gemini를 먼저 시도하고, 실패(크레딧 고갈/오류/빈 응답)
+    하면 그 자리에서 GPT로 넘어간다(둘 다 실패하면 예외를 그대로 올린다 —
+    조용히 낮은 품질로 발행하지 않는다).
+    """
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from openai_text import openai_available, openai_generate_text
+
+    if use_gpt:
+        if not openai_available():
+            raise RuntimeError("GPT escalation requested but OpenAI credentials are unavailable")
+        return openai_generate_text(prompt, temperature=0.85, max_retries=3)
+
     try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from openai_text import openai_available, openai_generate_text
+        return _gemini_generate_text_raw(prompt)
+    except Exception as gemini_err:
         if openai_available():
+            print(f"  ⚠️ Gemini 생성 실패({gemini_err}) → GPT로 즉시 전환")
             return openai_generate_text(prompt, temperature=0.85, max_retries=3)
-    except ImportError as exc:
-        raise RuntimeError("WordPress GPT provider module is unavailable; Gemini fallback is prohibited") from exc
-    raise RuntimeError("WordPress GPT credentials are unavailable; Gemini fallback is prohibited")
+        raise RuntimeError(f"Gemini failed and GPT escalation is unavailable: {gemini_err}") from gemini_err
 
 def strip_code_fences(text):
     """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
@@ -3193,8 +3276,11 @@ def process_one(site, keyword):
     best_score=0; best_result=None; best_length_valid=False
 
     for attempt in range(MAX_REGEN+1):
+        # ★ 2026-08-28: attempt>0(=품질 목표 미달로 재작성하는 회차)이거나
+        #   뉴스룸(=중요글)이면 GPT로 간다. 그 외 일반 블로그 1회차는 Gemini.
+        use_gpt = attempt > 0 or mode in ("news", "news_en")
         try:
-            raw=generate_content_gemini(prompt)
+            raw=generate_content_gemini(prompt, use_gpt=use_gpt)
         except Exception as e:
             print(f"  ❌ AI 생성 실패: {e}")
             log(url,theme,keyword,"","",0,0,"❌ AI 생성 실패",str(e))

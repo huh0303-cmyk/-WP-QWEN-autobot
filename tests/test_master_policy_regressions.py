@@ -22,11 +22,17 @@ def load_autopost_functions(*names):
 
 
 class MasterPolicyRegressionTests(unittest.TestCase):
-    def test_wordpress_text_generator_has_no_gemini_fallback(self):
+    def test_wordpress_text_generator_uses_gemini_primary_with_gpt_escalation(self):
+        # 2026-08-28: 사용자 지시로 정책 반전 — Gemini Flash(무료)가 주력 작가,
+        # GPT는 품질 실패 재작성/중요글 전용 escalation. 이전엔 그 반대
+        # ("GPT만, Gemini 폴백 금지")로 하드락돼 있었다.
         source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
-        block = source.split("def generate_content_gemini(prompt):", 1)[1].split("def strip_code_fences", 1)[0]
-        self.assertNotIn("gemini_client.models.generate_content", block)
-        self.assertIn("Gemini fallback is prohibited", block)
+        block = source.split("def generate_content_gemini(prompt, use_gpt=False):", 1)[1].split(
+            "def strip_code_fences", 1
+        )[0]
+        self.assertIn("_gemini_generate_text_raw(prompt)", block)
+        self.assertIn("openai_generate_text(prompt", block)
+        self.assertIn("use_gpt", block)
 
     def test_platform_queue_fails_workflow_when_publisher_fails(self):
         source = (ROOT / "scripts" / "process_platform_queue.py").read_text(encoding="utf-8")

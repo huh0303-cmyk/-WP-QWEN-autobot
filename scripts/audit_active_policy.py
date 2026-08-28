@@ -54,9 +54,15 @@ def main() -> None:
             fail(f"{name} does not receive REPLICATE_API_TOKEN")
 
     wp = workflow_text.get("daily-network-publish.yml", "")
-    if 'AI_TEXT_PROVIDER: "openai"' not in wp:
-        fail("WordPress publisher is not hard-routed to OpenAI text")
+    # 2026-08-28: Gemini Flash가 주력 작가, GPT는 품질 실패 재작성/중요글
+    # escalation 전용(사용자 지시로 이전 "GPT만" 하드락을 되돌림).
+    if 'AI_TEXT_PROVIDER: "gemini"' not in wp or "secrets.GEMINI_API_KEY" not in wp:
+        fail("WordPress publisher is not routed to Gemini as the primary writer")
+    if "secrets.OPENAI_API_KEY" not in wp or 'OPENAI_ENABLED: "true"' not in wp:
+        fail("WordPress publisher lost its GPT escalation credentials")
     wp_publisher = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
+    if "def generate_content_gemini(prompt, use_gpt=False)" not in wp_publisher:
+        fail("WordPress text generator lost its Gemini-primary/GPT-escalation signature")
     if "SEO_TARGET  = 75" not in wp_publisher:
         fail("WordPress publication threshold is not 75")
     wp_public_gate = (
