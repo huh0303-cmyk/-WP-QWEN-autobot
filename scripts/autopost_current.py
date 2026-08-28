@@ -7,9 +7,14 @@ must not regress to legacy labels retained in the large historical module.
 
 Current hard policy:
 - WordPress text generation uses Gemini as the primary writer.
-- Paid image generation is disabled. Publishing must continue without an image.
-- Pixabay, Pexels, OpenAI image, Gemini image/Nano Banana, local infographic fallbacks,
-  and OpenAI/Gemini image-relevance calls are blocked from the active WP entrypoint.
+- 2026-08-28 user decision: free-stock images (Pexels/Pixabay) stay banned, but paid
+  Replicate image generation (FLUX-primary, capped at 1 image/post by
+  replicate_image_provider's own hard guard) is re-enabled after the "no images at all"
+  policy structurally capped every post below the 75-point SEO publish gate (0/24 posts
+  published today). User explicitly approved the Replicate cost this implies.
+- Pixabay, Pexels, OpenAI image, Gemini image/Nano Banana, and local infographic
+  fallbacks stay blocked from the active WP entrypoint — only the approved Replicate
+  gateway may supply an image.
 """
 import os
 import socket
@@ -27,7 +32,7 @@ os.environ["OPENAI_ENABLED"] = "false"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "false"
-os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "false"
+os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "true"
 
 # Hostinger sites can advertise IPv6 while GitHub-hosted runners have an
 # intermittently unusable IPv6 route.  Prefer IPv4 at the client only; this
@@ -57,7 +62,7 @@ base.AI_TEXT_PROVIDER = "gemini"
 base.PIXABAY_KEY = None
 base.PEXELS_KEY = None
 base.GEMINI_IMAGE_MODELS = []
-base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = False
+base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
 
 
 def _blocked_stock(*args, **kwargs):
