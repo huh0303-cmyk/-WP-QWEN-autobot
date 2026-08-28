@@ -3,7 +3,7 @@
 """Single approved image-generation gateway for the automation repository.
 
 HARD POLICY (2026-08-27):
-- Only Replicate may generate images.
+- Free-confirmed Nano Banana is attempted once before Replicate.
 - Only the three models in ALLOWED_MODELS may be called.
 - One shared secret: REPLICATE_API_TOKEN.
 - At most one output image per content item and one attempt per model.
@@ -175,6 +175,30 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
     )
 
 
+def _free_nano_banana_data_url(prompt: str) -> Optional[str]:
+    """One free-only attempt. Never runs unless the free-tier flag is explicit."""
+    if os.getenv("NANO_BANANA_FREE_TIER_ENABLED", "false").strip().lower() != "true":
+        print("  ℹ️ Nano Banana free use is not confirmed — skipped")
+        return None
+    key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not key:
+        return None
+    try:
+        response = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={key}",
+            json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=90,
+        )
+        response.raise_for_status()
+        for part in response.json().get("candidates", [{}])[0].get("content", {}).get("parts", []):
+            inline = part.get("inlineData") or part.get("inline_data") or {}
+            if inline.get("data"):
+                mime = inline.get("mimeType") or inline.get("mime_type") or "image/png"
+                return f"data:{mime};base64,{inline['data']}"
+    except Exception as exc:
+        print(f"  ⚠️ free Nano Banana failed: {exc}")
+    return None
+
+
 def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
     """Generate at most one image using only the approved Replicate model chain."""
     token = _token()
@@ -189,6 +213,11 @@ def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
     if cache_key in _attempted_prompts:
         return None
     _attempted_prompts.add(cache_key)
+
+    nano_url = _free_nano_banana_data_url(prompt)
+    if nano_url:
+        _prompt_cache[cache_key] = nano_url
+        return nano_url
 
     for attempt_no, model in enumerate(ALLOWED_MODELS, start=1):
         if attempt_no > MAX_MODEL_ATTEMPTS:
