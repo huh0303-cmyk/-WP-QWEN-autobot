@@ -87,8 +87,13 @@
   "golden_keyword_selection": {
     "applies_to": ["wordpress", "blogger", "tistory"],
     "news_exception": "two_newsrooms_use_latest_rss_headlines_as_reporting_topics",
-    "dimensions": ["search_intent", "site_fit", "freshness", "value", "specificity"],
-    "selection": "highest_score_only_no_random_choice"
+    "policy_file": "config/golden_keyword_policy.json",
+    "pipeline": ["current_news_media_terms", "event_entity_clustering", "google_naver_gsc_validation", "site_intent_conversion", "score_and_hard_gate"],
+    "weights": {"gsc_demand": 25, "media_repetition": 20, "google_naver_trend": 20, "site_fit": 15, "actionable_search_intent": 10, "official_source_available": 10},
+    "thresholds": {"candidate": 70, "priority": 80, "top": 90},
+    "sensitive_topic_official_source_gate": "missing_source_means_hold_regardless_of_score",
+    "missing_signal_rule": "zero_points_never_fabricate",
+    "selection": "highest_verified_score_first_no_random_choice"
   },
   "cross_platform_originality": {
     "copy_paste_allowed": false,
