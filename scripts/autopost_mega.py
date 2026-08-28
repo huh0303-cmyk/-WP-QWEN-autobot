@@ -6,7 +6,7 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
   ✅ 카테고리 생성 완전 금지 — find_existing_wp_category (조회만)
   ✅ 27개 사이트별 독립 페르소나 + 글 구성 (SITE_PERSONA)
   ✅ make_site_prompt — 사이트별 프롬프트 완전 분리
-  ✅ SEO 90점 미달 시 최대 3회 재생성
+  ✅ SEO 70점 미달 시 재생성 후 발행 차단
   ✅ post-processing: 통계·TABLE 자동 보완
   ✅ IndexNow 발행 즉시 ping
   ✅ 구글시트 로깅 / Rank Math 메타 주입
@@ -85,10 +85,9 @@ _gemini_fallback_active = False
 GEMINI_IMAGE_MODELS = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"]
 
 TAG_COUNT   = 10
-# 2026-08-28 사용자 지시: "발행기준 SEO 75점"
-# — 예전 90/3회(4번 시도)보다 기준은 낮췄지만 시도 횟수를 줄여 ChatGPT 전환 후
-# 비용을 통제. 75점은 하드 게이트(미달이면 발행 자체 스킵, process_one 참고).
-SEO_TARGET  = 75
+# 2026-08-29 사용자 확정: 전체 글 발행기준 SEO 70점.
+# 70점은 하드 게이트(미달이면 발행 자체 스킵, process_one 참고).
+SEO_TARGET  = 70
 MAX_REGEN   = 1
 
 # ============================================================
@@ -3448,9 +3447,8 @@ def process_one(site, keyword):
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
 
-    # ★ 2026-08-04 사용자 지시("SEO 90점 이상만 올려"): 예전엔 SEO_TARGET(90)을
-    #   재생성 목표로만 쓰고, MAX_REGEN 다 써도 90 미달이면 postprocess로 보정만
-    #   하고 그냥 발행했음. 이제는 하드 게이트 — 90 미달이면 발행 자체를 스킵.
+    # ★ 2026-08-29 사용자 확정: SEO 70점은 하드 게이트.
+    #   재생성 후에도 70점 미달이면 발행 자체를 스킵.
     #   (주의: 이 score는 이 스크립트 자체 추정치이고, WP에 저장되는
     #   rank_math_seo_score도 이 값을 그대로 씀 — RankMath 플러그인이 REST로
     #   만든 글을 다시 분석해서 갱신해주는 게 아니라서, 실제 RankMath 분석
