@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+import json
 
 import requests
 
@@ -31,7 +32,8 @@ class BloggerPublisher:
                 endpoint,
                 params={"isDraft": str(not job.publish_now).lower()},
                 headers={"Authorization": f"Bearer {self.access_token}"},
-                json={"kind": "blogger#post", "title": job.title, "content": job.content_html, "labels": job.labels},
+                json={"kind": "blogger#post", "title": job.title, "content": job.content_html,
+                      "labels": job.labels, "customMetaData": json.dumps({"searchDescription": job.search_description}, ensure_ascii=False)},
                 timeout=30,
             )
             if response.status_code not in {200, 201}:
