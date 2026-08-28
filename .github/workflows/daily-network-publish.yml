@@ -57,11 +57,13 @@ jobs:
           # 재작성/중요글(뉴스룸) escalation 전용으로 되돌림(사용자 지시).
           AI_TEXT_PROVIDER: "gemini"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
-          GEMINI_IMAGE_GENERATION_ENABLED: "false"
-          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "true"
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           OPENAI_MODEL: "gpt-5.6-luna"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
