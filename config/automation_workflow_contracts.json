@@ -1,11 +1,12 @@
 {
-  "version": 1,
+  "version": 2,
   "description": "Workflow input contracts used by the central room scheduler. PUBLIC is never implied by this file.",
   "contracts": {
     "daily-network-publish.yml": {
       "platforms": ["wordpress"],
       "mode": "workflow_dispatch",
       "inputs": {
+        "room_id": "room.room_id",
         "target_site_url": "room.name_url",
         "force_keyword": "",
         "publication_approved": false
@@ -24,6 +25,7 @@
       "platforms": ["blogger", "tistory"],
       "mode": "workflow_dispatch",
       "inputs": {
+        "room_id": "room.room_id",
         "platform": "room.platform",
         "job_id": "",
         "max_jobs": "1"
@@ -36,6 +38,7 @@
       "mode": "workflow_dispatch",
       "channel_groups": ["PLAYLIST"],
       "inputs": {
+        "room_id": "room.room_id",
         "channel": "room.account_id",
         "topic": "",
         "language": "room.language",
@@ -49,6 +52,7 @@
       "mode": "workflow_dispatch",
       "channel_groups": ["KNOWLEDGE"],
       "inputs": {
+        "room_id": "room.room_id",
         "channel": "room.account_id",
         "topic": "",
         "publish_delay_hours": ""
