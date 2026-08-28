@@ -23,22 +23,24 @@ def test_daily_plan_stays_empty_until_sites_are_explicitly_launched():
     assert all(j["public_allowed"] is False for j in plan["jobs"])
 
 
-def test_petcare_preserves_existing_identity_and_requires_sources():
+def test_life365_replaces_the_stale_petcare_label():
     cfg = load_config()
-    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_petcare")
-    assert site["title"] == "K-Petcare"
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_life365")
+    assert site["current_label"] == "K-Petcare"
+    assert site["title"] == "오늘의 생활정보365"
     assert site["url"] == "https://huh0303.tistory.com/"
     assert site["official_source_required"] is True
-    assert "강아지건강" in site["categories"]
-    assert "펫보험" in site["categories"]
+    assert "정부지원금" in site["categories"]
+    assert "교통·시간표" in site["categories"]
 
 
-def test_healthcare_site_is_not_repurposed_as_finance():
+def test_finance_site_replaces_the_stale_healthcare_label():
     cfg = load_config()
-    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_healthcare_careers")
-    assert site["title"] == "K-보건의료자격증"
-    assert "국가자격" in site["categories"]
-    assert "대출" not in site["categories"]
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_finance_housing")
+    assert site["current_label"] == "K-보건의료자격증"
+    assert site["title"] == "K-부동산·금융생활"
+    assert "대출" in site["categories"]
+    assert "국가자격" not in site["categories"]
 
 
 def test_all_sites_are_guarded_for_staged_relaunch():
