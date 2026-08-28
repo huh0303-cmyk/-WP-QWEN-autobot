@@ -56,14 +56,19 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install requests google-api-python-client google-auth -q
-      - name: Rewrite with Gemini without paid image generation
+      - name: Golden keyword + Gemini/GPT + Claude + approved image chain
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_ENABLED: "true"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"
           SOURCE_WP_URL: ${{ inputs.source_wp_url }}
           BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
@@ -71,8 +76,8 @@ jobs:
           BLOGGER_PERSONA: ${{ inputs.persona }}
           BLOGGER_TONE: ${{ inputs.tone }}
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
-          BLOGGER_MAX_SIMILARITY: "0.68"
-          BLOGGER_MIN_QUALITY_SCORE: "75"
+          BLOGGER_MAX_SIMILARITY: "0.55"
+          BLOGGER_MIN_QUALITY_SCORE: "70"
           BLOGGER_PUBLISH_NOW: "false"
           FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py
