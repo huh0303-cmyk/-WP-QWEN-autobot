@@ -30,6 +30,7 @@ from gemini_text import gemini_generate_text
 from openai_text import openai_available, openai_generate_text
 from claude_text import claude_available, claude_generate_text
 from replicate_image_provider import generate_image_url
+from three_model_consensus import three_model_consensus
 from sync_automation_hub_to_sheets import QUEUE_TAB
 
 
@@ -139,19 +140,13 @@ def main():
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: Gemini와 GPT 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
 
-    if not claude_available():
-        _append_failure(service, sheet_id, blogger_site_id, error_code="AUDIT_UNAVAILABLE", message="Claude final audit is mandatory.", source_url=source["link"])
-        raise RuntimeError("Claude final audit is mandatory")
-    audit_prompt = json.dumps({"rules": "Check factual support, grammar, natural human tone, search intent, AI-like phrasing, repeated/similar title and cross-platform copying. Return strict JSON with ok and issues.", "source_title": source["title"]["rendered"], "draft": rewritten}, ensure_ascii=False)
-    try:
-        audit_raw = claude_generate_text(audit_prompt, system="You are a blocking editorial auditor. Return only JSON: {\"ok\": bool, \"issues\": [str]}", temperature=0.0)
-        audit_text = audit_raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-        audit_result = json.loads(audit_text)
-    except Exception as exc:
-        audit_result = {"ok": False, "issues": [str(exc)]}
-    if audit_result.get("ok") is not True:
-        _append_failure(service, sheet_id, blogger_site_id, error_code="AUDIT_FAILED", message=json.dumps(audit_result, ensure_ascii=False), source_url=source["link"])
-        raise RuntimeError("Claude final audit failed")
+    consensus = three_model_consensus(
+        title=rewritten["title"], content=rewritten["content_html"], meta=rewritten["meta_description"],
+        keyword=source["title"]["rendered"], gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
+    )
+    if consensus.get("ok") is not True:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="CONSENSUS_FAILED", message=json.dumps(consensus, ensure_ascii=False), source_url=source["link"])
+        raise RuntimeError("Gemini, GPT and Claude did not all approve")
 
     content = rewritten["content_html"]
     image_model = "0"
