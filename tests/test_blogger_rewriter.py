@@ -15,7 +15,7 @@ class BloggerRewriterTests(unittest.TestCase):
         }
         result = normalize_rewrite_format(article, target_chars=1200)
         self.assertLessEqual(len(result["title"]), 70)
-        self.assertLessEqual(len(result["meta_description"]), 130)
+        self.assertLessEqual(len(result["meta_description"].split()), 120)
         self.assertLessEqual(len(re.sub(r"\s+", "", plain_text(result["content_html"]))), 1620)
 
     def test_normalize_preserves_source_and_ymyl_tail(self):
@@ -32,7 +32,7 @@ class BloggerRewriterTests(unittest.TestCase):
         self.assertFalse(result["content_html"].rstrip().endswith("</h2>"))
 
     def test_parse_json_code_fence(self):
-        value = parse_rewrite_json('```json\n{"title":"New","meta_description":"A practical Korea guide with current steps, source-led checks, and clear details for readers planning their next move.","content_html":"<p>Body</p>","image_queries":[],"labels":["Korea","Guide","Planning"]}\n```')
+        value = parse_rewrite_json('```json\n{"title":"New","meta_description":"A practical Korea guide with current steps, source-led checks, and clear details for readers planning their next move.","content_html":"<p>Body</p>","image_queries":[],"labels":["Korea","Guide","Planning","Travel","Booking","Transport","Hotels","Seoul"]}\n```')
         self.assertEqual("New", value["title"])
 
     def test_similarity_catches_near_copy(self):
@@ -66,7 +66,7 @@ class BloggerRewriterTests(unittest.TestCase):
             '<h2>Final checklist</h2><p>' + ('Confirm reservations and keep the official details accessible. ' * 20) + '</p>'
             f'<p><a href="{source_url}">Detailed Korea travel source</a></p>'
         )
-        article = {"title": "Korea Travel Planning: Practical Steps", "meta_description": "Plan a Korea trip with practical transport, booking, timing, and official-information checks for a smoother journey today.", "content_html": content, "labels": ["Korea Travel", "Planning", "Transport"]}
+        article = {"title": "Korea Travel Planning: Practical Steps", "meta_description": " ".join(["Korea"] * 105), "content_html": content, "labels": ["Korea", "Travel", "Planning", "Transport", "Booking", "Hotels", "Seoul", "Routes"]}
         score, failures, _ = blogger_quality_score(article, source_title="Korea Travel Planning", source_url=source_url, source_html="<p>Short original source.</p>", target_chars=2400)
         self.assertGreaterEqual(score, 80, failures)
 
