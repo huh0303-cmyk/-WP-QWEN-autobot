@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -19,11 +20,26 @@ def _load_source(path: str) -> dict[str, Any]:
     p = Path(path)
     if not p.exists():
         return {}
+    text = p.read_text(encoding="utf-8", errors="replace")
     try:
-        raw = json.loads(p.read_text(encoding="utf-8"))
+        raw = json.loads(text)
         return raw if isinstance(raw, dict) else {"raw": raw}
-    except Exception as exc:
-        return {"source_parse_error": str(exc)}
+    except Exception:
+        source: dict[str, Any] = {"raw_log": text[-12000:]}
+        patterns = [
+            (r"studio\.youtube\.com/video/([A-Za-z0-9_-]{6,})/edit", "video_id", "https://studio.youtube.com/video/{}/edit"),
+            (r"youtube\.com/watch\?v=([A-Za-z0-9_-]{6,})", "video_id", "https://youtube.com/watch?v={}"),
+        ]
+        for pattern, id_key, url_template in patterns:
+            match = re.search(pattern, text)
+            if match:
+                source[id_key] = match.group(1)
+                source["video_url"] = url_template.format(match.group(1))
+                break
+        error_lines = [line.strip() for line in text.splitlines() if any(token in line.lower() for token in ("error", "failed", "❌", "unauthorized", "forbidden", "oauth", "scope"))]
+        if error_lines:
+            source["error_message"] = error_lines[-1][:2000]
+        return source
 
 
 def _first(source: dict[str, Any], *keys: str) -> str:
