@@ -27,7 +27,7 @@ def test_life365_replaces_the_stale_petcare_label():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_life365")
     assert site["current_label"] == "K-Petcare"
-    assert site["title"] == "오늘의 생활정보365"
+    assert site["title"] == "한국생활정보"
     assert site["url"] == "https://huh0303.tistory.com/"
     assert site["official_source_required"] is True
     assert "정부지원금" in site["categories"]
@@ -38,7 +38,7 @@ def test_finance_site_replaces_the_stale_healthcare_label():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_finance_housing")
     assert site["current_label"] == "K-보건의료자격증"
-    assert site["title"] == "K-부동산·금융생활"
+    assert site["title"] == "한국부동산금융정보"
     assert "대출" in site["categories"]
     assert "국가자격" not in site["categories"]
 
