@@ -36,6 +36,14 @@
       "safe_policy": "awaiting_approval",
       "artifact_kind": "platform_draft_or_queue_id"
     },
+    "tistory-daily-plan.yml": {
+      "platforms": ["tistory"],
+      "mode": "scheduler_managed",
+      "inputs": {},
+      "required_inputs": [],
+      "safe_policy": "awaiting_approval",
+      "artifact_kind": "tistory_draft_bundle"
+    },
     "generate-youtube-playlist.yml": {
       "platforms": ["youtube"],
       "mode": "workflow_dispatch",
