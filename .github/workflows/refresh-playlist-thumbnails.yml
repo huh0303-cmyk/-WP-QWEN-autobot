@@ -8,6 +8,7 @@ permissions:
 
 jobs:
   refresh:
+    if: ${{ false }} # EMERGENCY LOCK: paid thumbnail API disabled
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:

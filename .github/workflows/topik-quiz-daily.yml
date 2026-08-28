@@ -29,6 +29,7 @@ concurrency:
 
 jobs:
   generate:
+    if: ${{ false }} # EMERGENCY LOCK: video generation disabled
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
