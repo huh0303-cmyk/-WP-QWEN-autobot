@@ -3433,7 +3433,8 @@ def process_one(site, keyword):
         # 1) Nano Banana only when free-tier use is explicitly confirmed.
         # 2) Replicate: FLUX Schnell -> SDXL Lightning 4-step -> SDXL Turbo.
         # 3) If all fail, no other image fallback.
-        images = get_fallback_nanobanana_image(url, site["pw"], keyword, theme, lang)
+        wp_pass = os.getenv(site["wp_pass_env"], "")
+        images = get_fallback_nanobanana_image(url, wp_pass, keyword, theme, lang)
         if not images:
             img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
             images = [img_url] if img_url else []
