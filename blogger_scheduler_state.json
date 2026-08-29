@@ -1,5 +1,10 @@
 {
   "date": "2026-08-29",
-  "fired": {},
-  "last_dispatch_at": null
+  "fired": {
+    "blogger_kstudy365": {
+      "target_kst": "10:22",
+      "dispatched_at": "2026-08-29T12:53:51.693083+09:00"
+    }
+  },
+  "last_dispatch_at": "2026-08-29T12:53:51.693083+09:00"
 }
