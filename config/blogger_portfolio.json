@@ -1,46 +1,50 @@
 {
-  "version": 1,
-  "description": "Blogger 27-channel registration blueprint. Create all shells first, then activate only 4-5 channels per KST day. Every post remains draft until human approval.",
+  "version": 2,
+  "locked_on": "2026-08-29",
+  "description": "Locked WordPress-to-Blogger 1:1 MASTER MAP. WordPress remains unchanged. Blogger shells are separate editorial properties and never copy WordPress posts.",
   "timezone": "Asia/Seoul",
-  "creation_policy": "shell_only",
-  "activation_policy": {
-    "daily_limit": 5,
-    "public_publish": false,
-    "draft_only": true,
-    "activate_after_checks": ["destination_id", "language", "search_description", "robots", "https", "adsense_preserved"]
+  "creation_policy": {
+    "mode": "shell_only",
+    "duplicate_check_required": true,
+    "exact_address_only": true,
+    "invented_suffixes_forbidden": true,
+    "minimum_gap_minutes": 30,
+    "round_clock_times_forbidden": true,
+    "new_posts_forbidden": true,
+    "required_pages": ["About", "Contact", "Privacy Policy", "Disclaimer"]
   },
+  "language_policy": {
+    "ko_only": ["koreanews365.com", "k-health365.com"],
+    "all_others": "en"
+  },
+  "status_values": ["CREATED", "EXISTING", "CONFLICT", "BLOCKED", "SCHEDULED"],
   "channels": [
-    {"order":1,"batch":1,"room_id":"blogger_khealth365","title":"K-health365 연구소","language":"ko","topic":"건강·생활습관","status":"READY","destination_id":"8294304371132383961","url":"https://k-health365.blogspot.com","fixed_on":"2026-08-28"},
-    {"order":2,"batch":1,"room_id":"blogger_koreanews365","title":"한국생활지원정보","language":"ko","topic":"정부지원금·장려금·신청일·지급일·교통시간표·표예매","status":"CREATED_SHELL","destination_id":"2531035487222435079","url":"https://korea-life-support365.blogspot.com","created_on":"2026-08-28"},
-    {"order":3,"batch":1,"room_id":"blogger_ktrip365","title":"K-trip365","language":"en","topic":"Korea travel for international visitors","status":"EXISTING"},
-    {"order":4,"batch":1,"room_id":"blogger_koreamedicaltour365","title":"Korea Medical Tour 365","language":"en","topic":"Korea medical travel","status":"EXISTING"},
-    {"order":5,"batch":1,"room_id":"blogger_koreainsurance365","title":"Korea Insurance 365","language":"en","topic":"Insurance in Korea for foreigners","status":"EXISTING"},
-
-    {"order":6,"batch":2,"room_id":"blogger_kfinance365","title":"Korea Finance 365","language":"en","topic":"Personal finance in Korea","status":"CREATED_SHELL","destination_id":"1687098888954822322","url":"https://kfinance365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":7,"batch":2,"room_id":"blogger_krealestate365","title":"Korea Real Estate 365","language":"en","topic":"Housing and property in Korea","status":"CREATED_SHELL","destination_id":"6980941479069687285","url":"https://krealestate365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":8,"batch":2,"room_id":"blogger_koreataxnlaw","title":"Korea Tax & Law Guide","language":"en","topic":"Korean tax and practical law","status":"CREATED_SHELL","destination_id":"8654603097966481527","url":"https://koreataxnlaw.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":9,"batch":2,"room_id":"blogger_koreainvest365","title":"Korea Investment 365","language":"en","topic":"Investing and business in Korea","status":"CREATED_SHELL","destination_id":"4890361213499831195","url":"https://koreainvest365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":10,"batch":2,"room_id":"blogger_kvisa365","title":"K-Visa365","language":"en","topic":"Korean visas and immigration","status":"EXISTING"},
-
-    {"order":11,"batch":3,"room_id":"blogger_jobkorea365","title":"Jobs in Korea 365","language":"en","topic":"Jobs and careers in Korea","status":"EXISTING"},
-    {"order":12,"batch":3,"room_id":"blogger_jobinkorea365","title":"Job in Korea Guide","language":"en","topic":"Foreign worker job guidance","status":"CREATED_SHELL","destination_id":"3560791242887862780","url":"https://jobinkorea365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":13,"batch":3,"room_id":"blogger_jobkoreaglobal","title":"Korea Global Careers","language":"en","topic":"Global careers connected to Korea","status":"CREATED_SHELL","destination_id":"5264943720375052759","url":"https://jobkoreaglobal.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":14,"batch":3,"room_id":"blogger_kstudy365","title":"Study in Korea 365","language":"en","topic":"Studying in Korea","status":"EXISTING"},
-    {"order":15,"batch":3,"room_id":"blogger_studyinkorea365","title":"Korea Study Guide","language":"en","topic":"Admissions and student life","status":"CREATED_SHELL","destination_id":"2107448954473357757","url":"https://studyinkorea365.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-
-    {"order":16,"batch":4,"room_id":"blogger_sis","title":"Seoul International School Guide","language":"en","topic":"International education in Korea","status":"CREATED_SHELL","destination_id":"8077962392257357260","url":"https://seoulintlschoolguide.blogspot.com","created_on":"2026-08-28","language_fixed":true},
-    {"order":17,"batch":4,"room_id":"blogger_kieca","title":"한국유학·교육정보","language":"ko","topic":"유학·교육기관·진학정보","status":"CREATED_SHELL","destination_id":"5061870975921599649","url":"https://koreastudyedu365.blogspot.com","created_on":"2026-08-28"},
-    {"order":18,"batch":4,"room_id":"blogger_ksa","title":"한국교육기관정보","language":"ko","topic":"교육기관·학교생활·교육정책","status":"CREATE_REQUIRED"},
-    {"order":19,"batch":4,"room_id":"blogger_kskin365","title":"K-Beauty Skin Guide","language":"en","topic":"Korean skincare","status":"CREATE_REQUIRED"},
-
-    {"order":20,"batch":5,"room_id":"blogger_oliveyoungkorea","title":"Olive Young Korea Guide","language":"en","topic":"K-beauty shopping and products","status":"CREATE_REQUIRED"},
-    {"order":21,"batch":5,"room_id":"blogger_koreawedding365","title":"Korea Wedding 365","language":"en","topic":"Weddings and couples in Korea","status":"CREATE_REQUIRED"},
-    {"order":22,"batch":5,"room_id":"blogger_kworld365","title":"K-World 365","language":"en","topic":"Korean culture and lifestyle","status":"CREATE_REQUIRED"},
-    {"order":23,"batch":5,"room_id":"blogger_ktech365","title":"Korea Tech 365","language":"en","topic":"Korean technology and digital life","status":"CREATE_REQUIRED"},
-
-    {"order":24,"batch":6,"room_id":"blogger_koreacrypto365","title":"Korea Crypto 365","language":"en","topic":"Korean digital assets and regulation","status":"CREATE_REQUIRED"},
-    {"order":25,"batch":6,"room_id":"blogger_kikorea","title":"KI Korea Guide","language":"en","topic":"Practical Korea information","status":"CREATE_REQUIRED"},
-    {"order":26,"batch":6,"room_id":"blogger_korea365","title":"Korea 365","language":"en","topic":"Everyday Korea guide","status":"CREATE_REQUIRED"},
-    {"order":27,"batch":6,"room_id":"blogger_theseouljournal","title":"The Seoul Journal","language":"en","topic":"Seoul news, culture and city life","status":"CREATE_REQUIRED"}
+    {"order":1,"wp":"https://k-trip365.com","blogspot":"https://k-trip365.blogspot.com","title":"K-Trip365","language":"en","topic":"Korea travel","status":"EXISTING","destination_id":"5345010194652095946"},
+    {"order":2,"wp":"https://kworld365.com","blogspot":"https://kworld365.blogspot.com","title":"KWorld365","language":"en","topic":"K-pop","status":"SCHEDULED","scheduled_kst":"2026-08-30 08:17"},
+    {"order":3,"wp":"https://jobkorea365.com","blogspot":"https://jobkorea365.blogspot.com","title":"JobKorea365","language":"en","topic":"Jobs and careers in Korea","status":"EXISTING","destination_id":"9124051754121584517"},
+    {"order":4,"wp":"https://kstudy365.com","blogspot":"https://kstudy365.blogspot.com","title":"KStudy365","language":"en","topic":"Studying in Korea","status":"EXISTING","destination_id":"1529526209955625690"},
+    {"order":5,"wp":"https://koreainsurance365.com","blogspot":"https://koreainsurance365.blogspot.com","title":"Korea Insurance 365","language":"en","topic":"Insurance in Korea","status":"EXISTING","destination_id":"8888982369193041814"},
+    {"order":6,"wp":"https://kfinance365.com","blogspot":"https://kfinance365.blogspot.com","title":"KFinance365","language":"en","topic":"Personal finance in Korea","status":"EXISTING","destination_id":"1687098888954822322"},
+    {"order":7,"wp":"https://koreamedicaltour.com","blogspot":"https://koreamedicaltour.blogspot.com","title":"Korea Medical Tour","language":"en","topic":"Korea medical tourism","status":"CONFLICT","notes":"Exact Blogspot address was unavailable on 2026-08-29. The separate koreamedicaltour365.blogspot.com asset is not the official 1:1 target and must not be substituted."},
+    {"order":8,"wp":"https://k-visa365.com","blogspot":"https://k-visa365.blogspot.com","title":"K-Visa365","language":"en","topic":"Korean visas and immigration","status":"EXISTING","destination_id":"8661782623130728248"},
+    {"order":9,"wp":"https://koreanews365.com","blogspot":"https://koreanews365.blogspot.com","title":"KoreaNews365","language":"ko","topic":"한국 뉴스·시사","status":"SCHEDULED","scheduled_kst":"2026-08-30 09:06"},
+    {"order":10,"wp":"https://koreainvest365.com","blogspot":"https://koreainvest365.blogspot.com","title":"Korea Invest 365","language":"en","topic":"Investing and business in Korea","status":"EXISTING","destination_id":"4890361213499831195"},
+    {"order":11,"wp":"https://oliveyoungkorea.com","blogspot":"https://oliveyoungkorea.blogspot.com","title":"Olive Young Korea","language":"en","topic":"K-beauty products and shopping","status":"SCHEDULED","scheduled_kst":"2026-08-30 10:21"},
+    {"order":12,"wp":"https://koreacrypto365.com","blogspot":"https://koreacrypto365.blogspot.com","title":"Korea Crypto 365","language":"en","topic":"Korean digital assets and regulation","status":"SCHEDULED","scheduled_kst":"2026-08-30 11:09"},
+    {"order":13,"wp":"https://jobinkorea365.com","blogspot":"https://jobinkorea365.blogspot.com","title":"Job in Korea 365","language":"en","topic":"Foreign worker job guidance","status":"EXISTING","destination_id":"3560791242887862780"},
+    {"order":14,"wp":"https://koreawedding365.com","blogspot":"https://koreawedding365.blogspot.com","title":"Korea Wedding 365","language":"en","topic":"Korean weddings and international couples","status":"SCHEDULED","scheduled_kst":"2026-08-30 12:38"},
+    {"order":15,"wp":"https://theseouljournal.com","blogspot":"https://theseouljournal.blogspot.com","title":"The Seoul Journal","language":"en","topic":"English-language Korea news and analysis","status":"SCHEDULED","scheduled_kst":"2026-08-30 13:27"},
+    {"order":16,"wp":"https://ktech365.com","blogspot":"https://ktech365.blogspot.com","title":"KTech365","language":"en","topic":"Korean technology and innovation","status":"SCHEDULED","scheduled_kst":"2026-08-30 14:44"},
+    {"order":17,"wp":"https://kieca-korea.org","blogspot":"https://kieca-korea.blogspot.com","title":"KIECA Korea","language":"en","topic":"International education and cultural exchange","status":"SCHEDULED","scheduled_kst":"2026-08-30 15:31"},
+    {"order":18,"wp":"https://ki-korea.org","blogspot":"https://ki-korea.blogspot.com","title":"KI Korea","language":"en","topic":"Korea-focused international cooperation","status":"SCHEDULED","scheduled_kst":"2026-08-30 16:58"},
+    {"order":19,"wp":"https://ksa-korea.org","blogspot":"https://ksa-korea.blogspot.com","title":"KSA Korea","language":"en","topic":"Korea study networks and student support","status":"SCHEDULED","scheduled_kst":"2026-08-30 17:46"},
+    {"order":20,"wp":"https://koreataxnlaw.com","blogspot":"https://koreataxnlaw.blogspot.com","title":"Korea Tax & Law","language":"en","topic":"Korean tax and practical law","status":"EXISTING","destination_id":"8654603097966481527"},
+    {"order":21,"wp":"https://jobkoreaglobal.com","blogspot":"https://jobkoreaglobal.blogspot.com","title":"Job Korea Global","language":"en","topic":"Global careers connected to Korea","status":"EXISTING","destination_id":"5264943720375052759"},
+    {"order":22,"wp":"https://studyinkorea365.com","blogspot":"https://studyinkorea365.blogspot.com","title":"Study in Korea 365","language":"en","topic":"Admissions and student life","status":"EXISTING","destination_id":"2107448954473357757"},
+    {"order":23,"wp":"https://korea365.org","blogspot":"https://korea365.blogspot.com","title":"Korea365","language":"en","topic":"Public-interest Korea information","status":"SCHEDULED","scheduled_kst":"2026-08-30 18:53"},
+    {"order":24,"wp":"https://sis-korea.com","blogspot":"https://sis-korea.blogspot.com","title":"SIS Korea","language":"en","topic":"Seoul International University and global education","status":"SCHEDULED","scheduled_kst":"2026-08-30 19:41"},
+    {"order":25,"wp":"https://krealestate365.com","blogspot":"https://krealestate365.blogspot.com","title":"Korea Real Estate 365","language":"en","topic":"Housing and property in Korea","status":"EXISTING","destination_id":"6980941479069687285"},
+    {"order":26,"wp":"https://k-health365.com","blogspot":"https://k-health365.blogspot.com","title":"K-Health365 연구소","language":"ko","topic":"건강·영양·생활습관","status":"EXISTING","destination_id":"8294304371132383961"},
+    {"order":27,"wp":"https://kskin365.com","blogspot":"https://kskin365.blogspot.com","title":"KSkin365","language":"en","topic":"Korean skincare","status":"CREATED","destination_id":"7354545101201355815","created_on":"2026-08-29"}
   ]
 }
