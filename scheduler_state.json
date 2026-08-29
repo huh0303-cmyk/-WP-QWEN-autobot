@@ -1,9 +1,5 @@
 {
-  "date": "2026-08-29",
-  "fired": {
-    "https://jobinkorea365.com": true,
-    "https://kieca-korea.org": true,
-    "https://sis-korea.com": true
-  },
-  "last_dispatch_at": "2026-08-29T23:40:18.359461+09:00"
+  "date": "2026-08-30",
+  "fired": {},
+  "last_dispatch_at": null
 }
