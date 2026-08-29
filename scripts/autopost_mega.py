@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 53049)
-Total output lines: 3632
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -1435,7 +1432,31 @@ SITE_INTERNAL_LINKS = {
     "https://koreamedicaltour.com":[("Medical Tourism Guide","https://koreamedicaltour.com"),("Plastic Surgery","https://koreamedicaltour.com/?s=plastic+surgery"),("Dental","https://koreamedicaltour.com/?s=dental"),("Medical Visa","https://koreamedicaltour.com/?s=visa"),("Best Hospitals","https://koreamedicaltour.com/?s=hospital")],
     "https://koreainvest365.com":[("Investment Guide","https://koreainvest365.com"),("Stock Market","https://koreainvest365.com/?s=stock"),("ETF","https://koreainvest365.com/?s=ETF"),("Real Estate","https://koreainvest365.com/?s=real+estate"),("Crypto","https://koreainvest365.com/?s=crypto")],
     "https://ki-korea.com":[("한국 투자","https://ki-korea.com"),("주식","https://ki-korea.com/?s=주식"),("ETF","https://ki-korea.com/?s=ETF"),("부동산","https://ki-korea.com/?s=부동산"),("절세","https://ki-korea.com/?s=절세")],
-    "https://koreainsurance365…13049 tokens truncated…즘 이렇게 준비합니다",
+    "https://koreainsurance365.com":[("Insurance Guide","https://koreainsurance365.com"),("Health Insurance","https://koreainsurance365.com/?s=health"),("Life Insurance","https://koreainsurance365.com/?s=life"),("Auto Insurance","https://koreainsurance365.com/?s=auto"),("Foreigner Insurance","https://koreainsurance365.com/?s=foreigner")],
+    "https://kfinance365.com":[("Finance Guide","https://kfinance365.com"),("Investment","https://kfinance365.com/?s=investment"),("Stock","https://kfinance365.com/?s=stock"),("Tax","https://kfinance365.com/?s=tax"),("Banking","https://kfinance365.com/?s=banking")],
+    "https://koreataxnlaw.com":[("Tax Guide","https://koreataxnlaw.com"),("Income Tax","https://koreataxnlaw.com/?s=income+tax"),("Corporate Tax","https://koreataxnlaw.com/?s=corporate"),("Visa Law","https://koreataxnlaw.com/?s=visa"),("Labor Law","https://koreataxnlaw.com/?s=labor")],
+    "https://koreacrypto365.com":[("Crypto Guide","https://koreacrypto365.com"),("Bitcoin","https://koreacrypto365.com/?s=bitcoin"),("Regulation","https://koreacrypto365.com/?s=regulation"),("DeFi","https://koreacrypto365.com/?s=DeFi"),("Exchanges","https://koreacrypto365.com/?s=exchange")],
+    "https://krealestate365.com":[("부동산 정보","https://krealestate365.com"),("아파트","https://krealestate365.com/?s=아파트"),("청약","https://krealestate365.com/?s=청약"),("전세","https://krealestate365.com/?s=전세"),("정책","https://krealestate365.com/?s=정책")],
+    "https://ktech365.com":[("Tech News","https://ktech365.com"),("AI","https://ktech365.com/?s=AI"),("Semiconductor","https://ktech365.com/?s=semiconductor"),("Startup","https://ktech365.com/?s=startup"),("EV Battery","https://ktech365.com/?s=EV")],
+    "https://kskin365.com":[("K-Beauty Guide","https://kskin365.com"),("Skincare","https://kskin365.com/?s=skincare"),("Products","https://kskin365.com/?s=products"),("Anti-Aging","https://kskin365.com/?s=anti-aging"),("Ingredients","https://kskin365.com/?s=ingredients")],
+    "https://oliveyoungkorea.com":[("K-Beauty Reviews","https://oliveyoungkorea.com"),("Skincare Reviews","https://oliveyoungkorea.com/?s=skincare"),("Makeup","https://oliveyoungkorea.com/?s=makeup"),("Budget Picks","https://oliveyoungkorea.com/?s=budget"),("Olive Young","https://oliveyoungkorea.com/?s=olive+young")],
+    "https://kworld365.com":[("K-POP News","https://kworld365.com"),("BTS","https://kworld365.com/?s=BTS"),("BLACKPINK","https://kworld365.com/?s=BLACKPINK"),("New Releases","https://kworld365.com/?s=new+release"),("Concert","https://kworld365.com/?s=concert")],
+    "https://k-trip365.com":[("Korea Travel","https://k-trip365.com"),("Seoul","https://k-trip365.com/?s=Seoul"),("Jeju","https://k-trip365.com/?s=Jeju"),("Hiking","https://k-trip365.com/?s=hiking"),("Food","https://k-trip365.com/?s=food")],
+    "https://k-visa365.com":[("Visa Guide","https://k-visa365.com"),("D-2 Student","https://k-visa365.com/?s=D-2"),("E-7 Work","https://k-visa365.com/?s=E-7"),("Working Holiday","https://k-visa365.com/?s=working+holiday"),("Extension","https://k-visa365.com/?s=extension")],
+    "https://koreawedding365.com":[("Wedding Guide","https://koreawedding365.com"),("Venues","https://koreawedding365.com/?s=venue"),("Photography","https://koreawedding365.com/?s=photography"),("Traditional","https://koreawedding365.com/?s=traditional"),("Honeymoon","https://koreawedding365.com/?s=honeymoon")],
+    "https://kstudy365.com":[("Study in Korea","https://kstudy365.com"),("University Admission","https://kstudy365.com/?s=university"),("Scholarship","https://kstudy365.com/?s=scholarship"),("Student Visa","https://kstudy365.com/?s=visa"),("TOPIK","https://kstudy365.com/?s=TOPIK")],
+    "https://studyinkorea365.com":[("International Students","https://studyinkorea365.com"),("Scholarship","https://studyinkorea365.com/?s=scholarship"),("Korean Language","https://studyinkorea365.com/?s=Korean"),("Visa","https://studyinkorea365.com/?s=visa"),("Dormitory","https://studyinkorea365.com/?s=dormitory")],
+    "https://kieca-korea.org":[("국제교육문화","https://kieca-korea.org"),("유학","https://kieca-korea.org/?s=유학"),("한국어","https://kieca-korea.org/?s=한국어"),("문화교류","https://kieca-korea.org/?s=문화교류"),("장학금","https://kieca-korea.org/?s=장학금")],
+    "https://ksa-korea.org":[("한국유학정보","https://ksa-korea.org"),("비자","https://ksa-korea.org/?s=비자"),("장학금","https://ksa-korea.org/?s=장학금"),("기숙사","https://ksa-korea.org/?s=기숙사"),("TOPIK","https://ksa-korea.org/?s=TOPIK")],
+    "https://sis-korea.com":[("Career Programs","https://sis-korea.com"),("Internship","https://sis-korea.com/?s=internship"),("Language","https://sis-korea.com/?s=language"),("Job Placement","https://sis-korea.com/?s=job"),("Networking","https://sis-korea.com/?s=networking")],
+    "https://jobkorea365.com":[("Jobs Guide","https://jobkorea365.com"),("IT Jobs","https://jobkorea365.com/?s=IT"),("Teaching","https://jobkorea365.com/?s=teacher"),("Work Visa","https://jobkorea365.com/?s=visa"),("Salary","https://jobkorea365.com/?s=salary")],
+    "https://jobinkorea365.com":[("Jobs in Korea","https://jobinkorea365.com"),("Developer","https://jobinkorea365.com/?s=developer"),("English Teacher","https://jobinkorea365.com/?s=English+teacher"),("Finance Jobs","https://jobinkorea365.com/?s=finance"),("Startup","https://jobinkorea365.com/?s=startup")],
+    "https://jobkoreaglobal.com":[("Global Recruitment","https://jobkoreaglobal.com"),("Hiring","https://jobkoreaglobal.com/?s=hiring"),("Foreign Worker","https://jobkoreaglobal.com/?s=foreign+worker"),("Global Talent","https://jobkoreaglobal.com/?s=global+talent"),("Salary","https://jobkoreaglobal.com/?s=salary")],
+    "https://korea365.org":[("Korean Culture","https://korea365.org"),("Food","https://korea365.org/?s=food"),("Festivals","https://korea365.org/?s=festival"),("History","https://korea365.org/?s=history"),("K-Wave","https://korea365.org/?s=K-pop")],
+    "https://koreanews365.com":[("최신 뉴스","https://koreanews365.com"),("경제","https://koreanews365.com/category/경제-economy/"),("정치","https://koreanews365.com/category/정치-politics/"),("사회","https://koreanews365.com/category/사회-society/"),("국제","https://koreanews365.com/category/국제-international/")],
+    "https://theseouljournal.com":[("The Seoul Journal","https://theseouljournal.com"),("Politics","https://theseouljournal.com/category/politics/"),("Economy","https://theseouljournal.com/category/economy/"),("Culture","https://theseouljournal.com/category/culture/"),("Expat Life","https://theseouljournal.com/category/expat-life/")],
+}
+TITLE_TEMPLATES_KO = [
     "{keyword} 관련 자주 헷갈리는 부분",
     "{keyword}, 시간과 비용을 아끼는 방법",
     "{keyword} 살펴보기 — 알아두면 유용한 정보",
