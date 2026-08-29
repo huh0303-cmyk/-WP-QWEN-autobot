@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import requests
@@ -19,7 +20,24 @@ EXPECTED_SCOPES = {
 
 
 def main() -> None:
-    data = json.loads(CREDENTIALS_PATH.read_text(encoding="utf-8"))
+    if all(
+        os.environ.get(name)
+        for name in (
+            "GOOGLE_METRICS_CLIENT_ID",
+            "GOOGLE_METRICS_CLIENT_SECRET",
+            "GOOGLE_METRICS_REFRESH_TOKEN",
+        )
+    ):
+        data = {
+            "client_id": os.environ["GOOGLE_METRICS_CLIENT_ID"],
+            "client_secret": os.environ["GOOGLE_METRICS_CLIENT_SECRET"],
+            "refresh_token": os.environ["GOOGLE_METRICS_REFRESH_TOKEN"],
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "scopes": sorted(EXPECTED_SCOPES),
+        }
+    else:
+        data = json.loads(CREDENTIALS_PATH.read_text(encoding="utf-8"))
+
     scopes = set(data.get("scopes") or [])
     if not EXPECTED_SCOPES.issubset(scopes):
         raise RuntimeError(f"Missing expected read-only scopes: {sorted(EXPECTED_SCOPES - scopes)}")
