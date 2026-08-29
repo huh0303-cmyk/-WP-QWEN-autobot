@@ -4,7 +4,7 @@ This policy applies to every current and future Blogger destination.
 
 Default publishing language is English. Korean is allowed only for Blogger destinations mapped to `koreanews365.com` or `K-health365.com`.
 
-Default address rule: use the WordPress domain stem as the Blogspot subdomain (`example.com` -> `example.blogspot.com`). The official Blogger host is `blogspot.com`, not `blogpost.com`. Preserve meaningful hyphens, remove only the top-level domain, and do not add `guide`, `blog`, numbers, or other suffixes unless the exact domain-stem address is unavailable and the user explicitly approves an alternative. Availability checks do not reserve an address; only successful blog creation does.
+Default address rule: use the WordPress domain stem as the Blogspot subdomain (`example.com` -> `example.blogspot.com`). The official Blogger host is `blogspot.com`, not `blogpost.com`. Preserve meaningful hyphens and remove only the top-level domain. If the exact address is unavailable, record `CONFLICT` and stop. Never add `guide`, `blog`, numbers, or another suffix unless the user first changes the locked MASTER MAP. Availability checks do not reserve an address; only successful blog creation does.
 
 1. Publish and verify the matching WordPress article first.
 2. Reuse the primary keyword, but rebuild the Blogger article instead of copying or sentence-level paraphrasing.
@@ -15,7 +15,7 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 7. Visa, insurance, and medical-tourism posts require official sources, an as-of date, a change-warning, and an appropriate informational disclaimer.
 8. Change structure, examples, headings, and framing to prevent duplicate content.
 9. Do not upload the generated profile logo. The profile photo remains user-managed.
-10. Do not schedule creation or publishing at repetitive round-clock times. Distribute runs across different, non-round times within approved operating windows.
+10. Do not schedule creation or publishing at repetitive round-clock times. Every shell-creation run uses an explicit non-round time, varies the minute value, and keeps at least 30 minutes between creation attempts. A fixed hourly recurrence is not an acceptable substitute.
 11. Write for a real reader's task, not for search-engine manipulation. Every post must add original synthesis, a complete answer, and practical next steps beyond the WordPress source.
 12. Use a descriptive, non-clickbait title; a direct-answer introduction; logically ordered H2/H3 sections; and checklists, comparisons, tables, or FAQs only when they materially help.
 13. Make authorship and scope clear. Never invent credentials, first-hand experience, statistics, quotations, case studies, or sources.
@@ -39,14 +39,12 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 30. Every Blogger image that is used must include a useful topic-specific ALT description. Image generation follows the approved Replicate-to-FLUX route; irrelevant or unsafe images are rejected.
     - 2026-08-28 incident: during the 27-channel shell rollout, an interrupted/frozen "새 블로그" creation dialog silently produced a duplicate `한국생활지원정보` shell (id `777260289366042949`, address `life-support-korea365.blogspot.com`) alongside the original (id `2531035487222435079`, address `korea-life-support365.blogspot.com`). The duplicate had zero posts. Per user instruction, it was soft-deleted via Blogger's own "내 블로그 삭제" (90-day recoverable trash), not permanently destroyed, and never recorded in the registry. Lesson: after any "새 블로그" dialog that showed unresponsive/frozen input, re-verify the blog switcher's full list (including "삭제된 블로그") before creating the next shell, rather than assuming the stuck attempt produced nothing.
 
-## Publishing order for the first six Blogger sites
+## Locked 1:1 portfolio and shell-creation schedule
 
-1. k-trip365
-2. jobkorea365
-3. kstudy365
-4. K-visa365
-5. koreainsurance365
-6. koreamedicaltour365
+- The canonical 27-property mapping and current `CREATED` / `EXISTING` / `CONFLICT` / `BLOCKED` / `SCHEDULED` state live in `config/blogger_portfolio.json`.
+- `koreamedicaltour.com` maps only to `koreamedicaltour.blogspot.com`. The older `koreamedicaltour365.blogspot.com` asset is not the official 1:1 target and must not be substituted.
+- The 2026-08-30 shell-creation plan uses separate one-time non-round KST executions at 08:17, 09:06, 10:21, 11:09, 12:38, 13:27, 14:44, 15:31, 16:58, 17:46, 18:53, and 19:41.
+- Before each attempt, re-open the Blogger account list and check exact-address availability. Never create a duplicate merely because a previous run did not report cleanly.
 
 ## Shared public author identity
 
