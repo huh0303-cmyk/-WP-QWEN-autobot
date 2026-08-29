@@ -1,5 +1,7 @@
 {
   "date": "2026-08-29",
-  "fired": {},
-  "last_dispatch_at": null
+  "fired": {
+    "https://jobinkorea365.com": true
+  },
+  "last_dispatch_at": "2026-08-29T11:25:31.861444+09:00"
 }
