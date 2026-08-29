@@ -1,5 +1,7 @@
 {
   "date": "2026-08-30",
-  "fired": {},
-  "last_dispatch_at": null
+  "fired": {
+    "https://ksa-korea.org": true
+  },
+  "last_dispatch_at": "2026-08-30T06:55:35.157237+09:00"
 }
