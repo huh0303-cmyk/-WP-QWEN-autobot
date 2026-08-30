@@ -1,0 +1,38 @@
+name: "Olive Young — enable Site Verification API + retry restore"
+on:
+  push:
+    branches:
+      - ops/restore-indexed-private-20260830
+    paths:
+      - .ops/enable-siteverification-and-retry-olive.trigger
+permissions:
+  contents: read
+jobs:
+  enable-retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests PyJWT cryptography -q
+      - name: "Site Verification API 활성화 시도"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/enable_siteverification_api.py
+      - name: "API 전파 대기"
+        run: sleep 20
+      - name: "Olive Young 인증 + Google 근거글 공개복구 재시도"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          WP_USER: ${{ secrets.WP_USER }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+        run: python scripts/verify_and_restore_oliveyoung.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: olive-enable-retry-${{ github.run_id }}
+          path: verify_and_restore_oliveyoung_result.json
+          if-no-files-found: warn
+          retention-days: 30
