@@ -36,7 +36,10 @@ def claude_generate_text(prompt, system=None, temperature=0.9, max_retries=5):
     body = {
         "model": CLAUDE_MODEL,
         "max_tokens": CLAUDE_MAX_TOKENS,
-        "temperature": temperature,
+        # Sonnet 5 (this repo's default CLAUDE_MODEL) removed sampling
+        # params entirely - temperature/top_p/top_k all return 400. The
+        # `temperature` argument is kept for caller compatibility but
+        # deliberately not sent.
         "messages": [{"role": "user", "content": prompt}],
     }
     if system:
@@ -57,6 +60,8 @@ def claude_generate_text(prompt, system=None, temperature=0.9, max_retries=5):
             last_err = f"{r.status_code}: {r.text[:200]}"
             time.sleep(min(15 * (2 ** attempt), 120))
             continue
+        if r.status_code >= 400:
+            raise RuntimeError(f"Claude request failed: {r.status_code}: {r.text[:500]}")
         r.raise_for_status()
         parts = r.json().get("content", [])
         text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
