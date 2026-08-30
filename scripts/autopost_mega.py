@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 53049)
-Total output lines: 3632
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -1435,7 +1432,698 @@ SITE_INTERNAL_LINKS = {
     "https://koreamedicaltour.com":[("Medical Tourism Guide","https://koreamedicaltour.com"),("Plastic Surgery","https://koreamedicaltour.com/?s=plastic+surgery"),("Dental","https://koreamedicaltour.com/?s=dental"),("Medical Visa","https://koreamedicaltour.com/?s=visa"),("Best Hospitals","https://koreamedicaltour.com/?s=hospital")],
     "https://koreainvest365.com":[("Investment Guide","https://koreainvest365.com"),("Stock Market","https://koreainvest365.com/?s=stock"),("ETF","https://koreainvest365.com/?s=ETF"),("Real Estate","https://koreainvest365.com/?s=real+estate"),("Crypto","https://koreainvest365.com/?s=crypto")],
     "https://ki-korea.com":[("한국 투자","https://ki-korea.com"),("주식","https://ki-korea.com/?s=주식"),("ETF","https://ki-korea.com/?s=ETF"),("부동산","https://ki-korea.com/?s=부동산"),("절세","https://ki-korea.com/?s=절세")],
-    "https://koreainsurance365…13049 tokens truncated…즘 이렇게 준비합니다",
+    "https://koreainsurance365.com":[("Insurance Guide","https://koreainsurance365.com"),("Health Insurance","https://koreainsurance365.com/?s=health"),("Life Insurance","https://koreainsurance365.com/?s=life"),("Auto Insurance","https://koreainsurance365.com/?s=auto"),("Foreigner Insurance","https://koreainsurance365.com/?s=foreigner")],
+    "https://kfinance365.com":[("Finance Guide","https://kfinance365.com"),("Investment","https://kfinance365.com/?s=investment"),("Stock","https://kfinance365.com/?s=stock"),("Tax","https://kfinance365.com/?s=tax"),("Banking","https://kfinance365.com/?s=banking")],
+    "https://koreataxnlaw.com":[("Tax Guide","https://koreataxnlaw.com"),("Income Tax","https://koreataxnlaw.com/?s=income+tax"),("Corporate Tax","https://koreataxnlaw.com/?s=corporate"),("Visa Law","https://koreataxnlaw.com/?s=visa"),("Labor Law","https://koreataxnlaw.com/?s=labor")],
+    "https://koreacrypto365.com":[("Crypto Guide","https://koreacrypto365.com"),("Bitcoin","https://koreacrypto365.com/?s=bitcoin"),("Regulation","https://koreacrypto365.com/?s=regulation"),("DeFi","https://koreacrypto365.com/?s=DeFi"),("Exchanges","https://koreacrypto365.com/?s=exchange")],
+    "https://krealestate365.com":[("부동산 정보","https://krealestate365.com"),("아파트","https://krealestate365.com/?s=아파트"),("청약","https://krealestate365.com/?s=청약"),("전세","https://krealestate365.com/?s=전세"),("정책","https://krealestate365.com/?s=정책")],
+    "https://ktech365.com":[("Tech News","https://ktech365.com"),("AI","https://ktech365.com/?s=AI"),("Semiconductor","https://ktech365.com/?s=semiconductor"),("Startup","https://ktech365.com/?s=startup"),("EV Battery","https://ktech365.com/?s=EV")],
+    "https://kskin365.com":[("K-Beauty Guide","https://kskin365.com"),("Skincare","https://kskin365.com/?s=skincare"),("Products","https://kskin365.com/?s=products"),("Anti-Aging","https://kskin365.com/?s=anti-aging"),("Ingredients","https://kskin365.com/?s=ingredients")],
+    "https://oliveyoungkorea.com":[("K-Beauty Reviews","https://oliveyoungkorea.com"),("Skincare Reviews","https://oliveyoungkorea.com/?s=skincare"),("Makeup","https://oliveyoungkorea.com/?s=makeup"),("Budget Picks","https://oliveyoungkorea.com/?s=budget"),("Olive Young","https://oliveyoungkorea.com/?s=olive+young")],
+    "https://kworld365.com":[("K-POP News","https://kworld365.com"),("BTS","https://kworld365.com/?s=BTS"),("BLACKPINK","https://kworld365.com/?s=BLACKPINK"),("New Releases","https://kworld365.com/?s=new+release"),("Concert","https://kworld365.com/?s=concert")],
+    "https://k-trip365.com":[("Korea Travel","https://k-trip365.com"),("Seoul","https://k-trip365.com/?s=Seoul"),("Jeju","https://k-trip365.com/?s=Jeju"),("Hiking","https://k-trip365.com/?s=hiking"),("Food","https://k-trip365.com/?s=food")],
+    "https://k-visa365.com":[("Visa Guide","https://k-visa365.com"),("D-2 Student","https://k-visa365.com/?s=D-2"),("E-7 Work","https://k-visa365.com/?s=E-7"),("Working Holiday","https://k-visa365.com/?s=working+holiday"),("Extension","https://k-visa365.com/?s=extension")],
+    "https://koreawedding365.com":[("Wedding Guide","https://koreawedding365.com"),("Venues","https://koreawedding365.com/?s=venue"),("Photography","https://koreawedding365.com/?s=photography"),("Traditional","https://koreawedding365.com/?s=traditional"),("Honeymoon","https://koreawedding365.com/?s=honeymoon")],
+    "https://kstudy365.com":[("Study in Korea","https://kstudy365.com"),("University Admission","https://kstudy365.com/?s=university"),("Scholarship","https://kstudy365.com/?s=scholarship"),("Student Visa","https://kstudy365.com/?s=visa"),("TOPIK","https://kstudy365.com/?s=TOPIK")],
+    "https://studyinkorea365.com":[("International Students","https://studyinkorea365.com"),("Scholarship","https://studyinkorea365.com/?s=scholarship"),("Korean Language","https://studyinkorea365.com/?s=Korean"),("Visa","https://studyinkorea365.com/?s=visa"),("Dormitory","https://studyinkorea365.com/?s=dormitory")],
+    "https://kieca-korea.org":[("국제교육문화","https://kieca-korea.org"),("유학","https://kieca-korea.org/?s=유학"),("한국어","https://kieca-korea.org/?s=한국어"),("문화교류","https://kieca-korea.org/?s=문화교류"),("장학금","https://kieca-korea.org/?s=장학금")],
+    "https://ksa-korea.org":[("한국유학정보","https://ksa-korea.org"),("비자","https://ksa-korea.org/?s=비자"),("장학금","https://ksa-korea.org/?s=장학금"),("기숙사","https://ksa-korea.org/?s=기숙사"),("TOPIK","https://ksa-korea.org/?s=TOPIK")],
+    "https://sis-korea.com":[("Career Programs","https://sis-korea.com"),("Internship","https://sis-korea.com/?s=internship"),("Language","https://sis-korea.com/?s=language"),("Job Placement","https://sis-korea.com/?s=job"),("Networking","https://sis-korea.com/?s=networking")],
+    "https://jobkorea365.com":[("Jobs Guide","https://jobkorea365.com"),("IT Jobs","https://jobkorea365.com/?s=IT"),("Teaching","https://jobkorea365.com/?s=teacher"),("Work Visa","https://jobkorea365.com/?s=visa"),("Salary","https://jobkorea365.com/?s=salary")],
+    "https://jobinkorea365.com":[("Jobs in Korea","https://jobinkorea365.com"),("Developer","https://jobinkorea365.com/?s=developer"),("English Teacher","https://jobinkorea365.com/?s=English+teacher"),("Finance Jobs","https://jobinkorea365.com/?s=finance"),("Startup","https://jobinkorea365.com/?s=startup")],
+    "https://jobkoreaglobal.com":[("Global Recruitment","https://jobkoreaglobal.com"),("Hiring","https://jobkoreaglobal.com/?s=hiring"),("Foreign Worker","https://jobkoreaglobal.com/?s=foreign+worker"),("Global Talent","https://jobkoreaglobal.com/?s=global+talent"),("Salary","https://jobkoreaglobal.com/?s=salary")],
+    "https://korea365.org":[("Korean Culture","https://korea365.org"),("Food","https://korea365.org/?s=food"),("Festivals","https://korea365.org/?s=festival"),("History","https://korea365.org/?s=history"),("K-Wave","https://korea365.org/?s=K-pop")],
+    "https://koreanews365.com":[("최신 뉴스","https://koreanews365.com"),("경제","https://koreanews365.com/category/경제-economy/"),("정치","https://koreanews365.com/category/정치-politics/"),("사회","https://koreanews365.com/category/사회-society/"),("국제","https://koreanews365.com/category/국제-international/")],
+    "https://theseouljournal.com":[("The Seoul Journal","https://theseouljournal.com"),("Politics","https://theseouljournal.com/category/politics/"),("Economy","https://theseouljournal.com/category/economy/"),("Culture","https://theseouljournal.com/category/culture/"),("Expat Life","https://theseouljournal.com/category/expat-life/")],
+}
+CROSS_LINKS = {
+    "https://kstudy365.com":[("Study in Korea 365","https://studyinkorea365.com"),("Korea Visa","https://k-visa365.com"),("Korea Education","https://kieca-korea.org"),("Career Programs","https://sis-korea.com")],
+    "https://studyinkorea365.com":[("Kstudy365","https://kstudy365.com"),("Korea Visa","https://k-visa365.com"),("Jobs in Korea","https://jobinkorea365.com"),("Korea Culture","https://korea365.org")],
+    "https://kieca-korea.org":[("한국 유학","https://kstudy365.com"),("한국 유학정보","https://ksa-korea.org"),("한국 취업","https://jobkorea365.com"),("한국 뉴스","https://koreanews365.com")],
+    "https://ksa-korea.org":[("한국 유학 365","https://kstudy365.com"),("국제교육문화","https://kieca-korea.org"),("비자 안내","https://k-visa365.com"),("취업 정보","https://jobkorea365.com")],
+    "https://sis-korea.com":[("Study in Korea","https://kstudy365.com"),("Jobs in Korea","https://jobinkorea365.com"),("Korea Visa","https://k-visa365.com"),("Recruitment","https://jobkoreaglobal.com")],
+    "https://jobkorea365.com":[("Jobs in Korea","https://jobinkorea365.com"),("Recruitment","https://jobkoreaglobal.com"),("Visa","https://k-visa365.com"),("Career Programs","https://sis-korea.com")],
+    "https://jobinkorea365.com":[("Korea Jobs","https://jobkorea365.com"),("Global Recruitment","https://jobkoreaglobal.com"),("Work Visa","https://k-visa365.com"),("Study and Work","https://kstudy365.com")],
+    "https://jobkoreaglobal.com":[("Jobs in Korea","https://jobinkorea365.com"),("Employment","https://jobkorea365.com"),("Career Programs","https://sis-korea.com"),("Visa","https://k-visa365.com")],
+    "https://kfinance365.com":[("Korea Investment","https://koreainvest365.com"),("Insurance","https://koreainsurance365.com"),("Tax Law","https://koreataxnlaw.com"),("Crypto","https://koreacrypto365.com")],
+    "https://koreainvest365.com":[("Finance 365","https://kfinance365.com"),("Real Estate","https://krealestate365.com"),("Crypto","https://koreacrypto365.com"),("Tax","https://koreataxnlaw.com")],
+    "https://ki-korea.com":[("한국 금융","https://kfinance365.com"),("한국 부동산","https://krealestate365.com"),("암호화폐","https://koreacrypto365.com"),("한국 뉴스","https://koreanews365.com")],
+    "https://koreainsurance365.com":[("Finance","https://kfinance365.com"),("Tax Law","https://koreataxnlaw.com"),("Investment","https://koreainvest365.com")],
+    "https://koreataxnlaw.com":[("Finance","https://kfinance365.com"),("Insurance","https://koreainsurance365.com"),("Visa","https://k-visa365.com")],
+    "https://koreacrypto365.com":[("Finance","https://kfinance365.com"),("Investment","https://koreainvest365.com"),("Tax","https://koreataxnlaw.com")],
+    "https://krealestate365.com":[("한국 투자","https://koreainvest365.com"),("한국 금융","https://kfinance365.com"),("한국 뉴스","https://koreanews365.com")],
+    "https://korea365.org":[("Travel","https://k-trip365.com"),("K-Beauty","https://kskin365.com"),("K-POP","https://kworld365.com"),("Wedding","https://koreawedding365.com")],
+    "https://k-trip365.com":[("Korea Culture","https://korea365.org"),("Visa","https://k-visa365.com"),("Medical Tourism","https://koreamedicaltour.com"),("Wedding","https://koreawedding365.com")],
+    "https://koreawedding365.com":[("Travel","https://k-trip365.com"),("K-Beauty","https://kskin365.com"),("Korea Culture","https://korea365.org")],
+    "https://kskin365.com":[("K-Beauty Reviews","https://oliveyoungkorea.com"),("Medical Tourism","https://koreamedicaltour.com"),("Korea Culture","https://korea365.org")],
+    "https://oliveyoungkorea.com":[("K-Beauty Guide","https://kskin365.com"),("Korea Culture","https://korea365.org"),("Medical Tourism","https://koreamedicaltour.com")],
+    "https://kworld365.com":[("Korea Culture","https://korea365.org"),("K-Beauty","https://kskin365.com"),("Travel","https://k-trip365.com")],
+    "https://k-health365.com":[("의료관광","https://koreamedicaltour.com"),("보험","https://koreainsurance365.com"),("한국 뉴스","https://koreanews365.com")],
+    "https://koreamedicaltour.com":[("K-Health 365","https://k-health365.com"),("Visa","https://k-visa365.com"),("Travel","https://k-trip365.com"),("Insurance","https://koreainsurance365.com")],
+    "https://ktech365.com":[("Finance","https://kfinance365.com"),("Investment","https://koreainvest365.com"),("Seoul Journal","https://theseouljournal.com")],
+    "https://k-visa365.com":[("Study in Korea","https://kstudy365.com"),("Jobs","https://jobinkorea365.com"),("Travel","https://k-trip365.com"),("Medical Tourism","https://koreamedicaltour.com")],
+    "https://koreanews365.com":[("한국 금융","https://kfinance365.com"),("한국 부동산","https://krealestate365.com"),("한국 건강","https://k-health365.com")],
+    "https://theseouljournal.com":[("Korea Culture","https://korea365.org"),("Travel","https://k-trip365.com"),("Study in Korea","https://kstudy365.com"),("Finance","https://kfinance365.com")],
+}
+
+def get_internal_links(site_url, count=4):
+    own   = SITE_INTERNAL_LINKS.get(site_url, [])
+    cross = CROSS_LINKS.get(site_url, [])
+    sel   = []
+    if own:   sel.extend(random.sample(own, min(3, len(own))))
+    if cross: sel.extend(random.sample(cross, min(count-len(sel), len(cross))))
+    return sel[:count] or [("홈페이지", site_url)]
+
+# ============================================================
+# ★★★ 실제 글 기반 "관련 글" 블록 — 코드가 직접 삽입 (AI 지시에 의존하지 않음) ★★★
+# GSC에서 내부링크 669개가 전부 홈페이지로만 잡힌 원인:
+#   1) 기존 SITE_INTERNAL_LINKS가 실제 글이 아닌 "?s=검색어" 검색결과 URL이었음
+#   2) 프롬프트로 AI에게 "자연스럽게 삽입해줘" 요청만 했을 뿐 강제되지 않았음
+# → 발행 직전 코드가 WP REST API로 실제 최근 글 목록을 가져와
+#   진짜 permalink로 "관련 글" 박스를 무조건 본문 끝에 삽입한다.
+# ============================================================
+_wp_posts_cache: dict = {}
+
+def fetch_recent_wp_posts(site_url, wp_pass, count=30):
+    """실제 발행된 글의 (제목, permalink) 목록을 가져와 캐싱."""
+    if site_url in _wp_posts_cache: return _wp_posts_cache[site_url]
+    posts = []
+    try:
+        r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+                         params={"per_page": count, "orderby":"date", "order":"desc",
+                                 "_fields":"title,link", "status":"publish"}, timeout=12)
+        if r.status_code == 200:
+            for p in r.json():
+                raw = p.get("title", {})
+                t = raw.get("rendered", "") if isinstance(raw, dict) else str(raw)
+                t = re.sub(r'<[^>]+>', '', t).strip()
+                link = p.get("link", "")
+                if t and link:
+                    posts.append((t, link))
+    except: pass
+    _wp_posts_cache[site_url] = posts
+    return posts
+
+def build_related_links_html(site_url, wp_pass, lang, exclude_title=""):
+    """
+    같은 사이트의 실제 글 2~3개(무작위) + (30% 확률로) 클러스터 내
+    형제 사이트 1개를 '관련 글' 박스로 만들어 반환. 전부 실제 permalink.
+    """
+    posts = fetch_recent_wp_posts(site_url, wp_pass, count=30)
+    posts = [p for p in posts if p[0].strip().lower() != exclude_title.strip().lower()]
+    if not posts:
+        return ""  # 그 사이트 첫 글이면 관련글 없음 — 자연스러운 상태
+
+    own_sel = random.sample(posts, min(3, len(posts)))
+    heading = "관련 글" if lang == "ko" else "Related Articles"
+    items = "".join(f'<li><a href="{link}">{title}</a></li>' for title, link in own_sel)
+
+    # 사이트 간 링크는 매번 넣지 않고 ~30%만 (기계적 패턴 방지, 클러스터 내부만)
+    if random.random() < 0.3:
+        cross = CROSS_LINKS.get(site_url, [])
+        if cross:
+            cname, curl = random.choice(cross)
+            items += f'<li><a href="{curl}">{cname}</a></li>'
+
+    return (f'<div class="related-links" style="margin:32px 0;padding:20px;'
+            f'background:#f7f9fb;border-radius:10px;">'
+            f'<h3 style="margin-top:0;">{heading}</h3>'
+            f'<ul style="margin:0;padding-left:20px;">{items}</ul></div>')
+
+# ============================================================
+# ★ 뉴스 키워드
+# ============================================================
+NEWS_KO_FALLBACK = [
+    ("한국 부동산 정책 동향","최근 부동산 정책 변화와 시장 영향을 심층 분석합니다."),
+    ("한국은행 기준금리 결정 배경","기준금리 결정 배경과 향후 경제 전망을 다룹니다."),
+    ("반도체 수출 실적 분석","반도체 산업 수출 동향과 글로벌 경쟁력을 분석합니다."),
+    ("K-배터리 차세대 기술 개발","국내 배터리 산업의 기술 혁신과 시장 동향을 다룹니다."),
+    ("저출산 대책 예산 집행 현황","저출산 문제 해결을 위한 정부 예산 정책을 정리합니다."),
+    ("K-푸드 글로벌 수출 동향","한국 식품의 해외 수출 트렌드를 분석합니다."),
+]
+NEWS_EN_FALLBACK = [
+    ("Living in Seoul as an Expat","A practical guide for foreigners settling in Seoul."),
+    ("How to Open a Bank Account in Korea","Step-by-step guide to Korean banking for foreigners."),
+    ("Korean Work Culture Explained","What to expect when working in a Korean company."),
+    ("How to Get an E-7 Visa for Korea","Detailed walkthrough of the E-7 visa application process."),
+    ("Top Korean Language Schools in Seoul","Comparing the best Korean language programs for expats."),
+    ("Cost of Living in Seoul 2026","Realistic monthly budget breakdown for expats in Seoul."),
+]
+
+_used_news_ko: set = set()
+_used_news_en: set = set()
+_wp_title_cache: dict = {}
+
+def _title_dup_key(t):
+    # 완전히 똑같은 제목만 잡던 걸 앞 20자 기준 fuzzy 매칭으로 강화
+    # (2026-08-03: 중복 제목 125건이 대부분 살짝 다른 표현이라 exact match로는 못 잡았음)
+    return re.sub(r'\s+', '', t[:20].lower())
+
+def fetch_recent_wp_titles(site_url, wp_pass, count=None):
+    if site_url in _wp_title_cache: return _wp_title_cache[site_url]
+    titles = set()
+    try:
+        page = 1
+        while True:
+            r = requests.get(f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
+                             params={"per_page": 100, "page": page, "orderby":"date","order":"desc",
+                                     "_fields":"title,content","status":"publish"}, timeout=15)
+            if r.status_code != 200: break
+            batch = r.json()
+            if not isinstance(batch, list) or not batch: break
+            for p in batch:
+                raw = p.get("title",{})
+                t = raw.get("rendered","") if isinstance(raw,dict) else str(raw)
+                t = re.sub(r'<[^>]+>','',t).strip().lower()
+                if t:
+                    titles.add(t)
+                    titles.add(_title_dup_key(t))
+                content = p.get("content", {}).get("rendered", "") if isinstance(p.get("content"), dict) else ""
+                for href in re.findall(r'href=["\'](https?://[^"\']+)', content, re.IGNORECASE):
+                    titles.add("source:" + href.split("#", 1)[0].rstrip("/"))
+            if len(batch) < 100: break
+            page += 1
+    except: pass
+    _wp_title_cache[site_url] = titles
+    return titles
+
+def crawl_rss_news(lang="ko", site_url=""):
+    used = _used_news_ko if lang=="ko" else _used_news_en
+    cache = _wp_title_cache.get(site_url, set())
+    fallback = NEWS_KO_FALLBACK if lang=="ko" else NEWS_EN_FALLBACK
+
+    def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
+
+    # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
+    sources = get_enabled_rss_sources(lang)
+    if not sources:
+        print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
+        return "", "", None, ""
+    random.shuffle(sources)
+    candidates = []
+    for src, url in sources:
+        try:
+            res = requests.get(url, timeout=10, headers={"User-Agent":"Mozilla/5.0"})
+            soup = BeautifulSoup(res.text, 'xml')
+            for it in soup.find_all('item'):
+                t = re.sub(r'<[^>]+>','', it.title.text.strip() if it.title else "")
+                d = re.sub(r'<[^>]+>','', it.description.text.strip() if it.description else "")
+                link = it.link.text.strip() if it.link else ""
+                raw_date = (it.pubDate.text.strip() if it.pubDate else "") or (it.find("dc:date").text.strip() if it.find("dc:date") else "")
+                recent = True
+                if raw_date:
+                    try:
+                        published = parsedate_to_datetime(raw_date) if "," in raw_date else datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
+                        if published.tzinfo is None: published = published.replace(tzinfo=timezone.utc)
+                        recent = datetime.now(timezone.utc) - published.astimezone(timezone.utc) <= timedelta(hours=72)
+                    except Exception:
+                        recent = False
+                source_key = "source:" + link.split("#", 1)[0].rstrip("/") if link else ""
+                if t and len(t)>=5 and recent and not is_dup(t) and (not source_key or source_key not in cache):
+                    candidates.append((t, d, src, link))
+        except: pass
+
+    if candidates:
+        ch = random.choice(candidates)
+        used.add(ch[0].strip().lower())
+        print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
+        return ch
+
+    print(f"   NEWS SOURCE GATE: no eligible story published within 72 hours for lang={lang}")
+    return "", "", None, ""
+
+# ============================================================
+# ★ 구성표 숫자 랜덤화 — "FAQ 5문항"처럼 매번 똑같은 개수로 고정돼 있으면
+#   그 자체가 AI/자동화 패턴으로 읽힌다(사용자 피드백, 2026-08-19). 범위 표현
+#   ("3~5가지")은 이미 매번 달라질 여지가 있으니 건드리지 않고, 단일 고정
+#   숫자("5문항","4 questions","3가지")만 원래 값 근처(±2)에서 다시 뽑는다.
+# ============================================================
+_STRUCT_COUNT_RE = re.compile(r'(?<![~\-\d])(\d+)(\s*(?:가지|개|문항|questions|reasons|tips|ways))\b')
+
+def randomize_structure_counts(structure):
+    def repl(m):
+        orig = int(m.group(1))
+        suffix = m.group(2)
+        lo, hi = max(2, orig - 2), orig + 2
+        return f"{random.randint(lo, hi)}{suffix}"
+    return [_STRUCT_COUNT_RE.sub(repl, item) for item in structure]
+
+# ============================================================
+# ★ min_chars 해석 — 사이트별 값이 int(고정) / (lo,hi)(랜덤 범위) /
+#   {카테고리: (lo,hi) 또는 int}(카테고리별 밴드, "_default"는 카테고리 매칭
+#   실패 시 폴백) 중 무엇이든 최종 정수로 풀어준다. 같은 글을 프롬프트
+#   생성(make_site_prompt)과 발행 게이트(process_one)에서 각각 다시 계산하면
+#   서로 다른 랜덤값이 나와 불일치할 수 있으므로, process_one()이 딱 한 번만
+#   호출해 값을 고정하고 make_site_prompt()에는 그 값을 그대로 넘긴다.
+# ============================================================
+def resolve_min_chars(url):
+    val = SITE_PERSONA.get(url, {}).get("min_chars", 2200)
+    if isinstance(val, dict):
+        cat = _last_keyword_category.get(url)
+        val = val.get(cat, val.get("_default", 2200))
+    if isinstance(val, (tuple, list)) and len(val) == 2:
+        return random.randint(val[0], val[1])
+    return val
+
+# ============================================================
+# ★ 문장 리듬(rhythm) — 2026-08-22 사용자 지시: "톤앤매너.. 글씨체 다
+#   달라야해.. 진짜로". SITE_PERSONA의 tone은 사이트마다 다른 서술 문구지만,
+#   실제 문장 구조 규칙("모든 <p>는 2문장 이하로")은 26개 사이트 전부
+#   토씨 하나 안 틀리고 동일했다 — tone 지시만으로는 문체가 실제로 갈리는지
+#   보장이 안 되고, 이 구조적 규칙 자체가 같으면 결과물이 은근히 비슷해진다.
+#   사이트 URL로 결정론적 시드를 만들어(매번 같은 사이트는 항상 같은 리듬을
+#   쓰되, 사이트 간에는 서로 다른 리듬을 쓰게) 5가지 문장 리듬 중 하나를
+#   고정 배정한다.
+# ============================================================
+_RHYTHM_PROFILES = [
+    {"name": "punchy",
+     "ko": "문장: 모든 <p>는 1문장만. 짧고 단정적으로 끊어 쓸 것 — 접속사로 문장을 길게 잇지 말 것.",
+     "en": "Sentences: every <p> is exactly 1 sentence. Short and declarative — never chain "
+           "clauses together with conjunctions into a longer sentence."},
+    {"name": "flowing",
+     "ko": "문장: 대부분의 <p>는 2~3문장으로, 앞 문장과 자연스럽게 이어지는 연결어를 써서 리듬감 있게.",
+     "en": "Sentences: most <p> run 2-3 sentences, connected with natural transitional phrasing "
+           "rather than choppy fragments."},
+    {"name": "scannable",
+     "ko": "문장: 모든 <p>는 2문장 이하. 나열할 정보가 나오면 문장으로 풀지 말고 즉시 <ul>/<table>로 전환.",
+     "en": "Sentences: every <p> max 2 sentences. The moment content becomes list-like, break "
+           "immediately into <ul>/<table> instead of writing it out as prose."},
+    {"name": "formal",
+     "ko": "문장: 모든 <p>는 2문장. 축약 표현 없이 신중하고 정확한 어조를 유지할 것.",
+     "en": "Sentences: every <p> is 2 sentences, measured and precise — avoid contractions and "
+           "casual asides."},
+    {"name": "conversational",
+     "ko": "문장: 대부분 <p>는 2문장이되, 강조하고 싶은 지점에서는 1문장짜리 짧은 단락을 섞어 리듬을 준다.",
+     "en": "Sentences: most <p> run 2 sentences, but mix in occasional 1-sentence paragraphs "
+           "for emphasis and pacing rather than a uniform rhythm throughout."},
+]
+
+_SITE_RHYTHM_ASSIGNMENT = {
+    "https://koreainvest365.com": "scannable",
+    "https://ki-korea.com": "formal",
+    "https://koreainsurance365.com": "conversational",
+    "https://kfinance365.com": "punchy",
+    "https://koreataxnlaw.com": "formal",
+    "https://koreacrypto365.com": "flowing",
+    "https://krealestate365.com": "punchy",
+    "https://ktech365.com": "scannable",
+    "https://k-health365.com": "flowing",
+    "https://koreamedicaltour.com": "conversational",
+    "https://kstudy365.com": "formal",
+    "https://studyinkorea365.com": "conversational",
+    "https://kieca-korea.org": "punchy",
+    "https://ksa-korea.org": "scannable",
+    "https://sis-korea.com": "flowing",
+    "https://jobkorea365.com": "formal",
+    "https://jobinkorea365.com": "punchy",
+    "https://jobkoreaglobal.com": "conversational",
+    "https://oliveyoungkorea.com": "punchy",
+    "https://kworld365.com": "conversational",
+    "https://k-trip365.com": "flowing",
+    "https://k-visa365.com": "formal",
+    "https://koreawedding365.com": "scannable",
+    "https://korea365.org": "flowing",
+}
+_RHYTHM_BY_NAME = {p["name"]: p for p in _RHYTHM_PROFILES}
+
+
+def get_rhythm_for_site(url):
+    name = _SITE_RHYTHM_ASSIGNMENT.get(url)
+    if name:
+        return _RHYTHM_BY_NAME[name]
+    idx = int(hashlib.md5(url.encode()).hexdigest(), 16) % len(_RHYTHM_PROFILES)
+    return _RHYTHM_PROFILES[idx]
+
+
+def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override=None):
+    url   = site["url"]
+    theme = site["theme"]
+    lang  = site["lang"]
+    mode  = site.get("mode", "blog")
+    tag_count = tag_count or TAG_COUNT
+
+    p = SITE_PERSONA.get(url, {})
+    min_chars = min_chars_override if min_chars_override is not None else resolve_min_chars(url)
+    tables_req = p.get("tables", 1)
+    rhythm = get_rhythm_for_site(url)
+    structure = randomize_structure_counts(p.get("structure", []))
+    scope = p.get("scope", theme)
+
+    if lang == "ko":
+        persona = p.get("persona_ko", "전문 칼럼니스트")
+        tone = p.get("tone", "전문적이고 친근한 스타일")
+    else:
+        persona = p.get("persona_en", "Expert writer")
+        tone = p.get("tone", "Professional and engaging")
+
+    ext = get_authority_links(theme)
+    ext_s = random.sample(ext, min(3, len(ext)))
+    ext_h = ", ".join(f"{n}({u})" for n, u in ext_s)
+
+    ilinks = get_internal_links(url, count=4)
+    il_str = "\n".join(f'  - <a href="{u}" title="{n}">{n}</a>' for n, u in ilinks)
+    struct_str = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(structure))
+
+    medical_note = ""
+    if lang == "ko" and ("건강" in theme or "의학" in theme):
+        medical_note = '\n- ⚠️ "위험 신호 / 병원 가야 할 때" 섹션 필수\n- "이 글은 의학적 참고 정보이며, 진단·치료는 반드시 전문의와 상담하세요." 문구 필수'
+
+    # ★ 뉴스모드(news/news_en)는 keyword가 RSS 헤드라인 "문장 전체"라서, 블로그용
+    #   "keyword를 첫 문장에 포함 + 10회 반복" / "TAGS 첫번째=keyword" 지시를 그대로 쓰면
+    #   헤드라인이 본문 첫 문장·태그에 통째로 복붙되는 문제가 생긴다(제보로 확인됨).
+    #   뉴스모드는 별도 지시문을 쓴다.
+    is_news = mode in ("news", "news_en")
+    news_integrity_note = ""
+    if is_news:
+        news_integrity_note = (
+            "\n- NEWSROOM RULE: use the source headline only as a reporting lead. Do not copy, translate, spin, or paraphrase the source article paragraph by paragraph. Build the article from independently verified facts, primary records, and at least one additional source. Keep direct quotations short, exact, attributed, and necessary. Never bypass a paywall. Clearly label analysis and unresolved claims."
+            if lang != "ko" else
+            "\n- 편집국 규칙: 타사 헤드라인은 취재 단서로만 사용합니다. 원문 기사를 문단별로 복사·번역·단어 치환·재서술하지 않습니다. 공식 원문과 최소 1개의 추가 출처로 사실을 독립 확인하고, 직접 인용은 짧고 정확하게 출처를 표시합니다. 유료벽을 우회하지 않으며 분석과 미확인 주장을 명확히 구분합니다."
+        )
+        if lang == "ko":
+            return f"""[한국신문 뉴스룸 전용]\n역할: {persona}\n취재 단서: {keyword}\n편집 범위: {scope}\n
+- HTML은 p, h2, blockquote, ul, li만 사용한다.
+- 본문은 공백 제외 1,500~2,000자이며 2,000자를 절대 넘기지 않는다.
+- 역피라미드 구조: 핵심 사실 리드, 확인된 경위, 배경·맥락, 영향, 미확인 사항.
+- 첫 문단은 2~3문장, 각 문단은 1~3문장으로 짧게 쓴다. 소제목은 최대 2개다.
+- 표, FAQ, 체크리스트, 상담 CTA, 결론 요약을 쓰지 않는다.
+- '알아보겠습니다·추천·꿀팁·총정리·도움이 되셨다면' 같은 블로그 표현과 독자 질문을 금지한다.
+- 간결한 신문 기사체를 사용하고 과장, 감탄, 지어낸 인용·수치·인명·날짜·반응을 금지한다.
+- RSS 원문을 문단별로 번역·치환·재서술하지 않는다. 과거 연도와 수치를 현재 값으로 바꾸지 않는다.
+- 정보가 부족하면 억지로 늘리지 말고 확인된 범위의 짧은 기사로 쓴다.
+- 끝에 META_DESC: 100~140자와 TAGS: 짧은 명사 6~10개를 쓴다. FAQ와 TITLE은 출력하지 않는다."""
+        return f"""[THE SEOUL JOURNAL NEWSROOM ONLY]\nRole: {persona}\nReporting lead: {keyword}\nEditorial scope: {scope}\n
+- Use only p, h2, blockquote, ul and li HTML tags.
+- Body length is 1,500–2,000 characters excluding spaces; never exceed 2,000.
+- Use an inverted pyramid: concise lede, verified developments, context, significance, unresolved facts.
+- Write a 2–3 sentence lede and 1–3 sentence paragraphs. Use no more than two subheads.
+- No tables, FAQ, checklist, CTA or summary conclusion.
+- Ban blog language such as 'in this article', 'let's explore', 'tips', 'ultimate guide' and reader questions.
+- Use restrained newspaper prose. Never invent quotes, figures, dates, witnesses or reactions.
+- Do not translate, spin or paraphrase a source article paragraph by paragraph. Preserve historical dates exactly.
+- If facts are thin, write a shorter verified brief instead of padding.
+- End with META_DESC: 120–155 characters and TAGS: 6–10 short nouns. Do not output FAQ or TITLE."""
+
+    if lang == "ko":
+        keyword_rule = ("- 사건 소개: 이 헤드라인이 다루는 사건을 첫 문장에서 소개하되, "
+                         "헤드라인 문장을 그대로 반복하지 말고 다른 표현으로 풀어서 쓸 것. "
+                         "본문 전체에서 사건의 핵심 인물/기관/장소명을 자연스럽게 반복 언급"
+                         if is_news else
+                         f"- 키워드: '{keyword}'를 첫 문장에 자연스럽게 포함. 이후엔 억지로 "
+                         f"반복 횟수를 채우지 말고, 대명사/유의어/줄인 표현으로 자연스럽게 바꿔써도 됨 "
+                         f"(같은 단어를 기계적으로 반복하면 검색엔진이 스팸으로 판단할 수 있음)")
+        tags_line = (f"TAGS: ({tag_count}개, 쉼표로 구분된 짧은 명사/키워드만. "
+                     "문장·특수기호·구분선 금지)"
+                     if is_news else
+                     f"TAGS: ({tag_count}개, 쉼표로 구분된 짧은 명사형 단어/구만(각 2~15자). "
+                     f"문장·조사가 붙은 서술형·특수기호 금지, 서로 다른 단어로. "
+                     f"'{keyword}'와 관련되되 그 문구를 그대로 반복 재사용하지 말 것)")
+    else:
+        keyword_rule = ("- Intro: introduce the event this headline covers in the first sentence, "
+                         "in your own words — do not repeat the headline sentence verbatim. "
+                         "Naturally repeat the key people/organizations/places involved throughout"
+                         if is_news else
+                         f"- Keyword: include '{keyword}' naturally in the first sentence. After that, "
+                         f"don't force a repetition count — use pronouns, synonyms, or shortened phrasing "
+                         f"instead (mechanically repeating the exact same phrase reads as spam to both "
+                         f"readers and search engines)")
+        tags_line = (f"TAGS: ({tag_count} English tags, comma-separated short nouns/keywords only. "
+                     "No full sentences, symbols, or section dividers)"
+                     if is_news else
+                     f"TAGS: ({tag_count} English tags, comma-separated short noun phrases only "
+                     f"(2-25 characters each, no full sentences, no symbols, each one distinct). "
+                     f"Related to '{keyword}' but don't just repeat that whole phrase in every tag)")
+
+    if lang == "ko":
+        return f"""[역할]
+너는 {persona}야. 톤앤매너는 '{tone}'로, {url} 사이트의 '{theme}' 카테고리 독자를 대상으로 글을 쓴다.
+
+[지식/자료]
+- 이 사이트의 단일 편집 범위(절대 이탈 금지): '{scope}'\n- 위 범위 안에서 다룰 주제: '{keyword}'
+- 권위 있는 인용 출처(정부기관/대학교만 사용): {ext_h}
+- 본문에 자연스럽게 녹여 넣을 내부링크 4개:
+{il_str}
+
+[제약 — 반드시 지킬 것]
+- 형식: HTML 태그만 사용(h2,h3,p,ul,li,ol,strong,table,blockquote). 마크다운 절대 금지
+- 분량: 최소 {min_chars}자 이상(공백 제외)
+- {rhythm['ko']} 단락 사이 줄바꿈 필수
+- 문체(글 전체에 적용 — 도입부만이 아니라 소제목·본문·마무리 전부): 질문을 던지기보다
+  현상을 짚어주는 담담한 존댓말, 전문 기자가 리포트를 쓰듯 신뢰감 있고 객관적인 태도.
+  불필요한 수식어를 걷어내고 정보의 본질에 집중해서 서술.
+- 물음표 사용 금지: 본문 어디에도(소제목 포함) "~인가요?/~일까요?/~하시나요?/~해보셨나요?" 같은
+  의문문을 쓰지 말 것. FAQ_START~FAQ_END 섹션의 질문(Q:)에만 예외적으로 허용.
+  h2/h3 소제목은 반드시 명사구나 평서문으로 쓸 것 (예: "왜 중요할까요?" 금지 → "~의 역할"로 대체)
+  느낌표는 전체 글에서 1개 이하.
+- 절대 쓰지 말 것 — "이것 몰랐죠?/알고 계셨나요?" 류 충격 유도, "충격적인 사실/~%나 된다는 사실"
+  같은 통계 충격요법, "오늘은 ~에 대해 함께 알아보겠습니다/알아보아요" 같은 글 소개용 메타 문장,
+  "우리 몸은 정말 신비롭죠" 류의 막연한 감탄 필러, "이 글을 통해 궁금증을 모두 해소하시길
+  바랍니다" 같은 마무리성 문장을 서론에 두는 것, "현대 사회에서/현대인들에게" 같은 거창한 서두,
+  "그 중요성이 점점 커지고 있습니다" 같은 상투구, "~에 좋아요/추천합니다"처럼 근거 없이
+  주관적으로 끝내는 문장, "~임/~함"체 문어체.
+- 도입부 구성 순서: 현상 진단 → 배경 설명 → 이 글에서 다룰 방향 제시.
+  예시(이렇게 고쳐 쓸 것):
+    (금지) "전기세, 조금만 신경 써도 눈에 띄게 줄일 수 있다는 사실, 알고 계셨나요?"
+    (사용) "가전제품을 효율적으로 관리하는 것만으로도 불필요하게 낭비되는 전력을 상당 부분 줄일 수 있습니다."
+    (금지) "역류성 식도염, 그냥 속 쓰린 거라고 넘기면 안 되는 이유가 있습니다."
+    (사용) "역류성 식도염을 단순한 속 쓰림으로 여겨 방치하면 더 큰 질환으로 이어질 위험이 있습니다."
+    (금지 소제목) "내 몸의 든든한 방패, 셀레늄! 왜 중요할까요?"
+    (사용 소제목) "셀레늄의 역할과 항산화 작용"
+  마무리는 "오늘부터 시작해 보세요" 식 강요 대신 "작은 변화가 큰 결과로 이어질 수 있습니다"처럼
+  담백하게 격려하는 정도로.
+- 전문용어: 등장할 때마다 괄호로 쉽게 풀어서 설명할 것
+{keyword_rule}{news_integrity_note}
+- 통계/출처: 실제로 근거 있는 수치나 기관명을 알고 있을 때만 "(KOSIS, 2026)" 같은 형식으로
+  자연스럽게 인용. 억지로 개수를 채우려고 애매하거나 지어낸 수치를 넣지 말 것 —
+  근거 없는 통계보다 통계가 아예 없는 게 낫다.
+- 연도: 본문에 2024·2025·2023 등 과거 연도 절대 금지. 연도가 필요하면 반드시 2026만 사용, 확실하지 않으면 연도 자체를 생략
+- 표: 실제로 항목을 비교/정리하는 게 독자에게 유용한 주제일 때는 <table>을 쓸 것
+  (thead/tbody/tr/th/td 완전 구조). 이 글의 주제라면 대부분 비교표(원인별/유형별/
+  단계별/전후 비교 등)를 최소 1개는 자연스럽게 만들 수 있다 — 정말 표로 정리할
+  항목이 하나도 없는 극히 예외적인 경우만 생략하고, 그럴 때도 <table> 대신 잘
+  구조화된 <ul> 목록으로 핵심 정보를 정리할 것(구조 없이 문단으로만 끝내지 말 것).
+- "항목: 설명. 항목: 설명. 항목: 설명." 식으로 같은 패턴이 3개 이상 반복되는 내용을
+  한 문단에 욱여넣지 말 것 — 반드시 <ul><li><strong>항목:</strong> 설명</li></ul> 형태의
+  실제 목록으로 풀어 쓸 것. 독자가 훑어보기만 해도 구조가 눈에 들어와야 한다.
+- 특정 시점의 수치(지수, 종가, 거래량, 환율 등 매일 바뀌는 값)를 마치 항상 "오늘"의
+  값인 것처럼 단정적으로 쓰지 말 것 — 이 글은 발행 후 몇 주, 몇 달이 지나도 계속
+  읽힌다. "작성 시점 기준", "최근 거래일 기준"처럼 특정 시점의 스냅샷임을 밝히고,
+  글 전체를 하나의 순간적 수치에만 의존해 구성하지 말 것.
+- META_DESC 글자수는 타협 불가 항목이다 — 반드시 130~140자(공백 포함) 사이여야
+  하며, 120자 미만이거나 150자를 넘으면 실패로 간주된다. 짧게 쓰고 끝내지 말고
+  '{keyword}' 관련 구체적인 이유/이점을 한 문장 더 보태서라도 130자를 채울 것.
+- 위 내부링크 4개를 본문 흐름에 자연스럽게 삽입{medical_note}
+- FAQ는 본문(본문HTML) 안에 절대 작성하지 말 것. 아래 구성표에 "FAQ"가 언급되어 있어도
+  그건 이 글에 FAQ가 필요하다는 표시일 뿐, 실제 질문·답변은 반드시 FAQ_START~FAQ_END
+  섹션에서만 작성한다. 본문에 "자주 묻는 질문"이나 "FAQ" 같은 소제목, Q&A 형식을
+  직접 쓰면 발행 시 시스템이 추가하는 FAQ 박스와 겹쳐서 같은 내용이 두 번 노출된다.
+
+[이 사이트 전용 글 구성 — 반드시 이 순서로. 목록의 "FAQ"는 본문이 아니라
+FAQ_START~FAQ_END에서 작성하라는 뜻]
+{struct_str}
+
+[출력 형식]
+본문HTML → META_DESC: (정확히 130~140자, '{keyword}' 포함) → FAQ_START~FAQ_END (Q:/A: 형식) → {tags_line}
+(TITLE 줄은 쓰지 않아도 된다 — 제목은 별도 시스템이 생성한다)"""
+
+    else:
+        return f"""[ROLE]
+You are {persona}. Write in a '{tone}' tone for readers of the '{theme}' category on {url}.
+
+[KNOWLEDGE / SOURCES]
+- Single-site editorial scope (never leave this subject): '{scope}'\n- Topic to cover within that scope: '{keyword}'
+- Authoritative sources to cite (Korean gov/university only): {ext_h}
+- 4 internal links to weave naturally into the body:
+{il_str}
+
+[CONSTRAINTS — must follow]
+- Format: HTML tags only (h2,h3,p,ul,li,ol,strong,table,blockquote). No markdown whatsoever
+- Length: minimum {min_chars} characters
+- {rhythm['en']} Clear paragraph breaks between sections
+- Opening: start with a concrete fact or situation related to the topic, stated plainly.
+  Never use — rhetorical questions ("Have you ever wondered...?", "Did you know...?",
+  "What if I told you..."), especially chained back-to-back; shock-stat openers
+  ("a staggering X%", "surprisingly, X% of..."); throat-clearing meta-sentences about
+  the article itself ("In this article, we'll explore...", "Today, let's dive into...");
+  vague filler sentences ("Navigating the complexities of X can seem daunting, yet...",
+  "In today's fast-paced world...", "its importance is only growing"); or wrap-up-style sentences placed in the intro
+  ("By the end of this article, you'll..."). Max 1 exclamation point in the whole piece.
+- Opening structure: diagnose the situation → give context → state what this piece covers
+  (never lead with a question). Rewrite like this:
+    (banned) "Have you ever wondered how much you could save by managing your appliances better?"
+    (use) "Managing household appliances more efficiently can meaningfully cut wasted electricity."
+    (banned) "Acid reflux — just some heartburn, right? Actually, there's a reason not to ignore it."
+    (use) "Dismissing acid reflux as ordinary heartburn can let it develop into a more serious condition."
+  Keep the overall voice closer to a calm, factual news reporter than a hype blogger.
+- Jargon: explain any technical term in parentheses when first used
+{keyword_rule}
+- Statistics/citations: only cite a figure or source (e.g. "(OECD, 2026)") when you actually
+  have something grounded to reference. Don't pad the piece with vague or invented numbers just
+  to hit a count — no statistic beats a fabricated one.
+- Years: never write 2024, 2025, 2023, or any past year anywhere in the body. If a year is needed, use ONLY 2026 — if unsure, omit the year entirely
+- Tables: use a <table> (full thead/tbody/tr/th/td structure) whenever the topic can support
+  a side-by-side comparison (by type/stage/option/before-after/cost, etc.) — most topics here
+  can. Only skip it in the rare case there's truly nothing to compare, and even then replace it
+  with a well-structured <ul> summarizing the key points (never end a section with plain
+  paragraphs only when a list or table would organize it better).
+- Never cram a repeating "Label: description" pattern (3+ items) into a single run-on
+  paragraph — convert it into a real <ul><li><strong>Label:</strong> description</li></ul>.
+    (banned) "Flow indicator: net buying or selling. Price indicator: index performance.
+    Currency indicator: the exchange rate. Position indicator: ownership by sector."
+    (use) <ul><li><strong>Flow indicator:</strong> net buying or selling.</li>
+    <li><strong>Price indicator:</strong> index performance.</li>...</ul>
+  A reader should be able to scan the section in 2 seconds, not parse a wall of text.
+- Point-in-time figures (an index level, closing price, trading volume, exchange rate, or
+  any number that changes daily) must never be stated as if permanently current — this page
+  will still be read weeks or months after publication. State it as a dated snapshot
+  ("as of the article's writing", "in a recent session") rather than implying it is today's
+  live number, and never build the whole piece around one moment-in-time figure.
+- META_DESC length is non-negotiable — it must be 130-155 characters, not shorter. If your first
+  draft is short, add one more concrete reason/benefit related to '{keyword}' rather than
+  stopping early.
+- Weave the 4 internal links above naturally into the body{medical_note}
+- Never write the FAQ inside the article body itself. If the structure list below mentions
+  "FAQ", that only marks that this article needs one — the actual questions/answers belong
+  exclusively in the FAQ_START~FAQ_END section. Writing an "FAQ" or "Frequently Asked
+  Questions" heading with Q&A pairs directly in the body will duplicate the FAQ box the
+  system appends automatically at publish time.
+
+[THIS SITE'S UNIQUE STRUCTURE — follow exactly in order. Where the list says "FAQ", that
+belongs in FAQ_START~FAQ_END, not the body]
+{struct_str}
+
+[OUTPUT FORMAT — write ONLY these parts, back to back, with nothing else]
+1. The article body itself, written directly in HTML tags (do not write the words "body" or "HTML" anywhere as a label/header — just start straight in with the first <h2> or <p>)
+2. Then the line: META_DESC: (exactly 130~155 English chars, include '{keyword}')
+3. Then FAQ_START ~ FAQ_END (Q:/A: format)
+4. Then {tags_line}
+Do not write a TITLE line (a separate system generates the title). Do not restate or reference these instructions anywhere in your answer — output only the final content."""
+
+# ============================================================
+# ★ 유틸리티
+# ============================================================
+def _gemini_generate_text_raw(prompt, temperature=0.85):
+    if not gemini_client:
+        raise RuntimeError("GEMINI_API_KEY is not configured")
+    resp = gemini_client.models.generate_content(
+        model=GEMINI_MODEL, contents=prompt,
+        config={"temperature": temperature},
+    )
+    text = (resp.text or "").strip()
+    if not text:
+        raise RuntimeError("Gemini returned an empty response")
+    return text
+
+
+def generate_content_gemini(prompt, use_gpt=False):
+    """2026-08-28 정책 변경(사용자 지시): Gemini Flash(무료)를 주력 작가로,
+    GPT는 품질 실패 재작성/중요글(뉴스룸) 전용 escalation으로 되돌렸다.
+    (직전엔 'Gemini 폴백 금지, GPT만'으로 하드락돼 있었음 — 사용자가 그 잠금을
+    알고서 명시적으로 뒤집으라고 지시함.)
+
+    automation_hub.content_model_policy.choose_writer()가 이 라우팅의 유일한
+    기준이다 — 특히 "무료 tier가 소진됐다는 이유만으로 조용히 유료로 넘어가지
+    않는다"는 잠긴 규칙: Gemini 호출이 실패(크레딧 고갈 포함)하면 GPT로
+    자동 전환하지 않고 그대로 실패시킨다(=이 글은 스킵, AWAITING_APPROVAL과
+    동급). GPT는 quality_fail/important_content 같은 명시적 신호가 있을
+    때만(use_gpt=True) 쓴다.
+    """
+    from automation_hub.content_model_policy import choose_writer
+
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from openai_text import openai_available, openai_generate_text
+
+    decision = choose_writer(quality_fail=use_gpt, primary_available=bool(gemini_client))
+
+    if decision.provider == "none":
+        raise RuntimeError(f"writer blocked by content policy: {decision.reason} ({decision.status})")
+
+    if decision.provider == "openai":
+        if not openai_available():
+            # Paid escalation is intentionally disabled in routine automation.
+            # Retry with Gemini instead of turning an otherwise publishable daily
+            # article into a false-success workflow with no post.
+            return _gemini_generate_text_raw(prompt)
+        return openai_generate_text(prompt, temperature=0.85, max_retries=3)
+
+    return _gemini_generate_text_raw(prompt)
+
+def strip_code_fences(text):
+    """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
+    발행 전 이를 제거한다 (그대로 두면 본문 맨 위에 '```html' 텍스트가 그대로 노출됨)."""
+    t = text.strip()
+    t = re.sub(r'^```[a-zA-Z]*\s*\n', '', t)
+    t = re.sub(r'\n```\s*$', '', t)
+    t = t.strip()
+    t = "\n".join(l for l in t.split("\n") if l.strip() not in ("```", "```html", "```HTML"))
+    return t
+
+def extract_meta_and_faq(text):
+    text = strip_code_fences(text)
+    title=""; meta=""; faq=[]
+    lines=text.split("\n"); out=[]
+    in_faq=False; cur_q=None
+    for line in lines:
+        s=line.strip()
+        sc=s.lstrip('#').lstrip('*').strip()
+        if sc.upper().startswith("TITLE:"):
+            title=sc.split(":",1)[1].strip() if ":" in sc else ""; continue
+        if sc.upper().startswith("META_DESC:"):
+            meta=sc.split(":",1)[1].strip() if ":" in sc else ""; continue
+        if s.upper().startswith("FAQ_START"): in_faq=True; continue
+        if s.upper().startswith("FAQ_END"):   in_faq=False; continue
+        if in_faq:
+            if s[:2].upper()=="Q:": cur_q=s[2:].strip()
+            elif s[:2].upper()=="A:" and cur_q: faq.append((cur_q,s[2:].strip())); cur_q=None
+            continue
+        out.append(line)
+    title=title.strip('"').strip("'").strip("*").strip()
+    if not title or len(title)<8:
+        body="\n".join(out)
+        m=re.search(r'<h1[^>]*>(.*?)</h1>',body,re.DOTALL|re.IGNORECASE)
+        if m:
+            ext=re.sub(r'<[^>]+>','',m.group(1)).strip()
+            if len(ext)>=8: title=ext
+        if not title:
+            for ol in out:
+                pl=re.sub(r'<[^>]+>','',ol).strip()
+                if len(pl)>=10: title=pl[:120]; break
+    return "\n".join(out).strip(), title, meta, faq
+
+# ============================================================
+# ★★★ 제목 다양화 — AI에게 "부탁"하지 않고 코드가 직접 22개 템플릿 중 랜덤 선택 ★★★
+# 문제: 기존엔 프롬프트로 "패턴 7개 중 골라서 절대 반복하지 마라"고 지시만 했는데,
+#      AI가 실제로는 "How to Actually X: A Specialist's Guide" 류로 계속 수렴함
+#      → 반복 패턴은 구글이 "찍어낸 AI 콘텐츠"로 인식해 색인에 불리
+# 해결: AI 지시에 의존하지 않고, 코드가 22개 템플릿 중 매번 진짜 랜덤으로 뽑아
+#      키워드만 채워 넣는 방식으로 강제 (내부링크 수정과 동일한 원칙)
+# ============================================================
+TITLE_TEMPLATES_KO = [
+    "{keyword}, 이것부터 확인하세요",
+    "{keyword} 관리, 이 {n}가지만 지켜도 달라집니다",
+    "{keyword}에 대해 알아두면 좋은 것들",
+    "{keyword}, 어디서부터 시작해야 할까",
+    "{keyword} 제대로 준비하는 법",
+    "놓치기 쉬운 {keyword} 체크포인트",
+    "{keyword}, 실제로는 이렇게 진행됩니다",
+    "{keyword} 하기 전에 알아두면 좋은 것들",
+    "{keyword}, 핵심만 짚어드립니다",
+    "{keyword}, 얼마나 준비해야 할까",
+    "{keyword}에서 자주 나오는 질문 {n}가지",
+    "{keyword} 첫걸음 — 순서대로 정리",
+    "{keyword}, 쉽게 풀어드립니다",
+    "{year}년 {keyword}, 이렇게 달라졌습니다",
+    "{keyword}의 실제 비용 — 미리 알아야 할 것들",
+    "{keyword} 시작 전에 꼭 읽어야 할 글",
+    "{keyword}에서 놓치기 쉬운 부분들",
+    "외국인을 위한 {keyword} 실전 가이드",
+    "{keyword} 입문 — 처음이라면 꼭 알아야 할 것",
+    "{keyword} 준비할 때 헷갈리는 부분 정리",
+    "{year}년 달라진 {keyword}, 무엇이 바뀌었나",
+    "{keyword} 궁금증, 하나씩 풀어봅니다",
+    "{keyword}, 순서대로 따라 하면 됩니다",
+    "{keyword} 고를 때 살펴봐야 할 {n}가지",
+    "{keyword}, 요즘 이렇게 준비합니다",
     "{keyword} 관련 자주 헷갈리는 부분",
     "{keyword}, 시간과 비용을 아끼는 방법",
     "{keyword} 살펴보기 — 알아두면 유용한 정보",
@@ -2781,13 +3469,6 @@ def process_one(site, keyword):
     elif score < quality_target:
         print(f"  ⛔ 품질점수 {score}점 < 뉴스/콘텐츠 목표 {quality_target}점 → 발행 스킵")
         log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
-        return False
-
-    consensus = run_three_model_gate(title, body, meta, keyword)
-    if consensus.get("ok") is not True:
-        reason = json.dumps(consensus, ensure_ascii=False)[:1000]
-        print("  ⛔ Gemini·GPT·Claude 3자 합의 검토 실패")
-        log(url,theme,keyword,title,"",score,len(images),"⛔ skip_three_model_consensus",reason)
         return False
 
     cat_name=get_category_for_post(theme,f"{news_source or ''} {keyword}".strip(),title)
