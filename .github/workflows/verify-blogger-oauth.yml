@@ -1,0 +1,30 @@
+name: "Automation Hub — verify Blogger OAuth (no LLM, no writes)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      verify_blog_id:
+        description: "Blogger destination_id to read (e.g. from config/content_engine_profiles.json)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install requests -q
+      - env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          VERIFY_BLOG_ID: ${{ inputs.verify_blog_id }}
+        run: python scripts/verify_blogger_oauth.py
