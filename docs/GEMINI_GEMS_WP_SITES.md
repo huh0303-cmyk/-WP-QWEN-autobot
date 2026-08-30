@@ -11,6 +11,10 @@ source of truth and the running log of progress through all 27.
 
 Order follows `config/blogger_portfolio.json`. Status: **8/27 done.**
 
+**LENGTH POLICY (locked, applies to every Gem in this file):**
+- Regular blog sites: **2,300–3,000 characters, randomized per post** — never the same number twice, never a fixed template length.
+- **Newsroom sites are the exception** — KoreaNews365 (order 9) and The Seoul Journal (order 15) are actual news sites. Their length is free/random per story's real weight: a short brief can run **as low as ~1,000 characters**, up to 3,000 characters for a fuller story. Never pad a brief item to hit a target length.
+
 ---
 
 ## 1. K-Trip365 (k-trip365.com) — DONE
@@ -41,6 +45,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: city/region itineraries, transportation how-tos (KTX,
   subway, intercity bus), seasonal travel guides, food and neighborhood
   guides, practical logistics (SIM cards, T-money, tipping, etiquette),
@@ -128,6 +134,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: comeback/release coverage and analysis, artist/group
   career-trajectory spotlights, award-show and chart context (explain
   what a ranking/award actually means, not just "X won"), concert/tour
@@ -221,6 +229,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: hiring trends by industry, employment law and contract
   basics (Labor Standards Act, probation periods, severance/퇴직금),
   résumé and interview norms in Korea, workplace culture explainers,
@@ -316,6 +326,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: application process by degree level (language program,
   undergraduate, graduate), scholarship guides (GKS/KGSP and university-
   specific), D-2/D-4 student visa requirements, required documents and
@@ -411,6 +423,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: National Health Insurance enrollment and how it works
   for foreigners, private supplemental insurance types (cancer, dental,
   travel/short-term), claims processes, cost comparisons by
@@ -515,6 +529,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: opening and using Korean bank accounts as a foreigner,
   savings/deposit products (적금/예금) and how interest is actually
   calculated, remittance and international transfers, credit history/
@@ -613,6 +629,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: plastic surgery procedure explainers (what it involves,
   typical recovery window, what to ask a clinic), dental tourism guides,
   medical visa (C-3-3/G-1-10) requirements, how to evaluate a
@@ -722,6 +740,8 @@ SITE IDENTITY
 
 CONTENT STRATEGY
 - Cadence target: 3-4 posts/week.
+- Length: 2,300–3,000 characters, randomized post to post — never default
+  to the same number every time.
 - Core pillars: visa type explainers (D-2 student, E-series work, F-
   series residency/marriage, C-3 tourist), application/renewal
   procedures at immigration offices, required documents and how to get
