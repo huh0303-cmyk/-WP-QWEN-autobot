@@ -45,12 +45,28 @@ def parse_rewrite_json(raw: str) -> dict[str, Any]:
     return data
 
 
+_DANGLING_TRAILING_WORDS = {
+    "a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet",
+    "to", "of", "in", "on", "at", "by", "with", "from", "as", "is", "are",
+}
+
+
 def _clip_words(value: str, maximum: int) -> str:
-    """Clip generated prose at a word boundary without adding new text."""
+    """Clip generated prose at a word boundary without adding new text.
+
+    Never leaves the clip ending on a preposition/conjunction/article -
+    a plain word-boundary cut can land right after one (e.g. "...Tips for"
+    when the original continued "...Tips for 2026"), producing a title
+    that reads as grammatically broken rather than just shorter.
+    """
     value = re.sub(r"\s+", " ", value).strip()
     if len(value) <= maximum:
         return value
     clipped = value[: maximum + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    words = clipped.split(" ")
+    while len(words) > 1 and words[-1].lower().strip(",;:-") in _DANGLING_TRAILING_WORDS:
+        words.pop()
+    clipped = " ".join(words).rstrip(" ,;:-")
     return clipped or value[:maximum].rstrip()
 
 
