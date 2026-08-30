@@ -28,7 +28,7 @@ def _access_token() -> str:
     client_id = os.environ.get("BLOGGER_GOOGLE_CLIENT_ID", "")
     client_secret = os.environ.get("BLOGGER_GOOGLE_CLIENT_SECRET", "")
     if not all((refresh_token, client_id, client_secret)):
-        raise SystemExit("BLOGGER_GOOGLE_REFRESH_TOKEN / _CLIENT_ID / _CLIENT_SECRET are required")
+        return ""
     response = requests.post(
         "https://oauth2.googleapis.com/token",
         data={"client_id": client_id, "client_secret": client_secret, "refresh_token": refresh_token, "grant_type": "refresh_token"},
@@ -38,8 +38,26 @@ def _access_token() -> str:
     return response.json()["access_token"]
 
 
-def main() -> int:
+def _lookup_auth() -> tuple[dict, dict]:
+    """blogs.getByUrl is a public read - OAuth is preferred (also proves the
+    write-scope credential works) but a plain API key is enough to look up
+    IDs. Falls back to whatever key this repo already has (YouTube's, most
+    likely on the same GCP project) if the dedicated Blogger OAuth secret
+    hasn't been set up yet."""
     token = _access_token()
+    if token:
+        return {"Authorization": f"Bearer {token}"}, {}
+    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("YOUTUBE_API_KEY", "")
+    if not api_key:
+        raise SystemExit(
+            "No usable credential: BLOGGER_GOOGLE_REFRESH_TOKEN/_CLIENT_ID/_CLIENT_SECRET "
+            "are not set, and no GOOGLE_API_KEY/YOUTUBE_API_KEY fallback is available either."
+        )
+    return {}, {"key": api_key}
+
+
+def main() -> int:
+    headers, extra_params = _lookup_auth()
     data = json.loads(PORTFOLIO_PATH.read_text(encoding="utf-8"))
     found, still_missing = [], []
     for channel in data["channels"]:
@@ -50,8 +68,8 @@ def main() -> int:
             continue
         response = requests.get(
             "https://www.googleapis.com/blogger/v3/blogs/byurl",
-            params={"url": channel["blogspot"]},
-            headers={"Authorization": f"Bearer {token}"},
+            params={"url": channel["blogspot"], **extra_params},
+            headers=headers,
             timeout=20,
         )
         if response.status_code == 200:
@@ -59,8 +77,10 @@ def main() -> int:
             channel["destination_id"] = blog_id
             channel["status"] = "EXISTING"
             found.append((channel["order"], channel["title"], blog_id))
-        else:
+        elif response.status_code == 404:
             still_missing.append((channel["order"], channel["title"], "not created yet"))
+        else:
+            still_missing.append((channel["order"], channel["title"], f"lookup failed: HTTP {response.status_code} {response.text[:200]}"))
 
     PORTFOLIO_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
