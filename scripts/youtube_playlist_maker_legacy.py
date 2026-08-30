@@ -138,7 +138,7 @@ DURATION_POOL_MAX_SEC = 100 * 60
 # starbucks(=카페음악, 2026-08-06부터 연주곡 전용 채널로 재배정): 56~190분 확정.
 # globalmusic(=로맨틱글로벌): 2026-08-12부터 64~132분 확정.
 CHANNEL_DURATION_POOL_SEC = {
-    "starbucks": (56 * 60, 190 * 60),
+    "starbucks": (130 * 60, 210 * 60),
     "globalmusic": (64 * 60, 132 * 60),
     # healing: 3~4시간짜리 긴 수면/이완용 재생목록으로 고정(2026-08-16 사용자 요청,
     # 기존 2~3시간에서 연장).
@@ -414,8 +414,8 @@ CHANNEL_DESC_CONTEXT = {
     # 로파이 인스트루멘탈이 아니라 영어/불어/독일어 등 전 세계 모든 언어의
     # 달달한(로맨틱/스위트) 보컬곡 채널로 확정.
     "globalmusic": "a sweet, romantic global music channel featuring vocal love songs in many different languages (English, French, German, and more — warm, tender, feel-good mood)",
-    # healing: 3가지 테마 중 하나만(섞지 않음) — 강한비/시냇물+가끔새소리/약한비, 2~4시간 롱폼(2026-08-16 재설계)
-    "healing": "an ambient nature-sounds channel for relaxation and sleep — each video is ONE single sound only (either heavy rain, or a calm stream with occasional birdsong, or light rain — never mixed together), no lyrics, pure atmosphere, long-form 2-4 hour sessions",
+    # healing: 한 영상은 하나의 자연음 테마만 유지하며 3~4시간 롱폼으로 제작한다.
+    "healing": "an ambient nature-sounds channel for relaxation and sleep — rain is the main theme, with calm streams and occasional birdsong plus temple ambience when verified source audio is available; no music, no lyrics, pure atmosphere, long-form 3-4 hour sessions",
     # starbucks(=starbucksvibes 채널): 편한 카페 재즈, 보컬 없음(사용자 지시 그대로)
     "starbucks": "a relaxing instrumental cafe jazz channel (no vocals, smooth jazz, warm laid-back cafe mood)",
     "mbb": "a classical music channel centered on Mozart, Bach and Beethoven (and other classical composers)",
@@ -632,7 +632,11 @@ CHANNEL_TOPIC_POOLS = {
         "Cello for Deep Focus & Work", "Violin for Afternoon Tea",
         "Piano & Violin Dinner", "Romantic Cello & Piano", "Evening Violin Serenade",
         "Rain & Piano for Sleep", "Morning Chamber Music", "Candlelight Piano Dinner",
-        "Cello for Reading & Studying",
+        "Cello for Reading & Studying", "Mozart for Pregnancy and Relaxation",
+        "Essential Arias for a Quiet Evening", "Classical Music for a Rainy Day",
+        "Violin Solos to Hear Once in a Lifetime", "Cello Solos to Hear Once in a Lifetime",
+        "Sarasate Violin Masterpieces", "Flute and Piano Morning", "Trumpet Classics",
+        "Mozart Bach and Beethoven Essentials",
     ],
     "kpop": [
         "study playlist", "workout playlist", "driving at night", "chill dance practice",
@@ -657,7 +661,7 @@ def make_channel_thumbnail(channel_key: str, image_path: str, out_path: str, top
     elif channel_key in PLAYLIST_HERO_CHANNELS:
         # 2026-08-22: globalmusic는 실제 채널 브랜드명이 Cafe_K라서(CHANNEL_DESC_CONTEXT
         # 참고) 히어로 텍스트도 제네릭 "Playlist" 대신 브랜드명을 그대로 쓴다.
-        hero_text = "Cafe_K" if channel_key == "globalmusic" else "Playlist"
+        hero_text = "Cafe_Romantic" if channel_key == "globalmusic" else "Playlist"
         return make_caption_thumbnail(image_path, out_path, topic=hero_text,
                                        subtitle_override=topic, show_waveform=True)
     else:
@@ -1586,9 +1590,9 @@ HEALING_FOOTAGE_QUERIES = {
                      "green forest stream nature"],
 }
 HEALING_THEME_DURATION_SEC = {
-    "strong_rain": (145 * 60, 155 * 60),   # "2시간 30분" 목표
-    "stream_calm": (120 * 60, 180 * 60),   # "2~3시간"
-    "weak_rain": (120 * 60, 180 * 60),     # "2~3시간"
+    "strong_rain": (180 * 60, 240 * 60),
+    "stream_calm": (180 * 60, 240 * 60),
+    "weak_rain": (180 * 60, 240 * 60),
 }
 
 
@@ -1752,28 +1756,25 @@ def main():
         log("4/5 정지 이미지 한 장 + 음악으로 영상 파일 생성 중...")
         make_static_video(healing_photo, audio_path, final_path)
     elif topic_keyword.strip():
-        log(f"3/5 주제 '{topic_keyword}' — 채널 기존 이미지 한 장 선택 중...")
-        background_path = select_single_bank_image(WORKDIR, service)
+        log(f"3/5 주제 '{topic_keyword}' — FLUX 실사 이미지 한 장 생성 중...")
+        generated_images = build_ai_images(topic_keyword, WORKDIR, service)
+        if not generated_images:
+            raise RuntimeError("FLUX 실사 이미지 생성 실패 — 기존 이미지/무료스톡 폴백 금지")
+        background_path = generated_images[0]
         caption_text = ""
         thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, background_path, thumbnail_out, topic_keyword)
         log("4/5 같은 정지 이미지 한 장 + 음악으로 영상 파일 생성 중...")
         make_static_video(background_path, audio_path, final_path)
     else:
-        log("3/5 주제어 없음 — 썸네일창고에서 이미지 무작위 선택(폴백)...")
-        thumbs = list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, "image/")
-        if not thumbs:
-            log("❌ 썸네일창고에 이미지가 없습니다")
-            raise SystemExit(1)
-        thumb_meta = random.choice(thumbs)
-        thumb_ext = os.path.splitext(thumb_meta["name"])[1] or ".jpg"
-        thumb_path = os.path.join(WORKDIR, f"thumbnail{thumb_ext}")
-        download_drive_file(service, thumb_meta["id"], thumb_path)
-        log(f"   ✅ 썸네일: {thumb_meta['name']}")
-
-        log("4/5 정지 이미지 + 음악으로 영상 생성 중...")
-        make_static_video(thumb_path, audio_path, final_path)
-        from PIL import Image
-        thumbnail_out = _save_thumbnail_capped(Image.open(thumb_path).convert("RGB"), thumbnail_out)
+        log("3/5 주제어 없음 — 채널 기본 주제로 FLUX 실사 이미지 한 장 생성 중...")
+        generated_images = build_ai_images("signature channel mood", WORKDIR, service)
+        if not generated_images:
+            raise RuntimeError("FLUX 실사 이미지 생성 실패 — 기존 이미지/무료스톡 폴백 금지")
+        background_path = generated_images[0]
+        caption_text = ""
+        thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, background_path, thumbnail_out, "")
+        log("4/5 같은 FLUX 정지 이미지 한 장 + 음악으로 영상 생성 중...")
+        make_static_video(background_path, audio_path, final_path)
 
     log("5/5 구글드라이브 업로드 중...")
     now = datetime.now(KST)

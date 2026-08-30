@@ -57,7 +57,12 @@ def generate_flux_thumbnail_url(subject: str, theme: str = "YouTube thumbnail") 
     theme = " ".join(str(theme or "").split())[:160]
     prompt = (
         f"High-impact professional YouTube thumbnail source image. Subject: {subject}. "
-        f"Channel/theme: {theme}. Photorealistic editorial composition, strong focal subject, "
+        f"Channel/theme: {theme}. It must look like an authentic photograph captured by a skilled "
+        "human photographer, with believable anatomy, hands, skin texture, reflections, materials, "
+        "weather and perspective. Avoid plastic skin, malformed fingers, duplicated objects, waxy "
+        "faces, artificial symmetry, CGI, 3D render, illustration and generic AI-art aesthetics. "
+        "Use a plausible camera lens, natural depth of field and restrained professional color grading. "
+        "Photorealistic editorial composition, strong focal subject, "
         "cinematic lighting, clean negative space for optional title overlay, highly legible at small size, "
         "no visible text, no captions, no logo, no watermark, no UI, 16:9 landscape."
     )

@@ -69,7 +69,7 @@
     {"room_id":"naver_n2","platform":"naver","report_code":"N2","name":"N2","enabled":false,"destination_id":"","workflow":"naver-blog-local","language":"ko","publish_policy":"draft","duplicate_guard":true,"status":"ACCOUNT_INFO_REQUIRED"},
     {"room_id":"naver_n3","platform":"naver","report_code":"N3","name":"N3","enabled":false,"destination_id":"","workflow":"naver-blog-local","language":"ko","publish_policy":"draft","duplicate_guard":true,"status":"ACCOUNT_INFO_REQUIRED"},
 
-    {"room_id":"yt_globalmusic","platform":"youtube","name":"플리-로맨틱글로벌","enabled":true,"destination_id":"UCbJfEtsffpgI5MsKkB7BYvQ","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},
+    {"room_id":"yt_globalmusic","platform":"youtube","name":"Cafe_Romantic","enabled":true,"destination_id":"UCbJfEtsffpgI5MsKkB7BYvQ","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},
     {"room_id":"yt_healing","platform":"youtube","name":"플리-힐링","enabled":true,"destination_id":"UC7yEsLM-HoXudngrD-4FIqg","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},
     {"room_id":"yt_starbucks","platform":"youtube","name":"플리-카페음악","enabled":true,"destination_id":"UC_e-sbLkVgwJNYEeobolNog","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},
     {"room_id":"yt_mbb","platform":"youtube","name":"플리-MBB","enabled":true,"destination_id":"UC7jOhyMa-FIrzZuea97z1Pw","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},

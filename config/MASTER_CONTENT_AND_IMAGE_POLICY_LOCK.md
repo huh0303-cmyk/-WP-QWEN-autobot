@@ -59,6 +59,23 @@ Hard rules:
 - Blogger requires human review before publication
 - playlist thumbnails retain the existing-frame-only exception; do not generate thumbnail video
 
+### YouTube playlist thumbnail lock (2026-08-30)
+
+- every new playlist source image and thumbnail must be generated with FLUX.1 Schnell
+- Drive thumbnail-bank, free-stock, SDXL, Gemini image and OpenAI image fallback are forbidden
+- the result must look like authentic professional photography; obvious AI anatomy, plastic skin,
+  malformed hands, duplicated objects, fake reflections, CGI or illustration styling is QUALITY_FAIL
+- generate exactly one 16:9 source image and reuse it as the full-video still and thumbnail source
+- `Cafe_Romantic` uses a sweet affectionate couple photo series, including tasteful black-and-white
+  photography; the final overlay is the large `Cafe_Romantic` brand with a waveform below
+- Healing uses rain-heavy jungle, forest, stream, river, open nature or temple-in-nature photography;
+  no thumbnail text
+- Cafe Music uses a close-up seasonal drink with an open sea, coast, Eiffel Tower or other landmark
+  visible through a large window; no commercial cafe brand marks
+- MBB uses elegant instruments and theme-led classical photography; thumbnail text is omitted or kept
+  extremely short and must never overlap
+- K-pop uses high-end realistic Korean pop editorial photography
+
 ## 3. Change control
 
 These two configuration files are the executable master references:
