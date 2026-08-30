@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Platform room skeleton. Fill credentials/destination IDs later; keep PUBLIC disabled by default.",
-  "expected_counts": {"wordpress": 27, "blogger": 27, "tistory": 5, "youtube": 10},
+  "expected_counts": {"wordpress": 27, "blogger": 27, "tistory": 5, "naver": 3, "youtube": 10},
   "rooms": [
     {"room_id":"wp_khealth365","platform":"wordpress","name":"k-health365.com","enabled":true,"workflow":"daily-network-publish.yml","language":"ko","group":"A","publish_policy":"draft","duplicate_guard":true,"status":"READY"},
     {"room_id":"wp_koreamedicaltour","platform":"wordpress","name":"koreamedicaltour.com","enabled":true,"workflow":"daily-network-publish.yml","language":"en","group":"A","publish_policy":"draft","duplicate_guard":true,"status":"READY"},
@@ -59,11 +59,15 @@
     {"room_id":"blogger_koreanews365","platform":"blogger","name":"한국생활지원정보","source_id":"wp_koreanews365","enabled":false,"destination_id":"2531035487222435079","workflow":"blogger-daily-scheduler.yml","language":"ko","group":"BLOGGER","content_mode":"official_source_trend","publish_policy":"draft","duplicate_guard":true,"status":"CREATED_SHELL"},
     {"room_id":"blogger_theseouljournal","platform":"blogger","name":"theseouljournal","source_id":"wp_theseouljournal","enabled":false,"workflow":"blogger-daily-scheduler.yml","language":"en","group":"BLOGGER","publish_policy":"draft","duplicate_guard":true,"status":"EMPTY"},
 
-    {"room_id":"tistory_insurance_lab","platform":"tistory","name":"한국보험분석연구소","enabled":true,"destination_id":"https://k-insight-vietnam.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
-    {"room_id":"tistory_dental_cost","platform":"tistory","name":"한국치과비용연구소","enabled":true,"destination_id":"https://k-vietnam.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
-    {"room_id":"tistory_finance_housing","platform":"tistory","name":"한국부동산금융정보","enabled":true,"destination_id":"https://k-healthcare.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
-    {"room_id":"tistory_life365","platform":"tistory","name":"한국생활정보","enabled":true,"destination_id":"https://huh0303.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
-    {"room_id":"tistory_ktrip365","platform":"tistory","name":"K-trip365","enabled":true,"destination_id":"https://k-trip365.tistory.com/","workflow":"tistory-daily-plan.yml","language":"en","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
+    {"room_id":"tistory_insurance_lab","platform":"tistory","report_code":"T1","name":"한국보험분석연구소","enabled":true,"destination_id":"https://k-insight-vietnam.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
+    {"room_id":"tistory_dental_cost","platform":"tistory","report_code":"T2","name":"한국치과비용연구소","enabled":true,"destination_id":"https://k-vietnam.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
+    {"room_id":"tistory_finance_housing","platform":"tistory","report_code":"T3","name":"한국부동산금융정보","enabled":true,"destination_id":"https://k-healthcare.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
+    {"room_id":"tistory_life365","platform":"tistory","report_code":"T4","name":"한국생활정보","enabled":true,"destination_id":"https://huh0303.tistory.com/","workflow":"tistory-daily-plan.yml","language":"ko","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
+    {"room_id":"tistory_ktrip365","platform":"tistory","report_code":"T5","name":"K-trip365","enabled":true,"destination_id":"https://k-trip365.tistory.com/","workflow":"tistory-daily-plan.yml","language":"en","publish_policy":"awaiting_approval","duplicate_guard":true,"status":"READY"},
+
+    {"room_id":"naver_n1","platform":"naver","report_code":"N1","name":"N1","enabled":false,"destination_id":"","workflow":"naver-blog-local","language":"ko","publish_policy":"draft","duplicate_guard":true,"status":"ACCOUNT_INFO_REQUIRED"},
+    {"room_id":"naver_n2","platform":"naver","report_code":"N2","name":"N2","enabled":false,"destination_id":"","workflow":"naver-blog-local","language":"ko","publish_policy":"draft","duplicate_guard":true,"status":"ACCOUNT_INFO_REQUIRED"},
+    {"room_id":"naver_n3","platform":"naver","report_code":"N3","name":"N3","enabled":false,"destination_id":"","workflow":"naver-blog-local","language":"ko","publish_policy":"draft","duplicate_guard":true,"status":"ACCOUNT_INFO_REQUIRED"},
 
     {"room_id":"yt_globalmusic","platform":"youtube","name":"플리-로맨틱글로벌","enabled":true,"destination_id":"UCbJfEtsffpgI5MsKkB7BYvQ","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},
     {"room_id":"yt_healing","platform":"youtube","name":"플리-힐링","enabled":true,"destination_id":"UC7yEsLM-HoXudngrD-4FIqg","workflow":"generate-youtube-playlist.yml","group":"PLAYLIST","publish_policy":"private","duplicate_guard":true,"status":"READY"},

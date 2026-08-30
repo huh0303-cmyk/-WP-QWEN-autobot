@@ -642,6 +642,74 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
         log(f"⚠️ 아침 통합 대시보드 갱신 실패: {exc}")
 
 
+def send_master_62_dashboard(site_details, blogger_details, checked_at):
+    """Write the confirmed 62-asset master snapshot in one numbered table."""
+    import gsheets_direct
+    if not SHEET_ID or not gsheets_direct.has_credentials():
+        return
+
+    rooms_path = Path(REPO_ROOT) / "config" / "automation_rooms.json"
+    try:
+        rooms = json.loads(rooms_path.read_text(encoding="utf-8")).get("rooms", [])
+    except (OSError, ValueError):
+        rooms = []
+    tistory_rooms = [room for room in rooms if room.get("platform") == "tistory"]
+    naver_rooms = [room for room in rooms if room.get("platform") == "naver"]
+
+    rows = []
+    number = 1
+    for item in site_details:
+        vm = item.get("visitor_metrics") or {}
+        rows.append([
+            number, "WP", item["domain"], item.get("url", ""),
+            _fmt_value_delta(item.get("total_posts"), item.get("published_delta")),
+            _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
+            _fmt_value_delta(vm.get("today"), vm.get("daily_delta")),
+            _fmt_value_delta(vm.get("total"), vm.get("total_delta")),
+            _fmt_value_delta(item.get("clicks"), item.get("clicks_delta")),
+            item.get("status", ""), checked_at,
+        ])
+        number += 1
+
+    # Blogger rows follow the corresponding WP order and reuse its confirmed name.
+    for index, item in enumerate(blogger_details):
+        wp_name = site_details[index]["domain"] if index < len(site_details) else item.get("name", item["domain"])
+        rows.append([
+            number, "BLOGSPOT", wp_name, item.get("url", ""),
+            _fmt_value_delta(item.get("public_posts"), item.get("published_delta")),
+            _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
+            "", "", "", item.get("status", ""), checked_at,
+        ])
+        number += 1
+
+    for room in tistory_rooms:
+        rows.append([
+            number, "TISTORY", room.get("report_code", f"T{number - 54}"),
+            room.get("destination_id", ""), "", "", "", "", "",
+            "등록완료 · 수치수집 연결 필요", checked_at,
+        ])
+        number += 1
+
+    for room in naver_rooms:
+        rows.append([
+            number, "NAVER", room.get("report_code", f"N{number - 59}"),
+            room.get("destination_id", ""), "", "", "", "", "",
+            "계정 주소 등록 필요", checked_at,
+        ])
+        number += 1
+
+    if len(rows) != 62:
+        raise RuntimeError(f"종합상황실 자산 수 불일치: {len(rows)} (기대 62)")
+
+    header = [
+        "번호", "플랫폼", "관리명", "사이트 주소", "공개글(전일대비)",
+        "구글색인(전일대비)", "오늘방문(전일대비)", "누적방문(오늘증가)",
+        "검색클릭(전일대비)", "수집상태", "기준시각(KST)",
+    ]
+    gsheets_direct.replace_tab_rows(SHEET_ID, "종합_62개현황", header, rows)
+    log("📊 종합_62개현황 갱신 완료 — WP27 + Blogspot27 + Tistory5 + Naver3")
+
+
 def send_email(subject, body):
     if not GMAIL_APP_PASSWORD:
         log("⚠️ GMAIL_APP_PASSWORD 없음 — 이메일 스킵")
@@ -1014,6 +1082,7 @@ def main():
         {"tiktok": tiktok_m, "facebook": facebook_m, "instagram": instagram_m, "threads": threads_m},
         sns_diffs, dashboard_totals, checked_at,
     )
+    send_master_62_dashboard(site_details_list, blogger_details, checked_at)
 
     send_email(f"[종합상황실] {checked_at[:10]} 오늘 방문자·증감 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
