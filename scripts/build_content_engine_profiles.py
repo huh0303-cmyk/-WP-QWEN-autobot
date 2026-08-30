@@ -56,6 +56,16 @@ def main() -> int:
                 "description": channel.get("description", ""),
                 "search_description": channel.get("search_description", ""),
                 "notes": channel.get("notes", ""),
+                # Same persona/tone as WordPress (same site, same voice) but a
+                # shorter, distinctly-keyworded piece per the locked v2 policy:
+                # WordPress carries the deep-dive, Blogspot a related-but-different
+                # angle. Derived as a ratio of the WordPress length so every site
+                # gets a sane range without a second hand-maintained table.
+                "persona": wp_site["persona"],
+                "tone": wp_site["tone"],
+                "min_chars": max(1000, round(wp_site.get("min_chars", 1800) * 0.7)),
+                "target_chars": max(1300, round(wp_site.get("target_chars", 2400) * 0.7)),
+                "max_chars": max(1600, round(wp_site.get("max_chars", 3200) * 0.72)),
             },
         })
 
