@@ -42,4 +42,3 @@ Locked on 2026-08-30. These rules apply to the five English knowledge channels.
 
 - Evoke American memory through authentic people, facial expressions, household objects, shops, cars, schools, diners, roads, advertisements and daily life.
 - Keep it distinct from Silent Era: this channel is social memory and material culture, not a movie-history channel.
-
