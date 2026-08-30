@@ -1,0 +1,54 @@
+name: "CEO Dashboard — dispatch due keywords to the write pipeline"
+
+# Closes the loop: roll_14day_content_calendar.py plans, then
+# promote_calendar_to_golden_keywords.py queues, and this is the piece
+# that actually calls sheet-triggered-auto-write.yml for whatever is
+# waiting. At most one site dispatched per run, min 30 minutes apart -
+# see scripts/dispatch_due_writes.py.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/dispatch_due_writes.py"
+  schedule:
+    - cron: "12 * * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: dispatch-due-writes
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: Find and dispatch one due site
+        env:
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/dispatch_due_writes.py
+      - name: Commit dispatcher state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add write_dispatch_state.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 발사 스케줄러 상태 갱신 [skip ci]"
+          git push
