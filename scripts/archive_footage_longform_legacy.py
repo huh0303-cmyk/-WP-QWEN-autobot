@@ -45,6 +45,7 @@ from classic_reads_longform import (  # noqa: E402
 from nasa_archive_longform import (  # noqa: E402
     normalize_clip, build_visual_track, extract_hero_frame, W, H, CLIP_TRIM_SECONDS,
 )
+from knowledge_visual_alignment import inspect_and_filter_clips, verify_narration_alignment  # noqa: E402
 
 IA_SEARCH = "https://archive.org/advancedsearch.php"
 IA_METADATA = "https://archive.org/metadata"
@@ -551,6 +552,8 @@ def main():
         log("❌ 이 주제로 사용 가능한 퍼블릭도메인 클립을 하나도 못 찾음 — 주제를 바꿔서 재시도 필요")
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보 (전부 퍼블릭도메인 검증됨)")
+    clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
+    log(f"   AI actual-frame review passed: {len(clips)} relevant clips")
 
     target_seconds = None
     if channel_key == "silent_era":
@@ -568,6 +571,8 @@ def main():
     else:
         data = generate_script(topic, channel_key, clips, target_seconds=target_seconds)
         narration = data["narration"]
+        alignment = verify_narration_alignment(topic, clips, narration, gemini_generate_text)
+        log(f"   narration/footage alignment: {alignment['alignment_score']}/100 PASS")
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
         json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
     log(f"   나레이션 {len(narration.split())}단어")

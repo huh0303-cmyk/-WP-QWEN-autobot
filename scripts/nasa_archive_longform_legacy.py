@@ -33,6 +33,7 @@ from curio_longform import (  # noqa: E402
     gemini_generate_text, get_duration, run_ffmpeg, _strip_json_fence,
     log, GEMINI_API_KEY, ensure_thumbnail_font,
 )
+from knowledge_visual_alignment import inspect_and_filter_clips, verify_narration_alignment  # noqa: E402
 from classic_reads_longform import (  # noqa: E402
     build_narration_track, write_srt, mux_final, CAPTION_STYLE, _save_thumbnail_capped,
 )
@@ -386,10 +387,14 @@ def main():
         log("❌ 이 주제로 사용 가능한 NASA 클립을 하나도 못 찾음")
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보")
+    clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
+    log(f"   AI actual-frame review passed: {len(clips)} relevant clips")
 
     log("2/6 사실기반 대본 생성 중 (실제 확보한 클립 정보 근거)...")
     data = generate_script(topic, clips)
     narration = data["narration"]
+    alignment = verify_narration_alignment(topic, clips, narration, gemini_generate_text)
+    log(f"   narration/footage alignment: {alignment['alignment_score']}/100 PASS")
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
         json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
     log(f"   나레이션 {len(narration.split())}단어")
