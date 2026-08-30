@@ -1,18 +1,5 @@
 {
-  "date": "2026-08-30",
-  "fired": {
-    "blogger_kstudy365": {
-      "target_kst": "09:38",
-      "dispatched_at": "2026-08-30T10:44:59.576521+09:00"
-    },
-    "blogger_ktrip365": {
-      "target_kst": "11:49",
-      "dispatched_at": "2026-08-30T16:30:16.393465+09:00"
-    },
-    "blogger_kvisa365": {
-      "target_kst": "12:17",
-      "dispatched_at": "2026-08-30T22:19:56.372195+09:00"
-    }
-  },
-  "last_dispatch_at": "2026-08-30T22:19:56.372195+09:00"
+  "date": "2026-08-31",
+  "fired": {},
+  "last_dispatch_at": null
 }
