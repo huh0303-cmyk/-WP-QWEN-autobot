@@ -1,0 +1,47 @@
+name: "Priority restore — Olive Young + KSkin indexed private posts"
+
+on:
+  push:
+    branches:
+      - ops/restore-indexed-private-20260830
+    paths:
+      - .ops/restore-priority-olive-kskin.trigger
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  restore-priority:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests PyJWT cryptography -q
+      - name: "Olive Young + KSkin Private 전수검사 및 색인글 공개복구"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          WP_USER: ${{ secrets.WP_USER }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+        run: python scripts/restore_priority_olive_kskin.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: restore-priority-olive-kskin-${{ github.run_id }}
+          path: restore_priority_olive_kskin_result.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: "복구결과 저장"
+        if: always()
+        run: |
+          if [ -f restore_priority_olive_kskin_result.json ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add restore_priority_olive_kskin_result.json
+            git commit -m "chore: save priority Olive/KSkin restore receipt [skip ci]" || true
+            git push origin HEAD:ops/restore-indexed-private-20260830
+          fi
