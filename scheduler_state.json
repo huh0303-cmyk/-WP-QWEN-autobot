@@ -1,5 +1,7 @@
 {
   "date": "2026-08-31",
-  "fired": {},
-  "last_dispatch_at": null
+  "fired": {
+    "CAL-0001": true
+  },
+  "last_dispatch_at": "2026-08-31T08:39:31.133752+09:00"
 }
