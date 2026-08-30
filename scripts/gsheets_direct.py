@@ -246,7 +246,15 @@ def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, m
             spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!1:1",
         ).execute().get("values", [[]])
         row1_vals = row1[0] if row1 else []
-        existing_width = len(row1_vals)
+        # 1행의 날짜는 여러 지표 열에 병합되어 있어 Google Values API가
+        # 병합 블록의 첫 셀만 반환한다. 1행 길이만 사용하면 다음 날짜가 기존
+        # 지표 블록 안에 겹쳐 쓰이므로, 실제 지표가 채워진 2행 폭을 기준으로
+        # 다음 블록 시작 열을 결정한다.
+        row2 = service.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!2:2",
+        ).execute().get("values", [[]])
+        row2_vals = row2[0] if row2 else []
+        existing_width = max(len(row1_vals), len(row2_vals))
 
         # 마지막 날짜 블록 라벨이 이번 date_label과 같으면(워크플로가 같은 날
         # 여러 번 실행됨) 새 컬럼을 추가하지 않고 그 블록을 그대로 덮어쓴다.

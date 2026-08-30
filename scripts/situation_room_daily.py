@@ -209,6 +209,7 @@ def _blogger_slug(room):
     """Return the intended blogspot subdomain for all 27 Blogger rooms."""
     aliases = {
         "blogger_khealth365": "k-health365",
+        "blogger_ktrip365": "k-trip365",
         "blogger_kvisa365": "k-visa365",
         "blogger_kikorea": "ki-korea",
         "blogger_kieca": "kieca-korea",
