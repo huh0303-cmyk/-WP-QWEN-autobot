@@ -229,18 +229,14 @@ def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, m
         ).execute()
         start_col = 1  # B열(0-기준 인덱스 1)부터 시작
     else:
-        # 탭이 이 함수가 아니라 다른 경로(수동 생성 등)로 먼저 만들어졌으면
-        # A열에 도메인이 한 번도 안 써졌을 수 있다 — A3가 비어있으면 채운다.
-        a3 = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!A3",
-        ).execute().get("values", [[]])
-        if not (a3 and a3[0] and a3[0][0]):
-            service.spreadsheets().values().update(
-                spreadsheetId=spreadsheet_id,
-                range=f"'{tab_name}'!A3",
-                valueInputOption="RAW",
-                body={"values": [[d] for d in domains]},
-            ).execute()
+        # 주소 교정이나 사이트 목록 변경이 A열에도 즉시 반영되도록 매 실행마다
+        # 정규 목록을 다시 쓴다. 지표 데이터가 있는 B열 이후는 건드리지 않는다.
+        service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{tab_name}'!A3",
+            valueInputOption="RAW",
+            body={"values": [[d] for d in domains]},
+        ).execute()
 
         row1 = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id, range=f"'{tab_name}'!1:1",
