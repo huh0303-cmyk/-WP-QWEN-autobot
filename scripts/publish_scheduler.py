@@ -190,10 +190,16 @@ def main() -> None:
             print("⚠️ dispatch 실패 — 다음 스케줄러 실행에서 재시도")
             continue
 
-        mark_dispatched(service, item)
+        # Record the successful dispatch first.  The OAuth identity currently used by
+        # Actions may have read-only Sheets access; a calendar write failure must never
+        # turn a successful draft request into a duplicate dispatch on the next poll.
         fired[schedule_id] = True
         state["last_dispatch_at"] = now.isoformat()
         changed = True
+        try:
+            mark_dispatched(service, item)
+        except Exception as exc:
+            print(f"⚠️ draft dispatch succeeded; calendar status write deferred: {exc}")
         break
 
     _save_state(state, fired, changed)
