@@ -70,6 +70,30 @@ def _clip_words(value: str, maximum: int) -> str:
     return clipped or value[:maximum].rstrip()
 
 
+def _clip_sentence(value: str, maximum: int) -> str:
+    """Clip prose to fit within `maximum` characters, preferring a sentence
+    boundary over a word boundary.
+
+    A meta description that only word-clips can still cut off mid-thought
+    (e.g. "...Find the best route" when the sentence continued "...for your
+    trip."), which reads as broken even though no word was split. A shorter
+    but complete sentence reads far better than a longer but truncated one,
+    so any in-budget sentence end wins over the word-boundary fallback,
+    which only fires when the source has no sentence-ending punctuation at
+    all within the limit.
+    """
+    value = re.sub(r"\s+", " ", value).strip()
+    if len(value) <= maximum:
+        return value
+    window = value[: maximum + 1]
+    boundary = max(window.rfind(". "), window.rfind("! "), window.rfind("? "))
+    if boundary == -1 and window[:-1].endswith((".", "!", "?")):
+        boundary = len(window) - 2
+    if boundary != -1:
+        return window[: boundary + 1].strip()
+    return _clip_words(value, maximum)
+
+
 def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, source_url: str = "", ymyl: bool = False) -> dict[str, Any]:
     """Fit Gemini output to Blogger's hard format limits before scoring.
 
@@ -78,7 +102,7 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
     """
     normalized = dict(article)
     normalized["title"] = _clip_words(str(article.get("title", "")), 70)
-    normalized["meta_description"] = _clip_words(str(article.get("meta_description", "")), 120)
+    normalized["meta_description"] = _clip_sentence(str(article.get("meta_description", "")), 120)
 
     content = str(article.get("content_html", ""))
     maximum = int(target_chars * 1.35)
