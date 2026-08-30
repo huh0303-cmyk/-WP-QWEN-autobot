@@ -1,0 +1,32 @@
+name: "Olive Young — verify GSC service account + restore Google-evidenced private posts"
+on:
+  push:
+    branches:
+      - ops/restore-indexed-private-20260830
+    paths:
+      - .ops/verify-and-restore-oliveyoung.trigger
+permissions:
+  contents: read
+jobs:
+  verify-restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests PyJWT cryptography -q
+      - name: "서비스계정 GSC 인증 + 과거/현재 Google 근거 글 공개복구"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          WP_USER: ${{ secrets.WP_USER }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+        run: python scripts/verify_and_restore_oliveyoung.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verify-and-restore-oliveyoung-${{ github.run_id }}
+          path: verify_and_restore_oliveyoung_result.json
+          if-no-files-found: warn
+          retention-days: 30
