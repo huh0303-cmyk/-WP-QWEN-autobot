@@ -126,7 +126,16 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
             if len(re.sub(r"\s+", "", plain_text(candidate))) + required_chars > maximum:
                 break
             kept.append(block)
-        while kept and re.match(r"(?is)^<h[23]", kept[-1]):
+        def _dangles(block: str) -> bool:
+            # A heading with nothing kept after it, or a paragraph that ends
+            # with a colon, both promise content (a list, an explanation)
+            # that trimming just cut away - keeping either leaves the
+            # article reading as cut off mid-thought rather than shorter.
+            if re.match(r"(?is)^<h[23]", block):
+                return True
+            return plain_text(block).rstrip().endswith(":")
+
+        while kept and _dangles(kept[-1]):
             kept.pop()
         final_blocks = kept + [block for block in required if block not in kept]
         if needs_attribution:
