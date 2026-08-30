@@ -15,7 +15,7 @@ def original_prompt(*, keyword: str, site_theme: str, language: str, persona: st
                     tone: str, target_chars: int, prior_feedback: str = "") -> str:
     return f"""Write a new standalone article for the keyword below. This is original work, not a rewrite of any existing article.
 Site theme: {site_theme}. Primary keyword/topic: {keyword}.
-The title is the highest-priority text: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. Never use AI-sounding stock phrases, a repeated title formula, or a title similar to another article.
+The title is the highest-priority text: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. Never use AI-sounding stock phrases, a repeated title formula, or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
 The article must feel individually edited for this site's persona, not mass-produced. Avoid AI-signaling phrases, generic filler, keyword stuffing, repetitive templates, fake freshness, exaggerated claims, and unnecessary FAQs.
