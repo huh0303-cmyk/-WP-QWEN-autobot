@@ -173,13 +173,13 @@
         "content_type": "blog"
       },
       "blogspot": {
-        "url": "https://koreamedicaltour.blogspot.com",
-        "status": "CONFLICT",
+        "url": "https://koreamedicaltour365.blogspot.com",
+        "status": "SCHEDULED",
         "destination_id": "",
         "ready_for_automation": false,
-        "description": "",
-        "search_description": "",
-        "notes": "Exact Blogspot address was unavailable on 2026-08-29. The separate koreamedicaltour365.blogspot.com asset is not the official 1:1 target and must not be substituted. Excluded from the 2026-08-30 SEO setup pass pending resolution."
+        "description": "Cautious, practical guidance on medical tourism in Korea - choosing a clinic, planning a visit, and understanding costs, written in plain, non-diagnostic language.",
+        "search_description": "Korea medical tourism: choosing a clinic, planning a visit, and understanding costs, explained clearly.",
+        "notes": ""
       }
     },
     {
