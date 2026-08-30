@@ -1,50 +1,50 @@
-Korea foreign worker flat tax 2026 increase	Tax Filing
-Korea expatriate tax rate changes	Tax Filing
-Korean tax residency 183-day rule 2026	Tax Filing
-Korea corporate tax rate increase 2026	Tax Filing
-Global Minimum Tax Korea 2026 compliance	Tax Filing
-Reduced withholding tax Korea personal services 2027	Tax Filing
-Korea entertainment expense threshold 2026	Tax Filing
+Foreign worker flat tax rate 2027 increase	Tax Filing
+Korea expat flat tax eligibility extension	Tax Filing
+CFC effective tax rate threshold Korea	Tax Filing
+Share buyback tax treatment Korea 2027	Tax Filing
+International transaction fines Korea 2027	Tax Filing
+Korea new tax incentives 2026	Tax Filing
+VAT cross-border services Korea rules	Tax Filing
+Tax residency criteria changes Korea	Tax Filing
+Overseas trust reporting deadline Korea	Tax Filing
 Korea exit tax overseas stocks 2027	Tax Filing
-Overseas trust reporting Korea 2026 deadline	Tax Filing
-Korea VAT registration foreign businesses 2026	Tax Filing
-Korea VAT refund eligibility non-residents 2026	Tax Filing
-Korea simplified VAT taxpayer threshold 2026	Tax Filing
-Korea tax invoice supply date rule	Tax Filing
-Foreign income exemption Korea 5 years	Tax Filing
-Korea year-end tax settlement foreigners	Tax Filing
-Progressive income tax Korea vs flat	Tax Filing
-Dividend withholding tax Korea 2026 rules	Tax Filing
-Foreign investment dividend tax Korea	Tax Filing
-Korea tax treaty reduced withholding application	Tax Filing
-Korean tax changes foreign companies	Tax Filing
-Korea business registration deadline 2026	Business Setup
-Foreign-owned Korean subsidiary compliance 2026	Business Setup
-FDI notification Korea 2026 requirements	Business Setup
-Korea company formation capital requirements	Business Setup
-Source of funds audit D-8 visa	Business Setup
-FIPA amendment Korea 2026 impact	Business Setup
-Indirect foreign investment Korea screening	Business Setup
+Corporate income tax rate increases 2026	Tax Filing
+Withholding agent treaty documentation Korea	Tax Filing
+Year-end tax settlement foreigners guide	Tax Filing
+Korea progressive income tax brackets 2026	Tax Filing
+Reduced personal service income tax Korea	Tax Filing
+Late tax return penalty reduction Korea	Tax Filing
+QDMTT foreign tax credit Korea	Tax Filing
+Digital nomad tax implications Korea	Tax Filing
+Foreign property capital gains Korea	Tax Filing
+Korea tax audit foreign businesses	Tax Filing
+Foreign company incorporation Korea 2026	Business Setup
+Branch office abolition Korea impact	Business Setup
+Place of effective management Korea	Business Setup
+FDI capital requirements D-8 visa	Business Setup
+E-commerce consumer protection act Korea	Business Setup
+Foreign e-commerce local representative Korea	Business Setup
+Online seller identity verification Korea	Business Setup
+Communication sales business registration Korea	Business Setup
+Commercial act amendment Korea 2026	Business Setup
+Treasury share cancellation rules Korea	Business Setup
+Independent director requirements Korea 2026	Business Setup
+Expanded producer responsibility Korea	Business Setup
 Startup eligibility rules Korea 2026	Business Setup
-High-potential startup definition Korea	Business Setup
-Global Startup Business Program Korea 2026	Business Setup
-Korea 52-hour workweek compliance 2026	Business Setup
-KRW 10,320 minimum wage Korea 2026	Business Setup
-Korean labor standards act foreign employees	Business Setup
-Mandatory written employment contract Korea	Business Setup
-Four Major Insurances Korea registration	Business Setup
-Corporate bank account setup Korea foreigners	Business Setup
-E-commerce business registration Korea 2026	Business Setup
-Intellectual property rights foreign startups Korea	Business Setup
-Foreign investment promotion incentives Korea 2026	Business Setup
-Company purpose statement Korea importance	Business Setup
-Korea digital nomad visa permanent 2026	Visa
-F-1-D visa income threshold 2026	Visa
-South Korea workation visa eligibility	Visa
-Digital nomad visa Korea medical insurance	Visa
-D-8-1 corporate investment visa 2026	Visa
-D-8-4 technology startup visa requirements	Visa
-Startup Korea Special Visa D-8-4S	Visa
-OASIS program D-8-4 pathway Korea	Visa
-D-10-2 startup preparation visa benefits	Visa
-E-7 professional visa Korea 2026	Visa
+Jusik Hoesa vs Yuhan Hoesa choice	Business Setup
+Foreign direct investment notification steps	Business Setup
+Corporate bank account opening foreigners	Business Setup
+IP strategy for Korean startups	Business Setup
+Korea data protection compliance 2026	Business Setup
+Foreign ownership restrictions Korea	Business Setup
+Regional investment incentives Korea	Business Setup
+F-2 visa long-term residency relaxed	Visa
+E-7 visa quota expansion Korea	Visa
+E-9 visa quota cut 2026	Visa
+D-10 student visa job seeking	Visa
+Korea digital nomad visa options	Visa
+Family visa improvements South Korea	Visa
+K-ETA exemption extension 2026	Visa
+E-Arrival card mandatory Korea 2026	Visa
+Top-Tier visa expansion science tech	Visa
+Employment visa subcategory consolidation Korea	Visa

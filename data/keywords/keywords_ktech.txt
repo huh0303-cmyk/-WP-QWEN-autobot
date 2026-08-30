@@ -1,50 +1,50 @@
-Korea free national AI chatbot	AI
-SK Telecom AI for All rollout	AI
-Kakao AI business restructuring	AI
-Korean government AI talent training	AI
-SK Horizon AI data center expansion	AI
-South Korea AI Compute Strategy	AI
-AI chip design investment Korea	AI
-Generative AI adoption trends Korea	AI
-Korea AI ethics policy framework	AI
-High-density AI data center cooling	AI
-KAIST AI college curriculum	AI
-Public AI agent government services	AI
-GovTech AI bootcamp application	AI
-Korea AI infrastructure plan 2035	AI
-Samsung SDS AI data center projects	AI
-Korean sovereign AI model development	AI
-AI in public administration benefits	AI
-SK Hyper AI data center targets	AI
-Ministry of Science AI data sharing	AI
-KakaoTalk AI agent integration	AI
-Samsung Foundry 2nm process refinement	Semiconductors
-SK Hynix HBM NVIDIA partnership	Semiconductors
-Korea semiconductor R&D tax incentives	Semiconductors
-Samsung 1.4nm node timeline 2029	Semiconductors
-High-NA EUV lithography Samsung plans	Semiconductors
-Korean government AI chip initiative	Semiconductors
-Regional advanced chip manufacturing support	Semiconductors
-South Korea quantum chip goal 2035	Semiconductors
-Future Response Fund chip revenue	Semiconductors
-Samsung Foundry technology roadmap update	Semiconductors
-Korea quantum industry masterplan	Semiconductors
-SDT Inc quantum-AI hybrid data center	Semiconductors
-Korea strategic tech investment 2026	Semiconductors
-Quantum computing workforce development Korea	Semiconductors
-Advanced semiconductor packaging innovation	Semiconductors
-Korean chip industry policy support	Semiconductors
-Samsung Tesla AI processor supply	Semiconductors
-KISTI supercomputer quantum integration	Semiconductors
-Korea quantum cluster designation	Semiconductors
-Korean memory chip production increase	Semiconductors
-Korea venture investment record 2026	Startups
-AI startup funding South Korea 2026	Startups
-Robotics startup investment increase Korea	Startups
-Ministry of SMEs startup support	Startups
-Non-capital region startup funding Korea	Startups
-KOSDAQ IPO exit challenges	Startups
-Korean AI biotech startup funding	Startups
-Early-stage startup investment growth	Startups
-Startup employment generation Korea	Startups
-Kakao spin-off for AI startups	Startups
+South Korea free AI chatbot program	AI
+SK Telecom AI for All beta	AI
+KT national AI service launch	AI
+Kakao AI chatbot public access	AI
+Nvidia B200 GPU Korea deployment	AI
+Korean AI data center investment 2026	AI
+SK Horizon AI data center funding	AI
+South Korea AI budget increase 2026	AI
+Korean AI ethics principles impact	AI
+AI Basic Act compliance guide Korea	AI
+Generative AI content labeling Korea	AI
+High-impact AI system rules Korea	AI
+South Korea sovereign AI models	AI
+Samsung Galaxy AI features expansion	AI
+Samsung AI-driven factories plan	AI
+AI integration public services Korea	AI
+Korea AI R&D investment strategy	AI
+Ministry Science ICT AI goals	AI
+AI for Biotechnology research grants	AI
+Korea AI chip development support	AI
+SK Hynix HBM4 production timeline	Semiconductors
+SK Hynix Indiana fab construction	Semiconductors
+HBM memory supercycle market forecast	Semiconductors
+Korean DRAM export prices soaring	Semiconductors
+Nvidia HBM demand impact Korea	Semiconductors
+Samsung semiconductor investment outlook	Semiconductors
+Korean semiconductor talent shortage	Semiconductors
+Rebellions AI chip funding round	Semiconductors
+FuriosaAI semiconductor innovation plans	Semiconductors
+South Korea HBM advanced packaging	Semiconductors
+Semiconductor industry growth Korea 2026	Semiconductors
+Global memory chip supply constraints	Semiconductors
+Korea chip industry policy support	Semiconductors
+Samsung HBM market competition	Semiconductors
+SK Hynix record quarterly earnings	Semiconductors
+Korean semiconductor export boom August	Semiconductors
+Micro-fabrication limits HBM production	Semiconductors
+Korean advanced packaging facility investments	Semiconductors
+HBM3E HBM4 market transition	Semiconductors
+DRAM NAND price increase 2026	Semiconductors
+Wrtn Technologies Series C details	Startups
+Korean AI startup global expansion	Startups
+South Korea venture investment H1 2026	Startups
+Trending Korean startup sectors 2026	Startups
+Forbes Asia 100 to Watch Korea	Startups
+Regional startup growth fund benefits	Startups
+Jeonbuk regional fund investment	Startups
+Chungbuk startup park development	Startups
+F4GE manufacturing infrastructure funding	Startups
+Anabatic Semiconductor Series B	Startups

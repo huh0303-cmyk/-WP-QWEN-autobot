@@ -1,50 +1,50 @@
-Seoul foreign home purchase rules	Apartments
-Gyeonggi foreign buyer approval	Apartments
-Incheon foreign property restrictions	Apartments
-Foreigner residency requirement Seoul	Apartments
-Korea foreign home funding disclosure	Apartments
-Jeonse fraud foreign victims aid	Apartments
-Gyeonggi jeonse fraud support	Apartments
-KB jeonse safety check service	Apartments
-Dabang jeonse risk assessment	Apartments
-Jeonse deposit return insurance update	Apartments
-Korea monthly rent tax credit 2026	Apartments
-Foreigner monthly rent assistance eligibility	Apartments
-Korean rental housing maintenance fees	Apartments
-Seoul officetel jeonse prices August	Apartments
-Mid-size officetel jeonse demand	Apartments
-Public rental housing young foreigners	Apartments
-Safe rental trust Korea foreigners	Apartments
-Foreigner housing benefit 2026 income	Apartments
-Seoul apartment rent supply index	Apartments
-Korean rental market changes foreigners	Apartments
-Korea commercial property foreign investment	Commercial
-Seoul commercial real estate trends	Commercial
-Foreign capital logistics sector Korea	Commercial
-Seoul hotel investment foreign buyers	Commercial
-Korea office market foreign investors	Commercial
-Illegal lodging Seoul foreigners	Commercial
-Commercial property rental loopholes	Commercial
-Foreign worker flat tax rate 2026	Commercial
-Rental housing portfolio KKR Korea	Commercial
-Foreign real estate tax burden Korea	Commercial
-Korea co-living investment opportunities	Commercial
-Seoul preferred investment city 2026	Commercial
-Commercial property transaction volume Korea	Commercial
-Business rental market Korea foreigners	Commercial
-Foreign company property acquisition Korea	Commercial
-Korea land transaction permit zones business	Commercial
-Commercial rental market outlook Seoul	Commercial
-Foreigner housing loan Korea 2026	Loans
-Youth Future Bogeumjari Loan	Loans
-First-time buyer policy loans Korea	Loans
-Non-apartment home loan eligibility	Loans
-Foreigner mortgage deposit requirements	Loans
-Korean bank foreigner mortgage rates	Loans
-Household loan growth cap Korea	Loans
-Housing mortgage loan decline Korea	Loans
-Youth Jeonse Loan Guarantee expansion	Loans
-Combined jeonse monthly rent guarantee	Loans
-Low-interest jeonse loans foreigners	Loans
-Foreigner home loan documentation Korea	Loans
-Overseas financing Korea property rules	Loans
+Seoul foreign buyer permit extension	Apartments
+Korea property mandatory residency rules	Apartments
+Foreigner home purchase disclosure 2026	Apartments
+Seoul monthly rent burden 2026	Apartments
+Gyeonggi Jeonse fraud foreigner support	Apartments
+Monthly rent tax credit Korea 2026	Apartments
+Foreign resident housing benefit eligibility	Apartments
+Short term apartment rentals Seoul	Apartments
+Korea Jeonse deposit protection steps	Apartments
+Foreigner move-in reporting requirements	Apartments
+Seoul apartment rental contract guide	Apartments
+Wolse versus Jeonse for foreigners	Apartments
+Alien Registration Card rental process	Apartments
+Furnished apartment options Seoul	Apartments
+Jeonse market shift to wolse	Apartments
+Korea rental deposit scam prevention	Apartments
+Foreigner landlord verification steps	Apartments
+Seoul designated permit zones foreign	Apartments
+Korea property tax non-resident owner	Apartments
+Residential visa apartment rental Korea	Apartments
+Jeonse loan ban non-resident owners	Loans
+Korea Jeonse loan guarantee reduction	Loans
+Foreigner DSR loan limits 2026	Loans
+Household loan cap increase Korea	Loans
+Commercial bank mortgages foreigners	Loans
+Government backed mortgage foreign	Loans
+Korea mortgage down payment foreigner	Loans
+Foreign resident mortgage interest rates	Loans
+KB Kookmin Bank foreigner mortgage	Loans
+Shinhan Bank foreign mortgage options	Loans
+Hana Bank foreign resident loans	Loans
+Woori Bank foreigner home loans	Loans
+Jeonse loan eligibility foreign residents	Loans
+Beotimok loan foreigner restrictions	Loans
+Jeonse deposit return guarantee HUG	Loans
+Foreigner home loan LTV caps	Loans
+Mortgage requirements F-5 visa	Loans
+Korea Housing Finance Corporation foreign	Loans
+Policy loans young homebuyers Korea	Loans
+Korea commercial real estate trends 2026	Commercial
+Seoul data center investment foreigner	Commercial
+Korea logistics real estate foreign	Commercial
+Seoul hotel investment opportunities	Commercial
+Foreign capital commercial property Korea	Commercial
+Real estate tokenization Korea 2027	Commercial
+PropTech adoption commercial Seoul	Commercial
+Commercial property transaction volume Seoul	Commercial
+Foreign investor reporting requirements Korea	Commercial
+Seoul prime office asset trends	Commercial
+Alternative living sector investment Korea	Commercial
