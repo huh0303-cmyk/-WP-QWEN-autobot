@@ -735,7 +735,13 @@ def main():
         d_clicks = diff(d["clicks"], y.get("clicks"))
         d_posts = diff(d.get("total_posts"), y.get("total_posts"))
         d_indexed = diff(d["indexed"], y.get("indexed"))
-        d_visitors = diff(d.get("visitor_count"), y.get("visitor_count"))
+        # 방문자 증감은 저장된 이전 실행값이 아니라 각 사이트 카운터가 제공하는
+        # 완결된 두 날짜(어제-그제)를 직접 사용한다. 실행 누락/지연이 있어도
+        # 비교 기준이 흔들리지 않는다.
+        vm = d.get("visitor_metrics") or {}
+        d_visitors = vm.get("daily_delta")
+        if d_visitors is None:
+            d_visitors = diff(d.get("visitor_count"), y.get("visitor_count"))
         comment = _site_comment(d["status"], d["clicks"], d_clicks, d["indexed"], d.get("total_posts"))
         clicks_str = d["clicks"] if d["clicks"] is not None else "-"
         posts_str = d.get("total_posts") if d.get("total_posts") is not None else "-"
@@ -868,7 +874,7 @@ def main():
         sns_diffs, dashboard_totals, checked_at,
     )
 
-    send_email(f"[종합상황실] {checked_at[:10]} 현황 리포트",
+    send_email(f"[종합상황실] {checked_at[:10]} 어제 방문자·증감 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
                "\n\n[오늘의 원포인트레슨]\n" + one_point_lesson +
                (f"\n\n시트: {sheet_link}" if sheet_link else ""))
