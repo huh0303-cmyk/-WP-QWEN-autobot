@@ -30,7 +30,7 @@
         "indexed": 0,
         "total_posts": 3,
         "status": "정상",
-        "visitor_count": 25
+        "visitor_count": 29
       },
       "koreainsurance365.com": {
         "clicks": 0,
@@ -58,7 +58,7 @@
         "indexed": 0,
         "total_posts": 48,
         "status": "정상",
-        "visitor_count": 191
+        "visitor_count": 192
       },
       "krealestate365.com": {
         "clicks": 0,
@@ -72,7 +72,7 @@
         "indexed": 0,
         "total_posts": 12,
         "status": "정상",
-        "visitor_count": 84
+        "visitor_count": 85
       },
       "kskin365.com": {
         "clicks": 0,
@@ -93,7 +93,7 @@
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 103
+        "visitor_count": 104
       },
       "k-trip365.com": {
         "clicks": 0,
@@ -149,14 +149,14 @@
         "indexed": 0,
         "total_posts": 58,
         "status": "정상",
-        "visitor_count": 255
+        "visitor_count": 259
       },
       "jobkorea365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 37,
         "status": "정상",
-        "visitor_count": 234
+        "visitor_count": 235
       },
       "jobinkorea365.com": {
         "clicks": 0,
@@ -177,7 +177,7 @@
         "indexed": 0,
         "total_posts": 88,
         "status": "정상",
-        "visitor_count": 91
+        "visitor_count": 95
       },
       "koreanews365.com": {
         "clicks": 0,
@@ -260,8 +260,8 @@
         "indexed": null,
         "status": "공개피드 HTTP 404 | GSC 속성 연결 필요"
       },
-      "ktrip365.blogspot.com": {
-        "public_posts": 1,
+      "k-trip365.blogspot.com": {
+        "public_posts": 0,
         "indexed": null,
         "status": "GSC 속성 연결 필요"
       },
@@ -466,5 +466,5 @@
       }
     }
   },
-  "updated_at": "2026-08-30 14:15:14"
+  "updated_at": "2026-08-30 14:20:17"
 }
