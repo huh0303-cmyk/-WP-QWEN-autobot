@@ -15,7 +15,10 @@ def gemini_generate_text(prompt: str, *, temperature: float = 0.7) -> str:
         params={"key": api_key},
         json={
             "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": temperature, "responseMimeType": "application/json"},
+            # No explicit maxOutputTokens previously meant relying on the
+            # model's implicit default, which real test runs showed cutting
+            # articles off mid-sentence well before their target length.
+            "generationConfig": {"temperature": temperature, "responseMimeType": "application/json", "maxOutputTokens": 8192},
         },
         timeout=120,
     )
