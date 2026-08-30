@@ -4,10 +4,11 @@ Evidence rule: page URL had impressions or clicks in Search Analytics through 20
 """
 import json, os, sys
 from datetime import datetime, timezone
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit
 import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from restore_indexed_private_posts import fetch_private_posts, publish, get_gsc_token, gsc_post
+from restore_indexed_private_posts import fetch_private_posts, publish
+from daily_site_traffic import get_gsc_token, gsc_post
 
 SITE='https://kskin365.com'; PROP='sc-domain:kskin365.com'; SECRET='KSKIN365COM'; OUT='restore_kskin_historical_search_visible_result.json'
 
