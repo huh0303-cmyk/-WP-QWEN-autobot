@@ -26,6 +26,14 @@ def _load_source(path: str) -> dict[str, Any]:
         return raw if isinstance(raw, dict) else {"raw": raw}
     except Exception:
         source: dict[str, Any] = {"raw_log": text[-12000:]}
+        wp_draft = re.search(r"초안 생성:\s*(https?://\S*?[?&]p=(\d+))", text)
+        if wp_draft:
+            source["post_id"] = wp_draft.group(2)
+            source["url"] = wp_draft.group(1).rstrip(".,)")
+            source["status"] = "draft"
+            title_matches = re.findall(r"🖊\s+\[[^]]+\]\s+(.+?)\s+\|", text)
+            if title_matches:
+                source["title"] = title_matches[-1].strip()
         patterns = [
             (r"studio\.youtube\.com/video/([A-Za-z0-9_-]{6,})/edit", "video_id", "https://studio.youtube.com/video/{}/edit"),
             (r"youtube\.com/watch\?v=([A-Za-z0-9_-]{6,})", "video_id", "https://youtube.com/watch?v={}"),
