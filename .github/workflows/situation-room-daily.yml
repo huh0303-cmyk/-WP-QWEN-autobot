@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   report:
+    environment: google-metrics
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -29,6 +30,9 @@ jobs:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           TIKTOK_USERNAME: ${{ secrets.TIKTOK_USERNAME }}

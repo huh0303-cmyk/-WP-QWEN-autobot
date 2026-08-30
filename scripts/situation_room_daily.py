@@ -87,6 +87,53 @@ GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 KAKAO_REST_API_KEY = os.environ.get("KAKAO_REST_API_KEY", "")
 KAKAO_REFRESH_TOKEN = os.environ.get("KAKAO_REFRESH_TOKEN", "")
 
+
+def collect_adsense_khealth_revenue():
+    """Read K-health365 AdSense estimates in KRW through the read-only API."""
+    client_id = os.environ.get("GOOGLE_METRICS_CLIENT_ID", "")
+    client_secret = os.environ.get("GOOGLE_METRICS_CLIENT_SECRET", "")
+    refresh_token = os.environ.get("GOOGLE_METRICS_REFRESH_TOKEN", "")
+    empty = {"today": None, "month": None, "cumulative": None, "currency": "KRW"}
+    if not all((client_id, client_secret, refresh_token)):
+        return {**empty, "status": "AdSense 읽기 인증 연결 필요"}
+    try:
+        token_response = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={"client_id": client_id, "client_secret": client_secret,
+                  "refresh_token": refresh_token, "grant_type": "refresh_token"}, timeout=20,
+        )
+        token_response.raise_for_status()
+        headers = {"Authorization": f"Bearer {token_response.json()['access_token']}"}
+        accounts_response = requests.get(
+            "https://adsense.googleapis.com/v2/accounts", headers=headers, timeout=20,
+        )
+        accounts_response.raise_for_status()
+        accounts = accounts_response.json().get("accounts", [])
+        if not accounts:
+            return {**empty, "status": "AdSense 계정 없음"}
+        account = accounts[0]["name"]
+
+        def report(date_range):
+            response = requests.get(
+                f"https://adsense.googleapis.com/v2/{account}/reports:generate",
+                headers=headers,
+                params=[("metrics", "ESTIMATED_EARNINGS"), ("dateRange", date_range),
+                        ("filters", "DOMAIN_NAME==k-health365.com"), ("currencyCode", "KRW")],
+                timeout=30,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            cells = (payload.get("totals") or {}).get("cells", [])
+            return round(float(cells[0].get("value", 0)), 2) if cells else 0.0
+
+        return {
+            "today": report("TODAY"), "month": report("MONTH_TO_DATE"),
+            "cumulative": report("YEAR_TO_DATE"), "currency": "KRW",
+            "status": "수익화 승인 · AdSense 정상",
+        }
+    except Exception as exc:
+        return {**empty, "status": f"AdSense 수익 수집 실패: {str(exc)[:120]}"}
+
 def load_reporting_channels():
     """Combine the canonical scheduler registry with explicit strategic-only channels."""
     channels = [(c.display_name, c.channel_id) for c in load_channels() if c.enabled]
@@ -548,14 +595,14 @@ def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
             v = yt_stats.get(label, {})
             d = yt_diffs.get(label, {})
             values_by_channel[label] = [
-                v.get("subs"), _fmt_diff_cell(d.get("subs")),
-                v.get("views"), _fmt_diff_cell(d.get("views")),
+                _fmt_value_delta(v.get("subs"), d.get("subs")),
+                _fmt_value_delta(v.get("views"), d.get("views")),
             ]
         # 채널이 10개가 넘고 이름도 길어서, 27개사이트_트래픽처럼 채널명을
         # A열에 세로로 고정하고 날짜를 오른쪽으로 늘려가는 방식이 더 적합.
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "유튜브채널현황", channel_names, date_label,
-            ["구독자수", "증가", "조회수", "증가"], values_by_channel,
+            ["구독자(전일대비)", "누적조회(전일대비)"], values_by_channel,
         )
         log("📊 구글시트 직접 쓰기 완료 — 탭: 유튜브채널현황")
     except Exception as e:
@@ -632,10 +679,13 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
             for brand in BRANDS:
                 key = f"{platform_label} · {BRAND_LABELS_KR[brand]}"
                 info = social_stats[platform_key][brand]
-                sns_values[key] = [info.get("count"), _fmt_diff_cell(sns_diffs[platform_key].get(brand)), info.get("error", "")]
+                sns_values[key] = [
+                    _fmt_value_delta(info.get("count"), sns_diffs[platform_key].get(brand)),
+                    info.get("error", ""),
+                ]
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "아침_SNS상세", list(sns_values), date_label,
-            ["팔로워", "전일대비", "상태"], sns_values,
+            ["팔로워(전일대비)", "상태"], sns_values,
         )
         log("📊 아침 통합 대시보드 4개 탭 갱신 완료")
     except Exception as exc:
@@ -708,6 +758,38 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
     ]
     gsheets_direct.replace_tab_rows(SHEET_ID, "종합_62개현황", header, rows)
     log("📊 종합_62개현황 갱신 완료 — WP27 + Blogspot27 + Tistory5 + Naver3")
+
+
+def send_monetization_dashboard(adsense, topik_stats, topik_diff, khealth_metrics, checked_at):
+    """Write the two currently monetized assets with audience and revenue KPIs."""
+    import gsheets_direct
+    if not SHEET_ID or not gsheets_direct.has_credentials():
+        return
+    vm = khealth_metrics or {}
+    currency = adsense.get("currency", "KRW")
+
+    def money(value):
+        if value is None:
+            return ""
+        return f"{value:,.0f} {currency}"
+
+    rows = [
+        ["M1", "WEB", "K-health365", "k-health365.com", "AdSense 승인",
+         _fmt_value_delta(vm.get("today"), vm.get("daily_delta")), "",
+         money(adsense.get("today")), money(adsense.get("month")),
+         money(adsense.get("cumulative")), adsense.get("status", ""), checked_at],
+        ["M2", "YOUTUBE", "한국어(TOPIK)", "https://www.youtube.com/@seoultopik", "수익화 승인",
+         _fmt_value_delta(topik_stats.get("views"), topik_diff.get("views")),
+         _fmt_value_delta(topik_stats.get("subs"), topik_diff.get("subs")),
+         "", "", "", "YouTube 수익 OAuth 연결 필요", checked_at],
+    ]
+    header = [
+        "번호", "플랫폼", "수익화 자산", "주소", "승인상태", "조회·방문(증감)",
+        "구독자·회원(증감)", "오늘 추정수익", "이번달 추정수익",
+        "올해 누적 추정수익", "수집상태", "기준시각(KST)",
+    ]
+    gsheets_direct.replace_tab_rows(SHEET_ID, "수익화_현황", header, rows)
+    log("💰 수익화_현황 갱신 완료 — K-health365 + YouTube TOPIK")
 
 
 def send_email(subject, body):
@@ -783,6 +865,9 @@ def main():
     for label, v in yt_stats.items():
         log(f"   {label}: 구독자 {v['subs']} / 조회수 {v['views']}")
 
+    adsense_metrics = collect_adsense_khealth_revenue()
+    log(f"   AdSense K-health365: {adsense_metrics.get('status')}")
+
     log("3/4 틱톡/페이스북/인스타그램/Threads 3개 브랜드씩 수집 중...")
     tiktok_m = get_tiktok_followers_multi()
     facebook_m = get_facebook_followers_multi()
@@ -808,6 +893,7 @@ def main():
             for d in blogger_details
         },
         "youtube": yt_stats,
+        "adsense_khealth365": adsense_metrics,
         "tiktok": tiktok_m, "facebook": facebook_m,
         "instagram": instagram_m, "threads": threads_m,
     }
@@ -887,6 +973,16 @@ def main():
         "threads": _sns_diffs("threads", threads_m),
     }
 
+    topik_stats = today["youtube"].get("한국어(TOPIK)", {})
+    topik_diff = yt_diffs.get("한국어(TOPIK)", {})
+    khealth_item = next(
+        (item for item in site_details_list if item["domain"] == "k-health365.com"), {}
+    )
+    khealth_vm = khealth_item.get("visitor_metrics") or {}
+
+    def fmt_money(value):
+        return "-" if value is None else f"{value:,.0f} KRW"
+
     yt_channel_id = dict(YOUTUBE_CHANNELS)
 
     site_count = len(SITES)
@@ -925,6 +1021,17 @@ def main():
         f"  WP 누적방문 합계 {total_cumulative_visitors}{fmt_diff(total_cumulative_delta)}명",
         f"  유튜브 {youtube_count}채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
         f"  SNS 연결계정 {sns_connected}/{sns_account_count}개",
+        "",
+        "💰 수익화 핵심 2개",
+        f"  K-health365 | 오늘 {fmt_money(adsense_metrics.get('today'))} | "
+        f"이번달 {fmt_money(adsense_metrics.get('month'))} | "
+        f"올해 누적 {fmt_money(adsense_metrics.get('cumulative'))} | "
+        f"방문 {_fmt_value_delta(khealth_vm.get('today'), khealth_vm.get('daily_delta')) or '-'} | "
+        f"{adsense_metrics.get('status', '')}",
+        f"  YouTube TOPIK | 구독자 "
+        f"{_fmt_value_delta(topik_stats.get('subs'), topik_diff.get('subs')) or '-'} | "
+        f"누적조회 {_fmt_value_delta(topik_stats.get('views'), topik_diff.get('views')) or '-'} | "
+        "YouTube 수익 OAuth 연결 필요",
         "",
         f"■ 사이트 {site_count}개 — 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} / "
         f"Google 검색 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
@@ -1083,6 +1190,9 @@ def main():
         sns_diffs, dashboard_totals, checked_at,
     )
     send_master_62_dashboard(site_details_list, blogger_details, checked_at)
+    send_monetization_dashboard(
+        adsense_metrics, topik_stats, topik_diff, khealth_vm, checked_at
+    )
 
     send_email(f"[종합상황실] {checked_at[:10]} 오늘 방문자·증감 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
