@@ -75,6 +75,10 @@ Hard rules:
 - MBB uses elegant instruments and theme-led classical photography; thumbnail text is omitted or kept
   extremely short and must never overlap
 - K-pop uses high-end realistic Korean pop editorial photography
+- every playlist channel runs once after a random 2-3 day interval, never a fixed two-day cadence
+- the next KST execution time uses an irregular random minute inside the allowed window; round
+  five-minute marks and the channel's previous HH:MM are excluded so repeated machine-like timestamps
+  are forbidden
 
 ## 3. Change control
 

@@ -37,8 +37,30 @@ def next_run(channel: dict[str, str], now: dt.datetime) -> dt.datetime:
     high = int(channel["interval_days_max"])
     rng = random.Random(f"{channel['channel_key']}:{now.date().isoformat()}:youtube-control")
     day = now.date() + dt.timedelta(days=rng.randint(low, high))
-    hour = rng.randint(int(channel["allowed_hour_start"]), int(channel["allowed_hour_end"]))
-    minute = rng.choice([7, 17, 27, 37, 47, 57])
+    hour_start = int(channel["allowed_hour_start"])
+    hour_end = int(channel["allowed_hour_end"])
+    previous_minute = None
+    raw_previous = channel.get("next_run_at", "").strip()
+    if raw_previous:
+        try:
+            previous = dt.datetime.fromisoformat(raw_previous.replace("Z", "+00:00"))
+            if previous.tzinfo is None:
+                previous = previous.replace(tzinfo=KST)
+            previous = previous.astimezone(KST)
+            previous_minute = previous.hour * 60 + previous.minute
+        except ValueError:
+            previous_minute = None
+
+    # Every minute is intentionally irregular. Exclude round 5-minute marks and
+    # the previous HH:MM so a channel never looks machine-stamped at one fixed time.
+    candidates = [
+        hour * 60 + minute
+        for hour in range(hour_start, hour_end + 1)
+        for minute in range(60)
+        if minute % 5 != 0 and hour * 60 + minute != previous_minute
+    ]
+    selected = rng.choice(candidates)
+    hour, minute = divmod(selected, 60)
     return dt.datetime.combine(day, dt.time(hour, minute), tzinfo=KST)
 
 
