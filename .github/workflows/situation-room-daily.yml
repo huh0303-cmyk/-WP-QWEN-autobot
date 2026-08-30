@@ -3,9 +3,8 @@ name: CEO 종합상황실 일일보고 (전체 KPI → 시트/이메일/카카�
 on:
   workflow_dispatch: {}
   schedule:
-    # CEO 단일 일일보고: WP/Blogspot/GSC/방문자/YouTube/SNS/AdSense를
-    # 같은 기준시각에 한 번 수집하고 시트·이메일·카카오톡을 함께 갱신한다.
-    - cron: "50 20 * * *"   # 05:50 KST (전날 20:50 UTC)
+    # CEO 단일 일일보고: 매일 05:50 KST 한 번만 정기 발송.
+    - cron: "50 20 * * *"
 
 concurrency:
   group: situation-room-daily
@@ -25,7 +24,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
-      - name: "종합상황실 수집 → 분석 → 발송"
+      - name: "CEO 종합상황실 수집 → 승인양식 → 발송"
         env:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
@@ -62,8 +61,8 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
-        run: python scripts/situation_room_daily.py
-      - name: "다음날 비교용 기록 커밋"
+        run: python scripts/ceo_situation_room_runner.py
+      - name: "다음날 비교용 기록 + 이메일 발송잠금 커밋"
         if: always()
         run: |
           git config user.name "github-actions[bot]"
@@ -71,6 +70,6 @@ jobs:
           git stash --include-untracked || true
           git pull --rebase origin main
           git stash pop || true
-          git add situation_room_history.json 2>/dev/null || true
+          git add situation_room_history.json situation_room_email_state.json 2>/dev/null || true
           git diff --cached --quiet || git commit -m "chore: 종합상황실 기록 갱신 [skip ci]"
           git push
