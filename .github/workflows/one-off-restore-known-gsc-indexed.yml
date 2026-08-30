@@ -14,7 +14,20 @@ jobs:
   restore:
     environment: google-metrics
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        site:
+          - koreainvest365.com
+          - koreamedicaltour.com
+          - koreainsurance365.com
+          - kfinance365.com
+          - koreataxnlaw.com
+          - koreacrypto365.com
+          - ktech365.com
+          - k-trip365.com
+          - k-visa365.com
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,6 +37,7 @@ jobs:
       - name: "GSC 확인 저장 글 중 private만 publish"
         env:
           CONFIRM: RESTORE-KNOWN-INDEXED-PRIVATE-ONLY
+          SITE_FILTER: ${{ matrix.site }}
           WP_USER: ${{ secrets.WP_USER }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
@@ -41,6 +55,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: restore-known-gsc-indexed-${{ github.run_id }}
-          path: restore_known_gsc_indexed_private_posts_result.json
+          name: restore-known-gsc-indexed-${{ matrix.site }}-${{ github.run_id }}
+          path: restore_known_gsc_indexed_*.json
           retention-days: 30

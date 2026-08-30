@@ -13,7 +13,8 @@ from site_registry import SITES
 CONFIRM_PHRASE = "RESTORE-KNOWN-INDEXED-PRIVATE-ONLY"
 EXCLUDED = {"k-health365.com", "koreanews365.com", "theseouljournal.com"}
 SOURCE = Path(__file__).parent / "data" / "protected_indexed_posts.json"
-OUTPUT = Path("restore_known_gsc_indexed_private_posts_result.json")
+SITE_FILTER = os.getenv("SITE_FILTER", "").strip().lower()
+OUTPUT = Path(f"restore_known_gsc_indexed_{SITE_FILTER or 'all'}.json")
 
 
 def host(value: str) -> str:
@@ -40,6 +41,8 @@ def main() -> None:
 
     for domain, ids in sorted(indexed.items()):
         if domain in EXCLUDED:
+            continue
+        if SITE_FILTER and domain != SITE_FILTER:
             continue
         row = {"requested": len(ids), "published": [], "already_public": [], "not_private": [], "failed": []}
         result["sites"][domain] = row
