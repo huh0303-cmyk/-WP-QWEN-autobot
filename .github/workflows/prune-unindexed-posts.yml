@@ -51,7 +51,7 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/prune_unindexed_all_sites.py
+        run: python scripts/prune_unindexed_all_sites_safe.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
