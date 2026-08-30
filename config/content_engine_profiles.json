@@ -5,7 +5,7 @@
   ],
   "count": 27,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 25,
+  "blogspot_ready_count": 26,
   "profiles": [
     {
       "order": 1,
@@ -48,10 +48,10 @@
         "content_type": "blog"
       },
       "blogspot": {
-        "url": "https://kworld365.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "url": "https://kworld365seoul.blogspot.com",
+        "status": "EXISTING",
+        "destination_id": "5061870975921599649",
+        "ready_for_automation": true,
         "description": "Your friendly companion for K-pop news, artist spotlights, comeback updates, and fan culture - written for global fans who want to stay close to Korean pop music.",
         "search_description": "K-pop news, artist spotlights, and comeback updates for global fans of Korean pop music and culture.",
         "notes": ""

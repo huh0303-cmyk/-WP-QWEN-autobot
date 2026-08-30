@@ -59,14 +59,14 @@
     {
       "order": 2,
       "wp": "https://kworld365.com",
-      "blogspot": "https://kworld365.blogspot.com",
+      "blogspot": "https://kworld365seoul.blogspot.com",
       "title": "KWorld365",
       "language": "en",
       "topic": "K-pop",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 08:17",
+      "status": "EXISTING",
       "description": "Your friendly companion for K-pop news, artist spotlights, comeback updates, and fan culture - written for global fans who want to stay close to Korean pop music.",
-      "search_description": "K-pop news, artist spotlights, and comeback updates for global fans of Korean pop music and culture."
+      "search_description": "K-pop news, artist spotlights, and comeback updates for global fans of Korean pop music and culture.",
+      "destination_id": "5061870975921599649"
     },
     {
       "order": 3,
