@@ -38,6 +38,33 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
+          # Credential presence is checked before a calendar row can be dispatched.
+          # Values stay masked by Actions and are never printed.
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
         run: python scripts/publish_scheduler.py
       - name: Commit scheduler state
         if: always()
