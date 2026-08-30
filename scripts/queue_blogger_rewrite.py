@@ -133,7 +133,7 @@ def main():
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
             quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
-            critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL"))]
+            critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL", "meta description is incomplete"))]
             if quality_score >= minimum_quality and not critical_failures:
                 rewritten = candidate
                 text_provider = provider

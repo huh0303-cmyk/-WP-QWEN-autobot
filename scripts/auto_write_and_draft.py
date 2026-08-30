@@ -120,7 +120,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
-            critical = [f for f in failures if f.startswith("body length")]
+            critical = [f for f in failures if f.startswith(("body length", "meta description is incomplete"))]
             if score >= 70 and not critical:
                 return candidate, score, failures, provider
         except Exception as exc:

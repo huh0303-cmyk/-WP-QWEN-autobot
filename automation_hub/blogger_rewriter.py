@@ -207,6 +207,8 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
         score += 10
     else:
         failures.append("meta description must be 100-120 characters")
+    if meta and not meta.endswith((".", "!", "?", '"', "”", "'")):
+        failures.append("meta description is incomplete: does not end in a finished sentence")
     if 8 <= len(labels) <= 14 and all(len(str(label)) <= 30 and len(str(label).split()) <= 3 for label in labels):
         score += 10
     else:
