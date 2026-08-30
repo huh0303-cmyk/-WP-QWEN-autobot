@@ -15,7 +15,7 @@ class BloggerRewriterTests(unittest.TestCase):
         }
         result = normalize_rewrite_format(article, target_chars=1200)
         self.assertLessEqual(len(result["title"]), 70)
-        self.assertLessEqual(len(result["meta_description"].split()), 120)
+        self.assertLessEqual(len(result["meta_description"]), 120)
         self.assertLessEqual(len(re.sub(r"\s+", "", plain_text(result["content_html"]))), 1620)
 
     def test_normalize_preserves_source_and_ymyl_tail(self):
@@ -66,7 +66,8 @@ class BloggerRewriterTests(unittest.TestCase):
             '<h2>Final checklist</h2><p>' + ('Confirm reservations and keep the official details accessible. ' * 20) + '</p>'
             f'<p><a href="{source_url}">Detailed Korea travel source</a></p>'
         )
-        article = {"title": "Korea Travel Planning: Practical Steps", "meta_description": " ".join(["Korea"] * 105), "content_html": content, "labels": ["Korea", "Travel", "Planning", "Transport", "Booking", "Hotels", "Seoul", "Routes"]}
+        meta_description = "Practical, source-led guidance for planning a Korea trip, covering transport, checklists, and booking timing."
+        article = {"title": "Korea Travel Planning: Practical Steps", "meta_description": meta_description, "content_html": content, "labels": ["Korea", "Travel", "Planning", "Transport", "Booking", "Hotels", "Seoul", "Routes"]}
         score, failures, _ = blogger_quality_score(article, source_title="Korea Travel Planning", source_url=source_url, source_html="<p>Short original source.</p>", target_chars=2400)
         self.assertGreaterEqual(score, 80, failures)
 

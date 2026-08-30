@@ -78,8 +78,7 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
     """
     normalized = dict(article)
     normalized["title"] = _clip_words(str(article.get("title", "")), 70)
-    meta_words = re.sub(r"\s+", " ", str(article.get("meta_description", ""))).strip().split()
-    normalized["meta_description"] = " ".join(meta_words[:120])
+    normalized["meta_description"] = _clip_words(str(article.get("meta_description", "")), 120)
 
     content = str(article.get("content_html", ""))
     maximum = int(target_chars * 1.35)
@@ -127,7 +126,7 @@ The article must feel individually edited for this site's persona, not mass-prod
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
 Return JSON only with keys title, meta_description, content_html, image_queries, labels.
-meta_description is mandatory and must be a natural search description of 100-120 words.
+meta_description is mandatory and must be a natural search description of 100-120 characters (not words) - one concise sentence, the length that actually fits a Blogger/Google search-result snippet.
 labels must contain 8-14 short noun search terms directly relevant to the article. Vary the count inside that range for each article; never use sentences as labels. image_queries must contain 0-2 precise first-image prompts.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
 For visa, insurance, or medical/health topics (YMYL), within the first three paragraphs include: (1) a reference-date sentence using the literal words "as of" (English) or "기준" (Korean) followed by a real month/year, e.g. "2026년 8월 기준" or "as of August 2026"; (2) a change-warning sentence using words like "can change"/"subject to change" or "변경될 수 있으니"/"확인하세요"; (3) a short non-advisory disclaimer ("consult a professional"/"전문가와 상담" or "not medical/legal advice"/"의료/법률 자문이 아닙니다"). These three must appear as real sentences, not a heading label alone, or the article fails the quality gate.
@@ -171,10 +170,10 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
         score += 20
     else:
         failures.append(f"body length {body_chars} is outside {minimum}-{maximum} characters")
-    if 100 <= len(meta.split()) <= 120:
+    if 100 <= len(meta) <= 120:
         score += 10
     else:
-        failures.append("meta description must be 100-120 words")
+        failures.append("meta description must be 100-120 characters")
     if 8 <= len(labels) <= 14 and all(len(str(label)) <= 30 and len(str(label).split()) <= 3 for label in labels):
         score += 10
     else:

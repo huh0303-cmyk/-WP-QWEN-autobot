@@ -23,7 +23,7 @@ Write for the reader's real task: open with a concise direct answer, then use de
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
 Add useful original synthesis grounded in generally known, verifiable facts. Do not invent personal experience, specific statistics, quotes, prices, or sources you cannot be confident are correct. When a fact would need a citation to be trustworthy (a specific number, date, rule, or claim), phrase it as general guidance instead of a false-precision fact.
 Return JSON only with keys title, meta_description, content_html, image_queries, labels.
-meta_description is mandatory. Write it as exactly 2-3 short sentences, then count the words and revise until the total is between 100 and 120 words - not visually "about right," an actual word count in that exact range. This is checked mechanically and anything outside 100-120 fails.
+meta_description is mandatory. Write it as one concise sentence - a real search-result-length description, not a paragraph - then count the characters and revise until the total is between 100 and 120 characters, not words. This is checked mechanically and anything outside 100-120 characters fails.
 labels must contain 8-14 short noun search terms directly relevant to the article. Vary the count inside that range for each article; never use sentences as labels. image_queries must contain 0-2 precise first-image prompts.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts, and must not link to any URL (no external or invented links).
 For visa, insurance, or medical/health topics (YMYL), within the first three paragraphs include: (1) a reference-date sentence using the literal words "as of" (English) or "기준" (Korean) followed by a real month/year, e.g. "2026년 8월 기준" or "as of August 2026"; (2) a change-warning sentence using words like "can change"/"subject to change" or "변경될 수 있으니"/"확인하세요"; (3) a short non-advisory disclaimer ("consult a professional"/"전문가와 상담" or "not medical/legal advice"/"의료/법률 자문이 아닙니다"). These three must appear as real sentences, not a heading label alone, or the article fails the quality gate.
@@ -60,10 +60,10 @@ def original_quality_score(article: dict[str, Any], *, keyword: str, target_char
         score += 20
     else:
         failures.append(f"body length {body_chars} is outside {minimum}-{maximum} characters")
-    if 100 <= len(meta.split()) <= 120:
+    if 100 <= len(meta) <= 120:
         score += 15
     else:
-        failures.append("meta description must be 100-120 words")
+        failures.append("meta description must be 100-120 characters")
     if 8 <= len(labels) <= 14 and all(len(str(label)) <= 30 and len(str(label).split()) <= 3 for label in labels):
         score += 15
     else:
