@@ -1,0 +1,31 @@
+name: "CEO Dashboard — promote tomorrow's calendar keywords to the write queue"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "35 20 * * *" # 05:35 KST, after the 05:17 KST calendar roll
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-calendar-keywords
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install google-api-python-client google-auth -q
+      - name: Promote tomorrow's WordPress calendar rows into 자동화_황금키워드
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/promote_calendar_to_golden_keywords.py
