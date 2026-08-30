@@ -27,10 +27,16 @@ CALENDAR_TAB = "14일_콘텐츠운영캘린더"
 STATE_FILE = "scheduler_state.json"
 
 _registry = load_runtime_registry()
-BLOG_CONFIG = {
+ALL_BLOG_CONFIG = {
     site.url.rstrip("/"): site
     for site in _registry.enabled("wordpress")
     if site.content_type == "blog" and site.publish_mode == "automatic"
+}
+# Do not spend generation calls on destinations that cannot accept a draft.  The
+# credential itself is never logged; only non-empty presence is used.
+BLOG_CONFIG = {
+    url: site for url, site in ALL_BLOG_CONFIG.items()
+    if site.secret_name and os.getenv(site.secret_name, "").strip()
 }
 SITES = sorted(BLOG_CONFIG)
 
@@ -157,7 +163,8 @@ def main() -> None:
     due = load_due_calendar_rows(service)
     print(
         f"캘린더 기반 오늘 발행 대상: due={len(due)}, "
-        f"A/B cadence sites={len(TODAY_SITES)}/{len(SITES)}"
+        f"A/B cadence credentialed sites={len(TODAY_SITES)}/{len(SITES)} "
+        f"(registry total={len(ALL_BLOG_CONFIG)})"
     )
 
     changed = False
