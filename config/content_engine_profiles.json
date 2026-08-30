@@ -5,7 +5,7 @@
   ],
   "count": 27,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 14,
+  "blogspot_ready_count": 16,
   "profiles": [
     {
       "order": 1,
@@ -449,9 +449,9 @@
       },
       "blogspot": {
         "url": "https://ki-korea.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "2490110552890683078",
+        "ready_for_automation": true,
         "description": "Formal, source-led coverage of foreign investment policy in Korea - rules, incentives, and what they mean for investors.",
         "search_description": "Foreign investment in Korea: policy, incentives, and what they mean for investors, explained clearly.",
         "notes": ""
@@ -474,9 +474,9 @@
       },
       "blogspot": {
         "url": "https://ksa-korea.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "4432103895513840706",
+        "ready_for_automation": true,
         "description": "A supportive guide to Korea study networks and student support - community resources, practical tips, and friendly advice for students far from home.",
         "search_description": "Korea study networks and student support: community resources and practical tips for international students.",
         "notes": ""

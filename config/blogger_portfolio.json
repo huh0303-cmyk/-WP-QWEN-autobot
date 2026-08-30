@@ -254,10 +254,10 @@
       "title": "KI Korea",
       "language": "en",
       "topic": "Foreign investment in Korea",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 16:58",
+      "status": "EXISTING",
       "description": "Formal, source-led coverage of foreign investment policy in Korea - rules, incentives, and what they mean for investors.",
-      "search_description": "Foreign investment in Korea: policy, incentives, and what they mean for investors, explained clearly."
+      "search_description": "Foreign investment in Korea: policy, incentives, and what they mean for investors, explained clearly.",
+      "destination_id": "2490110552890683078"
     },
     {
       "order": 19,
@@ -266,10 +266,10 @@
       "title": "KSA Korea",
       "language": "en",
       "topic": "Korea study networks and student support",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 17:46",
+      "status": "EXISTING",
       "description": "A supportive guide to Korea study networks and student support - community resources, practical tips, and friendly advice for students far from home.",
-      "search_description": "Korea study networks and student support: community resources and practical tips for international students."
+      "search_description": "Korea study networks and student support: community resources and practical tips for international students.",
+      "destination_id": "4432103895513840706"
     },
     {
       "order": 20,
