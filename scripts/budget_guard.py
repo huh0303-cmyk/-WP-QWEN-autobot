@@ -29,7 +29,7 @@ STATE_FILE = Path(__file__).resolve().parents[1] / "budget_state.json"
 # Total monthly ceiling across every paid pipeline (WP+Blogspot writing,
 # YouTube, SNS, everything). Deliberately conservative; raise only with
 # an explicit decision, never silently.
-DEFAULT_CEILING_USD = float(os.environ.get("BUDGET_MONTHLY_CEILING_USD", "80"))
+DEFAULT_CEILING_USD = float(os.environ.get("BUDGET_MONTHLY_CEILING_USD", "").strip() or "80")
 
 
 def _month_key(now: datetime) -> str:
