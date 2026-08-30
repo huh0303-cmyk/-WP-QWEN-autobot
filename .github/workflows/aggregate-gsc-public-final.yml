@@ -1,0 +1,29 @@
+name: "27개 WP 공개·색인 최종 집계"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/aggregate-gsc-public-final.yml"
+      - "scripts/aggregate_gsc_public_results.py"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "24개 사이트 결과 내려받기"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 33284433841 --repo huh0303-cmyk/-WP-QWEN-autobot --dir downloaded-results
+      - name: "사이트별 GSC 색인 수 집계"
+        run: python scripts/aggregate_gsc_public_results.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gsc-24-final-summary-${{ github.run_id }}
+          path: gsc_24_final_summary.json
+          retention-days: 30
