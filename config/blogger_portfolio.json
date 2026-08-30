@@ -315,10 +315,10 @@
       "title": "Korea365",
       "language": "en",
       "topic": "Public-interest Korea information",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 18:53",
+      "status": "EXISTING",
       "description": "A friendly, public-interest resource on life in Korea - practical information and everyday guidance written to be genuinely useful.",
-      "search_description": "Public-interest Korea information: practical, everyday guidance written to be genuinely useful."
+      "search_description": "Public-interest Korea information: practical, everyday guidance written to be genuinely useful.",
+      "destination_id": "242870255610398021"
     },
     {
       "order": 24,

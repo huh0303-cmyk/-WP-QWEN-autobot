@@ -5,7 +5,7 @@
   ],
   "count": 27,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 24,
+  "blogspot_ready_count": 25,
   "profiles": [
     {
       "order": 1,
@@ -574,9 +574,9 @@
       },
       "blogspot": {
         "url": "https://korea365.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "242870255610398021",
+        "ready_for_automation": true,
         "description": "A friendly, public-interest resource on life in Korea - practical information and everyday guidance written to be genuinely useful.",
         "search_description": "Public-interest Korea information: practical, everyday guidance written to be genuinely useful.",
         "notes": ""
