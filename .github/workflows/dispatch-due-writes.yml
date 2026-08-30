@@ -7,12 +7,15 @@ name: "CEO Dashboard — dispatch due keywords to the write pipeline"
 # see scripts/dispatch_due_writes.py.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "scripts/dispatch_due_writes.py"
-  schedule:
-    - cron: "12 * * * *"
+  # Schedule disabled 2026-08-30: a second, independent calendar consumer
+  # (scripts/publish_scheduler.py, commit aa3f438) was found reading the
+  # same 14일_콘텐츠운영캘린더 tab at nearly the same time this workflow
+  # was built, dispatching the same due rows through a different pipeline
+  # (daily-network-publish.yml -> autopost_mega.py) with no shared
+  # dedup between the two. Re-enable only after that overlap is resolved -
+  # see the two scripts' PLANNED_STATUS handling before turning this back on.
+  # schedule:
+  #   - cron: "12 * * * *"
 
 permissions:
   contents: write
