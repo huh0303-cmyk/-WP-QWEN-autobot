@@ -1,0 +1,84 @@
+name: "One-off — localize Olive Young post 876 image"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/_one-off-localize-oliveyoung-876.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  localize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Copy temporary generated image into WordPress media
+        env:
+          WP_PASS: ${{ secrets.OLIVEYOUNGKOREACOM }}
+        run: |
+          python - <<'PY'
+          import html
+          import os
+          import re
+          import requests
+
+          site = "https://oliveyoungkorea.com"
+          post_id = 876
+          auth = ("huh0303@gmail.com", os.environ["WP_PASS"].strip())
+          if not auth[1]:
+              raise SystemExit("OLIVEYOUNGKOREACOM is empty")
+
+          post_api = f"{site}/wp-json/wp/v2/posts/{post_id}"
+          post = requests.get(post_api, auth=auth, params={"context": "edit"}, timeout=30)
+          post.raise_for_status()
+          raw = post.json()["content"]["raw"]
+
+          candidates = re.findall(r'https://[^\\"\'<>\s]+cloudflarestorage\.com[^\\"\'<>\s]*', raw)
+          candidates = [html.unescape(url) for url in candidates]
+          if not candidates:
+              print("No temporary image remains; already localized")
+              raise SystemExit(0)
+
+          old_url = candidates[0]
+          image = requests.get(old_url, timeout=60)
+          image.raise_for_status()
+          mime = image.headers.get("content-type", "image/webp").split(";")[0]
+          ext = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}.get(mime, "webp")
+          filename = f"olive-young-kbeauty-shopping-2026-{post_id}.{ext}"
+
+          media = requests.post(
+              f"{site}/wp-json/wp/v2/media",
+              auth=auth,
+              headers={
+                  "Content-Disposition": f'attachment; filename="{filename}"',
+                  "Content-Type": mime,
+              },
+              data=image.content,
+              timeout=60,
+          )
+          media.raise_for_status()
+          local_url = media.json()["source_url"]
+
+          updated_raw = raw.replace(html.escape(old_url, quote=True), local_url)
+          updated_raw = updated_raw.replace(old_url, local_url)
+          if updated_raw == raw:
+              raise SystemExit("Temporary image URL was found but not replaced")
+
+          updated = requests.post(post_api, auth=auth, json={"content": updated_raw}, timeout=60)
+          updated.raise_for_status()
+
+          public = requests.get(post_api, params={"context": "view"}, timeout=30)
+          public.raise_for_status()
+          rendered = public.json()["content"]["rendered"]
+          if "cloudflarestorage.com" in rendered or "X-Amz-Expires" in rendered:
+              raise SystemExit("Verification failed: temporary URL still present")
+          if local_url not in rendered:
+              raise SystemExit("Verification failed: localized media URL missing")
+
+          print(f"LOCALIZED_MEDIA_ID={media.json()['id']}")
+          print(f"LOCALIZED_URL={local_url}")
+          print(f"POST_URL={public.json()['link']}")
+          PY
