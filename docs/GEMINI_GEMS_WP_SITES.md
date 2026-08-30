@@ -15,6 +15,16 @@ Order follows `config/blogger_portfolio.json`. Status: **11/27 done.**
 - Regular blog sites: **2,300–3,000 characters, randomized per post** — never the same number twice, never a fixed template length.
 - **Newsroom sites are the exception** — KoreaNews365 (order 9) and The Seoul Journal (order 15) are actual news sites. Their length is free/random per story's real weight: a short brief can run **as low as ~1,000 characters**, up to 3,000 characters for a fuller story. Never pad a brief item to hit a target length.
 
+**REVIEW POLICY (locked, applies to every Gem in this file):** Gemini's
+chat window only shows the HTML as text/code — it never renders the real
+layout, image placement, or readability. So the draft is never approved
+from the chat. Before publishing anything: paste the draft into
+WordPress (or Blogger) as a **DRAFT**, then use the platform's own
+**Preview** button to see the actual rendered post — real theme, real
+image placement, real readability — while it's still completely private.
+Only approve/publish after that real preview, never from how it looks in
+the Gemini chat.
+
 ---
 
 ## 1. K-Trip365 (k-trip365.com) — DONE
