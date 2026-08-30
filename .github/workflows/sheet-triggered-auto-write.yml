@@ -41,6 +41,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
           CLAUDE_ENABLED: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"

@@ -13,6 +13,11 @@ import time
 import requests
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+# Only needed for an "identity-linked" API key (one created under an
+# organization with multiple workspaces) - the API rejects those with 400
+# unless every request names which workspace it acts in. A classic
+# standalone key doesn't need this at all.
+ANTHROPIC_WORKSPACE_ID = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
 CLAUDE_ENABLED = os.environ.get("CLAUDE_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5")
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
@@ -33,6 +38,8 @@ def claude_generate_text(prompt, system=None, temperature=0.9, max_retries=5):
         "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
     }
+    if ANTHROPIC_WORKSPACE_ID:
+        headers["anthropic-workspace-id"] = ANTHROPIC_WORKSPACE_ID
     body = {
         "model": CLAUDE_MODEL,
         "max_tokens": CLAUDE_MAX_TOKENS,
