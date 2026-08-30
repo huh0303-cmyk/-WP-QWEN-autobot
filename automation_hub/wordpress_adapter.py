@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import os
 
 from .registry import SiteRegistry
 
@@ -25,6 +26,9 @@ def apply_wordpress_registry(
             lang=site.language,
             theme=str(site.keyword_rules.get("theme") or current.get("theme") or site.name),
             wp_pass_env=site.secret_name,
+            # The mature publisher posts with config["pw"].  Keeping only the env
+            # variable name makes every credentialed destination fail at save time.
+            pw=os.getenv(site.secret_name, "").strip(),
             daily=site.daily_max,
             daily_min=site.daily_min,
             daily_max=site.daily_max,
