@@ -32,6 +32,11 @@ from claude_text import claude_available, claude_generate_text
 from replicate_image_provider import generate_image_url
 from three_model_consensus import three_model_consensus
 from sync_automation_hub_to_sheets import QUEUE_TAB
+from budget_guard import check_and_record
+
+# Worst case for one run: 2 write attempts (gemini+gpt fallback) + 3-way
+# consensus check (gemini+gpt+claude) + 1 image. See budget_guard.py.
+ESTIMATED_COST_PER_RUN_USD = 0.03
 
 
 def _records(values: list[list[str]]) -> list[dict[str, str]]:
@@ -78,6 +83,7 @@ def main():
     blogger_site_id = os.environ.get("BLOGGER_SITE_ID", "").strip()
     if not all((sheet_id, source_url, blogger_site_id)):
         raise SystemExit("SHEET_ID, SOURCE_WP_URL and BLOGGER_SITE_ID are required")
+    check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
     service = get_sheets_service()
     try:
         posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
