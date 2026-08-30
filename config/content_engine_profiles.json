@@ -5,7 +5,7 @@
   ],
   "count": 27,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 16,
+  "blogspot_ready_count": 17,
   "profiles": [
     {
       "order": 1,
@@ -424,9 +424,9 @@
       },
       "blogspot": {
         "url": "https://kieca-korea.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "3364333636330259319",
+        "ready_for_automation": true,
         "description": "A welcoming resource on international education and cultural exchange in Korea - programs, opportunities, and practical guidance for global learners.",
         "search_description": "International education and cultural exchange in Korea: programs and practical guidance for global learners.",
         "notes": ""

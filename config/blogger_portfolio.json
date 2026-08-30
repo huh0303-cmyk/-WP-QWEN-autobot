@@ -242,10 +242,10 @@
       "title": "KIECA Korea",
       "language": "en",
       "topic": "International education and cultural exchange",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 15:31",
+      "status": "EXISTING",
       "description": "A welcoming resource on international education and cultural exchange in Korea - programs, opportunities, and practical guidance for global learners.",
-      "search_description": "International education and cultural exchange in Korea: programs and practical guidance for global learners."
+      "search_description": "International education and cultural exchange in Korea: programs and practical guidance for global learners.",
+      "destination_id": "3364333636330259319"
     },
     {
       "order": 18,
