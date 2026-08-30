@@ -12,7 +12,7 @@ import time
 
 import requests
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 CLAUDE_ENABLED = os.environ.get("CLAUDE_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5")
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"

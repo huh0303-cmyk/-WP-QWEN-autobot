@@ -23,7 +23,7 @@ SITES = [
     ("https://sis-korea.com", "SISKOREACOM", "active"),
     ("https://jobkorea365.com", "JOBKOREA365COM", "active"),
     ("https://jobinkorea365.com", "JOBINKOREA365COM", "active"),
-    ("https://jobkoreaglobal.com", "JOBKOREAGLOBALCOM", "review"),
+    ("https://jobkoreaglobal.com", "JOBKOREAGLOBALCOM", "active"),
     ("https://korea365.org", "KOREA365ORG", "active"),
     ("https://koreanews365.com", "KOREANEWS365COM", "active"),
     ("https://theseouljournal.com", "THESEOULJOURNALCOM", "active"),
