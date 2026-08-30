@@ -1,0 +1,92 @@
+name: "긴급 — 24개 WP GSC 색인글 전부 공개 완결"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/complete-all-gsc-indexed-public.yml"
+      - "scripts/sync_24_sites_gsc_index_visibility.py"
+
+permissions:
+  contents: read
+
+jobs:
+  publish-indexed:
+    environment: google-metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        site:
+          - koreamedicaltour.com
+          - koreainvest365.com
+          - ki-korea.com
+          - koreainsurance365.com
+          - kfinance365.com
+          - koreataxnlaw.com
+          - koreacrypto365.com
+          - krealestate365.com
+          - ktech365.com
+          - kskin365.com
+          - oliveyoungkorea.com
+          - kworld365.com
+          - k-trip365.com
+          - k-visa365.com
+          - koreawedding365.com
+          - kstudy365.com
+          - studyinkorea365.com
+          - kieca-korea.org
+          - ksa-korea.org
+          - sis-korea.com
+          - jobkorea365.com
+          - jobinkorea365.com
+          - jobkoreaglobal.com
+          - korea365.org
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "GSC PASS 글만 공개"
+        env:
+          CONFIRM: SYNC-24-INDEXED-ONLY
+          SITE_FILTER: ${{ matrix.site }}
+          PUBLISH_ONLY: "1"
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+          WP_USER: ${{ secrets.WP_USER }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: python scripts/sync_24_sites_gsc_index_visibility.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gsc-indexed-public-${{ matrix.site }}-${{ github.run_id }}
+          path: sync_gsc_publish_*.json
+          retention-days: 30

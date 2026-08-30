@@ -14,7 +14,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from site_registry import ACTIVE_SITES  # noqa: E402
 
 WP_USER = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
-OUT = Path("sync_24_sites_gsc_index_visibility_result.json")
+SITE_FILTER = os.getenv("SITE_FILTER", "").strip().lower()
+PUBLISH_ONLY = os.getenv("PUBLISH_ONLY", "").strip() == "1"
+OUT = Path(f"sync_gsc_publish_{SITE_FILTER}.json" if SITE_FILTER else
+           "sync_24_sites_gsc_index_visibility_result.json")
 EXCLUDED = {"k-health365.com", "koreanews365.com", "theseouljournal.com"}
 
 _getaddrinfo = socket.getaddrinfo
@@ -99,6 +102,10 @@ def main():
     targets = [x for x in ACTIVE_SITES if x[0].removeprefix("https://").rstrip("/") not in EXCLUDED]
     if len(targets) != 24:
         raise SystemExit(f"scope guard failed: expected 24, got {len(targets)}")
+    if SITE_FILTER:
+        targets = [x for x in targets if x[0].removeprefix("https://").rstrip("/") == SITE_FILTER]
+        if len(targets) != 1:
+            raise SystemExit(f"site filter not in 24-site scope: {SITE_FILTER}")
     result = {"excluded":sorted(EXCLUDED), "sites":{}}
     for site, secret_name, _ in targets:
         site = site.rstrip("/"); domain = site.removeprefix("https://")
@@ -117,7 +124,8 @@ def main():
         for post in posts:
             evidence = inspect(token, prop, post["link"])
             desired = "publish" if evidence.get("ok") and evidence.get("verdict") == "PASS" else (
-                "private" if evidence.get("ok") else None)
+                post["status"] if evidence.get("ok") and PUBLISH_ONLY else
+                ("private" if evidence.get("ok") else None))
             item = {"id":post["id"], "url":post["link"], "before":post["status"],
                     "desired":desired, "inspection":evidence}
             if desired is None:
