@@ -23,7 +23,7 @@
         "indexed": 0,
         "total_posts": 73,
         "status": "정상",
-        "visitor_count": 82
+        "visitor_count": 83
       },
       "ki-korea.com": {
         "clicks": 0,
@@ -100,21 +100,21 @@
         "indexed": 0,
         "total_posts": 6,
         "status": "정상",
-        "visitor_count": 222
+        "visitor_count": 223
       },
       "k-visa365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 50,
         "status": "정상",
-        "visitor_count": 311
+        "visitor_count": 312
       },
       "koreawedding365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 61,
         "status": "정상",
-        "visitor_count": 351
+        "visitor_count": 353
       },
       "kstudy365.com": {
         "clicks": 0,
@@ -135,21 +135,21 @@
         "indexed": 0,
         "total_posts": 4,
         "status": "정상",
-        "visitor_count": 35
+        "visitor_count": 37
       },
       "ksa-korea.org": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 16
+        "visitor_count": 20
       },
       "sis-korea.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 58,
         "status": "정상",
-        "visitor_count": 259
+        "visitor_count": 267
       },
       "jobkorea365.com": {
         "clicks": 0,
@@ -163,7 +163,7 @@
         "indexed": 0,
         "total_posts": 44,
         "status": "정상",
-        "visitor_count": 72
+        "visitor_count": 73
       },
       "jobkoreaglobal.com": {
         "clicks": 1,
@@ -191,7 +191,7 @@
         "indexed": 0,
         "total_posts": 93,
         "status": "정상",
-        "visitor_count": 30
+        "visitor_count": 32
       }
     },
     "blogger_details": {
@@ -334,7 +334,7 @@
     "youtube": {
       "플리-로맨틱글로벌": {
         "subs": 11,
-        "views": 1813
+        "views": 1815
       },
       "플리-힐링": {
         "subs": 13,
@@ -362,7 +362,7 @@
       },
       "발명 지식": {
         "subs": 1,
-        "views": 92
+        "views": 101
       },
       "무성영화 지식": {
         "subs": 1,
@@ -466,5 +466,5 @@
       }
     }
   },
-  "updated_at": "2026-08-30 14:20:17"
+  "updated_at": "2026-08-30 14:30:11"
 }
