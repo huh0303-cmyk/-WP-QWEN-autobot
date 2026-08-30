@@ -30,7 +30,7 @@ def main() -> None:
     saved = json.loads(SOURCE.read_text(encoding="utf-8"))
     indexed = {host(site): sorted({int(x) for x in ids}) for site, ids in saved.items()}
     registry = {host(url): (url.rstrip("/"), secret) for url, secret, _ in SITES}
-    user = os.environ["WP_USER"]
+    user = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
     result = {
         "mode": "known_gsc_indexed_ids_only",
         "excluded": sorted(EXCLUDED),
