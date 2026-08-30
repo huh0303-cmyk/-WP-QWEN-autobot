@@ -123,9 +123,10 @@
       "title": "Korea Medical Tour",
       "language": "en",
       "topic": "Korea medical tourism",
-      "status": "SCHEDULED",
+      "status": "EXISTING",
       "description": "Cautious, practical guidance on medical tourism in Korea - choosing a clinic, planning a visit, and understanding costs, written in plain, non-diagnostic language.",
-      "search_description": "Korea medical tourism: choosing a clinic, planning a visit, and understanding costs, explained clearly."
+      "search_description": "Korea medical tourism: choosing a clinic, planning a visit, and understanding costs, explained clearly.",
+      "destination_id": "2234527810530371008"
     },
     {
       "order": 8,
@@ -170,10 +171,10 @@
       "title": "Olive Young Korea",
       "language": "en",
       "topic": "K-beauty products and shopping",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 10:21",
+      "status": "EXISTING",
       "description": "A friendly guide to K-beauty products and shopping in Korea - honest reviews, must-try picks, and shopping tips for skincare and cosmetics lovers everywhere.",
-      "search_description": "K-beauty product reviews and shopping tips: must-try skincare and cosmetics picks from Korea."
+      "search_description": "K-beauty product reviews and shopping tips: must-try skincare and cosmetics picks from Korea.",
+      "destination_id": "473506254375374117"
     },
     {
       "order": 12,
@@ -182,10 +183,10 @@
       "title": "Korea Crypto 365",
       "language": "en",
       "topic": "Korean digital assets and regulation",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 11:09",
+      "status": "EXISTING",
       "description": "Clear, friendly coverage of Korean digital assets and regulation - market updates, policy explainers, and practical guidance for crypto users in Korea.",
-      "search_description": "Korean crypto and digital asset news: market updates, regulation explainers, and practical guidance."
+      "search_description": "Korean crypto and digital asset news: market updates, regulation explainers, and practical guidance.",
+      "destination_id": "3406327845659558883"
     },
     {
       "order": 13,
@@ -206,10 +207,10 @@
       "title": "Korea Wedding 365",
       "language": "en",
       "topic": "Korean weddings and international couples",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 12:38",
+      "status": "EXISTING",
       "description": "A warm, friendly guide to Korean weddings and international couples - traditions, planning tips, and paperwork basics for a smooth, joyful celebration.",
-      "search_description": "Korean wedding guide for international couples: traditions, planning tips, and paperwork basics."
+      "search_description": "Korean wedding guide for international couples: traditions, planning tips, and paperwork basics.",
+      "destination_id": "2674139059432343378"
     },
     {
       "order": 15,
@@ -218,10 +219,10 @@
       "title": "The Seoul Journal",
       "language": "en",
       "topic": "English-language Korea news and analysis",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 13:27",
+      "status": "EXISTING",
       "description": "Friendly, English-language news and analysis on Korea - politics, society, and culture explained clearly for readers who want the full picture.",
-      "search_description": "English-language Korea news and analysis: politics, society, and culture explained clearly."
+      "search_description": "English-language Korea news and analysis: politics, society, and culture explained clearly.",
+      "destination_id": "6946912888985634794"
     },
     {
       "order": 16,
@@ -230,10 +231,10 @@
       "title": "KTech365",
       "language": "en",
       "topic": "Korean technology and innovation",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 14:44",
+      "status": "EXISTING",
       "description": "A friendly look at Korean technology and innovation - startups, gadgets, and industry trends explained in plain language for curious readers.",
-      "search_description": "Korean tech and innovation news: startups, gadgets, and industry trends explained simply."
+      "search_description": "Korean tech and innovation news: startups, gadgets, and industry trends explained simply.",
+      "destination_id": "6878877615041749185"
     },
     {
       "order": 17,
@@ -326,10 +327,10 @@
       "title": "SIS Korea",
       "language": "en",
       "topic": "Seoul International University and global education",
-      "status": "SCHEDULED",
-      "scheduled_kst": "2026-08-30 19:41",
+      "status": "EXISTING",
       "description": "A welcoming guide to Seoul International University and global education in Korea - admissions, programs, and campus life for international students.",
-      "search_description": "Seoul International University and global education in Korea: admissions, programs, and campus life."
+      "search_description": "Seoul International University and global education in Korea: admissions, programs, and campus life.",
+      "destination_id": "8077962392257357260"
     },
     {
       "order": 25,

@@ -5,7 +5,7 @@
   ],
   "count": 27,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 17,
+  "blogspot_ready_count": 24,
   "profiles": [
     {
       "order": 1,
@@ -174,9 +174,9 @@
       },
       "blogspot": {
         "url": "https://koreamedicaltour365.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "2234527810530371008",
+        "ready_for_automation": true,
         "description": "Cautious, practical guidance on medical tourism in Korea - choosing a clinic, planning a visit, and understanding costs, written in plain, non-diagnostic language.",
         "search_description": "Korea medical tourism: choosing a clinic, planning a visit, and understanding costs, explained clearly.",
         "notes": ""
@@ -274,9 +274,9 @@
       },
       "blogspot": {
         "url": "https://oliveyoungkorea.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "473506254375374117",
+        "ready_for_automation": true,
         "description": "A friendly guide to K-beauty products and shopping in Korea - honest reviews, must-try picks, and shopping tips for skincare and cosmetics lovers everywhere.",
         "search_description": "K-beauty product reviews and shopping tips: must-try skincare and cosmetics picks from Korea.",
         "notes": ""
@@ -299,9 +299,9 @@
       },
       "blogspot": {
         "url": "https://koreacrypto365.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "3406327845659558883",
+        "ready_for_automation": true,
         "description": "Clear, friendly coverage of Korean digital assets and regulation - market updates, policy explainers, and practical guidance for crypto users in Korea.",
         "search_description": "Korean crypto and digital asset news: market updates, regulation explainers, and practical guidance.",
         "notes": ""
@@ -349,9 +349,9 @@
       },
       "blogspot": {
         "url": "https://koreawedding365.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "2674139059432343378",
+        "ready_for_automation": true,
         "description": "A warm, friendly guide to Korean weddings and international couples - traditions, planning tips, and paperwork basics for a smooth, joyful celebration.",
         "search_description": "Korean wedding guide for international couples: traditions, planning tips, and paperwork basics.",
         "notes": ""
@@ -374,9 +374,9 @@
       },
       "blogspot": {
         "url": "https://theseouljournal.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "6946912888985634794",
+        "ready_for_automation": true,
         "description": "Friendly, English-language news and analysis on Korea - politics, society, and culture explained clearly for readers who want the full picture.",
         "search_description": "English-language Korea news and analysis: politics, society, and culture explained clearly.",
         "notes": ""
@@ -399,9 +399,9 @@
       },
       "blogspot": {
         "url": "https://ktech365.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "6878877615041749185",
+        "ready_for_automation": true,
         "description": "A friendly look at Korean technology and innovation - startups, gadgets, and industry trends explained in plain language for curious readers.",
         "search_description": "Korean tech and innovation news: startups, gadgets, and industry trends explained simply.",
         "notes": ""
@@ -599,9 +599,9 @@
       },
       "blogspot": {
         "url": "https://sis-korea.blogspot.com",
-        "status": "SCHEDULED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "8077962392257357260",
+        "ready_for_automation": true,
         "description": "A welcoming guide to Seoul International University and global education in Korea - admissions, programs, and campus life for international students.",
         "search_description": "Seoul International University and global education in Korea: admissions, programs, and campus life.",
         "notes": ""
