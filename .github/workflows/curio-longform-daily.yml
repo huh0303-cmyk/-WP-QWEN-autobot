@@ -53,12 +53,14 @@ jobs:
           if [ -z "$TOPIC" ]; then
             case "$CH" in
               nasa) TOPICS=("The Apollo 11 moon landing" "The Voyager Golden Record" "The Challenger disaster and what NASA learned" "Neil Armstrong's first steps on the Moon" "The Hubble Space Telescope's greatest discoveries" "How the Mercury Seven became America's first astronauts" "The Apollo 13 rescue" "Life aboard the International Space Station" "The first images from Mars" "JFK's Moon speech and the Space Race") ;;
-              history) TOPICS=("The attack on Pearl Harbor" "D-Day and the Normandy landings" "The fall of the Berlin Wall" "The Cuban Missile Crisis" "The Civil Rights March on Washington" "The fall of Saigon and the end of the Vietnam War" "The assassination of John F. Kennedy" "The signing of the Declaration of Independence" "V-J Day and the end of World War II" "The Wright Brothers' first flight") ;;
+              history) TOPIC="$(python scripts/pick_knowledge_topic.py history)" ;;
               invention) TOPICS=("How the telephone was invented" "The invention of the light bulb" "How the assembly line changed America" "The invention of the airplane" "How radio broadcasting began" "The invention of photography" "How the printing press changed the world" "Edison and the invention of the phonograph" "How the electric refrigerator changed home life" "The invention of television") ;;
               silent_era) TOPICS=("Charlie Chaplin and the birth of The Tramp" "Buster Keaton's death-defying stunts" "How silent films used live orchestras" "The first horror film, Nosferatu" "The rise and fall of silent film stars" "The birth of Hollywood's silent studios" "Charlie Chaplin's Modern Times and the machine age" "America's first movie palaces" "How title cards told the story before sound") ;;
               retro_reels) TOPICS=("The rise of the drive-in movie theater" "How the jukebox took over America" "The golden age of the roadside diner" "1950s home appliances that changed daily life" "The birth of the American shopping mall" "Vintage arcade games and their legacy" "How television changed 1950s family life" "The story of the classic American road trip" "How the drive-in became a teenage hangout" "The rise of the American motel") ;;
             esac
-            TOPIC="${TOPICS[$((RANDOM % ${#TOPICS[@]}))]}"
+            if [ -z "$TOPIC" ]; then
+              TOPIC="${TOPICS[$((RANDOM % ${#TOPICS[@]}))]}"
+            fi
           fi
           echo "topic=$TOPIC" >> "$GITHUB_OUTPUT"
       - name: Generate longform from public-domain/archive material
@@ -71,6 +73,9 @@ jobs:
           PAID_IMAGE_GENERATION_ENABLED: "false"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          KNOWLEDGE_VOICE_1_ID: ${{ secrets.KNOWLEDGE_VOICE_1_ID }}
+          KNOWLEDGE_VOICE_2_ID: ${{ secrets.KNOWLEDGE_VOICE_2_ID }}
+          KNOWLEDGE_VOICE_3_ID: ${{ secrets.KNOWLEDGE_VOICE_3_ID }}
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
         run: |
           CH="${{ inputs.channel }}"

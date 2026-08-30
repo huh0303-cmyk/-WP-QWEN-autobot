@@ -37,7 +37,7 @@ import requests  # noqa: E402
 
 from curio_longform import (  # noqa: E402
     gemini_generate_text, get_duration, run_ffmpeg, _strip_json_fence,
-    log, GEMINI_API_KEY, ensure_thumbnail_font,
+    log, GEMINI_API_KEY, ensure_thumbnail_font, make_silence,
 )
 from classic_reads_longform import (  # noqa: E402
     build_narration_track, write_srt, mux_final, _save_thumbnail_capped,
@@ -383,9 +383,10 @@ def generate_script(topic, channel_key, clips, target_seconds=None):
 video about: "{topic}". This channel's domain is: {domain}. The video uses real
 public-domain archival footage (not AI-generated visuals).
 
-Real archival clips that will play under this narration (ground your script in
-real, well-documented facts — reference what these clips likely show, but do
-not invent specific details not backed by well-known public facts):
+Real archival clips that will play under this narration, in the exact screen
+order shown below. Move through their subjects in this same order so narration
+and picture remain aligned. Ground the script in real, well-documented facts;
+do not invent specific details not backed by well-known public facts:
 ---
 {clip_notes[:3000]}
 ---
@@ -560,8 +561,13 @@ def main():
             f"이 길이 그대로 나레이션을 맞춘다(고정 14분 강제 안 함)")
 
     log("2/6 사실기반 대본 생성 중...")
-    data = generate_script(topic, channel_key, clips, target_seconds=target_seconds)
-    narration = data["narration"]
+    if channel_key == "silent_era":
+        data = {"narration": "", "title_hint": topic}
+        narration = ""
+        log("   silent_era: wordless policy active — synthetic narration disabled")
+    else:
+        data = generate_script(topic, channel_key, clips, target_seconds=target_seconds)
+        narration = data["narration"]
     with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
         json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
     log(f"   나레이션 {len(narration.split())}단어")
@@ -571,7 +577,13 @@ def main():
     log(f"   제목: {yt_meta['title']}")
 
     log("3/6 나레이션 TTS + 캡션 타이밍 생성 중...")
-    audio_path, srt_entries, total_dur = build_narration_track(narration, workdir)
+    if channel_key == "silent_era":
+        total_dur = max(float(target_seconds or 0), 1.0)
+        audio_path = os.path.join(workdir, "silent_track.m4a")
+        make_silence(audio_path, total_dur)
+        srt_entries = []
+    else:
+        audio_path, srt_entries, total_dur = build_narration_track(narration, workdir)
     log(f"   총 나레이션 길이: {total_dur/60:.1f}분")
     srt_path = os.path.join(workdir, "captions.srt")
     write_srt(srt_entries, srt_path)

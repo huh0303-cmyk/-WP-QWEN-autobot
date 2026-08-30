@@ -153,9 +153,11 @@ def generate_script(topic, clips):
 video about: "{topic}", for a channel that uses real NASA archival footage
 (not AI-generated visuals).
 
-Here are the actual NASA archive clips that will play under this narration —
-ground your script in real, well-documented facts about this topic, and feel
-free to reference what these clips likely show, but do not invent specific
+Here are the actual NASA archive clips that will play under this narration, in
+the exact screen order shown below —
+ground your script in real, well-documented facts about this topic. Move through
+the subjects in this exact clip order so narration and picture remain aligned.
+Feel free to reference what these clips likely show, but do not invent specific
 technical details not backed by well-known public facts:
 ---
 {clip_notes[:3000]}
@@ -239,16 +241,14 @@ def build_visual_track(clips, total_duration, workdir):
     # 섞고, 직전에 쓴 클립이 다음 바퀴 맨 앞에 바로 다시 나오지 않게만 피한다.
     segments = []
     covered = 0.0
+    # The script is written against this exact source order. Preserve it so the
+    # narration and picture do not become two unrelated tracks.
     order = list(range(len(norm_clips)))
-    random.shuffle(order)
     pos = 0
     last_clip = None
     while covered < total_duration:
         if pos >= len(order):
             order = list(range(len(norm_clips)))
-            random.shuffle(order)
-            if len(order) > 1 and norm_clips[order[0]] == last_clip:
-                order[0], order[-1] = order[-1], order[0]
             pos = 0
         clip = norm_clips[order[pos]]
         pos += 1
