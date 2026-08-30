@@ -1,10 +1,10 @@
-name: 종합상황실 우선수집 (GSC+방문자+유튜브 → 시트/보고)
+name: CEO 종합상황실 일일보고 (전체 KPI → 시트/이메일/카카오톡)
 
 on:
   workflow_dispatch: {}
   schedule:
-    # 1순위 통계 작업: 사이트 상세 스냅샷(05:20 KST)이 끝난 직후 실행한다.
-    # GSC·방문자·유튜브를 콘텐츠 발행 작업보다 먼저 집계한다.
+    # CEO 단일 일일보고: WP/Blogspot/GSC/방문자/YouTube/SNS/AdSense를
+    # 같은 기준시각에 한 번 수집하고 시트·이메일·카카오톡을 함께 갱신한다.
     - cron: "50 20 * * *"   # 05:50 KST (전날 20:50 UTC)
 
 concurrency:

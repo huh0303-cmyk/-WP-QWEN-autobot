@@ -1,11 +1,11 @@
-name: 27개 사이트 방문자/색인 현황 (매일 아침 구글시트 업데이트)
+name: 27개 사이트 방문자/색인 현황 (수동 점검용 · 정기보고 중지)
 
 on:
   workflow_dispatch: {}
-  schedule:
-    # 하루 1회. 종합상황실(08:10 KST)보다 충분히 앞서고, 다른 발행 작업과
-    # 겹침을 줄이기 위해 05:20 KST에 실행한다. GitHub cron은 UTC 기준.
-    - cron: "20 20 * * *"   # 05:20 KST (전날 20:20 UTC)
+
+# 2026-08-30 CEO 확정: 방문자·GSC·YouTube·SNS·AdSense를
+# situation-room-daily.yml에서 같은 기준시각에 한 번만 수집·보고한다.
+# 이 워크플로는 장애 진단을 위한 수동 실행만 남긴다.
 
 permissions:
   contents: write
