@@ -27,6 +27,7 @@ if str(ROOT) not in sys.path:
 
 WP_USER = "huh0303@gmail.com"
 RESULT_FILE = "newsroom_publish_result.json"
+NORMALIZED_RESULT_FILE = "artifacts/automation-room-result.json"
 
 
 def _site_key_map() -> dict:
@@ -64,12 +65,25 @@ def _resolve_post_id(site_url: str, post_url: str, wp_pass: str) -> int:
 
 
 def build_draft_reviews() -> list[dict]:
-    if not Path(RESULT_FILE).exists():
-        return []
-    try:
-        records = json.loads(Path(RESULT_FILE).read_text(encoding="utf-8")).get("records", [])
-    except Exception:
-        return []
+    records = []
+    if Path(RESULT_FILE).exists():
+        try:
+            records = json.loads(Path(RESULT_FILE).read_text(encoding="utf-8")).get("records", [])
+        except Exception:
+            records = []
+    if not records and Path(NORMALIZED_RESULT_FILE).exists():
+        try:
+            normalized = json.loads(Path(NORMALIZED_RESULT_FILE).read_text(encoding="utf-8"))
+            source = normalized.get("source", {})
+            draft_url = normalized.get("artifact_url", "")
+            if draft_url:
+                records = [{
+                    "status": source.get("status", "draft"),
+                    "url": draft_url,
+                    "title": source.get("title", "(제목 없음)"),
+                }]
+        except Exception:
+            records = []
 
     key_map = _site_key_map()
     lines = []
