@@ -75,8 +75,8 @@ def log(msg):
 def get_footer_visitor_stats(site_url):
     """Footer 카운터와 같은 WordPress option 값을 공개 REST에서 읽는다.
 
-    리포트 기준값은 yesterday_count(전날 확정치)다. 현재 시각의 today count는
-    하루 중간값이라 일일 비교에는 쓰지 않는다.
+    오늘 현재 방문자와 어제 방문자를 비교하고, 누적 방문자의 오늘 증가분은
+    오늘 방문자 수와 동일하게 표시한다.
     """
     try:
         url = site_url.rstrip("/") + "/wp-json/site-stats/v1/visitors"
@@ -84,21 +84,18 @@ def get_footer_visitor_stats(site_url):
         if r.status_code != 200:
             return None, f"visitor API HTTP {r.status_code}"
         data = r.json()
+        today_count = int(data.get("count", 0) or 0)
         y_count = int(data.get("yesterday_count", 0) or 0)
         total = int(data.get("total", 0) or 0)
-        y_date = data.get("yesterday_date")
-
-        # 전전날 값은 endpoint 구버전에는 없을 수 있으므로 None 허용.
-        dby_raw = data.get("day_before_yesterday_count")
-        dby_count = int(dby_raw) if dby_raw is not None else None
-        delta = y_count - dby_count if dby_count is not None else None
 
         return {
-            "date": y_date,
-            "daily_visitors": y_count,
-            "visitor_delta": delta,
+            "date": data.get("date"),
+            "daily_visitors": today_count,
+            "visitor_delta": today_count - y_count,
             "total_visitors": total,
-            "today_live": int(data.get("count", 0) or 0),
+            "total_delta": today_count,
+            "today_live": today_count,
+            "yesterday_visitors": y_count,
         }, None
     except Exception as e:
         return None, f"visitor API 예외: {str(e)[:160]}"
@@ -257,6 +254,14 @@ def fmt_delta(v):
     return f"+{v}" if v >= 0 else str(v)
 
 
+def fmt_value_delta(value, delta):
+    if value is None:
+        return ""
+    value_text = f"{value:,}" if isinstance(value, int) else str(value)
+    delta_text = fmt_delta(delta)
+    return f"{value_text}({delta_text})" if delta_text else value_text
+
+
 def send_to_sheets(records):
     if SHEETS_WEBHOOK:
         try:
@@ -282,9 +287,8 @@ def send_to_sheets(records):
         domains = [s.rstrip("/").replace("https://", "") for s in SITES]
         values_by_domain = {
             r["domain"]: [
-                r.get("daily_visitors"),
-                fmt_delta(r.get("visitor_delta")),
-                r.get("total_visitors"),
+                fmt_value_delta(r.get("daily_visitors"), r.get("visitor_delta")),
+                fmt_value_delta(r.get("total_visitors"), r.get("total_delta")),
                 r.get("sitemap_indexed"),
                 r.get("sitemap_submitted"),
                 r.get("unindexed"),
@@ -306,7 +310,7 @@ def send_to_sheets(records):
             domains,
             date_label,
             [
-                "일일방문자수", "증감", "누적방문자", "사이트맵 보고 색인수", "사이트맵 제출URL수",
+                "오늘방문(전일대비)", "누적방문(오늘증가)", "사이트맵 보고 색인수", "사이트맵 제출URL수",
                 "미색인수", "색인율(%)", "최근 색인 증가", "총 발행글",
                 "GSC클릭", "GSC노출", "GSC CTR(%)", "GSC평균순위", "GSC기준일",
                 "오류/연결상태",
@@ -419,7 +423,7 @@ def main():
         row["status"] = "정상" if not row["errors"] else " | ".join(row["errors"])
         if visitor:
             log(
-                f"[{i:02d}/{len(SITES)}] {domain}: 전일 {row['daily_visitors']} "
+                f"[{i:02d}/{len(SITES)}] {domain}: 오늘 {row['daily_visitors']} "
                 f"({fmt_delta(row['visitor_delta']) or '비교없음'}) / 누적 {row['total_visitors']} "
                 f"/ GSC 클릭 {row['gsc_clicks']} · 노출 {row['impressions']} "
                 f"· CTR {row['ctr']}% · 평균순위 {row['position']}"
@@ -442,7 +446,7 @@ def main():
             {"checked_at": checked_at, "records": records, "partial": False},
             f, ensure_ascii=False, indent=2,
         )
-    log("✅ 완료 — 일일방문자수는 footer 카운터 전일 확정값 기준")
+    log("✅ 완료 — 오늘방문(전일대비)·누적방문(오늘증가) 형식으로 기록")
 
 
 if __name__ == "__main__":

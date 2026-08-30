@@ -160,31 +160,29 @@ def now_kst_str():
 # 1) 27개 사이트 요약 (상세 아니라 합계만)
 # ════════════════════════════════════════════════════════════
 def get_visitor_metrics(site_url):
-    """Return the last completed day's visitor count plus cumulative total.
+    """Return today's live visitors, yesterday comparison, and total.
 
-    2026-08-28 fix: this used to report "count" (today-so-far, still
-    accumulating) as the headline number and diff it against
-    yesterday_count (a full completed day) — comparing a partial day to
-    a complete one meant the "전일대비" column showed a decline for
-    almost every site, every single run, regardless of actual trend.
-    Use yesterday_count (the last complete day) as the headline, and
-    diff it against day_before_yesterday_count so both sides of the
-    comparison are full days.
+    User-facing display is ``오늘방문 120(+30)`` and
+    ``누적방문 1,053(+2)``. The cumulative increase for today equals
+    today's visitor count because the footer counter adds each visit to
+    both today's count and the cumulative total.
     """
     try:
         r = requests.get(f"{site_url}/wp-json/site-stats/v1/visitors",
                           headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
         if r.status_code == 200:
             data = r.json()
+            today_count = int(data.get("count", 0))
             yesterday_count = int(data.get("yesterday_count", 0))
             day_before_count = int(data.get("day_before_yesterday_count", 0))
-            total_count = int(data.get("total", yesterday_count))
+            total_count = int(data.get("total", today_count))
             return {
-                "today": yesterday_count,
-                "yesterday": day_before_count,
-                "daily_delta": yesterday_count - day_before_count,
+                "today": today_count,
+                "yesterday": yesterday_count,
+                "day_before_yesterday": day_before_count,
+                "daily_delta": today_count - yesterday_count,
                 "total": total_count,
-                "total_delta": yesterday_count,
+                "total_delta": today_count,
             }
     except Exception:
         pass
@@ -447,6 +445,14 @@ def _fmt_diff_cell(d):
     return f"+{d}" if d >= 0 else str(d)
 
 
+def _fmt_value_delta(value, delta):
+    if value is None:
+        return ""
+    value_text = f"{value:,}" if isinstance(value, int) else str(value)
+    delta_text = _fmt_diff_cell(delta)
+    return f"{value_text}({delta_text})" if delta_text else value_text
+
+
 def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
     import gsheets_direct
     if not SHEET_ID or not gsheets_direct.has_credentials():
@@ -484,7 +490,7 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
     date_label = f"{now.year}-{now.month:02d}-{now.day:02d} {weekday_kr(now.strftime('%Y-%m-%d'))}"
     try:
         summary_header = [
-            "기준일(KST)", "수집시각(KST)", "WP수집", "WP전체", "어제방문자합계",
+            "기준일(KST)", "수집시각(KST)", "WP수집", "WP전체", "오늘방문자합계(전일대비)",
             "누적방문자합계", "검색클릭합계", "색인합계", "공개글합계",
             "YouTube수집", "YouTube전체", "구독자합계", "조회수합계",
             "SNS수집", "SNS전체", "Blogger연결", "Blogger목표", "Tistory연결",
@@ -492,7 +498,9 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
         ]
         summary_row = [
             date_label, checked_at, totals["wp_collected"], totals["wp_total"],
-            totals["daily_visitors"], totals["cumulative_visitors"], totals["search_clicks"],
+            _fmt_value_delta(totals["daily_visitors"], totals["daily_visitors_delta"]),
+            _fmt_value_delta(totals["cumulative_visitors"], totals["cumulative_visitors_delta"]),
+            totals["search_clicks"],
             totals["indexed"], totals["posts"], totals["youtube_collected"],
             totals["youtube_total"], totals["youtube_subscribers"], totals["youtube_views"],
             totals["sns_collected"], totals["sns_total"], totals["blogger_connected"], 27,
@@ -506,13 +514,13 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
         for item in site_details:
             vm = item.get("visitor_metrics") or {}
             wp_values[item["domain"]] = [
-                vm.get("today"), _fmt_diff_cell(vm.get("daily_delta")),
-                vm.get("total"), _fmt_diff_cell(vm.get("total_delta")),
+                _fmt_value_delta(vm.get("today"), vm.get("daily_delta")),
+                _fmt_value_delta(vm.get("total"), vm.get("total_delta")),
                 item.get("clicks"), item.get("indexed"), item.get("total_posts"), item.get("status"),
             ]
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "아침_WP상세", [item["domain"] for item in site_details], date_label,
-            ["일방문자(어제)", "전일대비", "누적방문자", "누적증가", "검색클릭", "색인", "공개글", "수집상태"],
+            ["오늘방문(전일대비)", "누적방문(오늘증가)", "검색클릭", "색인", "공개글", "수집상태"],
             wp_values,
         )
 
@@ -712,6 +720,12 @@ def main():
     total_cumulative_visitors = sum(
         (d.get("visitor_metrics") or {}).get("total", 0) for d in site_details_list
     )
+    total_today_delta = sum(
+        (d.get("visitor_metrics") or {}).get("daily_delta", 0) for d in site_details_list
+    )
+    total_cumulative_delta = sum(
+        (d.get("visitor_metrics") or {}).get("total_delta", 0) for d in site_details_list
+    )
     summary_lines = [
         f"[{checked_at}] 종합상황실",
         "",
@@ -719,15 +733,15 @@ def main():
         f"  사이트 {ok_sites}/{site_count} 정상 | 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} | "
         f"Google 검색 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} | "
         f"사이트맵 색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} | "
-        f"실제방문자 합계(어제 최종) {total_real_visitors}명(수집 {visitor_sites}/{site_count})",
-        f"  WP 누적방문자 합계 {total_cumulative_visitors}명",
+        f"오늘방문 합계 {total_real_visitors}{fmt_diff(total_today_delta)}명(수집 {visitor_sites}/{site_count})",
+        f"  WP 누적방문 합계 {total_cumulative_visitors}{fmt_diff(total_cumulative_delta)}명",
         f"  유튜브 {youtube_count}채널 구독자합계 {total_yt_subs}명 | 조회수합계 {total_yt_views}회",
         f"  SNS 연결계정 {sns_connected}/{sns_account_count}개",
         "",
         f"■ 사이트 {site_count}개 — 전체글수 {today['site_posts']} {fmt_diff(d_site_posts)} / "
         f"Google 검색 클릭 합계 {today['site_clicks']} {fmt_diff(d_site_clicks)} / "
         f"사이트맵 색인 합계 {today['site_indexed']} {fmt_diff(d_site_indexed)} / "
-        f"실제방문자 합계(어제 최종) {total_real_visitors}명(수집 {visitor_sites}/{site_count})",
+        f"오늘방문 합계 {total_real_visitors}{fmt_diff(total_today_delta)}명(수집 {visitor_sites}/{site_count})",
     ]
     for d in site_details_list:
         domain = d["domain"]
@@ -735,9 +749,7 @@ def main():
         d_clicks = diff(d["clicks"], y.get("clicks"))
         d_posts = diff(d.get("total_posts"), y.get("total_posts"))
         d_indexed = diff(d["indexed"], y.get("indexed"))
-        # 방문자 증감은 저장된 이전 실행값이 아니라 각 사이트 카운터가 제공하는
-        # 완결된 두 날짜(어제-그제)를 직접 사용한다. 실행 누락/지연이 있어도
-        # 비교 기준이 흔들리지 않는다.
+        # 방문자 증감은 사이트 카운터가 제공하는 오늘-어제 값을 직접 사용한다.
         vm = d.get("visitor_metrics") or {}
         d_visitors = vm.get("daily_delta")
         if d_visitors is None:
@@ -747,10 +759,14 @@ def main():
         posts_str = d.get("total_posts") if d.get("total_posts") is not None else "-"
         indexed_str = d["indexed"] if d["indexed"] is not None else "-"
         visitors_str = d.get("visitor_count") if d.get("visitor_count") is not None else "미배포"
+        total_visitors = vm.get("total")
+        total_visitors_str = total_visitors if total_visitors is not None else "미배포"
+        total_delta = vm.get("total_delta")
         summary_lines.append(
             f"  - {domain} | {d['url']} | 전체글 {posts_str}{fmt_diff(d_posts)} | "
             f"사이트맵 색인 {indexed_str}{fmt_diff(d_indexed)} | Google 검색 클릭 {clicks_str}{fmt_diff(d_clicks)} | "
-            f"실제방문자(어제 최종) {visitors_str}{fmt_diff(d_visitors)} | {comment}")
+            f"오늘방문 {visitors_str}{fmt_diff(d_visitors)} | "
+            f"누적방문 {total_visitors_str}{fmt_diff(total_delta)} | {comment}")
     summary_lines += [
         "",
         f"■ 유튜브 전체 운영채널 (총 {youtube_count}개)",
@@ -854,7 +870,9 @@ def main():
         "wp_collected": visitor_sites,
         "wp_total": site_count,
         "daily_visitors": total_real_visitors,
+        "daily_visitors_delta": total_today_delta,
         "cumulative_visitors": total_cumulative_visitors,
+        "cumulative_visitors_delta": total_cumulative_delta,
         "search_clicks": today["site_clicks"],
         "indexed": today["site_indexed"],
         "posts": today["site_posts"],
@@ -874,7 +892,7 @@ def main():
         sns_diffs, dashboard_totals, checked_at,
     )
 
-    send_email(f"[종합상황실] {checked_at[:10]} 어제 방문자·증감 리포트",
+    send_email(f"[종합상황실] {checked_at[:10]} 오늘 방문자·증감 리포트",
                summary_text + "\n\n[AI 분석]\n" + analysis +
                "\n\n[오늘의 원포인트레슨]\n" + one_point_lesson +
                (f"\n\n시트: {sheet_link}" if sheet_link else ""))
