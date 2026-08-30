@@ -44,14 +44,14 @@
         "indexed": 0,
         "total_posts": 45,
         "status": "정상",
-        "visitor_count": 222
+        "visitor_count": 228
       },
       "koreataxnlaw.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 1,
         "status": "정상",
-        "visitor_count": 78
+        "visitor_count": 82
       },
       "koreacrypto365.com": {
         "clicks": 0,
@@ -65,28 +65,28 @@
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 26
+        "visitor_count": 27
       },
       "ktech365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 12,
         "status": "정상",
-        "visitor_count": 85
+        "visitor_count": 86
       },
       "kskin365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 46,
         "status": "정상",
-        "visitor_count": 209
+        "visitor_count": 210
       },
       "oliveyoungkorea.com": {
         "clicks": null,
         "indexed": null,
         "total_posts": 0,
         "status": "권한없음",
-        "visitor_count": 115
+        "visitor_count": 118
       },
       "kworld365.com": {
         "clicks": 0,
@@ -100,28 +100,28 @@
         "indexed": 0,
         "total_posts": 6,
         "status": "정상",
-        "visitor_count": 223
+        "visitor_count": 224
       },
       "k-visa365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 50,
         "status": "정상",
-        "visitor_count": 312
+        "visitor_count": 314
       },
       "koreawedding365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 61,
         "status": "정상",
-        "visitor_count": 353
+        "visitor_count": 355
       },
       "kstudy365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 12,
         "status": "정상",
-        "visitor_count": 63
+        "visitor_count": 70
       },
       "studyinkorea365.com": {
         "clicks": 0,
@@ -142,14 +142,14 @@
         "indexed": 0,
         "total_posts": 0,
         "status": "정상",
-        "visitor_count": 20
+        "visitor_count": 21
       },
       "sis-korea.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 58,
         "status": "정상",
-        "visitor_count": 267
+        "visitor_count": 268
       },
       "jobkorea365.com": {
         "clicks": 0,
@@ -163,35 +163,35 @@
         "indexed": 0,
         "total_posts": 44,
         "status": "정상",
-        "visitor_count": 73
+        "visitor_count": 78
       },
       "jobkoreaglobal.com": {
         "clicks": 1,
         "indexed": 0,
         "total_posts": 35,
         "status": "정상",
-        "visitor_count": 278
+        "visitor_count": 279
       },
       "korea365.org": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 88,
         "status": "정상",
-        "visitor_count": 95
+        "visitor_count": 107
       },
       "koreanews365.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 10,
         "status": "정상",
-        "visitor_count": 50
+        "visitor_count": 54
       },
       "theseouljournal.com": {
         "clicks": 0,
         "indexed": 0,
         "total_posts": 93,
         "status": "정상",
-        "visitor_count": 32
+        "visitor_count": 33
       }
     },
     "blogger_details": {
@@ -397,6 +397,13 @@
         "views": 14
       }
     },
+    "adsense_khealth365": {
+      "today": 23.0,
+      "month": 853.0,
+      "cumulative": 8291.0,
+      "currency": "KRW",
+      "status": "수익화 승인 · AdSense 정상"
+    },
     "tiktok": {
       "TOPIK": {
         "count": 30300,
@@ -466,5 +473,5 @@
       }
     }
   },
-  "updated_at": "2026-08-30 14:30:11"
+  "updated_at": "2026-08-30 15:25:19"
 }
