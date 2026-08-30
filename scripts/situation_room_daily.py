@@ -205,6 +205,87 @@ def get_total_published(site_url):
     return None
 
 
+def _blogger_slug(room):
+    """Return the intended blogspot subdomain for all 27 Blogger rooms."""
+    aliases = {
+        "blogger_khealth365": "k-health365",
+        "blogger_kvisa365": "k-visa365",
+        "blogger_kikorea": "ki-korea",
+        "blogger_kieca": "kieca-korea",
+        "blogger_ksa": "ksa-korea",
+        "blogger_sis": "sis-korea",
+        "blogger_koreanews365": "koreanews365",
+    }
+    room_id = room.get("room_id", "")
+    return aliases.get(room_id, room_id.removeprefix("blogger_") or room.get("name", ""))
+
+
+def load_blogger_rooms():
+    path = Path(REPO_ROOT) / "config" / "automation_rooms.json"
+    try:
+        rooms = json.loads(path.read_text(encoding="utf-8")).get("rooms", [])
+    except (OSError, ValueError):
+        return []
+    return [room for room in rooms if room.get("platform") == "blogger"]
+
+
+def get_blogger_published_count(blog_url):
+    """Count publicly visible Blogger posts through the public JSON feed."""
+    try:
+        response = requests.get(
+            f"{blog_url.rstrip('/')}/feeds/posts/default",
+            params={"alt": "json", "max-results": 1},
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=15,
+        )
+        if response.status_code != 200:
+            return None, f"공개피드 HTTP {response.status_code}"
+        total = response.json().get("feed", {}).get("openSearch$totalResults", {}).get("$t")
+        return int(total or 0), None
+    except Exception as exc:
+        return None, f"공개피드 오류: {str(exc)[:100]}"
+
+
+def collect_blogger_summary():
+    """Collect public-post and sitemap-index counts for all 27 Blogger rooms."""
+    rooms = load_blogger_rooms()
+    token = None
+    accessible = set()
+    try:
+        token = get_gsc_token()
+        response = gsc_get(token, "/sites")
+        if response.status_code == 200:
+            accessible = {item.get("siteUrl") for item in response.json().get("siteEntry", [])}
+    except Exception:
+        token = None
+
+    details = []
+    for room in rooms:
+        slug = _blogger_slug(room)
+        blog_url = f"https://{slug}.blogspot.com"
+        public_posts, feed_error = get_blogger_published_count(blog_url)
+        indexed = None
+        errors = []
+        if feed_error:
+            errors.append(feed_error)
+        property_candidates = (blog_url + "/", f"sc-domain:{slug}.blogspot.com")
+        query_site = next((candidate for candidate in property_candidates if candidate in accessible), None)
+        if token and query_site:
+            coverage, coverage_error = get_index_coverage(token, query_site)
+            if coverage:
+                indexed = coverage.get("sitemap_indexed")
+            elif coverage_error:
+                errors.append(coverage_error)
+        else:
+            errors.append("GSC 속성 연결 필요")
+        details.append({
+            "site_id": room.get("room_id"), "name": room.get("name"),
+            "domain": f"{slug}.blogspot.com", "url": blog_url,
+            "public_posts": public_posts, "indexed": indexed,
+            "status": "정상" if not errors else " | ".join(errors),
+        })
+    return details
+
+
 def collect_site_summary():
     if not os.environ.get("GSC_SERVICE_ACCOUNT_JSON"):
         return {"total_clicks": None, "total_indexed": None, "total_posts": None, "error_sites": [],
@@ -450,7 +531,7 @@ def _fmt_value_delta(value, delta):
         return ""
     value_text = f"{value:,}" if isinstance(value, int) else str(value)
     delta_text = _fmt_diff_cell(delta)
-    return f"{value_text}({delta_text})" if delta_text else value_text
+    return f"{value_text}({delta_text or '—'})"
 
 
 def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
@@ -480,8 +561,8 @@ def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
 
-def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats, sns_diffs,
-                                 totals, checked_at):
+def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_diffs,
+                                 social_stats, sns_diffs, totals, checked_at):
     """Write one compact summary plus per-asset daily comparison tables."""
     import gsheets_direct
     if not SHEET_ID or not gsheets_direct.has_credentials():
@@ -491,7 +572,7 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
     try:
         summary_header = [
             "기준일(KST)", "수집시각(KST)", "WP수집", "WP전체", "오늘방문자합계(전일대비)",
-            "누적방문자합계", "검색클릭합계", "색인합계", "공개글합계",
+            "누적방문자합계", "검색클릭합계(전일대비)", "색인합계(전일대비)", "공개글합계(전일대비)",
             "YouTube수집", "YouTube전체", "구독자합계", "조회수합계",
             "SNS수집", "SNS전체", "Blogger연결", "Blogger목표", "Tistory연결",
             "Tistory목표", "상태"
@@ -500,8 +581,9 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
             date_label, checked_at, totals["wp_collected"], totals["wp_total"],
             _fmt_value_delta(totals["daily_visitors"], totals["daily_visitors_delta"]),
             _fmt_value_delta(totals["cumulative_visitors"], totals["cumulative_visitors_delta"]),
-            totals["search_clicks"],
-            totals["indexed"], totals["posts"], totals["youtube_collected"],
+            _fmt_value_delta(totals["search_clicks"], totals["search_clicks_delta"]),
+            _fmt_value_delta(totals["indexed"], totals["indexed_delta"]),
+            _fmt_value_delta(totals["posts"], totals["posts_delta"]), totals["youtube_collected"],
             totals["youtube_total"], totals["youtube_subscribers"], totals["youtube_views"],
             totals["sns_collected"], totals["sns_total"], totals["blogger_connected"], 27,
             totals["tistory_connected"], 5, totals["status"],
@@ -516,12 +598,29 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
             wp_values[item["domain"]] = [
                 _fmt_value_delta(vm.get("today"), vm.get("daily_delta")),
                 _fmt_value_delta(vm.get("total"), vm.get("total_delta")),
-                item.get("clicks"), item.get("indexed"), item.get("total_posts"), item.get("status"),
+                _fmt_value_delta(item.get("total_posts"), item.get("published_delta")),
+                _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
+                _fmt_value_delta(item.get("clicks"), item.get("clicks_delta")), item.get("status"),
             ]
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "아침_WP상세", [item["domain"] for item in site_details], date_label,
-            ["오늘방문(전일대비)", "누적방문(오늘증가)", "검색클릭", "색인", "공개글", "수집상태"],
+            ["오늘방문(전일대비)", "누적방문(오늘증가)", "공개글(전일대비)",
+             "구글색인(전일대비)", "검색클릭(전일대비)", "수집상태"],
             wp_values,
+        )
+
+        blogger_values = {
+            item["domain"]: [
+                _fmt_value_delta(item.get("public_posts"), item.get("published_delta")),
+                _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
+                item.get("url"), item.get("status"),
+            ]
+            for item in blogger_details
+        }
+        gsheets_direct.append_dated_metric_columns(
+            SHEET_ID, "아침_Blogger상세", [item["domain"] for item in blogger_details], date_label,
+            ["공개글(전일대비)", "구글색인(전일대비)", "Blogger URL", "수집상태"],
+            blogger_values,
         )
 
         sns_values = {}
@@ -537,7 +636,7 @@ def send_morning_asset_dashboard(site_details, yt_stats, yt_diffs, social_stats,
             SHEET_ID, "아침_SNS상세", list(sns_values), date_label,
             ["팔로워", "전일대비", "상태"], sns_values,
         )
-        log("📊 아침 통합 대시보드 3개 탭 갱신 완료")
+        log("📊 아침 통합 대시보드 4개 탭 갱신 완료")
     except Exception as exc:
         log(f"⚠️ 아침 통합 대시보드 갱신 실패: {exc}")
 
@@ -606,6 +705,10 @@ def main():
     log(f"   전체글수 합계 {site_summary['total_posts']} / 클릭 합계 {site_summary['total_clicks']} "
         f"/ 색인 합계 {site_summary['total_indexed']} / 오류사이트 {len(site_summary['error_sites'])}개")
 
+    log("   Blogger 27개 공개글·색인 현황 수집 중...")
+    blogger_details = collect_blogger_summary()
+    log(f"   Blogger {len(blogger_details)}개 목록 확인")
+
     log("2/4 유튜브 전 채널 구독자 수집 중...")
     yt_stats, yt_err = collect_youtube_all()
     for label, v in yt_stats.items():
@@ -630,6 +733,11 @@ def main():
                                         "total_posts": d.get("total_posts"), "status": d["status"],
                                         "visitor_count": d.get("visitor_count")}
                           for d in site_details_list},
+        "blogger_details": {
+            d["domain"]: {"public_posts": d.get("public_posts"), "indexed": d.get("indexed"),
+                          "status": d.get("status")}
+            for d in blogger_details
+        },
         "youtube": yt_stats,
         "tiktok": tiktok_m, "facebook": facebook_m,
         "instagram": instagram_m, "threads": threads_m,
@@ -658,6 +766,17 @@ def main():
     d_site_indexed = diff(today["site_indexed"], yesterday.get("site_indexed"))
     d_site_posts = diff(today["site_posts"], yesterday.get("site_posts"))
     yesterday_sites = yesterday.get("site_details", {})
+    yesterday_bloggers = yesterday.get("blogger_details", {})
+
+    for item in site_details_list:
+        previous = yesterday_sites.get(item["domain"], {})
+        item["published_delta"] = diff(item.get("total_posts"), previous.get("total_posts"))
+        item["indexed_delta"] = diff(item.get("indexed"), previous.get("indexed"))
+        item["clicks_delta"] = diff(item.get("clicks"), previous.get("clicks"))
+    for item in blogger_details:
+        previous = yesterday_bloggers.get(item["domain"], {})
+        item["published_delta"] = diff(item.get("public_posts"), previous.get("public_posts"))
+        item["indexed_delta"] = diff(item.get("indexed"), previous.get("indexed"))
 
     def _site_comment(status, clicks, d_clicks, indexed, total_posts):
         if status != "정상":
@@ -874,8 +993,11 @@ def main():
         "cumulative_visitors": total_cumulative_visitors,
         "cumulative_visitors_delta": total_cumulative_delta,
         "search_clicks": today["site_clicks"],
+        "search_clicks_delta": d_site_clicks,
         "indexed": today["site_indexed"],
+        "indexed_delta": d_site_indexed,
         "posts": today["site_posts"],
+        "posts_delta": d_site_posts,
         "youtube_collected": yt_configured,
         "youtube_total": youtube_count,
         "youtube_subscribers": total_yt_subs,
@@ -887,7 +1009,7 @@ def main():
         "status": "정상" if visitor_sites == site_count and yt_configured == youtube_count else "일부수집",
     }
     send_morning_asset_dashboard(
-        site_details_list, yt_stats, yt_diffs,
+        site_details_list, blogger_details, yt_stats, yt_diffs,
         {"tiktok": tiktok_m, "facebook": facebook_m, "instagram": instagram_m, "threads": threads_m},
         sns_diffs, dashboard_totals, checked_at,
     )
