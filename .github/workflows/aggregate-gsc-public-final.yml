@@ -21,7 +21,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh run download 33284433841 --repo huh0303-cmyk/-WP-QWEN-autobot --dir downloaded-results
       - name: "사이트별 GSC 색인 수 집계"
-        run: python scripts/aggregate_gsc_public_results.py
+        run: |
+          python scripts/aggregate_gsc_public_results.py
+          cat gsc_24_final_summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: gsc-24-final-summary-${{ github.run_id }}

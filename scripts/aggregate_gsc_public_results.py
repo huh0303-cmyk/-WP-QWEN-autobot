@@ -27,3 +27,9 @@ for row in rows:
     print("\t".join(str(row[key]) for key in
           ("site", "posts_checked", "indexed", "newly_published", "uncertain", "failed")))
 print(f"SITES={len(rows)} INDEXED_TOTAL={sum(row['indexed'] for row in rows)}")
+
+md = ["## 24개 WP GSC URL 검사 최종 집계", "", "| 사이트 | 검사 글 | 색인 글 | 새 공개 | 미확정 | 실패 |", "|---|---:|---:|---:|---:|---:|"]
+for row in rows:
+    md.append(f"| {row['site']} | {row['posts_checked']} | {row['indexed']} | {row['newly_published']} | {row['uncertain']} | {row['failed']} |")
+md += ["", f"**색인 글 합계: {sum(row['indexed'] for row in rows)}개**"]
+Path("gsc_24_final_summary.md").write_text("\n".join(md), encoding="utf-8")
