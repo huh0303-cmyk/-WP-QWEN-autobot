@@ -23,3 +23,15 @@ def test_plain_email_links_to_the_post_editor_not_only_run_log():
     assert "글 확인·승인·비승인" in body
     assert REVIEWS[0]["edit_url"] in body
     assert "모바일 확인·업로드" not in body
+
+
+def test_mature_worker_draft_status_resolves_editor(tmp_path, monkeypatch):
+    import json
+    from scripts import publishing_completion_notify as mod
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / mod.RESULT_FILE).write_text(json.dumps({"records": [{
+        "status": "✅ DRAFT", "url": "https://example.com/?p=12", "title": "Review me"
+    }]}), encoding="utf-8")
+    monkeypatch.setattr(mod, "_site_key_map", lambda: {"https://example.com": "TEST_WP"})
+    monkeypatch.setenv("TEST_WP", "test-only")
+    assert mod.build_draft_reviews()[0]["edit_url"] == REVIEWS[0]["edit_url"]

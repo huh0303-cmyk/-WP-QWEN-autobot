@@ -88,7 +88,7 @@ def build_draft_reviews() -> list[dict]:
     key_map = _site_key_map()
     lines = []
     for rec in records:
-        if rec.get("status") != "draft" or not rec.get("url"):
+        if rec.get("status") not in {"draft", "✅ DRAFT"} or not rec.get("url"):
             continue
         site_url = "https://" + urlparse(rec["url"]).netloc
         wp_pass = os.environ.get(key_map.get(site_url.rstrip("/"), ""), "")
@@ -199,6 +199,30 @@ def main() -> int:
         }, ensure_ascii=False))
         return 0
 
+    schedule_id = os.getenv("CALENDAR_SCHEDULE_ID", "").strip()
+    if schedule_id.startswith(("CAL-", "ROLL-")):
+        from scripts.gsheets_direct import get_sheets_service
+        service = get_sheets_service()
+        sheet_id = os.environ["SHEET_ID"]
+        tab = "14일_콘텐츠운영캘린더"
+        values = service.spreadsheets().values().get(
+            spreadsheetId=sheet_id, range=f"'{tab}'!A1:O2000"
+        ).execute().get("values", [])
+        matches = [(i, r + [""] * (15 - len(r))) for i, r in enumerate(values, 1)
+                   if r and r[0] == schedule_id]
+        if len(matches) != 1 or len(reviews) != 1:
+            raise RuntimeError("Calendar result must match exactly one schedule and draft")
+        index, row = matches[0]
+        review = reviews[0]
+        if row[2] != "WordPress" or urlparse(row[4]).netloc != urlparse(review["edit_url"]).netloc:
+            raise RuntimeError("Draft destination does not match calendar")
+        if row[12] not in {"자료수집", "검수중"} or (row[13] and row[13] != review["edit_url"]):
+            raise RuntimeError("Calendar changed during generation; refusing to overwrite")
+        service.spreadsheets().values().update(
+            spreadsheetId=sheet_id, range=f"'{tab}'!M{index}:O{index}", valueInputOption="RAW",
+            body={"values": [["검수중", review["edit_url"], row[14] + "\n비공개 초안 저장; 관리자에서 직접 공개"]]},
+        ).execute()
+
     try:
         from scripts.review_sheet import append_review_rows
         sheet_synced = append_review_rows([
@@ -216,7 +240,7 @@ def main() -> int:
     results = {"email": send_email(title, body, email_html), "kakao": bool(kakao_results) and all(kakao_results),
                "url": fallback_link, "draft_links_found": len(reviews), "sheet_synced": sheet_synced}
     print(json.dumps(results, ensure_ascii=False))
-    return 0
+    return 0 if results["email"] else 1
 
 
 if __name__ == "__main__":

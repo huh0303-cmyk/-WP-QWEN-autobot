@@ -98,6 +98,8 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: |
           set -o pipefail
           mkdir -p artifacts
@@ -132,6 +134,11 @@ jobs:
           REPORT_EMAIL_TO: "huh0303@gmail.com"
           REPORT_EMAIL_FROM: "huh0303@gmail.com"
           REPORT_TITLE: "[WordPress 작성 완료] 글 확인 후 승인 또는 비승인"
+          CALENDAR_SCHEDULE_ID: ${{ inputs.room_id }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           REPORT_BODY: "오늘 작성된 비공개 글입니다. 글을 먼저 읽고 승인(공개) 또는 비승인(보류·삭제)을 선택해 주세요."
           REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}

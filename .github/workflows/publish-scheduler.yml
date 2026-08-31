@@ -1,8 +1,8 @@
 name: Publish Scheduler (A/B 랜덤 발행 트리거)
 
-# 실제 주간 대상/순서는 scripts/publish_scheduler.py가 결정한다.
+# 대상/순서는 구글 시트의 오늘 운영 캘린더가 결정한다.
 # 오늘 운영 캘린더의 대기 건을 놓치지 않도록 15분마다 확인한다.
-# 한 번에 최대 1개 사이트만 디스패치하며 실제 간격 제한은 스케줄러 코드가 적용한다.
+# 한 번에 최대 3개 미처리 일정의 비공개 초안을 요청한다.
 on:
   workflow_dispatch:
   push:
@@ -65,6 +65,8 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/publish_scheduler.py
       - name: Commit scheduler state
         if: always()
