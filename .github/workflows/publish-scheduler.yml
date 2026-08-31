@@ -1,8 +1,8 @@
 name: Publish Scheduler (A/B 랜덤 발행 트리거)
 
 # 실제 주간 대상/순서는 scripts/publish_scheduler.py가 결정한다.
-# 15분 폴링은 하루 96회 실행되어 Actions 소모와 로그 혼잡이 커서,
-# 2026-08-26부터 매시 37분 한 번만 확인한다. 한 번에 최대 1개 사이트만 디스패치한다.
+# 오늘 운영 캘린더의 대기 건을 놓치지 않도록 15분마다 확인한다.
+# 한 번에 최대 1개 사이트만 디스패치하며 실제 간격 제한은 스케줄러 코드가 적용한다.
 on:
   workflow_dispatch:
   push:
@@ -10,7 +10,7 @@ on:
     paths:
       - "scripts/publish_scheduler.py"
   schedule:
-    - cron: "37 * * * *"
+    - cron: "*/15 * * * *"
 
 permissions:
   contents: write
