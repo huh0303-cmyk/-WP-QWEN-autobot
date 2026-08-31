@@ -72,6 +72,22 @@ def _wp_status(site_url: str, post_id: int, password: str) -> tuple[str, str]:
 
 def _format_dashboard(service, sheet_id: str, tab_id: int, row_count: int) -> None:
     end_row = max(row_count, 2)
+    metadata = service.spreadsheets().get(
+        spreadsheetId=sheet_id,
+        fields="sheets(properties(sheetId,gridProperties(columnCount)),conditionalFormats)",
+    ).execute()
+    old_rule_count = 0
+    column_count = 0
+    for sheet in metadata.get("sheets", []):
+        if sheet.get("properties", {}).get("sheetId") == tab_id:
+            old_rule_count = len(sheet.get("conditionalFormats", []))
+            column_count = sheet.get("properties", {}).get("gridProperties", {}).get("columnCount", 0)
+            break
+    if column_count < 12:
+        service.spreadsheets().batchUpdate(
+            spreadsheetId=sheet_id,
+            body={"requests": [{"appendDimension": {"sheetId": tab_id, "dimension": "COLUMNS", "length": 12 - column_count}}]},
+        ).execute()
     service.spreadsheets().values().update(
         spreadsheetId=sheet_id, range=f"'{TAB_NAME}'!K1:L5", valueInputOption="USER_ENTERED",
         body={"values": [
@@ -82,15 +98,6 @@ def _format_dashboard(service, sheet_id: str, tab_id: int, row_count: int) -> No
             ["전체", "=COUNTA(D2:D)"],
         ]},
     ).execute()
-    metadata = service.spreadsheets().get(
-        spreadsheetId=sheet_id,
-        fields="sheets(properties(sheetId),conditionalFormats)",
-    ).execute()
-    old_rule_count = 0
-    for sheet in metadata.get("sheets", []):
-        if sheet.get("properties", {}).get("sheetId") == tab_id:
-            old_rule_count = len(sheet.get("conditionalFormats", []))
-            break
     requests_batch = [
         *({"deleteConditionalFormatRule": {"sheetId": tab_id, "index": 0}} for _ in range(old_rule_count)),
         {"updateSheetProperties": {"properties": {"sheetId": tab_id, "gridProperties": {"frozenRowCount": 1}}, "fields": "gridProperties.frozenRowCount"}},
