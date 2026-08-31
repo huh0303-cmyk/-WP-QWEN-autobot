@@ -6,11 +6,14 @@ import datetime as dt
 import json
 import os
 import random
+import sys
 from pathlib import Path
 
 import requests
 from urllib.parse import urlparse, parse_qs
 from gsheets_direct import get_sheets_service
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from automation_hub.calendar_time import is_current_slot
 
 ROOT = Path(__file__).resolve().parents[1]
 KST = dt.timezone(dt.timedelta(hours=9))
@@ -70,7 +73,7 @@ def main() -> int:
             continue
         item = rows[0]
         when = dt.datetime.strptime(item["planned_at_kst"].removesuffix(" KST"), "%Y-%m-%d %H:%M").replace(tzinfo=KST)
-        if when > NOW:
+        if not is_current_slot(when, NOW):
             continue
         source = wordpress.get(site.get("keyword_rules", {}).get("source_site_id", ""))
         if not source:
@@ -106,6 +109,9 @@ def main() -> int:
     for site in sorted((s for s in bloggers if s["site_id"] in due), key=lambda s: due[s["site_id"]][0]["planned_at_kst"]):
         site_id = site["site_id"]
         item, exact_source = due[site_id]
+        planned = dt.datetime.strptime(item["planned_at_kst"].removesuffix(" KST"), "%Y-%m-%d %H:%M").replace(tzinfo=KST)
+        if not is_current_slot(planned, dt.datetime.now(KST)):
+            continue
         target = 0  # The calendar due-time check above replaces random timing.
         print(f"{site_id}: target={target // 60:02d}:{target % 60:02d} KST fired={bool(state['fired'].get(site_id))}")
         if state["fired"].get(site_id) or now_minute < target:

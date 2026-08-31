@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime as dt
 from .youtube_registry import load_channels
+from .calendar_time import is_current_slot
 
 KST = dt.timezone(dt.timedelta(hours=9))
 TAB = "14일_콘텐츠운영캘린더"
@@ -74,7 +75,7 @@ def select_due(rows, now, enabled, limit=3):
         if (r["status"] != READY or r["url"] or not r["topic"] or slot in occupied
                 or r["key"] in blocked or r["key"] not in enabled):
             continue
-        if r["when"].date() == now.astimezone(KST).date() and r["when"] <= now:
+        if is_current_slot(r["when"], now):
             selected.append(r)
     return sorted(selected, key=lambda r: (r["when"], r["id"]))[:limit], skipped
 

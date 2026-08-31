@@ -16,7 +16,7 @@ def test_only_exact_public_calendar_source_can_dispatch(monkeypatch, tmp_path, p
     monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
     monkeypatch.setenv("GH_DISPATCH_TOKEN", "test")
     header = ["schedule_id", "planned_at_kst", "platform", "destination_url", "golden_keyword_candidate", "current_status", "review_or_output_url"]
-    when = mod["TODAY"] + " 00:00 KST"
+    when = mod["NOW"].strftime("%Y-%m-%d %H:%M KST")
     values = [header, ["CAL-WP", when, "WordPress", "https://example.com", "same topic", "검수중", "https://example.com/wp-admin/post.php?post=42&action=edit"],
               ["CAL-B", when, "Blogger", site["url"], "same topic", "WP 선행대기", ""]]
     service = Mock()

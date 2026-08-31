@@ -5,9 +5,9 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 
-def test_calendar_overrides_cadence_and_claims_before_dispatch(monkeypatch, tmp_path):
-    site = SimpleNamespace(url="https://example.com", content_type="news_en",
-                           publish_mode="automatic", secret_name="TEST_WP")
+def test_calendar_preserves_cadence_and_claims_before_dispatch(monkeypatch, tmp_path):
+    site = SimpleNamespace(url="https://example.com", content_type="blog",
+                           publish_mode="automatic", secret_name="TEST_WP", weekly_min=7, weekly_max=7)
     monkeypatch.setitem(sys.modules, "load_automation_hub_from_sheets",
                         SimpleNamespace(load_runtime_registry=lambda: SimpleNamespace(enabled=lambda _: [site])))
     monkeypatch.setenv("TEST_WP", "not-a-real-secret")
@@ -16,10 +16,11 @@ def test_calendar_overrides_cadence_and_claims_before_dispatch(monkeypatch, tmp_
     monkeypatch.setenv("GITHUB_OUTPUT", str(tmp_path / "out"))
     mod = runpy.run_path(str(Path(__file__).resolve().parents[1] / "scripts/publish_scheduler.py"))
     assert mod["TODAY_SITES"] == {site.url}
+    assert mod["weekly_publish_days"](site.url) == list(range(7))
     header = ["schedule_id", "planned_at_kst", "platform", "channel_site", "destination_url",
               "language", "golden_keyword_candidate", "planned_title_direction", "content_format",
               "source_asset_plan", "dependency", "quality_gate", "current_status", "review_or_output_url", "notes"]
-    row = ["CAL-test", mod["today"] + " 00:00 KST", "WordPress", "example", site.url,
+    row = ["CAL-test", mod["now"].strftime("%Y-%m-%d %H:%M KST"), "WordPress", "example", site.url,
            "en", "Exact sheet keyword", "", "", "", "", "", "황금키워드 검증대기", "", ""]
     service = Mock()
     service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {"values": [header, row]}
@@ -37,6 +38,9 @@ def test_calendar_overrides_cadence_and_claims_before_dispatch(monkeypatch, tmp_
     monkeypatch.setattr(globals_["requests"], "post", post)
     mod["main"]()
     assert events == ["claim", "dispatch"]
+    import datetime
+    row[1] = (mod["now"] - datetime.timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M KST")
+    assert mod["load_due_calendar_rows"](service) == []
     mod["main"]()
     assert events == ["claim", "dispatch"]
     row[12] = "보류"

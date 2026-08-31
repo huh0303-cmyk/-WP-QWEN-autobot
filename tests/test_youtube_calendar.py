@@ -23,7 +23,7 @@ def parsed(*rows):
     return parse_calendar([HEADERS, *rows])
 
 
-NOW = dt.datetime(2026, 8, 31, 13, tzinfo=KST)
+NOW = dt.datetime(2026, 8, 31, 12, tzinfo=KST)
 
 
 def test_aliases_and_future_time():
@@ -59,8 +59,8 @@ def test_unknown_channels_duplicate_ids_and_wrong_platform_fail_closed():
 
 
 def test_chronological_limit():
-    selected, _ = select_due(parsed(row(), row("CAL-2", "Healing", "2026-08-31 11:00 KST")), NOW, {"mbb", "healing"}, 1)
-    assert selected[0]["key"] == "healing"
+    selected, _ = select_due(parsed(row(), row("CAL-2", "Healing", "2026-08-31 12:00 KST")), NOW, {"mbb", "healing"}, 1)
+    assert selected[0]["key"] == "mbb"
 
 
 def test_private_result_requires_identity_and_private(tmp_path):
@@ -115,7 +115,7 @@ def test_dispatch_claims_before_http_and_forwards_calendar(monkeypatch):
     values = [["channel_key", "channel_type", "display_name", "channel_id", "secret_profile", "workflow", "enabled"],
               [c.channel_key, c.channel_type, c.display_name, c.channel_id, c.secret_profile, c.workflow, "ON"]]
     service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {"values": values}
-    r = parsed(row(when=dt.datetime.now(KST).strftime("%Y-%m-%d 00:00 KST")))[0]
+    r = parsed(row(when=dt.datetime.now(KST).strftime("%Y-%m-%d %H:%M KST")))[0]
     events = []
     def claim(*args):
         events.append("claim")

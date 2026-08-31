@@ -2,23 +2,25 @@
 # -*- coding: utf-8 -*-
 """Dispatch due WordPress calendar rows through the existing A/B draft pipeline.
 
-The 14-day calendar is the source of WHAT/WHEN, including today's catch-up work.
-The registry controls active destinations, not a second random weekly filter. Every dispatch
+The 14-day calendar is the source of WHAT/WHEN. Missed slots are PASS.
+The registry's established tier cadence and independent newsroom routing remain intact. Every dispatch
 keeps publication_approved=false, so this scheduler can only create review drafts.
 Only destinations with a non-empty runtime WordPress credential are eligible.
-The workflow polls every 15 minutes and catches up at most three overdue rows.
+No late catch-up, replay, or rescheduling is permitted.
 """
 from __future__ import annotations
 
 import datetime
 import json
 import os
+import random
 from typing import Any
 
 import requests
 
 from gsheets_direct import get_sheets_service
 from load_automation_hub_from_sheets import load_runtime_registry
+from automation_hub.calendar_time import is_current_slot
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 now = datetime.datetime.now(KST)
@@ -31,7 +33,7 @@ _registry = load_runtime_registry()
 ALL_BLOG_CONFIG = {
     site.url.rstrip("/"): site
     for site in _registry.enabled("wordpress")
-    if site.publish_mode in {"automatic", "review"}
+    if site.content_type == "blog" and site.publish_mode == "automatic"
 }
 # Do not spend generation calls on destinations that cannot accept a draft.  The
 # credential itself is never logged; only non-empty presence is used.
@@ -42,7 +44,18 @@ BLOG_CONFIG = {
 SITES = sorted(BLOG_CONFIG)
 
 
-TODAY_SITES = set(SITES)
+def weekly_publish_days(site_url: str) -> list[int]:
+    """Preserve the established tier cadence; never expand it to catch up."""
+    iso = now.date().isocalendar()
+    rng = random.Random(f"{iso.year}-W{iso.week}-{site_url}-weekly-cadence-v1")
+    config = BLOG_CONFIG[site_url]
+    count = rng.randint(config.weekly_min, config.weekly_max)
+    weekend_day = rng.choice([5, 6])
+    remaining = [day for day in range(7) if day != weekend_day]
+    return sorted([weekend_day] + rng.sample(remaining, count - 1))
+
+
+TODAY_SITES = {site for site in SITES if now.weekday() in weekly_publish_days(site)}
 
 GH_TOKEN = os.environ["GH_DISPATCH_TOKEN"]
 REPO = os.environ["GITHUB_REPOSITORY"]
@@ -99,7 +112,7 @@ def load_due_calendar_rows(service) -> list[dict[str, Any]]:
             str(row[index["platform"]]).strip() == "WordPress"
             and planned is not None
             and planned.date() == now.date()
-            and planned <= now
+            and is_current_slot(planned, now)
             and destination in TODAY_SITES
             and status == "황금키워드 검증대기"
             and not str(row[index["review_or_output_url"]]).strip()
@@ -133,6 +146,17 @@ def mark_dispatched(service, item: dict[str, Any]) -> None:
 def main() -> None:
     state = load_state()
     fired = state.get("fired", {})
+    last_raw = state.get("last_dispatch_at")
+    if last_raw:
+        try:
+            last = datetime.datetime.fromisoformat(last_raw)
+            if last.tzinfo is None:
+                last = last.replace(tzinfo=KST)
+            if (now - last.astimezone(KST)).total_seconds() < 30 * 60:
+                print("PASS: preserve established 30-minute dispatch spacing")
+                return
+        except ValueError:
+            pass
 
     service = get_sheets_service()
     due = load_due_calendar_rows(service)
@@ -148,6 +172,8 @@ def main() -> None:
     for item in due:
         schedule_id = item["schedule_id"]
         if not schedule_id or fired.get(schedule_id) or item["site_url"] in destinations:
+            continue
+        if not is_current_slot(item["planned"], datetime.datetime.now(KST)):
             continue
         # Persist the claim BEFORE dispatch. Unknown HTTP outcomes must not
         # recreate a draft. A failed claim prevents the external request.
@@ -183,7 +209,7 @@ def main() -> None:
 
         dispatched += 1
         destinations.add(item["site_url"])
-        if dispatched >= 3:
+        if dispatched >= 1:
             break
 
     _save_state(state, fired, changed)

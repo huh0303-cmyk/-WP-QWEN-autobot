@@ -23,8 +23,9 @@ An original `CAL-` series takes precedence over accidentally appended `ROLL-`
 rows through the original series end date. Suppressed rows are kept for audit;
 no historical data is deleted. One canonical channel/day is selected.
 
-Only `기획확정·자료준비` rows due today are eligible. Yesterday's dated content is
-not blindly replayed. Claim the row as `자료수집` before calling GitHub. Workers
+Only `기획확정·자료준비` rows in the current Sheet minute are eligible. Past times
+are PASS, including earlier today; never catch up. See CALENDAR_NO_CATCHUP_POLICY.md.
+Claim the row as `자료수집` before calling GitHub. Workers
 must bind the claim once, and consume a separate upload marker before the API
 upload. Failed/ambiguous requests and GitHub reruns never automatically upload
 again; inspect the run and Studio before explicitly resetting a failed claim.
