@@ -6,6 +6,7 @@ The 14-day calendar is the source of WHAT/WHEN.  The automation hub registry rem
 source of truth for WHICH sites are active and for A/B weekly cadence.  Every dispatch
 keeps publication_approved=false, so this scheduler can only create review drafts.
 Only destinations with a non-empty runtime WordPress credential are eligible.
+The workflow polls every 15 minutes; this script enforces the per-dispatch spacing.
 """
 from __future__ import annotations
 
