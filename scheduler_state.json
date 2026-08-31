@@ -3,7 +3,10 @@
   "fired": {
     "CAL-0001": true,
     "CAL-0021": true,
-    "CAL-0047": true
+    "CAL-0047": true,
+    "CAL-0043": true,
+    "CAL-0049": true,
+    "CAL-0029": true
   },
-  "last_dispatch_at": "2026-08-31T16:46:15.338576+09:00"
+  "last_dispatch_at": "2026-08-31T17:14:05.899496+09:00"
 }
