@@ -1,4 +1,4 @@
-name: "Two Newsrooms — 3–10 Daily Editions"
+name: "Two Newsrooms — RSS 2–10 Daily Editions"
 
 on:
   workflow_dispatch:

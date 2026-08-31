@@ -33,16 +33,16 @@ KST = timezone(timedelta(hours=9))
 def now_kst():
     return datetime.now(KST)
 
-NEWSROOM_DAILY_MIN = 3
+NEWSROOM_DAILY_MIN = 2
 NEWSROOM_DAILY_MAX = 10
 
 def newsroom_daily_target(site_url, day=None, daily_min=NEWSROOM_DAILY_MIN, daily_max=NEWSROOM_DAILY_MAX):
-    """Stable per-site target for one KST day; changes automatically next day."""
+    """RSS availability drives volume; no random early stop before the cap."""
     day = day or now_kst().date()
     seed = hashlib.sha256(f"{site_url}|{day.isoformat()}".encode()).digest()
     if daily_max < daily_min:
         raise ValueError(f"invalid newsroom daily range: {daily_min}-{daily_max}")
-    return daily_min + int.from_bytes(seed[:4], "big") % (daily_max - daily_min + 1)
+    return min(10, daily_max)
 
 def count_published_today(site_url, wp_pass):
     """Count posts published since KST midnight; fail closed on API errors."""
@@ -51,7 +51,7 @@ def count_published_today(site_url, wp_pass):
     try:
         response = requests.get(
             f"{site_url}/wp-json/wp/v2/posts", auth=(WP_USER, wp_pass),
-            params={"status":"publish", "after":after_utc, "per_page":1, "_fields":"id"},
+            params={"status":"publish,draft,pending,private,future", "after":after_utc, "per_page":1, "_fields":"id"},
             timeout=12,
         )
         response.raise_for_status()
@@ -1619,8 +1619,8 @@ def crawl_rss_news(lang="ko", site_url=""):
     if not sources:
         print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
         return "", "", None, ""
-    random.shuffle(sources)
     candidates = []
+    priorities = {}
     for src, url in sources:
         try:
             res = requests.get(url, timeout=10, headers={"User-Agent":"Mozilla/5.0"})
@@ -1630,7 +1630,8 @@ def crawl_rss_news(lang="ko", site_url=""):
                 d = re.sub(r'<[^>]+>','', it.description.text.strip() if it.description else "")
                 link = it.link.text.strip() if it.link else ""
                 raw_date = (it.pubDate.text.strip() if it.pubDate else "") or (it.find("dc:date").text.strip() if it.find("dc:date") else "")
-                recent = True
+                recent = False
+                published = None
                 if raw_date:
                     try:
                         published = parsedate_to_datetime(raw_date) if "," in raw_date else datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
@@ -1641,10 +1642,12 @@ def crawl_rss_news(lang="ko", site_url=""):
                 source_key = "source:" + link.split("#", 1)[0].rstrip("/") if link else ""
                 if t and len(t)>=5 and recent and not is_dup(t) and (not source_key or source_key not in cache):
                     candidates.append((t, d, src, link))
+                    urgent = bool(re.search(r'\b(breaking|urgent|alert)\b|속보|긴급', t, re.I))
+                    priorities[(t, link)] = (urgent, published.timestamp())
         except: pass
 
     if candidates:
-        ch = random.choice(candidates)
+        ch = max(candidates, key=lambda item: priorities[(item[0], item[3])])
         used.add(ch[0].strip().lower())
         print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
         return ch
@@ -3040,6 +3043,11 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     related_html = build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
 
+    if is_newsroom and cat_id:
+        from automation_hub.newsroom_category_badge import add_category_badge
+        actual_name = next((name for cid, name in load_site_categories(url, pw) if cid == cat_id), cat_name)
+        final = add_category_badge(final, actual_name, f"{url}/?cat={cat_id}")
+
     tag_ids=[]
     for tag in tags:
         try:
@@ -3538,17 +3546,17 @@ def main():
         if site["mode"] in ("news", "news_en"):
             daily_target = newsroom_daily_target(
                 url,
-                daily_min=site.get("daily_min", NEWSROOM_DAILY_MIN),
-                daily_max=site.get("daily_max", NEWSROOM_DAILY_MAX),
+                daily_min=NEWSROOM_DAILY_MIN,
+                daily_max=NEWSROOM_DAILY_MAX,
             )
             published_today = count_published_today(url, os.getenv(site["wp_pass_env"], ""))
             if published_today is None:
                 print(f"⏭  {url} — 오늘 발행량 확인 실패, 안전 중지")
                 skip += n
                 continue
-            print(f"  🗓️ 오늘 발행 {published_today}/{daily_target}건 (3~10건 자동 선정)")
+            print(f"  🗓️ 오늘 기사 준비·발행 {published_today}/{daily_target}건 (RSS 기반 2~10회·속보 우선)")
             if published_today >= daily_target:
-                print(f"⏭  {url} — 오늘의 무작위 발행 목표 달성")
+                print(f"⏭  {url} — 오늘 기사 상한 도달")
                 skip += n
                 continue
 
