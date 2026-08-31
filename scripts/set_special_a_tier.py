@@ -40,30 +40,34 @@ def main():
     wmin_col = header.index("weekly_min")
     wmax_col = header.index("weekly_max")
 
-    updates = []
+    target_rows = []
     found = set()
     for row_index, row in enumerate(values[1:], start=2):
-        if row_index and len(row) <= site_id_col:
-            continue
         site_id = row[site_id_col] if len(row) > site_id_col else ""
         if site_id not in SPECIAL_A_SITE_IDS:
             continue
         found.add(site_id)
-        updates.append((f"'{TAB}'!{_col_letter(group_col)}{row_index}", [["특A"]]))
-        updates.append((f"'{TAB}'!{_col_letter(wmin_col)}{row_index}", [["7"]]))
-        updates.append((f"'{TAB}'!{_col_letter(wmax_col)}{row_index}", [["7"]]))
+        target_rows.append(row_index)
 
     missing = SPECIAL_A_SITE_IDS - found
     if missing:
         raise SystemExit(f"site_id not found in {TAB}: {sorted(missing)}")
 
-    service.spreadsheets().values().batchUpdate(
-        spreadsheetId=SHEET_ID,
-        body={
-            "valueInputOption": "RAW",
-            "data": [{"range": rng, "values": vals} for rng, vals in updates],
-        },
-    ).execute()
+    # batchUpdate returned 403 with this refresh token's scope; every other
+    # script in this repo only ever uses single-range values().update()/
+    # append(), so match that proven pattern instead - one call per cell
+    # range, weekly_min/max combined since they're adjacent columns.
+    for row_index in target_rows:
+        service.spreadsheets().values().update(
+            spreadsheetId=SHEET_ID, range=f"'{TAB}'!{_col_letter(group_col)}{row_index}",
+            valueInputOption="RAW", body={"values": [["특A"]]},
+        ).execute()
+        service.spreadsheets().values().update(
+            spreadsheetId=SHEET_ID,
+            range=f"'{TAB}'!{_col_letter(wmin_col)}{row_index}:{_col_letter(wmax_col)}{row_index}",
+            valueInputOption="RAW", body={"values": [["7", "7"]]},
+        ).execute()
+
     print(f"Set group=특A, weekly_min=weekly_max=7 for {len(found)} sites:")
     for site_id in sorted(found):
         print(f"  {site_id}")
