@@ -79,6 +79,7 @@ jobs:
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "gemini"
           OPENAI_ENABLED: "true"
+          CLAUDE_ENABLED: "true"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_ENABLED: "true"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

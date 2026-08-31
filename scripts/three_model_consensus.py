@@ -22,11 +22,13 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
     rejection blocks the draft from reaching the review queue.
     """
     packet = json.dumps({"keyword": keyword, "title": title, "meta_description": meta,
-                         "content": content[:20000]}, ensure_ascii=False)
+                         "content": content}, ensure_ascii=False)
     rule = (
         "Independently inspect factual support, search intent, grammar, natural human tone, "
         "AI-like repetition, title originality and emotional hook, cross-platform copying, "
-        "metadata, headings and SEO quality. Do not trust another model's decision. "
+        "metadata, headings and SEO quality. Reject unsupported firsthand/field reporting, "
+        "generic stacked headline templates, and headline promises absent from the body. "
+        "Do not trust another model's decision. "
         "Return only JSON: {\"ok\": bool, \"issues\": [str]}. Draft:\n" + packet
     )
     results = {}

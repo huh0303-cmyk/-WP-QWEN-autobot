@@ -59,6 +59,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_ENABLED: "true"
+          CLAUDE_ENABLED: "true"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_ENABLED: "true"
           OPENAI_IMAGE_ENABLED: "false"

@@ -28,7 +28,7 @@ if str(ROOT) not in sys.path:
 # Set provider policy before importing the legacy engine so import-time defaults cannot
 # silently route WordPress back to Gemini or enable legacy paid image generation.
 os.environ["AI_TEXT_PROVIDER"] = "gemini"
-os.environ["OPENAI_ENABLED"] = "false"
+os.environ.setdefault("OPENAI_ENABLED", "false")
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "true"

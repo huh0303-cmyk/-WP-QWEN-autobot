@@ -3048,6 +3048,16 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         actual_name = next((name for cid, name in load_site_categories(url, pw) if cid == cat_id), cat_name)
         final = add_category_badge(final, actual_name, f"{url}/?cat={cat_id}")
 
+    # Inspect the exact title and final body that will be stored, including
+    # generated captions and footer. No later title/content substitution.
+    from editorial_title_gate import require_editorial_approval
+    try:
+        approval = require_editorial_approval(title=title, content=final, meta=meta, keyword=keyword,
+            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0))
+        print("EDITORIAL_APPROVAL " + json.dumps(approval, ensure_ascii=False))
+    except Exception as exc:
+        return {"ok": False, "error": f"Editorial gate blocked draft: {exc}"}
+
     tag_ids=[]
     for tag in tags:
         try:
@@ -3272,6 +3282,8 @@ def process_one(site, keyword):
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(9, 13)
     base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count,min_chars_override=min_chars)
+    from editorial_title_gate import TITLE_RULE
+    base_prompt += "\nFINAL HEADLINE REQUIREMENTS:\n" + TITLE_RULE
     if mode in ("news", "news_en"):
         base_prompt += (
             "\n\nSOURCE LEAD FOR FACTUAL GROUNDING:\n"
@@ -3300,15 +3312,8 @@ def process_one(site, keyword):
         body_raw,title,meta,faq=extract_meta_and_faq(raw)
         body,tags=extract_tags(body_raw,keyword,theme,lang,is_news=(mode in ("news","news_en")),tag_count=tag_count)
 
-        # AI가 만든 제목은 버리고, 코드가 22개 템플릿 중 랜덤으로 뽑아 무조건 교체
-        # (반복 패턴이 구글에 "AI 대량생산"으로 보이는 문제 해결)
-        # ★ 단, 뉴스 모드는 keyword가 이미 완성된 RSS 헤드라인이므로 템플릿을
-        #   덧씌우면 "Rethinking [완성된 문장]: A Fresh Perspective for 2026" 처럼
-        #   말이 안 되는 제목이 됨 → 뉴스 전용 헤드라인 재작성 함수 사용
-        if mode in ("news", "news_en"):
-            title = build_news_headline(keyword, lang)
-        else:
-            title=build_diverse_title(keyword,lang,site_url=url)
+        # Keep the article-grounded model title. The final assembled article
+        # must pass Gemini/GPT/Claude before WordPress can save a draft.
 
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
