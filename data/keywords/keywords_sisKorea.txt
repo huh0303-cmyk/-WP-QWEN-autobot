@@ -1,50 +1,50 @@
-Korea D-2 student visa changes 2026	Applications
-K-STAR visa eligibility 2026	Applications
-F-2-R visa designated universities	Applications
-Korean student visa requirements 2026	Applications
-TOPIK digital exam changes 2029	Applications
-International school Seoul admissions 2026	Applications
-Korea international school eligibility	Applications
-Seoul Foreign School application 2026	Applications
-Seoul International School application fees	Applications
-Korean short-term language application 2026	Applications
-BUFS International Summer School application	Applications
-Pusan National University summer deadlines	Applications
-Korea D-10 job seeking extension	Applications
-E-7-M visa K-CORE requirements	Applications
-Universities banned student visas 2026	Applications
-Korea student visa financial proof	Applications
-Designated universities AI permanent residency	Applications
-International student study plan 2026	Applications
-New gap year visa Korea	Applications
-Parents visa international students Korea	Applications
-Yonsei 3-week Korean program	Programs
-Korea University intensive Korean	Programs
-Ewha Womans short-term language	Programs
-Busan summer academic programs 2026	Programs
-Pusan National University global studies	Programs
-ARTSinTANK international dance Seoul	Programs
-ACC CREATORS residency 2026 art-tech	Programs
-STEM programs South Korea 2026	Programs
-AI degree programs Korea residency	Programs
-Vocational technical programs Korea 2026	Programs
-K-Culture experiential programs Korea	Programs
-British curriculum international schools Korea	Programs
-American curriculum international schools Seoul	Programs
-Chadwick International School Songdo programs	Programs
-North London Collegiate Jeju programs	Programs
-Regional specialized programs Korea	Programs
-Korean language education overseas expansion	Programs
-Global Korea Scholarship 2026-2027	Scholarships
-GKS undergraduate scholarship benefits	Scholarships
-KOICA Master's scholarship Korea	Scholarships
-KAIST scholarship 2027 international students	Scholarships
-Sogang University STEM graduate scholarship	Scholarships
-Seoul ANCHOR Project tuition waiver	Scholarships
-SNU President Fellowship 2026	Scholarships
-Korea University Global KU Scholarship	Scholarships
-Yonsei Underwood International College scholarship	Scholarships
-POSTECH international student funding	Scholarships
-GIST scholarships for foreigners	Scholarships
-Hanyang University international grants	Scholarships
-Ewha Global Leaders scholarship	Scholarships
+South Korea Education Policy Changes (Dec 2025/May 2026 announcements):**	Applications
+TOPIK exam digitisation by 2029, computer-based, AI grading.	Programs
+Expanded post-study pathways, "growth ladder visa system".	Scholarships
+Eased D-4 trainee visa requirements.	Applications
+New "gap year" route for OECD high school graduates.	Programs
+Here's the plan for keyword generation:	Scholarships
+Extract specific entities (school names, program names, scholarship names).	Applications
+Extract specific policies, events, or deadlines.	Programs
+Ensure no near-duplicates.	Scholarships
+Assign to one of the three categories: Applications, Programs, Scholarships.	Applications
+Let's start generating.	Programs
+Keywords Draft (Internal thought process - not final output):**	Scholarships
+Korea University Spring 2027 application	Applications
+KAIST graduate admission 2027	Programs
+Yonsei UIC Spring 2027 application	Scholarships
+GKS 2027 Embassy track deadline	Applications
+GKS 2027 University track application	Programs
+SKKU Spring 2027 international admission	Scholarships
+Korean student visa D-2 requirements	Applications
+D-4 to D-2 visa change Korea	Programs
+Korea University 2027 language test	Scholarships
+Seoul Foreign School 2027 enrollment	Applications
+Yongsan International School 2027 apply	Programs
+Korea International School 2027 admissions	Scholarships
+Korean high school exchange 2027	Applications
+KGSP 2027 undergraduate application	Programs
+Korea University international freshman 2027	Scholarships
+Hanyang University 2027 admissions	Applications
+Ewha Womans University 2027 application	Programs
+Kyung Hee University 2027 applications	Scholarships
+KOICA scholarship 2027 application	Applications
+GKS 2027 document checklist	Programs
+South Korea D-4 visa requirements 2026	Scholarships
+International student visa Korea process	Applications
+Korea study visa financial proof	Programs
+Korea AI graduate F-5 visa	Scholarships
+Korean language training 2026	Applications
+South Korea gap year program	Programs
+KAIST Master's PhD programs	Scholarships
+Yonsei Underwood International College	Applications
+Short-term Korean culture programs	Programs
+Seoul international school curriculum	Scholarships
+Korea STEM academic programs 2026	Applications
+TOPIK exam digital format 2029	Programs
+Korea D-2 student visa work rights	Scholarships
+Seoul student housing 2026 options	Applications
+Korea University dormitory options	Programs
+Yonsei SK Global House	Scholarships
+No deposit student housing Seoul	Applications
+South Korea teaching March 2027	Programs

@@ -1,50 +1,50 @@
-K-Pass Climate Card benefits	Transport & Admission
-Seoul Climate Card Plus	Transport & Admission
-Busan Dongbaek Pass registration	Transport & Admission
-AREX Express train 2026	Transport & Admission
-Incheon Airport e-Arrival card	Transport & Admission
-Korail Chuseok booking foreigners	Transport & Admission
-Jeju Island bus routes 2026	Transport & Admission
-Busan Metro fare 2026	Transport & Admission
-T-Money card top-up locations	Transport & Admission
-WOWPASS Korea transport card	Transport & Admission
-Gangneung public transport QR	Transport & Admission
-GTX-A Seoul Station opening	Transport & Admission
-KTX Chuseok tickets 2026	Transport & Admission
-AREX All-stop train stops	Transport & Admission
-Korea public bike rental	Transport & Admission
-Autumn foliage KTX tours	Itineraries
-Seoul Busan Jeju itinerary	Itineraries
-Gyeongju public transport plan	Itineraries
-Nami Island autumn daytrip	Itineraries
-Jeonju Hanok Village transit	Itineraries
-Seoraksan National Park transport	Itineraries
-Busan film festival routes	Itineraries
-DMZ tour public transport	Itineraries
-Budget Korea travel itinerary	Itineraries
-Accessible Seoul subway tour	Itineraries
-Gangneung coastal bus trip	Itineraries
-Multi-city Korea train travel	Itineraries
-Seoul autumn leaves spots	Itineraries
-Hallasan hiking bus guide	Itineraries
-Andong Mask Festival transport	Itineraries
-Chuseok 2026 travel dates	Seasonal Travel
-Korea autumn foliage forecast 2026	Seasonal Travel
-Naejangsan autumn peak timing	Seasonal Travel
-Seoraksan fall colors timing	Seasonal Travel
-Late summer festivals Korea	Seasonal Travel
-Typhoon season travel tips	Seasonal Travel
-Winter Gangwon transport safety	Seasonal Travel
-Cherry blossom train tours	Seasonal Travel
-Spring festival Seoul 2026	Seasonal Travel
-New Year sunrise public transit	Seasonal Travel
-October Korea travel crowds	Seasonal Travel
-November Korea fall leaves	Seasonal Travel
-Seollal 2026 travel impact	Seasonal Travel
-Jeju Island autumn scenic bus	Seasonal Travel
-Seoul Station hotels KTX	Stays & Lodging
-L7 Haeundae Busan beachfront	Stays & Lodging
-Mohegan INSPIRE resort Incheon	Stays & Lodging
-New Hanok hotels Seoul 2026	Stays & Lodging
-Myeongdong subway hotels guide	Stays & Lodging
-Hongdae budget lodging options	Stays & Lodging
+KTX SRT merger updates	Transport & Admission
+KTX Sancheon tickets booking	Transport & Admission
+Integrated Korea rail app	Transport & Admission
+Seoul Climate Card benefits	Transport & Admission
+K-Pass Seoul tourist options	Transport & Admission
+e-Arrival Card Korea form	Transport & Admission
+K-ETA exemption 2026 validity	Transport & Admission
+Dongbuk Line subway opening	Transport & Admission
+Wirye Line tram route map	Transport & Admission
+GTX-A Seoul Suseo section	Transport & Admission
+Seohae Line extension March 2026	Transport & Admission
+Seoul new urban rail plans	Transport & Admission
+Korail transfer discount system	Transport & Admission
+Korea rail pass options 2026	Transport & Admission
+Public transport Seoul budget	Transport & Admission
+Fall festival Korea travel plan	Itineraries
+Public transport Busan itinerary	Itineraries
+Seoul Gyeongju Busan train itinerary	Itineraries
+Jeju Island public transport tours	Itineraries
+Seoraksan autumn day trip	Itineraries
+Andong Mask Dance Festival dates	Itineraries
+Jinju Lantern Festival visit	Itineraries
+Seoul Autumn Festa schedule	Itineraries
+UNESCO heritage Korea by rail	Itineraries
+Gyeongju fall foliage routes	Itineraries
+DMZ public transport options	Itineraries
+Coastal cities KTX connections	Itineraries
+Seoul 5-day budget itinerary	Itineraries
+Hahoe Folk Village tour 2026	Itineraries
+Korea fall foliage forecast 2026	Seasonal Travel
+Best time Korea autumn 2026	Seasonal Travel
+Autumn festivals South Korea	Seasonal Travel
+Seoraksan peak foliage guide	Seasonal Travel
+Jeju Island autumn travel tips	Seasonal Travel
+Seoul October activities guide	Seasonal Travel
+Korea autumn packing list	Seasonal Travel
+Pink muhly grass locations	Seasonal Travel
+Seoul International Fireworks Festival 2026	Seasonal Travel
+Suwon Hwaseong Cultural Festival	Seasonal Travel
+Naejangsan Maple Festival dates	Seasonal Travel
+Early November Korea foliage	Seasonal Travel
+October weather South Korea	Seasonal Travel
+Gyeongju autumn leaves viewing	Seasonal Travel
+Sheraton Jeju new resort 2026	Stays & Lodging
+Mohegan INSPIRE Resort booking	Stays & Lodging
+Jeju Island safety concerns hotels	Stays & Lodging
+Yongsan luxury hotel development	Stays & Lodging
+Hyatt Place Seoul Pangyo review	Stays & Lodging
+Wyndham Goseong Gangwon location	Stays & Lodging
+Jeju guesthouse safety updates	Stays & Lodging
