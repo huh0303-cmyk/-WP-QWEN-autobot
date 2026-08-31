@@ -8,6 +8,7 @@ import os
 import socket
 import sys
 import uuid
+from urllib.parse import urlparse, parse_qs
 from pathlib import Path
 
 import requests
@@ -86,8 +87,18 @@ def main():
     check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
     service = get_sheets_service()
     try:
-        posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
+        parsed = urlparse(source_url)
+        exact_ids = parse_qs(parsed.query).get("p", [])
+        if exact_ids:
+            if not exact_ids[0].isdigit():
+                raise ValueError("Invalid exact WordPress source ID")
+            posts = requests.get(f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
+        else:
+            posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
         posts.raise_for_status()
+        source_posts = [posts.json()] if exact_ids else posts.json()
+        if exact_ids and source_posts[0].get("status") != "publish":
+            raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
     except requests.RequestException as exc:
         _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
         raise
@@ -98,7 +109,7 @@ def main():
         intent = os.environ.get("BLOGGER_SEARCH_INTENT", "").lower().split(",")
         persona = os.environ.get("BLOGGER_PERSONA", "").lower().split()
         return 40 + min(30, 10 * sum(x.strip() in title for x in intent if x.strip())) + min(20, 4 * sum(x in title for x in persona if len(x) > 3)) + min(10, len(title) // 12)
-    eligible = [post for post in posts.json() if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))]
+    eligible = [post for post in source_posts if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))]
     source = max(eligible, key=golden_source_score, default=None)
     if not source:
         _append_failure(service, sheet_id, blogger_site_id, error_code="NO_NEW_SOURCE", message="새로운 WordPress 원문이 없어 생성과 유료 API 호출을 시작하지 않았습니다.", source_url=source_url)
