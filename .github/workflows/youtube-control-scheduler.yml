@@ -26,7 +26,8 @@ permissions:
   actions: write
 
 concurrency:
-  group: youtube-control-scheduler
+  # v2 isolates the restored calendar scheduler from the pre-restoration queue.
+  group: youtube-control-scheduler-calendar-v2
   cancel-in-progress: false
 
 jobs:
