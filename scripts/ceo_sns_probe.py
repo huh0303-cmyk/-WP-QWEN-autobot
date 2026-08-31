@@ -5,6 +5,7 @@ explicitly marked; missing values and unverified deltas are never zero-filled.
 """
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -20,7 +21,7 @@ def safe_error(error):
         if any(part in key.upper() for part in ("TOKEN", "SECRET", "PASSWORD", "API_KEY")) and value:
             text = text.replace(value, "[REDACTED]")
     # Do not export exception URLs, which may contain truncated credentials.
-    if "access_token" in text.lower() or "https://" in text.lower():
+    if re.search(r"access_token\s*=", text, re.I) or "https://" in text.lower():
         return "요청 실패 — 인증정보 보호를 위해 상세 URL 생략"
     return text[:240]
 

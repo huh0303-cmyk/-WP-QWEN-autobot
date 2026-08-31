@@ -576,10 +576,10 @@ def _fmt_diff_cell(d):
 
 def _fmt_value_delta(value, delta):
     if value is None:
-        return ""
+        return "미집계(증감 미확인)"
     value_text = f"{value:,}" if isinstance(value, int) else str(value)
-    delta_text = _fmt_diff_cell(delta)
-    return f"{value_text}({delta_text or '—'})"
+    delta_text = "증감 미확인" if delta is None else "0" if delta == 0 else _fmt_diff_cell(delta)
+    return f"{value_text}({delta_text})"
 
 
 def send_youtube_status_to_sheets(yt_stats, yt_diffs, checked_at):
@@ -681,7 +681,7 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
                 info = social_stats[platform_key][brand]
                 sns_values[key] = [
                     _fmt_value_delta(info.get("count"), sns_diffs[platform_key].get(brand)),
-                    info.get("error", ""),
+                    info.get("error") or ("공개 프로필 참고값; 공식 인사이트 아님" if platform_key == "tiktok" else "공식 API 조회 성공"),
                 ]
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "아침_SNS상세", list(sns_values), date_label,

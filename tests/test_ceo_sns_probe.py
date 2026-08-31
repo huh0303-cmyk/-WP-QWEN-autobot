@@ -20,6 +20,7 @@ class ProbeTests(unittest.TestCase):
         with patch.dict(os.environ, {"FB_PAGE_ACCESS_TOKEN": "test-sensitive-value"}):
             self.assertNotIn("test-sensitive-value", safe_error("bad test-sensitive-value"))
             self.assertNotIn("https://", safe_error("https://x/?access_token=partial"))
+        self.assertEqual(safe_error("THREADS_ACCESS_TOKEN 없음"), "THREADS_ACCESS_TOKEN 없음")
 
 
 if __name__ == "__main__":
