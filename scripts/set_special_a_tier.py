@@ -14,7 +14,7 @@ SHEET_ID = os.environ.get("SHEET_ID", "").strip()
 TAB = "자동화_사이트설정"
 
 SPECIAL_A_SITE_IDS = {
-    "wp_kfinance365", "wp_koreacrypto365", "wp_kskin365", "wp_ktrip365",
+    "wp_kfinance365", "wp_kcrypto365", "wp_kskin365", "wp_ktrip365",
     "wp_kvisa365", "wp_koreawedding", "wp_sis", "wp_jobkorea365",
     "wp_jobglobal", "wp_kstudy365",
 }

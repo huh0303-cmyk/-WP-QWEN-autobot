@@ -13,7 +13,7 @@
 | # | site_id | 도메인 | 비고 |
 |---|---|---|---|
 | 1 | wp_kfinance365 | kfinance365.com | 기존 A |
-| 2 | wp_koreacrypto365 | koreacrypto365.com | 기존 B → 특A로 승급 |
+| 2 | wp_kcrypto365 | koreacrypto365.com | 기존 B → 특A로 승급 |
 | 3 | wp_kskin365 | kskin365.com | 기존 A |
 | 4 | wp_ktrip365 | k-trip365.com | 기존 A |
 | 5 | wp_kvisa365 | k-visa365.com | 기존 A |
