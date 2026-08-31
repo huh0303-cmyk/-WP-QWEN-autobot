@@ -1,10 +1,5 @@
 {
-  "date": "2026-08-31",
-  "fired": {
-    "blogger_khealth365": {
-      "target_kst": "10:44",
-      "dispatched_at": "2026-08-31T15:58:56.014237+09:00"
-    }
-  },
-  "last_dispatch_at": "2026-08-31T15:58:56.014237+09:00"
+  "date": "2026-09-01",
+  "fired": {},
+  "last_dispatch_at": null
 }
