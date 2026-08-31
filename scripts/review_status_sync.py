@@ -4,10 +4,16 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from scripts.gsheets_direct import ensure_tab, get_sheets_service
 from scripts.review_sheet import HEADER, TAB_NAME
