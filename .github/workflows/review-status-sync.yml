@@ -2,6 +2,11 @@ name: "Approval Board — status sync"
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/review_status_sync.py"
+      - ".github/workflows/review-status-sync.yml"
   schedule:
     - cron: "*/10 * * * *"
 
