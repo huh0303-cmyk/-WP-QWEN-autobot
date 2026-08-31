@@ -142,3 +142,20 @@ def test_dry_run_has_no_writes_or_dispatch(monkeypatch):
     with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(dispatch_module, "read_calendar", return_value=[]), patch.object(dispatch_module, "update_row") as write, patch.object(dispatch_module.requests, "post") as post:
         assert dispatch_module.main() == 0
     write.assert_not_called(); post.assert_not_called()
+
+
+def test_private_email_has_editor_link_and_is_not_marked_on_failure():
+    from scripts.youtube_calendar_result import notify_review
+    r = parsed(row())[0]
+    url = "https://studio.youtube.com/video/abcdefghijk/edit"
+    with patch("scripts.publishing_completion_notify.send_email", return_value=False), patch("scripts.youtube_calendar_result.update_row") as write:
+        with pytest.raises(RuntimeError, match="email was not sent"):
+            notify_review(Mock(), "sheet", r, url, "")
+        write.assert_not_called()
+    with patch("scripts.publishing_completion_notify.send_email", return_value=True) as send, patch("scripts.youtube_calendar_result.update_row") as write:
+        notify_review(Mock(), "sheet", r, url, "")
+        assert url in send.call_args.args[1]
+        assert "[review-email-sent:CAL-1]" in write.call_args.args[-1]
+        send.reset_mock()
+        notify_review(Mock(), "sheet", r, url, "[review-email-sent:CAL-1]")
+        send.assert_not_called()

@@ -12,6 +12,20 @@ from automation_hub.youtube_identity import expected_channel_id
 from gsheets_direct import get_sheets_service
 
 
+def notify_review(service, sid, row, url, notes):
+    """Report only a validated private receipt; retries never repeat an upload."""
+    marker = f"[review-email-sent:{row['id']}]"
+    if marker in notes:
+        return
+    from scripts.publishing_completion_notify import send_email
+    body = (f"유튜브 비공개 업로드가 준비되었습니다.\n일정: {row['id']}\n"
+            f"채널: {row['key']}\n관리자 검토 링크: {url}\n\n"
+            "아직 공개되지 않았습니다. Studio에서 내용을 검토하고 직접 공개 버튼을 눌러주세요.")
+    if not send_email(f"[비공개 업로드 완료·검토 요청] {row['id']} {row['key']}", body):
+        raise RuntimeError("Private upload saved, but review email was not sent; retry reporting only")
+    update_row(service, sid, row, "비공개 업로드", url, notes + "\n" + marker)
+
+
 def private_result(path, channel):
     if not Path(path).is_file():
         return "", "worker did not produce a private upload result"
@@ -55,6 +69,10 @@ def main():
         update_row(service, sid, row, "자료수집", "", row["notes"] + f"\n[yt-upload:{run_id}]")
         return
     if row["status"] == "비공개 업로드" and row["url"]:
+        url, error = private_result(args.result, channel)
+        if error or url != row["url"]:
+            raise RuntimeError("Cannot retry email without the matching private receipt")
+        notify_review(service, sid, row, url, row["notes"])
         return
     url, error = private_result(args.result, channel)
     status = "비공개 업로드" if url else "실패"
@@ -65,6 +83,8 @@ def main():
         valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [[
             row["when"].isoformat(), channel, row["cells"][2], os.getenv("WORKER_WORKFLOW", ""),
             status, run_url, "", url, error]]}).execute()
+    if url:
+        notify_review(service, sid, row, url, notes)
 
 
 if __name__ == "__main__":

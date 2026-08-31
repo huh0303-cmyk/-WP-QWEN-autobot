@@ -247,6 +247,9 @@ jobs:
           CLAIM_TOKEN: ${{ inputs.claim_token }}
           CHANNEL_KEY: ${{ inputs.channel }}
           WORKER_WORKFLOW: generate-youtube-playlist.yml
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          REPORT_EMAIL_TO: huh0303@gmail.com
+          REPORT_EMAIL_FROM: huh0303@gmail.com
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}

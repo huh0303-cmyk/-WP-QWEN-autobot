@@ -148,7 +148,8 @@ def main():
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f: json.dump(result, f, ensure_ascii=False, indent=2)
     log(f"✅ 업로드 완료(PRIVATE): {studio_url}")
-    send_email(f"[유튜브 비공개 업로드 완료] {os.environ['YT_TITLE'][:60]}", f"검토 후 직접 공개해주세요.\n\n{studio_url}\n")
+    if not os.getenv("SCHEDULE_ID"):
+        send_email(f"[유튜브 비공개 업로드 완료] {os.environ['YT_TITLE'][:60]}", f"검토 후 직접 공개해주세요.\n\n{studio_url}\n")
 
 
 if __name__ == "__main__":
