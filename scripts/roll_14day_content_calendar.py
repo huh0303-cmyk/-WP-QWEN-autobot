@@ -6,6 +6,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 
 from gsheets_direct import get_sheets_service
@@ -14,6 +15,9 @@ SHEET_ID = os.getenv("SHEET_ID", "12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI")
 TAB = "14일_콘텐츠운영캘린더"
 KST = dt.timezone(dt.timedelta(hours=9))
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from automation_hub.youtube_calendar import channel_key
 HEADERS = [
     "schedule_id", "planned_at_kst", "platform", "channel_site", "destination_url",
     "language", "golden_keyword_candidate", "planned_title_direction", "content_format",
@@ -59,9 +63,19 @@ def irregular_time(key: str, start_minute=0, span=1440) -> str:
 
 
 def load_rows(service):
-    return service.spreadsheets().values().get(
-        spreadsheetId=SHEET_ID, range=f"'{TAB}'!A1:O1000"
-    ).execute().get("values", [])
+    meta = service.spreadsheets().get(spreadsheetId=SHEET_ID, fields="sheets.properties").execute()
+    count = next(s["properties"]["gridProperties"]["rowCount"] for s in meta["sheets"]
+                 if s["properties"]["title"] == TAB)
+    values = []
+    for start in range(1, count + 1, 1000):
+        end = min(start + 999, count)
+        chunk = service.spreadsheets().values().get(
+            spreadsheetId=SHEET_ID, range=f"'{TAB}'!A{start}:O{end}"
+        ).execute().get("values", [])
+        values.extend(chunk + [[]] * (end - start + 1 - len(chunk)))
+    while values and not values[-1]:
+        values.pop()
+    return values
 
 
 def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
@@ -76,7 +90,8 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
         sensitive = any(x in topic.lower() for x in ("insurance", "finance", "medical", "visa", "tax", "law", "crypto", "건강", "뉴스"))
         source = "정부·공식기관 원문 필수" if sensitive else "공식기관·신뢰 출처 우선"
         for platform in ("WordPress", "Blogger"):
-            key = f"{target_date}|{platform}|{wp}"
+            identity = wp if platform == "WordPress" else wp.rsplit(".", 1)[0]
+            key = f"{target_date}|{platform}|{identity}"
             if key in existing_keys:
                 continue
             if platform == "WordPress":
@@ -109,7 +124,7 @@ def youtube_rows(horizon: dt.date, existing, channels):
         name = channel["display_name"]
         dates = sorted(
             dt.date.fromisoformat(row[1][:10]) for row in existing
-            if len(row) > 3 and row[2].startswith("YouTube") and row[3] == name
+            if len(row) > 3 and row[2].startswith("YouTube") and channel_key(row[3]) == channel["channel_key"]
         )
         due = dates[-1] if dates else dt.datetime.now(KST).date()
         counter = len(dates)

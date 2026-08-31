@@ -12,9 +12,14 @@ on:
         description: "Maximum channels dispatched in one run"
         required: true
         type: string
-        default: "1"
+        default: "3"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/youtube_calendar_dispatch.py"
+      - "automation_hub/youtube_calendar.py"
   schedule:
-    - cron: "27 * * * *"
+    - cron: "7,22,37,52 * * * *"
 
 permissions:
   contents: read
@@ -26,7 +31,6 @@ concurrency:
 
 jobs:
   dispatch:
-    if: ${{ false }} # EMERGENCY LOCK: all YouTube/video automation disabled
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -36,7 +40,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install requests google-api-python-client google-auth -q
-      - name: Dispatch one due channel safely
+      - name: Dispatch due calendar rows to PRIVATE review only
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -44,8 +48,8 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           GH_DISPATCH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-          MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '1' }}
+          DRY_RUN: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+          MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '3' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
         run: python scripts/youtube_control_scheduler.py

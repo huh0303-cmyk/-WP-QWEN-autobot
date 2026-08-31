@@ -9,6 +9,14 @@ on:
         type: choice
         default: "nasa"
         options: [nasa, history, invention, silent_era, retro_reels]
+      schedule_id:
+        description: "Central calendar schedule ID (required to execute)"
+        required: true
+        type: string
+      claim_token:
+        description: "One-use calendar claim from the central scheduler"
+        required: true
+        type: string
       topic:
         description: "주제 (비우면 채널별 주제풀에서 무작위)"
         required: false
@@ -31,7 +39,7 @@ concurrency:
 
 jobs:
   generate-and-upload-private:
-    if: ${{ false }} # EMERGENCY LOCK: video generation disabled
+    if: ${{ inputs.schedule_id != '' && inputs.claim_token != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -47,9 +55,10 @@ jobs:
       - name: Pick topic
         id: pick
         shell: bash
+        env:
+          CH: ${{ inputs.channel }}
+          TOPIC: ${{ inputs.topic }}
         run: |
-          CH="${{ inputs.channel }}"
-          TOPIC="${{ inputs.topic }}"
           if [ -z "$TOPIC" ]; then
             case "$CH" in
               nasa) TOPICS=("The Apollo 11 moon landing" "The Voyager Golden Record" "The Challenger disaster and what NASA learned" "Neil Armstrong's first steps on the Moon" "The Hubble Space Telescope's greatest discoveries" "How the Mercury Seven became America's first astronauts" "The Apollo 13 rescue" "Life aboard the International Space Station" "The first images from Mars" "JFK's Moon speech and the Space Race") ;;
@@ -62,9 +71,22 @@ jobs:
               TOPIC="${TOPICS[$((RANDOM % ${#TOPICS[@]}))]}"
             fi
           fi
-          echo "topic=$TOPIC" >> "$GITHUB_OUTPUT"
+          delimiter="TOPIC_$(openssl rand -hex 12)"
+          printf 'topic<<%s\n%s\n%s\n' "$delimiter" "$TOPIC" "$delimiter" >> "$GITHUB_OUTPUT"
+      - name: Claim calendar job (reject re-runs)
+        env:
+          SCHEDULE_ID: ${{ inputs.schedule_id }}
+          CLAIM_TOKEN: ${{ inputs.claim_token }}
+          CHANNEL_KEY: ${{ inputs.channel }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/youtube_calendar_result.py start
       - name: Generate longform from public-domain/archive material
         env:
+          CH: ${{ inputs.channel }}
+          TOPIC: ${{ steps.pick.outputs.topic }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
@@ -78,8 +100,6 @@ jobs:
           KNOWLEDGE_VOICE_3_ID: ${{ secrets.KNOWLEDGE_VOICE_3_ID }}
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
         run: |
-          CH="${{ inputs.channel }}"
-          TOPIC="${{ steps.pick.outputs.topic }}"
           if [ "$CH" = "nasa" ]; then
             python scripts/nasa_archive_longform.py
           else
@@ -87,6 +107,12 @@ jobs:
           fi
       - name: Upload to YouTube PRIVATE only
         env:
+          SCHEDULE_ID: ${{ inputs.schedule_id }}
+          CLAIM_TOKEN: ${{ inputs.claim_token }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
@@ -98,11 +124,25 @@ jobs:
           YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
           ROOM_RESULT_SOURCE: artifacts/youtube_curio_result.json
           CHANNEL_KEY: ${{ inputs.channel }}
-        run: python scripts/curio_upload.py "${{ inputs.channel }}" en
+        run: |
+          python scripts/youtube_calendar_result.py upload-start
+          python scripts/curio_upload.py "$CHANNEL_KEY" en
       - name: Normalize room result
         if: always()
         run: |
           python scripts/normalize_room_result.py --room-id "${{ inputs.room_id }}" --platform youtube --workflow curio-longform-daily.yml --source artifacts/youtube_curio_result.json --outcome "${{ job.status == 'success' && 'success' || 'failure' }}"
+      - name: Record private review URL or failure in calendar
+        if: always()
+        env:
+          SCHEDULE_ID: ${{ inputs.schedule_id }}
+          CLAIM_TOKEN: ${{ inputs.claim_token }}
+          CHANNEL_KEY: ${{ inputs.channel }}
+          WORKER_WORKFLOW: curio-longform-daily.yml
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/youtube_calendar_result.py finish --result artifacts/youtube_curio_result.json
       - name: Upload room result
         if: always()
         uses: actions/upload-artifact@v4

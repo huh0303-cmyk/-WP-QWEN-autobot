@@ -377,7 +377,7 @@ def main():
         raise SystemExit(1)
 
     lang = "en"
-    topic = pick_topic()
+    topic = os.environ.get("TOPIC", "").strip() or pick_topic()
     workdir = os.path.join("curio_longform_output", CHANNEL_KEY, lang)
     os.makedirs(workdir, exist_ok=True)
 

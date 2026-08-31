@@ -9,6 +9,14 @@ on:
         type: choice
         default: "globalmusic"
         options: [globalmusic, healing, starbucks, mbb, kpop]
+      schedule_id:
+        description: "Central calendar schedule ID (required to execute)"
+        required: true
+        type: string
+      claim_token:
+        description: "One-use calendar claim from the central scheduler"
+        required: true
+        type: string
       preset_theme:
         description: "빠른 선택 프리셋"
         required: false
@@ -63,7 +71,7 @@ concurrency:
 
 jobs:
   prepare:
-    if: ${{ false }} # EMERGENCY LOCK: video generation disabled
+    if: ${{ inputs.schedule_id != '' && inputs.claim_token != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     outputs:
@@ -85,6 +93,16 @@ jobs:
           sudo apt-get install -y -q ffmpeg fonts-nanum
       - name: Install Python dependencies
         run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+      - name: Claim calendar job (reject re-runs)
+        env:
+          SCHEDULE_ID: ${{ inputs.schedule_id }}
+          CLAIM_TOKEN: ${{ inputs.claim_token }}
+          CHANNEL_KEY: ${{ inputs.channel }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/youtube_calendar_result.py start
       - name: Run playlist maker — GPT text + Replicate-only image
         env:
           AUTO_TOPIC: "true"
@@ -155,7 +173,7 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: 플레이리스트 최근 상태 갱신 [skip ci]"; git push
 
   publish:
-    if: ${{ false }} # EMERGENCY LOCK: video upload disabled
+    if: ${{ needs.prepare.result == 'success' }}
     needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -167,6 +185,9 @@ jobs:
       - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
       - name: Upload video to YouTube PRIVATE only
         env:
+          SCHEDULE_ID: ${{ inputs.schedule_id }}
+          CLAIM_TOKEN: ${{ inputs.claim_token }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
           VIDEO_DRIVE_ID: ${{ needs.prepare.outputs.video_drive_id }}
           THUMB_DRIVE_ID: ${{ needs.prepare.outputs.thumb_drive_id }}
           YT_TITLE: ${{ needs.prepare.outputs.yt_title }}
@@ -182,11 +203,20 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', needs.prepare.outputs.channel_key_upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', needs.prepare.outputs.channel_key_upper)] || (needs.prepare.outputs.channel_key_upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: python scripts/youtube_publish_approved.py
+        run: |
+          python scripts/youtube_calendar_result.py upload-start
+          python scripts/youtube_publish_approved.py
       - name: Normalize room result
         if: always()
         run: |
           python scripts/normalize_room_result.py --room-id "${{ inputs.room_id }}" --platform youtube --workflow generate-youtube-playlist.yml --source artifacts/youtube_playlist_result.json --outcome "${{ job.status == 'success' && 'success' || 'failure' }}"
+      - name: Preserve private upload receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calendar-private-receipt-${{ github.run_id }}
+          path: artifacts/youtube_playlist_result.json
+          if-no-files-found: ignore
       - name: Upload room result
         if: always()
         uses: actions/upload-artifact@v4
@@ -195,6 +225,33 @@ jobs:
           path: artifacts/automation-room-result.json
           retention-days: 7
           if-no-files-found: error
+
+  report-calendar:
+    if: ${{ always() && inputs.schedule_id != '' && inputs.claim_token != '' }}
+    needs: [prepare, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install google-api-python-client google-auth requests -q
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: calendar-private-receipt-${{ github.run_id }}
+          path: artifacts
+      - name: Record private review URL or failure in calendar
+        env:
+          SCHEDULE_ID: ${{ inputs.schedule_id }}
+          CLAIM_TOKEN: ${{ inputs.claim_token }}
+          CHANNEL_KEY: ${{ inputs.channel }}
+          WORKER_WORKFLOW: generate-youtube-playlist.yml
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/youtube_calendar_result.py finish --result artifacts/youtube_playlist_result.json
 
   fix_metadata:
     if: ${{ false }} # EMERGENCY LOCK: all YouTube mutation disabled

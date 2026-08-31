@@ -92,7 +92,7 @@ def dispatch(channel: dict[str, str], repo: str, token: str) -> requests.Respons
     )
 
 
-def main() -> int:
+def legacy_interval_main() -> int:
     spreadsheet_id = os.environ.get("SHEET_ID", "").strip()
     repo = os.environ.get("GITHUB_REPOSITORY", "").strip()
     token = os.environ.get("GH_DISPATCH_TOKEN", "").strip()
@@ -142,6 +142,12 @@ def main() -> int:
             break
     print(f"Dispatched {dispatched} YouTube channel(s)")
     return 0
+
+
+def main() -> int:
+    # Single active owner: calendar time/topic, never the old next_run_at lottery.
+    from youtube_calendar_dispatch import main as calendar_main
+    return calendar_main()
 
 
 if __name__ == "__main__":

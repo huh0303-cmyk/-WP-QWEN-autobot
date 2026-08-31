@@ -1697,7 +1697,7 @@ def main():
         # healing은 여행지/도시명 같은 일반 AUTO_TOPIC_POOL이 애초에 안 맞는 채널이라
         # (자연음 채널인데 "Tokyo" 같은 주제가 나가고 있었음) 3테마 전용 로직을 쓴다.
         healing_theme = pick_healing_theme()
-        topic_keyword = HEALING_THEME_TOPICS[healing_theme]
+        topic_keyword = topic_keyword.strip() or HEALING_THEME_TOPICS[healing_theme]
         language_keyword = ""
         log(f"🌧️ [healing] 테마 선택: {healing_theme} — {topic_keyword}")
     else:
