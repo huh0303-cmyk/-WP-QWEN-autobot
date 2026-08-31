@@ -1,0 +1,45 @@
+name: CEO SNS current statistics (read-only)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    environment: google-metrics
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Inspect existing SNS connections without publishing
+        env:
+          TIKTOK_USERNAME: ${{ secrets.TIKTOK_USERNAME }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          TIKTOK_USERNAME_ENGLISH: ${{ secrets.TIKTOK_USERNAME_ENGLISH }}
+          TIKTOK_USERNAME_LANGUAGE: ${{ secrets.TIKTOK_USERNAME_LANGUAGE }}
+          FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
+          FB_PAGE_ID_ENGLISH: ${{ secrets.FB_PAGE_ID_ENGLISH }}
+          FB_PAGE_ACCESS_TOKEN_LANGUAGE: ${{ secrets.FB_PAGE_ACCESS_TOKEN_LANGUAGE }}
+          FB_PAGE_ID_LANGUAGE: ${{ secrets.FB_PAGE_ID_LANGUAGE }}
+          IG_ACCESS_TOKEN_ENGLISH: ${{ secrets.IG_ACCESS_TOKEN_ENGLISH }}
+          IG_USER_ID_ENGLISH: ${{ secrets.IG_USER_ID_ENGLISH }}
+          IG_ACCESS_TOKEN_LANGUAGE: ${{ secrets.IG_ACCESS_TOKEN_LANGUAGE }}
+          IG_USER_ID_LANGUAGE: ${{ secrets.IG_USER_ID_LANGUAGE }}
+          THREADS_ACCESS_TOKEN_ENGLISH: ${{ secrets.THREADS_ACCESS_TOKEN_ENGLISH }}
+          THREADS_USER_ID_ENGLISH: ${{ secrets.THREADS_USER_ID_ENGLISH }}
+          THREADS_ACCESS_TOKEN_LANGUAGE: ${{ secrets.THREADS_ACCESS_TOKEN_LANGUAGE }}
+          THREADS_USER_ID_LANGUAGE: ${{ secrets.THREADS_USER_ID_LANGUAGE }}
+        run: python scripts/ceo_sns_probe.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ceo-sns-current
+          path: ceo_sns_probe.json
+          if-no-files-found: error
