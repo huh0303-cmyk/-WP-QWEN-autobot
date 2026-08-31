@@ -3422,22 +3422,35 @@ def process_one(site, keyword):
     newsroom_gate_ok = (
         mode in ("news", "news_en")
         and bool(news_source and news_source_url)
-        and min_chars <= plain_len <= (max_chars or plain_len)
+        # USER-LOCKED 2026-08-31: newsroom length is never a publish gate.
         and bool(title.strip())
         and len(meta.strip()) >= 80
         and len(tags) >= 6
     )
     if mode in ("news", "news_en"):
         if not newsroom_gate_ok:
-            reason = (f"source={bool(news_source and news_source_url)}, length={plain_len}/"
-                      f"{min_chars}-{max_chars}, meta={len(meta)}, tags={len(tags)}")
+            reason = (f"source={bool(news_source and news_source_url)}, "
+                      f"meta={len(meta)}, tags={len(tags)}, length_info_only={plain_len}")
             print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
             return False
     elif score < quality_target:
-        print(f"  ⛔ 품질점수 {score}점 < 뉴스/콘텐츠 목표 {quality_target}점 → 발행 스킵")
-        log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
-        return False
+        review_draft = (
+            os.getenv("WP_POST_STATUS", "publish").strip().lower() == "draft"
+            and os.getenv("WP_PUBLICATION_APPROVED", "false").strip().lower()
+                not in {"1", "true", "yes", "on"}
+        )
+        if review_draft:
+            # A private review draft must still reach the user. The quality gate
+            # blocks public publication, not draft creation/email review.
+            print(
+                f"  ⚠️ 품질점수 {score}점 < 목표 {quality_target}점 — "
+                "비공개 검토 초안으로 계속 진행"
+            )
+        else:
+            print(f"  ⛔ 품질점수 {score}점 < 목표 {quality_target}점 → 공개 발행 차단")
+            log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
+            return False
 
     cat_name=get_category_for_post(theme,f"{news_source or ''} {keyword}".strip(),title)
     print(f"  📁 카테고리: {cat_name}")
