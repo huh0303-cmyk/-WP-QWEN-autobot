@@ -3305,17 +3305,10 @@ def process_one(site, keyword):
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
 
-        candidate_len=len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
-        candidate_length_valid = not (
-            mode in ("news", "news_en")
-        ) or (candidate_len >= min_chars and (not max_chars or candidate_len <= max_chars))
-        # 뉴스룸에서는 일반 블로그 SEO 점수보다 약속한 기사 길이를 우선한다.
-        # 그렇지 않으면 재생성된 정상 길이 기사보다 짧은 초안이 선택될 수 있다.
-        if (candidate_length_valid and not best_length_valid) or (
-            candidate_length_valid == best_length_valid and pre > best_score
-        ):
+        # NEWSROOM EXCEPTION: KoreaNews365 and The Seoul Journal are never
+        # selected or rejected by article length. Prefer the strongest factual/SEO draft.
+        if pre > best_score:
             best_score=pre; best_result=(body,title,meta,faq,tags)
-            best_length_valid=candidate_length_valid
 
         if pre>=quality_target:
             print(f"  ✅ {pre}점 달성"); break
@@ -3325,8 +3318,10 @@ def process_one(site, keyword):
             issues=[]
             plain=re.sub(r'<[^>]+>','',body)
             blen=len(plain.replace(' ','').replace('\n',''))
-            if blen<min_chars: issues.append(f"본문 {blen}자→{min_chars}자 증량")
-            if max_chars and blen>max_chars: issues.append(f"본문 {blen}자→{max_chars}자 이하로 축약")
+            if mode not in ("news", "news_en") and blen<min_chars:
+                issues.append(f"본문 {blen}자→{min_chars}자 증량")
+            if mode not in ("news", "news_en") and max_chars and blen>max_chars:
+                issues.append(f"본문 {blen}자→{max_chars}자 이하로 축약")
             if mode not in ("news", "news_en"):
                 if count_stats(body)<5: issues.append("통계 5개 이상 추가")
                 if len(re.findall(r'\([^)]{3,40},\s*20[0-9]{2}\)',body))<3: issues.append("출처 괄호 3개 이상")
@@ -3342,37 +3337,10 @@ def process_one(site, keyword):
 
     body,title,meta,faq,tags=best_result
     newsroom_len=newsroom_char_count(body)
-    if mode in ("news", "news_en") and not (min_chars <= newsroom_len <= (max_chars or newsroom_len)):
-        print(f"  ✂️ 뉴스 원고 길이 교정: {newsroom_len}자 → 목표 1600~1850자")
-        try:
-            body = resize_newsroom_body(body, lang, news_source_summary, min_chars, max_chars or 2000)
-            newsroom_len=newsroom_char_count(body)
-            print(f"  ✂️ 교정 결과: {newsroom_len}자")
-        except Exception as exc:
-            print(f"  ⚠️ 뉴스 원고 길이 교정 실패: {exc}")
-    # Reserve a bounded amount for the fixed source note appended below.  The
-    # former 450-character reserve could force a valid 1,750+ draft down to
-    # 1,550 characters, below the configured minimum.  Never choose a trim
-    # target below the newsroom minimum.
-    if mode in ("news", "news_en") and max_chars:
-        attribution_reserve = min(220, max(120, max_chars - min_chars))
-        trim_target = max(min_chars, max_chars - attribution_reserve)
-    else:
-        trim_target = None
-    if trim_target and newsroom_len > trim_target:
-        body = trim_newsroom_html(body, target_chars=trim_target)
-        newsroom_len = newsroom_char_count(body)
-        print(f"  ✂️ HTML 보존 상한 교정 결과: {newsroom_len}자")
-    if mode in ("news","news_en") and newsroom_len < min_chars:
-        print(f"  ⛔ 뉴스 본문 {newsroom_len}자 < {min_chars}자 → 발행 스킵")
-        log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_short",
-            f"length={newsroom_len}, required={min_chars}-{max_chars}")
-        return False
-    if mode in ("news","news_en") and max_chars and newsroom_len>max_chars:
-        print(f"  ⛔ 뉴스 본문 {newsroom_len}자 > {max_chars}자 → 발행 스킵")
-        log(url,theme,keyword,title,"",best_score,0,"⛔ skip_newsroom_too_long",
-            f"length={newsroom_len}, required={min_chars}-{max_chars}")
-        return False
+    if mode in ("news", "news_en"):
+        # USER-LOCKED 2026-08-31: both newsrooms operate outside all blog
+        # length rules. A concise breaking-news brief may proceed without padding.
+        print(f"  📰 뉴스 본문 길이: {newsroom_len}자 (참고값·발행 차단 없음)")
 
     # ★ 발행 직전 최종 방어선: '#' 잔재 강제 제거 (재발 방지 안전장치)
     title = strip_hash_artifacts(title)
