@@ -100,6 +100,8 @@ def build_draft_reviews() -> list[dict]:
                 "site": rec.get("site") or rec.get("site_id") or urlparse(rec.get("url", "")).netloc,
                 "title": rec.get("title", "(제목 없음)"),
                 "quality_score": rec.get("quality_score"),
+                "search_description": rec.get("search_description", ""),
+                "search_description_ui_required": bool(rec.get("search_description_ui_required")),
                 "edit_url": direct_edit_url,
                 "post_url": rec.get("url", direct_edit_url),
             })
@@ -146,7 +148,9 @@ def _plain_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
             f"{review.get('site', '')}\n"
             f"{review['title']}\n"
             f"{_score_line(review)}"
-            f"검토·발행·예약: {review['edit_url']}"
+            + (f"검색 설명({len(review.get('search_description', ''))}자): {review.get('search_description')}\n"
+               if review.get("search_description_ui_required") else "")
+            + f"검토·발행·예약: {review['edit_url']}"
         )
     return base_body + "\n\n" + "\n\n".join(blocks)
 
@@ -161,12 +165,17 @@ def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
         score = review.get("quality_score")
         score_html = (f'<p style="margin:0 0 12px;color:#52606d">품질점수: <b>{html.escape(str(score))}/100</b> '
                       f'(파이프라인 자체 점검)</p>') if score not in (None, "") else ""
+        search_description = str(review.get("search_description") or "")
+        meta_html = (f'<p style="margin:0 0 12px;padding:12px;background:#fff7d6;border-radius:8px">'
+                     f'<b>검색 설명 {len(search_description)}자</b><br>{html.escape(search_description)}</p>') \
+                    if review.get("search_description_ui_required") else ""
         edit_url = html.escape(str(review["edit_url"]), quote=True)
         cards.append(f"""
         <section style="margin:18px 0;padding:20px;border:1px solid #dfe5ec;border-radius:14px;background:#fff">
           <p style="margin:0 0 6px;color:#52606d;font-size:14px">{site}</p>
           <h2 style="margin:0 0 16px;font-size:20px;line-height:1.45;color:#172033">{title}</h2>
           {score_html}
+          {meta_html}
           <a href="{edit_url}" style="display:block;margin:8px 0;padding:14px;border-radius:9px;background:#16794b;color:#fff;text-align:center;text-decoration:none;font-weight:800">관리자에서 검토 · 발행 · 예약</a>
         </section>""")
     if not cards:

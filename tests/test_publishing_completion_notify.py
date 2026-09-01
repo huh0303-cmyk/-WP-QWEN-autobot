@@ -47,8 +47,12 @@ def test_blogger_draft_uses_native_editor_link_without_wp_credentials(tmp_path, 
     (tmp_path / mod.RESULT_FILE).write_text(json.dumps({"records": [{
         "status": "draft", "platform": "blogger", "site": "demo.blogspot.com",
         "url": edit_url, "edit_url": edit_url, "title": "Blogger draft", "quality_score": 81,
+        "search_description": "가" * 110, "search_description_ui_required": True,
     }]}), encoding="utf-8")
     review = mod.build_draft_reviews()[0]
     assert review["platform"] == "blogger"
     assert review["edit_url"] == edit_url
     assert review["quality_score"] == 81
+    assert review["search_description"] == "가" * 110
+    assert "검색 설명 110자" in _html_body("초안", [review], "")
+    assert "검색 설명(110자)" in _plain_body("초안", [review], "")

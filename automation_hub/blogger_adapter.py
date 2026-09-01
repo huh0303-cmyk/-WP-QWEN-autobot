@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any
-import json
 
 import requests
 
@@ -32,8 +31,11 @@ class BloggerPublisher:
                 endpoint,
                 params={"isDraft": str(not job.publish_now).lower()},
                 headers={"Authorization": f"Bearer {self.access_token}"},
+                # Blogger API v3's Post resource does not expose the editor's
+                # Search description field. Sending an invented customMetaData
+                # property is silently ignored, so never claim that it saved.
                 json={"kind": "blogger#post", "title": job.title, "content": job.content_html,
-                      "labels": job.labels, "customMetaData": json.dumps({"searchDescription": job.search_description}, ensure_ascii=False)},
+                      "labels": job.labels},
                 timeout=30,
             )
             if response.status_code not in {200, 201}:
@@ -46,7 +48,12 @@ class BloggerPublisher:
         remote_id = str(payload.get("id", ""))
         if not job.publish_now:
             review_url = f"https://www.blogger.com/blog/post/edit/{self.blog_id}/{remote_id}"
-            return PublishResult(True, "blogger", self.site_id, job.job_id, "drafted", public_url=review_url, remote_id=remote_id, message="Blogger draft created; human review and manual publish required")
+            return PublishResult(
+                True, "blogger", self.site_id, job.job_id, "drafted",
+                public_url=review_url, remote_id=remote_id,
+                message="Blogger draft created; Search description must be saved in the editor before manual publish",
+                extra={"search_description": job.search_description, "search_description_ui_required": True},
+            )
         verification = verify_publication(public_url, job.title, site_url=self.site_url, attempts=3)
         if not verification.ok:
             return PublishResult(False, "blogger", self.site_id, job.job_id, "verification_failed", public_url=public_url, remote_id=remote_id, error_code=verification.error_code, message=verification.error_message)

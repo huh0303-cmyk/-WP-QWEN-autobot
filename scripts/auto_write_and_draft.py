@@ -229,6 +229,8 @@ def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: st
         "status": "draft", "platform": "blogger", "site": site_url or site_id,
         "url": result.public_url, "edit_url": result.public_url,
         "title": article["title"], "post_id": result.remote_id,
+        "search_description": article.get("meta_description", ""),
+        "search_description_ui_required": True,
     }
 
 

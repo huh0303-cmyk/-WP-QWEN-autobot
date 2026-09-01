@@ -49,6 +49,9 @@ class PlatformPublisherTests(unittest.TestCase):
         )
         result = BloggerPublisher("blogger_site-1", "123", "token", session=session).publish(draft)
         self.assertTrue(result.ok)
+        self.assertNotIn("customMetaData", session.post.call_args.kwargs["json"])
+        self.assertTrue(result.extra["search_description_ui_required"])
+        self.assertEqual("가" * 110, result.extra["search_description"])
 
     def test_naver_never_claims_false_api_success(self):
         result = InteractiveEditorPublisher("naver", "site-1", "https://blog.naver.com").publish(self.job)
