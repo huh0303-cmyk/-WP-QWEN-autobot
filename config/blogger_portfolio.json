@@ -204,12 +204,23 @@
       "order": 14,
       "wp": "https://koreawedding365.com",
       "blogspot": "https://koreawedding365.blogspot.com",
-      "title": "Korea Wedding 365",
+      "title": "Korea Wedding 365 | International Couples",
       "language": "en",
-      "topic": "Korean weddings and international couples",
+      "topic": "International dating, Korean couples, wedding culture, costs and Korean language",
       "status": "EXISTING",
-      "description": "A warm, friendly guide to Korean weddings and international couples - traditions, planning tips, and paperwork basics for a smooth, joyful celebration.",
-      "search_description": "Korean wedding guide for international couples: traditions, planning tips, and paperwork basics.",
+      "description": "An international community for people interested in dating, relationships, and marriage with Koreans. Explore Korean men and women, international couple stories, wedding culture, costs, safe meeting application guidance, and free Korean and TOPIK lessons from SIS.",
+      "search_description": "Korean dating and marriage guide: international couples, wedding culture, costs, meeting applications, and free SIS TOPIK lessons.",
+      "funnel": {
+        "stages": [
+          "International dating and relationship information",
+          "Korean men, Korean women and international-couple stories",
+          "Wedding culture, process and realistic costs",
+          "Safe meeting and consultation application",
+          "Free Korean and TOPIK learning"
+        ],
+        "topik_youtube_url": "https://www.youtube.com/channel/UCdA24IuR-JE7qButWv5jLqA",
+        "application_url": ""
+      },
       "destination_id": "2674139059432343378"
     },
     {

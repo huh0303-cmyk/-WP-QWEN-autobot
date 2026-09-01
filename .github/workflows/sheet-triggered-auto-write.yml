@@ -7,6 +7,24 @@ on:
         description: "wp_<key> or blogger_<key>, e.g. wp_ktrip365 or blogger_ktrip365"
         required: true
         type: string
+      keyword:
+        description: "Optional direct keyword from Control Center; otherwise use the Sheet queue"
+        required: false
+        type: string
+      source_wp_url:
+        description: "Required for a direct Blogger draft; verified public WordPress article URL"
+        required: false
+        type: string
+      text_model:
+        description: "Preferred writing engine"
+        required: false
+        default: "gemini-2.5-flash"
+        type: string
+      image_model:
+        description: "Image engine or none"
+        required: false
+        default: "black-forest-labs/flux-schnell"
+        type: string
 
 permissions:
   contents: write
@@ -31,6 +49,10 @@ jobs:
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           SITE_ID: ${{ inputs.site_id }}
+          DIRECT_KEYWORD: ${{ inputs.keyword }}
+          SOURCE_WP_URL: ${{ inputs.source_wp_url }}
+          TEXT_MODEL: ${{ inputs.text_model }}
+          IMAGE_MODEL: ${{ inputs.image_model }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}

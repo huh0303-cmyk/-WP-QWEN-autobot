@@ -176,21 +176,28 @@ def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: st
 def main() -> int:
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     site_id = os.environ.get("SITE_ID", "").strip()
-    if not all((sheet_id, site_id)):
-        raise SystemExit("SHEET_ID and SITE_ID are required")
+    direct_keyword = os.environ.get("DIRECT_KEYWORD", "").strip()
+    source_wp_url = os.environ.get("SOURCE_WP_URL", "").strip()
+    if not site_id or (not sheet_id and not direct_keyword):
+        raise SystemExit("SITE_ID and either SHEET_ID or DIRECT_KEYWORD are required")
 
     platform, profile = _profile_for(site_id)
     check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"auto-write:{site_id}")
 
-    service = get_sheets_service()
-    ensure_tab(service, sheet_id, KEYWORDS_TAB, KEYWORD_HEADER)
-    due = _next_due_row(service, sheet_id, site_id)
-    if not due:
-        print(json.dumps({"ok": True, "skipped": True, "reason": "no 대기 keyword queued for this site"}, ensure_ascii=False))
-        return 0
-    sheet_row, record = due
-    keyword = record["keyword"]
-    _set_status(service, sheet_id, sheet_row, "작성중")
+    service = None
+    sheet_row = None
+    if direct_keyword:
+        keyword = direct_keyword
+    else:
+        service = get_sheets_service()
+        ensure_tab(service, sheet_id, KEYWORDS_TAB, KEYWORD_HEADER)
+        due = _next_due_row(service, sheet_id, site_id)
+        if not due:
+            print(json.dumps({"ok": True, "skipped": True, "reason": "no 대기 keyword queued for this site"}, ensure_ascii=False))
+            return 0
+        sheet_row, record = due
+        keyword = record["keyword"]
+        _set_status(service, sheet_id, sheet_row, "작성중")
 
     if platform == "wordpress":
         settings = profile["wordpress"]
@@ -201,6 +208,13 @@ def main() -> int:
         if not settings.get("ready_for_automation"):
             _set_status(service, sheet_id, sheet_row, "보류")
             raise SystemExit(f"{site_id}: Blogspot blog not yet created/wired (destination_id missing)")
+        if direct_keyword:
+            wp_base = profile["wordpress"]["url"].rstrip("/") + "/"
+            if not source_wp_url.startswith(wp_base):
+                raise SystemExit(f"{site_id}: SOURCE_WP_URL must be a public article under {wp_base}")
+            check = requests.get(source_wp_url, timeout=30, allow_redirects=True)
+            if check.status_code != 200:
+                raise SystemExit(f"{site_id}: SOURCE_WP_URL is not publicly reachable (HTTP {check.status_code})")
 
     article, score, failures, provider = _write_article(
         keyword=keyword, site_theme=profile["wordpress"]["theme"], language=language,
@@ -208,7 +222,8 @@ def main() -> int:
         min_chars=settings["min_chars"], target_chars=settings["target_chars"], max_chars=settings["max_chars"],
     )
     if article is None:
-        _set_status(service, sheet_id, sheet_row, "보류")
+        if service is not None and sheet_row is not None:
+            _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Quality gate failed for {site_id}/{keyword}: score={score} failures={failures}")
 
     consensus = three_model_consensus(
@@ -216,11 +231,12 @@ def main() -> int:
         keyword=keyword, gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
     )
     if consensus.get("ok") is not True:
-        _set_status(service, sheet_id, sheet_row, "보류")
+        if service is not None and sheet_row is not None:
+            _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Gemini/GPT/Claude consensus failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")
 
     image_subject = (article.get("image_queries") or [article["title"]])[0]
-    image_url = generate_image_url(image_subject, theme=article["title"]) or ""
+    image_url = "" if os.environ.get("IMAGE_MODEL", "").strip() == "none" else (generate_image_url(image_subject, theme=article["title"]) or "")
 
     if platform == "wordpress":
         record_out = _publish_wordpress(site_url=site_url, secret_name=settings["secret_name"], article=article, image_url=image_url)
@@ -236,7 +252,8 @@ def main() -> int:
     existing.setdefault("records", []).append(record_out)
     Path(RESULT_FILE).write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    _set_status(service, sheet_id, sheet_row, "초안완료")
+    if service is not None and sheet_row is not None:
+        _set_status(service, sheet_id, sheet_row, "초안완료")
     print(json.dumps({"ok": True, "site_id": site_id, "keyword": keyword, "score": score, "provider": provider, "url": record_out.get("url")}, ensure_ascii=False))
     return 0
 
