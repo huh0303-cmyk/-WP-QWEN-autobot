@@ -42,7 +42,10 @@ WRITER_SYSTEM_PROMPT = (
     "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
-    "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts)."
+    "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts). "
+    "Every paragraph must contain no more than two short sentences. Never place bullet symbols "
+    "inside a paragraph; convert enumerations into a real ul/li list. Break long explanations "
+    "into separate p elements so the mobile article has visible breathing room."
 )
 
 AUDIT_SYSTEM_PROMPT = (
@@ -111,6 +114,14 @@ def structural_check(draft: dict) -> list[str]:
         issues.append(f"body length {len(plain)} is below the {MIN_BODY_CHARS}-character floor")
     if not re.search(r"(?is)<h[23][\s>]", body):
         issues.append("body has no h2/h3 headings")
+    paragraph_texts = [
+        re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", value)).strip()
+        for value in re.findall(r"(?is)<p(?:\s[^>]*)?>(.*?)</p>", body)
+    ]
+    if any(len(value) > 320 for value in paragraph_texts):
+        issues.append("body contains a paragraph longer than 320 characters")
+    if re.search(r"(?is)<p(?:\s[^>]*)?>[^<]*(?:▶|■|●|◆|▪|•)[^<]*</p>", body):
+        issues.append("bullet-like text must be converted to a real ul/li list")
     return issues
 
 
