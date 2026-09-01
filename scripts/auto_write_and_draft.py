@@ -93,7 +93,7 @@ def _profile_for(site_id: str) -> tuple[str, dict]:
 def _next_due_row(service, sheet_id: str, site_id: str) -> tuple[int, dict] | None:
     values = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{KEYWORDS_TAB}'!A1:K").execute().get("values", [])
     records = _records(values)
-    candidates = [(i, r) for i, r in enumerate(records) if r.get("site_id") == site_id and r.get("status") == "대기"]
+    candidates = [(i, r) for i, r in enumerate(records) if r.get("site_id") == site_id and r.get("status") in {"대기", "보류"}]
     if not candidates:
         return None
     candidates.sort(key=lambda pair: float(pair[1].get("total_score") or 0), reverse=True)

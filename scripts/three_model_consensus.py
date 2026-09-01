@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date
 from typing import Callable
 
 from claude_text import claude_available, claude_generate_text
@@ -11,7 +12,13 @@ from openai_text import openai_available, openai_generate_text
 
 def _json(raw: str) -> dict:
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.I)
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        match = re.search(r'\{.*\}', text, flags=re.S)
+        if not match:
+            raise
+        return json.loads(match.group(0))
 
 
 def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
@@ -24,6 +31,7 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
     packet = json.dumps({"keyword": keyword, "title": title, "meta_description": meta,
                          "content": content}, ensure_ascii=False)
     rule = (
+        f"The verified current date is {date.today().isoformat()}; do not call that date future-dated. "
         "Independently inspect factual support, search intent, grammar, natural human tone, "
         "AI-like repetition, title originality and emotional hook, cross-platform copying, "
         "metadata, headings and SEO quality. Reject unsupported firsthand/field reporting, "
