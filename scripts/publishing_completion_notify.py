@@ -88,7 +88,32 @@ def build_draft_reviews() -> list[dict]:
     key_map = _site_key_map()
     lines = []
     for rec in records:
-        if rec.get("status") not in {"draft", "✅ DRAFT"} or not rec.get("url"):
+        if rec.get("status") not in {"draft", "drafted", "✅ DRAFT"} or not rec.get("url"):
+            continue
+        # New pipeline records carry the exact editor URL. This is required
+        # for Blogger, and avoids an unnecessary WordPress API lookup too.
+        direct_edit_url = str(rec.get("edit_url") or "").strip()
+        platform = str(rec.get("platform") or "").strip().lower()
+        if direct_edit_url:
+            lines.append({
+                "platform": platform or ("blogger" if "blogger.com/blog/post/edit" in direct_edit_url else "wordpress"),
+                "site": rec.get("site") or rec.get("site_id") or urlparse(rec.get("url", "")).netloc,
+                "title": rec.get("title", "(제목 없음)"),
+                "quality_score": rec.get("quality_score"),
+                "edit_url": direct_edit_url,
+                "post_url": rec.get("url", direct_edit_url),
+            })
+            continue
+        # Blogger draft URLs are already administrator edit links.
+        if "blogger.com/blog/post/edit/" in str(rec.get("url", "")):
+            lines.append({
+                "platform": "blogger",
+                "site": rec.get("site") or rec.get("site_id") or "Blogger",
+                "title": rec.get("title", "(제목 없음)"),
+                "quality_score": rec.get("quality_score"),
+                "edit_url": rec["url"],
+                "post_url": rec["url"],
+            })
             continue
         site_url = "https://" + urlparse(rec["url"]).netloc
         wp_pass = os.environ.get(key_map.get(site_url.rstrip("/"), ""), "")
@@ -99,8 +124,17 @@ def build_draft_reviews() -> list[dict]:
             continue
         edit_url = _admin_edit_url(site_url, post_id)
         title = rec.get("title", "(제목 없음)")
-        lines.append({"title": title, "edit_url": edit_url, "post_url": rec["url"]})
+        lines.append({
+            "platform": "wordpress", "site": urlparse(site_url).netloc,
+            "title": title, "quality_score": rec.get("quality_score"),
+            "edit_url": edit_url, "post_url": rec["url"],
+        })
     return lines
+
+
+def _score_line(review: dict) -> str:
+    score = review.get("quality_score")
+    return f"품질점수: {score}/100 (파이프라인 자체 점검)\n" if score not in (None, "") else ""
 
 
 def _plain_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
@@ -109,10 +143,12 @@ def _plain_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
     blocks = []
     for review in reviews:
         blocks.append(
+            f"{review.get('site', '')}\n"
             f"{review['title']}\n"
-            f"글 확인·승인·비승인: {review['edit_url']}"
+            f"{_score_line(review)}"
+            f"검토·발행·예약: {review['edit_url']}"
         )
-    return base_body + "\n\n" + "\n\n".join(blocks) + f"\n\n작업 기록: {fallback_link}"
+    return base_body + "\n\n" + "\n\n".join(blocks)
 
 
 def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
@@ -121,26 +157,26 @@ def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
     cards = []
     for review in reviews:
         title = html.escape(str(review["title"]))
+        site = html.escape(str(review.get("site", "")))
+        score = review.get("quality_score")
+        score_html = (f'<p style="margin:0 0 12px;color:#52606d">품질점수: <b>{html.escape(str(score))}/100</b> '
+                      f'(파이프라인 자체 점검)</p>') if score not in (None, "") else ""
         edit_url = html.escape(str(review["edit_url"]), quote=True)
         cards.append(f"""
         <section style="margin:18px 0;padding:20px;border:1px solid #dfe5ec;border-radius:14px;background:#fff">
+          <p style="margin:0 0 6px;color:#52606d;font-size:14px">{site}</p>
           <h2 style="margin:0 0 16px;font-size:20px;line-height:1.45;color:#172033">{title}</h2>
-          <a href="{edit_url}" style="display:block;margin:8px 0;padding:14px;border-radius:9px;background:#eef3f8;color:#172033;text-align:center;text-decoration:none;font-weight:700">글 먼저 보기</a>
-          <table role="presentation" width="100%"><tr>
-            <td width="50%" style="padding:4px 4px 0 0"><a href="{edit_url}#submitdiv" style="display:block;padding:14px;border-radius:9px;background:#16794b;color:#fff;text-align:center;text-decoration:none;font-weight:800">승인(공개)</a></td>
-            <td width="50%" style="padding:4px 0 0 4px"><a href="{edit_url}#delete-action" style="display:block;padding:14px;border-radius:9px;background:#a93333;color:#fff;text-align:center;text-decoration:none;font-weight:800">비승인(보류·삭제)</a></td>
-          </tr></table>
+          {score_html}
+          <a href="{edit_url}" style="display:block;margin:8px 0;padding:14px;border-radius:9px;background:#16794b;color:#fff;text-align:center;text-decoration:none;font-weight:800">관리자에서 검토 · 발행 · 예약</a>
         </section>""")
     if not cards:
         return ""
     escaped_base = html.escape(base_body)
-    escaped_log = html.escape(fallback_link, quote=True)
     return f"""<html><body style="margin:0;background:#f3f5f7;font-family:Arial,'Noto Sans KR',sans-serif;color:#172033">
     <main style="max-width:640px;margin:auto;padding:24px 14px">
       <h1 style="font-size:24px;margin:0 0 8px">오늘 작성된 글 검토</h1>
-      <p style="line-height:1.6;margin:0 0 14px">{escaped_base}<br>아래 글 제목을 눌러 내용을 확인한 뒤 WordPress 화면에서 공개 또는 보류하세요.</p>
+      <p style="line-height:1.6;margin:0 0 14px">{escaped_base}<br>링크를 누른 뒤 각 플랫폼 관리자에서 직접 발행하거나 예약하세요.</p>
       {''.join(cards)}
-      <p style="font-size:12px;color:#697386"><a href="{escaped_log}">작업 기록</a></p>
     </main></body></html>"""
 
 
@@ -174,9 +210,9 @@ def send_kakao_review(review: dict) -> bool:
     link = review["edit_url"]
     template = {
         "object_type": "text",
-        "text": f"{str(review['title'])[:100]}\n\n글을 읽은 뒤 승인(공개) 또는 비승인(보류·삭제)을 선택하세요.",
+        "text": f"{str(review['title'])[:100]}\n\n관리자에서 검토 후 직접 발행 또는 예약하세요.",
         "link": {"web_url": link, "mobile_web_url": link},
-        "button_title": "글 보기 · 승인/비승인",
+        "button_title": "관리자에서 검토",
     }
     response = requests.post("https://kapi.kakao.com/v2/api/talk/memo/default/send", headers={"Authorization": f"Bearer {access}"}, data={"template_object": json.dumps(template, ensure_ascii=False)}, timeout=20)
     response.raise_for_status()
