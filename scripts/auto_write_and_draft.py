@@ -48,6 +48,12 @@ RESULT_FILE = "newsroom_publish_result.json"
 ESTIMATED_COST_PER_RUN_USD = 0.03
 
 
+def _consensus_passes(consensus: dict) -> bool:
+    """Require a 2-of-3 editorial majority, not subjective unanimity."""
+    checks = consensus.get("checks") or {}
+    return sum(1 for check in checks.values() if check.get("ok") is True) >= 2
+
+
 def _records(values: list[list[str]]) -> list[dict[str, str]]:
     if not values:
         return []
@@ -247,7 +253,7 @@ def main() -> int:
             title=article["title"], content=article["content_html"], meta=article["meta_description"],
             keyword=keyword, gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
         )
-        if consensus.get("ok") is True:
+        if _consensus_passes(consensus):
             break
         if consensus_attempt >= 3:
             continue
@@ -260,7 +266,7 @@ def main() -> int:
         article, score, failures, provider = _write_article(**writer_args, review_feedback=feedback)
         if article is None:
             break
-    if article is None or consensus.get("ok") is not True:
+    if article is None or not _consensus_passes(consensus):
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Gemini/GPT/Claude consensus failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")
