@@ -134,35 +134,6 @@ def build_draft_reviews() -> list[dict]:
     return lines
 
 
-def build_tistory_reviews(fallback_link: str) -> list[dict]:
-    """Build private review cards for Tistory artifacts.
-
-    Tistory does not expose a supported draft-write API, so these links open
-    the private Actions run that contains the generated article and card-news
-    artifacts. Public publication remains disabled.
-    """
-    drafts_file = os.getenv("TISTORY_DRAFTS_FILE", "").strip()
-    if not drafts_file or not Path(drafts_file).exists():
-        return []
-    try:
-        payload = json.loads(Path(drafts_file).read_text(encoding="utf-8"))
-    except Exception:
-        return []
-    reviews = []
-    for draft in payload.get("drafts", []):
-        if draft.get("status") not in {"DRAFT_READY", "draft", "drafted"}:
-            continue
-        reviews.append({
-            "platform": "tistory",
-            "site": draft.get("site_title") or draft.get("site_id") or "Tistory",
-            "title": draft.get("title", "(제목 없음)"),
-            "quality_score": draft.get("quality_score"),
-            "edit_url": fallback_link,
-            "post_url": fallback_link,
-        })
-    return reviews
-
-
 def _score_line(review: dict) -> str:
     score = review.get("quality_score")
     return f"품질점수: {score}/100 (파이프라인 자체 점검)\n" if score not in (None, "") else ""
@@ -263,8 +234,6 @@ def main() -> int:
     base_body = os.getenv("REPORT_BODY", "자동발행 결과를 확인하세요.")
 
     reviews = build_draft_reviews()
-    if not reviews:
-        reviews = build_tistory_reviews(fallback_link)
     if not reviews:
         # Never send an empty "review" message. A mobile review notice is valid
         # only when it contains at least one real draft editor URL.
