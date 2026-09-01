@@ -47,6 +47,7 @@ def main() -> int:
                 "target_chars": wp_site.get("target_chars", 2400),
                 "max_chars": wp_site.get("max_chars", 3200),
                 "content_type": wp_site.get("content_type", "blog"),
+                "editorial_funnel": wp_site.get("editorial_funnel", {}),
             },
             "blogspot": {
                 "url": channel["blogspot"],
@@ -56,6 +57,7 @@ def main() -> int:
                 "description": channel.get("description", ""),
                 "search_description": channel.get("search_description", ""),
                 "notes": channel.get("notes", ""),
+                "editorial_funnel": channel.get("funnel") or wp_site.get("editorial_funnel", {}),
                 # Same persona/tone as WordPress (same site, same voice) but a
                 # shorter, distinctly-keyworded piece per the locked v2 policy:
                 # WordPress carries the deep-dive, Blogspot a related-but-different

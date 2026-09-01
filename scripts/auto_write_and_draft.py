@@ -216,8 +216,10 @@ def main() -> int:
             if check.status_code != 200:
                 raise SystemExit(f"{site_id}: SOURCE_WP_URL is not publicly reachable (HTTP {check.status_code})")
 
+    editorial_funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
+    funnel_context = json.dumps(editorial_funnel, ensure_ascii=False) if editorial_funnel else ""
     article, score, failures, provider = _write_article(
-        keyword=keyword, site_theme=profile["wordpress"]["theme"], language=language,
+        keyword=keyword, site_theme=profile["wordpress"]["theme"] + (f". Editorial funnel and safety rules: {funnel_context}" if funnel_context else ""), language=language,
         persona=settings["persona"], tone=settings["tone"],
         min_chars=settings["min_chars"], target_chars=settings["target_chars"], max_chars=settings["max_chars"],
     )

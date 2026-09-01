@@ -20,7 +20,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://k-trip365.blogspot.com",
@@ -30,6 +31,7 @@
         "description": "Friendly, practical guides to traveling in Korea - itineraries, hidden gems, transportation tips, and seasonal highlights for first-time visitors and repeat travelers alike.",
         "search_description": "Practical Korea travel guides: itineraries, hidden gems, transport tips, and seasonal highlights for every traveler.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea travel planner",
         "tone": "Specific, current and itinerary-oriented",
         "min_chars": 1260,
@@ -50,7 +52,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://kworld365seoul.blogspot.com",
@@ -60,6 +63,7 @@
         "description": "Your friendly companion for K-pop news, artist spotlights, comeback updates, and fan culture - written for global fans who want to stay close to Korean pop music.",
         "search_description": "K-pop news, artist spotlights, and comeback updates for global fans of Korean pop music and culture.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "K-pop industry editor",
         "tone": "Current, factual and fan-accessible",
         "min_chars": 1260,
@@ -80,7 +84,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://jobkorea365.blogspot.com",
@@ -90,6 +95,7 @@
         "description": "A welcoming guide to jobs and careers in Korea - hiring trends, resume tips, workplace culture, and practical advice for anyone building a career here.",
         "search_description": "Jobs and career advice for Korea: hiring trends, resume tips, and workplace culture, explained simply.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea employment guide editor",
         "tone": "Actionable, lawful and direct",
         "min_chars": 1260,
@@ -110,7 +116,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://kstudy365.blogspot.com",
@@ -120,6 +127,7 @@
         "description": "Helpful, friendly guidance for studying in Korea - university admissions, scholarships, student visas, and everyday campus life tips for international students.",
         "search_description": "Studying in Korea made simple: admissions, scholarships, visas, and campus life tips.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "International admissions adviser",
         "tone": "Procedural, precise and student-friendly",
         "min_chars": 1260,
@@ -140,7 +148,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://koreainsurance365.blogspot.com",
@@ -150,6 +159,7 @@
         "description": "Clear, friendly explanations of insurance in Korea - health coverage, national pension basics, and practical comparisons to help you choose with confidence.",
         "search_description": "Insurance in Korea explained simply: health coverage, national pension basics, and practical comparisons.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea insurance explainer",
         "tone": "Careful, comparative and plain-spoken",
         "min_chars": 1260,
@@ -170,7 +180,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://kfinance365.blogspot.com",
@@ -180,6 +191,7 @@
         "description": "Friendly, practical personal finance guidance for life in Korea - banking, saving, taxes, and everyday money tips for residents and newcomers alike.",
         "search_description": "Personal finance in Korea: banking, saving, taxes, and everyday money tips for residents and newcomers.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea personal-finance editor",
         "tone": "Numerate, neutral and risk-aware",
         "min_chars": 1260,
@@ -200,7 +212,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://koreamedicaltour365.blogspot.com",
@@ -210,6 +223,7 @@
         "description": "Cautious, practical guidance on medical tourism in Korea - choosing a clinic, planning a visit, and understanding costs, written in plain, non-diagnostic language.",
         "search_description": "Korea medical tourism: choosing a clinic, planning a visit, and understanding costs, explained clearly.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Medical tourism information editor",
         "tone": "Cautious, practical and non-diagnostic",
         "min_chars": 1260,
@@ -230,7 +244,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://k-visa365.blogspot.com",
@@ -240,6 +255,7 @@
         "description": "A friendly, step-by-step resource for Korean visas and immigration - application requirements, renewal tips, and practical advice for a smoother process.",
         "search_description": "Korean visa and immigration guidance: requirements, renewal tips, and practical advice, explained clearly.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea immigration information editor",
         "tone": "Cautious, source-led and procedural",
         "min_chars": 1260,
@@ -260,7 +276,8 @@
         "min_chars": 1500,
         "target_chars": 1750,
         "max_chars": 2000,
-        "content_type": "news_ko"
+        "content_type": "news_ko",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://koreanews365daily.blogspot.com",
@@ -270,6 +287,7 @@
         "description": "한국의 주요 뉴스와 시사 이슈를 알기 쉽고 친절하게 정리해서 전해드리는 블로그입니다. 바쁜 일상 속에서도 핵심을 빠르게 확인하실 수 있어요.",
         "search_description": "한국 뉴스와 시사 이슈를 쉽고 친절하게 정리해서 전해드립니다.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "독립 종합 인터넷신문 편집국",
         "tone": "검증과 맥락을 우선하는 절제된 신문 기사체",
         "min_chars": 1050,
@@ -290,7 +308,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://koreainvest365.blogspot.com",
@@ -300,6 +319,7 @@
         "description": "Friendly, practical insights on investing and business in Korea - market trends, company spotlights, and everyday guidance for curious investors.",
         "search_description": "Investing and business in Korea explained: market trends, company spotlights, and practical guidance.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korean markets analyst",
         "tone": "Data-led, balanced and risk-aware",
         "min_chars": 1260,
@@ -320,7 +340,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://oliveyoungkorea.blogspot.com",
@@ -330,6 +351,7 @@
         "description": "A friendly guide to K-beauty products and shopping in Korea - honest reviews, must-try picks, and shopping tips for skincare and cosmetics lovers everywhere.",
         "search_description": "K-beauty product reviews and shopping tips: must-try skincare and cosmetics picks from Korea.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "K-beauty shopping editor",
         "tone": "Ingredient-aware, balanced and non-promotional",
         "min_chars": 1260,
@@ -350,7 +372,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://koreacrypto365.blogspot.com",
@@ -360,6 +383,7 @@
         "description": "Clear, friendly coverage of Korean digital assets and regulation - market updates, policy explainers, and practical guidance for crypto users in Korea.",
         "search_description": "Korean crypto and digital asset news: market updates, regulation explainers, and practical guidance.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea digital-asset policy analyst",
         "tone": "Regulation-led, neutral and risk-conscious",
         "min_chars": 1260,
@@ -380,7 +404,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://jobinkorea365.blogspot.com",
@@ -390,6 +415,7 @@
         "description": "A supportive, friendly resource for foreign workers in Korea - visa-linked job guidance, workplace rights, and practical tips for building a career here.",
         "search_description": "Job guidance for foreign workers in Korea: visa-linked advice, workplace rights, and practical tips.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Foreign job-seeker coach",
         "tone": "Concrete, encouraging and workplace-aware",
         "min_chars": 1260,
@@ -404,13 +430,34 @@
       "wordpress": {
         "url": "https://koreawedding365.com",
         "secret_name": "KOREAWEDDING365COM",
-        "persona": "Korea international-couple community and wedding culture editor",
-        "tone": "Warm, respectful, safety-aware, practical and culturally sensitive",
-        "theme": "International dating, Korean couples, wedding culture, costs, meeting applications and free TOPIK",
+        "persona": "Korea international-couple community, cultural exchange and wedding editor",
+        "tone": "Warm, respectful, safety-aware, practical, inclusive and culturally sensitive",
+        "theme": "International dating, Korean couples, wedding culture, costs, Korean basics, TOPIK, cultural meetups and multicultural understanding",
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {
+          "stages": [
+            "Korean relationship and marriage interest",
+            "Free basic Korean and TOPIK learning",
+            "Invitations to safe cultural meetups and Korea culture tours",
+            "Multicultural understanding and international exchange",
+            "Optional matching parties, introductions and consultation applications"
+          ],
+          "partner": {
+            "name": "KIECA Korea International Education & Culture Association",
+            "url": "https://kieca-korea.org",
+            "status": "Public-interest incorporated association status in progress"
+          },
+          "topik_youtube_url": "https://www.youtube.com/channel/UCdA24IuR-JE7qButWv5jLqA",
+          "application_url": "",
+          "required_disclosures": [
+            "Participation or education does not guarantee dating, matching or marriage",
+            "Verify identity, consent, age and event safety before introductions",
+            "Do not stereotype Korean men, Korean women or any nationality"
+          ]
+        }
       },
       "blogspot": {
         "url": "https://koreawedding365.blogspot.com",
@@ -420,8 +467,19 @@
         "description": "An international community for people interested in dating, relationships, and marriage with Koreans. Explore Korean men and women, international couple stories, wedding culture, costs, safe meeting application guidance, and free Korean and TOPIK lessons from SIS.",
         "search_description": "Korean dating and marriage guide: international couples, wedding culture, costs, meeting applications, and free SIS TOPIK lessons.",
         "notes": "",
-        "persona": "Korea international-couple community and wedding culture editor",
-        "tone": "Warm, respectful, safety-aware, practical and culturally sensitive",
+        "editorial_funnel": {
+          "stages": [
+            "International dating and relationship information",
+            "Korean men, Korean women and international-couple stories",
+            "Wedding culture, process and realistic costs",
+            "Safe meeting and consultation application",
+            "Free Korean and TOPIK learning"
+          ],
+          "topik_youtube_url": "https://www.youtube.com/channel/UCdA24IuR-JE7qButWv5jLqA",
+          "application_url": ""
+        },
+        "persona": "Korea international-couple community, cultural exchange and wedding editor",
+        "tone": "Warm, respectful, safety-aware, practical, inclusive and culturally sensitive",
         "min_chars": 1260,
         "target_chars": 1680,
         "max_chars": 2304
@@ -440,7 +498,8 @@
         "min_chars": 1500,
         "target_chars": 1750,
         "max_chars": 2000,
-        "content_type": "news_en"
+        "content_type": "news_en",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://theseouljournal.blogspot.com",
@@ -450,6 +509,7 @@
         "description": "Friendly, English-language news and analysis on Korea - politics, society, and culture explained clearly for readers who want the full picture.",
         "search_description": "English-language Korea news and analysis: politics, society, and culture explained clearly.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Independent English-language Korea newsroom",
         "tone": "Verified, contextual and restrained newspaper prose",
         "min_chars": 1050,
@@ -470,7 +530,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://ktech365.blogspot.com",
@@ -480,6 +541,7 @@
         "description": "A friendly look at Korean technology and innovation - startups, gadgets, and industry trends explained in plain language for curious readers.",
         "search_description": "Korean tech and innovation news: startups, gadgets, and industry trends explained simply.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korean technology industry editor",
         "tone": "Technical, accessible and evidence-led",
         "min_chars": 1260,
@@ -500,7 +562,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://kieca-korea.blogspot.com",
@@ -510,6 +573,7 @@
         "description": "A welcoming resource on international education and cultural exchange in Korea - programs, opportunities, and practical guidance for global learners.",
         "search_description": "International education and cultural exchange in Korea: programs and practical guidance for global learners.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "국제교육문화 편집자",
         "tone": "공식적이고 교육적인 안내체",
         "min_chars": 1260,
@@ -530,7 +594,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://ki-korea.blogspot.com",
@@ -540,6 +605,7 @@
         "description": "Formal, source-led coverage of foreign investment policy in Korea - rules, incentives, and what they mean for investors.",
         "search_description": "Foreign investment in Korea: policy, incentives, and what they mean for investors, explained clearly.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Foreign investment policy editor",
         "tone": "Formal, institutional and source-led",
         "min_chars": 1260,
@@ -560,7 +626,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://ksa-korea.blogspot.com",
@@ -570,6 +637,7 @@
         "description": "A supportive guide to Korea study networks and student support - community resources, practical tips, and friendly advice for students far from home.",
         "search_description": "Korea study networks and student support: community resources and practical tips for international students.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "한국유학정보 상담 편집자",
         "tone": "친절하고 절차 중심적인 설명체",
         "min_chars": 1260,
@@ -590,7 +658,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://koreataxnlaw.blogspot.com",
@@ -600,6 +669,7 @@
         "description": "Clear, friendly explanations of Korean tax and practical law - everyday legal questions answered simply, without the confusing jargon.",
         "search_description": "Korean tax and law explained simply: everyday legal questions answered without the jargon.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea tax and legal information editor",
         "tone": "Formal, qualified and source-specific",
         "min_chars": 1260,
@@ -620,7 +690,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://jobkoreaglobal.blogspot.com",
@@ -630,6 +701,7 @@
         "description": "A friendly guide to global careers connected to Korea - international hiring trends, remote work, and practical advice for a borderless career.",
         "search_description": "Global careers connected to Korea: hiring trends, remote work, and practical career advice.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Global recruitment editor",
         "tone": "Professional, inclusive and compliance-aware",
         "min_chars": 1260,
@@ -650,7 +722,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://studyinkorea365.blogspot.com",
@@ -660,6 +733,7 @@
         "description": "Friendly, practical guidance on studying in Korea - admissions steps, scholarships, and everyday student life tips for international students.",
         "search_description": "Study in Korea guide: admissions steps, scholarships, and student life tips, explained simply.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "International student life adviser",
         "tone": "Supportive, realistic and budget-aware",
         "min_chars": 1260,
@@ -674,24 +748,70 @@
       "wordpress": {
         "url": "https://korea365.org",
         "secret_name": "KOREA365ORG",
-        "persona": "Korea culture service journalist",
-        "tone": "Practical, locally grounded and concise",
-        "theme": "Korea Culture",
+        "persona": "Korea life A-Z portal editor and trusted service navigator",
+        "tone": "Practical, welcoming, locally grounded, source-led and conversion-aware without pressure",
+        "theme": "Korea life A-Z: travel, visas, jobs, study, finance, health, housing, relationships, culture and public services",
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {
+          "role": "Master portal and routing hub for the Korea365 specialist network",
+          "stages": [
+            "Answer the reader's Korea-life question",
+            "Route to the most relevant specialist Korea365 site",
+            "Offer a useful checklist, newsletter, consultation or program",
+            "Collect contact information only through explicit opt-in consent"
+          ],
+          "vertical_routes": {
+            "travel": "https://k-trip365.com",
+            "visa": "https://k-visa365.com",
+            "jobs": "https://jobkorea365.com",
+            "study": "https://kstudy365.com",
+            "finance": "https://kfinance365.com",
+            "insurance": "https://koreainsurance365.com",
+            "housing": "https://krealestate365.com",
+            "health": "https://k-health365.com",
+            "medical_tourism": "https://koreamedicaltour.com",
+            "beauty": "https://kskin365.com",
+            "wedding": "https://koreawedding365.com",
+            "technology": "https://ktech365.com",
+            "international_education": "https://kieca-korea.org"
+          },
+          "lead_capture_url": "",
+          "privacy_rules": [
+            "No hidden collection or pre-checked consent",
+            "State purpose, data fields, retention period and withdrawal method",
+            "Keep service consent separate from optional marketing consent",
+            "Do not send personal data to a specialist site without user action"
+          ]
+        }
       },
       "blogspot": {
         "url": "https://korea365guide.blogspot.com",
         "status": "EXISTING",
         "destination_id": "242870255610398021",
         "ready_for_automation": true,
-        "description": "A friendly, public-interest resource on life in Korea - practical information and everyday guidance written to be genuinely useful.",
-        "search_description": "Public-interest Korea information: practical, everyday guidance written to be genuinely useful.",
+        "description": "Your Korea life A-Z portal for travel, visas, jobs, study, finance, health, housing, relationships, culture, and public services. Get practical answers, move to the right specialist guide, and choose helpful consultations or programs when you are ready.",
+        "search_description": "Korea life A-Z: practical guides to travel, visas, jobs, study, finance, health, housing, culture, and trusted specialist services.",
         "notes": "",
-        "persona": "Korea culture service journalist",
-        "tone": "Practical, locally grounded and concise",
+        "editorial_funnel": {
+          "role": "Blogspot companion to the Korea365 master portal",
+          "stages": [
+            "Answer a practical Korea-life question",
+            "Link to the relevant specialist site",
+            "Offer an optional checklist, consultation, newsletter, or program",
+            "Collect contact details only with explicit consent"
+          ],
+          "lead_capture_url": "",
+          "privacy_rules": [
+            "No hidden data collection",
+            "Explain purpose, retention and withdrawal",
+            "Separate service and marketing consent"
+          ]
+        },
+        "persona": "Korea life A-Z portal editor and trusted service navigator",
+        "tone": "Practical, welcoming, locally grounded, source-led and conversion-aware without pressure",
         "min_chars": 1260,
         "target_chars": 1680,
         "max_chars": 2304
@@ -710,7 +830,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://sis-korea.blogspot.com",
@@ -720,6 +841,7 @@
         "description": "Seoul International School (SIS) is the Vietnam campus of Seoul International University. Explore pathways to study in Korea, free TOPIK Korean lessons, online classes, admissions guidance, and student programs.",
         "search_description": "Study in Korea with SIS: free TOPIK Korean lessons, online classes, admissions guidance, and student programs from our Vietnam campus.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "SIS Vietnam campus international admissions and TOPIK program editor",
         "tone": "Welcoming, credible, action-oriented and student-friendly",
         "min_chars": 1260,
@@ -740,7 +862,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://krealestate365.blogspot.com",
@@ -750,6 +873,7 @@
         "description": "Friendly, practical guidance on housing and property in Korea - rental basics, buying tips, and market trends explained in plain language.",
         "search_description": "Housing and property in Korea explained: rental basics, buying tips, and market trends.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korea property market editor",
         "tone": "Analytical, locality-specific and cautious",
         "min_chars": 1260,
@@ -770,7 +894,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://k-health365.blogspot.com",
@@ -780,6 +905,7 @@
         "description": "건강, 영양, 생활습관에 관한 정보를 친절하고 이해하기 쉽게 전해드리는 블로그입니다. 일상에서 바로 실천할 수 있는 팁을 담았습니다.",
         "search_description": "건강·영양·생활습관 정보를 친절하고 쉽게 전해드립니다.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "건강정보 편집국",
         "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
         "min_chars": 1260,
@@ -800,7 +926,8 @@
         "min_chars": 1800,
         "target_chars": 2400,
         "max_chars": 3200,
-        "content_type": "blog"
+        "content_type": "blog",
+        "editorial_funnel": {}
       },
       "blogspot": {
         "url": "https://kskin365.blogspot.com",
@@ -810,6 +937,7 @@
         "description": "A friendly guide to Korean skincare - ingredient explainers, routine tips, and honest product insights for healthier, happier skin.",
         "search_description": "Korean skincare guide: ingredient explainers, routine tips, and honest product insights.",
         "notes": "",
+        "editorial_funnel": {},
         "persona": "Korean skincare science editor",
         "tone": "Evidence-led, ingredient-first and cautious",
         "min_chars": 1260,

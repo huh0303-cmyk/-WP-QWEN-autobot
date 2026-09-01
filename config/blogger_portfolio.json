@@ -323,12 +323,18 @@
       "order": 23,
       "wp": "https://korea365.org",
       "blogspot": "https://korea365guide.blogspot.com",
-      "title": "Korea365",
+      "title": "Korea365 | Korea Life A-Z",
       "language": "en",
-      "topic": "Public-interest Korea information",
+      "topic": "Korea life A-Z portal and specialist service guide",
       "status": "EXISTING",
-      "description": "A friendly, public-interest resource on life in Korea - practical information and everyday guidance written to be genuinely useful.",
-      "search_description": "Public-interest Korea information: practical, everyday guidance written to be genuinely useful.",
+      "description": "Your Korea life A-Z portal for travel, visas, jobs, study, finance, health, housing, relationships, culture, and public services. Get practical answers, move to the right specialist guide, and choose helpful consultations or programs when you are ready.",
+      "search_description": "Korea life A-Z: practical guides to travel, visas, jobs, study, finance, health, housing, culture, and trusted specialist services.",
+      "funnel": {
+        "role": "Blogspot companion to the Korea365 master portal",
+        "stages": ["Answer a practical Korea-life question", "Link to the relevant specialist site", "Offer an optional checklist, consultation, newsletter, or program", "Collect contact details only with explicit consent"],
+        "lead_capture_url": "",
+        "privacy_rules": ["No hidden data collection", "Explain purpose, retention and withdrawal", "Separate service and marketing consent"]
+      },
       "destination_id": "242870255610398021"
     },
     {
