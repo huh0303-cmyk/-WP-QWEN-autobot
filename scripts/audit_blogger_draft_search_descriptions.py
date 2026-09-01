@@ -20,6 +20,8 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from process_platform_queue import _access_token
+from gemini_text import gemini_generate_text
+from auto_write_and_draft import _finish_meta_description
 
 OUT = Path("blogger_draft_search_description_audit.json")
 
@@ -27,6 +29,31 @@ OUT = Path("blogger_draft_search_description_audit.json")
 def plain_intro(content: str) -> str:
     text = re.sub(r"<[^>]+>", " ", content or "")
     return re.sub(r"\s+", " ", text).strip()[:500]
+
+
+def prepare_search_descriptions(records: list[dict]) -> None:
+    """Generate post-specific 100-120 character snippets in small batches."""
+    for start in range(0, len(records), 8):
+        batch = records[start:start + 8]
+        source = [{"index": start + i, "title": row["title"], "intro": row["intro"]}
+                  for i, row in enumerate(batch)]
+        prompt = f"""Create one search description for each Blogger post below.
+Return JSON array only: [{{"index": 0, "search_description": "..."}}].
+Each description must be one grammatical sentence, 100-120 CHARACTERS including spaces, in the same language as its title. It must accurately describe that specific post, avoid hype, and must not invent facts.
+POSTS: {json.dumps(source, ensure_ascii=False)}"""
+        raw = gemini_generate_text(prompt, temperature=0.2)
+        match = re.search(r"\[[\s\S]*\]", raw)
+        generated = json.loads(match.group(0)) if match else []
+        by_index = {int(item["index"]): str(item.get("search_description") or "")
+                    for item in generated if "index" in item}
+        for i, row in enumerate(batch):
+            absolute = start + i
+            candidate = by_index.get(absolute, "") or row["intro"]
+            fitted = _finish_meta_description({"title": row["title"], "meta_description": candidate})["meta_description"]
+            if not 100 <= len(fitted) <= 120:
+                raise RuntimeError(f"search description length failed for {row['site_id']}/{row['post_id']}: {len(fitted)}")
+            row["search_description"] = fitted
+            row["search_description_length"] = len(fitted)
 
 
 def main() -> int:
@@ -70,6 +97,7 @@ def main() -> int:
                     "search_description_api_state": "not_exposed_by_blogger_v3",
                     "ui_verification_required": True,
                 })
+    prepare_search_descriptions(records)
     result = {"blogs_expected": len(profiles), "drafts_found": len(records), "records": records, "errors": errors}
     OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"blogs_expected": len(profiles), "drafts_found": len(records), "errors": len(errors)}, ensure_ascii=False))
