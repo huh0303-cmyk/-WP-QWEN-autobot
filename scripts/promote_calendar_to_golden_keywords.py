@@ -1,24 +1,17 @@
 #!/usr/bin/env python3
-"""Bridge the 14-day content calendar to the actual write queue.
+"""Keep seven days of WP and Blogger keywords ready in the write queue.
 
 roll_14day_content_calendar.py plans WHAT/WHEN in 14일_콘텐츠운영캘린더, but
 nothing reads that plan - auto_write_and_draft.py only ever picks up rows
 already sitting in 자동화_황금키워드. This script closes that gap: once a
-day, it looks at tomorrow's WordPress calendar rows and, for any that
+week, it looks at the next seven calendar days and, for any rows that
 aren't already queued, appends them to 자동화_황금키워드 as a normal 대기
 row - so by the time tomorrow's scheduled slot arrives, the keyword is
 already waiting for whatever dispatches the write.
 
-WordPress only, deliberately: the calendar's Blogger rows are written
-"동일 키워드 WP 발행 후" (same keyword, after WP publishes), a sequential
-dependency the calendar's own design assumes. The live Blogger pipeline
-(original_writer.py via a blogger_ site_id) writes fresh from a keyword
-directly and was deliberately built with its own separate keyword queue
-per platform, precisely so WordPress and Blogspot never write the same
-keyword. Auto-promoting Blogger rows here would silently reintroduce the
-same-keyword coupling that design intentionally avoided - so Blogger
-calendar rows are left for a human/other-session decision, not promoted
-here.
+Both platforms get their own site_id queue. Blogger receives a distinct
+reader-Q&A/practical-example angle so it never duplicates the paired
+WordPress article even when both calendar rows share a core topic.
 """
 from __future__ import annotations
 
@@ -57,6 +50,19 @@ def _domain_to_site_key() -> dict[str, str]:
     return mapping
 
 
+def _blogspot_to_site_key() -> dict[str, str]:
+    profiles = json.loads((ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8"))["profiles"]
+    return {
+        profile["blogspot"]["url"].removeprefix("https://").removeprefix("http://").rstrip("/"): profile["site_key"]
+        for profile in profiles if profile.get("blogspot", {}).get("url")
+    }
+
+
+def _blogger_angle(keyword: str, language: str) -> str:
+    suffix = " — 독자 질문과 실전 예시" if language == "ko" else " — reader questions and practical examples"
+    return keyword + suffix
+
+
 def main() -> int:
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     if not sheet_id:
@@ -80,12 +86,15 @@ def main() -> int:
     existing = {(r.get("site_id"), r.get("keyword")) for r in _records(keyword_values, KEYWORD_HEADER)}
 
     domain_to_key = _domain_to_site_key()
+    blogspot_to_key = _blogspot_to_site_key()
     tomorrow = (dt.datetime.now(KST) + dt.timedelta(days=1)).date()
+    horizon = tomorrow + dt.timedelta(days=6)
 
     new_rows = []
     skipped_no_mapping = []
     for row in calendar_rows:
-        if row.get("platform") != "WordPress":
+        platform = row.get("platform")
+        if platform not in {"WordPress", "Blogger"}:
             continue
         planned_at = row.get("planned_at_kst", "")
         if not planned_at[:10]:
@@ -94,15 +103,22 @@ def main() -> int:
             planned_date = dt.date.fromisoformat(planned_at[:10])
         except ValueError:
             continue
-        if planned_date != tomorrow:
+        if not tomorrow <= planned_date <= horizon:
             continue
-        domain = row.get("channel_site", "").strip()
-        site_key = domain_to_key.get(domain)
+        if platform == "WordPress":
+            identity = row.get("channel_site", "").strip()
+            site_key = domain_to_key.get(identity)
+            site_id = f"wp_{site_key}" if site_key else ""
+        else:
+            identity = row.get("destination_url", "").strip().removeprefix("https://").removeprefix("http://").rstrip("/")
+            site_key = blogspot_to_key.get(identity)
+            site_id = f"blogger_{site_key}" if site_key else ""
         if not site_key:
-            skipped_no_mapping.append(domain)
+            skipped_no_mapping.append(f"{platform}:{identity}")
             continue
-        site_id = f"wp_{site_key}"
         keyword = row.get("golden_keyword_candidate", "").strip()
+        if platform == "Blogger" and keyword:
+            keyword = _blogger_angle(keyword, row.get("language", ""))
         if not keyword or (site_id, keyword) in existing:
             continue
         intent = row.get("planned_title_direction", "") or row.get("notes", "")
@@ -112,7 +128,7 @@ def main() -> int:
     if skipped_no_mapping:
         print(f"no site_key mapping for domains: {sorted(set(skipped_no_mapping))}")
     if not new_rows:
-        print(f"nothing new to promote for {tomorrow}")
+        print(f"nothing new to promote for {tomorrow} through {horizon}")
         return 0
 
     service.spreadsheets().values().append(
@@ -120,7 +136,7 @@ def main() -> int:
         valueInputOption="RAW", insertDataOption="INSERT_ROWS",
         body={"values": new_rows},
     ).execute()
-    print(f"promoted {len(new_rows)} calendar rows for {tomorrow} into {KEYWORDS_TAB}")
+    print(f"promoted {len(new_rows)} WP+Blogger rows for {tomorrow} through {horizon} into {KEYWORDS_TAB}")
     for row in new_rows:
         print(f"  {row[1]} | {row[2]}")
     return 0

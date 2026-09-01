@@ -1,9 +1,9 @@
-name: "CEO Dashboard — promote tomorrow's calendar keywords to the write queue"
+name: "CEO Dashboard — prepare 7-day WP+Blogger keyword queues"
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "35 20 * * *" # 05:35 KST, after the 05:17 KST calendar roll
+    - cron: "35 20 * * 0" # Monday 05:35 KST, after the rolling calendar refresh
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install google-api-python-client google-auth -q
-      - name: Promote tomorrow's WordPress calendar rows into 자동화_황금키워드
+      - name: Prepare seven days for all 27 WordPress and 27 Blogger queues
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
