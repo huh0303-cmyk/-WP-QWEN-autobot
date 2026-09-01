@@ -1,0 +1,39 @@
+name: WordPress missing credentials bootstrap
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "canary validates one missing site; all processes every missing site"
+        required: true
+        default: canary
+        type: choice
+        options: [canary, all]
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Issue, validate and store missing WordPress application passwords
+        env:
+          BOOTSTRAP_MODE: ${{ inputs.mode }}
+          WP_REAL_PASSWORD: ${{ secrets.WP_REAL_PASSWORD }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          WP_USER: huh0303@gmail.com
+        run: python scripts/bootstrap_missing_wp_app_passwords.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wp-auth-bootstrap-result
+          path: wp_auth_bootstrap_result.json
+          if-no-files-found: warn
+          retention-days: 7
