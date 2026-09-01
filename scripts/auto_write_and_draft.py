@@ -58,6 +58,7 @@ def _consensus_passes(consensus: dict) -> bool:
 def _finish_meta_description(article: dict) -> dict:
     """Fit Blogger/Google snippet text to the shared 100-120 char gate."""
     meta = str(article.get("meta_description", "")).strip().rstrip(" ,;:-.!?")
+    title = str(article.get("title", "")).strip()
     korean = bool(re.search(r"[가-힣]", meta))
     suffix = (
         ". 이 실용 가이드에서 준비사항과 핵심 절차, 계획 전 확인할 내용을 차근차근 살펴보세요"
@@ -70,9 +71,20 @@ def _finish_meta_description(article: dict) -> dict:
         meta += ". 실제 준비 과정에서 놓치기 쉬운 부분과 안전하게 판단하는 기준도 함께 정리했습니다"
     if len(meta) > 119:
         shortened = meta[:119]
-        if not korean and " " in shortened:
+        # Korean also uses spaces. Never leave a visibly chopped word such as
+        # "차." or "public." in the search snippet.
+        if " " in shortened:
             shortened = shortened.rsplit(" ", 1)[0]
         meta = shortened.rstrip(" ,;:-.!?")
+    if len(meta) < 99:
+        topic = title[:38].rstrip(" ,;:-.!?")
+        meta = (
+            f"{topic}에 필요한 준비사항과 확인 절차를 정리했습니다. 처음 시작할 때 놓치기 쉬운 기준과 실전 체크포인트를 단계별로 확인하세요"
+            if korean else
+            f"Learn the practical steps for {topic}. See what to prepare, what to verify, and which questions to ask before you proceed"
+        )
+        if len(meta) > 119 and " " in meta[:119]:
+            meta = meta[:119].rsplit(" ", 1)[0].rstrip(" ,;:-.!?")
     if meta:
         meta += "."
     article["meta_description"] = meta
@@ -256,9 +268,15 @@ def main() -> int:
             wp_base = profile["wordpress"]["url"].rstrip("/") + "/"
             if not source_wp_url.startswith(wp_base):
                 raise SystemExit(f"{site_id}: SOURCE_WP_URL must be a public article under {wp_base}")
-            check = requests.get(source_wp_url, timeout=30, allow_redirects=True)
-            if check.status_code != 200:
-                raise SystemExit(f"{site_id}: SOURCE_WP_URL is not publicly reachable (HTTP {check.status_code})")
+            # The source URL establishes the paired WP identity; the Blogger
+            # article itself is written from the queued keyword. A temporary
+            # DNS/hosting outage must not empty or block the Blogger queue.
+            try:
+                check = requests.get(source_wp_url, timeout=15, allow_redirects=True)
+                if check.status_code != 200:
+                    print(json.dumps({"source_warning": f"HTTP {check.status_code}", "source_wp_url": source_wp_url}))
+            except requests.RequestException as exc:
+                print(json.dumps({"source_warning": str(exc), "source_wp_url": source_wp_url}))
 
     editorial_funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
     funnel_context = json.dumps(editorial_funnel, ensure_ascii=False) if editorial_funnel else ""
