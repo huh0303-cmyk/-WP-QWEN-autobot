@@ -51,6 +51,9 @@ If a model fails or is unavailable, try the next model in the strict order above
 Hard rules:
 
 - image must be relevant to the article/video topic
+- every non-decorative image on WordPress, Blogger and Tistory must have a concise, natural ALT description of what is actually visible and how it relates to the surrounding content
+- empty, missing, filename-only, title-duplicated or keyword-stuffed ALT text is a blocking QUALITY_FAIL; the pipeline must not save, schedule or publish the draft until the ALT value is corrected
+- this ALT gate applies to hero images and every inline image, including replacement images uploaded during manual review
 - free-stock fallback is forbidden
 - generic filler images are forbidden
 - do not fabricate official documents
