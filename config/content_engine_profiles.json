@@ -683,7 +683,7 @@
         "content_type": "blog"
       },
       "blogspot": {
-        "url": "https://korea365.blogspot.com",
+        "url": "https://korea365guide.blogspot.com",
         "status": "EXISTING",
         "destination_id": "242870255610398021",
         "ready_for_automation": true,
@@ -715,7 +715,7 @@
       "blogspot": {
         "url": "https://sis-korea.blogspot.com",
         "status": "EXISTING",
-        "destination_id": "8077962392257357260",
+        "destination_id": "6436826795706658249",
         "ready_for_automation": true,
         "description": "A welcoming guide to Seoul International University and global education in Korea - admissions, programs, and campus life for international students.",
         "search_description": "Seoul International University and global education in Korea: admissions, programs, and campus life.",
