@@ -66,18 +66,20 @@ def main() -> int:
     owned = _owned_blogs()
     data = json.loads(PORTFOLIO_PATH.read_text(encoding="utf-8"))
     found, still_missing = [], []
+    verified = []
     for channel in data["channels"]:
-        if channel["status"] in {"EXISTING", "CREATED"} and channel.get("destination_id"):
-            continue
         if channel["status"] == "CONFLICT":
             still_missing.append((channel["order"], channel["title"], "CONFLICT - needs a different address, see docs"))
             continue
         target_url = str(channel["blogspot"]).rstrip("/").lower()
         blog_id = owned.get(target_url)
         if blog_id:
+            previous_id = str(channel.get("destination_id", ""))
             channel["destination_id"] = blog_id
             channel["status"] = "EXISTING"
-            found.append((channel["order"], channel["title"], blog_id))
+            verified.append((channel["order"], channel["title"], blog_id))
+            if previous_id != blog_id:
+                found.append((channel["order"], channel["title"], blog_id))
         else:
             still_missing.append((channel["order"], channel["title"], "not present in authenticated owner's blog list"))
 
@@ -88,6 +90,7 @@ def main() -> int:
 
     print(json.dumps({
         "newly_wired": [{"order": o, "title": t, "blog_id": b} for o, t, b in found],
+        "ownership_verified": [{"order": o, "title": t, "blog_id": b} for o, t, b in verified],
         "still_missing": [{"order": o, "title": t, "reason": r} for o, t, r in still_missing],
     }, ensure_ascii=False, indent=2))
     return 0
