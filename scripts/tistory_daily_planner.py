@@ -86,6 +86,7 @@ def build_plan(now: datetime | None = None) -> dict:
             "duplicate_guard": True,
             "trend_mode": bool(site.get("trend_mode")),
             "official_source_required": bool(site.get("official_source_required")),
+            "official_sources": site.get("official_sources", []),
             "categories": site.get("categories", []),
             "intent": site.get("intent", []),
             "seed_topic": seed_topic,

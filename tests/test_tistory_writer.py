@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import tistory_writer
 
 JOB = {"job_id": "tistory_dental_cost:2026-08-28", "site_id": "tistory_dental_cost", "title": "한국치과비용연구소", "language": "ko", "audience": "한국인", "categories": ["임플란트", "치아보험"], "intent": ["비용"], "seed_topic": "임플란트 비용이 병원마다 다른 이유", "trend_mode": False, "official_source_required": False}
-BODY = "<h2>비용이 달라지는 순간</h2><p>비용을 확인하는 독자를 위한 설명입니다.</p><ul><li>확인 항목</li></ul><h2>상담 전 질문</h2><p>" + ("충분한 새 설명 " * 100) + "</p>"
+BODY = "<h2>비용이 달라지는 순간</h2><p>비용을 확인하는 독자를 위한 설명입니다.</p><ul><li>확인 항목</li></ul><h2>상담 전 질문</h2><p>" + ("충분한 새 설명 " * 150) + "</p>"
 VALID = json.dumps({"title": "상담실에서 당황하지 않게, 임플란트 비용이 달라지는 순간", "category": "임플란트", "meta_description": "임플란트 상담 전 비용 차이를 만드는 항목을 차분히 확인합니다.", "image_prompt": "치과 상담실에서 견적서를 살펴보는 사람의 안도감", "body_html": BODY})
 AUDIT_OK = json.dumps({"ok": True, "issues": []})
 

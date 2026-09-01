@@ -30,7 +30,7 @@ def test_life365_replaces_the_stale_petcare_label():
     assert site["title"] == "한국생활정보"
     assert site["url"] == "https://huh0303.tistory.com/"
     assert site["official_source_required"] is True
-    assert "장려금·지원금" in site["categories"]
+    assert "지원금·신청" in site["categories"]
     assert "교통·시간표" in site["categories"]
     assert site["rss_output"] == {"visibility": "full", "items": 50}
     assert site["source_policy"]["copy_feed_content"] is False
@@ -40,10 +40,18 @@ def test_life365_replaces_the_stale_petcare_label():
 def test_finance_site_replaces_the_stale_healthcare_label():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_finance_housing")
-    assert site["current_label"] == "K-보건의료자격증"
+    assert site["current_label"] == "K-덴탈보험연구소"
     assert site["title"] == "한국부동산금융정보"
     assert "대출" in site["categories"]
     assert "국가자격" not in site["categories"]
+
+
+def test_health_site_uses_the_healthcare_address():
+    cfg = load_config()
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_health_info")
+    assert site["url"] == "https://k-healthcare.tistory.com/"
+    assert site["title"] == "한국건강정보"
+    assert "건강검진" in site["categories"]
 
 
 def test_all_sites_are_enabled_for_staged_relaunch():

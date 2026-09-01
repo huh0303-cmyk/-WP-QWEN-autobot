@@ -39,7 +39,8 @@ WRITER_SYSTEM_PROMPT = (
     "Never copy sentences, paragraph order, headings, examples or FAQs from WordPress, Blogspot, or another Tistory site. "
     "Use a platform-specific search intent and newly built outline. "
     "The title is the most important text element: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. "
-    "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
+    "Never use exclamation marks, '비법', '완벽', '놓치지 마세요', '후회합니다', 'insider tips', 'unlock', 'seamless', or stacked headline formulas. "
+    "Prefer a calm, specific title that names the exact reader task. Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
     "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts)."
@@ -80,6 +81,16 @@ def build_writer_prompt(job: dict) -> str:
             "the exact current figure, tell the reader to check the official "
             "source instead of inventing a number."
         )
+        sources = job.get("official_sources") or []
+        if sources:
+            lines.append(
+                "Use at least two of these official references as named clickable links in the body, "
+                "and do not invent any other URL: " + "; ".join(sources)
+            )
+    lines.append(
+        "Write practical steps, a short checklist, and limits/exceptions. Avoid promotional conclusions, "
+        "unsupported statistics, guaranteed outcomes, and repetitive filler."
+    )
     lines.append("Write the article now as the JSON object described above.")
     return "\n".join(lines)
 
@@ -224,10 +235,47 @@ def generate_draft(job: dict) -> dict:
         title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
         keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
     )
+    draft["three_model_consensus_initial"] = consensus
+    if consensus.get("ok") is not True and openai_available():
+        issue_lines = []
+        for model, result in consensus.get("checks", {}).items():
+            for issue in result.get("issues", []):
+                issue_lines.append(f"- {model}: {issue}")
+        rewrite_prompt = (
+            WRITER_SYSTEM_PROMPT + "\n\nRewrite the draft so every audit issue is genuinely fixed. "
+            "Keep the allowed category, remove hype and unsupported claims, add concrete official-source links "
+            "from the supplied list, and make the tone sound like a careful human editor. Do not merely add disclaimers.\n"
+            f"Allowed category: {draft['category']}\nOfficial sources: {job.get('official_sources', [])}\n"
+            f"Seed topic: {job['seed_topic']}\nAudit issues:\n" + "\n".join(issue_lines) +
+            "\nCurrent draft:\n" + json.dumps({
+                "title": draft["title"], "category": draft["category"],
+                "meta_description": draft["meta_description"],
+                "image_prompt": draft["image_prompt"], "body_html": draft["body_html"],
+            }, ensure_ascii=False)
+        )
+        try:
+            revised = _parse_json_response(openai_generate_text(rewrite_prompt, temperature=0.25, max_retries=2))
+            revised["category"] = draft["category"]
+            draft.update({
+                "title": revised.get("title", draft["title"]),
+                "body_html": revised.get("body_html", draft["body_html"]),
+                "meta_description": revised.get("meta_description", draft["meta_description"]),
+                "image_prompt": revised.get("image_prompt", draft["image_prompt"]),
+                "engine": draft["engine"] + "+gpt_consensus_rewrite",
+            })
+            score, issues = quality_score(draft, job)
+            draft["quality_score"], draft["quality_issues"] = score, issues
+            if score >= MIN_QUALITY_SCORE and not issues:
+                consensus = three_model_consensus(
+                    title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
+                    keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
+                )
+        except Exception as exc:
+            draft["consensus_rewrite_error"] = str(exc)
     draft["three_model_consensus"] = consensus
     if consensus.get("ok") is not True:
         draft["status"] = "CONSENSUS_FAILED"
-        draft["error"] = "Gemini, GPT and Claude did not all approve"
+        draft["error"] = "Gemini, GPT and Claude did not all approve after corrective rewrite"
         return draft
     # Nano Banana is attempted only when its free tier is explicitly enabled
     # by the shared policy. Current official API tier is not free, so the
