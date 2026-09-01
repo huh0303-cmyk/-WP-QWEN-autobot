@@ -61,8 +61,9 @@ def test_all_sites_are_enabled_for_staged_relaunch():
     assert all(s["preserve_identity"] is True for s in cfg["sites"])
 
 
-def test_ktrip_is_english_for_foreign_visitors():
+def test_ktrip_is_korean_travel_information():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_ktrip365")
-    assert site["language"] == "en"
-    assert "Foreign" in site["audience"]
+    assert site["language"] == "ko"
+    assert site["title"] == "한국여행정보"
+    assert "한국어" in site["audience"]

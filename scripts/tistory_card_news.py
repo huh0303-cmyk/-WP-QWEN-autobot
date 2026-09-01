@@ -11,7 +11,7 @@ from string import Template
 
 THEMES = {
     "tistory_insurance_lab": {"bg1": "#071b33", "bg2": "#174b83", "accent": "#62d5ff", "soft": "#d9f4ff", "mark": "INSURANCE"},
-    "tistory_dental_cost": {"bg1": "#2d123f", "bg2": "#8e3f73", "accent": "#ffcf75", "soft": "#fff0d5", "mark": "DENTAL"},
+    "tistory_health_info": {"bg1": "#2d123f", "bg2": "#8e3f73", "accent": "#ffcf75", "soft": "#fff0d5", "mark": "HEALTH"},
     "tistory_finance_housing": {"bg1": "#13271f", "bg2": "#357052", "accent": "#d5f071", "soft": "#efffc7", "mark": "HOUSING"},
     "tistory_life365": {"bg1": "#32120c", "bg2": "#b64b2b", "accent": "#ffd166", "soft": "#fff1c7", "mark": "BENEFIT"},
     "tistory_ktrip365": {"bg1": "#0b2340", "bg2": "#2368a2", "accent": "#ff8d6b", "soft": "#e0f1ff", "mark": "K-TRIP"},

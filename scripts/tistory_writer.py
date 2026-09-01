@@ -43,7 +43,9 @@ WRITER_SYSTEM_PROMPT = (
     "Prefer a calm, specific title that names the exact reader task. Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
-    "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts)."
+    "body_html must be simple HTML using real h2/h3 headings, separate p paragraphs, and ul/li lists "
+    "(no inline styles, scripts, or fake heading glyphs such as ■, ▶, •). "
+    "The image_prompt must describe a photorealistic Korean editorial scene with no readable text, letters, numbers, logos, brands, signs, screens, labels, watermarks, or printed documents."
 )
 
 AUDIT_SYSTEM_PROMPT = (
@@ -120,8 +122,20 @@ def structural_check(draft: dict) -> list[str]:
         issues.append("title is empty")
     if len(plain) < MIN_BODY_CHARS:
         issues.append(f"body length {len(plain)} is below the {MIN_BODY_CHARS}-character floor")
-    if not re.search(r"(?is)<h[23][\s>]", body):
-        issues.append("body has no h2/h3 headings")
+    heading_count = len(re.findall(r"(?is)<h[23][\s>]", body))
+    paragraph_count = len(re.findall(r"(?is)<p[\s>]", body))
+    list_item_count = len(re.findall(r"(?is)<li[\s>]", body))
+    if heading_count < 2:
+        issues.append(f"body has only {heading_count} real h2/h3 headings; at least 2 are required")
+    if paragraph_count < 4:
+        issues.append(f"body has only {paragraph_count} real paragraphs; at least 4 are required")
+    if list_item_count < 3:
+        issues.append(f"body has only {list_item_count} real list items; at least 3 are required")
+    if re.search(r"(?:^|[>\s])[■▶](?:\s|$)", body):
+        issues.append("body uses fake heading glyphs instead of HTML headings")
+    longest_text_block = max((len(re.sub(r"<[^>]+>", "", block).strip()) for block in re.findall(r"(?is)<p[^>]*>.*?</p>", body)), default=0)
+    if longest_text_block > 650:
+        issues.append(f"a paragraph is {longest_text_block} characters long; split it for mobile readability")
     return issues
 
 
@@ -316,7 +330,13 @@ def generate_draft(job: dict) -> dict:
     # Nano Banana is attempted only when its free tier is explicitly enabled
     # by the shared policy. Current official API tier is not free, so the
     # workflow skips it and enters the approved Replicate chain below.
-    draft["image_url"] = generate_image_url(draft["image_prompt"], theme=draft["category"])
+    safe_image_prompt = (
+        f"{draft['image_prompt']}. Photorealistic Korean editorial photography. "
+        "No readable text, no letters, no numbers, no logos, no brands, no signs, "
+        "no screens, no labels, no watermarks, and no printed documents."
+    )
+    draft["image_prompt"] = safe_image_prompt
+    draft["image_url"] = generate_image_url(safe_image_prompt, theme=draft["category"])
     draft["first_image_priority"] = True
     draft["image_policy"] = "free_nano_then_flux_schnell_then_sdxl_lightning_then_sdxl_turbo_or_none"
     return draft
