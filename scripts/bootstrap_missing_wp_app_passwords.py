@@ -20,6 +20,7 @@ USER = os.environ.get("WP_USER", "huh0303@gmail.com")
 REAL_PASSWORD = os.environ.get("WP_REAL_PASSWORD", "").strip()
 GH_TOKEN = os.environ.get("GH_PAT", "").strip()
 MODE = os.environ.get("BOOTSTRAP_MODE", "canary").strip().lower()
+TARGET_SECRET_NAMES = {name.strip() for name in os.environ.get("TARGET_SECRET_NAMES", "").split(",") if name.strip()}
 RESULT_PATH = ROOT / "wp_auth_bootstrap_result.json"
 
 
@@ -118,8 +119,9 @@ def store_secret(name: str, password: str) -> None:
 def main() -> int:
     if not REAL_PASSWORD or not GH_TOKEN:
         raise SystemExit("required bootstrap credentials are unavailable")
-    present = registered_secret_names()
-    targets = [row for row in wp_sites() if row.get("secret_name") not in present]
+    targets = [row for row in wp_sites() if row.get("secret_name") in TARGET_SECRET_NAMES]
+    if not targets:
+        raise SystemExit("no bootstrap target names were supplied")
     if MODE == "canary":
         targets = targets[:1]
     results = []
