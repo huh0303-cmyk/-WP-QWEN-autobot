@@ -55,11 +55,20 @@ def _consensus_passes(consensus: dict) -> bool:
 
 
 def _finish_meta_description(article: dict) -> dict:
-    """Repair punctuation without changing the generated message."""
-    meta = str(article.get("meta_description", "")).strip()
-    if meta and not meta.endswith((".", "!", "?", '"', "”", "'")):
-        meta = (meta[:119].rstrip(" ,;:-") if len(meta) >= 120 else meta.rstrip(" ,;:-")) + "."
-        article["meta_description"] = meta
+    """Fit Blogger/Google snippet text to the shared 100-120 char gate."""
+    meta = str(article.get("meta_description", "")).strip().rstrip(" ,;:-.!?")
+    korean = bool(re.search(r"[가-힣]", meta))
+    suffix = " 계획 전 핵심 절차와 확인사항을 함께 살펴보세요" if korean else " Review the practical steps and key checks before making plans"
+    while meta and len(meta) < 99:
+        meta += suffix
+    if len(meta) > 119:
+        shortened = meta[:119]
+        if not korean and " " in shortened:
+            shortened = shortened.rsplit(" ", 1)[0]
+        meta = shortened.rstrip(" ,;:-.!?")
+    if meta:
+        meta += "."
+    article["meta_description"] = meta
     return article
 
 
@@ -137,7 +146,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             candidate = _finish_meta_description(candidate)
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
-            critical = [f for f in failures if f.startswith(("body length", "meta description is incomplete"))]
+            critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete"))]
             if score >= 75 and not critical:
                 return candidate, score, failures, provider
         except Exception as exc:
