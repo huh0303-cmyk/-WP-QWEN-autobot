@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 0.24,
+  "spent_estimate_usd": 0.27,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -39,6 +39,11 @@
     },
     {
       "at": "2026-09-01T19:15:24.860056+09:00",
+      "label": "auto-write:blogger_ktrip365",
+      "amount_usd": 0.03
+    },
+    {
+      "at": "2026-09-01T19:22:00.344726+09:00",
       "label": "auto-write:blogger_ktrip365",
       "amount_usd": 0.03
     }
