@@ -155,7 +155,11 @@ def main() -> int:
     if wp_status != "draft":
         raise SystemExit(f"WordPress returned unexpected status {wp_status!r}; expected 'draft' (post_id={post_id})")
 
-    record = {"status": "draft", "url": post_url, "title": title, "post_id": post_id}
+    record = {
+        "status": "draft", "platform": "wordpress", "site": site_url,
+        "url": post_url, "edit_url": f"{site_url}/wp-admin/post.php?post={post_id}&action=edit",
+        "title": title, "post_id": post_id,
+    }
     existing = {"records": []}
     if Path(RESULT_FILE).exists():
         try:

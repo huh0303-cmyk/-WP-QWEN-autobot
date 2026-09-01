@@ -121,7 +121,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
             critical = [f for f in failures if f.startswith(("body length", "meta description is incomplete"))]
-            if score >= 70 and not critical:
+            if score >= 75 and not critical:
                 return candidate, score, failures, provider
         except Exception as exc:
             failures = [f"invalid output: {exc}"]
@@ -154,10 +154,17 @@ def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_
     payload = response.json()
     if payload.get("status") != "draft":
         raise SystemExit(f"WordPress returned unexpected status {payload.get('status')!r}")
-    return {"status": "draft", "url": payload.get("link", ""), "title": article["title"], "post_id": payload.get("id")}
+    post_id = payload.get("id")
+    return {
+        "status": "draft", "platform": "wordpress", "site": site_url,
+        "url": payload.get("link", ""),
+        "edit_url": f"{site_url.rstrip('/')}/wp-admin/post.php?post={post_id}&action=edit",
+        "title": article["title"], "post_id": post_id,
+    }
 
 
-def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: str, keyword: str) -> dict:
+def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: str,
+                     site_url: str, keyword: str) -> dict:
     token = _access_token("")
     content = article["content_html"]
     if image_url:
@@ -170,7 +177,11 @@ def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: st
     result = BloggerPublisher(site_id, blog_id, token).publish(job)
     if not result.ok:
         raise SystemExit(f"Blogger draft creation failed: {result.error_code} {result.message}")
-    return {"status": "draft", "url": result.public_url, "title": article["title"]}
+    return {
+        "status": "draft", "platform": "blogger", "site": site_url or site_id,
+        "url": result.public_url, "edit_url": result.public_url,
+        "title": article["title"], "post_id": result.remote_id,
+    }
 
 
 def main() -> int:
@@ -243,7 +254,12 @@ def main() -> int:
     if platform == "wordpress":
         record_out = _publish_wordpress(site_url=site_url, secret_name=settings["secret_name"], article=article, image_url=image_url)
     else:
-        record_out = _publish_blogger(blog_id=settings["destination_id"], article=article, image_url=image_url, site_id=site_id, keyword=keyword)
+        record_out = _publish_blogger(
+            blog_id=settings["destination_id"], article=article, image_url=image_url,
+            site_id=site_id, site_url=site_url, keyword=keyword,
+        )
+    record_out["quality_score"] = score
+    record_out["site_id"] = site_id
 
     existing = {"records": []}
     if Path(RESULT_FILE).exists():
