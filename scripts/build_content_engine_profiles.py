@@ -24,7 +24,7 @@ def main() -> int:
         for s in json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8")).get("sites", [])
         if s.get("platform") == "wordpress"
     }
-    portfolio = json.loads((ROOT / "config" / "blogger_portfolio.json").read_text())["channels"]
+    portfolio = json.loads((ROOT / "config" / "blogger_portfolio.json").read_text(encoding="utf-8"))["channels"]
 
     profiles = []
     for channel in portfolio:
