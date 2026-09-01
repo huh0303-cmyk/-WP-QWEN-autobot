@@ -2,6 +2,11 @@ name: "Tistory — Daily 5-Site Plan"
 
 on:
   workflow_dispatch:
+    inputs:
+      site_ids:
+        description: "Comma-separated site IDs; blank runs all five"
+        required: false
+        default: ""
   schedule:
     - cron: "11 21 * * *"
 
@@ -20,7 +25,23 @@ jobs:
       - name: Install dependencies
         run: pip install requests -q
       - name: Build one-post-per-site safe plan
-        run: python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
+        env:
+          SITE_IDS: ${{ inputs.site_ids }}
+        run: |
+          python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
+          if [ -n "$SITE_IDS" ]; then
+            python - <<'PY'
+          import json, os
+          path = 'artifacts/tistory-daily-plan.json'
+          plan = json.load(open(path, encoding='utf-8'))
+          wanted = {x.strip() for x in os.environ['SITE_IDS'].split(',') if x.strip()}
+          plan['jobs'] = [job for job in plan['jobs'] if job['site_id'] in wanted]
+          plan['enabled_sites'] = len(plan['jobs'])
+          if not plan['jobs'] or {job['site_id'] for job in plan['jobs']} != wanted:
+              raise SystemExit('Unknown or empty Tistory site selection')
+          json.dump(plan, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+          PY
+          fi
       - name: Validate public publishing is disabled
         run: |
           python - <<'PY'

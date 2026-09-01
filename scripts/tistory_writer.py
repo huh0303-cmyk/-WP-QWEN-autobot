@@ -272,6 +272,42 @@ def generate_draft(job: dict) -> dict:
                 )
         except Exception as exc:
             draft["consensus_rewrite_error"] = str(exc)
+    if consensus.get("ok") is not True and openai_available():
+        issue_lines = []
+        for model, result in consensus.get("checks", {}).items():
+            issue_lines.extend(f"- {model}: {issue}" for issue in result.get("issues", []))
+        final_prompt = (
+            WRITER_SYSTEM_PROMPT + "\n\nThis is the final corrective edit. Fix every remaining audit issue below, "
+            "not just the wording. Replace numbered/list-template headlines with a specific natural title. "
+            "Remove any promise not delivered by the body. Consolidate repetitive cautions. Add one concrete "
+            "worked example or comparison table when useful. Use clickable official links and remove any exact "
+            "time, fare, rate, date, or rule that is not directly supported.\n"
+            f"Allowed category: {draft['category']}\nOfficial sources: {job.get('official_sources', [])}\n"
+            f"Seed topic: {job['seed_topic']}\nRemaining issues:\n" + "\n".join(issue_lines) +
+            "\nDraft to revise:\n" + json.dumps({
+                "title": draft["title"], "category": draft["category"],
+                "meta_description": draft["meta_description"],
+                "image_prompt": draft["image_prompt"], "body_html": draft["body_html"],
+            }, ensure_ascii=False)
+        )
+        try:
+            revised = _parse_json_response(openai_generate_text(final_prompt, temperature=0.15, max_retries=2))
+            draft.update({
+                "title": revised.get("title", draft["title"]),
+                "body_html": revised.get("body_html", draft["body_html"]),
+                "meta_description": revised.get("meta_description", draft["meta_description"]),
+                "image_prompt": revised.get("image_prompt", draft["image_prompt"]),
+                "engine": draft["engine"] + "+gpt_final_edit",
+            })
+            score, issues = quality_score(draft, job)
+            draft["quality_score"], draft["quality_issues"] = score, issues
+            if score >= MIN_QUALITY_SCORE and not issues:
+                consensus = three_model_consensus(
+                    title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
+                    keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
+                )
+        except Exception as exc:
+            draft["consensus_final_edit_error"] = str(exc)
     draft["three_model_consensus"] = consensus
     if consensus.get("ok") is not True:
         draft["status"] = "CONSENSUS_FAILED"
