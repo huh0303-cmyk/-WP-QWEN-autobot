@@ -38,26 +38,32 @@ def _access_token() -> str:
     return response.json()["access_token"]
 
 
-def _lookup_auth() -> tuple[dict, dict]:
-    """blogs.getByUrl is a public read - OAuth is preferred (also proves the
-    write-scope credential works) but a plain API key is enough to look up
-    IDs. Falls back to whatever key this repo already has (YouTube's, most
-    likely on the same GCP project) if the dedicated Blogger OAuth secret
-    hasn't been set up yet."""
+def _owned_blogs() -> dict[str, str]:
+    """Return exact URL -> ID mappings for blogs owned by the OAuth account.
+
+    A public blogs.getByUrl lookup is not sufficient: it can return a blog
+    owned by someone else when a requested address is unavailable.  Wiring a
+    draft destination therefore fails closed unless the address appears in
+    users/self/blogs for the authenticated account.
+    """
     token = _access_token()
-    if token:
-        return {"Authorization": f"Bearer {token}"}, {}
-    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("YOUTUBE_API_KEY", "")
-    if not api_key:
-        raise SystemExit(
-            "No usable credential: BLOGGER_GOOGLE_REFRESH_TOKEN/_CLIENT_ID/_CLIENT_SECRET "
-            "are not set, and no GOOGLE_API_KEY/YOUTUBE_API_KEY fallback is available either."
-        )
-    return {}, {"key": api_key}
+    if not token:
+        raise SystemExit("Blogger OAuth credential is required to verify blog ownership")
+    response = requests.get(
+        "https://www.googleapis.com/blogger/v3/users/self/blogs",
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=30,
+    )
+    response.raise_for_status()
+    return {
+        str(item.get("url", "")).rstrip("/").lower(): str(item.get("id", ""))
+        for item in response.json().get("items", [])
+        if item.get("url") and item.get("id")
+    }
 
 
 def main() -> int:
-    headers, extra_params = _lookup_auth()
+    owned = _owned_blogs()
     data = json.loads(PORTFOLIO_PATH.read_text(encoding="utf-8"))
     found, still_missing = [], []
     for channel in data["channels"]:
@@ -66,21 +72,14 @@ def main() -> int:
         if channel["status"] == "CONFLICT":
             still_missing.append((channel["order"], channel["title"], "CONFLICT - needs a different address, see docs"))
             continue
-        response = requests.get(
-            "https://www.googleapis.com/blogger/v3/blogs/byurl",
-            params={"url": channel["blogspot"], **extra_params},
-            headers=headers,
-            timeout=20,
-        )
-        if response.status_code == 200:
-            blog_id = response.json()["id"]
+        target_url = str(channel["blogspot"]).rstrip("/").lower()
+        blog_id = owned.get(target_url)
+        if blog_id:
             channel["destination_id"] = blog_id
             channel["status"] = "EXISTING"
             found.append((channel["order"], channel["title"], blog_id))
-        elif response.status_code == 404:
-            still_missing.append((channel["order"], channel["title"], "not created yet"))
         else:
-            still_missing.append((channel["order"], channel["title"], f"lookup failed: HTTP {response.status_code} {response.text[:200]}"))
+            still_missing.append((channel["order"], channel["title"], "not present in authenticated owner's blog list"))
 
     PORTFOLIO_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

@@ -143,15 +143,13 @@
     {
       "order": 9,
       "wp": "https://koreanews365.com",
-      "blogspot": "https://koreanews365.blogspot.com",
+      "blogspot": "https://koreanews365daily.blogspot.com",
       "title": "KoreaNews365",
       "language": "ko",
       "topic": "한국 뉴스·시사",
-      "status": "EXISTING",
-      "scheduled_kst": "2026-08-30 09:06",
+      "status": "CREATED",
       "description": "한국의 주요 뉴스와 시사 이슈를 알기 쉽고 친절하게 정리해서 전해드리는 블로그입니다. 바쁜 일상 속에서도 핵심을 빠르게 확인하실 수 있어요.",
-      "search_description": "한국 뉴스와 시사 이슈를 쉽고 친절하게 정리해서 전해드립니다.",
-      "destination_id": "1548983591062080646"
+      "search_description": "한국 뉴스와 시사 이슈를 쉽고 친절하게 정리해서 전해드립니다."
     },
     {
       "order": 10,
@@ -325,12 +323,12 @@
       "order": 24,
       "wp": "https://sis-korea.com",
       "blogspot": "https://sis-korea.blogspot.com",
-      "title": "SIS Korea",
+      "title": "SIS Korea | Study & Career Guide",
       "language": "en",
-      "topic": "Seoul International University and global education",
+      "topic": "Study and career guidance for international students in Korea",
       "status": "EXISTING",
-      "description": "A welcoming guide to Seoul International University and global education in Korea - admissions, programs, and campus life for international students.",
-      "search_description": "Seoul International University and global education in Korea: admissions, programs, and campus life.",
+      "description": "Practical, source-led guidance for international students and global learners in Korea, covering study options, admissions, scholarships, visas, campus life, and career planning.",
+      "search_description": "Study and career guidance for international students in Korea: admissions, scholarships, visas, campus life and career planning.",
       "destination_id": "6436826795706658249"
     },
     {
