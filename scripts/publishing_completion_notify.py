@@ -272,8 +272,17 @@ def main() -> int:
         sheet_synced = False
     body = _plain_body(base_body, reviews, fallback_link)
     email_html = _html_body(base_body, reviews, fallback_link)
-    kakao_results = [send_kakao_review(review) for review in reviews]
-    results = {"email": send_email(title, body, email_html), "kakao": bool(kakao_results) and all(kakao_results),
+    # Email is the authoritative review channel. An expired optional Kakao
+    # token must never prevent the administrator edit link from being sent.
+    email_result = send_email(title, body, email_html)
+    kakao_results = []
+    for review in reviews:
+        try:
+            kakao_results.append(send_kakao_review(review))
+        except Exception as exc:
+            print(f"kakao notification failed without affecting email: {exc}")
+            kakao_results.append(False)
+    results = {"email": email_result, "kakao": bool(kakao_results) and all(kakao_results),
                "url": fallback_link, "draft_links_found": len(reviews), "sheet_synced": sheet_synced}
     print(json.dumps(results, ensure_ascii=False))
     return 0 if results["email"] else 1
