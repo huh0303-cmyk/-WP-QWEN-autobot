@@ -18,6 +18,7 @@ REGISTRY = ROOT / "config" / "automation_hub_sites.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "huh0303-cmyk/-WP-QWEN-autobot")
 USER = os.environ.get("WP_USER", "huh0303@gmail.com")
 REAL_PASSWORD = os.environ.get("WP_REAL_PASSWORD", "").strip()
+ADMIN_PASSWORD = os.environ.get("WP_ADMIN_PASSWORD", "").strip()
 GH_TOKEN = os.environ.get("GH_PAT", "").strip()
 MODE = os.environ.get("BOOTSTRAP_MODE", "canary").strip().lower()
 TARGET_SECRET_NAMES = {name.strip() for name in os.environ.get("TARGET_SECRET_NAMES", "").split(",") if name.strip()}
@@ -54,20 +55,25 @@ def find_nonce(html: str) -> str:
 
 def create_application_password(site: dict) -> tuple[str, str]:
     base = site["url"].rstrip("/")
-    session = requests.Session()
-    session.headers.update({"User-Agent": "SIS-Control-Center-Auth/1.0"})
     login_url = f"{base}/wp-login.php"
     profile_url = f"{base}/wp-admin/profile.php"
-    session.get(login_url, timeout=30)
-    login = session.post(
-        login_url,
-        data={
-            "log": USER, "pwd": REAL_PASSWORD, "rememberme": "forever",
-            "wp-submit": "Log In", "redirect_to": profile_url, "testcookie": "1",
-        },
-        timeout=45, allow_redirects=True,
-    )
-    if "wp-login.php" in login.url or "login_error" in login.text:
+    session = None
+    for candidate in dict.fromkeys(password for password in (REAL_PASSWORD, ADMIN_PASSWORD) if password):
+        attempt = requests.Session()
+        attempt.headers.update({"User-Agent": "SIS-Control-Center-Auth/1.0"})
+        attempt.get(login_url, timeout=30)
+        login = attempt.post(
+            login_url,
+            data={
+                "log": USER, "pwd": candidate, "rememberme": "forever",
+                "wp-submit": "Log In", "redirect_to": profile_url, "testcookie": "1",
+            },
+            timeout=45, allow_redirects=True,
+        )
+        if "wp-login.php" not in login.url and "login_error" not in login.text:
+            session = attempt
+            break
+    if session is None:
         raise RuntimeError("administrator_login_failed")
     profile = session.get(profile_url, timeout=30)
     if profile.status_code != 200 or "wp-login.php" in profile.url:
@@ -117,7 +123,7 @@ def store_secret(name: str, password: str) -> None:
 
 
 def main() -> int:
-    if not REAL_PASSWORD or not GH_TOKEN:
+    if not (REAL_PASSWORD or ADMIN_PASSWORD) or not GH_TOKEN:
         raise SystemExit("required bootstrap credentials are unavailable")
     targets = [row for row in wp_sites() if row.get("secret_name") in TARGET_SECRET_NAMES]
     if not targets:
