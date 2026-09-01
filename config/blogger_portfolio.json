@@ -331,9 +331,18 @@
       "search_description": "Korea life A-Z: practical guides to travel, visas, jobs, study, finance, health, housing, culture, and trusted specialist services.",
       "funnel": {
         "role": "Blogspot companion to the Korea365 master portal",
-        "stages": ["Answer a practical Korea-life question", "Link to the relevant specialist site", "Offer an optional checklist, consultation, newsletter, or program", "Collect contact details only with explicit consent"],
+        "stages": [
+          "Answer a practical Korea-life question",
+          "Link to the relevant specialist site",
+          "Offer an optional checklist, consultation, newsletter, or program",
+          "Collect contact details only with explicit consent"
+        ],
         "lead_capture_url": "",
-        "privacy_rules": ["No hidden data collection", "Explain purpose, retention and withdrawal", "Separate service and marketing consent"]
+        "privacy_rules": [
+          "No hidden data collection",
+          "Explain purpose, retention and withdrawal",
+          "Separate service and marketing consent"
+        ]
       },
       "destination_id": "242870255610398021"
     },
@@ -380,7 +389,7 @@
       "title": "KSkin365",
       "language": "en",
       "topic": "Korean skincare",
-      "status": "CREATED",
+      "status": "EXISTING",
       "destination_id": "7354545101201355815",
       "created_on": "2026-08-29",
       "description": "A friendly guide to Korean skincare - ingredient explainers, routine tips, and honest product insights for healthier, happier skin.",
