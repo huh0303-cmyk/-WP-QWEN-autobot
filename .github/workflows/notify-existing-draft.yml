@@ -1,0 +1,67 @@
+name: "Automation Hub — notify existing draft"
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "wordpress or blogger"
+        required: true
+        type: string
+      site:
+        description: "Site address"
+        required: true
+        type: string
+      title:
+        description: "Draft title"
+        required: true
+        type: string
+      quality_score:
+        description: "Pipeline quality score"
+        required: true
+        type: string
+      edit_url:
+        description: "Native administrator edit URL"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build review record
+        env:
+          PLATFORM: ${{ inputs.platform }}
+          SITE: ${{ inputs.site }}
+          DRAFT_TITLE: ${{ inputs.title }}
+          QUALITY_SCORE: ${{ inputs.quality_score }}
+          EDIT_URL: ${{ inputs.edit_url }}
+        run: |
+          python - <<'PY'
+          import json, os
+          record = {
+              "status": "draft", "platform": os.environ["PLATFORM"],
+              "site": os.environ["SITE"], "title": os.environ["DRAFT_TITLE"],
+              "quality_score": os.environ["QUALITY_SCORE"],
+              "url": os.environ["EDIT_URL"], "edit_url": os.environ["EDIT_URL"],
+          }
+          open("newsroom_publish_result.json", "w", encoding="utf-8").write(
+              json.dumps({"records": [record]}, ensure_ascii=False)
+          )
+          PY
+      - name: Email administrator review link
+        env:
+          REPORT_TITLE: "[초안 검토] ${{ inputs.site }} — ${{ inputs.title }}"
+          REPORT_BODY: "비공개 초안입니다. 관리자에서 검토 후 직접 발행하거나 예약하세요."
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          REPORT_EMAIL_TO: ${{ secrets.BLOGGER_REVIEW_EMAIL_TO }}
+          REPORT_EMAIL_FROM: ${{ secrets.BLOGGER_REVIEW_EMAIL_FROM }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python scripts/publishing_completion_notify.py
