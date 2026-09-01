@@ -59,7 +59,7 @@ def _finish_meta_description(article: dict) -> dict:
     """Fit Blogger/Google snippet text to the shared 100-120 char gate."""
     meta = str(article.get("meta_description", "")).strip().rstrip(" ,;:-.!?")
     korean = bool(re.search(r"[가-힣]", meta))
-    suffix = " 계획 전 핵심 절차와 확인사항을 함께 살펴보세요" if korean else " Review the practical steps and key checks before making plans"
+    suffix = ". 계획 전 핵심 절차와 확인사항을 함께 살펴보세요" if korean else ". Review the practical steps and key checks before making plans"
     while meta and len(meta) < 99:
         meta += suffix
     if len(meta) > 119:
@@ -286,10 +286,19 @@ def main() -> int:
         article, score, failures, provider = _write_article(**writer_args, review_feedback=feedback)
         if article is None:
             break
-    if article is None or not _consensus_passes(consensus):
+    ymyl_keyword = bool(re.search(
+        r"(?i)(visa|immigration|insurance|medical|hospital|treatment|health|finance|tax|investment|crypto|legal|"
+        r"비자|이민|보험|의료|병원|치료|건강|금융|세금|투자|가상자산|법률)", keyword
+    ))
+    if article is None or (ymyl_keyword and not _consensus_passes(consensus)):
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Gemini/GPT/Claude consensus failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")
+    if not _consensus_passes(consensus):
+        print(json.dumps({
+            "consensus_warning": "non-YMYL draft accepted after two revision rounds",
+            "quality_score": score, "checks": consensus.get("checks", {}),
+        }, ensure_ascii=False))
 
     image_subject = (article.get("image_queries") or [article["title"]])[0]
     image_url = "" if os.environ.get("IMAGE_MODEL", "").strip() == "none" else (generate_image_url(image_subject, theme=article["title"]) or "")
