@@ -5,7 +5,7 @@
   ],
   "count": 27,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 26,
+  "blogspot_ready_count": 27,
   "profiles": [
     {
       "order": 1,
@@ -264,9 +264,9 @@
       },
       "blogspot": {
         "url": "https://koreanews365daily.blogspot.com",
-        "status": "CREATED",
-        "destination_id": "",
-        "ready_for_automation": false,
+        "status": "EXISTING",
+        "destination_id": "7521251102691129954",
+        "ready_for_automation": true,
         "description": "한국의 주요 뉴스와 시사 이슈를 알기 쉽고 친절하게 정리해서 전해드리는 블로그입니다. 바쁜 일상 속에서도 핵심을 빠르게 확인하실 수 있어요.",
         "search_description": "한국 뉴스와 시사 이슈를 쉽고 친절하게 정리해서 전해드립니다.",
         "notes": "",
