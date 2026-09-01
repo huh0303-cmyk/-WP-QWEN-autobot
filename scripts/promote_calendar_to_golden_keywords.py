@@ -58,6 +58,14 @@ def _blogspot_to_site_key() -> dict[str, str]:
     }
 
 
+def _blogger_channel_to_site_key() -> dict[str, str]:
+    profiles = json.loads((ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8"))["profiles"]
+    return {
+        profile["wordpress"]["url"].removeprefix("https://").removeprefix("http://").rstrip("/").rsplit(".", 1)[0]: profile["site_key"]
+        for profile in profiles
+    }
+
+
 def _blogger_angle(keyword: str, language: str) -> str:
     suffix = " — 독자 질문과 실전 예시" if language == "ko" else " — reader questions and practical examples"
     return keyword + suffix
@@ -87,6 +95,7 @@ def main() -> int:
 
     domain_to_key = _domain_to_site_key()
     blogspot_to_key = _blogspot_to_site_key()
+    blogger_channel_to_key = _blogger_channel_to_site_key()
     tomorrow = (dt.datetime.now(KST) + dt.timedelta(days=1)).date()
     horizon = tomorrow + dt.timedelta(days=6)
 
@@ -111,7 +120,7 @@ def main() -> int:
             site_id = f"wp_{site_key}" if site_key else ""
         else:
             identity = row.get("destination_url", "").strip().removeprefix("https://").removeprefix("http://").rstrip("/")
-            site_key = blogspot_to_key.get(identity)
+            site_key = blogspot_to_key.get(identity) or blogger_channel_to_key.get(row.get("channel_site", "").strip())
             site_id = f"blogger_{site_key}" if site_key else ""
         if not site_key:
             skipped_no_mapping.append(f"{platform}:{identity}")
