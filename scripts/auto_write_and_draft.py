@@ -54,6 +54,15 @@ def _consensus_passes(consensus: dict) -> bool:
     return sum(1 for check in checks.values() if check.get("ok") is True) >= 2
 
 
+def _finish_meta_description(article: dict) -> dict:
+    """Repair punctuation without changing the generated message."""
+    meta = str(article.get("meta_description", "")).strip()
+    if meta and not meta.endswith((".", "!", "?", '"', "”", "'")):
+        meta = (meta[:119].rstrip(" ,;:-") if len(meta) >= 120 else meta.rstrip(" ,;:-")) + "."
+        article["meta_description"] = meta
+    return article
+
+
 def _records(values: list[list[str]]) -> list[dict[str, str]]:
     if not values:
         return []
@@ -125,6 +134,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             candidate = parse_rewrite_json(raw)
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
+            candidate = _finish_meta_description(candidate)
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
             critical = [f for f in failures if f.startswith(("body length", "meta description is incomplete"))]
