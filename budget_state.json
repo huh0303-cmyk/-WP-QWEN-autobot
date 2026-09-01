@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 0.51,
+  "spent_estimate_usd": 0.54,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -85,6 +85,11 @@
     {
       "at": "2026-09-01T19:51:15.366489+09:00",
       "label": "auto-write:wp_kieca",
+      "amount_usd": 0.03
+    },
+    {
+      "at": "2026-09-01T19:55:17.470481+09:00",
+      "label": "auto-write:blogger_khealth365",
       "amount_usd": 0.03
     }
   ]
