@@ -62,7 +62,7 @@ def _finish_meta_description(article: dict) -> dict:
     suffix = (
         ". 이 실용 가이드에서 준비사항과 핵심 절차, 계획 전 확인할 내용을 차근차근 살펴보세요"
         if korean else
-        ". This practical guide explains what to prepare, what to check, and how to plan each step with confidence"
+        ". This practical guide covers what to prepare, what to check, and how to plan with confidence"
     )
     if meta and len(meta) < 99:
         meta += suffix
