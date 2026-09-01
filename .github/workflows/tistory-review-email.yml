@@ -17,10 +17,10 @@ jobs:
           python-version: "3.11"
       - name: Restore private review pack
         env:
-          TISTORY_REVIEW_JSON: ${{ secrets.TISTORY_REVIEW_JSON }}
+          TISTORY_REVIEW_GZIP_B64: ${{ secrets.TISTORY_REVIEW_GZIP_B64 }}
         run: |
           mkdir -p artifacts
-          printf '%s' "$TISTORY_REVIEW_JSON" > artifacts/tistory-daily-drafts.json
+          printf '%s' "$TISTORY_REVIEW_GZIP_B64" | base64 -d | gzip -d > artifacts/tistory-daily-drafts.json
           python -c "import json; p=json.load(open('artifacts/tistory-daily-drafts.json')); assert len(p['drafts']) == 5"
       - name: Upload private review pack
         uses: actions/upload-artifact@v4
