@@ -1,0 +1,42 @@
+name: "Tistory — Send Approved Review Pack"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Restore private review pack
+        env:
+          TISTORY_REVIEW_JSON: ${{ secrets.TISTORY_REVIEW_JSON }}
+        run: |
+          mkdir -p artifacts
+          printf '%s' "$TISTORY_REVIEW_JSON" > artifacts/tistory-daily-drafts.json
+          python -c "import json; p=json.load(open('artifacts/tistory-daily-drafts.json')); assert len(p['drafts']) == 5"
+      - name: Upload private review pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: tistory-review-pack-${{ github.run_id }}
+          path: artifacts/tistory-daily-drafts.json
+          retention-days: 7
+      - name: Send review email
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          REPORT_EMAIL_TO: "huh0303@gmail.com"
+          REPORT_EMAIL_FROM: "huh0303@gmail.com"
+          REPORT_TITLE: "[Tistory 초안 검토] 5개 사이트 링크"
+          REPORT_BODY: "Tistory 5개 사이트의 비공개 검토본입니다. 사이트명·제목·품질점수를 확인한 뒤 링크에서 검토하세요. 공개 발행은 하지 않았습니다."
+          REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TISTORY_DRAFTS_FILE: "artifacts/tistory-daily-drafts.json"
+        run: |
+          pip install requests -q
+          python scripts/publishing_completion_notify.py
