@@ -102,8 +102,9 @@ def _next_due_row(service, sheet_id: str, site_id: str) -> tuple[int, dict] | No
 
 
 def _write_article(*, keyword: str, site_theme: str, language: str, persona: str, tone: str,
-                   min_chars: int, target_chars: int, max_chars: int) -> tuple[dict | None, int, list[str], str]:
-    failures: list[str] = []
+                   min_chars: int, target_chars: int, max_chars: int,
+                   review_feedback: str = "") -> tuple[dict | None, int, list[str], str]:
+    failures: list[str] = [review_feedback] if review_feedback else []
     for attempt, provider in enumerate(("gemini", "gpt"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
@@ -229,21 +230,37 @@ def main() -> int:
 
     editorial_funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
     funnel_context = json.dumps(editorial_funnel, ensure_ascii=False) if editorial_funnel else ""
-    article, score, failures, provider = _write_article(
+    writer_args = dict(
         keyword=keyword, site_theme=profile["wordpress"]["theme"] + (f". Editorial funnel and safety rules: {funnel_context}" if funnel_context else ""), language=language,
         persona=settings["persona"], tone=settings["tone"],
         min_chars=settings["min_chars"], target_chars=settings["target_chars"], max_chars=settings["max_chars"],
     )
+    article, score, failures, provider = _write_article(**writer_args)
     if article is None:
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Quality gate failed for {site_id}/{keyword}: score={score} failures={failures}")
 
-    consensus = three_model_consensus(
-        title=article["title"], content=article["content_html"], meta=article["meta_description"],
-        keyword=keyword, gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
-    )
-    if consensus.get("ok") is not True:
+    consensus = {}
+    for consensus_attempt in range(1, 4):
+        consensus = three_model_consensus(
+            title=article["title"], content=article["content_html"], meta=article["meta_description"],
+            keyword=keyword, gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
+        )
+        if consensus.get("ok") is True:
+            break
+        if consensus_attempt >= 3:
+            continue
+        issues = []
+        for model, check in (consensus.get("checks") or {}).items():
+            for issue in check.get("issues") or []:
+                issues.append(f"{model}: {issue}")
+        feedback = "Revise the article to resolve every reviewer issue: " + "; ".join(issues)
+        print(json.dumps({"consensus_attempt": consensus_attempt, "action": "revise", "issues": issues}, ensure_ascii=False))
+        article, score, failures, provider = _write_article(**writer_args, review_feedback=feedback)
+        if article is None:
+            break
+    if article is None or consensus.get("ok") is not True:
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Gemini/GPT/Claude consensus failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")

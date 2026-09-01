@@ -30,7 +30,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: sheet-triggered-auto-write-${{ inputs.site_id }}
+  # One global writer queue prevents simultaneous budget-state commits and
+  # duplicate Sheet row claims across the 27 WP + 27 Blogger destinations.
+  group: sheet-triggered-auto-write-global
   cancel-in-progress: false
 
 jobs:
