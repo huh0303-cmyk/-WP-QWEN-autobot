@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div><p class="eyebrow">WORDPRESS 27</p><h1>키워드에서 검토용 초안까지</h1><p>ChatGPT가 글을 작성하고 앱이 품질·중복·초안 상태를 통제합니다. Codex는 운영 중 호출하지 않습니다.</p></div>
+  <div class="stat"><strong>27</strong><span>등록 사이트</span></div>
+</section>
+<section class="panel">
+  <h2>새 작업</h2>
+  <form method="post" action="{{ url_for('create_job') }}" class="create-form">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>사이트<select name="site_id" required>{% for site in sites %}<option value="{{ site.site_id }}">{{ site.name }} · {{ site.url }}</option>{% endfor %}</select></label>
+    <label>핵심 키워드<input name="keyword" required minlength="3" placeholder="예: Korea D-10 job seeker visa requirements"></label>
+    <button type="submit">작업 만들기</button>
+  </form>
+</section>
+<section class="panel"><h2>27개 연결 상태</h2><div class="site-grid">
+{% for site in sites %}<article><div><strong>{{ loop.index }}. {{ site.name }}</strong><small>{{ site.url }}</small></div><span class="badge {{ health[site.site_id] }}">{{ '인증 준비' if health[site.site_id]=='ready' else '인증 필요' }}</span><p>{{ site.persona }}<br>{{ site.tone }}</p></article>{% endfor %}
+</div></section>
+<section class="panel"><h2>최근 작업</h2>
+{% if jobs %}<div class="table-wrap"><table><thead><tr><th>상태</th><th>사이트</th><th>키워드</th><th>점수</th><th>생성</th></tr></thead><tbody>{% for job in jobs %}<tr><td><span class="state">{{ job.state }}</span></td><td>{{ job.site_id }}</td><td><a href="{{ url_for('job_detail',job_id=job.id) }}">{{ job.keyword }}</a></td><td>{{ job.quality_score if job.quality_score is not none else '—' }}</td><td>{{ job.created_at[:16] }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="muted">아직 작업이 없습니다.</p>{% endif %}
+</section>
+{% endblock %}
+
