@@ -42,7 +42,7 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 ## Locked 1:1 portfolio and shell-creation schedule
 
 - The canonical 27-property mapping and current `CREATED` / `EXISTING` / `CONFLICT` / `BLOCKED` / `SCHEDULED` state live in `config/blogger_portfolio.json`.
-- `koreamedicaltour.com` maps only to `koreamedicaltour.blogspot.com`. The older `koreamedicaltour365.blogspot.com` asset is not the official 1:1 target and must not be substituted.
+- `koreamedicaltour.com` maps to the user-confirmed owned property `koreamedicaltour365.blogspot.com` (Blogger ID `270775542645307723`). This exact mapping is authoritative; `koreamedicaltour1.blogspot.com` / ID `2234527810530371008` is not an automation target.
 - The 2026-08-30 shell-creation plan uses separate one-time non-round KST executions at 08:17, 09:06, 10:21, 11:09, 12:38, 13:27, 14:44, 15:31, 16:58, 17:46, 18:53, and 19:41.
 - Before each attempt, re-open the Blogger account list and check exact-address availability. Never create a duplicate merely because a previous run did not report cleanly.
 

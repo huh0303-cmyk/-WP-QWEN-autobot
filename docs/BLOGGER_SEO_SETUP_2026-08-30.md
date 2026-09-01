@@ -1,7 +1,8 @@
 # Blogger Description & SEO Setup — 2026-08-30
 
-Scope: all 26 channels in `config/blogger_portfolio.json` **except order 7
-(koreamedicaltour.com)**, which stays excluded pending its address conflict.
+Scope: all 27 channels in `config/blogger_portfolio.json`. Order 7 is the
+user-confirmed owned property `koreamedicaltour365.blogspot.com` (Blogger ID
+`270775542645307723`).
 
 ## Why this is manual, not automated
 
@@ -36,7 +37,7 @@ text and want an exact match instead, send it over and these get revised.
 7. On the first post, use the blog's core keyword (see `Topic` column) as
    a **Label** — Blogger's label archive pages help indexing.
 
-## All 26 blogs
+## All 27 blogs
 
 | # | Blogspot address | Status | Lang | Topic | Description (Basic → Description) | Search description (Meta tag) |
 |---|---|---|---|---|---|---|
@@ -46,6 +47,7 @@ text and want an exact match instead, send it over and these get revised.
 | 4 | kstudy365.blogspot.com | EXISTING | en | Studying in Korea | Helpful, friendly guidance for studying in Korea — university admissions, scholarships, student visas, and everyday campus life tips for international students. | Studying in Korea made simple: admissions, scholarships, visas, and campus life tips. |
 | 5 | koreainsurance365.blogspot.com | EXISTING | en | Insurance in Korea | Clear, friendly explanations of insurance in Korea — health coverage, national pension basics, and practical comparisons to help you choose with confidence. | Insurance in Korea explained simply: health coverage, national pension basics, and practical comparisons. |
 | 6 | kfinance365.blogspot.com | EXISTING | en | Personal finance in Korea | Friendly, practical personal finance guidance for life in Korea — banking, saving, taxes, and everyday money tips for residents and newcomers alike. | Personal finance in Korea: banking, saving, taxes, and everyday money tips for residents and newcomers. |
+| 7 | koreamedicaltour365.blogspot.com | EXISTING | en | Korea medical tourism | Cautious, practical guidance on medical tourism in Korea — choosing a clinic, planning a visit, and understanding costs, written in plain, non-diagnostic language. | Korea medical tourism: choosing a clinic, planning a visit, and understanding costs, explained clearly. |
 | 8 | k-visa365.blogspot.com | EXISTING | en | Korean visas and immigration | A friendly, step-by-step resource for Korean visas and immigration — application requirements, renewal tips, and practical advice for a smoother process. | Korean visa and immigration guidance: requirements, renewal tips, and practical advice, explained clearly. |
 | 9 | koreanews365.blogspot.com | SCHEDULED 09:06 | **ko** | 한국 뉴스·시사 | 한국의 주요 뉴스와 시사 이슈를 알기 쉽고 친절하게 정리해서 전해드리는 블로그입니다. 바쁜 일상 속에서도 핵심을 빠르게 확인하실 수 있어요. | 한국 뉴스와 시사 이슈를 쉽고 친절하게 정리해서 전해드립니다. |
 | 10 | koreainvest365.blogspot.com | EXISTING | en | Investing and business in Korea | Friendly, practical insights on investing and business in Korea — market trends, company spotlights, and everyday guidance for curious investors. | Investing and business in Korea explained: market trends, company spotlights, and practical guidance. |
@@ -67,9 +69,9 @@ text and want an exact match instead, send it over and these get revised.
 | 26 | k-health365.blogspot.com | EXISTING | **ko** | 건강·영양·생활습관 | 건강, 영양, 생활습관에 관한 정보를 친절하고 이해하기 쉽게 전해드리는 블로그입니다. 일상에서 바로 실천할 수 있는 팁을 담았습니다. | 건강·영양·생활습관 정보를 친절하고 쉽게 전해드립니다. |
 | 27 | kskin365.blogspot.com | CREATED | en | Korean skincare | A friendly guide to Korean skincare — ingredient explainers, routine tips, and honest product insights for healthier, happier skin. | Korean skincare guide: ingredient explainers, routine tips, and honest product insights. |
 
-## Excluded
+## Address verification note
 
-- **koreamedicaltour.com** (order 7) — blogspot address unresolved
-  (`koreamedicaltour.blogspot.com` availability unconfirmed;
-  `koreamedicaltour365.blogspot.com` is a different asset and must not be
-  substituted). Revisit once the address is confirmed.
+- **koreamedicaltour.com** (order 7) is confirmed as
+  `koreamedicaltour365.blogspot.com`, Blogger ID `270775542645307723`.
+- Do not route this site to `koreamedicaltour1.blogspot.com` / ID
+  `2234527810530371008`.
