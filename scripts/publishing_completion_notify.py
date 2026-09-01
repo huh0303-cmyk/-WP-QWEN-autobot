@@ -182,8 +182,8 @@ def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
 
 def send_email(subject: str, body: str, html_body: str = "") -> bool:
     password = os.getenv("GMAIL_APP_PASSWORD", "").strip()
-    recipient = os.getenv("REPORT_EMAIL_TO", "huh0303@gmail.com").strip()
-    sender = os.getenv("REPORT_EMAIL_FROM", "huh0303@gmail.com").strip()
+    recipient = os.getenv("REPORT_EMAIL_TO", "").strip() or "huh0303@gmail.com"
+    sender = os.getenv("REPORT_EMAIL_FROM", "").strip() or "huh0303@gmail.com"
     if not password:
         print("email skipped: GMAIL_APP_PASSWORD missing")
         return False
