@@ -148,7 +148,10 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
                    min_chars: int, target_chars: int, max_chars: int,
                    review_feedback: str = "") -> tuple[dict | None, int, list[str], str]:
     failures: list[str] = [review_feedback] if review_feedback else []
-    for attempt, provider in enumerate(("gemini", "gpt"), start=1):
+    # A third, feedback-informed pass prevents a transient short response from
+    # wasting an otherwise valid queued topic. It runs only after both normal
+    # providers fail the mechanical 75-point gate.
+    for attempt, provider in enumerate(("gemini", "gpt", "gemini"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
                                   prior_feedback="; ".join(failures))
