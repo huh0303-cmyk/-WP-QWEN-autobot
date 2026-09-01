@@ -29,6 +29,7 @@ jobs:
           WP_REAL_PASSWORD: ${{ secrets.WP_REAL_PASSWORD }}
           GH_PAT: ${{ secrets.GH_PAT }}
           WP_USER: huh0303@gmail.com
+          TARGET_SECRET_NAMES: KOREA365ORG,KHEALTH365COM,KSKIN365COM,KTRIP365COM,KFINANCE365COM,KOREAINSURANCE365COM,KOREATAXNLAWCOM,KWORLD365COM,KOREAWEDDING365COM,KTECH365COM,KIECAKOREAORG,KSAKOREAORG,KIKOREACOM,KOREANEWS365COM
         run: python scripts/bootstrap_missing_wp_app_passwords.py
       - if: always()
         uses: actions/upload-artifact@v4
