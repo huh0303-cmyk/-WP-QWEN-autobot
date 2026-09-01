@@ -59,9 +59,15 @@ def _finish_meta_description(article: dict) -> dict:
     """Fit Blogger/Google snippet text to the shared 100-120 char gate."""
     meta = str(article.get("meta_description", "")).strip().rstrip(" ,;:-.!?")
     korean = bool(re.search(r"[가-힣]", meta))
-    suffix = ". 계획 전 핵심 절차와 확인사항을 함께 살펴보세요" if korean else ". Review the practical steps and key checks before making plans"
-    while meta and len(meta) < 99:
+    suffix = (
+        ". 이 실용 가이드에서 준비사항과 핵심 절차, 계획 전 확인할 내용을 차근차근 살펴보세요"
+        if korean else
+        ". This practical guide explains what to prepare, what to check, and how to plan each step with confidence"
+    )
+    if meta and len(meta) < 99:
         meta += suffix
+    if meta and len(meta) < 99:
+        meta += ". 실제 준비 과정에서 놓치기 쉬운 부분과 안전하게 판단하는 기준도 함께 정리했습니다"
     if len(meta) > 119:
         shortened = meta[:119]
         if not korean and " " in shortened:
