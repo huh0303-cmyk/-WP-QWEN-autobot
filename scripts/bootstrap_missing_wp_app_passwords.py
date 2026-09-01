@@ -58,20 +58,31 @@ def create_application_password(site: dict) -> tuple[str, str]:
     login_url = f"{base}/wp-login.php"
     profile_url = f"{base}/wp-admin/profile.php"
     session = None
-    for candidate in dict.fromkeys(password for password in (REAL_PASSWORD, ADMIN_PASSWORD) if password):
-        attempt = requests.Session()
-        attempt.headers.update({"User-Agent": "SIS-Control-Center-Auth/1.0"})
-        attempt.get(login_url, timeout=30)
-        login = attempt.post(
-            login_url,
-            data={
-                "log": USER, "pwd": candidate, "rememberme": "forever",
-                "wp-submit": "Log In", "redirect_to": profile_url, "testcookie": "1",
-            },
-            timeout=45, allow_redirects=True,
-        )
-        if "wp-login.php" not in login.url and "login_error" not in login.text:
-            session = attempt
+    login_user = ""
+    users = [USER]
+    public_users = requests.get(f"{base}/wp-json/wp/v2/users", params={"per_page": 100}, timeout=30)
+    if public_users.status_code == 200:
+        primary = next((row for row in public_users.json() if int(row.get("id", 0)) == 1), None)
+        if primary and primary.get("slug"):
+            users.append(str(primary["slug"]))
+    for username in dict.fromkeys(users):
+        for candidate in dict.fromkeys(password for password in (REAL_PASSWORD, ADMIN_PASSWORD) if password):
+            attempt = requests.Session()
+            attempt.headers.update({"User-Agent": "SIS-Control-Center-Auth/1.0"})
+            attempt.get(login_url, timeout=30)
+            login = attempt.post(
+                login_url,
+                data={
+                    "log": username, "pwd": candidate, "rememberme": "forever",
+                    "wp-submit": "Log In", "redirect_to": profile_url, "testcookie": "1",
+                },
+                timeout=45, allow_redirects=True,
+            )
+            if "wp-login.php" not in login.url and "login_error" not in login.text:
+                session = attempt
+                login_user = username
+                break
+        if session is not None:
             break
     if session is None:
         raise RuntimeError("administrator_login_failed")
@@ -104,7 +115,7 @@ def create_application_password(site: dict) -> tuple[str, str]:
     if not password:
         raise RuntimeError("application_password_missing_from_response")
     check = requests.get(
-        f"{base}/wp-json/wp/v2/users/me", auth=(USER, password),
+        f"{base}/wp-json/wp/v2/users/me", auth=(login_user, password),
         params={"context": "edit"}, timeout=30,
     )
     if check.status_code != 200:
