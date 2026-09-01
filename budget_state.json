@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 0.33,
+  "spent_estimate_usd": 0.36,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -55,6 +55,11 @@
     {
       "at": "2026-09-01T19:33:21.699679+09:00",
       "label": "auto-write:blogger_jobkorea365",
+      "amount_usd": 0.03
+    },
+    {
+      "at": "2026-09-01T19:33:43.052112+09:00",
+      "label": "auto-write:blogger_medicaltour",
       "amount_usd": 0.03
     }
   ]
