@@ -28,8 +28,8 @@ class PublishJob:
         if not self.content_html.strip():
             errors.append("content_html is required")
         if self.site_id.startswith("blogger_"):
-            if not 100 <= len(self.search_description.split()) <= 120:
-                errors.append("Blogger search_description must be 100-120 words")
+            if not 100 <= len(self.search_description.strip()) <= 120:
+                errors.append("Blogger search_description must be 100-120 characters")
             if not 8 <= len(self.labels) <= 14:
                 errors.append("Blogger labels must contain 8-14 items")
         return errors

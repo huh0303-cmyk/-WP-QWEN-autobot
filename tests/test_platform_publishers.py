@@ -39,6 +39,17 @@ class PlatformPublisherTests(unittest.TestCase):
         self.assertEqual("https://www.blogger.com/blog/post/edit/123/44", result.public_url)
         self.assertEqual("true", session.post.call_args.kwargs["params"]["isDraft"])
 
+    def test_blogger_search_description_is_validated_in_characters(self):
+        session = Mock()
+        session.post.return_value = Mock(status_code=200, json=lambda: {"id": "45"}, text="")
+        draft = PublishJob(
+            "job-3", "blogger_site-1", "Draft title", "<p>Draft</p>",
+            [f"label-{i}" for i in range(8)], publish_now=False,
+            search_description="가" * 110,
+        )
+        result = BloggerPublisher("blogger_site-1", "123", "token", session=session).publish(draft)
+        self.assertTrue(result.ok)
+
     def test_naver_never_claims_false_api_success(self):
         result = InteractiveEditorPublisher("naver", "site-1", "https://blog.naver.com").publish(self.job)
         self.assertFalse(result.ok)
