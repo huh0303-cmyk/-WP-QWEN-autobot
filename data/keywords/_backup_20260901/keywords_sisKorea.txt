@@ -1,0 +1,50 @@
+South Korea Education Policy Changes (Dec 2025/May 2026 announcements):**	Applications
+TOPIK exam digitisation by 2029, computer-based, AI grading.	Programs
+Expanded post-study pathways, "growth ladder visa system".	Scholarships
+Eased D-4 trainee visa requirements.	Applications
+New "gap year" route for OECD high school graduates.	Programs
+Here's the plan for keyword generation:	Scholarships
+Extract specific entities (school names, program names, scholarship names).	Applications
+Extract specific policies, events, or deadlines.	Programs
+Ensure no near-duplicates.	Scholarships
+Assign to one of the three categories: Applications, Programs, Scholarships.	Applications
+Let's start generating.	Programs
+Keywords Draft (Internal thought process - not final output):**	Scholarships
+Korea University Spring 2027 application	Applications
+KAIST graduate admission 2027	Programs
+Yonsei UIC Spring 2027 application	Scholarships
+GKS 2027 Embassy track deadline	Applications
+GKS 2027 University track application	Programs
+SKKU Spring 2027 international admission	Scholarships
+Korean student visa D-2 requirements	Applications
+D-4 to D-2 visa change Korea	Programs
+Korea University 2027 language test	Scholarships
+Seoul Foreign School 2027 enrollment	Applications
+Yongsan International School 2027 apply	Programs
+Korea International School 2027 admissions	Scholarships
+Korean high school exchange 2027	Applications
+KGSP 2027 undergraduate application	Programs
+Korea University international freshman 2027	Scholarships
+Hanyang University 2027 admissions	Applications
+Ewha Womans University 2027 application	Programs
+Kyung Hee University 2027 applications	Scholarships
+KOICA scholarship 2027 application	Applications
+GKS 2027 document checklist	Programs
+South Korea D-4 visa requirements 2026	Scholarships
+International student visa Korea process	Applications
+Korea study visa financial proof	Programs
+Korea AI graduate F-5 visa	Scholarships
+Korean language training 2026	Applications
+South Korea gap year program	Programs
+KAIST Master's PhD programs	Scholarships
+Yonsei Underwood International College	Applications
+Short-term Korean culture programs	Programs
+Seoul international school curriculum	Scholarships
+Korea STEM academic programs 2026	Applications
+TOPIK exam digital format 2029	Programs
+Korea D-2 student visa work rights	Scholarships
+Seoul student housing 2026 options	Applications
+Korea University dormitory options	Programs
+Yonsei SK Global House	Scholarships
+No deposit student housing Seoul	Applications
+South Korea teaching March 2027	Programs

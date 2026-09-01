@@ -1,50 +1,50 @@
-서울대 외국인전형 2027 봄학기	Admissions
-연세대 국제학생 입학요강 2027	Admissions
-고려대 외국인 특별전형 2027	Admissions
-KAIST 외국인 대학원 입학 2027	Admissions
-성균관대 국제학생 모집 2027	Admissions
-한양대 외국인 유학생 전형 2027	Admissions
-이화여대 유학생 입학 서류 2027	Admissions
-경희대 외국인 신입학 2027 봄	Admissions
-중앙대 유학생 입학 일정 2027	Admissions
-서강대 국제학생 지원 방법 2027	Admissions
-TOPIK 점수 유효기간 2027 입학	Admissions
-한국 대학 입학 영어 성적 2027	Admissions
-외국 학력 증명 아포스티유 2026	Admissions
-대학 입학 자기소개서 예시	Admissions
-온라인 면접 대비 한국 유학	Admissions
-비자 변경 D2 입학 서류	Admissions
-한국 유학 학비 납부 방식	Admissions
-어학당 수료 후 대학원 진학	Admissions
-유학생 기숙사 신청 방법 2027	Admissions
-고등학교 졸업자 한국 유학	Admissions
-GKS 2027년 정부초청 장학금	Scholarships
-GKS 대학원 장학금 신청 자격	Scholarships
-한국 정부 장학금 2027 발표	Scholarships
-KGSP 2027 제출 서류 목록	Scholarships
-GKS 장학금 면접 준비 팁	Scholarships
-대학교 자체 외국인 장학금	Scholarships
-서울대 외국인 장학금 종류	Scholarships
-연세대 국제학생 등록금 면제	Scholarships
-고려대 유학생 장학금 조건	Scholarships
-KAIST 외국인 학비 지원 2027	Scholarships
-NIIED 장학금 신청 기간 2027	Scholarships
-유학생 생활비 지원 장학금	Scholarships
-성적 우수 외국인 장학금	Scholarships
-어학 연수생 장학금 지원	Scholarships
-과학 기술 분야 유학 장학금	Scholarships
-예술 체육 유학생 장학금	Scholarships
-한국 대학 장학금 경쟁률	Scholarships
-민간 재단 유학 장학금	Scholarships
-장학금 수령 후 유의사항	Scholarships
-D-2 유학 비자 발급 서류 2026	Visa
-D-4 어학연수 비자 신청 갱신	Visa
-외국인 유학생 비자 변경 절차	Visa
-유학생 아르바이트 허가 요건	Visa
-D-2 비자 연장 준비물 2026	Visa
-체류 기간 연장 신청 방법	Visa
-외국인등록증 재발급 절차	Visa
-건강 보험 가입 의무 유학생	Visa
-재정 능력 증명 서류 비자	Visa
-한국 유학 비자 거절 사유	Visa
-비자 인터뷰 준비 요령	Visa
+학년도 한국 대학 입학	Admissions
+외국인 전형 모집요강 2027	Admissions
+한국 유학 온라인 원서접수	Admissions
+봄학기 대학원 입학	Admissions
+해외고 한국대학 입학 전략	Admissions
+한국어 능력 입학 기준	Admissions
+대학별 전공진입 한국어 조건	Admissions
+재외국민 특별전형 2027	Admissions
+외국인 유학생 기숙사 신청	Admissions
+가을학기 기숙사 입사	Admissions
+국제학생센터 입학 상담	Admissions
+온라인 유학 설명회 일정	Admissions
+한국 대학 입학 필수 서류	Admissions
+학업 계획서 작성법 유학	Admissions
+추천서 제출 마감일 2026	Admissions
+영어 특기자 전형 대학	Admissions
+한국 대학원 입학 자격	Admissions
+고교학점제 유학생 영향	Admissions
+서울대학교 글로벌인재 전형	Admissions
+GKS 장학금 2027년 신청	Scholarships
+한국 정부 초청 장학금	Scholarships
+GKS 학사 석사 박사	Scholarships
+GKS 장학금 지원 자격	Scholarships
+Study in Korea 장학금 정보	Scholarships
+대학 트랙 장학금 신청	Scholarships
+대사관 트랙 GKS 지원	Scholarships
+GKS 온라인 신청 포털	Scholarships
+장학금 한국어 연수 지원	Scholarships
+GKS 합격자 발표 2026	Scholarships
+NIIED 장학금 프로그램	Scholarships
+외국인 유학생 생활비 지원	Scholarships
+GKS 장학금 등록금 면제	Scholarships
+한국 유학 장학금 종류	Scholarships
+대학별 장학금	Scholarships
+장학금 제출 서류 목록	Scholarships
+GKS 한국어 능력 면제	Scholarships
+한국유학 장학금 비교	Scholarships
+GKS 신청 기간 2027	Scholarships
+D-2 유학 비자 2026	Visa
+D-4 D-2 비자 변경	Visa
+유학 비자 필요 서류	Visa
+K-ETA 면제 기간 2026	Visa
+외국인 유학생 건강보험료 2026	Visa
+유학생 건강보험 의무 가입	Visa
+D-2 비자 연장 주의사항	Visa
+졸업 후 D-10 비자	Visa
+구직 비자 전환 방법	Visa
+성장 사다리 비자 체계	Visa
+유학생 취업 비자 정책	Visa
+지역 특화형 비자 유학생	Visa
