@@ -39,6 +39,7 @@ WRITER_SYSTEM_PROMPT = (
     "Use a platform-specific search intent and newly built outline. "
     "The title is the most important text element: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. "
     "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
+    "Never use the word Unlock or any Unlock/Unlocking title formula; rewrite it as a specific natural headline. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
     "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts). "
@@ -110,6 +111,8 @@ def structural_check(draft: dict) -> list[str]:
     plain = re.sub(r"\s+", "", plain)
     if not title:
         issues.append("title is empty")
+    if re.search(r"(?i)\bunlock(?:s|ed|ing)?\b", title):
+        issues.append("TITLE_QUALITY_FAIL: Unlock title formulas are forbidden")
     if len(plain) < MIN_BODY_CHARS:
         issues.append(f"body length {len(plain)} is below the {MIN_BODY_CHARS}-character floor")
     if not re.search(r"(?is)<h[23][\s>]", body):

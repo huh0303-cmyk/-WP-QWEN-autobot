@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import editorial_title_gate as gate
 
 
-@pytest.mark.parametrize("title", ["", "A Guide Q&A: Answers From the Field", "Korea, From Someone Who's Been There", "Housing: Practical Guide Q&A"])
+@pytest.mark.parametrize("title", ["", "Unlock Your Korea Future", "UNLOCK the Secrets of Korea", "Unlocking Korea Visa Success", "A Guide Q&A: Answers From the Field", "Korea, From Someone Who's Been There", "Housing: Practical Guide Q&A"])
 def test_bad_templates_never_reach_model_review(monkeypatch, title):
     check = Mock()
     monkeypatch.setattr(gate, "three_model_consensus", check)

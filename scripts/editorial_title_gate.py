@@ -9,11 +9,16 @@ Never append random keyword templates, stack Practical Guide/Q&A/Step by Step,
 or invent counts, savings, year-specific changes, interviews, or firsthand experience.
 No 'Answers From the Field' or 'From Someone Who's Been There'.
 Newsrooms require factual news headlines, not blog-guide hooks.
+The word Unlock and every Unlock/Unlocking title formula are forbidden.
 """
+
+FORBIDDEN_TITLE_PATTERN = re.compile(r"(?i)\bunlock(?:s|ed|ing)?\b")
 
 
 def require_editorial_approval(*, title, content, meta, keyword, gemini_generate):
-    if not title.strip() or re.search(r"answers from the field|from someone who.s been there|practical guide\s+q\s*&\s*a", title, re.I):
+    if (not title.strip()
+            or FORBIDDEN_TITLE_PATTERN.search(title)
+            or re.search(r"answers from the field|from someone who.s been there|practical guide\s+q\s*&\s*a", title, re.I)):
         raise ValueError("TITLE_QUALITY_FAIL: unsupported experience or stacked template headline")
     result = three_model_consensus(title=title, content=content, meta=meta, keyword=keyword,
                                    gemini_generate=gemini_generate)

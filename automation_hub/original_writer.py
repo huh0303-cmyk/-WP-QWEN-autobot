@@ -18,7 +18,7 @@ def original_prompt(*, keyword: str, site_theme: str, language: str, persona: st
     return f"""Write a new standalone article for the keyword below. This is original work, not a rewrite of any existing article.
 Current date: {current_date}. Never present an earlier year or month as the current verification date. Do not claim that changing fares, schedules, rules, or availability are current unless the article can support that claim; direct readers to the relevant official operator or authority for confirmation.
 Site theme: {site_theme}. Primary keyword/topic: {keyword}.
-The title is the highest-priority text: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. Never use AI-sounding stock phrases, a repeated title formula, or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
+The title is the highest-priority text: make it specific and useful so a real reader wants to click, without clickbait or false promises. Never start with or use cheap AI-title formulas such as "Unlock", "Unlock the secrets", "Ultimate Guide", "Navigate", "Your Path to", "Master", "Revolutionize", "Discover the Power of", or Korean equivalents such as "비밀을 풀다", "완벽 가이드", "궁극의 가이드". Never use a repeated title formula or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: {target_chars} characters - plan the number of sections and their depth to fit this budget, and finish every section you start; an oversized draft gets trimmed and can end up cut off mid-thought, so write to the budget rather than over-writing and expecting it to be shortened.
 The article must feel individually edited for this site's persona, not mass-produced. Avoid AI-signaling phrases, generic filler, keyword stuffing, repetitive templates, fake freshness, exaggerated claims, and unnecessary FAQs.
@@ -55,6 +55,12 @@ def original_quality_score(article: dict[str, Any], *, keyword: str, target_char
         score += 10
     else:
         failures.append("title length must be 20-70 characters")
+    ai_title_pattern = re.compile(
+        r"(?i)\b(unlock(?:s|ed|ing)?(?: the secrets?)?|ultimate guide|navigate|your path to|master|"
+        r"revolutionize|discover the power of)\b|비밀을\s*풀|완벽\s*가이드|궁극의\s*가이드"
+    )
+    if ai_title_pattern.search(title):
+        failures.append("AI-like stock title formula is forbidden")
 
     body_chars = len(re.sub(r"\s+", "", text))
     minimum = max(1000, int(target_chars * 0.78))

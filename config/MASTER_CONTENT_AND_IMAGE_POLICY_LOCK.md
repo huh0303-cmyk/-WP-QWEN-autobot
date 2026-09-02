@@ -41,6 +41,13 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 
 GPT must not invent facts while editing. Material factual uncertainty goes back to source verification. Failed review => REWRITE_REQUIRED or QUALITY_FAIL.
 
+### Network-wide title ban — `Unlock` (LOCKED 2026-09-02)
+
+- WordPress 27, Blogger 27 and Tistory 5 must never generate, save, schedule or publish a title containing `Unlock`, regardless of capitalization.
+- `Unlock the Secrets`, `Unlock Your...`, `Unlocking...` and similar mass-produced formulas must be rewritten as specific, natural headlines.
+- The ban is enforced in every writer prompt and again in the deterministic pre-save gate. Model approval cannot override it.
+- Violation result: `TITLE_QUALITY_FAIL`; the draft remains unsaved and unpublished until its title passes recheck.
+
 ## 2. Image generation pipeline
 
 Scope: WordPress 27, Blogger 27, Tistory 5, YouTube and SNS.

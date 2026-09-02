@@ -3,9 +3,33 @@ import unittest
 from unittest.mock import Mock
 
 from automation_hub.blogger_rewriter import FreeImage, attach_single_image, blogger_quality_score, extract_http_links, find_one_free_image, image_is_relevant, normalize_rewrite_format, parse_rewrite_json, plain_text, similarity
+from scripts.blogger_search_description import build_search_description
 
 
 class BloggerRewriterTests(unittest.TestCase):
+    def test_unlock_title_is_blocked_by_blogger_quality_gate(self):
+        source_url = "https://example.com/korea-travel"
+        content = (
+            '<p>A direct answer for Korea travel planning.</p>'
+            '<h2>Before departure</h2><p>' + ('Check current requirements carefully. ' * 35) + '</p>'
+            '<h2>Transport planning</h2><p>' + ('Compare routes and timing before booking. ' * 35) + '</p>'
+            '<h2>Final checklist</h2><p>' + ('Confirm reservations and official details. ' * 35) + '</p>'
+            f'<p><a href="{source_url}">Detailed source</a></p>'
+        )
+        article = {
+            "title": "Unlocking Korea Travel Planning",
+            "meta_description": "Practical source-led Korea travel planning guidance covering transport, reservations, timing, and essential checks.",
+            "content_html": content,
+            "labels": ["Korea", "Travel", "Planning", "Transport", "Booking", "Hotels", "Seoul", "Routes"],
+        }
+        _, failures, _ = blogger_quality_score(article, source_title="Korea Travel Planning", source_url=source_url, source_html="<p>Short source.</p>", target_chars=2400)
+        self.assertTrue(any("Unlock title formulas" in item for item in failures))
+
+    def test_search_description_is_100_to_119_characters(self):
+        for keyword in ("한국 보험 가입 전 확인사항", "Korea housing contract checklist"):
+            description = build_search_description(keyword)
+            self.assertGreaterEqual(len(description), 100)
+            self.assertLess(len(description), 120)
     def test_normalize_rewrite_format_clips_generated_fields(self):
         paragraph = "<p>" + ("useful Korea planning detail " * 30) + "</p>"
         article = {

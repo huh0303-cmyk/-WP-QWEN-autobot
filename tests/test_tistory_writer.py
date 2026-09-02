@@ -50,6 +50,13 @@ def test_prompt_forbids_copy_and_repeated_ai_titles():
     assert "ai-sounding" in prompt
     assert "emotionally resonant" in prompt
     assert "no more than two short sentences" in prompt
+    assert "unlock" in prompt
+
+
+def test_unlock_title_is_blocked_before_tistory_draft_ready():
+    body = "<h2>확인</h2>" + ("<p>필요한 내용을 차분하게 확인합니다.</p>" * 80)
+    issues = tistory_writer.structural_check({"title": "Unlocking 한국 건강검진의 비밀", "body_html": body})
+    assert any("Unlock title formulas" in issue for issue in issues)
 
 
 def test_long_or_fake_bullet_paragraphs_are_rejected():

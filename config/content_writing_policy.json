@@ -80,6 +80,9 @@
     "title_priority": "highest_text_priority",
     "first_image_priority": "equal_to_title_and_must_visualize_the_titles_specific_situation_emotion_and_benefit",
     "forbid_ai_sounding_title_formulas": true,
+    "forbidden_title_terms": ["Unlock"],
+    "forbidden_title_term_match": "case_insensitive_whole_word_and_inflections",
+    "forbidden_title_action": "QUALITY_FAIL_NO_SAVE_NO_PUBLISH",
     "forbid_repeated_or_similar_titles": true,
     "forbid_clickbait_or_false_promises": true,
     "never_hide_sources_or_material_corrections": true
