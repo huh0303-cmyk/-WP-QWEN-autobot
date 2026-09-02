@@ -16,6 +16,7 @@ if str(ROOT / "scripts") not in sys.path:
 from process_platform_queue import _access_token
 
 REGISTRY_FILE = ROOT / "config" / "automation_hub_sites.json"
+REPORT_FILE = ROOT / "blogger_connection_report.json"
 
 
 def main():
@@ -49,7 +50,14 @@ def main():
         "configured_count": len(configured), "oauth_visible_count": len(blogs),
         "matched_count": len(configured) - len(missing) - len(mismatched),
         "missing": missing, "url_mismatches": mismatched,
+        "matched_site_ids": [
+            row["site_id"] for row in configured
+            if str(row.get("destination_id", "")) in owned
+            and owned[str(row["destination_id"])].get("url", "").rstrip("/").lower()
+            == row["url"].rstrip("/").lower()
+        ],
     }
+    REPORT_FILE.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     if not report["ok"]:
         raise SystemExit("BLOGGER_27_OAUTH_VERIFY_FAILED")
