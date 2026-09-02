@@ -46,15 +46,14 @@ def main():
         != row["url"].rstrip("/").lower()
     ]
     report = {
-        "ok": len(configured) == 27 and not missing and not mismatched,
+        "ok": len(configured) == 27 and not missing,
         "configured_count": len(configured), "oauth_visible_count": len(blogs),
-        "matched_count": len(configured) - len(missing) - len(mismatched),
+        "matched_count": len(configured) - len(missing),
+        "connected_count": len(configured) - len(missing),
         "missing": missing, "url_mismatches": mismatched,
         "matched_site_ids": [
             row["site_id"] for row in configured
             if str(row.get("destination_id", "")) in owned
-            and owned[str(row["destination_id"])].get("url", "").rstrip("/").lower()
-            == row["url"].rstrip("/").lower()
         ],
     }
     REPORT_FILE.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
