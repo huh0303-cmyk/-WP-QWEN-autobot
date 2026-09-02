@@ -31,6 +31,8 @@ app.config["CONTROL_CENTER_CSRF"] = os.environ.get("CONTROL_CENTER_CSRF") or sec
 @app.before_request
 def require_control_center_login():
     """Protect every PWA route when deployment credentials are configured."""
+    if request.path == "/healthz":
+        return None
     username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
     password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
     if not username or not password:
@@ -47,6 +49,11 @@ def require_control_center_login():
         401,
         {"WWW-Authenticate": 'Basic realm="Korea365 CEO Control Room"'},
     )
+
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok"}
 
 
 @app.get("/manifest.webmanifest")

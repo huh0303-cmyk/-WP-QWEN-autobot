@@ -5,7 +5,7 @@ services:
     plan: free
     buildCommand: pip install -r requirements-control-center.txt
     startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 4 control_center.app:app
-    healthCheckPath: /
+    healthCheckPath: /healthz
     autoDeployTrigger: commit
     envVars:
       - key: PYTHON_VERSION
