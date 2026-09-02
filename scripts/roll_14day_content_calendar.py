@@ -122,14 +122,24 @@ def youtube_rows(horizon: dt.date, existing, channels):
     rows = []
     for channel in channels:
         name = channel["display_name"]
-        dates = sorted(
-            dt.date.fromisoformat(row[1][:10]) for row in existing
+        scheduled = sorted(
+            (dt.date.fromisoformat(row[1][:10]), row[1][11:16]) for row in existing
             if len(row) > 3 and row[2].startswith("YouTube") and channel_key(row[3]) == channel["channel_key"]
         )
-        due = dates[-1] if dates else dt.datetime.now(KST).date()
-        counter = len(dates)
+        due = scheduled[-1][0] if scheduled else dt.datetime.now(KST).date()
+        previous_time = scheduled[-1][1] if scheduled else ""
+        recent_gaps = [
+            (scheduled[index][0] - scheduled[index - 1][0]).days
+            for index in range(1, len(scheduled))
+            if (scheduled[index][0] - scheduled[index - 1][0]).days in {2, 3}
+        ]
+        counter = len(scheduled)
         while True:
             gap = 2 + stable_int(f"{name}|{due}|gap") % 2
+            # Keep the interval random-looking without allowing a conspicuous
+            # run of the same gap (2,2,2... or 3,3,3...).
+            if len(recent_gaps) >= 2 and recent_gaps[-2:] == [gap, gap]:
+                gap = 5 - gap
             due += dt.timedelta(days=gap)
             if due > horizon:
                 break
@@ -142,6 +152,14 @@ def youtube_rows(horizon: dt.date, existing, channels):
                 topic = topic_pool[counter % len(topic_pool)] if topic_pool else channel["tone"]
             minute = irregular_time(key, channel["allowed_hour_start"] * 60,
                                     (channel["allowed_hour_end"] - channel["allowed_hour_start"] + 1) * 60)
+            # A channel must not look like a fixed-time bot. If the deterministic
+            # random slot repeats the previous run's HH:MM, reroll with a salt.
+            salt = 1
+            previous_band = int(previous_time[:2]) // 6 if previous_time else -1
+            while minute == previous_time or int(minute[:2]) // 6 == previous_band:
+                minute = irregular_time(f"{key}|reroll-{salt}", channel["allowed_hour_start"] * 60,
+                                        (channel["allowed_hour_end"] - channel["allowed_hour_start"] + 1) * 60)
+                salt += 1
             is_knowledge = channel["channel_type"] == "knowledge"
             rows.append([
                 "ROLL-" + hashlib.sha1(key.encode()).hexdigest()[:10].upper(),
@@ -152,6 +170,8 @@ def youtube_rows(horizon: dt.date, existing, channels):
                 "화면관련≥65·일치도≥80" if is_knowledge else "채널분리·실사품질·권리검수",
                 "기획확정·자료준비", "", "비공개 링크 생성 후 토큰 없는 이메일 보고",
             ])
+            previous_time = minute
+            recent_gaps.append(gap)
             counter += 1
     return rows
 

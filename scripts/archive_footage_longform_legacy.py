@@ -366,7 +366,10 @@ def generate_script(topic, channel_key, clips, target_seconds=None):
     None이면(다른 채널들) 기존처럼 고정 ~14분/~2000단어 그대로 유지."""
     domain = CHANNEL_ARCHIVE_CONFIG[channel_key]["domain"]
     clip_notes = "\n".join(
-        f"- {c['title']} ({c['year'] or 'year unknown'}): {c['description']}" for c in clips
+        f"{index}. {c['title']} ({c['year'] or 'year unknown'}): "
+        f"VISIBLE={c.get('visual_analysis', {}).get('visual_summary', '')}; "
+        f"SHOT_SEQUENCE={c.get('visual_analysis', {}).get('shot_sequence', [])}"
+        for index, c in enumerate(clips, 1)
     )
     if target_seconds is not None:
         target_minutes = target_seconds / 60

@@ -17,8 +17,8 @@ def _strip_json(text: str) -> str:
     return text.strip()
 
 
-def inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log, min_score=65):
-    """Inspect a real frame from every clip and reject visually unrelated footage."""
+def inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log, min_score=75):
+    """Inspect three real frames from every clip and reject unrelated footage."""
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is required for visual-footage alignment review")
@@ -28,12 +28,15 @@ def inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log, min_score=6
     client = genai.Client(api_key=api_key)
     accepted = []
     for index, clip in enumerate(clips):
-        frame = Path(workdir) / f"alignment_frame_{index}.jpg"
-        at_sec = max(0.5, min(float(clip.get("duration", 1)) * 0.45, 20.0))
-        run_ffmpeg([
-            "ffmpeg", "-y", "-ss", str(at_sec), "-i", clip["path"],
-            "-frames:v", "1", "-q:v", "3", str(frame),
-        ])
+        duration = max(float(clip.get("duration", 1)), 1.0)
+        frames = []
+        for frame_no, ratio in enumerate((0.2, 0.5, 0.8), 1):
+            frame = Path(workdir) / f"alignment_frame_{index}_{frame_no}.jpg"
+            run_ffmpeg([
+                "ffmpeg", "-y", "-ss", str(max(0.2, duration * ratio)), "-i", clip["path"],
+                "-frames:v", "1", "-q:v", "3", str(frame),
+            ])
+            frames.append(frame)
         prompt = f"""Inspect this actual archival-video frame. The planned documentary topic is:
 {topic}
 
@@ -41,7 +44,8 @@ Archive metadata title: {clip.get('title', '')}
 Archive metadata description: {clip.get('description', '')}
 
 Return JSON only:
-{{"visual_summary":"literal visible people, objects, place and action",
+{{"visual_summary":"literal visible people, objects, place and action across all three frames",
+  "shot_sequence":["opening visible action","middle visible action","closing visible action"],
   "era_cues":"visible period clues or unknown",
   "relevance_score":0,
   "reason":"brief evidence-based reason"}}
@@ -49,12 +53,14 @@ Return JSON only:
 Score relevance from 0 to 100. Do not infer that the image is relevant merely from
 the metadata. Judge what is visibly on screen. Generic or unrelated filler scores below 65.
 """
+        contents = [
+            types.Part.from_bytes(data=frame.read_bytes(), mime_type="image/jpeg")
+            for frame in frames
+        ]
+        contents.append(prompt)
         response = client.models.generate_content(
             model=os.getenv("KNOWLEDGE_VISION_MODEL", "gemini-2.5-flash"),
-            contents=[
-                types.Part.from_bytes(data=frame.read_bytes(), mime_type="image/jpeg"),
-                prompt,
-            ],
+            contents=contents,
         )
         analysis = json.loads(_strip_json(response.text or ""))
         score = int(analysis.get("relevance_score", 0))
@@ -69,10 +75,11 @@ the metadata. Judge what is visibly on screen. Generic or unrelated filler score
     return accepted
 
 
-def verify_narration_alignment(topic, clips, narration, generate_text, min_score=80):
+def verify_narration_alignment(topic, clips, narration, generate_text, min_score=90):
     """Fail before rendering when narration and inspected footage remain mismatched."""
     evidence = "\n".join(
-        f"{i + 1}. {clip.get('visual_analysis', {}).get('visual_summary', '')}"
+        f"{i + 1}. {clip.get('visual_analysis', {}).get('visual_summary', '')}; "
+        f"sequence={clip.get('visual_analysis', {}).get('shot_sequence', [])}"
         for i, clip in enumerate(clips)
     )
     prompt = f"""Act as a strict documentary continuity editor.
