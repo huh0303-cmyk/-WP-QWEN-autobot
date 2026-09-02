@@ -1,0 +1,56 @@
+name: "WordPress 27 — Site logos"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - {site_id: wp_korea365, url: "https://korea365.org", secret: KOREA365ORG}
+          - {site_id: wp_kstudy365, url: "https://kstudy365.com", secret: KSTUDY365COM}
+          - {site_id: wp_oliveyoung, url: "https://oliveyoungkorea.com", secret: OLIVEYOUNGKOREACOM}
+          - {site_id: wp_jobkorea365, url: "https://jobkorea365.com", secret: JOBKOREA365COM}
+          - {site_id: wp_kvisa365, url: "https://k-visa365.com", secret: KVISA365COM}
+          - {site_id: wp_khealth365, url: "https://k-health365.com", secret: KHEALTH365COM}
+          - {site_id: wp_kskin365, url: "https://kskin365.com", secret: KSKIN365COM}
+          - {site_id: wp_ktrip365, url: "https://k-trip365.com", secret: KTRIP365COM}
+          - {site_id: wp_kfinance365, url: "https://kfinance365.com", secret: KFINANCE365COM}
+          - {site_id: wp_kinsurance365, url: "https://koreainsurance365.com", secret: KOREAINSURANCE365COM}
+          - {site_id: wp_koreataxlaw, url: "https://koreataxnlaw.com", secret: KOREATAXNLAWCOM}
+          - {site_id: wp_medicaltour, url: "https://koreamedicaltour.com", secret: KOREAMEDICALTOURCOM}
+          - {site_id: wp_studyinkorea, url: "https://studyinkorea365.com", secret: STUDYINKOREA365COM}
+          - {site_id: wp_jobinkorea, url: "https://jobinkorea365.com", secret: JOBINKOREA365COM}
+          - {site_id: wp_kworld365, url: "https://kworld365.com", secret: KWORLD365COM}
+          - {site_id: wp_koreawedding, url: "https://koreawedding365.com", secret: KOREAWEDDING365COM}
+          - {site_id: wp_jobglobal, url: "https://jobkoreaglobal.com", secret: JOBKOREAGLOBALCOM}
+          - {site_id: wp_kinvest365, url: "https://koreainvest365.com", secret: KOREAINVEST365COM}
+          - {site_id: wp_krealestate, url: "https://krealestate365.com", secret: KREALESTATE365COM}
+          - {site_id: wp_kcrypto365, url: "https://koreacrypto365.com", secret: KOREACRYPTO365COM}
+          - {site_id: wp_ktech365, url: "https://ktech365.com", secret: KTECH365COM}
+          - {site_id: wp_kieca, url: "https://kieca-korea.org", secret: KIECAKOREAORG}
+          - {site_id: wp_ksa, url: "https://ksa-korea.org", secret: KSAKOREAORG}
+          - {site_id: wp_sis, url: "https://sis-korea.com", secret: SISKOREACOM}
+          - {site_id: wp_kikorea, url: "https://ki-korea.com", secret: KIKOREACOM}
+          - {site_id: wp_koreanews, url: "https://koreanews365.com", secret: KOREANEWS365COM}
+          - {site_id: wp_seouljournal, url: "https://theseouljournal.com", secret: THESEOULJOURNALCOM}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - name: Apply and verify site identity
+        env:
+          SITE_ID: ${{ matrix.site_id }}
+          SITE_URL: ${{ matrix.url }}
+          WP_USER: admin
+          WP_APP_PASSWORD: ${{ secrets[matrix.secret] }}
+        run: python scripts/apply_wordpress_logo.py
