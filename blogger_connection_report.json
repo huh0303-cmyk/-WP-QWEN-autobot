@@ -1,0 +1,42 @@
+{
+  "ok": false,
+  "configured_count": 27,
+  "oauth_visible_count": 33,
+  "matched_count": 26,
+  "missing": [],
+  "url_mismatches": [
+    {
+      "site_id": "blogger_kskin365",
+      "configured_url": "https://kskin365.blogspot.com",
+      "oauth_url": "https://skin.k-health365.com/"
+    }
+  ],
+  "matched_site_ids": [
+    "blogger_ktrip365",
+    "blogger_kworld365",
+    "blogger_jobkorea365",
+    "blogger_kstudy365",
+    "blogger_kinsurance365",
+    "blogger_kfinance365",
+    "blogger_medicaltour",
+    "blogger_kvisa365",
+    "blogger_koreanews",
+    "blogger_kinvest365",
+    "blogger_oliveyoung",
+    "blogger_kcrypto365",
+    "blogger_jobinkorea",
+    "blogger_koreawedding",
+    "blogger_seouljournal",
+    "blogger_ktech365",
+    "blogger_kieca",
+    "blogger_kikorea",
+    "blogger_ksa",
+    "blogger_koreataxlaw",
+    "blogger_jobglobal",
+    "blogger_studyinkorea",
+    "blogger_korea365",
+    "blogger_sis",
+    "blogger_krealestate",
+    "blogger_khealth365"
+  ]
+}
