@@ -291,8 +291,9 @@ def main() -> int:
         except Exception as exc:
             print(f"kakao notification failed without affecting email: {exc}")
             kakao_results.append(False)
+    # Logs and downstream status use the same real editor link as the email.
     results = {"email": email_result, "kakao": bool(kakao_results) and all(kakao_results),
-               "url": fallback_link, "draft_links_found": len(reviews), "sheet_synced": sheet_synced}
+               "url": reviews[0]["edit_url"], "draft_links_found": len(reviews), "sheet_synced": sheet_synced}
     print(json.dumps(results, ensure_ascii=False))
     return 0 if results["email"] else 1
 
