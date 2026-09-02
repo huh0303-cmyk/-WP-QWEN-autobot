@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """Generate one article draft per Tistory site job.
 
-LOCKED: Gemini first; GPT rewrites after generation/quality/review failure
-and performs the final independent review. SEO/quality below 70 is rejected.
+LOCKED: GPT-5 mini writes the first draft and any required rewrite;
+Gemini 2.5 Flash performs the independent final review. SEO/quality below 70
+is rejected.
 
 Reads a plan produced by tistory_daily_planner.py and writes drafts only —
 this never publishes anything. Every job stays publish_policy=awaiting_approval

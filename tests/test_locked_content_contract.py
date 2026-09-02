@@ -28,12 +28,32 @@ def test_all_blog_writers_are_gpt5_mini_and_images_are_sdxl_first():
         "pass_without_image",
     ]
     tistory = (ROOT / "scripts" / "tistory_writer.py").read_text(encoding="utf-8")
+    assert "GPT-5 mini writes the first draft" in tistory
+    assert "Gemini 2.5 Flash performs the independent final review" in tistory
+    assert "Gemini first" not in tistory
     assert 'for provider in ("gpt",):' in tistory
-    for workflow_name in ("daily-network-publish.yml", "newsrooms-daily-publisher.yml"):
+    for workflow_name in (
+        "daily-network-publish.yml",
+        "newsrooms-daily-publisher.yml",
+        "generate-youtube-playlist.yml",
+        "curio-longform-daily.yml",
+    ):
         workflow = (ROOT / ".github" / "workflows" / workflow_name).read_text(encoding="utf-8")
         assert 'AI_TEXT_PROVIDER: "openai"' in workflow
-        assert 'OPENAI_MODEL: "gpt-5-mini"' in workflow
-        assert 'GEMINI_IMAGE_GENERATION_ENABLED: "false"' in workflow
+        if workflow_name in ("daily-network-publish.yml", "newsrooms-daily-publisher.yml"):
+            assert 'OPENAI_MODEL: "gpt-5-mini"' in workflow
+            assert 'GEMINI_IMAGE_GENERATION_ENABLED: "false"' in workflow
+
+    image_policy = load_json("network_image_generation_policy.json")
+    assert image_policy["provider"] == "replicate"
+    assert [item["model_id"] for item in image_policy["model_priority"]] == [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell",
+    ]
+
+    lock = (ROOT / "config" / "MASTER_CONTENT_AND_IMAGE_POLICY_LOCK.md").read_text(encoding="utf-8")
+    assert "YouTube retains its separate FLUX-only thumbnail lock" in lock
+    assert "every new playlist source image and thumbnail must be generated with FLUX.1 Schnell" in lock
 
 
 def test_wordpress_and_newsroom_contract():
