@@ -45,7 +45,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install requests google-api-python-client google-auth -q
-      - name: Golden keyword -> Gemini/GPT write -> 3-way consensus -> draft
+      - name: Golden keyword -> Gemini draft -> GPT review/rewrite -> private draft
         id: write
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
@@ -63,9 +63,6 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
-          CLAUDE_ENABLED: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
