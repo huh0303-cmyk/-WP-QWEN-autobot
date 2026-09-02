@@ -94,6 +94,7 @@ def build_prompt(job: dict) -> str:
 
 MIN_BODY_CHARS = 800
 MIN_QUALITY_SCORE = 70
+MAX_CONSENSUS_REWRITES = 2
 
 
 def structural_check(draft: dict) -> list[str]:
@@ -196,6 +197,55 @@ def audit_draft(draft: dict, job: dict) -> dict | None:
         return {"ok": None, "issues": [f"audit_failed: {exc}"]}
 
 
+def _consensus_issues(consensus: dict) -> list[str]:
+    issues: list[str] = []
+    for model, check in (consensus.get("checks") or {}).items():
+        if check.get("ok") is True:
+            continue
+        for issue in check.get("issues") or []:
+            issues.append(f"{model}: {issue}")
+    return issues
+
+
+def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
+    """Use GPT only as the configured repair engine after a failed review."""
+    if not openai_available():
+        raise RuntimeError("GPT rewrite requested but OpenAI credentials are unavailable")
+    feedback = "\n".join(f"- {issue}" for issue in _consensus_issues(consensus))
+    prompt = (
+        f"{WRITER_SYSTEM_PROMPT}\n\n"
+        "Revise the supplied draft so every reviewer issue is genuinely fixed. "
+        "Keep the same site, language, search intent and allowed category. "
+        "Remove clickbait, unsupported numbers, repetitive AI-like phrases and vague generalities. "
+        "Make the article practical and specific without inventing facts.\n\n"
+        f"Site: {job['title']} ({job['language']})\n"
+        f"Allowed categories: {', '.join(job['categories'])}\n"
+        f"Seed topic: {job['seed_topic']}\n"
+        f"Reviewer issues:\n{feedback}\n\n"
+        f"Current draft JSON:\n{json.dumps(draft, ensure_ascii=False)}\n\n"
+        "Return only the corrected JSON object."
+    )
+    parsed = _parse_json_response(openai_generate_text(prompt, temperature=0.35, max_retries=3))
+    category = parsed.get("category")
+    if category not in job["categories"]:
+        category = draft["category"] if draft.get("category") in job["categories"] else job["categories"][0]
+    rewritten = {
+        **draft,
+        "title": parsed.get("title", ""),
+        "category": category,
+        "body_html": parsed.get("body_html", ""),
+        "meta_description": parsed.get("meta_description", ""),
+        "image_prompt": parsed.get("image_prompt", "") or parsed.get("title", ""),
+        "engine": "gpt-rewrite",
+    }
+    score, issues = quality_score(rewritten, job)
+    rewritten["quality_score"] = score
+    rewritten["quality_issues"] = issues
+    if score < MIN_QUALITY_SCORE or issues:
+        raise RuntimeError(f"rewritten quality={score}; {'; '.join(issues)}")
+    return rewritten
+
+
 def generate_draft(job: dict) -> dict:
     errors = []
     draft = None
@@ -231,15 +281,29 @@ def generate_draft(job: dict) -> dict:
         errors.append(f"{provider}: quality={score}; {'; '.join(issues)}")
     if draft is None:
         return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
-    consensus = three_model_consensus(
-        title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
-        keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
-    )
-    draft["three_model_consensus"] = consensus
-    if consensus.get("ok") is not True:
-        draft["status"] = "CONSENSUS_FAILED"
-        draft["error"] = "Gemini, GPT and Claude did not all approve"
-        return draft
+    rewrite_errors: list[str] = []
+    for attempt in range(MAX_CONSENSUS_REWRITES + 1):
+        consensus = three_model_consensus(
+            title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
+            keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
+        )
+        draft["three_model_consensus"] = consensus
+        draft["consensus_attempts"] = attempt + 1
+        if consensus.get("ok") is True:
+            break
+        if attempt >= MAX_CONSENSUS_REWRITES:
+            draft["status"] = "CONSENSUS_FAILED"
+            draft["error"] = "Gemini, GPT and Claude did not all approve after guided rewrites"
+            draft["rewrite_errors"] = rewrite_errors
+            return draft
+        try:
+            draft = _rewrite_after_consensus(draft, job, consensus)
+        except Exception as exc:
+            rewrite_errors.append(str(exc))
+            draft["status"] = "CONSENSUS_FAILED"
+            draft["error"] = f"Consensus rewrite failed: {exc}"
+            draft["rewrite_errors"] = rewrite_errors
+            return draft
     # Nano Banana is attempted only when its free tier is explicitly enabled
     # by the shared policy. Current official API tier is not free, so the
     # workflow skips it and enters the approved Replicate chain below.
