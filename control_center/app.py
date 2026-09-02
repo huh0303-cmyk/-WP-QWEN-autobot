@@ -742,6 +742,33 @@ def trigger_tistory_plan():
             flash(f"Tistory 5개 검토본 실행 요청 실패 · {detail}", "error")
     return redirect(url_for("index") + "#tistory")
 
+
+@app.post("/trigger/youtube-batch")
+def trigger_youtube_batch():
+    """Ask the central scheduler for at most one private upload per channel."""
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#youtube")
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    if not token:
+        flash("YouTube 중앙 스케줄러 실행용 GitHub 연결이 필요합니다.", "error")
+        return redirect(url_for("index") + "#youtube")
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/youtube-control-scheduler.yml/dispatches",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            json={"ref": "main", "inputs": {"dry_run": "false", "max_dispatch": "10"}},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+    except (requests.RequestException, RuntimeError) as exc:
+        flash(f"YouTube 10채널 실행 요청 실패 · {exc}", "error")
+    else:
+        flash("YouTube 10채널 중앙 스케줄러를 시작했습니다. 채널별 최대 1개, 비공개 업로드만 실행합니다.", "success")
+    return redirect(url_for("index") + "#youtube")
+
 @app.route("/")
 def index():
     sites = get_site_data()
