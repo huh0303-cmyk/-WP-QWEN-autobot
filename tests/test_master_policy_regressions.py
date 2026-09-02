@@ -22,10 +22,7 @@ def load_autopost_functions(*names):
 
 
 class MasterPolicyRegressionTests(unittest.TestCase):
-    def test_wordpress_text_generator_uses_gemini_primary_with_gpt_escalation(self):
-        # 2026-08-28: 사용자 지시로 정책 반전 — Gemini Flash(무료)가 주력 작가,
-        # GPT는 품질 실패 재작성/중요글 전용 escalation. 이전엔 그 반대
-        # ("GPT만, Gemini 폴백 금지")로 하드락돼 있었다.
+    def test_wordpress_text_generator_uses_gpt_primary(self):
         source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
         block = source.split("def generate_content_gemini(prompt, use_gpt=False):", 1)[1].split(
             "def strip_code_fences", 1
@@ -34,22 +31,20 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertIn("openai_generate_text(prompt", block)
         self.assertIn("use_gpt", block)
 
-    def test_wordpress_gemini_failure_does_not_silently_upgrade_to_gpt(self):
-        # Locked policy (config/content_writing_policy.json): "No paid
-        # fallback is allowed merely because the primary free tier was
-        # exhausted." A Gemini exception must raise, not quietly call GPT.
+    def test_wordpress_default_goes_straight_to_gpt_never_calls_gemini(self):
         import sys
         from unittest.mock import patch
 
         sys.path.insert(0, str(ROOT / "scripts"))
         import autopost_mega as am
 
-        with patch.object(am, "_gemini_generate_text_raw", side_effect=RuntimeError("quota exhausted")), \
+        with patch.object(am, "_gemini_generate_text_raw") as gemini_call, \
              patch("openai_text.openai_available", return_value=True), \
-             patch("openai_text.openai_generate_text") as gpt_call:
-            with self.assertRaises(RuntimeError):
-                am.generate_content_gemini("prompt", use_gpt=False)
-        gpt_call.assert_not_called()
+             patch("openai_text.openai_generate_text", return_value="gpt output") as gpt_call:
+            result = am.generate_content_gemini("prompt", use_gpt=False)
+        gemini_call.assert_not_called()
+        gpt_call.assert_called_once()
+        self.assertEqual(result, "gpt output")
 
     def test_wordpress_use_gpt_true_goes_straight_to_gpt_never_calls_gemini(self):
         import sys

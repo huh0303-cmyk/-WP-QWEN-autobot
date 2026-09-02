@@ -48,7 +48,7 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
 
 
 def test_locked_default_content_and_image_engines():
-    assert DEFAULT_TEXT_MODEL == "gemini-2.5-flash"
+    assert DEFAULT_TEXT_MODEL == "gpt-5-mini"
     assert DEFAULT_IMAGE_MODEL == "bytedance/sdxl-lightning-4step"
     assert list(IMAGE_MODELS) == [
         "none",

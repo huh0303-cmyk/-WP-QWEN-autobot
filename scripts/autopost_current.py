@@ -6,7 +6,7 @@ Keeps the mature autopost_mega engine while applying current operational metadat
 must not regress to legacy labels retained in the large historical module.
 
 Current hard policy:
-- All WordPress and newsroom draft text generation uses Gemini.
+- All WordPress and newsroom draft text generation uses GPT-5 mini by default.
 - 2026-08-28 user decision: free-stock images (Pexels/Pixabay) stay banned, but paid
   Replicate image generation (FLUX-primary, capped at 1 image/post by
   replicate_image_provider's own hard guard) is re-enabled after the "no images at all"
@@ -27,7 +27,7 @@ if str(ROOT) not in sys.path:
 
 # Set provider policy before importing the legacy engine so import-time defaults cannot
 # silently route WordPress back to Gemini or enable legacy paid image generation.
-os.environ["AI_TEXT_PROVIDER"] = "gemini"
+os.environ["AI_TEXT_PROVIDER"] = "openai"
 os.environ.setdefault("OPENAI_ENABLED", "false")
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
@@ -53,8 +53,8 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # ---------------------------------------------------------------------------
 # HARD ROUTING GUARDS
 # ---------------------------------------------------------------------------
-# All WordPress and newsroom draft text uses Gemini.
-base.AI_TEXT_PROVIDER = "gemini"
+# All WordPress and newsroom draft text uses GPT-5 mini.
+base.AI_TEXT_PROVIDER = "openai"
 
 # Images: free-confirmed Nano Banana first, then the approved Replicate chain.
 base.PIXABAY_KEY = None

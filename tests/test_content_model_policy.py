@@ -1,20 +1,20 @@
 from automation_hub.content_model_policy import choose_writer, review_role
 
 
-def test_default_writer_is_gemini():
+def test_default_writer_is_gpt_5_mini():
     decision = choose_writer()
-    assert decision.provider == "gemini"
+    assert decision.provider == "openai"
     assert decision.status == "OK"
 
 
-def test_gpt_only_for_explicit_fallback_signal():
+def test_rewrite_signals_keep_gpt_writer():
     assert choose_writer(quality_fail=True).provider == "openai"
     assert choose_writer(important_content=True).provider == "openai"
     assert choose_writer(high_value_content=True).provider == "openai"
     assert choose_writer(manual_override=True).provider == "openai"
 
 
-def test_no_silent_paid_fallback_when_free_primary_unavailable():
+def test_no_silent_model_fallback_when_primary_unavailable():
     decision = choose_writer(primary_available=False)
     assert decision.provider == "none"
     assert decision.status == "AWAITING_APPROVAL"
@@ -26,5 +26,5 @@ def test_freshness_sensitive_requires_official_verification():
     assert decision.status == "QUALITY_FAIL"
 
 
-def test_gpt_is_final_review_role_after_gemini():
+def test_gemini_is_independent_review_role_after_gpt():
     assert review_role() == "independent_final_editorial_fact_and_quality_reviewer"

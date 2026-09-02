@@ -151,7 +151,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     # A third, feedback-informed pass prevents a transient short response from
     # wasting an otherwise valid queued topic. It runs only after both normal
     # providers fail the mechanical 75-point gate.
-    for attempt, provider in enumerate(("gemini", "gpt", "gemini"), start=1):
+    for attempt, provider in enumerate(("gpt", "gemini", "gpt"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
                                   prior_feedback="; ".join(failures))

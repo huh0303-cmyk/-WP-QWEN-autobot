@@ -2019,34 +2019,25 @@ def _gemini_generate_text_raw(prompt, temperature=0.85):
 
 
 def generate_content_gemini(prompt, use_gpt=False):
-    """2026-08-28 정책 변경(사용자 지시): Gemini Flash(무료)를 주력 작가로,
-    GPT는 품질 실패 재작성/중요글(뉴스룸) 전용 escalation으로 되돌렸다.
-    (직전엔 'Gemini 폴백 금지, GPT만'으로 하드락돼 있었음 — 사용자가 그 잠금을
-    알고서 명시적으로 뒤집으라고 지시함.)
+    """Generate with the locked network writer (GPT-5 mini by default).
 
-    automation_hub.content_model_policy.choose_writer()가 이 라우팅의 유일한
-    기준이다 — 특히 "무료 tier가 소진됐다는 이유만으로 조용히 유료로 넘어가지
-    않는다"는 잠긴 규칙: Gemini 호출이 실패(크레딧 고갈 포함)하면 GPT로
-    자동 전환하지 않고 그대로 실패시킨다(=이 글은 스킵, AWAITING_APPROVAL과
-    동급). GPT는 quality_fail/important_content 같은 명시적 신호가 있을
-    때만(use_gpt=True) 쓴다.
+    The historical function name is retained for compatibility. Routing comes
+    from content_model_policy; Gemini remains an independent reviewer and is
+    not the routine first-draft writer. Claude is excluded.
     """
     from automation_hub.content_model_policy import choose_writer
 
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from openai_text import openai_available, openai_generate_text
 
-    decision = choose_writer(quality_fail=use_gpt, primary_available=bool(gemini_client))
+    decision = choose_writer(quality_fail=use_gpt, primary_available=openai_available())
 
     if decision.provider == "none":
         raise RuntimeError(f"writer blocked by content policy: {decision.reason} ({decision.status})")
 
     if decision.provider == "openai":
         if not openai_available():
-            # Paid escalation is intentionally disabled in routine automation.
-            # Retry with Gemini instead of turning an otherwise publishable daily
-            # article into a false-success workflow with no post.
-            return _gemini_generate_text_raw(prompt)
+            raise RuntimeError("OPENAI_API_KEY is not configured for GPT-5 mini writing")
         return openai_generate_text(prompt, temperature=0.85, max_retries=3)
 
     return _gemini_generate_text_raw(prompt)

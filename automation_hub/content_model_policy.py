@@ -32,11 +32,10 @@ def choose_writer(
     official_source_verified: bool = True,
     policy: dict[str, Any] | None = None,
 ) -> WriterDecision:
-    """Route article generation under the locked cost/safety policy.
+    """Route article generation under the locked two-model policy.
 
-    Gemini Flash is the normal writer. GPT is allowed only for explicit
-    quality/high-value/manual signals. Claude is intentionally excluded from
-    automatic bulk-writing decisions; it is reserved for audit/dev work.
+    GPT-5 mini is the routine writer. Gemini is the independent reviewer;
+    Claude is excluded from automatic blog writing and review.
     """
     policy = policy or load_policy()
 
@@ -53,21 +52,21 @@ def choose_writer(
         return WriterDecision(
             provider=policy["fallback_writer"]["provider"],
             role=policy["fallback_writer"]["role"],
-            reason="explicit_gpt_fallback_signal",
+            reason="explicit_rewrite_signal",
         )
 
     if not primary_available:
         return WriterDecision(
             provider="none",
             role="blocked",
-            reason="primary_free_tier_unavailable_no_silent_paid_fallback",
+            reason="primary_writer_unavailable",
             status="AWAITING_APPROVAL",
         )
 
     return WriterDecision(
         provider=policy["primary_writer"]["provider"],
         role=policy["primary_writer"]["role"],
-        reason="default_free_tier_first",
+        reason="network_default_writer",
     )
 
 

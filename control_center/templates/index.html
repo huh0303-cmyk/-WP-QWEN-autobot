@@ -238,7 +238,7 @@
                                 {% endfor %}
                             </select>
                         </label>
-                        <p class="sm:col-span-2 text-[10px] text-slate-400">Gemini 신규 작성 · 관련 이미지 0~2장</p>
+                        <p class="sm:col-span-2 text-[10px] text-slate-400">GPT-5 mini 기본 작성 · SDXL Lightning 기본 이미지 · FLUX Schnell 대체</p>
                     </div>
                     <div class="space-y-2 border-t pt-3">
                         <label class="block text-[11px] font-black text-slate-500">핵심 키워드</label>
@@ -248,7 +248,7 @@
                     </div>
                     <div class="border-t pt-2 text-[11px] text-slate-500">
                         대응 WP: <span class="font-semibold">{{ blog.wp_url|replace('https://', '')|replace('http://', '') }}</span><br>
-                        WP URL 검증 후 · Gemini 신규 작성 · 비공개 초안만
+                        WP URL 검증 후 · GPT-5 mini 신규 작성 · 비공개 초안만
                     </div>
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-4 text-sm font-black text-white shadow-md shadow-violet-200 transition active:scale-[.98] hover:from-violet-800 hover:to-fuchsia-700">
                         <span>Blogspot 비공개 초안 생성</span><span aria-hidden="true">→</span>

@@ -99,7 +99,7 @@ def _gemini_generate(model: str, prompt: str) -> str:
         raise RuntimeError("Gemini API 응답 형식을 읽을 수 없습니다") from exc
 
 
-def generate_article(site: WordPressSite, keyword: str, feedback: list[str] | None = None, *, text_model: str = "gemini-2.5-flash") -> dict[str, Any]:
+def generate_article(site: WordPressSite, keyword: str, feedback: list[str] | None = None, *, text_model: str = "gpt-5-mini") -> dict[str, Any]:
     prompt = build_prompt(site, keyword, feedback)
     raw = _gemini_generate(text_model, prompt) if text_model.startswith("gemini-") else _openai_generate(text_model, prompt)
     return _parse_json(raw)
