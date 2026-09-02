@@ -125,6 +125,14 @@ def test_review_queue_is_visible_directly_in_control_room():
     assert "글 검토·승인 →" in template
 
 
+def test_control_room_displays_full_blogger_33_portfolio():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "Blogspot 33" in template
+    assert "BLOGSPOT 33" in template
+    assert "{{ bloggers|length }}/33" in template
+    assert "Blogspot 27" not in template
+
+
 def test_all_wordpress_drafts_require_rankmath_focus_keyword():
     publisher = (Path(__file__).resolve().parents[1] / "control_center" / "wordpress.py").read_text(encoding="utf-8")
     direct_writer = (Path(__file__).resolve().parents[1] / "scripts" / "auto_write_and_draft.py").read_text(encoding="utf-8")
