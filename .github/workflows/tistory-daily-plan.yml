@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: tistory-daily-single-owner
+  cancel-in-progress: false
+
 jobs:
   plan:
     runs-on: ubuntu-latest

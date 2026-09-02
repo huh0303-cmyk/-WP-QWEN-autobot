@@ -40,7 +40,7 @@ def test_calendar_preserves_cadence_and_claims_before_dispatch(monkeypatch, tmp_
     assert events == ["claim", "dispatch"]
     import datetime
     row[1] = (mod["now"] - datetime.timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M KST")
-    assert mod["load_due_calendar_rows"](service) == []
+    assert len(mod["load_due_calendar_rows"](service)) == 1
     mod["main"]()
     assert events == ["claim", "dispatch"]
     row[12] = "보류"

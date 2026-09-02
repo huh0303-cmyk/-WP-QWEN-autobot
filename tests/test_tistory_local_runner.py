@@ -36,6 +36,18 @@ def test_completed_job_is_not_selected_again(tmp_path):
     assert db.execute("SELECT * FROM jobs WHERE state IN ('pending','retry')").fetchall() == []
 
 
+def test_interrupted_running_job_is_recovered_on_restart(tmp_path):
+    path = tmp_path / "q.sqlite3"
+    db = runner.open_queue(path)
+    db.execute("INSERT INTO jobs(job_id,sheet_row,site_id,payload,state) VALUES(?,?,?,?,?)", ("stale", 2, "tistory_health_info", "{}", "running"))
+    db.commit()
+    db.close()
+    recovered = runner.open_queue(path)
+    row = recovered.execute("SELECT state,error FROM jobs WHERE job_id='stale'").fetchone()
+    assert row["state"] == "retry"
+    assert "interrupted" in row["error"]
+
+
 def test_only_private_ready_artifacts_enter_sheet_queue():
     payload = {"drafts": [
         {"job_id": "ok", "site_id": "tistory_health_info", "status": "DRAFT_READY", "public_allowed": False, "title": "제목", "body_html": "<p>본문</p>", "category": "건강검진", "meta_description": "설명"},

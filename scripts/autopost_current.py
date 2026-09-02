@@ -10,7 +10,7 @@ Current hard policy:
 - 2026-08-28 user decision: free-stock images (Pexels/Pixabay) stay banned, but paid
   Replicate image generation (FLUX-primary, capped at 1 image/post by
   replicate_image_provider's own hard guard) is re-enabled after the "no images at all"
-  policy structurally capped every post below the 75-point SEO publish gate (0/24 posts
+  policy structurally capped every post below the former SEO publish gate (0/24 posts
   published today). User explicitly approved the Replicate cost this implies.
 - Pixabay, Pexels, OpenAI image, Gemini image/Nano Banana, and local infographic
   fallbacks stay blocked from the active WP entrypoint — only the approved Replicate

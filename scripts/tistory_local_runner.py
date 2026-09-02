@@ -49,6 +49,8 @@ def open_queue(path: Path):
     );
     CREATE TABLE IF NOT EXISTS outbox (job_id TEXT PRIMARY KEY, payload TEXT NOT NULL);
     """)
+    db.execute("UPDATE jobs SET state='retry', error='recovered after interrupted local run', updated_at=CURRENT_TIMESTAMP WHERE state='running'")
+    db.commit()
     return db
 
 

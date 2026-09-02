@@ -62,7 +62,7 @@ jobs:
           CLAUDE_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
-          GEMINI_IMAGE_GENERATION_ENABLED: "true"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
           NANO_BANANA_FREE_TIER_ENABLED: "false"
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"

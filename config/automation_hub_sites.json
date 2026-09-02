@@ -11,8 +11,8 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Korea life A-Z portal editor and trusted service navigator",
       "tone": "Practical, welcoming, locally grounded, source-led and conversion-aware without pressure",
@@ -49,7 +49,9 @@
           "Keep service consent separate from optional marketing consent",
           "Do not send personal data to a specialist site without user action"
         ]
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kstudy365",
@@ -60,14 +62,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "International admissions adviser",
       "tone": "Procedural, precise and student-friendly",
       "keyword_rules": {
         "theme": "Study in Korea"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_oliveyoung",
@@ -78,15 +82,17 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_2",
       "persona": "K-beauty shopping editor",
       "tone": "Ingredient-aware, balanced and non-promotional",
       "keyword_rules": {
         "theme": "K-Beauty Reviews"
       },
-      "affiliate_profile": "beauty"
+      "affiliate_profile": "beauty",
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_jobkorea365",
@@ -97,14 +103,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Korea employment guide editor",
       "tone": "Actionable, lawful and direct",
       "keyword_rules": {
         "theme": "Employment"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kvisa365",
@@ -115,14 +123,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Korea immigration information editor",
       "tone": "Cautious, source-led and procedural",
       "keyword_rules": {
         "theme": "Visa Guide"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_khealth365",
@@ -133,14 +143,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "ko",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "건강정보 편집국",
       "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
       "keyword_rules": {
         "theme": "건강과 의학"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kskin365",
@@ -151,15 +163,17 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_2",
       "persona": "Korean skincare science editor",
       "tone": "Evidence-led, ingredient-first and cautious",
       "keyword_rules": {
         "theme": "K-Beauty"
       },
-      "affiliate_profile": "beauty"
+      "affiliate_profile": "beauty",
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_ktrip365",
@@ -170,15 +184,17 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Korea travel planner",
       "tone": "Specific, current and itinerary-oriented",
       "keyword_rules": {
         "theme": "Travel"
       },
-      "affiliate_profile": "travel"
+      "affiliate_profile": "travel",
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kfinance365",
@@ -189,14 +205,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korea personal-finance editor",
       "tone": "Numerate, neutral and risk-aware",
       "keyword_rules": {
         "theme": "Finance"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kinsurance365",
@@ -207,14 +225,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korea insurance explainer",
       "tone": "Careful, comparative and plain-spoken",
       "keyword_rules": {
         "theme": "Insurance"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_koreataxlaw",
@@ -225,14 +245,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korea tax and legal information editor",
       "tone": "Formal, qualified and source-specific",
       "keyword_rules": {
         "theme": "Tax and Law"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_medicaltour",
@@ -243,14 +265,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Medical tourism information editor",
       "tone": "Cautious, practical and non-diagnostic",
       "keyword_rules": {
         "theme": "Korea Medical Tourism"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_studyinkorea",
@@ -261,14 +285,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "International student life adviser",
       "tone": "Supportive, realistic and budget-aware",
       "keyword_rules": {
         "theme": "International Students"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_jobinkorea",
@@ -279,14 +305,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Foreign job-seeker coach",
       "tone": "Concrete, encouraging and workplace-aware",
       "keyword_rules": {
         "theme": "Jobs in Korea"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kworld365",
@@ -297,14 +325,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_2",
       "persona": "K-pop industry editor",
       "tone": "Current, factual and fan-accessible",
       "keyword_rules": {
         "theme": "K-POP"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_koreawedding",
@@ -315,8 +345,8 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_2",
       "persona": "Korea international-couple community, cultural exchange and wedding editor",
       "tone": "Warm, respectful, safety-aware, practical, inclusive and culturally sensitive",
@@ -344,7 +374,9 @@
           "Do not stereotype Korean men, Korean women or any nationality"
         ]
       },
-      "affiliate_profile": "wedding"
+      "affiliate_profile": "wedding",
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_jobglobal",
@@ -355,14 +387,16 @@
       "content_type": "blog",
       "group": "A",
       "language": "en",
-      "weekly_min": 3,
-      "weekly_max": 4,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "Global recruitment editor",
       "tone": "Professional, inclusive and compliance-aware",
       "keyword_rules": {
         "theme": "Recruitment"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kinvest365",
@@ -373,14 +407,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "en",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korean markets analyst",
       "tone": "Data-led, balanced and risk-aware",
       "keyword_rules": {
         "theme": "Investment"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_krealestate",
@@ -391,14 +427,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "en",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korea property market editor",
       "tone": "Analytical, locality-specific and cautious",
       "keyword_rules": {
         "theme": "Korea Real Estate"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kcrypto365",
@@ -409,14 +447,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "en",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korea digital-asset policy analyst",
       "tone": "Regulation-led, neutral and risk-conscious",
       "keyword_rules": {
         "theme": "Crypto"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_ktech365",
@@ -427,14 +467,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "en",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Korean technology industry editor",
       "tone": "Technical, accessible and evidence-led",
       "keyword_rules": {
         "theme": "Technology"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kieca",
@@ -445,14 +487,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "ko",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "국제교육문화 편집자",
       "tone": "공식적이고 교육적인 안내체",
       "keyword_rules": {
         "theme": "국제교육문화"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_ksa",
@@ -463,14 +507,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "ko",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "한국유학정보 상담 편집자",
       "tone": "친절하고 절차 중심적인 설명체",
       "keyword_rules": {
         "theme": "한국유학정보"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_sis",
@@ -481,14 +527,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "en",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_1",
       "persona": "SIS Vietnam campus international admissions and TOPIK program editor",
       "tone": "Welcoming, credible, action-oriented and student-friendly",
       "keyword_rules": {
         "theme": "TOPIK, online Korean classes and study pathways to Korea"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_kikorea",
@@ -499,14 +547,16 @@
       "content_type": "blog",
       "group": "B",
       "language": "en",
-      "weekly_min": 2,
-      "weekly_max": 3,
+      "weekly_min": 7,
+      "weekly_max": 7,
       "content_profile": "option_3",
       "persona": "Foreign investment policy editor",
       "tone": "Formal, institutional and source-led",
       "keyword_rules": {
         "theme": "Korea Investment"
-      }
+      },
+      "daily_min": 1,
+      "daily_max": 1
     },
     {
       "site_id": "wp_koreanews",
@@ -523,9 +573,9 @@
       "weekly_max": 70,
       "min_gap_minutes": 45,
       "content_profile": "newsroom_ko",
-      "min_chars": 1500,
-      "target_chars": 1750,
-      "max_chars": 2000,
+      "min_chars": 700,
+      "target_chars": 1100,
+      "max_chars": 1500,
       "persona": "독립 종합 인터넷신문 편집국",
       "tone": "검증과 맥락을 우선하는 절제된 신문 기사체",
       "image_mode": "licensed_editorial",
@@ -552,9 +602,9 @@
       "weekly_max": 70,
       "min_gap_minutes": 45,
       "content_profile": "newsroom_en",
-      "min_chars": 1500,
-      "target_chars": 1750,
-      "max_chars": 2000,
+      "min_chars": 700,
+      "target_chars": 1100,
+      "max_chars": 1500,
       "persona": "Independent English-language Korea newsroom",
       "tone": "Verified, contextual and restrained newspaper prose",
       "image_mode": "licensed_editorial",

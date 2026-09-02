@@ -128,7 +128,7 @@ def test_dispatch_claims_before_http_and_forwards_calendar(monkeypatch):
         assert inputs["publish_delay_hours"] == ""
         assert inputs["claim_token"]
         return Mock()
-    with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(dispatch_module, "read_calendar", return_value=[r]), patch.object(dispatch_module, "update_row", side_effect=claim), patch.object(dispatch_module.requests, "post", side_effect=post):
+    with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(dispatch_module, "read_calendar", return_value=[r]), patch.object(dispatch_module, "update_row", side_effect=claim), patch.object(dispatch_module, "youtube_worker_active", return_value=False), patch.object(dispatch_module.requests, "post", side_effect=post):
         assert dispatch_module.main() == 0
     assert events == ["claim", "post"]
 

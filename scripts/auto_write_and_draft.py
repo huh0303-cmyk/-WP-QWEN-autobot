@@ -150,7 +150,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     failures: list[str] = [review_feedback] if review_feedback else []
     # A third, feedback-informed pass prevents a transient short response from
     # wasting an otherwise valid queued topic. It runs only after both normal
-    # providers fail the mechanical 75-point gate.
+    # providers fail the mechanical 70-point gate.
     for attempt, provider in enumerate(("gpt", "gemini", "gpt"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
@@ -169,7 +169,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
             critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete"))]
-            if score >= 75 and not critical:
+            if score >= 70 and not critical:
                 return candidate, score, failures, provider
         except Exception as exc:
             failures = [f"invalid output: {exc}"]

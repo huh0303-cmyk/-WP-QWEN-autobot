@@ -15,7 +15,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.sheet_schema import PUBLISH_QUEUE_HEADER
-from gsheets_direct import append_tab_rows
+from gsheets_direct import ensure_tab, get_sheets_service
 from sync_automation_hub_to_sheets import QUEUE_TAB
 
 
@@ -45,8 +45,21 @@ def main():
         raise SystemExit("SHEET_ID is required")
     payload = json.loads(Path(args.drafts).read_text(encoding="utf-8"))
     rows = rows_from_artifact(payload)
-    append_tab_rows(sheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER, rows)
-    print(json.dumps({"queued": len(rows), "visibility": "private"}, ensure_ascii=False))
+    service = get_sheets_service()
+    ensure_tab(service, sheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
+    existing = service.spreadsheets().values().get(
+        spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:Q"
+    ).execute().get("values", [])
+    job_index = PUBLISH_QUEUE_HEADER.index("job_id")
+    existing_ids = {row[job_index] for row in existing[1:] if len(row) > job_index and row[job_index]}
+    unique_rows = [row for row in rows if row[job_index] not in existing_ids]
+    if unique_rows:
+        service.spreadsheets().values().append(
+            spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1",
+            valueInputOption="RAW", insertDataOption="INSERT_ROWS",
+            body={"values": unique_rows},
+        ).execute()
+    print(json.dumps({"queued": len(unique_rows), "duplicates_blocked": len(rows) - len(unique_rows), "visibility": "private"}, ensure_ascii=False))
     return 0
 
 

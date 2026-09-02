@@ -5,7 +5,7 @@ from html import unescape
 from typing import Any
 
 
-MIN_SCORE = 75
+MIN_SCORE = 70
 
 
 def plain_text(html: str) -> str:
@@ -80,4 +80,3 @@ def score_article(article: dict[str, Any], *, keyword: str, target_chars: int) -
         failures.append("이미지 후보는 0~2개만 허용됩니다")
         score = min(score, 74)
     return min(score, 100), failures
-

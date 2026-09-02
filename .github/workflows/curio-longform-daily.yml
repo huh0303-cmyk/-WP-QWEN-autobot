@@ -34,7 +34,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: curio-longform-${{ inputs.channel }}
+  group: youtube-production-single-owner
   cancel-in-progress: false
 
 jobs:

@@ -66,7 +66,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: generate-youtube-playlist-${{ inputs.channel || 'default' }}
+  group: youtube-production-single-owner
   cancel-in-progress: false
 
 jobs:

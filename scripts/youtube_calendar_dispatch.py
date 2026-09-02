@@ -10,6 +10,23 @@ from automation_hub.youtube_registry import load_channels
 from gsheets_direct import get_sheets_service
 
 
+ACTIVE_RUN_STATES = {"queued", "in_progress", "requested", "waiting", "pending"}
+
+
+def youtube_worker_active(repo, token, workflows):
+    """Fail closed when worker state cannot be proven idle."""
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
+    for workflow in sorted(set(workflows)):
+        response = requests.get(
+            f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs",
+            headers=headers, params={"per_page": 20}, timeout=30,
+        )
+        response.raise_for_status()
+        if any(run.get("status") in ACTIVE_RUN_STATES for run in response.json().get("workflow_runs", [])):
+            return True
+    return False
+
+
 def main():
     sid = os.environ["SHEET_ID"]
     repo = os.environ["GITHUB_REPOSITORY"]
@@ -29,8 +46,18 @@ def main():
             raise RuntimeError(f"Channel identity/workflow mismatch: {c.channel_key}")
         enabled.add(c.channel_key)
     now = dt.datetime.now(KST)
+    token = os.environ.get("GH_DISPATCH_TOKEN", "")
+    if not dry:
+        if not token:
+            raise RuntimeError("GH_DISPATCH_TOKEN is required for production dispatch")
+        try:
+            if youtube_worker_active(repo, token, (c.workflow for c in channels.values())):
+                print("YouTube worker is active; no new calendar claim was created")
+                return 0
+        except requests.RequestException as exc:
+            raise RuntimeError("Could not prove YouTube workers idle; refusing dispatch") from exc
     selected, skipped = select_due(read_calendar(service, sid), now, enabled,
-                                  min(10, max(1, int(os.getenv("MAX_DISPATCH", "3")))))
+                                  min(10, max(1, int(os.getenv("MAX_DISPATCH", "3")))) if dry else 1)
     print(json.dumps({"mode": "dry_run" if dry else "private-production", "due": [
         {"id": r["id"], "channel": r["key"], "planned_at": r["when"].isoformat(), "topic": r["topic"]}
         for r in selected], "suppressed_duplicates": skipped, "public_allowed": False}, ensure_ascii=False))

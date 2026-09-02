@@ -20,9 +20,9 @@
     "model_family": "gpt-5-mini",
     "role": "failed_draft_recovery_and_rewrite",
     "allowed_when": [
-      "gemini_generation_failure",
-      "gemini_quality_fail",
-      "gemini_policy_or_format_fail",
+      "gpt_generation_failure",
+      "gpt_quality_fail",
+      "gpt_policy_or_format_fail",
       "important_content",
       "high_value_content",
       "manual_override"

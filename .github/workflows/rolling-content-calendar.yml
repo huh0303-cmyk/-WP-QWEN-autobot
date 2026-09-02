@@ -3,7 +3,7 @@ name: "CEO Dashboard — roll 14-day content calendar"
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 20 * * *" # 05:17 KST, intentionally not on the hour
+    - cron: "58 20 * * *" # 05:58 KST, isolated from production workers
 
 permissions:
   contents: read

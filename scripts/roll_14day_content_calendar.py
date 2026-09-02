@@ -98,15 +98,15 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
                 time_text = irregular_time(key, 0, 720)
                 destination, fmt = item["wp"], "GPT 원문 기사"
                 dependency, gate, status, notes = (
-                    "SEO·출처·중복 검수 후 WP 먼저", "SEO≥75·공식출처·중복방지",
+                    "SEO·출처·중복 검수 후 WP 먼저", "SEO≥70·공식출처·중복방지",
                     "황금키워드 검증대기", "실행 48시간 전 신호 재검증",
                 )
                 channel = wp
             else:
                 time_text = irregular_time(key, 720, 700)
-                destination, fmt = item["blogspot"], "Gemini 신규 구성 기사"
+                destination, fmt = item["blogspot"], "GPT-5 mini 원고·Gemini 독립 검수"
                 dependency, gate, status, notes = (
-                    "동일 키워드 WP 발행·URL 검증 후", "SEO≥75·120자 설명·라벨3~5",
+                    "동일 키워드 WP 발행·URL 검증 후", "SEO≥70·120자 설명·라벨8~14",
                     "WP 선행대기", "공개 금지·사람 검토용 초안",
                 )
                 channel = wp.rsplit(".", 1)[0]
@@ -120,6 +120,10 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
 
 def youtube_rows(horizon: dt.date, existing, channels):
     rows = []
+    used_slots = {
+        (row[1][:10], row[1][11:16]) for row in existing
+        if len(row) > 2 and row[2].startswith("YouTube")
+    }
     for channel in channels:
         name = channel["display_name"]
         scheduled = sorted(
@@ -128,18 +132,13 @@ def youtube_rows(horizon: dt.date, existing, channels):
         )
         due = scheduled[-1][0] if scheduled else dt.datetime.now(KST).date()
         previous_time = scheduled[-1][1] if scheduled else ""
-        recent_gaps = [
-            (scheduled[index][0] - scheduled[index - 1][0]).days
-            for index in range(1, len(scheduled))
-            if (scheduled[index][0] - scheduled[index - 1][0]).days in {2, 3}
-        ]
         counter = len(scheduled)
         while True:
-            gap = 2 + stable_int(f"{name}|{due}|gap") % 2
-            # Keep the interval random-looking without allowing a conspicuous
-            # run of the same gap (2,2,2... or 3,3,3...).
-            if len(recent_gaps) >= 2 and recent_gaps[-2:] == [gap, gap]:
-                gap = 5 - gap
+            gap_min = int(channel.get("interval_days_min", 2))
+            gap_max = int(channel.get("interval_days_max", 3))
+            if (gap_min, gap_max) != (2, 3):
+                raise ValueError(f"{name}: YouTube cadence contract must be 2-3 days")
+            gap = gap_min + stable_int(f"{name}|{due}|gap") % (gap_max - gap_min + 1)
             due += dt.timedelta(days=gap)
             if due > horizon:
                 break
@@ -155,11 +154,14 @@ def youtube_rows(horizon: dt.date, existing, channels):
             # A channel must not look like a fixed-time bot. If the deterministic
             # random slot repeats the previous run's HH:MM, reroll with a salt.
             salt = 1
-            previous_band = int(previous_time[:2]) // 6 if previous_time else -1
-            while minute == previous_time or int(minute[:2]) // 6 == previous_band:
+            while (minute == previous_time or (due.isoformat(), minute) in used_slots) and salt <= 64:
                 minute = irregular_time(f"{key}|reroll-{salt}", channel["allowed_hour_start"] * 60,
                                         (channel["allowed_hour_end"] - channel["allowed_hour_start"] + 1) * 60)
                 salt += 1
+            if minute == previous_time:
+                raise RuntimeError(f"{name}: could not produce a different publication time")
+            if (due.isoformat(), minute) in used_slots:
+                raise RuntimeError(f"{name}: could not produce a collision-free publication time")
             is_knowledge = channel["channel_type"] == "knowledge"
             rows.append([
                 "ROLL-" + hashlib.sha1(key.encode()).hexdigest()[:10].upper(),
@@ -171,7 +173,7 @@ def youtube_rows(horizon: dt.date, existing, channels):
                 "기획확정·자료준비", "", "비공개 링크 생성 후 토큰 없는 이메일 보고",
             ])
             previous_time = minute
-            recent_gaps.append(gap)
+            used_slots.add((due.isoformat(), minute))
             counter += 1
     return rows
 

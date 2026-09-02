@@ -143,23 +143,18 @@ def _parse_json_response(raw: str) -> dict:
     return json.loads(text)
 
 
-def _write_body(job: dict, provider: str = "gemini") -> tuple[str, str]:
+def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
     """Returns (raw_response_text, engine_used).
 
-    Routing comes from the locked automation_hub.content_model_policy, not
-    from ad-hoc exception handling: important_content (trend/official-source
-    sites) goes to GPT directly; everything else is Gemini-only. If Gemini
-    fails, that is NOT treated as a reason to silently upgrade to a paid
-    tier — the job just fails (WRITE_FAILED), same as the policy's
-    "no silent paid fallback when the free tier is unavailable" rule.
+    GPT-5 mini is the only authoring engine. Gemini is called separately by
+    the independent reviewer and must never become the first-draft writer.
     """
     prompt = build_writer_prompt(job)
-    if provider == "gpt":
-        if not openai_available():
-            raise RuntimeError("GPT escalation requested but OpenAI credentials are unavailable")
-        return openai_generate_text(prompt, temperature=0.7, max_retries=3), "gpt"
-
-    return gemini_generate_text(prompt, temperature=0.7), "gemini"
+    if provider != "gpt":
+        raise RuntimeError("Only GPT-5 mini may write Tistory drafts")
+    if not openai_available():
+        raise RuntimeError("GPT-5 mini writer credentials are unavailable")
+    return openai_generate_text(prompt, temperature=0.7, max_retries=3), "gpt"
 
 
 def quality_score(draft: dict, job: dict) -> tuple[int, list[str]]:
@@ -239,7 +234,7 @@ def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
 def generate_draft(job: dict) -> dict:
     errors = []
     draft = None
-    for provider in ("gemini", "gpt"):
+    for provider in ("gpt",):
         try:
             raw, engine = _write_body(job, provider)
             parsed = _parse_json_response(raw)

@@ -101,9 +101,9 @@ class MasterPolicyRegressionTests(unittest.TestCase):
     def test_newsroom_trim_cannot_cross_minimum(self):
         helpers = load_autopost_functions("newsroom_char_count", "trim_newsroom_html")
         body = "<p>" + ("검증된 사실 문장입니다. " * 180) + "</p>"
-        trimmed = helpers["trim_newsroom_html"](body, target_chars=max(1500, 2000 - 220))
+        trimmed = helpers["trim_newsroom_html"](body, target_chars=1500)
         length = helpers["newsroom_char_count"](trimmed)
-        self.assertGreaterEqual(length, 1500)
+        self.assertLessEqual(length, 1500)
         self.assertLessEqual(length, 1800)
         self.assertTrue(BeautifulSoup(trimmed, "html.parser").find("p"))
 

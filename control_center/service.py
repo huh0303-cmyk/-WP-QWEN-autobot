@@ -55,7 +55,7 @@ class ControlCenter:
     def draft(self, job_id: str):
         job = self.store.get(job_id)
         if job["state"] != QUALITY_PASSED:
-            raise ValueError("품질점수 75점 이상인 작업만 WP 초안을 만들 수 있습니다")
+            raise ValueError(f"품질점수 {MIN_SCORE}점 이상인 작업만 WP 초안을 만들 수 있습니다")
         site = self.sites[job["site_id"]]
         self.store.transition(job_id, DRAFTING, error="")
         article = {

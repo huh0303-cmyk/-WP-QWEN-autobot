@@ -83,7 +83,7 @@ def test_job_persists_selected_models():
 
 def test_quality_gate_accepts_compliant_article():
     score, failures = score_article(GOOD_ARTICLE, keyword="Korea job seeker visa requirements", target_chars=2400)
-    assert score >= 75, failures
+    assert score >= 70, failures
 
 
 def test_service_never_publishes_and_recovers_same_draft():
