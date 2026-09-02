@@ -3,7 +3,7 @@
   "description": "Platform room skeleton. Fill credentials/destination IDs later; keep PUBLIC disabled by default.",
   "expected_counts": {
     "wordpress": 27,
-    "blogger": 27,
+    "blogger": 33,
     "tistory": 5,
     "naver": 3,
     "youtube": 10
@@ -711,6 +711,120 @@
       "duplicate_guard": true,
       "status": "READY",
       "destination_id": "6946912888985634794"
+    },
+    {
+      "room_id": "blogger_kwellness_lab",
+      "platform": "blogger",
+      "name": "K-wellness Lab",
+      "source_id": "wp_khealth365",
+      "enabled": true,
+      "destination_id": "4456888951628869767",
+      "workflow": "blogger-daily-scheduler.yml",
+      "language": "en",
+      "group": "BLOGGER",
+      "publish_policy": "draft",
+      "duplicate_guard": true,
+      "status": "READY",
+      "text_model": "gpt-5-mini",
+      "image_models": [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell"
+      ]
+    },
+    {
+      "room_id": "blogger_kmedical_job_center",
+      "platform": "blogger",
+      "name": "K-Medical Job Center",
+      "source_id": "wp_khealth365",
+      "enabled": true,
+      "destination_id": "3205814823967421343",
+      "workflow": "blogger-daily-scheduler.yml",
+      "language": "ko",
+      "group": "BLOGGER",
+      "publish_policy": "draft",
+      "duplicate_guard": true,
+      "status": "READY",
+      "text_model": "gpt-5-mini",
+      "image_models": [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell"
+      ]
+    },
+    {
+      "room_id": "blogger_korea_life_support365",
+      "platform": "blogger",
+      "name": "한국생활지원정보",
+      "source_id": "wp_koreanews",
+      "enabled": true,
+      "destination_id": "2531035487222435079",
+      "workflow": "blogger-daily-scheduler.yml",
+      "language": "ko",
+      "group": "BLOGGER",
+      "publish_policy": "draft",
+      "duplicate_guard": true,
+      "status": "READY",
+      "text_model": "gpt-5-mini",
+      "image_models": [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell"
+      ]
+    },
+    {
+      "room_id": "blogger_koreamedicaltour1",
+      "platform": "blogger",
+      "name": "Korea Medical Tour",
+      "source_id": "wp_medicaltour",
+      "enabled": true,
+      "destination_id": "2234527810530371008",
+      "workflow": "blogger-daily-scheduler.yml",
+      "language": "en",
+      "group": "BLOGGER",
+      "publish_policy": "draft",
+      "duplicate_guard": true,
+      "status": "READY",
+      "text_model": "gpt-5-mini",
+      "image_models": [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell"
+      ]
+    },
+    {
+      "room_id": "blogger_kworld365_kpop",
+      "platform": "blogger",
+      "name": "KWorld365",
+      "source_id": "wp_kworld365",
+      "enabled": true,
+      "destination_id": "3683978748331752523",
+      "workflow": "blogger-daily-scheduler.yml",
+      "language": "en",
+      "group": "BLOGGER",
+      "publish_policy": "draft",
+      "duplicate_guard": true,
+      "status": "READY",
+      "text_model": "gpt-5-mini",
+      "image_models": [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell"
+      ]
+    },
+    {
+      "room_id": "blogger_seoul_intl_school_guide",
+      "platform": "blogger",
+      "name": "Seoul International School Guide",
+      "source_id": "wp_sis",
+      "enabled": true,
+      "destination_id": "8077962392257357260",
+      "workflow": "blogger-daily-scheduler.yml",
+      "language": "en",
+      "group": "BLOGGER",
+      "publish_policy": "draft",
+      "duplicate_guard": true,
+      "status": "READY",
+      "text_model": "gpt-5-mini",
+      "image_models": [
+        "bytedance/sdxl-lightning-4step",
+        "black-forest-labs/flux-schnell"
+      ]
     },
     {
       "room_id": "tistory_insurance_lab",

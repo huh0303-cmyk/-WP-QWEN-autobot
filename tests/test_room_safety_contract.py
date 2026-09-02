@@ -9,9 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_room_counts_are_fixed():
     registry = RoomRegistry.load()
     summary = registry.summary()
-    assert summary["total"] == 72
+    assert summary["total"] == 78
     assert summary["wordpress"] == 27
-    assert summary["blogger"] == 27
+    assert summary["blogger"] == 33
     assert summary["tistory"] == 5
     assert summary["naver"] == 3
     assert summary["youtube"] == 10

@@ -3,13 +3,14 @@
     "config/automation_hub_sites.json",
     "config/blogger_portfolio.json"
   ],
-  "count": 27,
+  "count": 33,
   "wordpress_ready_count": 27,
-  "blogspot_ready_count": 27,
+  "blogspot_ready_count": 33,
   "profiles": [
     {
       "order": 1,
       "site_key": "ktrip365",
+      "source_site_id": "wp_ktrip365",
       "language": "en",
       "wordpress": {
         "url": "https://k-trip365.com",
@@ -36,12 +37,15 @@
         "tone": "Specific, current and itinerary-oriented",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 2,
       "site_key": "kworld365",
+      "source_site_id": "wp_kworld365",
       "language": "en",
       "wordpress": {
         "url": "https://kworld365.com",
@@ -68,12 +72,15 @@
         "tone": "Current, factual and fan-accessible",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 3,
       "site_key": "jobkorea365",
+      "source_site_id": "wp_jobkorea365",
       "language": "en",
       "wordpress": {
         "url": "https://jobkorea365.com",
@@ -100,12 +107,15 @@
         "tone": "Actionable, lawful and direct",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 4,
       "site_key": "kstudy365",
+      "source_site_id": "wp_kstudy365",
       "language": "en",
       "wordpress": {
         "url": "https://kstudy365.com",
@@ -132,12 +142,15 @@
         "tone": "Procedural, precise and student-friendly",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 5,
       "site_key": "kinsurance365",
+      "source_site_id": "wp_kinsurance365",
       "language": "en",
       "wordpress": {
         "url": "https://koreainsurance365.com",
@@ -164,12 +177,15 @@
         "tone": "Careful, comparative and plain-spoken",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 6,
       "site_key": "kfinance365",
+      "source_site_id": "wp_kfinance365",
       "language": "en",
       "wordpress": {
         "url": "https://kfinance365.com",
@@ -196,12 +212,15 @@
         "tone": "Numerate, neutral and risk-aware",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 7,
       "site_key": "medicaltour",
+      "source_site_id": "wp_medicaltour",
       "language": "en",
       "wordpress": {
         "url": "https://koreamedicaltour.com",
@@ -228,12 +247,15 @@
         "tone": "Cautious, practical and non-diagnostic",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 8,
       "site_key": "kvisa365",
+      "source_site_id": "wp_kvisa365",
       "language": "en",
       "wordpress": {
         "url": "https://k-visa365.com",
@@ -260,12 +282,15 @@
         "tone": "Cautious, source-led and procedural",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 9,
       "site_key": "koreanews",
+      "source_site_id": "wp_koreanews",
       "language": "ko",
       "wordpress": {
         "url": "https://koreanews365.com",
@@ -273,9 +298,9 @@
         "persona": "독립 종합 인터넷신문 편집국",
         "tone": "검증과 맥락을 우선하는 절제된 신문 기사체",
         "theme": "한국 뉴스·시사",
-        "min_chars": 1500,
-        "target_chars": 1750,
-        "max_chars": 2000,
+        "min_chars": 700,
+        "target_chars": 1100,
+        "max_chars": 1500,
         "content_type": "news_ko",
         "editorial_funnel": {}
       },
@@ -290,14 +315,17 @@
         "editorial_funnel": {},
         "persona": "독립 종합 인터넷신문 편집국",
         "tone": "검증과 맥락을 우선하는 절제된 신문 기사체",
-        "min_chars": 1050,
+        "min_chars": 1000,
         "target_chars": 1300,
-        "max_chars": 1600
+        "max_chars": 1600,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 10,
       "site_key": "kinvest365",
+      "source_site_id": "wp_kinvest365",
       "language": "en",
       "wordpress": {
         "url": "https://koreainvest365.com",
@@ -324,12 +352,15 @@
         "tone": "Data-led, balanced and risk-aware",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 11,
       "site_key": "oliveyoung",
+      "source_site_id": "wp_oliveyoung",
       "language": "en",
       "wordpress": {
         "url": "https://oliveyoungkorea.com",
@@ -356,12 +387,15 @@
         "tone": "Ingredient-aware, balanced and non-promotional",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 12,
       "site_key": "kcrypto365",
+      "source_site_id": "wp_kcrypto365",
       "language": "en",
       "wordpress": {
         "url": "https://koreacrypto365.com",
@@ -388,12 +422,15 @@
         "tone": "Regulation-led, neutral and risk-conscious",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 13,
       "site_key": "jobinkorea",
+      "source_site_id": "wp_jobinkorea",
       "language": "en",
       "wordpress": {
         "url": "https://jobinkorea365.com",
@@ -420,12 +457,15 @@
         "tone": "Concrete, encouraging and workplace-aware",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 14,
       "site_key": "koreawedding",
+      "source_site_id": "wp_koreawedding",
       "language": "en",
       "wordpress": {
         "url": "https://koreawedding365.com",
@@ -482,12 +522,15 @@
         "tone": "Warm, respectful, safety-aware, practical, inclusive and culturally sensitive",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 15,
       "site_key": "seouljournal",
+      "source_site_id": "wp_seouljournal",
       "language": "en",
       "wordpress": {
         "url": "https://theseouljournal.com",
@@ -495,9 +538,9 @@
         "persona": "Independent English-language Korea newsroom",
         "tone": "Verified, contextual and restrained newspaper prose",
         "theme": "English-language Korea news and analysis",
-        "min_chars": 1500,
-        "target_chars": 1750,
-        "max_chars": 2000,
+        "min_chars": 700,
+        "target_chars": 1100,
+        "max_chars": 1500,
         "content_type": "news_en",
         "editorial_funnel": {}
       },
@@ -512,14 +555,17 @@
         "editorial_funnel": {},
         "persona": "Independent English-language Korea newsroom",
         "tone": "Verified, contextual and restrained newspaper prose",
-        "min_chars": 1050,
+        "min_chars": 1000,
         "target_chars": 1300,
-        "max_chars": 1600
+        "max_chars": 1600,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 16,
       "site_key": "ktech365",
+      "source_site_id": "wp_ktech365",
       "language": "en",
       "wordpress": {
         "url": "https://ktech365.com",
@@ -546,12 +592,15 @@
         "tone": "Technical, accessible and evidence-led",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 17,
       "site_key": "kieca",
+      "source_site_id": "wp_kieca",
       "language": "ko",
       "wordpress": {
         "url": "https://kieca-korea.org",
@@ -578,12 +627,15 @@
         "tone": "공식적이고 교육적인 안내체",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 18,
       "site_key": "kikorea",
+      "source_site_id": "wp_kikorea",
       "language": "en",
       "wordpress": {
         "url": "https://ki-korea.com",
@@ -610,12 +662,15 @@
         "tone": "Formal, institutional and source-led",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 19,
       "site_key": "ksa",
+      "source_site_id": "wp_ksa",
       "language": "ko",
       "wordpress": {
         "url": "https://ksa-korea.org",
@@ -642,12 +697,15 @@
         "tone": "친절하고 절차 중심적인 설명체",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 20,
       "site_key": "koreataxlaw",
+      "source_site_id": "wp_koreataxlaw",
       "language": "en",
       "wordpress": {
         "url": "https://koreataxnlaw.com",
@@ -674,12 +732,15 @@
         "tone": "Formal, qualified and source-specific",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 21,
       "site_key": "jobglobal",
+      "source_site_id": "wp_jobglobal",
       "language": "en",
       "wordpress": {
         "url": "https://jobkoreaglobal.com",
@@ -706,12 +767,15 @@
         "tone": "Professional, inclusive and compliance-aware",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 22,
       "site_key": "studyinkorea",
+      "source_site_id": "wp_studyinkorea",
       "language": "en",
       "wordpress": {
         "url": "https://studyinkorea365.com",
@@ -738,12 +802,15 @@
         "tone": "Supportive, realistic and budget-aware",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 23,
       "site_key": "korea365",
+      "source_site_id": "wp_korea365",
       "language": "en",
       "wordpress": {
         "url": "https://korea365.org",
@@ -814,12 +881,15 @@
         "tone": "Practical, welcoming, locally grounded, source-led and conversion-aware without pressure",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 24,
       "site_key": "sis",
+      "source_site_id": "wp_sis",
       "language": "en",
       "wordpress": {
         "url": "https://sis-korea.com",
@@ -846,12 +916,15 @@
         "tone": "Welcoming, credible, action-oriented and student-friendly",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 25,
       "site_key": "krealestate",
+      "source_site_id": "wp_krealestate",
       "language": "en",
       "wordpress": {
         "url": "https://krealestate365.com",
@@ -878,12 +951,15 @@
         "tone": "Analytical, locality-specific and cautious",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 26,
       "site_key": "khealth365",
+      "source_site_id": "wp_khealth365",
       "language": "ko",
       "wordpress": {
         "url": "https://k-health365.com",
@@ -910,12 +986,15 @@
         "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
       }
     },
     {
       "order": 27,
       "site_key": "kskin365",
+      "source_site_id": "wp_kskin365",
       "language": "en",
       "wordpress": {
         "url": "https://kskin365.com",
@@ -931,7 +1010,7 @@
       },
       "blogspot": {
         "url": "https://kskin365.blogspot.com",
-        "status": "CREATED",
+        "status": "EXISTING",
         "destination_id": "7354545101201355815",
         "ready_for_automation": true,
         "description": "A friendly guide to Korean skincare - ingredient explainers, routine tips, and honest product insights for healthier, happier skin.",
@@ -942,7 +1021,237 @@
         "tone": "Evidence-led, ingredient-first and cautious",
         "min_chars": 1260,
         "target_chars": 1680,
-        "max_chars": 2304
+        "max_chars": 2304,
+        "text_model": "",
+        "image_models": []
+      }
+    },
+    {
+      "order": 28,
+      "site_key": "kwellness_lab",
+      "source_site_id": "wp_khealth365",
+      "language": "ko",
+      "wordpress": {
+        "url": "https://k-health365.com",
+        "secret_name": "KHEALTH365COM",
+        "persona": "건강정보 편집국",
+        "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
+        "theme": "건강과 의학",
+        "min_chars": 1800,
+        "target_chars": 2400,
+        "max_chars": 3200,
+        "content_type": "blog",
+        "editorial_funnel": {}
+      },
+      "blogspot": {
+        "url": "https://glow.k-health365.com",
+        "status": "EXISTING",
+        "destination_id": "4456888951628869767",
+        "ready_for_automation": true,
+        "description": "Evidence-led Korean wellness and beauty guidance.",
+        "search_description": "K-wellness and K-beauty guidance covering healthy routines, ingredients and practical care.",
+        "notes": "",
+        "editorial_funnel": {},
+        "persona": "건강정보 편집국",
+        "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
+        "min_chars": 1260,
+        "target_chars": 1680,
+        "max_chars": 2304,
+        "text_model": "gpt-5-mini",
+        "image_models": [
+          "bytedance/sdxl-lightning-4step",
+          "black-forest-labs/flux-schnell"
+        ]
+      }
+    },
+    {
+      "order": 29,
+      "site_key": "kmedical_job_center",
+      "source_site_id": "wp_khealth365",
+      "language": "ko",
+      "wordpress": {
+        "url": "https://k-health365.com",
+        "secret_name": "KHEALTH365COM",
+        "persona": "건강정보 편집국",
+        "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
+        "theme": "건강과 의학",
+        "min_chars": 1800,
+        "target_chars": 2400,
+        "max_chars": 3200,
+        "content_type": "blog",
+        "editorial_funnel": {}
+      },
+      "blogspot": {
+        "url": "https://k-health365-edu.blogspot.com",
+        "status": "EXISTING",
+        "destination_id": "3205814823967421343",
+        "ready_for_automation": true,
+        "description": "한국 의료직업과 자격증을 준비하는 실무 안내서입니다.",
+        "search_description": "한국 의료직업과 자격증의 요건, 준비 과정과 진로 정보를 정확하게 안내합니다.",
+        "notes": "",
+        "editorial_funnel": {},
+        "persona": "건강정보 편집국",
+        "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체",
+        "min_chars": 1260,
+        "target_chars": 1680,
+        "max_chars": 2304,
+        "text_model": "gpt-5-mini",
+        "image_models": [
+          "bytedance/sdxl-lightning-4step",
+          "black-forest-labs/flux-schnell"
+        ]
+      }
+    },
+    {
+      "order": 30,
+      "site_key": "korea_life_support365",
+      "source_site_id": "wp_koreanews",
+      "language": "ko",
+      "wordpress": {
+        "url": "https://koreanews365.com",
+        "secret_name": "KOREANEWS365COM",
+        "persona": "독립 종합 인터넷신문 편집국",
+        "tone": "검증과 맥락을 우선하는 절제된 신문 기사체",
+        "theme": "정부지원금·보조금·혜택",
+        "min_chars": 700,
+        "target_chars": 1100,
+        "max_chars": 1500,
+        "content_type": "news_ko",
+        "editorial_funnel": {}
+      },
+      "blogspot": {
+        "url": "https://korea-life-support365.blogspot.com",
+        "status": "EXISTING",
+        "destination_id": "2531035487222435079",
+        "ready_for_automation": true,
+        "description": "정부지원금, 보조금과 생활 혜택을 공식 출처 중심으로 정리합니다.",
+        "search_description": "정부지원금, 보조금과 생활 혜택의 대상, 신청기간과 방법을 공식자료로 안내합니다.",
+        "notes": "",
+        "editorial_funnel": {},
+        "persona": "독립 종합 인터넷신문 편집국",
+        "tone": "검증과 맥락을 우선하는 절제된 신문 기사체",
+        "min_chars": 1000,
+        "target_chars": 1300,
+        "max_chars": 1600,
+        "text_model": "gpt-5-mini",
+        "image_models": [
+          "bytedance/sdxl-lightning-4step",
+          "black-forest-labs/flux-schnell"
+        ]
+      }
+    },
+    {
+      "order": 31,
+      "site_key": "koreamedicaltour1",
+      "source_site_id": "wp_medicaltour",
+      "language": "en",
+      "wordpress": {
+        "url": "https://koreamedicaltour.com",
+        "secret_name": "KOREAMEDICALTOURCOM",
+        "persona": "Medical tourism information editor",
+        "tone": "Cautious, practical and non-diagnostic",
+        "theme": "Korea Medical Tourism",
+        "min_chars": 1800,
+        "target_chars": 2400,
+        "max_chars": 3200,
+        "content_type": "blog",
+        "editorial_funnel": {}
+      },
+      "blogspot": {
+        "url": "https://koreamedicaltour1.blogspot.com",
+        "status": "EXISTING",
+        "destination_id": "2234527810530371008",
+        "ready_for_automation": true,
+        "description": "Practical, non-diagnostic guidance for planning medical travel to Korea.",
+        "search_description": "Plan medical travel to Korea with practical guidance on providers, costs, logistics and recovery.",
+        "notes": "",
+        "editorial_funnel": {},
+        "persona": "Medical tourism information editor",
+        "tone": "Cautious, practical and non-diagnostic",
+        "min_chars": 1260,
+        "target_chars": 1680,
+        "max_chars": 2304,
+        "text_model": "gpt-5-mini",
+        "image_models": [
+          "bytedance/sdxl-lightning-4step",
+          "black-forest-labs/flux-schnell"
+        ]
+      }
+    },
+    {
+      "order": 32,
+      "site_key": "kworld365_kpop",
+      "source_site_id": "wp_kworld365",
+      "language": "en",
+      "wordpress": {
+        "url": "https://kworld365.com",
+        "secret_name": "KWORLD365COM",
+        "persona": "K-pop industry editor",
+        "tone": "Current, factual and fan-accessible",
+        "theme": "K-POP",
+        "min_chars": 1800,
+        "target_chars": 2400,
+        "max_chars": 3200,
+        "content_type": "blog",
+        "editorial_funnel": {}
+      },
+      "blogspot": {
+        "url": "https://kworld365.blogspot.com",
+        "status": "EXISTING",
+        "destination_id": "3683978748331752523",
+        "ready_for_automation": true,
+        "description": "A dedicated K-pop news, music and fandom guide distinct from KWorld365 Seoul.",
+        "search_description": "Dedicated K-pop coverage with factual artist, music, performance and fandom guides.",
+        "notes": "",
+        "editorial_funnel": {},
+        "persona": "K-pop industry editor",
+        "tone": "Current, factual and fan-accessible",
+        "min_chars": 1260,
+        "target_chars": 1680,
+        "max_chars": 2304,
+        "text_model": "gpt-5-mini",
+        "image_models": [
+          "bytedance/sdxl-lightning-4step",
+          "black-forest-labs/flux-schnell"
+        ]
+      }
+    },
+    {
+      "order": 33,
+      "site_key": "seoul_intl_school_guide",
+      "source_site_id": "wp_sis",
+      "language": "en",
+      "wordpress": {
+        "url": "https://sis-korea.com",
+        "secret_name": "SISKOREACOM",
+        "persona": "SIS Vietnam campus international admissions and TOPIK program editor",
+        "tone": "Welcoming, credible, action-oriented and student-friendly",
+        "theme": "TOPIK, online Korean classes and study pathways to Korea",
+        "min_chars": 1800,
+        "target_chars": 2400,
+        "max_chars": 3200,
+        "content_type": "blog",
+        "editorial_funnel": {}
+      },
+      "blogspot": {
+        "url": "https://seoulintlschoolguide.blogspot.com",
+        "status": "EXISTING",
+        "destination_id": "8077962392257357260",
+        "ready_for_automation": true,
+        "description": "Practical guidance on international schools and international education in Seoul.",
+        "search_description": "Compare Seoul international schools, admissions pathways and international education choices.",
+        "notes": "",
+        "editorial_funnel": {},
+        "persona": "SIS Vietnam campus international admissions and TOPIK program editor",
+        "tone": "Welcoming, credible, action-oriented and student-friendly",
+        "min_chars": 1260,
+        "target_chars": 1680,
+        "max_chars": 2304,
+        "text_model": "gpt-5-mini",
+        "image_models": [
+          "bytedance/sdxl-lightning-4step",
+          "black-forest-labs/flux-schnell"
+        ]
       }
     }
   ]

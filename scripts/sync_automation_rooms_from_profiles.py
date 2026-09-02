@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize all 27 Blogger execution rooms from the canonical profile map."""
+"""Synchronize all 33 Blogger execution rooms from the canonical profile map."""
 from __future__ import annotations
 
 import json
@@ -37,6 +37,12 @@ ROOM_TO_KEY = {
     "blogger_korea365": "korea365",
     "blogger_koreanews365": "koreanews",
     "blogger_theseouljournal": "seouljournal",
+    "blogger_kwellness_lab": "kwellness_lab",
+    "blogger_kmedical_job_center": "kmedical_job_center",
+    "blogger_korea_life_support365": "korea_life_support365",
+    "blogger_koreamedicaltour1": "koreamedicaltour1",
+    "blogger_kworld365_kpop": "kworld365_kpop",
+    "blogger_seoul_intl_school_guide": "seoul_intl_school_guide",
 }
 
 
@@ -52,15 +58,15 @@ def main() -> int:
         profile = by_key.get(site_key or "")
         if not profile or not profile["blogspot"].get("ready_for_automation"):
             raise SystemExit(f"Cannot ready {room.get('room_id')}: canonical Blogger mapping missing")
-        room["source_id"] = f"wp_{site_key}"
+        room["source_id"] = profile.get("source_site_id") or f"wp_{site_key}"
         room["destination_id"] = profile["blogspot"]["destination_id"]
         room["enabled"] = True
         room["status"] = "READY"
         room["publish_policy"] = "draft"
         room["duplicate_guard"] = True
         updated += 1
-    if updated != 27:
-        raise SystemExit(f"Expected 27 Blogger rooms, updated {updated}")
+    if updated != 33:
+        raise SystemExit(f"Expected 33 Blogger rooms, updated {updated}")
     ROOMS_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"ok": True, "blogger_rooms_ready": updated}, ensure_ascii=False))
     return 0

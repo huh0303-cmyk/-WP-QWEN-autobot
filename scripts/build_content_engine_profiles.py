@@ -35,7 +35,8 @@ def main() -> int:
         blogspot_ready = channel["status"] in {"EXISTING", "CREATED"} and bool(channel.get("destination_id"))
         profiles.append({
             "order": channel["order"],
-            "site_key": wp_site["site_id"].removeprefix("wp_"),
+            "site_key": channel.get("site_key") or wp_site["site_id"].removeprefix("wp_"),
+            "source_site_id": wp_site["site_id"],
             "language": wp_site["language"],
             "wordpress": {
                 "url": wp_site["url"],
@@ -68,13 +69,15 @@ def main() -> int:
                 "min_chars": max(1000, round(wp_site.get("min_chars", 1800) * 0.7)),
                 "target_chars": max(1300, round(wp_site.get("target_chars", 2400) * 0.7)),
                 "max_chars": max(1600, round(wp_site.get("max_chars", 3200) * 0.72)),
+                "text_model": channel.get("text_model", ""),
+                "image_models": channel.get("image_models", []),
             },
         })
 
     output = {
         "generated_from": ["config/automation_hub_sites.json", "config/blogger_portfolio.json"],
         "count": len(profiles),
-        "wordpress_ready_count": len(profiles),
+        "wordpress_ready_count": len(wp_sites),
         "blogspot_ready_count": sum(1 for p in profiles if p["blogspot"]["ready_for_automation"]),
         "profiles": profiles,
     }

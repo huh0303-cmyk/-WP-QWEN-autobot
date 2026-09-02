@@ -129,6 +129,8 @@ def main() -> int:
             json={"ref": "main", "inputs": {"source_wp_url": exact_source, "blogger_site_id": site_id,
                   "language": site.get("language", "en"), "persona": site.get("persona", "helpful specialist editor"),
                   "tone": site.get("tone", "practical and clear"), "target_chars": str(site.get("target_chars", 2400)),
+                  "text_model": site.get("keyword_rules", {}).get("text_provider", ""),
+                  "image_models": ",".join(site.get("keyword_rules", {}).get("image_models", [])),
                   "publish_now": "false"}}, timeout=20)
         print(f"Dispatch {site_id}: HTTP {response.status_code}")
         if response.status_code not in (200, 201, 204):
