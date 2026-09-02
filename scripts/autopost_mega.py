@@ -3396,16 +3396,14 @@ def process_one(site, keyword):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
-        # 2026-08-29 GitHub-pinned order:
-        # 1) Nano Banana only when free-tier use is explicitly confirmed.
-        # 2) Replicate: FLUX Schnell -> SDXL Lightning 4-step -> SDXL Turbo.
-        # 3) If all fail, no other image fallback.
-        images = get_fallback_nanobanana_image(url, site["pw"], keyword, theme, lang)
+        # 2026-09-02 GitHub-pinned blog order:
+        # 1) SDXL Lightning 4-step.
+        # 2) FLUX Schnell once if SDXL fails.
+        # 3) If both fail, continue without an image.
+        img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
+        images = [img_url] if img_url else []
         if not images:
-            img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
-            images = [img_url] if img_url else []
-        if not images:
-            print("  🚫 Nano Banana + approved Replicate chain failed → 이미지 없이 발행")
+            print("  ℹ️ SDXL Lightning + FLUX Schnell failed → 이미지 없이 발행")
     print(f"  🖼  이미지 {len(images)}장")
 
     score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)

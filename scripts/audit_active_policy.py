@@ -96,9 +96,8 @@ def main() -> None:
 
     provider = (ROOT / "scripts" / "replicate_image_provider.py").read_text(encoding="utf-8")
     approved_models = (
-        "black-forest-labs/flux-schnell",
         "bytedance/sdxl-lightning-4step",
-        "jyoung105/sdxl-turbo",
+        "black-forest-labs/flux-schnell",
     )
     for model in approved_models:
         if model not in provider:

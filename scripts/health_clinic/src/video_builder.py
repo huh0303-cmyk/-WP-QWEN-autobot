@@ -2,7 +2,7 @@
 
 The previous Gemini + Pexels/Pixabay implementation is preserved in
 video_builder_legacy.py. This active module allows one generated source image per video,
-using only the approved Replicate three-model gateway. The mature ffmpeg/TTS/subtitle
+using the approved Replicate gateway. The mature ffmpeg/TTS/subtitle
 assembly logic remains unchanged through the legacy implementation.
 """
 from __future__ import annotations

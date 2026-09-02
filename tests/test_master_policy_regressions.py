@@ -77,7 +77,8 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertIn("publish_now = False", source)
         self.assertIn('error_code="NO_NEW_SOURCE"', source)
         self.assertIn('error_code="SOURCE_FETCH"', source)
-        self.assertIn('error_code="IMAGE_GENERATION"', source)
+        self.assertIn('"image_pass": True', source)
+        self.assertIn("pass_no_image", source)
         self.assertNotIn("BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}", workflow)
         self.assertIn('BLOGGER_PUBLISH_NOW: "false"', workflow)
 

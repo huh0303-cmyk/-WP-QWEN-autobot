@@ -294,16 +294,11 @@ def generate_draft(job: dict) -> dict:
             draft["error"] = f"Consensus rewrite failed: {exc}"
             draft["rewrite_errors"] = rewrite_errors
             return draft
-    # Nano Banana is attempted only when its free tier is explicitly enabled
-    # by the shared policy. Current official API tier is not free, so the
-    # workflow skips it and enters the approved Replicate chain below.
     draft["image_url"] = generate_image_url(draft["image_prompt"], theme=draft["category"])
     draft["image_alt"] = f"{str(draft['image_prompt']).strip()} 관련 장면"
-    draft["first_image_priority"] = True
-    draft["image_policy"] = "free_nano_then_flux_schnell_then_sdxl_lightning_then_sdxl_turbo_or_quality_fail"
-    if not draft["image_url"]:
-        draft["status"] = "IMAGE_FAILED"
-        draft["error"] = "Approved image chain failed; Tistory draft registration is blocked"
+    draft["first_image_priority"] = bool(draft["image_url"])
+    draft["image_policy"] = "sdxl_lightning_then_flux_schnell_then_pass_without_image"
+    draft["image_status"] = "generated" if draft["image_url"] else "pass_no_image"
     return draft
 
 

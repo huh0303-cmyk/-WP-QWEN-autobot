@@ -4,7 +4,7 @@
 
 Cost policy: one image per channel per manual refresh. The active youtube_playlist_maker
 policy module has already replaced legacy Gemini/OpenAI/Pexels/Pixabay image calls with
-Replicate's approved 3-model chain.
+the approved image gateway.
 """
 import os
 import sys

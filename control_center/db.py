@@ -54,7 +54,7 @@ class Store:
                     site_id TEXT NOT NULL,
                     keyword TEXT NOT NULL,
                     text_model TEXT NOT NULL DEFAULT 'gemini-2.5-flash',
-                    image_model TEXT NOT NULL DEFAULT 'black-forest-labs/flux-schnell',
+                    image_model TEXT NOT NULL DEFAULT 'bytedance/sdxl-lightning-4step',
                     state TEXT NOT NULL,
                     title TEXT NOT NULL DEFAULT '',
                     meta_description TEXT NOT NULL DEFAULT '',
@@ -85,9 +85,9 @@ class Store:
             if "text_model" not in columns:
                 con.execute("ALTER TABLE jobs ADD COLUMN text_model TEXT NOT NULL DEFAULT 'gemini-2.5-flash'")
             if "image_model" not in columns:
-                con.execute("ALTER TABLE jobs ADD COLUMN image_model TEXT NOT NULL DEFAULT 'black-forest-labs/flux-schnell'")
+                con.execute("ALTER TABLE jobs ADD COLUMN image_model TEXT NOT NULL DEFAULT 'bytedance/sdxl-lightning-4step'")
 
-    def create_job(self, *, site_id: str, keyword: str, text_model: str = "gemini-2.5-flash", image_model: str = "black-forest-labs/flux-schnell") -> dict[str, Any]:
+    def create_job(self, *, site_id: str, keyword: str, text_model: str = "gemini-2.5-flash", image_model: str = "bytedance/sdxl-lightning-4step") -> dict[str, Any]:
         normalized = " ".join(keyword.lower().split())
         key = f"wordpress:{site_id}:{normalized}:{text_model}:{image_model}:v2"
         stamp = now_iso()

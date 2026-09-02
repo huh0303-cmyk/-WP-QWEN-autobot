@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 """Single approved image-generation gateway for the automation repository.
 
-HARD POLICY (2026-08-27):
-- Free-confirmed Nano Banana is attempted once before Replicate.
-- Only the three models in ALLOWED_MODELS may be called.
+HARD POLICY (2026-09-02):
+- SDXL Lightning 4-step is attempted first.
+- FLUX Schnell is attempted once only when SDXL Lightning fails.
+- Only the two models in ALLOWED_MODELS may be called.
 - One shared secret: REPLICATE_API_TOKEN.
 - At most one output image per content item and one attempt per model.
 - No stock-photo, OpenAI image, Gemini image, Stability API, or other fallback.
@@ -22,11 +23,11 @@ import requests
 
 REPLICATE_API = "https://api.replicate.com/v1"
 
-PRIMARY_MODEL = "black-forest-labs/flux-schnell"
+PRIMARY_MODEL = "bytedance/sdxl-lightning-4step"
+SECONDARY_MODEL = "black-forest-labs/flux-schnell"
 ALLOWED_MODELS = (
     PRIMARY_MODEL,
-    "bytedance/sdxl-lightning-4step",
-    "jyoung105/sdxl-turbo",
+    SECONDARY_MODEL,
 )
 
 # Cost guardrails. Deliberately hard-clamped; env vars cannot raise these limits.
@@ -90,7 +91,7 @@ def _latest_version_id(model: str, token: str) -> Optional[str]:
 
 def _input_for(model: str, prompt: str) -> dict:
     # Force exactly one output on every approved model.
-    if model == PRIMARY_MODEL:
+    if model == SECONDARY_MODEL:
         return {
             "prompt": prompt,
             "num_outputs": 1,
@@ -98,7 +99,7 @@ def _input_for(model: str, prompt: str) -> dict:
             "output_format": "webp",
             "output_quality": 82,
         }
-    if model == "bytedance/sdxl-lightning-4step":
+    if model == PRIMARY_MODEL:
         return {
             "prompt": prompt,
             "width": 1024,
@@ -108,15 +109,7 @@ def _input_for(model: str, prompt: str) -> dict:
             "guidance_scale": 0,
             "negative_prompt": "text, logo, watermark, low quality, distorted",
         }
-    return {
-        "prompt": prompt,
-        "negative_prompt": "text, logo, watermark, low quality, distorted",
-        "width": 1024,
-        "height": 576,
-        "num_images": 1,
-        "steps": 1,
-        "guidance_scale": 0,
-    }
+    raise RuntimeError(f"blocked image model: {model}")
 
 
 def _create_prediction(model: str, prompt: str, token: str) -> dict:
@@ -124,7 +117,7 @@ def _create_prediction(model: str, prompt: str, token: str) -> dict:
         raise RuntimeError(f"blocked image model: {model}")
 
     payload = {"input": _input_for(model, prompt)}
-    if model == PRIMARY_MODEL:
+    if model == SECONDARY_MODEL:
         owner, name = model.split("/", 1)
         endpoint = f"{REPLICATE_API}/models/{owner}/{name}/predictions"
     else:
@@ -178,30 +171,6 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
     )
 
 
-def _free_nano_banana_data_url(prompt: str) -> Optional[str]:
-    """One free-only attempt. Never runs unless the free-tier flag is explicit."""
-    if os.getenv("NANO_BANANA_FREE_TIER_ENABLED", "false").strip().lower() != "true":
-        print("  ℹ️ Nano Banana free use is not confirmed — skipped")
-        return None
-    key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not key:
-        return None
-    try:
-        response = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={key}",
-            json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=90,
-        )
-        response.raise_for_status()
-        for part in response.json().get("candidates", [{}])[0].get("content", {}).get("parts", []):
-            inline = part.get("inlineData") or part.get("inline_data") or {}
-            if inline.get("data"):
-                mime = inline.get("mimeType") or inline.get("mime_type") or "image/png"
-                return f"data:{mime};base64,{inline['data']}"
-    except Exception as exc:
-        print(f"  ⚠️ free Nano Banana failed: {exc}")
-    return None
-
-
 def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
     """Generate at most one image using only the approved Replicate model chain."""
     token = _token()
@@ -216,11 +185,6 @@ def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
     if cache_key in _attempted_prompts:
         return None
     _attempted_prompts.add(cache_key)
-
-    nano_url = _free_nano_banana_data_url(prompt)
-    if nano_url:
-        _prompt_cache[cache_key] = nano_url
-        return nano_url
 
     for attempt_no, model in enumerate(ALLOWED_MODELS, start=1):
         if attempt_no > MAX_MODEL_ATTEMPTS:
@@ -238,7 +202,7 @@ def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
         except Exception as exc:
             print(f"  ⚠️ approved image model error: {model} ({exc})")
 
-    print("  ⛔ All 3 approved Replicate models failed — no legacy image fallback")
+    print("  ℹ️ SDXL Lightning and FLUX Schnell both failed — continue without an image")
     _prompt_cache[cache_key] = None
     return None
 
