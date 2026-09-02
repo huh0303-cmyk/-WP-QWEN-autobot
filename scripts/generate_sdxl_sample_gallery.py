@@ -53,6 +53,36 @@ def first_url(output) -> str:
     return output if isinstance(output, str) else ""
 
 
+def create_with_backoff(token: str, version: str, prompt: str) -> dict:
+    payload = {
+        "version": version,
+        "input": {
+            "prompt": prompt,
+            "negative_prompt": NEGATIVE,
+            "width": 1024,
+            "height": 576,
+            "num_outputs": 1,
+            "num_inference_steps": 4,
+            "guidance_scale": 0,
+        },
+    }
+    for attempt in range(1, 6):
+        response = requests.post(
+            f"{API}/predictions",
+            headers=headers(token, wait=True),
+            json=payload,
+            timeout=65,
+        )
+        if response.status_code != 429:
+            response.raise_for_status()
+            return response.json()
+        delay = attempt * 20
+        print(f"Replicate rate limit; waiting {delay}s before retry {attempt}/5")
+        time.sleep(delay)
+    response.raise_for_status()
+    raise RuntimeError("Replicate rate limit did not clear")
+
+
 def main() -> None:
     token = os.environ["REPLICATE_API_TOKEN"]
     OUT.mkdir(parents=True, exist_ok=True)
@@ -66,25 +96,7 @@ def main() -> None:
 
     manifest = []
     for index, prompt in enumerate(PROMPTS, start=1):
-        response = requests.post(
-            f"{API}/predictions",
-            headers=headers(token, wait=True),
-            json={
-                "version": version,
-                "input": {
-                    "prompt": prompt,
-                    "negative_prompt": NEGATIVE,
-                    "width": 1024,
-                    "height": 576,
-                    "num_outputs": 1,
-                    "num_inference_steps": 4,
-                    "guidance_scale": 0,
-                },
-            },
-            timeout=65,
-        )
-        response.raise_for_status()
-        prediction = wait_for(response.json(), token)
+        prediction = wait_for(create_with_backoff(token, version, prompt), token)
         if prediction.get("status") != "succeeded":
             raise RuntimeError(f"Sample {index} failed: {prediction.get('error')}")
         image_url = first_url(prediction.get("output"))
@@ -103,6 +115,7 @@ def main() -> None:
             }
         )
         print(f"Saved {path}")
+        time.sleep(20)
 
     (OUT / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
