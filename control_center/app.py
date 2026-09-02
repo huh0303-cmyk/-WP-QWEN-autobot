@@ -29,6 +29,22 @@ app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secret
 app.config["CONTROL_CENTER_CSRF"] = os.environ.get("CONTROL_CENTER_CSRF") or secrets.token_urlsafe(24)
 
 
+@app.template_filter("compact_category")
+def compact_category(value: object, limit: int = 22) -> str:
+    """Short dashboard label; the source category remains unchanged."""
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    text = {
+        "international students": "intl students",
+        "international student": "intl student",
+        "Korean language programs": "Korean programs",
+        "cultural adjustment": "culture tips",
+        "government websites": "gov websites",
+        "residence registration": "residence ID",
+        "accommodation": "housing",
+    }.get(text, text)
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
 @app.before_request
 def require_control_center_login():
     """Protect every PWA route when deployment credentials are configured."""
@@ -530,6 +546,7 @@ def get_blogger_data():
         "wp_url": row.get("wp") or row.get("wordpress") or row.get("wp_url", ""),
         "url": row.get("blogspot", ""),
         "status": row.get("status", "UNKNOWN"),
+        "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"}),
         "blog_id": row.get("destination_id", ""),
         "admin_review_url": f"https://www.blogger.com/blog/posts/{row.get('destination_id', '')}" if row.get("destination_id") else "https://www.blogger.com/",
         "category": row.get("topic") or "미분류",
