@@ -766,7 +766,7 @@ def trigger_youtube_batch():
     except (requests.RequestException, RuntimeError) as exc:
         flash(f"YouTube 10채널 실행 요청 실패 · {exc}", "error")
     else:
-        flash("YouTube 10채널 중앙 스케줄러를 시작했습니다. 채널별 최대 1개, 비공개 업로드만 실행합니다.", "success")
+        flash("YouTube 중앙 스케줄러를 시작했습니다. 현재 승인 슬롯이 있으면 전체에서 1개만 비공개 업로드합니다.", "success")
     return redirect(url_for("index") + "#youtube")
 
 @app.route("/")
