@@ -69,7 +69,7 @@ def save(m):
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--site"); ap.add_argument("--max-per-site",type=int,default=0)
-    ap.add_argument("--sleep",type=float,default=.35); args=ap.parse_args()
+    ap.add_argument("--sleep",type=float,default=.35); ap.add_argument("--refresh-all",action="store_true"); args=ap.parse_args()
     if not GSC_JSON: raise SystemExit("GSC_SERVICE_ACCOUNT_JSON missing")
     tok=token(); props=properties(tok); manifest=load()
     today=dt.datetime.now(dt.timezone.utc)
@@ -77,6 +77,7 @@ def main():
         if args.site and args.site not in site: continue
         prop=property_for(site,props)
         entry=manifest["sites"].setdefault(site,{"lifecycle":lifecycle,"property":prop,"posts":{}})
+        previous_summary=dict(entry.get("summary") or {})
         entry["property"]=prop
         if not prop:
             entry["error"]="gsc_property_not_accessible"; save(manifest); continue
@@ -84,9 +85,12 @@ def main():
         except Exception as e:
             entry["error"]=f"wp_inventory_failed: {e}"; save(manifest); continue
         if args.max_per_site: items=items[:args.max_per_site]
+        active_ids={str(p["id"]) for p in items}
+        for stale_id in set(entry["posts"]) - active_ids:
+            entry["posts"].pop(stale_id, None)
         for i,p in enumerate(items,1):
             key=str(p["id"]); old=entry["posts"].get(key,{})
-            if old.get("state") in ("indexed","unindexed"): continue
+            if not args.refresh_all and old.get("state") in ("indexed","unindexed"): continue
             result=inspect(tok,prop,p["link"])
             published=dt.datetime.fromisoformat(p["date_gmt"].replace("Z","+00:00"))
             if published.tzinfo is None:
@@ -99,7 +103,13 @@ def main():
             if i%10==0: save(manifest)
             time.sleep(args.sleep)
         states=[x.get("state") for x in entry["posts"].values()]
-        entry["summary"]={k:states.count(k) for k in ("indexed","unindexed","unknown")}
+        summary={k:states.count(k) for k in ("indexed","unindexed","unknown")}
+        old_indexed=previous_summary.get("indexed")
+        summary["indexed_delta"]=None if old_indexed is None else summary["indexed"]-int(old_indexed)
+        summary["total_published"]=len(entry["posts"])
+        entry["summary"]=summary
+        entry["audited_at"]=dt.datetime.now(dt.timezone.utc).isoformat()
+        entry.pop("error", None)
         save(manifest)
     print(json.dumps({s:v.get("summary",{}) for s,v in manifest["sites"].items()},ensure_ascii=False,indent=2))
 
