@@ -389,6 +389,13 @@ def get_site_data():
             history_sites = json.loads(history_path.read_text(encoding="utf-8")).get("latest", {}).get("site_details", {})
         except (OSError, ValueError):
             history_sites = {}
+    index_audit_sites = {}
+    index_audit_path = root / "index_audit_manifest.json"
+    if index_audit_path.exists():
+        try:
+            index_audit_sites = json.loads(index_audit_path.read_text(encoding="utf-8")).get("sites", {})
+        except (OSError, ValueError):
+            index_audit_sites = {}
     registry_by_domain = {
         site.url.replace("https://", "").replace("http://", "").rstrip("/"): site
         for site in load_wordpress_sites()
@@ -419,8 +426,30 @@ def get_site_data():
         today_visitors = traffic.get("daily_visitors")
         visitor_delta = traffic.get("visitor_delta")
         total_visitors = traffic.get("total_visitors")
-        total_posts = detail.get("total_posts", traffic.get("total_posts"))
-        indexed = detail.get("indexed", traffic.get("indexed"))
+        total_posts = traffic.get("total_posts")
+        if total_posts is None:
+            total_posts = detail.get("total_posts")
+        previous_posts = detail.get("total_posts")
+        posts_delta = (
+            total_posts - previous_posts
+            if total_posts is not None and previous_posts is not None
+            else None
+        )
+        audit_entry = (
+            index_audit_sites.get(f"https://{item['domain']}")
+            or index_audit_sites.get(f"https://{item['domain']}/")
+            or index_audit_sites.get(item["domain"])
+            or {}
+        )
+        audit_summary = audit_entry.get("summary") or {}
+        indexed = audit_summary.get("indexed")
+        indexed_delta = audit_summary.get("indexed_delta")
+        if indexed is not None:
+            index_status = "URL별 Google 정밀 집계"
+        elif audit_entry.get("error") == "gsc_property_not_accessible":
+            index_status = "Search Console 권한 연결 필요"
+        else:
+            index_status = "정밀 집계 중"
         sites.append({
             "site_id": registered.site_id if registered else item["domain"],
             "domain": item["domain"],
@@ -430,9 +459,10 @@ def get_site_data():
             "total_visitors": total_visitors,
             "total_delta": traffic.get("total_delta"),
             "total_posts": total_posts,
-            "posts_delta": None,
+            "posts_delta": posts_delta,
             "indexed": indexed,
-            "indexed_delta": traffic.get("recent_index_increase"),
+            "indexed_delta": indexed_delta,
+            "index_status": index_status,
             "visitor_connected": bool(live_traffic.get("connected")),
             "category": registered.theme if registered else "미분류",
             "cadence": wordpress_cadence(registered),
