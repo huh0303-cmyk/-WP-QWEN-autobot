@@ -247,7 +247,7 @@
                 </div>
                 <div class="rounded-2xl border border-violet-100 bg-violet-50 p-4 text-center">
                     <div class="text-3xl font-black text-violet-600">{{ bloggers|length }}/27</div>
-                    <div class="text-xs font-black text-emerald-600">Blogger API 연결</div>
+                    <div class="text-xs font-black text-violet-700">Blogger 발행 ID 등록</div>
                 </div>
             </div>
             <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
@@ -266,7 +266,7 @@
                             </div>
                             <a class="break-all font-bold text-violet-700 hover:underline" href="{{ blog.url }}" target="_blank" rel="noopener">{{ blog.url|replace('https://', '') }}</a>
                         </div>
-                        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black {% if blog.connected %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}"><span class="h-2 w-2 rounded-full {% if blog.connected %}bg-emerald-500{% else %}bg-red-500{% endif %}"></span>{% if blog.connected %}연결됨{% else %}연결 확인 필요{% endif %}</span>
+                        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black {% if blog.connected %}bg-violet-100 text-violet-700{% else %}bg-red-100 text-red-700{% endif %}" title="방문자·색인 연결 상태가 아니라 Blogger 발행 대상 ID 등록 여부입니다"><span class="h-2 w-2 rounded-full {% if blog.connected %}bg-violet-500{% else %}bg-red-500{% endif %}"></span>{% if blog.connected %}발행 ID 등록{% else %}발행 ID 없음{% endif %}</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 rounded-2xl border border-violet-300 bg-violet-950 p-2 shadow-inner">
                         {% for label, value, delta in [('당일 방문자', blog.today_visitors, blog.today_delta), ('누적 방문자', blog.total_visitors, blog.total_delta), ('총 글 수', blog.total_posts, blog.posts_delta), ('Google 색인', blog.indexed, blog.indexed_delta)] %}
@@ -362,7 +362,7 @@
                             </div>
                             <a class="break-all text-sm font-bold text-teal-800 hover:underline" href="{{ blog.url }}" target="_blank" rel="noopener">{{ blog.url|replace('https://', '') }}</a>
                         </div>
-                        <span class="h-3 w-3 shrink-0 rounded-full {% if blog.feed_connected %}bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,.18)]{% else %}bg-red-500 shadow-[0_0_0_3px_rgba(239,68,68,.18)]{% endif %}" title="RSS {% if blog.feed_connected %}정상{% else %}미연결{% endif %}"></span>
+                        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black {% if blog.feed_connected %}bg-teal-100 text-teal-700{% else %}bg-red-100 text-red-700{% endif %}" title="방문자·Google 색인이 아니라 공개 RSS 피드 연결 상태입니다"><span class="h-2 w-2 rounded-full {% if blog.feed_connected %}bg-teal-500{% else %}bg-red-500{% endif %}"></span>RSS {% if blog.feed_connected %}연결{% else %}미연결{% endif %}</span>
                     </div>
                     <div class="rounded-lg border border-teal-200 bg-teal-100/80 px-3 py-2 text-xs text-teal-950">
                         <span class="font-black">사이트 분야:</span> <span class="font-bold">{{ blog.category or '미분류' }}</span>

@@ -133,6 +133,13 @@ def test_all_wordpress_drafts_require_rankmath_focus_keyword():
     assert "focus keyword is required" in direct_writer
 
 
+def test_connection_badges_do_not_overstate_metrics_connectivity():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "Blogger 발행 ID 등록" in template
+    assert "방문자·색인 연결 상태가 아니라" in template
+    assert "방문자·Google 색인이 아니라 공개 RSS 피드 연결 상태" in template
+
+
 def test_job_creation_is_idempotent():
     with tempfile.TemporaryDirectory() as tmp:
         store = Store(Path(tmp) / "db.sqlite3")
