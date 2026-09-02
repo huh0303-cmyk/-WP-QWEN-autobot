@@ -109,7 +109,11 @@ def process_site(site: str, secret_name: str) -> dict:
 
 
 def main() -> int:
-    results = [process_site(site, secret) for site, secret, _lifecycle in SITES]
+    site_filter = os.getenv("SITE_FILTER", "").strip().rstrip("/").lower()
+    selected = [row for row in SITES if not site_filter or row[0].rstrip("/").lower() == site_filter]
+    if site_filter and not selected:
+        raise SystemExit(f"SITE_FILTER not found: {site_filter}")
+    results = [process_site(site, secret) for site, secret, _lifecycle in selected]
     payload = {"sites": results, "totals": {
         key: sum(int(row[key]) for row in results)
         for key in ("scanned", "already_set", "filled", "failed")
