@@ -107,7 +107,7 @@ def _wp_category_counts(site_url: str) -> list[dict[str, object]]:
         response = requests.get(
             f"{site_url.rstrip('/')}/wp-json/wp/v2/categories",
             params={"per_page": 100, "hide_empty": "false", "orderby": "name", "order": "asc"},
-            timeout=12,
+            timeout=8,
         )
         response.raise_for_status()
         categories = [
@@ -138,7 +138,7 @@ def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, objec
     try:
         response = requests.get(
             f"{site_url.rstrip('/')}/wp-json/site-stats/v1/visitors",
-            timeout=12,
+            timeout=8,
             headers={"User-Agent": "Korea365-Control-Room/1.0"},
         )
         response.raise_for_status()
@@ -167,7 +167,7 @@ def _blogger_label_counts(blog_url: str) -> list[dict[str, object]]:
         response = requests.get(
             f"{blog_url.rstrip('/')}/feeds/posts/default",
             params={"alt": "json", "max-results": 500},
-            timeout=12,
+            timeout=8,
         )
         response.raise_for_status()
         counts: Counter[str] = Counter()
@@ -393,18 +393,20 @@ def get_site_data():
         site.url.replace("https://", "").replace("http://", "").rstrip("/"): site
         for site in load_wordpress_sites()
     }
-    with ThreadPoolExecutor(max_workers=8) as executor:
-        category_results = dict(executor.map(
-            lambda pair: (pair[0], _wp_category_counts(pair[1].url)),
-            registry_by_domain.items(),
-        ))
-        visitor_results = dict(executor.map(
-            lambda pair: (
-                pair[0],
-                _wp_visitor_stats(pair[1].url, int(time.time() // 300)),
-            ),
-            registry_by_domain.items(),
-        ))
+    # Categories and visitor counters are independent public APIs. Fetch them
+    # together so one slow site cannot serialize the entire 27-site dashboard.
+    bucket = int(time.time() // 300)
+    with ThreadPoolExecutor(max_workers=32) as executor:
+        category_futures = {
+            domain: executor.submit(_wp_category_counts, site.url)
+            for domain, site in registry_by_domain.items()
+        }
+        visitor_futures = {
+            domain: executor.submit(_wp_visitor_stats, site.url, bucket)
+            for domain, site in registry_by_domain.items()
+        }
+        category_results = {domain: future.result() for domain, future in category_futures.items()}
+        visitor_results = {domain: future.result() for domain, future in visitor_futures.items()}
     _attach_wp_category_deltas(category_results)
     secret_names = _github_secret_names()
     sites = []
