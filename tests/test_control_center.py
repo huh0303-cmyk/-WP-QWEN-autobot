@@ -83,9 +83,9 @@ def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     assert "YouTube Studio에서 검토·공개" in template
 
 
-def test_blogspot_dashboard_uses_green_connection_and_compact_categories():
+def test_blogspot_dashboard_uses_precise_connection_label_and_compact_categories():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "연결됨" in template
+    assert "발행 ID 등록" in template
     assert "blog.official_categories[:8]" in template
     assert compact_category("international students") == "intl students"
     assert compact_category("A category name that is unnecessarily long", 16).endswith("…")
