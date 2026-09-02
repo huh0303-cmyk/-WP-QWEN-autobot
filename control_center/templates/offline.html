@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}연결 대기 · Korea365 통제실{% endblock %}
+{% block content %}
+<section class="offline-shell">
+  <div class="offline-card">
+    <h1>통제실 연결 대기</h1>
+    <p>운영 데이터와 관리자 링크는 보안을 위해 기기에 저장하지 않습니다. 인터넷 또는 통제실 서버 연결을 확인한 뒤 다시 시도해 주세요.</p>
+    <button type="button" onclick="location.reload()">다시 연결</button>
+  </div>
+</section>
+{% endblock %}

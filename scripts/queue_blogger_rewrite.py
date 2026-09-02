@@ -168,9 +168,18 @@ def main():
     content = rewritten["content_html"]
     image_model = "0"
     image_subject = (rewritten.get("image_queries") or [rewritten["title"]])[0]
+    image_alt = f"{str(image_subject).strip()} 관련 장면"
     image_url = generate_image_url(image_subject, theme=rewritten["title"])
+    if not image_url:
+        _append_failure(
+            service, sheet_id, blogger_site_id,
+            error_code="IMAGE_GENERATION",
+            message="Approved image chain failed; draft was not queued.",
+            source_url=source["link"],
+        )
+        raise RuntimeError("Approved image chain failed; Blogger draft was not queued")
     if image_url:
-        content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(rewritten["title"], quote=True)}" /></p>' + content
+        content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
         image_model = "approved_image_chain"
 
     content_id = stable_content_id(
@@ -181,7 +190,7 @@ def main():
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
-    publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "on"}
+    publish_now = False
     # Re-read immediately before append. Workflow concurrency serializes the
     # normal scheduler path; this second check also blocks a queue/operator race.
     latest = service.spreadsheets().values().get(

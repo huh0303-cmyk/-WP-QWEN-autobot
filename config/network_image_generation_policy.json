@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "scope": ["wordpress_27", "blogger_27", "youtube", "sns"],
+  "scope": ["wordpress_27", "blogger_27", "tistory_5", "youtube", "sns"],
   "provider": "replicate",
   "credential_secret": "REPLICATE_API_TOKEN",
   "enabled_when_provider_credentials_exist": false,

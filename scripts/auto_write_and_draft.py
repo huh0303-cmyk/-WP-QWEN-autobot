@@ -216,7 +216,9 @@ def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: st
     token = _access_token("")
     content = article["content_html"]
     if image_url:
-        content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(article["title"], quote=True)}" /></p>' + content
+        image_subject = (article.get("image_queries") or [keyword])[0]
+        image_alt = f"{str(image_subject).strip()} 관련 장면"
+        content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
     job = PublishJob(
         job_id=f"auto-{site_id}-{abs(hash(keyword))}", site_id=site_id, title=article["title"], content_html=content,
         labels=article.get("labels", []), publish_now=False, source_keyword=keyword,

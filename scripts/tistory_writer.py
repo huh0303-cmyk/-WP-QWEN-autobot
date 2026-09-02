@@ -39,13 +39,13 @@ WRITER_SYSTEM_PROMPT = (
     "Never copy sentences, paragraph order, headings, examples or FAQs from WordPress, Blogspot, or another Tistory site. "
     "Use a platform-specific search intent and newly built outline. "
     "The title is the most important text element: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. "
-    "Never use exclamation marks, '비법', '완벽', '놓치지 마세요', '후회합니다', 'insider tips', 'unlock', 'seamless', or stacked headline formulas. "
-    "Prefer a calm, specific title that names the exact reader task. Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
+    "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
-    "body_html must be simple HTML using real h2/h3 headings, separate p paragraphs, and ul/li lists "
-    "(no inline styles, scripts, or fake heading glyphs such as ■, ▶, •). "
-    "The image_prompt must describe a photorealistic Korean editorial scene with no readable text, letters, numbers, logos, brands, signs, screens, labels, watermarks, or printed documents."
+    "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts). "
+    "Every paragraph must contain no more than two short sentences. Never place bullet symbols "
+    "inside a paragraph; convert enumerations into a real ul/li list. Break long explanations "
+    "into separate p elements so the mobile article has visible breathing room."
 )
 
 AUDIT_SYSTEM_PROMPT = (
@@ -83,16 +83,6 @@ def build_writer_prompt(job: dict) -> str:
             "the exact current figure, tell the reader to check the official "
             "source instead of inventing a number."
         )
-        sources = job.get("official_sources") or []
-        if sources:
-            lines.append(
-                "Use at least two of these official references as named clickable links in the body, "
-                "and do not invent any other URL: " + "; ".join(sources)
-            )
-    lines.append(
-        "Write practical steps, a short checklist, and limits/exceptions. Avoid promotional conclusions, "
-        "unsupported statistics, guaranteed outcomes, and repetitive filler."
-    )
     lines.append("Write the article now as the JSON object described above.")
     return "\n".join(lines)
 
@@ -122,20 +112,16 @@ def structural_check(draft: dict) -> list[str]:
         issues.append("title is empty")
     if len(plain) < MIN_BODY_CHARS:
         issues.append(f"body length {len(plain)} is below the {MIN_BODY_CHARS}-character floor")
-    heading_count = len(re.findall(r"(?is)<h[23][\s>]", body))
-    paragraph_count = len(re.findall(r"(?is)<p[\s>]", body))
-    list_item_count = len(re.findall(r"(?is)<li[\s>]", body))
-    if heading_count < 2:
-        issues.append(f"body has only {heading_count} real h2/h3 headings; at least 2 are required")
-    if paragraph_count < 4:
-        issues.append(f"body has only {paragraph_count} real paragraphs; at least 4 are required")
-    if list_item_count < 3:
-        issues.append(f"body has only {list_item_count} real list items; at least 3 are required")
-    if re.search(r"(?:^|[>\s])[■▶](?:\s|$)", body):
-        issues.append("body uses fake heading glyphs instead of HTML headings")
-    longest_text_block = max((len(re.sub(r"<[^>]+>", "", block).strip()) for block in re.findall(r"(?is)<p[^>]*>.*?</p>", body)), default=0)
-    if longest_text_block > 650:
-        issues.append(f"a paragraph is {longest_text_block} characters long; split it for mobile readability")
+    if not re.search(r"(?is)<h[23][\s>]", body):
+        issues.append("body has no h2/h3 headings")
+    paragraph_texts = [
+        re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", value)).strip()
+        for value in re.findall(r"(?is)<p(?:\s[^>]*)?>(.*?)</p>", body)
+    ]
+    if any(len(value) > 320 for value in paragraph_texts):
+        issues.append("body contains a paragraph longer than 320 characters")
+    if re.search(r"(?is)<p(?:\s[^>]*)?>[^<]*(?:▶|■|●|◆|▪|•)[^<]*</p>", body):
+        issues.append("bullet-like text must be converted to a real ul/li list")
     return issues
 
 
@@ -249,96 +235,21 @@ def generate_draft(job: dict) -> dict:
         title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
         keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
     )
-    draft["three_model_consensus_initial"] = consensus
-    if consensus.get("ok") is not True and openai_available():
-        issue_lines = []
-        for model, result in consensus.get("checks", {}).items():
-            for issue in result.get("issues", []):
-                issue_lines.append(f"- {model}: {issue}")
-        rewrite_prompt = (
-            WRITER_SYSTEM_PROMPT + "\n\nRewrite the draft so every audit issue is genuinely fixed. "
-            "Keep the allowed category, remove hype and unsupported claims, add concrete official-source links "
-            "from the supplied list, and make the tone sound like a careful human editor. Do not merely add disclaimers.\n"
-            f"Allowed category: {draft['category']}\nOfficial sources: {job.get('official_sources', [])}\n"
-            f"Seed topic: {job['seed_topic']}\nAudit issues:\n" + "\n".join(issue_lines) +
-            "\nCurrent draft:\n" + json.dumps({
-                "title": draft["title"], "category": draft["category"],
-                "meta_description": draft["meta_description"],
-                "image_prompt": draft["image_prompt"], "body_html": draft["body_html"],
-            }, ensure_ascii=False)
-        )
-        try:
-            revised = _parse_json_response(openai_generate_text(rewrite_prompt, temperature=0.25, max_retries=2))
-            revised["category"] = draft["category"]
-            draft.update({
-                "title": revised.get("title", draft["title"]),
-                "body_html": revised.get("body_html", draft["body_html"]),
-                "meta_description": revised.get("meta_description", draft["meta_description"]),
-                "image_prompt": revised.get("image_prompt", draft["image_prompt"]),
-                "engine": draft["engine"] + "+gpt_consensus_rewrite",
-            })
-            score, issues = quality_score(draft, job)
-            draft["quality_score"], draft["quality_issues"] = score, issues
-            if score >= MIN_QUALITY_SCORE and not issues:
-                consensus = three_model_consensus(
-                    title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
-                    keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
-                )
-        except Exception as exc:
-            draft["consensus_rewrite_error"] = str(exc)
-    if consensus.get("ok") is not True and openai_available():
-        issue_lines = []
-        for model, result in consensus.get("checks", {}).items():
-            issue_lines.extend(f"- {model}: {issue}" for issue in result.get("issues", []))
-        final_prompt = (
-            WRITER_SYSTEM_PROMPT + "\n\nThis is the final corrective edit. Fix every remaining audit issue below, "
-            "not just the wording. Replace numbered/list-template headlines with a specific natural title. "
-            "Remove any promise not delivered by the body. Consolidate repetitive cautions. Add one concrete "
-            "worked example or comparison table when useful. Use clickable official links and remove any exact "
-            "time, fare, rate, date, or rule that is not directly supported.\n"
-            f"Allowed category: {draft['category']}\nOfficial sources: {job.get('official_sources', [])}\n"
-            f"Seed topic: {job['seed_topic']}\nRemaining issues:\n" + "\n".join(issue_lines) +
-            "\nDraft to revise:\n" + json.dumps({
-                "title": draft["title"], "category": draft["category"],
-                "meta_description": draft["meta_description"],
-                "image_prompt": draft["image_prompt"], "body_html": draft["body_html"],
-            }, ensure_ascii=False)
-        )
-        try:
-            revised = _parse_json_response(openai_generate_text(final_prompt, temperature=0.15, max_retries=2))
-            draft.update({
-                "title": revised.get("title", draft["title"]),
-                "body_html": revised.get("body_html", draft["body_html"]),
-                "meta_description": revised.get("meta_description", draft["meta_description"]),
-                "image_prompt": revised.get("image_prompt", draft["image_prompt"]),
-                "engine": draft["engine"] + "+gpt_final_edit",
-            })
-            score, issues = quality_score(draft, job)
-            draft["quality_score"], draft["quality_issues"] = score, issues
-            if score >= MIN_QUALITY_SCORE and not issues:
-                consensus = three_model_consensus(
-                    title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
-                    keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
-                )
-        except Exception as exc:
-            draft["consensus_final_edit_error"] = str(exc)
     draft["three_model_consensus"] = consensus
     if consensus.get("ok") is not True:
         draft["status"] = "CONSENSUS_FAILED"
-        draft["error"] = "Gemini, GPT and Claude did not all approve after corrective rewrite"
+        draft["error"] = "Gemini, GPT and Claude did not all approve"
         return draft
     # Nano Banana is attempted only when its free tier is explicitly enabled
     # by the shared policy. Current official API tier is not free, so the
     # workflow skips it and enters the approved Replicate chain below.
-    safe_image_prompt = (
-        f"{draft['image_prompt']}. Photorealistic Korean editorial photography. "
-        "No readable text, no letters, no numbers, no logos, no brands, no signs, "
-        "no screens, no labels, no watermarks, and no printed documents."
-    )
-    draft["image_prompt"] = safe_image_prompt
-    draft["image_url"] = generate_image_url(safe_image_prompt, theme=draft["category"])
+    draft["image_url"] = generate_image_url(draft["image_prompt"], theme=draft["category"])
+    draft["image_alt"] = f"{str(draft['image_prompt']).strip()} 관련 장면"
     draft["first_image_priority"] = True
-    draft["image_policy"] = "free_nano_then_flux_schnell_then_sdxl_lightning_then_sdxl_turbo_or_none"
+    draft["image_policy"] = "free_nano_then_flux_schnell_then_sdxl_lightning_then_sdxl_turbo_or_quality_fail"
+    if not draft["image_url"]:
+        draft["status"] = "IMAGE_FAILED"
+        draft["error"] = "Approved image chain failed; Tistory draft registration is blocked"
     return draft
 
 

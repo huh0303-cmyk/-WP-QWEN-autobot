@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "Korea365 CEO 종합통제실",
+  "short_name": "Korea365 통제실",
+  "description": "WordPress 27, Blogspot 27, Tistory 5 비공개 초안 및 운영 현황 통제실",
+  "lang": "ko-KR",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7fb",
+  "theme_color": "#101828",
+  "icons": [
+    {"src": "/static/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

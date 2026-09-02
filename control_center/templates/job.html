@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ job.keyword }} · Control Center{% endblock %}
+{% block content %}
+<section class="job-head"><div><p class="eyebrow">{{ site.url|replace('https://', '')|replace('http://', '') }}</p><h1>{{ job.keyword }}</h1><p><span class="state">{{ job.state }}</span> {% if job.quality_score is not none %}<span class="score">SEO {{ job.quality_score }}/100</span>{% endif %}</p><p class="muted">글: {{ text_models[job.text_model].label }} · {{ text_models[job.text_model].price }} &nbsp;|&nbsp; 이미지: {{ image_models[job.image_model].label }} · {{ image_models[job.image_model].price }}</p></div><a class="secondary" href="{{ url_for('index') }}">목록</a></section>
+{% if job.error %}<div class="flash error">{{ job.error }}</div>{% endif %}
+<section class="actions panel">
+  {% if job.state in ['CREATED','QUALITY_FAILED','REJECTED','FAILED'] %}<form method="post" action="{{ url_for('generate',job_id=job.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button>{{ text_models[job.text_model].label }}로 작성·검사</button></form>{% endif %}
+  {% if job.state == 'QUALITY_PASSED' %}<form method="post" action="{{ url_for('draft',job_id=job.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button>WordPress 비공개 초안 저장</button></form>{% endif %}
+  {% if job.state == 'WP_DRAFTED' %}<a class="button" target="_blank" rel="noopener" href="{{ job.wp_edit_url }}">WP에서 초안 검토</a><form method="post" action="{{ url_for('approve',job_id=job.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button>검토 승인 기록</button></form><form method="post" action="{{ url_for('reject',job_id=job.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="danger">반려</button></form>{% endif %}
+  {% if job.state == 'APPROVED' %}<strong>승인 완료. 이 버전에는 공개 발행 기능이 없어 자동 공개되지 않습니다.</strong>{% endif %}
+</section>
+{% if job.quality_failures %}<section class="panel"><h2>품질 보완점</h2><ul>{% for item in job.quality_failures %}<li>{{ item }}</li>{% endfor %}</ul></section>{% endif %}
+{% if job.title %}<section class="panel article"><p class="eyebrow">ARTICLE PREVIEW</p><h1>{{ job.title }}</h1><p class="meta">{{ job.meta_description }}</p><p><strong>태그:</strong> {{ job.labels|join(', ') }}</p><div class="body">{{ job.content_html|safe }}</div></section>{% endif %}
+{% endblock %}

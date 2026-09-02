@@ -17,6 +17,13 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 7. Validate SEO structure and metadata.
 8. Save only as DRAFT / PRIVATE / AWAITING_APPROVAL. No automatic public publishing under this master policy.
 
+### Network-wide engine default lock (2026-09-02)
+
+- WordPress 27, Blogger 27, Tistory 5, newsroom content, YouTube scripts and SNS copy all use Gemini 2.5 Flash as the default first-draft writer.
+- GPT must never appear as a routine default in the control center. It is used only for failed generation, failed quality/policy/format gates, high-value/important content explicitly routed for escalation, or a manual override.
+- Claude is the final auditor and cannot be selected as the routine bulk writer.
+- Control-center cards, stored job defaults, workflows and execution code must agree with this order: Gemini 2.5 Flash -> GPT recovery/rewrite -> Claude final audit.
+
 ### Claude audit responsibilities
 
 - grammar and spelling
@@ -36,7 +43,7 @@ Claude must not invent facts while editing. Material factual uncertainty goes ba
 
 ## 2. Image generation pipeline
 
-Scope: WordPress 27, Blogger 27, YouTube and SNS.
+Scope: WordPress 27, Blogger 27, Tistory 5, YouTube and SNS.
 Provider: Replicate.
 Credential: REPLICATE_API_TOKEN.
 
