@@ -56,6 +56,10 @@
             </div>
         </div>
         <div class="space-y-4">
+            <div class="grid gap-2 text-xs sm:grid-cols-2">
+                <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 font-bold text-blue-900">일반 WordPress 25개 · 사이트별 하루 1포스팅 · 주 7포스팅</p>
+                <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-bold text-amber-900">뉴스룸 2개 예외 · 사이트별 RSS 하루 3~10회</p>
+            </div>
             <p class="text-xs text-slate-400">k-health365.com 고정 1위 · 나머지는 당일 방문자 내림차순</p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for site in sites %}
@@ -80,6 +84,9 @@
                     </div>
                     <div class="rounded-lg border border-blue-200 bg-blue-100/80 px-3 py-2 text-xs text-blue-900">
                         <span class="font-black">사이트 분야:</span> <span class="font-bold">{{ site.category or '미분류' }}</span>
+                    </div>
+                    <div class="rounded-lg border px-3 py-2 text-xs {% if site.cadence.kind == 'newsroom' %}border-amber-200 bg-amber-50 text-amber-900{% else %}border-emerald-200 bg-emerald-50 text-emerald-900{% endif %}">
+                        <span class="font-black">발행 정책:</span> <span class="font-bold">{{ site.cadence.label }}</span>
                     </div>
                     <div class="rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-xs">
                         <p class="mb-1.5 font-black text-slate-700">카테고리명 (글 수·증감)</p>

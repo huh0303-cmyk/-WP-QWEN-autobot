@@ -255,6 +255,29 @@ def _attach_wp_category_deltas(category_results: dict[str, list[dict[str, object
     except OSError:
         pass
 
+
+def wordpress_cadence(site) -> dict[str, object]:
+    """Return the locked WP27 cadence shown by the control room."""
+    is_newsroom = bool(site and site.content_type in {"news_ko", "news_en"})
+    if is_newsroom:
+        return {
+            "daily_min": 3,
+            "daily_max": 10,
+            "weekly_min": None,
+            "weekly_max": None,
+            "label": "RSS 하루 3~10회",
+            "kind": "newsroom",
+        }
+    return {
+        "daily_min": 1,
+        "daily_max": 1,
+        "weekly_min": 7,
+        "weekly_max": 7,
+        "label": "하루 1포스팅 · 주 7포스팅",
+        "kind": "blog",
+    }
+
+
 def get_site_data():
     raw_sites = [
         {"domain": "k-health365.com", "today": 196, "total": 12450, "diff": -6, "persona": "건강정보 편집국", "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체"},
@@ -336,6 +359,7 @@ def get_site_data():
             "indexed": indexed,
             "indexed_delta": traffic.get("recent_index_increase"),
             "category": registered.theme if registered else "미분류",
+            "cadence": wordpress_cadence(registered),
             "official_categories": category_results.get(item["domain"], []),
             "auth_ready": bool(registered and (
                 registered.secret_name in secret_names or os.environ.get(registered.secret_name, "").strip()

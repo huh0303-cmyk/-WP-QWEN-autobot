@@ -11,11 +11,35 @@ from control_center.db import Store
 from control_center.quality import score_article
 from control_center.registry import load_wordpress_sites
 from control_center.service import ControlCenter
-from control_center.app import _site_rows, get_youtube_data
+from control_center.app import _site_rows, get_youtube_data, wordpress_cadence
 from control_center.keywords import weekly_suggestions
 from control_center.states import QUALITY_PASSED, WP_DRAFTED
 from control_center.wordpress import DraftResult
 from control_center.models import DEFAULT_IMAGE_MODEL, DEFAULT_TEXT_MODEL, IMAGE_MODELS
+
+
+def test_control_room_uses_one_daily_post_for_every_regular_wordpress_site():
+    site = type("Site", (), {"content_type": "blog"})()
+    assert wordpress_cadence(site) == {
+        "daily_min": 1,
+        "daily_max": 1,
+        "weekly_min": 7,
+        "weekly_max": 7,
+        "label": "하루 1포스팅 · 주 7포스팅",
+        "kind": "blog",
+    }
+
+
+def test_control_room_keeps_newsroom_rss_exception():
+    site = type("Site", (), {"content_type": "news_ko"})()
+    assert wordpress_cadence(site) == {
+        "daily_min": 3,
+        "daily_max": 10,
+        "weekly_min": None,
+        "weekly_max": None,
+        "label": "RSS 하루 3~10회",
+        "kind": "newsroom",
+    }
 
 
 GOOD_ARTICLE = {
