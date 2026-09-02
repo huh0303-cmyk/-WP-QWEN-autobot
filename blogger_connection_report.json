@@ -1,9 +1,9 @@
 {
-  "ok": true,
-  "configured_count": 27,
+  "ok": false,
+  "configured_count": 33,
   "oauth_visible_count": 33,
-  "matched_count": 27,
-  "connected_count": 27,
+  "matched_count": 33,
+  "connected_count": 33,
   "missing": [],
   "url_mismatches": [
     {
@@ -39,6 +39,12 @@
     "blogger_sis",
     "blogger_krealestate",
     "blogger_khealth365",
-    "blogger_kskin365"
+    "blogger_kskin365",
+    "blogger_kwellness_lab",
+    "blogger_kmedical_job_center",
+    "blogger_korea_life_support365",
+    "blogger_koreamedicaltour1",
+    "blogger_kworld365_kpop",
+    "blogger_seoul_intl_school_guide"
   ]
 }
