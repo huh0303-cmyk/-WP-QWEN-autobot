@@ -39,6 +39,11 @@
     "require_license_and_provider_cost_log": true,
     "forbid_fabricated_official_documents": true,
     "forbid_misleading_medical_legal_financial_evidence": true,
+    "forbid_any_visible_generated_text": true,
+    "forbid_illegible_pseudo_text_or_random_glyphs": true,
+    "forbid_fake_hangul_chinese_japanese_characters": true,
+    "avoid_documents_forms_screens_signs_labels_and_packaging": true,
+    "text_or_pseudo_text_detection_action": "QUALITY_FAIL_REMOVE_IMAGE_NO_SAVE_NO_PUBLISH",
     "human_review_required_before_blogger_publication": true
   },
   "failure_policy": {

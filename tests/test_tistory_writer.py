@@ -51,6 +51,7 @@ def test_prompt_forbids_copy_and_repeated_ai_titles():
     assert "emotionally resonant" in prompt
     assert "no more than two short sentences" in prompt
     assert "unlock" in prompt
+    assert "fake chinese/japanese" in prompt.lower()
 
 
 def test_unlock_title_is_blocked_before_tistory_draft_ready():

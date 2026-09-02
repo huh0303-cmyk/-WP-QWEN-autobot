@@ -41,6 +41,7 @@ WRITER_SYSTEM_PROMPT = (
     "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
     "Never use the word Unlock or any Unlock/Unlocking title formula; rewrite it as a specific natural headline. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
+    "The image_prompt must request a scene with no visible letters, words, numbers, documents, forms, screens, signs, labels, logos, watermarks, pseudo-text, fake Hangul, or fake Chinese/Japanese characters. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
     "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts). "
     "Every paragraph must contain no more than two short sentences. Never place bullet symbols "

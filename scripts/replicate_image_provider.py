@@ -171,7 +171,10 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
     return (
         f"Editorial documentary-style image for an article about: {subject}.{context} "
         "Accurately represent the specific subject, natural realistic lighting, clean composition, "
-        "no visible text, no captions, no logos, no watermark, no UI, no brand marks, 16:9."
+        "NO TEXT ANYWHERE IN THE IMAGE. Do not show letters, words, numbers, writing, labels, captions, "
+        "documents, forms, checklists, certificates, screens, signs, books, packaging, logos, watermarks, "
+        "UI or brand marks. Avoid paper and display surfaces that could contain generated writing. "
+        "Any illegible pseudo-text, fake Hangul, fake Chinese/Japanese characters or random glyphs is forbidden. 16:9."
     )
 
 

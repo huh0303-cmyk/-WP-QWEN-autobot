@@ -67,6 +67,10 @@ Hard rules:
 - image must be relevant to the article/video topic
 - free-stock fallback is forbidden
 - generic filler images are forbidden
+- generated blog images must contain no visible letters, words, numbers, captions, labels, logos, watermarks or UI anywhere in the scene
+- illegible pseudo-text, random glyphs, fake Hangul and Chinese/Japanese-looking dummy characters are blocking `QUALITY_FAIL` defects
+- avoid documents, forms, checklists, certificates, screens, signs, books and packaging whenever they could invite the image model to fabricate writing
+- if any text or pseudo-text is visible, remove the image and regenerate a text-free scene; the draft must not be saved, scheduled or published with that image
 - do not fabricate official documents
 - do not create misleading medical/legal/financial evidence
 - image/provider/license/cost logging is required
