@@ -34,6 +34,10 @@ def test_gpt_rewrites_after_gemini_generation_failure():
         draft = tistory_writer.generate_draft(JOB)
     gpt.assert_called_once()
     assert draft["engine"] == "gpt"
+    assert draft["status"] == "DRAFT_READY"
+    assert draft["image_url"] is None
+    assert draft["image_status"] == "pass_no_image"
+    assert draft["first_image_priority"] is False
 
 
 def test_any_consensus_failure_is_a_blocking_gate():

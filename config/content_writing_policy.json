@@ -122,7 +122,7 @@
   },
   "image_generation": {
     "maximum_images_per_content": 1,
-    "order": ["Nano Banana only when explicitly confirmed free", "black-forest-labs/flux-schnell", "bytedance/sdxl-lightning-4step", "jyoung105/sdxl-turbo"],
+    "order": ["bytedance/sdxl-lightning-4step", "black-forest-labs/flux-schnell", "pass_without_image"],
     "attempts_per_model": 1,
     "all_failed_action": "no_image_no_substitute"
   },

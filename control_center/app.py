@@ -344,7 +344,7 @@ def get_site_data():
             "persona": registered.persona if registered else item["persona"],
             "tone": registered.tone if registered else item["tone"],
             "default_text_model": "gemini-2.5-flash",
-            "default_image_model": "black-forest-labs/flux-schnell",
+            "default_image_model": "bytedance/sdxl-lightning-4step",
         })
     return sorted(sites, key=lambda site: (
         site["domain"] != "k-health365.com",
@@ -405,7 +405,7 @@ def get_blogger_data():
         "persona": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "persona", "Specialist editorial desk"),
         "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
         "default_text_model": "gemini-2.5-flash",
-        "default_image_model": "black-forest-labs/flux-schnell",
+        "default_image_model": "bytedance/sdxl-lightning-4step",
         "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
         "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
         "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
@@ -468,7 +468,7 @@ def get_tistory_data() -> list[dict[str, object]]:
             "persona": persona,
             "tone": tone,
             "default_text_model": "gemini-2.5-flash",
-            "default_image_model": "black-forest-labs/flux-schnell",
+            "default_image_model": "bytedance/sdxl-lightning-4step",
             "today_visitors": None,
             "today_delta": None,
             "total_visitors": None,

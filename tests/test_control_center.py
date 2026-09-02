@@ -49,12 +49,11 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
 
 def test_locked_default_content_and_image_engines():
     assert DEFAULT_TEXT_MODEL == "gemini-2.5-flash"
-    assert DEFAULT_IMAGE_MODEL == "black-forest-labs/flux-schnell"
+    assert DEFAULT_IMAGE_MODEL == "bytedance/sdxl-lightning-4step"
     assert list(IMAGE_MODELS) == [
         "none",
-        "black-forest-labs/flux-schnell",
         "bytedance/sdxl-lightning-4step",
-        "jyoung105/sdxl-turbo",
+        "black-forest-labs/flux-schnell",
     ]
 
 

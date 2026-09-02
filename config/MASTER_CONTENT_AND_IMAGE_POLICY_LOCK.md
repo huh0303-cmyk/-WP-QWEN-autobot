@@ -57,17 +57,17 @@ GPT must not invent facts while editing. Material factual uncertainty goes back 
 
 ## 2. Image generation pipeline
 
-Scope: WordPress 27, Blogger 27, Tistory 5, YouTube and SNS.
+Scope: WordPress 27, Blogger 27 and Tistory 5. YouTube retains its separate FLUX-only thumbnail lock.
 Provider: Replicate.
 Credential: REPLICATE_API_TOKEN.
 
 Strict generation order:
 
-1. FLUX.1 Schnell — black-forest-labs/flux-schnell
-2. SDXL-Lightning 4-step — bytedance/sdxl-lightning-4step
-3. SDXL Turbo — jyoung105/sdxl-turbo
+1. SDXL-Lightning 4-step — bytedance/sdxl-lightning-4step
+2. FLUX.1 Schnell — black-forest-labs/flux-schnell
+3. Both unavailable or rejected — PASS and continue without an image
 
-If a model fails or is unavailable, try the next model in the strict order above. If all three fail, use zero images or QUALITY_FAIL and send for review.
+If SDXL Lightning fails or is unavailable, try FLUX Schnell once. If both fail, remove the rejected image and continue with a text-only draft; image failure must not block draft creation, review email or later publication.
 
 Hard rules:
 
@@ -77,7 +77,7 @@ Hard rules:
 - generated blog images must contain no visible letters, words, numbers, captions, labels, logos, watermarks or UI anywhere in the scene
 - illegible pseudo-text, random glyphs, fake Hangul and Chinese/Japanese-looking dummy characters are blocking `QUALITY_FAIL` defects
 - avoid documents, forms, checklists, certificates, screens, signs, books and packaging whenever they could invite the image model to fabricate writing
-- if any text or pseudo-text is visible, remove the image and regenerate a text-free scene; the draft must not be saved, scheduled or published with that image
+- if any text or pseudo-text is visible, reject that image and try the next approved model; if both fail, continue text-only
 - do not fabricate official documents
 - do not create misleading medical/legal/financial evidence
 - image/provider/license/cost logging is required

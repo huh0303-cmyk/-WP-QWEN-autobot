@@ -1,30 +1,23 @@
 {
-  "version": 4,
-  "scope": ["wordpress_27", "blogger_27", "tistory_5", "youtube", "sns"],
+  "version": 5,
+  "scope": ["wordpress_27", "blogger_27", "tistory_5"],
   "provider": "replicate",
   "credential_secret": "REPLICATE_API_TOKEN",
   "enabled_when_provider_credentials_exist": false,
   "model_priority": [
     {
       "priority": 1,
-      "model": "FLUX.1 Schnell",
-      "model_id": "black-forest-labs/flux-schnell",
-      "role": "primary",
-      "license_gate": "Apache-2.0 or provider terms"
-    },
-    {
-      "priority": 2,
       "model": "SDXL-Lightning 4-step",
       "model_id": "bytedance/sdxl-lightning-4step",
-      "role": "low-cost fallback",
+      "role": "primary",
       "license_gate": "OpenRAIL++ and provider terms"
     },
     {
-      "priority": 3,
-      "model": "SDXL Turbo",
-      "model_id": "jyoung105/sdxl-turbo",
-      "role": "final generation fallback",
-      "license_gate": "current Stability AI and provider commercial terms"
+      "priority": 2,
+      "model": "FLUX.1 Schnell",
+      "model_id": "black-forest-labs/flux-schnell",
+      "role": "single fallback",
+      "license_gate": "Apache-2.0 or provider terms"
     }
   ],
   "hard_rules": {
@@ -43,14 +36,14 @@
     "forbid_illegible_pseudo_text_or_random_glyphs": true,
     "forbid_fake_hangul_chinese_japanese_characters": true,
     "avoid_documents_forms_screens_signs_labels_and_packaging": true,
-    "text_or_pseudo_text_detection_action": "QUALITY_FAIL_REMOVE_IMAGE_NO_SAVE_NO_PUBLISH",
+    "text_or_pseudo_text_detection_action": "REMOVE_IMAGE_AND_CONTINUE_TEXT_ONLY",
     "human_review_required_before_blogger_publication": true
   },
   "failure_policy": {
-    "fallback_order": ["FLUX.1 Schnell", "SDXL-Lightning 4-step", "SDXL Turbo"],
+    "fallback_order": ["SDXL-Lightning 4-step", "FLUX.1 Schnell"],
     "fallback_to_free_stock": false,
     "fallback_to_generic_image": false,
-    "when_all_generation_models_fail": "QUALITY_FAIL_OR_ZERO_IMAGE"
+    "when_all_generation_models_fail": "PASS_AND_CONTINUE_WITH_ZERO_IMAGES"
   },
-  "notes": "MASTER IMAGE POLICY. For WordPress, Blogger, YouTube and SNS, generated images must route through Replicate in this strict order: FLUX.1 Schnell -> SDXL-Lightning 4-step -> SDXL Turbo. Free-stock and generic filler fallbacks remain forbidden. If all three generation models fail or results are irrelevant/unsafe, produce zero images or QUALITY_FAIL and send for review. Existing-frame-only exception remains for playlist thumbnails."
+  "notes": "MASTER BLOG IMAGE POLICY. WordPress, Blogger and Tistory route through Replicate in this strict order: SDXL-Lightning 4-step -> FLUX.1 Schnell. If both fail or an image is rejected, continue with a text-only draft. Free-stock and generic filler fallbacks remain forbidden. YouTube retains its separate FLUX-only thumbnail policy."
 }
