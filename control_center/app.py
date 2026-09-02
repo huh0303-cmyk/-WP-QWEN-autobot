@@ -13,6 +13,7 @@ import subprocess
 import html
 import hmac
 import secrets
+import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from collections import Counter
@@ -124,6 +125,39 @@ def _wp_category_counts(site_url: str) -> list[dict[str, object]]:
         return sorted(categories, key=lambda row: (-int(row["count"]), str(row["name"]).casefold()))
     except (requests.RequestException, ValueError, TypeError):
         return []
+
+
+@lru_cache(maxsize=128)
+def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, object]:
+    """Read the public visitor counter deployed on each WordPress site.
+
+    The bucket keeps Render page loads fast while refreshing every five minutes.
+    Missing or malformed responses are never replaced with invented numbers.
+    """
+    del five_minute_bucket
+    try:
+        response = requests.get(
+            f"{site_url.rstrip('/')}/wp-json/site-stats/v1/visitors",
+            timeout=12,
+            headers={"User-Agent": "Korea365-Control-Room/1.0"},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        today = int(payload["count"])
+        yesterday = int(payload["yesterday_count"])
+        total = int(payload["total"])
+        return {
+            "connected": True,
+            "date": payload.get("date"),
+            "daily_visitors": today,
+            "visitor_delta": today - yesterday,
+            "yesterday_visitors": yesterday,
+            "total_visitors": total,
+            # The all-time counter grows by today's visits since midnight.
+            "total_delta": today,
+        }
+    except (requests.RequestException, ValueError, TypeError, KeyError):
+        return {"connected": False}
 
 
 @lru_cache(maxsize=64)
@@ -364,16 +398,25 @@ def get_site_data():
             lambda pair: (pair[0], _wp_category_counts(pair[1].url)),
             registry_by_domain.items(),
         ))
+        visitor_results = dict(executor.map(
+            lambda pair: (
+                pair[0],
+                _wp_visitor_stats(pair[1].url, int(time.time() // 300)),
+            ),
+            registry_by_domain.items(),
+        ))
     _attach_wp_category_deltas(category_results)
     secret_names = _github_secret_names()
     sites = []
     for item in raw_sites:
         registered = registry_by_domain.get(item["domain"])
-        traffic = traffic_by_domain.get(item["domain"], {})
+        live_traffic = visitor_results.get(item["domain"], {})
+        stored_traffic = traffic_by_domain.get(item["domain"], {})
+        traffic = live_traffic if live_traffic.get("connected") else stored_traffic
         detail = history_sites.get(item["domain"], {})
-        today_visitors = traffic.get("daily_visitors", item["today"])
-        visitor_delta = traffic.get("visitor_delta", item["diff"])
-        total_visitors = traffic.get("total_visitors", item["total"])
+        today_visitors = traffic.get("daily_visitors")
+        visitor_delta = traffic.get("visitor_delta")
+        total_visitors = traffic.get("total_visitors")
         total_posts = detail.get("total_posts", traffic.get("total_posts"))
         indexed = detail.get("indexed", traffic.get("indexed"))
         sites.append({
@@ -382,11 +425,12 @@ def get_site_data():
             "today_visitors": today_visitors,
             "today_delta": visitor_delta,
             "total_visitors": total_visitors,
-            "total_delta": today_visitors,
+            "total_delta": traffic.get("total_delta"),
             "total_posts": total_posts,
             "posts_delta": None,
             "indexed": indexed,
             "indexed_delta": traffic.get("recent_index_increase"),
+            "visitor_connected": bool(live_traffic.get("connected")),
             "category": registered.theme if registered else "미분류",
             "cadence": wordpress_cadence(registered),
             "official_categories": category_results.get(item["domain"], []),

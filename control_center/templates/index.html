@@ -71,6 +71,7 @@
                     <input type="hidden" name="domain" value="{{ site.domain }}">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
+                            <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}수집 실패{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}실패{% endif %}</span>
                             <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white">{{ loop.index }}위</span>
                             <span class="break-all font-bold text-slate-800">{{ site.domain }}</span>
                         </div>
@@ -108,8 +109,8 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         {% for label, value, delta in [
-                            ('당일 방문자(증감)', site.today_visitors, site.today_delta),
-                            ('누적 방문자(증감)', site.total_visitors, site.total_delta),
+                            ('당일 방문자(어제 대비)', site.today_visitors, site.today_delta),
+                            ('누적 방문자(오늘 증가)', site.total_visitors, site.total_delta),
                             ('총 게시글(증감)', site.total_posts, site.posts_delta),
                             ('Google 색인 글(증감)', site.indexed, site.indexed_delta)
                         ] %}
