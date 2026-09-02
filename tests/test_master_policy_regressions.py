@@ -22,6 +22,15 @@ def load_autopost_functions(*names):
 
 
 class MasterPolicyRegressionTests(unittest.TestCase):
+    def test_site_editorial_playbook_covers_all_network_destinations(self):
+        playbook = (ROOT / "config" / "SITE_EDITORIAL_PLAYBOOKS.md").read_text(encoding="utf-8")
+        registry = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
+        tistory = json.loads((ROOT / "config" / "tistory_portfolio.json").read_text(encoding="utf-8"))
+        wp_domains = [row["url"].split("//", 1)[-1].rstrip("/") for row in registry["sites"] if row["platform"] == "wordpress"]
+        tistory_domains = [row["url"].split("//", 1)[-1].rstrip("/") for row in tistory["sites"]]
+        assert all(domain in playbook for domain in wp_domains + tistory_domains)
+        assert "### Blogger" in playbook
+
     def test_wordpress_text_generator_uses_gpt_primary(self):
         source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
         block = source.split("def generate_content_gemini(prompt, use_gpt=False):", 1)[1].split(
