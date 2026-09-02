@@ -9,7 +9,6 @@ code is preserved in archive_footage_longform_legacy.py.
 from __future__ import annotations
 
 import os
-import random
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -23,15 +22,14 @@ if str(ROOT) not in sys.path:
 import archive_footage_longform_legacy as base
 import classic_reads_longform as narration_engine
 from flux_thumbnail_provider import generate_flux_thumbnail_url
+from knowledge_narrator import select_documentary_narrator
 
 
 def _select_narrator(channel_key: str) -> None:
     """Choose one of three approved male/female voices once per production."""
-    defaults = ["pNInz6obpgDQGcFmaJgB", "21m00Tcm4TlvDq8ikWAM", "EXAVITQu4vr4xnSDxMaL"]
-    pool = [os.getenv(f"KNOWLEDGE_VOICE_{index}_ID", defaults[index - 1]).strip() for index in range(1, 4)]
-    narrator = random.SystemRandom().choice(pool)
-    narration_engine.VOICE_ID = narrator
-    base.log(f"   narrator pool: selected 1 of {len(pool)} approved voices for {channel_key}")
+    narrator = select_documentary_narrator()
+    narration_engine.VOICE_ID = narrator["voice_id"]
+    base.log(f"   narrator: {narrator['name']} ({narrator['accent']}, {narrator['gender']}) for {channel_key}")
 
 
 def _history_date_overlay(path: str) -> str:

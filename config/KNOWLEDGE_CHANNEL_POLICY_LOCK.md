@@ -11,7 +11,7 @@ Locked on 2026-08-30. These rules apply to the five English knowledge channels.
 - After writing, run a second continuity review against the inspected clip order. A narration/footage alignment score below 90/100 is a hard failure: do not render or upload even privately.
 - Maintain a source ledger containing the original URL, institution, title, date, creator, rights statement and retrieval date.
 - Do not use unrelated filler. Every important narration passage must have a semantically matching clip or still.
-- NASA, History and Invention choose one narrator per production from three approved male/female ElevenLabs voices.
+- Narrated knowledge channels choose one documentary-suitable ElevenLabs voice per production from available American/British male/female voices; blank or unrelated character voices are forbidden.
 - Silent Era is wordless. It does not receive explanatory narration.
 - Upload PRIVATE for human review. Never auto-publish publicly.
 
