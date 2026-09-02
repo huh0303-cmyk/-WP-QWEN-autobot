@@ -1,8 +1,9 @@
 {
-  "ok": false,
+  "ok": true,
   "configured_count": 27,
   "oauth_visible_count": 33,
-  "matched_count": 26,
+  "matched_count": 27,
+  "connected_count": 27,
   "missing": [],
   "url_mismatches": [
     {
@@ -37,6 +38,7 @@
     "blogger_korea365",
     "blogger_sis",
     "blogger_krealestate",
-    "blogger_khealth365"
+    "blogger_khealth365",
+    "blogger_kskin365"
   ]
 }
