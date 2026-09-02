@@ -24,6 +24,12 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/fetch_blogger_blog_ids.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blogger-owned-inventory-${{ github.run_id }}
+          path: blogger_owned_inventory.json
+          if-no-files-found: error
+          retention-days: 30
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

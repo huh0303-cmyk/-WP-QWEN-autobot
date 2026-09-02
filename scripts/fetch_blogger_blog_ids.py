@@ -67,6 +67,10 @@ def main() -> int:
     data = json.loads(PORTFOLIO_PATH.read_text(encoding="utf-8"))
     found, still_missing = [], []
     verified = []
+    configured_urls = {
+        str(channel.get("blogspot", "")).rstrip("/").lower()
+        for channel in data["channels"] if channel.get("blogspot")
+    }
     for channel in data["channels"]:
         if channel["status"] == "CONFLICT":
             still_missing.append((channel["order"], channel["title"], "CONFLICT - needs a different address, see docs"))
@@ -88,11 +92,21 @@ def main() -> int:
     if found:
         subprocess.run([sys.executable, str(ROOT / "scripts" / "build_content_engine_profiles.py")], check=True)
 
-    print(json.dumps({
+    report = {
+        "owned_total": len(owned),
+        "configured_total": len(data["channels"]),
+        "unregistered_owned": [
+            {"url": url, "blog_id": blog_id}
+            for url, blog_id in sorted(owned.items()) if url not in configured_urls
+        ],
         "newly_wired": [{"order": o, "title": t, "blog_id": b} for o, t, b in found],
         "ownership_verified": [{"order": o, "title": t, "blog_id": b} for o, t, b in verified],
         "still_missing": [{"order": o, "title": t, "reason": r} for o, t, r in still_missing],
-    }, ensure_ascii=False, indent=2))
+    }
+    (ROOT / "blogger_owned_inventory.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
 
