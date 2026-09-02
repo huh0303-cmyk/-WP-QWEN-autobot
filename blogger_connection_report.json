@@ -5,13 +5,7 @@
   "matched_count": 33,
   "connected_count": 33,
   "missing": [],
-  "url_mismatches": [
-    {
-      "site_id": "blogger_kskin365",
-      "configured_url": "https://kskin365.blogspot.com",
-      "oauth_url": "https://skin.k-health365.com/"
-    }
-  ],
+  "url_mismatches": [],
   "matched_site_ids": [
     "blogger_ktrip365",
     "blogger_kworld365",
