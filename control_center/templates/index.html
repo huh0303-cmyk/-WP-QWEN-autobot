@@ -67,6 +67,25 @@
             <p class="text-xs font-black text-amber-700">REVIEW &amp; FINAL PUBLISH</p>
             <h2 class="mt-1 text-2xl font-extrabold text-slate-950">검토·발행대기</h2>
             <p class="mt-2 text-sm leading-relaxed text-slate-700">생성 버튼을 누른 작업은 CEO종합상황실 시트에 기록됩니다. 준비가 끝난 글은 아래 관리자 화면에서 본문·제목·이미지를 검토한 뒤, 각 플랫폼의 <strong>공개/게시 버튼</strong>을 직접 눌러 최종 발행합니다. 이 통제실은 공개 버튼을 대신 누르지 않습니다.</p>
+            <div class="mt-4 overflow-hidden rounded-2xl border border-amber-300 bg-white shadow-sm">
+                <div class="flex items-center justify-between bg-amber-100 px-4 py-3">
+                    <h3 class="font-black text-amber-950">승인대기 글 목록</h3>
+                    <span class="rounded-full bg-amber-700 px-2.5 py-1 text-xs font-black text-white">{{ review_items|length }}건</span>
+                </div>
+                {% if review_items %}
+                <div class="divide-y divide-slate-100">
+                    {% for item in review_items %}
+                    <article class="grid gap-2 px-4 py-3 sm:grid-cols-[110px_1fr_auto] sm:items-center">
+                        <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black text-amber-700">{{ item.platform }}</span>{{ item.created_at }}</div>
+                        <div class="min-w-0"><p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p><p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p></div>
+                        <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-600 px-4 text-xs font-black text-white hover:bg-amber-700">글 검토·승인 →</a>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="px-4 py-6 text-center text-sm font-bold text-slate-500">현재 검토 가능한 초안이 없습니다.</p>
+                {% endif %}
+            </div>
             <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 <a href="https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/edit" target="_blank" rel="noopener" class="rounded-2xl bg-emerald-700 px-4 py-4 text-center text-sm font-black text-white">① 발행대기 시트 확인</a>
                 <a href="https://k-health365.com/wp-admin/edit.php?post_status=draft&post_type=post" target="_blank" rel="noopener" class="rounded-2xl bg-blue-700 px-4 py-4 text-center text-sm font-black text-white">② WordPress 초안</a>

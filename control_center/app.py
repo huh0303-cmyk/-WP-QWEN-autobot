@@ -7,6 +7,8 @@ from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
 
 import json
+import csv
+import io
 import os
 import re
 import subprocess
@@ -23,6 +25,8 @@ from pathlib import Path
 from urllib.parse import unquote
 
 import requests
+
+REVIEW_QUEUE_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%9E%90%EB%8F%99%ED%99%94_%EB%B0%9C%ED%96%89%EB%8C%80%EA%B8%B0&range=A1:N200"
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secrets.token_hex(32)
@@ -43,6 +47,34 @@ def compact_category(value: object, limit: int = 22) -> str:
         "accommodation": "housing",
     }.get(text, text)
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def get_review_queue() -> list[dict[str, str]]:
+    """Read reviewable drafts from the central Sheet without requiring a Google login."""
+    try:
+        response = requests.get(REVIEW_QUEUE_CSV, timeout=12)
+        response.raise_for_status()
+        rows = list(csv.reader(io.StringIO(response.text)))
+    except (requests.RequestException, csv.Error):
+        return []
+    items = []
+    for row in rows[1:]:
+        row += [""] * (14 - len(row))
+        created_at, job_id, site_id, status, publish_now, title = row[:6]
+        review_url = row[9].strip()
+        if not job_id.strip() or not title.strip() or not review_url.startswith("http"):
+            continue
+        platform = "Blogspot" if "blogger" in job_id.lower() or "blogger" in site_id.lower() else "WordPress"
+        items.append({
+            "created_at": created_at.replace("T", " ")[:16],
+            "job_id": job_id,
+            "site_id": site_id,
+            "platform": platform,
+            "title": title,
+            "review_url": review_url,
+            "status": "검토대기" if publish_now.strip().upper() != "TRUE" else status,
+        })
+    return list(reversed(items[-50:]))
 
 
 @app.before_request
@@ -845,6 +877,7 @@ def index():
     return render_template(
         "index.html", sites=sites, bloggers=get_blogger_data(), tistory_sites=get_tistory_data(),
         youtube_channels=get_youtube_data(),
+        review_items=get_review_queue(),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
     )
 

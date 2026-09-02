@@ -118,6 +118,21 @@ def test_wordpress_kpis_appear_before_site_metadata():
     assert wordpress < kpis < category < persona
 
 
+def test_review_queue_is_visible_directly_in_control_room():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "승인대기 글 목록" in template
+    assert "review_items" in template
+    assert "글 검토·승인 →" in template
+
+
+def test_all_wordpress_drafts_require_rankmath_focus_keyword():
+    publisher = (Path(__file__).resolve().parents[1] / "control_center" / "wordpress.py").read_text(encoding="utf-8")
+    direct_writer = (Path(__file__).resolve().parents[1] / "scripts" / "auto_write_and_draft.py").read_text(encoding="utf-8")
+    assert '"rank_math_focus_keyword": keyword.strip()' in publisher
+    assert '"rank_math_focus_keyword": focus_keyword' in direct_writer
+    assert "focus keyword is required" in direct_writer
+
+
 def test_job_creation_is_idempotent():
     with tempfile.TemporaryDirectory() as tmp:
         store = Store(Path(tmp) / "db.sqlite3")

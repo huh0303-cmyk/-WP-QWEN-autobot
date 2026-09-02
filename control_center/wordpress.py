@@ -92,7 +92,11 @@ def create_draft(site: WordPressSite, *, job_id: str, keyword: str, article: dic
         "status": "draft",
         "comment_status": "closed",
         "ping_status": "closed",
-        "meta": {"rank_math_description": article["meta_description"], "control_center_job_id": job_id},
+        "meta": {
+            "rank_math_focus_keyword": keyword.strip(),
+            "rank_math_description": article["meta_description"],
+            "control_center_job_id": job_id,
+        },
     }
     if featured_media:
         payload["featured_media"] = featured_media

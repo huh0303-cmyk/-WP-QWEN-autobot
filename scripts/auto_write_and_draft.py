@@ -177,7 +177,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     return None, 0, failures, ""
 
 
-def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_url: str) -> dict:
+def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_url: str, keyword: str) -> dict:
     wp_pass = os.environ.get(secret_name, "")
     if not wp_pass:
         raise SystemExit(f"No WordPress application password found in env var {secret_name}")
@@ -191,8 +191,13 @@ def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_
     tag_ids = resolve_tag_ids(site_url, wp_pass, article.get("labels", []))
     if tag_ids:
         data["tags"] = tag_ids
-    if article.get("meta_description"):
-        data["meta"] = {"rank_math_description": article["meta_description"]}
+    focus_keyword = keyword.strip()
+    if not focus_keyword:
+        raise SystemExit("WordPress focus keyword is required; draft creation blocked")
+    data["meta"] = {
+        "rank_math_focus_keyword": focus_keyword,
+        "rank_math_description": article.get("meta_description", ""),
+    }
     featured_media_id = ensure_featured_media(site_url, wp_pass, image_url, article["title"])
     if featured_media_id:
         data["featured_media"] = featured_media_id
@@ -335,7 +340,7 @@ def main() -> int:
     image_url = "" if os.environ.get("IMAGE_MODEL", "").strip() == "none" else (generate_image_url(image_subject, theme=article["title"]) or "")
 
     if platform == "wordpress":
-        record_out = _publish_wordpress(site_url=site_url, secret_name=settings["secret_name"], article=article, image_url=image_url)
+        record_out = _publish_wordpress(site_url=site_url, secret_name=settings["secret_name"], article=article, image_url=image_url, keyword=keyword)
     else:
         record_out = _publish_blogger(
             blog_id=settings["destination_id"], article=article, image_url=image_url,
