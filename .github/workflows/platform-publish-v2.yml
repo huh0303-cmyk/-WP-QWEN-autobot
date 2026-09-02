@@ -83,7 +83,7 @@ jobs:
           outcome="failure"
           if [ "${{ job.status }}" = "success" ]; then outcome="success"; fi
           platform="${{ github.event_name == 'schedule' && 'blogger' || inputs.platform || 'blogger' }}"
-          python scripts/normalize_room_result.py --platform "$platform" --workflow platform-publish.yml --source artifacts/platform-worker.log --outcome "$outcome" --output artifacts/automation-room-result.json
+          python scripts/normalize_room_result.py --platform "$platform" --workflow platform-publish-v2.yml --source artifacts/platform-worker.log --outcome "$outcome" --output artifacts/automation-room-result.json
       - name: Save platform result
         if: always()
         uses: actions/upload-artifact@v4

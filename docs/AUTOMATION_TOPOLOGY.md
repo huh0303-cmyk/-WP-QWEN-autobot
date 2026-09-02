@@ -8,8 +8,8 @@ Authority: `MASTER_MONETIZATION_STRATEGY_2026.md`.
 |---|---|---|---|---|---|
 | Ordinary WordPress | `publish-scheduler.yml` (:37 hourly) | `daily-network-publish.yml` -> `autopost_current.py` | GPT text; legacy paid image flags off | one WP site | scheduler dispatch cap 1 |
 | Newsrooms | `newsrooms-daily-publisher.yml` | `autopost_current.py` | current newsroom writer path | one of two newsroom sites | source, length and quality gates |
-| Blogger daily | `blogger-daily-scheduler.yml` (:08/:28/:48) | `blogger-rewrite.yml` | Gemini text | Blogger draft | one connected site/day |
-| Sheet platform queue | `platform-publish.yml` (:17 hourly) | `process_platform_queue.py` | pre-generated queue content | Blogger draft; other review paths | duplicate-suspect with Blogger daily |
+| Blogger daily | `blogger-daily-scheduler-v2.yml` (:08/:28/:48) | `blogger-rewrite.yml` | GPT-5 mini text | Blogger draft | one connected site/day |
+| Sheet platform queue | `platform-publish-v2.yml` (:17 hourly) | `process_platform_queue.py` | pre-generated queue content | Blogger draft; other review paths | duplicate-suspect with Blogger daily |
 | YouTube | `youtube-control-scheduler.yml` (:27 hourly) | playlist/knowledge workflows | FLUX Schnell thumbnail policy | one channel dispatch | canonical 10-channel registry, cap 1 |
 | Site metrics | `daily-site-traffic.yml` (05:20 KST) | `daily_site_traffic.py` | WP REST + GSC | control Sheet | read-only collection |
 | Executive report | `situation-room-daily.yml` (08:10 KST) | `situation_room_daily.py` | GSC/YouTube/official SNS connections | control Sheet + configured notifications | canonical reporting registry |

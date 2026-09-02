@@ -87,7 +87,7 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertIn('BLOGGER_PUBLISH_NOW: "false"', workflow)
 
     def test_blogger_oauth_is_separate_from_shared_drive_token(self):
-        workflow = (ROOT / ".github" / "workflows" / "platform-publish.yml").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github" / "workflows" / "platform-publish-v2.yml").read_text(encoding="utf-8")
         setup = (ROOT / "scripts" / "setup_blogger_oauth_local.py").read_text(encoding="utf-8")
         for name in (
             "BLOGGER_GOOGLE_CLIENT_ID",

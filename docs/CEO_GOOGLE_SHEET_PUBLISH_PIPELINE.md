@@ -8,7 +8,7 @@
 | 구분 | 수량 | Google Sheet 통제 탭 | 실제 작업기 |
 |---|---:|---|---|
 | WordPress | 27 | `자동화_사이트설정`, `자동화_황금키워드`, `자동화_발행대기` | `daily-network-publish.yml`, `newsrooms-daily-publisher.yml` |
-| Blogspot | 27 | `자동화_사이트설정`, `자동화_발행대기` | `platform-publish.yml` |
+| Blogspot | 27 | `자동화_사이트설정`, `자동화_발행대기` | `platform-publish-v2.yml` |
 | YouTube 플레이리스트 | 5 | `자동화_유튜브채널`, `자동화_유튜브실행` | `generate-youtube-playlist.yml` |
 | YouTube 영어 지식 | 5 | `자동화_유튜브채널`, `자동화_유튜브실행` | `curio-longform-daily.yml` |
 
@@ -38,8 +38,8 @@
 - 27개 대응 행은 등록되어 있다.
 - Blogger API destination ID가 있고 즉시 작업 가능한 사이트는 제한적이다.
 - 현재 READY 6개, QUALITY_FAIL 1개, 나머지는 CREATED_SHELL 또는 EMPTY다.
-- 실제 시트 큐 작업기는 `platform-publish.yml`이다.
-- `blogger-daily-scheduler.yml`은 별도 상태 파일을 쓰는 구형 경로이므로 최종 전환 때 정기 스케줄을 제거해야 한다.
+- 실제 시트 큐 작업기는 `platform-publish-v2.yml`이다.
+- `blogger-daily-scheduler-v2.yml`은 별도 상태 파일을 쓰는 구형 경로이므로 최종 전환 때 정기 스케줄을 제거해야 한다.
 
 ### YouTube 10
 
@@ -54,7 +54,7 @@
 
 | 중복 경로 | 처리 기준 |
 |---|---|
-| `blogger-daily-scheduler.yml` 정기 스케줄 | 중지하고 `platform-publish.yml`만 사용 |
+| `blogger-daily-scheduler-v2.yml` 정기 스케줄 | 중지하고 `platform-publish-v2.yml`만 사용 |
 | JSON 상태 파일 기반 Blogger 랜덤 발사 | Google Sheet `자동화_발행대기`로 대체 |
 | YouTube 개별 채널 자체 스케줄러 | `youtube-control-scheduler.yml`로 통합 |
 | 별도 방문자 보고 | CEO 종합상황실 한 번으로 통합 완료 |

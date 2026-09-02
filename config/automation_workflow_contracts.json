@@ -15,7 +15,7 @@
       "safe_policy": "draft",
       "artifact_kind": "wordpress_post_id"
     },
-    "blogger-daily-scheduler.yml": {
+    "blogger-daily-scheduler-v2.yml": {
       "platforms": ["blogger"],
       "mode": "scheduler_managed",
       "inputs": {},
@@ -23,7 +23,7 @@
       "safe_policy": "draft",
       "artifact_kind": "blogger_draft_id"
     },
-    "platform-publish.yml": {
+    "platform-publish-v2.yml": {
       "platforms": ["blogger", "tistory"],
       "mode": "workflow_dispatch",
       "inputs": {

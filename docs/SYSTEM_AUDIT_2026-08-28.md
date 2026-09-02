@@ -19,7 +19,7 @@
 
 - 현재 자동화 가능 수준: 저장소의 publisher는 `InteractiveEditorPublisher`이며 GitHub Actions 무인 환경에서는 `local_login_required` 또는 `official_write_api_unavailable`로 안전하게 중단한다.
 - 발견 문제: 수동 workflow에서 Tistory 선택 경로 부족, DRAFT 강제 및 중복 본문/출처 검사 불충분, 계정 누락 및 empty run의 불명확한 성공 처리 가능성
-- 수정: `platform-publish.yml`, `process_platform_queue.py`, `content_identity.py`에서 Tistory/Naver 수동 필터, DRAFT 강제, 제목·본문·source 중복 차단, 계정 누락 기록, empty manual run 실패, publisher 실패 시 non-zero 종료를 적용했다.
+- 수정: `platform-publish-v2.yml`, `process_platform_queue.py`, `content_identity.py`에서 Tistory/Naver 수동 필터, DRAFT 강제, 제목·본문·source 중복 차단, 계정 누락 기록, empty manual run 실패, publisher 실패 시 non-zero 종료를 적용했다.
 - 실제 draft 생성: 불가. 로컬 로그인 세션과 안전한 대화형 편집기 연결이 없으므로 쓰기 테스트를 실행하지 않았다.
 - 추가 인증: 필요. ID/password를 Secret에 넣는 Selenium 우회는 구현하지 않았다.
 
@@ -52,7 +52,7 @@
 
 - `.github/workflows/adsense-infrastructure-audit.yml`
 - `.github/workflows/blogger-rewrite.yml`
-- `.github/workflows/platform-publish.yml`
+- `.github/workflows/platform-publish-v2.yml`
 - `.gitignore`
 - `automation_hub/content_identity.py`
 - `scripts/audit_adsense_sites.py`

@@ -84,14 +84,14 @@ Codex action:
 
 ## Priority 4 — Blogger has two active processing paths (DUPLICATE-SUSPECT)
 Path A:
-- `.github/workflows/blogger-daily-scheduler.yml`
+- `.github/workflows/blogger-daily-scheduler-v2.yml`
 - every 20 minutes (`8,28,48 * * * *`)
 - `scripts/blogger_daily_scheduler.py`
 - dispatches `blogger-rewrite.yml`
 - one Gemini Blogger draft per connected site/day; `publish_now=false`.
 
 Path B:
-- `.github/workflows/platform-publish.yml`
+- `.github/workflows/platform-publish-v2.yml`
 - every hour at :17
 - `scripts/process_platform_queue.py`
 - processes `자동화_발행대기` Blogger rows from Google Sheet;
@@ -174,8 +174,8 @@ Never label one metric as another.
 ### ACTIVE / scheduled
 - `publish-scheduler.yml` — WP A/B dispatch controller, hourly :37, max one dispatch
 - `daily-network-publish.yml` — dispatched single WP site publisher
-- `blogger-daily-scheduler.yml` — Blogger draft scheduler
-- `platform-publish.yml` — queued Blogger processor (duplicate-suspect with above)
+- `blogger-daily-scheduler-v2.yml` — Blogger draft scheduler
+- `platform-publish-v2.yml` — queued Blogger processor (duplicate-suspect with above)
 - `youtube-control-scheduler.yml` — canonical 10-channel YouTube scheduler
 - `daily-site-traffic.yml` — daily measurement collector
 - `situation-room-daily.yml` — daily executive report

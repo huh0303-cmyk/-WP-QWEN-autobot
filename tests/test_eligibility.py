@@ -50,7 +50,7 @@ YT_CONTRACT = {
 }
 
 BLOGGER_MANAGED_CONTRACT = {
-    "blogger-daily-scheduler.yml": {
+    "blogger-daily-scheduler-v2.yml": {
         "platforms": ["blogger"],
         "mode": "scheduler_managed",
         "inputs": {},
@@ -232,7 +232,7 @@ def test_real_contracts_use_only_supported_room_expressions():
 def test_scheduler_managed_room_has_no_generic_dispatch_inputs():
     room = AutomationRoom.from_dict(dict(
         room_id="blogger_test", platform="blogger", name="test",
-        enabled=True, destination_id="123", workflow="blogger-daily-scheduler.yml",
+        enabled=True, destination_id="123", workflow="blogger-daily-scheduler-v2.yml",
         publish_policy="draft", duplicate_guard=True,
     ))
     result = evaluate_room(room, BLOGGER_MANAGED_CONTRACT, NOW)
@@ -245,7 +245,7 @@ def test_scheduler_managed_room_is_not_in_generic_dispatch_list():
     registry = RoomRegistry([
         AutomationRoom.from_dict(dict(
             room_id="blogger_test", platform="blogger", name="test",
-            enabled=True, destination_id="123", workflow="blogger-daily-scheduler.yml",
+            enabled=True, destination_id="123", workflow="blogger-daily-scheduler-v2.yml",
             publish_policy="draft", duplicate_guard=True,
         ))
     ])

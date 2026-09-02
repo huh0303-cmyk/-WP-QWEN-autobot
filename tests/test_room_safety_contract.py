@@ -26,7 +26,7 @@ def test_all_room_policies_are_non_public():
 def test_contracts_require_identity_for_dispatched_rooms():
     contracts = load_contracts()
     assert {"room_id", "target_site_url"} <= set(contracts["daily-network-publish.yml"]["required_inputs"])
-    assert {"room_id", "platform"} <= set(contracts["platform-publish.yml"]["required_inputs"])
+    assert {"room_id", "platform"} <= set(contracts["platform-publish-v2.yml"]["required_inputs"])
     assert {"room_id", "channel"} <= set(contracts["generate-youtube-playlist.yml"]["required_inputs"])
     assert {"room_id", "channel"} <= set(contracts["curio-longform-daily.yml"]["required_inputs"])
 
