@@ -437,6 +437,7 @@ def get_site_data():
             "cadence": wordpress_cadence(registered),
             "official_categories": category_results.get(item["domain"], []),
             "auth_ready": bool(registered and (
+                os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip() or
                 registered.secret_name in secret_names or os.environ.get(registered.secret_name, "").strip()
             )),
             "google_approved": item["domain"] == "k-health365.com",
@@ -632,14 +633,32 @@ def _queue_draft_trigger(payload: dict[str, object]) -> str:
 def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
     """Dispatch the real GitHub draft worker; this command cannot publish publicly."""
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    inputs = {
+        "site_id": str(payload["site_id"]),
+        "keyword": str(payload["keyword"]),
+        "source_wp_url": str(payload.get("source_wp_url") or ""),
+        "text_model": str(payload["text_model"]),
+        "image_model": str(payload["image_model"]),
+    }
+    if token:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/sheet-triggered-auto-write.yml/dispatches",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {token}",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+            json={"ref": "main", "inputs": inputs},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+        return f"https://github.com/{repo}/actions/workflows/sheet-triggered-auto-write.yml"
     command = [
         "gh", "workflow", "run", "sheet-triggered-auto-write.yml",
         "--repo", repo,
-        "-f", f"site_id={payload['site_id']}",
-        "-f", f"keyword={payload['keyword']}",
-        "-f", f"source_wp_url={payload.get('source_wp_url') or ''}",
-        "-f", f"text_model={payload['text_model']}",
-        "-f", f"image_model={payload['image_model']}",
+        *[part for key, value in inputs.items() for part in ("-f", f"{key}={value}")],
     ]
     completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
     if completed.returncode != 0:
@@ -699,13 +718,24 @@ def trigger_tistory_plan():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#tistory")
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
-    command = ["gh", "workflow", "run", "tistory-daily-plan.yml", "--repo", repo]
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     try:
-        completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
-    except (OSError, subprocess.SubprocessError) as exc:
+        if token:
+            response = requests.post(
+                f"https://api.github.com/repos/{repo}/actions/workflows/tistory-daily-plan.yml/dispatches",
+                headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+                json={"ref": "main"}, timeout=30,
+            )
+            if response.status_code != 204:
+                raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+            completed = None
+        else:
+            command = ["gh", "workflow", "run", "tistory-daily-plan.yml", "--repo", repo]
+            completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
+    except (OSError, subprocess.SubprocessError, requests.RequestException, RuntimeError) as exc:
         flash(f"Tistory 5개 검토본 실행 요청 실패 · {exc}", "error")
     else:
-        if completed.returncode == 0:
+        if completed is None or completed.returncode == 0:
             flash("Tistory 5개 비공개 검토본 생성을 시작했습니다. 공개 발행은 하지 않습니다.", "success")
         else:
             detail = (completed.stderr or completed.stdout or "GitHub workflow dispatch failed").strip()
