@@ -35,6 +35,8 @@ def validate_channel_groups(registry: RoomRegistry, contracts: dict) -> dict[str
     room.group."""
     problems: dict[str, list[str]] = {}
     for room in registry.rooms:
+        if not room.enabled:
+            continue
         contract = contracts.get(room.workflow)
         if not contract:
             continue
