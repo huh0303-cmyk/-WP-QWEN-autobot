@@ -43,6 +43,7 @@ def main() -> int:
             "daily_max": 1,
             "weekly_min": 7,
             "weekly_max": 7,
+            "min_gap_minutes": 20,
             "content_profile": source.get("content_profile", "option_1"),
             "min_chars": blog["min_chars"],
             "target_chars": blog["target_chars"],
@@ -58,9 +59,10 @@ def main() -> int:
                 "text_provider": "gpt-5-mini",
                 "review_provider": "gemini-2.5-flash",
                 "meta_description_chars_min": 100,
-                "meta_description_chars_max": 120,
-                "labels_min": 3,
-                "labels_max": 8,
+                "meta_description_chars_max_exclusive": 120,
+                "labels_min": 8,
+                "labels_max": 14,
+                "image_provider_order": ["sdxl-lightning", "flux-schnell", "pass_no_image"],
             },
         })
 

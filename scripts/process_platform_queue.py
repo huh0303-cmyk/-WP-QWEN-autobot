@@ -161,7 +161,10 @@ def main() -> int:
         ).execute()
         result = publisher.publish(job)
         if platform == "blogger" and result.ok and result.status == "drafted":
-            notify_blogger_draft(site_id=job.site_id, title=job.title, review_url=result.public_url, quality_note=row.get("message", ""))
+            notify_blogger_draft(
+                site_id=job.site_id, title=job.title, review_url=result.public_url,
+                search_description=job.search_description, quality_note=row.get("message", ""),
+            )
         service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!D{index}", valueInputOption="RAW",
             body={"values": [[result.status]]},

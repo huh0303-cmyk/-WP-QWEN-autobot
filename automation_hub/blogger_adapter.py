@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 from typing import Any
 
 import requests
@@ -26,7 +27,40 @@ class BloggerPublisher:
             return PublishResult(False, "blogger", self.site_id, job.job_id, "auth_required", error_code="missing_blogger_credentials", message="Blogger blog ID and OAuth token are required")
 
         endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{self.blog_id}/posts"
+        marker = f"automation-job:{job.job_id}"
+        marked_content = f"<!-- {html.escape(marker)} -->{job.content_html}"
         try:
+            # Blogger has no idempotency-key header.  Persist a hidden stable
+            # job marker in the draft and look for it before every retry.  A
+            # worker crash after POST but before the Sheet update therefore
+            # returns the already-created draft instead of making a duplicate.
+            existing = self.session.get(
+                endpoint,
+                params={"status": ["draft", "live", "scheduled"], "view": "ADMIN",
+                        "fetchBodies": "true", "maxResults": 50},
+                headers={"Authorization": f"Bearer {self.access_token}"},
+                timeout=30,
+            )
+            if isinstance(existing.status_code, int) and existing.status_code != 200:
+                return PublishResult(
+                    False, "blogger", self.site_id, job.job_id, "failed",
+                    error_code=f"blogger_preflight_http_{existing.status_code}",
+                    message="Blogger idempotency preflight failed; draft creation was not attempted",
+                )
+            if existing.status_code == 200:
+                for item in existing.json().get("items", []):
+                    if marker not in str(item.get("content", "")):
+                        continue
+                    remote_id = str(item.get("id", ""))
+                    review_url = f"https://www.blogger.com/blog/post/edit/{self.blog_id}/{remote_id}"
+                    return PublishResult(
+                        True, "blogger", self.site_id, job.job_id, "drafted",
+                        public_url=review_url, remote_id=remote_id,
+                        message="Existing Blogger draft recovered by stable job marker; no duplicate created",
+                        extra={"idempotent_recovery": True,
+                               "search_description": job.search_description,
+                               "search_description_ui_required": True},
+                    )
             response = self.session.post(
                 endpoint,
                 params={"isDraft": str(not job.publish_now).lower()},
@@ -34,7 +68,7 @@ class BloggerPublisher:
                 # Blogger API v3's Post resource does not expose the editor's
                 # Search description field. Sending an invented customMetaData
                 # property is silently ignored, so never claim that it saved.
-                json={"kind": "blogger#post", "title": job.title, "content": job.content_html,
+                json={"kind": "blogger#post", "title": job.title, "content": marked_content,
                       "labels": job.labels},
                 timeout=30,
             )

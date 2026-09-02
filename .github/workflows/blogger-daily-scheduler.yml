@@ -1,4 +1,4 @@
-name: Blogger Daily - Gemini staggered publishing
+name: Blogger Daily - GPT-5 mini staggered drafts
 
 on:
   workflow_dispatch:

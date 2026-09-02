@@ -5,7 +5,8 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-def notify_blogger_draft(*, site_id: str, title: str, review_url: str, quality_note: str = "") -> bool:
+def notify_blogger_draft(*, site_id: str, title: str, review_url: str,
+                         search_description: str, quality_note: str = "") -> bool:
     """Email a private Blogger review link when Gmail credentials are configured."""
     try:
         from scripts.review_sheet import append_review_rows
@@ -27,6 +28,8 @@ def notify_blogger_draft(*, site_id: str, title: str, review_url: str, quality_n
 블로그: {site_id}
 제목: {title}
 검수·편집 링크: {review_url}
+검색 설명(100~119자, Blogger 우측 '검색 설명'에 확인/붙여넣기):
+{search_description}
 품질 기록: {quality_note or '-'}
 
 자동 공개되지 않습니다. 내용을 직접 읽고 확신이 설 때 Blogger에서 게시를 눌러주세요.

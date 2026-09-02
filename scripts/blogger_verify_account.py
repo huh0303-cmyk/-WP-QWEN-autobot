@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify Blogger OAuth and list blogs available to the configured Google account."""
+"""Verify Blogger OAuth against every enabled destination in the 27-site registry."""
 from __future__ import annotations
 
 import json
@@ -15,6 +15,8 @@ if str(ROOT / "scripts") not in sys.path:
 
 from process_platform_queue import _access_token
 
+REGISTRY_FILE = ROOT / "config" / "automation_hub_sites.json"
+
 
 def main():
     profile = os.environ.get("AUTH_PROFILE", "")
@@ -28,7 +30,30 @@ def main():
     if response.status_code != 200:
         raise SystemExit(f"Blogger OAuth 확인 실패 HTTP {response.status_code}: {response.text[:500]}")
     blogs = [{"id": str(item.get("id", "")), "name": item.get("name", ""), "url": item.get("url", "")} for item in response.json().get("items", [])]
-    print(json.dumps({"ok": True, "count": len(blogs), "blogs": blogs}, ensure_ascii=False, indent=2))
+    owned = {row["id"]: row for row in blogs if row["id"]}
+    configured = [row for row in json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))["sites"]
+                  if row.get("platform") == "blogger" and row.get("enabled", True)]
+    missing = [
+        {"site_id": row["site_id"], "destination_id": str(row.get("destination_id", "")), "url": row["url"]}
+        for row in configured if str(row.get("destination_id", "")) not in owned
+    ]
+    mismatched = [
+        {"site_id": row["site_id"], "configured_url": row["url"],
+         "oauth_url": owned[str(row["destination_id"])].get("url", "")}
+        for row in configured if str(row.get("destination_id", "")) in owned
+        and owned[str(row["destination_id"])].get("url", "").rstrip("/").lower()
+        != row["url"].rstrip("/").lower()
+    ]
+    report = {
+        "ok": len(configured) == 27 and not missing and not mismatched,
+        "configured_count": len(configured), "oauth_visible_count": len(blogs),
+        "matched_count": len(configured) - len(missing) - len(mismatched),
+        "missing": missing, "url_mismatches": mismatched,
+    }
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if not report["ok"]:
+        raise SystemExit("BLOGGER_27_OAUTH_VERIFY_FAILED")
+    print("BLOGGER_27_OAUTH_VERIFY_SUCCESS")
     return 0
 
 

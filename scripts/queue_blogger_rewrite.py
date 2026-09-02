@@ -34,8 +34,8 @@ from three_model_consensus import three_model_consensus
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
 
-# Worst case for one run: 2 write attempts (gemini+gpt fallback) + 3-way
-# Gemini+GPT review plus one image. See budget_guard.py.
+# Worst case for one run: two GPT writing attempts + independent Gemini/GPT
+# review plus one image. See budget_guard.py.
 ESTIMATED_COST_PER_RUN_USD = 0.03
 
 
@@ -130,15 +130,17 @@ def main():
     failures = []
     similarity_score = 1.0
     text_provider = ""
-    for attempt, provider in enumerate(("gemini", "gpt"), start=1):
+    # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
+    # attempt is a rewrite using the deterministic gate feedback; Gemini is
+    # deliberately reserved for the independent review below and never
+    # silently becomes the writer when credits or credentials fail.
+    for attempt in range(1, 3):
+        provider = "gpt"
         prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
         try:
-            if provider == "gemini":
-                raw = gemini_generate_text(prompt, temperature=0.7)
-            else:
-                if not openai_available():
-                    raise RuntimeError("GPT fallback unavailable")
-                raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
+            if not openai_available():
+                raise RuntimeError("GPT-5 mini writer unavailable")
+            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
             candidate = parse_rewrite_json(raw)
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
             quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
@@ -154,7 +156,7 @@ def main():
     if rewritten is None:
         failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source["link"], "", "", "QUALITY_GATE", f"quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
-        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: Gemini와 GPT 모두 {minimum_quality}점 미만이므로 발행을 차단했습니다. {failures}")
+        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 {minimum_quality}점 미만이므로 초안 생성을 차단했습니다. {failures}")
 
     consensus = three_model_consensus(
         title=rewritten["title"], content=rewritten["content_html"], meta=rewritten["meta_description"],

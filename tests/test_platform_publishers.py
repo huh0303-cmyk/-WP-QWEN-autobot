@@ -53,6 +53,33 @@ class PlatformPublisherTests(unittest.TestCase):
         self.assertTrue(result.extra["search_description_ui_required"])
         self.assertEqual("가" * 110, result.extra["search_description"])
 
+    def test_blogger_reuses_existing_draft_with_same_job_marker(self):
+        session = Mock()
+        session.get.return_value = Mock(
+            status_code=200,
+            json=lambda: {"items": [{"id": "77", "content": "<!-- automation-job:job-4 --><p>saved</p>"}]},
+        )
+        draft = PublishJob(
+            "job-4", "blogger_site-1", "Draft title", "<p>Draft</p>",
+            [f"label-{i}" for i in range(8)], publish_now=False,
+            search_description="가" * 110,
+        )
+        result = BloggerPublisher("blogger_site-1", "123", "token", session=session).publish(draft)
+        self.assertTrue(result.ok)
+        self.assertEqual("77", result.remote_id)
+        self.assertTrue(result.extra["idempotent_recovery"])
+        session.post.assert_not_called()
+
+    def test_blogger_rejects_120_character_search_description(self):
+        draft = PublishJob(
+            "job-5", "blogger_site-1", "Draft title", "<p>Draft</p>",
+            [f"label-{i}" for i in range(8)], publish_now=False,
+            search_description="가" * 120,
+        )
+        result = BloggerPublisher("blogger_site-1", "123", "token").publish(draft)
+        self.assertFalse(result.ok)
+        self.assertIn("100-119", result.message)
+
     def test_naver_never_claims_false_api_success(self):
         result = InteractiveEditorPublisher("naver", "site-1", "https://blog.naver.com").publish(self.job)
         self.assertFalse(result.ok)
