@@ -31,6 +31,7 @@ import time
 import requests
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -253,7 +254,7 @@ def get_total_published(site_url):
 
 
 def _blogger_slug(room):
-    """Return the intended blogspot subdomain for all 27 Blogger rooms."""
+    """Return the intended host label for all 33 Blogger rooms."""
     aliases = {
         "blogger_khealth365": "k-health365",
         "blogger_ktrip365": "k-trip365",
@@ -274,7 +275,16 @@ def load_blogger_rooms():
         rooms = json.loads(path.read_text(encoding="utf-8")).get("rooms", [])
     except (OSError, ValueError):
         return []
-    return [room for room in rooms if room.get("platform") == "blogger"]
+    registry_path = Path(REPO_ROOT) / "config" / "automation_hub_sites.json"
+    try:
+        sites = json.loads(registry_path.read_text(encoding="utf-8")).get("sites", [])
+        urls = {site.get("site_id"): site.get("url", "") for site in sites if site.get("platform") == "blogger"}
+    except (OSError, ValueError):
+        urls = {}
+    bloggers = [room for room in rooms if room.get("platform") == "blogger"]
+    for room in bloggers:
+        room["url"] = urls.get(room.get("room_id"), "")
+    return bloggers
 
 
 def get_blogger_published_count(blog_url):
@@ -294,7 +304,7 @@ def get_blogger_published_count(blog_url):
 
 
 def collect_blogger_summary():
-    """Collect public-post and sitemap-index counts for all 27 Blogger rooms."""
+    """Collect public-post and sitemap-index counts for all 33 Blogger rooms."""
     rooms = load_blogger_rooms()
     token = None
     accessible = set()
@@ -309,13 +319,14 @@ def collect_blogger_summary():
     details = []
     for room in rooms:
         slug = _blogger_slug(room)
-        blog_url = f"https://{slug}.blogspot.com"
+        blog_url = room.get("url") or f"https://{slug}.blogspot.com"
         public_posts, feed_error = get_blogger_published_count(blog_url)
         indexed = None
         errors = []
         if feed_error:
             errors.append(feed_error)
-        property_candidates = (blog_url + "/", f"sc-domain:{slug}.blogspot.com")
+        host = urlparse(blog_url).netloc
+        property_candidates = (blog_url.rstrip("/") + "/", f"sc-domain:{host}")
         query_site = next((candidate for candidate in property_candidates if candidate in accessible), None)
         if token and query_site:
             coverage, coverage_error = get_index_coverage(token, query_site)
@@ -633,7 +644,7 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
             _fmt_value_delta(totals["indexed"], totals["indexed_delta"]),
             _fmt_value_delta(totals["posts"], totals["posts_delta"]), totals["youtube_collected"],
             totals["youtube_total"], totals["youtube_subscribers"], totals["youtube_views"],
-            totals["sns_collected"], totals["sns_total"], totals["blogger_connected"], 27,
+            totals["sns_collected"], totals["sns_total"], totals["blogger_connected"], 33,
             totals["tistory_connected"], 5, totals["status"],
         ]
         gsheets_direct.append_or_update_tab_row(
@@ -757,7 +768,7 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
         "검색클릭(전일대비)", "수집상태", "기준시각(KST)",
     ]
     gsheets_direct.replace_tab_rows(SHEET_ID, "종합_62개현황", header, rows)
-    log("📊 종합_62개현황 갱신 완료 — WP27 + Blogspot27 + Tistory5 + Naver3")
+    log("📊 종합_68개현황 갱신 완료 — WP27 + Blogspot33 + Tistory5 + Naver3")
 
 
 def send_monetization_dashboard(adsense, topik_stats, topik_diff, khealth_metrics, checked_at):
@@ -856,7 +867,7 @@ def main():
     log(f"   전체글수 합계 {site_summary['total_posts']} / 클릭 합계 {site_summary['total_clicks']} "
         f"/ 색인 합계 {site_summary['total_indexed']} / 오류사이트 {len(site_summary['error_sites'])}개")
 
-    log("   Blogger 27개 공개글·색인 현황 수집 중...")
+    log("   Blogger 33개 공개글·색인 현황 수집 중...")
     blogger_details = collect_blogger_summary()
     log(f"   Blogger {len(blogger_details)}개 목록 확인")
 

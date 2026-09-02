@@ -13,7 +13,7 @@ class RegistryTests(unittest.TestCase):
         wordpress = [s for s in registry.sites if s.platform == "wordpress"]
         blogger = [s for s in registry.sites if s.platform == "blogger"]
         self.assertEqual(27, len(wordpress))
-        self.assertEqual(27, len(blogger))
+        self.assertEqual(33, len(blogger))
         self.assertEqual(25, len([s for s in wordpress if s.content_type == "blog"]))
         self.assertEqual(2, len([s for s in wordpress if s.content_type.startswith("news")]))
         self.assertEqual({}, registry.validate())

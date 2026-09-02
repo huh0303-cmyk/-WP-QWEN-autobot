@@ -60,10 +60,11 @@ def _blogspot_to_site_key() -> dict[str, str]:
 
 def _blogger_channel_to_site_key() -> dict[str, str]:
     profiles = json.loads((ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8"))["profiles"]
-    return {
-        profile["wordpress"]["url"].removeprefix("https://").removeprefix("http://").rstrip("/").rsplit(".", 1)[0]: profile["site_key"]
-        for profile in profiles
-    }
+    mapping = {profile["site_key"]: profile["site_key"] for profile in profiles}
+    for profile in profiles:
+        source_channel = profile["wordpress"]["url"].removeprefix("https://").removeprefix("http://").rstrip("/").rsplit(".", 1)[0]
+        mapping.setdefault(source_channel, profile["site_key"])
+    return mapping
 
 
 def _blogger_angle(keyword: str, language: str) -> str:

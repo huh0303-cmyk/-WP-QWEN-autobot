@@ -4,24 +4,7 @@
   "policy": {
     "automation_enabled": false,
     "publish_forbidden_until_assigned": true,
-    "do_not_mix_with_wp27_blogger27": true
+    "do_not_mix_with_wp27_blogger33": true
   },
-  "candidates": [
-    {
-      "url": "https://koreamedicaltour1.blogspot.com",
-      "destination_id": "2234527810530371008",
-      "status": "HOLD_UNASSIGNED",
-      "future_use": "General-interest blog candidate",
-      "notes": "Former medical-tour mapping. Excluded from koreamedicaltour.com; no automatic drafts or duplicate medical content."
-    },
-    {
-      "url": "https://k-health365-glow.blogspot.com",
-      "title": "K-Wellness Lab",
-      "destination_id": "",
-      "status": "HOLD_UNASSIGNED",
-      "future_use": "English-language K-wellness, beauty and healthy-lifestyle companion candidate",
-      "adsense_status": "NOT_INHERITED_REQUIRES_OWN_BLOGGER_ADSENSE_VERIFICATION",
-      "notes": "This blogspot.com hostname is a separate Blogger property, not a DNS subdomain of k-health365.com."
-    }
-  ]
+  "candidates": []
 }

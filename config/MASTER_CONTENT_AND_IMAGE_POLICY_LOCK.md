@@ -59,7 +59,7 @@ Gemini must not invent facts while reviewing. Material factual uncertainty goes 
 
 ## 2. Image generation pipeline
 
-Scope: WordPress 27, Blogger 27 and Tistory 5. YouTube retains its separate FLUX-only thumbnail lock.
+Scope: WordPress 27, Blogger 33 and Tistory 5. YouTube retains its separate FLUX-only thumbnail lock.
 Provider: Replicate.
 Credential: REPLICATE_API_TOKEN.
 

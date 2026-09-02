@@ -89,7 +89,8 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
         keyword = f"{topic} {angle}" if lang == "ko" else f"{topic}: {angle}"
         sensitive = any(x in topic.lower() for x in ("insurance", "finance", "medical", "visa", "tax", "law", "crypto", "건강", "뉴스"))
         source = "정부·공식기관 원문 필수" if sensitive else "공식기관·신뢰 출처 우선"
-        for platform in ("WordPress", "Blogger"):
+        platforms = ("Blogger",) if item.get("blogspot_only") else ("WordPress", "Blogger")
+        for platform in platforms:
             identity = wp if platform == "WordPress" else wp.rsplit(".", 1)[0]
             key = f"{target_date}|{platform}|{identity}"
             if key in existing_keys:
@@ -109,7 +110,7 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
                     "동일 키워드 WP 발행·URL 검증 후", "SEO≥70·120자 설명·라벨8~14",
                     "WP 선행대기", "공개 금지·사람 검토용 초안",
                 )
-                channel = wp.rsplit(".", 1)[0]
+                channel = item.get("site_key") or wp.rsplit(".", 1)[0]
             schedule_id = "ROLL-" + hashlib.sha1(key.encode()).hexdigest()[:10].upper()
             rows.append([
                 schedule_id, f"{target_date} {time_text} KST", platform, channel, destination,

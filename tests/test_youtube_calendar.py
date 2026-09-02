@@ -77,7 +77,7 @@ def test_private_result_requires_identity_and_private(tmp_path):
 def test_roll_does_not_duplicate_blogger_rows():
     first = wp_blogger_rows(NOW.date(), set())
     keys = {f"{r[1][:10]}|{r[2]}|{r[3]}" for r in first}
-    assert len(first) == 54
+    assert len(first) == 60  # 27 WP + 33 distinct Blogger destinations
     assert wp_blogger_rows(NOW.date(), keys) == []
 
 
