@@ -40,7 +40,7 @@ def test_life365_replaces_the_stale_petcare_label():
 def test_finance_site_replaces_the_stale_healthcare_label():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_finance_housing")
-    assert site["current_label"] == "K-덴탈보험연구소"
+    assert site["current_label"] == "한국부동산금융정보"
     assert site["title"] == "한국부동산금융정보"
     assert "대출" in site["categories"]
     assert "국가자격" not in site["categories"]

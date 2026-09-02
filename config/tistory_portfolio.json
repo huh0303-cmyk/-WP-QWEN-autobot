@@ -9,7 +9,7 @@
     {
       "site_id": "tistory_finance_housing",
       "url": "https://k-vietnam.tistory.com/",
-      "current_label": "K-덴탈보험연구소",
+      "current_label": "한국부동산금융정보",
       "title": "한국부동산금융정보",
       "launch_order": 2,
       "launch_enabled": true,
@@ -47,7 +47,7 @@
     {
       "site_id": "tistory_health_info",
       "url": "https://k-healthcare.tistory.com/",
-      "current_label": "K-보건의료자격증",
+      "current_label": "한국건강정보",
       "title": "한국건강정보",
       "launch_order": 3,
       "launch_enabled": true,
@@ -66,7 +66,7 @@
     {
       "site_id": "tistory_life365",
       "url": "https://huh0303.tistory.com/",
-      "current_label": "K-Petcare",
+      "current_label": "한국생활정보",
       "title": "한국생활정보",
       "launch_order": 4,
       "launch_enabled": true,
