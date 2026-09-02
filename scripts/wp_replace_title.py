@@ -9,7 +9,7 @@ def main() -> int:
     site = os.environ["WP_SITE_URL"].rstrip("/")
     post_id = os.environ["WP_POST_ID"].strip()
     new_title = os.environ["WP_NEW_TITLE"].strip()
-    user = os.environ.get("WP_USER", "admin").strip() or "admin"
+    user = os.environ.get("WP_USER", "huh0303@gmail.com").strip() or "huh0303@gmail.com"
     password = os.environ["WP_APP_PASSWORD"].strip()
     if not new_title or "unlock" in new_title.lower():
         raise SystemExit("replacement title is empty or still contains Unlock")

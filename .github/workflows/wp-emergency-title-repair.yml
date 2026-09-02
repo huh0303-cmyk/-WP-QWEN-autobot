@@ -33,6 +33,6 @@ jobs:
           WP_SITE_URL: ${{ inputs.site_url }}
           WP_POST_ID: ${{ inputs.post_id }}
           WP_NEW_TITLE: ${{ inputs.new_title }}
-          WP_USER: admin
+          WP_USER: huh0303@gmail.com
           WP_APP_PASSWORD: ${{ secrets[inputs.site_key] }}
         run: python scripts/wp_replace_title.py
