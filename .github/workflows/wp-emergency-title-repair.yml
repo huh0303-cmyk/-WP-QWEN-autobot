@@ -1,0 +1,38 @@
+name: WordPress — Emergency title repair
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: WordPress site URL
+        required: true
+      site_key:
+        description: GitHub secret key for the site app password
+        required: true
+      post_id:
+        description: WordPress post ID
+        required: true
+      new_title:
+        description: Replacement title (slug/body/status remain unchanged)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Replace title and verify
+        env:
+          WP_SITE_URL: ${{ inputs.site_url }}
+          WP_POST_ID: ${{ inputs.post_id }}
+          WP_NEW_TITLE: ${{ inputs.new_title }}
+          WP_USER: admin
+          WP_APP_PASSWORD: ${{ secrets[inputs.site_key] }}
+        run: python scripts/wp_replace_title.py
