@@ -51,6 +51,6 @@ jobs:
         env:
           SITE_ID: ${{ matrix.site_id }}
           SITE_URL: ${{ matrix.url }}
-          WP_USER: admin
+          WP_USER: huh0303@gmail.com
           WP_APP_PASSWORD: ${{ secrets[matrix.secret] }}
         run: python scripts/apply_wordpress_logo.py

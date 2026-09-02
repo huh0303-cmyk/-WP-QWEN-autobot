@@ -12,7 +12,7 @@ def main() -> int:
     site_url = os.environ["SITE_URL"].rstrip("/")
     site_id = os.environ["SITE_ID"]
     password = os.environ["WP_APP_PASSWORD"].strip()
-    user = os.environ.get("WP_USER", "admin")
+    user = os.environ.get("WP_USER", "huh0303@gmail.com")
     path = Path("assets/site_logos/wordpress") / f"{site_id}.png"
     if not password or not path.exists():
         raise RuntimeError(f"Missing credential or logo asset for {site_id}")
