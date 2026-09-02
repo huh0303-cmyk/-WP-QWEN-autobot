@@ -1628,11 +1628,16 @@ def crawl_rss_news(lang="ko", site_url=""):
         try:
             res = requests.get(url, timeout=10, headers={"User-Agent":"Mozilla/5.0"})
             soup = BeautifulSoup(res.text, 'xml')
-            for it in soup.find_all('item'):
+            # Support both RSS <item> and Atom <entry>; GOV.UK's licensed
+            # politics/culture/sport feeds are Atom.
+            for it in soup.find_all(['item', 'entry']):
                 t = re.sub(r'<[^>]+>','', it.title.text.strip() if it.title else "")
-                d = re.sub(r'<[^>]+>','', it.description.text.strip() if it.description else "")
-                link = it.link.text.strip() if it.link else ""
-                raw_date = (it.pubDate.text.strip() if it.pubDate else "") or (it.find("dc:date").text.strip() if it.find("dc:date") else "")
+                summary_node = it.find('description') or it.find('summary') or it.find('content')
+                d = re.sub(r'<[^>]+>','', summary_node.text.strip() if summary_node else "")
+                link_node = it.find('link')
+                link = ((link_node.get('href') or link_node.text).strip() if link_node else "")
+                date_node = it.find('pubDate') or it.find('dc:date') or it.find('published') or it.find('updated')
+                raw_date = date_node.text.strip() if date_node else ""
                 recent = False
                 published = None
                 if raw_date:
@@ -1650,7 +1655,12 @@ def crawl_rss_news(lang="ko", site_url=""):
         except: pass
 
     if candidates:
-        ch = max(candidates, key=lambda item: priorities[(item[0], item[3])])
+        rotation = (["정치", "경제", "국방", "글로벌", "문화", "스포츠"] if lang == "ko" else
+                    ["Politics", "Business", "Military", "World", "Culture", "Sports"])
+        preferred = rotation[(now_kst().timetuple().tm_yday + now_kst().hour) % len(rotation)]
+        preferred_candidates = [item for item in candidates if item[4] == preferred]
+        pool = preferred_candidates or candidates
+        ch = max(pool, key=lambda item: priorities[(item[0], item[3])])
         used.add(ch[0].strip().lower())
         print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
         return ch

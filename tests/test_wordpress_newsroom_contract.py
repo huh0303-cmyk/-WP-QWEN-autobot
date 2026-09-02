@@ -28,6 +28,7 @@ def test_wp_and_newsroom_workflows_are_fail_closed_by_role():
     assert 'WP_PUBLICATION_APPROVED: "true"' in newsroom
     assert "newsroom-publisher-single-owner" in newsroom
     assert "for attempt in 1 2 3" in newsroom
+    assert 'EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"' in newsroom
 
 
 def test_both_workflows_use_sheet_registry_and_locked_models():

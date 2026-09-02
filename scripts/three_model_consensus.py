@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import date
 from typing import Callable
@@ -42,7 +43,27 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
     try:
         results["gemini"] = _json(gemini_generate("You are the first independent quality checker. " + rule))
     except Exception as exc:
-        results["gemini"] = {"ok": False, "issues": [f"check_failed: {exc}"]}
+        # Newsrooms must not stop publishing merely because the Gemini account
+        # is temporarily rate-limited or out of credit.  When explicitly
+        # enabled by the newsroom workflow, replace the unavailable Gemini
+        # check with a separate, cold OpenAI review.  This is still a blocking
+        # review: a rejection or malformed response fails closed.
+        fallback_enabled = os.getenv("EDITORIAL_GEMINI_OUTAGE_FALLBACK", "false").strip().lower() == "true"
+        if fallback_enabled and openai_available():
+            try:
+                fallback = _json(openai_generate_text(
+                    "You are the continuity quality checker replacing an unavailable Gemini checker. "
+                    "Review independently from a blank context. " + rule,
+                    temperature=0.0,
+                    max_retries=1,
+                ))
+                fallback["provider"] = "openai_continuity_reviewer"
+                fallback["fallback_reason"] = type(exc).__name__
+                results["gemini"] = fallback
+            except Exception as fallback_exc:
+                results["gemini"] = {"ok": False, "issues": [f"fallback_check_failed: {fallback_exc}"]}
+        else:
+            results["gemini"] = {"ok": False, "issues": [f"check_failed: {exc}"]}
     if not openai_available():
         results["gpt"] = {"ok": False, "issues": ["GPT checker unavailable"]}
     else:

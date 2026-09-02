@@ -84,6 +84,10 @@ jobs:
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "openai"
           GEMINI_REVIEW_MODEL: "gemini-2.5-flash"
+          # Keep the editorial gate operating during Gemini quota/outage
+          # incidents. A second cold GPT review replaces only the unavailable
+          # checker; any factual rejection still blocks publication.
+          EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"
           OPENAI_ENABLED: "true"
           CLAUDE_ENABLED: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
