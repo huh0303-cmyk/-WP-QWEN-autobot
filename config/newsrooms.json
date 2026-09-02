@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "publishing_enabled": true,
   "shared": {
     "theme_target": "twentytwentyfive",
@@ -48,7 +48,8 @@
     },
     "ai_image_rule": "Never simulate documentary photography of a real event. Use labelled illustration, map, timeline or data graphic only.",
     "source_rule": "Original reporting/analysis first. Attribute and link every external lead. Never copy, translate line-by-line, spin, bypass paywalls or use sources requiring separate written permission.",
-    "quality_gate": "Automatic publication is limited to the two approved newsroom workflows and requires source, recency, duplication, image-rights and SEO gates."
+    "quality_gate": "Automatic public publication is limited to koreanews365.com and theseouljournal.com. Every article must pass source, recency, duplication, image-rights and SEO gates; all other network sites remain human-approval drafts.",
+    "publication_mode": "public_after_automated_quality_gates_no_human_review"
   },
   "sites": {
     "koreanews365.com": {

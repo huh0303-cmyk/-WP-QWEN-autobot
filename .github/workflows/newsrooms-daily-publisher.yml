@@ -1,4 +1,4 @@
-name: "Two Newsrooms — RSS 2–10 Daily Editions"
+name: "Two Newsrooms — RSS 3–10 Daily Editions"
 
 on:
   workflow_dispatch:
@@ -74,14 +74,15 @@ jobs:
       - name: Publish one source-checked edition
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
-          WP_POST_STATUS: "draft"
-          WP_PUBLICATION_APPROVED: "false"
+          # The two approved newsrooms are the only WordPress exception to the
+          # network-wide human approval rule. All source/recency/duplicate/
+          # rights/SEO gates still run before a public post can be created.
+          WP_POST_STATUS: "publish"
+          WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
-          AI_TEXT_PROVIDER: "gemini"
+          AI_TEXT_PROVIDER: "openai"
           OPENAI_ENABLED: "true"
-          CLAUDE_ENABLED: "true"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_ENABLED: "true"
+          CLAUDE_ENABLED: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_IMAGE_ENABLED: "false"
@@ -89,9 +90,9 @@ jobs:
           GEMINI_IMAGE_GENERATION_ENABLED: "true"
           NANO_BANANA_FREE_TIER_ENABLED: "false"
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
-          OPENAI_MODEL: "gpt-5.6-luna"
+          OPENAI_MODEL: "gpt-5-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          NEWSROOM_REQUIRE_PUBLICATION: "false"
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
@@ -111,17 +112,3 @@ jobs:
           path: newsroom_publish_result.json
           if-no-files-found: warn
           retention-days: 7
-      - name: Send private-draft review link
-        if: always()
-        env:
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
-          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
-          REPORT_EMAIL_TO: "huh0303@gmail.com"
-          REPORT_EMAIL_FROM: "huh0303@gmail.com"
-          REPORT_TITLE: "[뉴스룸 작성 완료] 글 확인 후 승인 또는 비승인"
-          REPORT_BODY: "뉴스룸 비공개 초안 작업이 끝났습니다. 아래 링크에서 결과와 초안 주소를 확인한 뒤 직접 최종 공개해 주세요."
-          REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/publishing_completion_notify.py

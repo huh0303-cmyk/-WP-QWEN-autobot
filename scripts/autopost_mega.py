@@ -33,7 +33,7 @@ KST = timezone(timedelta(hours=9))
 def now_kst():
     return datetime.now(KST)
 
-NEWSROOM_DAILY_MIN = 2
+NEWSROOM_DAILY_MIN = 3
 NEWSROOM_DAILY_MAX = 10
 
 def newsroom_daily_target(site_url, day=None, daily_min=NEWSROOM_DAILY_MIN, daily_max=NEWSROOM_DAILY_MAX):
@@ -3506,7 +3506,7 @@ def main():
     print(f"\n{'='*60}")
     print(f"🚀 autopost_mega.py v2.0 — SLOT {RUN_SLOT} | {now_kst().strftime('%Y-%m-%d %H:%M:%S')} KST")
     provider = os.getenv("AI_TEXT_PROVIDER", "auto").strip().lower()
-    model = os.getenv("OPENAI_MODEL", "gpt-5.6-luna") if provider == "openai" else GEMINI_MODEL
+    model = os.getenv("OPENAI_MODEL", "gpt-5-mini") if provider == "openai" else GEMINI_MODEL
     print(f"   AI: {provider}/{model} | SEO 목표: {SEO_TARGET}점 | 재생성: {MAX_REGEN}회")
     print(f"   ✅ 카테고리 생성 금지 — 기존 카테고리 중에서만 매칭 (pick_best_category)")
     print(f"   ✅ 27개 사이트별 독립 페르소나 (SITE_PERSONA)")
@@ -3557,7 +3557,7 @@ def main():
                 print(f"⏭  {url} — 오늘 발행량 확인 실패, 안전 중지")
                 skip += n
                 continue
-            print(f"  🗓️ 오늘 기사 준비·발행 {published_today}/{daily_target}건 (RSS 기반 2~10회·속보 우선)")
+            print(f"  🗓️ 오늘 기사 발행 {published_today}/{daily_target}건 (RSS 기반 3~10회·속보 우선)")
             if published_today >= daily_target:
                 print(f"⏭  {url} — 오늘 기사 상한 도달")
                 skip += n
