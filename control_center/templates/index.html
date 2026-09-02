@@ -243,13 +243,10 @@
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <div class="mb-1 flex items-center gap-2">
-                                <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-violet-600 px-2 text-xs font-black text-white">{{ loop.index }}위</span>
+                                <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-violet-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
                                 <p class="text-[10px] font-bold text-slate-400">등록 B{{ blog.order }} · {{ blog.name }}</p>
                             </div>
                             <a class="break-all font-bold text-violet-700 hover:underline" href="{{ blog.url }}" target="_blank" rel="noopener">{{ blog.url|replace('https://', '') }}</a>
-                            <div class="mt-2 rounded-lg border border-violet-200 bg-violet-100/80 px-3 py-2 text-xs text-violet-900">
-                                <span class="font-black">분야:</span> <span class="font-bold">{{ (blog.category or '미분류')|compact_category(42) }}</span>
-                            </div>
                         </div>
                         <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black {% if blog.connected %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}"><span class="h-2 w-2 rounded-full {% if blog.connected %}bg-emerald-500{% else %}bg-red-500{% endif %}"></span>{% if blog.connected %}연결됨{% else %}연결 확인 필요{% endif %}</span>
                     </div>
@@ -261,6 +258,9 @@
                             {% else %}<p class="mt-1 text-sm font-black text-amber-600">미집계 <span class="text-[9px] text-slate-400">(증감 미집계)</span></p>{% endif %}
                         </div>
                         {% endfor %}
+                    </div>
+                    <div class="rounded-lg border border-violet-200 bg-violet-100/80 px-3 py-2 text-xs text-violet-900">
+                        <span class="font-black">분야:</span> <span class="font-bold">{{ (blog.category or '미분류')|compact_category(42) }}</span>
                     </div>
                     <div class="rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-xs">
                         <p class="mb-1.5 font-black text-slate-700">대표 카테고리 · 글 수</p>

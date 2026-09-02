@@ -569,6 +569,7 @@ def get_blogger_data():
         key=lambda item: (
             item["today_visitors"] is None,
             -(item["today_visitors"] or 0),
+            -(item["total_visitors"] or 0),
             item["order"] or 999,
         ),
     )

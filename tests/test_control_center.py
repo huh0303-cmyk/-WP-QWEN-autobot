@@ -89,6 +89,8 @@ def test_blogspot_dashboard_uses_green_connection_and_compact_categories():
     assert "blog.official_categories[:8]" in template
     assert compact_category("international students") == "intl students"
     assert compact_category("A category name that is unnecessarily long", 16).endswith("…")
+    assert "당일 방문자 내림차순" in template
+    assert "오늘 {{ loop.index }}위" in template
 
 
 def test_locked_default_content_and_image_engines():
