@@ -16,7 +16,8 @@ WP_USER = os.getenv("WP_USER", "huh0303@gmail.com").strip()
 
 
 def main() -> int:
-    rows = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    rows = registry.get("sites", []) if isinstance(registry, dict) else registry
     sites = [row for row in rows if row.get("platform") == "wordpress"]
     results: list[dict] = []
 
