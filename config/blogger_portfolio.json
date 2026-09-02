@@ -4,6 +4,15 @@
   "seo_setup_updated_on": "2026-08-30",
   "description": "Locked WordPress-to-Blogger 1:1 MASTER MAP. WordPress remains unchanged. Blogger shells are separate editorial properties and never copy WordPress posts.",
   "timezone": "Asia/Seoul",
+  "custom_domain_policy": {
+    "locked_on": "2026-09-03",
+    "adsense_parent": "k-health365.com",
+    "mappings": {
+      "KSkin365": "https://skin.k-health365.com",
+      "K-wellness Lab": "https://glow.k-health365.com"
+    },
+    "rule": "Keep these Blogger custom domains canonical in every registry, dashboard and publisher; do not revert them to blogspot.com aliases."
+  },
   "creation_policy": {
     "mode": "shell_only",
     "duplicate_check_required": true,

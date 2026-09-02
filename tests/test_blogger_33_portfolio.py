@@ -41,7 +41,12 @@ def test_kworld_kpop_is_distinct_from_existing_kworld_seoul():
 
 
 def test_kskin_uses_its_live_custom_domain():
-    portfolio = json.loads((ROOT / "config/blogger_portfolio.json").read_text(encoding="utf-8"))["channels"]
+    document = json.loads((ROOT / "config/blogger_portfolio.json").read_text(encoding="utf-8"))
+    portfolio = document["channels"]
     urls = {row["blogspot"] for row in portfolio}
     assert "https://skin.k-health365.com" in urls
     assert "https://kskin365.blogspot.com" not in urls
+    assert document["custom_domain_policy"]["mappings"] == {
+        "KSkin365": "https://skin.k-health365.com",
+        "K-wellness Lab": "https://glow.k-health365.com",
+    }
