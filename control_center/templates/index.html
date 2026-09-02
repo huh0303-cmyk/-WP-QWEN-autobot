@@ -91,7 +91,7 @@
                 <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 font-bold text-blue-900">일반 WordPress 25개 · 사이트별 하루 1포스팅 · 주 7포스팅</p>
                 <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-bold text-amber-900">뉴스룸 2개 예외 · 사이트별 RSS 하루 3~10회</p>
             </div>
-            <p class="text-xs text-slate-400">k-health365.com 고정 1위 · 나머지는 당일 방문자 내림차순</p>
+            <p class="text-xs text-slate-400">전체 사이트 당일 방문자 내림차순 · 등수는 매일 자동 갱신</p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for site in sites %}
                 <form method="post" action="{{ url_for('trigger_draft') }}" class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if site.google_approved %}border-2 border-amber-400 to-amber-50 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-blue-200 to-blue-50{% endif %}">
@@ -102,7 +102,7 @@
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}수집 실패{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}실패{% endif %}</span>
-                            <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white">{{ loop.index }}위</span>
+                            <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
                             <span class="break-all font-bold text-slate-800">{{ site.domain }}</span>
                         </div>
                         <div class="flex items-center gap-2">
@@ -114,40 +114,39 @@
                             <span class="h-3 w-3 rounded-full {% if site.auth_ready %}bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,.18)]{% else %}bg-red-500 shadow-[0_0_0_3px_rgba(239,68,68,.18)]{% endif %}" title="WP 인증 {% if site.auth_ready %}정상{% else %}미연결{% endif %}"></span>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2" aria-label="{{ site.domain }} 핵심 통계 4개">
-                        <div class="col-span-2 rounded-xl border-2 border-blue-400 bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 text-white shadow-lg shadow-blue-200/80">
-                            <p class="text-xs font-black tracking-tight text-blue-100">당일 방문자 · 어제 대비</p>
+                    <div class="grid grid-cols-2 gap-2 rounded-2xl border-2 border-blue-400 bg-slate-950 p-2 shadow-lg shadow-blue-200/70" aria-label="{{ site.domain }} 핵심 통계 4개">
+                        <div class="rounded-xl border border-blue-300 bg-gradient-to-br from-blue-700 to-blue-500 px-3 py-3 text-white shadow-sm">
+                            <p class="text-[11px] font-black tracking-tight text-blue-100">당일 방문자(어제 대비)</p>
                             {% if site.today_visitors is not none %}
                             <p class="mt-1 flex items-baseline gap-2">
-                                <span class="visitor-bounce text-4xl font-black tabular-nums">{{ '{:,}'.format(site.today_visitors) }}</span>
-                                {% if site.today_delta is not none %}<span class="rounded-full bg-white/20 px-2 py-0.5 text-sm font-black {% if site.today_delta < 0 %}text-rose-100{% else %}text-emerald-100{% endif %}">({% if site.today_delta > 0 %}+{% endif %}{{ site.today_delta }})</span>{% else %}<span class="text-xs font-bold text-blue-100">(증감 집계 중)</span>{% endif %}
+                                <span class="visitor-bounce text-3xl font-black tabular-nums">{{ '{:,}'.format(site.today_visitors) }}</span>
+                                {% if site.today_delta is not none %}<span class="rounded-full bg-white/20 px-2 py-0.5 text-sm font-black {% if site.today_delta < 0 %}text-rose-100{% else %}text-emerald-100{% endif %}">({% if site.today_delta > 0 %}+{% endif %}{{ site.today_delta }})</span>{% else %}<span class="text-[10px] font-bold text-blue-100">(증감 미집계)</span>{% endif %}
                             </p>
                             {% else %}<p class="mt-1 text-lg font-black text-amber-200">방문자 연결 필요</p>{% endif %}
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
-                            <p class="text-[11px] font-black text-slate-500">누적 방문자 · 오늘 증가</p>
+                            <p class="text-[11px] font-black text-slate-500">누적 방문자(오늘 증가)</p>
                             {% if site.total_visitors is not none %}
                             <p class="mt-1 text-2xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.total_visitors) }}
-                                {% if site.total_delta is not none %}<span class="text-xs {% if site.total_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.total_delta > 0 %}+{% endif %}{{ site.total_delta }})</span>{% endif %}
+                                {% if site.total_delta is not none %}<span class="text-xs {% if site.total_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.total_delta > 0 %}+{% endif %}{{ site.total_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
                             </p>
                             {% else %}<p class="mt-1 text-sm font-black text-amber-600">집계 중</p>{% endif %}
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
-                            <p class="text-[11px] font-black text-slate-500">총 게시글 · 증감</p>
+                            <p class="text-[11px] font-black text-slate-500">총 게시글(증감)</p>
                             {% if site.total_posts is not none %}
                             <p class="mt-1 text-2xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.total_posts) }}
-                                {% if site.posts_delta is not none %}<span class="text-xs {% if site.posts_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.posts_delta > 0 %}+{% endif %}{{ site.posts_delta }})</span>{% endif %}
+                                {% if site.posts_delta is not none %}<span class="text-xs {% if site.posts_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.posts_delta > 0 %}+{% endif %}{{ site.posts_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
                             </p>
                             {% else %}<p class="mt-1 text-sm font-black text-amber-600">집계 중</p>{% endif %}
                         </div>
-                        <div class="col-span-2 rounded-xl border-2 border-emerald-300 bg-emerald-50 px-3 py-3 shadow-sm" title="{{ site.index_status }}">
+                        <div class="rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-3 shadow-sm" title="{{ site.index_status }}">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-black text-emerald-800">Google 색인 글 · 증감</p>
-                                <span class="text-[9px] font-bold text-emerald-700">{{ site.index_status }}</span>
+                                <p class="text-[11px] font-black text-emerald-800">Google 색인 글(증감)</p>
                             </div>
                             {% if site.indexed is not none %}
                             <p class="mt-1 text-3xl font-black tabular-nums text-emerald-950">{{ '{:,}'.format(site.indexed) }}
-                                {% if site.indexed_delta is not none %}<span class="text-sm {% if site.indexed_delta < 0 %}text-red-600{% else %}text-emerald-700{% endif %}">({% if site.indexed_delta > 0 %}+{% endif %}{{ site.indexed_delta }})</span>{% endif %}
+                                {% if site.indexed_delta is not none %}<span class="text-sm {% if site.indexed_delta < 0 %}text-red-600{% else %}text-emerald-700{% endif %}">({% if site.indexed_delta > 0 %}+{% endif %}{{ site.indexed_delta }})</span>{% else %}<span class="text-[10px] text-emerald-700">(증감 미집계)</span>{% endif %}
                             </p>
                             {% else %}<p class="mt-1 text-base font-black text-amber-700">{{ site.index_status }}</p>{% endif %}
                         </div>

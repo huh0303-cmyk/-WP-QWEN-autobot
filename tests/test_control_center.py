@@ -103,9 +103,19 @@ def test_locked_default_content_and_image_engines():
     ]
 
 
-def test_khealth_is_always_first_in_traffic_order():
+def test_wordpress_cards_are_ranked_by_daily_traffic():
     rows, _ = _site_rows(load_wordpress_sites())
-    assert rows[0]["domain"] == "k-health365.com"
+    daily = [row["today_visitors"] for row in rows if row["today_visitors"] is not None]
+    assert daily == sorted(daily, reverse=True)
+
+
+def test_wordpress_kpis_appear_before_site_metadata():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    wordpress = template.index("{% for site in sites %}")
+    kpis = template.index("당일 방문자(어제 대비)", wordpress)
+    category = template.index("사이트 분야:", wordpress)
+    persona = template.index("페르소나:", wordpress)
+    assert wordpress < kpis < category < persona
 
 
 def test_job_creation_is_idempotent():

@@ -494,8 +494,10 @@ def get_site_data():
             "default_image_model": "bytedance/sdxl-lightning-4step",
         })
     return sorted(sites, key=lambda site: (
-        site["domain"] != "k-health365.com",
+        site["today_visitors"] is None,
         -(site["today_visitors"] or 0),
+        -(site["total_visitors"] or 0),
+        site["domain"],
     ))
 
 
