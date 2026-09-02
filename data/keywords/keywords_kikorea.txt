@@ -1,50 +1,50 @@
-FIPA amendment national security review	Investment Structures
-Indirect foreign investment Korea screening	Investment Structures
-National core technology M&A rules	Investment Structures
-Defense industry company investment approval	Investment Structures
-Korea M&A foreign investor guidelines	Investment Structures
-Foreign-invested enterprise structure benefits	Investment Structures
-Securities acquisition reporting capital limits	Investment Structures
-Branch office abolition impact 2026	Investment Structures
-Korean Commercial Act governance updates	Investment Structures
-Limited liability company Korea setup	Investment Structures
-Joint venture establishment Korea legal	Investment Structures
-Foreign capital contribution USD direct	Investment Structures
-Corporate venture capital exit rules	Investment Structures
-Low capital entity banking review	Investment Structures
-Shareholder protection M&A transactions	Investment Structures
-Wholly owned subsidiary Korea setup	Investment Structures
-China Plus One manufacturing Korea	Investment Structures
-Greenfield investment notifications 2026	Investment Structures
-M&A investment notifications growth 2026	Investment Structures
-Foreign entity tax residency test	Investment Structures
-Korea company registration updates 2026	Registration Process
-FDI notification process timeline 2026	Registration Process
-Capital remittance foreign investment steps	Registration Process
-Court registration foreign company Korea	Registration Process
-Business registration tax office deadline	Registration Process
-Corporate bank account activation 2026	Registration Process
-Foreign-invested company registration sequence	Registration Process
-D-8 investor visa requirements 2026	Registration Process
-D-8-1 corporate investment visa Korea	Registration Process
-D-8-4 technology startup visa changes	Registration Process
-D-8-3 joint representative visa rules	Registration Process
-K-Startup Grand Challenge eligibility 2026	Registration Process
-Foreign founder immigration filing Korea	Registration Process
-Regulatory licenses social insurance rates	Registration Process
-D-8 visa minimum capital KRW 100M	Registration Process
-Overseas fund remittance D8 visa	Registration Process
-Consular scrutiny D-8 visa 2026	Registration Process
-Digital certificate foreign company setup	Registration Process
-D-8 visa permanent residency path	Registration Process
-FDI notification common filing mistakes	Registration Process
-Korea 2026 Tax Revision Bill	Incentives & Support
-Strategic industries tax incentives 2026	Incentives & Support
-Regional investment incentives Korea updates	Incentives & Support
-Korea foreign investment cash grants	Incentives & Support
-Cash grant eligible costs 2026	Incentives & Support
-Semiconductor FDI tax credits Korea	Incentives & Support
-AI R&D tax credit benefits	Incentives & Support
+Korea FIPA amendment implications	Investment Structures
+Indirect foreign investment screening Korea	Investment Structures
+National security review FDI Korea	Investment Structures
+Mandatory prior notification investments Korea	Investment Structures
+Foreign-invested enterprise control rules Korea	Investment Structures
+Korean defense industry investment approval	Investment Structures
+Free Economic Zones Korea benefits 2026	Investment Structures
+Foreign Investment Zones Korea guide	Investment Structures
+Free Trade Zone land ownership Korea	Investment Structures
+FEZ manufacturing logistics incentives	Investment Structures
+Greenfield vs M&A investment Korea	Investment Structures
+Corporate equity acquisition Korea 2026	Investment Structures
+Joint Stock Company Korea setup	Investment Structures
+Limited Liability Company Korea formation	Investment Structures
+Strategic industries investment structures	Investment Structures
+Korea U-turn policy regional investment	Investment Structures
+Five Mega-Regions investment strategy	Investment Structures
+Special Self-Governing Provinces FDI	Investment Structures
+Advanced specialization zones Korea	Investment Structures
+Korea company formation entity comparison	Investment Structures
+Korea FDI notification process 2026	Registration Process
+Foreign investment capital remittance Korea	Registration Process
+Korea business court registration steps	Registration Process
+Tax registration foreign company Korea	Registration Process
+Foreign-invested company registration guide	Registration Process
+D-8 business investment visa Korea	Registration Process
+Tightened tax residency criteria Korea	Registration Process
+Place of effective management Korea	Registration Process
+Korea branch registry abolition impact	Registration Process
+Regulatory permit streamlining Korea	Registration Process
+Environmental permit application Korea FDI	Registration Process
+Labor permit foreign company Korea	Registration Process
+K-ETA system investment visits	Registration Process
+Digital certificate foreign company Korea	Registration Process
+Banking setup foreign investors Korea	Registration Process
+AML checks Korea business 2026	Registration Process
+Founder visa Korea innovation potential	Registration Process
+Business plan requirements Korea FDI	Registration Process
+Substance over form Korea	Registration Process
+Korea semiconductor investment incentives 2026	Incentives & Support
+AI data center investment grants Korea	Incentives & Support
+Secondary battery tax credits Korea	Incentives & Support
+Biotechnology R&D tax benefits Korea	Incentives & Support
+Korea strategic industry cash grants	Incentives & Support
+Equipment investment tax credits Korea	Incentives & Support
+R&D tax credits Korea eligibility	Incentives & Support
 Customs duty exemptions imported equipment	Incentives & Support
-Corporate income tax reductions foreign	Incentives & Support
-Acquisition property tax benefits 2026	Incentives & Support
+Land infrastructure subsidies Korea	Incentives & Support
+Regulatory fast-tracking strategic projects	Incentives & Support
+Advanced manufacturing FDI support	Incentives & Support

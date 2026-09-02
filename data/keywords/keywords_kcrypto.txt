@@ -1,50 +1,50 @@
-Korea Digital Asset Basic Act status	Regulations
-South Korea 2027 crypto tax guidance	Regulations
-FIU expanded VASP investigation powers	Regulations
-Korean Travel Rule zero threshold impact	Regulations
-FSC stablecoin regulation framework	Regulations
-Virtual Asset User Protection Act scope	Regulations
-Korea STO market regulatory overview	Regulations
-National Asset Basic Act crypto inclusion	Regulations
-FSS AI crypto market surveillance	Regulations
-Cross-border crypto transfer registration 2026	Regulations
-Korean VASP AML compliance updates	Regulations
-FSC crypto policy committee agenda	Regulations
-CARF crypto tax reporting obligations	Regulations
-Korean crypto tax private wallets 2027	Regulations
-Overseas crypto income tax enforcement	Regulations
-Digital Asset Framework Act discussion	Regulations
-South Korea FATF Travel Rule adherence	Regulations
-Financial Intelligence Unit bill progress	Regulations
-Korea crypto market manipulation crackdown	Regulations
-Digital asset taxation procedural standards	Regulations
-FSC virtual asset oversight strategy	Regulations
-Korean crypto legal framework consolidation	Regulations
-Korean crypto exchange ownership cap	Exchanges
-Upbit Bithumb shareholder cap impact	Exchanges
-Licensed South Korean crypto exchanges	Exchanges
-Bithumb operational safety rules 2026	Exchanges
-VASP internal control standards Korea	Exchanges
-Korea Exchange Novel Securities Market	Exchanges
-KRX STO trading platform launch	Exchanges
-VASP financial health criteria updates	Exchanges
-Exchange IT security compliance requirements	Exchanges
-Major Korean crypto exchanges analysis	Exchanges
-DAXA exchange governance initiatives	Exchanges
-Virtual asset market entry criteria	Exchanges
-Korean exchange operator debt ratio	Exchanges
-FSC exchange supervision measures	Exchanges
-VASP suspicious transaction monitoring	Exchanges
-Real-name verified accounts system Korea	Exchanges
-Crypto exchange operational resilience	Exchanges
-Korean VASP licensing manual changes	Exchanges
-Crypto custody requirements for platforms	Exchanges
-Overseas VASP registration challenges Korea	Exchanges
-Korean corporate crypto investment limits	Investing
-Investing in tokenized securities South Korea	Investing
-Korean crypto capital gains tax 2027	Investing
-Crypto tax cost basis tracking Korea	Investing
-Crypto staking income tax implications	Investing
-CARF tax identification number collection	Investing
-South Korea digital asset wealth recognition	Investing
-Tokenized government bonds pilot project	Investing
+Digital Asset Framework Act September	Regulations
+South Korea stablecoin issuance rules	Regulations
+FSC virtual asset policy roadmap	Regulations
+FIU direct investigative powers	Regulations
+Korean crypto tax deferral outlook	Regulations
+National Asset Basic Act crypto	Regulations
+South Korea crypto legal structure	Regulations
+FSC exchange voting rights cap	Regulations
+Bank of Korea CBDC Project Han	Regulations
+FSS AI market surveillance crypto	Regulations
+Cross-border crypto transfer registration	Regulations
+Digital Asset Basic Act passage	Regulations
+Korea financial intelligence enforcement	Regulations
+Virtual Asset User Protection effectiveness	Regulations
+South Korea blockchain policy changes	Regulations
+Consolidated Digital Asset bill	Regulations
+FSC crypto policy review grades	Regulations
+Stablecoin regulatory disagreements Korea	Regulations
+Korea virtual asset legislative timeline	Regulations
+Ministry of Economy crypto plans	Regulations
+Korean VASP registration requirements	Exchanges
+Crypto exchange debt-equity ratio	Exchanges
+South Korea Travel Rule elimination	Exchanges
+Licensed VASP operational compliance	Exchanges
+FSC VASP shareholder vetting	Exchanges
+Upbit Bithumb Coinone regulations	Exchanges
+Korean exchange internal control standards	Exchanges
+VASP registration renewal deadlines	Exchanges
+Wallet reconciliation rules Korea	Exchanges
+Unregistered crypto platforms investigation	Exchanges
+Korean exchange security infrastructure	Exchanges
+VASP customer deposit segregation	Exchanges
+Crypto exchange audit frequency Korea	Exchanges
+Korean VASP financial health tests	Exchanges
+Overseas crypto exchange compliance	Exchanges
+Digital Asset Exchange Alliance views	Exchanges
+VASP registration grace period	Exchanges
+Bithumb error triggered rules	Exchanges
+Korean exchange anti-money laundering	Exchanges
+Korean crypto tax 2027 preparation	Investing
+Private wallet crypto tax tracing	Investing
+Corporate crypto investment guidelines	Investing
+Tracking crypto purchase price Korea	Investing
+virtual asset income calculation	Investing
+Security token offering investment eligibility	Investing
+Tax implications crypto staking Korea	Investing
+Buying STOs South Korea 2026	Investing
+Korean won stablecoin investment risks	Investing
+Foreign crypto exchange tax reporting	Investing
+Crypto tax planning 2026 guidance	Investing

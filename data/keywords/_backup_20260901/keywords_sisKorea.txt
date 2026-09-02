@@ -1,50 +1,50 @@
-South Korea Education Policy Changes (Dec 2025/May 2026 announcements):**	Applications
-TOPIK exam digitisation by 2029, computer-based, AI grading.	Programs
-Expanded post-study pathways, "growth ladder visa system".	Scholarships
-Eased D-4 trainee visa requirements.	Applications
-New "gap year" route for OECD high school graduates.	Programs
-Here's the plan for keyword generation:	Scholarships
-Extract specific entities (school names, program names, scholarship names).	Applications
-Extract specific policies, events, or deadlines.	Programs
-Ensure no near-duplicates.	Scholarships
-Assign to one of the three categories: Applications, Programs, Scholarships.	Applications
-Let's start generating.	Programs
-Keywords Draft (Internal thought process - not final output):**	Scholarships
-Korea University Spring 2027 application	Applications
-KAIST graduate admission 2027	Programs
-Yonsei UIC Spring 2027 application	Scholarships
-GKS 2027 Embassy track deadline	Applications
-GKS 2027 University track application	Programs
-SKKU Spring 2027 international admission	Scholarships
-Korean student visa D-2 requirements	Applications
-D-4 to D-2 visa change Korea	Programs
-Korea University 2027 language test	Scholarships
-Seoul Foreign School 2027 enrollment	Applications
-Yongsan International School 2027 apply	Programs
-Korea International School 2027 admissions	Scholarships
-Korean high school exchange 2027	Applications
-KGSP 2027 undergraduate application	Programs
-Korea University international freshman 2027	Scholarships
-Hanyang University 2027 admissions	Applications
-Ewha Womans University 2027 application	Programs
-Kyung Hee University 2027 applications	Scholarships
-KOICA scholarship 2027 application	Applications
-GKS 2027 document checklist	Programs
-South Korea D-4 visa requirements 2026	Scholarships
-International student visa Korea process	Applications
-Korea study visa financial proof	Programs
-Korea AI graduate F-5 visa	Scholarships
-Korean language training 2026	Applications
-South Korea gap year program	Programs
-KAIST Master's PhD programs	Scholarships
-Yonsei Underwood International College	Applications
-Short-term Korean culture programs	Programs
-Seoul international school curriculum	Scholarships
-Korea STEM academic programs 2026	Applications
-TOPIK exam digital format 2029	Programs
-Korea D-2 student visa work rights	Scholarships
-Seoul student housing 2026 options	Applications
-Korea University dormitory options	Programs
-Yonsei SK Global House	Scholarships
-No deposit student housing Seoul	Applications
-South Korea teaching March 2027	Programs
+Seoul International 2027 admissions portal	Applications
+Chadwick International 2027 application guide	Applications
+KIS Jeju enrollment window closes	Applications
+Dwight Seoul IB applications open	Applications
+YISS early decision 2027 timeline	Applications
+SNU graduate Spring 2027 apply	Applications
+Yonsei Fall 2027 undergraduate dates	Applications
+Korea University winter program deadlines	Applications
+KAIST international student application tips	Applications
+Hanyang short-term program eligibility	Applications
+Ewha Womans University 2027 application	Applications
+Sogang KLP winter session apply	Applications
+GKS 2027 application required documents	Applications
+New D-4 visa change effective	Applications
+D-2 student visa updates 2026	Applications
+Pyeongtaek International School tuition	Applications
+Busan Foreign School application process	Applications
+Global Korea Scholarship 2027 FAQs	Applications
+Online university application Korea guide	Applications
+Yonsei Summer Abroad 2027 registration	Programs
+SNU Global Leadership 2027 dates	Programs
+KAIST AI Ethics bootcamp registration	Programs
+K-pop dance intensive December Korea	Programs
+Korean language winter program Seoul	Programs
+Business innovation short course January	Programs
+Medical observership Seoul hospital	Programs
+Digital content creation workshop Korea	Programs
+Sustainable development programs 2027	Programs
+Metaverse development crash course	Programs
+Busan marine science internship	Programs
+Jeju eco-tourism study program	Programs
+Gangwon winter sports program	Programs
+Korea cultural heritage tour	Programs
+Fintech bootcamp South Korea Fall	Programs
+Global MBA short program January	Programs
+STEM research exchange Korea	Programs
+Seoul startup accelerator application	Programs
+Creative writing workshop November Korea	Programs
+TESOL certificate program Seoul	Programs
+GKS 2027 scholarship application deadline	Scholarships
+Korean government scholarship quota	Scholarships
+SNU international student grants	Scholarships
+Yonsei Global Leader scholarship 2027	Scholarships
+KAIST research assistantship opportunities	Scholarships
+Ewha Womans international scholarships	Scholarships
+Hanyang University financial aid 2027	Scholarships
+Sogang KLP scholarship requirements	Scholarships
+POSCO TJ Park fellowship 2027	Scholarships
+Samsung SDS international student grants	Scholarships
+Hyundai scholarship automotive engineering	Scholarships

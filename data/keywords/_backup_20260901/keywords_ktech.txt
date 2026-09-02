@@ -1,50 +1,50 @@
-Samsung AI chip investment 2026	Semiconductors
-SK Hynix Indiana fab HBM4E	Semiconductors
-Korean HBM memory market share	Semiconductors
-South Korea semiconductor tax credits	Semiconductors
-Advanced chip packaging Korea future	Semiconductors
-Samsung HBM4 chip specifications	Semiconductors
-SK Hynix SOCAMM2 power efficiency	Semiconductors
-Korea semiconductor talent shortage solutions	Semiconductors
-South Korea chip export record	Semiconductors
-Nvidia Samsung foundry partnership Groq3	Semiconductors
-Korean special semiconductor act updates	Semiconductors
-Future Response Fund chip investments	Semiconductors
-Korean chip materials profit boom	Semiconductors
-SK Hynix HBM5 hybrid bonding	Semiconductors
-South Korea advanced fab locations	Semiconductors
-Pyeongtaek Samsung campus expansion	Semiconductors
-Korea EUV lithography tool acquisition	Semiconductors
-AI memory chip shortage 2030	Semiconductors
-Korean 5nm logic chip progress	Semiconductors
-Semiconductor equipment investment incentives Korea	Semiconductors
-Korean National AI roadmap 2026-2028	AI
-SK Horizon AI data center growth	AI
-Korea national AI computing plans	AI
-South Korea GPU infrastructure goals	AI
-OpenAI Korea AI data center partnership	AI
-SK Telecom AI infrastructure shift	AI
-South Korea physical AI initiatives	AI
-Korean AI data center investment	AI
-SKT Asia AI hub strategy	AI
-Korea AI workforce development programs	AI
-Government AI computing resources access	AI
-Korean private AI investment trends	AI
-AI data center safety standards Korea	AI
-South Korea cloud expansion projects	AI
-Korean industry AI adoption rates	AI
-South Korea military AI policy	AI
-AI data center cooling innovations	AI
-Korean energy efficient AI solutions	AI
-Korea AI chip export support	AI
-DeepX AI chip startup valuation	Startups
-Wrtn AI app unicorn journey	Startups
-South Korea AI startup investment	Startups
-Liner AI agent user growth	Startups
-Anthropic free AI credits Korea	Startups
-Korean VC investment sectors 2026	Startups
-South Korea startup survival challenges	Startups
-Korea government startup support program	Startups
-Korean AI chip designer companies	Startups
-Robotics startup funding South Korea	Startups
-South Korea generative AI unicorns	Startups
+Korean free AI access details	AI
+SK Telecom AI services launch	AI
+KT AI platform public	AI
+KakaoTalk AI agent features	AI
+Nvidia B200 chip allocation	AI
+Korean sovereign AI model	AI
+AI data privacy policy Korea	AI
+Naver AI search agent	AI
+Naver HyperClova X advancements	AI
+Naver AI infrastructure expansion	AI
+Kakao AI company split	AI
+South Korea AI budget 2026	AI
+AI public utility benefits Korea	AI
+Seoul AI infrastructure summit	AI
+Korean AI tech ecosystem funding	AI
+Naver Labs spatial intelligence	AI
+SK Telecom AI data center plans	AI
+AI agent marketplace Korea	AI
+SK Hynix Indiana fab progress	Semiconductors
+SK Hynix HBM production 2029	Semiconductors
+Samsung HBM4E memory specifications	Semiconductors
+Samsung PIM technology adoption	Semiconductors
+Korean semiconductor investment incentives guide	Semiconductors
+South Korea AI chip manufacturing	Semiconductors
+HBM3E memory spot pricing	Semiconductors
+DRAM price hike impact	Semiconductors
+Korean semiconductor manufacturing zones	Semiconductors
+Mega Special Zone Act benefits	Semiconductors
+Samsung SK Hynix memory competition	Semiconductors
+LPDDR5X-PIM market applications	Semiconductors
+Korean advanced packaging innovations	Semiconductors
+Global HBM supply forecast	Semiconductors
+SK Hynix Cheongju fab investment	Semiconductors
+Samsung long-term HBM deals	Semiconductors
+Korean government semiconductor roadmap	Semiconductors
+HBM wafer capacity outlook	Semiconductors
+Next-gen AI memory comparison	Semiconductors
+Korean venture investment H1 2026	Startups
+South Korea deep tech package	Startups
+K-Startup Grand Challenge apply	Startups
+Startup Korea Plan overview	Startups
+Foreign founders Korea support	Startups
+Korean startup ecosystem ranking	Startups
+Deep tech startup grants Korea	Startups
+AI Fast-Track Program details	Startups
+Regional startup hub incentives	Startups
+Korean venture capital reforms	Startups
+Startup regulatory flexibility Korea	Startups
+Early-stage startup capital Korea	Startups
+Korean robotics startup investment	Startups
