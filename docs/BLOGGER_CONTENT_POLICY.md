@@ -49,4 +49,5 @@ Default address rule: use the WordPress domain stem as the Blogspot subdomain (`
 ## Shared public author identity
 
 - Display name: `Korea 365 Editorial Desk`
-- Bio: `Korea 365 Editorial Desk publishes practical, source-led guides to jobs, travel, visas, insurance, medical tourism, and study in Korea. We prioritize current official sources, clear procedures, and plain-language explanations. Time-sensitive requirements should always be confirmed with the relevant authority.`
+- Shared Blogger display name: `Korea 365 Editorial Network`
+- Shared Blogger bio: `Korea 365 Editorial Network publishes practical, source-led information about life, work, study, travel, health, beauty, culture, finance, and public services connected to Korea. We explain complex topics clearly, distinguish verified facts from opinion, and direct readers to current official sources when rules or requirements may change.`
