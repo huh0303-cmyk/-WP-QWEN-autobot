@@ -56,6 +56,7 @@ def main() -> int:
 
     verified = requests.get(
         f"{base}/sites/{site}/sitemaps/{feed}", headers=headers, timeout=30
+    )
     verified.raise_for_status()
     data = verified.json()
     print(json.dumps({
