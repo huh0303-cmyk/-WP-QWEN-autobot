@@ -28,7 +28,8 @@
         </div>
     </header>
     <nav class="sticky top-[61px] z-20 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
-        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-5">
+        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-6">
+            <a href="#review-queue" class="rounded-lg bg-amber-50 px-2 py-2 text-center text-[10px] font-black text-amber-800 sm:text-xs">검토·발행대기</a>
             <a href="#wordpress" class="rounded-lg bg-blue-50 px-2 py-2 text-center text-[10px] font-black text-blue-700 sm:text-xs">WP 27</a>
             <a href="#blogspot" class="rounded-lg bg-violet-50 px-2 py-2 text-center text-[10px] font-black text-violet-700 sm:text-xs">Blogspot 27</a>
             <a href="#tistory" class="rounded-lg bg-teal-50 px-2 py-2 text-center text-[10px] font-black text-teal-700 sm:text-xs">Tistory 5</a>
@@ -46,6 +47,19 @@
         </div>
         {% endif %}
         {% endwith %}
+        <section id="review-queue" class="scroll-mt-24 rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm sm:p-7">
+            <p class="text-xs font-black text-amber-700">REVIEW &amp; FINAL PUBLISH</p>
+            <h2 class="mt-1 text-2xl font-extrabold text-slate-950">검토·발행대기</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-700">생성 버튼을 누른 작업은 CEO종합상황실 시트에 기록됩니다. 준비가 끝난 글은 아래 관리자 화면에서 본문·제목·이미지를 검토한 뒤, 각 플랫폼의 <strong>공개/게시 버튼</strong>을 직접 눌러 최종 발행합니다. 이 통제실은 공개 버튼을 대신 누르지 않습니다.</p>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                <a href="https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/edit" target="_blank" rel="noopener" class="rounded-2xl bg-emerald-700 px-4 py-4 text-center text-sm font-black text-white">① 발행대기 시트 확인</a>
+                <a href="https://k-health365.com/wp-admin/edit.php?post_status=draft&post_type=post" target="_blank" rel="noopener" class="rounded-2xl bg-blue-700 px-4 py-4 text-center text-sm font-black text-white">② WordPress 초안</a>
+                <a href="https://www.blogger.com/" target="_blank" rel="noopener" class="rounded-2xl bg-violet-700 px-4 py-4 text-center text-sm font-black text-white">② Blogspot 초안</a>
+                <a href="https://www.tistory.com/auth/login" target="_blank" rel="noopener" class="rounded-2xl bg-teal-700 px-4 py-4 text-center text-sm font-black text-white">② Tistory 관리자</a>
+                <a href="https://studio.youtube.com/" target="_blank" rel="noopener" class="rounded-2xl bg-red-700 px-4 py-4 text-center text-sm font-black text-white">② YouTube 비공개</a>
+            </div>
+            <p class="mt-3 text-xs font-bold text-amber-800">확인 순서: 자동화_발행대기 행 확인 → 해당 카드의 관리자 검토 버튼 → 내용 확인 → 플랫폼 관리자에서 직접 공개</p>
+        </section>
         <div id="wordpress" class="flex items-center justify-between gap-3 scroll-mt-24">
             <div>
                 <p class="text-xs font-bold text-slate-400">WORDPRESS 27</p>
@@ -164,6 +178,7 @@
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
                         <span>WP 비공개 초안 생성</span><span aria-hidden="true">→</span>
                     </button>
+                    <a href="{{ site.admin_review_url }}" target="_blank" rel="noopener" class="flex h-11 w-full items-center justify-center rounded-xl border-2 border-blue-200 bg-white px-4 text-xs font-black text-blue-800 hover:bg-blue-50">관리자에서 초안 검토·발행 →</a>
                     <p class="text-center text-[10px] font-semibold text-slate-400">공개 발행 없음 · 최종 검토 후 직접 승인</p>
                 </form>
                 {% endfor %}
@@ -262,6 +277,7 @@
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-4 text-sm font-black text-white shadow-md shadow-violet-200 transition active:scale-[.98] hover:from-violet-800 hover:to-fuchsia-700">
                         <span>Blogspot 비공개 초안 생성</span><span aria-hidden="true">→</span>
                     </button>
+                    <a href="{{ blog.admin_review_url }}" target="_blank" rel="noopener" class="flex h-11 w-full items-center justify-center rounded-xl border-2 border-violet-200 bg-white px-4 text-xs font-black text-violet-800 hover:bg-violet-50">관리자에서 초안 검토·발행 →</a>
                     <p class="text-center text-[10px] font-semibold text-slate-400">WP 공개 URL 검증 필수 · 공개 발행 없음</p>
                 </form>
                 {% endfor %}
@@ -371,6 +387,7 @@
                         <input type="hidden" name="site_id" value="{{ blog.site_id }}">
                         <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-teal-800 active:scale-[.98]">이 사이트 비공개 초안 생성</button>
                     </form>
+                    <a href="{{ blog.admin_review_url }}" target="_blank" rel="noopener" class="flex h-11 w-full items-center justify-center rounded-xl border-2 border-teal-200 bg-white px-4 text-xs font-black text-teal-800 hover:bg-teal-50">관리자에서 검토·발행 →</a>
                 </article>
                 {% endfor %}
             </div>
@@ -414,6 +431,7 @@
                         <input type="hidden" name="channel_key" value="{{ channel.channel_key }}">
                         <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-red-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-red-800 active:scale-[.98]">이 채널 비공개 업로드 시작</button>
                     </form>
+                    <a href="{{ channel.admin_review_url }}" target="_blank" rel="noopener" class="flex h-11 w-full items-center justify-center rounded-xl border-2 border-red-200 bg-white px-4 text-xs font-black text-red-800 hover:bg-red-50">YouTube Studio에서 검토·공개 →</a>
                 </article>
                 {% endfor %}
             </div>

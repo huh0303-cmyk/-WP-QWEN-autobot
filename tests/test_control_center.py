@@ -78,6 +78,9 @@ def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     assert "이 채널 비공개 업로드 시작" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
+    assert 'id="review-queue"' in template
+    assert "관리자에서 초안 검토·발행" in template
+    assert "YouTube Studio에서 검토·공개" in template
 
 
 def test_locked_default_content_and_image_engines():
