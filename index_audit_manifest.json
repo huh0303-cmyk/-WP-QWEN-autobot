@@ -6,25 +6,25 @@
       "lifecycle": "priority",
       "property": "sc-domain:k-health365.com",
       "posts": {},
-      "error": "wp_inventory_failed: 500 Server Error: Internal Server Error for url: https://k-health365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='k-health365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='k-health365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreamedicaltour.com": {
       "lifecycle": "active",
       "property": "sc-domain:koreamedicaltour.com",
       "posts": {},
-      "error": "wp_inventory_failed: 500 Server Error: Internal Server Error for url: https://koreamedicaltour.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreamedicaltour.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreamedicaltour.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreainvest365.com": {
       "lifecycle": "active",
       "property": "sc-domain:koreainvest365.com",
       "posts": {},
-      "error": "wp_inventory_failed: 500 Server Error: Internal Server Error for url: https://koreainvest365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreainvest365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreainvest365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://ki-korea.com": {
       "lifecycle": "active",
       "property": "sc-domain:ki-korea.com",
       "posts": {},
-      "error": "wp_inventory_failed: 500 Server Error: Internal Server Error for url: https://ki-korea.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='ki-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreainsurance365.com": {
       "lifecycle": "active",
@@ -266,7 +266,8 @@
         "indexed_delta": null,
         "total_published": 12
       },
-      "audited_at": "2026-09-02T10:59:39.407150+00:00"
+      "audited_at": "2026-09-02T10:59:39.407150+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreainsurance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreainsurance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://kfinance365.com": {
       "lifecycle": "active",
@@ -1154,7 +1155,8 @@
         "indexed_delta": null,
         "total_published": 46
       },
-      "audited_at": "2026-09-02T11:04:47.076051+00:00"
+      "audited_at": "2026-09-02T11:04:47.076051+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kfinance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kfinance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreataxnlaw.com": {
       "lifecycle": "active",
@@ -1187,7 +1189,8 @@
         "indexed_delta": null,
         "total_published": 1
       },
-      "audited_at": "2026-09-02T11:04:54.975495+00:00"
+      "audited_at": "2026-09-02T11:04:54.975495+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreataxnlaw.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreataxnlaw.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreacrypto365.com": {
       "lifecycle": "active",
@@ -2132,7 +2135,8 @@
         "indexed_delta": null,
         "total_published": 49
       },
-      "audited_at": "2026-09-02T11:10:24.602318+00:00"
+      "audited_at": "2026-09-02T11:10:24.602318+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreacrypto365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreacrypto365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://krealestate365.com": {
       "lifecycle": "active",
@@ -2184,7 +2188,8 @@
         "indexed_delta": null,
         "total_published": 2
       },
-      "audited_at": "2026-09-02T11:10:39.859950+00:00"
+      "audited_at": "2026-09-02T11:10:39.859950+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='krealestate365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='krealestate365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://ktech365.com": {
       "lifecycle": "active",
@@ -2464,7 +2469,8 @@
         "indexed_delta": null,
         "total_published": 14
       },
-      "audited_at": "2026-09-02T11:12:14.176849+00:00"
+      "audited_at": "2026-09-02T11:12:14.176849+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='ktech365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='ktech365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://kskin365.com": {
       "lifecycle": "active",
@@ -3352,7 +3358,8 @@
         "indexed_delta": null,
         "total_published": 46
       },
-      "audited_at": "2026-09-02T11:17:27.759056+00:00"
+      "audited_at": "2026-09-02T11:17:27.759056+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kskin365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://oliveyoungkorea.com": {
       "lifecycle": "active",
@@ -3448,7 +3455,8 @@
         "indexed_delta": null,
         "total_published": 4
       },
-      "audited_at": "2026-09-02T11:17:56.285064+00:00"
+      "audited_at": "2026-09-02T11:17:56.285064+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kworld365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kworld365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://k-trip365.com": {
       "lifecycle": "active",
@@ -3614,7 +3622,8 @@
         "indexed_delta": null,
         "total_published": 8
       },
-      "audited_at": "2026-09-02T11:18:59.811078+00:00"
+      "audited_at": "2026-09-02T11:18:59.811078+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://k-visa365.com": {
       "lifecycle": "active",
@@ -4597,7 +4606,8 @@
         "indexed_delta": null,
         "total_published": 51
       },
-      "audited_at": "2026-09-02T11:24:38.868372+00:00"
+      "audited_at": "2026-09-02T11:24:38.868372+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='k-visa365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='k-visa365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreawedding365.com": {
       "lifecycle": "active",
@@ -5808,7 +5818,8 @@
         "indexed_delta": null,
         "total_published": 63
       },
-      "audited_at": "2026-09-02T11:31:34.483010+00:00"
+      "audited_at": "2026-09-02T11:31:34.483010+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreawedding365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreawedding365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://kstudy365.com": {
       "lifecycle": "active",
@@ -6088,7 +6099,8 @@
         "indexed_delta": null,
         "total_published": 14
       },
-      "audited_at": "2026-09-02T11:33:11.940973+00:00"
+      "audited_at": "2026-09-02T11:33:11.940973+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://studyinkorea365.com": {
       "lifecycle": "active",
@@ -7033,7 +7045,8 @@
         "indexed_delta": null,
         "total_published": 49
       },
-      "audited_at": "2026-09-02T11:38:41.491735+00:00"
+      "audited_at": "2026-09-02T11:38:41.491735+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='studyinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='studyinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://kieca-korea.org": {
       "lifecycle": "active",
@@ -7142,7 +7155,8 @@
         "indexed_delta": null,
         "total_published": 5
       },
-      "audited_at": "2026-09-02T11:39:18.108994+00:00"
+      "audited_at": "2026-09-02T11:39:18.108994+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://ksa-korea.org": {
       "lifecycle": "active",
@@ -7175,7 +7189,8 @@
         "indexed_delta": null,
         "total_published": 1
       },
-      "audited_at": "2026-09-02T11:39:28.582323+00:00"
+      "audited_at": "2026-09-02T11:39:28.582323+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='ksa-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://sis-korea.com": {
       "lifecycle": "active",
@@ -8348,7 +8363,8 @@
         "indexed_delta": null,
         "total_published": 61
       },
-      "audited_at": "2026-09-02T11:46:16.779733+00:00"
+      "audited_at": "2026-09-02T11:46:16.779733+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='sis-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://jobkorea365.com": {
       "lifecycle": "active",
@@ -9103,7 +9119,8 @@
         "indexed_delta": null,
         "total_published": 39
       },
-      "audited_at": "2026-09-02T11:50:35.048690+00:00"
+      "audited_at": "2026-09-02T11:50:35.048690+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='jobkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://jobinkorea365.com": {
       "lifecycle": "active",
@@ -10010,7 +10027,8 @@
         "indexed_delta": null,
         "total_published": 47
       },
-      "audited_at": "2026-09-02T11:55:50.621451+00:00"
+      "audited_at": "2026-09-02T11:55:50.621451+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='jobinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='jobinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://jobkoreaglobal.com": {
       "lifecycle": "review",
@@ -10655,7 +10673,8 @@
         "indexed_delta": null,
         "total_published": 37
       },
-      "audited_at": "2026-09-02T11:58:43.640584+00:00"
+      "audited_at": "2026-09-02T11:58:43.640584+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://korea365.org": {
       "lifecycle": "active",
@@ -11825,7 +11844,8 @@
         "indexed_delta": null,
         "total_published": 88
       },
-      "audited_at": "2026-09-02T11:59:36.204180+00:00"
+      "audited_at": "2026-09-02T11:59:36.204180+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='korea365.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='korea365.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://koreanews365.com": {
       "lifecycle": "active",
@@ -11982,7 +12002,8 @@
         "indexed_delta": null,
         "total_published": 11
       },
-      "audited_at": "2026-09-02T11:59:45.165847+00:00"
+      "audited_at": "2026-09-02T11:59:45.165847+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     },
     "https://theseouljournal.com": {
       "lifecycle": "active",
@@ -13244,8 +13265,9 @@
         "indexed_delta": null,
         "total_published": 96
       },
-      "audited_at": "2026-09-02T12:00:29.224948+00:00"
+      "audited_at": "2026-09-02T12:00:29.224948+00:00",
+      "error": "wp_inventory_failed: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='theseouljournal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
     }
   },
-  "updated_at": "2026-09-02T12:00:29.224973+00:00"
+  "updated_at": "2026-09-02T17:16:16.153243+00:00"
 }
