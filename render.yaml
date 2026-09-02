@@ -6,6 +6,8 @@ services:
     buildCommand: pip install -r requirements-control-center.txt
     startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 4 control_center.app:app
     healthCheckPath: /healthz
+    domains:
+      - control.korea365.org
     autoDeployTrigger: commit
     envVars:
       - key: PYTHON_VERSION
