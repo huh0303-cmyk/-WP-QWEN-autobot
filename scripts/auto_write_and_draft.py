@@ -324,7 +324,7 @@ def main() -> int:
     if article is None or (ymyl_keyword and not _consensus_passes(consensus)):
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
-        raise SystemExit(f"Gemini/GPT/Claude consensus failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")
+        raise SystemExit(f"Gemini/GPT review failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")
     if not _consensus_passes(consensus):
         print(json.dumps({
             "consensus_warning": "non-YMYL draft accepted after two revision rounds",

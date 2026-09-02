@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
   "status": "LOCKED",
   "scope": ["wordpress", "blogger", "tistory", "news", "youtube_scripts", "sns_copy"],
@@ -33,9 +33,9 @@
     ]
   },
   "auditor": {
-    "provider": "anthropic",
-    "model_family": "Claude",
-    "role": "editorial_grammar_and_quality_auditor",
+    "provider": "openai",
+    "model_family": "ChatGPT/GPT",
+    "role": "independent_final_editorial_fact_and_quality_reviewer",
     "checks": [
       "grammar_and_spelling",
       "awkward_or_ai_sounding_phrasing",
@@ -51,8 +51,8 @@
       "final_quality_gate"
     ],
     "rules": [
-      "Claude audits and flags or minimally corrects editorial problems; it is not the routine bulk first-draft writer.",
-      "Claude must not invent new facts while correcting grammar or style.",
+      "GPT independently reviews and rewrites editorial problems after the Gemini draft; it is not the routine first-draft writer.",
+      "GPT must not invent new facts while correcting grammar or style.",
       "Material factual uncertainty must be returned for source verification, not silently rewritten.",
       "A failed audit returns QUALITY_FAIL or REWRITE_REQUIRED and routes back to the writer before approval."
     ]
@@ -63,7 +63,7 @@
     "gemini_2_5_flash_first_draft",
     "quality_gate",
     "chatgpt_fallback_if_generation_or_quality_fails",
-    "claude_editorial_grammar_quality_audit",
+    "gemini_and_gpt_independent_review",
     "seo_and_metadata_validation",
     "draft_private_awaiting_approval"
   ],
@@ -102,13 +102,12 @@
     "similar_or_repeated_title_action": "QUALITY_FAIL"
   },
   "quality_gate": {"minimum_score": 70, "below_minimum_action": "QUALITY_FAIL"},
-  "three_model_checks_and_balances": {
+  "two_model_checks_and_balances": {
     "status": "LOCKED_MANDATORY",
     "applies_to": ["wordpress", "blogger", "tistory", "news"],
     "gemini": "first_draft_and_independent_self_check",
     "gpt": "independent_fact_structure_seo_originality_check_and_rewrite_when_required",
-    "claude": "independent_final_editorial_fact_and_policy_audit",
-    "approval_rule": "all_three_must_return_ok_true",
+    "approval_rule": "gemini_and_gpt_must_both_return_ok_true",
     "single_model_approval_allowed": false,
     "missing_or_failed_checker_action": "CONSENSUS_FAILED_NO_DRAFT"
   },

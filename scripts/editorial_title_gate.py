@@ -1,4 +1,4 @@
-"""Require the actual final headline/body to pass all three editorial checks."""
+"""Require the actual final headline/body to pass Gemini and GPT checks."""
 import re
 from three_model_consensus import three_model_consensus
 
@@ -18,6 +18,6 @@ def require_editorial_approval(*, title, content, meta, keyword, gemini_generate
     result = three_model_consensus(title=title, content=content, meta=meta, keyword=keyword,
                                    gemini_generate=gemini_generate)
     checks = result.get("checks", {})
-    if set(checks) != {"gemini", "gpt", "claude"} or not all(v.get("ok") is True for v in checks.values()):
+    if set(checks) != {"gemini", "gpt"} or not all(v.get("ok") is True for v in checks.values()):
         raise ValueError("CONSENSUS_FAILED: " + str(checks))
     return result

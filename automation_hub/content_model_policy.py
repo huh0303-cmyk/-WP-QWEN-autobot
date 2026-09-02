@@ -71,6 +71,6 @@ def choose_writer(
     )
 
 
-def claude_role(policy: dict[str, Any] | None = None) -> str:
+def review_role(policy: dict[str, Any] | None = None) -> str:
     policy = policy or load_policy()
     return policy["auditor"]["role"]

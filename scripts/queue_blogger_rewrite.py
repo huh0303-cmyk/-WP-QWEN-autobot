@@ -29,14 +29,13 @@ from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from gemini_text import gemini_generate_text
 from openai_text import openai_available, openai_generate_text
-from claude_text import claude_available, claude_generate_text
 from replicate_image_provider import generate_image_url
 from three_model_consensus import three_model_consensus
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
 
 # Worst case for one run: 2 write attempts (gemini+gpt fallback) + 3-way
-# consensus check (gemini+gpt+claude) + 1 image. See budget_guard.py.
+# Gemini+GPT review plus one image. See budget_guard.py.
 ESTIMATED_COST_PER_RUN_USD = 0.03
 
 
@@ -163,7 +162,7 @@ def main():
     )
     if consensus.get("ok") is not True:
         _append_failure(service, sheet_id, blogger_site_id, error_code="CONSENSUS_FAILED", message=json.dumps(consensus, ensure_ascii=False), source_url=source["link"])
-        raise RuntimeError("Gemini, GPT and Claude did not all approve")
+        raise RuntimeError("Gemini and GPT did not both approve")
 
     content = rewritten["content_html"]
     image_model = "0"

@@ -1,4 +1,4 @@
-"""Blocking three-model checks-and-balances gate for every written draft."""
+"""Blocking Gemini+GPT checks-and-balances gate for every written draft."""
 from __future__ import annotations
 
 import json
@@ -6,7 +6,6 @@ import re
 from datetime import date
 from typing import Callable
 
-from claude_text import claude_available, claude_generate_text
 from openai_text import openai_available, openai_generate_text
 
 
@@ -23,7 +22,7 @@ def _json(raw: str) -> dict:
 
 def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
                           gemini_generate: Callable[[str], str]) -> dict:
-    """Gemini self-check + GPT independent check + Claude final audit.
+    """Gemini self-check + GPT independent final review.
 
     No model can approve alone. Missing credentials, invalid JSON, or any
     rejection blocks the draft from reaching the review queue.
@@ -51,11 +50,4 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
             results["gpt"] = _json(openai_generate_text("You are the second independent quality checker. " + rule, temperature=0.0, max_retries=1))
         except Exception as exc:
             results["gpt"] = {"ok": False, "issues": [f"check_failed: {exc}"]}
-    if not claude_available():
-        results["claude"] = {"ok": False, "issues": ["Claude checker unavailable"]}
-    else:
-        try:
-            results["claude"] = _json(claude_generate_text(rule, system="You are the third and final independent editorial auditor.", temperature=0.0, max_retries=1))
-        except Exception as exc:
-            results["claude"] = {"ok": False, "issues": [f"check_failed: {exc}"]}
     return {"ok": all(result.get("ok") is True for result in results.values()), "checks": results}

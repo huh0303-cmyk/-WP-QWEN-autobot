@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """Generate one article draft per Tistory site job.
 
-LOCKED: Gemini first; GPT rewrites only after generation/quality failure;
-Claude is a blocking final audit. SEO/quality score below 70 is rejected.
+LOCKED: Gemini first; GPT rewrites after generation/quality/review failure
+and performs the final independent review. SEO/quality below 70 is rejected.
 
 Reads a plan produced by tistory_daily_planner.py and writes drafts only —
 this never publishes anything. Every job stays publish_policy=awaiting_approval
@@ -24,7 +24,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
-from claude_text import claude_available, claude_generate_text  # noqa: E402
 from gemini_text import gemini_generate_text  # noqa: E402
 from openai_text import openai_available, openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
@@ -102,7 +101,7 @@ def structural_check(draft: dict) -> list[str]:
 
     This is not an SEO score — it only catches obviously broken output
     (near-empty body, no title, no real structure) that the writer or
-    Claude audit could otherwise let through silently.
+    Model review could otherwise let through silently.
     """
     issues: list[str] = []
     title = str(draft.get("title", "")).strip()
@@ -177,24 +176,6 @@ def quality_score(draft: dict, job: dict) -> tuple[int, list[str]]:
         issues.append("title lacks a specific emotional/benefit hook")
         score = min(score, 69)
     return min(score, 100), issues
-
-
-def audit_draft(draft: dict, job: dict) -> dict | None:
-    """Claude is the mandatory final editorial gate."""
-    if not claude_available():
-        return None
-    prompt = (
-        f"Site rules: allowed categories = {job['categories']}; "
-        f"official_source_required = {job.get('official_source_required', False)}.\n\n"
-        f"Draft title: {draft.get('title', '')}\n"
-        f"Draft category: {draft.get('category', '')}\n"
-        f"Draft body_html:\n{draft.get('body_html', '')}"
-    )
-    try:
-        raw = claude_generate_text(prompt, system=AUDIT_SYSTEM_PROMPT, temperature=0.0)
-        return _parse_json_response(raw)
-    except Exception as exc:
-        return {"ok": None, "issues": [f"audit_failed: {exc}"]}
 
 
 def _consensus_issues(consensus: dict) -> list[str]:
@@ -293,7 +274,7 @@ def generate_draft(job: dict) -> dict:
             break
         if attempt >= MAX_CONSENSUS_REWRITES:
             draft["status"] = "CONSENSUS_FAILED"
-            draft["error"] = "Gemini, GPT and Claude did not all approve after guided rewrites"
+            draft["error"] = "Gemini and GPT did not both approve after guided rewrites"
             draft["rewrite_errors"] = rewrite_errors
             return draft
         try:
@@ -342,7 +323,7 @@ def main() -> int:
     result = {
         "date": plan["date"],
         "public_allowed": False,
-        "claude_audit_enabled": claude_available(),
+        "review_models": ["gemini", "gpt"],
         "drafts": drafts,
     }
     out = Path(args.output)

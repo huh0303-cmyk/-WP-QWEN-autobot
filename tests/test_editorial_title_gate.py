@@ -18,11 +18,11 @@ def test_bad_templates_never_reach_model_review(monkeypatch, title):
     check.assert_not_called()
 
 
-@pytest.mark.parametrize("reject", ["gemini", "gpt", "claude", "missing"])
+@pytest.mark.parametrize("reject", ["gemini", "gpt", "missing"])
 def test_any_missing_or_failed_check_blocks(monkeypatch, reject):
-    checks = {name: {"ok": True} for name in ["gemini", "gpt", "claude"]}
+    checks = {name: {"ok": True} for name in ["gemini", "gpt"]}
     if reject == "missing":
-        del checks["claude"]
+        del checks["gpt"]
     else:
         checks[reject]["ok"] = False
     monkeypatch.setattr(gate, "three_model_consensus", lambda **kw: {"ok": True, "checks": checks})
@@ -31,7 +31,7 @@ def test_any_missing_or_failed_check_blocks(monkeypatch, reject):
 
 
 def test_success_reviews_exact_final_packet(monkeypatch):
-    check = Mock(return_value={"checks": {name: {"ok": True} for name in ["gemini", "gpt", "claude"]}})
+    check = Mock(return_value={"checks": {name: {"ok": True} for name in ["gemini", "gpt"]}})
     monkeypatch.setattr(gate, "three_model_consensus", check)
     content = "actual final HTML" * 2000
     title = "Renting in Korea: Deposits and Contracts"

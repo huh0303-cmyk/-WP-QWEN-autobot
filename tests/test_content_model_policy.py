@@ -1,4 +1,4 @@
-from automation_hub.content_model_policy import choose_writer, claude_role
+from automation_hub.content_model_policy import choose_writer, review_role
 
 
 def test_default_writer_is_gemini():
@@ -26,5 +26,5 @@ def test_freshness_sensitive_requires_official_verification():
     assert decision.status == "QUALITY_FAIL"
 
 
-def test_claude_is_audit_role_not_default_writer():
-    assert claude_role() == "development_code_system_audit"
+def test_gpt_is_final_review_role_after_gemini():
+    assert review_role() == "independent_final_editorial_fact_and_quality_reviewer"

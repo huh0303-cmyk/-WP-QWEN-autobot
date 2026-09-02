@@ -55,13 +55,11 @@ jobs:
           assert all(j['duplicate_guard'] is True for j in p['jobs'])
           print('TISTORY PLAN SAFETY PASS')
           PY
-      - name: Draft articles — Gemini first, GPT fallback, Claude blocking audit
+      - name: Draft articles — Gemini first, GPT rewrite and final review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_ENABLED: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"
         run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json

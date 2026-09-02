@@ -17,7 +17,7 @@ AUDIT_OK = json.dumps({"ok": True, "issues": []})
 
 
 def test_gemini_then_three_model_consensus_then_image_chain():
-    approved = {"ok": True, "checks": {name: {"ok": True, "issues": []} for name in ("gemini", "gpt", "claude")}}
+    approved = {"ok": True, "checks": {name: {"ok": True, "issues": []} for name in ("gemini", "gpt")}}
     with patch("tistory_writer.gemini_generate_text", return_value=VALID) as gemini, patch("tistory_writer.three_model_consensus", return_value=approved), patch("tistory_writer.generate_image_url", return_value="https://example.test/image.webp"):
         draft = tistory_writer.generate_draft(JOB)
     gemini.assert_called_once()
@@ -29,7 +29,7 @@ def test_gemini_then_three_model_consensus_then_image_chain():
 
 
 def test_gpt_rewrites_after_gemini_generation_failure():
-    approved = {"ok": True, "checks": {name: {"ok": True, "issues": []} for name in ("gemini", "gpt", "claude")}}
+    approved = {"ok": True, "checks": {name: {"ok": True, "issues": []} for name in ("gemini", "gpt")}}
     with patch("tistory_writer.gemini_generate_text", side_effect=RuntimeError("failed")), patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.three_model_consensus", return_value=approved), patch("tistory_writer.generate_image_url", return_value=None):
         draft = tistory_writer.generate_draft(JOB)
     gpt.assert_called_once()
@@ -37,7 +37,7 @@ def test_gpt_rewrites_after_gemini_generation_failure():
 
 
 def test_any_consensus_failure_is_a_blocking_gate():
-    rejected = {"ok": False, "checks": {"gemini": {"ok": True}, "gpt": {"ok": True}, "claude": {"ok": False}}}
+    rejected = {"ok": False, "checks": {"gemini": {"ok": True}, "gpt": {"ok": False}}}
     with patch("tistory_writer.gemini_generate_text", return_value=VALID), patch("tistory_writer.three_model_consensus", return_value=rejected):
         draft = tistory_writer.generate_draft(JOB)
     assert draft["status"] == "CONSENSUS_FAILED"

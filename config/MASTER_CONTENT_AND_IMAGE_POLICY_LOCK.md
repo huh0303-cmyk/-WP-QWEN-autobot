@@ -13,7 +13,7 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 3. Gemini 2.5 Flash writes the first draft by default.
 4. Run structural and quality gates.
 5. If Gemini generation fails or the draft fails quality/policy/format gates, route to ChatGPT/GPT for recovery and rewrite.
-6. Claude performs final editorial, grammar and quality audit. Claude is an auditor, not the routine bulk first-draft writer.
+6. GPT performs the independent final editorial, factual and quality review after the Gemini draft and any required rewrite.
 7. Validate SEO structure and metadata.
 8. Save only as DRAFT / PRIVATE / AWAITING_APPROVAL. No automatic public publishing under this master policy.
 
@@ -21,10 +21,10 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 
 - WordPress 27, Blogger 27, Tistory 5, newsroom content, YouTube scripts and SNS copy all use Gemini 2.5 Flash as the default first-draft writer.
 - GPT must never appear as a routine default in the control center. It is used only for failed generation, failed quality/policy/format gates, high-value/important content explicitly routed for escalation, or a manual override.
-- Claude is the final auditor and cannot be selected as the routine bulk writer.
-- Control-center cards, stored job defaults, workflows and execution code must agree with this order: Gemini 2.5 Flash -> GPT recovery/rewrite -> Claude final audit.
+- Claude is not part of the WordPress, Blogger or Tistory writing/review pipeline.
+- Control-center cards, stored job defaults, workflows and execution code must agree with this order: Gemini 2.5 Flash -> GPT recovery/rewrite and final review.
 
-### Claude audit responsibilities
+### GPT final review responsibilities
 
 - grammar and spelling
 - awkward, translated or AI-sounding phrasing
@@ -39,7 +39,7 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 - internal contradictions
 - final editorial quality gate
 
-Claude must not invent facts while editing. Material factual uncertainty goes back to source verification. Failed audit => REWRITE_REQUIRED or QUALITY_FAIL.
+GPT must not invent facts while editing. Material factual uncertainty goes back to source verification. Failed review => REWRITE_REQUIRED or QUALITY_FAIL.
 
 ## 2. Image generation pipeline
 
