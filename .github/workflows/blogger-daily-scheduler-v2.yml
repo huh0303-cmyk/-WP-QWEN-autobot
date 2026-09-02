@@ -1,6 +1,9 @@
 name: Blogger Daily - GPT-5 mini staggered drafts
 
 on:
+  push:
+    paths:
+      - ".github/workflows/blogger-daily-scheduler-v2.yml"
   workflow_dispatch:
   schedule:
     - cron: "8,28,48 * * * *"
@@ -14,7 +17,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  registration-check:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "blogger-daily-scheduler-v2 registered; production side effects skipped"
+
   schedule:
+    if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

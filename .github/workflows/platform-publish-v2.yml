@@ -1,6 +1,9 @@
 name: "Automation Hub — platform publish"
 
 on:
+  push:
+    paths:
+      - ".github/workflows/platform-publish-v2.yml"
   schedule:
     # GitHub cron is UTC. Every hour at :17; Sheets/operator timestamps remain KST.
     - cron: "17 * * * *"
@@ -39,7 +42,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  registration-check:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "platform-publish-v2 registered; production side effects skipped"
+
   publish:
+    if: ${{ github.event_name != 'push' }}
     # Dedicated environment avoids the repository-level 100-secret ceiling and
     # isolates Blogger write credentials from Sheets/Drive OAuth credentials.
     environment: blogger
