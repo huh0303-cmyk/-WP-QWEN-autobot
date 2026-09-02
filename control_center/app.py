@@ -492,8 +492,13 @@ def get_site_data():
         audit_summary = audit_entry.get("summary") or {}
         indexed = audit_summary.get("indexed")
         indexed_delta = audit_summary.get("indexed_delta")
+        index_unknown = audit_summary.get("unknown")
+        index_checked_at = audit_entry.get("audited_at") or ""
         if indexed is not None:
-            index_status = "URL별 Google 정밀 집계"
+            index_status = (
+                f"Google URL별 확인 · 미확인 {index_unknown}개"
+                if index_unknown else "Google URL별 전수 확인"
+            )
         elif audit_entry.get("error") == "gsc_property_not_accessible":
             index_status = "Search Console 권한 연결 필요"
         else:
@@ -510,8 +515,11 @@ def get_site_data():
             "posts_delta": posts_delta,
             "indexed": indexed,
             "indexed_delta": indexed_delta,
+            "index_unknown": index_unknown,
+            "index_checked_at": index_checked_at,
             "index_status": index_status,
             "visitor_connected": bool(live_traffic.get("connected")),
+            "visitor_checked_at": live_traffic.get("date") or stored_traffic.get("checked_at") or "",
             "category": registered.theme if registered else "미분류",
             "cadence": wordpress_cadence(registered),
             "official_categories": category_results.get(item["domain"], []),

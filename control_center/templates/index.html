@@ -136,6 +136,7 @@
                     <div class="grid grid-cols-2 gap-2 rounded-2xl border-2 border-blue-400 bg-slate-950 p-2 shadow-lg shadow-blue-200/70" aria-label="{{ site.domain }} 핵심 통계 4개">
                         <div class="rounded-xl border border-blue-300 bg-gradient-to-br from-blue-700 to-blue-500 px-3 py-3 text-white shadow-sm">
                             <p class="text-[11px] font-black tracking-tight text-blue-100">당일 방문자(어제 대비)</p>
+                            {% if site.visitor_checked_at %}<p class="text-[9px] font-bold text-blue-100">실측 {{ site.visitor_checked_at }}</p>{% endif %}
                             {% if site.today_visitors is not none %}
                             <p class="mt-1 flex items-baseline gap-2">
                                 <span class="visitor-bounce text-3xl font-black tabular-nums">{{ '{:,}'.format(site.today_visitors) }}</span>
@@ -167,6 +168,7 @@
                             <p class="mt-1 text-3xl font-black tabular-nums text-emerald-950">{{ '{:,}'.format(site.indexed) }}
                                 {% if site.indexed_delta is not none %}<span class="text-sm {% if site.indexed_delta < 0 %}text-red-600{% else %}text-emerald-700{% endif %}">({% if site.indexed_delta > 0 %}+{% endif %}{{ site.indexed_delta }})</span>{% else %}<span class="text-[10px] text-emerald-700">(증감 미집계)</span>{% endif %}
                             </p>
+                            {% if site.index_unknown %}<p class="mt-1 text-[9px] font-black text-amber-700">판정 미확인 {{ site.index_unknown }}개 별도</p>{% endif %}
                             {% else %}<p class="mt-1 text-base font-black text-amber-700">{{ site.index_status }}</p>{% endif %}
                         </div>
                     </div>

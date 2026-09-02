@@ -140,6 +140,12 @@ def test_connection_badges_do_not_overstate_metrics_connectivity():
     assert "방문자·Google 색인이 아니라 공개 RSS 피드 연결 상태" in template
 
 
+def test_dashboard_discloses_metric_evidence_and_unknown_index_count():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "실측 {{ site.visitor_checked_at }}" in template
+    assert "판정 미확인 {{ site.index_unknown }}개 별도" in template
+
+
 def test_job_creation_is_idempotent():
     with tempfile.TemporaryDirectory() as tmp:
         store = Store(Path(tmp) / "db.sqlite3")

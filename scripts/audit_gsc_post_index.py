@@ -31,15 +31,21 @@ def property_for(site, props):
     return None
 
 def posts(site):
-    out=[]; page=1
+    """Fetch the full public inventory, reducing page size on overloaded sites."""
+    out=[]; page=1; per_page=100
     while True:
-        r=requests.get(f"{site}/wp-json/wp/v2/posts",params={"status":"publish","per_page":100,"page":page,
+        r=requests.get(f"{site}/wp-json/wp/v2/posts",params={"status":"publish","per_page":per_page,"page":page,
             "orderby":"date","order":"asc","_fields":"id,link,slug,date_gmt,modified_gmt,title"},timeout=30)
+        if r.status_code >= 500 and per_page > 10:
+            per_page = 20 if per_page == 100 else 10
+            page = 1; out = []
+            time.sleep(1)
+            continue
         if r.status_code==400 and "rest_post_invalid_page_number" in r.text: break
         r.raise_for_status(); batch=r.json()
         if not batch: break
         out.extend(batch)
-        if len(batch)<100: break
+        if len(batch)<per_page: break
         page+=1
     return out
 
