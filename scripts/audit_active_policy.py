@@ -97,8 +97,8 @@ def main() -> None:
         fail("Blogger workflow is not wired to Replicate images")
     if "BLOGGER_GEMINI_MODEL" not in blogger:
         fail("Blogger workflow lost its Gemini text route")
-    if 'BLOGGER_MIN_QUALITY_SCORE: "75"' not in blogger:
-        fail("Blogger publication threshold is not 75")
+    if 'BLOGGER_MIN_QUALITY_SCORE: "70"' not in blogger:
+        fail("Blogger publication threshold is not 70")
 
     provider = (ROOT / "scripts" / "replicate_image_provider.py").read_text(encoding="utf-8")
     approved_models = (
