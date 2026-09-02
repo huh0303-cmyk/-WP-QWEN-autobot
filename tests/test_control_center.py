@@ -71,6 +71,15 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
     assert all(row["sheet_controlled"] for row in channels)
 
 
+def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "Blogspot 비공개 초안 생성" in template
+    assert "이 사이트 비공개 초안 생성" in template
+    assert "이 채널 비공개 업로드 시작" in template
+    assert 'name="site_id" value="{{ blog.site_id }}"' in template
+    assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
+
+
 def test_locked_default_content_and_image_engines():
     assert DEFAULT_TEXT_MODEL == "gpt-5-mini"
     assert DEFAULT_IMAGE_MODEL == "bytedance/sdxl-lightning-4step"

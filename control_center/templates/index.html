@@ -366,6 +366,11 @@
                         <span class="font-bold text-teal-800">{{ blog.status }} · {{ blog.publish_policy }}</span>
                         <span class="font-semibold text-slate-400">공개 발행 없음</span>
                     </div>
+                    <form method="post" action="{{ url_for('trigger_tistory_plan') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="site_id" value="{{ blog.site_id }}">
+                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-teal-800 active:scale-[.98]">이 사이트 비공개 초안 생성</button>
+                    </form>
                 </article>
                 {% endfor %}
             </div>
@@ -404,6 +409,11 @@
                         <p><span class="font-black">트리거:</span> Google Sheet 중앙 스케줄러</p>
                     </div>
                     <div class="rounded-xl bg-slate-900 px-3 py-2 text-center text-[10px] font-black text-white">시트 승인 토큰 필수 · 임의 공개 차단</div>
+                    <form method="post" action="{{ url_for('trigger_youtube_batch') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="channel_key" value="{{ channel.channel_key }}">
+                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-red-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-red-800 active:scale-[.98]">이 채널 비공개 업로드 시작</button>
+                    </form>
                 </article>
                 {% endfor %}
             </div>

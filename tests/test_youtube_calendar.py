@@ -144,6 +144,21 @@ def test_dry_run_has_no_writes_or_dispatch(monkeypatch):
     write.assert_not_called(); post.assert_not_called()
 
 
+def test_control_room_target_limits_scheduler_to_one_channel(monkeypatch):
+    from scripts import youtube_calendar_dispatch as dispatch_module
+    monkeypatch.setenv("SHEET_ID", "sheet"); monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
+    monkeypatch.setenv("DRY_RUN", "true"); monkeypatch.setenv("TARGET_CHANNEL_KEY", "healing")
+    channels = {c.channel_key: c for c in load_channels()}
+    values = [["channel_key", "channel_type", "display_name", "channel_id", "secret_profile", "workflow", "enabled"]]
+    for key in ("mbb", "healing"):
+        c = channels[key]
+        values.append([c.channel_key, c.channel_type, c.display_name, c.channel_id, c.secret_profile, c.workflow, "ON"])
+    service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {"values": values}
+    rows = parsed(row(), row("CAL-2", "Healing"))
+    with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(dispatch_module, "read_calendar", return_value=rows):
+        assert dispatch_module.main() == 0
+
+
 def test_private_email_has_editor_link_and_is_not_marked_on_failure():
     from scripts.youtube_calendar_result import notify_review
     r = parsed(row())[0]

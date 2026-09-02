@@ -13,6 +13,11 @@ on:
         required: true
         type: string
         default: "1"
+      channel_key:
+        description: "Optional single channel key selected by the control room"
+        required: false
+        type: string
+        default: ""
   push:
     branches: [main]
     paths:
@@ -53,6 +58,7 @@ jobs:
           # Video rendering/upload is intentionally serialized across all 10 channels.
           # Parallel dispatches previously competed for APIs and caused cancelled runs.
           MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '1' }}
+          TARGET_CHANNEL_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_key || '' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
         run: python scripts/youtube_control_scheduler.py

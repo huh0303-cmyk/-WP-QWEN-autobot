@@ -45,6 +45,11 @@ def main():
         if r[3] != c.channel_id or r[5] != c.workflow:
             raise RuntimeError(f"Channel identity/workflow mismatch: {c.channel_key}")
         enabled.add(c.channel_key)
+    target_channel = os.environ.get("TARGET_CHANNEL_KEY", "").strip()
+    if target_channel:
+        if target_channel not in channels:
+            raise RuntimeError(f"Unknown YouTube target channel: {target_channel}")
+        enabled &= {target_channel}
     now = dt.datetime.now(KST)
     token = os.environ.get("GH_DISPATCH_TOKEN", "")
     if not dry:

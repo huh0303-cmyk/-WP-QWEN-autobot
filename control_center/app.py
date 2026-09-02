@@ -717,6 +717,11 @@ def trigger_tistory_plan():
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#tistory")
+    site_id = request.form.get("site_id", "").strip()
+    allowed_site_ids = {str(site["site_id"]) for site in get_tistory_data()}
+    if site_id and site_id not in allowed_site_ids:
+        flash("등록되지 않은 Tistory 사이트입니다.", "error")
+        return redirect(url_for("index") + "#tistory")
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     try:
@@ -724,19 +729,22 @@ def trigger_tistory_plan():
             response = requests.post(
                 f"https://api.github.com/repos/{repo}/actions/workflows/tistory-daily-plan.yml/dispatches",
                 headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-                json={"ref": "main"}, timeout=30,
+                json={"ref": "main", "inputs": {"site_ids": site_id}}, timeout=30,
             )
             if response.status_code != 204:
                 raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
             completed = None
         else:
             command = ["gh", "workflow", "run", "tistory-daily-plan.yml", "--repo", repo]
+            if site_id:
+                command.extend(["-f", f"site_ids={site_id}"])
             completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
     except (OSError, subprocess.SubprocessError, requests.RequestException, RuntimeError) as exc:
         flash(f"Tistory 5개 검토본 실행 요청 실패 · {exc}", "error")
     else:
         if completed is None or completed.returncode == 0:
-            flash("Tistory 5개 비공개 검토본 생성을 시작했습니다. 공개 발행은 하지 않습니다.", "success")
+            target = site_id or "5개 전체"
+            flash(f"Tistory {target} 비공개 검토본 생성을 시작했습니다. 공개 발행은 하지 않습니다.", "success")
         else:
             detail = (completed.stderr or completed.stdout or "GitHub workflow dispatch failed").strip()
             flash(f"Tistory 5개 검토본 실행 요청 실패 · {detail}", "error")
@@ -749,6 +757,11 @@ def trigger_youtube_batch():
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#youtube")
+    channel_key = request.form.get("channel_key", "").strip()
+    allowed_channel_keys = {str(channel["channel_key"]) for channel in get_youtube_data()}
+    if channel_key and channel_key not in allowed_channel_keys:
+        flash("등록되지 않은 YouTube 채널입니다.", "error")
+        return redirect(url_for("index") + "#youtube")
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     if not token:
@@ -758,7 +771,7 @@ def trigger_youtube_batch():
         response = requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/youtube-control-scheduler.yml/dispatches",
             headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": {"dry_run": "false", "max_dispatch": "10"}},
+            json={"ref": "main", "inputs": {"dry_run": "false", "max_dispatch": "1", "channel_key": channel_key}},
             timeout=30,
         )
         if response.status_code != 204:
@@ -766,7 +779,8 @@ def trigger_youtube_batch():
     except (requests.RequestException, RuntimeError) as exc:
         flash(f"YouTube 10채널 실행 요청 실패 · {exc}", "error")
     else:
-        flash("YouTube 중앙 스케줄러를 시작했습니다. 현재 승인 슬롯이 있으면 전체에서 1개만 비공개 업로드합니다.", "success")
+        target = channel_key or "전체 채널"
+        flash(f"YouTube {target} 중앙 스케줄러를 시작했습니다. 현재 승인 슬롯이 있을 때 1개만 비공개 업로드합니다.", "success")
     return redirect(url_for("index") + "#youtube")
 
 @app.route("/")
