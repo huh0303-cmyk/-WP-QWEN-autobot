@@ -2,6 +2,7 @@
   "version": 5,
   "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
   "status": "LOCKED",
+  "site_editorial_playbook": "config/SITE_EDITORIAL_PLAYBOOKS.md",
   "scope": ["wordpress", "blogger", "tistory", "news", "youtube_scripts", "sns_copy"],
   "primary_writer": {
     "provider": "openai",

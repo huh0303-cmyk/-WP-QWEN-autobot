@@ -2,6 +2,8 @@
 
 Status: LOCKED / GitHub source of truth
 
+The mandatory site-by-site persona, tone, do/don't and platform overlays are defined in `config/SITE_EDITORIAL_PLAYBOOKS.md`. They are part of this lock, not optional suggestions.
+
 This file freezes the approved network-wide content writing and image generation architecture. Do not change these rules silently. Any future change requires an explicit user instruction and a new GitHub commit.
 
 ## 1. Content writing pipeline
