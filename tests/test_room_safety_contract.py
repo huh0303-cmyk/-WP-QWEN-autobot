@@ -31,6 +31,12 @@ def test_contracts_require_identity_for_dispatched_rooms():
     assert {"room_id", "channel"} <= set(contracts["curio-longform-daily.yml"]["required_inputs"])
 
 
+def test_result_collector_treats_missing_optional_artifact_as_noop():
+    workflow = (ROOT / ".github" / "workflows" / "automation-room-result-collector.yml").read_text(encoding="utf-8")
+    assert "mkdir -p collected-artifacts" in workflow
+    assert "head -n 1 || true" in workflow
+
+
 def test_wordpress_contract_cannot_approve_publication():
     contract = load_contracts()["daily-network-publish.yml"]
     assert contract["safe_policy"] == "draft"

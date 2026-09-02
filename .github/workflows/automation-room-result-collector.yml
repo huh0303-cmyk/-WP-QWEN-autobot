@@ -32,7 +32,8 @@ jobs:
         id: locate
         shell: bash
         run: |
-          result="$(find collected-artifacts -type f -name automation-room-result.json | head -n 1)"
+          mkdir -p collected-artifacts
+          result="$(find collected-artifacts -type f -name automation-room-result.json 2>/dev/null | head -n 1 || true)"
           if [ -z "$result" ]; then
             echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
