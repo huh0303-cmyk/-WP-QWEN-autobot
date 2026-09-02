@@ -1,0 +1,35 @@
+name: WordPress 25 Sequential Public Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      index:
+        description: "Zero-based site index; start with 0"
+        required: true
+        default: "0"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: wordpress-25-sequential-public
+  cancel-in-progress: false
+
+jobs:
+  dispatch-next:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Dispatch one site and queue the next one
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          A_GROUP_INDEX: ${{ inputs.index }}
+          WP_SEQUENCE_DELAY_MINUTES: "5"
+        run: python scripts/a_group_sequential_dispatch.py

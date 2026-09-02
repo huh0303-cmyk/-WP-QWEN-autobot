@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Dispatch A-group posts in the owner's fixed order, 40-55 minutes apart."""
+"""Dispatch the 25 regular WordPress sites in a fixed, public sequence.
+
+The two newsrooms are intentionally excluded: newsrooms-daily-publisher.yml owns
+their independent 3-10 posts/day RSS schedule.
+"""
 import os
-import random
 import sys
 import time
 
@@ -9,23 +12,31 @@ import requests
 
 
 A_GROUP_SITES = [
-    "https://korea365.org",
-    "https://kstudy365.com",
-    "https://oliveyoungkorea.com",
-    "https://jobkorea365.com",
-    "https://k-visa365.com",
     "https://k-health365.com",
-    "https://kskin365.com",
-    "https://k-trip365.com",
-    "https://kfinance365.com",
-    "https://koreainsurance365.com",
-    "https://koreataxnlaw.com",
     "https://koreamedicaltour.com",
-    "https://studyinkorea365.com",
-    "https://jobinkorea365.com",
+    "https://koreainvest365.com",
+    "https://ki-korea.com",
+    "https://koreainsurance365.com",
+    "https://kfinance365.com",
+    "https://koreataxnlaw.com",
+    "https://koreacrypto365.com",
+    "https://krealestate365.com",
+    "https://ktech365.com",
+    "https://kskin365.com",
+    "https://oliveyoungkorea.com",
     "https://kworld365.com",
+    "https://k-trip365.com",
+    "https://k-visa365.com",
     "https://koreawedding365.com",
+    "https://kstudy365.com",
+    "https://studyinkorea365.com",
+    "https://kieca-korea.org",
+    "https://ksa-korea.org",
+    "https://sis-korea.com",
+    "https://jobkorea365.com",
+    "https://jobinkorea365.com",
     "https://jobkoreaglobal.com",
+    "https://korea365.org",
 ]
 
 API = "https://api.github.com"
@@ -55,13 +66,17 @@ def main():
 
     site = A_GROUP_SITES[index]
     print(f"A-group {index + 1}/{len(A_GROUP_SITES)}: dispatching {site}", flush=True)
-    dispatch(repo, token, "daily-network-publish.yml", {"target_site_url": site})
+    dispatch(repo, token, "daily-network-publish.yml", {
+        "target_site_url": site,
+        "publication_approved": "true",
+        "room_id": f"wp25-{index + 1:02d}",
+    })
 
     if index == len(A_GROUP_SITES) - 1:
         print("A-group sequence fully dispatched.", flush=True)
         return
 
-    delay_minutes = random.randint(40, 55)
+    delay_minutes = int(os.environ.get("WP_SEQUENCE_DELAY_MINUTES", "5"))
     print(f"Next site will be dispatched in {delay_minutes} minutes.", flush=True)
     time.sleep(delay_minutes * 60)
     dispatch(repo, token, "a-group-sequential-publish.yml", {"index": str(index + 1)})
