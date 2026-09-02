@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install dependencies
-        run: pip install requests -q
+        run: pip install requests google-api-python-client google-auth -q
       - name: Build one-post-per-site safe plan
         env:
           SITE_IDS: ${{ inputs.site_ids }}
@@ -75,6 +75,13 @@ jobs:
               assert draft.get('publish_policy') in (None, 'awaiting_approval')
           print('TISTORY DRAFT SAFETY PASS')
           PY
+      - name: Queue private drafts in Google Sheets for the local registrar
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/enqueue_tistory_drafts.py --drafts artifacts/tistory-daily-drafts.json
       - name: Build mobile card-news screens
         run: python scripts/tistory_card_news.py --drafts artifacts/tistory-daily-drafts.json --output-dir artifacts/tistory-card-news
       - name: Upload plan + draft artifacts

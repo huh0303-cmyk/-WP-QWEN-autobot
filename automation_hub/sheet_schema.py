@@ -32,7 +32,8 @@ PLATFORM_ACCOUNT_HEADER = [
 PUBLISH_QUEUE_HEADER = [
     "created_at", "job_id", "site_id", "status", "publish_now", "title",
     "content_html", "labels", "source_keyword", "public_url", "remote_id",
-    "error_code", "message", "completed_at",
+    "error_code", "message", "completed_at", "category",
+    "search_description", "visibility",
 ]
 
 YOUTUBE_CHANNEL_HEADER = [

@@ -6,6 +6,7 @@ the registry must intentionally replace the Settings tab.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -37,6 +38,55 @@ YOUTUBE_RUN_TAB = "자동화_유튜브실행"
 
 def _ensure_log_tab(service, spreadsheet_id: str, tab_name: str, header: list[str]) -> None:
     ensure_tab(service, spreadsheet_id, tab_name, header)
+
+
+def _ensure_queue_tab_without_data_loss(service, spreadsheet_id: str) -> None:
+    """Append new queue columns without clearing live/pending commands."""
+    existing = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!A1:Z1",
+    ).execute().get("values", [[]])
+    current = existing[0] if existing else []
+    if not current:
+        ensure_tab(service, spreadsheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
+        return
+    missing = [column for column in PUBLISH_QUEUE_HEADER if column not in current]
+    if not missing:
+        return
+    service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id,
+        range=f"'{QUEUE_TAB}'!{chr(65 + len(current))}1",
+        valueInputOption="RAW", body={"values": [missing]},
+    ).execute()
+
+
+def _seed_tistory_accounts(service, spreadsheet_id: str) -> int:
+    """Add the canonical five Tistory accounts; never overwrite user rows."""
+    values = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=f"'{ACCOUNTS_TAB}'!A1:I",
+    ).execute().get("values", [])
+    header = values[0] if values else PLATFORM_ACCOUNT_HEADER
+    site_index = header.index("site_id")
+    existing_site_ids = {row[site_index] for row in values[1:] if len(row) > site_index}
+    portfolio = json.loads((ROOT / "config" / "tistory_portfolio.json").read_text(encoding="utf-8"))
+    rows = []
+    for site in portfolio["sites"]:
+        if not site.get("launch_enabled") or site["site_id"] in existing_site_ids:
+            continue
+        blog_name = site["url"].split("//", 1)[-1].split(".", 1)[0]
+        item = {
+            "account_id": f"tistory:{blog_name}", "platform": "tistory",
+            "site_id": site["site_id"], "display_name": site["title"],
+            "destination_id": blog_name, "editor_url": site["url"],
+            "auth_profile": "tistory-local-persistent", "enabled": "ON",
+            "notes": "private-only local registrar",
+        }
+        rows.append([item.get(column, "") for column in PLATFORM_ACCOUNT_HEADER])
+    if rows:
+        service.spreadsheets().values().append(
+            spreadsheetId=spreadsheet_id, range=f"'{ACCOUNTS_TAB}'!A1",
+            valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": rows},
+        ).execute()
+    return len(rows)
 
 
 def main() -> int:
@@ -76,7 +126,8 @@ def main() -> int:
     _ensure_log_tab(service, spreadsheet_id, KEYWORDS_TAB, KEYWORD_HEADER)
     _ensure_log_tab(service, spreadsheet_id, RSS_TAB, RSS_HEADER)
     _ensure_log_tab(service, spreadsheet_id, ACCOUNTS_TAB, PLATFORM_ACCOUNT_HEADER)
-    _ensure_log_tab(service, spreadsheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
+    tistory_added = _seed_tistory_accounts(service, spreadsheet_id)
+    _ensure_queue_tab_without_data_loss(service, spreadsheet_id)
     _ensure_log_tab(service, spreadsheet_id, YOUTUBE_CHANNEL_TAB, YOUTUBE_CHANNEL_HEADER)
     _ensure_log_tab(service, spreadsheet_id, YOUTUBE_RUN_TAB, YOUTUBE_RUN_HEADER)
     youtube_rows = service.spreadsheets().values().get(
@@ -89,7 +140,7 @@ def main() -> int:
             valueInputOption="RAW", body={"values": rows},
         ).execute()
         print(f"Seeded {len(rows)} YouTube channels")
-    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}, {YOUTUBE_CHANNEL_TAB}, {YOUTUBE_RUN_TAB}")
+    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}, {YOUTUBE_CHANNEL_TAB}, {YOUTUBE_RUN_TAB}; Tistory accounts added={tistory_added}")
     return 0
 
 
