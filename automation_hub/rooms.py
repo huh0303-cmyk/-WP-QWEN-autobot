@@ -39,7 +39,10 @@ class AutomationRoom:
         errors: list[str] = []
         if not self.room_id:
             errors.append("room_id is required")
-        if self.platform not in ALLOWED_PLATFORMS:
+        # Disabled placeholder rooms may describe a future platform without
+        # blocking today's production plan. Full platform validation begins
+        # only when that room is enabled for execution.
+        if self.enabled and self.platform not in ALLOWED_PLATFORMS:
             errors.append(f"unsupported platform: {self.platform}")
         if self.publish_policy not in SAFE_POLICIES:
             errors.append(f"unsafe publish_policy: {self.publish_policy}")
