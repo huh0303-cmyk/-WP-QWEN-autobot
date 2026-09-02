@@ -38,3 +38,10 @@ def test_kworld_kpop_is_distinct_from_existing_kworld_seoul():
     urls = {row["blogspot"] for row in portfolio}
     assert "https://kworld365.blogspot.com" in urls
     assert "https://kworld365seoul.blogspot.com" in urls
+
+
+def test_kskin_uses_its_live_custom_domain():
+    portfolio = json.loads((ROOT / "config/blogger_portfolio.json").read_text(encoding="utf-8"))["channels"]
+    urls = {row["blogspot"] for row in portfolio}
+    assert "https://skin.k-health365.com" in urls
+    assert "https://kskin365.blogspot.com" not in urls
