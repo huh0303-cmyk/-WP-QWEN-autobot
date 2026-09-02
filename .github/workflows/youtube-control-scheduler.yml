@@ -12,7 +12,7 @@ on:
         description: "Maximum channels dispatched in one run"
         required: true
         type: string
-        default: "3"
+        default: "1"
   push:
     branches: [main]
     paths:
@@ -50,7 +50,9 @@ jobs:
           GH_DISPATCH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           DRY_RUN: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
-          MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '3' }}
+          # Video rendering/upload is intentionally serialized across all 10 channels.
+          # Parallel dispatches previously competed for APIs and caused cancelled runs.
+          MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '1' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
         run: python scripts/youtube_control_scheduler.py
