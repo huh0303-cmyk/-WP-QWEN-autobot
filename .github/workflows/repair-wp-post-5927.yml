@@ -1,0 +1,30 @@
+name: "WordPress — repair K-Health draft 5927"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Generate hero, set focus keyword, preserve draft status, verify
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+        run: python scripts/repair_wp_post_5927.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wp-post-5927-repair-${{ github.run_id }}
+          path: wp_post_5927_repair_result.json
+          if-no-files-found: warn
+          retention-days: 30
