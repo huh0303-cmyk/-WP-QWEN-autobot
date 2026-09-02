@@ -19,7 +19,7 @@
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
             <div class="min-w-0">
                 <h1 class="truncate text-base font-black tracking-tight sm:text-xl">서울국제대학SIS 총장실 Lab</h1>
-                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WP 27 + Blogspot 27 + Tistory 5 · 비공개 초안 통제</p>
+                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WP 27 + Blogspot 27 + Tistory 5 + YouTube 10 · Google Sheet 통제</p>
             </div>
             <div class="flex shrink-0 items-center gap-2">
                 <button id="install-pwa" type="button" hidden class="rounded-lg border border-white/20 bg-white px-2.5 py-1 text-[10px] font-black text-slate-950 shadow sm:text-xs">앱 설치</button>
@@ -27,6 +27,14 @@
             </div>
         </div>
     </header>
+    <nav class="sticky top-[61px] z-20 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
+        <div class="mx-auto grid max-w-7xl grid-cols-4 gap-1.5">
+            <a href="#wordpress" class="rounded-lg bg-blue-50 px-2 py-2 text-center text-[10px] font-black text-blue-700 sm:text-xs">WP 27</a>
+            <a href="#blogspot" class="rounded-lg bg-violet-50 px-2 py-2 text-center text-[10px] font-black text-violet-700 sm:text-xs">Blogspot 27</a>
+            <a href="#tistory" class="rounded-lg bg-teal-50 px-2 py-2 text-center text-[10px] font-black text-teal-700 sm:text-xs">Tistory 5</a>
+            <a href="#youtube" class="rounded-lg bg-red-50 px-2 py-2 text-center text-[10px] font-black text-red-700 sm:text-xs">YouTube 10</a>
+        </div>
+    </nav>
     <main class="mx-auto max-w-7xl space-y-10 p-3 pb-20 sm:p-6">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -349,6 +357,39 @@
                         <span class="font-bold text-teal-800">{{ blog.status }} · {{ blog.publish_policy }}</span>
                         <span class="font-semibold text-slate-400">공개 발행 없음</span>
                     </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="youtube" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                    <p class="text-xs font-bold text-slate-400">YOUTUBE 10 · 독립 생성 모듈</p>
+                    <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">YouTube 통제실</h2>
+                    <p class="mt-1 text-xs text-slate-400">플리 5 + 지식 5 · Google Sheet 중앙 스케줄 승인 후 비공개 업로드</p>
+                </div>
+                <div class="rounded-2xl border border-red-100 bg-red-50 px-5 py-3 text-center">
+                    <div class="text-3xl font-black text-red-700">{{ youtube_channels|length }}</div>
+                    <div class="text-xs font-semibold text-red-600">등록 채널</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {% for channel in youtube_channels %}
+                <article class="min-w-0 space-y-3 rounded-2xl border border-red-200 bg-gradient-to-br from-white to-red-50 p-4 shadow-sm">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <span class="rounded-full {% if channel.group == 'PLAYLIST' %}bg-fuchsia-600{% else %}bg-red-700{% endif %} px-2 py-1 text-[9px] font-black text-white">{% if channel.group == 'PLAYLIST' %}플리{% else %}지식{% endif %}</span>
+                            <h3 class="mt-2 truncate text-base font-black text-slate-900">{{ channel.name }}</h3>
+                        </div>
+                        <span class="h-3 w-3 shrink-0 rounded-full {% if channel.enabled and channel.status == 'READY' %}bg-emerald-500{% else %}bg-red-500{% endif %}" title="{{ channel.status }}"></span>
+                    </div>
+                    {% if channel.channel_url %}<a href="{{ channel.channel_url }}" target="_blank" rel="noopener" class="block break-all text-[11px] font-bold text-red-700 hover:underline">{{ channel.channel_id }}</a>{% endif %}
+                    <div class="rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-[11px] text-slate-700">
+                        <p><span class="font-black">전용 워크플로:</span> {{ channel.workflow }}</p>
+                        <p><span class="font-black">업로드 상태:</span> {{ channel.publish_policy|upper }}</p>
+                        <p><span class="font-black">트리거:</span> Google Sheet 중앙 스케줄러</p>
+                    </div>
+                    <div class="rounded-xl bg-slate-900 px-3 py-2 text-center text-[10px] font-black text-white">시트 승인 토큰 필수 · 임의 공개 차단</div>
                 </article>
                 {% endfor %}
             </div>

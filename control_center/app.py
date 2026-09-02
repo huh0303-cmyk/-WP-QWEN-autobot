@@ -487,6 +487,33 @@ def get_tistory_data() -> list[dict[str, object]]:
     return sorted(result, key=lambda item: item["order"] or 999)
 
 
+def get_youtube_data() -> list[dict[str, object]]:
+    """Expose the ten locked YouTube rooms without bypassing Sheet scheduling."""
+    path = Path(__file__).resolve().parents[1] / "config" / "automation_rooms.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    rows = []
+    for room in payload.get("rooms", []):
+        if room.get("platform") != "youtube":
+            continue
+        channel_id = str(room.get("destination_id", "")).strip()
+        rows.append({
+            "room_id": str(room.get("room_id", "")),
+            "name": str(room.get("name", "")),
+            "group": str(room.get("group", "")),
+            "channel_id": channel_id,
+            "channel_url": f"https://www.youtube.com/channel/{channel_id}" if channel_id else "",
+            "workflow": str(room.get("workflow", "")),
+            "publish_policy": str(room.get("publish_policy", "private")),
+            "status": str(room.get("status", "UNKNOWN")),
+            "enabled": bool(room.get("enabled", False)),
+            "sheet_controlled": True,
+        })
+    return sorted(rows, key=lambda row: (row["group"] != "PLAYLIST", row["name"].casefold()))
+
+
 def _queue_draft_trigger(payload: dict[str, object]) -> str:
     """Persist a draft-only request for the worker; never publish from the UI."""
     trigger_id = f"draft-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
@@ -593,6 +620,7 @@ def index():
         site["keyword_suggestions"] = weekly_suggestions(site["domain"])
     return render_template(
         "index.html", sites=sites, bloggers=get_blogger_data(), tistory_sites=get_tistory_data(),
+        youtube_channels=get_youtube_data(),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
     )
 

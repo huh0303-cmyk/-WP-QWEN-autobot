@@ -11,7 +11,7 @@ from control_center.db import Store
 from control_center.quality import score_article
 from control_center.registry import load_wordpress_sites
 from control_center.service import ControlCenter
-from control_center.app import _site_rows
+from control_center.app import _site_rows, get_youtube_data
 from control_center.keywords import weekly_suggestions
 from control_center.states import QUALITY_PASSED, WP_DRAFTED
 from control_center.wordpress import DraftResult
@@ -37,6 +37,14 @@ def test_registry_has_exactly_27_wordpress_sites():
     sites = load_wordpress_sites()
     assert len(sites) == 27
     assert len({site.site_id for site in sites}) == 27
+
+
+def test_pwa_has_ten_youtube_rooms_in_two_groups():
+    channels = get_youtube_data()
+    assert len(channels) == 10
+    assert sum(row["group"] == "PLAYLIST" for row in channels) == 5
+    assert sum(row["group"] == "KNOWLEDGE" for row in channels) == 5
+    assert all(row["sheet_controlled"] for row in channels)
 
 
 def test_locked_default_content_and_image_engines():
