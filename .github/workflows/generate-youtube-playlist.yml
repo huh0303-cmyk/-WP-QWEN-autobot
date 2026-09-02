@@ -93,6 +93,17 @@ jobs:
           sudo apt-get install -y -q ffmpeg fonts-nanum
       - name: Install Python dependencies
         run: pip install requests pillow google-api-python-client google-auth google-auth-httplib2 -q
+      - name: Resolve channel credential profile
+        id: channel-profile
+        shell: bash
+        run: echo "upper=$(echo '${{ inputs.channel }}' | tr '[:lower:]' '[:upper:]')" >> "$GITHUB_OUTPUT"
+      - name: Preflight OAuth scope and exact channel identity
+        env:
+          CHANNEL_KEY: ${{ inputs.channel }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', steps.channel-profile.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', steps.channel-profile.outputs.upper)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', steps.channel-profile.outputs.upper)] || (steps.channel-profile.outputs.upper == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}
+        run: python scripts/youtube_readiness_check.py --channel "$CHANNEL_KEY"
       - name: Claim calendar job (reject re-runs)
         env:
           SCHEDULE_ID: ${{ inputs.schedule_id }}

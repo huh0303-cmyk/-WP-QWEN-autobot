@@ -13,12 +13,13 @@ def expected_channel_id(channel_key: str) -> str:
 def verify_authenticated_channel(service, channel_key: str) -> str:
     """Stop an upload when OAuth belongs to a different YouTube channel."""
     expected = expected_channel_id(channel_key)
-    response = service.channels().list(part="id", mine=True, maxResults=1).execute()
+    response = service.channels().list(part="id", mine=True, maxResults=50).execute()
     items = response.get("items", [])
-    actual = items[0].get("id", "") if items else ""
-    if actual != expected:
+    actual_ids = [item.get("id", "") for item in items if item.get("id")]
+    if actual_ids != [expected]:
         raise RuntimeError(
-            f"YouTube OAuth channel mismatch for {channel_key}: expected {expected}, got {actual or 'none'}"
+            f"YouTube OAuth channel mismatch for {channel_key}: expected only {expected}, "
+            f"got {','.join(actual_ids) or 'none'}"
         )
-    return actual
+    return expected
 

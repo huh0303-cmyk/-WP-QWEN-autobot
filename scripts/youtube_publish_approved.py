@@ -16,7 +16,8 @@ import requests
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.youtube_readiness import UPLOAD_SCOPE, assert_access_scope, check_channel
+from automation_hub.youtube_registry import load_channels
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -75,11 +76,14 @@ def download_drive_file(service, file_id, out_path):
 
 
 def get_youtube_service():
+    from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
     creds = Credentials(token=None, refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
         token_uri="https://oauth2.googleapis.com/token", client_id=YOUTUBE_OAUTH_CLIENT_ID,
-        client_secret=YOUTUBE_OAUTH_CLIENT_SECRET, scopes=["https://www.googleapis.com/auth/youtube.upload"])
+        client_secret=YOUTUBE_OAUTH_CLIENT_SECRET, scopes=[UPLOAD_SCOPE])
+    creds.refresh(Request())
+    assert_access_scope(creds, UPLOAD_SCOPE)
     return build("youtube", "v3", credentials=creds)
 
 
@@ -108,6 +112,9 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
             retries += 1
             if retries >= max_retries: raise
             time.sleep(min(2 ** retries, 8))
+    response_status = response.get("status", {})
+    if response_status.get("privacyStatus") != "private" or response_status.get("publishAt"):
+        raise RuntimeError("YouTube did not confirm a private unscheduled upload; receipt withheld")
     video_id = response["id"]
     if thumb_path and os.path.exists(thumb_path) and os.path.getsize(thumb_path) > 0:
         try:
@@ -134,10 +141,18 @@ def main():
         meta = drive.files().get(fileId=thumb_id, fields="name").execute()
         thumb_path = os.path.join(WORKDIR, "thumbnail" + (os.path.splitext(meta.get("name", ""))[1] or ".png"))
         download_drive_file(drive, thumb_id, thumb_path)
-    youtube = get_youtube_service()
     channel_key = os.environ.get("CHANNEL_KEY", "").strip().lower()
     if not channel_key: raise RuntimeError("CHANNEL_KEY is required")
-    verified_id = verify_authenticated_channel(youtube, channel_key)
+    channel = next((item for item in load_channels() if item.channel_key == channel_key), None)
+    if channel is None:
+        raise RuntimeError(f"Unknown CHANNEL_KEY: {channel_key}")
+    readiness = check_channel(channel)
+    if not readiness.ready:
+        raise RuntimeError("YouTube OAuth/channel readiness failed: " + "; ".join(readiness.errors))
+    verified_id = readiness.verified_channel_id
+    # The mutation client is intentionally upload-only. It cannot publish or
+    # schedule existing videos even though the readiness client can read identity.
+    youtube = get_youtube_service()
     video_id = upload_to_youtube(youtube, video_path, thumb_path, os.environ["YT_TITLE"],
         os.environ.get("YT_DESCRIPTION", ""), [t.strip() for t in os.environ.get("YT_TAGS", "").split(",") if t.strip()])
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"

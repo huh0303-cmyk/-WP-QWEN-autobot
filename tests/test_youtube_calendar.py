@@ -12,6 +12,7 @@ from automation_hub.youtube_calendar import KST, READY, channel_key, parse_calen
 from scripts.youtube_calendar_result import private_result, main as result_main
 from scripts.roll_14day_content_calendar import HEADERS, wp_blogger_rows, youtube_rows
 from automation_hub.youtube_registry import load_channels
+from automation_hub.sheet_schema import YOUTUBE_CHANNEL_HEADER
 
 
 def row(sid="CAL-1", name="MBB", when="2026-08-31 12:00 KST", status=READY, platform="YouTube Playlist"):
@@ -24,6 +25,10 @@ def parsed(*rows):
 
 
 NOW = dt.datetime(2026, 8, 31, 12, tzinfo=KST)
+
+
+def channel_settings_values():
+    return [YOUTUBE_CHANNEL_HEADER, *[channel.to_row() for channel in load_channels()]]
 
 
 def test_aliases_and_future_time():
@@ -111,9 +116,7 @@ def test_dispatch_claims_before_http_and_forwards_calendar(monkeypatch):
     from scripts import youtube_calendar_dispatch as dispatch_module
     monkeypatch.setenv("SHEET_ID", "sheet"); monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
     monkeypatch.setenv("GH_DISPATCH_TOKEN", "test-token"); monkeypatch.setenv("DRY_RUN", "false")
-    c = next(c for c in load_channels() if c.channel_key == "mbb")
-    values = [["channel_key", "channel_type", "display_name", "channel_id", "secret_profile", "workflow", "enabled"],
-              [c.channel_key, c.channel_type, c.display_name, c.channel_id, c.secret_profile, c.workflow, "ON"]]
+    values = channel_settings_values()
     service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {"values": values}
     r = parsed(row(when=dt.datetime.now(KST).strftime("%Y-%m-%d %H:%M KST")))[0]
     events = []
@@ -131,17 +134,56 @@ def test_dispatch_claims_before_http_and_forwards_calendar(monkeypatch):
     with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(dispatch_module, "read_calendar", return_value=[r]), patch.object(dispatch_module, "update_row", side_effect=claim), patch.object(dispatch_module, "youtube_worker_active", return_value=False), patch.object(dispatch_module.requests, "post", side_effect=post):
         assert dispatch_module.main() == 0
     assert events == ["claim", "post"]
+    assert any("'자동화_유튜브채널'!P" in call.kwargs.get("range", "")
+               for call in service.spreadsheets.return_value.values.return_value.update.call_args_list)
 
 
 def test_dry_run_has_no_writes_or_dispatch(monkeypatch):
     from scripts import youtube_calendar_dispatch as dispatch_module
     monkeypatch.setenv("SHEET_ID", "sheet"); monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
     monkeypatch.setenv("DRY_RUN", "true")
-    service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {"values": [
-        ["channel_key", "channel_type", "display_name", "channel_id", "secret_profile", "workflow", "enabled"]]}
+    service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {
+        "values": channel_settings_values()}
     with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(dispatch_module, "read_calendar", return_value=[]), patch.object(dispatch_module, "update_row") as write, patch.object(dispatch_module.requests, "post") as post:
         assert dispatch_module.main() == 0
     write.assert_not_called(); post.assert_not_called()
+
+
+@pytest.mark.parametrize("enabled,next_run", [
+    ("OFF", ""),
+    ("ON", (dt.datetime.now(KST) + dt.timedelta(days=1)).isoformat()),
+])
+def test_active_scheduler_honors_sheet_off_and_next_run(monkeypatch, enabled, next_run):
+    from scripts import youtube_calendar_dispatch as dispatch_module
+    monkeypatch.setenv("SHEET_ID", "sheet"); monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
+    monkeypatch.setenv("DRY_RUN", "true")
+    values = channel_settings_values()
+    mbb = next(row for row in values[1:] if row[0] == "mbb")
+    mbb[6], mbb[15] = enabled, next_run
+    service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {"values": values}
+    current = parsed(row(when=dt.datetime.now(KST).strftime("%Y-%m-%d %H:%M KST")))[0]
+    with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(
+        dispatch_module, "read_calendar", return_value=[current],
+    ), patch.object(dispatch_module.requests, "post") as post:
+        assert dispatch_module.main() == 0
+    post.assert_not_called()
+
+
+def test_expired_calendar_row_is_recorded_as_pass(monkeypatch):
+    from scripts import youtube_calendar_dispatch as dispatch_module
+    monkeypatch.setenv("SHEET_ID", "sheet"); monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
+    monkeypatch.setenv("GH_DISPATCH_TOKEN", "test-token"); monkeypatch.setenv("DRY_RUN", "false")
+    service = Mock(); service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {
+        "values": channel_settings_values()}
+    past = parsed(row(when=(dt.datetime.now(KST) - dt.timedelta(hours=1)).strftime("%Y-%m-%d %H:%M KST")))[0]
+    with patch.object(dispatch_module, "get_sheets_service", return_value=service), patch.object(
+        dispatch_module, "read_calendar", return_value=[past],
+    ), patch.object(dispatch_module, "youtube_worker_active", return_value=False), patch.object(
+        dispatch_module, "update_row",
+    ) as write, patch.object(dispatch_module.requests, "post") as post:
+        assert dispatch_module.main() == 0
+    assert write.call_args.args[3] == "PASS"
+    post.assert_not_called()
 
 
 def test_private_email_has_editor_link_and_is_not_marked_on_failure():

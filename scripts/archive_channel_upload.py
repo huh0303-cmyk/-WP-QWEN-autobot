@@ -362,10 +362,9 @@ def mark_uploaded(drive, file_id, old_name):
 def upload_to_youtube(service, video_path, thumb_path, title, description, publish_at_iso=None):
     from googleapiclient.http import MediaFileUpload
 
-    status = {"selfDeclaredMadeForKids": False,
-              "privacyStatus": "private" if publish_at_iso else "private"}
     if publish_at_iso:
-        status["publishAt"] = publish_at_iso
+        raise RuntimeError("Automated publishAt is prohibited; upload private and publish manually in Studio")
+    status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
 
     body = {
         "snippet": {"title": title[:100], "description": description, "categoryId": "27"},

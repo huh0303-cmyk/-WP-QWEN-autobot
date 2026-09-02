@@ -29,7 +29,10 @@ def notify_review(service, sid, row, url, notes):
 def private_result(path, channel):
     if not Path(path).is_file():
         return "", "worker did not produce a private upload result"
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return "", f"private upload result is unreadable: {type(exc).__name__}"
     vid = data.get("video_id", "")
     import re
     if (not re.fullmatch(r"[A-Za-z0-9_-]{11}", vid)
@@ -60,6 +63,18 @@ def main():
         if row["status"] != "자료수집" or row["url"] or "[yt-worker:" in row["notes"] or os.getenv("GITHUB_RUN_ATTEMPT", "1") != "1":
             raise RuntimeError("Claim already consumed; refusing duplicate generation/upload")
         update_row(service, sid, row, "자료수집", "", row["notes"] + "\n" + worker)
+        return
+    if args.mode == "finish" and worker not in row["notes"]:
+        if row["status"] != "자료수집" or row["url"]:
+            raise RuntimeError("Preflight failure cannot overwrite changed calendar state")
+        run_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run_id}"
+        error = "OAuth/readiness or workflow setup failed before worker claim; no upload attempted"
+        notes = row["notes"] + f"\n{run_url}\n{error}"
+        update_row(service, sid, row, "실패", "", notes)
+        service.spreadsheets().values().append(spreadsheetId=sid, range="'자동화_유튜브실행'!A:I",
+            valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [[
+                row["when"].isoformat(), channel, row["cells"][2], os.getenv("WORKER_WORKFLOW", ""),
+                "실패", run_url, "", "", error]]}).execute()
         return
     if worker not in row["notes"]:
         raise RuntimeError("No matching worker claim; leave calendar unchanged")

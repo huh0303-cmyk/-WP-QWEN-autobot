@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.youtube_readiness import UPLOAD_SCOPE, assert_access_scope, check_channel
+from automation_hub.youtube_registry import load_channels
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -64,7 +65,6 @@ def strip_ai_fingerprint(video_path):
 
 
 def get_youtube_service(secret_key):
-    from google.auth.exceptions import RefreshError
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
@@ -79,25 +79,17 @@ def get_youtube_service(secret_key):
     if not refresh_token:
         raise SystemExit(f"YOUTUBE_OAUTH_REFRESH_TOKEN_{secret_key} 시크릿이 없습니다.")
 
-    last_err = None
-    for scope in (
-        "https://www.googleapis.com/auth/youtube.force-ssl",
-        "https://www.googleapis.com/auth/youtube.upload",
-    ):
-        creds = Credentials(
-            token=None,
-            refresh_token=refresh_token,
-            token_uri="https://oauth2.googleapis.com/token",
-            client_id=client_id,
-            client_secret=client_secret,
-            scopes=[scope],
-        )
-        try:
-            creds.refresh(Request())
-            return build("youtube", "v3", credentials=creds)
-        except RefreshError as exc:
-            last_err = exc
-    raise last_err
+    creds = Credentials(
+        token=None,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=client_id,
+        client_secret=client_secret,
+        scopes=[UPLOAD_SCOPE],
+    )
+    creds.refresh(Request())
+    assert_access_scope(creds, UPLOAD_SCOPE)
+    return build("youtube", "v3", credentials=creds, cache_discovery=False)
 
 
 def upload_to_youtube(service, video_path, thumb_path, title, description, tags=None):
@@ -135,6 +127,10 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
         status_obj, response = request.next_chunk(num_retries=5)
         if status_obj:
             log(f"   업로드 진행률: {int(status_obj.progress() * 100)}%")
+
+    response_status = response.get("status", {})
+    if response_status.get("privacyStatus") != "private" or response_status.get("publishAt"):
+        raise RuntimeError("YouTube did not confirm a private unscheduled upload; receipt withheld")
 
     video_id = response["id"]
     if thumb_path and os.path.exists(thumb_path):
@@ -186,9 +182,15 @@ def main():
     tags = meta.get("tags") or []
 
     strip_ai_fingerprint(video_path)
-    service = get_youtube_service(CHANNEL_SECRET_MAP[channel_key])
-    verified_id = verify_authenticated_channel(service, channel_key)
+    channel = next((item for item in load_channels() if item.channel_key == channel_key), None)
+    if channel is None:
+        raise RuntimeError(f"Unknown channel registry entry: {channel_key}")
+    readiness = check_channel(channel)
+    if not readiness.ready:
+        raise RuntimeError("YouTube OAuth/channel readiness failed: " + "; ".join(readiness.errors))
+    verified_id = readiness.verified_channel_id
     log(f"   ✅ OAuth 채널 일치 확인: {channel_key} ({verified_id})")
+    service = get_youtube_service(CHANNEL_SECRET_MAP[channel_key])
     video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags)
     studio_url = write_result(video_id, channel_key, verified_id)
     log(f"✅ 업로드 완료(PRIVATE): {studio_url}")

@@ -5,6 +5,7 @@ on:
 
 jobs:
   set-public:
+    if: ${{ false }} # PERMANENT LOCK: YouTube public transitions are human-only in Studio
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

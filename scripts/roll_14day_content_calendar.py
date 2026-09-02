@@ -211,7 +211,7 @@ def main():
     end_row = start_row + len(new_rows)
     status_values = [
         "황금키워드 검증대기", "WP 선행대기", "기획확정·자료준비", "자료수집",
-        "대본작성", "검수중", "비공개 업로드", "공개완료", "보류", "실패",
+        "대본작성", "검수중", "비공개 업로드", "공개완료", "PASS", "보류", "실패",
     ]
     service.spreadsheets().batchUpdate(
         spreadsheetId=SHEET_ID,

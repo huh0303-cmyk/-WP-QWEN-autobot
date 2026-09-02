@@ -80,6 +80,31 @@ def select_due(rows, now, enabled, limit=3):
     return sorted(selected, key=lambda r: (r["when"], r["id"]))[:limit], skipped
 
 
+def select_passed(rows, now, window_minutes=30):
+    """Return untouched READY rows whose bounded execution window has elapsed."""
+    cutoff = now.astimezone(KST) - dt.timedelta(minutes=window_minutes)
+    return [
+        row for row in rows
+        if row["status"] == READY
+        and not row["url"]
+        and "[yt-calendar:" not in row["notes"]
+        and row["when"] <= cutoff
+    ]
+
+
+def next_calendar_run(rows, key, after):
+    """Expose the next central-calendar slot as channel-level next_run_at."""
+    candidates = [
+        row["when"] for row in rows
+        if row["key"] == key
+        and row["when"] > after.astimezone(KST)
+        and row["status"] == READY
+        and not row["url"]
+        and "[yt-calendar:" not in row["notes"]
+    ]
+    return min(candidates) if candidates else None
+
+
 def read_calendar(service, spreadsheet_id):
     meta = service.spreadsheets().get(spreadsheetId=spreadsheet_id, fields="sheets.properties").execute()
     count = next(s["properties"]["gridProperties"]["rowCount"] for s in meta["sheets"]
