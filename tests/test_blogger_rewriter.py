@@ -23,7 +23,7 @@ class BloggerRewriterTests(unittest.TestCase):
             "labels": ["Korea", "Travel", "Planning", "Transport", "Booking", "Hotels", "Seoul", "Routes"],
         }
         _, failures, _ = blogger_quality_score(article, source_title="Korea Travel Planning", source_url=source_url, source_html="<p>Short source.</p>", target_chars=2400)
-        self.assertTrue(any("Unlock title formulas" in item for item in failures))
+        self.assertTrue(any("mass-produced AI title formula" in item for item in failures))
 
     def test_search_description_is_100_to_119_characters(self):
         for keyword in ("한국 보험 가입 전 확인사항", "Korea housing contract checklist"):

@@ -48,6 +48,13 @@ GPT must not invent facts while editing. Material factual uncertainty goes back 
 - The ban is enforced in every writer prompt and again in the deterministic pre-save gate. Model approval cannot override it.
 - Violation result: `TITLE_QUALITY_FAIL`; the draft remains unsaved and unpublished until its title passes recheck.
 
+### Network-wide mass-produced AI phrase ban
+
+- Title formulas including `Ultimate/Complete/Comprehensive Guide`, `Discover/Unleash the Power`, `Navigate the Complexities/Landscape`, `Your Path to`, `Mastering the Art of`, `Revolutionize`, `Game Changer`, `Everything You Need to Know`, `Secrets Revealed/Unveiled`, `The Future of`, `완벽 가이드`, `궁극의 가이드` and `총정리` are forbidden alongside every `Unlock` variation.
+- Body filler including `In today's fast-paced/dynamic world`, `In the ever-evolving landscape`, `Delve into`, `Embark on a journey`, `A tapestry of`, `In the realm of`, `Look no further`, `Whether you're a seasoned`, `Elevate your experience`, `Seamlessly navigate`, `It's important to note`, `As we all know`, `In conclusion` and `Without further ado` is forbidden.
+- Title violations are `TITLE_QUALITY_FAIL`. Body violations are `REWRITE_REQUIRED`. Neither may be saved, scheduled, emailed for approval or published before correction.
+- These deterministic gates apply equally to Gemini and GPT output across WordPress 27, Blogger 27 and Tistory 5.
+
 ## 2. Image generation pipeline
 
 Scope: WordPress 27, Blogger 27, Tistory 5, YouTube and SNS.

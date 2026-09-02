@@ -28,6 +28,7 @@ from gemini_text import gemini_generate_text  # noqa: E402
 from openai_text import openai_available, openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
 from three_model_consensus import three_model_consensus  # noqa: E402
+from automation_hub.editorial_language_policy import body_cliches, title_cliches  # noqa: E402
 
 WRITER_SYSTEM_PROMPT = (
     "You are a careful Korean/English blog writer for a Tistory site. "
@@ -40,6 +41,8 @@ WRITER_SYSTEM_PROMPT = (
     "The title is the most important text element: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. "
     "Never use AI-sounding stock phrases, repeated title formulas, or a title similar to another article. "
     "Never use the word Unlock or any Unlock/Unlocking title formula; rewrite it as a specific natural headline. "
+    "Also forbid Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, and 총정리 title formulas. "
+    "Never use body filler such as In today's fast-paced/dynamic world, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Elevate your experience, It's important to note, In conclusion, or Without further ado. "
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "The image_prompt must request a scene with no visible letters, words, numbers, documents, forms, screens, signs, labels, logos, watermarks, pseudo-text, fake Hangul, or fake Chinese/Japanese characters. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
@@ -112,8 +115,8 @@ def structural_check(draft: dict) -> list[str]:
     plain = re.sub(r"\s+", "", plain)
     if not title:
         issues.append("title is empty")
-    if re.search(r"(?i)\bunlock(?:s|ed|ing)?\b", title):
-        issues.append("TITLE_QUALITY_FAIL: Unlock title formulas are forbidden")
+    if title_cliches(title):
+        issues.append("TITLE_QUALITY_FAIL: mass-produced AI title formula is forbidden")
     if len(plain) < MIN_BODY_CHARS:
         issues.append(f"body length {len(plain)} is below the {MIN_BODY_CHARS}-character floor")
     if not re.search(r"(?is)<h[23][\s>]", body):
@@ -126,6 +129,8 @@ def structural_check(draft: dict) -> list[str]:
         issues.append("body contains a paragraph longer than 320 characters")
     if re.search(r"(?is)<p(?:\s[^>]*)?>[^<]*(?:▶|■|●|◆|▪|•)[^<]*</p>", body):
         issues.append("bullet-like text must be converted to a real ul/li list")
+    if body_cliches(re.sub(r"<[^>]+>", " ", body)):
+        issues.append("REWRITE_REQUIRED: mass-produced AI body phrasing detected")
     return issues
 
 

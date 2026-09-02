@@ -10,6 +10,7 @@ from datetime import date
 from typing import Any
 
 from automation_hub.blogger_rewriter import plain_text
+from automation_hub.editorial_language_policy import body_cliches, title_cliches
 
 
 def original_prompt(*, keyword: str, site_theme: str, language: str, persona: str,
@@ -18,10 +19,10 @@ def original_prompt(*, keyword: str, site_theme: str, language: str, persona: st
     return f"""Write a new standalone article for the keyword below. This is original work, not a rewrite of any existing article.
 Current date: {current_date}. Never present an earlier year or month as the current verification date. Do not claim that changing fares, schedules, rules, or availability are current unless the article can support that claim; direct readers to the relevant official operator or authority for confirmation.
 Site theme: {site_theme}. Primary keyword/topic: {keyword}.
-The title is the highest-priority text: make it specific and useful so a real reader wants to click, without clickbait or false promises. Never start with or use cheap AI-title formulas such as "Unlock", "Unlock the secrets", "Ultimate Guide", "Navigate", "Your Path to", "Master", "Revolutionize", "Discover the Power of", or Korean equivalents such as "비밀을 풀다", "완벽 가이드", "궁극의 가이드". Never use a repeated title formula or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
+The title is the highest-priority text: make it specific and useful so a real reader wants to click, without clickbait or false promises. Never use mass-produced AI title formulas including Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리. Never use a repeated title formula or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: {target_chars} characters - plan the number of sections and their depth to fit this budget, and finish every section you start; an oversized draft gets trimmed and can end up cut off mid-thought, so write to the budget rather than over-writing and expecting it to be shortened.
-The article must feel individually edited for this site's persona, not mass-produced. Avoid AI-signaling phrases, generic filler, keyword stuffing, repetitive templates, fake freshness, exaggerated claims, and unnecessary FAQs.
+The article must feel individually edited for this site's persona, not mass-produced. Never use filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer and fits within the length budget - finishing fewer sections completely beats starting a section (or a comparison list) you don't have room to finish.
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
 Add useful original synthesis grounded in generally known, verifiable facts. Do not invent personal experience, specific statistics, quotes, prices, or sources you cannot be confident are correct. When a fact would need a citation to be trustworthy (a specific number, date, rule, or claim), phrase it as general guidance instead of a false-precision fact.
@@ -55,12 +56,8 @@ def original_quality_score(article: dict[str, Any], *, keyword: str, target_char
         score += 10
     else:
         failures.append("title length must be 20-70 characters")
-    ai_title_pattern = re.compile(
-        r"(?i)\b(unlock(?:s|ed|ing)?(?: the secrets?)?|ultimate guide|navigate|your path to|master|"
-        r"revolutionize|discover the power of)\b|비밀을\s*풀|완벽\s*가이드|궁극의\s*가이드"
-    )
-    if ai_title_pattern.search(title):
-        failures.append("AI-like stock title formula is forbidden")
+    if title_cliches(title):
+        failures.append("TITLE_QUALITY_FAIL: mass-produced AI title formula is forbidden")
 
     body_chars = len(re.sub(r"\s+", "", text))
     minimum = max(1000, int(target_chars * 0.78))
@@ -85,7 +82,7 @@ def original_quality_score(article: dict[str, Any], *, keyword: str, target_char
         score += 10
     else:
         failures.append("at least three useful H2/H3 headings are required")
-    banned = re.findall(r"(?i)\b(as an ai|language model|in conclusion|delve into|unlock the secrets)\b", text)
+    banned = re.findall(r"(?i)\b(as an ai|language model)\b", text) + body_cliches(text)
     if not banned:
         score += 10
     else:

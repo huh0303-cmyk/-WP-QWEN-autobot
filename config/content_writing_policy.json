@@ -80,9 +80,11 @@
     "title_priority": "highest_text_priority",
     "first_image_priority": "equal_to_title_and_must_visualize_the_titles_specific_situation_emotion_and_benefit",
     "forbid_ai_sounding_title_formulas": true,
-    "forbidden_title_terms": ["Unlock"],
-    "forbidden_title_term_match": "case_insensitive_whole_word_and_inflections",
+    "forbidden_title_terms": ["Unlock", "Ultimate Guide", "Complete Guide", "Comprehensive Guide", "Discover the Power of", "Unleash the Power", "Navigate the Complexities", "Navigate the Landscape", "Your Path to", "Mastering the Art of", "Revolutionize", "Game Changer", "Everything You Need to Know", "Secrets Revealed", "Secrets Unveiled", "The Future of", "완벽 가이드", "궁극의 가이드", "총정리"],
+    "forbidden_body_phrases": ["In today's fast-paced world", "In today's dynamic world", "In the ever-evolving landscape", "Delve into", "Embark on a journey", "A tapestry of", "In the realm of", "Look no further", "Whether you're a seasoned", "Elevate your experience", "Seamlessly navigate", "It's important to note", "As we all know", "In conclusion", "Without further ado"],
+    "forbidden_title_term_match": "case_insensitive_formula_and_inflections",
     "forbidden_title_action": "QUALITY_FAIL_NO_SAVE_NO_PUBLISH",
+    "forbidden_body_phrase_action": "REWRITE_REQUIRED_NO_SAVE_NO_PUBLISH",
     "forbid_repeated_or_similar_titles": true,
     "forbid_clickbait_or_false_promises": true,
     "never_hide_sources_or_material_corrections": true

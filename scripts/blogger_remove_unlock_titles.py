@@ -34,8 +34,9 @@ def token() -> str:
 
 def main() -> int:
     apply_changes = os.environ.get("APPLY_CHANGES", "true").lower() == "true"
-    registry = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
-    sites = [row for row in registry["sites"] if row.get("platform") == "blogger" and row.get("destination_id")]
+    profiles = json.loads((ROOT / "config/content_engine_profiles.json").read_text(encoding="utf-8"))
+    sites = [{"site_id": f"blogger_{row['site_key']}", "destination_id": row["blogspot"].get("destination_id")}
+             for row in profiles["profiles"] if row.get("blogspot", {}).get("destination_id")]
     headers = {"Authorization": f"Bearer {token()}"}
     found = changed = 0
     results = []

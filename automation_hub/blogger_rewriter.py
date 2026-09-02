@@ -8,6 +8,7 @@ from difflib import SequenceMatcher
 from typing import Any
 
 import requests
+from automation_hub.editorial_language_policy import body_cliches, title_cliches
 
 
 def plain_text(value: str) -> str:
@@ -155,7 +156,7 @@ The title is the highest-priority text: make it emotionally resonant, curiosity-
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
-The article must feel individually edited for this site's persona, not mass-produced. Avoid AI-signaling phrases, generic filler, keyword stuffing, repetitive templates, fake freshness, exaggerated claims, and unnecessary FAQs. Titles using "Unlock", "Unlock the secrets", "Ultimate Guide", "Navigate", "Your Path to", "Master", "Revolutionize", "Discover the Power of", "비밀을 풀다", "완벽 가이드", or "궁극의 가이드" are forbidden and must be rewritten.
+The article must feel individually edited for this site's persona, not mass-produced. Titles using Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리 are forbidden. Never use body filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
 Return JSON only with keys title, meta_description, content_html, image_queries, labels.
@@ -195,8 +196,8 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
         score += 10
     else:
         failures.append("title length must be 20-70 characters")
-    if re.search(r"(?i)\bunlock(?:s|ed|ing)?\b", title):
-        failures.append("TITLE_QUALITY_FAIL: Unlock title formulas are forbidden")
+    if title_cliches(title):
+        failures.append("TITLE_QUALITY_FAIL: mass-produced AI title formula is forbidden")
 
     body_chars = len(re.sub(r"\s+", "", text))
     minimum = max(1200, int(target_chars * 0.78))
@@ -237,7 +238,7 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
         score += 10
     else:
         failures.append(f"source similarity {copy_similarity:.3f} exceeds {maximum_similarity:.2f}")
-    banned = re.findall(r"(?i)\b(as an ai|language model|in conclusion|delve into|unlock the secrets)\b", text)
+    banned = re.findall(r"(?i)\b(as an ai|language model)\b", text) + body_cliches(text)
     if not banned:
         score += 5
     else:
