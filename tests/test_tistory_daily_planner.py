@@ -23,10 +23,10 @@ def test_daily_plan_includes_all_five_launched_sites():
     assert all(j["public_allowed"] is False for j in plan["jobs"])
 
 
-def test_life365_replaces_the_stale_petcare_label():
+def test_life365_has_no_stale_petcare_label():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_life365")
-    assert site["current_label"] == "K-Petcare"
+    assert site["current_label"] == "한국생활정보"
     assert site["title"] == "한국생활정보"
     assert site["url"] == "https://huh0303.tistory.com/"
     assert site["official_source_required"] is True
