@@ -40,37 +40,43 @@ def main() -> int:
     headers = {"Authorization": f"Bearer {token()}"}
     found = changed = 0
     results = []
+    seen_posts = set()
     for site in sites:
         blog_id = str(site["destination_id"])
-        page_token = None
-        while True:
-            params = {"maxResults": 500, "fetchBodies": "false", "view": "ADMIN"}
-            if page_token:
-                params["pageToken"] = page_token
-            response = requests.get(f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts",
-                                    headers=headers, params=params, timeout=30)
-            response.raise_for_status()
-            payload = response.json()
-            for post in payload.get("items", []):
-                old = post.get("title", "")
-                if not PATTERN.search(old):
-                    continue
-                found += 1
-                new = cleaned_title(old)
-                if not new or PATTERN.search(new):
-                    raise RuntimeError(f"unsafe replacement for {blog_id}/{post.get('id')}: {old!r}")
-                if apply_changes:
-                    patched = requests.patch(
-                        f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts/{post['id']}",
-                        headers={**headers, "Content-Type": "application/json"}, json={"title": new}, timeout=30)
-                    patched.raise_for_status()
-                    changed += 1
-                results.append({"site_id": site["site_id"], "blog_id": blog_id, "post_id": post["id"],
-                                "status": post.get("status"), "old_title": old, "new_title": new,
-                                "changed": apply_changes})
-            page_token = payload.get("nextPageToken")
-            if not page_token:
-                break
+        for requested_status in ("LIVE", "DRAFT", "SCHEDULED"):
+            page_token = None
+            while True:
+                params = {"maxResults": 500, "fetchBodies": "false", "view": "ADMIN", "status": requested_status}
+                if page_token:
+                    params["pageToken"] = page_token
+                response = requests.get(f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts",
+                                        headers=headers, params=params, timeout=30)
+                response.raise_for_status()
+                payload = response.json()
+                for post in payload.get("items", []):
+                    key = (blog_id, str(post.get("id")))
+                    if key in seen_posts:
+                        continue
+                    seen_posts.add(key)
+                    old = post.get("title", "")
+                    if not PATTERN.search(old):
+                        continue
+                    found += 1
+                    new = cleaned_title(old)
+                    if not new or PATTERN.search(new):
+                        raise RuntimeError(f"unsafe replacement for {blog_id}/{post.get('id')}: {old!r}")
+                    if apply_changes:
+                        patched = requests.patch(
+                            f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts/{post['id']}",
+                            headers={**headers, "Content-Type": "application/json"}, json={"title": new}, timeout=30)
+                        patched.raise_for_status()
+                        changed += 1
+                    results.append({"site_id": site["site_id"], "blog_id": blog_id, "post_id": post["id"],
+                                    "status": post.get("status"), "old_title": old, "new_title": new,
+                                    "changed": apply_changes})
+                page_token = payload.get("nextPageToken")
+                if not page_token:
+                    break
     print(json.dumps({"blogs_scanned": len(sites), "found": found, "changed": changed, "items": results}, ensure_ascii=False))
     return 0
 
