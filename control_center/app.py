@@ -1,6 +1,6 @@
 ﻿from flask import Flask, render_template
 
-from flask import flash, jsonify, redirect, request, send_from_directory, url_for
+from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
 
 from .keywords import weekly_suggestions
 from .registry import load_wordpress_sites
@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 import html
+import hmac
 import secrets
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
@@ -25,6 +26,27 @@ import requests
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secrets.token_hex(32)
 app.config["CONTROL_CENTER_CSRF"] = os.environ.get("CONTROL_CENTER_CSRF") or secrets.token_urlsafe(24)
+
+
+@app.before_request
+def require_control_center_login():
+    """Protect every PWA route when deployment credentials are configured."""
+    username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
+    password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
+    if not username or not password:
+        return None
+    supplied = request.authorization
+    if (
+        supplied
+        and hmac.compare_digest(supplied.username or "", username)
+        and hmac.compare_digest(supplied.password or "", password)
+    ):
+        return None
+    return Response(
+        "CEO control-room login required",
+        401,
+        {"WWW-Authenticate": 'Basic realm="Korea365 CEO Control Room"'},
+    )
 
 
 @app.get("/manifest.webmanifest")

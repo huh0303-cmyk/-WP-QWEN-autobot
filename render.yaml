@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: korea365-ceo-control-room
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-control-center.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 4 control_center.app:app
+    healthCheckPath: /
+    autoDeployTrigger: commit
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CONTROL_CENTER_USERNAME
+        value: ceo
+      - key: CONTROL_CENTER_PASSWORD
+        generateValue: true
+      - key: CONTROL_CENTER_SECRET_KEY
+        generateValue: true
+      - key: CONTROL_CENTER_CSRF
+        generateValue: true
+      - key: CONTROL_CENTER_GITHUB_REPO
+        value: huh0303-cmyk/-WP-QWEN-autobot
