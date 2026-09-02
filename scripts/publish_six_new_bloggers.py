@@ -139,7 +139,10 @@ EDITORIAL BRIEF:
     data = json.loads(raw)
     title = str(data["title"]).strip()
     content = str(data["content_html"]).strip()
-    labels = [str(v).strip() for v in data["labels"] if str(v).strip()][:12]
+    # Blogger rejects a post with a generic INVALID_ARGUMENT when generated
+    # label values exceed its undocumented aggregate constraints. Preserve
+    # the approved, short site taxonomy for deterministic publishing.
+    labels = site["labels"]
     subject = str(data["image_subject"]).strip()
     if not title or len(content) < 1500 or not (8 <= len(labels) <= 12) or not subject:
         raise RuntimeError(f"GPT-5 mini output failed quality gate for {site['key']}")
