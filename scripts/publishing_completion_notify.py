@@ -190,6 +190,9 @@ def _html_body(base_body: str, reviews: list[dict], fallback_link: str) -> str:
 
 
 def send_email(subject: str, body: str, html_body: str = "") -> bool:
+    if os.getenv("NORMAL_COMPLETION_EMAIL_ENABLED", "false").strip().lower() not in {"1", "true", "yes", "on"}:
+        print("normal completion email suppressed; review is available in the CEO control room")
+        return True
     password = os.getenv("GMAIL_APP_PASSWORD", "").strip()
     recipient = os.getenv("REPORT_EMAIL_TO", "").strip() or "huh0303@gmail.com"
     sender = os.getenv("REPORT_EMAIL_FROM", "").strip() or "huh0303@gmail.com"
@@ -281,8 +284,13 @@ def main() -> int:
         sheet_synced = False
     body = _plain_body(base_body, reviews, fallback_link)
     email_html = _html_body(base_body, reviews, fallback_link)
-    # Email is the authoritative review channel. An expired optional Kakao
-    # token must never prevent the administrator edit link from being sent.
+    # The CEO control room/Sheet is the authoritative review channel. Normal
+    # per-item mail and Kakao notices are opt-in to prevent notification floods.
+    if os.getenv("NORMAL_COMPLETION_EMAIL_ENABLED", "false").strip().lower() not in {"1", "true", "yes", "on"}:
+        print(json.dumps({"email": "suppressed", "kakao": "suppressed", "url": reviews[0]["edit_url"],
+                          "draft_links_found": len(reviews), "sheet_synced": sheet_synced,
+                          "review_channel": "control.korea365.org"}, ensure_ascii=False))
+        return 0
     email_result = send_email(title, body, email_html)
     kakao_results = []
     for review in reviews:

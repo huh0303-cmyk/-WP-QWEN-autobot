@@ -41,6 +41,9 @@ def log(msg):
 
 
 def send_email(subject, body):
+    if os.environ.get("NORMAL_COMPLETION_EMAIL_ENABLED", "false").strip().lower() not in {"1", "true", "yes", "on"}:
+        log("   YouTube completion email suppressed; use the CEO control room")
+        return
     if not GMAIL_APP_PASSWORD:
         return
     import smtplib

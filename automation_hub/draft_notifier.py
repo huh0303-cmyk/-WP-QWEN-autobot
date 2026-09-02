@@ -17,6 +17,9 @@ def notify_blogger_draft(*, site_id: str, title: str, review_url: str,
         }])
     except Exception as exc:
         print(f"Blogger review sheet sync skipped without affecting draft: {exc}")
+    if os.environ.get("NORMAL_COMPLETION_EMAIL_ENABLED", "false").strip().lower() not in {"1", "true", "yes", "on"}:
+        print("Blogger draft email suppressed; review link recorded in the CEO control room Sheet.")
+        return True
     password = os.environ.get("GMAIL_APP_PASSWORD", "").strip()
     recipient = os.environ.get("BLOGGER_REVIEW_EMAIL_TO", "huh0303@gmail.com").strip()
     sender = os.environ.get("BLOGGER_REVIEW_EMAIL_FROM", recipient).strip()
