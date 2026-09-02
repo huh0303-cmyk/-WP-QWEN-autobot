@@ -8,6 +8,8 @@ permissions:
 
 jobs:
   fix-images:
+    # Retired: stock-photo replacement conflicts with the locked SDXL -> FLUX -> no-image policy.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -21,7 +23,7 @@ jobs:
         env:
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
-          PEXELS_KEY: ${{ secrets.PEXELS_KEY }}
+          PEXELS_KEY: ""
         run: python scripts/fix_ai_looking_images.py
 
   publish-kworld:
