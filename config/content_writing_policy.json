@@ -1,22 +1,22 @@
 {
-  "version": 4,
+  "version": 5,
   "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
   "status": "LOCKED",
   "scope": ["wordpress", "blogger", "tistory", "news", "youtube_scripts", "sns_copy"],
   "primary_writer": {
-    "provider": "gemini",
-    "model": "Gemini 2.5 Flash",
+    "provider": "openai",
+    "model": "gpt-5-mini",
     "role": "first_draft_writer_for_all_content",
-    "cost_policy": "free_tier_first",
+    "cost_policy": "user_approved_paid_default",
     "rules": [
-      "All first drafts are written by Gemini 2.5 Flash by default.",
-      "Gemini must follow the site-specific persona, language, search intent, SEO structure, labels/categories and metadata rules.",
-      "Do not silently upgrade to a paid Gemini tier when quota or authentication fails."
+      "All WordPress, Blogger and Tistory first drafts are written by gpt-5-mini by default.",
+      "GPT-5 mini must follow the site-specific persona, language, search intent, SEO structure, labels/categories and metadata rules.",
+      "Do not silently switch to another paid model when authentication or quota fails."
     ]
   },
   "fallback_writer": {
     "provider": "openai",
-    "model_family": "ChatGPT/GPT",
+    "model_family": "gpt-5-mini",
     "role": "failed_draft_recovery_and_rewrite",
     "allowed_when": [
       "gemini_generation_failure",
@@ -27,14 +27,14 @@
       "manual_override"
     ],
     "rules": [
-      "ChatGPT is the second-line writer, not the routine first-draft engine.",
-      "When Gemini fails quality, factual, structural or formatting gates, ChatGPT rewrites the draft rather than automatically publishing it.",
+      "GPT-5 mini is both the routine writer and the only automatic rewrite writer.",
+      "When a draft fails quality, factual, structural or formatting gates, GPT-5 mini rewrites it rather than automatically publishing it.",
       "No public publishing occurs from fallback output without the normal approval flow."
     ]
   },
   "auditor": {
-    "provider": "openai",
-    "model_family": "ChatGPT/GPT",
+    "provider": "gemini",
+    "model_family": "Gemini 2.5 Flash",
     "role": "independent_final_editorial_fact_and_quality_reviewer",
     "checks": [
       "grammar_and_spelling",
@@ -51,8 +51,8 @@
       "final_quality_gate"
     ],
     "rules": [
-      "GPT independently reviews and rewrites editorial problems after the Gemini draft; it is not the routine first-draft writer.",
-      "GPT must not invent new facts while correcting grammar or style.",
+      "Gemini independently reviews the GPT-5 mini draft and returns structured findings.",
+      "Gemini must not invent new facts while checking grammar, structure or style.",
       "Material factual uncertainty must be returned for source verification, not silently rewritten.",
       "A failed audit returns QUALITY_FAIL or REWRITE_REQUIRED and routes back to the writer before approval."
     ]
@@ -60,10 +60,10 @@
   "pipeline": [
     "keyword_and_search_intent",
     "official_source_verification_when_required",
-    "gemini_2_5_flash_first_draft",
+    "gpt_5_mini_first_draft",
     "quality_gate",
-    "chatgpt_fallback_if_generation_or_quality_fails",
-    "gemini_and_gpt_independent_review",
+    "gpt_5_mini_rewrite_if_quality_fails",
+    "gemini_independent_review",
     "seo_and_metadata_validation",
     "draft_private_awaiting_approval"
   ],
@@ -110,8 +110,8 @@
   "two_model_checks_and_balances": {
     "status": "LOCKED_MANDATORY",
     "applies_to": ["wordpress", "blogger", "tistory", "news"],
-    "gemini": "first_draft_and_independent_self_check",
-    "gpt": "independent_fact_structure_seo_originality_check_and_rewrite_when_required",
+    "gpt": "first_draft_and_rewrite_when_required",
+    "gemini": "independent_fact_structure_seo_originality_check",
     "approval_rule": "gemini_and_gpt_must_both_return_ok_true",
     "single_model_approval_allowed": false,
     "missing_or_failed_checker_action": "CONSENSUS_FAILED_NO_DRAFT"

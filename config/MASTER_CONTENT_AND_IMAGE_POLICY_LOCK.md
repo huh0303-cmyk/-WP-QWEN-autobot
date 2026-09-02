@@ -10,21 +10,21 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 
 1. Keyword and search-intent selection.
 2. Verify current official sources first when freshness or YMYL accuracy requires it.
-3. Gemini 2.5 Flash writes the first draft by default.
+3. GPT-5 mini writes the first draft by default.
 4. Run structural and quality gates.
-5. If Gemini generation fails or the draft fails quality/policy/format gates, route to ChatGPT/GPT for recovery and rewrite.
-6. GPT performs the independent final editorial, factual and quality review after the Gemini draft and any required rewrite.
+5. If the draft fails quality/policy/format gates, GPT-5 mini rewrites it.
+6. Gemini 2.5 Flash performs the independent editorial, factual and quality review after the GPT draft and any required rewrite.
 7. Validate SEO structure and metadata.
 8. Save only as DRAFT / PRIVATE / AWAITING_APPROVAL. No automatic public publishing under this master policy.
 
 ### Network-wide engine default lock (2026-09-02)
 
-- WordPress 27, Blogger 27, Tistory 5, newsroom content, YouTube scripts and SNS copy all use Gemini 2.5 Flash as the default first-draft writer.
-- GPT must never appear as a routine default in the control center. It is used only for failed generation, failed quality/policy/format gates, high-value/important content explicitly routed for escalation, or a manual override.
+- WordPress 27, Blogger 27, Tistory 5 and newsroom content use GPT-5 mini as the default first-draft writer.
+- The control center, Google Sheet job defaults and execution workflows must display and use GPT-5 mini as their routine writing default.
 - Claude is not part of the WordPress, Blogger or Tistory writing/review pipeline.
-- Control-center cards, stored job defaults, workflows and execution code must agree with this order: Gemini 2.5 Flash -> GPT recovery/rewrite and final review.
+- Control-center cards, stored job defaults, workflows and execution code must agree with this order: GPT-5 mini draft/rewrite -> Gemini 2.5 Flash independent review.
 
-### GPT final review responsibilities
+### Gemini independent review responsibilities
 
 - grammar and spelling
 - awkward, translated or AI-sounding phrasing
@@ -39,7 +39,7 @@ Scope: WordPress, Blogger, Tistory, newsroom content where applicable, YouTube s
 - internal contradictions
 - final editorial quality gate
 
-GPT must not invent facts while editing. Material factual uncertainty goes back to source verification. Failed review => REWRITE_REQUIRED or QUALITY_FAIL.
+Gemini must not invent facts while reviewing. Material factual uncertainty goes back to source verification. Failed review => REWRITE_REQUIRED or QUALITY_FAIL.
 
 ### Network-wide title ban — `Unlock` (LOCKED 2026-09-02)
 

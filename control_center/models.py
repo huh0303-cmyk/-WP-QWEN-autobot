@@ -3,7 +3,7 @@ from __future__ import annotations
 TEXT_MODELS = {
     "gemini-2.5-flash-lite": {"label": "Gemini 2.5 Flash-Lite", "price": "$0.0007/글", "description": "일반 글 · 최저비용"},
     "gemini-2.5-flash": {"label": "Gemini 2.5 Flash", "price": "$0.0041/글", "description": "비자·금융·의료 검토"},
-    "gpt-5-mini": {"label": "GPT-5 mini", "price": "$0.0033/글", "description": "Gemini 실패·품질미달 시 재작성"},
+    "gpt-5-mini": {"label": "GPT-5 mini", "price": "$0.0033/글", "description": "전체 블로그 기본 작성 엔진"},
     "gpt-5.4-mini": {"label": "GPT-5.4 mini", "price": "$0.0075/글", "description": "최중요 글"},
 }
 
@@ -13,7 +13,7 @@ IMAGE_MODELS = {
     "black-forest-labs/flux-schnell": {"label": "FLUX.1 Schnell", "price": "$0.003/장", "description": "SDXL 실패 시 한 번만 대체"},
 }
 
-DEFAULT_TEXT_MODEL = "gemini-2.5-flash"
+DEFAULT_TEXT_MODEL = "gpt-5-mini"
 DEFAULT_IMAGE_MODEL = "bytedance/sdxl-lightning-4step"
 
 

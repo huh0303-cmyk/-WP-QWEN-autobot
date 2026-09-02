@@ -53,21 +53,18 @@ jobs:
           FORCE_KEYWORD: ${{ inputs.force_keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
-          # 2026-08-28: Gemini Flash(무료)를 주력 작가로, GPT는 품질 실패
-          # 재작성/중요글(뉴스룸) escalation 전용으로 되돌림(사용자 지시).
-          AI_TEXT_PROVIDER: "gemini"
+          # Network default: GPT-5 mini writes; Gemini performs independent review.
+          AI_TEXT_PROVIDER: "openai"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_ENABLED: "true"
-          CLAUDE_ENABLED: "true"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_ENABLED: "true"
+          CLAUDE_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
           PAID_IMAGE_GENERATION_ENABLED: "false"
           GEMINI_IMAGE_GENERATION_ENABLED: "true"
           NANO_BANANA_FREE_TIER_ENABLED: "false"
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
-          OPENAI_MODEL: "gpt-5.6-luna"
+          OPENAI_MODEL: "gpt-5-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
