@@ -359,6 +359,20 @@ def get_enabled_rss_sources(language: str) -> list[tuple[str, str]]:
     ]
 
 
+def get_enabled_rss_source_records(language: str) -> list[dict]:
+    """Return complete, rights-audited source records for category-aware routing.
+
+    Callers that only need a feed can keep using ``get_enabled_rss_sources``.
+    Newsroom publishers should use this form so the recorded licence basis and
+    editorial category are not discarded before publication.
+    """
+    return [
+        dict(source)
+        for source in NEWS_SOURCES
+        if source["language"] == language and source.get("feed")
+    ]
+
+
 def source_audit() -> list[dict]:
     return [
         {

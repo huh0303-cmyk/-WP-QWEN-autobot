@@ -49,4 +49,8 @@ def test_live_wp_path_cannot_override_title_and_gates_before_save():
     writes = [n.lineno for n in ast.walk(publish) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "post"]
     assert review.lineno < min(writes)
     for name in ["daily-network-publish.yml", "newsrooms-daily-publisher.yml"]:
-        assert 'CLAUDE_ENABLED: "true"' in (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
+        workflow = (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
+        assert 'CLAUDE_ENABLED: "false"' in workflow
+        assert 'AI_TEXT_PROVIDER: "openai"' in workflow
+        assert 'OPENAI_MODEL: "gpt-5-mini"' in workflow
+        assert 'GEMINI_REVIEW_MODEL: "gemini-2.5-flash"' in workflow

@@ -35,7 +35,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: newsroom-${{ github.event.schedule || inputs.newsroom || github.run_id }}
+  # A single owner prevents two scheduled editions from racing on RSS/source
+  # deduplication or WordPress writes when a prior run is slow.
+  group: newsroom-publisher-single-owner
   cancel-in-progress: false
 
 jobs:
@@ -81,6 +83,7 @@ jobs:
           WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "openai"
+          GEMINI_REVIEW_MODEL: "gemini-2.5-flash"
           OPENAI_ENABLED: "true"
           CLAUDE_ENABLED: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -93,6 +96,7 @@ jobs:
           OPENAI_MODEL: "gpt-5-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
+          FORCE_SOURCE_IPV4: "true"
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
@@ -103,12 +107,27 @@ jobs:
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/autopost_current.py
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          # A retry starts from a fresh process. The publisher reloads recent
+          # titles and embedded source URLs first, so a timeout after a remote
+          # create cannot intentionally create a duplicate edition.
+          for attempt in 1 2 3; do
+            if python scripts/autopost_current.py 2>&1 | tee "artifacts/newsroom-attempt-${attempt}.log"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 20)); fi
+          done
+          exit 1
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: newsroom-result-${{ steps.target.outputs.key }}-${{ github.run_id }}
-          path: newsroom_publish_result.json
+          path: |
+            newsroom_publish_result.json
+            artifacts/newsroom-attempt-*.log
           if-no-files-found: warn
           retention-days: 7

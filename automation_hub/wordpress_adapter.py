@@ -42,6 +42,7 @@ def apply_wordpress_registry(
             max_chars=site.max_chars,
             default_category=site.default_category,
             image_mode=site.image_mode,
+            no_image=site.image_mode == "none" or site.image_max == 0,
             image_min=site.image_min,
             image_max=site.image_max,
         )

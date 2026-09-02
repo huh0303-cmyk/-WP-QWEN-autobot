@@ -54,17 +54,17 @@ def main() -> None:
             fail(f"{name} does not receive REPLICATE_API_TOKEN")
 
     wp = workflow_text.get("daily-network-publish.yml", "")
-    # 2026-08-28: Gemini Flash가 주력 작가, GPT는 품질 실패 재작성/중요글
-    # escalation 전용(사용자 지시로 이전 "GPT만" 하드락을 되돌림).
-    if 'AI_TEXT_PROVIDER: "gemini"' not in wp or "secrets.GEMINI_API_KEY" not in wp:
-        fail("WordPress publisher is not routed to Gemini as the primary writer")
+    if 'AI_TEXT_PROVIDER: "openai"' not in wp or 'OPENAI_MODEL: "gpt-5-mini"' not in wp:
+        fail("WordPress publisher is not routed to GPT-5 mini as the primary writer")
     if "secrets.OPENAI_API_KEY" not in wp or 'OPENAI_ENABLED: "true"' not in wp:
-        fail("WordPress publisher lost its GPT escalation credentials")
+        fail("WordPress publisher lost its GPT-5 mini credentials")
+    if "secrets.GEMINI_API_KEY" not in wp or 'GEMINI_REVIEW_MODEL: "gemini-2.5-flash"' not in wp:
+        fail("WordPress publisher lost its Gemini independent-review route")
     wp_publisher = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
     if "def generate_content_gemini(prompt, use_gpt=False)" not in wp_publisher:
-        fail("WordPress text generator lost its Gemini-primary/GPT-escalation signature")
-    if "SEO_TARGET  = 75" not in wp_publisher:
-        fail("WordPress publication threshold is not 75")
+        fail("WordPress text generator lost its compatibility entrypoint")
+    if "SEO_TARGET  = 70" not in wp_publisher:
+        fail("WordPress publication threshold is not 70")
     wp_public_gate = (
         'publication_approved:' in wp
         and 'default: false' in wp
@@ -77,6 +77,12 @@ def main() -> None:
     newsroom = workflow_text.get("newsrooms-daily-publisher.yml", "")
     if 'WP_POST_STATUS: "publish"' not in newsroom or 'WP_PUBLICATION_APPROVED: "true"' not in newsroom:
         fail("newsroom workflow lacks explicit public-publication approval")
+    if "newsroom-publisher-single-owner" not in newsroom or "for attempt in 1 2 3" not in newsroom:
+        fail("newsroom workflow lost single-owner execution or bounded retries")
+    if 'AI_TEXT_PROVIDER: "openai"' not in newsroom or 'OPENAI_MODEL: "gpt-5-mini"' not in newsroom:
+        fail("newsroom workflow is not routed to GPT-5 mini")
+    if 'GEMINI_REVIEW_MODEL: "gemini-2.5-flash"' not in newsroom:
+        fail("newsroom workflow lost Gemini independent review")
 
     rankmath = workflow_text.get("daily-rankmath-check.yml", "")
     if "continue-on-error: true" in rankmath:

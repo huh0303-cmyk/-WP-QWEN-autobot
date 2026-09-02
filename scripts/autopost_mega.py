@@ -26,7 +26,7 @@ from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from google import genai
 from google.genai import types as genai_types
-from news_source_registry import get_enabled_rss_sources
+from news_source_registry import get_enabled_rss_source_records
 import replicate_image_provider
 
 KST = timezone(timedelta(hours=9))
@@ -76,7 +76,7 @@ SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
 AUTOMATED_IMAGE_PUBLISHING_ENABLED = os.getenv("AUTOMATED_IMAGE_PUBLISHING_ENABLED", "false").strip().lower() == "true"
 
 gemini_client         = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-GEMINI_MODEL_PRIMARY  = "gemini-2.5-flash-lite"
+GEMINI_MODEL_PRIMARY  = os.getenv("GEMINI_REVIEW_MODEL", "gemini-2.5-flash")
 GEMINI_MODEL_FALLBACK = "gemini-2.5-flash"
 GEMINI_MODEL          = GEMINI_MODEL_PRIMARY
 _gemini_fallback_active = False
@@ -1615,13 +1615,16 @@ def crawl_rss_news(lang="ko", site_url=""):
     def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
 
     # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
-    sources = get_enabled_rss_sources(lang)
+    sources = get_enabled_rss_source_records(lang)
     if not sources:
         print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
         return "", "", None, ""
     candidates = []
     priorities = {}
-    for src, url in sources:
+    for source in sources:
+        src = source["name"]
+        url = source["feed"]
+        source_category = source.get("category", "")
         try:
             res = requests.get(url, timeout=10, headers={"User-Agent":"Mozilla/5.0"})
             soup = BeautifulSoup(res.text, 'xml')
@@ -1641,7 +1644,7 @@ def crawl_rss_news(lang="ko", site_url=""):
                         recent = False
                 source_key = "source:" + link.split("#", 1)[0].rstrip("/") if link else ""
                 if t and len(t)>=5 and recent and not is_dup(t) and (not source_key or source_key not in cache):
-                    candidates.append((t, d, src, link))
+                    candidates.append((t, d, src, link, source_category))
                     urgent = bool(re.search(r'\b(breaking|urgent|alert)\b|속보|긴급', t, re.I))
                     priorities[(t, link)] = (urgent, published.timestamp())
         except: pass
@@ -3130,7 +3133,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 _log_buf=[]
 
 def log(site_url,theme,keyword,title,post_url,score,imgs,status,error="",author="",category=""):
-    _log_buf.append({"timestamp":now_kst().strftime("%Y-%m-%d %H:%M:%S"),"site":site_url,"theme":theme,"keyword":keyword,"title":title,"status":status,"seo_score":score,"images":imgs,"url":post_url,"error":error,"slot":str(RUN_SLOT),"model":GEMINI_MODEL,"author":author,"category":category})
+    writer_model = os.getenv("OPENAI_MODEL", "gpt-5-mini")
+    reviewer_model = GEMINI_MODEL
+    _log_buf.append({"timestamp":now_kst().strftime("%Y-%m-%d %H:%M:%S"),"site":site_url,"theme":theme,"keyword":keyword,"title":title,"status":status,"seo_score":score,"images":imgs,"url":post_url,"error":error,"slot":str(RUN_SLOT),"model":writer_model,"writer_model":writer_model,"reviewer_model":reviewer_model,"author":author,"category":category})
 
 def flush_log():
     if not _log_buf: return
@@ -3256,6 +3261,7 @@ def process_one(site, keyword):
     news_source = None
     news_source_url = None
     news_source_summary = None
+    news_source_category = None
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
@@ -3269,6 +3275,8 @@ def process_one(site, keyword):
             news_source_summary=kw_tuple[1]
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=4:
             news_source_url=kw_tuple[3]
+        if isinstance(kw_tuple,tuple) and len(kw_tuple)>=5:
+            news_source_category=kw_tuple[4]
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(9, 13)
@@ -3391,7 +3399,8 @@ def process_one(site, keyword):
         # 1) SDXL Lightning 4-step.
         # 2) FLUX Schnell once if SDXL fails.
         # 3) If both fail, continue without an image.
-        img_url = replicate_image_provider.generate_image_url(keyword, theme=theme)
+        image_theme = f"NEWS ILLUSTRATION ONLY — {theme}" if mode in ("news", "news_en") else theme
+        img_url = replicate_image_provider.generate_image_url(keyword, theme=image_theme)
         images = [img_url] if img_url else []
         if not images:
             print("  ℹ️ SDXL Lightning + FLUX Schnell failed → 이미지 없이 발행")
@@ -3454,7 +3463,8 @@ def process_one(site, keyword):
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
             return False
 
-    cat_name=get_category_for_post(theme,f"{news_source or ''} {keyword}".strip(),title)
+    category_context = f"{news_source_category or ''} {news_source or ''} {keyword}".strip()
+    cat_name=get_category_for_post(theme,category_context,title)
     print(f"  📁 카테고리: {cat_name}")
 
     # ★ 2026-08-03: 예전엔 뉴스모드 2개 사이트만 중복 제목을 걸렀음(그것도 완전
@@ -3470,7 +3480,8 @@ def process_one(site, keyword):
             return False
         sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
-    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,category_hint=news_source or "")
+    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,
+                   category_hint=f"{news_source_category or ''} {news_source or ''}".strip())
     if result["ok"]:
         is_draft = result.get("status") == "draft"
         outcome = "초안 생성" if is_draft else "공개 발행"

@@ -161,8 +161,16 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
     subject = " ".join(str(subject or "").split())[:260]
     theme = " ".join(str(theme or "").split())[:120]
     context = f" Topic category: {theme}." if theme else ""
+    newsroom = theme.upper().startswith("NEWS ILLUSTRATION ONLY")
+    visual_style = (
+        "Clearly editorial conceptual illustration, not a photograph and not evidence of the real event. "
+        "Do not depict an identifiable real person, exact incident, casualty, disaster damage, weapon strike, "
+        "or any scene that could be mistaken for contemporaneous documentary footage. "
+        if newsroom else
+        "Editorial documentary-style image. "
+    )
     return (
-        f"Editorial documentary-style image for an article about: {subject}.{context} "
+        f"{visual_style}For an article about: {subject}.{context} "
         "Accurately represent the specific subject, natural realistic lighting, clean composition, "
         "NO TEXT ANYWHERE IN THE IMAGE. Do not show letters, words, numbers, writing, labels, captions, "
         "documents, forms, checklists, certificates, screens, signs, books, packaging, logos, watermarks, "
