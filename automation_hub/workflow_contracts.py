@@ -52,6 +52,11 @@ def validate_contracts() -> dict[str, list[str]]:
     problems: dict[str, list[str]] = {}
 
     for room in registry.rooms:
+        # Placeholder rooms (for example future Naver accounts) must never
+        # block the production WordPress/Blogger/Tistory plan while disabled.
+        # They become contract-enforced as soon as they are enabled.
+        if not room.enabled:
+            continue
         if not room.workflow:
             continue
         contract = contracts.get(room.workflow)
