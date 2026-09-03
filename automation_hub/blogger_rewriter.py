@@ -144,6 +144,19 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
             final_blocks.append(f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>')
         if final_blocks:
             normalized["content_html"] = "".join(final_blocks)
+
+    # 2026-09-04: this forced-attribution fallback used to live only inside
+    # the length-trimming branch above, so any article that was already
+    # within the target length (the common case) never got a guaranteed
+    # source link at all — blogger_quality_score's hard "verified WordPress
+    # source link is missing" gate then failed every such draft regardless
+    # of how high the rest of the score was (CEO's 04:03 KST smoke test hit
+    # this: 95/100 blocked on a missing link). Ensuring the link is present
+    # cannot rely on the model following the prompt; guarantee it here.
+    content = str(normalized.get("content_html", ""))
+    if source_url and source_url not in content:
+        safe_url = html.escape(source_url, quote=True)
+        normalized["content_html"] = content + f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>'
     return normalized
 
 
