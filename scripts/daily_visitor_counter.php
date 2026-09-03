@@ -2,6 +2,9 @@
 // 2026-08-21 최초 배포, 2026-08-22 강화, 2026-08-26 일일 종합상황실용
 // 전날/전전날 확정 방문자수 추가, 2026-09-03 footer에 전일 대비 증감 표시 추가.
 // 봇 트래픽 제외, 쿠키 기반 일일 중복방지(페이지뷰가 아닌 방문자 근사치).
+// Priority 95: render after the network-utility-footer links (priority 90,
+// deploy_regular_site_menus.py) so the counter sits below About/Contact/
+// Disclaimer/Privacy, not above them.
 
 add_action('wp_footer', function () {
     if (is_admin()) return;
@@ -58,7 +61,7 @@ add_action('wp_footer', function () {
         . '<span>' . esc_html($total_label) . ' ' . number_format_i18n($total_count)
         . ' (' . esc_html($today_added_label) . ' +' . number_format_i18n($day_count) . ')</span>'
         . '</div>';
-});
+}, 95);
 
 add_action('rest_api_init', function () {
     register_rest_route('site-stats/v1', '/visitors', array(
