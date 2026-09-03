@@ -1,0 +1,37 @@
+name: "One-off — bump YouTube calendar rows into the current slot"
+
+# Manual convenience for a CEO-requested "run all 10 channels now" batch.
+# Moves the earliest READY calendar row per requested channel to the current
+# time so the existing central scheduler (youtube-control-scheduler.yml) can
+# legitimately claim and dispatch it on its next run. Read scheduling logic
+# untouched; this only edits column B (planned_at_kst) of already-planned rows.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel_keys:
+        description: "Comma-separated channel keys to bump (blank = all 10)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install google-api-python-client google-auth requests -q
+      - name: Bump earliest READY row per channel to now
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          CHANNEL_KEYS: ${{ inputs.channel_keys }}
+        run: python scripts/bump_youtube_calendar_slots.py
