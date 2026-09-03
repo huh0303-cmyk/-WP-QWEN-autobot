@@ -176,6 +176,7 @@ jobs:
     if: ${{ needs.prepare.result == 'success' }}
     needs: prepare
     runs-on: ubuntu-latest
+    environment: youtube-channels
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

@@ -9,6 +9,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    environment: youtube-channels
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4

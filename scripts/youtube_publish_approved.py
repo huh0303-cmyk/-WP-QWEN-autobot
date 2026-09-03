@@ -82,7 +82,7 @@ def get_youtube_service():
     from googleapiclient.discovery import build
     creds = Credentials(token=None, refresh_token=YOUTUBE_OAUTH_REFRESH_TOKEN,
         token_uri="https://oauth2.googleapis.com/token", client_id=YOUTUBE_OAUTH_CLIENT_ID,
-        client_secret=YOUTUBE_OAUTH_CLIENT_SECRET, scopes=["https://www.googleapis.com/auth/youtube.upload"])
+        client_secret=YOUTUBE_OAUTH_CLIENT_SECRET, scopes=["https://www.googleapis.com/auth/youtube"])
     return build("youtube", "v3", credentials=creds)
 
 
