@@ -7,6 +7,11 @@ row (topic, format, id) changes.
 import datetime as dt
 import json
 import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from automation_hub.youtube_calendar import KST, READY, TAB, read_calendar
 from automation_hub.youtube_registry import load_channels
