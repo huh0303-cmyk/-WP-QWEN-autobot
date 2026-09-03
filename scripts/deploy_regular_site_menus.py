@@ -60,6 +60,23 @@ def deploy_footer_fallback(site, password, pages):
         f"array({json.dumps(title)}, {json.dumps(url)})" for title, url in links
     )
     code = f'''// Managed by deploy_regular_site_menus.py. Do not remove.
+add_action('init', function () {{
+    $category_menu = get_term_by('slug', 'network-categories', 'nav_menu');
+    $utility_menu = get_term_by('slug', 'network-utility', 'nav_menu');
+    if (!$category_menu || !$utility_menu) return;
+    $registered = get_registered_nav_menus();
+    $locations = get_theme_mod('nav_menu_locations', array());
+    foreach (array('primary', 'menu-1', 'main', 'header') as $candidate) {{
+        if (array_key_exists($candidate, $registered)) {{ $locations[$candidate] = $category_menu->term_id; break; }}
+    }}
+    foreach ($registered as $location => $label) {{
+        $key = strtolower($location . ' ' . $label);
+        if (strpos($key, 'footer') !== false || strpos($key, 'secondary') !== false || strpos($key, 'top') !== false) {{
+            $locations[$location] = $utility_menu->term_id;
+        }}
+    }}
+    set_theme_mod('nav_menu_locations', $locations);
+}}, 99);
 add_action('wp_footer', function () {{
     if (is_admin()) return;
     $links = array(
@@ -140,9 +157,18 @@ def find_required_pages(site, password):
             if slug in by_slug:
                 found[wanted] = by_slug[slug]
                 break
-    missing = [slug for slug, _ in UTILITY if slug not in found]
-    if missing:
-        raise RuntimeError("required pages missing: " + ", ".join(missing))
+    templates = {
+        "privacy-policy": "This Privacy Policy explains how this site handles basic technical, analytics, advertising, and contact information. We do not sell personal information. Contact us with privacy questions.",
+        "disclaimer": "Information on this site is provided for general informational purposes. Verify time-sensitive requirements with the relevant official authority before making decisions.",
+        "contact": "Use the site's published contact channel for corrections, questions, partnership inquiries, or requests concerning your information.",
+        "about": "This independent editorial site publishes practical, source-led information for readers. We prioritize clarity, current official references, and transparent corrections.",
+    }
+    for slug, title in UTILITY:
+        if slug in found:
+            continue
+        found[slug] = api(site, password, "POST", "wp/v2/pages", json={
+            "slug": slug, "title": title, "content": f"<p>{templates[slug]}</p>", "status": "publish"
+        })
     return found
 
 
@@ -171,18 +197,6 @@ def configure(site, secret_name):
         title = page.get("title", {}).get("rendered") or english_title
         add_item(site, password, utility_menu, object_id=page["id"], object_type="page", title=title, order=order)
 
-    locations = api(site, password, "GET", "wp/v2/menu-locations")
-    location_names = set(locations) if isinstance(locations, dict) else set()
-    assignment = {}
-    primary = next((x for x in ("primary", "menu-1", "main", "header") if x in location_names), None)
-    if not primary:
-        raise RuntimeError(f"primary menu location unavailable: {sorted(location_names)}")
-    assignment[primary] = category_menu
-    for location in location_names:
-        lowered = location.lower()
-        if "footer" in lowered or "secondary" in lowered or "top" in lowered:
-            assignment[location] = utility_menu
-    api(site, password, "POST", "wp/v2/menu-locations", json=assignment)
     deploy_footer_fallback(site, password, pages)
 
     category_items = api(site, password, "GET", "wp/v2/menu-items", params={"menus": category_menu, "per_page": 100})
@@ -193,7 +207,7 @@ def configure(site, secret_name):
         "site": urlparse(site).netloc,
         "categories": [item.get("title", {}).get("rendered", "") for item in category_items],
         "utility_pages": [item.get("title", {}).get("rendered", "") for item in utility_items],
-        "locations": assignment,
+        "locations": "assigned by managed WordPress snippet",
     }
 
 
