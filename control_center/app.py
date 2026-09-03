@@ -27,6 +27,7 @@ from urllib.parse import unquote
 import requests
 
 REVIEW_QUEUE_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%9E%90%EB%8F%99%ED%99%94_%EB%B0%9C%ED%96%89%EB%8C%80%EA%B8%B0&range=A1:Q500"
+EDITORIAL_REVIEW_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%98%A4%EB%8A%98_%EA%B8%80%EA%B2%80%EC%88%98&range=A1:I500"
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secrets.token_hex(32)
@@ -74,7 +75,30 @@ def get_review_queue() -> list[dict[str, str]]:
             "review_url": review_url,
             "status": "검토대기" if publish_now.strip().upper() != "TRUE" else status,
         })
-    return list(reversed(items[-50:]))
+    # Blogger and WordPress editorial drafts use the compact review sheet.
+    # Merge it into the same control-room list so the CEO has one inbox.
+    try:
+        editorial_response = requests.get(EDITORIAL_REVIEW_CSV, timeout=12)
+        editorial_response.raise_for_status()
+        editorial_rows = list(csv.reader(io.StringIO(editorial_response.text)))
+    except (requests.RequestException, csv.Error):
+        editorial_rows = []
+    for index, row in enumerate(editorial_rows[1:], start=2):
+        row += [""] * (9 - len(row))
+        created_at, platform, channel, title, review_url, status, decision = row[:7]
+        if not title.strip() or not review_url.strip().startswith("http"):
+            continue
+        items.append({
+            "created_at": created_at.replace("T", " ")[:16],
+            "job_id": f"editorial-{index}-{channel}",
+            "site_id": channel,
+            "platform": platform or "Blogspot",
+            "title": title,
+            "review_url": review_url,
+            "status": decision or status or "검토대기",
+        })
+    deduped = {item["review_url"]: item for item in items}
+    return sorted(deduped.values(), key=lambda item: item["created_at"], reverse=True)[:100]
 
 
 @app.get("/review/tistory/<path:job_id>")

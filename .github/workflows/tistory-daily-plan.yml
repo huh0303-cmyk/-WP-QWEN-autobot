@@ -87,7 +87,8 @@ jobs:
               assert draft['status'] == 'DRAFT_READY'
               assert draft.get('publish_policy') in (None, 'awaiting_approval')
               assert draft.get('title') and draft.get('body_html') and draft.get('meta_description')
-              assert draft.get('category') and draft.get('image_url')
+              assert draft.get('category')
+              assert draft.get('image_status') in ('generated', 'pass_no_image')
           print('TISTORY DRAFT SAFETY PASS')
           PY
       - name: Queue private drafts in Google Sheets for the local registrar

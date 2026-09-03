@@ -57,7 +57,13 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
     raw = openai_generate_text(prompt, temperature=0.5, max_retries=3).strip()
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].removeprefix("json").strip()
-    data = json.loads(raw)
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        # Models occasionally return a literal backslash in otherwise valid JSON.
+        # Preserve the character instead of losing the whole site's draft.
+        import re
+        data = json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw))
     title, body = str(data["title"]).strip(), str(data["content_html"]).strip()
     labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:12]
     if not title or len(body) < 1500 or len(labels) < 8:
