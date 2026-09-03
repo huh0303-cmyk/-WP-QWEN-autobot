@@ -73,10 +73,42 @@ jobs:
           if [ "$KEY" = "theseouljournal" ]; then URL="https://theseouljournal.com"; else URL="https://koreanews365.com"; fi
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+          # 2026-09-03 CEO: "정치·경제·문화·스포츠·군사 이렇게 쌓이는 게 살아있는
+          # 느낌" — each site's own 10 scheduled slots round-robin across its
+          # category rotation (6 for koreanews365, 7 for theseouljournal) so
+          # every category gets at least one, usually two, tries per day
+          # instead of an hour-formula that could skip a category entirely.
+          # Manual dispatches with an explicit preferred_category, or with
+          # none at all, are left alone (empty = crawl_rss_news free-picks).
+          CATEGORY=""
+          if [ -z "$MANUAL" ]; then
+            if [ "$KEY" = "koreanews365" ]; then
+              KO_CATS=("정치" "경제" "국방" "글로벌" "문화" "스포츠")
+              case "$S" in
+                "31 22 * * *") IDX=0 ;; "43 0 * * *") IDX=1 ;; "9 2 * * *") IDX=2 ;;
+                "18 3 * * *") IDX=3 ;; "46 4 * * *") IDX=4 ;; "29 6 * * *") IDX=5 ;;
+                "6 8 * * *") IDX=0 ;; "41 9 * * *") IDX=1 ;; "23 11 * * *") IDX=2 ;;
+                "53 12 * * *") IDX=3 ;; *) IDX=-1 ;;
+              esac
+              if [ "$IDX" -ge 0 ]; then CATEGORY="${KO_CATS[$IDX]}"; fi
+            else
+              EN_CATS=("Politics" "Business" "Military" "World" "Culture" "Art" "Sports")
+              case "$S" in
+                "3 23 * * *") IDX=0 ;; "16 1 * * *") IDX=1 ;; "40 2 * * *") IDX=2 ;;
+                "49 3 * * *") IDX=3 ;; "18 5 * * *") IDX=4 ;; "1 7 * * *") IDX=5 ;;
+                "38 8 * * *") IDX=6 ;; "13 10 * * *") IDX=0 ;; "54 11 * * *") IDX=1 ;;
+                "25 13 * * *") IDX=2 ;; *) IDX=-1 ;;
+              esac
+              if [ "$IDX" -ge 0 ]; then CATEGORY="${EN_CATS[$IDX]}"; fi
+            fi
+          fi
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
       - name: Repair recent source-based categories
         env:
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
+          NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/repair_recent_newsroom_categories.py
@@ -105,6 +137,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           FORCE_SOURCE_IPV4: "true"
+          NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
+          NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"

@@ -1687,8 +1687,16 @@ def crawl_rss_news(lang="ko", site_url=""):
     if candidates:
         rotation = (["정치", "경제", "국방", "글로벌", "문화", "스포츠"] if lang == "ko" else
                     ["Politics", "Business", "Military", "World", "Culture", "Art", "Sports"])
+        # NEWSROOM_PREFERRED_CATEGORY: hard request (manual workflow_dispatch
+        # desk pick) — no items means fail closed, the operator asked for
+        # exactly this desk.
+        # NEWSROOM_SUGGESTED_CATEGORY: soft request (2026-09-03 CEO: each
+        # scheduled slot round-robins a category so none goes uncovered all
+        # day) — prefer it, but never waste the slot if that desk is dry;
+        # fall back to the full pool instead of returning nothing.
         forced_preferred = os.getenv("NEWSROOM_PREFERRED_CATEGORY", "").strip()
-        preferred = forced_preferred or rotation[(now_kst().timetuple().tm_yday + now_kst().hour) % len(rotation)]
+        suggested = os.getenv("NEWSROOM_SUGGESTED_CATEGORY", "").strip()
+        preferred = forced_preferred or suggested or rotation[(now_kst().timetuple().tm_yday + now_kst().hour) % len(rotation)]
         preferred_candidates = [item for item in candidates if item[4] == preferred]
         if forced_preferred and not preferred_candidates:
             print(f"   NEWS SOURCE GATE: no fresh rights-cleared RSS item for requested desk {forced_preferred}")
