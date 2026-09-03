@@ -231,9 +231,15 @@ def _github_secret_names() -> set[str]:
         return set()
 
 
-@lru_cache(maxsize=64)
-def _wp_category_counts(site_url: str) -> list[dict[str, object]]:
-    """Read the categories actually registered in WordPress, including zero-count ones."""
+@lru_cache(maxsize=128)
+def _wp_category_counts(site_url: str, five_minute_bucket: int) -> list[dict[str, object]]:
+    """Read the categories actually registered in WordPress, including zero-count ones.
+
+    2026-09-03: had no time bucket, so one transient network hiccup got
+    cached as "categories: []" (shown as "카테고리 수집 실패") for the rest
+    of the Render dyno's lifetime — sites were actually fine on re-check.
+    The bucket keeps page loads fast while retrying every five minutes."""
+    del five_minute_bucket
     try:
         response = requests.get(
             f"{site_url.rstrip('/')}/wp-json/wp/v2/categories",
@@ -291,9 +297,13 @@ def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, objec
         return {"connected": False}
 
 
-@lru_cache(maxsize=64)
-def _blogger_label_counts(blog_url: str) -> list[dict[str, object]]:
-    """Count labels used by publicly visible Blogger posts."""
+@lru_cache(maxsize=128)
+def _blogger_label_counts(blog_url: str, five_minute_bucket: int) -> list[dict[str, object]]:
+    """Count labels used by publicly visible Blogger posts.
+
+    2026-09-03: no time bucket meant one transient failure cached empty
+    forever for that Render process's lifetime. See _wp_category_counts."""
+    del five_minute_bucket
     try:
         response = requests.get(
             f"{blog_url.rstrip('/')}/feeds/posts/default",
@@ -315,9 +325,13 @@ def _blogger_label_counts(blog_url: str) -> list[dict[str, object]]:
         return []
 
 
-@lru_cache(maxsize=16)
-def _tistory_feed_summary(site_url: str) -> dict[str, object]:
-    """Read exact public category counts, falling back to the Tistory RSS feed."""
+@lru_cache(maxsize=32)
+def _tistory_feed_summary(site_url: str, five_minute_bucket: int) -> dict[str, object]:
+    """Read exact public category counts, falling back to the Tistory RSS feed.
+
+    2026-09-03: no time bucket meant one transient failure cached empty
+    forever for that Render process's lifetime. See _wp_category_counts."""
+    del five_minute_bucket
     try:
         homepage = requests.get(site_url.rstrip("/") + "/", timeout=15)
         homepage.raise_for_status()
@@ -536,7 +550,7 @@ def get_site_data():
     bucket = int(time.time() // 300)
     with ThreadPoolExecutor(max_workers=32) as executor:
         category_futures = {
-            domain: executor.submit(_wp_category_counts, site.url)
+            domain: executor.submit(_wp_category_counts, site.url, bucket)
             for domain, site in registry_by_domain.items()
         }
         visitor_futures = {
@@ -648,7 +662,7 @@ def get_blogger_data():
             history_bloggers = {}
     with ThreadPoolExecutor(max_workers=8) as executor:
         blogger_labels = dict(executor.map(
-            lambda row: (row.get("blogspot", ""), _blogger_label_counts(row.get("blogspot", ""))),
+            lambda row: (row.get("blogspot", ""), _blogger_label_counts(row.get("blogspot", ""), int(time.time() // 300))),
             rows,
         ))
     wp_registry = {
@@ -716,7 +730,7 @@ def get_tistory_data() -> list[dict[str, object]]:
             latest_by_site = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
         feed_results = dict(executor.map(
-            lambda row: (row.get("site_id", ""), _tistory_feed_summary(row.get("url", ""))),
+            lambda row: (row.get("site_id", ""), _tistory_feed_summary(row.get("url", ""), int(time.time() // 300))),
             rows,
         ))
     _attach_tistory_category_deltas(feed_results)
