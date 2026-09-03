@@ -101,14 +101,20 @@ def main() -> None:
         fail("WordPress text generator lost its compatibility entrypoint")
     if "SEO_TARGET  = 70" not in wp_publisher:
         fail("WordPress publication threshold is not 70")
+    # 2026-09-03 CEO decision: manual per-item review doesn't scale past
+    # ~30 drafts/day, so ordinary WP publishing now defaults to public once
+    # the two-pass GPT editorial gate approves — that gate is unconditional
+    # either way (require_editorial_approval always runs before wp_post()
+    # can save anything). Assert the switch defaults to auto-publish and
+    # still wires to the same status mapping, not that it's fail-closed.
     wp_public_gate = (
         'publication_approved:' in wp
-        and 'default: false' in wp
+        and 'default: true' in wp
         and "inputs.publication_approved && 'publish' || 'draft'" in wp
         and "inputs.publication_approved && 'true' || 'false'" in wp
     )
     if not wp_public_gate:
-        fail("ordinary WordPress workflow is not fail-closed behind explicit approval")
+        fail("ordinary WordPress workflow lost its auto-publish-on-gate-pass default")
 
     newsroom = workflow_text.get("newsrooms-daily-publisher.yml", "")
     if 'WP_POST_STATUS: "publish"' not in newsroom or 'WP_PUBLICATION_APPROVED: "true"' not in newsroom:

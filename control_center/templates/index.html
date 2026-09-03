@@ -64,6 +64,48 @@
         </div>
         {% endif %}
         {% endwith %}
+        <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
+            {% if problem_summary.all_clear %}
+            <p class="flex items-center gap-2 text-sm font-black text-emerald-800"><span class="text-lg">✅</span> 지금 문제 없음 — WP {{ problem_summary.wp_total }}·Blogspot {{ problem_summary.blogger_total }}·Tistory {{ problem_summary.tistory_total }}·YouTube {{ problem_summary.youtube_total }}·SNS {{ problem_summary.sns_total }} 전부 정상</p>
+            {% else %}
+            <p class="text-sm font-black text-rose-800">⚠ 지금 확인이 필요한 항목</p>
+            <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {% if problem_summary.wp_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">WordPress {{ problem_summary.wp_issues|length }}/{{ problem_summary.wp_total }}</p>
+                    {% for issue in problem_summary.wp_issues[:6] %}
+                    <p class="truncate text-[11px] text-slate-700"><a href="#wordpress" class="font-bold hover:underline">{{ issue.domain }}</a> — {{ issue.reasons|join(', ') }}</p>
+                    {% endfor %}
+                    {% if problem_summary.wp_issues|length > 6 %}<p class="text-[10px] text-slate-400">외 {{ problem_summary.wp_issues|length - 6 }}개 더 (WP 27 탭에서 확인)</p>{% endif %}
+                </div>
+                {% endif %}
+                {% if problem_summary.blogger_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">Blogspot {{ problem_summary.blogger_issues|length }}/{{ problem_summary.blogger_total }} 미연결</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#blogspot" class="font-bold hover:underline">{{ problem_summary.blogger_issues[:8]|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+                {% if problem_summary.tistory_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">Tistory {{ problem_summary.tistory_issues|length }}/{{ problem_summary.tistory_total }} 피드 실패</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#tistory" class="font-bold hover:underline">{{ problem_summary.tistory_issues|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+                {% if problem_summary.youtube_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">YouTube {{ problem_summary.youtube_issues|length }}/{{ problem_summary.youtube_total }} 채널ID 없음</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#youtube" class="font-bold hover:underline">{{ problem_summary.youtube_issues|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+                {% if problem_summary.sns_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">SNS {{ problem_summary.sns_issues|length }}/{{ problem_summary.sns_total }} 오류</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#sns" class="font-bold hover:underline">{{ problem_summary.sns_issues|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
         <section id="review-queue" class="scroll-mt-24 rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm sm:p-7">
             <p class="text-xs font-black text-amber-700">REVIEW &amp; FINAL PUBLISH</p>
             <h2 class="mt-1 text-2xl font-extrabold text-slate-950">검토·발행대기</h2>

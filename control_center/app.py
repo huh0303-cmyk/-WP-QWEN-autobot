@@ -1104,15 +1104,54 @@ def trigger_publish_site_now():
     return redirect(url_for("index") + "#wordpress")
 
 
+def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:
+    """One-glance rollup of what needs attention, computed from the same
+    per-platform data already shown further down the page. CEO explicitly
+    asked (2026-09-03) for problems to surface before having to scan every
+    card one by one."""
+    wp_issues = []
+    for site in sites:
+        reasons = []
+        if not site.get("visitor_connected"):
+            reasons.append("방문자 통계 연결 실패")
+        if not site.get("official_categories"):
+            reasons.append("카테고리 수집 실패")
+        if site.get("indexed") is None and "권한" in (site.get("index_status") or ""):
+            reasons.append("GSC 권한 연결 필요")
+        if not site.get("auth_ready"):
+            reasons.append("WP 인증 미연결")
+        if reasons:
+            wp_issues.append({"domain": site["domain"], "reasons": reasons})
+
+    blogger_issues = [b.get("name", "") for b in bloggers if not b.get("connected")]
+    tistory_issues = [t.get("name", "") for t in tistory_sites if not t.get("feed_connected")]
+    youtube_issues = [y.get("name", "") for y in youtube_channels if y.get("enabled") and not y.get("channel_id")]
+    sns_issues = [f"{s.get('platform', '')}({s.get('brand', '')})" for s in sns_accounts if s.get("error")]
+
+    return {
+        "wp_total": len(sites), "wp_issues": wp_issues,
+        "blogger_total": len(bloggers), "blogger_issues": blogger_issues,
+        "tistory_total": len(tistory_sites), "tistory_issues": tistory_issues,
+        "youtube_total": len(youtube_channels), "youtube_issues": youtube_issues,
+        "sns_total": len(sns_accounts), "sns_issues": sns_issues,
+        "all_clear": not (wp_issues or blogger_issues or tistory_issues or youtube_issues or sns_issues),
+    }
+
+
 @app.route("/")
 def index():
     sites = get_site_data()
     for site in sites:
         site["keyword_suggestions"] = weekly_suggestions(site["domain"])
+    bloggers = get_blogger_data()
+    tistory_sites = get_tistory_data()
+    youtube_channels = get_youtube_data()
+    sns_accounts = get_sns_data()
     return render_template(
-        "index.html", sites=sites, bloggers=get_blogger_data(), tistory_sites=get_tistory_data(),
-        youtube_channels=get_youtube_data(), sns_accounts=get_sns_data(),
+        "index.html", sites=sites, bloggers=bloggers, tistory_sites=tistory_sites,
+        youtube_channels=youtube_channels, sns_accounts=sns_accounts,
         review_items=get_review_queue(),
+        problem_summary=build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
     )
 

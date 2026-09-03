@@ -17,9 +17,9 @@ on:
         required: false
         default: ""
       publication_approved:
-        description: "Explicit approval to publish publicly (default keeps a review draft)"
+        description: "Publish publicly once the two-pass GPT editorial gate approves (2026-09-03 CEO decision: default true — manual per-item review no longer scales past ~30 drafts/day; set false only for a deliberate draft-only test run)"
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
