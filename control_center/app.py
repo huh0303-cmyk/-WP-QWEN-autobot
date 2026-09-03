@@ -1056,6 +1056,54 @@ def trigger_publish_now():
     return redirect(url_for("index") + "#review-queue")
 
 
+@app.post("/trigger/publish-site-now")
+def trigger_publish_site_now():
+    """CEO clicked '이 사이트만 지금 바로 1건 발행(공개)' on one WP card.
+
+    Writes a brand-new article from that site's own keyword pool and
+    publishes it publicly immediately — no keyword input, no review
+    step. This is the same direct-publish path a-group-sequential-publish.yml
+    already uses per site (daily-network-publish.yml with
+    publication_approved=true); this just lets the CEO fire it for one
+    chosen site on demand instead of waiting for the batch chain to
+    reach it. The scheduled batch sequence is unaffected.
+    """
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    domain = request.form.get("domain", "").strip()
+    registered = next(
+        (site for site in load_wordpress_sites() if site.url.replace("https://", "").replace("http://", "").rstrip("/") == domain),
+        None,
+    )
+    if not registered:
+        flash(f"{domain}: 등록되지 않은 사이트입니다.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    if not token:
+        flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/daily-network-publish.yml/dispatches",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            json={"ref": "main", "inputs": {
+                "target_site_url": registered.url,
+                "publication_approved": "true",
+                "room_id": f"manual-onebutton-{registered.site_id}",
+            }},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+    except (requests.RequestException, RuntimeError) as exc:
+        flash(f"{domain}: 발행 요청 실패 · {exc}", "error")
+    else:
+        flash(f"{domain}: 글쓰기·공개 발행을 시작했습니다 (검토 단계 없음).", "success")
+    return redirect(url_for("index") + "#wordpress")
+
+
 @app.route("/")
 def index():
     sites = get_site_data()

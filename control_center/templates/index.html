@@ -249,6 +249,12 @@
                     <a href="{{ site.admin_review_url }}" target="_blank" rel="noopener" class="flex h-11 w-full items-center justify-center rounded-xl border-2 border-blue-200 bg-white px-4 text-xs font-black text-blue-800 hover:bg-blue-50">관리자에서 초안 검토·발행 →</a>
                     <p class="text-center text-[10px] font-semibold text-slate-400">공개 발행 없음 · 최종 검토 후 직접 승인</p>
                 </form>
+                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="-mt-2 rounded-b-2xl border border-t-0 border-emerald-200 bg-emerald-50 px-4 py-2.5"
+                      onsubmit="return confirm('{{ site.domain }}: 사이트 자체 키워드 풀에서 지금 바로 글을 쓰고 공개 발행할까요? 검토 단계 없이 바로 공개됩니다.');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="domain" value="{{ site.domain }}">
+                    <button type="submit" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-xs font-black text-white hover:bg-emerald-700">이 사이트만 지금 바로 1건 발행(공개) →</button>
+                </form>
                 {% endfor %}
             </div>
         </div>
