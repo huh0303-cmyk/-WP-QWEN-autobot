@@ -1,6 +1,6 @@
-// Daily visitor counter v3 — footer display + read-only REST endpoint.
+// Daily visitor counter v4 — footer display (with deltas) + read-only REST endpoint.
 // 2026-08-21 최초 배포, 2026-08-22 강화, 2026-08-26 일일 종합상황실용
-// 전날/전전날 확정 방문자수 추가. Footer 표시는 기존처럼 오늘/누적을 유지한다.
+// 전날/전전날 확정 방문자수 추가, 2026-09-03 footer에 전일 대비 증감 표시 추가.
 // 봇 트래픽 제외, 쿠키 기반 일일 중복방지(페이지뷰가 아닌 방문자 근사치).
 
 add_action('wp_footer', function () {
@@ -30,16 +30,33 @@ add_action('wp_footer', function () {
         $total_count = (int) get_option($total_key, 0);
     }
 
+    $yesterday_key = 'daily_visitor_count_' . wp_date('Y-m-d', time() - DAY_IN_SECONDS, new DateTimeZone('Asia/Seoul'));
+    $yesterday_final = get_option($yesterday_key, null);
+    $day_delta = ($yesterday_final === null) ? null : ($day_count - (int) $yesterday_final);
+
     $is_ko = strpos(determine_locale(), 'ko') === 0;
     $today_label = $is_ko ? '오늘 방문' : 'Today';
     $total_label = $is_ko ? '누적' : 'Total';
+    $vs_yesterday_label = $is_ko ? '전일대비' : 'vs yesterday';
+    $today_added_label = $is_ko ? '오늘' : 'today';
+
+    $fmt_delta = function ($delta) use ($is_ko, $vs_yesterday_label) {
+        if ($delta === null) {
+            return $is_ko ? '증감 미확인' : 'no comparison yet';
+        }
+        $sign = $delta > 0 ? '+' : '';
+        return $vs_yesterday_label . ' ' . $sign . number_format_i18n($delta);
+    };
+
     echo '<div class="network-daily-visitor-counter" aria-label="Daily visitor counter" '
-        . 'style="display:flex;justify-content:center;gap:14px;align-items:center;'
-        . 'margin:18px auto 4px;padding:8px 16px;max-width:320px;border-radius:20px;'
+        . 'style="display:flex;justify-content:center;gap:14px;align-items:center;flex-wrap:wrap;'
+        . 'margin:18px auto 4px;padding:8px 16px;max-width:420px;border-radius:20px;'
         . 'background:rgba(120,120,120,0.08);font-size:12.5px;color:inherit;opacity:0.82;">'
-        . '<span>👁 ' . esc_html($today_label) . ' ' . number_format_i18n($day_count) . '</span>'
+        . '<span>👁 ' . esc_html($today_label) . ' ' . number_format_i18n($day_count)
+        . ' (' . esc_html($fmt_delta($day_delta)) . ')</span>'
         . '<span style="opacity:0.5;">·</span>'
-        . '<span>' . esc_html($total_label) . ' ' . number_format_i18n($total_count) . '</span>'
+        . '<span>' . esc_html($total_label) . ' ' . number_format_i18n($total_count)
+        . ' (' . esc_html($today_added_label) . ' +' . number_format_i18n($day_count) . ')</span>'
         . '</div>';
 });
 
