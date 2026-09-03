@@ -17,10 +17,10 @@ except ImportError:  # Direct execution: python scripts/deploy_regular_site_menu
 WP_USER = os.getenv("WP_USER", "").strip() or "huh0303@gmail.com"
 REGULAR_SITES = SITES[:-2]
 UTILITY = (
-    ("privacy-policy", "Privacy Policy"),
-    ("disclaimer", "Disclaimer"),
-    ("contact", "Contact Us"),
     ("about", "About Us"),
+    ("contact", "Contact Us"),
+    ("disclaimer", "Disclaimer"),
+    ("privacy-policy", "Privacy Policy"),
 )
 SNIPPET_NAME = "Network utility footer and one-line category menu"
 
@@ -71,12 +71,20 @@ add_action('init', function () {{
     }}
     foreach ($registered as $location => $label) {{
         $key = strtolower($location . ' ' . $label);
-        if (strpos($key, 'footer') !== false || strpos($key, 'secondary') !== false || strpos($key, 'top') !== false) {{
-            $locations[$location] = $utility_menu->term_id;
-        }}
+        if (strpos($key, 'footer') !== false) $locations[$location] = $utility_menu->term_id;
     }}
     set_theme_mod('nav_menu_locations', $locations);
 }}, 99);
+// Legal/about pages are footer-only even when an old theme menu still contains them.
+add_filter('wp_nav_menu_objects', function ($items, $args) {{
+    $location = strtolower(isset($args->theme_location) ? $args->theme_location : '');
+    if (strpos($location, 'footer') !== false) return $items;
+    $blocked = array('about', 'about-us', 'contact', 'contact-us', 'disclaimer', 'privacy', 'privacy-policy');
+    return array_values(array_filter($items, function ($item) use ($blocked) {{
+        $path = trim((string) parse_url($item->url, PHP_URL_PATH), '/');
+        return !in_array(strtolower($path), $blocked, true);
+    }}));
+}}, 999, 2);
 add_action('wp_footer', function () {{
     if (is_admin()) return;
     $links = array(
@@ -90,7 +98,9 @@ add_action('wp_footer', function () {{
 }}, 90);
 add_action('wp_head', function () {{
     echo '<style id="network-menu-layout-css">
-    .site-logo,.custom-logo-link,.site-branding .site-logo{{display:none!important}}
+    header .site-logo,header .custom-logo-link,header .custom-logo,
+    .site-header .site-logo,.site-header .custom-logo-link,.site-header .custom-logo,
+    .header-image,.site-branding img{{display:none!important}}
     .network-utility-footer{{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:18px 12px;border-top:1px solid rgba(127,127,127,.25);font-size:14px}}
     .network-utility-footer a{{text-decoration:none}}
     #site-navigation>div>ul,.main-navigation>div>ul,.primary-menu,.main-header-menu{{display:flex;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;scrollbar-width:thin}}
