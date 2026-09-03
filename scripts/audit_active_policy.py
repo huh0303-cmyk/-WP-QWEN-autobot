@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Fail CI when active automation paths drift from the 2026-08-27 operating policy."""
+"""Fail CI when active automation paths drift from the operating policy.
+
+2026-09-03: CEO decision — Gemini is removed as an editorial reviewer
+network-wide (WP, Blogger, Tistory, newsrooms). It kept blocking every
+draft on real billing outages, and even when reachable its own factual
+judgment on a newsroom rewrite had no route to try a different article,
+stalling koreanews365/theseouljournal at 0 published for a full day.
+Two independent cold-context GPT passes replace it everywhere. This
+audit now asserts Gemini's ABSENCE from every reviewer role instead of
+its presence — the reverse of the pre-2026-09-03 policy.
+"""
 from __future__ import annotations
 
 import json
@@ -7,6 +17,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WF = ROOT / ".github" / "workflows"
+
+GEMINI_REVIEWER_TOKENS = (
+    "GEMINI_REVIEW_MODEL",
+    "BLOGGER_GEMINI_MODEL",
+    "gemini_generate",
+)
+REVIEWER_WORKFLOWS = (
+    "daily-network-publish.yml",
+    "newsrooms-daily-publisher.yml",
+    "blogger-rewrite.yml",
+    "tistory-daily-plan.yml",
+    "sheet-triggered-auto-write.yml",
+)
 
 BANNED_IMAGE_SECRET_REFS = (
     "secrets.PEXELS_API_KEY",
@@ -35,6 +58,17 @@ def fail(msg: str) -> None:
 
 
 def main() -> None:
+    consensus_src = (ROOT / "scripts" / "three_model_consensus.py").read_text(encoding="utf-8")
+    if "gemini_generate(" in consensus_src:
+        fail("three_model_consensus.py still invokes gemini_generate — Gemini reviewer must stay uncalled")
+    if "gpt_1" not in consensus_src or "gpt_2" not in consensus_src:
+        fail("three_model_consensus.py is not running two independent GPT passes")
+
+    for name in ("queue_blogger_rewrite.py", "tistory_writer.py"):
+        src = (ROOT / "scripts" / name).read_text(encoding="utf-8")
+        if "gemini_generate" in src or "three_model_consensus" in src:
+            fail(f"{name} re-wired Gemini/consensus review — Blogger/Tistory use a GPT-only quality gate")
+
     workflow_text = {}
     for path in WF.glob("*.yml"):
         text = path.read_text(encoding="utf-8")
@@ -45,6 +79,10 @@ def main() -> None:
         for token in BANNED_DEPRECATED_CHANNEL_REFS:
             if token in text:
                 fail(f"{path.name} still references deprecated channel {token}")
+        if path.name in REVIEWER_WORKFLOWS:
+            for token in GEMINI_REVIEWER_TOKENS:
+                if token in text:
+                    fail(f"{path.name} still wires Gemini into a reviewer role via {token}")
 
     for name in YOUTUBE_IMAGE_WORKFLOWS:
         text = workflow_text.get(name, "")
@@ -58,8 +96,6 @@ def main() -> None:
         fail("WordPress publisher is not routed to GPT-5 mini as the primary writer")
     if "secrets.OPENAI_API_KEY" not in wp or 'OPENAI_ENABLED: "true"' not in wp:
         fail("WordPress publisher lost its GPT-5 mini credentials")
-    if "secrets.GEMINI_API_KEY" not in wp or 'GEMINI_REVIEW_MODEL: "gemini-2.5-flash"' not in wp:
-        fail("WordPress publisher lost its Gemini independent-review route")
     wp_publisher = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
     if "def generate_content_gemini(prompt, use_gpt=False)" not in wp_publisher:
         fail("WordPress text generator lost its compatibility entrypoint")
@@ -81,8 +117,6 @@ def main() -> None:
         fail("newsroom workflow lost single-owner execution or bounded retries")
     if 'AI_TEXT_PROVIDER: "openai"' not in newsroom or 'OPENAI_MODEL: "gpt-5-mini"' not in newsroom:
         fail("newsroom workflow is not routed to GPT-5 mini")
-    if 'GEMINI_REVIEW_MODEL: "gemini-2.5-flash"' not in newsroom:
-        fail("newsroom workflow lost Gemini independent review")
 
     rankmath = workflow_text.get("daily-rankmath-check.yml", "")
     if "continue-on-error: true" in rankmath:
@@ -95,8 +129,6 @@ def main() -> None:
     blogger = workflow_text.get("blogger-rewrite.yml", "")
     if "REPLICATE_API_TOKEN" not in blogger:
         fail("Blogger workflow is not wired to Replicate images")
-    if "BLOGGER_GEMINI_MODEL" not in blogger:
-        fail("Blogger workflow lost its Gemini text route")
     if 'BLOGGER_MIN_QUALITY_SCORE: "70"' not in blogger:
         fail("Blogger publication threshold is not 70")
 

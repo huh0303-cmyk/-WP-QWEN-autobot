@@ -77,9 +77,6 @@ jobs:
           # ever reaches the review queue (Replicate's own URLs expire).
           GITHUB_REPOSITORY: ${{ github.repository }}
           GH_ASSET_TOKEN: ${{ github.token }}
-          # Gemini billing is unavailable; replace the second reviewer with an
-          # independent cold-context GPT pass instead of blocking every draft.
-          EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"
         run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
       - name: Validate drafts never authorize public publication
         run: |
