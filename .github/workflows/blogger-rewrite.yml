@@ -67,6 +67,9 @@ jobs:
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
           CLAUDE_ENABLED: "false"
+          # Gemini billing is unavailable; replace the second reviewer with an
+          # independent cold-context GPT pass instead of blocking every draft.
+          EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"

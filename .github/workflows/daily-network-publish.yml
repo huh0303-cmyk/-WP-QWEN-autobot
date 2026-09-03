@@ -61,6 +61,9 @@ jobs:
           AI_TEXT_PROVIDER: "openai"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_REVIEW_MODEL: "gemini-2.5-flash"
+          # Gemini billing is unavailable; replace the second reviewer with an
+          # independent cold-context GPT pass instead of blocking every draft.
+          EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_ENABLED: "true"
           CLAUDE_ENABLED: "false"
