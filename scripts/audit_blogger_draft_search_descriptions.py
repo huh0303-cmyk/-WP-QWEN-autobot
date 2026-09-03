@@ -20,7 +20,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from process_platform_queue import _access_token
-from gemini_text import gemini_generate_text
+from openai_text import openai_generate_text
 
 OUT = Path("blogger_draft_search_description_audit.json")
 
@@ -45,7 +45,7 @@ def prepare_search_descriptions(records: list[dict]) -> None:
 Return JSON array only: [{{"index": 0, "search_description": "..."}}].
 Each description must be ONE complete grammatical sentence, 100-115 CHARACTERS including spaces, in the same language as its title. Count characters before answering. Never truncate a phrase. It must accurately describe that specific post, avoid hype, and invent no facts.
 POSTS: {json.dumps(source, ensure_ascii=False)}"""
-            raw = gemini_generate_text(prompt, temperature=0.1)
+            raw = openai_generate_text(prompt, temperature=0.1, max_retries=3)
             match = re.search(r"\[[\s\S]*\]", raw)
             generated = json.loads(match.group(0)) if match else []
             for item in generated:
@@ -55,7 +55,7 @@ POSTS: {json.dumps(source, ensure_ascii=False)}"""
                     r"(?i)\b(and|or|of|in|for|to|with|including|emphasizing|focusing|various|practical|precise|own|work|healthy)\.$",
                     candidate,
                 ))
-                if index in pending and 100 <= len(candidate) <= 120 and candidate.endswith((".", "!", "?")) and not bad_ending:
+                if index in pending and 100 <= len(candidate) <= 119 and candidate.endswith((".", "!", "?")) and not bad_ending:
                     accepted[index] = candidate
                     pending.pop(index)
         if pending:

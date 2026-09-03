@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 MIN_CHARS = 100
-MAX_CHARS = 120
+MAX_CHARS = 119
 
 
 def validate_search_description(value: str) -> str:

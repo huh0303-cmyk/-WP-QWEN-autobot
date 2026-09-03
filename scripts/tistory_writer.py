@@ -237,7 +237,9 @@ def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
 def generate_draft(job: dict) -> dict:
     errors = []
     draft = None
-    for provider in ("gpt",):
+    # Retry GPT-5 mini up to three times when a response misses the mechanical
+    # length/SEO gate. No alternate model is used.
+    for provider in ("gpt", "gpt", "gpt"):
         try:
             raw, engine = _write_body(job, provider)
             parsed = _parse_json_response(raw)

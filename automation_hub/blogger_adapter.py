@@ -59,6 +59,8 @@ class BloggerPublisher:
                         message="Existing Blogger draft recovered by stable job marker; no duplicate created",
                         extra={"idempotent_recovery": True,
                                "search_description": job.search_description,
+                               "search_description_length": len(job.search_description),
+                               "search_description_status": "required_in_blogger_editor",
                                "search_description_ui_required": True},
                     )
             response = self.session.post(
@@ -86,7 +88,10 @@ class BloggerPublisher:
                 True, "blogger", self.site_id, job.job_id, "drafted",
                 public_url=review_url, remote_id=remote_id,
                 message="Blogger draft created; Search description must be saved in the editor before manual publish",
-                extra={"search_description": job.search_description, "search_description_ui_required": True},
+                extra={"search_description": job.search_description,
+                       "search_description_length": len(job.search_description),
+                       "search_description_status": "required_in_blogger_editor",
+                       "search_description_ui_required": True},
             )
         verification = verify_publication(public_url, job.title, site_url=self.site_url, attempts=3)
         if not verification.ok:

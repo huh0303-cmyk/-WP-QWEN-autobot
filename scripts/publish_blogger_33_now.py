@@ -133,7 +133,9 @@ def main() -> int:
                     raise RuntimeError("draft created but control-room review queue sync failed")
                 results.append({"site": site["key"], "status": "drafted" if ok else "verification_failed",
                                 "review_url": review_url, "post_id": post.get("id", ""),
-                                "search_description": description})
+                                "search_description": description,
+                                "search_description_length": len(description),
+                                "search_description_status": "required_in_blogger_editor"})
             else:
                 check = requests.get(url, timeout=30)
                 ok = check.status_code == 200 and marker in check.text and title in check.text
