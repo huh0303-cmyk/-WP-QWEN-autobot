@@ -12,6 +12,7 @@ from pathlib import Path
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from openai_text import openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
