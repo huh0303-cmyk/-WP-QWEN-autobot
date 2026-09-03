@@ -1122,6 +1122,47 @@ def trigger_publish_site_now():
     return redirect(url_for("index") + "#wordpress")
 
 
+@app.post("/trigger/social-publish")
+def trigger_social_publish():
+    """CEO clicked one platform's '발행 →' button in the SNS section.
+
+    Dispatches social-publish-one.yml for exactly that platform against
+    whatever content is already generated and waiting (topik_quiz_output/
+    meta_ko.json by default) — the other platforms are untouched. Every
+    platform in scripts/social_publish.py already fails safe on its own
+    (YouTube/Facebook stay private/draft, TikTok stays self-only unless
+    audited, Instagram/Threads never auto-post — caption+link emailed
+    instead), so this button does not change that behavior, it just lets
+    the CEO fire one platform on demand instead of all five at once.
+    """
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#sns")
+    platform = request.form.get("platform", "").strip().lower()
+    if platform not in {"tiktok", "instagram", "facebook", "threads", "youtube"}:
+        flash("알 수 없는 플랫폼입니다.", "error")
+        return redirect(url_for("index") + "#sns")
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    if not token:
+        flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
+        return redirect(url_for("index") + "#sns")
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/social-publish-one.yml/dispatches",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            json={"ref": "main", "inputs": {"platform": platform}},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+    except (requests.RequestException, RuntimeError) as exc:
+        flash(f"{platform}: 발행 요청 실패 · {exc}", "error")
+    else:
+        flash(f"{platform}: 발행을 시작했습니다. 준비된 콘텐츠가 없으면 실패 메일이 옵니다.", "success")
+    return redirect(url_for("index") + "#sns")
+
+
 def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:
     """One-glance rollup of what needs attention, computed from the same
     per-platform data already shown further down the page. CEO explicitly

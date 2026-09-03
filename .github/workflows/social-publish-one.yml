@@ -1,0 +1,61 @@
+name: "Control Room — publish one SNS platform now"
+
+# Dispatched only by a human clicking one platform's button in the CEO
+# control room. Publishes whatever content is already generated and
+# waiting (topik_quiz_output/meta_<lang>.json by default) to exactly one
+# platform — the other four are left untouched. Every platform in
+# social_publish.py already fails safe (draft/private/caption-only) on
+# its own; this workflow does not change that behavior.
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "발행할 플랫폼 하나"
+        required: true
+        type: choice
+        options: [tiktok, instagram, facebook, threads, youtube]
+      lang:
+        description: "meta_<lang>.json의 언어 코드 (기본 ko)"
+        required: false
+        default: "ko"
+      meta_path:
+        description: "직접 meta.json 경로 지정(선택, 비우면 위 lang 사용)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: social-publish-${{ inputs.platform }}
+  cancel-in-progress: false
+
+jobs:
+  publish-one-platform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+      - name: Publish to the one requested platform
+        env:
+          SOCIAL_PUBLISH_PLATFORM: ${{ inputs.platform }}
+          TARGET_LANG: ${{ inputs.lang }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NORMAL_COMPLETION_EMAIL_ENABLED: "true"
+        run: |
+          if [ -n "${{ inputs.meta_path }}" ]; then
+            python scripts/social_publish.py "${{ inputs.meta_path }}"
+          else
+            python scripts/social_publish.py "${{ inputs.lang }}"
+          fi

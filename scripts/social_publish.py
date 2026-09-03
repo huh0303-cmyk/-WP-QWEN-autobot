@@ -342,7 +342,17 @@ def main():
         log(f"❌ 영상 파일 없음: {video_path}")
         raise SystemExit(1)
 
-    log(f"게시 시작 — {label}, 영상: {video_path}")
+    # 2026-09-04: 통제실의 "이 플랫폼만 지금 발행" 버튼용 — 비우면 기존처럼 5개
+    # 전부 시도하고, 하나로 좁히면 그 플랫폼만 시도한다(나머지는 건드리지 않음).
+    only_platform = os.environ.get("SOCIAL_PUBLISH_PLATFORM", "").strip().lower()
+    platforms = PLATFORMS
+    if only_platform:
+        if only_platform not in PLATFORMS:
+            log(f"❌ 알 수 없는 플랫폼: {only_platform} (선택지: {', '.join(PLATFORMS)})")
+            raise SystemExit(1)
+        platforms = {only_platform: PLATFORMS[only_platform]}
+
+    log(f"게시 시작 — {label}, 영상: {video_path}, 대상: {', '.join(platforms)}")
     results = {}
     state_path = os.path.join(os.path.dirname(meta_path) or WORKDIR, "social_publish_state.json")
     try:
@@ -350,7 +360,7 @@ def main():
             state = json.load(f)
     except (OSError, ValueError):
         state = {}
-    for name, fn in PLATFORMS.items():
+    for name, fn in platforms.items():
         log(f"  → {name} 게시 중...")
         fingerprint = content_fingerprint(meta, name)
         if state.get(name) == fingerprint:

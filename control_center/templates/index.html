@@ -595,6 +595,19 @@
                 </div>
             </div>
             {% endfor %}
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <p class="text-xs font-black text-slate-500">이 플랫폼만 지금 발행</p>
+                <p class="mt-1 text-[11px] text-slate-400">준비된 콘텐츠(topik_quiz_output/meta_ko.json)를 그 플랫폼에만 올립니다 — 콘텐츠가 없으면 정직하게 실패합니다.</p>
+                <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {% for key, label, color in [('tiktok','TikTok','bg-cyan-600 hover:bg-cyan-700'), ('instagram','Instagram','bg-fuchsia-600 hover:bg-fuchsia-700'), ('facebook','Facebook','bg-blue-600 hover:bg-blue-700'), ('threads','Threads','bg-slate-700 hover:bg-slate-800')] %}
+                    <form method="post" action="{{ url_for('trigger_social_publish') }}" onsubmit="return confirm('{{ label }}에 지금 바로 발행할까요? (유튜브/페북은 비공개·초안, 인스타/쓰레드는 캡션 이메일로만 전달)');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="platform" value="{{ key }}">
+                        <button type="submit" class="flex h-11 w-full items-center justify-center rounded-xl {{ color }} px-3 text-xs font-black text-white">{{ label }} 발행 →</button>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
         </section>
         <section id="google-sheet" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
             <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm sm:p-7">
