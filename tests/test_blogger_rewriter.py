@@ -95,6 +95,27 @@ class BloggerRewriterTests(unittest.TestCase):
         score, failures, _ = blogger_quality_score(article, source_title="Korea Travel Planning", source_url=source_url, source_html="<p>Short original source.</p>", target_chars=2400)
         self.assertGreaterEqual(score, 80, failures)
 
+    def test_english_blogger_rejects_korean_summary_or_caption(self):
+        source_url = "https://example.com/korea-travel"
+        content = (
+            '<p>A direct answer for Korea travel planning.</p>'
+            '<h2>Before departure</h2><p>' + ('Check official requirements carefully. ' * 25) + '</p>'
+            '<h2>Transport planning</h2><p>' + ('Compare routes and timing before booking. ' * 25) + '</p>'
+            '<h2>한국어 요약</h2><p>이 문단은 영문 사이트에 들어가면 안 됩니다.</p>'
+            f'<p><a href="{source_url}">Detailed source</a></p>'
+        )
+        article = {
+            "title": "Korea Travel Planning: Practical Steps",
+            "meta_description": "Practical, source-led guidance for planning a Korea trip, covering transport, checklists, and booking timing.",
+            "content_html": content,
+            "labels": ["Korea", "Travel", "Planning", "Transport", "Booking", "Hotels", "Seoul", "Routes"],
+        }
+        _, failures, _ = blogger_quality_score(
+            article, source_title="Korea Travel Planning", source_url=source_url,
+            source_html="<p>Short source.</p>", target_chars=2400, language="en",
+        )
+        self.assertTrue(any(item.startswith("language mismatch") for item in failures))
+
 
 if __name__ == "__main__":
     unittest.main()

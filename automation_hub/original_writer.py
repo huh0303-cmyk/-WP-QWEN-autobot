@@ -10,7 +10,7 @@ from datetime import date
 from typing import Any
 
 from automation_hub.blogger_rewriter import plain_text
-from automation_hub.editorial_language_policy import body_cliches, title_cliches
+from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
 
 
 def original_prompt(*, keyword: str, site_theme: str, language: str, persona: str,
@@ -22,6 +22,7 @@ Site theme: {site_theme}. Primary keyword/topic: {keyword}.
 The title is the highest-priority text: make it specific and useful so a real reader wants to click, without clickbait or false promises. Never use mass-produced AI title formulas including Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리. Never use a repeated title formula or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: {target_chars} characters - plan the number of sections and their depth to fit this budget, and finish every section you start; an oversized draft gets trimmed and can end up cut off mid-thought, so write to the budget rather than over-writing and expecting it to be shortened.
+Every reader-visible field must use that language, including the title, meta_description, headings, body, labels, image_queries, and image alt text. If the target language is English, do not include a Korean summary, Korean caption, or any Hangul text.
 The article must feel individually edited for this site's persona, not mass-produced. Never use filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer and fits within the length budget - finishing fewer sections completely beats starting a section (or a comparison list) you don't have room to finish.
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
@@ -35,7 +36,8 @@ For visa, insurance, or medical/health topics (YMYL), within the first three par
 """
 
 
-def original_quality_score(article: dict[str, Any], *, keyword: str, target_chars: int) -> tuple[int, list[str]]:
+def original_quality_score(article: dict[str, Any], *, keyword: str, target_chars: int,
+                           language: str = "") -> tuple[int, list[str]]:
     """Pre-publication score for an original (non-rewrite) article. No
     source-similarity check applies since there is no source to compare to."""
     title = str(article.get("title", "")).strip()
@@ -87,6 +89,12 @@ def original_quality_score(article: dict[str, Any], *, keyword: str, target_char
         score += 10
     else:
         failures.append("AI/filler phrasing detected")
+    mismatches = language_mismatch_fields(
+        language=language, title=title, meta_description=meta,
+        content=text, labels=[str(label) for label in labels],
+    )
+    if mismatches:
+        failures.append("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
     ymyl = bool(re.search(r"(?i)(visa|immigration|insurance|medical|hospital|treatment|비자|보험|의료)", keyword + " " + text))
     if not ymyl or (re.search(r"(?i)(as of|effective|기준일|[0-9]{4}년\s*[0-9]{1,2}월[^.]{0,10}기준)", text) and re.search(r"(?i)(can change|subject to change|confirm|disclaimer|consult|변경|확인|면책|상담)", text)):
         score += 5

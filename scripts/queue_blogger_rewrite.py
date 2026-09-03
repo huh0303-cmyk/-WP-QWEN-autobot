@@ -161,9 +161,9 @@ def main():
             raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
             candidate = parse_rewrite_json(raw)
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
-            quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum)
+            quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum, language=language)
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
-            critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL", "meta description is incomplete"))]
+            critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL", "meta description is incomplete", "language mismatch"))]
             if quality_score >= minimum_quality and not critical_failures:
                 rewritten = candidate
                 text_provider = provider
@@ -179,7 +179,11 @@ def main():
     content = rewritten["content_html"]
     image_model = "0"
     image_subject = (rewritten.get("image_queries") or [rewritten["title"]])[0]
-    image_alt = f"{str(image_subject).strip()} 관련 장면"
+    image_alt = (
+        f"{str(image_subject).strip()} 관련 장면"
+        if language.startswith("ko") else
+        f"Scene related to {str(image_subject).strip()}"
+    )
     image_url = generate_image_url(image_subject, theme=rewritten["title"])
     if not image_url:
         print(json.dumps({

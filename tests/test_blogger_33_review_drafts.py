@@ -14,3 +14,9 @@ def test_blogger_33_review_mode_is_private_and_records_editor_links():
     assert "exact_complete" in source
     assert 'BLOGGER_REVIEW_DRAFT_MODE: "true"' in workflow
     assert 'NORMAL_COMPLETION_EMAIL_ENABLED: "false"' in workflow
+
+
+def test_legacy_bulk_entry_also_creates_drafts_instead_of_public_posts():
+    workflow = (ROOT / ".github" / "workflows" / "publish-blogger-33-now.yml").read_text(encoding="utf-8")
+    assert 'BLOGGER_REVIEW_DRAFT_MODE: "true"' in workflow
+    assert "PUBLIC_RUN_KEY" not in workflow

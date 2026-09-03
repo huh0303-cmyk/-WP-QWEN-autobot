@@ -34,3 +34,22 @@ def title_cliches(title: str) -> list[str]:
 
 def body_cliches(text: str) -> list[str]:
     return [match.group(0) for match in BODY_CLICHE_PATTERN.finditer(text or "")]
+
+
+def language_mismatch_fields(*, language: str, title: str, meta_description: str,
+                             content: str, labels: list[str] | None = None) -> list[str]:
+    """Return visible fields that violate the target site's language.
+
+    English properties must not receive Korean summaries, captions, labels, or
+    body fragments.  This is intentionally strict: a Korean source may inform
+    an English article, but every reader-visible field must still be English.
+    """
+    if not (language or "").lower().startswith("en"):
+        return []
+    values = {
+        "title": title,
+        "meta_description": meta_description,
+        "content": content,
+        "labels": " ".join(labels or []),
+    }
+    return [name for name, value in values.items() if re.search(r"[가-힣]", value or "")]

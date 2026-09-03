@@ -8,7 +8,7 @@ from difflib import SequenceMatcher
 from typing import Any
 
 import requests
-from automation_hub.editorial_language_policy import body_cliches, title_cliches
+from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
 
 
 def plain_text(value: str) -> str:
@@ -156,6 +156,7 @@ The title is the highest-priority text: make it emotionally resonant, curiosity-
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
+Every reader-visible field must use that language, including the title, meta_description, headings, body, labels, image_queries, and image alt text. If the target language is English, do not include a Korean summary, Korean caption, or any Hangul text.
 The article must feel individually edited for this site's persona, not mass-produced. Titles using Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리 are forbidden. Never use body filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
@@ -176,7 +177,8 @@ Source article:
 
 
 def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_url: str,
-                          source_html: str, target_chars: int, maximum_similarity: float = 0.68) -> tuple[int, list[str], float]:
+                          source_html: str, target_chars: int, maximum_similarity: float = 0.68,
+                          language: str = "") -> tuple[int, list[str], float]:
     """Pre-publication Blogger score. This is an internal gate, not a Google score."""
     title = str(article.get("title", "")).strip()
     meta = str(article.get("meta_description", "")).strip()
@@ -243,6 +245,12 @@ def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_
         score += 5
     else:
         failures.append("AI/filler phrasing detected")
+    mismatches = language_mismatch_fields(
+        language=language, title=title, meta_description=meta,
+        content=text, labels=[str(label) for label in labels],
+    )
+    if mismatches:
+        failures.append("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
     ymyl = bool(re.search(r"(?i)(visa|immigration|insurance|medical|hospital|treatment|비자|보험|의료)", source_title + " " + text))
     if not ymyl or (re.search(r"(?i)(as of|effective|기준일|[0-9]{4}년\s*[0-9]{1,2}월[^.]{0,10}기준)", text) and re.search(r"(?i)(can change|subject to change|confirm|disclaimer|consult|변경|확인|면책|상담)", text)):
         score += 5

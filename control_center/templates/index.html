@@ -106,11 +106,28 @@
                 {% if review_items %}
                 <div class="divide-y divide-slate-100">
                     {% for item in review_items[:25] %}
-                    <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="grid gap-2 px-4 py-3 hover:bg-amber-50/60 sm:grid-cols-[110px_1fr_auto] sm:items-center">
+                    <article class="grid gap-2 px-4 py-3 hover:bg-amber-50/60 sm:grid-cols-[110px_1fr_auto] sm:items-center">
                         <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black text-amber-700">{{ item.platform }}</span>{{ item.created_at }}</div>
-                        <div class="min-w-0"><p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p><p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p></div>
-                        <span class="inline-flex min-h-10 items-center justify-center rounded-xl {% if item.platform == 'WordPress' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-600 text-white{% endif %} px-4 text-xs font-black">{% if item.platform == 'WordPress' %}공개됨 →{% else %}검토 →{% endif %}</span>
-                    </a>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p>
+                            <p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p>
+                            {% if item.platform == "Blogspot" %}
+                            {% if item.search_description %}
+                            <div class="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-[10px] font-black text-violet-800">Blogger 검색 설명 · {{ item.search_description|length }}자</p>
+                                    <button type="button" data-copy="{{ item.search_description|e }}" onclick="navigator.clipboard.writeText(this.dataset.copy); this.textContent='복사됨';" class="shrink-0 rounded-lg bg-violet-700 px-2 py-1 text-[10px] font-black text-white">설명 복사</button>
+                                </div>
+                                <p class="mt-1 text-[11px] leading-relaxed text-slate-700">{{ item.search_description }}</p>
+                                <p class="mt-1 text-[9px] font-bold text-violet-700">글 검토를 열어 검색 설명 칸에 붙여넣은 뒤 공개하세요.</p>
+                            </div>
+                            {% else %}
+                            <p class="mt-2 rounded-lg bg-red-50 px-2 py-1.5 text-[10px] font-black text-red-700">검색 설명 누락 · 공개하지 말고 다시 생성하세요.</p>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl {% if item.platform == 'WordPress' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-600 text-white{% endif %} px-4 text-xs font-black">{% if item.platform == 'WordPress' %}공개글 확인 →{% else %}검토 →{% endif %}</a>
+                    </article>
                     {% endfor %}
                 </div>
                 {% else %}

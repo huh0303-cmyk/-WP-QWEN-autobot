@@ -72,6 +72,8 @@ def get_review_queue() -> list[dict[str, str]]:
         row += [""] * (14 - len(row))
         created_at, job_id, site_id, status, publish_now, title = row[:6]
         review_url = row[9].strip()
+        message = row[12].strip()
+        search_description = message.split("meta_description=", 1)[1].strip() if "meta_description=" in message else ""
         if not job_id.strip() or not title.strip() or not review_url.startswith("http"):
             continue
         platform = "Tistory" if site_id.lower().startswith("tistory_") else "Blogspot" if "blogger" in job_id.lower() or "blogger" in site_id.lower() else "WordPress"
@@ -82,6 +84,7 @@ def get_review_queue() -> list[dict[str, str]]:
             "platform": platform,
             "title": title,
             "review_url": review_url,
+            "search_description": search_description,
             "status": "검토대기" if publish_now.strip().upper() != "TRUE" else status,
         })
     # Blogger and WordPress editorial drafts use the compact review sheet.
@@ -94,7 +97,8 @@ def get_review_queue() -> list[dict[str, str]]:
         editorial_rows = []
     for index, row in enumerate(editorial_rows[1:], start=2):
         row += [""] * (9 - len(row))
-        created_at, platform, channel, title, review_url, status, decision = row[:7]
+        created_at, platform, channel, title, review_url, status, decision, note = row[:8]
+        search_description = note.split("검색 설명(붙여넣기용):", 1)[1].strip() if "검색 설명(붙여넣기용):" in note else ""
         if not title.strip() or not review_url.strip().startswith("http"):
             continue
         items.append({
@@ -104,6 +108,7 @@ def get_review_queue() -> list[dict[str, str]]:
             "platform": platform or "Blogspot",
             "title": title,
             "review_url": review_url,
+            "search_description": search_description,
             "status": decision or status or "검토대기",
         })
     deduped = {item["review_url"]: item for item in items}

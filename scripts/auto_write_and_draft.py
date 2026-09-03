@@ -57,33 +57,42 @@ def _finish_meta_description(article: dict) -> dict:
     meta = str(article.get("meta_description", "")).strip().rstrip(" ,;:-.!?")
     title = str(article.get("title", "")).strip()
     korean = bool(re.search(r"[가-힣]", meta))
-    suffix = (
-        ". 이 실용 가이드에서 준비사항과 핵심 절차, 계획 전 확인할 내용을 차근차근 살펴보세요"
-        if korean else
-        ". This practical guide covers what to prepare, what to check, and how to plan with confidence"
-    )
-    if meta and len(meta) < 99:
-        meta += suffix
-    if meta and len(meta) < 99:
-        meta += ". 실제 준비 과정에서 놓치기 쉬운 부분과 안전하게 판단하는 기준도 함께 정리했습니다"
     if len(meta) > 119:
-        shortened = meta[:119]
-        # Korean also uses spaces. Never leave a visibly chopped word such as
-        # "차." or "public." in the search snippet.
-        if " " in shortened:
-            shortened = shortened.rsplit(" ", 1)[0]
-        meta = shortened.rstrip(" ,;:-.!?")
-    if len(meta) < 99:
-        topic = title[:38].rstrip(" ,;:-.!?")
-        meta = (
-            f"{topic}에 필요한 준비사항과 확인 절차를 정리했습니다. 처음 시작할 때 놓치기 쉬운 기준과 실전 체크포인트를 단계별로 확인하세요"
-            if korean else
-            f"Learn the practical steps for {topic}. See what to prepare, what to verify, and which questions to ask before you proceed"
-        )
-        if len(meta) > 119 and " " in meta[:119]:
-            meta = meta[:119].rsplit(" ", 1)[0].rstrip(" ,;:-.!?")
-    if meta:
+        complete = re.findall(r".*?[.!?](?=\s|$)", meta)
+        meta = " ".join(part.strip() for part in complete if part.strip())
+        if not 100 <= len(meta) <= 119:
+            meta = ""
+    if meta and not meta.endswith((".", "!", "?")):
         meta += "."
+    suffixes = (
+        [" 핵심 절차와 준비사항을 확인하세요.", " 놓치기 쉬운 기준도 함께 확인하세요.", " 실제 확인 순서를 차근차근 살펴보세요."]
+        if korean else
+        [
+            " Check current details before deciding.",
+            " Review key facts, timing, and costs before deciding.",
+            " Check key steps, costs, timing, and practical details before deciding.",
+        ]
+    )
+    if meta and len(meta) < 100:
+        fitting = next((suffix for suffix in suffixes if 100 <= len(meta + suffix) <= 119), "")
+        meta += fitting
+    if not 100 <= len(meta) <= 119:
+        topic = re.sub(r"\s+", " ", title).strip(" ,;:-.!?")
+        topic = topic[:42].rsplit(" ", 1)[0] if len(topic) > 42 and " " in topic[:42] else topic[:42]
+        meta = (
+            f"{topic}의 핵심 절차와 준비사항, 비용과 시기, 놓치기 쉬운 확인 기준을 실제 계획 순서에 맞춰 알기 쉽게 정리합니다."
+            if korean else
+            f"Learn about {topic}, with practical steps, key checks, timing, costs, and preparation tips for informed decisions."
+        )
+        if len(meta) > 119:
+            topic = topic[: max(12, 42 - (len(meta) - 119))].rstrip(" ,;:-")
+            meta = (
+                f"{topic}의 핵심 절차와 준비사항, 비용과 시기, 놓치기 쉬운 확인 기준을 실제 계획 순서에 맞춰 알기 쉽게 정리합니다."
+                if korean else
+                f"Learn about {topic}, with practical steps, key checks, timing, costs, and preparation tips for informed decisions."
+            )
+    if not 100 <= len(meta) <= 119 or not meta.endswith((".", "!", "?")):
+        raise ValueError("Could not build a complete 100-119 character meta description")
     article["meta_description"] = meta
     return article
 
@@ -160,9 +169,9 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
             candidate = _finish_meta_description(candidate)
-            score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars)
+            score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
-            critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete"))]
+            critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete", "language mismatch"))]
             if score >= 70 and not critical:
                 return candidate, score, failures, provider
         except Exception as exc:
@@ -216,7 +225,11 @@ def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: st
     content = article["content_html"]
     if image_url:
         image_subject = (article.get("image_queries") or [keyword])[0]
-        image_alt = f"{str(image_subject).strip()} 관련 장면"
+        image_alt = (
+            f"{str(image_subject).strip()} 관련 장면"
+            if profile["language"].lower().startswith("ko") else
+            f"Scene related to {str(image_subject).strip()}"
+        )
         content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
     job = PublishJob(
         job_id=f"auto-{site_id}-{abs(hash(keyword))}", site_id=site_id, title=article["title"], content_html=content,

@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from openai_text import openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
+from automation_hub.editorial_language_policy import language_mismatch_fields
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
 
@@ -68,6 +69,12 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
     labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:12]
     if not title or len(body) < 1500 or len(labels) < 8:
         raise RuntimeError("GPT-5 mini output failed quality gate")
+    mismatches = language_mismatch_fields(
+        language=site["language"], title=title, meta_description="",
+        content=body, labels=labels,
+    )
+    if mismatches:
+        raise RuntimeError("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
     image = generate_image_url(str(data.get("image_subject") or title), theme=site["theme"])
     if image:
         body = f'<figure><img src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}"/></figure>\n' + body
@@ -78,6 +85,11 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
 
 def main() -> int:
     draft_mode = os.environ.get("BLOGGER_REVIEW_DRAFT_MODE", "false").strip().lower() == "true"
+    if not draft_mode:
+        raise SystemExit(
+            "Blogger API cannot save the post Search description field. "
+            "Direct public publishing is blocked; create a review draft, paste the prepared description in Blogger, then publish manually."
+        )
     run_key = os.environ.get("REVIEW_RUN_KEY" if draft_mode else "PUBLIC_RUN_KEY", "").strip()
     if not run_key:
         raise SystemExit("PUBLIC_RUN_KEY is required")

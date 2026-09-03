@@ -20,4 +20,16 @@ def test_short_english_meta_gets_complete_search_snippet():
     meta = _finish_meta_description(article)["meta_description"]
     assert 100 <= len(meta) <= 120
     assert meta.endswith(".")
+    assert not meta.endswith((" to.", " for.", " and.", " with."))
+
+
+def test_bus_an_meta_does_not_end_with_chopped_phrase():
+    article = {
+        "title": "Busan Weekend: Smart Savings, Big Memories",
+        "meta_description": "Plan your affordable Busan weekend trip with this budget guide",
+    }
+    meta = _finish_meta_description(article)["meta_description"]
+    assert 100 <= len(meta) <= 119
+    assert "what to." not in meta.lower()
+    assert meta.endswith(".")
 

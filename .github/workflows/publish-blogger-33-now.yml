@@ -1,10 +1,10 @@
-name: "Blogger — public publish all 33 sequentially"
+name: "Blogger — create 33 review drafts (legacy entry)"
 
 on:
   workflow_dispatch:
     inputs:
       run_key:
-        description: "Unique idempotency key for this approved public run"
+        description: "Unique idempotency key for this 33-draft review run"
         required: true
         type: string
 
@@ -26,9 +26,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests -q
-      - name: Publish 33 in guarded sequence
+      - name: Create 33 private drafts with prepared search descriptions
         env:
-          PUBLIC_RUN_KEY: ${{ inputs.run_key }}
+          BLOGGER_REVIEW_DRAFT_MODE: "true"
+          REVIEW_RUN_KEY: ${{ inputs.run_key }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GH_ASSET_TOKEN: ${{ github.token }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -43,6 +44,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blogger-33-public-results-${{ github.run_id }}
+          name: blogger-33-review-results-${{ github.run_id }}
           path: artifacts/blogger-33-public-results.json
           retention-days: 30
