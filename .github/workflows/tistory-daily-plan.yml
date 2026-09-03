@@ -15,7 +15,7 @@ on:
     - cron: "11 21 * * *"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: tistory-daily-single-owner
@@ -73,6 +73,10 @@ jobs:
           OPENAI_MODEL: "gpt-5-mini"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"
+          # Re-host each generated image as a permanent repo asset before it
+          # ever reaches the review queue (Replicate's own URLs expire).
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_ASSET_TOKEN: ${{ github.token }}
           # Gemini billing is unavailable; replace the second reviewer with an
           # independent cold-context GPT pass instead of blocking every draft.
           EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"

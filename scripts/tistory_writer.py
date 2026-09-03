@@ -27,6 +27,7 @@ if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
 from openai_text import openai_available, openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
+from stable_image_hosting import host_permanently, is_temporary  # noqa: E402
 from automation_hub.editorial_language_policy import body_cliches, title_cliches  # noqa: E402
 
 WRITER_SYSTEM_PROMPT = (
@@ -284,8 +285,19 @@ def generate_draft(job: dict) -> dict:
     if draft is None:
         return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
     draft["review_policy"] = "gpt_writer_plus_deterministic_quality_gate"
-    draft["image_url"] = generate_image_url(draft["image_prompt"], theme=draft["category"])
-    draft["image_alt"] = f"{str(draft['image_prompt']).strip()} 관련 장면"
+    generated_url = generate_image_url(draft["image_prompt"], theme=draft["category"])
+    # Replicate's own delivery URLs expire within hours, well before a draft
+    # sitting in the review queue gets approved. Re-host once, up front, so
+    # the review link never shows a broken image.
+    if generated_url and is_temporary(generated_url):
+        try:
+            generated_url = host_permanently(generated_url, asset_key=job["job_id"])
+        except (RuntimeError, KeyError):
+            generated_url = None
+    draft["image_url"] = generated_url
+    # Alt text must describe the image for a reader, not carry the raw
+    # AI generation prompt — use the article's own title instead.
+    draft["image_alt"] = draft.get("title") or draft["category"]
     draft["first_image_priority"] = bool(draft["image_url"])
     draft["image_policy"] = "sdxl_lightning_then_flux_schnell_then_pass_without_image"
     draft["image_status"] = "generated" if draft["image_url"] else "pass_no_image"
