@@ -14,6 +14,7 @@ TOPIK 면제 한국대학 2027	Admissions
 국제학생 전형 변화	Admissions
 비수도권 대학 유학생 특별전형	Admissions
 한국어 능력 시험 대체 인정	Admissions
+해외 이수자 학생부대체서식	Admissions
 편입학 국제학생 요건	Admissions
 재외국민 특별전형 2027 분석	Admissions
 GKS 2027 장학금 모집 요강	Scholarships
