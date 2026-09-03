@@ -81,6 +81,7 @@ def main() -> int:
             match = next((p for p in existing.json().get("items", []) if marker in str(p.get("content", ""))), None)
             if match:
                 results.append({"site": site["key"], "status": "existing", "url": match.get("url", ""), "post_id": match.get("id", "")})
+                RESULT.write_text(json.dumps({"run_key": run_key, "updated_at": datetime.now(timezone.utc).isoformat(), "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
                 continue
             title, body, labels = generate(site)
             body = f"<!-- {marker} -->\n{body}"
