@@ -3527,8 +3527,15 @@ def process_one(site, keyword):
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
             return False
 
-    category_context = f"{news_source_category or ''} {news_source or ''} {keyword}".strip()
-    cat_name=get_category_for_post(theme,category_context,title)
+    # 2026-09-03: news_source_category comes from a keyword-*search* RSS feed
+    # (e.g. gov.uk ?keywords=sport) that does not guarantee the matched item
+    # is actually about that topic — forcing it into the match string made
+    # every article from that feed get mis-categorized (e.g. tagged 스포츠
+    # for an investment-fraud sentencing story), which the editorial gate
+    # then correctly rejected as a category/label mismatch every single
+    # time. Categorize from the real headline/title only (news_source_category
+    # and news_source are always None outside news/news_en mode anyway).
+    cat_name=get_category_for_post(theme,keyword,title)
     print(f"  📁 카테고리: {cat_name}")
 
     # ★ 2026-08-03: 예전엔 뉴스모드 2개 사이트만 중복 제목을 걸렀음(그것도 완전

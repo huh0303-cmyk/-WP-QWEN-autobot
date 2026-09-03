@@ -34,7 +34,7 @@ NEWSROOMS = {
 NEWS_SOURCES = [
     {
         "key": "uk_government_politics_ko_desk",
-        "name": "UK Government Politics",
+        "name": "UK Government",
         "language": "ko",
         "category": "정치",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=politics",
@@ -44,7 +44,7 @@ NEWS_SOURCES = [
     },
     {
         "key": "uk_government_culture_ko_desk",
-        "name": "UK Government Culture",
+        "name": "UK Government",
         "language": "ko",
         "category": "문화",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=culture",
@@ -54,7 +54,7 @@ NEWS_SOURCES = [
     },
     {
         "key": "uk_government_sport_ko_desk",
-        "name": "UK Government Sport",
+        "name": "UK Government",
         "language": "ko",
         "category": "스포츠",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=sport",
@@ -194,7 +194,7 @@ NEWS_SOURCES = [
     },
     {
         "key": "uk_government_politics",
-        "name": "UK Government Politics",
+        "name": "UK Government",
         "language": "en",
         "category": "Politics",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=politics",
@@ -204,7 +204,7 @@ NEWS_SOURCES = [
     },
     {
         "key": "uk_government_culture",
-        "name": "UK Government Culture",
+        "name": "UK Government",
         "language": "en",
         "category": "Culture",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=culture",
@@ -214,7 +214,7 @@ NEWS_SOURCES = [
     },
     {
         "key": "uk_government_art",
-        "name": "UK Government Arts and Culture",
+        "name": "UK Government",
         "language": "en",
         "category": "Art",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=art",
@@ -224,7 +224,7 @@ NEWS_SOURCES = [
     },
     {
         "key": "uk_government_sport",
-        "name": "UK Government Sport",
+        "name": "UK Government",
         "language": "en",
         "category": "Sports",
         "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=sport",
