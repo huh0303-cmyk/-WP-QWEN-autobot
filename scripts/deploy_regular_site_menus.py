@@ -73,6 +73,7 @@ add_action('wp_footer', function () {{
 }}, 90);
 add_action('wp_head', function () {{
     echo '<style id="network-menu-layout-css">
+    .site-logo,.custom-logo-link,.site-branding .site-logo{{display:none!important}}
     .network-utility-footer{{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:18px 12px;border-top:1px solid rgba(127,127,127,.25);font-size:14px}}
     .network-utility-footer a{{text-decoration:none}}
     #site-navigation>div>ul,.main-navigation>div>ul,.primary-menu,.main-header-menu{{display:flex;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;scrollbar-width:thin}}

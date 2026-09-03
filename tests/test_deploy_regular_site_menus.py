@@ -18,3 +18,4 @@ def test_utility_order_and_category_limit_are_locked():
     assert 'assignment[primary] = category_menu' in source
     assert 'network-utility-footer' in source
     assert 'flex-wrap:nowrap' in source
+    assert '.site-logo,.custom-logo-link' in source
