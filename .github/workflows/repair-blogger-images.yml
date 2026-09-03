@@ -1,0 +1,30 @@
+name: "Blogger — audit and repair recent images"
+on:
+  workflow_dispatch:
+    inputs:
+      recent_limit: {description: "Recent live posts per blog", required: true, default: "10", type: string}
+permissions: {contents: write}
+concurrency: {group: blogger-image-repair, cancel-in-progress: false}
+jobs:
+  repair:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - name: Audit and patch broken image sources
+        env:
+          BLOGGER_RECENT_LIMIT: ${{ inputs.recent_limit }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/repair_blogger_images.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: "blogger-image-repair-${{ github.run_id }}", path: artifacts/blogger-image-repair-results.json, retention-days: 30}
