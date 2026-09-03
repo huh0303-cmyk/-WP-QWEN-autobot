@@ -103,7 +103,7 @@ def get_review_queue() -> list[dict[str, str]]:
 
 @app.get("/review/tistory/<path:job_id>")
 def review_tistory_draft(job_id: str):
-    """Render one queued Tistory draft; this endpoint never changes approval state."""
+    """Render one queued Tistory draft with a usable approval hand-off."""
     try:
         response = requests.get(REVIEW_QUEUE_CSV, timeout=12)
         response.raise_for_status()
@@ -118,8 +118,46 @@ def review_tistory_draft(job_id: str):
         body = re.sub(r"(?is)<(?:script|style|iframe|object|embed)[^>]*>.*?</(?:script|style|iframe|object|embed)>", "", body)
         body = re.sub(r"(?i)\s+on\w+\s*=\s*(['\"]).*?\1", "", body)
         body = re.sub(r"(?i)(href|src)\s*=\s*(['\"])\s*javascript:.*?\2", r'\1="#"', body)
-        return render_template("tistory_review.html", job_id=job_id, site_id=row[2], title=row[5], body_html=body, category=row[14], description=row[15], visibility=row[16])
+        rooms = json.loads((Path(__file__).parents[1] / "config" / "automation_rooms.json").read_text(encoding="utf-8"))
+        room = next((item for item in rooms.get("rooms", []) if item.get("room_id") == row[2]), {})
+        destination = str(room.get("destination_id") or "https://www.tistory.com/").rstrip("/")
+        manager_url = destination + "/manage/newpost/?type=post"
+        return render_template(
+            "tistory_review.html", job_id=job_id, site_id=row[2], title=row[5],
+            body_html=body, category=row[14], description=row[15], visibility=row[16],
+            manager_url=manager_url,
+        )
     return Response("해당 Tistory 검토본을 찾을 수 없습니다.", status=404)
+
+
+@app.post("/review/tistory/<path:job_id>/approve")
+def approve_tistory_draft(job_id: str):
+    """Record CEO approval, then hand off to the correct Tistory editor."""
+    site_id = request.form.get("site_id", "").strip()
+    manager_url = request.form.get("manager_url", "https://www.tistory.com/").strip()
+    if not manager_url.startswith("https://"):
+        manager_url = "https://www.tistory.com/"
+    try:
+        from scripts.gsheets_direct import get_sheets_service
+        sheet_id = os.environ.get("SHEET_ID", "12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI").strip()
+        service = get_sheets_service()
+        result = service.spreadsheets().values().get(
+            spreadsheetId=sheet_id, range="'자동화_발행대기'!A1:Q500"
+        ).execute()
+        rows = result.get("values", [])
+        for index, row in enumerate(rows[1:], start=2):
+            if len(row) > 1 and row[1] == job_id:
+                service.spreadsheets().values().update(
+                    spreadsheetId=sheet_id,
+                    range=f"'자동화_발행대기'!D{index}:E{index}",
+                    valueInputOption="USER_ENTERED",
+                    body={"values": [["승인완료", "TRUE"]]},
+                ).execute()
+                break
+        flash(f"{site_id or 'Tistory'} 승인 기록 완료. 티스토리 편집기에서 최종 게시를 눌러주세요.", "success")
+    except Exception as exc:
+        flash(f"승인 기록 저장 실패: {exc}", "error")
+    return redirect(manager_url)
 
 
 @app.before_request
