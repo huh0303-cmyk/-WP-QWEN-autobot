@@ -1,4 +1,6 @@
-from scripts.audit_repair_all_blogger_posts import clean_english_content, complete_description, image_sources
+from unittest.mock import Mock, patch
+
+from scripts.audit_repair_all_blogger_posts import api_request, clean_english_content, complete_description, image_sources
 
 
 def test_korean_summary_is_removed_without_touching_images():
@@ -20,3 +22,13 @@ def test_korean_search_description_matches_korean_blog_language():
     description = complete_description("한국 생활 건강", "<p>짧은 소개입니다.</p>", "ko")
     assert 100 <= len(description) <= 119
     assert description.endswith(".")
+
+
+@patch("scripts.audit_repair_all_blogger_posts.time.sleep")
+@patch("scripts.audit_repair_all_blogger_posts.requests.request")
+def test_blogger_api_transient_failure_is_retried(request, sleep):
+    request.side_effect = [Mock(status_code=503), Mock(status_code=200)]
+    result = api_request("GET", "https://example.test", timeout=1)
+    assert result.status_code == 200
+    assert request.call_count == 2
+    sleep.assert_called_once()

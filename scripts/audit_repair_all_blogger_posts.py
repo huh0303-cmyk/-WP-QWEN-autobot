@@ -47,6 +47,19 @@ def access_token() -> str:
     return response.json()["access_token"]
 
 
+def api_request(method: str, url: str, **kwargs) -> requests.Response:
+    """Retry transient Blogger/Google failures without repeating a succeeded write."""
+    for attempt in range(1, 6):
+        response = requests.request(method, url, **kwargs)
+        if response.status_code not in {429, 500, 502, 503, 504}:
+            response.raise_for_status()
+            return response
+        if attempt == 5:
+            response.raise_for_status()
+        time.sleep(min(20, attempt * 3))
+    raise RuntimeError("unreachable Blogger API retry state")
+
+
 def load_sites() -> list[dict]:
     profiles = json.loads((ROOT / "config/content_engine_profiles.json").read_text(encoding="utf-8"))["profiles"]
     sites, seen = [], set()
@@ -69,8 +82,7 @@ def list_all_posts(site: dict, headers: dict[str, str]) -> list[dict]:
             params = {"status": status, "view": "ADMIN", "fetchBodies": "true", "maxResults": 50}
             if token:
                 params["pageToken"] = token
-            response = requests.get(endpoint, params=params, headers=headers, timeout=45)
-            response.raise_for_status()
+            response = api_request("GET", endpoint, params=params, headers=headers, timeout=45)
             payload = response.json()
             for post in payload.get("items", []):
                 post["_status"] = status
@@ -222,12 +234,12 @@ def main() -> int:
             if not record["content_changed"] and record["new_title"] == record["title"]:
                 continue
             endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{record['blog_id']}/posts/{record['post_id']}"
-            response = requests.patch(
+            response = api_request(
+                "PATCH",
                 endpoint, headers=headers,
                 json={"kind": "blogger#post", "id": record["post_id"], "title": record["new_title"], "content": record["cleaned_content"]},
                 timeout=45,
             )
-            response.raise_for_status()
             returned = response.json()
             if image_sources(str(returned.get("content") or "")) != record["images_before"]:
                 raise RuntimeError(f"live image verification failed for {record['site_key']}:{record['post_id']}")
