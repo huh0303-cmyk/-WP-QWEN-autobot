@@ -123,6 +123,15 @@ def main() -> None:
         fail("newsroom workflow lost single-owner execution or bounded retries")
     if 'AI_TEXT_PROVIDER: "openai"' not in newsroom or 'OPENAI_MODEL: "gpt-5-mini"' not in newsroom:
         fail("newsroom workflow is not routed to GPT-5 mini")
+    if newsroom.count("- cron:") != 20:
+        fail("newsroom workflow must keep exactly 10 daily scheduled slots per newsroom")
+    if 'KO_CATS=("정치" "경제" "국방" "글로벌" "문화" "스포츠")' not in newsroom:
+        fail("KoreaNews365 six-desk round-robin is not locked")
+    if 'EN_CATS=("Politics" "Business" "Military" "World" "Culture" "Art" "Sports")' not in newsroom:
+        fail("The Seoul Journal seven-desk round-robin is not locked")
+    newsroom_source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
+    if "pool = preferred_candidates or candidates" not in newsroom_source:
+        fail("scheduled newsroom desk can no longer fall back to another fresh category")
 
     rankmath = workflow_text.get("daily-rankmath-check.yml", "")
     if "continue-on-error: true" in rankmath:
