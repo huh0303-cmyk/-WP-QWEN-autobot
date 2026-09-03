@@ -206,6 +206,11 @@ Rules:
   is required so code can count it. Use exactly seven tab-separated fields:
   keyword<TAB>category<TAB>noun<TAB>surface<TAB>outlet<TAB>YYYY-MM-DD<TAB>source_url
   Category must be exactly one of: {categories}. source_url must be the actual result URL.
+- CRITICAL: every row for the same noun cluster must repeat the noun field with exactly
+  the same canonical spelling. Do not output a noun seen on only one surface.
+- Example structure (format only, do not reuse its facts):
+  Example noun practical guide<TAB>{example_category}<TAB>Example Noun<TAB>newspaper<TAB>Outlet A<TAB>{today}<TAB>https://example.com/a
+  Example noun practical guide<TAB>{example_category}<TAB>Example Noun<TAB>naver<TAB>Outlet B<TAB>{today}<TAB>https://example.com/b
 - No numbering, no headers, no explanation, no markdown — just the raw lines.
 """
 
@@ -405,8 +410,9 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
         if need <= 0:
             break
         prompt = PROMPT_TMPL.format(
-            today=today_str, domain=target["domain_desc"], count=need + 10,  # 여유분 요청(필터링 손실 대비)
-            categories=categories_str, lang_label=lang_label, avoid_block=avoid_block,
+            today=today_str, domain=target["domain_desc"], count=min(15, need),
+            categories=categories_str, example_category=target["categories"][0],
+            lang_label=lang_label, avoid_block=avoid_block,
         )
         text, grounded = call_search_llm(client, prompt)
         grounded_any = grounded_any or grounded
@@ -481,6 +487,14 @@ def main():
             print(f"  ❌ 리서치 실패({e}) — 이 사이트만 스킵, 기존 파일 유지\n")
             continue
 
+        fresh_count = len(accepted)
+        if fresh_count < 10:
+            print(
+                f"  ❌ 오늘자 교차출처 명사 {fresh_count}개 < 최소 10개 — "
+                "기존 파일 유지(과거 키워드로 성공 위장 금지)"
+            )
+            continue
+
         if len(accepted) < 50:
             # 부족분은 기존 파일에서 코퍼스와 안 겹치는 항목만 살려서 채운다.
             # 항상 정확히 50개를 유지하기 위함(사용자 지시: "50개 항상 유지").
@@ -518,7 +532,10 @@ def main():
             for kw, cat in accepted:
                 f.write(f"{kw}\t{cat}\n")
         tag = "검색 그라운딩" if grounded_any else "모델 지식 폴백"
-        print(f"  ✅ {len(accepted)}개 키워드로 교체 완료 [{tag}]\n")
+        print(
+            f"  ✅ {len(accepted)}개 키워드로 교체 완료 "
+            f"[오늘자 교차출처 명사 {fresh_count}개, {tag}]\n"
+        )
         any_updated = True
 
     if not any_updated:
