@@ -1486,12 +1486,14 @@ def _save_recent_tracks(data):
 
 
 def _bring_longest_to_front(items):
-    """인트로에서 처음 들리는 곡이 가장 임팩트 있게, 재생시간이 긴 곡 중 하나를
-    맨 앞으로 보낸다(파일 크기를 재생시간 근사치로 사용). 예전엔 "가장 긴 파일
-    하나"를 결정적으로 골라서 소스 풀이 그대로면 몇 번을 돌려도 1번 곡이 항상
-    똑같았음(2026-08-16 사용자 지적: "첫곡이 같으면 절대 안되지") — 이제 상위
-    후보(길이 상위 20%, 최소 5개) 중 채널별 최근 사용곡(playlist_recent_tracks.json)을
-    피해서 무작위로 고른다. 나머지는 무작위 순서 유지."""
+    """인트로의 1번·2번 곡이 플리 채널에서 가장 중요하고(썸네일 다음으로),
+    재생시간이 긴 곡 중에서 골라야 임팩트가 있다(파일 크기를 재생시간 근사치로
+    사용). 예전엔 "가장 긴 파일 하나"를 결정적으로 골라서 소스 풀이 그대로면
+    몇 번을 돌려도 1번 곡이 항상 똑같았음(2026-08-16 사용자 지적: "첫곡이 같으면
+    절대 안되지"). 2026-09-03: 2번 곡도 반드시 이전 실행과 달라야 한다는 지적에
+    따라 1번·2번을 각각 독립된 최근-사용 이력(playlist_recent_tracks.json)으로
+    피해서 고른다 — 같은 상위 후보(길이 상위 20%, 최소 5개) 안에서 1번·2번이
+    서로 겹치지 않게 뽑고, 나머지는 무작위 순서 유지."""
     if not items:
         return items
 
@@ -1502,22 +1504,33 @@ def _bring_longest_to_front(items):
             return 0
 
     recent_data = _load_recent_tracks()
-    recent = recent_data.get(CHANNEL_KEY, [])
+    channel_recent = recent_data.get(CHANNEL_KEY, {})
+    if isinstance(channel_recent, list):  # legacy shape: 1번 곡 이력만 있던 예전 파일
+        channel_recent = {"front": channel_recent, "second": []}
+    recent_front = channel_recent.get("front", [])
+    recent_second = channel_recent.get("second", [])
 
     sorted_items = sorted(items, key=_size, reverse=True)
     top_n = max(5, len(sorted_items) // 5)
     candidates = sorted_items[:top_n]
-    fresh_candidates = [t for t in candidates if t.get("name") not in recent] or candidates
 
-    front = random.choice(fresh_candidates)
-    rest = [t for t in items if t is not front]
+    fresh_front_candidates = [t for t in candidates if t.get("name") not in recent_front] or candidates
+    front = random.choice(fresh_front_candidates)
+
+    second_pool = [t for t in candidates if t is not front] or [t for t in items if t is not front]
+    fresh_second_candidates = [t for t in second_pool if t.get("name") not in recent_second] or second_pool
+    second = random.choice(fresh_second_candidates) if fresh_second_candidates else None
+
+    rest = [t for t in items if t is not front and t is not second]
     random.shuffle(rest)
 
-    new_recent = ([front.get("name", "")] + [n for n in recent if n != front.get("name", "")])[:PLAYLIST_RECENT_TRACKS_MEMORY]
-    recent_data[CHANNEL_KEY] = new_recent
+    new_front = ([front.get("name", "")] + [n for n in recent_front if n != front.get("name", "")])[:PLAYLIST_RECENT_TRACKS_MEMORY]
+    new_second = ([second.get("name", "")] + [n for n in recent_second if n != second.get("name", "")])[:PLAYLIST_RECENT_TRACKS_MEMORY] if second else recent_second
+    recent_data[CHANNEL_KEY] = {"front": new_front, "second": new_second}
     _save_recent_tracks(recent_data)
 
-    return [front] + rest
+    ordered = [front] + ([second] if second else []) + rest
+    return ordered
 
 
 def filter_tracks_by_language(tracks, keyword):
