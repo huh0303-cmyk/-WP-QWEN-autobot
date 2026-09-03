@@ -2090,15 +2090,16 @@ def extract_meta_and_faq(text):
         out.append(line)
     title=title.strip('"').strip("'").strip("*").strip()
     if not title or len(title)<8:
+        # 2026-09-03: 예전엔 여기서 "본문 첫 줄"을 그대로 제목으로 썼는데, 이 사이트
+        # 프로필들이 구조(structure) 아웃라인의 첫 섹션 제목으로 본문을 시작하다 보니
+        # "Who the route fits"·"Market question" 같은 아웃라인 라벨이 그대로 발행 제목이
+        # 되어버렸다(ki-korea.com 등, CEO가 발행된 글에서 직접 발견). 진짜 <h1>이
+        # 있으면만 쓰고, 그마저 없으면 빈 제목으로 남겨 호출부가 재작성을 시키게 한다.
         body="\n".join(out)
         m=re.search(r'<h1[^>]*>(.*?)</h1>',body,re.DOTALL|re.IGNORECASE)
         if m:
             ext=re.sub(r'<[^>]+>','',m.group(1)).strip()
             if len(ext)>=8: title=ext
-        if not title:
-            for ol in out:
-                pl=re.sub(r'<[^>]+>','',ol).strip()
-                if len(pl)>=10: title=pl[:120]; break
     return "\n".join(out).strip(), title, meta, faq
 
 # ============================================================
@@ -3338,9 +3339,14 @@ def process_one(site, keyword):
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
 
+        # A missing or too-short title can never win best_result, even with a
+        # high SEO score elsewhere — this is what let outline-heading leftovers
+        # ("Who the route fits") reach WordPress as the real post title before.
+        if not title or len(title) < 15:
+            print(f"  ⚠️ 제목 추출 실패/미달({title!r}) — 이번 회차는 채택하지 않음")
         # NEWSROOM EXCEPTION: KoreaNews365 and The Seoul Journal are never
         # selected or rejected by article length. Prefer the strongest factual/SEO draft.
-        if pre > best_score:
+        elif pre > best_score:
             best_score=pre; best_result=(body,title,meta,faq,tags)
 
         if pre>=quality_target:
@@ -3362,11 +3368,18 @@ def process_one(site, keyword):
                 if not re.search(r'<table[\s>]',body,re.IGNORECASE): issues.append("<table> 1개 이상")
                 if len(re.findall(r'<h2[\s>]',body,re.IGNORECASE))<4: issues.append("h2 4개 이상")
             if len(meta)<100: issues.append(f"META_DESC {len(meta)}자→130자 이상")
+            if not title or len(title) < 15:
+                issues.append("응답 맨 위에 'TITLE: <완전한 제목>' 줄이 반드시 있어야 함 — 섹션 제목이 아닌 실제 기사 제목")
             suffix=f"\n\n[SEO {pre}점 미달 보완]\n"+"".join(f"{i+1}. {x}\n" for i,x in enumerate(issues))
             suffix+="\n위 항목 모두 충족하여 처음부터 다시 작성."
             prompt=base_prompt+suffix
             print(f"  🔄 재생성 ({attempt+2}회차)")
             time.sleep(5)
+
+    if best_result is None:
+        print(f"  ❌ {MAX_REGEN+1}회 시도 모두 제목 추출 실패 — 발행 차단")
+        log(url,theme,keyword,"","",0,0,"❌ 제목 추출 실패","no valid title after all attempts")
+        return False
 
     body,title,meta,faq,tags=best_result
     newsroom_len=newsroom_char_count(body)
