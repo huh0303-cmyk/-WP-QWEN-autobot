@@ -47,12 +47,16 @@ jobs:
           WP_POST_STATUS: ${{ inputs.publication_approved && 'publish' || 'draft' }}
           WP_PUBLICATION_APPROVED: ${{ inputs.publication_approved && 'true' || 'false' }}
           AUTOMATION_HUB_SOURCE: "sheets"
-          NEWSROOM_REQUIRE_PUBLICATION: "false"
+          # Despite the legacy name, this makes every single-site run fail when
+          # zero posts were actually published. Orchestrators must never treat a
+          # generated-but-blocked article as a successful publication.
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           FORCE_SOURCE_IPV4: "true"
           FORCE_KEYWORD: ${{ inputs.force_keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
+          MAX_REGEN: "2"
           # Network default: GPT-5 mini writes; Gemini performs independent review.
           AI_TEXT_PROVIDER: "openai"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -102,7 +106,19 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log
+          published=false
+          for attempt in 1 2 3; do
+            echo "Publication attempt ${attempt}/3"
+            if python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log; then
+              published=true
+              break
+            fi
+            sleep $((attempt * 15))
+          done
+          if [ "$published" != "true" ]; then
+            echo "::error title=WordPress publication failed::No verified public post after 3 attempts"
+            exit 1
+          fi
       - name: Normalize room result
         if: always()
         env:
