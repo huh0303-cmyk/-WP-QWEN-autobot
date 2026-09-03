@@ -12,7 +12,7 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "artifacts" / "four-wordpress-review-repair.json"
-USER = os.environ.get("WP_USER", "huh0303@gmail.com").strip()
+USER = os.environ.get("WP_USER", "").strip() or "huh0303@gmail.com"
 
 TARGETS = [
     {
