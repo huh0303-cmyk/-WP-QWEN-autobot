@@ -44,12 +44,13 @@
         </div>
     </header>
     <nav class="sticky top-[61px] z-20 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
-        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-6">
+        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-7">
             <a href="#review-queue" class="rounded-lg bg-amber-50 px-2 py-2 text-center text-[10px] font-black text-amber-800 sm:text-xs">검토·발행대기</a>
             <a href="#wordpress" class="rounded-lg bg-blue-50 px-2 py-2 text-center text-[10px] font-black text-blue-700 sm:text-xs">WP 27</a>
             <a href="#blogspot" class="rounded-lg bg-violet-50 px-2 py-2 text-center text-[10px] font-black text-violet-700 sm:text-xs">Blogspot 33</a>
             <a href="#tistory" class="rounded-lg bg-teal-50 px-2 py-2 text-center text-[10px] font-black text-teal-700 sm:text-xs">Tistory 5</a>
             <a href="#youtube" class="rounded-lg bg-red-50 px-2 py-2 text-center text-[10px] font-black text-red-700 sm:text-xs">YouTube 10</a>
+            <a href="#sns" class="rounded-lg bg-fuchsia-50 px-2 py-2 text-center text-[10px] font-black text-fuchsia-700 sm:text-xs">SNS 핵심수치</a>
             <a href="#google-sheet" class="rounded-lg bg-emerald-50 px-2 py-2 text-center text-[10px] font-black text-emerald-700 sm:text-xs">Google Sheet</a>
         </div>
     </nav>
@@ -492,6 +493,22 @@
                         <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-red-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-red-800 active:scale-[.98]">이 채널 비공개 업로드 시작</button>
                     </form>
                     <a href="{{ channel.admin_review_url }}" target="_blank" rel="noopener" class="flex h-11 w-full items-center justify-center rounded-xl border-2 border-red-200 bg-white px-4 text-xs font-black text-red-800 hover:bg-red-50">YouTube Studio에서 검토·공개 →</a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="sns" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
+            <div><p class="text-xs font-bold text-fuchsia-600">SOCIAL MEDIA DAILY SCOREBOARD</p><h2 class="mt-1 text-2xl font-extrabold text-slate-900 sm:text-3xl">SNS 핵심 수치</h2><p class="mt-2 text-sm text-slate-600">현재값 (전일 대비) · 미제공 값은 0으로 오인하지 않도록 미집계로 표시합니다.</p></div>
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for account in sns_accounts %}
+                <article class="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+                    <div class="flex items-start justify-between gap-3"><div><p class="text-xs font-black text-fuchsia-700">{{ account.platform }} · {{ account.brand }}</p><h3 class="mt-1 font-extrabold text-slate-950">{{ '@' + account.handle if account.handle else '계정 연결 필요' }}</h3></div>{% if account.url %}<a href="{{ account.url }}" target="_blank" rel="noopener" class="text-xs font-black text-fuchsia-700">계정 열기 →</a>{% endif %}</div>
+                    <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+                        {% for label, key in [('팔로워 수','followers'),('좋아요·반응','likes'),('콘텐츠 수','content'),('시청시간 합계','watch_time')] %}
+                        <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold text-slate-500">{{ label }} (증감)</p><p class="mt-1 text-lg font-black text-slate-950">{% set value = account[key] %}{% set delta = account[key + '_delta'] %}{{ '{:,}'.format(value) if value is not none else '미집계' }} <span class="text-xs {% if delta is not none and delta > 0 %}text-emerald-600{% elif delta is not none and delta < 0 %}text-red-600{% else %}text-slate-400{% endif %}">{% if delta is none %}(증감 미집계){% elif delta >= 0 %}(+{{ '{:,}'.format(delta) }}){% else %}({{ '{:,}'.format(delta) }}){% endif %}</span></p></div>
+                        {% endfor %}
+                    </div>
+                    {% if account.error %}<p class="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-[10px] font-bold text-amber-800">권한/연결 확인 필요: {{ account.error }}</p>{% endif %}
                 </article>
                 {% endfor %}
             </div>

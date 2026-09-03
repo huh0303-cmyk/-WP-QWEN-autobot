@@ -1217,6 +1217,7 @@ def main():
                   f"[원포인트레슨] {one_point_lesson}"[:80])
     send_kakao(kakao_text, sheet_link or "https://github.com/huh0303-cmyk/-WP-QWEN-autobot")
 
+    history["previous"] = history.get("latest", {})
     history["latest"] = today
     history["updated_at"] = checked_at
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:

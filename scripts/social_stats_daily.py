@@ -189,7 +189,13 @@ def get_tiktok_followers_multi():
             if not m:
                 results[brand] = {"count": None, "username": username, "error": "followerCount 파싱 실패(계정 없음/구조변경)"}
                 continue
-            results[brand] = {"count": int(m.group(1)), "username": username, "error": None}
+            likes = re.search(r'"heartCount":(\d+)', r.text)
+            videos = re.search(r'"videoCount":(\d+)', r.text)
+            results[brand] = {
+                "count": int(m.group(1)), "likes": int(likes.group(1)) if likes else None,
+                "content_count": int(videos.group(1)) if videos else None,
+                "watch_time": None, "username": username, "error": None,
+            }
         except Exception as e:
             results[brand] = {"count": None, "username": username, "error": str(e)[:200]}
     return results
@@ -209,14 +215,19 @@ def get_facebook_followers_multi():
         try:
             r = requests.get(
                 f"https://graph.facebook.com/v21.0/{page_id}",
-                params={"fields": "followers_count,fan_count", "access_token": token},
+                params={"fields": "followers_count,fan_count,published_posts.limit(0).summary(true)", "access_token": token},
                 timeout=15,
             )
             data = r.json()
             if "error" in data:
                 results[brand] = {"count": None, "page_id": page_id, "error": data["error"].get("message", "알 수 없는 오류")[:200]}
                 continue
-            results[brand] = {"count": data.get("followers_count", data.get("fan_count")), "page_id": page_id, "error": None}
+            results[brand] = {
+                "count": data.get("followers_count", data.get("fan_count")),
+                "likes": data.get("fan_count"),
+                "content_count": (data.get("published_posts", {}).get("summary", {}) or {}).get("total_count"),
+                "watch_time": None, "page_id": page_id, "error": None,
+            }
         except Exception as e:
             results[brand] = {"count": None, "page_id": page_id, "error": str(e)[:200]}
     return results
@@ -236,14 +247,16 @@ def get_instagram_followers_multi():
         try:
             r = requests.get(
                 f"https://graph.facebook.com/v21.0/{ig_user_id}",
-                params={"fields": "followers_count", "access_token": token},
+                params={"fields": "followers_count,media_count", "access_token": token},
                 timeout=15,
             )
             data = r.json()
             if "error" in data:
                 results[brand] = {"count": None, "user_id": ig_user_id, "error": data["error"].get("message", "알 수 없는 오류")[:200]}
                 continue
-            results[brand] = {"count": data.get("followers_count"), "user_id": ig_user_id, "error": None}
+            results[brand] = {"count": data.get("followers_count"), "likes": None,
+                              "content_count": data.get("media_count"), "watch_time": None,
+                              "user_id": ig_user_id, "error": None}
         except Exception as e:
             results[brand] = {"count": None, "user_id": ig_user_id, "error": str(e)[:200]}
     return results
@@ -272,7 +285,13 @@ def get_threads_followers_multi():
                 continue
             values = data.get("data", [])
             if values and values[0].get("total_value"):
-                results[brand] = {"count": values[0]["total_value"].get("value"), "user_id": user_id, "error": None}
+                posts = requests.get(
+                    f"https://graph.threads.net/v1.0/{user_id}/threads",
+                    params={"fields": "id", "limit": 1, "access_token": token}, timeout=15,
+                ).json()
+                results[brand] = {"count": values[0]["total_value"].get("value"), "likes": None,
+                                  "content_count": (posts.get("paging", {}).get("summary", {}) or {}).get("total_count"),
+                                  "watch_time": None, "user_id": user_id, "error": None}
             else:
                 results[brand] = {"count": None, "user_id": user_id, "error": "followers_count 값 없음"}
         except Exception as e:

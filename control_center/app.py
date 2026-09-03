@@ -791,6 +791,44 @@ def get_youtube_data() -> list[dict[str, object]]:
     return sorted(rows, key=lambda row: (row["group"] != "PLAYLIST", row["name"].casefold()))
 
 
+def get_sns_data() -> list[dict[str, object]]:
+    """Return the four CEO metrics for every configured SNS account."""
+    history_path = Path(__file__).resolve().parents[1] / "situation_room_history.json"
+    try:
+        history = json.loads(history_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        history = {}
+    latest, previous = history.get("latest", {}), history.get("previous", {})
+    handles = {
+        "tiktok": {"TOPIK": "sis_topik"},
+        "instagram": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
+        "threads": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
+        "facebook": {"TOPIK": "61588777439380", "ENGLISH": "61592457107609", "LANGUAGE": "61593057083167"},
+    }
+    labels = {"tiktok": "TikTok", "instagram": "Instagram", "threads": "Threads", "facebook": "Facebook 페이지"}
+    metric_keys = (("followers", "count"), ("likes", "likes"), ("content", "content_count"), ("watch_time", "watch_time"))
+    rows = []
+    for platform in ("tiktok", "instagram", "facebook", "threads"):
+        current_platform = latest.get(platform, {}) if isinstance(latest.get(platform, {}), dict) else {}
+        previous_platform = previous.get(platform, {}) if isinstance(previous.get(platform, {}), dict) else {}
+        for brand in ("TOPIK", "ENGLISH", "LANGUAGE"):
+            current = current_platform.get(brand, {}) if isinstance(current_platform.get(brand, {}), dict) else {}
+            old = previous_platform.get(brand, {}) if isinstance(previous_platform.get(brand, {}), dict) else {}
+            metrics = {}
+            for display_key, source_key in metric_keys:
+                value, old_value = current.get(source_key), old.get(source_key)
+                metrics[display_key] = value
+                metrics[display_key + "_delta"] = value - old_value if isinstance(value, (int, float)) and isinstance(old_value, (int, float)) else None
+            handle = handles.get(platform, {}).get(brand, "")
+            if platform == "tiktok": url = f"https://www.tiktok.com/@{handle}" if handle else ""
+            elif platform == "instagram": url = f"https://www.instagram.com/{handle}/" if handle else ""
+            elif platform == "threads": url = f"https://www.threads.net/@{handle}" if handle else ""
+            else: url = f"https://www.facebook.com/{handle}" if handle else ""
+            rows.append({"platform": labels[platform], "platform_key": platform, "brand": brand,
+                         "handle": handle, "url": url, "error": current.get("error"), **metrics})
+    return rows
+
+
 def _queue_draft_trigger(payload: dict[str, object]) -> str:
     """Persist a draft-only request for the worker; never publish from the UI."""
     trigger_id = f"draft-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
@@ -1011,7 +1049,7 @@ def index():
         site["keyword_suggestions"] = weekly_suggestions(site["domain"])
     return render_template(
         "index.html", sites=sites, bloggers=get_blogger_data(), tistory_sites=get_tistory_data(),
-        youtube_channels=get_youtube_data(),
+        youtube_channels=get_youtube_data(), sns_accounts=get_sns_data(),
         review_items=get_review_queue(),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
     )
