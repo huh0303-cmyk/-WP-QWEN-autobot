@@ -63,6 +63,13 @@ def test_registry_has_exactly_27_wordpress_sites():
     assert len({site.site_id for site in sites}) == 27
 
 
+def test_visitor_deploy_uses_current_wordpress_secret_names():
+    workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows" / "deploy-visitor-api.yml").read_text(encoding="utf-8")
+    from scripts.site_registry import ACTIVE_SITES
+    for _, secret_name, _ in ACTIVE_SITES:
+        assert f"{secret_name}: ${{{{ secrets.{secret_name} }}}}" in workflow
+
+
 def test_pwa_has_ten_youtube_rooms_in_two_groups():
     channels = get_youtube_data()
     assert len(channels) == 10
