@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from openai_text import openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
+from repair_blogger_images import stabilize_html_images
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
 
@@ -86,6 +87,12 @@ def main() -> int:
                 RESULT.write_text(json.dumps({"run_key": run_key, "updated_at": datetime.now(timezone.utc).isoformat(), "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
                 continue
             title, body, labels = generate(site)
+            body, image_evidence = stabilize_html_images(
+                body, repo=os.environ["GITHUB_REPOSITORY"], gh_token=os.environ["GH_ASSET_TOKEN"],
+                blog_id=site["id"], asset_key=f"new-{run_key}-{site['key']}",
+            )
+            if any(item["status"] != "stable" and not item.get("stable_src") for item in image_evidence):
+                raise RuntimeError("permanent image hard gate failed")
             body = f"<!-- {marker} -->\n{body}"
             response = requests.post(endpoint, params={"isDraft": "false"}, headers=headers,
                                      json={"kind": "blogger#post", "title": title, "content": body, "labels": labels}, timeout=30)

@@ -9,7 +9,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: blogger-33-public-publisher
@@ -29,6 +29,8 @@ jobs:
       - name: Publish 33 in guarded sequence
         env:
           PUBLIC_RUN_KEY: ${{ inputs.run_key }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_ASSET_TOKEN: ${{ github.token }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
