@@ -13,6 +13,7 @@ and public_allowed=false; a human (or a later approved workflow) posts it.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import re
@@ -47,6 +48,7 @@ WRITER_SYSTEM_PROMPT = (
     "The image_prompt is equally important and must visualize the title's specific human situation, emotion and practical benefit as the first image. "
     "The image_prompt must request a scene with no visible letters, words, numbers, documents, forms, screens, signs, labels, logos, watermarks, pseudo-text, fake Hangul, or fake Chinese/Japanese characters. "
     "Return strict JSON: {\"title\": str, \"category\": str, \"meta_description\": str, \"image_prompt\": str, \"body_html\": str}. "
+    "meta_description must be a natural 70-150 character Korean search description. "
     "body_html must be simple HTML (h2/h3/p/ul/li only, no inline styles, no scripts). "
     "Every paragraph must contain no more than two short sentences. Never place bullet symbols "
     "inside a paragraph; convert enumerations into a real ul/li list. Break long explanations "
@@ -116,6 +118,9 @@ def structural_check(draft: dict) -> list[str]:
     plain = re.sub(r"\s+", "", plain)
     if not title:
         issues.append("title is empty")
+    description = " ".join(str(draft.get("meta_description", "")).split())
+    if not 70 <= len(description) <= 150:
+        issues.append("meta description must be 70-150 characters")
     if title_cliches(title):
         issues.append("TITLE_QUALITY_FAIL: mass-produced AI title formula is forbidden")
     if len(plain) < MIN_BODY_CHARS:
@@ -222,6 +227,7 @@ def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
         "body_html": parsed.get("body_html", ""),
         "meta_description": parsed.get("meta_description", ""),
         "image_prompt": parsed.get("image_prompt", "") or parsed.get("title", ""),
+        "source_keyword": job["seed_topic"],
         "engine": "gpt-rewrite",
     }
     score, issues = quality_score(rewritten, job)
@@ -295,6 +301,8 @@ def generate_draft(job: dict) -> dict:
     draft["first_image_priority"] = bool(draft["image_url"])
     draft["image_policy"] = "sdxl_lightning_then_flux_schnell_then_pass_without_image"
     draft["image_status"] = "generated" if draft["image_url"] else "pass_no_image"
+    if draft["image_url"]:
+        draft["body_html"] = f'<p><img src="{html.escape(str(draft["image_url"]), quote=True)}" alt="{html.escape(draft["image_alt"], quote=True)}"></p>' + draft["body_html"]
     return draft
 
 

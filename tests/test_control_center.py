@@ -130,6 +130,9 @@ def test_review_queue_is_visible_directly_in_control_room():
     assert "승인대기 글 목록" in template
     assert "review_items" in template
     assert "글 검토·승인 →" in template
+    review_template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "tistory_review.html").read_text(encoding="utf-8")
+    assert "비공개 검토 대기" in review_template
+    assert "검색 설명" in review_template
 
 
 def test_control_room_displays_full_blogger_33_portfolio():

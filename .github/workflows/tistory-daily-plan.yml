@@ -7,6 +7,10 @@ on:
         description: "Comma-separated site IDs; blank runs all five"
         required: false
         default: ""
+      run_key:
+        description: "Unique review-bundle key; blank uses the KST date"
+        required: false
+        default: ""
   schedule:
     - cron: "11 21 * * *"
 
@@ -31,6 +35,7 @@ jobs:
       - name: Build one-post-per-site safe plan
         env:
           SITE_IDS: ${{ inputs.site_ids }}
+          TISTORY_RUN_KEY: ${{ inputs.run_key }}
         run: |
           python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
           if [ -n "$SITE_IDS" ]; then
@@ -55,6 +60,8 @@ jobs:
           assert p['portfolio_sites'] == 5
           assert len(p['jobs']) == p['enabled_sites']
           assert len(p['jobs']) <= 5
+          assert len({j['site_id'] for j in p['jobs']}) == len(p['jobs'])
+          assert len({j['job_id'] for j in p['jobs']}) == len(p['jobs'])
           assert all(j['publish_policy']=='awaiting_approval' for j in p['jobs'])
           assert all(j['duplicate_guard'] is True for j in p['jobs'])
           print('TISTORY PLAN SAFETY PASS')
@@ -74,9 +81,13 @@ jobs:
           import json
           d=json.load(open('artifacts/tistory-daily-drafts.json', encoding='utf-8'))
           assert d['public_allowed'] is False
+          assert len(d['drafts']) > 0
           for draft in d['drafts']:
               assert draft['public_allowed'] is False
+              assert draft['status'] == 'DRAFT_READY'
               assert draft.get('publish_policy') in (None, 'awaiting_approval')
+              assert draft.get('title') and draft.get('body_html') and draft.get('meta_description')
+              assert draft.get('category') and draft.get('image_url')
           print('TISTORY DRAFT SAFETY PASS')
           PY
       - name: Queue private drafts in Google Sheets for the local registrar

@@ -5,6 +5,8 @@ import argparse
 import hashlib
 import json
 import random
+import os
+import re
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -65,6 +67,9 @@ def build_plan(now: datetime | None = None) -> dict:
     now = now or datetime.now(KST)
     cfg = load_config()
     day = now.date().isoformat()
+    run_key = os.environ.get("TISTORY_RUN_KEY", "").strip() or day
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", run_key):
+        raise ValueError("TISTORY_RUN_KEY must contain only letters, numbers, dot, underscore or hyphen")
     jobs = []
     enabled_sites = sorted(
         (site for site in cfg["sites"] if site.get("launch_enabled") is True),
@@ -73,7 +78,7 @@ def build_plan(now: datetime | None = None) -> dict:
     for site in enabled_sites:
         seed_topic, keyword_score, keyword_breakdown = _pick_seed_topic(site, day)
         jobs.append({
-            "job_id": f"{site['site_id']}:{day}",
+            "job_id": f"{site['site_id']}:{run_key}",
             "site_id": site["site_id"],
             "title": site["title"],
             "language": site["language"],
@@ -100,6 +105,7 @@ def build_plan(now: datetime | None = None) -> dict:
     return {
         "generated_at": now.isoformat(),
         "date": day,
+        "run_key": run_key,
         "timezone": "Asia/Seoul",
         "daily_posts_per_site": 1,
         "portfolio_sites": len(cfg["sites"]),

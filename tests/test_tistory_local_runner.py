@@ -50,7 +50,7 @@ def test_interrupted_running_job_is_recovered_on_restart(tmp_path):
 
 def test_only_private_ready_artifacts_enter_sheet_queue():
     payload = {"drafts": [
-        {"job_id": "ok", "site_id": "tistory_health_info", "status": "DRAFT_READY", "public_allowed": False, "title": "제목", "body_html": "<p>본문</p>", "category": "건강검진", "meta_description": "설명"},
+        {"job_id": "ok", "site_id": "tistory_health_info", "status": "DRAFT_READY", "public_allowed": False, "title": "제목", "body_html": "<p>본문</p>", "category": "건강검진", "meta_description": "설명", "source_keyword": "검진 준비"},
         {"job_id": "bad", "site_id": "tistory_health_info", "status": "CONSENSUS_FAILED", "public_allowed": False},
     ]}
     rows = enqueue_tistory_drafts.rows_from_artifact(payload)
@@ -59,3 +59,5 @@ def test_only_private_ready_artifacts_enter_sheet_queue():
     queued = dict(zip(header, rows[0]))
     assert queued["visibility"] == "private"
     assert queued["publish_now"] == "FALSE"
+    assert queued["source_keyword"] == "검진 준비"
+    assert queued["public_url"] == "https://control.korea365.org/review/tistory/ok"

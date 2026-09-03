@@ -12,7 +12,7 @@ BODY = (
     "<ul><li>확인 항목</li></ul><h2>상담 전 질문</h2>"
     + "".join(f"<p>충분한 새 설명 {index}입니다. 확인 순서를 짧게 안내합니다.</p>" for index in range(35))
 )
-VALID = json.dumps({"title": "상담실에서 당황하지 않게, 임플란트 비용이 달라지는 순간", "category": "임플란트", "meta_description": "임플란트 상담 전 비용 차이를 만드는 항목을 차분히 확인합니다.", "image_prompt": "치과 상담실에서 견적서를 살펴보는 사람의 안도감", "body_html": BODY})
+VALID = json.dumps({"title": "상담실에서 당황하지 않게, 임플란트 비용이 달라지는 순간", "category": "임플란트", "meta_description": "임플란트 상담 전에 비용 차이를 만드는 재료와 치료 범위, 추가 진료 항목을 차분히 확인하고 병원에서 물어볼 질문과 비교 순서를 실제 상담 흐름에 맞춰 정리합니다.", "image_prompt": "치과 상담실에서 견적서를 살펴보는 사람의 안도감", "body_html": BODY})
 AUDIT_OK = json.dumps({"ok": True, "issues": []})
 
 

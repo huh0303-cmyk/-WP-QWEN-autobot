@@ -26,7 +26,7 @@ from urllib.parse import unquote
 
 import requests
 
-REVIEW_QUEUE_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%9E%90%EB%8F%99%ED%99%94_%EB%B0%9C%ED%96%89%EB%8C%80%EA%B8%B0&range=A1:N200"
+REVIEW_QUEUE_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%9E%90%EB%8F%99%ED%99%94_%EB%B0%9C%ED%96%89%EB%8C%80%EA%B8%B0&range=A1:Q500"
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secrets.token_hex(32)
@@ -64,7 +64,7 @@ def get_review_queue() -> list[dict[str, str]]:
         review_url = row[9].strip()
         if not job_id.strip() or not title.strip() or not review_url.startswith("http"):
             continue
-        platform = "Blogspot" if "blogger" in job_id.lower() or "blogger" in site_id.lower() else "WordPress"
+        platform = "Tistory" if site_id.lower().startswith("tistory_") else "Blogspot" if "blogger" in job_id.lower() or "blogger" in site_id.lower() else "WordPress"
         items.append({
             "created_at": created_at.replace("T", " ")[:16],
             "job_id": job_id,
@@ -75,6 +75,27 @@ def get_review_queue() -> list[dict[str, str]]:
             "status": "검토대기" if publish_now.strip().upper() != "TRUE" else status,
         })
     return list(reversed(items[-50:]))
+
+
+@app.get("/review/tistory/<path:job_id>")
+def review_tistory_draft(job_id: str):
+    """Render one queued Tistory draft; this endpoint never changes approval state."""
+    try:
+        response = requests.get(REVIEW_QUEUE_CSV, timeout=12)
+        response.raise_for_status()
+        rows = list(csv.reader(io.StringIO(response.text)))
+    except (requests.RequestException, csv.Error):
+        return Response("검토 대기열을 읽을 수 없습니다.", status=503)
+    for row in rows[1:]:
+        row += [""] * (17 - len(row))
+        if row[1] != job_id or not row[2].startswith("tistory_"):
+            continue
+        body = row[6]
+        body = re.sub(r"(?is)<(?:script|style|iframe|object|embed)[^>]*>.*?</(?:script|style|iframe|object|embed)>", "", body)
+        body = re.sub(r"(?i)\s+on\w+\s*=\s*(['\"]).*?\1", "", body)
+        body = re.sub(r"(?i)(href|src)\s*=\s*(['\"])\s*javascript:.*?\2", r'\1="#"', body)
+        return render_template("tistory_review.html", job_id=job_id, site_id=row[2], title=row[5], body_html=body, category=row[14], description=row[15], visibility=row[16])
+    return Response("해당 Tistory 검토본을 찾을 수 없습니다.", status=404)
 
 
 @app.before_request

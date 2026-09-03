@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ title }}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:820px;margin:auto;padding:24px;line-height:1.75;color:#172033}img{max-width:100%;height:auto;border-radius:16px}.meta{background:#ecfeff;padding:16px;border-radius:14px;margin:18px 0}.lock{color:#b45309;font-weight:800}</style></head>
+<body><p class="lock">비공개 검토 대기 · 이 화면에서는 공개되지 않습니다</p><h1>{{ title }}</h1>
+<div class="meta"><b>채널</b> {{ site_id }} · <b>카테고리</b> {{ category }} · <b>상태</b> {{ visibility }}<br><b>검색 설명</b> {{ description }}</div>
+<article>{{ body_html|safe }}</article><p><a href="/#review-queue">통제실 검토 대기열로 돌아가기</a></p></body></html>

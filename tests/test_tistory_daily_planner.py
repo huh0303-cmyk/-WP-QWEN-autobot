@@ -23,6 +23,14 @@ def test_daily_plan_includes_all_five_launched_sites():
     assert all(j["public_allowed"] is False for j in plan["jobs"])
 
 
+def test_explicit_run_key_creates_a_unique_five_item_bundle(monkeypatch):
+    monkeypatch.setenv("TISTORY_RUN_KEY", "manual-20260903-1")
+    plan = build_plan(datetime(2026, 9, 3, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+    assert plan["run_key"] == "manual-20260903-1"
+    assert len({job["job_id"] for job in plan["jobs"]}) == 5
+    assert all(job["job_id"].endswith(":manual-20260903-1") for job in plan["jobs"])
+
+
 def test_life365_has_no_stale_petcare_label():
     cfg = load_config()
     site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_life365")
