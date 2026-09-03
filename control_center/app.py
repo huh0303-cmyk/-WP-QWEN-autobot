@@ -1153,9 +1153,12 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
 
 @app.route("/")
 def index():
+    # 2026-09-03: WP cards no longer show a manual keyword-entry form (WP
+    # auto-publishes from its own keyword pool once the GPT gate approves),
+    # so per-site keyword_suggestions is no longer rendered — drop the
+    # per-site weekly_suggestions() computation instead of paying for 27
+    # unused API calls on every page load.
     sites = get_site_data()
-    for site in sites:
-        site["keyword_suggestions"] = weekly_suggestions(site["domain"])
     bloggers = get_blogger_data()
     tistory_sites = get_tistory_data()
     youtube_channels = get_youtube_data()

@@ -33,7 +33,7 @@
     </header>
     <nav class="sticky top-[61px] z-20 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
         <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-7">
-            <a href="#review-queue" class="rounded-lg bg-amber-50 px-2 py-2 text-center text-[10px] font-black text-amber-800 sm:text-xs">검토·발행대기</a>
+            <a href="#review-queue" class="rounded-lg bg-amber-50 px-2 py-2 text-center text-[10px] font-black text-amber-800 sm:text-xs">최근 글 현황</a>
             <a href="#sns" class="rounded-lg bg-fuchsia-50 px-2 py-2 text-center text-[10px] font-black text-fuchsia-700 sm:text-xs">SNS 핵심수치</a>
             <a href="#wordpress" class="rounded-lg bg-blue-50 px-2 py-2 text-center text-[10px] font-black text-blue-700 sm:text-xs">WP 27</a>
             <a href="#blogspot" class="rounded-lg bg-violet-50 px-2 py-2 text-center text-[10px] font-black text-violet-700 sm:text-xs">Blogspot {{ bloggers|length }}</a>
@@ -95,46 +95,33 @@
             {% endif %}
         </section>
         <section id="review-queue" class="scroll-mt-24 rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm sm:p-7">
-            <p class="text-xs font-black text-amber-700">REVIEW &amp; FINAL PUBLISH</p>
-            <h2 class="mt-1 text-2xl font-extrabold text-slate-950">검토·발행대기</h2>
-            <p class="mt-2 text-sm leading-relaxed text-slate-700">생성 버튼을 누른 작업은 CEO종합상황실 시트에 기록됩니다. 준비가 끝난 글은 아래 관리자 화면에서 본문·제목·이미지를 검토한 뒤, 각 플랫폼의 <strong>공개/게시 버튼</strong>을 직접 눌러 최종 발행합니다. 이 통제실은 공개 버튼을 대신 누르지 않습니다.</p>
+            <p class="text-xs font-black text-amber-700">RECENT ACTIVITY</p>
+            <h2 class="mt-1 text-2xl font-extrabold text-slate-950">최근 글 현황</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-700">WordPress는 GPT 2중 심사를 통과하면 자동으로 공개됩니다 — 여기는 확인용 기록이며, 이상하면 글을 눌러 직접 비공개로 되돌리세요. Blogspot·Tistory는 아직 비공개 초안이라 각 플랫폼에서 직접 검토·공개해야 합니다.</p>
             <div class="mt-4 overflow-hidden rounded-2xl border border-amber-300 bg-white shadow-sm">
                 <div class="flex items-center justify-between bg-amber-100 px-4 py-3">
-                    <h3 class="font-black text-amber-950">승인대기 글 목록</h3>
+                    <h3 class="font-black text-amber-950">최근 글 목록</h3>
                     <span class="rounded-full bg-amber-700 px-2.5 py-1 text-xs font-black text-white">{{ review_items|length }}건</span>
                 </div>
                 {% if review_items %}
                 <div class="divide-y divide-slate-100">
-                    {% for item in review_items %}
-                    <article class="grid gap-2 px-4 py-3 sm:grid-cols-[110px_1fr_auto] sm:items-center">
+                    {% for item in review_items[:25] %}
+                    <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="grid gap-2 px-4 py-3 hover:bg-amber-50/60 sm:grid-cols-[110px_1fr_auto] sm:items-center">
                         <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black text-amber-700">{{ item.platform }}</span>{{ item.created_at }}</div>
                         <div class="min-w-0"><p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p><p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p></div>
-                        <div class="flex items-center gap-2">
-                            <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-600 px-4 text-xs font-black text-white hover:bg-amber-700">글 검토 →</a>
-                            {% if item.platform == "WordPress" %}
-                            <form method="post" action="{{ url_for('trigger_publish_now') }}" onsubmit="return confirm('{{ item.site_id }}: 이 글을 지금 바로 공개로 발행할까요?');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                                <input type="hidden" name="domain" value="{{ item.site_id }}">
-                                <input type="hidden" name="review_url" value="{{ item.review_url }}">
-                                <button type="submit" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-emerald-600 px-4 text-xs font-black text-white hover:bg-emerald-700">지금 발행</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </article>
+                        <span class="inline-flex min-h-10 items-center justify-center rounded-xl {% if item.platform == 'WordPress' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-600 text-white{% endif %} px-4 text-xs font-black">{% if item.platform == 'WordPress' %}공개됨 →{% else %}검토 →{% endif %}</span>
+                    </a>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="px-4 py-6 text-center text-sm font-bold text-slate-500">현재 검토 가능한 초안이 없습니다.</p>
+                <p class="px-4 py-6 text-center text-sm font-bold text-slate-500">오늘 기록된 글이 아직 없습니다.</p>
                 {% endif %}
             </div>
-            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                <a href="https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/edit#gid=1360859005" target="_blank" rel="noopener" class="rounded-2xl bg-emerald-700 px-4 py-4 text-center text-sm font-black text-white">① 발행대기 시트 확인</a>
-                <a href="https://k-health365.com/wp-admin/edit.php?post_status=draft&post_type=post" target="_blank" rel="noopener" class="rounded-2xl bg-blue-700 px-4 py-4 text-center text-sm font-black text-white">② WordPress 초안</a>
-                <a href="https://www.blogger.com/" target="_blank" rel="noopener" class="rounded-2xl bg-violet-700 px-4 py-4 text-center text-sm font-black text-white">② Blogspot 초안</a>
-                <a href="https://www.tistory.com/auth/login" target="_blank" rel="noopener" class="rounded-2xl bg-teal-700 px-4 py-4 text-center text-sm font-black text-white">② Tistory 관리자</a>
-                <a href="https://studio.youtube.com/" target="_blank" rel="noopener" class="rounded-2xl bg-red-700 px-4 py-4 text-center text-sm font-black text-white">② YouTube 비공개</a>
+            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <a href="https://www.blogger.com/" target="_blank" rel="noopener" class="rounded-2xl bg-violet-700 px-4 py-4 text-center text-sm font-black text-white">Blogspot 초안 검토</a>
+                <a href="https://www.tistory.com/auth/login" target="_blank" rel="noopener" class="rounded-2xl bg-teal-700 px-4 py-4 text-center text-sm font-black text-white">Tistory 관리자</a>
+                <a href="https://studio.youtube.com/" target="_blank" rel="noopener" class="rounded-2xl bg-red-700 px-4 py-4 text-center text-sm font-black text-white">YouTube 비공개 검토</a>
             </div>
-            <p class="mt-3 text-xs font-bold text-amber-800">확인 순서: 자동화_발행대기 행 확인 → 해당 카드의 관리자 검토 버튼 → 내용 확인 → 플랫폼 관리자에서 직접 공개</p>
         </section>
         <div id="wordpress" class="flex items-center justify-between gap-3 scroll-mt-24">
             <div>

@@ -136,10 +136,14 @@ def test_wordpress_kpis_appear_before_site_metadata():
 
 
 def test_review_queue_is_visible_directly_in_control_room():
+    # 2026-09-03 CEO decision: WP auto-publishes once the GPT gate approves,
+    # so this list is now a read-only activity log (no per-item approval
+    # button needed for WordPress) — Blogspot/Tistory still show a review
+    # link since those platforms remain private-draft-only.
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "승인대기 글 목록" in template
+    assert "최근 글 목록" in template
     assert "review_items" in template
-    assert "글 검토 →" in template
+    assert "검토 →" in template
     review_template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "tistory_review.html").read_text(encoding="utf-8")
     assert "비공개 검토 대기" in review_template
     assert "검색 설명" in review_template
