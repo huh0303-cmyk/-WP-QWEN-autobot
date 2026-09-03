@@ -213,6 +213,16 @@ NEWS_SOURCES = [
         "use": "primary_fact_lead",
     },
     {
+        "key": "uk_government_art",
+        "name": "UK Government Arts and Culture",
+        "language": "en",
+        "category": "Art",
+        "feed": "https://www.gov.uk/search/news-and-communications.atom?keywords=art",
+        "license": "uk_open_government_licence_primary",
+        "license_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "use": "primary_fact_lead",
+    },
+    {
         "key": "uk_government_sport",
         "name": "UK Government Sport",
         "language": "en",

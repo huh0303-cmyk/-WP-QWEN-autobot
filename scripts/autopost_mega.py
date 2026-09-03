@@ -1656,9 +1656,13 @@ def crawl_rss_news(lang="ko", site_url=""):
 
     if candidates:
         rotation = (["정치", "경제", "국방", "글로벌", "문화", "스포츠"] if lang == "ko" else
-                    ["Politics", "Business", "Military", "World", "Culture", "Sports"])
-        preferred = rotation[(now_kst().timetuple().tm_yday + now_kst().hour) % len(rotation)]
+                    ["Politics", "Business", "Military", "World", "Culture", "Art", "Sports"])
+        forced_preferred = os.getenv("NEWSROOM_PREFERRED_CATEGORY", "").strip()
+        preferred = forced_preferred or rotation[(now_kst().timetuple().tm_yday + now_kst().hour) % len(rotation)]
         preferred_candidates = [item for item in candidates if item[4] == preferred]
+        if forced_preferred and not preferred_candidates:
+            print(f"   NEWS SOURCE GATE: no fresh rights-cleared RSS item for requested desk {forced_preferred}")
+            return "", "", None, ""
         pool = preferred_candidates or candidates
         ch = max(pool, key=lambda item: priorities[(item[0], item[3])])
         used.add(ch[0].strip().lower())

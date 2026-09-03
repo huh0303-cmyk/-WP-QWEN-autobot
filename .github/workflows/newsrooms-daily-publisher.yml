@@ -9,6 +9,12 @@ on:
         type: choice
         options: [koreanews365, theseouljournal]
         default: koreanews365
+      preferred_category:
+        description: "Optional RSS desk (World/Sports/Military/Art)"
+        required: false
+        type: choice
+        options: ["", World, Sports, Military, Art]
+        default: ""
   schedule:
     - cron: "31 22 * * *"
     - cron: "43 0 * * *"
@@ -70,6 +76,7 @@ jobs:
       - name: Repair recent source-based categories
         env:
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
+          NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/repair_recent_newsroom_categories.py
