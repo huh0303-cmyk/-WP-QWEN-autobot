@@ -44,8 +44,15 @@ import os
 import re
 import sys
 import time
+from pathlib import Path
 
 import requests
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from automation_hub.golden_keyword_mentions import parse_mention_rows, rank_mentioned_keywords
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_SEARCH_MODEL = os.environ.get("OPENAI_SEARCH_MODEL", "gpt-4o-mini")
@@ -162,12 +169,20 @@ TARGETS = [
 PROMPT_TMPL = """Search the web right now for what is actually trending TODAY ({today}) in
 this topic area: {domain}.
 
-Based on real current search interest (not generic evergreen topics), produce {count}
-distinct {lang_label} SEO keyword phrases a blog would target this week, split across
-these categories: {categories}.
+Collect current evidence first. Identify repeatedly mentioned proper nouns and concrete
+noun phrases across four separate discovery surfaces: newspapers, Naver, Google, and
+other media. Then attach a practical {lang_label} SEO phrase to each observed noun.
+
+Priority sources include Naver News, Chosun Ilbo, Hankyoreh, CNN and The New York Times,
+plus other reputable national newspapers, broadcasters and specialist media relevant to
+the topic. Count only items whose publication date is exactly {today}. Collect at least
+{count} distinct noun clusters, with one output row for every independent mention.
 
 Rules:
-- Start from terms repeatedly exposed in current news/media and official announcements.
+- Collect multiple independent mentions for each noun; do not treat syndicated copies at
+  the same URL as separate evidence.
+- Surface must be exactly newspaper, naver, google, or media. "naver" means a result
+  observed through Naver News/Search; "google" means Google News/Search/Trends.
 - Cluster aliases and near-identical headlines into one underlying event, entity, policy,
   accident, season or issue before proposing a search phrase.
 - Validate each idea using observable Google/Naver trend signals and GSC demand when those
@@ -180,14 +195,17 @@ Rules:
 - Convert the verified signal into this site's practical intent (cost, method, eligibility,
   schedule, comparison or precautions) instead of copying a news headline.
 - Never copy headline wording or article text.
-- Each keyword is a short search-style phrase (3-6 words), not a full sentence.
+- Each keyword is a short search-style phrase (3-6 words), not a full sentence, and must
+  contain the observed noun or its unambiguous canonical spelling.
 - Ground them in what's actually happening right now (specific companies, specific policy
   developments, specific product names, specific market/regulatory events) — not vague
   evergreen phrases like "how to invest in Korea".
 - No two keywords should be near-duplicates of each other.
 {avoid_block}
-- Output ONLY the keyword list, one per line, tab-separated as: keyword<TAB>category
-  Category must be exactly one of: {categories}
+- Output one row PER OBSERVED MENTION. Repeating the same noun on separate sourced rows
+  is required so code can count it. Use exactly seven tab-separated fields:
+  keyword<TAB>category<TAB>noun<TAB>surface<TAB>outlet<TAB>YYYY-MM-DD<TAB>source_url
+  Category must be exactly one of: {categories}. source_url must be the actual result URL.
 - No numbering, no headers, no explanation, no markdown — just the raw lines.
 """
 
@@ -392,7 +410,9 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
         )
         text, grounded = call_search_llm(client, prompt)
         grounded_any = grounded_any or grounded
-        candidates = parse_lines(text, target["categories"])
+        mention_rows = parse_mention_rows(text, target["categories"], observed_on=today_str)
+        ranked_mentions = rank_mentioned_keywords(mention_rows, minimum_surfaces=2)
+        candidates = [(kw, cat) for kw, cat, _metrics in ranked_mentions]
 
         for kw, cat in candidates:
             kl = kw.lower()
@@ -410,7 +430,10 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
             if len(accepted) >= 50:
                 break
 
-        print(f"    라운드 {round_i+1}: 후보 {len(candidates)}개 → 누적 채택 {len(accepted)}개")
+        print(
+            f"    라운드 {round_i+1}: 출처행 {len(mention_rows)}개, "
+            f"2개 이상 출처군 명사 {len(candidates)}개 → 누적 채택 {len(accepted)}개"
+        )
         if len(accepted) >= 50:
             break
         # 다음 라운드에서 같은 키워드를 또 제안받지 않도록 힌트 추가

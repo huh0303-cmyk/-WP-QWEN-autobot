@@ -25,10 +25,10 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: pip install google-genai requests -q
+      - run: pip install requests -q
       - name: Research current keywords for all 25 blogs
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scripts/refresh_keyword_pool_current.py
       - name: Commit updated keyword pools
         if: always()
