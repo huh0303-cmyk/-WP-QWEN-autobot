@@ -8,7 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from automation_hub.youtube_calendar import KST, READY, channel_key, parse_calendar, select_due
+from automation_hub.youtube_calendar import KST, READY, channel_key, parse_calendar, select_due, select_next_ready
 from scripts.youtube_calendar_result import private_result, main as result_main
 from scripts.roll_14day_content_calendar import HEADERS, wp_blogger_rows, youtube_rows
 from automation_hub.youtube_registry import load_channels
@@ -61,6 +61,13 @@ def test_unknown_channels_duplicate_ids_and_wrong_platform_fail_closed():
 def test_chronological_limit():
     selected, _ = select_due(parsed(row(), row("CAL-2", "Healing", "2026-08-31 12:00 KST")), NOW, {"mbb", "healing"}, 1)
     assert selected[0]["key"] == "mbb"
+
+
+def test_operator_button_runs_selected_channels_next_prepared_item_now():
+    future = row("CAL-FUTURE", "Healing", "2026-09-02 14:17 KST")
+    selected, _ = select_next_ready(parsed(future), NOW, {"healing"})
+    assert [item["id"] for item in selected] == ["CAL-FUTURE"]
+    assert not select_next_ready(parsed(future), NOW, {"mbb"})[0]
 
 
 def test_private_result_requires_identity_and_private(tmp_path):

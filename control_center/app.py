@@ -28,6 +28,15 @@ import requests
 
 REVIEW_QUEUE_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%9E%90%EB%8F%99%ED%99%94_%EB%B0%9C%ED%96%89%EB%8C%80%EA%B8%B0&range=A1:Q500"
 EDITORIAL_REVIEW_CSV = "https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/gviz/tq?tqx=out:csv&sheet=%EC%98%A4%EB%8A%98_%EA%B8%80%EA%B2%80%EC%88%98&range=A1:I500"
+ADSENSE_BLOGGER_URLS = {
+    "https://skin.k-health365.com",
+    "https://glow.k-health365.com",
+}
+HIDDEN_BLOGGER_URLS = {
+    # Duplicate medical-tour test blog. The production destination is
+    # https://koreamedicaltour365.blogspot.com (ID 270775542645307723).
+    "https://koreamedicaltour1.blogspot.com",
+}
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secrets.token_hex(32)
@@ -645,7 +654,10 @@ def _site_rows(_sites=None):
 
 def get_blogger_data():
     path = Path(__file__).resolve().parents[1] / "config" / "blogger_portfolio.json"
-    rows = json.loads(path.read_text(encoding="utf-8")).get("channels", [])
+    rows = [
+        row for row in json.loads(path.read_text(encoding="utf-8")).get("channels", [])
+        if row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS
+    ]
     stats_path = Path(__file__).resolve().parents[1] / "data" / "blogger_traffic_latest.json"
     stats = {}
     if stats_path.exists():
@@ -684,6 +696,7 @@ def get_blogger_data():
         "name": row.get("title") or row.get("name") or f"Blogger {row.get('order', '')}",
         "wp_url": row.get("wp") or row.get("wordpress") or row.get("wp_url", ""),
         "url": row.get("blogspot", ""),
+        "google_approved": row.get("blogspot", "").rstrip("/") in ADSENSE_BLOGGER_URLS,
         "status": row.get("status", "UNKNOWN"),
         "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"}),
         "blog_id": row.get("destination_id", ""),
@@ -1000,7 +1013,7 @@ def trigger_youtube_batch():
         response = requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/youtube-control-scheduler.yml/dispatches",
             headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": {"dry_run": "false", "max_dispatch": "1", "channel_key": channel_key}},
+            json={"ref": "main", "inputs": {"dry_run": "false", "max_dispatch": "1", "channel_key": channel_key, "run_now": "true"}},
             timeout=30,
         )
         if response.status_code != 204:
@@ -1009,7 +1022,7 @@ def trigger_youtube_batch():
         flash(f"YouTube 10채널 실행 요청 실패 · {exc}", "error")
     else:
         target = channel_key or "전체 채널"
-        flash(f"YouTube {target} 중앙 스케줄러를 시작했습니다. 현재 승인 슬롯이 있을 때 1개만 비공개 업로드합니다.", "success")
+        flash(f"YouTube {target} 영상 제작을 시작했습니다. 다음 준비 항목 1개를 만들어 비공개로 업로드합니다.", "success")
     return redirect(url_for("index") + "#youtube")
 
 

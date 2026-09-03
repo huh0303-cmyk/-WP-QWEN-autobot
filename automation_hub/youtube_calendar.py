@@ -80,6 +80,29 @@ def select_due(rows, now, enabled, limit=3):
     return sorted(selected, key=lambda r: (r["when"], r["id"]))[:limit], skipped
 
 
+def select_next_ready(rows, now, enabled, limit=1):
+    """Select a channel's next prepared item for an explicit operator click.
+
+    This ignores the planned clock time but keeps identity, duplicate, active-work,
+    topic, and private-upload guards intact. Past calendar history is never reused.
+    """
+    blocked = {r["key"] for r in rows if r["status"] in {"자료수집", "대본작성", "검수중"}}
+    occupied = {(r["key"], r["when"].date()) for r in rows
+                if r["status"] != READY or r["url"] or "[yt-calendar:" in r["notes"]}
+    candidates = [
+        r for r in rows
+        if r["key"] in enabled
+        and r["key"] not in blocked
+        and r["status"] == READY
+        and r["topic"]
+        and not r["url"]
+        and "[yt-calendar:" not in r["notes"]
+        and (r["key"], r["when"].date()) not in occupied
+        and r["when"].date() >= now.date()
+    ]
+    return sorted(candidates, key=lambda r: (r["when"], r["id"]))[:limit], []
+
+
 def read_calendar(service, spreadsheet_id):
     meta = service.spreadsheets().get(spreadsheetId=spreadsheet_id, fields="sheets.properties").execute()
     count = next(s["properties"]["gridProperties"]["rowCount"] for s in meta["sheets"]

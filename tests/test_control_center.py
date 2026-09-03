@@ -11,7 +11,7 @@ from control_center.db import Store
 from control_center.quality import score_article
 from control_center.registry import load_wordpress_sites
 from control_center.service import ControlCenter
-from control_center.app import _site_rows, compact_category, get_youtube_data, wordpress_cadence
+from control_center.app import ADSENSE_BLOGGER_URLS, HIDDEN_BLOGGER_URLS, _site_rows, compact_category, get_youtube_data, wordpress_cadence
 from control_center.keywords import weekly_suggestions
 from control_center.states import QUALITY_PASSED, WP_DRAFTED
 from control_center.wordpress import DraftResult
@@ -80,24 +80,34 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "Blogspot 비공개 초안 생성" in template
-    assert "이 사이트 비공개 초안 생성" in template
-    assert "이 채널 비공개 업로드 시작" in template
+    assert "Blogspot 글 초안 만들기" in template
+    assert "이 사이트 글 초안 만들기" in template
+    assert "이 채널 영상 만들기" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
     assert 'id="review-queue"' in template
-    assert "관리자에서 초안 검토·발행" in template
-    assert "YouTube Studio에서 검토·공개" in template
+    assert "관리자에서 초안 검토·발행" not in template
+    assert "완성된 영상은 먼저 비공개로 저장됩니다." in template
 
 
 def test_blogspot_dashboard_uses_precise_connection_label_and_compact_categories():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "발행 ID 등록" in template
+    assert "발행 준비됨" in template
     assert "blog.official_categories[:8]" in template
     assert compact_category("international students") == "intl students"
     assert compact_category("A category name that is unnecessarily long", 16).endswith("…")
     assert "당일 방문자 내림차순" in template
     assert "오늘 {{ loop.index }}위" in template
+
+
+def test_adsense_blogger_sites_receive_gold_approval_cards():
+    assert ADSENSE_BLOGGER_URLS == {
+        "https://skin.k-health365.com",
+        "https://glow.k-health365.com",
+    }
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "{% if blog.google_approved %}" in template
+    assert "G승인" in template
 
 
 def test_locked_default_content_and_image_engines():
@@ -129,18 +139,25 @@ def test_review_queue_is_visible_directly_in_control_room():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
     assert "승인대기 글 목록" in template
     assert "review_items" in template
-    assert "글 검토·승인 →" in template
+    assert "글 검토 →" in template
     review_template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "tistory_review.html").read_text(encoding="utf-8")
     assert "비공개 검토 대기" in review_template
     assert "검색 설명" in review_template
 
 
-def test_control_room_displays_full_blogger_33_portfolio():
+def test_control_room_displays_only_active_blogger_portfolio():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "Blogspot 33" in template
-    assert "BLOGSPOT 33" in template
-    assert "{{ bloggers|length }}/33" in template
+    assert "Blogspot {{ bloggers|length }}" in template
+    assert "BLOGSPOT {{ bloggers|length }}" in template
+    assert "실제 운영 사이트만 표시" in template
     assert "Blogspot 27" not in template
+
+
+def test_duplicate_medical_tour_blog_is_hidden_from_control_room():
+    assert HIDDEN_BLOGGER_URLS == {"https://koreamedicaltour1.blogspot.com"}
+    portfolio = json.loads((Path(__file__).resolve().parents[1] / "config" / "blogger_portfolio.json").read_text(encoding="utf-8"))["channels"]
+    production = next(row for row in portfolio if row["blogspot"] == "https://koreamedicaltour365.blogspot.com")
+    assert production["destination_id"] == "270775542645307723"
 
 
 def test_all_wordpress_drafts_require_rankmath_focus_keyword():
@@ -153,7 +170,7 @@ def test_all_wordpress_drafts_require_rankmath_focus_keyword():
 
 def test_connection_badges_do_not_overstate_metrics_connectivity():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "Blogger 발행 ID 등록" in template
+    assert "Blogger 발행 대상 ID 등록 여부" in template
     assert "방문자·색인 연결 상태가 아니라" in template
     assert "방문자·Google 색인이 아니라 공개 RSS 피드 연결 상태" in template
 

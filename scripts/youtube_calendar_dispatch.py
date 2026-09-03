@@ -5,7 +5,7 @@ import os
 import uuid
 
 import requests
-from automation_hub.youtube_calendar import KST, READY, read_calendar, select_due, update_row
+from automation_hub.youtube_calendar import KST, READY, read_calendar, select_due, select_next_ready, update_row
 from automation_hub.youtube_registry import load_channels
 from gsheets_direct import get_sheets_service
 
@@ -61,8 +61,10 @@ def main():
                 return 0
         except requests.RequestException as exc:
             raise RuntimeError("Could not prove YouTube workers idle; refusing dispatch") from exc
-    selected, skipped = select_due(read_calendar(service, sid), now, enabled,
-                                  min(10, max(1, int(os.getenv("MAX_DISPATCH", "3")))) if dry else 1)
+    run_selected_now = bool(target_channel) and os.environ.get("RUN_SELECTED_NOW", "false").lower() == "true"
+    selector = select_next_ready if run_selected_now else select_due
+    selected, skipped = selector(read_calendar(service, sid), now, enabled,
+                                 min(10, max(1, int(os.getenv("MAX_DISPATCH", "3")))) if dry else 1)
     print(json.dumps({"mode": "dry_run" if dry else "private-production", "due": [
         {"id": r["id"], "channel": r["key"], "planned_at": r["when"].isoformat(), "topic": r["topic"]}
         for r in selected], "suppressed_duplicates": skipped, "public_allowed": False}, ensure_ascii=False))
@@ -71,13 +73,14 @@ def main():
     for planned in selected:
         # Re-resolve by stable ID immediately before claiming; don't trust a stale row number.
         live = read_calendar(service, sid)
-        eligible, _ = select_due(live, dt.datetime.now(KST), enabled, 10)
+        eligible, _ = selector(live, dt.datetime.now(KST), enabled, 10)
         row = next((r for r in eligible if r["id"] == planned["id"] and r["cells"] == planned["cells"]), None)
         if row is None:
             continue
         token = uuid.uuid4().hex
         marker = f"[yt-calendar:{row['id']}:{token}]"
-        notes = row["notes"] + "\n" + marker + " 비공개 제작 요청; 공개는 관리자 수동 버튼만"
+        request_kind = "운영자 즉시 제작 요청" if run_selected_now else "예약 비공개 제작 요청"
+        notes = row["notes"] + "\n" + marker + f" {request_kind}; 업로드 상태 PRIVATE"
         update_row(service, sid, row, "자료수집", "", notes)
         c = channels[row["key"]]
         inputs = {"channel": c.channel_key, "topic": row["topic"], "schedule_id": row["id"],

@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: ""
+      run_now:
+        description: "Run the selected channel's next prepared calendar item now"
+        required: false
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -59,6 +64,7 @@ jobs:
           # Parallel dispatches previously competed for APIs and caused cancelled runs.
           MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '1' }}
           TARGET_CHANNEL_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_key || '' }}
+          RUN_SELECTED_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.run_now || 'false' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
         run: python scripts/youtube_control_scheduler.py

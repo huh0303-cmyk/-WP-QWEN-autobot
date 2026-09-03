@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import html
 import os
+import re
 import socket
 import sys
 import uuid
@@ -34,6 +35,20 @@ from budget_guard import check_and_record
 
 # Worst case for one run: two GPT writing attempts plus one image.
 ESTIMATED_COST_PER_RUN_USD = 0.03
+KPOP_SITE_ID = "blogger_kworld365_kpop"
+KPOP_TERMS = (
+    "k-pop", "kpop", "idol", "comeback", "album", "single", "music video",
+    "concert", "fan meeting", "fandom", "billboard", "gaon", "circle chart",
+    "music bank", "inkigayo", "m countdown", "artist", "group", "soloist",
+)
+
+
+def is_kpop_source(post: dict) -> bool:
+    """Allow the dedicated KWorld365 Blogger only K-pop source articles."""
+    title = str(post.get("title", {}).get("rendered", ""))
+    body = str(post.get("content", {}).get("rendered", ""))
+    text = html.unescape(re.sub(r"<[^>]+>", " ", f"{title} {body}")).lower()
+    return any(term in text for term in KPOP_TERMS)
 
 
 def _records(values: list[list[str]]) -> list[dict[str, str]]:
@@ -112,6 +127,14 @@ def main():
         raise RuntimeError(
             "새로운 WordPress 원문이 없어 Blogger 검토 대기 행을 만들지 못했습니다."
         )
+    if blogger_site_id == KPOP_SITE_ID and not is_kpop_source(source):
+        _append_failure(
+            service, sheet_id, blogger_site_id,
+            error_code="KPOP_TOPIC_LOCK",
+            message="KWorld365는 K-pop 전문 채널이므로 K-pop과 무관한 원문을 차단했습니다.",
+            source_url=source.get("link", source_url),
+        )
+        raise RuntimeError("KWorld365 K-pop topic lock rejected a non-K-pop source")
     language = os.environ.get("BLOGGER_LANGUAGE", "en").strip().lower()
     korean_source_hosts = {"koreanews365.com", "www.koreanews365.com", "k-health365.com", "www.k-health365.com"}
     source_host = requests.utils.urlparse(source_url).netloc.lower()
