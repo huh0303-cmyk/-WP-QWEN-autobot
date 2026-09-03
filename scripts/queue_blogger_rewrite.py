@@ -99,16 +99,33 @@ def main():
     service = get_sheets_service()
     try:
         parsed = urlparse(source_url)
+        site_root = f"{parsed.scheme}://{parsed.netloc}"
         exact_ids = parse_qs(parsed.query).get("p", [])
+        # 2026-09-04: SOURCE_WP_URL from a real published post is normally a
+        # pretty permalink (https://site.com/some-post-slug/), not the raw
+        # ?p=<id> form — the old code appended /wp-json/... straight onto
+        # that full permalink (site.com/some-post-slug/wp-json/...), which
+        # is not a real path and just timed out. Resolve a permalink's slug
+        # via ?slug= first; only fall back to "10 most recent posts on this
+        # domain" when there's no path to resolve at all.
+        slug = parsed.path.strip("/").rsplit("/", 1)[-1] if parsed.path.strip("/") else ""
         if exact_ids:
             if not exact_ids[0].isdigit():
                 raise ValueError("Invalid exact WordPress source ID")
-            posts = requests.get(f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
+            posts = requests.get(f"{site_root}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
+            posts.raise_for_status()
+            source_posts = [posts.json()]
+        elif slug:
+            posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"slug": slug, "status": "publish"}, timeout=30)
+            posts.raise_for_status()
+            source_posts = posts.json()
+            if not source_posts:
+                raise RuntimeError(f"No published post found at slug '{slug}' on {site_root}")
         else:
-            posts = requests.get(f"{source_url}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
-        posts.raise_for_status()
-        source_posts = [posts.json()] if exact_ids else posts.json()
-        if exact_ids and source_posts[0].get("status") != "publish":
+            posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
+            posts.raise_for_status()
+            source_posts = posts.json()
+        if (exact_ids or slug) and source_posts[0].get("status") != "publish":
             raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
     except requests.RequestException as exc:
         _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
