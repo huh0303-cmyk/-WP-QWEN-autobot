@@ -1244,7 +1244,7 @@ SITE_PERSONA = {
             "확인된 사실과 미확인 사항",
             "원문 출처 링크·작성 시각·수정 이력"
         ],
-        "min_chars": 700,
+        "min_chars": 400,
         "max_chars": 1500,
         "tables": 0,
         "lang": "ko",
@@ -1263,7 +1263,7 @@ SITE_PERSONA = {
             "What remains unconfirmed",
             "Linked source note, publication time and correction record"
         ],
-        "min_chars": 700,
+        "min_chars": 400,
         "max_chars": 2000,
         "tables": 0,
         "lang": "en",
@@ -1853,7 +1853,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
         if lang == "ko":
             return f"""[한국신문 뉴스룸 전용]\n역할: {persona}\n취재 단서: {keyword}\n편집 범위: {scope}\n
 - HTML은 p, h2, blockquote, ul, li만 사용한다.
-- 본문은 공백 제외 700~1,500자이며 1,500자를 절대 넘기지 않는다.
+- 본문은 공백 제외 400~1,500자이며 1,500자를 절대 넘기지 않는다.
 - 역피라미드 구조: 핵심 사실 리드, 확인된 경위, 배경·맥락, 영향, 미확인 사항.
 - 첫 문단은 2~3문장, 각 문단은 1~3문장으로 짧게 쓴다. 소제목은 최대 2개다.
 - 표, FAQ, 체크리스트, 상담 CTA, 결론 요약을 쓰지 않는다.
@@ -1864,7 +1864,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
 - 끝에 META_DESC: 100~140자와 TAGS: 짧은 명사 6~10개를 쓴다. FAQ와 TITLE은 출력하지 않는다."""
         return f"""[THE SEOUL JOURNAL NEWSROOM ONLY]\nRole: {persona}\nReporting lead: {keyword}\nEditorial scope: {scope}\n
 - Use only p, h2, blockquote, ul and li HTML tags.
-- Body length is 700–1,500 characters excluding spaces; never exceed 1,500.
+- Body length is 400–1,500 characters excluding spaces; never exceed 1,500.
 - Use an inverted pyramid: concise lede, verified developments, context, significance, unresolved facts.
 - Write a 2–3 sentence lede and 1–3 sentence paragraphs. Use no more than two subheads.
 - No tables, FAQ, checklist, CTA or summary conclusion.
@@ -3232,9 +3232,15 @@ def build_news_headline(keyword, lang):
         print(f"  ⚠️ 뉴스 헤드라인 재작성 실패: {e}")
     return keyword  # 실패 시 RSS 원본 헤드라인 그대로 사용(템플릿 왜곡보다 안전)
 
-def resize_newsroom_body(body, lang, source_summary, min_chars=700, max_chars=1500):
-    """Bring a sourced newsroom draft into the promised article-length band."""
-    target_lo, target_hi = max(min_chars + 100, 800), min(max_chars - 100, 1400)
+def resize_newsroom_body(body, lang, source_summary, min_chars=400, max_chars=1500):
+    """Bring a sourced newsroom draft into the promised article-length band.
+
+    2026-09-03: was hardcoded to always target 800+ regardless of the
+    caller's min_chars, so a short-brief policy (min_chars=400) still
+    pushed the model toward padding a thin gov.uk source past what it
+    could support without inventing facts. Target a modest margin above
+    whatever floor the caller actually asked for."""
+    target_lo, target_hi = min_chars + 100, min(max_chars - 100, 1400)
     instruction = (
         "아래 뉴스 기사 HTML을 공백 제외 " if lang == "ko" else
         "Edit the news article HTML below to "
@@ -3357,9 +3363,14 @@ def process_one(site, keyword):
         body,tags=extract_tags(body_raw,keyword,theme,lang,is_news=(mode in ("news","news_en")),tag_count=tag_count)
 
         if mode in ("news", "news_en"):
+            # 2026-09-03: 700자 하한이 CEO의 "속보중심" 방향과 실제로 충돌했다 —
+            # gov.uk 1차 출처는 종종 2~3문장짜리 짧은 보도자료라, "새 사실을
+            # 지어내지 마라"는 프롬프트 규칙을 지키면 700자를 못 채우는 게
+            # 정상이었다(같은 기사를 3번 재작성해도 매번 660~690자에서 막힘).
+            # 짧은 속보 브리프를 그대로 인정하도록 하한을 낮춘다.
             newsroom_length = newsroom_char_count(body)
-            if newsroom_length < 700:
-                body = resize_newsroom_body(body, lang, news_source_summary, 700, 1500)
+            if newsroom_length < 400:
+                body = resize_newsroom_body(body, lang, news_source_summary, 400, 1500)
             if newsroom_char_count(body) > 1500:
                 body = trim_newsroom_html(body, 1500)
 
@@ -3492,12 +3503,14 @@ def process_one(site, keyword):
     #   점수와는 다를 수 있음. 그래도 현재 유일하게 있는 사전 품질 신호라
     #   이걸 게이트로 쓴다.)
     # 뉴스룸은 일반 블로그용 SEO 채점표(FAQ, 표, 4개 내부링크, 3천자에 가점)를
-    # 그대로 적용하면 700~1,500자 속보 기사체 원고가 구조적으로 70점에 도달하기
+    # 그대로 적용하면 400~1,500자 속보 기사체 원고가 구조적으로 70점에 도달하기
     # 어렵다. 출처·길이·메타·태그·제목을 별도 하드 게이트로 검증한다.
+    # 2026-09-03: 700자 하한을 400자로 낮춤(CEO "속보중심" 방향 + 짧은 1차
+    # 출처를 사실 날조 없이 억지로 부풀리다 매번 게이트 탈락하던 문제 해결).
     newsroom_gate_ok = (
         mode in ("news", "news_en")
         and bool(news_source and news_source_url)
-        and 700 <= plain_len <= 1500
+        and 400 <= plain_len <= 1500
         and bool(title.strip())
         and len(meta.strip()) >= 80
         and len(tags) >= 6
@@ -3505,7 +3518,7 @@ def process_one(site, keyword):
     if mode in ("news", "news_en"):
         if not newsroom_gate_ok:
             reason = (f"source={bool(news_source and news_source_url)}, "
-                      f"meta={len(meta)}, tags={len(tags)}, length={plain_len}/700-1500")
+                      f"meta={len(meta)}, tags={len(tags)}, length={plain_len}/400-1500")
             print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
             return False
