@@ -47,13 +47,13 @@ def access_token() -> str:
     return response.json()["access_token"]
 
 
-def load_english_sites() -> list[dict]:
+def load_sites() -> list[dict]:
     profiles = json.loads((ROOT / "config/content_engine_profiles.json").read_text(encoding="utf-8"))["profiles"]
     sites, seen = [], set()
     for profile in profiles:
         blog = profile.get("blogspot") or {}
         blog_id = str(blog.get("destination_id") or "")
-        if profile.get("language") != "en" or not blog.get("ready_for_automation") or not blog_id or blog_id in seen:
+        if not blog.get("ready_for_automation") or not blog_id or blog_id in seen:
             continue
         seen.add(blog_id)
         sites.append({"site_key": profile["site_key"], "blog_id": blog_id, "url": blog.get("url", ""), "theme": blog.get("theme") or profile.get("wordpress", {}).get("theme", ""), "language": profile.get("language", "en")})
@@ -182,12 +182,13 @@ def main() -> int:
     apply_changes = os.environ.get("APPLY_CHANGES", "false").lower() == "true"
     headers = {"Authorization": f"Bearer {access_token()}"}
     records, site_counts = [], {}
-    for site in load_english_sites():
+    sites = load_sites()
+    for site in sites:
         posts = list_all_posts(site, headers)
         site_counts[site["site_key"]] = len(posts)
         for post in posts:
             content = str(post.get("content") or "")
-            cleaned, removed = clean_english_content(content)
+            cleaned, removed = clean_english_content(content) if site["language"] == "en" else (content, 0)
             if image_sources(content) != image_sources(cleaned):
                 raise RuntimeError(f"image preservation guard failed for {site['site_key']}:{post.get('id')}")
             title = html.unescape(str(post.get("title") or "")).strip()
@@ -238,7 +239,10 @@ def main() -> int:
         record.pop("content", None)
         record.pop("cleaned_content", None)
     summary = {
-        "english_blogs": len(site_counts), "posts_total": len(records),
+        "blogs_total": len(site_counts),
+        "english_blogs": sum(site["language"] == "en" for site in sites),
+        "korean_blogs": sum(site["language"] == "ko" for site in sites),
+        "posts_total": len(records),
         "drafts": sum(r["status"] == "draft" for r in records),
         "published": sum(r["status"] == "live" for r in records),
         "scheduled": sum(r["status"] == "scheduled" for r in records),
