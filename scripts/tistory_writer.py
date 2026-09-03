@@ -143,7 +143,10 @@ def _parse_json_response(raw: str) -> dict:
         text = text.split("```")[1]
         if text.startswith("json"):
             text = text[4:]
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text))
 
 
 def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
@@ -269,6 +272,15 @@ def generate_draft(job: dict) -> dict:
             draft = candidate
             break
         errors.append(f"{provider}: quality={score}; {'; '.join(issues)}")
+        try:
+            repaired = _rewrite_after_consensus(
+                candidate, job,
+                {"checks": {"deterministic": {"ok": False, "issues": issues}}},
+            )
+            draft = repaired
+            break
+        except Exception as exc:
+            errors.append(f"gpt-repair: {exc}")
     if draft is None:
         return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
     draft["review_policy"] = "gpt_writer_plus_deterministic_quality_gate"
@@ -314,7 +326,9 @@ def main() -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     statuses = {d["status"] for d in drafts}
-    print(json.dumps({"drafts": len(drafts), "statuses": sorted(statuses)}, ensure_ascii=False))
+    print(json.dumps({"drafts": len(drafts), "statuses": sorted(statuses),
+                      "failures": [{"site_id": d.get("site_id"), "status": d.get("status"), "error": d.get("error", "")}
+                                   for d in drafts if d.get("status") != "DRAFT_READY"]}, ensure_ascii=False))
     return 0
 
 
