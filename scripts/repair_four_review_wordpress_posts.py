@@ -27,21 +27,21 @@ TARGETS = [
         "post_id": 564,
         "secret": "KREALESTATE365COM",
         "title": "Renting or Buying in Korea: Deposits, Contracts and Property Checks",
-        "description": "Compare renting and buying in Korea with practical checks for deposits, contracts, registration records, agent fees and the steps that protect your housing decision.",
+        "description": "Compare renting and buying in Korea with checks for deposits, contracts, registration records, agent fees and steps that protect your housing decision.",
     },
     {
         "site": "https://ktech365.com",
         "post_id": 4659,
         "secret": "KTECH365COM",
         "title": "South Korea Tech Entry: AI, Chips, R&D and Partnership Priorities",
-        "description": "Understand South Korea's technology landscape through AI, semiconductors, research funding, startup programs and practical partnership checks before entering the market.",
+        "description": "Explore South Korea's technology landscape through AI, semiconductors, research funding, startup programs and partnership checks before market entry.",
     },
     {
         "site": "https://jobinkorea365.com",
         "post_id": 997,
         "secret": "JOBINKOREA365COM",
         "title": "Working in Korea: Visa Eligibility, Contract Costs and Job-Search Plan",
-        "description": "Plan a Korean job search with clear checks for visa eligibility, contract terms, relocation costs, hiring documents and realistic steps from application to employment.",
+        "description": "Plan a Korean job search with checks for visa eligibility, contract terms, relocation costs, hiring documents and steps from application to employment.",
     },
 ]
 
