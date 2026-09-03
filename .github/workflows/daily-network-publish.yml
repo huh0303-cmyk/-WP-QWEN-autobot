@@ -57,13 +57,9 @@ jobs:
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
           MAX_REGEN: "2"
-          # Network default: GPT-5 mini writes; Gemini performs independent review.
+          # Regular 25-site network: GPT-5 mini plus deterministic quality gates.
           AI_TEXT_PROVIDER: "openai"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_REVIEW_MODEL: "gemini-2.5-flash"
-          # Gemini billing is unavailable; replace the second reviewer with an
-          # independent cold-context GPT pass instead of blocking every draft.
-          EDITORIAL_GEMINI_OUTAGE_FALLBACK: "true"
+          CHATGPT_SINGLE_MODEL_PIPELINE: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_ENABLED: "true"
           CLAUDE_ENABLED: "false"

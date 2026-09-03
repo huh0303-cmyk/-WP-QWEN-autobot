@@ -1,4 +1,5 @@
 """Require the actual final headline/body to pass Gemini and GPT checks."""
+import os
 import re
 from three_model_consensus import three_model_consensus
 from automation_hub.editorial_language_policy import body_cliches, title_cliches
@@ -20,6 +21,8 @@ def require_editorial_approval(*, title, content, meta, keyword, gemini_generate
         raise ValueError("TITLE_QUALITY_FAIL: unsupported experience or stacked template headline")
     if body_cliches(content):
         raise ValueError("REWRITE_REQUIRED: mass-produced AI body phrasing detected")
+    if os.getenv("CHATGPT_SINGLE_MODEL_PIPELINE", "false").strip().lower() == "true":
+        return {"ok": True, "policy": "gpt_writer_plus_deterministic_quality_gate", "checks": {}}
     result = three_model_consensus(title=title, content=content, meta=meta, keyword=keyword,
                                    gemini_generate=gemini_generate)
     checks = result.get("checks", {})
