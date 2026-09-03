@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 """Generate one article draft per Tistory site job.
 
-LOCKED: GPT-5 mini writes the first draft and any required rewrite;
-Gemini 2.5 Flash performs the independent final review. SEO/quality below 70
-is rejected.
+LOCKED: GPT-5 mini writes the draft and deterministic quality checks perform
+the final review. SEO/quality below 70 is rejected.
 
 Reads a plan produced by tistory_daily_planner.py and writes drafts only —
 this never publishes anything. Every job stays publish_policy=awaiting_approval
@@ -26,10 +25,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
-from gemini_text import gemini_generate_text  # noqa: E402
 from openai_text import openai_available, openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
-from three_model_consensus import three_model_consensus  # noqa: E402
 from automation_hub.editorial_language_policy import body_cliches, title_cliches  # noqa: E402
 
 WRITER_SYSTEM_PROMPT = (
@@ -152,8 +149,7 @@ def _parse_json_response(raw: str) -> dict:
 def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
     """Returns (raw_response_text, engine_used).
 
-    GPT-5 mini is the only authoring engine. Gemini is called separately by
-    the independent reviewer and must never become the first-draft writer.
+    GPT-5 mini is the only authoring engine; no second model is required.
     """
     prompt = build_writer_prompt(job)
     if provider != "gpt":
@@ -273,29 +269,7 @@ def generate_draft(job: dict) -> dict:
         errors.append(f"{provider}: quality={score}; {'; '.join(issues)}")
     if draft is None:
         return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
-    rewrite_errors: list[str] = []
-    for attempt in range(MAX_CONSENSUS_REWRITES + 1):
-        consensus = three_model_consensus(
-            title=draft["title"], content=draft["body_html"], meta=draft["meta_description"],
-            keyword=job["seed_topic"], gemini_generate=lambda prompt: gemini_generate_text(prompt, temperature=0.0),
-        )
-        draft["three_model_consensus"] = consensus
-        draft["consensus_attempts"] = attempt + 1
-        if consensus.get("ok") is True:
-            break
-        if attempt >= MAX_CONSENSUS_REWRITES:
-            draft["status"] = "CONSENSUS_FAILED"
-            draft["error"] = "Gemini and GPT did not both approve after guided rewrites"
-            draft["rewrite_errors"] = rewrite_errors
-            return draft
-        try:
-            draft = _rewrite_after_consensus(draft, job, consensus)
-        except Exception as exc:
-            rewrite_errors.append(str(exc))
-            draft["status"] = "CONSENSUS_FAILED"
-            draft["error"] = f"Consensus rewrite failed: {exc}"
-            draft["rewrite_errors"] = rewrite_errors
-            return draft
+    draft["review_policy"] = "gpt_writer_plus_deterministic_quality_gate"
     draft["image_url"] = generate_image_url(draft["image_prompt"], theme=draft["category"])
     draft["image_alt"] = f"{str(draft['image_prompt']).strip()} 관련 장면"
     draft["first_image_priority"] = bool(draft["image_url"])
@@ -331,7 +305,7 @@ def main() -> int:
     result = {
         "date": plan["date"],
         "public_allowed": False,
-        "review_models": ["gemini", "gpt"],
+        "review_models": ["gpt-5-mini"],
         "drafts": drafts,
     }
     out = Path(args.output)

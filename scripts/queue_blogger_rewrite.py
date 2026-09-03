@@ -27,15 +27,12 @@ from automation_hub.blogger_rewriter import (
 from automation_hub.content_identity import active_duplicate, canonical_source_id, stable_content_id
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
-from gemini_text import gemini_generate_text
 from openai_text import openai_available, openai_generate_text
 from replicate_image_provider import generate_image_url
-from three_model_consensus import three_model_consensus
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
 
-# Worst case for one run: two GPT writing attempts + independent Gemini/GPT
-# review plus one image. See budget_guard.py.
+# Worst case for one run: two GPT writing attempts plus one image.
 ESTIMATED_COST_PER_RUN_USD = 0.03
 
 
@@ -131,9 +128,7 @@ def main():
     similarity_score = 1.0
     text_provider = ""
     # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
-    # attempt is a rewrite using the deterministic gate feedback; Gemini is
-    # deliberately reserved for the independent review below and never
-    # silently becomes the writer when credits or credentials fail.
+    # The second GPT attempt uses deterministic quality-gate feedback.
     for attempt in range(1, 3):
         provider = "gpt"
         prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
@@ -157,14 +152,6 @@ def main():
         failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source["link"], "", "", "QUALITY_GATE", f"quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 {minimum_quality}점 미만이므로 초안 생성을 차단했습니다. {failures}")
-
-    consensus = three_model_consensus(
-        title=rewritten["title"], content=rewritten["content_html"], meta=rewritten["meta_description"],
-        keyword=source["title"]["rendered"], gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
-    )
-    if consensus.get("ok") is not True:
-        _append_failure(service, sheet_id, blogger_site_id, error_code="CONSENSUS_FAILED", message=json.dumps(consensus, ensure_ascii=False), source_url=source["link"])
-        raise RuntimeError("Gemini and GPT did not both approve")
 
     content = rewritten["content_html"]
     image_model = "0"

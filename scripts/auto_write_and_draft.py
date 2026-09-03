@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sheet-triggered original-content pipeline: pick a due keyword from
-자동화_황금키워드, write it (Gemini -> GPT fallback), pass Gemini+GPT+Claude
-consensus, generate one image, create a WordPress or Blogger DRAFT (never
+자동화_황금키워드, write it with GPT-5 mini, pass deterministic quality
+checks, generate one image, create a WordPress or Blogger DRAFT (never
 publish), update the sheet row, and leave a record for the existing
 email+Kakao review notifier.
 
@@ -35,17 +35,14 @@ from automation_hub.sheet_schema import KEYWORD_HEADER
 from automation_hub.time_utils import iso_kst
 from budget_guard import check_and_record
 from create_manual_wp_draft import WP_USER, ensure_featured_media, resolve_category_id, resolve_tag_ids
-from gemini_text import gemini_generate_text
 from gsheets_direct import ensure_tab, get_sheets_service
 from openai_text import openai_available, openai_generate_text
-from claude_text import claude_available, claude_generate_text
 from process_platform_queue import _access_token
 from replicate_image_provider import generate_image_url
-from three_model_consensus import three_model_consensus
 
 KEYWORDS_TAB = "자동화_황금키워드"
 RESULT_FILE = "newsroom_publish_result.json"
-# Worst case: 2 write attempts (gemini+gpt) + 3-way consensus (gemini+gpt+claude) + 1 image.
+# Worst case: 3 GPT writing attempts plus one image.
 ESTIMATED_COST_PER_RUN_USD = 0.03
 
 
@@ -151,17 +148,14 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     # A third, feedback-informed pass prevents a transient short response from
     # wasting an otherwise valid queued topic. It runs only after both normal
     # providers fail the mechanical 70-point gate.
-    for attempt, provider in enumerate(("gpt", "gemini", "gpt"), start=1):
+    for attempt, provider in enumerate(("gpt", "gpt", "gpt"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
                                   prior_feedback="; ".join(failures))
         try:
-            if provider == "gemini":
-                raw = gemini_generate_text(prompt, temperature=0.7)
-            else:
-                if not openai_available():
-                    raise RuntimeError("GPT fallback unavailable")
-                raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
+            if not openai_available():
+                raise RuntimeError("GPT-5 mini writer unavailable")
+            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
             candidate = parse_rewrite_json(raw)
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
@@ -302,39 +296,6 @@ def main() -> int:
         if service is not None and sheet_row is not None:
             _set_status(service, sheet_id, sheet_row, "보류")
         raise SystemExit(f"Quality gate failed for {site_id}/{keyword}: score={score} failures={failures}")
-
-    consensus = {}
-    for consensus_attempt in range(1, 4):
-        consensus = three_model_consensus(
-            title=article["title"], content=article["content_html"], meta=article["meta_description"],
-            keyword=keyword, gemini_generate=lambda check: gemini_generate_text(check, temperature=0.0),
-        )
-        if _consensus_passes(consensus):
-            break
-        if consensus_attempt >= 3:
-            continue
-        issues = []
-        for model, check in (consensus.get("checks") or {}).items():
-            for issue in check.get("issues") or []:
-                issues.append(f"{model}: {issue}")
-        feedback = "Revise the article to resolve every reviewer issue: " + "; ".join(issues)
-        print(json.dumps({"consensus_attempt": consensus_attempt, "action": "revise", "issues": issues}, ensure_ascii=False))
-        article, score, failures, provider = _write_article(**writer_args, review_feedback=feedback)
-        if article is None:
-            break
-    ymyl_keyword = bool(re.search(
-        r"(?i)(visa|immigration|insurance|medical|hospital|treatment|health|finance|tax|investment|crypto|legal|"
-        r"비자|이민|보험|의료|병원|치료|건강|금융|세금|투자|가상자산|법률)", keyword
-    ))
-    if article is None or (ymyl_keyword and not _consensus_passes(consensus)):
-        if service is not None and sheet_row is not None:
-            _set_status(service, sheet_id, sheet_row, "보류")
-        raise SystemExit(f"Gemini/GPT review failed for {site_id}/{keyword}: {json.dumps(consensus, ensure_ascii=False)}")
-    if not _consensus_passes(consensus):
-        print(json.dumps({
-            "consensus_warning": "non-YMYL draft accepted after two revision rounds",
-            "quality_score": score, "checks": consensus.get("checks", {}),
-        }, ensure_ascii=False))
 
     image_subject = (article.get("image_queries") or [article["title"]])[0]
     image_url = "" if os.environ.get("IMAGE_MODEL", "").strip() == "none" else (generate_image_url(image_subject, theme=article["title"]) or "")

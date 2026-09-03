@@ -56,20 +56,18 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install requests google-api-python-client google-auth -q
-      - name: Golden keyword + GPT-5 mini authoring + Gemini/GPT review + approved image chain
+      - name: Golden keyword + GPT-5 mini authoring + deterministic review + approved image chain
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
           CLAUDE_ENABLED: "false"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"
-          BLOGGER_GEMINI_MODEL: "gemini-2.5-flash"
           SOURCE_WP_URL: ${{ inputs.source_wp_url }}
           BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
           BLOGGER_LANGUAGE: ${{ inputs.language }}

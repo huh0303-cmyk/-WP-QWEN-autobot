@@ -66,9 +66,8 @@ jobs:
           assert all(j['duplicate_guard'] is True for j in p['jobs'])
           print('TISTORY PLAN SAFETY PASS')
           PY
-      - name: Draft articles — GPT-5 mini first, Gemini independent review
+      - name: Draft articles — GPT-5 mini with deterministic quality checks
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
