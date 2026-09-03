@@ -54,7 +54,11 @@ _load_dotenv()
 
 CLIENT_ID = os.environ.get("YOUTUBE_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET", "")
-SCOPE = "https://www.googleapis.com/auth/youtube.upload"
+# 2026-09-03: youtube.upload 단독 스코프로는 업로드 직전 채널 신원 확인
+# (automation_hub/youtube_identity.py의 channels().list(mine=true))이
+# "Insufficient Permission"으로 실패한다(globalmusic에서 실제 발생). 업로드
+# 권한을 포함하면서 읽기도 되는 전체 youtube 스코프로 재발급해야 한다.
+SCOPE = "https://www.googleapis.com/auth/youtube"
 
 CHANNELS = ["globalmusic", "healing", "starbucks", "mbb", "kpop"]
 
