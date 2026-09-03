@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from openai_text import openai_generate_text  # noqa: E402
 from replicate_image_provider import generate_image_url  # noqa: E402
+from automation_hub.blogger_search_description import build_search_description, validate_search_description
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
 
@@ -61,6 +62,7 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
     image = generate_image_url(str(data.get("image_subject") or title), theme=site["theme"])
     if image:
         body = f'<figure><img src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}"/></figure>\n' + body
+    validate_search_description(build_search_description(title=title, topic=site["theme"], language=site["language"]))
     return title, body, labels
 
 
