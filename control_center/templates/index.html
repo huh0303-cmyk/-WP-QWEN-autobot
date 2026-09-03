@@ -78,7 +78,17 @@
                     <article class="grid gap-2 px-4 py-3 sm:grid-cols-[110px_1fr_auto] sm:items-center">
                         <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black text-amber-700">{{ item.platform }}</span>{{ item.created_at }}</div>
                         <div class="min-w-0"><p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p><p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p></div>
-                        <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-600 px-4 text-xs font-black text-white hover:bg-amber-700">글 검토·승인 →</a>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-600 px-4 text-xs font-black text-white hover:bg-amber-700">글 검토 →</a>
+                            {% if item.platform == "WordPress" %}
+                            <form method="post" action="{{ url_for('trigger_publish_now') }}" onsubmit="return confirm('{{ item.site_id }}: 이 글을 지금 바로 공개로 발행할까요?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="domain" value="{{ item.site_id }}">
+                                <input type="hidden" name="review_url" value="{{ item.review_url }}">
+                                <button type="submit" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-emerald-600 px-4 text-xs font-black text-white hover:bg-emerald-700">지금 발행</button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </article>
                     {% endfor %}
                 </div>

@@ -960,6 +960,50 @@ def trigger_youtube_batch():
         flash(f"YouTube {target} 중앙 스케줄러를 시작했습니다. 현재 승인 슬롯이 있을 때 1개만 비공개 업로드합니다.", "success")
     return redirect(url_for("index") + "#youtube")
 
+
+@app.post("/trigger/publish-now")
+def trigger_publish_now():
+    """CEO clicked '지금 발행' on one already-reviewed WordPress post.
+
+    This is the only place in the control room that ever flips a post
+    public; it always targets exactly one post_id chosen by a human.
+    """
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#review-queue")
+    domain = request.form.get("domain", "").strip()
+    review_url = request.form.get("review_url", "").strip()
+    match = re.search(r"[?&]post=(\d+)", review_url)
+    registered = next(
+        (site for site in load_wordpress_sites() if site.url.replace("https://", "").replace("http://", "").rstrip("/") == domain),
+        None,
+    )
+    if not registered or not match:
+        flash(f"{domain}: 발행 대상을 확인할 수 없습니다 (사이트 등록 또는 글 번호 누락).", "error")
+        return redirect(url_for("index") + "#review-queue")
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    if not token:
+        flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
+        return redirect(url_for("index") + "#review-queue")
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/publish-now.yml/dispatches",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            json={"ref": "main", "inputs": {
+                "domain": registered.url, "post_id": match.group(1), "secret_name": registered.secret_name,
+            }},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+    except (requests.RequestException, RuntimeError) as exc:
+        flash(f"{domain}: 발행 요청 실패 · {exc}", "error")
+    else:
+        flash(f"{domain}: 글 #{match.group(1)} 발행을 시작했습니다.", "success")
+    return redirect(url_for("index") + "#review-queue")
+
+
 @app.route("/")
 def index():
     sites = get_site_data()
