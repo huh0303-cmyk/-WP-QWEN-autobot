@@ -1607,12 +1607,42 @@ def fetch_recent_wp_titles(site_url, wp_pass, count=None):
     _wp_title_cache[site_url] = titles
     return titles
 
+# 2026-09-03: newsrooms-daily-publisher.yml retries a fresh `python` process up
+# to 3x on failure (see workflow comment), so the in-memory _used_news_* sets
+# reset every attempt and crawl_rss_news() kept re-picking the exact same
+# CONSENSUS_FAILED article every time (CEO caught koreanews365/theseouljournal
+# stuck at 0 published all day on "UK Government Politics..."). Persist
+# rejected-this-run titles to a file on the runner's own filesystem, which
+# *does* survive across the 3 subprocess attempts within one job.
+def _rejected_news_path(lang: str) -> str:
+    return f"newsroom_rejected_today_{lang}.json"
+
+def _load_rejected_news(lang: str) -> set:
+    try:
+        with open(_rejected_news_path(lang), encoding="utf-8") as f:
+            return set(json.load(f))
+    except Exception:
+        return set()
+
+def record_rejected_news(lang: str, title: str) -> None:
+    if not title:
+        return
+    path = _rejected_news_path(lang)
+    rejected = _load_rejected_news(lang)
+    rejected.add(title.strip().lower())
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(sorted(rejected), f, ensure_ascii=False)
+    except Exception as e:
+        print(f"   ⚠️ 거부 기사 기록 실패(무시하고 진행): {e}")
+
 def crawl_rss_news(lang="ko", site_url=""):
     used = _used_news_ko if lang=="ko" else _used_news_en
     cache = _wp_title_cache.get(site_url, set())
+    rejected = _load_rejected_news(lang)
     fallback = NEWS_KO_FALLBACK if lang=="ko" else NEWS_EN_FALLBACK
 
-    def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache
+    def is_dup(t): return t.strip().lower() in used or t.strip().lower() in cache or t.strip().lower() in rejected
 
     # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
     sources = get_enabled_rss_source_records(lang)
@@ -3527,6 +3557,10 @@ def process_one(site, keyword):
         err=result.get("error","")
         print(f"  ❌ 실패: {err[:100]}")
         log(url,theme,keyword,title,"",score,len(images),"❌ WP 실패",err,reporter["name"],cat_name)
+        if mode in ("news", "news_en"):
+            # Don't let a retry (fresh process) pick this exact rejected
+            # story again — try a different RSS item next attempt instead.
+            record_rejected_news(lang, keyword)
         return False
 
 # ============================================================

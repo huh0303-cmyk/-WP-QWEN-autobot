@@ -18,11 +18,11 @@ def test_bad_templates_never_reach_model_review(monkeypatch, title):
     check.assert_not_called()
 
 
-@pytest.mark.parametrize("reject", ["gemini", "gpt", "missing"])
+@pytest.mark.parametrize("reject", ["gpt_1", "gpt_2", "missing"])
 def test_any_missing_or_failed_check_blocks(monkeypatch, reject):
-    checks = {name: {"ok": True} for name in ["gemini", "gpt"]}
+    checks = {name: {"ok": True} for name in ["gpt_1", "gpt_2"]}
     if reject == "missing":
-        del checks["gpt"]
+        del checks["gpt_2"]
     else:
         checks[reject]["ok"] = False
     monkeypatch.setattr(gate, "three_model_consensus", lambda **kw: {"ok": True, "checks": checks})
@@ -31,7 +31,7 @@ def test_any_missing_or_failed_check_blocks(monkeypatch, reject):
 
 
 def test_success_reviews_exact_final_packet(monkeypatch):
-    check = Mock(return_value={"checks": {name: {"ok": True} for name in ["gemini", "gpt"]}})
+    check = Mock(return_value={"checks": {name: {"ok": True} for name in ["gpt_1", "gpt_2"]}})
     monkeypatch.setattr(gate, "three_model_consensus", check)
     content = "actual final HTML" * 2000
     title = "Renting in Korea: Deposits and Contracts"
@@ -53,4 +53,3 @@ def test_live_wp_path_cannot_override_title_and_gates_before_save():
         assert 'CLAUDE_ENABLED: "false"' in workflow
         assert 'AI_TEXT_PROVIDER: "openai"' in workflow
         assert 'OPENAI_MODEL: "gpt-5-mini"' in workflow
-        assert 'GEMINI_REVIEW_MODEL: "gemini-2.5-flash"' in workflow

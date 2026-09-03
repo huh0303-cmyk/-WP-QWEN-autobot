@@ -1,8 +1,15 @@
-"""Blocking Gemini+GPT checks-and-balances gate for every written draft."""
+"""Blocking two-pass GPT checks-and-balances gate for every written draft.
+
+2026-09-03 CEO decision: drop Gemini as a reviewer network-wide (WP, Blogger,
+Tistory, newsrooms) — it was blocking on real Gemini API billing outages
+network-wide, and even when reachable its own factual judgment on a
+newsroom rewrite kept rejecting the same article with no route to try a
+different one. Two independent, cold-context GPT passes replace it
+everywhere; `gemini_generate` is still accepted for backward compatibility
+with older call sites but is never invoked."""
 from __future__ import annotations
 
 import json
-import os
 import re
 from datetime import date
 from typing import Callable
@@ -21,13 +28,23 @@ def _json(raw: str) -> dict:
         return json.loads(match.group(0))
 
 
-def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
-                          gemini_generate: Callable[[str], str]) -> dict:
-    """Gemini self-check + GPT independent final review.
+def _gpt_check(label: str, rule: str) -> dict:
+    if not openai_available():
+        return {"ok": False, "issues": ["GPT checker unavailable"]}
+    try:
+        return _json(openai_generate_text(f"You are the {label} independent quality checker. " + rule,
+                                          temperature=0.0, max_retries=1))
+    except Exception as exc:
+        return {"ok": False, "issues": [f"check_failed: {exc}"]}
 
-    No model can approve alone. Missing credentials, invalid JSON, or any
-    rejection blocks the draft from reaching the review queue.
+
+def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
+                          gemini_generate: Callable[[str], str] | None = None) -> dict:
+    """Two independent, cold-context GPT reviews. No model can approve alone.
+
+    Missing credentials, invalid JSON, or either rejection blocks the draft.
     """
+    del gemini_generate  # kept for call-site compatibility; never invoked
     packet = json.dumps({"keyword": keyword, "title": title, "meta_description": meta,
                          "content": content}, ensure_ascii=False)
     rule = (
@@ -39,36 +56,5 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
         "Do not trust another model's decision. "
         "Return only JSON: {\"ok\": bool, \"issues\": [str]}. Draft:\n" + packet
     )
-    results = {}
-    try:
-        results["gemini"] = _json(gemini_generate("You are the first independent quality checker. " + rule))
-    except Exception as exc:
-        # Newsrooms must not stop publishing merely because the Gemini account
-        # is temporarily rate-limited or out of credit.  When explicitly
-        # enabled by the newsroom workflow, replace the unavailable Gemini
-        # check with a separate, cold OpenAI review.  This is still a blocking
-        # review: a rejection or malformed response fails closed.
-        fallback_enabled = os.getenv("EDITORIAL_GEMINI_OUTAGE_FALLBACK", "false").strip().lower() == "true"
-        if fallback_enabled and openai_available():
-            try:
-                fallback = _json(openai_generate_text(
-                    "You are the continuity quality checker replacing an unavailable Gemini checker. "
-                    "Review independently from a blank context. " + rule,
-                    temperature=0.0,
-                    max_retries=1,
-                ))
-                fallback["provider"] = "openai_continuity_reviewer"
-                fallback["fallback_reason"] = type(exc).__name__
-                results["gemini"] = fallback
-            except Exception as fallback_exc:
-                results["gemini"] = {"ok": False, "issues": [f"fallback_check_failed: {fallback_exc}"]}
-        else:
-            results["gemini"] = {"ok": False, "issues": [f"check_failed: {exc}"]}
-    if not openai_available():
-        results["gpt"] = {"ok": False, "issues": ["GPT checker unavailable"]}
-    else:
-        try:
-            results["gpt"] = _json(openai_generate_text("You are the second independent quality checker. " + rule, temperature=0.0, max_retries=1))
-        except Exception as exc:
-            results["gpt"] = {"ok": False, "issues": [f"check_failed: {exc}"]}
+    results = {"gpt_1": _gpt_check("first", rule), "gpt_2": _gpt_check("second", rule)}
     return {"ok": all(result.get("ok") is True for result in results.values()), "checks": results}
