@@ -319,7 +319,8 @@
             <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for blog in bloggers %}
-                <form method="post" action="{{ url_for('trigger_draft') }}" class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}">
+                <article class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}">
+                <form method="post" action="{{ url_for('trigger_draft') }}" class="space-y-3">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="platform" value="blogger">
                     <input type="hidden" name="site_id" value="{{ blog.site_id }}">
@@ -405,6 +406,15 @@
                         <span>Blogspot 글 초안 만들기</span><span aria-hidden="true">→</span>
                     </button>
                 </form>
+                {% if blog.wp_url %}
+                <form method="post" action="{{ url_for('trigger_publish_blog_now') }}" class="-mx-4 -mb-4 mt-1 rounded-b-2xl border-t border-violet-200 bg-violet-50 px-4 py-3"
+                      onsubmit="return confirm('{{ blog.name }}: {{ blog.wp_url|replace('https://', '') }}의 최신 글 중 오늘 가장 화제성 높은 주제를 골라 지금 바로 재작성할까요? 통과하면 다음 매시 자동 처리 때(최대 1시간 이내) 실제로 공개됩니다.');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="site_id" value="{{ blog.site_id }}">
+                    <button type="submit" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 text-xs font-black text-white hover:bg-violet-800">이 블로그 지금 발행 (오늘 화제 키워드 자동 선택) →</button>
+                </form>
+                {% endif %}
+                </article>
                 {% endfor %}
             </div>
         </section>

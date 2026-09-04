@@ -135,7 +135,8 @@ def main() -> int:
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
-            publish_now=False, source_keyword=row.get("source_keyword", ""), search_description=search_description,
+            publish_now=row.get("publish_now", "").strip().upper() == "TRUE",
+            source_keyword=row.get("source_keyword", ""), search_description=search_description,
         )
         if platform == "blogger":
             try:

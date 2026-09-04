@@ -219,7 +219,7 @@ def main():
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
         labels = [x.strip() for x in labels.split(",") if x.strip()]
-    publish_now = False
+    publish_now = os.environ.get("BLOGGER_PUBLISH_NOW", "false").strip().lower() in {"1", "true", "yes", "on"}
     # Re-read immediately before append. Workflow concurrency serializes the
     # normal scheduler path; this second check also blocks a queue/operator race.
     latest = service.spreadsheets().values().get(

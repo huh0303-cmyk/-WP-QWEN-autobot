@@ -657,6 +657,56 @@ def _site_rows(_sites=None):
     return get_site_data(), None
 
 
+# 2026-09-04 CEO: Blogspot's "지금 발행" button must rewrite whichever recent
+# WP post best matches what's actually trending today, not a random recent
+# post. Each paired WP site already keeps a virality-ranked golden-keyword
+# pool file (see scripts/refresh_keyword_pool.py) — first lines are the
+# highest cross-outlet-mention keywords for that site's own topic. Reusing
+# that file (instead of a live web search per button click) keeps this
+# instant and free.
+WP_KEYWORD_FILE_BY_URL = {
+    "https://k-health365.com": "data/keywords/keywords_khealth.txt",
+    "https://koreamedicaltour.com": "data/keywords/keywords_medicaltour.txt",
+    "https://koreainvest365.com": "data/keywords/keywords_kinvest.txt",
+    "https://ki-korea.com": "data/keywords/keywords_kikorea.txt",
+    "https://koreainsurance365.com": "data/keywords/keywords_kinsurance.txt",
+    "https://kfinance365.com": "data/keywords/keywords_kfinance.txt",
+    "https://koreataxnlaw.com": "data/keywords/keywords_ktax.txt",
+    "https://koreacrypto365.com": "data/keywords/keywords_kcrypto.txt",
+    "https://krealestate365.com": "data/keywords/keywords_krealestate.txt",
+    "https://ktech365.com": "data/keywords/keywords_ktech.txt",
+    "https://oliveyoungkorea.com": "data/keywords/keywords_oliveyoung.txt",
+    "https://kworld365.com": "data/keywords/keywords_kworld.txt",
+    "https://k-trip365.com": "data/keywords/keywords_ktrip.txt",
+    "https://k-visa365.com": "data/keywords/keywords_kvisa.txt",
+    "https://koreawedding365.com": "data/keywords/keywords_kwedding.txt",
+    "https://kstudy365.com": "data/keywords/keywords_kstudy365.txt",
+    "https://studyinkorea365.com": "data/keywords/keywords_studyinkorea365.txt",
+    "https://kieca-korea.org": "data/keywords/keywords_kieca.txt",
+    "https://ksa-korea.org": "data/keywords/keywords_ksaKorea.txt",
+    "https://sis-korea.com": "data/keywords/keywords_sisKorea.txt",
+    "https://jobkorea365.com": "data/keywords/keywords_jobkorea365.txt",
+    "https://jobinkorea365.com": "data/keywords/keywords_jobinkorea365.txt",
+    "https://jobkoreaglobal.com": "data/keywords/keywords_jobkoreaglobal.txt",
+    "https://korea365.org": "data/keywords/keywords_korea365.txt",
+}
+
+
+def top_golden_keywords(wp_url: str, limit: int = 5) -> str:
+    """Top cross-outlet-ranked keywords for wp_url's own topic, comma-joined."""
+    rel = WP_KEYWORD_FILE_BY_URL.get(wp_url.rstrip("/"), "")
+    if not rel:
+        return ""
+    path = Path(__file__).resolve().parents[1] / rel
+    if not path.exists():
+        return ""
+    try:
+        lines = [line.split("\t", 1)[0].strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    except OSError:
+        return ""
+    return ", ".join(lines[:limit])
+
+
 def get_blogger_data():
     path = Path(__file__).resolve().parents[1] / "config" / "blogger_portfolio.json"
     rows = [
@@ -1120,6 +1170,57 @@ def trigger_publish_site_now():
     else:
         flash(f"{domain}: 글쓰기·공개 발행을 시작했습니다 (검토 단계 없음).", "success")
     return redirect(url_for("index") + "#wordpress")
+
+
+@app.post("/trigger/publish-blog-now")
+def trigger_publish_blog_now():
+    """CEO clicked '지금 발행' on one Blogspot card.
+
+    No manual keyword/source-URL typing: rewrites whichever of the paired
+    WP site's recent posts best matches that site's own current top
+    golden-keyword (virality-ranked, same file autopost_mega.py itself
+    draws from) and marks it for live publish. The rewrite+queue step runs
+    now; the actual Blogger API post happens on the next hourly
+    platform-publish-v2.yml pass (top of the hour + 17 min, so within 60
+    minutes) — not literally instant like the WP button, because Blogger
+    publishing is a separate two-stage pipeline.
+    """
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    site_id = request.form.get("site_id", "").strip()
+    registered = next((blog for blog in get_blogger_data() if blog["site_id"] == site_id), None)
+    if not registered or not registered.get("wp_url"):
+        flash("등록되지 않았거나 참고할 WordPress 사이트가 연결되지 않은 블로그입니다.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    if not token:
+        flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    language = "ko" if registered["wp_url"].rstrip("/") in {"https://koreanews365.com", "https://k-health365.com"} else "en"
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/blogger-rewrite.yml/dispatches",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            json={"ref": "main", "inputs": {
+                "source_wp_url": registered["wp_url"],
+                "blogger_site_id": site_id,
+                "language": language,
+                "persona": registered.get("persona") or "helpful specialist editor",
+                "tone": registered.get("tone") or "practical and clear",
+                "search_intent": top_golden_keywords(registered["wp_url"]),
+                "publish_now": "true",
+            }},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
+    except (requests.RequestException, RuntimeError) as exc:
+        flash(f"{registered['name']}: 발행 요청 실패 · {exc}", "error")
+    else:
+        flash(f"{registered['name']}: 글 작성을 시작했습니다. 통과하면 다음 매시 자동 처리(최대 1시간 이내) 때 실제로 공개됩니다.", "success")
+    return redirect(url_for("index") + "#blogspot")
 
 
 @app.post("/trigger/social-publish")

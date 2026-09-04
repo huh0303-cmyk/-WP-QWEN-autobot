@@ -31,6 +31,11 @@ on:
         required: true
         default: "1800"
         type: string
+      search_intent:
+        description: "Comma-separated current top keywords for this blog's own topic (from its paired WP site's golden-keyword pool); biases which recent WP post gets rewritten toward what's trending right now"
+        required: false
+        default: ""
+        type: string
       publish_now:
         description: "Explicit approval to publish; default creates a review draft"
         required: true
@@ -74,9 +79,10 @@ jobs:
           BLOGGER_PERSONA: ${{ inputs.persona }}
           BLOGGER_TONE: ${{ inputs.tone }}
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
+          BLOGGER_SEARCH_INTENT: ${{ inputs.search_intent }}
           BLOGGER_MAX_SIMILARITY: "0.55"
           BLOGGER_MIN_QUALITY_SCORE: "70"
-          BLOGGER_PUBLISH_NOW: "false"
+          BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
           FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py
       - name: Commit budget guard state
