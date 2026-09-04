@@ -113,6 +113,14 @@ def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     assert "완성된 영상은 먼저 비공개로 저장됩니다." in template
 
 
+def test_tiktok_heading_shows_logo_account_label_and_connected_count():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert 'aria-label="TikTok 로고"' in template
+    assert "{{ platform_name }}{% if platform_name != 'Facebook 페이지' %} 계정{% endif %}" in template
+    assert "({{ connected_accounts|length }}개)" in template
+    assert "{% for account in platform_accounts %}" in template
+
+
 def test_sns_cards_do_not_offer_unconnected_publish_actions():
     accounts = get_sns_data()
     assert accounts
