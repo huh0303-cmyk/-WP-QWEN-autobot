@@ -1,0 +1,667 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Korea365 통제실">
+    <title>서울국제대학SIS 총장실 Lab</title>
+    <link rel="manifest" href="{{ url_for('pwa_manifest') }}">
+    <link rel="icon" href="{{ url_for('static', filename='app-icon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='app-icon.svg') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        summary::-webkit-details-marker { display: none; }
+        details[open] .details-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
+    <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 px-4 py-3 text-white shadow-xl backdrop-blur sm:px-6">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div class="min-w-0">
+                <h1 class="truncate text-base font-black tracking-tight sm:text-xl">서울국제대학SIS 총장실 Lab</h1>
+                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WP 27 + Blogspot {{ bloggers|length }} + Tistory 5 + YouTube 10 · Google Sheet 통제</p>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+                <button id="install-pwa" type="button" hidden class="rounded-lg border border-white/20 bg-white px-2.5 py-1 text-[10px] font-black text-slate-950 shadow sm:text-xs">앱 설치</button>
+                <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-black text-emerald-300 sm:text-xs">DRAFT ONLY</span>
+            </div>
+        </div>
+    </header>
+    <nav class="sticky top-[61px] z-20 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
+        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-7">
+            <a href="#review-queue" class="rounded-lg bg-amber-50 px-2 py-2 text-center text-[10px] font-black text-amber-800 sm:text-xs">최근 글 현황</a>
+            <a href="#sns" class="rounded-lg bg-fuchsia-50 px-2 py-2 text-center text-[10px] font-black text-fuchsia-700 sm:text-xs">SNS 핵심수치</a>
+            <a href="#wordpress" class="rounded-lg bg-blue-50 px-2 py-2 text-center text-[10px] font-black text-blue-700 sm:text-xs">WP 27</a>
+            <a href="#blogspot" class="rounded-lg bg-violet-50 px-2 py-2 text-center text-[10px] font-black text-violet-700 sm:text-xs">Blogspot {{ bloggers|length }}</a>
+            <a href="#tistory" class="rounded-lg bg-teal-50 px-2 py-2 text-center text-[10px] font-black text-teal-700 sm:text-xs">Tistory 5</a>
+            <a href="#youtube" class="rounded-lg bg-red-50 px-2 py-2 text-center text-[10px] font-black text-red-700 sm:text-xs">YouTube 10</a>
+            <a href="#google-sheet" class="rounded-lg bg-emerald-50 px-2 py-2 text-center text-[10px] font-black text-emerald-700 sm:text-xs">Google Sheet</a>
+        </div>
+    </nav>
+    <main class="mx-auto max-w-7xl space-y-10 p-3 pb-20 sm:p-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="sticky top-16 z-20 space-y-2">
+            {% for category, message in messages %}
+            <div class="rounded-xl border px-4 py-3 text-sm font-bold shadow-lg {% if category == 'success' %}border-emerald-300 bg-emerald-50 text-emerald-800{% else %}border-red-300 bg-red-50 text-red-800{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
+            {% if problem_summary.all_clear %}
+            <p class="flex items-center gap-2 text-sm font-black text-emerald-800"><span class="text-lg">✅</span> 지금 문제 없음 — WP {{ problem_summary.wp_total }}·Blogspot {{ problem_summary.blogger_total }}·Tistory {{ problem_summary.tistory_total }}·YouTube {{ problem_summary.youtube_total }}·SNS {{ problem_summary.sns_total }} 전부 정상</p>
+            {% else %}
+            <p class="text-sm font-black text-rose-800">⚠ 지금 확인이 필요한 항목</p>
+            <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {% if problem_summary.wp_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">WordPress {{ problem_summary.wp_issues|length }}/{{ problem_summary.wp_total }}</p>
+                    {% for issue in problem_summary.wp_issues[:6] %}
+                    <p class="truncate text-[11px] text-slate-700"><a href="#wordpress" class="font-bold hover:underline">{{ issue.domain }}</a> — {{ issue.reasons|join(', ') }}</p>
+                    {% endfor %}
+                    {% if problem_summary.wp_issues|length > 6 %}<p class="text-[10px] text-slate-400">외 {{ problem_summary.wp_issues|length - 6 }}개 더 (WP 27 탭에서 확인)</p>{% endif %}
+                </div>
+                {% endif %}
+                {% if problem_summary.blogger_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">Blogspot {{ problem_summary.blogger_issues|length }}/{{ problem_summary.blogger_total }} 미연결</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#blogspot" class="font-bold hover:underline">{{ problem_summary.blogger_issues[:8]|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+                {% if problem_summary.tistory_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">Tistory {{ problem_summary.tistory_issues|length }}/{{ problem_summary.tistory_total }} 피드 실패</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#tistory" class="font-bold hover:underline">{{ problem_summary.tistory_issues|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+                {% if problem_summary.youtube_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">YouTube {{ problem_summary.youtube_issues|length }}/{{ problem_summary.youtube_total }} 채널ID 없음</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#youtube" class="font-bold hover:underline">{{ problem_summary.youtube_issues|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+                {% if problem_summary.sns_issues %}
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-xs font-black text-rose-700">SNS {{ problem_summary.sns_issues|length }}/{{ problem_summary.sns_total }} 오류</p>
+                    <p class="truncate text-[11px] text-slate-700"><a href="#sns" class="font-bold hover:underline">{{ problem_summary.sns_issues|join(', ') }}</a></p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+        <section id="review-queue" class="scroll-mt-24 rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm sm:p-7">
+            <p class="text-xs font-black text-amber-700">RECENT ACTIVITY</p>
+            <h2 class="mt-1 text-2xl font-extrabold text-slate-950">최근 글 현황</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-700">WordPress는 GPT 2중 심사를 통과하면 자동으로 공개됩니다 — 여기는 확인용 기록이며, 이상하면 글을 눌러 직접 비공개로 되돌리세요. Blogspot·Tistory는 아직 비공개 초안이라 각 플랫폼에서 직접 검토·공개해야 합니다.</p>
+            <div class="mt-4 overflow-hidden rounded-2xl border border-amber-300 bg-white shadow-sm">
+                <div class="flex items-center justify-between bg-amber-100 px-4 py-3">
+                    <h3 class="font-black text-amber-950">최근 글 목록</h3>
+                    <span class="rounded-full bg-amber-700 px-2.5 py-1 text-xs font-black text-white">{{ review_items|length }}건</span>
+                </div>
+                {% if review_items %}
+                <div class="divide-y divide-slate-100">
+                    {% for item in review_items[:25] %}
+                    <article class="grid gap-2 px-4 py-3 {% if item.error %}bg-red-50/70{% else %}hover:bg-amber-50/60{% endif %} sm:grid-cols-[110px_1fr_auto] sm:items-center">
+                        <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black {% if item.error %}text-red-700{% else %}text-amber-700{% endif %}">{{ item.platform }}</span>{{ item.created_at }}</div>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p>
+                            <p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p>
+                            <p class="mt-1 text-[10px] font-black {% if item.error %}text-red-700{% else %}text-slate-500{% endif %}">{{ item.status }}</p>
+                            {% if item.platform == "Blogspot" %}
+                            {% if item.search_description %}
+                            <div class="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-[10px] font-black text-violet-800">Blogger 검색 설명 · {{ item.search_description|length }}자</p>
+                                    <button type="button" data-copy="{{ item.search_description|e }}" onclick="navigator.clipboard.writeText(this.dataset.copy); this.textContent='복사됨';" class="shrink-0 rounded-lg bg-violet-700 px-2 py-1 text-[10px] font-black text-white">설명 복사</button>
+                                </div>
+                                <p class="mt-1 text-[11px] leading-relaxed text-slate-700">{{ item.search_description }}</p>
+                                <p class="mt-1 text-[9px] font-bold text-violet-700">글 검토를 열어 검색 설명 칸에 붙여넣은 뒤 공개하세요.</p>
+                            </div>
+                            {% else %}
+                            <p class="mt-2 rounded-lg bg-red-50 px-2 py-1.5 text-[10px] font-black text-red-700">검색 설명 누락 · 공개하지 말고 다시 생성하세요.</p>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        {% if item.review_url %}
+                        <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl {% if item.platform == 'WordPress' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-600 text-white{% endif %} px-4 text-xs font-black">{% if item.platform == 'WordPress' %}공개글 확인 →{% else %}검토 →{% endif %}</a>
+                        {% elif item.retryable %}
+                        <a href="#blogspot" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-red-700 px-4 text-xs font-black text-white">카드에서 재시도 ↓</a>
+                        {% else %}
+                        <span class="inline-flex min-h-10 items-center justify-center rounded-xl bg-slate-100 px-4 text-xs font-black text-slate-600">{{ item.status }}</span>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="px-4 py-6 text-center text-sm font-bold text-slate-500">오늘 기록된 글이 아직 없습니다.</p>
+                {% endif %}
+            </div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <a href="https://www.blogger.com/" target="_blank" rel="noopener" class="rounded-2xl bg-violet-700 px-4 py-4 text-center text-sm font-black text-white">Blogspot 초안 검토</a>
+                <a href="https://www.tistory.com/auth/login" target="_blank" rel="noopener" class="rounded-2xl bg-teal-700 px-4 py-4 text-center text-sm font-black text-white">Tistory 관리자</a>
+                <a href="https://studio.youtube.com/" target="_blank" rel="noopener" class="rounded-2xl bg-red-700 px-4 py-4 text-center text-sm font-black text-white">YouTube 비공개 검토</a>
+            </div>
+        </section>
+        <div id="wordpress" class="flex items-center justify-between gap-3 scroll-mt-24">
+            <div>
+                <p class="text-xs font-bold text-slate-400">WORDPRESS 27</p>
+                <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">WordPress 통제실</h2>
+            </div>
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+                <div class="text-3xl font-black text-blue-600">27</div>
+                <div class="text-xs text-blue-500 font-semibold">등록 사이트</div>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <div class="grid gap-2 text-xs sm:grid-cols-2">
+                <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 font-bold text-blue-900">일반 WordPress 25개 · 사이트별 하루 1포스팅 · 주 7포스팅</p>
+                <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-bold text-amber-900">뉴스룸 2개 예외 · 사이트별 RSS 하루 3~10회</p>
+            </div>
+            <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm font-black text-slate-900">오늘 방문자 많은 순서</p>
+                    <p class="text-xs text-slate-500">핵심 수치와 실행 버튼을 먼저 보여줍니다. 세부 설정은 각 카드의 ‘상세정보 보기’에서 확인하세요.</p>
+                </div>
+                <label class="relative block sm:w-72">
+                    <span class="sr-only">사이트 찾기</span>
+                    <input id="wordpress-search" type="search" class="h-11 w-full rounded-xl border border-slate-300 bg-slate-50 pl-10 pr-3 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="사이트 이름으로 찾기">
+                    <span class="pointer-events-none absolute left-3 top-2.5 text-lg text-slate-400">⌕</span>
+                </label>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {% for site in sites %}
+                <article class="wordpress-card min-w-0 overflow-hidden rounded-2xl border bg-gradient-to-br from-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if site.google_approved %}border-2 border-amber-400 to-amber-50 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-blue-200 to-blue-50{% endif %}" data-search="{{ site.domain|lower }} {{ (site.category or '')|lower }}">
+                <form method="post" action="{{ url_for('trigger_draft') }}" class="space-y-3 p-4" {% if not site.auth_ready %}onsubmit="return false;" aria-disabled="true"{% endif %}>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="platform" value="wordpress">
+                    <input type="hidden" name="site_id" value="{{ site.site_id }}">
+                    <input type="hidden" name="domain" value="{{ site.domain }}">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}자동 재수집 중{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}재수집{% endif %}</span>
+                            <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
+                            <span class="break-all font-bold text-slate-800">{{ site.domain }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            {% if site.google_approved %}
+                            <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-300 to-amber-500 px-2 py-1 text-[9px] font-black tracking-tight text-amber-950 shadow-[0_3px_10px_rgba(217,119,6,.28)]" title="Google 승인 2025-08-15">
+                                <span class="text-[11px] leading-none">★</span><span>G승인</span><span class="font-bold opacity-70">250815</span>
+                            </span>
+                            {% endif %}
+                            <span class="h-3 w-3 rounded-full {% if site.auth_ready %}bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,.18)]{% else %}bg-red-500 shadow-[0_0_0_3px_rgba(239,68,68,.18)]{% endif %}" title="WP 인증 {% if site.auth_ready %}정상{% else %}미연결{% endif %}"></span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-100 p-2" aria-label="{{ site.domain }} 핵심 통계 4개">
+                        <div class="col-span-2 rounded-xl border border-blue-200 bg-blue-600 px-3 py-3 text-white shadow-sm">
+                            <p class="text-[11px] font-black tracking-tight text-blue-100">당일 방문자(어제 대비)</p>
+                            {% if site.visitor_checked_at %}<p class="text-[9px] font-bold text-blue-100">실측 {{ site.visitor_checked_at }}</p>{% endif %}
+                            {% if site.today_visitors is not none %}
+                            <p class="mt-1 flex items-baseline gap-2">
+                                <span class="text-3xl font-black tabular-nums">{{ '{:,}'.format(site.today_visitors) }}</span>
+                                {% if site.today_delta is not none %}<span class="rounded-full bg-white/20 px-2 py-0.5 text-sm font-black {% if site.today_delta < 0 %}text-rose-100{% else %}text-emerald-100{% endif %}">({% if site.today_delta > 0 %}+{% endif %}{{ site.today_delta }})</span>{% else %}<span class="text-[10px] font-bold text-blue-100">(증감 미집계)</span>{% endif %}
+                            </p>
+                            {% else %}<p class="mt-1 text-lg font-black text-amber-200">잠시 후 자동 재수집</p>{% endif %}
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+                            <p class="text-[11px] font-black text-slate-500">누적 방문자(오늘 증가)</p>
+                            {% if site.total_visitors is not none %}
+                            <p class="mt-1 text-xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.total_visitors) }}
+                                {% if site.total_delta is not none %}<span class="text-xs {% if site.total_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.total_delta > 0 %}+{% endif %}{{ site.total_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
+                            </p>
+                            {% else %}<p class="mt-1 text-sm font-black text-amber-600">집계 중</p>{% endif %}
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+                            <p class="text-[11px] font-black text-slate-500">총 게시글(증감)</p>
+                            {% if site.total_posts is not none %}
+                            <p class="mt-1 text-xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.total_posts) }}
+                                {% if site.posts_delta is not none %}<span class="text-xs {% if site.posts_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.posts_delta > 0 %}+{% endif %}{{ site.posts_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
+                            </p>
+                            {% else %}<p class="mt-1 text-sm font-black text-amber-600">집계 중</p>{% endif %}
+                        </div>
+                        <div class="col-span-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 shadow-sm" title="{{ site.index_status }}">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-[11px] font-black text-emerald-800">Google 색인 글(증감)</p>
+                            </div>
+                            {% if site.indexed is not none %}
+                            <p class="mt-1 text-xl font-black tabular-nums text-emerald-950">{{ '{:,}'.format(site.indexed) }}
+                                {% if site.indexed_delta is not none %}<span class="text-sm {% if site.indexed_delta < 0 %}text-red-600{% else %}text-emerald-700{% endif %}">({% if site.indexed_delta > 0 %}+{% endif %}{{ site.indexed_delta }})</span>{% else %}<span class="text-[10px] text-emerald-700">(증감 미집계)</span>{% endif %}
+                            </p>
+                            {% if site.index_unknown %}<p class="mt-1 text-[9px] font-black text-amber-700">판정 미확인 {{ site.index_unknown }}개 별도</p>{% endif %}
+                            {% else %}<p class="mt-1 text-base font-black text-amber-700">{{ site.index_status }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <div class="rounded-lg border border-blue-200 bg-blue-100/80 px-3 py-2 text-xs text-blue-900">
+                        <span class="font-black">사이트 분야:</span> <span class="font-bold">{{ site.category or '미분류' }}</span>
+                    </div>
+                    <div class="rounded-lg border px-3 py-2 text-xs {% if site.cadence.kind == 'newsroom' %}border-amber-200 bg-amber-50 text-amber-900{% else %}border-emerald-200 bg-emerald-50 text-emerald-900{% endif %}">
+                        <span class="font-black">발행 정책:</span> <span class="font-bold">{{ site.cadence.label }}</span>
+                    </div>
+                    <details class="rounded-xl border border-slate-200 bg-white/80 text-xs">
+                        <summary class="flex min-h-11 cursor-pointer items-center justify-between px-3 py-2 font-black text-slate-700"><span>상세정보 보기</span><span class="details-arrow text-slate-400 transition">⌄</span></summary>
+                        <div class="space-y-3 border-t border-slate-100 px-3 py-3">
+                        <p class="mb-1.5 font-black text-slate-700">카테고리별 글 수</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for category in site.official_categories %}
+                            <span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-bold text-slate-700">
+                                {{ category.name }} ({{ category.count }},
+                                {% if category.delta is not none %}<span class="{% if category.delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">{% if category.delta > 0 %}+{% endif %}{{ category.delta }}</span>{% else %}<span class="text-slate-400">증감 미집계</span>{% endif %})
+                            </span>
+                            {% else %}
+                            <span class="text-[10px] font-bold text-amber-600">카테고리 수집 실패</span>
+                            {% endfor %}
+                        </div>
+                    <div class="space-y-1 rounded-lg bg-slate-900/5 px-3 py-2 text-[11px] text-slate-700">
+                        <p><span class="font-black">페르소나:</span> {{ site.persona }}</p>
+                        <p><span class="font-black">톤앤매너:</span> {{ site.tone }}</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2 border-t pt-3 sm:grid-cols-2">
+                        <label class="text-[10px] font-black text-slate-500">글쓰기 엔진
+                            <select name="text_model" class="mt-1 h-11 w-full rounded-xl border border-blue-200 bg-white px-2 text-xs font-bold text-slate-800">
+                                {% for value, model in text_models.items() %}
+                                <option value="{{ value }}" {% if value == site.default_text_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label class="text-[10px] font-black text-slate-500">이미지 엔진
+                            <select name="image_model" class="mt-1 h-11 w-full rounded-xl border border-blue-200 bg-white px-2 text-xs font-bold text-slate-800">
+                                {% for value, model in image_models.items() %}
+                                <option value="{{ value }}" {% if value == site.default_image_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <p class="sm:col-span-2 text-[10px] text-slate-400">이미지는 관련성이 있을 때만 0~2장</p>
+                    </div>
+                        </div>
+                    </details>
+                    <div class="border-t pt-3 space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-500">핵심 키워드</label>
+                        <input id="keyword-{{ loop.index }}" name="keyword" type="text" required
+                               class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-base focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100"
+                               placeholder="직접 입력하거나 아래 추천 선택">
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for suggestion in site.keyword_suggestions %}
+                            <button type="button"
+                                    class="keyword-chip rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700 hover:bg-blue-100"
+                                    data-target="keyword-{{ loop.index }}"
+                                    data-keyword="{{ suggestion.keyword }}"
+                                    title="{{ suggestion.category }} · 주간 리서치 풀">
+                                {{ suggestion.keyword }}
+                            </button>
+                            {% else %}
+                            <span class="text-[11px] text-amber-600">주간 키워드 풀 갱신 필요</span>
+                            {% endfor %}
+                        </div>
+                        <p class="text-[10px] text-slate-400">매주 갱신 · 네트워크 제목 중복 제거 · 확인되지 않은 수치 미표시</p>
+                    </div>
+                    {% if site.auth_ready %}
+                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
+                        <span>WordPress 글 바로 만들기 · 비공개 초안</span><span aria-hidden="true">→</span>
+                    </button>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 초안 실행 · 연결 없음</div>
+                    {% endif %}
+                </form>
+                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="border-t {% if site.auth_ready %}border-emerald-200 bg-emerald-50{% else %}border-slate-200 bg-slate-50{% endif %} px-4 py-3"
+                      onsubmit="return confirm('{{ site.domain }}: 사이트 자체 키워드 풀에서 지금 바로 글을 쓰고 공개 발행할까요? 검토 단계 없이 바로 공개됩니다.');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="domain" value="{{ site.domain }}">
+                    {% if site.auth_ready %}
+                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl {% if site.domain in ['koreanews365.com', 'korea365.org'] %}bg-gradient-to-r from-orange-600 to-rose-600{% else %}bg-emerald-600{% endif %} px-4 text-sm font-black text-white shadow-sm hover:brightness-95">{% if site.domain in ['koreanews365.com', 'korea365.org'] %}🔥 바이럴 발행{% else %}WordPress 글 1건 바로 올리기 · 공개 →{% endif %}</button>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 바로 올리기 · 연결 없음</div>
+                    {% endif %}
+                </form>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+        <section id="blogspot" class="scroll-mt-24 space-y-4 border-t border-slate-200 pt-8">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold text-slate-400">BLOGSPOT {{ bloggers|length }} · 실제 운영 사이트만 표시</p>
+                    <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">Blogspot 통제실</h2>
+                </div>
+                <div class="rounded-2xl border border-violet-100 bg-violet-50 p-4 text-center">
+                    <div class="text-3xl font-black text-violet-600">{{ bloggers|length }}</div>
+                    <div class="text-xs font-black text-violet-700">운영 중인 Blogger</div>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {% for blog in bloggers %}
+                <form method="post" action="{{ url_for('trigger_draft') }}" class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}" {% if not blog.connected %}onsubmit="return false;" aria-disabled="true"{% endif %}>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="platform" value="blogger">
+                    <input type="hidden" name="site_id" value="{{ blog.site_id }}">
+                    <input type="hidden" name="domain" value="{{ blog.url|replace('https://', '')|replace('http://', '') }}">
+                    <input type="hidden" name="selection_mode" value="auto">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="mb-1 flex items-center gap-2">
+                                <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-violet-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
+                                <p class="text-[10px] font-bold text-slate-400">등록 B{{ blog.order }} · {{ blog.category }}</p>
+                            </div>
+                            <h3 class="truncate text-base font-black text-slate-950" title="{{ blog.name }}">{{ blog.name }}</h3>
+                            <a class="mt-0.5 block truncate text-[11px] font-semibold text-violet-700 hover:underline" href="{{ blog.url }}" target="_blank" rel="noopener" title="{{ blog.url }}">{{ blog.url|replace('https://', '') }}</a>
+                        </div>
+                        <div class="flex shrink-0 flex-col items-end gap-1.5">
+                            {% if blog.google_approved %}<span class="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-300 to-amber-500 px-2 py-1 text-[9px] font-black text-amber-950 shadow"><span>★</span> G승인</span>{% endif %}
+                            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black {% if blog.connected %}bg-violet-100 text-violet-700{% else %}bg-red-100 text-red-700{% endif %}" title="방문자·색인 연결 상태가 아니라 Blogger 발행 대상 ID 등록 여부입니다"><span class="h-2 w-2 rounded-full {% if blog.connected %}bg-violet-500{% else %}bg-red-500{% endif %}"></span>{% if blog.connected %}발행 준비됨{% else %}연결 필요{% endif %}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 rounded-2xl border border-violet-300 bg-violet-950 p-2 shadow-inner">
+                        {% for label, value, delta in [('당일 방문자', blog.today_visitors, blog.today_delta), ('누적 방문자', blog.total_visitors, blog.total_delta), ('총 글 수', blog.total_posts, blog.posts_delta), ('Google 색인', blog.indexed, blog.indexed_delta)] %}
+                        <div class="rounded-xl bg-white p-3 shadow-sm">
+                            <p class="text-[10px] font-black text-slate-500">{{ label }} <span class="text-slate-400">(증감)</span></p>
+                            {% if value is not none %}<p class="mt-1 text-xl font-black text-slate-950">{{ '{:,}'.format(value) }} {% if delta is not none %}<span class="text-xs {% if delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if delta > 0 %}+{% endif %}{{ delta }})</span>{% else %}<span class="text-[9px] text-slate-400">(증감 미집계)</span>{% endif %}</p>
+                            {% else %}<p class="mt-1 text-sm font-black text-amber-600">미집계 <span class="text-[9px] text-slate-400">(증감 미집계)</span></p>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="rounded-lg border border-violet-200 bg-violet-100/80 px-3 py-2 text-xs text-violet-900">
+                        <span class="font-black">분야:</span> <span class="font-bold">{{ (blog.category or '미분류')|compact_category(42) }}</span>
+                    </div>
+                    {% if blog.site_id == 'blogger_kworld365_kpop' %}
+                    <div class="rounded-xl border border-fuchsia-300 bg-fuchsia-50 px-3 py-2 text-xs text-fuchsia-950">
+                        <p class="font-black">K-pop 전문 · 매일 1회</p>
+                        <p class="mt-0.5 text-[10px] font-semibold">아티스트·컴백·음원·공연·차트·팬덤 관련 글만 작성합니다.</p>
+                    </div>
+                    {% endif %}
+                    <details class="rounded-xl border border-slate-200 bg-white/80 text-xs">
+                        <summary class="flex min-h-11 cursor-pointer items-center justify-between px-3 py-2 font-black text-slate-700"><span>상세정보 보기</span><span class="details-arrow text-slate-400 transition">⌄</span></summary>
+                        <div class="space-y-3 border-t border-slate-100 px-3 py-3">
+                        <p class="mb-1.5 font-black text-slate-700">카테고리별 글 수</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for category in blog.official_categories[:8] %}
+                            <span class="rounded-full border border-violet-200 bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-700" title="{{ category.name }}">{{ category.name|compact_category }} ({{ category.count }})</span>
+                            {% else %}
+                            <span class="text-[10px] font-bold text-slate-400">라벨 없음</span>
+                            {% endfor %}
+                            {% if blog.official_categories|length > 8 %}<span class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-black text-slate-500">+{{ blog.official_categories|length - 8 }}개</span>{% endif %}
+                        </div>
+                    <div class="space-y-1 rounded-lg bg-violet-900/5 px-3 py-2 text-[11px] text-slate-700">
+                        <p><span class="font-black">페르소나:</span> {{ blog.persona }}</p>
+                        <p><span class="font-black">톤앤매너:</span> {{ blog.tone }}</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2 border-t pt-3 sm:grid-cols-2">
+                        <label class="text-[10px] font-black text-slate-500">글쓰기 엔진
+                            <select name="text_model" class="mt-1 h-11 w-full rounded-xl border border-violet-200 bg-white px-2 text-xs font-bold text-slate-800">
+                                {% for value, model in text_models.items() %}
+                                <option value="{{ value }}" {% if value == blog.default_text_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label class="text-[10px] font-black text-slate-500">이미지 엔진
+                            <select name="image_model" class="mt-1 h-11 w-full rounded-xl border border-violet-200 bg-white px-2 text-xs font-bold text-slate-800">
+                                {% for value, model in image_models.items() %}
+                                <option value="{{ value }}" {% if value == blog.default_image_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <p class="sm:col-span-2 text-[10px] text-slate-400">글과 이미지 생성 방식은 필요할 때만 변경하세요.</p>
+                    </div>
+                        </div>
+                    </details>
+                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-3 text-[11px] text-violet-950">
+                        <p class="font-black">주제 자동 선택</p>
+                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다.</p>
+                        <p class="text-[10px] text-violet-700">연계 기준 WP: {{ blog.wp_url|replace('https://', '')|replace('http://', '') }} · 의미상 가까운 공개 글만 자동 연결하며, 맞는 글이 없으면 억지로 연결하지 않습니다.</p>
+                    </div>
+                    {% if blog.connected %}
+                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-4 text-sm font-black text-white shadow-md shadow-violet-200 transition active:scale-[.98] hover:from-violet-800 hover:to-fuchsia-700">
+                        <span>{% if blog.url|replace('https://', '')|replace('http://', '')|replace('/', '') == 'korea365guide.blogspot.com' %}🔥 바이럴 발행{% else %}Blogspot 글 1건 지금 발행 · 공개{% endif %}</span><span aria-hidden="true">→</span>
+                    </button>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">Blogspot 바로 올리기 · 연결 없음</div>
+                    {% endif %}
+                </form>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="tistory" class="scroll-mt-24 space-y-4 border-t border-slate-200 pt-8">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                    <p class="text-xs font-bold text-slate-400">TISTORY 5 · 독립 검토 큐</p>
+                    <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">Tistory 통제실</h2>
+                    <p class="mt-1 text-xs text-slate-500">글 만들기 → 내용 확인 → Tistory에서 게시</p>
+                </div>
+                <div class="flex items-stretch gap-2">
+                    <div class="rounded-2xl border border-teal-100 bg-teal-50 px-5 py-3 text-center">
+                        <div class="text-3xl font-black text-teal-700">{{ tistory_sites|length }}</div>
+                        <div class="text-xs font-semibold text-teal-600">등록 채널</div>
+                    </div>
+                    <form method="post" action="{{ url_for('trigger_tistory_plan') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="h-full rounded-2xl bg-gradient-to-r from-teal-700 to-cyan-600 px-4 text-xs font-black text-white shadow-md shadow-teal-200 transition active:scale-[.98] hover:from-teal-800 hover:to-cyan-700">
+                            5개 검토본 생성
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% if not problem_summary.tistory_issues %}
+            <p class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-800">✓ 5개 사이트 RSS 모두 연결됨 · 공개글 수 정상 수집 중</p>
+            {% endif %}
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {% for blog in tistory_sites %}
+                <article class="min-w-0 space-y-3 rounded-2xl border border-teal-200 bg-gradient-to-br from-white to-teal-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="mb-1 flex items-center gap-2">
+                                <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-teal-700 px-2 text-xs font-black text-white">T{{ blog.order }}</span>
+                                <p class="truncate text-[11px] font-black text-slate-700">{{ blog.name }}</p>
+                            </div>
+                            <a class="break-all text-sm font-bold text-teal-800 hover:underline" href="{{ blog.url }}" target="_blank" rel="noopener">{{ blog.url|replace('https://', '') }}</a>
+                        </div>
+                        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black {% if blog.feed_connected %}bg-teal-100 text-teal-700{% else %}bg-red-100 text-red-700{% endif %}" title="방문자·Google 색인이 아니라 공개 RSS 피드 연결 상태입니다"><span class="h-2 w-2 rounded-full {% if blog.feed_connected %}bg-teal-500{% else %}bg-red-500{% endif %}"></span>RSS {% if blog.feed_connected %}연결{% else %}미연결{% endif %}</span>
+                    </div>
+                    <div class="rounded-lg border border-teal-200 bg-teal-100/80 px-3 py-2 text-xs text-teal-950">
+                        <span class="font-black">사이트 분야:</span> <span class="font-bold">{{ blog.category or '미분류' }}</span>
+                        {% if blog.reference_wp %}<p class="mt-1 text-[10px] font-bold text-teal-700">연계 WP: {{ blog.reference_wp|replace('https://', '')|replace('http://', '') }}</p>{% endif %}
+                    </div>
+                    <details class="rounded-xl border border-slate-200 bg-white/80 text-xs">
+                        <summary class="flex min-h-11 cursor-pointer items-center justify-between px-3 py-2 font-black text-slate-700"><span>카테고리·작성 설정 보기</span><span class="details-arrow text-slate-400 transition">⌄</span></summary>
+                        <div class="space-y-3 border-t border-slate-100 px-3 py-3">
+                        <p class="mb-1.5 font-black text-slate-700">카테고리별 공개글 수</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for category in blog.official_categories %}
+                            <span class="rounded-full border border-teal-200 bg-teal-50 px-2 py-1 text-[10px] font-bold text-teal-800">
+                                {{ category.name }} {{ category.count }}({% if category.delta is not none %}<span class="{% if category.delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">{% if category.delta > 0 %}+{% endif %}{{ category.delta }}</span>{% else %}<span class="text-slate-400">—</span>{% endif %})
+                            </span>
+                            {% else %}
+                            <span class="text-[10px] font-bold text-amber-600">카테고리 글수 수집 필요</span>
+                            {% endfor %}
+                        </div>
+                    <div class="space-y-1 rounded-lg bg-teal-900/5 px-3 py-2 text-[11px] text-slate-700">
+                        <p><span class="font-black">페르소나:</span> {{ blog.persona }}</p>
+                        <p><span class="font-black">톤앤매너:</span> {{ blog.tone }}</p>
+                    </div>
+                    {% if blog.latest_draft_title %}
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[10px] font-black text-emerald-700">최신 비공개 검토본</span>
+                            <span class="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-black text-white">{{ blog.latest_draft_score }}점</span>
+                        </div>
+                        <p class="mt-1 text-xs font-bold leading-relaxed text-slate-800">{{ blog.latest_draft_title }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="grid grid-cols-2 gap-2">
+                        {% for label, value, delta in [
+                            ('당일 방문자(증감)', blog.today_visitors, blog.today_delta),
+                            ('누적 방문자(증감)', blog.total_visitors, blog.total_delta),
+                            ('RSS 공개글(증감)', blog.total_posts, blog.posts_delta),
+                            ('Google 색인 글(증감)', blog.indexed, blog.indexed_delta)
+                        ] %}
+                        <div class="rounded-lg bg-white/80 p-3">
+                            <p class="text-[10px] font-bold text-slate-400">{{ label }}</p>
+                            {% if value is not none %}
+                            <p class="text-lg font-black text-slate-900">{{ '{:,}'.format(value) }}
+                                {% if delta is not none %}<span class="text-xs {% if delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if delta > 0 %}+{% endif %}{{ delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
+                            </p>
+                            {% else %}<p class="text-sm font-bold text-slate-500">통계 미연동</p>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="grid grid-cols-1 gap-2 border-t pt-3 sm:grid-cols-2">
+                        <label class="text-[10px] font-black text-slate-500">기본 글쓰기 엔진
+                            <select class="mt-1 h-11 w-full rounded-xl border border-teal-200 bg-white px-2 text-xs font-bold text-slate-800" disabled>
+                                {% for value, model in text_models.items() %}
+                                <option value="{{ value }}" {% if value == blog.default_text_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label class="text-[10px] font-black text-slate-500">기본 이미지 엔진
+                            <select class="mt-1 h-11 w-full rounded-xl border border-teal-200 bg-white px-2 text-xs font-bold text-slate-800" disabled>
+                                {% for value, model in image_models.items() %}
+                                <option value="{{ value }}" {% if value == blog.default_image_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                        </div>
+                    </details>
+                    <div class="flex items-center justify-between border-t pt-3 text-[11px]">
+                        <span class="font-bold text-teal-800">발행 준비됨</span>
+                        <span class="font-semibold text-slate-500">확인 후 직접 게시</span>
+                    </div>
+                    <form method="post" action="{{ url_for('trigger_tistory_plan') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="site_id" value="{{ blog.site_id }}">
+                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl {% if blog.url|replace('https://', '')|replace('http://', '')|replace('/', '') == 'huh0303.tistory.com' %}bg-gradient-to-r from-orange-600 to-rose-600{% else %}bg-teal-700{% endif %} px-4 text-sm font-black text-white shadow-sm transition hover:brightness-95 active:scale-[.98]">{% if blog.url|replace('https://', '')|replace('http://', '')|replace('/', '') == 'huh0303.tistory.com' %}🔥 바이럴 발행{% else %}이 사이트 글 초안 만들기{% endif %}</button>
+                    </form>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="youtube" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                    <p class="text-xs font-bold text-slate-400">YOUTUBE 10 · 독립 생성 모듈</p>
+                    <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">YouTube 통제실</h2>
+                    <p class="mt-1 text-xs text-slate-500">플리 5 + 지식 5 · 채널 버튼을 누르면 다음 준비 영상을 만들고 비공개로 업로드합니다.</p>
+                </div>
+                <div class="rounded-2xl border border-red-100 bg-red-50 px-5 py-3 text-center">
+                    <div class="text-3xl font-black text-red-700">{{ youtube_channels|length }}</div>
+                    <div class="text-xs font-semibold text-red-600">등록 채널</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {% for channel in youtube_channels %}
+                <article class="min-w-0 space-y-3 rounded-2xl border border-red-200 bg-gradient-to-br from-white to-red-50 p-4 shadow-sm">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <span class="rounded-full {% if channel.group == 'PLAYLIST' %}bg-fuchsia-600{% else %}bg-red-700{% endif %} px-2 py-1 text-[9px] font-black text-white">{% if channel.group == 'PLAYLIST' %}플리{% else %}지식{% endif %}</span>
+                            <h3 class="mt-2 truncate text-base font-black text-slate-900">{{ channel.name }}</h3>
+                        </div>
+                        <span class="h-3 w-3 shrink-0 rounded-full {% if channel.enabled and channel.status == 'READY' %}bg-emerald-500{% else %}bg-red-500{% endif %}" title="{{ channel.status }}"></span>
+                    </div>
+                    {% if channel.channel_url %}<a href="{{ channel.channel_url }}" target="_blank" rel="noopener" class="block break-all text-[11px] font-bold text-red-700 hover:underline">{{ channel.channel_id }}</a>{% endif %}
+                    <p class="rounded-xl border border-red-100 bg-white/80 px-3 py-2 text-[11px] font-semibold text-slate-600">완성된 영상은 먼저 비공개로 저장됩니다.</p>
+                    {% if channel.action_ready %}
+                    <form method="post" action="{{ url_for('trigger_youtube_batch') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="channel_key" value="{{ channel.channel_key }}">
+                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-red-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-red-800 active:scale-[.98]">YouTube 콘텐츠 바로 만들기 · 비공개</button>
+                    </form>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">YouTube 바로 올리기 · 연결 없음</div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="sns" class="scroll-mt-28 space-y-7 border-t border-slate-200 pt-8">
+            <div class="rounded-3xl bg-gradient-to-r from-fuchsia-700 via-violet-700 to-indigo-700 px-5 py-6 text-white shadow-lg sm:px-7">
+                <p class="text-xs font-black text-fuchsia-200">가장 먼저 확인할 성장 지표</p>
+                <h2 class="mt-1 text-3xl font-black sm:text-4xl">SNS 계정 현황</h2>
+                <p class="mt-2 text-sm font-semibold text-white/80">플랫폼 → 계정 → 팔로워·반응·콘텐츠·시청시간 순서로 확인하세요.</p>
+            </div>
+            {% for platform_name in ['TikTok', 'Instagram', 'Facebook 페이지', 'Threads'] %}
+            <div class="space-y-3 {% if platform_name == 'Threads' %}border-t border-slate-200 pt-6{% endif %}">
+                <div class="flex items-end justify-between gap-3">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.18em] {% if platform_name == 'TikTok' %}text-cyan-600{% elif platform_name == 'Instagram' %}text-fuchsia-600{% elif platform_name == 'Facebook 페이지' %}text-blue-600{% else %}text-slate-500{% endif %}">{% if platform_name == 'Threads' %}보조 채널{% else %}핵심 채널{% endif %}</p>
+                        <h3 class="text-2xl font-black text-slate-950 sm:text-3xl">{{ platform_name }}</h3>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    {% for account in sns_accounts if account.platform == platform_name %}
+                    <article class="rounded-2xl border bg-white p-4 shadow-sm sm:p-5 {% if platform_name == 'TikTok' %}border-cyan-200{% elif platform_name == 'Instagram' %}border-fuchsia-200{% elif platform_name == 'Facebook 페이지' %}border-blue-200{% else %}border-slate-200{% endif %}">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-xs font-black text-slate-500">{{ account.brand }} 계정</p>
+                                <p class="truncate text-lg font-black text-slate-950">{{ '@' + account.handle if account.handle else '계정 연결 필요' }}</p>
+                            </div>
+                            {% if account.url %}<a href="{{ account.url }}" target="_blank" rel="noopener" class="shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-100">계정 열기 →</a>{% endif %}
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
+                            {% for label, key in [('팔로워 수','followers'),('좋아요·반응','likes'),('콘텐츠 수','content'),('시청시간','watch_time')] %}
+                            {% set value = account[key] %}{% set delta = account[key + '_delta'] %}
+                            <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                                <p class="text-[11px] font-black text-slate-500">{{ label }}</p>
+                                <p class="mt-1 text-xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(value) if value is not none else '미집계' }}</p>
+                                <p class="mt-1 text-[11px] font-bold {% if delta is not none and delta > 0 %}text-emerald-600{% elif delta is not none and delta < 0 %}text-red-600{% else %}text-slate-400{% endif %}">증감 {% if delta is none %}미집계{% elif delta > 0 %}+{{ '{:,}'.format(delta) }}{% else %}{{ '{:,}'.format(delta) }}{% endif %}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if account.error %}<p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-black text-amber-800">이 계정은 통계 연결 확인이 필요합니다.</p>{% endif %}
+                        <div class="mt-3 flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">SNS 콘텐츠 바로 올리기 · 연결 없음</div>
+                        <p class="mt-1 text-[10px] font-semibold text-slate-500">{{ account.publish_unavailable_reason }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        <section id="google-sheet" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
+            <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm sm:p-7">
+                <p class="text-xs font-bold text-emerald-600">CENTRAL SCHEDULER · SINGLE SOURCE OF TRUTH</p>
+                <h2 class="mt-1 text-2xl font-extrabold text-slate-900 sm:text-3xl">Google Sheet 통제실</h2>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">WordPress 27 · Blogspot {{ bloggers|length }} · Tistory 5 · YouTube 10의 발행 일정, 승인, 실행 결과와 히스토리를 CEO종합상황실 한 곳에서 확인합니다.</p>
+                <a href="https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/edit#gid=693660577" target="_blank" rel="noopener" class="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-emerald-800 sm:w-auto">CEO종합상황실 열기 →</a>
+            </div>
+        </section>
+    </main>
+    <script>
+        document.querySelectorAll('.keyword-chip').forEach((button) => {
+            button.addEventListener('click', () => {
+                const input = document.getElementById(button.dataset.target);
+                input.value = button.dataset.keyword;
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                input.focus();
+            });
+        });
+        const wordpressSearch = document.getElementById('wordpress-search');
+        if (wordpressSearch) {
+            wordpressSearch.addEventListener('input', () => {
+                const query = wordpressSearch.value.trim().toLocaleLowerCase('ko');
+                document.querySelectorAll('.wordpress-card').forEach((card) => {
+                    card.hidden = query && !card.dataset.search.includes(query);
+                });
+            });
+        }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
+        }
+        let installPrompt = null;
+        const installButton = document.getElementById('install-pwa');
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+            installPrompt = event;
+            installButton.hidden = false;
+        });
+        installButton.addEventListener('click', async () => {
+            if (!installPrompt) return;
+            installPrompt.prompt();
+            await installPrompt.userChoice;
+            installPrompt = null;
+            installButton.hidden = true;
+        });
+        window.addEventListener('appinstalled', () => { installButton.hidden = true; });
+    </script>
+</body>
+</html>
