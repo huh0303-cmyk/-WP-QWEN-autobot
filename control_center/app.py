@@ -2,7 +2,7 @@
 
 from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
 
-from .keywords import weekly_suggestions
+from .keywords import top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
 
@@ -1206,6 +1206,7 @@ def trigger_publish_site_now():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#wordpress")
     domain = request.form.get("domain", "").strip()
+    keyword = request.form.get("keyword", "").strip()
     registered = next(
         (site for site in load_wordpress_sites() if site.url.replace("https://", "").replace("http://", "").rstrip("/") == domain),
         None,
@@ -1229,10 +1230,16 @@ def trigger_publish_site_now():
             "publication_approved": "true",
             "room_id": f"manual-onebutton-{registered.site_id}",
         }
+        # 2026-09-04 CEO: let the CEO pick one of the 3-per-category chips
+        # (see /api/keyword-suggestions-by-category) instead of the site
+        # silently auto-picking; blank keeps the original auto-pick.
+        if keyword:
+            workflow_inputs["force_keyword"] = keyword
+        picked = f' — "{keyword}"' if keyword else ""
         success_message = (
-            f"{domain}: 실시간 주요매체 반복 명사를 다시 수집해 글쓰기·공개 발행을 시작했습니다."
+            f"{domain}: 실시간 주요매체 반복 명사를 다시 수집해 글쓰기·공개 발행을 시작했습니다{picked}."
             if registered.url.rstrip("/") == "https://korea365.org"
-            else f"{domain}: 글쓰기·공개 발행을 시작했습니다."
+            else f"{domain}: 글쓰기·공개 발행을 시작했습니다{picked}."
         )
     try:
         response = requests.post(
@@ -1315,6 +1322,18 @@ def keyword_suggestions(domain: str):
              "verification": item.verification}
             for item in items
         ],
+    })
+
+
+@app.get("/api/keyword-suggestions-by-category/<path:domain>")
+def keyword_suggestions_by_category(domain: str):
+    """3 keyword chips per category for the '지금 발행' card — today's top
+    search-volume/virality picks (see refresh_keyword_pool.py), grouped so a
+    professional-persona site stays inside its own categories while still
+    surfacing what's actually trending right now within them."""
+    return jsonify({
+        "domain": domain,
+        "groups": top_keywords_by_category(domain, per_category=3),
     })
 
 

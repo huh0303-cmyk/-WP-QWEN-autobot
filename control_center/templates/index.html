@@ -252,11 +252,18 @@
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 초안 실행 · 연결 없음</div>
                     {% endif %}
                 </form>
-                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="border-t {% if site.auth_ready %}border-emerald-200 bg-emerald-50{% else %}border-slate-200 bg-slate-50{% endif %} px-4 py-3"
-                      onsubmit="return confirm('{{ site.domain }}: 사이트 자체 키워드 풀에서 지금 바로 글을 쓰고 공개 발행할까요? 검토 단계 없이 바로 공개됩니다.');">
+                <form method="post" action="{{ url_for('trigger_publish_site_now') }}"
+                      class="force-publish-form border-t {% if site.auth_ready %}border-emerald-200 bg-emerald-50{% else %}border-slate-200 bg-slate-50{% endif %} px-4 py-3 space-y-2"
+                      data-domain="{{ site.domain }}" onsubmit="return confirmForcePublish(this);">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="domain" value="{{ site.domain }}">
+                    <input type="hidden" name="keyword" class="force-keyword-input" value="">
                     {% if site.auth_ready %}
+                    {% if site.domain not in ['koreanews365.com', 'korea365.org'] %}
+                    <div class="force-keyword-groups space-y-1.5 text-[11px]">
+                        <p class="text-slate-400">오늘의 카테고리별 추천 키워드 불러오는 중…</p>
+                    </div>
+                    {% endif %}
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl {% if site.domain in ['koreanews365.com', 'korea365.org'] %}bg-gradient-to-r from-orange-600 to-rose-600{% else %}bg-emerald-600{% endif %} px-4 text-sm font-black text-white shadow-sm hover:brightness-95">{% if site.domain in ['koreanews365.com', 'korea365.org'] %}🔥 바이럴 발행{% else %}WordPress 글 1건 바로 올리기 · 공개 →{% endif %}</button>
                     {% else %}
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 바로 올리기 · 연결 없음</div>
@@ -590,6 +597,63 @@
                 });
             });
         }
+        function confirmForcePublish(form) {
+            const picked = form.querySelector('.force-keyword-input').value.trim();
+            const domain = form.dataset.domain;
+            const what = picked ? `"${picked}"` : '사이트 자체 키워드 풀에서 자동 선택';
+            return confirm(`${domain}: ${what}로 지금 바로 글을 쓰고 공개 발행할까요? 검토 단계 없이 바로 공개됩니다.`);
+        }
+        document.querySelectorAll('.force-publish-form[data-domain]').forEach((form) => {
+            const groupsEl = form.querySelector('.force-keyword-groups');
+            const keywordInput = form.querySelector('.force-keyword-input');
+            if (!groupsEl || !keywordInput) return;
+            fetch(`/api/keyword-suggestions-by-category/${encodeURIComponent(form.dataset.domain)}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    const groups = data.groups || [];
+                    groupsEl.innerHTML = '';
+                    if (!groups.length) {
+                        const empty = document.createElement('p');
+                        empty.className = 'text-amber-600';
+                        empty.textContent = '오늘의 추천 키워드 없음 · 사이트 자체 풀에서 자동 선택됩니다';
+                        groupsEl.appendChild(empty);
+                        return;
+                    }
+                    groups.forEach((group) => {
+                        const row = document.createElement('div');
+                        row.className = 'flex flex-wrap items-center gap-1.5';
+                        const label = document.createElement('span');
+                        label.className = 'font-black text-emerald-800';
+                        label.textContent = group.category + ':';
+                        row.appendChild(label);
+                        group.keywords.forEach((keyword) => {
+                            const chip = document.createElement('button');
+                            chip.type = 'button';
+                            chip.className = 'force-keyword-chip rounded-full bg-white border border-emerald-300 px-2.5 py-1 font-semibold text-emerald-700 hover:bg-emerald-100';
+                            chip.textContent = keyword;
+                            chip.addEventListener('click', () => {
+                                const already = keywordInput.value === keyword;
+                                keywordInput.value = already ? '' : keyword;
+                                groupsEl.querySelectorAll('.force-keyword-chip').forEach((el) => {
+                                    el.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+                                });
+                                if (!already) {
+                                    chip.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+                                }
+                            });
+                            row.appendChild(chip);
+                        });
+                        groupsEl.appendChild(row);
+                    });
+                })
+                .catch(() => {
+                    groupsEl.innerHTML = '';
+                    const failed = document.createElement('p');
+                    failed.className = 'text-amber-600';
+                    failed.textContent = '추천 키워드 불러오기 실패 · 사이트 자체 풀에서 자동 선택됩니다';
+                    groupsEl.appendChild(failed);
+                });
+        });
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
         }
