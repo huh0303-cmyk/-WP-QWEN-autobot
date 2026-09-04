@@ -1,7 +1,13 @@
 name: "Emergency — Restore 27 WordPress visitor counters"
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      target_site_url:
+        description: "Optional exact WordPress URL; blank restores all 27"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -18,6 +24,7 @@ jobs:
       - run: pip install requests -q
       - name: Reactivate the real counter and visitor REST API on all 27 sites
         env:
+          TARGET_SITE_URL: ${{ inputs.target_site_url }}
           WP_USER: ${{ secrets.WP_USER }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
@@ -47,19 +54,23 @@ jobs:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/deploy_daily_visitor_counter.py
-      - name: Verify all 27 public visitor endpoints immediately
+      - name: Verify the requested public visitor endpoints immediately
+        env:
+          TARGET_SITE_URL: ${{ inputs.target_site_url }}
         run: |
           python - <<'PY'
-          import requests, sys
+          import os, requests, sys
           sys.path.insert(0, "scripts")
           from site_registry import ACTIVE_SITES
+          requested=os.environ.get("TARGET_SITE_URL", "").strip().rstrip("/")
+          targets=[row for row in ACTIVE_SITES if not requested or row[0].rstrip("/")==requested]
           failures=[]
-          for site, _, _ in ACTIVE_SITES:
+          for site, _, _ in targets:
               response=requests.get(site.rstrip("/")+"/wp-json/site-stats/v1/visitors", timeout=25)
               data=response.json() if response.ok else {}
               ok=response.status_code==200 and {"count","yesterday_count","day_before_yesterday_count","total"}.issubset(data)
               print(site, response.status_code, "PASS" if ok else "FAIL")
               if not ok: failures.append(site)
           if failures: raise SystemExit("Missing visitor endpoints: "+", ".join(failures))
-          print(f"VISITOR COUNTER API PASS: {len(ACTIVE_SITES)}/{len(ACTIVE_SITES)}")
+          print(f"VISITOR COUNTER API PASS: {len(targets)}/{len(targets)}")
           PY
