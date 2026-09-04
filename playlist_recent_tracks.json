@@ -6,13 +6,18 @@
     "Sous La Pluie De Juin (1).wav",
     "Slip det bare (1).mp3"
   ],
-  "starbucks": [
-    "Viet balad cafe (1).mp3",
-    "french kiss  (1).mp3",
-    "2026-08-04-claude.mp3",
-    "Love_2.mp3",
-    "English cafeB.mp3"
-  ],
+  "starbucks": {
+    "front": [
+      "love french (1).mp3",
+      "Viet balad cafe (1).mp3",
+      "french kiss  (1).mp3",
+      "2026-08-04-claude.mp3",
+      "Love_2.mp3"
+    ],
+    "second": [
+      "Midnight in the Lounge_2_dup1.mp3"
+    ]
+  },
   "mbb": [
     "2026-08-04-claude-아침.mp3",
     "LudwigVanBeethoven-SymphonyNo.3InEFlatMajorEroicaOp.55-04-FinaleAllegroMolto.mp3",
