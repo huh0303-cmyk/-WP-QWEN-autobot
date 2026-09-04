@@ -16,9 +16,8 @@ VALID = json.dumps({"title": "상담실에서 당황하지 않게, 임플란트 
 AUDIT_OK = json.dumps({"ok": True, "issues": []})
 
 
-def test_gpt5_mini_then_independent_consensus_then_image_chain():
-    approved = {"ok": True, "checks": {name: {"ok": True, "issues": []} for name in ("gemini", "gpt")}}
-    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.three_model_consensus", return_value=approved), patch("tistory_writer.generate_image_url", return_value="https://example.test/image.webp"):
+def test_gpt5_mini_then_deterministic_gate_then_image_chain():
+    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.generate_image_url", return_value="https://example.test/image.webp"):
         draft = tistory_writer.generate_draft(JOB)
     gpt.assert_called_once()
     assert draft["engine"] == "gpt"
@@ -26,15 +25,14 @@ def test_gpt5_mini_then_independent_consensus_then_image_chain():
     assert draft["quality_score"] >= 70
     assert draft["first_image_priority"] is True
     assert draft["image_alt"]
-    assert draft["image_alt"] != draft["title"]
+    assert draft["image_alt"] == draft["title"]
 
 
-def test_gpt_writer_failure_does_not_fall_back_to_gemini():
-    approved = {"ok": True, "checks": {name: {"ok": True, "issues": []} for name in ("gemini", "gpt")}}
-    with patch("tistory_writer.gemini_generate_text") as gemini, patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.three_model_consensus", return_value=approved), patch("tistory_writer.generate_image_url", return_value=None):
+def test_gpt_writer_has_no_gemini_fallback():
+    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.generate_image_url", return_value=None):
         draft = tistory_writer.generate_draft(JOB)
-    gemini.assert_not_called()
     gpt.assert_called_once()
+    assert "gemini_generate" not in Path(tistory_writer.__file__).read_text(encoding="utf-8")
     assert draft["engine"] == "gpt"
     assert draft["status"] == "DRAFT_READY"
     assert draft["image_url"] is None
@@ -42,12 +40,13 @@ def test_gpt_writer_failure_does_not_fall_back_to_gemini():
     assert draft["first_image_priority"] is False
 
 
-def test_any_consensus_failure_is_a_blocking_gate():
-    rejected = {"ok": False, "checks": {"gemini": {"ok": True}, "gpt": {"ok": False}}}
-    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID), patch("tistory_writer.three_model_consensus", return_value=rejected):
+def test_deterministic_quality_failure_is_a_blocking_gate():
+    invalid = json.dumps({"title": "", "category": "임플란트", "meta_description": "짧음", "image_prompt": "", "body_html": "<p>짧음</p>"})
+    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=invalid), patch("tistory_writer.generate_image_url") as image:
         draft = tistory_writer.generate_draft(JOB)
-    assert draft["status"] == "CONSENSUS_FAILED"
+    assert draft["status"] == "QUALITY_FAILED"
     assert draft["public_allowed"] is False
+    image.assert_not_called()
 
 
 def test_prompt_forbids_copy_and_repeated_ai_titles():

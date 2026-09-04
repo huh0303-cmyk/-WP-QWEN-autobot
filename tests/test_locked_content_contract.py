@@ -28,10 +28,10 @@ def test_all_blog_writers_are_gpt5_mini_and_images_are_sdxl_first():
         "pass_without_image",
     ]
     tistory = (ROOT / "scripts" / "tistory_writer.py").read_text(encoding="utf-8")
-    assert "GPT-5 mini writes the first draft" in tistory
-    assert "Gemini 2.5 Flash performs the independent final review" in tistory
-    assert "Gemini first" not in tistory
-    assert 'for provider in ("gpt",):' in tistory
+    assert "GPT-5 mini writes the draft" in tistory
+    assert "deterministic quality checks perform" in tistory
+    assert "gemini_generate" not in tistory
+    assert 'for provider in ("gpt", "gpt", "gpt"):' in tistory
     for workflow_name in (
         "daily-network-publish.yml",
         "newsrooms-daily-publisher.yml",
@@ -75,7 +75,7 @@ def test_blogger_and_tistory_daily_contract():
     sites = load_json("automation_hub_sites.json")["sites"]
     blogger = [s for s in sites if s["platform"] == "blogger"]
     tistory = load_json("tistory_portfolio.json")
-    assert len(blogger) == 27
+    assert len(blogger) == 33
     assert all((s["daily_min"], s["daily_max"], s["weekly_min"], s["weekly_max"]) == (1, 1, 7, 7) for s in blogger)
     assert tistory["daily_posts_per_site"] == 1
     assert len([s for s in tistory["sites"] if s.get("launch_enabled")]) == 5

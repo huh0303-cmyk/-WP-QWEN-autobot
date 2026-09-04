@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize all 27 Blogger destinations into the main site registry."""
+"""Synchronize all 33 Blogger destinations into the main site registry."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ def main() -> int:
             "keyword_rules": {
                 "source_site_id": source["site_id"],
                 "text_provider": "gpt-5-mini",
-                "review_provider": "gemini-2.5-flash",
+                "review_provider": "gpt-5-mini-second-pass",
                 "meta_description_chars_min": 100,
                 "meta_description_chars_max_exclusive": 120,
                 "labels_min": 8,
@@ -66,13 +66,13 @@ def main() -> int:
             },
         })
 
-    if len(bloggers) != 27:
-        raise SystemExit(f"Expected 27 Blogger destinations, got {len(bloggers)}")
-    if len({b["site_id"] for b in bloggers}) != 27:
+    if len(bloggers) != 33:
+        raise SystemExit(f"Expected 33 Blogger destinations, got {len(bloggers)}")
+    if len({b["site_id"] for b in bloggers}) != 33:
         raise SystemExit("Duplicate Blogger site_id")
-    if len({b["destination_id"] for b in bloggers}) != 27:
+    if len({b["destination_id"] for b in bloggers}) != 33:
         raise SystemExit("Duplicate Blogger destination_id")
-    if len({b["url"] for b in bloggers}) != 27:
+    if len({b["url"] for b in bloggers}) != 33:
         raise SystemExit("Duplicate Blogger URL")
 
     registry["sites"] = wordpress + bloggers + others

@@ -75,22 +75,16 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertIn("if not result.ok:", source)
         self.assertIn("processed queue job(s) failed", source)
 
-    def test_blogger_generation_defaults_to_draft_but_control_room_can_request_publish(self):
-        # 2026-09-04 CEO decision: add a per-blog "지금 발행" instant-publish
-        # button in the control room, matching the WordPress/YouTube/SNS
-        # one-button pattern. Default behavior is still a review draft —
-        # the workflow's publish_now input defaults to false — but the
-        # button can now explicitly opt a run into publish_now=true instead
-        # of that path being permanently hardcoded off.
+    def test_blogger_generation_requires_explicit_publish_input_and_logs_prequeue_failures(self):
         source = (ROOT / "scripts" / "queue_blogger_rewrite.py").read_text(encoding="utf-8")
         workflow = (ROOT / ".github" / "workflows" / "blogger-rewrite.yml").read_text(encoding="utf-8")
-        self.assertIn('publish_now = os.environ.get("BLOGGER_PUBLISH_NOW"', source)
+        self.assertIn('os.environ.get("BLOGGER_PUBLISH_NOW", "false")', source)
         self.assertIn('error_code="NO_NEW_SOURCE"', source)
         self.assertIn('error_code="SOURCE_FETCH"', source)
         self.assertIn('"image_pass": True', source)
         self.assertIn("pass_no_image", source)
         self.assertIn("BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}", workflow)
-        self.assertIn("default: false", workflow)
+        self.assertIn("gh workflow run platform-publish-v2.yml", workflow)
 
     def test_blogger_oauth_is_separate_from_shared_drive_token(self):
         workflow = (ROOT / ".github" / "workflows" / "platform-publish-v2.yml").read_text(encoding="utf-8")
