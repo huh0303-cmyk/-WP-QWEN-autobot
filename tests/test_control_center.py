@@ -92,7 +92,7 @@ def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     assert "{% if site.auth_ready %}" in template
     assert "{% if blog.connected %}" in template
     assert "{% if channel.action_ready %}" in template
-    assert 'id="review-queue"' in template
+    assert 'id="review-queue"' not in template
     assert "관리자에서 초안 검토·발행" not in template
     assert "완성된 영상은 먼저 비공개로 저장됩니다." in template
 
@@ -335,21 +335,16 @@ def test_wordpress_kpis_appear_before_site_metadata():
     assert wordpress < kpis < category < persona
 
 
-def test_review_queue_is_visible_directly_in_control_room():
-    # 2026-09-03 CEO decision: WP auto-publishes once the GPT gate approves,
-    # so this list is now a read-only activity log (no per-item approval
-    # button needed for WordPress) — Blogspot/Tistory still show a review
-    # link since those platforms remain private-draft-only.
+def test_recent_activity_panel_is_removed_from_control_room():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "최근 글 목록" in template
-    assert "review_items" in template
-    assert "검토 →" in template
-    assert "Blogger 검색 설명" in template
-    assert "설명 복사" in template
-    assert "검색 설명 누락 · 공개하지 말고 다시 생성하세요." in template
+    assert "최근 글 현황" not in template
+    assert "최근 글 목록" not in template
+    assert "review_items" not in template
+    assert 'href="#review-queue"' not in template
     review_template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "tistory_review.html").read_text(encoding="utf-8")
     assert "비공개 검토 대기" in review_template
     assert "검색 설명" in review_template
+    assert 'href="/#tistory"' in review_template
 
 
 def test_control_room_displays_only_active_blogger_portfolio():
