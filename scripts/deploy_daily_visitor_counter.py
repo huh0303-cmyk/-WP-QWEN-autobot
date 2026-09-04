@@ -47,9 +47,13 @@ def deploy_one(site, env_key, code):
 
 def main():
     code = SOURCE.read_text(encoding="utf-8")
+    requested = os.environ.get("TARGET_SITE_URL", "").strip().rstrip("/")
+    targets = [row for row in ACTIVE_SITES if not requested or row[0].rstrip("/") == requested]
+    if requested and len(targets) != 1:
+        raise SystemExit(f"unknown TARGET_SITE_URL: {requested}")
     print(f"{'사이트':35s} {'결과':10s} 비고")
     ok = fail = skip = 0
-    for site, env_key, lifecycle in ACTIVE_SITES:
+    for site, env_key, lifecycle in targets:
         action, err = deploy_one(site, env_key, code)
         print(f"{site:35s} {action:10s} {err or ''}")
         if action in ("created", "updated"):
@@ -58,9 +62,9 @@ def main():
             skip += 1
         else:
             fail += 1
-    print(f"\n완료: 성공 {ok} / 스킵 {skip} / 실패 {fail} (총 {len(ACTIVE_SITES)}개)")
-    if ok != len(ACTIVE_SITES) or skip or fail:
-        raise SystemExit(f"27개 전체 배포 미완료: 성공={ok}, 스킵={skip}, 실패={fail}")
+    print(f"\n완료: 성공 {ok} / 스킵 {skip} / 실패 {fail} (총 {len(targets)}개)")
+    if ok != len(targets) or skip or fail:
+        raise SystemExit(f"카운터 배포 미완료: 성공={ok}, 스킵={skip}, 실패={fail}")
 
 
 if __name__ == "__main__":
