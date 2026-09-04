@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: pip install requests beautifulsoup4 pytest flask google-api-python-client google-auth google-genai -q
+      - run: pip install requests beautifulsoup4 pytest flask pillow google-api-python-client google-auth google-genai -q
       - run: python -m pytest tests -q
       - run: python -m automation_hub.cli validate
       - run: python -c "from automation_hub.youtube_registry import load_channels; assert len(load_channels()) == 10"
