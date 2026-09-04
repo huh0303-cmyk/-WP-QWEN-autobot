@@ -3573,8 +3573,7 @@ def process_one(site, keyword):
             return False
         sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
-    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,
-                   category_hint=f"{news_source_category or ''} {news_source or ''}".strip())
+    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
     if result["ok"]:
         is_draft = result.get("status") == "draft"
         outcome = "초안 생성" if is_draft else "공개 발행"
