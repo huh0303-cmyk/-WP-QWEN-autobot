@@ -25,6 +25,17 @@ UTILITY = (
 SNIPPET_NAME = "Network utility footer and one-line category menu"
 
 
+def is_utility_footer_snippet(item: dict) -> bool:
+    """Match only the managed footer renderer, never a comment/reference.
+
+    The visitor counter intentionally mentions ``network-utility-footer`` in
+    a comment to explain ordering. A loose substring check therefore disabled
+    the real counter as if it were a duplicate footer.
+    """
+    code = str(item.get("code", ""))
+    return item.get("name") == SNIPPET_NAME or '<nav class="network-utility-footer"' in code
+
+
 def api(site, password, method, path, **kwargs):
     response = requests.request(
         method,
@@ -57,7 +68,8 @@ def deploy_footer_fallback(site, password, pages):
         title = page.get("title", {}).get("rendered") or english_title
         links.append((title, page["link"]))
     php_links = ",\n        ".join(
-        f"array({json.dumps(title)}, {json.dumps(url)})" for title, url in links
+        f"array({json.dumps(title, ensure_ascii=False)}, {json.dumps(url, ensure_ascii=False)})"
+        for title, url in links
     )
     code = f'''// Managed by deploy_regular_site_menus.py. Do not remove.
 add_action('init', function () {{
@@ -120,7 +132,7 @@ add_action('wp_head', function () {{
     snippets = response if isinstance(response, list) else response.get("data", response.get("items", []))
     candidates = [
         item for item in snippets
-        if item.get("name") == SNIPPET_NAME or "network-utility-footer" in item.get("code", "")
+        if is_utility_footer_snippet(item)
     ]
     # Older deployments created a second active copy under a legacy name. Keep
     # one canonical snippet and deactivate every extra copy so the footer row

@@ -19,7 +19,7 @@ jobs:
 
       - run: pip install requests -q
 
-      - name: Deploy footer visitor counter and REST API to 27 sites
+      - name: Repair utility footer on 25 regular sites, then restore visitor counter on all 27
         env:
           WP_USER: ${{ secrets.WP_USER }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
@@ -49,7 +49,9 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/deploy_daily_visitor_counter.py
+        run: |
+          python scripts/deploy_regular_site_menus.py
+          python scripts/deploy_daily_visitor_counter.py
 
       - name: Remove the obsolete [hits] widget left by a removed plugin
         env:
@@ -105,3 +107,6 @@ jobs:
               raise SystemExit('Visitor API verification failed:\n'+'\n'.join(failed))
           print(f'All {len(ACTIVE_SITES)} visitor APIs verified.')
           PY
+
+      - name: Audit rendered footers, Unicode labels, counters and endpoints
+        run: python scripts/audit_wordpress_footers.py

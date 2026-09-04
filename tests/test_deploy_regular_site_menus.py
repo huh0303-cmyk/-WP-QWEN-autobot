@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from scripts.deploy_regular_site_menus import REGULAR_SITES, UTILITY
+from scripts.deploy_regular_site_menus import REGULAR_SITES, UTILITY, is_utility_footer_snippet
 
 
 def test_scope_is_25_regular_sites_and_excludes_newsrooms():
@@ -19,3 +19,17 @@ def test_utility_order_and_category_limit_are_locked():
     assert 'network-utility-footer' in source
     assert 'flex-wrap:nowrap' in source
     assert 'header .site-logo,header .custom-logo-link' in source
+    assert 'json.dumps(title, ensure_ascii=False)' in source
+
+
+def test_duplicate_footer_detection_never_matches_the_visitor_counter_comment():
+    counter = {
+        "name": "Daily visitor counter v2",
+        "code": "// render after network-utility-footer\necho '<div class=\"network-daily-visitor-counter\">';",
+    }
+    footer = {
+        "name": "old footer",
+        "code": "echo '<nav class=\"network-utility-footer\" aria-label=\"Site information\">';",
+    }
+    assert is_utility_footer_snippet(counter) is False
+    assert is_utility_footer_snippet(footer) is True
