@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify Blogger OAuth against every enabled destination in the 27-site registry."""
+"""Verify Blogger OAuth against every enabled destination in the 33-site registry."""
 from __future__ import annotations
 
 import json
@@ -46,7 +46,7 @@ def main():
         != row["url"].rstrip("/").lower()
     ]
     report = {
-        "ok": len(configured) == 27 and not missing,
+        "ok": len(configured) == 33 and not missing and not mismatched,
         "configured_count": len(configured), "oauth_visible_count": len(blogs),
         "matched_count": len(configured) - len(missing),
         "connected_count": len(configured) - len(missing),
@@ -59,8 +59,8 @@ def main():
     REPORT_FILE.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     if not report["ok"]:
-        raise SystemExit("BLOGGER_27_OAUTH_VERIFY_FAILED")
-    print("BLOGGER_27_OAUTH_VERIFY_SUCCESS")
+        raise SystemExit("BLOGGER_33_OAUTH_VERIFY_FAILED")
+    print("BLOGGER_33_OAUTH_VERIFY_SUCCESS")
     return 0
 
 

@@ -1,4 +1,4 @@
-name: "Automation Hub — Blogger 27 connection check"
+name: "Automation Hub — Blogger 33 connection check"
 
 on:
   workflow_dispatch:
@@ -23,7 +23,7 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install requests -q
-      - name: Verify Blogger OAuth and all 27 blog IDs
+      - name: Verify Blogger OAuth and all 33 blog IDs
         env:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
@@ -35,6 +35,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add blogger_connection_report.json 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "data: refresh Blogger 27 connection status [skip ci]"
+          git diff --cached --quiet || git commit -m "data: refresh Blogger 33 connection status [skip ci]"
           git pull --rebase origin main
           git push

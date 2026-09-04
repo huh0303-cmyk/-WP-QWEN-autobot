@@ -31,6 +31,12 @@ class BloggerModuleContractTests(unittest.TestCase):
                 rules["image_provider_order"],
             )
 
+    def test_connection_verifier_requires_all_33_without_url_mismatches(self):
+        verifier = (ROOT / "scripts" / "blogger_verify_account.py").read_text(encoding="utf-8")
+        self.assertIn("len(configured) == 33", verifier)
+        self.assertIn("and not mismatched", verifier)
+        self.assertIn("BLOGGER_33_OAUTH_VERIFY_SUCCESS", verifier)
+
 
 if __name__ == "__main__":
     unittest.main()
