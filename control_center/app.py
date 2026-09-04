@@ -1064,7 +1064,7 @@ def trigger_draft():
             flash(f"{domain}: 로컬 대기열에는 저장했지만 GitHub 실행 요청 실패 · {exc}", "error")
         else:
             if automatic_blogger_topic:
-                flash(f"{domain}: 당일 주요 매체에서 최고 주제를 골라 실제 발행하는 작업을 접수했습니다. 생성·검수·발행 결과와 실패 사유는 최근 글 현황에서 확인하고 실패 시 이 카드에서 다시 실행하세요. · {trigger_id} · {workflow_url}", "success")
+                flash(f"{domain}: 당일 주요 매체에서 최고 주제를 골라 실제 발행하는 작업을 접수했습니다. 실패하면 해당 사이트 카드에서 다시 실행하세요. · {trigger_id} · {workflow_url}", "success")
             else:
                 flash(f"{domain}: 실제 비공개 초안 작업 시작 · {trigger_id} · {workflow_url}", "success")
     return redirect(url_for("index") + f"#{anchor}")
@@ -1156,7 +1156,7 @@ def trigger_publish_now():
     """
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
-        return redirect(url_for("index") + "#review-queue")
+        return redirect(url_for("index") + "#wordpress")
     domain = request.form.get("domain", "").strip()
     review_url = request.form.get("review_url", "").strip()
     match = re.search(r"[?&]post=(\d+)", review_url)
@@ -1166,12 +1166,12 @@ def trigger_publish_now():
     )
     if not registered or not match:
         flash(f"{domain}: 발행 대상을 확인할 수 없습니다 (사이트 등록 또는 글 번호 누락).", "error")
-        return redirect(url_for("index") + "#review-queue")
+        return redirect(url_for("index") + "#wordpress")
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     if not token:
         flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
-        return redirect(url_for("index") + "#review-queue")
+        return redirect(url_for("index") + "#wordpress")
     try:
         response = requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/publish-now.yml/dispatches",
@@ -1187,7 +1187,7 @@ def trigger_publish_now():
         flash(f"{domain}: 발행 요청 실패 · {exc}", "error")
     else:
         flash(f"{domain}: 글 #{match.group(1)} 발행을 시작했습니다.", "success")
-    return redirect(url_for("index") + "#review-queue")
+    return redirect(url_for("index") + "#wordpress")
 
 
 @app.post("/trigger/publish-site-now")
@@ -1299,7 +1299,6 @@ def index():
     return render_template(
         "index.html", sites=sites, bloggers=bloggers, tistory_sites=tistory_sites,
         youtube_channels=youtube_channels, sns_accounts=sns_accounts,
-        review_items=get_review_queue(),
         problem_summary=build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
     )
