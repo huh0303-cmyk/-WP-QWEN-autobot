@@ -14,7 +14,7 @@ Newsrooms require factual news headlines, not blog-guide hooks.
 The word Unlock and every Unlock/Unlocking title formula are forbidden.
 """
 
-def require_editorial_approval(*, title, content, meta, keyword, gemini_generate):
+def require_editorial_approval(*, title, content, meta, keyword, gemini_generate, is_newsroom_brief=False):
     if (not title.strip()
             or title_cliches(title)
             or re.search(r"answers from the field|from someone who.s been there|practical guide\s+q\s*&\s*a", title, re.I)):
@@ -24,7 +24,7 @@ def require_editorial_approval(*, title, content, meta, keyword, gemini_generate
     if os.getenv("CHATGPT_SINGLE_MODEL_PIPELINE", "false").strip().lower() == "true":
         return {"ok": True, "policy": "gpt_writer_plus_deterministic_quality_gate", "checks": {}}
     result = three_model_consensus(title=title, content=content, meta=meta, keyword=keyword,
-                                   gemini_generate=gemini_generate)
+                                   gemini_generate=gemini_generate, is_newsroom_brief=is_newsroom_brief)
     checks = result.get("checks", {})
     if set(checks) != {"gpt_1", "gpt_2"} or not all(v.get("ok") is True for v in checks.values()):
         raise ValueError("CONSENSUS_FAILED: " + str(checks))

@@ -39,7 +39,8 @@ def _gpt_check(label: str, rule: str) -> dict:
 
 
 def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
-                          gemini_generate: Callable[[str], str] | None = None) -> dict:
+                          gemini_generate: Callable[[str], str] | None = None,
+                          is_newsroom_brief: bool = False) -> dict:
     """Two independent, cold-context GPT reviews. No model can approve alone.
 
     Missing credentials, invalid JSON, or either rejection blocks the draft.
@@ -54,7 +55,23 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
         "metadata, headings and SEO quality. Reject unsupported firsthand/field reporting, "
         "generic stacked headline templates, and headline promises absent from the body. "
         "Do not trust another model's decision. "
-        "Return only JSON: {\"ok\": bool, \"issues\": [str]}. Draft:\n" + packet
     )
+    if is_newsroom_brief:
+        # 2026-09-04 CEO decision: brief/wire-style coverage of a single
+        # official release is an accepted, normal newsroom format for these
+        # two sites — do not require a quoted excerpt, multiple corroborating
+        # sources, an interview, or named individuals the source itself
+        # never gave. Still block fabrication, misattributed authority/dates,
+        # or a missing source link — those remain hard failures.
+        rule += (
+            "This is a short wire-style newsroom brief that accurately summarizes ONE official "
+            "government/institutional press release in the reporter's own words. That is an "
+            "ACCEPTABLE, normal news format on its own — do NOT reject solely for single-source "
+            "reliance, lack of a directly quoted excerpt, lack of an interview, or missing "
+            "names/figures/dates the source release itself never provided. DO still reject if the "
+            "draft states specifics (names, figures, dates, who has the authority to act) that are "
+            "not actually supported by the source, or if the source link is missing entirely. "
+        )
+    rule += "Return only JSON: {\"ok\": bool, \"issues\": [str]}. Draft:\n" + packet
     results = {"gpt_1": _gpt_check("first", rule), "gpt_2": _gpt_check("second", rule)}
     return {"ok": all(result.get("ok") is True for result in results.values()), "checks": results}

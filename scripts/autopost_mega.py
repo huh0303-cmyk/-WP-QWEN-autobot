@@ -3101,7 +3101,8 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     from editorial_title_gate import require_editorial_approval
     try:
         approval = require_editorial_approval(title=title, content=final, meta=meta, keyword=keyword,
-            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0))
+            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0),
+            is_newsroom_brief=is_newsroom)
         print("EDITORIAL_APPROVAL " + json.dumps(approval, ensure_ascii=False))
     except Exception as exc:
         return {"ok": False, "error": f"Editorial gate blocked draft: {exc}"}
