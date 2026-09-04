@@ -25,6 +25,11 @@ class YouTubeChannel:
     topic_mode: str = "auto"
     language: str = "en"
     tone: str = ""
+    official_name: str = ""
+    handle: str = ""
+    created_at: str = ""
+    subscriber_count_snapshot: int | None = None
+    video_count_snapshot: int | None = None
     next_run_at: str = ""
     last_dispatched_at: str = ""
     last_run_status: str = ""

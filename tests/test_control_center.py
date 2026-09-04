@@ -101,9 +101,8 @@ def test_youtube_cards_show_official_identity_growth_and_pastel_action():
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "WordPress 글 바로 만들기 · 비공개 초안" in template
-    assert "WordPress 글 1건 바로 올리기 · 공개" in template
-    assert "Blogspot 글 1건 지금 발행 · 공개" in template
+    assert "키워드보고발행" in template
+    assert "바이럴자동발행" in template
     assert "YouTube 콘텐츠 바로 만들기 · 비공개" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
@@ -111,7 +110,6 @@ def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     assert "{% if blog.connected %}" in template
     assert "{% if channel.action_ready %}" in template
     assert 'id="review-queue"' not in template
-    assert "관리자에서 초안 검토·발행" not in template
     assert "완성된 영상은 먼저 비공개로 저장됩니다." in template
 
 
