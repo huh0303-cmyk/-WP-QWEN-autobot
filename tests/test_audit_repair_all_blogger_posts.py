@@ -27,6 +27,18 @@ def test_inline_korean_summary_paragraph_and_checklist_are_removed():
     assert "Keep the next section" in cleaned
 
 
+def test_bilingual_korean_summary_heading_removes_trailing_section():
+    source = (
+        '<p><img src="https://img/hero.jpg"></p><h2>Useful details</h2><p>Keep this.</p>'
+        '<hr><h2>Korean Summary / 한국어 요약</h2><p>이 요약은 삭제합니다.</p>'
+    )
+    cleaned, count = clean_english_content(source)
+    assert count == 1
+    assert "이 요약은 삭제" not in cleaned
+    assert "Keep this" in cleaned
+    assert image_sources(cleaned) == ["https://img/hero.jpg"]
+
+
 def test_english_search_description_is_complete_and_full_length():
     description = complete_description("Affordable Busan Weekend", "<p>Short introduction.</p>")
     assert 100 <= len(description) <= 119

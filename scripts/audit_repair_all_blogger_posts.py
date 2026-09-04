@@ -26,20 +26,21 @@ from scripts.openai_text import openai_available, openai_generate_text
 
 OUT = ROOT / "artifacts" / "blogger-all-posts-repair.json"
 GENERIC_TITLE = re.compile(
-    r"(?i)\b(?:a closer look|made simple|step[- ]by[- ]step|right the first time|"
+    r"(?i)\b(?:a closer look|made simple|step[-‐‑‒–— ]by[-‐‑‒–— ]step|right the first time|"
     r"things to (?:look for|check)|questions people ask|what nobody tells you|"
-    r"practical guide|complete guide|your (?:smart|confident|practical)?\s*checklist|"
+    r"practical(?:\s+guide|\s+pathway)?|complete guide|navigating|overview|guide|"
+    r"your (?:smart|confident|practical)?\s*checklist|"
     r"costs,? eligibility|frequently confused points|experts explain)\b"
 )
 SUMMARY_HEADING = re.compile(
-    r"(?is)<h([1-6])\b[^>]*>\s*(?:<[^>]+>\s*)*(?:한국어|한글|Korean)\s*(?:핵심\s*)?(?:요약|summary)\s*(?:</[^>]+>\s*)*</h\1>"
+    r"(?is)<h([1-6])\b[^>]*>(?:(?!</h\1>).)*(?:한국어\s*(?:핵심\s*)?요약|한글\s*(?:핵심\s*)?요약|Korean\s+Summary)(?:(?!</h\1>).)*</h\1>"
 )
 SUMMARY_CHECKLIST_PARAGRAPH = re.compile(
-    r"(?is)<p\b[^>]*>\s*(?:<(?:strong|b|span|em|i)\b[^>]*>\s*)*(?:한국어|한글)\s*(?:핵심\s*)?요약\s*체크리스트\s*:?.*?</p>"
+    r"(?is)<p\b[^>]*>\s*(?:<(?:strong|b|span|em|i)\b[^>]*>\s*)*(?:한국어\s*(?:핵심\s*)?요약|한글\s*(?:핵심\s*)?요약|Korean\s+Summary)\s*체크리스트\s*:?.*?</p>"
     r"\s*(?:<(?:ul|ol)\b[^>]*>.*?</(?:ul|ol)>)?"
 )
 SUMMARY_PARAGRAPH = re.compile(
-    r"(?is)<p\b[^>]*>\s*(?:<(?:strong|b|span|em|i)\b[^>]*>\s*)*(?:한국어|한글)\s*(?:핵심\s*)?요약\s*:?.*?</p>"
+    r"(?is)<p\b[^>]*>\s*(?:<(?:strong|b|span|em|i)\b[^>]*>\s*)*(?:한국어\s*(?:핵심\s*)?요약|한글\s*(?:핵심\s*)?요약|Korean\s+Summary)\s*:?.*?</p>"
 )
 
 
