@@ -25,5 +25,6 @@ jobs:
       - name: Remove duplicate utility footer and verify menus
         env:
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
         run: python scripts/deploy_regular_site_menus.py
