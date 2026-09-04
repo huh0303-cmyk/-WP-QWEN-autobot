@@ -484,12 +484,18 @@ def collect_youtube_all():
     for label, cid in YOUTUBE_CHANNELS:
         it = items.get(cid)
         if it:
+            snippet = it.get("snippet", {})
             result[label] = {
                 "subs": int(it["statistics"].get("subscriberCount", 0)),
                 "views": int(it["statistics"].get("viewCount", 0)),
+                "videos": int(it["statistics"].get("videoCount", 0)),
+                "title": snippet.get("title", ""),
+                "handle": str(snippet.get("customUrl", "")).lstrip("@"),
+                "created_at": snippet.get("publishedAt", ""),
             }
         else:
-            result[label] = {"subs": None, "views": None}
+            result[label] = {"subs": None, "views": None, "videos": None,
+                             "title": "", "handle": "", "created_at": ""}
     return result, None
 
 
@@ -925,6 +931,7 @@ def main():
         label: {
             "subs": diff(v.get("subs"), _yesterday_metric(label, "subs")),
             "views": diff(v.get("views"), _yesterday_metric(label, "views")),
+            "videos": diff(v.get("videos"), _yesterday_metric(label, "videos")),
         }
         for label, v in today["youtube"].items()
     }

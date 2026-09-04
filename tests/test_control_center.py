@@ -79,6 +79,24 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
     assert all(row["channel_key"] for row in channels)
     assert all(row["action_ready"] for row in channels)
     assert len({row["channel_key"] for row in channels}) == 10
+    assert all(row["official_name"] for row in channels)
+    assert all(row["handle"] for row in channels)
+    assert all(row["channel_id"].startswith("UC") for row in channels)
+    assert all(row["subscriber_count"] is not None for row in channels)
+    assert all(row["content_count"] is not None for row in channels)
+    assert all(row["created_at"] for row in channels)
+
+
+def test_youtube_cards_show_official_identity_growth_and_pastel_action():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "{{ channel.official_name }}" in template
+    assert "@{{ channel.handle }}" in template
+    assert "구독자 수 (증감)" in template
+    assert "콘텐츠 수 (증감)" in template
+    assert "채널 개설일" in template
+    assert "from-sky-200 to-indigo-200" in template
+    youtube = template[template.index('<section id="youtube"'):template.index('<section id="sns"')]
+    assert "bg-red-700 px-4 text-sm" not in youtube
 
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():

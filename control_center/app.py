@@ -838,6 +838,21 @@ def get_youtube_data() -> list[dict[str, object]]:
         for channel in channel_payload.get("channels", [])
         if str(channel.get("channel_id", "")).strip()
     }
+    try:
+        history = json.loads((root / "situation_room_history.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        history = {}
+    latest_youtube = history.get("latest", {}).get("youtube", {})
+    previous_youtube = history.get("previous", {}).get("youtube", {})
+    snapshot_at = str(channel_payload.get("stats_snapshot_at", ""))
+    history_updated_at = str(history.get("updated_at", "")).replace(" ", "T")
+    prefer_snapshot = bool(snapshot_at and snapshot_at > history_updated_at)
+
+    def metric_delta(current: object, previous: object) -> int | None:
+        if isinstance(current, (int, float)) and isinstance(previous, (int, float)):
+            return int(current - previous)
+        return None
+
     rows = []
     for room in payload.get("rooms", []):
         if room.get("platform") != "youtube":
@@ -849,6 +864,23 @@ def get_youtube_data() -> list[dict[str, object]]:
         status = str(room.get("status", "UNKNOWN"))
         workflow = str(room.get("workflow", ""))
         registry_workflow = str(registry_channel.get("workflow", ""))
+        stats_key = str(registry_channel.get("display_name", room.get("name", "")))
+        current = latest_youtube.get(stats_key, {}) if isinstance(latest_youtube, dict) else {}
+        previous = previous_youtube.get(stats_key, {}) if isinstance(previous_youtube, dict) else {}
+        if not isinstance(current, dict):
+            current = {"subs": current}
+        if not isinstance(previous, dict):
+            previous = {"subs": previous}
+        if prefer_snapshot:
+            subscriber_count = registry_channel.get("subscriber_count_snapshot", current.get("subs"))
+            video_count = registry_channel.get("video_count_snapshot", current.get("videos"))
+            subscriber_previous = current.get("subs")
+            video_previous = current.get("videos")
+        else:
+            subscriber_count = current.get("subs", registry_channel.get("subscriber_count_snapshot"))
+            video_count = current.get("videos", registry_channel.get("video_count_snapshot"))
+            subscriber_previous = previous.get("subs")
+            video_previous = previous.get("videos")
         rows.append({
             "room_id": str(room.get("room_id", "")),
             "channel_key": channel_key,
@@ -856,6 +888,13 @@ def get_youtube_data() -> list[dict[str, object]]:
             "group": str(room.get("group", "")),
             "channel_id": channel_id,
             "channel_url": f"https://www.youtube.com/channel/{channel_id}" if channel_id else "",
+            "official_name": str(current.get("title") or registry_channel.get("official_name") or room.get("name", "")),
+            "handle": str(current.get("handle") or registry_channel.get("handle") or "").lstrip("@"),
+            "subscriber_count": subscriber_count,
+            "subscriber_delta": metric_delta(subscriber_count, subscriber_previous),
+            "content_count": video_count,
+            "content_delta": metric_delta(video_count, video_previous),
+            "created_at": str(current.get("created_at") or registry_channel.get("created_at") or ""),
             "admin_review_url": "https://studio.youtube.com/channel/" + channel_id + "/videos/upload?filter=%5B%7B%22name%22%3A%22VISIBILITY%22%2C%22value%22%3A%5B%22PRIVATE%22%5D%7D%5D" if channel_id else "https://studio.youtube.com/",
             "workflow": workflow,
             "publish_policy": str(room.get("publish_policy", "private")),
