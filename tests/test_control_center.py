@@ -242,6 +242,17 @@ def test_blogger_failure_status_is_visible_and_retryable_in_recent_activity():
     assert items[0]["review_url"] == ""
 
 
+def test_superseded_queue_rows_are_hidden_from_recent_activity():
+    header = ["created_at", "job_id", "site_id", "status", "publish_now", "title", "content", "labels", "source", "review_url", "x", "error_code", "message", "finished_at"]
+    old = ["2026-09-03T10:00:00", "old-tistory", "tistory_life365", "superseded", "FALSE", "old title", "", "", "", "https://example.com/review", "", "", "", ""]
+    queue_response = Mock(text=",".join(header) + "\n" + ",".join(old) + "\n")
+    queue_response.raise_for_status.return_value = None
+    editorial_response = Mock(text="created_at,platform,channel,title,review_url,status,decision,note\n")
+    editorial_response.raise_for_status.return_value = None
+    with patch("control_center.app.requests.get", side_effect=[queue_response, editorial_response]):
+        assert get_review_queue() == []
+
+
 def test_youtube_trigger_rejects_an_unconnected_channel_without_dispatch(monkeypatch):
     monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
     monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
