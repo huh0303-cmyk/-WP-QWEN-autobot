@@ -27,4 +27,5 @@ jobs:
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
         run: python scripts/deploy_regular_site_menus.py
