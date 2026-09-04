@@ -118,7 +118,16 @@ add_action('wp_head', function () {{
 }}, 99);'''
     response = snippet_api(site, password, "GET", "snippets", params={"per_page": 100})
     snippets = response if isinstance(response, list) else response.get("data", response.get("items", []))
-    match = next((item for item in snippets if item.get("name") == SNIPPET_NAME or "network-utility-footer" in item.get("code", "")), None)
+    candidates = [
+        item for item in snippets
+        if item.get("name") == SNIPPET_NAME or "network-utility-footer" in item.get("code", "")
+    ]
+    # Older deployments created a second active copy under a legacy name. Keep
+    # one canonical snippet and deactivate every extra copy so the footer row
+    # can never be printed twice.
+    match = next((item for item in candidates if item.get("name") == SNIPPET_NAME), None)
+    if match is None and candidates:
+        match = candidates[0]
     payload = {
         "name": SNIPPET_NAME,
         "desc": "Required pages in footer; category navigation kept on one line.",
@@ -132,6 +141,25 @@ add_action('wp_head', function () {{
     saved = snippet_api(site, password, "POST", path, json=payload)
     if not saved.get("active", False):
         raise RuntimeError("footer fallback snippet is not active")
+    canonical_id = str(saved.get("id") or (match or {}).get("id") or "")
+    disabled = 0
+    for duplicate in candidates:
+        if str(duplicate.get("id", "")) == canonical_id:
+            continue
+        inactive_payload = {
+            "name": duplicate.get("name") or "Legacy duplicate utility footer",
+            "desc": duplicate.get("desc") or duplicate.get("description") or "Disabled duplicate footer snippet.",
+            "code": duplicate.get("code") or "// Disabled duplicate footer snippet.",
+            "scope": duplicate.get("scope") or "global",
+            "active": False,
+            "priority": int(duplicate.get("priority") or 10),
+            "tags": duplicate.get("tags") or ["footer", "duplicate", "disabled"],
+        }
+        stopped = snippet_api(site, password, "POST", f"snippets/{duplicate['id']}", json=inactive_payload)
+        if stopped.get("active", True):
+            raise RuntimeError(f"duplicate footer snippet {duplicate['id']} stayed active")
+        disabled += 1
+    return disabled
 
 
 def ensure_menu(site, password, menus, *, name, slug):
@@ -216,7 +244,7 @@ def configure(site, secret_name):
         title = page.get("title", {}).get("rendered") or english_title
         add_item(site, password, utility_menu, object_id=page["id"], object_type="page", title=title, order=order)
 
-    deploy_footer_fallback(site, password, pages)
+    disabled_duplicates = deploy_footer_fallback(site, password, pages)
 
     category_items = api(site, password, "GET", "wp/v2/menu-items", params={"menus": category_menu, "per_page": 100})
     utility_items = api(site, password, "GET", "wp/v2/menu-items", params={"menus": utility_menu, "per_page": 100})
@@ -226,6 +254,7 @@ def configure(site, secret_name):
         "site": urlparse(site).netloc,
         "categories": [item.get("title", {}).get("rendered", "") for item in category_items],
         "utility_pages": [item.get("title", {}).get("rendered", "") for item in utility_items],
+        "disabled_duplicate_footer_snippets": disabled_duplicates,
         "locations": "assigned by managed WordPress snippet",
     }
 
