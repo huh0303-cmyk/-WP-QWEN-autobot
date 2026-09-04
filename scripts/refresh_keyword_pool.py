@@ -161,9 +161,25 @@ TARGETS = [
                      "in Korea (B2B, not job-seeker facing)",
      "categories": ["Hiring", "Sponsorship", "Compliance", "Foreign Workers", "Salaries", "Onboarding"], "lang": "en"},
     {"url": "https://korea365.org", "file": "data/keywords/keywords_korea365.txt",
+     # 2026-09-04 CEO: this is the one site in the network built as a broad
+     # "Korea life A-Z" portal (not locked to one vertical like the other 32
+     # sites), so it should be the one that actually rides today's biggest
+     # viral moment IN Korea daily life — a Chuseok train-ticket booking
+     # crunch, a KBO/Son Heung-min match affecting commute or bar/restaurant
+     # crowds, a public holiday travel surge — turned into a practical
+     # newcomer-relevant angle (how to book, what to expect, what changes for
+     # you). Never partisan political commentary or approval-rating takes —
+     # that would break this site's neutral newcomer-service brand; that
+     # kind of coverage belongs on koreanews365.com instead.
      "domain_desc": "Essential public services and daily administration for newcomers "
-                     "to Korea (general newcomer guide, not government-affiliated)",
-     "categories": ["Public Services", "Culture", "Daily Life"], "lang": "en"},
+                     "to Korea (general newcomer guide, not government-affiliated) — "
+                     "actively prioritize whatever is most talked-about in Korea RIGHT "
+                     "NOW that has a practical daily-life angle for a resident/newcomer "
+                     "(holiday travel/ticketing surges, a major sports match changing "
+                     "transit or crowds, a seasonal service rush), turned into concrete "
+                     "how-to guidance. Do not cover partisan politics, election polling, "
+                     "or named politicians — that is out of scope for this site.",
+     "categories": ["Culture", "Living", "Travel", "Etc"], "lang": "en"},
 ]
 
 PROMPT_TMPL = """Search the web right now for what is actually trending TODAY ({today}) in
