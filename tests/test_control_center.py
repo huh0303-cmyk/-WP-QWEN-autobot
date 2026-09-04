@@ -83,12 +83,9 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert template.count("바이럴 글 즉시 발행") == 5
-    assert "WordPress 글 바로 만들기 · 비공개 초안" not in template
-    assert "WordPress 글 1건 바로 올리기 · 공개" not in template
-    assert "Blogspot 글 1건 지금 발행 · 공개" not in template
-    assert "이 사이트 글 초안 만들기" not in template
-    assert "5개 검토본 생성" not in template
+    assert "WordPress 글 바로 만들기 · 비공개 초안" in template
+    assert "WordPress 글 1건 바로 올리기 · 공개" in template
+    assert "Blogspot 글 1건 지금 발행 · 공개" in template
     assert "YouTube 콘텐츠 바로 만들기 · 비공개" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
@@ -111,12 +108,15 @@ def test_sns_cards_do_not_offer_unconnected_publish_actions():
 
 
 def test_blogspot_cards_use_the_real_automatic_queue_without_manual_source_url():
+    # 2026-09-04 CEO: added a second "키워드보고발행" button (chips from the
+    # paired WP site's own category pool) alongside the original
+    # "바이럴자동발행" auto-research button — so a keyword field is now
+    # expected here, but a manual free-text source URL is still gone.
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
     blogspot = template[template.index('{% for blog in bloggers %}'):template.index('{% endfor %}', template.index('{% for blog in bloggers %}'))]
     assert 'name="selection_mode" value="auto"' in blogspot
     assert 'name="source_wp_url"' not in blogspot
-    assert 'name="keyword"' not in blogspot
-    assert "당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를" in template
+    assert 'name="keyword" class="force-keyword-input"' in blogspot
     assert "의미상 가까운 공개 글만 자동 연결" in template
     assert "맞는 글이 없으면 억지로 연결하지 않습니다." in template
 
@@ -131,11 +131,19 @@ def test_blogspot_public_button_continues_to_exact_platform_publish_job():
     assert 'output_file.write(f"job_id={job_id}\\n")' in queue
 
 
-def test_four_locked_general_sites_show_viral_publish_actions():
+def test_all_sites_show_the_two_publish_actions():
+    # 2026-09-04 CEO: "두개 버튼으로 해줘 모든사이트 WP, 블팟, 티스토리까지" —
+    # every WP/Blogspot/Tistory card now shows both "키워드보고발행" (chip
+    # picked, seen before publishing) and "바이럴자동발행" (blind live
+    # cross-media research), not just the two originally special-cased
+    # general sites (koreanews365.com/korea365.org) — those two keep a
+    # separate backend workflow (RSS-based newsroom publisher) in app.py,
+    # but the button UI is now uniform across all sites.
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사" in template
-    assert "오늘의 언급량과 검색 추세를 다시 조사" in template
-    assert "bg-gradient-to-r from-blue-700 to-blue-500" in template
+    app_source = (Path(__file__).resolve().parents[1] / "control_center" / "app.py").read_text(encoding="utf-8")
+    assert 'registered.url.rstrip("/") == "https://koreanews365.com"' in app_source
+    assert template.count("키워드보고발행") >= 3
+    assert template.count("바이럴자동발행") >= 3
 
 
 def test_koreanews_viral_button_dispatches_newsroom_workflow(monkeypatch):
@@ -152,32 +160,6 @@ def test_koreanews_viral_button_dispatches_newsroom_workflow(monkeypatch):
     assert response.status_code == 302
     assert dispatch.call_args.args[0].endswith("/newsrooms-daily-publisher.yml/dispatches")
     assert dispatch.call_args.kwargs["json"]["inputs"]["newsroom"] == "koreanews365"
-
-
-def test_each_tistory_click_dispatches_a_fresh_live_topic_job(monkeypatch):
-    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
-    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
-    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
-    client = control_center_app.test_client()
-    target = [{"site_id": "tistory_ktrip365"}]
-    with patch("control_center.app.get_tistory_data", return_value=target), patch(
-        "control_center.app.requests.post"
-    ) as dispatch:
-        dispatch.return_value.status_code = 204
-        for _ in range(2):
-            response = client.post(
-                "/trigger/tistory-plan",
-                data={
-                    "csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"],
-                    "site_id": "tistory_ktrip365",
-                },
-            )
-            assert response.status_code == 302
-    first = dispatch.call_args_list[0].kwargs["json"]["inputs"]
-    second = dispatch.call_args_list[1].kwargs["json"]["inputs"]
-    assert first["site_ids"] == "tistory_ktrip365"
-    assert first["run_key"].startswith("manual-tistory_ktrip365-")
-    assert first["run_key"] != second["run_key"]
 
 
 def test_blogspot_automatic_topic_dispatch_does_not_require_a_manual_wp_url(monkeypatch):

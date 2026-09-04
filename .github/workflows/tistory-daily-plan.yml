@@ -11,6 +11,10 @@ on:
         description: "Unique review-bundle key; blank uses the KST date"
         required: false
         default: ""
+      force_topic:
+        description: "키워드보고발행: CEO picked this exact seed topic; blank keeps 바이럴자동발행's own live cross-media pick"
+        required: false
+        default: ""
   schedule:
     - cron: "11 21 * * *"
 
@@ -36,6 +40,7 @@ jobs:
         env:
           SITE_IDS: ${{ inputs.site_ids }}
           TISTORY_RUN_KEY: ${{ inputs.run_key }}
+          TISTORY_FORCE_TOPIC: ${{ inputs.force_topic }}
           TISTORY_LIVE_TRENDS_ENABLED: "true"
         run: |
           python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json

@@ -110,6 +110,7 @@ def main():
     force_ipv4_dns_if_requested()
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     source_url = os.environ.get("SOURCE_WP_URL", "").rstrip("/")
+    force_keyword = os.environ.get("BLOGGER_FORCE_KEYWORD", "").strip()
     blogger_site_id = os.environ.get("BLOGGER_SITE_ID", "").strip()
     if not all((sheet_id, blogger_site_id)):
         raise SystemExit("SHEET_ID and BLOGGER_SITE_ID are required")
@@ -148,6 +149,35 @@ def main():
         except requests.RequestException as exc:
             _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
             raise
+    elif force_keyword:
+        # 키워드보고발행: CEO already picked this exact topic (a chip from
+        # the paired WP site's own category pool) — skip the live
+        # cross-media research entirely and just find the closest matching
+        # public post for it, same matching logic resolve_automatic_source
+        # itself uses.
+        from automation_hub.blogger_topic_router import fetch_public_wp_posts, select_wp_source
+
+        wp_url = str(profile["wordpress"]["url"]).rstrip("/")
+        already_used = [
+            record.get("source_keyword", "")
+            for record in queue_records
+            if record.get("site_id") == blogger_site_id
+        ]
+        try:
+            candidate_posts = fetch_public_wp_posts(wp_url)
+        except requests.RequestException as exc:
+            _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=wp_url)
+            raise
+        selected = select_wp_source(force_keyword, candidate_posts, profile=profile, excluded_urls=already_used)
+        selected_topic = force_keyword
+        route_code = "WP_RELATED_SOURCE" if selected else "INDEPENDENT_TREND_ARTICLE"
+        if selected:
+            post, source_match_score = selected
+            source_posts = [post]
+            source_url = str(post["link"])
+        else:
+            source_posts = []
+            source_url = ""
     else:
         already_used = [
             record.get("source_keyword", "")

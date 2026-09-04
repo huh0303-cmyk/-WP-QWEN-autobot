@@ -77,3 +77,47 @@ def weekly_suggestions(domain: str, *, limit: int = 5, today: date | None = None
     start = int(hashlib.sha256(seed).hexdigest()[:12], 16) % len(pool)
     ordered = pool[start:] + pool[:start]
     return ordered[: max(1, min(limit, 5))]
+
+
+def top_keywords_by_category(domain: str, *, per_category: int = 3) -> list[dict[str, object]]:
+    """Top N keywords per category, ranked by today's search-volume+virality.
+
+    2026-09-04 CEO: the "지금 발행" button needs a visible pick, not a silent
+    auto-choice — 3 keyword chips per category, click one then publish.
+    scripts/refresh_keyword_pool.py already re-researches and re-ranks this
+    file every day (mention/outlet/surface count, highest first) and writes
+    each category's entries in that same rank order, so simply grouping by
+    category and keeping the first `per_category` per group already IS
+    "today's top search-volume/virality keywords, per category" — no extra
+    rotation or scoring needed here.
+    """
+    pool = _read_pool(domain)
+    grouped: dict[str, list[str]] = {}
+    for item in pool:
+        bucket = grouped.setdefault(item.category, [])
+        if len(bucket) < per_category:
+            bucket.append(item.keyword)
+    return [{"category": category, "keywords": keywords} for category, keywords in grouped.items()]
+
+
+def tistory_seed_topics(site_id: str) -> list[dict[str, object]]:
+    """This site's own configured seed topics as chips (Tistory has no daily
+    virality-ranked pool file like WordPress, just a fixed candidate list per
+    site in tistory_portfolio.json — still lets the CEO see a topic before
+    creating the review draft, same UX as the WP/Blogspot chips)."""
+    import json
+
+    path = ROOT / "config" / "tistory_portfolio.json"
+    if not path.exists():
+        return []
+    try:
+        sites = json.loads(path.read_text(encoding="utf-8")).get("sites", [])
+    except (OSError, ValueError):
+        return []
+    site = next((item for item in sites if item.get("site_id") == site_id), None)
+    if not site:
+        return []
+    topics = [str(topic).strip() for topic in site.get("seed_topics") or [] if str(topic).strip()]
+    if not topics:
+        return []
+    return [{"category": "추천 주제", "keywords": topics[:6]}]

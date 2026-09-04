@@ -2,7 +2,7 @@
 
 from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
 
-from .keywords import weekly_suggestions
+from .keywords import tistory_seed_topics, top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
 
@@ -981,6 +981,10 @@ def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
             "tone": str(blogspot.get("tone") or "practical and clear"),
             "target_chars": str(blogspot.get("target_chars") or 1800),
             "publish_now": "true",
+            # 2026-09-04 CEO: "키워드보고발행" — a chip picked from the paired
+            # WP site's own category pool; blank keeps "바이럴자동발행"
+            # (the workflow's own live cross-media research).
+            "force_keyword": str(payload.get("keyword") or ""),
         }
     else:
         workflow_name = "sheet-triggered-auto-write.yml"
@@ -1064,7 +1068,8 @@ def trigger_draft():
             flash(f"{domain}: 로컬 대기열에는 저장했지만 GitHub 실행 요청 실패 · {exc}", "error")
         else:
             if automatic_blogger_topic:
-                flash(f"{domain}: 당일 주요 매체에서 최고 주제를 골라 실제 발행하는 작업을 접수했습니다. 실패하면 해당 사이트 카드에서 다시 실행하세요. · {trigger_id} · {workflow_url}", "success")
+                picked = f' — "{keyword}"' if keyword else ""
+                flash(f"{domain}: 당일 주요 매체에서 최고 주제를 골라 실제 발행하는 작업을 접수했습니다{picked}. 실패하면 해당 사이트 카드에서 다시 실행하세요. · {trigger_id} · {workflow_url}", "success")
             else:
                 flash(f"{domain}: 실제 비공개 초안 작업 시작 · {trigger_id} · {workflow_url}", "success")
     return redirect(url_for("index") + f"#{anchor}")
@@ -1083,6 +1088,7 @@ def trigger_tistory_plan():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#tistory")
     site_id = request.form.get("site_id", "").strip()
+    keyword = request.form.get("keyword", "").strip()
     # A fresh key prevents a second click on the same day from overwriting or
     # reusing the first job. Every click therefore performs a new discovery run.
     run_key = f"manual-{site_id or 'all'}-{int(time.time())}-{secrets.token_hex(3)}"
@@ -1092,28 +1098,32 @@ def trigger_tistory_plan():
         return redirect(url_for("index") + "#tistory")
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    dispatch_inputs = {"site_ids": site_id, "run_key": run_key}
+    if keyword:
+        dispatch_inputs["force_topic"] = keyword
     try:
         if token:
             response = requests.post(
                 f"https://api.github.com/repos/{repo}/actions/workflows/tistory-daily-plan.yml/dispatches",
                 headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-                json={"ref": "main", "inputs": {"site_ids": site_id, "run_key": run_key}}, timeout=30,
+                json={"ref": "main", "inputs": dispatch_inputs}, timeout=30,
             )
             if response.status_code != 204:
                 raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
             completed = None
         else:
             command = ["gh", "workflow", "run", "tistory-daily-plan.yml", "--repo", repo]
-            if site_id:
-                command.extend(["-f", f"site_ids={site_id}"])
-            command.extend(["-f", f"run_key={run_key}"])
+            for key, value in dispatch_inputs.items():
+                if value:
+                    command.extend(["-f", f"{key}={value}"])
             completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
     except (OSError, subprocess.SubprocessError, requests.RequestException, RuntimeError) as exc:
         flash(f"Tistory 5개 검토본 실행 요청 실패 · {exc}", "error")
     else:
         if completed is None or completed.returncode == 0:
             target = site_id or "5개 전체"
-            flash(f"Tistory {target}: 오늘의 바이럴 신호 재조사와 새 글 생성을 시작했습니다. Tistory 공개 저장은 로그인된 로컬 등록기가 이어서 처리합니다.", "success")
+            picked = f' — "{keyword}"' if keyword else ""
+            flash(f"Tistory {target}: 오늘의 바이럴 신호 재조사와 새 글 생성을 시작했습니다{picked}. Tistory 공개 저장은 로그인된 로컬 등록기가 이어서 처리합니다.", "success")
         else:
             detail = (completed.stderr or completed.stdout or "GitHub workflow dispatch failed").strip()
             flash(f"Tistory 5개 검토본 실행 요청 실패 · {detail}", "error")
@@ -1216,6 +1226,7 @@ def trigger_publish_site_now():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#wordpress")
     domain = request.form.get("domain", "").strip()
+    keyword = request.form.get("keyword", "").strip()
     registered = next(
         (site for site in load_wordpress_sites() if site.url.replace("https://", "").replace("http://", "").rstrip("/") == domain),
         None,
@@ -1239,7 +1250,15 @@ def trigger_publish_site_now():
             "publication_approved": "true",
             "room_id": f"manual-onebutton-{registered.site_id}",
         }
-        success_message = f"{domain}: 오늘의 주요매체 언급량과 검색 추세를 다시 조사해 바이럴 글 1건 공개 발행을 시작했습니다."
+        # 2026-09-04 CEO: "키워드보고발행" — pick one of the 3-per-category
+        # chips (see /api/keyword-suggestions-by-category) so the CEO sees
+        # the topic before committing; force_keyword overrides the
+        # workflow's own live cross-media research for this one run. Blank
+        # keyword keeps the original "바이럴자동발행" behavior.
+        if keyword:
+            workflow_inputs["force_keyword"] = keyword
+        picked = f' — "{keyword}"' if keyword else ""
+        success_message = f"{domain}: 오늘의 주요매체 언급량과 검색 추세를 다시 조사해 바이럴 글 1건 공개 발행을 시작했습니다{picked}."
     try:
         response = requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
@@ -1321,6 +1340,28 @@ def keyword_suggestions(domain: str):
              "verification": item.verification}
             for item in items
         ],
+    })
+
+
+@app.get("/api/keyword-suggestions-by-category/<path:domain>")
+def keyword_suggestions_by_category(domain: str):
+    """3 keyword chips per category for the '키워드보고발행' button — today's
+    top search-volume/virality picks (see refresh_keyword_pool.py), shown
+    before publishing so the CEO can choose the topic instead of the
+    '바이럴자동발행' button's blind live auto-research."""
+    return jsonify({
+        "domain": domain,
+        "groups": top_keywords_by_category(domain, per_category=3),
+    })
+
+
+@app.get("/api/tistory-seed-topics/<path:site_id>")
+def tistory_seed_topics_route(site_id: str):
+    """Chips for a Tistory card's '키워드보고발행' button — that site's own
+    configured seed topics, shown before creating the review draft."""
+    return jsonify({
+        "site_id": site_id,
+        "groups": tistory_seed_topics(site_id),
     })
 
 

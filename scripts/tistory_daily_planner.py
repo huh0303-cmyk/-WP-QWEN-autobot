@@ -51,6 +51,11 @@ def _golden_keyword_score(topic: str, site: dict) -> tuple[int, dict[str, int]]:
 
 
 def _pick_seed_topic(site: dict, day: str) -> tuple[str, int, dict[str, int]]:
+    forced = os.environ.get("TISTORY_FORCE_TOPIC", "").strip()
+    if forced:
+        # 키워드보고발행: CEO already picked this exact seed topic from the
+        # card's chips; skip live research and the day-hash pick entirely.
+        return forced, 0, {"ceo_picked": 1}
     if os.environ.get("TISTORY_LIVE_TRENDS_ENABLED", "false").strip().lower() == "true":
         try:
             from automation_hub.blogger_topic_router import fetch_profile_headlines, fetch_today_headlines, fetch_trending_terms, rank_topics
@@ -98,8 +103,11 @@ def build_plan(now: datetime | None = None) -> dict:
     if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", run_key):
         raise ValueError("TISTORY_RUN_KEY must contain only letters, numbers, dot, underscore or hyphen")
     jobs = []
+    requested_site_ids = {s.strip() for s in os.environ.get("SITE_IDS", "").split(",") if s.strip()}
     enabled_sites = sorted(
-        (site for site in cfg["sites"] if site.get("launch_enabled") is True),
+        (site for site in cfg["sites"]
+         if site.get("launch_enabled") is True
+         and (not requested_site_ids or site["site_id"] in requested_site_ids)),
         key=lambda site: int(site.get("launch_order", 999)),
     )
     for site in enabled_sites:
@@ -122,7 +130,11 @@ def build_plan(now: datetime | None = None) -> dict:
             "categories": site.get("categories", []),
             "intent": site.get("intent", []),
             "seed_topic": seed_topic,
-            "keyword_selection": "live_cross_media_noun_frequency" if "live_cross_media" in keyword_breakdown else "golden_keyword_score",
+            "keyword_selection": (
+                "ceo_picked" if "ceo_picked" in keyword_breakdown
+                else "live_cross_media_noun_frequency" if "live_cross_media" in keyword_breakdown
+                else "golden_keyword_score"
+            ),
             "keyword_score": keyword_score,
             "keyword_score_breakdown": keyword_breakdown,
             "status": "PLANNED",

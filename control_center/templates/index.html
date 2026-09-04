@@ -122,9 +122,11 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for site in sites %}
                 <article class="wordpress-card min-w-0 overflow-hidden rounded-2xl border bg-gradient-to-br from-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if site.google_approved %}border-2 border-amber-400 to-amber-50 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-blue-200 to-blue-50{% endif %}" data-search="{{ site.domain|lower }} {{ (site.category or '')|lower }}">
-                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="space-y-3 p-4" {% if site.auth_ready %}onsubmit="return confirm('{{ site.domain }}: 오늘의 뉴스 언급량과 검색 추세를 다시 조사해 바이럴 글 1건을 즉시 공개 발행할까요?');"{% else %}onsubmit="return false;" aria-disabled="true"{% endif %}>
+                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="force-publish-form space-y-3 p-4" data-domain="{{ site.domain }}" {% if site.auth_ready %}onsubmit="return confirmForcePublish(event, this);"{% else %}onsubmit="return false;" aria-disabled="true"{% endif %}>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="domain" value="{{ site.domain }}">
+                    <input type="hidden" name="keyword" class="force-keyword-input" value="">
+                    <input type="hidden" name="submit_mode" class="force-submit-mode" value="">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}자동 재수집 중{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}재수집{% endif %}</span>
@@ -222,13 +224,19 @@
                     </div>
                         </div>
                     </details>
-                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">누를 때마다 오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사하고, 이 사이트 분야에 맞는 최고 주제를 선택합니다.</p>
                     {% if site.auth_ready %}
-                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
-                        <span>바이럴 글 즉시 발행</span><span aria-hidden="true">→</span>
+                    <div class="force-keyword-groups space-y-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px]">
+                        <p class="text-slate-400">오늘의 카테고리별 추천 키워드 불러오는 중…</p>
+                    </div>
+                    <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
+                        <span>키워드보고발행</span><span aria-hidden="true">→</span>
+                    </button>
+                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">누를 때마다 오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사하고, 이 사이트 분야에 맞는 최고 주제를 선택합니다. 결과를 미리 보여주지 않고 바로 발행합니다.</p>
+                    <button type="button" class="force-viral-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
+                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
                     </button>
                     {% else %}
-                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">바이럴 글 즉시 발행 · 연결 필요</div>
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
                     {% endif %}
                 </form>
                 </article>
@@ -249,12 +257,16 @@
             <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for blog in bloggers %}
-                <form method="post" action="{{ url_for('trigger_draft') }}" class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}" {% if not blog.connected %}onsubmit="return false;" aria-disabled="true"{% endif %}>
+                <form method="post" action="{{ url_for('trigger_draft') }}"
+                      class="force-publish-form min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}"
+                      data-domain="{{ blog.wp_url|replace('https://', '')|replace('http://', '') }}" {% if not blog.connected %}onsubmit="return false;" aria-disabled="true"{% endif %}>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="platform" value="blogger">
                     <input type="hidden" name="site_id" value="{{ blog.site_id }}">
                     <input type="hidden" name="domain" value="{{ blog.url|replace('https://', '')|replace('http://', '') }}">
                     <input type="hidden" name="selection_mode" value="auto">
+                    <input type="hidden" name="keyword" class="force-keyword-input" value="">
+                    <input type="hidden" name="submit_mode" class="force-submit-mode" value="">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <div class="mb-1 flex items-center gap-2">
@@ -322,17 +334,23 @@
                     </div>
                         </div>
                     </details>
-                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-3 text-[11px] text-violet-950">
-                        <p class="font-black">주제 자동 선택</p>
-                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다.</p>
-                        <p class="text-[10px] text-violet-700">연계 기준 WP: {{ blog.wp_url|replace('https://', '')|replace('http://', '') }} · 의미상 가까운 공개 글만 자동 연결하며, 맞는 글이 없으면 억지로 연결하지 않습니다.</p>
-                    </div>
+                    <p class="text-[10px] text-violet-700">연계 기준 WP: {{ blog.wp_url|replace('https://', '')|replace('http://', '') }} · 의미상 가까운 공개 글만 자동 연결하며, 맞는 글이 없으면 억지로 연결하지 않습니다.</p>
                     {% if blog.connected %}
-                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
-                        <span>바이럴 글 즉시 발행</span><span aria-hidden="true">→</span>
+                    <div class="force-keyword-groups space-y-1.5 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[11px]">
+                        <p class="text-slate-400">오늘의 카테고리별 추천 키워드 불러오는 중…</p>
+                    </div>
+                    <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
+                        <span>키워드보고발행</span><span aria-hidden="true">→</span>
+                    </button>
+                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-3 text-[11px] text-violet-950">
+                        <p class="font-black">바이럴자동발행</p>
+                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다. 결과를 미리 보여주지 않습니다.</p>
+                    </div>
+                    <button type="button" class="force-viral-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
+                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
                     </button>
                     {% else %}
-                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">바이럴 글 즉시 발행 · 연결 필요</div>
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
                     {% endif %}
                 </form>
                 {% endfor %}
@@ -431,11 +449,25 @@
                     </div>
                         </div>
                     </details>
-                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">누를 때마다 오늘의 언급량과 검색 추세를 다시 조사해 이 사이트 분야의 최고 주제를 선택합니다. 최종 공개 저장은 로그인된 로컬 Tistory 발행기가 이어서 완료합니다.</p>
-                    <form method="post" action="{{ url_for('trigger_tistory_plan') }}">
+                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">최종 공개 저장은 로그인된 로컬 Tistory 발행기가 이어서 완료합니다.</p>
+                    <form method="post" action="{{ url_for('trigger_tistory_plan') }}"
+                          class="force-publish-form space-y-3" data-site-label="{{ blog.name }}"
+                          data-suggest-url="{{ url_for('tistory_seed_topics_route', site_id=blog.site_id) }}"
+                          data-instant-publish="false" onsubmit="return confirmForcePublish(event, this);">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="site_id" value="{{ blog.site_id }}">
-                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">바이럴 글 즉시 발행</button>
+                        <input type="hidden" name="keyword" class="force-keyword-input" value="">
+                        <input type="hidden" name="submit_mode" class="force-submit-mode" value="">
+                        <div class="force-keyword-groups space-y-1.5 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-[11px]">
+                            <p class="text-slate-400">추천 주제 불러오는 중…</p>
+                        </div>
+                        <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
+                            <span>키워드보고발행</span><span aria-hidden="true">→</span>
+                        </button>
+                        <p class="text-[11px] font-semibold leading-relaxed text-slate-500">누를 때마다 오늘의 언급량과 검색 추세를 다시 조사해 이 사이트 분야의 최고 주제를 선택합니다. 결과를 미리 보여주지 않습니다.</p>
+                        <button type="button" class="force-viral-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
+                            <span>바이럴자동발행</span><span aria-hidden="true">→</span>
+                        </button>
                     </form>
                 </article>
                 {% endfor %}
@@ -531,6 +563,93 @@
         </section>
     </main>
     <script>
+        function confirmForcePublish(event, form) {
+            const mode = form.querySelector('.force-submit-mode').value;
+            const picked = form.querySelector('.force-keyword-input').value.trim();
+            const domain = form.dataset.domain || form.dataset.siteLabel || '';
+            const instant = form.dataset.instantPublish !== 'false';
+            const action = instant ? '공개 발행' : '비공개 검토본 생성';
+            const caveat = instant ? ' 검토 단계 없이 바로 공개됩니다.' : ' Tistory 공개 저장은 로그인된 로컬 등록기가 이어서 처리합니다.';
+            if (mode === 'keyword') {
+                if (!picked) {
+                    alert(`${domain}: 먼저 키워드 칩을 하나 선택하세요.`);
+                    return false;
+                }
+                return confirm(`${domain}: "${picked}" 키워드로 지금 바로 글을 써서 ${action}할까요?${caveat}`);
+            }
+            return confirm(`${domain}: 오늘의 주요매체 언급량과 검색 추세를 실시간으로 다시 조사해 바이럴 글 1건을 즉시 ${action}할까요? 어떤 주제가 될지는 미리 보이지 않습니다.${caveat}`);
+        }
+        document.querySelectorAll('.force-publish-form').forEach((form) => {
+            const groupsEl = form.querySelector('.force-keyword-groups');
+            const keywordInput = form.querySelector('.force-keyword-input');
+            const modeInput = form.querySelector('.force-submit-mode');
+            const keywordButton = form.querySelector('.force-keyword-submit');
+            const viralButton = form.querySelector('.force-viral-submit');
+            if (keywordButton) {
+                keywordButton.addEventListener('click', () => {
+                    modeInput.value = 'keyword';
+                    form.requestSubmit();
+                });
+            }
+            if (viralButton) {
+                viralButton.addEventListener('click', () => {
+                    keywordInput.value = '';
+                    modeInput.value = 'viral';
+                    form.requestSubmit();
+                });
+            }
+            if (!groupsEl || !keywordInput) return;
+            const suggestUrl = form.dataset.suggestUrl
+                || `/api/keyword-suggestions-by-category/${encodeURIComponent(form.dataset.domain)}`;
+            fetch(suggestUrl)
+                .then((response) => response.json())
+                .then((data) => {
+                    const groups = data.groups || [];
+                    groupsEl.innerHTML = '';
+                    if (!groups.length) {
+                        const empty = document.createElement('p');
+                        empty.className = 'text-amber-600';
+                        empty.textContent = '오늘의 추천 키워드 없음';
+                        groupsEl.appendChild(empty);
+                        if (keywordButton) keywordButton.disabled = true;
+                        return;
+                    }
+                    groups.forEach((group) => {
+                        const row = document.createElement('div');
+                        row.className = 'flex flex-wrap items-center gap-1.5';
+                        const label = document.createElement('span');
+                        label.className = 'font-black text-emerald-800';
+                        label.textContent = group.category + ':';
+                        row.appendChild(label);
+                        group.keywords.forEach((keyword) => {
+                            const chip = document.createElement('button');
+                            chip.type = 'button';
+                            chip.className = 'force-keyword-chip rounded-full bg-white border border-emerald-300 px-2.5 py-1 font-semibold text-emerald-700 hover:bg-emerald-100';
+                            chip.textContent = keyword;
+                            chip.addEventListener('click', () => {
+                                const already = keywordInput.value === keyword;
+                                keywordInput.value = already ? '' : keyword;
+                                groupsEl.querySelectorAll('.force-keyword-chip').forEach((el) => {
+                                    el.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+                                });
+                                if (!already) {
+                                    chip.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+                                }
+                            });
+                            row.appendChild(chip);
+                        });
+                        groupsEl.appendChild(row);
+                    });
+                })
+                .catch(() => {
+                    groupsEl.innerHTML = '';
+                    const failed = document.createElement('p');
+                    failed.className = 'text-amber-600';
+                    failed.textContent = '추천 키워드 불러오기 실패';
+                    groupsEl.appendChild(failed);
+                    if (keywordButton) keywordButton.disabled = true;
+                });
+        });
         document.querySelectorAll('.keyword-chip').forEach((button) => {
             button.addEventListener('click', () => {
                 const input = document.getElementById(button.dataset.target);

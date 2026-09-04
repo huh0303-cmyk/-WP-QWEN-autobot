@@ -31,6 +31,11 @@ on:
         required: true
         default: "1800"
         type: string
+      force_keyword:
+        description: "키워드보고발행: CEO picked this exact topic; blank keeps 바이럴자동발행's own live cross-media research"
+        required: false
+        default: ""
+        type: string
       publish_now:
         description: "Explicit approval to publish; default creates a review draft"
         required: true
@@ -76,6 +81,7 @@ jobs:
           BLOGGER_PERSONA: ${{ inputs.persona }}
           BLOGGER_TONE: ${{ inputs.tone }}
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
+          BLOGGER_FORCE_KEYWORD: ${{ inputs.force_keyword }}
           BLOGGER_MAX_SIMILARITY: "0.55"
           BLOGGER_MIN_QUALITY_SCORE: "70"
           BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
