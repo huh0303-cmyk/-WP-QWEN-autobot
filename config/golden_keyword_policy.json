@@ -3,6 +3,16 @@
   "name": "GOLDEN_KEYWORD_SELECTION_POLICY",
   "status": "LOCKED",
   "scope": ["wordpress", "blogger", "tistory", "news"],
+  "viral_general_sites": {
+    "wordpress": ["https://koreanews365.com", "https://korea365.org"],
+    "blogger": ["https://korea365guide.blogspot.com"],
+    "tistory": ["https://huh0303.tistory.com"],
+    "topic_mode": "today_cross_media_repeated_nouns_first",
+    "cross_category": true,
+    "categories": ["politics", "economy", "society", "daily_life", "reservations", "culture", "sports", "world"],
+    "entity_examples": ["용혜인", "김승원", "민주당", "추석 예매", "대통령 지지율", "KBO", "손흥민"],
+    "rule": "These general sites may follow the strongest verified issue across categories. Rank today's repeated proper nouns and noun phrases by unique URL, independent outlet, discovery surface and search-trend evidence; never invent or blindly copy a headline."
+  },
   "signal_pipeline": [
     "collect_current_newspaper_naver_google_and_media_mentions",
     "extract_and_normalize_repeated_nouns",
@@ -46,7 +56,7 @@
   },
   "routing": {
     "newsrooms": "The two newsrooms use the latest RSS headlines as reporting topics, verify the underlying event, and write an original report.",
-    "general_blogs": "Convert the same verified signal into practical site-fit intent such as cost, method, eligibility, schedule, comparison or precautions.",
+    "general_blogs": "The explicitly registered viral general sites may select the highest verified cross-category issue. Convert the signal into useful context, cost, method, eligibility, schedule, comparison or precautions.",
     "categories": ["politics", "economy", "society", "culture_and_arts", "sports", "education", "travel", "health", "technology"]
   },
   "selection": "highest_cross_surface_noun_frequency_then_verified_score_no_random_choice"

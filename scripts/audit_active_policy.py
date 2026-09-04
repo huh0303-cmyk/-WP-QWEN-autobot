@@ -58,6 +58,22 @@ def fail(msg: str) -> None:
 
 
 def main() -> None:
+    keyword_policy = json.loads((ROOT / "config" / "golden_keyword_policy.json").read_text(encoding="utf-8"))
+    viral_sites = keyword_policy.get("viral_general_sites", {})
+    expected_viral_sites = {
+        "wordpress": {"https://koreanews365.com", "https://korea365.org"},
+        "blogger": {"https://korea365guide.blogspot.com"},
+        "tistory": {"https://huh0303.tistory.com"},
+    }
+    for platform, expected_urls in expected_viral_sites.items():
+        if set(viral_sites.get(platform, [])) != expected_urls:
+            fail(f"viral general-site registry drift for {platform}: {viral_sites.get(platform, [])}")
+    if viral_sites.get("topic_mode") != "today_cross_media_repeated_nouns_first" or viral_sites.get("cross_category") is not True:
+        fail("viral general sites lost today's cross-media noun-first, cross-category routing")
+    required_examples = {"용혜인", "김승원", "민주당", "추석 예매", "대통령 지지율", "KBO", "손흥민"}
+    if not required_examples.issubset(set(viral_sites.get("entity_examples", []))):
+        fail("viral general-site entity examples drifted from the CEO lock")
+
     consensus_src = (ROOT / "scripts" / "three_model_consensus.py").read_text(encoding="utf-8")
     if "gemini_generate(" in consensus_src:
         fail("three_model_consensus.py still invokes gemini_generate — Gemini reviewer must stay uncalled")
@@ -146,6 +162,13 @@ def main() -> None:
         fail("Blogger workflow is not wired to Replicate images")
     if 'BLOGGER_MIN_QUALITY_SCORE: "70"' not in blogger:
         fail("Blogger publication threshold is not 70")
+
+    if "load_live_general_keyword(site)" not in wp_publisher or 'GENERAL_VIRAL_WP_SITES = {"https://korea365.org"}' not in wp_publisher:
+        fail("korea365.org lost live cross-media general-topic routing")
+    tistory_plan = workflow_text.get("tistory-daily-plan.yml", "")
+    tistory_planner = (ROOT / "scripts" / "tistory_daily_planner.py").read_text(encoding="utf-8")
+    if 'TISTORY_LIVE_TRENDS_ENABLED: "true"' not in tistory_plan or "live_cross_media_noun_frequency" not in tistory_planner:
+        fail("huh0303.tistory.com lost live cross-media general-topic routing")
 
     provider = (ROOT / "scripts" / "replicate_image_provider.py").read_text(encoding="utf-8")
     approved_models = (

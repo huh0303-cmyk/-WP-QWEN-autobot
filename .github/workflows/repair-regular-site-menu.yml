@@ -1,0 +1,29 @@
+name: "Repair one regular-site menu"
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_site_url:
+        description: "Exact registered regular WordPress URL"
+        required: true
+        default: "https://k-trip365.com"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Remove duplicate utility footer and verify menus
+        env:
+          TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+        run: python scripts/deploy_regular_site_menus.py

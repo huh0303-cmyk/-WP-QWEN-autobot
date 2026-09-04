@@ -524,10 +524,9 @@ THEME_CATEGORY_MAP = {
     "한국 뉴스": {"default":"글로벌 (GLOBAL)","keyword_map":[
         (["정치","대통령","국회","선거","여당","야당","탄핵"],"정치 (POLITICS)"),
         (["경제","금리","물가","GDP","수출","무역","코스피","기업","삼성","현대","SK","LG"],"경제 (ECONOMY)"),
-        (["사기","횡령","기소","징역","사법","법원","재판","구속"],"사회 (SOCIETY)"),
         (["사회","범죄","복지","노동","청년","저출산"],"사회 (SOCIETY)"),
         (["문화","K-pop","드라마","영화"],"문화 (CULTURE)"),
-        (["투자사기","금융사기","금융","주가","증시","은행"],"금융 (FINANCE)"),
+        (["금융","주가","증시","은행"],"금융 (FINANCE)"),
         (["부동산","아파트","주택","집값","전세"],"부동산 (REAL ESTATE)"),
         (["국방","군사","군대","국방부","defense","department of defense","war.gov"],"국방 (MILITARY)"),
         (["예술","미술","전시"],"예술 (ART)"),
@@ -1385,7 +1384,7 @@ SITES_CONFIG = [
     {"url":"https://jobkorea365.com",        "lang":"en","theme":"Employment",          "mode":"blog",      "keywords_file":"data/keywords/keywords_jobkorea365.txt",    "wp_pass_env":"JOBKOREA365COM",       "daily":1,"publish_every_n_days":1},
     {"url":"https://jobinkorea365.com",      "lang":"en","theme":"Jobs in Korea",       "mode":"blog",      "keywords_file":"data/keywords/keywords_jobinkorea365.txt",  "wp_pass_env":"JOBINKOREA365COM",     "daily":1,"publish_every_n_days":1},
     {"url":"https://jobkoreaglobal.com",     "lang":"en","theme":"Recruitment",         "mode":"blog",      "keywords_file":"data/keywords/keywords_jobkoreaglobal.txt", "wp_pass_env":"JOBKOREAGLOBALCOM",    "daily":1,"publish_every_n_days":1},
-    {"url":"https://korea365.org",           "lang":"en","theme":"Korea Culture",       "mode":"blog",      "keywords_file":"data/keywords/keywords_korea365.txt",       "wp_pass_env":"KOREA365ORG",          "daily":1,"publish_every_n_days":1},
+    {"url":"https://korea365.org",           "lang":"en","theme":"Korea current affairs, public life and viral topics", "mode":"blog", "keywords_file":"data/keywords/keywords_korea365.txt", "wp_pass_env":"KOREA365ORG", "daily":1,"publish_every_n_days":1},
     {"url":"https://koreanews365.com",       "lang":"ko","theme":"한국 뉴스",            "mode":"news",      "keywords_file":"data/keywords/keywords_koreanews.txt",      "wp_pass_env":"KOREANEWS365COM",      "daily":1,"publish_every_n_days":1},
     {"url":"https://theseouljournal.com",    "lang":"en","theme":"Seoul Lifestyle",     "mode":"news_en",   "keywords_file":"data/keywords/keywords_seouljournal.txt",   "wp_pass_env":"THESEOULJOURNALCOM",   "daily":1,"publish_every_n_days":1},
 ]
@@ -2834,6 +2833,32 @@ def load_keyword(filename, site_url, fallback):
         pass
     return fallback
 
+
+GENERAL_VIRAL_WP_SITES = {"https://korea365.org"}
+
+
+def load_live_general_keyword(site):
+    """Pick today's strongest verified cross-media noun for a general WP site."""
+    if site.get("url") not in GENERAL_VIRAL_WP_SITES:
+        return ""
+    try:
+        from automation_hub.blogger_topic_router import fetch_today_headlines, fetch_trending_terms, rank_topics
+
+        profile = {
+            "site_key": "korea365",
+            "language": site.get("lang", "en"),
+            "wordpress": {"theme": site.get("theme", ""), "persona": "general current-affairs editor"},
+            "blogspot": {},
+        }
+        ranked = rank_topics(fetch_today_headlines(), profile=profile, trend_terms=fetch_trending_terms())
+        if ranked:
+            winner = ranked[0]
+            print(f"  🔥 당일 종합 이슈 선택: {winner.keyword} · mentions={winner.mention_count} · outlets={winner.outlet_count} · score={winner.score:.1f}")
+            return winner.keyword
+    except Exception as exc:
+        print(f"  ⚠️ 당일 종합 이슈 수집 실패, 검증된 기존 키워드 풀로 대체: {exc}")
+    return ""
+
 _PLACEHOLDER_KEYWORDS = {"추가", "add", "tbd", "todo", "n/a"}
 
 def sanitize_keyword(kw, fallback):
@@ -3101,8 +3126,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     from editorial_title_gate import require_editorial_approval
     try:
         approval = require_editorial_approval(title=title, content=final, meta=meta, keyword=keyword,
-            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0),
-            is_newsroom_brief=is_newsroom)
+            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0))
         print("EDITORIAL_APPROVAL " + json.dumps(approval, ensure_ascii=False))
     except Exception as exc:
         return {"ok": False, "error": f"Editorial gate blocked draft: {exc}"}
@@ -3574,7 +3598,8 @@ def process_one(site, keyword):
             return False
         sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
-    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
+    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter,
+                   category_hint=f"{news_source_category or ''} {news_source or ''}".strip())
     if result["ok"]:
         is_draft = result.get("status") == "draft"
         outcome = "초안 생성" if is_draft else "공개 발행"
@@ -3678,7 +3703,8 @@ def main():
                 kw = force_kw
             else:
                 kw=("__news__" if site["mode"] in ("news","news_en")
-                    else load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
+                    else load_live_general_keyword(site)
+                    or load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
             if site["mode"] not in ("news","news_en"):
                 kw=sanitize_keyword(kw, f"{theme} guide 2026")
             try:

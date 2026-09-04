@@ -1214,15 +1214,27 @@ def trigger_publish_site_now():
     if not token:
         flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
         return redirect(url_for("index") + "#wordpress")
+    if registered.url.rstrip("/") == "https://koreanews365.com":
+        workflow_name = "newsrooms-daily-publisher.yml"
+        workflow_inputs = {"newsroom": "koreanews365", "preferred_category": ""}
+        success_message = "koreanews365.com: 실시간 주요 뉴스 이슈를 다시 수집해 바이럴 발행을 시작했습니다."
+    else:
+        workflow_name = "daily-network-publish.yml"
+        workflow_inputs = {
+            "target_site_url": registered.url,
+            "publication_approved": "true",
+            "room_id": f"manual-onebutton-{registered.site_id}",
+        }
+        success_message = (
+            f"{domain}: 실시간 주요매체 반복 명사를 다시 수집해 글쓰기·공개 발행을 시작했습니다."
+            if registered.url.rstrip("/") == "https://korea365.org"
+            else f"{domain}: 글쓰기·공개 발행을 시작했습니다."
+        )
     try:
         response = requests.post(
-            f"https://api.github.com/repos/{repo}/actions/workflows/daily-network-publish.yml/dispatches",
+            f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
             headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": {
-                "target_site_url": registered.url,
-                "publication_approved": "true",
-                "room_id": f"manual-onebutton-{registered.site_id}",
-            }},
+            json={"ref": "main", "inputs": workflow_inputs},
             timeout=30,
         )
         if response.status_code != 204:
@@ -1230,7 +1242,7 @@ def trigger_publish_site_now():
     except (requests.RequestException, RuntimeError) as exc:
         flash(f"{domain}: 발행 요청 실패 · {exc}", "error")
     else:
-        flash(f"{domain}: 글쓰기·공개 발행을 시작했습니다 (검토 단계 없음).", "success")
+        flash(success_message, "success")
     return redirect(url_for("index") + "#wordpress")
 
 

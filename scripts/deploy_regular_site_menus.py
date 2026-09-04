@@ -87,6 +87,15 @@ add_filter('wp_nav_menu_objects', function ($items, $args) {{
 }}, 999, 2);
 add_action('wp_footer', function () {{
     if (is_admin()) return;
+    // GeneratePress (and other themes with a real footer location) already
+    // renders the utility menu. The managed fallback must not print a second
+    // identical row underneath it.
+    $registered = get_registered_nav_menus();
+    $locations = get_nav_menu_locations();
+    foreach ($registered as $location => $label) {{
+        $key = strtolower($location . ' ' . $label);
+        if (strpos($key, 'footer') !== false && !empty($locations[$location])) return;
+    }}
     $links = array(
         {php_links}
     );
@@ -224,14 +233,18 @@ def configure(site, secret_name):
 def main():
     if len(REGULAR_SITES) != 25:
         raise SystemExit("scope guard failed: expected exactly 25 regular sites")
+    requested = os.getenv("TARGET_SITE_URL", "").strip().rstrip("/")
+    targets = [row for row in REGULAR_SITES if not requested or row[0].rstrip("/") == requested]
+    if requested and len(targets) != 1:
+        raise SystemExit(f"unknown or non-regular TARGET_SITE_URL: {requested}")
     failed = []
-    for index, (site, secret_name, _) in enumerate(REGULAR_SITES, 1):
+    for index, (site, secret_name, _) in enumerate(targets, 1):
         try:
             result = configure(site, secret_name)
-            print(f"[{index:02d}/25] OK {result}", flush=True)
+            print(f"[{index:02d}/{len(targets)}] OK {result}", flush=True)
         except Exception as exc:
             failed.append(f"{site}: {exc}")
-            print(f"[{index:02d}/25] FAIL {site}: {exc}", flush=True)
+            print(f"[{index:02d}/{len(targets)}] FAIL {site}: {exc}", flush=True)
     if failed:
         raise SystemExit("menu deployment incomplete:\n" + "\n".join(failed))
 

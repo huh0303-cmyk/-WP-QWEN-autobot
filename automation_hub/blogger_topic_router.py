@@ -40,7 +40,7 @@ TREND_FEEDS = (
     "https://trends.google.com/trending/rss?geo=US",
 )
 PRIORITY_OUTLETS = {"chosun ilbo", "hankyoreh", "cnn", "the new york times"}
-GENERAL_PROFILE_KEYS = {"korea365", "koreanews", "seouljournal"}
+GENERAL_PROFILE_KEYS = {"korea365", "koreanews", "seouljournal", "tistory_life365"}
 
 _EN_STOP = {
     "about", "after", "again", "amid", "and", "are", "but", "for", "from", "has", "have",

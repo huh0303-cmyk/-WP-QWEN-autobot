@@ -128,6 +128,30 @@ def test_blogspot_public_button_continues_to_exact_platform_publish_job():
     assert 'output_file.write(f"job_id={job_id}\\n")' in queue
 
 
+def test_four_locked_general_sites_show_viral_publish_actions():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "['koreanews365.com', 'korea365.org']" in template
+    assert "korea365guide.blogspot.com" in template
+    assert "huh0303.tistory.com" in template
+    assert template.count("🔥 바이럴 발행") == 3  # one conditional label per platform section
+
+
+def test_koreanews_viral_button_dispatches_newsroom_workflow(monkeypatch):
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
+    client = control_center_app.test_client()
+    with patch("control_center.app.requests.post") as dispatch:
+        dispatch.return_value.status_code = 204
+        response = client.post(
+            "/trigger/publish-site-now",
+            data={"csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"], "domain": "koreanews365.com"},
+        )
+    assert response.status_code == 302
+    assert dispatch.call_args.args[0].endswith("/newsrooms-daily-publisher.yml/dispatches")
+    assert dispatch.call_args.kwargs["json"]["inputs"]["newsroom"] == "koreanews365"
+
+
 def test_blogspot_automatic_topic_dispatch_does_not_require_a_manual_wp_url(monkeypatch):
     monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
     monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)

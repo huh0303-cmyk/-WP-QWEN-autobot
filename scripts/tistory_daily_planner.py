@@ -51,6 +51,27 @@ def _golden_keyword_score(topic: str, site: dict) -> tuple[int, dict[str, int]]:
 
 
 def _pick_seed_topic(site: dict, day: str) -> tuple[str, int, dict[str, int]]:
+    if site.get("trend_mode") and os.environ.get("TISTORY_LIVE_TRENDS_ENABLED", "false").strip().lower() == "true":
+        try:
+            from automation_hub.blogger_topic_router import fetch_today_headlines, fetch_trending_terms, rank_topics
+
+            profile = {
+                "site_key": site["site_id"],
+                "language": site.get("language", "ko"),
+                "wordpress": {"theme": "종합 생활정보·정치·경제·사회·문화·스포츠", "persona": "당일 이슈 생활정보 편집자"},
+                "blogspot": {},
+            }
+            ranked = rank_topics(fetch_today_headlines(), profile=profile, trend_terms=fetch_trending_terms())
+            if ranked:
+                winner = ranked[0]
+                return winner.keyword, round(winner.score), {
+                    "live_cross_media": round(winner.score),
+                    "mentions": winner.mention_count,
+                    "outlets": winner.outlet_count,
+                    "surfaces": winner.surface_count,
+                }
+        except Exception as exc:
+            print(f"Tistory live trend fallback for {site['site_id']}: {exc}")
     topics = site.get("seed_topics") or []
     if not topics:
         return "", 0, {}
@@ -95,7 +116,7 @@ def build_plan(now: datetime | None = None) -> dict:
             "categories": site.get("categories", []),
             "intent": site.get("intent", []),
             "seed_topic": seed_topic,
-            "keyword_selection": "golden_keyword_score",
+            "keyword_selection": "live_cross_media_noun_frequency" if "live_cross_media" in keyword_breakdown else "golden_keyword_score",
             "keyword_score": keyword_score,
             "keyword_score_breakdown": keyword_breakdown,
             "status": "PLANNED",

@@ -36,6 +36,7 @@ jobs:
         env:
           SITE_IDS: ${{ inputs.site_ids }}
           TISTORY_RUN_KEY: ${{ inputs.run_key }}
+          TISTORY_LIVE_TRENDS_ENABLED: "true"
         run: |
           python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
           if [ -n "$SITE_IDS" ]; then

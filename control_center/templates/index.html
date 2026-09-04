@@ -311,7 +311,7 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="domain" value="{{ site.domain }}">
                     {% if site.auth_ready %}
-                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm hover:bg-emerald-700">WordPress 글 1건 바로 올리기 · 공개 →</button>
+                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl {% if site.domain in ['koreanews365.com', 'korea365.org'] %}bg-gradient-to-r from-orange-600 to-rose-600{% else %}bg-emerald-600{% endif %} px-4 text-sm font-black text-white shadow-sm hover:brightness-95">{% if site.domain in ['koreanews365.com', 'korea365.org'] %}🔥 바이럴 발행{% else %}WordPress 글 1건 바로 올리기 · 공개 →{% endif %}</button>
                     {% else %}
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 바로 올리기 · 연결 없음</div>
                     {% endif %}
@@ -414,7 +414,7 @@
                     </div>
                     {% if blog.connected %}
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-4 text-sm font-black text-white shadow-md shadow-violet-200 transition active:scale-[.98] hover:from-violet-800 hover:to-fuchsia-700">
-                        <span>Blogspot 글 1건 지금 발행 · 공개</span><span aria-hidden="true">→</span>
+                        <span>{% if blog.url|replace('https://', '')|replace('http://', '')|replace('/', '') == 'korea365guide.blogspot.com' %}🔥 바이럴 발행{% else %}Blogspot 글 1건 지금 발행 · 공개{% endif %}</span><span aria-hidden="true">→</span>
                     </button>
                     {% else %}
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">Blogspot 바로 올리기 · 연결 없음</div>
@@ -531,7 +531,7 @@
                     <form method="post" action="{{ url_for('trigger_tistory_plan') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="site_id" value="{{ blog.site_id }}">
-                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-teal-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-teal-800 active:scale-[.98]">이 사이트 글 초안 만들기</button>
+                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl {% if blog.url|replace('https://', '')|replace('http://', '')|replace('/', '') == 'huh0303.tistory.com' %}bg-gradient-to-r from-orange-600 to-rose-600{% else %}bg-teal-700{% endif %} px-4 text-sm font-black text-white shadow-sm transition hover:brightness-95 active:scale-[.98]">{% if blog.url|replace('https://', '')|replace('http://', '')|replace('/', '') == 'huh0303.tistory.com' %}🔥 바이럴 발행{% else %}이 사이트 글 초안 만들기{% endif %}</button>
                     </form>
                 </article>
                 {% endfor %}
