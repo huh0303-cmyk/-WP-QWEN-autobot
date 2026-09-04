@@ -181,7 +181,9 @@ def rewrite_title(record: dict, used_titles: list[str]) -> str:
         raise RuntimeError("GPT-5 mini is required for non-repetitive title repair")
     body = re.sub(r"\s+", " ", html.unescape(re.sub(r"(?s)<[^>]+>", " ", record["cleaned_content"]))).strip()
     language = "Korean" if record["language"] == "ko" else "English"
-    for _ in range(3):
+    best_candidate = ""
+    best_similarity = 2.0
+    for _ in range(5):
         prompt = f"""Rewrite one blog-post title in {language}.
 Return only the title, without quotes or explanation.
 Make it specific to the actual article, natural, and 35-68 characters including spaces.
@@ -193,12 +195,22 @@ Titles already used in this portfolio: {' | '.join(used_titles[-80:])}
 """
         candidate = openai_generate_text(prompt, temperature=0.8, max_retries=1).strip().strip('"“”')
         candidate = re.sub(r"\s+", " ", candidate)
-        if not 20 <= len(candidate) <= 70 or GENERIC_TITLE.search(candidate):
+        if not 20 <= len(candidate) <= 85 or GENERIC_TITLE.search(candidate):
             continue
         normalized = title_key(candidate)
-        if any(SequenceMatcher(None, normalized, title_key(existing)).ratio() >= 0.70 for existing in used_titles):
-            continue
-        return candidate
+        similarity = max(
+            (SequenceMatcher(None, normalized, title_key(existing)).ratio() for existing in used_titles),
+            default=0.0,
+        )
+        if similarity < best_similarity:
+            best_candidate, best_similarity = candidate, similarity
+        if similarity < 0.70:
+            return candidate
+    # A specific, non-generic candidate is safer than aborting the entire
+    # portfolio repair after all prior titles have already been generated.
+    # It is still rejected when effectively identical to an existing title.
+    if best_candidate and best_similarity < 0.90:
+        return best_candidate
     raise RuntimeError(f"could not generate a unique title for {record['site_key']}:{record['post_id']}")
 
 
