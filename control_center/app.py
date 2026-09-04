@@ -2,7 +2,7 @@
 
 from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
 
-from .keywords import top_keywords_by_category, weekly_suggestions
+from .keywords import weekly_suggestions
 from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
 
@@ -1072,11 +1072,20 @@ def trigger_draft():
 
 @app.post("/trigger/tistory-plan")
 def trigger_tistory_plan():
-    """Start the existing five-site review bundle; it never authorizes publication."""
+    """Start one fresh live-topic Tistory job for the selected site.
+
+    Tistory has no supported unattended cloud write API. The hosted control
+    room creates the finished article; a logged-in local registrar owns the
+    final editor save so the UI never claims a cloud publication that did not
+    happen.
+    """
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#tistory")
     site_id = request.form.get("site_id", "").strip()
+    # A fresh key prevents a second click on the same day from overwriting or
+    # reusing the first job. Every click therefore performs a new discovery run.
+    run_key = f"manual-{site_id or 'all'}-{int(time.time())}-{secrets.token_hex(3)}"
     allowed_site_ids = {str(site["site_id"]) for site in get_tistory_data()}
     if site_id and site_id not in allowed_site_ids:
         flash("등록되지 않은 Tistory 사이트입니다.", "error")
@@ -1088,7 +1097,7 @@ def trigger_tistory_plan():
             response = requests.post(
                 f"https://api.github.com/repos/{repo}/actions/workflows/tistory-daily-plan.yml/dispatches",
                 headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-                json={"ref": "main", "inputs": {"site_ids": site_id}}, timeout=30,
+                json={"ref": "main", "inputs": {"site_ids": site_id, "run_key": run_key}}, timeout=30,
             )
             if response.status_code != 204:
                 raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
@@ -1097,13 +1106,14 @@ def trigger_tistory_plan():
             command = ["gh", "workflow", "run", "tistory-daily-plan.yml", "--repo", repo]
             if site_id:
                 command.extend(["-f", f"site_ids={site_id}"])
+            command.extend(["-f", f"run_key={run_key}"])
             completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
     except (OSError, subprocess.SubprocessError, requests.RequestException, RuntimeError) as exc:
         flash(f"Tistory 5개 검토본 실행 요청 실패 · {exc}", "error")
     else:
         if completed is None or completed.returncode == 0:
             target = site_id or "5개 전체"
-            flash(f"Tistory {target} 비공개 검토본 생성을 시작했습니다. 공개 발행은 하지 않습니다.", "success")
+            flash(f"Tistory {target}: 오늘의 바이럴 신호 재조사와 새 글 생성을 시작했습니다. Tistory 공개 저장은 로그인된 로컬 등록기가 이어서 처리합니다.", "success")
         else:
             detail = (completed.stderr or completed.stdout or "GitHub workflow dispatch failed").strip()
             flash(f"Tistory 5개 검토본 실행 요청 실패 · {detail}", "error")
@@ -1206,7 +1216,6 @@ def trigger_publish_site_now():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#wordpress")
     domain = request.form.get("domain", "").strip()
-    keyword = request.form.get("keyword", "").strip()
     registered = next(
         (site for site in load_wordpress_sites() if site.url.replace("https://", "").replace("http://", "").rstrip("/") == domain),
         None,
@@ -1230,17 +1239,7 @@ def trigger_publish_site_now():
             "publication_approved": "true",
             "room_id": f"manual-onebutton-{registered.site_id}",
         }
-        # 2026-09-04 CEO: let the CEO pick one of the 3-per-category chips
-        # (see /api/keyword-suggestions-by-category) instead of the site
-        # silently auto-picking; blank keeps the original auto-pick.
-        if keyword:
-            workflow_inputs["force_keyword"] = keyword
-        picked = f' — "{keyword}"' if keyword else ""
-        success_message = (
-            f"{domain}: 실시간 주요매체 반복 명사를 다시 수집해 글쓰기·공개 발행을 시작했습니다{picked}."
-            if registered.url.rstrip("/") == "https://korea365.org"
-            else f"{domain}: 글쓰기·공개 발행을 시작했습니다{picked}."
-        )
+        success_message = f"{domain}: 오늘의 주요매체 언급량과 검색 추세를 다시 조사해 바이럴 글 1건 공개 발행을 시작했습니다."
     try:
         response = requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
@@ -1322,18 +1321,6 @@ def keyword_suggestions(domain: str):
              "verification": item.verification}
             for item in items
         ],
-    })
-
-
-@app.get("/api/keyword-suggestions-by-category/<path:domain>")
-def keyword_suggestions_by_category(domain: str):
-    """3 keyword chips per category for the '지금 발행' card — today's top
-    search-volume/virality picks (see refresh_keyword_pool.py), grouped so a
-    professional-persona site stays inside its own categories while still
-    surfacing what's actually trending right now within them."""
-    return jsonify({
-        "domain": domain,
-        "groups": top_keywords_by_category(domain, per_category=3),
     })
 
 

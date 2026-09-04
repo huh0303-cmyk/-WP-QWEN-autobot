@@ -51,17 +51,23 @@ def _golden_keyword_score(topic: str, site: dict) -> tuple[int, dict[str, int]]:
 
 
 def _pick_seed_topic(site: dict, day: str) -> tuple[str, int, dict[str, int]]:
-    if site.get("trend_mode") and os.environ.get("TISTORY_LIVE_TRENDS_ENABLED", "false").strip().lower() == "true":
+    if os.environ.get("TISTORY_LIVE_TRENDS_ENABLED", "false").strip().lower() == "true":
         try:
-            from automation_hub.blogger_topic_router import fetch_today_headlines, fetch_trending_terms, rank_topics
+            from automation_hub.blogger_topic_router import fetch_profile_headlines, fetch_today_headlines, fetch_trending_terms, rank_topics
 
             profile = {
-                "site_key": site["site_id"],
+                "site_key": "tistory_life365" if site.get("trend_mode") else site["site_id"],
                 "language": site.get("language", "ko"),
-                "wordpress": {"theme": "종합 생활정보·정치·경제·사회·문화·스포츠", "persona": "당일 이슈 생활정보 편집자"},
+                "wordpress": {
+                    "theme": "종합 생활정보·정치·경제·사회·문화·스포츠" if site.get("trend_mode") else site.get("description", ""),
+                    "persona": site.get("title", "") + " 편집자",
+                    "categories": site.get("categories", []),
+                },
                 "blogspot": {},
             }
-            ranked = rank_topics(fetch_today_headlines(), profile=profile, trend_terms=fetch_trending_terms())
+            headlines = fetch_today_headlines()
+            headlines.extend(fetch_profile_headlines(profile))
+            ranked = rank_topics(headlines, profile=profile, trend_terms=fetch_trending_terms())
             if ranked:
                 winner = ranked[0]
                 return winner.keyword, round(winner.score), {

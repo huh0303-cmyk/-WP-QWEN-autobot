@@ -41,6 +41,9 @@ jobs:
           cache: pip
       - name: Install publisher dependencies
         run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+      - name: Recheck today's cross-media and search-trend signals
+        id: viral
+        run: python scripts/select_live_viral_keyword.py --site "${{ inputs.target_site_url }}"
       - name: Create one quality-gated review draft
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
@@ -53,7 +56,7 @@ jobs:
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           FORCE_SOURCE_IPV4: "true"
-          FORCE_KEYWORD: ${{ inputs.force_keyword }}
+          FORCE_KEYWORD: ${{ inputs.force_keyword || steps.viral.outputs.keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
           MAX_REGEN: "2"
@@ -137,6 +140,7 @@ jobs:
             newsroom_publish_result.json
             artifacts/automation-room-result.json
             artifacts/wordpress-worker.log
+            artifacts/live-viral-topic.json
           if-no-files-found: warn
           retention-days: 14
       - name: Send private-draft review link

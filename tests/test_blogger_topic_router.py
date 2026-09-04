@@ -40,6 +40,22 @@ def test_general_blog_picks_most_repeated_viral_noun_phrase():
     assert ranked[0].viral_score > 0
 
 
+def test_headline_stop_words_do_not_create_artificial_verb_phrases():
+    rows = [
+        _row("September plans to change Korea travel insurance", "CNN", "https://cnn.test/1"),
+        _row("Korea travel insurance options for visitors", "The New York Times", "https://nyt.test/2"),
+    ]
+    ranked = rank_topics(rows, profile=_profile("ktrip365", "Travel", "Korea travel planner"))
+    assert ranked
+    assert ranked[0].keyword.casefold() == "travel insurance"
+    assert all("plans to" not in item.keyword.casefold() for item in ranked)
+
+
+def test_priority_media_registry_includes_requested_us_outlets():
+    feed_names = {name for name, _, _ in router.MEDIA_FEEDS}
+    assert {"The Washington Post", "Los Angeles Times"} <= feed_names
+
+
 def test_specialist_profile_filters_more_viral_off_topic_candidate():
     rows = [
         _row("Election debate schedule announced", "CNN", "https://cnn.test/1"),

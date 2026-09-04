@@ -83,9 +83,12 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "WordPress 글 바로 만들기 · 비공개 초안" in template
-    assert "WordPress 글 1건 바로 올리기 · 공개" in template
-    assert "Blogspot 글 1건 지금 발행 · 공개" in template
+    assert template.count("바이럴 글 즉시 발행") == 5
+    assert "WordPress 글 바로 만들기 · 비공개 초안" not in template
+    assert "WordPress 글 1건 바로 올리기 · 공개" not in template
+    assert "Blogspot 글 1건 지금 발행 · 공개" not in template
+    assert "이 사이트 글 초안 만들기" not in template
+    assert "5개 검토본 생성" not in template
     assert "YouTube 콘텐츠 바로 만들기 · 비공개" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
@@ -130,10 +133,9 @@ def test_blogspot_public_button_continues_to_exact_platform_publish_job():
 
 def test_four_locked_general_sites_show_viral_publish_actions():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "['koreanews365.com', 'korea365.org']" in template
-    assert "korea365guide.blogspot.com" in template
-    assert "huh0303.tistory.com" in template
-    assert template.count("🔥 바이럴 발행") == 3  # one conditional label per platform section
+    assert "오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사" in template
+    assert "오늘의 언급량과 검색 추세를 다시 조사" in template
+    assert "bg-gradient-to-r from-blue-700 to-blue-500" in template
 
 
 def test_koreanews_viral_button_dispatches_newsroom_workflow(monkeypatch):
@@ -150,6 +152,32 @@ def test_koreanews_viral_button_dispatches_newsroom_workflow(monkeypatch):
     assert response.status_code == 302
     assert dispatch.call_args.args[0].endswith("/newsrooms-daily-publisher.yml/dispatches")
     assert dispatch.call_args.kwargs["json"]["inputs"]["newsroom"] == "koreanews365"
+
+
+def test_each_tistory_click_dispatches_a_fresh_live_topic_job(monkeypatch):
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
+    client = control_center_app.test_client()
+    target = [{"site_id": "tistory_ktrip365"}]
+    with patch("control_center.app.get_tistory_data", return_value=target), patch(
+        "control_center.app.requests.post"
+    ) as dispatch:
+        dispatch.return_value.status_code = 204
+        for _ in range(2):
+            response = client.post(
+                "/trigger/tistory-plan",
+                data={
+                    "csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"],
+                    "site_id": "tistory_ktrip365",
+                },
+            )
+            assert response.status_code == 302
+    first = dispatch.call_args_list[0].kwargs["json"]["inputs"]
+    second = dispatch.call_args_list[1].kwargs["json"]["inputs"]
+    assert first["site_ids"] == "tistory_ktrip365"
+    assert first["run_key"].startswith("manual-tistory_ktrip365-")
+    assert first["run_key"] != second["run_key"]
 
 
 def test_blogspot_automatic_topic_dispatch_does_not_require_a_manual_wp_url(monkeypatch):

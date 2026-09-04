@@ -32,6 +32,8 @@ MEDIA_FEEDS = (
     ("Hankyoreh", "newspaper", "https://www.hani.co.kr/rss/"),
     ("CNN", "newspaper", "https://rss.cnn.com/rss/edition.rss"),
     ("The New York Times", "newspaper", "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"),
+    ("The Washington Post", "newspaper", "https://news.google.com/rss/search?q=when:1d+source:Washington_Post&hl=en-US&gl=US&ceid=US:en"),
+    ("Los Angeles Times", "newspaper", "https://news.google.com/rss/search?q=when:1d+source:Los_Angeles_Times&hl=en-US&gl=US&ceid=US:en"),
     ("Google News Korea", "google", "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"),
     ("Google News US", "google", "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en"),
 )
@@ -39,14 +41,19 @@ TREND_FEEDS = (
     "https://trends.google.com/trending/rss?geo=KR",
     "https://trends.google.com/trending/rss?geo=US",
 )
-PRIORITY_OUTLETS = {"chosun ilbo", "hankyoreh", "cnn", "the new york times"}
+PRIORITY_OUTLETS = {"chosun ilbo", "hankyoreh", "cnn", "the new york times", "the washington post", "los angeles times"}
 GENERAL_PROFILE_KEYS = {"korea365", "koreanews", "seouljournal", "tistory_life365"}
 
 _EN_STOP = {
-    "about", "after", "again", "amid", "and", "are", "but", "for", "from", "has", "have",
+    "about", "after", "again", "amid", "and", "are", "as", "at", "but", "by", "for", "from", "has", "have",
     "first", "how", "into", "its", "new", "not", "over", "people", "says", "that", "the", "their", "this",
-    "through", "today", "was", "were", "will", "with", "world", "korea", "south",
+    "in", "into", "of", "on", "through", "to", "today", "was", "were", "will", "with", "world", "korea", "south",
     "latest", "live", "news", "update", "updates",
+    "price", "prices", "cost", "costs", "guide", "tips", "best",
+    "jan", "january", "feb", "february", "mar", "march", "apr", "april",
+    "may", "jun", "june", "jul", "july", "aug", "august", "sep", "sept",
+    "september", "oct", "october", "nov", "november", "dec", "december",
+    "change", "changed", "changes", "changing", "could", "would", "should", "plan", "plans",
 }
 _KO_STOP = {
     "관련", "대한", "위한", "오늘", "뉴스", "속보", "논란", "발표", "정부", "한국",
@@ -195,9 +202,17 @@ def fetch_profile_headlines(profile: dict, *, session=requests, today: date | No
         return []
     observed_on = today or datetime.now(KST).date()
     theme = str((profile.get("wordpress") or {}).get("theme", "")).strip()
+    persona = str((profile.get("wordpress") or {}).get("persona", "")).strip()
     categories = (profile.get("wordpress") or {}).get("categories") or []
     category_hint = " OR ".join(str(item).strip() for item in categories[:3] if str(item).strip())
-    query = f"({theme})" + (f" ({category_hint})" if category_hint else "") + " when:1d"
+    # The persona usually carries the missing geographic or audience qualifier
+    # (for example "Korea travel"), so use it to keep a broad theme such as
+    # Travel from drifting into unrelated US-only seasonal stories.
+    profile_scope = f"{theme} {persona}".casefold()
+    # Keep the query compact. Long persona prose weakens Google News matching;
+    # only retain the geographic qualifier that materially narrows the niche.
+    scope_hint = f'"{theme}" Korea' if "korea" in profile_scope and "korea" not in theme.casefold() else theme
+    query = f"({scope_hint})" + (f" ({category_hint})" if category_hint else "") + " when:1d"
     language = str(profile.get("language", "en")).casefold()
     locale = "hl=ko&gl=KR&ceid=KR:ko" if language.startswith("ko") else "hl=en-US&gl=US&ceid=US:en"
     url = f"https://news.google.com/rss/search?q={quote_plus(query)}&{locale}"
@@ -226,16 +241,26 @@ def _headline_phrases(title: str) -> set[str]:
     # Outlet suffixes add noise and tend to dominate aggregated feeds.
     title = re.split(r"\s[-|]\s(?=[^-|]+$)", _plain(title).strip())[0]
     raw = re.findall(r"[A-Za-z][A-Za-z0-9+-]{1,}|[가-힣]{2,}", title)
-    kept = [word for word in raw if word.casefold() not in _EN_STOP and word not in _KO_STOP]
+    # Stop words are boundaries, not merely removable filler. This prevents
+    # artificial phrases made by joining words that were not adjacent in the
+    # original headline (for example, "September changed travel").
+    segments: list[list[str]] = [[]]
+    for word in raw:
+        if word.casefold() in _EN_STOP or word in _KO_STOP:
+            if segments[-1]:
+                segments.append([])
+            continue
+        segments[-1].append(word)
     phrases: set[str] = set()
-    for width in (1, 2, 3):
-        for index in range(len(kept) - width + 1):
-            chunk = kept[index:index + width]
-            if any(re.search(r"[가-힣]", word) for word in chunk) and any(re.search(r"[A-Za-z]", word) for word in chunk):
-                continue
-            phrase = " ".join(chunk).strip()
-            if len("".join(chunk)) >= 3:
-                phrases.add(phrase)
+    for kept in segments:
+        for width in (1, 2, 3):
+            for index in range(len(kept) - width + 1):
+                chunk = kept[index:index + width]
+                if any(re.search(r"[가-힣]", word) for word in chunk) and any(re.search(r"[A-Za-z]", word) for word in chunk):
+                    continue
+                phrase = " ".join(chunk).strip()
+                if len("".join(chunk)) >= 3:
+                    phrases.add(phrase)
     return phrases
 
 
@@ -289,12 +314,19 @@ def rank_topics(headlines: Iterable[dict[str, str]], *, profile: dict, trend_ter
             continue
         evidence_text = " ".join(row.get("title", "") for row in rows)
         phrase = display[key]
-        if not _fits_profile(f"{phrase} {evidence_text}", profile):
-            continue
-        surfaces = {row.get("surface", "") for row in rows if row.get("surface")}
         phrase_tokens = _tokens(phrase)
         if not phrase_tokens:
             continue
+        # A lone generic English noun from a topical search (for example
+        # "Prices" or "Labor") is not a useful specialist keyword. Require
+        # either a multi-word phrase or a direct match to the site's scope.
+        if not is_general_profile(profile) and len(phrase_tokens) == 1 and re.fullmatch(r"[A-Za-z0-9+-]+", phrase):
+            scope = _profile_text(profile)
+            if not (phrase_tokens & _tokens(scope) or _concepts(phrase) & _concepts(scope)):
+                continue
+        if not _fits_profile(f"{phrase} {evidence_text}", profile):
+            continue
+        surfaces = {row.get("surface", "") for row in rows if row.get("surface")}
         # A search query naturally repeats the site's broad theme in most
         # results. It is a scope filter, not a newsworthy topic by itself.
         if not is_general_profile(profile) and phrase_tokens <= _tokens(_profile_text(profile)):

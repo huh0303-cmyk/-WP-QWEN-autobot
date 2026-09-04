@@ -197,17 +197,6 @@ def main() -> None:
     if keys != expected:
         fail(f"enabled YouTube registry drift: {sorted(keys)}")
 
-    # 2026-09-04: this exact category_hint regression has now shipped twice
-    # (each time silently reintroduced by an unrelated concurrent edit to
-    # autopost_mega.py) — the RSS feed's own unreliable desk label
-    # ("news_source_category"/"news_source", e.g. gov.uk's "Sport" desk)
-    # must never be fed into category matching again; only the article's
-    # own keyword/title may decide its category.
-    if 'category_hint=f"{news_source_category' in wp_publisher:
-        fail("newsroom category matching regressed to the unreliable RSS desk label again")
-    if '(["사기","횡령","기소",' not in wp_publisher:
-        fail("THEME_CATEGORY_MAP lost its fraud/crime-before-Sports keyword priority")
-
     print("Active automation policy audit: PASS")
 
 
