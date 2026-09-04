@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -11,7 +11,7 @@ from control_center.db import Store
 from control_center.quality import score_article
 from control_center.registry import load_wordpress_sites
 from control_center.service import ControlCenter
-from control_center.app import ADSENSE_BLOGGER_URLS, HIDDEN_BLOGGER_URLS, _site_rows, compact_category, get_youtube_data, wordpress_cadence
+from control_center.app import ADSENSE_BLOGGER_URLS, HIDDEN_BLOGGER_URLS, _dispatch_draft_workflow, _site_rows, app as control_center_app, compact_category, get_review_queue, get_sns_data, get_youtube_data, wordpress_cadence
 from control_center.keywords import weekly_suggestions
 from control_center.states import QUALITY_PASSED, WP_DRAFTED
 from control_center.wordpress import DraftResult
@@ -76,18 +76,183 @@ def test_pwa_has_ten_youtube_rooms_in_two_groups():
     assert sum(row["group"] == "PLAYLIST" for row in channels) == 5
     assert sum(row["group"] == "KNOWLEDGE" for row in channels) == 5
     assert all(row["sheet_controlled"] for row in channels)
+    assert all(row["channel_key"] for row in channels)
+    assert all(row["action_ready"] for row in channels)
+    assert len({row["channel_key"] for row in channels}) == 10
 
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "Blogspot 글 초안 만들기" in template
-    assert "이 사이트 글 초안 만들기" in template
-    assert "이 채널 영상 만들기" in template
+    assert "WordPress 글 바로 만들기 · 비공개 초안" in template
+    assert "WordPress 글 1건 바로 올리기 · 공개" in template
+    assert "Blogspot 글 1건 지금 발행 · 공개" in template
+    assert "YouTube 콘텐츠 바로 만들기 · 비공개" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
+    assert "{% if site.auth_ready %}" in template
+    assert "{% if blog.connected %}" in template
+    assert "{% if channel.action_ready %}" in template
     assert 'id="review-queue"' in template
     assert "관리자에서 초안 검토·발행" not in template
     assert "완성된 영상은 먼저 비공개로 저장됩니다." in template
+
+
+def test_sns_cards_do_not_offer_unconnected_publish_actions():
+    accounts = get_sns_data()
+    assert accounts
+    assert all(account["publish_connected"] is False for account in accounts)
+    assert all(account["publish_unavailable_reason"] for account in accounts)
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    assert "SNS 콘텐츠 바로 올리기 · 연결 없음" in template
+    assert "{{ account.publish_unavailable_reason }}" in template
+
+
+def test_blogspot_cards_use_the_real_automatic_queue_without_manual_source_url():
+    template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
+    blogspot = template[template.index('{% for blog in bloggers %}'):template.index('{% endfor %}', template.index('{% for blog in bloggers %}'))]
+    assert 'name="selection_mode" value="auto"' in blogspot
+    assert 'name="source_wp_url"' not in blogspot
+    assert 'name="keyword"' not in blogspot
+    assert "당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를" in template
+    assert "의미상 가까운 공개 글만 자동 연결" in template
+    assert "맞는 글이 없으면 억지로 연결하지 않습니다." in template
+
+
+def test_blogspot_public_button_continues_to_exact_platform_publish_job():
+    workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows" / "blogger-rewrite.yml").read_text(encoding="utf-8")
+    queue = (Path(__file__).resolve().parents[1] / "scripts" / "queue_blogger_rewrite.py").read_text(encoding="utf-8")
+    assert "actions: write" in workflow
+    assert "steps.queue.outputs.job_id" in workflow
+    assert "gh workflow run platform-publish-v2.yml" in workflow
+    assert '-f job_id="$QUEUED_JOB_ID"' in workflow
+    assert 'output_file.write(f"job_id={job_id}\\n")' in queue
+
+
+def test_blogspot_automatic_topic_dispatch_does_not_require_a_manual_wp_url(monkeypatch):
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    client = control_center_app.test_client()
+    with patch("control_center.app._queue_draft_trigger", return_value="draft-test"), patch(
+        "control_center.app._dispatch_draft_workflow", return_value="https://example.test/workflow"
+    ) as dispatch:
+        response = client.post(
+            "/trigger/draft",
+            data={
+                "csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"],
+                "platform": "blogger",
+                "site_id": "blogger_ktrip365",
+                "domain": "k-trip365.blogspot.com",
+                "selection_mode": "auto",
+                "text_model": "gpt-5-mini",
+                "image_model": "none",
+            },
+        )
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("#blogspot")
+    payload = dispatch.call_args.args[0]
+    assert payload["keyword"] == ""
+    assert payload["source_wp_url"] is None
+    assert payload["selection_mode"] == "auto"
+
+
+def test_blogspot_automatic_topic_rejects_an_unconnected_target(monkeypatch):
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    client = control_center_app.test_client()
+    with patch("control_center.app._queue_draft_trigger") as queue, patch(
+        "control_center.app._dispatch_draft_workflow"
+    ) as dispatch:
+        response = client.post(
+            "/trigger/draft",
+            data={
+                "csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"],
+                "platform": "blogger",
+                "site_id": "blogger_not_registered",
+                "domain": "not-registered.blogspot.com",
+                "selection_mode": "auto",
+                "text_model": "gpt-5-mini",
+                "image_model": "none",
+            },
+        )
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("#blogspot")
+    queue.assert_not_called()
+    dispatch.assert_not_called()
+
+
+def test_blogspot_automatic_topic_uses_the_evidence_backed_rewrite_workflow(monkeypatch):
+    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
+    with patch("control_center.app.requests.post") as dispatch:
+        dispatch.return_value.status_code = 204
+        workflow_url = _dispatch_draft_workflow({
+            "platform": "blogger",
+            "site_id": "blogger_ktrip365",
+            "selection_mode": "auto",
+            "keyword": "",
+            "source_wp_url": None,
+            "text_model": "gpt-5-mini",
+            "image_model": "none",
+        })
+    assert workflow_url.endswith("/blogger-rewrite.yml")
+    assert dispatch.call_args.args[0].endswith("/blogger-rewrite.yml/dispatches")
+    inputs = dispatch.call_args.kwargs["json"]["inputs"]
+    assert inputs["source_wp_url"] == ""
+    assert inputs["blogger_site_id"] == "blogger_ktrip365"
+    assert inputs["persona"] == "Korea travel planner"
+    assert inputs["publish_now"] == "true"
+
+
+def test_blogger_failure_status_is_visible_and_retryable_in_recent_activity():
+    header = ["created_at", "job_id", "site_id", "status", "publish_now", "title", "content", "labels", "source", "review_url", "x", "error_code", "message", "finished_at"]
+    failure = ["2026-09-04T10:00:00", "blogger-rewrite-1", "blogger_ktrip365", "failed", "FALSE", "", "", "", "https://k-trip365.com", "", "", "NO_RELATED_WP_SOURCE", "관련 WordPress 글이 없어 억지 연결을 차단했습니다.", "2026-09-04T10:01:00"]
+    queue_csv = ",".join(header) + "\n" + ",".join(failure) + "\n"
+    queue_response = Mock(text=queue_csv)
+    queue_response.raise_for_status.return_value = None
+    editorial_response = Mock(text="created_at,platform,channel,title,review_url,status,decision,note\n")
+    editorial_response.raise_for_status.return_value = None
+    with patch("control_center.app.requests.get", side_effect=[queue_response, editorial_response]):
+        items = get_review_queue()
+    assert len(items) == 1
+    assert items[0]["status"] == "실패 · NO_RELATED_WP_SOURCE"
+    assert items[0]["retryable"] is True
+    assert items[0]["review_url"] == ""
+
+
+def test_youtube_trigger_rejects_an_unconnected_channel_without_dispatch(monkeypatch):
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
+    client = control_center_app.test_client()
+    with patch("control_center.app.requests.post") as dispatch:
+        response = client.post(
+            "/trigger/youtube-batch",
+            data={"csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"], "channel_key": ""},
+        )
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("#youtube")
+    dispatch.assert_not_called()
+
+
+def test_youtube_trigger_dispatches_the_selected_real_channel(monkeypatch):
+    channel = get_youtube_data()[0]
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
+    client = control_center_app.test_client()
+    with patch("control_center.app.requests.post") as dispatch:
+        dispatch.return_value.status_code = 204
+        response = client.post(
+            "/trigger/youtube-batch",
+            data={
+                "csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"],
+                "channel_key": channel["channel_key"],
+            },
+        )
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("#youtube")
+    payload = dispatch.call_args.kwargs["json"]
+    assert payload["inputs"]["channel_key"] == channel["channel_key"]
+    assert payload["inputs"]["run_now"] == "true"
 
 
 def test_blogspot_dashboard_uses_precise_connection_label_and_compact_categories():

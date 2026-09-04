@@ -14,11 +14,27 @@ from automation_hub.editorial_language_policy import body_cliches, language_mism
 
 
 def original_prompt(*, keyword: str, site_theme: str, language: str, persona: str,
-                    tone: str, target_chars: int, prior_feedback: str = "") -> str:
+                    tone: str, target_chars: int, prior_feedback: str = "",
+                    verified_sources: list[dict[str, str]] | None = None) -> str:
     current_date = date.today().isoformat()
+    sources = verified_sources or []
+    source_block = ""
+    link_rule = "content_html must not link to any URL (no external or invented links)."
+    if sources:
+        source_lines = "\n".join(
+            f"- {item.get('outlet', 'Media')}: {item.get('title', '')} | {item.get('url', '')}"
+            for item in sources
+        )
+        source_block = f"""
+Current evidence collected today (reporting leads, not text to copy):
+{source_lines}
+Use only facts supportable by these leads, clearly attribute changing claims, and include natural links to at least two of these exact URLs. Never copy or closely paraphrase a headline or article passage.
+"""
+        link_rule = "content_html may link only to the verified evidence URLs listed above; never invent or guess a URL."
     return f"""Write a new standalone article for the keyword below. This is original work, not a rewrite of any existing article.
 Current date: {current_date}. Never present an earlier year or month as the current verification date. Do not claim that changing fares, schedules, rules, or availability are current unless the article can support that claim; direct readers to the relevant official operator or authority for confirmation.
 Site theme: {site_theme}. Primary keyword/topic: {keyword}.
+{source_block}
 The title is the highest-priority text: make it specific and useful so a real reader wants to click, without clickbait or false promises. Never use mass-produced AI title formulas including Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리. Never use a repeated title formula or a title similar to another article. The title must be a complete, grammatical phrase or sentence that is 68 characters or fewer including spaces - count the characters and shorten it until it fits before finalizing; never write a longer title expecting it to be trimmed, since a trimmed title reads as broken.
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Language: {language}. Persona: {persona}. Tone: {tone}. Target length: {target_chars} characters - plan the number of sections and their depth to fit this budget, and finish every section you start; an oversized draft gets trimmed and can end up cut off mid-thought, so write to the budget rather than over-writing and expecting it to be shortened.
@@ -30,7 +46,7 @@ Add useful original synthesis grounded in generally known, verifiable facts. Do 
 Return JSON only with keys title, meta_description, content_html, image_queries, labels.
 meta_description is mandatory. Write it as one concise sentence that names the keyword's topic and its practical benefit - a real search-result-length description, not a paragraph, and not a generic one-line summary - then count the characters and revise until the total is between 100 and 120 characters, not words: too short reads as thin and vague, too long fails just the same. This is checked mechanically and anything outside 100-120 characters fails.
 labels must contain 8-14 short noun search terms directly relevant to the article. Vary the count inside that range for each article; never use sentences as labels. image_queries must contain 0-2 precise first-image prompts.
-content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts, and must not link to any URL (no external or invented links).
+content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts, and {link_rule}
 For visa, insurance, or medical/health topics (YMYL), within the first three paragraphs include: (1) a reference-date sentence using the literal words "as of" (English) or "기준" (Korean) followed by a real month/year, e.g. "2026년 8월 기준" or "as of August 2026"; (2) a change-warning sentence using words like "can change"/"subject to change" or "변경될 수 있으니"/"확인하세요"; (3) a short non-advisory disclaimer ("consult a professional"/"전문가와 상담" or "not medical/legal advice"/"의료/법률 자문이 아닙니다"). These three must appear as real sentences, not a heading label alone, or the article fails the quality gate.
 {f"Previous attempt failed these checks; rebuild it and correct every item: {prior_feedback}" if prior_feedback else ""}
 """

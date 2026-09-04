@@ -69,14 +69,37 @@ def get_review_queue() -> list[dict[str, str]]:
         return []
     items = []
     for row in rows[1:]:
-        row += [""] * (14 - len(row))
+        row += [""] * (17 - len(row))
         created_at, job_id, site_id, status, publish_now, title = row[:6]
         review_url = row[9].strip()
+        error_code = row[11].strip()
         message = row[12].strip()
         search_description = message.split("meta_description=", 1)[1].strip() if "meta_description=" in message else ""
-        if not job_id.strip() or not title.strip() or not review_url.startswith("http"):
+        if not job_id.strip():
             continue
         platform = "Tistory" if site_id.lower().startswith("tistory_") else "Blogspot" if "blogger" in job_id.lower() or "blogger" in site_id.lower() else "WordPress"
+        failed = status.strip().casefold() == "failed" or bool(error_code)
+        if failed:
+            items.append({
+                "created_at": created_at.replace("T", " ")[:16],
+                "job_id": job_id,
+                "site_id": site_id,
+                "platform": platform,
+                "title": message or error_code or "작업 실패",
+                "review_url": "",
+                "search_description": "",
+                "status": f"실패 · {error_code}" if error_code else "실패",
+                "retryable": platform == "Blogspot",
+                "error": True,
+            })
+            continue
+        if not title.strip():
+            continue
+        status_label = {
+            "ready": "검토 대기열 등록",
+            "queued": "실행 대기",
+            "processing": "처리 중",
+        }.get(status.strip().casefold(), status or "작업대기")
         items.append({
             "created_at": created_at.replace("T", " ")[:16],
             "job_id": job_id,
@@ -85,7 +108,9 @@ def get_review_queue() -> list[dict[str, str]]:
             "title": title,
             "review_url": review_url,
             "search_description": search_description,
-            "status": "검토대기" if publish_now.strip().upper() != "TRUE" else status,
+            "status": "검토대기" if review_url.startswith("http") and publish_now.strip().upper() != "TRUE" else status_label,
+            "retryable": False,
+            "error": False,
         })
     # Blogger and WordPress editorial drafts use the compact review sheet.
     # Merge it into the same control-room list so the CEO has one inbox.
@@ -111,7 +136,7 @@ def get_review_queue() -> list[dict[str, str]]:
             "search_description": search_description,
             "status": decision or status or "검토대기",
         })
-    deduped = {item["review_url"]: item for item in items}
+    deduped = {item["review_url"] or item["job_id"]: item for item in items}
     return sorted(deduped.values(), key=lambda item: item["created_at"], reverse=True)[:100]
 
 
@@ -657,56 +682,6 @@ def _site_rows(_sites=None):
     return get_site_data(), None
 
 
-# 2026-09-04 CEO: Blogspot's "지금 발행" button must rewrite whichever recent
-# WP post best matches what's actually trending today, not a random recent
-# post. Each paired WP site already keeps a virality-ranked golden-keyword
-# pool file (see scripts/refresh_keyword_pool.py) — first lines are the
-# highest cross-outlet-mention keywords for that site's own topic. Reusing
-# that file (instead of a live web search per button click) keeps this
-# instant and free.
-WP_KEYWORD_FILE_BY_URL = {
-    "https://k-health365.com": "data/keywords/keywords_khealth.txt",
-    "https://koreamedicaltour.com": "data/keywords/keywords_medicaltour.txt",
-    "https://koreainvest365.com": "data/keywords/keywords_kinvest.txt",
-    "https://ki-korea.com": "data/keywords/keywords_kikorea.txt",
-    "https://koreainsurance365.com": "data/keywords/keywords_kinsurance.txt",
-    "https://kfinance365.com": "data/keywords/keywords_kfinance.txt",
-    "https://koreataxnlaw.com": "data/keywords/keywords_ktax.txt",
-    "https://koreacrypto365.com": "data/keywords/keywords_kcrypto.txt",
-    "https://krealestate365.com": "data/keywords/keywords_krealestate.txt",
-    "https://ktech365.com": "data/keywords/keywords_ktech.txt",
-    "https://oliveyoungkorea.com": "data/keywords/keywords_oliveyoung.txt",
-    "https://kworld365.com": "data/keywords/keywords_kworld.txt",
-    "https://k-trip365.com": "data/keywords/keywords_ktrip.txt",
-    "https://k-visa365.com": "data/keywords/keywords_kvisa.txt",
-    "https://koreawedding365.com": "data/keywords/keywords_kwedding.txt",
-    "https://kstudy365.com": "data/keywords/keywords_kstudy365.txt",
-    "https://studyinkorea365.com": "data/keywords/keywords_studyinkorea365.txt",
-    "https://kieca-korea.org": "data/keywords/keywords_kieca.txt",
-    "https://ksa-korea.org": "data/keywords/keywords_ksaKorea.txt",
-    "https://sis-korea.com": "data/keywords/keywords_sisKorea.txt",
-    "https://jobkorea365.com": "data/keywords/keywords_jobkorea365.txt",
-    "https://jobinkorea365.com": "data/keywords/keywords_jobinkorea365.txt",
-    "https://jobkoreaglobal.com": "data/keywords/keywords_jobkoreaglobal.txt",
-    "https://korea365.org": "data/keywords/keywords_korea365.txt",
-}
-
-
-def top_golden_keywords(wp_url: str, limit: int = 5) -> str:
-    """Top cross-outlet-ranked keywords for wp_url's own topic, comma-joined."""
-    rel = WP_KEYWORD_FILE_BY_URL.get(wp_url.rstrip("/"), "")
-    if not rel:
-        return ""
-    path = Path(__file__).resolve().parents[1] / rel
-    if not path.exists():
-        return ""
-    try:
-        lines = [line.split("\t", 1)[0].strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    except OSError:
-        return ""
-    return ", ".join(lines[:limit])
-
-
 def get_blogger_data():
     path = Path(__file__).resolve().parents[1] / "config" / "blogger_portfolio.json"
     rows = [
@@ -847,27 +822,45 @@ def get_tistory_data() -> list[dict[str, object]]:
 
 def get_youtube_data() -> list[dict[str, object]]:
     """Expose the ten locked YouTube rooms without bypassing Sheet scheduling."""
-    path = Path(__file__).resolve().parents[1] / "config" / "automation_rooms.json"
+    root = Path(__file__).resolve().parents[1]
+    path = root / "config" / "automation_rooms.json"
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
+        channel_payload = json.loads((root / "config" / "youtube_channels.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return []
+    registry_channel_by_id = {
+        str(channel.get("channel_id", "")).strip(): channel
+        for channel in channel_payload.get("channels", [])
+        if str(channel.get("channel_id", "")).strip()
+    }
     rows = []
     for room in payload.get("rooms", []):
         if room.get("platform") != "youtube":
             continue
         channel_id = str(room.get("destination_id", "")).strip()
+        registry_channel = registry_channel_by_id.get(channel_id, {})
+        channel_key = str(registry_channel.get("channel_key", "")).strip()
+        enabled = bool(room.get("enabled", False))
+        status = str(room.get("status", "UNKNOWN"))
+        workflow = str(room.get("workflow", ""))
+        registry_workflow = str(registry_channel.get("workflow", ""))
         rows.append({
             "room_id": str(room.get("room_id", "")),
+            "channel_key": channel_key,
             "name": str(room.get("name", "")),
             "group": str(room.get("group", "")),
             "channel_id": channel_id,
             "channel_url": f"https://www.youtube.com/channel/{channel_id}" if channel_id else "",
             "admin_review_url": "https://studio.youtube.com/channel/" + channel_id + "/videos/upload?filter=%5B%7B%22name%22%3A%22VISIBILITY%22%2C%22value%22%3A%5B%22PRIVATE%22%5D%7D%5D" if channel_id else "https://studio.youtube.com/",
-            "workflow": str(room.get("workflow", "")),
+            "workflow": workflow,
             "publish_policy": str(room.get("publish_policy", "private")),
-            "status": str(room.get("status", "UNKNOWN")),
-            "enabled": bool(room.get("enabled", False)),
+            "status": status,
+            "enabled": enabled,
+            "action_ready": bool(
+                channel_key and channel_id and workflow and enabled and status == "READY"
+                and registry_channel.get("enabled", False) and registry_workflow == workflow
+            ),
             "sheet_controlled": True,
         })
     return sorted(rows, key=lambda row: (row["group"] != "PLAYLIST", row["name"].casefold()))
@@ -906,9 +899,41 @@ def get_sns_data() -> list[dict[str, object]]:
             elif platform == "instagram": url = f"https://www.instagram.com/{handle}/" if handle else ""
             elif platform == "threads": url = f"https://www.threads.net/@{handle}" if handle else ""
             else: url = f"https://www.facebook.com/{handle}" if handle else ""
-            rows.append({"platform": labels[platform], "platform_key": platform, "brand": brand,
-                         "handle": handle, "url": url, "error": current.get("error"), **metrics})
+            rows.append({
+                "platform": labels[platform],
+                "platform_key": platform,
+                "brand": brand,
+                "handle": handle,
+                "url": url,
+                "error": current.get("error"),
+                # There is no enabled, account-selectable SNS publishing workflow.
+                # Keep this explicit so the dashboard cannot present a fake action.
+                "publish_connected": False,
+                "publish_unavailable_reason": "이 계정에 연결된 콘텐츠 발행 실행이 없습니다.",
+                **metrics,
+            })
     return rows
+
+
+@lru_cache(maxsize=1)
+def _automatic_blogger_targets() -> dict[str, str]:
+    """Return the exact enabled Blogspot site-id/domain pairs accepted by the one-click UI."""
+    path = Path(__file__).resolve().parents[1] / "config" / "content_engine_profiles.json"
+    try:
+        profiles = json.loads(path.read_text(encoding="utf-8")).get("profiles", [])
+    except (OSError, json.JSONDecodeError):
+        return {}
+    targets = {}
+    for profile in profiles:
+        blogspot = profile.get("blogspot", {})
+        url = str(blogspot.get("url", "")).rstrip("/")
+        if not blogspot.get("ready_for_automation") or url in HIDDEN_BLOGGER_URLS:
+            continue
+        site_key = str(profile.get("site_key", "")).strip()
+        domain = re.sub(r"^https?://", "", url, flags=re.IGNORECASE)
+        if site_key and domain:
+            targets[f"blogger_{site_key}"] = domain
+    return targets
 
 
 def _queue_draft_trigger(payload: dict[str, object]) -> str:
@@ -928,19 +953,43 @@ def _queue_draft_trigger(payload: dict[str, object]) -> str:
 
 
 def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
-    """Dispatch the real GitHub draft worker; this command cannot publish publicly."""
+    """Dispatch the selected site's real generation and publication workflow."""
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
-    inputs = {
-        "site_id": str(payload["site_id"]),
-        "keyword": str(payload["keyword"]),
-        "source_wp_url": str(payload.get("source_wp_url") or ""),
-        "text_model": str(payload["text_model"]),
-        "image_model": str(payload["image_model"]),
-    }
+    automatic_blogger_topic = payload.get("platform") == "blogger" and payload.get("selection_mode") == "auto"
+    if automatic_blogger_topic:
+        site_key = str(payload["site_id"]).removeprefix("blogger_")
+        profiles_path = Path(__file__).resolve().parents[1] / "config" / "content_engine_profiles.json"
+        try:
+            profiles = json.loads(profiles_path.read_text(encoding="utf-8")).get("profiles", [])
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError("Blogger profile registry is unavailable") from exc
+        profile = next((item for item in profiles if item.get("site_key") == site_key), None)
+        if not profile:
+            raise RuntimeError(f"No Blogger profile for {payload['site_id']}")
+        blogspot = profile.get("blogspot", {})
+        workflow_name = "blogger-rewrite.yml"
+        inputs = {
+            "source_wp_url": "",
+            "blogger_site_id": str(payload["site_id"]),
+            "language": str(profile.get("language") or "en"),
+            "persona": str(blogspot.get("persona") or "helpful specialist editor"),
+            "tone": str(blogspot.get("tone") or "practical and clear"),
+            "target_chars": str(blogspot.get("target_chars") or 1800),
+            "publish_now": "true",
+        }
+    else:
+        workflow_name = "sheet-triggered-auto-write.yml"
+        inputs = {
+            "site_id": str(payload["site_id"]),
+            "keyword": str(payload["keyword"]),
+            "source_wp_url": str(payload.get("source_wp_url") or ""),
+            "text_model": str(payload["text_model"]),
+            "image_model": str(payload["image_model"]),
+        }
     if token:
         response = requests.post(
-            f"https://api.github.com/repos/{repo}/actions/workflows/sheet-triggered-auto-write.yml/dispatches",
+            f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
             headers={
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {token}",
@@ -951,16 +1000,16 @@ def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
         )
         if response.status_code != 204:
             raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
-        return f"https://github.com/{repo}/actions/workflows/sheet-triggered-auto-write.yml"
+        return f"https://github.com/{repo}/actions/workflows/{workflow_name}"
     command = [
-        "gh", "workflow", "run", "sheet-triggered-auto-write.yml",
+        "gh", "workflow", "run", workflow_name,
         "--repo", repo,
         *[part for key, value in inputs.items() for part in ("-f", f"{key}={value}")],
     ]
     completed = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
     if completed.returncode != 0:
         raise RuntimeError((completed.stderr or completed.stdout or "GitHub workflow dispatch failed").strip())
-    return f"https://github.com/{repo}/actions/workflows/sheet-triggered-auto-write.yml"
+    return f"https://github.com/{repo}/actions/workflows/{workflow_name}"
 
 
 @app.post("/trigger/draft")
@@ -975,15 +1024,17 @@ def trigger_draft():
     text_model = request.form.get("text_model", "").strip()
     image_model = request.form.get("image_model", "").strip()
     source_wp_url = request.form.get("source_wp_url", "").strip()
+    selection_mode = request.form.get("selection_mode", "manual").strip().lower()
+    automatic_blogger_topic = platform == "blogger" and selection_mode == "auto"
     anchor = "blogspot" if platform == "blogger" else "wordpress"
 
     if platform not in {"wordpress", "blogger"} or not domain:
         flash("사이트 정보가 올바르지 않습니다.", "error")
-    elif len(keyword) < 2:
+    elif not automatic_blogger_topic and len(keyword) < 2:
         flash(f"{domain}: 핵심 키워드를 2자 이상 입력하세요.", "error")
     elif text_model not in TEXT_MODELS or image_model not in IMAGE_MODELS:
         flash(f"{domain}: 지원하지 않는 엔진입니다.", "error")
-    elif platform == "blogger" and not source_wp_url.startswith("https://"):
+    elif platform == "blogger" and not automatic_blogger_topic and not source_wp_url.startswith("https://"):
         flash(f"{domain}: 검증된 WP 공개 글 URL을 먼저 입력하세요.", "error")
     else:
         payload = {
@@ -994,17 +1045,24 @@ def trigger_draft():
             "text_model": text_model,
             "image_model": image_model,
             "source_wp_url": source_wp_url or None,
+            "selection_mode": "auto" if automatic_blogger_topic else "manual",
         }
         if not payload["site_id"].startswith(("wp_", "blogger_")):
             flash(f"{domain}: 실행용 사이트 ID 연결이 완료되지 않았습니다.", "error")
             return redirect(url_for("index") + f"#{anchor}")
+        if automatic_blogger_topic and _automatic_blogger_targets().get(str(payload["site_id"])) != domain.rstrip("/"):
+            flash(f"{domain}: 자동 주제 실행이 연결된 Blogspot 사이트가 아닙니다.", "error")
+            return redirect(url_for("index") + "#blogspot")
         trigger_id = _queue_draft_trigger(payload)
         try:
             workflow_url = _dispatch_draft_workflow(payload)
         except (OSError, subprocess.SubprocessError, RuntimeError) as exc:
             flash(f"{domain}: 로컬 대기열에는 저장했지만 GitHub 실행 요청 실패 · {exc}", "error")
         else:
-            flash(f"{domain}: 실제 비공개 초안 작업 시작 · {trigger_id} · {workflow_url}", "success")
+            if automatic_blogger_topic:
+                flash(f"{domain}: 당일 주요 매체에서 최고 주제를 골라 실제 발행하는 작업을 접수했습니다. 생성·검수·발행 결과와 실패 사유는 최근 글 현황에서 확인하고 실패 시 이 카드에서 다시 실행하세요. · {trigger_id} · {workflow_url}", "success")
+            else:
+                flash(f"{domain}: 실제 비공개 초안 작업 시작 · {trigger_id} · {workflow_url}", "success")
     return redirect(url_for("index") + f"#{anchor}")
 
 
@@ -1055,9 +1113,13 @@ def trigger_youtube_batch():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#youtube")
     channel_key = request.form.get("channel_key", "").strip()
-    allowed_channel_keys = {str(channel["channel_key"]) for channel in get_youtube_data()}
-    if channel_key and channel_key not in allowed_channel_keys:
-        flash("등록되지 않은 YouTube 채널입니다.", "error")
+    allowed_channel_keys = {
+        str(channel["channel_key"])
+        for channel in get_youtube_data()
+        if channel.get("action_ready")
+    }
+    if not channel_key or channel_key not in allowed_channel_keys:
+        flash("콘텐츠 실행이 연결된 YouTube 채널이 아닙니다.", "error")
         return redirect(url_for("index") + "#youtube")
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
@@ -1170,98 +1232,6 @@ def trigger_publish_site_now():
     else:
         flash(f"{domain}: 글쓰기·공개 발행을 시작했습니다 (검토 단계 없음).", "success")
     return redirect(url_for("index") + "#wordpress")
-
-
-@app.post("/trigger/publish-blog-now")
-def trigger_publish_blog_now():
-    """CEO clicked '지금 발행' on one Blogspot card.
-
-    No manual keyword/source-URL typing: rewrites whichever of the paired
-    WP site's recent posts best matches that site's own current top
-    golden-keyword (virality-ranked, same file autopost_mega.py itself
-    draws from) and marks it for live publish. The rewrite+queue step runs
-    now; the actual Blogger API post happens on the next hourly
-    platform-publish-v2.yml pass (top of the hour + 17 min, so within 60
-    minutes) — not literally instant like the WP button, because Blogger
-    publishing is a separate two-stage pipeline.
-    """
-    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
-        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
-        return redirect(url_for("index") + "#blogspot")
-    site_id = request.form.get("site_id", "").strip()
-    registered = next((blog for blog in get_blogger_data() if blog["site_id"] == site_id), None)
-    if not registered or not registered.get("wp_url"):
-        flash("등록되지 않았거나 참고할 WordPress 사이트가 연결되지 않은 블로그입니다.", "error")
-        return redirect(url_for("index") + "#blogspot")
-    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
-    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
-    if not token:
-        flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
-        return redirect(url_for("index") + "#blogspot")
-    language = "ko" if registered["wp_url"].rstrip("/") in {"https://koreanews365.com", "https://k-health365.com"} else "en"
-    try:
-        response = requests.post(
-            f"https://api.github.com/repos/{repo}/actions/workflows/blogger-rewrite.yml/dispatches",
-            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": {
-                "source_wp_url": registered["wp_url"],
-                "blogger_site_id": site_id,
-                "language": language,
-                "persona": registered.get("persona") or "helpful specialist editor",
-                "tone": registered.get("tone") or "practical and clear",
-                "search_intent": top_golden_keywords(registered["wp_url"]),
-                "publish_now": "true",
-            }},
-            timeout=30,
-        )
-        if response.status_code != 204:
-            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
-    except (requests.RequestException, RuntimeError) as exc:
-        flash(f"{registered['name']}: 발행 요청 실패 · {exc}", "error")
-    else:
-        flash(f"{registered['name']}: 글 작성을 시작했습니다. 통과하면 다음 매시 자동 처리(최대 1시간 이내) 때 실제로 공개됩니다.", "success")
-    return redirect(url_for("index") + "#blogspot")
-
-
-@app.post("/trigger/social-publish")
-def trigger_social_publish():
-    """CEO clicked one platform's '발행 →' button in the SNS section.
-
-    Dispatches social-publish-one.yml for exactly that platform against
-    whatever content is already generated and waiting (topik_quiz_output/
-    meta_ko.json by default) — the other platforms are untouched. Every
-    platform in scripts/social_publish.py already fails safe on its own
-    (YouTube/Facebook stay private/draft, TikTok stays self-only unless
-    audited, Instagram/Threads never auto-post — caption+link emailed
-    instead), so this button does not change that behavior, it just lets
-    the CEO fire one platform on demand instead of all five at once.
-    """
-    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
-        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
-        return redirect(url_for("index") + "#sns")
-    platform = request.form.get("platform", "").strip().lower()
-    if platform not in {"tiktok", "instagram", "facebook", "threads", "youtube"}:
-        flash("알 수 없는 플랫폼입니다.", "error")
-        return redirect(url_for("index") + "#sns")
-    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
-    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
-    if not token:
-        flash("발행 실행용 GitHub 연결이 필요합니다.", "error")
-        return redirect(url_for("index") + "#sns")
-    try:
-        response = requests.post(
-            f"https://api.github.com/repos/{repo}/actions/workflows/social-publish-one.yml/dispatches",
-            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": {"platform": platform}},
-            timeout=30,
-        )
-        if response.status_code != 204:
-            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
-    except (requests.RequestException, RuntimeError) as exc:
-        flash(f"{platform}: 발행 요청 실패 · {exc}", "error")
-    else:
-        flash(f"{platform}: 발행을 시작했습니다. 준비된 콘텐츠가 없으면 실패 메일이 옵니다.", "success")
-    return redirect(url_for("index") + "#sns")
 
 
 def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:

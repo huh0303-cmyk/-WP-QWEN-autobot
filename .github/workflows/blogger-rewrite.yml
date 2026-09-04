@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       source_wp_url:
-        description: "Source WordPress site URL"
-        required: true
+        description: "Optional exact WordPress source; blank auto-selects today's highest evidenced topic and closest related public post"
+        required: false
         type: string
       blogger_site_id:
         description: "site_id from 자동화_플랫폼계정"
@@ -31,11 +31,6 @@ on:
         required: true
         default: "1800"
         type: string
-      search_intent:
-        description: "Comma-separated current top keywords for this blog's own topic (from its paired WP site's golden-keyword pool); biases which recent WP post gets rewritten toward what's trending right now"
-        required: false
-        default: ""
-        type: string
       publish_now:
         description: "Explicit approval to publish; default creates a review draft"
         required: true
@@ -43,6 +38,7 @@ on:
         type: boolean
 
 permissions:
+  actions: write
   contents: write
 
 concurrency:
@@ -62,6 +58,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests google-api-python-client google-auth -q
       - name: Golden keyword + GPT-5 mini authoring + deterministic review + approved image chain
+        id: queue
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -79,12 +76,21 @@ jobs:
           BLOGGER_PERSONA: ${{ inputs.persona }}
           BLOGGER_TONE: ${{ inputs.tone }}
           BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
-          BLOGGER_SEARCH_INTENT: ${{ inputs.search_intent }}
           BLOGGER_MAX_SIMILARITY: "0.55"
           BLOGGER_MIN_QUALITY_SCORE: "70"
           BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
           FORCE_SOURCE_IPV4: "true"
         run: python scripts/queue_blogger_rewrite.py
+      - name: Continue directly to the exact Blogger publication job
+        if: ${{ inputs.publish_now && steps.queue.outputs.job_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QUEUED_JOB_ID: ${{ steps.queue.outputs.job_id }}
+        run: >-
+          gh workflow run platform-publish-v2.yml --ref main
+          -f platform=blogger
+          -f job_id="$QUEUED_JOB_ID"
+          -f max_jobs=1
       - name: Commit budget guard state
         if: always()
         run: |

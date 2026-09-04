@@ -44,6 +44,7 @@ def main() -> int:
                 "persona": wp_site["persona"],
                 "tone": wp_site["tone"],
                 "theme": wp_site.get("keyword_rules", {}).get("theme", channel["topic"]),
+                "categories": wp_site.get("categories") or wp_site.get("keyword_rules", {}).get("categories", []),
                 "min_chars": wp_site.get("min_chars", 1800),
                 "target_chars": wp_site.get("target_chars", 2400),
                 "max_chars": wp_site.get("max_chars", 3200),
@@ -71,6 +72,7 @@ def main() -> int:
                 "max_chars": max(1600, round(wp_site.get("max_chars", 3200) * 0.72)),
                 "text_model": channel.get("text_model", ""),
                 "image_models": channel.get("image_models", []),
+                "categories": channel.get("categories", []),
             },
         })
 

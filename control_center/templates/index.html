@@ -106,11 +106,12 @@
                 {% if review_items %}
                 <div class="divide-y divide-slate-100">
                     {% for item in review_items[:25] %}
-                    <article class="grid gap-2 px-4 py-3 hover:bg-amber-50/60 sm:grid-cols-[110px_1fr_auto] sm:items-center">
-                        <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black text-amber-700">{{ item.platform }}</span>{{ item.created_at }}</div>
+                    <article class="grid gap-2 px-4 py-3 {% if item.error %}bg-red-50/70{% else %}hover:bg-amber-50/60{% endif %} sm:grid-cols-[110px_1fr_auto] sm:items-center">
+                        <div class="text-[10px] font-bold text-slate-500"><span class="block text-xs font-black {% if item.error %}text-red-700{% else %}text-amber-700{% endif %}">{{ item.platform }}</span>{{ item.created_at }}</div>
                         <div class="min-w-0">
                             <p class="truncate text-sm font-black text-slate-900" title="{{ item.title }}">{{ item.title }}</p>
                             <p class="truncate text-[10px] text-slate-400">{{ item.site_id }}</p>
+                            <p class="mt-1 text-[10px] font-black {% if item.error %}text-red-700{% else %}text-slate-500{% endif %}">{{ item.status }}</p>
                             {% if item.platform == "Blogspot" %}
                             {% if item.search_description %}
                             <div class="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2">
@@ -126,7 +127,13 @@
                             {% endif %}
                             {% endif %}
                         </div>
+                        {% if item.review_url %}
                         <a href="{{ item.review_url }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center justify-center rounded-xl {% if item.platform == 'WordPress' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-600 text-white{% endif %} px-4 text-xs font-black">{% if item.platform == 'WordPress' %}공개글 확인 →{% else %}검토 →{% endif %}</a>
+                        {% elif item.retryable %}
+                        <a href="#blogspot" class="inline-flex min-h-10 items-center justify-center rounded-xl bg-red-700 px-4 text-xs font-black text-white">카드에서 재시도 ↓</a>
+                        {% else %}
+                        <span class="inline-flex min-h-10 items-center justify-center rounded-xl bg-slate-100 px-4 text-xs font-black text-slate-600">{{ item.status }}</span>
+                        {% endif %}
                     </article>
                     {% endfor %}
                 </div>
@@ -169,7 +176,7 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for site in sites %}
                 <article class="wordpress-card min-w-0 overflow-hidden rounded-2xl border bg-gradient-to-br from-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if site.google_approved %}border-2 border-amber-400 to-amber-50 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-blue-200 to-blue-50{% endif %}" data-search="{{ site.domain|lower }} {{ (site.category or '')|lower }}">
-                <form method="post" action="{{ url_for('trigger_draft') }}" class="space-y-3 p-4">
+                <form method="post" action="{{ url_for('trigger_draft') }}" class="space-y-3 p-4" {% if not site.auth_ready %}onsubmit="return false;" aria-disabled="true"{% endif %}>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="platform" value="wordpress">
                     <input type="hidden" name="site_id" value="{{ site.site_id }}">
@@ -291,15 +298,23 @@
                         </div>
                         <p class="text-[10px] text-slate-400">매주 갱신 · 네트워크 제목 중복 제거 · 확인되지 않은 수치 미표시</p>
                     </div>
+                    {% if site.auth_ready %}
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
-                        <span>WordPress 글 초안 만들기</span><span aria-hidden="true">→</span>
+                        <span>WordPress 글 바로 만들기 · 비공개 초안</span><span aria-hidden="true">→</span>
                     </button>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 초안 실행 · 연결 없음</div>
+                    {% endif %}
                 </form>
-                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="border-t border-emerald-200 bg-emerald-50 px-4 py-3"
+                <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="border-t {% if site.auth_ready %}border-emerald-200 bg-emerald-50{% else %}border-slate-200 bg-slate-50{% endif %} px-4 py-3"
                       onsubmit="return confirm('{{ site.domain }}: 사이트 자체 키워드 풀에서 지금 바로 글을 쓰고 공개 발행할까요? 검토 단계 없이 바로 공개됩니다.');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="domain" value="{{ site.domain }}">
-                    <button type="submit" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-xs font-black text-white hover:bg-emerald-700">이 사이트에 새 글 1건 바로 게시 →</button>
+                    {% if site.auth_ready %}
+                    <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm hover:bg-emerald-700">WordPress 글 1건 바로 올리기 · 공개 →</button>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">WordPress 바로 올리기 · 연결 없음</div>
+                    {% endif %}
                 </form>
                 </article>
                 {% endfor %}
@@ -319,12 +334,12 @@
             <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for blog in bloggers %}
-                <article class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}">
-                <form method="post" action="{{ url_for('trigger_draft') }}" class="space-y-3">
+                <form method="post" action="{{ url_for('trigger_draft') }}" class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}" {% if not blog.connected %}onsubmit="return false;" aria-disabled="true"{% endif %}>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="platform" value="blogger">
                     <input type="hidden" name="site_id" value="{{ blog.site_id }}">
                     <input type="hidden" name="domain" value="{{ blog.url|replace('https://', '')|replace('http://', '') }}">
+                    <input type="hidden" name="selection_mode" value="auto">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <div class="mb-1 flex items-center gap-2">
@@ -392,29 +407,19 @@
                     </div>
                         </div>
                     </details>
-                    <div class="space-y-2 border-t pt-3">
-                        <label class="block text-[11px] font-black text-slate-600">새 글의 핵심 키워드</label>
-                        <input name="keyword" type="text" required class="h-11 w-full rounded-xl border border-violet-200 bg-white px-3 text-base focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100" placeholder="예: 부산 주말여행">
-                        <label class="block text-[11px] font-black text-slate-600">참고할 WordPress 글 주소</label>
-                        <input name="source_wp_url" type="url" required class="h-11 w-full rounded-xl border border-violet-200 bg-white px-3 text-sm focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100" placeholder="공개된 WordPress 글 주소를 붙여넣으세요">
-                        <p class="text-[10px] leading-relaxed text-slate-500">입력한 WordPress 글의 내용을 참고해 Blogspot용 새 글을 만듭니다. 원문을 그대로 복사하지 않습니다.</p>
+                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-3 text-[11px] text-violet-950">
+                        <p class="font-black">주제 자동 선택</p>
+                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다.</p>
+                        <p class="text-[10px] text-violet-700">연계 기준 WP: {{ blog.wp_url|replace('https://', '')|replace('http://', '') }} · 의미상 가까운 공개 글만 자동 연결하며, 맞는 글이 없으면 억지로 연결하지 않습니다.</p>
                     </div>
-                    <div class="rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-[11px] text-violet-900">
-                        <span class="font-black">추천 참고 사이트:</span> <span class="font-semibold">{{ blog.wp_url|replace('https://', '')|replace('http://', '') }}</span>
-                    </div>
+                    {% if blog.connected %}
                     <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-4 text-sm font-black text-white shadow-md shadow-violet-200 transition active:scale-[.98] hover:from-violet-800 hover:to-fuchsia-700">
-                        <span>Blogspot 글 초안 만들기</span><span aria-hidden="true">→</span>
+                        <span>Blogspot 글 1건 지금 발행 · 공개</span><span aria-hidden="true">→</span>
                     </button>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">Blogspot 바로 올리기 · 연결 없음</div>
+                    {% endif %}
                 </form>
-                {% if blog.wp_url %}
-                <form method="post" action="{{ url_for('trigger_publish_blog_now') }}" class="-mx-4 -mb-4 mt-1 rounded-b-2xl border-t border-violet-200 bg-violet-50 px-4 py-3"
-                      onsubmit="return confirm('{{ blog.name }}: {{ blog.wp_url|replace('https://', '') }}의 최신 글 중 오늘 가장 화제성 높은 주제를 골라 지금 바로 재작성할까요? 통과하면 다음 매시 자동 처리 때(최대 1시간 이내) 실제로 공개됩니다.');">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <input type="hidden" name="site_id" value="{{ blog.site_id }}">
-                    <button type="submit" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 text-xs font-black text-white hover:bg-violet-800">이 블로그 지금 발행 (오늘 화제 키워드 자동 선택) →</button>
-                </form>
-                {% endif %}
-                </article>
                 {% endfor %}
             </div>
         </section>
@@ -556,11 +561,15 @@
                     </div>
                     {% if channel.channel_url %}<a href="{{ channel.channel_url }}" target="_blank" rel="noopener" class="block break-all text-[11px] font-bold text-red-700 hover:underline">{{ channel.channel_id }}</a>{% endif %}
                     <p class="rounded-xl border border-red-100 bg-white/80 px-3 py-2 text-[11px] font-semibold text-slate-600">완성된 영상은 먼저 비공개로 저장됩니다.</p>
+                    {% if channel.action_ready %}
                     <form method="post" action="{{ url_for('trigger_youtube_batch') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="channel_key" value="{{ channel.channel_key }}">
-                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-red-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-red-800 active:scale-[.98]">이 채널 영상 만들기</button>
+                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-red-700 px-4 text-sm font-black text-white shadow-sm transition hover:bg-red-800 active:scale-[.98]">YouTube 콘텐츠 바로 만들기 · 비공개</button>
                     </form>
+                    {% else %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">YouTube 바로 올리기 · 연결 없음</div>
+                    {% endif %}
                 </article>
                 {% endfor %}
             </div>
@@ -600,24 +609,13 @@
                             {% endfor %}
                         </div>
                         {% if account.error %}<p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-black text-amber-800">이 계정은 통계 연결 확인이 필요합니다.</p>{% endif %}
+                        <div class="mt-3 flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">SNS 콘텐츠 바로 올리기 · 연결 없음</div>
+                        <p class="mt-1 text-[10px] font-semibold text-slate-500">{{ account.publish_unavailable_reason }}</p>
                     </article>
                     {% endfor %}
                 </div>
             </div>
             {% endfor %}
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <p class="text-xs font-black text-slate-500">이 플랫폼만 지금 발행</p>
-                <p class="mt-1 text-[11px] text-slate-400">준비된 콘텐츠(topik_quiz_output/meta_ko.json)를 그 플랫폼에만 올립니다 — 콘텐츠가 없으면 정직하게 실패합니다.</p>
-                <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {% for key, label, color in [('tiktok','TikTok','bg-cyan-600 hover:bg-cyan-700'), ('instagram','Instagram','bg-fuchsia-600 hover:bg-fuchsia-700'), ('facebook','Facebook','bg-blue-600 hover:bg-blue-700'), ('threads','Threads','bg-slate-700 hover:bg-slate-800')] %}
-                    <form method="post" action="{{ url_for('trigger_social_publish') }}" onsubmit="return confirm('{{ label }}에 지금 바로 발행할까요? (유튜브/페북은 비공개·초안, 인스타/쓰레드는 캡션 이메일로만 전달)');">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                        <input type="hidden" name="platform" value="{{ key }}">
-                        <button type="submit" class="flex h-11 w-full items-center justify-center rounded-xl {{ color }} px-3 text-xs font-black text-white">{{ label }} 발행 →</button>
-                    </form>
-                    {% endfor %}
-                </div>
-            </div>
         </section>
         <section id="google-sheet" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
             <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm sm:p-7">

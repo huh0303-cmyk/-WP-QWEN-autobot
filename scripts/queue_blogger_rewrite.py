@@ -21,11 +21,18 @@ for candidate in (ROOT, ROOT / "scripts"):
 
 from automation_hub.blogger_rewriter import (
     blogger_quality_score,
+    extract_http_links,
     normalize_rewrite_format,
     parse_rewrite_json,
     rewrite_prompt,
 )
 from automation_hub.content_identity import active_duplicate, canonical_source_id, stable_content_id
+from automation_hub.blogger_topic_router import (
+    NoEligibleTopic,
+    NoRelatedWordPressSource,
+    resolve_automatic_source,
+)
+from automation_hub.original_writer import original_prompt, original_quality_score
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from openai_text import openai_available, openai_generate_text
@@ -56,6 +63,17 @@ def _records(values: list[list[str]]) -> list[dict[str, str]]:
         return []
     header = values[0]
     return [dict(zip(header, [*row, *([""] * (len(header) - len(row)))])) for row in values[1:] if row]
+
+
+def _profile_for_blogger(blogger_site_id: str) -> dict:
+    site_key = blogger_site_id.removeprefix("blogger_")
+    profiles = json.loads(
+        (ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8")
+    )["profiles"]
+    profile = next((item for item in profiles if item.get("site_key") == site_key), None)
+    if profile is None:
+        raise RuntimeError(f"등록되지 않은 Blogger 사이트 ID입니다: {blogger_site_id}")
+    return profile
 
 
 def _append_failure(service, sheet_id: str, blogger_site_id: str, *,
@@ -93,45 +111,87 @@ def main():
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     source_url = os.environ.get("SOURCE_WP_URL", "").rstrip("/")
     blogger_site_id = os.environ.get("BLOGGER_SITE_ID", "").strip()
-    if not all((sheet_id, source_url, blogger_site_id)):
-        raise SystemExit("SHEET_ID, SOURCE_WP_URL and BLOGGER_SITE_ID are required")
-    check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
+    if not all((sheet_id, blogger_site_id)):
+        raise SystemExit("SHEET_ID and BLOGGER_SITE_ID are required")
     service = get_sheets_service()
-    try:
-        parsed = urlparse(source_url)
-        site_root = f"{parsed.scheme}://{parsed.netloc}"
-        exact_ids = parse_qs(parsed.query).get("p", [])
-        # 2026-09-04: SOURCE_WP_URL from a real published post is normally a
-        # pretty permalink (https://site.com/some-post-slug/), not the raw
-        # ?p=<id> form — the old code appended /wp-json/... straight onto
-        # that full permalink (site.com/some-post-slug/wp-json/...), which
-        # is not a real path and just timed out. Resolve a permalink's slug
-        # via ?slug= first; only fall back to "10 most recent posts on this
-        # domain" when there's no path to resolve at all.
-        slug = parsed.path.strip("/").rsplit("/", 1)[-1] if parsed.path.strip("/") else ""
-        if exact_ids:
-            if not exact_ids[0].isdigit():
-                raise ValueError("Invalid exact WordPress source ID")
-            posts = requests.get(f"{site_root}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
-            posts.raise_for_status()
-            source_posts = [posts.json()]
-        elif slug:
-            posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"slug": slug, "status": "publish"}, timeout=30)
-            posts.raise_for_status()
-            source_posts = posts.json()
-            if not source_posts:
-                raise RuntimeError(f"No published post found at slug '{slug}' on {site_root}")
-        else:
-            posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
-            posts.raise_for_status()
-            source_posts = posts.json()
-        if (exact_ids or slug) and source_posts[0].get("status") != "publish":
-            raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
-    except requests.RequestException as exc:
-        _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
-        raise
     existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
     queue_records = _records(existing)
+    profile = _profile_for_blogger(blogger_site_id)
+    selected_topic = ""
+    source_match_score = None
+    route_code = "WP_RELATED_SOURCE"
+    evidence_sources: list[dict[str, str]] = []
+    if source_url:
+        try:
+            parsed = urlparse(source_url)
+            site_root = f"{parsed.scheme}://{parsed.netloc}"
+            exact_ids = parse_qs(parsed.query).get("p", [])
+            slug = parsed.path.strip("/").rsplit("/", 1)[-1] if parsed.path.strip("/") else ""
+            if exact_ids:
+                if not exact_ids[0].isdigit():
+                    raise ValueError("Invalid exact WordPress source ID")
+                posts = requests.get(f"{site_root}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
+            elif slug:
+                posts = requests.get(
+                    f"{site_root}/wp-json/wp/v2/posts",
+                    params={"slug": slug, "status": "publish"},
+                    timeout=30,
+                )
+            else:
+                posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
+            posts.raise_for_status()
+            source_posts = [posts.json()] if exact_ids else posts.json()
+            if slug and not source_posts:
+                raise RuntimeError(f"No published post found at slug '{slug}' on {site_root}")
+            if (exact_ids or slug) and source_posts[0].get("status") != "publish":
+                raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
+        except requests.RequestException as exc:
+            _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
+            raise
+    else:
+        already_used = [
+            record.get("source_keyword", "")
+            for record in queue_records
+            if record.get("site_id") == blogger_site_id
+        ]
+        try:
+            routed = resolve_automatic_source(profile, excluded_urls=already_used)
+        except NoEligibleTopic as exc:
+            _append_failure(
+                service, sheet_id, blogger_site_id, error_code="NO_TREND_TOPIC",
+                message=str(exc), source_url=profile["wordpress"]["url"],
+            )
+            raise
+        except NoRelatedWordPressSource as exc:
+            _append_failure(
+                service, sheet_id, blogger_site_id, error_code="NO_RELATED_WP_SOURCE",
+                message=str(exc), source_url=profile["wordpress"]["url"],
+            )
+            raise
+        selected_topic = routed.topic.keyword
+        source_match_score = routed.source_score
+        route_code = routed.result_code
+        evidence_sources = [
+            {"outlet": outlet, "title": title, "url": url}
+            for outlet, title, url in routed.topic.evidence_items
+        ]
+        if routed.post is not None:
+            source_posts = [routed.post]
+            source_url = str(routed.post["link"])
+        else:
+            source_posts = []
+            source_url = ""
+        print(json.dumps({
+            "route_code": route_code,
+            "automatic_topic": selected_topic,
+            "topic_score": routed.topic.score,
+            "media_mentions": routed.topic.mention_count,
+            "media_outlets": routed.topic.outlet_count,
+            "viral_score": routed.topic.viral_score,
+            "source_wp_url": source_url or None,
+            "source_match_score": source_match_score,
+        }, ensure_ascii=False))
+
     def golden_source_score(post):
         title = post.get("title", {}).get("rendered", "").lower()
         intent = os.environ.get("BLOGGER_SEARCH_INTENT", "").lower().split(",")
@@ -139,12 +199,26 @@ def main():
         return 40 + min(30, 10 * sum(x.strip() in title for x in intent if x.strip())) + min(20, 4 * sum(x in title for x in persona if len(x) > 3)) + min(10, len(title) // 12)
     eligible = [post for post in source_posts if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))]
     source = max(eligible, key=golden_source_score, default=None)
-    if not source:
+    evidence_urls = [item["url"] for item in evidence_sources if item.get("url")]
+    source_identity = source.get("link", "") if source else (evidence_urls[0] if evidence_urls else "")
+    if source_posts and not source:
         _append_failure(service, sheet_id, blogger_site_id, error_code="NO_NEW_SOURCE", message="새로운 WordPress 원문이 없어 생성과 유료 API 호출을 시작하지 않았습니다.", source_url=source_url)
         raise RuntimeError(
             "새로운 WordPress 원문이 없어 Blogger 검토 대기 행을 만들지 못했습니다."
         )
-    if blogger_site_id == KPOP_SITE_ID and not is_kpop_source(source):
+    if source is None and not evidence_urls:
+        _append_failure(
+            service, sheet_id, blogger_site_id, error_code="NO_TREND_EVIDENCE",
+            message="독립 신규 글에 사용할 복수 매체 근거 URL이 없습니다.",
+        )
+        raise RuntimeError("Independent trend article requires verified media evidence")
+    if active_duplicate(queue_records, site_id=blogger_site_id, source_id=source_identity):
+        _append_failure(
+            service, sheet_id, blogger_site_id, error_code="DUPLICATE_SOURCE",
+            message="같은 원문 또는 당일 매체 근거로 이미 진행 중인 글이 있습니다.", source_url=source_identity,
+        )
+        raise RuntimeError("Duplicate Blogger source is already active")
+    if source is not None and blogger_site_id == KPOP_SITE_ID and not is_kpop_source(source):
         _append_failure(
             service, sheet_id, blogger_site_id,
             error_code="KPOP_TOPIC_LOCK",
@@ -154,33 +228,63 @@ def main():
         raise RuntimeError("KWorld365 K-pop topic lock rejected a non-K-pop source")
     language = os.environ.get("BLOGGER_LANGUAGE", "en").strip().lower()
     korean_source_hosts = {"koreanews365.com", "www.koreanews365.com", "k-health365.com", "www.k-health365.com"}
-    source_host = requests.utils.urlparse(source_url).netloc.lower()
-    if language == "ko" and source_host not in korean_source_hosts:
+    source_host = requests.utils.urlparse(source_url).netloc.lower() if source_url else ""
+    if source is not None and language == "ko" and source_host not in korean_source_hosts:
         _append_failure(service, sheet_id, blogger_site_id, error_code="LANGUAGE_POLICY", message="Korean Blogger output is allowed only for approved Korean source sites.", source_url=source["link"])
         raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
     target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
     minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "70"))
-    ymyl = any(word in (source["title"]["rendered"] + " " + source_url).lower() for word in ("visa", "immigration", "insurance", "medical", "hospital", "treatment"))
+    topic_for_safety = (
+        source["title"]["rendered"] + " " + source_url
+        if source is not None else selected_topic + " " + profile["wordpress"].get("theme", "")
+    )
+    ymyl = any(word in topic_for_safety.lower() for word in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
     rewritten = None
     quality_score = 0
     failures = []
     similarity_score = 1.0
     text_provider = ""
+    # Paid generation starts only after the deterministic topic, duplicate and
+    # source/fallback checks have selected a valid route.
+    check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
     # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
     # The second GPT attempt uses deterministic quality-gate feedback.
     for attempt in range(1, 3):
         provider = "gpt"
-        prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", "helpful specialist editor"), tone=os.environ.get("BLOGGER_TONE", "practical and clear"), target_chars=target_chars, prior_feedback="; ".join(failures))
+        if source is not None:
+            prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", profile["blogspot"].get("persona", "helpful specialist editor")), tone=os.environ.get("BLOGGER_TONE", profile["blogspot"].get("tone", "practical and clear")), target_chars=target_chars, prior_feedback="; ".join(failures))
+        else:
+            prompt = original_prompt(
+                keyword=selected_topic,
+                site_theme=profile["wordpress"].get("theme", ""),
+                language=language,
+                persona=os.environ.get("BLOGGER_PERSONA", profile["blogspot"].get("persona", "helpful specialist editor")),
+                tone=os.environ.get("BLOGGER_TONE", profile["blogspot"].get("tone", "practical and clear")),
+                target_chars=target_chars,
+                prior_feedback="; ".join(failures),
+                verified_sources=evidence_sources,
+            )
         try:
             if not openai_available():
                 raise RuntimeError("GPT-5 mini writer unavailable")
             raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
             candidate = parse_rewrite_json(raw)
-            candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
-            quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum, language=language)
+            if source is not None:
+                candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
+                quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum, language=language)
+                critical_prefixes = ("body length", "verified WordPress source link", "YMYL", "meta description is incomplete", "language mismatch")
+            else:
+                candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
+                quality_score, failures = original_quality_score(candidate, keyword=selected_topic, target_chars=target_chars, language=language)
+                used_evidence = set(extract_http_links(candidate.get("content_html", ""))) & set(evidence_urls)
+                if len(used_evidence) < min(2, len(evidence_urls)):
+                    failures.append("verified trend evidence links are incomplete")
+                    quality_score = max(0, quality_score - 15)
+                similarity_score = 0.0
+                critical_prefixes = ("body length", "verified trend evidence", "YMYL", "meta description is incomplete", "language mismatch")
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
-            critical_failures = [failure for failure in failures if failure.startswith(("body length", "verified WordPress source link", "YMYL", "meta description is incomplete", "language mismatch"))]
+            critical_failures = [failure for failure in failures if failure.startswith(critical_prefixes)]
             if quality_score >= minimum_quality and not critical_failures:
                 rewritten = candidate
                 text_provider = provider
@@ -189,7 +293,7 @@ def main():
             failures = [f"invalid output: {exc}"]
             print(json.dumps({"attempt": attempt, "quality_score": 0, "failures": failures}, ensure_ascii=False))
     if rewritten is None:
-        failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source["link"], "", "", "QUALITY_GATE", f"quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
+        failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source_identity, "", "", "QUALITY_GATE", f"route_code={route_code}; quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 {minimum_quality}점 미만이므로 초안 생성을 차단했습니다. {failures}")
 
@@ -212,7 +316,7 @@ def main():
         image_model = "approved_image_chain"
 
     content_id = stable_content_id(
-        "blogger", blogger_site_id, source["link"],
+        "blogger", blogger_site_id, source_identity,
         version=os.environ.get("BLOGGER_CONTENT_VERSION", "v1"),
     )
     job_id = f"blogger-{content_id}"
@@ -225,14 +329,18 @@ def main():
     latest = service.spreadsheets().values().get(
         spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N"
     ).execute().get("values", [])
-    duplicate = active_duplicate(_records(latest), site_id=blogger_site_id, source_id=source["link"])
+    duplicate = active_duplicate(_records(latest), site_id=blogger_site_id, source_id=source_identity)
     if duplicate:
         print(json.dumps({"queued": False, "duplicate_blocked": True, "existing_job_id": duplicate.get("job_id"), "content_id": content_id}, ensure_ascii=False))
         return 0
     label_count = 8 + int(content_id[:2], 16) % 7
-    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:label_count]), canonical_source_id(source["link"]), "", "", "", f"content_id={content_id}; quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={image_model}; image_status={'generated' if image_url else 'pass_no_image'}; meta_description={rewritten['meta_description']}", ""]
+    row = [iso_kst(), job_id, blogger_site_id, "ready", "TRUE" if publish_now else "FALSE", rewritten["title"], content, ",".join(labels[:label_count]), canonical_source_id(source_identity), "", "", "", f"route_code={route_code}; content_id={content_id}; selected_topic={selected_topic or 'manual_source'}; source_match_score={source_match_score if source_match_score is not None else 'none'}; quality_score={quality_score}; rewritten_similarity={similarity_score:.3f}; images={image_model}; image_status={'generated' if image_url else 'pass_no_image'}; meta_description={rewritten['meta_description']}", ""]
     service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [row]}).execute()
-    print(json.dumps({"queued": True, "job_id": job_id, "content_id": content_id, "source": canonical_source_id(source["link"]), "golden_keyword_score": golden_source_score(source), "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": text_provider, "image_provider": image_model}, ensure_ascii=False))
+    github_output = os.environ.get("GITHUB_OUTPUT", "").strip()
+    if github_output:
+        with open(github_output, "a", encoding="utf-8") as output_file:
+            output_file.write(f"job_id={job_id}\n")
+    print(json.dumps({"queued": True, "result_code": route_code, "job_id": job_id, "content_id": content_id, "selected_topic": selected_topic or None, "source": canonical_source_id(source_identity), "source_wp_url": source.get("link") if source else None, "source_match_score": source_match_score, "golden_keyword_score": golden_source_score(source) if source else None, "quality_score": quality_score, "similarity": round(similarity_score, 3), "image_count": 1 if image_model != "0" else 0, "meta_description": rewritten["meta_description"], "publish_now": publish_now, "text_provider": text_provider, "image_provider": image_model}, ensure_ascii=False))
     return 0
 
 
