@@ -71,9 +71,9 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <button id="bulk-button-{{ group }}" type="submit" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-rose-500 px-4 text-sm font-black text-slate-950 shadow-md transition active:scale-[.98] hover:from-amber-300 hover:to-rose-400 disabled:cursor-not-allowed disabled:opacity-60">{{ title }} 발행 →</button>
                     </form>
-                    <div id="bulk-status-{{ group }}" class="mt-3 hidden space-y-2 border-t border-white/10 pt-3">
-                        <p id="bulk-headline-{{ group }}" class="text-[11px] font-bold text-slate-300"></p>
-                        <p id="bulk-counts-{{ group }}" class="text-sm font-black"></p>
+                    <div id="bulk-status-{{ group }}" class="mt-3 space-y-2 border-t border-white/10 pt-3">
+                        <p id="bulk-headline-{{ group }}" class="text-[11px] font-bold text-slate-300">상태: 불러오는 중…</p>
+                        <p id="bulk-counts-{{ group }}" class="text-sm font-black">-</p>
                         <div id="bulk-failures-{{ group }}" class="max-h-48 space-y-1.5 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
@@ -628,16 +628,15 @@
             const statusLabels = { idle: '대기 중', dispatching: '발행 요청 전송 중…', polling: '완료 확인 중…', done: '완료' };
 
             function renderStatus(data) {
-                if (data.status === 'idle' && !data.counts.total) { statusBox.classList.add('hidden'); return; }
-                statusBox.classList.remove('hidden');
                 let text = '상태: ' + (statusLabels[data.status] || data.status);
+                if (data.status === 'idle' && !data.counts.total) text = '상태: 아직 실행한 적 없음';
                 if (data.started_at) text += ' · 시작 ' + data.started_at.replace('T', ' ').slice(0, 19);
                 if (data.status === 'done' && data.finished_at) text += ' · 완료 ' + data.finished_at.replace('T', ' ').slice(0, 19);
                 headline.textContent = text;
                 const c = data.counts;
                 counts.textContent = c.total
                     ? c.success + '성공 / ' + c.failed + '실패 / ' + c.pending + '진행중 (총 ' + c.total + ')'
-                    : '해당 없음';
+                    : '아직 없음';
                 failuresBox.innerHTML = '';
                 if (data.failures && data.failures.length) {
                     const title = document.createElement('p');
