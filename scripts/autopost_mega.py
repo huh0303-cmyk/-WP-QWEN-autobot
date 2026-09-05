@@ -3516,7 +3516,24 @@ def process_one(site, keyword):
             print("  ℹ️ SDXL Lightning + FLUX Schnell failed → 이미지 없이 발행")
     print(f"  🖼  이미지 {len(images)}장")
 
-    score=estimate_seo_score(title,body,meta,tags,faq,images,keyword)
+    # ★ 2026-09-06: wp_post()가 발행 직전에 코드로 강제 삽입하는 "관련 글" 박스
+    #   (build_related_links_html — 실제 permalink 2~3개 + 가끔 형제 사이트 1개)가
+    #   여기서 계산하는 최종 게이트 점수에는 전혀 반영되지 않고 있었다. 그 결과
+    #   실제로 발행될 글에는 링크가 있는데도 채점은 "링크 0~1개"짜리 미완성 본문
+    #   기준으로 이뤄져, 링크 배점(최대 10점)을 매번 놓치고 70점 문턱에 걸려
+    #   대량 발행 실패로 이어졌다. wp_post()의 본문(body) 자체는 건드리지 않고,
+    #   채점용으로만 같은 관련글 블록을 미리 덧붙여 실제 발행물과 동일한 기준으로
+    #   평가한다.
+    scoring_body = body
+    if mode not in ("news", "news_en"):
+        pw_for_scoring = os.getenv(site.get("wp_pass_env", ""), "").strip()
+        if pw_for_scoring:
+            try:
+                scoring_body = body + build_related_links_html(url, pw_for_scoring, lang, exclude_title=title)
+            except Exception as exc:
+                print(f"  ⚠️ 관련 글 미리보기 실패(채점은 원문 기준으로 계속): {exc}")
+
+    score=estimate_seo_score(title,scoring_body,meta,tags,faq,images,keyword)
     # The generic blog score does not measure newsroom-specific safeguards.
     # Credit a story only after it has a named, linked, <=72-hour source lead;
     # source-URL duplication was already rejected in crawl_rss_news().
