@@ -3420,6 +3420,10 @@ def process_one(site, keyword):
         # ("Who the route fits") reach WordPress as the real post title before.
         if not title or len(title) < 15:
             print(f"  ⚠️ 제목 추출 실패/미달({title!r}) — 이번 회차는 채택하지 않음")
+            # ★ 2026-09-06 임시 진단 로그: 실패 원인(모델이 TITLE: 줄 자체를 안 냈는지,
+            #   다른 표기를 썼는지)을 보려면 원문 앞부분이 필요한데 지금까지 로그에
+            #   전혀 안 남아 있었다. 동작은 바꾸지 않고 원문 첫 400자만 남긴다.
+            print(f"  🔍 raw 응답 앞부분: {raw[:400]!r}")
         # NEWSROOM EXCEPTION: KoreaNews365 and The Seoul Journal are never
         # selected or rejected by article length. Prefer the strongest factual/SEO draft.
         elif pre > best_score:
