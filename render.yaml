@@ -9,6 +9,19 @@ services:
     domains:
       - control.korea365.org
     autoDeployTrigger: commit
+    # 2026-09-06: automated bots on this repo commit to main every 1-5
+    # minutes (Tistory image hosting, budget guard state), and each commit
+    # was redeploying this service and killing every in-flight background
+    # publish thread mid-run - the CEO would click "WP 25개 발행" and the
+    # status panel would go right back to "아직 실행한 적 없음" a few minutes
+    # later because the whole instance (and its ephemeral state files) had
+    # just been replaced. Only these two high-frequency, control-center-
+    # irrelevant paths are excluded; everything else the dashboard actually
+    # reads from disk still redeploys normally to stay fresh.
+    buildFilter:
+      ignoredPaths:
+        - assets/tistory_images/**
+        - budget_state.json
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
