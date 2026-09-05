@@ -51,6 +51,37 @@
         </div>
         {% endif %}
         {% endwith %}
+        <section id="bulk-publish" class="rounded-3xl border-2 border-slate-900 bg-slate-950 p-4 text-white shadow-lg sm:p-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-xs font-black text-amber-300">한 번에 전체 실행</p>
+                    <h2 class="text-xl font-black sm:text-2xl">전체글발행</h2>
+                    <p class="mt-1 text-xs leading-relaxed text-slate-300">WP 25(뉴스 2개 제외) · Blogspot {{ bloggers|length }} · Tistory 5 순서를 무작위로 섞어 한 번에 실행합니다. 실제 완료 결과는 아래 패널에서 실시간으로 확인하세요.</p>
+                </div>
+                <form method="post" action="{{ url_for('trigger_publish_all') }}" onsubmit="return confirm('WP·Blogspot·Tistory 전체 사이트 발행을 지금 시작할까요? 완료까지 최대 20여 분 걸릴 수 있습니다.');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button id="bulk-publish-button" type="submit" class="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-rose-500 px-6 text-base font-black text-slate-950 shadow-md transition active:scale-[.98] hover:from-amber-300 hover:to-rose-400 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">전체글발행 시작 →</button>
+                </form>
+            </div>
+            <div id="bulk-publish-status" class="mt-4 hidden space-y-3 border-t border-white/10 pt-4">
+                <p id="bulk-publish-headline" class="text-sm font-bold text-slate-200"></p>
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    <div class="rounded-xl bg-white/10 px-3 py-2">
+                        <p class="text-[10px] font-black text-blue-300">WordPress</p>
+                        <p id="bulk-wp-count" class="text-sm font-black">-</p>
+                    </div>
+                    <div class="rounded-xl bg-white/10 px-3 py-2">
+                        <p class="text-[10px] font-black text-violet-300">Blogspot</p>
+                        <p id="bulk-blogger-count" class="text-sm font-black">-</p>
+                    </div>
+                    <div class="rounded-xl bg-white/10 px-3 py-2">
+                        <p class="text-[10px] font-black text-teal-300">Tistory</p>
+                        <p id="bulk-tistory-count" class="text-sm font-black">-</p>
+                    </div>
+                </div>
+                <div id="bulk-publish-failures" class="max-h-56 space-y-1 overflow-y-auto pr-1"></div>
+            </div>
+        </section>
         <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
             {% if problem_summary.all_clear %}
             <p class="flex items-center gap-2 text-sm font-black text-emerald-800"><span class="text-lg">✅</span> 지금 문제 없음 — WP {{ problem_summary.wp_total }}·Blogspot {{ problem_summary.blogger_total }}·Tistory {{ problem_summary.tistory_total }}·YouTube {{ problem_summary.youtube_total }}·SNS {{ problem_summary.sns_total }} 전부 정상</p>
@@ -588,6 +619,69 @@
         </section>
     </main>
     <script>
+        (function () {
+            const statusBox = document.getElementById('bulk-publish-status');
+            const headline = document.getElementById('bulk-publish-headline');
+            const wpCount = document.getElementById('bulk-wp-count');
+            const bloggerCount = document.getElementById('bulk-blogger-count');
+            const tistoryCount = document.getElementById('bulk-tistory-count');
+            const failuresBox = document.getElementById('bulk-publish-failures');
+            const button = document.getElementById('bulk-publish-button');
+            if (!statusBox) return;
+            let pollTimer = null;
+            const statusLabels = { idle: '대기 중', dispatching: '발행 요청 전송 중…', polling: '완료 확인 중…', done: '완료' };
+
+            function renderCount(el, counts) {
+                if (!el) return;
+                if (!counts || !counts.total) { el.textContent = '해당 없음'; return; }
+                el.textContent = counts.success + '성공 / ' + counts.failed + '실패 / ' + counts.pending + '진행중 (총 ' + counts.total + ')';
+            }
+
+            function renderStatus(data) {
+                if (data.status === 'idle' && !data.total_items) { statusBox.classList.add('hidden'); return; }
+                statusBox.classList.remove('hidden');
+                let text = '상태: ' + (statusLabels[data.status] || data.status);
+                if (data.started_at) text += ' · 시작 ' + data.started_at.replace('T', ' ').slice(0, 19);
+                if (data.status === 'done' && data.finished_at) text += ' · 완료 ' + data.finished_at.replace('T', ' ').slice(0, 19);
+                headline.textContent = text;
+                renderCount(wpCount, data.counts && data.counts.wordpress);
+                renderCount(bloggerCount, data.counts && data.counts.blogger);
+                renderCount(tistoryCount, data.counts && data.counts.tistory);
+                failuresBox.innerHTML = '';
+                if (data.failures && data.failures.length) {
+                    const title = document.createElement('p');
+                    title.className = 'text-xs font-black text-rose-300';
+                    title.textContent = '실패 ' + data.failures.length + '건';
+                    failuresBox.appendChild(title);
+                    data.failures.forEach(function (failure) {
+                        const row = document.createElement('p');
+                        row.className = 'text-[11px] text-rose-100';
+                        row.textContent = failure.platform + ' · ' + failure.label + ' — ' + (failure.reason || '사유 미확인');
+                        failuresBox.appendChild(row);
+                    });
+                } else if (data.status === 'done') {
+                    const ok = document.createElement('p');
+                    ok.className = 'text-xs font-black text-emerald-300';
+                    ok.textContent = '실패 없음 — 전체 성공';
+                    failuresBox.appendChild(ok);
+                }
+                if (button) button.disabled = data.status === 'dispatching' || data.status === 'polling';
+                if (data.status === 'done' && pollTimer) {
+                    clearInterval(pollTimer);
+                    pollTimer = null;
+                }
+            }
+
+            function poll() {
+                fetch('/api/publish-all-status')
+                    .then(function (response) { return response.json(); })
+                    .then(renderStatus)
+                    .catch(function () {});
+            }
+
+            poll();
+            pollTimer = setInterval(poll, 8000);
+        })();
         function confirmForcePublish(event, form) {
             const mode = form.querySelector('.force-submit-mode').value;
             const picked = form.querySelector('.force-keyword-input').value.trim();

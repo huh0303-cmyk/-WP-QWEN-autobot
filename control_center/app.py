@@ -10,16 +10,18 @@ import json
 import csv
 import io
 import os
+import random
 import re
 import subprocess
 import html
 import hmac
 import secrets
+import threading
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from collections import Counter
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import unquote
@@ -995,10 +997,13 @@ def _queue_draft_trigger(payload: dict[str, object]) -> str:
     return trigger_id
 
 
-def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
-    """Dispatch the selected site's real generation and publication workflow."""
-    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
-    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+def _build_draft_workflow_call(payload: dict[str, object]) -> tuple[str, dict[str, str]]:
+    """Resolve the (workflow_name, inputs) pair for a draft/publish request.
+
+    Pulled out of _dispatch_draft_workflow so /trigger/publish-all can reuse
+    the exact same input-building logic (incl. the Blogger profile lookup)
+    without duplicating it, while the HTTP dispatch itself stays owned by
+    the caller (single-site vs bulk need different follow-up tracking)."""
     automatic_blogger_topic = payload.get("platform") == "blogger" and payload.get("selection_mode") == "auto"
     if automatic_blogger_topic:
         site_key = str(payload["site_id"]).removeprefix("blogger_")
@@ -1034,6 +1039,14 @@ def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
             "text_model": str(payload["text_model"]),
             "image_model": str(payload["image_model"]),
         }
+    return workflow_name, inputs
+
+
+def _dispatch_draft_workflow(payload: dict[str, object]) -> str:
+    """Dispatch the selected site's real generation and publication workflow."""
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    workflow_name, inputs = _build_draft_workflow_call(payload)
     if token:
         response = requests.post(
             f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
@@ -1312,6 +1325,277 @@ def trigger_publish_site_now():
     else:
         flash(success_message, "success")
     return redirect(url_for("index") + "#wordpress")
+
+
+_bulk_lock = threading.Lock()
+_BULK_STATE_PATH = Path(__file__).resolve().parents[1] / "data" / "bulk_publish_state.json"
+_BULK_STATE_DEFAULT: dict[str, object] = {"status": "idle", "started_at": None, "finished_at": None, "items": []}
+
+
+def _bulk_read() -> dict[str, object]:
+    """Read bulk-publish state from disk, not a process-local variable.
+
+    Production runs this app under gunicorn --workers 2 (see render.yaml):
+    the worker that handles the dispatching POST and the worker that later
+    handles a status-polling GET are frequently different OS processes, so
+    an in-memory dict would silently show "idle" to whichever worker didn't
+    do the dispatching — the exact "발행이 느린건지 확인 안됨" complaint this
+    feature exists to fix. Both workers share one filesystem on the same
+    Render instance, so a JSON file (same pattern as this repo's other
+    *_latest.json caches) is the simplest thing that actually works here.
+    """
+    try:
+        return json.loads(_BULK_STATE_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return dict(_BULK_STATE_DEFAULT)
+
+
+def _bulk_write(state: dict[str, object]) -> None:
+    with _bulk_lock:
+        _BULK_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = _BULK_STATE_PATH.with_suffix(".tmp")
+        tmp_path.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+        os.replace(tmp_path, _BULK_STATE_PATH)
+
+
+def _bulk_snapshot() -> dict[str, object]:
+    """Read the current/last bulk-publish run for the UI panel."""
+    state = _bulk_read()
+    status = state.get("status", "idle")
+    started_at = state.get("started_at")
+    finished_at = state.get("finished_at")
+    items = state.get("items", [])
+    counts = {}
+    for platform in ("wordpress", "blogger", "tistory"):
+        plat_items = [item for item in items if item["platform"] == platform]
+        counts[platform] = {
+            "total": len(plat_items),
+            "success": sum(1 for item in plat_items if item.get("conclusion") == "success"),
+            "failed": sum(1 for item in plat_items if item["status"] == "done" and item.get("conclusion") != "success"),
+            "pending": sum(1 for item in plat_items if item["status"] != "done"),
+        }
+    failures = [
+        {"label": item["label"], "platform": item["platform"], "reason": item.get("reason") or "", "run_url": item.get("run_url", "")}
+        for item in items
+        if item["status"] == "done" and item.get("conclusion") != "success"
+    ]
+    return {
+        "status": status, "started_at": started_at, "finished_at": finished_at,
+        "counts": counts, "failures": failures, "total_items": len(items),
+    }
+
+
+def _first_failed_step_label(repo: str, token: str, run_id: int) -> str:
+    """Best-effort one-line reason for a failed run: the first failed step's name."""
+    try:
+        response = requests.get(
+            f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            timeout=15,
+        )
+        response.raise_for_status()
+        for job in response.json().get("jobs", []):
+            if job.get("conclusion") != "failure":
+                continue
+            for step in job.get("steps", []) or []:
+                if step.get("conclusion") == "failure":
+                    return f"{step.get('name', '단계')} 실패"
+            return f"{job.get('name', '작업')} 실패"
+    except (requests.RequestException, ValueError):
+        pass
+    return ""
+
+
+def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[str, str], label: str, platform: str) -> dict[str, object]:
+    """Dispatch one workflow and try to find its resulting run id for later polling.
+
+    workflow_dispatch returns HTTP 204 with no run id, so this looks the run
+    up right after by filtering that workflow's recent runs to the
+    workflow_dispatch event created since this call started. It can
+    misattribute if something else dispatches the SAME workflow within the
+    same few seconds (e.g. a CEO manually clicking a single-site button
+    mid-bulk-run) — an acceptable, rare edge case, not a crash risk."""
+    item: dict[str, object] = {
+        "label": label, "platform": platform, "workflow": workflow_name,
+        "run_id": None, "run_url": "", "status": "dispatched", "conclusion": None, "reason": "",
+    }
+    dispatch_time = datetime.now(timezone.utc)
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
+            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+            json={"ref": "main", "inputs": inputs},
+            timeout=30,
+        )
+        if response.status_code != 204:
+            item.update(status="done", conclusion="dispatch_failed", reason=f"GitHub 실행요청 실패 (HTTP {response.status_code})")
+            return item
+    except requests.RequestException as exc:
+        item.update(status="done", conclusion="dispatch_failed", reason=f"GitHub 실행요청 실패 · {exc}")
+        return item
+
+    for _ in range(6):
+        time.sleep(2)
+        try:
+            runs_response = requests.get(
+                f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/runs",
+                headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+                params={"event": "workflow_dispatch", "per_page": 5},
+                timeout=15,
+            )
+            runs_response.raise_for_status()
+            candidates = [
+                row for row in runs_response.json().get("workflow_runs", [])
+                if datetime.fromisoformat(str(row["created_at"]).replace("Z", "+00:00")) >= dispatch_time - timedelta(seconds=15)
+            ]
+        except (requests.RequestException, ValueError, KeyError):
+            continue
+        if candidates:
+            newest = max(candidates, key=lambda row: row["created_at"])
+            item.update(run_id=newest["id"], run_url=newest.get("html_url", ""), status="running")
+            return item
+    # Run not found yet — still let the poller keep watching for completion
+    # by conclusion never resolving; mark it unresolved instead of failed.
+    item.update(status="done", conclusion="unknown", reason="실행 ID를 확인하지 못했습니다 · GitHub Actions에서 직접 확인 필요")
+    return item
+
+
+def _poll_bulk_items(repo: str, token: str, timeout_seconds: int = 1500) -> None:
+    """Update each dispatched item's real conclusion as its GitHub Actions run finishes."""
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        state = _bulk_read()
+        items = state.get("items", [])
+        pending = [item for item in items if item["status"] == "running" and item.get("run_id")]
+        if not pending:
+            break
+        changed = False
+        for item in pending:
+            try:
+                run_response = requests.get(
+                    f"https://api.github.com/repos/{repo}/actions/runs/{item['run_id']}",
+                    headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+                    timeout=15,
+                )
+                run_response.raise_for_status()
+                run_data = run_response.json()
+            except (requests.RequestException, ValueError):
+                continue
+            if run_data.get("status") != "completed":
+                continue
+            conclusion = str(run_data.get("conclusion") or "unknown")
+            reason = "" if conclusion == "success" else (_first_failed_step_label(repo, token, item["run_id"]) or conclusion)
+            item.update(status="done", conclusion=conclusion, reason=reason)
+            changed = True
+        if changed:
+            state["items"] = items
+            _bulk_write(state)
+        time.sleep(20)
+    state = _bulk_read()
+    items = state.get("items", [])
+    changed = False
+    for item in items:
+        if item["status"] == "running":
+            item.update(status="done", conclusion="timeout", reason="완료 확인 시간 초과 · GitHub Actions/시트에서 직접 확인 필요")
+            changed = True
+    if changed:
+        state["items"] = items
+        _bulk_write(state)
+
+
+def _run_bulk_publish() -> None:
+    """Background worker for the '전체글발행' button.
+
+    Publishes every auth-ready WordPress site (the 2 newsroom sites
+    excluded, per the CEO's request — they already run on their own RSS
+    cadence), every connected Blogspot channel, and the Tistory 5-site
+    review batch, in random order, then tracks each dispatched GitHub
+    Actions run to completion so the panel can show real success/failure
+    instead of just "request sent"."""
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    _bulk_write(state)
+
+    if not token:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": "전체글발행", "platform": "wordpress", "workflow": "", "run_id": None, "run_url": "",
+            "status": "done", "conclusion": "dispatch_failed",
+            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+        }])
+        _bulk_write(state)
+        return
+
+    wp_targets = [site for site in get_site_data() if site["cadence"]["kind"] != "newsroom" and site["auth_ready"]]
+    blogger_targets = [blog for blog in get_blogger_data() if blog["connected"]]
+    random.shuffle(wp_targets)
+    random.shuffle(blogger_targets)
+
+    dispatched: list[dict[str, object]] = []
+
+    def _record(item: dict[str, object]) -> None:
+        dispatched.append(item)
+        state["items"] = list(dispatched)
+        _bulk_write(state)
+
+    for site in wp_targets:
+        _record(_dispatch_and_track(
+            repo, token, "daily-network-publish.yml",
+            {
+                "target_site_url": f"https://{site['domain']}",
+                "publication_approved": "true",
+                "room_id": f"bulk-onebutton-{site['site_id']}",
+            },
+            label=site["domain"], platform="wordpress",
+        ))
+        time.sleep(8)  # stagger dispatches so shared GPT/Gemini/GH-Actions capacity doesn't 429 all at once
+
+    for blog in blogger_targets:
+        try:
+            workflow_name, inputs = _build_draft_workflow_call({
+                "platform": "blogger", "selection_mode": "auto", "site_id": blog["site_id"], "keyword": "",
+            })
+        except RuntimeError as exc:
+            _record({
+                "label": blog["name"], "platform": "blogger", "workflow": "blogger-rewrite.yml",
+                "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed", "reason": str(exc),
+            })
+            continue
+        _record(_dispatch_and_track(repo, token, workflow_name, inputs, label=blog["name"], platform="blogger"))
+        time.sleep(8)
+
+    _record(_dispatch_and_track(
+        repo, token, "tistory-daily-plan.yml",
+        {"site_ids": "", "run_key": f"bulk-{int(time.time())}"},
+        label="Tistory 5개 전체", platform="tistory",
+    ))
+
+    state["status"] = "polling"
+    _bulk_write(state)
+    _poll_bulk_items(repo, token)
+    state = _bulk_read()
+    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
+    _bulk_write(state)
+
+
+@app.post("/trigger/publish-all")
+def trigger_publish_all():
+    """CEO clicked the top '전체글발행' button — see _run_bulk_publish for what it does."""
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index"))
+    already_running = _bulk_read().get("status") in {"dispatching", "polling"}
+    if already_running:
+        flash("전체글발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
+        return redirect(url_for("index"))
+    threading.Thread(target=_run_bulk_publish, daemon=True).start()
+    flash("전체글발행을 시작했습니다. 완료까지 몇 분에서 최대 20여 분 걸릴 수 있습니다 — 아래 발행 결과 패널에서 실시간으로 확인하세요.", "success")
+    return redirect(url_for("index"))
+
+
+@app.get("/api/publish-all-status")
+def publish_all_status():
+    return jsonify(_bulk_snapshot())
 
 
 def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:
