@@ -1328,61 +1328,95 @@ def trigger_publish_site_now():
 
 
 _bulk_lock = threading.Lock()
-_BULK_STATE_PATH = Path(__file__).resolve().parents[1] / "data" / "bulk_publish_state.json"
+_BULK_GROUPS = ("wp25", "news2", "blogspot33", "tistory5")
+_BULK_GROUP_TITLES = {
+    "wp25": "WP 25개", "news2": "뉴스룸 2채널", "blogspot33": "Blogspot", "tistory5": "Tistory 5개",
+}
 _BULK_STATE_DEFAULT: dict[str, object] = {"status": "idle", "started_at": None, "finished_at": None, "items": []}
 
 
-def _bulk_read() -> dict[str, object]:
-    """Read bulk-publish state from disk, not a process-local variable.
+def _bulk_state_path(group: str) -> Path:
+    return Path(__file__).resolve().parents[1] / "data" / f"bulk_publish_state_{group}.json"
+
+
+def _bulk_read(group: str) -> dict[str, object]:
+    """Read one group's bulk-publish state from disk, not a process-local variable.
 
     Production runs this app under gunicorn --workers 2 (see render.yaml):
     the worker that handles the dispatching POST and the worker that later
     handles a status-polling GET are frequently different OS processes, so
     an in-memory dict would silently show "idle" to whichever worker didn't
-    do the dispatching — the exact "발행이 느린건지 확인 안됨" complaint this
-    feature exists to fix. Both workers share one filesystem on the same
-    Render instance, so a JSON file (same pattern as this repo's other
-    *_latest.json caches) is the simplest thing that actually works here.
+    do the dispatching. Each of the four publish groups (WP25/News2/
+    Blogspot33/Tistory5) gets its own file so they run and report
+    independently — mixing them into one queue was exactly why the CEO
+    could not tell which stage a stalled run was stuck on (2026-09-06).
     """
     try:
-        return json.loads(_BULK_STATE_PATH.read_text(encoding="utf-8"))
+        return json.loads(_bulk_state_path(group).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return dict(_BULK_STATE_DEFAULT)
 
 
-def _bulk_write(state: dict[str, object]) -> None:
+def _bulk_write(group: str, state: dict[str, object]) -> None:
+    path = _bulk_state_path(group)
     with _bulk_lock:
-        _BULK_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        tmp_path = _BULK_STATE_PATH.with_suffix(".tmp")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = path.with_suffix(".tmp")
         tmp_path.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
-        os.replace(tmp_path, _BULK_STATE_PATH)
+        os.replace(tmp_path, path)
 
 
-def _bulk_snapshot() -> dict[str, object]:
-    """Read the current/last bulk-publish run for the UI panel."""
-    state = _bulk_read()
-    status = state.get("status", "idle")
-    started_at = state.get("started_at")
-    finished_at = state.get("finished_at")
-    items = state.get("items", [])
-    counts = {}
-    for platform in ("wordpress", "blogger", "tistory"):
-        plat_items = [item for item in items if item["platform"] == platform]
-        counts[platform] = {
-            "total": len(plat_items),
-            "success": sum(1 for item in plat_items if item.get("conclusion") == "success"),
-            "failed": sum(1 for item in plat_items if item["status"] == "done" and item.get("conclusion") != "success"),
-            "pending": sum(1 for item in plat_items if item["status"] != "done"),
-        }
-    failures = [
-        {"label": item["label"], "platform": item["platform"], "reason": item.get("reason") or "", "run_url": item.get("run_url", "")}
-        for item in items
-        if item["status"] == "done" and item.get("conclusion") != "success"
-    ]
-    return {
-        "status": status, "started_at": started_at, "finished_at": finished_at,
-        "counts": counts, "failures": failures, "total_items": len(items),
-    }
+@lru_cache(maxsize=1)
+def _budget_state_cached(five_minute_bucket: int) -> dict[str, object]:
+    """Read this repo's budget_state.json (committed by CI) for cost lookups.
+
+    Only auto_write_and_draft.py (single-site keyword button) and
+    queue_blogger_rewrite.py (Blogspot) call budget_guard.check_and_record
+    today — the WP25/News2/Tistory workflows do not yet log real spend, so
+    cost is only ever exact for Blogspot items; everything else falls back
+    to a labeled estimate rather than a fabricated precise number."""
+    del five_minute_bucket
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    try:
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/budget_state.json", timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except (requests.RequestException, ValueError):
+        return {}
+
+
+def _estimate_item_cost(item: dict[str, object]) -> str:
+    """Best-effort spend note for one failed item, for the '발행실패때 api 비용계산' ask."""
+    if item.get("platform") == "blogger" and item.get("site_id"):
+        budget = _budget_state_cached(int(time.time() // 300))
+        dispatched_at = item.get("dispatched_at") or ""
+        label_prefix = f"blogger-rewrite:{item['site_id']}"
+        try:
+            since = datetime.fromisoformat(str(dispatched_at))
+        except ValueError:
+            since = None
+        total = 0.0
+        matched = 0
+        for call in budget.get("calls", []) if isinstance(budget, dict) else []:
+            if call.get("label") != label_prefix:
+                continue
+            if since is not None:
+                try:
+                    call_at = datetime.fromisoformat(str(call.get("at", "")))
+                except ValueError:
+                    continue
+                if call_at < since - timedelta(minutes=1):
+                    continue
+            total += float(call.get("amount_usd") or 0)
+            matched += 1
+        if matched:
+            return f"약 ${total:.2f} (실측, budget_state.json {matched}건)"
+        return "실측 비용 기록 없음(시도가 과금 전 단계에서 중단됐을 수 있음)"
+    # WP25 / News2 / Tistory don't call budget_guard yet, so this is a
+    # documented flat estimate (GPT-5-mini text-gen ≈ $0.03/attempt, up to
+    # 3 attempts, matching the per-call rate budget_guard.py already uses
+    # elsewhere), not a real measurement.
+    return "약 $0.03~$0.09 (추정 · 이 경로는 실측 비용 기록이 아직 연결되어 있지 않음, 텍스트 재생성 최대 3회 기준)"
 
 
 def _first_failed_step_label(repo: str, token: str, run_id: int) -> str:
@@ -1406,7 +1440,35 @@ def _first_failed_step_label(repo: str, token: str, run_id: int) -> str:
     return ""
 
 
-def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[str, str], label: str, platform: str) -> dict[str, object]:
+def _bulk_snapshot(group: str) -> dict[str, object]:
+    """Read one group's current/last bulk-publish run for its UI panel."""
+    state = _bulk_read(group)
+    status = state.get("status", "idle")
+    started_at = state.get("started_at")
+    finished_at = state.get("finished_at")
+    items = state.get("items", [])
+    counts = {
+        "total": len(items),
+        "success": sum(1 for item in items if item.get("conclusion") == "success"),
+        "failed": sum(1 for item in items if item["status"] == "done" and item.get("conclusion") != "success"),
+        "pending": sum(1 for item in items if item["status"] != "done"),
+    }
+    failures = [
+        {
+            "label": item["label"], "reason": item.get("reason") or "", "run_url": item.get("run_url", ""),
+            "cost": _estimate_item_cost(item),
+        }
+        for item in items
+        if item["status"] == "done" and item.get("conclusion") != "success"
+    ]
+    return {
+        "group": group, "title": _BULK_GROUP_TITLES.get(group, group),
+        "status": status, "started_at": started_at, "finished_at": finished_at,
+        "counts": counts, "failures": failures,
+    }
+
+
+def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[str, str], label: str, platform: str, site_id: str = "") -> dict[str, object]:
     """Dispatch one workflow and try to find its resulting run id for later polling.
 
     workflow_dispatch returns HTTP 204 with no run id, so this looks the run
@@ -1416,8 +1478,9 @@ def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[
     same few seconds (e.g. a CEO manually clicking a single-site button
     mid-bulk-run) — an acceptable, rare edge case, not a crash risk."""
     item: dict[str, object] = {
-        "label": label, "platform": platform, "workflow": workflow_name,
+        "label": label, "platform": platform, "site_id": site_id, "workflow": workflow_name,
         "run_id": None, "run_url": "", "status": "dispatched", "conclusion": None, "reason": "",
+        "dispatched_at": datetime.now(timezone.utc).isoformat(),
     }
     dispatch_time = datetime.now(timezone.utc)
     try:
@@ -1460,11 +1523,11 @@ def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[
     return item
 
 
-def _poll_bulk_items(repo: str, token: str, timeout_seconds: int = 1500) -> None:
+def _poll_bulk_items(group: str, repo: str, token: str, timeout_seconds: int = 1500) -> None:
     """Update each dispatched item's real conclusion as its GitHub Actions run finishes."""
     deadline = time.time() + timeout_seconds
     while time.time() < deadline:
-        state = _bulk_read()
+        state = _bulk_read(group)
         items = state.get("items", [])
         pending = [item for item in items if item["status"] == "running" and item.get("run_id")]
         if not pending:
@@ -1489,9 +1552,9 @@ def _poll_bulk_items(repo: str, token: str, timeout_seconds: int = 1500) -> None
             changed = True
         if changed:
             state["items"] = items
-            _bulk_write(state)
+            _bulk_write(group, state)
         time.sleep(20)
-    state = _bulk_read()
+    state = _bulk_read(group)
     items = state.get("items", [])
     changed = False
     for item in items:
@@ -1500,102 +1563,122 @@ def _poll_bulk_items(repo: str, token: str, timeout_seconds: int = 1500) -> None
             changed = True
     if changed:
         state["items"] = items
-        _bulk_write(state)
+        _bulk_write(group, state)
 
 
-def _run_bulk_publish() -> None:
-    """Background worker for the '전체글발행' button.
+def _run_group_publish(group: str) -> None:
+    """Background worker for one of the four split publish buttons.
 
-    Publishes every auth-ready WordPress site (the 2 newsroom sites
-    excluded, per the CEO's request — they already run on their own RSS
-    cadence), every connected Blogspot channel, and the Tistory 5-site
-    review batch, in random order, then tracks each dispatched GitHub
-    Actions run to completion so the panel can show real success/failure
-    instead of just "request sent"."""
+    2026-09-06 CEO: the single combined '전체글발행' button mixed WP(25) +
+    Blogspot(33) + Tistory(5) into one 63-item queue, which made it
+    impossible to tell which stage a long run was actually stuck on.
+    Split into four independently-triggerable, independently-tracked
+    groups: wp25, news2 (the 2 newsroom sites), blogspot33, tistory5.
+    YouTube already has its own per-channel button in the dashboard and
+    is intentionally not part of this grouping."""
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
-    _bulk_write(state)
+    _bulk_write(group, state)
 
     if not token:
         state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
-            "label": "전체글발행", "platform": "wordpress", "workflow": "", "run_id": None, "run_url": "",
-            "status": "done", "conclusion": "dispatch_failed",
+            "label": _BULK_GROUP_TITLES.get(group, group), "platform": group, "site_id": "", "workflow": "",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
             "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
         }])
-        _bulk_write(state)
+        _bulk_write(group, state)
         return
-
-    wp_targets = [site for site in get_site_data() if site["cadence"]["kind"] != "newsroom" and site["auth_ready"]]
-    blogger_targets = [blog for blog in get_blogger_data() if blog["connected"]]
-    random.shuffle(wp_targets)
-    random.shuffle(blogger_targets)
 
     dispatched: list[dict[str, object]] = []
 
     def _record(item: dict[str, object]) -> None:
         dispatched.append(item)
         state["items"] = list(dispatched)
-        _bulk_write(state)
+        _bulk_write(group, state)
 
-    for site in wp_targets:
+    if group == "wp25":
+        targets = [site for site in get_site_data() if site["cadence"]["kind"] != "newsroom" and site["auth_ready"]]
+        random.shuffle(targets)
+        for site in targets:
+            _record(_dispatch_and_track(
+                repo, token, "daily-network-publish.yml",
+                {
+                    "target_site_url": f"https://{site['domain']}",
+                    "publication_approved": "true",
+                    "room_id": f"bulk-wp25-{site['site_id']}",
+                },
+                label=site["domain"], platform="wordpress", site_id=site["site_id"],
+            ))
+            time.sleep(8)  # stagger dispatches so shared GPT/Gemini/GH-Actions capacity doesn't 429 all at once
+
+    elif group == "news2":
+        newsrooms = [("koreanews365", "koreanews365.com"), ("theseouljournal", "theseouljournal.com")]
+        random.shuffle(newsrooms)
+        for newsroom_key, domain in newsrooms:
+            _record(_dispatch_and_track(
+                repo, token, "newsrooms-daily-publisher.yml",
+                {"newsroom": newsroom_key, "preferred_category": ""},
+                label=domain, platform="news", site_id=newsroom_key,
+            ))
+            time.sleep(8)
+
+    elif group == "blogspot33":
+        targets = [blog for blog in get_blogger_data() if blog["connected"]]
+        random.shuffle(targets)
+        for blog in targets:
+            try:
+                workflow_name, inputs = _build_draft_workflow_call({
+                    "platform": "blogger", "selection_mode": "auto", "site_id": blog["site_id"], "keyword": "",
+                })
+            except RuntimeError as exc:
+                _record({
+                    "label": blog["name"], "platform": "blogger", "site_id": blog["site_id"], "workflow": "blogger-rewrite.yml",
+                    "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed", "reason": str(exc),
+                    "dispatched_at": datetime.now(timezone.utc).isoformat(),
+                })
+                continue
+            _record(_dispatch_and_track(repo, token, workflow_name, inputs, label=blog["name"], platform="blogger", site_id=blog["site_id"]))
+            time.sleep(8)
+
+    elif group == "tistory5":
         _record(_dispatch_and_track(
-            repo, token, "daily-network-publish.yml",
-            {
-                "target_site_url": f"https://{site['domain']}",
-                "publication_approved": "true",
-                "room_id": f"bulk-onebutton-{site['site_id']}",
-            },
-            label=site["domain"], platform="wordpress",
+            repo, token, "tistory-daily-plan.yml",
+            {"site_ids": "", "run_key": f"bulk-{int(time.time())}"},
+            label="Tistory 5개 전체", platform="tistory",
         ))
-        time.sleep(8)  # stagger dispatches so shared GPT/Gemini/GH-Actions capacity doesn't 429 all at once
-
-    for blog in blogger_targets:
-        try:
-            workflow_name, inputs = _build_draft_workflow_call({
-                "platform": "blogger", "selection_mode": "auto", "site_id": blog["site_id"], "keyword": "",
-            })
-        except RuntimeError as exc:
-            _record({
-                "label": blog["name"], "platform": "blogger", "workflow": "blogger-rewrite.yml",
-                "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed", "reason": str(exc),
-            })
-            continue
-        _record(_dispatch_and_track(repo, token, workflow_name, inputs, label=blog["name"], platform="blogger"))
-        time.sleep(8)
-
-    _record(_dispatch_and_track(
-        repo, token, "tistory-daily-plan.yml",
-        {"site_ids": "", "run_key": f"bulk-{int(time.time())}"},
-        label="Tistory 5개 전체", platform="tistory",
-    ))
 
     state["status"] = "polling"
-    _bulk_write(state)
-    _poll_bulk_items(repo, token)
-    state = _bulk_read()
+    _bulk_write(group, state)
+    _poll_bulk_items(group, repo, token)
+    state = _bulk_read(group)
     state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
-    _bulk_write(state)
+    _bulk_write(group, state)
 
 
-@app.post("/trigger/publish-all")
-def trigger_publish_all():
-    """CEO clicked the top '전체글발행' button — see _run_bulk_publish for what it does."""
+@app.post("/trigger/publish-group/<group>")
+def trigger_publish_group(group: str):
+    """One of the four split publish buttons — see _run_group_publish."""
+    if group not in _BULK_GROUPS:
+        flash("알 수 없는 발행 그룹입니다.", "error")
+        return redirect(url_for("index"))
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index"))
-    already_running = _bulk_read().get("status") in {"dispatching", "polling"}
+    already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
     if already_running:
-        flash("전체글발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
+        flash(f"{_BULK_GROUP_TITLES.get(group, group)} 발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
         return redirect(url_for("index"))
-    threading.Thread(target=_run_bulk_publish, daemon=True).start()
-    flash("전체글발행을 시작했습니다. 완료까지 몇 분에서 최대 20여 분 걸릴 수 있습니다 — 아래 발행 결과 패널에서 실시간으로 확인하세요.", "success")
+    threading.Thread(target=_run_group_publish, args=(group,), daemon=True).start()
+    flash(f"{_BULK_GROUP_TITLES.get(group, group)} 발행을 시작했습니다 — 아래 패널에서 실시간으로 확인하세요.", "success")
     return redirect(url_for("index"))
 
 
-@app.get("/api/publish-all-status")
-def publish_all_status():
-    return jsonify(_bulk_snapshot())
+@app.get("/api/publish-group-status/<group>")
+def publish_group_status(group: str):
+    if group not in _BULK_GROUPS:
+        return jsonify({"error": "unknown group"}), 404
+    return jsonify(_bulk_snapshot(group))
 
 
 def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:

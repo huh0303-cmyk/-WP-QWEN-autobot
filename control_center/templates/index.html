@@ -51,35 +51,33 @@
         </div>
         {% endif %}
         {% endwith %}
-        <section id="bulk-publish" class="rounded-3xl border-2 border-slate-900 bg-slate-950 p-4 text-white shadow-lg sm:p-5">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-xs font-black text-amber-300">한 번에 전체 실행</p>
-                    <h2 class="text-xl font-black sm:text-2xl">전체글발행</h2>
-                    <p class="mt-1 text-xs leading-relaxed text-slate-300">WP 25(뉴스 2개 제외) · Blogspot {{ bloggers|length }} · Tistory 5 순서를 무작위로 섞어 한 번에 실행합니다. 실제 완료 결과는 아래 패널에서 실시간으로 확인하세요.</p>
-                </div>
-                <form method="post" action="{{ url_for('trigger_publish_all') }}" onsubmit="return confirm('WP·Blogspot·Tistory 전체 사이트 발행을 지금 시작할까요? 완료까지 최대 20여 분 걸릴 수 있습니다.');">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button id="bulk-publish-button" type="submit" class="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-rose-500 px-6 text-base font-black text-slate-950 shadow-md transition active:scale-[.98] hover:from-amber-300 hover:to-rose-400 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">전체글발행 시작 →</button>
-                </form>
+        <section id="bulk-publish" class="space-y-3">
+            <div>
+                <p class="text-xs font-black text-amber-300">그룹별로 따로 실행 · 어디서 멈췄는지 바로 확인</p>
+                <h2 class="text-xl font-black text-slate-900 sm:text-2xl">발행 컨트롤</h2>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. (유튜브는 채널별로 아래 YouTube 통제실에서 하나씩 실행하세요.)</p>
             </div>
-            <div id="bulk-publish-status" class="mt-4 hidden space-y-3 border-t border-white/10 pt-4">
-                <p id="bulk-publish-headline" class="text-sm font-bold text-slate-200"></p>
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    <div class="rounded-xl bg-white/10 px-3 py-2">
-                        <p class="text-[10px] font-black text-blue-300">WordPress</p>
-                        <p id="bulk-wp-count" class="text-sm font-black">-</p>
-                    </div>
-                    <div class="rounded-xl bg-white/10 px-3 py-2">
-                        <p class="text-[10px] font-black text-violet-300">Blogspot</p>
-                        <p id="bulk-blogger-count" class="text-sm font-black">-</p>
-                    </div>
-                    <div class="rounded-xl bg-white/10 px-3 py-2">
-                        <p class="text-[10px] font-black text-teal-300">Tistory</p>
-                        <p id="bulk-tistory-count" class="text-sm font-black">-</p>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {% for group, title, desc, confirm_msg, color in [
+                    ('wp25', 'WP 25개', '뉴스 2개 제외 · 매번 무작위 순서', 'WP 25개 사이트 발행을 지금 시작할까요?', 'blue'),
+                    ('news2', '뉴스룸 2채널', 'koreanews365 · theseouljournal', '뉴스룸 2채널 발행을 지금 시작할까요?', 'amber'),
+                    ('blogspot33', 'Blogspot', bloggers|length ~ '개 · 매번 무작위 순서', 'Blogspot 전체 채널 발행을 지금 시작할까요?', 'violet'),
+                    ('tistory5', 'Tistory 5개', '비공개 검토본 생성', 'Tistory 5개 사이트 검토본 생성을 지금 시작할까요?', 'teal'),
+                ] %}
+                <div class="rounded-3xl border-2 border-slate-900 bg-slate-950 p-4 text-white shadow-lg">
+                    <p class="text-[10px] font-black text-{{ color }}-300">{{ desc }}</p>
+                    <h3 class="text-lg font-black">{{ title }}</h3>
+                    <form method="post" action="{{ url_for('trigger_publish_group', group=group) }}" onsubmit="return confirm('{{ confirm_msg }}');" class="mt-3">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button id="bulk-button-{{ group }}" type="submit" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-rose-500 px-4 text-sm font-black text-slate-950 shadow-md transition active:scale-[.98] hover:from-amber-300 hover:to-rose-400 disabled:cursor-not-allowed disabled:opacity-60">{{ title }} 발행 →</button>
+                    </form>
+                    <div id="bulk-status-{{ group }}" class="mt-3 hidden space-y-2 border-t border-white/10 pt-3">
+                        <p id="bulk-headline-{{ group }}" class="text-[11px] font-bold text-slate-300"></p>
+                        <p id="bulk-counts-{{ group }}" class="text-sm font-black"></p>
+                        <div id="bulk-failures-{{ group }}" class="max-h-48 space-y-1.5 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
-                <div id="bulk-publish-failures" class="max-h-56 space-y-1 overflow-y-auto pr-1"></div>
+                {% endfor %}
             </div>
         </section>
         <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
@@ -619,34 +617,27 @@
         </section>
     </main>
     <script>
-        (function () {
-            const statusBox = document.getElementById('bulk-publish-status');
-            const headline = document.getElementById('bulk-publish-headline');
-            const wpCount = document.getElementById('bulk-wp-count');
-            const bloggerCount = document.getElementById('bulk-blogger-count');
-            const tistoryCount = document.getElementById('bulk-tistory-count');
-            const failuresBox = document.getElementById('bulk-publish-failures');
-            const button = document.getElementById('bulk-publish-button');
+        ['wp25', 'news2', 'blogspot33', 'tistory5'].forEach(function (group) {
+            const statusBox = document.getElementById('bulk-status-' + group);
+            const headline = document.getElementById('bulk-headline-' + group);
+            const counts = document.getElementById('bulk-counts-' + group);
+            const failuresBox = document.getElementById('bulk-failures-' + group);
+            const button = document.getElementById('bulk-button-' + group);
             if (!statusBox) return;
             let pollTimer = null;
             const statusLabels = { idle: '대기 중', dispatching: '발행 요청 전송 중…', polling: '완료 확인 중…', done: '완료' };
 
-            function renderCount(el, counts) {
-                if (!el) return;
-                if (!counts || !counts.total) { el.textContent = '해당 없음'; return; }
-                el.textContent = counts.success + '성공 / ' + counts.failed + '실패 / ' + counts.pending + '진행중 (총 ' + counts.total + ')';
-            }
-
             function renderStatus(data) {
-                if (data.status === 'idle' && !data.total_items) { statusBox.classList.add('hidden'); return; }
+                if (data.status === 'idle' && !data.counts.total) { statusBox.classList.add('hidden'); return; }
                 statusBox.classList.remove('hidden');
                 let text = '상태: ' + (statusLabels[data.status] || data.status);
                 if (data.started_at) text += ' · 시작 ' + data.started_at.replace('T', ' ').slice(0, 19);
                 if (data.status === 'done' && data.finished_at) text += ' · 완료 ' + data.finished_at.replace('T', ' ').slice(0, 19);
                 headline.textContent = text;
-                renderCount(wpCount, data.counts && data.counts.wordpress);
-                renderCount(bloggerCount, data.counts && data.counts.blogger);
-                renderCount(tistoryCount, data.counts && data.counts.tistory);
+                const c = data.counts;
+                counts.textContent = c.total
+                    ? c.success + '성공 / ' + c.failed + '실패 / ' + c.pending + '진행중 (총 ' + c.total + ')'
+                    : '해당 없음';
                 failuresBox.innerHTML = '';
                 if (data.failures && data.failures.length) {
                     const title = document.createElement('p');
@@ -656,8 +647,12 @@
                     data.failures.forEach(function (failure) {
                         const row = document.createElement('p');
                         row.className = 'text-[11px] text-rose-100';
-                        row.textContent = failure.platform + ' · ' + failure.label + ' — ' + (failure.reason || '사유 미확인');
+                        row.textContent = failure.label + ' — ' + (failure.reason || '사유 미확인');
+                        const costRow = document.createElement('p');
+                        costRow.className = 'text-[10px] text-rose-200/80 pl-2';
+                        costRow.textContent = '비용: ' + failure.cost;
                         failuresBox.appendChild(row);
+                        failuresBox.appendChild(costRow);
                     });
                 } else if (data.status === 'done') {
                     const ok = document.createElement('p');
@@ -673,7 +668,7 @@
             }
 
             function poll() {
-                fetch('/api/publish-all-status')
+                fetch('/api/publish-group-status/' + group)
                     .then(function (response) { return response.json(); })
                     .then(renderStatus)
                     .catch(function () {});
@@ -681,7 +676,7 @@
 
             poll();
             pollTimer = setInterval(poll, 8000);
-        })();
+        });
         function confirmForcePublish(event, form) {
             const mode = form.querySelector('.force-submit-mode').value;
             const picked = form.querySelector('.force-keyword-input').value.trim();
