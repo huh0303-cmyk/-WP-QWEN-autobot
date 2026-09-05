@@ -1182,6 +1182,43 @@ def trigger_tistory_plan():
     return redirect(url_for("index") + "#tistory")
 
 
+def _run_youtube_publish(channel_key: str, label: str) -> None:
+    """Background worker for one YouTube channel's '바로 만들기' button.
+
+    2026-09-06 CEO: wanted the same always-visible success/failure tracking
+    on YouTube as the four split publish buttons, instead of a one-shot
+    flash message with no way to tell if it actually finished. Reuses the
+    same dispatch+poll state machine, scoped to a per-channel group key
+    (youtube_<channel_key>) so all 10 channels track fully independently."""
+    group = f"youtube_{channel_key}"
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    _bulk_write(group, state)
+
+    if not token:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": label, "platform": "youtube", "site_id": channel_key, "workflow": "",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
+            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+        }])
+        _bulk_write(group, state)
+        return
+
+    item = _dispatch_and_track(
+        repo, token, "youtube-control-scheduler.yml",
+        {"dry_run": "false", "max_dispatch": "1", "channel_key": channel_key, "run_now": "true"},
+        label=label, platform="youtube", site_id=channel_key,
+    )
+    state["items"] = [item]
+    state["status"] = "polling"
+    _bulk_write(group, state)
+    _poll_bulk_items(group, repo, token, timeout_seconds=1800)  # video render + upload can run long
+    state = _bulk_read(group)
+    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
+    _bulk_write(group, state)
+
+
 @app.post("/trigger/youtube-batch")
 def trigger_youtube_batch():
     """Ask the central scheduler for at most one private upload per channel."""
@@ -1189,33 +1226,18 @@ def trigger_youtube_batch():
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
         return redirect(url_for("index") + "#youtube")
     channel_key = request.form.get("channel_key", "").strip()
-    allowed_channel_keys = {
-        str(channel["channel_key"])
-        for channel in get_youtube_data()
-        if channel.get("action_ready")
-    }
-    if not channel_key or channel_key not in allowed_channel_keys:
+    channels_by_key = {str(channel["channel_key"]): channel for channel in get_youtube_data() if channel.get("action_ready")}
+    if not channel_key or channel_key not in channels_by_key:
         flash("콘텐츠 실행이 연결된 YouTube 채널이 아닙니다.", "error")
         return redirect(url_for("index") + "#youtube")
-    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
-    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
-    if not token:
-        flash("YouTube 중앙 스케줄러 실행용 GitHub 연결이 필요합니다.", "error")
+    group = f"youtube_{channel_key}"
+    already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
+    label = str(channels_by_key[channel_key].get("official_name") or channel_key)
+    if already_running:
+        flash(f"{label} 실행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
         return redirect(url_for("index") + "#youtube")
-    try:
-        response = requests.post(
-            f"https://api.github.com/repos/{repo}/actions/workflows/youtube-control-scheduler.yml/dispatches",
-            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": {"dry_run": "false", "max_dispatch": "1", "channel_key": channel_key, "run_now": "true"}},
-            timeout=30,
-        )
-        if response.status_code != 204:
-            raise RuntimeError(f"GitHub API dispatch failed ({response.status_code})")
-    except (requests.RequestException, RuntimeError) as exc:
-        flash(f"YouTube 10채널 실행 요청 실패 · {exc}", "error")
-    else:
-        target = channel_key or "전체 채널"
-        flash(f"YouTube {target} 영상 제작을 시작했습니다. 다음 준비 항목 1개를 만들어 비공개로 업로드합니다.", "success")
+    threading.Thread(target=_run_youtube_publish, args=(channel_key, label), daemon=True).start()
+    flash(f"{label} 콘텐츠 제작을 시작했습니다 — 채널 카드 아래에서 실시간으로 확인하세요.", "success")
     return redirect(url_for("index") + "#youtube")
 
 
@@ -1676,7 +1698,7 @@ def trigger_publish_group(group: str):
 
 @app.get("/api/publish-group-status/<group>")
 def publish_group_status(group: str):
-    if group not in _BULK_GROUPS:
+    if group not in _BULK_GROUPS and not group.startswith("youtube_"):
         return jsonify({"error": "unknown group"}), 404
     return jsonify(_bulk_snapshot(group))
 

@@ -542,8 +542,14 @@
                     <form method="post" action="{{ url_for('trigger_youtube_batch') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="channel_key" value="{{ channel.channel_key }}">
-                        <button type="submit" class="flex h-12 w-full items-center justify-center rounded-xl border border-sky-300 bg-gradient-to-r from-sky-200 to-indigo-200 px-4 text-sm font-black text-sky-950 shadow-sm transition hover:from-sky-300 hover:to-indigo-300 active:scale-[.98]">YouTube 콘텐츠 바로 만들기 · 비공개</button>
+                        <button id="bulk-button-youtube_{{ channel.channel_key }}" type="submit" class="flex h-12 w-full items-center justify-center rounded-xl border border-sky-300 bg-gradient-to-r from-sky-200 to-indigo-200 px-4 text-sm font-black text-sky-950 shadow-sm transition hover:from-sky-300 hover:to-indigo-300 active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-60">YouTube 콘텐츠 바로 만들기 · 비공개</button>
                     </form>
+                    <div class="youtube-bulk-group" data-group="youtube_{{ channel.channel_key }}"></div>
+                    <div id="bulk-status-youtube_{{ channel.channel_key }}" class="space-y-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2">
+                        <p id="bulk-headline-youtube_{{ channel.channel_key }}" class="text-[11px] font-bold text-slate-500">상태: 불러오는 중…</p>
+                        <p id="bulk-counts-youtube_{{ channel.channel_key }}" class="text-sm font-black text-slate-800">-</p>
+                        <div id="bulk-failures-youtube_{{ channel.channel_key }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div>
+                    </div>
                     {% else %}
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">YouTube 바로 올리기 · 연결 없음</div>
                     {% endif %}
@@ -617,7 +623,7 @@
         </section>
     </main>
     <script>
-        ['wp25', 'news2', 'blogspot33', 'tistory5'].forEach(function (group) {
+        function wireBulkStatus(group, light) {
             const statusBox = document.getElementById('bulk-status-' + group);
             const headline = document.getElementById('bulk-headline-' + group);
             const counts = document.getElementById('bulk-counts-' + group);
@@ -626,6 +632,9 @@
             if (!statusBox) return;
             let pollTimer = null;
             const statusLabels = { idle: '대기 중', dispatching: '발행 요청 전송 중…', polling: '완료 확인 중…', done: '완료' };
+            const c = light
+                ? { title: 'text-rose-700', reason: 'text-rose-700', cost: 'text-rose-500', ok: 'text-emerald-700' }
+                : { title: 'text-rose-300', reason: 'text-rose-100', cost: 'text-rose-200/80', ok: 'text-emerald-300' };
 
             function renderStatus(data) {
                 let text = '상태: ' + (statusLabels[data.status] || data.status);
@@ -633,29 +642,29 @@
                 if (data.started_at) text += ' · 시작 ' + data.started_at.replace('T', ' ').slice(0, 19);
                 if (data.status === 'done' && data.finished_at) text += ' · 완료 ' + data.finished_at.replace('T', ' ').slice(0, 19);
                 headline.textContent = text;
-                const c = data.counts;
-                counts.textContent = c.total
-                    ? c.success + '성공 / ' + c.failed + '실패 / ' + c.pending + '진행중 (총 ' + c.total + ')'
+                const cc = data.counts;
+                counts.textContent = cc.total
+                    ? cc.success + '성공 / ' + cc.failed + '실패 / ' + cc.pending + '진행중 (총 ' + cc.total + ')'
                     : '아직 없음';
                 failuresBox.innerHTML = '';
                 if (data.failures && data.failures.length) {
                     const title = document.createElement('p');
-                    title.className = 'text-xs font-black text-rose-300';
+                    title.className = 'text-xs font-black ' + c.title;
                     title.textContent = '실패 ' + data.failures.length + '건';
                     failuresBox.appendChild(title);
                     data.failures.forEach(function (failure) {
                         const row = document.createElement('p');
-                        row.className = 'text-[11px] text-rose-100';
+                        row.className = 'text-[11px] ' + c.reason;
                         row.textContent = failure.label + ' — ' + (failure.reason || '사유 미확인');
                         const costRow = document.createElement('p');
-                        costRow.className = 'text-[10px] text-rose-200/80 pl-2';
+                        costRow.className = 'text-[10px] pl-2 ' + c.cost;
                         costRow.textContent = '비용: ' + failure.cost;
                         failuresBox.appendChild(row);
                         failuresBox.appendChild(costRow);
                     });
                 } else if (data.status === 'done') {
                     const ok = document.createElement('p');
-                    ok.className = 'text-xs font-black text-emerald-300';
+                    ok.className = 'text-xs font-black ' + c.ok;
                     ok.textContent = '실패 없음 — 전체 성공';
                     failuresBox.appendChild(ok);
                 }
@@ -675,6 +684,11 @@
 
             poll();
             pollTimer = setInterval(poll, 8000);
+        }
+
+        ['wp25', 'news2', 'blogspot33', 'tistory5'].forEach(function (group) { wireBulkStatus(group, false); });
+        document.querySelectorAll('.youtube-bulk-group').forEach(function (el) {
+            wireBulkStatus(el.dataset.group, true);
         });
         function confirmForcePublish(event, form) {
             const mode = form.querySelector('.force-submit-mode').value;

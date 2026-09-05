@@ -308,8 +308,25 @@ def test_youtube_trigger_dispatches_the_selected_real_channel(monkeypatch):
     monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
     monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
     client = control_center_app.test_client()
-    with patch("control_center.app.requests.post") as dispatch:
+
+    class SyncThread:
+        """The real endpoint dispatches from a background thread so the
+        status panel can poll it to completion; run the target inline here
+        so the assertions below see the dispatch call deterministically."""
+
+        def __init__(self, target=None, args=(), daemon=None):
+            self._target, self._args = target, args
+
+        def start(self):
+            self._target(*self._args)
+
+    monkeypatch.setattr("control_center.app.threading.Thread", SyncThread)
+    monkeypatch.setattr("control_center.app.time.sleep", lambda seconds: None)
+    with patch("control_center.app.requests.post") as dispatch, \
+            patch("control_center.app.requests.get") as poll:
         dispatch.return_value.status_code = 204
+        poll.return_value.raise_for_status.return_value = None
+        poll.return_value.json.return_value = {"workflow_runs": []}
         response = client.post(
             "/trigger/youtube-batch",
             data={
