@@ -76,14 +76,16 @@ def main():
     sa = gsc_post(token, f"/sites/{enc}/searchAnalytics/query", body)
     print(sa.status_code, json.dumps(sa.json(), ensure_ascii=False)[:2000])
 
-    print("\n=== URL 검사 (홈페이지) ===")
-    # URL Inspection lives on a different API (searchconsole v1, not webmasters v3).
-    ui = requests.post(
-        "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-        json={"inspectionUrl": site_url, "siteUrl": prop}, timeout=20,
-    )
-    print(ui.status_code, json.dumps(ui.json(), ensure_ascii=False, indent=2)[:3000])
+    inspect_urls = [site_url] + sys.argv[2:]
+    for target in inspect_urls:
+        print(f"\n=== URL 검사: {target} ===")
+        # URL Inspection lives on a different API (searchconsole v1, not webmasters v3).
+        ui = requests.post(
+            "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json={"inspectionUrl": target, "siteUrl": prop}, timeout=20,
+        )
+        print(ui.status_code, json.dumps(ui.json(), ensure_ascii=False, indent=2)[:3000])
 
 
 if __name__ == "__main__":
