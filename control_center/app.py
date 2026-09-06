@@ -1350,9 +1350,9 @@ def trigger_publish_site_now():
 
 
 _bulk_lock = threading.Lock()
-_BULK_GROUPS = ("wp25", "news2", "blogspot33", "tistory5")
+_BULK_GROUPS = ("wp25", "news2", "tistory5")
 _BULK_GROUP_TITLES = {
-    "wp25": "WP 25개", "news2": "뉴스룸 2채널", "blogspot33": "Blogspot", "tistory5": "Tistory 5개",
+    "wp25": "WP 25개", "news2": "뉴스룸 2채널", "tistory5": "Tistory 5개",
 }
 _BULK_STATE_DEFAULT: dict[str, object] = {"status": "idle", "started_at": None, "finished_at": None, "items": []}
 
@@ -1589,15 +1589,19 @@ def _poll_bulk_items(group: str, repo: str, token: str, timeout_seconds: int = 1
 
 
 def _run_group_publish(group: str) -> None:
-    """Background worker for one of the four split publish buttons.
+    """Background worker for one of the three split publish buttons.
 
     2026-09-06 CEO: the single combined '전체글발행' button mixed WP(25) +
     Blogspot(33) + Tistory(5) into one 63-item queue, which made it
     impossible to tell which stage a long run was actually stuck on.
-    Split into four independently-triggerable, independently-tracked
-    groups: wp25, news2 (the 2 newsroom sites), blogspot33, tistory5.
-    YouTube already has its own per-channel button in the dashboard and
-    is intentionally not part of this grouping."""
+    Split into independently-triggerable, independently-tracked
+    groups: wp25, news2 (the 2 newsroom sites), tistory5. Blogspot was
+    originally a fourth 33-in-one-click group here too, but a single
+    shared GitHub Actions concurrency slot meant the 33 staggered
+    dispatches canceled each other out (see blogger-rewrite.yml) - once
+    that was fixed the CEO asked for Blogspot to get the same per-item
+    treatment as YouTube instead: each of the 33 sites now has its own
+    dedicated button and tracker (see _run_single_blogspot_publish)."""
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
@@ -1645,24 +1649,6 @@ def _run_group_publish(group: str) -> None:
             ))
             time.sleep(8)
 
-    elif group == "blogspot33":
-        targets = [blog for blog in get_blogger_data() if blog["connected"]]
-        random.shuffle(targets)
-        for blog in targets:
-            try:
-                workflow_name, inputs = _build_draft_workflow_call({
-                    "platform": "blogger", "selection_mode": "auto", "site_id": blog["site_id"], "keyword": "",
-                })
-            except RuntimeError as exc:
-                _record({
-                    "label": blog["name"], "platform": "blogger", "site_id": blog["site_id"], "workflow": "blogger-rewrite.yml",
-                    "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed", "reason": str(exc),
-                    "dispatched_at": datetime.now(timezone.utc).isoformat(),
-                })
-                continue
-            _record(_dispatch_and_track(repo, token, workflow_name, inputs, label=blog["name"], platform="blogger", site_id=blog["site_id"]))
-            time.sleep(8)
-
     elif group == "tistory5":
         _record(_dispatch_and_track(
             repo, token, "tistory-daily-plan.yml",
@@ -1676,6 +1662,76 @@ def _run_group_publish(group: str) -> None:
     state = _bulk_read(group)
     state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
     _bulk_write(group, state)
+
+
+def _run_single_blogspot_publish(site_id: str, label: str) -> None:
+    """Background worker for one Blogspot site's dedicated publish button.
+
+    2026-09-06 CEO: once the shared-concurrency-slot bug in
+    blogger-rewrite.yml was fixed, asked for Blogspot's 33 sites to each
+    get their own button and live tracker exactly like YouTube's 10
+    channels, instead of one 33-in-one-click group where a stall on one
+    site hid the other 32. Reuses '바이럴자동발행''s own dispatch (auto
+    topic selection, no keyword) so behavior is identical - only the
+    visibility of the result changes."""
+    group = f"blogspot_{site_id}"
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    _bulk_write(group, state)
+
+    if not token:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": label, "platform": "blogger", "site_id": site_id, "workflow": "",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
+            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+        }])
+        _bulk_write(group, state)
+        return
+
+    try:
+        workflow_name, inputs = _build_draft_workflow_call({
+            "platform": "blogger", "selection_mode": "auto", "site_id": site_id, "keyword": "",
+        })
+    except RuntimeError as exc:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": label, "platform": "blogger", "site_id": site_id, "workflow": "blogger-rewrite.yml",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed", "reason": str(exc),
+            "dispatched_at": datetime.now(timezone.utc).isoformat(),
+        }])
+        _bulk_write(group, state)
+        return
+
+    item = _dispatch_and_track(repo, token, workflow_name, inputs, label=label, platform="blogger", site_id=site_id)
+    state["items"] = [item]
+    state["status"] = "polling"
+    _bulk_write(group, state)
+    _poll_bulk_items(group, repo, token)
+    state = _bulk_read(group)
+    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
+    _bulk_write(group, state)
+
+
+@app.post("/trigger/blogspot-single")
+def trigger_blogspot_single():
+    """One Blogspot site's dedicated live-tracked '바이럴자동발행' button."""
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    site_id = request.form.get("site_id", "").strip()
+    blogs_by_id = {str(blog["site_id"]): blog for blog in get_blogger_data() if blog["connected"]}
+    if not site_id or site_id not in blogs_by_id:
+        flash("발행이 연결된 Blogspot 사이트가 아닙니다.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    group = f"blogspot_{site_id}"
+    already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
+    label = str(blogs_by_id[site_id].get("name") or site_id)
+    if already_running:
+        flash(f"{label} 발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    threading.Thread(target=_run_single_blogspot_publish, args=(site_id, label), daemon=True).start()
+    flash(f"{label} 발행을 시작했습니다 — 카드 아래에서 실시간으로 확인하세요.", "success")
+    return redirect(url_for("index") + "#blogspot")
 
 
 @app.post("/trigger/publish-group/<group>")
@@ -1698,7 +1754,7 @@ def trigger_publish_group(group: str):
 
 @app.get("/api/publish-group-status/<group>")
 def publish_group_status(group: str):
-    if group not in _BULK_GROUPS and not group.startswith("youtube_"):
+    if group not in _BULK_GROUPS and not group.startswith("youtube_") and not group.startswith("blogspot_"):
         return jsonify({"error": "unknown group"}), 404
     return jsonify(_bulk_snapshot(group))
 

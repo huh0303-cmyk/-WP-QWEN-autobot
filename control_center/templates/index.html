@@ -55,13 +55,12 @@
             <div>
                 <p class="text-xs font-black text-amber-300">그룹별로 따로 실행 · 어디서 멈췄는지 바로 확인</p>
                 <h2 class="text-xl font-black text-slate-900 sm:text-2xl">발행 컨트롤</h2>
-                <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. (유튜브는 채널별로 아래 YouTube 통제실에서 하나씩 실행하세요.)</p>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. (Blogspot은 사이트별로 아래 Blogspot 통제실에서, 유튜브는 채널별로 아래 YouTube 통제실에서 하나씩 실행하세요.)</p>
             </div>
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {% for group, title, desc, confirm_msg, color in [
                     ('wp25', 'WP 25개', '뉴스 2개 제외 · 매번 무작위 순서', 'WP 25개 사이트 발행을 지금 시작할까요?', 'blue'),
                     ('news2', '뉴스룸 2채널', 'koreanews365 · theseouljournal', '뉴스룸 2채널 발행을 지금 시작할까요?', 'amber'),
-                    ('blogspot33', 'Blogspot', bloggers|length ~ '개 · 매번 무작위 순서', 'Blogspot 전체 채널 발행을 지금 시작할까요?', 'violet'),
                     ('tistory5', 'Tistory 5개', '비공개 검토본 생성', 'Tistory 5개 사이트 검토본 생성을 지금 시작할까요?', 'teal'),
                 ] %}
                 <div class="rounded-3xl border-2 border-slate-900 bg-slate-950 p-4 text-white shadow-lg">
@@ -286,8 +285,9 @@
             <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for blog in bloggers %}
+                <article class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}">
                 <form method="post" action="{{ url_for('trigger_draft') }}"
-                      class="force-publish-form min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}"
+                      class="force-publish-form space-y-3"
                       data-domain="{{ blog.wp_url|replace('https://', '')|replace('http://', '') }}" {% if not blog.connected %}onsubmit="return false;" aria-disabled="true"{% endif %}>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="platform" value="blogger">
@@ -371,17 +371,32 @@
                     <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
                         <span>키워드보고발행</span><span aria-hidden="true">→</span>
                     </button>
-                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-3 text-[11px] text-violet-950">
-                        <p class="font-black">바이럴자동발행</p>
-                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다. 결과를 미리 보여주지 않습니다.</p>
-                    </div>
-                    <button type="button" class="force-viral-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
-                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
-                    </button>
                     {% else %}
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
                     {% endif %}
                 </form>
+                {% if blog.connected %}
+                <div class="space-y-3 border-t border-violet-200 pt-3">
+                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[11px] text-violet-950">
+                        <p class="font-black">바이럴자동발행</p>
+                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다. 결과를 미리 보여주지 않습니다. 이 사이트 하나만 독립적으로 실행·추적됩니다.</p>
+                    </div>
+                    <form method="post" action="{{ url_for('trigger_blogspot_single') }}" onsubmit="return confirm('{{ blog.name }} 바이럴자동발행을 지금 시작할까요?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="site_id" value="{{ blog.site_id }}">
+                        <button id="bulk-button-blogspot_{{ blog.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600 disabled:cursor-not-allowed disabled:opacity-60">
+                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+                    <div class="blogspot-bulk-group" data-group="blogspot_{{ blog.site_id }}"></div>
+                    <div id="bulk-status-blogspot_{{ blog.site_id }}" class="space-y-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2">
+                        <p id="bulk-headline-blogspot_{{ blog.site_id }}" class="text-[11px] font-bold text-slate-500">상태: 불러오는 중…</p>
+                        <p id="bulk-counts-blogspot_{{ blog.site_id }}" class="text-sm font-black text-slate-800">-</p>
+                        <div id="bulk-failures-blogspot_{{ blog.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+                {% endif %}
+                </article>
                 {% endfor %}
             </div>
         </section>
@@ -686,8 +701,8 @@
             pollTimer = setInterval(poll, 8000);
         }
 
-        ['wp25', 'news2', 'blogspot33', 'tistory5'].forEach(function (group) { wireBulkStatus(group, false); });
-        document.querySelectorAll('.youtube-bulk-group').forEach(function (el) {
+        ['wp25', 'news2', 'tistory5'].forEach(function (group) { wireBulkStatus(group, false); });
+        document.querySelectorAll('.youtube-bulk-group, .blogspot-bulk-group').forEach(function (el) {
             wireBulkStatus(el.dataset.group, true);
         });
         function confirmForcePublish(event, form) {
