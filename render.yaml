@@ -22,6 +22,8 @@ services:
       ignoredPaths:
         - assets/tistory_images/**
         - budget_state.json
+        - data/blogspot_daily_auto_state.json
+        - blogger_scheduler_state.json
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
