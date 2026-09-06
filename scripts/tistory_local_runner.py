@@ -63,14 +63,19 @@ def _description(row):
     return text[:147].rstrip(" ,.;:") + ("." if len(text) >= 70 else "")
 
 
-def draft_from_row(row, site_url):
+def draft_from_row(row, site_url, *, force_private=False):
     labels = [x.strip() for x in row.get("labels", "").split(",") if x.strip()]
     # 2026-09-06 CEO decision: Tistory now auto-publishes end to end like the
     # other platforms. The queue row's own visibility column (set by
     # enqueue_tistory_drafts.py) is the single source of truth, not a
     # constant - this is what lets a future "review first" row still stay
     # private on request instead of always publishing blind.
-    visibility = "public" if str(row.get("visibility", "")).strip().lower() == "public" else "private"
+    # force_private is the CEO's manual "5개 지금 발행" button: write the
+    # drafts but let the human set each one's own reserved/staggered
+    # publish time in Tistory instead of going public immediately.
+    visibility = "private" if force_private else (
+        "public" if str(row.get("visibility", "")).strip().lower() == "public" else "private"
+    )
     return TistoryDraft(
         site_id=row["site_id"], site_url=site_url, title=row.get("title", ""),
         content_html=row.get("content_html", ""), category=row.get("category", "") or (labels[0] if labels else ""),
@@ -117,12 +122,12 @@ def flush_outbox(service, sheet_id, db):
     return sent
 
 
-def process_jobs(db, context, limit, gap_seconds):
+def process_jobs(db, context, limit, gap_seconds, *, force_private=False):
     rows = db.execute("SELECT * FROM jobs WHERE state IN ('pending','retry') ORDER BY rowid LIMIT ?", (limit,)).fetchall()
     results = []
     for index, item in enumerate(rows):
         payload = json.loads(item["payload"])
-        draft = draft_from_row(payload, payload["site_url"])
+        draft = draft_from_row(payload, payload["site_url"], force_private=force_private)
         db.execute("UPDATE jobs SET state='running',attempts=attempts+1,updated_at=CURRENT_TIMESTAMP WHERE job_id=?", (item["job_id"],)); db.commit()
         page = context.new_page()
         try:
@@ -170,6 +175,9 @@ def main():
     parser.add_argument("--gap-seconds", type=int, default=600)
     parser.add_argument("--queue-db", default=str(ROOT / ".local" / "tistory-queue.sqlite3"))
     parser.add_argument("--profile-root", default=str(ROOT / ".local" / "tistory-profile"))
+    parser.add_argument("--force-private", action="store_true",
+                         help="Write drafts as private regardless of the sheet's visibility column, "
+                              "so the CEO can set each post's own reserved/staggered publish time by hand.")
     args = parser.parse_args()
     db = open_queue(Path(args.queue_db))
     if args.command == "status":
@@ -184,7 +192,7 @@ def main():
         context = pw.chromium.launch_persistent_context(args.profile_root, headless=False, locale="ko-KR")
         if args.command == "login":
             page = context.pages[0] if context.pages else context.new_page(); page.goto("https://www.tistory.com/auth/login"); input("로그인을 마친 뒤 Enter: "); context.close(); return 0
-        results = process_jobs(db, context, max(1, args.max_jobs), max(0, args.gap_seconds)); context.close()
+        results = process_jobs(db, context, max(1, args.max_jobs), max(0, args.gap_seconds), force_private=args.force_private); context.close()
     try:
         flush_outbox(service, sheet_id, db)
     except Exception as exc:

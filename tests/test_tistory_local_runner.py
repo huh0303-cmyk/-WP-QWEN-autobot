@@ -39,6 +39,15 @@ def test_draft_from_sheet_reads_visibility_from_the_queue_row():
     assert default_draft.visibility == "private"
 
 
+def test_force_private_overrides_a_public_row():
+    # The CEO's manual "5개 지금 발행" button: write drafts but let the
+    # human set each post's own reserved/staggered publish time by hand,
+    # regardless of what the sheet row says.
+    row = {"site_id": "tistory_health_info", "visibility": "public"}
+    draft = runner.draft_from_row(row, "https://k-healthcare.tistory.com/", force_private=True)
+    assert draft.visibility == "private"
+
+
 def test_completed_job_is_not_selected_again(tmp_path):
     db = runner.open_queue(tmp_path / "q.sqlite3")
     db.execute("INSERT INTO jobs(job_id,sheet_row,site_id,payload,state) VALUES(?,?,?,?,?)", ("done", 2, "tistory_health_info", "{}", "complete"))
