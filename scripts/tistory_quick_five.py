@@ -18,18 +18,42 @@ import os
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 import requests
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_dotenv() -> None:
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        if key and key not in os.environ:
+            os.environ[key] = value.strip().strip('"').strip("'")
+
+
+_load_dotenv()
+
 REPO = os.environ.get("GITHUB_REPOSITORY", "huh0303-cmyk/-WP-QWEN-autobot")
-TOKEN = os.environ.get("GH_TOKEN") or os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "")
+TOKEN = (
+    os.environ.get("GH_TOKEN")
+    or os.environ.get("CONTROL_CENTER_GITHUB_TOKEN")
+    or os.environ.get("GITHUB_TOKEN")
+    or os.environ.get("GH_PAT", "")
+)
 
 
 def dispatch_generation() -> None:
     if not TOKEN:
         raise SystemExit(
-            "GH_TOKEN (또는 CONTROL_CENTER_GITHUB_TOKEN) 환경변수가 필요합니다.\n"
-            "Windows: setx GH_TOKEN \"ghp_...\" 로 한 번 등록해두면 다음부터 자동으로 읽습니다."
+            "GitHub 토큰이 필요합니다 (.env의 GITHUB_TOKEN/GH_PAT, 또는 GH_TOKEN 환경변수)."
         )
     print("1/3 오늘의 황금키워드로 5개 사이트 글 생성 요청 중...")
     response = requests.post(

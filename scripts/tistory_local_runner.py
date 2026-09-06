@@ -24,6 +24,29 @@ for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
+
+def _load_dotenv() -> None:
+    """This machine has no persistent env vars for GOOGLE_OAUTH_*/SHEET_ID -
+    every local script has silently depended on a human having manually
+    exported the repo's .env into the current shell first. Load it directly
+    so Task Scheduler and the one-click quick-five button work unattended.
+    Must run before importing gsheets_direct, which reads these at module
+    load time."""
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        if key and key not in os.environ:
+            os.environ[key] = value.strip().strip('"').strip("'")
+
+
+_load_dotenv()
+
 from automation_hub.tistory_local_adapter import TistoryLocalPublisher
 from control_center.tistory import TistoryDraft
 from gsheets_direct import get_sheets_service
