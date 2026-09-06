@@ -27,7 +27,7 @@
             </div>
             <div class="flex shrink-0 items-center gap-2">
                 <button id="install-pwa" type="button" hidden class="rounded-lg border border-white/20 bg-white px-2.5 py-1 text-[10px] font-black text-slate-950 shadow sm:text-xs">앱 설치</button>
-                <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-black text-emerald-300 sm:text-xs">DRAFT ONLY</span>
+                <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-black text-emerald-300 sm:text-xs">발행 통제실</span>
             </div>
         </div>
     </header>
@@ -51,10 +51,17 @@
         </div>
         {% endif %}
         {% endwith %}
+        <section class="rounded-3xl bg-slate-950 p-5 text-white space-y-3" id="publish-everything">
+            <p class="text-xs font-bold text-sky-300">01 · 전체 총괄</p>
+            <button type="button" id="publish-all-button" class="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-rose-500 p-5 text-xl font-black text-slate-950">전체 채널 한 번에 실행 →</button>
+            <p class="text-xs text-slate-300">WP 25 · 뉴스 2 · Blogspot {{ bloggers|length }} · Tistory 5 · YouTube 10</p>
+            <p class="text-xs text-slate-300">WP·Blogspot 공개 발행 / Tistory 검토본 생성 후 로그인된 등록기로 게시 / YouTube 비공개 제작</p>
+            <p id="publish-all-message" role="status" aria-live="polite" class="text-sm"></p>
+        </section>
         <section id="bulk-publish" class="space-y-3">
             <div>
                 <p class="text-xs font-black text-amber-300">그룹별로 따로 실행 · 어디서 멈췄는지 바로 확인</p>
-                <h2 class="text-xl font-black text-slate-900 sm:text-2xl">발행 컨트롤</h2>
+                <h2 class="text-xl font-black text-slate-900 sm:text-2xl">02 · 그룹별 발행</h2>
                 <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. 사이트 하나씩만 실행하려면 아래 각 통제실 카드의 개별 버튼을 쓰세요.</p>
             </div>
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -80,6 +87,35 @@
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+        </section>
+        {% macro quick_tile(name, url, group, label, ready=true, visitors=none) %}
+        <article data-tile-group="{{ group }}" data-visitors="{{ visitors if visitors is not none else -1 }}" class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm min-w-0">
+            <p class="truncate text-xs font-black text-slate-800" title="{{ name }}">{{ name }}</p>
+            <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block truncate text-xs text-blue-700 underline" title="{{ url }}">{{ url|replace('https://','')|replace('http://','') }} ↗</a>
+            <p class="tile-visitors mt-1 text-[10px] font-bold text-slate-500">오늘 방문자 {{ visitors if visitors is not none else '미집계' }}</p>
+            <button type="button" data-quick-group="{{ group }}" {% if not ready %}disabled{% endif %} class="mt-3 w-full rounded-lg bg-blue-700 px-2 py-2 text-xs font-bold text-white disabled:opacity-40">{{ label if ready else '연결 필요' }}</button>
+            <p data-quick-status="{{ group }}" role="status" class="mt-1 text-[10px] text-slate-500"></p>
+        </article>
+        {% endmacro %}
+        <section id="site-quick-tiles" class="space-y-4">
+            <div><h2 class="text-xl font-black">03 · 사이트별 바로 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
+            <p class="text-xs text-slate-500">플랫폼별 오늘 방문자 많은 순 · 미집계는 아래 · 5분마다 통계 갱신</p>
+            <h3 class="text-sm font-bold">WordPress 27 · 일반 25 + 뉴스 2</h3>
+            <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
+            {% for site in sites %}{{ quick_tile('WP · ' ~ (site.name or site.domain), 'https://' ~ site.domain, 'wp_' ~ site.site_id, '즉시 발행', site.auth_ready, site.today_visitors) }}{% endfor %}
+            </div>
+            <h3 class="text-sm font-bold">Blogspot {{ bloggers|length }}</h3>
+            <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
+            {% for blog in bloggers %}{{ quick_tile('Blogspot · ' ~ blog.name, blog.url, 'blogspot_' ~ blog.site_id, '즉시 발행', blog.connected, blog.today_visitors) }}{% endfor %}
+            </div>
+            <h3 class="text-sm font-bold">Tistory 5</h3>
+            <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
+            {% for blog in tistory_sites %}{{ quick_tile('Tistory · ' ~ blog.name, blog.url, 'tistory_' ~ blog.site_id, '글 생성·게시 준비', true, blog.today_visitors) }}{% endfor %}
+            </div>
+            <h3 class="text-sm font-bold">YouTube 10 · 플리 5 + 지식 5</h3>
+            <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
+            {% for channel in youtube_channels %}{{ quick_tile(channel.name or channel.channel_key, 'https://www.youtube.com/channel/' ~ channel.channel_id, 'youtube_' ~ channel.channel_key, '제작·비공개 업로드', channel.action_ready) }}{% endfor %}
             </div>
         </section>
         <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
@@ -733,6 +769,61 @@
         ['wp25', 'news2', 'tistory5', 'blogspot33', 'youtube_playlist5', 'youtube_archive5'].forEach(function (group) { wireBulkStatus(group, false); });
         document.querySelectorAll('.youtube-bulk-group, .blogspot-bulk-group, .wp-bulk-group, .tistory-bulk-group').forEach(function (el) {
             wireBulkStatus(el.dataset.group, true);
+        });
+        function sortSiteTiles() {
+            document.querySelectorAll('.ranked-site-tiles').forEach(function(grid) {
+            Array.from(grid.children).sort(function(a,b) { return Number(b.dataset.visitors) - Number(a.dataset.visitors); }).forEach(function(tile) { grid.appendChild(tile); });
+            });
+        }
+        sortSiteTiles();
+        setInterval(async function () {
+            if (document.hidden) return;
+            try {
+                const response = await fetch('/', {credentials:'same-origin', cache:'no-store'});
+                if (!response.ok) return;
+                const updated = new DOMParser().parseFromString(await response.text(), 'text/html');
+                const incoming = new Map(Array.from(updated.querySelectorAll('[data-tile-group]')).map(function(el) { return [el.dataset.tileGroup, el]; }));
+                document.querySelectorAll('[data-tile-group]').forEach(function(tile) {
+                    const fresh = incoming.get(tile.dataset.tileGroup);
+                    if (!fresh) return;
+                    tile.dataset.visitors = fresh.dataset.visitors;
+                    tile.querySelector('.tile-visitors').textContent = fresh.querySelector('.tile-visitors').textContent;
+                });
+                sortSiteTiles();
+            } catch (_) {}
+        }, 300000);
+        document.querySelectorAll('[data-quick-group]').forEach(function (button) {
+            const original = document.getElementById('bulk-button-' + button.dataset.quickGroup);
+            if (!original) { button.disabled = true; return; }
+            const status = button.parentElement.querySelector('[data-quick-status]');
+            const sync = function () {
+                button.disabled = original.disabled;
+                const source = document.getElementById('bulk-headline-' + button.dataset.quickGroup);
+                if (source) status.textContent = source.textContent;
+            };
+            new MutationObserver(sync).observe(original, {attributes: true});
+            const source = document.getElementById('bulk-status-' + button.dataset.quickGroup);
+            if (source) new MutationObserver(sync).observe(source, {childList:true, subtree:true, characterData:true});
+            button.addEventListener('click', function () { original.click(); });
+            sync();
+        });
+        document.getElementById('publish-all-button').addEventListener('click', async function () {
+            if (!confirm('전체 채널을 실행합니다. WP·Blogspot은 공개 발행, Tistory는 게시 준비, YouTube는 비공개 제작입니다. 실행할까요?')) return;
+            const button = this;
+            button.disabled = true;
+            const message = document.getElementById('publish-all-message');
+            message.textContent = '6개 그룹에 실행 요청을 전송하고 있습니다…';
+            const groups = ['wp25','news2','blogspot33','tistory5','youtube_playlist5','youtube_archive5'];
+            const results = await Promise.allSettled(groups.map(async function (group) {
+                const source = document.getElementById('bulk-button-' + group);
+                if (source.disabled) return;
+                const form = source.closest('form');
+                const response = await fetch(form.action, {method:'POST', body:new FormData(form), credentials:'same-origin'});
+                if (!response.ok) throw new Error(group);
+            }));
+            const failed = results.filter(function (r) { return r.status === 'rejected'; }).length;
+            message.textContent = failed ? '일부 요청 전송에 실패했습니다. 아래 그룹별 상태를 확인하세요.' : '실행 요청 전송 완료. 실제 성공·실패는 아래 그룹별 상태를 확인하세요.';
+            button.disabled = false;
         });
         function confirmForcePublish(event, form) {
             const mode = form.querySelector('.force-submit-mode').value;
