@@ -1350,9 +1350,10 @@ def trigger_publish_site_now():
 
 
 _bulk_lock = threading.Lock()
-_BULK_GROUPS = ("wp25", "news2", "tistory5")
+_BULK_GROUPS = ("wp25", "news2", "tistory5", "blogspot33", "youtube_playlist5", "youtube_archive5")
 _BULK_GROUP_TITLES = {
     "wp25": "WP 25개", "news2": "뉴스룸 2채널", "tistory5": "Tistory 5개",
+    "blogspot33": "Blogspot 32개", "youtube_playlist5": "YouTube 플리 5개", "youtube_archive5": "YouTube 지식 5개",
 }
 _BULK_STATE_DEFAULT: dict[str, object] = {"status": "idle", "started_at": None, "finished_at": None, "items": []}
 
@@ -1589,19 +1590,20 @@ def _poll_bulk_items(group: str, repo: str, token: str, timeout_seconds: int = 1
 
 
 def _run_group_publish(group: str) -> None:
-    """Background worker for one of the three split publish buttons.
+    """Background worker for one of the six group-level publish buttons.
 
     2026-09-06 CEO: the single combined '전체글발행' button mixed WP(25) +
     Blogspot(33) + Tistory(5) into one 63-item queue, which made it
     impossible to tell which stage a long run was actually stuck on.
-    Split into independently-triggerable, independently-tracked
-    groups: wp25, news2 (the 2 newsroom sites), tistory5. Blogspot was
-    originally a fourth 33-in-one-click group here too, but a single
-    shared GitHub Actions concurrency slot meant the 33 staggered
-    dispatches canceled each other out (see blogger-rewrite.yml) - once
-    that was fixed the CEO asked for Blogspot to get the same per-item
-    treatment as YouTube instead: each of the 33 sites now has its own
-    dedicated button and tracker (see _run_single_blogspot_publish)."""
+    Split into independently-triggerable, independently-tracked groups:
+    wp25, news2 (the 2 newsroom sites), tistory5, blogspot33, and two
+    YouTube bundles (youtube_playlist5 / youtube_archive5, split along the
+    same PLAYLIST-vs-지식 grouping already used for the channel cards).
+    Every site within a group ALSO gets its own individual button and
+    tracker elsewhere on the page (_run_single_blogspot_publish,
+    _run_single_wp_publish, _run_single_tistory_publish,
+    _run_youtube_publish) - the group button here is a convenience to fire
+    a whole platform at once without waiting on 5-33 separate clicks."""
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
@@ -1656,9 +1658,45 @@ def _run_group_publish(group: str) -> None:
             label="Tistory 5개 전체", platform="tistory",
         ))
 
+    elif group == "blogspot33":
+        targets = [blog for blog in get_blogger_data() if blog["connected"]]
+        random.shuffle(targets)
+        for blog in targets:
+            try:
+                workflow_name, inputs = _build_draft_workflow_call({
+                    "platform": "blogger", "selection_mode": "auto", "site_id": blog["site_id"], "keyword": "",
+                })
+            except RuntimeError as exc:
+                _record({
+                    "label": blog["name"], "platform": "blogger", "site_id": blog["site_id"], "workflow": "blogger-rewrite.yml",
+                    "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed", "reason": str(exc),
+                    "dispatched_at": datetime.now(timezone.utc).isoformat(),
+                })
+                continue
+            _record(_dispatch_and_track(repo, token, workflow_name, inputs, label=blog["name"], platform="blogger", site_id=blog["site_id"]))
+            time.sleep(8)
+
+    elif group in ("youtube_playlist5", "youtube_archive5"):
+        # Matches the card grouping already used in the YouTube 통제실 UI:
+        # channel.group == 'PLAYLIST' is 플리, anything else renders as 지식.
+        want_playlist = group == "youtube_playlist5"
+        targets = [ch for ch in get_youtube_data() if ch.get("action_ready") and (ch.get("group") == "PLAYLIST") == want_playlist]
+        for channel in targets:
+            label = str(channel.get("official_name") or channel["channel_key"])
+            _record(_dispatch_and_track(
+                repo, token, "youtube-control-scheduler.yml",
+                {"dry_run": "false", "max_dispatch": "1", "channel_key": channel["channel_key"], "run_now": "true"},
+                label=label, platform="youtube", site_id=channel["channel_key"],
+            ))
+            time.sleep(8)
+
     state["status"] = "polling"
     _bulk_write(group, state)
-    _poll_bulk_items(group, repo, token)
+    # Video render + upload can run long, same reasoning as the per-channel
+    # YouTube button (_run_youtube_publish) - everything else keeps the
+    # shorter default.
+    poll_timeout = 1800 * 5 if group.startswith("youtube_") else 1500
+    _poll_bulk_items(group, repo, token, timeout_seconds=poll_timeout)
     state = _bulk_read(group)
     state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
     _bulk_write(group, state)
@@ -1734,9 +1772,129 @@ def trigger_blogspot_single():
     return redirect(url_for("index") + "#blogspot")
 
 
+def _run_single_wp_publish(site_id: str, domain: str, label: str) -> None:
+    """Background worker for one WordPress site's dedicated publish button.
+
+    2026-09-06 CEO: wanted every one of the 27 WP sites to get its own
+    button and live tracker exactly like Blogspot's 33 and YouTube's 10,
+    instead of the per-card '바이럴자동발행' firing a one-shot flash with no
+    completion visibility. Dispatches the same daily-network-publish.yml
+    with publication_approved=true the WP25 bulk group and single-site
+    quick-publish button already use."""
+    group = f"wp_{site_id}"
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    _bulk_write(group, state)
+
+    if not token:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": label, "platform": "wordpress", "site_id": site_id, "workflow": "",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
+            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+        }])
+        _bulk_write(group, state)
+        return
+
+    item = _dispatch_and_track(
+        repo, token, "daily-network-publish.yml",
+        {"target_site_url": f"https://{domain}", "publication_approved": "true", "room_id": f"manual-single-{site_id}"},
+        label=label, platform="wordpress", site_id=site_id,
+    )
+    state["items"] = [item]
+    state["status"] = "polling"
+    _bulk_write(group, state)
+    _poll_bulk_items(group, repo, token)
+    state = _bulk_read(group)
+    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
+    _bulk_write(group, state)
+
+
+@app.post("/trigger/wp-single")
+def trigger_wp_single():
+    """One WordPress site's dedicated live-tracked '바이럴자동발행' button."""
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    site_id = request.form.get("site_id", "").strip()
+    sites_by_id = {str(site["site_id"]): site for site in get_site_data() if site["auth_ready"]}
+    if not site_id or site_id not in sites_by_id:
+        flash("발행이 연결된 WordPress 사이트가 아닙니다.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    group = f"wp_{site_id}"
+    already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
+    site = sites_by_id[site_id]
+    label = str(site["domain"])
+    if already_running:
+        flash(f"{label} 발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    threading.Thread(target=_run_single_wp_publish, args=(site_id, site["domain"], label), daemon=True).start()
+    flash(f"{label} 발행을 시작했습니다 — 카드 아래에서 실시간으로 확인하세요.", "success")
+    return redirect(url_for("index") + "#wordpress")
+
+
+def _run_single_tistory_publish(site_id: str, label: str) -> None:
+    """Background worker for one Tistory site's dedicated publish button.
+
+    Same live-tracking treatment as Blogspot/WP/YouTube. Tistory has no
+    unattended cloud publish API, so this still only reaches a private
+    review draft that the logged-in local registrar (tistory_local_runner.py)
+    finishes - the tracker reports that stage honestly, not a fake public
+    publish."""
+    group = f"tistory_{site_id}"
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    _bulk_write(group, state)
+
+    if not token:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": label, "platform": "tistory", "site_id": site_id, "workflow": "",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
+            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+        }])
+        _bulk_write(group, state)
+        return
+
+    item = _dispatch_and_track(
+        repo, token, "tistory-daily-plan.yml",
+        {"site_ids": site_id, "run_key": f"manual-{site_id}-{int(time.time())}"},
+        label=label, platform="tistory", site_id=site_id,
+    )
+    state["items"] = [item]
+    state["status"] = "polling"
+    _bulk_write(group, state)
+    _poll_bulk_items(group, repo, token)
+    state = _bulk_read(group)
+    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
+    _bulk_write(group, state)
+
+
+@app.post("/trigger/tistory-single")
+def trigger_tistory_single():
+    """One Tistory site's dedicated live-tracked '바이럴자동발행' button."""
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#tistory")
+    site_id = request.form.get("site_id", "").strip()
+    sites_by_id = {str(site["site_id"]): site for site in get_tistory_data()}
+    if not site_id or site_id not in sites_by_id:
+        flash("등록되지 않은 Tistory 사이트입니다.", "error")
+        return redirect(url_for("index") + "#tistory")
+    group = f"tistory_{site_id}"
+    already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
+    label = str(sites_by_id[site_id].get("name") or site_id)
+    if already_running:
+        flash(f"{label} 발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
+        return redirect(url_for("index") + "#tistory")
+    threading.Thread(target=_run_single_tistory_publish, args=(site_id, label), daemon=True).start()
+    flash(f"{label} 검토본 생성을 시작했습니다 — 카드 아래에서 실시간으로 확인하세요.", "success")
+    return redirect(url_for("index") + "#tistory")
+
+
 @app.post("/trigger/publish-group/<group>")
 def trigger_publish_group(group: str):
-    """One of the four split publish buttons — see _run_group_publish."""
+    """One of the six group-level publish buttons — see _run_group_publish."""
     if group not in _BULK_GROUPS:
         flash("알 수 없는 발행 그룹입니다.", "error")
         return redirect(url_for("index"))
@@ -1754,7 +1912,8 @@ def trigger_publish_group(group: str):
 
 @app.get("/api/publish-group-status/<group>")
 def publish_group_status(group: str):
-    if group not in _BULK_GROUPS and not group.startswith("youtube_") and not group.startswith("blogspot_"):
+    individual_prefixes = ("youtube_", "blogspot_", "wp_", "tistory_")
+    if group not in _BULK_GROUPS and not group.startswith(individual_prefixes):
         return jsonify({"error": "unknown group"}), 404
     return jsonify(_bulk_snapshot(group))
 

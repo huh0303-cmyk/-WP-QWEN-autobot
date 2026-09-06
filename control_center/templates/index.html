@@ -55,13 +55,16 @@
             <div>
                 <p class="text-xs font-black text-amber-300">그룹별로 따로 실행 · 어디서 멈췄는지 바로 확인</p>
                 <h2 class="text-xl font-black text-slate-900 sm:text-2xl">발행 컨트롤</h2>
-                <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. (Blogspot은 사이트별로 아래 Blogspot 통제실에서, 유튜브는 채널별로 아래 YouTube 통제실에서 하나씩 실행하세요.)</p>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. 사이트 하나씩만 실행하려면 아래 각 통제실 카드의 개별 버튼을 쓰세요.</p>
             </div>
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {% for group, title, desc, confirm_msg, color in [
                     ('wp25', 'WP 25개', '뉴스 2개 제외 · 매번 무작위 순서', 'WP 25개 사이트 발행을 지금 시작할까요?', 'blue'),
                     ('news2', '뉴스룸 2채널', 'koreanews365 · theseouljournal', '뉴스룸 2채널 발행을 지금 시작할까요?', 'amber'),
                     ('tistory5', 'Tistory 5개', '비공개 검토본 생성', 'Tistory 5개 사이트 검토본 생성을 지금 시작할까요?', 'teal'),
+                    ('blogspot33', 'Blogspot ' ~ (bloggers|length) ~ '개', '매번 무작위 순서', 'Blogspot 전체 채널 발행을 지금 시작할까요?', 'violet'),
+                    ('youtube_playlist5', 'YouTube 플리 5개', '플레이리스트 채널 묶음', 'YouTube 플리 5개 채널 콘텐츠 제작을 지금 시작할까요?', 'sky'),
+                    ('youtube_archive5', 'YouTube 지식 5개', '지식 채널 묶음', 'YouTube 지식 5개 채널 콘텐츠 제작을 지금 시작할까요?', 'amber'),
                 ] %}
                 <div class="rounded-3xl border-2 border-slate-900 bg-slate-950 p-4 text-white shadow-lg">
                     <p class="text-[10px] font-black text-{{ color }}-300">{{ desc }}</p>
@@ -259,14 +262,28 @@
                     <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
                         <span>키워드보고발행</span><span aria-hidden="true">→</span>
                     </button>
-                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">누를 때마다 오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사하고, 이 사이트 분야에 맞는 최고 주제를 선택합니다. 결과를 미리 보여주지 않고 바로 발행합니다.</p>
-                    <button type="button" class="force-viral-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
-                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
-                    </button>
                     {% else %}
                     <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
                     {% endif %}
                 </form>
+                {% if site.auth_ready %}
+                <div class="space-y-3 border-t border-blue-200 px-4 pb-4 pt-3">
+                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">바이럴자동발행 — 누를 때마다 오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사하고, 이 사이트 분야에 맞는 최고 주제를 선택합니다. 결과를 미리 보여주지 않고 바로 발행합니다. 이 사이트 하나만 독립적으로 실행·추적됩니다.</p>
+                    <form method="post" action="{{ url_for('trigger_wp_single') }}" onsubmit="return confirm('{{ site.domain }} 바이럴자동발행을 지금 시작할까요?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="site_id" value="{{ site.site_id }}">
+                        <button id="bulk-button-wp_{{ site.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600 disabled:cursor-not-allowed disabled:opacity-60">
+                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+                    <div class="wp-bulk-group" data-group="wp_{{ site.site_id }}"></div>
+                    <div id="bulk-status-wp_{{ site.site_id }}" class="space-y-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2">
+                        <p id="bulk-headline-wp_{{ site.site_id }}" class="text-[11px] font-bold text-slate-500">상태: 불러오는 중…</p>
+                        <p id="bulk-counts-wp_{{ site.site_id }}" class="text-sm font-black text-slate-800">-</p>
+                        <div id="bulk-failures-wp_{{ site.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+                {% endif %}
                 </article>
                 {% endfor %}
             </div>
@@ -508,11 +525,23 @@
                         <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
                             <span>키워드보고발행</span><span aria-hidden="true">→</span>
                         </button>
-                        <p class="text-[11px] font-semibold leading-relaxed text-slate-500">누를 때마다 오늘의 언급량과 검색 추세를 다시 조사해 이 사이트 분야의 최고 주제를 선택합니다. 결과를 미리 보여주지 않습니다.</p>
-                        <button type="button" class="force-viral-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600">
-                            <span>바이럴자동발행</span><span aria-hidden="true">→</span>
-                        </button>
                     </form>
+                    <div class="space-y-3 border-t border-teal-200 pt-3">
+                        <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">바이럴자동발행 — 누를 때마다 오늘의 언급량과 검색 추세를 다시 조사해 이 사이트 분야의 최고 주제를 선택합니다. 결과를 미리 보여주지 않습니다. 이 사이트 하나만 독립적으로 실행·추적됩니다.</p>
+                        <form method="post" action="{{ url_for('trigger_tistory_single') }}" onsubmit="return confirm('{{ blog.name }} 바이럴자동발행을 지금 시작할까요?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="site_id" value="{{ blog.site_id }}">
+                            <button id="bulk-button-tistory_{{ blog.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600 disabled:cursor-not-allowed disabled:opacity-60">
+                            <span>바이럴자동발행</span><span aria-hidden="true">→</span>
+                            </button>
+                        </form>
+                        <div class="tistory-bulk-group" data-group="tistory_{{ blog.site_id }}"></div>
+                        <div id="bulk-status-tistory_{{ blog.site_id }}" class="space-y-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2">
+                            <p id="bulk-headline-tistory_{{ blog.site_id }}" class="text-[11px] font-bold text-slate-500">상태: 불러오는 중…</p>
+                            <p id="bulk-counts-tistory_{{ blog.site_id }}" class="text-sm font-black text-slate-800">-</p>
+                            <div id="bulk-failures-tistory_{{ blog.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div>
+                        </div>
+                    </div>
                 </article>
                 {% endfor %}
             </div>
@@ -701,8 +730,8 @@
             pollTimer = setInterval(poll, 8000);
         }
 
-        ['wp25', 'news2', 'tistory5'].forEach(function (group) { wireBulkStatus(group, false); });
-        document.querySelectorAll('.youtube-bulk-group, .blogspot-bulk-group').forEach(function (el) {
+        ['wp25', 'news2', 'tistory5', 'blogspot33', 'youtube_playlist5', 'youtube_archive5'].forEach(function (group) { wireBulkStatus(group, false); });
+        document.querySelectorAll('.youtube-bulk-group, .blogspot-bulk-group, .wp-bulk-group, .tistory-bulk-group').forEach(function (el) {
             wireBulkStatus(el.dataset.group, true);
         });
         function confirmForcePublish(event, form) {
