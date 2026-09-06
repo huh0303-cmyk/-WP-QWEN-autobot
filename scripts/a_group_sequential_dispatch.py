@@ -7,6 +7,7 @@ their independent 3-10 posts/day RSS schedule.
 import os
 import sys
 import time
+import random
 
 import requests
 
@@ -64,7 +65,15 @@ def main():
     if not 0 <= index < len(A_GROUP_SITES):
         raise SystemExit(f"invalid A_GROUP_INDEX={index}")
 
-    site = A_GROUP_SITES[index]
+    # Keep legacy in-flight chains in their original order. New index-zero
+    # chains carry one seed throughout, including across midnight/retries.
+    seed = os.environ.get("WP_SEQUENCE_SEED", "").strip()
+    if index == 0 and not seed:
+        seed = str(random.SystemRandom().getrandbits(64))
+    sites = list(A_GROUP_SITES)
+    if seed:
+        random.Random(seed).shuffle(sites)
+    site = sites[index]
     print(f"A-group {index + 1}/{len(A_GROUP_SITES)}: dispatching {site}", flush=True)
     dispatch(repo, token, "daily-network-publish.yml", {
         "target_site_url": site,
@@ -76,10 +85,12 @@ def main():
         print("A-group sequence fully dispatched.", flush=True)
         return
 
-    delay_minutes = int(os.environ.get("WP_SEQUENCE_DELAY_MINUTES", "5"))
-    print(f"Next site will be dispatched in {delay_minutes} minutes.", flush=True)
-    time.sleep(delay_minutes * 60)
-    dispatch(repo, token, "a-group-sequential-publish.yml", {"index": str(index + 1)})
+    delay_seconds = random.SystemRandom().randint(180, 420)
+    print(f"Next site starts after a randomized {delay_seconds} seconds.", flush=True)
+    time.sleep(delay_seconds)
+    dispatch(repo, token, "a-group-sequential-publish.yml", {
+        "index": str(index + 1), "sequence_seed": seed,
+    })
     print(f"Queued A-group index {index + 1}.", flush=True)
 
 

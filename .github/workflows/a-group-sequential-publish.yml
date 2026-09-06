@@ -7,6 +7,10 @@ on:
         description: "Zero-based site index; start with 0"
         required: true
         default: "0"
+      sequence_seed:
+        description: "Internal stable shuffle seed; leave blank for a new batch"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -31,5 +35,6 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GH_DISPATCH_TOKEN: ${{ github.token }}
           A_GROUP_INDEX: ${{ inputs.index }}
+          WP_SEQUENCE_SEED: ${{ inputs.sequence_seed }}
           WP_SEQUENCE_DELAY_MINUTES: "5"
         run: python scripts/a_group_sequential_dispatch.py
