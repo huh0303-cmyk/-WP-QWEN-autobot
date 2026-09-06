@@ -273,6 +273,7 @@ def main():
     rewritten = None
     quality_score = 0
     failures = []
+    critical_failures: list[str] = []
     similarity_score = 1.0
     text_provider = ""
     # Paid generation starts only after the deterministic topic, duplicate and
@@ -320,12 +321,23 @@ def main():
                 text_provider = provider
                 break
         except Exception as exc:
+            quality_score = 0
             failures = [f"invalid output: {exc}"]
+            critical_failures = []
             print(json.dumps({"attempt": attempt, "quality_score": 0, "failures": failures}, ensure_ascii=False))
     if rewritten is None:
         failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source_identity, "", "", "QUALITY_GATE", f"route_code={route_code}; quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
-        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 {minimum_quality}점 미만이므로 초안 생성을 차단했습니다. {failures}")
+        # The error text used to always say "below {minimum_quality}" even when
+        # quality_score was 90-100 - the real block was a critical_failures hit
+        # (e.g. language mismatch, missing verified source link), which are
+        # rejected regardless of score. Misreporting the reason sent whoever
+        # read this log chasing the wrong cause (2026-09-06).
+        if critical_failures:
+            reason = f"필수 항목 미충족({'; '.join(critical_failures)})"
+        else:
+            reason = f"{minimum_quality}점 미만"
+        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 차단됨 · {reason}. {failures}")
 
     content = rewritten["content_html"]
     image_model = "0"
