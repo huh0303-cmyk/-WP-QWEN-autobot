@@ -89,6 +89,53 @@ def _seed_tistory_accounts(service, spreadsheet_id: str) -> int:
     return len(rows)
 
 
+def _seed_blogger_accounts(service, spreadsheet_id: str) -> int:
+    """Add Blogger accounts missing from the accounts sheet; never overwrite user rows.
+
+    2026-09-06/07 CEO: found that only 5 of 32 connected Blogspot sites had a
+    row here at all - Tistory has always had _seed_tistory_accounts to bridge
+    the dashboard registry into this sheet, but Blogger never got the same
+    treatment, so every site added after the first 5 silently could never
+    actually publish (process_platform_queue.py skips any job whose site_id
+    has no enabled row here) even though the dashboard showed them as
+    "connected" and every dispatch reported success up to that point.
+    Only adds a row where automation_hub_sites.json already has a real,
+    non-empty destination_id - never invents one. Sites already present
+    (including the ones a human explicitly left disabled pending a numeric
+    Blog ID check) are left untouched.
+    """
+    values = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=f"'{ACCOUNTS_TAB}'!A1:I",
+    ).execute().get("values", [])
+    header = values[0] if values else PLATFORM_ACCOUNT_HEADER
+    site_index = header.index("site_id")
+    existing_site_ids = {row[site_index] for row in values[1:] if len(row) > site_index}
+    registry = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
+    rows = []
+    for site in registry["sites"]:
+        if site.get("platform") != "blogger":
+            continue
+        if site["site_id"] in existing_site_ids:
+            continue
+        destination_id = str(site.get("destination_id") or "").strip()
+        if not site.get("enabled") or not destination_id:
+            continue
+        item = {
+            "account_id": f"blogger:{site['site_id']}", "platform": "blogger",
+            "site_id": site["site_id"], "display_name": site.get("name", site["site_id"]),
+            "destination_id": destination_id, "editor_url": site.get("url", ""),
+            "auth_profile": "default", "enabled": "ON",
+            "notes": "auto-registered from automation_hub_sites.json",
+        }
+        rows.append([item.get(column, "") for column in PLATFORM_ACCOUNT_HEADER])
+    if rows:
+        service.spreadsheets().values().append(
+            spreadsheetId=spreadsheet_id, range=f"'{ACCOUNTS_TAB}'!A1",
+            valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": rows},
+        ).execute()
+    return len(rows)
+
+
 def main() -> int:
     spreadsheet_id = os.environ.get("SHEET_ID", "").strip()
     if not spreadsheet_id:
@@ -127,6 +174,7 @@ def main() -> int:
     _ensure_log_tab(service, spreadsheet_id, RSS_TAB, RSS_HEADER)
     _ensure_log_tab(service, spreadsheet_id, ACCOUNTS_TAB, PLATFORM_ACCOUNT_HEADER)
     tistory_added = _seed_tistory_accounts(service, spreadsheet_id)
+    blogger_added = _seed_blogger_accounts(service, spreadsheet_id)
     _ensure_queue_tab_without_data_loss(service, spreadsheet_id)
     _ensure_log_tab(service, spreadsheet_id, YOUTUBE_CHANNEL_TAB, YOUTUBE_CHANNEL_HEADER)
     _ensure_log_tab(service, spreadsheet_id, YOUTUBE_RUN_TAB, YOUTUBE_RUN_HEADER)
@@ -140,7 +188,7 @@ def main() -> int:
             valueInputOption="RAW", body={"values": rows},
         ).execute()
         print(f"Seeded {len(rows)} YouTube channels")
-    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}, {YOUTUBE_CHANNEL_TAB}, {YOUTUBE_RUN_TAB}; Tistory accounts added={tistory_added}")
+    print(f"Control tabs ready: {SETTINGS_TAB}, {RUNS_TAB}, {KEYWORDS_TAB}, {RSS_TAB}, {ACCOUNTS_TAB}, {QUEUE_TAB}, {YOUTUBE_CHANNEL_TAB}, {YOUTUBE_RUN_TAB}; Tistory accounts added={tistory_added}; Blogger accounts added={blogger_added}")
     return 0
 
 
