@@ -17,7 +17,7 @@ def plain_text(value: str) -> str:
 
 
 def extract_http_links(value: str) -> list[str]:
-    links = re.findall(r'''(?is)href=["'](https?://[^"'#\s]+)''', value)
+    links = re.findall(r'''(?is)\bhref\s*=\s*["'](https?://[^"'\s]+)["']''', value)
     return list(dict.fromkeys(html.unescape(link) for link in links))[:30]
 
 
@@ -154,7 +154,7 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
     # this: 95/100 blocked on a missing link). Ensuring the link is present
     # cannot rely on the model following the prompt; guarantee it here.
     content = str(normalized.get("content_html", ""))
-    if source_url and source_url not in content:
+    if source_url and source_url not in extract_http_links(content):
         safe_url = html.escape(source_url, quote=True)
         normalized["content_html"] = content + f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>'
     return normalized
