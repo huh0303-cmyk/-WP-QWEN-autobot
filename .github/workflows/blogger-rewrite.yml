@@ -47,7 +47,15 @@ permissions:
   contents: write
 
 concurrency:
-  group: blogger-rewrite-queue
+  # Per-site queue key. A single shared "blogger-rewrite-queue" group meant
+  # every one of the 33 Blogspot sites competed for the same one pending
+  # slot: GitHub Actions only keeps ONE queued run per concurrency group, so
+  # each new dispatch canceled whichever site was still waiting - the CEO
+  # would fire all 33 in a stagger and watch 32 of them get canceled before
+  # a runner ever picked them up. Keying by site id still prevents the same
+  # site from double-running if clicked twice, without sites blocking each
+  # other.
+  group: blogger-rewrite-queue-${{ inputs.blogger_site_id }}
   cancel-in-progress: false
 
 jobs:
