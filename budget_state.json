@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 1.41,
+  "spent_estimate_usd": 1.44,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -235,6 +235,11 @@
     {
       "at": "2026-09-06T19:06:25.292633+09:00",
       "label": "blogger-rewrite:blogger_kikorea",
+      "amount_usd": 0.03
+    },
+    {
+      "at": "2026-09-06T19:07:49.063040+09:00",
+      "label": "blogger-rewrite:blogger_oliveyoung",
       "amount_usd": 0.03
     }
   ]
