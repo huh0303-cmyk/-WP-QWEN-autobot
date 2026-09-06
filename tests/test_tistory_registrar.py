@@ -31,5 +31,12 @@ def test_missing_or_invalid_alt_blocks_registration(content):
     assert any("ALT" in error for error in _draft(content_html=content).validate())
 
 
-def test_public_visibility_is_never_accepted():
-    assert any("비공개" in error for error in _draft(visibility="public").validate())
+def test_public_visibility_is_accepted():
+    # 2026-09-06 CEO decision: Tistory auto-publishes end to end now, like
+    # the other platforms, so a queue row explicitly marked public must
+    # validate cleanly - only an unrecognized visibility value is rejected.
+    assert _draft(visibility="public").validate() == []
+
+
+def test_unrecognized_visibility_is_rejected():
+    assert any("visibility" in error for error in _draft(visibility="unlisted").validate())

@@ -17,16 +17,26 @@ def test_local_queue_is_idempotent_and_survives_restart(tmp_path):
     assert reopened.execute("SELECT count(*) FROM jobs WHERE job_id='t-1'").fetchone()[0] == 1
 
 
-def test_draft_from_sheet_is_always_private_and_uses_category_label():
-    row = {
+def test_draft_from_sheet_reads_visibility_from_the_queue_row():
+    # 2026-09-06 CEO decision: Tistory auto-publishes end to end now, like
+    # the other platforms - the queue row's own visibility column (written
+    # by enqueue_tistory_drafts.py) decides, not a hardcoded constant.
+    base = {
         "site_id": "tistory_health_info", "title": "검진 전 확인할 항목",
         "content_html": '<p><img src="x.webp" alt="검진표를 확인하는 사람"></p>' + ("<p>검진 전에 확인할 내용을 설명합니다.</p>" * 10),
         "labels": "건강검진", "search_description": "건강검진 전에 복용약과 금식 시간, 예약기관 안내를 확인하는 순서를 실제 준비 과정에 맞춰 알기 쉽게 정리하고 당일 준비물과 주의사항까지 함께 안내합니다.",
     }
-    draft = runner.draft_from_row(row, "https://k-healthcare.tistory.com/")
-    assert draft.visibility == "private"
-    assert draft.category == "건강검진"
-    assert draft.validate() == []
+    public_draft = runner.draft_from_row({**base, "visibility": "public"}, "https://k-healthcare.tistory.com/")
+    assert public_draft.visibility == "public"
+    assert public_draft.category == "건강검진"
+    assert public_draft.validate() == []
+
+    private_draft = runner.draft_from_row({**base, "visibility": "private"}, "https://k-healthcare.tistory.com/")
+    assert private_draft.visibility == "private"
+    assert private_draft.validate() == []
+
+    default_draft = runner.draft_from_row(base, "https://k-healthcare.tistory.com/")
+    assert default_draft.visibility == "private"
 
 
 def test_completed_job_is_not_selected_again(tmp_path):
@@ -48,7 +58,7 @@ def test_interrupted_running_job_is_recovered_on_restart(tmp_path):
     assert "interrupted" in row["error"]
 
 
-def test_only_private_ready_artifacts_enter_sheet_queue():
+def test_only_quality_gated_ready_artifacts_enter_sheet_queue():
     payload = {"drafts": [
         {"job_id": "ok", "site_id": "tistory_health_info", "status": "DRAFT_READY", "public_allowed": False, "title": "제목", "body_html": "<p>본문</p>", "category": "건강검진", "meta_description": "설명", "source_keyword": "검진 준비"},
         {"job_id": "bad", "site_id": "tistory_health_info", "status": "CONSENSUS_FAILED", "public_allowed": False},
@@ -57,7 +67,11 @@ def test_only_private_ready_artifacts_enter_sheet_queue():
     assert len(rows) == 1
     header = enqueue_tistory_drafts.PUBLISH_QUEUE_HEADER
     queued = dict(zip(header, rows[0]))
-    assert queued["visibility"] == "private"
-    assert queued["publish_now"] == "FALSE"
+    # 2026-09-06 CEO decision: Tistory auto-publishes end to end now, like
+    # the other platforms - passing this upstream quality gate (DRAFT_READY,
+    # public_allowed False at generation time) is what queues a row at all;
+    # once queued, the local registrar takes it all the way public.
+    assert queued["visibility"] == "public"
+    assert queued["publish_now"] == "TRUE"
     assert queued["source_keyword"] == "검진 준비"
     assert queued["public_url"] == "https://control.korea365.org/review/tistory/ok"

@@ -29,10 +29,18 @@ def rows_from_artifact(payload):
             continue
         values = {
             "created_at": now, "job_id": draft["job_id"], "site_id": draft["site_id"],
-            "status": "ready", "publish_now": "FALSE", "title": draft["title"],
+            # 2026-09-06 CEO decision: Tistory auto-publishes end to end now,
+            # like the other platforms - the local registrar
+            # (tistory_local_runner.py) reads this row's publish_now/
+            # visibility and actually clicks 공개 instead of stopping at a
+            # private review draft. The upstream DRAFT_READY/public_allowed
+            # quality gate (asserted above and in tistory-daily-plan.yml)
+            # is untouched; this only changes what the approved local
+            # registrar does with content that already passed it.
+            "status": "ready", "publish_now": "TRUE", "title": draft["title"],
             "content_html": draft["body_html"], "labels": draft["category"],
             "source_keyword": draft.get("source_keyword", ""), "category": draft["category"],
-            "search_description": draft["meta_description"], "visibility": "private",
+            "search_description": draft["meta_description"], "visibility": "public",
         }
         values["public_url"] = f"https://control.korea365.org/review/tistory/{quote(str(draft['job_id']), safe='')}"
         rows.append([values.get(column, "") for column in PUBLISH_QUEUE_HEADER])

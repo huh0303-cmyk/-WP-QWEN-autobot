@@ -36,8 +36,8 @@ class TistoryDraft:
         description = " ".join(self.search_description.split())
         if not 70 <= len(description) <= 150:
             errors.append("검색설명은 공백 포함 70~150자로 작성해야 합니다")
-        if self.visibility != "private":
-            errors.append("앱 등록기는 비공개 초안만 저장할 수 있습니다")
+        if self.visibility not in ("private", "public"):
+            errors.append("visibility 값은 private 또는 public이어야 합니다")
 
         for index, image_tag in enumerate(IMAGE_RE.findall(self.content_html), start=1):
             match = ALT_RE.search(image_tag)
@@ -57,6 +57,9 @@ class TistoryDraft:
     def editor_url(self, post_id: str | int) -> str:
         return f"https://{self.blog_name}.tistory.com/manage/newpost/{post_id}?type=post"
 
+    def public_url(self, post_id: str | int) -> str:
+        return f"https://{self.blog_name}.tistory.com/{post_id}"
+
 
 @dataclass(frozen=True, slots=True)
 class TistoryDraftResult:
@@ -68,9 +71,11 @@ class TistoryDraftResult:
 class TistoryDraftRegistrar:
     """Contract for the authenticated local-browser writer.
 
-    Tistory has no supported write API for this workflow.  The concrete browser
-    worker must implement this contract, preserve ``private`` visibility and
-    return only after reopening the saved editor URL successfully.
+    Tistory has no supported write API for this workflow.  The concrete
+    browser worker must implement this contract, honor the draft's own
+    ``visibility`` (private stays a review-only save; public actually
+    publishes it live, 2026-09-06 CEO decision), and return only after
+    reopening the saved editor URL successfully.
     """
 
     def save(self, draft: TistoryDraft) -> TistoryDraftResult:

@@ -65,10 +65,16 @@ def _description(row):
 
 def draft_from_row(row, site_url):
     labels = [x.strip() for x in row.get("labels", "").split(",") if x.strip()]
+    # 2026-09-06 CEO decision: Tistory now auto-publishes end to end like the
+    # other platforms. The queue row's own visibility column (set by
+    # enqueue_tistory_drafts.py) is the single source of truth, not a
+    # constant - this is what lets a future "review first" row still stay
+    # private on request instead of always publishing blind.
+    visibility = "public" if str(row.get("visibility", "")).strip().lower() == "public" else "private"
     return TistoryDraft(
         site_id=row["site_id"], site_url=site_url, title=row.get("title", ""),
         content_html=row.get("content_html", ""), category=row.get("category", "") or (labels[0] if labels else ""),
-        search_description=_description(row), visibility="private",
+        search_description=_description(row), visibility=visibility,
     )
 
 
@@ -121,7 +127,13 @@ def process_jobs(db, context, limit, gap_seconds):
         page = context.new_page()
         try:
             saved = TistoryLocalPublisher(draft).publish(page)
-            result = {"status": "review_ready", "edit_url": saved.edit_url, "post_id": saved.post_id, "error_code": "", "message": "비공개 저장 및 재검증 완료", "completed_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+            is_public = saved.status == "public"
+            result = {
+                "status": "published" if is_public else "review_ready",
+                "edit_url": saved.edit_url, "post_id": saved.post_id, "error_code": "",
+                "message": "공개 발행 및 재검증 완료" if is_public else "비공개 저장 및 재검증 완료",
+                "completed_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            }
             db.execute("UPDATE jobs SET state='complete',edit_url=?,remote_id=?,error='',updated_at=CURRENT_TIMESTAMP WHERE job_id=?", (saved.edit_url, saved.post_id, item["job_id"]))
         except Exception as exc:
             result = {"status": "local_attention_required", "edit_url": "", "post_id": "", "error_code": "tistory_editor_error", "message": str(exc)[:500], "completed_at": time.strftime("%Y-%m-%d %H:%M:%S")}

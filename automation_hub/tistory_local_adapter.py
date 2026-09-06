@@ -21,11 +21,19 @@ class TistoryEditorSelectors:
 
 
 class TistoryLocalPublisher:
-    """Private-only Tistory writer for a persistent local browser profile.
+    """Tistory writer for a persistent, logged-in local browser profile.
 
-    It deliberately has no public-publish method.  A successful result means
-    the private post was saved, reopened, and its administrator edit URL was
-    verified.  The owner remains the only person who can make it public.
+    A successful result means the post was saved with the draft's own
+    ``visibility`` (private review-only, or public and actually live),
+    reopened, and its administrator edit URL was re-verified.
+
+    2026-09-06 CEO decision: this used to be private-only by design ("the
+    owner remains the only person who can make it public"). The CEO
+    explicitly asked for Tistory to auto-publish end to end like the other
+    platforms, so a draft explicitly marked visibility="public" (see
+    control_center.tistory.TistoryDraft, wired from the queue row's
+    publish_now/visibility columns) now goes all the way to a live post
+    instead of stopping at a private save.
     """
 
     def __init__(self, draft: TistoryDraft):
@@ -107,14 +115,16 @@ class TistoryLocalPublisher:
         self._fill_category(page)
         self._fill_search_description(page)
 
-    def save_private(self, page) -> TistoryDraftResult:
+    def _save(self, page, *, public: bool) -> TistoryDraftResult:
+        visibility_label = r"^공개$" if public else r"^비공개$"
+        confirm_pattern = r"^공개 발행$|^발행$|^저장$|^완료$" if public else r"^비공개 저장$|^저장$|^완료$"
         self._click_named(page, r"^완료$|저장")
         page.wait_for_timeout(900)
-        private = page.get_by_text(re.compile(r"^비공개$")).last
-        if not private.is_visible(timeout=2500):
-            raise RuntimeError("비공개 선택 항목을 찾지 못했습니다")
-        private.click()
-        self._click_named(page, r"^비공개 저장$|^저장$|^완료$", timeout=3000)
+        option = page.get_by_text(re.compile(visibility_label)).last
+        if not option.is_visible(timeout=2500):
+            raise RuntimeError(f"{'공개' if public else '비공개'} 선택 항목을 찾지 못했습니다")
+        option.click()
+        self._click_named(page, confirm_pattern, timeout=3000)
         page.wait_for_timeout(2500)
         match = re.search(r"/manage/(?:newpost|post)/?(\d+)", page.url or "")
         if not match:
@@ -131,8 +141,20 @@ class TistoryLocalPublisher:
         document = page.content()
         if self.draft.title not in document or self.draft.search_description not in document:
             raise RuntimeError("저장된 제목 또는 검색 설명 재검증에 실패했습니다")
-        return TistoryDraftResult(post_id=post_id, edit_url=edit_url, status="private")
+        if public:
+            live_url = self.draft.public_url(post_id)
+            page.goto(live_url, wait_until="domcontentloaded", timeout=60_000)
+            page.wait_for_timeout(1200)
+            if self.draft.title not in (page.content() or ""):
+                raise RuntimeError(f"공개 발행 후 실제 공개 페이지 재검증에 실패했습니다: {live_url}")
+        return TistoryDraftResult(post_id=post_id, edit_url=edit_url, status="public" if public else "private")
+
+    def save_private(self, page) -> TistoryDraftResult:
+        return self._save(page, public=False)
+
+    def save_public(self, page) -> TistoryDraftResult:
+        return self._save(page, public=True)
 
     def publish(self, page) -> TistoryDraftResult:
         self.fill(page)
-        return self.save_private(page)
+        return self._save(page, public=self.draft.visibility == "public")
