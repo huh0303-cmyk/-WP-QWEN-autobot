@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
+      - run: pip install -r requirements-control-center.txt -q
       - name: Dispatch today's remaining Blogspot sites
         env:
           GH_DISPATCH_TOKEN: ${{ github.token }}
