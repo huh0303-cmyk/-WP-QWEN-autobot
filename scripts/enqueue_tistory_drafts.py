@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from urllib.parse import quote
 from datetime import datetime
 from pathlib import Path
@@ -38,6 +39,25 @@ def rows_from_artifact(payload):
     return rows
 
 
+def _with_retries(call, attempts=3, delay_seconds=5):
+    """Retry a single Sheets API call on a transient network failure.
+
+    2026-09-06: a plain socket read timeout to the Sheets API (seen live in
+    production) crashed this script uncaught, discarding every already-
+    generated Tistory draft for the whole run even though only one HTTP
+    call actually failed. This affects real content the CEO paid to
+    generate, so a network blip must not throw the batch away."""
+    last_exc: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            return call()
+        except Exception as exc:  # Sheets/httplib2 raise several distinct types for a dropped connection
+            last_exc = exc
+            if attempt < attempts - 1:
+                time.sleep(delay_seconds)
+    raise last_exc
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--drafts", default="artifacts/tistory-daily-drafts.json")
@@ -51,21 +71,21 @@ def main():
         raise RuntimeError("Every requested Tistory draft must be DRAFT_READY and private before queueing")
     service = get_sheets_service()
     ensure_tab(service, sheet_id, QUEUE_TAB, PUBLISH_QUEUE_HEADER)
-    existing = service.spreadsheets().values().get(
+    existing = _with_retries(lambda: service.spreadsheets().values().get(
         spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:Q"
-    ).execute().get("values", [])
+    ).execute()).get("values", [])
     job_index = PUBLISH_QUEUE_HEADER.index("job_id")
     existing_ids = {row[job_index] for row in existing[1:] if len(row) > job_index and row[job_index]}
     unique_rows = [row for row in rows if row[job_index] not in existing_ids]
     if unique_rows:
-        service.spreadsheets().values().append(
+        _with_retries(lambda: service.spreadsheets().values().append(
             spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1",
             valueInputOption="RAW", insertDataOption="INSERT_ROWS",
             body={"values": unique_rows},
-        ).execute()
-    verified = service.spreadsheets().values().get(
+        ).execute())
+    verified = _with_retries(lambda: service.spreadsheets().values().get(
         spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:Q"
-    ).execute().get("values", [])
+    ).execute()).get("values", [])
     target_ids = {row[job_index] for row in rows}
     counts = {job_id: sum(len(row) > job_index and row[job_index] == job_id for row in verified[1:]) for job_id in target_ids}
     if len(rows) != len(target_ids) or any(count != 1 for count in counts.values()):
