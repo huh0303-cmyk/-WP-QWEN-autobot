@@ -3163,7 +3163,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         site, requested_status=requested_status, public_approved=public_approved
     )
     data={"title":title,"content":final,"status":post_status,
-          "date":date_str,"date_gmt":date_gmt_str,
+          # Let WordPress assign its own current local/GMT dates.
+          # Sending a hard-coded KST local date schedules posts on non-KST sites.
+
           "comment_status":"closed","ping_status":"closed",
           "categories":[cat_id] if cat_id and cat_id>0 else [],
           "tags":tag_ids,
