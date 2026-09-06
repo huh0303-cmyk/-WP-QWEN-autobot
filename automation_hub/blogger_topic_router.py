@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import html
 import re
+import time
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
@@ -417,11 +418,24 @@ def resolve_automatic_source(
     today: date | None = None,
     excluded_urls: Iterable[str] = (),
 ) -> RoutedSource:
-    headlines = fetch_today_headlines(session=session, today=today)
-    headlines.extend(fetch_profile_headlines(profile, session=session, today=today))
-    headlines = list({row["url"]: row for row in headlines}.values())
-    trends = fetch_trending_terms(session=session)
-    topics = rank_topics(headlines, profile=profile, trend_terms=trends)
+    # 2026-09-06: a GitHub Actions runner IP occasionally gets a thin or empty
+    # RSS/Google News response for a single fetch (rate limiting, a transient
+    # network hiccup) even on days with plenty of real, multi-outlet coverage
+    # - confirmed by re-running the exact same profile moments after a
+    # production "no eligible topic" failure and getting a strong candidate
+    # (score 93, 9 outlets) on the first try from a different network. One
+    # retry after a short pause distinguishes a genuinely quiet news day from
+    # a bad fetch, without ever inventing a topic that lacks real evidence.
+    topics: list[TopicCandidate] = []
+    for attempt in range(2):
+        headlines = fetch_today_headlines(session=session, today=today)
+        headlines.extend(fetch_profile_headlines(profile, session=session, today=today))
+        headlines = list({row["url"]: row for row in headlines}.values())
+        trends = fetch_trending_terms(session=session)
+        topics = rank_topics(headlines, profile=profile, trend_terms=trends)
+        if topics or attempt == 1:
+            break
+        time.sleep(8)
     if not topics:
         raise NoEligibleTopic("오늘자 복수 매체 근거와 사이트 주제를 함께 만족하는 주제어가 없습니다.")
     # The user asked for the highest-virality topic first. We do not silently
