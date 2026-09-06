@@ -38,7 +38,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: automation-hub-platform-publish
+  group: automation-hub-platform-publish-${{ inputs.job_id || 'scheduled-drain' }}
   cancel-in-progress: false
 
 jobs:
