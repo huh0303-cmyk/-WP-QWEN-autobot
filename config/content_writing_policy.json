@@ -50,7 +50,7 @@
   "auditor": {
     "provider": "gemini",
     "model_family": "Gemini 2.5 Flash",
-    "role": "independent_final_editorial_fact_and_quality_reviewer_for_wordpress_tistory_and_news",
+    "role": "independent_final_editorial_fact_and_quality_reviewer",
     "applies_to": ["wordpress", "tistory", "news"],
     "note": "Blogger does not use this auditor role; Gemini is Blogger's writer instead, see blogger_writer.",
     "checks": [
