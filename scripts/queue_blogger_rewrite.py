@@ -309,6 +309,9 @@ def main():
                 prior_feedback="; ".join(failures),
                 verified_sources=evidence_sources,
             )
+        from automation_hub.repetition_guard import history_prompt, repetition_issues, clean_opening
+        recent_content = [r for r in queue_records if r.get("site_id") == blogger_site_id and r.get("status", "").lower() in ACTIVE_CONTENT_STATUSES]
+        prompt += "\n" + history_prompt(recent_content)
         if attempt > 1 and 'candidate' in locals():
             prompt += "\nRepair this previous draft. Preserve its valid factual content and exact verified links; expand any short sections to the required body length. Return the complete corrected JSON, not a summary.\n" + json.dumps(candidate, ensure_ascii=False)
         try:
@@ -329,6 +332,9 @@ def main():
                     quality_score = max(0, quality_score - 15)
                 similarity_score = 0.0
                 critical_prefixes = ("body length", "verified trend evidence", "YMYL", "meta description", "language mismatch")
+            candidate["content_html"] = clean_opening(candidate["title"], candidate["content_html"])
+            failures.extend(repetition_issues(candidate["title"], candidate["content_html"], recent_content))
+            critical_prefixes += ("REPETITION:",)
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
             critical_failures = [failure for failure in failures if failure.startswith(critical_prefixes)]
             if quality_score >= minimum_quality and not critical_failures:
@@ -390,7 +396,9 @@ def main():
     latest = service.spreadsheets().values().get(
         spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N"
     ).execute().get("values", [])
+    from automation_hub.content_identity import is_similar_content
     duplicate = active_duplicate(_records(latest), site_id=blogger_site_id, source_id=source_identity)
+    duplicate = duplicate or next((r for r in _records(latest) if r.get("status", "").lower() in ACTIVE_CONTENT_STATUSES and is_similar_content(r, site_id=blogger_site_id, title=rewritten["title"], content_html=content)), None)
     if duplicate:
         print(json.dumps({"queued": False, "duplicate_blocked": True, "existing_job_id": duplicate.get("job_id"), "content_id": content_id}, ensure_ascii=False))
         return 0
