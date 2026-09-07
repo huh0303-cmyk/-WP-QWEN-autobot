@@ -20,3 +20,12 @@ def test_bank_empty_is_explicit_wait(monkeypatch,tmp_path):
     monkeypatch.setattr(maker,'list_folder_files',lambda *a:[])
     with pytest.raises(RuntimeError,match='WAITING_ASSETS'):
         maker.select_single_bank_image(str(tmp_path),object())
+
+def test_intro_uses_local_ffmpeg_and_keeps_audio(monkeypatch):
+    calls=[]
+    monkeypatch.setattr(maker.base,'run_ffmpeg',lambda cmd:calls.append(cmd))
+    maker.make_intro_video('cover.png','music.m4a','video.mp4')
+    assert calls[0][0]=='ffmpeg'
+    assert 'music.m4a' in calls[0]
+    assert '-shortest' in calls[0]
+    assert 'min(on,150)' in calls[0][calls[0].index('-vf')+1]

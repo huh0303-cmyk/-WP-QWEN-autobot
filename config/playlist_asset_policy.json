@@ -22,7 +22,10 @@
       "gemini_app_lyria_korean_vocals"
     ]
   },
-  "interval_days": 3,
   "target_minutes": 60,
-  "app_subscription_is_not_api_credit": true
+  "app_subscription_is_not_api_credit": true,
+  "interval_days_min": 2,
+  "interval_days_max": 3,
+  "publication_status": "private",
+  "intro_seconds": 6
 }

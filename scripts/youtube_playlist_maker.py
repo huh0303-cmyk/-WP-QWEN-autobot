@@ -61,4 +61,14 @@ base.make_channel_thumbnail=lambda channel,image,out,topic,**kwargs: base.make_p
 # Preserve the existing rain/stream selection and bird sound mixing.
 base.HEALING_THEME_DURATION_SEC={theme:(59*60,61*60) for theme in base.HEALING_THEME_DURATION_SEC}
 
+def make_intro_video(image_path, audio_path, out_path):
+    # Six-second gentle push-in, then hold; no extra video model or audio repetition.
+    vf=("scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
+        "zoompan=z='1+min(on,150)*0.0003':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1920x1080:fps=25,"
+        "fade=t=in:st=0:d=1.2,format=yuv420p")
+    base.run_ffmpeg(['ffmpeg','-y','-loop','1','-framerate','25','-i',image_path,'-i',audio_path,
+        '-vf',vf,'-af','afade=t=in:st=0:d=0.5','-c:v','libx264','-preset','fast','-crf','21',
+        '-c:a','aac','-b:a','192k','-movflags','+faststart','-shortest',out_path])
+base.make_static_video=make_intro_video
+
 if __name__=='__main__': base.main()
