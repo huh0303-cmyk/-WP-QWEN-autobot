@@ -306,11 +306,10 @@ def test_youtube_trigger_rejects_an_unconnected_channel_without_dispatch(monkeyp
     dispatch.assert_not_called()
 
 
-def test_youtube_trigger_dispatches_the_selected_real_channel(monkeypatch):
+def test_youtube_trigger_queues_the_selected_channel_on_vps(monkeypatch):
     channel = get_youtube_data()[0]
     monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
     monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
-    monkeypatch.setenv("CONTROL_CENTER_GITHUB_TOKEN", "test-token")
     client = control_center_app.test_client()
 
     class SyncThread:
@@ -325,12 +324,8 @@ def test_youtube_trigger_dispatches_the_selected_real_channel(monkeypatch):
             self._target(*self._args)
 
     monkeypatch.setattr("control_center.app.threading.Thread", SyncThread)
-    monkeypatch.setattr("control_center.app.time.sleep", lambda seconds: None)
-    with patch("control_center.app.requests.post") as dispatch, \
-            patch("control_center.app.requests.get") as poll:
-        dispatch.return_value.status_code = 204
-        poll.return_value.raise_for_status.return_value = None
-        poll.return_value.json.return_value = {"workflow_runs": []}
+    with patch("control_center.app._bulk_read", return_value={"status": "idle"}), \
+            patch("control_center.app.enqueue_youtube_vps", return_value={"job_id": "vps-test"}) as enqueue:
         response = client.post(
             "/trigger/youtube-batch",
             data={
@@ -340,9 +335,8 @@ def test_youtube_trigger_dispatches_the_selected_real_channel(monkeypatch):
         )
     assert response.status_code == 302
     assert response.headers["Location"].endswith("#youtube")
-    payload = dispatch.call_args.kwargs["json"]
-    assert payload["inputs"]["channel_key"] == channel["channel_key"]
-    assert payload["inputs"]["run_now"] == "true"
+    assert enqueue.call_args.args[:3] == (channel["channel_key"], channel["official_name"], f"youtube_{channel['channel_key']}")
+    assert enqueue.call_args.kwargs["run_now"] is True
 
 
 def test_blogspot_dashboard_uses_precise_connection_label_and_compact_categories():

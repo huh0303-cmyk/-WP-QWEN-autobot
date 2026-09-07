@@ -110,6 +110,29 @@ def main() -> None:
         elif "REPLICATE_API_TOKEN" not in text:
             fail(f"{name} does not receive REPLICATE_API_TOKEN")
 
+    # YouTube rendering is VPS-owned. The retained Actions definitions are
+    # emergency documentation only and must stay un-runnable.
+    for name in ("youtube-control-scheduler.yml", "generate-youtube-playlist.yml", "curio-longform-daily.yml"):
+        if "if: ${{ false }}" not in workflow_text.get(name, ""):
+            fail(f"{name} can still run; YouTube production must be VPS-only")
+    if (ROOT / "render.yaml").exists():
+        fail("render.yaml returned; control.korea365.org is VPS-only")
+    control_source = (ROOT / "control_center" / "app.py").read_text(encoding="utf-8")
+    vps_worker = (ROOT / "scripts" / "youtube_vps_worker.py").read_text(encoding="utf-8")
+    playlist = (ROOT / "scripts" / "youtube_playlist_maker.py").read_text(encoding="utf-8")
+    if "enqueue_youtube_vps" not in control_source or "youtube-control-scheduler.yml" in control_source:
+        fail("control center YouTube buttons are not exclusively routed to the VPS queue")
+    if "generate_lyria_track" not in playlist or "generate_thumbnail" not in playlist:
+        fail("playlist lost fresh Lyria/Gemini generation")
+    if "MUSIC_SOURCE_FOLDER_ID" in playlist or "THUMBNAIL_FOLDER_ID" in playlist:
+        fail("playlist reintroduced existing Drive input assets")
+    if "youtube_calendar_result.py" not in vps_worker or "youtube_publish_approved.py" not in vps_worker:
+        fail("VPS worker lost calendar reporting or private playlist upload")
+    for name in ("archive_footage_longform.py", "nasa_archive_longform.py"):
+        source = (ROOT / "scripts" / name).read_text(encoding="utf-8")
+        if "generate_thumbnail" not in source or "flux_thumbnail_provider" in source:
+            fail(f"{name} is not using fresh Gemini thumbnail generation")
+
     wp = workflow_text.get("daily-network-publish.yml", "")
     if 'AI_TEXT_PROVIDER: "openai"' not in wp or 'OPENAI_MODEL: "gpt-5-mini"' not in wp:
         fail("WordPress publisher is not routed to GPT-5 mini as the primary writer")

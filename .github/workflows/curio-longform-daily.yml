@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   generate-and-upload-private:
-    if: ${{ inputs.schedule_id != '' && inputs.claim_token != '' }}
+    if: ${{ false }} # RETIRED: knowledge video generation/rendering runs only on the VPS
     environment: youtube-channels
     runs-on: ubuntu-latest
     timeout-minutes: 90

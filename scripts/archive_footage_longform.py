@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Active archival longform pipeline with FLUX-only YouTube thumbnails.
-
-History/Invention/Silent Era/Retro Reels keep real public-domain archival video footage.
-Only thumbnail imagery is generated with black-forest-labs/flux-schnell. Legacy thumbnail
-code is preserved in archive_footage_longform_legacy.py.
-"""
+"""Archival longform with fresh Gemini-generated thumbnail source imagery."""
 from __future__ import annotations
 
 import os
@@ -13,15 +8,13 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import requests
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import archive_footage_longform_legacy as base
 import classic_reads_longform as narration_engine
-from flux_thumbnail_provider import generate_flux_thumbnail_url
+from gemini_media_provider import generate_thumbnail
 from knowledge_narrator import select_documentary_narrator
 
 
@@ -52,21 +45,8 @@ def _history_date_overlay(path: str) -> str:
     return path
 
 
-def _download_flux(url: str, out_path: str) -> bool:
-    try:
-        response = requests.get(url, timeout=90, stream=True)
-        response.raise_for_status()
-        with open(out_path, "wb") as handle:
-            for chunk in response.iter_content(chunk_size=1 << 20):
-                if chunk:
-                    handle.write(chunk)
-        return True
-    except Exception as exc:
-        base.log(f"   ⚠️ FLUX thumbnail download failed: {exc}")
-        return False
-
-
-def _flux_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdir: str):
+def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdir: str):
+    del hero_frame_path
     channel_theme = {
         "history": "world history, source-grounded international events, one clear editorial subject, minimal text",
         "invention": "history of inventions documentary",
@@ -74,18 +54,17 @@ def _flux_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdir:
         "retro_reels": "Retro USA everyday American homes and social life from the 1960s through 2000s",
         "american_archive": "American archive history documentary",
     }.get(channel_key, "archival history documentary")
-    url = generate_flux_thumbnail_url(topic, theme=f"{channel_theme} YouTube thumbnail")
-    if not url:
-        raise RuntimeError("FLUX thumbnail generation failed; no non-FLUX thumbnail fallback allowed")
-    flux_path = os.path.join(workdir, "thumbnail_flux_source.webp")
-    if not _download_flux(url, flux_path):
-        raise RuntimeError("FLUX thumbnail download failed")
-    result = base._legacy_build_thumbnail(topic, channel_key, flux_path, workdir)
+    source_path = os.path.join(workdir, "thumbnail_gemini_source.bin")
+    prompt = (f"Create a completely original photorealistic 16:9 documentary thumbnail source image about '{topic}'. "
+              f"Editorial direction: {channel_theme}. One unmistakable focal subject, strong depth, historically "
+              "plausible details, clean space for later title typography, no text, no logo, no watermark, no copied image.")
+    generate_thumbnail(prompt, source_path)
+    result = base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
     return _history_date_overlay(result) if channel_key == "history" else result
 
 
 base._legacy_build_thumbnail = base.build_thumbnail
-base.build_thumbnail = _flux_thumbnail
+base.build_thumbnail = _gemini_thumbnail
 
 if __name__ == "__main__":
     _select_narrator(sys.argv[4] if len(sys.argv) > 4 else "archive")

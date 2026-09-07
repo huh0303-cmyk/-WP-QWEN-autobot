@@ -59,7 +59,7 @@ Gemini must not invent facts while reviewing. Material factual uncertainty goes 
 
 ## 2. Image generation pipeline
 
-Scope: WordPress 27, Blogger 33 and Tistory 5. YouTube retains its separate FLUX-only thumbnail lock.
+Scope: WordPress 27, Blogger 33 and Tistory 5. YouTube retains its separate Gemini thumbnail lock.
 Provider: Replicate.
 Credential: REPLICATE_API_TOKEN.
 
@@ -86,22 +86,26 @@ Hard rules:
 - Blogger requires human review before publication
 - playlist thumbnails retain the existing-frame-only exception; do not generate thumbnail video
 
-### YouTube playlist thumbnail lock (2026-08-30)
+### YouTube media generation lock (updated 2026-09-07)
 
-- every new playlist source image and thumbnail must be generated with FLUX.1 Schnell
-- Drive thumbnail-bank, free-stock, SDXL, Gemini image and OpenAI image fallback are forbidden
+- playlist music is generated fresh for every run through Lyria 3.5; existing Drive music is forbidden as input
+- every playlist and knowledge-channel thumbnail source is generated fresh through Gemini 3.1 Flash Image
+- Drive thumbnail-bank, free-stock, SDXL, FLUX and OpenAI image fallback are forbidden for these ten channels
 - the result must look like authentic professional photography; obvious AI anatomy, plastic skin,
   malformed hands, duplicated objects, fake reflections, CGI or illustration styling is QUALITY_FAIL
 - generate exactly one 16:9 source image and reuse it as the full-video still and thumbnail source
-- `Cafe_Romantic` uses a sweet affectionate couple photo series, including tasteful black-and-white
-  photography; the final overlay is the large `Cafe_Romantic` brand with a waveform below
+- playlist layout benchmarks are limited to common visual patterns from channels above 500,000 subscribers:
+  one focal scene, restrained palette, deliberate negative space and compact readable type. No specific thumbnail,
+  character, artwork, logo, font treatment or trade dress may be copied
+- `Cafe_Romantic` uses an original warm romantic photo; overlay text uses this project's own smaller font and sizing
 - Healing uses rain-heavy jungle, forest, stream, river, open nature or temple-in-nature photography;
-  no thumbnail text
+  compact house typography may be placed only in the reserved negative-space panel
 - Cafe Music uses a close-up seasonal drink with an open sea, coast, Eiffel Tower or other landmark
   visible through a large window; no commercial cafe brand marks
-- MBB uses elegant instruments and theme-led classical photography; thumbnail text is omitted or kept
-  extremely short and must never overlap
+- MBB uses elegant instruments and theme-led classical photography; thumbnail text is short and must never overlap
 - K-pop uses high-end realistic Korean pop editorial photography
+- all YouTube generation and FFmpeg rendering runs on the VPS single-owner queue; retained GitHub Actions video
+  workflows stay hard-disabled and Render configuration is forbidden
 - every playlist channel runs once after a random 2-3 day interval, never a fixed two-day cadence
 - the next KST execution time uses an irregular random minute inside the allowed window; round
   five-minute marks and the channel's previous HH:MM are excluded so repeated machine-like timestamps

@@ -1,0 +1,10 @@
+[Unit]
+Description=Queue due Korea365 YouTube calendar work
+
+[Service]
+Type=oneshot
+User=korea365
+Group=korea365
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/control-center.env
+ExecStart=/opt/korea365/.venv/bin/python scripts/youtube_vps_worker.py --enqueue-due

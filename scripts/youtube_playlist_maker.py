@@ -1,128 +1,206 @@
 #!/usr/bin/env python3
-"""No-extra-generation-cost playlist pipeline: existing assets + Gemini app exports.
-Gemini subscription generation happens in the app. This worker consumes Drive assets;
-it never purchases API music or images and never silently substitutes another provider.
+"""Create every playlist from fresh Lyria music and a fresh Gemini image.
+
+Drive is output transport only. Existing Drive music/images are never read.
 """
-import os, random, sys, json, re
+from __future__ import annotations
+
+import json
+import os
+import random
+import shutil
+import sys
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]
-for p in (ROOT, ROOT/'scripts'):
-    if str(p) not in sys.path: sys.path.insert(0,str(p))
+
+ROOT = Path(__file__).resolve().parents[1]
+for entry in (ROOT, ROOT / "scripts"):
+    if str(entry) not in sys.path:
+        sys.path.insert(0, str(entry))
+
 import youtube_playlist_maker_legacy as base
-from PIL import Image
+from gemini_media_provider import generate_lyria_track, generate_thumbnail
+from PIL import Image, ImageDraw, ImageFont
 
-list_folder_files=base.list_folder_files
-download_drive_file=base.download_drive_file
-IMAGE_EXTS=base.IMAGE_EXTS
-THUMBNAIL_FOLDER_ID=base.THUMBNAIL_FOLDER_ID
-PLAYLIST_CHANNELS=base.PLAYLIST_CHANNELS
-CHANNEL_KEY=base.CHANNEL_KEY
-log=base.log
+GENERATED_PREFIX = "fresh-lyria:"
+_generated_paths: dict[str, str] = {}
+_selected_language = ""
 
-def select_single_bank_image(workdir, service):
-    images=list_folder_files(service, THUMBNAIL_FOLDER_ID, IMAGE_EXTS, 'image/')
-    if not images: raise RuntimeError('WAITING_ASSETS: add a Gemini app thumbnail export to the channel Drive folder')
-    picked=random.choice(images)
-    path=os.path.join(workdir, 'playlist_background'+(os.path.splitext(picked['name'])[1] or '.jpg'))
-    download_drive_file(service,picked['id'],path)
-    return path
-
-def bank_images(topic, workdir, service=None):
-    global THUMBNAIL_FOLDER_ID
-    THUMBNAIL_FOLDER_ID=base._channel_env('THUMBNAIL_FOLDER_ID',base._DEFAULT_THUMB_FOLDER)
-    path=select_single_bank_image(workdir,service or base.get_drive_service())
-    with Image.open(path) as image:
-        if image.width < 1280 or image.height < 720:
-            raise RuntimeError('WAITING_ASSETS: thumbnail must be at least 1280x720; do not upscale a poor image')
-    return [path]
-
-def no_paid_generation(*args, **kwargs):
-    raise RuntimeError('PAID_GENERATION_DISABLED: use Gemini subscription app and save exports to Drive')
 
 def metadata(topic, caption, duration_min):
-    labels={'healing':'Nature Sounds', 'kpop':'Original K-pop', 'mbb':'Classical Music', 'globalmusic':'Romantic Songs', 'starbucks':'Instrumental Cafe Music'}
-    label=labels[base.CHANNEL_KEY]
-    title=f'{topic} | {label} | {round(duration_min)} min'
-    return title, f'{label}: {topic}.\nPlaying time: {round(duration_min)} minutes.', [label,topic], False
+    labels = {"healing": "Original Ambient Music", "kpop": "Original K-pop",
+              "mbb": "Original Classical Music", "globalmusic": "Original Romantic Songs",
+              "starbucks": "Original Instrumental Cafe Music"}
+    label = labels[base.CHANNEL_KEY]
+    return (f"{topic} | {label} | {round(duration_min)} min",
+            f"{label}: {topic}.\nPlaying time: {round(duration_min)} minutes.", [label, topic], False)
 
-base.GEMINI_API_KEY=''
-base.OPENAI_API_KEY=''
-base.GMAIL_APP_PASSWORD=''
-base.PEXELS_API_KEY=''
-base.PIXABAY_KEY=''
-base.gemini_generate_text=no_paid_generation
-base.gemini_generate_image=no_paid_generation
-base.build_ai_images=bank_images
-base.fetch_healing_photo=lambda theme,workdir: bank_images(theme,workdir)[0]
-base.generate_youtube_title_description=metadata
-base.pick_duration_target=lambda: (50*60,70*60)
-# Keep the approved Gemini composition, rather than repainting it with legacy text bars.
-base.make_channel_thumbnail=lambda channel,image,out,topic,**kwargs: base.make_photo_thumbnail(image,out)
-# Preserve the existing rain/stream selection and bird sound mixing.
-base.HEALING_THEME_DURATION_SEC={theme:(50*60,70*60) for theme in base.HEALING_THEME_DURATION_SEC}
-
-def make_intro_video(image_path, audio_path, out_path):
-    # Six-second gentle push-in, then hold; no extra video model or audio repetition.
-    vf=("scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
-        "zoompan=z='1+min(on,150)*0.0003':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1920x1080:fps=25,"
-        "fade=t=in:st=0:d=1.2,format=yuv420p")
-    base.run_ffmpeg(['ffmpeg','-y','-loop','1','-framerate','25','-i',image_path,'-i',audio_path,
-        '-vf',vf,'-af','afade=t=in:st=0:d=0.5','-c:v','libx264','-preset','fast','-crf','21',
-        '-c:a','aac','-b:a','192k','-movflags','+faststart','-shortest',out_path])
-base.make_static_video=make_intro_video
-
-
-LANGUAGE_TAGS={'korean':['한국어','korean','[ko]'], 'french':['프랑스어','불어','french','[fr]'],
-    'japanese':['일본어','japanese','[ja]'], 'spanish':['스페인어','spanish','[es]'], 'italian':['이탈리아어','italian','[it]']}
-_selected_language=''
-
-def strict_tracks(tracks, keyword):
-    global _selected_language
-    language='korean' if base.CHANNEL_KEY=='kpop' else (_selected_language or keyword.lower())
-    if base.CHANNEL_KEY not in {'kpop','globalmusic'}: return base._bring_longest_to_front(list(tracks))
-    if base.CHANNEL_KEY == 'globalmusic' and language not in LANGUAGE_TAGS:
-        # Calendar topics often carry Mixed; resolve from actual tagged assets.
-        available = [lang for lang in ('french','japanese','spanish','italian')
-                     if any(any(tag in t['name'].casefold() for tag in LANGUAGE_TAGS[lang]) for t in tracks)]
-        if not available:
-            raise RuntimeError('WAITING_ASSETS: no identified French/Japanese/Spanish/Italian vocals in source folder')
-        state_path=Path(base.RECENT_TOPICS_FILE)
-        state=json.loads(state_path.read_text(encoding='utf-8')) if state_path.exists() else {}
-        counts=state.get('romantic_language_counts',{})
-        minimum=min(counts.get(lang,0) for lang in available)
-        language=random.choice([lang for lang in available if counts.get(lang,0)==minimum])
-        _selected_language=language
-    tags=LANGUAGE_TAGS.get(language,[])
-    matched=[t for t in tracks if any(tag in t['name'].casefold() for tag in tags)]
-    if not matched: raise RuntimeError(f'WAITING_ASSETS: no explicitly tagged {language} vocals; refusing unrelated-language fallback')
-    return base._bring_longest_to_front(matched)
 
 def balanced_language(counts):
-    languages=['french','japanese','spanish','italian']
-    minimum=min(counts.get(lang,0) for lang in languages)
-    return random.choice([lang for lang in languages if counts.get(lang,0)==minimum])
+    languages = ["french", "japanese", "spanish", "italian"]
+    minimum = min(counts.get(language, 0) for language in languages)
+    return random.choice([language for language in languages if counts.get(language, 0) == minimum])
+
 
 def pick_topic():
     global _selected_language
-    path=Path(base.RECENT_TOPICS_FILE)
-    state=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
-    recent=state.get('recent',[])
-    if base.CHANNEL_KEY=='globalmusic':
-        counts=state.setdefault('romantic_language_counts',{})
-        _selected_language=balanced_language(counts)
-        counts[_selected_language]=counts.get(_selected_language,0)+1
-        pool=['Golden Hour Acoustic Romance','Soft Songs for a Quiet Cafe','A Sweet Unplugged Evening','Warm Guitar Love Songs']
-    elif base.CHANNEL_KEY=='kpop':
-        _selected_language='korean'
-        pool=['Korean Acoustic Pop Evening','Unplugged Korean Love Songs','Soft Korean Acoustic R&B','Korean Folk Pop for a Quiet Cafe']
+    path = Path(base.RECENT_TOPICS_FILE)
+    state = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    recent = state.get("recent", [])
+    if base.CHANNEL_KEY == "globalmusic":
+        counts = state.setdefault("romantic_language_counts", {})
+        _selected_language = balanced_language(counts)
+        counts[_selected_language] = counts.get(_selected_language, 0) + 1
+        pool = ["Golden Hour Acoustic Romance", "Soft Songs for a Quiet Cafe",
+                "A Sweet Unplugged Evening", "Warm Guitar Love Songs"]
+    elif base.CHANNEL_KEY == "kpop":
+        _selected_language = "korean"
+        pool = ["Korean Acoustic Pop Evening", "Unplugged Korean Love Songs",
+                "Soft Korean Acoustic R&B", "Korean Folk Pop for a Quiet Cafe"]
     else:
-        _selected_language=''
-        pool=base.CHANNEL_TOPIC_POOLS.get(base.CHANNEL_KEY,base.AUTO_TOPIC_POOL)
-    topic=random.choice([t for t in pool if t not in recent] or list(pool))
-    state['recent']=([topic]+[t for t in recent if t!=topic])[:base.RECENT_TOPICS_MEMORY]
-    path.write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding='utf-8')
-    return topic,_selected_language
-base.pick_auto_topic=pick_topic
-base.filter_tracks_by_language=strict_tracks
+        _selected_language = ""
+        pool = base.CHANNEL_TOPIC_POOLS.get(base.CHANNEL_KEY, base.AUTO_TOPIC_POOL)
+    topic = random.choice([value for value in pool if value not in recent] or list(pool))
+    state["recent"] = ([topic] + [value for value in recent if value != topic])[:base.RECENT_TOPICS_MEMORY]
+    path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    return topic, _selected_language
 
-if __name__=='__main__': base.main()
+
+def _music_prompt(index: int) -> str:
+    topic = os.environ.get("TOPIC_KEYWORD", "").strip() or "signature channel mood"
+    language = os.environ.get("LANGUAGE_KEYWORD", "").strip() or _selected_language
+    style = {
+        "globalmusic": f"a warm romantic acoustic vocal song in {language or 'French, Japanese, Spanish, or Italian'}",
+        "kpop": "an original Korean-language acoustic K-pop song with fresh lyrics",
+        "starbucks": "an instrumental cafe jazz and soft piano piece, no vocals",
+        "mbb": "an original elegant classical chamber and piano piece, instrumental only",
+        "healing": "a slow original ambient nature soundscape led by rain and water, instrumental only",
+    }[base.CHANNEL_KEY]
+    return (f"Create {style}, approximately three minutes long, inspired by '{topic}'. It must be a new "
+            "composition with no quotation of an existing melody, no named artist imitation, and no brand "
+            f"references. Keep a clean beginning and ending. Unique production seed: {index}-{random.getrandbits(64):016x}.")
+
+
+def generate_fresh_tracks(*_args, **_kwargs):
+    # Generate the full upper bound so the legacy assembler never needs to loop a track.
+    minimum_seconds = int(os.environ.get("PLAYLIST_FRESH_AUDIO_SECONDS", str(70 * 60)))
+    requested = max(1, int(os.environ.get("LYRIA_TRACK_COUNT", "20")))
+    maximum = max(requested, int(os.environ.get("LYRIA_MAX_TRACKS", "30")))
+    tracks, total = [], 0.0
+    for index in range(1, maximum + 1):
+        path = Path(base.WORKDIR) / f"fresh_lyria_{index:02d}.mp3"
+        base.log(f"   Lyria 새 음악 생성 {index}/{maximum}...")
+        generate_lyria_track(_music_prompt(index), path)
+        duration = base.get_duration(str(path))
+        if duration <= 0:
+            raise RuntimeError(f"Lyria track has no playable duration: {path.name}")
+        file_id = f"{GENERATED_PREFIX}{index}"
+        _generated_paths[file_id] = str(path)
+        tracks.append({"id": file_id, "name": path.name, "duration": duration})
+        total += duration
+        if index >= requested and total >= minimum_seconds:
+            break
+    if total < minimum_seconds:
+        raise RuntimeError(f"Fresh Lyria music is only {total / 60:.1f} minutes; refusing to reuse or loop assets")
+    return tracks
+
+
+def copy_generated(_service, file_id, output_path):
+    source = _generated_paths.get(file_id)
+    if not source:
+        raise RuntimeError("Drive music input is disabled; only fresh Lyria tracks are accepted")
+    shutil.copyfile(source, output_path)
+
+
+def _thumbnail_prompt(topic: str) -> str:
+    # Common layout grammar observed across established 500k+ playlist channels:
+    # one memorable scene, restrained palette, and intentional negative space.
+    # No specific thumbnail, character, artwork, or brand identity is copied.
+    direction = {
+        "globalmusic": "golden-hour romantic cafe, one couple in soft silhouette, calm negative space on the left",
+        "kpop": "modern Korean acoustic listening room, one original adult subject on the right, negative space on the left",
+        "starbucks": "cozy independent cafe, one window table and piano, warm restrained palette, negative space on the left",
+        "mbb": "elegant classical chamber hall, one grand piano on the right, timeless low-contrast light, negative space on the left",
+        "healing": "peaceful rain over a lush forest stream, one clear natural focal point, open misty space on the left",
+    }[base.CHANNEL_KEY]
+    return (f"Create a completely new original photorealistic source photograph for a music playlist about '{topic}': "
+            f"{direction}. Use the proven visual hierarchy of large playlist channels without copying any existing "
+            "thumbnail or identifiable character. 16:9, cinematic depth, premium natural color grading, no text, no "
+            "logo, no watermark, no trademark, no collage, and no reproduction of an existing image.")
+
+
+def fresh_image(topic, workdir, service=None):
+    del service
+    raw_path = Path(workdir) / "fresh_gemini_thumbnail.bin"
+    generate_thumbnail(_thumbnail_prompt(topic), raw_path)
+    try:
+        with Image.open(raw_path) as image:
+            image.verify()
+        with Image.open(raw_path) as image:
+            if image.width < 1280 or image.height < 720:
+                raise RuntimeError("Generated thumbnail is smaller than 1280x720")
+            suffix = ".jpg" if (image.format or "").lower() in {"jpeg", "jpg"} else ".png"
+    except Exception as exc:
+        raise RuntimeError("Gemini returned an invalid thumbnail image") from exc
+    final_path = raw_path.with_suffix(suffix)
+    raw_path.replace(final_path)
+    return [str(final_path)]
+
+
+def benchmark_thumbnail(_channel, image_path, output_path, topic, **_kwargs):
+    """Overlay an original, deliberately smaller type system on the fresh photo."""
+    image = base._resize_cover(Image.open(image_path).convert("RGB"), 1280, 720)
+    overlay = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay, "RGBA")
+    draw.rounded_rectangle((42, 438, 610, 666), radius=24, fill=(5, 8, 16, 132))
+    font_path = base.ensure_font()
+    title = (topic or "ORIGINAL PLAYLIST").strip()
+    words, lines, current = title.split(), [], ""
+    for word in words:
+        candidate = f"{current} {word}".strip()
+        if len(candidate) > 22 and current:
+            lines.append(current)
+            current = word
+        else:
+            current = candidate
+    lines.append(current)
+    lines = lines[:2]
+    title_font = ImageFont.truetype(font_path, 62 if len(" ".join(lines)) < 25 else 52)
+    label_font = ImageFont.truetype(font_path, 25)
+    draw.text((78, 472), "FRESH ORIGINAL MUSIC", font=label_font, fill=(238, 224, 190, 245))
+    y = 516
+    for line in lines:
+        draw.text((76, y), line, font=title_font, fill=(255, 255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0, 120))
+        y += title_font.size + 4
+    composed = Image.alpha_composite(image.convert("RGBA"), overlay).convert("RGB")
+    return base._save_thumbnail_capped(composed, output_path)
+
+
+def make_intro_video(image_path, audio_path, out_path):
+    vf = ("scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
+          "zoompan=z='1+min(on,150)*0.0003':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1920x1080:fps=25,"
+          "fade=t=in:st=0:d=1.2,format=yuv420p")
+    base.run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-framerate", "25", "-i", image_path, "-i", audio_path,
+                     "-vf", vf, "-af", "afade=t=in:st=0:d=0.5", "-c:v", "libx264", "-preset", "fast",
+                     "-crf", "21", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", out_path])
+
+
+def build_fresh_healing(_service, _theme, output_path):
+    return base.build_playlist_audio(None, generate_fresh_tracks(), output_path)
+
+
+base.GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+base.pick_auto_topic = pick_topic
+base.list_folder_files = generate_fresh_tracks
+base.download_drive_file = copy_generated
+base.filter_tracks_by_language = lambda tracks, _keyword: tracks
+base.build_healing_theme_audio = build_fresh_healing
+base.fetch_healing_photo = lambda theme, workdir: fresh_image(theme, workdir)[0]
+base.build_ai_images = fresh_image
+base.generate_youtube_title_description = metadata
+base.pick_duration_target = lambda: (50 * 60, 70 * 60)
+base.make_channel_thumbnail = benchmark_thumbnail
+base.make_static_video = make_intro_video
+base.HEALING_THEME_DURATION_SEC = {theme: (50 * 60, 70 * 60) for theme in base.HEALING_THEME_DURATION_SEC}
+
+if __name__ == "__main__":
+    base.main()

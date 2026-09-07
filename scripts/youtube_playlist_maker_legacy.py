@@ -1737,18 +1737,18 @@ def main():
 
     audio_path = os.path.join(WORKDIR, "playlist_audio.m4a")
     if healing_theme:
-        log(f"1-2/5 healing 테마({healing_theme}) 오디오 생성 중...")
+        log(f"1-2/5 healing 테마({healing_theme}) Lyria 새 음악 생성 중...")
         total_sec = build_healing_theme_audio(service, healing_theme, audio_path)
     else:
-        log("1/5 원곡 폴더에서 음악 목록 조회 중...")
+        log("1/5 Lyria API로 새 음악 생성 중...")
         tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS, "audio/")
         if not tracks:
-            log("❌ 원곡 폴더에 음원이 없습니다")
+            log("❌ Lyria가 재생 가능한 새 음원을 반환하지 않았습니다")
             raise SystemExit(1)
-        log(f"   -> {len(tracks)}개 트랙 발견")
+        log(f"   -> 새 트랙 {len(tracks)}개 생성 완료")
         tracks = filter_tracks_by_language(tracks, language_keyword)
 
-        log("2/5 음악 60~80분 분량으로 무작위 이어붙이는 중...")
+        log("2/5 새 음악을 50~70분 분량으로 이어붙이는 중...")
         total_sec = build_playlist_audio(service, tracks, audio_path)
     log(f"   ✅ 총 재생시간: {total_sec/60:.1f}분")
 
@@ -1769,24 +1769,24 @@ def main():
         log("4/5 정지 이미지 한 장 + 음악으로 영상 파일 생성 중...")
         make_static_video(healing_photo, audio_path, final_path)
     elif topic_keyword.strip():
-        log(f"3/5 주제 '{topic_keyword}' — FLUX 실사 이미지 한 장 생성 중...")
+        log(f"3/5 주제 '{topic_keyword}' — Gemini 새 썸네일 원본 한 장 생성 중...")
         generated_images = build_ai_images(topic_keyword, WORKDIR, service)
         if not generated_images:
-            raise RuntimeError("FLUX 실사 이미지 생성 실패 — 기존 이미지/무료스톡 폴백 금지")
+            raise RuntimeError("Gemini 썸네일 생성 실패 — 기존 이미지/무료스톡 폴백 금지")
         background_path = generated_images[0]
         caption_text = ""
         thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, background_path, thumbnail_out, topic_keyword)
         log("4/5 같은 정지 이미지 한 장 + 음악으로 영상 파일 생성 중...")
         make_static_video(background_path, audio_path, final_path)
     else:
-        log("3/5 주제어 없음 — 채널 기본 주제로 FLUX 실사 이미지 한 장 생성 중...")
+        log("3/5 주제어 없음 — 채널 기본 주제로 Gemini 새 썸네일 원본 생성 중...")
         generated_images = build_ai_images("signature channel mood", WORKDIR, service)
         if not generated_images:
-            raise RuntimeError("FLUX 실사 이미지 생성 실패 — 기존 이미지/무료스톡 폴백 금지")
+            raise RuntimeError("Gemini 썸네일 생성 실패 — 기존 이미지/무료스톡 폴백 금지")
         background_path = generated_images[0]
         caption_text = ""
         thumbnail_out = make_channel_thumbnail(CHANNEL_KEY, background_path, thumbnail_out, "")
-        log("4/5 같은 FLUX 정지 이미지 한 장 + 음악으로 영상 생성 중...")
+        log("4/5 같은 Gemini 정지 이미지 한 장 + 음악으로 영상 생성 중...")
         make_static_video(background_path, audio_path, final_path)
 
     log("5/5 구글드라이브 업로드 중...")

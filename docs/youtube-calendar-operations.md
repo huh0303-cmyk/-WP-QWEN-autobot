@@ -4,11 +4,11 @@ User-confirmed operating policy, 2026-08-31:
 
 - Active YouTube scope: five playlists and five knowledge channels. Language
   education and unrelated legacy workflows remain disabled.
-- The 2026-08-28 emergency generation lock is lifted only for these two workers
-  and their central calendar scheduler.
+- The 2026-08-28 emergency generation lock is lifted only for the VPS single-owner
+  worker and its systemd calendar timer. GitHub video workflows are retired and locked.
 - The 14-day calendar supplies the channel, KST production-start time and topic.
-  This is not a promise of exact upload-completion time: Actions can queue, and
-  rendering/uploading takes additional time. Polling is every 15 minutes.
+  This is not a promise of exact upload-completion time: the VPS queue is sequential,
+  and rendering/uploading takes additional time. Calendar checks run every 15 minutes.
 - Automated uploads MUST remain private with no `publishAt`. Review/approval
   does not publish. The owner must explicitly click Publish in the administrator
   page (YouTube Studio). No automatic public transition is added here.
@@ -25,9 +25,9 @@ no historical data is deleted. One canonical channel/day is selected.
 
 Only `기획확정·자료준비` rows in the current Sheet minute are eligible. Past times
 are PASS, including earlier today; never catch up. See CALENDAR_NO_CATCHUP_POLICY.md.
-Claim the row as `자료수집` before calling GitHub. Workers
+Claim the row as `자료수집` before starting the VPS subprocess. Workers
 must bind the claim once, and consume a separate upload marker before the API
-upload. Failed/ambiguous requests and GitHub reruns never automatically upload
+upload. Failed/ambiguous requests and worker restarts never automatically upload
 again; inspect the run and Studio before explicitly resetting a failed claim.
 
 On completion, validate private status and OAuth channel identity in the receipt,
@@ -37,8 +37,9 @@ manual reconciliation; it must not be reset merely because time has elapsed.
 
 ## Checks
 
-Run the central workflow with `dry_run=true` first. This performs reads only.
-Worker dispatch without a calendar ID and one-use claim is intentionally blocked.
+Use `python scripts/youtube_vps_worker.py` for a one-job smoke test. The systemd
+service uses `--daemon`; the timer uses `--enqueue-due`. Worker execution without
+a calendar ID and one-use claim is intentionally blocked.
 Local regression command:
 
 ```

@@ -11,7 +11,7 @@ Role: handoff/current-state companion to MASTER_MONETIZATION_STRATEGY_2026.md
 ## Frozen business policy
 - WordPress long-form = GPT.
 - Blogger/Blogspot long-form = Gemini.
-- YouTube generated thumbnail = Replicate black-forest-labs/flux-schnell.
+- YouTube generated thumbnail = fresh Gemini 3.1 Flash Image on the VPS.
 - Approved non-YouTube Replicate image pool only: flux-schnell, bytedance/sdxl-lightning-4step, jyoung105/sdxl-turbo.
 - No silent fallback to legacy paid image providers.
 - One-source-multi-use is allowed only with platform-native rewrites; duplicate mass posting is not.
@@ -59,7 +59,7 @@ Use '올뉴종합상황실' as executive control center. Automate only verifiabl
 Priority 3 — Content engine normalization
 - WP = GPT only.
 - Blogger = Gemini only.
-- YouTube thumbnail = FLUX Schnell only.
+- YouTube thumbnail = Gemini 3.1 Flash Image only; playlist music = Lyria 3.5.
 - SNS = one-source-multi-use with native title/hook/caption/CTA/hashtag/timing and duplicate prevention.
 - Randomized/natural schedules; avoid synchronized machine-like publishing.
 
@@ -85,7 +85,7 @@ Validate generation -> image -> quality -> duplicate check -> draft/private/revi
 - Work/Codex: implementation, code changes, integration, tests, commits, automation execution.
 - Claude: independent QA/audit when used; should not reinvent business strategy.
 - Gemini: designated production model for Blogger and other explicitly assigned low-cost tasks only.
-- GitHub Actions: recurring production worker after validation.
+- VPS systemd worker: YouTube generation/render/upload owner; GitHub video workflows retired.
 - Google Sheet '올뉴종합상황실': control room and performance record.
 
 ## Reporting rule

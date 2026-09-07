@@ -121,22 +121,27 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
 
 
 def main():
-    required = {"VIDEO_DRIVE_ID": os.environ.get("VIDEO_DRIVE_ID", ""), "YT_TITLE": os.environ.get("YT_TITLE", ""),
+    local_video = os.environ.get("LOCAL_VIDEO_PATH", "").strip()
+    required = {"VIDEO_SOURCE": local_video or os.environ.get("VIDEO_DRIVE_ID", ""), "YT_TITLE": os.environ.get("YT_TITLE", ""),
         "GOOGLE_OAUTH_CLIENT_ID": GOOGLE_OAUTH_CLIENT_ID, "GOOGLE_OAUTH_REFRESH_TOKEN": GOOGLE_OAUTH_REFRESH_TOKEN,
         "YOUTUBE_OAUTH_CLIENT_ID": YOUTUBE_OAUTH_CLIENT_ID, "YOUTUBE_OAUTH_REFRESH_TOKEN": YOUTUBE_OAUTH_REFRESH_TOKEN}
     missing = [k for k,v in required.items() if not v]
     if missing:
         raise SystemExit(f"환경변수 누락: {missing}")
     os.makedirs(WORKDIR, exist_ok=True)
-    drive = get_drive_service()
-    video_path = os.path.join(WORKDIR, "final.mp4")
-    download_drive_file(drive, os.environ["VIDEO_DRIVE_ID"], video_path)
-    thumb_path = None
-    thumb_id = os.environ.get("THUMB_DRIVE_ID", "")
-    if thumb_id:
-        meta = drive.files().get(fileId=thumb_id, fields="name").execute()
-        thumb_path = os.path.join(WORKDIR, "thumbnail" + (os.path.splitext(meta.get("name", ""))[1] or ".png"))
-        download_drive_file(drive, thumb_id, thumb_path)
+    video_path = local_video
+    thumb_path = os.environ.get("LOCAL_THUMB_PATH", "").strip() or None
+    if not video_path:
+        drive = get_drive_service()
+        video_path = os.path.join(WORKDIR, "final.mp4")
+        download_drive_file(drive, os.environ["VIDEO_DRIVE_ID"], video_path)
+        thumb_id = os.environ.get("THUMB_DRIVE_ID", "")
+        if thumb_id:
+            meta = drive.files().get(fileId=thumb_id, fields="name").execute()
+            thumb_path = os.path.join(WORKDIR, "thumbnail" + (os.path.splitext(meta.get("name", ""))[1] or ".png"))
+            download_drive_file(drive, thumb_id, thumb_path)
+    if not os.path.isfile(video_path):
+        raise RuntimeError(f"Local video does not exist: {video_path}")
     youtube = get_youtube_service()
     channel_key = os.environ.get("CHANNEL_KEY", "").strip().lower()
     if not channel_key: raise RuntimeError("CHANNEL_KEY is required")

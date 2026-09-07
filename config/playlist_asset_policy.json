@@ -1,29 +1,31 @@
 {
-  "generation_budget_usd": 0,
+  "generation_mode": "fresh_api_required",
+  "reuse_existing_assets": false,
   "paid_api_fallback": false,
-  "image_source": "gemini_app_export_or_existing_approved_drive_image",
+  "image_source": "gemini-3.1-flash-image",
+  "thumbnail_benchmark": "common_layout_patterns_from_playlist_channels_over_500k_subscribers_only",
+  "thumbnail_copy_prohibited": true,
+  "thumbnail_original_photo_required": true,
+  "thumbnail_typography": "new_font_and_size_with_each_house_layout",
   "music_sources": {
     "healing": [
-      "existing_free_nature_recordings"
+      "lyria-3.5-fresh-api"
     ],
     "mbb": [
-      "existing_rights_cleared_classical_recordings"
+      "lyria-3.5-fresh-api"
     ],
     "starbucks": [
-      "existing_licensed_instrumentals",
-      "gemini_app_lyria_instrumentals"
+      "lyria-3.5-fresh-api"
     ],
     "globalmusic": [
-      "existing_licensed_romantic_vocals",
-      "gemini_app_lyria_french_vocals"
+      "lyria-3.5-fresh-api"
     ],
     "kpop": [
-      "existing_licensed_korean_vocals",
-      "gemini_app_lyria_korean_vocals"
+      "lyria-3.5-fresh-api"
     ]
   },
   "target_minutes": 60,
-  "app_subscription_is_not_api_credit": true,
+  "api_key_required": true,
   "interval_days_min": 2,
   "interval_days_max": 3,
   "publication_status": "private",

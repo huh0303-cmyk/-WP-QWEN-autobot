@@ -104,12 +104,10 @@ def test_repeated_upload_claim_cannot_upload(monkeypatch):
             result_main()
 
 
-def test_active_workflows_keep_non_calendar_routes_locked():
+def test_legacy_youtube_workflows_are_retired_for_vps_owner():
     for name in ["generate-youtube-playlist.yml", "curio-longform-daily.yml"]:
         text = (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
-        assert "inputs.schedule_id != '' && inputs.claim_token != ''" in text
-        assert "youtube_calendar_result.py upload-start" in text
-        assert "youtube_calendar_result.py finish" in text
+        assert "if: ${{ false }}" in text
     for name in ["curio-scheduler.yml", "daily_multilang_quiz.yml"]:
         assert "if: ${{ false }}" in (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
 

@@ -71,7 +71,7 @@ concurrency:
 
 jobs:
   prepare:
-    if: ${{ inputs.schedule_id != '' && inputs.claim_token != '' }}
+    if: ${{ false }} # RETIRED: video generation/rendering runs only on the VPS
     runs-on: ubuntu-latest
     timeout-minutes: 180
     outputs:
@@ -170,7 +170,7 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: 플레이리스트 최근 상태 갱신 [skip ci]"; git push
 
   publish:
-    if: ${{ needs.prepare.result == 'success' }}
+    if: ${{ false }} # RETIRED: the VPS worker uploads PRIVATE directly
     needs: prepare
     runs-on: ubuntu-latest
     environment: youtube-channels
@@ -224,7 +224,7 @@ jobs:
           if-no-files-found: error
 
   report-calendar:
-    if: ${{ always() && inputs.schedule_id != '' && inputs.claim_token != '' }}
+    if: ${{ false }} # RETIRED: the VPS worker writes calendar results
     needs: [prepare, publish]
     runs-on: ubuntu-latest
     steps:

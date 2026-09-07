@@ -5,6 +5,7 @@ from flask import Response, flash, jsonify, redirect, request, send_from_directo
 from .keywords import tistory_seed_topics, top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
+from automation_hub.youtube_vps_queue import enqueue as enqueue_youtube_vps
 
 import json
 import csv
@@ -282,7 +283,7 @@ def _wp_category_counts(site_url: str, five_minute_bucket: int) -> list[dict[str
 
     2026-09-03: had no time bucket, so one transient network hiccup got
     cached as "categories: []" (shown as "카테고리 수집 실패") for the rest
-    of the Render dyno's lifetime — sites were actually fine on re-check.
+    of the web process lifetime — sites were actually fine on re-check.
     The bucket keeps page loads fast while retrying every five minutes."""
     del five_minute_bucket
     try:
@@ -313,7 +314,7 @@ def _wp_category_counts(site_url: str, five_minute_bucket: int) -> list[dict[str
 def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, object]:
     """Read the public visitor counter deployed on each WordPress site.
 
-    The bucket keeps Render page loads fast while refreshing every five minutes.
+    The bucket keeps VPS page loads fast while refreshing every five minutes.
     Missing or malformed responses are never replaced with invented numbers.
     """
     del five_minute_bucket
@@ -1200,39 +1201,21 @@ def trigger_tistory_plan():
 
 
 def _run_youtube_publish(channel_key: str, label: str) -> None:
-    """Background worker for one YouTube channel's '바로 만들기' button.
-
-    2026-09-06 CEO: wanted the same always-visible success/failure tracking
-    on YouTube as the four split publish buttons, instead of a one-shot
-    flash message with no way to tell if it actually finished. Reuses the
-    same dispatch+poll state machine, scoped to a per-channel group key
-    (youtube_<channel_key>) so all 10 channels track fully independently."""
+    """Put one private YouTube production into the durable VPS queue."""
     group = f"youtube_{channel_key}"
-    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
-    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
     _bulk_write(group, state)
-
-    if not token:
+    try:
+        job = enqueue_youtube_vps(channel_key, label, group, run_now=True)
+        item = {"job_id": job["job_id"], "label": label, "platform": "youtube", "site_id": channel_key,
+                "workflow": "youtube-vps-worker", "run_id": None, "run_url": "", "status": "queued",
+                "conclusion": None, "reason": "VPS 제작 대기"}
+        state.update(status="polling", items=[item])
+    except RuntimeError as exc:
         state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
-            "label": label, "platform": "youtube", "site_id": channel_key, "workflow": "",
-            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
-            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+            "label": label, "platform": "youtube", "site_id": channel_key, "workflow": "youtube-vps-worker",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "queue_failed", "reason": str(exc),
         }])
-        _bulk_write(group, state)
-        return
-
-    item = _dispatch_and_track(
-        repo, token, "youtube-control-scheduler.yml",
-        {"dry_run": "false", "max_dispatch": "1", "channel_key": channel_key, "run_now": "true"},
-        label=label, platform="youtube", site_id=channel_key,
-    )
-    state["items"] = [item]
-    state["status"] = "polling"
-    _bulk_write(group, state)
-    _poll_bulk_items(group, repo, token, timeout_seconds=1800)  # video render + upload can run long
-    state = _bulk_read(group)
-    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
     _bulk_write(group, state)
 
 
@@ -1382,7 +1365,7 @@ def _bulk_state_path(group: str) -> Path:
 def _bulk_read(group: str) -> dict[str, object]:
     """Read one group's bulk-publish state from disk, not a process-local variable.
 
-    Production runs this app under gunicorn --workers 2 (see render.yaml):
+    Production runs this app on the VPS under gunicorn with two workers:
     the worker that handles the dispatching POST and the worker that later
     handles a status-polling GET are frequently different OS processes, so
     an in-memory dict would silently show "idle" to whichever worker didn't
@@ -1626,7 +1609,7 @@ def _run_group_publish(group: str) -> None:
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
     _bulk_write(group, state)
 
-    if not token:
+    if not token and not group.startswith("youtube_"):
         state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
             "label": _BULK_GROUP_TITLES.get(group, group), "platform": group, "site_id": "", "workflow": "",
             "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
@@ -1695,34 +1678,24 @@ def _run_group_publish(group: str) -> None:
             time.sleep(8)
 
     elif group in ("youtube_playlist5", "youtube_archive5"):
-        # Matches the card grouping already used in the YouTube 통제실 UI:
-        # channel.group == 'PLAYLIST' is 플리, anything else renders as 지식.
-        #
-        # 2026-09-07: generate-youtube-playlist.yml deliberately runs under a
-        # single shared concurrency group (youtube-production-single-owner,
-        # cancel-in-progress: false) - only one video render/upload at a
-        # time, by design (shared rendering/quota resource, not a bug like
-        # the old Blogger one). Dispatching all 5 channels' scheduler runs
-        # within an 8-second stagger meant every run after the first queued
-        # up behind it and then got bumped by the NEXT dispatch before its
-        # turn came, so 4 of 5 came back "cancelled" - confirmed against the
-        # 03:25 UTC run (1 success / 4 cancelled on both YouTube groups).
-        # Respecting that single-owner constraint means dispatching and
-        # fully waiting for each channel before starting the next, not
-        # firing all 5 and polling together afterward.
         want_playlist = group == "youtube_playlist5"
         targets = [ch for ch in get_youtube_data() if ch.get("action_ready") and (ch.get("group") == "PLAYLIST") == want_playlist]
         for channel in targets:
             label = str(channel.get("official_name") or channel["channel_key"])
-            _record(_dispatch_and_track(
-                repo, token, "youtube-control-scheduler.yml",
-                {"dry_run": "false", "max_dispatch": "1", "channel_key": channel["channel_key"], "run_now": "true"},
-                label=label, platform="youtube", site_id=channel["channel_key"],
-            ))
-            state["status"] = "polling"
-            _bulk_write(group, state)
-            _poll_bulk_items(group, repo, token, timeout_seconds=1800)
+            try:
+                job = enqueue_youtube_vps(channel["channel_key"], label, group, run_now=True)
+                _record({"job_id": job["job_id"], "label": label, "platform": "youtube",
+                         "site_id": channel["channel_key"], "workflow": "youtube-vps-worker", "run_id": None,
+                         "run_url": "", "status": "queued", "conclusion": None, "reason": "VPS 제작 대기"})
+            except RuntimeError as exc:
+                _record({"label": label, "platform": "youtube", "site_id": channel["channel_key"],
+                         "workflow": "youtube-vps-worker", "run_id": None, "run_url": "", "status": "done",
+                         "conclusion": "queue_failed", "reason": str(exc)})
 
+    if group.startswith("youtube_"):
+        state["status"] = "polling" if any(item.get("status") != "done" for item in state["items"]) else "done"
+        _bulk_write(group, state)
+        return
     state["status"] = "polling"
     _bulk_write(group, state)
     # Video render + upload can run long, same reasoning as the per-channel

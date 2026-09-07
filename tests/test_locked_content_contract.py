@@ -52,8 +52,9 @@ def test_all_blog_writers_are_gpt5_mini_and_images_are_sdxl_first():
     ]
 
     lock = (ROOT / "config" / "MASTER_CONTENT_AND_IMAGE_POLICY_LOCK.md").read_text(encoding="utf-8")
-    assert "YouTube retains its separate FLUX-only thumbnail lock" in lock
-    assert "every new playlist source image and thumbnail must be generated with FLUX.1 Schnell" in lock
+    assert "YouTube retains its separate Gemini thumbnail lock" in lock
+    assert "playlist music is generated fresh for every run through Lyria 3.5" in lock
+    assert "channels above 500,000 subscribers" in lock
 
 
 def test_wordpress_and_newsroom_contract():
@@ -87,8 +88,8 @@ def test_youtube_contract_and_global_worker_owner():
     assert all((c["interval_days_min"], c["interval_days_max"]) == (2, 3) for c in channels)
     for name in ("generate-youtube-playlist.yml", "curio-longform-daily.yml"):
         text = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
-        assert "group: youtube-production-single-owner" in text
-        assert "cancel-in-progress: false" in text
+        assert "if: ${{ false }}" in text
+    assert "--daemon" in (ROOT / "deploy" / "vps" / "korea365-youtube-worker.service").read_text(encoding="utf-8")
 
 
 def test_youtube_generated_schedule_has_no_fixed_short_period_or_time_collision():

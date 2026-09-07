@@ -23,13 +23,6 @@ on:
         required: false
         type: boolean
         default: false
-  push:
-    branches: [main]
-    paths:
-      - "scripts/youtube_calendar_dispatch.py"
-      - "automation_hub/youtube_calendar.py"
-  schedule:
-    - cron: "7,22,37,52 * * * *"
 
 permissions:
   contents: read
@@ -42,6 +35,7 @@ concurrency:
 
 jobs:
   dispatch:
+    if: ${{ false }} # RETIRED: the VPS systemd timer owns YouTube scheduling
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -68,4 +62,3 @@ jobs:
           PAID_IMAGE_GENERATION_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
         run: python scripts/youtube_control_scheduler.py
-
