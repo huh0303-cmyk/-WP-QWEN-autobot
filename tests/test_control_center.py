@@ -137,7 +137,12 @@ def test_blogspot_cards_use_the_real_automatic_queue_without_manual_source_url()
     # "바이럴자동발행" auto-research button — so a keyword field is now
     # expected here, but a manual free-text source URL is still gone.
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    blogspot = template[template.index('{% for blog in bloggers %}'):template.index('{% endfor %}', template.index('{% for blog in bloggers %}'))]
+    # The template has two `{% for blog in bloggers %}` loops: an earlier
+    # quick_tile(...) summary row (single "즉시 발행" button, intentionally
+    # simple) and the detailed automation card further down that this test
+    # covers - use the last occurrence so the assertions target the latter.
+    loop_start = template.rindex('{% for blog in bloggers %}')
+    blogspot = template[loop_start:template.index('{% endfor %}', loop_start)]
     assert 'name="selection_mode" value="auto"' in blogspot
     assert 'name="source_wp_url"' not in blogspot
     assert 'name="keyword" class="force-keyword-input"' in blogspot

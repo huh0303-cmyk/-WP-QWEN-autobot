@@ -196,11 +196,12 @@
                     <input type="hidden" name="submit_mode" class="force-submit-mode" value="">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}자동 재수집 중{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}재수집{% endif %}</span>
                             <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
+                            <span class="rounded-full bg-blue-100 px-2 py-1 text-[9px] font-black text-blue-700" title="WordPress">WP</span>
                             <span class="break-all font-bold text-slate-800">{{ site.domain }}</span>
                         </div>
                         <div class="flex items-center gap-2">
+                            <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}자동 재수집 중{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}재수집{% endif %}</span>
                             {% if site.google_approved %}
                             <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-300 to-amber-500 px-2 py-1 text-[9px] font-black tracking-tight text-amber-950 shadow-[0_3px_10px_rgba(217,119,6,.28)]" title="Google 승인 2025-08-15">
                                 <span class="text-[11px] leading-none">★</span><span>G승인</span><span class="font-bold opacity-70">250815</span>
@@ -353,7 +354,8 @@
                         <div class="min-w-0">
                             <div class="mb-1 flex items-center gap-2">
                                 <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-violet-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
-                                <p class="text-[10px] font-bold text-slate-400">등록 B{{ blog.order }} · {{ blog.category }}</p>
+                                <span class="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700" title="Blogspot">BLOG</span>
+                                <p class="truncate text-[10px] font-bold text-slate-400">등록 B{{ blog.order }} · {{ blog.category }}</p>
                             </div>
                             <h3 class="truncate text-base font-black text-slate-950" title="{{ blog.name }}">{{ blog.name }}</h3>
                             <a class="mt-0.5 block truncate text-[11px] font-semibold text-violet-700 hover:underline" href="{{ blog.url }}" target="_blank" rel="noopener" title="{{ blog.url }}">{{ blog.url|replace('https://', '') }}</a>
