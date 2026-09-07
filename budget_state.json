@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 2.61,
+  "spent_estimate_usd": 2.64,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -518,6 +518,15 @@
       "amount_usd": 0.03,
       "reservation_id": "8a00ae190cd4106802890dad9147980ba16274bb2aaa0cec2b5d59c5cb2df953",
       "run_id": "34119167180",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-07T20:57:35.295247+09:00",
+      "label": "blogger-rewrite:blogger_sis",
+      "amount_usd": 0.03,
+      "reservation_id": "1fdc3c574f24e839f5d8b7b96ca12f9ae54d8bf0df1f862dfafb9a152a4b0840",
+      "run_id": "34119185298",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
