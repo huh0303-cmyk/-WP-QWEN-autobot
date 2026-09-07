@@ -27,5 +27,29 @@
   "interval_days_min": 2,
   "interval_days_max": 3,
   "publication_status": "private",
-  "intro_seconds": 6
+  "intro_seconds": 6,
+  "kpop": {
+    "language": "ko",
+    "vocals": true,
+    "preferred_styles": [
+      "acoustic pop",
+      "unplugged folk pop",
+      "acoustic R&B",
+      "acoustic bossa pop"
+    ],
+    "reference_sample": "https://gemini.google.com/app/1791551cdc17bcb2",
+    "sample_approved": true
+  },
+  "romantic": {
+    "languages": {
+      "fr": 0.25,
+      "ja": 0.25,
+      "es": 0.25,
+      "it": 0.25
+    },
+    "french_voice": "sweet cute adult female, soft natural singing",
+    "style": "sweet acoustic cafe romance",
+    "reference_sample": "https://gemini.google.com/app/7b76cb5aaf4a3a56",
+    "sample_approved": true
+  }
 }

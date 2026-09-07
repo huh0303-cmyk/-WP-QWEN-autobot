@@ -29,3 +29,15 @@ def test_intro_uses_local_ffmpeg_and_keeps_audio(monkeypatch):
     assert 'music.m4a' in calls[0]
     assert '-shortest' in calls[0]
     assert 'min(on,150)' in calls[0][calls[0].index('-vf')+1]
+
+def test_language_cycle_is_balanced():
+    counts={}
+    for _ in range(40):
+        chosen=maker.balanced_language(counts)
+        counts[chosen]=counts.get(chosen,0)+1
+    assert set(counts.values())=={10}
+
+def test_kpop_never_falls_back_to_other_languages(monkeypatch):
+    monkeypatch.setattr(maker.base,'CHANNEL_KEY','kpop')
+    with pytest.raises(RuntimeError,match='WAITING_ASSETS'):
+        maker.strict_tracks([{'name':'[ja] Japanese song.mp3'}],'mixed')

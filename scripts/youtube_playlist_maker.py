@@ -3,7 +3,7 @@
 Gemini subscription generation happens in the app. This worker consumes Drive assets;
 it never purchases API music or images and never silently substitutes another provider.
 """
-import os, random, sys
+import os, random, sys, json, re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 for p in (ROOT, ROOT/'scripts'):
@@ -70,5 +70,46 @@ def make_intro_video(image_path, audio_path, out_path):
         '-vf',vf,'-af','afade=t=in:st=0:d=0.5','-c:v','libx264','-preset','fast','-crf','21',
         '-c:a','aac','-b:a','192k','-movflags','+faststart','-shortest',out_path])
 base.make_static_video=make_intro_video
+
+
+LANGUAGE_TAGS={'korean':['한국어','korean','[ko]'], 'french':['프랑스어','불어','french','[fr]'],
+    'japanese':['일본어','japanese','[ja]'], 'spanish':['스페인어','spanish','[es]'], 'italian':['이탈리아어','italian','[it]']}
+_selected_language=''
+
+def strict_tracks(tracks, keyword):
+    language='korean' if base.CHANNEL_KEY=='kpop' else (_selected_language or keyword.lower())
+    if base.CHANNEL_KEY not in {'kpop','globalmusic'}: return base._bring_longest_to_front(list(tracks))
+    tags=LANGUAGE_TAGS.get(language,[])
+    matched=[t for t in tracks if any(tag in t['name'].casefold() for tag in tags)]
+    if not matched: raise RuntimeError(f'WAITING_ASSETS: no explicitly tagged {language} vocals; refusing unrelated-language fallback')
+    return base._bring_longest_to_front(matched)
+
+def balanced_language(counts):
+    languages=['french','japanese','spanish','italian']
+    minimum=min(counts.get(lang,0) for lang in languages)
+    return random.choice([lang for lang in languages if counts.get(lang,0)==minimum])
+
+def pick_topic():
+    global _selected_language
+    path=Path(base.RECENT_TOPICS_FILE)
+    state=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+    recent=state.get('recent',[])
+    if base.CHANNEL_KEY=='globalmusic':
+        counts=state.setdefault('romantic_language_counts',{})
+        _selected_language=balanced_language(counts)
+        counts[_selected_language]=counts.get(_selected_language,0)+1
+        pool=['Golden Hour Acoustic Romance','Soft Songs for a Quiet Cafe','A Sweet Unplugged Evening','Warm Guitar Love Songs']
+    elif base.CHANNEL_KEY=='kpop':
+        _selected_language='korean'
+        pool=['Korean Acoustic Pop Evening','Unplugged Korean Love Songs','Soft Korean Acoustic R&B','Korean Folk Pop for a Quiet Cafe']
+    else:
+        _selected_language=''
+        pool=base.CHANNEL_TOPIC_POOLS.get(base.CHANNEL_KEY,base.AUTO_TOPIC_POOL)
+    topic=random.choice([t for t in pool if t not in recent] or list(pool))
+    state['recent']=([topic]+[t for t in recent if t!=topic])[:base.RECENT_TOPICS_MEMORY]
+    path.write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding='utf-8')
+    return topic,_selected_language
+base.pick_auto_topic=pick_topic
+base.filter_tracks_by_language=strict_tracks
 
 if __name__=='__main__': base.main()
