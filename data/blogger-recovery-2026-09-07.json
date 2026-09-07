@@ -13,10 +13,12 @@
     "blogger_medicaltour": "https://koreamedicaltour365.blogspot.com/2026/09/police-search-of-hanjin-kal-what.html",
     "blogger_kstudy365": "https://kstudy365.blogspot.com/2026/09/long-distance-relationship-while.html",
     "blogger_kworld365_kpop": "https://kworld365.blogspot.com/2026/09/hongdae-k-pop-shopping-how-to-plan-haul.html",
-    "blogger_kvisa365": "https://k-visa365.blogspot.com/2026/09/what-foreign-nationals-families-should.html"
+    "blogger_kvisa365": "https://k-visa365.blogspot.com/2026/09/what-foreign-nationals-families-should.html",
+    "blogger_oliveyoung": "https://oliveyoungkorea.blogspot.com/2026/09/trim-your-cart-not-your-results-how-to.html",
+    "blogger_kskin365": "https://skin.k-health365.com/2026/09/will-your-favorite-sunscreen-survive.html"
   },
   "next_generation_after": "2026-09-07T10:18:18.412988+00:00",
-  "checked_at": "2026-09-07T09:32:10.971516+00:00",
+  "checked_at": "2026-09-07T15:24:02.346316+00:00",
   "results": [
     {
       "site": "blogger_jobglobal",
@@ -35,7 +37,8 @@
     },
     {
       "site": "blogger_oliveyoung",
-      "status": "awaiting_generation"
+      "status": "published",
+      "public_url": "https://oliveyoungkorea.blogspot.com/2026/09/trim-your-cart-not-your-results-how-to.html"
     },
     {
       "site": "blogger_korea365",
@@ -44,15 +47,18 @@
     },
     {
       "site": "blogger_studyinkorea",
-      "status": "awaiting_generation"
+      "status": "blocked",
+      "reason": "ModuleNotFoundError"
     },
     {
       "site": "blogger_koreanews",
-      "status": "awaiting_generation"
+      "status": "blocked",
+      "reason": "ModuleNotFoundError"
     },
     {
       "site": "blogger_korea_life_support365",
-      "status": "awaiting_generation"
+      "status": "blocked",
+      "reason": "ModuleNotFoundError"
     },
     {
       "site": "blogger_kworld365",
@@ -128,7 +134,8 @@
     },
     {
       "site": "blogger_kskin365",
-      "status": "awaiting_generation"
+      "status": "published",
+      "public_url": "https://skin.k-health365.com/2026/09/will-your-favorite-sunscreen-survive.html"
     },
     {
       "site": "blogger_kstudy365",
