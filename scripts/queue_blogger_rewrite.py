@@ -319,7 +319,7 @@ def main():
             if source is not None:
                 candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
                 quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum, language=language)
-                critical_prefixes = ("body length", "verified WordPress source link", "YMYL", "meta description is incomplete", "language mismatch")
+                critical_prefixes = ("body length", "verified WordPress source link", "YMYL", "meta description", "language mismatch")
             else:
                 candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl, preserve_urls=evidence_urls)
                 quality_score, failures = original_quality_score(candidate, keyword=selected_topic, target_chars=target_chars, language=language)
@@ -328,7 +328,7 @@ def main():
                     failures.append("verified trend evidence links are incomplete")
                     quality_score = max(0, quality_score - 15)
                 similarity_score = 0.0
-                critical_prefixes = ("body length", "verified trend evidence", "YMYL", "meta description is incomplete", "language mismatch")
+                critical_prefixes = ("body length", "verified trend evidence", "YMYL", "meta description", "language mismatch")
             print(json.dumps({"attempt": attempt, "quality_score": quality_score, "failures": failures}, ensure_ascii=False))
             critical_failures = [failure for failure in failures if failure.startswith(critical_prefixes)]
             if quality_score >= minimum_quality and not critical_failures:
