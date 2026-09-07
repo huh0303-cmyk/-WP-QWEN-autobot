@@ -119,6 +119,7 @@ jobs:
       - name: Build mobile card-news screens
         run: python scripts/tistory_card_news.py --drafts artifacts/tistory-daily-drafts.json --output-dir artifacts/tistory-card-news
       - name: Upload plan + draft artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tistory-daily-plan-${{ github.run_id }}

@@ -305,8 +305,11 @@ def generate_draft(job: dict) -> dict:
     # AI generation prompt — use the article's own title instead.
     draft["image_alt"] = f'{draft["category"]} 주제를 설명하는 대표 이미지'
     draft["first_image_priority"] = bool(draft["image_url"])
-    draft["image_policy"] = "sdxl_lightning_then_flux_schnell_then_pass_without_image"
-    draft["image_status"] = "generated" if draft["image_url"] else "pass_no_image"
+    draft["image_policy"] = "sdxl_lightning_then_flux_schnell_required_representative"
+    draft["image_status"] = "generated" if draft["image_url"] else "missing_required_image"
+    if not draft["image_url"]:
+        draft["status"] = "MEDIA_REQUIRED"
+        draft["error"] = "대표 이미지 생성 또는 영구 보관 실패: 공개 발행 대기"
     if draft["image_url"]:
         draft["body_html"] = f'<p><img src="{html.escape(str(draft["image_url"]), quote=True)}" alt="{html.escape(draft["image_alt"], quote=True)}"></p>' + draft["body_html"]
     return draft
