@@ -285,6 +285,12 @@ def generate_draft(job: dict) -> dict:
     if draft is None:
         return {"job_id": job["job_id"], "site_id": job["site_id"], "status": "QUALITY_FAILED", "error": " | ".join(errors), "public_allowed": False}
     draft["review_policy"] = "gpt_writer_plus_deterministic_quality_gate"
+    draft["source_keyword"] = job["seed_topic"]
+    from automation_hub.tistory_keywords import duplicate
+    if duplicate(draft['title'], job.get('recent_titles', [])):
+        draft['status'] = 'DUPLICATE_TITLE_BLOCKED'
+        draft['error'] = 'Recent published or queued title is too similar'
+        return draft
     generated_url = generate_image_url(draft["image_prompt"], theme=draft["category"])
     # Replicate's own delivery URLs expire within hours, well before a draft
     # sitting in the review queue gets approved. Re-host once, up front, so
@@ -297,10 +303,13 @@ def generate_draft(job: dict) -> dict:
     draft["image_url"] = generated_url
     # Alt text must describe the image for a reader, not carry the raw
     # AI generation prompt — use the article's own title instead.
-    draft["image_alt"] = draft.get("title") or draft["category"]
+    draft["image_alt"] = f'{draft["category"]} 주제를 설명하는 대표 이미지'
     draft["first_image_priority"] = bool(draft["image_url"])
-    draft["image_policy"] = "sdxl_lightning_then_flux_schnell_then_pass_without_image"
-    draft["image_status"] = "generated" if draft["image_url"] else "pass_no_image"
+    draft["image_policy"] = "sdxl_lightning_then_flux_schnell_required_representative"
+    draft["image_status"] = "generated" if draft["image_url"] else "missing_required_image"
+    if not draft["image_url"]:
+        draft["status"] = "MEDIA_REQUIRED"
+        draft["error"] = "대표 이미지 생성 또는 영구 보관 실패: 공개 발행 대기"
     if draft["image_url"]:
         draft["body_html"] = f'<p><img src="{html.escape(str(draft["image_url"]), quote=True)}" alt="{html.escape(draft["image_alt"], quote=True)}"></p>' + draft["body_html"]
     return draft

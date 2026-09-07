@@ -3,6 +3,11 @@ name: "Tistory — Daily 5-Site Plan"
 on:
   workflow_dispatch:
     inputs:
+      slot:
+        description: "KST morning or afternoon slot"
+        type: choice
+        options: [am, pm]
+        default: am
       site_ids:
         description: "Comma-separated site IDs; blank runs all five"
         required: false
@@ -15,8 +20,7 @@ on:
         description: "키워드보고발행: CEO picked this exact seed topic; blank keeps 바이럴자동발행's own live cross-media pick"
         required: false
         default: ""
-  schedule:
-    - cron: "11 21 * * *"
+
 
 permissions:
   contents: write
@@ -38,6 +42,11 @@ jobs:
         run: pip install requests google-api-python-client google-auth -q
       - name: Build one-post-per-site safe plan
         env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          TISTORY_SLOT: ${{ inputs.slot }}
           SITE_IDS: ${{ inputs.site_ids }}
           TISTORY_RUN_KEY: ${{ inputs.run_key }}
           TISTORY_FORCE_TOPIC: ${{ inputs.force_topic }}
@@ -110,6 +119,7 @@ jobs:
       - name: Build mobile card-news screens
         run: python scripts/tistory_card_news.py --drafts artifacts/tistory-daily-drafts.json --output-dir artifacts/tistory-card-news
       - name: Upload plan + draft artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tistory-daily-plan-${{ github.run_id }}

@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -16,7 +17,7 @@ def test_daily_plan_includes_all_five_launched_sites():
     assert plan["portfolio_sites"] == 5
     assert plan["enabled_sites"] == 5
     assert len(plan["jobs"]) == 5
-    assert plan["daily_posts_per_site"] == 1
+    assert plan["daily_posts_per_site"] == 2
     assert plan["public_allowed"] is False
     assert all(j["publish_policy"] == "awaiting_approval" for j in plan["jobs"])
     assert all(j["duplicate_guard"] is True for j in plan["jobs"])
@@ -75,3 +76,8 @@ def test_ktrip_is_korean_travel_information():
     assert site["language"] == "ko"
     assert site["title"] == "한국여행정보"
     assert "한국어" in site["audience"]
+
+@pytest.fixture(autouse=True)
+def isolate_live_keyword_sources(monkeypatch):
+    monkeypatch.setattr('automation_hub.tistory_keywords.recent_history', lambda site: [])
+    monkeypatch.setattr('scripts.tistory_daily_planner._pick_seed_topic', lambda site, day: ('새로운 검증 주제', 80, {'live_cross_media':80}))

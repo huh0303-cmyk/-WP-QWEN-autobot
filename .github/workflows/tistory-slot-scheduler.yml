@@ -1,0 +1,25 @@
+name: Tistory morning and afternoon random scheduler
+on:
+  schedule:
+    - cron: '*/5 0-7,22-23 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: tistory-slot-dispatcher
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Dispatch each due site slot once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/dispatch_tistory_slots.py
