@@ -77,8 +77,21 @@ LANGUAGE_TAGS={'korean':['한국어','korean','[ko]'], 'french':['프랑스어',
 _selected_language=''
 
 def strict_tracks(tracks, keyword):
+    global _selected_language
     language='korean' if base.CHANNEL_KEY=='kpop' else (_selected_language or keyword.lower())
     if base.CHANNEL_KEY not in {'kpop','globalmusic'}: return base._bring_longest_to_front(list(tracks))
+    if base.CHANNEL_KEY == 'globalmusic' and language not in LANGUAGE_TAGS:
+        # Calendar topics often carry Mixed; resolve from actual tagged assets.
+        available = [lang for lang in ('french','japanese','spanish','italian')
+                     if any(any(tag in t['name'].casefold() for tag in LANGUAGE_TAGS[lang]) for t in tracks)]
+        if not available:
+            raise RuntimeError('WAITING_ASSETS: no identified French/Japanese/Spanish/Italian vocals in source folder')
+        state_path=Path(base.RECENT_TOPICS_FILE)
+        state=json.loads(state_path.read_text(encoding='utf-8')) if state_path.exists() else {}
+        counts=state.get('romantic_language_counts',{})
+        minimum=min(counts.get(lang,0) for lang in available)
+        language=random.choice([lang for lang in available if counts.get(lang,0)==minimum])
+        _selected_language=language
     tags=LANGUAGE_TAGS.get(language,[])
     matched=[t for t in tracks if any(tag in t['name'].casefold() for tag in tags)]
     if not matched: raise RuntimeError(f'WAITING_ASSETS: no explicitly tagged {language} vocals; refusing unrelated-language fallback')
