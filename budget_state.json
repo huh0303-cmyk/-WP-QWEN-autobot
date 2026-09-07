@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 2.82,
+  "spent_estimate_usd": 2.85,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -581,6 +581,15 @@
       "amount_usd": 0.03,
       "reservation_id": "e30ab277842af0e1642d37425fae7ae66d6ce4faf5da174beebd7329c343797a",
       "run_id": "34119235073",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-07T20:58:47.381377+09:00",
+      "label": "blogger-rewrite:blogger_kmedical_job_center",
+      "amount_usd": 0.03,
+      "reservation_id": "d50eea9f7f5b4987a91dd4aa26e27489e194ce78ea65da38f48d7cfc03aad947",
+      "run_id": "34119321496",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
