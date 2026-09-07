@@ -3,6 +3,10 @@ name: "Automation Hub — WordPress to Blogger rewrite"
 on:
   workflow_dispatch:
     inputs:
+      recover_from_wp:
+        description: "복구: 연결된 WP의 미사용 공개 원문으로 작성 (중복 원문 제외)"
+        type: boolean
+        default: false
       source_wp_url:
         description: "Optional exact WordPress source; blank auto-selects today's highest evidenced topic and closest related public post"
         required: false
@@ -83,11 +87,15 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          BUDGET_GITHUB_REPOSITORY: ${{ github.repository }}
+          BUDGET_GITHUB_BRANCH: main
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
           CLAUDE_ENABLED: "false"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: "false"
+          BLOGGER_RECOVER_FROM_WP: ${{ inputs.recover_from_wp }}
           SOURCE_WP_URL: ${{ inputs.source_wp_url }}
           BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
           BLOGGER_LANGUAGE: ${{ inputs.language }}
@@ -111,25 +119,10 @@ jobs:
           -f platform=blogger
           -f job_id="$QUEUED_JOB_ID"
           -f max_jobs=1
-      - name: Commit budget guard state
+      - name: Preserve estimated budget receipt
         if: always()
-        # This is cost-tracking bookkeeping, not the actual article
-        # generation/queueing above - it must never fail the job. Under
-        # GitHub Actions' default `set -e`, a `git pull --rebase` conflict
-        # (many sites' runs landing close together) used to kill this step
-        # outright and get logged as the whole run "failing" even though the
-        # article had already queued successfully. Now a conflict just aborts
-        # the rebase and gives up gracefully after a few tries.
-        continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add budget_state.json 2>/dev/null || true
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: budget guard state [skip ci]"
-            for attempt in 1 2 3; do
-              git push && break
-              git pull --rebase origin main || git rebase --abort || true
-              sleep $((attempt * 5))
-            done
-          fi
+        uses: actions/upload-artifact@v4
+        with:
+          name: budget-estimate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: budget_state.json
+          if-no-files-found: warn

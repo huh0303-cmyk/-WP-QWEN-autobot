@@ -81,7 +81,15 @@ def main() -> int:
     failed = 0
 
     for index, row in enumerate(queue, start=2):
-        if row.get("status", "").strip().lower() not in {"ready", "대기"}:
+        recover_invalid = (
+            bool(selected_job) and row.get("job_id") == selected_job
+            and os.getenv("RECOVER_INVALID_JOB", "false").lower() == "true"
+            and row.get("status", "").lower() == "failed"
+            and row.get("error_code") == "invalid_job"
+            and not row.get("remote_id") and not row.get("public_url")
+            and 100 <= len(os.getenv("RECOVERY_SEARCH_DESCRIPTION", "").strip()) < 120
+        )
+        if row.get("status", "").strip().lower() not in {"ready", "대기"} and not recover_invalid:
             continue
         if selected_job and row.get("job_id") != selected_job:
             continue
@@ -132,6 +140,8 @@ def main() -> int:
                 continue
         message = row.get("message", "")
         search_description = message.split("meta_description=", 1)[1].strip() if "meta_description=" in message else ""
+        if recover_invalid:
+            search_description = os.environ["RECOVERY_SEARCH_DESCRIPTION"].strip()
         job = PublishJob(
             job_id=row.get("job_id", ""), site_id=row.get("site_id", ""), title=row.get("title", ""),
             content_html=row.get("content_html", ""), labels=[x.strip() for x in row.get("labels", "").split(",") if x.strip()],
