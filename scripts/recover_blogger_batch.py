@@ -95,9 +95,9 @@ def main():
         except (Exception,SystemExit) as error:
             message=str(error)
             # Never persist request URLs or secrets from provider exceptions.
-            reason='GEMINI_QUOTA' if 'GEMINI_QUOTA' in message else type(error).__name__
+            reason='OPENAI_QUOTA' if 'OPENAI_QUOTA' in message else type(error).__name__
             report.append({'site':site,'status':'blocked','reason':reason})
-            if reason=='GEMINI_QUOTA':
+            if reason=='OPENAI_QUOTA':
                 generation_allowed=False
                 state['next_generation_after']=(now+timedelta(hours=6)).isoformat()
     state['checked_at']=now.isoformat();state['results']=report
