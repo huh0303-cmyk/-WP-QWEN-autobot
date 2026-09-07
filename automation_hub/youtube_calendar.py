@@ -16,9 +16,12 @@ ALIASES = {
 
 def channel_key(name):
     aliases = dict(ALIASES)
+    aliases.update({'Cafe_Romantic': 'globalmusic', '플리-힐링': 'healing', '플리-카페음악': 'starbucks', '플리-MBB': 'mbb', '플리-K-pop': 'kpop'})
     for c in load_channels():
         aliases.update({c.display_name: c.channel_key, c.channel_key: c.channel_key,
                         c.channel_id: c.channel_key})
+        if c.official_name:
+            aliases[c.official_name] = c.channel_key
     return aliases.get(name.strip())
 
 
