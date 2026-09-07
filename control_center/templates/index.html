@@ -102,7 +102,7 @@
             {% if metrics and metrics.get('index_total') is not none %}
             <p class="text-[9px] {{ 'text-amber-700' if metrics.get('index_partial') else 'text-slate-500' }}">Google 검사 대상 {{ metrics.get('index_total') }}개 · 미색인 {{ metrics.get('index_unindexed') }}개 · 미확인 {{ metrics.get('index_unknown') or 0 }}개{% if metrics.get('index_partial') %} · 일부 확인(전체 색인 수 아님){% endif %}</p>
             {% elif metrics %}<p class="text-[9px] text-amber-700">{{ metrics.get('index_status') or 'Google Search Console 집계 미연결' }}</p>{% endif %}
-            <p class="text-[9px] text-slate-400">방문 집계 {{ metrics.get('visitor_checked_at') or '시각 미확인' if metrics else '미지원' }} · 색인 {{ metrics.get('index_checked_at') or '시각 미확인' if metrics else '미지원' }}</p>
+            <p class="text-[9px] text-slate-400">방문 집계 {{ metrics.get('visitor_checked_at')|kst_time if metrics else '미지원' }} · 색인 {{ metrics.get('index_checked_at')|kst_time if metrics else '미지원' }}</p>
             </div>
             <div class="tile-history mt-2 space-y-1 border-t pt-2 text-[10px]" aria-live="polite">발행 기록 확인 중…</div>
             <button type="button" data-quick-group="{{ group }}" {% if not ready %}disabled{% endif %} class="mt-3 w-full rounded-lg bg-blue-700 px-2 py-2 text-xs font-bold text-white disabled:opacity-40">{{ label if ready else '연결 필요' }}</button>

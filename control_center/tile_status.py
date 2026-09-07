@@ -48,12 +48,12 @@ def new_content(url, platform, bucket):
     try:
         if platform == 'wordpress':
             r = requests.get(url.rstrip('/') + '/wp-json/wp/v2/posts', params={
-                'per_page': 100, '_fields': 'id,date_gmt', 'status': 'publish',
+                'per_page': 20, '_fields': 'id,date_gmt', 'status': 'publish',
             }, timeout=8)
             r.raise_for_status()
             rows = r.json()
             dates = [datetime.fromisoformat(row['date_gmt'].rstrip('Z') + '+00:00').astimezone(KST) for row in rows]
-            if len(rows) == 100 and min(dates) >= yesterday:
+            if len(rows) == 20 and min(dates) >= yesterday:
                 return {'new_posts': None, 'new_posts_delta': None}
             counts = [sum(today <= d < today + timedelta(days=1) for d in dates), sum(yesterday <= d < today for d in dates)]
         else:
