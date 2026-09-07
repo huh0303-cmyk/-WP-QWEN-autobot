@@ -55,11 +55,11 @@ base.gemini_generate_image=no_paid_generation
 base.build_ai_images=bank_images
 base.fetch_healing_photo=lambda theme,workdir: bank_images(theme,workdir)[0]
 base.generate_youtube_title_description=metadata
-base.pick_duration_target=lambda: (59*60,61*60)
+base.pick_duration_target=lambda: (50*60,70*60)
 # Keep the approved Gemini composition, rather than repainting it with legacy text bars.
 base.make_channel_thumbnail=lambda channel,image,out,topic,**kwargs: base.make_photo_thumbnail(image,out)
 # Preserve the existing rain/stream selection and bird sound mixing.
-base.HEALING_THEME_DURATION_SEC={theme:(59*60,61*60) for theme in base.HEALING_THEME_DURATION_SEC}
+base.HEALING_THEME_DURATION_SEC={theme:(50*60,70*60) for theme in base.HEALING_THEME_DURATION_SEC}
 
 def make_intro_video(image_path, audio_path, out_path):
     # Six-second gentle push-in, then hold; no extra video model or audio repetition.

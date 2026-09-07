@@ -6,8 +6,8 @@ def test_paid_generation_is_blocked():
         maker.base.gemini_generate_image('prompt', 'output.png')
 
 def test_hour_target_and_existing_nature_routing():
-    assert maker.base.pick_duration_target() == (3540,3660)
-    assert all(v == (3540,3660) for v in maker.base.HEALING_THEME_DURATION_SEC.values())
+    assert maker.base.pick_duration_target() == (3000,4200)
+    assert all(v == (3000,4200) for v in maker.base.HEALING_THEME_DURATION_SEC.values())
     assert maker.base.build_healing_theme_audio.__name__ == 'build_healing_theme_audio'
 
 def test_metadata_does_not_call_paid_writer(monkeypatch):

@@ -51,5 +51,16 @@
     "style": "sweet acoustic cafe romance",
     "reference_sample": "https://gemini.google.com/app/7b76cb5aaf4a3a56",
     "sample_approved": true
-  }
+  },
+  "duration_minutes_min": 50,
+  "duration_minutes_max": 70,
+  "target_track_count": 20,
+  "batch_order": [
+    "healing",
+    "kpop",
+    "globalmusic",
+    "mbb",
+    "starbucks"
+  ],
+  "batch_gap_minutes": 17
 }
