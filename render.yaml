@@ -21,6 +21,7 @@ services:
     buildFilter:
       ignoredPaths:
         - assets/tistory_images/**
+        - data/site-publication-history.json
         - budget_state.json
         - data/blogspot_daily_auto_state.json
         - blogger_scheduler_state.json

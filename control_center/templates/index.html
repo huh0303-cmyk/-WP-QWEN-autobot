@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -89,33 +89,44 @@
                 {% endfor %}
             </div>
         </section>
-        {% macro quick_tile(name, url, group, label, ready=true, visitors=none) %}
-        <article data-tile-group="{{ group }}" data-visitors="{{ visitors if visitors is not none else -1 }}" class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm min-w-0">
+        {% macro quick_tile(name, url, group, label, ready=true, visitors=none, metrics=none, site_id="") %}
+        <article data-site-id="{{ site_id }}" data-tile-group="{{ group }}" data-visitors="{{ visitors if visitors is not none else -1 }}" class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm min-w-0">
             <p class="truncate text-xs font-black text-slate-800" title="{{ name }}">{{ name }}</p>
             <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block truncate text-xs text-blue-700 underline" title="{{ url }}">{{ url|replace('https://','')|replace('http://','') }} ↗</a>
-            <p class="tile-visitors mt-1 text-[10px] font-bold text-slate-500">오늘 방문자 {{ visitors if visitors is not none else '미집계' }}</p>
+            <span class="tile-rank mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-black text-blue-800">순위 미집계</span>
+            <div class="tile-metrics mt-2 space-y-1 text-[11px]">
+            {% for title, key, change, basis in [('오늘 방문자','today_visitors','today_delta','어제 하루 대비'),('누적 방문자','total_visitors','total_delta','오늘 증가'),('새 콘텐츠 · 오늘','new_posts','new_posts_delta','어제 하루 대비 · KST'),('Google 색인 · 글','indexed','indexed_delta','이전 Google 확인 대비')] %}
+            {% set value = metrics.get(key) if metrics else none %}{% set delta = metrics.get(change) if metrics else none %}
+            <p class="flex flex-wrap justify-between gap-1" title="{{ basis }}"><span>{{ title }}</span><strong>{{ '{:,}'.format(value) if value is not none else '미집계' }} <span class="{{ 'text-red-600' if delta is not none and delta < 0 else 'text-emerald-700' }}">({% if delta is none %}증감 미집계{% else %}{{ '+' if delta > 0 else '' }}{{ '{:,}'.format(delta) }}{% endif %})</span></strong></p>
+            {% endfor %}
+            {% if metrics and metrics.get('index_total') is not none %}
+            <p class="text-[9px] {{ 'text-amber-700' if metrics.get('index_partial') else 'text-slate-500' }}">Google 검사 대상 {{ metrics.get('index_total') }}개 · 미색인 {{ metrics.get('index_unindexed') }}개 · 미확인 {{ metrics.get('index_unknown') or 0 }}개{% if metrics.get('index_partial') %} · 일부 확인(전체 색인 수 아님){% endif %}</p>
+            {% elif metrics %}<p class="text-[9px] text-amber-700">{{ metrics.get('index_status') or 'Google Search Console 집계 미연결' }}</p>{% endif %}
+            <p class="text-[9px] text-slate-400">방문 집계 {{ metrics.get('visitor_checked_at') or '시각 미확인' if metrics else '미지원' }} · 색인 {{ metrics.get('index_checked_at') or '시각 미확인' if metrics else '미지원' }}</p>
+            </div>
+            <div class="tile-history mt-2 space-y-1 border-t pt-2 text-[10px]" aria-live="polite">발행 기록 확인 중…</div>
             <button type="button" data-quick-group="{{ group }}" {% if not ready %}disabled{% endif %} class="mt-3 w-full rounded-lg bg-blue-700 px-2 py-2 text-xs font-bold text-white disabled:opacity-40">{{ label if ready else '연결 필요' }}</button>
             <p data-quick-status="{{ group }}" role="status" class="mt-1 text-[10px] text-slate-500"></p>
         </article>
         {% endmacro %}
         <section id="site-quick-tiles" class="space-y-4">
             <div><h2 class="text-xl font-black">03 · 사이트별 바로 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
-            <p class="text-xs text-slate-500">플랫폼별 오늘 방문자 많은 순 · 미집계는 아래 · 5분마다 통계 갱신</p>
+            <p class="text-xs text-slate-500">플랫폼별 오늘 방문자 순위(동률 공동순위) · 방문자·새 콘텐츠는 어제 대비 · 누적은 오늘 증가 · 색인은 이전 확인 대비 · 시각 KST · 통계 5분 / 발행 로그 1분 갱신</p>
             <h3 class="text-sm font-bold">WordPress 27 · 일반 25 + 뉴스 2</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
-            {% for site in sites %}{{ quick_tile('WP · ' ~ (site.name or site.domain), 'https://' ~ site.domain, 'wp_' ~ site.site_id, '즉시 발행', site.auth_ready, site.today_visitors) }}{% endfor %}
+            {% for site in sites %}{{ quick_tile('WP · ' ~ (site.name or site.domain), 'https://' ~ site.domain, 'wp_' ~ site.site_id, '즉시 발행', site.auth_ready, site.today_visitors, site, site.site_id) }}{% endfor %}
             </div>
             <h3 class="text-sm font-bold">Blogspot {{ bloggers|length }}</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
-            {% for blog in bloggers %}{{ quick_tile('Blogspot · ' ~ blog.name, blog.url, 'blogspot_' ~ blog.site_id, '즉시 발행', blog.connected, blog.today_visitors) }}{% endfor %}
+            {% for blog in bloggers %}{{ quick_tile('Blogspot · ' ~ blog.name, blog.url, 'blogspot_' ~ blog.site_id, '즉시 발행', blog.connected, blog.today_visitors, blog, blog.site_id) }}{% endfor %}
             </div>
             <h3 class="text-sm font-bold">Tistory 5</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
-            {% for blog in tistory_sites %}{{ quick_tile('Tistory · ' ~ blog.name, blog.url, 'tistory_' ~ blog.site_id, '글 생성·게시 준비', true, blog.today_visitors) }}{% endfor %}
+            {% for blog in tistory_sites %}{{ quick_tile('Tistory · ' ~ blog.name, blog.url, 'tistory_' ~ blog.site_id, '글 생성·게시 준비', true, blog.today_visitors, blog, blog.site_id) }}{% endfor %}
             </div>
             <h3 class="text-sm font-bold">YouTube 10 · 플리 5 + 지식 5</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
-            {% for channel in youtube_channels %}{{ quick_tile(channel.name or channel.channel_key, 'https://www.youtube.com/channel/' ~ channel.channel_id, 'youtube_' ~ channel.channel_key, '제작·비공개 업로드', channel.action_ready) }}{% endfor %}
+            {% for channel in youtube_channels %}{{ quick_tile(channel.name or channel.channel_key, 'https://www.youtube.com/channel/' ~ channel.channel_id, 'youtube_' ~ channel.channel_key, '제작·비공개 업로드', channel.action_ready, none, none, channel.channel_key) }}{% endfor %}
             </div>
         </section>
         <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
@@ -689,7 +700,7 @@
 
             function renderStatus(data) {
                 let text = '상태: ' + (statusLabels[data.status] || data.status);
-                if (data.status === 'idle' && !data.counts.total) text = '상태: 아직 실행한 적 없음';
+                if (data.status === 'idle' && !data.counts.total) text = '개별 버튼 기록 없음 · 위 사이트 발행 기록 참조';
                 if (data.started_at) text += ' · 시작 ' + data.started_at.replace('T', ' ').slice(0, 19);
                 if (data.status === 'done' && data.finished_at) text += ' · 완료 ' + data.finished_at.replace('T', ' ').slice(0, 19);
                 headline.textContent = text;
@@ -743,10 +754,57 @@
         });
         function sortSiteTiles() {
             document.querySelectorAll('.ranked-site-tiles').forEach(function(grid) {
-            Array.from(grid.children).sort(function(a,b) { return Number(b.dataset.visitors) - Number(a.dataset.visitors); }).forEach(function(tile) { grid.appendChild(tile); });
+            let last = null, rank = 0;
+            Array.from(grid.children).sort(function(a,b) { return Number(b.dataset.visitors) - Number(a.dataset.visitors); }).forEach(function(tile, i) {
+                const value = Number(tile.dataset.visitors);
+                if (value !== last) rank = i + 1;
+                tile.querySelector('.tile-rank').textContent = value < 0 ? '순위 미집계' : rank + '위';
+                last = value;
+                grid.appendChild(tile);
+            });
             });
         }
         sortSiteTiles();
+        function historyTime(at) {
+            const date = new Date(at);
+            return Number.isNaN(date.getTime()) ? '시각 미확인' : new Intl.DateTimeFormat('ko-KR', {timeZone:'Asia/Seoul', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false}).format(date) + ' KST';
+        }
+        async function refreshTileHistory() {
+            try {
+                const response = await fetch('/api/site-publication-history', {cache:'no-store'});
+                if (!response.ok) throw new Error('history unavailable');
+                const data = await response.json();
+                document.querySelectorAll('[data-site-id]').forEach(function(tile) {
+                    const box = tile.querySelector('.tile-history');
+                    if (!box) return;
+                    const info = data[tile.dataset.siteId] || {};
+                    box.replaceChildren();
+                    const names = {published:'공개 발행 성공', failed:'실패', running:'진행 중', workflow_success:'작업 완료 · 공개 여부 미확인'};
+                    [['최근 상태',info.latest],['최근 발행 성공',info.success],['최근 실패',info.failure]].forEach(function(pair) {
+                        const row = document.createElement('p');
+                        const event = pair[1];
+                        row.textContent = pair[0] + ': ' + (event ? historyTime(event.at) + ' · ' + (names[event.status] || event.status) : '확인된 기록 없음');
+                        row.className = event && event.status === 'failed' ? 'text-red-700' : event && event.status === 'published' ? 'text-emerald-700' : 'text-slate-600';
+                        if (event && event.reason) row.title = event.reason;
+                        if (event && (event.run_url || event.public_url)) {
+                            const link = document.createElement('a');
+                            const href = event.public_url || event.run_url;
+                            if (/^https:\/\//i.test(href)) {
+                                link.href = href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+                                link.textContent = ' ↗ 확인'; link.className = 'underline'; row.appendChild(link);
+                            }
+                        }
+                        box.appendChild(row);
+                    });
+                });
+            } catch (_) {
+                document.querySelectorAll('.tile-history').forEach(function(box) {
+                    if (box.textContent === '발행 기록 확인 중…') box.textContent = '발행 기록 연결 지연 · 자동 재확인 중';
+                });
+            }
+        }
+        refreshTileHistory();
+        setInterval(refreshTileHistory, 60000);
         setInterval(async function () {
             if (document.hidden) return;
             try {
@@ -758,7 +816,7 @@
                     const fresh = incoming.get(tile.dataset.tileGroup);
                     if (!fresh) return;
                     tile.dataset.visitors = fresh.dataset.visitors;
-                    tile.querySelector('.tile-visitors').textContent = fresh.querySelector('.tile-visitors').textContent;
+                    tile.querySelector('.tile-metrics').replaceWith(fresh.querySelector('.tile-metrics').cloneNode(true));
                 });
                 sortSiteTiles();
             } catch (_) {}
@@ -770,7 +828,10 @@
             const sync = function () {
                 button.disabled = original.disabled;
                 const source = document.getElementById('bulk-headline-' + button.dataset.quickGroup);
-                if (source) status.textContent = source.textContent;
+                if (source) {
+                    const count = document.getElementById('bulk-counts-' + button.dataset.quickGroup);
+                    status.textContent = '버튼 실행: ' + source.textContent + (count ? ' · ' + count.textContent : '');
+                }
             };
             new MutationObserver(sync).observe(original, {attributes: true});
             const source = document.getElementById('bulk-status-' + button.dataset.quickGroup);

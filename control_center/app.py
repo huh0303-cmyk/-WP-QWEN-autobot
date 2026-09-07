@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template
+from flask import Flask, render_template
 
 from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
 
@@ -613,8 +613,11 @@ def get_site_data():
         stored_traffic = traffic_by_domain.get(item["domain"], {})
         traffic = live_traffic if live_traffic.get("connected") else stored_traffic
         detail = history_sites.get(item["domain"], {})
-        today_visitors = traffic.get("daily_visitors")
-        visitor_delta = traffic.get("visitor_delta")
+        traffic_date = str(traffic.get("date") or traffic.get("checked_at") or "")[:10]
+        current_day = datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+        traffic_fresh = traffic_date == current_day
+        today_visitors = traffic.get("daily_visitors") if traffic_fresh else None
+        visitor_delta = traffic.get("visitor_delta") if traffic_fresh else None
         total_visitors = traffic.get("total_visitors")
         total_posts = traffic.get("total_posts")
         if total_posts is None:
@@ -636,6 +639,13 @@ def get_site_data():
         indexed_delta = audit_summary.get("indexed_delta")
         index_unknown = audit_summary.get("unknown")
         index_checked_at = audit_entry.get("audited_at") or ""
+        if index_unknown:
+            indexed_delta = None
+            if not indexed and not audit_summary.get("unindexed"):
+                indexed = None
+        if audit_entry.get("error"):
+            indexed = None
+            indexed_delta = None
         if indexed is not None:
             index_status = (
                 f"Google URL별 확인 · 미확인 {index_unknown}개"
@@ -644,7 +654,7 @@ def get_site_data():
         elif audit_entry.get("error") == "gsc_property_not_accessible":
             index_status = "Search Console 권한 연결 필요"
         else:
-            index_status = "정밀 집계 중"
+            index_status = "확인 실패 · 재검사 필요" if index_unknown or audit_entry.get("error") else "정밀 집계 중"
         sites.append({
             "site_id": registered.site_id if registered else item["domain"],
             "domain": item["domain"],
@@ -652,12 +662,15 @@ def get_site_data():
             "today_visitors": today_visitors,
             "today_delta": visitor_delta,
             "total_visitors": total_visitors,
-            "total_delta": traffic.get("total_delta"),
+            "total_delta": traffic.get("total_delta") if traffic_fresh else None,
             "total_posts": total_posts,
             "posts_delta": posts_delta,
             "indexed": indexed,
             "indexed_delta": indexed_delta,
             "index_unknown": index_unknown,
+            "index_unindexed": audit_summary.get("unindexed"),
+            "index_total": audit_summary.get("total_published"),
+            "index_partial": bool(index_unknown),
             "index_checked_at": index_checked_at,
             "index_status": index_status,
             "visitor_connected": bool(live_traffic.get("connected")),
@@ -696,9 +709,14 @@ def get_blogger_data():
     ]
     stats_path = Path(__file__).resolve().parents[1] / "data" / "blogger_traffic_latest.json"
     stats = {}
+    stats_at = ""
     if stats_path.exists():
         try:
-            stats = json.loads(stats_path.read_text(encoding="utf-8")).get("sites", {})
+            stats_payload = json.loads(stats_path.read_text(encoding="utf-8"))
+            stats = stats_payload.get("sites", {})
+            stats_at = stats_payload.get("generated_at", "")
+            if stats_at[:10] != datetime.now(timezone(timedelta(hours=9))).date().isoformat():
+                stats = {url: {**values, "today": None, "today_delta": None, "total_delta": None} for url, values in stats.items()}
         except (OSError, ValueError):
             stats = {}
     history_bloggers = {}
@@ -743,6 +761,7 @@ def get_blogger_data():
         "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
         "default_text_model": "gpt-5-mini",
         "default_image_model": "bytedance/sdxl-lightning-4step",
+        "visitor_checked_at": stats_at,
         "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
         "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
         "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
@@ -1974,6 +1993,51 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
     }
 
 
+@lru_cache(maxsize=2)
+def _tile_receipts(bucket):
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    try:
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/site-publication-history.json", timeout=8)
+        response.raise_for_status()
+        return response.json().get("events", [])
+    except (requests.RequestException, ValueError):
+        path = Path(__file__).resolve().parents[1] / "data/site-publication-history.json"
+        try:
+            return json.loads(path.read_text(encoding="utf-8")).get("events", [])
+        except (OSError, ValueError):
+            return []
+
+
+def _tile_histories():
+    from .tile_status import local_events, summarize
+    by_site = {}
+    for event in _tile_receipts(int(time.time() // 60)):
+        by_site.setdefault(event["site_id"], []).append(event)
+    for path in (Path(__file__).resolve().parents[1] / "data").glob("bulk_publish_state_*.json"):
+        try:
+            state = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for site_id in {i.get("site_id") for i in state.get("items", []) if i.get("site_id")}:
+            by_site.setdefault(site_id, []).extend(local_events(state, site_id))
+    # Durable verified Tistory public receipts; planner success is not publication.
+    for path in (Path(__file__).resolve().parents[1] / "data").glob("tistory-publishing-*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            rows = payload if isinstance(payload, list) else payload.get("results", [])
+            for row in rows:
+                if row.get("status") == "published" and row.get("site_id"):
+                    by_site.setdefault(row["site_id"], []).append({**row, "at": row.get("published_at") or row.get("verified_at") or "", "run_id": row.get("job_id")})
+        except (OSError, ValueError, TypeError):
+            pass
+    return {key: summarize(value) for key, value in by_site.items()}
+
+
+@app.get("/api/site-publication-history")
+def site_publication_history():
+    return jsonify(_tile_histories())
+
+
 @app.route("/")
 def index():
     # 2026-09-03: WP cards no longer show a manual keyword-entry form (WP
@@ -1986,6 +2050,14 @@ def index():
     tistory_sites = get_tistory_data()
     youtube_channels = get_youtube_data()
     sns_accounts = get_sns_data()
+    from .tile_status import new_content
+    targets = [(site, "https://" + site["domain"], "wordpress") for site in sites]
+    targets += [(site, site["url"], "blogger") for site in bloggers]
+    targets += [(site, site["url"], "tistory") for site in tistory_sites]
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        futures = [(site, pool.submit(new_content, url, platform, int(time.time() // 300))) for site, url, platform in targets]
+        for site, future in futures:
+            site.update(future.result())
     return render_template(
         "index.html", sites=sites, bloggers=bloggers, tistory_sites=tistory_sites,
         youtube_channels=youtube_channels, sns_accounts=sns_accounts,

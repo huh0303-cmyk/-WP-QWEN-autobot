@@ -11,14 +11,20 @@ from site_registry import SITES
 
 OUT = Path(os.getenv("INDEX_AUDIT_OUT", "index_audit_manifest.json"))
 GSC_JSON = os.getenv("GSC_SERVICE_ACCOUNT_JSON", "")
+_TOKEN_CACHE = {"value": "", "until": 0}
 
-def token():
+def token(force=False):
+    if not force and _TOKEN_CACHE["value"] and time.time() < _TOKEN_CACHE["until"]:
+        return _TOKEN_CACHE["value"]
     import jwt
     key=json.loads(GSC_JSON); now=int(time.time())
     assertion=jwt.encode({"iss":key["client_email"],"scope":"https://www.googleapis.com/auth/webmasters.readonly",
         "aud":"https://oauth2.googleapis.com/token","iat":now,"exp":now+3600},key["private_key"],algorithm="RS256")
     r=requests.post("https://oauth2.googleapis.com/token",data={"grant_type":"urn:ietf:params:oauth:grant-type:jwt-bearer","assertion":assertion},timeout=20)
-    r.raise_for_status(); return r.json()["access_token"]
+    r.raise_for_status()
+    payload = r.json()
+    _TOKEN_CACHE.update(value=payload["access_token"], until=time.time() + int(payload.get("expires_in", 3600)) - 120)
+    return _TOKEN_CACHE["value"]
 
 def properties(tok):
     r=requests.get("https://www.googleapis.com/webmasters/v3/sites",headers={"Authorization":f"Bearer {tok}"},timeout=20)
@@ -50,14 +56,18 @@ def posts(site):
     return out
 
 def inspect(tok, prop, url):
-    r=requests.post("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
-        headers={"Authorization":f"Bearer {tok}","Content-Type":"application/json"},
-        json={"inspectionUrl":url,"siteUrl":prop},timeout=30)
+    for attempt in range(2):
+        r=requests.post("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+            headers={"Authorization":f"Bearer {tok}","Content-Type":"application/json"},
+            json={"inspectionUrl":url,"siteUrl":prop},timeout=30)
+        if r.status_code != 401 or attempt:
+            break
+        tok = token(force=True)
     if r.status_code!=200:
         return {"state":"unknown","http":r.status_code,"error":r.text[:300]}
     s=r.json().get("inspectionResult",{}).get("indexStatusResult",{})
     verdict=s.get("verdict")
-    return {"state":"indexed" if verdict=="PASS" else "unindexed","verdict":verdict,
+    return {"state":"indexed" if verdict=="PASS" else "unindexed" if verdict in ("FAIL", "NEUTRAL") else "unknown","verdict":verdict,
         "coverageState":s.get("coverageState"),"robotsTxtState":s.get("robotsTxtState"),
         "indexingState":s.get("indexingState"),"lastCrawlTime":s.get("lastCrawlTime"),
         "googleCanonical":s.get("googleCanonical"),"userCanonical":s.get("userCanonical"),
@@ -75,7 +85,7 @@ def save(m):
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--site"); ap.add_argument("--max-per-site",type=int,default=0)
-    ap.add_argument("--sleep",type=float,default=.35); ap.add_argument("--refresh-all",action="store_true"); args=ap.parse_args()
+    ap.add_argument("--sleep",type=float,default=.35); ap.add_argument("--refresh-all",action="store_true"); ap.add_argument("--retry-unknown",action="store_true"); args=ap.parse_args()
     if not GSC_JSON: raise SystemExit("GSC_SERVICE_ACCOUNT_JSON missing")
     tok=token(); props=properties(tok); manifest=load()
     today=dt.datetime.now(dt.timezone.utc)
@@ -96,8 +106,13 @@ def main():
             entry["posts"].pop(stale_id, None)
         for i,p in enumerate(items,1):
             key=str(p["id"]); old=entry["posts"].get(key,{})
-            if not args.refresh_all and old.get("state") in ("indexed","unindexed"): continue
-            result=inspect(tok,prop,p["link"])
+            if (args.retry_unknown or not args.refresh_all) and old.get("state") in ("indexed","unindexed"): continue
+            tok = token()
+            try:
+                result=inspect(tok,prop,p["link"])
+            except requests.RequestException:
+                result={"state":"unknown", "error":"inspection_network_error"}
+            result["checked_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
             published=dt.datetime.fromisoformat(p["date_gmt"].replace("Z","+00:00"))
             if published.tzinfo is None:
                 published=published.replace(tzinfo=dt.timezone.utc)
@@ -111,8 +126,10 @@ def main():
         states=[x.get("state") for x in entry["posts"].values()]
         summary={k:states.count(k) for k in ("indexed","unindexed","unknown")}
         old_indexed=previous_summary.get("indexed")
-        summary["indexed_delta"]=None if old_indexed is None else summary["indexed"]-int(old_indexed)
+        summary["indexed_delta"]=None if old_indexed is None or summary["unknown"] or previous_summary.get("unknown") else summary["indexed"]-int(old_indexed)
         summary["total_published"]=len(entry["posts"])
+        summary["complete"] = summary["unknown"] == 0
+        summary["comparison_at"] = entry.get("audited_at") if summary["indexed_delta"] is not None else None
         entry["summary"]=summary
         entry["audited_at"]=dt.datetime.now(dt.timezone.utc).isoformat()
         entry.pop("error", None)
