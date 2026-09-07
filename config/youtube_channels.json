@@ -5,7 +5,7 @@
     {
       "channel_key": "globalmusic",
       "channel_type": "playlist",
-      "display_name": "Cafe_Romantic",
+      "display_name": "카페로맨틱",
       "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
       "official_name": "cafe_romantic",
       "handle": "cafe_romantic",
@@ -27,7 +27,7 @@
     {
       "channel_key": "healing",
       "channel_type": "playlist",
-      "display_name": "플리-힐링",
+      "display_name": "힐링카페",
       "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
       "official_name": "Cafe healing",
       "handle": "cafe_healing1",
@@ -49,7 +49,7 @@
     {
       "channel_key": "starbucks",
       "channel_type": "playlist",
-      "display_name": "플리-카페음악",
+      "display_name": "스타벅스바이브-노동요",
       "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
       "official_name": "Starbucks vibes",
       "handle": "Starbucksvibes",
@@ -71,7 +71,7 @@
     {
       "channel_key": "mbb",
       "channel_type": "playlist",
-      "display_name": "플리-MBB",
+      "display_name": "카페 모짜르트",
       "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
       "official_name": "Cafe Mozart",
       "handle": "cafe_mozart",
@@ -93,7 +93,7 @@
     {
       "channel_key": "kpop",
       "channel_type": "playlist",
-      "display_name": "플리-K-pop",
+      "display_name": "Kpop",
       "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw",
       "official_name": "kpop KOREA",
       "handle": "kpop_studio7",
