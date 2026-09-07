@@ -12,10 +12,11 @@
     "blogger_kfinance365": "https://kfinance365.blogspot.com/2026/09/real-estate-risk-checklist-for-korean.html",
     "blogger_medicaltour": "https://koreamedicaltour365.blogspot.com/2026/09/police-search-of-hanjin-kal-what.html",
     "blogger_kstudy365": "https://kstudy365.blogspot.com/2026/09/long-distance-relationship-while.html",
-    "blogger_kworld365_kpop": "https://kworld365.blogspot.com/2026/09/hongdae-k-pop-shopping-how-to-plan-haul.html"
+    "blogger_kworld365_kpop": "https://kworld365.blogspot.com/2026/09/hongdae-k-pop-shopping-how-to-plan-haul.html",
+    "blogger_kvisa365": "https://k-visa365.blogspot.com/2026/09/what-foreign-nationals-families-should.html"
   },
   "next_generation_after": "2026-09-07T10:18:18.412988+00:00",
-  "checked_at": "2026-09-07T04:18:18.412988+00:00",
+  "checked_at": "2026-09-07T09:32:10.971516+00:00",
   "results": [
     {
       "site": "blogger_jobglobal",
@@ -24,8 +25,8 @@
     },
     {
       "site": "blogger_kvisa365",
-      "status": "blocked",
-      "reason": "OPENAI_QUOTA"
+      "status": "published",
+      "public_url": "https://k-visa365.blogspot.com/2026/09/what-foreign-nationals-families-should.html"
     },
     {
       "site": "blogger_kinvest365",
