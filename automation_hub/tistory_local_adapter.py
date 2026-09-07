@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import re
+import html
 import requests
 from urllib.parse import urlparse
 from dataclasses import dataclass
 
 from control_center.tistory import TistoryDraft, TistoryDraftResult
+from automation_hub.tistory_media import editor_category
 
 
 @dataclass(slots=True)
@@ -78,7 +80,7 @@ class TistoryLocalPublisher:
             control.click()
         else:
             self._click_named(page, r"카테고리|분류", timeout=2000)
-        category = page.get_by_text(self.draft.category, exact=True).last
+        category = page.get_by_text(editor_category(self.draft.site_id, self.draft.category), exact=True).last
         if not category.is_visible(timeout=2500):
             raise RuntimeError(f"등록된 카테고리를 찾지 못했습니다: {self.draft.category}")
         category.click()
@@ -153,7 +155,10 @@ class TistoryLocalPublisher:
         title.fill(self.draft.title)
         body.click()
         # Playwright's insert_html keeps img alt attributes and structured HTML.
-        body.evaluate("(node, value) => { node.innerHTML = value; node.dispatchEvent(new InputEvent('input', {bubbles:true, inputType:'insertText'})); }", self.draft.content_html)
+        # Tistory's native editor has no Blogger-style search-description field.
+        # Preserve the supplied description as the leading summary for excerpts.
+        content = '<p data-ke-size="size16">' + html.escape(self.draft.search_description) + '</p>' + self.draft.content_html
+        body.evaluate("(node, value) => { node.innerHTML = value; node.dispatchEvent(new InputEvent('input', {bubbles:true, inputType:'insertText'})); }", content)
         self._fill_category(page)
         self._fill_search_description(page)
         self._fill_tags(page)
@@ -173,8 +178,13 @@ class TistoryLocalPublisher:
         match = re.search(r"/manage/(?:newpost|post)/?(\d+)", page.url or "")
         if not match:
             # Tistory commonly leaves the editor and exposes the id in links.
-            html = page.content()
-            match = re.search(r"/manage/(?:newpost|post)/(\d+)", html)
+            # Bind the ID to this title's row, never an arbitrary older edit link.
+            title_link = page.get_by_role("link", name=self.draft.title, exact=True)
+            if title_link.count() != 1:
+                raise RuntimeError("저장한 글의 고유한 목록 행을 확인하지 못했습니다")
+            row = title_link.locator("xpath=ancestor::li[1]")
+            checkbox_id = row.locator('input[id^="inpCheck"]').get_attribute("id") or ""
+            match = re.fullmatch(r"inpCheck(\d+)", checkbox_id)
         if not match:
             raise RuntimeError("저장 후 Tistory 글 ID를 확인하지 못했습니다")
         post_id = match.group(1)
@@ -186,6 +196,9 @@ class TistoryLocalPublisher:
         title_field = self._first_visible(page, self.selectors.title)
         if title_field is None or title_field.input_value() != self.draft.title:
             raise RuntimeError("저장된 제목 재검증에 실패했습니다")
+        saved_body = self._first_visible(page, self.selectors.body)
+        if saved_body is None or self.draft.search_description not in saved_body.inner_text():
+            raise RuntimeError("저장된 검색 설명 요약문 재검증에 실패했습니다")
         if public:
             live_url = self.draft.public_url(post_id)
             page.goto(live_url, wait_until="domcontentloaded", timeout=60_000)

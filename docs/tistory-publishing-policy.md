@@ -22,6 +22,9 @@ Queue metadata retains tags and the representative image URL. The browser
 registrar confirms tag entry and uploads a representative image into the
 publication dialog; missing media or a missing decoded preview blocks save.
 Signed R2 and Replicate image URLs are rehosted before entering the queue.
+The supplied search description is inserted as a leading body summary and
+verified after reopening. Tistory's native editor has no separate Blogger-style
+search-description field; search engines may choose their own result snippet.
 
 GitHub runs scheduling and article preparation with the PC off. Public
 Tistory publication still requires the authenticated browser registrar to
