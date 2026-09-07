@@ -45,3 +45,27 @@ def test_failed_measurement_is_unknown(monkeypatch):
         raise m.requests.RequestException('offline')
     monkeypatch.setattr(m.requests, 'get', fail)
     assert m.new_content('https://a.com', 'wordpress', 1) == {'new_posts': None, 'new_posts_delta': None}
+
+
+def test_gsc_renews_expired_token_and_keeps_unspecified_unknown(monkeypatch):
+    import sys
+    import types
+    monkeypatch.setitem(sys.modules, 'site_registry', types.SimpleNamespace(SITES=[]))
+    m = module('scripts/audit_gsc_post_index.py')
+    class Reply:
+        def __init__(self, code, verdict=None):
+            self.status_code = code
+            self.text = 'expired'
+            self.verdict = verdict
+        def json(self):
+            return {'inspectionResult': {'indexStatusResult': {'verdict': self.verdict}}}
+    replies = iter([Reply(401), Reply(200, 'PASS'), Reply(200, 'VERDICT_UNSPECIFIED')])
+    calls = []
+    def post(*args, **kwargs):
+        calls.append(kwargs['headers']['Authorization'])
+        return next(replies)
+    monkeypatch.setattr(m.requests, 'post', post)
+    monkeypatch.setattr(m, 'token', lambda force=False: 'renewed' if force else 'cached')
+    assert m.inspect('expired', 'sc-domain:a.com', 'https://a.com/')['state'] == 'indexed'
+    assert calls == ['Bearer expired', 'Bearer renewed']
+    assert m.inspect('renewed', 'sc-domain:a.com', 'https://a.com/b')['state'] == 'unknown'

@@ -636,6 +636,13 @@ def get_site_data():
         indexed_delta = audit_summary.get("indexed_delta")
         index_unknown = audit_summary.get("unknown")
         index_checked_at = audit_entry.get("audited_at") or ""
+        if index_unknown:
+            indexed_delta = None
+            if not indexed and not audit_summary.get("unindexed"):
+                indexed = None
+        if audit_entry.get("error"):
+            indexed = None
+            indexed_delta = None
         if indexed is not None:
             index_status = (
                 f"Google URL별 확인 · 미확인 {index_unknown}개"
@@ -644,7 +651,7 @@ def get_site_data():
         elif audit_entry.get("error") == "gsc_property_not_accessible":
             index_status = "Search Console 권한 연결 필요"
         else:
-            index_status = "정밀 집계 중"
+            index_status = "확인 실패 · 재검사 필요" if index_unknown or audit_entry.get("error") else "정밀 집계 중"
         sites.append({
             "site_id": registered.site_id if registered else item["domain"],
             "domain": item["domain"],
@@ -658,6 +665,9 @@ def get_site_data():
             "indexed": indexed,
             "indexed_delta": indexed_delta,
             "index_unknown": index_unknown,
+            "index_unindexed": audit_summary.get("unindexed"),
+            "index_total": audit_summary.get("total_published"),
+            "index_partial": bool(index_unknown),
             "index_checked_at": index_checked_at,
             "index_status": index_status,
             "visitor_connected": bool(live_traffic.get("connected")),
