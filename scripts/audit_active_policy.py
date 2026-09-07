@@ -104,7 +104,10 @@ def main() -> None:
         text = workflow_text.get(name, "")
         if not text:
             fail(f"missing expected workflow {name}")
-        if "REPLICATE_API_TOKEN" not in text:
+        if name == "generate-youtube-playlist.yml":
+            if any(token in text for token in ("secrets.REPLICATE_API_TOKEN", "secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
+                fail("playlist must not receive paid generation credentials")
+        elif "REPLICATE_API_TOKEN" not in text:
             fail(f"{name} does not receive REPLICATE_API_TOKEN")
 
     wp = workflow_text.get("daily-network-publish.yml", "")
