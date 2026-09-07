@@ -613,8 +613,11 @@ def get_site_data():
         stored_traffic = traffic_by_domain.get(item["domain"], {})
         traffic = live_traffic if live_traffic.get("connected") else stored_traffic
         detail = history_sites.get(item["domain"], {})
-        today_visitors = traffic.get("daily_visitors")
-        visitor_delta = traffic.get("visitor_delta")
+        traffic_date = str(traffic.get("date") or traffic.get("checked_at") or "")[:10]
+        current_day = datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+        traffic_fresh = traffic_date == current_day
+        today_visitors = traffic.get("daily_visitors") if traffic_fresh else None
+        visitor_delta = traffic.get("visitor_delta") if traffic_fresh else None
         total_visitors = traffic.get("total_visitors")
         total_posts = traffic.get("total_posts")
         if total_posts is None:
@@ -659,7 +662,7 @@ def get_site_data():
             "today_visitors": today_visitors,
             "today_delta": visitor_delta,
             "total_visitors": total_visitors,
-            "total_delta": traffic.get("total_delta"),
+            "total_delta": traffic.get("total_delta") if traffic_fresh else None,
             "total_posts": total_posts,
             "posts_delta": posts_delta,
             "indexed": indexed,
@@ -706,9 +709,14 @@ def get_blogger_data():
     ]
     stats_path = Path(__file__).resolve().parents[1] / "data" / "blogger_traffic_latest.json"
     stats = {}
+    stats_at = ""
     if stats_path.exists():
         try:
-            stats = json.loads(stats_path.read_text(encoding="utf-8")).get("sites", {})
+            stats_payload = json.loads(stats_path.read_text(encoding="utf-8"))
+            stats = stats_payload.get("sites", {})
+            stats_at = stats_payload.get("generated_at", "")
+            if stats_at[:10] != datetime.now(timezone(timedelta(hours=9))).date().isoformat():
+                stats = {url: {**values, "today": None, "today_delta": None, "total_delta": None} for url, values in stats.items()}
         except (OSError, ValueError):
             stats = {}
     history_bloggers = {}
@@ -753,6 +761,7 @@ def get_blogger_data():
         "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
         "default_text_model": "gpt-5-mini",
         "default_image_model": "bytedance/sdxl-lightning-4step",
+        "visitor_checked_at": stats_at,
         "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
         "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
         "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
