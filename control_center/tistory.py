@@ -19,6 +19,8 @@ class TistoryDraft:
     category: str
     search_description: str
     visibility: str = "private"
+    tags: tuple[str, ...] = ()
+    representative_image_url: str = ""
 
     def validate(self) -> list[str]:
         errors: list[str] = []

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+import requests
+from urllib.parse import urlparse
 from dataclasses import dataclass
 
 from control_center.tistory import TistoryDraft, TistoryDraftResult
@@ -17,6 +19,7 @@ class TistoryEditorSelectors:
         "div.ProseMirror[contenteditable='true']",
         "div[contenteditable='true'][role='textbox']",
         "textarea[name='content']",
+        "body#tinymce[contenteditable='true']",
     )
 
 
@@ -70,7 +73,11 @@ class TistoryLocalPublisher:
     def _fill_category(self, page) -> None:
         # Tistory's category widget has changed labels several times. Prefer an
         # exact visible category and fail closed instead of silently using none.
-        self._click_named(page, r"카테고리|분류", timeout=2000)
+        control = page.get_by_role("combobox", name="카테고리 선택")
+        if control.is_visible():
+            control.click()
+        else:
+            self._click_named(page, r"카테고리|분류", timeout=2000)
         category = page.get_by_text(self.draft.category, exact=True).last
         if not category.is_visible(timeout=2500):
             raise RuntimeError(f"등록된 카테고리를 찾지 못했습니다: {self.draft.category}")
@@ -93,11 +100,46 @@ class TistoryLocalPublisher:
                     "textarea[name='description']",
                 ))
         if field is None:
-            raise RuntimeError("검색 설명 입력칸을 찾지 못했습니다")
+            # The standard Tistory editor derives its snippet from the body;
+            # unlike Blogger it has no separate search-description input.
+            return
         field.fill(self.draft.search_description)
+
+    def _fill_tags(self, page) -> None:
+        field = page.locator("#tagText")
+        field.wait_for(state="visible", timeout=5000)
+        for tag in self.draft.tags:
+            field.fill(tag)
+            field.press("Enter")
+            page.get_by_text(tag, exact=True).last.wait_for(state="visible", timeout=3000)
+        if field.input_value().strip():
+            raise RuntimeError("태그 입력이 확정되지 않았습니다")
+
+    def _fill_representative_image(self, page) -> None:
+        url = self.draft.representative_image_url
+        if urlparse(url).scheme != "https":
+            raise RuntimeError("대표 이미지 HTTPS 주소가 필요합니다")
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        mime = response.headers.get("content-type", "").split(";")[0]
+        extensions = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp"}
+        if mime not in extensions or not 500 < len(response.content) <= 10 * 1024 * 1024:
+            raise RuntimeError("대표 이미지 파일 형식 또는 크기가 올바르지 않습니다")
+        dialog = page.get_by_role("dialog")
+        dialog.locator('input[type="file"]').set_input_files({
+            "name": "representative." + extensions[mime],
+            "mimeType": mime, "buffer": response.content,
+        })
+        # The publication dialog must show a decoded preview, not just a URL.
+        preview = dialog.locator("img").last
+        preview.wait_for(state="visible", timeout=15000)
+        page.wait_for_function("""() => Array.from(document.querySelectorAll('[role="dialog"] img'))
+            .some(img => img.complete && img.naturalWidth > 0)""", timeout=15000)
 
     def fill(self, page) -> None:
         errors = self.draft.validate()
+        if not self.draft.tags or not self.draft.representative_image_url:
+            errors.append("태그와 대표 이미지가 준비되어야 발행할 수 있습니다")
         if errors:
             raise ValueError("; ".join(errors))
         editor = f"https://{self.draft.blog_name}.tistory.com/manage/newpost/?type=post"
@@ -114,6 +156,7 @@ class TistoryLocalPublisher:
         body.evaluate("(node, value) => { node.innerHTML = value; node.dispatchEvent(new InputEvent('input', {bubbles:true, inputType:'insertText'})); }", self.draft.content_html)
         self._fill_category(page)
         self._fill_search_description(page)
+        self._fill_tags(page)
 
     def _save(self, page, *, public: bool) -> TistoryDraftResult:
         visibility_label = r"^공개$" if public else r"^비공개$"
@@ -124,6 +167,7 @@ class TistoryLocalPublisher:
         if not option.is_visible(timeout=2500):
             raise RuntimeError(f"{'공개' if public else '비공개'} 선택 항목을 찾지 못했습니다")
         option.click()
+        self._fill_representative_image(page)
         self._click_named(page, confirm_pattern, timeout=3000)
         page.wait_for_timeout(2500)
         match = re.search(r"/manage/(?:newpost|post)/?(\d+)", page.url or "")
@@ -139,8 +183,9 @@ class TistoryLocalPublisher:
         page.wait_for_timeout(1500)
         self._verify_login_and_destination(page)
         document = page.content()
-        if self.draft.title not in document or self.draft.search_description not in document:
-            raise RuntimeError("저장된 제목 또는 검색 설명 재검증에 실패했습니다")
+        title_field = self._first_visible(page, self.selectors.title)
+        if title_field is None or title_field.input_value() != self.draft.title:
+            raise RuntimeError("저장된 제목 재검증에 실패했습니다")
         if public:
             live_url = self.draft.public_url(post_id)
             page.goto(live_url, wait_until="domcontentloaded", timeout=60_000)

@@ -17,6 +17,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.sheet_schema import PUBLISH_QUEUE_HEADER
+from automation_hub.tistory_media import media_metadata
 from gsheets_direct import ensure_tab, get_sheets_service
 from sync_automation_hub_to_sheets import QUEUE_TAB
 
@@ -27,6 +28,7 @@ def rows_from_artifact(payload):
     for draft in payload.get("drafts", []):
         if draft.get("status") != "DRAFT_READY" or draft.get("public_allowed") is not False:
             continue
+        media = media_metadata(draft)
         values = {
             "created_at": now, "job_id": draft["job_id"], "site_id": draft["site_id"],
             # 2026-09-06 CEO decision: Tistory auto-publishes end to end now,
@@ -38,7 +40,8 @@ def rows_from_artifact(payload):
             # is untouched; this only changes what the approved local
             # registrar does with content that already passed it.
             "status": "ready", "publish_now": "TRUE", "title": draft["title"],
-            "content_html": draft["body_html"], "labels": draft["category"],
+            "content_html": draft["body_html"], "labels": ",".join(media["tags"]),
+            "message": json.dumps(media, ensure_ascii=False),
             "source_keyword": draft.get("source_keyword", ""), "category": draft["category"],
             "search_description": draft["meta_description"], "visibility": "public",
         }

@@ -48,6 +48,7 @@ def _load_dotenv() -> None:
 _load_dotenv()
 
 from automation_hub.tistory_local_adapter import TistoryLocalPublisher
+from automation_hub.tistory_media import media_metadata
 from control_center.tistory import TistoryDraft
 from gsheets_direct import get_sheets_service
 from sync_automation_hub_to_sheets import ACCOUNTS_TAB, QUEUE_TAB
@@ -99,10 +100,12 @@ def draft_from_row(row, site_url, *, force_private=False):
     visibility = "private" if force_private else (
         "public" if str(row.get("visibility", "")).strip().lower() == "public" else "private"
     )
+    media = media_metadata(row)
     return TistoryDraft(
         site_id=row["site_id"], site_url=site_url, title=row.get("title", ""),
         content_html=row.get("content_html", ""), category=row.get("category", "") or (labels[0] if labels else ""),
         search_description=_description(row), visibility=visibility,
+        tags=tuple(media["tags"]), representative_image_url=media["representative_image_url"],
     )
 
 

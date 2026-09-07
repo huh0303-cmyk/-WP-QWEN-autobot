@@ -19,7 +19,9 @@ import requests
 
 
 def is_temporary(url: str) -> bool:
-    return urlparse(url).netloc.lower().endswith(("replicate.delivery", "replicateusercontent.com"))
+    parsed = urlparse(url)
+    return (parsed.netloc.lower().endswith(("replicate.delivery", "replicateusercontent.com", "r2.cloudflarestorage.com"))
+            or "x-amz-signature=" in parsed.query.lower())
 
 
 def _image_ok(url: str) -> tuple[bool, dict]:

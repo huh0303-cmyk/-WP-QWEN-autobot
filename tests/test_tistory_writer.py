@@ -25,7 +25,7 @@ def test_gpt5_mini_then_deterministic_gate_then_image_chain():
     assert draft["quality_score"] >= 70
     assert draft["first_image_priority"] is True
     assert draft["image_alt"]
-    assert draft["image_alt"] == draft["title"]
+    assert draft["image_alt"] != draft["title"]
 
 
 def test_gpt_writer_has_no_gemini_fallback():

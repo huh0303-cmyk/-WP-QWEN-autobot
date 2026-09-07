@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import hashlib
 import json
 import random
@@ -12,6 +13,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scripts"))
 CONFIG = ROOT / "config" / "tistory_portfolio.json"
 KST = ZoneInfo("Asia/Seoul")
 
@@ -56,43 +59,15 @@ def _pick_seed_topic(site: dict, day: str) -> tuple[str, int, dict[str, int]]:
         # 키워드보고발행: CEO already picked this exact seed topic from the
         # card's chips; skip live research and the day-hash pick entirely.
         return forced, 0, {"ceo_picked": 1}
-    if os.environ.get("TISTORY_LIVE_TRENDS_ENABLED", "false").strip().lower() == "true":
-        try:
-            from automation_hub.blogger_topic_router import fetch_profile_headlines, fetch_today_headlines, fetch_trending_terms, rank_topics
+    from automation_hub.blogger_topic_router import fetch_profile_headlines, fetch_today_headlines, rank_topics
+    from automation_hub.tistory_keywords import search_volumes, choose
+    profile = {"site_key":site["site_id"], "language":site.get("language","ko"),
+               "wordpress":{"theme":site.get("description",""),"persona":site.get("title",""),"categories":site.get("categories",[])},"blogspot":{}}
+    volumes = search_volumes()
+    headlines = fetch_today_headlines() + fetch_profile_headlines(profile)
+    ranked = rank_topics(headlines, profile=profile, trend_terms=volumes)
+    return choose(ranked, volumes, site.get("recent_history", []))
 
-            profile = {
-                "site_key": "tistory_life365" if site.get("trend_mode") else site["site_id"],
-                "language": site.get("language", "ko"),
-                "wordpress": {
-                    "theme": "종합 생활정보·정치·경제·사회·문화·스포츠" if site.get("trend_mode") else site.get("description", ""),
-                    "persona": site.get("title", "") + " 편집자",
-                    "categories": site.get("categories", []),
-                },
-                "blogspot": {},
-            }
-            headlines = fetch_today_headlines()
-            headlines.extend(fetch_profile_headlines(profile))
-            ranked = rank_topics(headlines, profile=profile, trend_terms=fetch_trending_terms())
-            if ranked:
-                winner = ranked[0]
-                return winner.keyword, round(winner.score), {
-                    "live_cross_media": round(winner.score),
-                    "mentions": winner.mention_count,
-                    "outlets": winner.outlet_count,
-                    "surfaces": winner.surface_count,
-                }
-        except Exception as exc:
-            print(f"Tistory live trend fallback for {site['site_id']}: {exc}")
-    topics = site.get("seed_topics") or []
-    if not topics:
-        return "", 0, {}
-    ranked = []
-    for topic in topics:
-        score, breakdown = _golden_keyword_score(topic, site)
-        tie = hashlib.sha256(f"{site['site_id']}:{day}:{topic}".encode()).hexdigest()
-        ranked.append((score, tie, topic, breakdown))
-    score, _, topic, breakdown = max(ranked)
-    return topic, score, breakdown
 
 
 def build_plan(now: datetime | None = None) -> dict:
@@ -111,6 +86,9 @@ def build_plan(now: datetime | None = None) -> dict:
         key=lambda site: int(site.get("launch_order", 999)),
     )
     for site in enabled_sites:
+        from automation_hub.tistory_keywords import recent_history
+        from automation_hub.tistory_schedule import slot_time
+        site = {**site, "recent_history": recent_history(site)}
         seed_topic, keyword_score, keyword_breakdown = _pick_seed_topic(site, day)
         jobs.append({
             "job_id": f"{site['site_id']}:{run_key}",
@@ -121,7 +99,8 @@ def build_plan(now: datetime | None = None) -> dict:
             "description": site.get("description", ""),
             "url": site.get("url", ""),
             "launch_order": site.get("launch_order"),
-            "scheduled_local_time": _pick_time(site, day),
+            "scheduled_local_time": slot_time(site["site_id"], day, os.environ.get("TISTORY_SLOT", "am")),
+            "recent_titles": site["recent_history"],
             "publish_policy": cfg.get("default_publish_policy", "awaiting_approval"),
             "duplicate_guard": True,
             "trend_mode": bool(site.get("trend_mode")),
@@ -146,7 +125,7 @@ def build_plan(now: datetime | None = None) -> dict:
         "date": day,
         "run_key": run_key,
         "timezone": "Asia/Seoul",
-        "daily_posts_per_site": 1,
+        "daily_posts_per_site": 2,
         "portfolio_sites": len(cfg["sites"]),
         "enabled_sites": len(enabled_sites),
         "public_allowed": False,
