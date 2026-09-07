@@ -33,9 +33,8 @@ jobs:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: 'true'
-          OPENAI_MODEL: gpt-5-mini
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BLOGGER_GEMINI_MODEL: gemini-2.5-flash
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           NANO_BANANA_FREE_TIER_ENABLED: 'false'
           FORCE_SOURCE_IPV4: 'true'

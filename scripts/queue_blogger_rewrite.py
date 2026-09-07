@@ -35,12 +35,12 @@ from automation_hub.blogger_topic_router import (
 from automation_hub.original_writer import original_prompt, original_quality_score
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
-from openai_text import openai_available, openai_generate_text
+from gemini_text import gemini_generate_text
 from replicate_image_provider import generate_image_url
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
 
-# Worst case for one run: two GPT writing attempts plus one image.
+# Worst case for one run: two Gemini writing attempts plus one image.
 ESTIMATED_COST_PER_RUN_USD = 0.03
 KPOP_SITE_ID = "blogger_kworld365_kpop"
 KPOP_TERMS = (
@@ -292,10 +292,10 @@ def main():
     # Paid generation starts only after the deterministic topic, duplicate and
     # source/fallback checks have selected a valid route.
     check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
-    # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
-    # The second GPT attempt uses deterministic quality-gate feedback.
+    # Blogger's locked authoring policy is Gemini first. A second Gemini
+    # attempt uses deterministic quality-gate feedback.
     for attempt in range(1, 3):
-        provider = "gpt"
+        provider = "gemini"
         if source is not None:
             prompt = rewrite_prompt(source["title"]["rendered"], source["content"]["rendered"], source["link"], language=language, persona=os.environ.get("BLOGGER_PERSONA", profile["blogspot"].get("persona", "helpful specialist editor")), tone=os.environ.get("BLOGGER_TONE", profile["blogspot"].get("tone", "practical and clear")), target_chars=target_chars, prior_feedback="; ".join(failures))
         else:
@@ -315,9 +315,7 @@ def main():
         if attempt > 1 and 'candidate' in locals():
             prompt += "\nRepair this previous draft. Preserve its valid factual content and exact verified links; expand any short sections to the required body length. Return the complete corrected JSON, not a summary.\n" + json.dumps(candidate, ensure_ascii=False)
         try:
-            if not openai_available():
-                raise RuntimeError("GPT-5 mini writer unavailable")
-            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
+            raw = gemini_generate_text(prompt, temperature=0.7)
             candidate = parse_rewrite_json(raw)
             if source is not None:
                 candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url=source["link"], ymyl=ymyl)
@@ -342,10 +340,11 @@ def main():
                 text_provider = provider
                 break
         except Exception as exc:
-            if "OpenAI unavailable (quota/credits)" in str(exc):
-                _append_failure(service, sheet_id, blogger_site_id, error_code="OPENAI_QUOTA",
-                    message="OpenAI API quota/credits unavailable; generation stopped without a second attempt", source_url=source_identity)
-                raise RuntimeError("OPENAI_QUOTA: account credits or quota must be restored before generation") from None
+            quota_hit = isinstance(exc, requests.HTTPError) and exc.response is not None and exc.response.status_code == 429
+            if quota_hit:
+                _append_failure(service, sheet_id, blogger_site_id, error_code="GEMINI_QUOTA",
+                    message="Gemini API quota/rate limit hit; generation stopped without a second attempt", source_url=source_identity)
+                raise RuntimeError("GEMINI_QUOTA: API quota or rate limit must be restored before generation") from None
             quality_score = 0
             failures = [f"invalid output: {exc}"]
             critical_failures = []
@@ -362,7 +361,7 @@ def main():
             reason = f"필수 항목 미충족({'; '.join(critical_failures)})"
         else:
             reason = f"{minimum_quality}점 미만"
-        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 차단됨 · {reason}. {failures}")
+        raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: Gemini 초안·재작성이 모두 차단됨 · {reason}. {failures}")
 
     content = rewritten["content_html"]
     image_model = "0"
