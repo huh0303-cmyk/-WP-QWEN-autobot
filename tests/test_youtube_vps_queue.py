@@ -20,5 +20,6 @@ def test_render_host_contract_is_vps_only():
     assert not (root / "render.yaml").exists()
     assert "enqueue_youtube_vps" in (root / "control_center" / "app.py").read_text(encoding="utf-8")
     assert "--daemon" in (root / "deploy" / "vps" / "korea365-youtube-worker.service").read_text(encoding="utf-8")
+    assert "--enqueue-channel globalmusic" in (root / "deploy" / "vps" / "README.md").read_text(encoding="utf-8")
     for name in ("youtube-control-scheduler.yml", "generate-youtube-playlist.yml", "curio-longform-daily.yml"):
         assert "if: ${{ false }}" in (root / ".github" / "workflows" / name).read_text(encoding="utf-8")

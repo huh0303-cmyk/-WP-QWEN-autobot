@@ -180,12 +180,18 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--daemon", action="store_true")
     parser.add_argument("--enqueue-due", action="store_true")
+    parser.add_argument("--enqueue-channel", choices=[channel.channel_key for channel in load_channels()])
     args = parser.parse_args()
     if args.enqueue_due:
         try:
             enqueue("", "예약 YouTube 작업", "youtube_scheduler", run_now=False)
         except RuntimeError:
             pass
+        return 0
+    if args.enqueue_channel:
+        channel = next(item for item in load_channels() if item.channel_key == args.enqueue_channel)
+        enqueue(channel.channel_key, channel.official_name or channel.display_name,
+                f"youtube_{channel.channel_key}", run_now=True)
         return 0
     while True:
         worked = process_one()

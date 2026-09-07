@@ -21,3 +21,12 @@ sudo systemctl enable --now korea365-control.service korea365-youtube-worker.ser
 ```
 
 The nginx virtual host for `control.korea365.org` should proxy to `127.0.0.1:8000`.
+
+After deployment, queue exactly one Cafe Romantic validation playlist with all three locks
+(VPS render, fresh Lyria music, fresh benchmark-informed Gemini thumbnail):
+
+```bash
+sudo -u korea365 /opt/korea365/.venv/bin/python /opt/korea365/scripts/youtube_vps_worker.py --enqueue-channel globalmusic
+```
+
+Watch it with `journalctl -u korea365-youtube-worker.service -f`. The upload remains PRIVATE.
