@@ -11,32 +11,25 @@ import requests
 KST = dt.timezone(dt.timedelta(hours=9))
 
 
-def history_today(now: dt.datetime) -> str:
-    url = (
-        "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/"
-        f"{now.month:02d}/{now.day:02d}"
-    )
-    response = requests.get(
-        url,
-        headers={"User-Agent": "Korea365KnowledgeChannels/1.0 (editorial research)"},
-        timeout=30,
-    )
+def history_events(now: dt.datetime) -> list[dict]:
+    url = f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/{now.month:02d}/{now.day:02d}"
+    response = requests.get(url, headers={"User-Agent": "Korea365KnowledgeChannels/1.0"}, timeout=30)
     response.raise_for_status()
-    events = response.json().get("events", [])
     candidates = []
-    for event in events:
-        text = " ".join(str(event.get("text", "")).split())
-        year = event.get("year")
-        pages = event.get("pages") or []
-        if text and year and pages:
-            candidates.append((len(pages), len(text), f"{year}: {text}"))
+    for event in response.json().get("events", []):
+        if not event.get("text") or not isinstance(event.get("year"), int) or not event.get("pages"):
+            continue
+        sources = [p.get("content_urls", {}).get("desktop", {}).get("page", "") for p in event["pages"]]
+        candidates.append({"year": event["year"], "text": event["text"], "sources": [s for s in sources if s], "coverage": len(event["pages"])})
     if not candidates:
-        return f"What happened on {now.strftime('%B %d')} in history"
-    # Prefer events with strong supporting page coverage, then rotate among the
-    # best candidates deterministically for that calendar date.
-    candidates.sort(reverse=True)
-    shortlist = [item[2] for item in candidates[: min(8, len(candidates))]]
-    return random.Random(now.strftime("%Y-%m-%d-history-today")).choice(shortlist)
+        raise RuntimeError("No sourced events for today's date")
+    # Coverage selects research leads; presentation is always reverse chronology.
+    selected = sorted(candidates, key=lambda e: e['coverage'], reverse=True)[:8]
+    return sorted(selected, key=lambda e: e['year'], reverse=True)
+
+
+def history_today(now: dt.datetime) -> str:
+    return f"{now.strftime('%B %d')} — Today in World History: " + " | ".join(f"{e['year']}: {e['text']}" for e in history_events(now))
 
 
 def main() -> None:

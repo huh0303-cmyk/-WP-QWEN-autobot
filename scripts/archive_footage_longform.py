@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -38,7 +38,7 @@ def _history_date_overlay(path: str) -> str:
     image = Image.open(path).convert("RGB")
     draw = ImageDraw.Draw(image)
     font_path = base.ensure_thumbnail_font("en", base.DATA_DIR)
-    date_text = datetime.now().strftime("%B %d").upper()
+    date_text = datetime.now(timezone(timedelta(hours=9))).strftime("%B %d").upper()
     date_font = ImageFont.truetype(font_path, max(118, image.width // 10))
     label_font = ImageFont.truetype(font_path, max(34, image.width // 32))
     for text, font, y in (
@@ -68,10 +68,10 @@ def _download_flux(url: str, out_path: str) -> bool:
 
 def _flux_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdir: str):
     channel_theme = {
-        "history": "authentic black-and-white war photography, American prosperity era, presidents, streets and archival newspaper collage",
+        "history": "world history, source-grounded international events, one clear editorial subject, minimal text",
         "invention": "history of inventions documentary",
-        "silent_era": "silent cinema history documentary",
-        "retro_reels": "vintage twentieth-century culture documentary",
+        "silent_era": "Old Hollywood silent and black-and-white cinema documentary",
+        "retro_reels": "Retro USA everyday American homes and social life from the 1960s through 2000s",
         "american_archive": "American archive history documentary",
     }.get(channel_key, "archival history documentary")
     url = generate_flux_thumbnail_url(topic, theme=f"{channel_theme} YouTube thumbnail")

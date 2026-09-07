@@ -1,30 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-archive_footage_longform.py
-─────────────────────────────────────────────────────────────
-american_archive / history(_today) / invention / silent_era / retro_reels
-5개 채널 공용 파이프라인. nasa_archive_longform.py와 같은 원칙 — AI 생성
-영상 대신 Internet Archive(archive.org, 무료·키 불필요)에서 실제 퍼블릭도메인
-영상을 검색+다운로드해 짜깁기하고, 그 위에 Gemini 사실기반 나레이션
-(ElevenLabs TTS) + 큰 번인자막을 입힌다. 썸네일도 실제 다운로드한 프레임 사용.
-
-퍼블릭도메인 검증 원칙(채널마다 다름, CHANNEL_ARCHIVE_CONFIG 참고):
-- Prelinger Archives(collection:prelinger)는 기증 조건 자체가 전량 퍼블릭도메인이라
-  개별 licenseurl 없이도 안전(invention, retro_reels).
-- 그 외(american_archive, history, silent_era)는 검색 시점에 licenseurl이 명시적으로
-  "publicdomain"인 항목만 통과시킨다 — archive.org는 저작권 있는 업로드도 섞여 있어서
-  Prelinger처럼 컬렉션 전체를 신뢰할 수 없음.
-- silent_era는 추가로 1929년 이전 작품이면 licenseurl이 없어도 허용(미국 저작권법상
-  95년 보호기간이 지나 자동으로 퍼블릭도메인인 게 법적으로 확실하기 때문).
-
-myth(신화)와 science(과학상식)는 이 파이프라인 대상이 아니다 — 실존하는 "실제 영상
-자료"가 애초에 없는 주제라 억지로 아카이브를 끼워맞추면 안 됨. 계속 curio_longform.py
-(Gemini 이미지 기반) 그대로 사용.
-
-사용법(curio_longform.py와 동일한 인자 순서 — 워크플로우 재사용 가능):
-    python scripts/archive_footage_longform.py "<주제>" en "" <channel_key>
-    예: python scripts/archive_footage_longform.py "Charlie Chaplin and The Tramp" en "" silent_era
+"""Reusable archive footage with scene-locked ElevenLabs documentary narration.
+Item-level rights required; source age or collection membership is not sufficient.
 """
 import os
 import re
@@ -57,12 +34,12 @@ CHANNEL_ARCHIVE_CONFIG = {
                           "domain": "American history told through public archival footage"},
     "history": {"collections": None, "require_pd_license": True, "max_year": None,
                 "domain": "on-this-day historical events"},
-    "invention": {"collections": ["prelinger"], "require_pd_license": False, "max_year": None,
+    "invention": {"collections": ["prelinger"], "require_pd_license": True, "max_year": None,
                   "domain": "the history of inventions, shown through real vintage footage"},
-    "silent_era": {"collections": None, "require_pd_license": True, "max_year": 1929,
-                    "domain": "classic silent films and the early days of cinema"},
-    "retro_reels": {"collections": ["prelinger"], "require_pd_license": False, "max_year": None,
-                     "domain": "nostalgic 20th-century pop culture, shown through real vintage footage"},
+    "silent_era": {"collections": None, "require_pd_license": True, "max_year": None,
+                    "domain": "Old Hollywood silent and black-and-white films with documentary narration"},
+    "retro_reels": {"collections": ["prelinger"], "require_pd_license": True, "max_year": None,
+                     "domain": "Retro USA everyday American life in the 1960s through 2000s"},
 }
 
 
@@ -338,6 +315,8 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=40):
             clips.append({
                 "path": raw_path, "title": d.get("title", ""), "duration": dur,
                 "identifier": identifier, "year": d.get("year", ""),
+                "source_url": f"https://archive.org/details/{identifier}",
+                "license_url": d.get("licenseurl", ""),
                 "description": (d.get("description") or "")[:300] if isinstance(d.get("description"), str) else "",
             })
         except Exception as e:
@@ -550,60 +529,41 @@ def main():
     os.makedirs(workdir, exist_ok=True)
 
     log(f"1/6 Internet Archive에서 실제 퍼블릭도메인 클립 검색+다운로드 중 (주제: {topic})...")
-    clips = fetch_archive_clips(topic, channel_key, workdir)
+    if channel_key == "history":
+        from pick_knowledge_topic import history_events, KST
+        import datetime as dt
+        today = dt.datetime.now(KST)
+        clips = []
+        for event in history_events(today):
+            event_dir = os.path.join(workdir, f"event_{event['year']}")
+            os.makedirs(event_dir, exist_ok=True)
+            event_clips = fetch_archive_clips(event['text'], channel_key, event_dir, n_target=4)
+            if not event_clips:
+                continue
+            event_clips = inspect_and_filter_clips(event['text'], event_clips, event_dir, run_ffmpeg, log)
+            for clip in event_clips:
+                clip['event_label'] = f"{today.strftime('%B %d')} · {event['year']}"
+                clip['event_text'] = event['text']
+                clip['event_sources'] = event['sources']
+            clips.extend(event_clips)
+        topic = f"{today.strftime('%B %d')} — Today in World History, newest to oldest"
+    else:
+        clips = fetch_archive_clips(topic, channel_key, workdir)
     if not clips:
         log("❌ 이 주제로 사용 가능한 퍼블릭도메인 클립을 하나도 못 찾음 — 주제를 바꿔서 재시도 필요")
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보 (전부 퍼블릭도메인 검증됨)")
-    clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
+    if channel_key != "history":
+        clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
     log(f"   AI actual-frame review passed: {len(clips)} relevant clips")
 
-    target_seconds = None
-    if channel_key == "silent_era":
-        # 실제 사용될 필름 분량(클립당 최대 CLIP_TRIM_SECONDS) 그대로 영상 길이로
-        # 쓴다 — 억지로 14분 채우려고 짧은 무성영화 클립 몇 개를 계속 순환시키지 않는다.
-        target_seconds = sum(min(c["duration"], CLIP_TRIM_SECONDS) for c in clips)
-        log(f"   silent_era: 실제 확보 필름 분량 {target_seconds/60:.1f}분 — "
-            f"이 길이 그대로 나레이션을 맞춘다(고정 14분 강제 안 함)")
-
-    log("2/6 사실기반 대본 생성 중...")
-    if channel_key == "silent_era":
-        data = {"narration": "", "title_hint": topic}
-        narration = ""
-        log("   silent_era: wordless policy active — synthetic narration disabled")
-    else:
-        data = generate_script(topic, channel_key, clips, target_seconds=target_seconds)
-        narration = data["narration"]
-        alignment = verify_narration_alignment(topic, clips, narration, gemini_generate_text)
-        log(f"   narration/footage alignment: {alignment['alignment_score']}/100 PASS")
-    with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
-        json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
-    log(f"   나레이션 {len(narration.split())}단어")
-
-    log("2.5/6 유튜브 제목/설명 생성 중...")
+    from knowledge_scene_edit import render_scenes
+    final_path, narration = render_scenes(
+        topic, channel_key, clips, workdir, gemini_generate_text, _strip_json_fence,
+        verify_narration_alignment, build_narration_track, write_srt, mux_final,
+        normalize_clip, run_ffmpeg, get_duration)
     yt_meta = generate_youtube_metadata(topic, channel_key, narration)
-    log(f"   제목: {yt_meta['title']}")
-
-    log("3/6 나레이션 TTS + 캡션 타이밍 생성 중...")
-    if channel_key == "silent_era":
-        total_dur = max(float(target_seconds or 0), 1.0)
-        audio_path = os.path.join(workdir, "silent_track.m4a")
-        make_silence(audio_path, total_dur)
-        srt_entries = []
-    else:
-        audio_path, srt_entries, total_dur = build_narration_track(narration, workdir)
-    log(f"   총 나레이션 길이: {total_dur/60:.1f}분")
-    srt_path = os.path.join(workdir, "captions.srt")
-    write_srt(srt_entries, srt_path)
-
-    log("4/6 실제 아카이브 클립으로 영상 트랙 조립 중 (트림+정규화+순환)...")
-    visual_path = build_visual_track(clips, total_dur, workdir)
-
-    log("5/6 영상+오디오 합성 중...")
-    final_path = os.path.join(workdir, "final.mp4")
-    mux_final(visual_path, audio_path, srt_path, final_path, workdir)
     dur = get_duration(final_path)
-    log(f"   ✅ 영상 완성: {final_path} ({dur/60:.1f}분)")
 
     log("6/6 썸네일 생성 중 (실제 프레임 사용)...")
     hero_frame = os.path.join(workdir, "hero_frame.jpg")
