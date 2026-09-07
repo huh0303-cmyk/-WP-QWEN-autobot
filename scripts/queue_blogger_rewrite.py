@@ -26,7 +26,7 @@ from automation_hub.blogger_rewriter import (
     parse_rewrite_json,
     rewrite_prompt,
 )
-from automation_hub.content_identity import active_duplicate, canonical_source_id, stable_content_id
+from automation_hub.content_identity import ACTIVE_CONTENT_STATUSES, active_duplicate, canonical_source_id, stable_content_id
 from automation_hub.blogger_topic_router import (
     NoEligibleTopic,
     NoRelatedWordPressSource,
@@ -122,6 +122,19 @@ def main():
     source_match_score = None
     route_code = "WP_RELATED_SOURCE"
     evidence_sources: list[dict[str, str]] = []
+    if not source_url and os.getenv("BLOGGER_RECOVER_FROM_WP", "false").lower() == "true":
+        # Explicit repair dispatch: use an existing public article from the
+        # paired site instead of requiring fresh cross-media trend discovery.
+        from automation_hub.blogger_topic_router import fetch_public_wp_posts
+        posts = fetch_public_wp_posts(profile["wordpress"]["url"])
+        eligible_posts = [post for post in posts if not active_duplicate(
+            queue_records, site_id=blogger_site_id, source_id=post["link"])]
+        if blogger_site_id == KPOP_SITE_ID:
+            eligible_posts = [post for post in eligible_posts if is_kpop_source(post)]
+        if not eligible_posts:
+            print(json.dumps({"queued": False, "result_code": "NO_NEW_SOURCE", "duplicate_blocked": True}))
+            return 0
+        source_url = eligible_posts[0]["link"]
     if source_url:
         try:
             parsed = urlparse(source_url)
@@ -161,7 +174,7 @@ def main():
         already_used = [
             record.get("source_keyword", "")
             for record in queue_records
-            if record.get("site_id") == blogger_site_id
+            if record.get("site_id") == blogger_site_id and record.get("status", "").lower() in ACTIVE_CONTENT_STATUSES
         ]
         try:
             candidate_posts = fetch_public_wp_posts(wp_url)
@@ -182,7 +195,7 @@ def main():
         already_used = [
             record.get("source_keyword", "")
             for record in queue_records
-            if record.get("site_id") == blogger_site_id
+            if record.get("site_id") == blogger_site_id and record.get("status", "").lower() in ACTIVE_CONTENT_STATUSES
         ]
         try:
             routed = resolve_automatic_source(profile, excluded_urls=already_used)
@@ -296,6 +309,8 @@ def main():
                 prior_feedback="; ".join(failures),
                 verified_sources=evidence_sources,
             )
+        if attempt > 1 and 'candidate' in locals():
+            prompt += "\nRepair this previous draft. Preserve its valid factual content and exact verified links; expand any short sections to the required body length. Return the complete corrected JSON, not a summary.\n" + json.dumps(candidate, ensure_ascii=False)
         try:
             if not openai_available():
                 raise RuntimeError("GPT-5 mini writer unavailable")
@@ -306,7 +321,7 @@ def main():
                 quality_score, failures, similarity_score = blogger_quality_score(candidate, source_title=source["title"]["rendered"], source_url=source["link"], source_html=source["content"]["rendered"], target_chars=target_chars, maximum_similarity=maximum, language=language)
                 critical_prefixes = ("body length", "verified WordPress source link", "YMYL", "meta description is incomplete", "language mismatch")
             else:
-                candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
+                candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl, preserve_urls=evidence_urls)
                 quality_score, failures = original_quality_score(candidate, keyword=selected_topic, target_chars=target_chars, language=language)
                 used_evidence = set(extract_http_links(candidate.get("content_html", ""))) & set(evidence_urls)
                 if len(used_evidence) < min(2, len(evidence_urls)):

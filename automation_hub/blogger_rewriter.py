@@ -95,7 +95,7 @@ def _clip_sentence(value: str, maximum: int) -> str:
     return _clip_words(value, maximum)
 
 
-def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, source_url: str = "", ymyl: bool = False) -> dict[str, Any]:
+def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, source_url: str = "", ymyl: bool = False, preserve_urls: list[str] | None = None) -> dict[str, Any]:
     """Fit generated output to Blogger's hard format limits before scoring.
 
     This only removes generated words/HTML blocks. It never authors or
@@ -112,7 +112,7 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
         required: list[str] = []
         for block in blocks:
             lower = plain_text(block).lower()
-            if (source_url and source_url in block) or (ymyl and re.search(r"\b(as of|subject to change|rules can change|requirements can change|disclaimer|not medical advice|not legal advice)\b", lower)):
+            if any(url in extract_http_links(block) for url in ([source_url] if source_url else []) + (preserve_urls or [])) or (ymyl and re.search(r"\b(as of|subject to change|rules can change|requirements can change|disclaimer|not medical advice|not legal advice)\b", lower)):
                 required.append(block)
         required = list(dict.fromkeys(required))
         required_chars = len(re.sub(r"\s+", "", plain_text("".join(required))))
@@ -143,7 +143,12 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
             safe_url = html.escape(source_url, quote=True)
             final_blocks.append(f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>')
         if final_blocks:
-            normalized["content_html"] = "".join(final_blocks)
+            shortened = "".join(final_blocks)
+            # Whole-block clipping can leave only a tiny introduction. Keep the
+            # original for the repair attempt instead of destroying the draft.
+            minimum = max(1000, int(target_chars * 0.78))
+            if len(re.sub(r"\s+", "", plain_text(shortened))) >= minimum:
+                normalized["content_html"] = shortened
 
     # 2026-09-04: this forced-attribution fallback used to live only inside
     # the length-trimming branch above, so any article that was already
@@ -168,7 +173,7 @@ Never copy or paraphrase sentence by sentence. Reusing sentences, paragraph orde
 The title is the highest-priority text: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. Never use AI-sounding stock phrases, a repeated title formula, or a title similar to another article.
 The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
 Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
-Language: {language}. Persona: {persona}. Tone: {tone}. Target length: about {target_chars} characters.
+Language: {language}. Persona: {persona}. Tone: {tone}. Target body length: {target_chars} visible non-whitespace characters, excluding HTML tags, spaces, title, labels and meta description. Write 3-4 complete sections, each with substantive paragraphs. Count body text only; links and JSON syntax do not count.
 Every reader-visible field must use that language, including the title, meta_description, headings, body, labels, image_queries, and image alt text. If the target language is English, do not include a Korean summary, Korean caption, or any Hangul text.
 The article must feel individually edited for this site's persona, not mass-produced. Titles using Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리 are forbidden. Never use body filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.

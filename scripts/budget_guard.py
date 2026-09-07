@@ -18,6 +18,14 @@ CI the same way blogger_scheduler_state.json already is.
 """
 from __future__ import annotations
 
+import base64
+import hashlib
+import math
+import random
+import time
+
+import requests
+
 import json
 import os
 from datetime import datetime, timezone, timedelta
@@ -50,6 +58,11 @@ def _load_state(now: datetime) -> dict:
 def check_and_record(amount_usd: float, *, label: str, ceiling_usd: float = DEFAULT_CEILING_USD) -> None:
     """Raise SystemExit and record nothing if this call would breach the
     monthly ceiling. Otherwise record it and return normally."""
+    if not math.isfinite(amount_usd) or amount_usd < 0:
+        raise ValueError("Budget amount must be finite and nonnegative")
+    if os.getenv("BUDGET_GITHUB_REPOSITORY"):
+        _reserve_remote(amount_usd, label=label, ceiling_usd=ceiling_usd)
+        return
     now = datetime.now(KST)
     state = _load_state(now)
     projected = state["spent_estimate_usd"] + amount_usd
@@ -66,6 +79,55 @@ def check_and_record(amount_usd: float, *, label: str, ceiling_usd: float = DEFA
     state["calls"] = state["calls"][-500:]  # keep the file bounded
     STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"budget guard OK: {label} +${amount_usd:.4f} -> month total ${state['spent_estimate_usd']:.2f} / ${ceiling_usd:.2f}")
+
+
+
+def _reserve_remote(amount_usd: float, *, label: str, ceiling_usd: float) -> None:
+    """Reserve estimated spend before generation using GitHub's SHA compare-and-swap.
+
+    A conflicting writer is re-read and merged before retrying. Failure to save
+    blocks paid calls; reservation amounts are estimates, never measured charges.
+    """
+    repository = os.environ["BUDGET_GITHUB_REPOSITORY"]
+    token = os.getenv("GH_TOKEN", "")
+    if not token:
+        raise RuntimeError("Budget reservation requires GH_TOKEN")
+    branch = os.getenv("BUDGET_GITHUB_BRANCH", "main")
+    run = os.getenv("GITHUB_RUN_ID", "")
+    attempt = os.getenv("GITHUB_RUN_ATTEMPT", "1")
+    if not run:
+        raise RuntimeError("Budget reservation requires GITHUB_RUN_ID")
+    operation = hashlib.sha256(f"{run}:{attempt}:{label}".encode()).hexdigest()
+    url = f"https://api.github.com/repos/{repository}/contents/budget_state.json"
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
+    for retry in range(12):
+        response = requests.get(url, headers=headers, params={"ref": branch}, timeout=30)
+        if response.status_code != 200:
+            raise RuntimeError(f"Budget read failed: HTTP {response.status_code}; paid calls blocked")
+        data = response.json()
+        state = json.loads(base64.b64decode(data["content"]))
+        now = datetime.now(KST)
+        if state.get("month") != _month_key(now):
+            state = {"month": _month_key(now), "spent_estimate_usd": 0.0, "calls": []}
+        if any(call.get("reservation_id") == operation for call in state["calls"]):
+            raise RuntimeError("Budget reservation already exists for this execution; refusing a second paid attempt")
+        projected = round(float(state["spent_estimate_usd"]) + amount_usd, 4)
+        if not math.isfinite(projected) or projected > ceiling_usd:
+            raise SystemExit("BUDGET GUARD BLOCKED: monthly estimated ceiling would be exceeded; no API call made")
+        state["spent_estimate_usd"] = projected
+        state["calls"].append({"at": now.isoformat(), "label": label, "amount_usd": amount_usd,
+            "reservation_id": operation, "run_id": run, "run_attempt": attempt, "cost_type": "estimate"})
+        encoded = json.dumps(state, ensure_ascii=False, indent=2) + "\n"
+        response = requests.put(url, headers=headers, json={"message": "chore: reserve generation budget [skip ci]",
+            "branch": branch, "sha": data["sha"], "content": base64.b64encode(encoded.encode()).decode()}, timeout=30)
+        if response.status_code in {200, 201}:
+            STATE_FILE.write_text(encoded, encoding="utf-8")
+            print(f"budget guard reserved estimate: {label} +${amount_usd:.4f}; month ${projected:.2f}")
+            return
+        if response.status_code not in {409, 422}:
+            raise RuntimeError(f"Budget save failed: HTTP {response.status_code}; paid calls blocked")
+        time.sleep(min(retry + 1, 5) + random.random())
+    raise RuntimeError("Budget reservation contention exhausted retries; no paid API call made")
 
 
 def month_status(ceiling_usd: float = DEFAULT_CEILING_USD) -> dict:
