@@ -142,10 +142,17 @@ def test_automatic_route_falls_back_to_independent_article(monkeypatch):
     assert routed.source_score is None
 
 
-def test_queue_keeps_two_gpt_attempts_and_has_no_gemini_route():
+def test_queue_keeps_two_attempts_and_uses_gemini_not_gpt():
+    """Blogger is a deliberate 2026-09-07 exception to the network's GPT-only
+    writer default: see docs/CONTENT_CADENCE_POLICY_LOCK.md and
+    config/content_writing_policy.json's blogger_writer block. This test
+    used to assert the opposite (GPT-only, no Gemini route); it was updated
+    in the same commit that made the switch, per the lock file's own
+    governance rule."""
     from pathlib import Path
 
     source = (Path(__file__).resolve().parents[1] / "scripts" / "queue_blogger_rewrite.py").read_text(encoding="utf-8")
     assert "for attempt in range(1, 3)" in source
     assert "resolve_automatic_source" in source
-    assert "gemini_generate" not in source
+    assert "gemini_generate_text" in source
+    assert "openai_generate_text" not in source
