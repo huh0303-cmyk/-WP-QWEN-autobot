@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "name": "MASTER_CONTENT_WRITING_ENGINE_POLICY",
   "status": "LOCKED",
   "site_editorial_playbook": "config/SITE_EDITORIAL_PLAYBOOKS.md",
@@ -7,10 +7,11 @@
   "primary_writer": {
     "provider": "openai",
     "model": "gpt-5-mini",
-    "role": "first_draft_writer_for_all_content",
+    "role": "first_draft_writer_for_wordpress_tistory_and_news",
     "cost_policy": "user_approved_paid_default",
     "rules": [
-      "All WordPress, Blogger and Tistory first drafts are written by gpt-5-mini by default.",
+      "All WordPress and Tistory first drafts are written by gpt-5-mini by default.",
+      "Blogger is a deliberate exception to this default; see blogger_writer below.",
       "GPT-5 mini must follow the site-specific persona, language, search intent, SEO structure, labels/categories and metadata rules.",
       "Do not silently switch to another paid model when authentication or quota fails."
     ]
@@ -18,7 +19,7 @@
   "fallback_writer": {
     "provider": "openai",
     "model_family": "gpt-5-mini",
-    "role": "failed_draft_recovery_and_rewrite",
+    "role": "failed_draft_recovery_and_rewrite_for_wordpress_tistory_and_news",
     "allowed_when": [
       "gpt_generation_failure",
       "gpt_quality_fail",
@@ -28,15 +29,30 @@
       "manual_override"
     ],
     "rules": [
-      "GPT-5 mini is both the routine writer and the only automatic rewrite writer.",
+      "GPT-5 mini is both the routine writer and the only automatic rewrite writer for WordPress, Tistory and news.",
       "When a draft fails quality, factual, structural or formatting gates, GPT-5 mini rewrites it rather than automatically publishing it.",
       "No public publishing occurs from fallback output without the normal approval flow."
+    ]
+  },
+  "blogger_writer": {
+    "provider": "gemini",
+    "model": "gemini-2.5-flash",
+    "role": "first_draft_and_rewrite_writer_for_blogger_only",
+    "status": "DELIBERATE_EXCEPTION_2026-09-07",
+    "cost_policy": "user_approved_paid_default",
+    "rules": [
+      "Blogger first drafts and quality-gate rewrites are written by Gemini, not GPT-5 mini.",
+      "This overrides primary_writer/fallback_writer for the blogger platform only; WordPress, Tistory and news are unaffected and remain GPT-5 mini only.",
+      "Existing code-level quality and repetition gates (automation_hub.repetition_guard, blogger_quality_score, original_quality_score) still apply unchanged and still block a repeated title or a below-threshold draft.",
+      "Do not silently switch to another paid model when authentication or quota fails."
     ]
   },
   "auditor": {
     "provider": "gemini",
     "model_family": "Gemini 2.5 Flash",
     "role": "independent_final_editorial_fact_and_quality_reviewer",
+    "applies_to": ["wordpress", "tistory", "news"],
+    "note": "Blogger does not use this auditor role; Gemini is Blogger's writer instead, see blogger_writer.",
     "checks": [
       "grammar_and_spelling",
       "awkward_or_ai_sounding_phrasing",
@@ -110,7 +126,8 @@
   "quality_gate": {"minimum_score": 70, "below_minimum_action": "QUALITY_FAIL"},
   "two_model_checks_and_balances": {
     "status": "LOCKED_MANDATORY",
-    "applies_to": ["wordpress", "blogger", "tistory", "news"],
+    "applies_to": ["wordpress", "tistory", "news"],
+    "note": "Blogger is excluded here since blogger_writer makes Gemini the sole writer for that platform, not an independent auditor.",
     "gpt": "first_draft_and_rewrite_when_required",
     "gemini": "independent_fact_structure_seo_originality_check",
     "approval_rule": "gemini_and_gpt_must_both_return_ok_true",

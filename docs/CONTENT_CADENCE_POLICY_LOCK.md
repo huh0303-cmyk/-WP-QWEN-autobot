@@ -5,7 +5,8 @@ This file is an executable operating contract, not a planning note. Any change t
 ## Locked rules
 
 - Quality threshold: **70/100** across every writing and draft gate.
-- Writing engine: **OpenAI `gpt-5-mini` only** for WordPress, both newsrooms, Blogger, and Tistory first drafts and rewrites. Gemini is an independent reviewer only; it is never an automatic writer fallback.
+- Writing engine: **OpenAI `gpt-5-mini` only** for WordPress, both newsrooms, and Tistory first drafts and rewrites. Gemini is an independent reviewer only for these platforms; it is never an automatic writer fallback for WordPress, newsrooms, or Tistory.
+- Blogger writing engine (deliberate 2026-09-07 exception): **Google Gemini (`gemini-2.5-flash`) only**, for both the first draft and the quality-gate rewrite attempt. GPT is not used as a Blogger writer or fallback. All other Blogger rules on this page (27 destinations, one private draft per destination per KST day, matching WordPress source required, review-gated publication) are unchanged.
 - Blog image engine: Replicate **`bytedance/sdxl-lightning-4step` first**, then one **`black-forest-labs/flux-schnell`** fallback attempt, then text-only. Gemini/OpenAI/stock image fallbacks are disabled.
 - WordPress blogs: **25 destinations, exactly one item per destination per KST day** (`daily=1`, `weekly=7`).
 - Newsrooms: **2 destinations** (`koreanews365.com`, `theseouljournal.com`), **3–10 public briefs per KST day per newsroom**, driven by timely RSS/primary-source leads. Each brief must contain **700–1,500 visible characters**, retain source attribution, reject duplicate source URLs, and run through the single newsroom owner lock.
