@@ -110,8 +110,17 @@ def test_active_workflows_keep_non_calendar_routes_locked():
         assert "inputs.schedule_id != '' && inputs.claim_token != ''" in text
         assert "youtube_calendar_result.py upload-start" in text
         assert "youtube_calendar_result.py finish" in text
-    for name in ["topik-quiz-daily.yml", "curio-scheduler.yml", "daily_multilang_quiz.yml"]:
+    for name in ["curio-scheduler.yml", "daily_multilang_quiz.yml"]:
         assert "if: ${{ false }}" in (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
+
+
+def test_topik_manual_generation_keeps_stop_switch_and_review_default():
+    text = (ROOT / ".github/workflows/topik-quiz-daily.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch:" in text
+    assert "schedule:" not in text
+    assert "vars.TOPIK_VIDEO_GENERATION_DISABLED != 'true'" in text
+    assert "META_PUBLISH_ENABLED" not in text
+    assert "default: false" in text
 
 
 def test_dispatch_claims_before_http_and_forwards_calendar(monkeypatch):

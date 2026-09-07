@@ -1,11 +1,7 @@
 name: "Control Room — publish one SNS platform now"
 
-# Dispatched only by a human clicking one platform's button in the CEO
-# control room. Publishes whatever content is already generated and
-# waiting (topik_quiz_output/meta_<lang>.json by default) to exactly one
-# platform — the other four are left untouched. Every platform in
-# social_publish.py already fails safe (draft/private/caption-only) on
-# its own; this workflow does not change that behavior.
+# A deliberate dispatch publishes Instagram/Threads publicly.
+# Other platforms retain their existing private/draft upload behavior.
 
 on:
   workflow_dispatch:
@@ -15,6 +11,15 @@ on:
         required: true
         type: choice
         options: [tiktok, instagram, facebook, threads, youtube]
+      brand:
+        description: "게시 계정 브랜드"
+        type: choice
+        options: [TOPIK, ENGLISH, LANGUAGE]
+        default: TOPIK
+      source_run_id:
+        description: "생성 영상이 보관된 TOPIK 실행 ID (선택)"
+        required: false
+        default: ""
       lang:
         description: "meta_<lang>.json의 언어 코드 (기본 ko)"
         required: false
@@ -26,9 +31,10 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
-  group: social-publish-${{ inputs.platform }}
+  group: social-publish-${{ inputs.brand || 'TOPIK' }}-${{ inputs.platform }}
   cancel-in-progress: false
 
 jobs:
@@ -41,9 +47,39 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-api-python-client google-auth google-auth-httplib2 -q
+      - name: Download generated review artifact
+        if: ${{ inputs.source_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id }}
+          name: topik-review-${{ inputs.source_run_id }}
+          path: topik_quiz_output
+      - uses: actions/cache/restore@v4
+        with:
+          path: .meta-publish-state
+          key: meta-receipts-${{ inputs.brand || 'TOPIK' }}-${{ inputs.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: meta-receipts-${{ inputs.brand || 'TOPIK' }}-${{ inputs.platform }}-
       - name: Publish to the one requested platform
         env:
           SOCIAL_PUBLISH_PLATFORM: ${{ inputs.platform }}
+          META_PUBLISH_ENABLED: "true"
+          SOCIAL_BRAND: ${{ inputs.brand || 'TOPIK' }}
+          META_GRAPH_VERSION: ${{ vars.META_GRAPH_VERSION || 'v25.0' }}
+          IG_LOGIN_TYPE: ${{ vars.IG_LOGIN_TYPE || 'facebook' }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          IG_ACCESS_TOKEN_ENGLISH: ${{ secrets.IG_ACCESS_TOKEN_ENGLISH }}
+          IG_USER_ID_ENGLISH: ${{ secrets.IG_USER_ID_ENGLISH }}
+          IG_ACCESS_TOKEN_LANGUAGE: ${{ secrets.IG_ACCESS_TOKEN_LANGUAGE }}
+          IG_USER_ID_LANGUAGE: ${{ secrets.IG_USER_ID_LANGUAGE }}
+          THREADS_ACCESS_TOKEN_ENGLISH: ${{ secrets.THREADS_ACCESS_TOKEN_ENGLISH }}
+          THREADS_USER_ID_ENGLISH: ${{ secrets.THREADS_USER_ID_ENGLISH }}
+          THREADS_ACCESS_TOKEN_LANGUAGE: ${{ secrets.THREADS_ACCESS_TOKEN_LANGUAGE }}
+          THREADS_USER_ID_LANGUAGE: ${{ secrets.THREADS_USER_ID_LANGUAGE }}
+          INPUT_META_PATH: ${{ inputs.meta_path }}
           TARGET_LANG: ${{ inputs.lang }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
@@ -52,10 +88,24 @@ jobs:
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NORMAL_COMPLETION_EMAIL_ENABLED: "true"
+          NORMAL_COMPLETION_EMAIL_ENABLED: "false"
         run: |
-          if [ -n "${{ inputs.meta_path }}" ]; then
-            python scripts/social_publish.py "${{ inputs.meta_path }}"
+          if [ -n "$INPUT_META_PATH" ]; then
+            python scripts/social_publish.py "$INPUT_META_PATH"
           else
-            python scripts/social_publish.py "${{ inputs.lang }}"
+            python scripts/social_publish.py "$TARGET_LANG"
           fi
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .meta-publish-state
+          key: meta-receipts-${{ inputs.brand || 'TOPIK' }}-${{ inputs.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: social-publish-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: |
+            .meta-publish-state/*.json
+            topik_quiz_output/publish_result_*.json
+          if-no-files-found: warn

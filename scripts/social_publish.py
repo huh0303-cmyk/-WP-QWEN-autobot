@@ -1,42 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-social_publish.py
-─────────────────────────────────────────────────────────────
-topik_quiz_shorts.py / health_shorts.py 등이 만든 쇼츠(final.mp4 + meta.json)를
-유튜브/틱톡/페이스북에 "발행 대기" 상태로 올리고, 인스타그램/쓰레드는
-캡션+영상 링크만 준비한다. 어떤 생성 스크립트가 만든 쇼츠든 meta.json
-포맷(youtube_title/youtube_description/short_caption/hashtags/video_path/
-public_video_url)만 맞으면 그대로 쓸 수 있다.
-
-원칙: 자동화는 예약/준비까지만 하고, 실제 공개(퍼블리시)는 항상 사람이
-마지막에 직접 누른다.
-    - 유튜브: private로 업로드 → 스튜디오에서 직접 공개
-    - 틱톡: 앱 미감사 상태라 원래 본인 계정 비공개 초안으로만 올라감(자연히 만족)
-    - 페이스북: DRAFT로 업로드 → Meta Business Suite에서 직접 게시
-    - 인스타그램/쓰레드: API에 진짜 임시저장이 없어서(컨테이너 24시간 뒤 만료)
-      아예 API 호출 안 하고 캡션+영상 링크만 결과에 담아 이메일로 보냄 → 앱에서 직접 업로드
-
-각 플랫폼은 독립적으로 실패해도 나머지 플랫폼에 영향을 주지 않는다
-(social_stats_daily.py와 동일한 원칙). 필요한 시크릿이 없는 플랫폼은
-에러 없이 건너뛴다.
-
-사용법:
-    python scripts/social_publish.py <lang>              # 단어퀴즈: topik_quiz_output/meta_{lang}.json
-    python scripts/social_publish.py <meta.json 경로>      # 건강채널 등: 경로 그대로 사용
-
-필요 환경변수(플랫폼별로 없으면 해당 플랫폼만 스킵):
-    YOUTUBE_OAUTH_CLIENT_ID/SECRET/REFRESH_TOKEN   - 유튜브 업로드(스코프: youtube.upload)
-
-    TIKTOK_ACCESS_TOKEN                            - 틱톡 Content Posting API 액세스 토큰
-                                                      (video.publish 스코프)
-    TIKTOK_PRIVACY_LEVEL                           - (선택) 기본 SELF_ONLY
-
-    FB_PAGE_ACCESS_TOKEN, FB_PAGE_ID               - 페이스북 릴스 업로드(pages_manage_posts,
-                                                      pages_read_engagement 권한 필요)
-
-    GMAIL_APP_PASSWORD                             - 완료 요약 메일(선택, 인스타/쓰레드
-                                                      캡션은 이 메일로만 전달됨)
+"""Publish generated shorts to selected platforms.
+YouTube/Facebook retain private/draft behavior. Instagram/Threads publish through
+Meta APIs when META_PUBLISH_ENABLED=true; otherwise report preparation as skipped.
+See docs/META_PUBLISHING_SETUP.md for credentials and persistent receipt storage.
 """
 
 import os
@@ -281,33 +248,15 @@ def publish_facebook(video_path, meta):
 
 
 # ════════════════════════════════════════════════════════════
-# Instagram / Threads — 두 플랫폼 다 API로 만든 컨테이너는 "초안"으로
-# 앱에 남지 않고 24시간 뒤 그냥 만료돼버린다(진짜 임시저장 기능이 없음).
-# 그래서 여기서는 API로 대신 올려버리지 않고, 캡션+영상 링크만 준비해서
-# 사용자가 앱에서 직접 업로드하게 한다("최종 업로드는 내가 함" 원칙).
-# ════════════════════════════════════════════════════════════
+# Instagram / Threads — actual publishing is explicitly enabled by the caller.
 def publish_instagram(meta):
-    if not meta.get("public_video_url"):
-        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
-    caption = platform_copy(meta, "instagram")["caption"]
-    return {
-        "ok": True,
-        "note": "인스타그램 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 릴스 업로드 필요",
-        "video_url": meta["public_video_url"],
-        "caption": caption,
-    }
+    from meta_publish import publish
+    return publish("instagram", meta, platform_copy(meta, "instagram")["caption"])
 
 
 def publish_threads(meta):
-    if not meta.get("public_video_url"):
-        return {"ok": False, "skipped": True, "reason": "공개 video_url 없음 — 드라이브 업로드 설정 확인 필요"}
-    caption = platform_copy(meta, "threads", max_hashtags=3)["caption"]
-    return {
-        "ok": True,
-        "note": "쓰레드 API는 임시저장이 없어 자동 게시 안 함 — 아래 캡션으로 직접 업로드 필요",
-        "video_url": meta["public_video_url"],
-        "caption": caption,
-    }
+    from meta_publish import publish
+    return publish("threads", meta, platform_copy(meta, "threads", max_hashtags=3)["caption"])
 
 
 PLATFORMS = {
@@ -338,7 +287,7 @@ def main():
         meta = json.load(f)
     publish_times = recommended_publish_times(meta)
     video_path = meta.get("video_path") or os.path.join(os.path.dirname(meta_path), "final.mp4")
-    if not os.path.exists(video_path):
+    if not os.path.exists(video_path) and os.getenv("SOCIAL_PUBLISH_PLATFORM") not in {"instagram", "threads"}:
         log(f"❌ 영상 파일 없음: {video_path}")
         raise SystemExit(1)
 
@@ -363,7 +312,7 @@ def main():
     for name, fn in platforms.items():
         log(f"  → {name} 게시 중...")
         fingerprint = content_fingerprint(meta, name)
-        if state.get(name) == fingerprint:
+        if name not in {"instagram", "threads"} and state.get(name) == fingerprint:
             result = {"ok": False, "skipped": True, "reason": "동일 플랫폼 중복 콘텐츠 차단"}
             results[name] = result
             log(f"     ⏭️  건너뜀: {result['reason']}")
@@ -379,7 +328,7 @@ def main():
         if result.get("skipped"):
             log(f"     ⏭️  건너뜀: {result.get('reason')}")
         elif result.get("ok"):
-            log(f"     ✅ {result.get('note') or '완료'} — {result.get('url') or result.get('video_id') or result.get('publish_id') or ''}")
+            log(f"     ✅ {result.get('note') or '완료'} — {result.get('url') or result.get('video_id') or result.get('publish_id') or result.get('media_id') or ''}")
         else:
             log(f"     ❌ 실패: {result.get('error')}")
 
@@ -394,7 +343,7 @@ def main():
     skip_count = sum(1 for r in results.values() if r.get("skipped"))
     fail_count = len(results) - ok_count - skip_count
 
-    summary_lines = [f"[{label}] {meta.get('youtube_title', '')}", "", "※ 전부 발행 대기 상태입니다 — 최종 공개는 직접 눌러야 합니다.", ""]
+    summary_lines = [f"[{label}] {meta.get('youtube_title', '')}", "", "※ 플랫폼별 결과를 확인하세요. Meta published는 공개 게시 완료입니다.", ""]
     for name, r in results.items():
         if r.get("ok"):
             line = f"✅ {name}: {r.get('note') or '완료'}"

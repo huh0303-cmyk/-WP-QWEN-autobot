@@ -6,6 +6,11 @@ name: TOPIK 단어 퀴즈 쇼츠 — 검수용 생성만
 on:
   workflow_dispatch:
     inputs:
+      lang:
+        description: "퀴즈 언어"
+        type: choice
+        options: [ko, en, ja, es, vi]
+        default: ko
       category:
         description: "카테고리 (비우면 무작위)"
         required: false
@@ -29,7 +34,7 @@ concurrency:
 
 jobs:
   generate:
-    if: ${{ false }} # EMERGENCY LOCK: video generation disabled
+    if: ${{ vars.TOPIK_VIDEO_GENERATION_DISABLED != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -50,7 +55,7 @@ jobs:
         env:
           TOPIC_CATEGORY: ${{ inputs.category }}
           NUM_ITEMS: ${{ inputs.num_items || '5' }}
-          TARGET_LANG: "ko"
+          TARGET_LANG: ${{ inputs.lang || 'ko' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
@@ -67,10 +72,11 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TARGET_LANG: ${{ inputs.lang || 'ko' }}
           TIKTOK_PRIVACY_LEVEL: SELF_ONLY
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-        run: python scripts/social_publish.py topik_quiz_output/meta_ko.json
+        run: python scripts/social_publish.py "$TARGET_LANG"
       - name: "검수용 영상/메타데이터 보관"
         if: always()
         uses: actions/upload-artifact@v4
