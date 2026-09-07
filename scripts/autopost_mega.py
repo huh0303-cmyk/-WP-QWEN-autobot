@@ -1841,7 +1841,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
 
     ilinks = get_internal_links(url, count=4)
     il_str = "\n".join(f'  - <a href="{u}" title="{n}">{n}</a>' for n, u in ilinks)
-    struct_str = "\n".join(f"  {i+1}. {s}" for i, s in enumerate(structure))
+    struct_str = "Coverage checklist only; write specific headings from the facts, never copy these labels verbatim.\n" + "\n".join(f"  {i+1}. {s}" for i, s in enumerate(structure))
 
     medical_note = ""
     if lang == "ko" and ("건강" in theme or "의학" in theme):
@@ -3078,6 +3078,14 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if not pw: return {"ok":False,"error":f"No password: {site['wp_pass_env']}"}
     url=site["url"]; theme=site["theme"]
 
+    from automation_hub.repetition_guard import fetch_wp_history, repetition_issues, clean_opening, opening
+    body_html = clean_opening(title, body_html)
+    try:
+        repeat_errors = repetition_issues(title, body_html, fetch_wp_history(requests, url, (WP_USER, pw)))
+        if repeat_errors:
+            return {"ok": False, "error": "; ".join(repeat_errors)}
+    except Exception as exc:
+        return {"ok": False, "error": f"Publication history check failed: {exc}"}
     author_id=get_or_create_wp_author(url,pw,reporter)
     cat_name=get_category_for_post(theme,f"{category_hint} {keyword}".strip(),title)
     cat_id=0
@@ -3162,7 +3170,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     post_status = resolve_wordpress_post_status(
         site, requested_status=requested_status, public_approved=public_approved
     )
-    data={"title":title,"content":final,"status":post_status,
+    data={"title":title,"content":final,"status":post_status,"excerpt":opening(body_html),
           # Let WordPress assign its own current local/GMT dates.
           # Sending a hard-coded KST local date schedules posts on non-KST sites.
 
@@ -3370,7 +3378,9 @@ def process_one(site, keyword):
     tag_count = random.randint(9, 13)
     base_prompt=make_site_prompt(keyword,site,reporter,tag_count=tag_count,min_chars_override=min_chars)
     from editorial_title_gate import TITLE_RULE
-    base_prompt += "\nFINAL HEADLINE REQUIREMENTS:\n" + TITLE_RULE
+    from automation_hub.repetition_guard import fetch_wp_history, history_prompt, repetition_issues, clean_opening
+    history = fetch_wp_history(requests, url, (WP_USER, os.getenv(site["wp_pass_env"], "")))
+    base_prompt += "\nFINAL HEADLINE REQUIREMENTS:\n" + TITLE_RULE + "\n" + history_prompt(history)
     if mode in ("news", "news_en"):
         base_prompt += (
             "\n\nSOURCE LEAD FOR FACTUAL GROUNDING:\n"
@@ -3414,6 +3424,12 @@ def process_one(site, keyword):
         # Keep the article-grounded model title. The final assembled article
         # must pass Gemini/GPT/Claude before WordPress can save a draft.
 
+        body = clean_opening(title, body)
+        repeat_errors = repetition_issues(title, body, history)
+        if repeat_errors:
+            print("REWRITE_REQUIRED " + "; ".join(repeat_errors))
+            prompt = base_prompt + "\nRewrite the headline and opening from the article facts.\n" + "\n".join(repeat_errors)
+            continue
         pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
 

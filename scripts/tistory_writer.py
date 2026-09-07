@@ -155,7 +155,8 @@ def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
 
     GPT-5 mini is the only authoring engine; no second model is required.
     """
-    prompt = build_writer_prompt(job)
+    from automation_hub.repetition_guard import history_prompt
+    prompt = build_writer_prompt(job) + "\n" + history_prompt([{"title": t} for t in job.get("recent_titles", [])])
     if provider != "gpt":
         raise RuntimeError("Only GPT-5 mini may write Tistory drafts")
     if not openai_available():
@@ -164,7 +165,9 @@ def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
 
 
 def quality_score(draft: dict, job: dict) -> tuple[int, list[str]]:
+    from automation_hub.repetition_guard import repetition_issues
     issues = structural_check(draft)
+    issues.extend(repetition_issues(draft.get("title", ""), draft.get("body_html", ""), [{"title": t} for t in job.get("recent_titles", [])]))
     body = str(draft.get("body_html", ""))
     plain = re.sub(r"<[^>]+>", " ", body).lower()
     score = 30 if not issues else max(0, 30 - 10 * len(issues))

@@ -9,6 +9,8 @@ def normalized(text):
     return re.sub(r'[^0-9a-z가-힣]', '', str(text).lower())
 
 def duplicate(text, history):
+    from .repetition_guard import title_repeats
+    if any(title_repeats(text, old) for old in history): return True
     key = normalized(text)
     return any(key and (key == normalized(old) or SequenceMatcher(None,key,normalized(old)).ratio() >= .72) for old in history)
 

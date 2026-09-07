@@ -6,7 +6,7 @@ from difflib import SequenceMatcher
 from urllib.parse import urlsplit, urlunsplit
 
 
-ACTIVE_CONTENT_STATUSES = {"ready", "processing", "drafted", "published", "review_ready"}
+ACTIVE_CONTENT_STATUSES = {"ready", "processing", "drafted", "published", "review_ready", "verification_failed"}
 
 
 def canonical_source_id(value: str) -> str:
@@ -54,4 +54,5 @@ def is_similar_content(row: dict[str, str], *, site_id: str, title: str, content
     old_body, new_body = _plain(row.get("content_html", "")), _plain(content_html)
     title_match = bool(old_title and new_title and SequenceMatcher(None, old_title, new_title).ratio() >= threshold)
     body_match = bool(old_body and new_body and SequenceMatcher(None, old_body[:5000], new_body[:5000]).ratio() >= threshold)
-    return title_match or body_match
+    from .repetition_guard import repetition_issues
+    return title_match or body_match or bool(repetition_issues(title, content_html, [row]))
