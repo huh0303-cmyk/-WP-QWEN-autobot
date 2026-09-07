@@ -28,7 +28,7 @@ def inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log, min_score=7
     client = genai.Client(api_key=api_key)
     accepted = []
     for index, clip in enumerate(clips):
-        duration = max(float(clip.get("duration", 1)), 1.0)
+        duration = min(max(float(clip.get("duration", 1)), 1.0), 45.0)
         frames = []
         for frame_no, ratio in enumerate((0.2, 0.5, 0.8), 1):
             frame = Path(workdir) / f"alignment_frame_{index}_{frame_no}.jpg"
@@ -68,7 +68,7 @@ the metadata. Judge what is visibly on screen. Generic or unrelated filler score
         log(f"   visual check {index + 1}: {score}/100 — {analysis.get('visual_summary', '')[:100]}")
         if score >= min_score:
             accepted.append(clip)
-    if len(accepted) < 2:
+    if not accepted:
         raise RuntimeError(
             f"Visual relevance gate failed: only {len(accepted)}/{len(clips)} clips scored {min_score}+"
         )
