@@ -579,13 +579,7 @@ def get_site_data():
             history_sites = json.loads(history_path.read_text(encoding="utf-8")).get("latest", {}).get("site_details", {})
         except (OSError, ValueError):
             history_sites = {}
-    index_audit_sites = {}
-    index_audit_path = root / "index_audit_manifest.json"
-    if index_audit_path.exists():
-        try:
-            index_audit_sites = json.loads(index_audit_path.read_text(encoding="utf-8")).get("sites", {})
-        except (OSError, ValueError):
-            index_audit_sites = {}
+    index_audit_sites = _current_index_manifest(int(time.time() // 300)).get("sites", {})
     registry_by_domain = {
         site.url.replace("https://", "").replace("http://", "").rstrip("/"): site
         for site in load_wordpress_sites()
@@ -1991,6 +1985,36 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
         "sns_total": len(sns_accounts), "sns_issues": sns_issues,
         "all_clear": not (wp_issues or blogger_issues or tistory_issues or youtube_issues or sns_issues),
     }
+
+
+@lru_cache(maxsize=2)
+def _current_index_manifest(bucket):
+    # Hosted audits update data independently; the VPS must not require a
+    # restart (and interruption of publishing workers) to show new evidence.
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    try:
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/index_audit_manifest.json", timeout=12)
+        response.raise_for_status()
+        return response.json()
+    except (requests.RequestException, ValueError):
+        path = Path(__file__).resolve().parents[1] / "index_audit_manifest.json"
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+
+
+@app.template_filter("kst_time")
+def kst_time(value):
+    if not value:
+        return "시각 미확인"
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            return str(value)
+        return parsed.astimezone(timezone(timedelta(hours=9))).strftime("%m-%d %H:%M KST")
+    except ValueError:
+        return str(value)
 
 
 @lru_cache(maxsize=2)
