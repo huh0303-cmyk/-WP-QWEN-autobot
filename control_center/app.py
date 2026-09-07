@@ -1684,6 +1684,19 @@ def _run_group_publish(group: str) -> None:
     elif group in ("youtube_playlist5", "youtube_archive5"):
         # Matches the card grouping already used in the YouTube 통제실 UI:
         # channel.group == 'PLAYLIST' is 플리, anything else renders as 지식.
+        #
+        # 2026-09-07: generate-youtube-playlist.yml deliberately runs under a
+        # single shared concurrency group (youtube-production-single-owner,
+        # cancel-in-progress: false) - only one video render/upload at a
+        # time, by design (shared rendering/quota resource, not a bug like
+        # the old Blogger one). Dispatching all 5 channels' scheduler runs
+        # within an 8-second stagger meant every run after the first queued
+        # up behind it and then got bumped by the NEXT dispatch before its
+        # turn came, so 4 of 5 came back "cancelled" - confirmed against the
+        # 03:25 UTC run (1 success / 4 cancelled on both YouTube groups).
+        # Respecting that single-owner constraint means dispatching and
+        # fully waiting for each channel before starting the next, not
+        # firing all 5 and polling together afterward.
         want_playlist = group == "youtube_playlist5"
         targets = [ch for ch in get_youtube_data() if ch.get("action_ready") and (ch.get("group") == "PLAYLIST") == want_playlist]
         for channel in targets:
@@ -1693,13 +1706,17 @@ def _run_group_publish(group: str) -> None:
                 {"dry_run": "false", "max_dispatch": "1", "channel_key": channel["channel_key"], "run_now": "true"},
                 label=label, platform="youtube", site_id=channel["channel_key"],
             ))
-            time.sleep(8)
+            state["status"] = "polling"
+            _bulk_write(group, state)
+            _poll_bulk_items(group, repo, token, timeout_seconds=1800)
 
     state["status"] = "polling"
     _bulk_write(group, state)
     # Video render + upload can run long, same reasoning as the per-channel
     # YouTube button (_run_youtube_publish) - everything else keeps the
-    # shorter default.
+    # shorter default. The youtube_* groups already polled each channel to
+    # completion above; this call is a no-op for them (nothing left
+    # "running") and only does real work for the non-YouTube groups.
     poll_timeout = 1800 * 5 if group.startswith("youtube_") else 1500
     _poll_bulk_items(group, repo, token, timeout_seconds=poll_timeout)
     state = _bulk_read(group)
