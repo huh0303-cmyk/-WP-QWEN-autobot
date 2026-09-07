@@ -1,0 +1,114 @@
+name: "Tistory — Review Pages (5-site)"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: tistory-review-pipeline
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Build one-post-per-site safe plan
+        id: plan
+        run: |
+          python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
+          echo "date=$(python -c "import json;print(json.load(open('artifacts/tistory-daily-plan.json'))['date'])")" >> "$GITHUB_OUTPUT"
+      - name: Validate public publishing is disabled
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('artifacts/tistory-daily-plan.json', encoding='utf-8'))
+          assert p['public_allowed'] is False
+          assert p['portfolio_sites'] == 5
+          assert len(p['jobs']) == p['enabled_sites']
+          assert len(p['jobs']) <= 5
+          assert all(j['publish_policy']=='awaiting_approval' for j in p['jobs'])
+          assert all(j['duplicate_guard'] is True for j in p['jobs'])
+          print('TISTORY PLAN SAFETY PASS')
+          PY
+      - name: Draft articles — Gemini first, GPT fallback, Claude blocking audit
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_ENABLED: "true"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+        run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
+      - name: Validate drafts never authorize public publication
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('artifacts/tistory-daily-drafts.json', encoding='utf-8'))
+          assert d['public_allowed'] is False
+          for draft in d['drafts']:
+              assert draft['public_allowed'] is False
+              assert draft.get('publish_policy') in (None, 'awaiting_approval')
+          print('TISTORY DRAFT SAFETY PASS')
+          PY
+      - name: Build review pages with signed one-time approval tokens
+        env:
+          TISTORY_APPROVAL_SIGNING_SECRET: ${{ secrets.TISTORY_APPROVAL_SIGNING_SECRET }}
+        run: |
+          python scripts/tistory_review_pages.py \
+            --plan artifacts/tistory-daily-plan.json \
+            --drafts artifacts/tistory-daily-drafts.json \
+            --output-dir "public/tistory-review/${{ steps.plan.outputs.date }}" \
+            --state-dir state/tistory_approvals \
+            --repo "${{ github.repository }}" \
+            --ref "${{ github.ref_name }}" \
+            --workflow-file tistory-approve-publish.yml \
+            --pages-base-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+      - name: Validate review manifest structure
+        run: |
+          python - <<'PY'
+          import json
+          m = json.load(open("public/tistory-review/${{ steps.plan.outputs.date }}/manifest.json", encoding="utf-8"))
+          assert len(m["jobs"]) == 5, f"expected 5 review jobs, got {len(m['jobs'])}"
+          for j in m["jobs"]:
+              assert j.get("review_url", "").startswith("https://")
+          print("TISTORY REVIEW PAGE SAFETY PASS", len(m["jobs"]), "jobs")
+          PY
+      - name: Commit generated review pages and approval state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public state
+          git diff --cached --quiet || git commit -m "chore: generate Tistory review pages for ${{ steps.plan.outputs.date }} [skip ci]"
+          git push
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Print review URLs
+        run: |
+          python - <<'PY'
+          import json
+          m = json.load(open("public/tistory-review/${{ steps.plan.outputs.date }}/manifest.json", encoding="utf-8"))
+          for j in m["jobs"]:
+              print(j["site_id"], j["status"], j["review_url"])
+          PY
