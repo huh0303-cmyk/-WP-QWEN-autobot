@@ -236,7 +236,7 @@ _FALLBACK_QUERY = {
 }
 
 
-def fetch_archive_clips(topic, channel_key, workdir, n_target=40):
+def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
     """실제 영상을 반드시 확보하는 게 우선이라(사용자 지시: 짧아도, 흑백이어도
     상관없음), 특정 주제로 결과가 없으면 점점 검색 범위를 넓혀서 재시도한다:
     1) 정확한 주제 그대로 검색
