@@ -390,33 +390,13 @@ def main():
     clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
     log(f"   AI actual-frame review passed: {len(clips)} relevant clips")
 
-    log("2/6 사실기반 대본 생성 중 (실제 확보한 클립 정보 근거)...")
-    data = generate_script(topic, clips)
-    narration = data["narration"]
-    alignment = verify_narration_alignment(topic, clips, narration, gemini_generate_text)
-    log(f"   narration/footage alignment: {alignment['alignment_score']}/100 PASS")
-    with open(os.path.join(workdir, "script.json"), "w", encoding="utf-8") as f:
-        json.dump({"topic": topic, "clips": clips, **data}, f, ensure_ascii=False, indent=2)
-    log(f"   나레이션 {len(narration.split())}단어")
-
-    log("2.5/6 유튜브 제목/설명 생성 중...")
+    from knowledge_scene_edit import render_scenes
+    final_path, narration = render_scenes(
+        topic, "nasa", clips, workdir, gemini_generate_text, _strip_json_fence,
+        verify_narration_alignment, build_narration_track, write_srt, mux_final,
+        normalize_clip, run_ffmpeg, get_duration)
     yt_meta = generate_youtube_metadata(topic, narration)
-    log(f"   제목: {yt_meta['title']}")
-
-    log("3/6 나레이션 TTS + 캡션 타이밍 생성 중...")
-    audio_path, srt_entries, total_dur = build_narration_track(narration, workdir)
-    log(f"   총 나레이션 길이: {total_dur/60:.1f}분")
-    srt_path = os.path.join(workdir, "captions.srt")
-    write_srt(srt_entries, srt_path)
-
-    log("4/6 실제 NASA 클립으로 영상 트랙 조립 중 (트림+정규화+순환)...")
-    visual_path = build_visual_track(clips, total_dur, workdir)
-
-    log("5/6 영상+오디오 합성 중...")
-    final_path = os.path.join(workdir, "final.mp4")
-    mux_final(visual_path, audio_path, srt_path, final_path, workdir)
     dur = get_duration(final_path)
-    log(f"   ✅ 영상 완성: {final_path} ({dur/60:.1f}분)")
 
     log("6/6 썸네일 생성 중 (실제 NASA 프레임 사용)...")
     hero_frame = os.path.join(workdir, "hero_frame.jpg")

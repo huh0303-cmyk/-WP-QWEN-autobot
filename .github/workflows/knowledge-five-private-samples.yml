@@ -1,0 +1,37 @@
+name: Five knowledge samples - sequential PRIVATE uploads
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Five playlist samples - sequential PRIVATE uploads"]
+    types: [completed]
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: knowledge-five-private-samples
+  cancel-in-progress: false
+jobs:
+  samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: NASA first; verify private receipt before each next channel
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          SAMPLE_BATCH_ID: knowledge-samples-20260907
+        run: python scripts/knowledge_private_sample_batch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: knowledge-private-samples-${{ github.run_id }}
+          path: artifacts/knowledge-private-samples.json
