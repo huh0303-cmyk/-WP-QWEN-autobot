@@ -1029,6 +1029,10 @@ def _build_draft_workflow_call(payload: dict[str, object]) -> tuple[str, dict[st
             # WP site's own category pool; blank keeps "바이럴자동발행"
             # (the workflow's own live cross-media research).
             "force_keyword": str(payload.get("keyword") or ""),
+            # 2026-09-07: bulk/group dispatch passes a nonzero value here so
+            # each runner's headline fetch doesn't land on the same news
+            # feeds at the same moment as every other site in the batch.
+            "fetch_jitter_max_seconds": str(payload.get("jitter_max_seconds") or "0"),
         }
     else:
         workflow_name = "sheet-triggered-auto-write.yml"
@@ -1665,6 +1669,7 @@ def _run_group_publish(group: str) -> None:
             try:
                 workflow_name, inputs = _build_draft_workflow_call({
                     "platform": "blogger", "selection_mode": "auto", "site_id": blog["site_id"], "keyword": "",
+                    "jitter_max_seconds": "60",
                 })
             except RuntimeError as exc:
                 _record({

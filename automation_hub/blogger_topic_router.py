@@ -10,6 +10,8 @@ uses only public posts from the WordPress property paired in
 from __future__ import annotations
 
 import html
+import os
+import random
 import re
 import time
 from collections import defaultdict
@@ -423,19 +425,33 @@ def resolve_automatic_source(
     # network hiccup) even on days with plenty of real, multi-outlet coverage
     # - confirmed by re-running the exact same profile moments after a
     # production "no eligible topic" failure and getting a strong candidate
-    # (score 93, 9 outlets) on the first try from a different network. One
-    # retry after a short pause distinguishes a genuinely quiet news day from
-    # a bad fetch, without ever inventing a topic that lacks real evidence.
+    # (score 93, 9 outlets) on the first try from a different network.
+    #
+    # 2026-09-07: root-caused further. MEDIA_FEEDS is the same fixed outlet
+    # list for every site, so dispatching many sites within the same short
+    # window (a stress test, or the daily auto-publisher's batch) sends many
+    # near-simultaneous requests to the exact same news.google.com/RSS URLs
+    # from GitHub's shared runner IP ranges - the classic pattern that trips
+    # Google's own rate limiting and returns thin 200 OK responses that never
+    # raise an exception. BLOGGER_TOPIC_FETCH_JITTER_MAX_SECONDS (set by the
+    # batch dispatcher, unset/0 in tests and single manual runs) spreads out
+    # when each runner actually starts fetching, and three retries with
+    # growing backoff give a genuinely thin response more room to clear
+    # before this falls back to NoEligibleTopic.
+    jitter_max = float(os.environ.get("BLOGGER_TOPIC_FETCH_JITTER_MAX_SECONDS", "0") or 0)
+    if jitter_max > 0:
+        time.sleep(random.uniform(0, jitter_max))
     topics: list[TopicCandidate] = []
-    for attempt in range(2):
+    backoffs = (8, 20)
+    for attempt in range(len(backoffs) + 1):
         headlines = fetch_today_headlines(session=session, today=today)
         headlines.extend(fetch_profile_headlines(profile, session=session, today=today))
         headlines = list({row["url"]: row for row in headlines}.values())
         trends = fetch_trending_terms(session=session)
         topics = rank_topics(headlines, profile=profile, trend_terms=trends)
-        if topics or attempt == 1:
+        if topics or attempt == len(backoffs):
             break
-        time.sleep(8)
+        time.sleep(backoffs[attempt])
     if not topics:
         raise NoEligibleTopic("오늘자 복수 매체 근거와 사이트 주제를 함께 만족하는 주제어가 없습니다.")
     # The user asked for the highest-virality topic first. We do not silently

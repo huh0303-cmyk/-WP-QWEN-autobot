@@ -41,6 +41,11 @@ on:
         required: true
         default: false
         type: boolean
+      fetch_jitter_max_seconds:
+        description: "Random 0-N second delay before fetching headlines, so a batch dispatch doesn't hit the same news feeds simultaneously from many runners; 0 for a single manual run"
+        required: false
+        default: "0"
+        type: string
 
 permissions:
   actions: write
@@ -94,6 +99,7 @@ jobs:
           BLOGGER_MIN_QUALITY_SCORE: "70"
           BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
           FORCE_SOURCE_IPV4: "true"
+          BLOGGER_TOPIC_FETCH_JITTER_MAX_SECONDS: ${{ inputs.fetch_jitter_max_seconds }}
         run: python scripts/queue_blogger_rewrite.py
       - name: Continue directly to the exact Blogger publication job
         if: ${{ inputs.publish_now && steps.queue.outputs.job_id != '' }}
@@ -107,6 +113,14 @@ jobs:
           -f max_jobs=1
       - name: Commit budget guard state
         if: always()
+        # This is cost-tracking bookkeeping, not the actual article
+        # generation/queueing above - it must never fail the job. Under
+        # GitHub Actions' default `set -e`, a `git pull --rebase` conflict
+        # (many sites' runs landing close together) used to kill this step
+        # outright and get logged as the whole run "failing" even though the
+        # article had already queued successfully. Now a conflict just aborts
+        # the rebase and gives up gracefully after a few tries.
+        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -115,6 +129,7 @@ jobs:
             git commit -m "chore: budget guard state [skip ci]"
             for attempt in 1 2 3; do
               git push && break
-              git pull --rebase origin main
+              git pull --rebase origin main || git rebase --abort || true
+              sleep $((attempt * 5))
             done
           fi

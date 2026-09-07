@@ -73,6 +73,7 @@ def main() -> int:
         try:
             workflow_name, inputs = _build_draft_workflow_call({
                 "platform": "blogger", "selection_mode": "auto", "site_id": site_id, "keyword": "",
+                "jitter_max_seconds": "60",
             })
         except RuntimeError as exc:
             print(f"  {site_id}: 스킵 ({exc})")
