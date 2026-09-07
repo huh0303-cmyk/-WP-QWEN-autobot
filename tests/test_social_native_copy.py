@@ -1,7 +1,9 @@
+import os
 import pathlib
 import sys
 import unittest
 from datetime import datetime, timezone
+from unittest.mock import patch
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -45,6 +47,26 @@ class SocialNativeCopyTests(unittest.TestCase):
 
         self.assertNotIn("page-secret-value", message)
         self.assertIn("access_token=[REDACTED]", message)
+
+    def test_facebook_page_credentials_are_brand_suffixed(self):
+        # 2026-09-07: mirrors meta_publish.account()'s convention so the
+        # three Facebook Pages (TOPIK/ENGLISH/LANGUAGE) never cross-post to
+        # the wrong page - TOPIK stays on the bare env var names.
+        env = {
+            "FB_PAGE_ACCESS_TOKEN": "topik-token", "FB_PAGE_ID": "topik-id",
+            "FB_PAGE_ACCESS_TOKEN_ENGLISH": "en-token", "FB_PAGE_ID_ENGLISH": "en-id",
+        }
+        with patch.dict(os.environ, env, clear=False):
+            os.environ.pop("SOCIAL_BRAND", None)
+            self.assertEqual(social_publish.facebook_page_credentials(), ("topik-token", "topik-id"))
+            os.environ["SOCIAL_BRAND"] = "ENGLISH"
+            self.assertEqual(social_publish.facebook_page_credentials(), ("en-token", "en-id"))
+            os.environ["SOCIAL_BRAND"] = "LANGUAGE"
+            self.assertEqual(social_publish.facebook_page_credentials(), ("", ""))
+            os.environ["SOCIAL_BRAND"] = "unknown"
+            with self.assertRaises(ValueError):
+                social_publish.facebook_page_credentials()
+        os.environ.pop("SOCIAL_BRAND", None)
 
 
 if __name__ == "__main__":

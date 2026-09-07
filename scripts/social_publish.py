@@ -53,6 +53,8 @@ def sanitize_error(error):
         YOUTUBE_OAUTH_REFRESH_TOKEN,
         TIKTOK_ACCESS_TOKEN,
         FB_PAGE_ACCESS_TOKEN,
+        os.environ.get("FB_PAGE_ACCESS_TOKEN_ENGLISH", ""),
+        os.environ.get("FB_PAGE_ACCESS_TOKEN_LANGUAGE", ""),
     ):
         if secret:
             message = message.replace(secret, "[REDACTED]")
@@ -203,15 +205,30 @@ def publish_tiktok(video_path, meta):
 # ════════════════════════════════════════════════════════════
 # Facebook — Reels
 # ════════════════════════════════════════════════════════════
+def facebook_page_credentials():
+    """Brand-suffixed lookup, matching meta_publish.account()'s convention:
+    TOPIK uses the bare FB_PAGE_ACCESS_TOKEN/FB_PAGE_ID names, ENGLISH/
+    LANGUAGE use those names with the brand appended - never mixed across
+    brands, since each is a different Facebook Page."""
+    brand = os.environ.get("SOCIAL_BRAND", "TOPIK").upper()
+    if brand not in {"TOPIK", "ENGLISH", "LANGUAGE"}:
+        raise ValueError("Unknown SOCIAL_BRAND")
+    suffix = "" if brand == "TOPIK" else "_" + brand
+    token = os.environ.get("FB_PAGE_ACCESS_TOKEN" + suffix, "")
+    page_id = os.environ.get("FB_PAGE_ID" + suffix, "")
+    return token, page_id
+
+
 def publish_facebook(video_path, meta):
-    if not all([FB_PAGE_ACCESS_TOKEN, FB_PAGE_ID]):
+    fb_token, fb_page_id = facebook_page_credentials()
+    if not all([fb_token, fb_page_id]):
         return {"ok": False, "skipped": True, "reason": "FB_PAGE_ACCESS_TOKEN/FB_PAGE_ID 없음"}
 
-    base = f"https://graph.facebook.com/{GRAPH_VERSION}/{FB_PAGE_ID}"
+    base = f"https://graph.facebook.com/{GRAPH_VERSION}/{fb_page_id}"
     caption = platform_copy(meta, "facebook")["caption"]
 
     start = requests.post(f"{base}/video_reels",
-                           params={"upload_phase": "start", "access_token": FB_PAGE_ACCESS_TOKEN},
+                           params={"upload_phase": "start", "access_token": fb_token},
                            timeout=30)
     start.raise_for_status()
     start_data = start.json()
@@ -224,7 +241,7 @@ def publish_facebook(video_path, meta):
     up = requests.post(
         upload_url,
         headers={
-            "Authorization": f"OAuth {FB_PAGE_ACCESS_TOKEN}",
+            "Authorization": f"OAuth {fb_token}",
             "offset": "0",
             "file_size": str(size),
         },
@@ -239,7 +256,7 @@ def publish_facebook(video_path, meta):
         "video_id": video_id,
         "video_state": "DRAFT",
         "description": caption,
-        "access_token": FB_PAGE_ACCESS_TOKEN,
+        "access_token": fb_token,
     }, timeout=30)
     finish.raise_for_status()
 

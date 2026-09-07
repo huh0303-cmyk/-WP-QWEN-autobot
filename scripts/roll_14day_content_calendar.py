@@ -83,7 +83,11 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
     rows = []
     angle_index = (target_date - dt.date(2026, 8, 31)).days % 14
     for item in portfolio["channels"]:
-        wp = item["wp"].removeprefix("https://").rstrip("/")
+        # koreamedicaltour1 (repurposed as a standalone general-interest
+        # blog, 2026-09-07) has no paired WordPress site at all - blank,
+        # not a crash. It is always blogspot_only, so `wp` is only ever
+        # used below as an identity fallback for the Blogger row.
+        wp = (item.get("wp") or "").removeprefix("https://").rstrip("/")
         lang, topic = item["language"], item["topic"]
         angle = (KO_ANGLES if lang == "ko" else EN_ANGLES)[angle_index]
         keyword = f"{topic} {angle}" if lang == "ko" else f"{topic}: {angle}"
@@ -91,7 +95,7 @@ def wp_blogger_rows(target_date: dt.date, existing_keys: set[str]):
         source = "정부·공식기관 원문 필수" if sensitive else "공식기관·신뢰 출처 우선"
         platforms = ("Blogger",) if item.get("blogspot_only") else ("WordPress", "Blogger")
         for platform in platforms:
-            identity = wp if platform == "WordPress" else wp.rsplit(".", 1)[0]
+            identity = wp if platform == "WordPress" else (wp.rsplit(".", 1)[0] if wp else item.get("site_key", ""))
             key = f"{target_date}|{platform}|{identity}"
             if key in existing_keys:
                 continue
