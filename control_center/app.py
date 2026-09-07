@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template
+from flask import Flask, render_template
 
 from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
 
@@ -1974,6 +1974,51 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
     }
 
 
+@lru_cache(maxsize=2)
+def _tile_receipts(bucket):
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    try:
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/site-publication-history.json", timeout=8)
+        response.raise_for_status()
+        return response.json().get("events", [])
+    except (requests.RequestException, ValueError):
+        path = Path(__file__).resolve().parents[1] / "data/site-publication-history.json"
+        try:
+            return json.loads(path.read_text(encoding="utf-8")).get("events", [])
+        except (OSError, ValueError):
+            return []
+
+
+def _tile_histories():
+    from .tile_status import local_events, summarize
+    by_site = {}
+    for event in _tile_receipts(int(time.time() // 60)):
+        by_site.setdefault(event["site_id"], []).append(event)
+    for path in (Path(__file__).resolve().parents[1] / "data").glob("bulk_publish_state_*.json"):
+        try:
+            state = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for site_id in {i.get("site_id") for i in state.get("items", []) if i.get("site_id")}:
+            by_site.setdefault(site_id, []).extend(local_events(state, site_id))
+    # Durable verified Tistory public receipts; planner success is not publication.
+    for path in (Path(__file__).resolve().parents[1] / "data").glob("tistory-publishing-*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            rows = payload if isinstance(payload, list) else payload.get("results", [])
+            for row in rows:
+                if row.get("status") == "published" and row.get("site_id"):
+                    by_site.setdefault(row["site_id"], []).append({**row, "at": row.get("published_at") or row.get("verified_at") or "", "run_id": row.get("job_id")})
+        except (OSError, ValueError, TypeError):
+            pass
+    return {key: summarize(value) for key, value in by_site.items()}
+
+
+@app.get("/api/site-publication-history")
+def site_publication_history():
+    return jsonify(_tile_histories())
+
+
 @app.route("/")
 def index():
     # 2026-09-03: WP cards no longer show a manual keyword-entry form (WP
@@ -1986,6 +2031,14 @@ def index():
     tistory_sites = get_tistory_data()
     youtube_channels = get_youtube_data()
     sns_accounts = get_sns_data()
+    from .tile_status import new_content
+    targets = [(site, "https://" + site["domain"], "wordpress") for site in sites]
+    targets += [(site, site["url"], "blogger") for site in bloggers]
+    targets += [(site, site["url"], "tistory") for site in tistory_sites]
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        futures = [(site, pool.submit(new_content, url, platform, int(time.time() // 300))) for site, url, platform in targets]
+        for site, future in futures:
+            site.update(future.result())
     return render_template(
         "index.html", sites=sites, bloggers=bloggers, tistory_sites=tistory_sites,
         youtube_channels=youtube_channels, sns_accounts=sns_accounts,
