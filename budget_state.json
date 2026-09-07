@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 1.89,
+  "spent_estimate_usd": 1.92,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -315,6 +315,11 @@
     {
       "at": "2026-09-07T12:25:58.231739+09:00",
       "label": "blogger-rewrite:blogger_seouljournal",
+      "amount_usd": 0.03
+    },
+    {
+      "at": "2026-09-07T12:27:05.720043+09:00",
+      "label": "blogger-rewrite:blogger_kcrypto365",
       "amount_usd": 0.03
     }
   ]
