@@ -101,7 +101,6 @@ def test_youtube_cards_show_official_identity_growth_and_pastel_action():
 
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "키워드보고발행" in template
     assert "바이럴자동발행" in template
     assert "YouTube 콘텐츠 바로 만들기 · 비공개" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
@@ -160,18 +159,18 @@ def test_blogspot_public_button_continues_to_exact_platform_publish_job():
     assert 'output_file.write(f"job_id={job_id}\\n")' in queue
 
 
-def test_all_sites_show_the_two_publish_actions():
-    # 2026-09-04 CEO: "두개 버튼으로 해줘 모든사이트 WP, 블팟, 티스토리까지" —
-    # every WP/Blogspot/Tistory card now shows both "키워드보고발행" (chip
-    # picked, seen before publishing) and "바이럴자동발행" (blind live
-    # cross-media research), not just the two originally special-cased
-    # general sites (koreanews365.com/korea365.org) — those two keep a
-    # separate backend workflow (RSS-based newsroom publisher) in app.py,
-    # but the button UI is now uniform across all sites.
+def test_all_sites_show_a_single_publish_action():
+    # 2026-09-07 CEO: reversed the 2026-09-04 "two buttons" request - the
+    # manual chip-picked "키워드보고발행" path added clutter across 62 site
+    # cards without being used, so it was removed. Every WP/Blogspot/Tistory
+    # card now shows only "바이럴자동발행" (blind live cross-media research).
+    # koreanews365.com/korea365.org still keep a separate backend workflow
+    # (RSS-based newsroom publisher) in app.py, unaffected by this UI change.
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
     app_source = (Path(__file__).resolve().parents[1] / "control_center" / "app.py").read_text(encoding="utf-8")
     assert 'registered.url.rstrip("/") == "https://koreanews365.com"' in app_source
-    assert template.count("키워드보고발행") >= 3
+    assert "키워드보고발행" not in template
+    assert 'class="force-keyword-groups' not in template
     assert template.count("바이럴자동발행") >= 3
 
 

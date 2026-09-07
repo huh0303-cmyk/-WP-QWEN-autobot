@@ -292,16 +292,6 @@
                     </div>
                         </div>
                     </details>
-                    {% if site.auth_ready %}
-                    <div class="force-keyword-groups space-y-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px]">
-                        <p class="text-slate-400">오늘의 카테고리별 추천 키워드 불러오는 중…</p>
-                    </div>
-                    <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
-                        <span>키워드보고발행</span><span aria-hidden="true">→</span>
-                    </button>
-                    {% else %}
-                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
-                    {% endif %}
                 </form>
                 {% if site.auth_ready %}
                 <div class="space-y-3 border-t border-blue-200 px-4 pb-4 pt-3">
@@ -320,6 +310,8 @@
                         <div id="bulk-failures-wp_{{ site.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
+                {% else %}
+                <div class="mx-4 mb-4 flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
                 {% endif %}
                 </article>
                 {% endfor %}
@@ -419,16 +411,6 @@
                         </div>
                     </details>
                     <p class="text-[10px] text-violet-700">연계 기준 WP: {{ blog.wp_url|replace('https://', '')|replace('http://', '') }} · 의미상 가까운 공개 글만 자동 연결하며, 맞는 글이 없으면 억지로 연결하지 않습니다.</p>
-                    {% if blog.connected %}
-                    <div class="force-keyword-groups space-y-1.5 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[11px]">
-                        <p class="text-slate-400">오늘의 카테고리별 추천 키워드 불러오는 중…</p>
-                    </div>
-                    <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
-                        <span>키워드보고발행</span><span aria-hidden="true">→</span>
-                    </button>
-                    {% else %}
-                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
-                    {% endif %}
                 </form>
                 {% if blog.connected %}
                 <div class="space-y-3 border-t border-violet-200 pt-3">
@@ -450,6 +432,8 @@
                         <div id="bulk-failures-blogspot_{{ blog.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
+                {% else %}
+                <div class="flex h-12 items-center justify-center rounded-xl border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-500" role="status">발행 · 연결 필요</div>
                 {% endif %}
                 </article>
                 {% endfor %}
@@ -549,21 +533,6 @@
                         </div>
                     </details>
                     <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">최종 공개 저장은 로그인된 로컬 Tistory 발행기가 이어서 완료합니다.</p>
-                    <form method="post" action="{{ url_for('trigger_tistory_plan') }}"
-                          class="force-publish-form space-y-3" data-site-label="{{ blog.name }}"
-                          data-suggest-url="{{ url_for('tistory_seed_topics_route', site_id=blog.site_id) }}"
-                          data-instant-publish="false" onsubmit="return confirmForcePublish(event, this);">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                        <input type="hidden" name="site_id" value="{{ blog.site_id }}">
-                        <input type="hidden" name="keyword" class="force-keyword-input" value="">
-                        <input type="hidden" name="submit_mode" class="force-submit-mode" value="">
-                        <div class="force-keyword-groups space-y-1.5 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-[11px]">
-                            <p class="text-slate-400">추천 주제 불러오는 중…</p>
-                        </div>
-                        <button type="button" class="force-keyword-submit flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white shadow-sm transition active:scale-[.98] hover:bg-emerald-700">
-                            <span>키워드보고발행</span><span aria-hidden="true">→</span>
-                        </button>
-                    </form>
                     <div class="space-y-3 border-t border-teal-200 pt-3">
                         <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">바이럴자동발행 — 누를 때마다 오늘의 언급량과 검색 추세를 다시 조사해 이 사이트 분야의 최고 주제를 선택합니다. 결과를 미리 보여주지 않습니다. 이 사이트 하나만 독립적으로 실행·추적됩니다.</p>
                         <form method="post" action="{{ url_for('trigger_tistory_single') }}" onsubmit="return confirm('{{ blog.name }} 바이럴자동발행을 지금 시작할까요?');">
