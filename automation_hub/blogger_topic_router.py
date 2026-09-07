@@ -359,7 +359,7 @@ def fetch_public_wp_posts(site_url: str, *, session=requests, timeout: int = 20)
     response = session.get(
         f"{site_url.rstrip('/')}/wp-json/wp/v2/posts",
         params={
-            "status": "publish", "per_page": 100, "orderby": "date", "order": "desc",
+            "status": "publish", "per_page": 20, "orderby": "date", "order": "desc",
             "_fields": "id,link,status,title,excerpt,content,date",
         },
         timeout=timeout,

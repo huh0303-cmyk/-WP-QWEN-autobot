@@ -103,7 +103,7 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
     """
     normalized = dict(article)
     normalized["title"] = _clip_words(str(article.get("title", "")), 70)
-    normalized["meta_description"] = _clip_sentence(str(article.get("meta_description", "")), 120)
+    normalized["meta_description"] = _clip_sentence(str(article.get("meta_description", "")), 119)
 
     content = str(article.get("content_html", ""))
     maximum = int(target_chars * 1.35)

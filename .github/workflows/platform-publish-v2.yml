@@ -9,6 +9,14 @@ on:
     - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
+      recover_invalid_job:
+        description: "정확한 job_id의 게시 전 검증 실패만 복구 (재생성 없음)"
+        type: boolean
+        default: false
+      recovery_search_description:
+        description: "복구할 검색설명 100-119자"
+        type: string
+        default: ""
       room_id:
         description: "Automation room id for result tracking"
         required: false
@@ -72,6 +80,8 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          RECOVER_INVALID_JOB: ${{ inputs.recover_invalid_job }}
+          RECOVERY_SEARCH_DESCRIPTION: ${{ inputs.recovery_search_description }}
           JOB_ID: ${{ inputs.job_id || '' }}
           MAX_JOBS: ${{ inputs.max_jobs || '1' }}
           PLATFORM_FILTER: ${{ github.event_name == 'schedule' && 'blogger' || inputs.platform || 'blogger' }}

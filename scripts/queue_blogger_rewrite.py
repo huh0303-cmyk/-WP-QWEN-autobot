@@ -336,6 +336,10 @@ def main():
                 text_provider = provider
                 break
         except Exception as exc:
+            if "OpenAI unavailable (quota/credits)" in str(exc):
+                _append_failure(service, sheet_id, blogger_site_id, error_code="OPENAI_QUOTA",
+                    message="OpenAI API quota/credits unavailable; generation stopped without a second attempt", source_url=source_identity)
+                raise RuntimeError("OPENAI_QUOTA: account credits or quota must be restored before generation") from None
             quality_score = 0
             failures = [f"invalid output: {exc}"]
             critical_failures = []
