@@ -51,8 +51,17 @@ Threads has no configured credentials. Instagram per-brand IDs/tokens/permission
 remain incomplete. Facebook ENGLISH and LANGUAGE page credentials are saved in
 the social-publish environment; TOPIK FB_PAGE_ID needs explicit configuration.
 
-Use existing licensed imagery and cached audio. No paid image/audio generation
-is enabled by this plan. Codex subscription/usage and actual provider charges have
-not been measured; never display an invented zero-cost receipt.
+Use existing licensed imagery. The owner subsequently requested ElevenLabs for
+all vocabulary cards. The `tts` section authorizes paid ElevenLabs speech for
+Korean, English, German, French, Vietnamese and Spanish, using Flash v2.5 and
+explicit language codes. No alternate TTS or silent audio fallback is allowed.
+Generate each word and sentence once, cache the audio, then repeat locally five
+times each and calculate bounce cues from the actual audio durations. Replacing
+voices or cross-posting does not advance the language rotation or word count.
+The legacy top-level paid_generation_enabled=false continues to disable paid
+image generation; paid TTS is controlled separately by tts.paid_generation_enabled.
+Codex usage and actual provider invoice amounts have not been measured; never
+display an invented zero-cost receipt. The initial six clips used 56 characters
+and returned a total character-cost header of 8; this is not a currency amount.
 
 Validation: python -m unittest discover -s tests -p test_vocabulary_card_ledger.py -v

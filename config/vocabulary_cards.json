@@ -21,6 +21,17 @@
   "quiz_count_scope": "learning_language",
   "count_only_verified_publications": true,
   "paid_generation_enabled": false,
+  "tts": {
+    "provider": "elevenlabs",
+    "paid_generation_enabled": true,
+    "model_id": "eleven_flash_v2_5",
+    "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+    "voice_name": "George",
+    "languages": ["ko", "en", "de", "fr", "vi", "es"],
+    "voice_settings": {"stability": 0.65, "similarity_boost": 0.75, "speed": 0.85},
+    "fallback_provider": null,
+    "repeat_cached_audio": true
+  },
   "destinations": {
     "facebook": {"TOPIK": "1128119143729384", "ENGLISH": "1247951015067104", "LANGUAGE": "1236641259534475"},
     "youtube": {"TOPIK": "UCdA24IuR-JE7qButWv5jLqA", "ENGLISH": "UCrjkKWMHzAAvpLIFgHnwcWg", "LANGUAGE": "UCOWoNH_d6p45ywQ6W0Z1Jng"},

@@ -25,4 +25,4 @@ def vocabulary_status(config_path=None):
         target_posts_per_day=6*len(config['platforms']),quiz_every=config['quiz_every_unique_words'],
         quiz_mode=config['quiz_mode'],word_repetitions=config['word_repetitions'],
         sentence_repetitions=config['sentence_repetitions'],published_count=None,
-        paid_generation_enabled=config['paid_generation_enabled'],actual_cost=None)
+        paid_generation_enabled=config['paid_generation_enabled'],tts=config.get('tts'),actual_cost=None)
