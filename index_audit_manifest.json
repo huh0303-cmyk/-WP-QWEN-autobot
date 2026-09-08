@@ -5355,10 +5355,9 @@
         "indexed_delta": 0,
         "total_published": 281,
         "complete": true,
-        "comparison_at": "2026-09-06T21:40:58.554834+00:00"
+        "comparison_at": "2026-09-07T11:39:23.640076+00:00"
       },
-      "audited_at": "2026-09-07T11:39:23.640076+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='k-health365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='k-health365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:49.385968+00:00"
     },
     "https://koreamedicaltour.com": {
       "lifecycle": "active",
@@ -5848,10 +5847,9 @@
         "indexed_delta": 0,
         "total_published": 25,
         "complete": true,
-        "comparison_at": "2026-09-06T21:43:46.821976+00:00"
+        "comparison_at": "2026-09-07T11:39:31.475624+00:00"
       },
-      "audited_at": "2026-09-07T11:39:31.475624+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreamedicaltour.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreamedicaltour.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:50.468780+00:00"
     },
     "https://koreainvest365.com": {
       "lifecycle": "active",
@@ -7367,10 +7365,9 @@
         "indexed_delta": 0,
         "total_published": 79,
         "complete": true,
-        "comparison_at": "2026-09-06T21:53:05.051305+00:00"
+        "comparison_at": "2026-09-07T11:39:39.866994+00:00"
       },
-      "audited_at": "2026-09-07T11:39:39.866994+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreainvest365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreainvest365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:51.590827+00:00"
     },
     "https://ki-korea.com": {
       "lifecycle": "active",
@@ -7480,10 +7477,9 @@
         "indexed_delta": 0,
         "total_published": 5,
         "complete": true,
-        "comparison_at": "2026-09-06T21:53:41.543682+00:00"
+        "comparison_at": "2026-09-07T11:39:47.842772+00:00"
       },
-      "audited_at": "2026-09-07T11:39:47.842772+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='ki-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='ki-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:52.778354+00:00"
     },
     "https://koreainsurance365.com": {
       "lifecycle": "active",
@@ -7802,10 +7798,9 @@
         "indexed_delta": 0,
         "total_published": 16,
         "complete": true,
-        "comparison_at": "2026-09-06T21:55:30.046049+00:00"
+        "comparison_at": "2026-09-07T11:39:55.776708+00:00"
       },
-      "audited_at": "2026-09-07T11:39:55.776708+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreainsurance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreainsurance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:53.776189+00:00"
     },
     "https://kfinance365.com": {
       "lifecycle": "active",
@@ -8732,10 +8727,9 @@
         "indexed_delta": 0,
         "total_published": 48,
         "complete": true,
-        "comparison_at": "2026-09-06T22:00:57.421385+00:00"
+        "comparison_at": "2026-09-07T11:40:03.553085+00:00"
       },
-      "audited_at": "2026-09-07T11:40:03.553085+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kfinance365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kfinance365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:54.789916+00:00"
     },
     "https://koreataxnlaw.com": {
       "lifecycle": "active",
@@ -8826,10 +8820,9 @@
         "indexed_delta": 0,
         "total_published": 4,
         "complete": true,
-        "comparison_at": "2026-09-06T22:01:19.951356+00:00"
+        "comparison_at": "2026-09-07T11:40:12.722090+00:00"
       },
-      "audited_at": "2026-09-07T11:40:12.722090+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreataxnlaw.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreataxnlaw.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:55.817024+00:00"
     },
     "https://koreacrypto365.com": {
       "lifecycle": "active",
@@ -9813,10 +9806,9 @@
         "indexed_delta": 0,
         "total_published": 51,
         "complete": true,
-        "comparison_at": "2026-09-06T22:07:08.313699+00:00"
+        "comparison_at": "2026-09-07T11:40:20.663455+00:00"
       },
-      "audited_at": "2026-09-07T11:40:20.663455+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreacrypto365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreacrypto365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:56.897841+00:00"
     },
     "https://krealestate365.com": {
       "lifecycle": "active",
@@ -9926,10 +9918,9 @@
         "indexed_delta": 0,
         "total_published": 5,
         "complete": true,
-        "comparison_at": "2026-09-06T22:07:39.471184+00:00"
+        "comparison_at": "2026-09-07T11:40:28.600457+00:00"
       },
-      "audited_at": "2026-09-07T11:40:28.600457+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='krealestate365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='krealestate365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:57.931179+00:00"
     },
     "https://ktech365.com": {
       "lifecycle": "active",
@@ -10268,13 +10259,12 @@
         "indexed": 12,
         "unindexed": 5,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 17,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T11:41:03.905115+00:00"
       },
-      "audited_at": "2026-09-07T11:41:03.905115+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='ktech365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='ktech365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:58.915212+00:00"
     },
     "https://kskin365.com": {
       "lifecycle": "active",
@@ -11241,151 +11231,364 @@
         "indexed": 39,
         "unindexed": 9,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 48,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T11:46:08.516448+00:00"
       },
-      "audited_at": "2026-09-07T11:46:08.516448+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kskin365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kskin365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:44:59.889784+00:00"
     },
     "https://oliveyoungkorea.com": {
       "lifecycle": "active",
       "property": "sc-domain:oliveyoungkorea.com",
-      "posts": {},
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='oliveyoungkorea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='oliveyoungkorea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
-    },
-    "https://kworld365.com": {
-      "lifecycle": "active",
-      "property": "sc-domain:kworld365.com",
       "posts": {
-        "760": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 760,
-          "url": "https://kworld365.com/before-you-try-korean-numbers-guide-read-this-first/",
-          "slug": "before-you-try-korean-numbers-guide-read-this-first",
-          "title": "Before You Try Korean numbers guide, Read This First",
-          "published_gmt": "2026-09-01T01:00:00",
-          "modified_gmt": "2026-09-02T21:52:03",
+        "876": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "Discovered - currently not indexed",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:07.414185+00:00",
+          "id": 876,
+          "url": "https://oliveyoungkorea.com/getting-k-beauty-products-and-shopping-2026-practical-guide-right-the-first-time/",
+          "slug": "getting-k-beauty-products-and-shopping-2026-practical-guide-right-the-first-time",
+          "title": "Getting K-beauty Products and Shopping: 2026 Practical Guide Right the First Time",
+          "published_gmt": "2026-08-30T22:36:17",
+          "modified_gmt": "2026-08-30T23:57:04",
+          "age_days": 8,
+          "private_candidate": false
+        },
+        "881": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "Discovered - currently not indexed",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:14.144667+00:00",
+          "id": 881,
+          "url": "https://oliveyoungkorea.com/k-beauty-shopping-costs-eligibility-and-fewer-surprises/",
+          "slug": "k-beauty-shopping-costs-eligibility-and-fewer-surprises",
+          "title": "K-Beauty Shopping: Costs, Eligibility, and Fewer Surprises",
+          "published_gmt": "2026-09-01T11:20:42",
+          "modified_gmt": "2026-09-02T21:51:51",
+          "age_days": 6,
+          "private_candidate": false
+        },
+        "884": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "Discovered - currently not indexed",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:20.947094+00:00",
+          "id": 884,
+          "url": "https://oliveyoungkorea.com/a-no-regrets-checklist-for-k-beauty-products-and-shopping/",
+          "slug": "a-no-regrets-checklist-for-k-beauty-products-and-shopping",
+          "title": "A No-Regrets Checklist for K-Beauty Products and Shopping",
+          "published_gmt": "2026-09-02T03:36:04",
+          "modified_gmt": "2026-09-02T21:51:48",
           "age_days": 5,
           "private_candidate": false
         },
-        "790": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 790,
-          "url": "https://kworld365.com/3-questions-people-ask-about-bigbang-2026-world-tour-in-goyang/",
-          "slug": "3-questions-people-ask-about-bigbang-2026-world-tour-in-goyang",
-          "title": "3 Questions People Ask About BIGBANG 2026 World Tour in Goyang",
-          "published_gmt": "2026-09-01T01:00:00",
-          "modified_gmt": "2026-09-02T21:52:01",
-          "age_days": 5,
-          "private_candidate": false
-        },
-        "803": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 803,
-          "url": "https://kworld365.com/the-true-price-of-k-pop-stardom-costs-eligibility-unpacked/",
-          "slug": "the-true-price-of-k-pop-stardom-costs-eligibility-unpacked",
-          "title": "The True Price of K-pop Stardom: Costs &#038; Eligibility Unpacked",
-          "published_gmt": "2026-09-01T11:22:46",
-          "modified_gmt": "2026-09-02T21:51:59",
-          "age_days": 5,
-          "private_candidate": false
-        },
-        "806": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 806,
-          "url": "https://kworld365.com/your-k-pop-concert-checklist-for-a-night-youll-actually-enjoy/",
-          "slug": "your-k-pop-concert-checklist-for-a-night-youll-actually-enjoy",
-          "title": "Your K-pop Concert Checklist for a Night You’ll Actually Enjoy",
-          "published_gmt": "2026-09-02T03:33:00",
-          "modified_gmt": "2026-09-02T21:51:58",
-          "age_days": 4,
-          "private_candidate": false
-        },
-        "762": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 762,
-          "url": "https://kworld365.com/learn-hangul-fast-common-points-of-confusion-cleared-up/",
-          "slug": "learn-hangul-fast-common-points-of-confusion-cleared-up",
-          "title": "learn Hangul fast — Common Points of Confusion, Cleared Up",
-          "published_gmt": "2026-09-03T01:00:00",
-          "modified_gmt": "2026-09-02T21:52:09",
-          "age_days": 3,
-          "private_candidate": false
-        },
-        "787": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 787,
-          "url": "https://kworld365.com/6-things-to-look-for-when-choosing-korean-slang-words/",
-          "slug": "6-things-to-look-for-when-choosing-korean-slang-words",
-          "title": "6 Things to Look For When Choosing Korean slang words",
-          "published_gmt": "2026-09-03T01:00:00",
-          "modified_gmt": "2026-09-02T21:52:08",
-          "age_days": 3,
-          "private_candidate": false
-        },
-        "758": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 758,
-          "url": "https://kworld365.com/k-pop-survival-show-2026-101-where-first-timers-should-begin/",
-          "slug": "k-pop-survival-show-2026-101-where-first-timers-should-begin",
-          "title": "K-pop survival show 2026 101: Where First-Timers Should Begin",
-          "published_gmt": "2026-09-05T01:00:00",
-          "modified_gmt": "2026-09-02T21:52:07",
+        "946": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:27.690745+00:00",
+          "id": 946,
+          "url": "https://oliveyoungkorea.com/how-to-choose-k-beauty-products-at-olive-young-for-international-shoppers-with-ingredient-and-shipping-guidance/",
+          "slug": "how-to-choose-k-beauty-products-at-olive-young-for-international-shoppers-with-ingredient-and-shipping-guidance",
+          "title": "How to choose K beauty products at Olive Young for international shoppers with ingredient and shipping guidance",
+          "published_gmt": "2026-09-06T03:23:54",
+          "modified_gmt": "2026-09-06T03:23:54",
           "age_days": 1,
           "private_candidate": false
         },
-        "785": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 785,
-          "url": "https://kworld365.com/hongdae-k-pop-shopping-explained-simply/",
-          "slug": "hongdae-k-pop-shopping-explained-simply",
-          "title": "Hongdae K-pop shopping, Explained Simply",
-          "published_gmt": "2026-09-05T01:00:00",
-          "modified_gmt": "2026-09-02T21:52:06",
+        "948": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:34.694055+00:00",
+          "id": 948,
+          "url": "https://oliveyoungkorea.com/how-to-choose-ingredient-led-k-beauty-picks-at-olive-young-for-international-shoppers/",
+          "slug": "how-to-choose-ingredient-led-k-beauty-picks-at-olive-young-for-international-shoppers",
+          "title": "How to choose ingredient-led K‑Beauty picks at Olive Young for international shoppers",
+          "published_gmt": "2026-09-06T12:11:41",
+          "modified_gmt": "2026-09-06T12:11:41",
           "age_days": 1,
           "private_candidate": false
         },
-        "869": {
-          "state": "unknown",
-          "http": 401,
-          "error": "{\n  \"error\": {\n    \"code\": 401,\n    \"message\": \"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"det",
-          "id": 869,
-          "url": "https://kworld365.com/blackpink-lisa-agency-confirms-solo-release-window-whats-official-whats-pending-and-next-milestones/",
-          "slug": "blackpink-lisa-agency-confirms-solo-release-window-whats-official-whats-pending-and-next-milestones",
-          "title": "BLACKPINK Lisa: Agency Confirms Solo Release Window — What’s Official, What’s Pending, and Next Milestones",
-          "published_gmt": "2026-09-06T11:56:25",
-          "modified_gmt": "2026-09-06T13:36:32",
+        "950": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:41.671805+00:00",
+          "id": 950,
+          "url": "https://oliveyoungkorea.com/how-to-shop-ingredient-led-k-beauty-at-olive-young-from-abroad-labels-availability-and-logistics/",
+          "slug": "how-to-shop-ingredient-led-k-beauty-at-olive-young-from-abroad-labels-availability-and-logistics",
+          "title": "How to shop ingredient-led K‑beauty at Olive Young from abroad: labels, availability and logistics",
+          "published_gmt": "2026-09-06T13:07:15",
+          "modified_gmt": "2026-09-06T13:07:15",
+          "age_days": 1,
+          "private_candidate": false
+        },
+        "952": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:48.477147+00:00",
+          "id": 952,
+          "url": "https://oliveyoungkorea.com/how-to-pick-ingredient-led-k-beauty-products-on-olive-young-as-an-international-shopper/",
+          "slug": "how-to-pick-ingredient-led-k-beauty-products-on-olive-young-as-an-international-shopper",
+          "title": "How to pick ingredient-led K beauty products on Olive Young as an international shopper",
+          "published_gmt": "2026-09-07T08:48:24",
+          "modified_gmt": "2026-09-07T08:48:24",
           "age_days": 0,
           "private_candidate": false
         }
       },
       "summary": {
         "indexed": 0,
-        "unindexed": 0,
-        "unknown": 9,
-        "indexed_delta": 0,
-        "total_published": 9
+        "unindexed": 7,
+        "unknown": 0,
+        "indexed_delta": null,
+        "total_published": 7,
+        "complete": true,
+        "comparison_at": null
       },
-      "audited_at": "2026-09-06T22:10:02.495026+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kworld365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kworld365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:45:48.827328+00:00"
+    },
+    "https://kworld365.com": {
+      "lifecycle": "active",
+      "property": "sc-domain:kworld365.com",
+      "posts": {
+        "760": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:45:56.017346+00:00",
+          "id": 760,
+          "url": "https://kworld365.com/before-you-try-korean-numbers-guide-read-this-first/",
+          "slug": "before-you-try-korean-numbers-guide-read-this-first",
+          "title": "Before You Try Korean numbers guide, Read This First",
+          "published_gmt": "2026-09-01T01:00:00",
+          "modified_gmt": "2026-09-02T21:52:03",
+          "age_days": 7,
+          "private_candidate": false
+        },
+        "790": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:02.718768+00:00",
+          "id": 790,
+          "url": "https://kworld365.com/3-questions-people-ask-about-bigbang-2026-world-tour-in-goyang/",
+          "slug": "3-questions-people-ask-about-bigbang-2026-world-tour-in-goyang",
+          "title": "3 Questions People Ask About BIGBANG 2026 World Tour in Goyang",
+          "published_gmt": "2026-09-01T01:00:00",
+          "modified_gmt": "2026-09-02T21:52:01",
+          "age_days": 7,
+          "private_candidate": false
+        },
+        "803": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:09.435049+00:00",
+          "id": 803,
+          "url": "https://kworld365.com/the-true-price-of-k-pop-stardom-costs-eligibility-unpacked/",
+          "slug": "the-true-price-of-k-pop-stardom-costs-eligibility-unpacked",
+          "title": "The True Price of K-pop Stardom: Costs &#038; Eligibility Unpacked",
+          "published_gmt": "2026-09-01T11:22:46",
+          "modified_gmt": "2026-09-02T21:51:59",
+          "age_days": 6,
+          "private_candidate": false
+        },
+        "806": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:15.991986+00:00",
+          "id": 806,
+          "url": "https://kworld365.com/your-k-pop-concert-checklist-for-a-night-youll-actually-enjoy/",
+          "slug": "your-k-pop-concert-checklist-for-a-night-youll-actually-enjoy",
+          "title": "Your K-pop Concert Checklist for a Night You’ll Actually Enjoy",
+          "published_gmt": "2026-09-02T03:33:00",
+          "modified_gmt": "2026-09-02T21:51:58",
+          "age_days": 5,
+          "private_candidate": false
+        },
+        "762": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:22.566062+00:00",
+          "id": 762,
+          "url": "https://kworld365.com/learn-hangul-fast-common-points-of-confusion-cleared-up/",
+          "slug": "learn-hangul-fast-common-points-of-confusion-cleared-up",
+          "title": "learn Hangul fast — Common Points of Confusion, Cleared Up",
+          "published_gmt": "2026-09-03T01:00:00",
+          "modified_gmt": "2026-09-02T21:52:09",
+          "age_days": 5,
+          "private_candidate": false
+        },
+        "787": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:29.543887+00:00",
+          "id": 787,
+          "url": "https://kworld365.com/6-things-to-look-for-when-choosing-korean-slang-words/",
+          "slug": "6-things-to-look-for-when-choosing-korean-slang-words",
+          "title": "6 Things to Look For When Choosing Korean slang words",
+          "published_gmt": "2026-09-03T01:00:00",
+          "modified_gmt": "2026-09-02T21:52:08",
+          "age_days": 5,
+          "private_candidate": false
+        },
+        "758": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:36.237618+00:00",
+          "id": 758,
+          "url": "https://kworld365.com/k-pop-survival-show-2026-101-where-first-timers-should-begin/",
+          "slug": "k-pop-survival-show-2026-101-where-first-timers-should-begin",
+          "title": "K-pop survival show 2026 101: Where First-Timers Should Begin",
+          "published_gmt": "2026-09-05T01:00:00",
+          "modified_gmt": "2026-09-02T21:52:07",
+          "age_days": 3,
+          "private_candidate": false
+        },
+        "785": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:43.078423+00:00",
+          "id": 785,
+          "url": "https://kworld365.com/hongdae-k-pop-shopping-explained-simply/",
+          "slug": "hongdae-k-pop-shopping-explained-simply",
+          "title": "Hongdae K-pop shopping, Explained Simply",
+          "published_gmt": "2026-09-05T01:00:00",
+          "modified_gmt": "2026-09-02T21:52:06",
+          "age_days": 3,
+          "private_candidate": false
+        },
+        "869": {
+          "state": "unindexed",
+          "verdict": "NEUTRAL",
+          "coverageState": "URL is unknown to Google",
+          "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
+          "indexingState": "INDEXING_STATE_UNSPECIFIED",
+          "lastCrawlTime": null,
+          "googleCanonical": null,
+          "userCanonical": null,
+          "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
+          "checked_at": "2026-09-08T01:46:49.800338+00:00",
+          "id": 869,
+          "url": "https://kworld365.com/blackpink-lisa-agency-confirms-solo-release-window-whats-official-whats-pending-and-next-milestones/",
+          "slug": "blackpink-lisa-agency-confirms-solo-release-window-whats-official-whats-pending-and-next-milestones",
+          "title": "BLACKPINK Lisa: Agency Confirms Solo Release Window — What’s Official, What’s Pending, and Next Milestones",
+          "published_gmt": "2026-09-06T11:56:25",
+          "modified_gmt": "2026-09-06T13:36:32",
+          "age_days": 1,
+          "private_candidate": false
+        }
+      },
+      "summary": {
+        "indexed": 0,
+        "unindexed": 9,
+        "unknown": 0,
+        "indexed_delta": null,
+        "total_published": 9,
+        "complete": true,
+        "comparison_at": null
+      },
+      "audited_at": "2026-09-08T01:46:50.150532+00:00"
     },
     "https://k-trip365.com": {
       "lifecycle": "active",
@@ -11636,13 +11839,12 @@
         "indexed": 6,
         "unindexed": 6,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 12,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T11:47:32.026765+00:00"
       },
-      "audited_at": "2026-09-07T11:47:32.026765+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='k-trip365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='k-trip365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:51.180536+00:00"
     },
     "https://k-visa365.com": {
       "lifecycle": "active",
@@ -12713,13 +12915,12 @@
         "indexed": 48,
         "unindexed": 5,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 53,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T11:53:41.648560+00:00"
       },
-      "audited_at": "2026-09-07T11:53:41.648560+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='k-visa365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='k-visa365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:52.381327+00:00"
     },
     "https://koreawedding365.com": {
       "lifecycle": "active",
@@ -14090,13 +14291,12 @@
         "indexed": 62,
         "unindexed": 6,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 68,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:01:40.058954+00:00"
       },
-      "audited_at": "2026-09-07T12:01:40.058954+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreawedding365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreawedding365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:53.422857+00:00"
     },
     "https://kstudy365.com": {
       "lifecycle": "active",
@@ -14427,13 +14627,12 @@
         "indexed": 8,
         "unindexed": 8,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 16,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:03:34.067972+00:00"
       },
-      "audited_at": "2026-09-07T12:03:34.067972+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kstudy365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kstudy365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:54.439571+00:00"
     },
     "https://studyinkorea365.com": {
       "lifecycle": "active",
@@ -15484,13 +15683,12 @@
         "indexed": 49,
         "unindexed": 3,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 52,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:09:35.342710+00:00"
       },
-      "audited_at": "2026-09-07T12:09:35.342710+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='studyinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='studyinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:55.447963+00:00"
     },
     "https://kieca-korea.org": {
       "lifecycle": "active",
@@ -15641,13 +15839,12 @@
         "indexed": 4,
         "unindexed": 3,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 7,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:10:27.148502+00:00"
       },
-      "audited_at": "2026-09-07T12:10:27.148502+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='kieca-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='kieca-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:56.465227+00:00"
     },
     "https://ksa-korea.org": {
       "lifecycle": "active",
@@ -15758,13 +15955,12 @@
         "indexed": 0,
         "unindexed": 5,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 5,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:11:04.531993+00:00"
       },
-      "audited_at": "2026-09-07T12:11:04.531993+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='ksa-korea.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='ksa-korea.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:57.480063+00:00"
     },
     "https://sis-korea.com": {
       "lifecycle": "active",
@@ -17055,13 +17251,12 @@
         "indexed": 58,
         "unindexed": 6,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 64,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:18:24.416153+00:00"
       },
-      "audited_at": "2026-09-07T12:18:24.416153+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='sis-korea.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='sis-korea.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:58.497780+00:00"
     },
     "https://jobkorea365.com": {
       "lifecycle": "active",
@@ -17912,13 +18107,12 @@
         "indexed": 30,
         "unindexed": 12,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 42,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:23:12.220399+00:00"
       },
-      "audited_at": "2026-09-07T12:23:12.220399+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='jobkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='jobkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:46:59.521513+00:00"
     },
     "https://jobinkorea365.com": {
       "lifecycle": "active",
@@ -18929,13 +19123,12 @@
         "indexed": 40,
         "unindexed": 10,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 50,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:28:58.739767+00:00"
       },
-      "audited_at": "2026-09-07T12:28:58.739767+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='jobinkorea365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='jobinkorea365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:47:00.552521+00:00"
     },
     "https://jobkoreaglobal.com": {
       "lifecycle": "review",
@@ -19786,13 +19979,12 @@
         "indexed": 31,
         "unindexed": 11,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 42,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:33:47.405899+00:00"
       },
-      "audited_at": "2026-09-07T12:33:47.405899+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='jobkoreaglobal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='jobkoreaglobal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:47:01.658001+00:00"
     },
     "https://korea365.org": {
       "lifecycle": "active",
@@ -21643,13 +21835,12 @@
         "indexed": 88,
         "unindexed": 4,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 92,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:44:20.297652+00:00"
       },
-      "audited_at": "2026-09-07T12:44:20.297652+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='korea365.org', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='korea365.org', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:47:03.369161+00:00"
     },
     "https://koreanews365.com": {
       "lifecycle": "active",
@@ -21880,13 +22071,12 @@
         "indexed": 10,
         "unindexed": 1,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 11,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:45:38.605966+00:00"
       },
-      "audited_at": "2026-09-07T12:45:38.605966+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='koreanews365.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='koreanews365.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:47:04.561550+00:00"
     },
     "https://theseouljournal.com": {
       "lifecycle": "active",
@@ -23857,14 +24047,13 @@
         "indexed": 87,
         "unindexed": 11,
         "unknown": 0,
-        "indexed_delta": null,
+        "indexed_delta": 0,
         "total_published": 98,
         "complete": true,
-        "comparison_at": null
+        "comparison_at": "2026-09-07T12:56:46.453163+00:00"
       },
-      "audited_at": "2026-09-07T12:56:46.453163+00:00",
-      "error": "wp_inventory_failed: HTTPSConnectionPool(host='theseouljournal.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle (Caused by NewConnectionError(\"HTTPSConnection(host='theseouljournal.com', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))"
+      "audited_at": "2026-09-08T01:47:05.831650+00:00"
     }
   },
-  "updated_at": "2026-09-07T22:10:12.210018+00:00"
+  "updated_at": "2026-09-08T01:47:05.831665+00:00"
 }
