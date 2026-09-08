@@ -102,6 +102,7 @@
             {% if metrics and metrics.get('index_total') is not none %}
             <p class="text-[9px] {{ 'text-amber-700' if metrics.get('index_partial') else 'text-slate-500' }}">Google 검사 대상 {{ metrics.get('index_total') }}개 · 미색인 {{ metrics.get('index_unindexed') }}개 · 미확인 {{ metrics.get('index_unknown') or 0 }}개{% if metrics.get('index_partial') %} · 일부 확인(전체 색인 수 아님){% endif %}</p>
             {% elif metrics %}<p class="text-[9px] text-amber-700">{{ metrics.get('index_status') or 'Google Search Console 집계 미연결' }}</p>{% endif %}
+            {% if metrics and metrics.get('posts_checked_at') %}<p class="text-[9px] text-slate-500">새 글 집계 {{ metrics.get('posts_checked_at')|kst_time }} 확인값</p>{% endif %}
             {% if metrics and metrics.get('index_stale') %}<p class="text-[9px] text-amber-700">{{ metrics.get('index_status') }}</p>{% endif %}
             <p class="text-[9px] text-slate-400">방문 집계 {{ metrics.get('visitor_checked_at')|kst_time if metrics else '미지원' }} · 색인 {{ metrics.get('index_checked_at')|kst_time if metrics else '미지원' }}</p>
             </div>

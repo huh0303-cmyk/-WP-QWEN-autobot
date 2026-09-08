@@ -69,3 +69,29 @@ def recent_post_counts(site_url, bucket):
     except (requests.RequestException, ValueError, TypeError, KeyError):
         pass
     return {'new_posts': None, 'new_posts_delta': None}
+
+
+def post_metrics(live, entry):
+    """Use today's complete server inventory when a live request is unavailable."""
+    if live.get('new_posts') is not None:
+        return live
+    try:
+        now = datetime.now(timezone(timedelta(hours=9))).date()
+        checked = datetime.fromisoformat(entry['audited_at'].replace('Z', '+00:00'))
+        if entry.get('error') or checked.astimezone(timezone(timedelta(hours=9))).date() != now:
+            return live
+        posts = entry['posts']
+        if len(posts) != entry['summary']['total_published']:
+            return live
+        counts = {now: 0, now - timedelta(days=1): 0}
+        for post in posts.values():
+            stamp = datetime.fromisoformat(post['published_gmt'].replace('Z', '+00:00'))
+            if stamp.tzinfo is None:
+                stamp = stamp.replace(tzinfo=timezone.utc)
+            day = stamp.astimezone(timezone(timedelta(hours=9))).date()
+            if day in counts:
+                counts[day] += 1
+        return {'new_posts': counts[now], 'new_posts_delta': counts[now] - counts[now-timedelta(days=1)],
+                'posts_checked_at': entry['audited_at']}
+    except (KeyError, ValueError, TypeError):
+        return live
