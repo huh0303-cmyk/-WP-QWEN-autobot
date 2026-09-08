@@ -18,7 +18,7 @@
     "blogger_kskin365": "https://skin.k-health365.com/2026/09/will-your-favorite-sunscreen-survive.html"
   },
   "next_generation_after": "2026-09-07T10:18:18.412988+00:00",
-  "checked_at": "2026-09-08T00:34:11.211251+00:00",
+  "checked_at": "2026-09-08T05:28:29.714019+00:00",
   "results": [
     {
       "site": "blogger_jobglobal",
@@ -48,17 +48,17 @@
     {
       "site": "blogger_studyinkorea",
       "status": "blocked",
-      "reason": "ConnectTimeout"
+      "reason": "ModuleNotFoundError"
     },
     {
       "site": "blogger_koreanews",
       "status": "blocked",
-      "reason": "ConnectTimeout"
+      "reason": "ModuleNotFoundError"
     },
     {
       "site": "blogger_korea_life_support365",
       "status": "blocked",
-      "reason": "ConnectTimeout"
+      "reason": "ModuleNotFoundError"
     },
     {
       "site": "blogger_kworld365",
