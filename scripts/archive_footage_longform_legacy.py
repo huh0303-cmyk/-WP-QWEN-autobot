@@ -549,6 +549,16 @@ def main():
         topic = f"{today.strftime('%B %d')} — Today in World History, newest to oldest"
     else:
         clips = fetch_archive_clips(topic, channel_key, workdir)
+        if not clips:
+            # A calendar-supplied topic is often a full sentence (e.g. "How X
+            # became Y in Z"); archive.org's full-text search can miss on the
+            # whole phrase even when the core subject has real footage. Retry
+            # once with just the extracted keywords before giving up.
+            keywords = _extract_keywords(topic)
+            short_query = " ".join(sorted(keywords))
+            if short_query and short_query.lower() != topic.lower():
+                log(f"   ⚠️ 전체 문장으로 클립 없음 — 핵심어만으로 재시도: {short_query}")
+                clips = fetch_archive_clips(short_query, channel_key, workdir)
     if not clips:
         log("❌ 이 주제로 사용 가능한 퍼블릭도메인 클립을 하나도 못 찾음 — 주제를 바꿔서 재시도 필요")
         raise SystemExit(1)
