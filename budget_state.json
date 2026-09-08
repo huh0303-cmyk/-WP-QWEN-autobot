@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 3.66,
+  "spent_estimate_usd": 3.69,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -833,6 +833,15 @@
       "amount_usd": 0.03,
       "reservation_id": "d39dc3ba9632bd21fbdd535ef677cdd62451048957e69df8c4c0a2c5090cc997",
       "run_id": "34192862583",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-08T15:01:50.198308+09:00",
+      "label": "blogger-rewrite:blogger_kieca",
+      "amount_usd": 0.03,
+      "reservation_id": "3f89d7646166392e9a64deb847b376a0807df8abb57647c27bf00185e55758f4",
+      "run_id": "34192848050",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
