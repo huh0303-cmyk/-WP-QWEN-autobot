@@ -39,6 +39,7 @@ concurrency:
 
 jobs:
   publish-one-platform:
+    environment: social-publish
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
