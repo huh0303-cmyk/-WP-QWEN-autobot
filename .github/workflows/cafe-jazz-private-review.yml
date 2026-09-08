@@ -1,0 +1,35 @@
+name: Private cafe instrumental jazz review
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cafe-jazz-review
+  cancel-in-progress: false
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 pillow requests
+      - name: Render and upload licensed cafe instrumental selection privately
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS }}
+        run: python -u scripts/cafe_jazz_private_review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cafe-jazz-review-receipt
+          path: |
+            data/cafe-jazz-private-review/*.json
+            data/cafe-jazz-private-review/thumbnail.jpg
+            data/cafe-jazz-private-review/preview.mp4
+          retention-days: 14

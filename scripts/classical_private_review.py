@@ -8,6 +8,7 @@ job.CHANNEL='mbb'
 job.EXPECTED_CHANNEL='UC7jOhyMa-FIrzZuea97z1Pw'
 job.MARKER='Review reference: classical-goldberg-20260908'
 job.TITLE='Bach by the Sea | Beautiful Piano for Reading & Quiet Mornings | Cafe Mozart'
+IMAGE_ASSET='classical-piano.png'
 manifest=json.loads((job.ROOT/'assets/playlist-review/classical-tracks.json').read_text())
 job.DURATION=round(sum(float(t['seconds']) for t in manifest))
 job.DESCRIPTION='''Open the windows to a peaceful morning of solo piano. This Cafe Mozart selection brings together complete movements from J. S. Bach's Goldberg Variations, performed by pianist Kimiko Ishizaka for the Open Goldberg Variations project. The piano's clear lines and changing textures offer a thoughtful companion for reading, quiet work, or simply listening.
@@ -33,7 +34,7 @@ def render():
     (job.WORK/'concat.txt').write_text('\n'.join("file '"+str(p)+"'" for p in files))
     audio=job.WORK/'audio.m4a'
     job.ff('-f','concat','-safe','0','-i',job.WORK/'concat.txt','-c:a','aac','-b:a','192k',audio)
-    image=ImageOps.fit(Image.open(job.ROOT/'assets/playlist-review/classical-piano.png').convert('RGB'),(1280,720))
+    image=ImageOps.fit(Image.open(job.ROOT/'assets/playlist-review'/IMAGE_ASSET).convert('RGB'),(1280,720))
     image.save(job.WORK/'thumbnail.jpg',quality=93)
     video=job.WORK/'rain-75.mp4'
     job.ff('-loop','1','-framerate','10','-i',job.WORK/'thumbnail.jpg','-i',audio,'-filter_complex','[1:a]showwaves=s=1152x44:mode=cline:rate=10:colors=white:scale=sqrt[w];[0:v][w]overlay=64:652:shortest=1[v]','-map','[v]','-map','1:a','-c:v','libx264','-preset','ultrafast','-crf','24','-threads','2','-pix_fmt','yuv420p','-c:a','copy','-shortest','-movflags','+faststart',video)
