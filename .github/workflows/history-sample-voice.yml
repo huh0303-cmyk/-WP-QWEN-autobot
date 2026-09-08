@@ -1,26 +1,27 @@
-name: History sample voice - explicitly approved one-off
+name: Vocabulary ElevenLabs replacement - owner requested
 on:
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: history-sample-voice
+  group: vocabulary-elevenlabs-samples
   cancel-in-progress: false
 jobs:
   sample:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Generate only the approved sample audio
+      - name: Inspect ElevenLabs availability
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-        run: python scripts/history_sample_voice.py
+        run: python scripts/vocabulary_elevenlabs_samples.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: history-sample-voice
-          path: history_sample_voice/
+          name: vocabulary-elevenlabs-samples
+          path: vocabulary_elevenlabs_samples/
           retention-days: 3
