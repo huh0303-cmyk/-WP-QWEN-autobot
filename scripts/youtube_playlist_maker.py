@@ -73,7 +73,11 @@ def _music_prompt(index: int) -> str:
         "kpop": "an original Korean-language acoustic K-pop song with fresh lyrics",
         "starbucks": "an instrumental cafe jazz and soft piano piece, no vocals",
         "mbb": "an original elegant classical chamber and piano piece, instrumental only",
-        "healing": "a slow original ambient nature soundscape led by rain and water, instrumental only",
+        "healing": "a slow original ambient nature soundscape, instrumental only, built from " + random.choice([
+            "gentle falling rain as the lead element, distant soft thunder rumble",
+            "a flowing forest stream over rocks with layered gentle birdsong",
+            "steady rain over a forest with occasional distant birdsong",
+        ]),
     }[base.CHANNEL_KEY]
     return (f"Create {style}, approximately three minutes long, inspired by '{topic}'. It must be a new "
             "composition with no quotation of an existing melody, no named artist imitation, and no brand "
