@@ -1,0 +1,24 @@
+<section id="vocabulary-cards" class="scroll-mt-28 rounded-3xl border border-orange-200 bg-orange-50 p-5 sm:p-7">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div><p class="text-xs font-bold text-orange-700">한국어 · 영어 · 기타언어</p><h2 class="mt-1 text-2xl font-black text-slate-900">단어 카드 발행 계획</h2></div>
+    <span class="rounded-full bg-amber-100 px-4 py-2 text-xs font-black text-amber-900">계정 연결 및 공개 발행 검증 대기</span>
+  </div>
+  {% if vocabulary_cards.available %}
+  <p class="mt-3 text-sm font-semibold text-slate-700">아침 3장 + 오후 3장 · 하루 6장 · 5개 플랫폼 연결 완료 시 하루 30건 게시</p>
+  <p class="mt-2 text-sm text-slate-700">한국어 → 서울국제대학SIS-TOPIK · 영어 → English Survival · 기타언어 → SIS Language. 모든 플랫폼에서 각 브랜드의 별도 계정에만 게시합니다.</p>
+  <div class="mt-4 grid gap-3 sm:grid-cols-3">
+    <div class="rounded-2xl bg-white p-4"><p class="font-black text-orange-700">매일 무작위 시각</p><p class="mt-2 text-sm">아침 03:00–07:00<br>오후 14:00–18:00</p><p class="mt-2 text-xs text-slate-500">한국 시간 · 날짜별 시각 고정으로 재실행 중복 방지</p></div>
+    <div class="rounded-2xl bg-white p-4"><p class="font-black text-orange-700">보고 듣고 따라 읽기</p><p class="mt-2 text-sm">뜻이 보이는 그림<br>단어 5번 + 예문 5번<br>바운스 · 예문 속 단어 색상 강조</p></div>
+    <div class="rounded-2xl bg-white p-4"><p class="font-black text-orange-700">10단어마다 복습 퀴즈</p><p class="mt-2 text-sm">각 학습 언어별로 집계<br>해당 언어 카드 대신 퀴즈 게시<br>하루 6장 유지</p></div>
+  </div>
+  <p class="mt-4 rounded-xl bg-white p-3 text-sm font-bold text-slate-800">기타언어: {{ vocabulary_cards.rotation|join(' → ') }} → 반복 · 뜻 설명은 영어</p>
+  <div class="mt-4 overflow-x-auto rounded-2xl border border-orange-100 bg-white">
+    <table class="w-full min-w-[850px] text-left text-sm">
+      <thead class="bg-slate-900 text-white"><tr>{% for heading in ['발행 플랫폼','한국어 TOPIK','영어 ENGLISH','기타언어 LANGUAGE','현재 상태'] %}<th class="p-3">{{ heading }}</th>{% endfor %}</tr></thead>
+      <tbody>{% for account in vocabulary_cards.accounts %}<tr class="border-t border-slate-100"><th class="p-3">{{ account.platform }}</th><td class="p-3">{{ account.topik }}</td><td class="p-3">{{ account.english }}</td><td class="p-3">{{ account.language }}</td><td class="p-3 text-amber-800">{{ account.status }}</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  <p class="mt-4 text-xs leading-relaxed text-slate-600">등록된 계정명은 발행 인증 완료를 뜻하지 않습니다. 같은 단어를 여러 플랫폼에 올려도 학습 진도는 한 번만 집계하며, 초안·비공개·실패는 완료로 세지 않습니다. 이번 운영 설정은 아직 자동 실행에 연결되지 않았습니다.</p>
+  <p class="mt-2 text-xs leading-relaxed text-slate-600">음성: 모든 단어 카드는 ElevenLabs를 사용합니다. 단어와 예문을 각각 한 번 생성한 뒤 저장한 음성을 5번씩 반복합니다. 유료 이미지 생성은 꺼 둡니다. ElevenLabs 사용료가 발생하며 실제 청구액과 Codex 사용량 차감은 미확인입니다.</p>
+  {% else %}<p class="mt-3 text-sm text-rose-700">{{ vocabulary_cards.error }}</p>{% endif %}
+</section>

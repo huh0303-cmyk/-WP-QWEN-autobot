@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "timezone": "Asia/Seoul",
+  "enabled": false,
+  "disabled_reason": "Account mapping and public-publishing verification are incomplete.",
+  "schedule_seed": "sis-vocabulary-2026-09-08",
+  "windows": {"morning": ["03:00", "07:00"], "evening": ["14:00", "18:00"]},
+  "platforms": ["youtube", "tiktok", "facebook", "instagram", "threads"],
+  "brands": {"TOPIK": "ko", "ENGLISH": "en", "LANGUAGE": ["de", "fr", "vi", "es"]},
+  "brand_names": {"TOPIK": "서울국제대학SIS-TOPIK", "ENGLISH": "English Survival", "LANGUAGE": "SIS Language"},
+  "allow_cross_brand_fallback": false,
+  "explanation_languages": {"ko": "ko", "en": "ko", "de": "en", "fr": "en", "vi": "en", "es": "en"},
+  "word_repetitions": 5,
+  "sentence_repetitions": 5,
+  "illustration_required": true,
+  "highlight_target_in_sentence": true,
+  "bounce_word_and_sentence": true,
+  "quiz_every_unique_words": 10,
+  "quiz_mode": "replace_language_card",
+  "quiz_mode_confirmed": true,
+  "quiz_count_scope": "learning_language",
+  "count_only_verified_publications": true,
+  "paid_generation_enabled": false,
+  "tts": {
+    "provider": "elevenlabs",
+    "paid_generation_enabled": true,
+    "model_id": "eleven_flash_v2_5",
+    "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+    "voice_name": "George",
+    "languages": ["ko", "en", "de", "fr", "vi", "es"],
+    "voice_settings": {"stability": 0.65, "similarity_boost": 0.75, "speed": 0.85},
+    "fallback_provider": null,
+    "repeat_cached_audio": true
+  },
+  "destinations": {
+    "facebook": {"TOPIK": "1128119143729384", "ENGLISH": "1247951015067104", "LANGUAGE": "1236641259534475"},
+    "youtube": {"TOPIK": "UCdA24IuR-JE7qButWv5jLqA", "ENGLISH": "UCrjkKWMHzAAvpLIFgHnwcWg", "LANGUAGE": "UCOWoNH_d6p45ywQ6W0Z1Jng"},
+    "tiktok": {"TOPIK": null, "ENGLISH": null, "LANGUAGE": null},
+    "instagram": {"TOPIK": "17841410825136018", "ENGLISH": null, "LANGUAGE": null},
+    "threads": {"TOPIK": null, "ENGLISH": null, "LANGUAGE": null}
+  }
+}
