@@ -89,19 +89,14 @@ def render(tracks):
       raise RuntimeError('WAITING_ASSETS: original review background is missing; no paid fallback')
     image=maker.base._resize_cover(Image.open(photo).convert('RGB'),1280,720)
     if Image.open(photo).width<1280:raise RuntimeError('Thumbnail source too small')
-    draw=ImageDraw.Draw(image)
-    font=ImageFont.truetype(maker.base.ensure_font(),76)
-    draw.text((640,358),'Sweet Cafe',anchor='mm',font=font,fill='white',stroke_width=2,stroke_fill=(35,24,24))
+    # The approved source already contains the owner's huge PLAYLIST lettering.
     image.save(WORK/'thumbnail.jpg',quality=93)
-    video=WORK/'final.mp4'
+    video=WORK/'final-waveform.mp4'
     if not video.exists():
-      vf="scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='1+min(on,149)*0.0003':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1920x1080:fps=25,fade=t=in:st=0:d=1,format=yuv420p"
-      ff(['-loop','1','-framerate','25','-i',str(photo),'-t','6','-vf',vf,'-c:v','libx264','-preset','fast','-crf','20','-an',str(WORK/'intro.mp4')])
-      ff(['-loop','1','-framerate','25','-i',str(photo),'-t','10','-vf','scale=2006:1129:force_original_aspect_ratio=increase,crop=1920:1080,format=yuv420p','-c:v','libx264','-preset','fast','-tune','stillimage','-crf','20','-an',str(WORK/'still.mp4')])
       seconds=maker.base.get_duration(str(audio))
-      clips=[WORK/'intro.mp4']+[WORK/'still.mp4']*int(seconds/10+2)
-      (WORK/'video-list.txt').write_text('\n'.join("file '"+str(p)+"'" for p in clips))
-      ff(['-f','concat','-safe','0','-i',str(WORK/'video-list.txt'),'-i',str(audio),'-map','0:v','-map','1:a','-c','copy','-t',str(seconds),'-movflags','+faststart',str(video)])
+      # Waveform is driven by the actual soundtrack, not a decorative loop.
+      filters="[0:v]scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,zoompan=z='1+min(on,71)*0.00025':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1280x720:fps=12,fade=t=in:st=0:d=1,drawbox=x=0:y=625:w=iw:h=95:color=black@0.30:t=fill[bg];[1:a]aformat=channel_layouts=mono,showwaves=s=1152x56:mode=cline:rate=12:colors=white:scale=sqrt[wave];[bg][wave]overlay=64:646:shortest=1,format=yuv420p[v]"
+      ff(['-loop','1','-framerate','12','-i',str(photo),'-i',str(audio),'-filter_complex',filters,'-map','[v]','-map','1:a','-c:v','libx264','-preset','veryfast','-tune','stillimage','-crf','20','-threads','2','-c:a','copy','-t',str(seconds),'-movflags','+faststart',str(video)])
     seconds=maker.base.get_duration(str(video))
     if not 3000<=seconds<=4200:raise RuntimeError('Final duration outside 50–70 minutes')
     return video,seconds

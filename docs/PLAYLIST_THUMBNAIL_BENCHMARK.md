@@ -14,8 +14,11 @@ checking its channel and actual thumbnails.
   with warm candle/fire light; a short, clear centered two-word title; scene fills
   the frame. The channel logo is not part of our design.
 - Apply the composition principles to an original scene, not a copied image.
-- Cafe Romantic review: original Paris riverside cafe at sunset, two coffee cups,
-  amber candle, restrained rose/plum palette; text `Sweet Cafe` only.
+- Cafe Romantic review: original Paris riverside cafe at sunset, diverse adult
+  male-female couples, amber candle, restrained rose/plum palette. Owner's latest
+  direction overrides the initial small title: `PLAYLIST` must be extremely large.
+- Video must include a moving waveform derived from the real soundtrack, not a
+  decorative repeated animation. Keep the people and large title readable.
 - Validate the 16:9 composition at mobile thumbnail size; final thumbnail must be
   at least 1280x720 and within YouTube's upload size limit.
 
