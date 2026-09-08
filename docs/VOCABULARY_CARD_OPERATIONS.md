@@ -42,6 +42,8 @@ receipts, rotation after first verified publication, unique-word counting, and
 ten-question quiz manifests. It is not yet connected to a renderer, persistent VPS
 worker, quiz replacement dispatcher, or all-platform public publisher. enabled
 remains false. No scheduled task or live social post is claimed by this change.
+The obsolete 11:41 KST legacy TOPIK review schedule is removed to avoid duplicate
+content outside the new owner's six-card cadence. Its manual review entry remains.
 
 Existing social_publish.py uses private YouTube uploads and Facebook drafts.
 TikTok has no TIKTOK_ACCESS_TOKEN in repository/environment secret inventory;
