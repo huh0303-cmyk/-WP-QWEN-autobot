@@ -5,6 +5,7 @@ from flask import Response, flash, jsonify, redirect, request, send_from_directo
 from .keywords import tistory_seed_topics, top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
+from .vocabulary import vocabulary_status
 from automation_hub.youtube_vps_queue import enqueue as enqueue_youtube_vps
 
 import json
@@ -901,6 +902,11 @@ def get_youtube_data() -> list[dict[str, object]]:
             "sheet_controlled": True,
         })
     return sorted(rows, key=lambda row: (row["group"] != "PLAYLIST", row["name"].casefold()))
+
+
+@app.get("/api/vocabulary-cards")
+def vocabulary_cards_status():
+    return jsonify(vocabulary_status())
 
 
 def get_sns_data() -> list[dict[str, object]]:
@@ -2051,6 +2057,7 @@ def index():
     return render_template(
         "index.html", sites=sites, bloggers=bloggers, tistory_sites=tistory_sites,
         youtube_channels=youtube_channels, sns_accounts=sns_accounts,
+        vocabulary_cards=vocabulary_status(),
         problem_summary=build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
     )
