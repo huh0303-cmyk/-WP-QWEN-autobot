@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   revise:
+    if: ${{ false }} # Retired by owner: this job reused existing songs. New compositions required.
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: youtube-channels
