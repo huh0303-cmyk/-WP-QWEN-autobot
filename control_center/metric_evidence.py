@@ -39,11 +39,11 @@ def recent_post_counts(site_url, bucket):
     yesterday = today - timedelta(days=1)
     counts = {today: 0, yesterday: 0}
     try:
-        for page in range(1, 11):
+        for page in range(1, 51):
             for attempt in range(3):
                 try:
                     response = requests.get(site_url.rstrip('/') + '/wp-json/wp/v2/posts',
-                        params={'status': 'publish', 'per_page': 100, 'page': page,
+                        params={'status': 'publish', 'per_page': 20, 'page': page,
                                 'orderby': 'date', 'order': 'desc', '_fields': 'id,date_gmt'},
                         timeout=(5, 12))
                     response.raise_for_status()
@@ -64,7 +64,7 @@ def recent_post_counts(site_url, bucket):
                 oldest = min(oldest, day)
                 if day in counts:
                     counts[day] += 1
-            if len(posts) < 100 or oldest < yesterday:
+            if len(posts) < 20 or oldest < yesterday:
                 return {'new_posts': counts[today], 'new_posts_delta': counts[today] - counts[yesterday]}
     except (requests.RequestException, ValueError, TypeError, KeyError):
         pass
