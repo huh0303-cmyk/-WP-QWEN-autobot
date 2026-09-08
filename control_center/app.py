@@ -2041,8 +2041,8 @@ def index():
     youtube_channels = get_youtube_data()
     sns_accounts = get_sns_data()
     from .tile_status import new_content
-    targets = [(site, "https://" + site["domain"], "wordpress") for site in sites]
-    targets += [(site, site["url"], "blogger") for site in bloggers]
+    # WordPress counts already include verified inventory fallback in get_site_data.
+    targets = [(site, site["url"], "blogger") for site in bloggers]
     targets += [(site, site["url"], "tistory") for site in tistory_sites]
     with ThreadPoolExecutor(max_workers=16) as pool:
         futures = [(site, pool.submit(new_content, url, platform, int(time.time() // 300))) for site, url, platform in targets]
