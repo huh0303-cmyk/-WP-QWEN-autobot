@@ -203,6 +203,8 @@ def select_music(service, folder_id, exts, mime_prefix):
         if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").lower() != "true":
             raise RuntimeError("Paid music generation is disabled")
         return generate_fresh_tracks()
+    if base.CHANNEL_KEY in {'globalmusic', 'kpop'}:
+        raise RuntimeError('WAITING_FRESH_COMPOSITIONS: owner requires newly composed music; Drive bank reuse is disabled')
     tracks = _bank_list(service, folder_id, exts, mime_prefix)
     from playlist_language_policy import select_bank_tracks
     return select_bank_tracks(tracks, base.CHANNEL_KEY)
