@@ -88,6 +88,8 @@ def get_youtube_service():
 
 def upload_to_youtube(service, video_path, thumb_path, title, description, tags=None):
     from googleapiclient.http import MediaFileUpload
+    from youtube_english_metadata import validate_metadata
+    validate_metadata(title, description)
     # HARD GATE: automated playlist uploads are always PRIVATE. Never set publishAt here.
     status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
     snippet = {"title": title, "description": description, "categoryId": "10"}
