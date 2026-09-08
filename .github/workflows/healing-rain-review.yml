@@ -1,0 +1,35 @@
+name: Private healing rainforest sample - 75 minutes
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: healing-rain-75-review
+  cancel-in-progress: false
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 pillow requests
+      - name: Synthesize continuous rain and upload privately to locked healing channel
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+        run: python -u scripts/healing_rain_review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: healing-rain-review-receipt
+          path: |
+            data/healing-rain-review/*.json
+            data/healing-rain-review/thumbnail.jpg
+            data/healing-rain-review/preview.mp4
+          retention-days: 14
