@@ -9,7 +9,8 @@ VPS playlist worker routes healing jobs to scripts/healing_motion.py. A stable s
 Sources reviewed 2026-09-08:
 
 - Rain footage: https://www.pexels.com/video/waving-leaves-during-heavy-rain-13166787/
-- Flowing water footage/audio: https://www.pexels.com/video/flowing-river-on-the-rain-forest-5021254/
+- Clear shallow creek footage: https://www.pexels.com/video/a-stream-in-the-jungle-with-rocks-and-trees-18132437/
+- Separate flowing-water audio, mixed at a gentle level: https://www.pexels.com/video/flowing-river-on-the-rain-forest-5021254/
 - Pexels license: https://www.pexels.com/license/
 - Bird audio: Magnesus, Forest birds - ambient seamless loop, https://freesound.org/people/Magnesus/sounds/723913/ . The source page explicitly specifies Creative Commons 0, https://creativecommons.org/publicdomain/zero/1.0/ . The bundled MP3 is the official high-quality preview, https://cdn.freesound.org/previews/723/723913_2008500-hq.mp3 . Retained locally to avoid intermittent CDN failures.
 

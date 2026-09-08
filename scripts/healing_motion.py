@@ -34,12 +34,15 @@ Footage: Pexels, used under the Pexels License. Bird ambience, when present: Mag
 MODE,SEED,MINUTES=configure()
 def render():
     work=job.WORK
-    source_id=13166787 if MODE=='rain' else 5021254
+    source_id=13166787 if MODE=='rain' else 18132437
     source=work/'source.mp4'
     download(f'https://www.pexels.com/download/video/{source_id}/',source)
     job.ff('-ss','3','-i',source,'-frames:v','1','-vf','scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080',work/'thumbnail.jpg')
     # Last second dissolves into first second; next loop begins where the dissolve ends.
-    transition='[0:v]fps=24,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1,split[a][b];[a]trim=start=1:end=10,setpts=PTS-STARTPTS[x];[b]trim=start=0:end=1,setpts=PTS-STARTPTS[y];[x][y]xfade=transition=fade:duration=1:offset=8[v]'
+    source_seconds=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','default=nw=1:nk=1',str(source)]))
+    end=min(40,int(source_seconds))
+    if end<10: raise RuntimeError('Nature source is too short')
+    transition=f'[0:v]fps=24,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1,split[a][b];[a]trim=start=1:end={end},setpts=PTS-STARTPTS[x];[b]trim=start=0:end=1,setpts=PTS-STARTPTS[y];[x][y]xfade=transition=fade:duration=1:offset={end-2}[v]'
     job.ff('-i',source,'-filter_complex_threads','1','-filter_complex',transition,'-map','[v]','-an','-c:v','libx264','-preset','fast','-b:v','2200k','-maxrate','2600k','-bufsize','5200k','-pix_fmt','yuv420p',work/'scene.mp4')
     tail=f'afade=t=in:d=4,afade=t=out:st={job.DURATION-6}:d=6'
     if MODE=='rain':
@@ -48,8 +51,10 @@ def render():
     else:
         import shutil
         shutil.copyfile(job.ROOT/'assets/playlist-review/forest-birds-cc0.mp3',work/'birds.mp3')
+        water_source=work/'water-source.mp4'
+        download('https://www.pexels.com/download/video/5021254/',water_source)
         # Crossfade the field audio once into a seamless loop, then mix gentle birds.
-        job.ff('-i',source,'-filter_complex','[0:a]asplit[x][y];[x]atrim=start=1:end=18,asetpts=PTS-STARTPTS[a];[y]atrim=start=0:end=1,asetpts=PTS-STARTPTS[b];[a][b]acrossfade=d=1[c]','-map','[c]','-c:a','pcm_s16le',work/'water.wav')
+        job.ff('-i',water_source,'-filter_complex','[0:a]asplit[x][y];[x]atrim=start=1:end=18,asetpts=PTS-STARTPTS[a];[y]atrim=start=0:end=1,asetpts=PTS-STARTPTS[b];[a][b]acrossfade=d=1[c]','-map','[c]','-c:a','pcm_s16le',work/'water.wav')
         inputs=['-stream_loop','-1','-i',work/'water.wav','-stream_loop','-1','-i',work/'birds.mp3']
         filters='[1:a]loudnorm=I=-25:TP=-3:LRA=7[w];[2:a]loudnorm=I=-32:TP=-5:LRA=7[b];[w][b]amix=inputs=2:normalize=0,'+tail+'[a]'
     job.save('synthesis.json',{'minutes':MINUTES,'mode':MODE,'seed':SEED,'motion':'real footage with crossfaded loop','source_id':source_id,'license':'https://www.pexels.com/license/','bird_license':'CC0 https://freesound.org/people/Magnesus/sounds/723913/','thumbnail_text':False})
