@@ -119,7 +119,7 @@ def _thumbnail_prompt(topic: str) -> str:
     # one memorable scene, restrained palette, and intentional negative space.
     # No specific thumbnail, character, artwork, or brand identity is copied.
     direction = {
-        "globalmusic": "golden-hour romantic cafe, one couple in soft silhouette, calm negative space on the left",
+        "globalmusic": "golden-hour romantic riverside cafe, diverse adult male-female couples in natural affectionate moments, clearly visible faces, calm open sky in the upper third for one large title",
         "kpop": "modern Korean acoustic listening room, one original adult subject on the right, negative space on the left",
         "starbucks": "cozy independent cafe, one window table and piano, warm restrained palette, negative space on the left",
         "mbb": "elegant classical chamber hall, one grand piano on the right, timeless low-contrast light, negative space on the left",
@@ -166,41 +166,32 @@ def fresh_image(topic, workdir, service=None):
 
 
 def benchmark_thumbnail(_channel, image_path, output_path, topic, **_kwargs):
-    """Overlay an original, deliberately smaller type system on the fresh photo."""
+    """Owner's latest requirement: one very large, mobile-readable PLAYLIST label."""
     image = base._resize_cover(Image.open(image_path).convert("RGB"), 1280, 720)
     overlay = Image.new("RGBA", image.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay, "RGBA")
-    draw.rounded_rectangle((42, 438, 610, 666), radius=24, fill=(5, 8, 16, 132))
     font_path = base.ensure_font()
-    title = (topic or "ORIGINAL PLAYLIST").strip()
-    words, lines, current = title.split(), [], ""
-    for word in words:
-        candidate = f"{current} {word}".strip()
-        if len(candidate) > 22 and current:
-            lines.append(current)
-            current = word
-        else:
-            current = candidate
-    lines.append(current)
-    lines = lines[:2]
-    title_font = ImageFont.truetype(font_path, 62 if len(" ".join(lines)) < 25 else 52)
-    label_font = ImageFont.truetype(font_path, 25)
-    draw.text((78, 472), "YOUR QUIET MOMENT", font=label_font, fill=(238, 224, 190, 245))
-    y = 516
-    for line in lines:
-        draw.text((76, y), line, font=title_font, fill=(255, 255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0, 120))
-        y += title_font.size + 4
+    size=200
+    title_font=ImageFont.truetype(font_path,size)
+    while draw.textlength('PLAYLIST',font=title_font)>1088:
+        size-=2
+        title_font=ImageFont.truetype(font_path,size)
+    draw.text((644,216),'PLAYLIST',anchor='mm',font=title_font,fill=(0,0,0,160),stroke_width=4)
+    draw.text((640,210),'PLAYLIST',anchor='mm',font=title_font,fill='white',stroke_width=1,stroke_fill=(40,30,30,130))
     composed = Image.alpha_composite(image.convert("RGBA"), overlay).convert("RGB")
     return base._save_thumbnail_capped(composed, output_path)
 
 
 def make_intro_video(image_path, audio_path, out_path):
-    vf = ("scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
-          "zoompan=z='1+min(on,150)*0.0003':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1920x1080:fps=25,"
-          "fade=t=in:st=0:d=1.2,format=yuv420p")
-    base.run_ffmpeg(["ffmpeg", "-y", "-loop", "1", "-framerate", "25", "-i", image_path, "-i", audio_path,
-                     "-vf", vf, "-af", "afade=t=in:st=0:d=0.5", "-c:v", "libx264", "-preset", "fast",
-                     "-crf", "21", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", out_path])
+    vf=("[0:v]scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,"
+        "zoompan=z='1+min(on,71)*0.00025':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1280x720:fps=12,"
+        "fade=t=in:st=0:d=1,drawbox=x=0:y=625:w=iw:h=95:color=black@0.30:t=fill[bg];"
+        "[1:a]aformat=channel_layouts=mono,showwaves=s=1152x56:mode=cline:rate=12:colors=white:scale=sqrt[wave];"
+        "[bg][wave]overlay=64:646:shortest=1,format=yuv420p[v]")
+    base.run_ffmpeg(["ffmpeg","-y","-loop","1","-framerate","12","-i",image_path,"-i",audio_path,
+                    "-filter_complex",vf,"-map","[v]","-map","1:a","-c:v","libx264","-preset","veryfast",
+                    "-tune","stillimage","-crf","20","-threads","2","-c:a","aac","-b:a","192k",
+                    "-movflags","+faststart","-shortest",out_path])
 
 
 def build_fresh_healing(_service, _theme, output_path):
