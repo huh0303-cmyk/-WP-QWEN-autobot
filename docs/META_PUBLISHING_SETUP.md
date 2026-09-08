@@ -15,8 +15,8 @@
 - `me/accounts?fields=id,name,tasks`가 정상 응답했으며 세 페이지의 MANAGE 및 CREATE_CONTENT 작업 권한을 확인했다. 현재 상태에서는 목록 조회를 위해 비즈니스 인증을 먼저 진행할 필요가 없다.
 - Facebook Graph API 페이지 ID: LANGUAGE `1236641259534475`, ENGLISH `1247951015067104`, TOPIK `1128119143729384`. 전달받았던 `61593057083167` 및 `61592457107609` 대신 API에서 검증한 ID를 사용한다.
 - 저장소 Secrets 100개 한도 때문에 새 SNS 자격 증명은 기존 `social-publish` Environment Secrets에 저장한다. `social-publish-one.yml`의 게시 job은 이 환경을 참조한다. 기존 저장소 Secrets는 그대로 사용할 수 있다.
-- `FB_PAGE_ID_ENGLISH`, `FB_PAGE_ID_LANGUAGE`를 이 환경에 등록했다. 페이지 액세스 토큰은 아직 등록하지 않았다.
-- 기존 사용자 토큰에는 `pages_manage_posts`, `instagram_basic`, `instagram_content_publish`가 없다. 탐색기에서 세 권한 선택과 OAuth 요청 전달은 확인했지만 새 권한 승인 및 장기 토큰 교환은 아직 완료하지 않았다.
+- `FB_PAGE_ID_ENGLISH`, `FB_PAGE_ID_LANGUAGE`, `FB_PAGE_ACCESS_TOKEN_ENGLISH`, `FB_PAGE_ACCESS_TOKEN_LANGUAGE`를 `social-publish` 환경에 등록하고 이름 목록으로 저장 완료를 확인했다.
+- 2026-09-08 사용자 승인 후 세 페이지의 `pages_manage_posts` 권한을 추가했다. Meta 재인증 후 유효한 장기 사용자 토큰(만료 Unix 1794021754)을 확인하고 `me/accounts`로 페이지별 토큰을 확보했다. Instagram 게시 권한 및 Threads OAuth는 아직 완료하지 않았다.
 - Instagram 동의 화면에는 `sis_topik1` (`17841410825136018`)만 표시됐다. ENGLISH/LANGUAGE의 계정 연결은 확인 전이며 TOPIK 계정으로 대체하지 않는다.
 - Threads는 별도 OAuth가 필요하고 아직 토큰/사용자 ID를 등록하지 않았다.
 - 현재 사용 가능한 Actions 아티팩트에서 `topik-review-*`를 찾지 못했다. 발행 테스트 전에 브랜드에 맞는 기존 영상·캡션·공개 HTTPS MP4 또는 새 검수 아티팩트를 준비해야 한다. 실제 발행 테스트는 아직 실행하지 않았다.
