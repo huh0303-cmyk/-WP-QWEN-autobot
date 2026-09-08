@@ -632,7 +632,7 @@ def get_site_data():
             or index_audit_sites.get(item["domain"])
             or {}
         )
-        from .metric_evidence import index_metrics
+        from .metric_evidence import index_metrics, post_metrics
         evidence = index_metrics(audit_entry)
         sites.append({
             "site_id": registered.site_id if registered else item["domain"],
@@ -645,7 +645,7 @@ def get_site_data():
             "total_posts": total_posts,
             "posts_delta": posts_delta,
             **evidence,
-            **post_results.get(item["domain"], {}),
+            **post_metrics(post_results.get(item["domain"], {}), audit_entry),
             "visitor_connected": bool(live_traffic.get("connected")),
             "visitor_checked_at": live_traffic.get("date") or stored_traffic.get("checked_at") or "",
             "category": registered.theme if registered else "미분류",
