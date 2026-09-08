@@ -1,0 +1,37 @@
+name: Correct private romantic review to one large couple
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: romantic-single-couple-review
+  cancel-in-progress: false
+jobs:
+  revise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 pillow requests python-dotenv
+      - name: Update thumbnail and render private correction
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+        run: python -u scripts/revise_romantic_single_couple.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: single-couple-review-receipt
+          path: |
+            data/romantic-review-single-couple-20260908/*.json
+            data/romantic-review-single-couple-20260908/thumbnail.jpg
+          if-no-files-found: warn
+          retention-days: 7

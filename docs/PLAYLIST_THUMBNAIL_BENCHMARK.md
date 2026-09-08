@@ -14,8 +14,10 @@ checking its channel and actual thumbnails.
   with warm candle/fire light; a short, clear centered two-word title; scene fills
   the frame. The channel logo is not part of our design.
 - Apply the composition principles to an original scene, not a copied image.
-- Cafe Romantic review: original Paris riverside cafe at sunset, diverse adult
-  male-female couples, amber candle, restrained rose/plum palette. Owner's latest
+- Cafe Romantic: EXACTLY ONE adult male-female couple shown large, two people total.
+  Vary cultural background across separate videos, never several couples in one image.
+  Randomly vary bright, airy backgrounds: open sea, beach cafe, garden, lakeside.
+  Owner's latest
   direction overrides the initial small title: `PLAYLIST` must be extremely large.
 - Video must include a moving waveform derived from the real soundtrack, not a
   decorative repeated animation. Keep the people and large title readable.
