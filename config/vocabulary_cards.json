@@ -7,6 +7,8 @@
   "windows": {"morning": ["03:00", "07:00"], "evening": ["14:00", "18:00"]},
   "platforms": ["youtube", "tiktok", "facebook", "instagram", "threads"],
   "brands": {"TOPIK": "ko", "ENGLISH": "en", "LANGUAGE": ["de", "fr", "vi", "es"]},
+  "brand_names": {"TOPIK": "서울국제대학SIS-TOPIK", "ENGLISH": "English Survival", "LANGUAGE": "SIS Language"},
+  "allow_cross_brand_fallback": false,
   "explanation_languages": {"ko": "ko", "en": "ko", "de": "en", "fr": "en", "vi": "en", "es": "en"},
   "word_repetitions": 5,
   "sentence_repetitions": 5,
