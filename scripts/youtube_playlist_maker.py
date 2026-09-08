@@ -8,9 +8,12 @@ from __future__ import annotations
 import json
 import os
 import random
+import re
 import shutil
 import sys
 from pathlib import Path
+
+import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 for entry in (ROOT, ROOT / "scripts"):
@@ -84,12 +87,89 @@ def _music_prompt(index: int) -> str:
             f"references. Keep a clean beginning and ending. Unique production seed: {index}-{random.getrandbits(64):016x}.")
 
 
+# MBB plays real Mozart/Bach/Beethoven performances, not AI-generated
+# "in the style of" imitations — only Internet Archive items whose own
+# licenseurl is explicitly public domain are used, matching the same
+# license-verification pattern archive_footage_longform_legacy.py already
+# uses for video.
+MBB_COMPOSERS = ["Bach", "Mozart", "Beethoven"]
+MBB_FORMS = ["concerto", "sonata"]
+
+
+def _search_pd_classical(query, count):
+    response = requests.get(
+        "https://archive.org/advancedsearch.php",
+        params={
+            "q": f"title:({query}) AND mediatype:(audio) AND licenseurl:(*publicdomain*)",
+            "fl[]": ["identifier", "title"],
+            "rows": count,
+            "output": "json",
+        },
+        timeout=30,
+    )
+    response.raise_for_status()
+    return response.json()["response"]["docs"]
+
+
+def _pd_mp3_url(identifier):
+    meta = requests.get(f"https://archive.org/metadata/{identifier}", timeout=30).json()
+    mp3_file = next((f for f in meta.get("files", []) if f.get("name", "").lower().endswith(".mp3")), None)
+    if not mp3_file:
+        return None
+    return f"https://archive.org/download/{identifier}/{mp3_file['name']}"
+
+
+def fetch_mbb_tracks(workdir, n_target, minimum_seconds):
+    tracks, total, seen = [], 0.0, set()
+    queries = [f"{composer} {form}" for composer in MBB_COMPOSERS for form in MBB_FORMS]
+    random.shuffle(queries)
+    for query in queries * 3:
+        if len(tracks) >= n_target and total >= minimum_seconds:
+            break
+        docs = _search_pd_classical(query, 20)
+        random.shuffle(docs)
+        for doc in docs:
+            if len(tracks) >= n_target and total >= minimum_seconds:
+                break
+            identifier = doc["identifier"]
+            if identifier in seen:
+                continue
+            seen.add(identifier)
+            try:
+                url = _pd_mp3_url(identifier)
+                if not url:
+                    continue
+                safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", identifier)[:60]
+                out_path = Path(workdir) / f"mbb_pd_{len(tracks):02d}_{safe_name}.mp3"
+                if not out_path.exists():
+                    resp = requests.get(url, timeout=120)
+                    resp.raise_for_status()
+                    out_path.write_bytes(resp.content)
+                duration = base.get_duration(str(out_path))
+                if duration < 20:
+                    continue
+            except Exception as exc:
+                base.log(f"   ⚠️ MBB PD 다운로드 실패({identifier}): {exc}")
+                continue
+            file_id = f"{GENERATED_PREFIX}{len(tracks) + 1}"
+            _generated_paths[file_id] = str(out_path)
+            tracks.append({"id": file_id, "name": out_path.name, "duration": duration})
+            total += duration
+            base.log(f"   MBB 실연주 확보 {len(tracks)}/{n_target}: {doc.get('title', identifier)}")
+    if total < minimum_seconds:
+        raise RuntimeError(f"Public-domain MBB recordings only totaled {total / 60:.1f} minutes")
+    return tracks
+
+
 def generate_fresh_tracks(*_args, **_kwargs):
     global _track_languages
     # Prepare a mixed-language playlist, regardless of a single-language calendar label.
     minimum_seconds = int(os.environ.get("PLAYLIST_FRESH_AUDIO_SECONDS", str(70 * 60)))
     requested = max(1, int(os.environ.get("LYRIA_TRACK_COUNT", "20")))
     maximum = max(requested, int(os.environ.get("LYRIA_MAX_TRACKS", "30")))
+    if base.CHANNEL_KEY == "mbb":
+        # Real Mozart/Bach/Beethoven performances, not an AI approximation of them.
+        return fetch_mbb_tracks(base.WORKDIR, maximum, minimum_seconds)
     from playlist_language_policy import romantic_languages
     _track_languages = romantic_languages(maximum)
     tracks, total = [], 0.0
