@@ -104,8 +104,8 @@ Hard rules:
   visible through a large window; no commercial cafe brand marks
 - MBB uses elegant instruments and theme-led classical photography; thumbnail text is short and must never overlap
 - K-pop uses high-end realistic Korean pop editorial photography
-- all YouTube generation and FFmpeg rendering runs on the VPS single-owner queue; retained GitHub Actions video
-  workflows stay hard-disabled and Render configuration is forbidden
+- all YouTube generation and FFmpeg rendering runs on the Hostinger VPS single-owner queue; retained GitHub Actions
+  video workflows stay hard-disabled, and no second production host is allowed
 - every playlist channel runs once after a random 2-3 day interval, never a fixed two-day cadence
 - the next KST execution time uses an irregular random minute inside the allowed window; round
   five-minute marks and the channel's previous HH:MM are excluded so repeated machine-like timestamps

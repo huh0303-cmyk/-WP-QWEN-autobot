@@ -1,7 +1,8 @@
 # Korea365 VPS runtime
 
-Production topology is `nginx -> gunicorn control center -> durable VPS queue -> single YouTube worker`.
-Render and GitHub Actions are not YouTube render hosts.
+Hostinger VPS is the sole production host.
+The production topology is `nginx -> gunicorn control center -> durable VPS queue -> single YouTube worker`.
+GitHub Actions is CI-only and does not generate or upload YouTube videos.
 
 Install `ffmpeg`, `fonts-nanum`, Python 3.11+, create user `korea365`, clone this repository at
 `/opt/korea365`, create `/opt/korea365/.venv`, and install `requirements-control-center.txt` plus

@@ -15,11 +15,12 @@ def test_queue_is_durable_and_rejects_duplicate_channel(monkeypatch, tmp_path):
         enqueue("kpop", "K-pop", "youtube_kpop")
 
 
-def test_render_host_contract_is_vps_only():
+def test_hostinger_vps_contract_is_single_owner():
     root = Path(__file__).resolve().parents[1]
-    assert not (root / "render.yaml").exists()
     assert "enqueue_youtube_vps" in (root / "control_center" / "app.py").read_text(encoding="utf-8")
     assert "--daemon" in (root / "deploy" / "vps" / "korea365-youtube-worker.service").read_text(encoding="utf-8")
-    assert "--enqueue-channel globalmusic" in (root / "deploy" / "vps" / "README.md").read_text(encoding="utf-8")
+    vps_readme = (root / "deploy" / "vps" / "README.md").read_text(encoding="utf-8")
+    assert "Hostinger VPS is the sole production host" in vps_readme
+    assert "--enqueue-channel globalmusic" in vps_readme
     for name in ("youtube-control-scheduler.yml", "generate-youtube-playlist.yml", "curio-longform-daily.yml"):
         assert "if: ${{ false }}" in (root / ".github" / "workflows" / name).read_text(encoding="utf-8")

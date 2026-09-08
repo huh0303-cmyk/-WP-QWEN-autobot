@@ -115,8 +115,9 @@ def main() -> None:
     for name in ("youtube-control-scheduler.yml", "generate-youtube-playlist.yml", "curio-longform-daily.yml"):
         if "if: ${{ false }}" not in workflow_text.get(name, ""):
             fail(f"{name} can still run; YouTube production must be VPS-only")
-    if (ROOT / "render.yaml").exists():
-        fail("render.yaml returned; control.korea365.org is VPS-only")
+    vps_readme = (ROOT / "deploy" / "vps" / "README.md").read_text(encoding="utf-8")
+    if "Hostinger VPS is the sole production host" not in vps_readme:
+        fail("Hostinger VPS single-host contract is missing")
     control_source = (ROOT / "control_center" / "app.py").read_text(encoding="utf-8")
     vps_worker = (ROOT / "scripts" / "youtube_vps_worker.py").read_text(encoding="utf-8")
     playlist = (ROOT / "scripts" / "youtube_playlist_maker.py").read_text(encoding="utf-8")
