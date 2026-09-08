@@ -1,31 +1,36 @@
 {
-  "generation_mode": "fresh_api_required",
-  "reuse_existing_assets": false,
+  "generation_mode": "approved_bank_and_gemini_app",
+  "reuse_existing_assets": true,
   "paid_api_fallback": false,
-  "image_source": "gemini-3.1-flash-image",
+  "image_source": "gemini_app_export",
   "thumbnail_benchmark": "common_layout_patterns_from_playlist_channels_over_500k_subscribers_only",
   "thumbnail_copy_prohibited": true,
   "thumbnail_original_photo_required": true,
   "thumbnail_typography": "new_font_and_size_with_each_house_layout",
   "music_sources": {
     "healing": [
-      "lyria-3.5-fresh-api"
+      "approved_existing_audio",
+      "gemini_app_lyria_export"
     ],
     "mbb": [
-      "lyria-3.5-fresh-api"
+      "approved_existing_audio",
+      "gemini_app_lyria_export"
     ],
     "starbucks": [
-      "lyria-3.5-fresh-api"
+      "approved_existing_audio",
+      "gemini_app_lyria_export"
     ],
     "globalmusic": [
-      "lyria-3.5-fresh-api"
+      "approved_existing_audio",
+      "gemini_app_lyria_export"
     ],
     "kpop": [
-      "lyria-3.5-fresh-api"
+      "approved_existing_audio",
+      "gemini_app_lyria_export"
     ]
   },
   "target_minutes": 60,
-  "api_key_required": true,
+  "api_key_required": false,
   "interval_days_min": 2,
   "interval_days_max": 3,
   "publication_status": "private",
@@ -52,7 +57,8 @@
     "french_voice": "sweet cute adult female, soft natural singing",
     "style": "sweet acoustic cafe romance",
     "reference_sample": "https://gemini.google.com/app/7b76cb5aaf4a3a56",
-    "sample_approved": true
+    "sample_approved": true,
+    "ratio_basis": "track_count_per_playlist; French and Japanese together 50%, Spanish 25%, Italian 25%"
   },
   "duration_minutes_min": 50,
   "duration_minutes_max": 70,

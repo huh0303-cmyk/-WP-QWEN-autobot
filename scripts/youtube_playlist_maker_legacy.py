@@ -909,10 +909,10 @@ def build_playlist_audio(service, tracks_meta, out_path, duration_range=None):
     # 예전엔 풀을 한 바퀴 돌고 그냥 끝나서 영상이 목표보다 훨씬 짧게 나왔다
     # (2026-08-16 사용자 지적) — 이제 목표에 도달할 때까지 풀을 반복해서 순회한다.
     # 무한루프 방지용 안전 상한만 걸어둔다.
-    max_passes = 40
+    max_passes = 1
     i = 0
 
-    while accumulated < target_max_sec and i < len(shuffled) * max_passes:
+    while (CHANNEL_KEY == "globalmusic" or accumulated < target_max_sec) and i < len(shuffled) * max_passes:
         meta = shuffled[i % len(shuffled)]
         i += 1
 
@@ -934,7 +934,7 @@ def build_playlist_audio(service, tracks_meta, out_path, duration_range=None):
                 continue
             downloaded[meta["id"]] = (local_path, dur)
 
-        if accumulated >= target_min_sec and accumulated + dur > target_max_sec:
+        if CHANNEL_KEY != "globalmusic" and accumulated >= target_min_sec and accumulated + dur > target_max_sec:
             # 목표 구간 안에 이미 들어와 있고 이 곡을 더하면 넘침 -> 여기서 종료
             log(f"   (목표 구간 도달 — 반복 추가 중단)")
             break
@@ -1737,10 +1737,10 @@ def main():
 
     audio_path = os.path.join(WORKDIR, "playlist_audio.m4a")
     if healing_theme:
-        log(f"1-2/5 healing 테마({healing_theme}) Lyria 새 음악 생성 중...")
+        log(f"1-2/5 healing 테마({healing_theme}) 승인된 음원 준비 중...")
         total_sec = build_healing_theme_audio(service, healing_theme, audio_path)
     else:
-        log("1/5 Lyria API로 새 음악 생성 중...")
+        log("1/5 승인된 음원 준비 중...")
         tracks = list_folder_files(service, MUSIC_SOURCE_FOLDER_ID, AUDIO_EXTS, "audio/")
         if not tracks:
             log("❌ Lyria가 재생 가능한 새 음원을 반환하지 않았습니다")

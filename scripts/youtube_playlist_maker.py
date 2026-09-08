@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Create every playlist from fresh Lyria music and a fresh Gemini image.
 
-Drive is output transport only. Existing Drive music/images are never read.
+Prefer existing approved music and Gemini app exports; API generation is explicit opt-in.
 """
 from __future__ import annotations
 
@@ -21,18 +21,17 @@ import youtube_playlist_maker_legacy as base
 from gemini_media_provider import generate_lyria_track, generate_thumbnail
 from PIL import Image, ImageDraw, ImageFont
 
+_bank_list = base.list_folder_files
+_bank_download = base.download_drive_file
 GENERATED_PREFIX = "fresh-lyria:"
 _generated_paths: dict[str, str] = {}
 _selected_language = ""
+_track_languages = []
 
 
 def metadata(topic, caption, duration_min):
-    labels = {"healing": "Original Ambient Music", "kpop": "Original K-pop",
-              "mbb": "Original Classical Music", "globalmusic": "Original Romantic Songs",
-              "starbucks": "Original Instrumental Cafe Music"}
-    label = labels[base.CHANNEL_KEY]
-    return (f"{topic} | {label} | {round(duration_min)} min",
-            f"{label}: {topic}.\nPlaying time: {round(duration_min)} minutes.", [label, topic], False)
+    from youtube_english_metadata import playlist_metadata
+    return playlist_metadata(base.CHANNEL_KEY, topic, duration_min)
 
 
 def balanced_language(counts):
@@ -67,9 +66,10 @@ def pick_topic():
 
 def _music_prompt(index: int) -> str:
     topic = os.environ.get("TOPIC_KEYWORD", "").strip() or "signature channel mood"
-    language = os.environ.get("LANGUAGE_KEYWORD", "").strip() or _selected_language
+    language = (_track_languages[index - 1] if base.CHANNEL_KEY == "globalmusic" and index <= len(_track_languages)
+                else os.environ.get("LANGUAGE_KEYWORD", "").strip() or _selected_language)
     style = {
-        "globalmusic": f"a warm romantic acoustic vocal song in {language or 'French, Japanese, Spanish, or Italian'}",
+        "globalmusic": f"a sweet adult female romantic acoustic vocal song in {language or 'French, Japanese, Spanish, or Italian'}",
         "kpop": "an original Korean-language acoustic K-pop song with fresh lyrics",
         "starbucks": "an instrumental cafe jazz and soft piano piece, no vocals",
         "mbb": "an original elegant classical chamber and piano piece, instrumental only",
@@ -81,10 +81,13 @@ def _music_prompt(index: int) -> str:
 
 
 def generate_fresh_tracks(*_args, **_kwargs):
-    # Generate the full upper bound so the legacy assembler never needs to loop a track.
+    global _track_languages
+    # Prepare a mixed-language playlist, regardless of a single-language calendar label.
     minimum_seconds = int(os.environ.get("PLAYLIST_FRESH_AUDIO_SECONDS", str(70 * 60)))
     requested = max(1, int(os.environ.get("LYRIA_TRACK_COUNT", "20")))
     maximum = max(requested, int(os.environ.get("LYRIA_MAX_TRACKS", "30")))
+    from playlist_language_policy import romantic_languages
+    _track_languages = romantic_languages(maximum)
     tracks, total = [], 0.0
     for index in range(1, maximum + 1):
         path = Path(base.WORKDIR) / f"fresh_lyria_{index:02d}.mp3"
@@ -107,7 +110,7 @@ def generate_fresh_tracks(*_args, **_kwargs):
 def copy_generated(_service, file_id, output_path):
     source = _generated_paths.get(file_id)
     if not source:
-        raise RuntimeError("Drive music input is disabled; only fresh Lyria tracks are accepted")
+        return _bank_download(_service, file_id, output_path)
     shutil.copyfile(source, output_path)
 
 
@@ -129,7 +132,23 @@ def _thumbnail_prompt(topic: str) -> str:
 
 
 def fresh_image(topic, workdir, service=None):
-    del service
+    if os.environ.get("PLAYLIST_IMAGE_SOURCE", "gemini_app_export") != "gemini_api":
+        service = base.get_drive_service()
+        items = _bank_list(service, base.THUMBNAIL_FOLDER_ID, base.IMAGE_EXTS, "image/")
+        items = [item for item in items if "gemini" in item['name'].lower()]
+        if not items:
+            raise RuntimeError("WAITING_ASSETS: save an approved Gemini thumbnail export named gemini_* in this channel thumbnail folder")
+        raw_path = Path(workdir) / ("gemini_app_export" + Path(random.choice(items)['name']).suffix)
+        chosen = random.choice(items)
+        _bank_download(service, chosen['id'], str(raw_path))
+        with Image.open(raw_path) as image:
+            image.verify()
+        with Image.open(raw_path) as image:
+            if image.width < 1280 or image.height < 720:
+                raise RuntimeError("Gemini app thumbnail must be at least 1280x720")
+        return [str(raw_path)]
+    if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").lower() != "true":
+        raise RuntimeError("Paid image generation is disabled")
     raw_path = Path(workdir) / "fresh_gemini_thumbnail.bin"
     generate_thumbnail(_thumbnail_prompt(topic), raw_path)
     try:
@@ -166,7 +185,7 @@ def benchmark_thumbnail(_channel, image_path, output_path, topic, **_kwargs):
     lines = lines[:2]
     title_font = ImageFont.truetype(font_path, 62 if len(" ".join(lines)) < 25 else 52)
     label_font = ImageFont.truetype(font_path, 25)
-    draw.text((78, 472), "FRESH ORIGINAL MUSIC", font=label_font, fill=(238, 224, 190, 245))
+    draw.text((78, 472), "YOUR QUIET MOMENT", font=label_font, fill=(238, 224, 190, 245))
     y = 516
     for line in lines:
         draw.text((76, y), line, font=title_font, fill=(255, 255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0, 120))
@@ -188,12 +207,28 @@ def build_fresh_healing(_service, _theme, output_path):
     return base.build_playlist_audio(None, generate_fresh_tracks(), output_path)
 
 
+def select_music(service, folder_id, exts, mime_prefix):
+    if os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank") == "lyria_api":
+        if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").lower() != "true":
+            raise RuntimeError("Paid music generation is disabled")
+        return generate_fresh_tracks()
+    tracks = _bank_list(service, folder_id, exts, mime_prefix)
+    from playlist_language_policy import select_bank_tracks
+    return select_bank_tracks(tracks, base.CHANNEL_KEY)
+
+
+def build_hybrid_healing(service, theme, output_path):
+    tracks = select_music(service, base.MUSIC_SOURCE_FOLDER_ID, base.AUDIO_EXTS, "audio/")
+    return base.build_playlist_audio(service, tracks, output_path)
+
+
 base.GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 base.pick_auto_topic = pick_topic
-base.list_folder_files = generate_fresh_tracks
+base.list_folder_files = select_music
 base.download_drive_file = copy_generated
 base.filter_tracks_by_language = lambda tracks, _keyword: tracks
-base.build_healing_theme_audio = build_fresh_healing
+base.generate_caption = lambda topic: topic
+base.build_healing_theme_audio = build_hybrid_healing
 base.fetch_healing_photo = lambda theme, workdir: fresh_image(theme, workdir)[0]
 base.build_ai_images = fresh_image
 base.generate_youtube_title_description = metadata

@@ -38,6 +38,8 @@ def test_fresh_tracks_are_unique_and_never_drive_inputs(monkeypatch, tmp_path):
 
 
 def test_thumbnail_is_generated_fresh_once(monkeypatch, tmp_path):
+    monkeypatch.setenv("PLAYLIST_IMAGE_SOURCE", "gemini_api")
+    monkeypatch.setenv("PLAYLIST_PAID_API_ENABLED", "true")
     calls = []
 
     def generate(prompt, path):
@@ -57,7 +59,9 @@ def test_playlist_duration_and_metadata_policy(monkeypatch):
     assert all(value == (3000, 4200) for value in maker.base.HEALING_THEME_DURATION_SEC.values())
     monkeypatch.setattr(maker.base, "CHANNEL_KEY", "kpop")
     title, _description, _tags, fallback = maker.metadata("Tonight in Seoul", "", 60)
-    assert "Original K-pop" in title
+    assert "Korean Acoustic Pop" in title
+    assert 800 <= len(_description) <= 1200
+    assert len(title) <= 100
     assert fallback is False
 
 
