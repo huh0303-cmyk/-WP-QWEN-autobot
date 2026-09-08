@@ -318,29 +318,32 @@ def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, objec
     Missing or malformed responses are never replaced with invented numbers.
     """
     del five_minute_bucket
-    try:
-        response = requests.get(
-            f"{site_url.rstrip('/')}/wp-json/site-stats/v1/visitors",
-            timeout=8,
-            headers={"User-Agent": "Korea365-Control-Room/1.0"},
-        )
-        response.raise_for_status()
-        payload = response.json()
-        today = int(payload["count"])
-        yesterday = int(payload["yesterday_count"])
-        total = int(payload["total"])
-        return {
-            "connected": True,
-            "date": payload.get("date"),
-            "daily_visitors": today,
-            "visitor_delta": today - yesterday,
-            "yesterday_visitors": yesterday,
-            "total_visitors": total,
-            # The all-time counter grows by today's visits since midnight.
-            "total_delta": today,
-        }
-    except (requests.RequestException, ValueError, TypeError, KeyError):
-        return {"connected": False}
+    for attempt in range(3):
+        try:
+            response = requests.get(
+                f"{site_url.rstrip('/')}/wp-json/site-stats/v1/visitors",
+                timeout=(5, 12),
+                headers={"User-Agent": "Korea365-Control-Room/1.0"},
+            )
+            response.raise_for_status()
+            payload = response.json()
+            today = int(payload["count"])
+            yesterday = int(payload["yesterday_count"])
+            total = int(payload["total"])
+            return {
+                "connected": True,
+                "date": payload.get("date"),
+                "daily_visitors": today,
+                "visitor_delta": today - yesterday,
+                "yesterday_visitors": yesterday,
+                "total_visitors": total,
+                # The all-time counter grows by today's visits since midnight.
+                "total_delta": today,
+            }
+        except (requests.RequestException, ValueError, TypeError, KeyError):
+            if attempt == 2:
+                return {"connected": False}
+            time.sleep(0.3 * (attempt + 1))
 
 
 @lru_cache(maxsize=128)
@@ -563,16 +566,10 @@ def get_site_data():
         {"domain": "theseouljournal.com", "today": 55, "total": 1000, "diff": 0, "persona": "", "tone": ""}
     ]
     root = Path(__file__).resolve().parents[1]
-    traffic_by_domain = {}
-    traffic_path = root / "daily_site_traffic_result.json"
-    if traffic_path.exists():
-        try:
-            traffic_by_domain = {
-                row["domain"]: row
-                for row in json.loads(traffic_path.read_text(encoding="utf-8")).get("records", [])
-            }
-        except (OSError, ValueError, KeyError):
-            traffic_by_domain = {}
+    traffic_by_domain = {
+        row['domain']: row for row in _current_traffic_manifest(int(time.time() // 300)).get('records', [])
+        if row.get('domain')
+    }
     history_sites = {}
     history_path = root / "situation_room_history.json"
     if history_path.exists():
@@ -597,6 +594,12 @@ def get_site_data():
             domain: executor.submit(_wp_visitor_stats, site.url, bucket)
             for domain, site in registry_by_domain.items()
         }
+        from .metric_evidence import recent_post_counts
+        post_futures = {
+            domain: executor.submit(recent_post_counts, site.url, bucket)
+            for domain, site in registry_by_domain.items()
+        }
+        post_results = {domain: future.result() for domain, future in post_futures.items()}
         category_results = {domain: future.result() for domain, future in category_futures.items()}
         visitor_results = {domain: future.result() for domain, future in visitor_futures.items()}
     _attach_wp_category_deltas(category_results)
@@ -629,27 +632,8 @@ def get_site_data():
             or index_audit_sites.get(item["domain"])
             or {}
         )
-        audit_summary = audit_entry.get("summary") or {}
-        indexed = audit_summary.get("indexed")
-        indexed_delta = audit_summary.get("indexed_delta")
-        index_unknown = audit_summary.get("unknown")
-        index_checked_at = audit_entry.get("audited_at") or ""
-        if index_unknown:
-            indexed_delta = None
-            if not indexed and not audit_summary.get("unindexed"):
-                indexed = None
-        if audit_entry.get("error"):
-            indexed = None
-            indexed_delta = None
-        if indexed is not None:
-            index_status = (
-                f"Google URL별 확인 · 미확인 {index_unknown}개"
-                if index_unknown else "Google URL별 전수 확인"
-            )
-        elif audit_entry.get("error") == "gsc_property_not_accessible":
-            index_status = "Search Console 권한 연결 필요"
-        else:
-            index_status = "확인 실패 · 재검사 필요" if index_unknown or audit_entry.get("error") else "정밀 집계 중"
+        from .metric_evidence import index_metrics
+        evidence = index_metrics(audit_entry)
         sites.append({
             "site_id": registered.site_id if registered else item["domain"],
             "domain": item["domain"],
@@ -660,14 +644,8 @@ def get_site_data():
             "total_delta": traffic.get("total_delta") if traffic_fresh else None,
             "total_posts": total_posts,
             "posts_delta": posts_delta,
-            "indexed": indexed,
-            "indexed_delta": indexed_delta,
-            "index_unknown": index_unknown,
-            "index_unindexed": audit_summary.get("unindexed"),
-            "index_total": audit_summary.get("total_published"),
-            "index_partial": bool(index_unknown),
-            "index_checked_at": index_checked_at,
-            "index_status": index_status,
+            **evidence,
+            **post_results.get(item["domain"], {}),
             "visitor_connected": bool(live_traffic.get("connected")),
             "visitor_checked_at": live_traffic.get("date") or stored_traffic.get("checked_at") or "",
             "category": registered.theme if registered else "미분류",
@@ -1971,6 +1949,21 @@ def _current_index_manifest(bucket):
         return response.json()
     except (requests.RequestException, ValueError):
         path = Path(__file__).resolve().parents[1] / "index_audit_manifest.json"
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+
+
+@lru_cache(maxsize=2)
+def _current_traffic_manifest(bucket):
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    try:
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/daily_site_traffic_result.json", timeout=12)
+        response.raise_for_status()
+        return response.json()
+    except (requests.RequestException, ValueError):
+        path = Path(__file__).resolve().parents[1] / "daily_site_traffic_result.json"
         try:
             return json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
