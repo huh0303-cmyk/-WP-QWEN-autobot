@@ -15,3 +15,14 @@ def test_posts_count_korean_midnight_and_previous_day():
 def test_posts_network_failure_is_not_zero():
     with patch('control_center.metric_evidence.requests.get', side_effect=requests.ConnectionError), patch('control_center.metric_evidence.time.sleep'):
         assert recent_post_counts('https://failed.example', 1)['new_posts'] is None
+from control_center.metric_evidence import post_metrics
+
+def test_fallback_rejects_old_inventory():
+    assert post_metrics({'new_posts': None}, {'audited_at':'2000-01-01T00:00:00+00:00'})['new_posts'] is None
+
+def test_fallback_counts_complete_inventory():
+    now=datetime.now(timezone.utc).isoformat()
+    entry={'audited_at':now, 'summary':{'total_published':1}, 'posts':{'1':{'published_gmt':now}}}
+    assert post_metrics({'new_posts':None},entry)['new_posts']==1
+    entry['summary']['total_published']=2
+    assert post_metrics({'new_posts':None},entry)['new_posts'] is None
