@@ -10,6 +10,17 @@
 - Instagram TOPIK 시크릿은 존재한다. 9월 3일 기존 조회 결과는 권한 부족이며 현재 게시 가능 여부는 미검증이다. Threads 및 ENGLISH/LANGUAGE별 시크릿은 없다.
 - Facebook 로그인 후 개발자 플랫폼은 비정상 활동에 따른 계정 확인을 요구한다. 계정 확인 후 기존 앱부터 확인한다.
 
+## 2026-09-08 연결 점검
+
+- `me/accounts?fields=id,name,tasks`가 정상 응답했으며 세 페이지의 MANAGE 및 CREATE_CONTENT 작업 권한을 확인했다. 현재 상태에서는 목록 조회를 위해 비즈니스 인증을 먼저 진행할 필요가 없다.
+- Facebook Graph API 페이지 ID: LANGUAGE `1236641259534475`, ENGLISH `1247951015067104`, TOPIK `1128119143729384`. 전달받았던 `61593057083167` 및 `61592457107609` 대신 API에서 검증한 ID를 사용한다.
+- 저장소 Secrets 100개 한도 때문에 새 SNS 자격 증명은 기존 `social-publish` Environment Secrets에 저장한다. `social-publish-one.yml`의 게시 job은 이 환경을 참조한다. 기존 저장소 Secrets는 그대로 사용할 수 있다.
+- `FB_PAGE_ID_ENGLISH`, `FB_PAGE_ID_LANGUAGE`를 이 환경에 등록했다. 페이지 액세스 토큰은 아직 등록하지 않았다.
+- 기존 사용자 토큰에는 `pages_manage_posts`, `instagram_basic`, `instagram_content_publish`가 없다. 탐색기에서 세 권한 선택과 OAuth 요청 전달은 확인했지만 새 권한 승인 및 장기 토큰 교환은 아직 완료하지 않았다.
+- Instagram 동의 화면에는 `sis_topik1` (`17841410825136018`)만 표시됐다. ENGLISH/LANGUAGE의 계정 연결은 확인 전이며 TOPIK 계정으로 대체하지 않는다.
+- Threads는 별도 OAuth가 필요하고 아직 토큰/사용자 ID를 등록하지 않았다.
+- 현재 사용 가능한 Actions 아티팩트에서 `topik-review-*`를 찾지 못했다. 발행 테스트 전에 브랜드에 맞는 기존 영상·캡션·공개 HTTPS MP4 또는 새 검수 아티팩트를 준비해야 한다. 실제 발행 테스트는 아직 실행하지 않았다.
+
 ## 인증 방식
 
 Instagram은 Business 또는 Creator 계정이 필요하다. Facebook Login 방식은 연결된 Facebook Page 및 instagram_basic, instagram_content_publish, pages_read_engagement, pages_show_list 권한을 사용한다. Instagram Login 방식도 지원하도록 IG_LOGIN_TYPE=instagram을 제공한다. 해당 방식은 instagram_business_basic, instagram_business_content_publish를 사용하며 Facebook Page 연결이 필수는 아니다.
