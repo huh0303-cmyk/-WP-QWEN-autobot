@@ -10,6 +10,8 @@ from PIL import Image, ImageOps
 WORK = ROOT/'data/healing-rain-review'
 WORK.mkdir(parents=True, exist_ok=True)
 MARKER = 'Review reference: healing-rain-75-20260908'
+DURATION = 4500
+TITLE = 'Gentle Jungle Rain | 75 Minutes of Peaceful Forest Ambience, No Music'
 DESCRIPTION = '''Step beneath a lush green canopy and settle into 75 minutes of gentle rain. Broad tropical leaves, soft forest mist, and a quiet stream create an open, peaceful setting for reading, resting, journaling, or an unhurried evening at home.
 
 This soundscape was newly synthesized for this video. Layers of softly filtered rain-like noise create a continuous stereo texture with gentle changes in intensity. It is not a recording made in a real jungle, and no existing songs or short repeating rain recordings were used. There is no music, narration, or sudden thunder.
@@ -63,19 +65,23 @@ def main():
     if matches:
         video_id=matches[0]['id']
         if matches[0]['status']['privacyStatus']!='private': raise RuntimeError('Existing sample privacy changed')
-        ImageOps.fit(Image.open(ROOT/'assets/playlist-review/healing-rainforest.png').convert('RGB'),(1920,1080)).save(WORK/'thumbnail.jpg',quality=90)
+        # Preserve the existing thumbnail when resuming a previously uploaded motion sample.
     else:
         render()
-        video_id=publisher.upload_to_youtube(service,str(WORK/'rain-75.mp4'),None,'Gentle Jungle Rain | 75 Minutes of Peaceful Forest Ambience, No Music',DESCRIPTION,['rain sounds','forest rain','jungle ambience','no music','relaxing rain'])
+        video_id=publisher.upload_to_youtube(service,str(WORK/'rain-75.mp4'),None,TITLE,DESCRIPTION,['nature sounds','forest ambience','no music','relaxation'])
     save('upload.json',{'video_id':video_id,'channel_id':actual,'privacy':'private'})
-    service.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(WORK/'thumbnail.jpg'))).execute()
+    if (WORK/'thumbnail.jpg').exists(): service.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(WORK/'thumbnail.jpg'))).execute()
     for _ in range(90):
         video=service.videos().list(part='snippet,status,processingDetails,contentDetails',id=video_id).execute()['items'][0]
         save('verified-status.json',video)
         if video['status']['privacyStatus']!='private' or video['snippet']['channelId']!=actual: raise RuntimeError('Upload identity/privacy mismatch')
         state=video.get('processingDetails',{}).get('processingStatus')
         if state=='succeeded':
-            if video['contentDetails']['duration']!='PT1H15M': raise RuntimeError('Unexpected uploaded duration')
+            import re
+            duration=video['contentDetails']['duration']
+            parts=re.fullmatch(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?',duration)
+            actual_seconds=sum(int(v or 0)*m for v,m in zip(parts.groups(),(3600,60,1))) if parts else -1
+            if abs(actual_seconds-DURATION)>2: raise RuntimeError('Unexpected uploaded duration')
             print('PRIVATE_UPLOAD_VERIFIED',video_id,flush=True); return
         if state in ('failed','terminated'): raise RuntimeError('YouTube processing '+state)
         time.sleep(10)

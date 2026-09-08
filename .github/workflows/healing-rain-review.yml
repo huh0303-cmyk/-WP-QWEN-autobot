@@ -1,6 +1,12 @@
-name: Private healing rainforest sample - 75 minutes
+name: Private moving nature - random 74 to 175 minutes
 on:
   workflow_dispatch:
+    inputs:
+      variant:
+        description: Nature scene and sound preset
+        type: choice
+        options: [random, rain, creek]
+        default: random
 permissions:
   contents: read
 concurrency:
@@ -20,10 +26,11 @@ jobs:
       - run: pip install google-api-python-client google-auth google-auth-httplib2 pillow requests
       - name: Synthesize continuous rain and upload privately to locked healing channel
         env:
+          HEALING_VARIANT: ${{ inputs.variant }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
-        run: python -u scripts/healing_rain_review.py
+        run: python -u scripts/healing_motion.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

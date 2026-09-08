@@ -81,6 +81,14 @@ def _claim(job: dict) -> tuple[object, str]:
 
 
 def _playlist(env: dict[str, str], log_handle) -> str:
+    if env['CHANNEL_KEY'] == 'healing':
+        for key in ('CLIENT_ID', 'CLIENT_SECRET', 'REFRESH_TOKEN'):
+            value = env.get(f'YOUTUBE_OAUTH_{key}_HEALING', '')
+            if value:
+                env[f'YOUTUBE_OAUTH_{key}'] = value
+        env.update(HEALING_VARIANT='random', ROOM_RESULT_SOURCE='artifacts/youtube_playlist_result.json')
+        _run([sys.executable, 'scripts/healing_motion.py'], env, log_handle)
+        return 'artifacts/youtube_playlist_result.json'
     output = ROOT / "playlist_output"
     if output.exists():
         shutil.rmtree(output)
