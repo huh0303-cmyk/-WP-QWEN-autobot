@@ -119,7 +119,7 @@ def _thumbnail_prompt(topic: str) -> str:
     # one memorable scene, restrained palette, and intentional negative space.
     # No specific thumbnail, character, artwork, or brand identity is copied.
     direction = {
-        "globalmusic": "golden-hour romantic riverside cafe, diverse adult male-female couples in natural affectionate moments, clearly visible faces, calm open sky in the upper third for one large title",
+        "globalmusic": random.choice(["bright open seaside cafe terrace with turquoise ocean and wide horizon", "sunlit beach cafe with open sea and pale blue sky", "airy garden cafe with flowers and open sky", "bright lakeside terrace with a spacious water view"]) + ", EXACTLY ONE adult male-female couple, two people total, large close-up faces and upper bodies dominating the scene, natural affectionate moment, no other people anywhere; vary cultural background across separate videos, never several couples in one image; airy bright natural lighting and open upper space for one large title",
         "kpop": "modern Korean acoustic listening room, one original adult subject on the right, negative space on the left",
         "starbucks": "cozy independent cafe, one window table and piano, warm restrained palette, negative space on the left",
         "mbb": "elegant classical chamber hall, one grand piano on the right, timeless low-contrast light, negative space on the left",

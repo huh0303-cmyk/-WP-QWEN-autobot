@@ -3,7 +3,8 @@ import base64, hashlib, json, os, re, subprocess, sys, time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT),str(ROOT/'scripts')]
-os.environ.update(json.loads(Path('/etc/korea365/youtube-runtime.json').read_text()))
+runtime=Path('/etc/korea365/youtube-runtime.json')
+if runtime.exists():os.environ.update(json.loads(runtime.read_text()))
 os.environ['CHANNEL_KEY']='globalmusic'
 for key in ('CLIENT_ID','CLIENT_SECRET','REFRESH_TOKEN'):
     os.environ['YOUTUBE_OAUTH_'+key]=os.environ['YOUTUBE_OAUTH_'+key+'_GLOBALMUSIC']
