@@ -384,7 +384,20 @@ def main():
     log(f"1/6 NASA 아카이브에서 실제 영상 클립 검색+다운로드 중 (주제: {topic})...")
     clips = fetch_nasa_clips(topic, workdir)
     if not clips:
-        log("❌ 이 주제로 사용 가능한 NASA 클립을 하나도 못 찾음")
+        # A calendar-supplied TOPIC is free-form prose (e.g. "Hubble discoveries
+        # shown through official footage") and often matches nothing in NASA's
+        # search index, unlike the curated short-keyword TOPICS pool below. Fall
+        # back to a curated topic instead of failing the whole run outright.
+        log(f"   ⚠️ '{topic}' 주제로 클립 없음 — 검증된 주제 목록에서 재시도")
+        for _ in range(len(TOPICS)):
+            fallback_topic = pick_topic()
+            clips = fetch_nasa_clips(fallback_topic, workdir)
+            if clips:
+                topic = fallback_topic
+                log(f"   ✅ 대체 주제로 확보: {topic}")
+                break
+    if not clips:
+        log("❌ 사용 가능한 NASA 클립을 하나도 못 찾음 (대체 주제 포함 전부 실패)")
         raise SystemExit(1)
     log(f"   {len(clips)}개 클립 확보")
     clips = inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log)
