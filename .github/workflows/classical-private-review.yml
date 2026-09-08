@@ -1,6 +1,11 @@
 name: Cafe Mozart private piano review
 on:
   workflow_dispatch:
+    inputs:
+      render_only:
+        description: Prepare full video while channel authorization is pending
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -20,6 +25,7 @@ jobs:
       - run: pip install google-api-python-client google-auth google-auth-httplib2 pillow requests
       - name: Render and upload actual public-domain piano performance privately
         env:
+          RENDER_ONLY: ${{ inputs.render_only }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_MBB || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_MBB || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
@@ -33,3 +39,10 @@ jobs:
             data/classical-private-review/thumbnail.jpg
             data/classical-private-review/preview.mp4
           retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: success() && inputs.render_only
+        with:
+          name: classical-full-video-for-private-upload
+          path: data/classical-private-review/rain-75.mp4
+          compression-level: 0
+          retention-days: 7

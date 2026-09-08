@@ -1,5 +1,5 @@
 """Public-domain actual piano performance, private Cafe Mozart review."""
-import hashlib,json,subprocess
+import hashlib,json,subprocess,os
 from urllib.parse import quote
 import requests
 import healing_rain_review as job
@@ -39,9 +39,15 @@ def render():
     video=job.WORK/'rain-75.mp4'
     job.ff('-loop','1','-framerate','10','-i',job.WORK/'thumbnail.jpg','-i',audio,'-filter_complex','[1:a]showwaves=s=1152x44:mode=cline:rate=10:colors=white:scale=sqrt[w];[0:v][w]overlay=64:652:shortest=1[v]','-map','[v]','-map','1:a','-c:v','libx264','-preset','ultrafast','-crf','24','-threads','2','-pix_fmt','yuv420p','-c:a','copy','-shortest','-movflags','+faststart',video)
     job.ff('-ss','30','-i',video,'-t','20','-c','copy',job.WORK/'preview.mp4')
+    seconds=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','default=nw=1:nk=1',str(video)]))
+    if abs(seconds-job.DURATION)>3: raise RuntimeError('Classical render duration mismatch')
+    job.save('render-status.json',{'state':'rendered_not_uploaded','seconds':seconds,'track_count':len(manifest),'channel_id':job.EXPECTED_CHANNEL,'title':job.TITLE,'description':job.DESCRIPTION,'privacy_required':'private'})
     print('CLASSICAL_RENDERED',job.DURATION,flush=True)
 
 if __name__=='__main__':
     job.WORK=job.ROOT/'data/classical-private-review';job.WORK.mkdir(parents=True,exist_ok=True)
     job.render=render
-    job.main()
+    if os.environ.get('RENDER_ONLY','false').lower()=='true':
+        render()
+    else:
+        job.main()
