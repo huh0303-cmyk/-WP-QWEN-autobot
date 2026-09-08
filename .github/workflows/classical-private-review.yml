@@ -1,0 +1,35 @@
+name: Cafe Mozart private piano review
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: classical-goldberg-review
+  cancel-in-progress: false
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 pillow requests
+      - name: Render and upload actual public-domain piano performance privately
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_MBB || secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_MBB || secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
+        run: python -u scripts/classical_private_review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: classical-review-receipt
+          path: |
+            data/classical-private-review/*.json
+            data/classical-private-review/thumbnail.jpg
+            data/classical-private-review/preview.mp4
+          retention-days: 14

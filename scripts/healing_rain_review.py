@@ -12,6 +12,8 @@ WORK.mkdir(parents=True, exist_ok=True)
 MARKER = 'Review reference: healing-rain-75-20260908'
 DURATION = 4500
 TITLE = 'Gentle Jungle Rain | 75 Minutes of Peaceful Forest Ambience, No Music'
+CHANNEL = 'healing'
+EXPECTED_CHANNEL = 'UC7yEsLM-HoXudngrD-4FIqg'
 DESCRIPTION = '''Step beneath a lush green canopy and settle into 75 minutes of gentle rain. Broad tropical leaves, soft forest mist, and a quiet stream create an open, peaceful setting for reading, resting, journaling, or an unhurried evening at home.
 
 This soundscape was newly synthesized for this video. Layers of softly filtered rain-like noise create a continuous stereo texture with gentle changes in intensity. It is not a recording made in a real jungle, and no existing songs or short repeating rain recordings were used. There is no music, narration, or sudden thunder.
@@ -49,8 +51,8 @@ def render():
 
 def main():
     service = publisher.get_youtube_service()
-    actual = verify_authenticated_channel(service,'healing')
-    if actual != 'UC7yEsLM-HoXudngrD-4FIqg': raise RuntimeError('Healing channel lock mismatch')
+    actual = verify_authenticated_channel(service,CHANNEL)
+    if actual != EXPECTED_CHANNEL: raise RuntimeError('Review channel lock mismatch')
     uploads=service.channels().list(part='contentDetails',mine=True).execute()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
     ids=[]; token=None
     while True:
