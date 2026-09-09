@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 5.4,
+  "spent_estimate_usd": 5.43,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -1355,6 +1355,15 @@
       "amount_usd": 0.03,
       "reservation_id": "0ca6056245a00e5154886d1d675cb6df7cc0569ba42628a32a593227488d2923",
       "run_id": "34317172583",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-09T15:01:41.362874+09:00",
+      "label": "blogger-rewrite:blogger_seouljournal",
+      "amount_usd": 0.03,
+      "reservation_id": "03452d49ba860e2adc0f5d1da5e0c6387cd05432e8dc97986452754425d32c5c",
+      "run_id": "34317217223",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
