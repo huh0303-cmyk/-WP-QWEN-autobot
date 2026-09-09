@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Korea365 통제실">
-    <title>서울국제대학SIS 총장실 Lab</title>
+    <title>Korea365 운영 통제실</title>
     <link rel="manifest" href="{{ url_for('pwa_manifest') }}">
     <link rel="icon" href="{{ url_for('static', filename='app-icon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='app-icon.svg') }}">
@@ -29,8 +29,8 @@
     <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 px-4 py-3 text-white shadow-xl backdrop-blur sm:px-6">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
             <div class="min-w-0">
-                <h1 class="truncate text-base font-black tracking-tight sm:text-xl">서울국제대학SIS 총장실 Lab</h1>
-                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WP 27 + Blogspot {{ bloggers|length }} + Tistory 5 + YouTube 10 · Google Sheet 통제</p>
+                <h1 class="truncate text-base font-black tracking-tight sm:text-xl">Korea365 운영 통제실</h1>
+                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WP 25 · Blogspot {{ bloggers|length }} · 뉴스룸 2 · Tistory 5</p>
             </div>
             <div class="flex shrink-0 items-center gap-2">
                 <button id="install-pwa" type="button" hidden class="rounded-lg border border-white/20 bg-white px-2.5 py-1 text-[10px] font-black text-slate-950 shadow sm:text-xs">앱 설치</button>
@@ -40,12 +40,12 @@
     </header>
     <nav class="sticky top-[61px] z-20 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
         <div class="mx-auto grid max-w-7xl grid-cols-2 gap-1.5 sm:grid-cols-6">
-            <a href="#sns" class="rounded-lg bg-fuchsia-50 px-2 py-2 text-center text-[10px] font-black text-fuchsia-700 sm:text-xs">SNS 핵심수치</a>
-            <a href="#wordpress" class="rounded-lg bg-blue-50 px-2 py-2 text-center text-[10px] font-black text-blue-700 sm:text-xs">WP 27</a>
-            <a href="#blogspot" class="rounded-lg bg-violet-50 px-2 py-2 text-center text-[10px] font-black text-violet-700 sm:text-xs">Blogspot {{ bloggers|length }}</a>
-            <a href="#tistory" class="rounded-lg bg-teal-50 px-2 py-2 text-center text-[10px] font-black text-teal-700 sm:text-xs">Tistory 5</a>
-            <a href="#youtube" class="rounded-lg bg-red-50 px-2 py-2 text-center text-[10px] font-black text-red-700 sm:text-xs">YouTube 10</a>
-            <a href="#google-sheet" class="rounded-lg bg-emerald-50 px-2 py-2 text-center text-[10px] font-black text-emerald-700 sm:text-xs">Google Sheet</a>
+            <a href="#daily-core-metrics" class="dashboard-nav">방문·글·색인</a>
+            <a href="#operation-summary" class="dashboard-nav">작업 상태</a>
+            <a href="#bulk-publish" class="dashboard-nav">그룹 실행</a>
+            <a href="#site-quick-tiles" class="dashboard-nav">사이트 찾기</a>
+            <a href="#sns" class="dashboard-nav">SNS</a>
+            <a href="#advanced-controls" class="dashboard-nav">설정·기록</a>
         </div>
     </nav>
     <main class="mx-auto max-w-7xl space-y-10 p-3 pb-20 sm:p-6">
@@ -66,7 +66,7 @@
             setInterval(async () => {
                 try {
                     const response = await fetch('/api/core-metrics-report', {cache: 'no-store'});
-                    if (response.ok) document.getElementById('daily-core-metrics-content').innerHTML = await response.text();
+                    if (response.ok) { document.getElementById('daily-core-metrics-content').innerHTML = await response.text(); window.simplifyMetrics?.(); }
                 } catch (_) { /* Keep the dated report visible during a network interruption. */ }
             }, 300000);
         </script>
@@ -84,18 +84,19 @@
         </div>
         {% endif %}
         {% endwith %}
-        <section class="rounded-3xl bg-slate-950 p-5 text-white space-y-3" id="publish-everything">
+        <details class="dashboard-disclosure" id="publish-everything"><summary>전체 채널 실행 · 범위를 먼저 확인하세요</summary><section class="p-4 space-y-3">
             <p class="text-xs font-bold text-sky-300">01 · 전체 총괄</p>
             <button type="button" id="publish-all-button" class="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-rose-500 p-5 text-xl font-black text-slate-950">전체 채널 한 번에 실행 →</button>
             <p class="text-xs text-slate-300">WP 25 · 뉴스 2 · Blogspot {{ bloggers|length }} · Tistory 5 · YouTube 10</p>
             <p class="text-xs text-slate-300">WP·Blogspot 공개 발행 / Tistory 검토본 생성 후 로그인된 등록기로 게시 / YouTube 비공개 제작</p>
             <p id="publish-all-message" role="status" aria-live="polite" class="text-sm"></p>
         </section>
+        </details>
         <section id="bulk-publish" class="space-y-3">
             <div>
-                <p class="text-xs font-black text-amber-300">그룹별로 따로 실행 · 어디서 멈췄는지 바로 확인</p>
-                <h2 class="text-xl font-black text-slate-900 sm:text-2xl">02 · 그룹별 발행</h2>
-                <p class="mt-1 text-xs leading-relaxed text-slate-500">각 그룹은 완전히 독립적으로 실행·추적됩니다. 실패 항목은 사유와 함께 예상/실측 API 비용도 표시합니다. 사이트 하나씩만 실행하려면 아래 각 통제실 카드의 개별 버튼을 쓰세요.</p>
+                <p class="text-xs font-black text-amber-300">필요한 그룹만 선택</p>
+                <h2 class="text-xl font-black text-slate-900 sm:text-2xl">그룹별 실행</h2>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">최근 작업 상태입니다. 새 글 작성에 비용이 필요한 경로는 기존 중지 정책을 따릅니다.</p>
             </div>
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {% for group, title, desc, confirm_msg, color in [
@@ -106,7 +107,7 @@
                     ('youtube_playlist5', 'YouTube 플리 5개', '플레이리스트 채널 묶음', 'YouTube 플리 5개 채널 콘텐츠 제작을 지금 시작할까요?', 'sky'),
                     ('youtube_archive5', 'YouTube 지식 5개', '지식 채널 묶음', 'YouTube 지식 5개 채널 콘텐츠 제작을 지금 시작할까요?', 'amber'),
                 ] %}
-                <div class="rounded-3xl border-2 border-slate-900 bg-slate-950 p-4 text-white shadow-lg">
+                <div class="dashboard-group {% if group.startswith('youtube_') %}dashboard-video-group{% endif %}">
                     <p class="text-[10px] font-black text-{{ color }}-300">{{ desc }}</p>
                     <h3 class="text-lg font-black">{{ title }}</h3>
                     <form method="post" action="{{ url_for('trigger_publish_group', group=group) }}" onsubmit="return confirm('{{ confirm_msg }}');" class="mt-3">
@@ -144,8 +145,9 @@
             <p data-quick-status="{{ group }}" role="status" class="mt-1 text-[10px] text-slate-500"></p>
         </article>
         {% endmacro %}
-        <section id="site-quick-tiles" class="space-y-4">
-            <div><h2 class="text-xl font-black">03 · 사이트별 바로 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
+        <details id="site-quick-tiles" class="dashboard-disclosure"><summary>사이트별 실행·발행 이력 찾기</summary><section class="space-y-4 p-4">
+            <input id="quick-site-search" type="search" class="dashboard-search" placeholder="사이트 이름이나 주소 검색" aria-label="사이트별 실행 검색">
+            <div><h2 class="text-xl font-black">사이트별 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
             <p class="text-xs text-slate-500">플랫폼별 오늘 방문자 순위(동률 공동순위) · 방문자·새 콘텐츠는 어제 대비 · 누적은 오늘 증가 · 색인은 이전 확인 대비 · 시각 KST · 통계 5분 / 발행 로그 1분 갱신</p>
             <h3 class="text-sm font-bold">WordPress 27 · 일반 25 + 뉴스 2</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
@@ -164,9 +166,11 @@
             {% for channel in youtube_channels %}{{ quick_tile(channel.name or channel.channel_key, 'https://www.youtube.com/channel/' ~ channel.channel_id, 'youtube_' ~ channel.channel_key, '제작·비공개 업로드', channel.action_ready, none, none, channel.channel_key) }}{% endfor %}
             </div>
         </section>
+        </details>
+        <details id="advanced-controls" class="dashboard-disclosure"><summary>연결 설정·플랫폼 상세·YouTube 기록</summary>
         <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
             {% if problem_summary.all_clear %}
-            <p class="flex items-center gap-2 text-sm font-black text-emerald-800"><span class="text-lg">✅</span> 지금 문제 없음 — WP {{ problem_summary.wp_total }}·Blogspot {{ problem_summary.blogger_total }}·Tistory {{ problem_summary.tistory_total }}·YouTube {{ problem_summary.youtube_total }}·SNS {{ problem_summary.sns_total }} 전부 정상</p>
+            <p class="flex items-center gap-2 text-sm font-black text-emerald-800"><span class="text-lg">✅</span> 등록·연결 점검 항목 없음 — WP {{ problem_summary.wp_total }}·Blogspot {{ problem_summary.blogger_total }}·Tistory {{ problem_summary.tistory_total }}·YouTube {{ problem_summary.youtube_total }}·SNS {{ problem_summary.sns_total }} · 발행 성공 여부는 작업 상태에서 확인</p>
             {% else %}
             <p class="text-sm font-black text-rose-800">⚠ 지금 확인이 필요한 항목</p>
             <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -723,6 +727,7 @@
                 <a href="https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/edit#gid=693660577" target="_blank" rel="noopener" class="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-emerald-800 sm:w-auto">CEO종합상황실 열기 →</a>
             </div>
         </section>
+        </details>
     </main>
     <script>
         function focusReviewTarget() {
@@ -1053,6 +1058,7 @@
         });
         window.addEventListener('appinstalled', () => { installButton.hidden = true; });
     </script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='operations.js') }}"></script>
 </body>
 </html>
