@@ -765,8 +765,16 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
         ])
         number += 1
 
-    if len(rows) != 62:
-        raise RuntimeError(f"종합상황실 자산 수 불일치: {len(rows)} (기대 62)")
+    # 2026-09-09: was a hardcoded "!= 62" - broke the report every single day
+    # for a week (RuntimeError, nothing written) the moment 6 new Blogspot
+    # rooms brought the real total to 68, because nobody remembers to bump a
+    # magic number every time a site is added. Compute the expected count
+    # from the same registries that built `rows`, so this check still catches
+    # a genuine bug (a row silently missing) without going stale on its own
+    # whenever the portfolio grows.
+    expected = len(site_details) + len(blogger_details) + len(tistory_rooms) + len(naver_rooms)
+    if len(rows) != expected:
+        raise RuntimeError(f"종합상황실 자산 수 불일치: {len(rows)} (기대 {expected})")
 
     header = [
         "번호", "플랫폼", "관리명", "사이트 주소", "공개글(전일대비)",
@@ -774,7 +782,8 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
         "검색클릭(전일대비)", "수집상태", "기준시각(KST)",
     ]
     gsheets_direct.replace_tab_rows(SHEET_ID, "종합_62개현황", header, rows)
-    log("📊 종합_68개현황 갱신 완료 — WP27 + Blogspot33 + Tistory5 + Naver3")
+    log(f"📊 종합상황실 자산 현황 갱신 완료 — WP{len(site_details)} + Blogspot{len(blogger_details)} "
+        f"+ Tistory{len(tistory_rooms)} + Naver{len(naver_rooms)} = {len(rows)}개")
 
 
 def send_monetization_dashboard(adsense, topik_stats, topik_diff, khealth_metrics, checked_at):
