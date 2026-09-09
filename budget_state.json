@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 7.53,
+  "spent_estimate_usd": 7.56,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -1994,6 +1994,15 @@
       "amount_usd": 0.03,
       "reservation_id": "3fc76e378d54f2533d54b5c19f4a2268e29793b1fd5c84dba9bfeca3a91d312f",
       "run_id": "34326673965",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-09T16:59:47.636340+09:00",
+      "label": "blogger-rewrite:blogger_khealth365",
+      "amount_usd": 0.03,
+      "reservation_id": "95ace2e87aa708ea41efcade43924b29066f13d252618740ee93643f07776d34",
+      "run_id": "34326676384",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
