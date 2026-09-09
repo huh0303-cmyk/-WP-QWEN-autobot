@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 6.87,
+  "spent_estimate_usd": 6.9,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -1796,6 +1796,15 @@
       "amount_usd": 0.03,
       "reservation_id": "b24c42bf692546f8aa52f1e8219986ee3fd1640c0882cfa1085c11c59d124f73",
       "run_id": "34325919597",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-09T16:50:56.811808+09:00",
+      "label": "blogger-rewrite:blogger_kcrypto365",
+      "amount_usd": 0.03,
+      "reservation_id": "873c17a6e9ddbd609be9c12887581f3d2784c25c47fcf00d8d2f93997dfbf90a",
+      "run_id": "34325909250",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
