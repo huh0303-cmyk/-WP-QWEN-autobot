@@ -270,11 +270,10 @@ def main():
         )
         raise RuntimeError("KWorld365 K-pop topic lock rejected a non-K-pop source")
     language = os.environ.get("BLOGGER_LANGUAGE", "en").strip().lower()
-    korean_source_hosts = {"koreanews365.com", "www.koreanews365.com", "k-health365.com", "www.k-health365.com"}
-    source_host = requests.utils.urlparse(source_url).netloc.lower() if source_url else ""
-    if source is not None and language == "ko" and source_host not in korean_source_hosts:
-        _append_failure(service, sheet_id, blogger_site_id, error_code="LANGUAGE_POLICY", message="Korean Blogger output is allowed only for approved Korean source sites.", source_url=source["link"])
-        raise RuntimeError("Korean Blogger output is allowed only for koreanews365.com and K-health365.com")
+    configured_language = str(profile["blogspot"].get("language") or profile.get("language") or "en").strip().lower()
+    if language != configured_language:
+        _append_failure(service, sheet_id, blogger_site_id, error_code="LANGUAGE_POLICY", message=f"Requested language {language} does not match configured Blogger language {configured_language}.", source_url=source_url)
+        raise RuntimeError(f"Blogger language must match its configured profile: {configured_language}")
     target_chars = int(os.environ.get("BLOGGER_TARGET_CHARS", "1800"))
     maximum = float(os.environ.get("BLOGGER_MAX_SIMILARITY", "0.68"))
     minimum_quality = int(os.environ.get("BLOGGER_MIN_QUALITY_SCORE", "70"))

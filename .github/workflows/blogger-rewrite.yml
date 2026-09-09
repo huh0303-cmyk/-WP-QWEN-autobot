@@ -78,7 +78,9 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install dependencies
-        run: pip install requests google-api-python-client google-auth -q
+        run: pip install requests google-api-python-client google-auth beautifulsoup4 -q
+      - name: Verify writing dependencies before source discovery or paid calls
+        run: python -c "from automation_hub.repetition_guard import history_prompt, repetition_issues, clean_opening"
       - name: Golden keyword + GPT-5 mini authoring + deterministic review + approved image chain
         id: queue
         env:
