@@ -114,11 +114,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           QUEUED_JOB_ID: ${{ steps.queue.outputs.job_id }}
-        run: >-
-          gh workflow run platform-publish-v2.yml --ref main
-          -f platform=blogger
-          -f job_id="$QUEUED_JOB_ID"
-          -f max_jobs=1
+          BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
+        run: python scripts/dispatch_blogger_publication.py
+      - name: Preserve exact publication handoff
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-handoff-${{ github.run_id }}
+          path: artifacts/control-handoff.json
+          if-no-files-found: warn
       - name: Preserve estimated budget receipt
         if: always()
         uses: actions/upload-artifact@v4

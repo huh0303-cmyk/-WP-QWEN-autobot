@@ -1,4 +1,5 @@
-name: "Two Newsrooms — RSS 3–10 Daily Editions"
+name: "Two Newsrooms — New RSS Story"
+run-name: "newsroom:${{ inputs.newsroom }} · RSS ${{ github.event_name }}"
 
 on:
   workflow_dispatch:
@@ -15,30 +16,15 @@ on:
         type: choice
         options: ["", World, Sports, Military, Art]
         default: ""
-  schedule:
-    - cron: "31 22 * * *"
-    - cron: "43 0 * * *"
-    - cron: "9 2 * * *"
-    - cron: "18 3 * * *"
-    - cron: "46 4 * * *"
-    - cron: "29 6 * * *"
-    - cron: "6 8 * * *"
-    - cron: "41 9 * * *"
-    - cron: "23 11 * * *"
-    - cron: "53 12 * * *"
-    - cron: "3 23 * * *"
-    - cron: "16 1 * * *"
-    - cron: "40 2 * * *"
-    - cron: "49 3 * * *"
-    - cron: "18 5 * * *"
-    - cron: "1 7 * * *"
-    - cron: "38 8 * * *"
-    - cron: "13 10 * * *"
-    - cron: "54 11 * * *"
-    - cron: "25 13 * * *"
+      source_url:
+        description: "Exact newly detected RSS story URL; blank for manual source selection"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
+  checks: write
 
 concurrency:
   # A single owner prevents two scheduled editions from racing on RSS/source
@@ -61,49 +47,11 @@ jobs:
         id: target
         shell: bash
         run: |
-          S="${{ github.event.schedule }}"
-          MANUAL="${{ inputs.newsroom }}"
-          if [ -n "$MANUAL" ]; then
-            KEY="$MANUAL"
-          elif [[ "$S" == "3 23 * * *" || "$S" == "16 1 * * *" || "$S" == "40 2 * * *" || "$S" == "49 3 * * *" || "$S" == "18 5 * * *" || "$S" == "1 7 * * *" || "$S" == "38 8 * * *" || "$S" == "13 10 * * *" || "$S" == "54 11 * * *" || "$S" == "25 13 * * *" ]]; then
-            KEY="theseouljournal"
-          else
-            KEY="koreanews365"
-          fi
+          KEY="${{ inputs.newsroom }}"
           if [ "$KEY" = "theseouljournal" ]; then URL="https://theseouljournal.com"; else URL="https://koreanews365.com"; fi
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
-
-          # 2026-09-03 CEO: "정치·경제·문화·스포츠·군사 이렇게 쌓이는 게 살아있는
-          # 느낌" — each site's own 10 scheduled slots round-robin across its
-          # category rotation (6 for koreanews365, 7 for theseouljournal) so
-          # every category gets at least one, usually two, tries per day
-          # instead of an hour-formula that could skip a category entirely.
-          # Manual dispatches with an explicit preferred_category, or with
-          # none at all, are left alone (empty = crawl_rss_news free-picks).
-          CATEGORY=""
-          if [ -z "$MANUAL" ]; then
-            if [ "$KEY" = "koreanews365" ]; then
-              KO_CATS=("정치" "경제" "국방" "글로벌" "문화" "스포츠")
-              case "$S" in
-                "31 22 * * *") IDX=0 ;; "43 0 * * *") IDX=1 ;; "9 2 * * *") IDX=2 ;;
-                "18 3 * * *") IDX=3 ;; "46 4 * * *") IDX=4 ;; "29 6 * * *") IDX=5 ;;
-                "6 8 * * *") IDX=0 ;; "41 9 * * *") IDX=1 ;; "23 11 * * *") IDX=2 ;;
-                "53 12 * * *") IDX=3 ;; *) IDX=-1 ;;
-              esac
-              if [ "$IDX" -ge 0 ]; then CATEGORY="${KO_CATS[$IDX]}"; fi
-            else
-              EN_CATS=("Politics" "Business" "Military" "World" "Culture" "Art" "Sports")
-              case "$S" in
-                "3 23 * * *") IDX=0 ;; "16 1 * * *") IDX=1 ;; "40 2 * * *") IDX=2 ;;
-                "49 3 * * *") IDX=3 ;; "18 5 * * *") IDX=4 ;; "1 7 * * *") IDX=5 ;;
-                "38 8 * * *") IDX=6 ;; "13 10 * * *") IDX=0 ;; "54 11 * * *") IDX=1 ;;
-                "25 13 * * *") IDX=2 ;; *) IDX=-1 ;;
-              esac
-              if [ "$IDX" -ge 0 ]; then CATEGORY="${EN_CATS[$IDX]}"; fi
-            fi
-          fi
-          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "category=" >> "$GITHUB_OUTPUT"
       - name: Repair recent source-based categories
         env:
           TARGET_SITE_URL: ${{ steps.target.outputs.url }}
@@ -122,6 +70,7 @@ jobs:
           WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
           AI_TEXT_PROVIDER: "openai"
+          GH_TOKEN: ${{ github.token }}
           # 2026-09-03: Gemini removed from the reviewer role network-wide —
           # three_model_consensus.py now always runs two independent GPT
           # passes and never calls Gemini at all. See audit_active_policy.py.
@@ -136,6 +85,7 @@ jobs:
           OPENAI_MODEL: "gpt-5-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
+          NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}
           FORCE_SOURCE_IPV4: "true"
           NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
           NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}

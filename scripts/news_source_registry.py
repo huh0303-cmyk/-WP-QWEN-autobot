@@ -1,7 +1,7 @@
 """No-contact, copyright-aware source policy for the two newsrooms.
 
-Only sources with an explicit public-domain, CC BY, or primary-government basis
-are eligible. A feed is used as a story lead; source text and media are not
+Primary/CC feeds and configured publisher headline/link feeds are eligible as
+reporting leads. Publisher feeds do not grant article or image reuse rights. A feed is used as a story lead; source text and media are not
 copied. Item-level third-party credits still override the source-level policy.
 """
 from __future__ import annotations
@@ -11,9 +11,8 @@ NEWSROOMS = {
         "publication": "Koreanews365 한국신문",
         "language": "ko",
         "categories": ["속보", "정치", "경제", "사회", "국제", "군사", "스포츠"],
-        "daily_total_min": 3,
-        "daily_total_max": 10,
-        "daily_original_min": 2,
+        "mode": "new_rss_item",
+        "daily_publication_limit": None,
         "weekly_original_ratio_min": 0.30,
         "theme_candidate": "Twenty Twenty-Five News Blog",
     },
@@ -21,9 +20,8 @@ NEWSROOMS = {
         "publication": "The Seoul Journal",
         "language": "en",
         "categories": ["Top Stories", "World", "Business", "Technology", "Asia & Korea", "Military", "Sports"],
-        "daily_total_min": 3,
-        "daily_total_max": 10,
-        "daily_original_min": 2,
+        "mode": "new_rss_item",
+        "daily_publication_limit": None,
         "weekly_original_ratio_min": 0.30,
         "theme_candidate": "Twenty Twenty-Five News Blog",
     },
@@ -420,8 +418,16 @@ def image_source_audit(license_code: str, credit: str = "", *, media_marked: boo
     }
 
 
+# Publisher RSS is a reporting lead, not a reusable article/media licence.
+import json as _json
+from pathlib import Path as _Path
+_watch_config = _json.loads((_Path(__file__).resolve().parents[1] / "config/newsroom_rss_watch.json").read_text(encoding="utf-8"))
+NEWS_SOURCES.extend(dict(source, category="속보" if source["language"] == "ko" else "Top Stories", license="headline_lead_only_no_article_reuse",
+                         license_url=source["feed"], use="headline_fact_lead") for source in _watch_config["sources"])
+
+
 def get_enabled_rss_sources(language: str) -> list[tuple[str, str]]:
-    """All returned feeds have a no-contact reuse basis recorded above."""
+    """Return source feeds for independent reporting leads."""
     return [
         (source["name"], source["feed"])
         for source in NEWS_SOURCES

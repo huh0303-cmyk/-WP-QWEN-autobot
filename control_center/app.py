@@ -518,11 +518,11 @@ def wordpress_cadence(site) -> dict[str, object]:
     is_newsroom = bool(site and site.content_type in {"news_ko", "news_en"})
     if is_newsroom:
         return {
-            "daily_min": 3,
-            "daily_max": 10,
+            "daily_min": None,
+            "daily_max": None,
             "weekly_min": None,
             "weekly_max": None,
-            "label": "RSS 하루 3~10회",
+            "label": "RSS 새 기사 감지 시 자동 발행",
             "kind": "newsroom",
         }
     return {
@@ -913,7 +913,7 @@ def get_sns_data() -> list[dict[str, object]]:
     latest, previous = history.get("latest", {}), history.get("previous", {})
     handles = {
         "tiktok": {"TOPIK": "sis_topik"},
-        "instagram": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
+        "instagram": {"TOPIK": "sis_topik1", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
         "threads": {"TOPIK": "sis__topik", "ENGLISH": "sis_english1", "LANGUAGE": "sis_language"},
         "facebook": {"TOPIK": "61588777439380", "ENGLISH": "61592457107609", "LANGUAGE": "61593057083167"},
     }
@@ -934,7 +934,7 @@ def get_sns_data() -> list[dict[str, object]]:
             handle = handles.get(platform, {}).get(brand, "")
             if platform == "tiktok": url = f"https://www.tiktok.com/@{handle}" if handle else ""
             elif platform == "instagram": url = f"https://www.instagram.com/{handle}/" if handle else ""
-            elif platform == "threads": url = f"https://www.threads.net/@{handle}" if handle else ""
+            elif platform == "threads": url = f"https://www.threads.com/@{handle}" if handle else ""
             else: url = f"https://www.facebook.com/{handle}" if handle else ""
             rows.append({
                 "platform": labels[platform],
@@ -946,7 +946,7 @@ def get_sns_data() -> list[dict[str, object]]:
                 # There is no enabled, account-selectable SNS publishing workflow.
                 # Keep this explicit so the dashboard cannot present a fake action.
                 "publish_connected": False,
-                "publish_unavailable_reason": "이 계정에 연결된 콘텐츠 발행 실행이 없습니다.",
+                "publish_unavailable_reason": "계정에서 콘텐츠를 확인하고 게시하세요. 통제실 자동 발행 연결은 아직 확인되지 않았습니다." if handle else "계정 주소 확인이 필요합니다.",
                 **metrics,
             })
     return rows
@@ -1819,7 +1819,7 @@ def trigger_wp_single():
     return redirect(url_for("index") + "#wordpress")
 
 
-def _run_single_tistory_publish(site_id: str, label: str) -> None:
+def _run_single_tistory_publish(site_id: str, label: str, run_key: str = "") -> None:
     """Background worker for one Tistory site's dedicated publish button.
 
     Same live-tracking treatment as Blogspot/WP/YouTube. Tistory has no
@@ -1830,7 +1830,8 @@ def _run_single_tistory_publish(site_id: str, label: str) -> None:
     group = f"tistory_{site_id}"
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
-    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    run_key = run_key or f"manual-{site_id}-{secrets.token_hex(6)}"
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": [], "review_job_id": f"{site_id}:{run_key}"}
     _bulk_write(group, state)
 
     if not token:
@@ -1844,7 +1845,7 @@ def _run_single_tistory_publish(site_id: str, label: str) -> None:
 
     item = _dispatch_and_track(
         repo, token, "tistory-daily-plan.yml",
-        {"site_ids": site_id, "run_key": f"manual-{site_id}-{int(time.time())}"},
+        {"site_ids": site_id, "run_key": run_key},
         label=label, platform="tistory", site_id=site_id,
     )
     state["items"] = [item]
@@ -1871,11 +1872,15 @@ def trigger_tistory_single():
     already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
     label = str(sites_by_id[site_id].get("name") or site_id)
     if already_running:
-        flash(f"{label} 발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
-        return redirect(url_for("index") + "#tistory")
-    threading.Thread(target=_run_single_tistory_publish, args=(site_id, label), daemon=True).start()
-    flash(f"{label} 검토본 생성을 시작했습니다 — 카드 아래에서 실시간으로 확인하세요.", "success")
-    return redirect(url_for("index") + "#tistory")
+        flash({"text": f"{label} 검토본 생성이 이미 진행 중입니다.", "target": f"bulk-status-{group}"}, "success")
+        return redirect(url_for("index"))
+    run_key = f"manual-{site_id}-{secrets.token_hex(6)}"
+    # Replace the previous result before redirecting; the first poll must not
+    # mistake the previous completed request for the one just started.
+    _bulk_write(group, {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": [], "review_job_id": f"{site_id}:{run_key}"})
+    threading.Thread(target=_run_single_tistory_publish, args=(site_id, label, run_key), daemon=True).start()
+    flash({"text": f"{label} 검토본 생성을 시작했습니다.", "target": f"bulk-status-{group}"}, "success")
+    return redirect(url_for("index"))
 
 
 @app.post("/trigger/publish-group/<group>")
@@ -1901,7 +1906,14 @@ def publish_group_status(group: str):
     individual_prefixes = ("youtube_", "blogspot_", "wp_", "tistory_")
     if group not in _BULK_GROUPS and not group.startswith(individual_prefixes):
         return jsonify({"error": "unknown group"}), 404
-    return jsonify(_bulk_snapshot(group))
+    snapshot = _bulk_snapshot(group)
+    if group.startswith("tistory_"):
+        state = _bulk_read(group)
+        job_id = state.get("review_job_id")
+        if job_id and snapshot["status"] == "done" and snapshot["counts"]["success"]:
+            # Only this request's exact draft, never a previous site's latest draft.
+            snapshot["review_url"] = url_for("review_tistory_draft", job_id=job_id)
+    return jsonify(snapshot)
 
 
 def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:
@@ -2090,6 +2102,11 @@ def tistory_seed_topics_route(site_id: str):
         "site_id": site_id,
         "groups": tistory_seed_topics(site_id),
     })
+
+
+from .operation_routes import install as _install_operations
+import sys as _sys
+_operation_worker = _install_operations(_sys.modules[__name__])
 
 
 def main() -> None:

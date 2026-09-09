@@ -159,11 +159,9 @@
         }
       ],
       "cadence": {
-        "daily_total_min": 3,
-        "daily_total_max": 10,
-        "mode": "daily_deterministic_random_with_source_gate",
-        "original_daily_min": 2,
-        "original_weekly_share_min": 0.3
+        "mode": "new_rss_item",
+        "original_weekly_share_min": 0.3,
+        "daily_publication_limit": null
       }
     },
     "theseouljournal.com": {
@@ -258,11 +256,9 @@
         }
       ],
       "cadence": {
-        "daily_total_min": 3,
-        "daily_total_max": 10,
-        "mode": "daily_deterministic_random_with_source_gate",
-        "original_daily_min": 2,
-        "original_weekly_share_min": 0.3
+        "mode": "new_rss_item",
+        "original_weekly_share_min": 0.3,
+        "daily_publication_limit": null
       }
     }
   }
