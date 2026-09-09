@@ -126,7 +126,8 @@ def test_sns_cards_do_not_offer_unconnected_publish_actions():
     assert all(account["publish_connected"] is False for account in accounts)
     assert all(account["publish_unavailable_reason"] for account in accounts)
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
-    assert "SNS 콘텐츠 바로 올리기 · 연결 없음" in template
+    assert '{{ account.platform }} 콘텐츠 확인·게시 →' in template
+    assert 'href="{{ account.url }}"' in template
     assert "{{ account.publish_unavailable_reason }}" in template
 
 
