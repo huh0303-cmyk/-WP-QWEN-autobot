@@ -180,13 +180,21 @@ def report_html(result):
     parts = ["<h2>통제실 네 가지 핵심 통계</h2>", "<p>기준: " + html.escape(result["generated_at"]) + "</p>",
              "<p>오늘 방문 증감: 오늘 현재−어제 하루. 누적 방문 증감: 오늘 증가. 총글 증감: 전날 저장값 대비. 색인 증감: 이전 확인값 대비. Blogger 방문은 자체 조회수입니다. 미확인 값은 0이 아닙니다.</p>"]
     for platform, title in [("wordpress", "WordPress 25개"), ("blogger", "Blogspot 33개"), ("news", "뉴스룸 2개 · 별도")]:
-        rows = [r for r in result["records"] if r["platform"] == platform]
-        parts.append(f"<h3>{title} · 수집 대상 {len(rows)}개</h3><table border='1' cellpadding='6' style='border-collapse:collapse'><tr><th>사이트</th><th>오늘 방문(증감)</th><th>누적 방문(증감)</th><th>총 발행 글(증감)</th><th>Google 색인(증감)</th><th>확인 필요</th></tr>")
-        for r in rows:
-            values = [html.escape(r["url"])] + [format_metric(r, k, d) for k, d in [("today_visitors", "today_delta"), ("total_visitors", "total_delta"), ("total_posts", "posts_delta"), ("indexed", "indexed_delta")]]
+        rows = sorted((r for r in result["records"] if r["platform"] == platform),
+                      key=lambda r: (r.get("today_visitors") is None, -(r.get("today_visitors") or 0), r["url"]))
+        parts.append(f"<h3>{title} · 수집 대상 {len(rows)}개</h3><p>오늘 방문 내림차순 · 같은 수치는 공동 순위 · 미확인은 맨 아래</p><div style='overflow-x:auto'><table border='1' cellpadding='6' style='border-collapse:collapse;width:100%;font-size:13px'><tr><th>순위</th><th>사이트</th><th>오늘 방문(증감)</th><th>누적 방문(증감)</th><th>총 발행 글(증감)</th><th>Google 색인(증감)</th><th>확인 필요</th></tr>")
+        previous, rank = None, 0
+        for position, r in enumerate(rows, 1):
+            count = r.get("today_visitors")
+            if count is not None and count != previous:
+                rank = position
+            previous = count
+            url = html.escape(r["url"], quote=True)
+            site = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>' if r["url"].startswith("https://") else url
+            values = [str(rank) if count is not None else "—", site] + [format_metric(r, k, d) for k, d in [("today_visitors", "today_delta"), ("total_visitors", "total_delta"), ("total_posts", "posts_delta"), ("indexed", "indexed_delta")]]
             values.append(html.escape(" / ".join(r.get("errors", [])) + (f" · 색인 미확인 {r['index_unknown']}개" if r.get("index_unknown") else "")))
             parts.append("<tr>" + "".join("<td>" + v + "</td>" for v in values) + "</tr>")
-        parts.append("</table>")
+        parts.append("</table></div>")
     return "".join(parts)
 
 

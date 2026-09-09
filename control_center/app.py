@@ -2101,7 +2101,21 @@ def index():
         youtube_channels=youtube_channels, sns_accounts=sns_accounts,
         problem_summary=build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
+        core_metrics_html=_ranked_core_metrics_html(),
     )
+
+
+def _ranked_core_metrics_html():
+    from scripts.core_metrics_report import report_html
+    manifest = _core_metrics_manifest(int(time.time() // 300))
+    if not manifest.get("records") or not manifest.get("generated_at"):
+        return "<p>통계 자료를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.</p>"
+    return report_html(manifest)
+
+
+@app.get("/api/core-metrics-report")
+def ranked_core_metrics_report():
+    return _ranked_core_metrics_html(), 200, {"Cache-Control": "no-store"}
 
 
 @app.get("/api/keyword-suggestions/<path:domain>")

@@ -21,3 +21,21 @@ def test_zero_is_evidence_but_missing_is_not_zero():
 def test_exact_previous_day_is_used():
     row = {"url": "https://example.com", "total_posts": 10}
     assert metrics.previous_day({"days": {"2026-09-08": {"records": [row]}}}, "2026-09-09") == {row["url"]: row}
+
+
+def test_visitor_ranking_ties_zero_and_unknown():
+    import re
+    rows = [dict(platform="wordpress", url="https://" + name + ".com", today_visitors=value)
+            for name, value in [("unknown", None), ("zero", 0), ("b", 12), ("a", 12), ("third", 4)]]
+    document = metrics.report_html({"generated_at": "2026-09-10", "records": rows})
+    rendered = re.findall(r'<tr><td>(.*?)</td><td><a href="(.*?)"', document)
+    assert rendered == [("1", "https://a.com"), ("1", "https://b.com"), ("3", "https://third.com"),
+                        ("4", "https://zero.com"), ("—", "https://unknown.com")]
+
+
+def test_report_escapes_untrusted_site_and_errors():
+    document = metrics.report_html({"generated_at": "<script>", "records": [
+        {"platform": "blogger", "url": 'https://example.com/"<img>', "today_visitors": 1,
+         "errors": ["<script>alert(1)</script>"]}]})
+    assert "<script>" not in document and "<img>" not in document
+    assert "&lt;script&gt;" in document and "&quot;" in document
