@@ -123,10 +123,11 @@ def main() -> None:
     playlist = (ROOT / "scripts" / "youtube_playlist_maker.py").read_text(encoding="utf-8")
     if "enqueue_youtube_vps" not in control_source or "youtube-control-scheduler.yml" in control_source:
         fail("control center YouTube buttons are not exclusively routed to the VPS queue")
-    if "generate_lyria_track" not in playlist or "generate_thumbnail" not in playlist:
-        fail("playlist lost fresh Lyria/Gemini generation")
-    if "MUSIC_SOURCE_FOLDER_ID" in playlist or "THUMBNAIL_FOLDER_ID" in playlist:
-        fail("playlist reintroduced existing Drive input assets")
+    if 'os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")' not in playlist:
+        fail("playlist must default to prepared music rather than paid generation")
+    queue = (ROOT / "automation_hub" / "youtube_vps_queue.py").read_text(encoding="utf-8")
+    if "cost_hold_active" not in queue or "/etc/korea365/youtube-cost-hold" not in queue:
+        fail("VPS YouTube queue lost the active cost-hold check")
     if "youtube_calendar_result.py" not in vps_worker or "youtube_publish_approved.py" not in vps_worker:
         fail("VPS worker lost calendar reporting or private playlist upload")
     for name in ("archive_footage_longform.py", "nasa_archive_longform.py"):
@@ -162,19 +163,15 @@ def main() -> None:
     newsroom = workflow_text.get("newsrooms-daily-publisher.yml", "")
     if 'WP_POST_STATUS: "publish"' not in newsroom or 'WP_PUBLICATION_APPROVED: "true"' not in newsroom:
         fail("newsroom workflow lacks explicit public-publication approval")
-    if "newsroom-publisher-single-owner" not in newsroom or "for attempt in 1 2 3" not in newsroom:
-        fail("newsroom workflow lost single-owner execution or bounded retries")
+    if "newsroom-publisher-single-owner" not in newsroom or newsroom.count("python scripts/autopost_current.py") != 1 or "for attempt in" in newsroom:
+        fail("newsroom must retain a single owner and one generation attempt per RSS event")
     if 'AI_TEXT_PROVIDER: "openai"' not in newsroom or 'OPENAI_MODEL: "gpt-5-mini"' not in newsroom:
         fail("newsroom workflow is not routed to GPT-5 mini")
-    if newsroom.count("- cron:") != 20:
-        fail("newsroom workflow must keep exactly 10 daily scheduled slots per newsroom")
-    if 'KO_CATS=("정치" "경제" "국방" "글로벌" "문화" "스포츠")' not in newsroom:
-        fail("KoreaNews365 six-desk round-robin is not locked")
-    if 'EN_CATS=("Politics" "Business" "Military" "World" "Culture" "Art" "Sports")' not in newsroom:
-        fail("The Seoul Journal seven-desk round-robin is not locked")
+    if "- cron:" in newsroom or "source_item:" not in newsroom or "source_url:" not in newsroom:
+        fail("newsrooms must consume newly detected RSS stories without a daily publication quota")
     newsroom_source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
-    if "pool = preferred_candidates or candidates" not in newsroom_source:
-        fail("scheduled newsroom desk can no longer fall back to another fresh category")
+    if "pool = candidates if exact_source_url else preferred_candidates or candidates" not in newsroom_source:
+        fail("RSS publisher must honor the exact detected source before optional category preferences")
 
     rankmath = workflow_text.get("daily-rankmath-check.yml", "")
     if "continue-on-error: true" in rankmath:
