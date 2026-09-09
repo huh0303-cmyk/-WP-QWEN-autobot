@@ -14,6 +14,14 @@ Open with the concrete finding or reader decision, not a generic introduction.
 def plain(value):
     return re.sub(r"\s+", " ", BeautifulSoup(html.unescape(value or ""), "html.parser").get_text(" ", strip=True)).strip()
 
+_TITLE_STOPWORDS = {
+    "a", "an", "the", "and", "or", "by", "with", "for", "to", "of", "in", "on",
+    "at", "from", "how", "what", "why", "when", "who", "is", "are", "your",
+}
+
+def _significant_words(text):
+    return {w for w in re.findall(r"[a-z0-9'-]+", text) if w not in _TITLE_STOPWORDS and len(w) > 2}
+
 def title_repeats(title, previous):
     a, b = plain(title).casefold(), plain(previous).casefold()
     if not a or not b:
@@ -25,7 +33,25 @@ def title_repeats(title, previous):
     for x, y in zip(left, right):
         if x != y: break
         shared.append(x)
-    return len(shared) >= 3 and len(" ".join(shared)) >= 15
+    if len(shared) >= 3 and len(" ".join(shared)) >= 15:
+        return True
+    # 2026-09-10: the checks above only catch a reused sentence *frame*
+    # (near-identical string, or an identical leading phrase). A title
+    # reworded around the same underlying topic slips through both - e.g.
+    # "Seoul central palaces and markets by subway - an 8-hour timed
+    # tourism route with ticketing and seasonal cautions" vs "Seoul central
+    # cultural loop by subway - a timed public-transport itinerary with
+    # admission and seasonal notes" diverge at the third word, so the prefix
+    # check never engages, yet they share the same city area, transport
+    # mode, and "timed itinerary" angle - the same article in different
+    # words. Catch that by requiring a real overlap in the significant
+    # (non-stopword) vocabulary instead of position-sensitive matching.
+    words_a, words_b = _significant_words(a), _significant_words(b)
+    if len(words_a) >= 4 and len(words_b) >= 4:
+        overlap = words_a & words_b
+        if len(overlap) >= 5 or len(overlap) / min(len(words_a), len(words_b)) >= 0.55:
+            return True
+    return False
 
 def clean_opening(title, body):
     soup = BeautifulSoup(body or "", "html.parser")
