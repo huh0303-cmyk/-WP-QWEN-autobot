@@ -4,6 +4,55 @@ Hostinger VPS is the sole production host.
 The production topology is `nginx -> gunicorn control center -> durable VPS queue -> single YouTube worker`.
 GitHub Actions is CI-only and does not generate or upload YouTube videos.
 
+## Automatic production code deployment (September 9, 2026)
+
+The production VPS pulls `origin/main` every 60–70 seconds using its existing repository
+read access. No inbound SSH deployment key is stored in GitHub. `main` remains the release
+authority; merge reviewed changes there. This timer updates application code automatically,
+not just the checkout metadata. GitHub runs `VPS deployment safety tests` for deployment changes.
+
+Install the tested deployment engine once (as root):
+
+```bash
+install -d -m 755 /usr/local/lib/korea365
+install -m 755 deploy/vps/sync_main.py /usr/local/lib/korea365/sync_main.py
+install -m 644 deploy/vps/korea365-deploy.service deploy/vps/korea365-deploy.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now korea365-deploy.timer
+systemctl start korea365-deploy.service
+```
+
+The engine is installed outside the application checkout so a bad application release cannot
+replace its recovery program. Upgrade that engine explicitly after its tests pass; do not
+blindly replace systemd unit files during an application release.
+
+Code in `automation_hub`, `control_center`, `scripts`, `config`, `deploy`, `tests`, `tools`,
+`multilang_quiz`, `.github`, and root Python files is synchronized. Existing runtime data,
+generated assets, root state JSON files, credentials and `.venv` are preserved. Dependency
+manifest changes pause deployment for a tested environment update. Conflicting server-only
+code also pauses deployment, rather than silently destroying a hotfix. Previously applied
+hotfixes identical to main are accepted. Do not run `git clean` or `git reset --hard` on production.
+
+The deployer holds the video worker's own lock before stopping services. An active video
+job defers deployment. It backs up every changed code file, applies code, updates HEAD, starts
+all three production services and checks `/healthz` plus systemd state. Failure restores
+the previous files and HEAD. An interrupted deployment is recovered on the next timer run.
+A failed release is not retried until a new main commit is available.
+
+Inspect actual deployed revision and status:
+
+```bash
+cat /opt/korea365/data/deploy-status.json
+systemctl list-timers korea365-deploy.timer
+journalctl -u korea365-deploy.service -n 30 --no-pager
+```
+
+Backups are private under `data/deployment-backups/`. A successful code deployment does not
+claim that paid provider credits, external account permissions, or individual publications
+are healthy; those require their own end-to-end checks.
+
+## Initial installation reference
+
 Install `ffmpeg`, `fonts-nanum`, Python 3.11+, create user `korea365`, clone this repository at
 `/opt/korea365`, create `/opt/korea365/.venv`, and install `requirements-control-center.txt` plus
 `pillow google-api-python-client google-auth google-auth-httplib2 google-genai`.
