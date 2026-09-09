@@ -156,6 +156,23 @@ def test_rss_does_not_cap_new_articles_at_ten(store,tmp_path):
     assert watcher.status()['waiting']==25
 
 
+def test_rss_dispatch_keeps_detected_evidence_even_after_feed_rotation(store,tmp_path):
+    config=tmp_path/'rss.json';config.write_text(json.dumps({'sources':[],'poll_seconds':60}))
+    target=dict(site_id='news-ko',label='koreanews365.com',platform='news',inputs={'newsroom':'koreanews365'})
+    watcher=RSSWatcher(store,config,lambda:[target]);source={'key':'feed','language':'ko'}
+    watcher.ingest(source,[])
+    item={'title':'New source story','url':'https://example.com/story','published':time.time(),'summary':'Captured facts'}
+    watcher.ingest(source,[item])
+    watcher.ingest(source,[])
+    watcher.scan()
+    with store.connect() as db:
+        jobs=db.execute('SELECT payload FROM jobs').fetchall()
+    assert len(jobs)==1
+    payload=json.loads(jobs[0][0])
+    assert json.loads(payload['inputs']['source_item'])['summary']=='Captured facts'
+    assert payload['inputs']['source_url']==item['url']
+
+
 def test_feed_parser_rejects_html_and_handles_rss_atom():
     with pytest.raises(ValueError):parse_feed('<html><body>Blocked</body></html>')
     assert parse_feed('<rss><channel><item><title>News</title><link>https://example.com/a</link></item></channel></rss>')[0]['url']=='https://example.com/a'

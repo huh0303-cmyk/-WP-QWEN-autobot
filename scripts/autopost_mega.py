@@ -1640,6 +1640,21 @@ def crawl_rss_news(lang="ko", site_url=""):
     # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
     sources = get_enabled_rss_source_records(lang)
     exact_source_url = os.getenv("NEWSROOM_SOURCE_URL", "").strip()
+    captured_item = os.getenv("NEWSROOM_SOURCE_ITEM", "").strip()
+    if captured_item:
+        from automation_hub.rss_event import resolve_rss_event
+        try:
+            item = resolve_rss_event(captured_item, exact_source_url, sources, lang)
+        except (ValueError, TypeError, KeyError) as exc:
+            print(f"   NEWS SOURCE GATE: captured RSS item rejected: {exc}")
+            return "", "", None, ""
+        source_key = 'source:' + item[3].split('#')[0].rstrip('/')
+        if is_dup(item[0]) or source_key in cache:
+            print('   NEWS SOURCE GATE: captured RSS article already processed')
+            return "", "", None, ""
+        used.add(item[0].strip().lower())
+        print(f"   RSS event accepted: {item[2]} — {item[0][:60]}")
+        return item
     if not sources:
         print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
         return "", "", None, ""

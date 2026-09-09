@@ -1,5 +1,7 @@
 """VPS new-item detector. Polling a feed never implies publishing a quota."""
 import hashlib
+import html
+import re
 import json
 import time
 import xml.etree.ElementTree as ET
@@ -37,7 +39,10 @@ def parse_feed(text):
         except (ValueError, TypeError):
             published = None
         if value("title"):
-            items.append({"title": value("title"), "url": url.split("#")[0], "published": published})
+            summary = value("description") or value("summary") or value("content")
+            summary = re.sub(r"<[^>]+>", " ", summary)
+            items.append({"title": value("title"), "url": url.split("#")[0], "published": published,
+                          "summary": re.sub(r"\s+", " ", html.unescape(summary)).strip()[:5000]})
     return items
 
 
@@ -49,6 +54,7 @@ class RSSWatcher:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS rss_feeds (key TEXT PRIMARY KEY, initialized INTEGER NOT NULL DEFAULT 0, checked REAL, error TEXT, etag TEXT, modified TEXT);
                 CREATE TABLE IF NOT EXISTS rss_items (id TEXT PRIMARY KEY, newsroom TEXT NOT NULL, source TEXT NOT NULL, url TEXT NOT NULL, title TEXT NOT NULL, published REAL, detected REAL NOT NULL, state TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS rss_item_evidence (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
             """)
 
     def ingest(self, source, items):
@@ -66,6 +72,9 @@ class RSSWatcher:
                 if item["published"] is not None and now - item["published"] > 72 * 3600:
                     state = "expired"
                 db.execute("INSERT OR IGNORE INTO rss_items VALUES (?,?,?,?,?,?,?,?)", (identity, key, source["key"], item["url"], item["title"], item["published"], now, state))
+                evidence = dict(item, source_key=source['key'], detected=now)
+                db.execute("INSERT OR IGNORE INTO rss_item_evidence VALUES (?,?)", (identity, json.dumps(evidence, ensure_ascii=False)))
+                db.execute("UPDATE rss_items SET state='waiting' WHERE id=? AND state='awaiting_source'", (identity,))
             db.execute("INSERT INTO rss_feeds(key,initialized,checked,error) VALUES (?,1,?,'') ON CONFLICT(key) DO UPDATE SET initialized=1,checked=excluded.checked,error=''", (source["key"], now))
 
     def scan(self):
@@ -93,8 +102,16 @@ class RSSWatcher:
         for item in waiting:
             if item["newsroom"] not in targets:
                 continue
+            with self.store.connect() as db:
+                evidence = db.execute("SELECT payload FROM rss_item_evidence WHERE id=?", (item['id'],)).fetchone()
+                if not evidence:
+                    db.execute("UPDATE rss_items SET state='awaiting_source' WHERE id=?", (item['id'],))
+                    continue
+                if item['published'] is None or not -600 <= time.time()-item['published'] <= 72*3600:
+                    db.execute("UPDATE rss_items SET state='expired' WHERE id=?", (item['id'],))
+                    continue
             descriptor = dict(targets[item["newsroom"]], source="rss", source_title=item["title"], source_url=item["url"])
-            descriptor["inputs"] = dict(descriptor["inputs"], source_url=item["url"])
+            descriptor["inputs"] = dict(descriptor["inputs"], source_url=item["url"], source_item=evidence[0])
             try:
                 self.store.submit("news2", [descriptor], "rss-" + item["id"])
             except Conflict:
