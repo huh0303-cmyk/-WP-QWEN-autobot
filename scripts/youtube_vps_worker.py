@@ -20,7 +20,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from automation_hub.youtube_calendar import KST, read_calendar, select_due, select_next_ready, update_row
 from automation_hub.youtube_registry import load_channels
-from automation_hub.youtube_vps_queue import enqueue, queue_root
+from automation_hub.youtube_vps_queue import enqueue, queue_root, cost_hold_active, check_cost_hold
 from gsheets_direct import get_sheets_service
 
 
@@ -125,6 +125,7 @@ def _knowledge(env: dict[str, str], log_handle) -> str:
 
 
 def run_job(job: dict) -> None:
+    check_cost_hold()
     _update_dashboard(job, "running")
     log_dir = queue_root() / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -159,6 +160,8 @@ def run_job(job: dict) -> None:
 
 
 def process_one() -> bool:
+    if cost_hold_active():
+        return False
     root = queue_root()
     for name in ("pending", "running", "completed", "failed", "logs"):
         (root / name).mkdir(parents=True, exist_ok=True)

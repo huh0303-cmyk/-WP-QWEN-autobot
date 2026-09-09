@@ -12,11 +12,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def cost_hold_active() -> bool:
+    """Server-owned pause survives code deployments and preserves queued work."""
+    return Path(os.environ.get("YOUTUBE_COST_HOLD_FILE", "/etc/korea365/youtube-cost-hold")).exists()
+
+
+def check_cost_hold() -> None:
+    if cost_hold_active():
+        raise RuntimeError("비용 점검으로 YouTube 제작을 일시중지했습니다. 추가 과금 방지 설정 해제 후 재개할 수 있습니다.")
+
+
 def queue_root() -> Path:
     return Path(os.environ.get("YOUTUBE_VPS_QUEUE_DIR", ROOT / "data" / "youtube_vps_queue"))
 
 
 def enqueue(channel_key: str, label: str, state_group: str, run_now: bool = True) -> dict:
+    check_cost_hold()
     root = queue_root()
     pending, running = root / "pending", root / "running"
     pending.mkdir(parents=True, exist_ok=True)
