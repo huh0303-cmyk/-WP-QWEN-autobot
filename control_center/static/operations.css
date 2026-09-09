@@ -29,3 +29,18 @@
 [hidden]{display:none!important}#video-group-history .dashboard-group{margin-top:1rem}
 @media(max-width:800px){#bulk-publish>div.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){main{padding:10px!important}#bulk-publish>div.grid{grid-template-columns:1fr}.metrics-controls{flex-direction:column}.operation-totals{gap:6px}.operation-totals button{font-size:12px;flex:1 0 28%}.dashboard-disclosure{padding:12px}}
+
+#advanced-controls .grid>*{min-width:0}#advanced-controls{overflow-wrap:anywhere}
+#daily-core-metrics{scroll-margin-top:210px}.metrics-definitions{font-size:12px;color:#475569;margin:8px 0}.metrics-definitions summary{cursor:pointer}
+@media(max-width:640px){
+ #advanced-controls .grid{grid-template-columns:minmax(0,1fr)}
+ #daily-core-metrics-content table,#daily-core-metrics-content tbody{display:block;width:100%!important}
+ #daily-core-metrics-content tr:first-child{display:none}
+ #daily-core-metrics-content tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:12px;overflow:hidden}
+ #daily-core-metrics-content td{display:block;white-space:normal!important;border:0!important;padding:10px!important;font-weight:700;min-width:0!important;max-width:none!important}
+ #daily-core-metrics-content td:nth-child(1){grid-column:1 / -1;background:#eff6ff;padding-bottom:0!important}
+ #daily-core-metrics-content td:nth-child(1)::before{content:'순위 ';display:inline}
+ #daily-core-metrics-content td:nth-child(2){grid-column:1 / -1;background:#eff6ff;overflow-wrap:anywhere}
+ #daily-core-metrics-content td:nth-child(n+3):nth-child(-n+6)::before{content:attr(data-label);display:block;font-size:11px;font-weight:400;color:#475569;margin-bottom:4px}
+ #daily-core-metrics-content td:last-child{grid-column:1 / -1;font-weight:400}
+}
