@@ -7,6 +7,15 @@ from scripts.blogger_search_description import build_search_description
 
 
 class BloggerRewriterTests(unittest.TestCase):
+    def test_description_uses_complete_alternative_instead_of_broken_clip(self):
+        good = "Practical source-led Korea travel planning guidance covering transport, reservations, timing, and essential checks."
+        article = {"title": "Korea travel planning", "content_html": "<p>Body.</p>",
+                   "meta_description": "Short. " + "Long unfinished description " * 10,
+                   "meta_description_candidates": ["Too short.", good]}
+        result = normalize_rewrite_format(article, target_chars=1800)
+        self.assertEqual(result["meta_description"], good)
+        self.assertEqual(result["content_html"], article["content_html"])
+
     def test_unlock_title_is_blocked_by_blogger_quality_gate(self):
         source_url = "https://example.com/korea-travel"
         content = (
