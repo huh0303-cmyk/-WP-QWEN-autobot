@@ -8,6 +8,9 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
+from pathlib import Path
+
+NEWSROOM_COST_HOLD = Path("/etc/korea365/newsroom-cost-hold")
 
 import requests
 
@@ -96,6 +99,12 @@ class RSSWatcher:
                 with self.store.connect() as db:
                     db.execute("INSERT INTO rss_feeds(key,checked,error) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET checked=excluded.checked,error=excluded.error",
                                (source["key"], time.time(), "RSS 연결 또는 형식 확인 실패"))
+        if NEWSROOM_COST_HOLD.exists():
+            # Continue recording fresh RSS evidence while paid writing is held.
+            # Do not repeatedly dispatch a disabled workflow and report 422s.
+            with self.store.connect() as db:
+                db.execute("UPDATE settings SET value=? WHERE key='rss_scan_lease'", (str(time.time() + self.config["poll_seconds"]),))
+            return
         targets = {t["label"].split(".")[0]: t for t in self.targets()}
         with self.store.connect() as db:
             waiting = db.execute("SELECT * FROM rss_items WHERE state='waiting' ORDER BY CASE WHEN title LIKE '%속보%' OR title LIKE '%긴급%' OR title LIKE '%breaking%' THEN 0 ELSE 1 END, detected,published LIMIT 200").fetchall()
@@ -131,6 +140,8 @@ class RSSWatcher:
         stale = any(not f["checked"] or time.time()-f["checked"] > 180 for f in feeds)
         failed = sum(bool(f["error"]) for f in feeds)
         message = "RSS 새 기사 감지 → 작성·검수·게시 · 일일 발행 횟수 제한 없음"
+        if NEWSROOM_COST_HOLD.exists():
+            message = "RSS 새 기사 감지 중 · 비용 중지로 작성·게시 대기"
         message += f" · 대기 기사 {waiting}건"
         if not feeds:
             message += " · 감시 시작 확인 대기"

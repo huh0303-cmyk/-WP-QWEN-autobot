@@ -208,3 +208,24 @@ def test_news_workflow_has_no_fixed_publication_schedule():
     assert 'NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}' in workflow
     worker=(root/'scripts/autopost_mega.py').read_text(encoding='utf-8')
     assert 'published_today >= daily_target' not in worker
+
+
+def test_newsroom_cost_hold_records_new_items_without_dispatch(store, tmp_path, monkeypatch):
+    from control_center import rss_watch
+    hold = tmp_path / "newsroom-hold"
+    hold.touch()
+    monkeypatch.setattr(rss_watch, "NEWSROOM_COST_HOLD", hold)
+    source = {"key": "desk", "name": "Desk", "language": "ko", "feed": "https://example.com/feed"}
+    config = tmp_path / "rss.json"
+    config.write_text(json.dumps({"sources": [source], "poll_seconds": 60}))
+    descriptor = dict(target(), label="koreanews365.com")
+    watcher = RSSWatcher(store, config, lambda: [descriptor])
+    watcher.ingest(source, [])
+    response = Mock()
+    response.text = '<rss><channel><item><title>New story</title><link>https://example.com/new</link></item></channel></rss>'
+    monkeypatch.setattr(rss_watch.requests, "get", Mock(return_value=response))
+    watcher.scan()
+    with store.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM rss_items WHERE state='waiting'").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM jobs").fetchone()[0] == 0
+    assert "비용 중지" in watcher.status()["message"]
