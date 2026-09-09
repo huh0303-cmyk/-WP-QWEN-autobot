@@ -1,0 +1,73 @@
+name: "GSC Blogspot Index Audit (read-only)"
+
+# Clone of gsc-post-index-audit.yml for the 33 Blogspot properties. Same GSC
+# service account, same read-only URL Inspection call - only the post-list
+# source differs (Blogger's public feed instead of the WP REST API).
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Optional domain filter; blank audits all 33"
+        required: false
+        default: ""
+      max_per_site:
+        description: "0 = all published posts"
+        required: false
+        default: "0"
+      retry_unknown:
+        description: "Retry failed/uninspected URLs only; preserve already verified results"
+        type: boolean
+        default: false
+  schedule:
+    # 매일 04:47 KST — WP 감사(04:00)와 겹치지 않게 47분 뒤로 분산.
+    - cron: "47 19 * * *"
+  push:
+    paths:
+      - "scripts/audit_gsc_blogspot_index.py"
+      - "scripts/blogspot_site_registry.py"
+      - ".github/workflows/gsc-blogspot-index-audit.yml"
+
+concurrency:
+  group: gsc-blogspot-index-audit
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: Run exact URL-level GSC audit for all 33 Blogspot sites
+        env:
+          RETRY_UNKNOWN: ${{ inputs.retry_unknown }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: |
+          mode="--refresh-all"
+          if [ "$RETRY_UNKNOWN" = "true" ]; then mode="--retry-unknown"; fi
+          python scripts/audit_gsc_blogspot_index.py \
+            --site "${{ github.event.inputs.site || '' }}" \
+            --max-per-site "${{ github.event.inputs.max_per_site || '0' }}" \
+            "$mode"
+      - name: Save dashboard index totals
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add blogspot_index_audit_manifest.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "data: refresh exact Blogspot GSC index totals [skip ci]"
+          git pull --rebase origin main
+          git push
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gsc-blogspot-index-audit-${{ github.run_id }}
+          path: blogspot_index_audit_manifest.json
+          if-no-files-found: warn
+          retention-days: 30
