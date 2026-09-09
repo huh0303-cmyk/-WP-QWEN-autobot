@@ -3097,6 +3097,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     mid =build_img_html(images[1:2],keyword,alt_text=keyword) if len(images)>1 else ""
     end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}") if len(images)>2 else ""
     is_newsroom = site.get("mode") in ("news", "news_en")
+    if is_newsroom:
+        from newsroom_real_photos import figure
+        ai_caption = "AI 생성 설명 이미지 · 실제 현장 사진 아님" if site.get("lang") == "ko" else "AI-generated illustration; not a photograph of the event"
+        photo = site.get("_newsroom_real_photo")
+        hero = figure(photo, site.get("lang", "en")) if photo else build_img_html(images[:1], keyword, alt_text=ai_caption)
+        mid = build_img_html(images[:1], keyword, alt_text=ai_caption) if photo else ""
+        end = ""
     faq_html="" if is_newsroom else build_faq_html(faq)
 
     h2ends=[m.end() for m in re.finditer(r'</h2>',body_html,re.IGNORECASE)]
@@ -3173,7 +3180,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
           "categories":[cat_id] if cat_id and cat_id>0 else [],
           "tags":tag_ids,
           "meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta,"rank_math_seo_score":str(score)}}
-    featured_media_id = ensure_featured_media(url, pw, images[0] if images else "", title)
+    real_photo = site.get("_newsroom_real_photo") if is_newsroom else None
+    featured_url = real_photo["image_url"] if real_photo else (images[0] if images else "")
+    featured_media_id = ensure_featured_media(url, pw, featured_url, real_photo["caption_ko" if site.get("lang") == "ko" else "caption_en"] if real_photo else title)
     if featured_media_id:
         data["featured_media"] = featured_media_id
     if author_id and author_id>0: data["author"]=author_id
@@ -3521,6 +3530,12 @@ def process_one(site, keyword):
         print(f"  🔧 {best_score}점 → post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
+    site.pop("_newsroom_real_photo", None)
+    if AUTOMATED_IMAGE_PUBLISHING_ENABLED and not site.get("no_image") and mode in ("news", "news_en"):
+        from newsroom_real_photos import select_photo
+        site["_newsroom_real_photo"] = select_photo(f"{keyword} {title} {news_source_summary}")
+        if site["_newsroom_real_photo"]:
+            print("  📷 개별 이용조건 확인된 실제 자료사진 + AI 설명 이미지")
     if not AUTOMATED_IMAGE_PUBLISHING_ENABLED or site.get("no_image"):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
