@@ -1954,7 +1954,7 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
 def _core_metrics_manifest(bucket):
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     try:
-        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/core_metrics_latest.json", timeout=12)
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/core_metrics_latest.json", params={"refresh": bucket}, timeout=12)
         response.raise_for_status()
         return response.json()
     except (requests.RequestException, ValueError):
