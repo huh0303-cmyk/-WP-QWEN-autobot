@@ -56,6 +56,9 @@ def main() -> int:
             "keyword_mode": "golden_keyword_queue",
             "keyword_rules": {
                 "source_site_id": source["site_id"],
+                "theme": blog.get("theme", ""),
+                "seed_keywords": blog.get("seed_keywords", []),
+                "editorial_policy": blog.get("editorial_policy", ""),
                 "text_provider": "gpt-5-mini",
                 "review_provider": "gpt-5-mini-second-pass",
                 "meta_description_chars_min": 100,
