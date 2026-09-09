@@ -107,7 +107,7 @@
             <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block truncate text-xs text-blue-700 underline" title="{{ url }}">{{ url|replace('https://','')|replace('http://','') }} ↗</a>
             <span class="tile-rank mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-black text-blue-800">순위 미집계</span>
             <div class="tile-metrics mt-2 space-y-1 text-[11px]">
-            {% for title, key, change, basis in [('오늘 방문자','today_visitors','today_delta','어제 하루 대비'),('누적 방문자','total_visitors','total_delta','오늘 증가'),('새 콘텐츠 · 오늘','new_posts','new_posts_delta','어제 하루 대비 · KST'),('Google 색인 · 글','indexed','indexed_delta','이전 Google 확인 대비')] %}
+            {% for title, key, change, basis in [('오늘 방문자','today_visitors','today_delta','오늘 현재 − 어제 하루 · Blogger는 자체 조회수'),('누적 방문자','total_visitors','total_delta','오늘 증가'),('총 발행 글','total_posts','posts_delta','전날 저장값 대비 · 비교자료 없으면 미집계'),('Google 색인 · 글','indexed','indexed_delta','이전 Google 확인 대비')] %}
             {% set value = metrics.get(key) if metrics else none %}{% set delta = metrics.get(change) if metrics else none %}
             <p class="flex flex-wrap justify-between gap-1" title="{{ basis }}"><span>{{ title }}</span><strong>{{ '{:,}'.format(value) if value is not none else '미집계' }} <span class="{{ 'text-red-600' if delta is not none and delta < 0 else 'text-emerald-700' }}">({% if delta is none %}증감 미집계{% else %}{{ '+' if delta > 0 else '' }}{{ '{:,}'.format(delta) }}{% endif %})</span></strong></p>
             {% endfor %}

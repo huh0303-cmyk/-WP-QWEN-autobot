@@ -1,0 +1,60 @@
+name: Four core statistics and daily email (no paid AI)
+on:
+  workflow_dispatch:
+    inputs:
+      send_email:
+        type: boolean
+        default: true
+        description: Send the requested four-metric email
+  schedule:
+    - cron: '50 20 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: core-metrics-report
+  cancel-in-progress: false
+jobs:
+  collect:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests pyjwt cryptography
+      - name: Collect real statistics and send requested email
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SEND_EMAIL: ${{ github.event_name == 'schedule' || inputs.send_email }}
+        run: |
+          if [ "$SEND_EMAIL" = true ]; then
+            python scripts/core_metrics_report.py --email
+          else
+            python scripts/core_metrics_report.py
+          fi
+      - name: Preserve date-stamped measurements
+        if: always()
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_report.html
+          git diff --cached --quiet || git commit -m 'Update four core metrics [skip ci]'
+          for attempt in 1 2 3; do
+            git pull --rebase origin main || exit 1
+            git push && exit 0
+            sleep 2
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core-metrics-report
+          path: |
+            data/core_metrics_latest.json
+            data/core_metrics_report.html

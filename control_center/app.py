@@ -661,6 +661,7 @@ def get_site_data():
             "default_text_model": "gpt-5-mini",
             "default_image_model": "bytedance/sdxl-lightning-4step",
         })
+    sites = _overlay_core_metrics(sites, "wordpress")
     return sorted(sites, key=lambda site: (
         site["today_visitors"] is None,
         -(site["today_visitors"] or 0),
@@ -678,7 +679,6 @@ def get_blogger_data():
     path = Path(__file__).resolve().parents[1] / "config" / "blogger_portfolio.json"
     rows = [
         row for row in json.loads(path.read_text(encoding="utf-8")).get("channels", [])
-        if row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS
     ]
     stats_path = Path(__file__).resolve().parents[1] / "data" / "blogger_traffic_latest.json"
     stats = {}
@@ -725,7 +725,7 @@ def get_blogger_data():
         "url": row.get("blogspot", ""),
         "google_approved": row.get("blogspot", "").rstrip("/") in ADSENSE_BLOGGER_URLS,
         "status": row.get("status", "UNKNOWN"),
-        "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"}),
+        "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"} and row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS),
         "blog_id": row.get("destination_id", ""),
         "admin_review_url": f"https://www.blogger.com/blog/posts/{row.get('destination_id', '')}" if row.get("destination_id") else "https://www.blogger.com/",
         "category": row.get("topic") or "미분류",
@@ -745,7 +745,7 @@ def get_blogger_data():
         "indexed_delta": None,
     } for row in rows]
     return sorted(
-        result,
+        _overlay_core_metrics(result, "blogger"),
         key=lambda item: (
             item["today_visitors"] is None,
             -(item["today_visitors"] or 0),
@@ -1948,6 +1948,42 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
         "sns_total": len(sns_accounts), "sns_issues": sns_issues,
         "all_clear": not (wp_issues or blogger_issues or tistory_issues or youtube_issues or sns_issues),
     }
+
+
+@lru_cache(maxsize=2)
+def _core_metrics_manifest(bucket):
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    try:
+        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/core_metrics_latest.json", timeout=12)
+        response.raise_for_status()
+        return response.json()
+    except (requests.RequestException, ValueError):
+        try:
+            return json.loads((Path(__file__).resolve().parents[1] / "data/core_metrics_latest.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+
+
+def _overlay_core_metrics(rows, platform):
+    manifest = _core_metrics_manifest(int(time.time() // 300))
+    records = {r["url"].rstrip("/"): r for r in manifest.get("records", [])}
+    today = datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+    for row in rows:
+        key = row.get("url") or "https://" + row.get("domain", "")
+        record = records.get(key.rstrip("/"))
+        if not record:
+            continue
+        keys = ["total_posts", "posts_delta", "posts_checked_at", "indexed", "indexed_delta", "index_total", "index_unknown", "index_unindexed", "index_partial", "index_checked_at"]
+        if platform == "blogger":
+            keys += ["today_visitors", "today_delta", "total_visitors", "total_delta", "visitor_checked_at"]
+        for field in keys:
+            row[field] = record.get(field)
+        if manifest.get("generated_at", "")[:10] != today:
+            row["posts_delta"] = None
+            if platform == "blogger":
+                row.update(today_visitors=None, today_delta=None, total_delta=None)
+        row["index_status"] = " / ".join(record.get("errors", [])) or "Google URL별 확인"
+    return rows
 
 
 @lru_cache(maxsize=2)
