@@ -21,6 +21,11 @@ on:
         required: false
         type: string
         default: ""
+      source_item:
+        description: "RSS item captured at detection; prevents rolling-feed loss"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -86,6 +91,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}
+          NEWSROOM_SOURCE_ITEM: ${{ inputs.source_item }}
           FORCE_SOURCE_IPV4: "true"
           NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
           NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
@@ -103,16 +109,9 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          # A retry starts from a fresh process. The publisher reloads recent
-          # titles and embedded source URLs first, so a timeout after a remote
-          # create cannot intentionally create a duplicate edition.
-          for attempt in 1 2 3; do
-            if python scripts/autopost_current.py 2>&1 | tee "artifacts/newsroom-attempt-${attempt}.log"; then
-              exit 0
-            fi
-            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 20)); fi
-          done
-          exit 1
+          # One RSS event owns one publication attempt. Never regenerate the
+          # same article three times just because a source/quality gate failed.
+          python scripts/autopost_current.py 2>&1 | tee artifacts/newsroom-attempt-1.log
       - name: Save publication result
         if: always()
         uses: actions/upload-artifact@v4

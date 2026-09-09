@@ -120,6 +120,13 @@ def install(module):
             descriptors = targets(group, site_id)
             if not descriptors:
                 raise ValueError("등록된 실행 대상이 없습니다.")
+            if all(d.get('platform') == 'news' for d in descriptors):
+                # A newsroom button wakes RSS discovery; it must not fabricate
+                # an empty publication request or a daily publication quota.
+                worker.last_discovery = 0
+                worker.start()
+                return reply({'accepted': True, 'group': group, 'target': target,
+                              'message': 'RSS 새 기사 확인을 요청했습니다. 새 기사만 발행하며, 없으면 대기합니다.'}, 202)
             request_id = request.form.get("operation_request_id") or module.secrets.token_hex(16)
             if not re.fullmatch(r"[a-zA-Z0-9-]{16,80}", request_id):
                 raise ValueError("요청 번호 형식이 올바르지 않습니다.")

@@ -6,7 +6,7 @@ import pytest
 module = import_module('control_center.app')
 
 
-@pytest.mark.parametrize('group,expected', [('wp25',25),('news2',2),('blogspot33',32),('tistory5',5)])
+@pytest.mark.parametrize('group,expected', [('wp25',25),('blogspot33',32),('tistory5',5)])
 def test_group_acceptance_is_saved_per_site_before_response(group,expected,tmp_path,monkeypatch):
     from control_center.operations import Store
     temporary=Store(tmp_path/'operations.db')
@@ -22,8 +22,18 @@ def test_group_acceptance_is_saved_per_site_before_response(group,expected,tmp_p
         response=client.post('/trigger/publish-group/'+group,data=data,headers={'Accept':'application/json'})
         assert response.status_code==202
     assert len(temporary.snapshot())==expected
-    if group=='news2':
-        assert {j['workflow'] for j in temporary.snapshot()}=={'newsrooms-daily-publisher.yml'}
+
+
+def test_newsroom_button_wakes_rss_without_fabricating_publication_jobs(monkeypatch):
+    extension=module.app.extensions['operations']
+    monkeypatch.setenv('CONTROL_CENTER_GITHUB_TOKEN','test-only')
+    with patch.object(extension['worker'],'start') as start,patch.object(extension['store'],'submit') as submit:
+        response=module.app.test_client().post('/trigger/publish-group/news2',
+            data={'csrf_token':module.app.config['CONTROL_CENTER_CSRF']},headers={'Accept':'application/json'})
+    assert response.status_code==202
+    start.assert_called_once()
+    submit.assert_not_called()
+    assert extension['worker'].last_discovery==0
 
 
 def test_expired_csrf_returns_rejection_not_redirect_success():
