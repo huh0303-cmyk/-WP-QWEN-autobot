@@ -33,11 +33,11 @@ def test_control_room_uses_one_daily_post_for_every_regular_wordpress_site():
 def test_control_room_keeps_newsroom_rss_exception():
     site = type("Site", (), {"content_type": "news_ko"})()
     assert wordpress_cadence(site) == {
-        "daily_min": 3,
-        "daily_max": 10,
+        "daily_min": None,
+        "daily_max": None,
         "weekly_min": None,
         "weekly_max": None,
-        "label": "RSS 하루 3~10회",
+        "label": "RSS 새 기사 감지 시 자동 발행",
         "kind": "newsroom",
     }
 
@@ -155,8 +155,8 @@ def test_blogspot_public_button_continues_to_exact_platform_publish_job():
     queue = (Path(__file__).resolve().parents[1] / "scripts" / "queue_blogger_rewrite.py").read_text(encoding="utf-8")
     assert "actions: write" in workflow
     assert "steps.queue.outputs.job_id" in workflow
-    assert "gh workflow run platform-publish-v2.yml" in workflow
-    assert '-f job_id="$QUEUED_JOB_ID"' in workflow
+    assert "python scripts/dispatch_blogger_publication.py" in workflow
+    assert 'QUEUED_JOB_ID: ${{ steps.queue.outputs.job_id }}' in workflow
     assert 'output_file.write(f"job_id={job_id}\\n")' in queue
 
 

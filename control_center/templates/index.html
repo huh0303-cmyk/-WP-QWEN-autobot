@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='operations.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#020617">
     <meta name="mobile-web-app-capable" content="yes">
@@ -78,7 +79,7 @@
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {% for group, title, desc, confirm_msg, color in [
                     ('wp25', 'WP 25개', '뉴스 2개 제외 · 매번 무작위 순서', 'WP 25개 사이트 발행을 지금 시작할까요?', 'blue'),
-                    ('news2', '뉴스룸 2채널', 'koreanews365 · theseouljournal', '뉴스룸 2채널 발행을 지금 시작할까요?', 'amber'),
+                    ('news2', '뉴스룸 2채널', 'RSS 새 기사 자동 감시', '뉴스룸 2채널 발행을 지금 시작할까요?', 'amber'),
                     ('tistory5', 'Tistory 5개', '비공개 검토본 생성', 'Tistory 5개 사이트 검토본 생성을 지금 시작할까요?', 'teal'),
                     ('blogspot33', 'Blogspot ' ~ (bloggers|length) ~ '개', '매번 무작위 순서', 'Blogspot 전체 채널 발행을 지금 시작할까요?', 'violet'),
                     ('youtube_playlist5', 'YouTube 플리 5개', '플레이리스트 채널 묶음', 'YouTube 플리 5개 채널 콘텐츠 제작을 지금 시작할까요?', 'sky'),
@@ -197,7 +198,7 @@
         <div class="space-y-4">
             <div class="grid gap-2 text-xs sm:grid-cols-2">
                 <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 font-bold text-blue-900">일반 WordPress 25개 · 사이트별 하루 1포스팅 · 주 7포스팅</p>
-                <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-bold text-amber-900">뉴스룸 2개 예외 · 사이트별 RSS 하루 3~10회</p>
+                <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-bold text-amber-900">뉴스룸 2개 예외 · RSS 새 기사 감지 시 자동 발행</p>
             </div>
             <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -721,6 +722,7 @@
         window.addEventListener('hashchange', focusReviewTarget);
         window.addEventListener('load', focusReviewTarget);
         function wireBulkStatus(group, light) {
+            if (['wp25','news2','blogspot33','tistory5'].includes(group) || /^(wp_|blogspot_|tistory_)/.test(group)) return;
             const statusBox = document.getElementById('bulk-status-' + group);
             const headline = document.getElementById('bulk-headline-' + group);
             const counts = document.getElementById('bulk-counts-' + group);
@@ -896,6 +898,10 @@
                 const source = document.getElementById('bulk-button-' + group);
                 if (source.disabled) return;
                 const form = source.closest('form');
+                if (window.controlOperations && window.controlOperations.managed(group)) {
+                    if (!await window.controlOperations.submit(form)) throw new Error(group);
+                    return;
+                }
                 const response = await fetch(form.action, {method:'POST', body:new FormData(form), credentials:'same-origin'});
                 if (!response.ok) throw new Error(group);
             }));
@@ -1026,5 +1032,6 @@
         });
         window.addEventListener('appinstalled', () => { installButton.hidden = true; });
     </script>
+    <script src="{{ url_for('static', filename='operations.js') }}"></script>
 </body>
 </html>

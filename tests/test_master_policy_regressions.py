@@ -84,7 +84,7 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         self.assertIn('"image_pass": True', source)
         self.assertIn("pass_no_image", source)
         self.assertIn("BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}", workflow)
-        self.assertIn("gh workflow run platform-publish-v2.yml", workflow)
+        self.assertIn("python scripts/dispatch_blogger_publication.py", workflow)
 
     def test_blogger_oauth_is_separate_from_shared_drive_token(self):
         workflow = (ROOT / ".github" / "workflows" / "platform-publish-v2.yml").read_text(encoding="utf-8")

@@ -27,22 +27,14 @@ from bs4 import BeautifulSoup
 from google import genai
 from google.genai import types as genai_types
 from news_source_registry import get_enabled_rss_source_records
+from publication_progress import report as report_publication_progress
 import replicate_image_provider
 
 KST = timezone(timedelta(hours=9))
 def now_kst():
     return datetime.now(KST)
 
-NEWSROOM_DAILY_MIN = 3
-NEWSROOM_DAILY_MAX = 10
-
-def newsroom_daily_target(site_url, day=None, daily_min=NEWSROOM_DAILY_MIN, daily_max=NEWSROOM_DAILY_MAX):
-    """RSS availability drives volume; no random early stop before the cap."""
-    day = day or now_kst().date()
-    seed = hashlib.sha256(f"{site_url}|{day.isoformat()}".encode()).digest()
-    if daily_max < daily_min:
-        raise ValueError(f"invalid newsroom daily range: {daily_min}-{daily_max}")
-    return min(10, daily_max)
+# News volume follows new RSS stories; there is no daily quota or cap.
 
 def count_published_today(site_url, wp_pass):
     """Count posts published since KST midnight; fail closed on API errors."""
@@ -1647,6 +1639,7 @@ def crawl_rss_news(lang="ko", site_url=""):
 
     # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
     sources = get_enabled_rss_source_records(lang)
+    exact_source_url = os.getenv("NEWSROOM_SOURCE_URL", "").strip()
     if not sources:
         print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
         return "", "", None, ""
@@ -1679,6 +1672,8 @@ def crawl_rss_news(lang="ko", site_url=""):
                     except Exception:
                         recent = False
                 source_key = "source:" + link.split("#", 1)[0].rstrip("/") if link else ""
+                if exact_source_url and link.split("#", 1)[0].rstrip("/") != exact_source_url.split("#", 1)[0].rstrip("/"):
+                    continue
                 if t and len(t)>=5 and recent and not is_dup(t) and (not source_key or source_key not in cache):
                     candidates.append((t, d, src, link, source_category))
                     urgent = bool(re.search(r'\b(breaking|urgent|alert)\b|속보|긴급', t, re.I))
@@ -1702,7 +1697,7 @@ def crawl_rss_news(lang="ko", site_url=""):
         if forced_preferred and not preferred_candidates:
             print(f"   NEWS SOURCE GATE: no fresh rights-cleared RSS item for requested desk {forced_preferred}")
             return "", "", None, ""
-        pool = preferred_candidates or candidates
+        pool = candidates if exact_source_url else preferred_candidates or candidates
         ch = max(pool, key=lambda item: priorities[(item[0], item[3])])
         used.add(ch[0].strip().lower())
         print(f"   📰 RSS: {ch[2]} — {ch[0][:40]}")
@@ -3184,6 +3179,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if author_id and author_id>0: data["author"]=author_id
 
     try:
+        report_publication_progress("publishing", url, detail="검수 통과 · WordPress에 게시 요청 중")
         r=requests.post(f"{url}/wp-json/wp/v2/posts",auth=(WP_USER,pw),json=data,timeout=30)
         if r.status_code in (200,201):
             response_data=r.json()
@@ -3209,6 +3205,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
                         "verification":verification.to_dict()}
             # IndexNow ping only after the public page is verified.
             ping_indexnow(purl, url)
+            report_publication_progress("published", url, public_url=verification.final_url or purl, detail="공개 페이지 검증 완료")
             return {"ok":True,"post_id":pid,"url":verification.final_url or purl,"status":"publish",
                     "author":reporter["name"],"category":cat_name,
                     "verification":verification.to_dict()}
@@ -3347,6 +3344,7 @@ def build_newsroom_meta(title, source_summary, lang):
     return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
 
 def process_one(site, keyword):
+    report_publication_progress("working", site["url"], detail="주제·출처 확인 및 글 작성·검수 중")
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
     p=SITE_PERSONA.get(url,{}); min_chars=resolve_min_chars(url); max_chars=p.get("max_chars")
@@ -3709,22 +3707,6 @@ def main():
             if n==0:
                 print(f"⏭  {url} — 이번 슬롯 없음"); continue
 
-        if site["mode"] in ("news", "news_en"):
-            daily_target = newsroom_daily_target(
-                url,
-                daily_min=NEWSROOM_DAILY_MIN,
-                daily_max=NEWSROOM_DAILY_MAX,
-            )
-            published_today = count_published_today(url, os.getenv(site["wp_pass_env"], ""))
-            if published_today is None:
-                print(f"⏭  {url} — 오늘 발행량 확인 실패, 안전 중지")
-                skip += n
-                continue
-            print(f"  🗓️ 오늘 기사 발행 {published_today}/{daily_target}건 (RSS 기반 3~10회·속보 우선)")
-            if published_today >= daily_target:
-                print(f"⏭  {url} — 오늘 기사 상한 도달")
-                skip += n
-                continue
 
         print(f"\n{'─'*50}")
         print(f"🌐 {url} [{theme}] 슬롯{RUN_SLOT} → {n}건")

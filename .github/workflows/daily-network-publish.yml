@@ -24,6 +24,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 concurrency:
   group: blog-publish-${{ inputs.target_site_url }}
@@ -62,6 +63,7 @@ jobs:
           MAX_REGEN: "2"
           # Regular 25-site network: GPT-5 mini plus deterministic quality gates.
           AI_TEXT_PROVIDER: "openai"
+          GH_TOKEN: ${{ github.token }}
           CHATGPT_SINGLE_MODEL_PIPELINE: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           OPENAI_ENABLED: "true"

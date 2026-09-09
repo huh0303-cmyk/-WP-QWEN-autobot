@@ -518,11 +518,11 @@ def wordpress_cadence(site) -> dict[str, object]:
     is_newsroom = bool(site and site.content_type in {"news_ko", "news_en"})
     if is_newsroom:
         return {
-            "daily_min": 3,
-            "daily_max": 10,
+            "daily_min": None,
+            "daily_max": None,
             "weekly_min": None,
             "weekly_max": None,
-            "label": "RSS 하루 3~10회",
+            "label": "RSS 새 기사 감지 시 자동 발행",
             "kind": "newsroom",
         }
     return {
@@ -2102,6 +2102,11 @@ def tistory_seed_topics_route(site_id: str):
         "site_id": site_id,
         "groups": tistory_seed_topics(site_id),
     })
+
+
+from .operation_routes import install as _install_operations
+import sys as _sys
+_operation_worker = _install_operations(_sys.modules[__name__])
 
 
 def main() -> None:
