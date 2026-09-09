@@ -132,3 +132,10 @@ jobs:
           name: budget-estimate-${{ github.run_id }}-${{ github.run_attempt }}
           path: budget_state.json
           if-no-files-found: warn
+      - name: Preserve failed draft for inspection without another generation
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-failed-draft-${{ github.run_id }}
+          path: artifacts/blogger-failed-draft.json
+          if-no-files-found: ignore

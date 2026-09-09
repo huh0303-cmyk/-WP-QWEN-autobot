@@ -104,6 +104,18 @@ def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, sour
     normalized = dict(article)
     normalized["title"] = _clip_words(str(article.get("title", "")), 70)
     normalized["meta_description"] = _clip_sentence(str(article.get("meta_description", "")), 119)
+    # Select a complete generated alternative instead of truncating a sentence
+    # and then rejecting our own truncation. No replacement prose is invented.
+    alternatives = article.get("meta_description_candidates", [])
+    if isinstance(alternatives, list):
+        descriptions = [article.get("meta_description", "")] + alternatives[:5]
+        for description in descriptions:
+            if not isinstance(description, str):
+                continue
+            description = re.sub(r"\s+", " ", description).strip()
+            if 100 <= len(description) <= 119 and description.endswith((".", "!", "?", '"', "”", "'")):
+                normalized["meta_description"] = description
+                break
 
     content = str(article.get("content_html", ""))
     maximum = int(target_chars * 1.35)
@@ -178,7 +190,8 @@ Every reader-visible field must use that language, including the title, meta_des
 The article must feel individually edited for this site's persona, not mass-produced. Titles using Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리 are forbidden. Never use body filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
 Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.
 Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
-Return JSON only with keys title, meta_description, content_html, image_queries, labels.
+Return JSON only with keys title, meta_description, meta_description_candidates, content_html, image_queries, labels.
+meta_description_candidates must contain five distinct complete search descriptions, each 100-119 characters including spaces. They must describe this specific article; the checker will select a complete valid one without truncating it.
 meta_description is mandatory and must be a natural search description of 100-119 characters (not words) - one concise complete sentence, the length that actually fits a Blogger/Google search-result snippet.
 labels must contain 8-14 short noun search terms directly relevant to the article. Vary the count inside that range for each article; never use sentences as labels. image_queries must contain 0-2 precise first-image prompts.
 content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.

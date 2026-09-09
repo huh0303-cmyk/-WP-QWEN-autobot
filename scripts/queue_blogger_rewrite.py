@@ -320,6 +320,13 @@ def main():
                 + json.dumps(previous_candidate, ensure_ascii=False)
             )
         from automation_hub.repetition_guard import history_prompt, repetition_issues, clean_opening
+        if language.startswith("ko"):
+            paragraph_target = max(170, target_chars // 8)
+            prompt += (
+                f"\nKorean body planning: use four H2 sections with two substantive paragraphs per section, "
+                f"approximately {paragraph_target} Korean non-whitespace characters per paragraph. "
+                "Do not count spaces or JSON toward the body target. Use only source-supported detail, never padding."
+            )
         recent_content = [r for r in queue_records if r.get("site_id") == blogger_site_id and r.get("status", "").lower() in ACTIVE_CONTENT_STATUSES]
         prompt += "\n" + history_prompt(recent_content)
         if previous_candidate is not None:
@@ -377,6 +384,11 @@ def main():
             critical_failures = []
             print(json.dumps({"attempt": attempt, "quality_score": 0, "failures": failures}, ensure_ascii=False))
     if rewritten is None:
+        if previous_candidate is not None:
+            draft_path = ROOT / "artifacts" / "blogger-failed-draft.json"
+            draft_path.parent.mkdir(parents=True, exist_ok=True)
+            draft_path.write_text(json.dumps({"site_id": blogger_site_id, "draft": previous_candidate,
+                "failures": failures, "source_url": source_identity}, ensure_ascii=False, indent=2), encoding="utf-8")
         failure_row = [iso_kst(), f"blogger-rewrite-{uuid.uuid4().hex[:12]}", blogger_site_id, "failed_quality", "FALSE", "", "", "", source_identity, "", "", "QUALITY_GATE", f"route_code={route_code}; quality_score={quality_score}; failures={'; '.join(failures)}", iso_kst()]
         service.spreadsheets().values().append(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1", valueInputOption="RAW", insertDataOption="INSERT_ROWS", body={"values": [failure_row]}).execute()
         # The error text used to always say "below {minimum_quality}" even when
