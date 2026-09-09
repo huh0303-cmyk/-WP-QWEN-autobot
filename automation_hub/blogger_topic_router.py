@@ -292,6 +292,9 @@ def is_general_profile(profile: dict) -> bool:
 
 
 def _fits_profile(candidate_text: str, profile: dict) -> bool:
+    medical = profile.get("medical_editorial")
+    if medical:
+        return any(term in candidate_text for term in medical["candidate_terms"])
     if is_general_profile(profile):
         return True
     scope = _profile_text(profile)
