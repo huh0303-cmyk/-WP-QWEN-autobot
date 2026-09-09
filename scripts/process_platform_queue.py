@@ -189,7 +189,11 @@ def main() -> int:
         ).execute()
         service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id, range=f"'{QUEUE_TAB}'!J{index}:N{index}", valueInputOption="RAW",
-            body={"values": [[result.public_url, result.remote_id, result.error_code, result.message, result.completed_at]]},
+            # Keep the approved description when recording a transport error;
+            # otherwise the next retry loses its required publication input.
+            body={"values": [[result.public_url, result.remote_id, result.error_code,
+                result.message + ("\nmeta_description=" + search_description if platform == "blogger" and search_description else ""),
+                result.completed_at]]},
         ).execute()
         print(json.dumps(result.to_dict(), ensure_ascii=False))
         processed += 1
