@@ -362,14 +362,22 @@ def rank_topics(headlines: Iterable[dict[str, str]], *, profile: dict, trend_ter
 
 
 def fetch_public_wp_posts(site_url: str, *, session=requests, timeout: int = 20) -> list[dict]:
-    response = session.get(
-        f"{site_url.rstrip('/')}/wp-json/wp/v2/posts",
-        params={
-            "status": "publish", "per_page": 20, "orderby": "date", "order": "desc",
-            "_fields": "id,link,status,title,excerpt,content,date",
-        },
-        timeout=timeout,
-    )
+    # This is a read-only fetch before paid generation. Brief origin outages
+    # should not abort a whole site's publication after a single connection.
+    for attempt in range(3):
+        try:
+            response = session.get(
+                f"{site_url.rstrip('/')}/wp-json/wp/v2/posts",
+                params={
+                    "status": "publish", "per_page": 20, "orderby": "date", "order": "desc",
+                    "_fields": "id,link,status,title,excerpt,content,date",
+                },
+                timeout=timeout,
+            )
+            break
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 2:
+                raise
     response.raise_for_status()
     payload = response.json()
     if not isinstance(payload, list):

@@ -149,3 +149,25 @@ def test_queue_keeps_two_gpt_attempts_and_has_no_gemini_route():
     assert "for attempt in range(1, 3)" in source
     assert "resolve_automatic_source" in source
     assert "gemini_generate" not in source
+def test_public_source_fetch_recovers_from_connection_timeout():
+    from unittest.mock import Mock
+    import requests
+    from automation_hub.blogger_topic_router import fetch_public_wp_posts
+    response = Mock()
+    response.json.return_value = [{"status": "publish", "link": "https://example.com/post"}]
+    session = Mock()
+    session.get.side_effect = [requests.ConnectTimeout(), response]
+    assert fetch_public_wp_posts("https://example.com", session=session) == response.json.return_value
+    assert session.get.call_count == 2
+
+
+def test_public_source_fetch_stops_after_three_network_failures():
+    from unittest.mock import Mock
+    import requests
+    import pytest
+    from automation_hub.blogger_topic_router import fetch_public_wp_posts
+    session = Mock()
+    session.get.side_effect = requests.ConnectTimeout()
+    with pytest.raises(requests.ConnectTimeout):
+        fetch_public_wp_posts("https://example.com", session=session)
+    assert session.get.call_count == 3
