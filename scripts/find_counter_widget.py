@@ -47,3 +47,22 @@ if isinstance(ts, list):
         content = t.get("content", {}).get("raw", "") if isinstance(t.get("content"), dict) else str(t.get("content"))
         if "uagb" in content.lower() or "counter" in content.lower():
             print("=== TEMPLATE MATCH ===", t.get("slug"))
+
+print("=== reusable blocks ===")
+r4 = requests.get(f"{base}/blocks", auth=auth, params={"per_page": 50, "context": "edit"}, timeout=30)
+print("blocks status:", r4.status_code)
+bs = r4.json()
+if isinstance(bs, list):
+    print("total reusable blocks:", len(bs))
+    for b in bs:
+        content = b.get("content", {}).get("raw", "") if isinstance(b.get("content"), dict) else str(b.get("content"))
+        marker = " <== HAS COUNTER" if ("uagb" in content.lower() or "counter" in content.lower()) else ""
+        print(f"--- block id: {b.get('id')} | title: {b.get('title',{}).get('raw','')}{marker} ---")
+        if marker:
+            print(content[:3000])
+else:
+    print(bs)
+
+print("=== raw widgets.php option fallback: check classic widget option ===")
+r5 = requests.get(f"{base}/pages", auth=auth, params={"per_page": 5, "context": "edit"}, timeout=15)
+print("pages check status (sanity):", r5.status_code)
