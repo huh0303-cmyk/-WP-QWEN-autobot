@@ -35,7 +35,7 @@ def openai_image_available():
     return False
 
 
-def openai_generate_text(prompt, temperature=0.9, max_retries=5):
+def openai_generate_text(prompt, temperature=0.9, max_retries=5, timeout=60):
     import time as _time
     if not openai_available():
         raise RuntimeError("OpenAI generation is disabled; use the caller's Gemini fallback")
@@ -51,10 +51,10 @@ def openai_generate_text(prompt, temperature=0.9, max_retries=5):
 
     last_err = None
     for attempt in range(max_retries):
-        r = requests.post(OPENAI_URL, headers=headers, json=_body(send_temperature), timeout=60)
+        r = requests.post(OPENAI_URL, headers=headers, json=_body(send_temperature), timeout=timeout)
         if r.status_code == 400 and send_temperature and "temperature" in r.text.lower():
             send_temperature = False
-            r = requests.post(OPENAI_URL, headers=headers, json=_body(False), timeout=60)
+            r = requests.post(OPENAI_URL, headers=headers, json=_body(False), timeout=timeout)
         if r.status_code == 429:
             # insufficient_quota/credits는 재시도해도 회복되지 않으므로 즉시 중단.
             if "insufficient" in r.text.lower() or "credit" in r.text.lower() or "quota" in r.text.lower():
