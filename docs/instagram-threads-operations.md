@@ -18,4 +18,8 @@
 
 ## 현재 검증 상태
 
-현재 social-publish-one.yml과 meta_publish.py는 TOPIK·ENGLISH·LANGUAGE의 영상 수동 게시 경로만 지원한다. Amazon·Ben·Rosie·Jisoo의 계정 ID와 토큰 매핑, 정보 이미지/텍스트 게시 경로, 하루 두 번 예약, 실제 게시 성공 확인은 미완료다. 이 문서는 실행 완료 증거가 아니며, 네 계정 자동화가 완성됐다고 보고하지 않는다.
+네 계정의 실제 운영 경로는 Codex 반복 작업 365-4이다. 한국시간 09:00·18:00에 실행하며 해당 작업의 Chrome 로그인과 계정 연결이 필요하다. GitHub social-publish-one.yml은 TOPIK·ENGLISH·LANGUAGE 영상용 별도 수동 경로다. 두 경로를 혼동하지 않는다.
+
+2026-09-09 게시 기록 기준 네 Instagram 계정은 새벽 정보 카드 게시 기록이 있다. 오후에는 Amazon 건강 계정의 Instagram과 Threads가 게시됐고, Ben·Rosie·Jisoo는 로그인·계정 전환 문제로 게시하지 못했다. 건강 이외 Threads 세 계정과 Facebook 연결도 미완료다. 모든 계정 하루 두 건 완료라고 보고하지 않는다.
+
+최신 비용 중지 지침을 반복 작업에도 반영했다. 추가 과금 API 없이 기존 검수 이미지·직접 만든 텍스트 카드·사용 권한을 확인한 무료 자료를 사용한다. 자동화가 활성화돼 있어도 컴퓨터·앱·로그인 상태에 의존하므로 VPS의 무인 서버 게시와 같다고 설명하지 않는다.
