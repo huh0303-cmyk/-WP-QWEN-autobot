@@ -5,8 +5,8 @@ on:
     paths:
       - ".github/workflows/platform-publish-v2.yml"
   schedule:
-    # GitHub cron is UTC. Every hour at :17; Sheets/operator timestamps remain KST.
-    - cron: "17 * * * *"
+    # Check ready content at 09:17 and 17:17 KST; per-site daily gate prevents bursts.
+    - cron: "17 0,8 * * *"
   workflow_dispatch:
     inputs:
       recover_transient_job:
@@ -50,7 +50,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: automation-hub-platform-publish-${{ inputs.job_id || 'scheduled-drain' }}
+  group: free-approved-publication
   cancel-in-progress: false
 
 jobs:
@@ -88,7 +88,7 @@ jobs:
           RECOVER_TRANSIENT_JOB: ${{ inputs.recover_transient_job }}
           RECOVERY_SEARCH_DESCRIPTION: ${{ inputs.recovery_search_description }}
           JOB_ID: ${{ inputs.job_id || '' }}
-          MAX_JOBS: ${{ inputs.max_jobs || '1' }}
+          MAX_JOBS: ${{ github.event_name == 'schedule' && '33' || inputs.max_jobs || '1' }}
           PLATFORM_FILTER: ${{ github.event_name == 'schedule' && 'blogger' || inputs.platform || 'blogger' }}
           FAIL_ON_EMPTY: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
           PAID_IMAGE_GENERATION_ENABLED: "false"

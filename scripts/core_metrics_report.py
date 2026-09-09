@@ -46,9 +46,14 @@ def oauth():
 
 
 def get(url, **kwargs):
-    response = requests.get(url, timeout=20, **kwargs)
-    response.raise_for_status()
-    return response
+    for attempt in range(2):
+        try:
+            response = requests.get(url, timeout=20, **kwargs)
+            response.raise_for_status()
+            return response
+        except requests.RequestException:
+            if attempt:
+                raise
 
 
 def previous_day(history, day):
@@ -129,6 +134,7 @@ def collect():
                 row["visitor_checked_at"] = stamp
         except Exception:
             row["errors"].append("Blogger API 수집 실패·권한 확인")
+        row["published_urls"] = urls
         from urllib.parse import urlparse
         prop = next((p for p in (url + "/", url, "sc-domain:" + urlparse(url).netloc) if p in properties), None)
         if prop and row.get("total_posts") is not None:
@@ -187,8 +193,15 @@ def report_html(result):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--email", action="store_true")
+    parser.add_argument("--refresh-index", action="store_true")
     args = parser.parse_args()
-    result, history = collect()
+    if args.refresh_index:
+        from core_metrics_gsc import refresh
+        result = refresh(read("data/core_metrics_latest.json"), read("data/core_metrics_history.json"))
+        history = read("data/core_metrics_history.json")
+        history.setdefault("days", {})[result["generated_at"][:10]] = result
+    else:
+        result, history = collect()
     for name, value in [("core_metrics_latest.json", result), ("core_metrics_history.json", history)]:
         path = ROOT / "data" / name
         path.parent.mkdir(exist_ok=True)

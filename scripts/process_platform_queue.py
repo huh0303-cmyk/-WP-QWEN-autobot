@@ -14,6 +14,7 @@ for candidate in (ROOT, ROOT / "scripts"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
+from scripts.free_publish_guard import blogger_daily_gate
 from automation_hub.blogger_adapter import BloggerPublisher
 from automation_hub.content_identity import active_duplicate, is_same_content, is_similar_content
 from automation_hub.draft_notifier import notify_blogger_draft
@@ -161,6 +162,15 @@ def main() -> int:
             except requests.RequestException as exc:
                 token = ""
                 print(f"OAuth refresh failed for {job.job_id}: {str(exc)[:200]}")
+            if job.publish_now:
+                try:
+                    reason = blogger_daily_gate(account.get("destination_id", ""), token,
+                                                account.get("editor_url", ""))
+                except (requests.RequestException, ValueError, KeyError):
+                    reason = "publication_count_unavailable"
+                if reason:
+                    print(json.dumps({"job_id": job.job_id, "status": "waiting", "reason": reason}, ensure_ascii=False))
+                    continue
             publisher = BloggerPublisher(job.site_id, account.get("destination_id", ""), token, site_url=account.get("editor_url", ""))
         elif platform in {"naver", "tistory"}:
             publisher = InteractiveEditorPublisher(platform, job.site_id, account.get("editor_url", ""))
