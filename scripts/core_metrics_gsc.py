@@ -1,5 +1,6 @@
 """Use the existing Google Metrics grant without transferring its credentials."""
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from urllib.parse import urlparse
@@ -38,6 +39,7 @@ def unavailable(row, reason):
 
 
 def refresh(report, history):
+    deadline = time.monotonic() + 12 * 60
     response = requests.post("https://oauth2.googleapis.com/token", data={
         "client_id": os.environ["GOOGLE_METRICS_CLIENT_ID"],
         "client_secret": os.environ["GOOGLE_METRICS_CLIENT_SECRET"],
@@ -51,6 +53,8 @@ def refresh(report, history):
     old = previous_day(history, report["generated_at"][:10])
 
     def inspect(row):
+        if time.monotonic() >= deadline:
+            return unavailable(row, "Google 응답 지연 · 다음 집계에서 재확인")
         url = row["url"].rstrip("/")
         host = urlparse(url).hostname
         candidates = [url + "/", url, "sc-domain:" + host]
@@ -74,6 +78,8 @@ def refresh(report, history):
         if len(urls) != row["total_posts"]:
             return unavailable(row, "색인 검사 대상 글 목록 불완전")
         def inspect_post(post):
+            if time.monotonic() >= deadline:
+                return "unknown", "Google 응답 지연 · 검사 시간 한도"
             try:
                 r = requests.post("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
                     headers=headers, json={"inspectionUrl": post, "siteUrl": prop}, timeout=25)

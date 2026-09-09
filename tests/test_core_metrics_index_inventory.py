@@ -56,3 +56,17 @@ def test_parallel_refresh_keeps_unknown_separate(monkeypatch):
     row = metrics.refresh(report, {"days": {}})["records"][0]
     assert (row["indexed"], row["index_unindexed"], row["index_unknown"]) == (1, 1, 1)
     assert row["index_partial"] and row["indexed_delta"] is None
+
+
+def test_delayed_google_cannot_block_report_forever(monkeypatch):
+    for key in ("GOOGLE_METRICS_CLIENT_ID", "GOOGLE_METRICS_CLIENT_SECRET", "GOOGLE_METRICS_REFRESH_TOKEN"):
+        monkeypatch.setenv(key, "test")
+    token = Mock(); token.json.return_value = {"access_token": "test"}
+    sites = Mock(); sites.json.return_value = {"siteEntry": []}
+    monkeypatch.setattr(metrics.requests, "post", Mock(return_value=token))
+    monkeypatch.setattr(metrics.requests, "get", Mock(return_value=sites))
+    monkeypatch.setattr(metrics.time, "monotonic", Mock(side_effect=[0, 721]))
+    report = {"generated_at": "2026-09-10", "records": [{"platform":"blogger", "url":"https://site", "total_posts":3, "indexed":0}]}
+    row = metrics.refresh(report, {"days":{}})["records"][0]
+    assert row["indexed"] is None and row["index_unknown"] == 3
+    assert row["errors"] == ["Google 응답 지연 · 다음 집계에서 재확인"]
