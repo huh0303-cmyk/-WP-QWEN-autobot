@@ -1,0 +1,12 @@
+[Unit]
+Description=Synchronize verified main code to Korea365 VPS
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/korea365
+ExecStart=/opt/korea365/.venv/bin/python /usr/local/lib/korea365/sync_main.py
+TimeoutStartSec=600
+UMask=0077
