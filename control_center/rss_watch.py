@@ -94,7 +94,17 @@ class RSSWatcher:
             if item["newsroom"] not in targets:
                 continue
             descriptor = dict(targets[item["newsroom"]], source="rss", source_title=item["title"], source_url=item["url"])
-            descriptor["inputs"] = dict(descriptor["inputs"], source_url=item["url"])
+            # 2026-09-09: pass the title captured at DETECTION time straight
+            # through as a workflow input, not just source_url. A fast-moving
+            # feed (chosun.com regularly holds ~100 live items) can churn a
+            # specific story out of its own RSS window in the 1-2 minutes a
+            # GitHub Actions runner takes to cold-start + checkout + install,
+            # so autopost_mega.py re-fetching the feed and requiring an exact
+            # URL match was finding "no eligible story" for stories that were
+            # real and fresh moments earlier - a timing race, not a rights
+            # problem. Forwarding the already-verified title lets the
+            # publisher use it directly instead of re-chasing a moving feed.
+            descriptor["inputs"] = dict(descriptor["inputs"], source_url=item["url"], source_title=item["title"])
             try:
                 self.store.submit("news2", [descriptor], "rss-" + item["id"])
             except Conflict:
