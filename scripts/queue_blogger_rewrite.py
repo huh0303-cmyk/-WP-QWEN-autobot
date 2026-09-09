@@ -24,6 +24,7 @@ from automation_hub.blogger_rewriter import (
     extract_http_links,
     normalize_rewrite_format,
     parse_rewrite_json,
+    plain_text,
     rewrite_prompt,
 )
 from automation_hub.content_identity import ACTIVE_CONTENT_STATUSES, active_duplicate, canonical_source_id, stable_content_id
@@ -321,12 +322,27 @@ def main():
         from automation_hub.repetition_guard import history_prompt, repetition_issues, clean_opening
         recent_content = [r for r in queue_records if r.get("site_id") == blogger_site_id and r.get("status", "").lower() in ACTIVE_CONTENT_STATUSES]
         prompt += "\n" + history_prompt(recent_content)
-        if attempt > 1 and 'candidate' in locals():
-            prompt += "\nRepair this previous draft. Preserve its valid factual content and exact verified links; expand any short sections to the required body length. Return the complete corrected JSON, not a summary.\n" + json.dumps(candidate, ensure_ascii=False)
+        if previous_candidate is not None:
+            body_count = len(re.sub(r"\s+", "", plain_text(previous_candidate["content_html"])))
+            meta_count = len(str(previous_candidate["meta_description"]).strip())
+            prompt += (
+                f"\nMeasured previous body: {body_count} non-whitespace characters. "
+                f"Target: {target_chars}; adjust by approximately {target_chars - body_count:+d} characters. "
+                f"Measured previous meta description: {meta_count} characters INCLUDING spaces. "
+                "Write a complete 100-119 character sentence, aiming for 110; no clipped sentence or padding. "
+                "Preserve fields that already pass; change only what is needed to repair the listed failures."
+            )
+            if any(item.startswith("YMYL") for item in failures):
+                prompt += (
+                    "\nThe draft includes a visa, insurance or health topic. Keep a source-supported reference date "
+                    "and the change warning and professional-advice disclaimer in the body. "
+                    "For Korean use the literal label '기준일' with the date; for English use 'as of'. "
+                    "Use the source publication date as the source's date, never invent a verification date."
+                )
         try:
             if not openai_available():
                 raise RuntimeError("GPT-5 mini writer unavailable")
-            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
+            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1, timeout=120)
             candidate = parse_rewrite_json(raw)
             previous_candidate = candidate
             if source is not None:
