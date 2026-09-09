@@ -1640,6 +1640,24 @@ def crawl_rss_news(lang="ko", site_url=""):
     # Only no-contact CC/public/primary feeds from news_source_registry are eligible.
     sources = get_enabled_rss_source_records(lang)
     exact_source_url = os.getenv("NEWSROOM_SOURCE_URL", "").strip()
+    exact_source_title = os.getenv("NEWSROOM_SOURCE_TITLE", "").strip()
+    # 2026-09-09: rss_watch dispatches this run because it saw a fresh item
+    # moments ago and already captured its title. Re-fetching every source
+    # feed here and requiring the exact same URL still be present was failing
+    # constantly on fast-churning feeds (chosun.com holds ~100 live items;
+    # a specific story can scroll out of that window within the 1-2 minutes
+    # a runner takes to cold-start) even though the story was genuinely fresh
+    # and rights-eligible at detection time. Trust that snapshot directly
+    # instead of re-chasing a moving feed - rss_watch only ever watches the
+    # same configured, already-licensed-as-headline-lead sources, so nothing
+    # new needs to be re-verified here, just deduplicated.
+    if exact_source_url and exact_source_title:
+        if is_dup(exact_source_title):
+            print(f"   NEWS SOURCE GATE: detected story is already used/duplicate for lang={lang}")
+            return "", "", None, ""
+        used.add(exact_source_title.strip().lower())
+        print(f"   📰 RSS (rss_watch 감지 시점 정보 사용): {exact_source_title[:40]}")
+        return exact_source_title, "", None, exact_source_url
     if not sources:
         print(f"   NEWS SOURCE GATE: no rights-cleared RSS source for lang={lang}")
         return "", "", None, ""
