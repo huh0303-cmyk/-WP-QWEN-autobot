@@ -3431,17 +3431,8 @@ def process_one(site, keyword):
         body_raw,title,meta,faq=extract_meta_and_faq(raw)
         body,tags=extract_tags(body_raw,keyword,theme,lang,is_news=(mode in ("news","news_en")),tag_count=tag_count)
 
-        if mode in ("news", "news_en"):
-            # 2026-09-03: 700자 하한이 CEO의 "속보중심" 방향과 실제로 충돌했다 —
-            # gov.uk 1차 출처는 종종 2~3문장짜리 짧은 보도자료라, "새 사실을
-            # 지어내지 마라"는 프롬프트 규칙을 지키면 700자를 못 채우는 게
-            # 정상이었다(같은 기사를 3번 재작성해도 매번 660~690자에서 막힘).
-            # 짧은 속보 브리프를 그대로 인정하도록 하한을 낮춘다.
-            newsroom_length = newsroom_char_count(body)
-            if newsroom_length < 400:
-                body = resize_newsroom_body(body, lang, news_source_summary, 400, 1500)
-            if newsroom_char_count(body) > 1500:
-                body = trim_newsroom_html(body, 1500)
+        # A news brief stays as long as its verified source warrants. Never
+        # pad or truncate it solely to satisfy a generic character target.
 
         # Keep the article-grounded model title. The final assembled article
         # must pass Gemini/GPT/Claude before WordPress can save a draft.
@@ -3458,7 +3449,7 @@ def process_one(site, keyword):
         # A missing or too-short title can never win best_result, even with a
         # high SEO score elsewhere — this is what let outline-heading leftovers
         # ("Who the route fits") reach WordPress as the real post title before.
-        if not title or len(title) < 15:
+        if not title or (mode not in ("news", "news_en") and len(title) < 15):
             print(f"  ⚠️ 제목 추출 실패/미달({title!r}) — 이번 회차는 채택하지 않음")
             # ★ 2026-09-06 임시 진단 로그: 실패 원인(모델이 TITLE: 줄 자체를 안 냈는지,
             #   다른 표기를 썼는지)을 보려면 원문 앞부분이 필요한데 지금까지 로그에
@@ -3469,6 +3460,8 @@ def process_one(site, keyword):
         elif pre > best_score:
             best_score=pre; best_result=(body,title,meta,faq,tags)
 
+        if mode in ("news", "news_en") and best_result is not None:
+            break
         if pre>=quality_target:
             print(f"  ✅ {pre}점 달성"); break
 
@@ -3609,18 +3602,12 @@ def process_one(site, keyword):
     # 어렵다. 출처·길이·메타·태그·제목을 별도 하드 게이트로 검증한다.
     # 2026-09-03: 700자 하한을 400자로 낮춤(CEO "속보중심" 방향 + 짧은 1차
     # 출처를 사실 날조 없이 억지로 부풀리다 매번 게이트 탈락하던 문제 해결).
-    newsroom_gate_ok = (
-        mode in ("news", "news_en")
-        and bool(news_source and news_source_url)
-        and 400 <= plain_len <= 1500
-        and bool(title.strip())
-        and len(meta.strip()) >= 80
-        and len(tags) >= 6
-    )
+    from automation_hub.rss_event import newsroom_article_ready
+    newsroom_gate_ok = newsroom_article_ready(title, body, news_source, news_source_url)
     if mode in ("news", "news_en"):
         if not newsroom_gate_ok:
             reason = (f"source={bool(news_source and news_source_url)}, "
-                      f"meta={len(meta)}, tags={len(tags)}, length={plain_len}/400-1500")
+                      f"title={bool(title.strip())}, body={bool(plain_len)}")
             print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
             return False

@@ -2,6 +2,15 @@
 import json
 import math
 import time
+import re
+import html
+
+
+def newsroom_article_ready(title, body, source_name, source_url):
+    """A sourced brief does not need a word-count, tag-count or SEO quota."""
+    text = re.sub(r'(?is)<(script|style).*?>.*?</\1>', '', body)
+    text = html.unescape(re.sub(r'<[^>]+>', ' ', text)).strip()
+    return bool(title.strip() and text and source_name and source_url)
 
 
 def resolve_rss_event(raw, exact_url, sources, language, *, now=None):
