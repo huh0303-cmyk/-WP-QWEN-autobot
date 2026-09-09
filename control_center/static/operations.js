@@ -13,16 +13,29 @@
         return node;
     }
     const summary = el('section', '', 'operation-summary'); summary.id = 'operation-summary'; summary.tabIndex = -1;
-    summary.append(el('h2','글 발행 운영 상태'), el('p','요청 접수 → 작업 중 → 검토 준비 또는 게시 중 → 게시 완료 · 문제 발생 시 중단 / 실패 / 확인 필요'));
+    summary.append(el('h2','지금 확인할 작업'), el('p','사이트별 최근 요청 기준입니다. 게시 완료는 오늘 발행량이 아닙니다. 상태를 누르면 해당 작업만 보입니다.'));
     const connection = el('p','운영 기록 연결 중…'); connection.setAttribute('role','status'); summary.append(connection);
     const news = el('p', '뉴스룸 RSS 감시 기록 확인 중…'); summary.append(news);
     const feeds = el('details');feeds.append(el('summary','매체별 RSS 연결 상태'));const feedBody=el('div');feeds.append(feedBody);summary.append(feeds);
     const totals = el('div', '', 'operation-totals'); summary.append(totals);
     const history = el('details'); history.append(el('summary','최근 요청 이력 보기')); const historyBody = el('div'); history.append(historyBody); summary.append(history);
-    const anchor = document.getElementById('publish-all-button'); anchor.closest('section')?.before(summary);
+    const anchor = document.getElementById('publish-all-button'); document.getElementById('publish-everything').before(summary);
     if (!summary.isConnected) anchor.parentElement.before(summary);
     const notice = el('div', '', 'operation-notice'); notice.hidden = true; notice.setAttribute('role','status'); summary.prepend(notice);
-    let lastJobs = [], polling = false;
+    let lastJobs = [], polling = false, selectedPhase = 'needs-action';
+    const focused = el('div'); focused.id='operation-focus'; summary.append(focused);
+    const focusLabel=el('h3','진행·검토·문제 항목');focused.append(focusLabel);
+    const focusList=el('div');focused.append(focusList);
+    let currentJobs=[];
+    const normalize=job=>['dispatching','queued'].includes(job.phase)?'accepted':job.phase;
+    function filterJobs(){
+        focusLabel.textContent=selectedPhase==='needs-action'?'진행·검토·문제 항목':labels[selectedPhase]+' · 최근 요청';
+        const jobs=currentJobs.filter(job=>selectedPhase==='needs-action'?job.phase!=='published':normalize(job)===selectedPhase);
+        refreshList(focusList,jobs);
+        if(!jobs.length)focusList.replaceChildren(el('p','해당 상태의 작업 기록이 없습니다.'));
+        totals.querySelectorAll('button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.phase===selectedPhase)));
+    }
+
     function showNotice(text, target, failed=false) {
         notice.hidden = false; notice.replaceChildren(el('p',text)); notice.dataset.error = String(failed);
         if (target) {
@@ -34,7 +47,7 @@
     }
     function jumpTo(id) {
         const target = document.getElementById(id); if (!target) return;
-        target.tabIndex=-1; target.scrollIntoView({block:'center',behavior:'smooth'}); target.focus({preventScroll:true});
+        window.revealDashboardTarget?.(target); target.tabIndex=-1; target.scrollIntoView({block:'center',behavior:'smooth'}); target.focus({preventScroll:true});
     }
     function card(job) {
         const row = el('div','','operation-row'); row.dataset.phase=job.phase;
@@ -69,14 +82,15 @@
         totals.replaceChildren();
         ['accepted','working','review_ready','publishing','published','stopped','failed','attention'].forEach(phase=>{
             const count = [...latest.values()].filter(j=>(['dispatching','queued'].includes(j.phase)?'accepted':j.phase)===phase).length;
-            totals.append(el('span',labels[phase]+' '+count));
+            const button=el('button',labels[phase]+' '+count);button.type='button';button.dataset.phase=phase;button.onclick=()=>{selectedPhase=phase;filterJobs();};totals.append(button);
         });
+        currentJobs=[...latest.values()]; filterJobs();
         document.querySelectorAll('[id^="bulk-status-"]').forEach(box=>{
             const group=box.id.slice('bulk-status-'.length); if(!managed(group)) return;
             const jobs = groups.has(group) ? [...latest.values()].filter(j=> group==='wp25'?j.platform==='wordpress': group==='news2'?j.platform==='news':group==='tistory5'?j.platform==='tistory':j.platform==='blogger') : [...latest.values()].filter(j=>j.site_group===group);
             const head=document.getElementById('bulk-headline-'+group), counts=document.getElementById('bulk-counts-'+group);
             if(head) head.textContent=jobs.length===1?labels[jobs[0].phase]+' · '+jobs[0].detail:jobs.length?'사이트별 실제 작업 상태':'아직 접수된 요청 없음';
-            if(counts) counts.textContent=jobs.length && groups.has(group)?['accepted','working','review_ready','publishing','published','stopped','failed','attention'].map(p=>labels[p]+' '+jobs.filter(j=>(['dispatching','queued'].includes(j.phase)?'accepted':j.phase)===p).length).join(' · '):'';
+            if(counts) counts.textContent=jobs.length && groups.has(group)?['accepted','working','review_ready','publishing','published','stopped','failed','attention'].filter(p=>jobs.some(j=>(['dispatching','queued'].includes(j.phase)?'accepted':j.phase)===p)).map(p=>labels[p]+' '+jobs.filter(j=>(['dispatching','queued'].includes(j.phase)?'accepted':j.phase)===p).length).join(' · '):'';
             let list=box.querySelector('.operation-list');
             if(!list) {
                 list=el('div','','operation-list');
