@@ -89,7 +89,14 @@ def main() -> int:
             and not row.get("remote_id") and not row.get("public_url")
             and 100 <= len(os.getenv("RECOVERY_SEARCH_DESCRIPTION", "").strip()) < 120
         )
-        if row.get("status", "").strip().lower() not in {"ready", "대기"} and not recover_invalid:
+        recover_transient = (
+            bool(selected_job) and row.get("job_id") == selected_job
+            and os.getenv("RECOVER_TRANSIENT_JOB", "false").lower() == "true"
+            and row.get("status", "").lower() == "failed"
+            and row.get("error_code") in {"blogger_http_500", "blogger_http_502", "blogger_http_503", "blogger_http_504"}
+            and not row.get("remote_id") and not row.get("public_url")
+        )
+        if row.get("status", "").strip().lower() not in {"ready", "대기"} and not recover_invalid and not recover_transient:
             continue
         if selected_job and row.get("job_id") != selected_job:
             continue

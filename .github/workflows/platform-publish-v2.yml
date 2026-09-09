@@ -9,6 +9,10 @@ on:
     - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
+      recover_transient_job:
+        description: "Retry exact failed Blogger server-error job with duplicate preflight; no regeneration"
+        type: boolean
+        default: false
       recover_invalid_job:
         description: "정확한 job_id의 게시 전 검증 실패만 복구 (재생성 없음)"
         type: boolean
@@ -81,6 +85,7 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
           RECOVER_INVALID_JOB: ${{ inputs.recover_invalid_job }}
+          RECOVER_TRANSIENT_JOB: ${{ inputs.recover_transient_job }}
           RECOVERY_SEARCH_DESCRIPTION: ${{ inputs.recovery_search_description }}
           JOB_ID: ${{ inputs.job_id || '' }}
           MAX_JOBS: ${{ inputs.max_jobs || '1' }}
