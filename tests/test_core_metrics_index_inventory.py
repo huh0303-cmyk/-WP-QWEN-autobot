@@ -32,3 +32,27 @@ def test_failed_inspection_does_not_reuse_old_zero():
     metrics.unavailable(row, "No permission")
     assert row["indexed"] is None and row["indexed_delta"] is None
     assert row["index_unknown"] == 283 and row["index_partial"]
+
+
+def test_parallel_refresh_keeps_unknown_separate(monkeypatch):
+    for key in ("GOOGLE_METRICS_CLIENT_ID", "GOOGLE_METRICS_CLIENT_SECRET", "GOOGLE_METRICS_REFRESH_TOKEN"):
+        monkeypatch.setenv(key, "test")
+    def get(url, **kwargs):
+        result = Mock()
+        result.json.return_value = {"siteEntry": [{"siteUrl": "https://site/"}]}
+        return result
+    def post(url, **kwargs):
+        result = Mock()
+        if "oauth2" in url:
+            result.json.return_value = {"access_token": "test"}
+        else:
+            verdict = {"a": "PASS", "b": "NEUTRAL", "c": "VERDICT_UNSPECIFIED"}[kwargs["json"]["inspectionUrl"].rsplit("/", 1)[1]]
+            result.json.return_value = {"inspectionResult": {"indexStatusResult": {"verdict": verdict}}}
+        return result
+    monkeypatch.setattr(metrics.requests, "get", get)
+    monkeypatch.setattr(metrics.requests, "post", post)
+    report = {"generated_at": "2026-09-10", "records": [{"platform": "blogger", "url": "https://site", "total_posts": 3,
+              "published_urls": ["https://site/a", "https://site/b", "https://site/c"], "errors": []}]}
+    row = metrics.refresh(report, {"days": {}})["records"][0]
+    assert (row["indexed"], row["index_unindexed"], row["index_unknown"]) == (1, 1, 1)
+    assert row["index_partial"] and row["indexed_delta"] is None

@@ -73,18 +73,22 @@ def refresh(report, history):
         urls = row.get("published_urls", [])
         if len(urls) != row["total_posts"]:
             return unavailable(row, "색인 검사 대상 글 목록 불완전")
-        for post in urls:
+        def inspect_post(post):
             try:
                 r = requests.post("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
                     headers=headers, json={"inspectionUrl": post, "siteUrl": prop}, timeout=25)
                 r.raise_for_status()
                 status = r.json()["inspectionResult"]["indexStatusResult"]
                 verdict = status.get("verdict")
-                counts["indexed" if verdict == "PASS" else "unindexed" if verdict in ("NEUTRAL", "FAIL") else "unknown"] += 1
-                reasons[status.get("coverageState") or "Google 판정 미확인"] += 1
+                return ("indexed" if verdict == "PASS" else "unindexed" if verdict in ("NEUTRAL", "FAIL") else "unknown",
+                        status.get("coverageState") or "Google 판정 미확인")
             except (requests.RequestException, KeyError, ValueError):
-                counts["unknown"] += 1
-                reasons["검사 요청 실패"] += 1
+                return "unknown", "검사 요청 실패"
+        # A shared bounded pool avoids one large site serially delaying the
+        # morning report. Aggregation stays in the coordinator thread.
+        for bucket, reason in url_pool.map(inspect_post, urls):
+            counts[bucket] += 1
+            reasons[reason] += 1
         row.update(indexed=counts["indexed"] if counts["unknown"] < len(urls) or not urls else None,
             index_unknown=counts["unknown"], index_unindexed=counts["unindexed"], index_total=len(urls),
             index_partial=bool(counts["unknown"]), index_checked_at=datetime.now(KST).isoformat(),
@@ -93,8 +97,9 @@ def refresh(report, history):
         row["indexed_delta"] = None if row["index_partial"] or previous.get("index_partial") else delta(row["indexed"], previous.get("indexed"))
         if not counts["unknown"]:
             row["errors"] = [e for e in row.get("errors", []) if e not in ("Google 색인 조회 권한 연결 필요", "Google 색인 최신 확인 필요")]
+        print(f"INDEX_CHECK {url} total={len(urls)} indexed={counts['indexed']} unknown={counts['unknown']}", flush=True)
         return row
 
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=12) as url_pool, ThreadPoolExecutor(max_workers=4) as pool:
         report["records"] = list(pool.map(inspect, report["records"]))
     return report
