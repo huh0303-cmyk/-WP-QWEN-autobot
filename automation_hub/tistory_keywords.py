@@ -28,16 +28,32 @@ def search_volumes():
     return result
 
 def choose(ranked, volumes, history):
+    """Require independent multi-outlet coverage and no duplicate topic.
+
+    A niche site's real, multi-outlet-verified topic (`ranked` already
+    enforces outlet_count>=2 and profile fit in blogger_topic_router.rank_topics)
+    rarely happens to also appear in Korea's *general* daily trending-search
+    list - a travel keyword competing for a slot against whatever celebrity
+    or sports story is trending nationwide that day. Requiring a literal
+    substring match against that unrelated general list as a hard gate
+    starved niche sites of every candidate on most days (observed 2026-09-09,
+    tistory_ktrip365: zero candidates despite real ranked topics existing).
+    Generic trend overlap is now a scoring bonus when it happens to be
+    present, not a requirement - the real quality bars (2+ independent
+    outlets, not a repeat of recent history) are unchanged.
+    """
     candidates=[]
+    max_volume=max(volumes.values()) if volumes else 0
     for item in ranked:
+        if item.outlet_count<2 or duplicate(item.keyword,history): continue
         matches={term:volume for term,volume in volumes.items() if normalized(item.keyword) in normalized(term) or normalized(term) in normalized(item.keyword)}
-        if not matches or item.outlet_count<2 or duplicate(item.keyword,history): continue
-        volume=max(matches.values())
-        score=50*math.log1p(volume)/math.log1p(max(volumes.values())) + 50*min(1,item.mention_count/10)
+        volume=max(matches.values()) if matches else 0
+        trend_bonus=50*math.log1p(volume)/math.log1p(max_volume) if matches and max_volume else 0
+        score=trend_bonus + 50*min(1,item.mention_count/10)
         candidates.append((score,item.keyword,item,volume,matches))
-    if not candidates: raise RuntimeError('검색량·복수 매체 언급·중복 검사를 모두 통과한 새 키워드 없음')
+    if not candidates: raise RuntimeError('복수 매체 언급·중복 검사를 통과한 새 키워드 없음 (관련 뉴스 자체가 없음)')
     score,_,item,volume,matches=max(candidates,key=lambda row:(row[0],row[1]))
-    return item.keyword, round(score), {'search_volume_approx':volume,'search_matches':matches,'mentions':item.mention_count,'outlets':item.outlet_count,'evidence_urls':list(item.evidence_urls),'live_cross_media':round(score)}
+    return item.keyword, round(score), {'search_volume_approx':volume,'search_matches':matches,'general_trend_match':bool(matches),'mentions':item.mention_count,'outlets':item.outlet_count,'evidence_urls':list(item.evidence_urls),'live_cross_media':round(score)}
 
 def recent_history(site):
     # Include public posts predating the queue as well as all reserved/queued topics.
