@@ -10,6 +10,18 @@ from scripts import process_platform_queue
 
 
 class PlatformPublisherTests(unittest.TestCase):
+    @patch("automation_hub.blogger_adapter.verify_publication")
+    def test_retry_recovers_verified_live_post_without_creating_duplicate(self, verify):
+        session = Mock()
+        session.get.return_value = Mock(status_code=200, json=lambda: {"items": [
+            {"id": "77", "status": "LIVE", "url": "https://demo.blogspot.com/real.html",
+             "content": "<!-- automation-job:job-1 --><p>saved</p>"}]})
+        verify.return_value = Mock(ok=True, final_url="https://demo.blogspot.com/real.html")
+        result = BloggerPublisher("site-1", "123", "token", session=session).publish(self.job)
+        self.assertTrue(result.ok)
+        self.assertEqual(result.status, "published")
+        session.post.assert_not_called()
+
     def setUp(self):
         self.job = PublishJob("job-1", "site-1", "A useful title", "<p>Useful article</p>", ["guide"])
 

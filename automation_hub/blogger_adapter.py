@@ -52,6 +52,16 @@ class BloggerPublisher:
                     if marker not in str(item.get("content", "")):
                         continue
                     remote_id = str(item.get("id", ""))
+                    if item.get("status", "").lower() == "live" and job.publish_now:
+                        verification = verify_publication(item.get("url", ""), job.title, site_url=self.site_url, attempts=3)
+                        return PublishResult(
+                            verification.ok, "blogger", self.site_id, job.job_id,
+                            "published" if verification.ok else "verification_failed",
+                            public_url=verification.final_url or item.get("url", ""), remote_id=remote_id,
+                            error_code="" if verification.ok else verification.error_code,
+                            message="Existing public post recovered; no duplicate created",
+                            extra={"idempotent_recovery": True},
+                        )
                     review_url = f"https://www.blogger.com/blog/post/edit/{self.blog_id}/{remote_id}"
                     return PublishResult(
                         True, "blogger", self.site_id, job.job_id, "drafted",
