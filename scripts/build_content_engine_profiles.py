@@ -37,7 +37,7 @@ def main() -> int:
             "order": channel["order"],
             "site_key": channel.get("site_key") or wp_site["site_id"].removeprefix("wp_"),
             "source_site_id": wp_site["site_id"],
-            "language": wp_site["language"],
+            "language": channel.get("language", wp_site["language"]),
             "wordpress": {
                 "url": wp_site["url"],
                 "secret_name": wp_site["secret_name"],
@@ -65,8 +65,11 @@ def main() -> int:
                 # WordPress carries the deep-dive, Blogspot a related-but-different
                 # angle. Derived as a ratio of the WordPress length so every site
                 # gets a sane range without a second hand-maintained table.
-                "persona": wp_site["persona"],
-                "tone": wp_site["tone"],
+                "persona": channel.get("persona", wp_site["persona"]),
+                "tone": channel.get("tone", wp_site["tone"]),
+                "theme": channel.get("theme", channel["topic"]),
+                "editorial_policy": channel.get("editorial_policy", ""),
+                "seed_keywords": channel.get("seed_keywords", []),
                 "min_chars": max(1000, round(wp_site.get("min_chars", 1800) * 0.7)),
                 "target_chars": max(1300, round(wp_site.get("target_chars", 2400) * 0.7)),
                 "max_chars": max(1600, round(wp_site.get("max_chars", 3200) * 0.72)),

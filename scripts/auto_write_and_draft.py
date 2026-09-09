@@ -135,6 +135,9 @@ def _profile_for(site_id: str) -> tuple[str, dict]:
     profiles = json.loads((ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8"))["profiles"]
     for profile in profiles:
         if profile["site_key"] == site_key:
+            if platform == "blogger":
+                from automation_hub.medical_editorial import medical_profile
+                profile = medical_profile(profile)
             return platform, profile
     raise SystemExit(f"No content_engine_profiles.json entry for site_key={site_key!r}")
 
@@ -274,6 +277,8 @@ def main() -> int:
         keyword = record["keyword"]
         _set_status(service, sheet_id, sheet_row, "작성중")
 
+    from automation_hub.medical_editorial import require_medical_topic
+    require_medical_topic(profile, keyword)
     if platform == "wordpress":
         settings = profile["wordpress"]
         language, site_url = profile["language"], settings["url"]

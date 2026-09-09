@@ -74,7 +74,8 @@ def _profile_for_blogger(blogger_site_id: str) -> dict:
     profile = next((item for item in profiles if item.get("site_key") == site_key), None)
     if profile is None:
         raise RuntimeError(f"등록되지 않은 Blogger 사이트 ID입니다: {blogger_site_id}")
-    return profile
+    from automation_hub.medical_editorial import medical_profile
+    return medical_profile(profile)
 
 
 def _append_failure(service, sheet_id: str, blogger_site_id: str, *,
@@ -119,6 +120,13 @@ def main():
     existing = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"'{QUEUE_TAB}'!A1:N").execute().get("values", [])
     queue_records = _records(existing)
     profile = _profile_for_blogger(blogger_site_id)
+    if profile.get("medical_editorial"):
+        from automation_hub.medical_editorial import require_medical_topic
+        if force_keyword:
+            require_medical_topic(profile, force_keyword)
+        os.environ["BLOGGER_LANGUAGE"] = "ko"
+        os.environ["BLOGGER_PERSONA"] = profile["blogspot"]["persona"]
+        os.environ["BLOGGER_TONE"] = profile["blogspot"]["tone"]
     selected_topic = ""
     source_match_score = None
     route_code = "WP_RELATED_SOURCE"
@@ -243,6 +251,8 @@ def main():
         return 40 + min(30, 10 * sum(x.strip() in title for x in intent if x.strip())) + min(20, 4 * sum(x in title for x in persona if len(x) > 3)) + min(10, len(title) // 12)
     eligible = [post for post in source_posts if not active_duplicate(queue_records, site_id=blogger_site_id, source_id=post.get("link", ""))]
     source = max(eligible, key=golden_source_score, default=None)
+    if profile.get("medical_editorial"):
+        require_medical_topic(profile, source.get("title", {}).get("rendered", "") if source else selected_topic)
     evidence_urls = [item["url"] for item in evidence_sources if item.get("url")]
     source_identity = source.get("link", "") if source else (evidence_urls[0] if evidence_urls else "")
     if source_posts and not source:
@@ -310,6 +320,8 @@ def main():
                 prior_feedback="; ".join(failures),
                 verified_sources=evidence_sources,
             )
+        from automation_hub.medical_editorial import medical_instructions
+        prompt += medical_instructions(profile)
         if previous_candidate is not None:
             prompt += (
                 "\nRepair the previous JSON draft below rather than starting over. Preserve its verified facts and links. "
