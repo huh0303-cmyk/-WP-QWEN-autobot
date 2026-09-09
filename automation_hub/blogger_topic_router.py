@@ -33,7 +33,13 @@ KST = timezone(timedelta(hours=9))
 MEDIA_FEEDS = (
     ("Chosun Ilbo", "newspaper", "https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml"),
     ("Hankyoreh", "newspaper", "https://www.hani.co.kr/rss/"),
-    ("CNN", "newspaper", "https://rss.cnn.com/rss/edition.rss"),
+    # rss.cnn.com stopped completing TLS handshakes (verified 2026-09-09: every
+    # path times out/EOFs from two independent clients, not just edition.rss;
+    # cnn.com/services/rss/ no longer serves an RSS index either) - CNN has
+    # retired this feed host. Routed through Google News' per-source search,
+    # the same technique already used below for Washington Post/LA Times,
+    # rather than dropping CNN from PRIORITY_OUTLETS entirely.
+    ("CNN", "google", "https://news.google.com/rss/search?q=when:1d+source:CNN&hl=en-US&gl=US&ceid=US:en"),
     ("The New York Times", "newspaper", "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"),
     ("The Washington Post", "newspaper", "https://news.google.com/rss/search?q=when:1d+source:Washington_Post&hl=en-US&gl=US&ceid=US:en"),
     ("Los Angeles Times", "newspaper", "https://news.google.com/rss/search?q=when:1d+source:Los_Angeles_Times&hl=en-US&gl=US&ceid=US:en"),
