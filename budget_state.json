@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 7.14,
+  "spent_estimate_usd": 7.17,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -1877,6 +1877,15 @@
       "amount_usd": 0.03,
       "reservation_id": "df80df818a80d9aeb724262c01e5cef8f63cf8172c9db11f74f11a44e787b460",
       "run_id": "34325936254",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-09T16:52:19.784837+09:00",
+      "label": "blogger-rewrite:blogger_krealestate",
+      "amount_usd": 0.03,
+      "reservation_id": "492df590ed42e31b6043a66cc0433ab5d68471ec5174669aa6a4ad99c1dc88ed",
+      "run_id": "34325939110",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
