@@ -178,7 +178,8 @@ def format_metric(row, key, change):
 
 def report_html(result):
     parts = ["<h2>통제실 네 가지 핵심 통계</h2>", "<p>기준: " + html.escape(result["generated_at"]) + "</p>",
-             "<p>오늘 방문 증감: 오늘 현재−어제 하루. 누적 방문 증감: 오늘 증가. 총글 증감: 전날 저장값 대비. 색인 증감: 이전 확인값 대비. Blogger 방문은 자체 조회수입니다. 미확인 값은 0이 아닙니다.</p>"]
+             "<p>오늘 방문 증감: 오늘 현재−어제 하루. 누적 방문 증감: 오늘 증가. 총글 증감: 전날 저장값 대비. 색인 증감: 이전 확인값 대비. Blogger 방문은 자체 조회수입니다. 미확인 값은 0이 아닙니다.</p>",
+             "<p>Google 색인은 공개 발행 글 URL의 검사 결과입니다. 카테고리·태그 등을 포함하는 GSC 전체 페이지 수와 다릅니다. 일부 확인은 확정된 최소 수치이며, 검사 실패를 미색인 0으로 처리하지 않습니다.</p>"]
     for platform, title in [("wordpress", "WordPress 25개"), ("blogger", "Blogspot 33개"), ("news", "뉴스룸 2개 · 별도")]:
         rows = sorted((r for r in result["records"] if r["platform"] == platform),
                       key=lambda r: (r.get("today_visitors") is None, -(r.get("today_visitors") or 0), r["url"]))
@@ -192,7 +193,14 @@ def report_html(result):
             url = html.escape(r["url"], quote=True)
             site = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>' if r["url"].startswith("https://") else url
             values = [str(rank) if count is not None else "—", site] + [format_metric(r, k, d) for k, d in [("today_visitors", "today_delta"), ("total_visitors", "total_delta"), ("total_posts", "posts_delta"), ("indexed", "indexed_delta")]]
-            values.append(html.escape(" / ".join(r.get("errors", [])) + (f" · 색인 미확인 {r['index_unknown']}개" if r.get("index_unknown") else "")))
+            if r.get("index_partial") and r.get("indexed") is not None:
+                values[-1] += " · 일부 확인"
+            details = list(r.get("errors", []))
+            if r.get("index_total") is not None:
+                details.append(f"검사 대상 {r['index_total']}글 · 미색인 {r.get('index_unindexed') if r.get('index_unindexed') is not None else '미확인'} · 확인 실패 {r.get('index_unknown') if r.get('index_unknown') is not None else '미확인'}")
+            if r.get("index_checked_at"):
+                details.append("색인 확인 " + r["index_checked_at"])
+            values.append(html.escape(" / ".join(details)))
             parts.append("<tr>" + "".join("<td>" + v + "</td>" for v in values) + "</tr>")
         parts.append("</table></div>")
     return "".join(parts)
