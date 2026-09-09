@@ -1,0 +1,27 @@
+name: Provision existing YouTube providers to owner VPS (encrypted)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install cryptography -q
+      - name: Encrypt existing credentials for the configured VPS public key
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+        run: python scripts/seal_vps_youtube_providers.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sealed-youtube-providers
+          path: artifacts/youtube-providers.sealed.json
+          retention-days: 1
+          if-no-files-found: error
