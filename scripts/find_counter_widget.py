@@ -15,7 +15,14 @@ widgets = r.json()
 print("total widgets:", len(widgets) if isinstance(widgets, list) else widgets)
 if isinstance(widgets, list):
     for w in widgets:
-        print("id:", w.get("id"), "| id_base:", w.get("id_base"), "| sidebar:", w.get("sidebar"))
+        content = ""
+        if isinstance(w.get("content"), dict):
+            content = w["content"].get("raw", "") or w["content"].get("rendered", "")
+        elif isinstance(w.get("content"), str):
+            content = w["content"]
+        marker = " <== HAS COUNTER" if ("counter" in content.lower() or "k-health" in content.lower()) else ""
+        print(f"--- id: {w.get('id')} | sidebar: {w.get('sidebar')}{marker} ---")
+        print(content[:1500])
 
 print("=== template parts ===")
 r2 = requests.get(f"{base}/template-parts", auth=auth, params={"per_page": 50, "context": "edit"}, timeout=30)
