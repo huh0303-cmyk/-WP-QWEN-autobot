@@ -4,13 +4,6 @@ name: TOPIK 단어 퀴즈 쇼츠 — 검수용 생성만
 # 사용자가 최종 검수한 뒤 별도 게시한다. 기본값은 생성만 하며, 명시적인
 # 소액 E2E 검증 때만 PRIVATE/DRAFT/준비 상태의 플랫폼 업로드를 1회 실행한다.
 on:
-  schedule:
-    # Daily at 11:41 KST (GitHub cron is UTC). Generates one review set and
-    # uploads the PRIVATE/DRAFT-only review copies (YouTube private, TikTok
-    # self-only, Facebook draft) — same safe defaults as a manual run with
-    # run_social_review=true. Instagram/Threads stay untouched here since
-    # META_PUBLISH_ENABLED is not set for this job.
-    - cron: "41 2 * * *"
   workflow_dispatch:
     inputs:
       lang:
@@ -73,7 +66,7 @@ jobs:
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: python scripts/topik_quiz_shorts.py
       - name: "SNS/YouTube 검토본 1세트 업로드"
-        if: ${{ github.event_name == 'schedule' || inputs.run_social_review == true }}
+        if: ${{ inputs.run_social_review == true }}
         env:
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
