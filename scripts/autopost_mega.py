@@ -3008,13 +3008,50 @@ def build_faq_html(faq):
     items="".join(f'<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">{q}</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">{a}</p></div></div>' for q,a in faq)
     return f'<div itemscope itemtype="https://schema.org/FAQPage"><h2>자주 묻는 질문 (FAQ)</h2>{items}</div>'
 
-def build_img_html(urls, keyword, alt_text=None):
+def rehost_remote_image(site_url, pw, image_url):
+    """Download a provider-hosted image (Replicate/AI-gateway R2 output) and
+    re-upload it to this site's own WP media library, returning a permanent
+    URL. 2026-09-10: inline body images were embedded with the raw provider
+    URL directly - unlike the featured image, which already goes through
+    ensure_featured_media()'s download-and-reupload step. Those provider
+    URLs expire (Replicate within hours; the R2 gateway URLs carry an
+    explicit X-Amz-Expires=86400), silently turning the article's own first
+    image into a dead link within a day or two of publishing. Route inline
+    images through the same permanent-rehost step so they don't rot.
+    Fails soft: on any error, returns the original URL rather than blocking
+    publication over an image problem."""
+    if not image_url or not image_url.startswith("http"):
+        return image_url
+    try:
+        image = requests.get(image_url, timeout=25, headers={"User-Agent": "Mozilla/5.0"})
+        image.raise_for_status()
+        mime = image.headers.get("Content-Type", "image/jpeg").split(";", 1)[0]
+        extension = ".png" if "png" in mime else ".webp" if "webp" in mime else ".jpg"
+        filename = "inline-" + hashlib.md5(image_url.encode()).hexdigest()[:12] + extension
+        uploaded = requests.post(
+            f"{site_url}/wp-json/wp/v2/media", auth=(WP_USER, pw),
+            headers={"Content-Disposition": f'attachment; filename="{filename}"', "Content-Type": mime},
+            data=image.content, timeout=35,
+        )
+        uploaded.raise_for_status()
+        media = uploaded.json()
+        source_url = media.get("source_url")
+        if source_url and media.get("id"):
+            _uploaded_media_ids[image_url] = media["id"]
+        return source_url or image_url
+    except Exception as e:
+        print(f"  ⚠️ 본문 이미지 재호스팅 실패, 원본 URL 유지(만료 위험 있음): {e}")
+        return image_url
+
+def build_img_html(urls, keyword, alt_text=None, site_url=None, pw=None):
     # 2026-08-22: 이전엔 한 글에 이미지 여러 장이 들어가도 전부 동일한 alt(키워드
     # 단독)를 썼음 — 사진마다 실제로 다른 걸 담고 있는데 alt는 똑같은 게 반복되는
     # 건 AI 대량생산 흔적으로 읽힐 수 있어, 호출부가 사진의 위치/역할에 맞는
     # alt_text를 넘겨주면 그걸 쓰고, 안 넘기면 keyword로 폴백한다.
     html=""
     for u in urls:
+        if site_url and pw:
+            u = rehost_remote_image(site_url, pw, u)
         alt = alt_text or keyword
         html+=f'<figure style="margin:20px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);"><img src="{u}" alt="{alt}" loading="lazy" style="width:100%;height:auto;display:block;"><figcaption style="padding:8px 14px;font-size:13px;color:#666;text-align:center;">{alt}</figcaption></figure>\n'
     return html
@@ -3108,16 +3145,16 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if not cat_id:
         cat_id=pick_best_category(url,pw,keyword,title)
 
-    hero=build_img_html(images[:1],keyword,alt_text=title)
-    mid =build_img_html(images[1:2],keyword,alt_text=keyword) if len(images)>1 else ""
-    end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}") if len(images)>2 else ""
+    hero=build_img_html(images[:1],keyword,alt_text=title,site_url=url,pw=pw)
+    mid =build_img_html(images[1:2],keyword,alt_text=keyword,site_url=url,pw=pw) if len(images)>1 else ""
+    end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}",site_url=url,pw=pw) if len(images)>2 else ""
     is_newsroom = site.get("mode") in ("news", "news_en")
     if is_newsroom:
         from newsroom_real_photos import figure
         ai_caption = "AI 생성 설명 이미지 · 실제 현장 사진 아님" if site.get("lang") == "ko" else "AI-generated illustration; not a photograph of the event"
         photo = site.get("_newsroom_real_photo")
-        hero = figure(photo, site.get("lang", "en")) if photo else build_img_html(images[:1], keyword, alt_text=ai_caption)
-        mid = build_img_html(images[:1], keyword, alt_text=ai_caption) if photo else ""
+        hero = figure(photo, site.get("lang", "en")) if photo else build_img_html(images[:1], keyword, alt_text=ai_caption,site_url=url,pw=pw)
+        mid = build_img_html(images[:1], keyword, alt_text=ai_caption,site_url=url,pw=pw) if photo else ""
         end = ""
     faq_html="" if is_newsroom else build_faq_html(faq)
 
