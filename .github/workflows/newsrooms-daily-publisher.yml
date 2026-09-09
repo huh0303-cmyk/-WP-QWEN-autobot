@@ -21,6 +21,11 @@ on:
         required: false
         type: string
         default: ""
+      source_title:
+        description: "Title captured by rss_watch at detection time (avoids re-matching a fast-churning feed later)"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -86,6 +91,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}
+          NEWSROOM_SOURCE_TITLE: ${{ inputs.source_title }}
           FORCE_SOURCE_IPV4: "true"
           NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
           NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
