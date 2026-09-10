@@ -155,7 +155,7 @@ def _next_due_row(service, sheet_id: str, site_id: str) -> tuple[int, dict] | No
 
 def _write_article(*, keyword: str, site_theme: str, language: str, persona: str, tone: str,
                    min_chars: int, target_chars: int, max_chars: int,
-                   review_feedback: str = "") -> tuple[dict | None, int, list[str], str]:
+                   review_feedback: str = "", editorial_rules: str = "") -> tuple[dict | None, int, list[str], str]:
     failures: list[str] = [review_feedback] if review_feedback else []
     # A third, feedback-informed pass prevents a transient short response from
     # wasting an otherwise valid queued topic. It runs only after both normal
@@ -164,6 +164,8 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
                                   prior_feedback="; ".join(failures))
+        if editorial_rules:
+            prompt += editorial_rules
         try:
             if not openai_available():
                 raise RuntimeError("GPT-5 mini writer unavailable")
@@ -304,10 +306,15 @@ def main() -> int:
 
     editorial_funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
     funnel_context = json.dumps(editorial_funnel, ensure_ascii=False) if editorial_funnel else ""
+    editorial_rules = ""
+    if profile.get("medical_editorial"):
+        from automation_hub.medical_editorial import medical_instructions
+        editorial_rules = medical_instructions(profile)
     writer_args = dict(
         keyword=keyword, site_theme=profile["wordpress"]["theme"] + (f". Editorial funnel and safety rules: {funnel_context}" if funnel_context else ""), language=language,
         persona=settings["persona"], tone=settings["tone"],
         min_chars=settings["min_chars"], target_chars=settings["target_chars"], max_chars=settings["max_chars"],
+        editorial_rules=editorial_rules,
     )
     article, score, failures, provider = _write_article(**writer_args)
     if article is None:
