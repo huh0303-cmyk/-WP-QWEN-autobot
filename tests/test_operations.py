@@ -67,17 +67,17 @@ def test_dispatch_uses_exact_returned_id_without_recent_run_search(store):
     gateway = GitHubGateway("owner/repo", "fake", lambda: [])
     response = Mock(status_code=200)
     response.json.return_value = {"workflow_run_id":123}
-    with patch("control_center.operation_gateway.requests.post", return_value=response) as post, patch.object(gateway,"get") as get:
+    with patch("control_center.operation_gateway.requests.post", return_value=response) as post, patch.object(gateway,"get",return_value={"state":"active"}) as get:
         gateway.dispatch(job)
     assert job["run_id"] == 123 and job["phase"] == "queued"
     assert post.call_args.kwargs["json"]["return_run_details"] is True
-    get.assert_not_called()
+    get.assert_called_once_with("/actions/workflows/writer.yml")
 
 
 @pytest.mark.parametrize("code,phase", [(403,"failed"),(422,"failed"),(500,"attention"),(204,"attention")])
 def test_dispatch_error_never_claims_acceptance(store,code,phase):
     job=ready(store)
-    with patch("control_center.operation_gateway.requests.post",return_value=Mock(status_code=code)):
+    with patch.object(GitHubGateway,"get",return_value={"state":"active"}), patch("control_center.operation_gateway.requests.post",return_value=Mock(status_code=code)):
         GitHubGateway("owner/repo","fake",lambda:[]).dispatch(job)
     assert job["phase"] == phase and not job.get("run_id")
 
@@ -229,3 +229,13 @@ def test_newsroom_cost_hold_records_new_items_without_dispatch(store, tmp_path, 
         assert db.execute("SELECT COUNT(*) FROM rss_items WHERE state='waiting'").fetchone()[0] == 1
         assert db.execute("SELECT COUNT(*) FROM jobs").fetchone()[0] == 0
     assert "비용 중지" in watcher.status()["message"]
+
+
+@pytest.mark.parametrize("state,phase", [("disabled_manually", "stopped"), ("disabled_inactivity", "stopped"), (None, "attention")])
+def test_disabled_or_unknown_workflow_never_dispatches(store, state, phase):
+    job = ready(store)
+    gateway = GitHubGateway("owner/repo", "fake", lambda: [])
+    with patch.object(gateway, "get", return_value={"state":state}), patch("control_center.operation_gateway.requests.post") as post:
+        gateway.dispatch(job)
+    post.assert_not_called()
+    assert job["phase"] == phase and not job.get("run_id")
