@@ -20,7 +20,7 @@ def best_snapshot(data_dir, remote=None):
     data_dir = Path(data_dir)
     cache = data_dir / "core_metrics_cached.json"
     candidates = [remote]
-    for path in (cache, data_dir / "core_metrics_latest.json"):
+    for path in (cache, data_dir / "core_metrics_daily_latest.json", data_dir / "core_metrics_latest.json"):
         try:
             candidates.append(json.loads(path.read_text(encoding="utf-8")))
         except (OSError, ValueError):
@@ -29,7 +29,7 @@ def best_snapshot(data_dir, remote=None):
     valid = [(stamp, value) for stamp, value in valid if stamp is not None]
     if not valid:
         return {}
-    _, best = max(valid, key=lambda item: item[0])
+    _, best = max(valid, key=lambda item: (item[1].get("report_kind") == "daily_0700", item[0]))
     if best is remote:
         name = None
         try:

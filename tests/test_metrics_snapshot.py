@@ -22,3 +22,9 @@ def test_invalid_remote_cannot_replace_good_cache(tmp_path):
 def test_missing_data_does_not_invent_zero(tmp_path):
     assert best_snapshot(tmp_path) == {}
     assert best_snapshot(tmp_path, snapshot(11))["records"][0]["today_visitors"] is None
+
+
+def test_manual_check_never_replaces_daily_dashboard(tmp_path):
+    daily=dict(snapshot(11), report_kind="daily_0700")
+    best_snapshot(tmp_path,daily)
+    assert best_snapshot(tmp_path,snapshot(12)) == daily

@@ -1955,12 +1955,14 @@ def _core_metrics_manifest(bucket):
     from .metrics_snapshot import best_snapshot
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     remote = None
-    try:
-        response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/core_metrics_latest.json", params={"refresh": bucket}, timeout=12)
-        response.raise_for_status()
-        remote = response.json()
-    except (requests.RequestException, ValueError):
-        pass
+    for filename in ("core_metrics_daily_latest.json", "core_metrics_latest.json"):
+        try:
+            response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/{filename}", params={"refresh": bucket}, timeout=12)
+            response.raise_for_status()
+            remote = response.json()
+            break
+        except (requests.RequestException, ValueError):
+            pass
     return best_snapshot(Path(__file__).resolve().parents[1] / "data", remote)
 
 

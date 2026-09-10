@@ -39,3 +39,12 @@ def test_report_escapes_untrusted_site_and_errors():
          "errors": ["<script>alert(1)</script>"]}]})
     assert "<script>" not in document and "<img>" not in document
     assert "&lt;script&gt;" in document and "&quot;" in document
+
+
+def test_change_colors_and_prominent_kst_date():
+    assert '#1d4ed8' in metrics.format_metric({'n':15,'d':3},'n','d')
+    assert '#dc2626' in metrics.format_metric({'n':15,'d':-3},'n','d')
+    assert 'color:' not in metrics.format_metric({'n':15,'d':0},'n','d')
+    rendered=metrics.report_html({'generated_at':'2026-09-12T07:02:00+09:00','scheduled_for':'2026-09-12T07:00:00+09:00','report_kind':'daily_0700','records':[]})
+    assert '2026년 9월 12일 오전 7시 00분 (KST) 기준' in rendered
+    assert 'metrics-reference-time' in rendered and '32px' in rendered

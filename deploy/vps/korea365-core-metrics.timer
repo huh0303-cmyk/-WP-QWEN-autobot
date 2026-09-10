@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily statistics at exactly 07:00 Asia/Seoul
+
+[Timer]
+OnCalendar=*-*-* 07:00:00 Asia/Seoul
+AccuracySec=1s
+RandomizedDelaySec=0
+Persistent=false
+Unit=korea365-core-metrics.service
+
+[Install]
+WantedBy=timers.target
