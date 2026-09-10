@@ -1,0 +1,31 @@
+name: Diagnose native Blogger pageview response (read only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Read only public-count fields from two owned blogs
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: |
+          python - <<'PY'
+          import sys,json,requests
+          sys.path.insert(0,'scripts')
+          from core_metrics_report import oauth
+          headers=oauth()
+          for blog in ['5345010194652095946','8294304371132383961']:
+              r=requests.get('https://www.googleapis.com/blogger/v3/blogs/'+blog+'/pageviews',headers=headers,params={'range':'all'},timeout=20)
+              print(json.dumps({'blog':blog,'http':r.status_code,'response':r.json()},ensure_ascii=False))
+          PY
