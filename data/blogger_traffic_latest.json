@@ -1,104 +1,105 @@
 {
-  "generated_at": "2026-09-09T18:53:04.243723+09:00",
+  "generated_at": "2026-09-11T08:14:54.997+09:00",
   "source": "blogger_native_stats_authenticated",
+  "collection_started_at": "2026-09-11T08:11:11.627+09:00",
   "sites": {
     "https://k-trip365.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 22,
-      "total_delta": 0
+      "today": 2,
+      "yesterday": 1,
+      "today_delta": 1,
+      "total": 25,
+      "total_delta": 2
     },
     "https://kworld365seoul.blogspot.com": {
-      "today": 1,
-      "yesterday": 0,
-      "today_delta": 1,
-      "total": 13,
-      "total_delta": 1
+      "today": 0,
+      "yesterday": 3,
+      "today_delta": -3,
+      "total": 15,
+      "total_delta": 0
     },
     "https://jobkorea365.blogspot.com": {
       "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 12,
+      "yesterday": 1,
+      "today_delta": -1,
+      "total": 13,
       "total_delta": 0
     },
     "https://kstudy365.blogspot.com": {
       "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 13,
+      "yesterday": 1,
+      "today_delta": -1,
+      "total": 14,
       "total_delta": 0
     },
     "https://koreainsurance365.blogspot.com": {
-      "today": 0,
+      "today": 2,
       "yesterday": 0,
-      "today_delta": 0,
-      "total": 18,
-      "total_delta": 0
+      "today_delta": 2,
+      "total": 20,
+      "total_delta": 2
     },
     "https://kfinance365.blogspot.com": {
-      "today": 0,
-      "yesterday": 1,
-      "today_delta": -1,
-      "total": 22,
-      "total_delta": 0
+      "today": 2,
+      "yesterday": 2,
+      "today_delta": 0,
+      "total": 26,
+      "total_delta": 2
     },
     "https://koreamedicaltour365.blogspot.com": {
-      "today": 0,
+      "today": 1,
       "yesterday": 2,
-      "today_delta": -2,
-      "total": 32,
-      "total_delta": 0
+      "today_delta": -1,
+      "total": 35,
+      "total_delta": 1
     },
     "https://k-visa365.blogspot.com": {
       "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 10,
-      "total_delta": 0
-    },
-    "https://koreanews365daily.blogspot.com": {
-      "today": 1,
-      "yesterday": 0,
-      "today_delta": 1,
-      "total": 6,
-      "total_delta": 1
-    },
-    "https://koreainvest365.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 11,
-      "total_delta": 0
-    },
-    "https://oliveyoungkorea.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
+      "yesterday": 2,
+      "today_delta": -2,
       "total": 12,
       "total_delta": 0
     },
-    "https://koreacrypto365.blogspot.com": {
+    "https://koreanews365daily.blogspot.com": {
       "today": 0,
-      "yesterday": 1,
-      "today_delta": -1,
+      "yesterday": 2,
+      "today_delta": -2,
+      "total": 7,
+      "total_delta": 0
+    },
+    "https://koreainvest365.blogspot.com": {
+      "today": 0,
+      "yesterday": 2,
+      "today_delta": -2,
       "total": 13,
       "total_delta": 0
     },
-    "https://jobinkorea365.blogspot.com": {
-      "today": 0,
+    "https://oliveyoungkorea.blogspot.com": {
+      "today": 1,
       "yesterday": 0,
+      "today_delta": 1,
+      "total": 13,
+      "total_delta": 1
+    },
+    "https://koreacrypto365.blogspot.com": {
+      "today": 2,
+      "yesterday": 2,
       "today_delta": 0,
-      "total": 11,
-      "total_delta": 0
+      "total": 17,
+      "total_delta": 2
+    },
+    "https://jobinkorea365.blogspot.com": {
+      "today": 2,
+      "yesterday": 0,
+      "today_delta": 2,
+      "total": 13,
+      "total_delta": 2
     },
     "https://koreawedding365.blogspot.com": {
-      "today": 0,
+      "today": 1,
       "yesterday": 0,
-      "today_delta": 0,
-      "total": 8,
-      "total_delta": 0
+      "today_delta": 1,
+      "total": 9,
+      "total_delta": 1
     },
     "https://theseouljournal.blogspot.com": {
       "today": 0,
@@ -108,102 +109,102 @@
       "total_delta": 0
     },
     "https://ktech365.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 9,
-      "total_delta": 0
-    },
-    "https://kieca-korea.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 8,
-      "total_delta": 0
-    },
-    "https://ki-korea.blogspot.com": {
-      "today": 0,
-      "yesterday": 1,
-      "today_delta": -1,
-      "total": 16,
-      "total_delta": 0
-    },
-    "https://ksa-korea.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
-      "total": 9,
-      "total_delta": 0
-    },
-    "https://koreataxnlaw.blogspot.com": {
       "today": 1,
-      "yesterday": 1,
-      "today_delta": 0,
-      "total": 16,
+      "yesterday": 0,
+      "today_delta": 1,
+      "total": 10,
       "total_delta": 1
     },
-    "https://jobkoreaglobal.blogspot.com": {
-      "today": 0,
+    "https://kieca-korea.blogspot.com": {
+      "today": 2,
       "yesterday": 0,
-      "today_delta": 0,
-      "total": 9,
-      "total_delta": 0
+      "today_delta": 2,
+      "total": 10,
+      "total_delta": 2
+    },
+    "https://ki-korea.blogspot.com": {
+      "today": 3,
+      "yesterday": 0,
+      "today_delta": 3,
+      "total": 19,
+      "total_delta": 3
+    },
+    "https://ksa-korea.blogspot.com": {
+      "today": 2,
+      "yesterday": 0,
+      "today_delta": 2,
+      "total": 11,
+      "total_delta": 2
+    },
+    "https://koreataxnlaw.blogspot.com": {
+      "today": 3,
+      "yesterday": 1,
+      "today_delta": 2,
+      "total": 19,
+      "total_delta": 3
+    },
+    "https://jobkoreaglobal.blogspot.com": {
+      "today": 2,
+      "yesterday": 0,
+      "today_delta": 2,
+      "total": 11,
+      "total_delta": 2
     },
     "https://studyinkorea365.blogspot.com": {
-      "today": 0,
+      "today": 3,
       "yesterday": 0,
-      "today_delta": 0,
-      "total": 15,
-      "total_delta": 0
+      "today_delta": 3,
+      "total": 18,
+      "total_delta": 3
     },
     "https://korea365guide.blogspot.com": {
       "today": 0,
-      "yesterday": 3,
-      "today_delta": -3,
+      "yesterday": 0,
+      "today_delta": 0,
       "total": 1193,
       "total_delta": 0
     },
     "https://sis-korea.blogspot.com": {
-      "today": 0,
+      "today": 2,
       "yesterday": 0,
-      "today_delta": 0,
-      "total": 7,
-      "total_delta": 0
+      "today_delta": 2,
+      "total": 9,
+      "total_delta": 2
     },
     "https://krealestate365.blogspot.com": {
-      "today": 0,
+      "today": 1,
       "yesterday": 0,
-      "today_delta": 0,
-      "total": 10,
-      "total_delta": 0
+      "today_delta": 1,
+      "total": 11,
+      "total_delta": 1
     },
     "https://k-health365.blogspot.com": {
       "today": 0,
-      "yesterday": 2,
-      "today_delta": -2,
+      "yesterday": 0,
+      "today_delta": 0,
       "total": 13461,
       "total_delta": 0
     },
     "https://skin.k-health365.com": {
-      "today": 0,
-      "yesterday": 9,
-      "today_delta": -9,
-      "total": 110,
-      "total_delta": 0
+      "today": 1,
+      "yesterday": 0,
+      "today_delta": 1,
+      "total": 111,
+      "total_delta": 1
     },
     "https://glow.k-health365.com": {
-      "today": 0,
-      "yesterday": 163,
-      "today_delta": -163,
-      "total": 1292,
-      "total_delta": 0
+      "today": 1,
+      "yesterday": 0,
+      "today_delta": 1,
+      "total": 1293,
+      "total_delta": 1
     },
     "https://k-health365-edu.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
+      "today": 2,
+      "yesterday": 2,
       "today_delta": 0,
-      "total": 567,
-      "total_delta": 0
+      "total": 571,
+      "total_delta": 2
     },
     "https://korea-life-support365.blogspot.com": {
       "today": 0,
@@ -216,22 +217,22 @@
       "today": 0,
       "yesterday": 1,
       "today_delta": -1,
-      "total": 9,
-      "total_delta": 0
-    },
-    "https://kworld365.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
-      "today_delta": 0,
       "total": 10,
       "total_delta": 0
     },
-    "https://seoulintlschoolguide.blogspot.com": {
-      "today": 0,
-      "yesterday": 0,
+    "https://kworld365.blogspot.com": {
+      "today": 1,
+      "yesterday": 1,
       "today_delta": 0,
-      "total": 8,
-      "total_delta": 0
+      "total": 12,
+      "total_delta": 1
+    },
+    "https://seoulintlschoolguide.blogspot.com": {
+      "today": 2,
+      "yesterday": 1,
+      "today_delta": 1,
+      "total": 11,
+      "total_delta": 2
     }
   }
 }

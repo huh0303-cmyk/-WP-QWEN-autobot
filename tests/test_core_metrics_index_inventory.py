@@ -70,3 +70,12 @@ def test_delayed_google_cannot_block_report_forever(monkeypatch):
     row = metrics.refresh(report, {"days":{}})["records"][0]
     assert row["indexed"] is None and row["index_unknown"] == 3
     assert row["errors"] == ["Google 응답 지연 · 다음 집계에서 재확인"]
+
+
+def test_large_site_cannot_starve_small_sites():
+    prepared = [({}, "large", [str(i) for i in range(284)]),
+                ({}, "blogger1", ["a", "b"]), ({}, "blogger2", ["c"])]
+    tasks = list(metrics.fair_inspection_tasks(prepared))
+    assert tasks[:3] == [(0, "large", "0"), (1, "blogger1", "a"), (2, "blogger2", "c")]
+    assert tasks[3:5] == [(0, "large", "1"), (1, "blogger1", "b")]
+    assert len(tasks) == 287
