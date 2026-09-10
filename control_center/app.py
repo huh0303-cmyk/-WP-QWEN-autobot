@@ -1952,16 +1952,16 @@ def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_
 
 @lru_cache(maxsize=2)
 def _core_metrics_manifest(bucket):
+    from .metrics_snapshot import best_snapshot
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+    remote = None
     try:
         response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/core_metrics_latest.json", params={"refresh": bucket}, timeout=12)
         response.raise_for_status()
-        return response.json()
+        remote = response.json()
     except (requests.RequestException, ValueError):
-        try:
-            return json.loads((Path(__file__).resolve().parents[1] / "data/core_metrics_latest.json").read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            return {}
+        pass
+    return best_snapshot(Path(__file__).resolve().parents[1] / "data", remote)
 
 
 def _overlay_core_metrics(rows, platform):

@@ -53,6 +53,13 @@ class GitHubGateway:
         return response.json()
 
     def dispatch(self, job):
+        state = self.get(f"/actions/workflows/{job['workflow']}").get("state")
+        if state in {"disabled_manually", "disabled_inactivity", "disabled_fork", "deleted"}:
+            job.update(phase="stopped", detail="발행 작업이 일시 중지되어 있습니다. 비용·운영 중지 설정을 확인하세요. 글 작성이나 게시를 실행하지 않았습니다.", checked_at=time.time())
+            return
+        if state != "active":
+            job.update(phase="attention", detail="발행 작업의 활성 상태를 확인하지 못했습니다. 실행하지 않았습니다.", checked_at=time.time())
+            return
         response = requests.post(self.base + f"/actions/workflows/{job['workflow']}/dispatches",
                                  headers=self.headers, json={"ref": "main", "inputs": job["inputs"], "return_run_details": True}, timeout=30)
         if response.status_code in {400, 401, 403, 404, 422}:
