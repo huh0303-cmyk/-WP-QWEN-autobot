@@ -54,7 +54,8 @@ def test_parallel_refresh_keeps_unknown_separate(monkeypatch):
     report = {"generated_at": "2026-09-10", "records": [{"platform": "blogger", "url": "https://site", "total_posts": 3,
               "published_urls": ["https://site/a", "https://site/b", "https://site/c"], "errors": []}]}
     row = metrics.refresh(report, {"days": {}})["records"][0]
-    assert (row["indexed"], row["index_unindexed"], row["index_unknown"]) == (1, 1, 1)
+    assert (row["indexed"], row["index_unindexed"], row["index_unknown"]) == (None, 1, 1)
+    assert row["index_confirmed"] == 1
     assert row["index_partial"] and row["indexed_delta"] is None
 
 
@@ -65,7 +66,7 @@ def test_delayed_google_cannot_block_report_forever(monkeypatch):
     sites = Mock(); sites.json.return_value = {"siteEntry": []}
     monkeypatch.setattr(metrics.requests, "post", Mock(return_value=token))
     monkeypatch.setattr(metrics.requests, "get", Mock(return_value=sites))
-    monkeypatch.setattr(metrics.time, "monotonic", Mock(side_effect=[0, 721]))
+    monkeypatch.setattr(metrics.time, "monotonic", Mock(side_effect=[0, 1201]))
     report = {"generated_at": "2026-09-10", "records": [{"platform":"blogger", "url":"https://site", "total_posts":3, "indexed":0}]}
     row = metrics.refresh(report, {"days":{}})["records"][0]
     assert row["indexed"] is None and row["index_unknown"] == 3

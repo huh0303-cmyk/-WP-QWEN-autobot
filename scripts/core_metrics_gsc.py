@@ -40,7 +40,7 @@ def unavailable(row, reason):
 
 
 def refresh(report, history):
-    deadline = time.monotonic() + 12 * 60
+    deadline = time.monotonic() + 20 * 60
     response = requests.post("https://oauth2.googleapis.com/token", data={
         "client_id": os.environ["GOOGLE_METRICS_CLIENT_ID"],
         "client_secret": os.environ["GOOGLE_METRICS_CLIENT_SECRET"],
@@ -63,7 +63,7 @@ def refresh(report, history):
         prop = next((p for p in candidates if p in props), None)
         if not prop:
             return unavailable(row, "Google 색인 조회 권한 연결 필요")
-        if row["platform"] in ("wordpress", "news"):
+        if row["platform"] in ("wordpress", "news") and "published_urls" not in row:
             try:
                 row["published_urls"] = published_wordpress_urls(url)
                 row["total_posts"] = len(row["published_urls"])
@@ -84,8 +84,12 @@ def refresh(report, history):
         if time.monotonic() >= deadline:
             return index, "unknown", "Google 응답 지연 · 검사 시간 한도"
         try:
-            r = requests.post("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
-                headers=headers, json={"inspectionUrl": post, "siteUrl": prop}, timeout=25)
+            for attempt in range(2):
+                r = requests.post("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+                    headers=headers, json={"inspectionUrl": post, "siteUrl": prop}, timeout=25)
+                if r.status_code not in (429, 500, 502, 503, 504) or attempt or time.monotonic() >= deadline:
+                    break
+                time.sleep(1)
             r.raise_for_status()
             status = r.json()["inspectionResult"]["indexStatusResult"]
             verdict = status.get("verdict")
@@ -105,14 +109,14 @@ def refresh(report, history):
     reasons_by_site = [Counter() for _ in prepared]
     # Interleave one URL per site before submitting the next URL from any site.
     # Large WordPress inventories must not exhaust the deadline ahead of Blogger.
-    with ThreadPoolExecutor(max_workers=12) as pool:
+    with ThreadPoolExecutor(max_workers=24) as pool:
         for index, bucket, reason in pool.map(inspect_post, fair_inspection_tasks(prepared)):
             counts_by_site[index][bucket] += 1
             reasons_by_site[index][reason] += 1
     for index, (row, prop, urls) in enumerate(prepared):
         url = row["url"].rstrip("/")
         counts, reasons = counts_by_site[index], reasons_by_site[index]
-        row.update(indexed=counts["indexed"] if counts["unknown"] < len(urls) or not urls else None,
+        row.update(indexed=counts["indexed"] if not counts["unknown"] else None, index_confirmed=counts["indexed"],
             index_unknown=counts["unknown"], index_unindexed=counts["unindexed"], index_total=len(urls),
             index_partial=bool(counts["unknown"]), index_checked_at=datetime.now(KST).isoformat(),
             index_source="Google URL Inspection API · published posts only", index_reasons=dict(reasons), index_property=prop)

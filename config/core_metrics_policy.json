@@ -1,0 +1,15 @@
+{
+  "version": "kst0700-v1",
+  "timezone": "Asia/Seoul",
+  "collection_time": "07:00",
+  "scheduler": "VPS systemd",
+  "max_start_delay_seconds": 600,
+  "daily_visitors": "cumulative_at_today_0700 - cumulative_at_yesterday_0700",
+  "daily_delta": "daily_visitors - previous_daily_visitors",
+  "cumulative_delta": "current_cumulative - previous_daily_snapshot_cumulative",
+  "posts": "unique publicly published post URLs; drafts excluded",
+  "indexed": "PASS verdicts for the frozen published URL inventory; incomplete counts are unknown",
+  "comparison": "exact previous calendar day fixed-time snapshot only",
+  "manual_runs": "never modify fixed-time history",
+  "paid_ai_allowed": false
+}

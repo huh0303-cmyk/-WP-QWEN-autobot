@@ -1,31 +1,97 @@
-name: Diagnose native Blogger pageview response (read only)
+name: Four core statistics and daily email (no paid AI)
 on:
   workflow_dispatch:
+    inputs:
+      send_email:
+        type: boolean
+        default: true
+        description: Send the requested four-metric email
+      baseline_date:
+        type: string
+        default: ''
+        description: VPS-only KST 07:00 baseline date (YYYY-MM-DD); blank for manual inspection
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: core-metrics-report
+  cancel-in-progress: false
 jobs:
-  inspect:
+  collect:
     environment: blogger
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - name: Read only public-count fields from two owned blogs
+      - run: pip install requests pyjwt cryptography
+      - name: Collect public measurements with Blogger credentials
         env:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          BASELINE_DATE: ${{ inputs.baseline_date }}
+        run: python scripts/core_metrics_report.py --baseline-date "$BASELINE_DATE"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: core-metrics-collected
+          path: |
+            data/core_metrics_latest.json
+            data/core_metrics_history.json
+  finish:
+    needs: collect
+    environment: google-metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - uses: actions/download-artifact@v4
+        with:
+          name: core-metrics-collected
+          path: data
+      - name: Verify Google index using dedicated metrics grant
+        env:
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SEND_EMAIL: ${{ github.event_name == 'schedule' || inputs.send_email }}
         run: |
-          python - <<'PY'
-          import sys,json,requests
-          sys.path.insert(0,'scripts')
-          from core_metrics_report import oauth
-          headers=oauth()
-          for blog in ['5345010194652095946','8294304371132383961']:
-              r=requests.get('https://www.googleapis.com/blogger/v3/blogs/'+blog+'/pageviews',headers=headers,params={'range':'all'},timeout=20)
-              print(json.dumps({'blog':blog,'http':r.status_code,'response':r.json()},ensure_ascii=False))
-          PY
+          if [ "$SEND_EMAIL" = true ]; then
+            python scripts/core_metrics_report.py --refresh-index --email
+          else
+            python scripts/core_metrics_report.py --refresh-index
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core-metrics-report
+          path: |
+            data/core_metrics_latest.json
+            data/core_metrics_report.html
+      - name: Preserve date-stamped measurements
+        if: ${{ success() && github.ref == 'refs/heads/main' }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_report.html
+          for file in data/core_metrics_daily_history.json data/core_metrics_daily_latest.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
+          git diff --cached --quiet || git commit -m 'Update four core metrics [skip ci]'
+          for attempt in 1 2 3; do
+            git pull --rebase origin main || exit 1
+            git push && exit 0
+            sleep 2
+          done
+          exit 1

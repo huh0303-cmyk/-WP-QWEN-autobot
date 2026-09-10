@@ -28,7 +28,7 @@
             const platform=group.dataset.metricsPlatform;
             group.hidden=select.value!=='전체'&&!platform.includes(select.value);
             group.querySelectorAll('tr').forEach((row,i)=>{
-                if(i)[...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','오늘 방문(증감)','누적 방문(증감)','총 발행 글(증감)','Google 색인(증감)','확인 필요'][index];});if(i)row.hidden=!row.cells[1]?.textContent.toLowerCase().includes(filter.value.trim().toLowerCase());});
+                if(i)[...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','일일 방문자수(증감)','누적 방문자수(증감)','총 발행 글(증감)','Google 색인 발행 글수(증감)','확인 필요'][index];});if(i)row.hidden=!row.cells[1]?.textContent.toLowerCase().includes(filter.value.trim().toLowerCase());});
         });
     }
     filter.oninput=applyFilter;select.onchange=applyFilter;
@@ -40,19 +40,19 @@
             let node=heading;
             while(node){const next=node.nextElementSibling;group.append(node);if(node.tagName==='DIV'&&node.querySelector('table'))break;if(next?.tagName==='H3')break;node=next;}
             group.querySelectorAll('tr').forEach((row,i)=>{
-                if(i)[...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','오늘 방문(증감)','누적 방문(증감)','총 발행 글(증감)','Google 색인(증감)','확인 필요'][index];});
+                if(i)[...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','일일 방문자수(증감)','누적 방문자수(증감)','총 발행 글(증감)','Google 색인 발행 글수(증감)','확인 필요'][index];});
                 if(i&&row.cells[6]?.textContent){const cell=row.cells[6];const details=document.createElement('details');const label=document.createElement('summary');label.textContent='확인 내역';const text=document.createElement('p');text.textContent=cell.textContent;details.append(label,text);cell.replaceChildren(details);}
             });
         });
         if(!host.querySelector('.metrics-definitions')){
-            const notes=[...host.children].filter(node=>node.tagName==='P'&&!node.textContent.startsWith('기준:'));
+            const notes=[...host.children].filter(node=>node.tagName==='P'&&!node.classList.contains('metrics-reference-time')&&!node.textContent.startsWith('기준:'));
             if(notes.length){const details=document.createElement('details');details.className='metrics-definitions';const label=document.createElement('summary');label.textContent='증감·조회수·색인 집계 기준';details.append(label,...notes);host.querySelector('h2').after(details);}
         }
-        const stamp=[...host.children].find(node=>node.tagName==='P'&&node.textContent.startsWith('기준:'));
+        const stamp=[...host.children].find(node=>node.tagName==='P'&&(node.classList.contains('metrics-reference-time')||node.textContent.startsWith('기준:')));
         let freshness=host.querySelector('.metrics-freshness');
         if(stamp){
             if(!freshness){freshness=document.createElement('p');freshness.className='metrics-freshness';stamp.after(freshness);}
-            const measured=stamp.textContent.match(/\d{4}-\d{2}-\d{2}/)?.[0];
+            const measured=stamp.dataset.date||stamp.textContent.match(/\d{4}-\d{2}-\d{2}/)?.[0];
             const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
             freshness.textContent=measured&&measured!==today?'이전 집계 자료입니다. 오늘 통계 갱신을 기다리고 있습니다.':'오늘 집계 자료 · 정확한 확인 시각은 각 항목에서 확인하세요.';
             freshness.style.color=measured!==today?'#b45309':'#047857';
