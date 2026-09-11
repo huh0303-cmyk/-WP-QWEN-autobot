@@ -1,31 +1,75 @@
-name: Publication network read-only health and writer probe
+name: Correct one inspected public newsroom test article
 on:
   workflow_dispatch: {}
 permissions:
   contents: read
+concurrency:
+  group: newsroom-publisher-single-owner
+  cancel-in-progress: false
 jobs:
-  health:
+  correct:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 4
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install requests -q
-      - name: Check all 66 public destinations
-        run: python scripts/publication_health_audit.py
-      - name: One short Flash response with a single GPT fallback
+      - name: Correct inspected terminology and attribution, preserving images
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: 'true'
-          PYTHONPATH: scripts
-        run: python -c "from economy_text import generate_text; text = generate_text('Return exactly the word OK.'); print('Writer returned text:', bool(text.strip()))"
+          WP_PASSWORD: ${{ secrets.KOREANEWS365COM }}
+          ARTICLE_RECORD: "{\"timestamp\": \"2026-09-12 05:54:39\", \"site\": \"https://koreanews365.com\", \"theme\": \"\\ud55c\\uad6d \\ub274\\uc2a4\", \"keyword\": \"Yorkshire and East of England artists to be showcased around the world\", \"title\": \"\\uc601\\uad6d \\uc815\\ubd80, \\uc694\\ud06c\\uc154\\u00b7\\ub3d9\\ubd80 \\uc789\\uae00\\ub79c\\ub4dc \\ucd9c\\uc2e0 \\uc791\\uac00 8\\uba85 \\uc791\\ud488 10\\uc810 \\uc815\\ubd80\\ubbf8\\uc220\\ud488\\uc5d0 \\ud3b8\\uc785 \\u2014 \\ud574\\uc678 10\\uac1c \\uacf5\\uad00 \\uc804\\uc2dc \\uc608\\uc815\", \"status\": \"\\u2705 OK\", \"seo_score\": 45, \"images\": 1, \"url\": \"https://koreanews365.com/%EC%98%81%EA%B5%AD-%EC%A0%95%EB%B6%80-%EC%9A%94%ED%81%AC%EC%85%94%C2%B7%EB%8F%99%EB%B6%80-%EC%9E%89%EA%B8%80%EB%9E%9C%EB%93%9C-%EC%B6%9C%EC%8B%A0-%EC%9E%91%EA%B0%80-8%EB%AA%85-%EC%9E%91%ED%92%88-10/\", \"error\": \"\", \"slot\": \"1\", \"model\": \"gpt-5-mini\", \"writer_model\": \"gpt-5-mini\", \"reviewer_model\": \"gemini-2.5-flash\", \"author\": \"\\ud55c\\uad6d\\uc2e0\\ubb38 \\ud3b8\\uc9d1\\uad6d\", \"category\": \"\\uc608\\uc220 (ART)\"}"
+        run: |
+          python - <<'PY'
+          """Single explicitly scoped edit to the inspected public test article."""
+          import json, os, re
+          from pathlib import Path
+          from urllib.parse import urlparse, unquote
+          import requests
+          
+          record=json.loads(os.environ['ARTICLE_RECORD'])
+          base='https://koreanews365.com'
+          assert urlparse(record['url']).netloc == 'koreanews365.com'
+          auth=('huh0303@gmail.com',os.environ['WP_PASSWORD'])
+          assert auth[1]
+          response=requests.get(base+'/wp-json/wp/v2/posts',params={'slug':unquote(urlparse(record['url']).path.strip('/')),'context':'edit'},auth=auth,timeout=20)
+          response.raise_for_status()
+          posts=response.json()
+          assert len(posts)==1 and posts[0]['status']=='publish'
+          post=posts[0]
+          old_title=post['title']['raw']
+          assert old_title==record['title']
+          content=post['content']['raw']
+          old_sentence='GAC 측은 이들 작품이 국내외 관객에게 지역 예술의 다양성을 보여주고 컬렉션의 지역 대표성을 강화할 것으로 기대한다고 밝혔다.'
+          new_sentence='영국 정부 발표문은 이 사업이 영국 각지의 창작 역량을 컬렉션에 반영하려는 취지라고 설명했다.'
+          assert '주영사저' in content and old_sentence in content
+          fixed=content.replace('주영사저','대사관저').replace(old_sentence,new_sentence)
+          title='영국 정부, 지역 작가 8명 작품 10점 수집…해외 공관에도 전시'
+          meta='영국 정부미술품 컬렉션이 요크셔·동부 잉글랜드 작가 8명의 작품 10점을 수집했다. Art X-UK 사업과 해외 10개 공관 전시 계획을 정리했다.'
+          Path('article-before-correction.json').write_text(json.dumps({'id':post['id'],'title':old_title,'content':content,'excerpt':post['excerpt']['raw']},ensure_ascii=False,indent=2),encoding='utf-8')
+          endpoint=base+'/wp-json/wp/v2/posts/'+str(post['id'])
+          fresh=requests.get(endpoint,params={'context':'edit'},auth=auth,timeout=20)
+          fresh.raise_for_status()
+          assert fresh.json()['modified_gmt']==post['modified_gmt'], 'Concurrent edit detected'
+          updated=requests.post(endpoint,auth=auth,json={'title':title,'content':fixed,'excerpt':meta,'meta':{'rank_math_description':meta}},timeout=30)
+          updated.raise_for_status()
+          public=requests.get(endpoint,timeout=20)
+          public.raise_for_status()
+          data=public.json()
+          assert data['status']=='publish'
+          assert '주영사저' not in data['content']['rendered'] and old_sentence not in data['content']['rendered']
+          assert new_sentence in data['content']['rendered']
+          page=requests.get(data['link'],timeout=20)
+          page.raise_for_status()
+          assert title in page.text and new_sentence in page.text
+          evidence={'id':data['id'],'url':data['link'],'title':title,'status':data['status'],'http_status':page.status_code,
+                    'corrections':['주영사저 → 대사관저','GAC 직접 발언으로 오인될 문장을 정부 발표문 취지 설명으로 정정','제목 간결화'],
+                    'images_unchanged':re.findall(r'<img\b[^>]*>',content)==re.findall(r'<img\b[^>]*>',fixed)}
+          Path('article-correction-result.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: publication-health
-          path: |
-            artifacts/publication-health.json
-            artifacts/article-writer-usage.jsonl
+          name: inspected-article-correction
+          path: article-*.json
