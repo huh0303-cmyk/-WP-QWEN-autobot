@@ -1,0 +1,272 @@
+{
+  "reviewed_on": "2026-09-10",
+  "audit_scope": "25 WordPress sites, 263 latest public posts, 153 featured images visually reviewed",
+  "posts": [
+    {
+      "site": "https://koreamedicaltour.com",
+      "post_id": 1718,
+      "expected_media_id": 1717,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 14
+    },
+    {
+      "site": "https://koreainvest365.com",
+      "post_id": 3245,
+      "expected_media_id": 3244,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 24
+    },
+    {
+      "site": "https://koreainvest365.com",
+      "post_id": 3241,
+      "expected_media_id": 3240,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 26
+    },
+    {
+      "site": "https://koreainvest365.com",
+      "post_id": 3237,
+      "expected_media_id": 3236,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 28
+    },
+    {
+      "site": "https://ki-korea.com",
+      "post_id": 1802,
+      "expected_media_id": 1801,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 37
+    },
+    {
+      "site": "https://koreainsurance365.com",
+      "post_id": 3721,
+      "expected_media_id": 3720,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 44
+    },
+    {
+      "site": "https://kfinance365.com",
+      "post_id": 3937,
+      "expected_media_id": 3936,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 53
+    },
+    {
+      "site": "https://koreataxnlaw.com",
+      "post_id": 3980,
+      "expected_media_id": 3979,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 68
+    },
+    {
+      "site": "https://krealestate365.com",
+      "post_id": 625,
+      "expected_media_id": 624,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 85
+    },
+    {
+      "site": "https://ktech365.com",
+      "post_id": 4720,
+      "expected_media_id": 4719,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 90
+    },
+    {
+      "site": "https://ktech365.com",
+      "post_id": 4722,
+      "expected_media_id": 4721,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 91
+    },
+    {
+      "site": "https://oliveyoungkorea.com",
+      "post_id": 950,
+      "expected_media_id": 949,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 114
+    },
+    {
+      "site": "https://oliveyoungkorea.com",
+      "post_id": 948,
+      "expected_media_id": 947,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 115
+    },
+    {
+      "site": "https://oliveyoungkorea.com",
+      "post_id": 946,
+      "expected_media_id": 945,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 116
+    },
+    {
+      "site": "https://k-trip365.com",
+      "post_id": 4727,
+      "expected_media_id": 4726,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 132
+    },
+    {
+      "site": "https://k-trip365.com",
+      "post_id": 4725,
+      "expected_media_id": 4724,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 133
+    },
+    {
+      "site": "https://k-visa365.com",
+      "post_id": 3261,
+      "expected_media_id": 3260,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 143
+    },
+    {
+      "site": "https://koreawedding365.com",
+      "post_id": 870,
+      "expected_media_id": 869,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 158
+    },
+    {
+      "site": "https://kstudy365.com",
+      "post_id": 1337,
+      "expected_media_id": 1336,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 167
+    },
+    {
+      "site": "https://studyinkorea365.com",
+      "post_id": 3017,
+      "expected_media_id": 3016,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 178
+    },
+    {
+      "site": "https://studyinkorea365.com",
+      "post_id": 3015,
+      "expected_media_id": 3014,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 179
+    },
+    {
+      "site": "https://studyinkorea365.com",
+      "post_id": 3011,
+      "expected_media_id": 3010,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 181
+    },
+    {
+      "site": "https://kieca-korea.org",
+      "post_id": 1188,
+      "expected_media_id": 1187,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 191
+    },
+    {
+      "site": "https://kieca-korea.org",
+      "post_id": 1186,
+      "expected_media_id": 1185,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 192
+    },
+    {
+      "site": "https://ksa-korea.org",
+      "post_id": 855,
+      "expected_media_id": 854,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 199
+    },
+    {
+      "site": "https://ksa-korea.org",
+      "post_id": 853,
+      "expected_media_id": 852,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 200
+    },
+    {
+      "site": "https://sis-korea.com",
+      "post_id": 1996,
+      "expected_media_id": 1995,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 203
+    },
+    {
+      "site": "https://sis-korea.com",
+      "post_id": 1992,
+      "expected_media_id": 1991,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 205
+    },
+    {
+      "site": "https://jobkorea365.com",
+      "post_id": 1153,
+      "expected_media_id": 1152,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 215
+    },
+    {
+      "site": "https://jobkorea365.com",
+      "post_id": 1149,
+      "expected_media_id": 1148,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 218
+    },
+    {
+      "site": "https://jobinkorea365.com",
+      "post_id": 1056,
+      "expected_media_id": 1055,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 228
+    },
+    {
+      "site": "https://jobkoreaglobal.com",
+      "post_id": 1500,
+      "expected_media_id": 1499,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 239
+    },
+    {
+      "site": "https://jobkoreaglobal.com",
+      "post_id": 1498,
+      "expected_media_id": 1497,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 240
+    },
+    {
+      "site": "https://jobkoreaglobal.com",
+      "post_id": 1478,
+      "expected_media_id": 1477,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 243
+    },
+    {
+      "site": "https://jobkoreaglobal.com",
+      "post_id": 1484,
+      "expected_media_id": 1483,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 244
+    },
+    {
+      "site": "https://korea365.org",
+      "post_id": 2609,
+      "expected_media_id": 2608,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 252
+    },
+    {
+      "site": "https://korea365.org",
+      "post_id": 2607,
+      "expected_media_id": 2606,
+      "reason": "Repeated warehouse/document-row composition",
+      "review_index": 253
+    },
+    {
+      "site": "https://korea365.org",
+      "post_id": 2602,
+      "expected_media_id": 2601,
+      "reason": "Additional copy of visually repeated photo on the same site",
+      "review_index": 255
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+name: History sample voice - explicitly approved one-off
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: history-sample-voice
+  cancel-in-progress: false
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate only the approved sample audio
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python scripts/history_sample_voice.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: history-sample-voice
+          path: history_sample_voice/
+          retention-days: 3

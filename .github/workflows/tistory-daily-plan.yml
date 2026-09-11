@@ -1,0 +1,163 @@
+name: "Tistory — Daily 5-Site Plan"
+
+on:
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "KST morning or afternoon slot"
+        type: choice
+        options: [am, pm]
+        default: am
+      site_ids:
+        description: "Comma-separated site IDs; blank runs all five"
+        required: false
+        default: ""
+      run_key:
+        description: "Unique review-bundle key; blank uses the KST date"
+        required: false
+        default: ""
+      force_topic:
+        description: "키워드보고발행: CEO picked this exact seed topic; blank keeps 바이럴자동발행's own live cross-media pick"
+        required: false
+        default: ""
+
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tistory-daily-single-owner
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: data/stock_image_cache
+          key: stock-search-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: stock-search-${{ runner.os }}-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 google-api-python-client google-auth -q
+      - name: Build one-post-per-site safe plan
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          TISTORY_SLOT: ${{ inputs.slot }}
+          SITE_IDS: ${{ inputs.site_ids }}
+          TISTORY_RUN_KEY: ${{ inputs.run_key }}
+          TISTORY_FORCE_TOPIC: ${{ inputs.force_topic }}
+          TISTORY_LIVE_TRENDS_ENABLED: "true"
+        run: |
+          python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
+          if [ -n "$SITE_IDS" ]; then
+            python - <<'PY'
+          import json, os
+          path = 'artifacts/tistory-daily-plan.json'
+          plan = json.load(open(path, encoding='utf-8'))
+          wanted = {x.strip() for x in os.environ['SITE_IDS'].split(',') if x.strip()}
+          plan['jobs'] = [job for job in plan['jobs'] if job['site_id'] in wanted]
+          plan['enabled_sites'] = len(plan['jobs'])
+          if not plan['jobs'] or {job['site_id'] for job in plan['jobs']} != wanted:
+              raise SystemExit('Unknown or empty Tistory site selection')
+          json.dump(plan, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+          PY
+          fi
+      - name: Validate public publishing is disabled
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('artifacts/tistory-daily-plan.json', encoding='utf-8'))
+          assert p['public_allowed'] is False
+          assert p['portfolio_sites'] == 5
+          assert len(p['jobs']) == p['enabled_sites']
+          assert len(p['jobs']) <= 5
+          assert len({j['site_id'] for j in p['jobs']}) == len(p['jobs'])
+          assert len({j['job_id'] for j in p['jobs']}) == len(p['jobs'])
+          assert all(j['publish_policy']=='awaiting_approval' for j in p['jobs'])
+          assert all(j['duplicate_guard'] is True for j in p['jobs'])
+          print('TISTORY PLAN SAFETY PASS')
+          PY
+      - name: Draft articles — GPT-5 mini with deterministic quality checks
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_EDITOR_ENABLED: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+          # Re-host each generated image as a permanent repo asset before it
+          # ever reaches the review queue (Replicate's own URLs expire).
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+        run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
+      - name: Validate drafts never authorize public publication
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('artifacts/tistory-daily-drafts.json', encoding='utf-8'))
+          assert d['public_allowed'] is False
+          assert len(d['drafts']) > 0
+          for draft in d['drafts']:
+              assert draft['public_allowed'] is False
+              assert draft['status'] == 'DRAFT_READY'
+              assert draft.get('publish_policy') in (None, 'awaiting_approval')
+              assert draft.get('title') and draft.get('body_html') and draft.get('meta_description')
+              assert draft.get('category')
+              assert draft.get('image_status') in ('generated', 'pass_no_image')
+          print('TISTORY DRAFT SAFETY PASS')
+          PY
+      - name: Queue private drafts in Google Sheets for the local registrar
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/enqueue_tistory_drafts.py --drafts artifacts/tistory-daily-drafts.json
+      - name: Build mobile card-news screens
+        run: python scripts/tistory_card_news.py --drafts artifacts/tistory-daily-drafts.json --output-dir artifacts/tistory-card-news
+      - name: Upload plan + draft artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tistory-daily-plan-${{ github.run_id }}
+          path: |
+            artifacts/tistory-daily-plan.json
+            artifacts/tistory-daily-drafts.json
+            artifacts/tistory-card-news/*.html
+          retention-days: 7
+      - name: Send mobile completion report
+        if: always()
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          REPORT_EMAIL_TO: "huh0303@gmail.com"
+          REPORT_EMAIL_FROM: "huh0303@gmail.com"
+          REPORT_TITLE: "[Tistory] 오늘의 5채널 글·카드뉴스 준비 완료"
+          REPORT_BODY: "Tistory 5채널 글과 모바일 카드뉴스 화면 생성이 끝났습니다. 아래 링크에서 결과물을 내려받아 업로드할 수 있습니다."
+          REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python scripts/publishing_completion_notify.py
+
+      - name: Save image sources and estimated image costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-image-receipts-${{ github.run_id }}
+          path: |
+            artifacts/stock-image-receipts.jsonl
+            artifacts/image-cost-estimates.jsonl
+            artifacts/editorial-brief-cost.jsonl
+          if-no-files-found: ignore

@@ -1,0 +1,82 @@
+name: Audit and repair recent editorial repetition
+on:
+  workflow_dispatch:
+    inputs:
+      apply_changes:
+        type: boolean
+        default: false
+      repair_images_only:
+        type: boolean
+        default: false
+      post_limit:
+        type: string
+        default: "10"
+      site_url:
+        type: string
+        default: 'https://korea365.org'
+permissions:
+  contents: read
+concurrency:
+  group: recent-editorial-repair
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests pillow beautifulsoup4 google-api-python-client google-auth -q
+      - name: Audit latest three posts and update existing IDs
+        env:
+          REPAIR_IMAGES_ONLY: ${{ inputs.repair_images_only }}
+          REPAIR_SITE_URL: ${{ inputs.site_url }}
+          APPLY_CHANGES: ${{ inputs.apply_changes }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+          WP_USER: ${{ secrets.WP_USER }}
+          OPENAI_ENABLED: "true"
+          REPAIR_POST_LIMIT: ${{ inputs.post_limit }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: |
+          if [ "$REPAIR_IMAGES_ONLY" = true ]; then
+            python scripts/repair_wp_duplicate_images.py
+          else
+            python scripts/repair_recent_editorial_repetition.py
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recent-editorial-repair-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 30

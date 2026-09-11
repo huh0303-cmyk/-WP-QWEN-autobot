@@ -1,0 +1,89 @@
+name: Health Clinic 장편 자동생성 (한/영/일, 수동 검수)
+
+# 자동 schedule은 비용/Drive 안정성 검증 전까지 중단.
+# 이미지 정책: REPLICATE_API_TOKEN + 승인 3모델만 사용.
+on:
+  workflow_dispatch:
+    inputs:
+      lang:
+        description: "채널 언어 (kr/en/jp)"
+        required: true
+        default: "en"
+      topic:
+        description: "영상 주제 (비우면 언어별 주제풀에서 무작위 선택)"
+        required: false
+      only:
+        description: "테스트용 실행 단계 (예: script,video,thumbnail,notify)"
+        required: false
+
+concurrency:
+  group: health-clinic-daily
+  cancel-in-progress: false
+
+jobs:
+  run-pipeline:
+    if: ${{ false }} # EMERGENCY LOCK: video generation disabled
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: scripts/health_clinic
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 시스템 패키지 설치
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-nanum fonts-noto-cjk fonts-dejavu-core
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+      - name: 언어/주제 결정
+        id: pick
+        shell: bash
+        run: |
+          LANG_IN="${{ github.event.inputs.lang }}"
+          TOPIC_IN="${{ github.event.inputs.topic }}"
+          if [ -z "$TOPIC_IN" ]; then
+            case "$LANG_IN" in
+              kr) TOPICS=("국민건강검진 200% 활용법" "무릎 통증 완화 스트레칭" "갱년기 극복한 선배들의 조언" "혈압 낮추는 집밥 반찬" "화투로 치매 예방하는 이유" "장수마을 어르신들의 아침 습관" "당뇨 잡는 나물 반찬 5가지" "허리디스크 예방 앉는 자세" "명절 스트레스 관리법") ;;
+              jp) TOPICS=("ラジオ体操で健康寿命を延ばす" "更年期の症状緩和" "温泉入浴と血行促進の関係" "和食で血糖値をコントロールする方法" "認知症予防の脳トレ習慣" "膝痛を防ぐ正しい歩き方" "一人暮らしシニアの孤独対策" "高齢者の熱中症対策" "腰痛を防ぐ布団と寝方") ;;
+              *) TOPICS=("healthy aging tips for seniors" "menopause symptom relief for women over 50" "how Medicare covers preventive checkups" "gardening as low-impact exercise for seniors" "grandparent-grandchild bonding activities" "managing arthritis pain in cold weather" "heart-healthy comfort food swaps" "staying social after retirement" "fall-prevention home safety tips") ;;
+            esac
+            TOPIC_IN="${TOPICS[$((RANDOM % ${#TOPICS[@]}))]}"
+          fi
+          echo "lang=$LANG_IN" >> "$GITHUB_OUTPUT"
+          echo "topic=$TOPIC_IN" >> "$GITHUB_OUTPUT"
+      - name: 파이프라인 실행
+        env:
+          # 텍스트용 Gemini 키는 이미지 생성에 사용되지 않는다.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID_KR_A: ${{ secrets.HEALTH_CLINIC_VOICE_ID_KR_A }}
+          ELEVENLABS_VOICE_ID_KR_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_KR_B }}
+          ELEVENLABS_VOICE_ID_EN_A: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_A }}
+          ELEVENLABS_VOICE_ID_EN_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_B }}
+          ELEVENLABS_VOICE_ID_JP_A: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_A }}
+          ELEVENLABS_VOICE_ID_JP_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_B }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
+          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_KR }}
+          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN }}
+          HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP }}
+          NOTIFY_EMAIL_TO: huh0303@gmail.com
+          NOTIFY_EMAIL_FROM: huh0303@gmail.com
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          ONLY_ARG=""
+          if [ -n "${{ github.event.inputs.only }}" ]; then
+            ONLY_ARG="--only ${{ github.event.inputs.only }}"
+          fi
+          python main.py --lang "${{ steps.pick.outputs.lang }}" \
+                         --topic "${{ steps.pick.outputs.topic }}" \
+                         $ONLY_ARG

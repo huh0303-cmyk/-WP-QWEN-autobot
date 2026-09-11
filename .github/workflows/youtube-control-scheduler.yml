@@ -1,0 +1,64 @@
+name: "YouTube Hub — 10 channel scheduler"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Check due channels without dispatching"
+        required: true
+        type: boolean
+        default: true
+      max_dispatch:
+        description: "Maximum channels dispatched in one run"
+        required: true
+        type: string
+        default: "1"
+      channel_key:
+        description: "Optional single channel key selected by the control room"
+        required: false
+        type: string
+        default: ""
+      run_now:
+        description: "Run the selected channel's next prepared calendar item now"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  # v2 isolates the restored calendar scheduler from the pre-restoration queue.
+  group: youtube-control-scheduler-calendar-v2
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: ${{ false }} # RETIRED: the VPS systemd timer owns YouTube scheduling
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: Dispatch due calendar rows to PRIVATE review only
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DRY_RUN: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+          # Video rendering/upload is intentionally serialized across all 10 channels.
+          # Parallel dispatches previously competed for APIs and caused cancelled runs.
+          MAX_DISPATCH: ${{ github.event_name == 'workflow_dispatch' && inputs.max_dispatch || '1' }}
+          TARGET_CHANNEL_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_key || '' }}
+          RUN_SELECTED_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.run_now || 'false' }}
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          OPENAI_IMAGE_ENABLED: "false"
+        run: python scripts/youtube_control_scheduler.py

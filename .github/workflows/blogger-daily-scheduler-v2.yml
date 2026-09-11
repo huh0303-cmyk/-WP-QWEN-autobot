@@ -1,0 +1,55 @@
+name: Blogger Daily - GPT-5 mini staggered drafts
+
+on:
+  push:
+    paths:
+      - ".github/workflows/blogger-daily-scheduler-v2.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "8,28,48 * * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: blogger-daily-scheduler
+  cancel-in-progress: false
+
+jobs:
+  registration-check:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "blogger-daily-scheduler-v2 registered; production side effects skipped"
+
+  schedule:
+    if: ${{ github.event_name != 'push' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: Dispatch one due Blogger site
+        env:
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/blogger_daily_scheduler.py
+      - name: Save daily dispatch state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add blogger_scheduler_state.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: Blogger daily scheduler state [skip ci]"
+          git push

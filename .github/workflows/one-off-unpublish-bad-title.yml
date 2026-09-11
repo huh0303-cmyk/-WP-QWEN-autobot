@@ -1,0 +1,23 @@
+name: "One-off — revert ki-korea.com post 1765 to draft"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Revert the broken-title post to draft
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+        run: python scripts/one_off_unpublish_bad_title.py

@@ -1,0 +1,50 @@
+Ajou University Frontier Scholarship S	Admissions
+Ajou University Global Scholarship 1	Scholarships
+Ajou University Special Scholarship E	Application Process
+Ajou University Academic Excellence Scholarship 1	Admissions
+AISA 200,000 Won Scholarship	Scholarships
+AISA International Student Grant	Application Process
+KAIST Electrical Engineering Scholarship	Admissions
+KAIST EE Scholarship Application	Scholarships
+KAIST EE Scholarship Financial Need	Application Process
+KAIST EE Scholarship Academic Performance	Admissions
+Korea University Result Announcement	Scholarships
+Korea University Registration Period	Application Process
+Korea University Application Form	Admissions
+Korea University Spring 2027 international admissions	Admissions
+Korea University application deadline August 31, 2026	Scholarships
+Korea University admission results November 27, 2026	Admissions
+Korea University application fee payment	Scholarships
+Korea University international admissions office hours	Application Process
+Stony Brook University Spring 2027 application	Admissions
+Stony Brook University application start date August 3, 2026	Scholarships
+Stony Brook University first priority deadline September 28, 2026	Application Process
+Stony Brook University second priority deadline December 16, 2026	Admissions
+Stony Brook University third priority deadline January 20, 2027	Scholarships
+Stony Brook University application start date October 19, 2026	Application Process
+Stony Brook University second priority deadline March 18, 2027	Admissions
+Stony Brook University third priority deadline June 24, 2027	Scholarships
+Stony Brook University non-Korean applicants	Application Process
+Stony Brook University fashion design applicants	Admissions
+Sungkyunkwan University Spring 2027 undergraduate admissions	Scholarships
+Sungkyunkwan University application period August 12–21, 2026	Application Process
+Sungkyunkwan University document submission period August 12–September 4, 2026	Admissions
+Sungkyunkwan University additional TOPIK score reports	Scholarships
+Sungkyunkwan University TOPIK score report deadline October 4, 2026	Application Process
+Kyungpook National University application deadline August 31, 2026	Admissions
+Kyungpook National University document screening September 4, 2026	Scholarships
+Kyungpook National University interview evaluation September 18, 2026	Application Process
+Kyungpook National University pre-admission certificates	Admissions
+Kyungpook National University tuition fee reduction scholarships	Scholarships
+KAIST University Scholarship 2026	Application Process
+KAIST University fully funded scholarship	Admissions
+KAIST University Master's and PhD scholarships	Scholarships
+KAIST University scholarship application deadline	Application Process
+Kyung Hee University Admission Scholarship F	Admissions
+Kyung Hee University scholarship for international students	Scholarships
+Kyung Hee University scholarship application deadline August 31, 2026	Application Process
+Chungbuk National University CBNU Bridge Scholarship	Admissions
+Chungbuk National University scholarship for international students	Scholarships
+Chungbuk National University scholarship amount KRW 1,000,000	Application Process
+Chungbuk National University tuition waiver scholarship	Admissions
+Korea University Informatics Global Excellence Scholarship	Scholarships

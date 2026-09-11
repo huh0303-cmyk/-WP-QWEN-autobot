@@ -1,0 +1,41 @@
+name: "Blogger — publish six newly discovered sites"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blogger-publish-six-new-sites
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Publish and publicly verify six posts
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/publish_six_new_bloggers.py
+      - name: Save publication URLs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: six-blogger-publication-results-${{ github.run_id }}
+          path: six_blogger_publish_results.json
+          if-no-files-found: warn
+          retention-days: 30

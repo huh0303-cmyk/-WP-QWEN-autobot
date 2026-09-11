@@ -1,0 +1,50 @@
+name: 27개 사이트 방문자/색인 현황 (수동 점검용 · 정기보고 중지)
+
+on:
+  workflow_dispatch: {}
+
+# 2026-08-30 CEO 확정: 방문자·GSC·YouTube·SNS·AdSense를
+# situation-room-daily.yml에서 같은 기준시각에 한 번만 수집·보고한다.
+# 이 워크플로는 장애 진단을 위한 수동 실행만 남긴다.
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-site-traffic
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
+
+      - name: "27개 Footer 방문자 + GSC 클릭·노출·CTR·평균순위 → 종합상황실"
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+        run: python scripts/daily_site_traffic.py
+
+      - name: "결과 JSON 저장소에 커밋 (시트 없이도 바로 확인 가능하게)"
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add daily_site_traffic_result.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 27사이트 footer 방문자 현황 갱신 [skip ci]"
+          git push

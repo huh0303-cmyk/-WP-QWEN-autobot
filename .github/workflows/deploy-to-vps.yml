@@ -1,0 +1,40 @@
+name: "Deploy to VPS (control room + operations)"
+
+# 2026-09-09: there was no automated deploy at all - merges to main sat in
+# GitHub while the VPS kept running whatever it last had, sometimes for
+# days. This closes that gap for the two dashboard services. The YouTube
+# worker is deliberately NOT restarted here - it was intentionally stopped
+# to pause spend, and a deploy should never silently turn it back on.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-to-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Pull latest and restart control-room services
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/korea365
+            # A plain fast-forward pull, not reset --hard: the working tree
+            # may hold local runtime state (SQLite DB, queue/state JSON) that
+            # a hard reset would silently discard. Fail loudly instead of
+            # destroying data if the tree ever has local commits to reconcile.
+            git fetch origin main
+            git merge --ff-only origin/main
+            systemctl restart korea365-control.service korea365-operations.service
+            sleep 2
+            systemctl is-active korea365-control.service korea365-operations.service
+            echo "Deployed $(git rev-parse --short HEAD)"

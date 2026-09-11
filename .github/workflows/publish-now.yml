@@ -1,0 +1,47 @@
+name: "Control Room — publish one reviewed post now"
+
+# Dispatched only by a human clicking "지금 발행" in the CEO control room for
+# one specific already-reviewed post. Never runs on a schedule and never
+# picks its own target.
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Full site URL, e.g. https://k-trip365.com"
+        required: true
+        type: string
+      post_id:
+        description: "WordPress post ID to publish"
+        required: true
+        type: string
+      secret_name:
+        description: "GitHub secret name holding this site's WP application password"
+        required: true
+        type: string
+      room_id:
+        description: "Automation Hub room id for result tracking"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Publish the reviewed post
+        env:
+          SITE: ${{ inputs.domain }}
+          POST_ID: ${{ inputs.post_id }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_PASSWORD: ${{ secrets[inputs.secret_name] }}
+        run: python scripts/publish_now.py

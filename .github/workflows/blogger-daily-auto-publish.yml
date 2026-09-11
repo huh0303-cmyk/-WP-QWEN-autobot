@@ -1,0 +1,50 @@
+name: "Blogspot 33개 - 캘린더 없는 일일 자동발행"
+
+# 2026-09-06 CEO: "33개 블로그스팟에 매일 좋은 글들이 올라가야해, 확실히 좀
+# 해줘." blogger-daily-scheduler-v2.yml is calendar-gated (needs a matching
+# 14일_콘텐츠운영캘린더 row AND its paired WordPress post already live) and
+# only dispatches one site per tick - if the calendar is stale or GitHub's
+# own cron firing is late/dropped (common on repos with many scheduled
+# workflows, this one included), whole days can silently produce nothing.
+# This workflow reuses the CEO's own proven-working manual "바이럴자동발행"
+# dispatch shape with no calendar dependency, and processes several sites
+# per tick specifically to make up for unreliable cron firing.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "17 1,7,13,19 * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: blogger-daily-auto-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-control-center.txt -q
+      - name: Dispatch today's remaining Blogspot sites
+        env:
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          MAX_PER_RUN: "12"
+        run: python scripts/blogger_daily_auto_publish.py
+      - name: Save today's dispatch state
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/blogspot_daily_auto_state.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: Blogspot daily auto-publish state [skip ci]"
+          git pull --rebase origin main
+          git push

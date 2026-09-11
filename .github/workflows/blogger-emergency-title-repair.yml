@@ -1,0 +1,30 @@
+name: Blogger — Emergency Unlock title repair
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply_changes:
+        description: Apply title-only changes
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Scan and repair Blogger titles
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          APPLY_CHANGES: ${{ inputs.apply_changes }}
+        run: python scripts/blogger_remove_unlock_titles.py

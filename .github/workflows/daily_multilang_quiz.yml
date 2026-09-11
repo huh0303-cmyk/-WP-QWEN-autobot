@@ -1,0 +1,64 @@
+name: Multilang Quiz — 검수용 생성만
+
+# 자동 생성물은 먼저 검수 상태로 보관한다. YouTube/Facebook/Instagram/Threads/TikTok
+# 자동 게시 단계는 제거했다. 최종 게시 여부는 사용자가 검수 후 별도 실행한다.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: multilang-quiz-review-generation
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: ${{ false }} # EMERGENCY LOCK: video generation disabled
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: multilang_quiz
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-noto-cjk fonts-dejavu-core
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      - name: Generate multilingual quiz review videos
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID_QUIZ: ${{ secrets.ELEVENLABS_VOICE_ID_QUIZ }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+        run: |
+          for lang in ko en ja es vi fr de zh ar ru; do
+            python3 scripts/make_quiz_short_multi.py --lang "$lang" --n 5 --out_dir outputs
+          done
+      - name: Save to Google Drive for review
+        env:
+          ML_GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.ML_GDRIVE_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/upload_drive.py
+        continue-on-error: true
+      - name: Save review artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multilang-quiz-review-${{ github.run_id }}
+          path: multilang_quiz/outputs/*.mp4
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Send generation report
+        if: always()
+        env:
+          ML_GMAIL_SENDER: ${{ secrets.ML_GMAIL_SENDER }}
+          ML_GMAIL_APP_PASSWORD: ${{ secrets.ML_GMAIL_APP_PASSWORD }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ML_REPORT_TO: huh0303@gmail.com
+        run: python3 scripts/send_report_email.py
+        continue-on-error: true

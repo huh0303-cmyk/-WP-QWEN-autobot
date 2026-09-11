@@ -1,0 +1,75 @@
+name: CEO 종합상황실 일일보고 (전체 KPI → 시트/이메일/카카오톡)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # CEO 단일 일일보고: 매일 05:50 KST 한 번만 정기 발송.
+    - cron: "50 20 * * *"
+
+concurrency:
+  group: situation-room-daily
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    environment: google-metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography google-api-python-client google-auth google-auth-httplib2 -q
+      - name: "CEO 종합상황실 수집 → 승인양식 → 발송"
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TIKTOK_USERNAME: ${{ secrets.TIKTOK_USERNAME }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          TIKTOK_USERNAME_ENGLISH: ${{ secrets.TIKTOK_USERNAME_ENGLISH }}
+          TIKTOK_USERNAME_LANGUAGE: ${{ secrets.TIKTOK_USERNAME_LANGUAGE }}
+          FB_PAGE_ACCESS_TOKEN_ENGLISH: ${{ secrets.FB_PAGE_ACCESS_TOKEN_ENGLISH }}
+          FB_PAGE_ID_ENGLISH: ${{ secrets.FB_PAGE_ID_ENGLISH }}
+          FB_PAGE_ACCESS_TOKEN_LANGUAGE: ${{ secrets.FB_PAGE_ACCESS_TOKEN_LANGUAGE }}
+          FB_PAGE_ID_LANGUAGE: ${{ secrets.FB_PAGE_ID_LANGUAGE }}
+          IG_ACCESS_TOKEN_ENGLISH: ${{ secrets.IG_ACCESS_TOKEN_ENGLISH }}
+          IG_USER_ID_ENGLISH: ${{ secrets.IG_USER_ID_ENGLISH }}
+          IG_ACCESS_TOKEN_LANGUAGE: ${{ secrets.IG_ACCESS_TOKEN_LANGUAGE }}
+          IG_USER_ID_LANGUAGE: ${{ secrets.IG_USER_ID_LANGUAGE }}
+          THREADS_ACCESS_TOKEN_ENGLISH: ${{ secrets.THREADS_ACCESS_TOKEN_ENGLISH }}
+          THREADS_USER_ID_ENGLISH: ${{ secrets.THREADS_USER_ID_ENGLISH }}
+          THREADS_ACCESS_TOKEN_LANGUAGE: ${{ secrets.THREADS_ACCESS_TOKEN_LANGUAGE }}
+          THREADS_USER_ID_LANGUAGE: ${{ secrets.THREADS_USER_ID_LANGUAGE }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python scripts/ceo_situation_room_runner.py
+      - name: "다음날 비교용 기록 + 이메일 발송잠금 커밋"
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add situation_room_history.json situation_room_email_state.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: 종합상황실 기록 갱신 [skip ci]"
+          git push

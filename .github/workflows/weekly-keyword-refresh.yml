@@ -1,0 +1,43 @@
+name: "Daily Golden Keyword Refresh — 25 blogs"
+
+# 매일 최신 검색수요와 공식 출처 후보를 조사해 25개 블로그의 키워드 풀을 갱신한다.
+# 뉴스 2개는 RSS/뉴스 소스 기반이라 대상에서 제외한다.
+# 2026-08-26: kskin365 누락(24/25) 수정, OpenAI 잔액 0 상태의 불필요한 429 재시도 제거.
+on:
+  schedule:
+    - cron: "0 22 * * *"   # 매일 07:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-golden-keyword-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install requests -q
+      - name: Research current keywords for all 25 blogs
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/refresh_keyword_pool_current.py
+      - name: Commit updated keyword pools
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked || true
+          git pull --rebase origin main
+          git stash pop || true
+          git add data/keywords/ 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "chore: 25블로그 주간 키워드 풀 갱신 [skip ci]"
+          git push

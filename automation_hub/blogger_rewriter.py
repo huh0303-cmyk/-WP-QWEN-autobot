@@ -1,0 +1,329 @@
+from __future__ import annotations
+
+import html
+import json
+import re
+from dataclasses import dataclass
+from difflib import SequenceMatcher
+from typing import Any
+
+import requests
+from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
+
+
+def plain_text(value: str) -> str:
+    value = re.sub(r"(?is)<(script|style).*?>.*?</\1>", "", value)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"(?s)<[^>]+>", " ", value))).strip()
+
+
+def extract_http_links(value: str) -> list[str]:
+    links = re.findall(r'''(?is)\bhref\s*=\s*["'](https?://[^"'\s]+)["']''', value)
+    return list(dict.fromkeys(html.unescape(link) for link in links))[:30]
+
+
+def similarity(source_html: str, rewritten_html: str) -> float:
+    return SequenceMatcher(None, plain_text(source_html).lower(), plain_text(rewritten_html).lower()).ratio()
+
+
+def parse_rewrite_json(raw: str) -> dict[str, Any]:
+    cleaned = raw.strip()
+    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", cleaned, flags=re.I)
+    data = json.loads(cleaned)
+    if not all(str(data.get(key, "")).strip() for key in ("title", "content_html", "meta_description")):
+        raise ValueError("rewrite output must include title, content_html and meta_description")
+    labels = data.get("labels", [])
+    if isinstance(labels, str):
+        labels = [item.strip() for item in labels.split(",") if item.strip()]
+    data["labels"] = [str(item).strip() for item in labels if str(item).strip()][:14]
+    if len(data["labels"]) < 8:
+        raise ValueError("rewrite output must include 8-14 relevant labels")
+    if any(len(label) > 30 or len(label.split()) > 3 for label in data["labels"]):
+        raise ValueError("labels must be short noun search terms")
+    queries = data.get("image_queries", [])
+    if isinstance(queries, str):
+        queries = [queries] if queries.strip() else []
+    data["image_queries"] = [str(query).strip() for query in queries if str(query).strip()][:2]
+    return data
+
+
+_DANGLING_TRAILING_WORDS = {
+    "a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet",
+    "to", "of", "in", "on", "at", "by", "with", "from", "as", "is", "are",
+}
+
+
+def _clip_words(value: str, maximum: int) -> str:
+    """Clip generated prose at a word boundary without adding new text.
+
+    Never leaves the clip ending on a preposition/conjunction/article -
+    a plain word-boundary cut can land right after one (e.g. "...Tips for"
+    when the original continued "...Tips for 2026"), producing a title
+    that reads as grammatically broken rather than just shorter.
+    """
+    value = re.sub(r"\s+", " ", value).strip()
+    if len(value) <= maximum:
+        return value
+    clipped = value[: maximum + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    words = clipped.split(" ")
+    while len(words) > 1 and words[-1].lower().strip(",;:-") in _DANGLING_TRAILING_WORDS:
+        words.pop()
+    clipped = " ".join(words).rstrip(" ,;:-")
+    return clipped or value[:maximum].rstrip()
+
+
+def _clip_sentence(value: str, maximum: int) -> str:
+    """Clip prose to fit within `maximum` characters, preferring a sentence
+    boundary over a word boundary.
+
+    A meta description that only word-clips can still cut off mid-thought
+    (e.g. "...Find the best route" when the sentence continued "...for your
+    trip."), which reads as broken even though no word was split. A shorter
+    but complete sentence reads far better than a longer but truncated one,
+    so any in-budget sentence end wins over the word-boundary fallback,
+    which only fires when the source has no sentence-ending punctuation at
+    all within the limit.
+    """
+    value = re.sub(r"\s+", " ", value).strip()
+    if len(value) <= maximum:
+        return value
+    window = value[: maximum + 1]
+    boundary = max(window.rfind(". "), window.rfind("! "), window.rfind("? "))
+    if boundary == -1 and window[:-1].endswith((".", "!", "?")):
+        boundary = len(window) - 2
+    if boundary != -1:
+        return window[: boundary + 1].strip()
+    return _clip_words(value, maximum)
+
+
+def normalize_rewrite_format(article: dict[str, Any], *, target_chars: int, source_url: str = "", ymyl: bool = False, preserve_urls: list[str] | None = None) -> dict[str, Any]:
+    """Fit generated output to Blogger's hard format limits before scoring.
+
+    This only removes generated words/HTML blocks. It never authors or
+    invents replacement copy, so the prose remains model-written.
+    """
+    normalized = dict(article)
+    normalized["title"] = _clip_words(str(article.get("title", "")), 70)
+    normalized["meta_description"] = _clip_sentence(str(article.get("meta_description", "")), 119)
+    # Select a complete generated alternative instead of truncating a sentence
+    # and then rejecting our own truncation. No replacement prose is invented.
+    alternatives = article.get("meta_description_candidates", [])
+    if isinstance(alternatives, list):
+        descriptions = [article.get("meta_description", "")] + alternatives[:5]
+        for description in descriptions:
+            if not isinstance(description, str):
+                continue
+            description = re.sub(r"\s+", " ", description).strip()
+            if 100 <= len(description) <= 119 and description.endswith((".", "!", "?", '"', "”", "'")):
+                normalized["meta_description"] = description
+                break
+
+    content = str(article.get("content_html", ""))
+    maximum = int(target_chars * 1.35)
+    if len(re.sub(r"\s+", "", plain_text(content))) > maximum:
+        blocks = re.findall(r"(?is)<(?:h[23]|p|ul|ol|blockquote)(?:\s[^>]*)?>.*?</(?:h[23]|p|ul|ol|blockquote)>", content)
+        required: list[str] = []
+        for block in blocks:
+            lower = plain_text(block).lower()
+            if any(url in extract_http_links(block) for url in ([source_url] if source_url else []) + (preserve_urls or [])) or (ymyl and re.search(r"\b(as of|subject to change|rules can change|requirements can change|disclaimer|not medical advice|not legal advice)\b", lower)):
+                required.append(block)
+        required = list(dict.fromkeys(required))
+        required_chars = len(re.sub(r"\s+", "", plain_text("".join(required))))
+        needs_attribution = bool(source_url and not any(source_url in block for block in required))
+        if needs_attribution:
+            required_chars += 160
+        kept: list[str] = []
+        for block in blocks:
+            if block in required:
+                continue
+            candidate = "".join(kept + [block])
+            if len(re.sub(r"\s+", "", plain_text(candidate))) + required_chars > maximum:
+                break
+            kept.append(block)
+        def _dangles(block: str) -> bool:
+            # A heading with nothing kept after it, or a paragraph that ends
+            # with a colon, both promise content (a list, an explanation)
+            # that trimming just cut away - keeping either leaves the
+            # article reading as cut off mid-thought rather than shorter.
+            if re.match(r"(?is)^<h[23]", block):
+                return True
+            return plain_text(block).rstrip().endswith(":")
+
+        while kept and _dangles(kept[-1]):
+            kept.pop()
+        final_blocks = kept + [block for block in required if block not in kept]
+        if needs_attribution:
+            safe_url = html.escape(source_url, quote=True)
+            final_blocks.append(f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>')
+        if final_blocks:
+            shortened = "".join(final_blocks)
+            # Whole-block clipping can leave only a tiny introduction. Keep the
+            # original for the repair attempt instead of destroying the draft.
+            minimum = max(1000, int(target_chars * 0.78))
+            if len(re.sub(r"\s+", "", plain_text(shortened))) >= minimum:
+                normalized["content_html"] = shortened
+
+    # 2026-09-04: this forced-attribution fallback used to live only inside
+    # the length-trimming branch above, so any article that was already
+    # within the target length (the common case) never got a guaranteed
+    # source link at all — blogger_quality_score's hard "verified WordPress
+    # source link is missing" gate then failed every such draft regardless
+    # of how high the rest of the score was (CEO's 04:03 KST smoke test hit
+    # this: 95/100 blocked on a missing link). Ensuring the link is present
+    # cannot rely on the model following the prompt; guarantee it here.
+    content = str(normalized.get("content_html", ""))
+    if source_url and source_url not in extract_http_links(content):
+        safe_url = html.escape(source_url, quote=True)
+        normalized["content_html"] = content + f'<p>Original source: <a href="{safe_url}">{safe_url}</a></p>'
+    return normalized
+
+
+def rewrite_prompt(source_title: str, source_html: str, source_url: str, *, language: str, persona: str, tone: str, target_chars: int, prior_feedback: str = "") -> str:
+    verified_links = extract_http_links(source_html)
+    verified_link_text = "\n".join(f"- {link}" for link in verified_links) or "- No additional verified links supplied"
+    return f"""Write a new standalone Blogspot article using only verified facts from the owned source.
+Never copy or paraphrase sentence by sentence. Reusing sentences, paragraph order, headings, examples, checklist or FAQ is forbidden. Choose a different search intent and rebuild everything.
+The title is the highest-priority text: make it emotionally resonant, curiosity-driving and benefit-led so a real reader wants to click, without clickbait or false promises. Never use AI-sounding stock phrases, a repeated title formula, or a title similar to another article.
+The first image is equally important. image_queries must describe the title's specific human situation, emotion and practical benefit, not a generic decorative photo.
+Add useful original synthesis. Do not invent personal experience, statistics, quotes or sources.
+Language: {language}. Persona: {persona}. Tone: {tone}. Target body length: {target_chars} visible non-whitespace characters, excluding HTML tags, spaces, title, labels and meta description. Write 3-4 complete sections, each with substantive paragraphs. Count body text only; links and JSON syntax do not count.
+Every reader-visible field must use that language, including the title, meta_description, headings, body, labels, image_queries, and image alt text. If the target language is English, do not include a Korean summary, Korean caption, or any Hangul text.
+The article must feel individually edited for this site's persona, not mass-produced. Titles using Unlock, Ultimate/Complete/Comprehensive Guide, Discover/Unleash the Power, Navigate the Complexities/Landscape, Your Path to, Mastering the Art of, Revolutionize, Game Changer, Everything You Need to Know, Secrets Revealed/Unveiled, The Future of, 완벽 가이드, 궁극의 가이드, or 총정리 are forbidden. Never use body filler such as In today's fast-paced/dynamic world, In the ever-evolving landscape, Delve into, Embark on a journey, A tapestry of, In the realm of, Look no further, Whether you're a seasoned, Elevate your experience, Seamlessly navigate, It's important to note, As we all know, In conclusion, or Without further ado.
+Write for the reader's real task: open with a concise direct answer, then use descriptive H2/H3 sections in a natural order. Add a checklist, comparison, table, or FAQ only when it genuinely improves the answer.
+Use the primary keyword naturally in the title, introduction, and relevant headings without forcing repetitions. Use descriptive, varied anchor text.
+Return JSON only with keys title, meta_description, meta_description_candidates, content_html, image_queries, labels.
+meta_description_candidates must contain five distinct complete search descriptions, each 100-119 characters including spaces. They must describe this specific article; the checker will select a complete valid one without truncating it.
+meta_description is mandatory and must be a natural search description of 100-119 characters (not words) - one concise complete sentence, the length that actually fits a Blogger/Google search-result snippet.
+labels must contain 8-14 short noun search terms directly relevant to the article. Vary the count inside that range for each article; never use sentences as labels. image_queries must contain 0-2 precise first-image prompts.
+content_html must contain semantic HTML only (h2/h3/p/ul/ol/blockquote), no html/head/body, no images, no scripts.
+For visa, insurance, or medical/health topics (YMYL), within the first three paragraphs include: (1) a reference-date sentence using the literal words "as of" (English) or "기준" (Korean) followed by a real month/year, e.g. "2026년 8월 기준" or "as of August 2026"; (2) a change-warning sentence using words like "can change"/"subject to change" or "변경될 수 있으니"/"확인하세요"; (3) a short non-advisory disclaimer ("consult a professional"/"전문가와 상담" or "not medical/legal advice"/"의료/법률 자문이 아닙니다"). These three must appear as real sentences, not a heading label alone, or the article fails the quality gate.
+Link naturally to the owned detailed source using this exact URL in one of the first two paragraphs so it survives length editing: {source_url}
+Use additional internal WordPress or authoritative primary-source links only from the verified list below. Include only links that materially support the article; never invent or guess URLs. Prefer government, regulator, university, hospital, insurer, and other primary sources for factual or time-sensitive claims.
+Verified link candidates from the source article:
+{verified_link_text}
+Source title: {source_title}
+Source article:
+{plain_text(source_html)[:18000]}
+{f"Previous attempt failed these checks; rebuild it and correct every item: {prior_feedback}" if prior_feedback else ""}
+"""
+
+
+def blogger_quality_score(article: dict[str, Any], *, source_title: str, source_url: str,
+                          source_html: str, target_chars: int, maximum_similarity: float = 0.68,
+                          language: str = "") -> tuple[int, list[str], float]:
+    """Pre-publication Blogger score. This is an internal gate, not a Google score."""
+    title = str(article.get("title", "")).strip()
+    meta = str(article.get("meta_description", "")).strip()
+    content = str(article.get("content_html", ""))
+    labels = article.get("labels", [])
+    text = plain_text(content)
+    score = 0
+    failures: list[str] = []
+
+    source_terms = {word.lower() for word in re.findall(r"[A-Za-z0-9가-힣]{3,}", plain_text(source_title))}
+    title_terms = {word.lower() for word in re.findall(r"[A-Za-z0-9가-힣]{3,}", title)}
+    if source_terms & title_terms:
+        score += 10
+    else:
+        failures.append("title does not preserve the source topic/primary keyword")
+    if 20 <= len(title) <= 70:
+        score += 10
+    else:
+        failures.append("title length must be 20-70 characters")
+    if title_cliches(title):
+        failures.append("TITLE_QUALITY_FAIL: mass-produced AI title formula is forbidden")
+
+    body_chars = len(re.sub(r"\s+", "", text))
+    minimum = max(1200, int(target_chars * 0.78))
+    maximum = int(target_chars * 1.35)
+    if minimum <= body_chars <= maximum:
+        score += 20
+    else:
+        failures.append(f"body length {body_chars} is outside {minimum}-{maximum} characters")
+    if 100 <= len(meta) < 120:
+        score += 10
+    else:
+        failures.append("meta description must be 100-119 characters")
+    if meta and not meta.endswith((".", "!", "?", '"', "”", "'")):
+        failures.append("meta description is incomplete: does not end in a finished sentence")
+    if 8 <= len(labels) <= 14 and all(len(str(label)) <= 30 and len(str(label).split()) <= 3 for label in labels):
+        score += 10
+    else:
+        failures.append("labels must contain 8-14 short noun search terms")
+
+    heading_count = len(re.findall(r"(?is)<h[23](?:\s[^>]*)?>", content))
+    if heading_count >= 3:
+        score += 10
+    else:
+        failures.append("at least three useful H2/H3 headings are required")
+    links = extract_http_links(content)
+    if source_url in links:
+        score += 5
+    else:
+        failures.append("verified WordPress source link is missing")
+    verified = set(extract_http_links(source_html))
+    if not verified or verified.intersection(links):
+        score += 5
+    else:
+        failures.append("available verified supporting link is not used")
+
+    copy_similarity = similarity(source_html, content)
+    if copy_similarity <= maximum_similarity:
+        score += 10
+    else:
+        failures.append(f"source similarity {copy_similarity:.3f} exceeds {maximum_similarity:.2f}")
+    banned = re.findall(r"(?i)\b(as an ai|language model)\b", text) + body_cliches(text)
+    if not banned:
+        score += 5
+    else:
+        failures.append("AI/filler phrasing detected")
+    mismatches = language_mismatch_fields(
+        language=language, title=title, meta_description=meta,
+        content=text, labels=[str(label) for label in labels],
+    )
+    if mismatches:
+        failures.append("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
+    ymyl = bool(re.search(r"(?i)(visa|immigration|insurance|medical|hospital|treatment|비자|보험|의료)", source_title + " " + text))
+    if not ymyl or (re.search(r"(?i)(as of|effective|기준일|[0-9]{4}년\s*[0-9]{1,2}월[^.]{0,10}기준)", text) and re.search(r"(?i)(can change|subject to change|confirm|disclaimer|consult|변경|확인|면책|상담)", text)):
+        score += 5
+    else:
+        failures.append("YMYL as-of date/change warning/disclaimer is incomplete")
+    return min(score, 100), failures, copy_similarity
+
+
+@dataclass(slots=True)
+class FreeImage:
+    url: str
+    page_url: str
+    credit: str
+    provider: str
+    description: str = ""
+
+
+def find_one_free_image(query: str, *, pexels_key: str = "", pixabay_key: str = "", session=requests) -> FreeImage | None:
+    """Return exactly one free-stock image; never calls an AI image service."""
+    if pexels_key:
+        response = session.get("https://api.pexels.com/v1/search", headers={"Authorization": pexels_key}, params={"query": query, "per_page": 1, "orientation": "landscape"}, timeout=25)
+        if response.status_code == 200 and response.json().get("photos"):
+            photo = response.json()["photos"][0]
+            return FreeImage(photo["src"].get("large2x") or photo["src"]["large"], photo["url"], f"Photo by {photo.get('photographer', 'Pexels contributor')} on Pexels", "Pexels", photo.get("alt", ""))
+    if pixabay_key:
+        response = session.get("https://pixabay.com/api/", params={"key": pixabay_key, "q": query, "image_type": "photo", "orientation": "horizontal", "per_page": 3, "safesearch": "true"}, timeout=25)
+        if response.status_code == 200 and response.json().get("hits"):
+            photo = response.json()["hits"][0]
+            return FreeImage(photo.get("largeImageURL") or photo["webformatURL"], photo["pageURL"], f"Image by {photo.get('user', 'Pixabay contributor')} on Pixabay", "Pixabay", photo.get("tags", ""))
+    return None
+
+
+def image_is_relevant(image: FreeImage, *, query: str, title: str) -> bool:
+    """Reject stock results whose provider description has no topic overlap."""
+    topic = {x.lower() for x in re.findall(r"[A-Za-z0-9가-힣]{3,}", f"{query} {title}")}
+    description = {x.lower() for x in re.findall(r"[A-Za-z0-9가-힣]{3,}", image.description)}
+    return bool(description and topic.intersection(description))
+
+
+def attach_single_image(content_html: str, image: FreeImage, alt: str) -> str:
+    figure = (
+        f'<figure><img src="{html.escape(image.url, quote=True)}" alt="{html.escape(alt, quote=True)}" loading="lazy">'
+        f'<figcaption><a href="{html.escape(image.page_url, quote=True)}" rel="nofollow noopener">{html.escape(image.credit)}</a></figcaption></figure>'
+    )
+    return figure + content_html

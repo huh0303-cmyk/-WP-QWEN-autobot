@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101828">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Korea365 통제실">
+  <title>{% block title %}서울국제대학SIS 총장실 Lab{% endblock %}</title>
+  <link rel="manifest" href="{{ url_for('pwa_manifest') }}">
+  <link rel="icon" href="{{ url_for('static', filename='app-icon.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='app-icon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+  <header class="topbar"><a href="{{ url_for('index') }}">서울국제대학SIS 총장실 Lab</a><span>WordPress 27 · 초안 전용 · 공개 기능 잠금</span><button id="install-pwa" class="install-pwa" type="button" hidden>앱 설치</button></header>
+  <section class="world-clock" aria-label="세계 주요 도시 현재 시간">
+    <div><strong>KST</strong><time id="clock-kst">—</time></div>
+    <div><strong>NEW YORK</strong><time id="clock-new-york">—</time></div>
+    <div><strong>LONDON</strong><time id="clock-london">—</time></div>
+    <div><strong>PARIS</strong><time id="clock-paris">—</time></div>
+  </section>
+  <main>
+    {% for category, message in get_flashed_messages(with_categories=true) %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <script>
+    (() => {
+      const clocks = [
+        ["clock-kst", "Asia/Seoul"],
+        ["clock-new-york", "America/New_York"],
+        ["clock-london", "Europe/London"],
+        ["clock-paris", "Europe/Paris"]
+      ];
+      const formatters = new Map(clocks.map(([, zone]) => [zone, new Intl.DateTimeFormat("ko-KR", {
+        timeZone: zone, year: "numeric", month: "2-digit", day: "2-digit",
+        weekday: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      })]));
+      function updateClocks() {
+        const now = new Date();
+        clocks.forEach(([id, zone]) => {
+          const element = document.getElementById(id);
+          if (element) { element.textContent = formatters.get(zone).format(now); element.dateTime = now.toISOString(); }
+        });
+      }
+      updateClocks();
+      window.setInterval(updateClocks, 1000);
+    })();
+    (() => {
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js"));
+      }
+      let installPrompt = null;
+      const button = document.getElementById("install-pwa");
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        installPrompt = event;
+        button.hidden = false;
+      });
+      button?.addEventListener("click", async () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+        installPrompt = null;
+        button.hidden = true;
+      });
+      window.addEventListener("appinstalled", () => { button.hidden = true; });
+    })();
+  </script>
+</body>
+</html>

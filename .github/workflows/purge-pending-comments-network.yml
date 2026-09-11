@@ -1,0 +1,55 @@
+name: "WordPress — Purge Pending/Spam Comments Network-Wide"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Purge hold+spam comments on 27 sites
+        env:
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/purge_pending_comments.py
+      - name: Commit result
+        run: |
+          git config user.name "autobot"
+          git config user.email "autobot@users.noreply.github.com"
+          git add purge_pending_comments_result.txt || true
+          git diff --cached --quiet || git commit -m "chore: purge pending comments result $(date -u +%F)"
+          git push || true

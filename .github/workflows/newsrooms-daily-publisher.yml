@@ -1,0 +1,143 @@
+name: "Two Newsrooms — New RSS Story"
+run-name: "newsroom:${{ inputs.newsroom }} · RSS ${{ github.event_name }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      newsroom:
+        description: "koreanews365 / theseouljournal"
+        required: true
+        type: choice
+        options: [koreanews365, theseouljournal]
+        default: koreanews365
+      preferred_category:
+        description: "Optional RSS desk (World/Sports/Military/Art)"
+        required: false
+        type: choice
+        options: ["", World, Sports, Military, Art]
+        default: ""
+      source_url:
+        description: "Exact newly detected RSS story URL; blank for manual source selection"
+        required: false
+        type: string
+        default: ""
+      source_item:
+        description: "RSS item captured at detection; prevents rolling-feed loss"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+  checks: write
+
+concurrency:
+  # A single owner prevents two scheduled editions from racing on RSS/source
+  # deduplication or WordPress writes when a prior run is slow.
+  group: newsroom-publisher-single-owner
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: data/stock_image_cache
+          key: stock-search-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: stock-search-${{ runner.os }}-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+      - name: Resolve newsroom
+        id: target
+        shell: bash
+        run: |
+          KEY="${{ inputs.newsroom }}"
+          if [ "$KEY" = "theseouljournal" ]; then URL="https://theseouljournal.com"; else URL="https://koreanews365.com"; fi
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "category=" >> "$GITHUB_OUTPUT"
+      - name: Repair recent source-based categories
+        env:
+          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
+          NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
+          NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/repair_recent_newsroom_categories.py
+      - name: Publish one source-checked edition
+        env:
+          WP_AUTOPUBLISH_ENABLED: "true"
+          # The two approved newsrooms are the only WordPress exception to the
+          # network-wide human approval rule. All source/recency/duplicate/
+          # rights/SEO gates still run before a public post can be created.
+          WP_POST_STATUS: "publish"
+          WP_PUBLICATION_APPROVED: "true"
+          AUTOMATION_HUB_SOURCE: "sheets"
+          AI_TEXT_PROVIDER: "openai"
+          GH_TOKEN: ${{ github.token }}
+          # 2026-09-03: Gemini removed from the reviewer role network-wide —
+          # three_model_consensus.py now always runs two independent GPT
+          # passes and never calls Gemini at all. See audit_active_policy.py.
+          OPENAI_ENABLED: "true"
+          CLAUDE_ENABLED: "false"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}
+          NEWSROOM_SOURCE_ITEM: ${{ inputs.source_item }}
+          FORCE_SOURCE_IPV4: "true"
+          NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
+          NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
+          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
+          RUN_SLOT: "1"
+          SLEEP_BETWEEN_POSTS: "2"
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          # One RSS event owns one publication attempt. Never regenerate the
+          # same article three times just because a source/quality gate failed.
+          python scripts/autopost_current.py 2>&1 | tee artifacts/newsroom-attempt-1.log
+      - name: Save publication result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsroom-result-${{ steps.target.outputs.key }}-${{ github.run_id }}
+          path: |
+            newsroom_publish_result.json
+            artifacts/newsroom-attempt-*.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Save image sources and estimated image costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-image-receipts-${{ github.run_id }}
+          path: |
+            artifacts/stock-image-receipts.jsonl
+            artifacts/image-cost-estimates.jsonl
+          if-no-files-found: ignore

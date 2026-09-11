@@ -1,0 +1,55 @@
+name: "Automation Hub — golden keyword queue"
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "add: 새 예정 키워드 추가 / update_status: 기존 행 상태 변경"
+        required: true
+        type: choice
+        options: [add, update_status]
+      site_id:
+        description: "site_id (예: wp_ktrip365, blogger_ktrip365)"
+        required: true
+        type: string
+      keyword:
+        description: "키워드/주제"
+        required: true
+        type: string
+      intent:
+        description: "add 전용: 검색 의도/한 줄 메모"
+        required: false
+        default: ""
+        type: string
+      status:
+        description: "update_status 전용: 대기/작성중/검수중/초안완료/발행완료/보류"
+        required: false
+        default: ""
+        type: choice
+        options: ["", 대기, 작성중, 검수중, 초안완료, 발행완료, 보류]
+
+permissions:
+  contents: read
+
+jobs:
+  update-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install google-api-python-client google-auth -q
+      - env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GOLDEN_ACTION: ${{ inputs.action }}
+          GOLDEN_SITE_ID: ${{ inputs.site_id }}
+          GOLDEN_KEYWORD: ${{ inputs.keyword }}
+          GOLDEN_INTENT: ${{ inputs.intent }}
+          GOLDEN_STATUS: ${{ inputs.status }}
+        run: python scripts/manage_golden_keyword_queue.py

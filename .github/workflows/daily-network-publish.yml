@@ -1,0 +1,213 @@
+name: "Blog Publish — Single Site (dispatched by A/B scheduler)"
+
+# publish_scheduler.py가 A17/B8 중 오늘 대상 사이트를 하나씩 분산 dispatch한다.
+# 뉴스 2개는 newsrooms-daily-publisher.yml이 별도로 담당한다.
+on:
+  workflow_dispatch:
+    inputs:
+      room_id:
+        description: "Automation room id for result tracking"
+        required: false
+        default: ""
+      target_site_url:
+        description: "발행 대상 블로그 URL"
+        required: true
+      force_keyword:
+        description: "시험/수동 발행 키워드 (비우면 사이트 키워드 풀 사용)"
+        required: false
+        default: ""
+      publication_approved:
+        description: "Publish publicly once the two-pass GPT editorial gate approves (2026-09-03 CEO decision: default true — manual per-item review no longer scales past ~30 drafts/day; set false only for a deliberate draft-only test run)"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  checks: write
+
+concurrency:
+  group: blog-publish-${{ inputs.target_site_url }}
+  cancel-in-progress: false
+
+jobs:
+  publish-one:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: data/stock_image_cache
+          key: stock-search-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: stock-search-${{ runner.os }}-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install publisher dependencies
+        run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+      - name: Recheck today's cross-media and search-trend signals
+        id: viral
+        run: python scripts/select_live_viral_keyword.py --site "${{ inputs.target_site_url }}"
+      - name: Create one quality-gated review draft
+        env:
+          WP_AUTOPUBLISH_ENABLED: "true"
+          WP_POST_STATUS: ${{ inputs.publication_approved && 'publish' || 'draft' }}
+          WP_PUBLICATION_APPROVED: ${{ inputs.publication_approved && 'true' || 'false' }}
+          AUTOMATION_HUB_SOURCE: "sheets"
+          # Despite the legacy name, this makes every single-site run fail when
+          # zero posts were actually published. Orchestrators must never treat a
+          # generated-but-blocked article as a successful publication.
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          TARGET_SITE_URL: ${{ inputs.target_site_url }}
+          FORCE_SOURCE_IPV4: "true"
+          FORCE_KEYWORD: ${{ inputs.force_keyword || steps.viral.outputs.keyword }}
+          RUN_SLOT: "1"
+          SLEEP_BETWEEN_POSTS: "2"
+          MAX_REGEN: "2"
+          # Regular 25-site network: GPT-5 mini plus deterministic quality gates.
+          AI_TEXT_PROVIDER: "openai"
+          GH_TOKEN: ${{ github.token }}
+          CHATGPT_SINGLE_MODEL_PIPELINE: "true"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+          GEMINI_EDITOR_ENABLED: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          CLAUDE_ENABLED: "false"
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          published=false
+          for attempt in 1 2 3; do
+            echo "Publication attempt ${attempt}/3"
+            if python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log; then
+              published=true
+              break
+            fi
+            sleep $((attempt * 15))
+          done
+          if [ "$published" != "true" ]; then
+            echo "::error title=WordPress publication failed::No verified public post after 3 attempts"
+            exit 1
+          fi
+      - name: Normalize room result
+        if: always()
+        env:
+          ROOM_ID: ${{ inputs.room_id }}
+        run: |
+          source_path="artifacts/wordpress-worker.log"
+          if [ -f newsroom_publish_result.json ]; then source_path="newsroom_publish_result.json"; fi
+          outcome="failure"
+          if [ "${{ job.status }}" = "success" ]; then outcome="success"; fi
+          python scripts/normalize_room_result.py --platform wordpress --workflow daily-network-publish.yml --source "$source_path" --outcome "$outcome" --output artifacts/automation-room-result.json
+      - name: Save publication result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blog-publish-result-${{ github.run_id }}
+          path: |
+            newsroom_publish_result.json
+            artifacts/automation-room-result.json
+            artifacts/wordpress-worker.log
+            artifacts/live-viral-topic.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Send private-draft review link
+        if: always()
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          REPORT_EMAIL_TO: "huh0303@gmail.com"
+          REPORT_EMAIL_FROM: "huh0303@gmail.com"
+          REPORT_TITLE: "[WordPress 작성 완료] 글 확인 후 승인 또는 비승인"
+          CALENDAR_SCHEDULE_ID: ${{ inputs.room_id }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          REPORT_BODY: "오늘 작성된 비공개 글입니다. 글을 먼저 읽고 승인(공개) 또는 비승인(보류·삭제)을 선택해 주세요."
+          REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/publishing_completion_notify.py
+
+      - name: Save image sources and estimated image costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-image-receipts-${{ github.run_id }}
+          path: |
+            artifacts/stock-image-receipts.jsonl
+            artifacts/image-cost-estimates.jsonl
+            artifacts/editorial-brief-cost.jsonl
+          if-no-files-found: ignore
