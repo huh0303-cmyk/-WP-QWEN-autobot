@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "CLAIMED", "attempts": 3, "claim": "daily-2026-09-12-blogger_krealestate-ea0ee927", "claimed_at": "2026-09-12T06:36:12.560024+09:00", "run_id": null, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 3, "claim": "daily-2026-09-12-blogger_krealestate-ea0ee927", "claimed_at": "2026-09-12T06:36:12.560024+09:00", "run_id": 34650183176, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
