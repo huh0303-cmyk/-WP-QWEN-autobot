@@ -35,7 +35,13 @@ for post in reversed(posts):
     soup=BeautifulSoup(current['content']['raw'],'html.parser')
     for img in list(soup.find_all('img')):
         src=img.get('src','')
-        if src and same_photo(image_fingerprint(src),fp):
+        if not src:continue
+        try:
+            matches=same_photo(image_fingerprint(src),fp)
+        except requests.RequestException:
+            # An expired unrelated inline URL must not stop hero cleanup.
+            continue
+        if matches:
             parent=img.find_parent('figure')
             if parent:parent.decompose()
             else:img.decompose()
