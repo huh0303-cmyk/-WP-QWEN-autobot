@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-09-12-wp_kfinance365-a7b666bc", "claimed_at": "2026-09-12T06:53:01.972447+09:00", "run_id": 34651508127, "child_run_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://kfinance365.com/where-foreign-residents-in-korea-can-obtain-and-present-a-financial-certificate-for-banking-and-official-use/", "published_at": "2026-09-11T21:59:01Z"}
