@@ -31,7 +31,8 @@ def test_all_blog_writers_are_gpt5_mini_and_images_are_sdxl_first():
     assert "GPT-5 mini writes the draft" in tistory
     assert "deterministic quality checks perform" in tistory
     assert "gemini_generate" not in tistory
-    assert 'for provider in ("gpt", "gpt", "gpt"):' in tistory
+    assert 'for provider in ("auto", "gpt"):' in tistory
+    assert 'economy_text.generate_text' in tistory
     for workflow_name in (
         "daily-network-publish.yml",
         "newsrooms-daily-publisher.yml",
