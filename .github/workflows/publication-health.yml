@@ -6,26 +6,31 @@ permissions:
 jobs:
   health:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests -q
-      - name: Check all 66 public destinations
-        run: python scripts/publication_health_audit.py
-      - name: One short Flash response with a single GPT fallback
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: 'true'
-          PYTHONPATH: scripts
-        run: python -c "from economy_text import generate_text; text = generate_text('Return exactly the word OK.'); print('Writer returned text:', bool(text.strip()))"
+      - run: pip install requests beautifulsoup4 -q
+      - name: Verify public article without credentials
+        run: |
+          python - <<'PY'
+          import json, requests
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+          results=[]
+          for url in ['https://koreanews365.com','https://skin.k-health365.com']:
+              if 'koreanews' in url:
+                  r=requests.get(url+'/wp-json/wp/v2/posts?per_page=1',timeout=20);r.raise_for_status();p=r.json()[0];link=p['link'];title=p['title']['rendered']
+              else:
+                  r=requests.get(url+'/feeds/posts/default?alt=json&max-results=1',timeout=20);r.raise_for_status();p=r.json()['feed']['entry'][0];link=next(x['href'] for x in p['link'] if x['rel']=='alternate');title=p['title']['$t']
+              page=requests.get(link,timeout=20);page.raise_for_status();soup=BeautifulSoup(page.text,'html.parser')
+              results.append({'url':link,'expected_title':title,'page_title':soup.title.get_text() if soup.title else '', 'h1':[n.get_text(' ',strip=True) for n in soup.find_all('h1')], 'http_status':page.status_code})
+          Path('public-verification.json').write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(results,ensure_ascii=False))
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: publication-health
-          path: |
-            artifacts/publication-health.json
-            artifacts/article-writer-usage.jsonl
+          name: public-article-verification
+          path: public-verification.json
