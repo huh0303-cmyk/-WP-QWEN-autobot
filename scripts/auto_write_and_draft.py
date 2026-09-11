@@ -156,6 +156,9 @@ def _next_due_row(service, sheet_id: str, site_id: str) -> tuple[int, dict] | No
 def _write_article(*, keyword: str, site_theme: str, language: str, persona: str, tone: str,
                    min_chars: int, target_chars: int, max_chars: int,
                    review_feedback: str = "") -> tuple[dict | None, int, list[str], str]:
+    from editorial_brief import editorial_brief
+    from automation_hub.repetition_guard import RULE
+    plan = editorial_brief(f"{language}: {keyword}; {site_theme}")
     failures: list[str] = [review_feedback] if review_feedback else []
     # A third, feedback-informed pass prevents a transient short response from
     # wasting an otherwise valid queued topic. It runs only after both normal
@@ -164,6 +167,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
                                   prior_feedback="; ".join(failures))
+        prompt += "\n" + RULE + plan
         try:
             if not openai_available():
                 raise RuntimeError("GPT-5 mini writer unavailable")

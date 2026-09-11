@@ -5,6 +5,8 @@ from difflib import SequenceMatcher
 from bs4 import BeautifulSoup
 
 RULE = """Use an article-specific headline and opening grounded in the supplied facts.
+Never start a headline with How. Do not substitute another repeated question formula.
+Do not invent a connection between a trending person and Korean visas or services.
 Do not reuse a recent headline's sentence frame with only a different keyword.
 Treat profile outlines as coverage requirements, not literal headings or a fixed order.
 Do not repeat the headline in the opening paragraph or include an h1 in the body.
@@ -48,6 +50,8 @@ def opening(body):
 def repetition_issues(title, body, history):
     lead = opening(clean_opening(title, body)).casefold()
     issues = []
+    if re.match(r'^how\b', plain(title), re.I):
+        issues.append('REPETITION: How-start headline is forbidden')
     for old in history:
         old_title = old.get('title', '')
         if isinstance(old_title, dict): old_title = old_title.get('rendered', '')

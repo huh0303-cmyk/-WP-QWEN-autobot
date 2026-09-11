@@ -33,3 +33,9 @@ def test_history_errors_fail_closed():
     class Session:
         def get(self, *a, **k): return Response()
     with pytest.raises(RuntimeError): fetch_wp_history(Session(), 'https://example.com', None)
+
+
+def test_different_how_words_still_rejected():
+    assert repetition_issues("How Goldman Sachs affects Korea", "<p>Specific body.</p>", [])
+    assert repetition_issues("How Korean regulators treat gifts", "<p>Specific body.</p>", [])
+    assert not repetition_issues("Crypto gifts: transfer records and recipient checks", "<p>Specific body.</p>", [])

@@ -1,5 +1,7 @@
 """Audit latest three posts per WP/Blogger site; repair existing IDs only."""
-import json, os, sys, re
+import json, os, sys, re, socket
+import urllib3.util.connection
+urllib3.util.connection.allowed_gai_family = lambda: socket.AF_INET
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import requests
@@ -23,7 +25,7 @@ def propose(post, history):
     lead = next((p for p in soup.find_all('p') if len(plain(str(p))) >= 50), None)
     headings = [h for h in soup.find_all(['h2', 'h3']) if not h.find_parent(class_=re.compile('related|author|faq'))]
     source = {'title':post['title'], 'body':plain(post['content_html'])[:22000], 'headings':[plain(str(h)) for h in headings]}
-    for attempt in range(3):
+    for attempt in range(2):
         raw = openai_generate_text(history_prompt(history) + '\nEdit this published article using ONLY facts already present. Preserve language. Return JSON {"title":str,"opening":str,"headings":[str]}. Each heading must describe its original section, in the same order and count. No invented statistics, novelty, claims or personal experience. Opening must summarize this article specifically. SOURCE: ' + json.dumps(source, ensure_ascii=False), temperature=.6, max_retries=1)
         edit = decode(raw)
         if len(edit.get('headings', [])) != len(headings) or not 15 <= len(edit.get('title', '')) <= 180 or len(edit.get('opening', '')) < 50: continue
@@ -42,7 +44,7 @@ def audit_site(site):
     try:
         wp = site['platform'] == 'wordpress'
         if wp:
-            auth = (os.environ.get('WP_USER', ''), os.environ.get(site['secret_name'], ''))
+            auth = (os.environ.get('WP_USER') or 'huh0303@gmail.com', os.environ.get(site['secret_name'], ''))
             endpoint = site['url'].rstrip('/') + '/wp-json/wp/v2/posts'
             resp = requests.get(endpoint, auth=auth, params={'per_page':50,'status':'publish','orderby':'date','order':'desc'}, timeout=35)
         else:
@@ -52,7 +54,7 @@ def audit_site(site):
         resp.raise_for_status()
         raw = resp.json() if wp else resp.json().get('items', [])
         posts = [{'id':p['id'], 'title':p['title']['rendered'] if wp else p['title'], 'content_html':p['content']['rendered'] if wp else p.get('content',''), 'url':p.get('link') if wp else p.get('url'), 'original':p} for p in raw]
-        for post in posts[:3]:
+        for post in posts[:int(os.getenv('REPAIR_POST_LIMIT', '10'))]:
             history = [p for p in posts if p['id'] != post['id']]
             issues = repetition_issues(post['title'], post['content_html'], history)
             if title_cliches(post['title']): issues.append('TITLE_CLICHE')
@@ -94,6 +96,9 @@ def audit_site(site):
 def main():
     sites = json.loads((ROOT/'config/automation_hub_sites.json').read_text(encoding='utf-8'))['sites']
     sites = [s for s in sites if s.get('enabled',True) and s['platform'] in {'wordpress','blogger'}]
+    target = os.getenv('REPAIR_SITE_URL', 'all').rstrip('/')
+    if target != 'all':
+        sites = [s for s in sites if s['url'].rstrip('/') == target]
     OUT.parent.mkdir(exist_ok=True)
     results = []
     with ThreadPoolExecutor(max_workers=4) as pool:

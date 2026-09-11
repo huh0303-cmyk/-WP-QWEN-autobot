@@ -3415,6 +3415,8 @@ def process_one(site, keyword):
             "Do not invent quotations, statistics, witnesses, dates, locations, reactions, or additional sources. "
             "If the available facts are limited, write a concise brief rather than padding the article."
         )
+    from editorial_brief import editorial_brief
+    base_prompt += editorial_brief(base_prompt)
     prompt=base_prompt
     best_score=0; best_result=None; best_length_valid=False
 

@@ -1,5 +1,7 @@
 """Remove duplicate hero/inline images from existing posts; keep IDs and text."""
-import json,os
+import json,os,socket
+import urllib3.util.connection
+urllib3.util.connection.allowed_gai_family = lambda: socket.AF_INET
 from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
@@ -15,7 +17,11 @@ known=[];results=[]
 for post in reversed(posts):
     url=photo_url(post)
     if not url:continue
-    fp=image_fingerprint(url)
+    try:
+        fp=image_fingerprint(url)
+    except Exception as exc:
+        print(json.dumps({'id':post['id'],'status':'image_unavailable','error_type':type(exc).__name__}))
+        continue
     duplicate=next((p for old,p in known if same_photo(fp,old)),None)
     if not duplicate:known.append((fp,post));continue
     record={'id':post['id'],'url':post['link'],'duplicates_post':duplicate['id'],'status':'identified'}
