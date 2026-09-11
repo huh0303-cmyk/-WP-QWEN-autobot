@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-12-wp_korea365-e7015acd", "claimed_at": "2026-09-12T06:19:27.259439+09:00", "run_id": 34648810331, "child_run_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://korea365.org/steps-saudi-nationals-should-complete-first-after-arriving-in-korea-to-access-health-care-banking-and-municipal-services/", "published_at": "2026-09-11T21:23:06Z"}
