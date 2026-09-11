@@ -28,7 +28,7 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 
 from automation_hub.blogger_adapter import BloggerPublisher
-from automation_hub.blogger_rewriter import normalize_rewrite_format, parse_rewrite_json
+from automation_hub.blogger_rewriter import normalize_rewrite_format, parse_rewrite_json, visitor_counter_html
 from automation_hub.original_writer import original_prompt, original_quality_score
 from automation_hub.publishing import PublishJob
 from automation_hub.sheet_schema import KEYWORD_HEADER
@@ -234,6 +234,7 @@ def _publish_blogger(*, blog_id: str, article: dict, image_url: str, site_id: st
             f"Scene related to {str(image_subject).strip()}"
         )
         content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
+    content = content + visitor_counter_html(site_id)
     job = PublishJob(
         job_id=f"auto-{site_id}-{abs(hash(keyword))}", site_id=site_id, title=article["title"], content_html=content,
         labels=article.get("labels", []), publish_now=False, source_keyword=keyword,
