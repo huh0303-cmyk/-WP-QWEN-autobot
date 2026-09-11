@@ -45,4 +45,6 @@ def generate_text(prompt, temperature=0.7, force_gpt=False):
         raise RuntimeError('No available article writer; preserve the job for retry')
     print('Article writer: GPT fallback; maximum one attempt')
     last_writer_model = os.getenv('OPENAI_MODEL', 'gpt-5-mini')
-    return openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=120)
+    # Long articles repeatedly exceeded 120s in live WP/Blogger runs. Await the
+    # same request longer rather than paying for a second generated article.
+    return openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=300)
