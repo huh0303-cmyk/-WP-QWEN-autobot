@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-12-wp_seouljournal-4ecbf3c5", "claimed_at": "2026-09-12T06:19:45.802818+09:00", "run_id": 34648827261, "child_run_id": null, "workflow": "newsrooms-daily-publisher.yml"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://theseouljournal.com/trump-hegseth-and-gen-dan-caine-host-25th-anniversary-9-11-observance-at-the-pentagon/", "published_at": "2026-09-11T21:24:14Z"}
