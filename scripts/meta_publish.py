@@ -52,21 +52,31 @@ def api(method, url, token, **fields):
 
 
 def publish(platform, meta, caption):
+    if platform not in {"instagram", "threads"}:
+        raise ValueError("Unsupported Meta platform")
     if os.getenv("META_PUBLISH_ENABLED", "false").lower() != "true":
         return {"ok": False, "skipped": True, "prepared": True,
                 "reason": "Meta publishing disabled; set META_PUBLISH_ENABLED=true to publish",
                 "caption": caption, "video_url": meta.get("public_video_url")}
     base, user, token = account(platform)
-    url = meta.get("public_video_url") or ""
+    kind = meta.get("media_type", "VIDEO").upper()
+    if kind not in {"VIDEO", "IMAGE", "TEXT"} or (platform == "instagram" and kind == "TEXT"):
+        raise ValueError("Instagram requires an image or video; Threads supports text too")
+    url = meta.get("public_image_url" if kind == "IMAGE" else "public_video_url") or ""
     parsed = urlparse(url)
-    if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
-        raise ValueError("public_video_url must be a public HTTPS video URL")
+    if kind != "TEXT" and (parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password):
+        raise ValueError("Media must have a public HTTPS URL")
+    if kind == "TEXT":
+        url = ""
     if not caption.strip():
         raise ValueError("Publication requires a nonempty caption")
     limit = 2200 if platform == "instagram" else 500
     if len(caption) > limit:
         raise ValueError(f"{platform} caption exceeds {limit} characters")
-    key = hashlib.sha256(json.dumps([platform, base, user, url, caption]).encode()).hexdigest()
+    identity = [platform, base, user, url, caption]
+    if kind != "VIDEO":
+        identity.append(kind)
+    key = hashlib.sha256(json.dumps(identity).encode()).hexdigest()
     folder = Path(os.getenv("META_PUBLISH_STATE_DIR", ".meta-publish-state"))
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / (key + ".json")
@@ -87,7 +97,14 @@ def publish(platform, meta, caption):
     publish_edge = "media_publish" if platform == "instagram" else "threads_publish"
     status_field = "status_code" if platform == "instagram" else "status"
     if not receipt.get("container_id"):
-        fields = {"video_url": url, "media_type": "REELS" if platform == "instagram" else "VIDEO"}
+        if kind == "VIDEO":
+            fields = {"video_url": url, "media_type": "REELS" if platform == "instagram" else "VIDEO"}
+        elif kind == "IMAGE":
+            fields = {"image_url": url}
+            if platform == "threads":
+                fields["media_type"] = "IMAGE"
+        else:
+            fields = {"media_type": "TEXT"}
         fields["caption" if platform == "instagram" else "text"] = caption
         receipt["container_id"] = api("POST", f"{base}/{user}/{create_edge}", token, **fields)["id"]
         save()
