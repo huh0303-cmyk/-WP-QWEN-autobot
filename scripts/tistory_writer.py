@@ -303,12 +303,14 @@ def generate_draft(job: dict) -> dict:
             generated_url = host_permanently(generated_url, asset_key=job["job_id"])
         except (RuntimeError, KeyError):
             generated_url = None
+    from stock_image_provider import credit_html
+    draft["body_html"] += credit_html(generated_url)
     draft["image_url"] = generated_url
     # Alt text must describe the image for a reader, not carry the raw
     # AI generation prompt — use the article's own title instead.
     draft["image_alt"] = f'{draft["category"]} 주제를 설명하는 대표 이미지'
     draft["first_image_priority"] = bool(draft["image_url"])
-    draft["image_policy"] = "sdxl_lightning_then_flux_schnell_required_representative"
+    draft["image_policy"] = "matching_stock_then_sdxl_then_flux"
     draft["image_status"] = "generated" if draft["image_url"] else "missing_required_image"
     if not draft["image_url"]:
         draft["status"] = "MEDIA_REQUIRED"

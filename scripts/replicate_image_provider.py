@@ -8,13 +8,17 @@ HARD POLICY (2026-09-02):
 - Only the two models in ALLOWED_MODELS may be called.
 - One shared secret: REPLICATE_API_TOKEN.
 - At most one output image per content item and one attempt per model.
-- No stock-photo, OpenAI image, Gemini image, Stability API, or other fallback.
+- 2026-09-11: explicitly enabled article workflows try matching Pexels/Pixabay first.
+- No OpenAI image, Gemini image, Stability API, or other paid fallback.
 - If all approved models fail, return no image rather than using a legacy provider.
 """
 
 from __future__ import annotations
 
 import hashlib
+import json
+from pathlib import Path
+from datetime import datetime, timezone
 import os
 import time
 from typing import Optional
@@ -179,8 +183,29 @@ def build_editorial_prompt(subject: str, theme: str = "") -> str:
     )
 
 
+def _cost_receipt(model, subject, status):
+    # Informational estimate, separate from the existing pre-call budget reservation.
+    amount = 0.0014 if model == PRIMARY_MODEL else 0.003
+    receipt = {"at": datetime.now(timezone.utc).isoformat(), "category": "image",
+               "provider": "Replicate", "model": model, "status": status,
+               "estimated_usd": amount, "pricing_basis": "2026-09-11 public rate; SDXL runtime varies",
+               "subject_hash": hashlib.sha256(subject.encode()).hexdigest()[:16]}
+    path = Path("artifacts/image-cost-estimates.jsonl")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(receipt) + "\n")
+    except OSError:
+        pass
+    print("image cost estimate: " + json.dumps(receipt))
+
+
 def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
     """Generate at most one image using only the approved Replicate model chain."""
+    from stock_image_provider import find_stock_image
+    stock = find_stock_image(subject, theme)
+    if stock:
+        return stock
     token = _token()
     if not token:
         print("  ⛔ REPLICATE_API_TOKEN missing — image generation skipped; legacy fallback forbidden")
@@ -199,6 +224,7 @@ def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
             break
         try:
             print(f"  🖼️ Replicate approved image model {attempt_no}/{MAX_MODEL_ATTEMPTS}: {model}")
+            _cost_receipt(model, subject, "attempt_reserved")
             prediction = _await_prediction(_create_prediction(model, prompt, token), token)
             if prediction.get("status") == "succeeded":
                 url = _first_output_url(prediction.get("output"))

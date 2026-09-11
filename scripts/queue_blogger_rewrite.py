@@ -423,6 +423,8 @@ def main():
         f"Scene related to {str(image_subject).strip()}"
     )
     image_url = generate_image_url(image_subject, theme=rewritten["title"])
+    from stock_image_provider import credit_html
+    content += credit_html(image_url)
     if not image_url:
         print(json.dumps({
             "image_pass": True,

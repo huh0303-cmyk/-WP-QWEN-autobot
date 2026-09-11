@@ -23,7 +23,7 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
   checks: write
 
 concurrency:
@@ -36,6 +36,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: data/stock_image_cache
+          key: stock-search-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: stock-search-${{ runner.os }}-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -66,6 +71,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           CHATGPT_SINGLE_MODEL_PIPELINE: "true"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ github.token }}
           OPENAI_ENABLED: "true"
           CLAUDE_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
@@ -189,3 +198,13 @@ jobs:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         run: python scripts/publishing_completion_notify.py
+
+      - name: Save image sources and estimated image costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-image-receipts-${{ github.run_id }}
+          path: |
+            artifacts/stock-image-receipts.jsonl
+            artifacts/image-cost-estimates.jsonl
+          if-no-files-found: ignore
