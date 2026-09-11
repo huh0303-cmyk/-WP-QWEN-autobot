@@ -329,6 +329,8 @@ def main() -> int:
     args = parser.parse_args()
 
     plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
+    out = Path(args.output)
+    out.parent.mkdir(parents=True, exist_ok=True)
     drafts = []
     for job in plan['jobs']:
         try:
@@ -337,6 +339,11 @@ def main() -> int:
             drafts.append({'site_id': job['site_id'], 'job_id': job['job_id'],
                            'status': 'DRAFT_REPAIR_REQUIRED', 'public_allowed': False,
                            'error': type(exc).__name__})
+        # Recovery inputs only; the portfolio review below must still complete.
+        checkpoint = {'date': plan['date'], 'public_allowed': False,
+                      'stage': 'PARTIAL_REQUIRES_PORTFOLIO_REVIEW', 'drafts': drafts}
+        out.with_suffix('.partial.json').write_text(
+            json.dumps(checkpoint, ensure_ascii=False, indent=2), encoding='utf-8')
     # Hard portfolio guard: similar/repeated titles across the five accounts
     # never reach the review-ready state.
     for index, draft in enumerate(drafts):

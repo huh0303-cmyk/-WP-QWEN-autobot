@@ -32,7 +32,7 @@ concurrency:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -140,6 +140,7 @@ jobs:
           path: |
             artifacts/tistory-daily-plan.json
             artifacts/tistory-daily-drafts.json
+            artifacts/tistory-daily-drafts.partial.json
             artifacts/tistory-card-news/*.html
           retention-days: 7
       - name: Send mobile completion report
