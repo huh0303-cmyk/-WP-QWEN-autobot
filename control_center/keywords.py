@@ -29,6 +29,7 @@ KEYWORD_FILES = {
     "krealestate365.com": "keywords_krealestate.txt",
     "ktech365.com": "keywords_ktech.txt",
     "oliveyoungkorea.com": "keywords_oliveyoung.txt",
+    "kskin365.com": "keywords_kskin.txt",
     "kworld365.com": "keywords_kworld.txt",
     "k-trip365.com": "keywords_ktrip.txt",
     "k-visa365.com": "keywords_kvisa.txt",
@@ -57,7 +58,7 @@ def _read_pool(domain: str) -> list[KeywordSuggestion]:
     suggestions: list[KeywordSuggestion] = []
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         for row in csv.reader(handle, delimiter="\t"):
-            if not row or not row[0].strip():
+            if not row or not row[0].strip() or row[0].lstrip().startswith('#'):
                 continue
             suggestions.append(KeywordSuggestion(
                 keyword=row[0].strip(),
@@ -80,17 +81,7 @@ def weekly_suggestions(domain: str, *, limit: int = 5, today: date | None = None
 
 
 def top_keywords_by_category(domain: str, *, per_category: int = 3) -> list[dict[str, object]]:
-    """Top N keywords per category, ranked by today's search-volume+virality.
-
-    2026-09-04 CEO: the "지금 발행" button needs a visible pick, not a silent
-    auto-choice — 3 keyword chips per category, click one then publish.
-    scripts/refresh_keyword_pool.py already re-researches and re-ranks this
-    file every day (mention/outlet/surface count, highest first) and writes
-    each category's entries in that same rank order, so simply grouping by
-    category and keeping the first `per_category` per group already IS
-    "today's top search-volume/virality keywords, per category" — no extra
-    rotation or scoring needed here.
-    """
+    """Return candidates in stored research order, not measured search-volume rank."""
     pool = _read_pool(domain)
     grouped: dict[str, list[str]] = {}
     for item in pool:

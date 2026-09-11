@@ -25,7 +25,11 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: pip install requests -q
+      - run: pip install requests pyjwt cryptography -q
+      - name: Collect measured search query evidence
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/collect_keyword_search_demand.py
       - name: Research current keywords for all 25 blogs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
