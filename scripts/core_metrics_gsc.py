@@ -10,16 +10,17 @@ import requests
 from core_metrics_report import KST, previous_day, delta
 
 
-def published_wordpress_urls(url):
-    urls, page, expected = [], 1, None
+def published_wordpress_urls(url, with_dates=False):
+    urls, posts, page, expected = [], [], 1, None
     while True:
         response = requests.get(url + "/wp-json/wp/v2/posts", params={
-            "status": "publish", "per_page": 100, "page": page, "_fields": "id,link"}, timeout=30)
+            "status": "publish", "per_page": 100, "page": page, "_fields": "id,link,date_gmt" if with_dates else "id,link"}, timeout=30)
         response.raise_for_status()
         total = int(response.headers["X-WP-Total"])
         if expected is not None and total != expected:
             raise ValueError("Publication inventory changed during collection")
         expected = total
+        posts.extend(response.json())
         urls.extend(post["link"] for post in response.json())
         if len(urls) >= expected:
             break
@@ -28,7 +29,7 @@ def published_wordpress_urls(url):
         page += 1
     if len(set(urls)) != expected:
         raise ValueError("Incomplete or duplicate publication inventory")
-    return urls
+    return posts if with_dates else urls
 
 
 def unavailable(row, reason):
