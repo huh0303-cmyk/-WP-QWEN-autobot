@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 3, "claim": "daily-2026-09-12-blogger_kwellness_lab-11f30c9d", "claimed_at": "2026-09-12T06:36:12.560024+09:00", "run_id": 34650196683, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://glow.k-health365.com/2026/09/blog-post_12.html", "published_at": "2026-09-12T06:39:59.554+09:00"}
