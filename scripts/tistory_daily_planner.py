@@ -60,13 +60,19 @@ def _pick_seed_topic(site: dict, day: str) -> tuple[str, int, dict[str, int]]:
         # card's chips; skip live research and the day-hash pick entirely.
         return forced, 0, {"ceo_picked": 1}
     from automation_hub.blogger_topic_router import fetch_profile_headlines, fetch_today_headlines, rank_topics
-    from automation_hub.tistory_keywords import search_volumes, choose
+    from automation_hub.tistory_keywords import search_volumes, choose, reserve_topic
     profile = {"site_key":site["site_id"], "language":site.get("language","ko"),
                "wordpress":{"theme":site.get("description",""),"persona":site.get("title",""),"categories":site.get("categories",[])},"blogspot":{}}
-    volumes = search_volumes()
-    headlines = fetch_today_headlines() + fetch_profile_headlines(profile)
-    ranked = rank_topics(headlines, profile=profile, trend_terms=volumes)
-    return choose(ranked, volumes, site.get("recent_history", []))
+    try:
+        volumes = search_volumes()
+    except Exception:
+        volumes = {}
+    try:
+        headlines = fetch_today_headlines() + fetch_profile_headlines(profile)
+        ranked = rank_topics(headlines, profile=profile, trend_terms=volumes)
+        return choose(ranked, volumes, site.get("recent_history", []))
+    except Exception:
+        return reserve_topic(site, day)
 
 
 
@@ -78,6 +84,7 @@ def build_plan(now: datetime | None = None) -> dict:
     if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", run_key):
         raise ValueError("TISTORY_RUN_KEY must contain only letters, numbers, dot, underscore or hyphen")
     jobs = []
+    failures = []
     requested_site_ids = {s.strip() for s in os.environ.get("SITE_IDS", "").split(",") if s.strip()}
     enabled_sites = sorted(
         (site for site in cfg["sites"]
@@ -88,8 +95,13 @@ def build_plan(now: datetime | None = None) -> dict:
     for site in enabled_sites:
         from automation_hub.tistory_keywords import recent_history
         from automation_hub.tistory_schedule import slot_time
-        site = {**site, "recent_history": recent_history(site)}
-        seed_topic, keyword_score, keyword_breakdown = _pick_seed_topic(site, day)
+        try:
+            site = {**site, "recent_history": recent_history(site)}
+            seed_topic, keyword_score, keyword_breakdown = _pick_seed_topic(site, day)
+        except Exception as exc:
+            failures.append({'site_id': site['site_id'], 'status': 'PLAN_REPAIR_REQUIRED',
+                             'error_type': type(exc).__name__, 'reason': str(exc)[:250]})
+            continue
         jobs.append({
             "job_id": f"{site['site_id']}:{run_key}",
             "site_id": site["site_id"],
@@ -112,6 +124,7 @@ def build_plan(now: datetime | None = None) -> dict:
             "keyword_selection": (
                 "ceo_picked" if "ceo_picked" in keyword_breakdown
                 else "live_cross_media_noun_frequency" if "live_cross_media" in keyword_breakdown
+                else "evergreen_reserve" if "evergreen_reserve" in keyword_breakdown
                 else "golden_keyword_score"
             ),
             "keyword_score": keyword_score,
@@ -130,6 +143,7 @@ def build_plan(now: datetime | None = None) -> dict:
         "enabled_sites": len(enabled_sites),
         "public_allowed": False,
         "jobs": jobs,
+        "failures": failures,
     }
 
 

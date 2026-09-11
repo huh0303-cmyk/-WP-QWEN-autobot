@@ -70,3 +70,15 @@ def recent_history(site):
         if record.get('site_id')==site['site_id']:
             titles.extend([record.get('title',''),record.get('source_keyword','')])
     return [title for title in titles if title]
+
+
+def reserve_topic(site, day):
+    """Use configured evergreen search intents without inventing trend volume."""
+    candidates = [topic for topic in site.get('seed_topics', [])
+                  if not duplicate(topic, site.get('recent_history', []))]
+    if not candidates:
+        raise RuntimeError('비축 주제 중복 검사 후 잔여 없음: 주제 보충 필요')
+    import hashlib
+    index = int(hashlib.sha256((site['site_id'] + day).encode()).hexdigest()[:8], 16) % len(candidates)
+    return candidates[index], 0, {'evergreen_reserve': True, 'search_volume_approx': None,
+                                  'official_sources': site.get('official_sources', [])}
