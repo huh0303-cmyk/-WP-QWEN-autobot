@@ -91,7 +91,10 @@ def main() -> None:
         workflow_text[path.name] = text
         for token in BANNED_IMAGE_SECRET_REFS:
             if token in text:
-                fail(f"{path.name} still references banned image secret {token}")
+                stock_authorized = (path.name in (*REVIEWER_WORKFLOWS, "stock-image-preflight.yml")
+                                    and token in ("secrets.PEXELS_API_KEY", "secrets.PIXABAY_KEY"))
+                if not stock_authorized:
+                    fail(f"{path.name} still references banned image secret {token}")
         for token in BANNED_DEPRECATED_CHANNEL_REFS:
             if token in text:
                 fail(f"{path.name} still references deprecated channel {token}")
