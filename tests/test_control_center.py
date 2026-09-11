@@ -11,7 +11,7 @@ from control_center.db import Store
 from control_center.quality import score_article
 from control_center.registry import load_wordpress_sites
 from control_center.service import ControlCenter
-from control_center.app import ADSENSE_BLOGGER_URLS, HIDDEN_BLOGGER_URLS, _dispatch_draft_workflow, _site_rows, app as control_center_app, compact_category, get_review_queue, get_sns_data, get_youtube_data, wordpress_cadence
+from control_center.app import ADSENSE_BLOGGER_URLS, HIDDEN_BLOGGER_URLS, _dispatch_draft_workflow, _site_rows, app as control_center_app, blog_engine_defaults, compact_category, get_review_queue, get_sns_data, get_youtube_data, wordpress_cadence
 from control_center.keywords import weekly_suggestions
 from control_center.states import QUALITY_PASSED, WP_DRAFTED
 from control_center.wordpress import DraftResult
@@ -368,6 +368,28 @@ def test_locked_default_content_and_image_engines():
         "bytedance/sdxl-lightning-4step",
         "black-forest-labs/flux-schnell",
     ]
+
+
+def test_blog_engine_defaults_reflects_a_real_per_site_override():
+    """A dashboard card must show what a blog will actually use, not a
+    hardcoded network-default literal that silently lies about sites with
+    a real override configured in content_engine_profiles.json."""
+    profile_by_key = {
+        "kmedical_job_center": {"blogspot": {"text_model": "gpt-5-mini",
+                                              "image_models": ["bytedance/sdxl-lightning-4step", "black-forest-labs/flux-schnell"]}},
+    }
+    text_model, image_model = blog_engine_defaults(profile_by_key, "kmedical_job_center")
+    assert text_model == "gpt-5-mini"
+    assert image_model == "bytedance/sdxl-lightning-4step"
+
+
+def test_blog_engine_defaults_falls_back_to_network_default_when_unset():
+    profile_by_key = {"ktrip365": {"blogspot": {"text_model": "", "image_models": []}}}
+    text_model, image_model = blog_engine_defaults(profile_by_key, "ktrip365")
+    assert text_model == DEFAULT_TEXT_MODEL
+    assert image_model == DEFAULT_IMAGE_MODEL
+    # Also true for a site_key with no profile entry at all.
+    assert blog_engine_defaults({}, "unknown_site") == (DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL)
 
 
 def test_wordpress_cards_are_ranked_by_daily_traffic():
