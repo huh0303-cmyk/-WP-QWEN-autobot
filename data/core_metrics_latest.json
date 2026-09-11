@@ -3278,18 +3278,18 @@
   ],
   "paid_ai_used": false,
   "daily_header": {
-    "published_today": null,
-    "published_delta": null,
+    "published_today": 0,
+    "published_delta": 0,
     "confirmed_published_today": 0,
-    "covered_sites": 58,
+    "covered_sites": 60,
     "expected_sites": 60,
     "scope": "WP 25 · Blogspot 33 · 뉴스룸 2 · 현재 공개 글의 발행일 기준",
     "period": "KST 당일 00:00부터 표시된 기준 시각까지 · 전날 같은 시간대와 비교",
     "api_cost_total": null,
     "api_cost_delta": null,
     "api_cost_currency": "USD",
-    "recorded_estimate_usd": null,
-    "estimated_cost_delta_usd": null,
+    "recorded_estimate_usd": 0.0,
+    "estimated_cost_delta_usd": 0.0,
     "api_cost_note": "예상액 · 글쓰기+이미지 묶음 예약액 및 기타 원장 기록 합산 · 미기록 경로 제외 · 실패 전 예약 포함 · 실제 청구액과 다를 수 있음"
   }
 }
