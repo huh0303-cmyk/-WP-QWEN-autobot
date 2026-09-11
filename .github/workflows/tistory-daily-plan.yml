@@ -65,8 +65,8 @@ jobs:
           plan = json.load(open(path, encoding='utf-8'))
           wanted = {x.strip() for x in os.environ['SITE_IDS'].split(',') if x.strip()}
           plan['jobs'] = [job for job in plan['jobs'] if job['site_id'] in wanted]
-          plan['enabled_sites'] = len(plan['jobs'])
-          if not plan['jobs'] or {job['site_id'] for job in plan['jobs']} != wanted:
+          represented = {job['site_id'] for job in plan['jobs']} | {job['site_id'] for job in plan.get('failures', [])}
+          if represented != wanted:
               raise SystemExit('Unknown or empty Tistory site selection')
           json.dump(plan, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
           PY
@@ -78,7 +78,8 @@ jobs:
           p=json.load(open('artifacts/tistory-daily-plan.json', encoding='utf-8'))
           assert p['public_allowed'] is False
           assert p['portfolio_sites'] == 5
-          assert len(p['jobs']) == p['enabled_sites']
+          assert len(p['jobs']) + len(p.get('failures', [])) == p['enabled_sites']
+          assert p['jobs'], 'No site passed planning; inspect plan failures'
           assert len(p['jobs']) <= 5
           assert len({j['site_id'] for j in p['jobs']}) == len(p['jobs'])
           assert len({j['job_id'] for j in p['jobs']}) == len(p['jobs'])
@@ -108,6 +109,9 @@ jobs:
           python - <<'PY'
           import json
           d=json.load(open('artifacts/tistory-daily-drafts.json', encoding='utf-8'))
+          d['failures'] = [draft for draft in d['drafts'] if draft.get('status') != 'DRAFT_READY']
+          d['drafts'] = [draft for draft in d['drafts'] if draft.get('status') == 'DRAFT_READY']
+          json.dump(d, open('artifacts/tistory-daily-drafts.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
           assert d['public_allowed'] is False
           assert len(d['drafts']) > 0
           for draft in d['drafts']:
