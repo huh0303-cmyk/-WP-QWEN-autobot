@@ -40,12 +40,14 @@ def check(site):
             row['public_count'] = int(feed.get('openSearch$totalResults', {}).get('$t', 0))
             row['latest_url'] = next((x['href'] for x in entries[0].get('link', []) if x.get('rel') == 'alternate'), '') if entries else ''
             row['latest_published'] = entries[0]['published']['$t'] if entries else None
+            row['latest_title'] = entries[0].get('title', {}).get('$t', '') if entries else ''
         elif platform in {'wordpress', 'newsroom'}:
             posts = response.json()
             if not isinstance(posts, list):
                 raise ValueError('Expected a WordPress post list')
             row['latest_url'] = posts[0]['link'] if posts else ''
             row['latest_published'] = posts[0]['date_gmt'] + 'Z' if posts else None
+            row['latest_title'] = posts[0].get('title', {}).get('rendered', '') if posts else ''
             row['public_count'] = int(response.headers['X-WP-Total']) if response.headers.get('X-WP-Total') else None
         elif platform == 'tistory':
             item = ET.fromstring(response.content).find('./channel/item')
