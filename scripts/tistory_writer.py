@@ -82,12 +82,15 @@ def build_writer_prompt(job: dict) -> str:
             "high-search-volume angle on the seed topic."
         )
     if job.get("official_source_required"):
+        lines.append('Official reference destinations: ' + json.dumps(job.get('official_sources', []), ensure_ascii=False))
         lines.append(
             "Any date, amount, or deadline MUST be attributed to an official "
             "source by name (e.g. 정부24, 코레일, 지자체 공고). If you don't know "
             "the exact current figure, tell the reader to check the official "
             "source instead of inventing a number."
         )
+    if job.get('keyword_selection') == 'evergreen_reserve':
+        lines.append('This is an evergreen practical search intent, not breaking news. Do not claim a trend or search volume. Do not assert current amounts, eligibility, deadlines or policy changes without supplied source evidence. Never claim to have read the reference sites; explain the verification steps when evidence is absent.')
     lines.append("Write the article now as the JSON object described above.")
     return "\n".join(lines)
 
@@ -326,7 +329,14 @@ def main() -> int:
     args = parser.parse_args()
 
     plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
-    drafts = [generate_draft(job) for job in plan["jobs"]]
+    drafts = []
+    for job in plan['jobs']:
+        try:
+            drafts.append(generate_draft(job))
+        except Exception as exc:
+            drafts.append({'site_id': job['site_id'], 'job_id': job['job_id'],
+                           'status': 'DRAFT_REPAIR_REQUIRED', 'public_allowed': False,
+                           'error': type(exc).__name__})
     # Hard portfolio guard: similar/repeated titles across the five accounts
     # never reach the review-ready state.
     for index, draft in enumerate(drafts):
