@@ -3140,7 +3140,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     from editorial_title_gate import require_editorial_approval
     try:
         approval = require_editorial_approval(title=title, content=final, meta=meta, keyword=keyword,
-            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0))
+            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0),
+            is_newsroom_brief=is_newsroom,
+            source_evidence=site.get("_newsroom_source_evidence") if is_newsroom else None)
         print("EDITORIAL_APPROVAL " + json.dumps(approval, ensure_ascii=False))
     except Exception as exc:
         return {"ok": False, "error": f"Editorial gate blocked draft: {exc}"}
@@ -3369,6 +3371,7 @@ def process_one(site, keyword):
     news_source_url = None
     news_source_summary = None
     news_source_category = None
+    site.pop("_newsroom_source_evidence", None)
     if mode in ("news","news_en"):
         kw_tuple=crawl_rss_news(lang,site_url=url)
         keyword=kw_tuple[0] if isinstance(kw_tuple,tuple) else kw_tuple
@@ -3384,6 +3387,10 @@ def process_one(site, keyword):
             news_source_url=kw_tuple[3]
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=5:
             news_source_category=kw_tuple[4]
+        site["_newsroom_source_evidence"] = {
+            "publisher": news_source, "url": news_source_url,
+            "headline": keyword, "excerpt": news_source_summary,
+        }
 
     # 2026-08-19 사용자 지시: 태그 개수도 매번 10개 고정이면 패턴이 보이니 10~13개로 랜덤화
     tag_count = random.randint(9, 13)
@@ -3398,7 +3405,11 @@ def process_one(site, keyword):
             f"- Publisher: {news_source or 'Primary-source lead'}\n"
             f"- Source URL: {news_source_url or 'not supplied'}\n"
             f"- Feed summary: {news_source_summary or 'No summary supplied'}\n"
-            "Use only facts supported by this lead or clearly identified primary records. "
+            "Use only facts explicitly supported by this supplied headline and excerpt. "
+            "Attribute the report to the supplied publisher in the opening paragraph. "
+            "A secondary report is not direct access to its cited bank, official or another outlet. "
+            "Never imply you read those primary records or conducted original reporting. "
+            "Do not infer a month or year for relative dates; omit ambiguous dates instead. "
             "Do not invent quotations, statistics, witnesses, dates, locations, reactions, or additional sources. "
             "If the available facts are limited, write a concise brief rather than padding the article."
         )
@@ -3408,9 +3419,8 @@ def process_one(site, keyword):
     best_score=0; best_result=None; best_length_valid=False
 
     for attempt in range(MAX_REGEN+1):
-        # ★ 2026-08-28: attempt>0(=품질 목표 미달로 재작성하는 회차)이거나
-        #   뉴스룸(=중요글)이면 GPT로 간다. 그 외 일반 블로그 1회차는 Gemini.
-        use_gpt = attempt > 0 or mode in ("news", "news_en")
+        # First draft uses the shared Flash-first writer; quality repair uses GPT.
+        use_gpt = attempt > 0
         try:
             raw=generate_content_gemini(prompt, use_gpt=use_gpt)
         except Exception as e:
@@ -3514,7 +3524,7 @@ def process_one(site, keyword):
         else:
             source_label = news_source
         if lang=="ko":
-            body += f'<p><em>출처: {source_label}. 헤드라인과 공개 사실을 참고했으며, 본문은 Koreanews365 편집국이 독자적으로 작성했습니다.</em></p>'
+            body += f'<p><em>출처: {source_label}. 위 매체의 보도를 바탕으로 작성한 요약 기사입니다.</em></p>'
         else:
             body += f'<p><em>Source: {source_label}. The source headline and public facts were used as leads; this article was independently written by The Seoul Journal.</em></p>'
 

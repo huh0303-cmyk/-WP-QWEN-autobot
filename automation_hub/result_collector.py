@@ -5,6 +5,7 @@ import json
 import os
 import urllib.parse
 import urllib.request
+import urllib.error
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -90,16 +91,27 @@ def collect(repo: str, token: str, per_workflow: int = 10) -> dict:
     workflow_counts = Counter(r.workflow for r in registry.rooms if r.workflow)
     workflows = sorted(workflow_counts)
     runs_by_workflow: dict[str, list[dict]] = {}
+    collection_errors = {}
     for workflow in workflows:
-        payload = _request(
-            f"{API}/repos/{repo}/actions/workflows/{workflow}/runs?event=workflow_dispatch&per_page={per_workflow}",
-            token,
-        )
-        runs_by_workflow[workflow] = payload.get("workflow_runs") or []
+        try:
+            payload = _request(
+                f"{API}/repos/{repo}/actions/workflows/{urllib.parse.quote(workflow, safe='')}/runs?event=workflow_dispatch&per_page={per_workflow}",
+                token,
+            )
+            runs_by_workflow[workflow] = payload.get("workflow_runs") or []
+        except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+            collection_errors[workflow] = f"HTTP {exc.code}" if isinstance(exc, urllib.error.HTTPError) else type(exc).__name__
 
     rows = []
     unattributed_shared = 0
     for room in registry.rooms:
+        if room.workflow in collection_errors:
+            rows.append(make_status(room_id=room.room_id, platform=room.platform,
+                status='FAILED', workflow=room.workflow, publish_policy=room.publish_policy,
+                failure_reason='RESULT_COLLECTION_FAILED: ' + collection_errors[room.workflow],
+                details={'name': room.name, 'result_source': 'collection_error',
+                         'note': 'Publication outcome is unknown; this is a collection failure, not a failed publication.'}).to_dict())
+            continue
         runs = runs_by_workflow.get(room.workflow) or []
         run, match_method = _match_run(room, runs, workflow_counts.get(room.workflow, 0))
         if not run:
@@ -157,6 +169,7 @@ def collect(repo: str, token: str, per_workflow: int = 10) -> dict:
             "total": len(rows),
             "by_status": counts,
             "shared_workflow_unattributed_rooms": unattributed_shared,
+            "collection_errors": collection_errors,
         },
         "rows": rows,
     }
