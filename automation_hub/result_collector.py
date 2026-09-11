@@ -14,6 +14,7 @@ from .rooms import RoomRegistry
 from .status_schema import make_status
 
 API = "https://api.github.com"
+LOCAL_WORKFLOWS = {"naver-blog-local"}
 
 
 def _request(url: str, token: str) -> dict:
@@ -89,7 +90,7 @@ def _match_run(room, runs: list[dict], workflow_room_count: int) -> tuple[dict |
 def collect(repo: str, token: str, per_workflow: int = 10) -> dict:
     registry = RoomRegistry.load()
     workflow_counts = Counter(r.workflow for r in registry.rooms if r.workflow)
-    workflows = sorted(workflow_counts)
+    workflows = sorted(set(workflow_counts) - LOCAL_WORKFLOWS)
     runs_by_workflow: dict[str, list[dict]] = {}
     collection_errors = {}
     for workflow in workflows:
@@ -105,6 +106,13 @@ def collect(repo: str, token: str, per_workflow: int = 10) -> dict:
     rows = []
     unattributed_shared = 0
     for room in registry.rooms:
+        if room.workflow in LOCAL_WORKFLOWS:
+            rows.append(make_status(room_id=room.room_id, platform=room.platform,
+                status='AUTH_REQUIRED' if not room.destination_id else 'AWAITING_APPROVAL',
+                workflow=room.workflow, publish_policy=room.publish_policy,
+                details={'name': room.name, 'result_source': 'local_runner_not_collected',
+                         'note': 'Local browser execution has no GitHub workflow receipt.'}).to_dict())
+            continue
         if room.workflow in collection_errors:
             rows.append(make_status(room_id=room.room_id, platform=room.platform,
                 status='FAILED', workflow=room.workflow, publish_policy=room.publish_policy,
