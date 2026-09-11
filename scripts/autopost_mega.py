@@ -2085,28 +2085,9 @@ def _gemini_generate_text_raw(prompt, temperature=0.85):
 
 
 def generate_content_gemini(prompt, use_gpt=False):
-    """Generate with the locked network writer (GPT-5 mini by default).
-
-    The historical function name is retained for compatibility. Routing comes
-    from content_model_policy; Gemini remains an independent reviewer and is
-    not the routine first-draft writer. Claude is excluded.
-    """
-    from automation_hub.content_model_policy import choose_writer
-
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from openai_text import openai_available, openai_generate_text
-
-    decision = choose_writer(quality_fail=use_gpt, primary_available=openai_available())
-
-    if decision.provider == "none":
-        raise RuntimeError(f"writer blocked by content policy: {decision.reason} ({decision.status})")
-
-    if decision.provider == "openai":
-        if not openai_available():
-            raise RuntimeError("OPENAI_API_KEY is not configured for GPT-5 mini writing")
-        return openai_generate_text(prompt, temperature=0.85, max_retries=3)
-
-    return _gemini_generate_text_raw(prompt)
+    # 2026-09-11: user prioritizes Flash cost and a single GPT fallback.
+    from economy_text import generate_text
+    return generate_text(prompt, temperature=0.85, force_gpt=use_gpt)
 
 def strip_code_fences(text):
     """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
@@ -3251,7 +3232,8 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
 _log_buf=[]
 
 def log(site_url,theme,keyword,title,post_url,score,imgs,status,error="",author="",category=""):
-    writer_model = os.getenv("OPENAI_MODEL", "gpt-5-mini")
+    import economy_text
+    writer_model = economy_text.last_writer_model
     reviewer_model = GEMINI_MODEL
     _log_buf.append({"timestamp":now_kst().strftime("%Y-%m-%d %H:%M:%S"),"site":site_url,"theme":theme,"keyword":keyword,"title":title,"status":status,"seo_score":score,"images":imgs,"url":post_url,"error":error,"slot":str(RUN_SLOT),"model":writer_model,"writer_model":writer_model,"reviewer_model":reviewer_model,"author":author,"category":category})
 

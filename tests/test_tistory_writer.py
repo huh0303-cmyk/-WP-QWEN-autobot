@@ -17,10 +17,10 @@ AUDIT_OK = json.dumps({"ok": True, "issues": []})
 
 
 def test_gpt5_mini_then_deterministic_gate_then_image_chain():
-    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.generate_image_url", return_value="https://example.test/image.webp"):
+    with patch("economy_text.last_writer_model", "gemini-2.5-flash"), patch("economy_text.generate_text", return_value=VALID) as gpt, patch("tistory_writer.generate_image_url", return_value="https://example.test/image.webp"):
         draft = tistory_writer.generate_draft(JOB)
     gpt.assert_called_once()
-    assert draft["engine"] == "gpt"
+    assert draft["engine"] == "gemini-2.5-flash"
     assert draft["status"] == "DRAFT_READY"
     assert draft["quality_score"] >= 70
     assert draft["first_image_priority"] is True
@@ -29,11 +29,11 @@ def test_gpt5_mini_then_deterministic_gate_then_image_chain():
 
 
 def test_gpt_writer_has_no_gemini_fallback():
-    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=VALID) as gpt, patch("tistory_writer.generate_image_url", return_value=None):
+    with patch("economy_text.last_writer_model", "gemini-2.5-flash"), patch("economy_text.generate_text", return_value=VALID) as gpt, patch("tistory_writer.generate_image_url", return_value=None):
         draft = tistory_writer.generate_draft(JOB)
     gpt.assert_called_once()
     assert "gemini_generate" not in Path(tistory_writer.__file__).read_text(encoding="utf-8")
-    assert draft["engine"] == "gpt"
+    assert draft["engine"] == "gemini-2.5-flash"
     assert draft["status"] == "MEDIA_REQUIRED"
     assert draft["image_url"] is None
     assert draft["image_status"] == "missing_required_image"
@@ -42,7 +42,7 @@ def test_gpt_writer_has_no_gemini_fallback():
 
 def test_deterministic_quality_failure_is_a_blocking_gate():
     invalid = json.dumps({"title": "", "category": "임플란트", "meta_description": "짧음", "image_prompt": "", "body_html": "<p>짧음</p>"})
-    with patch("tistory_writer.openai_available", return_value=True), patch("tistory_writer.openai_generate_text", return_value=invalid), patch("tistory_writer.generate_image_url") as image:
+    with patch("economy_text.last_writer_model", "gemini-2.5-flash"), patch("economy_text.generate_text", return_value=invalid), patch("tistory_writer.generate_image_url") as image:
         draft = tistory_writer.generate_draft(JOB)
     assert draft["status"] == "QUALITY_FAILED"
     assert draft["public_allowed"] is False
