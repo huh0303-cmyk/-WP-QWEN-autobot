@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 8.25,
+  "spent_estimate_usd": 8.28,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -2210,6 +2210,15 @@
       "amount_usd": 0.03,
       "reservation_id": "059abffdc651d278f75cf9ab4a7cd2cc1358b486423dc0ed94659f2efad9639c",
       "run_id": "34574078396",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-11T16:28:41.502848+09:00",
+      "label": "blogger-rewrite:blogger_kinsurance365",
+      "amount_usd": 0.03,
+      "reservation_id": "96c4b2b5bd9c9067cf06caee7458807d4ba48571b2646a4ab505c642162ce0de",
+      "run_id": "34574079024",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
