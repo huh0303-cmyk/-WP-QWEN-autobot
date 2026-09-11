@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Pull latest and restart control-room services
+      - name: Request deployment through the VPS deployment owner
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -27,14 +27,15 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           script: |
             set -e
-            cd /opt/korea365
-            # A plain fast-forward pull, not reset --hard: the working tree
-            # may hold local runtime state (SQLite DB, queue/state JSON) that
-            # a hard reset would silently discard. Fail loudly instead of
-            # destroying data if the tree ever has local commits to reconcile.
-            git fetch origin main
-            git merge --ff-only origin/main
-            systemctl restart korea365-control.service korea365-operations.service
-            sleep 2
+            # Share the timer's lock, video guard, backup and rollback logic.
+            # A second git pull/restart races the timer and cancels service jobs.
+            systemctl start korea365-deploy.service
+            python3 - <<'PY'
+            import json
+            from pathlib import Path
+            state = json.loads(Path('/opt/korea365/data/deploy-status.json').read_text())
+            print(json.dumps({k: state.get(k) for k in ('status', 'deployed_commit', 'target_commit')}))
+            if state.get('status') not in {'current', 'deployed'}:
+                raise SystemExit('Deployment is deferred or failed; inspect VPS deployment status')
+            PY
             systemctl is-active korea365-control.service korea365-operations.service
-            echo "Deployed $(git rev-parse --short HEAD)"
