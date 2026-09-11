@@ -362,9 +362,8 @@ def main():
                     "Use the source publication date as the source's date, never invent a verification date."
                 )
         try:
-            if not openai_available():
-                raise RuntimeError("GPT-5 mini writer unavailable")
-            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1, timeout=120)
+            from economy_text import generate_text
+            raw = generate_text(prompt, temperature=0.7)
             candidate = parse_rewrite_json(raw)
             previous_candidate = candidate
             if source is not None:

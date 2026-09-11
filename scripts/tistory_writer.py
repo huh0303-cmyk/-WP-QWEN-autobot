@@ -150,20 +150,18 @@ def _parse_json_response(raw: str) -> dict:
         return json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text))
 
 
-def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
+def _write_body(job: dict, provider: str = "auto") -> tuple[str, str]:
     """Returns (raw_response_text, engine_used).
 
-    GPT-5 mini is the only authoring engine; no second model is required.
+    Flash first; GPT is the bounded fallback or explicit repair choice.
     """
     from automation_hub.repetition_guard import history_prompt
     prompt = build_writer_prompt(job) + "\n" + history_prompt([{"title": t} for t in job.get("recent_titles", [])])
     from editorial_brief import editorial_brief
     prompt += editorial_brief(prompt)
-    if provider != "gpt":
-        raise RuntimeError("Only GPT-5 mini may write Tistory drafts")
-    if not openai_available():
-        raise RuntimeError("GPT-5 mini writer credentials are unavailable")
-    return openai_generate_text(prompt, temperature=0.7, max_retries=3), "gpt"
+    import economy_text
+    raw = economy_text.generate_text(prompt, temperature=0.7, force_gpt=provider == "gpt")
+    return raw, economy_text.last_writer_model
 
 
 def quality_score(draft: dict, job: dict) -> tuple[int, list[str]]:
@@ -221,7 +219,7 @@ def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
         f"Current draft JSON:\n{json.dumps(draft, ensure_ascii=False)}\n\n"
         "Return only the corrected JSON object."
     )
-    parsed = _parse_json_response(openai_generate_text(prompt, temperature=0.35, max_retries=3))
+    parsed = _parse_json_response(openai_generate_text(prompt, temperature=0.35, max_retries=1))
     category = parsed.get("category")
     if category not in job["categories"]:
         category = draft["category"] if draft.get("category") in job["categories"] else job["categories"][0]
@@ -246,9 +244,8 @@ def _rewrite_after_consensus(draft: dict, job: dict, consensus: dict) -> dict:
 def generate_draft(job: dict) -> dict:
     errors = []
     draft = None
-    # Retry GPT-5 mini up to three times when a response misses the mechanical
-    # length/SEO gate. No alternate model is used.
-    for provider in ("gpt", "gpt", "gpt"):
+    # One initial attempt and at most one repair; retain existing quality gates.
+    for provider in ("auto", "gpt"):
         try:
             raw, engine = _write_body(job, provider)
             parsed = _parse_json_response(raw)

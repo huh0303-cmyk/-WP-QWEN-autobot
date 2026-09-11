@@ -1,0 +1,31 @@
+name: Publication network read-only health and writer probe
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Check all 66 public destinations
+        run: python scripts/publication_health_audit.py
+      - name: One short Flash response with a single GPT fallback
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: 'true'
+          PYTHONPATH: scripts
+        run: python -c "from economy_text import generate_text; text = generate_text('Return exactly the word OK.'); print('Writer returned text:', bool(text.strip()))"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: publication-health
+          path: |
+            artifacts/publication-health.json
+            artifacts/article-writer-usage.jsonl

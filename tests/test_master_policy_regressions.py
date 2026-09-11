@@ -31,44 +31,17 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         assert all(domain in playbook for domain in wp_domains + tistory_domains)
         assert "### Blogger" in playbook
 
-    def test_wordpress_text_generator_uses_gpt_primary(self):
-        source = (ROOT / "scripts" / "autopost_mega.py").read_text(encoding="utf-8")
-        block = source.split("def generate_content_gemini(prompt, use_gpt=False):", 1)[1].split(
-            "def strip_code_fences", 1
-        )[0]
-        self.assertIn("_gemini_generate_text_raw(prompt)", block)
-        self.assertIn("openai_generate_text(prompt", block)
-        self.assertIn("use_gpt", block)
-
-    def test_wordpress_default_goes_straight_to_gpt_never_calls_gemini(self):
+    def test_wordpress_routes_to_bounded_writer(self):
         import sys
         from unittest.mock import patch
-
         sys.path.insert(0, str(ROOT / "scripts"))
-        import autopost_mega as am
-
-        with patch.object(am, "_gemini_generate_text_raw") as gemini_call, \
-             patch("openai_text.openai_available", return_value=True), \
-             patch("openai_text.openai_generate_text", return_value="gpt output") as gpt_call:
-            result = am.generate_content_gemini("prompt", use_gpt=False)
-        gemini_call.assert_not_called()
-        gpt_call.assert_called_once()
-        self.assertEqual(result, "gpt output")
-
-    def test_wordpress_use_gpt_true_goes_straight_to_gpt_never_calls_gemini(self):
-        import sys
-        from unittest.mock import patch
-
-        sys.path.insert(0, str(ROOT / "scripts"))
-        import autopost_mega as am
-
-        with patch.object(am, "_gemini_generate_text_raw") as gemini_call, \
-             patch("openai_text.openai_available", return_value=True), \
-             patch("openai_text.openai_generate_text", return_value="gpt output") as gpt_call:
-            result = am.generate_content_gemini("prompt", use_gpt=True)
-        gemini_call.assert_not_called()
-        gpt_call.assert_called_once()
-        self.assertEqual(result, "gpt output")
+        generator = load_autopost_functions("generate_content_gemini")["generate_content_gemini"]
+        with patch("economy_text.generate_text", return_value="article") as writer:
+            self.assertEqual(generator("prompt"), "article")
+            writer.assert_called_once_with("prompt", temperature=0.85, force_gpt=False)
+        with patch("economy_text.generate_text", return_value="repair") as writer:
+            self.assertEqual(generator("prompt", use_gpt=True), "repair")
+            writer.assert_called_once_with("prompt", temperature=0.85, force_gpt=True)
 
     def test_platform_queue_fails_workflow_when_publisher_fails(self):
         source = (ROOT / "scripts" / "process_platform_queue.py").read_text(encoding="utf-8")
