@@ -32,8 +32,13 @@ def _gpt_check(label: str, rule: str) -> dict:
     if not openai_available():
         return {"ok": False, "issues": ["GPT checker unavailable"]}
     try:
-        return _json(openai_generate_text(f"You are the {label} independent quality checker. " + rule,
+        result = _json(openai_generate_text(f"You are the {label} independent quality checker. " + rule,
                                           temperature=0.0, max_retries=1, timeout=120))
+        if not isinstance(result, dict) or not isinstance(result.get('issues'), list):
+            return {'ok': False, 'issues': ['check_failed: invalid review schema']}
+        # An approval boolean cannot override errors in the same review.
+        result['ok'] = result.get('ok') is True and not result['issues']
+        return result
     except Exception as exc:
         return {"ok": False, "issues": [f"check_failed: {exc}"]}
 
@@ -81,6 +86,12 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
             "Reject additions about eligibility, amounts, or events absent from the excerpt, "
             "but do not demand that the writer invent details the source never provided. "
         )
-    rule += "Return only JSON: {\"ok\": bool, \"issues\": [str]}. Draft:\n" + packet
+    rule += (
+        'Separate blocking errors from optional advice. Factual mistakes, incorrect attribution, '
+        'unsupported claims and misleading translations MUST go in issues and require ok=false. '
+        'Purely optional style/SEO improvements belong only in suggestions. '
+        'Set ok=true only when issues is empty. '
+        'Return only JSON: {"ok": bool, "issues": [str], "suggestions": [str]}. Draft:\n' + packet
+    )
     results = {"gpt_1": _gpt_check("first", rule), "gpt_2": _gpt_check("second", rule)}
     return {"ok": all(result.get("ok") is True for result in results.values()), "checks": results}
