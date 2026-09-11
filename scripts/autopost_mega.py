@@ -3127,7 +3127,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     author_bio_html = "" if is_newsroom else build_author_bio_html(url, site.get("lang","ko"), reporter, keyword)
     final += author_bio_html
 
-    related_html = build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
+    related_html = "" if is_newsroom else build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
 
     if is_newsroom and cat_id:
@@ -3139,10 +3139,17 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     # generated captions and footer. No later title/content substitution.
     from editorial_title_gate import require_editorial_approval
     try:
-        approval = require_editorial_approval(title=title, content=final, meta=meta, keyword=keyword,
-            gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0),
-            is_newsroom_brief=is_newsroom,
-            source_evidence=site.get("_newsroom_source_evidence") if is_newsroom else None)
+        if is_newsroom:
+            from newsroom_review_repair import review_newsroom
+            title, final, meta, approval = review_newsroom(title=title, content=final, meta=meta,
+                keyword=keyword, source_evidence=site.get("_newsroom_source_evidence"))
+            repeat_errors = repetition_issues(title, final, fetch_wp_history(requests, url, (WP_USER, pw)))
+            if repeat_errors:
+                raise ValueError('; '.join(repeat_errors))
+            body_html = final
+        else:
+            approval = require_editorial_approval(title=title, content=final, meta=meta, keyword=keyword,
+                gemini_generate=lambda prompt: _gemini_generate_text_raw(prompt, temperature=0.0))
         print("EDITORIAL_APPROVAL " + json.dumps(approval, ensure_ascii=False))
     except Exception as exc:
         return {"ok": False, "error": f"Editorial gate blocked draft: {exc}"}
@@ -3209,7 +3216,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
                 requests.patch(f"{url}/wp-json/wp/v2/posts/{pid}",auth=(WP_USER,pw),
                                json={"meta":{"rank_math_focus_keyword":rank_kw,"rank_math_description":meta}},timeout=15)
             if post_status == "draft":
-                return {"ok":True,"post_id":pid,"url":purl,"status":"draft",
+                return {"ok":True,"post_id":pid,"url":purl,"status":"draft","title":title,
                         "author":reporter["name"],"category":cat_name,
                         "verification":{"ok":True,"mode":"draft_review"}}
             verification = verify_publication(purl, title, site_url=url)
@@ -3220,7 +3227,7 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
             # IndexNow ping only after the public page is verified.
             ping_indexnow(purl, url)
             report_publication_progress("published", url, public_url=verification.final_url or purl, detail="공개 페이지 검증 완료")
-            return {"ok":True,"post_id":pid,"url":verification.final_url or purl,"status":"publish",
+            return {"ok":True,"post_id":pid,"url":verification.final_url or purl,"status":"publish","title":title,
                     "author":reporter["name"],"category":cat_name,
                     "verification":verification.to_dict()}
         else:
@@ -3658,6 +3665,7 @@ def process_one(site, keyword):
 
     result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
     if result["ok"]:
+        title = result.get("title", title)
         is_draft = result.get("status") == "draft"
         outcome = "초안 생성" if is_draft else "공개 발행"
         log_status = "✅ DRAFT" if is_draft else "✅ OK"
