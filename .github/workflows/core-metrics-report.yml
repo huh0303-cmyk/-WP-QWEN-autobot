@@ -6,6 +6,10 @@ on:
         type: boolean
         default: true
         description: Send the requested four-metric email
+      refresh_header:
+        type: boolean
+        default: false
+        description: Refresh only publication/cost header at the existing cutoff, preserve four metrics
       baseline_date:
         type: string
         default: ''
@@ -35,7 +39,13 @@ jobs:
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           BASELINE_DATE: ${{ inputs.baseline_date }}
-        run: python scripts/core_metrics_report.py --baseline-date "$BASELINE_DATE"
+          REFRESH_HEADER: ${{ inputs.refresh_header }}
+        run: |
+          if [ "$REFRESH_HEADER" = true ]; then
+            python scripts/core_metrics_report.py --refresh-header
+          else
+            python scripts/core_metrics_report.py --baseline-date "$BASELINE_DATE"
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: core-metrics-collected
@@ -65,12 +75,15 @@ jobs:
           GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
           GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          REFRESH_HEADER: ${{ inputs.refresh_header }}
           SEND_EMAIL: ${{ github.event_name == 'schedule' || inputs.send_email }}
         run: |
+          MODE=--refresh-index
+          if [ "$REFRESH_HEADER" = true ]; then MODE=--render-only; fi
           if [ "$SEND_EMAIL" = true ]; then
-            python scripts/core_metrics_report.py --refresh-index --email
+            python scripts/core_metrics_report.py "$MODE" --email
           else
-            python scripts/core_metrics_report.py --refresh-index
+            python scripts/core_metrics_report.py "$MODE"
           fi
       - uses: actions/upload-artifact@v4
         if: always()

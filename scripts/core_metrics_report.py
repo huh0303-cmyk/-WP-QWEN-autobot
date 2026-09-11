@@ -61,8 +61,8 @@ def previous_day(history, day):
     return {r["url"]: r for r in history.get("days", {}).get(key, {}).get("records", [])}
 
 
-def collect(baseline_date=""):
-    stamp = datetime.now(KST).isoformat()
+def collect(baseline_date="", cutoff_stamp=None):
+    stamp = cutoff_stamp or datetime.now(KST).isoformat()
     day = stamp[:10]
     history = read("data/core_metrics_history.json")
     prior = previous_day(history, day)
@@ -85,7 +85,10 @@ def collect(baseline_date=""):
             row["errors"].append("방문 수집 실패")
         try:
             from core_metrics_gsc import published_wordpress_urls
-            row["published_urls"] = published_wordpress_urls(url)
+            from core_metrics_header import publication_counts
+            posts = published_wordpress_urls(url, with_dates=True)
+            row["published_urls"] = [post["link"] for post in posts]
+            row.update(publication_counts(posts, stamp, "date_gmt"))
             row["total_posts"] = len(row["published_urls"])
             row["posts_checked_at"] = datetime.now(KST).isoformat()
         except Exception:
@@ -103,16 +106,19 @@ def collect(baseline_date=""):
     def blogger(blog):
         url = blog["blogspot"].rstrip("/")
         row = {"url": url, "platform": "blogger", "name": blog.get("title"), "errors": [], "visitor_basis": "Blogger 자체 조회수"}
-        urls = []
+        urls, published_posts = [], []
         try:
             endpoint = "https://www.googleapis.com/blogger/v3/blogs/" + str(blog["destination_id"])
-            params = {"maxResults": 500, "fetchBodies": "false", "status": "live", "fields": "items(url),nextPageToken"}
+            params = {"maxResults": 500, "fetchBodies": "false", "status": "live", "fields": "items(url,published),nextPageToken"}
             while True:
                 result = get(endpoint + "/posts", headers=blogger_headers, params=params).json()
+                published_posts.extend(result.get("items", []))
                 urls.extend(x["url"] for x in result.get("items", []))
                 if not result.get("nextPageToken"):
                     break
                 params["pageToken"] = result["nextPageToken"]
+            from core_metrics_header import publication_counts
+            row.update(publication_counts(published_posts, stamp, "published"))
             row.update(total_posts=len(urls), posts_checked_at=datetime.now(KST).isoformat())
             pv = get(endpoint + "/pageviews", headers=blogger_headers, params={"range": "all"}).json()
             row["total_visitors"] = next((number(c.get("count")) for c in pv.get("counts", []) if c.get("timeRange", "").upper() in {"ALL", "ALL_TIME"}), None)
@@ -135,6 +141,8 @@ def collect(baseline_date=""):
         row["comparison_date"] = (datetime.fromisoformat(day).date() - timedelta(days=1)).isoformat() if old else None
     from core_metrics_policy import classify
     result = {"generated_at": stamp, "records": records, "paid_ai_used": False, **classify(stamp, baseline_date)}
+    from core_metrics_header import header_summary
+    result["daily_header"] = header_summary(records, stamp, read("budget_state.json"))
     history.setdefault("days", {})[day] = result
     return result, history
 
@@ -163,14 +171,30 @@ def report_html(result):
         day = stamp.date().isoformat()
     except (ValueError, TypeError):
         display_stamp, day = str(raw_stamp), ""
+    summary = result.get("daily_header", {})
+    count = summary.get("published_today")
+    change = summary.get("published_delta")
+    total_label = f"{count:,}건" if count is not None else "미확인"
+    if change is None:
+        delta_label = "증감 미확인"
+    else:
+        color = "#1d4ed8" if change > 0 else "#dc2626" if change < 0 else "#475569"
+        delta_label = f'<span style="color:{color}">{change:+,}건</span>'
+    header_line = f'<span class="metrics-daily-totals" style="display:inline-block;font-size:18px;line-height:1.6;margin-left:12px">(당일 총발행 {total_label} ({delta_label}) · API 총비용 미확인 (증감 미확인))</span>'
     parts = ["<h2>통제실 네 가지 핵심 통계</h2>",
-             f'<p class="metrics-reference-time" data-date="{day}" style="font-size:clamp(22px,3vw,32px);font-weight:800;line-height:1.4;color:#0f172a;padding:16px;background:#eff6ff;border:2px solid #93c5fd;border-radius:12px">{html.escape(display_stamp)}</p>',
+             f'<p class="metrics-reference-time" data-date="{day}" style="font-size:clamp(22px,3vw,32px);font-weight:800;line-height:1.4;color:#0f172a;padding:16px;background:#eff6ff;border:2px solid #93c5fd;border-radius:12px">{html.escape(display_stamp)} {header_line}</p>',
              "<p>고정 기준: 매일 KST 07:00 수집. 일일 방문: 전날 07:00부터 오늘 07:00까지 누적 조회수 증가분. 일일 증감: 직전 24시간 증가분 대비. 나머지 증감: 전날 07:00 정기 저장값 대비. WP·Blogger 원천 조회수이며 고유 방문자 수와 다를 수 있습니다. 미확인은 0이 아닙니다.</p>",
              "<p>Google 색인은 공개 발행 글 URL의 검사 결과입니다. 카테고리·태그 등을 포함하는 GSC 전체 페이지 수와 다릅니다. 전체 URL 검사가 완료돼야 색인 글수를 확정합니다. 검사 실패·시간 초과는 미확인으로 표시합니다. Google 결과에는 반영 지연이 있을 수 있습니다.</p>"]
     label = "07:00 정기 집계" if result.get("report_kind") == "daily_0700" else "임시 점검 자료 · 07:00 정기 비교 기준으로 사용하지 않음"
     parts.insert(2, "<p>" + label + " · 실제 API 확인 시각은 각 항목에 기록</p>")
     if not result.get("policy_version"):
         parts[3] = "<p>기존 임시 집계: 일일 방문은 당일 현재 조회수, 증감은 어제 하루와 비교한 값입니다. 새 07:00 고정 비교 자료가 생성되면 교체됩니다. 누적·색인·총글의 실제 확인 시각은 각 항목에 표시합니다.</p>"
+    notes = [summary.get("scope", "WP·Blogspot·뉴스룸 60개 합계"), summary.get("period", "KST 당일 00:00~기준 시각"), summary.get("api_cost_note", "실제 API 청구액 미연동")]
+    if summary.get("recorded_estimate_usd") is not None:
+        notes.append(f"기록된 일부 API 추정 예약액 ${summary['recorded_estimate_usd']:.4f} · 실제 총비용 아님")
+    if count is None and summary.get("expected_sites"):
+        notes.append(f"발행일 수집 {summary['covered_sites']}/{summary['expected_sites']}개 사이트 · 확인된 발행 {summary['confirmed_published_today']}건")
+    parts.insert(3, '<p class="metrics-header-notes">' + html.escape(" / ".join(notes)) + "</p>")
     for platform, title in [("wordpress", "WordPress 25개"), ("blogger", "Blogspot 33개"), ("news", "뉴스룸 2개 · 별도")]:
         rows = sorted((r for r in result["records"] if r["platform"] == platform),
                       key=lambda r: (r.get("today_visitors") is None, -(r.get("today_visitors") or 0), r["url"]))
@@ -208,8 +232,18 @@ def main():
     parser.add_argument("--email", action="store_true")
     parser.add_argument("--refresh-index", action="store_true")
     parser.add_argument("--baseline-date", default="")
+    parser.add_argument("--refresh-header", action="store_true")
+    parser.add_argument("--render-only", action="store_true")
     args = parser.parse_args()
-    if args.refresh_index:
+    if args.refresh_header:
+        result = read("data/core_metrics_latest.json")
+        measured, _ = collect(cutoff_stamp=result["generated_at"])
+        result["daily_header"] = measured["daily_header"]
+        history = read("data/core_metrics_history.json")
+        history.setdefault("days", {})[result["generated_at"][:10]] = result
+    elif args.render_only:
+        result, history = read("data/core_metrics_latest.json"), read("data/core_metrics_history.json")
+    elif args.refresh_index:
         from core_metrics_gsc import refresh
         result = refresh(read("data/core_metrics_latest.json"), read("data/core_metrics_history.json"))
         history = read("data/core_metrics_history.json")
