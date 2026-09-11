@@ -11,6 +11,18 @@ import requests
 from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
 
 
+def visitor_counter_html(page_id: str) -> str:
+    """A free, no-signup visitor-count badge appended to a Blogger post.
+    Uses one page_id per blog (not per post) so the count accumulates
+    site-wide across every post that embeds it."""
+    safe_id = re.sub(r"[^a-zA-Z0-9_-]", "-", page_id)
+    return (
+        '<p style="text-align:center;margin-top:24px;">'
+        f'<img src="https://visitor-badge.laobi.icu/badge?page_id={safe_id}" '
+        'alt="visitor count" loading="lazy" /></p>'
+    )
+
+
 def plain_text(value: str) -> str:
     value = re.sub(r"(?is)<(script|style).*?>.*?</\1>", "", value)
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"(?s)<[^>]+>", " ", value))).strip()
