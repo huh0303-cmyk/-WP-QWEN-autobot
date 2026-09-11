@@ -26,6 +26,7 @@ class PublicationVerification:
 
 def _normalize_title(value: str) -> str:
     value = html.unescape(re.sub(r"<[^>]+>", " ", value or ""))
+    value = value.translate(str.maketrans({'‘': "'", '’': "'", '“': '"', '”': '"'}))
     return re.sub(r"\s+", " ", value).strip().casefold()
 
 
@@ -83,7 +84,7 @@ def verify_publication(
                 last.error_code = "redirected_to_home"
                 last.error_message = f"permalink redirected to site home: {final_url}"
                 continue
-            if expected and expected not in normalized_page_title and normalized_page_title not in expected:
+            if expected and (not normalized_page_title or (expected not in normalized_page_title and normalized_page_title not in expected)):
                 last.error_code = "title_mismatch"
                 last.error_message = f"expected title was not found in page title: {page_title!r}"
                 continue
