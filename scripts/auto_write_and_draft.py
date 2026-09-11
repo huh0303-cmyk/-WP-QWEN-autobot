@@ -204,6 +204,9 @@ def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_
         "rank_math_focus_keyword": focus_keyword,
         "rank_math_description": article.get("meta_description", ""),
     }
+    from editorial_image_guard import filter_wp_images
+    checked_images = filter_wp_images(site_url, [image_url] if image_url else [], (WP_USER, wp_pass))
+    image_url = checked_images[0] if checked_images else ""
     featured_media_id = ensure_featured_media(site_url, wp_pass, image_url, article["title"])
     if featured_media_id:
         data["featured_media"] = featured_media_id
