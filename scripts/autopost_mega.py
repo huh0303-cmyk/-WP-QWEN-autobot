@@ -3108,6 +3108,8 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     if not cat_id:
         cat_id=pick_best_category(url,pw,keyword,title)
 
+    from editorial_image_guard import filter_wp_images
+    images = filter_wp_images(url, images, (WP_USER, pw))
     hero=build_img_html(images[:1],keyword,alt_text=title)
     mid =build_img_html(images[1:2],keyword,alt_text=keyword) if len(images)>1 else ""
     end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}") if len(images)>2 else ""
