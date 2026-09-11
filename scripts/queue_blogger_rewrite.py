@@ -341,6 +341,9 @@ def main():
             )
         recent_content = [r for r in queue_records if r.get("site_id") == blogger_site_id and r.get("status", "").lower() in ACTIVE_CONTENT_STATUSES]
         prompt += "\n" + history_prompt(recent_content)
+        if attempt == 1:
+            from editorial_brief import editorial_brief
+            prompt += editorial_brief(prompt)
         if previous_candidate is not None:
             body_count = len(re.sub(r"\s+", "", plain_text(previous_candidate["content_html"])))
             meta_count = len(str(previous_candidate["meta_description"]).strip())

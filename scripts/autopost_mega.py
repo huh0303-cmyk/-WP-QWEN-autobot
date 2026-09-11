@@ -3109,7 +3109,12 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
         cat_id=pick_best_category(url,pw,keyword,title)
 
     from editorial_image_guard import filter_wp_images
-    images = filter_wp_images(url, images, (WP_USER, pw))
+    selected_photo = site.get("_newsroom_real_photo")
+    candidates = ([selected_photo["image_url"]] if selected_photo else []) + images
+    checked_images = filter_wp_images(url, candidates, (WP_USER, pw))
+    if selected_photo and selected_photo["image_url"] not in checked_images:
+        site.pop("_newsroom_real_photo", None)
+    images = [image for image in checked_images if not selected_photo or image != selected_photo["image_url"]]
     hero=build_img_html(images[:1],keyword,alt_text=title)
     mid =build_img_html(images[1:2],keyword,alt_text=keyword) if len(images)>1 else ""
     end =build_img_html(images[2:3],keyword,alt_text=f"{keyword} {theme}") if len(images)>2 else ""
@@ -3415,6 +3420,8 @@ def process_one(site, keyword):
             "Do not invent quotations, statistics, witnesses, dates, locations, reactions, or additional sources. "
             "If the available facts are limited, write a concise brief rather than padding the article."
         )
+    from editorial_brief import editorial_brief
+    base_prompt += editorial_brief(base_prompt)
     prompt=base_prompt
     best_score=0; best_result=None; best_length_valid=False
 

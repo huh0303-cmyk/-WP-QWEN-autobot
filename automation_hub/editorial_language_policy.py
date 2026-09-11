@@ -29,7 +29,7 @@ BODY_CLICHE_PATTERN = re.compile(
 
 
 def title_cliches(title: str) -> list[str]:
-    return [match.group(0) for match in TITLE_CLICHE_PATTERN.finditer(title or "")]
+    return (["How-start headline"] if re.match(r'^\s*how\b', title or '', re.I) else []) + [match.group(0) for match in TITLE_CLICHE_PATTERN.finditer(title or "")]
 
 
 def body_cliches(text: str) -> list[str]:

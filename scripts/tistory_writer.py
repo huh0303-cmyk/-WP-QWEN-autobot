@@ -157,6 +157,8 @@ def _write_body(job: dict, provider: str = "gpt") -> tuple[str, str]:
     """
     from automation_hub.repetition_guard import history_prompt
     prompt = build_writer_prompt(job) + "\n" + history_prompt([{"title": t} for t in job.get("recent_titles", [])])
+    from editorial_brief import editorial_brief
+    prompt += editorial_brief(prompt)
     if provider != "gpt":
         raise RuntimeError("Only GPT-5 mini may write Tistory drafts")
     if not openai_available():

@@ -1,5 +1,7 @@
 """Remove duplicate hero/inline images from existing posts; keep IDs and text."""
-import json,os
+import json,os,socket
+import urllib3.util.connection
+urllib3.util.connection.allowed_gai_family = lambda: socket.AF_INET
 from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
@@ -15,7 +17,11 @@ known=[];results=[]
 for post in reversed(posts):
     url=photo_url(post)
     if not url:continue
-    fp=image_fingerprint(url)
+    try:
+        fp=image_fingerprint(url)
+    except Exception as exc:
+        print(json.dumps({'id':post['id'],'status':'image_unavailable','error_type':type(exc).__name__}))
+        continue
     duplicate=next((p for old,p in known if same_photo(fp,old)),None)
     if not duplicate:known.append((fp,post));continue
     record={'id':post['id'],'url':post['link'],'duplicates_post':duplicate['id'],'status':'identified'}
@@ -29,7 +35,13 @@ for post in reversed(posts):
     soup=BeautifulSoup(current['content']['raw'],'html.parser')
     for img in list(soup.find_all('img')):
         src=img.get('src','')
-        if src and same_photo(image_fingerprint(src),fp):
+        if not src:continue
+        try:
+            matches=same_photo(image_fingerprint(src),fp)
+        except requests.RequestException:
+            # An expired unrelated inline URL must not stop hero cleanup.
+            continue
+        if matches:
             parent=img.find_parent('figure')
             if parent:parent.decompose()
             else:img.decompose()

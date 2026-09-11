@@ -8,6 +8,9 @@ on:
       repair_images_only:
         type: boolean
         default: false
+      post_limit:
+        type: string
+        default: "10"
       site_url:
         type: string
         default: 'https://korea365.org'
@@ -59,6 +62,8 @@ jobs:
           STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
           WP_USER: ${{ secrets.WP_USER }}
+          OPENAI_ENABLED: "true"
+          REPAIR_POST_LIMIT: ${{ inputs.post_limit }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}

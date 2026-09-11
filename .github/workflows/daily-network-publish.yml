@@ -75,6 +75,8 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           GH_ASSET_TOKEN: ${{ github.token }}
+          GEMINI_EDITOR_ENABLED: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_ENABLED: "true"
           CLAUDE_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
@@ -207,4 +209,5 @@ jobs:
           path: |
             artifacts/stock-image-receipts.jsonl
             artifacts/image-cost-estimates.jsonl
+            artifacts/editorial-brief-cost.jsonl
           if-no-files-found: ignore

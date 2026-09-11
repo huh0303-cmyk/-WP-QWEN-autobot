@@ -97,6 +97,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           BUDGET_GITHUB_REPOSITORY: ${{ github.repository }}
           BUDGET_GITHUB_BRANCH: main
+          GEMINI_EDITOR_ENABLED: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
           CLAUDE_ENABLED: "false"
@@ -157,4 +159,5 @@ jobs:
           path: |
             artifacts/stock-image-receipts.jsonl
             artifacts/image-cost-estimates.jsonl
+            artifacts/editorial-brief-cost.jsonl
           if-no-files-found: ignore
