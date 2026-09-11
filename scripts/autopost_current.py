@@ -5,16 +5,12 @@
 Keeps the mature autopost_mega engine while applying current operational metadata that
 must not regress to legacy labels retained in the large historical module.
 
-Current hard policy:
-- All WordPress and newsroom draft text generation uses GPT-5 mini by default.
-- 2026-08-28 user decision: free-stock images (Pexels/Pixabay) stay banned, but paid
-  Replicate image generation (FLUX-primary, capped at 1 image/post by
-  replicate_image_provider's own hard guard) is re-enabled after the "no images at all"
-  policy structurally capped every post below the former SEO publish gate (0/24 posts
-  published today). User explicitly approved the Replicate cost this implies.
-- Pixabay, Pexels, OpenAI image, Gemini image/Nano Banana, and local infographic
-  fallbacks stay blocked from the active WP entrypoint — only the approved Replicate
-  gateway may supply an image.
+Current policy (2026-09-11 user instruction):
+- Keep GPT-5 mini for article writing.
+- Matching Pexels/Pixabay photos first in opted-in article workflows.
+- SDXL Lightning then FLUX Schnell only when no suitable free photo is available.
+- Legacy stock helpers remain disabled; all selection uses the shared checked gateway.
+- Video generation remains disabled operationally.
 """
 import os
 import socket
@@ -56,7 +52,7 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # All WordPress and newsroom draft text uses GPT-5 mini.
 base.AI_TEXT_PROVIDER = "openai"
 
-# Images: free-confirmed Nano Banana first, then the approved Replicate chain.
+# Images use the shared stock-first gateway; legacy helpers remain bypassed.
 base.PIXABAY_KEY = None
 base.PEXELS_KEY = None
 base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True

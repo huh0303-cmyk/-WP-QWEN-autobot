@@ -1,0 +1,44 @@
+name: Stock image routing verification (no paid AI, no publication)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Verify stock credentials and stable hosting without paid generation
+        env:
+          STOCK_IMAGES_ENABLED: 'true'
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os, sys, json
+          sys.path.insert(0, 'scripts')
+          import stock_image_provider as stock
+          for provider, key_name in [('Pexels','PEXELS_API_KEY'),('Pixabay','PIXABAY_KEY')]:
+              try:
+                  items=stock._search(provider,'Seoul skyline',os.environ[key_name])
+                  print(json.dumps({'provider':provider,'api_ok':True,'candidates':len(items),'matches':sum(stock.matches('Seoul skyline',p['description']) for p in items)}))
+              except Exception as exc:
+                  print(json.dumps({'provider':provider,'api_ok':False,'error_type':type(exc).__name__}))
+          url=stock.find_stock_image('Seoul skyline')
+          if not url:
+              url=stock.find_stock_image('coffee cup')
+          if not url:
+              raise SystemExit('No matched stock photo could be hosted; no paid API was called')
+          print(json.dumps({'hosted_url':url,'credit':stock.credit_html(url),'paid_calls':0}))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stock-image-verification
+          path: artifacts/stock-image-receipts.jsonl

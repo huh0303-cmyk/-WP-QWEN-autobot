@@ -3555,6 +3555,8 @@ def process_one(site, keyword):
         image_theme = f"NEWS ILLUSTRATION ONLY — {theme}" if mode in ("news", "news_en") else theme
         img_url = replicate_image_provider.generate_image_url(keyword, theme=image_theme)
         images = [img_url] if img_url else []
+        from stock_image_provider import credit_html
+        body += credit_html(img_url)
         if not images:
             print("  ℹ️ SDXL Lightning + FLUX Schnell failed → 이미지 없이 발행")
     print(f"  🖼  이미지 {len(images)}장")
