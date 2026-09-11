@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-09-12-blogger_kskin365-85ac4c43", "claimed_at": "2026-09-12T06:26:13.993216+09:00", "run_id": 34649383038, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://skin.k-health365.com/2026/09/a-clear-practical-plan-for-using.html", "published_at": "2026-09-11T14:29:19.232-07:00"}
