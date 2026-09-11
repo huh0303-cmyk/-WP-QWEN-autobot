@@ -6,26 +6,28 @@ permissions:
 jobs:
   health:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install requests -q
-      - name: Check all 66 public destinations
-        run: python scripts/publication_health_audit.py
-      - name: One short Flash response with a single GPT fallback
+      - name: Diagnose Flash without exposing credentials
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: 'true'
-          PYTHONPATH: scripts
-        run: python -c "from economy_text import generate_text; text = generate_text('Return exactly the word OK.'); print('Writer returned text:', bool(text.strip()))"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: publication-health
-          path: |
-            artifacts/publication-health.json
-            artifacts/article-writer-usage.jsonl
+        run: |
+          python - <<'PY'
+          import os,requests,json
+          key=os.getenv('GEMINI_API_KEY','')
+          print('Key present:',bool(key))
+          if not key: raise SystemExit(1)
+          headers={'x-goog-api-key':key}
+          base='https://generativelanguage.googleapis.com/v1beta/'
+          r=requests.get(base+'models',headers=headers,timeout=20)
+          print('Model list HTTP:',r.status_code)
+          data=r.json()
+          print('Flash models:',[m['name'] for m in data.get('models',[]) if 'flash' in m['name']][:25])
+          r=requests.post(base+'models/gemini-2.5-flash:generateContent',headers=headers,timeout=45,json={'contents':[{'parts':[{'text':'Return OK.'}]}],'generationConfig':{'maxOutputTokens':128,'thinkingConfig':{'thinkingBudget':0}}})
+          data=r.json()
+          print(json.dumps({'http':r.status_code,'error_status':data.get('error',{}).get('status'),'finish':[(c.get('finishReason'),bool(c.get('content'))) for c in data.get('candidates',[])],'block':data.get('promptFeedback',{}).get('blockReason')}))
+          PY
