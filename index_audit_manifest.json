@@ -5696,7 +5696,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:05:32.713008+00:00"
       },
-      "audited_at": "2026-09-10T22:01:51.949797+00:00"
+      "audited_at": "2026-09-10T22:01:51.949797+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://k-health365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://koreamedicaltour.com": {
       "lifecycle": "active",
@@ -6232,7 +6233,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:08:32.268803+00:00"
       },
-      "audited_at": "2026-09-10T22:04:58.298881+00:00"
+      "audited_at": "2026-09-10T22:04:58.298881+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://koreamedicaltour.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://koreainvest365.com": {
       "lifecycle": "active",
@@ -7848,7 +7850,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:17:50.564123+00:00"
       },
-      "audited_at": "2026-09-10T22:14:25.585497+00:00"
+      "audited_at": "2026-09-10T22:14:25.585497+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://koreainvest365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://ki-korea.com": {
       "lifecycle": "active",
@@ -7964,7 +7967,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:18:26.935382+00:00"
       },
-      "audited_at": "2026-09-10T22:15:03.482908+00:00"
+      "audited_at": "2026-09-10T22:15:03.482908+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://ki-korea.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://koreainsurance365.com": {
       "lifecycle": "active",
@@ -8320,7 +8324,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:20:24.809405+00:00"
       },
-      "audited_at": "2026-09-10T22:17:04.227714+00:00"
+      "audited_at": "2026-09-10T22:17:04.227714+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://koreainsurance365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://kfinance365.com": {
       "lifecycle": "active",
@@ -9296,7 +9301,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:26:14.074176+00:00"
       },
-      "audited_at": "2026-09-10T22:22:43.459273+00:00"
+      "audited_at": "2026-09-10T22:22:43.459273+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://kfinance365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://koreataxnlaw.com": {
       "lifecycle": "active",
@@ -9412,7 +9418,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:26:50.995661+00:00"
       },
-      "audited_at": "2026-09-10T22:23:19.911108+00:00"
+      "audited_at": "2026-09-10T22:23:19.911108+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://koreataxnlaw.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://koreacrypto365.com": {
       "lifecycle": "active",
@@ -10468,7 +10475,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:32:57.238509+00:00"
       },
-      "audited_at": "2026-09-10T22:29:17.787545+00:00"
+      "audited_at": "2026-09-10T22:29:17.787545+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://krealestate365.com": {
       "lifecycle": "active",
@@ -10604,7 +10612,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:33:42.279886+00:00"
       },
-      "audited_at": "2026-09-10T22:30:00.257951+00:00"
+      "audited_at": "2026-09-10T22:30:00.257951+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://ktech365.com": {
       "lifecycle": "active",
@@ -10980,7 +10989,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:36:08.759329+00:00"
       },
-      "audited_at": "2026-09-10T22:32:03.830633+00:00"
+      "audited_at": "2026-09-10T22:32:03.830633+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://kskin365.com": {
       "lifecycle": "active",
@@ -11976,7 +11986,8 @@
         "complete": true,
         "comparison_at": null
       },
-      "audited_at": "2026-09-10T22:37:42.373012+00:00"
+      "audited_at": "2026-09-10T22:37:42.373012+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://oliveyoungkorea.com": {
       "lifecycle": "active",
@@ -12152,7 +12163,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:43:25.302629+00:00"
       },
-      "audited_at": "2026-09-10T22:38:37.565274+00:00"
+      "audited_at": "2026-09-10T22:38:37.565274+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://kworld365.com": {
       "lifecycle": "active",
@@ -12368,7 +12380,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:44:52.252745+00:00"
       },
-      "audited_at": "2026-09-10T22:39:46.308762+00:00"
+      "audited_at": "2026-09-10T22:39:46.308762+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://kworld365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://k-trip365.com": {
       "lifecycle": "active",
@@ -12624,7 +12637,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:46:22.277837+00:00"
       },
-      "audited_at": "2026-09-10T22:41:09.572602+00:00"
+      "audited_at": "2026-09-10T22:41:09.572602+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://k-visa365.com": {
       "lifecycle": "active",
@@ -13720,7 +13734,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T22:53:59.043812+00:00"
       },
-      "audited_at": "2026-09-10T22:47:26.913824+00:00"
+      "audited_at": "2026-09-10T22:47:26.913824+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://koreawedding365.com": {
       "lifecycle": "active",
@@ -15090,7 +15105,8 @@
         "complete": false,
         "comparison_at": null
       },
-      "audited_at": "2026-09-10T22:55:27.939484+00:00"
+      "audited_at": "2026-09-10T22:55:27.939484+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://kstudy365.com": {
       "lifecycle": "active",
@@ -15446,7 +15462,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:06:22.449385+00:00"
       },
-      "audited_at": "2026-09-10T22:57:25.450220+00:00"
+      "audited_at": "2026-09-10T22:57:25.450220+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://studyinkorea365.com": {
       "lifecycle": "active",
@@ -16542,7 +16559,8 @@
         "complete": true,
         "comparison_at": null
       },
-      "audited_at": "2026-09-10T23:03:42.746553+00:00"
+      "audited_at": "2026-09-10T23:03:42.746553+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://kieca-korea.org": {
       "lifecycle": "active",
@@ -16718,7 +16736,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:16:01.793929+00:00"
       },
-      "audited_at": "2026-09-10T23:04:39.184578+00:00"
+      "audited_at": "2026-09-10T23:04:39.184578+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://ksa-korea.org": {
       "lifecycle": "active",
@@ -16834,7 +16853,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:16:38.772789+00:00"
       },
-      "audited_at": "2026-09-10T23:05:15.128082+00:00"
+      "audited_at": "2026-09-10T23:05:15.128082+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://sis-korea.com": {
       "lifecycle": "active",
@@ -18150,7 +18170,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:29:08.046091+00:00"
       },
-      "audited_at": "2026-09-10T23:12:45.625869+00:00"
+      "audited_at": "2026-09-10T23:12:45.625869+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://jobkorea365.com": {
       "lifecycle": "active",
@@ -19026,7 +19047,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:34:26.405270+00:00"
       },
-      "audited_at": "2026-09-10T23:17:40.560120+00:00"
+      "audited_at": "2026-09-10T23:17:40.560120+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://jobinkorea365.com": {
       "lifecycle": "active",
@@ -20062,7 +20084,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:46:37.064203+00:00"
       },
-      "audited_at": "2026-09-10T23:23:27.957846+00:00"
+      "audited_at": "2026-09-10T23:23:27.957846+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://jobkoreaglobal.com": {
       "lifecycle": "review",
@@ -20938,7 +20961,8 @@
         "complete": true,
         "comparison_at": "2026-09-09T23:51:55.739799+00:00"
       },
-      "audited_at": "2026-09-10T23:28:21.588521+00:00"
+      "audited_at": "2026-09-10T23:28:21.588521+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://korea365.org": {
       "lifecycle": "active",
@@ -22814,7 +22838,8 @@
         "complete": true,
         "comparison_at": "2026-09-10T00:03:16.859711+00:00"
       },
-      "audited_at": "2026-09-10T23:39:03.263236+00:00"
+      "audited_at": "2026-09-10T23:39:03.263236+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://koreanews365.com": {
       "lifecycle": "active",
@@ -23050,7 +23075,8 @@
         "complete": true,
         "comparison_at": "2026-09-10T00:04:32.700563+00:00"
       },
-      "audited_at": "2026-09-10T23:40:20.026819+00:00"
+      "audited_at": "2026-09-10T23:40:20.026819+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     },
     "https://theseouljournal.com": {
       "lifecycle": "active",
@@ -25026,8 +25052,9 @@
         "complete": true,
         "comparison_at": "2026-09-10T00:19:30.029628+00:00"
       },
-      "audited_at": "2026-09-10T23:52:08.340044+00:00"
+      "audited_at": "2026-09-10T23:52:08.340044+00:00",
+      "error": "wp_inventory_failed: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
     }
   },
-  "updated_at": "2026-09-10T23:52:08.340071+00:00"
+  "updated_at": "2026-09-11T15:05:51.509923+00:00"
 }
