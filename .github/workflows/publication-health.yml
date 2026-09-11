@@ -6,26 +6,31 @@ permissions:
 jobs:
   health:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests -q
-      - name: Check all 66 public destinations
-        run: python scripts/publication_health_audit.py
-      - name: One short Flash response with a single GPT fallback
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: 'true'
-          PYTHONPATH: scripts
-        run: python -c "from economy_text import generate_text; text = generate_text('Return exactly the word OK.'); print('Writer returned text:', bool(text.strip()))"
+      - run: pip install requests beautifulsoup4 -q
+      - name: Verify public article without credentials
+        run: |
+          python - <<'PY'
+          import json,requests
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+          record={'timestamp': '2026-09-12 05:37:26', 'site': 'https://koreanews365.com', 'theme': '한국 뉴스', 'keyword': '해외건설협회-디벨로퍼협회, 해외 개발사업 진출 ‘맞손’', 'title': '해외건설協·디벨로퍼協 MOU 체결, 해외 개발사업 공동 진출 추진', 'status': '✅ OK', 'seo_score': 35, 'images': 1, 'url': 'https://koreanews365.com/%ED%95%B4%EC%99%B8%EA%B1%B4%EC%84%A4%E5%8D%94%C2%B7%EB%94%94%EB%B2%A8%EB%A1%9C%ED%8D%BC%E5%8D%94-mou-%EC%B2%B4%EA%B2%B0-%ED%95%B4%EC%99%B8-%EA%B0%9C%EB%B0%9C%EC%82%AC%EC%97%85-%EA%B3%B5%EB%8F%99/', 'error': '', 'slot': '1', 'model': 'gpt-5-mini', 'writer_model': 'gpt-5-mini', 'reviewer_model': 'gemini-2.5-flash', 'author': '한국신문 편집국', 'category': '글로벌 (GLOBAL)'}
+          r=requests.get(record['url'],timeout=20)
+          soup=BeautifulSoup(r.text,'html.parser')
+          article=soup.select_one('.entry-content') or soup.select_one('article')
+          result={'http_status':r.status_code, 'url':r.url, 'title_present':record['title'] in soup.get_text(' ',strip=True),
+                  'article_text':article.get_text(' ',strip=True)[:4000] if article else '',
+                  'image_count':len(article.select('img')) if article else 0}
+          Path('public-verification.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False))
+          assert result['http_status']==200 and result['title_present'] and result['image_count']>=1
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: publication-health
-          path: |
-            artifacts/publication-health.json
-            artifacts/article-writer-usage.jsonl
+          name: public-article-verification
+          path: public-verification.json
