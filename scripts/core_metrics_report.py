@@ -180,7 +180,14 @@ def report_html(result):
     else:
         color = "#1d4ed8" if change > 0 else "#dc2626" if change < 0 else "#475569"
         delta_label = f'<span style="color:{color}">{change:+,}건</span>'
-    header_line = f'<span class="metrics-daily-totals" style="display:inline-block;font-size:18px;line-height:1.6;margin-left:12px">(당일 총발행 {total_label} ({delta_label}) · API 총비용 미확인 (증감 미확인))</span>'
+    estimate = summary.get("recorded_estimate_usd")
+    cost_change = summary.get("estimated_cost_delta_usd")
+    cost_label = f"${estimate:,.4f}" if estimate is not None else "미집계"
+    cost_delta = "증감 미확인"
+    if cost_change is not None:
+        cost_color = "#1d4ed8" if cost_change > 0 else "#dc2626" if cost_change < 0 else "#475569"
+        cost_delta = f'<span style="color:{cost_color}">{cost_change:+,.4f} USD</span>'
+    header_line = f'<span class="metrics-daily-totals" style="display:inline-block;font-size:18px;line-height:1.6;margin-left:12px">(당일 총발행 {total_label} ({delta_label}) · API 예상 총비용 {cost_label} ({cost_delta}, 기록분))</span>'
     parts = ["<h2>통제실 네 가지 핵심 통계</h2>",
              f'<p class="metrics-reference-time" data-date="{day}" style="font-size:clamp(22px,3vw,32px);font-weight:800;line-height:1.4;color:#0f172a;padding:16px;background:#eff6ff;border:2px solid #93c5fd;border-radius:12px">{html.escape(display_stamp)} {header_line}</p>',
              "<p>고정 기준: 매일 KST 07:00 수집. 일일 방문: 전날 07:00부터 오늘 07:00까지 누적 조회수 증가분. 일일 증감: 직전 24시간 증가분 대비. 나머지 증감: 전날 07:00 정기 저장값 대비. WP·Blogger 원천 조회수이며 고유 방문자 수와 다를 수 있습니다. 미확인은 0이 아닙니다.</p>",
@@ -191,7 +198,7 @@ def report_html(result):
         parts[3] = "<p>기존 임시 집계: 일일 방문은 당일 현재 조회수, 증감은 어제 하루와 비교한 값입니다. 새 07:00 고정 비교 자료가 생성되면 교체됩니다. 누적·색인·총글의 실제 확인 시각은 각 항목에 표시합니다.</p>"
     notes = [summary.get("scope", "WP·Blogspot·뉴스룸 60개 합계"), summary.get("period", "KST 당일 00:00~기준 시각"), summary.get("api_cost_note", "실제 API 청구액 미연동")]
     if summary.get("recorded_estimate_usd") is not None:
-        notes.append(f"기록된 일부 API 추정 예약액 ${summary['recorded_estimate_usd']:.4f} · 실제 총비용 아님")
+        notes.append(f"글쓰기·이미지 포함 기록 예상액 ${summary['recorded_estimate_usd']:.4f} · 실제 총비용 아님")
     if count is None and summary.get("expected_sites"):
         notes.append(f"발행일 수집 {summary['covered_sites']}/{summary['expected_sites']}개 사이트 · 확인된 발행 {summary['confirmed_published_today']}건")
     parts.insert(3, '<p class="metrics-header-notes">' + html.escape(" / ".join(notes)) + "</p>")

@@ -26,10 +26,19 @@ def test_estimated_reservation_cannot_be_reported_as_total_cost():
     assert result["recorded_estimate_usd"] == 0.03
     rendered=report_html({"generated_at":"2026-09-11T07:00:00+09:00","records":[],"daily_header":result})
     header=rendered.split('class="metrics-reference-time"')[1].split('</p>')[0]
-    assert '당일 총발행 2건' in header and 'API 총비용 미확인' in header
+    assert '당일 총발행 2건' in header and 'API 예상 총비용 $0.0300' in header
     assert '#1d4ed8' in header
 
 
 def test_duplicate_urls_do_not_inflate_publication_count():
     post={"url":"https://s/a","published":"2026-09-11T01:00:00+09:00"}
     assert publication_counts([post,post],"2026-09-11T07:00:00+09:00","published")["published_today"] is None
+
+
+def test_estimated_delta_uses_previous_same_kst_window():
+    calls=[{"at":"2026-09-11T06:00:00+09:00","amount_usd":0.09},
+           {"at":"2026-09-10T06:00:00+09:00","amount_usd":0.03},
+           {"at":"2026-09-10T08:00:00+09:00","amount_usd":9}]
+    result=header_summary([],"2026-09-11T07:00:00+09:00",{"calls":calls})
+    assert result["recorded_estimate_usd"] == 0.09
+    assert result["estimated_cost_delta_usd"] == 0.06
