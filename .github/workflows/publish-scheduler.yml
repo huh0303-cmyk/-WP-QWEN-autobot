@@ -1,14 +1,14 @@
-name: Publish Scheduler (A/B 랜덤 발행 트리거)
+name: WordPress daily public minimum scheduler
 
-# 대상/순서는 구글 시트의 오늘 운영 캘린더가 결정한다.
-# 오늘 운영 캘린더의 대기 건을 놓치지 않도록 15분마다 확인한다.
-# 현재 시트 시각의 일정만 요청한다. 지난 시각은 PASS, 몰아 처리하지 않는다.
+# Every site needs a verified public article each KST day, regardless of old
+# calendar slots or weekly tiers. Bounded dispatch keeps provider load spread out.
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
       - "scripts/publish_scheduler.py"
+      - "scripts/daily_publication_floor.py"
   schedule:
     - cron: "*/15 * * * *"
 
@@ -67,15 +67,12 @@ jobs:
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
           THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/publish_scheduler.py
-      - name: Commit scheduler state
-        if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git stash --include-untracked || true
-          git pull --rebase origin main
-          git stash pop || true
-          git add scheduler_state.json 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "chore: 스케줄러 상태 갱신 [skip ci]"
-          git push
+          python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 4
+          python scripts/daily_publication_floor.py --platform newsroom --max-dispatch 1
+      - name: Preserve daily public delivery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-publication-floor-${{ github.run_id }}
+          path: artifacts/daily-publication-floor-*.json
