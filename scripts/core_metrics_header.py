@@ -56,6 +56,6 @@ def header_summary(records, stamp, budget):
             "scope":"WP 25 · Blogspot 33 · 뉴스룸 2 · 현재 공개 글의 발행일 기준",
             "period":"KST 당일 00:00부터 표시된 기준 시각까지 · 전날 같은 시간대와 비교",
             "api_cost_total":None, "api_cost_delta":None, "api_cost_currency":"USD",
-            "recorded_estimate_usd":float(estimate) if entries else None,
-            "estimated_cost_delta_usd":float(estimate-previous_estimate) if entries and previous_entries else None,
+            "recorded_estimate_usd":float(estimate) if budget.get("calls") else None,
+            "estimated_cost_delta_usd":float(estimate-previous_estimate) if budget.get("calls") else None,
             "api_cost_note":"예상액 · 글쓰기+이미지 묶음 예약액 및 기타 원장 기록 합산 · 미기록 경로 제외 · 실패 전 예약 포함 · 실제 청구액과 다를 수 있음"}
