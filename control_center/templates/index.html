@@ -565,15 +565,15 @@
                         {% endfor %}
                     </div>
                     <div class="grid grid-cols-1 gap-2 border-t pt-3 sm:grid-cols-2">
-                        <label class="text-[10px] font-black text-slate-500">기본 글쓰기 엔진
-                            <select class="mt-1 h-11 w-full rounded-xl border border-teal-200 bg-white px-2 text-xs font-bold text-slate-800" disabled>
+                        <label class="text-[10px] font-black text-slate-500">기본 글쓰기 엔진 · 실제 설정값(읽기 전용)
+                            <select class="mt-1 h-11 w-full rounded-xl border border-teal-200 bg-white px-2 text-xs font-bold text-slate-800" disabled title="이 사이트의 실제 발행 설정값입니다. 개별 발행 시에는 아래 '지금 발행' 폼에서 엔진을 바꿔 실행할 수 있습니다.">
                                 {% for value, model in text_models.items() %}
                                 <option value="{{ value }}" {% if value == blog.default_text_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
                                 {% endfor %}
                             </select>
                         </label>
-                        <label class="text-[10px] font-black text-slate-500">기본 이미지 엔진
-                            <select class="mt-1 h-11 w-full rounded-xl border border-teal-200 bg-white px-2 text-xs font-bold text-slate-800" disabled>
+                        <label class="text-[10px] font-black text-slate-500">기본 이미지 엔진 · 실제 설정값(읽기 전용)
+                            <select class="mt-1 h-11 w-full rounded-xl border border-teal-200 bg-white px-2 text-xs font-bold text-slate-800" disabled title="이 사이트의 실제 발행 설정값입니다. 개별 발행 시에는 아래 '지금 발행' 폼에서 엔진을 바꿔 실행할 수 있습니다.">
                                 {% for value, model in image_models.items() %}
                                 <option value="{{ value }}" {% if value == blog.default_image_model %}selected{% endif %}>{{ model.label }} · {{ model.price }}</option>
                                 {% endfor %}

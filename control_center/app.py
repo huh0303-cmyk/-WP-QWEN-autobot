@@ -4,7 +4,7 @@ from flask import Response, flash, jsonify, redirect, request, send_from_directo
 
 from .keywords import tistory_seed_topics, top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
-from .models import IMAGE_MODELS, TEXT_MODELS
+from .models import DEFAULT_IMAGE_MODEL, DEFAULT_TEXT_MODEL, IMAGE_MODELS, TEXT_MODELS
 from automation_hub.youtube_vps_queue import enqueue as enqueue_youtube_vps
 
 import json
@@ -658,8 +658,8 @@ def get_site_data():
             "google_approved": item["domain"] == "k-health365.com",
             "persona": registered.persona if registered else item["persona"],
             "tone": registered.tone if registered else item["tone"],
-            "default_text_model": "gpt-5-mini",
-            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "default_text_model": DEFAULT_TEXT_MODEL,
+            "default_image_model": DEFAULT_IMAGE_MODEL,
         })
     sites = _overlay_core_metrics(sites, "wordpress")
     return sorted(sites, key=lambda site: (
@@ -673,6 +673,19 @@ def get_site_data():
 def _site_rows(_sites=None):
     """Compatibility hook used by tests and the richer control-center shell."""
     return get_site_data(), None
+
+
+def blog_engine_defaults(profile_by_key, site_key):
+    """content_engine_profiles.json only overrides the default engine for a
+    Blogger blog when that blog needs something other than the network
+    default (e.g. a locked medical-editorial channel). Showing the network
+    default as a hardcoded literal regardless of site silently lied about
+    sites that DO have a real override."""
+    blogspot = (profile_by_key.get(site_key) or {}).get("blogspot") or {}
+    text_model = blogspot.get("text_model") or DEFAULT_TEXT_MODEL
+    image_models = blogspot.get("image_models") or []
+    image_model = image_models[0] if image_models else DEFAULT_IMAGE_MODEL
+    return text_model, image_model
 
 
 def get_blogger_data():
@@ -709,41 +722,47 @@ def get_blogger_data():
     }
     profiles_path = Path(__file__).resolve().parents[1] / "config" / "content_engine_profiles.json"
     profile_by_order = {}
+    profile_by_key = {}
     if profiles_path.exists():
         try:
-            profile_by_order = {
-                int(profile["order"]): profile["site_key"]
-                for profile in json.loads(profiles_path.read_text(encoding="utf-8")).get("profiles", [])
-            }
+            all_profiles = json.loads(profiles_path.read_text(encoding="utf-8")).get("profiles", [])
+            profile_by_order = {int(profile["order"]): profile["site_key"] for profile in all_profiles}
+            profile_by_key = {profile["site_key"]: profile for profile in all_profiles}
         except (OSError, ValueError, KeyError, TypeError):
             profile_by_order = {}
-    result = [{
-        "site_id": f"blogger_{profile_by_order.get(int(row.get('order') or 0), '')}",
-        "order": row.get("order"),
-        "name": row.get("title") or row.get("name") or f"Blogger {row.get('order', '')}",
-        "wp_url": row.get("wp") or row.get("wordpress") or row.get("wp_url", ""),
-        "url": row.get("blogspot", ""),
-        "google_approved": row.get("blogspot", "").rstrip("/") in ADSENSE_BLOGGER_URLS,
-        "status": row.get("status", "UNKNOWN"),
-        "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"} and row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS),
-        "blog_id": row.get("destination_id", ""),
-        "admin_review_url": f"https://www.blogger.com/blog/posts/{row.get('destination_id', '')}" if row.get("destination_id") else "https://www.blogger.com/",
-        "category": row.get("topic") or "미분류",
-        "official_categories": blogger_labels.get(row.get("blogspot", ""), []),
-        "persona": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "persona", "Specialist editorial desk"),
-        "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
-        "default_text_model": "gpt-5-mini",
-        "default_image_model": "bytedance/sdxl-lightning-4step",
-        "visitor_checked_at": stats_at,
-        "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
-        "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
-        "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
-        "total_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("total_delta"),
-        "total_posts": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("public_posts"),
-        "posts_delta": None,
-        "indexed": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("indexed"),
-        "indexed_delta": None,
-    } for row in rows]
+            profile_by_key = {}
+
+    result = []
+    for row in rows:
+        site_key = profile_by_order.get(int(row.get("order") or 0), "")
+        text_model, image_model = blog_engine_defaults(profile_by_key, site_key)
+        result.append({
+            "site_id": f"blogger_{site_key}",
+            "order": row.get("order"),
+            "name": row.get("title") or row.get("name") or f"Blogger {row.get('order', '')}",
+            "wp_url": row.get("wp") or row.get("wordpress") or row.get("wp_url", ""),
+            "url": row.get("blogspot", ""),
+            "google_approved": row.get("blogspot", "").rstrip("/") in ADSENSE_BLOGGER_URLS,
+            "status": row.get("status", "UNKNOWN"),
+            "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"} and row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS),
+            "blog_id": row.get("destination_id", ""),
+            "admin_review_url": f"https://www.blogger.com/blog/posts/{row.get('destination_id', '')}" if row.get("destination_id") else "https://www.blogger.com/",
+            "category": row.get("topic") or "미분류",
+            "official_categories": blogger_labels.get(row.get("blogspot", ""), []),
+            "persona": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "persona", "Specialist editorial desk"),
+            "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
+            "default_text_model": text_model,
+            "default_image_model": image_model,
+            "visitor_checked_at": stats_at,
+            "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
+            "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
+            "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
+            "total_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("total_delta"),
+            "total_posts": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("public_posts"),
+            "posts_delta": None,
+            "indexed": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("indexed"),
+            "indexed_delta": None,
+        })
     return sorted(
         _overlay_core_metrics(result, "blogger"),
         key=lambda item: (
@@ -798,8 +817,8 @@ def get_tistory_data() -> list[dict[str, object]]:
             "official_categories": summary.get("categories", []),
             "persona": persona,
             "tone": tone,
-            "default_text_model": "gpt-5-mini",
-            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "default_text_model": DEFAULT_TEXT_MODEL,
+            "default_image_model": DEFAULT_IMAGE_MODEL,
             "today_visitors": None,
             "today_delta": None,
             "total_visitors": None,
