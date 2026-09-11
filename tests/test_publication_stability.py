@@ -30,6 +30,17 @@ def test_missing_workflow_does_not_hide_other_room_results(monkeypatch):
     assert rows['working']['run_id'] == '123'
 
 
+def test_naver_local_runner_is_not_queried_as_github_workflow(monkeypatch):
+    room = AutomationRoom(room_id='naver', platform='naver', name='naver', workflow='naver-blog-local')
+    monkeypatch.setattr(collector.RoomRegistry, 'load', lambda: RoomRegistry([room]))
+    request = Mock(side_effect=AssertionError('local route must not call GitHub'))
+    monkeypatch.setattr(collector, '_request', request)
+    result = collector.collect('owner/repo', 'unused')
+    request.assert_not_called()
+    assert result['rows'][0]['status'] == 'AUTH_REQUIRED'
+    assert result['summary']['collection_errors'] == {}
+
+
 def test_news_evidence_reaches_both_independent_checks(monkeypatch):
     monkeypatch.setenv('CHATGPT_SINGLE_MODEL_PIPELINE', 'true')
     check = Mock(return_value={'ok': True, 'issues': []})
