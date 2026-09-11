@@ -53,6 +53,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from automation_hub.golden_keyword_mentions import parse_mention_rows, rank_mentioned_keywords
+from scripts.collect_keyword_search_demand import demand_context
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_SEARCH_MODEL = os.environ.get("OPENAI_SEARCH_MODEL", "gpt-4o-mini")
@@ -203,9 +204,11 @@ Rules:
   accident, season or issue before proposing a search phrase.
 - Validate each idea using observable Google/Naver trend signals and GSC demand when those
   signals are available. Never invent unavailable evidence.
-- Apply this locked 100-point rubric: GSC demand 25, media repetition 20,
-  Google/Naver trend 20, site fit 15, actionable intent 10, official source 10.
-- Keep only ideas that can credibly reach 70/100. Prefer 80+, and rank 90+ first.
+- Distinguish actual search volume from this site's GSC impressions, media mentions,
+  search-result counts and relative Trends indices. These are different metrics.
+- Never manufacture a 100-point SEO score from missing data. Prefer verified site fit,
+  practical intent, source quality and independently observed demand.
+{demand_block}
 - Policy, accident, medical, finance, legal and visa/immigration topics require a current
   official source; without one, omit the idea regardless of its apparent popularity.
 - Convert the verified signal into this site's practical intent (cost, method, eligibility,
@@ -429,6 +432,7 @@ def research_one_site(client, target, today_str, corpus_norms, corpus_wordsets):
             today=today_str, domain=target["domain_desc"], count=min(15, need),
             categories=categories_str, example_category=target["categories"][0],
             lang_label=lang_label, avoid_block=avoid_block,
+            demand_block=demand_context(target['url']),
         )
         text, grounded = call_search_llm(client, prompt)
         grounded_any = grounded_any or grounded

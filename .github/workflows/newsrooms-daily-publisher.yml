@@ -62,14 +62,8 @@ jobs:
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "category=" >> "$GITHUB_OUTPUT"
-      - name: Repair recent source-based categories
-        env:
-          TARGET_SITE_URL: ${{ steps.target.outputs.url }}
-          NEWSROOM_PREFERRED_CATEGORY: ${{ inputs.preferred_category }}
-          NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}
-          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
-        run: python scripts/repair_recent_newsroom_categories.py
+      # Historical category maintenance must not block a new verified edition.
+      # Run scripts/repair_recent_newsroom_categories.py as a maintenance task.
       - name: Publish one source-checked edition
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
