@@ -26,6 +26,7 @@ from automation_hub.blogger_rewriter import (
     parse_rewrite_json,
     plain_text,
     rewrite_prompt,
+    visitor_counter_html,
 )
 from automation_hub.content_identity import ACTIVE_CONTENT_STATUSES, active_duplicate, canonical_source_id, stable_content_id
 from automation_hub.blogger_topic_router import (
@@ -431,6 +432,7 @@ def main():
     if image_url:
         content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
         image_model = "approved_image_chain"
+    content = content + visitor_counter_html(blogger_site_id)
 
     content_id = stable_content_id(
         "blogger", blogger_site_id, source_identity,
