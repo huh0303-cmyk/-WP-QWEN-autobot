@@ -169,9 +169,9 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
                                   prior_feedback="; ".join(failures))
         prompt += "\n" + RULE + plan
         try:
-            if not openai_available():
-                raise RuntimeError("GPT-5 mini writer unavailable")
-            raw = openai_generate_text(prompt, temperature=0.7, max_retries=1)
+            import economy_text
+            raw = economy_text.generate_text(prompt, temperature=0.7)
+            provider = economy_text.last_writer_model
             candidate = parse_rewrite_json(raw)
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
