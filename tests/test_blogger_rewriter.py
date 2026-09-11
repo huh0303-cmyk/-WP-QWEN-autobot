@@ -2,11 +2,22 @@ import re
 import unittest
 from unittest.mock import Mock
 
-from automation_hub.blogger_rewriter import FreeImage, attach_single_image, blogger_quality_score, extract_http_links, find_one_free_image, image_is_relevant, normalize_rewrite_format, parse_rewrite_json, plain_text, similarity
+from automation_hub.blogger_rewriter import FreeImage, attach_single_image, blogger_quality_score, extract_http_links, find_one_free_image, image_is_relevant, normalize_rewrite_format, parse_rewrite_json, plain_text, similarity, visitor_counter_html
 from scripts.blogger_search_description import build_search_description
 
 
 class BloggerRewriterTests(unittest.TestCase):
+    def test_visitor_counter_html_embeds_the_given_page_id(self):
+        badge = visitor_counter_html("blogger_ktrip365")
+        self.assertIn('page_id=blogger_ktrip365', badge)
+        self.assertTrue(badge.strip().startswith("<p"))
+
+    def test_visitor_counter_html_sanitizes_unsafe_page_id_characters(self):
+        badge = visitor_counter_html("blogger/k trip 365!")
+        self.assertNotIn("/", badge.split("page_id=", 1)[1].split('"')[0])
+        self.assertNotIn(" ", badge.split("page_id=", 1)[1].split('"')[0])
+        self.assertNotIn("!", badge)
+
     def test_description_uses_complete_alternative_instead_of_broken_clip(self):
         good = "Practical source-led Korea travel planning guidance covering transport, reservations, timing, and essential checks."
         article = {"title": "Korea travel planning", "content_html": "<p>Body.</p>",
