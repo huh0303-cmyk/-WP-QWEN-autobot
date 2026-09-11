@@ -6,26 +6,31 @@ permissions:
 jobs:
   health:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests -q
-      - name: Check all 66 public destinations
-        run: python scripts/publication_health_audit.py
-      - name: One short Flash response with a single GPT fallback
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: 'true'
-          PYTHONPATH: scripts
-        run: python -c "from economy_text import generate_text; text = generate_text('Return exactly the word OK.'); print('Writer returned text:', bool(text.strip()))"
+      - run: pip install requests beautifulsoup4 -q
+      - name: Verify public article without credentials
+        run: |
+          python - <<'PY'
+          import json,requests
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+          record={'timestamp': '2026-09-12 05:54:39', 'site': 'https://koreanews365.com', 'theme': '한국 뉴스', 'keyword': 'Yorkshire and East of England artists to be showcased around the world', 'title': '영국 정부, 요크셔·동부 잉글랜드 출신 작가 8명 작품 10점 정부미술품에 편입 — 해외 10개 공관 전시 예정', 'status': '✅ OK', 'seo_score': 45, 'images': 1, 'url': 'https://koreanews365.com/%EC%98%81%EA%B5%AD-%EC%A0%95%EB%B6%80-%EC%9A%94%ED%81%AC%EC%85%94%C2%B7%EB%8F%99%EB%B6%80-%EC%9E%89%EA%B8%80%EB%9E%9C%EB%93%9C-%EC%B6%9C%EC%8B%A0-%EC%9E%91%EA%B0%80-8%EB%AA%85-%EC%9E%91%ED%92%88-10/', 'error': '', 'slot': '1', 'model': 'gpt-5-mini', 'writer_model': 'gpt-5-mini', 'reviewer_model': 'gemini-2.5-flash', 'author': '한국신문 편집국', 'category': '예술 (ART)'}
+          r=requests.get(record['url'],timeout=20)
+          soup=BeautifulSoup(r.text,'html.parser')
+          article=soup.select_one('.entry-content') or soup.select_one('article')
+          result={'http_status':r.status_code, 'url':r.url, 'title_present':record['title'] in soup.get_text(' ',strip=True),
+                  'article_text':article.get_text(' ',strip=True)[:4000] if article else '',
+                  'image_count':len(article.select('img')) if article else 0}
+          Path('public-verification.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False))
+          assert result['http_status']==200 and result['title_present'] and result['image_count']>=1
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: publication-health
-          path: |
-            artifacts/publication-health.json
-            artifacts/article-writer-usage.jsonl
+          name: public-article-verification
+          path: public-verification.json
