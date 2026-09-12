@@ -12,10 +12,11 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           script: |
-            cd /opt/korea365
-            echo "=== git diff --stat HEAD (uncommitted) ==="
-            git diff --stat HEAD
-            echo "=== git diff for scripts/autopost_mega.py (first 200 lines) ==="
-            git diff HEAD -- scripts/autopost_mega.py | head -200
-            echo "=== file mtime ==="
-            stat scripts/autopost_mega.py
+            echo "=== korea365-control.service status ==="
+            systemctl status korea365-control.service --no-pager -l || true
+            echo "=== korea365-operations.service status ==="
+            systemctl status korea365-operations.service --no-pager -l || true
+            echo "=== recent control service journal ==="
+            journalctl -xeu korea365-control.service --no-pager -n 60
+            echo "=== nginx status ==="
+            systemctl status nginx --no-pager -l | head -20 || true
