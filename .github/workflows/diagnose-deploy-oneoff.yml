@@ -1,0 +1,24 @@
+name: "One-off: diagnose korea365-deploy.service failure"
+on:
+  workflow_dispatch: {}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            echo "=== journalctl korea365-deploy.service (last 80 lines) ==="
+            journalctl -xeu korea365-deploy.service --no-pager -n 80
+            echo "=== systemctl status ==="
+            systemctl status korea365-deploy.service --no-pager -l || true
+            echo "=== deploy-status.json ==="
+            cat /opt/korea365/data/deploy-status.json 2>&1 || true
+            echo "=== git status in /opt/korea365 ==="
+            cd /opt/korea365 && git status 2>&1 | head -30
+            echo "=== git log -3 ==="
+            git log -3 --oneline 2>&1
