@@ -77,9 +77,38 @@ def test_a_stale_active_job_no_longer_blocks_new_submissions(store):
     from control_center.operations import STALE_ACTIVE_JOB_SECONDS
     ready(store)
     with store.connect() as db:
-        db.execute("UPDATE jobs SET updated=?", (time.time() - STALE_ACTIVE_JOB_SECONDS - 60,))
+        db.execute("UPDATE jobs SET created=?", (time.time() - STALE_ACTIVE_JOB_SECONDS - 60,))
     request_id, skipped = store.submit("wp_wp_one", [target()], "fresh-request")
     assert skipped == []
+
+
+def test_a_repeatedly_reclaimed_job_still_goes_stale_by_its_original_age(store):
+    """Confirmed live: an 'attention' job keeps getting reclaimed and
+    re-polled by the worker, which bumps `updated` every cycle - so a job
+    stuck for 20+ hours can still show "updated moments ago" forever.
+    Staleness must be measured from `created`, which never changes."""
+    from control_center.operations import STALE_ACTIVE_JOB_SECONDS
+    ready(store)
+    with store.connect() as db:
+        db.execute("UPDATE jobs SET created=?, updated=?",
+                   (time.time() - STALE_ACTIVE_JOB_SECONDS - 60, time.time()))
+    request_id, skipped = store.submit("wp_wp_one", [target()], "fresh-request")
+    assert skipped == []
+
+
+def test_claim_retires_a_job_stuck_past_the_give_up_window_instead_of_looping_forever(store):
+    """The staleness window in submit() only stops a dead job from
+    blocking NEW requests - the dead job itself sat in the table forever,
+    endlessly reclaimed and re-polled. claim() must retire it to 'stopped'
+    once it is unambiguously dead, not merely stale."""
+    from control_center.operations import STALE_JOB_GIVE_UP_SECONDS
+    ready(store)
+    with store.connect() as db:
+        db.execute("UPDATE jobs SET created=?, lease=0, next_poll=0",
+                   (time.time() - STALE_JOB_GIVE_UP_SECONDS - 60,))
+    assert store.claim() is None  # this cycle retires it rather than handing it to a worker
+    snapshot = store.snapshot()
+    assert snapshot[0]["phase"] == "stopped"
 
 
 def test_restart_recovers_accepted_but_never_redispatches_ambiguous_send(store):

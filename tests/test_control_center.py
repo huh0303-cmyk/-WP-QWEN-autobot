@@ -175,6 +175,36 @@ def test_all_sites_show_a_single_publish_action():
     assert template.count("바이럴자동발행") >= 3
 
 
+def test_admin_can_stop_a_stuck_job_immediately(monkeypatch):
+    """2026-09-12: there was no way for a human to clear a job stuck in a
+    non-terminal phase short of waiting out the give-up window - confirmed
+    live, five sites sat blocked for 20+ hours with no recourse."""
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    client = control_center_app.test_client()
+    store = control_center_app.extensions["operations"]["store"]
+    target = dict(site_id="wp_test_admin_stop", site_group="wp_test", label="Test",
+                  platform="wordpress", workflow="x.yml", inputs={})
+    request_id, _skipped = store.submit("wp25", [target], "admin-stop-test")
+    job_id = next(row["id"] for row in store.snapshot() if row["request_id"] == request_id)
+
+    response = client.post(f"/admin/jobs/{job_id}/stop",
+                            data={"csrf_token": control_center_app.config["CONTROL_CENTER_CSRF"]})
+
+    assert response.status_code == 200
+    assert response.get_json()["accepted"] is True
+    phase = next(row["phase"] for row in store.snapshot() if row["id"] == job_id)
+    assert phase == "stopped"
+
+
+def test_admin_stop_job_rejects_bad_csrf(monkeypatch):
+    monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
+    monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
+    client = control_center_app.test_client()
+    response = client.post("/admin/jobs/nonexistent/stop", data={"csrf_token": "wrong"})
+    assert response.status_code == 403
+
+
 def test_koreanews_viral_button_dispatches_newsroom_workflow(monkeypatch):
     monkeypatch.delenv("CONTROL_CENTER_USERNAME", raising=False)
     monkeypatch.delenv("CONTROL_CENTER_PASSWORD", raising=False)
