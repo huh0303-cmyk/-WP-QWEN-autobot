@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -34,8 +35,11 @@ def choose_writer(
 ) -> WriterDecision:
     """Route article generation under the locked two-model policy.
 
-    GPT-5 mini is the routine writer. Gemini is the independent reviewer;
-    Claude is excluded from automatic blog writing and review.
+    2026-09-12 (user directive): the routine first draft randomly uses
+    either GPT-5 mini or Gemini 2.5 Flash, not GPT-5 mini exclusively;
+    generate_content_gemini() retries with the other one if the randomly
+    chosen provider fails to generate at all. Claude is excluded from
+    automatic blog writing and review.
     """
     policy = policy or load_policy()
 
@@ -64,9 +68,9 @@ def choose_writer(
         )
 
     return WriterDecision(
-        provider=policy["primary_writer"]["provider"],
+        provider=random.choice(policy["primary_writer"]["providers"]),
         role=policy["primary_writer"]["role"],
-        reason="network_default_writer",
+        reason="network_default_writer_random_pick",
     )
 
 
