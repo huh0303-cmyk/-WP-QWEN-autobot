@@ -209,7 +209,7 @@ def approve_tistory_draft(job_id: str):
 @app.before_request
 def require_control_center_login():
     """Protect every PWA route when deployment credentials are configured."""
-    if request.path in {"/healthz", "/api/vps/publish"}:
+    if request.path in {"/healthz", "/api/vps/publish"} or request.endpoint == "blog_visits":
         return None
     username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
     password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
@@ -2237,8 +2237,10 @@ def tistory_seed_topics_route(site_id: str):
 
 
 from .operation_routes import install as _install_operations
+from .blog_visitors import install as _install_blog_visitors
 import sys as _sys
 _operation_worker = _install_operations(_sys.modules[__name__])
+_install_blog_visitors(_sys.modules[__name__])
 
 
 def main() -> None:
