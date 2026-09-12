@@ -1,0 +1,137 @@
+{
+  "checked_at": "2026-09-12",
+  "source": "Authenticated AdSense Sites table; approval and Ads.txt columns read separately",
+  "sites": {
+    "k-health365.com": {
+      "approval_status": "ready",
+      "label": "준비됨",
+      "ads_txt_status": "authorized"
+    },
+    "koreainvest365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "korea365.org": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "kfinance365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "jobkorea365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "k-trip365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "koreainsurance365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "koreataxnlaw.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "kworld365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "koreamedicaltour.com": {
+      "approval_status": "needs_attention",
+      "label": "주의 필요",
+      "ads_txt_status": "authorized",
+      "detail": "가치가 별로 없는 콘텐츠"
+    },
+    "krealestate365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "kstudy365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "k-visa365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "jobinkorea365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "jobkoreaglobal.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "oliveyoungkorea.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "sis-korea.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "studyinkorea365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "kieca-korea.org": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "ki-korea.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "ksa-korea.org": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "koreacrypto365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "ktech365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "koreawedding365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "koreanews365.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    },
+    "theseouljournal.com": {
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "authorized"
+    }
+  }
+}

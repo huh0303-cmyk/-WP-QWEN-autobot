@@ -365,27 +365,25 @@ def rank_topics(headlines: Iterable[dict[str, str]], *, profile: dict, trend_ter
 
 
 def fetch_public_wp_posts(site_url: str, *, session=requests, timeout: int = 20) -> list[dict]:
-    # This is a read-only fetch before paid generation. Brief origin outages
-    # should not abort a whole site's publication after a single connection.
+    from automation_hub.cached_wp_sources import cached_posts
     for attempt in range(3):
         try:
             response = session.get(
                 f"{site_url.rstrip('/')}/wp-json/wp/v2/posts",
-                params={
-                    "status": "publish", "per_page": 20, "orderby": "date", "order": "desc",
-                    "_fields": "id,link,status,title,excerpt,content,date",
-                },
-                timeout=timeout,
-            )
-            break
-        except (requests.Timeout, requests.ConnectionError):
+                params={"status": "publish", "per_page": 20, "orderby": "date", "order": "desc",
+                        "_fields": "id,link,status,title,excerpt,content,date"}, timeout=timeout)
+            response.raise_for_status()
+            payload = response.json()
+            if not isinstance(payload, list):
+                raise ValueError("WordPress posts endpoint did not return a list")
+            return [post for post in payload if post.get("status") == "publish" and post.get("link")]
+        except requests.RequestException:
+            cached = cached_posts(site_url)
+            if cached:
+                print("Source origin unavailable; using public snapshot fetched within 24 hours")
+                return cached
             if attempt == 2:
                 raise
-    response.raise_for_status()
-    payload = response.json()
-    if not isinstance(payload, list):
-        raise ValueError("WordPress posts endpoint did not return a list")
-    return [post for post in payload if post.get("status") == "publish" and post.get("link")]
 
 
 def source_similarity(topic: TopicCandidate | str, post: dict, *, profile: dict) -> float:

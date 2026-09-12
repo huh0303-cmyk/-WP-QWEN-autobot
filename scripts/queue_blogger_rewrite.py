@@ -169,8 +169,13 @@ def main():
             if (exact_ids or slug) and source_posts[0].get("status") != "publish":
                 raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
         except requests.RequestException as exc:
-            _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {exc}", source_url=source_url)
-            raise
+            from automation_hub.cached_wp_sources import cached_exact
+            cached = cached_exact(source_url)
+            if cached is None:
+                _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {type(exc).__name__}", source_url=source_url)
+                raise
+            source_posts = [cached]
+            print("Exact source loaded from public snapshot fetched within 24 hours")
     elif force_keyword:
         # 키워드보고발행: CEO already picked this exact topic (a chip from
         # the paired WP site's own category pool) — skip the live
@@ -303,6 +308,8 @@ def main():
     # source/fallback checks have selected a valid route.
     check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
     previous_candidate = None
+    from economy_text import begin_article
+    begin_article()
     # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
     # The second GPT attempt uses deterministic quality-gate feedback.
     for attempt in range(1, 3):
@@ -363,7 +370,7 @@ def main():
                 )
         try:
             from economy_text import generate_text
-            raw = generate_text(prompt, temperature=0.7)
+            raw = generate_text(prompt, temperature=0.7, repair=attempt > 1)
             candidate = parse_rewrite_json(raw)
             previous_candidate = candidate
             if source is not None:
