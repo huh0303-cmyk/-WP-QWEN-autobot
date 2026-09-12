@@ -1,0 +1,16 @@
+name: "One-off: fix k-health365 broken post 6004"
+on:
+  workflow_dispatch: {}
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python scripts/fix_khealth_broken_post.py
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
