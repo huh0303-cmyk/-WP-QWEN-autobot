@@ -36,11 +36,13 @@ def main():
         print("no replacement image available"); return 1
     print("new image:", new_url)
 
-    media_resp = requests.get(new_url, timeout=30)
+    media_resp = requests.get(new_url, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
     media_resp.raise_for_status()
-    ext = "jpg" if "jpg" in new_url or "jpeg" in new_url else "webp" if "webp" in new_url else "png"
+    mime = media_resp.headers.get("Content-Type", "image/jpeg").split(";", 1)[0]
+    ext = "png" if "png" in mime else "webp" if "webp" in mime else "jpg"
     upload = requests.post(f"{SITE}/wp-json/wp/v2/media", auth=AUTH, timeout=30,
-                            headers={"Content-Disposition": f'attachment; filename="koreawedding-888-{POST_ID}.{ext}"'},
+                            headers={"Content-Disposition": f'attachment; filename="koreawedding-888-{POST_ID}.{ext}"',
+                                     "Content-Type": mime},
                             data=media_resp.content)
     upload.raise_for_status()
     media = upload.json()
