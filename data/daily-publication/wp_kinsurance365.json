@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 3, "claim": "wp25-2026-09-12-wp_kinsurance365-859c7b96", "claimed_at": "2026-09-12T11:18:18.025085+09:00", "run_id": 34667310576, "child_run_id": null, "workflow": "daily-network-publish.yml", "repair_context": "User requested all25; PR113 fixes factual SEO repair feedback"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://koreainsurance365.com/deciding-whether-to-enroll-eligibility-coverage-and-claims-for-foreign-seasonal-worker-health-insurance-2026/", "published_at": "2026-09-12T03:32:12Z"}
