@@ -436,6 +436,9 @@ def main():
         content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
         image_model = "approved_image_chain"
 
+    from automation_hub.blog_visitor_widget import visitor_counter_html
+    content += visitor_counter_html(blogger_site_id.removeprefix("blogger_"), language=language)
+
     content_id = stable_content_id(
         "blogger", blogger_site_id, source_identity,
         version=os.environ.get("BLOGGER_CONTENT_VERSION", "v1"),
