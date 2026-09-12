@@ -1,0 +1,33 @@
+name: "One-off: backfill visitor counter widget onto existing Blogger posts"
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "site_key for a pilot run (blank = full run, all 32 eligible blogs)"
+        required: false
+        default: ""
+      max_posts:
+        description: "cap posts per blog (0 = no cap)"
+        required: false
+        default: "0"
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python scripts/backfill_blog_visitor_widget.py --only "${{ inputs.only }}" --max-posts "${{ inputs.max_posts }}"
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blog-visitor-widget-backfill
+          path: artifacts/blog-visitor-widget-backfill.json
+          if-no-files-found: ignore
