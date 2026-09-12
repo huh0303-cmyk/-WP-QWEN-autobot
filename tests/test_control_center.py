@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 import tempfile
+import time
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 
 from control_center.db import Store
+from control_center.operations import Conflict as OperationsConflict, STALE_ACTIVE_JOB_SECONDS, Store as OperationsStore
 from control_center.quality import score_article
 from control_center.registry import load_wordpress_sites
 from control_center.service import ControlCenter
@@ -478,6 +480,52 @@ def test_store_rejects_unsafe_publish_transition():
         job = store.create_job(site_id="wp_kvisa365", keyword="Korea visa requirements")
         with pytest.raises(ValueError):
             store.transition(job["id"], "PUBLISHED")
+
+
+def _bulk_target(site_id, label):
+    return {"site_id": site_id, "label": label, "platform": "blogger", "workflow": "x.yml", "inputs": {}}
+
+
+def test_batch_submit_skips_a_blocked_site_instead_of_aborting_the_whole_batch(tmp_path):
+    """2026-09-12: a single stuck site (e.g. an old 'attention' job on
+    KFinance365) used to make the ENTIRE 33-site batch fail with nothing
+    submitted for any site. A batch must accept every site that is not
+    blocked and only report the blocked ones as skipped."""
+    store = OperationsStore(tmp_path / "ops.sqlite3")
+    blocked = _bulk_target("kfinance365", "KFinance365")
+    healthy_a = _bulk_target("ktrip365", "K-Trip365")
+    healthy_b = _bulk_target("kworld365", "KWorld365")
+    store.submit("blogspot_kfinance365", [blocked], "req-occupy")
+
+    request_id, skipped = store.submit("blogspot33", [blocked, healthy_a, healthy_b], "req-batch")
+
+    assert skipped == ["KFinance365"]
+    with store.connect() as db:
+        rows = db.execute("SELECT site_id FROM jobs WHERE request_id=?", (request_id,)).fetchall()
+    assert {r["site_id"] for r in rows} == {"ktrip365", "kworld365"}
+
+
+def test_single_site_submit_still_raises_conflict_when_blocked(tmp_path):
+    store = OperationsStore(tmp_path / "ops.sqlite3")
+    target = _bulk_target("kfinance365", "KFinance365")
+    store.submit("blogspot_kfinance365", [target], "req-1")
+    with pytest.raises(OperationsConflict):
+        store.submit("blogspot_kfinance365", [target], "req-2")
+
+
+def test_a_stale_job_no_longer_blocks_new_submissions(tmp_path):
+    """A job with no terminal outcome (most often 'attention') used to
+    block that site forever, since nothing ever clears it. Past the
+    staleness window it must stop counting as active."""
+    store = OperationsStore(tmp_path / "ops.sqlite3")
+    target = _bulk_target("kfinance365", "KFinance365")
+    store.submit("blogspot_kfinance365", [target], "req-old")
+    with store.connect() as db:
+        db.execute("UPDATE jobs SET updated=? WHERE request_id='req-old'",
+                    (time.time() - STALE_ACTIVE_JOB_SECONDS - 60,))
+
+    request_id, skipped = store.submit("blogspot_kfinance365", [target], "req-new")
+    assert skipped == []
 
 
 def test_weekly_keyword_suggestions_are_stable_and_bounded():
