@@ -11,7 +11,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -q requests
-      - run: python scripts/deploy_koreanews_masthead_v2.py
+      - run: python deploy_koreanews_masthead_v2.py
         working-directory: scripts
         env:
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
