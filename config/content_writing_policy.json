@@ -5,22 +5,25 @@
   "site_editorial_playbook": "config/SITE_EDITORIAL_PLAYBOOKS.md",
   "scope": ["wordpress", "blogger", "tistory", "news", "youtube_scripts", "sns_copy"],
   "primary_writer": {
-    "provider": "openai",
-    "model": "gpt-5-mini",
+    "providers": ["openai", "gemini"],
+    "models": {"openai": "gpt-5-mini", "gemini": "gemini-2.5-flash"},
+    "selection": "random_per_article",
     "role": "first_draft_writer_for_all_content",
     "cost_policy": "user_approved_paid_default",
     "rules": [
-      "All WordPress, Blogger and Tistory first drafts are written by gpt-5-mini by default.",
-      "GPT-5 mini must follow the site-specific persona, language, search intent, SEO structure, labels/categories and metadata rules.",
-      "Do not silently switch to another paid model when authentication or quota fails."
+      "2026-09-12 (user directive): each article's first draft randomly uses either gpt-5-mini or Gemini 2.5 Flash, not gpt-5-mini exclusively.",
+      "Whichever model is randomly selected must follow the site-specific persona, language, search intent, SEO structure, labels/categories and metadata rules.",
+      "Do not silently switch to a third, unapproved paid model when authentication or quota fails - only the other of these two approved models."
     ]
   },
   "fallback_writer": {
     "provider": "openai",
     "model_family": "gpt-5-mini",
-    "role": "failed_draft_recovery_and_rewrite",
+    "role": "explicit_quality_or_importance_rewrite_writer",
+    "mutual_technical_fallback_rule": "separately from an explicit rewrite signal below: when the randomly selected primary provider (openai or gemini) fails to generate at all, the OTHER approved provider is retried immediately for that same article before treating it as a generation failure",
     "allowed_when": [
       "gpt_generation_failure",
+      "gemini_generation_failure",
       "gpt_quality_fail",
       "gpt_policy_or_format_fail",
       "important_content",
@@ -28,14 +31,14 @@
       "manual_override"
     ],
     "rules": [
-      "GPT-5 mini is both the routine writer and the only automatic rewrite writer.",
-      "When a draft fails quality, factual, structural or formatting gates, GPT-5 mini rewrites it rather than automatically publishing it.",
+      "openai:gpt-5-mini and gemini:gemini-2.5-flash are each other's automatic technical-failure fallback for the initial random draft.",
+      "When a draft fails quality, factual, structural or formatting gates, gpt-5-mini rewrites it (unchanged from before) rather than automatically publishing it.",
       "No public publishing occurs from fallback output without the normal approval flow."
     ]
   },
   "auditor": {
-    "provider": "gemini",
-    "model_family": "Gemini 2.5 Flash",
+    "provider": "whichever_of_openai_or_gemini_did_not_write_this_article",
+    "model_family": "Gemini 2.5 Flash or GPT-5 mini",
     "role": "independent_final_editorial_fact_and_quality_reviewer",
     "checks": [
       "grammar_and_spelling",
@@ -52,8 +55,8 @@
       "final_quality_gate"
     ],
     "rules": [
-      "Gemini independently reviews the GPT-5 mini draft and returns structured findings.",
-      "Gemini must not invent new facts while checking grammar, structure or style.",
+      "The reviewer must be the approved model that did NOT write this article's draft, so the check stays independent even now that either model can be the writer.",
+      "The reviewer must not invent new facts while checking grammar, structure or style.",
       "Material factual uncertainty must be returned for source verification, not silently rewritten.",
       "A failed audit returns QUALITY_FAIL or REWRITE_REQUIRED and routes back to the writer before approval."
     ]
@@ -61,10 +64,10 @@
   "pipeline": [
     "keyword_and_search_intent",
     "official_source_verification_when_required",
-    "gpt_5_mini_first_draft",
+    "random_writer_first_draft_gpt5mini_or_gemini25flash",
     "quality_gate",
     "gpt_5_mini_rewrite_if_quality_fails",
-    "gemini_independent_review",
+    "independent_review_by_the_other_approved_model",
     "seo_and_metadata_validation",
     "draft_private_awaiting_approval"
   ],
@@ -111,9 +114,9 @@
   "two_model_checks_and_balances": {
     "status": "LOCKED_MANDATORY",
     "applies_to": ["wordpress", "blogger", "tistory", "news"],
-    "gpt": "first_draft_and_rewrite_when_required",
-    "gemini": "independent_fact_structure_seo_originality_check",
-    "approval_rule": "gemini_and_gpt_must_both_return_ok_true",
+    "writer": "randomly gpt-5-mini or gemini-2.5-flash for this article (see primary_writer), rewrite always uses gpt-5-mini",
+    "reviewer": "the other approved model - independent fact/structure/SEO/originality check, never the same model that wrote the draft",
+    "approval_rule": "writer_and_reviewer_must_both_return_ok_true",
     "single_model_approval_allowed": false,
     "missing_or_failed_checker_action": "CONSENSUS_FAILED_NO_DRAFT"
   },
@@ -123,7 +126,9 @@
   },
   "image_generation": {
     "maximum_images_per_content": 1,
-    "order": ["bytedance/sdxl-lightning-4step", "black-forest-labs/flux-schnell", "pass_without_image"],
+    "order": ["pexels", "pixabay", "bytedance/sdxl-lightning-4step", "black-forest-labs/flux-schnell", "pass_without_image"],
+    "free_image_relevance_check_required": true,
+    "note": "2026-09-12 (user directive): free stock photos (Pexels, then Pixabay) are tried first and kept only if they pass the same relevance check used elsewhere; AI image generation is now a paid fallback for when no relevant free photo is found, not the default first step.",
     "attempts_per_model": 1,
     "all_failed_action": "no_image_no_substitute"
   },
