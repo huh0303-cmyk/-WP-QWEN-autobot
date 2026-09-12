@@ -31,7 +31,11 @@ def review_newsroom(*, title, content, meta, keyword, source_evidence):
     fixed = json.loads(raw)
     if not isinstance(fixed, dict) or not all(isinstance(fixed.get(k), str) and fixed[k].strip() for k in ('title', 'content', 'meta')):
         raise ValueError('NEWS_REPAIR_INVALID_PACKET')
-    for pattern in (r'<img\b[^>]*>', r'\b(?:href|src)\s*=\s*["\'][^"\']*["\']'):
+    # Compare the actual URLs, not the raw tag text: a harmless GPT-introduced
+    # whitespace or quote-style change in an unrelated attribute must not look
+    # like a swapped image or link. The moment a URL itself changes, this
+    # still catches it.
+    for pattern in (r'<img\b[^>]*\bsrc\s*=\s*["\']([^"\']+)["\']', r'\b(?:href|src)\s*=\s*["\']([^"\']+)["\']'):
         if sorted(re.findall(pattern, content, re.I)) != sorted(re.findall(pattern, fixed['content'], re.I)):
             raise ValueError('NEWS_REPAIR_CHANGED_MEDIA_OR_LINKS')
     if re.search(r'<script\b|\bon\w+\s*=', fixed['content'], re.I):
