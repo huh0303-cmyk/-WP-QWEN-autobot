@@ -1,0 +1,18 @@
+name: "One-off: fix koreamedicaltour.com irrelevant festival post image"
+on:
+  workflow_dispatch: {}
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python fix_kmt_festival_image.py
+        working-directory: scripts
+        env:
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
