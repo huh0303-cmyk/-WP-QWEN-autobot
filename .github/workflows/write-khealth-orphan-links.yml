@@ -1,6 +1,15 @@
 name: "One-off, user-approved: write k-health365.com orphan-fix internal links"
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "How many orphan/donor pairs to process this run"
+        required: false
+        default: "5"
+      batch_offset:
+        description: "Index to start from in the precomputed pairs list"
+        required: false
+        default: "0"
 permissions:
   contents: read
 jobs:
@@ -15,4 +24,6 @@ jobs:
       - run: pip install requests -q
       - env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          ORPHAN_FIX_BATCH_SIZE: ${{ inputs.batch_size }}
+          ORPHAN_FIX_BATCH_OFFSET: ${{ inputs.batch_offset }}
         run: python scripts/write_khealth_orphan_links.py
