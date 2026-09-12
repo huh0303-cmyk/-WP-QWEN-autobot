@@ -1,9 +1,13 @@
 from automation_hub.content_model_policy import choose_writer, review_role
 
 
-def test_default_writer_is_gpt_5_mini():
+def test_default_writer_is_randomly_gpt_or_gemini():
+    """2026-09-12 (user directive): the routine writer is randomly gpt-5
+    mini or Gemini 2.5 Flash per article, not gpt-5-mini exclusively."""
+    seen = {choose_writer().provider for _ in range(60)}
+    assert seen == {"openai", "gemini"}
     decision = choose_writer()
-    assert decision.provider == "openai"
+    assert decision.provider in {"openai", "gemini"}
     assert decision.status == "OK"
 
 
