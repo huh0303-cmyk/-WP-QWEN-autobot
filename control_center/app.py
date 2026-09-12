@@ -1951,6 +1951,36 @@ def publish_group_status(group: str):
     return jsonify(snapshot)
 
 
+# CEO Today Board (2026-09-12): these three sites carry the company's
+# non-newsroom revenue plan and must never be visually indistinguishable
+# from the other 24 general WordPress blogs on the dashboard.
+CORE_BUSINESS_SITES = (
+    ("k-health365.com", "HEALTH"),
+    ("kstudy365.com", "STUDY"),
+    ("jobkorea365.com", "JOB"),
+)
+
+
+def _core_business_sites(sites) -> list[dict]:
+    by_domain = {site["domain"]: site for site in sites}
+    return [dict(by_domain[domain], business_tag=tag) for domain, tag in CORE_BUSINESS_SITES if domain in by_domain]
+
+
+def _monetization_summary(sites, bloggers) -> dict:
+    """Real, already-tracked approval flags only. No revenue figures exist in
+    this codebase yet, so those fields stay None (rendered as '미연결') rather
+    than being estimated or invented."""
+    approved = [site["domain"] for site in sites if site.get("google_approved")]
+    approved += [blogger["name"] for blogger in bloggers if blogger.get("google_approved")]
+    return {
+        "adsense_approved": approved,
+        "adsense_pending": None,
+        "youtube_monetized": None,
+        "revenue_today": None,
+        "revenue_month": None,
+    }
+
+
 def build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts) -> dict:
     """One-glance rollup of what needs attention, computed from the same
     per-platform data already shown further down the page. CEO explicitly
@@ -2137,6 +2167,8 @@ def index():
         "index.html", sites=sites, bloggers=bloggers, tistory_sites=tistory_sites,
         youtube_channels=youtube_channels, sns_accounts=sns_accounts,
         problem_summary=build_problem_summary(sites, bloggers, tistory_sites, youtube_channels, sns_accounts),
+        core_business=_core_business_sites(sites),
+        monetization=_monetization_summary(sites, bloggers),
         text_models=TEXT_MODELS, image_models=IMAGE_MODELS,
         core_metrics_html=_ranked_core_metrics_html(),
     )

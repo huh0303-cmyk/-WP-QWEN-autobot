@@ -48,7 +48,70 @@
             <a href="#advanced-controls" class="dashboard-nav">설정·기록</a>
         </div>
     </nav>
-    <main class="mx-auto max-w-7xl space-y-10 p-3 pb-20 sm:p-6">
+    <main class="mx-auto max-w-7xl space-y-6 p-3 pb-20 sm:space-y-8 sm:p-6">
+        <section id="mission-board" class="rounded-2xl border border-slate-800 bg-slate-950 p-4 text-white shadow-xl sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-sm font-black tracking-wide text-slate-200 sm:text-lg">📟 CEO 오늘의 발행 현황</h2>
+                <span id="mission-board-time" class="text-[10px] font-semibold text-slate-500 sm:text-xs">연결 중…</span>
+            </div>
+            <div id="mission-board-stats" class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4"></div>
+            <p class="mt-3 text-[10px] font-semibold text-slate-500 sm:text-xs">오늘 발행 현황</p>
+            <div id="mission-board-platforms" class="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5"></div>
+        </section>
+        <section id="core-business" class="rounded-2xl border border-indigo-200 bg-indigo-50/60 p-4 shadow-sm sm:p-6">
+            <h2 class="text-sm font-black tracking-wide text-indigo-900 sm:text-lg">🎯 CORE BUSINESS</h2>
+            <p class="mt-0.5 text-[11px] font-semibold text-indigo-700">회사의 핵심 사업 3사이트 — 일반 사이트 목록과 별도로 항상 여기서 확인합니다.</p>
+            <div id="core-business-cards" class="mt-3 grid gap-3 sm:grid-cols-3">
+                {% for site in core_business %}
+                <div class="core-business-card rounded-2xl border border-indigo-200 bg-white p-3 shadow-sm" data-site-id="{{ site.site_id }}">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">{{ site.business_tag }}</p>
+                        {% if site.google_approved %}<span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-700">AdSense 승인</span>{% endif %}
+                    </div>
+                    <h3 class="mt-0.5 truncate text-sm font-black text-slate-900">{{ site.domain }}</h3>
+                    <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-slate-600">
+                        <p>오늘 방문자 <b class="text-slate-900">{{ site.today_visitors if site.today_visitors is not none else '-' }}</b>{% if site.today_delta %} <span class="{{ 'text-emerald-600' if site.today_delta > 0 else 'text-rose-600' }}">({{ '+' if site.today_delta > 0 }}{{ site.today_delta }})</span>{% endif %}</p>
+                        <p>누적방문 <b class="text-slate-900">{{ site.total_visitors if site.total_visitors is not none else '-' }}</b></p>
+                        <p>Google 색인 <b class="text-slate-900">{{ site.indexed if site.indexed is not none else '확인 중' }}{% if site.index_total %}/{{ site.index_total }}{% endif %}</b></p>
+                        <p>공개글 <b class="text-slate-900">{{ site.total_posts if site.total_posts is not none else '-' }}</b></p>
+                    </div>
+                    <div class="core-business-today mt-2 rounded-lg bg-slate-50 px-2 py-1.5 text-[11px] text-slate-500">오늘 발행 현황 불러오는 중…</div>
+                    <a href="https://{{ site.domain }}" target="_blank" rel="noopener noreferrer" class="mt-2 inline-block text-[11px] font-bold text-indigo-700 hover:underline">사이트 열기 →</a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="red-alert" class="rounded-2xl border-2 p-4 shadow-sm sm:p-6 border-rose-200 bg-white">
+            <h2 class="text-sm font-black tracking-wide text-slate-900 sm:text-lg">🚨 RED ALERT — 지금 처리할 것만</h2>
+            <div id="red-alert-body" class="mt-2 space-y-1.5"></div>
+        </section>
+        <section id="today-publish-detail" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+            <h2 class="text-sm font-black tracking-wide text-slate-900 sm:text-lg">📰 오늘 발행 상세</h2>
+            <div id="today-detail-tabs" class="mt-2 flex flex-wrap gap-1.5"></div>
+            <div id="today-detail-list" class="mt-2 space-y-1.5"></div>
+        </section>
+        <section id="monetization" class="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm sm:p-6">
+            <h2 class="text-sm font-black tracking-wide text-amber-900 sm:text-lg">💰 MONETIZATION</h2>
+            <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-[10px] font-bold text-slate-500">AdSense 승인 사이트</p>
+                    <p class="text-lg font-black text-slate-900">{{ monetization.adsense_approved|length }}개</p>
+                    <p class="truncate text-[10px] text-slate-500">{{ monetization.adsense_approved|join(', ') if monetization.adsense_approved else '-' }}</p>
+                </div>
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-[10px] font-bold text-slate-500">AdSense 신청 준비</p>
+                    <p class="text-lg font-black text-slate-400">{{ monetization.adsense_pending if monetization.adsense_pending is not none else '미연결' }}</p>
+                </div>
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-[10px] font-bold text-slate-500">YouTube 수익화 채널</p>
+                    <p class="text-lg font-black text-slate-400">{{ monetization.youtube_monetized if monetization.youtube_monetized is not none else '미연결' }}</p>
+                </div>
+                <div class="rounded-xl bg-white/70 px-3 py-2">
+                    <p class="text-[10px] font-bold text-slate-500">오늘 / 이번달 수익</p>
+                    <p class="text-lg font-black text-slate-400">미연결</p>
+                </div>
+            </div>
+        </section>
         <section id="daily-core-metrics" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" style="min-width:0">
             <p class="text-sm font-bold text-blue-800">매일 KST 오전 7시 수집 · 검증 완료 후 이메일 발송 · 전날 7시 기준과 비교</p>
             <p class="mt-1 text-xs text-slate-500">아래 기준 시각의 자료입니다. WP·Blogspot·뉴스룸별 순위이며, 표 안에서 아래·좌우로 스크롤할 수 있습니다.</p>
@@ -1057,6 +1120,10 @@
             installButton.hidden = true;
         });
         window.addEventListener('appinstalled', () => { installButton.hidden = true; });
+    </script>
+    {% set core_business_ids = core_business|map(attribute="site_id")|list %}
+    <script id="ceo-board-data" type="application/json">
+        {"problem_summary": {{ problem_summary|tojson }}, "core_business": {{ core_business_ids|tojson }}}
     </script>
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='operations.js') }}"></script>
