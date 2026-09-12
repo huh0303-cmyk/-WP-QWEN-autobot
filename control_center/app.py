@@ -570,6 +570,22 @@ def wordpress_cadence(site) -> dict[str, object]:
     }
 
 
+# 2026-09-12: read directly off the CEO's AdSense console (26 of 27 WP sites
+# show "승인됨"/Approved there; kskin365.com is not listed, so it stays
+# unapproved here rather than being assumed). This superseded the old
+# single-site (`== "k-health365.com"`) check, which had gone stale — most of
+# the network was approved without this flag ever being updated to say so.
+ADSENSE_APPROVED_DOMAINS = {
+    "k-health365.com", "koreainvest365.com", "korea365.org", "kfinance365.com",
+    "jobkorea365.com", "k-trip365.com", "koreainsurance365.com", "koreataxnlaw.com",
+    "kworld365.com", "koreamedicaltour.com", "krealestate365.com", "kstudy365.com",
+    "k-visa365.com", "jobinkorea365.com", "jobkoreaglobal.com", "oliveyoungkorea.com",
+    "sis-korea.com", "studyinkorea365.com", "kieca-korea.org", "ki-korea.com",
+    "ksa-korea.org", "koreacrypto365.com", "ktech365.com", "koreawedding365.com",
+    "koreanews365.com", "theseouljournal.com",
+}
+
+
 def get_site_data():
     raw_sites = [
         {"domain": "k-health365.com", "today": 196, "total": 12450, "diff": -6, "persona": "건강정보 편집국", "tone": "근거 중심의 신중하고 이해하기 쉬운 설명체"},
@@ -690,7 +706,7 @@ def get_site_data():
                 os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip() or
                 registered.secret_name in secret_names or os.environ.get(registered.secret_name, "").strip()
             )),
-            "google_approved": item["domain"] == "k-health365.com",
+            "google_approved": item["domain"] in ADSENSE_APPROVED_DOMAINS,
             "persona": registered.persona if registered else item["persona"],
             "tone": registered.tone if registered else item["tone"],
             "default_text_model": "gpt-5-mini",
