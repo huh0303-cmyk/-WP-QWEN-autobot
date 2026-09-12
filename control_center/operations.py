@@ -24,6 +24,10 @@ TERMINAL = {"published", "stopped", "failed"}
 # the ENTIRE batch's transaction before any of the other 32 got inserted.
 # A job stuck this long is dead, not "in progress"; treat it as no longer
 # active rather than let it block every future request for that site.
+# Measured from `created`, not `updated`: an 'attention' job keeps getting
+# reclaimed and re-polled by the worker (confirmed live - five real jobs
+# stayed at "0.0h since last update" while sitting stuck for 20+ hours),
+# so `updated` never ages and the staleness check never fired.
 STALE_ACTIVE_JOB_SECONDS = 6 * 3600
 
 
@@ -78,7 +82,7 @@ class Store:
             accepted, skipped = [], []
             for target in descriptors:
                 active = db.execute(
-                    "SELECT id FROM jobs WHERE site_id=? AND phase NOT IN ('published','stopped','failed') AND updated>? LIMIT 1",
+                    "SELECT id FROM jobs WHERE site_id=? AND phase NOT IN ('published','stopped','failed') AND created>? LIMIT 1",
                     (target["site_id"], now - STALE_ACTIVE_JOB_SECONDS),
                 ).fetchone()
                 if active:
