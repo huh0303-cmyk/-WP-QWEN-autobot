@@ -3394,6 +3394,8 @@ def process_one(site, keyword):
             news_source_url=kw_tuple[3]
         if isinstance(kw_tuple,tuple) and len(kw_tuple)>=5:
             news_source_category=kw_tuple[4]
+        from newsroom_source_evidence import enrich_source
+        news_source_summary = enrich_source(news_source_url, news_source_summary)
         site["_newsroom_source_evidence"] = {
             "publisher": news_source, "url": news_source_url,
             "headline": keyword, "excerpt": news_source_summary,
@@ -3419,6 +3421,8 @@ def process_one(site, keyword):
             "Do not infer a month or year for relative dates; omit ambiguous dates instead. "
             "Do not invent quotations, statistics, witnesses, dates, locations, reactions, or additional sources. "
             "If the available facts are limited, write a concise brief rather than padding the article."
+            " Use a short event-focused headline; omit nonessential job titles and lists of names. "
+            "Begin the response with the required TITLE: line, then body HTML and META_DESC:."
         )
     from editorial_brief import editorial_brief
     base_prompt += editorial_brief(base_prompt)
