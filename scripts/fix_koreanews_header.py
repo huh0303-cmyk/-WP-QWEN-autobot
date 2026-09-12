@@ -16,7 +16,7 @@ CODE = """add_action('wp_footer', function () {
     }
     ?>
     <style id="kn365-header-cleanup-style">
-      .mg-nav-widget-area .inner { background-color: #ffffff !important; background-image: none !important; }
+      .mg-nav-widget-area-back .inner { background-color: #ffffff !important; background-image: none !important; }
       .navbar-header .site-logo .network-text-site-title { display: none !important; }
     </style>
     <?php
