@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 2, "claim": "wp25-2026-09-12-wp_jobinkorea-073e68cd", "claimed_at": "2026-09-12T11:18:18.025085+09:00", "run_id": 34667313162, "child_run_id": null, "workflow": "daily-network-publish.yml", "repair_context": "User requested all25; PR113 fixes factual SEO repair feedback"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://jobinkorea365.com/what-foreign-candidates-in-korea-need-to-know-about-us-h1b-employer-wage-scrutiny-when-evaluating-sponsor-offers/", "published_at": "2026-09-12T02:22:29Z"}
