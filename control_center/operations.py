@@ -29,6 +29,12 @@ TERMINAL = {"published", "stopped", "failed"}
 # stayed at "0.0h since last update" while sitting stuck for 20+ hours),
 # so `updated` never ages and the staleness check never fired.
 STALE_ACTIVE_JOB_SECONDS = 6 * 3600
+# A non-terminal job past this age is not "slow", it is dead - no real
+# publish workflow in this network runs anywhere close to this long (the
+# longest timeout-minutes: is 20). claim() retires it to 'stopped' instead
+# of reclaiming and re-polling it forever. Well above STALE_ACTIVE_JOB_SECONDS
+# so a request is never blocked by a job the system hasn't given up on yet.
+STALE_JOB_GIVE_UP_SECONDS = 24 * 3600
 
 
 class Conflict(Exception):
@@ -143,6 +149,19 @@ class Store:
             if row is None:
                 return None
             data = json.loads(row["payload"])
+            if now - row["created"] > STALE_JOB_GIVE_UP_SECONDS:
+                # 2026-09-12: a job that never reaches a terminal outcome
+                # (confirmed live - five 'attention' jobs sat for 20+ hours,
+                # reclaimed and re-polled every cycle with no progress) used
+                # to loop forever, and blocked every future request for that
+                # site the whole time. Retire it instead of reclaiming it
+                # again; STALE_ACTIVE_JOB_SECONDS in submit() already stops
+                # counting it as active well before this point.
+                data.update(phase="stopped", detail="장시간 진행되지 않아 자동 종료됨 · 다시 실행해 주세요")
+                db.execute("UPDATE jobs SET lease=0,phase='stopped',payload=?,updated=? WHERE id=?",
+                           (json.dumps(data, ensure_ascii=False), now, row["id"]))
+                db.execute("INSERT INTO events(job_id,at,phase,detail) VALUES (?,?,?,?)", (row["id"], now, "stopped", data["detail"]))
+                return None
             if data["phase"] == "accepted":
                 # Record intent before the external side effect. A crash here is
                 # ambiguous and must never blindly send the request a second time.
