@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 10.38,
+  "spent_estimate_usd": 10.41,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -2849,6 +2849,15 @@
       "amount_usd": 0.03,
       "reservation_id": "e19f33a9684a6377c9d19006d1b8211903b1f65664e0637cfffbade0f2b23164",
       "run_id": "34673520944",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-12T13:46:19.551330+09:00",
+      "label": "blogger-rewrite:blogger_kvisa365",
+      "amount_usd": 0.03,
+      "reservation_id": "8ad283da045a9e2f23404c0d3319a1cb68af5e0be5faa0a3ec97bd6550ab8832",
+      "run_id": "34673520949",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
