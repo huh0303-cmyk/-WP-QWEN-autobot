@@ -3374,6 +3374,8 @@ def build_newsroom_meta(title, source_summary, lang):
     return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
 
 def process_one(site, keyword):
+    from economy_text import begin_article
+    begin_article()
     report_publication_progress("working", site["url"], detail="주제·출처 확인 및 글 작성·검수 중")
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET

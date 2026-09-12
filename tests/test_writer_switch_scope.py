@@ -23,3 +23,22 @@ def test_geography_alone_does_not_qualify_keyword():
     assert topic_fits('https://k-trip365.com','Seoul autumn walking routes')
     assert choose_scoped_keyword('https://jobinkorea365.com','Korea election results',
                                 ['Korea bitcoin','Korea job interview preparation'])=='Korea job interview preparation'
+
+
+def test_two_attempt_cap_includes_transport_and_quality_failure(monkeypatch):
+    import pytest
+    engine.begin_article()
+    calls=[]
+    def gpt(p,t):
+        calls.append('gpt')
+        raise RuntimeError('provider unavailable')
+    def gemini(p,t):
+        calls.append('gemini')
+        return 'draft failing quality'
+    monkeypatch.setattr(engine,'_try_gpt',gpt)
+    monkeypatch.setattr(engine,'_try_gemini',gemini)
+    assert engine.generate_text('first',force_gpt=True)=='draft failing quality'
+    with pytest.raises(RuntimeError,match='WRITERS_EXHAUSTED'):
+        engine.generate_text('repair',repair=True)
+    assert calls==['gpt','gemini']
+    monkeypatch.setattr(engine,'_article_attempts',None)

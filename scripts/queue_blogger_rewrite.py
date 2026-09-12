@@ -308,6 +308,8 @@ def main():
     # source/fallback checks have selected a valid route.
     check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
     previous_candidate = None
+    from economy_text import begin_article
+    begin_article()
     # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
     # The second GPT attempt uses deterministic quality-gate feedback.
     for attempt in range(1, 3):

@@ -11,6 +11,14 @@ from openai_text import openai_available, openai_generate_text
 _gemini_unavailable = False
 _gpt_unavailable = False
 last_writer_model = 'not_called'
+_article_attempts = None
+
+
+def begin_article():
+    global _article_attempts, _gemini_unavailable, _gpt_unavailable, last_writer_model
+    _article_attempts = set()
+    _gemini_unavailable = _gpt_unavailable = False
+    last_writer_model = 'not_called'
 
 
 def _try_gemini(prompt, temperature):
@@ -55,15 +63,15 @@ def _try_gpt(prompt, temperature):
 
 def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
     global _gemini_unavailable, _gpt_unavailable
-    if force_gpt:
-        return _try_gpt(prompt, temperature)
     # 2026-09-12 (user directive): randomly pick which of the two approved
     # writers goes first for THIS article instead of always trying Gemini
     # Flash first, so the load is split between both instead of GPT sitting
     # idle as a pure backup. Whichever one is not picked is the automatic
     # fallback if the first attempt fails technically. Quality repairs try
     # the other writer first, then retain the available writer on provider outage.
-    if repair and last_writer_model != 'not_called':
+    if force_gpt:
+        order = ['gpt', 'gemini']
+    elif repair and last_writer_model != 'not_called':
         previous = 'gemini' if last_writer_model.startswith('gemini') else 'gpt'
         order = ['gpt', 'gemini'] if previous == 'gemini' else ['gemini', 'gpt']
         print('Quality repair: switching writer from ' + previous + ' to ' + order[0])
@@ -71,6 +79,10 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
         order = random.sample(['gemini', 'gpt'], 2)
     last_exc = None
     for provider in order:
+        if _article_attempts is not None:
+            if provider in _article_attempts:
+                continue
+            _article_attempts.add(provider)
         try:
             if provider == 'gemini':
                 return _try_gemini(prompt, temperature)
@@ -83,4 +95,4 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
             else:
                 _gpt_unavailable = True
                 print(f'GPT unavailable; falling back to Gemini Flash: {type(exc).__name__}')
-    raise RuntimeError(f'No available article writer; preserve the job for retry ({last_exc})')
+    raise RuntimeError('WRITERS_EXHAUSTED: both approved writers attempted; retain draft and stop this article')
