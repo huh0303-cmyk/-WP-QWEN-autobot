@@ -1,0 +1,16 @@
+name: "One-off: inspect kfinance365 menu structure"
+on:
+  workflow_dispatch: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python scripts/inspect_menu.py
+        env:
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
