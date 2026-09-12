@@ -86,6 +86,8 @@ def main():
     os.makedirs("artifacts", exist_ok=True)
     with open("artifacts/duplicate-images-recent.json", "w", encoding="utf-8") as f:
         json.dump(dupes, f, ensure_ascii=False, indent=2)
+    with open("artifacts/duplicate-images-raw.json", "w", encoding="utf-8") as f:
+        json.dump(all_rows, f, ensure_ascii=False, indent=2)
 
     # sort by how many times reused, print top offenders
     ranked = sorted(dupes.items(), key=lambda kv: -len(kv[1]))
