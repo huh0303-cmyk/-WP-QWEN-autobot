@@ -1,0 +1,19 @@
+name: "One-off, user-approved: publish 2 digital-product side-income articles to kfinance365.com"
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - env:
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: python scripts/publish_digital_products_articles.py
