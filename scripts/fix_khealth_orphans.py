@@ -9,8 +9,18 @@ import html
 import re
 import time
 import os
+import socket
 import requests
 from requests.auth import HTTPBasicAuth
+
+_original_getaddrinfo = socket.getaddrinfo
+
+
+def _ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+
+socket.getaddrinfo = _ipv4_only
 
 USER = "huh0303@gmail.com"
 PW = os.environ["KHEALTH365COM"]
@@ -27,6 +37,9 @@ def fetch_all_posts():
             "_fields": "id,link,title,content,categories",
         }, timeout=30)
         if r.status_code == 400:
+            break
+        if r.status_code != 200:
+            print(f"unexpected status {r.status_code} on page {page}: {r.text[:300]}")
             break
         batch = r.json()
         if not isinstance(batch, list) or not batch:
