@@ -19,14 +19,21 @@ def visitor_counter_html(site_key: str, language: str = "ko") -> str:
   var siteKey = "{safe_key}";
   var box = document.getElementById("{MARK}-{safe_key}");
   if (!box) return;
-  var today = new Date().toISOString().slice(0,10);
+  var today = new Date(Date.now() + 9*60*60*1000).toISOString().slice(0,10);
   var flagKey = "dvc_" + siteKey + "_" + today;
   var alreadyCounted = false;
   try {{ alreadyCounted = !!localStorage.getItem(flagKey); }} catch (e) {{}}
-  fetch("{API_BASE}/" + siteKey, {{method: alreadyCounted ? "GET" : "POST"}})
-    .then(function(r) {{ return r.json(); }})
+  var visitorId;
+  try {{
+    visitorId = localStorage.getItem("k365_visitor");
+    if (!visitorId) {{ visitorId = crypto.randomUUID(); localStorage.setItem("k365_visitor", visitorId); }}
+  }} catch(e) {{ visitorId = null; }}
+  var shouldCount = !alreadyCounted && !!visitorId;
+  fetch("{API_BASE}/" + siteKey, {{method: shouldCount ? "POST" : "GET",
+    body: shouldCount ? new URLSearchParams({{visitor_id: visitorId}}) : undefined}})
+    .then(function(r) {{ if (!r.ok) throw new Error("counter unavailable"); return r.json(); }})
     .then(function(data) {{
-      try {{ localStorage.setItem(flagKey, "1"); }} catch (e) {{}}
+      if (shouldCount) {{ try {{ localStorage.setItem(flagKey, "1"); }} catch (e) {{}} }}
       box.textContent = "{today_label} " + data.today + " · {total_label} " + data.total;
     }})
     .catch(function() {{ box.style.display = "none"; }});

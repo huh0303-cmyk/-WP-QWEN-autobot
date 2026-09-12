@@ -209,7 +209,7 @@ def approve_tistory_draft(job_id: str):
 @app.before_request
 def require_control_center_login():
     """Protect every PWA route when deployment credentials are configured."""
-    if request.path in {"/healthz", "/api/vps/publish"}:
+    if request.path in {"/healthz", "/api/vps/publish"} or request.endpoint == "blog_visits":
         return None
     username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
     password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
