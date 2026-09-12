@@ -38,7 +38,8 @@ def recent_posts(site_url):
                               params={"per_page": 30, "page": page, "status": "publish",
                                       "after": cutoff + "Z", "orderby": "date", "order": "desc",
                                       "_fields": "id,title,content,link,date"})
-        except Exception:
+        except Exception as exc:
+            print(f"  connection error on {site_url} page{page}: {type(exc).__name__}: {str(exc)[:150]}")
             break
         if r.status_code != 200:
             break
