@@ -5736,7 +5736,8 @@
         "complete": true,
         "comparison_at": "2026-09-10T22:01:51.949797+00:00"
       },
-      "audited_at": "2026-09-11T22:09:33.890820+00:00"
+      "audited_at": "2026-09-11T22:09:33.890820+00:00",
+      "error": "wp_inventory_failed: 403 Client Error: Forbidden for url: https://k-health365.com/wp-json/wp/v2/posts?status=publish&per_page=100&page=1&orderby=date&order=asc&_fields=id%2Clink%2Cslug%2Cdate_gmt%2Cmodified_gmt%2Ctitle"
     },
     "https://koreamedicaltour.com": {
       "lifecycle": "active",
@@ -25749,5 +25750,5 @@
       "audited_at": "2026-09-12T00:02:54.381837+00:00"
     }
   },
-  "updated_at": "2026-09-12T00:02:54.381861+00:00"
+  "updated_at": "2026-09-12T02:54:27.240497+00:00"
 }
