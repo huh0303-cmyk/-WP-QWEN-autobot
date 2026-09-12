@@ -151,4 +151,27 @@ def install(module):
             worker.start()
         return jsonify(jobs=store.snapshot(), server_time=time.time(), automatic_news=rss.status())
 
+    @app.post("/admin/jobs/<job_id>/stop")
+    def stop_job(job_id):
+        # 2026-09-12: there was no way for a human to clear a job stuck in a
+        # non-terminal phase (usually 'attention') short of waiting out the
+        # give-up window - confirmed live, five sites sat blocked for 20+
+        # hours with no recourse. This lets the control room owner end one
+        # immediately instead of waiting.
+        if not hmac.compare_digest(request.form.get("csrf_token", ""), app.config["CONTROL_CENTER_CSRF"]):
+            return jsonify({"message": "요청 확인값이 만료되었습니다."}), 403
+        now = time.time()
+        with store.connect() as db:
+            row = db.execute("SELECT payload FROM jobs WHERE id=?", (job_id,)).fetchone()
+            if not row:
+                return jsonify({"message": "해당 작업을 찾을 수 없습니다."}), 404
+            data = json.loads(row["payload"])
+            if data["phase"] in ("published", "stopped", "failed"):
+                return jsonify({"message": "이미 종료된 작업입니다.", "phase": data["phase"]}), 409
+            data.update(phase="stopped", detail="관리자가 수동으로 중단함")
+            db.execute("UPDATE jobs SET phase='stopped', payload=?, updated=?, lease=0 WHERE id=?",
+                       (json.dumps(data, ensure_ascii=False), now, job_id))
+            db.execute("INSERT INTO events(job_id,at,phase,detail) VALUES (?,?,?,?)", (job_id, now, "stopped", data["detail"]))
+        return jsonify({"accepted": True, "job_id": job_id, "message": "작업을 중단 처리했습니다."})
+
     return worker
