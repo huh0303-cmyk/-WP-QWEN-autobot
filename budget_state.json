@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 10.62,
+  "spent_estimate_usd": 10.65,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -2921,6 +2921,15 @@
       "amount_usd": 0.03,
       "reservation_id": "ccc57c30a5195e0048a009798cff628a5d42c54f6062149a7bb637a178e705a7",
       "run_id": "34673526924",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-12T15:28:10.373539+09:00",
+      "label": "blogger-rewrite:blogger_koreamedicaltour1",
+      "amount_usd": 0.03,
+      "reservation_id": "e384cb078a9200fdcfa3bedc48a6bc2e4ecccea7fa22b200e1aaee80050829e9",
+      "run_id": "34678181828",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
