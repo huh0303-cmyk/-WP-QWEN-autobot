@@ -2096,7 +2096,7 @@ def _gemini_generate_text_raw(prompt, temperature=0.85):
 def generate_content_gemini(prompt, use_gpt=False):
     # 2026-09-11: user prioritizes Flash cost and a single GPT fallback.
     from economy_text import generate_text
-    return generate_text(prompt, temperature=0.85, force_gpt=use_gpt)
+    return generate_text(prompt, temperature=0.85, repair=use_gpt)
 
 def strip_code_fences(text):
     """Gemini가 가끔 응답을 ```html ... ``` 코드블록으로 감싸서 반환하는 경우,
@@ -3463,7 +3463,7 @@ def process_one(site, keyword):
             print("REWRITE_REQUIRED " + "; ".join(repeat_errors))
             prompt = base_prompt + "\nRewrite the headline and opening from the article facts.\n" + "\n".join(repeat_errors)
             continue
-        pre=estimate_seo_score(title,body,meta,tags,faq,["x","x","x"],keyword)
+        pre=estimate_seo_score(title,body,meta,tags,faq,["x"],keyword)
         print(f"  📝 {attempt+1}회차 → SEO {pre}점")
 
         # A missing or too-short title can never win best_result, even with a
@@ -3787,6 +3787,11 @@ def main():
                     or load_keyword(site["keywords_file"],url,f"{theme} guide 2026"))
             if site["mode"] not in ("news","news_en"):
                 kw=sanitize_keyword(kw, f"{theme} guide 2026")
+                from editorial_topic_scope import choose_scoped_keyword
+                source_pool = Path(site["keywords_file"])
+                candidates = source_pool.read_text(encoding="utf-8-sig").splitlines() if source_pool.exists() else []
+                candidates = [c for c in candidates if not _keyword_recently_covered(c, url)]
+                kw = choose_scoped_keyword(url, kw, candidates)
             try:
                 if process_one(site,kw): ok+=1
                 else: fail+=1

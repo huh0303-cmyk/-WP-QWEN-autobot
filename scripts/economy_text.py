@@ -53,7 +53,7 @@ def _try_gpt(prompt, temperature):
     return openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=300)
 
 
-def generate_text(prompt, temperature=0.7, force_gpt=False):
+def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
     global _gemini_unavailable, _gpt_unavailable
     if force_gpt:
         return _try_gpt(prompt, temperature)
@@ -61,9 +61,14 @@ def generate_text(prompt, temperature=0.7, force_gpt=False):
     # writers goes first for THIS article instead of always trying Gemini
     # Flash first, so the load is split between both instead of GPT sitting
     # idle as a pure backup. Whichever one is not picked is the automatic
-    # fallback if the first attempt fails technically. Quality-gate rewrites
-    # still call generate_text(force_gpt=True) unchanged, bypassing this.
-    order = random.sample(['gemini', 'gpt'], 2)
+    # fallback if the first attempt fails technically. Quality repairs try
+    # the other writer first, then retain the available writer on provider outage.
+    if repair and last_writer_model != 'not_called':
+        previous = 'gemini' if last_writer_model.startswith('gemini') else 'gpt'
+        order = ['gpt', 'gemini'] if previous == 'gemini' else ['gemini', 'gpt']
+        print('Quality repair: switching writer from ' + previous + ' to ' + order[0])
+    else:
+        order = random.sample(['gemini', 'gpt'], 2)
     last_exc = None
     for provider in order:
         try:
@@ -74,8 +79,8 @@ def generate_text(prompt, temperature=0.7, force_gpt=False):
             last_exc = exc
             if provider == 'gemini':
                 _gemini_unavailable = True
-                print(f'Gemini Flash unavailable or incomplete; falling back to GPT: {exc}')
+                print(f'Gemini Flash unavailable or incomplete; falling back to GPT: {type(exc).__name__}')
             else:
                 _gpt_unavailable = True
-                print(f'GPT unavailable; falling back to Gemini Flash: {exc}')
+                print(f'GPT unavailable; falling back to Gemini Flash: {type(exc).__name__}')
     raise RuntimeError(f'No available article writer; preserve the job for retry ({last_exc})')

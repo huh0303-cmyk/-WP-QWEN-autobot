@@ -368,7 +368,7 @@ def main():
                 )
         try:
             from economy_text import generate_text
-            raw = generate_text(prompt, temperature=0.7)
+            raw = generate_text(prompt, temperature=0.7, repair=attempt > 1)
             candidate = parse_rewrite_json(raw)
             previous_candidate = candidate
             if source is not None:
