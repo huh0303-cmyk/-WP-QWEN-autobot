@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 2, "claim": "wp25-2026-09-12-wp_ktech365-d7b26538", "claimed_at": "2026-09-12T11:18:18.025085+09:00", "run_id": 34667323265, "child_run_id": null, "workflow": "daily-network-publish.yml", "repair_context": "User requested all25; PR113 fixes factual SEO repair feedback"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://ktech365.com/ai-fast-track-program-eligibility-technical-criteria-korean-actors-and-implications-for-chips-and-infrastructure/", "published_at": "2026-09-12T03:36:41Z"}
