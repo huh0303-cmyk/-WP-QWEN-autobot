@@ -308,6 +308,8 @@ def main():
     # source/fallback checks have selected a valid route.
     check_and_record(ESTIMATED_COST_PER_RUN_USD, label=f"blogger-rewrite:{blogger_site_id}")
     previous_candidate = None
+    from economy_text import begin_article
+    begin_article()
     # Blogger's locked authoring policy is GPT-5 mini first.  A second GPT
     # The second GPT attempt uses deterministic quality-gate feedback.
     for attempt in range(1, 3):
@@ -368,7 +370,7 @@ def main():
                 )
         try:
             from economy_text import generate_text
-            raw = generate_text(prompt, temperature=0.7)
+            raw = generate_text(prompt, temperature=0.7, repair=attempt > 1)
             candidate = parse_rewrite_json(raw)
             previous_candidate = candidate
             if source is not None:
