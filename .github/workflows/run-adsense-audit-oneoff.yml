@@ -1,0 +1,20 @@
+name: "One-off: run existing adsense audit script"
+on:
+  workflow_dispatch: {}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python scripts/audit_adsense_sites.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: adsense-audit
+          path: artifacts/adsense-audit/
+          if-no-files-found: ignore
