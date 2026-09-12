@@ -6,6 +6,7 @@ import json
 import re
 import socket
 import sys
+import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
@@ -33,15 +34,18 @@ def recent_posts(site_url):
     posts = []
     page = 1
     while True:
-        try:
-            r = requests.get(f"{site_url}/wp-json/wp/v2/posts", timeout=20,
-                              params={"per_page": 30, "page": page, "status": "publish",
-                                      "after": cutoff + "Z", "orderby": "date", "order": "desc",
-                                      "_fields": "id,title,content,link,date"})
-        except Exception as exc:
-            print(f"  connection error on {site_url} page{page}: {type(exc).__name__}: {str(exc)[:150]}")
-            break
-        if r.status_code != 200:
+        r = None
+        for attempt in range(4):
+            try:
+                r = requests.get(f"{site_url}/wp-json/wp/v2/posts", timeout=40,
+                                  params={"per_page": 30, "page": page, "status": "publish",
+                                          "after": cutoff + "Z", "orderby": "date", "order": "desc",
+                                          "_fields": "id,title,content,link,date"})
+                break
+            except Exception as exc:
+                print(f"  connection error on {site_url} page{page} attempt{attempt}: {type(exc).__name__}: {str(exc)[:150]}")
+                time.sleep(3 * (attempt + 1))
+        if r is None or r.status_code != 200:
             break
         batch = r.json()
         if not isinstance(batch, list) or not batch:
@@ -69,7 +73,7 @@ def scan_site(site_url):
 
 def main():
     all_rows = []
-    with ThreadPoolExecutor(max_workers=10) as pool:
+    with ThreadPoolExecutor(max_workers=5) as pool:
         futures = {pool.submit(scan_site, site): site for site, _, _ in ACTIVE_SITES}
         for future in as_completed(futures):
             rows = future.result()
