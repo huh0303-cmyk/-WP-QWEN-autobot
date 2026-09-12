@@ -2192,8 +2192,10 @@ def tistory_seed_topics_route(site_id: str):
 
 
 from .operation_routes import install as _install_operations
+from .blog_visitors import install as _install_blog_visitors
 import sys as _sys
 _operation_worker = _install_operations(_sys.modules[__name__])
+_install_blog_visitors(_sys.modules[__name__])
 
 
 def main() -> None:
