@@ -48,3 +48,16 @@ def test_repair_cannot_replace_images(monkeypatch):
     monkeypatch.setattr(repair, 'generate_text', Mock(return_value=json.dumps(dict(title='Title', content='<p>Changed</p>', meta='Meta'))))
     with pytest.raises(ValueError, match='CHANGED_MEDIA_OR_LINKS'):
         repair.review_newsroom(**PACKET)
+
+
+def test_harmless_attribute_formatting_change_is_not_treated_as_a_swap(monkeypatch):
+    """2026-09-12: GPT re-quoting/reordering an <img> tag's own attributes (not
+    its src) is not a media swap and must not fail closed the whole job."""
+    monkeypatch.setattr(repair, 'require_editorial_approval', Mock(side_effect=[ValueError('CONSENSUS_FAILED: incorrect'), {'ok': True}]))
+    reformatted = PACKET['content'].replace(
+        '<img src="https://example.org/a.jpg">',
+        "<img loading='lazy' src='https://example.org/a.jpg' alt=''>")
+    monkeypatch.setattr(repair, 'generate_text', Mock(return_value=json.dumps(
+        dict(title='Correct office title', content=reformatted, meta='Corrected summary'))))
+    title, content, meta, approved = repair.review_newsroom(**PACKET)
+    assert title == 'Correct office title' and approved['ok']
