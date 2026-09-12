@@ -1,4 +1,5 @@
 name: "Blog Publish — Single Site (dispatched by A/B scheduler)"
+run-name: "WordPress ${{ inputs.target_site_url }} · ${{ inputs.room_id }}"
 
 # publish_scheduler.py가 A17/B8 중 오늘 대상 사이트를 하나씩 분산 dispatch한다.
 # 뉴스 2개는 newsrooms-daily-publisher.yml이 별도로 담당한다.
@@ -49,8 +50,9 @@ jobs:
         run: pip install requests google-genai beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
       - name: Recheck today's cross-media and search-trend signals
         id: viral
+        continue-on-error: true
         run: python scripts/select_live_viral_keyword.py --site "${{ inputs.target_site_url }}"
-      - name: Create one quality-gated review draft
+      - name: Write and deliver one quality-gated article
         env:
           WP_AUTOPUBLISH_ENABLED: "true"
           WP_POST_STATUS: ${{ inputs.publication_approved && 'publish' || 'draft' }}
@@ -65,7 +67,7 @@ jobs:
           FORCE_KEYWORD: ${{ inputs.force_keyword || steps.viral.outputs.keyword }}
           RUN_SLOT: "1"
           SLEEP_BETWEEN_POSTS: "2"
-          MAX_REGEN: "2"
+          MAX_REGEN: "1"
           # Regular 25-site network: GPT-5 mini plus deterministic quality gates.
           AI_TEXT_PROVIDER: "openai"
           GH_TOKEN: ${{ github.token }}
@@ -86,6 +88,8 @@ jobs:
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          VPS_PUBLISH_INGEST_URL: "https://control.korea365.org/api/vps/publish"
+          VPS_PUBLISH_INGEST_TOKEN: ${{ secrets.VPS_PUBLISH_INGEST_TOKEN }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
@@ -121,19 +125,9 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          published=false
-          for attempt in 1 2 3; do
-            echo "Publication attempt ${attempt}/3"
-            if python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log; then
-              published=true
-              break
-            fi
-            sleep $((attempt * 15))
-          done
-          if [ "$published" != "true" ]; then
-            echo "::error title=WordPress publication failed::No verified public post after 3 attempts"
-            exit 1
-          fi
+          # Reconcile the public site and exact worker outcome before any retry.
+          # A fresh process must not repeat an uncertain WordPress write.
+          python scripts/autopost_current.py 2>&1 | tee artifacts/wordpress-worker.log
       - name: Normalize room result
         if: always()
         env:
@@ -157,7 +151,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
       - name: Send private-draft review link
-        if: always()
+        if: ${{ always() && !inputs.publication_approved }}
         env:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}

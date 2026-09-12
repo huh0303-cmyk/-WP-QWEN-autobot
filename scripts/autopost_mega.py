@@ -14,6 +14,15 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
 
 import os, sys, time, random, re, json, hashlib, base64
 import requests
+# Some hosting endpoints publish an AAAA record while rejecting IPv6
+# connections from the VPS.  Keep the choice explicit and opt-in so local
+# development remains unchanged; the VPS publisher enables this flag.
+if os.getenv("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes", "on"}:
+    import socket
+    _getaddrinfo = socket.getaddrinfo
+    def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        return _getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+    socket.getaddrinfo = _ipv4_only_getaddrinfo
 # Direct workflow execution uses `python scripts/autopost_mega.py`, which makes
 # scripts/ (not the repository root) sys.path[0]. Add the root for shared modules.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -2382,8 +2391,7 @@ def postprocess(body, meta, title, keyword, lang, min_chars, gemini_fn):
     # ★ 연도 강제 치환: AI 프롬프트 지시만으론 보장 안 되므로 코드가 이중으로 강제
     #   2023/2024/2025 → 2026 (단어 경계 기준, 다른 4자리 숫자는 건드리지 않음)
     #   (title은 build_diverse_title()이 이미 항상 현재연도만 쓰므로 별도 처리 불필요)
-    body = re.sub(r'\b(2023|2024|2025)\b', '2026', body)
-    meta = re.sub(r'\b(2023|2024|2025)\b', '2026', meta)
+    # Historical source dates must remain as written; no automatic year updates.
 
     # ★ 2026-08-14 제거: 통계/표가 부족하면 지어낸 가짜 수치("약 500만 명", "12.3%
     #   증가", "3조 2,000억 원" 등)와 매번 똑같은 템플릿 표를 강제로 붙여넣던 로직을
@@ -2392,12 +2400,12 @@ def postprocess(body, meta, title, keyword, lang, min_chars, gemini_fn):
     #   신호로 잡힐 수 있음 — 통계나 표가 부족하면 그냥 없이 발행하는 게 낫다.
 
     # META 보완
-    if len(meta) < 100:
+    if not 130 <= len(meta) <= 160:
         prompt = f"SEO 메타 디스크립션 {'130~140자(한글)' if lang=='ko' else '130~155 English chars'}로 작성. 키워드 '{keyword}' 포함. 제목: {title}\n순수 텍스트만 출력."
         try:
             result = gemini_fn(prompt).strip()
             result = re.sub(r'^META_DESC:\s*','',result,flags=re.IGNORECASE).strip()
-            if 80<=len(result)<=200: meta=result
+            if 130<=len(result)<=160: meta=result
         except: pass
         if len(meta)<100:
             # ★ "전문가 검증"은 실제로 검증한 적 없는 근거 없는 신뢰 주장이라 제거—
@@ -3487,12 +3495,12 @@ def process_one(site, keyword):
             if mode not in ("news", "news_en") and max_chars and blen>max_chars:
                 issues.append(f"본문 {blen}자→{max_chars}자 이하로 축약")
             if mode not in ("news", "news_en"):
-                if count_stats(body)<5: issues.append("통계 5개 이상 추가")
-                if len(re.findall(r'\([^)]{3,40},\s*20[0-9]{2}\)',body))<3: issues.append("출처 괄호 3개 이상")
+                issues.append("통계·날짜·정책은 확인한 출처가 있는 사실만 사용. 점수를 위해 숫자나 출처를 만들지 말 것.")
                 if len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))<4: issues.append("내부링크 4개 이상")
                 if not re.search(r'<table[\s>]',body,re.IGNORECASE): issues.append("<table> 1개 이상")
                 if len(re.findall(r'<h2[\s>]',body,re.IGNORECASE))<4: issues.append("h2 4개 이상")
-            if len(meta)<100: issues.append(f"META_DESC {len(meta)}자→130자 이상")
+            from article_seo_repair import metadata_feedback
+            issues.extend(metadata_feedback(title, meta, keyword))
             if not title or len(title) < 15:
                 issues.append("응답 맨 위에 'TITLE: <완전한 제목>' 줄이 반드시 있어야 함 — 섹션 제목이 아닌 실제 기사 제목")
             suffix=f"\n\n[SEO {pre}점 미달 보완]\n"+"".join(f"{i+1}. {x}\n" for i,x in enumerate(issues))
@@ -3667,7 +3675,26 @@ def process_one(site, keyword):
             return False
         sc.add(tl); sc.add(tl_key); _wp_title_cache[url]=sc
 
-    result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
+    ingest_url = os.getenv("VPS_PUBLISH_INGEST_URL", "").strip()
+    if ingest_url:
+        token = os.getenv("VPS_PUBLISH_INGEST_TOKEN", "").strip()
+        payload = {
+            "job_id": os.getenv("ROOM_ID", "") or hashlib.sha256(f"{url}|{title}".encode()).hexdigest()[:24],
+            "site_url": url, "secret_name": site.get("wp_pass_env", ""),
+            "title": title, "content_html": body, "status_after_review": os.getenv("WP_POST_STATUS", "publish"),
+            "meta_description": meta, "tags": tags, "keyword": keyword, "image_urls": images,
+        }
+        try:
+            gateway = requests.post(ingest_url, json=payload, headers={"Authorization": f"Bearer {token}"}, timeout=30)
+            gateway.raise_for_status()
+            data = gateway.json()
+            result = {"ok": data.get("ok") is True, "url": "", "status": "queued", "error": data.get("error", "")}
+            if result["ok"]:
+                print(f"  ✅ VPS 발행 큐 접수: {data.get('job_id', payload['job_id'])}")
+        except Exception as exc:
+            result = {"ok": False, "error": f"VPS gateway: {type(exc).__name__}: {exc}"}
+    else:
+        result=wp_post(site,title,body,meta,tags,faq,images,keyword,score,reporter)
     if result["ok"]:
         title = result.get("title", title)
         is_draft = result.get("status") == "draft"

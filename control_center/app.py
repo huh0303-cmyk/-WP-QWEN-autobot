@@ -209,7 +209,7 @@ def approve_tistory_draft(job_id: str):
 @app.before_request
 def require_control_center_login():
     """Protect every PWA route when deployment credentials are configured."""
-    if request.path == "/healthz":
+    if request.path in {"/healthz", "/api/vps/publish"}:
         return None
     username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
     password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
@@ -232,6 +232,41 @@ def require_control_center_login():
 @app.get("/healthz")
 def healthz():
     return {"status": "ok"}
+
+
+@app.post("/api/vps/publish")
+def enqueue_vps_publication():
+    """Receive one reviewed article for the VPS WordPress publisher.
+
+    GitHub supplies content; the VPS performs the authenticated REST write.
+    The bearer token is kept in the VPS environment and no credentials are
+    accepted in the request body.
+    """
+    expected = os.environ.get("VPS_PUBLISH_INGEST_TOKEN", "").strip()
+    supplied = request.headers.get("Authorization", "")
+    if not expected or not hmac.compare_digest(supplied, "Bearer " + expected):
+        return jsonify({"ok": False, "error": "unauthorized"}), 401
+    payload = request.get_json(silent=True) or {}
+    required = ("job_id", "site_url", "secret_name", "title", "content_html")
+    if any(not str(payload.get(key, "")).strip() for key in required):
+        return jsonify({"ok": False, "error": "missing publication fields"}), 400
+    site = str(payload["site_url"]).rstrip("/")
+    if not site.startswith("https://") or not re.match(r"^https://[A-Za-z0-9.-]+$", site):
+        return jsonify({"ok": False, "error": "invalid site_url"}), 400
+    allowed = {str(item["url"]).rstrip("/"): item for item in get_site_data()}
+    if site not in allowed or str(payload["secret_name"]) != str(allowed[site].get("secret_name", "")):
+        return jsonify({"ok": False, "error": "site is not registered"}), 403
+    queue = Path(os.environ.get("VPS_WP_QUEUE", "/opt/korea365/data/vps-wp-queue"))
+    queue.mkdir(parents=True, exist_ok=True)
+    job_id = re.sub(r"[^A-Za-z0-9_.:-]", "-", str(payload["job_id"]))[:120]
+    target = queue / f"{job_id}.queued.json"
+    if target.exists() or (queue / f"{job_id}.processing.json").exists() or (queue / f"{job_id}.published.json").exists():
+        return jsonify({"ok": True, "status": "already_queued", "job_id": job_id}), 200
+    tmp = queue / f".{job_id}.tmp"
+    tmp.write_text(json.dumps({**payload, "job_id": job_id, "site_url": site, "received_at": datetime.now(timezone.utc).isoformat()}, ensure_ascii=False), encoding="utf-8")
+    os.chmod(tmp, 0o600)
+    os.replace(tmp, target)
+    return jsonify({"ok": True, "status": "queued", "job_id": job_id}), 202
 
 
 @app.get("/manifest.webmanifest")
