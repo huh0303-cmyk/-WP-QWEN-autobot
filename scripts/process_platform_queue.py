@@ -80,6 +80,7 @@ def main() -> int:
     queue = _records(queue_values)
     processed = 0
     failed = 0
+    deferred = 0
 
     for index, row in enumerate(queue, start=2):
         recover_invalid = (
@@ -169,7 +170,10 @@ def main() -> int:
                 except (requests.RequestException, ValueError, KeyError):
                     reason = "publication_count_unavailable"
                 if reason:
-                    print(json.dumps({"job_id": job.job_id, "status": "waiting", "reason": reason}, ensure_ascii=False))
+                    print(json.dumps({"job_id": job.job_id, "site_id": job.site_id,
+                                      "status": "waiting", "reason": reason}, ensure_ascii=False))
+                    if reason == "daily_limit_reached":
+                        deferred += 1
                     continue
             publisher = BloggerPublisher(job.site_id, account.get("destination_id", ""), token, site_url=account.get("editor_url", ""))
         elif platform in {"naver", "tistory"}:
@@ -212,7 +216,7 @@ def main() -> int:
         if processed >= max_jobs:
             break
     print(f"Processed {processed} queue job(s)")
-    if fail_on_empty and processed == 0:
+    if fail_on_empty and processed == 0 and deferred == 0:
         raise SystemExit("No eligible queue job was processed")
     if failed:
         raise SystemExit(f"{failed} of {processed} processed queue job(s) failed")
