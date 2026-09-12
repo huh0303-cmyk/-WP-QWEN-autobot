@@ -44,7 +44,7 @@ def recent_posts(site_url):
                 break
             except Exception as exc:
                 print(f"  connection error on {site_url} page{page} attempt{attempt}: {type(exc).__name__}: {str(exc)[:150]}")
-                time.sleep(3 * (attempt + 1))
+                time.sleep(8 * (attempt + 1))
         if r is None or r.status_code != 200:
             break
         batch = r.json()
@@ -73,7 +73,7 @@ def scan_site(site_url):
 
 def main():
     all_rows = []
-    with ThreadPoolExecutor(max_workers=5) as pool:
+    with ThreadPoolExecutor(max_workers=2) as pool:
         futures = {pool.submit(scan_site, site): site for site, _, _ in ACTIVE_SITES}
         for future in as_completed(futures):
             rows = future.result()
