@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 9.99,
+  "spent_estimate_usd": 10.02,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -2732,6 +2732,15 @@
       "amount_usd": 0.03,
       "reservation_id": "9b379dc165e1b9f575c2561ad0c0003badca86ebff2ac2d3f8c6456c6fd6fcd8",
       "run_id": "34670566469",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-12T12:34:50.667351+09:00",
+      "label": "blogger-rewrite:blogger_koreawedding",
+      "amount_usd": 0.03,
+      "reservation_id": "59c97754613cf5fd725d9702ef363a2da7732d910878840cddeaadfe8e742c1e",
+      "run_id": "34670574383",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
