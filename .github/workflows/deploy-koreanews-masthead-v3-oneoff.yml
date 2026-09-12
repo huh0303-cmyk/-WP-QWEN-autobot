@@ -1,0 +1,17 @@
+name: "One-off: deploy koreanews365 masthead v3 (PHP echo pattern)"
+on:
+  workflow_dispatch: {}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python deploy_koreanews_masthead_v3.py
+        working-directory: scripts
+        env:
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
