@@ -17,12 +17,14 @@ def test_quality_threshold_is_locked_at_70():
     assert MIN_SCORE == 70
 
 
-def test_all_blog_writers_are_gpt5_mini_and_images_are_sdxl_first():
+def test_all_blog_writers_are_gpt5_mini_or_gemini_and_images_try_free_stock_first():
     policy = load_json("content_writing_policy.json")
-    assert policy["primary_writer"]["provider"] == "openai"
-    assert policy["primary_writer"]["model"] == "gpt-5-mini"
+    assert set(policy["primary_writer"]["providers"]) == {"openai", "gemini"}
+    assert policy["primary_writer"]["models"] == {"openai": "gpt-5-mini", "gemini": "gemini-2.5-flash"}
     assert policy["fallback_writer"]["provider"] == "openai"
     assert policy["image_generation"]["order"] == [
+        "pexels",
+        "pixabay",
         "bytedance/sdxl-lightning-4step",
         "black-forest-labs/flux-schnell",
         "pass_without_image",
