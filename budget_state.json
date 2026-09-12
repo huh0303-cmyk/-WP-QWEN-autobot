@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 10.68,
+  "spent_estimate_usd": 10.71,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -2939,6 +2939,15 @@
       "amount_usd": 0.03,
       "reservation_id": "2fdb9f44e228cce998b17a4cf4ab8cc2e419d65de75352607ee54378016b13c8",
       "run_id": "34678179564",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-12T15:28:18.061310+09:00",
+      "label": "blogger-rewrite:blogger_seoul_intl_school_guide",
+      "amount_usd": 0.03,
+      "reservation_id": "66e18405f8b3e9905b9cb3bce4461f232a13c384a08246a997443b20c596be19",
+      "run_id": "34678184622",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
