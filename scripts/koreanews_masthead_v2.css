@@ -1,0 +1,68 @@
+/* kn365-mobile-category-and-newsprint: 2026-09-12 — 카테고리 상시노출 + 신문지 느낌 마스트헤드 */
+
+/* 1) 카테고리 메뉴: 모바일에서 접히지 않고 항상 첫 줄로 노출 (가로 스크롤) */
+.mg-headwidget .navbar-wp .collapse.navbar-collapse{
+  display:flex!important;
+  visibility:visible!important;
+  height:auto!important;
+}
+.mg-headwidget .navbar-wp{
+  flex-wrap:nowrap!important;
+  overflow:hidden!important;
+}
+.mg-headwidget .navbar-wp .navbar-nav{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  overflow-x:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  scrollbar-width:none!important;
+  width:100%!important;
+  margin:0!important;
+}
+.mg-headwidget .navbar-wp .navbar-nav::-webkit-scrollbar{display:none!important}
+.mg-headwidget .navbar-wp .navbar-nav>li{flex:0 0 auto!important}
+.mg-headwidget .navbar-wp .navbar-nav>li>a{
+  display:inline-block!important;
+  padding:11px 12px!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  white-space:nowrap!important;
+}
+.mg-headwidget .navbar-toggler{display:none!important}
+@media(max-width:767px){
+  .mg-headwidget .navbar-wp .navbar-nav>li>a{font-size:12.5px!important;padding:10px 10px!important}
+}
+
+/* 2) 마스트헤드: 흰 배경 대신 신문 용지 느낌 (미색+미세 그레인+상하 괘선) */
+.mg-nav-widget-area-back{
+  background-color:#f4efe2!important;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 2px),
+    radial-gradient(rgba(0,0,0,0.05) 0.6px, transparent 0.6px)!important;
+  background-size:auto, 3px 3px!important;
+  border-top:3px double #171511!important;
+  border-bottom:1px solid #171511!important;
+  box-shadow:none!important;
+}
+.mg-nav-widget-area-back .overlay{
+  background:transparent!important;
+  padding:22px 0 20px!important;
+  position:relative!important;
+}
+.mg-nav-widget-area .site-title,.mg-nav-widget-area .site-title a{
+  color:#171511!important;
+}
+.mg-nav-widget-area .site-description{
+  position:relative!important;
+  padding-top:9px!important;
+  margin-top:9px!important;
+}
+.mg-nav-widget-area .site-description::before{
+  content:"";
+  position:absolute;
+  top:0;left:50%;
+  transform:translateX(-50%);
+  width:64px;height:1px;
+  background:#171511;
+  opacity:.5;
+}
