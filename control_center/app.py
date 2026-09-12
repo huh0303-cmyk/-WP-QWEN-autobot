@@ -253,8 +253,8 @@ def enqueue_vps_publication():
     site = str(payload["site_url"]).rstrip("/")
     if not site.startswith("https://") or not re.match(r"^https://[A-Za-z0-9.-]+$", site):
         return jsonify({"ok": False, "error": "invalid site_url"}), 400
-    allowed = {str(item["url"]).rstrip("/"): item for item in get_site_data()}
-    if site not in allowed or str(payload["secret_name"]) != str(allowed[site].get("secret_name", "")):
+    registered = {site_row.url.rstrip("/"): site_row for site_row in load_wordpress_sites()}
+    if site not in registered or str(payload["secret_name"]) != str(registered[site].secret_name):
         return jsonify({"ok": False, "error": "site is not registered"}), 403
     queue = Path(os.environ.get("VPS_WP_QUEUE", "/opt/korea365/data/vps-wp-queue"))
     queue.mkdir(parents=True, exist_ok=True)
