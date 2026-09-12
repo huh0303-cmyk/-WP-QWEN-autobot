@@ -8,7 +8,13 @@ def topic_fits(site_url, keyword):
     text=str(keyword).casefold()
     if host in KOREA_REQUIRED and not re.search(r'korea|한국|국내|서울|부산|제주|seoul|busan|jeju|\b(?:e-[12789]|d-[248]|f-[246])\b',text):
         return False
-    if host=='jobkoreaglobal.com' and re.search(r'marine corps|national guard|해병대|주방위군',text):
+    if host in {'jobkoreaglobal.com','jobkorea365.com','jobinkorea365.com'}:
+        if not re.search(r'job|employ|recruit|hire|hiring|career|worker|salary|contract|interview|teacher|professor|onboarding|취업|채용|고용|근로|임금|면접|교사|교수', text):
+            return False
+    if host == 'k-trip365.com':
+        if not re.search(r'travel|trip|tour|walking|route|itinerary|transport|train|rail|hotel|flight|airport|festival|여행|관광|교통|열차|기차|축제|숙소|항공', text):
+            return False
+    if host in {'jobkoreaglobal.com','jobkorea365.com','jobinkorea365.com'} and re.search(r'marine corps|national guard|해병대|주방위군',text):
         return False
     return True
 
@@ -29,3 +35,15 @@ def teacher_intent(title):
     if re.search(r'document|credential|qualification',text):return 'documents'
     if re.search(r'recruit|sponsor|hiring',text):return 'recruitment-and-sponsorship'
     return None
+
+
+def choose_scoped_keyword(site_url, proposed, candidates):
+    """Reject off-topic trends before authoring and try the site's own pool."""
+    if topic_fits(site_url, proposed):
+        return proposed
+    for candidate in candidates:
+        candidate = candidate.strip()
+        if candidate and not candidate.startswith('#') and topic_fits(site_url, candidate):
+            print('Off-topic trend replaced with a keyword from this site pool')
+            return candidate
+    raise ValueError('No in-scope keyword available; preserve job instead of writing an unrelated article')
