@@ -29,7 +29,7 @@ def best_snapshot(data_dir, remote=None):
     valid = [(stamp, value) for stamp, value in valid if stamp is not None]
     if not valid:
         return {}
-    _, best = max(valid, key=lambda item: (item[1].get("report_kind") == "daily_0700", item[0]))
+    _, best = max(valid, key=lambda item: item[0])
     if best is remote:
         name = None
         try:

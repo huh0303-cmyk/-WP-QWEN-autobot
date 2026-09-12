@@ -1955,7 +1955,7 @@ def _core_metrics_manifest(bucket):
     from .metrics_snapshot import best_snapshot
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
     remote = None
-    for filename in ("core_metrics_daily_latest.json", "core_metrics_latest.json"):
+    for filename in ("core_metrics_latest.json", "core_metrics_daily_latest.json"):
         try:
             response = requests.get(f"https://raw.githubusercontent.com/{repo}/main/data/{filename}", params={"refresh": bucket}, timeout=12)
             response.raise_for_status()
