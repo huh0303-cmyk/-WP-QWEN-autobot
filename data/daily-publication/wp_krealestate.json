@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 1, "claim": "wp25-2026-09-12-wp_krealestate-0b80cfca", "claimed_at": "2026-09-12T11:18:18.025085+09:00", "run_id": 34667321376, "workflow": "daily-network-publish.yml", "repair_context": "User requested all25; PR113 fixes factual SEO repair feedback"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://krealestate365.com/practical-steps-for-foreign-residents-signing-million-won-housing-contracts-in-korea/", "published_at": "2026-09-12T03:34:32Z"}
