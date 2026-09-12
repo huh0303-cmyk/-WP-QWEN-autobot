@@ -9,7 +9,7 @@ def topic_fits(site_url, keyword):
     if host in KOREA_REQUIRED and not re.search(r'korea|한국|국내|서울|부산|제주|seoul|busan|jeju|\b(?:e-[12789]|d-[248]|f-[246])\b',text):
         return False
     if host in {'jobkoreaglobal.com','jobkorea365.com','jobinkorea365.com'}:
-        if not re.search(r'job|employ|recruit|hiring|career|worker|salary|contract|interview|teacher|professor|onboarding|취업|채용|고용|근로|임금|면접|교사|교수', text):
+        if not re.search(r'job|employ|recruit|hire|hiring|career|worker|salary|contract|interview|teacher|professor|onboarding|취업|채용|고용|근로|임금|면접|교사|교수', text):
             return False
     if host == 'k-trip365.com':
         if not re.search(r'travel|trip|tour|walking|route|itinerary|transport|train|rail|hotel|flight|airport|festival|여행|관광|교통|열차|기차|축제|숙소|항공', text):

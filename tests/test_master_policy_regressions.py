@@ -38,10 +38,10 @@ class MasterPolicyRegressionTests(unittest.TestCase):
         generator = load_autopost_functions("generate_content_gemini")["generate_content_gemini"]
         with patch("economy_text.generate_text", return_value="article") as writer:
             self.assertEqual(generator("prompt"), "article")
-            writer.assert_called_once_with("prompt", temperature=0.85, force_gpt=False)
+            writer.assert_called_once_with("prompt", temperature=0.85, repair=False)
         with patch("economy_text.generate_text", return_value="repair") as writer:
             self.assertEqual(generator("prompt", use_gpt=True), "repair")
-            writer.assert_called_once_with("prompt", temperature=0.85, force_gpt=True)
+            writer.assert_called_once_with("prompt", temperature=0.85, repair=True)
 
     def test_platform_queue_fails_workflow_when_publisher_fails(self):
         source = (ROOT / "scripts" / "process_platform_queue.py").read_text(encoding="utf-8")
