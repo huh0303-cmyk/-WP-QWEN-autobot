@@ -16,6 +16,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests pyjwt cryptography -q
+      - name: Refresh stale sitemap without changing posts
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/repair_khealth_sitemap.py
       - name: Submit and verify sitemap in Search Console
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
