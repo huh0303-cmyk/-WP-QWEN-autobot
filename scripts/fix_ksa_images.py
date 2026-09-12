@@ -1,5 +1,6 @@
 import os
 import socket
+import time
 import requests
 
 _orig_getaddrinfo = socket.getaddrinfo
@@ -47,11 +48,19 @@ for i, (post_id, old_url, _, desc) in enumerate(FIXES):
     img.raise_for_status()
     content_type = img.headers.get("content-type", "image/jpeg")
     ext = "png" if "png" in content_type else "jpg"
-    upload = requests.post(f"{SITE}/wp-json/wp/v2/media", auth=AUTH, timeout=30,
-                            headers={"Content-Disposition": f'attachment; filename="ksa-{post_id}-fix-{photo["id"]}.{ext}"',
-                                     "Content-Type": content_type},
-                            data=img.content)
-    upload.raise_for_status()
+    for attempt in range(5):
+        try:
+            upload = requests.post(f"{SITE}/wp-json/wp/v2/media", auth=AUTH, timeout=30,
+                                    headers={"Content-Disposition": f'attachment; filename="ksa-{post_id}-fix-{photo["id"]}.{ext}"',
+                                             "Content-Type": content_type},
+                                    data=img.content)
+            upload.raise_for_status()
+            break
+        except Exception as exc:
+            print(f"  upload attempt {attempt} failed: {exc}")
+            if attempt == 4:
+                raise
+            time.sleep(5 * (attempt + 1))
     media = upload.json()
     new_url = media["source_url"]
     new_id = media["id"]
