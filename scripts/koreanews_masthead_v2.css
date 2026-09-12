@@ -35,7 +35,7 @@
 }
 
 /* 2) 마스트헤드: 흰 배경 대신 신문 용지 느낌 (미색+미세 그레인+상하 괘선) */
-.mg-nav-widget-area-back{
+.mg-nav-widget-area-back.mg-nav-widget-area-back{
   background-color:#f4efe2!important;
   background-image:
     repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 2px),
@@ -45,12 +45,12 @@
   border-bottom:1px solid #171511!important;
   box-shadow:none!important;
 }
-.mg-nav-widget-area-back .overlay{
+.mg-nav-widget-area-back .overlay.overlay{
   background:transparent!important;
   padding:22px 0 20px!important;
   position:relative!important;
 }
-.mg-nav-widget-area .site-title,.mg-nav-widget-area .site-title a{
+.mg-nav-widget-area .site-title.site-title,.mg-nav-widget-area .site-title.site-title a{
   color:#171511!important;
 }
 .mg-nav-widget-area .site-description{
