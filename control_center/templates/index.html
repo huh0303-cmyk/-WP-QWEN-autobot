@@ -316,8 +316,8 @@
                         <div class="flex items-center gap-2">
                             <span class="rounded-full px-2 py-1 text-[9px] font-black {% if site.visitor_connected %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}" title="방문자 통계 API {% if site.visitor_connected %}정상{% else %}자동 재수집 중{% endif %}">통계 {% if site.visitor_connected %}연결{% else %}재수집{% endif %}</span>
                             {% if site.google_approved %}
-                            <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-300 to-amber-500 px-2 py-1 text-[9px] font-black tracking-tight text-amber-950 shadow-[0_3px_10px_rgba(217,119,6,.28)]" title="Google 승인 2025-08-15">
-                                <span class="text-[11px] leading-none">★</span><span>G승인</span><span class="font-bold opacity-70">250815</span>
+                            <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-300 to-amber-500 px-2 py-1 text-[9px] font-black tracking-tight text-amber-950 shadow-[0_3px_10px_rgba(217,119,6,.28)]" title="AdSense 사이트 승인 상태: {{ site.adsense_status_label }} · 확인 {{ site.adsense_checked_at }}">
+                                <span class="text-[11px] leading-none">★</span><span>AdSense 준비됨</span>
                             </span>
                             {% endif %}
                             <span class="h-3 w-3 rounded-full {% if site.auth_ready %}bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,.18)]{% else %}bg-red-500 shadow-[0_0_0_3px_rgba(239,68,68,.18)]{% endif %}" title="WP 인증 {% if site.auth_ready %}정상{% else %}미연결{% endif %}"></span>
