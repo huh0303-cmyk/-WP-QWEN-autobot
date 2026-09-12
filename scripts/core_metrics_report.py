@@ -98,9 +98,12 @@ def collect(baseline_date="", cutoff_stamp=None):
         row.update(indexed=number(s.get("indexed")) if e.get("audited_at") and not (s.get("unknown") and not s.get("indexed") and not s.get("unindexed")) else None,
                    indexed_delta=None if s.get("unknown") or e.get("error") else number(s.get("indexed_delta")),
                    index_unknown=s.get("unknown"), index_total=s.get("total_published"), index_unindexed=s.get("unindexed"),
-                   index_partial=bool(s.get("unknown")), index_checked_at=e.get("audited_at"), index_comparison_at=s.get("comparison_at"))
+                   index_partial=bool(s.get("unknown") or e.get("error")), index_checked_at=e.get("audited_at"), index_comparison_at=s.get("comparison_at"))
         if e.get("error") or not e.get("audited_at"):
-            row["errors"].append("Google 색인 최신 확인 필요")
+            row["index_previous_confirmed"] = row.get("indexed")
+            row["indexed"] = None
+            row["index_partial"] = True
+            row["errors"].append("Google 색인 최신 확인 실패 · 이전 숫자를 현재값으로 표시하지 않음")
         return row
 
     def blogger(blog):

@@ -55,6 +55,10 @@ def repetition_issues(title, body, history):
     for old in history:
         old_title = old.get('title', '')
         if isinstance(old_title, dict): old_title = old_title.get('rendered', '')
+        from scripts.editorial_topic_scope import teacher_intent
+        intent = teacher_intent(plain(title))
+        if intent and intent == teacher_intent(plain(old_title)):
+            issues.append('REPETITION: same teacher-search intent already covered: ' + plain(old_title))
         if title_repeats(title, old_title):
             issues.append('REPETITION: headline frame resembles recent title: ' + plain(old_title))
         old_body = old.get('content_html', old.get('content', ''))
