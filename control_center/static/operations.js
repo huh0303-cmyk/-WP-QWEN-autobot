@@ -72,6 +72,43 @@
         const rows=jobs.map(job=>{const row=card(job);if(opened.has(job.id))row.querySelector('details').open=true;return row;});
         list.replaceChildren(...rows);
     }
+    const platformMeta = {
+        wp25: {label:'WP', total:25, test:j=>j.platform==='wordpress'},
+        blogspot33: {label:'Blogspot', total:33, test:j=>j.platform==='blogger'},
+        tistory5: {label:'Tistory', total:5, test:j=>j.platform==='tistory'},
+        news2: {label:'뉴스룸', total:2, test:j=>j.platform==='news'},
+    };
+    const kstDate = seconds => new Date(seconds*1000).toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
+    function renderMissionBoard(jobs) {
+        const stats=document.getElementById('mission-board-stats');
+        const platforms=document.getElementById('mission-board-platforms');
+        const boardTime=document.getElementById('mission-board-time');
+        if (!stats || !platforms) return;
+        const today=kstDate(Date.now()/1000);
+        const todays=jobs.filter(job=>kstDate(job.created_at)===today);
+        const tile=(label,count,color)=>{
+            const box=el('div','','rounded-xl border border-white/10 bg-white/5 p-3 text-center');
+            box.append(el('p',String(count),'text-2xl font-black '+color+' sm:text-3xl'));
+            box.append(el('p',label,'mt-0.5 text-[10px] font-bold text-slate-400 sm:text-xs'));
+            return box;
+        };
+        stats.replaceChildren(
+            tile('게시 완료', todays.filter(j=>j.phase==='published').length, 'text-emerald-400'),
+            tile('진행 중', todays.filter(j=>['working','publishing'].includes(j.phase)).length, 'text-sky-400'),
+            tile('검토 대기', todays.filter(j=>j.phase==='review_ready').length, 'text-amber-400'),
+            tile('문제 발생', todays.filter(j=>['failed','attention','stopped'].includes(j.phase)).length, 'text-rose-400'),
+        );
+        platforms.replaceChildren(...Object.entries(platformMeta).map(([group,meta])=>{
+            const done=todays.filter(j=>meta.test(j) && j.phase==='published').length;
+            const problem=todays.filter(j=>meta.test(j) && ['failed','attention'].includes(j.phase)).length;
+            // News has no fixed daily quota (RSS-driven, published as many qualify) — a "/2" target would misread as a cap.
+            const box=el('div','','rounded-xl border border-white/10 bg-white/5 p-3 text-center');
+            box.append(el('p',group==='news2'?String(done)+'건':done+'/'+meta.total,'text-lg font-black text-white sm:text-xl'));
+            box.append(el('p',meta.label+(problem?' · 문제 '+problem:''),'mt-0.5 text-[10px] font-bold sm:text-xs '+(problem?'text-rose-400':'text-slate-400')));
+            return box;
+        }));
+        if (boardTime) boardTime.textContent=today+' KST 기준 · 자동 갱신';
+    }
     function render(data) {
         lastJobs = data.jobs || [];
         connection.textContent = '통제실 연결됨 · ' + time(data.server_time);
@@ -109,6 +146,7 @@
             if(!jump) {jump=el('button','작업 상태·이력 보기','operation-action');jump.dataset.operationJump='';jump.onclick=()=>jumpTo('bulk-status-'+button.dataset.quickGroup);status.after(jump);}
         });
         refreshList(historyBody,lastJobs.slice(0,60));
+        renderMissionBoard(lastJobs);
     }
     async function poll() {
         if(polling) return; polling=true;
