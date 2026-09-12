@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-12-blogger_seouljournal-d4e050bf", "claimed_at": "2026-09-12T11:12:45.584113+09:00", "run_id": 34667035909, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-12", "status": "PUBLISHED", "public_url": "https://theseouljournal.blogspot.com/2026/09/pentagon-911-observance-what-official.html", "published_at": "2026-09-11T19:15:31.093-07:00"}
