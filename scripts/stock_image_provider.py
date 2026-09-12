@@ -63,7 +63,8 @@ def find_stock_image(subject, theme=""):
     # Stock cannot document a particular breaking event or identify a patient.
     if "NEWS ILLUSTRATION ONLY" in theme or SENSITIVE.search(subject + " " + theme):
         return None
-    query = " ".join(str(subject).split())
+    from editorial_topic_scope import stock_query
+    query = " ".join(stock_query(subject, theme).split())
     if not query or len(query) > 100 or not terms(query):
         return None
     for provider, key, domain, license_url in [

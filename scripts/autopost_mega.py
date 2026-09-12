@@ -12,7 +12,7 @@ autopost_mega.py v2.0 — 27개 사이트 오토포스팅
   ✅ 구글시트 로깅 / Rank Math 메타 주입
 """
 
-import os, sys, time, random, re, json, hashlib, base64
+import os, sys, time, random, re, json, hashlib, base64, html
 import requests
 # Direct workflow execution uses `python scripts/autopost_mega.py`, which makes
 # scripts/ (not the repository root) sys.path[0]. Add the root for shared modules.
@@ -3076,6 +3076,9 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
             return {"ok": False, "error": "; ".join(repeat_errors)}
     except Exception as exc:
         return {"ok": False, "error": f"Publication history check failed: {exc}"}
+    from editorial_topic_scope import topic_fits
+    if not topic_fits(url, keyword):
+        return {"ok": False, "error": "Topic does not match the site scope"}
     author_id=get_or_create_wp_author(url,pw,reporter)
     cat_name=get_category_for_post(theme,f"{category_hint} {keyword}".strip(),title)
     cat_id=0
@@ -3194,8 +3197,20 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     real_photo = site.get("_newsroom_real_photo") if is_newsroom else None
     featured_url = real_photo["image_url"] if real_photo else (images[0] if images else "")
     featured_media_id = ensure_featured_media(url, pw, featured_url, real_photo["caption_ko" if site.get("lang") == "ko" else "caption_en"] if real_photo else title)
+    if featured_url and not featured_media_id:
+        return {"ok": False, "error": "Image could not be stored in WordPress; publication held"}
     if featured_media_id:
         data["featured_media"] = featured_media_id
+        try:
+            stored = requests.get(f"{url}/wp-json/wp/v2/media/{featured_media_id}", auth=(WP_USER,pw), timeout=20)
+            stored.raise_for_status()
+            stable_url = stored.json()["source_url"]
+            if not stable_url.startswith(url.rstrip('/') + '/wp-content/uploads/'):
+                raise ValueError("Unexpected WordPress media location")
+            # The body must use the permanent upload, not an expiring model URL.
+            data["content"] = data["content"].replace(featured_url, stable_url).replace(html.escape(featured_url, quote=True), html.escape(stable_url, quote=True))
+        except Exception as exc:
+            return {"ok": False, "error": f"Stored image verification failed: {type(exc).__name__}"}
     if author_id and author_id>0: data["author"]=author_id
 
     try:
@@ -3365,6 +3380,10 @@ def build_newsroom_meta(title, source_summary, lang):
     return re.sub(r'^META_DESC:\s*', '', text, flags=re.IGNORECASE).strip()[:180]
 
 def process_one(site, keyword):
+    from editorial_topic_scope import topic_fits
+    if site.get("mode") not in ("news", "news_en") and not topic_fits(site["url"], keyword):
+        print("Topic does not fit the site; generation not started")
+        return False
     report_publication_progress("working", site["url"], detail="주제·출처 확인 및 글 작성·검수 중")
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
     quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET

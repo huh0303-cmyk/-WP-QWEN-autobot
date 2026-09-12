@@ -42,6 +42,8 @@ def main() -> int:
     headlines.extend(fetch_profile_headlines(profile))
     headlines = list({row["url"]: row for row in headlines}.values())
     topics = rank_topics(headlines, profile=profile, trend_terms=fetch_trending_terms())
+    from editorial_topic_scope import topic_fits
+    topics = [topic for topic in topics if topic_fits(args.site, topic.keyword)]
     winner = topics[0] if topics else None
     result = {
         "site": args.site.rstrip("/"),
