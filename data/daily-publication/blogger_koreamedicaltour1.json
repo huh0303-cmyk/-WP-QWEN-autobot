@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-09-12-blogger_koreamedicaltour1-2da2329f", "claimed_at": "2026-09-12T15:27:30.474330+09:00", "run_id": null, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-09-12-blogger_koreamedicaltour1-2da2329f", "claimed_at": "2026-09-12T15:27:30.474330+09:00", "run_id": 34678181828, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
