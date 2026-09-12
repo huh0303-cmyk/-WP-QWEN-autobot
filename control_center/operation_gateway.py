@@ -39,6 +39,25 @@ def publication_receipt(files, job):
     return ""
 
 
+def publication_wait(files, job):
+    """A verified daily cap is a deferral, never a failed or published article."""
+    for name, text in files.items():
+        if not name.endswith("platform-worker.log"):
+            continue
+        for line in text.splitlines():
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if (isinstance(row, dict) and job.get("publish_job_id")
+                    and row.get("job_id") == job["publish_job_id"]
+                    and row.get("site_id", job["site_id"]) == job["site_id"]
+                    and row.get("status") == "waiting"
+                    and row.get("reason") == "daily_limit_reached"):
+                return True
+    return False
+
+
 class GitHubGateway:
     def __init__(self, repo, token, queue_rows):
         self.base = f"https://api.github.com/repos/{repo}"
@@ -157,6 +176,10 @@ class GitHubGateway:
                            detail=("공개 게시 처리 중" if job.get("publish_job_id") else "글 작성·검수·게시 작업 실행 중") + (" · " + ", ".join(names) if names else ""))
             return
         files = self.artifacts(job["run_id"])
+        if publication_wait(files, job):
+            job.update(phase="attention", detail="오늘 발행 한도 충족 · 이 추가 글은 다음 발행 차례를 기다립니다. 실패하거나 새로 게시된 글이 아닙니다.",
+                       deferred_reason="daily_limit_reached")
+            return
         receipt = publication_receipt(files, job)
         if receipt:
             job.update(phase="published", public_url=receipt, detail="게시 결과 확인 완료 · 공개 글을 확인하세요.")
