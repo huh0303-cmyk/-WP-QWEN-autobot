@@ -4,11 +4,21 @@ ideas each) to kfinance365.com, the closest-fitting existing WP site for this
 topic. Original writing, not a reproduction of any specific creator's video."""
 import hashlib
 import os
+import socket
 from pathlib import Path
 import requests
 from requests.auth import HTTPBasicAuth
 
 ROOT = Path(__file__).resolve().parent
+
+_original_getaddrinfo = socket.getaddrinfo
+
+
+def _ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+
+socket.getaddrinfo = _ipv4_only
 
 WP_USER = "huh0303@gmail.com"
 PW = os.environ["KFINANCE365COM"]
