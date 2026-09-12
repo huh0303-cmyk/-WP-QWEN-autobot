@@ -1,0 +1,17 @@
+name: "One-off: preview pixabay queries"
+on:
+  workflow_dispatch: {}
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - run: python preview_pixabay.py
+        working-directory: scripts
+        env:
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
