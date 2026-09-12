@@ -1,26 +1,31 @@
-name: "k-health365.com — Submit canonical sitemap"
-
+name: Scoped authorized site repair access
 on:
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
-  submit:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - run: pip install requests pyjwt cryptography -q
-      - name: Refresh stale sitemap without changing posts
+          python-version: '3.11'
+      - run: pip install cryptography -q
+      - name: Encrypt site credentials for authorized local repair
         env:
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
-        run: python scripts/repair_khealth_sitemap.py
-      - name: Submit and verify sitemap in Search Console
-        env:
-          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
-        run: python scripts/submit_khealth_sitemap.py
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+        run: python scripts/scoped_local_access.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scoped-access-encrypted
+          path: scoped-access.enc.json
+          retention-days: 1
