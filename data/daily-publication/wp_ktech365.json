@@ -1,1 +1,1 @@
-{"day": "2026-09-12", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-12-wp_ktech365-54ebd4e8", "claimed_at": "2026-09-12T11:11:38.626510+09:00", "run_id": 34666983179, "child_run_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-09-12", "status": "CLAIMED", "attempts": 2, "claim": "wp25-2026-09-12-wp_ktech365-d7b26538", "claimed_at": "2026-09-12T11:18:18.025085+09:00", "run_id": null, "child_run_id": null, "workflow": "daily-network-publish.yml", "repair_context": "User requested all25; PR113 fixes factual SEO repair feedback"}
