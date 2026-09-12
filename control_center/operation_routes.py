@@ -130,14 +130,20 @@ def install(module):
             request_id = request.form.get("operation_request_id") or module.secrets.token_hex(16)
             if not re.fullmatch(r"[a-zA-Z0-9-]{16,80}", request_id):
                 raise ValueError("요청 번호 형식이 올바르지 않습니다.")
-            store.submit(group, descriptors, request_id)
+            request_id, skipped = store.submit(group, descriptors, request_id)
         except Conflict as exc:
             return reply({"message": str(exc), "target": target}, 409)
         except (ValueError, RuntimeError) as exc:
             return reply({"message": str(exc), "target": target}, 422)
         worker.start()
+        accepted_count = len(descriptors) - len(skipped)
+        message = f"{descriptors[0]['label'] if len(descriptors) == 1 else str(accepted_count) + '개 사이트'} 요청을 접수했습니다."
+        if skipped:
+            # One or more sites already had a live job - the rest of the
+            # batch still goes through instead of being blocked by them.
+            message += f" (진행 중이라 건너뜀: {', '.join(skipped)})"
         return reply({"accepted": True, "request_id": request_id, "group": group, "target": target,
-                      "message": f"{descriptors[0]['label'] if len(descriptors) == 1 else str(len(descriptors)) + '개 사이트'} 요청을 접수했습니다. 작업 상태에서 진행 상황을 확인하세요."}, 202)
+                      "skipped": skipped, "message": message + " 작업 상태에서 진행 상황을 확인하세요."}, 202)
 
     @app.get("/api/operations")
     def operation_status():

@@ -18,6 +18,13 @@ LABELS = {
     "attention": "확인 필요",
 }
 TERMINAL = {"published", "stopped", "failed"}
+# 2026-09-12: a job with no terminal outcome (most often 'attention', which
+# nothing ever auto-clears) blocked that one site's conflict check forever -
+# and inside a batch (wp25 / blogspot33 / tistory5), one such site aborted
+# the ENTIRE batch's transaction before any of the other 32 got inserted.
+# A job stuck this long is dead, not "in progress"; treat it as no longer
+# active rather than let it block every future request for that site.
+STALE_ACTIVE_JOB_SECONDS = 6 * 3600
 
 
 class Conflict(Exception):
@@ -56,7 +63,10 @@ class Store:
             return db.execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()[0]
 
     def submit(self, group, descriptors, request_id):
-        """Commit acceptance before responding; atomically reject overlapping batches."""
+        """Commit acceptance before responding. A single-site request still
+        rejects cleanly if that one site has a live job. A multi-site batch
+        never lets one blocked site abort the rest - it skips that site and
+        accepts every other one, returning which (if any) were skipped."""
         now = time.time()
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -64,13 +74,23 @@ class Store:
             if existing:
                 if existing[0] != group:
                     raise Conflict("같은 요청 번호가 다른 그룹에서 사용되었습니다.")
-                return request_id
+                return request_id, []
+            accepted, skipped = [], []
             for target in descriptors:
-                active = db.execute("SELECT id FROM jobs WHERE site_id=? AND phase NOT IN ('published','stopped','failed') LIMIT 1", (target["site_id"],)).fetchone()
+                active = db.execute(
+                    "SELECT id FROM jobs WHERE site_id=? AND phase NOT IN ('published','stopped','failed') AND updated>? LIMIT 1",
+                    (target["site_id"], now - STALE_ACTIVE_JOB_SECONDS),
+                ).fetchone()
                 if active:
-                    raise Conflict(f"{target['label']}: 진행 중이거나 확인이 필요한 요청이 있습니다. 기존 작업 상태를 확인하세요.")
+                    if len(descriptors) == 1:
+                        raise Conflict(f"{target['label']}: 진행 중이거나 확인이 필요한 요청이 있습니다. 기존 작업 상태를 확인하세요.")
+                    skipped.append(target["label"])
+                    continue
+                accepted.append(target)
+            if not accepted:
+                raise Conflict("모든 대상이 이미 진행 중이거나 확인이 필요합니다.")
             db.execute("INSERT INTO requests VALUES (?, ?)", (request_id, group))
-            for target in descriptors:
+            for target in accepted:
                 job_id = secrets.token_hex(16)
                 payload = dict(target, id=job_id, request_id=request_id, group=group,
                                phase="accepted", detail="통제실에 저장됨 · 실행 대기", run_id=None,
@@ -81,7 +101,7 @@ class Store:
                 db.execute("INSERT INTO jobs (id, request_id, site_id, group_id, phase, payload, created, updated) VALUES (?,?,?,?,?,?,?,?)",
                            (job_id, request_id, target["site_id"], group, "accepted", json.dumps(payload, ensure_ascii=False), now, now))
                 db.execute("INSERT INTO events(job_id,at,phase,detail) VALUES (?,?,?,?)", (job_id, now, "accepted", payload["detail"]))
-        return request_id
+        return request_id, skipped
 
     def snapshot(self):
         with self.connect() as db:

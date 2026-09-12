@@ -36,18 +36,50 @@ def test_double_click_and_group_single_overlap_are_atomic(store):
         results = list(pool.map(submit, range(8)))
     assert sum(r is not None for r in results) == 1
     assert len(store.snapshot()) == 1
-    request_id = next(r for r in results if r)
+    request_id, _skipped = next(r for r in results if r)
     store.submit("wp25", [target()], request_id)
     assert len(store.snapshot()) == 1
     with pytest.raises(Conflict):
         store.submit("wp_wp_one", [target()], "another-request")
 
 
-def test_conflicting_batch_accepts_nothing(store):
+def test_conflicting_batch_skips_only_the_blocked_site(store):
+    """2026-09-12: one stuck site (confirmed live - KFinance365's Blogger
+    channel had a stale 'attention' job) used to abort an entire 33-site
+    batch, leaving all 33 unsubmitted. A batch must accept every site that
+    is not blocked and only report the blocked one as skipped."""
+    ready(store)
+    request_id, skipped = store.submit("wp25", [target("wp_two"), target()], "second-request")
+    assert skipped == ["wp_one"]
+    site_ids = {row["site_id"] for row in store.snapshot() if row["request_id"] == request_id}
+    assert site_ids == {"wp_two"}
+    assert len(store.snapshot()) == 2  # the original wp_one job plus the new wp_two job
+
+
+def test_batch_raises_when_every_site_in_it_is_blocked(store):
+    ready(store)
+    store.submit("wp25", [target("wp_two")], "occupy-wp-two")
+    store.claim()
+    with pytest.raises(Conflict):
+        store.submit("wp25", [target(), target("wp_two")], "third-request")
+
+
+def test_single_site_submit_still_raises_conflict_when_blocked(store):
     ready(store)
     with pytest.raises(Conflict):
-        store.submit("wp25", [target("wp_two"), target()], "second-request")
-    assert len(store.snapshot()) == 1
+        store.submit("wp_wp_one", [target()], "second-request")
+
+
+def test_a_stale_active_job_no_longer_blocks_new_submissions(store):
+    """A job with no terminal outcome (most often 'attention', which
+    nothing ever auto-clears) used to block that site forever. Past the
+    staleness window it must stop counting as active."""
+    from control_center.operations import STALE_ACTIVE_JOB_SECONDS
+    ready(store)
+    with store.connect() as db:
+        db.execute("UPDATE jobs SET updated=?", (time.time() - STALE_ACTIVE_JOB_SECONDS - 60,))
+    request_id, skipped = store.submit("wp_wp_one", [target()], "fresh-request")
+    assert skipped == []
 
 
 def test_restart_recovers_accepted_but_never_redispatches_ambiguous_send(store):
