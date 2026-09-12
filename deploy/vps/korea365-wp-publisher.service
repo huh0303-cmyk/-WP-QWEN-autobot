@@ -1,0 +1,21 @@
+[Unit]
+Description=Korea365 VPS WordPress publisher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/control.env
+Environment=VPS_WP_QUEUE=/opt/korea365/data/vps-wp-queue
+Environment=VPS_WP_CREDENTIALS=/etc/korea365/wp-sites.json
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/vps_wordpress_worker.py
+Restart=always
+RestartSec=10
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
