@@ -38,6 +38,7 @@ def recent_posts(site_url):
         for attempt in range(4):
             try:
                 r = requests.get(f"{site_url}/wp-json/wp/v2/posts", timeout=40,
+                                  headers={"User-Agent": "Mozilla/5.0"},
                                   params={"per_page": 30, "page": page, "status": "publish",
                                           "after": cutoff + "Z", "orderby": "date", "order": "desc",
                                           "_fields": "id,title,content,link,date"})
@@ -73,7 +74,7 @@ def scan_site(site_url):
 
 def main():
     all_rows = []
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool:
         futures = {pool.submit(scan_site, site): site for site, _, _ in ACTIVE_SITES}
         for future in as_completed(futures):
             rows = future.result()
