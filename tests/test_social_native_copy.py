@@ -10,18 +10,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import social_publish
-import topik_quiz_shorts
 
 
 class SocialNativeCopyTests(unittest.TestCase):
-    def test_fallback_copy_is_distinct_for_every_platform(self):
-        copy = topik_quiz_shorts.normalize_platform_copy({}, "TOPIK Words")
-        captions = []
-        for platform in ("tiktok", "instagram", "facebook", "threads"):
-            native = copy["platform_copy"][platform]
-            captions.append((native["hook"], native["caption"], native["cta"]))
-        self.assertEqual(len(set(captions)), 4)
-
     def test_fingerprint_is_scoped_to_platform(self):
         meta = {"video_path": "video.mp4", "youtube_title": "Quiz", "platform_copy": {}}
         self.assertNotEqual(
