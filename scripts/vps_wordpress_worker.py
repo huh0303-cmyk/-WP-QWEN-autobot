@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -25,6 +26,53 @@ ROOT = Path(__file__).resolve().parents[1]
 QUEUE = Path(os.environ.get("VPS_WP_QUEUE", ROOT / "data/vps-wp-queue"))
 CREDENTIALS = Path(os.environ.get("VPS_WP_CREDENTIALS", "/etc/korea365/wp-sites.json"))
 MAX_RETRIES = int(os.environ.get("VPS_WP_MAX_RETRIES", "3"))
+
+# GitHub only hands off already-composed content_html; the "preferred
+# production path" below used to publish that HTML verbatim, including
+# whatever ephemeral image URL (Replicate/Pixabay/a signed R2 download)
+# autopost_mega.py's writer had hotlinked into it. Those links expire
+# within hours, which was the actual root cause of the network-wide
+# broken-image backlog cleaned up on 2026-09-13. Re-host each one to this
+# site's own WordPress media library before publishing, same as the
+# featured-image handling autopost_mega.py already does for its own
+# direct-publish path.
+_TEMP_IMAGE_HOSTS = ("replicate.delivery", "replicateusercontent.com", "pixabay.com/get", "r2.cloudflarestorage.com")
+
+
+def _is_temporary_image_url(url: str) -> bool:
+    lowered = url.lower()
+    return any(host in lowered for host in _TEMP_IMAGE_HOSTS) or "x-amz-signature=" in lowered
+
+
+def _rehost_temp_images(content_html: str, site_url: str, auth: HTTPBasicAuth, job_id: str) -> tuple[str, int]:
+    """Return (content_html with temp URLs replaced, featured media id or 0).
+
+    Raises on any failure - callers must not publish with an unverified
+    image link, matching the WordPress-specific policy already established
+    for the direct-publish path (hold the whole post rather than let a
+    broken image through).
+    """
+    candidates = [u for u in set(re.findall(r'src="(https?://[^"]+)"', content_html)) if _is_temporary_image_url(u)]
+    featured_media_id = 0
+    for index, temp_url in enumerate(candidates):
+        image_response = requests.get(temp_url, timeout=45)
+        image_response.raise_for_status()
+        content_type = image_response.headers.get("content-type", "image/png")
+        ext = "png" if "png" in content_type else "jpg" if "jpeg" in content_type else "webp"
+        media = requests.post(
+            f"{site_url}/wp-json/wp/v2/media", auth=auth,
+            headers={"Content-Disposition": f'attachment; filename="{job_id}-{index}.{ext}"', "Content-Type": content_type},
+            data=image_response.content, timeout=60,
+        )
+        media.raise_for_status()
+        media_data = media.json()
+        source_url = media_data.get("source_url", "")
+        if not source_url.startswith(site_url.rstrip("/") + "/wp-content/uploads/"):
+            raise RuntimeError(f"unexpected WordPress media location for {job_id}")
+        content_html = content_html.replace(temp_url, source_url)
+        if not featured_media_id:
+            featured_media_id = int(media_data["id"])
+    return content_html, featured_media_id
 
 
 def _now() -> str:
@@ -74,7 +122,10 @@ def run_one(path: Path, job: dict) -> bool:
                     target = path.with_name(path.name[:-len(".processing.json")] + ".published.json")
                     path.rename(target); target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
                     return True
-            payload = {"title": job["title"], "content": job["content_html"], "status": job.get("status_after_review", "publish")}
+            content_html, featured_media_id = _rehost_temp_images(job["content_html"], site_url, auth, job.get("job_id", ""))
+            payload = {"title": job["title"], "content": content_html, "status": job.get("status_after_review", "publish")}
+            if featured_media_id:
+                payload["featured_media"] = featured_media_id
             response = requests.post(api, json=payload, auth=auth, timeout=40)
             response.raise_for_status()
             row = response.json()
