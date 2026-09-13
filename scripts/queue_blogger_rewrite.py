@@ -38,6 +38,7 @@ from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from openai_text import openai_available, openai_generate_text
 from replicate_image_provider import generate_image_url
+from stable_image_hosting import host_permanently, is_temporary
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
 
@@ -424,6 +425,10 @@ def main():
         raise RuntimeError(f"Blogger 품질점수 {quality_score}/100: GPT-5 mini 초안·재작성이 모두 차단됨 · {reason}. {failures}")
 
     content = rewritten["content_html"]
+    content_id = stable_content_id(
+        "blogger", blogger_site_id, source_identity,
+        version=os.environ.get("BLOGGER_CONTENT_VERSION", "v1"),
+    )
     image_model = "0"
     image_subject = (rewritten.get("image_queries") or [rewritten["title"]])[0]
     image_alt = (
@@ -432,12 +437,23 @@ def main():
         f"Scene related to {str(image_subject).strip()}"
     )
     image_url = generate_image_url(image_subject, theme=rewritten["title"])
+    if image_url and is_temporary(image_url):
+        # Replicate's own delivery URLs expire within hours - well before a
+        # Blogger review draft sitting in the queue gets approved and
+        # published. Re-host once, up front, exactly like tistory_writer.py,
+        # so the queued draft never ends up pointing at a link that later
+        # goes dead (the bug behind the 2026-09 network-wide broken-image
+        # backlog).
+        try:
+            image_url = host_permanently(image_url, asset_key=content_id, folder="blogger_images")
+        except (RuntimeError, KeyError):
+            image_url = None
     from stock_image_provider import credit_html
     content += credit_html(image_url)
     if not image_url:
         print(json.dumps({
             "image_pass": True,
-            "reason": "SDXL Lightning and FLUX Schnell both failed; queueing text-only draft",
+            "reason": "SDXL Lightning and FLUX Schnell both failed, or permanent re-hosting failed; queueing text-only draft",
         }, ensure_ascii=False))
     if image_url:
         content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
@@ -446,10 +462,6 @@ def main():
     from automation_hub.blog_visitor_widget import visitor_counter_html
     content += visitor_counter_html(blogger_site_id.removeprefix("blogger_"), language=language)
 
-    content_id = stable_content_id(
-        "blogger", blogger_site_id, source_identity,
-        version=os.environ.get("BLOGGER_CONTENT_VERSION", "v1"),
-    )
     job_id = f"blogger-{content_id}"
     labels = rewritten.get("labels", [])
     if isinstance(labels, str):
