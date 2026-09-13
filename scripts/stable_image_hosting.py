@@ -34,8 +34,12 @@ def _image_ok(url: str) -> tuple[bool, dict]:
         return False, {"error": str(exc)[:300]}
 
 
-def host_permanently(url: str, *, asset_key: str) -> str:
-    """Download `url` and commit it under assets/tistory_images/, returning a stable URL.
+def host_permanently(url: str, *, asset_key: str, folder: str = "tistory_images") -> str:
+    """Download `url` and commit it under assets/<folder>/, returning a stable URL.
+
+    `folder` defaults to the original Tistory location for backward
+    compatibility with existing callers; pass e.g. folder="blogger_images"
+    to keep each platform's re-hosted assets in its own directory.
 
     Raises RuntimeError if the source image or the freshly hosted copy is not
     verifiably a real image; callers must not embed an unverified URL.
@@ -51,14 +55,14 @@ def host_permanently(url: str, *, asset_key: str) -> str:
     content_type = download.headers.get("content-type", "")
     ext = ".png" if "png" in content_type else ".jpg" if "jpeg" in content_type else ".webp"
     digest = hashlib.sha256(data).hexdigest()[:16]
-    path = f"assets/tistory_images/{asset_key}-{digest}{ext}"
+    path = f"assets/{folder}/{asset_key}-{digest}{ext}"
     api = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
     existing = requests.get(api, headers=headers, params={"ref": "main"}, timeout=30)
     stable_url = f"https://raw.githubusercontent.com/{repo}/main/{path}"
     if existing.status_code != 200:
         response = requests.put(api, headers=headers, json={
-            "message": f"fix: host Tistory image {asset_key} [skip ci]",
+            "message": f"fix: host image {asset_key} permanently [skip ci]",
             "content": base64.b64encode(data).decode(),
             "branch": "main",
         }, timeout=60)
