@@ -45,7 +45,7 @@ def prepare_search_descriptions(records: list[dict]) -> None:
 Return JSON array only: [{{"index": 0, "search_description": "..."}}].
 Each description must be ONE complete grammatical sentence, 100-115 CHARACTERS including spaces, in the same language as its title. Count characters before answering. Never truncate a phrase. It must accurately describe that specific post, avoid hype, and invent no facts.
 POSTS: {json.dumps(source, ensure_ascii=False)}"""
-            raw = openai_generate_text(prompt, temperature=0.1, max_retries=3)
+            raw = openai_generate_text(prompt, temperature=0.1, max_retries=3, timeout=150)
             match = re.search(r"\[[\s\S]*\]", raw)
             generated = json.loads(match.group(0)) if match else []
             for item in generated:
