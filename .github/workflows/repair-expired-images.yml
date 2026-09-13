@@ -1,0 +1,77 @@
+name: "Repair — remove expired hotlinked images (WP backlog)"
+
+# One-off cleanup for posts published before the 2026-09-12 fix (commit
+# 833e27ab) that made new posts upload images to permanent WordPress
+# storage. This only removes now-dead <img> tags from the pre-fix backlog;
+# it never regenerates a lost image. Dry-run by default.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply_changes:
+        description: "실제로 수정 저장 (기본 false = 조사만)"
+        required: true
+        type: boolean
+        default: false
+      sites:
+        description: "쉼표로 구분한 site_id 목록 (비우면 27개 전체)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repair-expired-images
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4 -q
+      - name: Repair expired temp-provider images across all WordPress sites
+        env:
+          APPLY_CHANGES: ${{ inputs.apply_changes }}
+          REPAIR_SITES: ${{ inputs.sites }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/repair_expired_temp_images.py
+      - name: Upload repair report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: expired-image-repair-${{ github.run_id }}
+          path: artifacts/expired-image-repair/
+          retention-days: 30
+          if-no-files-found: warn
