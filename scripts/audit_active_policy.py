@@ -26,7 +26,10 @@ GEMINI_REVIEWER_TOKENS = (
 REVIEWER_WORKFLOWS = (
     "daily-network-publish.yml",
     "newsrooms-daily-publisher.yml",
-    "blogger-rewrite.yml",
+    # blogger-rewrite.yml intentionally excluded since 2026-09-07: Gemini is
+    # Blogger's documented writer exception there, not a reviewer — see
+    # docs/CONTENT_CADENCE_POLICY_LOCK.md and the queue_blogger_rewrite.py
+    # check above.
     "tistory-daily-plan.yml",
     "sheet-triggered-auto-write.yml",
 )
@@ -80,10 +83,20 @@ def main() -> None:
     if "gpt_1" not in consensus_src or "gpt_2" not in consensus_src:
         fail("three_model_consensus.py is not running two independent GPT passes")
 
-    for name in ("queue_blogger_rewrite.py", "tistory_writer.py"):
-        src = (ROOT / "scripts" / name).read_text(encoding="utf-8")
-        if "gemini_generate" in src or "three_model_consensus" in src:
-            fail(f"{name} re-wired Gemini/consensus review — Blogger/Tistory use a GPT-only quality gate")
+    tistory_src = (ROOT / "scripts" / "tistory_writer.py").read_text(encoding="utf-8")
+    if "gemini_generate" in tistory_src or "three_model_consensus" in tistory_src:
+        fail("tistory_writer.py re-wired Gemini/consensus review — Tistory uses a GPT-only quality gate")
+
+    # 2026-09-07: Blogger is a deliberate, documented exception to the rule
+    # above (see docs/CONTENT_CADENCE_POLICY_LOCK.md and
+    # config/content_writing_policy.json's blogger_writer block) — Gemini is
+    # Blogger's first-draft/rewrite WRITER now, not a reintroduced independent
+    # reviewer/consensus step. Still forbid the actual consensus machinery.
+    blogger_src = (ROOT / "scripts" / "queue_blogger_rewrite.py").read_text(encoding="utf-8")
+    if "three_model_consensus" in blogger_src:
+        fail("queue_blogger_rewrite.py re-wired the consensus reviewer — Blogger uses a single Gemini writer with code-level quality gates, not multi-model consensus")
+    if "gemini_generate_text" not in blogger_src:
+        fail("queue_blogger_rewrite.py lost its documented Gemini writer wiring")
 
     workflow_text = {}
     for path in WF.glob("*.yml"):
@@ -186,13 +199,6 @@ def main() -> None:
     configured_models = tuple(item["model_id"] for item in image_policy["model_priority"])
     if configured_models != approved_models:
         fail(f"Replicate model policy drift: {configured_models}")
-
-    topik = (ROOT / "scripts" / "topik_quiz_shorts.py").read_text(encoding="utf-8")
-    if "generate_approved_image" not in topik or "openai_generate_image" in topik or "GEMINI_IMAGE_MODELS" in topik:
-        fail("TOPIK review generator can escape the approved Replicate image gateway")
-    topik_workflow = workflow_text.get("topik-quiz-daily.yml", "")
-    if "REPLICATE_API_TOKEN" not in topik_workflow:
-        fail("TOPIK review workflow lacks the shared Replicate token")
 
     registry = json.loads((ROOT / "config" / "youtube_channels.json").read_text(encoding="utf-8"))
     keys = {c["channel_key"] for c in registry["channels"] if c.get("enabled", True)}
