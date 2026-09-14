@@ -70,10 +70,9 @@
                     </div>
                     <h3 class="mt-0.5 truncate text-sm font-black text-slate-900">{{ site.domain }}</h3>
                     <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-slate-600">
-                        <p>오늘 방문자 <b class="text-slate-900">{{ site.today_visitors if site.today_visitors is not none else '-' }}</b>{% if site.today_delta %} <span class="{{ 'text-emerald-600' if site.today_delta > 0 else 'text-rose-600' }}">({{ '+' if site.today_delta > 0 }}{{ site.today_delta }})</span>{% endif %}</p>
-                        <p>누적방문 <b class="text-slate-900">{{ site.total_visitors if site.total_visitors is not none else '-' }}</b></p>
-                        <p>Google 색인 <b class="text-slate-900">{{ site.indexed if site.indexed is not none else '확인 중' }}{% if site.index_total %}/{{ site.index_total }}{% endif %}</b></p>
-                        <p>공개글 <b class="text-slate-900">{{ site.total_posts if site.total_posts is not none else '-' }}</b></p>
+                        {% for label, value, delta in [('일일 방문자', site.today_visitors, site.today_delta), ('누적 방문자', site.total_visitors, site.total_delta), ('신규 콘텐츠 수', site.new_posts, site.new_posts_delta), ('Google 검색 색인 수', site.indexed, site.indexed_delta)] %}
+                        <p>{{ label }} <b class="text-slate-900">{{ '{:,}'.format(value) if value is not none else '미집계' }}</b> <span class="{% if delta is none %}text-slate-400{% elif delta < 0 %}text-rose-600{% else %}text-emerald-600{% endif %}">({% if delta is none %}증감 미집계{% else %}{{ '+' if delta > 0 else '' }}{{ '{:,}'.format(delta) }}{% endif %})</span></p>
+                        {% endfor %}
                     </div>
                     <div class="core-business-today mt-2 rounded-lg bg-slate-50 px-2 py-1.5 text-[11px] text-slate-500">오늘 발행 현황 불러오는 중…</div>
                     <a href="https://{{ site.domain }}" target="_blank" rel="noopener noreferrer" class="mt-2 inline-block text-[11px] font-bold text-indigo-700 hover:underline">사이트 열기 →</a>
@@ -192,7 +191,7 @@
             <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block truncate text-xs text-blue-700 underline" title="{{ url }}">{{ url|replace('https://','')|replace('http://','') }} ↗</a>
             <span class="tile-rank mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-black text-blue-800">순위 미집계</span>
             <div class="tile-metrics mt-2 space-y-1 text-[11px]">
-            {% for title, key, change, basis in [('오늘 방문자','today_visitors','today_delta','오늘 현재 − 어제 하루 · Blogger는 자체 조회수'),('누적 방문자','total_visitors','total_delta','오늘 증가'),('총 발행 글','total_posts','posts_delta','전날 저장값 대비 · 비교자료 없으면 미집계'),('Google 색인 · 글','indexed','indexed_delta','이전 Google 확인 대비')] %}
+            {% for title, key, change, basis in [('일일 방문자','today_visitors','today_delta','오늘 현재 − 어제 하루 · Blogger는 자체 조회수'),('누적 방문자','total_visitors','total_delta','전일 확인값 대비'),('신규 콘텐츠 수','new_posts','new_posts_delta','오늘 공개 수 − 어제 공개 수'),('Google 검색 색인 수','indexed','indexed_delta','이전 Google 확인 대비')] %}
             {% set value = metrics.get(key) if metrics else none %}{% set delta = metrics.get(change) if metrics else none %}
             <p class="flex flex-wrap justify-between gap-1" title="{{ basis }}"><span>{{ title }}</span><strong>{{ '{:,}'.format(value) if value is not none else '미집계' }} <span class="{{ 'text-red-600' if delta is not none and delta < 0 else 'text-emerald-700' }}">({% if delta is none %}증감 미집계{% else %}{{ '+' if delta > 0 else '' }}{{ '{:,}'.format(delta) }}{% endif %})</span></strong></p>
             {% endfor %}
@@ -325,7 +324,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-100 p-2" aria-label="{{ site.domain }} 핵심 통계 4개">
                         <div class="col-span-2 rounded-xl border border-blue-200 bg-blue-600 px-3 py-3 text-white shadow-sm">
-                            <p class="text-[11px] font-black tracking-tight text-blue-100">당일 방문자(어제 대비)</p>
+                            <p class="text-[11px] font-black tracking-tight text-blue-100">일일 방문자 <span class="font-bold">(증감)</span></p>
                             {% if site.visitor_checked_at %}<p class="text-[9px] font-bold text-blue-100">실측 {{ site.visitor_checked_at }}</p>{% endif %}
                             {% if site.today_visitors is not none %}
                             <p class="mt-1 flex items-baseline gap-2">
@@ -335,7 +334,7 @@
                             {% else %}<p class="mt-1 text-lg font-black text-amber-200">잠시 후 자동 재수집</p>{% endif %}
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
-                            <p class="text-[11px] font-black text-slate-500">누적 방문자(오늘 증가)</p>
+                            <p class="text-[11px] font-black text-slate-500">누적 방문자 <span class="text-slate-400">(증감)</span></p>
                             {% if site.total_visitors is not none %}
                             <p class="mt-1 text-xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.total_visitors) }}
                                 {% if site.total_delta is not none %}<span class="text-xs {% if site.total_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.total_delta > 0 %}+{% endif %}{{ site.total_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
@@ -343,16 +342,16 @@
                             {% else %}<p class="mt-1 text-sm font-black text-amber-600">집계 중</p>{% endif %}
                         </div>
                         <div class="rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
-                            <p class="text-[11px] font-black text-slate-500">총 게시글(증감)</p>
-                            {% if site.total_posts is not none %}
-                            <p class="mt-1 text-xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.total_posts) }}
-                                {% if site.posts_delta is not none %}<span class="text-xs {% if site.posts_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.posts_delta > 0 %}+{% endif %}{{ site.posts_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
+                            <p class="text-[11px] font-black text-slate-500">신규 콘텐츠 수 <span class="text-slate-400">(증감)</span></p>
+                            {% if site.new_posts is not none %}
+                            <p class="mt-1 text-xl font-black tabular-nums text-slate-950">{{ '{:,}'.format(site.new_posts) }}
+                                {% if site.new_posts_delta is not none %}<span class="text-xs {% if site.new_posts_delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if site.new_posts_delta > 0 %}+{% endif %}{{ site.new_posts_delta }})</span>{% else %}<span class="text-[10px] text-slate-400">(증감 미집계)</span>{% endif %}
                             </p>
                             {% else %}<p class="mt-1 text-sm font-black text-amber-600">집계 중</p>{% endif %}
                         </div>
                         <div class="col-span-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 shadow-sm" title="{{ site.index_status }}">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-black text-emerald-800">Google 색인 글(증감)</p>
+                                <p class="text-[11px] font-black text-emerald-800">Google 검색 색인 수 <span class="text-emerald-700">(증감)</span></p>
                             </div>
                             {% if site.indexed is not none %}
                             <p class="mt-1 text-xl font-black tabular-nums text-emerald-950">{{ '{:,}'.format(site.indexed) }}
@@ -482,7 +481,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2 rounded-2xl border border-violet-300 bg-violet-950 p-2 shadow-inner">
-                        {% for label, value, delta in [('당일 방문자', blog.today_visitors, blog.today_delta), ('누적 방문자', blog.total_visitors, blog.total_delta), ('총 글 수', blog.total_posts, blog.posts_delta), ('Google 색인', blog.indexed, blog.indexed_delta)] %}
+                        {% for label, value, delta in [('일일 방문자', blog.today_visitors, blog.today_delta), ('누적 방문자', blog.total_visitors, blog.total_delta), ('신규 콘텐츠 수', blog.new_posts, blog.new_posts_delta), ('Google 검색 색인 수', blog.indexed, blog.indexed_delta)] %}
                         <div class="rounded-xl bg-white p-3 shadow-sm">
                             <p class="text-[10px] font-black text-slate-500">{{ label }} <span class="text-slate-400">(증감)</span></p>
                             {% if value is not none %}<p class="mt-1 text-xl font-black text-slate-950">{{ '{:,}'.format(value) }} {% if delta is not none %}<span class="text-xs {% if delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if delta > 0 %}+{% endif %}{{ delta }})</span>{% else %}<span class="text-[9px] text-slate-400">(증감 미집계)</span>{% endif %}</p>
@@ -627,10 +626,10 @@
                     {% endif %}
                     <div class="grid grid-cols-2 gap-2">
                         {% for label, value, delta in [
-                            ('당일 방문자(증감)', blog.today_visitors, blog.today_delta),
+                            ('일일 방문자(증감)', blog.today_visitors, blog.today_delta),
                             ('누적 방문자(증감)', blog.total_visitors, blog.total_delta),
-                            ('RSS 공개글(증감)', blog.total_posts, blog.posts_delta),
-                            ('Google 색인 글(증감)', blog.indexed, blog.indexed_delta)
+                            ('신규 콘텐츠 수(증감)', blog.new_posts, blog.new_posts_delta),
+                            ('Google 검색 색인 수(증감)', blog.indexed, blog.indexed_delta)
                         ] %}
                         <div class="rounded-lg bg-white/80 p-3">
                             <p class="text-[10px] font-bold text-slate-400">{{ label }}</p>
