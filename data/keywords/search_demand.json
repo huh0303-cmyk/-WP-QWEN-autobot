@@ -1,8 +1,8 @@
 {
-  "checked_at": "2026-09-11T23:46:58.589067+00:00",
+  "checked_at": "2026-09-14T00:03:33.193629+00:00",
   "period": {
-    "start": "2026-08-12",
-    "end": "2026-09-08"
+    "start": "2026-08-15",
+    "end": "2026-09-11"
   },
   "metric_note": "GSC impressions are site-specific, not monthly keyword search volume.",
   "sites": {
@@ -42,25 +42,18 @@
           "position": 28.333333333333332
         },
         {
+          "query": "work korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 36.75
+        },
+        {
           "query": "south korea work",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
           "position": 46
-        },
-        {
-          "query": "work korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 37.666666666666664
-        },
-        {
-          "query": "working in korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 32.33333333333333
         },
         {
           "query": "korea work",
@@ -70,18 +63,18 @@
           "position": 28
         },
         {
+          "query": "working in korea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 34
+        },
+        {
           "query": "is transportation allowance taxable?",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 69
-        },
-        {
-          "query": "korea job",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 41
         },
         {
           "query": "korea jobs",
@@ -151,25 +144,25 @@
       "status": "available",
       "queries": [
         {
-          "query": "minimum salary in south korea",
+          "query": "work in korea",
           "clicks": 0,
-          "impressions": 9,
+          "impressions": 23,
           "ctr": 0,
-          "position": 37
+          "position": 54.26086956521739
         },
         {
           "query": "severance pay",
           "clicks": 0,
-          "impressions": 9,
+          "impressions": 7,
           "ctr": 0,
-          "position": 83.44444444444444
+          "position": 83.28571428571429
         },
         {
-          "query": "employment in south korea",
+          "query": "minimum salary in south korea",
           "clicks": 0,
           "impressions": 6,
           "ctr": 0,
-          "position": 52.833333333333336
+          "position": 37.166666666666664
         },
         {
           "query": "jobkorea scraper",
@@ -179,18 +172,11 @@
           "position": 68.2
         },
         {
-          "query": "korea job",
+          "query": "employment in south korea",
           "clicks": 0,
-          "impressions": 5,
+          "impressions": 4,
           "ctr": 0,
-          "position": 44
-        },
-        {
-          "query": "minimum salary in korea",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 34.4
+          "position": 55.25
         },
         {
           "query": "factory worker in korea salary",
@@ -207,13 +193,6 @@
           "position": 50.75
         },
         {
-          "query": "korea factory worker salary",
-          "clicks": 0,
-          "impressions": 4,
-          "ctr": 0,
-          "position": 52.25
-        },
-        {
           "query": "korea minimum wage",
           "clicks": 0,
           "impressions": 4,
@@ -228,6 +207,13 @@
           "position": 51.5
         },
         {
+          "query": "minimum salary in korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 35.25
+        },
+        {
           "query": "south korea employment",
           "clicks": 0,
           "impressions": 4,
@@ -235,11 +221,11 @@
           "position": 52.75
         },
         {
-          "query": "job opportunities in korea",
+          "query": "korea factory worker salary",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 42.666666666666664
+          "position": 58
         },
         {
           "query": "korean employment",
@@ -256,18 +242,25 @@
           "position": 46.333333333333336
         },
         {
-          "query": "minimum salary south korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 33.666666666666664
-        },
-        {
           "query": "south korea work permit",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
           "position": 61.666666666666664
+        },
+        {
+          "query": "work in korea for foreigners",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 51.333333333333336
+        },
+        {
+          "query": "work korea",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 57
         },
         {
           "query": "how to get work permit in south korea",
@@ -277,11 +270,11 @@
           "position": 60
         },
         {
-          "query": "job search korea",
+          "query": "job opportunities in korea",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
-          "position": 36
+          "position": 43.5
         },
         {
           "query": "jobcorea",
@@ -312,18 +305,18 @@
           "position": 94
         },
         {
+          "query": "korea job",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 41
+        },
+        {
           "query": "korea work",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 65
-        },
-        {
-          "query": "korea work opportunities",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 57.5
         },
         {
           "query": "korea work permit",
@@ -340,18 +333,18 @@
           "position": 7
         },
         {
-          "query": "korean jobs",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 44.5
-        },
-        {
           "query": "korean work abroad",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 53.5
+        },
+        {
+          "query": "minimum salary south korea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 34
         },
         {
           "query": "salario minimo na coreia do sul",
@@ -375,25 +368,39 @@
           "position": 68
         },
         {
-          "query": "and after that",
+          "query": "south korea work visa online apply",
           "clicks": 0,
-          "impressions": 1,
+          "impressions": 2,
           "ctr": 0,
-          "position": 8
+          "position": 66.5
         },
         {
-          "query": "average korean worker salary",
+          "query": "termination of employment in south korea",
           "clicks": 0,
-          "impressions": 1,
+          "impressions": 2,
           "ctr": 0,
-          "position": 52
+          "position": 59.5
         },
         {
-          "query": "average salary in korea in usd",
+          "query": "work in korea requirements",
           "clicks": 0,
-          "impressions": 1,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 59
+        },
+        {
+          "query": "work in south korea for foreigners",
+          "clicks": 0,
+          "impressions": 2,
           "ctr": 0,
           "position": 55
+        },
+        {
+          "query": "working in korea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 62
         },
         {
           "query": "average salary in south korea 2026",
@@ -415,13 +422,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 73
-        },
-        {
-          "query": "careers in korea for foreigners",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 46
         },
         {
           "query": "common jobs in south korea",
@@ -452,32 +452,11 @@
           "position": 69
         },
         {
-          "query": "foreigner jobs in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 41
-        },
-        {
-          "query": "freelance korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 56
-        },
-        {
           "query": "get a job in korea",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 73
-        },
-        {
-          "query": "get paid to move to south korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 72
         },
         {
           "query": "how to earn money in korea",
@@ -492,41 +471,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 48
-        },
-        {
-          "query": "in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 7
-        },
-        {
-          "query": "job for korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 46
-        },
-        {
-          "query": "job in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 49
-        },
-        {
-          "query": "job in south korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 47
-        },
-        {
-          "query": "job in south korea for foreigners",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 43
         },
         {
           "query": "jobkorea english",
@@ -550,20 +494,6 @@
           "position": 75
         },
         {
-          "query": "jobs in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 50
-        },
-        {
-          "query": "jobs in korea for foreigners",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 51
-        },
-        {
           "query": "jokorea",
           "clicks": 0,
           "impressions": 1,
@@ -576,13 +506,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 43
-        },
-        {
-          "query": "korea basic salary",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 48
         },
         {
           "query": "korea daily wage",
@@ -604,13 +527,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 65
-        },
-        {
-          "query": "korea jobs",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 42
         },
         {
           "query": "korea minimum salary per month",
@@ -655,6 +571,13 @@
           "position": 55
         },
         {
+          "query": "korea work opportunities",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 71
+        },
+        {
           "query": "korea worker",
           "clicks": 0,
           "impressions": 1,
@@ -676,6 +599,13 @@
           "position": 65
         },
         {
+          "query": "korean jobs",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 48
+        },
+        {
           "query": "korean labour law for foreigners",
           "clicks": 0,
           "impressions": 1,
@@ -688,13 +618,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 23
-        },
-        {
-          "query": "korean work",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 42
         },
         {
           "query": "korean work permit",
@@ -774,13 +697,6 @@
           "position": 46
         },
         {
-          "query": "salary of factory worker in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 43
-        },
-        {
           "query": "salaryman in korean",
           "clicks": 0,
           "impressions": 1,
@@ -844,11 +760,88 @@
           "position": 53
         },
         {
+          "query": "south korea work visa price",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 65
+        },
+        {
+          "query": "south korea work visa processing time",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 80
+        },
+        {
           "query": "south korean occupations",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 48
+        },
+        {
+          "query": "south korean work",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 57
+        },
+        {
+          "query": "what topik level to work in korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 69
+        },
+        {
+          "query": "work abroad in korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 53
+        },
+        {
+          "query": "work at korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 74
+        },
+        {
+          "query": "work for korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 70
+        },
+        {
+          "query": "work permit in korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 56
+        },
+        {
+          "query": "work south korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 53
+        },
+        {
+          "query": "working in south korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 50
+        },
+        {
+          "query": "working korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 83
         }
       ]
     },
@@ -862,74 +855,53 @@
       "status": "available",
       "queries": [
         {
+          "query": "job in korea",
+          "clicks": 0,
+          "impressions": 27,
+          "ctr": 0,
+          "position": 63.77777777777778
+        },
+        {
           "query": "jobkorea",
           "clicks": 0,
           "impressions": 26,
           "ctr": 0,
-          "position": 21.653846153846153
-        },
-        {
-          "query": "job in korea",
-          "clicks": 0,
-          "impressions": 24,
-          "ctr": 0,
-          "position": 63.833333333333336
-        },
-        {
-          "query": "jobs in korea",
-          "clicks": 0,
-          "impressions": 19,
-          "ctr": 0,
-          "position": 64.73684210526315
+          "position": 21.615384615384617
         },
         {
           "query": "job korea",
           "clicks": 0,
-          "impressions": 18,
+          "impressions": 14,
           "ctr": 0,
-          "position": 45.833333333333336
+          "position": 46.857142857142854
         },
         {
-          "query": "korea job",
+          "query": "jobs in korea",
           "clicks": 0,
-          "impressions": 13,
+          "impressions": 14,
           "ctr": 0,
-          "position": 68.61538461538461
-        },
-        {
-          "query": "korea jobs",
-          "clicks": 0,
-          "impressions": 12,
-          "ctr": 0,
-          "position": 63.666666666666664
+          "position": 65.42857142857143
         },
         {
           "query": "jobs korea",
           "clicks": 0,
-          "impressions": 9,
+          "impressions": 10,
           "ctr": 0,
-          "position": 66.55555555555556
+          "position": 62.4
+        },
+        {
+          "query": "korea job",
+          "clicks": 0,
+          "impressions": 10,
+          "ctr": 0,
+          "position": 68.7
         },
         {
           "query": "korea job hiring",
           "clicks": 0,
-          "impressions": 8,
+          "impressions": 10,
           "ctr": 0,
-          "position": 63
-        },
-        {
-          "query": "job opportunities in korea",
-          "clicks": 0,
-          "impressions": 7,
-          "ctr": 0,
-          "position": 63.57142857142857
-        },
-        {
-          "query": "jobs in korea for foreigners",
-          "clicks": 0,
-          "impressions": 7,
-          "ctr": 0,
-          "position": 68.57142857142857
+          "position": 62.6
         },
         {
           "query": "korea job search",
@@ -941,58 +913,16 @@
         {
           "query": "korea job vacancy",
           "clicks": 0,
-          "impressions": 7,
+          "impressions": 6,
           "ctr": 0,
-          "position": 61.42857142857143
+          "position": 61.333333333333336
         },
         {
-          "query": "korea jobs for foreigners",
-          "clicks": 0,
-          "impressions": 7,
-          "ctr": 0,
-          "position": 68
-        },
-        {
-          "query": "job opportunities korea",
+          "query": "korea jobs",
           "clicks": 0,
           "impressions": 6,
           "ctr": 0,
-          "position": 59.166666666666664
-        },
-        {
-          "query": "job search korea",
-          "clicks": 0,
-          "impressions": 6,
-          "ctr": 0,
-          "position": 60.666666666666664
-        },
-        {
-          "query": "jobs in south korea",
-          "clicks": 0,
-          "impressions": 6,
-          "ctr": 0,
-          "position": 67
-        },
-        {
-          "query": "foreigner jobs in korea",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 65.6
-        },
-        {
-          "query": "hiring in south korea",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 67
-        },
-        {
-          "query": "job in korea for foreigners",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 67
+          "position": 65.66666666666667
         },
         {
           "query": "jobkorea scraper",
@@ -1002,11 +932,67 @@
           "position": 38.6
         },
         {
+          "query": "jobs in korea for foreigners",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 69.8
+        },
+        {
+          "query": "jobs in south korea",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 67.6
+        },
+        {
+          "query": "korea jobs for foreigners",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 68.6
+        },
+        {
           "query": "korean job board",
           "clicks": 0,
           "impressions": 5,
           "ctr": 0,
           "position": 71.6
+        },
+        {
+          "query": "korean jobs",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 75.4
+        },
+        {
+          "query": "foreigner jobs in korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 66.5
+        },
+        {
+          "query": "hiring in south korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 67.25
+        },
+        {
+          "query": "job in korea for foreigners",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 68.25
+        },
+        {
+          "query": "job search korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 64.75
         },
         {
           "query": "jobba i sydkorea",
@@ -1016,6 +1002,13 @@
           "position": 74
         },
         {
+          "query": "south korea work",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 81.75
+        },
+        {
           "query": "best jobs in korea for foreigners",
           "clicks": 0,
           "impressions": 3,
@@ -1023,25 +1016,11 @@
           "position": 83.66666666666667
         },
         {
-          "query": "careers in korea for foreigners",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 69.66666666666667
-        },
-        {
-          "query": "employment in south korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 68
-        },
-        {
           "query": "find jobs in korea",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 66
+          "position": 68.33333333333333
         },
         {
           "query": "find work in korea",
@@ -1051,13 +1030,6 @@
           "position": 69.33333333333333
         },
         {
-          "query": "job in south korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 67
-        },
-        {
           "query": "job korean",
           "clicks": 0,
           "impressions": 3,
@@ -1065,18 +1037,18 @@
           "position": 49.333333333333336
         },
         {
-          "query": "korea job finder",
+          "query": "job opportunities in korea",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 59.333333333333336
+          "position": 64.66666666666666
         },
         {
-          "query": "korea job opportunities",
+          "query": "jobs in korea finder",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 65.33333333333333
+          "position": 69
         },
         {
           "query": "korean job shop",
@@ -1084,6 +1056,13 @@
           "impressions": 3,
           "ctr": 0,
           "position": 82.66666666666667
+        },
+        {
+          "query": "korean work",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 83.66666666666667
         },
         {
           "query": "best jobs for foreigners in korea",
@@ -1107,32 +1086,18 @@
           "position": 76
         },
         {
-          "query": "high paying jobs in korea",
+          "query": "careers in korea for foreigners",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
-          "position": 67
+          "position": 71
         },
         {
-          "query": "high paying jobs in south korea for foreigners",
+          "query": "job in south korea",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
-          "position": 78
-        },
-        {
-          "query": "highest paying jobs in south korea for foreigners",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 77.5
-        },
-        {
-          "query": "job korea for foreigners",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 60
+          "position": 68.5
         },
         {
           "query": "job korea foreigners",
@@ -1142,6 +1107,20 @@
           "position": 68.5
         },
         {
+          "query": "job opportunities korea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 57.5
+        },
+        {
+          "query": "jobfinderkorea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 57.5
+        },
+        {
           "query": "jobkorea english",
           "clicks": 0,
           "impressions": 2,
@@ -1149,11 +1128,25 @@
           "position": 37
         },
         {
+          "query": "korea job opportunities",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 66.5
+        },
+        {
           "query": "korea job sites",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 59.5
+        },
+        {
+          "query": "korea recruitment",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 58.5
         },
         {
           "query": "korea work",
@@ -1184,6 +1177,27 @@
           "position": 54.5
         },
         {
+          "query": "south korea employment",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 71.5
+        },
+        {
+          "query": "south korea hiring",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 67
+        },
+        {
+          "query": "south korea jobs",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 65.5
+        },
+        {
           "query": "apply for jobs in korea",
           "clicks": 0,
           "impressions": 1,
@@ -1196,6 +1210,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 84
+        },
+        {
+          "query": "career korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 71
         },
         {
           "query": "career opportunities in korea",
@@ -1212,18 +1233,18 @@
           "position": 67
         },
         {
-          "query": "common jobs in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 69
-        },
-        {
           "query": "employment in korea",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 66
+        },
+        {
+          "query": "employment in south korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 68
         },
         {
           "query": "find job in korea",
@@ -1247,32 +1268,18 @@
           "position": 68
         },
         {
-          "query": "foreign jobs in south korea",
+          "query": "high paying jobs in south korea for foreigners",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 65
+          "position": 74
         },
         {
-          "query": "getting a job in korea",
+          "query": "highest paying jobs in south korea for foreigners",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 67
-        },
-        {
-          "query": "good jobs in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 70
-        },
-        {
-          "query": "highest paying jobs in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 61
+          "position": 80
         },
         {
           "query": "hire korea",
@@ -1296,13 +1303,6 @@
           "position": 74
         },
         {
-          "query": "job for foreigners in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 69
-        },
-        {
           "query": "job for foreigners in south korea",
           "clicks": 0,
           "impressions": 1,
@@ -1310,53 +1310,18 @@
           "position": 69
         },
         {
-          "query": "job for korea",
+          "query": "job opportunities in korea for foreigners",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 64
+          "position": 72
         },
         {
-          "query": "job in korea for indian",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 71
-        },
-        {
-          "query": "job in south korea for foreigners",
+          "query": "job opportunities in south korea",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 63
-        },
-        {
-          "query": "job korea website",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 29
-        },
-        {
-          "query": "job kroea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 69
-        },
-        {
-          "query": "job opportunities in korea for indian",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 77
-        },
-        {
-          "query": "job search in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 61
         },
         {
           "query": "job south korea",
@@ -1373,13 +1338,6 @@
           "position": 69
         },
         {
-          "query": "jobfinderkorea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 61
-        },
-        {
           "query": "jobk",
           "clicks": 0,
           "impressions": 1,
@@ -1394,25 +1352,11 @@
           "position": 86
         },
         {
-          "query": "jobkora",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 83
-        },
-        {
           "query": "jobkorean",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 52
-        },
-        {
-          "query": "jobkr",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 64
         },
         {
           "query": "jobkuel",
@@ -1422,25 +1366,11 @@
           "position": 10
         },
         {
-          "query": "jobs for foreigners in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 62
-        },
-        {
           "query": "jobs in korea for americans",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 76
-        },
-        {
-          "query": "jobs in korean",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 70
         },
         {
           "query": "jobs in south korea for foreigners",
@@ -1471,13 +1401,6 @@
           "position": 70
         },
         {
-          "query": "korea careers",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 65
-        },
-        {
           "query": "korea employment",
           "clicks": 0,
           "impressions": 1,
@@ -1499,13 +1422,6 @@
           "position": 65
         },
         {
-          "query": "korea hiring",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 66
-        },
-        {
           "query": "korea job apply",
           "clicks": 0,
           "impressions": 1,
@@ -1520,6 +1436,13 @@
           "position": 68
         },
         {
+          "query": "korea job finder",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 59
+        },
+        {
           "query": "korea job for foreigners",
           "clicks": 0,
           "impressions": 1,
@@ -1531,28 +1454,14 @@
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 74
+          "position": 77
         },
         {
-          "query": "korea recruitment",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 58
-        },
-        {
-          "query": "korea work opportunities",
+          "query": "korea work hiring",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 64
-        },
-        {
-          "query": "korean careers",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 79
         },
         {
           "query": "korean employment",
@@ -1560,6 +1469,90 @@
           "impressions": 1,
           "ctr": 0,
           "position": 59
+        },
+        {
+          "query": "korean job vacancies",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 56
+        },
+        {
+          "query": "korean job vacancy",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 54
+        },
+        {
+          "query": "korean job website for foreigners",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 60
+        },
+        {
+          "query": "korean jobs for foreigners",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 72
+        },
+        {
+          "query": "korian jobs",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 71
+        },
+        {
+          "query": "korvia job board",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 87
+        },
+        {
+          "query": "south korea hiring job",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 61
+        },
+        {
+          "query": "south korea job",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 71
+        },
+        {
+          "query": "south korea job opportunities",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 63
+        },
+        {
+          "query": "south korean jobs for foreigners",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 68
+        },
+        {
+          "query": "work abroad south korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 89
+        },
+        {
+          "query": "work at korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 72
         }
       ]
     },
@@ -1608,61 +1601,26 @@
         {
           "query": "f-4 visa help",
           "clicks": 0,
-          "impressions": 40,
+          "impressions": 20,
           "ctr": 0,
-          "position": 55.775
+          "position": 55.2
         },
         {
-          "query": "f4 korean visa",
+          "query": "f-4 visa korea requirements",
           "clicks": 0,
-          "impressions": 4,
+          "impressions": 1,
           "ctr": 0,
-          "position": 44.75
+          "position": 51
         },
         {
           "query": "f-4 visa south korea",
           "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 46
-        },
-        {
-          "query": "f4 visa for korea",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 45
-        },
-        {
-          "query": "f4 visa korea",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 46.5
-        },
-        {
-          "query": "f4 visa south korea",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 46
-        },
-        {
-          "query": "korean f4 visa",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 45.5
-        },
-        {
-          "query": "f 4 visa south korea",
-          "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 43
+          "position": 50
         },
         {
-          "query": "f-4 visa korea requirements",
+          "query": "f4 korean visa",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
@@ -1676,21 +1634,7 @@
           "position": 53
         },
         {
-          "query": "korea f-4 visa",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 40
-        },
-        {
-          "query": "korea f4",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 47
-        },
-        {
-          "query": "korea f4 visa",
+          "query": "f4 visa korea",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
@@ -1702,13 +1646,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 60
-        },
-        {
-          "query": "kvisa",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 57
         },
         {
           "query": "visa 09",
@@ -1738,9 +1675,16 @@
         {
           "query": "forex korea",
           "clicks": 0,
-          "impressions": 11,
+          "impressions": 13,
           "ctr": 0,
-          "position": 79
+          "position": 78.84615384615384
+        },
+        {
+          "query": "korean bank",
+          "clicks": 0,
+          "impressions": 8,
+          "ctr": 0,
+          "position": 76.75
         },
         {
           "query": "virtual account solutions in south korea",
@@ -1748,13 +1692,6 @@
           "impressions": 6,
           "ctr": 0,
           "position": 93.33333333333333
-        },
-        {
-          "query": "korean bank",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 78.2
         },
         {
           "query": "korean mortgage broker",
@@ -1799,13 +1736,6 @@
           "position": 66
         },
         {
-          "query": "korean financial translation",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 91.66666666666667
-        },
-        {
           "query": "finance in korean",
           "clicks": 0,
           "impressions": 2,
@@ -1820,11 +1750,11 @@
           "position": 77
         },
         {
-          "query": "korean finance",
+          "query": "korean financial translation",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
-          "position": 81.5
+          "position": 88
         },
         {
           "query": "korean iban",
@@ -1932,11 +1862,25 @@
           "position": 82
         },
         {
+          "query": "korean brokerage account",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 60
+        },
+        {
           "query": "korean export credit agency",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 58
+        },
+        {
+          "query": "korean finance",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 88
         },
         {
           "query": "korean finance association",
@@ -1974,18 +1918,18 @@
           "position": 80
         },
         {
+          "query": "south korea robo advisory software market",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 83
+        },
+        {
           "query": "tax refund korea 2026",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 56
-        },
-        {
-          "query": "tax refund korea percentage",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 72
         },
         {
           "query": "tax return korea",
@@ -2015,9 +1959,9 @@
         {
           "query": "ki korea",
           "clicks": 0,
-          "impressions": 16,
+          "impressions": 17,
           "ctr": 0,
-          "position": 15.0625
+          "position": 14.235294117647058
         },
         {
           "query": "ki",
@@ -2025,13 +1969,6 @@
           "impressions": 3,
           "ctr": 0,
           "position": 83
-        },
-        {
-          "query": "isa account",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 75
         },
         {
           "query": "isa 디시",
@@ -2053,13 +1990,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 66
-        },
-        {
-          "query": "korea investment",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 78
         },
         {
           "query": "korea investment corporation investments",
@@ -2088,13 +2018,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 53
-        },
-        {
-          "query": "what is the national pension amount",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 68
         }
       ]
     },
@@ -2110,9 +2033,9 @@
         {
           "query": "kieca",
           "clicks": 0,
-          "impressions": 3,
+          "impressions": 4,
           "ctr": 0,
-          "position": 3
+          "position": 3.25
         },
         {
           "query": "외국인 인턴",
@@ -2200,9 +2123,9 @@
         {
           "query": "south korea non fungible tokens market",
           "clicks": 0,
-          "impressions": 16,
+          "impressions": 8,
           "ctr": 0,
-          "position": 81.3125
+          "position": 82.125
         },
         {
           "query": "korea cryptocurrency exchange",
@@ -2210,13 +2133,6 @@
           "impressions": 3,
           "ctr": 0,
           "position": 84.33333333333333
-        },
-        {
-          "query": "crypto license in south korea for sale",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 82
         },
         {
           "query": "korean crypto arbitrage",
@@ -2252,13 +2168,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 98
-        },
-        {
-          "query": "south korea cryptocurrency",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 64
         }
       ]
     },
@@ -2326,6 +2235,13 @@
           "impressions": 2,
           "ctr": 0,
           "position": 67
+        },
+        {
+          "query": "korean car insurance",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 39
         },
         {
           "query": "board liability insurance",
@@ -2433,13 +2349,6 @@
           "position": 77
         },
         {
-          "query": "korean car insurance",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 55
-        },
-        {
           "query": "officers insurance",
           "clicks": 0,
           "impressions": 1,
@@ -2465,30 +2374,23 @@
         {
           "query": "medical tourism korea",
           "clicks": 0,
-          "impressions": 23,
+          "impressions": 24,
           "ctr": 0,
-          "position": 78.52173913043478
-        },
-        {
-          "query": "cosmetic surgery patient journey seoul",
-          "clicks": 0,
-          "impressions": 14,
-          "ctr": 0,
-          "position": 79.42857142857143
-        },
-        {
-          "query": "korea surgery",
-          "clicks": 0,
-          "impressions": 14,
-          "ctr": 0,
-          "position": 85.07142857142857
+          "position": 78.95833333333333
         },
         {
           "query": "south korea medical tourism market",
           "clicks": 0,
           "impressions": 14,
           "ctr": 0,
-          "position": 94.07142857142857
+          "position": 93.85714285714286
+        },
+        {
+          "query": "korea surgery",
+          "clicks": 0,
+          "impressions": 12,
+          "ctr": 0,
+          "position": 83
         },
         {
           "query": "south korea medical tourism",
@@ -2505,46 +2407,25 @@
           "position": 78.18181818181819
         },
         {
+          "query": "medical tourism south korea",
+          "clicks": 0,
+          "impressions": 11,
+          "ctr": 0,
+          "position": 83.63636363636364
+        },
+        {
+          "query": "korea medical tour",
+          "clicks": 0,
+          "impressions": 10,
+          "ctr": 0,
+          "position": 75
+        },
+        {
           "query": "korea medical tourism",
           "clicks": 0,
           "impressions": 10,
           "ctr": 0,
           "position": 71
-        },
-        {
-          "query": "medical tourism south korea",
-          "clicks": 0,
-          "impressions": 10,
-          "ctr": 0,
-          "position": 82.9
-        },
-        {
-          "query": "singapore korean medical clinic",
-          "clicks": 0,
-          "impressions": 10,
-          "ctr": 0,
-          "position": 87.3
-        },
-        {
-          "query": "korea medical tour",
-          "clicks": 0,
-          "impressions": 9,
-          "ctr": 0,
-          "position": 73.66666666666667
-        },
-        {
-          "query": "korean medical aesthetic treatment",
-          "clicks": 0,
-          "impressions": 9,
-          "ctr": 0,
-          "position": 86
-        },
-        {
-          "query": "korean medical aesthetic treatments",
-          "clicks": 0,
-          "impressions": 9,
-          "ctr": 0,
-          "position": 81.11111111111111
         },
         {
           "query": "korean medical aesthetic",
@@ -2554,6 +2435,27 @@
           "position": 85
         },
         {
+          "query": "korean medical aesthetic treatments",
+          "clicks": 0,
+          "impressions": 8,
+          "ctr": 0,
+          "position": 78.75
+        },
+        {
+          "query": "singapore korean medical clinic",
+          "clicks": 0,
+          "impressions": 8,
+          "ctr": 0,
+          "position": 84.25
+        },
+        {
+          "query": "cosmetic surgery patient journey seoul",
+          "clicks": 0,
+          "impressions": 7,
+          "ctr": 0,
+          "position": 70.28571428571429
+        },
+        {
           "query": "korea medical tourism agency",
           "clicks": 0,
           "impressions": 7,
@@ -2561,18 +2463,18 @@
           "position": 77.85714285714286
         },
         {
-          "query": "korea medical tourism packages",
-          "clicks": 0,
-          "impressions": 7,
-          "ctr": 0,
-          "position": 80.57142857142857
-        },
-        {
           "query": "korean aesthetics medical",
           "clicks": 0,
           "impressions": 7,
           "ctr": 0,
           "position": 85
+        },
+        {
+          "query": "korean medical aesthetic treatment",
+          "clicks": 0,
+          "impressions": 7,
+          "ctr": 0,
+          "position": 82.57142857142857
         },
         {
           "query": "korean medical and aesthetic clinic",
@@ -2587,6 +2489,13 @@
           "impressions": 7,
           "ctr": 0,
           "position": 82.28571428571429
+        },
+        {
+          "query": "去韩国 医美",
+          "clicks": 0,
+          "impressions": 7,
+          "ctr": 0,
+          "position": 80.57142857142857
         },
         {
           "query": "korean aesthetic medical center",
@@ -2607,14 +2516,14 @@
           "clicks": 0,
           "impressions": 6,
           "ctr": 0,
-          "position": 71.5
+          "position": 79.83333333333333
         },
         {
-          "query": "plastic surgery consultation fee seoul",
+          "query": "korea medical tourism packages",
           "clicks": 0,
-          "impressions": 6,
+          "impressions": 5,
           "ctr": 0,
-          "position": 86
+          "position": 75.4
         },
         {
           "query": "korean medical aesthetic center",
@@ -2638,25 +2547,25 @@
           "position": 88.8
         },
         {
+          "query": "south korean medical tourism",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 83.2
+        },
+        {
+          "query": "visit medical korea",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 70.4
+        },
+        {
           "query": "korean plastic surgery cost",
           "clicks": 0,
-          "impressions": 5,
+          "impressions": 4,
           "ctr": 0,
-          "position": 73.4
-        },
-        {
-          "query": "seoul medical tourism",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 84.6
-        },
-        {
-          "query": "south korea kidney stones market",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 90.8
+          "position": 68
         },
         {
           "query": "medical tourism agency korea",
@@ -2666,11 +2575,39 @@
           "position": 80.25
         },
         {
-          "query": "cosmetic surgery korea cost",
+          "query": "medical tourism in korea",
           "clicks": 0,
-          "impressions": 3,
+          "impressions": 4,
           "ctr": 0,
-          "position": 69.66666666666667
+          "position": 81
+        },
+        {
+          "query": "medical tourism seoul",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 81
+        },
+        {
+          "query": "seoul medical tourism",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 83.75
+        },
+        {
+          "query": "south korea soft tissue repair market",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 86.25
+        },
+        {
+          "query": "wisata medis korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 80.25
         },
         {
           "query": "korean medical tourism",
@@ -2678,20 +2615,6 @@
           "impressions": 3,
           "ctr": 0,
           "position": 94.66666666666667
-        },
-        {
-          "query": "korean plastic surgery agency",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 94.33333333333333
-        },
-        {
-          "query": "medical tourism in korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 78.33333333333333
         },
         {
           "query": "medical tourism in south korea",
@@ -2715,11 +2638,11 @@
           "position": 78.33333333333333
         },
         {
-          "query": "medical tourism seoul",
+          "query": "plastic surgery consultation fee seoul",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 75.66666666666667
+          "position": 81
         },
         {
           "query": "plastic surgery cost korea",
@@ -2727,6 +2650,20 @@
           "impressions": 3,
           "ctr": 0,
           "position": 65
+        },
+        {
+          "query": "south korea kidney stones market",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 92
+        },
+        {
+          "query": "cosmetic surgery korea cost",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 62
         },
         {
           "query": "cost of plastic surgery in korea",
@@ -2741,6 +2678,20 @@
           "impressions": 2,
           "ctr": 0,
           "position": 94
+        },
+        {
+          "query": "korean plastic surgery agency",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 91.5
+        },
+        {
+          "query": "korean plastic surgery tour package cost",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 87
         },
         {
           "query": "medical travel korea",
@@ -2785,18 +2736,18 @@
           "position": 93
         },
         {
-          "query": "south korea liposuction cost",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 80
-        },
-        {
           "query": "south korea plastic surgery packages",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 93.5
+        },
+        {
+          "query": "surgery korea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 80
         },
         {
           "query": "biaya facelift di korea",
@@ -2834,25 +2785,11 @@
           "position": 73
         },
         {
-          "query": "gangnam medical tour center",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 83
-        },
-        {
           "query": "ghost surgery korea",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 77
-        },
-        {
-          "query": "how much does plastic surgery cost in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 98
         },
         {
           "query": "how much is laser hair removal in korea",
@@ -2904,13 +2841,6 @@
           "position": 85
         },
         {
-          "query": "korea medical college fees",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 82
-        },
-        {
           "query": "korea medical tourism plastic surgery",
           "clicks": 0,
           "impressions": 1,
@@ -2953,32 +2883,11 @@
           "position": 78
         },
         {
-          "query": "korea plastic surgery tour package",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 84
-        },
-        {
           "query": "korea surgery clinic",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
           "position": 88
-        },
-        {
-          "query": "korea surgery cost",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 89
-        },
-        {
-          "query": "korean college of cosmetic surgery",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 73
         },
         {
           "query": "korean face surgery cost",
@@ -3023,13 +2932,6 @@
           "position": 66
         },
         {
-          "query": "korean plastic surgery tour package cost",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 89
-        },
-        {
           "query": "korean surgery cost",
           "clicks": 0,
           "impressions": 1,
@@ -3049,13 +2951,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 47
-        },
-        {
-          "query": "liposuction in korea cost",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 84
         },
         {
           "query": "liposuction korea cost",
@@ -3093,20 +2988,6 @@
           "position": 74
         },
         {
-          "query": "plastic surgery cost in south korea in indian rupees",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 75
-        },
-        {
-          "query": "plastic surgery in korea price",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 83
-        },
-        {
           "query": "plastic surgery korea cost",
           "clicks": 0,
           "impressions": 1,
@@ -3142,6 +3023,13 @@
           "position": 99
         },
         {
+          "query": "south korea liposuction cost",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 81
+        },
+        {
           "query": "south korea medical",
           "clicks": 0,
           "impressions": 1,
@@ -3156,11 +3044,32 @@
           "position": 81
         },
         {
-          "query": "south korea plastic surgery price",
+          "query": "south korea plastic surgery rates",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 76
+          "position": 74
+        },
+        {
+          "query": "south korea procedures",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 98
+        },
+        {
+          "query": "surgery cost in korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 63
+        },
+        {
+          "query": "韓国 整形 ツアー 費用",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 74
         }
       ]
     },
@@ -3194,13 +3103,6 @@
       "status": "available",
       "queries": [
         {
-          "query": "business laws in south korea",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 15.5
-        },
-        {
           "query": "korean tax refund australia",
           "clicks": 0,
           "impressions": 2,
@@ -3221,9 +3123,9 @@
         {
           "query": "destination weddings in jeju island",
           "clicks": 0,
-          "impressions": 67,
+          "impressions": 70,
           "ctr": 0,
-          "position": 21.507462686567163
+          "position": 20.985714285714284
         },
         {
           "query": "how much is a wedding in korea",
@@ -3245,13 +3147,6 @@
           "impressions": 2,
           "ctr": 0,
           "position": 65.5
-        },
-        {
-          "query": "average korean wedding cost",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 53
         },
         {
           "query": "duo korean matchmaking",
@@ -3282,13 +3177,6 @@
           "position": 21
         },
         {
-          "query": "korean matchmaking agency",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 19
-        },
-        {
           "query": "korean wedding cost",
           "clicks": 0,
           "impressions": 1,
@@ -3314,27 +3202,6 @@
       "status": "available",
       "queries": [
         {
-          "query": "korean realty",
-          "clicks": 0,
-          "impressions": 4,
-          "ctr": 0,
-          "position": 79.25
-        },
-        {
-          "query": "korea property",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 94
-        },
-        {
-          "query": "korean real estate",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 87.66666666666667
-        },
-        {
           "query": "real estate korea",
           "clicks": 0,
           "impressions": 3,
@@ -3342,11 +3209,11 @@
           "position": 60.666666666666664
         },
         {
-          "query": "korea real estate",
+          "query": "korea property",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
-          "position": 83.5
+          "position": 91
         },
         {
           "query": "buy apartment in south korea",
@@ -3354,13 +3221,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 83
-        },
-        {
-          "query": "buy house korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 94
         },
         {
           "query": "buying a house in south korea",
@@ -3384,18 +3244,11 @@
           "position": 87
         },
         {
-          "query": "korea housing market",
+          "query": "korean real estate",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 85
-        },
-        {
-          "query": "property in korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 91
+          "position": 79
         },
         {
           "query": "seoul real estate",
@@ -3417,13 +3270,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 100
-        },
-        {
-          "query": "south korean real estate",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 97
         }
       ]
     },
@@ -3452,18 +3298,18 @@
       "status": "available",
       "queries": [
         {
-          "query": "kstudy",
-          "clicks": 0,
-          "impressions": 6,
-          "ctr": 0,
-          "position": 51.666666666666664
-        },
-        {
           "query": "study in korea",
           "clicks": 0,
           "impressions": 5,
           "ctr": 0,
           "position": 69.6
+        },
+        {
+          "query": "kstudy",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 50.5
         },
         {
           "query": "kiss kstudy",
@@ -3508,11 +3354,11 @@
           "position": 58
         },
         {
-          "query": "k study",
+          "query": "kim il sung university application",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 63
+          "position": 51
         },
         {
           "query": "korea study",
@@ -3527,6 +3373,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 87
+        },
+        {
+          "query": "korea university undergraduate admission",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 58
         },
         {
           "query": "korea university visiting student program",
@@ -3633,37 +3486,44 @@
         {
           "query": "songdo smart city",
           "clicks": 0,
-          "impressions": 7,
+          "impressions": 6,
           "ctr": 0,
-          "position": 36.714285714285715
-        },
-        {
-          "query": "songdo city",
-          "clicks": 0,
-          "impressions": 5,
-          "ctr": 0,
-          "position": 87
-        },
-        {
-          "query": "korean tech",
-          "clicks": 0,
-          "impressions": 4,
-          "ctr": 0,
-          "position": 48.75
+          "position": 39
         },
         {
           "query": "hbm semiconductor",
           "clicks": 0,
-          "impressions": 3,
+          "impressions": 5,
           "ctr": 0,
-          "position": 72.33333333333333
+          "position": 75.4
+        },
+        {
+          "query": "korean tech",
+          "clicks": 0,
+          "impressions": 5,
+          "ctr": 0,
+          "position": 48.2
         },
         {
           "query": "korean technology",
           "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 61
+        },
+        {
+          "query": "technology korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 77.25
+        },
+        {
+          "query": "korea tech news",
+          "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 63
+          "position": 45.666666666666664
         },
         {
           "query": "south korea enterprise artificial intelligence market",
@@ -3678,13 +3538,6 @@
           "impressions": 3,
           "ctr": 0,
           "position": 62
-        },
-        {
-          "query": "technology korea",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 79
         },
         {
           "query": "chips hbm",
@@ -3708,11 +3561,25 @@
           "position": 69.5
         },
         {
+          "query": "korea tech companies",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 64
+        },
+        {
           "query": "samsung high bandwidth memory",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 58
+        },
+        {
+          "query": "songdo city",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 90.5
         },
         {
           "query": "songdo city korea",
@@ -3722,11 +3589,11 @@
           "position": 74.5
         },
         {
-          "query": "south korea ai healthcare roadmap",
+          "query": "south korea ethernet phy chip market",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
-          "position": 90
+          "position": 61.5
         },
         {
           "query": "south korea tech",
@@ -3778,13 +3645,6 @@
           "position": 75
         },
         {
-          "query": "k tech pro",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 69
-        },
-        {
           "query": "k technology",
           "clicks": 0,
           "impressions": 1,
@@ -3806,11 +3666,11 @@
           "position": 61
         },
         {
-          "query": "korea tech companies",
+          "query": "korea tech",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 65
+          "position": 55
         },
         {
           "query": "korea tech desk",
@@ -3818,13 +3678,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 69
-        },
-        {
-          "query": "korea tech news",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 46
         },
         {
           "query": "korea technologies",
@@ -3853,6 +3706,20 @@
           "impressions": 1,
           "ctr": 0,
           "position": 64
+        },
+        {
+          "query": "korean tech company",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 57
+        },
+        {
+          "query": "korean technology companies",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 62
         },
         {
           "query": "korean technology news",
@@ -3911,13 +3778,6 @@
           "position": 39
         },
         {
-          "query": "songdo city south korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 94
-        },
-        {
           "query": "songdo masterplan",
           "clicks": 0,
           "impressions": 1,
@@ -3937,20 +3797,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 51
-        },
-        {
-          "query": "south korea hbm",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 69
-        },
-        {
-          "query": "south korea healthcare artificial intelligence market",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 79
         },
         {
           "query": "south korean tech",
@@ -4001,17 +3847,24 @@
       "queries": [
         {
           "query": "olive young",
-          "clicks": 1,
-          "impressions": 194,
-          "ctr": 0.005154639175257732,
-          "position": 55.51546391752577
+          "clicks": 0,
+          "impressions": 180,
+          "ctr": 0,
+          "position": 55.166666666666664
         },
         {
           "query": "olive and young",
           "clicks": 0,
-          "impressions": 16,
+          "impressions": 17,
           "ctr": 0,
-          "position": 57.5
+          "position": 57.94117647058823
+        },
+        {
+          "query": "olive young advent calendar",
+          "clicks": 0,
+          "impressions": 6,
+          "ctr": 0,
+          "position": 75.33333333333333
         },
         {
           "query": "oliveyoung korean",
@@ -4035,11 +3888,39 @@
           "position": 57.5
         },
         {
-          "query": "korea olive young",
+          "query": "olive young ambassador",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 80.5
+        },
+        {
+          "query": "olive korea",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
-          "position": 49.333333333333336
+          "position": 50
+        },
+        {
+          "query": "olive korean skincare",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 51
+        },
+        {
+          "query": "olive yang",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 69.66666666666667
+        },
+        {
+          "query": "olive yong",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 56.333333333333336
         },
         {
           "query": "olive yougn",
@@ -4084,6 +3965,13 @@
           "position": 56
         },
         {
+          "query": "korea olive young",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 53.5
+        },
+        {
           "query": "korean beauty olive young",
           "clicks": 0,
           "impressions": 2,
@@ -4091,18 +3979,18 @@
           "position": 61.5
         },
         {
+          "query": "korean skincare olive young",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 53.5
+        },
+        {
           "query": "korean store olive",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 59
-        },
-        {
-          "query": "oive young",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 63
         },
         {
           "query": "oliv young",
@@ -4119,13 +4007,6 @@
           "position": 50.5
         },
         {
-          "query": "olive garden korea",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 48
-        },
-        {
           "query": "olive garden korean",
           "clicks": 0,
           "impressions": 2,
@@ -4138,34 +4019,6 @@
           "impressions": 2,
           "ctr": 0,
           "position": 56.5
-        },
-        {
-          "query": "olive kbeauty",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 58
-        },
-        {
-          "query": "olive korea",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 51
-        },
-        {
-          "query": "olive korean skincare",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 53
-        },
-        {
-          "query": "olive korean store",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 50
         },
         {
           "query": "olive toung",
@@ -4182,20 +4035,6 @@
           "position": 67
         },
         {
-          "query": "olive yang",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 74.5
-        },
-        {
-          "query": "olive yong",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 61
-        },
-        {
           "query": "olive you g",
           "clicks": 0,
           "impressions": 2,
@@ -4208,13 +4047,6 @@
           "impressions": 2,
           "ctr": 0,
           "position": 78.5
-        },
-        {
-          "query": "olive younf",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 60
         },
         {
           "query": "all live better",
@@ -4236,13 +4068,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 54
-        },
-        {
-          "query": "beauty of joseon olive young",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 26
         },
         {
           "query": "best korean eye cream olive young",
@@ -4271,6 +4096,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 85
+        },
+        {
+          "query": "cj oliveyoung",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 86
         },
         {
           "query": "clinique olive young",
@@ -4308,13 +4140,6 @@
           "position": 82
         },
         {
-          "query": "is olive young cruelty free",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 72
-        },
-        {
           "query": "is olive young korean",
           "clicks": 0,
           "impressions": 1,
@@ -4336,13 +4161,6 @@
           "position": 55
         },
         {
-          "query": "korean cosmetics olive young",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 64
-        },
-        {
           "query": "korean moisturizer olive young",
           "clicks": 0,
           "impressions": 1,
@@ -4355,13 +4173,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 60
-        },
-        {
-          "query": "korean skincare olive young",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 61
         },
         {
           "query": "la roche posay olive young",
@@ -4383,13 +4194,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 65
-        },
-        {
-          "query": "liveyoung",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 84
         },
         {
           "query": "loive young",
@@ -4420,6 +4224,13 @@
           "position": 51
         },
         {
+          "query": "oive young",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 71
+        },
+        {
           "query": "olice young",
           "clicks": 0,
           "impressions": 1,
@@ -4441,13 +4252,6 @@
           "position": 67
         },
         {
-          "query": "oliv eyoung",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 60
-        },
-        {
           "query": "olivayoung",
           "clicks": 0,
           "impressions": 1,
@@ -4460,13 +4264,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 59
-        },
-        {
-          "query": "olive and young canada",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 52
         },
         {
           "query": "olive and young global",
@@ -4511,6 +4308,13 @@
           "position": 62
         },
         {
+          "query": "olive garden korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 37
+        },
+        {
           "query": "olive global young",
           "clicks": 0,
           "impressions": 1,
@@ -4532,13 +4336,6 @@
           "position": 65
         },
         {
-          "query": "olive green korean",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 53
-        },
-        {
           "query": "olive june korean skincare",
           "clicks": 0,
           "impressions": 1,
@@ -4551,6 +4348,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 83
+        },
+        {
+          "query": "olive korean",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 75
         },
         {
           "query": "olive n young",
@@ -4572,6 +4376,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 91
+        },
+        {
+          "query": "olive skincare korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 51
         },
         {
           "query": "olive south korea",
@@ -4665,20 +4476,6 @@
           "position": 66
         },
         {
-          "query": "olive youang",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 56
-        },
-        {
-          "query": "olive youhg",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 66
-        },
-        {
           "query": "olive youhng",
           "clicks": 0,
           "impressions": 1,
@@ -4698,6 +4495,55 @@
           "impressions": 1,
           "ctr": 0,
           "position": 54
+        },
+        {
+          "query": "olive younf",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 58
+        },
+        {
+          "query": "olive younf global",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 52
+        },
+        {
+          "query": "olive younfg",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 57
+        },
+        {
+          "query": "olive young 2025",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 83
+        },
+        {
+          "query": "olive young 2025 awards",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 80
+        },
+        {
+          "query": "olive young actress",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 51
+        },
+        {
+          "query": "olive young affiliate",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 89
         }
       ]
     },
@@ -4737,13 +4583,6 @@
           "position": 77.42857142857143
         },
         {
-          "query": "sis korea",
-          "clicks": 0,
-          "impressions": 7,
-          "ctr": 0,
-          "position": 38.285714285714285
-        },
-        {
           "query": "서울 국제학교",
           "clicks": 0,
           "impressions": 7,
@@ -4753,9 +4592,9 @@
         {
           "query": "서울 국제 학교",
           "clicks": 0,
-          "impressions": 5,
+          "impressions": 6,
           "ctr": 0,
-          "position": 51.6
+          "position": 53.333333333333336
         },
         {
           "query": "global korea scholarship,scholarships & cost,480,19,informational,0.81,/resources",
@@ -4765,25 +4604,32 @@
           "position": 70.5
         },
         {
+          "query": "seoul international school",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 40.75
+        },
+        {
+          "query": "sis korea",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 22
+        },
+        {
+          "query": "sis 국제 학교",
+          "clicks": 0,
+          "impressions": 4,
+          "ctr": 0,
+          "position": 59.75
+        },
+        {
           "query": "scholarship in korea,scholarships & cost,260,39,informational,0.78,/resources",
           "clicks": 0,
           "impressions": 3,
           "ctr": 0,
           "position": 34.333333333333336
-        },
-        {
-          "query": "seoul international school",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 53.666666666666664
-        },
-        {
-          "query": "sis 국제 학교",
-          "clicks": 0,
-          "impressions": 3,
-          "ctr": 0,
-          "position": 56.333333333333336
         },
         {
           "query": "topik level 4",
@@ -4819,6 +4665,13 @@
           "impressions": 2,
           "ctr": 0,
           "position": 61
+        },
+        {
+          "query": "international schools in korea",
+          "clicks": 0,
+          "impressions": 2,
+          "ctr": 0,
+          "position": 28.5
         },
         {
           "query": "isep korea",
@@ -4889,6 +4742,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 63
+        },
+        {
+          "query": "international schools in south korea",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 21
         },
         {
           "query": "international student korea",
@@ -4996,6 +4856,13 @@
           "position": 68
         },
         {
+          "query": "korean international university",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 80
+        },
+        {
           "query": "korean winter school",
           "clicks": 0,
           "impressions": 1,
@@ -5029,6 +4896,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 75
+        },
+        {
+          "query": "seoul international school tuition",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 11
         },
         {
           "query": "seoul school",
@@ -5204,25 +5078,25 @@
       "status": "available",
       "queries": [
         {
-          "query": "seoul times",
-          "clicks": 0,
-          "impressions": 15,
-          "ctr": 0,
-          "position": 25.066666666666666
-        },
-        {
           "query": "roof top bar",
           "clicks": 0,
-          "impressions": 11,
+          "impressions": 9,
           "ctr": 0,
-          "position": 67.72727272727273
+          "position": 68.77777777777777
         },
         {
           "query": "rooftop bars",
           "clicks": 0,
-          "impressions": 11,
+          "impressions": 9,
           "ctr": 0,
-          "position": 69.0909090909091
+          "position": 69.22222222222223
+        },
+        {
+          "query": "seoul times",
+          "clicks": 0,
+          "impressions": 9,
+          "ctr": 0,
+          "position": 25.11111111111111
         },
         {
           "query": "rooftop bar itaewon",
@@ -5230,6 +5104,13 @@
           "impressions": 4,
           "ctr": 0,
           "position": 75.5
+        },
+        {
+          "query": "kiko mizuhara and g dragon",
+          "clicks": 0,
+          "impressions": 3,
+          "ctr": 0,
+          "position": 80.66666666666667
         },
         {
           "query": "rooftop bar pangyo seoul",
@@ -5253,46 +5134,11 @@
           "position": 71
         },
         {
-          "query": "kiko mizuhara and g dragon",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 80
-        },
-        {
-          "query": "kiko mizuhara dating",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 50.5
-        },
-        {
           "query": "kiko mizuhara g dragon",
           "clicks": 0,
           "impressions": 2,
           "ctr": 0,
           "position": 83
-        },
-        {
-          "query": "rooftop bars in seoul",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 65
-        },
-        {
-          "query": "seoul fixer",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 57
-        },
-        {
-          "query": "seoul rooftop bar",
-          "clicks": 0,
-          "impressions": 2,
-          "ctr": 0,
-          "position": 66.5
         },
         {
           "query": "aseul seoul",
@@ -5379,6 +5225,13 @@
           "position": 94
         },
         {
+          "query": "kiko mizuhara dating",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 52
+        },
+        {
           "query": "kiko mizuhara g-dragon",
           "clicks": 0,
           "impressions": 1,
@@ -5400,27 +5253,6 @@
           "position": 78
         },
         {
-          "query": "miari texas seoul",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 53
-        },
-        {
-          "query": "news seoul",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 78
-        },
-        {
-          "query": "paper seoul",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 62
-        },
-        {
           "query": "rooftop bar koreatown",
           "clicks": 0,
           "impressions": 1,
@@ -5435,13 +5267,6 @@
           "position": 70
         },
         {
-          "query": "rooftop bar seoul gangnam",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 73
-        },
-        {
           "query": "rooftop bars in dongdaemun seoul",
           "clicks": 0,
           "impressions": 1,
@@ -5449,11 +5274,11 @@
           "position": 67
         },
         {
-          "query": "rooftop bars itaewon",
+          "query": "rooftop bars in seoul",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 68
+          "position": 73
         },
         {
           "query": "rooftop cocktail bar hongdae",
@@ -5461,6 +5286,13 @@
           "impressions": 1,
           "ctr": 0,
           "position": 74
+        },
+        {
+          "query": "seoul church",
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 89
         },
         {
           "query": "seoul city sue",
@@ -5491,11 +5323,11 @@
           "position": 79
         },
         {
-          "query": "seoul news",
+          "query": "seoul rooftop bar",
           "clicks": 0,
           "impressions": 1,
           "ctr": 0,
-          "position": 74
+          "position": 71
         },
         {
           "query": "seoul rooftop dining",
@@ -5538,13 +5370,6 @@
           "impressions": 1,
           "ctr": 0,
           "position": 36
-        },
-        {
-          "query": "yongjugol south korea",
-          "clicks": 0,
-          "impressions": 1,
-          "ctr": 0,
-          "position": 39
         }
       ]
     }
