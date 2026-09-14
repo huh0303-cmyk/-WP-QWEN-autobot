@@ -14,6 +14,15 @@ last_writer_model = 'not_called'
 _article_attempts = None
 
 
+def _failure_summary(exc):
+    """Return a useful provider diagnosis without logging keys or response bodies."""
+    response = getattr(exc, 'response', None)
+    status = getattr(response, 'status_code', None)
+    if status:
+        return f'{type(exc).__name__} HTTP {status}'
+    return type(exc).__name__
+
+
 def begin_article():
     global _article_attempts, _gemini_unavailable, _gpt_unavailable, last_writer_model
     _article_attempts = set()
@@ -91,8 +100,8 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
             last_exc = exc
             if provider == 'gemini':
                 _gemini_unavailable = True
-                print(f'Gemini Flash unavailable or incomplete; falling back to GPT: {type(exc).__name__}')
+                print(f'Gemini Flash unavailable or incomplete; falling back to GPT: {_failure_summary(exc)}')
             else:
                 _gpt_unavailable = True
-                print(f'GPT unavailable; falling back to Gemini Flash: {type(exc).__name__}')
+                print(f'GPT unavailable; falling back to Gemini Flash: {_failure_summary(exc)}')
     raise RuntimeError('WRITERS_EXHAUSTED: both approved writers attempted; retain draft and stop this article')
