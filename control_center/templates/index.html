@@ -150,8 +150,8 @@
         <details class="dashboard-disclosure" id="publish-everything"><summary>전체 채널 실행 · 범위를 먼저 확인하세요</summary><section class="p-4 space-y-3">
             <p class="text-xs font-bold text-sky-300">01 · 전체 총괄</p>
             <button type="button" id="publish-all-button" class="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-rose-500 p-5 text-xl font-black text-slate-950">전체 채널 한 번에 실행 →</button>
-            <p class="text-xs text-slate-300">WP 25 · 뉴스 2 · Blogspot {{ bloggers|length }} · Tistory 5 · YouTube 10</p>
-            <p class="text-xs text-slate-300">WP·Blogspot 공개 발행 / Tistory 검토본 생성 후 로그인된 등록기로 게시 / YouTube 비공개 제작</p>
+            <p class="text-xs text-slate-300">WP 25 · 뉴스 2 · Blogspot {{ bloggers|length }} · YouTube 플리 5 + 지식 5 + 언어 10 + 기타 2</p>
+            <p class="text-xs text-slate-300">모든 대상: 콘텐츠 생성 → 내용 확인 → 공개 발행 → 공개 URL 검증을 단계별로 분리</p>
             <p id="publish-all-message" role="status" aria-live="polite" class="text-sm"></p>
         </section>
         </details>
@@ -408,12 +408,23 @@
                 </form>
                 {% if site.auth_ready %}
                 <div class="space-y-3 border-t border-blue-200 px-4 pb-4 pt-3">
-                    <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-blue-900">바이럴자동발행 — 누를 때마다 오늘의 주요 매체 반복 명사와 Google 검색 추세를 새로 조사하고, 이 사이트 분야에 맞는 최고 주제를 선택합니다. 결과를 미리 보여주지 않고 바로 발행합니다. 이 사이트 하나만 독립적으로 실행·추적됩니다.</p>
+                    <p class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-emerald-950">정상 운영 순서: ① 공개하지 않고 초안 생성 → ② 관리자에서 내용 확인·승인 → ③ 승인한 글만 공개 발행</p>
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <form method="post" action="{{ url_for('trigger_wp_draft_single') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="site_id" value="{{ site.site_id }}">
+                            <button id="bulk-button-wp_draft_{{ site.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-emerald-600 px-3 text-sm font-black text-white hover:bg-emerald-700">① 초안 만들기</button>
+                        </form>
+                        <a href="{{ site.admin_review_url }}" target="_blank" rel="noopener" class="flex h-12 items-center justify-center rounded-xl border border-emerald-300 bg-white px-3 text-sm font-black text-emerald-800 hover:bg-emerald-50">② 내용 확인·발행</a>
+                    </div>
+                    <div class="wp-bulk-group" data-group="wp_draft_{{ site.site_id }}"></div>
+                    <div id="bulk-status-wp_draft_{{ site.site_id }}" class="space-y-2 rounded-xl border border-emerald-200 bg-white/80 px-3 py-2"><p id="bulk-headline-wp_draft_{{ site.site_id }}" class="text-[11px] font-bold text-slate-500">초안 상태: 불러오는 중…</p><p id="bulk-counts-wp_draft_{{ site.site_id }}" class="text-sm font-black text-slate-800">-</p><div id="bulk-failures-wp_draft_{{ site.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div></div>
+                    <p class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] font-semibold leading-relaxed text-rose-900">비상 기능: 아래 버튼은 검토할 기존 초안을 발행하는 버튼이 아니라 새 글을 만들어 즉시 공개합니다.</p>
                     <form method="post" action="{{ url_for('trigger_wp_single') }}" onsubmit="return confirm('{{ site.domain }} 바이럴자동발행을 지금 시작할까요?');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="site_id" value="{{ site.site_id }}">
                         <button id="bulk-button-wp_{{ site.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600 disabled:cursor-not-allowed disabled:opacity-60">
-                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
+                        <span>③ 비상 · 새 글 즉시 공개</span><span aria-hidden="true">→</span>
                         </button>
                     </form>
                     <div class="wp-bulk-group" data-group="wp_{{ site.site_id }}"></div>
@@ -527,15 +538,19 @@
                 </form>
                 {% if blog.connected %}
                 <div class="space-y-3 border-t border-violet-200 pt-3">
-                    <div class="space-y-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[11px] text-violet-950">
-                        <p class="font-black">바이럴자동발행</p>
-                        <p class="font-semibold leading-relaxed">당일 주요 매체의 반복 명사와 검색 추세를 비교해 최고 주제를 고르고, 분야·페르소나·톤에 맞춰 생성·검수한 뒤 실제 발행합니다. 결과를 미리 보여주지 않습니다. 이 사이트 하나만 독립적으로 실행·추적됩니다.</p>
+                    <div class="space-y-1 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-950"><p class="font-black">정상 운영 순서</p><p class="font-semibold leading-relaxed">① 공개하지 않고 초안 생성 → ② Blogger 관리자에서 내용 확인 → ③ 승인한 글만 공개 발행</p></div>
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <form method="post" action="{{ url_for('trigger_blogspot_draft_single') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="site_id" value="{{ blog.site_id }}"><button id="bulk-button-blogspot_draft_{{ blog.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center rounded-xl bg-emerald-600 px-3 text-sm font-black text-white hover:bg-emerald-700">① 초안 만들기</button></form>
+                        <a href="{{ blog.admin_review_url }}" target="_blank" rel="noopener" class="flex h-12 items-center justify-center rounded-xl border border-emerald-300 bg-white px-3 text-sm font-black text-emerald-800 hover:bg-emerald-50">② 내용 확인·발행</a>
                     </div>
+                    <div class="blogspot-bulk-group" data-group="blogspot_draft_{{ blog.site_id }}"></div>
+                    <div id="bulk-status-blogspot_draft_{{ blog.site_id }}" class="space-y-2 rounded-xl border border-emerald-200 bg-white/80 px-3 py-2"><p id="bulk-headline-blogspot_draft_{{ blog.site_id }}" class="text-[11px] font-bold text-slate-500">초안 상태: 불러오는 중…</p><p id="bulk-counts-blogspot_draft_{{ blog.site_id }}" class="text-sm font-black text-slate-800">-</p><div id="bulk-failures-blogspot_draft_{{ blog.site_id }}" class="max-h-40 space-y-1.5 overflow-y-auto pr-1"></div></div>
+                    <p class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-900">비상 기능: 아래 버튼은 새 글 생성부터 공개까지 한 번에 실행합니다.</p>
                     <form method="post" action="{{ url_for('trigger_blogspot_single') }}" onsubmit="return confirm('{{ blog.name }} 바이럴자동발행을 지금 시작할까요?');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="site_id" value="{{ blog.site_id }}">
                         <button id="bulk-button-blogspot_{{ blog.site_id }}" type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 text-sm font-black text-white shadow-md shadow-blue-200 transition active:scale-[.98] hover:from-blue-800 hover:to-blue-600 disabled:cursor-not-allowed disabled:opacity-60">
-                        <span>바이럴자동발행</span><span aria-hidden="true">→</span>
+                        <span>③ 비상 · 새 글 즉시 공개</span><span aria-hidden="true">→</span>
                         </button>
                     </form>
                     <div class="blogspot-bulk-group" data-group="blogspot_{{ blog.site_id }}"></div>
@@ -670,7 +685,7 @@
         <section id="youtube" class="scroll-mt-28 space-y-4 border-t border-slate-200 pt-8">
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                    <p class="text-xs font-bold text-slate-400">YOUTUBE 10 · 독립 생성 모듈</p>
+                    <p class="text-xs font-bold text-slate-400">YOUTUBE 22 · 플리 5 + 지식 5 + 언어 10 + 기타 2</p>
                     <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">YouTube 통제실</h2>
                     <p class="mt-1 text-xs text-slate-500">플리 5 + 지식 5 · 채널 버튼을 누르면 다음 준비 영상을 만들고 비공개로 업로드합니다.</p>
                 </div>
@@ -679,6 +694,8 @@
                     <div class="text-xs font-semibold text-sky-700">등록 채널</div>
                 </div>
             </div>
+            <div class="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4"><p class="rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 font-black text-sky-900">플레이리스트 5 · 등록됨</p><p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-black text-amber-900">지식 5 · 등록됨</p><p class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 font-black text-rose-900">언어 10 · 채널 등록 필요</p><p class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 font-black text-rose-900">기타 2 · 이름·채널 ID 필요</p></div>
+            <div class="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-950">각 채널은 영상·썸네일·음성 생성 상태와 YouTube·Instagram·TikTok·Threads 발행 상태를 각각 별도 기록합니다. 현재 아래 카드는 실제 연결이 끝난 10개 채널입니다.</div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for channel in youtube_channels %}
                 <article class="min-w-0 space-y-3 rounded-2xl border {% if channel.group == 'PLAYLIST' %}border-sky-200 from-white to-sky-50{% else %}border-amber-200 from-white to-amber-50{% endif %} bg-gradient-to-br p-5 shadow-sm">
