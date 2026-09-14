@@ -1064,7 +1064,7 @@ def _build_draft_workflow_call(payload: dict[str, object]) -> tuple[str, dict[st
             "persona": str(blogspot.get("persona") or "helpful specialist editor"),
             "tone": str(blogspot.get("tone") or "practical and clear"),
             "target_chars": str(blogspot.get("target_chars") or 1800),
-            "publish_now": "true",
+            "publish_now": "true" if payload.get("publish_now", True) else "false",
             # 2026-09-04 CEO: "키워드보고발행" — a chip picked from the paired
             # WP site's own category pool; blank keeps "바이럴자동발행"
             # (the workflow's own live cross-media research).
@@ -1803,6 +1803,81 @@ def trigger_blogspot_single():
         return redirect(url_for("index") + "#blogspot")
     threading.Thread(target=_run_single_blogspot_publish, args=(site_id, label), daemon=True).start()
     flash(f"{label} 발행을 시작했습니다 — 카드 아래에서 실시간으로 확인하세요.", "success")
+    return redirect(url_for("index") + "#blogspot")
+
+
+def _run_single_draft_generation(platform: str, site_id: str, domain: str, label: str) -> None:
+    """Generate one review draft without conflating it with public delivery."""
+    group = f"{platform}_draft_{site_id}"
+    repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
+    token = os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip()
+    state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
+    _bulk_write(group, state)
+    if not token:
+        state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
+            "label": label, "platform": platform, "site_id": site_id, "workflow": "",
+            "run_id": None, "run_url": "", "status": "done", "conclusion": "dispatch_failed",
+            "reason": "GitHub 연결(CONTROL_CENTER_GITHUB_TOKEN)이 설정되어 있지 않습니다.",
+        }])
+        _bulk_write(group, state)
+        return
+    if platform == "wp":
+        workflow_name = "daily-network-publish.yml"
+        inputs = {
+            "target_site_url": f"https://{domain}", "publication_approved": "false",
+            "room_id": f"manual-draft-{site_id}",
+        }
+    else:
+        workflow_name, inputs = _build_draft_workflow_call({
+            "platform": "blogger", "site_id": site_id, "selection_mode": "auto",
+            "keyword": "", "publish_now": False,
+        })
+    item = _dispatch_and_track(repo, token, workflow_name, inputs, label=label, platform=platform, site_id=site_id)
+    state.update(status="polling", items=[item])
+    _bulk_write(group, state)
+    _poll_bulk_items(group, repo, token)
+    state = _bulk_read(group)
+    state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat())
+    _bulk_write(group, state)
+
+
+@app.post("/trigger/wp-draft-single")
+def trigger_wp_draft_single():
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    site_id = request.form.get("site_id", "").strip()
+    sites_by_id = {str(site["site_id"]): site for site in get_site_data() if site["auth_ready"]}
+    if site_id not in sites_by_id:
+        flash("초안 생성이 연결된 WordPress 사이트가 아닙니다.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    site = sites_by_id[site_id]
+    group = f"wp_draft_{site_id}"
+    if _bulk_read(group).get("status") in {"dispatching", "polling"}:
+        flash(f"{site['domain']} 초안 생성이 이미 진행 중입니다.", "error")
+        return redirect(url_for("index") + "#wordpress")
+    threading.Thread(target=_run_single_draft_generation, args=("wp", site_id, site["domain"], site["domain"]), daemon=True).start()
+    flash(f"{site['domain']}: 공개하지 않고 검토용 초안 생성을 시작했습니다.", "success")
+    return redirect(url_for("index") + "#wordpress")
+
+
+@app.post("/trigger/blogspot-draft-single")
+def trigger_blogspot_draft_single():
+    if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
+        flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    site_id = request.form.get("site_id", "").strip()
+    blogs_by_id = {str(blog["site_id"]): blog for blog in get_blogger_data() if blog["connected"]}
+    if site_id not in blogs_by_id:
+        flash("초안 생성이 연결된 Blogspot 사이트가 아닙니다.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    blog = blogs_by_id[site_id]
+    group = f"blogspot_draft_{site_id}"
+    if _bulk_read(group).get("status") in {"dispatching", "polling"}:
+        flash(f"{blog['name']} 초안 생성이 이미 진행 중입니다.", "error")
+        return redirect(url_for("index") + "#blogspot")
+    threading.Thread(target=_run_single_draft_generation, args=("blogspot", site_id, blog["url"], blog["name"]), daemon=True).start()
+    flash(f"{blog['name']}: 공개하지 않고 검토용 초안 생성을 시작했습니다.", "success")
     return redirect(url_for("index") + "#blogspot")
 
 
