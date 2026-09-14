@@ -409,10 +409,14 @@ def test_wordpress_cards_are_ranked_by_daily_traffic():
 def test_wordpress_kpis_appear_before_site_metadata():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
     wordpress = template.index("{% for site in sites %}")
-    kpis = template.index("당일 방문자(어제 대비)", wordpress)
+    kpis = template.index("일일 방문자 <span class=\"font-bold\">(증감)</span>", wordpress)
     category = template.index("사이트 분야:", wordpress)
     persona = template.index("페르소나:", wordpress)
     assert wordpress < kpis < category < persona
+    assert "신규 콘텐츠 수" in template[wordpress:category]
+    assert "site.new_posts" in template[wordpress:category]
+    assert "site.new_posts_delta" in template[wordpress:category]
+    assert "Google 검색 색인 수" in template[wordpress:category]
 
 
 def test_recent_activity_panel_is_removed_from_control_room():
