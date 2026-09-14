@@ -1,0 +1,445 @@
+{
+  "site_reports": [
+    {
+      "site": "jobkorea365",
+      "posts_with_images": 7
+    },
+    {
+      "site": "kworld365",
+      "posts_with_images": 10
+    },
+    {
+      "site": "kfinance365",
+      "posts_with_images": 7
+    },
+    {
+      "site": "kinsurance365",
+      "posts_with_images": 7
+    },
+    {
+      "site": "medicaltour",
+      "posts_with_images": 8
+    },
+    {
+      "site": "kvisa365",
+      "posts_with_images": 8
+    },
+    {
+      "site": "kstudy365",
+      "posts_with_images": 13
+    },
+    {
+      "site": "ktrip365",
+      "posts_with_images": 15
+    },
+    {
+      "site": "koreanews",
+      "posts_with_images": 0
+    },
+    {
+      "site": "oliveyoung",
+      "posts_with_images": 7
+    },
+    {
+      "site": "kinvest365",
+      "posts_with_images": 6
+    },
+    {
+      "site": "kcrypto365",
+      "posts_with_images": 7
+    },
+    {
+      "site": "jobinkorea",
+      "posts_with_images": 7
+    },
+    {
+      "site": "seouljournal",
+      "posts_with_images": 11
+    },
+    {
+      "site": "ktech365",
+      "posts_with_images": 10
+    },
+    {
+      "site": "koreawedding",
+      "posts_with_images": 9
+    },
+    {
+      "site": "kieca",
+      "posts_with_images": 5
+    },
+    {
+      "site": "kikorea",
+      "posts_with_images": 5
+    },
+    {
+      "site": "ksa",
+      "posts_with_images": 5
+    },
+    {
+      "site": "koreataxlaw",
+      "posts_with_images": 3
+    },
+    {
+      "site": "studyinkorea",
+      "posts_with_images": 6
+    },
+    {
+      "site": "jobglobal",
+      "posts_with_images": 9
+    },
+    {
+      "site": "sis",
+      "posts_with_images": 9
+    },
+    {
+      "site": "korea365",
+      "posts_with_images": 8
+    },
+    {
+      "site": "khealth365",
+      "posts_with_images": 6
+    },
+    {
+      "site": "krealestate",
+      "posts_with_images": 9
+    },
+    {
+      "site": "kskin365",
+      "posts_with_images": 7
+    },
+    {
+      "site": "kmedical_job_center",
+      "posts_with_images": 1
+    },
+    {
+      "site": "korea_life_support365",
+      "posts_with_images": 2
+    },
+    {
+      "site": "kwellness_lab",
+      "posts_with_images": 30
+    },
+    {
+      "site": "kworld365_kpop",
+      "posts_with_images": 7
+    },
+    {
+      "site": "koreamedicaltour1",
+      "posts_with_images": 2
+    },
+    {
+      "site": "seoul_intl_school_guide",
+      "posts_with_images": 6
+    }
+  ],
+  "broken_images": [
+    {
+      "site": "jobkorea365",
+      "post_id": "267712141536703933",
+      "post_title": "Protect Your Korea Career: Choose Roles That Match Visa Rules Before",
+      "post_url": "https://jobkorea365.blogspot.com/2026/09/protect-your-korea-career-choose-roles.html",
+      "image_url": "https://ai-gateway-outputs.0d37909e38d3e99c29fa2cd343ac421a.r2.cloudflarestorage.com/provider-outputs/eca39e11e5d6ce1cfdf6669ecae17290bd52691b8981b8bc12dd954c7fdd146d/eb1fb96f-3f75-4d2c-a9c4-3a87f14eda9b?X-Amz-Expires=86400&amp;X-Amz-Date=20260911T121720Z&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=766732b82d28513d70fca8df61685d41%2F20260911%2Fauto%2Fs3%2Faws4_request&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=a5635287920628ba817416ce31ff7912adc50c95e3554491ec86dabae5df7dcc",
+      "status": 400,
+      "error": ""
+    },
+    {
+      "site": "kworld365",
+      "post_id": "5512631128682050995",
+      "post_title": "Plan Fewer Problems, Make Better Memories: A Practical K-pop Concert",
+      "post_url": "https://kworld365seoul.blogspot.com/2026/09/plan-fewer-problems-make-better.html",
+      "image_url": "https://replicate.delivery/yhqm/6kUJPhhiL9ayAFeb8vADoHJQpk1Cz0VCeWMKORV5Fn0IBkMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "jobkorea365",
+      "post_id": "60584050172504733",
+      "post_title": "Don't Sign a Job Offer in Korea Until You Pass These 4 Quick Contract",
+      "post_url": "https://jobkorea365.blogspot.com/2026/09/dont-sign-job-offer-in-korea-until-you.html",
+      "image_url": "https://replicate.delivery/yhqm/ybMcc199T3q4L9qualtRUFXuQCAFHSDHiDDeLWKJ3zvfHWMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kfinance365",
+      "post_id": "2696644555329545364",
+      "post_title": "Pick the Best Bank Korea Expats Actually Use: Fees, English Support",
+      "post_url": "https://kfinance365.blogspot.com/2026/09/pick-best-bank-korea-expats-actually.html",
+      "image_url": "https://replicate.delivery/yhqm/S2Fei6zLI53wLqvWqK04zO0Xf2axFhlcM3mt3VAiIC8JAWMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kinsurance365",
+      "post_id": "8383180909726497230",
+      "post_title": "Director and Officer Liability Insurance: Close the Gaps Korean Boards",
+      "post_url": "https://koreainsurance365.blogspot.com/2026/09/director-and-officer-liability.html",
+      "image_url": "https://replicate.delivery/yhqm/pJm6kyPfJuVoXixIs8EQfhHrVj8Ym2gS9ifNPT9eKJDaHYxcB/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "medicaltour",
+      "post_id": "310520831573318580",
+      "post_title": "Plan or Postpone? Practical Steps When Your Korea Medical Trip",
+      "post_url": "https://koreamedicaltour365.blogspot.com/2026/09/plan-or-postpone-practical-steps-when.html",
+      "image_url": "https://ai-gateway-outputs.0d37909e38d3e99c29fa2cd343ac421a.r2.cloudflarestorage.com/provider-outputs/71cace902255a9d0f6e9260d442d44563f3ec92c0b336ca74128cbc60a7e1549/dfea4087-d438-474e-b30a-09cf1cf829d0?X-Amz-Expires=86400&amp;X-Amz-Date=20260912T033451Z&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=766732b82d28513d70fca8df61685d41%2F20260912%2Fauto%2Fs3%2Faws4_request&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=eda9a601422bfaaeaf10c8c66d7f6903faba480bb130e645ceff6de235a90fbb",
+      "status": 400,
+      "error": ""
+    },
+    {
+      "site": "kvisa365",
+      "post_id": "549896635057622876",
+      "post_title": "Economic hardship and migration: key risks and practical steps",
+      "post_url": "https://k-visa365.blogspot.com/2026/09/economic-hardship-and-migration-key.html",
+      "image_url": "https://replicate.delivery/yhqm/PfqHC6wBqiUEbiC0LOXnlYTkFCSKxZtacurUPVOWYutX7SmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kvisa365",
+      "post_id": "2909852684098548915",
+      "post_title": "If You Have a Violent Conviction: What Raises — and Lowers — Your",
+      "post_url": "https://k-visa365.blogspot.com/2026/09/if-you-have-violent-conviction-what.html",
+      "image_url": "https://replicate.delivery/yhqm/OvkUemOcfnlTHkpheZEizunQXxil54DXqvkvq5KcVGwxSsYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kstudy365",
+      "post_id": "6708645208476146176",
+      "post_title": "Korean Government Scholarship: A Practical Roadmap to Improve Your",
+      "post_url": "https://kstudy365.blogspot.com/2026/09/korean-government-scholarship-practical.html",
+      "image_url": "https://replicate.delivery/yhqm/Z0NE14Jcd75sMpDwQ6rhXQ3FnnEO8fojvTq65DvpsAKQ9WmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kstudy365",
+      "post_id": "4694545140403388664",
+      "post_title": "Charlie Kirk shooting: safety steps for international students",
+      "post_url": "https://kstudy365.blogspot.com/2026/09/charlie-kirk-shooting-safety-steps-for.html",
+      "image_url": "https://replicate.delivery/yhqm/7dcNNrHaddZ0DltDfq39HqI6itSpcB3S2oz62XG59MyFELmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "ktrip365",
+      "post_id": "9029976919741588810",
+      "post_title": "Arrive Calm at Gyeongbokgung: A Korea public transport plan to protect",
+      "post_url": "https://k-trip365.blogspot.com/2026/09/arrive-calm-at-gyeongbokgung-korea.html",
+      "image_url": "https://replicate.delivery/yhqm/rzC8V2UcXCJdP98E8eOsMX94QV1D6chpw6omwP0YtXYWASmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "oliveyoung",
+      "post_id": "3335236367749664523",
+      "post_title": "Stop Wasting Carts: A Shopper’s Plan to Buy Ingredient-Led K‑Beauty",
+      "post_url": "https://oliveyoungkorea.blogspot.com/2026/09/stop-wasting-carts-shoppers-plan-to-buy.html",
+      "image_url": "https://ai-gateway-outputs.0d37909e38d3e99c29fa2cd343ac421a.r2.cloudflarestorage.com/provider-outputs/b2a7057d1a5737b8c56cfbdd088913915aed408f9469959f456287e959fd85c5/4e87af28-f2bb-4ec8-ae29-88625ac62b2c?X-Amz-Expires=86400&amp;X-Amz-Date=20260911T073619Z&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=766732b82d28513d70fca8df61685d41%2F20260911%2Fauto%2Fs3%2Faws4_request&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=ba79022f2c154bd77696b8d5e04c06338e0fd870aae32597d960f230e5548a7f",
+      "status": 400,
+      "error": ""
+    },
+    {
+      "site": "kinvest365",
+      "post_id": "6047212566178564698",
+      "post_title": "Protect Returns and Reduce Carbon: A Practical Take on Korea ESG ETFs",
+      "post_url": "https://koreainvest365.blogspot.com/2026/09/protect-returns-and-reduce-carbon.html",
+      "image_url": "https://replicate.delivery/yhqm/UwT2MvtZORLfSqmwuLcMeX6ccr78bDU6KvaOyPM4ZhPjMaMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kinvest365",
+      "post_id": "7626085894075094192",
+      "post_title": "Should You Buy US Stocks from Seoul or Trade Directly? A Practical",
+      "post_url": "https://koreainvest365.blogspot.com/2026/09/should-you-buy-us-stocks-from-seoul-or.html",
+      "image_url": "https://replicate.delivery/yhqm/hajaJlGeB708d6e7k6VEdmsfVNA302eODcP3tuuaIOF3kYxcB/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kcrypto365",
+      "post_id": "3204940514829579369",
+      "post_title": "Will a Municipal Digital Currency Trigger Korean Financial Rules?",
+      "post_url": "https://koreacrypto365.blogspot.com/2026/09/will-municipal-digital-currency-trigger.html",
+      "image_url": "https://replicate.delivery/yhqm/HffBw5ssDWjDNEIi0P3hGjyrgNpAAbhT0bbzrToKcT7yDWMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "jobinkorea",
+      "post_id": "473354481286681758",
+      "post_title": "Choose the Right Korea Work Visa Fast: A Coach’s Short Plan",
+      "post_url": "https://jobinkorea365.blogspot.com/2026/09/choose-right-korea-work-visa-fast.html",
+      "image_url": "https://replicate.delivery/yhqm/vQS45e3FfGh560vyBAullIufys1bapxA0FWA6jhjPRUWMsYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "seouljournal",
+      "post_id": "545815226976068072",
+      "post_title": "Pentagon 9/11 observance: what the official record confirms — and what",
+      "post_url": "https://theseouljournal.blogspot.com/2026/09/pentagon-911-observance-what-official.html",
+      "image_url": "https://replicate.delivery/yhqm/YZfLZ2tGN9Snf0SikPHSo4AderNkRl7n6zpxggF1eZ3D6ZycB/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "seouljournal",
+      "post_id": "6573048153508825085",
+      "post_title": "Trump's $5,000 Pledge and the Political Fallout",
+      "post_url": "https://theseouljournal.blogspot.com/2026/09/trumps-5000-pledge-and-political-fallout.html",
+      "image_url": "https://replicate.delivery/yhqm/mvMaw5sfoeldGUF6ebq2EOTQOIF2197EIogSkm2zLyjhRsYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "ktech365",
+      "post_id": "5746958907547302859",
+      "post_title": "Trump Policy Signals and Korean Tech: Concrete choices to defend chips",
+      "post_url": "https://ktech365.blogspot.com/2026/09/trump-policy-signals-and-korean-tech.html",
+      "image_url": "https://replicate.delivery/yhqm/et0y3Oq0uaVCQCzusXHdK9OcMnwu929AhufeYLKl1dmUOsYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "koreawedding",
+      "post_id": "3069720209081376009",
+      "post_title": "Choi Gogi's reported remarriage and pre-wedding photos",
+      "post_url": "https://koreawedding365.blogspot.com/2026/09/choi-gogis-reported-remarriage-and-pre.html",
+      "image_url": "https://replicate.delivery/yhqm/DcQoh2eBcESMOiPvM9VpSOsGW3KCvH6Dy8LquONPE7j8GNmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "studyinkorea",
+      "post_id": "6242779648783933113",
+      "post_title": "Settling into Study in Korea: A 30-Day, Budget-Smart Plan to Stop",
+      "post_url": "https://studyinkorea365.blogspot.com/2026/09/settling-into-study-in-korea-30-day.html",
+      "image_url": "https://replicate.delivery/yhqm/VvBpv80efzitwURw9z1hvUiH1fZaifRzebf1e9KewzyQCerYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "studyinkorea",
+      "post_id": "7518039485970906646",
+      "post_title": "Arrival Checklist That Cuts First‑Month Headaches for International",
+      "post_url": "https://studyinkorea365.blogspot.com/2026/09/arrival-checklist-that-cuts-firstmonth.html",
+      "image_url": "https://replicate.delivery/yhqm/ofks1sqO8FXYIaBGiPtEOe0IQxfExxi9TmZsPZttXAzQWPZuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "jobglobal",
+      "post_id": "4712918965443431992",
+      "post_title": "Red Sea Risks Recruiters Should Monitor After Recent Island Seizure",
+      "post_url": "https://jobkoreaglobal.blogspot.com/2026/09/red-sea-risks-recruiters-should-monitor.html",
+      "image_url": "https://replicate.delivery/yhqm/JDWxtQE8RaKfYK96S2qvV03XTehVP63K0KA7sPsO4C4rbeYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "sis",
+      "post_id": "8042355843469706000",
+      "post_title": "Final Stretch: 4 Practical Steps to Finish TOPIK and Admissions Prep",
+      "post_url": "https://sis-korea.blogspot.com/2026/09/final-stretch-4-practical-steps-to.html",
+      "image_url": "https://ai-gateway-outputs.0d37909e38d3e99c29fa2cd343ac421a.r2.cloudflarestorage.com/provider-outputs/443d169c2a3e0dbea506f9f07543c31f65307631df309b46ba8086fcbf2bd84d/c78a9dae-0452-4ffa-8433-9bf7fe19579b?X-Amz-Expires=86400&amp;X-Amz-Date=20260911T073421Z&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=766732b82d28513d70fca8df61685d41%2F20260911%2Fauto%2Fs3%2Faws4_request&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=779d6490aa92563644458e1389075183a1bc64e860b00b95550c9678ee1d19dd",
+      "status": 400,
+      "error": ""
+    },
+    {
+      "site": "jobglobal",
+      "post_id": "7890539376149272961",
+      "post_title": "Red Sea port seizures: immediate steps recruiters should take",
+      "post_url": "https://jobkoreaglobal.blogspot.com/2026/09/red-sea-port-seizures-immediate-steps.html",
+      "image_url": "https://replicate.delivery/yhqm/vDEZdCeTJOweI0tTLWFhonXAscbBYXlbTsuEw7sHa2Kea0YuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "khealth365",
+      "post_id": "2126222177487281741",
+      "post_title": "증상 없더라도 점검이 필요합니다: 심뇌혈관질환 위험을 낮추는 우선 행동 5가지",
+      "post_url": "https://k-health365.blogspot.com/2026/09/5.html",
+      "image_url": "https://ai-gateway-outputs.0d37909e38d3e99c29fa2cd343ac421a.r2.cloudflarestorage.com/provider-outputs/1a9317185d35de318ca5099a141695697d6dcf640bc5f42feba5f7843d90534c/e48ebe67-ed3c-4a96-bf4e-e77ff06636f5?X-Amz-Expires=86400&amp;X-Amz-Date=20260911T214233Z&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=766732b82d28513d70fca8df61685d41%2F20260911%2Fauto%2Fs3%2Faws4_request&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=9872f7328e8206b9d43af7fe65c0efc76f4355ce7522a9de911fca6ae82a818b",
+      "status": 400,
+      "error": ""
+    },
+    {
+      "site": "korea365",
+      "post_id": "7691279787364672359",
+      "post_title": "What Koreans Should Know About the Houthis and Red Sea Risks",
+      "post_url": "https://korea365guide.blogspot.com/2026/09/what-koreans-should-know-about-houthis.html",
+      "image_url": "https://replicate.delivery/yhqm/jey9R0sUZa2CDyTty4s6i79h8DT6IfmsUZH2ryML24UYdeYuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "krealestate",
+      "post_id": "1008712759065915662",
+      "post_title": "Stop Losing Your Jeonse: A Seoul Checklist Every Foreign Tenant Needs",
+      "post_url": "https://krealestate365.blogspot.com/2026/09/stop-losing-your-jeonse-seoul-checklist.html",
+      "image_url": "https://replicate.delivery/yhqm/dKbgYvAa98rTDteRw0T0KyAtJF1KsV4cD9o9n81cx3p4ORmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kskin365",
+      "post_id": "3631180635772689186",
+      "post_title": "A Clear, Practical Plan for Using Niacinamide 10% on Oily or Sensitive",
+      "post_url": "https://skin.k-health365.com/2026/09/a-clear-practical-plan-for-using.html",
+      "image_url": "https://replicate.delivery/yhqm/LH9ifr1Y542jeEujFvhHPl537Tk4gVPxJP8MZRq3GG4MSiMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kskin365",
+      "post_id": "4656662753566022520",
+      "post_title": "Or al supplements in K-Beauty: L'Oréal and COSMAX collaboration impact",
+      "post_url": "https://skin.k-health365.com/2026/09/or-al-supplements-in-k-beauty-loreal.html",
+      "image_url": "https://replicate.delivery/yhqm/vuxlsZyjUWI6NdsaeROpQwF4gGOaHJZloEcCO3wkLBDLALmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kwellness_lab",
+      "post_id": "6986249537462106618",
+      "post_title": "가벼운 습관 하나로 심뇌혈관질환 예방 시작하기: 우선순위와 즉각 판단 기준",
+      "post_url": "https://glow.k-health365.com/2026/09/blog-post_12.html",
+      "image_url": "https://replicate.delivery/yhqm/xhsnbjQIjHZzPp0nnTVZzqyjhf3hJoZlMRKw3Mxeiheg4EZuA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kworld365_kpop",
+      "post_id": "4850866952229153857",
+      "post_title": "Before the Queue: What to Lock In Right Now for a K-pop Concert Run",
+      "post_url": "https://kworld365.blogspot.com/2026/09/before-queue-what-to-lock-in-right-now.html",
+      "image_url": "https://replicate.delivery/yhqm/omTvMronT9rjLhF7vtUKysKrFm0bcow4KCm3CeeqP8AktnMXA/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "kworld365_kpop",
+      "post_id": "1641911914386773228",
+      "post_title": "'Made My Night' Listed — a concise fan checklist to catch every",
+      "post_url": "https://kworld365.blogspot.com/2026/09/made-my-night-listed-concise-fan.html",
+      "image_url": "https://replicate.delivery/yhqm/srCAhMk7ZrqBFJsElxvJhXYza0PzD6uCd6EUPpkKDkJahFzF/out-0.png",
+      "status": 404,
+      "error": ""
+    },
+    {
+      "site": "seoul_intl_school_guide",
+      "post_id": "8734655564503547215",
+      "post_title": "Kim Seung-won school-transfer allegations: student guide",
+      "post_url": "https://seoulintlschoolguide.blogspot.com/2026/09/kim-seung-won-school-transfer.html",
+      "image_url": "https://replicate.delivery/yhqm/BHuZMSg02N6XE9BjkV4vJDFWDNgcNchkbjeluGZnonCmGNmLA/out-0.png",
+      "status": 404,
+      "error": ""
+    }
+  ],
+  "total_unique_images": 265
+}

@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "name": "GOLDEN_KEYWORD_SELECTION_POLICY",
+  "status": "LOCKED",
+  "scope": ["wordpress", "blogger", "tistory", "news"],
+  "viral_general_sites": {
+    "wordpress": ["https://koreanews365.com", "https://korea365.org"],
+    "blogger": ["https://korea365guide.blogspot.com"],
+    "tistory": ["https://huh0303.tistory.com"],
+    "topic_mode": "today_cross_media_repeated_nouns_first",
+    "cross_category": true,
+    "categories": ["politics", "economy", "society", "daily_life", "reservations", "culture", "sports", "world"],
+    "entity_examples": ["용혜인", "김승원", "민주당", "추석 예매", "대통령 지지율", "KBO", "손흥민"],
+    "rule": "These general sites may follow the strongest verified issue across categories. Rank today's repeated proper nouns and noun phrases by unique URL, independent outlet, discovery surface and search-trend evidence; never invent or blindly copy a headline."
+  },
+  "signal_pipeline": [
+    "collect_current_newspaper_naver_google_and_media_mentions",
+    "extract_and_normalize_repeated_nouns",
+    "rank_by_mention_count_outlet_count_and_surface_count",
+    "validate_with_google_trends_naver_and_gsc_when_available",
+    "convert_to_site_specific_search_intent",
+    "score_and_apply_hard_gates"
+  ],
+  "sources": {
+    "discovery": ["newspaper", "naver", "google", "media", "official_announcements"],
+    "priority_outlets": ["Naver News", "Chosun Ilbo", "Hankyoreh", "CNN", "The New York Times"],
+    "validation": ["google_trends", "naver_search_signal", "google_search_console"],
+    "rules": [
+      "Never copy a headline or article body.",
+      "Unavailable signals receive zero points and must be listed as missing; never fabricate evidence.",
+      "Use the date, source URL and observed entity or issue for every freshness claim.",
+      "Count each source URL once and reject nouns observed on fewer than two discovery surfaces.",
+      "Rank nouns by unique-URL mention count, then independent-outlet count, then discovery-surface count.",
+      "Reject discovery items whose publication date is not the current run date."
+    ]
+  },
+  "score": {
+    "gsc_demand": 25,
+    "media_repetition": 20,
+    "google_naver_trend": 20,
+    "site_fit": 15,
+    "actionable_search_intent": 10,
+    "official_source_available": 10,
+    "maximum": 100
+  },
+  "thresholds": {
+    "candidate": 70,
+    "priority": 80,
+    "top": 90,
+    "below_candidate_action": "REJECT"
+  },
+  "hard_gate": {
+    "topics": ["policy", "accident", "medical", "finance", "legal", "visa_immigration"],
+    "official_source_required": true,
+    "missing_official_source_action": "HOLD_REGARDLESS_OF_SCORE"
+  },
+  "routing": {
+    "newsrooms": "The two newsrooms use the latest RSS headlines as reporting topics, verify the underlying event, and write an original report.",
+    "general_blogs": "The explicitly registered viral general sites may select the highest verified cross-category issue. Convert the signal into useful context, cost, method, eligibility, schedule, comparison or precautions.",
+    "categories": ["politics", "economy", "society", "culture_and_arts", "sports", "education", "travel", "health", "technology"]
+  },
+  "selection": "highest_cross_surface_noun_frequency_then_verified_score_no_random_choice"
+}

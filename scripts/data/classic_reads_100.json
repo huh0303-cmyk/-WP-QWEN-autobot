@@ -1,0 +1,702 @@
+[
+  {
+    "rank": 1,
+    "title": "The Epic of Gilgamesh",
+    "author": "Unknown (Mesopotamian)",
+    "year": "c. 2100 BC",
+    "region": "Middle East"
+  },
+  {
+    "rank": 2,
+    "title": "The Iliad",
+    "author": "Homer",
+    "year": "c. 8th century BC",
+    "region": "West"
+  },
+  {
+    "rank": 3,
+    "title": "The Odyssey",
+    "author": "Homer",
+    "year": "c. 8th century BC",
+    "region": "West"
+  },
+  {
+    "rank": 4,
+    "title": "The Book of Songs (Shijing)",
+    "author": "Various",
+    "year": "c. 11th–7th century BC",
+    "region": "East Asia"
+  },
+  {
+    "rank": 5,
+    "title": "The Analects",
+    "author": "Confucius",
+    "year": "c. 475 BC",
+    "region": "East Asia"
+  },
+  {
+    "rank": 6,
+    "title": "Tao Te Ching",
+    "author": "Laozi",
+    "year": "c. 4th century BC",
+    "region": "East Asia"
+  },
+  {
+    "rank": 7,
+    "title": "The Art of War",
+    "author": "Sun Tzu",
+    "year": "c. 5th century BC",
+    "region": "East Asia"
+  },
+  {
+    "rank": 8,
+    "title": "Zhuangzi",
+    "author": "Zhuangzi",
+    "year": "c. 4th century BC",
+    "region": "East Asia"
+  },
+  {
+    "rank": 9,
+    "title": "Mencius",
+    "author": "Mencius",
+    "year": "c. 3rd century BC",
+    "region": "East Asia"
+  },
+  {
+    "rank": 10,
+    "title": "The Upanishads (selections)",
+    "author": "Unknown",
+    "year": "c. 800 BC",
+    "region": "South Asia"
+  },
+  {
+    "rank": 11,
+    "title": "The Bhagavad Gita",
+    "author": "Attrib. Vyasa",
+    "year": "c. 2nd century BC",
+    "region": "South Asia"
+  },
+  {
+    "rank": 12,
+    "title": "The Ramayana",
+    "author": "Valmiki",
+    "year": "c. 5th century BC",
+    "region": "South Asia"
+  },
+  {
+    "rank": 13,
+    "title": "The Mahabharata",
+    "author": "Vyasa",
+    "year": "c. 4th century BC",
+    "region": "South Asia"
+  },
+  {
+    "rank": 14,
+    "title": "The Dhammapada",
+    "author": "Attrib. Buddha",
+    "year": "c. 3rd century BC",
+    "region": "South Asia"
+  },
+  {
+    "rank": 15,
+    "title": "Panchatantra",
+    "author": "Vishnu Sharma",
+    "year": "c. 3rd century BC",
+    "region": "South Asia"
+  },
+  {
+    "rank": 16,
+    "title": "Oedipus Rex",
+    "author": "Sophocles",
+    "year": "c. 429 BC",
+    "region": "West"
+  },
+  {
+    "rank": 17,
+    "title": "The Republic",
+    "author": "Plato",
+    "year": "c. 375 BC",
+    "region": "West"
+  },
+  {
+    "rank": 18,
+    "title": "Nicomachean Ethics",
+    "author": "Aristotle",
+    "year": "c. 340 BC",
+    "region": "West"
+  },
+  {
+    "rank": 19,
+    "title": "Metamorphoses",
+    "author": "Ovid",
+    "year": "8 AD",
+    "region": "West"
+  },
+  {
+    "rank": 20,
+    "title": "The Egyptian Book of the Dead",
+    "author": "Unknown",
+    "year": "c. 1550 BC",
+    "region": "Africa/Middle East"
+  },
+  {
+    "rank": 21,
+    "title": "Confessions",
+    "author": "Augustine of Hippo",
+    "year": "397 AD",
+    "region": "West"
+  },
+  {
+    "rank": 22,
+    "title": "The Shahnameh",
+    "author": "Ferdowsi",
+    "year": "c. 1010",
+    "region": "Middle East"
+  },
+  {
+    "rank": 23,
+    "title": "The Tale of Genji",
+    "author": "Murasaki Shikibu",
+    "year": "c. 1010",
+    "region": "East Asia"
+  },
+  {
+    "rank": 24,
+    "title": "The Pillow Book",
+    "author": "Sei Shōnagon",
+    "year": "c. 1002",
+    "region": "East Asia"
+  },
+  {
+    "rank": 25,
+    "title": "The Rubáiyát of Omar Khayyám",
+    "author": "Omar Khayyám",
+    "year": "c. 1100",
+    "region": "Middle East"
+  },
+  {
+    "rank": 26,
+    "title": "The Conference of the Birds",
+    "author": "Attar of Nishapur",
+    "year": "c. 1177",
+    "region": "Middle East"
+  },
+  {
+    "rank": 27,
+    "title": "The Divine Comedy",
+    "author": "Dante Alighieri",
+    "year": "1320",
+    "region": "West"
+  },
+  {
+    "rank": 28,
+    "title": "The Tale of the Heike",
+    "author": "Unknown",
+    "year": "c. 1330",
+    "region": "East Asia"
+  },
+  {
+    "rank": 29,
+    "title": "The Canterbury Tales",
+    "author": "Geoffrey Chaucer",
+    "year": "1400",
+    "region": "West"
+  },
+  {
+    "rank": 30,
+    "title": "One Thousand and One Nights",
+    "author": "Various",
+    "year": "8th–14th century",
+    "region": "Middle East"
+  },
+  {
+    "rank": 31,
+    "title": "Popol Vuh",
+    "author": "Maya oral tradition",
+    "year": "pre-Columbian",
+    "region": "Americas"
+  },
+  {
+    "rank": 32,
+    "title": "Sundiata: An Epic of Old Mali",
+    "author": "Oral tradition",
+    "year": "c. 13th century",
+    "region": "Africa"
+  },
+  {
+    "rank": 33,
+    "title": "Romance of the Three Kingdoms",
+    "author": "Luo Guanzhong",
+    "year": "14th century",
+    "region": "East Asia"
+  },
+  {
+    "rank": 34,
+    "title": "Water Margin",
+    "author": "Shi Nai'an",
+    "year": "14th century",
+    "region": "East Asia"
+  },
+  {
+    "rank": 35,
+    "title": "The Masnavi",
+    "author": "Rumi",
+    "year": "13th century",
+    "region": "Middle East"
+  },
+  {
+    "rank": 36,
+    "title": "The Prince",
+    "author": "Niccolò Machiavelli",
+    "year": "1532",
+    "region": "West"
+  },
+  {
+    "rank": 37,
+    "title": "Journey to the West",
+    "author": "Wu Cheng'en",
+    "year": "1592",
+    "region": "East Asia"
+  },
+  {
+    "rank": 38,
+    "title": "Don Quixote",
+    "author": "Miguel de Cervantes",
+    "year": "1605",
+    "region": "West"
+  },
+  {
+    "rank": 39,
+    "title": "Hamlet",
+    "author": "William Shakespeare",
+    "year": "1603",
+    "region": "West"
+  },
+  {
+    "rank": 40,
+    "title": "Macbeth",
+    "author": "William Shakespeare",
+    "year": "1606",
+    "region": "West"
+  },
+  {
+    "rank": 41,
+    "title": "The Book of Five Rings",
+    "author": "Miyamoto Musashi",
+    "year": "1645",
+    "region": "East Asia"
+  },
+  {
+    "rank": 42,
+    "title": "Hong Gildong jeon",
+    "author": "Heo Gyun",
+    "year": "17th century",
+    "region": "East Asia"
+  },
+  {
+    "rank": 43,
+    "title": "The Cloud Dream of the Nine",
+    "author": "Kim Man-jung",
+    "year": "1687",
+    "region": "East Asia"
+  },
+  {
+    "rank": 44,
+    "title": "Paradise Lost",
+    "author": "John Milton",
+    "year": "1667",
+    "region": "West"
+  },
+  {
+    "rank": 45,
+    "title": "Robinson Crusoe",
+    "author": "Daniel Defoe",
+    "year": "1719",
+    "region": "West"
+  },
+  {
+    "rank": 46,
+    "title": "Gulliver's Travels",
+    "author": "Jonathan Swift",
+    "year": "1726",
+    "region": "West"
+  },
+  {
+    "rank": 47,
+    "title": "Candide",
+    "author": "Voltaire",
+    "year": "1759",
+    "region": "West"
+  },
+  {
+    "rank": 48,
+    "title": "The Sorrows of Young Werther",
+    "author": "Johann Wolfgang von Goethe",
+    "year": "1774",
+    "region": "West"
+  },
+  {
+    "rank": 49,
+    "title": "Tale of Chunhyang",
+    "author": "Unknown (Korean folk classic)",
+    "year": "18th century",
+    "region": "East Asia"
+  },
+  {
+    "rank": 50,
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "year": "1813",
+    "region": "West"
+  },
+  {
+    "rank": 51,
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "year": "1818",
+    "region": "West"
+  },
+  {
+    "rank": 52,
+    "title": "Faust",
+    "author": "Johann Wolfgang von Goethe",
+    "year": "1832",
+    "region": "West"
+  },
+  {
+    "rank": 53,
+    "title": "Le Père Goriot",
+    "author": "Honoré de Balzac",
+    "year": "1835",
+    "region": "West"
+  },
+  {
+    "rank": 54,
+    "title": "Oliver Twist",
+    "author": "Charles Dickens",
+    "year": "1838",
+    "region": "West"
+  },
+  {
+    "rank": 55,
+    "title": "A Christmas Carol",
+    "author": "Charles Dickens",
+    "year": "1843",
+    "region": "West"
+  },
+  {
+    "rank": 56,
+    "title": "The Count of Monte Cristo",
+    "author": "Alexandre Dumas",
+    "year": "1844",
+    "region": "West"
+  },
+  {
+    "rank": 57,
+    "title": "Wuthering Heights",
+    "author": "Emily Brontë",
+    "year": "1847",
+    "region": "West"
+  },
+  {
+    "rank": 58,
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "year": "1847",
+    "region": "West"
+  },
+  {
+    "rank": 59,
+    "title": "Vanity Fair",
+    "author": "William Makepeace Thackeray",
+    "year": "1848",
+    "region": "West"
+  },
+  {
+    "rank": 60,
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "year": "1851",
+    "region": "West"
+  },
+  {
+    "rank": 61,
+    "title": "Walden",
+    "author": "Henry David Thoreau",
+    "year": "1854",
+    "region": "West"
+  },
+  {
+    "rank": 62,
+    "title": "Madame Bovary",
+    "author": "Gustave Flaubert",
+    "year": "1857",
+    "region": "West"
+  },
+  {
+    "rank": 63,
+    "title": "Les Misérables",
+    "author": "Victor Hugo",
+    "year": "1862",
+    "region": "West"
+  },
+  {
+    "rank": 64,
+    "title": "Crime and Punishment",
+    "author": "Fyodor Dostoevsky",
+    "year": "1866",
+    "region": "West"
+  },
+  {
+    "rank": 65,
+    "title": "War and Peace",
+    "author": "Leo Tolstoy",
+    "year": "1869",
+    "region": "West"
+  },
+  {
+    "rank": 66,
+    "title": "Twenty Thousand Leagues Under the Sea",
+    "author": "Jules Verne",
+    "year": "1870",
+    "region": "West"
+  },
+  {
+    "rank": 67,
+    "title": "Middlemarch",
+    "author": "George Eliot",
+    "year": "1871",
+    "region": "West"
+  },
+  {
+    "rank": 68,
+    "title": "Anna Karenina",
+    "author": "Leo Tolstoy",
+    "year": "1877",
+    "region": "West"
+  },
+  {
+    "rank": 69,
+    "title": "The Brothers Karamazov",
+    "author": "Fyodor Dostoevsky",
+    "year": "1880",
+    "region": "West"
+  },
+  {
+    "rank": 70,
+    "title": "Treasure Island",
+    "author": "Robert Louis Stevenson",
+    "year": "1883",
+    "region": "West"
+  },
+  {
+    "rank": 71,
+    "title": "The Adventures of Huckleberry Finn",
+    "author": "Mark Twain",
+    "year": "1884",
+    "region": "West"
+  },
+  {
+    "rank": 72,
+    "title": "The Strange Case of Dr Jekyll and Mr Hyde",
+    "author": "Robert Louis Stevenson",
+    "year": "1886",
+    "region": "West"
+  },
+  {
+    "rank": 73,
+    "title": "The Picture of Dorian Gray",
+    "author": "Oscar Wilde",
+    "year": "1890",
+    "region": "West"
+  },
+  {
+    "rank": 74,
+    "title": "The Adventures of Sherlock Holmes",
+    "author": "Arthur Conan Doyle",
+    "year": "1892",
+    "region": "West"
+  },
+  {
+    "rank": 75,
+    "title": "The Time Machine",
+    "author": "H. G. Wells",
+    "year": "1895",
+    "region": "West"
+  },
+  {
+    "rank": 76,
+    "title": "Dracula",
+    "author": "Bram Stoker",
+    "year": "1897",
+    "region": "West"
+  },
+  {
+    "rank": 77,
+    "title": "The War of the Worlds",
+    "author": "H. G. Wells",
+    "year": "1898",
+    "region": "West"
+  },
+  {
+    "rank": 78,
+    "title": "Heart of Darkness",
+    "author": "Joseph Conrad",
+    "year": "1899",
+    "region": "West"
+  },
+  {
+    "rank": 79,
+    "title": "I Am a Cat",
+    "author": "Natsume Sōseki",
+    "year": "1905",
+    "region": "East Asia"
+  },
+  {
+    "rank": 80,
+    "title": "The Wonderful Wizard of Oz",
+    "author": "L. Frank Baum",
+    "year": "1900",
+    "region": "West"
+  },
+  {
+    "rank": 81,
+    "title": "The Hound of the Baskervilles",
+    "author": "Arthur Conan Doyle",
+    "year": "1902",
+    "region": "West"
+  },
+  {
+    "rank": 82,
+    "title": "Kokoro",
+    "author": "Natsume Sōseki",
+    "year": "1914",
+    "region": "East Asia"
+  },
+  {
+    "rank": 83,
+    "title": "Gitanjali",
+    "author": "Rabindranath Tagore",
+    "year": "1910",
+    "region": "South Asia"
+  },
+  {
+    "rank": 84,
+    "title": "Anne of Green Gables",
+    "author": "L. M. Montgomery",
+    "year": "1908",
+    "region": "West"
+  },
+  {
+    "rank": 85,
+    "title": "In Search of Lost Time",
+    "author": "Marcel Proust",
+    "year": "1913",
+    "region": "West"
+  },
+  {
+    "rank": 86,
+    "title": "The Metamorphosis",
+    "author": "Franz Kafka",
+    "year": "1915",
+    "region": "West"
+  },
+  {
+    "rank": 87,
+    "title": "Ulysses",
+    "author": "James Joyce",
+    "year": "1922",
+    "region": "West"
+  },
+  {
+    "rank": 88,
+    "title": "The Trial",
+    "author": "Franz Kafka",
+    "year": "1925",
+    "region": "West"
+  },
+  {
+    "rank": 89,
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "year": "1925",
+    "region": "West"
+  },
+  {
+    "rank": 90,
+    "title": "Mrs Dalloway",
+    "author": "Virginia Woolf",
+    "year": "1925",
+    "region": "West"
+  },
+  {
+    "rank": 91,
+    "title": "To the Lighthouse",
+    "author": "Virginia Woolf",
+    "year": "1927",
+    "region": "West"
+  },
+  {
+    "rank": 92,
+    "title": "All Quiet on the Western Front",
+    "author": "Erich Maria Remarque",
+    "year": "1929",
+    "region": "West"
+  },
+  {
+    "rank": 93,
+    "title": "A Farewell to Arms",
+    "author": "Ernest Hemingway",
+    "year": "1929",
+    "region": "West"
+  },
+  {
+    "rank": 94,
+    "title": "In Praise of Shadows",
+    "author": "Jun'ichirō Tanizaki",
+    "year": "1933",
+    "region": "East Asia"
+  },
+  {
+    "rank": 95,
+    "title": "Brave New World",
+    "author": "Aldous Huxley",
+    "year": "1932",
+    "region": "West"
+  },
+  {
+    "rank": 96,
+    "title": "The Travels of Marco Polo",
+    "author": "Marco Polo",
+    "year": "1300",
+    "region": "West/East Asia"
+  },
+  {
+    "rank": 97,
+    "title": "The Kama Sutra",
+    "author": "Vātsyāyana",
+    "year": "c. 3rd century",
+    "region": "South Asia"
+  },
+  {
+    "rank": 98,
+    "title": "Dream of the Red Chamber",
+    "author": "Cao Xueqin",
+    "year": "1791",
+    "region": "East Asia"
+  },
+  {
+    "rank": 99,
+    "title": "Beowulf",
+    "author": "Unknown (Anglo-Saxon)",
+    "year": "c. 8th–11th century",
+    "region": "West"
+  },
+  {
+    "rank": 100,
+    "title": "The Secret History of the Mongols",
+    "author": "Unknown",
+    "year": "c. 1240",
+    "region": "East Asia/Central Asia"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "verticals": [
+    {
+      "vertical_id": "blogger_korean_benefits",
+      "room_id": "blogger_koreanews365",
+      "platform": "blogger",
+      "language": "ko",
+      "title": "한국생활지원정보",
+      "status": "CREATED_SHELL",
+      "destination_id": "2531035487222435079",
+      "url": "https://korea-life-support365.blogspot.com",
+      "cadence": "daily",
+      "topics": ["정부지원금", "근로장려금", "자녀장려금", "청년지원", "지자체지원금", "신청기간", "지급일", "KTX시간표", "SRT시간표", "버스시간표", "승차권예매", "취소수수료"],
+      "official_source_required": true,
+      "as_of_date_required": true,
+      "image_policy": "no_image_or_local_card_news",
+      "paid_image_api": false
+    }
+  ]
+}

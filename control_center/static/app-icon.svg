@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Korea365 통제실">
+  <rect width="512" height="512" rx="112" fill="#101828"/>
+  <path d="M96 126h320v260H96z" fill="#fff" opacity=".08"/>
+  <path d="M132 342V220l62-42 62 42v122h-42v-82h-40v82zm150 0V154h98v188h-42v-56h-28v56z" fill="#fff"/>
+  <circle cx="359" cy="178" r="19" fill="#f4c542"/>
+  <path d="M112 386h288" stroke="#f4c542" stroke-width="18" stroke-linecap="round"/>
+</svg>

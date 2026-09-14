@@ -1,0 +1,31 @@
+word,category,image_query,concept
+사과,food,red apple fruit photo,apple
+바나나,food,banana fruit photo,banana
+강아지,animal,dog photo,dog
+고양이,animal,cat photo,cat
+책,object,open book photo,book
+의자,object,wooden chair photo,chair
+책상,object,wooden table photo,table
+물,food,glass of water photo,water
+빵,food,loaf of bread photo,bread
+우유,food,glass of milk photo,milk
+집,place,small house photo,house
+자동차,object,car photo,car
+나무,nature,tree photo,tree
+꽃,nature,flower photo,flower
+해,nature,sun sky photo,sun
+달,nature,moon photo,moon
+별,nature,star night sky photo,star
+새,animal,bird photo,bird
+물고기,animal,fish photo,fish
+계란,food,egg photo,egg
+신발,clothing,shoe photo,shoe
+모자,clothing,hat photo,hat
+우산,object,umbrella photo,umbrella
+가방,object,bag photo,bag
+연필,object,pencil photo,pencil
+전화기,object,smartphone photo,phone
+시계,object,clock photo,clock
+문,object,door photo,door
+창문,object,window photo,window
+열쇠,object,key photo,key

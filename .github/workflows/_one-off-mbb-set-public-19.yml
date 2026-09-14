@@ -1,0 +1,19 @@
+name: "(1회성) MBB String Quartet 19 공개 전환"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  set-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install google-api-python-client google-auth -q
+      - env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_MBB_BROAD: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB_BROAD }}
+        run: python scripts/_set_mbb_video_public_19.py

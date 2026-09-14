@@ -1,0 +1,58 @@
+name: "Automation Rooms — Canary Dispatch"
+
+on:
+  workflow_dispatch:
+    inputs:
+      execute:
+        description: "Actually dispatch canaries (false = dry-run only)"
+        required: true
+        default: false
+        type: boolean
+      platforms:
+        description: "Comma-separated platforms"
+        required: true
+        default: "wordpress,blogger,youtube"
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: automation-room-canary-dispatch
+  cancel-in-progress: false
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate rooms and contracts
+        run: |
+          python -m automation_hub.rooms
+          python -m automation_hub.workflow_contracts
+      - name: Build plan and dispatch payloads
+        run: |
+          python -m automation_hub.room_scheduler --output artifacts/automation-room-plan.json
+          python -m automation_hub.dispatch_builder --plan artifacts/automation-room-plan.json --output artifacts/automation-room-dispatch.json
+      - name: Select canaries / optionally dispatch
+        env:
+          GH_DISPATCH_TOKEN: ${{ github.token }}
+          CANARY_EXECUTION_APPROVED: ${{ inputs.execute && 'true' || 'false' }}
+        run: |
+          if [ "${{ inputs.execute }}" = "true" ]; then
+            python -m automation_hub.canary_dispatch --plan artifacts/automation-room-dispatch.json --platforms "${{ inputs.platforms }}" --execute
+          else
+            python -m automation_hub.canary_dispatch --plan artifacts/automation-room-dispatch.json --platforms "${{ inputs.platforms }}"
+          fi
+      - name: Save canary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-canary-evidence-${{ github.run_id }}
+          path: artifacts/*.json
+          retention-days: 7

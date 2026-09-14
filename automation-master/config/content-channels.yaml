@@ -1,0 +1,45 @@
+version: '2026-08-25'
+status: ACTIVE_MASTER
+approval_gate: draft_private_until_owner_approval
+
+playlist:
+  cadence_per_channel_per_week: [2,3]
+  scheduling: randomized
+  time_policy: different_each_release
+  thumbnail_priority: high
+  duplicate_guard: true
+  channels:
+    - {name: K-pop, role: K-pop_music}
+    - {name: Starbucks Vibes, role: instrumental_jazz_focus_work_study}
+    - {name: Global, role: sweet_romantic_music}
+    - {name: Healing, role: rain_healing_sleep_relax}
+    - {name: MBB, role: classical_mozart_bach_beethoven}
+
+knowledge:
+  channel_count: 5
+  scheduling: randomized
+  time_policy: different_each_release
+  visual_policy: use_relevant_video_frame_when_suitable
+  primary_quality_gate: narration_must_match_video_content
+  narration_priority: high
+  exact_channel_registry_source: MASTER_ASSET_TABLE
+
+language:
+  groups:
+    korean:
+      source: google_drive
+      source_folder_id: 19S8wWSw9T-j1sbCBnL35QfffwG6qvd-6
+      source_folder_title: 최종파일-단어퀴즈-MP4-한국어
+      content: validated_TOPIK_word_quiz
+    english:
+      source: google_drive
+      source_folder_id: 1m8PuFBuM0RoMmhNK6pZT_zFyR8E0yCiu
+      source_folder_title: 최종파일-단어퀴즈-MP4-영어
+    other_languages:
+      sources:
+        - {language: vi, folder_id: 11eBiiJSuBe1-COitPRrJhG04IiWUOG4l, title: 최종파일-단어퀴즈-MP4-베트남어}
+        - {language: es, folder_id: 1akto0rTIvAsIIyHIuJn4Wcy6PXuMXTO0, title: 최종파일-단어퀴즈-MP4-스페인어}
+        - {language: ja, folder_id: 1vBfhkO1s61lRfb6-HAbZYPlGhrn8Gw5G, title: 최종파일-단어퀴즈-MP4-일어}
+  distribution_targets: [YouTube_Shorts, TikTok, Facebook, Instagram, Threads]
+  same_platform_duplicate_forbidden: true
+  platform_specific_caption_hook_cta: true

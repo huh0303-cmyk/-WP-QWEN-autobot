@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "updated_on": "2026-09-01",
+  "policy": {
+    "automation_enabled": false,
+    "publish_forbidden_until_assigned": true,
+    "do_not_mix_with_wp27_blogger33": true
+  },
+  "candidates": []
+}

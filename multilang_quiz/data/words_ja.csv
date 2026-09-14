@@ -1,0 +1,31 @@
+word,category,image_query,concept
+りんご,food,red apple fruit photo,apple
+バナナ,food,banana fruit photo,banana
+犬,animal,dog photo,dog
+猫,animal,cat photo,cat
+本,object,open book photo,book
+椅子,object,wooden chair photo,chair
+机,object,wooden table photo,table
+水,food,glass of water photo,water
+パン,food,loaf of bread photo,bread
+牛乳,food,glass of milk photo,milk
+家,place,small house photo,house
+車,object,car photo,car
+木,nature,tree photo,tree
+花,nature,flower photo,flower
+太陽,nature,sun sky photo,sun
+月,nature,moon photo,moon
+星,nature,star night sky photo,star
+鳥,animal,bird photo,bird
+魚,animal,fish photo,fish
+卵,food,egg photo,egg
+靴,clothing,shoe photo,shoe
+帽子,clothing,hat photo,hat
+傘,object,umbrella photo,umbrella
+かばん,object,bag photo,bag
+鉛筆,object,pencil photo,pencil
+電話,object,smartphone photo,phone
+時計,object,clock photo,clock
+ドア,object,door photo,door
+窓,object,window photo,window
+鍵,object,key photo,key

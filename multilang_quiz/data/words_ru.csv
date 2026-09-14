@@ -1,0 +1,31 @@
+word,category,image_query,concept
+яблоко,food,red apple fruit photo,apple
+банан,food,banana fruit photo,banana
+собака,animal,dog photo,dog
+кошка,animal,cat photo,cat
+книга,object,open book photo,book
+стул,object,wooden chair photo,chair
+стол,object,wooden table photo,table
+вода,food,glass of water photo,water
+хлеб,food,loaf of bread photo,bread
+молоко,food,glass of milk photo,milk
+дом,place,small house photo,house
+машина,object,car photo,car
+дерево,nature,tree photo,tree
+цветок,nature,flower photo,flower
+солнце,nature,sun sky photo,sun
+луна,nature,moon photo,moon
+звезда,nature,star night sky photo,star
+птица,animal,bird photo,bird
+рыба,animal,fish photo,fish
+яйцо,food,egg photo,egg
+обувь,clothing,shoe photo,shoe
+шляпа,clothing,hat photo,hat
+зонт,object,umbrella photo,umbrella
+сумка,object,bag photo,bag
+карандаш,object,pencil photo,pencil
+телефон,object,smartphone photo,phone
+часы,object,clock photo,clock
+дверь,object,door photo,door
+окно,object,window photo,window
+ключ,object,key photo,key

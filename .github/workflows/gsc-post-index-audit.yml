@@ -1,0 +1,69 @@
+name: "GSC Post Index Audit (read-only)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Optional domain filter; blank audits all 27"
+        required: false
+        default: ""
+      max_per_site:
+        description: "0 = all published posts"
+        required: false
+        default: "0"
+      retry_unknown:
+        description: "Retry failed/uninspected URLs only; preserve already verified results"
+        type: boolean
+        default: false
+  schedule:
+    # 매일 04:00 KST 정밀 색인 전수조사. 05:20 트래픽 수집 전에 완료한다.
+    - cron: "0 19 * * *"
+  push:
+    paths:
+      - "scripts/audit_gsc_post_index.py"
+      - ".github/workflows/gsc-post-index-audit.yml"
+
+concurrency:
+  group: gsc-post-index-audit
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: Run exact URL-level GSC audit
+        env:
+          RETRY_UNKNOWN: ${{ inputs.retry_unknown }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: |
+          mode="--refresh-all"
+          if [ "$RETRY_UNKNOWN" = "true" ]; then mode="--retry-unknown"; fi
+          python scripts/audit_gsc_post_index.py \
+            --site "${{ github.event.inputs.site || '' }}" \
+            --max-per-site "${{ github.event.inputs.max_per_site || '0' }}" \
+            "$mode"
+      - name: Save dashboard index totals
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index_audit_manifest.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "data: refresh exact GSC index totals [skip ci]"
+          git pull --rebase origin main
+          git push
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gsc-index-audit-${{ github.run_id }}
+          path: index_audit_manifest.json
+          if-no-files-found: warn
+          retention-days: 30

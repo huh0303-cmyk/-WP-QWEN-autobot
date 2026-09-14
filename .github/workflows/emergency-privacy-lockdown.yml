@@ -1,0 +1,44 @@
+name: Emergency Privacy Lockdown — active channels only
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel_key:
+        description: "nasa / history / invention / silent_era / retro_reels"
+        required: true
+        type: choice
+        options: [nasa, history, invention, silent_era, retro_reels]
+      video_ids:
+        description: "영상 ID들, 공백으로 구분"
+        required: true
+      confirm:
+        description: "실행하려면 정확히 LOCK-PRIVATE 입력"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  lockdown:
+    if: ${{ inputs.confirm == 'LOCK-PRIVATE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install google-api-python-client google-auth google-auth-httplib2 -q
+      - name: "비공개 강제 전환"
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+        run: python scripts/emergency_privacy_lockdown.py "${{ inputs.channel_key }}" ${{ inputs.video_ids }}

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "channels": {
+    "healing": {
+      "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
+      "display_name": "힐링카페",
+      "oauth_brand_name": "K-ISSUE",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner",
+      "reject_brand_names": [
+        "K-HEALING"
+      ]
+    }
+  },
+  "rule": "Use channel_id as the authority. Names are navigation hints only. Verify channels.list(mine=true) before saving credentials or uploading. Never replace a configured ID based on a similar brand name."
+}

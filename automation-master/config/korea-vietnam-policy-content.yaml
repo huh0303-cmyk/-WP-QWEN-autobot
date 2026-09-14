@@ -1,0 +1,95 @@
+version: '2026-08-25'
+status: ACTIVE
+approval_gate: draft_private_until_owner_approval
+campaign: korea_vietnam_policy_opportunities
+
+source_policy:
+  authoritative_sources_required: true
+  korea_primary: Ministry_of_Justice_Korea
+  vietnam_primary: Vietnam_government_official_documents
+  fact_check_before_generation: true
+  no_unconfirmed_policy_as_fact: true
+
+topics:
+  - id: kr_student_visa_2026
+    pillar: Korea foreign student visa reform
+    keywords:
+      - 2026 Korea student visa reform
+      - D-2 visa Korea 2026
+      - D-4 visa Korea 2026
+      - international student visa Korea
+      - Korean language requirement student visa
+      - international student employment Korea
+      - foreign student settlement Korea
+      - regional university international students
+      - Vietnam students study in Korea
+    blog_angles:
+      - What Korea's 2026 student visa reform means for international students
+      - D-2 vs D-4 after Korea's visa policy changes
+      - Korean language ability and visa screening: what applicants should prepare
+      - From study to employment: Korea's emerging visa growth ladder
+      - What Korean universities must change in international student management
+      - A Vietnam applicant checklist for studying in Korea in 2026
+      - Regional universities and international student employment opportunities
+      - Financial proof, academic intent and language ability: what is changing
+      - How Korean universities can build a study-to-work pipeline
+      - Common misunderstandings about the 2026 student visa reform
+
+  - id: vn_foreign_degree_recognition_2026
+    pillar: Vietnam recognition of foreign degrees
+    keywords:
+      - Vietnam foreign degree recognition 2026
+      - Circular 65/2026 TT-BGDDT
+      - Korean degree recognition Vietnam
+      - Vietnam overseas degree recognition
+      - Korea Vietnam joint degree
+      - 2+2 Korea Vietnam university
+      - 3+1 Korea Vietnam university
+      - online foreign degree Vietnam
+      - blended learning degree recognition Vietnam
+      - Vietnam international education partnership
+    blog_angles:
+      - Vietnam's new foreign-degree recognition rules: what Korean universities need to know
+      - Will a Korean university degree be recognized in Vietnam?
+      - 2+2 and 3+1 Korea-Vietnam programs under the new recognition framework
+      - Online and blended foreign degrees: recognition issues in Vietnam
+      - Checklist for Korean universities planning Vietnam partnerships
+      - What Vietnamese students should verify before choosing a Korean university
+      - How degree recognition affects graduate employment in Vietnam
+      - Designing Korea-Vietnam joint education programs for recognition compliance
+      - Documents students may need for foreign-degree recognition
+      - Business opportunities created by digital degree verification
+
+content_factory:
+  blog:
+    initial_queue: 20
+    default_language: English
+    localization: [Korean, Vietnamese]
+    seo: [search_intent, FAQ, schema, internal_links, primary_source_citation]
+    publish_state: draft
+    duplicate_guard: true
+  youtube:
+    formats:
+      - {type: short, duration_seconds: '45-60', quantity_per_pillar: 5}
+      - {type: explainer, duration_minutes: '5-8', quantity_per_pillar: 2}
+    publish_state: private
+    narration_fact_check: true
+  social:
+    targets: [TikTok, Facebook, Instagram, Threads]
+    formats: [short_video, carousel, infographic, text_summary]
+    platform_specific_caption: true
+    publish_state: draft_private
+
+conversion:
+  primary_cta: free Korea study eligibility and policy update guide
+  funnels:
+    - blog_to_study_application
+    - short_video_to_blog
+    - social_to_policy_guide
+    - university_B2B_to_partnership_inquiry
+
+safety:
+  never_guarantee_visa: true
+  never_guarantee_degree_recognition: true
+  mark_pending_policy_details_as_pending: true
+  owner_final_approval_required: true

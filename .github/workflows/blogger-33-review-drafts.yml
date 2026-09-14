@@ -1,0 +1,54 @@
+name: "Blogger — create 33 review drafts"
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_key:
+        description: "Unique idempotency key for this 33-draft review run"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blogger-33-review-drafts
+  cancel-in-progress: false
+
+jobs:
+  create:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: Create 33 private drafts and queue review links
+        env:
+          BLOGGER_REVIEW_DRAFT_MODE: "true"
+          REVIEW_RUN_KEY: ${{ inputs.run_key }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          NORMAL_COMPLETION_EMAIL_ENABLED: "false"
+        run: python scripts/publish_blogger_33_now.py
+      - name: Upload 33-draft receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-33-review-results-${{ github.run_id }}
+          path: artifacts/blogger-33-public-results.json
+          retention-days: 30

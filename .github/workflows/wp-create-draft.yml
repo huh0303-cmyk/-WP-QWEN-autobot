@@ -1,0 +1,56 @@
+name: WP Create Draft From Gem (복붙 자동 초안 등록)
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_key:
+        description: "사이트 시크릿 키 (예: KHEALTH365COM)"
+        required: true
+      site_url:
+        description: "사이트 URL (예: https://k-health365.com)"
+        required: true
+      title:
+        description: "제목"
+        required: true
+      body:
+        description: "본문"
+        required: true
+      tags:
+        description: "태그, 쉼표로 구분"
+        required: true
+      meta_description:
+        description: "메타 디스크립션"
+        required: true
+      focus_keyword:
+        description: "포커스 키워드"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  create-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "초안 등록"
+        env:
+          WP_APP_PASSWORD: ${{ secrets[inputs.site_key] }}
+          SITE_URL: ${{ inputs.site_url }}
+          INPUT_TITLE: ${{ inputs.title }}
+          INPUT_BODY: ${{ inputs.body }}
+          INPUT_TAGS: ${{ inputs.tags }}
+          INPUT_META: ${{ inputs.meta_description }}
+          INPUT_FOCUS: ${{ inputs.focus_keyword }}
+        run: |
+          printf '%s' "$INPUT_TITLE" > title.txt
+          printf '%s' "$INPUT_BODY" > body.txt
+          printf '%s' "$INPUT_TAGS" > tags.txt
+          printf '%s' "$INPUT_META" > meta.txt
+          printf '%s' "$INPUT_FOCUS" > focus_kw.txt
+          python scripts/wp_create_draft.py "$SITE_URL" title.txt body.txt tags.txt meta.txt focus_kw.txt

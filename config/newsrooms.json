@@ -1,0 +1,265 @@
+{
+  "version": 2,
+  "publishing_enabled": true,
+  "shared": {
+    "theme_target": "twentytwentyfive",
+    "featured_image": {
+      "ratio": "16:9",
+      "min_width": 1600,
+      "alt_rule": "Describe the specific visual and its editorial relevance; never stuff keywords.",
+      "metadata": [
+        "creator",
+        "institution",
+        "work_title",
+        "source_url",
+        "license",
+        "license_evidence_url",
+        "retrieved_at"
+      ],
+      "allowed_licenses": [
+        "KOGL_0",
+        "KOGL_1",
+        "CC0",
+        "PUBLIC_DOMAIN",
+        "CC_BY"
+      ],
+      "require_item_level_license": true,
+      "reject_text_only_license_for_media": true,
+      "hotlink": false,
+      "blocked_credit_patterns": [
+        "연합뉴스",
+        "뉴시스",
+        "뉴스1",
+        "Reuters",
+        "AP",
+        "Getty",
+        "게티이미지",
+        "공동취재",
+        "제공"
+      ],
+      "preferred_public_sources": [
+        "공공누리",
+        "KTV 국민방송",
+        "대한민국 국회",
+        "국방부",
+        "아리랑TV",
+        "국회도서관"
+      ]
+    },
+    "ai_image_rule": "Never simulate documentary photography of a real event. Use labelled illustration, map, timeline or data graphic only.",
+    "source_rule": "Original reporting/analysis first. Attribute and link every external lead. Never copy, translate line-by-line, spin, bypass paywalls or use sources requiring separate written permission.",
+    "quality_gate": "Automatic public publication is limited to koreanews365.com and theseouljournal.com. Every article must pass source, recency, duplication, image-rights and SEO gates; all other network sites remain human-approval drafts.",
+    "publication_mode": "public_after_automated_quality_gates_no_human_review"
+  },
+  "sites": {
+    "koreanews365.com": {
+      "language": "ko-KR",
+      "name": "한국신문",
+      "tagline": "한국뉴스정론지",
+      "mission": "한국 독자를 위한 독립 종합 인터넷신문. 속보보다 검증, 단순 요약보다 설명을 우선한다.",
+      "palette": {
+        "ink": "#0B1F3A",
+        "paper": "#FFFFFF",
+        "muted": "#EEF2F6",
+        "breaking": "#B42318"
+      },
+      "typography": {
+        "headline": "Noto Serif KR",
+        "body": "Noto Sans KR"
+      },
+      "categories": [
+        {
+          "name": "속보",
+          "slug": "breaking"
+        },
+        {
+          "name": "정치 (POLITICS)",
+          "slug": "politics"
+        },
+        {
+          "name": "경제 (ECONOMY)",
+          "slug": "economy"
+        },
+        {
+          "name": "사회 (SOCIETY)",
+          "slug": "society"
+        },
+        {
+          "name": "글로벌 (GLOBAL)",
+          "slug": "world"
+        },
+        {
+          "name": "문화 (CULTURE)",
+          "slug": "culture"
+        },
+        {
+          "name": "금융 (FINANCE)",
+          "slug": "finance"
+        },
+        {
+          "name": "부동산 (REAL ESTATE)",
+          "slug": "real-estate"
+        },
+        {
+          "name": "국방 (MILITARY)",
+          "slug": "military"
+        },
+        {
+          "name": "예술 (ART)",
+          "slug": "art"
+        },
+        {
+          "name": "스포츠 (SPORTS)",
+          "slug": "sports"
+        }
+      ],
+      "primary_menu": [
+        "정치 (POLITICS)",
+        "경제 (ECONOMY)",
+        "사회 (SOCIETY)",
+        "문화 (CULTURE)",
+        "금융 (FINANCE)",
+        "부동산 (REAL ESTATE)",
+        "국방 (MILITARY)",
+        "예술 (ART)",
+        "스포츠 (SPORTS)",
+        "글로벌 (GLOBAL)",
+        "기사제보",
+        "신문사 소개"
+      ],
+      "homepage": [
+        "breaking_strip",
+        "lead_story",
+        "top_stories_4",
+        "politics_3",
+        "economy_3",
+        "society_3",
+        "world_3"
+      ],
+      "editorial_pages": [
+        {
+          "title": "신문사 소개",
+          "slug": "about"
+        },
+        {
+          "title": "편집 원칙",
+          "slug": "editorial-standards"
+        },
+        {
+          "title": "정정·반론 보도",
+          "slug": "corrections"
+        },
+        {
+          "title": "기사제보",
+          "slug": "tips"
+        },
+        {
+          "title": "출처 및 저작권 정책",
+          "slug": "source-copyright-policy"
+        }
+      ],
+      "cadence": {
+        "mode": "new_rss_item",
+        "original_weekly_share_min": 0.3,
+        "daily_publication_limit": null
+      }
+    },
+    "theseouljournal.com": {
+      "language": "en-US",
+      "name": "The Seoul Journal",
+      "tagline": "Seoul’s Perspective, Connected to the World.",
+      "mission": "An independent English-language publication explaining Korea and Asia with verified sources, original context and transparent corrections.",
+      "palette": {
+        "ink": "#111111",
+        "paper": "#FFFFFF",
+        "muted": "#F2F0EB",
+        "accent": "#173B65"
+      },
+      "typography": {
+        "headline": "Source Serif 4",
+        "body": "Inter"
+      },
+      "categories": [
+        {
+          "name": "Top Stories",
+          "slug": "top-stories"
+        },
+        {
+          "name": "Korea",
+          "slug": "korea"
+        },
+        {
+          "name": "Asia",
+          "slug": "asia"
+        },
+        {
+          "name": "World",
+          "slug": "world"
+        },
+        {
+          "name": "Business",
+          "slug": "business"
+        },
+        {
+          "name": "Technology",
+          "slug": "technology"
+        },
+        {
+          "name": "Military",
+          "slug": "military"
+        },
+        {
+          "name": "Sports",
+          "slug": "sports"
+        }
+      ],
+      "primary_menu": [
+        "Top Stories",
+        "Korea",
+        "Asia",
+        "World",
+        "Business",
+        "Technology",
+        "Military",
+        "Sports",
+        "About",
+        "Contact"
+      ],
+      "homepage": [
+        "lead_story",
+        "top_stories_4",
+        "korea_3",
+        "asia_3",
+        "business_3",
+        "technology_3"
+      ],
+      "editorial_pages": [
+        {
+          "title": "About",
+          "slug": "about"
+        },
+        {
+          "title": "Editorial Standards",
+          "slug": "editorial-standards"
+        },
+        {
+          "title": "Corrections & Right of Reply",
+          "slug": "corrections"
+        },
+        {
+          "title": "Submit a Tip",
+          "slug": "tips"
+        },
+        {
+          "title": "Sources & Copyright",
+          "slug": "source-copyright-policy"
+        }
+      ],
+      "cadence": {
+        "mode": "new_rss_item",
+        "original_weekly_share_min": 0.3,
+        "daily_publication_limit": null
+      }
+    }
+  }
+}

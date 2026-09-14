@@ -1,0 +1,48 @@
+name: Blogger failed-batch recovery (2026-09-07)
+on:
+  workflow_dispatch:
+    inputs:
+      force_retry:
+        description: "잔액 복구 후 즉시 재시도"
+        type: boolean
+        default: false
+  schedule:
+    - cron: '*/30 * * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: blogger-failed-batch-recovery-2026-09-07
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: Recover only unfinished sites
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE_RETRY: ${{ inputs.force_retry }}
+          BUDGET_GITHUB_REPOSITORY: ${{ github.repository }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: 'true'
+          OPENAI_MODEL: gpt-5-mini
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          NANO_BANANA_FREE_TIER_ENABLED: 'false'
+          FORCE_SOURCE_IPV4: 'true'
+        run: python scripts/recover_blogger_batch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blogger-recovery-${{ github.run_id }}
+          path: artifacts/blogger-recovery.json
+          if-no-files-found: warn

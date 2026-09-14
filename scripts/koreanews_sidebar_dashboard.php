@@ -1,0 +1,339 @@
+<?php
+/**
+ * Koreanews365 sidebar dashboard.
+ * Paste into the Code Snippets plugin without an opening PHP tag.
+ */
+
+function kn365_kbo_standings_v9() {
+    $cached = get_transient('kn365_kbo_standings_v9');
+    if (is_array($cached) && count($cached) === 10) {
+        return $cached;
+    }
+
+    $response = wp_remote_get(
+        'https://www.koreabaseball.com/Record/TeamRank/TeamRank.aspx',
+        array('timeout' => 8, 'user-agent' => 'Koreanews365/1.0 (+https://koreanews365.com/)')
+    );
+    if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) {
+        return array();
+    }
+
+    $html = wp_remote_retrieve_body($response);
+    if (!$html) {
+        return array();
+    }
+
+    $previous = libxml_use_internal_errors(true);
+    $dom = new DOMDocument();
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+    $xpath = new DOMXPath($dom);
+    $rows = $xpath->query("//table[contains(@class,'tData')]//tbody/tr");
+    $standings = array();
+
+    foreach ($rows as $row) {
+        $cells = $xpath->query('./td', $row);
+        if ($cells->length < 7) {
+            continue;
+        }
+        $rank = trim($cells->item(0)->textContent);
+        $team = trim($cells->item(1)->textContent);
+        if (!preg_match('/^([1-9]|10)$/', $rank) || '' === $team) {
+            continue;
+        }
+        $standings[] = array(
+            'rank' => $rank,
+            'team' => $team,
+            'games' => trim($cells->item(2)->textContent),
+            'rate' => trim($cells->item(6)->textContent),
+        );
+        if (10 === count($standings)) {
+            break;
+        }
+    }
+    libxml_clear_errors();
+    libxml_use_internal_errors($previous);
+
+    $previous_ranks = array();
+    $yesterday = wp_date('Y-m-d', current_time('timestamp') - DAY_IN_SECONDS);
+    $previous_response = wp_remote_get(
+        'https://www.koreabaseball.com/Record/TeamRank/TeamRankDaily.aspx?searchDate=' . rawurlencode($yesterday),
+        array('timeout' => 8, 'user-agent' => 'Koreanews365/1.0 (+https://koreanews365.com/)')
+    );
+    if (!is_wp_error($previous_response) && 200 === wp_remote_retrieve_response_code($previous_response)) {
+        $previous_dom = new DOMDocument();
+        $previous_dom->loadHTML('<?xml encoding="utf-8" ?>' . wp_remote_retrieve_body($previous_response));
+        $previous_xpath = new DOMXPath($previous_dom);
+        foreach ($previous_xpath->query("//table[contains(@class,'tData')]//tbody/tr") as $previous_row) {
+            $previous_cells = $previous_xpath->query('./td', $previous_row);
+            if ($previous_cells->length >= 2) {
+                $previous_rank = (int) trim($previous_cells->item(0)->textContent);
+                $previous_team = trim($previous_cells->item(1)->textContent);
+                if ($previous_rank >= 1 && $previous_rank <= 10 && $previous_team) {
+                    $previous_ranks[$previous_team] = $previous_rank;
+                }
+            }
+        }
+    }
+
+    $logo_base = 'https://6ptotvmi5753.edge.naverncp.com/KBO_IMAGE/KBOHome/resources/images/emblem/regular/';
+    $logos = array(
+        'KT' => $logo_base . '2022/KT.png', '삼성' => $logo_base . '2022/SS.png',
+        'KIA' => $logo_base . '2022/HT.png', 'LG' => $logo_base . '2022/LG.png',
+        '두산' => $logo_base . '2025/OB.png', 'NC' => $logo_base . '2022/NC.png',
+        '롯데' => $logo_base . '2022/LT.png', '한화' => $logo_base . '2025/HH.png',
+        'SSG' => $logo_base . '2024/SK.png', '키움' => $logo_base . '2022/WO.png',
+    );
+    foreach ($standings as &$standing) {
+        $current_rank = (int) $standing['rank'];
+        $previous_rank = $previous_ranks[$standing['team']] ?? $current_rank;
+        $standing['movement'] = $previous_rank - $current_rank;
+        $standing['logo'] = $logos[$standing['team']] ?? '';
+    }
+    unset($standing);
+
+    if (10 === count($standings)) {
+        set_transient('kn365_kbo_standings_v9', $standings, DAY_IN_SECONDS);
+    }
+    return $standings;
+}
+
+function kn365_korean_stock_quotes_v9() {
+    $cached = get_transient('kn365_korean_stock_quotes_v9');
+    if (is_array($cached) && count($cached) === 5) {
+        return $cached;
+    }
+    $stocks = array(
+        array('ticker' => '005930.KS', 'name' => '삼성전자'),
+        array('ticker' => '000660.KS', 'name' => 'SK하이닉스'),
+        array('ticker' => '005380.KS', 'name' => '현대차'),
+        array('ticker' => '017670.KS', 'name' => 'SK텔레콤'),
+        array('ticker' => '068270.KS', 'name' => '셀트리온'),
+    );
+    $quotes = array();
+    foreach ($stocks as $stock) {
+        $url = 'https://query1.finance.yahoo.com/v8/finance/chart/' . rawurlencode($stock['ticker']) . '?range=5d&interval=1d';
+        $response = wp_remote_get($url, array('timeout' => 6, 'user-agent' => 'Koreanews365/1.0'));
+        if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) {
+            continue;
+        }
+        $payload = json_decode(wp_remote_retrieve_body($response), true);
+        $meta = $payload['chart']['result'][0]['meta'] ?? array();
+        $price = isset($meta['regularMarketPrice']) ? (float) $meta['regularMarketPrice'] : 0;
+        $previous = isset($meta['chartPreviousClose']) ? (float) $meta['chartPreviousClose'] : 0;
+        if ($price <= 0 || $previous <= 0) {
+            continue;
+        }
+        $change = $price - $previous;
+        $quotes[] = array(
+            'name' => $stock['name'],
+            'price' => $price,
+            'change' => $change,
+            'percent' => ($change / $previous) * 100,
+        );
+    }
+    if (count($quotes) === 5) {
+        set_transient('kn365_korean_stock_quotes_v9', $quotes, DAY_IN_SECONDS);
+    }
+    return $quotes;
+}
+
+function kn365_gold_quote_v1() {
+    $cached = get_transient('kn365_gold_quote_v1');
+    if (is_array($cached) && !empty($cached['usd_oz']) && !empty($cached['krw_don'])) {
+        return $cached;
+    }
+    $read_quote = static function ($symbol) {
+        $url = 'https://query1.finance.yahoo.com/v8/finance/chart/' . rawurlencode($symbol) . '?range=5d&interval=1d';
+        $response = wp_remote_get($url, array('timeout' => 7, 'user-agent' => 'Koreanews365/1.0'));
+        if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) return 0;
+        $payload = json_decode(wp_remote_retrieve_body($response), true);
+        return (float) ($payload['chart']['result'][0]['meta']['regularMarketPrice'] ?? 0);
+    };
+    $gold_usd_oz = $read_quote('GC=F');
+    $usd_krw = $read_quote('KRW=X');
+    if ($gold_usd_oz <= 0 || $usd_krw <= 0) return array();
+    $grams_per_troy_ounce = 31.1034768;
+    $grams_per_don = 3.75;
+    $quote = array(
+        'usd_oz' => $gold_usd_oz,
+        'krw_don' => ($gold_usd_oz / $grams_per_troy_ounce) * $grams_per_don * $usd_krw,
+    );
+    set_transient('kn365_gold_quote_v1', $quote, DAY_IN_SECONDS);
+    return $quote;
+}
+
+add_action('wp_footer', function () {
+    if (is_admin()) {
+        return;
+    }
+    $standings = kn365_kbo_standings_v9();
+    $korean_quotes = kn365_korean_stock_quotes_v9();
+    $gold_quote = kn365_gold_quote_v1();
+    $cities = array(
+        array('서울', 'Asia/Seoul', 37.5665, 126.9780),
+        array('뉴욕', 'America/New_York', 40.7128, -74.0060),
+        array('런던', 'Europe/London', 51.5072, -0.1276),
+        array('LA', 'America/Los_Angeles', 34.0522, -118.2437),
+        array('파리', 'Europe/Paris', 48.8566, 2.3522),
+        array('베른', 'Europe/Zurich', 46.9480, 7.4474),
+        array('마드리드', 'Europe/Madrid', 40.4168, -3.7038),
+    );
+    ?>
+    <aside id="kn365-dashboard" class="kn365-dashboard" aria-label="실시간 정보">
+      <section class="kn365-panel kn365-kbo">
+        <div class="kn365-panel-head"><h2>KBO 순위</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
+        <?php if ($standings) : ?>
+          <table><thead><tr><th>순위</th><th>팀명</th><th>경기</th><th>승률(%)</th></tr></thead><tbody>
+          <?php foreach ($standings as $row) : ?>
+            <?php
+              $movement = (int) ($row['movement'] ?? 0);
+              $move_class = $movement > 0 ? 'up' : ($movement < 0 ? 'down' : 'flat');
+              $move_text = $movement > 0 ? '▲' . $movement : ($movement < 0 ? '▼' . abs($movement) : '─');
+              $move_label = $movement > 0 ? '어제보다 순위 상승' : ($movement < 0 ? '어제보다 순위 하락' : '어제와 순위 유지');
+            ?>
+            <tr>
+              <td class="rank"><?php echo esc_html($row['rank']); ?></td>
+              <td class="team">
+                <?php if (!empty($row['logo'])) : ?><img src="<?php echo esc_url($row['logo']); ?>" alt="" loading="lazy" width="28" height="28"><?php endif; ?>
+                <strong><?php echo esc_html($row['team']); ?></strong>
+                <span class="movement <?php echo esc_attr($move_class); ?>" title="<?php echo esc_attr($move_label); ?>" aria-label="<?php echo esc_attr($move_label); ?>"><?php echo esc_html($move_text); ?></span>
+              </td>
+              <td><?php echo esc_html($row['games'] . '/144'); ?></td><td><?php echo esc_html(number_format((float) $row['rate'] * 100, 1) . '%'); ?></td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody></table>
+          <a class="kn365-source" href="https://www.koreabaseball.com/Record/TeamRank/TeamRank.aspx" target="_blank" rel="noopener noreferrer">출처: KBO 공식 기록</a>
+        <?php else : ?>
+          <p class="kn365-muted">현재 순위를 불러오는 중입니다.</p>
+        <?php endif; ?>
+      </section>
+
+      <section class="kn365-panel kn365-market">
+        <div class="kn365-panel-head"><h2>주요 시세</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
+        <?php
+        ?>
+        <div class="kn365-market-group kn365-korean-quotes">
+          <h3>한국 주식 · KRW</h3>
+          <?php if (count($korean_quotes) === 5) : ?>
+            <div class="kn365-korean-quote-head"><span>종목</span><span>현재가</span><span>등락률</span></div>
+            <?php foreach ($korean_quotes as $quote) :
+                $direction = $quote['change'] > 0 ? 'up' : ($quote['change'] < 0 ? 'down' : 'flat');
+            ?>
+              <div class="kn365-korean-quote <?php echo esc_attr($direction); ?>">
+                <strong><?php echo esc_html($quote['name']); ?></strong>
+                <span class="price"><?php echo esc_html(number_format($quote['price'], 0)); ?>원</span>
+                <span class="change"><?php echo esc_html(sprintf('%+.2f%%', $quote['percent'])); ?></span>
+              </div>
+            <?php endforeach; ?>
+            <a class="kn365-source" href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">시세: Yahoo Finance · 하루 1회 갱신</a>
+          <?php else : ?>
+            <p class="kn365-muted">한국 주식 시세를 불러오는 중입니다.</p>
+          <?php endif; ?>
+        </div>
+        <?php
+        $market_groups = array(
+            '미국 주식 · USD' => array(
+                array('s' => 'NASDAQ:AAPL', 'd' => 'Apple'),
+                array('s' => 'NASDAQ:MSFT', 'd' => 'Microsoft'),
+                array('s' => 'NASDAQ:AMZN', 'd' => 'Amazon'),
+                array('s' => 'NASDAQ:TSLA', 'd' => 'Tesla'),
+                array('s' => 'NASDAQ:NVDA', 'd' => 'Nvidia'),
+            ),
+            '암호화폐 · USD' => array(
+                array('s' => 'COINBASE:BTCUSD', 'd' => 'Bitcoin'),
+                array('s' => 'COINBASE:ETHUSD', 'd' => 'Ethereum'),
+            ),
+        );
+        foreach ($market_groups as $group_title => $symbols) :
+            $market_height = count($symbols) > 3 ? 335 : 245;
+        ?>
+          <div class="kn365-market-group">
+            <h3><?php echo esc_html($group_title); ?></h3>
+            <div class="tradingview-widget-container">
+              <div class="tradingview-widget-container__widget"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+              <?php echo wp_json_encode(array(
+                  'colorTheme' => 'light', 'dateRange' => '1D', 'showChart' => false,
+                  'locale' => 'kr', 'width' => '100%', 'height' => $market_height,
+                  'isTransparent' => true, 'showSymbolLogo' => true, 'showFloatingTooltip' => false,
+                  'tabs' => array(array('title' => $group_title, 'symbols' => $symbols)),
+              ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+              </script>
+            </div>
+          </div>
+        <?php endforeach; ?>
+        <p class="kn365-disclaimer">투자 참고용 지연 정보이며 투자 권유가 아닙니다.</p>
+      </section>
+
+      <section class="kn365-panel kn365-gold">
+        <div class="kn365-panel-head"><h2>금 시세</h2><span><?php echo esc_html(wp_date('Y.n.j')); ?> 기준</span></div>
+        <?php if ($gold_quote) : ?>
+          <dl class="kn365-gold-grid" aria-label="국제 금값과 한국 돈 단위 환산값">
+            <div class="primary"><dt>현재 시세 / oz</dt><dd>$<?php echo esc_html(number_format($gold_quote['usd_oz'], 2)); ?></dd></div>
+            <div><dt>1oz</dt><dd>31.1035g</dd></div>
+            <div><dt>1돈</dt><dd>3.75g</dd></div>
+            <div class="don"><dt>1돈 환산</dt><dd>약 <?php echo esc_html(number_format($gold_quote['krw_don'], 0)); ?>원</dd></div>
+          </dl>
+          <a class="kn365-source" href="https://finance.yahoo.com/quote/GC=F/" target="_blank" rel="noopener noreferrer">금·환율: Yahoo Finance · 하루 1회 갱신</a>
+        <?php else : ?><p class="kn365-muted">금 시세를 불러오는 중입니다.</p><?php endif; ?>
+        <p class="kn365-disclaimer">국제 금 선물과 USD/KRW 환율의 단순 환산값입니다. 부가세·거래 수수료·매장 가격은 다를 수 있습니다.</p>
+      </section>
+
+      <section class="kn365-panel kn365-world">
+        <div class="kn365-panel-head"><h2>세계 시각·기온</h2><span id="kn365-weather-time">갱신 중</span></div>
+        <ul>
+        <?php foreach ($cities as $i => $city) : ?>
+          <li data-index="<?php echo esc_attr($i); ?>" data-zone="<?php echo esc_attr($city[1]); ?>">
+            <strong><?php echo esc_html($city[0]); ?></strong><time>--:--</time><span class="temp">--°</span>
+          </li>
+        <?php endforeach; ?>
+        </ul>
+        <a class="kn365-source" href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">날씨: Open-Meteo</a>
+      </section>
+    </aside>
+    <style>
+      #secondary .widget {display:none!important} #secondary{display:block!important}
+      body.single-post .entry-title{font-family:"Noto Serif KR","Nanum Myeongjo",serif!important;font-weight:800!important;letter-spacing:-.035em!important;line-height:1.35!important}
+      body.single-post .entry-content{font-family:"Noto Serif KR","Nanum Myeongjo",serif!important;font-size:18px!important;line-height:1.95!important;letter-spacing:-.012em!important;color:#202020!important}
+      body.single-post .entry-content p{margin:0 0 1.2em!important}body.single-post .entry-content h2{font-family:"Noto Serif KR","Nanum Myeongjo",serif!important;font-size:25px!important;line-height:1.45!important;margin:1.8em 0 .65em!important}
+      .kn365-dashboard{display:grid;gap:16px;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#172033}
+      .kn365-panel{background:#fff;border:1px solid #e4e9f1;border-radius:14px;box-shadow:0 7px 22px rgba(20,39,70,.07);padding:15px;overflow:hidden}
+      .kn365-panel-head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #b5121b;margin:-2px 0 10px;padding:0 0 8px}
+      .kn365-panel-head h2{font-size:18px!important;margin:0!important;color:#101c35}.kn365-panel-head span{font-size:11px;color:#778196}
+      .kn365-kbo table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #e5eaf1;border-radius:10px;font-size:12px}.kn365-kbo thead th{background:#f5f7fa;color:#536075;font-size:10px;letter-spacing:.04em}.kn365-kbo th,.kn365-kbo td{height:42px;padding:6px;border:0;border-bottom:1px solid #edf0f4;text-align:center}.kn365-kbo tbody tr:last-child td{border-bottom:0}.kn365-kbo tbody tr:hover{background:#fafbfd}.kn365-kbo td.team{display:flex;align-items:center;gap:7px;text-align:left}.kn365-kbo td.team img{width:28px;height:28px;object-fit:contain}.kn365-kbo td.team strong{font-size:12px}.kn365-kbo .movement{margin-left:auto;min-width:22px;text-align:right;font-size:10px;font-weight:800}.kn365-kbo .movement.up{color:#d71920}.kn365-kbo .movement.down{color:#1769d2}.kn365-kbo .movement.flat{color:#9aa3b1}
+      .kn365-kbo tbody tr:nth-child(6) td{border-top:2px dashed #c91421;padding-top:18px}
+      .kn365-kbo tbody tr:nth-child(6) td:first-child{position:relative}
+      .kn365-kbo tbody tr:nth-child(6) td:first-child::before{content:"가을야구 커트라인";position:absolute;top:2px;left:0;width:240px;text-align:center;color:#c91421;font-size:10px;font-weight:800;letter-spacing:.08em}
+      .kn365-source,.kn365-disclaimer,.kn365-muted{display:block;margin:9px 0 0;font-size:10px;color:#7a8495}.kn365-source{text-decoration:none}
+      .kn365-market-group{margin:0 0 14px}.kn365-market-group h3{margin:0 0 5px!important;font-size:13px!important;color:#26334a;letter-spacing:.04em}
+      .kn365-korean-quote-head,.kn365-korean-quote{display:grid;grid-template-columns:minmax(90px,1fr) 84px 58px;gap:7px;align-items:center}
+      .kn365-korean-quote-head{padding:5px 3px;color:#8a93a2;font-size:10px}.kn365-korean-quote-head span:not(:first-child){text-align:right}
+      .kn365-korean-quote{min-height:42px;padding:8px 3px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-korean-quote strong{font-size:12px;white-space:nowrap}.kn365-korean-quote .price,.kn365-korean-quote .change{text-align:right;font-variant-numeric:tabular-nums}.kn365-korean-quote .price{font-weight:700}.kn365-korean-quote.up .change{color:#d71920}.kn365-korean-quote.down .change{color:#1769d2}.kn365-korean-quote.flat .change{color:#657080}
+      .kn365-gold-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0;border:1px solid #e8ebf0;border-radius:10px;overflow:hidden}
+      .kn365-gold-grid>div{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:9px 11px;border-right:1px solid #edf0f4;border-bottom:1px solid #edf0f4}
+      .kn365-gold-grid>div:nth-child(2n){border-right:0}.kn365-gold-grid>div:nth-last-child(-n+2){border-bottom:0}
+      .kn365-gold-grid dt{margin:0;color:#6f7888;font-size:11px;font-weight:600}.kn365-gold-grid dd{margin:0;color:#172033;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+      .kn365-gold-grid .primary{grid-column:1/-1;background:#fffaf0;border-right:0}.kn365-gold-grid .primary dd{color:#9b6500;font-size:16px}.kn365-gold-grid .don dd{color:#b5121b}
+      .kn365-world ul{list-style:none;margin:0;padding:0}.kn365-world li{display:grid;grid-template-columns:1fr 58px 45px;gap:6px;padding:7px 2px;border-bottom:1px solid #edf0f4;font-size:12px}.kn365-world time,.kn365-world .temp{text-align:right;font-variant-numeric:tabular-nums}.kn365-world .temp{font-weight:700;color:#b5121b}
+      @media(max-width:767px){.kn365-dashboard{margin-top:18px}.kn365-panel{border-radius:12px}}
+    </style>
+    <script>
+    (()=>{
+      const dash=document.getElementById('kn365-dashboard');
+      const side=document.getElementById('secondary')
+        || document.querySelector('aside.sidebar-sticky')
+        || document.querySelector('aside.col-md-4');
+      if(!dash||!side)return; side.innerHTML=''; side.appendChild(dash);
+      const cities=<?php echo wp_json_encode($cities, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+      const tick=()=>document.querySelectorAll('#kn365-dashboard [data-zone]').forEach(el=>{
+        el.querySelector('time').textContent=new Intl.DateTimeFormat('ko-KR',{timeZone:el.dataset.zone,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
+      }); tick(); setInterval(tick,30000);
+      const lat=cities.map(c=>c[2]).join(','), lon=cities.map(c=>c[3]).join(',');
+      fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m&timezone=auto')
+        .then(r=>r.json()).then(data=>{const rows=Array.isArray(data)?data:[data]; rows.forEach((r,i)=>{const el=document.querySelector('#kn365-dashboard [data-index="'+i+'"] .temp');if(el&&r.current)el.textContent=Math.round(r.current.temperature_2m)+'°';}); const t=document.getElementById('kn365-weather-time');if(t)t.textContent='현재';})
+        .catch(()=>{const t=document.getElementById('kn365-weather-time');if(t)t.textContent='시간 표시';});
+    })();
+    </script>
+    <?php
+}, 40);
+

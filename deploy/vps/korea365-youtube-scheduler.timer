@@ -1,0 +1,11 @@
+[Unit]
+Description=Check YouTube calendar every 15 minutes on the VPS
+
+[Timer]
+OnCalendar=*:0/15
+Persistent=true
+RandomizedDelaySec=45
+Unit=korea365-youtube-scheduler.service
+
+[Install]
+WantedBy=timers.target

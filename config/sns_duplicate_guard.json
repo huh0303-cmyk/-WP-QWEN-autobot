@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "policy": "block_same_asset_on_same_platform_account",
+  "enabled": true,
+  "platforms": ["youtube", "tiktok", "instagram", "facebook", "threads"],
+  "identity": {
+    "primary": "sha256_media_file",
+    "secondary": ["source_asset_id", "normalized_title", "content_fingerprint"]
+  },
+  "pre_publish_check": {
+    "require_ledger_lookup": true,
+    "block_if_same_platform_account_and_fingerprint_exists": true,
+    "fail_closed_if_ledger_unavailable": true
+  },
+  "post_publish": {
+    "require_platform_post_id": true,
+    "require_permalink_when_available": true,
+    "record_timestamp": true
+  },
+  "retry": {
+    "never_retry_after_confirmed_platform_post_id": true,
+    "verify_remote_state_before_retry_after_timeout": true
+  },
+  "ledger_path": "data/sns_publish_ledger.jsonl"
+}

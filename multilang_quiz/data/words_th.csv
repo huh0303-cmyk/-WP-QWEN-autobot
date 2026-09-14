@@ -1,0 +1,31 @@
+word,category,image_query,concept
+แอปเปิ้ล,food,red apple fruit photo,apple
+กล้วย,food,banana fruit photo,banana
+หมา,animal,dog photo,dog
+แมว,animal,cat photo,cat
+หนังสือ,object,open book photo,book
+เก้าอี้,object,wooden chair photo,chair
+โต๊ะ,object,wooden table photo,table
+น้ำ,food,glass of water photo,water
+ขนมปัง,food,loaf of bread photo,bread
+นม,food,glass of milk photo,milk
+บ้าน,place,small house photo,house
+รถยนต์,object,car photo,car
+ต้นไม้,nature,tree photo,tree
+ดอกไม้,nature,flower photo,flower
+ดวงอาทิตย์,nature,sun sky photo,sun
+ดวงจันทร์,nature,moon photo,moon
+ดาว,nature,star night sky photo,star
+นก,animal,bird photo,bird
+ปลา,animal,fish photo,fish
+ไข่,food,egg photo,egg
+รองเท้า,clothing,shoe photo,shoe
+หมวก,clothing,hat photo,hat
+ร่ม,object,umbrella photo,umbrella
+กระเป๋า,object,bag photo,bag
+ดินสอ,object,pencil photo,pencil
+โทรศัพท์,object,smartphone photo,phone
+นาฬิกา,object,clock photo,clock
+ประตู,object,door photo,door
+หน้าต่าง,object,window photo,window
+กุญแจ,object,key photo,key

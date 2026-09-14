@@ -1,0 +1,13 @@
+[Unit]
+Description=Dispatch free four-metric collection with fixed 07:00 KST baseline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/control.env
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/dispatch_core_metrics_daily.py
+TimeoutStartSec=90
+UMask=0077

@@ -1,0 +1,21 @@
+[Unit]
+Description=Korea365 durable publication status monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=korea365
+Group=korea365
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/control-center.env
+Environment=CONTROL_OPERATIONS_DB=/opt/korea365/data/control-operations.sqlite3
+ExecStart=/opt/korea365/.venv/bin/python scripts/control_operations_worker.py
+Restart=always
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,334 @@
+[
+  {
+    "site": "https://k-health365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreamedicaltour.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreainvest365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://ki-korea.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 21
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreainsurance365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kfinance365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreataxnlaw.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreacrypto365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://krealestate365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 21
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://ktech365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 13
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kskin365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://oliveyoungkorea.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kworld365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://k-trip365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://k-visa365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreawedding365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kstudy365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://studyinkorea365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://kieca-korea.org",
+    "updated": [
+      {
+        "id": 17,
+        "old_desc": "국제교육·문화 콘텐츠 에디터.",
+        "new_desc": "한국국제교육문화협회(KIECA) 기획팀. 국제교육·문화 콘텐츠를 정리해 전달합니다.",
+        "old_name": "최윤아",
+        "new_name": "기획팀",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://ksa-korea.org",
+    "updated": [
+      {
+        "id": 18,
+        "old_desc": "한국 유학 정보 콘텐츠 에디터.",
+        "new_desc": "한국유학협회(KSA) 행정팀. 한국 유학 수속 정보를 정리해 전달합니다.",
+        "old_name": "서지훈",
+        "new_name": "행정팀",
+        "status": 200
+      }
+    ],
+    "skipped": [],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://sis-korea.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://jobkorea365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://jobinkorea365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://jobkoreaglobal.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://korea365.org",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 13
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://koreanews365.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  },
+  {
+    "site": "https://theseouljournal.com",
+    "updated": [],
+    "skipped": [
+      {
+        "reason": "already_up_to_date",
+        "id": 12
+      }
+    ],
+    "failed": [],
+    "dry_run": false
+  }
+]

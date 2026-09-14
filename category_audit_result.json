@@ -1,0 +1,801 @@
+{
+  "https://k-health365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "건강영양성분소개",
+        "count": 16
+      },
+      {
+        "name": "건강정보",
+        "count": 159
+      },
+      {
+        "name": "기타",
+        "count": 10
+      },
+      {
+        "name": "질병별대처법",
+        "count": 20
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 10,
+    "etc_pct": 5.0,
+    "total_posts": 202,
+    "missing_keyword": 15,
+    "missing_keyword_pct": 7.4
+  },
+  "https://koreamedicaltour.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Cosmetic Surgery",
+        "count": 55
+      },
+      {
+        "name": "Etc",
+        "count": 2
+      },
+      {
+        "name": "Government Support",
+        "count": 10
+      },
+      {
+        "name": "Hospital Costs",
+        "count": 26
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 2,
+    "etc_pct": 2.2,
+    "total_posts": 93,
+    "missing_keyword": 27,
+    "missing_keyword_pct": 29.0
+  },
+  "https://koreainvest365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Crypto &amp; Digital",
+        "count": 9
+      },
+      {
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "name": "Korea Funds &amp; ETF",
+        "count": 19
+      },
+      {
+        "name": "Korea Stocks",
+        "count": 37
+      }
+    ],
+    "empty_categories": [
+      "Etc"
+    ],
+    "etc_count": 0,
+    "etc_pct": 0.0,
+    "total_posts": 65,
+    "missing_keyword": 12,
+    "missing_keyword_pct": 18.5
+  },
+  "https://ki-korea.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 44
+      },
+      {
+        "name": "Pension",
+        "count": 0
+      },
+      {
+        "name": "Real Estate",
+        "count": 3
+      },
+      {
+        "name": "Stocks",
+        "count": 1
+      }
+    ],
+    "empty_categories": [
+      "Pension"
+    ],
+    "etc_count": 44,
+    "etc_pct": 91.7,
+    "total_posts": 48,
+    "missing_keyword": 0,
+    "missing_keyword_pct": 0.0
+  },
+  "https://koreainsurance365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Auto Insurance",
+        "count": 19
+      },
+      {
+        "name": "Dental Insurance",
+        "count": 9
+      },
+      {
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "name": "Health Insurance",
+        "count": 60
+      }
+    ],
+    "empty_categories": [
+      "Etc"
+    ],
+    "etc_count": 0,
+    "etc_pct": 0.0,
+    "total_posts": 88,
+    "missing_keyword": 11,
+    "missing_keyword_pct": 12.5
+  },
+  "https://kfinance365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Banking",
+        "count": 7
+      },
+      {
+        "name": "Etc",
+        "count": 17
+      },
+      {
+        "name": "Investing",
+        "count": 27
+      },
+      {
+        "name": "Tax Refund",
+        "count": 20
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 17,
+    "etc_pct": 23.9,
+    "total_posts": 71,
+    "missing_keyword": 24,
+    "missing_keyword_pct": 33.8
+  },
+  "https://koreataxnlaw.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Business Setup",
+        "count": 17
+      },
+      {
+        "name": "Etc",
+        "count": 31
+      },
+      {
+        "name": "Tax Filing",
+        "count": 32
+      },
+      {
+        "name": "Visa",
+        "count": 3
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 31,
+    "etc_pct": 37.3,
+    "total_posts": 83,
+    "missing_keyword": 31,
+    "missing_keyword_pct": 37.3
+  },
+  "https://koreacrypto365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 23
+      },
+      {
+        "name": "Exchanges",
+        "count": 12
+      },
+      {
+        "name": "Investing",
+        "count": 13
+      },
+      {
+        "name": "Regulations",
+        "count": 12
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 23,
+    "etc_pct": 38.3,
+    "total_posts": 60,
+    "missing_keyword": 14,
+    "missing_keyword_pct": 23.3
+  },
+  "https://krealestate365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Apartments",
+        "count": 16
+      },
+      {
+        "name": "Commercial",
+        "count": 10
+      },
+      {
+        "name": "Etc",
+        "count": 14
+      },
+      {
+        "name": "Loans",
+        "count": 3
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 14,
+    "etc_pct": 32.6,
+    "total_posts": 43,
+    "missing_keyword": 0,
+    "missing_keyword_pct": 0.0
+  },
+  "https://ktech365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "AI",
+        "count": 17
+      },
+      {
+        "name": "Etc",
+        "count": 22
+      },
+      {
+        "name": "Semiconductors",
+        "count": 11
+      },
+      {
+        "name": "Startups",
+        "count": 8
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 22,
+    "etc_pct": 37.9,
+    "total_posts": 58,
+    "missing_keyword": 7,
+    "missing_keyword_pct": 12.1
+  },
+  "https://kskin365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 20
+      },
+      {
+        "name": "Ingredients",
+        "count": 9
+      },
+      {
+        "name": "Routines",
+        "count": 9
+      },
+      {
+        "name": "Skincare",
+        "count": 39
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 20,
+    "etc_pct": 26.0,
+    "total_posts": 77,
+    "missing_keyword": 33,
+    "missing_keyword_pct": 42.9
+  },
+  "https://oliveyoungkorea.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 18
+      },
+      {
+        "name": "Skincare",
+        "count": 21
+      },
+      {
+        "name": "Top Products",
+        "count": 8
+      },
+      {
+        "name": "Wellness",
+        "count": 7
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 18,
+    "etc_pct": 33.3,
+    "total_posts": 54,
+    "missing_keyword": 9,
+    "missing_keyword_pct": 16.7
+  },
+  "https://kworld365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 4
+      },
+      {
+        "name": "K-Pop",
+        "count": 20
+      },
+      {
+        "name": "Learn Korean",
+        "count": 31
+      },
+      {
+        "name": "Travel",
+        "count": 5
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 4,
+    "etc_pct": 6.7,
+    "total_posts": 60,
+    "missing_keyword": 60,
+    "missing_keyword_pct": 100.0
+  },
+  "https://k-trip365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "AirBnB &amp; 민박",
+        "count": 1
+      },
+      {
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "name": "Hotels &amp; Stays",
+        "count": 12
+      },
+      {
+        "name": "Travel Guides",
+        "count": 45
+      },
+      {
+        "name": "기타",
+        "count": 1
+      }
+    ],
+    "empty_categories": [
+      "Etc"
+    ],
+    "etc_count": 1,
+    "etc_pct": 1.7,
+    "total_posts": 59,
+    "missing_keyword": 14,
+    "missing_keyword_pct": 23.7
+  },
+  "https://k-visa365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 5
+      },
+      {
+        "name": "etc-Uncategorized",
+        "count": 3
+      },
+      {
+        "name": "Long-term Visa",
+        "count": 29
+      },
+      {
+        "name": "Student Visa",
+        "count": 14
+      },
+      {
+        "name": "Work Visa",
+        "count": 9
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 5,
+    "etc_pct": 8.3,
+    "total_posts": 60,
+    "missing_keyword": 16,
+    "missing_keyword_pct": 26.7
+  },
+  "https://koreawedding365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Education",
+        "count": 6
+      },
+      {
+        "name": "Etc",
+        "count": 15
+      },
+      {
+        "name": "Marriage",
+        "count": 16
+      },
+      {
+        "name": "Matching",
+        "count": 10
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 15,
+    "etc_pct": 31.9,
+    "total_posts": 47,
+    "missing_keyword": 5,
+    "missing_keyword_pct": 10.6
+  },
+  "https://kstudy365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 2
+      },
+      {
+        "name": "ETC-Uncategorized",
+        "count": 3
+      },
+      {
+        "name": "Scholarships",
+        "count": 9
+      },
+      {
+        "name": "Student Life",
+        "count": 5
+      },
+      {
+        "name": "Study Korea",
+        "count": 30
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 2,
+    "etc_pct": 4.1,
+    "total_posts": 49,
+    "missing_keyword": 7,
+    "missing_keyword_pct": 14.3
+  },
+  "https://studyinkorea365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Admissions",
+        "count": 6
+      },
+      {
+        "name": "Campus Life",
+        "count": 5
+      },
+      {
+        "name": "Etc",
+        "count": 13
+      },
+      {
+        "name": "ETC-Uncategorized",
+        "count": 4
+      },
+      {
+        "name": "Scholarships",
+        "count": 12
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 13,
+    "etc_pct": 32.5,
+    "total_posts": 40,
+    "missing_keyword": 6,
+    "missing_keyword_pct": 15.0
+  },
+  "https://kieca-korea.org": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Careers",
+        "count": 24
+      },
+      {
+        "name": "Culture",
+        "count": 11
+      },
+      {
+        "name": "Etc",
+        "count": 11
+      },
+      {
+        "name": "Language",
+        "count": 4
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 11,
+    "etc_pct": 22.0,
+    "total_posts": 50,
+    "missing_keyword": 0,
+    "missing_keyword_pct": 0.0
+  },
+  "https://ksa-korea.org": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Admissions",
+        "count": 3
+      },
+      {
+        "name": "Etc",
+        "count": 18
+      },
+      {
+        "name": "Scholarships",
+        "count": 13
+      },
+      {
+        "name": "Visa",
+        "count": 3
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 18,
+    "etc_pct": 48.6,
+    "total_posts": 37,
+    "missing_keyword": 0,
+    "missing_keyword_pct": 0.0
+  },
+  "https://sis-korea.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 12
+      },
+      {
+        "name": "PROGRAMS",
+        "count": 11
+      },
+      {
+        "name": "Scholarships",
+        "count": 13
+      },
+      {
+        "name": "TOPIK",
+        "count": 6
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 12,
+    "etc_pct": 28.6,
+    "total_posts": 42,
+    "missing_keyword": 3,
+    "missing_keyword_pct": 7.1
+  },
+  "https://jobkorea365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 12
+      },
+      {
+        "name": "Jobs",
+        "count": 14
+      },
+      {
+        "name": "Salaries",
+        "count": 8
+      },
+      {
+        "name": "Work Visa",
+        "count": 15
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 12,
+    "etc_pct": 24.5,
+    "total_posts": 49,
+    "missing_keyword": 8,
+    "missing_keyword_pct": 16.3
+  },
+  "https://jobinkorea365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "name": "Interviews",
+        "count": 16
+      },
+      {
+        "name": "Jobs",
+        "count": 21
+      },
+      {
+        "name": "Salaries",
+        "count": 9
+      }
+    ],
+    "empty_categories": [
+      "Etc"
+    ],
+    "etc_count": 0,
+    "etc_pct": 0.0,
+    "total_posts": 46,
+    "missing_keyword": 10,
+    "missing_keyword_pct": 21.7
+  },
+  "https://jobkoreaglobal.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Etc",
+        "count": 0
+      },
+      {
+        "name": "Foreign Workers",
+        "count": 26
+      },
+      {
+        "name": "Hiring",
+        "count": 26
+      },
+      {
+        "name": "Salaries",
+        "count": 2
+      }
+    ],
+    "empty_categories": [
+      "Etc"
+    ],
+    "etc_count": 0,
+    "etc_pct": 0.0,
+    "total_posts": 54,
+    "missing_keyword": 9,
+    "missing_keyword_pct": 16.7
+  },
+  "https://korea365.org": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Culture",
+        "count": 30
+      },
+      {
+        "name": "Etc",
+        "count": 1
+      },
+      {
+        "name": "Living",
+        "count": 24
+      },
+      {
+        "name": "Travel",
+        "count": 18
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 1,
+    "etc_pct": 1.4,
+    "total_posts": 73,
+    "missing_keyword": 24,
+    "missing_keyword_pct": 32.9
+  },
+  "https://koreanews365.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "Business",
+        "count": 1
+      },
+      {
+        "name": "Health",
+        "count": 0
+      },
+      {
+        "name": "Newsbeat",
+        "count": 0
+      },
+      {
+        "name": "Science",
+        "count": 0
+      },
+      {
+        "name": "Sports",
+        "count": 1
+      },
+      {
+        "name": "Stories",
+        "count": 0
+      },
+      {
+        "name": "Tech",
+        "count": 0
+      },
+      {
+        "name": "World",
+        "count": 1
+      },
+      {
+        "name": "경제",
+        "count": 18
+      },
+      {
+        "name": "기타",
+        "count": 57
+      },
+      {
+        "name": "사회",
+        "count": 5
+      },
+      {
+        "name": "정치",
+        "count": 1
+      }
+    ],
+    "empty_categories": [
+      "Health",
+      "Newsbeat",
+      "Science",
+      "Stories",
+      "Tech"
+    ],
+    "etc_count": 57,
+    "etc_pct": 67.9,
+    "total_posts": 84,
+    "missing_keyword": 26,
+    "missing_keyword_pct": 31.0
+  },
+  "https://theseouljournal.com": {
+    "error": null,
+    "categories": [
+      {
+        "name": "CULTURE",
+        "count": 13
+      },
+      {
+        "name": "ECONOMY",
+        "count": 9
+      },
+      {
+        "name": "Etc.",
+        "count": 35
+      },
+      {
+        "name": "GLOBAL",
+        "count": 6
+      },
+      {
+        "name": "POLITICS",
+        "count": 7
+      }
+    ],
+    "empty_categories": [],
+    "etc_count": 35,
+    "etc_pct": 50.0,
+    "total_posts": 70,
+    "missing_keyword": 8,
+    "missing_keyword_pct": 11.4
+  }
+}

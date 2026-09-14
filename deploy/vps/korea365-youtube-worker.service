@@ -1,0 +1,18 @@
+[Unit]
+Description=Korea365 single-owner YouTube video worker
+After=network-online.target korea365-control.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=korea365
+Group=korea365
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/control-center.env
+ExecStart=/opt/korea365/.venv/bin/python scripts/youtube_vps_worker.py --daemon
+Restart=always
+RestartSec=5
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

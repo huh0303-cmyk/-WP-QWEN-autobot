@@ -1,0 +1,49 @@
+name: "Blogger — create 33 review drafts (legacy entry)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_key:
+        description: "Unique idempotency key for this 33-draft review run"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blogger-33-public-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Create 33 private drafts with prepared search descriptions
+        env:
+          BLOGGER_REVIEW_DRAFT_MODE: "true"
+          REVIEW_RUN_KEY: ${{ inputs.run_key }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/publish_blogger_33_now.py
+      - name: Upload public URL results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-33-review-results-${{ github.run_id }}
+          path: artifacts/blogger-33-public-results.json
+          retention-days: 30

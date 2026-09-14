@@ -1,0 +1,2 @@
+card_path=/tmp/infographic_fc2d1f27f6.png
+uploaded_url=https://k-health365.com/wp-content/uploads/2026/07/test-infographic-fallback.png

@@ -1,0 +1,26 @@
+name: Verify ten YouTube channel credentials
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        profile: [GLOBALMUSIC, HEALING, STARBUCKS, MBB, KPOP, NASA_SPACE_TIMES, HISTORY_TODAY_TIMES, INVENTION_TIMES, SILENT_ERA_TIMES, RETRO_REELS_TIMES]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - run: python scripts/youtube_auth_preflight.py
+        env:
+          PROFILE: ${{ matrix.profile }}
+          CLIENT_ID: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_ID_{0}', matrix.profile)] || secrets.YOUTUBE_OAUTH_CLIENT_ID || secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
+          CLIENT_SECRET: ${{ secrets[format('YOUTUBE_OAUTH_CLIENT_SECRET_{0}', matrix.profile)] || secrets.YOUTUBE_OAUTH_CLIENT_SECRET || secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
+          REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', matrix.profile)] || (matrix.profile == 'GLOBALMUSIC' && secrets.YOUTUBE_OAUTH_REFRESH_TOKEN) || '' }}

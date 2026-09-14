@@ -1,0 +1,26 @@
+name: "Repair K-Trip English language and SEO description"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repair-ktrip-english-seo
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Set English site language and verify the live search description
+        env:
+          WP_APP_PASSWORD: ${{ secrets.KTRIP365COM }}
+        run: python scripts/repair_ktrip_english_seo.py

@@ -1,0 +1,33 @@
+name: Site publication receipts
+on:
+  workflow_run:
+    workflows:
+      - "Blog Publish — Single Site (dispatched by A/B scheduler)"
+      - "Automation Hub — WordPress to Blogger rewrite"
+      - "Control Room — publish one reviewed post now"
+      - "Automation Hub — platform publish"
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  receipts:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Save attributable site outcomes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          if [ -n "$SOURCE_RUN_ID" ]; then
+            python scripts/collect_tile_publications.py --run-id "$SOURCE_RUN_ID"
+          else
+            python scripts/collect_tile_publications.py --backfill
+          fi

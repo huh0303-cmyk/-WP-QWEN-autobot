@@ -1,0 +1,23 @@
+name: "k-health365.com — Fix Burst Publish (privatize dupes + reschedule)"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Privatize duplicates + reschedule remaining posts
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/fix_khealth_burst.py

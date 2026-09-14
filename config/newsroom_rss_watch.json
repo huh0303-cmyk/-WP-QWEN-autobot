@@ -1,0 +1,13 @@
+{
+  "mode": "new_rss_item",
+  "poll_seconds": 60,
+  "daily_publication_limit": null,
+  "first_start": "baseline_existing_items",
+  "sources": [
+    {"key":"chosun_breaking","name":"조선일보","language":"ko","feed":"https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml"},
+    {"key":"donga_breaking","name":"동아일보","language":"ko","feed":"https://rss.donga.com/total.xml"},
+    {"key":"hani_breaking","name":"한겨레","language":"ko","feed":"https://www.hani.co.kr/rss/"},
+    {"key":"cnn_breaking","name":"CNN","language":"en","feed":"https://rss.cnn.com/rss/edition.rss"},
+    {"key":"nytimes_breaking","name":"The New York Times","language":"en","feed":"https://rss.nytimes.com/services/xml/rss/nyt/World.xml"}
+  ]
+}

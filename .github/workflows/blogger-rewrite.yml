@@ -1,0 +1,163 @@
+name: "Automation Hub — WordPress to Blogger rewrite"
+
+on:
+  workflow_dispatch:
+    inputs:
+      recover_from_wp:
+        description: "복구: 연결된 WP의 미사용 공개 원문으로 작성 (중복 원문 제외)"
+        type: boolean
+        default: false
+      source_wp_url:
+        description: "Optional exact WordPress source; blank auto-selects today's highest evidenced topic and closest related public post"
+        required: false
+        type: string
+      blogger_site_id:
+        description: "site_id from 자동화_플랫폼계정"
+        required: true
+        type: string
+      language:
+        description: "Output language"
+        required: true
+        default: "en"
+        type: string
+      persona:
+        description: "Blog-specific persona"
+        required: true
+        default: "helpful specialist editor"
+        type: string
+      tone:
+        description: "Blog-specific tone"
+        required: true
+        default: "practical and clear"
+        type: string
+      target_chars:
+        description: "Approximate output characters"
+        required: true
+        default: "1800"
+        type: string
+      force_keyword:
+        description: "키워드보고발행: CEO picked this exact topic; blank keeps 바이럴자동발행's own live cross-media research"
+        required: false
+        default: ""
+        type: string
+      publish_now:
+        description: "Explicit approval to publish; default creates a review draft"
+        required: true
+        default: false
+        type: boolean
+      fetch_jitter_max_seconds:
+        description: "Random 0-N second delay before fetching headlines, so a batch dispatch doesn't hit the same news feeds simultaneously from many runners; 0 for a single manual run"
+        required: false
+        default: "0"
+        type: string
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  # Per-site queue key. A single shared "blogger-rewrite-queue" group meant
+  # every one of the 33 Blogspot sites competed for the same one pending
+  # slot: GitHub Actions only keeps ONE queued run per concurrency group, so
+  # each new dispatch canceled whichever site was still waiting - the CEO
+  # would fire all 33 in a stagger and watch 32 of them get canceled before
+  # a runner ever picked them up. Keying by site id still prevents the same
+  # site from double-running if clicked twice, without sites blocking each
+  # other.
+  group: blogger-rewrite-queue-${{ inputs.blogger_site_id }}
+  cancel-in-progress: false
+
+jobs:
+  rewrite-and-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: data/stock_image_cache
+          key: stock-search-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: stock-search-${{ runner.os }}-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install requests google-api-python-client google-auth beautifulsoup4 -q
+      - name: Verify writing dependencies before source discovery or paid calls
+        run: python -c "from automation_hub.repetition_guard import history_prompt, repetition_issues, clean_opening"
+      - name: Golden keyword + GPT-5 mini authoring + deterministic review + approved image chain
+        id: queue
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          BUDGET_GITHUB_REPOSITORY: ${{ github.repository }}
+          BUDGET_GITHUB_BRANCH: main
+          GEMINI_EDITOR_ENABLED: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_ENABLED: "true"
+          OPENAI_MODEL: "gpt-5-mini"
+          CLAUDE_ENABLED: "false"
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ github.token }}
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+          BLOGGER_RECOVER_FROM_WP: ${{ inputs.recover_from_wp }}
+          SOURCE_WP_URL: ${{ inputs.source_wp_url }}
+          BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
+          BLOGGER_LANGUAGE: ${{ inputs.language }}
+          BLOGGER_PERSONA: ${{ inputs.persona }}
+          BLOGGER_TONE: ${{ inputs.tone }}
+          BLOGGER_TARGET_CHARS: ${{ inputs.target_chars }}
+          BLOGGER_FORCE_KEYWORD: ${{ inputs.force_keyword }}
+          BLOGGER_MAX_SIMILARITY: "0.55"
+          BLOGGER_MIN_QUALITY_SCORE: "70"
+          BLOGGER_PUBLISH_NOW: ${{ inputs.publish_now }}
+          FORCE_SOURCE_IPV4: "true"
+          BLOGGER_TOPIC_FETCH_JITTER_MAX_SECONDS: ${{ inputs.fetch_jitter_max_seconds }}
+        run: python scripts/queue_blogger_rewrite.py
+      - name: Continue directly to the exact Blogger publication job
+        if: ${{ inputs.publish_now && steps.queue.outputs.job_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QUEUED_JOB_ID: ${{ steps.queue.outputs.job_id }}
+          BLOGGER_SITE_ID: ${{ inputs.blogger_site_id }}
+        run: python scripts/dispatch_blogger_publication.py
+      - name: Preserve exact publication handoff
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-handoff-${{ github.run_id }}
+          path: artifacts/control-handoff.json
+          if-no-files-found: warn
+      - name: Preserve estimated budget receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: budget-estimate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: budget_state.json
+          if-no-files-found: warn
+      - name: Preserve failed draft for inspection without another generation
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-failed-draft-${{ github.run_id }}
+          path: artifacts/blogger-failed-draft.json
+          if-no-files-found: ignore
+
+      - name: Save image sources and estimated image costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-image-receipts-${{ github.run_id }}
+          path: |
+            artifacts/stock-image-receipts.jsonl
+            artifacts/image-cost-estimates.jsonl
+            artifacts/editorial-brief-cost.jsonl
+          if-no-files-found: ignore

@@ -1,0 +1,64 @@
+{
+  "version": 6,
+  "scope": [
+    "wordpress_27",
+    "blogger_33",
+    "tistory_5"
+  ],
+  "provider": "replicate",
+  "credential_secret": "REPLICATE_API_TOKEN",
+  "enabled_when_provider_credentials_exist": false,
+  "model_priority": [
+    {
+      "priority": 1,
+      "model": "SDXL-Lightning 4-step",
+      "model_id": "bytedance/sdxl-lightning-4step",
+      "role": "primary",
+      "license_gate": "OpenRAIL++ and provider terms"
+    },
+    {
+      "priority": 2,
+      "model": "FLUX.1 Schnell",
+      "model_id": "black-forest-labs/flux-schnell",
+      "role": "single fallback",
+      "license_gate": "Apache-2.0 or provider terms"
+    }
+  ],
+  "hard_rules": {
+    "require_article_or_video_topic_relevance": true,
+    "allow_zero_images_when_all_candidates_fail": true,
+    "images_per_article_min": 0,
+    "images_per_article_max": 2,
+    "free_stock_images_forbidden": false,
+    "playlist_thumbnail_existing_frame_only": true,
+    "thumbnail_video_generation_forbidden": true,
+    "never_insert_generic_filler_image": true,
+    "require_license_and_provider_cost_log": true,
+    "forbid_fabricated_official_documents": true,
+    "forbid_misleading_medical_legal_financial_evidence": true,
+    "forbid_any_visible_generated_text": true,
+    "forbid_illegible_pseudo_text_or_random_glyphs": true,
+    "forbid_fake_hangul_chinese_japanese_characters": true,
+    "avoid_documents_forms_screens_signs_labels_and_packaging": true,
+    "text_or_pseudo_text_detection_action": "REMOVE_IMAGE_AND_CONTINUE_TEXT_ONLY",
+    "human_review_required_before_blogger_publication": true,
+    "require_stock_subject_metadata_match": true,
+    "require_stock_self_hosting_and_credit": true
+  },
+  "failure_policy": {
+    "fallback_order": [
+      "Matching Pexels photo",
+      "Matching Pixabay photo",
+      "SDXL-Lightning 4-step",
+      "FLUX.1 Schnell"
+    ],
+    "fallback_to_free_stock": false,
+    "fallback_to_generic_image": false,
+    "when_all_generation_models_fail": "PASS_AND_CONTINUE_WITH_ZERO_IMAGES"
+  },
+  "notes": "2026-09-11 user instruction: article workflows use matching Pexels then Pixabay photos, self-host with source credits, then bounded SDXL/FLUX generation. Never use generic filler. Existing video generation cost hold remains in force.",
+  "stock_priority": [
+    "Pexels",
+    "Pixabay"
+  ]
+}

@@ -1,0 +1,29 @@
+name: "k-health365.com — Recovery Audit (read-only)"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Run read-only recovery audit (writes JSON only, changes nothing)
+        env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/khealth_recovery_audit.py --output artifacts/khealth-recovery-audit.json
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: khealth-recovery-audit-${{ github.run_id }}
+          path: artifacts/khealth-recovery-audit.json
+          retention-days: 14

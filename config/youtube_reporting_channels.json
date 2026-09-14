@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "purpose": "Strategic channels reported by the executive dashboard but not owned by the 10-channel publishing scheduler.",
+  "channels": [
+    {"display_name": "한국어(TOPIK)", "channel_id": "UCdA24IuR-JE7qButWv5jLqA", "enabled": true},
+    {"display_name": "영어(English Survival)", "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg", "enabled": true},
+    {"display_name": "다국어(Studio_starbucks)", "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng", "enabled": true},
+    {"display_name": "건강-영어(HealthClinicTV)", "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ", "enabled": true},
+    {"display_name": "건강-한국어(HealthClinic Seoul)", "channel_id": "UCAizx0tPkRSol8sIhanN_QQ", "enabled": true},
+    {"display_name": "일본어퀴즈(Studio Quiz JP)", "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg", "enabled": true}
+  ]
+}

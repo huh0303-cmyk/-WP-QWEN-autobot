@@ -1,0 +1,34 @@
+name: "K-Health365 — repair tags and focus keywords"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: khealth-tags-keywords-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Audit all posts and repair missing SEO fields
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+        run: python scripts/repair_khealth_tags_keywords.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: khealth-tags-keywords-${{ github.run_id }}
+          path: artifacts/khealth-tags-keywords-repair.json
+          if-no-files-found: error
+          retention-days: 30

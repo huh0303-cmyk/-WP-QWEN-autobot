@@ -1,0 +1,83 @@
+import pytest
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+from scripts.tistory_daily_planner import build_plan, load_config
+
+
+def test_tistory_portfolio_is_five_distinct_sites():
+    cfg = load_config()
+    assert len(cfg["sites"]) == 5
+    assert len({s["site_id"] for s in cfg["sites"]}) == 5
+    assert len({s["title"] for s in cfg["sites"]}) == 5
+
+
+def test_daily_plan_includes_all_five_launched_sites():
+    plan = build_plan(datetime(2026, 8, 28, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+    assert plan["portfolio_sites"] == 5
+    assert plan["enabled_sites"] == 5
+    assert len(plan["jobs"]) == 5
+    assert plan["daily_posts_per_site"] == 2
+    assert plan["public_allowed"] is False
+    assert all(j["publish_policy"] == "awaiting_approval" for j in plan["jobs"])
+    assert all(j["duplicate_guard"] is True for j in plan["jobs"])
+    assert all(j["public_allowed"] is False for j in plan["jobs"])
+
+
+def test_explicit_run_key_creates_a_unique_five_item_bundle(monkeypatch):
+    monkeypatch.setenv("TISTORY_RUN_KEY", "manual-20260903-1")
+    plan = build_plan(datetime(2026, 9, 3, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+    assert plan["run_key"] == "manual-20260903-1"
+    assert len({job["job_id"] for job in plan["jobs"]}) == 5
+    assert all(job["job_id"].endswith(":manual-20260903-1") for job in plan["jobs"])
+
+
+def test_life365_has_no_stale_petcare_label():
+    cfg = load_config()
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_life365")
+    assert site["current_label"] == "한국생활정보"
+    assert site["title"] == "한국생활정보"
+    assert site["url"] == "https://huh0303.tistory.com/"
+    assert site["official_source_required"] is True
+    assert "지원금·신청" in site["categories"]
+    assert "교통·시간표" in site["categories"]
+    assert site["rss_output"] == {"visibility": "full", "items": 50}
+    assert site["source_policy"]["copy_feed_content"] is False
+    assert "대한민국 정책브리핑 RSS (2026-07-01 종료)" in site["source_policy"]["discontinued_sources"]
+
+
+def test_finance_site_replaces_the_stale_healthcare_label():
+    cfg = load_config()
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_finance_housing")
+    assert site["current_label"] == "한국부동산금융정보"
+    assert site["title"] == "한국부동산금융정보"
+    assert "대출" in site["categories"]
+    assert "국가자격" not in site["categories"]
+
+
+def test_health_site_uses_the_healthcare_address():
+    cfg = load_config()
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_health_info")
+    assert site["url"] == "https://k-healthcare.tistory.com/"
+    assert site["title"] == "한국건강정보"
+    assert "건강검진" in site["categories"]
+
+
+def test_all_sites_are_enabled_for_staged_relaunch():
+    cfg = load_config()
+    assert [s["launch_order"] for s in sorted(cfg["sites"], key=lambda x: x["launch_order"])] == [1, 2, 3, 4, 5]
+    assert all(s["launch_enabled"] is True for s in cfg["sites"])
+    assert all(s["preserve_identity"] is True for s in cfg["sites"])
+
+
+def test_ktrip_is_korean_travel_information():
+    cfg = load_config()
+    site = next(s for s in cfg["sites"] if s["site_id"] == "tistory_ktrip365")
+    assert site["language"] == "ko"
+    assert site["title"] == "한국여행정보"
+    assert "한국어" in site["audience"]
+
+@pytest.fixture(autouse=True)
+def isolate_live_keyword_sources(monkeypatch):
+    monkeypatch.setattr('automation_hub.tistory_keywords.recent_history', lambda site: [])
+    monkeypatch.setattr('scripts.tistory_daily_planner._pick_seed_topic', lambda site, day: ('새로운 검증 주제', 80, {'live_cross_media':80}))

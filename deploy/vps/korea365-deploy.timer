@@ -1,0 +1,12 @@
+[Unit]
+Description=Check GitHub main for Korea365 deployments every minute
+
+[Timer]
+OnBootSec=90
+OnUnitInactiveSec=60
+RandomizedDelaySec=10
+Persistent=true
+Unit=korea365-deploy.service
+
+[Install]
+WantedBy=timers.target

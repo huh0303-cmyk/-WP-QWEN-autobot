@@ -1,0 +1,23 @@
+name: Deploy ki-korea.com title style fix
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Lighten entry-title and header site-title font weight
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+        run: python scripts/deploy_kikorea_title_style.py

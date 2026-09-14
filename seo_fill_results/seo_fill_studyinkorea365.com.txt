@@ -1,0 +1,54 @@
+https://studyinkorea365.com — 총 40건 처리 시작
+로그인 완료: https://studyinkorea365.com/wp-admin/
+  ⚠️ [2801] 오류: Page.goto: Timeout 60000ms exceeded.
+Call log:
+  - navigating to "https://studyinkorea365.com/wp-adm — The Truth About MBA scholarship Korea Th
+  ⚠️ [2760] 오류: Page.goto: Timeout 60000ms exceeded.
+Call log:
+  - navigating to "https://studyinkorea365.com/wp-adm — How to Actually Handle how to get schola
+  ⚠️ [2759] 오류: Page.goto: Timeout 60000ms exceeded.
+Call log:
+  - navigating to "https://studyinkorea365.com/wp-adm — How admission interview Korea tips Has C
+  ✅ [2758] 저장완료: Study Reveals: 7 in 10 People Misunderst
+  ✅ [2655] 저장완료: Before You Try Korean university culture
+  ✅ [2653] 저장완료: 5 Mistakes People Make With transfer adm
+  ✅ [2591] 저장완료: A Practical Look at MBA scholarship Kore
+  ✅ [2590] 저장완료: What Nobody Tells You About admission in
+  ✅ [2589] 저장완료: 5 Things About university sports facilit
+  ✅ [2588] 저장완료: research grant Korea Warning Signs You S
+  진행: 10/40
+  ✅ [2587] 저장완료: Debunking Common Myths About transfer ad
+  ✅ [2586] 저장완료: What Nobody Tells You About exchange pro
+  ✅ [2579] 저장완료: How university sports facilities Has Cha
+  ✅ [2578] 저장완료: exchange program Korea Warning Signs You
+  ✅ [2577] 저장완료: 9 Things About merit scholarship Korea Y
+  ✅ [2575] 저장완료: Behind the Scenes: What campus shuttle K
+  ✅ [2573] 저장완료: A Practical Look at MBA scholarship Kore
+  ✅ [2540] 저장완료: campus shuttle Korea guide: Frequently O
+  ✅ [2476] 저장완료: 5 Mistakes People Make With TTMIK Talk T
+  ✅ [2426] 저장완료: Is KT SKT LG U+ student plan comparison 
+  진행: 20/40
+  ✅ [2425] 저장완료: Why Does Korean resume writing tips fore
+  ✅ [2371] 저장완료: second year international student Korea 
+  ✅ [2370] 저장완료: 6 Things About internet setup Korea new 
+  ✅ [2368] 저장완료: beauty skincare routine Korea student li
+  ✅ [2366] 저장완료: MBA program Korea international students
+  ✅ [2362] 저장완료: How to Actually Handle graduate student 
+  ✅ [2357] 저장완료: Korean convenience store life hack stude
+  ✅ [2356] 저장완료: Debunking Common Myths About Korean webt
+  ✅ [2355] 저장완료: Before You Try GS25 CU 7-Eleven Korea st
+  ✅ [2354] 저장완료: startup ecosystem Korea foreign graduate
+  진행: 30/40
+  ✅ [2353] 저장완료: How master&#8217;s degree Korea English 
+  ✅ [2352] 저장완료: Insadong culture experience students Exp
+  ✅ [2350] 저장완료: What Nobody Tells You About utility bill
+  ✅ [2334] 저장완료: International Students 101: What First-T
+  ✅ [2315] 저장완료: Behind the Scenes: What Are You Making T
+  ✅ [2290] 저장완료: Don&#8217;t Wait: Understand Why &#8216;
+  ✅ [2281] 저장완료: The Truth About The Critical Consumer Da
+  ✅ [2279] 저장완료: Future Don&#8217;t Miss Out on Crucial L
+  ✅ [2249] 저장완료: The Real Cost of How to Actually Handle 
+  ✅ [2242] 저장완료: Rethinking Dream The Ultimate GKS Schola
+  진행: 40/40
+
+완료: 37/40 성공

@@ -1,0 +1,38 @@
+name: Generate Editorial Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject:
+        description: Article subject
+        required: true
+        type: string
+      theme:
+        description: Article theme
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Generate one approved editorial image
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          NANO_BANANA_FREE_TIER_ENABLED: "false"
+        run: >-
+          python scripts/generate_single_editorial_image.py
+          --subject "${{ inputs.subject }}"
+          --theme "${{ inputs.theme }}"
+          --output artifacts/editorial-image.webp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-image-${{ github.run_id }}
+          path: artifacts/editorial-image.webp
