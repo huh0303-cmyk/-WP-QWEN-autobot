@@ -61,7 +61,9 @@ jobs:
           # Despite the legacy name, this makes every single-site run fail when
           # zero posts were actually published. Orchestrators must never treat a
           # generated-but-blocked article as a successful publication.
-          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          # Draft-generation runs must finish successfully after saving the
+          # review draft. Public runs still fail unless a public URL exists.
+          NEWSROOM_REQUIRE_PUBLICATION: ${{ inputs.publication_approved && 'true' || 'false' }}
           TARGET_SITE_URL: ${{ inputs.target_site_url }}
           FORCE_SOURCE_IPV4: "true"
           FORCE_KEYWORD: ${{ inputs.force_keyword || steps.viral.outputs.keyword }}
