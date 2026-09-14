@@ -298,9 +298,9 @@
                     <span class="pointer-events-none absolute left-3 top-2.5 text-lg text-slate-400">⌕</span>
                 </label>
             </div>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="ranked-detailed-sites grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for site in sites %}
-                <article class="wordpress-card min-w-0 overflow-hidden rounded-2xl border bg-gradient-to-br from-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if site.google_approved %}border-2 border-amber-400 to-amber-50 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-blue-200 to-blue-50{% endif %}" data-search="{{ site.domain|lower }} {{ (site.category or '')|lower }}">
+                <article data-detailed-site="wp_{{ site.site_id }}" data-visitors="{{ site.today_visitors if site.today_visitors is not none else -1 }}" class="wordpress-card min-w-0 overflow-hidden rounded-2xl border bg-gradient-to-br from-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if site.google_approved %}border-2 border-amber-400 to-amber-50 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-blue-200 to-blue-50{% endif %}" data-search="{{ site.domain|lower }} {{ (site.category or '')|lower }}">
                 <form method="post" action="{{ url_for('trigger_publish_site_now') }}" class="force-publish-form space-y-3 p-4" data-domain="{{ site.domain }}" {% if site.auth_ready %}onsubmit="return confirmForcePublish(event, this);"{% else %}onsubmit="return false;" aria-disabled="true"{% endif %}>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <input type="hidden" name="domain" value="{{ site.domain }}">
@@ -308,7 +308,7 @@
                     <input type="hidden" name="submit_mode" class="force-submit-mode" value="">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
+                            <span class="detailed-rank flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-black text-white" title="일일 방문자 내림차순">오늘 {{ loop.index }}위</span>
                             <span class="rounded-full bg-blue-100 px-2 py-1 text-[9px] font-black text-blue-700" title="WordPress">WP</span>
                             <span class="break-all font-bold text-slate-800">{{ site.domain }}</span>
                         </div>
@@ -452,9 +452,9 @@
                 </div>
             </div>
             <p class="text-xs text-slate-400">방문자 수집 완료 채널 우선 · 당일 방문자 내림차순 · 미연결 채널은 수집 대기</p>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="ranked-detailed-sites grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for blog in bloggers %}
-                <article class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}">
+                <article data-detailed-site="blogspot_{{ blog.site_id }}" data-visitors="{{ blog.today_visitors if blog.today_visitors is not none else -1 }}" class="min-w-0 space-y-3 rounded-2xl border bg-gradient-to-br from-white to-violet-50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg {% if blog.google_approved %}border-2 border-amber-400 shadow-amber-200/70 ring-1 ring-amber-300{% else %}border-violet-200{% endif %}">
                 <form method="post" action="{{ url_for('trigger_draft') }}"
                       class="force-publish-form space-y-3"
                       data-domain="{{ blog.wp_url|replace('https://', '')|replace('http://', '') }}" {% if not blog.connected %}onsubmit="return false;" aria-disabled="true"{% endif %}>
@@ -468,7 +468,7 @@
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <div class="mb-1 flex items-center gap-2">
-                                <span class="flex h-7 min-w-7 items-center justify-center rounded-full bg-violet-600 px-2 text-xs font-black text-white" title="당일 방문자 내림차순">오늘 {{ loop.index }}위</span>
+                                <span class="detailed-rank flex h-7 min-w-7 items-center justify-center rounded-full bg-violet-600 px-2 text-xs font-black text-white" title="일일 방문자 내림차순">오늘 {{ loop.index }}위</span>
                                 <span class="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700" title="Blogspot">BLOG</span>
                                 <p class="truncate text-[10px] font-bold text-slate-400">등록 B{{ blog.order }} · {{ blog.category }}</p>
                             </div>
@@ -918,6 +918,22 @@
             });
         }
         sortSiteTiles();
+        function sortDetailedSites() {
+            document.querySelectorAll('.ranked-detailed-sites').forEach(function(grid) {
+                let last = null, rank = 0;
+                Array.from(grid.children).sort(function(a,b) {
+                    return Number(b.dataset.visitors) - Number(a.dataset.visitors);
+                }).forEach(function(card, i) {
+                    const value = Number(card.dataset.visitors);
+                    if (value !== last) rank = i + 1;
+                    const badge = card.querySelector('.detailed-rank');
+                    if (badge) badge.textContent = value < 0 ? '미집계' : '오늘 ' + rank + '위';
+                    last = value;
+                    grid.appendChild(card);
+                });
+            });
+        }
+        sortDetailedSites();
         function historyTime(at) {
             const date = new Date(at);
             return Number.isNaN(date.getTime()) ? '시각 미확인' : new Intl.DateTimeFormat('ko-KR', {timeZone:'Asia/Seoul', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false}).format(date) + ' KST';
@@ -971,7 +987,13 @@
                     tile.dataset.visitors = fresh.dataset.visitors;
                     tile.querySelector('.tile-metrics').replaceWith(fresh.querySelector('.tile-metrics').cloneNode(true));
                 });
+                const detailed = new Map(Array.from(updated.querySelectorAll('[data-detailed-site]')).map(function(el) { return [el.dataset.detailedSite, el]; }));
+                document.querySelectorAll('[data-detailed-site]').forEach(function(card) {
+                    const fresh = detailed.get(card.dataset.detailedSite);
+                    if (fresh) card.dataset.visitors = fresh.dataset.visitors;
+                });
                 sortSiteTiles();
+                sortDetailedSites();
             } catch (_) {}
         }, 300000);
         document.querySelectorAll('[data-quick-group]').forEach(function (button) {
