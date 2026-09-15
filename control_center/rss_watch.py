@@ -12,6 +12,17 @@ from pathlib import Path
 
 NEWSROOM_COST_HOLD = Path("/etc/korea365/newsroom-cost-hold")
 
+# 2026-09-12: high-volume Korean news feeds can surface several new items
+# within one poll cycle. Dispatching every one of them back-to-back hit
+# koreanews365.com's Hostinger host-level rate limiter, which started
+# returning 403 on the WP REST reads process_one() needs before it can even
+# check for duplicate coverage. Every affected run then failed with zero
+# published posts, and the Blogger companion - having no fresh WP article to
+# pair with - kept rewriting the one stale post that predated the outage
+# into repeated near-duplicate articles. Spacing dispatches per newsroom
+# gives the host's rate limiter room to reset between calls.
+MIN_DISPATCH_GAP_SECONDS = 240
+
 import requests
 
 from .operations import Conflict
@@ -108,10 +119,20 @@ class RSSWatcher:
         targets = {t["label"].split(".")[0]: t for t in self.targets()}
         with self.store.connect() as db:
             waiting = db.execute("SELECT * FROM rss_items WHERE state='waiting' ORDER BY CASE WHEN title LIKE '%속보%' OR title LIKE '%긴급%' OR title LIKE '%breaking%' THEN 0 ELSE 1 END, detected,published LIMIT 200").fetchall()
+        dispatched_this_scan = set()
         for item in waiting:
             if item["newsroom"] not in targets:
                 continue
+            if item["newsroom"] in dispatched_this_scan:
+                # Leave any further items from this newsroom 'waiting' for a
+                # later scan rather than burying them behind the cooldown
+                # below - the ORDER BY already prioritizes breaking news.
+                continue
+            last_dispatch_key = f"rss_last_dispatch_{item['newsroom']}"
             with self.store.connect() as db:
+                row = db.execute("SELECT value FROM settings WHERE key=?", (last_dispatch_key,)).fetchone()
+                if row and time.time() - float(row[0]) < MIN_DISPATCH_GAP_SECONDS:
+                    continue
                 evidence = db.execute("SELECT payload FROM rss_item_evidence WHERE id=?", (item['id'],)).fetchone()
                 if not evidence:
                     db.execute("UPDATE rss_items SET state='awaiting_source' WHERE id=?", (item['id'],))
@@ -125,8 +146,10 @@ class RSSWatcher:
                 self.store.submit("news2", [descriptor], "rss-" + item["id"])
             except Conflict:
                 continue
+            dispatched_this_scan.add(item["newsroom"])
             with self.store.connect() as db:
                 db.execute("UPDATE rss_items SET state='accepted' WHERE id=?", (item["id"],))
+                db.execute("INSERT INTO settings VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (last_dispatch_key, str(time.time())))
         with self.store.connect() as db:
             db.execute("UPDATE settings SET value=? WHERE key='rss_scan_lease'", (str(time.time() + self.config["poll_seconds"]),))
 
