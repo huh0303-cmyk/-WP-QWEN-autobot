@@ -17,8 +17,20 @@ done
 
 mkdir -p "$(dirname "$DOC_DST")" "$(dirname "$POLICY_DST")" "$(dirname "$RECEIPT")"
 
-install -m 0644 "$DOC_SRC" "$DOC_DST"
-install -m 0644 "$POLICY_SRC" "$POLICY_DST"
+copy_if_needed() {
+  local src="$1" dst="$2"
+  local src_real dst_real
+  src_real="$(readlink -f "$src")"
+  dst_real="$(readlink -f "$dst" 2>/dev/null || true)"
+  if [[ -n "$dst_real" && "$src_real" == "$dst_real" ]]; then
+    chmod 0644 "$dst"
+    return 0
+  fi
+  install -m 0644 "$src" "$dst"
+}
+
+copy_if_needed "$DOC_SRC" "$DOC_DST"
+copy_if_needed "$POLICY_SRC" "$POLICY_DST"
 
 GIT_SHA="unknown"
 if command -v git >/dev/null 2>&1 && git -C "$ROOT" rev-parse HEAD >/dev/null 2>&1; then
