@@ -1,0 +1,43 @@
+{
+  "project": {
+    "id": "project-a",
+    "name": "Project A",
+    "canonical_document": "docs/PROJECT_A_BLUEPRINT.md",
+    "canonical_repo": "huh0303-cmyk/-WP-QWEN-autobot",
+    "vps_root": "/opt/korea365",
+    "vps_blueprint": "/opt/korea365/docs/PROJECT_A_BLUEPRINT.md"
+  },
+  "governance": {
+    "final_decision_maker": "chairman",
+    "primary_pm": "codex",
+    "plan_b_acting_pm": "claude",
+    "plan_c_continuity": "gemini",
+    "verified_complete_authority": "deterministic_audit_engine"
+  },
+  "roles": {
+    "codex": ["project_management", "architecture", "prioritization", "task_decomposition", "implementation", "assignment", "remediation", "consolidated_reporting"],
+    "claude": ["independent_audit", "qa", "regression_review", "release_gate_review", "acting_pm_on_primary_failure", "incident_review", "executive_audit_summary"],
+    "gemini": ["blogger_production", "low_cost_generation", "structured_extraction", "secondary_audit_crosscheck", "plan_c_continuity_for_preapproved_tasks"],
+    "vps": ["persistent_workers", "scheduling", "rendering", "youtube_workers", "rss_collection", "audit_probes", "durable_state"],
+    "github": ["canonical_code", "workflow_execution", "version_history", "rollback"]
+  },
+  "failover": {
+    "pm_chain": ["openai", "anthropic", "gemini"],
+    "audit_summary_chain": ["anthropic", "gemini", "openai"],
+    "triggers": ["quota_exhausted", "rate_limit", "timeout", "provider_outage", "authentication_failure", "expired_pm_lease", "repeated_provider_failure"],
+    "handoff_required": ["open_tasks", "recent_decisions", "acceptance_criteria", "recent_errors", "audit_failures", "unfinished_assignments"]
+  },
+  "truth_model": {
+    "states": ["REQUESTED", "RUNNING", "READY_FOR_AUDIT", "VERIFIED_COMPLETE", "VERIFIED_PRIVATE", "FAILED", "BLOCKED", "NEEDS_ATTENTION"],
+    "rules": ["no_ai_may_self_certify_verified_complete", "workflow_success_is_not_publication_evidence", "generated_file_is_not_upload_evidence", "queue_status_is_not_publication_evidence", "external_evidence_must_match_exact_job_and_target"]
+  },
+  "verification": {
+    "web_publication": ["exact_target_identity", "public_url", "successful_http_response", "not_admin_preview_or_login", "not_404_or_error_placeholder", "expected_title_or_job_marker_when_available", "verification_timestamp"],
+    "youtube_private": ["valid_video_id", "exact_channel_id", "privacy_status_private", "validated_studio_url", "job_bound_upload_receipt"],
+    "youtube_public": ["valid_video_id", "exact_channel_id", "privacy_status_public", "youtube_api_retrieval_success", "verified_public_watch_url"]
+  },
+  "blueprint_update_policy": {
+    "must_update_on": ["agent_role_change", "failover_order_change", "platform_scope_change", "completion_rule_change", "audit_evidence_change", "runtime_location_change", "cost_policy_change", "publishing_policy_change"],
+    "vps_sync_requires_git_sha_record": true
+  }
+}
