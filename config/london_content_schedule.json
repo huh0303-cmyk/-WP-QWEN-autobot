@@ -1,0 +1,82 @@
+{
+  "project": "london-project",
+  "timezone": "Asia/Seoul",
+  "schedule_policy": {
+    "planned_jitter_minutes": 60,
+    "forbid_exact_hour": true,
+    "avoid_regular_minute_multiples": [0,5,10,15,20,25,30,35,40,45,50,55],
+    "minimum_same_platform_gap_minutes": 30,
+    "avoid_repeating_same_day_time_pattern": true,
+    "spread_targets_across_distinct_minutes": true
+  },
+  "cadence": {
+    "wordpress_general": {
+      "scope": "each_enabled_general_wordpress_site",
+      "target": "1_per_day",
+      "randomized_time": true
+    },
+    "newsrooms": {
+      "sites": ["The Seoul Journal", "Koreanews365"],
+      "target": "rss_event_driven",
+      "separate_from_general_wordpress": true
+    },
+    "blogspot": {
+      "special_a": "3_to_4_per_week",
+      "a": "3_to_4_per_week",
+      "b": "2_to_3_per_week",
+      "no_wordpress_copy_paste": true
+    },
+    "tistory": {
+      "site_count": 5,
+      "target": "2_to_3_per_week"
+    },
+    "youtube_playlist": {
+      "channel_count": 5,
+      "target": "2_to_3_per_week_per_channel",
+      "upload_default": "private",
+      "human_review_before_public": true
+    },
+    "youtube_knowledge": {
+      "channel_count": 5,
+      "target": "2_to_3_per_week_per_channel",
+      "upload_default": "private",
+      "human_review_before_public": true
+    },
+    "survival_10_language": {
+      "languages": ["Korean/TOPIK", "English", "Japanese", "Chinese", "Vietnamese", "Spanish", "French", "German", "Italian", "Portuguese"],
+      "lessons_per_language": 50,
+      "total_lessons": 500,
+      "completed_through_lesson": 2,
+      "next_lesson": 3,
+      "target": "3_per_week_per_language",
+      "upload_default": "private",
+      "require_verified_private_before_review": true,
+      "require_chairman_approval_before_public": true,
+      "spread_languages_across_distinct_slots": true
+    },
+    "instagram": {
+      "target": "4_to_7_per_week_per_active_brand"
+    },
+    "threads": {
+      "target": "mirror_instagram_topic_and_direction"
+    },
+    "tiktok": {
+      "target": "4_to_7_per_week_per_active_brand"
+    },
+    "facebook": {
+      "target": "3_to_7_per_week_per_active_brand"
+    }
+  },
+  "approval": {
+    "youtube_private_state": "VERIFIED_PRIVATE",
+    "human_review_state": "REVIEW_REQUIRED",
+    "public_state_after_api_verification": "VERIFIED_COMPLETE",
+    "never_public_without_human_approval": true
+  },
+  "failover": {
+    "plan_a": "codex_primary_pm",
+    "plan_b": "claude_acting_pm",
+    "plan_c": "gemini_continuity",
+    "safe_hold": "preserve_queue_stop_new_generation_and_unapproved_publication"
+  }
+}
