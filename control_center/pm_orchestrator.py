@@ -12,6 +12,24 @@ from .orchestrator import generate_text
 
 PRIMARY_PM = "codex"
 BACKUP_PM = "claude"
+PLAN_C_PM = "gemini"
+ROOT = Path(__file__).resolve().parents[1]
+BLUEPRINT_DOC = ROOT / "docs" / "PROJECT_A_BLUEPRINT.md"
+BLUEPRINT_POLICY = ROOT / "config" / "project_a_blueprint.json"
+
+
+def _blueprint_context() -> dict[str, Any]:
+    policy: dict[str, Any] = {}
+    document = ""
+    try:
+        policy = json.loads(BLUEPRINT_POLICY.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        policy = {"error": "Project A machine policy unavailable"}
+    try:
+        document = BLUEPRINT_DOC.read_text(encoding="utf-8")[:30000]
+    except OSError:
+        document = "Project A blueprint document unavailable"
+    return {"policy": policy, "document": document}
 
 
 def _db_path() -> str:
@@ -21,7 +39,7 @@ def _db_path() -> str:
     control_db = os.environ.get("CONTROL_OPERATIONS_DB", "").strip()
     if control_db:
         return control_db
-    return str(Path(__file__).resolve().parents[1] / "data" / "control-operations.sqlite3")
+    return str(ROOT / "data" / "control-operations.sqlite3")
 
 
 def _connect() -> sqlite3.Connection:
@@ -108,7 +126,13 @@ def handoff_packet() -> dict[str, Any]:
         events = db.execute(
             "SELECT task_id,actor,event,detail,created FROM pm_events ORDER BY id DESC LIMIT 50"
         ).fetchall()
-    return {"runtime": dict(runtime), "open_tasks": [dict(r) for r in tasks], "recent_events": [dict(r) for r in events]}
+    return {
+        "project": "Project A",
+        "runtime": dict(runtime),
+        "open_tasks": [dict(r) for r in tasks],
+        "recent_events": [dict(r) for r in events],
+        "blueprint": _blueprint_context(),
+    }
 
 
 def _acquire_lease(owner: str) -> bool:
@@ -140,31 +164,36 @@ def release_lease(owner: str) -> None:
 
 
 def _set_active_pm(provider: str, reason: str, packet: dict[str, Any]) -> str:
-    active = PRIMARY_PM if provider == "openai" else BACKUP_PM if provider == "anthropic" else provider
+    active = PRIMARY_PM if provider == "openai" else BACKUP_PM if provider == "anthropic" else PLAN_C_PM if provider == "gemini" else provider
     with _connect() as db:
         row = db.execute("SELECT active_pm,epoch FROM pm_runtime WHERE id=1").fetchone()
         old, epoch = str(row["active_pm"]), int(row["epoch"])
         db.execute("UPDATE pm_runtime SET active_pm=?,epoch=?,last_handoff=?,updated=? WHERE id=1",
                    (active, epoch + int(old != active), json.dumps(packet, ensure_ascii=False), time.time()))
     if old != active:
-        _log(active, "pm_failover" if active != PRIMARY_PM else "pm_restored",
-             {"from": old, "to": active, "reason": reason})
+        event = "pm_restored" if active == PRIMARY_PM else "pm_failover"
+        _log(active, event, {"from": old, "to": active, "reason": reason})
     return active
 
 
 def _prompt(task: sqlite3.Row, packet: dict[str, Any]) -> str:
-    return f"""You are the active Project Manager for the Korea365 automation system.
+    blueprint = packet.get("blueprint", {})
+    return f"""You are the active Project Manager for Project A, the Korea365 automation system.
 The chairman/user is final decision maker. CODEX/OpenAI is primary PM. If CODEX is unavailable, quota-limited,
 rate-limited, timed out or cannot continue, Claude automatically becomes Acting PM with continuity responsibility.
+If both CODEX and Claude are unavailable, Gemini is Plan C continuity for pre-approved operational work.
 The Acting PM must continue the same project state, not restart strategy from scratch.
 Never claim completion without external evidence. A PM decision can only request verification; it cannot self-certify publication.
 Do not invent credentials, paid approvals, URLs, test results or publication evidence.
+
+Project A canonical blueprint and machine policy:
+{json.dumps(blueprint, ensure_ascii=False)[:42000]}
 
 Task title: {task['title']}
 Objective: {task['objective']}
 Acceptance criteria: {task['acceptance_criteria']}
 Payload: {task['payload']}
-Handoff state: {json.dumps(packet, ensure_ascii=False)[:24000]}
+Handoff state: {json.dumps({k: v for k, v in packet.items() if k != 'blueprint'}, ensure_ascii=False)[:24000]}
 
 Return JSON only:
 {{"status":"plan|delegate|review|rework|blocked|ready_for_audit","summary":"...","next_actions":[],
@@ -193,7 +222,6 @@ def run_task(task_id: str) -> dict[str, Any]:
             decision = {"status": "review", "summary": raw[:4000], "next_actions": [], "assignments": [],
                         "risks": ["PM response was not valid JSON"], "needs_human_approval": False,
                         "completion_evidence_required": []}
-        # PM is never allowed to mark itself verified_complete. The audit layer owns that state.
         state = "ready_for_audit" if decision.get("status") == "ready_for_audit" else str(decision.get("status") or "review")
         with _connect() as db:
             db.execute("UPDATE pm_tasks SET state=?,active_pm=?,decision=?,updated=? WHERE task_id=?",
@@ -212,6 +240,10 @@ def run_task(task_id: str) -> dict[str, Any]:
 
 def status() -> dict[str, Any]:
     packet = handoff_packet()
-    packet["policy"] = {"primary_pm": PRIMARY_PM, "plan_b_pm": BACKUP_PM,
-                        "verified_complete_owner": "deterministic audit engine"}
+    packet["policy"] = {
+        "primary_pm": PRIMARY_PM,
+        "plan_b_pm": BACKUP_PM,
+        "plan_c_pm": PLAN_C_PM,
+        "verified_complete_owner": "deterministic audit engine",
+    }
     return packet
