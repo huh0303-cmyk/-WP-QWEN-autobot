@@ -1,0 +1,12 @@
+[Unit]
+Description=Sync and checksum Project A canonical blueprint on VPS
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/korea365
+EnvironmentFile=-/etc/korea365/control.env
+ExecStart=/bin/bash /opt/korea365/scripts/sync_project_a_blueprint.sh
+UMask=0077
