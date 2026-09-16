@@ -234,6 +234,48 @@ def record_failover(task_id: str, *, from_role: str, to_role: str, reason: str,
            event_type="FAILOVER", detail={"from": from_role, "to": to_role, "reason": reason})
 
 
+def record_human_approval(task_id: str, *, approved: bool, actor: str = "chairman",
+                          detail: dict[str, Any] | None = None) -> None:
+    with _connect() as db:
+        row = db.execute("SELECT correlation_id FROM london_tasks WHERE task_id=?", (task_id,)).fetchone()
+        if not row:
+            raise KeyError(task_id)
+        correlation_id = str(row["correlation_id"])
+    _event(task_id=task_id, correlation_id=correlation_id, actor=actor,
+           event_type="HUMAN_APPROVAL", detail={"approved": bool(approved), **(detail or {})},
+           success=bool(approved))
+
+
+def record_audit_result(task_id: str, *, passed: bool, evidence: list[dict[str, Any]],
+                        actor: str = "deterministic_audit_engine",
+                        detail: dict[str, Any] | None = None,
+                        verified_state: str = "VERIFIED_COMPLETE") -> None:
+    with _connect() as db:
+        row = db.execute("SELECT correlation_id FROM london_tasks WHERE task_id=?", (task_id,)).fetchone()
+        if not row:
+            raise KeyError(task_id)
+        correlation_id = str(row["correlation_id"])
+    _event(task_id=task_id, correlation_id=correlation_id, actor=actor,
+           event_type="AUDIT_RESULT", detail={"passed": bool(passed), **(detail or {})},
+           evidence=evidence, success=bool(passed))
+    if passed:
+        transition(task_id, verified_state, actor=actor, evidence=evidence,
+                   detail=detail or {}, verified_by_audit=(verified_state == "VERIFIED_COMPLETE"))
+    else:
+        transition(task_id, "REWORK_REQUIRED", actor=actor, evidence=evidence,
+                   detail=detail or {})
+
+
+def record_note(task_id: str, *, actor: str, event_type: str, detail: dict[str, Any]) -> None:
+    with _connect() as db:
+        row = db.execute("SELECT correlation_id FROM london_tasks WHERE task_id=?", (task_id,)).fetchone()
+        if not row:
+            raise KeyError(task_id)
+        correlation_id = str(row["correlation_id"])
+    _event(task_id=task_id, correlation_id=correlation_id, actor=actor,
+           event_type=event_type, detail=detail)
+
+
 def get_task(task_id: str) -> dict[str, Any]:
     with _connect() as db:
         task = db.execute("SELECT * FROM london_tasks WHERE task_id=?", (task_id,)).fetchone()
