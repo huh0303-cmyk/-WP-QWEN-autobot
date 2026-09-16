@@ -108,6 +108,7 @@ def submit_task(title: str, objective: str, *, platform: str = "", target: str =
                 payload: dict[str, Any] | None = None, parent_task_id: str = "") -> str:
     body = dict(payload or {})
     body["objective"] = objective
+    body["pm_managed"] = True
     task_id = london_activity.create_task(
         title,
         platform=platform,
@@ -123,15 +124,24 @@ def submit_task(title: str, objective: str, *, platform: str = "", target: str =
     return task_id
 
 
-def _open_tasks(limit: int = 200) -> list[dict[str, Any]]:
+def _is_pm_managed(row: dict[str, Any]) -> bool:
+    try:
+        payload = json.loads(str(row.get("payload", "{}")) or "{}")
+    except ValueError:
+        return False
+    return payload.get("pm_managed") is True
+
+
+def _open_tasks(limit: int = 200, *, pm_only: bool = False) -> list[dict[str, Any]]:
     rows = london_activity.recent(limit)["tasks"]
     terminal = {"VERIFIED_COMPLETE", "FAILED", "CANCELLED"}
-    return [row for row in rows if str(row.get("state", "")).upper() not in terminal]
+    result = [row for row in rows if str(row.get("state", "")).upper() not in terminal]
+    return [row for row in result if _is_pm_managed(row)] if pm_only else result
 
 
 def next_work_task_id() -> str:
     priorities = ["REQUESTED", "PLANNED", "ASSIGNED", "REWORK_REQUIRED"]
-    rows = _open_tasks(1000)
+    rows = _open_tasks(1000, pm_only=True)
     for state in priorities:
         matches = [r for r in rows if str(r.get("state", "")).upper() == state]
         if matches:
@@ -199,6 +209,8 @@ def run_task(task_id: str) -> dict[str, Any]:
     try:
         snapshot = london_activity.get_task(task_id)
         task = snapshot["task"]
+        if not _is_pm_managed(task):
+            raise RuntimeError("Task is not PM-managed; publication mirror tasks are not sent to an LLM")
         packet = handoff_packet()
         london_activity.transition(task_id, "RUNNING", actor="orchestrator")
         try:
