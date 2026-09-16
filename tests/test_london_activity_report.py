@@ -1,8 +1,31 @@
 import json
-import os
 import runpy
 import sqlite3
 from pathlib import Path
+
+
+def _task_row(task_id, state):
+    return (
+        task_id,          # task_id
+        "",               # parent_task_id
+        task_id,          # correlation_id
+        "report test",    # title
+        "wordpress",      # platform
+        "example.com",    # target
+        "chairman",       # requested_by
+        "codex",          # assigned_role
+        state,            # state
+        "[]",             # acceptance_criteria
+        "{}",             # payload
+        "{}",             # result
+        "[]",             # evidence
+        "",               # error
+        0,                # retry_count
+        1.0,              # created
+        2.0,              # updated
+        1.0,              # started
+        2.0,              # finished
+    )
 
 
 def test_activity_report_keeps_success_and_failure(monkeypatch, tmp_path):
@@ -23,9 +46,8 @@ def test_activity_report_keeps_success_and_failure(monkeypatch, tmp_path):
             success INTEGER, created REAL
         );
     """)
-    base = ("", "", "t", "wordpress", "x", "u", "codex", "[]", "{}", "{}", "[]", "", 0, 1.0, 2.0, 1.0, 2.0)
-    db.execute("INSERT INTO london_tasks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ("ok",) + base[:7] + ("VERIFIED_COMPLETE",) + base[7:])
-    db.execute("INSERT INTO london_tasks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ("bad",) + base[:7] + ("FAILED",) + base[7:])
+    db.execute("INSERT INTO london_tasks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", _task_row("ok", "VERIFIED_COMPLETE"))
+    db.execute("INSERT INTO london_tasks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", _task_row("bad", "FAILED"))
     db.commit()
     db.close()
 
