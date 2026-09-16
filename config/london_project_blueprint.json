@@ -1,0 +1,40 @@
+{
+  "project": {
+    "id": "london-project",
+    "name": "런던프로젝트 (London Project)",
+    "canonical_document": "docs/LONDON_PROJECT_BLUEPRINT.md",
+    "canonical_repo": "huh0303-cmyk/-WP-QWEN-autobot",
+    "vps_root": "/opt/korea365",
+    "vps_blueprint": "/opt/korea365/docs/LONDON_PROJECT_BLUEPRINT.md"
+  },
+  "governance": {
+    "final_decision_maker": "chairman",
+    "primary_pm": "codex",
+    "plan_b_acting_pm": "claude",
+    "plan_c_continuity": "gemini",
+    "verified_complete_authority": "deterministic_audit_engine"
+  },
+  "failover": {
+    "pm_chain": ["openai", "anthropic", "gemini"],
+    "audit_summary_chain": ["anthropic", "gemini", "openai"],
+    "triggers": ["quota_exhausted", "rate_limit", "timeout", "provider_outage", "authentication_failure", "expired_pm_lease", "repeated_provider_failure"],
+    "handoff_required": ["open_tasks", "recent_decisions", "acceptance_criteria", "recent_errors", "audit_failures", "unfinished_assignments"]
+  },
+  "truth_model": {
+    "states": ["REQUESTED", "RUNNING", "READY_FOR_AUDIT", "VERIFIED_COMPLETE", "VERIFIED_PRIVATE", "FAILED", "BLOCKED", "NEEDS_ATTENTION"],
+    "rules": ["no_ai_may_self_certify_verified_complete", "workflow_success_is_not_publication_evidence", "generated_file_is_not_upload_evidence", "queue_status_is_not_publication_evidence", "external_evidence_must_match_exact_job_and_target"]
+  },
+  "verification": {
+    "web_publication": ["exact_target_identity", "public_url", "successful_http_response", "not_admin_preview_or_login", "not_404_or_error_placeholder", "expected_title_or_job_marker_when_available", "verification_timestamp"],
+    "youtube_private": ["valid_video_id", "exact_channel_id", "privacy_status_private", "validated_studio_url", "job_bound_upload_receipt"],
+    "youtube_public": ["valid_video_id", "exact_channel_id", "privacy_status_public", "youtube_api_retrieval_success", "verified_public_watch_url"]
+  },
+  "runtime": {
+    "github_blueprint": "docs/LONDON_PROJECT_BLUEPRINT.md",
+    "vps_blueprint": "/opt/korea365/docs/LONDON_PROJECT_BLUEPRINT.md",
+    "vps_policy": "/opt/korea365/config/london_project_blueprint.json",
+    "vps_version_receipt": "/opt/korea365/data/london_project_blueprint_version.json",
+    "vps_audit_json": "/opt/korea365/data/london_project_audit_report.json",
+    "vps_audit_markdown": "/opt/korea365/data/london_project_audit_report.md"
+  }
+}
