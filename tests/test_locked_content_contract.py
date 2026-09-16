@@ -130,5 +130,5 @@ def test_canonical_docs_have_single_wordpress_cadence_contract():
     safety = (ROOT / "docs" / "PUBLISHING_SAFETY_POLICY_2026-08-25.md").read_text(encoding="utf-8")
     assert "과거 특A/A/B 등급별\n발행 빈도는 폐지" in tiers
     assert "`daily_min=1`" in tiers and "`weekly_max=7`" in tiers
-    assert "일일 발행 횟수 제한 없음" in newsroom
+    assert "목표는 KST 하루 3~10건" in newsroom
     assert "등급과 관계없이 사이트별 매일 1건, 주 7건" in safety
