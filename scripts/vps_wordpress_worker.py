@@ -100,13 +100,17 @@ def run_one(path: Path, job: dict) -> bool:
     secret_name = str(job.get("secret_name", "")).strip()
     if not site_url or not secret_name:
         job.update(status="failed", error="site_url and secret_name are required", checked_at=_now())
-        path.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+        target = path.with_name(path.name[:-len(".processing.json")] + ".failed.json")
+        path.rename(target)
+        target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
         return False
     credentials = json.loads(CREDENTIALS.read_text(encoding="utf-8"))
     password = credentials.get(secret_name, "")
     if not password:
         job.update(status="credential_required", error="credential is not provisioned", checked_at=_now())
-        path.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+        target = path.with_name(path.name[:-len(".processing.json")] + ".credential_required.json")
+        path.rename(target)
+        target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
         return False
     # Preferred production path: GitHub supplies an already reviewed article;
     # VPS performs only the authenticated, idempotent REST publication.
