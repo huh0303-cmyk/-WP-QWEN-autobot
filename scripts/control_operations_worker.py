@@ -1,5 +1,6 @@
 """VPS operations worker + London Project durable activity mirror/PM loop."""
 import json
+import os
 import sys
 import threading
 import time
@@ -25,11 +26,11 @@ PHASE_STATE = {
 }
 
 
-def _json(value, default):
+def _audit_backfill_seconds():
     try:
-        return json.loads(value or "")
-    except (TypeError, ValueError):
-        return default
+        return max(0, int(os.environ.get("LONDON_LEDGER_BACKFILL_AUDIT_HOURS", "24"))) * 3600
+    except ValueError:
+        return 24 * 3600
 
 
 def _ensure_task(job):
@@ -84,6 +85,21 @@ def _mirror_job(job):
                     detail={"phase": phase, "reason": "published phase lacks public URL/site identity"},
                 )
             return
+
+        # Historical backfill is recorded but not mass-refetched. Only recent
+        # publications are automatically audited; older ones stay traceable as
+        # READY_FOR_AUDIT until an explicit audit pass requests them.
+        created_at = float(job.get("created_at") or 0)
+        if created_at and time.time() - created_at > _audit_backfill_seconds():
+            if current != "READY_FOR_AUDIT":
+                london_activity.transition(
+                    str(job["id"]), "READY_FOR_AUDIT", actor="operations_mirror",
+                    evidence=_evidence(job),
+                    detail={"phase": phase, "historical_backfill": True, "automatic_refetch": False},
+                )
+            return
+        if current in {"REWORK_REQUIRED", "NEEDS_ATTENTION"}:
+            return
         if current != "AUDITING":
             london_activity.transition(
                 str(job["id"]), "AUDITING", actor="operations_mirror",
@@ -116,7 +132,6 @@ def _activity_mirror_loop():
                 try:
                     _mirror_job(job)
                 except Exception as exc:
-                    # Mirror failures must never stop the publication receipt worker.
                     task_id = str(job.get("id", ""))
                     if task_id:
                         try:
