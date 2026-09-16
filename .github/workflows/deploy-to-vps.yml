@@ -22,7 +22,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           script: |
             set -e
-            # Share the timer's lock, video guard, backup and rollback logic.
             set +e
             systemctl start korea365-deploy.service
             deploy_rc=$?
@@ -35,8 +34,15 @@ jobs:
               echo "=== KOREA365 DEPLOY STATUS JSON ==="
               cat /opt/korea365/data/deploy-status.json || true
               echo "=== SAFE SERVER HOTFIX DIFF: control_center/app.py ==="
-              # Code-only diff. Environment files, credentials and runtime data are never printed.
               git -C /opt/korea365 diff --no-ext-diff -- control_center/app.py | sed -n '1,1200p' || true
+              echo "=== SAFE SERVER CONTROL_CENTER STATUS ==="
+              git -C /opt/korea365 status --short --untracked-files=all control_center | sed -n '1,300p' || true
+              echo "=== SAFE SERVER MODULE: playlist_v3_page.py ==="
+              if [ -f /opt/korea365/control_center/playlist_v3_page.py ]; then
+                sed -n '1,1600p' /opt/korea365/control_center/playlist_v3_page.py
+              else
+                echo "MISSING"
+              fi
               exit "$deploy_rc"
             fi
 
@@ -53,9 +59,6 @@ jobs:
             PY
             systemctl is-active korea365-control.service korea365-operations.service
 
-            # London Project is hosted inside korea365-operations.service.
-            # Require fresh heartbeats from both the activity mirror and PM loop,
-            # so a green systemd state cannot masquerade as an inactive orchestrator.
             python3 - <<'PY'
             import json, time
             from pathlib import Path
