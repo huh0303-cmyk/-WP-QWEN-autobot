@@ -10,6 +10,8 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from flask import jsonify, request
 
+from .playlist_v3_page import install as install_playlist_v3
+
 BOT_RE = re.compile(r'bot|crawl|spider|slurp|bingpreview|facebookexternalhit|pingdom|uptime|ahrefs|semrush|mj12', re.I)
 KST = timezone(timedelta(hours=9))
 VISITOR_RE = re.compile(r'^[A-Za-z0-9_-]{20,80}$')
@@ -39,6 +41,10 @@ def install(module):
     Path(path).parent.mkdir(parents=True,exist_ok=True)
     profiles=json.loads((root/'config/content_engine_profiles.json').read_text())['profiles']
     origins={p['site_key']:p['blogspot']['url'].rstrip('/') for p in profiles}
+
+    # Preserve the reviewed VPS playlist status hotfix in canonical source code
+    # without requiring a server-only modification to control_center/app.py.
+    install_playlist_v3(app)
 
     def respond(payload,code=200):
         response=jsonify(payload)
