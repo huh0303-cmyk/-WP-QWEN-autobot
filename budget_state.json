@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 11.52,
+  "spent_estimate_usd": 11.55,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -3191,6 +3191,15 @@
       "amount_usd": 0.03,
       "reservation_id": "288e22e0c7f98385a27d7f3017e7d42a149be082c43cc4a24b1ec4584d0e3375",
       "run_id": "35081797507",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-16T18:53:11.021220+09:00",
+      "label": "blogger-rewrite:blogger_kworld365_kpop",
+      "amount_usd": 0.03,
+      "reservation_id": "ebf0e4f12c4e7f5b06bd569e54ac26f3cca7450e3efccc11517e2f3e91c674e0",
+      "run_id": "35081807037",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
