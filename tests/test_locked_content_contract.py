@@ -118,9 +118,10 @@ def test_youtube_generated_schedule_has_no_fixed_short_period_or_time_collision(
 
 def test_policy_lock_records_newsroom_and_youtube_exceptions():
     text = (ROOT / "docs" / "CONTENT_CADENCE_POLICY_LOCK.md").read_text(encoding="utf-8")
-    assert "no daily minimum, maximum, or fixed publication slots" in text
-    assert "700–1,500 visible characters" in text
+    assert "3–10 verified stories" in text
+    assert "hard maximum 10" in text
     assert "every **2–3 days**" in text
+    assert "10 languages × 50 lessons" in text
 
 
 def test_canonical_docs_have_single_wordpress_cadence_contract():
@@ -129,5 +130,5 @@ def test_canonical_docs_have_single_wordpress_cadence_contract():
     safety = (ROOT / "docs" / "PUBLISHING_SAFETY_POLICY_2026-08-25.md").read_text(encoding="utf-8")
     assert "과거 특A/A/B 등급별\n발행 빈도는 폐지" in tiers
     assert "`daily_min=1`" in tiers and "`weekly_max=7`" in tiers
-    assert "일일 발행 횟수 제한 없음" in newsroom
+    assert "목표는 KST 하루 3~10건" in newsroom
     assert "등급과 관계없이 사이트별 매일 1건, 주 7건" in safety
