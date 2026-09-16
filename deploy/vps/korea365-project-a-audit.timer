@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Project A audit every hour
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+Persistent=true
+Unit=korea365-project-a-audit.service
+
+[Install]
+WantedBy=timers.target
