@@ -34,6 +34,9 @@ jobs:
               journalctl -u korea365-deploy.service -n 120 --no-pager || true
               echo "=== KOREA365 DEPLOY STATUS JSON ==="
               cat /opt/korea365/data/deploy-status.json || true
+              echo "=== SAFE SERVER HOTFIX DIFF: control_center/app.py ==="
+              # Code-only diff. Environment files, credentials and runtime data are never printed.
+              git -C /opt/korea365 diff --no-ext-diff -- control_center/app.py | sed -n '1,1200p' || true
               exit "$deploy_rc"
             fi
 
