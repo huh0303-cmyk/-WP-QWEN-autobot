@@ -12,6 +12,39 @@ from control_center.app import _operation_worker
 from control_center import london_activity, london_orchestrator
 from control_center.audit_engine import verify_web_publication
 
+ROOT = Path(__file__).resolve().parents[1]
+RUNTIME_STATUS = Path(os.environ.get(
+    "LONDON_RUNTIME_STATUS",
+    ROOT / "data" / "london_project_runtime.json",
+))
+_RUNTIME_LOCK = threading.Lock()
+_RUNTIME = {
+    "project": "london-project",
+    "process_started_at": time.time(),
+    "operations_worker": "starting",
+    "activity_mirror": "starting",
+    "pm_loop": "starting",
+    "activity_mirror_heartbeat": 0,
+    "pm_loop_heartbeat": 0,
+    "active_pm": "unknown",
+    "last_pm_task_id": "",
+    "provider_configured": {
+        "openai": bool(os.environ.get("OPENAI_API_KEY", "").strip()),
+        "anthropic": bool(os.environ.get("ANTHROPIC_API_KEY", "").strip()),
+        "gemini": bool(os.environ.get("GEMINI_API_KEY", "").strip()),
+    },
+}
+
+
+def _write_runtime(**updates):
+    with _RUNTIME_LOCK:
+        _RUNTIME.update(updates)
+        _RUNTIME["written_at"] = time.time()
+        RUNTIME_STATUS.parent.mkdir(parents=True, exist_ok=True)
+        tmp = RUNTIME_STATUS.with_suffix(".tmp")
+        tmp.write_text(json.dumps(_RUNTIME, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(tmp, RUNTIME_STATUS)
+
 
 PHASE_STATE = {
     "accepted": "REQUESTED",
@@ -86,9 +119,6 @@ def _mirror_job(job):
                 )
             return
 
-        # Historical backfill is recorded but not mass-refetched. Only recent
-        # publications are automatically audited; older ones stay traceable as
-        # READY_FOR_AUDIT until an explicit audit pass requests them.
         created_at = float(job.get("created_at") or 0)
         if created_at and time.time() - created_at > _audit_backfill_seconds():
             if current != "READY_FOR_AUDIT":
@@ -126,6 +156,7 @@ def _mirror_job(job):
 
 
 def _activity_mirror_loop():
+    _write_runtime(activity_mirror="active", activity_mirror_heartbeat=time.time())
     while True:
         try:
             for job in _operation_worker.store.snapshot():
@@ -141,19 +172,28 @@ def _activity_mirror_loop():
                             )
                         except Exception:
                             pass
-        except Exception:
-            pass
+            _write_runtime(activity_mirror="active", activity_mirror_heartbeat=time.time())
+        except Exception as exc:
+            _write_runtime(activity_mirror="degraded", activity_mirror_heartbeat=time.time(),
+                           activity_mirror_error=str(exc)[:300])
         time.sleep(5)
 
 
 def _pm_loop():
+    _write_runtime(pm_loop="active", pm_loop_heartbeat=time.time())
     while True:
         task_id = ""
         try:
+            status = london_orchestrator.status()
+            active_pm = str(status.get("runtime", {}).get("active_pm", "unknown"))
             task_id = london_orchestrator.next_work_task_id()
+            _write_runtime(pm_loop="active", pm_loop_heartbeat=time.time(),
+                           active_pm=active_pm, last_pm_task_id=task_id)
             if task_id:
                 london_orchestrator.run_task(task_id)
         except Exception as exc:
+            _write_runtime(pm_loop="degraded", pm_loop_heartbeat=time.time(),
+                           last_pm_task_id=task_id, pm_loop_error=str(exc)[:300])
             if task_id:
                 try:
                     london_activity.record_note(
@@ -166,6 +206,7 @@ def _pm_loop():
 
 
 if __name__ == "__main__":
+    _write_runtime(operations_worker="active")
     threading.Thread(target=_activity_mirror_loop, daemon=True, name="london-activity-mirror").start()
     threading.Thread(target=_pm_loop, daemon=True, name="london-pm-loop").start()
     _operation_worker.run()
