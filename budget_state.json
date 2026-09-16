@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 11.07,
+  "spent_estimate_usd": 11.1,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -3056,6 +3056,15 @@
       "amount_usd": 0.03,
       "reservation_id": "b92b8e52ebe7a15be0dbd53a140a8b92118ccb129f3f474073351d0fd17abc96",
       "run_id": "35033508737",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-16T18:52:27.923940+09:00",
+      "label": "blogger-rewrite:blogger_medicaltour",
+      "amount_usd": 0.03,
+      "reservation_id": "d46a2c9de396a1b695c5040a76c8f81cba76f908fab7d411404294e9a394a152",
+      "run_id": "35081787539",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
