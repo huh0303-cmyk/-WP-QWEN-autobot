@@ -1,17 +1,11 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 from typing import Any
 
-import requests
-
+from .orchestrator import generate_text
 from .registry import WordPressSite
-
-
-OPENAI_URL = "https://api.openai.com/v1/chat/completions"
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 
 def build_prompt(site: WordPressSite, keyword: str, feedback: list[str] | None = None) -> str:
@@ -50,11 +44,11 @@ def _parse_json(raw: str) -> dict[str, Any]:
     text = re.sub(r"\s*```$", "", text)
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
-        raise ValueError("ChatGPT response did not contain a JSON object")
+        raise ValueError("LLM response did not contain a JSON object")
     data = json.loads(text[start:end + 1])
     for key in ("title", "meta_description", "content_html", "labels", "image_queries"):
         if key not in data:
-            raise ValueError(f"ChatGPT response is missing {key}")
+            raise ValueError(f"LLM response is missing {key}")
     if not isinstance(data["labels"], list) or not isinstance(data["image_queries"], list):
         raise ValueError("labels and image_queries must be arrays")
     data["labels"] = [str(x).strip() for x in data["labels"] if str(x).strip()][:5]
@@ -62,44 +56,23 @@ def _parse_json(raw: str) -> dict[str, Any]:
     return data
 
 
-def _openai_generate(model: str, prompt: str) -> str:
-    key = os.environ.get("OPENAI_API_KEY", "").strip()
-    if not key:
-        raise RuntimeError("OPENAI_API_KEY가 없어 OpenAI 글 생성을 시작하지 않았습니다")
-    response = requests.post(
-        OPENAI_URL,
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-        json={"model": model, "messages": [{"role": "user", "content": prompt}]},
-        timeout=120,
-    )
-    if response.status_code >= 400:
-        raise RuntimeError(f"OpenAI API 오류 HTTP {response.status_code}: {response.text[:240]}")
-    try:
-        return response.json()["choices"][0]["message"]["content"]
-    except (ValueError, KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError("OpenAI API 응답 형식을 읽을 수 없습니다") from exc
+def generate_article(
+    site: WordPressSite,
+    keyword: str,
+    feedback: list[str] | None = None,
+    *,
+    text_model: str = "gpt-5.6-luna",
+    task_type: str | None = None,
+) -> dict[str, Any]:
+    """Generate through Project A provider failover.
 
-
-def _gemini_generate(model: str, prompt: str) -> str:
-    key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not key:
-        raise RuntimeError("GEMINI_API_KEY가 없어 Gemini 글 생성을 시작하지 않았습니다")
-    response = requests.post(
-        GEMINI_URL.format(model=model), params={"key": key},
-        headers={"Content-Type": "application/json"},
-        json={"contents": [{"role": "user", "parts": [{"text": prompt}]}],
-              "generationConfig": {"responseMimeType": "application/json"}},
-        timeout=120,
-    )
-    if response.status_code >= 400:
-        raise RuntimeError(f"Gemini API 오류 HTTP {response.status_code}: {response.text[:240]}")
-    try:
-        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except (ValueError, KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError("Gemini API 응답 형식을 읽을 수 없습니다") from exc
-
-
-def generate_article(site: WordPressSite, keyword: str, feedback: list[str] | None = None, *, text_model: str = "gpt-5-mini") -> dict[str, Any]:
+    `text_model` remains for compatibility with existing callers. A Gemini
+    hint selects the Blogger/Gemini-first chain; WordPress uses
+    OpenAI -> Claude -> Gemini. Actual model ids are environment-configurable.
+    """
     prompt = build_prompt(site, keyword, feedback)
-    raw = _gemini_generate(text_model, prompt) if text_model.startswith("gemini-") else _openai_generate(text_model, prompt)
-    return _parse_json(raw)
+    resolved_task_type = task_type or ("blogger" if text_model.startswith("gemini-") else "wordpress")
+    raw, meta = generate_text(prompt, task_type=resolved_task_type)
+    result = _parse_json(raw)
+    result["orchestrator"] = meta
+    return result
