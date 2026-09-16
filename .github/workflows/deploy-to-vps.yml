@@ -23,7 +23,20 @@ jobs:
           script: |
             set -e
             # Share the timer's lock, video guard, backup and rollback logic.
+            set +e
             systemctl start korea365-deploy.service
+            deploy_rc=$?
+            set -e
+            if [ "$deploy_rc" -ne 0 ]; then
+              echo "=== KOREA365 DEPLOY SERVICE STATUS ==="
+              systemctl status korea365-deploy.service --no-pager -l || true
+              echo "=== KOREA365 DEPLOY JOURNAL ==="
+              journalctl -u korea365-deploy.service -n 120 --no-pager || true
+              echo "=== KOREA365 DEPLOY STATUS JSON ==="
+              cat /opt/korea365/data/deploy-status.json || true
+              exit "$deploy_rc"
+            fi
+
             python3 - <<'PY'
             import json
             from pathlib import Path
