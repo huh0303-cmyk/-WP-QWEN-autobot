@@ -27,24 +27,18 @@ jobs:
             deploy_rc=$?
             set -e
             if [ "$deploy_rc" -ne 0 ]; then
-              echo "=== KOREA365 DEPLOY SERVICE STATUS ==="
-              systemctl status korea365-deploy.service --no-pager -l || true
-              echo "=== KOREA365 DEPLOY JOURNAL ==="
-              journalctl -u korea365-deploy.service -n 80 --no-pager || true
-              echo "=== KOREA365 DEPLOY STATUS JSON ==="
+              echo "=== KOREA365 DEPLOY STATUS ==="
               cat /opt/korea365/data/deploy-status.json || true
-              echo "=== TRACKED WORKTREE MODIFICATIONS ==="
-              git -C /opt/korea365 status --short --untracked-files=no | sed -n '1,500p' || true
-              echo "=== SAFE SERVER HOTFIX DIFF: control_center/app.py ==="
+              echo "=== TRACKED MANAGED HOTFIXES ==="
+              git -C /opt/korea365 status --short --untracked-files=no control_center scripts config deploy .github tests automation_hub tools multilang_quiz | sed -n '1,400p' || true
+              echo "=== DIFF app.py ==="
               git -C /opt/korea365 diff --no-ext-diff -- control_center/app.py | sed -n '1,1400p' || true
-              echo "=== SAFE SERVER HOTFIX DIFF: control_center/templates/index.html ==="
-              git -C /opt/korea365 diff --no-ext-diff -- control_center/templates/index.html | sed -n '1,1800p' || true
-              echo "=== SAFE SERVER MODULE: playlist_v3_page.py ==="
-              if [ -f /opt/korea365/control_center/playlist_v3_page.py ]; then
-                sed -n '1,1600p' /opt/korea365/control_center/playlist_v3_page.py
-              else
-                echo "MISSING"
-              fi
+              echo "=== DIFF index.html ==="
+              git -C /opt/korea365 diff --no-ext-diff -- control_center/templates/index.html | sed -n '1,2200p' || true
+              echo "=== DIFF situation_room_daily.py ==="
+              git -C /opt/korea365 diff --no-ext-diff -- scripts/situation_room_daily.py | sed -n '1,1800p' || true
+              echo "=== DIFF vps_wordpress_worker.py ==="
+              git -C /opt/korea365 diff --no-ext-diff -- scripts/vps_wordpress_worker.py | sed -n '1,1800p' || true
               exit "$deploy_rc"
             fi
 
