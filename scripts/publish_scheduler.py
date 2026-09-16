@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 """Dispatch due WordPress calendar rows through the existing A/B draft pipeline.
 
+London Project production control is active from 2026-09-16. This file remains
+one of the explicit wake-up paths for the WordPress daily public-minimum scheduler.
+
 The 14-day calendar is the source of WHAT/WHEN. Missed slots are PASS.
 The registry's established tier cadence and independent newsroom routing remain intact. Every dispatch
 keeps publication_approved=false, so this scheduler can only create review drafts.
