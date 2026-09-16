@@ -61,18 +61,10 @@ def generate_article(
     keyword: str,
     feedback: list[str] | None = None,
     *,
-    text_model: str = "gpt-5-mini",
-    task_type: str | None = None,
+    task_type: str = "wordpress",
 ) -> dict[str, Any]:
-    """Generate an article through the resilient server-side orchestrator.
-
-    `text_model` is retained for compatibility with existing callers. A Gemini
-    model hint selects the Blogger/Gemini-first chain; otherwise WordPress uses
-    OpenAI -> Claude -> Gemini. Actual model ids are environment-configurable.
-    """
     prompt = build_prompt(site, keyword, feedback)
-    resolved_task_type = task_type or ("blogger" if text_model.startswith("gemini-") else "wordpress")
-    raw, meta = generate_text(prompt, task_type=resolved_task_type)
+    raw, meta = generate_text(prompt, task_type=task_type)
     result = _parse_json(raw)
     result["orchestrator"] = meta
     return result
