@@ -1,16 +1,24 @@
-"""VPS new-item detector. Polling a feed never implies publishing a quota."""
+"""VPS new-item detector for the London Project newsrooms.
+
+RSS is the source of timely leads. Each newsroom targets 3-10 verified
+stories per KST day, with a hard dispatch cap of 10. If there are fewer than
+three verified source leads, the system never fabricates filler to hit a quota.
+"""
 import hashlib
 import html
 import re
 import json
 import time
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
 from pathlib import Path
 
 NEWSROOM_COST_HOLD = Path("/etc/korea365/newsroom-cost-hold")
+NEWSROOM_DAILY_TARGET_MIN = 3
+NEWSROOM_DAILY_MAX = 10
+KST = timezone(timedelta(hours=9))
 
 import requests
 
@@ -26,9 +34,11 @@ def parse_feed(text):
         if item.tag.split("}")[-1] not in {"item", "entry"}:
             continue
         children = {c.tag.split("}")[-1]: c for c in item}
+
         def value(name):
             node = children.get(name)
             return "" if node is None else "".join(node.itertext()).strip()
+
         link = children.get("link")
         url = (link.get("href") or value("link")) if link is not None else ""
         parsed = urlparse(url)
@@ -47,6 +57,40 @@ def parse_feed(text):
             items.append({"title": value("title"), "url": url.split("#")[0], "published": published,
                           "summary": re.sub(r"\s+", " ", html.unescape(summary)).strip()[:5000]})
     return items
+
+
+def _dispatch_counter_key(newsroom: str, day: str | None = None) -> str:
+    day = day or datetime.now(KST).date().isoformat()
+    return f"rss_dispatch_count:{day}:{newsroom}"
+
+
+def _dispatch_count(store, newsroom: str) -> int:
+    key = _dispatch_counter_key(newsroom)
+    with store.connect() as db:
+        row = db.execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()
+    try:
+        return int(row[0]) if row else 0
+    except (TypeError, ValueError):
+        return 0
+
+
+def _increment_dispatch_count(store, newsroom: str) -> int:
+    key = _dispatch_counter_key(newsroom)
+    with store.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        row = db.execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()
+        try:
+            current = int(row[0]) if row else 0
+        except (TypeError, ValueError):
+            current = 0
+        updated = current + 1
+        db.execute(
+            "INSERT INTO settings(key,value) VALUES (?,?) "
+            "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            (key, str(updated)),
+        )
+        db.commit()
+    return updated
 
 
 class RSSWatcher:
@@ -69,8 +113,6 @@ class RSSWatcher:
             initialized = bool(feed and feed[0])
             for item in items:
                 identity = hashlib.sha256((key + "|" + item["url"].rstrip("/")).encode()).hexdigest()
-                # First successful read establishes a baseline, so starting a
-                # new VPS cannot republish a backlog of old stories.
                 state = "waiting" if initialized else "baseline"
                 if item["published"] is not None and now - item["published"] > 72 * 3600:
                     state = "expired"
@@ -81,8 +123,9 @@ class RSSWatcher:
             db.execute("INSERT INTO rss_feeds(key,initialized,checked,error) VALUES (?,1,?,'') ON CONFLICT(key) DO UPDATE SET initialized=1,checked=excluded.checked,error=''", (source["key"], now))
 
     def scan(self):
-        # Coordinate the monitor service and all web workers. A restart recovers
-        # after lease expiry; insertion and request IDs are also idempotent.
+        # One scanner owns a lease. New verified items remain waiting when a
+        # newsroom has already reached the London Project daily cap, so they can
+        # be considered on the next KST day rather than being silently dropped.
         now = time.time()
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -100,8 +143,6 @@ class RSSWatcher:
                     db.execute("INSERT INTO rss_feeds(key,checked,error) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET checked=excluded.checked,error=excluded.error",
                                (source["key"], time.time(), "RSS 연결 또는 형식 확인 실패"))
         if NEWSROOM_COST_HOLD.exists():
-            # Continue recording fresh RSS evidence while paid writing is held.
-            # Do not repeatedly dispatch a disabled workflow and report 422s.
             with self.store.connect() as db:
                 db.execute("UPDATE settings SET value=? WHERE key='rss_scan_lease'", (str(time.time() + self.config["poll_seconds"]),))
             return
@@ -109,7 +150,10 @@ class RSSWatcher:
         with self.store.connect() as db:
             waiting = db.execute("SELECT * FROM rss_items WHERE state='waiting' ORDER BY CASE WHEN title LIKE '%속보%' OR title LIKE '%긴급%' OR title LIKE '%breaking%' THEN 0 ELSE 1 END, detected,published LIMIT 200").fetchall()
         for item in waiting:
-            if item["newsroom"] not in targets:
+            newsroom = item["newsroom"]
+            if newsroom not in targets:
+                continue
+            if _dispatch_count(self.store, newsroom) >= NEWSROOM_DAILY_MAX:
                 continue
             with self.store.connect() as db:
                 evidence = db.execute("SELECT payload FROM rss_item_evidence WHERE id=?", (item['id'],)).fetchone()
@@ -119,12 +163,13 @@ class RSSWatcher:
                 if item['published'] is None or not -600 <= time.time()-item['published'] <= 72*3600:
                     db.execute("UPDATE rss_items SET state='expired' WHERE id=?", (item['id'],))
                     continue
-            descriptor = dict(targets[item["newsroom"]], source="rss", source_title=item["title"], source_url=item["url"])
+            descriptor = dict(targets[newsroom], source="rss", source_title=item["title"], source_url=item["url"])
             descriptor["inputs"] = dict(descriptor["inputs"], source_url=item["url"], source_item=evidence[0])
             try:
                 self.store.submit("news2", [descriptor], "rss-" + item["id"])
             except Conflict:
                 continue
+            _increment_dispatch_count(self.store, newsroom)
             with self.store.connect() as db:
                 db.execute("UPDATE rss_items SET state='accepted' WHERE id=?", (item["id"],))
         with self.store.connect() as db:
@@ -139,7 +184,14 @@ class RSSWatcher:
             feed["name"] = names.get(feed["key"],feed["key"])
         stale = any(not f["checked"] or time.time()-f["checked"] > 180 for f in feeds)
         failed = sum(bool(f["error"]) for f in feeds)
-        message = "RSS 새 기사 감지 → 작성·검수·게시 · 일일 발행 횟수 제한 없음"
+        today_counts = {
+            newsroom: _dispatch_count(self.store, newsroom)
+            for newsroom in ("koreanews365", "theseouljournal")
+        }
+        message = (
+            f"RSS 새 기사 감지 → 검증·작성·게시 · newsroom별 목표 {NEWSROOM_DAILY_TARGET_MIN}-{NEWSROOM_DAILY_MAX}건/일 "
+            f"(검증 소스 부족 시 억지 충족 금지) · 오늘 dispatch {today_counts}"
+        )
         if NEWSROOM_COST_HOLD.exists():
             message = "RSS 새 기사 감지 중 · 비용 중지로 작성·게시 대기"
         message += f" · 대기 기사 {waiting}건"
@@ -147,4 +199,5 @@ class RSSWatcher:
             message += " · 감시 시작 확인 대기"
         elif failed or stale:
             message += f" · 연결 실패 {failed}개" + (" · 감시 확인 지연" if stale else "")
-        return {"message": message, "feeds": feeds, "waiting": waiting}
+        return {"message": message, "feeds": feeds, "waiting": waiting, "today_dispatch": today_counts,
+                "daily_target_min": NEWSROOM_DAILY_TARGET_MIN, "daily_max": NEWSROOM_DAILY_MAX}
