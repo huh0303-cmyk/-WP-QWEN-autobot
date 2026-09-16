@@ -1,0 +1,1 @@
+The unattended publishing system must never depend on a single ChatGPT/Codex interactive session. Product-session message/token limits are not observable from the VPS. Therefore continuity is implemented in the server-side work queue and LLM API layer, where actual API failures and quota/rate-limit signals can be detected and routed to Claude or Gemini.
