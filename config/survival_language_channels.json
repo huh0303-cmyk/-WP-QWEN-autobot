@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "project": "london-project",
+  "program": "10-Language Survival 50",
+  "lessons_per_language": 50,
+  "completed_through_lesson": 2,
+  "next_lesson": 3,
+  "interval_days_min": 2,
+  "interval_days_max": 3,
+  "upload_default": "private",
+  "chairman_approval_before_public": true,
+  "rule": "never_guess_channel_id; upload is blocked until exact channel ownership/identity is verified",
+  "languages": [
+    {
+      "language_code": "ko",
+      "language": "Korean/TOPIK",
+      "series_name": "Korean Survival / TOPIK",
+      "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
+      "channel_identity_source": "config/youtube_reporting_channels.json",
+      "channel_status": "VERIFIED_REGISTRY_ID",
+      "upload_enabled": true
+    },
+    {
+      "language_code": "en",
+      "language": "English",
+      "series_name": "English Survival",
+      "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
+      "channel_identity_source": "config/youtube_reporting_channels.json",
+      "channel_status": "VERIFIED_REGISTRY_ID",
+      "upload_enabled": true
+    },
+    {
+      "language_code": "ja",
+      "language": "Japanese",
+      "series_name": "Survival Japanese",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "zh",
+      "language": "Chinese",
+      "series_name": "Survival Chinese",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "vi",
+      "language": "Vietnamese",
+      "series_name": "Survival Vietnamese",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "es",
+      "language": "Spanish",
+      "series_name": "Survival Spanish",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "fr",
+      "language": "French",
+      "series_name": "Survival French",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "de",
+      "language": "German",
+      "series_name": "Survival German",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "it",
+      "language": "Italian",
+      "series_name": "Survival Italian",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    },
+    {
+      "language_code": "pt",
+      "language": "Portuguese",
+      "series_name": "Survival Portuguese",
+      "channel_id": "",
+      "channel_status": "CHANNEL_ID_UNVERIFIED",
+      "upload_enabled": false
+    }
+  ]
+}
