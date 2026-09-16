@@ -21,24 +21,99 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           script: |
-            set -e
+            set -euo pipefail
+            ROOT=/opt/korea365
+            MARKER="$ROOT/data/london-reconcile-complete.json"
+
+            # One-time reconciliation of four reviewed server hotfix files.
+            # Every byte is backed up under runtime data before anything is restored.
+            # Future server-only modifications remain protected by sync_main.py.
+            if [ ! -f "$MARKER" ]; then
+              echo "=== LONDON ONE-TIME HOTFIX RECONCILIATION ==="
+              BACKUP="$ROOT/data/pre-london-reconcile/$(date -u +%Y%m%dT%H%M%SZ)-${{ github.sha }}"
+              mkdir -p "$BACKUP/files"
+              chmod 700 "$ROOT/data/pre-london-reconcile" "$BACKUP" "$BACKUP/files"
+
+              python3 - <<'PY'
+            import subprocess
+            from pathlib import Path
+
+            root = Path('/opt/korea365')
+            allowed = {
+                'control_center/app.py',
+                'control_center/templates/index.html',
+                'scripts/situation_room_daily.py',
+                'scripts/vps_wordpress_worker.py',
+            }
+            managed_roots = {'.github', 'automation_hub', 'control_center', 'scripts', 'config', 'deploy', 'tests', 'tools', 'multilang_quiz'}
+            raw = subprocess.check_output(
+                ['git', '-C', str(root), 'status', '--porcelain=v1', '--untracked-files=no'],
+                text=True,
+            )
+            dirty = []
+            for line in raw.splitlines():
+                path = line[3:]
+                if ' -> ' in path:
+                    path = path.split(' -> ', 1)[1]
+                p = Path(path)
+                managed = p.parts and (p.parts[0] in managed_roots or (len(p.parts) == 1 and (p.suffix == '.py' or path.startswith('requirements'))))
+                if managed:
+                    dirty.append(path)
+            unexpected = sorted(set(dirty) - allowed)
+            if unexpected:
+                raise SystemExit('Unexpected managed VPS hotfixes; refusing reconciliation: ' + ', '.join(unexpected))
+            Path('/tmp/london-reconcile-dirty.txt').write_text('\n'.join(sorted(set(dirty))) + ('\n' if dirty else ''), encoding='utf-8')
+            print('Reviewed dirty managed files:', sorted(set(dirty)))
+            PY
+
+              cp /tmp/london-reconcile-dirty.txt "$BACKUP/dirty-files.txt"
+              git -C "$ROOT" diff --no-ext-diff --binary -- \
+                control_center/app.py \
+                control_center/templates/index.html \
+                scripts/situation_room_daily.py \
+                scripts/vps_wordpress_worker.py \
+                > "$BACKUP/tracked-hotfixes.patch" || true
+
+              while IFS= read -r rel; do
+                [ -n "$rel" ] || continue
+                mkdir -p "$BACKUP/files/$(dirname "$rel")"
+                cp -a "$ROOT/$rel" "$BACKUP/files/$rel"
+              done < /tmp/london-reconcile-dirty.txt
+
+              # The old VPS had a server-only Playlist module. Its behavior has now
+              # been preserved as source-controlled control_center/playlist_v3_page.py.
+              # Back up the old untracked copy, then remove only that exact file so
+              # the deployer can install the reviewed GitHub version.
+              if [ -f "$ROOT/control_center/playlist_v3_page.py" ] && \
+                 ! git -C "$ROOT" ls-files --error-unmatch control_center/playlist_v3_page.py >/dev/null 2>&1; then
+                mkdir -p "$BACKUP/files/control_center"
+                cp -a "$ROOT/control_center/playlist_v3_page.py" "$BACKUP/files/control_center/playlist_v3_page.py"
+                rm -f "$ROOT/control_center/playlist_v3_page.py"
+                echo "control_center/playlist_v3_page.py" > "$BACKUP/untracked-files.txt"
+              fi
+
+              python3 - <<'PY'
+            import subprocess
+            from pathlib import Path
+            root = '/opt/korea365'
+            paths = [p for p in Path('/tmp/london-reconcile-dirty.txt').read_text(encoding='utf-8').splitlines() if p]
+            for path in paths:
+                subprocess.run(['git', '-C', root, 'restore', '--source=HEAD', '--worktree', '--', path], check=True)
+            print('Restored reviewed tracked hotfixes to deployed HEAD; backups retained.')
+            PY
+            fi
+
             set +e
             systemctl start korea365-deploy.service
             deploy_rc=$?
             set -e
             if [ "$deploy_rc" -ne 0 ]; then
-              echo "=== KOREA365 DEPLOY STATUS ==="
-              cat /opt/korea365/data/deploy-status.json || true
-              echo "=== TRACKED MANAGED HOTFIXES ==="
-              git -C /opt/korea365 status --short --untracked-files=no control_center scripts config deploy .github tests automation_hub tools multilang_quiz | sed -n '1,400p' || true
-              echo "=== DIFF app.py ==="
-              git -C /opt/korea365 diff --no-ext-diff -- control_center/app.py | sed -n '1,1400p' || true
-              echo "=== DIFF index.html ==="
-              git -C /opt/korea365 diff --no-ext-diff -- control_center/templates/index.html | sed -n '1,2200p' || true
-              echo "=== DIFF situation_room_daily.py ==="
-              git -C /opt/korea365 diff --no-ext-diff -- scripts/situation_room_daily.py | sed -n '1,1800p' || true
-              echo "=== DIFF vps_wordpress_worker.py ==="
-              git -C /opt/korea365 diff --no-ext-diff -- scripts/vps_wordpress_worker.py | sed -n '1,1800p' || true
+              echo "=== KOREA365 DEPLOY SERVICE STATUS ==="
+              systemctl status korea365-deploy.service --no-pager -l || true
+              echo "=== KOREA365 DEPLOY JOURNAL ==="
+              journalctl -u korea365-deploy.service -n 120 --no-pager || true
+              echo "=== KOREA365 DEPLOY STATUS JSON ==="
+              cat "$ROOT/data/deploy-status.json" || true
               exit "$deploy_rc"
             fi
 
@@ -53,13 +128,14 @@ jobs:
             if state.get('deployed_commit') != expected:
                 raise SystemExit(f"VPS commit mismatch: deployed={state.get('deployed_commit')} expected={expected}")
             PY
+
             systemctl is-active korea365-control.service korea365-operations.service
 
             python3 - <<'PY'
             import json, time
             from pathlib import Path
             path = Path('/opt/korea365/data/london_project_runtime.json')
-            deadline = time.time() + 25
+            deadline = time.time() + 30
             last = None
             while time.time() < deadline:
                 if path.exists():
@@ -86,10 +162,34 @@ jobs:
                                 'pm_age_seconds': round(pm_age, 2),
                             }
                             print('LONDON_RUNTIME', json.dumps(safe, sort_keys=True))
-                            raise SystemExit(0)
+                            Path('/tmp/london-runtime-ok.json').write_text(json.dumps(safe), encoding='utf-8')
+                            break
                     except (ValueError, OSError, TypeError):
                         pass
                 time.sleep(2)
-            print('LONDON_RUNTIME_LAST', json.dumps(last or {}, sort_keys=True))
-            raise SystemExit('London Project runtime heartbeat is not active')
+            else:
+                print('LONDON_RUNTIME_LAST', json.dumps(last or {}, sort_keys=True))
+                raise SystemExit('London Project runtime heartbeat is not active')
             PY
+
+            # Mark the one-time reconciliation complete only after deploy +
+            # service health + London heartbeat have all passed.
+            if [ ! -f "$MARKER" ]; then
+              python3 - <<'PY'
+            import json, time
+            from pathlib import Path
+            root = Path('/opt/korea365')
+            backups = sorted((root / 'data/pre-london-reconcile').glob('*'))
+            payload = {
+                'project': 'london-project',
+                'completed_at': time.time(),
+                'deployed_commit': '${{ github.sha }}',
+                'backup': str(backups[-1]) if backups else '',
+                'note': 'Reviewed server hotfixes backed up before restoring tracked files; future dirty-code protection remains enabled.',
+            }
+            target = root / 'data/london-reconcile-complete.json'
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+            target.chmod(0o600)
+            print('LONDON_RECONCILE', json.dumps(payload, ensure_ascii=False))
+            PY
+            fi
