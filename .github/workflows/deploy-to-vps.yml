@@ -30,13 +30,15 @@ jobs:
               echo "=== KOREA365 DEPLOY SERVICE STATUS ==="
               systemctl status korea365-deploy.service --no-pager -l || true
               echo "=== KOREA365 DEPLOY JOURNAL ==="
-              journalctl -u korea365-deploy.service -n 120 --no-pager || true
+              journalctl -u korea365-deploy.service -n 80 --no-pager || true
               echo "=== KOREA365 DEPLOY STATUS JSON ==="
               cat /opt/korea365/data/deploy-status.json || true
+              echo "=== TRACKED WORKTREE MODIFICATIONS ==="
+              git -C /opt/korea365 status --short --untracked-files=no | sed -n '1,500p' || true
               echo "=== SAFE SERVER HOTFIX DIFF: control_center/app.py ==="
-              git -C /opt/korea365 diff --no-ext-diff -- control_center/app.py | sed -n '1,1200p' || true
-              echo "=== SAFE SERVER CONTROL_CENTER STATUS ==="
-              git -C /opt/korea365 status --short --untracked-files=all control_center | sed -n '1,300p' || true
+              git -C /opt/korea365 diff --no-ext-diff -- control_center/app.py | sed -n '1,1400p' || true
+              echo "=== SAFE SERVER HOTFIX DIFF: control_center/templates/index.html ==="
+              git -C /opt/korea365 diff --no-ext-diff -- control_center/templates/index.html | sed -n '1,1800p' || true
               echo "=== SAFE SERVER MODULE: playlist_v3_page.py ==="
               if [ -f /opt/korea365/control_center/playlist_v3_page.py ]; then
                 sed -n '1,1600p' /opt/korea365/control_center/playlist_v3_page.py
