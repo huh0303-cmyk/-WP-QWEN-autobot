@@ -1,0 +1,9 @@
+# Names only. Do not commit real values.
+OPENAI_API_KEY=<secret>
+ANTHROPIC_API_KEY=<secret>
+GEMINI_API_KEY=<secret>
+CONTROL_OPERATIONS_DB=/opt/korea365/data/control-operations.sqlite3
+ORCHESTRATOR_COOLDOWN_SECONDS=900
+ORCHESTRATOR_OPENAI_MODEL=gpt-5-mini
+ORCHESTRATOR_CLAUDE_MODEL=claude-sonnet-4-20250514
+ORCHESTRATOR_GEMINI_MODEL=gemini-2.5-flash
