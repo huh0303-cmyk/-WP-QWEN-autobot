@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Project A deterministic publication audit
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/control.env
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/project_a_audit_report.py --since-hours 24 --output-dir /opt/korea365/data
+TimeoutStartSec=900
+UMask=0077
