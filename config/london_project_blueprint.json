@@ -5,34 +5,54 @@
     "canonical_document": "docs/LONDON_PROJECT_BLUEPRINT.md",
     "canonical_repo": "huh0303-cmyk/-WP-QWEN-autobot",
     "vps_root": "/opt/korea365",
-    "vps_blueprint": "/opt/korea365/docs/LONDON_PROJECT_BLUEPRINT.md"
+    "vps_blueprint": "/opt/korea365/docs/LONDON_PROJECT_BLUEPRINT.md",
+    "content_pipeline": "docs/LONDON_PROJECT_CONTENT_PIPELINES.md",
+    "content_schedule": "config/london_content_schedule.json"
   },
   "governance": {
     "final_decision_maker": "chairman",
     "primary_pm": "codex",
     "plan_b_acting_pm": "claude",
     "plan_c_continuity": "gemini",
+    "safe_hold": "vps_preserve_state_stop_new_generation_and_unapproved_publication",
     "verified_complete_authority": "deterministic_audit_engine"
   },
   "failover": {
-    "pm_chain": ["openai", "anthropic", "gemini"],
+    "pm_chain": ["openai", "anthropic", "gemini", "safe_hold"],
     "audit_summary_chain": ["anthropic", "gemini", "openai"],
     "triggers": ["quota_exhausted", "rate_limit", "timeout", "provider_outage", "authentication_failure", "expired_pm_lease", "repeated_provider_failure"],
-    "handoff_required": ["open_tasks", "recent_decisions", "acceptance_criteria", "recent_errors", "audit_failures", "unfinished_assignments"]
+    "handoff_required": ["open_tasks", "publishing_schedule", "recent_decisions", "acceptance_criteria", "recent_errors", "audit_failures", "unfinished_assignments"]
+  },
+  "publishing": {
+    "timezone": "Asia/Seoul",
+    "schedule_policy_file": "config/london_content_schedule.json",
+    "planned_jitter_minutes": 60,
+    "forbid_exact_hour": true,
+    "minimum_same_platform_gap_minutes": 30,
+    "wordpress_general": "1_per_enabled_site_per_day",
+    "newsrooms": "rss_event_driven_separate",
+    "survival_10_language": "3_private_uploads_per_language_per_week",
+    "survival_lessons_per_language": 50,
+    "survival_completed_through_lesson": 2,
+    "survival_next_lesson": 3,
+    "youtube_private_first": true,
+    "chairman_approval_before_review_gated_publication": true
   },
   "truth_model": {
-    "states": ["REQUESTED", "RUNNING", "READY_FOR_AUDIT", "VERIFIED_COMPLETE", "VERIFIED_PRIVATE", "FAILED", "BLOCKED", "NEEDS_ATTENTION"],
-    "rules": ["no_ai_may_self_certify_verified_complete", "workflow_success_is_not_publication_evidence", "generated_file_is_not_upload_evidence", "queue_status_is_not_publication_evidence", "external_evidence_must_match_exact_job_and_target"]
+    "states": ["REQUESTED", "RUNNING", "READY_FOR_AUDIT", "VERIFIED_PRIVATE", "REVIEW_REQUIRED", "VERIFIED_COMPLETE", "REWORK_REQUIRED", "FAILED", "BLOCKED", "NEEDS_ATTENTION"],
+    "rules": ["no_ai_may_self_certify_verified_complete", "workflow_success_is_not_publication_evidence", "generated_file_is_not_upload_evidence", "queue_status_is_not_publication_evidence", "external_evidence_must_match_exact_job_and_target", "review_gated_youtube_must_not_be_public_before_chairman_approval"]
   },
   "verification": {
     "web_publication": ["exact_target_identity", "public_url", "successful_http_response", "not_admin_preview_or_login", "not_404_or_error_placeholder", "expected_title_or_job_marker_when_available", "verification_timestamp"],
     "youtube_private": ["valid_video_id", "exact_channel_id", "privacy_status_private", "validated_studio_url", "job_bound_upload_receipt"],
-    "youtube_public": ["valid_video_id", "exact_channel_id", "privacy_status_public", "youtube_api_retrieval_success", "verified_public_watch_url"]
+    "youtube_public": ["valid_video_id", "exact_channel_id", "privacy_status_public", "youtube_api_retrieval_success", "verified_public_watch_url", "required_human_approval_if_review_gated"]
   },
   "runtime": {
     "github_blueprint": "docs/LONDON_PROJECT_BLUEPRINT.md",
+    "github_content_schedule": "config/london_content_schedule.json",
     "vps_blueprint": "/opt/korea365/docs/LONDON_PROJECT_BLUEPRINT.md",
     "vps_policy": "/opt/korea365/config/london_project_blueprint.json",
+    "vps_content_schedule": "/opt/korea365/config/london_content_schedule.json",
     "vps_version_receipt": "/opt/korea365/data/london_project_blueprint_version.json",
     "vps_audit_json": "/opt/korea365/data/london_project_audit_report.json",
     "vps_audit_markdown": "/opt/korea365/data/london_project_audit_report.md"
