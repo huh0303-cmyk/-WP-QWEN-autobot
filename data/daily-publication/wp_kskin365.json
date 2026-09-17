@@ -1,1 +1,1 @@
-{"day": "2026-09-18", "attempts": 1, "status": "CLAIMED", "claim": "daily-2026-09-18-wp_kskin365-030ebed6", "claimed_at": "2026-09-18T00:43:16.520270+09:00", "run_id": null, "child_run_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-09-18", "attempts": 1, "status": "DISPATCHED", "claim": "daily-2026-09-18-wp_kskin365-030ebed6", "claimed_at": "2026-09-18T00:43:16.520270+09:00", "run_id": 35242116782, "child_run_id": null, "workflow": "daily-network-publish.yml"}
