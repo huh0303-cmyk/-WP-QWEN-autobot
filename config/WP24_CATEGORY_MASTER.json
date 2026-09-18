@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "locked_on": "2026-09-18",
+  "objective": "AdSense readiness",
+  "rules": {
+    "default_categories": 1,
+    "max_categories": 2,
+    "miscellaneous_forbidden": true,
+    "off_topic_action": "PRIVATE_REVIEW",
+    "indexed_or_traffic_url_action": "CONSERVATIVE_REVIEW_BEFORE_CHANGE"
+  },
+  "sites": [
+    {
+      "domain": "korea365.org",
+      "categories": [
+        "Korea Life Guide"
+      ]
+    },
+    {
+      "domain": "k-trip365.com",
+      "categories": [
+        "Korea Travel"
+      ]
+    },
+    {
+      "domain": "k-visa365.com",
+      "categories": [
+        "Korea Visa"
+      ]
+    },
+    {
+      "domain": "kstudy365.com",
+      "categories": [
+        "Study in Korea"
+      ]
+    },
+    {
+      "domain": "studyinkorea365.com",
+      "categories": [
+        "Korea Admissions",
+        "Student Life"
+      ]
+    },
+    {
+      "domain": "jobkorea365.com",
+      "categories": [
+        "Jobs in Korea"
+      ]
+    },
+    {
+      "domain": "jobinkorea365.com",
+      "categories": [
+        "Foreign Workers in Korea"
+      ]
+    },
+    {
+      "domain": "jobkoreaglobal.com",
+      "categories": [
+        "Global Korea Careers"
+      ]
+    },
+    {
+      "domain": "koreamedicaltour.com",
+      "categories": [
+        "Korea Medical Tourism"
+      ]
+    },
+    {
+      "domain": "kskin365.com",
+      "categories": [
+        "Korean Skincare"
+      ]
+    },
+    {
+      "domain": "oliveyoungkorea.com",
+      "categories": [
+        "K-Beauty Products",
+        "K-Beauty Shopping"
+      ]
+    },
+    {
+      "domain": "kfinance365.com",
+      "categories": [
+        "Korea Personal Finance",
+        "Banking in Korea"
+      ]
+    },
+    {
+      "domain": "koreainsurance365.com",
+      "categories": [
+        "Insurance in Korea"
+      ]
+    },
+    {
+      "domain": "koreainvest365.com",
+      "categories": [
+        "Investing in Korea"
+      ]
+    },
+    {
+      "domain": "koreacrypto365.com",
+      "categories": [
+        "Korea Crypto"
+      ]
+    },
+    {
+      "domain": "koreataxnlaw.com",
+      "categories": [
+        "Korea Tax",
+        "Practical Law"
+      ]
+    },
+    {
+      "domain": "krealestate365.com",
+      "categories": [
+        "Korea Real Estate"
+      ]
+    },
+    {
+      "domain": "ktech365.com",
+      "categories": [
+        "Korean Technology"
+      ]
+    },
+    {
+      "domain": "kworld365.com",
+      "categories": [
+        "K-POP"
+      ]
+    },
+    {
+      "domain": "koreawedding365.com",
+      "categories": [
+        "Korean Wedding",
+        "International Couples"
+      ]
+    },
+    {
+      "domain": "ki-korea.com",
+      "categories": [
+        "Invest in Korea"
+      ]
+    },
+    {
+      "domain": "kieca-korea.org",
+      "categories": [
+        "International Education",
+        "Cultural Exchange"
+      ]
+    },
+    {
+      "domain": "ksa-korea.org",
+      "categories": [
+        "Korea Study Network"
+      ]
+    },
+    {
+      "domain": "sis-korea.com",
+      "categories": [
+        "Study Pathways to Korea",
+        "TOPIK & Korean"
+      ]
+    }
+  ]
+}
