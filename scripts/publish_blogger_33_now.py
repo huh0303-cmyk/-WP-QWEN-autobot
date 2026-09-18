@@ -53,7 +53,7 @@ def generate(site: dict) -> tuple[str, str, list[str], str]:
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject.
 Use 5 useful H2 sections, an actionable checklist, cautious source-aware wording, and no invented facts.
-English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels."""
+English: 900-1300 words. Korean: 1800-3000 characters. Provide 1-3 short, highly relevant labels only."""
     raw = openai_generate_text(prompt, temperature=0.5, max_retries=1).strip()
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].removeprefix("json").strip()
@@ -65,8 +65,8 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
         import re
         data = json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw))
     title, body = str(data["title"]).strip(), str(data["content_html"]).strip()
-    labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:12]
-    if not title or len(body) < 1500 or len(labels) < 8:
+    labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:3]
+    if not title or len(body) < 1500 or not (1 <= len(labels) <= 3):
         raise RuntimeError("GPT-5 mini output failed quality gate")
     mismatches = language_mismatch_fields(
         language=site["language"], title=title, meta_description="",
