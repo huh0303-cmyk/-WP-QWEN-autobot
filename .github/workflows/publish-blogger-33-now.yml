@@ -35,9 +35,8 @@ jobs:
         env:
           BLOGGER_REVIEW_DRAFT_MODE: "false"
           PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ENABLED: "true"
-          OPENAI_MODEL: "gpt-5-mini"
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          BLOGGER_FREE_TEXT_MODEL: "swiss-ai/Apertus-70B-Instruct-2509:publicai"
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
