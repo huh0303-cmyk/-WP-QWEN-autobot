@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/publish-blogger-33-now.yml"
+      - "data/blogger33-run-trigger.txt"
   workflow_dispatch:
     inputs:
       run_key:
