@@ -42,7 +42,7 @@ add_action('wp_footer', function () {
 
     echo '<div class="network-daily-visitor-counter" aria-label="Daily visitor counter" '
         . 'style="display:flex;justify-content:center;gap:14px;align-items:center;flex-wrap:wrap;'
-        . 'margin:18px auto 4px;padding:8px 16px;max-width:320px;border-radius:20px;'
+        . 'margin:18px auto 96px;padding:8px 16px;max-width:320px;border-radius:20px;'
         . 'background:rgba(120,120,120,0.08);font-size:12.5px;color:inherit;opacity:0.82;">'
         . '<span>👁 ' . esc_html($today_label) . ' ' . number_format_i18n($day_count) . '</span>'
         . '<span style="opacity:0.5;">·</span>'
