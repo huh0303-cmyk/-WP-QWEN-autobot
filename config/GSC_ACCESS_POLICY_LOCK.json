@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "locked_on": "2026-09-18",
+  "objective": "GSC data access for Golden Keyword and AdSense-readiness management",
+  "policy": {
+    "human_owner": "Chairman's Google account remains Owner",
+    "automation_role": "Full User",
+    "service_account_owner_forbidden_by_default": true,
+    "site_isolation": true,
+    "max_retry": 1
+  },
+  "scopes": {
+    "wordpress": {
+      "count": 24,
+      "source": "config/WP24_CATEGORY_MASTER.json",
+      "status": "24/24 properties currently accessible to service account; normalize permissions to Full User where possible without breaking access"
+    },
+    "blogger": {
+      "count": 33,
+      "source": "config/blogger_portfolio.json",
+      "status": "2/33 currently covered by k-health365.com domain property; remaining 31 require GSC property/access setup"
+    }
+  },
+  "completion": [
+    "property exists or is correctly covered by domain property",
+    "Chairman account remains Owner",
+    "automation service account has Full User access",
+    "Search Analytics query can be read",
+    "site state stored independently"
+  ]
+}
