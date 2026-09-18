@@ -14,7 +14,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
-from openai_text import openai_generate_text  # noqa: E402
+from gemini_text import gemini_generate_text  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
 from automation_hub.editorial_language_policy import language_mismatch_fields
 from review_sheet import append_review_rows
@@ -54,7 +54,7 @@ Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject.
 Use 5 useful H2 sections, an actionable checklist, cautious source-aware wording, and no invented facts.
 English: 900-1300 words. Korean: 1800-3000 characters. Provide 1-3 short, highly relevant labels only."""
-    raw = openai_generate_text(prompt, temperature=0.5, max_retries=1).strip()
+    raw = gemini_generate_text(prompt, temperature=0.5).strip()
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].removeprefix("json").strip()
     try:
@@ -67,7 +67,7 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 1-3 short, highly
     title, body = str(data["title"]).strip(), str(data["content_html"]).strip()
     labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:3]
     if not title or len(body) < 1500 or not (1 <= len(labels) <= 3):
-        raise RuntimeError("GPT-5 mini output failed quality gate")
+        raise RuntimeError("Gemini Flash output failed quality gate")
     mismatches = language_mismatch_fields(
         language=site["language"], title=title, meta_description="",
         content=body, labels=labels,
