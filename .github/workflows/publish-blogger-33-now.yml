@@ -1,18 +1,22 @@
-name: "Blogger — create 33 review drafts (legacy entry)"
+name: "Blogger 33 — direct public publish"
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-blogger-33-now.yml"
   workflow_dispatch:
     inputs:
       run_key:
-        description: "Unique idempotency key for this 33-draft review run"
-        required: true
+        description: "Unique idempotency key"
+        required: false
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: blogger-33-public-publisher
+  group: blogger-33-direct-publish
   cancel-in-progress: false
 
 jobs:
@@ -26,24 +30,21 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests -q
-      - name: Create 33 private drafts with prepared search descriptions
+      - name: Publish one independent article to each of 33 Blogger destinations
         env:
-          BLOGGER_REVIEW_DRAFT_MODE: "true"
-          REVIEW_RUN_KEY: ${{ inputs.run_key }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GH_ASSET_TOKEN: ${{ github.token }}
+          BLOGGER_REVIEW_DRAFT_MODE: "false"
+          PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENABLED: "true"
           OPENAI_MODEL: "gpt-5-mini"
-          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: python scripts/publish_blogger_33_now.py
-      - name: Upload public URL results
+      - name: Save exact post IDs and URLs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blogger-33-review-results-${{ github.run_id }}
+          name: blogger-33-public-results-${{ github.run_id }}
           path: artifacts/blogger-33-public-results.json
-          retention-days: 30
+          retention-days: 7
