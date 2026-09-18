@@ -36,7 +36,7 @@ jobs:
           BLOGGER_REVIEW_DRAFT_MODE: "false"
           PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          BLOGGER_FREE_TEXT_MODEL: "gemini-2.5-flash-lite"
+          BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
