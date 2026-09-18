@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 13.17,
+  "spent_estimate_usd": 13.2,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -3685,6 +3685,15 @@
       "label": "blogger-rewrite:blogger_studyinkorea",
       "amount_usd": 0.03,
       "reservation_id": "628638b73f5e764fc1cd2a93ba916b36499e0955adc0f2d0b03e6c62db25ccc2",
+      "run_id": "35314412044",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-18T15:20:19.151890+09:00",
+      "label": "blogger-rewrite:blogger_koreanews",
+      "amount_usd": 0.03,
+      "reservation_id": "115221477404ed83fbcdc4438efa5ae64c1704e8d6d41d0645d671843f26a94e",
       "run_id": "35314412044",
       "run_attempt": "1",
       "cost_type": "estimate"
