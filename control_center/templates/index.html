@@ -197,7 +197,7 @@
             <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block truncate text-xs text-blue-700 underline" title="{{ url }}">{{ url|replace('https://','')|replace('http://','') }} ↗</a>
             <span class="tile-rank mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-black text-blue-800">순위 미집계</span>
             <div class="tile-metrics mt-2 space-y-1 text-[11px]">
-            {% for title, key, change, basis in [('일일 방문자','today_visitors','today_delta','오늘 현재 − 어제 하루 · Blogger는 자체 조회수'),('누적 방문자','total_visitors','total_delta','전일 확인값 대비'),('신규 콘텐츠 수','new_posts','new_posts_delta','오늘 공개 수 − 어제 공개 수'),('Google 검색 색인 수','indexed','indexed_delta','이전 Google 확인 대비')] %}
+            {% for title, key, change, basis in [('① 일일 방문자','today_visitors','today_delta','오늘 현재 − 어제 하루 · Blogger는 자체 조회수'),('② Google 색인','indexed','indexed_delta','이전 Google 확인 대비'),('③ 누적 방문자','total_visitors','total_delta','전일 확인값 대비'),('④ 오늘 콘텐츠','new_posts','new_posts_delta','오늘 공개 수 − 어제 공개 수')] %}
             {% set value = metrics.get(key) if metrics else none %}{% set delta = metrics.get(change) if metrics else none %}
             <p class="flex flex-wrap justify-between gap-1" title="{{ basis }}"><span>{{ title }}</span><strong>{{ '{:,}'.format(value) if value is not none else '미집계' }} <span class="{{ 'text-red-600' if delta is not none and delta < 0 else 'text-emerald-700' }}">({% if delta is none %}증감 미집계{% else %}{{ '+' if delta > 0 else '' }}{{ '{:,}'.format(delta) }}{% endif %})</span></strong></p>
             {% endfor %}
@@ -488,7 +488,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2 rounded-2xl border border-violet-300 bg-violet-950 p-2 shadow-inner">
-                        {% for label, value, delta in [('일일 방문자', blog.today_visitors, blog.today_delta), ('누적 방문자', blog.total_visitors, blog.total_delta), ('신규 콘텐츠 수', blog.new_posts, blog.new_posts_delta), ('Google 검색 색인 수', blog.indexed, blog.indexed_delta)] %}
+                        {% for label, value, delta in [('① 일일 방문자', blog.today_visitors, blog.today_delta), ('② Google 색인', blog.indexed, blog.indexed_delta), ('③ 누적 방문자', blog.total_visitors, blog.total_delta), ('④ 오늘 콘텐츠', blog.new_posts, blog.new_posts_delta)] %}
                         <div class="rounded-xl bg-white p-3 shadow-sm">
                             <p class="text-[10px] font-black text-slate-500">{{ label }} <span class="text-slate-400">(증감)</span></p>
                             {% if value is not none %}<p class="mt-1 text-xl font-black text-slate-950">{{ '{:,}'.format(value) }} {% if delta is not none %}<span class="text-xs {% if delta < 0 %}text-red-600{% else %}text-emerald-600{% endif %}">({% if delta > 0 %}+{% endif %}{{ delta }})</span>{% else %}<span class="text-[9px] text-slate-400">(증감 미집계)</span>{% endif %}</p>
