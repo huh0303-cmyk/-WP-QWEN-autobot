@@ -19,9 +19,15 @@ on:
         description: Comma-separated post IDs to set to status=private (off-topic posts). Optional.
         required: false
         default: ""
-      confirm:
-        description: Type CONSOLIDATE to proceed
+      dry_run:
+        description: Dry run only (no changes made, just prints the plan). Set to false to actually execute.
         required: true
+        type: boolean
+        default: true
+      confirm:
+        description: For a real run (dry_run=false), type CONSOLIDATE to proceed. Ignored for dry runs.
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -36,10 +42,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests -q
-      - name: Guard confirmation token
+      - name: Guard confirmation token for live runs
         run: |
-          if [ "${{ inputs.confirm }}" != "CONSOLIDATE" ]; then
-            echo "confirm must be exactly CONSOLIDATE. Aborting."
+          if [ "${{ inputs.dry_run }}" = "false" ] && [ "${{ inputs.confirm }}" != "CONSOLIDATE" ]; then
+            echo "dry_run=false requires confirm=CONSOLIDATE exactly. Aborting."
             exit 1
           fi
       - name: Consolidate categories (never deletes posts)
@@ -50,5 +56,5 @@ jobs:
           WP_KEEP_CATEGORY_SLUG: ${{ inputs.keep_category_slug }}
           WP_MERGE_CATEGORY_SLUGS: ${{ inputs.merge_category_slugs }}
           WP_PRIVATE_POST_IDS: ${{ inputs.private_post_ids }}
+          WP_DRY_RUN: ${{ inputs.dry_run }}
         run: python scripts/wp_consolidate_categories.py
-
