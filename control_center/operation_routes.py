@@ -54,12 +54,17 @@ def install(module):
                 result.append(dict(site_id=site["site_id"], site_group="wp_" + site["site_id"], site_url="https://" + site["domain"], label=site["domain"],
                                    platform="news" if news else "wordpress", workflow="newsrooms-daily-publisher.yml" if news else "daily-network-publish.yml", inputs=inputs))
             return result
-        if group == "blogspot33" or group.startswith("blogspot_"):
-            sites = module.get_blogger_data()
-            sites = [s for s in sites if s["connected"] and (group == "blogspot33" or s["site_id"] == site_id)]
+        if group == "blogspot33":
+            # One CEO click dispatches the canonical 33-site direct publisher.
+            # The publisher itself isolates per-site failures and records exact Post IDs/URLs.
+            return [dict(site_id="blogspot33", site_group="blogspot33", site_url="", label="Blogspot 33",
+                         platform="blogger", workflow="publish-blogger-33-now.yml",
+                         inputs={"run_key": "control-" + str(int(time.time()))})]
+        if group.startswith("blogspot_"):
+            sites = [s for s in module.get_blogger_data() if s["connected"] and s["site_id"] == site_id]
             result = []
             for site in sites:
-                workflow, inputs = module._build_draft_workflow_call({"platform": "blogger", "selection_mode": "auto", "site_id": site["site_id"], "keyword": "", "jitter_max_seconds": "60" if group == "blogspot33" else "0"})
+                workflow, inputs = module._build_draft_workflow_call({"platform": "blogger", "selection_mode": "auto", "site_id": site["site_id"], "keyword": "", "jitter_max_seconds": "0"})
                 result.append(dict(site_id=site["site_id"], site_group="blogspot_" + site["site_id"], site_url=site["url"], label=site["name"], platform="blogger", workflow=workflow, inputs=inputs))
             return result
         sites = [dict(s, name=s["title"]) for s in json.loads((root / "config/tistory_portfolio.json").read_text(encoding="utf-8"))["sites"] if s.get("launch_enabled")]
