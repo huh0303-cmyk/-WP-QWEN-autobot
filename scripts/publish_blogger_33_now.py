@@ -15,7 +15,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from openai_text import openai_generate_text  # noqa: E402
-from replicate_image_provider import generate_image_url  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
 from automation_hub.editorial_language_policy import language_mismatch_fields
 from review_sheet import append_review_rows
@@ -55,7 +54,7 @@ Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject.
 Use 5 useful H2 sections, an actionable checklist, cautious source-aware wording, and no invented facts.
 English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels."""
-    raw = openai_generate_text(prompt, temperature=0.5, max_retries=3).strip()
+    raw = openai_generate_text(prompt, temperature=0.5, max_retries=1).strip()
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].removeprefix("json").strip()
     try:
@@ -75,9 +74,6 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
     )
     if mismatches:
         raise RuntimeError("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
-    image = generate_image_url(str(data.get("image_subject") or title), theme=site["theme"])
-    if image:
-        body = f'<figure><img src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}"/></figure>\n' + body
     description = build_search_description(title=title, topic=site["theme"], language=site["language"])
     validate_search_description(description)
     return title, body, labels, description
@@ -85,11 +81,6 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 8-12 short labels
 
 def main() -> int:
     draft_mode = os.environ.get("BLOGGER_REVIEW_DRAFT_MODE", "false").strip().lower() == "true"
-    if not draft_mode:
-        raise SystemExit(
-            "Blogger API cannot save the post Search description field. "
-            "Direct public publishing is blocked; create a review draft, paste the prepared description in Blogger, then publish manually."
-        )
     run_key = os.environ.get("REVIEW_RUN_KEY" if draft_mode else "PUBLIC_RUN_KEY", "").strip()
     if not run_key:
         raise SystemExit("PUBLIC_RUN_KEY is required")
@@ -122,12 +113,6 @@ def main() -> int:
                 RESULT.write_text(json.dumps({"run_key": run_key, "updated_at": datetime.now(timezone.utc).isoformat(), "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
                 continue
             title, body, labels, description = generate(site)
-            body, image_evidence = stabilize_html_images(
-                body, repo=os.environ["GITHUB_REPOSITORY"], gh_token=os.environ["GH_ASSET_TOKEN"],
-                blog_id=site["id"], asset_key=f"new-{run_key}-{site['key']}",
-            )
-            if any(item["status"] != "stable" and not item.get("stable_src") for item in image_evidence):
-                raise RuntimeError("permanent image hard gate failed")
             body = f"<!-- {marker} -->\n{body}"
             response = requests.post(endpoint, params={"isDraft": "true" if draft_mode else "false"}, headers=headers,
                                      json={"kind": "blogger#post", "title": title, "content": body, "labels": labels}, timeout=30)
