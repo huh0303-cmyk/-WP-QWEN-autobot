@@ -213,7 +213,9 @@
             <p data-quick-status="{{ group }}" role="status" class="mt-1 text-[10px] text-slate-500"></p>
         </article>
         {% endmacro %}
-        <details id="site-quick-tiles" class="dashboard-disclosure"><summary>사이트별 실행·발행 이력 찾기</summary><section class="space-y-4 p-4">
+        <section id="site-quick-tiles" class="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 class="text-xl font-black">개별 사이트 카드 · 방문자 내림차순</h2>
+            <p class="text-xs text-slate-500">카드 하나가 독립 실행 단위입니다. 한 사이트 실패가 다른 사이트를 막지 않습니다.</p>
             <input id="quick-site-search" type="search" class="dashboard-search" placeholder="사이트 이름이나 주소 검색" aria-label="사이트별 실행 검색">
             <div><h2 class="text-xl font-black">사이트별 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
             <p class="text-xs text-slate-500">플랫폼별 오늘 방문자 순위(동률 공동순위) · 방문자·새 콘텐츠는 어제 대비 · 누적은 오늘 증가 · 색인은 이전 확인 대비 · 시각 KST · 통계 5분 / 발행 로그 1분 갱신</p>
@@ -234,7 +236,6 @@
             {% for channel in youtube_channels %}{{ quick_tile(channel.name or channel.channel_key, 'https://www.youtube.com/channel/' ~ channel.channel_id, 'youtube_' ~ channel.channel_key, '제작·비공개 업로드', channel.action_ready, none, none, channel.channel_key) }}{% endfor %}
             </div>
         </section>
-        </details>
         <details id="advanced-controls" class="dashboard-disclosure"><summary>연결 설정·플랫폼 상세·YouTube 기록</summary>
         <section class="rounded-3xl border-2 p-4 shadow-sm sm:p-5 {% if problem_summary.all_clear %}border-emerald-300 bg-emerald-50{% else %}border-rose-300 bg-rose-50{% endif %}">
             {% if problem_summary.all_clear %}
