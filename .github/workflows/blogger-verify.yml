@@ -7,6 +7,7 @@ on:
       - "scripts/blogger_verify_account.py"
       - ".github/workflows/blogger-verify.yml"
       - "config/automation_hub_sites.json"
+      - "data/blogger-e2e-trigger.txt"
 
 permissions:
   contents: write
