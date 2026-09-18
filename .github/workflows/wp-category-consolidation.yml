@@ -1,0 +1,54 @@
+name: WordPress — Category consolidation (1 site, reversible)
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: WordPress site URL (e.g. https://k-trip365.com)
+        required: true
+      site_key:
+        description: GitHub secret key for the site app password (e.g. KTRIP365COM)
+        required: true
+      keep_category_slug:
+        description: Category slug to keep as the single main category
+        required: true
+      merge_category_slugs:
+        description: Comma-separated category slugs whose posts move into keep_category_slug (those now-empty categories are then deleted)
+        required: true
+      private_post_ids:
+        description: Comma-separated post IDs to set to status=private (off-topic posts). Optional.
+        required: false
+        default: ""
+      confirm:
+        description: Type CONSOLIDATE to proceed
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Guard confirmation token
+        run: |
+          if [ "${{ inputs.confirm }}" != "CONSOLIDATE" ]; then
+            echo "confirm must be exactly CONSOLIDATE. Aborting."
+            exit 1
+          fi
+      - name: Consolidate categories (never deletes posts)
+        env:
+          WP_SITE_URL: ${{ inputs.site_url }}
+          WP_USER: huh0303@gmail.com
+          WP_APP_PASSWORD: ${{ secrets[inputs.site_key] }}
+          WP_KEEP_CATEGORY_SLUG: ${{ inputs.keep_category_slug }}
+          WP_MERGE_CATEGORY_SLUGS: ${{ inputs.merge_category_slugs }}
+          WP_PRIVATE_POST_IDS: ${{ inputs.private_post_ids }}
+        run: python scripts/wp_consolidate_categories.py
+
