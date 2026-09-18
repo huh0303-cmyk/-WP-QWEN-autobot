@@ -37,7 +37,7 @@ from automation_hub.original_writer import original_prompt, original_quality_sco
 from automation_hub.time_utils import iso_kst
 from gsheets_direct import get_sheets_service
 from openai_text import openai_available, openai_generate_text
-from replicate_image_provider import generate_image_url
+from stock_image_provider import find_stock_image  # paid Replicate image-gen path removed 2026-09-18
 from stable_image_hosting import host_permanently, is_temporary
 from sync_automation_hub_to_sheets import QUEUE_TAB
 from budget_guard import check_and_record
@@ -436,7 +436,7 @@ def main():
         if language.startswith("ko") else
         f"Scene related to {str(image_subject).strip()}"
     )
-    image_url = generate_image_url(image_subject, theme=rewritten["title"])
+    image_url = find_stock_image(image_subject, theme=rewritten["title"])
     if image_url and is_temporary(image_url):
         # Replicate's own delivery URLs expire within hours - well before a
         # Blogger review draft sitting in the queue gets approved and
@@ -453,11 +453,11 @@ def main():
     if not image_url:
         print(json.dumps({
             "image_pass": True,
-            "reason": "SDXL Lightning and FLUX Schnell both failed, or permanent re-hosting failed; queueing text-only draft",
+            "reason": "No free/copyright-safe stock photo matched (Pexels/Pixabay); paid image generation is disabled for Blogger -- queueing text-only draft",
         }, ensure_ascii=False))
     if image_url:
         content = f'<p><img src="{html.escape(image_url, quote=True)}" alt="{html.escape(image_alt, quote=True)}" /></p>' + content
-        image_model = "approved_image_chain"
+        image_model = "free_stock_only"
 
     from automation_hub.blog_visitor_widget import visitor_counter_html
     content += visitor_counter_html(blogger_site_id.removeprefix("blogger_"), language=language)
