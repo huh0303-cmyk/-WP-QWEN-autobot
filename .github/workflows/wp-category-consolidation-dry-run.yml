@@ -1,0 +1,76 @@
+name: "일반 WP 사이트 — 1사이트 1카테고리 정제 DRY RUN"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_domain:
+        description: "대상 도메인 (예: jobkorea365.com). theseouljournal.com / koreanews365.com 은 denylist로 차단됨"
+        required: true
+        default: "jobkorea365.com"
+      target_category_name:
+        description: "대표 카테고리명 (기존에 맞는 카테고리가 있으면 그것을 유지 추천)"
+        required: false
+        default: "Korea Jobs"
+      confirm:
+        description: "실행하려면 정확히 DRY-RUN-AUDIT 입력"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: ${{ inputs.confirm == 'DRY-RUN-AUDIT' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: "게시글/카테고리 조회 + 백업 + GSC 매칭 DRY RUN (WP 변경 요청 없음)"
+        env:
+          DRY_RUN: "true"
+          SITE_DOMAIN: ${{ inputs.site_domain }}
+          TARGET_CATEGORY_NAME: ${{ inputs.target_category_name }}
+          WP_USER: ${{ secrets.WP_USER }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: python scripts/wp_category_consolidation_audit.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wp-category-consolidation-dry-run-${{ inputs.site_domain }}-${{ github.run_id }}
+          path: |
+            summary_*.json
+            backup_posts_*.json
+            backup_categories_*.json
+            protected_indexed_posts_*.csv
+            private_candidates_*.csv
+          if-no-files-found: warn
+          retention-days: 30
