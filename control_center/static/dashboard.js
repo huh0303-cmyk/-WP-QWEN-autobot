@@ -28,7 +28,7 @@
             const platform=group.dataset.metricsPlatform;
             group.hidden=select.value!=='전체'&&!platform.includes(select.value);
             group.querySelectorAll('tr').forEach((row,i)=>{
-                if(i)[...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','일일 방문자수(증감)','누적 방문자수(증감)','총 발행 글(증감)','Google 색인 발행 글수(증감)','확인 필요'][index];});if(i)row.hidden=!row.cells[1]?.textContent.toLowerCase().includes(filter.value.trim().toLowerCase());});
+                if(i)row.hidden=!row.cells[1]?.textContent.toLowerCase().includes(filter.value.trim().toLowerCase());});
         });
     }
     filter.oninput=applyFilter;select.onchange=applyFilter;
@@ -40,8 +40,20 @@
             let node=heading;
             while(node){const next=node.nextElementSibling;group.append(node);if(node.tagName==='DIV'&&node.querySelector('table'))break;if(next?.tagName==='H3')break;node=next;}
             group.querySelectorAll('tr').forEach((row,i)=>{
-                if(i)[...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','일일 방문자수(증감)','누적 방문자수(증감)','총 발행 글(증감)','Google 색인 발행 글수(증감)','확인 필요'][index];});
-                if(i&&row.cells[6]?.textContent){const cell=row.cells[6];const details=document.createElement('details');const label=document.createElement('summary');label.textContent='확인 내역';const text=document.createElement('p');text.textContent=cell.textContent;details.append(label,text);cell.replaceChildren(details);}
+                if(!i)return;
+                [...row.cells].forEach((cell,index)=>{cell.dataset.label=['순위','사이트','오늘 방문자','누적 방문자','총 발행 글','Google 색인 글','확인 필요'][index];});
+                const siteLink=row.cells[1]?.querySelector('a');
+                if(siteLink){try{siteLink.textContent=new URL(siteLink.href).hostname.replace(/^www\./,'');}catch(_){}}
+                if(row.cells[6]?.textContent){const cell=row.cells[6];const details=document.createElement('details');const label=document.createElement('summary');label.textContent='확인 내역';const text=document.createElement('p');text.textContent=cell.textContent;details.append(label,text);cell.replaceChildren(details);}
+                if(siteLink&&!row.querySelector('.metrics-actions')){
+                    const actions=document.createElement('td');actions.className='metrics-actions';
+                    const open=document.createElement('a');open.href=siteLink.href;open.target='_blank';open.rel='noopener noreferrer';open.textContent='사이트 열기 ↗';open.className='metrics-open';actions.append(open);
+                    const normalized=siteLink.href.replace(/\/$/,'');
+                    const tile=[...document.querySelectorAll('[data-tile-group]')].find(item=>item.querySelector('a[href]')?.href.replace(/\/$/,'')===normalized);
+                    const source=tile?.querySelector('[data-quick-group]');
+                    if(source){const publish=document.createElement('button');publish.type='button';publish.textContent=source.disabled?'연결 필요':'글 1개 발행';publish.className='metrics-publish';publish.disabled=source.disabled;publish.addEventListener('click',()=>source.click());actions.append(publish);}
+                    row.append(actions);
+                }
             });
         });
         if(!host.querySelector('.metrics-definitions')){
