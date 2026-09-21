@@ -79,6 +79,7 @@ jobs:
           # three_model_consensus.py now always runs two independent GPT
           # passes and never calls Gemini at all. See audit_active_policy.py.
           OPENAI_ENABLED: "true"
+          NEWSROOM_PAID_TEXT_APPROVED: "true"
           CLAUDE_ENABLED: "false"
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           STOCK_IMAGES_ENABLED: "true"
