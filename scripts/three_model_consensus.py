@@ -43,6 +43,19 @@ def _gpt_check(label: str, rule: str) -> dict:
         return {"ok": False, "issues": [f"check_failed: {exc}"]}
 
 
+def _newsroom_check(label, rule):
+    import newsroom_provider_recovery as recovery
+    try:
+        result = _json(recovery.generate(f"You are the {label} independent quality checker. " + rule))
+        if not isinstance(result, dict) or not isinstance(result.get('issues'), list):
+            return {'ok': False, 'issues': ['check_failed: invalid review schema']}
+        result['ok'] = result.get('ok') is True and not result['issues']
+        result['model'] = recovery.last_model
+        return result
+    except Exception as exc:
+        return {'ok': False, 'issues': ['check_failed: ' + type(exc).__name__]}
+
+
 def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
                           gemini_generate: Callable[[str], str] | None = None,
                           is_newsroom_brief: bool = False, source_evidence: dict | None = None) -> dict:
@@ -93,5 +106,9 @@ def three_model_consensus(*, title: str, content: str, meta: str, keyword: str,
         'Set ok=true only when issues is empty. '
         'Return only JSON: {"ok": bool, "issues": [str], "suggestions": [str]}. Draft:\n' + packet
     )
-    results = {"gpt_1": _gpt_check("first", rule), "gpt_2": _gpt_check("second", rule)}
+    import newsroom_provider_recovery as recovery
+    if is_newsroom_brief and recovery.enabled():
+        results = {"review_1": _newsroom_check("first", rule), "review_2": _newsroom_check("second", rule)}
+    else:
+        results = {"gpt_1": _gpt_check("first", rule), "gpt_2": _gpt_check("second", rule)}
     return {"ok": all(result.get("ok") is True for result in results.values()), "checks": results}

@@ -29,6 +29,6 @@ def require_editorial_approval(*, title, content, meta, keyword, gemini_generate
                                    gemini_generate=gemini_generate, is_newsroom_brief=is_newsroom_brief,
                                    source_evidence=source_evidence)
     checks = result.get("checks", {})
-    if set(checks) != {"gpt_1", "gpt_2"} or not all(v.get("ok") is True for v in checks.values()):
+    if set(checks) not in ({"gpt_1", "gpt_2"}, {"review_1", "review_2"}) or not all(v.get("ok") is True for v in checks.values()):
         raise ValueError("CONSENSUS_FAILED: " + str(checks))
     return result

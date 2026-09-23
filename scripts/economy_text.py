@@ -125,9 +125,10 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
     if os.getenv('NEWSROOM_PAID_TEXT_APPROVED', '').lower() == 'true' and target in {'koreanews365.com', 'theseouljournal.com'}:
         if os.getenv('OPENAI_MODEL', '') != 'gpt-5-mini':
             raise RuntimeError('Newsroom paid exception permits gpt-5-mini only')
-        from openai_text import openai_generate_text
-        last_writer_model = 'gpt-5-mini'
-        return openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=120)
+        import newsroom_provider_recovery as recovery
+        text = recovery.generate(prompt, temperature=temperature)
+        last_writer_model = recovery.last_model
+        return text
 
     # 2026-09-18 (user directive): paid GPT is fully disabled, even as a
 
