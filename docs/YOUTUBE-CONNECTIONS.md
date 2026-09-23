@@ -36,3 +36,6 @@ Windsor 인증은 해당 서비스가 보관한다. OAuth code, access/refresh t
 
 ## 발행 승인과 분리
 조회 연결은 업로드 또는 공개 승인이 아니다. YouTube/SNS 공개는 콘텐츠별 사용자 최종 승인 후 실행한다.
+
+## 추가 연결 확인
+서울국제대학SIS 및 English Survival 브랜드도 Google 읽기 동의 및 Windsor 선택 저장 완료. Windsor Selected accounts 6/15 확인. 두 계정의 실제 채널 ID 및 통계는 아직 별도 확인 전이며 이름만으로 확정하지 않는다.
