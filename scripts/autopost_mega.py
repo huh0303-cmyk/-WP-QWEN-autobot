@@ -1881,7 +1881,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
         if lang == "ko":
             return f"""[한국신문 뉴스룸 전용]\n역할: {persona}\n취재 단서: {keyword}\n편집 범위: {scope}\n
 - HTML은 p, h2, blockquote, ul, li만 사용한다.
-- 본문은 공백 제외 400~1,500자이며 1,500자를 절대 넘기지 않는다.
+- 최소 글자 수는 없다. 확인된 사실만 1~3개 짧은 문단으로 쓰고 길이를 채우기 위한 배경·추측을 추가하지 않는다.
 - 역피라미드 구조: 핵심 사실 리드, 확인된 경위, 배경·맥락, 영향, 미확인 사항.
 - 첫 문단은 2~3문장, 각 문단은 1~3문장으로 짧게 쓴다. 소제목은 최대 2개다.
 - 표, FAQ, 체크리스트, 상담 CTA, 결론 요약을 쓰지 않는다.
@@ -1892,7 +1892,7 @@ def make_site_prompt(keyword, site, reporter, tag_count=None, min_chars_override
 - 끝에 META_DESC: 100~140자와 TAGS: 짧은 명사 6~10개를 쓴다. FAQ와 TITLE은 출력하지 않는다."""
         return f"""[THE SEOUL JOURNAL NEWSROOM ONLY]\nRole: {persona}\nReporting lead: {keyword}\nEditorial scope: {scope}\n
 - Use only p, h2, blockquote, ul and li HTML tags.
-- Body length is 400–1,500 characters excluding spaces; never exceed 1,500.
+- There is no minimum length. Write 1–3 short paragraphs supported by the supplied excerpt. Do not add context or speculation to fill space.
 - Use an inverted pyramid: concise lede, verified developments, context, significance, unresolved facts.
 - Write a 2–3 sentence lede and 1–3 sentence paragraphs. Use no more than two subheads.
 - No tables, FAQ, checklist, CTA or summary conclusion.
