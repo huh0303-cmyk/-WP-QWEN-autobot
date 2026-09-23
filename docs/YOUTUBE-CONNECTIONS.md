@@ -1,41 +1,37 @@
-# YouTube 연결 운영 기록
+# YouTube persistent connections
 
-최종 확인: 2026-09-23. 사용자 지시: 연결을 보존하고 매번 재연결을 요구하지 않는다.
+Verified 2026-09-24 KST. Reuse stored connections; do not ask the user to authorize again unless an actual revocation or new scope requires it.
 
-## 다음 작업 시작 순서
-1. 이 문서 및 VPS `/opt/korea365/data/YOUTUBE-CONNECTION-PROGRESS-20260923.md`를 먼저 읽는다.
-2. 기존 저장 연결로 읽기 전용 조회를 먼저 시도한다. 브라우저 탭이 닫힌 것은 인증 해제가 아니다.
-3. 만료된 접근 토큰은 기존 갱신 토큰으로 갱신한다. 사용자 동의를 자동 반복하지 않는다.
-4. 권한 철회, invalid_grant, 새 권한 필요 등 실제 근거가 있을 때만 정확한 채널과 이유를 알린다.
-5. 채널명과 Google 브랜드명이 다르므로 실제 channel_id를 검증한다. 이름만 보고 기존 매핑을 덮어쓰지 않는다.
+## Verified coverage
+Playlist 5 and knowledge 5: all ten channel identities verified with actual API responses. Windsor provides 15 selected channels, plus two direct Analytics connections (romantic UCbJfEtsffpgI5MsKkB7BYvQ and healing UC7yEsLM-HoXudngrD-4FIqg): 17 active collection connections.
 
-## 직접 연결: 확인 완료
-- 로맨틱: `UCbJfEtsffpgI5MsKkB7BYvQ`, Analytics HTTP 200, 2026-08 조회수 67.
-- 힐링: `UC7yEsLM-HoXudngrD-4FIqg`, Analytics HTTP 200, 2026-08 조회수 85.
-- YouTube Analytics API 활성화 확인. 전날 값이 아직 응답에 없으면 0으로 만들지 않는다.
-- VPS `korea365-channel-metrics.timer` 활성, service Result=success 확인.
-- 인증 보관: VPS `/etc/korea365/youtube-runtime.json` (비밀 값은 저장소에 금지).
-- 수집 결과: `/opt/korea365/data/account-audience-metrics.json`.
-- 그 외 기존 8개 직접 연결은 조회 권한 오류 상태이며 이 문서로 완료 처리하지 않는다.
+- CAFE_MOZART: `UC7jOhyMa-FIrzZuea97z1Pw`
+- Spanish Survival: `UC9mvVEdL9Tllkit5v2Qv8UQ`
+- Seoul_Jisoo1: `UCAizx0tPkRSol8sIhanN_QQ`
+- Italian Survival: `UCK8B-BM09Cz-ockaQYLL5LA`
+- German Survival: `UCKF98zgzm7YRWlyMaoJJKIQ`
+- CAFE_KPOP: `UCKZsfAWyCmY0jckf4IWZrqw`
+- SILENT_ERA_FILM: `UCLvy6kSpC8-7o3hnSrfQ47g`
+- HISTORY_TV_TODAY: `UCVBvZwodUF4s57KeNicxQ3w`
+- CAFE_STARBUCKSVIBES: `UC_e-sbLkVgwJNYEeobolNog`
+- 서울국제대학-TOPIK센터: `UCdA24IuR-JE7qButWv5jLqA`
+- INVENTION_STORY1: `UCgNj-yS93A_fOHXXvG49fww`
+- French Survival: `UCmt8f9yUT6iTxBys8eH4-Cg`
+- English Survival: `UCrjkKWMHzAAvpLIFgHnwcWg`
+- NASA_XFILES: `UCtNLZO07Oh3UnXPI2CjOgNg`
+- RETRO_USA1: `UCwh49EokdWFJqYFE_zA6XDQ`
 
-## Windsor.ai: 연결 및 선택 저장 확인
-Google 브랜드 선택 이름 기준 4개:
-- Mozart-Bach-Beethoven
-- K-pop Studio
-- RETRO_REELS_TIMES
-- SILENT_ERA_TIMES
+## Runtime
+- VPS systemd `korea365-channel-metrics.timer` invokes `korea365-channel-metrics.service` daily.
+- Collectors execute direct Analytics, public metrics, then Windsor metrics in that order.
+- Output `/opt/korea365/data/account-audience-metrics.json` is read by the control center account cards.
+- Evidence `/opt/korea365/data/windsor-youtube-connection-proof.json`.
+- Credentials remain ONLY in restricted VPS `/etc/korea365/youtube-runtime.json` and `/etc/korea365/windsor-analytics.json`; never commit their contents.
+- Windsor API returned HTTP 200, 75 daily channel rows, latest available date 2026-09-20. Missing yesterday is pending, never a fabricated zero.
+- Windsor trial supports 15 selected accounts, expires 2026-10-23. No payment authorized. Health Clinic Japan and USA are authorized but not selected for daily Windsor collection. Other unverified channels are not marked complete.
+- The old Google brand `Chinese Survival` resolved to CAFE_STARBUCKSVIBES. Brand labels MUST NOT be used as channel identity.
+- Reauthorization can change Windsor numeric account IDs; use the selected-account IDs shown in its preview and verify the real YouTube IDs.
+- This is analytics collection, not a new publishing authorization. YouTube/SNS remain subject to content-specific final approval. No publication queues were changed.
 
-Windsor 미리보기 실제 응답으로 확인된 채널:
-- RETRO_USA1: `UCwh49EokdWFJqYFE_zA6XDQ`, 2026-08-26 영상별 조회수 3, 3, 1.
-- INVENTION_STORY1: `UCgNj-yS93A_fOHXXvG49fww`, 2026-08-26 영상별 조회수 1, 2, 27, 1.
-
-주의: 위 브랜드 4개와 실제 채널 간 개별 대응은 아직 확정하지 않았다. 브랜드 이름으로 클래식/K팝 신원이 검증됐다고 보고하지 않는다. 나머지 계정 연결, 최근 일별 통계, VPS 자동 수집 연결은 진행 중이다. Windsor 연결이 기존 VPS 인증 토큰을 갱신한 것은 아니다.
-
-Windsor 인증은 해당 서비스가 보관한다. OAuth code, access/refresh token, API key, client secret, 전체 인증 URL을 GitHub에 올리지 않는다.
-계정 화면은 2026-10-23까지 체험판, 10 sources / 15 accounts로 표시됨. 영구 무료라고 약속하지 않고 별도 승인 없이 결제하지 않는다.
-
-## 발행 승인과 분리
-조회 연결은 업로드 또는 공개 승인이 아니다. YouTube/SNS 공개는 콘텐츠별 사용자 최종 승인 후 실행한다.
-
-## 추가 연결 확인
-서울국제대학SIS 및 English Survival 브랜드도 Google 읽기 동의 및 Windsor 선택 저장 완료. Windsor Selected accounts 6/15 확인. 두 계정의 실제 채널 ID 및 통계는 아직 별도 확인 전이며 이름만으로 확정하지 않는다.
+## Recovery
+Read this record first, then check the timer and latest evidence. Retry stored credentials before asking for login. Never put tokens, API keys or full OAuth URLs in this repository. Do not claim that a third-party trial is permanent free operation.
