@@ -54,8 +54,10 @@ jobs:
             systemctl status korea365-wp-publisher.service --no-pager -l | tail -n 25 || true
             journalctl -u korea365-wp-publisher.service -n 25 --no-pager || true
             /opt/korea365/.venv/bin/python - <<'PY'
-            import json, requests
+            import json, requests, socket
             from requests.auth import HTTPBasicAuth
+            _ga = socket.getaddrinfo
+            socket.getaddrinfo = lambda host,port,family=0,type=0,proto=0,flags=0: _ga(host,port,socket.AF_INET,type,proto,flags)
             from pathlib import Path
             creds=json.loads(Path('/etc/korea365/wp-sites.json').read_text())
             probes=[
