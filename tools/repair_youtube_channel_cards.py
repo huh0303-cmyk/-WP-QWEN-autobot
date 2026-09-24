@@ -31,6 +31,8 @@ OAUTH_OK = {
 
 def update_source() -> None:
     text = SOURCE.read_text(encoding="utf-8")
+    if "oauth_ok=c.get('oauth_ok'" in text and "public_count=sum(1 for c in d.get('youtube',[])" in text:
+        return
     text, count_ok = re.subn(
         r"(?m)^(\s*)ok=c\.get\('status'\)=='채널 일치 · 읽기 확인'\s*$",
         r"\1oauth_ok=c.get('oauth_ok',c.get('status')=='채널 일치 · 읽기 확인')",
