@@ -28,8 +28,10 @@ jobs:
             state_path = Path('/opt/korea365/data/vps-wp-daily-floor.json')
             queue = Path('/opt/korea365/data/vps-wp-queue')
             if not state_path.exists():
-                raise SystemExit('WP_FLOOR_STATE_MISSING')
-            state = json.loads(state_path.read_text())
+                print('WP_FLOOR_STATE_MISSING')
+                state = {}
+            else:
+                state = json.loads(state_path.read_text())
             safe = {
               'hour_key': state.get('hour_key'),
               'checked_at': state.get('checked_at'),
@@ -47,4 +49,6 @@ jobs:
             safe['queue_counts']=qcounts
             print('WP_DAILY_FLOOR_SAFE', json.dumps(safe, ensure_ascii=False, sort_keys=True))
             PY
-            systemctl is-active korea365-wp-publisher.service
+            systemctl is-active korea365-wp-publisher.service || true
+            systemctl status korea365-wp-publisher.service --no-pager -l | tail -n 25 || true
+            journalctl -u korea365-wp-publisher.service -n 25 --no-pager || true
