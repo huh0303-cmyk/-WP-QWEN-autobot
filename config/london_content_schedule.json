@@ -29,9 +29,10 @@
       "target": "1_per_day",
       "weekly_target": 7,
       "randomized_time": true,
-      "adsense_growth_targets": 24,
       "approved_center": "k-health365.com",
-      "operating_total": 25
+      "operating_total": 25,
+      "includes_khealth": true,
+      "adsense_growth_targets_excluding_khealth": 24
     },
     "newsrooms": {
       "sites": [
@@ -194,17 +195,15 @@
     "approved_center": "k-health365.com",
     "approved_center_status": "sole currently approved AdSense site and operating benchmark",
     "adsense_growth_scope": {
-      "wordpress_targets": 24,
-      "wordpress_excludes": [
-        "k-health365.com",
-        "koreanews365.com",
-        "theseouljournal.com"
-      ],
+      "regular_wordpress_total": 25,
+      "approved_center": "k-health365.com",
+      "additional_adsense_approval_targets": 24,
+      "newsrooms_separate": 2,
       "blogger_targets": 33
     },
     "operating_counts": {
       "regular_wordpress_total": 25,
-      "regular_wordpress_breakdown": "k-health365.com approved center + 24 AdSense approval targets",
+      "regular_wordpress_includes": "k-health365.com",
       "newsrooms": 2,
       "blogger": 33
     },
