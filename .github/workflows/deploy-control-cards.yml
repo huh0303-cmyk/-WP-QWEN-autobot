@@ -17,11 +17,9 @@ jobs:
           script: |
             set -euo pipefail
             ROOT=/opt/korea365
-            printf '%s\n' '--- matching files ---'
-            grep -RIl --exclude='*.pyc' --exclude-dir='.git' -E 'channel-check|채널 조회 실패|youtube_auth_preflight' "$ROOT" 2>/dev/null | head -80
-            printf '%s\n' '--- matching source lines ---'
-            grep -RIn --exclude='*.pyc' --exclude-dir='.git' -E 'channel-check|채널 조회 실패|youtube_auth_preflight' "$ROOT/control_center" "$ROOT/scripts" "$ROOT/config" 2>/dev/null | head -240 || true
-            printf '%s\n' '--- relevant environment names ---'
-            systemctl show korea365-control.service -p Environment --value | tr ' ' '\n' | sed 's/=.*//' | grep -E 'YOUTUBE|CHANNEL|AUDIT' | sort -u || true
-            printf '%s\n' '--- service command ---'
-            systemctl show korea365-control.service -p ExecStart -p WorkingDirectory
+            printf '%s\n' '--- channel_check.py ---'
+            sed -n '1,320p' "$ROOT/control_center/channel_check.py"
+            printf '%s\n' '--- operations-channel-audit.json ---'
+            sed -n '1,500p' "$ROOT/data/operations-channel-audit.json"
+            printf '%s\n' '--- app registration ---'
+            grep -RIn --exclude='*.pyc' -E 'channel_check|register_channel' "$ROOT/control_center" | head -80 || true
