@@ -10,12 +10,12 @@ import json
 import os
 import re
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import requests
 from requests.auth import HTTPBasicAuth
-from control_center.registry import load_wordpress_sites
 if os.getenv("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes", "on"}:
     import socket
     _getaddrinfo = socket.getaddrinfo
@@ -24,6 +24,10 @@ if os.getenv("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes
     socket.getaddrinfo = _ipv4_only_getaddrinfo
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from control_center.registry import load_wordpress_sites
+
 QUEUE = Path(os.environ.get("VPS_WP_QUEUE", ROOT / "data/vps-wp-queue"))
 CREDENTIALS = Path(os.environ.get("VPS_WP_CREDENTIALS", "/etc/korea365/wp-sites.json"))
 MAX_RETRIES = int(os.environ.get("VPS_WP_MAX_RETRIES", "3"))
