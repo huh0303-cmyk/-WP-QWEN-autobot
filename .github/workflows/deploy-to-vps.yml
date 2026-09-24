@@ -68,7 +68,7 @@ jobs:
             PY
 
               cp /tmp/london-reconcile-dirty.txt "$BACKUP/dirty-files.txt"
-              git -C "$ROOT" diff --no-ext-diff --binary -- \
+              git -C "$ROOT" diff --no-ext-diff --binary HEAD -- \
                 control_center/app.py \
                 control_center/templates/index.html \
                 scripts/situation_room_daily.py \
@@ -99,7 +99,7 @@ jobs:
             root = '/opt/korea365'
             paths = [p for p in Path('/tmp/london-reconcile-dirty.txt').read_text(encoding='utf-8').splitlines() if p]
             for path in paths:
-                subprocess.run(['git', '-C', root, 'restore', '--source=HEAD', '--worktree', '--', path], check=True)
+                subprocess.run(['git', '-C', root, 'restore', '--source=HEAD', '--staged', '--worktree', '--', path], check=True)
             print('Restored reviewed tracked hotfixes to deployed HEAD; backups retained.')
             PY
             fi
@@ -119,11 +119,11 @@ jobs:
             )
             reconciled=0
             for rel in "${REVIEWED_HOTFIXES[@]}"; do
-              if ! git -C "$ROOT" diff --quiet -- "$rel"; then
+              if ! git -C "$ROOT" diff --quiet HEAD -- "$rel"; then
                 mkdir -p "$REVIEW_BACKUP/files/$(dirname "$rel")" "$REVIEW_BACKUP/patches/$(dirname "$rel")"
                 cp -a "$ROOT/$rel" "$REVIEW_BACKUP/files/$rel"
-                git -C "$ROOT" diff --no-ext-diff --binary -- "$rel" > "$REVIEW_BACKUP/patches/$rel.patch"
-                git -C "$ROOT" restore --source=HEAD --worktree -- "$rel"
+                git -C "$ROOT" diff --no-ext-diff --binary HEAD -- "$rel" > "$REVIEW_BACKUP/patches/$rel.patch"
+                git -C "$ROOT" restore --source=HEAD --staged --worktree -- "$rel"
                 echo "Backed up and reconciled reviewed hotfix: $rel"
                 reconciled=1
               fi
