@@ -22,10 +22,10 @@
     {"platform":"TikTok","role":"hot_item_shop","display_name":"지수의 하루 · Jisoo Picks","handle":"sis_languageccenter","url":"https://www.tiktok.com/@sis_languageccenter","account_exists":true,"identity_verified":true,"publish_connected":false,"note":"현재 건강·뷰티·여행 통합 쇼핑 계정으로 기록됨"},
 
     {"platform":"Instagram","role":"korean_topik","display_name":"SIS Korean · TOPIK","handle":"sis_topik1","url":"https://www.instagram.com/sis_topik1/","account_exists":true,"identity_verified":true,"publish_connected":false},
-    {"platform":"Instagram","role":"japanese","display_name":"SIS Japanese · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Instagram","role":"japanese","display_name":"SIS Language Center","handle":"sis_language365","url":"https://www.instagram.com/sis_language365/","account_exists":true,"identity_verified":true,"publish_connected":false,"note":"2026-09-25 계정 전환 목록에서 확인; 일본어 역할 최종 확인 필요"},
     {"platform":"Instagram","role":"english","display_name":"SIS English · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
     {"platform":"Instagram","role":"health_shop","display_name":"서울 헬스365","handle":"seoul_health365","url":"https://www.instagram.com/seoul_health365/","account_exists":true,"identity_verified":true,"publish_connected":false},
-    {"platform":"Instagram","role":"travel_shop","display_name":"서울 라이프365","handle":"seoul_life365","url":"https://www.instagram.com/seoul_life365/","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"Instagram","role":"travel_shop","display_name":"서울 트립365","handle":"seoul_trip365","url":"https://www.instagram.com/seoul_trip365/","account_exists":true,"identity_verified":true,"publish_connected":false,"note":"2026-09-25 계정 전환 목록 및 이메일 코드 인증 화면에서 확인"},
     {"platform":"Instagram","role":"hot_item_shop","display_name":"Rosie’s Picks","handle":"seoul_item365","url":"https://www.instagram.com/seoul_item365/","account_exists":true,"identity_verified":true,"publish_connected":false},
 
     {"platform":"Facebook","role":"korean_topik","display_name":"서울국제대학 SIS - TOPIK Center","handle":"","url":"","account_exists":true,"identity_verified":false,"publish_connected":false,"note":"브라우저 프로필 목록에서 이름 확인, 페이지 ID 필요"},
