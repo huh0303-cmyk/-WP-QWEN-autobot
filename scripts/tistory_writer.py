@@ -305,8 +305,10 @@ def generate_draft(job: dict) -> dict:
             generated_url = host_permanently(generated_url, asset_key=job["job_id"])
         except (RuntimeError, KeyError):
             generated_url = None
-    from stock_image_provider import credit_html
+    from stock_image_provider import credit_html, contains_public_photo_credit
     draft["body_html"] += credit_html(generated_url)
+    if contains_public_photo_credit(draft["body_html"]):
+        raise RuntimeError("PUBLIC_PHOTO_CREDIT_LEAK: Tistory draft blocked before write")
     draft["image_url"] = generated_url
     # Alt text must describe the image for a reader, not carry the raw
     # AI generation prompt — use the article's own title instead.
