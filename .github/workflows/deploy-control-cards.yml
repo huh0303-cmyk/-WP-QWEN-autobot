@@ -32,7 +32,7 @@ jobs:
             systemctl is-active --quiet korea365-control.service
             PAGE=''
             for attempt in 1 2 3 4 5 6 7 8 9 10; do
-              if PAGE=$(curl -fsS https://control.korea365.org/channel-check/youtube); then
+              if PAGE=$(curl -fsS http://127.0.0.1:8000/channel-check/youtube); then
                 break
               fi
               sleep 2
