@@ -5,6 +5,8 @@ Decisions must not exist only in chat.
 
 ## GitHub is the durable record
 
+Canonical logging policy: `docs/GITHUB_OPERATION_RECORD_POLICY_2026-09-25.md`
+
 1. Every approved technical, editorial, SEO, source-rights, cadence, lifecycle,
    or site-scope decision is committed to the active feature branch during the
    same work session.
@@ -18,6 +20,8 @@ Decisions must not exist only in chat.
    operation ran.
 6. Secrets, credentials, personal tokens, and private source agreements are
    never committed. Only secret names and policy state are stored.
+7. Every material intermediate or final result is written to GitHub in the same work session; chat-only state is prohibited.
+8. Before asking the Chairman to repeat a prior fact or decision, read the latest GitHub record first.
 
 ## Continuity and work sizing
 
