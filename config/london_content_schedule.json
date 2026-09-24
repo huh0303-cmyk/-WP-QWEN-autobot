@@ -4,7 +4,20 @@
   "schedule_policy": {
     "planned_jitter_minutes": 60,
     "forbid_exact_hour": true,
-    "avoid_regular_minute_multiples": [0,5,10,15,20,25,30,35,40,45,50,55],
+    "avoid_regular_minute_multiples": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55
+    ],
     "minimum_same_platform_gap_minutes": 30,
     "avoid_repeating_same_day_time_pattern": true,
     "spread_targets_across_distinct_minutes": true,
@@ -15,17 +28,24 @@
       "scope": "each_enabled_general_wordpress_site",
       "target": "1_per_day",
       "weekly_target": 7,
-      "randomized_time": true
+      "randomized_time": true,
+      "adsense_growth_targets": 24,
+      "approved_center": "k-health365.com",
+      "operating_total": 25
     },
     "newsrooms": {
-      "sites": ["The Seoul Journal", "Koreanews365"],
-      "target": "1_per_day_per_newsroom",
-      "weekly_target_per_newsroom": 7,
+      "sites": [
+        "The Seoul Journal",
+        "Koreanews365"
+      ],
+      "target": "3_to_10_verified_breaking_stories_per_newsroom_per_day",
+      "weekly_target_per_newsroom": "21_to_70_when_verified_leads_exist",
       "source_mode": "rss_and_breaking_news_event_driven",
       "minimum_requires_verified_source_leads": true,
       "never_invent_to_fill_minimum": true,
-      "daily_max": 1,
-      "separate_from_general_wordpress": true
+      "daily_max": 10,
+      "separate_from_general_wordpress": true,
+      "daily_min": 3
     },
     "blogspot": {
       "target": "1_public_post_per_enabled_destination_per_day",
@@ -60,19 +80,38 @@
       "avoid_channel_time_collisions": true
     },
     "survival_10_language": {
-      "enabled": false,
-      "status": "outside_locked_youtube_10_scope",
-      "languages": ["Korean/TOPIK", "English", "Japanese", "Chinese", "Vietnamese", "Spanish", "French", "German", "Italian", "Portuguese"],
+      "enabled": true,
+      "status": "daily_after_exact_channel_id_and_publish_auth_verified",
+      "languages": [
+        "Korean/TOPIK",
+        "English",
+        "Japanese",
+        "Chinese",
+        "Vietnamese",
+        "Spanish",
+        "French",
+        "German",
+        "Italian",
+        "Portuguese"
+      ],
       "lessons_per_language": 50,
       "total_lessons": 500,
       "completed_through_lesson": 2,
       "next_lesson": 3,
-      "target": "disabled_until_separately_approved",
-      "upload_default": "private",
+      "target": "1_public_post_per_verified_language_channel_per_day",
+      "upload_default": "public_after_identity_write_and_quality_checks",
       "require_verified_private_before_review": true,
       "require_chairman_approval_before_public": true,
       "avoid_language_time_collisions": true,
-      "spread_languages_across_distinct_slots": true
+      "spread_languages_across_distinct_slots": true,
+      "weekly_target_per_verified_channel": 7,
+      "public_requires_verified_channel_id": true,
+      "public_requires_write_auth": true,
+      "missing_channel_ids": [
+        "Chinese",
+        "Vietnamese",
+        "Portuguese"
+      ]
     },
     "instagram": {
       "target": "1_public_post_per_verified_account_per_day",
@@ -95,11 +134,40 @@
       "target": "1_public_post_per_verified_account_per_day",
       "weekly_target": 7,
       "public_requires_local_write_verification": true
+    },
+    "youtube_daily_additional": {
+      "channel_count": 3,
+      "channels": [
+        {
+          "name": "Seoul_Jisoo1",
+          "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
+          "role": "shopping_booking"
+        },
+        {
+          "name": "Health Clinic USA",
+          "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
+          "role": "health_english_usa"
+        },
+        {
+          "name": "Health_Clinic_Japan",
+          "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
+          "role": "health_japanese"
+        }
+      ],
+      "target": "1_public_post_per_connected_channel_per_day",
+      "weekly_target_per_channel": 7,
+      "public_requires_write_auth": true
     }
   },
   "image_policy": {
     "copyright_safe_first": true,
-    "order": ["pexels", "pixabay", "bytedance/sdxl-lightning-4step", "black-forest-labs/flux-schnell", "pass_without_image"],
+    "order": [
+      "pexels",
+      "pixabay",
+      "bytedance/sdxl-lightning-4step",
+      "black-forest-labs/flux-schnell",
+      "pass_without_image"
+    ],
     "relevance_check_required": true,
     "news_use_source_or_licensed_image_only": true,
     "never_copy_unlicensed_news_photo": true
@@ -120,5 +188,32 @@
     "plan_b": "claude_acting_pm",
     "plan_c": "gemini_continuity",
     "safe_hold": "preserve_queue_stop_new_generation_and_unapproved_publication"
+  },
+  "business_objective": {
+    "primary_goal": "Google AdSense revenue growth through traffic, pageviews and Google index coverage",
+    "approved_center": "k-health365.com",
+    "approved_center_status": "sole currently approved AdSense site and operating benchmark",
+    "adsense_growth_scope": {
+      "wordpress_targets": 24,
+      "wordpress_excludes": [
+        "k-health365.com",
+        "koreanews365.com",
+        "theseouljournal.com"
+      ],
+      "blogger_targets": 33
+    },
+    "operating_counts": {
+      "regular_wordpress_total": 25,
+      "regular_wordpress_breakdown": "k-health365.com approved center + 24 AdSense approval targets",
+      "newsrooms": 2,
+      "blogger": 33
+    },
+    "primary_kpis": [
+      "daily_visitors",
+      "pageviews",
+      "google_indexed_urls",
+      "adsense_approval_status",
+      "adsense_revenue"
+    ]
   }
 }
