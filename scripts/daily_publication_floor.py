@@ -134,6 +134,34 @@ def reconcile(site, public, api, now, allow_dispatch, max_attempts=2):
         return row, False
     state, sha = api.load(sid)
     day = now.date().isoformat()
+
+    # A previous calendar day's orphaned claim must never block today's
+    # required publication. If it has a real run that is still active, keep
+    # waiting for that run; otherwise start today's state cleanly.
+    if state.get('day') and state.get('day') != day:
+        old_run_id = state.get('child_run_id') or state.get('run_id')
+        if old_run_id:
+            try:
+                old_run = api.run(old_run_id)
+            except (requests.RequestException, ValueError, KeyError):
+                old_run = {'status': 'completed'}
+            if old_run.get('status') != 'completed':
+                return {**row, 'status': 'RUNNING_PREVIOUS_DAY', 'run_id': old_run_id}, False
+        state = {}
+
+    # A same-day CLAIMED record without a run id can be left behind when a
+    # dispatch is rejected before GitHub assigns a run. After a short grace
+    # period, allow the bounded retry instead of blocking the site all day.
+    if state.get('status') in {'CLAIMED', 'DISPATCH_UNCERTAIN'} and not (state.get('child_run_id') or state.get('run_id')):
+        try:
+            claimed = datetime.fromisoformat(str(state.get('claimed_at') or '').replace('Z', '+00:00'))
+            if claimed.tzinfo is None:
+                claimed = claimed.replace(tzinfo=KST)
+            if now - claimed.astimezone(KST) >= timedelta(minutes=5):
+                state['status'] = 'FAILED'
+        except (ValueError, TypeError):
+            state['status'] = 'FAILED'
+
     if public['status'] == 'PUBLISHED':
         updated = {'day': day, 'status': 'PUBLISHED', 'public_url': public['url'], 'published_at': public['published_at']}
         if state != updated:
@@ -174,8 +202,9 @@ def reconcile(site, public, api, now, allow_dispatch, max_attempts=2):
         return {**row, 'status': 'CREDENTIAL_REQUIRED'}, False
     claim = 'daily-'+day+'-'+sid+'-'+uuid.uuid4().hex[:8]
     workflow, inputs = worker(site, attempts+1, claim, state)
-    state.update(day=day, status='CLAIMED', attempts=attempts+1, claim=claim,
-                 claimed_at=now.isoformat(), run_id=None, child_run_id=None, workflow=workflow)
+    state = {'day': day, 'status': 'CLAIMED', 'attempts': attempts+1, 'claim': claim,
+             'claimed_at': now.isoformat(), 'run_id': None, 'child_run_id': None,
+             'child_job_id': state.get('child_job_id'), 'workflow': workflow}
     sha = api.save(sid, state, sha)
     try:
         run_id = api.dispatch(workflow, inputs)
