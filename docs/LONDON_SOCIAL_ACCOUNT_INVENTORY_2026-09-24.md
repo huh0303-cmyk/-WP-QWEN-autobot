@@ -1,6 +1,6 @@
 # 런던 프로젝트 소셜 계정 전체 목록
 
-기준일: 2026-09-24 KST  
+기준일: 2026-09-25 KST  
 판정 기준: 서버의 런던 프로젝트 설정, 최신 계정 상태, 분석 연결 기록, YouTube 채널 잠금 파일을 상호 대조함.
 
 ## 요약
@@ -34,10 +34,10 @@
 |---|---|---|---|
 | 한국어/TOPIK | 서울국제대학-TOPIK센터 | UCdA24IuR-JE7qButWv5jLqA | 분석 연결 확인 |
 | 영어 | English Survival | UCrjkKWMHzAAvpLIFgHnwcWg | 분석 연결 확인 |
-| 다국어/음악 | Studio_starbucks | UCOWoNH_d6p45ywQ6W0Z1Jng | 등록됨, 최신 분석 스냅샷 재확인 필요 |
-| 건강 영어 | Health Clinic USA | UC91BpNSb4nUwD6jrpthK7FQ | 분석 연결 확인 |
-| 건강 한국어 | Seoul_Jisoo1 | UCAizx0tPkRSol8sIhanN_QQ | 분석 연결 확인 |
-| 건강 일본어 | Health_Clinic_Japan | UCC_PcHMv-Uxpr00Pjw_J2Wg | 분석 연결 확인 |
+| 일본어 | Japanese Survival (@seoul_japanese1) | UCOWoNH_d6p45ywQ6W0Z1Jng | 채널 ID·핸들 대조 확정, 게시 권한 재확인 필요 |
+| 건강 영어 | Health Clinic USA | UC91BpNSb4nUwD6jrpthK7FQ | 미국·영어권 대상 건강 채널 |
+| 쇼핑·예약 | Seoul_Jisoo1 | UCAizx0tPkRSol8sIhanN_QQ | 건강기능식품·호텔예약·여행/생활 예약·생활상품 쇼핑 채널로 전환 |
+| 건강 일본어 | Health_Clinic_Japan | UCC_PcHMv-Uxpr00Pjw_J2Wg | 일본·일본어권 대상 건강 채널 |
 | 프랑스어 | French Survival | UCmt8f9yUT6iTxBys8eH4-Cg | 분석 연결 확인 |
 | 독일어 | German Survival | UCKF98zgzm7YRWlyMaoJJKIQ | 분석 연결 확인 |
 | 스페인어 | Spanish Survival | UC9mvVEdL9Tllkit5v2Qv8UQ | 분석 연결 확인 |
@@ -72,7 +72,7 @@ YouTube 채널 링크는 `https://www.youtube.com/channel/채널ID` 형식으로
 
 ## 계획에는 있으나 실제 계정값이 확정되지 않은 항목
 
-- YouTube: Survival Chinese, Survival Vietnamese, Survival Portuguese — 현재 저장된 채널 ID 없음.
+- YouTube: Survival Chinese, Survival Vietnamese, Survival Portuguese — 검증된 계정 목록에 전용 채널이 아직 없음. 각 언어 전용 채널을 생성하거나 선택한 뒤 정확한 `UC...` 채널 ID를 캡처해야 확정됨.
 - TikTok: 기존 시간표의 네 번째 카드 `Rosie’s Picks` — 별도 핸들이 비어 있으며, 최신 상태에는 `@sis_languageccenter`가 쇼핑 통합 계정으로 기록돼 있으므로 중복 생성 계정으로 단정하지 않음.
 - Instagram/Threads/Facebook 게시 권한: VPS에 유효한 Meta 게시 자격 증명이 아직 없음. 로그인 화면을 본 것만으로 연결 완료 처리하지 않음.
 
@@ -82,3 +82,11 @@ YouTube 채널 링크는 `https://www.youtube.com/channel/채널ID` 형식으로
 - Instagram과 Threads는 핸들이 같아도 별도 플랫폼 계정과 별도 권한으로 관리한다.
 - 미확정 항목은 확정 계정 수에 넣지 않는다.
 - 공개 게시 자동화는 실제 계정 ID와 게시 권한을 읽기 검증한 뒤에만 연결한다.
+
+## 2026-09-25 채널 구조 확정
+
+- Survival 10개는 **1언어 = 1채널** 원칙: Korean/TOPIK, English, Japanese, Chinese, Vietnamese, Spanish, French, German, Italian, Portuguese.
+- Japanese Survival은 `UCOWoNH_d6p45ywQ6W0Z1Jng`, 핸들 `@seoul_japanese1`로 식별 확정.
+- Chinese / Vietnamese / Portuguese는 전용 실채널 ID가 아직 없으므로 다른 채널 ID를 재사용하지 않는다.
+- `Seoul_Jisoo1`은 다언어 혼합 교육 채널이 아니라 쇼핑·예약형 채널로 운영한다.
+- `Health Clinic USA`는 미국·영어권, `Health_Clinic_Japan`은 일본·일본어권 건강 채널로 분리한다.
