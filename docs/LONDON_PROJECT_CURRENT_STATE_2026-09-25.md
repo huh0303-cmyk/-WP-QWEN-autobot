@@ -101,8 +101,8 @@ Therefore the desired policy is recorded, but public SNS automation must remain 
 - Each card has its own identity, public-profile link when known, official-login link, connection level, operating role, and action explanation.
 - Existing unconnected SNS cards open the official login path and never pretend to publish.
 - The ten core YouTube cards queue private jobs only.
-- Each Tistory card invokes its existing single-site review-draft workflow and separately exposes the official Tistory login.
-- Naver N1, N2, and N3 are separate cards and separate intended login profiles. Their exact blog IDs remain unfilled until the owner logs into each account.
+- Each Tistory card targets one public post per day through the local registrar. The owner reported Tistory is already logged in on 2026-09-25; do not request login again unless an actual session check fails or CAPTCHA appears.
+- Naver N1, N2, and N3 are separate cards and must remain separate login/profile bindings. The owner reported Naver is already logged in on 2026-09-25. Do not ask for login again; the remaining task is to bind the existing logged-in sessions to the exact N1/N2/N3 blog IDs and verify one public test per account.
 
 ## Remaining work, in order
 
