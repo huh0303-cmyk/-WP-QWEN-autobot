@@ -165,5 +165,7 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
     except Exception as exc:
         if last_exc is None:
             last_exc = exc
-        raise RuntimeError(f'WRITERS_EXHAUSTED: Gemini and bounded GPT-5 mini fallback failed ({type(exc).__name__})') from last_exc
+        safe_reason = str(exc).replace(os.getenv('OPENAI_API_KEY',''), '[redacted]')[:180]
+        print(f'GPT-5 mini fallback unavailable: {type(exc).__name__}: {safe_reason}')
+        raise RuntimeError(f'WRITERS_EXHAUSTED: Gemini and bounded GPT-5 mini fallback failed ({type(exc).__name__}: {safe_reason})') from last_exc
 
