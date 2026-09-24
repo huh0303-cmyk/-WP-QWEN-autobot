@@ -101,7 +101,7 @@ def main():
     counts = {job_id: sum(len(row) > job_index and row[job_index] == job_id for row in verified[1:]) for job_id in target_ids}
     if len(rows) != len(target_ids) or any(count != 1 for count in counts.values()):
         raise RuntimeError(f"Tistory queue verification failed: {counts}")
-    print(json.dumps({"queued": len(unique_rows), "duplicates_blocked": len(rows) - len(unique_rows), "verified": len(counts), "visibility": "private"}, ensure_ascii=False))
+    print(json.dumps({"queued": len(unique_rows), "duplicates_blocked": len(rows) - len(unique_rows), "verified": len(counts), "visibility": "public"}, ensure_ascii=False))
     return 0
 
 
