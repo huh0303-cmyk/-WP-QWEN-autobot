@@ -2,9 +2,9 @@
   "version": 1,
   "description": "Five existing Tistory properties enabled for daily original-content preparation and staged publication.",
   "default_timezone": "Asia/Seoul",
-  "default_publish_policy": "awaiting_approval",
+  "default_publish_policy": "public_after_logged_in_local_registrar",
   "duplicate_guard": true,
-  "daily_posts_per_site": 2,
+  "daily_posts_per_site": 1,
   "sites": [
     {
       "site_id": "tistory_finance_housing",
@@ -46,7 +46,9 @@
       "daily_window": [
         7,
         9
-      ]
+      ],
+      "daily_posts_per_site": 1,
+      "publish_target": "1_public_post_per_kst_day"
     },
     {
       "site_id": "tistory_insurance_lab",
@@ -90,7 +92,9 @@
       "daily_window": [
         10,
         12
-      ]
+      ],
+      "daily_posts_per_site": 1,
+      "publish_target": "1_public_post_per_kst_day"
     },
     {
       "site_id": "tistory_health_info",
@@ -132,7 +136,9 @@
       "daily_window": [
         13,
         15
-      ]
+      ],
+      "daily_posts_per_site": 1,
+      "publish_target": "1_public_post_per_kst_day"
     },
     {
       "site_id": "tistory_life365",
@@ -259,7 +265,9 @@
       "daily_window": [
         16,
         18
-      ]
+      ],
+      "daily_posts_per_site": 1,
+      "publish_target": "1_public_post_per_kst_day"
     },
     {
       "site_id": "tistory_ktrip365",
@@ -301,7 +309,9 @@
       "daily_window": [
         19,
         21
-      ]
+      ],
+      "daily_posts_per_site": 1,
+      "publish_target": "1_public_post_per_kst_day"
     }
   ],
   "daily_windows_kst": {
@@ -313,5 +323,10 @@
       "13:00",
       "17:00"
     ]
+  },
+  "owner_login_checkpoint": {
+    "reported_at": "2026-09-25",
+    "state": "OWNER_REPORTED_ALREADY_LOGGED_IN",
+    "instruction": "Do not ask the owner to log in again unless an actual runtime check detects an expired session or CAPTCHA."
   }
 }
