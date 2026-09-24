@@ -1,0 +1,12 @@
+[Unit]
+Description=Korea365 schedule 33 randomized daily Blogger publications
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/korea365
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/schedule_blogger33_daily_vps.py
+Nice=5

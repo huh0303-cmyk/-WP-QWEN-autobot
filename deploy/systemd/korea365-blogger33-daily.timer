@@ -1,0 +1,10 @@
+[Unit]
+Description=Korea365 daily Blogger 33 public publishing timer
+
+[Timer]
+OnCalendar=*-*-* 15:05:00 UTC
+Persistent=true
+Unit=korea365-blogger33-daily.service
+
+[Install]
+WantedBy=timers.target

@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 
-from flask import Response, flash, jsonify, redirect, request, send_from_directory, url_for
+from flask import Response, flash, jsonify, redirect, render_template_string, request, send_from_directory, session, url_for
 
 from .keywords import tistory_seed_topics, top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
@@ -206,14 +206,66 @@ def approve_tistory_draft(job_id: str):
     return redirect(manager_url)
 
 
+CONTROL_LOGIN_TEMPLATE = """<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>Korea365 CEO Control Room</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0b1220;color:#e6edf3;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}
+.box{background:#161b22;padding:2rem;border-radius:12px;width:300px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+h1{font-size:1.05rem;margin:0 0 1.2rem;font-weight:600}
+input{width:100%;padding:.65rem;margin:.4rem 0;border-radius:6px;border:1px solid #30363d;background:#0d1117;color:#e6edf3;box-sizing:border-box;font-size:1rem}
+button{width:100%;padding:.65rem;margin-top:.7rem;border-radius:6px;border:none;background:#238636;color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
+.err{color:#f85149;font-size:.85rem;margin-top:.6rem}
+</style></head>
+<body><div class="box">
+<h1>Korea365 CEO Control Room</h1>
+<form method="post">
+<input type="text" name="username" placeholder="ID" autofocus required autocomplete="username">
+<input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+<button type="submit">로그인</button>
+</form>
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+</div></body></html>"""
+
+
+@app.route("/control-login", methods=["GET", "POST"])
+def control_center_login():
+    """Session-based login screen replacing the raw browser Basic Auth prompt."""
+    username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
+    password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
+    if not username or not password:
+        return redirect(url_for("index"))
+    if request.method == "POST":
+        supplied_user = request.form.get("username", "")
+        supplied_pass = request.form.get("password", "")
+        if hmac.compare_digest(supplied_user, username) and hmac.compare_digest(supplied_pass, password):
+            session.clear()
+            session["control_center_authed"] = True
+            session.permanent = True
+            next_url = request.args.get("next") or url_for("index")
+            if not next_url.startswith("/") or next_url.startswith("//"):
+                next_url = url_for("index")
+            return redirect(next_url)
+        return render_template_string(CONTROL_LOGIN_TEMPLATE, error="아이디 또는 비밀번호가 올바르지 않습니다."), 401
+    return render_template_string(CONTROL_LOGIN_TEMPLATE, error=None)
+
+
+@app.route("/control-logout")
+def control_center_logout():
+    session.pop("control_center_authed", None)
+    return redirect(url_for("control_center_login"))
+
+
 @app.before_request
 def require_control_center_login():
     """Protect every PWA route when deployment credentials are configured."""
-    if request.path in {"/healthz", "/api/vps/publish"} or request.endpoint == "blog_visits":
+    if request.path in {"/healthz", "/api/vps/publish", "/control-login", "/control-logout"} or request.endpoint == "blog_visits":
         return None
     username = os.environ.get("CONTROL_CENTER_USERNAME", "").strip()
     password = os.environ.get("CONTROL_CENTER_PASSWORD", "")
     if not username or not password:
+        return None
+    if session.get("control_center_authed"):
         return None
     supplied = request.authorization
     if (
@@ -221,12 +273,9 @@ def require_control_center_login():
         and hmac.compare_digest(supplied.username or "", username)
         and hmac.compare_digest(supplied.password or "", password)
     ):
+        session["control_center_authed"] = True
         return None
-    return Response(
-        "CEO control-room login required",
-        401,
-        {"WWW-Authenticate": 'Basic realm="Korea365 CEO Control Room"'},
-    )
+    return redirect(url_for("control_center_login", next=request.path))
 
 
 @app.get("/healthz")
@@ -2326,3 +2375,32 @@ def main() -> None:
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8766, debug=True)
+
+# publication evidence board 20260921
+@app.context_processor
+def publication_evidence_context():
+    from scripts.publication_board import board
+    return {"publication_board_html": board()}
+
+@app.get("/api/publication-evidence")
+def publication_evidence():
+    from scripts.publication_board import board
+    return board(), 200, {"Cache-Control": "no-store"}
+
+from .operations_guide import install as _install_operations_guide
+_install_operations_guide(app)
+
+from .channel_check import install as _install_channel_check
+_install_channel_check(app)
+
+from .account_schedule import install as _install_account_schedule
+_install_account_schedule(app)
+
+from .account_publish_button import install as _install_account_publish_button
+_install_account_publish_button(app)
+
+from .social_accounts import install as _install_social_accounts
+_install_social_accounts(app)
+
+from .pipeline_status import install as _install_pipeline_status
+_install_pipeline_status(app)

@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "effective_date": "2026-09-25",
+  "timezone": "Asia/Seoul",
+  "cadence": "1_public_post_per_account_per_day_after_publish_auth_verified",
+  "schedule": {"window_start": "08:10", "window_end": "22:50", "randomize_daily": true, "minimum_gap_minutes": 15},
+  "platforms": ["TikTok", "Instagram", "Facebook", "Threads"],
+  "roles": [
+    {"order": 1, "key": "korean_topik", "name": "한국어(TOPIK)", "shopping": false, "topic": "한국어 표현, TOPIK 학습, 한국 유학 생활"},
+    {"order": 2, "key": "japanese", "name": "일본어", "shopping": false, "topic": "초급 일본어 표현과 상황별 생존 회화"},
+    {"order": 3, "key": "english", "name": "영어", "shopping": false, "topic": "초급 영어 표현과 상황별 생존 회화"},
+    {"order": 4, "key": "health_shop", "name": "헬스 쇼핑", "shopping": true, "topic": "건강기능식품과 건강용품의 근거 중심 정보, 과장 효능 금지"},
+    {"order": 5, "key": "travel_shop", "name": "여행 쇼핑", "shopping": true, "topic": "호텔, K-pop 공연표·예매, 여행상품과 여행 준비 정보"},
+    {"order": 6, "key": "hot_item_shop", "name": "생활 핫아이템 쇼핑", "shopping": true, "topic": "생활용품, 여행용품, 화제 상품의 실용 정보"}
+  ],
+  "accounts": [
+    {"platform":"TikTok","role":"korean_topik","display_name":"SIS Korean · TOPIK","handle":"sis_topik","url":"https://www.tiktok.com/@sis_topik","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"TikTok","role":"japanese","display_name":"SIS Japanese · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"TikTok","role":"english","display_name":"SIS English · Survival","handle":"sis_languagecenter","url":"https://www.tiktok.com/@sis_languagecenter","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"TikTok","role":"health_shop","display_name":"Seoul Health365 Shop","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"TikTok","role":"travel_shop","display_name":"Seoul Travel365 Shop","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"TikTok","role":"hot_item_shop","display_name":"지수의 하루 · Jisoo Picks","handle":"sis_languageccenter","url":"https://www.tiktok.com/@sis_languageccenter","account_exists":true,"identity_verified":true,"publish_connected":false,"note":"현재 건강·뷰티·여행 통합 쇼핑 계정으로 기록됨"},
+
+    {"platform":"Instagram","role":"korean_topik","display_name":"SIS Korean · TOPIK","handle":"sis_topik1","url":"https://www.instagram.com/sis_topik1/","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"Instagram","role":"japanese","display_name":"SIS Japanese · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Instagram","role":"english","display_name":"SIS English · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Instagram","role":"health_shop","display_name":"서울 헬스365","handle":"seoul_health365","url":"https://www.instagram.com/seoul_health365/","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"Instagram","role":"travel_shop","display_name":"서울 라이프365","handle":"seoul_life365","url":"https://www.instagram.com/seoul_life365/","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"Instagram","role":"hot_item_shop","display_name":"Rosie’s Picks","handle":"seoul_item365","url":"https://www.instagram.com/seoul_item365/","account_exists":true,"identity_verified":true,"publish_connected":false},
+
+    {"platform":"Facebook","role":"korean_topik","display_name":"서울국제대학 SIS - TOPIK Center","handle":"","url":"","account_exists":true,"identity_verified":false,"publish_connected":false,"note":"브라우저 프로필 목록에서 이름 확인, 페이지 ID 필요"},
+    {"platform":"Facebook","role":"japanese","display_name":"서울국제대학교 SIS - Language Center","handle":"","url":"","account_exists":true,"identity_verified":false,"publish_connected":false,"note":"일본어 역할 매핑과 페이지 ID 재확인 필요"},
+    {"platform":"Facebook","role":"english","display_name":"서울국제대학 SIS-ENGLISH Center","handle":"","url":"","account_exists":true,"identity_verified":false,"publish_connected":false,"note":"브라우저 프로필 목록에서 이름 확인, 페이지 ID 필요"},
+    {"platform":"Facebook","role":"health_shop","display_name":"Seoul Health365 Shop","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Facebook","role":"travel_shop","display_name":"Seoul Travel365 Shop","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Facebook","role":"hot_item_shop","display_name":"Seoul Hot Items365 Shop","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+
+    {"platform":"Threads","role":"korean_topik","display_name":"SIS Korean · TOPIK","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Threads","role":"japanese","display_name":"SIS Japanese · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Threads","role":"english","display_name":"SIS English · Survival","handle":"","url":"","account_exists":false,"identity_verified":false,"publish_connected":false},
+    {"platform":"Threads","role":"health_shop","display_name":"서울 헬스365","handle":"seoul_health365","url":"https://www.threads.com/@seoul_health365","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"Threads","role":"travel_shop","display_name":"서울 라이프365","handle":"seoul_life365","url":"https://www.threads.com/@seoul_life365","account_exists":true,"identity_verified":true,"publish_connected":false},
+    {"platform":"Threads","role":"hot_item_shop","display_name":"Rosie’s Picks","handle":"seoul_item365","url":"https://www.threads.com/@seoul_item365","account_exists":true,"identity_verified":true,"publish_connected":false}
+  ],
+  "content_rules": {
+    "platform_native_copy": true,
+    "no_cross_platform_verbatim_copy": true,
+    "no_ai_process_disclosure_in_visible_copy": true,
+    "no_fake_personal_experience": true,
+    "shopping_requires_source_evidence": true,
+    "health_no_diagnosis_or_guaranteed_effect": true,
+    "travel_price_and_availability_require_current_source": true,
+    "duplicate_guard_by_platform_account_date": true,
+    "public_publish_requires_verified_account_and_publish_auth": true
+  }
+}

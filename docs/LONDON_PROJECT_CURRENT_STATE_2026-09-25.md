@@ -1,0 +1,106 @@
+# London Project — Canonical Current State
+
+Updated: 2026-09-25 (Asia/Seoul)
+
+This file is the canonical continuity record for the Korea365 London Project. Before asking the owner to repeat channel names, IDs, account roles, or publishing policy, read this file and the referenced machine-readable configuration.
+
+## Non-negotiable operating rules
+
+- Never store passwords, OAuth refresh tokens, API keys, cookies, or application passwords in Git.
+- Do not claim an account is connected merely because its public profile can be opened. A publishing connection is complete only after identity and write permission are verified.
+- Never create a duplicate account before checking the existing account inventory.
+- YouTube publishing remains private/review-only unless the owner separately approves a public release.
+- Blogspot has a separate approved policy: 33 blogs, one public post per blog per day, distributed randomly through the day, with a per-blog/per-date duplicate guard.
+- TikTok, Instagram, Facebook, and Threads use the same six-role policy. Public automation starts per account only after that account's identity and write credential are verified.
+- Visible content must read naturally and must not contain internal generation/process notices. This does not authorize fake experience, fabricated evidence, undisclosed sponsorship, or misleading health claims.
+
+## YouTube: locked ten-channel mapping
+
+The following IDs are authoritative. Do not ask the owner to provide them again.
+
+| No. | Production key | Locked name | Channel ID |
+|---:|---|---|---|
+| 01 | `globalmusic` | CAFE_ROMANTIC | `UCbJfEtsffpgI5MsKkB7BYvQ` |
+| 02 | `healing` | Cafe healing | `UC7yEsLM-HoXudngrD-4FIqg` |
+| 03 | `starbucks` | CAFE_STARBUCKSVIBES / Starbucks vibes | `UC_e-sbLkVgwJNYEeobolNog` |
+| 04 | `mbb` | CAFE_MOZART | `UC7jOhyMa-FIrzZuea97z1Pw` |
+| 05 | `kpop` | CAFE_KPOP | `UCKZsfAWyCmY0jckf4IWZrqw` |
+| 06 | `nasa` | NASA_XFILES | `UCtNLZO07Oh3UnXPI2CjOgNg` |
+| 07 | `history` | HISTORY_TV_TODAY | `UCVBvZwodUF4s57KeNicxQ3w` |
+| 08 | `invention` | INVENTION_STORY1 | `UCgNj-yS93A_fOHXXvG49fww` |
+| 09 | `silent_era` | SILENT_ERA_FILM | `UCLvy6kSpC8-7o3hnSrfQ47g` |
+| 10 | `retro_reels` | RETRO_USA1 | `UCwh49EokdWFJqYFE_zA6XDQ` |
+
+Production result recorded on 2026-09-24/25:
+
+- The prior HTTP 403 cards were not proof that the channels did not exist; they reflected an incomplete/incorrect lookup-auth path.
+- Queue ownership was repaired and `korea365-youtube-worker.service` was restarted successfully.
+- Jobs for all ten locked keys were queued for private/review publishing only.
+- Control-room state and the ten-channel lock were synchronized. See `data/youtube-ten-channel-lock.json` and `data/youtube-ten-control-receipt.json` on production when auditing runtime state.
+
+## Blogspot 33: daily production policy
+
+- All 33 blogs were checked through the Blogger API, public URL, metadata, and registry rows.
+- Production scheduling runs on the VPS, not by relying on the previously failing GitHub Actions text-generation path.
+- The daily coordinator starts at 00:05 KST and spreads 33 individual jobs approximately from 06:10 to 23:20 KST.
+- Each blog receives exactly one public post per date when successful; the publisher uses a date/account idempotency key.
+- Generation/transient failures are retried without duplicating a successful publication.
+- The systemd units and scheduler scripts committed with this record are the deployable source of truth.
+
+## WordPress correction recorded
+
+- `kworld365.com` post 895 had an operational stock-photo/license sentence visible as the first body line.
+- The visible sentence was removed while license provenance remains internal.
+- `scripts/free_article_supplier.py` was corrected so future posts do not expose that operational caption.
+
+## Social network six-role matrix
+
+Applies identically to TikTok, Instagram, Facebook, and Threads:
+
+1. Korean / TOPIK
+2. Japanese
+3. English
+4. Health supplements and health shopping
+5. Travel, hotels, and K-pop ticket shopping
+6. Lifestyle hot-item shopping
+
+Roles 4–6 are shopping channels. Target cadence is one public post per verified account per day, randomly distributed from 08:10 to 22:50 KST, with at least a 15-minute spacing and a per-platform/account/date duplicate guard.
+
+The machine-readable authority is `config/sns_six_channel_policy.json`.
+
+Status at this checkpoint:
+
+- Required slots: 24 (6 roles × 4 platforms)
+- Existing/observed identities: 13
+- Missing identities: 11
+- Verified write connections: 0 of 24
+
+Therefore the desired policy is recorded, but public SNS automation must remain disabled per account until OAuth/write permission is actually verified. Existing handles and the missing-slot list are fully captured in the JSON; do not ask the owner to re-list them.
+
+## Control room state
+
+- A unified social-account card page was added at `/social-accounts` with filters and an immediate-action button.
+- Existing unconnected SNS cards return a safe connection-required result; they do not pretend to publish.
+- The ten core YouTube cards queue private jobs only.
+- The control room should next be expanded from the observed 30-card inventory to the canonical 44-card view: YouTube 20 plus the complete SNS 24-slot matrix, including missing-account cards and Facebook.
+
+## Remaining work, in order
+
+1. Verify or create only the 11 missing SNS identities, checking for duplicates first.
+2. Record Facebook page IDs and confirm the Japanese page-role mapping.
+3. Complete Meta/Instagram/Threads and TikTok OAuth with write scope; authentication and final consent require the owner in the browser.
+4. Run one private/draft or platform-supported test per account; record receipt IDs.
+5. Enable one-public-post-per-day scheduling only for accounts that pass identity + write + test verification.
+6. Expand the control-room UI to show the canonical 24 SNS slots and live connection/publication receipts.
+
+## Verification language
+
+Use these states consistently:
+
+- `observed`: a profile/page was seen publicly or in the owner UI.
+- `identity_verified`: the exact account/page ID or handle was confirmed.
+- `publish_connected`: a write credential was verified.
+- `test_published`: a real draft/private/test receipt exists.
+- `daily_active`: recurring publication is enabled and the latest run is healthy.
+
+Never collapse those five states into a single vague “connected” label.
