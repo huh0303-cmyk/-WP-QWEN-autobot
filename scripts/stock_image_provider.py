@@ -103,11 +103,25 @@ def find_stock_image(subject, theme=""):
     return None
 
 
+PUBLIC_PHOTO_NOTICE = re.compile(
+    r"illustrative\\s+stock\\s+photo|photo\\s+license|"
+    r"not\\s+a\\s+photograph\\s+of\\s+a\\s+specific\\s+event|"
+    r"stock\\s+photo\\s*/\\s*자료사진|class=[\"']?photo-credit",
+    re.I,
+)
+
+
+def contains_public_photo_credit(content):
+    """True when internal stock/licensing provenance leaked into reader-visible copy."""
+    return bool(PUBLIC_PHOTO_NOTICE.search(html.unescape(str(content or ""))))
+
+
 def credit_html(url):
-    item = METADATA.get(url)
-    if not item:
-        return ""
-    esc = lambda value: html.escape(str(value), quote=True)
-    return (f'<p class="photo-credit">Photo: {esc(item["author"])} / '
-            f'<a href="{esc(item["source"])}">{esc(item["provider"])}</a> '
-            f'(<a href="{esc(item["license"])}">License</a>) · Stock photo / 자료사진</p>')
+    """Never expose stock-provider/licence operations in reader-visible article HTML.
+
+    Rights/source provenance is already persisted by find_stock_image() in
+    artifacts/stock-image-receipts.jsonl and must remain internal.  Keeping
+    this function as a no-op makes every legacy caller safe without requiring
+    each publishing path to remember the rule independently.
+    """
+    return ""
