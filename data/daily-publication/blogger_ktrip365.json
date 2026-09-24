@@ -1,1 +1,13 @@
-{"day": "2026-09-25", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-09-25-blogger_ktrip365-01a458d7", "claimed_at": "2026-09-25T08:20:03.138928+09:00", "run_id": 36072198854, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{
+  "day": "2026-09-25",
+  "status": "FAILED",
+  "attempts": 0,
+  "claim": "daily-2026-09-25-blogger_ktrip365-01a458d7",
+  "claimed_at": "2026-09-25T08:20:03.138928+09:00",
+  "run_id": null,
+  "child_run_id": null,
+  "child_job_id": null,
+  "workflow": "blogger-rewrite.yml",
+  "system_repair": "2026-09-25 cached-source REST bypass + bounded writer fallback",
+  "system_repair_reason": "previous attempts failed because of pipeline defects now fixed; retry budget reset once"
+}
