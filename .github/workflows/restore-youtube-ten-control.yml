@@ -128,6 +128,14 @@ jobs:
 
             systemctl restart korea365-control.service
             systemctl is-active korea365-control.service
-            curl -fsS https://control.korea365.org/channel-check/youtube | grep -q '기존 읽기 연결 정상'
-            curl -fsS https://control.korea365.org/channel-check/youtube | grep -q 'UC_e-sbLkVgwJNYEeobolNog'
-            curl -fsS https://control.korea365.org/channel-check/youtube | grep -q 'UCwh49EokdWFJqYFE_zA6XDQ'
+            PAGE=$(mktemp)
+            trap 'rm -f "$PAGE"' EXIT
+            for attempt in $(seq 1 15); do
+              if curl -fsS https://control.korea365.org/channel-check/youtube > "$PAGE"; then
+                break
+              fi
+              sleep 2
+            done
+            grep -q '기존 읽기 연결 정상' "$PAGE"
+            grep -q 'UC_e-sbLkVgwJNYEeobolNog' "$PAGE"
+            grep -q 'UCwh49EokdWFJqYFE_zA6XDQ' "$PAGE"
