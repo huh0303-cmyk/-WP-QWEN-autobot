@@ -21,7 +21,7 @@
     const controls=document.createElement('div');controls.className='metrics-controls';
     const filter=document.createElement('input');filter.type='search';filter.placeholder='사이트 이름으로 검색';filter.setAttribute('aria-label','통계 사이트 검색');filter.className='dashboard-search';
     const select=document.createElement('select');select.setAttribute('aria-label','통계 플랫폼 선택');select.className='dashboard-search';
-    [['전체','전체'],['WordPress','WP 25'],['Blogspot','Blogspot 33'],['뉴스룸','뉴스룸 2']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);});
+    [['전체','전체'],['WordPress','WP 25 운영 · 승인대상 24 + K-Health'],['Blogspot','Blogspot 33'],['뉴스룸','뉴스룸 2 · 각 3~10/일']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);});
     controls.append(select,filter);host.before(controls);
     function applyFilter(){
         host.querySelectorAll('[data-metrics-platform]').forEach(group=>{
