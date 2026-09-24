@@ -41,6 +41,7 @@ jobs:
             root = Path('/opt/korea365')
             allowed = {
                 'control_center/app.py',
+                'control_center/operations_guide.py',
                 'control_center/templates/index.html',
                 'scripts/situation_room_daily.py',
                 'scripts/vps_wordpress_worker.py',
@@ -110,6 +111,7 @@ jobs:
             REVIEW_BACKUP="$ROOT/data/pre-london-reconcile/$(date -u +%Y%m%dT%H%M%SZ)-reviewed-hotfixes-${{ github.sha }}"
             REVIEWED_HOTFIXES=(
               "control_center/app.py"
+              "control_center/operations_guide.py"
               "control_center/templates/index.html"
               "scripts/situation_room_daily.py"
               "scripts/vps_wordpress_worker.py"
