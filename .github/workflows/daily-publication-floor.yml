@@ -1,6 +1,9 @@
 name: Daily public publication floor
 
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/daily-publication-floor.yml']
   schedule:
     - cron: '13 * * * *'
   workflow_dispatch:
