@@ -124,7 +124,7 @@ def worker(site, attempt, claim_id, state):
     return 'blogger-rewrite.yml', {'blogger_site_id': site['site_id'], 'language': site.get('language', 'en'),
         'persona': site.get('persona', 'helpful specialist editor'), 'tone': site.get('tone', 'practical and clear'),
         'target_chars': str(site.get('target_chars', 1800)), 'publish_now': 'true',
-        'recover_from_wp': 'true' if attempt > 1 else 'false', 'fetch_jitter_max_seconds': '30'}
+        'recover_from_wp': 'true', 'fetch_jitter_max_seconds': '30'}
 
 
 def reconcile(site, public, api, now, allow_dispatch, max_attempts=2):
