@@ -103,19 +103,32 @@ jobs:
             PY
             fi
 
-            # Preserve the long-standing VPS-only newsroom watcher edit that
-            # has blocked every deployment since Sep 21, then restore the
-            # tracked copy so the guarded deployer can advance. The original
-            # bytes and a binary-safe patch remain recoverable on the server.
-            NEWSROOM_HOTFIX="config/newsroom_rss_watch.json"
-            if ! git -C "$ROOT" diff --quiet -- "$NEWSROOM_HOTFIX"; then
-              REVIEW_BACKUP="$ROOT/data/pre-london-reconcile/$(date -u +%Y%m%dT%H%M%SZ)-newsroom-watcher-${{ github.sha }}"
-              mkdir -p "$REVIEW_BACKUP/config"
-              chmod 700 "$REVIEW_BACKUP" "$REVIEW_BACKUP/config"
-              cp -a "$ROOT/$NEWSROOM_HOTFIX" "$REVIEW_BACKUP/$NEWSROOM_HOTFIX"
-              git -C "$ROOT" diff --no-ext-diff --binary -- "$NEWSROOM_HOTFIX" > "$REVIEW_BACKUP/newsroom-rss-watch.patch"
-              git -C "$ROOT" restore --source=HEAD --worktree -- "$NEWSROOM_HOTFIX"
-              echo "Backed up and reconciled $NEWSROOM_HOTFIX at $REVIEW_BACKUP"
+            # Preserve the reviewed legacy VPS hotfix set even when the old
+            # one-time marker already exists. The guarded deployer reports one
+            # dirty path at a time, so reconcile the complete known set in one
+            # pass. Unknown dirty managed code still blocks deployment.
+            REVIEW_BACKUP="$ROOT/data/pre-london-reconcile/$(date -u +%Y%m%dT%H%M%SZ)-reviewed-hotfixes-${{ github.sha }}"
+            REVIEWED_HOTFIXES=(
+              "control_center/app.py"
+              "control_center/templates/index.html"
+              "scripts/situation_room_daily.py"
+              "scripts/vps_wordpress_worker.py"
+              "config/newsroom_rss_watch.json"
+            )
+            reconciled=0
+            for rel in "${REVIEWED_HOTFIXES[@]}"; do
+              if ! git -C "$ROOT" diff --quiet -- "$rel"; then
+                mkdir -p "$REVIEW_BACKUP/files/$(dirname "$rel")" "$REVIEW_BACKUP/patches/$(dirname "$rel")"
+                cp -a "$ROOT/$rel" "$REVIEW_BACKUP/files/$rel"
+                git -C "$ROOT" diff --no-ext-diff --binary -- "$rel" > "$REVIEW_BACKUP/patches/$rel.patch"
+                git -C "$ROOT" restore --source=HEAD --worktree -- "$rel"
+                echo "Backed up and reconciled reviewed hotfix: $rel"
+                reconciled=1
+              fi
+            done
+            if [ "$reconciled" -eq 1 ]; then
+              chmod -R go-rwx "$REVIEW_BACKUP"
+              echo "Reviewed hotfix backup: $REVIEW_BACKUP"
             fi
 
             set +e
