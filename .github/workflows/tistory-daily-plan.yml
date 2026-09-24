@@ -1,0 +1,53 @@
+name: Tistory Daily Plan
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_ids:
+        description: Comma-separated Tistory site IDs
+        required: true
+        type: string
+      run_key:
+        description: Unique per-site/day run key
+        required: true
+        type: string
+      slot:
+        description: Compatibility slot; all values normalize to one daily slot
+        required: false
+        default: daily
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-and-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE_IDS: ${{ inputs.site_ids }}
+      TISTORY_RUN_KEY: ${{ inputs.run_key }}
+      TISTORY_SLOT: ${{ inputs.slot }}
+      SHEET_ID: ${{ secrets.SHEET_ID }}
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+      AI_TEXT_PROVIDER: openai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install runtime
+        run: pip install -r requirements-control-center.txt google-api-python-client google-auth requests pillow
+      - name: Build one-site daily plan
+        run: python scripts/tistory_daily_planner.py --output artifacts/tistory-daily-plan.json
+      - name: Generate and quality-check article
+        run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
+      - name: Queue for logged-in local registrar
+        run: python scripts/enqueue_tistory_drafts.py --drafts artifacts/tistory-daily-drafts.json
