@@ -239,15 +239,27 @@ jobs:
             fi
 
             python3 - <<'PY'
-            import json
+            import json, subprocess
             from pathlib import Path
-            state = json.loads(Path('/opt/korea365/data/deploy-status.json').read_text())
+            root = '/opt/korea365'
+            state = json.loads(Path(root + '/data/deploy-status.json').read_text())
             print('DEPLOY_STATUS', json.dumps({k: state.get(k) for k in ('status', 'deployed_commit', 'target_commit')}))
             if state.get('status') not in {'current', 'deployed'}:
                 raise SystemExit('Deployment is deferred or failed; inspect VPS deployment status')
+            deployed = state.get('deployed_commit') or ''
+            target = state.get('target_commit') or ''
             expected = '${{ github.sha }}'
-            if state.get('deployed_commit') != expected:
-                raise SystemExit(f"VPS commit mismatch: deployed={state.get('deployed_commit')} expected={expected}")
+            if not deployed or deployed != target:
+                raise SystemExit(f"VPS target mismatch: deployed={deployed} target={target}")
+            # Another main commit may land while this deploy run is executing.
+            # Accept a newer deployed commit only when the triggering commit is
+            # an ancestor of it; never call an unrelated/older deployment good.
+            ancestor = subprocess.run(
+                ['git','-C',root,'merge-base','--is-ancestor',expected,deployed],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            ).returncode == 0
+            if not ancestor:
+                raise SystemExit(f"VPS commit does not contain triggering commit: deployed={deployed} expected_ancestor={expected}")
             PY
 
             # One-time 2026-09-25 remediation: remove any reader-visible internal
@@ -316,14 +328,14 @@ jobs:
             # service health + London heartbeat have all passed.
             if [ ! -f "$MARKER" ]; then
               python3 - <<'PY'
-            import json, time
+            import json, time, subprocess
             from pathlib import Path
             root = Path('/opt/korea365')
             backups = sorted((root / 'data/pre-london-reconcile').glob('*'))
             payload = {
                 'project': 'london-project',
                 'completed_at': time.time(),
-                'deployed_commit': '${{ github.sha }}',
+                'deployed_commit': subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'], text=True).strip(),
                 'backup': str(backups[-1]) if backups else '',
                 'note': 'Reviewed server hotfixes backed up before restoring tracked files; future dirty-code protection remains enabled.',
             }
