@@ -126,6 +126,10 @@ This checkpoint means **do not ask the owner to log in again** unless the browse
 - The public blog and Naver write-editor URLs were opened on the owner's PC. Do not ask the owner to re-enter the N1 identity.
 - Remaining verification is one real public test receipt from the local browser publisher; until that receipt exists, do not claim daily_active.
 
+## User-authentication tabs opened — 2026-09-25
+
+The following pages were opened on device `ChrisHUH` for the owner to authenticate or select the correct account where needed: Naver N1 (`huh0303`) editor, Tistory `huh0303` editor, Instagram, TikTok, Threads, Facebook, YouTube channel switcher, and YouTube Studio. For YouTube, the unresolved identities remain Chinese Survival, Vietnamese Survival, and Portuguese Survival; capture exact `UC...` channel IDs after owner selection. Do not request credentials in chat. If a page is already logged in, preserve that session and proceed to identity/write verification instead of forcing re-login.
+
 ## Remaining work, in order
 
 1. Verify or create only the 11 missing SNS identities, checking for duplicates first.
