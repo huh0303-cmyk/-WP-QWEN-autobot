@@ -29,6 +29,27 @@ from site_registry import SITES
 WP_USER = os.getenv("WP_USER", "huh0303@gmail.com")
 APPLY = os.getenv("PHOTO_CREDIT_CLEANUP_APPLY", "false").strip().lower() in {"1", "true", "yes", "on"}
 REPORT = ROOT / "artifacts" / "photo-credit-cleanup.json"
+VPS_CREDENTIALS = Path(os.getenv("VPS_WP_CREDENTIALS", "/etc/korea365/wp-sites.json"))
+
+
+def _credential_map() -> dict[str, str]:
+    """Use environment secrets in Actions, or the root-only provisioned VPS credential map."""
+    values: dict[str, str] = {}
+    if VPS_CREDENTIALS.exists():
+        try:
+            loaded = json.loads(VPS_CREDENTIALS.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                values.update({str(k): str(v) for k, v in loaded.items() if str(v).strip()})
+        except (OSError, ValueError, TypeError):
+            pass
+    for _url, secret_name, _tier in SITES:
+        value = os.getenv(secret_name, "").strip()
+        if value:
+            values[secret_name] = value
+    return values
+
+
+CREDENTIALS = _credential_map()
 
 ILLUSTRATIVE_PREFIX = re.compile(
     r"^\s*Illustrative\s+stock\s+photo\s*:\s*.*?"
@@ -106,7 +127,7 @@ def sanitize_excerpt(raw: str) -> tuple[str, bool]:
 
 
 def scan_site(site_url: str, secret_name: str) -> dict:
-    password = os.getenv(secret_name, "")
+    password = CREDENTIALS.get(secret_name, "")
     result = {"site": site_url, "secret_name": secret_name, "scanned": 0, "changed": [], "status": "ok"}
     if not password:
         result["status"] = "skipped_missing_secret"
