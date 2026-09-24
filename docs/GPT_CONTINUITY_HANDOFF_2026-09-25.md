@@ -8,8 +8,9 @@ Read these repository files before asking the owner any account questions:
 
 1. `docs/LONDON_PROJECT_CURRENT_STATE_2026-09-25.md`
 2. `config/sns_six_channel_policy.json`
-3. `docs/LONDON_PROJECT_BLUEPRINT.md` if present
-4. Existing YouTube lock/receipt and Blogspot 33 registry files
+3. `docs/DAILY_52_CHANNEL_EXECUTION_PLAN.md`
+4. `docs/LONDON_PROJECT_BLUEPRINT.md` if present
+5. Existing YouTube lock/receipt and Blogspot 33 registry files
 
 Treat the ten YouTube mappings and the six-role SNS matrix as already supplied and approved. Do not ask the owner to enumerate them again.
 
@@ -21,6 +22,7 @@ Treat the ten YouTube mappings and the six-role SNS matrix as already supplied a
 - The KWorld visible stock-license first line was removed and the future supplier path was corrected.
 - A consolidated social inventory and control-room page were created.
 - The full 24-slot TikTok/Instagram/Facebook/Threads role policy is now machine-readable.
+- A daily 52-account planner is active on the VPS. It reshuffles all accounts across 24 hours with one slot per account; unauthenticated slots remain blocked instead of attempting publication.
 
 ## What is intentionally not claimed complete
 

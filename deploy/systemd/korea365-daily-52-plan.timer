@@ -1,0 +1,11 @@
+[Unit]
+Description=Build the next Korea365 52-account plan every day
+
+[Timer]
+OnCalendar=*-*-* 15:01:00 UTC
+Persistent=true
+RandomizedDelaySec=180
+Unit=korea365-daily-52-plan.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Build Korea365 randomized 52-account daily plan
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=korea365
+Group=korea365
+WorkingDirectory=/opt/korea365
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/plan_52_channel_daily.py
