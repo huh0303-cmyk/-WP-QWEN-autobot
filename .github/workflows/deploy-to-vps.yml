@@ -157,6 +157,25 @@ jobs:
                 raise SystemExit(f"VPS commit mismatch: deployed={state.get('deployed_commit')} expected={expected}")
             PY
 
+            # One-time 2026-09-25 remediation: remove any reader-visible internal
+            # stock-photo/licence notices from already-published WordPress posts.
+            # Uses the root-only credential map provisioned on the VPS; no secret
+            # values are written to Git or logs.
+            PHOTO_FIX_MARKER="$ROOT/data/public-photo-credit-cleanup-2026-09-25.done"
+            if [ ! -f "$PHOTO_FIX_MARKER" ]; then
+              echo "=== PUBLIC PHOTO-CREDIT CLEANUP ==="
+              PHOTO_CREDIT_CLEANUP_APPLY=true \
+                VPS_WP_CREDENTIALS=/etc/korea365/wp-sites.json \
+                "$ROOT/.venv/bin/python" "$ROOT/scripts/cleanup_public_photo_credit.py"
+              python3 - <<'PY'
+            from pathlib import Path
+            p = Path('/opt/korea365/data/public-photo-credit-cleanup-2026-09-25.done')
+            p.write_text('completed\n', encoding='utf-8')
+            p.chmod(0o600)
+            print('PHOTO_CREDIT_CLEANUP_MARKER', p)
+            PY
+            fi
+
             systemctl is-active korea365-control.service korea365-operations.service
 
             python3 - <<'PY'
