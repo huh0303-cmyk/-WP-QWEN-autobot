@@ -46,9 +46,39 @@ def sites_for(platform):
 
 
 def public_status(site, now):
-    result = check(site)
-    if result['status'] not in {'public_post_found', 'no_public_post_in_response'}:
-        return {'status': 'READ_ERROR', 'reason': result['status']}
+    # WordPress fleet: use the same protected application-password channel as
+    # publishing. Public anonymous REST is frequently blocked by ModSecurity/
+    # bot rules and must not be interpreted as "no post today".
+    if site.get('platform') == 'wordpress':
+        secret = os.getenv(site.get('secret_name', ''), '').strip()
+        if not secret:
+            return {'status': 'READ_ERROR', 'reason': 'credential_missing'}
+        user = os.getenv('WP_USER', 'huh0303@gmail.com')
+        try:
+            response = requests.get(
+                site['url'].rstrip('/') + '/wp-json/wp/v2/posts',
+                auth=(user, secret),
+                headers={'User-Agent': 'Korea365-Control/1.0'},
+                params={'status': 'publish', 'per_page': 1, 'orderby': 'date',
+                        'order': 'desc', '_fields': 'link,date_gmt,title'},
+                timeout=15,
+            )
+            response.raise_for_status()
+            posts = response.json()
+            if not isinstance(posts, list):
+                raise ValueError('invalid WordPress post inventory')
+            result = {
+                'status': 'public_post_found' if posts else 'no_public_post_in_response',
+                'latest_url': posts[0].get('link','') if posts else '',
+                'latest_published': (posts[0].get('date_gmt','') + 'Z') if posts and posts[0].get('date_gmt') else None,
+                'latest_title': ((posts[0].get('title') or {}).get('rendered','')) if posts else '',
+            }
+        except (requests.RequestException, ValueError, TypeError):
+            return {'status': 'READ_ERROR', 'reason': 'authenticated_wp_inventory_failed'}
+    else:
+        result = check(site)
+        if result['status'] not in {'public_post_found', 'no_public_post_in_response'}:
+            return {'status': 'READ_ERROR', 'reason': result['status']}
     raw = result.get('latest_published')
     try:
         published = datetime.fromisoformat(raw.replace('Z', '+00:00')) if raw else None
