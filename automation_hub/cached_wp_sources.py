@@ -6,7 +6,7 @@ from urllib.parse import urlparse, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 
-def cached_posts(site_url, *, root=ROOT, now=None):
+def cached_posts(site_url, *, root=ROOT, now=None, max_age_seconds=86400):
     host = urlparse(site_url).hostname
     if not host or not all(c.isalnum() or c in '.-' for c in host):
         return []
@@ -14,7 +14,7 @@ def cached_posts(site_url, *, root=ROOT, now=None):
         data = json.loads((root/'data/wp-source-snapshots'/f'{host}.json').read_text())
         checked = datetime.fromisoformat(data['fetched_at'])
         age = ((now or datetime.now(timezone.utc)) - checked).total_seconds()
-        if not 0 <= age <= 86400 or data['site_url'].rstrip('/') != site_url.rstrip('/'):
+        if not 0 <= age <= max_age_seconds or data['site_url'].rstrip('/') != site_url.rstrip('/'):
             return []
         return [p for p in data['posts'] if p.get('status') == 'publish'
                 and urlparse(p.get('link','')).hostname == host
