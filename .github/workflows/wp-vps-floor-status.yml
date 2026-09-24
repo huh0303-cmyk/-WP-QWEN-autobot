@@ -1,4 +1,5 @@
 name: WP VPS daily floor status
+# verify after worker import repair 2026-09-25
 
 on:
   push:
