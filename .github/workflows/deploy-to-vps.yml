@@ -150,13 +150,14 @@ jobs:
             git -C "$ROOT" fetch origin main
             TARGET_REF=refs/remotes/origin/main
             COLLISION_BACKUP="$ROOT/data/pre-london-reconcile/$(date -u +%Y%m%dT%H%M%SZ)-untracked-target-collisions-${{ github.sha }}"
+            export COLLISION_BACKUP
             python3 - <<'PY'
-            import shutil, subprocess
+            import os, shutil, subprocess
             from pathlib import Path
 
             root = Path('/opt/korea365')
             target = 'refs/remotes/origin/main'
-            backup = Path("""$COLLISION_BACKUP""")
+            backup = Path(os.environ['COLLISION_BACKUP'])
             managed_roots = {'.github', 'automation_hub', 'control_center', 'scripts', 'config', 'deploy', 'tests', 'tools', 'multilang_quiz'}
             raw = subprocess.check_output(
                 ['git', '-C', str(root), 'diff', '--name-only', '-z', '--diff-filter=A', 'HEAD', target]
