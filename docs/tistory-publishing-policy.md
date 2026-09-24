@@ -1,10 +1,6 @@
 # Tistory publication policy — 2026-09-07
 
-Each of the five existing blogs has two slots every day in Asia/Seoul:
-07:00–10:59 and 13:00–16:59. Each site uses a shuffled minute schedule;
-adjacent days never repeat the same minute. GitHub checks due slots every
-five minutes. Actions queue delays and generation mean these are target
-start times, not guaranteed public-post timestamps.
+Each of the five existing blogs has exactly one randomized publication slot per KST day. The target is one public post per site per day. The dispatcher avoids exact-hour/repeating machine-like times. Generation and local-browser execution delays may shift the final public timestamp.
 
 The dispatcher records a site/day/slot reservation on main before dispatch.
 It never blindly redispatches an ambiguous request. The old daily cron is
@@ -26,7 +22,4 @@ The supplied search description is inserted as a leading body summary and
 verified after reopening. Tistory's native editor has no separate Blogger-style
 search-description field; search engines may choose their own result snippet.
 
-GitHub runs scheduling and article preparation with the PC off. Public
-Tistory publication still requires the authenticated browser registrar to
-be running. A stopped PC, expired login, or CAPTCHA blocks that final step;
-do not report queueing or draft creation as public publication.
+GitHub runs scheduling and article preparation with the PC off. Public Tistory publication is completed by the authenticated local browser registrar. As of 2026-09-25 the owner reported the Tistory login is already completed; do not ask for another login unless runtime verification detects an expired session or CAPTCHA. A stopped PC, expired session, or CAPTCHA blocks only the final browser step; never report queueing as public publication.
