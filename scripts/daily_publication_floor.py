@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 import io
 import json
 import os
+import socket
 from pathlib import Path
 import sys
 import uuid
@@ -24,6 +25,16 @@ from publication_health_audit import check
 from automation_hub.public_verifier import verify_publication
 
 KST = timezone(timedelta(hours=9))
+
+def force_ipv4_dns():
+    """Avoid GitHub runner AAAA routes that cannot reach the WordPress fleet."""
+    original = socket.getaddrinfo
+    def ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+        rows = original(host, port, socket.AF_INET, type, proto, flags)
+        if not rows:
+            raise OSError(f"no IPv4 address for {host}")
+        return rows
+    socket.getaddrinfo = ipv4_only
 
 
 def sites_for(platform):
@@ -224,6 +235,7 @@ def main():
     parser.add_argument('--platform', choices=['wordpress', 'blogger', 'newsroom'], required=True)
     parser.add_argument('--max-dispatch', type=int, default=4)
     args = parser.parse_args()
+    force_ipv4_dns()
     now = datetime.now(KST)
     sites = sites_for(args.platform)
     api = GitHub(os.environ['GITHUB_REPOSITORY'], os.environ['GH_DISPATCH_TOKEN'])
