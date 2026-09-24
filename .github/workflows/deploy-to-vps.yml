@@ -120,17 +120,22 @@ jobs:
             reconciled=0
             mkdir -p "$REVIEW_BACKUP/files" "$REVIEW_BACKUP/patches"
             for rel in "${REVIEWED_HOTFIXES[@]}"; do
-              # Always preserve then restore the explicitly reviewed server-hotfix set.
-              # This also clears staged-only/index states that ordinary diff checks can miss.
-              if git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
+              # Always preserve the explicitly reviewed server-hotfix path first.
+              if [ -f "$ROOT/$rel" ]; then
                 mkdir -p "$REVIEW_BACKUP/files/$(dirname "$rel")" "$REVIEW_BACKUP/patches/$(dirname "$rel")"
-                if [ -f "$ROOT/$rel" ]; then
-                  cp -a "$ROOT/$rel" "$REVIEW_BACKUP/files/$rel"
-                fi
+                cp -a "$ROOT/$rel" "$REVIEW_BACKUP/files/$rel"
+                reconciled=1
+              fi
+              if git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
                 git -C "$ROOT" diff --no-ext-diff --binary HEAD -- "$rel" > "$REVIEW_BACKUP/patches/$rel.patch" || true
                 git -C "$ROOT" restore --source=HEAD --staged --worktree -- "$rel"
-                echo "Backed up and restored reviewed hotfix path: $rel"
-                reconciled=1
+                echo "Backed up and restored reviewed tracked hotfix path: $rel"
+              elif [ -e "$ROOT/$rel" ]; then
+                # The deployed HEAD does not track this path, but a later GitHub
+                # revision does. Remove only after backup so sync_main sees the
+                # expected old state (absent) and can install the reviewed file.
+                rm -f "$ROOT/$rel"
+                echo "Backed up and removed reviewed untracked hotfix path: $rel"
               fi
             done
             if [ "$reconciled" -eq 1 ]; then
