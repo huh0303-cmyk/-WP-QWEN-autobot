@@ -15,7 +15,7 @@ This file is the canonical continuity record for the Korea365 London Project. Be
 
 - **Center of the entire London Project: `k-health365.com`**, the only currently AdSense-approved site and the operating benchmark.
 - The primary business goal is **Google AdSense revenue growth**. The leading operating KPIs are **daily visitors, pageviews, Google indexed URLs, AdSense approval status, and AdSense revenue**.
-- **AdSense growth scope:** 24 regular WordPress sites other than `k-health365.com`, plus 33 Blogspot properties. The two newsrooms are separate. Operationally there are 25 regular WordPress sites total: `k-health365.com` + 24 approval targets.
+- **Canonical operating count:** 25 regular WordPress sites **including `k-health365.com`**, plus 2 separate newsrooms. Of the 25 regular WordPress sites, `k-health365.com` is the currently AdSense-approved center and the other 24 are additional AdSense-approval targets. Blogspot has 33 properties.
 - **YouTube core 10 only** (5 playlist + 5 knowledge): publish 2–3 times per channel per week on randomized days.
 - **All other connected non-newsroom destinations:** target 1 public publication per destination/account/channel per KST day, subject to exact identity/write authorization and quality gates.
 - **Newsrooms:** `koreanews365.com` and `theseouljournal.com` target 3–10 verified breaking-news stories per newsroom per KST day. Never fabricate filler when verified leads are insufficient.
