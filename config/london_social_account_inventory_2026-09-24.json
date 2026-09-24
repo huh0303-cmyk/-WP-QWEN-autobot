@@ -1,49 +1,238 @@
 {
-  "as_of": "2026-09-24",
+  "as_of": "2026-09-25",
   "timezone": "Asia/Seoul",
-  "confirmed_counts": {"youtube": 20, "tiktok": 3, "instagram": 4, "threads": 3, "total": 30},
+  "confirmed_counts": {
+    "youtube": 20,
+    "tiktok": 3,
+    "instagram": 4,
+    "threads": 3,
+    "total": 30
+  },
   "youtube": [
-    {"group":"playlist","name":"cafe_romantic","channel_id":"UCbJfEtsffpgI5MsKkB7BYvQ","handle":"cafe_romantic","state":"connected"},
-    {"group":"playlist","name":"Cafe healing","channel_id":"UC7yEsLM-HoXudngrD-4FIqg","handle":"cafe_healing1","state":"connected"},
-    {"group":"playlist","name":"CAFE_STARBUCKSVIBES","channel_id":"UC_e-sbLkVgwJNYEeobolNog","handle":"Starbucksvibes","state":"connected"},
-    {"group":"playlist","name":"CAFE_MOZART","channel_id":"UC7jOhyMa-FIrzZuea97z1Pw","handle":"cafe_mozart","state":"connected"},
-    {"group":"playlist","name":"CAFE_KPOP","channel_id":"UCKZsfAWyCmY0jckf4IWZrqw","handle":"kpop_studio7","state":"connected"},
-    {"group":"knowledge","name":"NASA_XFILES","channel_id":"UCtNLZO07Oh3UnXPI2CjOgNg","handle":"NASA_XFILES","state":"connected"},
-    {"group":"knowledge","name":"HISTORY_TV_TODAY","channel_id":"UCVBvZwodUF4s57KeNicxQ3w","handle":"HISTORY_TV_TODAY","state":"connected"},
-    {"group":"knowledge","name":"INVENTION_STORY1","channel_id":"UCgNj-yS93A_fOHXXvG49fww","handle":"INVENTION_STORY1","state":"connected"},
-    {"group":"knowledge","name":"SILENT_ERA_FILM","channel_id":"UCLvy6kSpC8-7o3hnSrfQ47g","handle":"OLD_HOLLYWOOD1","state":"connected"},
-    {"group":"knowledge","name":"RETRO_USA1","channel_id":"UCwh49EokdWFJqYFE_zA6XDQ","handle":"RETRO_USA1","state":"connected"},
-    {"group":"language","name":"서울국제대학-TOPIK센터","channel_id":"UCdA24IuR-JE7qButWv5jLqA","state":"analytics_connected"},
-    {"group":"language","name":"English Survival","channel_id":"UCrjkKWMHzAAvpLIFgHnwcWg","state":"analytics_connected"},
-    {"group":"language","name":"Studio_starbucks","channel_id":"UCOWoNH_d6p45ywQ6W0Z1Jng","state":"registered_recheck_metrics"},
-    {"group":"health","name":"Health Clinic USA","channel_id":"UC91BpNSb4nUwD6jrpthK7FQ","state":"analytics_connected"},
-    {"group":"health","name":"Seoul_Jisoo1","channel_id":"UCAizx0tPkRSol8sIhanN_QQ","state":"analytics_connected"},
-    {"group":"health","name":"Health_Clinic_Japan","channel_id":"UCC_PcHMv-Uxpr00Pjw_J2Wg","state":"analytics_connected"},
-    {"group":"language","name":"French Survival","channel_id":"UCmt8f9yUT6iTxBys8eH4-Cg","state":"analytics_connected"},
-    {"group":"language","name":"German Survival","channel_id":"UCKF98zgzm7YRWlyMaoJJKIQ","state":"analytics_connected"},
-    {"group":"language","name":"Spanish Survival","channel_id":"UC9mvVEdL9Tllkit5v2Qv8UQ","state":"analytics_connected"},
-    {"group":"language","name":"Italian Survival","channel_id":"UCK8B-BM09Cz-ockaQYLL5LA","state":"analytics_connected"}
+    {
+      "group": "playlist",
+      "name": "cafe_romantic",
+      "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
+      "handle": "cafe_romantic",
+      "state": "connected"
+    },
+    {
+      "group": "playlist",
+      "name": "Cafe healing",
+      "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
+      "handle": "cafe_healing1",
+      "state": "connected"
+    },
+    {
+      "group": "playlist",
+      "name": "CAFE_STARBUCKSVIBES",
+      "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
+      "handle": "Starbucksvibes",
+      "state": "connected"
+    },
+    {
+      "group": "playlist",
+      "name": "CAFE_MOZART",
+      "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
+      "handle": "cafe_mozart",
+      "state": "connected"
+    },
+    {
+      "group": "playlist",
+      "name": "CAFE_KPOP",
+      "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw",
+      "handle": "kpop_studio7",
+      "state": "connected"
+    },
+    {
+      "group": "knowledge",
+      "name": "NASA_XFILES",
+      "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
+      "handle": "NASA_XFILES",
+      "state": "connected"
+    },
+    {
+      "group": "knowledge",
+      "name": "HISTORY_TV_TODAY",
+      "channel_id": "UCVBvZwodUF4s57KeNicxQ3w",
+      "handle": "HISTORY_TV_TODAY",
+      "state": "connected"
+    },
+    {
+      "group": "knowledge",
+      "name": "INVENTION_STORY1",
+      "channel_id": "UCgNj-yS93A_fOHXXvG49fww",
+      "handle": "INVENTION_STORY1",
+      "state": "connected"
+    },
+    {
+      "group": "knowledge",
+      "name": "SILENT_ERA_FILM",
+      "channel_id": "UCLvy6kSpC8-7o3hnSrfQ47g",
+      "handle": "OLD_HOLLYWOOD1",
+      "state": "connected"
+    },
+    {
+      "group": "knowledge",
+      "name": "RETRO_USA1",
+      "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
+      "handle": "RETRO_USA1",
+      "state": "connected"
+    },
+    {
+      "group": "language",
+      "name": "서울국제대학-TOPIK센터",
+      "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
+      "state": "analytics_connected"
+    },
+    {
+      "group": "language",
+      "name": "English Survival",
+      "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
+      "state": "analytics_connected"
+    },
+    {
+      "group": "language",
+      "name": "Japanese Survival",
+      "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng",
+      "state": "identity_verified_registry_handle_match",
+      "handle": "seoul_japanese1",
+      "role": "Japanese-only Survival language channel"
+    },
+    {
+      "group": "health",
+      "name": "Health Clinic USA",
+      "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
+      "state": "analytics_connected",
+      "role": "health_english_usa",
+      "audience": "US / English-speaking"
+    },
+    {
+      "group": "shopping",
+      "name": "Seoul_Jisoo1",
+      "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
+      "state": "analytics_connected",
+      "role": "shopping_booking",
+      "topic": "건강기능식품, 호텔예약, 여행·생활 예약, 생활상품 등 쇼핑·예약형 콘텐츠"
+    },
+    {
+      "group": "health",
+      "name": "Health_Clinic_Japan",
+      "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
+      "state": "analytics_connected",
+      "role": "health_japanese",
+      "audience": "Japan / Japanese-speaking"
+    },
+    {
+      "group": "language",
+      "name": "French Survival",
+      "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
+      "state": "analytics_connected"
+    },
+    {
+      "group": "language",
+      "name": "German Survival",
+      "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
+      "state": "analytics_connected"
+    },
+    {
+      "group": "language",
+      "name": "Spanish Survival",
+      "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
+      "state": "analytics_connected"
+    },
+    {
+      "group": "language",
+      "name": "Italian Survival",
+      "channel_id": "UCK8B-BM09Cz-ockaQYLL5LA",
+      "state": "analytics_connected"
+    }
   ],
   "tiktok": [
-    {"name":"SIS Korean · TOPIK","handle":"sis_topik","state":"profile_verified_publish_auth_missing"},
-    {"name":"SIS English · Survival","handle":"sis_languagecenter","state":"profile_verified_login_required"},
-    {"name":"지수의 하루 · Jisoo Picks","handle":"sis_languageccenter","state":"profile_verified_account_transition_in_progress"}
+    {
+      "name": "SIS Korean · TOPIK",
+      "handle": "sis_topik",
+      "state": "profile_verified_publish_auth_missing"
+    },
+    {
+      "name": "SIS English · Survival",
+      "handle": "sis_languagecenter",
+      "state": "profile_verified_login_required"
+    },
+    {
+      "name": "지수의 하루 · Jisoo Picks",
+      "handle": "sis_languageccenter",
+      "state": "profile_verified_account_transition_in_progress"
+    }
   ],
   "instagram": [
-    {"name":"SIS Korean · TOPIK","handle":"sis_topik1","state":"handle_confirmed_publish_auth_missing"},
-    {"name":"지수의 생활 발견","handle":"seoul_item365","state":"handle_confirmed_publish_auth_missing"},
-    {"name":"지수의 여행과 생활","handle":"seoul_life365","state":"handle_confirmed_publish_auth_missing"},
-    {"name":"지수의 건강 노트","handle":"seoul_health365","state":"handle_confirmed_publish_auth_missing"}
+    {
+      "name": "SIS Korean · TOPIK",
+      "handle": "sis_topik1",
+      "state": "handle_confirmed_publish_auth_missing"
+    },
+    {
+      "name": "지수의 생활 발견",
+      "handle": "seoul_item365",
+      "state": "handle_confirmed_publish_auth_missing"
+    },
+    {
+      "name": "지수의 여행과 생활",
+      "handle": "seoul_life365",
+      "state": "handle_confirmed_publish_auth_missing"
+    },
+    {
+      "name": "지수의 건강 노트",
+      "handle": "seoul_health365",
+      "state": "handle_confirmed_publish_auth_missing"
+    }
   ],
   "threads": [
-    {"name":"지수의 생활 발견","handle":"seoul_item365","state":"handle_confirmed_threads_auth_missing"},
-    {"name":"지수의 여행과 생활","handle":"seoul_life365","state":"handle_confirmed_threads_auth_missing"},
-    {"name":"지수의 건강 노트","handle":"seoul_health365","state":"handle_confirmed_threads_auth_missing"}
+    {
+      "name": "지수의 생활 발견",
+      "handle": "seoul_item365",
+      "state": "handle_confirmed_threads_auth_missing"
+    },
+    {
+      "name": "지수의 여행과 생활",
+      "handle": "seoul_life365",
+      "state": "handle_confirmed_threads_auth_missing"
+    },
+    {
+      "name": "지수의 건강 노트",
+      "handle": "seoul_health365",
+      "state": "handle_confirmed_threads_auth_missing"
+    }
   ],
   "unconfirmed": [
-    {"platform":"youtube","name":"Survival Chinese","reason":"channel_id_missing"},
-    {"platform":"youtube","name":"Survival Vietnamese","reason":"channel_id_missing"},
-    {"platform":"youtube","name":"Survival Portuguese","reason":"channel_id_missing"},
-    {"platform":"tiktok","name":"Rosie’s Picks fourth schedule card","reason":"separate_handle_missing_possible_duplicate"}
-  ]
+    {
+      "platform": "youtube",
+      "name": "Survival Chinese",
+      "reason": "dedicated_channel_not_present_in_verified_inventory; create/select channel and capture exact UC id"
+    },
+    {
+      "platform": "youtube",
+      "name": "Survival Vietnamese",
+      "reason": "dedicated_channel_not_present_in_verified_inventory; create/select channel and capture exact UC id"
+    },
+    {
+      "platform": "youtube",
+      "name": "Survival Portuguese",
+      "reason": "dedicated_channel_not_present_in_verified_inventory; create/select channel and capture exact UC id"
+    },
+    {
+      "platform": "tiktok",
+      "name": "Rosie’s Picks fourth schedule card",
+      "reason": "separate_handle_missing_possible_duplicate"
+    }
+  ],
+  "youtube_architecture": {
+    "as_of": "2026-09-25",
+    "survival_10": "One language per one YouTube channel: Korean/TOPIK, English, Japanese, Chinese, Vietnamese, Spanish, French, German, Italian, Portuguese.",
+    "shopping": "Seoul_Jisoo1 is the mixed/general commercial channel for supplements, hotel booking and related shopping/reservation content.",
+    "health": [
+      "Health Clinic USA = US/English-speaking health channel",
+      "Health_Clinic_Japan = Japan/Japanese-speaking health channel"
+    ]
+  }
 }
