@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Back up and deploy only the card interface
+      - name: Inspect YouTube channel-check implementation (read-only)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -17,25 +17,11 @@ jobs:
           script: |
             set -euo pipefail
             ROOT=/opt/korea365
-            TARGET=${{ github.sha }}
-            STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-            BACKUP="$ROOT/data/control-card-backups/$STAMP-$TARGET"
-            TMP=$(mktemp -d)
-            trap 'rm -rf "$TMP"' EXIT
-            mkdir -p "$BACKUP/control_center/static" "$BACKUP/control_center/templates"
-            chmod 700 "$ROOT/data/control-card-backups" "$BACKUP"
-            cp -a "$ROOT/control_center/static/dashboard.js" "$BACKUP/control_center/static/dashboard.js"
-            cp -a "$ROOT/control_center/static/operations.css" "$BACKUP/control_center/static/operations.css"
-            cp -a "$ROOT/control_center/templates/index.html" "$BACKUP/control_center/templates/index.html"
-            git -C "$ROOT" fetch origin main
-            git -C "$ROOT" show "$TARGET:control_center/static/dashboard.js" > "$TMP/dashboard.js"
-            git -C "$ROOT" show "$TARGET:control_center/static/operations.css" > "$TMP/operations.css"
-            git -C "$ROOT" show "$TARGET:control_center/templates/index.html" > "$TMP/index.html"
-            install -m 0644 "$TMP/dashboard.js" "$ROOT/control_center/static/dashboard.js"
-            install -m 0644 "$TMP/operations.css" "$ROOT/control_center/static/operations.css"
-            install -m 0644 "$TMP/index.html" "$ROOT/control_center/templates/index.html"
-            systemctl restart korea365-control.service
-            systemctl is-active korea365-control.service
-            curl -fsS https://control.korea365.org/ | grep -q '전체 사이트 현황'
-            curl -fsS https://control.korea365.org/static/operations.css | grep -q 'metrics-actions'
-            printf '{"deployed_commit":"%s","backup":"%s","deployed_at":"%s"}\n' "$TARGET" "$BACKUP" "$STAMP" > "$ROOT/data/control-card-deploy.json"
+            printf '%s\n' '--- matching files ---'
+            grep -RIl --exclude='*.pyc' --exclude-dir='.git' -E 'channel-check|채널 조회 실패|youtube_auth_preflight' "$ROOT" 2>/dev/null | head -80
+            printf '%s\n' '--- matching source lines ---'
+            grep -RIn --exclude='*.pyc' --exclude-dir='.git' -E 'channel-check|채널 조회 실패|youtube_auth_preflight' "$ROOT/control_center" "$ROOT/scripts" "$ROOT/config" 2>/dev/null | head -240 || true
+            printf '%s\n' '--- relevant environment names ---'
+            systemctl show korea365-control.service -p Environment --value | tr ' ' '\n' | sed 's/=.*//' | grep -E 'YOUTUBE|CHANNEL|AUDIT' | sort -u || true
+            printf '%s\n' '--- service command ---'
+            systemctl show korea365-control.service -p ExecStart -p WorkingDirectory
