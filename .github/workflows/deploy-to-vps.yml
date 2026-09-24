@@ -118,13 +118,18 @@ jobs:
               "config/newsroom_rss_watch.json"
             )
             reconciled=0
+            mkdir -p "$REVIEW_BACKUP/files" "$REVIEW_BACKUP/patches"
             for rel in "${REVIEWED_HOTFIXES[@]}"; do
-              if ! git -C "$ROOT" diff --quiet HEAD -- "$rel"; then
+              # Always preserve then restore the explicitly reviewed server-hotfix set.
+              # This also clears staged-only/index states that ordinary diff checks can miss.
+              if git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then
                 mkdir -p "$REVIEW_BACKUP/files/$(dirname "$rel")" "$REVIEW_BACKUP/patches/$(dirname "$rel")"
-                cp -a "$ROOT/$rel" "$REVIEW_BACKUP/files/$rel"
-                git -C "$ROOT" diff --no-ext-diff --binary HEAD -- "$rel" > "$REVIEW_BACKUP/patches/$rel.patch"
+                if [ -f "$ROOT/$rel" ]; then
+                  cp -a "$ROOT/$rel" "$REVIEW_BACKUP/files/$rel"
+                fi
+                git -C "$ROOT" diff --no-ext-diff --binary HEAD -- "$rel" > "$REVIEW_BACKUP/patches/$rel.patch" || true
                 git -C "$ROOT" restore --source=HEAD --staged --worktree -- "$rel"
-                echo "Backed up and reconciled reviewed hotfix: $rel"
+                echo "Backed up and restored reviewed hotfix path: $rel"
                 reconciled=1
               fi
             done
