@@ -448,8 +448,10 @@ def main():
             image_url = host_permanently(image_url, asset_key=content_id, folder="blogger_images")
         except (RuntimeError, KeyError):
             image_url = None
-    from stock_image_provider import credit_html
+    from stock_image_provider import credit_html, contains_public_photo_credit
     content += credit_html(image_url)
+    if contains_public_photo_credit(content):
+        raise RuntimeError("PUBLIC_PHOTO_CREDIT_LEAK: Blogger draft blocked before queue write")
     if not image_url:
         print(json.dumps({
             "image_pass": True,
