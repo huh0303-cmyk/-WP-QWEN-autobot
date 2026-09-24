@@ -1,6 +1,7 @@
 """Update the live control-room YouTube audit without uploading or publishing."""
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,11 +31,30 @@ OAUTH_OK = {
 
 def update_source() -> None:
     text = SOURCE.read_text(encoding="utf-8")
-    old = """    ok=c.get('status')=='채널 일치 · 읽기 확인'\n+    items.append(dict(name=c.get('actual_name') or c['name'],group='플레이리스트' if c.get('type')=='playlist' else '지식',status=c['status'],ok=ok,identity=c['channel_id'],topic='확정된 채널별 제작 지침 유지',next='완성본·권리 검수 후 비공개 업로드 시험' if ok else '채널 신원 조회 권한 보완 후 대상 계정 재확인',url='https://www.youtube.com/channel/'+c['channel_id']))\n+   note='10개 채널 읽기 검사: 2개 신원 일치, 8개 HTTP 403. 8개도 토큰의 업로드 권한 표시는 있으나 신원 조회가 막혔으므로 인증 만료로 단정하지 않습니다.'"""
-    new = """    oauth_ok=c.get('oauth_ok',c.get('status')=='채널 일치 · 읽기 확인')\n+    items.append(dict(name=c.get('actual_name') or c['name'],group='플레이리스트' if c.get('type')=='playlist' else '지식',status=c['status'],ok=oauth_ok,identity=c['channel_id'],topic='확정된 채널별 제작 지침 유지',next='완성본·권리 검수 후 비공개 업로드 시험' if oauth_ok else 'OAuth 읽기 범위 재승인 필요 · 자동 공개 안 함',url='https://www.youtube.com/channel/'+c['channel_id']))\n+   public_count=sum(1 for c in d.get('youtube',[]) if c.get('public_ok'))\n+   oauth_count=sum(1 for c in d.get('youtube',[]) if c.get('oauth_ok'))\n+   note=f'10개 채널 공개 조회: {public_count}개 존재·실제명 확인. OAuth 신원 조회: {oauth_count}개 정상, {len(d.get("youtube",[]))-oauth_count}개 읽기 범위 재승인 필요. 업로드·공개는 수행하지 않았습니다.'"""
-    if old not in text:
-        raise RuntimeError("Expected channel_check.py block was not found; refusing partial edit")
-    SOURCE.write_text(text.replace(old, new, 1), encoding="utf-8")
+    text, count_ok = re.subn(
+        r"(?m)^(\s*)ok=c\.get\('status'\)=='채널 일치 · 읽기 확인'\s*$",
+        r"\1oauth_ok=c.get('oauth_ok',c.get('status')=='채널 일치 · 읽기 확인')",
+        text,
+        count=1,
+    )
+    text, count_next = re.subn(
+        r"ok=ok,(.*?)next='완성본·권리 검수 후 비공개 업로드 시험' if ok else '채널 신원 조회 권한 보완 후 대상 계정 재확인'",
+        r"ok=oauth_ok,\1next='완성본·권리 검수 후 비공개 업로드 시험' if oauth_ok else 'OAuth 읽기 범위 재승인 필요 · 자동 공개 안 함'",
+        text,
+        count=1,
+    )
+    note_replacement = """   public_count=sum(1 for c in d.get('youtube',[]) if c.get('public_ok'))
+   oauth_count=sum(1 for c in d.get('youtube',[]) if c.get('oauth_ok'))
+   note=f'10개 채널 공개 조회: {public_count}개 존재·실제명 확인. OAuth 신원 조회: {oauth_count}개 정상, {len(d.get("youtube",[]))-oauth_count}개 읽기 범위 재승인 필요. 업로드·공개는 수행하지 않았습니다.'"""
+    text, count_note = re.subn(
+        r"(?m)^\s*note='10개 채널 읽기 검사:.*$",
+        note_replacement,
+        text,
+        count=1,
+    )
+    if (count_ok, count_next, count_note) != (1, 1, 1):
+        raise RuntimeError(f"Expected edits not found: ok={count_ok}, next={count_next}, note={count_note}")
+    SOURCE.write_text(text, encoding="utf-8")
 
 
 def update_audit() -> None:
