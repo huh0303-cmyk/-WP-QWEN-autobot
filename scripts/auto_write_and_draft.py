@@ -325,8 +325,10 @@ def main() -> int:
     image_subject = (article.get("image_queries") or [article["title"]])[0]
     image_url = "" if os.environ.get("IMAGE_MODEL", "").strip() == "none" else (generate_image_url(image_subject, theme=article["title"]) or "")
 
-    from stock_image_provider import credit_html
+    from stock_image_provider import credit_html, contains_public_photo_credit
     article["content_html"] = article.get("content_html", "") + credit_html(image_url)
+    if contains_public_photo_credit(article["content_html"]):
+        raise SystemExit("PUBLIC_PHOTO_CREDIT_LEAK: draft blocked before remote write")
 
     if platform == "wordpress":
         record_out = _publish_wordpress(site_url=site_url, secret_name=settings["secret_name"], article=article, image_url=image_url, keyword=keyword)
