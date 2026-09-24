@@ -1,11 +1,28 @@
 name: "WordPress 25 — immediate isolated publish"
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/daily-network-publish.yml"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      target_site_url:
+        description: "Optional exact WordPress target; blank runs all 25"
+        required: false
+        type: string
+        default: ""
+      room_id:
+        description: "Idempotency/trace key from the control room"
+        required: false
+        type: string
+        default: ""
+      publication_approved:
+        description: "Explicit public publication approval"
+        required: false
+        type: boolean
+        default: true
+      force_keyword:
+        description: "Optional exact keyword"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -46,6 +63,7 @@ jobs:
           - jobinkorea365.com
           - jobkoreaglobal.com
           - korea365.org
+    if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -63,10 +81,10 @@ jobs:
           TARGET_SITE_URL: "https://${{ matrix.site }}"
           WP_AUTOPUBLISH_ENABLED: "true"
           WP_POST_STATUS: "publish"
-          WP_PUBLICATION_APPROVED: "true"
+          WP_PUBLICATION_APPROVED: ${{ inputs.publication_approved && 'true' || 'false' }}
           NEWSROOM_REQUIRE_PUBLICATION: "true"
           FORCE_SOURCE_IPV4: "true"
-          FORCE_KEYWORD: ${{ steps.viral.outputs.keyword }}
+          FORCE_KEYWORD: ${{ inputs.force_keyword || steps.viral.outputs.keyword }}
           RUN_SLOT: "1"
           MAX_REGEN: "1"
           AI_TEXT_PROVIDER: "openai"
