@@ -16,3 +16,9 @@ def test_code_like_categories_are_hidden():
 
 def test_real_categories_are_preserved_without_duplicates():
     assert publication_board.clean_category_labels(["Skincare", "Skincare", "Wellness"], "K-Beauty Reviews") == ["Skincare", "Wellness"]
+
+
+def test_dashboard_does_not_expose_raw_errors():
+    source = MODULE_PATH.read_text(encoding="utf-8")
+    assert "esc(r['error'])" not in source
+    assert "연결 상태 재확인 중" in source
