@@ -1,5 +1,5 @@
 name: Daily public publication floor
-# repaired one-site dispatch + authenticated WP check + Blogger REST fallback 2026-09-25
+# Blogger daily floor rerun after cached-source branch repair and reset 2026-09-25
 
 on:
   push:
