@@ -11,10 +11,11 @@ import os
 import re
 import subprocess
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import requests
 from requests.auth import HTTPBasicAuth
+from control_center.registry import load_wordpress_sites
 if os.getenv("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes", "on"}:
     import socket
     _getaddrinfo = socket.getaddrinfo
@@ -26,6 +27,9 @@ ROOT = Path(__file__).resolve().parents[1]
 QUEUE = Path(os.environ.get("VPS_WP_QUEUE", ROOT / "data/vps-wp-queue"))
 CREDENTIALS = Path(os.environ.get("VPS_WP_CREDENTIALS", "/etc/korea365/wp-sites.json"))
 MAX_RETRIES = int(os.environ.get("VPS_WP_MAX_RETRIES", "3"))
+KST = timezone(timedelta(hours=9))
+DAILY_FLOOR_STATE = ROOT / "data" / "vps-wp-daily-floor.json"
+DAILY_FLOOR_MAX_ENQUEUE = max(1, int(os.environ.get("VPS_WP_DAILY_MAX_ENQUEUE", "2")))
 
 # GitHub only hands off already-composed content_html; the "preferred
 # production path" below used to publish that HTML verbatim, including
@@ -181,8 +185,129 @@ def run_one(path: Path, job: dict) -> bool:
     return False
 
 
+def _daily_floor_state(payload: dict) -> None:
+    DAILY_FLOOR_STATE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = DAILY_FLOOR_STATE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.chmod(tmp, 0o600)
+    os.replace(tmp, DAILY_FLOOR_STATE)
+
+
+def _daily_floor_once() -> dict:
+    """Queue a bounded number of missing regular-WP daily posts on the VPS.
+
+    The check uses the same root-only application passwords as publication,
+    so GitHub-runner bot blocking cannot make the network look empty.
+    """
+    now = datetime.now(KST)
+    hour_key = now.strftime("%Y-%m-%dT%H")
+    previous = {}
+    try:
+        previous = json.loads(DAILY_FLOOR_STATE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        pass
+    if previous.get("hour_key") == hour_key:
+        return previous
+
+    try:
+        credentials = json.loads(CREDENTIALS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        payload = {"hour_key": hour_key, "checked_at": _now(), "status": "credential_store_unavailable"}
+        _daily_floor_state(payload)
+        return payload
+
+    regular = [site for site in load_wordpress_sites() if site.content_type == "blog"]
+    if len(regular) != 25:
+        payload = {"hour_key": hour_key, "checked_at": _now(), "status": "registry_count_error",
+                   "regular_count": len(regular)}
+        _daily_floor_state(payload)
+        return payload
+
+    # Stable hourly rotation prevents the same first sites from monopolizing
+    # bounded slots while still avoiding simultaneous 25-site bursts.
+    import hashlib
+    regular.sort(key=lambda site: hashlib.sha256(
+        f"{now.date().isoformat()}|{now.hour}|{site.site_id}".encode()
+    ).hexdigest())
+
+    rows, queued = [], 0
+    for site in regular:
+        password = credentials.get(site.secret_name, "")
+        if not password:
+            rows.append({"site_id": site.site_id, "status": "credential_required"})
+            continue
+        auth = HTTPBasicAuth("huh0303@gmail.com", password)
+        try:
+            response = requests.get(
+                site.url + "/wp-json/wp/v2/posts",
+                auth=auth,
+                headers={"User-Agent": "Korea365-VPS/1.0"},
+                params={"status": "publish", "per_page": 1, "orderby": "date",
+                        "order": "desc", "_fields": "link,date_gmt,title"},
+                timeout=20,
+            )
+            response.raise_for_status()
+            posts = response.json()
+            if not isinstance(posts, list):
+                raise ValueError("invalid WordPress inventory")
+        except Exception as exc:
+            rows.append({"site_id": site.site_id, "status": "read_error",
+                         "error_type": type(exc).__name__})
+            continue
+
+        latest = posts[0] if posts else {}
+        raw = latest.get("date_gmt")
+        published_today = False
+        if raw:
+            try:
+                stamp = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+                if stamp.tzinfo is None:
+                    stamp = stamp.replace(tzinfo=timezone.utc)
+                published_today = stamp.astimezone(KST).date() == now.date()
+            except ValueError:
+                pass
+        if published_today:
+            rows.append({"site_id": site.site_id, "status": "published_today",
+                         "public_url": latest.get("link", "")})
+            continue
+
+        job_id = f"daily-{now.date().isoformat()}-{site.site_id}"
+        existing = next((p for suffix in ("queued","processing","published","failed","credential_required")
+                         if (p := QUEUE / f"{job_id}.{suffix}.json").exists()), None)
+        if existing:
+            rows.append({"site_id": site.site_id, "status": "already_tracked"})
+            continue
+        if queued >= DAILY_FLOOR_MAX_ENQUEUE:
+            rows.append({"site_id": site.site_id, "status": "due"})
+            continue
+
+        QUEUE.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "job_id": job_id, "site_url": site.url, "secret_name": site.secret_name,
+            "force_keyword": "", "status": "queued", "source": "vps-daily-floor",
+            "day_kst": now.date().isoformat(), "received_at": _now(), "retries": 0,
+        }
+        tmp = QUEUE / f".{job_id}.tmp"
+        target = QUEUE / f"{job_id}.queued.json"
+        tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, target)
+        queued += 1
+        rows.append({"site_id": site.site_id, "status": "queued"})
+
+    result = {"hour_key": hour_key, "checked_at": _now(), "status": "ok",
+              "target": 25, "queued": queued, "sites": rows}
+    _daily_floor_state(result)
+    return result
+
+
 def main() -> None:
     while True:
+        try:
+            _daily_floor_once()
+        except Exception:
+            # Daily-floor discovery failure must never kill the publisher.
+            pass
         item = _claim()
         if item:
             run_one(*item)
