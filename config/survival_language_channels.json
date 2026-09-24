@@ -16,7 +16,7 @@
       "language": "Korean/TOPIK",
       "series_name": "Korean Survival / TOPIK",
       "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
-      "channel_identity_source": "config/youtube_reporting_channels.json",
+      "channel_identity_source": "london_social_account_inventory_2026-09-24.json",
       "channel_status": "VERIFIED_REGISTRY_ID",
       "upload_enabled": true
     },
@@ -25,7 +25,7 @@
       "language": "English",
       "series_name": "English Survival",
       "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
-      "channel_identity_source": "config/youtube_reporting_channels.json",
+      "channel_identity_source": "london_social_account_inventory_2026-09-24.json",
       "channel_status": "VERIFIED_REGISTRY_ID",
       "upload_enabled": true
     },
@@ -33,65 +33,84 @@
       "language_code": "ja",
       "language": "Japanese",
       "series_name": "Survival Japanese",
-      "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng",
+      "channel_status": "VERIFIED_REGISTRY_HANDLE_MATCH",
+      "upload_enabled": false,
+      "channel_identity_source": "inventory + situation_room_history handle seoul_japanese1",
+      "handle": "seoul_japanese1"
     },
     {
       "language_code": "zh",
       "language": "Chinese",
       "series_name": "Survival Chinese",
       "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_status": "CHANNEL_ID_MISSING_NEEDS_ACCOUNT_CAPTURE",
+      "upload_enabled": false,
+      "required_action": "Create/select the dedicated YouTube channel, then capture its exact UC... channel ID before upload."
     },
     {
       "language_code": "vi",
       "language": "Vietnamese",
       "series_name": "Survival Vietnamese",
       "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_status": "CHANNEL_ID_MISSING_NEEDS_ACCOUNT_CAPTURE",
+      "upload_enabled": false,
+      "required_action": "Create/select the dedicated YouTube channel, then capture its exact UC... channel ID before upload."
     },
     {
       "language_code": "es",
       "language": "Spanish",
       "series_name": "Survival Spanish",
-      "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
+      "channel_status": "VERIFIED_ANALYTICS_ID",
+      "upload_enabled": true,
+      "channel_identity_source": "london_social_account_inventory_2026-09-24.json"
     },
     {
       "language_code": "fr",
       "language": "French",
       "series_name": "Survival French",
-      "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
+      "channel_status": "VERIFIED_ANALYTICS_ID",
+      "upload_enabled": true,
+      "channel_identity_source": "london_social_account_inventory_2026-09-24.json"
     },
     {
       "language_code": "de",
       "language": "German",
       "series_name": "Survival German",
-      "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
+      "channel_status": "VERIFIED_ANALYTICS_ID",
+      "upload_enabled": true,
+      "channel_identity_source": "london_social_account_inventory_2026-09-24.json"
     },
     {
       "language_code": "it",
       "language": "Italian",
       "series_name": "Survival Italian",
-      "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_id": "UCK8B-BM09Cz-ockaQYLL5LA",
+      "channel_status": "VERIFIED_ANALYTICS_ID",
+      "upload_enabled": true,
+      "channel_identity_source": "london_social_account_inventory_2026-09-24.json"
     },
     {
       "language_code": "pt",
       "language": "Portuguese",
       "series_name": "Survival Portuguese",
       "channel_id": "",
-      "channel_status": "CHANNEL_ID_UNVERIFIED",
-      "upload_enabled": false
+      "channel_status": "CHANNEL_ID_MISSING_NEEDS_ACCOUNT_CAPTURE",
+      "upload_enabled": false,
+      "required_action": "Create/select the dedicated YouTube channel, then capture its exact UC... channel ID before upload."
     }
-  ]
+  ],
+  "identity_summary": {
+    "as_of": "2026-09-25",
+    "verified_language_channels": 7,
+    "missing_language_channel_ids": [
+      "zh",
+      "vi",
+      "pt"
+    ],
+    "rule": "Never reuse a legacy brand label as channel identity; exact UC channel ID is required."
+  }
 }
