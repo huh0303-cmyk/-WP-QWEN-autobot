@@ -14,7 +14,10 @@ from automation_hub.youtube_vps_queue import enqueue as enqueue_youtube_vps
 ROOT = Path("/opt/korea365")
 DATA = ROOT / "data"
 INVENTORY = DATA / "london-social-account-inventory-2026-09-24.json"
+SNS_POLICY = ROOT / "config" / "sns_six_channel_policy.json"
 YOUTUBE_CONFIG = ROOT / "config" / "youtube_channels.json"
+TISTORY_CONFIG = ROOT / "config" / "tistory_portfolio.json"
+ROOMS_CONFIG = ROOT / "config" / "automation_rooms.json"
 
 CORE_YOUTUBE = {
     "UCbJfEtsffpgI5MsKkB7BYvQ": "globalmusic",
@@ -40,12 +43,15 @@ ROLE_DETAILS = {
     "German Survival": ("독일어 교육", "초급 생존 독일어 표현과 상황별 회화"),
     "Spanish Survival": ("스페인어 교육", "초급 생존 스페인어 표현과 상황별 회화"),
     "Italian Survival": ("이탈리아어 교육", "초급 생존 이탈리아어 표현과 상황별 회화"),
-    "SIS Korean · TOPIK": ("한국어·TOPIK", "TOPIK 학습과 한국어 교육용 숏폼"),
-    "SIS English · Survival": ("생활 영어", "짧은 생활 영어와 생존 회화 숏폼"),
-    "지수의 하루 · Jisoo Picks": ("건강·뷰티·여행 쇼핑", "생활용품, 여행용품, 건강·뷰티 상품 소개"),
-    "지수의 생활 발견": ("생활·여행용품", "실용적인 생활용품과 여행용품 추천"),
-    "지수의 여행과 생활": ("여행·생활정보", "한국 여행과 일상생활에 필요한 정보"),
-    "지수의 건강 노트": ("건강·건기식", "일반 건강 정보와 건강기능식품 주의사항"),
+}
+
+LOGIN_URLS = {
+    "TikTok": "https://www.tiktok.com/login",
+    "Instagram": "https://www.instagram.com/accounts/login/",
+    "Facebook": "https://www.facebook.com/login/",
+    "Threads": "https://www.instagram.com/accounts/login/",
+    "Tistory": "https://www.tistory.com/auth/login",
+    "Naver": "https://nid.naver.com/nidlogin.login",
 }
 
 
@@ -63,52 +69,117 @@ def _write_state(group: str, state: dict) -> None:
     os.replace(temp, target)
 
 
-def _cards() -> list[dict]:
+def _youtube_cards() -> list[dict]:
     inventory = _read(INVENTORY, {})
-    youtube_config = {r.get("channel_id"): r for r in _read(YOUTUBE_CONFIG, {}).get("channels", []) if r.get("channel_id")}
+    configured = {r.get("channel_id"): r for r in _read(YOUTUBE_CONFIG, {}).get("channels", []) if r.get("channel_id")}
     cards = []
     for row in inventory.get("youtube", []):
         channel_id = row["channel_id"]
-        configured = youtube_config.get(channel_id, {})
+        profile = configured.get(channel_id, {})
         core_key = CORE_YOUTUBE.get(channel_id)
-        group = configured.get("channel_type") or row.get("group") or "additional"
+        group = profile.get("channel_type") or row.get("group") or "additional"
         role, fallback = ROLE_DETAILS.get(row["name"], (group, "채널별 확정 주제 콘텐츠"))
         cards.append({
             "key": f"youtube:{channel_id}", "platform": "YouTube", "name": row["name"],
             "identity": channel_id, "handle": row.get("handle", ""),
-            "url": f"https://www.youtube.com/channel/{channel_id}", "role": role if not configured else group,
-            "description": configured.get("tone") or fallback,
-            "state_label": "제작·업로드 연결 완료" if core_key else ("분석 연결 확인" if row.get("state") == "analytics_connected" else "등록됨 · 최신 연결 재확인 필요"),
-            "publish_mode": "공개하지 않고 비공개 영상 제작 대기열에 1건 추가합니다." if core_key else "채널은 확인됐지만 통제실 제작 프로필이 아직 연결되지 않았습니다.",
-            "can_publish": bool(core_key), "channel_key": core_key or "",
-            "button_label": "즉시발행 · 비공개 제작" if core_key else "즉시발행 · 연결 필요",
+            "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
+            "role": role if not profile else group, "description": profile.get("tone") or fallback,
+            "state_label": "제작·업로드 연결 완료" if core_key else "계정 등록 · 제작 연결 확인 필요",
+            "connection_level": "publish_connected" if core_key else "identity_verified",
+            "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "YouTube Studio 로그인 후 제작 프로필을 확인합니다.",
+            "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",
+            "button_label": "비공개 제작 시작" if core_key else "YouTube Studio 로그인",
         })
-    urls = {"TikTok": "https://www.tiktok.com/@{handle}", "Instagram": "https://www.instagram.com/{handle}/", "Threads": "https://www.threads.com/@{handle}"}
-    for platform, source_key in (("TikTok", "tiktok"), ("Instagram", "instagram"), ("Threads", "threads")):
-        for row in inventory.get(source_key, []):
-            role, description = ROLE_DETAILS.get(row["name"], ("확정 주제 유지", "플랫폼별 확정 주제 콘텐츠"))
-            cards.append({
-                "key": f"{source_key}:{row['handle']}", "platform": platform, "name": row["name"],
-                "identity": f"@{row['handle']}", "handle": row["handle"], "url": urls[platform].format(handle=row["handle"]),
-                "role": role, "description": description, "state_label": "계정 확인 · 게시 인증 필요",
-                "publish_mode": "게시 API 권한이 없어 공개 발행하지 않고 필요한 연결을 안내합니다.",
-                "can_publish": False, "channel_key": "", "button_label": "즉시발행 · 인증 필요",
-            })
     return cards
+
+
+def _sns_cards() -> list[dict]:
+    policy = _read(SNS_POLICY, {})
+    roles = {r.get("key"): r for r in policy.get("roles", [])}
+    cards = []
+    for row in policy.get("accounts", []):
+        platform = row.get("platform", "")
+        role = roles.get(row.get("role"), {})
+        exists = bool(row.get("account_exists"))
+        identity_ok = bool(row.get("identity_verified"))
+        publish_ok = bool(row.get("publish_connected"))
+        if publish_ok:
+            state, level = "게시 권한 연결 완료", "publish_connected"
+        elif identity_ok:
+            state, level = "계정 확인 · 게시 로그인 필요", "identity_verified"
+        elif exists:
+            state, level = "계정 보임 · ID 확인 필요", "observed"
+        else:
+            state, level = "계정 미확인 · 로그인 후 확인", "missing"
+        cards.append({
+            "key": f"{platform.lower()}:{row.get('role')}", "platform": platform,
+            "name": row.get("display_name") or role.get("name") or row.get("role"),
+            "identity": f"@{row['handle']}" if row.get("handle") else "로그인 후 계정 ID 확인",
+            "handle": row.get("handle", ""), "url": row.get("url", ""),
+            "login_url": LOGIN_URLS.get(platform, ""), "role": role.get("name", row.get("role", "")),
+            "description": role.get("topic", "플랫폼별 확정 주제 콘텐츠"), "state_label": state,
+            "connection_level": level,
+            "publish_mode": "이 계정으로 하루 1건 공개 발행할 수 있습니다." if publish_ok else "로그인 후 정확한 계정과 게시 권한을 확인합니다. 확인 전에는 공개하지 않습니다.",
+            "can_publish": publish_ok, "channel_key": "", "action_kind": "sns_publish" if publish_ok else "login",
+            "button_label": "즉시발행" if publish_ok else "로그인 · 계정 연결", "note": row.get("note", ""),
+        })
+    return cards
+
+
+def _tistory_cards() -> list[dict]:
+    cards = []
+    for row in _read(TISTORY_CONFIG, {}).get("sites", []):
+        cards.append({
+            "key": f"tistory:{row['site_id']}", "platform": "Tistory", "name": row.get("title") or row.get("current_label") or row["site_id"],
+            "identity": row["site_id"], "handle": "", "url": row.get("url", ""), "login_url": LOGIN_URLS["Tistory"],
+            "role": " · ".join(row.get("categories", [])), "description": row.get("description", ""),
+            "state_label": "사이트 확인 · 로컬 로그인 필요", "connection_level": "identity_verified",
+            "publish_mode": "계정별 원고 생성 작업을 접수합니다. 로컬 Tistory 로그인 세션이 연결되면 검토본 저장까지 진행합니다.",
+            "can_publish": True, "channel_key": "", "action_kind": "tistory_form", "button_label": "이 채널 원고 생성",
+            "site_id": row["site_id"], "note": "공개 발행은 저장 결과와 로그인 세션을 확인한 뒤 처리합니다.",
+        })
+    return cards
+
+
+def _naver_cards() -> list[dict]:
+    cards = []
+    rooms = [r for r in _read(ROOMS_CONFIG, {}).get("rooms", []) if r.get("platform") == "naver"]
+    for row in rooms:
+        destination = str(row.get("destination_id") or "").strip()
+        cards.append({
+            "key": f"naver:{row['room_id']}", "platform": "Naver", "name": row.get("name") or row["room_id"],
+            "identity": destination or f"{row['report_code']} · 로그인 후 블로그 ID 확인", "handle": "",
+            "url": destination if destination.startswith("http") else "", "login_url": LOGIN_URLS["Naver"],
+            "role": "네이버 블로그 독립 채널", "description": "계정별 원고·중복 방지·발행 이력을 독립 관리합니다.",
+            "state_label": "블로그 주소 연결 완료" if destination else "계정 정보 필요 · 로그인 대기",
+            "connection_level": "identity_verified" if destination else "missing",
+            "publish_mode": "로그인 세션과 블로그 ID 확인 후 해당 계정 전용 대기열을 작동합니다.",
+            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "네이버 로그인 · 계정 연결",
+            "note": "다른 네이버 계정과 섞이지 않도록 N1·N2·N3를 서로 다른 로그인 프로필로 유지합니다.",
+        })
+    return cards
+
+
+def _cards() -> list[dict]:
+    return _youtube_cards() + _sns_cards() + _tistory_cards() + _naver_cards()
 
 
 def install(app):
     @app.get("/social-accounts")
     def social_accounts():
         cards = _cards()
-        platforms = ["전체", "YouTube", "TikTok", "Instagram", "Threads"]
+        platforms = ["전체", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "Tistory", "Naver"]
         selected = request.args.get("platform", "전체")
         if selected not in platforms:
             selected = "전체"
         visible = cards if selected == "전체" else [c for c in cards if c["platform"] == selected]
         counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:]}
-        return render_template("social_accounts.html", cards=visible, counts=counts, platforms=platforms,
-                               selected=selected, total=len(cards), csrf_token=app.config["CONTROL_CENTER_CSRF"]), 200, {"Cache-Control": "no-store"}
+        connected = sum(c.get("connection_level") == "publish_connected" for c in cards)
+        return render_template(
+            "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
+            selected=selected, total=len(cards), connected=connected,
+            csrf_token=app.config["CONTROL_CENTER_CSRF"],
+        ), 200, {"Cache-Control": "no-store"}
 
     @app.post("/social-accounts/publish-now")
     def social_accounts_publish_now():
@@ -118,9 +189,8 @@ def install(app):
         card = next((c for c in _cards() if c["key"] == payload.get("account_key")), None)
         if not card:
             return jsonify(message="등록된 계정 카드가 아닙니다."), 404
-        if not card["can_publish"]:
-            return jsonify(message=f"{card['name']}: 실제 게시 인증이 없어 공개하지 않았습니다. 연결 상태를 먼저 보완해야 합니다.",
-                           review_url=f"/channel-check/{card['platform'].lower()}"), 409
+        if card.get("action_kind") != "youtube_queue" or not card.get("can_publish"):
+            return jsonify(message=f"{card['name']}: 로그인 및 실제 게시 권한 확인이 먼저 필요합니다. 아직 공개하지 않았습니다.", review_url=card.get("login_url") or card.get("url")), 409
         channel_key = card["channel_key"]
         group = f"youtube_{channel_key}"
         try:

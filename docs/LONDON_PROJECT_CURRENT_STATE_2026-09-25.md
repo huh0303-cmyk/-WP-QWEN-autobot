@@ -79,10 +79,13 @@ Therefore the desired policy is recorded, but public SNS automation must remain 
 
 ## Control room state
 
-- A unified social-account card page was added at `/social-accounts` with filters and an immediate-action button.
-- Existing unconnected SNS cards return a safe connection-required result; they do not pretend to publish.
+- `/social-accounts` is now the unified 52-card account room: YouTube 20, SNS 24, Tistory 5, and Naver 3.
+- SNS is shown as six independent role cards on each of TikTok, Instagram, Facebook, and Threads, including missing-account slots.
+- Each card has its own identity, public-profile link when known, official-login link, connection level, operating role, and action explanation.
+- Existing unconnected SNS cards open the official login path and never pretend to publish.
 - The ten core YouTube cards queue private jobs only.
-- The control room should next be expanded from the observed 30-card inventory to the canonical 44-card view: YouTube 20 plus the complete SNS 24-slot matrix, including missing-account cards and Facebook.
+- Each Tistory card invokes its existing single-site review-draft workflow and separately exposes the official Tistory login.
+- Naver N1, N2, and N3 are separate cards and separate intended login profiles. Their exact blog IDs remain unfilled until the owner logs into each account.
 
 ## Remaining work, in order
 
