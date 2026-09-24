@@ -281,7 +281,14 @@ jobs:
             PY
             fi
 
-            systemctl is-active korea365-control.service korea365-operations.service
+            # Ensure the authenticated WordPress publisher is installed and
+            # restarted on every successful code deployment. It owns the WP25
+            # daily floor because GitHub-hosted runners are blocked by the sites.
+            install -m 644 "$ROOT/deploy/vps/korea365-wp-publisher.service" /etc/systemd/system/korea365-wp-publisher.service
+            systemctl daemon-reload
+            systemctl enable korea365-wp-publisher.service >/dev/null 2>&1 || true
+            systemctl restart korea365-wp-publisher.service
+            systemctl is-active korea365-control.service korea365-operations.service korea365-wp-publisher.service
 
             python3 - <<'PY'
             import json, time
