@@ -11,13 +11,23 @@ Updated: 2026-09-25 (Asia/Seoul)
 
 This file is the canonical continuity record for the Korea365 London Project. Before asking the owner to repeat channel names, IDs, account roles, or publishing policy, read this file and the referenced machine-readable configuration.
 
+## Final business objective lock — 2026-09-25
+
+- **Center of the entire London Project: `k-health365.com`**, the only currently AdSense-approved site and the operating benchmark.
+- The primary business goal is **Google AdSense revenue growth**. The leading operating KPIs are **daily visitors, pageviews, Google indexed URLs, AdSense approval status, and AdSense revenue**.
+- **AdSense growth scope:** 24 regular WordPress sites other than `k-health365.com`, plus 33 Blogspot properties. The two newsrooms are separate. Operationally there are 25 regular WordPress sites total: `k-health365.com` + 24 approval targets.
+- **YouTube core 10 only** (5 playlist + 5 knowledge): publish 2–3 times per channel per week on randomized days.
+- **All other connected non-newsroom destinations:** target 1 public publication per destination/account/channel per KST day, subject to exact identity/write authorization and quality gates.
+- **Newsrooms:** `koreanews365.com` and `theseouljournal.com` target 3–10 verified breaking-news stories per newsroom per KST day. Never fabricate filler when verified leads are insufficient.
+- **Google indexing is revenue infrastructure:** indexing gaps, sitemap/GSC failures, accidental noindex, crawl blocks and low-value duplication are priority operational defects, not secondary SEO notes.
+
 ## Non-negotiable operating rules
 
 - Never store passwords, OAuth refresh tokens, API keys, cookies, or application passwords in Git.
 - Do not claim an account is connected merely because its public profile can be opened. A publishing connection is complete only after identity and write permission are verified.
 - Never create a duplicate account before checking the existing account inventory.
 - YouTube publishing remains private/review-only unless the owner separately approves a public release.
-- Blogspot has a separate approved policy: 33 blogs, one public post per blog per day, distributed randomly through the day, with a per-blog/per-date duplicate guard.
+- Blogspot: 33 blogs, one public post per blog per day, distributed randomly through the day, with a per-blog/per-date duplicate guard.
 - TikTok, Instagram, Facebook, and Threads use the same six-role policy. Public automation starts per account only after that account's identity and write credential are verified.
 - Visible content must read naturally and must not contain internal generation/process notices. This does not authorize fake experience, fabricated evidence, undisclosed sponsorship, or misleading health claims.
 
