@@ -118,6 +118,14 @@ Remote device `ChrisHUH` is online again. Chrome `Profile 5` contains active ses
 
 This checkpoint means **do not ask the owner to log in again** unless the browser itself shows an expired-session/MFA/CAPTCHA challenge. It does **not** mean platform write/API authorization is complete. Keep `publish_connected=false` until the exact account/page identity and write scope are verified and one account-specific publication test produces a receipt.
 
+## Naver N1 connection checkpoint — 2026-09-25
+
+- Owner selected **N1 = `huh0303`** as the first Naver blog to activate.
+- Google Sheet `CEO종합상황실` -> `자동화_플랫폼계정` now contains an enabled Naver row for `naver_n1`, destination `huh0303`, editor URL `https://blog.naver.com/GoBlogWrite.naver?blogId=huh0303`, cadence one public post per KST day.
+- GitHub `config/automation_rooms.json` is synchronized: N1 enabled, destination `huh0303`, public policy, daily 1 / weekly 7.
+- The public blog and Naver write-editor URLs were opened on the owner's PC. Do not ask the owner to re-enter the N1 identity.
+- Remaining verification is one real public test receipt from the local browser publisher; until that receipt exists, do not claim daily_active.
+
 ## Remaining work, in order
 
 1. Verify or create only the 11 missing SNS identities, checking for duplicates first.
