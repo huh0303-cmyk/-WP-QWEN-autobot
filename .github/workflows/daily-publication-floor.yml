@@ -26,7 +26,8 @@ concurrency:
 
 jobs:
   wordpress:
-    if: ${{ inputs.platform == '' || inputs.platform == 'wordpress' || github.event_name == 'schedule' }}
+    # WP25 daily floor is owned by the authenticated VPS WordPress worker.
+    if: ${{ inputs.platform == 'wordpress' && github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
