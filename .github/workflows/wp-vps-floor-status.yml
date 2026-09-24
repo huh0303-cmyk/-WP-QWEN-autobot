@@ -1,0 +1,50 @@
+name: WP VPS daily floor status
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/wp-vps-floor-status.yml']
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read sanitized WP daily-floor state from VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            python3 - <<'PY'
+            import json
+            from pathlib import Path
+            state_path = Path('/opt/korea365/data/vps-wp-daily-floor.json')
+            queue = Path('/opt/korea365/data/vps-wp-queue')
+            if not state_path.exists():
+                raise SystemExit('WP_FLOOR_STATE_MISSING')
+            state = json.loads(state_path.read_text())
+            safe = {
+              'hour_key': state.get('hour_key'),
+              'checked_at': state.get('checked_at'),
+              'status': state.get('status'),
+              'target': state.get('target'),
+              'queued': state.get('queued'),
+              'counts': {},
+            }
+            for row in state.get('sites', []):
+                key = row.get('status','unknown')
+                safe['counts'][key] = safe['counts'].get(key,0)+1
+            qcounts={}
+            for suffix in ('queued','processing','published','failed','credential_required'):
+                qcounts[suffix]=len(list(queue.glob(f'daily-*.{suffix}.json'))) if queue.exists() else 0
+            safe['queue_counts']=qcounts
+            print('WP_DAILY_FLOOR_SAFE', json.dumps(safe, ensure_ascii=False, sort_keys=True))
+            PY
+            systemctl is-active korea365-wp-publisher.service
