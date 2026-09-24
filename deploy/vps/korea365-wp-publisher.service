@@ -10,6 +10,7 @@ WorkingDirectory=/opt/korea365
 EnvironmentFile=/etc/korea365/control.env
 Environment=VPS_WP_QUEUE=/opt/korea365/data/vps-wp-queue
 Environment=VPS_WP_CREDENTIALS=/etc/korea365/wp-sites.json
+Environment=FORCE_SOURCE_IPV4=true
 ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/vps_wordpress_worker.py
 Restart=always
 RestartSec=10
