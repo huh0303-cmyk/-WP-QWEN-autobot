@@ -3,6 +3,32 @@ import json,datetime,pathlib,requests,concurrent.futures,html,os,sqlite3
 ROOT=pathlib.Path('/opt/korea365')
 OUT=ROOT/'data/publication-board.json'
 KST=datetime.timezone(datetime.timedelta(hours=9))
+CATEGORY_PLACEHOLDERS={'etc','etc.','기타','uncategorized','미분류','other','others','etc-uncategorized'}
+CODE_LIKE_CATEGORY_TOKENS=('{{','}}','{%','%}','<script','</','```','javascript:')
+
+def clean_category_labels(labels,fallback=''):
+ """Hide placeholder taxonomy and malformed/code-like labels from operator-facing cards."""
+ cleaned=[]
+ for raw in labels or []:
+  name=html.unescape(str(raw or '')).strip()
+  normalized=name.casefold().replace('_','-').strip()
+  if not name or normalized in CATEGORY_PLACEHOLDERS:continue
+  if '\ufffd' in name or len(name)>60 or any(token in name.casefold() for token in CODE_LIKE_CATEGORY_TOKENS):continue
+  if name not in cleaned:cleaned.append(name)
+ fallback=html.unescape(str(fallback or '')).strip()
+ if not cleaned and fallback and fallback.casefold() not in CATEGORY_PLACEHOLDERS:cleaned=[fallback]
+ return cleaned
+
+def category_fallbacks():
+ """Use the editorial profile theme when a site's public taxonomy is only a placeholder."""
+ profiles=read_json(ROOT/'config/content_engine_profiles.json',{}).get('profiles',[])
+ out={}
+ for profile in profiles:
+  wp=profile.get('wordpress') or {};blog=profile.get('blogspot') or {};theme=str(wp.get('theme') or '').strip()
+  for item in (wp,blog):
+   url=str(item.get('url') or '').rstrip('/')
+   if url and theme:out[url.split('//')[-1]]=theme
+ return out
 def read_json(path,default):
  try:return json.loads(path.read_text(encoding='utf-8'))
  except (OSError,ValueError):return default
@@ -75,14 +101,14 @@ def collect():
  sites={p['wordpress']['url'].rstrip('/'):p['wordpress'] for p in profiles if p.get('wordpress',{}).get('url')}
  def check(pair):
   url,profile=pair;domain=url.split('//')[-1];news=domain in ['koreanews365.com','theseouljournal.com']
-  row={'site':domain,'url':url,'kind':'신문사' if news else 'WP','target':'1건','checked_at':now.isoformat(),'today':None,'latest_url':'','latest_title':'','categories':[],'next':'작성 경로 확인 필요','error':''}
+  row={'site':domain,'url':url,'kind':'신문사' if news else 'WP','theme':profile.get('theme',''),'target':'1건','checked_at':now.isoformat(),'today':None,'latest_url':'','latest_title':'','categories':[],'next':'작성 경로 확인 필요','error':''}
   try:
    s=requests.Session();s.params={'_audit':int(now.timestamp())}
    r=s.get(url+'/wp-json/wp/v2/posts',params={'per_page':100,'orderby':'date','order':'desc','_fields':'id,date_gmt,title,link'},timeout=25);r.raise_for_status();posts=r.json();row['published_total']=int(r.headers['X-WP-Total']) if r.headers.get('X-WP-Total') is not None else None
    row['history']=[{'id':p['id'],'title':html.unescape(p['title']['rendered']),'url':p['link'],'published_at':p['date_gmt']+'Z','published_kst':publication_date(p['date_gmt']+'Z')} for p in posts[:10]]
    row['today']=sum(datetime.datetime.fromisoformat(p['date_gmt']).replace(tzinfo=datetime.timezone.utc).astimezone(KST).date()==now.date() for p in posts)
    if posts:row.update(latest_url=posts[0]['link'],latest_title=html.unescape(posts[0]['title']['rendered']),latest_at=posts[0]['date_gmt']+'Z')
-   r=s.get(url+'/wp-json/wp/v2/categories',params={'per_page':100,'hide_empty':'true','_fields':'id,name,count'},timeout=25);r.raise_for_status();row['categories']=[html.unescape(c['name']) for c in r.json()]
+   r=s.get(url+'/wp-json/wp/v2/categories',params={'per_page':100,'hide_empty':'true','_fields':'id,name,count'},timeout=25);r.raise_for_status();row['categories']=clean_category_labels([c.get('name','') for c in r.json()],row.get('theme',''))
    row['status']=('오늘 발행 확인' if row['today']>= 1 else '목표까지 추가 발행 필요')
    if news:
     row['next']='RSS 감지 중 · 유료 작성 승인 대기' if pathlib.Path('/etc/korea365/newsroom-cost-hold').exists() else 'RSS 감지 중 · OpenAI 잔액/한도 부족(429), Gemini 403 해결 필요'
@@ -105,13 +131,13 @@ def collect():
  rows=list(concurrent.futures.ThreadPoolExecutor(max_workers=5).map(check,sites.items()))
  rows=list(concurrent.futures.ThreadPoolExecutor(max_workers=5).map(traffic,rows))
  def blogcheck(p):
-  b=p['blogspot'];url=b['url'].rstrip('/');row={'site':url.split('//')[-1],'url':url,'kind':'Blogspot','target':'1건','today':None,'latest_url':'','latest_title':'','categories':[],'next':'무료 원고 순차 발행 중','error':'','checked_at':now.isoformat()}
+  b=p['blogspot'];url=b['url'].rstrip('/');theme=(p.get('wordpress') or {}).get('theme','');row={'site':url.split('//')[-1],'url':url,'kind':'Blogspot','theme':theme,'target':'1건','today':None,'latest_url':'','latest_title':'','categories':[],'next':'무료 원고 순차 발행 중','error':'','checked_at':now.isoformat()}
   try:
    response=requests.get(url+'/feeds/posts/default',params={'alt':'json','max-results':100,'_audit':int(now.timestamp())},timeout=25);response.raise_for_status();feed=response.json()['feed'];entries=feed.get('entry',[]);row['published_total']=int(feed['openSearch$totalResults']['$t']) if feed.get('openSearch$totalResults') else None
    row['history']=[{'id':e['id']['$t'],'title':e['title']['$t'],'url':next(x['href'] for x in e['link'] if x['rel']=='alternate'),'published_at':e['published']['$t'],'published_kst':publication_date(e['published']['$t'])} for e in entries[:10]]
    row['today']=sum(datetime.datetime.fromisoformat(e['published']['$t']).astimezone(KST).date()==now.date() for e in entries)
    if entries:
-    e=entries[0];row.update(latest_at=e['published']['$t'],latest_title=e['title']['$t'],latest_url=next(x['href'] for x in e['link'] if x['rel']=='alternate'),categories=[c['term'] for c in e.get('category',[])])
+    e=entries[0];row.update(latest_at=e['published']['$t'],latest_title=e['title']['$t'],latest_url=next(x['href'] for x in e['link'] if x['rel']=='alternate'),categories=clean_category_labels([c.get('term','') for c in e.get('category',[])],row.get('theme','')))
    row['status']='오늘 발행 확인' if row['today'] else '오늘 발행 필요'
    row['next']='오늘 목표 완료 · 다음 무료 원고 준비 필요' if row['today'] else '무료 원고 준비·발행 필요'
   except Exception as e:row.update(status='확인 실패',error=type(e).__name__)
@@ -149,6 +175,7 @@ def board():
  except (OSError,ValueError):return '<p>발행 현황 수집 중입니다.</p>'
  esc=lambda x:html.escape(str(x),quote=True)
  checked=datetime.datetime.fromisoformat(data['checked_at']);visitor_day=(checked.date()-datetime.timedelta(days=1)).isoformat()
+ fallback_by_site=category_fallbacks()
  sections=[]
  for kind,title in [('WP','WordPress 25개'),('Blogspot','블로그스팟 33개'),('신문사','신문사 2개 · 별도 운영')]:
   accent,tint={'WP':('#1d4ed8','#eff6ff'),'Blogspot':('#c2410c','#fff7ed'),'신문사':('#047857','#ecfdf5')}[kind]
@@ -162,9 +189,10 @@ def board():
     if count!=last:rank=i
     badge=f'{rank}위';last=count
    else:badge='순위 미확인'
+   visible_categories=clean_category_labels(r.get('categories',[]),r.get('theme') or fallback_by_site.get(r.get('site',''),'') )
    next_step=r['next']
    if kind=='WP' and r['today']:next_step='오늘 발행 완료 · 다음날 무료 자동작성 복구 확인 필요'
-   cards.append('<article data-card-site="'+esc(r['site'])+'" style="background:white;border:1px solid #cbd5e1;border-top:5px solid '+accent+';border-radius:14px;padding:18px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div aria-label="방문자 순위" style="min-width:68px;padding:12px 8px;background:'+accent+';color:white;border-radius:12px;font-size:36px;font-weight:900;line-height:1.1;text-align:center">'+(str(rank)+'<span style="font-size:15px">위</span>' if count is not None else '<span style="font-size:16px">미확인</span>')+'</div><a style="font-weight:bold;color:#0369a1" href="'+esc(r['url'])+'" target="_blank" rel="noopener">'+esc(r['site'])+'</a></div><p style="font-size:12px;color:#64748b">카테고리</p><p style="font-size:23px;line-height:1.35;font-weight:800;color:'+accent+';background:'+tint+';border-radius:10px;padding:12px;margin:4px 0 16px">'+esc(' · '.join(r['categories']) or '공개 글 분류 없음')+'</p>'+four_metrics_html(r)+'<hr style="margin:12px 0"><p>오늘 발행 <b>'+('미확인' if r['today'] is None else str(r['today'])+'건')+'</b> / 목표 '+r['target']+'</p><p>'+esc(r['status'])+'</p><p style="font-size:12px">'+esc(next_step)+'</p><p style="color:#b91c1c">'+esc(r['error'])+'</p>'+('<a style="color:#0369a1;text-decoration:underline" href="'+esc(r['latest_url'])+'" target="_blank" rel="noopener">최근 글: '+esc(r['latest_title'])+'</a><p style="font-size:13px;margin-top:6px;color:#475569">발행일: '+esc(publication_date(r.get('latest_at')))+'</p>' if r['latest_url'] else '')+'<button type="button" data-card-publish-url="'+esc(r['url'])+'" style="width:50%;margin-top:18px;padding:13px 6px;background:'+accent+';color:white;border:0;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer">즉시발행</button><p data-quick-status="" role="status" aria-live="polite" style="font-size:12px;margin-top:6px;color:#475569"></p></article>')
+   cards.append('<article data-card-site="'+esc(r['site'])+'" style="background:white;border:1px solid #cbd5e1;border-top:5px solid '+accent+';border-radius:14px;padding:18px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div aria-label="방문자 순위" style="min-width:68px;padding:12px 8px;background:'+accent+';color:white;border-radius:12px;font-size:36px;font-weight:900;line-height:1.1;text-align:center">'+(str(rank)+'<span style="font-size:15px">위</span>' if count is not None else '<span style="font-size:16px">미확인</span>')+'</div><a style="font-weight:bold;color:#0369a1" href="'+esc(r['url'])+'" target="_blank" rel="noopener">'+esc(r['site'])+'</a></div><p style="font-size:12px;color:#64748b">카테고리</p><p style="font-size:23px;line-height:1.35;font-weight:800;color:'+accent+';background:'+tint+';border-radius:10px;padding:12px;margin:4px 0 16px">'+esc(' · '.join(visible_categories) or '분류 정보 확인 중')+'</p>'+four_metrics_html(r)+'<hr style="margin:12px 0"><p>오늘 발행 <b>'+('미확인' if r['today'] is None else str(r['today'])+'건')+'</b> / 목표 '+r['target']+'</p><p>'+esc(r['status'])+'</p><p style="font-size:12px">'+esc(next_step)+'</p><p style="color:#b91c1c">'+esc(r['error'])+'</p>'+('<a style="color:#0369a1;text-decoration:underline" href="'+esc(r['latest_url'])+'" target="_blank" rel="noopener">최근 글: '+esc(r['latest_title'])+'</a><p style="font-size:13px;margin-top:6px;color:#475569">발행일: '+esc(publication_date(r.get('latest_at')))+'</p>' if r['latest_url'] else '')+'<button type="button" data-card-publish-url="'+esc(r['url'])+'" style="width:50%;margin-top:18px;padding:13px 6px;background:'+accent+';color:white;border:0;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer">즉시발행</button><p data-quick-status="" role="status" aria-live="polite" style="font-size:12px;margin-top:6px;color:#475569"></p></article>')
   sections.append('<section data-platform="'+kind+'" style="margin-top:28px"><h3 style="font-size:23px;font-weight:bold;color:'+accent+';background:'+tint+';border-left:6px solid '+accent+';padding:12px 16px;border-radius:8px">'+title+'</h3><p>오늘 목표 달성 '+str(complete)+'/'+str(len(group))+'곳 · 공개 '+str(published)+'건 · 어제 방문자 내림차순</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">'+''.join(cards)+'</div></section>')
  stale=(datetime.datetime.now(KST)-checked).total_seconds()>1200
  return '<section id="publication-board" style="max-width:1280px;margin:24px auto;padding:16px"><h2 style="font-size:28px;font-weight:bold">사이트별 운영 카드</h2><p>방문자 기준일 '+visitor_day+' · 한국시간 00:00~24:00 · 괄호는 전전일 대비 증감</p><p>같은 방문자 수는 공동 순위 · 미확인은 맨 아래 · 수집 기록이 없으면 0명으로 표시하지 않습니다.</p><p style="font-size:12px">방문자는 사이트 자체 카운터 집계이며 플랫폼 간 측정 방식이 다를 수 있습니다. 갱신 '+esc(data['checked_at'])+(' · 갱신 지연' if stale else '')+'</p>'+''.join(sections)+'</section>'
