@@ -2184,9 +2184,14 @@ def _overlay_core_metrics(rows, platform):
             row[field] = record.get(field)
         if manifest.get("generated_at", "")[:10] != today:
             row["posts_delta"] = None
+            row["indexed_delta"] = None
+            if record.get("indexed") is not None:
+                row["index_stale"] = True
+                row["index_status"] = f"과거 마지막 확인값 ({manifest.get('generated_at', '')[:10] or '날짜 미확인'}) · 오늘 색인 재수집 필요"
             if platform == "blogger":
                 row.update(today_visitors=None, today_delta=None, total_delta=None)
-        row["index_status"] = " / ".join(record.get("errors", [])) or "Google URL별 확인"
+        else:
+            row["index_status"] = " / ".join(record.get("errors", [])) or "Google URL별 확인"
     return rows
 
 
