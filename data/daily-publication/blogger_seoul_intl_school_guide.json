@@ -1,13 +1,1 @@
-{
-  "day": "2026-09-25",
-  "status": "FAILED",
-  "attempts": 0,
-  "claim": "daily-2026-09-25-blogger_seoul_intl_school_guide-8a10f578",
-  "claimed_at": "2026-09-25T08:21:38.305709+09:00",
-  "run_id": null,
-  "child_run_id": null,
-  "child_job_id": null,
-  "workflow": "blogger-rewrite.yml",
-  "system_repair": "2026-09-25 cached-source REST bypass + bounded writer fallback",
-  "system_repair_reason": "previous attempts failed because of pipeline defects now fixed; retry budget reset once"
-}
+{"day": "2026-09-25", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-25-blogger_seoul_intl_school_guide-f0516acc", "claimed_at": "2026-09-25T08:35:42.143616+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
