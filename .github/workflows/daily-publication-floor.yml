@@ -1,5 +1,5 @@
 name: Daily public publication floor
-# repaired one-site dispatch + stale-claim recovery + writer fallback 2026-09-25
+# repaired one-site dispatch + stale-claim recovery + writer fallback + IPv4 checks 2026-09-25
 
 on:
   push:
