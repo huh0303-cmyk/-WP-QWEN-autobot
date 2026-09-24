@@ -1,0 +1,10 @@
+[Unit]
+Description=Queue due Korea365 YouTube private weekly jobs
+After=network-online.target korea365-youtube-worker.service
+
+[Service]
+Type=oneshot
+User=korea365
+Group=korea365
+WorkingDirectory=/opt/korea365
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/youtube_10_private_weekly.py

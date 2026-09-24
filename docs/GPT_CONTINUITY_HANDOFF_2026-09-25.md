@@ -9,8 +9,9 @@ Read these repository files before asking the owner any account questions:
 1. `docs/LONDON_PROJECT_CURRENT_STATE_2026-09-25.md`
 2. `config/sns_six_channel_policy.json`
 3. `docs/DAILY_52_CHANNEL_EXECUTION_PLAN.md`
-4. `docs/LONDON_PROJECT_BLUEPRINT.md` if present
-5. Existing YouTube lock/receipt and Blogspot 33 registry files
+4. `docs/PUBLISHING_POLICY_2026-09-25_FINAL.md` (newer policy takes precedence where schedules differ)
+5. `docs/LONDON_PROJECT_BLUEPRINT.md` if present
+6. Existing YouTube lock/receipt and Blogspot 33 registry files
 
 Treat the ten YouTube mappings and the six-role SNS matrix as already supplied and approved. Do not ask the owner to enumerate them again.
 

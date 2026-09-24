@@ -1,0 +1,36 @@
+name: SNS 24 accounts - one daily slot each
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+concurrency:
+  group: sns-24-hourly-${{ github.run_id }}
+  cancel-in-progress: false
+jobs:
+  select-and-publish:
+    if: ${{ vars.SNS_24_PUBLISH_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Select today's account for this hour
+        run: python scripts/sns_github_hourly_slot.py | tee sns-slot.json
+      - name: Require complete account credential bundle
+        env:
+          SNS_ACCOUNT_CREDENTIALS_JSON: ${{ secrets.SNS_ACCOUNT_CREDENTIALS_JSON }}
+        run: |
+          test -n "$SNS_ACCOUNT_CREDENTIALS_JSON" || { echo 'SNS account credential bundle is not connected yet'; exit 1; }
+          echo 'Credential bundle detected. The account-specific publisher must validate identity and save a remote receipt.'
+      - name: Stop before an unverified write adapter
+        run: |
+          echo 'SNS_24_PUBLISH_ENABLED must remain false until the selected account publisher and media payload are receipt-tested.'
+          exit 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sns-slot-${{ github.run_id }}
+          path: sns-slot.json
+          retention-days: 30

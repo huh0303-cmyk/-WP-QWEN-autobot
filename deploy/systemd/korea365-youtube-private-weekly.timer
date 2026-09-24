@@ -1,0 +1,10 @@
+[Unit]
+Description=Check due YouTube private jobs every five minutes
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+Unit=korea365-youtube-private-weekly.service
+
+[Install]
+WantedBy=timers.target
