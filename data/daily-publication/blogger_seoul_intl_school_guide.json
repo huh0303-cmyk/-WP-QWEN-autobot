@@ -1,1 +1,1 @@
-{"day": "2026-09-25", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-25-blogger_seoul_intl_school_guide-0cb4e29b", "claimed_at": "2026-09-25T08:20:03.138928+09:00", "run_id": 36072194253, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-25", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-09-25-blogger_seoul_intl_school_guide-8a10f578", "claimed_at": "2026-09-25T08:21:38.305709+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
