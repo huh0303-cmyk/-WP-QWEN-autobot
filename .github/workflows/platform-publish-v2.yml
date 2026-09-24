@@ -1,0 +1,72 @@
+name: Automation Hub - platform publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform filter
+        required: true
+        type: choice
+        options: [blogger]
+        default: blogger
+      job_id:
+        description: Exact queued job id; blank selects next ready row
+        required: false
+        type: string
+        default: ""
+      max_jobs:
+        description: Maximum jobs this run
+        required: false
+        type: string
+        default: "1"
+      recover_invalid_job:
+        description: Recover exact failed invalid job
+        required: false
+        type: boolean
+        default: false
+      recovery_search_description:
+        description: Recovery search description
+        required: false
+        type: string
+        default: ""
+      recover_transient_job:
+        description: Retry exact transient Blogger transport failure
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-publish-${{ inputs.platform }}-${{ inputs.job_id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install publisher dependencies
+        run: pip install requests google-api-python-client google-auth -q
+      - name: Publish and verify exact remote result
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          PLATFORM_FILTER: ${{ inputs.platform }}
+          JOB_ID: ${{ inputs.job_id }}
+          MAX_JOBS: ${{ inputs.max_jobs }}
+          FAIL_ON_EMPTY: "true"
+          RECOVER_INVALID_JOB: ${{ inputs.recover_invalid_job }}
+          RECOVERY_SEARCH_DESCRIPTION: ${{ inputs.recovery_search_description }}
+          RECOVER_TRANSIENT_JOB: ${{ inputs.recover_transient_job }}
+        run: python scripts/process_platform_queue.py
