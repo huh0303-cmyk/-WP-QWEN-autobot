@@ -1,4 +1,23 @@
-"""Keep last verified evidence visible when a later refresh fails."""
+"""Keep last verified evidence visible, but never present old index evidence as current."""
+
+from datetime import datetime, timedelta, timezone
+from functools import lru_cache
+import time
+import requests
+
+KST = timezone(timedelta(hours=9))
+
+
+def _is_old_index_evidence(value):
+    if not value:
+        return False
+    try:
+        checked = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if checked.tzinfo is None:
+            checked = checked.replace(tzinfo=timezone.utc)
+        return checked.astimezone(KST).date() != datetime.now(KST).date()
+    except (TypeError, ValueError):
+        return True
 
 
 def index_metrics(entry):
@@ -9,8 +28,11 @@ def index_metrics(entry):
     error = entry.get('error')
     if not verified_at or (unknown and not indexed and not summary.get('unindexed')):
         indexed = None
-    stale = bool(error and indexed is not None)
-    if stale:
+    stale_by_age = _is_old_index_evidence(verified_at)
+    stale = bool(indexed is not None and (error or stale_by_age))
+    if stale_by_age and indexed is not None:
+        status = '과거 마지막 확인값 · 오늘 색인 재검사 필요'
+    elif stale:
         status = '마지막 확인값 · 최근 갱신 실패'
     elif error == 'gsc_property_not_accessible':
         status = 'Search Console 권한 연결 필요'
@@ -24,12 +46,6 @@ def index_metrics(entry):
             'index_total': summary.get('total_published'),
             'index_partial': bool(unknown), 'index_stale': stale,
             'index_checked_at': verified_at, 'index_status': status}
-
-
-from datetime import datetime, timedelta, timezone
-from functools import lru_cache
-import time
-import requests
 
 
 @lru_cache(maxsize=128)
