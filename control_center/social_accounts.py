@@ -134,10 +134,10 @@ def _tistory_cards() -> list[dict]:
             "key": f"tistory:{row['site_id']}", "platform": "Tistory", "name": row.get("title") or row.get("current_label") or row["site_id"],
             "identity": row["site_id"], "handle": "", "url": row.get("url", ""), "login_url": LOGIN_URLS["Tistory"],
             "role": " · ".join(row.get("categories", [])), "description": row.get("description", ""),
-            "state_label": "사이트 확인 · 로컬 로그인 필요", "connection_level": "identity_verified",
-            "publish_mode": "계정별 원고 생성 작업을 접수합니다. 로컬 Tistory 로그인 세션이 연결되면 검토본 저장까지 진행합니다.",
+            "state_label": "로그인 완료 보고됨 · 로컬 등록기 연결 점검", "connection_level": "identity_verified",
+            "publish_mode": "하루 1건 원고를 생성해 큐에 넣고, 기존 로그인 세션의 로컬 등록기가 공개 발행·재검증합니다.",
             "can_publish": True, "channel_key": "", "action_kind": "tistory_form", "button_label": "이 채널 원고 생성",
-            "site_id": row["site_id"], "note": "공개 발행은 저장 결과와 로그인 세션을 확인한 뒤 처리합니다.",
+            "site_id": row["site_id"], "note": "2026-09-25 사용자 로그인 완료 보고. 실제 세션 만료/CAPTCHA가 확인될 때만 재로그인을 요청합니다.",
         })
     return cards
 
@@ -152,10 +152,10 @@ def _naver_cards() -> list[dict]:
             "identity": destination or f"{row['report_code']} · 로그인 후 블로그 ID 확인", "handle": "",
             "url": destination if destination.startswith("http") else "", "login_url": LOGIN_URLS["Naver"],
             "role": "네이버 블로그 독립 채널", "description": "계정별 원고·중복 방지·발행 이력을 독립 관리합니다.",
-            "state_label": "블로그 주소 연결 완료" if destination else "계정 정보 필요 · 로그인 대기",
+            "state_label": "기존 로그인 세션 · 블로그 ID 매핑 완료" if destination else "로그인 완료 보고됨 · 블로그 ID 매핑 필요",
             "connection_level": "identity_verified" if destination else "missing",
-            "publish_mode": "로그인 세션과 블로그 ID 확인 후 해당 계정 전용 대기열을 작동합니다.",
-            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "네이버 로그인 · 계정 연결",
+            "publish_mode": "기존 로그인 세션을 정확한 N1/N2/N3 블로그 ID에 연결한 뒤 하루 1건 공개 발행합니다.",
+            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "기존 로그인 세션 연결",
             "note": "다른 네이버 계정과 섞이지 않도록 N1·N2·N3를 서로 다른 로그인 프로필로 유지합니다.",
         })
     return cards
