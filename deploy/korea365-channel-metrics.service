@@ -1,9 +1,0 @@
-[Unit]
-Description=Read-only YouTube public and Analytics statistics
-[Service]
-Type=oneshot
-WorkingDirectory=/opt/korea365
-ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/channel_analytics_metrics.py
-ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/channel_public_metrics.py
-ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/windsor_youtube_metrics.py
-TimeoutStartSec=300

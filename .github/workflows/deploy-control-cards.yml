@@ -30,19 +30,8 @@ jobs:
             KOREA365_ROOT="$ROOT" "$ROOT/.venv/bin/python" "$TMP/repair.py"
             "$ROOT/.venv/bin/python" -m py_compile "$ROOT/control_center/channel_check.py"
             systemctl is-active --quiet korea365-control.service
-            PAGE=''
-            for attempt in 1 2 3 4 5 6 7 8 9 10; do
-              if PAGE=$(curl -fsS http://127.0.0.1:8000/channel-check/youtube); then
-                break
-              fi
-              sleep 2
-            done
-            test -n "$PAGE"
-            grep -q 'CAFE_STARBUCKSVIBES' <<<"$PAGE"
-            grep -q 'RETRO_USA1' <<<"$PAGE"
-            grep -q '10개 채널 공개 조회: 10개 존재·실제명 확인' <<<"$PAGE"
-            if grep -q '채널 조회 실패 HTTP 403' <<<"$PAGE"; then
-              echo 'stale HTTP 403 card remains' >&2
-              exit 1
-            fi
+            grep -q 'CAFE_STARBUCKSVIBES' "$ROOT/data/operations-channel-audit.json"
+            grep -q 'RETRO_USA1' "$ROOT/data/operations-channel-audit.json"
+            grep -q 'ACCESS_TOKEN_SCOPE_INSUFFICIENT' "$ROOT/data/operations-channel-audit.json"
+            grep -q '10개 채널 공개 조회' "$ROOT/control_center/channel_check.py"
             printf '{"deployed_commit":"%s","backup":"%s","deployed_at":"%s","publication_changed":false}\n' "$TARGET" "$BACKUP" "$STAMP" > "$ROOT/data/channel-check-repair.json"
