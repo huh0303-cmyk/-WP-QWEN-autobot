@@ -19,50 +19,55 @@
     },
     "newsrooms": {
       "sites": ["The Seoul Journal", "Koreanews365"],
-      "target": "3_to_10_per_day_per_newsroom",
+      "target": "1_per_day_per_newsroom",
+      "weekly_target_per_newsroom": 7,
       "source_mode": "rss_and_breaking_news_event_driven",
       "minimum_requires_verified_source_leads": true,
       "never_invent_to_fill_minimum": true,
-      "daily_max": 10,
+      "daily_max": 1,
       "separate_from_general_wordpress": true
     },
     "blogspot": {
-      "target": "1_private_draft_per_enabled_destination_per_day",
-      "review_gated": true,
+      "target": "1_public_post_per_enabled_destination_per_day",
+      "review_gated": false,
       "no_wordpress_copy_paste": true
     },
     "tistory": {
       "site_count": 5,
-      "target": "inherit_current_runtime_contract_until_explicitly_changed",
-      "review_gated": true
+      "target": "1_public_post_per_enabled_site_per_day",
+      "weekly_target_per_site": 7,
+      "randomized_time": true,
+      "public_requires_local_write_verification": true
     },
     "youtube_playlist": {
       "channel_count": 5,
-      "interval_days_min": 2,
-      "interval_days_max": 3,
-      "target": "1_private_production_per_channel_every_2_to_3_days",
+      "weekly_min": 2,
+      "weekly_max": 3,
+      "target": "2_to_3_private_productions_per_channel_per_week",
+      "randomize_weekly_days": true,
       "upload_default": "private",
       "human_review_before_public": true,
       "avoid_channel_time_collisions": true
     },
     "youtube_knowledge": {
       "channel_count": 5,
-      "interval_days_min": 2,
-      "interval_days_max": 3,
-      "target": "1_private_production_per_channel_every_2_to_3_days",
+      "weekly_min": 2,
+      "weekly_max": 3,
+      "target": "2_to_3_private_productions_per_channel_per_week",
+      "randomize_weekly_days": true,
       "upload_default": "private",
       "human_review_before_public": true,
       "avoid_channel_time_collisions": true
     },
     "survival_10_language": {
+      "enabled": false,
+      "status": "outside_locked_youtube_10_scope",
       "languages": ["Korean/TOPIK", "English", "Japanese", "Chinese", "Vietnamese", "Spanish", "French", "German", "Italian", "Portuguese"],
       "lessons_per_language": 50,
       "total_lessons": 500,
       "completed_through_lesson": 2,
       "next_lesson": 3,
-      "interval_days_min": 2,
-      "interval_days_max": 3,
-      "target": "1_private_lesson_per_language_every_2_to_3_days",
+      "target": "disabled_until_separately_approved",
       "upload_default": "private",
       "require_verified_private_before_review": true,
       "require_chairman_approval_before_public": true,
@@ -70,16 +75,26 @@
       "spread_languages_across_distinct_slots": true
     },
     "instagram": {
-      "target": "4_to_7_per_week_per_active_brand"
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7
     },
     "threads": {
-      "target": "mirror_instagram_topic_and_direction"
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7,
+      "content_direction": "mirror_instagram_topic_not_verbatim_copy"
     },
     "tiktok": {
-      "target": "4_to_7_per_week_per_active_brand"
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7
     },
     "facebook": {
-      "target": "3_to_7_per_week_per_active_brand"
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7
+    },
+    "naver": {
+      "target": "1_public_post_per_verified_account_per_day",
+      "weekly_target": 7,
+      "public_requires_local_write_verification": true
     }
   },
   "image_policy": {

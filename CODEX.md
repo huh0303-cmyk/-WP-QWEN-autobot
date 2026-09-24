@@ -31,10 +31,11 @@ For planned content, exact-hour publication is forbidden. Apply the configured �
 
 Current key cadence:
 - General WordPress: one post per enabled general site per day.
-- Newsrooms: RSS/breaking-news driven, target 3–10 verified stories per newsroom per day; never invent material merely to fill a minimum.
-- YouTube Playlist 5: one private production per channel every 2–3 days.
-- YouTube Knowledge 5: one private production per channel every 2–3 days.
-- 10-Language Survival: one private lesson per language every 2–3 days; 50 lessons per language, canonical progress through Lesson 2, next Lesson 3.
+- Newsrooms: one verified story per newsroom per day; never invent material merely to fill a minimum.
+- Blogspot, Tistory, Naver and SNS: one post per verified destination/account per day.
+- YouTube Playlist 5: two or three private productions per channel per week on randomized days.
+- YouTube Knowledge 5: two or three private productions per channel per week on randomized days.
+- 10-Language Survival is outside the locked YouTube-10 schedule and remains disabled until separately approved.
 - Review-gated YouTube content stays private until Chairman approval.
 
 ## Image authority
@@ -47,7 +48,7 @@ For blog/news imagery, prefer copyright-safe sources first: Pexels, then Pixabay
 2. Assign production/localization to Gemini.
 3. Assign independent QA to Claude.
 4. Assign rendering/upload to VPS.
-5. Schedule each language at a distinct randomized KST slot and maintain a 2–3 day interval per language.
+5. Do not schedule this separate project until the Chairman explicitly re-enables it.
 6. Upload YouTube as private only.
 7. Require deterministic verification of video_id, channel_id and privacyStatus=private.
 8. Surface review link to Chairman.

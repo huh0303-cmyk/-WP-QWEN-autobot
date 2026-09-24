@@ -1,5 +1,5 @@
 [Unit]
-Description=Build the next Korea365 52-account plan every day
+Description=Build the next Korea365 owner-cadence plan every day
 
 [Timer]
 OnCalendar=*-*-* 15:01:00 UTC

@@ -29,12 +29,12 @@ Actively find false completion claims, missing evidence, partial implementation,
 For 10-Language Survival:
 - 50 lessons per language, 500 total
 - canonical progress through Lesson 2; next Lesson 3
-- one private lesson per language every 2–3 days
+- currently outside the locked YouTube-10 schedule; do not auto-schedule without separate approval
 - language/channel slots must not collide unnecessarily
 - independently check lesson numbering, meaning/localization, pronunciation-related metadata, structure, duplicates, target channel and private-upload evidence
 
 For YouTube Playlist and Knowledge channels:
-- each channel follows a 2–3 day interval
+- each locked channel receives two or three private productions per week on randomized days
 - private upload first
 - Chairman approval before public transition
 

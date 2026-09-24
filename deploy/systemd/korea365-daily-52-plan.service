@@ -1,5 +1,5 @@
 [Unit]
-Description=Build Korea365 randomized 52-account daily plan
+Description=Build Korea365 daily non-YouTube and weekly YouTube-10 plan
 After=network-online.target
 
 [Service]

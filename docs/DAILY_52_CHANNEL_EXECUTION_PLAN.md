@@ -1,21 +1,21 @@
-# Daily 52-Channel Execution Plan
+# Daily Channel Execution Plan
 
 ## Goal
 
-Prepare exactly one slot per day for YouTube 20, TikTok 6, Instagram 6, Facebook 6, Threads 6, Tistory 5, and Naver 3. The 52 slots are reshuffled daily and spread over the full 24-hour KST day instead of clustering at a few fixed times.
+Prepare one daily slot for every non-YouTube destination: TikTok 6, Instagram 6, Facebook 6, Threads 6, Tistory 5, and Naver 3. Only the locked ten YouTube channels are scheduled, each on two or three randomly selected days per week and always as private/review-only production.
 
 ## Implemented foundation
 
-- `scripts/plan_52_channel_daily.py` loads the canonical account registries and refuses to run unless exactly 52 targets are present.
+- `scripts/plan_52_channel_daily.py` loads the canonical account registries and refuses to run unless exactly 32 daily non-YouTube targets and 10 locked YouTube identities are present.
 - Every account gets one deterministic date/account duplicate key.
-- Targets are randomly assigned to 52 equal time bands across 24 hours, with additional jitter inside each band.
-- The result is saved as `data/daily-52-schedule/YYYY-MM-DD.json`.
+- Due targets are reshuffled and distributed between 08:10 and 22:50 KST, with non-round minute jitter.
+- The result is saved as `data/daily-channel-schedule/YYYY-MM-DD.json`.
 - `korea365-daily-52-plan.timer` creates the plan at 00:01 KST each day with a small service-start jitter.
 - Planning is separated from publishing. A slot is `ready` only after exact identity and write authority are verified; otherwise it is `blocked_auth`.
 
 ## Release gates
 
-1. YouTube: currently connected core channels remain `private_review_only`; public release requires a separate owner decision.
+1. YouTube: only the locked ten channels are eligible, two or three times weekly, and remain `private_review_only`; public release requires a separate owner decision.
 2. TikTok, Instagram, Facebook, Threads: public posting requires account identity, platform write authorization, and one receipt-backed test.
 3. Tistory: public posting requires the local persistent browser login and one successful account-specific test.
 4. Naver: each of N1, N2, and N3 requires a separate persistent login profile, exact blog ID, and one successful test.

@@ -2,6 +2,13 @@
 
 Updated: 2026-09-25 (Asia/Seoul)
 
+## Owner cadence override — 2026-09-25
+
+- The locked ten YouTube channels only: two or three private productions per channel per week, with the production days randomized each week.
+- Every non-YouTube destination/account: one post per day.
+- A daily slot is generated from the destination's own topic bank or role brief and carries a date/account duplicate key.
+- Browser login alone is not represented as API write authorization. A blocked account remains planned but is not falsely marked published.
+
 This file is the canonical continuity record for the Korea365 London Project. Before asking the owner to repeat channel names, IDs, account roles, or publishing policy, read this file and the referenced machine-readable configuration.
 
 ## Non-negotiable operating rules

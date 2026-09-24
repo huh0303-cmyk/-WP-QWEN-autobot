@@ -4,7 +4,8 @@
   "identity_rule": "channel_id_is_authoritative",
   "connection_rule": "reuse_verified_existing_connection",
   "reauthorization_rule": "do_not_ask_again_unless_the_stored_connection_is_proven_revoked_or_missing",
-  "publication_rule": "no_automatic_upload_or_publication",
+  "production_cadence": "2_to_3_private_productions_per_channel_per_week_random_days",
+  "publication_rule": "automatic_private_upload_only_publication_requires_chairman_approval",
   "groups": {
     "playlist": [
       {"order": 1, "label": "CAFE_ROMANTIC", "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ", "connection_source": "direct_youtube_analytics"},

@@ -15,18 +15,23 @@ def test_london_schedule_contract():
     assert policy["schedule_policy"]["forbid_exact_hour"] is True
     assert policy["cadence"]["wordpress_general"]["target"] == "1_per_day"
     news = policy["cadence"]["newsrooms"]
-    assert news["daily_max"] == 10
-    assert news["target"] == "3_to_10_per_day_per_newsroom"
+    assert news["daily_max"] == 1
+    assert news["target"] == "1_per_day_per_newsroom"
     assert news["never_invent_to_fill_minimum"] is True
+    assert policy["cadence"]["blogspot"]["target"] == "1_public_post_per_enabled_destination_per_day"
+    assert policy["cadence"]["tistory"]["target"] == "1_public_post_per_enabled_site_per_day"
+    for key in ("instagram", "threads", "tiktok", "facebook", "naver"):
+        assert policy["cadence"][key]["weekly_target"] == 7
 
 
-def test_london_video_cadence_is_two_to_three_days_and_private_first():
+def test_locked_youtube_cadence_is_two_to_three_times_weekly_and_private_first():
     policy = load("london_content_schedule.json")
-    for key in ("youtube_playlist", "youtube_knowledge", "survival_10_language"):
+    for key in ("youtube_playlist", "youtube_knowledge"):
         cfg = policy["cadence"][key]
-        assert (cfg["interval_days_min"], cfg["interval_days_max"]) == (2, 3)
+        assert (cfg["weekly_min"], cfg["weekly_max"]) == (2, 3)
         assert cfg["upload_default"] == "private"
     survival = policy["cadence"]["survival_10_language"]
+    assert survival["enabled"] is False
     assert len(survival["languages"]) == 10
     assert survival["lessons_per_language"] == 50
     assert survival["total_lessons"] == 500

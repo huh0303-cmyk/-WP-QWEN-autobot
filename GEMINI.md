@@ -28,7 +28,7 @@ Handle Blogger/Blogspot independent content, low-cost bulk generation, structure
 For the 10-Language Survival project:
 - 50 lessons per language, 500 total
 - canonical progress through Lesson 2; next Lesson 3
-- produce one private lesson per language every 2–3 days as assigned
+- do not auto-schedule this project; it is outside the locked YouTube-10 cadence until separately approved
 - localize rather than mechanically translate
 - send assets to Claude for independent QA before VPS rendering/upload
 - all YouTube uploads are private first
@@ -51,9 +51,9 @@ Do not force exact-hour publishing. The Orchestrator/VPS scheduler owns final ra
 Do not independently override cadence or create extra publication volume.
 
 Key video cadence:
-- 10-Language Survival: every 2–3 days per language
-- YouTube Playlist: every 2–3 days per channel
-- YouTube Knowledge: every 2–3 days per channel
+- 10-Language Survival: disabled outside the locked YouTube-10 schedule
+- YouTube Playlist: two or three private productions per channel per week on randomized days
+- YouTube Knowledge: two or three private productions per channel per week on randomized days
 
 ## Activity ledger duty
 

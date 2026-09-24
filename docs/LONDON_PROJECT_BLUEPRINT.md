@@ -112,11 +112,13 @@ Control Korea365는 Publisher가 아니다.
 사이트/채널별 schedule은 독립적이다.
 
 현재 기본 방향:
-- WordPress: 사이트별 필요한 발행 슬롯.
-- News: RSS 기반 저빈도 확인.
-- Blogger: 사이트별 필요한 draft/content 슬롯.
-- YouTube Playlist 5: 채널별 약 주 2회 또는 승인된 cadence.
-- YouTube Knowledge 5: 채널별 약 주 2회 또는 승인된 cadence.
+- WordPress: 활성 사이트별 하루 1건, 랜덤 KST 슬롯.
+- News: 각 신문 하루 1건. RSS·1차 출처가 검증되지 않으면 숫자를 채우기 위해 만들지 않는다.
+- Blogger: 활성 사이트별 하루 1건 공개, 랜덤 KST 슬롯.
+- Tistory·Naver·TikTok·Instagram·Threads·Facebook: 게시 권한이 검증된 계정별 하루 1건.
+- YouTube Playlist 5: 채널별 주 2~3회, 매주 랜덤 요일, 비공개 업로드.
+- YouTube Knowledge 5: 채널별 주 2~3회, 매주 랜덤 요일, 비공개 업로드.
+- 위 확정 10개 외 YouTube 채널은 별도 승인 전 자동 제작 스케줄에 포함하지 않는다.
 
 ## 8. PM and provider roles
 
