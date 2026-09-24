@@ -9,6 +9,7 @@ Before any work, read:
 4. `config/london_content_schedule.json`
 5. `config/london_activity_policy.json`
 6. `docs/LONDON_PROJECT_ACTIVITY_LEDGER.md`
+7. `docs/GITHUB_OPERATION_RECORD_POLICY_2026-09-25.md`
 
 ## Command hierarchy
 
@@ -95,3 +96,8 @@ For every substantial task, return:
 - Next action
 
 Never use the word “complete” without evidence.
+
+
+## GitHub durability duty
+
+Every material finding, decision, correction, ID mapping, code/config change, failure, verification result and unresolved next action must be written to GitHub during the same work session. Chat-only state is not authoritative. Before asking the Chairman to repeat prior information, read the latest GitHub canonical records first.
