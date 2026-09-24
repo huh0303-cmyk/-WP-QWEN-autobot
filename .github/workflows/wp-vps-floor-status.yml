@@ -53,3 +53,29 @@ jobs:
             systemctl is-active korea365-wp-publisher.service || true
             systemctl status korea365-wp-publisher.service --no-pager -l | tail -n 25 || true
             journalctl -u korea365-wp-publisher.service -n 25 --no-pager || true
+            /opt/korea365/.venv/bin/python - <<'PY'
+            import json, requests
+            from requests.auth import HTTPBasicAuth
+            from pathlib import Path
+            creds=json.loads(Path('/etc/korea365/wp-sites.json').read_text())
+            probes=[
+              ('k-health365.com','KHEALTH365COM'),
+              ('k-trip365.com','KTRIP365COM'),
+            ]
+            for host,secret in probes:
+                pw=creds.get(secret,'')
+                if not pw:
+                    print('WP_AUTH_PROBE',host,'credential_missing')
+                    continue
+                try:
+                    r=requests.get(
+                      'https://'+host+'/wp-json/wp/v2/posts',
+                      params={'status':'publish','per_page':1,'_fields':'id,link,date_gmt'},
+                      auth=HTTPBasicAuth('huh0303@gmail.com',pw),
+                      headers={'User-Agent':'Korea365-VPS/1.0'},
+                      timeout=20,
+                    )
+                    print('WP_AUTH_PROBE',host,'status',r.status_code,'content_type',r.headers.get('content-type','').split(';')[0])
+                except Exception as exc:
+                    print('WP_AUTH_PROBE',host,'exception',type(exc).__name__)
+            PY
