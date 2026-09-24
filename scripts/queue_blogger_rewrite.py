@@ -136,7 +136,26 @@ def main():
         # Explicit repair dispatch: use an existing public article from the
         # paired site instead of requiring fresh cross-media trend discovery.
         from automation_hub.blogger_topic_router import fetch_public_wp_posts
-        posts = fetch_public_wp_posts(profile["wordpress"]["url"])
+        try:
+            posts = fetch_public_wp_posts(profile["wordpress"]["url"])
+        except requests.RequestException as exc:
+            from automation_hub.cached_wp_sources import cached_posts
+            posts = cached_posts(profile["wordpress"]["url"], max_age_seconds=30 * 86400)
+            if not posts:
+                _append_failure(
+                    service, sheet_id, blogger_site_id,
+                    error_code="SOURCE_FETCH",
+                    message=f"Paired WordPress REST unavailable and no <=30-day public snapshot: {type(exc).__name__}",
+                    source_url=profile["wordpress"]["url"],
+                )
+                raise
+            route_code = "WP_CACHED_RECOVERY_SOURCE"
+            print(json.dumps({
+                "route_code": route_code,
+                "source_recovery": "bounded_public_snapshot",
+                "rule": "evergreen rewrite only; never claim current policy/news from snapshot age",
+                "posts": len(posts),
+            }, ensure_ascii=False))
         eligible_posts = [post for post in posts if not active_duplicate(
             queue_records, site_id=blogger_site_id, source_id=post["link"])]
         if blogger_site_id == KPOP_SITE_ID:
@@ -330,6 +349,13 @@ def main():
             )
         from automation_hub.medical_editorial import medical_instructions
         prompt += medical_instructions(profile)
+        if route_code == "WP_CACHED_RECOVERY_SOURCE":
+            prompt += (
+                "\nRecovery-source rule: the paired WordPress article came from a bounded older public snapshot. "
+                "Treat it only as an evergreen topic/source reference. Do not claim it is today's news, do not invent "
+                "current prices, deadlines, eligibility rules, rankings, availability, medical guidance changes, or policy changes. "
+                "Where current facts matter, tell the reader to verify the current official source."
+            )
         if previous_candidate is not None:
             prompt += (
                 "\nRepair the previous JSON draft below rather than starting over. Preserve its verified facts and links. "
