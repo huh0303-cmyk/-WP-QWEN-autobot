@@ -118,6 +118,11 @@ def run_one(path: Path, job: dict) -> bool:
         auth = HTTPBasicAuth("huh0303@gmail.com", password)
         api = site_url + "/wp-json/wp/v2/posts"
         try:
+            # Final safety gate for the VPS publication path. Public article HTML
+            # must never expose internal stock-provider/license provenance.
+            from stock_image_provider import contains_public_photo_credit
+            if contains_public_photo_credit(job["content_html"]):
+                raise RuntimeError("PUBLIC_PHOTO_CREDIT_LEAK: blocked before WordPress REST write")
             existing = requests.get(api, params={"search": job["title"], "per_page": 10, "_fields": "id,title,link,status"}, auth=auth, timeout=25)
             existing.raise_for_status()
             for row in existing.json():
