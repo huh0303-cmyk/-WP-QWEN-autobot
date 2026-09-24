@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "locked_at": "2026-09-24",
+  "identity_rule": "channel_id_is_authoritative",
+  "connection_rule": "reuse_verified_existing_connection",
+  "reauthorization_rule": "do_not_ask_again_unless_the_stored_connection_is_proven_revoked_or_missing",
+  "publication_rule": "no_automatic_upload_or_publication",
+  "groups": {
+    "playlist": [
+      {"order": 1, "label": "CAFE_ROMANTIC", "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ", "connection_source": "direct_youtube_analytics"},
+      {"order": 2, "label": "CAFE_HEALING", "channel_id": "UC7yEsLM-HoXudngrD-4FIqg", "connection_source": "direct_youtube_analytics"},
+      {"order": 3, "label": "CAFE_STARBUCKSVIBES", "channel_id": "UC_e-sbLkVgwJNYEeobolNog", "connection_source": "windsor_youtube_readonly", "legacy_brand_alias": "Chinese Survival"},
+      {"order": 4, "label": "CAFE_MOZART", "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw", "connection_source": "windsor_youtube_readonly", "legacy_brand_alias": "Mozart-Bach-Beethoven"},
+      {"order": 5, "label": "CAFE_KPOP", "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw", "connection_source": "windsor_youtube_readonly", "legacy_brand_alias": "K-pop Studio"}
+    ],
+    "knowledge": [
+      {"order": 6, "label": "NASA_XFILES", "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg", "connection_source": "windsor_youtube_readonly"},
+      {"order": 7, "label": "HISTORY_TV_TODAY", "channel_id": "UCVBvZwodUF4s57KeNicxQ3w", "connection_source": "windsor_youtube_readonly"},
+      {"order": 8, "label": "INVENTION_STORY1", "channel_id": "UCgNj-yS93A_fOHXXvG49fww", "connection_source": "windsor_youtube_readonly"},
+      {"order": 9, "label": "SILENT_ERA_FILM", "channel_id": "UCLvy6kSpC8-7o3hnSrfQ47g", "connection_source": "windsor_youtube_readonly", "legacy_brand_alias": "SILENT_ERA_TIMES"},
+      {"order": 10, "label": "RETRO_USA1", "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ", "connection_source": "windsor_youtube_readonly", "legacy_brand_alias": "RETRO_REELS_TIMES"}
+    ]
+  }
+}
