@@ -3138,6 +3138,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     related_html = "" if is_newsroom else build_related_links_html(url, pw, site.get("lang","ko"), exclude_title=title)
     final += related_html
 
+    # Hard reader-visible provenance gate. Stock provider/license details belong
+    # in internal receipts only; if any legacy/model path leaks them, block the
+    # publication rather than showing operational text on the article/archive.
+    from stock_image_provider import contains_public_photo_credit
+    if contains_public_photo_credit(final):
+        return {"ok": False, "error": "PUBLIC_PHOTO_CREDIT_LEAK: blocked before WordPress write"}
+
     if is_newsroom and cat_id:
         from automation_hub.newsroom_category_badge import add_category_badge
         actual_name = next((name for cid, name in load_site_categories(url, pw) if cid == cat_id), cat_name)
