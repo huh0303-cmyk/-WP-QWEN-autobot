@@ -112,6 +112,12 @@ Current blocker at this checkpoint: the authorized PC device `ChrisHUH` is repor
 
 When the device connection is available, verify in this order and record each account separately: Instagram -> TikTok -> Threads -> Facebook. For each account, capture: exact handle/page ID, current login state, publish/write permission state, and one reversible test receipt before enabling daily public posting.
 
+## Live social browser-session result — 2026-09-25
+
+Remote device `ChrisHUH` is online again. Chrome `Profile 5` contains active session evidence for **Instagram, TikTok, Threads/Instagram, and Facebook**; the four sites were opened explicitly in that profile. No cookie values or passwords were read or stored.
+
+This checkpoint means **do not ask the owner to log in again** unless the browser itself shows an expired-session/MFA/CAPTCHA challenge. It does **not** mean platform write/API authorization is complete. Keep `publish_connected=false` until the exact account/page identity and write scope are verified and one account-specific publication test produces a receipt.
+
 ## Remaining work, in order
 
 1. Verify or create only the 11 missing SNS identities, checking for duplicates first.
