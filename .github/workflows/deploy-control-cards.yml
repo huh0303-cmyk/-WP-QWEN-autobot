@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Inspect YouTube channel-check implementation (read-only)
+      - name: Repair YouTube channel lookup cards without publishing
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -17,9 +17,26 @@ jobs:
           script: |
             set -euo pipefail
             ROOT=/opt/korea365
-            printf '%s\n' '--- channel_check.py ---'
-            sed -n '1,320p' "$ROOT/control_center/channel_check.py"
-            printf '%s\n' '--- operations-channel-audit.json ---'
-            sed -n '1,500p' "$ROOT/data/operations-channel-audit.json"
-            printf '%s\n' '--- app registration ---'
-            grep -RIn --exclude='*.pyc' -E 'channel_check|register_channel' "$ROOT/control_center" | head -80 || true
+            TARGET=${{ github.sha }}
+            STAMP=$(date -u +%Y%m%dT%H%M%SZ)
+            BACKUP="$ROOT/data/channel-check-backups/$STAMP-$TARGET"
+            TMP=$(mktemp -d)
+            trap 'rm -rf "$TMP"' EXIT
+            mkdir -p "$BACKUP/control_center" "$BACKUP/data"
+            cp -a "$ROOT/control_center/channel_check.py" "$BACKUP/control_center/channel_check.py"
+            cp -a "$ROOT/data/operations-channel-audit.json" "$BACKUP/data/operations-channel-audit.json"
+            git -C "$ROOT" fetch origin "$TARGET"
+            git -C "$ROOT" show "$TARGET:tools/repair_youtube_channel_cards.py" > "$TMP/repair.py"
+            KOREA365_ROOT="$ROOT" "$ROOT/.venv/bin/python" "$TMP/repair.py"
+            "$ROOT/.venv/bin/python" -m py_compile "$ROOT/control_center/channel_check.py"
+            systemctl restart korea365-control.service
+            systemctl is-active --quiet korea365-control.service
+            PAGE=$(curl -fsS https://control.korea365.org/channel-check/youtube)
+            printf '%s' "$PAGE" | grep -q 'CAFE_STARBUCKSVIBES'
+            printf '%s' "$PAGE" | grep -q 'RETRO_USA1'
+            printf '%s' "$PAGE" | grep -q '10개 채널 공개 조회: 10개 존재·실제명 확인'
+            if printf '%s' "$PAGE" | grep -q '채널 조회 실패 HTTP 403'; then
+              echo 'stale HTTP 403 card remains' >&2
+              exit 1
+            fi
+            printf '{"deployed_commit":"%s","backup":"%s","deployed_at":"%s","publication_changed":false}\n' "$TARGET" "$BACKUP" "$STAMP" > "$ROOT/data/channel-check-repair.json"
