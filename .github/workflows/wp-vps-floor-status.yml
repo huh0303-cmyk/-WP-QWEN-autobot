@@ -50,6 +50,12 @@ jobs:
             safe['queue_counts']=qcounts
             print('WP_DAILY_FLOOR_SAFE', json.dumps(safe, ensure_ascii=False, sort_keys=True))
             PY
+            for host in k-health365.com k-trip365.com; do
+              echo "WP_DNS_PROBE $host"
+              getent ahostsv4 "$host" | head -n 3 || true
+              code=$(curl -4 -L -sS --connect-timeout 8 --max-time 15 -o /dev/null -w '%{http_code}' "https://$host/" || true)
+              echo "WP_CURL_PROBE $host status $code"
+            done
             systemctl is-active korea365-wp-publisher.service || true
             systemctl status korea365-wp-publisher.service --no-pager -l | tail -n 25 || true
             journalctl -u korea365-wp-publisher.service -n 25 --no-pager || true
@@ -79,5 +85,6 @@ jobs:
                     )
                     print('WP_AUTH_PROBE',host,'status',r.status_code,'content_type',r.headers.get('content-type','').split(';')[0])
                 except Exception as exc:
-                    print('WP_AUTH_PROBE',host,'exception',type(exc).__name__)
+                    safe=str(exc).replace(pw,'[redacted]')[:240]
+                    print('WP_AUTH_PROBE',host,'exception',type(exc).__name__,safe)
             PY
