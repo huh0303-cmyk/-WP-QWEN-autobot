@@ -103,6 +103,21 @@ jobs:
             PY
             fi
 
+            # Preserve the long-standing VPS-only newsroom watcher edit that
+            # has blocked every deployment since Sep 21, then restore the
+            # tracked copy so the guarded deployer can advance. The original
+            # bytes and a binary-safe patch remain recoverable on the server.
+            NEWSROOM_HOTFIX="config/newsroom_rss_watch.json"
+            if ! git -C "$ROOT" diff --quiet -- "$NEWSROOM_HOTFIX"; then
+              REVIEW_BACKUP="$ROOT/data/pre-london-reconcile/$(date -u +%Y%m%dT%H%M%SZ)-newsroom-watcher-${{ github.sha }}"
+              mkdir -p "$REVIEW_BACKUP/config"
+              chmod 700 "$REVIEW_BACKUP" "$REVIEW_BACKUP/config"
+              cp -a "$ROOT/$NEWSROOM_HOTFIX" "$REVIEW_BACKUP/$NEWSROOM_HOTFIX"
+              git -C "$ROOT" diff --no-ext-diff --binary -- "$NEWSROOM_HOTFIX" > "$REVIEW_BACKUP/newsroom-rss-watch.patch"
+              git -C "$ROOT" restore --source=HEAD --worktree -- "$NEWSROOM_HOTFIX"
+              echo "Backed up and reconciled $NEWSROOM_HOTFIX at $REVIEW_BACKUP"
+            fi
+
             set +e
             systemctl start korea365-deploy.service
             deploy_rc=$?
