@@ -39,10 +39,10 @@ jobs:
               sleep 2
             done
             test -n "$PAGE"
-            printf '%s' "$PAGE" | grep -q 'CAFE_STARBUCKSVIBES'
-            printf '%s' "$PAGE" | grep -q 'RETRO_USA1'
-            printf '%s' "$PAGE" | grep -q '10개 채널 공개 조회: 10개 존재·실제명 확인'
-            if printf '%s' "$PAGE" | grep -q '채널 조회 실패 HTTP 403'; then
+            grep -q 'CAFE_STARBUCKSVIBES' <<<"$PAGE"
+            grep -q 'RETRO_USA1' <<<"$PAGE"
+            grep -q '10개 채널 공개 조회: 10개 존재·실제명 확인' <<<"$PAGE"
+            if grep -q '채널 조회 실패 HTTP 403' <<<"$PAGE"; then
               echo 'stale HTTP 403 card remains' >&2
               exit 1
             fi
