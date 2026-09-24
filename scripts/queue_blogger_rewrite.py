@@ -132,6 +132,7 @@ def main():
     source_match_score = None
     route_code = "WP_RELATED_SOURCE"
     evidence_sources: list[dict[str, str]] = []
+    recovery_source_post = None
     if not source_url and os.getenv("BLOGGER_RECOVER_FROM_WP", "false").lower() == "true":
         # Explicit repair dispatch: use an existing public article from the
         # paired site instead of requiring fresh cross-media trend discovery.
@@ -163,39 +164,43 @@ def main():
         if not eligible_posts:
             print(json.dumps({"queued": False, "result_code": "NO_NEW_SOURCE", "duplicate_blocked": True}))
             return 0
-        source_url = eligible_posts[0]["link"]
+        recovery_source_post = eligible_posts[0]
+        source_url = recovery_source_post["link"]
     if source_url:
-        try:
-            parsed = urlparse(source_url)
-            site_root = f"{parsed.scheme}://{parsed.netloc}"
-            exact_ids = parse_qs(parsed.query).get("p", [])
-            slug = parsed.path.strip("/").rsplit("/", 1)[-1] if parsed.path.strip("/") else ""
-            if exact_ids:
-                if not exact_ids[0].isdigit():
-                    raise ValueError("Invalid exact WordPress source ID")
-                posts = requests.get(f"{site_root}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
-            elif slug:
-                posts = requests.get(
-                    f"{site_root}/wp-json/wp/v2/posts",
-                    params={"slug": slug, "status": "publish"},
-                    timeout=30,
-                )
-            else:
-                posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
-            posts.raise_for_status()
-            source_posts = [posts.json()] if exact_ids else posts.json()
-            if slug and not source_posts:
-                raise RuntimeError(f"No published post found at slug '{slug}' on {site_root}")
-            if (exact_ids or slug) and source_posts[0].get("status") != "publish":
-                raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
-        except requests.RequestException as exc:
-            from automation_hub.cached_wp_sources import cached_exact
-            cached = cached_exact(source_url)
-            if cached is None:
-                _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {type(exc).__name__}", source_url=source_url)
-                raise
-            source_posts = [cached]
-            print("Exact source loaded from public snapshot fetched within 24 hours")
+        if route_code == "WP_CACHED_RECOVERY_SOURCE" and recovery_source_post is not None:
+            source_posts = [recovery_source_post]
+        else:
+            try:
+                    parsed = urlparse(source_url)
+                site_root = f"{parsed.scheme}://{parsed.netloc}"
+                exact_ids = parse_qs(parsed.query).get("p", [])
+                slug = parsed.path.strip("/").rsplit("/", 1)[-1] if parsed.path.strip("/") else ""
+                if exact_ids:
+                    if not exact_ids[0].isdigit():
+                        raise ValueError("Invalid exact WordPress source ID")
+                    posts = requests.get(f"{site_root}/wp-json/wp/v2/posts/{exact_ids[0]}", timeout=30)
+                elif slug:
+                    posts = requests.get(
+                        f"{site_root}/wp-json/wp/v2/posts",
+                        params={"slug": slug, "status": "publish"},
+                        timeout=30,
+                    )
+                else:
+                    posts = requests.get(f"{site_root}/wp-json/wp/v2/posts", params={"status": "publish", "per_page": 10, "orderby": "date", "order": "desc"}, timeout=30)
+                posts.raise_for_status()
+                source_posts = [posts.json()] if exact_ids else posts.json()
+                if slug and not source_posts:
+                    raise RuntimeError(f"No published post found at slug '{slug}' on {site_root}")
+                if (exact_ids or slug) and source_posts[0].get("status") != "publish":
+                    raise RuntimeError("Calendar WordPress source is not public; awaiting human approval")
+            except requests.RequestException as exc:
+                from automation_hub.cached_wp_sources import cached_exact
+                cached = cached_exact(source_url)
+                if cached is None:
+                    _append_failure(service, sheet_id, blogger_site_id, error_code="SOURCE_FETCH", message=f"WordPress source fetch failed: {type(exc).__name__}", source_url=source_url)
+                    raise
+                source_posts = [cached]
+                print("Exact source loaded from public snapshot fetched within 24 hours")
     elif force_keyword:
         # 키워드보고발행: CEO already picked this exact topic (a chip from
         # the paired WP site's own category pool) — skip the live
