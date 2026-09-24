@@ -104,6 +104,14 @@ Therefore the desired policy is recorded, but public SNS automation must remain 
 - Each Tistory card targets one public post per day through the local registrar. The owner reported Tistory is already logged in on 2026-09-25; do not request login again unless an actual session check fails or CAPTCHA appears.
 - Naver N1, N2, and N3 are separate cards and must remain separate login/profile bindings. The owner reported Naver is already logged in on 2026-09-25. Do not ask for login again; the remaining task is to bind the existing logged-in sessions to the exact N1/N2/N3 blog IDs and verify one public test per account.
 
+## Social login verification checkpoint — 2026-09-25
+
+Owner explicitly requested live login verification for **Instagram, TikTok, Threads, and Facebook**. Do not omit Facebook. Use the owner's existing browser sessions first; do not ask for credentials in chat and do not force a re-login if the session is already valid.
+
+Current blocker at this checkpoint: the authorized PC device `ChrisHUH` is reported offline by the remote desktop connector, so the browser sessions cannot be inspected or opened remotely from this chat. This is a device-connection blocker, not evidence that the social accounts are logged out.
+
+When the device connection is available, verify in this order and record each account separately: Instagram -> TikTok -> Threads -> Facebook. For each account, capture: exact handle/page ID, current login state, publish/write permission state, and one reversible test receipt before enabling daily public posting.
+
 ## Remaining work, in order
 
 1. Verify or create only the 11 missing SNS identities, checking for duplicates first.
