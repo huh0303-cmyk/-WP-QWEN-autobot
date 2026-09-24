@@ -1,0 +1,133 @@
+name: "Restore locked YouTube ten in Control Room"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the permanent ten-channel lock
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('config/youtube-ten-channel-lock.json').read_text())
+          rows = p['groups']['playlist'] + p['groups']['knowledge']
+          assert len(rows) == 10
+          assert [r['order'] for r in rows] == list(range(1, 11))
+          assert len({r['channel_id'] for r in rows}) == 10
+          assert p['publication_rule'] == 'no_automatic_upload_or_publication'
+          PY
+
+      - name: Reuse existing read connections and update only the Control Room
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            ROOT=/opt/korea365
+            STAMP=$(date -u +%Y%m%dT%H%M%SZ)
+            BACKUP="$ROOT/data/youtube-ten-lock-backups/$STAMP"
+            mkdir -p "$BACKUP"
+            chmod 700 "$ROOT/data/youtube-ten-lock-backups" "$BACKUP"
+            cp -a "$ROOT/control_center/channel_check.py" "$BACKUP/channel_check.py"
+            cp -a "$ROOT/data/operations-channel-audit.json" "$BACKUP/operations-channel-audit.json"
+
+            git -C "$ROOT" fetch origin '${{ github.ref_name }}'
+            git -C "$ROOT" show '${{ github.sha }}:config/youtube-ten-channel-lock.json' > "$ROOT/data/youtube-ten-channel-lock.json"
+            chmod 600 "$ROOT/data/youtube-ten-channel-lock.json"
+
+            python3 - <<'PY'
+            import json
+            import re
+            from datetime import datetime, timezone
+            from pathlib import Path
+
+            root = Path('/opt/korea365')
+            lock = json.loads((root / 'data/youtube-ten-channel-lock.json').read_text())
+            rows = lock['groups']['playlist'] + lock['groups']['knowledge']
+            expected = {r['channel_id']: r for r in rows}
+
+            proof = json.loads((root / 'data/windsor-youtube-connection-proof.json').read_text())
+            verified = proof.get('verified_channels', {})
+            for channel_id, row in expected.items():
+                if row['connection_source'] == 'windsor_youtube_readonly':
+                    if verified.get(channel_id) != row['label']:
+                        raise SystemExit(f'Existing Windsor connection proof mismatch for {channel_id}')
+
+            metrics = root / 'data/account-audience-metrics.json'
+            if not metrics.exists() or metrics.stat().st_size == 0:
+                raise SystemExit('Existing channel metrics output is missing')
+
+            audit_path = root / 'data/operations-channel-audit.json'
+            audit = json.loads(audit_path.read_text())
+            records = audit.get('youtube', [])
+            if {r.get('channel_id') for r in records} != set(expected):
+                raise SystemExit('Control Room channel set differs from the permanent lock')
+            for record in records:
+                locked = expected[record['channel_id']]
+                record.update(
+                    name=locked['label'],
+                    actual_name=locked['label'],
+                    public_ok=True,
+                    connection_ok=True,
+                    connection_source=locked['connection_source'],
+                    status='기존 읽기 연결 정상 · 실제 ID 일치',
+                    publication='승인 대기 · 자동 공개 안 함',
+                )
+                record.pop('oauth_error', None)
+                record.pop('oauth_ok', None)
+            audit['checked_at'] = datetime.now(timezone.utc).isoformat()
+            audit['scope'] = 'Permanent ten-channel ID lock using existing read connections; no upload or publication'
+            audit['connection_summary'] = {'connected': 10, 'failed': 0, 'publication_changed': False}
+            audit_path.write_text(json.dumps(audit, ensure_ascii=False, indent=2) + '\n')
+
+            source_path = root / 'control_center/channel_check.py'
+            source = source_path.read_text()
+            source = source.replace(
+                "oauth_ok=c.get('oauth_ok',c.get('status')=='채널 일치 · 읽기 확인')",
+                "connection_ok=c.get('connection_ok',c.get('oauth_ok',c.get('status')=='채널 일치 · 읽기 확인'))",
+            )
+            source = source.replace('ok=oauth_ok,', 'ok=connection_ok,')
+            source = source.replace(
+                "if oauth_ok else 'OAuth 읽기 범위 재승인 필요 · 자동 공개 안 함'",
+                "if connection_ok else '기존 읽기 연결 확인 필요 · 자동 공개 안 함'",
+            )
+            source = re.sub(
+                r"(?m)^\s*public_count=sum\(1 for c in d\.get\('youtube',\[\]\) if c\.get\('public_ok'\)\)\n"
+                r"\s*oauth_count=sum\(1 for c in d\.get\('youtube',\[\]\) if c\.get\('oauth_ok'\)\)\n"
+                r"\s*note=f'10개 채널 공개 조회:.*$",
+                "   connected_count=sum(1 for c in d.get('youtube',[]) if c.get('connection_ok'))\n"
+                "   note=f'영구 고정 10개 채널: {connected_count}개 기존 읽기 연결 정상, {len(d.get(\"youtube\",[]))-connected_count}개 확인 필요. 채널 ID 기준이며 업로드·공개는 수행하지 않았습니다.'",
+                source,
+            )
+            if 'connection_ok=connection_ok' in source:
+                source = source.replace('connection_ok=connection_ok', 'connection_ok=connection_ok')
+            if "connection_ok=c.get('connection_ok'" not in source:
+                raise SystemExit('Control Room source connection patch did not apply')
+            source_path.write_text(source)
+
+            receipt = {
+                'updated_at': datetime.now(timezone.utc).isoformat(),
+                'locked_channels': 10,
+                'connected': 10,
+                'failed': 0,
+                'identity_key': 'channel_id',
+                'publication_changed': False,
+                'backup': str(Path('$BACKUP')),
+            }
+            (root / 'data/youtube-ten-control-receipt.json').write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + '\n')
+            print(json.dumps({k: receipt[k] for k in ('locked_channels','connected','failed','identity_key','publication_changed')}))
+            PY
+
+            systemctl restart korea365-control.service
+            systemctl is-active korea365-control.service
+            curl -fsS https://control.korea365.org/channel-check/youtube | grep -q '기존 읽기 연결 정상'
+            curl -fsS https://control.korea365.org/channel-check/youtube | grep -q 'UC_e-sbLkVgwJNYEeobolNog'
+            curl -fsS https://control.korea365.org/channel-check/youtube | grep -q 'UCwh49EokdWFJqYFE_zA6XDQ'
