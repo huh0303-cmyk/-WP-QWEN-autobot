@@ -25,8 +25,11 @@ def test_free_match_prevents_paid_call(monkeypatch, tmp_path):
     with patch.object(stock, "_search", return_value=[candidate()]), patch("stable_image_hosting.host_permanently", return_value="https://raw.githubusercontent.com/r/p/main/photo.jpg"), patch.object(gateway, "_create_prediction") as paid:
         url=gateway.generate_image_url("Seoul skyline")
         assert url.startswith("https://raw.githubusercontent.com/")
-        assert "Pexels" in stock.credit_html(url)
-        assert "License" in stock.credit_html(url)
+        # Public articles must never expose provider/license operations.
+        assert stock.credit_html(url) == ""
+        # Provenance is still retained internally for audit/rights review.
+        assert stock.METADATA[url]["provider"] == "Pexels"
+        assert stock.METADATA[url]["license"].startswith("https://www.pexels.com/")
         paid.assert_not_called()
 
 
@@ -63,3 +66,12 @@ def test_unavailable_stock_keeps_sdxl_flux_order(monkeypatch):
     with patch.object(stock,"find_stock_image",return_value=None), patch.object(gateway,"_token",return_value="test"), patch.object(gateway,"_create_prediction",return_value={"status":"failed"}) as paid:
         assert gateway.generate_image_url("unmatched subject") is None
         assert [c.args[0] for c in paid.call_args_list] == list(gateway.ALLOWED_MODELS)
+
+
+def test_public_photo_credit_leak_detector():
+    assert stock.contains_public_photo_credit(
+        "Illustrative stock photo: Test / Pexels. Photo license. "
+        "Not a photograph of a specific event, client or reviewed product."
+    )
+    assert stock.contains_public_photo_credit('<p class="photo-credit">Photo: Test / Pexels (License)</p>')
+    assert not stock.contains_public_photo_credit("<p>Understanding Korea's industrial landscape.</p>")
