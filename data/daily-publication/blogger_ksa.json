@@ -1,1 +1,1 @@
-{"day": "2026-09-13", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-13-blogger_ksa-45191a80", "claimed_at": "2026-09-13T19:02:24.798996+09:00", "run_id": null, "child_run_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-25", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-25-blogger_ksa-ee54c9d3", "claimed_at": "2026-09-25T19:09:43.750841+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
