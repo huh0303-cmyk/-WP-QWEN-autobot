@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 13.44,
+  "spent_estimate_usd": 13.47,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -3767,6 +3767,15 @@
       "amount_usd": 0.03,
       "reservation_id": "4a406562a2cb6c1b5394d456c1975d0667d1dcb036ce00384da848fffab73381",
       "run_id": "36083778710",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-25T13:51:22.181022+09:00",
+      "label": "blogger-rewrite:blogger_koreataxlaw",
+      "amount_usd": 0.03,
+      "reservation_id": "94a8b4e54389a82f5d97a1b594a2ebaefe7269d641c80cc3cccb02ede09c82c4",
+      "run_id": "36096102667",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
