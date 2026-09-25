@@ -1,0 +1,71 @@
+# London Project — n8n-first migration plan (2026-09-26)
+
+## North Star
+- k-health365.com is the confirmed AdSense-approved reference property.
+- Primary web objective: improve AdSense approval readiness for the remaining WordPress 24 + Blogspot 33 properties.
+- Publishing volume is a means, not the KPI. Quality, indexability, policy readiness, reliability and measurable traffic are the KPI.
+
+## Cost policy
+- Use the existing Hostinger VPS.
+- n8n Community Edition is self-hosted on the existing VPS; do not purchase n8n Cloud or Make.
+- No new paid SaaS/subscription without explicit user approval.
+- Existing AI/API charges remain separate and must obey existing budget/kill-switch rules.
+
+## Roles
+- GitHub: source of truth, version history, configuration and rollback.
+- Hostinger VPS: 24/7 runtime.
+- n8n: orchestration, scheduling, retries, isolation, observability.
+- Existing Python/systemd workers: keep working components; n8n calls them rather than rewriting everything.
+- Control Korea365: executive status/approval dashboard.
+
+## Reliability rule
+A failure in one site/channel must not stop other sites/channels.
+- per-site queue
+- bounded retry with backoff
+- dead-letter/hold state after repeated failure
+- idempotency key / duplicate prevention
+- execution receipt and error reason
+- image failure may continue without image when the site policy allows it
+- never report success without publication/upload receipt
+
+## Phase 0 — no destructive changes
+1. Snapshot current VPS/repository state.
+2. Inventory active GitHub Actions, systemd services/timers and workers.
+3. Do not delete/disable existing production paths until replacement passes end-to-end tests.
+
+## Phase 1 — n8n foundation
+- Deploy n8n Community in an isolated Docker stack on the existing VPS.
+- Persistent volume + database backup.
+- Bind locally first; expose only through authenticated HTTPS reverse proxy.
+- Health check and restart policy.
+- Resource limits so YouTube rendering cannot starve orchestration.
+
+## Phase 2 — web publishing pilot
+Run representative end-to-end tests:
+1. WordPress: k-health365.com as reference/validation property; use draft/private test unless explicitly approved otherwise.
+2. Blogger: one connected Blogspot property, draft test.
+Validate: topic -> generation -> quality checks -> optional image -> duplicate check -> draft -> receipt -> control-center log.
+
+Scale only after pilot passes.
+
+## Phase 3 — AdSense web fleet
+- WordPress fleet: 24 remaining properties.
+- Blogspot fleet: 33 properties.
+- Site-level state: APPROVED / READY / FIX / HOLD.
+- Site-level readiness checks: focused topic, required pages, navigation, empty/duplicate taxonomy, content quality, indexability, broken URLs, internal links, mobile access and policy-risk flags.
+- WP and Blogger must use independently written content; no verbatim cross-posting.
+
+## Phase 4 — YouTube
+- Keep the VPS video worker as the render/upload owner.
+- n8n orchestrates queueing/status/retry only.
+- Video/thumbnail generation remains behind the existing cost safety gates; no unapproved paid generation.
+- Private upload test before any public automation.
+
+## Migration gate
+Only after n8n pilot evidence exists:
+- disable duplicate schedulers one at a time,
+- retain rollback,
+- record changed files/services, test receipt, API/cost impact and commit SHA.
+
+## Make.com decision
+Do not use Make.com in the production London Project. Its free tier is useful for small experiments, but a multi-site, multi-step 24/7 fleet is better kept on the already-paid VPS with self-hosted n8n to avoid credit limits and an additional SaaS dependency.
