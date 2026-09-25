@@ -1,1 +1,1 @@
-{"day": "2026-09-25", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-25-blogger_seoul_intl_school_guide-f0516acc", "claimed_at": "2026-09-25T08:35:42.143616+09:00", "run_id": 36073517699, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-25", "status": "PUBLISHED", "public_url": "https://seoulintlschoolguide.blogspot.com/2026/09/unlock-your-childs-future-seamless.html", "published_at": "2026-09-24T16:38:56.151-07:00"}
