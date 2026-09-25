@@ -26,8 +26,8 @@ concurrency:
 
 jobs:
   wordpress:
-    # WP25 daily floor is owned by the authenticated VPS WordPress worker.
-    if: ${{ inputs.platform == 'wordpress' && github.event_name == 'workflow_dispatch' }}
+    # Safety floor: verify today's real public post first, then fill only missing sites.
+    if: ${{ inputs.platform == '' || inputs.platform == 'wordpress' || github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -64,7 +64,7 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 2
+        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 4
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -85,7 +85,7 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GH_DISPATCH_TOKEN: ${{ github.token }}
-        run: python scripts/daily_publication_floor.py --platform blogger --max-dispatch 2
+        run: python scripts/daily_publication_floor.py --platform blogger --max-dispatch 4
       - uses: actions/upload-artifact@v4
         if: always()
         with:
