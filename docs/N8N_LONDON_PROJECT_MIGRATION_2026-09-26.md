@@ -69,3 +69,30 @@ Only after n8n pilot evidence exists:
 
 ## Make.com decision
 Do not use Make.com in the production London Project. Its free tier is useful for small experiments, but a multi-site, multi-step 24/7 fleet is better kept on the already-paid VPS with self-hosted n8n to avoid credit limits and an additional SaaS dependency.
+
+
+## Reference workflow adopted from YouTube QRJNEW08l5s
+Reviewed on 2026-09-26 from the video's Korean subtitles.
+
+Useful pattern to adopt:
+- Cron/scheduled trigger.
+- RSS/news-source ingestion.
+- Select a small number of recent relevant items.
+- LLM transforms source material into an original platform-specific article.
+- Publish to Blogger/WordPress.
+- Reuse the approved article/topic as the input for a short-form script.
+- Generate/render short-form video asynchronously.
+- Poll job status with bounded waits/retries.
+- Upload completed video to YouTube and record the receipt.
+
+London Project modifications:
+- Apply to WordPress 25 total (k-health365.com is the AdSense-approved reference + 24 approval targets) and Blogspot 33.
+- No verbatim WP/Blogger duplication.
+- AdSense readiness and useful original content outrank raw publishing volume.
+- Do NOT use the video's paid avatar/video API path.
+- Paid image generation is OFF. Prefer no image, existing rights-cleared assets, or free/local generation only.
+- Short-form rendering should use the existing VPS worker + FFmpeg/template/captions and rights-cleared/free assets; n8n orchestrates rather than renders.
+- YouTube upload defaults to private/test until the channel mapping and quality checks pass.
+- Per-site/per-channel isolation: one failed property cannot block the rest.
+- No unbounded polling loops; retries have caps and dead-letter/HOLD states.
+- No new paid API/SaaS without explicit user approval.
