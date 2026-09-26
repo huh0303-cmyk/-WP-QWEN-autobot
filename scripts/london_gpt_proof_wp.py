@@ -1,8 +1,13 @@
 from __future__ import annotations
-import json, os, sys
+import json, os, sys, socket
 from pathlib import Path
 import requests
 from requests.auth import HTTPBasicAuth
+
+_getaddrinfo = socket.getaddrinfo
+def _ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    return _getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _ipv4_only
 
 SITE="https://kstudy365.com"
 SECRET="KSTUDY365COM"
