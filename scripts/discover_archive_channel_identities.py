@@ -58,11 +58,13 @@ def check_one(ck):
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
+    from googleapiclient.errors import HttpError
 
-    last_err = None
+    attempts = []
     for scope in ("https://www.googleapis.com/auth/youtube.force-ssl",
                   "https://www.googleapis.com/auth/youtube.readonly",
                   "https://www.googleapis.com/auth/youtube.upload"):
+        scope_name = scope.rsplit("/", 1)[-1]
         creds = Credentials(
             token=None, refresh_token=refresh_token,
             token_uri="https://oauth2.googleapis.com/token",
@@ -71,30 +73,39 @@ def check_one(ck):
         )
         try:
             creds.refresh(Request())
+        except RefreshError as e:
+            attempts.append(f"{scope_name}: refresh 자체가 거부됨(invalid_scope 등) — {e}")
+            continue
+        # refresh 성공 — 이 스코프가 실제로 API 호출 권한이 있는지는 별개로 확인해야 함
+        try:
             youtube = build("youtube", "v3", credentials=creds)
             resp = youtube.channels().list(part="snippet,statistics", mine=True, maxResults=1).execute()
             items = resp.get("items", [])
             if not items:
                 return {"channel_key": ck, "configured": True, "auth_ok": True,
-                        "actual_channel_id": "", "actual_title": "(no channel returned)"}
+                        "scope_used": scope_name, "attempts": attempts,
+                        "actual_channel_id": "", "actual_title": "(refresh 성공, mine=true가 채널을 반환 안 함)"}
             item = items[0]
             return {
                 "channel_key": ck,
                 "configured": True,
                 "auth_ok": True,
-                "scope_used": scope.rsplit("/", 1)[-1],
+                "scope_used": scope_name,
+                "attempts": attempts,
                 "actual_channel_id": item.get("id", ""),
                 "actual_title": item.get("snippet", {}).get("title", ""),
                 "subscriber_count": item.get("statistics", {}).get("subscriberCount", ""),
                 "video_count": item.get("statistics", {}).get("videoCount", ""),
             }
-        except RefreshError as e:
-            last_err = e
+        except HttpError as e:
+            attempts.append(f"{scope_name}: refresh은 성공했지만 channels.list API 호출이 거부됨 — "
+                             f"HTTP {e.resp.status if hasattr(e, 'resp') else '?'} {e.reason if hasattr(e, 'reason') else e}")
             continue
         except Exception as e:
-            last_err = e
+            attempts.append(f"{scope_name}: 예상 못한 오류 — {e}")
             continue
-    return {"channel_key": ck, "configured": True, "auth_ok": False, "reason": str(last_err)}
+    return {"channel_key": ck, "configured": True, "auth_ok": False, "attempts": attempts,
+            "reason": "3개 스코프(force-ssl/readonly/upload) 모두로 channels.list 실패 — 상세는 attempts 참조"}
 
 
 def main():
@@ -104,6 +115,8 @@ def main():
             log(f"⬜ {r['channel_key']}: 미설정 ({r['reason']})")
         elif not r.get("auth_ok"):
             log(f"❌ {r['channel_key']}: 인증 실패 ({r.get('reason')})")
+            for a in r.get("attempts", []):
+                log(f"     - {a}")
         else:
             log(f"✅ {r['channel_key']} → 실제 채널: \"{r['actual_title']}\" ({r['actual_channel_id']}) "
                 f"구독자 {r.get('subscriber_count','?')} 영상 {r.get('video_count','?')}")
