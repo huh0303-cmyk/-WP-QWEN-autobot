@@ -479,7 +479,30 @@ def main():
     # 않으면 업로드를 거부한다(사람이 실제 채널 ID를 확인해서 등록하기 전까지는
     # 기본적으로 막힘 — fail closed).
     expected_channel_id = os.environ.get(f"EXPECTED_YOUTUBE_CHANNEL_ID_{CK}", "").strip()
-    actual = youtube.channels().list(part="snippet", mine=True, maxResults=1).execute()
+    # 2026-09-27 discover_archive_channel_identities.py 실측으로 확인됨: 이 archive
+    # 채널들의 refresh token은 force-ssl/readonly 스코프로는 아예 발급(consent)된 적이
+    # 없어서 refresh() 자체가 invalid_scope로 거부되고, 유일하게 refresh되는
+    # youtube.upload 스코프로는 channels.list 자체가 403 "insufficient authentication
+    # scopes"로 막힘 — 즉 지금 토큰들로는 업로드는 되지만 "내가 지금 어느 채널에
+    # 인증돼 있는지"를 API로 스스로 확인할 방법이 없다. 이걸 구분 못 하고 그냥
+    # .execute()가 죽게 두면 원인을 알 수 없는 스택트레이스만 남으므로, 여기서
+    # 명시적으로 잡아서 사람이 뭘 해야 하는지 알려준다. 어느 쪽이든 업로드는
+    # 진행되지 않는다(fail closed 유지).
+    from googleapiclient.errors import HttpError
+    try:
+        actual = youtube.channels().list(part="snippet", mine=True, maxResults=1).execute()
+    except HttpError as e:
+        status = e.resp.status if hasattr(e, "resp") else "?"
+        log(f"❌ [{CHANNEL_KEY}] 이 토큰은 channels.list 호출 권한이 없음(HTTP {status}) — "
+            f"업로드는 가능해도(youtube.upload 스코프) 채널 신원을 API로 스스로 확인할 "
+            f"권한은 없는 토큰으로 보임. 업로드 중단(fail closed). 해결하려면 이 채널의 "
+            f"구글 계정으로 OAuth를 youtube.force-ssl 또는 youtube.readonly 스코프를 "
+            f"포함해 다시 동의(재인증)하고 YOUTUBE_OAUTH_REFRESH_TOKEN_{CK}를 새 refresh "
+            f"token으로 교체하거나, 사람이 YouTube Studio에 직접 로그인해 실제 채널을 "
+            f"눈으로 확인한 뒤 그 채널 ID를 EXPECTED_YOUTUBE_CHANNEL_ID_{CK}로 등록할 것 — "
+            f"단 등록하더라도 이 스크립트는 여전히 API로 재검증하지 못하므로, 사람이 확인한 "
+            f"내용을 신뢰하고 검증 자체를 건너뛰도록 별도로 코드를 바꿔야 함(지금은 안 그럼).")
+        raise
     actual_items = actual.get("items", [])
     actual_id = actual_items[0]["id"] if actual_items else ""
     actual_title = actual_items[0]["snippet"]["title"] if actual_items else "(확인 불가)"

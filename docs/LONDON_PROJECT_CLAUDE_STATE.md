@@ -8,6 +8,56 @@
 평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
 최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
 
+## 2026-09-27 (10차) — archive 채널 9개 신원 확인 시도: API로는 불가능함을 실측 확인
+
+**Chairman 요청**: "제대로 다른것들 매칭해줘.." — 8차(French Survival 오업로드) 이후
+나머지 9개 archive 채널 키(`curio_upload.py`의 `CHANNEL_SECRET_MAP` 10개 중
+AMERICAN_ARCHIVE_TIMES 제외)의 실제 채널 신원 확인.
+
+**한 일**: `scripts/discover_archive_channel_identities.py`(읽기 전용, 업로드 없음)를
+작성해 `one-off-archive-channel-identity-discovery.yml`로 실행(run 36252803215,
+36252929284 — 둘 다 success). `channels().list(mine=true)`를 force-ssl → readonly →
+upload 순으로 시도.
+
+**실측 결과 (run 36252929284 로그 원문)**:
+- **미설정(시크릿 자체 없음, 3개)**: SCIENCE_FACTS_TIMES, MYTH_LEGEND_TIMES,
+  CLASSIC_READS_TIMES.
+- **설정은 돼 있지만 신원 확인 불가(7개)**: NASA_SPACE_TIMES, HISTORY_TODAY_TIMES,
+  CLASSICAL_JOURNAL, INVENTION_TIMES, AMERICAN_ARCHIVE_TIMES, SILENT_ERA_TIMES,
+  RETRO_REELS_TIMES. 전부 동일한 패턴: force-ssl/readonly 스코프는 refresh 자체가
+  `invalid_scope`로 거부(애초에 그 스코프로 동의된 적이 없음), 유일하게 refresh되는
+  `youtube.upload` 스코프는 refresh는 성공하지만 `channels.list` API 호출이 `HTTP 403
+  insufficient authentication scopes`로 거부됨.
+
+**결론(추측 아니고 API가 준 실제 오류로 확인)**: 이 7개 토큰은 **업로드는 되지만
+API로 스스로 "나는 어느 채널이다"를 밝힐 권한이 없는 토큰**임. 8차 사고에서
+French Survival을 알아낸 것도 API가 아니라 Chairman이 YouTube Studio 화면을 직접
+봐서 발견한 것이었음 — 이번에 API 우회 경로를 시도해봤지만 동일한 스코프 한계에
+막힘.
+
+**여기서 하지 않은 것**: 신원을 알아내겠다고 각 채널에 테스트 영상을 실제로
+업로드해서 어디 채널 스튜디오에 뜨는지 보는 방법은 **시도하지 않음** — 그게 바로
+8차 사고를 일으킨 것과 똑같은 패턴(추측성 업로드로 사후 확인)이라 다시 하지 않음.
+
+**부수 발견 및 수정**: 8차에서 추가한 fail-closed 검사(`archive_channel_upload.py`
+482행)가 바로 이 스코프 한계 때문에 `channels.list` 호출에서 처리 안 된 예외로
+죽어서, "인증된 실제 채널: ..." 안내 로그조차 못 찍고 원인 불명 스택트레이스만
+남기는 문제를 발견함. HttpError를 명시적으로 잡아 원인과 해결 방법을 로그로
+남기도록 수정(fail-closed 자체는 그대로 유지 — 업로드는 여전히 진행 안 됨).
+**중요**: `EXPECTED_YOUTUBE_CHANNEL_ID_<CK>`를 등록해도 이 스코프 문제 자체는 안
+풀림 — 이 스크립트는 앞으로도 이 7개 채널에 대해 API 재검증을 못 하므로 사실상
+계속 막혀 있음(안전하지만 재사용 불가 상태).
+
+**Chairman이 해야 실제로 풀리는 것 (둘 중 하나, 대행 불가 — 로그인 필요)**:
+1. 각 archive 채널의 구글 계정으로 다시 OAuth 동의(재인증)해서
+   `youtube.force-ssl` 또는 `youtube.readonly` 스코프를 포함한 새 refresh token을
+   받아 해당 `YOUTUBE_OAUTH_REFRESH_TOKEN_<CK>` 시크릿을 교체 — 그러면 API로도
+   신원 확인 가능해짐.
+2. 또는 사람이 YouTube Studio에 각 계정으로 직접 로그인해 실제 채널을 눈으로 확인
+   (8차 때처럼) — 이 경우 `EXPECTED_YOUTUBE_CHANNEL_ID_<CK>`를 등록하는 것과 별개로,
+   API 재검증 자체를 건너뛰도록 스크립트를 추가로 고쳐야 함(아직 안 함 — Chairman
+   확인 방식이 정해지면 그때 반영).
+
 ## 2026-09-27 (9차) — SNS 대시보드 "계정 미확인" 표시: 정직 확인, 가짜 처리 거부
 
 **Chairman 요청**: control.korea365.org/social-accounts 대시보드 스크린샷을 보여주며
