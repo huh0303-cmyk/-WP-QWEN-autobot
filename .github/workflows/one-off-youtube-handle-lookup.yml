@@ -1,0 +1,34 @@
+name: "One-off — public YouTube handle lookup (no OAuth)"
+# 2026-09-27. archive 채널 신원 OAuth 확인(discover_archive_channel_identities.py)이
+# 스코프 부족으로 실패한 뒤, Chairman이 직접 제공한 후보 브랜드명들과
+# config/youtube_channels.json에 이미 기록된 핸들이 서로 다른 걸 발견해서
+# 공개 API(forHandle)로 뭐가 실제로 존재하는 채널인지만 교차 확인한다.
+# OAuth 불필요, 쓰기 없음. 새 스케줄러 아님 — workflow_dispatch 전용 1회 실행기.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Public forHandle lookup for candidate archive channel names
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/lookup_youtube_handles_public.py
+      - name: Save result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-handle-lookup-${{ github.run_id }}
+          path: artifacts/youtube_handle_lookup.json
+          if-no-files-found: ignore
