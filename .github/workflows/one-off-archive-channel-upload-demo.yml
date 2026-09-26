@@ -1,0 +1,61 @@
+name: "One-off — archive channel private upload demo"
+# 2026-09-26 Chairman 요청("유튜브 비공개 업로드까지 시연") 대응용 1회성 수동
+# 워크플로우. scripts/archive_channel_upload.py는 이미 존재하지만 연결된
+# 워크플로우가 없었음(고아 스크립트) — 새 정기 스케줄러가 아니라 workflow_dispatch
+# 전용 1회 실행기만 추가. privacyStatus는 스크립트 내부에서 항상 "private"로
+# 고정되어 있어 실수로 공개될 위험 없음.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel_key:
+        description: "예: SCIENCE_FACTS_TIMES, NASA_SPACE_TIMES 등"
+        required: true
+        default: "SCIENCE_FACTS_TIMES"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-api-python-client google-auth -q
+      - name: "Resolve per-channel secret into a dynamically-named env var"
+        # 스크립트가 YOUTUBE_OAUTH_REFRESH_TOKEN_<CHANNEL_KEY> 처럼 채널마다 다른
+        # 이름의 환경변수를 읽는데, YAML env: 블록의 키 이름 자체는 동적으로 만들 수
+        # 없어서 secrets[format(...)]으로 값만 가져온 뒤 GITHUB_ENV에 계산된
+        # 이름으로 직접 적어 넣는다.
+        env:
+          RESOLVED_REFRESH_TOKEN: ${{ secrets[format('YOUTUBE_OAUTH_REFRESH_TOKEN_{0}', inputs.channel_key)] }}
+          RESOLVED_FOLDER_ID: ${{ secrets[format('OUTPUT_FOLDER_ID_{0}', inputs.channel_key)] }}
+          RESOLVED_LOG_FOLDER_ID: ${{ secrets[format('UPLOADED_LOG_FOLDER_ID_{0}', inputs.channel_key)] }}
+        run: |
+          echo "YOUTUBE_OAUTH_REFRESH_TOKEN_${{ inputs.channel_key }}=$RESOLVED_REFRESH_TOKEN" >> "$GITHUB_ENV"
+          echo "OUTPUT_FOLDER_ID_${{ inputs.channel_key }}=$RESOLVED_FOLDER_ID" >> "$GITHUB_ENV"
+          echo "UPLOADED_LOG_FOLDER_ID_${{ inputs.channel_key }}=$RESOLVED_LOG_FOLDER_ID" >> "$GITHUB_ENV"
+      - name: Upload one ready video from Drive as YouTube private
+        env:
+          CHANNEL_KEY: ${{ inputs.channel_key }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_CLIENT_ID_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NEW }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_NEW: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NEW }}
+          ARCHIVE_OUTPUT_FOLDER_IDS_JSON: ${{ secrets.ARCHIVE_OUTPUT_FOLDER_IDS_JSON }}
+        run: python scripts/archive_channel_upload.py
+      - name: Save result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-upload-demo-${{ github.run_id }}
+          path: artifacts/youtube_curio_result.json
+          if-no-files-found: ignore
