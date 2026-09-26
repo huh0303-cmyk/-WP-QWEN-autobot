@@ -50,6 +50,11 @@ JAPANESE_CANDIDATES = [
     "Japanese_survival", "JapaneseSurvival",
 ]
 
+SHOPPING2_CANDIDATES = [
+    "sis_languagecenter", "SIS_LanguageCenter", "SIS_Language", "sis_language",
+    "SISLanguageCenter", "seoul_language_center", "SIS_Languagecenter",
+]
+
 
 def log(msg):
     print(msg, flush=True)
@@ -109,9 +114,20 @@ def main():
             else:
                 log(f"JP_CANDIDATE_MISS\t@{cand}")
 
+    shop2_result = next((r for r in results if r["key"] == "shopping2"), None)
+    shop2_extra = []
+    if shop2_result and not shop2_result["found"]:
+        for cand in SHOPPING2_CANDIDATES:
+            r = lookup(cand)
+            shop2_extra.append(r)
+            if r["found"]:
+                log(f"SHOP2_CANDIDATE_OK\t@{r['handle']}\t{r['title']}\t{r['channel_id']}\t{r['published_at']}\t{r['subscriber_count']}\t{r['video_count']}")
+            else:
+                log(f"SHOP2_CANDIDATE_MISS\t@{cand}")
+
     Path("artifacts").mkdir(parents=True, exist_ok=True)
     Path("artifacts/final_25_channel_report.json").write_text(
-        json.dumps({"results": results, "japanese_extra": jp_extra}, ensure_ascii=False, indent=2),
+        json.dumps({"results": results, "japanese_extra": jp_extra, "shopping2_extra": shop2_extra}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 
