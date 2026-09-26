@@ -30,6 +30,7 @@ Operating principles: **Simple · Stable · No-New-Cost · Evidence-First**
 - SNS: Instagram / Threads / Facebook / TikTok
 
 ## Delivery files
+- `RECENT_CONVERSATIONS_2026-09-27.md` — 9월 최근 대화의 지시·결정·검증 상태·충돌 통합 기록
 - `ARCHITECTURE.md` — final system architecture
 - `WORKFLOWS.md` — master workflow design
 - `APP_SPEC.md` — operator/local app specification
