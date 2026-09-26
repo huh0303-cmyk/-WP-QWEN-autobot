@@ -177,65 +177,77 @@ def latest_daily_stats(token, site_url, window_days=10):
     """GSC는 2~3일 지연되므로 3일 전까지의 가장 최근 확정 검색 통계."""
     # GitHub runner는 UTC다. 05:20 KST 실행 시 date.today()를 쓰면 한국 날짜보다
     # 하루 전을 기준으로 조회할 수 있으므로 반드시 KST 날짜를 사용한다.
-    end = datetime.now(KST).date() - timedelta(days=3)
-    start = end - timedelta(days=window_days)
-    body = {
-        "startDate": start.isoformat(),
-        "endDate": end.isoformat(),
-        "dimensions": ["date"],
-        "rowLimit": window_days + 1,
-    }
-    endpoint = f"/sites/{requests.utils.quote(site_url, safe='')}/searchAnalytics/query"
-    r = gsc_post(token, endpoint, body)
-    if r.status_code != 200:
-        return None, f"GSC HTTP {r.status_code}: {r.text[:120]}"
-    rows = r.json().get("rows", [])
-    if not rows:
-        return None, "최근 GSC 데이터 없음"
-    rows.sort(key=lambda x: x["keys"][0])
-    latest = rows[-1]
-    return {
-        "date": latest["keys"][0],
-        "clicks": latest.get("clicks", 0),
-        "impressions": latest.get("impressions", 0),
-        "ctr": round(latest.get("ctr", 0) * 100, 2),
-        "position": round(latest.get("position", 0), 1),
-    }, None
+    # 2026-09-26 런던프로젝트클로드: 이 함수(와 get_index_coverage)에 try/except가
+    # 없어서 사이트 하나에서 ConnectionResetError(공유 호스팅 IP 레이트리밋으로
+    # 추정)가 나면 main()의 27개 루프 전체가 죽었다 — 그 결과 2026-09-08 이후
+    # 이 워크플로우가 사실상 멈춰서 종합상황실 GSC 지표가 "미확인"으로 2주 넘게
+    # 갱신 안 됐다. 이 파일의 다른 함수들(get_footer_visitor_stats 등)과 같은
+    # try/except 패턴으로 맞춘다 — 한 사이트 실패가 나머지를 막지 않게.
+    try:
+        end = datetime.now(KST).date() - timedelta(days=3)
+        start = end - timedelta(days=window_days)
+        body = {
+            "startDate": start.isoformat(),
+            "endDate": end.isoformat(),
+            "dimensions": ["date"],
+            "rowLimit": window_days + 1,
+        }
+        endpoint = f"/sites/{requests.utils.quote(site_url, safe='')}/searchAnalytics/query"
+        r = gsc_post(token, endpoint, body)
+        if r.status_code != 200:
+            return None, f"GSC HTTP {r.status_code}: {r.text[:120]}"
+        rows = r.json().get("rows", [])
+        if not rows:
+            return None, "최근 GSC 데이터 없음"
+        rows.sort(key=lambda x: x["keys"][0])
+        latest = rows[-1]
+        return {
+            "date": latest["keys"][0],
+            "clicks": latest.get("clicks", 0),
+            "impressions": latest.get("impressions", 0),
+            "ctr": round(latest.get("ctr", 0) * 100, 2),
+            "position": round(latest.get("position", 0), 1),
+        }, None
+    except Exception as e:
+        return None, f"GSC 검색통계 예외: {str(e)[:160]}"
 
 
 def get_index_coverage(token, site_url):
     """Return sitemap-reported counts; this is not a URL Inspection census."""
-    encoded = requests.utils.quote(site_url, safe="")
-    r = gsc_get(token, f"/sites/{encoded}/sitemaps")
-    if r.status_code != 200:
-        return None, f"사이트맵 목록 HTTP {r.status_code}"
-    sitemaps = r.json().get("sitemap", [])
-    if not sitemaps:
-        return None, "제출된 사이트맵 없음"
+    try:
+        encoded = requests.utils.quote(site_url, safe="")
+        r = gsc_get(token, f"/sites/{encoded}/sitemaps")
+        if r.status_code != 200:
+            return None, f"사이트맵 목록 HTTP {r.status_code}"
+        sitemaps = r.json().get("sitemap", [])
+        if not sitemaps:
+            return None, "제출된 사이트맵 없음"
 
-    total_indexed = 0
-    total_submitted = 0
-    found = False
-    for sm in sitemaps:
-        path = sm.get("path", "")
-        if not path:
-            continue
-        r2 = gsc_get(token, f"/sites/{encoded}/sitemaps/{requests.utils.quote(path, safe='')}" )
-        if r2.status_code != 200:
-            continue
-        for c in r2.json().get("contents", []):
-            found = True
-            total_indexed += int(c.get("indexed", 0) or 0)
-            total_submitted += int(c.get("submitted", 0) or 0)
-    if not found:
-        return None, "사이트맵 색인 데이터 없음"
-    return {
-        "sitemap_indexed": total_indexed,
-        "sitemap_submitted": total_submitted,
-        # Compatibility alias for older history readers. Never label this as an
-        # exact URL Inspection count in a dashboard.
-        "indexed": total_indexed,
-    }, None
+        total_indexed = 0
+        total_submitted = 0
+        found = False
+        for sm in sitemaps:
+            path = sm.get("path", "")
+            if not path:
+                continue
+            r2 = gsc_get(token, f"/sites/{encoded}/sitemaps/{requests.utils.quote(path, safe='')}" )
+            if r2.status_code != 200:
+                continue
+            for c in r2.json().get("contents", []):
+                found = True
+                total_indexed += int(c.get("indexed", 0) or 0)
+                total_submitted += int(c.get("submitted", 0) or 0)
+        if not found:
+            return None, "사이트맵 색인 데이터 없음"
+        return {
+            "sitemap_indexed": total_indexed,
+            "sitemap_submitted": total_submitted,
+            # Compatibility alias for older history readers. Never label this as an
+            # exact URL Inspection count in a dashboard.
+            "indexed": total_indexed,
+        }, None
+    except Exception as e:
+        return None, f"GSC 색인 커버리지 예외: {str(e)[:160]}"
 
 
 WEEKDAY_KR = ["월", "화", "수", "목", "금", "토", "일"]
@@ -437,7 +449,11 @@ def main():
                 {"checked_at": checked_at, "records": records, "partial": i < len(SITES)},
                 f, ensure_ascii=False, indent=2,
             )
-        time.sleep(0.2)
+        # 2026-09-26: 0.2초는 공유 호스팅 IP 레이트리밋을 피하기에 너무 짧았다
+        # (ensure_required_pages.py 재시도에서도 같은 IP대의 사이트들이 연속
+        # 커넥션리셋 난 것을 확인함). 3초로 늘림 — 27개 기준 총 실행시간
+        # +약 75초, timeout-minutes 여유 안에서 감당 가능.
+        time.sleep(3)
 
     send_to_sheets(records)
 
