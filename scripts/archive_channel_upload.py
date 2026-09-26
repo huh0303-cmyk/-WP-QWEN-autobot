@@ -467,6 +467,33 @@ def main():
 
     log("3/4 유튜브 업로드 중..." + (f" (예약: {hours_from_now}시간 뒤 공개)" if publish_at_iso else " (비공개로만 업로드)"))
     youtube = get_youtube_service()
+
+    # 2026-09-26 사고 후 추가: YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES가
+    # 실제로는 "French Survival"(10개국어 서바이벌 프로젝트, 별도 잠금 채널) 계정으로
+    # 인증되는 걸 실제 업로드 후에야 발견함(브랜드 라벨은 채널 정체성이 아니라는
+    # docs/YOUTUBE-CONNECTIONS.md의 기존 경고와 동일 패턴). curio_upload.py는
+    # automation_hub.youtube_identity.verify_authenticated_channel로 이미 이걸
+    # 막고 있었는데 이 스크립트만 그 검증이 빠져 있었음. youtube_registry.py에
+    # 이 archive 채널들 항목이 아예 없어서 같은 함수를 못 쓰므로, 채널별로
+    # EXPECTED_YOUTUBE_CHANNEL_ID_<CHANNEL_KEY> 시크릿이 명시적으로 설정돼 있지
+    # 않으면 업로드를 거부한다(사람이 실제 채널 ID를 확인해서 등록하기 전까지는
+    # 기본적으로 막힘 — fail closed).
+    expected_channel_id = os.environ.get(f"EXPECTED_YOUTUBE_CHANNEL_ID_{CK}", "").strip()
+    actual = youtube.channels().list(part="snippet", mine=True, maxResults=1).execute()
+    actual_items = actual.get("items", [])
+    actual_id = actual_items[0]["id"] if actual_items else ""
+    actual_title = actual_items[0]["snippet"]["title"] if actual_items else "(확인 불가)"
+    log(f"   인증된 실제 채널: {actual_title} ({actual_id})")
+    if not expected_channel_id:
+        log(f"❌ [{CHANNEL_KEY}] EXPECTED_YOUTUBE_CHANNEL_ID_{CK} 시크릿이 없어서 채널 일치 여부를 "
+            f"확인할 수 없음 — 잘못된 채널에 업로드될 위험이 있어 중단함. 위 '인증된 실제 채널'이 "
+            f"맞으면 그 채널 ID를 EXPECTED_YOUTUBE_CHANNEL_ID_{CK}로 등록한 뒤 재시도할 것.")
+        raise SystemExit(1)
+    if actual_id != expected_channel_id:
+        raise RuntimeError(
+            f"채널 불일치: {CHANNEL_KEY}는 {expected_channel_id}여야 하는데 실제로는 "
+            f"{actual_title} ({actual_id})로 인증됨 — 업로드 중단.")
+
     video_id = upload_to_youtube(youtube, video_path, thumb_path, title, description, publish_at_iso)
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
 
