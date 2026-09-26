@@ -5,6 +5,28 @@
 매 세션 끝에 이 파일 맨 위에 새 항목을 추가한다 (최신이 위로).
 
 관련 문서: `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` (목표/원칙, 거의 안 바뀜)
+평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
+최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
+
+---
+
+## 2026-09-26 (6차) — 최종 아키텍처/평가 문서 박제, n8n 배포 성공 확인, 타 트랙 현황 확인
+
+Chairman 요청("최종 아키텍처/워크플로우/백업플랜 등... 평가할 때 쓸꺼다")에 따라
+`docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` 신설. 요지:
+
+- **아키텍처 결정**: GitHub(기록) + VPS(24/7) + n8n(self-hosted, 무료 오케스트레이션).
+  **EXE/로컬 앱(복사장류)은 채택하지 않음** — 안정성 역행(PC가 켜져있어야 함), 인프라 중복,
+  비용/유지보수 증가가 이유. 로그인 필수 플랫폼(Naver/Tistory)만 사람 트리거 예외로 둠.
+- **n8n 실제 배포 확인**: 런던프로젝트GPT 트랙이 오늘 `deploy-london-n8n.yml`을 5번 시도해
+  4번 실패 후 성공(run 36234584029, completed/success — GitHub API로 직접 조회 확인).
+  Phase 1(기반)만 완료, 실제 발행 파이프라인 연결(Phase 2+)은 미착수.
+- **런던프로젝트제미나이 현황 확인**: `projects/LONDON_PROJECT_GEMINI/STATUS.md` 원문 —
+  "independent track not yet implemented", Gemini CLI 미확인. **아직 시작 전.**
+- **종합상황실 4지표+순위 UI**: 런던프로젝트GPT가 오늘 커밋(`d7051f5`,`eb1ab43`)했으나
+  나는 diff만 확인했고 브라우저로 직접 검증 안 함 — 다음 세션 확인 필요.
+- 완성률은 항목별로 편차가 큼(승인 1/25, 원인진단 부분완료, n8n 기반만 완료 등) — 단일
+  %로 뭉뚱그리지 않고 FINAL_ARCHITECTURE.md 1절 표로 정리.
 
 ---
 
