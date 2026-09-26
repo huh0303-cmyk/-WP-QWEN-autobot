@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>런던프로젝트GPT</title>
+<link rel="manifest" href="{{ url_for('pwa_manifest') }}">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+<header class="sticky top-0 z-20 border-b border-white/10 bg-slate-950/95 px-4 py-4 backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+    <div><h1 class="text-xl font-black sm:text-2xl">런던프로젝트GPT</h1><p class="text-xs text-slate-400">운영앱 · 작업→검수→발행→검증을 한 화면에서</p></div>
+    <a href="/" class="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">기존 통제실</a>
+  </div>
+</header>
+<main class="mx-auto max-w-7xl space-y-6 p-4 sm:p-6">
+<section class="rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+  <p class="text-xs font-black text-emerald-300">운영 원칙</p>
+  <h2 class="mt-1 text-2xl font-black">새 자격증명 재수집 없이 기존 런던프로젝트 자산을 그대로 사용</h2>
+  <p class="mt-2 text-sm text-slate-300">WordPress REST, Blogger OAuth, VPS, GitHub Secrets, 기존 큐와 통제실 코드를 재사용합니다. 없는 것과 깨진 것만 별도 표시합니다.</p>
+</section>
+<section>
+  <div class="mb-3 flex items-end justify-between"><div><p class="text-xs font-black text-slate-400">LIVE PORTFOLIO</p><h2 class="text-xl font-black">플랫폼 연결 현황</h2></div><span id="updated" class="text-xs text-slate-500">갱신 중</span></div>
+  <div id="platforms" class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+  {% for key,label in [('wordpress','WordPress'),('blogger','Blogspot'),('tistory','Tistory'),('naver','Naver'),('youtube','YouTube'),('sns','SNS')] %}
+    {% set p=snapshot.platforms[key] %}
+    <article class="rounded-2xl border border-white/10 bg-slate-900 p-4">
+      <p class="text-xs font-black text-slate-400">{{ label }}</p>
+      <p class="mt-1 text-3xl font-black">{{ p.total }}</p>
+      {% if p.ready is not none %}<p class="mt-2 text-xs font-bold text-emerald-300">연결 확인 {{ p.ready }} · 점검 {{ p.issues }}</p>{% else %}<p class="mt-2 text-xs font-bold text-amber-300">로그인 세션 검증 예정</p>{% endif %}
+    </article>
+  {% endfor %}
+  </div>
+</section>
+<section class="rounded-3xl border border-white/10 bg-slate-900 p-5">
+  <p class="text-xs font-black text-slate-400">복사장식 다중 단계 + 런던프로젝트 안정화</p>
+  <h2 class="mt-1 text-xl font-black">표준 발행 파이프라인</h2>
+  <div class="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    {% for step in snapshot.pipeline %}
+    <div class="rounded-2xl bg-slate-800 p-4"><span class="text-xs font-black text-blue-300">{{ loop.index|string|zfill(2) }}</span><h3 class="mt-1 font-black">{{ step.label }}</h3><p class="mt-1 text-xs text-slate-400">{{ step.purpose }}</p></div>
+    {% endfor %}
+  </div>
+  <p class="mt-4 text-xs text-slate-400">각 단계 실패는 재시도 횟수를 제한하고, 최종 Publish 뒤 Verify에서 실제 공개 URL을 확인해야 완료 처리합니다.</p>
+</section>
+<section class="grid gap-4 md:grid-cols-2">
+  <a href="/social-accounts" class="rounded-3xl bg-blue-600 p-5 font-black">Naver · Tistory · SNS 계정 통제 →<span class="mt-1 block text-xs font-semibold text-blue-100">계정별 로그인·연결·실행 상태</span></a>
+  <a href="/account-schedule" class="rounded-3xl bg-violet-600 p-5 font-black">전체 발행 시간표 →<span class="mt-1 block text-xs font-semibold text-violet-100">사이트·채널별 실행 계획</span></a>
+</section>
+</main>
+<script>
+async function refreshStatus(){
+  try{
+    const r=await fetch('/api/london-gpt/status',{cache:'no-store'});
+    const d=await r.json();
+    document.getElementById('updated').textContent='상태 갱신 '+new Date().toLocaleTimeString('ko-KR');
+  }catch(e){document.getElementById('updated').textContent='상태 갱신 실패';}
+}
+refreshStatus(); setInterval(refreshStatus,60000);
+</script>
+</body></html>

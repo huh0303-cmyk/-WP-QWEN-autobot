@@ -2409,3 +2409,7 @@ _install_social_accounts(app)
 
 from .pipeline_status import install as _install_pipeline_status
 _install_pipeline_status(app)
+
+
+from .london_gpt_app import install as _install_london_gpt_app
+_london_gpt_snapshot = _install_london_gpt_app(app, _sys.modules[__name__])
