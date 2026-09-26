@@ -71,6 +71,41 @@ def lookup(handle):
         return {"handle": handle, "found": False, "raw_error": str(e)}
 
 
+# 2026-09-27 "런던프로젝트GPT"가 25개 최종 확정본이라며 준 표를 그대로 안 믿고
+# channel_id로 역조회해서 "지금 이 순간" 그 ID의 진짜 handle/title이 뭔지 확인한다.
+# forHandle은 이름을 아는 상태에서 존재 확인용이고, id로 조회하면 모호함이 없다.
+ID_CHECKS = [
+    ("UCmt8f9yUT6iTxBys8eH4-Cg", "GPT 주장: SIS_FrenchSurvival / 내가 방금 찾은 값: AMERICAN_ARCHIVE_JOURNAL"),
+    ("UCRZ0uc_bxKDMwz3noBBi9KQ", "GPT 주장: SIS_VietnameseSurvival / 내가 방금 찾은 값: ClassicalJournal"),
+    ("UCKvKhETLGPaRV3qfWv2bM2g", "GPT 주장: Portuguese_survival / 내가 방금 찾은 값: SCIENCE_FACTS_JOURNAL"),
+    ("UCGTd7RhfaUaGGbVRsNPUN6Q", "GPT 주장: SIS_ChineseSurvival / 미확인(처음 조회)"),
+    ("UCKF98zgzm7YRWlyMaoJJKIQ", "GPT 주장: SIS_GermanSurvival / 내가 방금 찾은 값: CLASSIC_READS_JOURNAL"),
+]
+
+
+def lookup_by_id(channel_id):
+    try:
+        r = requests.get(
+            "https://youtube.googleapis.com/youtube/v3/channels",
+            params={"part": "snippet,statistics", "id": channel_id, "key": API_KEY},
+            timeout=20,
+        )
+        data = r.json()
+        items = data.get("items", [])
+        if not items:
+            return {"channel_id": channel_id, "found": False}
+        item = items[0]
+        return {
+            "channel_id": channel_id,
+            "found": True,
+            "handle": item.get("snippet", {}).get("customUrl", ""),
+            "title": item.get("snippet", {}).get("title", ""),
+            "subscriber_count": item.get("statistics", {}).get("subscriberCount", ""),
+        }
+    except Exception as e:
+        return {"channel_id": channel_id, "found": False, "raw_error": str(e)}
+
+
 def main():
     if not API_KEY:
         log("❌ YOUTUBE_API_KEY 없음 — 공개 조회 불가")
@@ -83,9 +118,20 @@ def main():
         else:
             log(f"⬜ @{r['handle']}: 존재하지 않음 또는 조회 실패 ({r.get('raw_error','')})")
 
+    log("")
+    log("=== channel_id 역조회 (GPT 주장 교차검증) ===")
+    id_results = []
+    for cid, note in ID_CHECKS:
+        r = lookup_by_id(cid)
+        id_results.append({**r, "note": note})
+        if r["found"]:
+            log(f"🔎 {cid} → 지금 실제 handle=@{r['handle']} title=\"{r['title']}\" 구독자={r.get('subscriber_count','?')}  [{note}]")
+        else:
+            log(f"⬜ {cid}: 조회 실패  [{note}]")
+
     Path("artifacts").mkdir(parents=True, exist_ok=True)
     Path("artifacts/youtube_handle_lookup.json").write_text(
-        json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8"
+        json.dumps({"handle_lookup": results, "id_lookup": id_results}, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
 
