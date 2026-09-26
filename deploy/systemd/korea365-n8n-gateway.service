@@ -1,0 +1,19 @@
+[Unit]
+Description=Korea365 n8n localhost gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/korea365
+EnvironmentFile=/etc/korea365/n8n.env
+ExecStart=/opt/korea365/.venv/bin/python /opt/korea365/scripts/n8n_gateway.py
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

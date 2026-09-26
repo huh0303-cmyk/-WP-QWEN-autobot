@@ -1,5 +1,5 @@
 {
-  "name": "London WP25 Master",
+  "name": "London Blogger33 Master",
   "nodes": [
     {
       "parameters": {
@@ -7,14 +7,15 @@
           "interval": [
             {
               "field": "hours",
-              "hoursInterval": 1,
-              "triggerAtMinute": 13
+              "hoursInterval": 24,
+              "triggerAtHour": 0,
+              "triggerAtMinute": 17
             }
           ]
         }
       },
       "id": "schedule",
-      "name": "Hourly WP25",
+      "name": "Daily Blogger33",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
@@ -25,7 +26,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://127.0.0.1:8766/run/wp25_tick",
+        "url": "http://127.0.0.1:8766/run/blogger33_daily",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -38,7 +39,7 @@
         "options": {}
       },
       "id": "run",
-      "name": "Run WP25",
+      "name": "Run Blogger33",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -48,11 +49,11 @@
     }
   ],
   "connections": {
-    "Hourly WP25": {
+    "Daily Blogger33": {
       "main": [
         [
           {
-            "node": "Run WP25",
+            "node": "Run Blogger33",
             "type": "main",
             "index": 0
           }
