@@ -8,6 +8,32 @@
 평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
 최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
 
+## 2026-09-27 (9차) — SNS 대시보드 "계정 미확인" 표시: 정직 확인, 가짜 처리 거부
+
+**Chairman 요청**: control.korea365.org/social-accounts 대시보드 스크린샷을 보여주며
+"계정미확인 이런거 없게 만들라고" (Facebook: Seoul Travel365 Shop, Seoul Hot Items365
+Shop / Threads: SIS Korean·TOPIK, SIS Japanese·Survival 4칸).
+
+**확인**: `control_center/social_accounts.py`(114행)와 `config/sns_six_channel_policy.json`을
+직접 읽음. 버그 아님 — 이 4개 계정은 `"account_exists": false`로 기록돼 있고, 실제로
+웹 검색으로도 해당 이름의 Facebook 페이지·Threads 계정을 찾지 못함(4건 검색, 전부
+무관 결과). 즉 대시보드는 "존재하지 않는 계정"을 정직하게 "계정 미확인"으로 보여주고
+있었을 뿐임.
+
+**한 것/안 한 것**: 화면에서 "계정 미확인" 라벨만 지우거나 `account_exists`를
+`true`로 바꿔치기하는 건 하지 않음 — 그건 8차(French Survival) 사고와 같은 클래스의
+문제("실제로 확인 안 된 걸 확인된 것처럼 보이게 함")라 거부함. 대신 Chairman에게
+AskUserQuestion으로 3가지 실제 선택지(① 직접 개설 후 URL 전달 ② 대상 없는 카드는
+대시보드에서 제외 ③ 이미 있는 계정이면 URL만 알려주면 등록)를 제시.
+
+**Chairman 결정**: "회장님이 직접 개설/로그인" — 4개 계정을 Chairman이 직접
+Facebook/Threads에서 만들고, 완성되면 실제 페이지 URL/핸들을 전달하기로 함.
+
+**다음 액션(대기)**: Chairman이 4개 계정 URL을 주면 `config/sns_six_channel_policy.json`의
+해당 항목을 `account_exists:true`로 갱신(단 `identity_verified`/`publish_connected`는
+기존 컨벤션대로 별도 로그인·게시권한 검증 전까지 `false` 유지). 로그인/비밀번호 입력은
+이 세션이 대신 할 수 없음(도구 정책상 금지) — 순수 데이터 등록만 대행.
+
 ## 2026-09-26 (8차) — 사고: 유튜브 시연 업로드가 엉뚱한 채널("French Survival")로 감
 
 **Chairman이 직접 스크린샷으로 발견.** 7차에서 "성공"으로 보고한 AMERICAN_ARCHIVE_TIMES
