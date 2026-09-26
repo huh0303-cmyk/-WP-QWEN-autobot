@@ -57,6 +57,32 @@
 | english_survival | `@English_survival`(English Survival, 구독자 9) |
 | sis_language | `@sis_languagecenter`(SIS-Language Center) — 이번 23개 목록엔 없었으나 이전에 별도 확인됨 |
 
+## 2026-09-27 업데이트 — "런던프로젝트GPT" 23개 마스터와 대조, 더 심각한 결론
+
+Chairman이 "런던프로젝트GPT" 트랙의 23개 최종 마스터(`config/YOUTUBE_23_CHANNEL_
+MASTER_LOCK_2026-09-27.json`, 이 리포엔 아직 없음 — GPT 자체 기록)를 전달함.
+channel_id로 직접 역조회(handle 아님, 모호함 없음)해서 대조한 결과 **23개 표
+자체는 지금 이 순간 기준으로 맞다** — French/Vietnamese/Portuguese/Chinese/German
+Survival 전부 `@SIS_XxxSurvival` handle과 실제로 일치함.
+
+**단, 같은 세션 안에서 몇 분 전에는 이 중 최소 4개 channel_id(French/Vietnamese/
+Portuguese/German Survival)가 `@AMERICAN_ARCHIVE_JOURNAL`/`@ClassicalJournal`/
+`@SCIENCE_FACTS_JOURNAL`/`@CLASSIC_READS_JOURNAL`라는 handle로도 동시에 걸렸다.**
+즉 american_archive/classical/science/classic_reads 시크릿이 가리키는 채널은
+**"이름만 같은 별도의 숨은 채널"이 아니라, 회장님의 진짜 공식 잠금 언어채널과
+동일한 channel_id일 가능성이 높다.** `UCmt8f9yUT6iTxBys8eH4-Cg`는 몇 달 전부터
+`docs/YOUTUBE-CONNECTIONS.md`에 French Survival로 기록돼 있던 ID이기도 함.
+
+**결론(이전 판단 정정)**: 8차 사고는 "동명이인 채널 착오"가 아니라 **진짜 잠긴
+언어채널에 실제로 업로드된 것**이었을 가능성이 더 높다. GPT가 23개 운영대상에서
+5개 키(science/classical/myth/american_archive/classic_reads)를 뺀 건 맞는
+방향이지만 **목록 제외만으론 구조적 안전장치가 안 됨** — 해당
+`YOUTUBE_OAUTH_REFRESH_TOKEN_<KEY>` 시크릿 자체가 GitHub에 남아있는 한, 다음에
+누가 실수로 `archive_channel_upload.py` 류 스크립트를 다시 돌리면 재발 가능.
+**이 세션은 GitHub 시크릿을 지울 권한이 없음 — Chairman이 직접 삭제해야 구조적으로
+막힌다.** (최소 `YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES`,
+`_CLASSICAL_JOURNAL`은 실제 토큰이 있는 걸로 확인됨 — 10차 참조.)
+
 ## 핵심 결론
 
 1. **같은 이름("Portuguese Survival", "Vietnamese Survival", "French Survival",
