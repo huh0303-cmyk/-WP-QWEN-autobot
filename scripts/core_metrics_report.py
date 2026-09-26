@@ -208,13 +208,10 @@ def report_html(result):
     for platform, title in [("wordpress", "WordPress 25개"), ("blogger", "Blogspot 33개"), ("news", "뉴스룸 2개 · 별도")]:
         rows = sorted((r for r in result["records"] if r["platform"] == platform),
                       key=lambda r: (r.get("today_visitors") is None, -(r.get("today_visitors") or 0), r["url"]))
-        parts.append(f"<h3>{title} · 수집 대상 {len(rows)}개</h3><p>오늘 방문 내림차순 · 같은 수치는 공동 순위 · 미확인은 맨 아래</p><div style='overflow-x:auto'><table border='1' cellpadding='6' style='border-collapse:collapse;width:100%;font-size:13px'><tr><th>순위</th><th>사이트</th><th>일일 방문자수(증감)</th><th>누적 방문자수(증감)</th><th>총 발행 글(증감)</th><th>Google 색인 발행 글수(증감)</th><th>확인 필요</th></tr>")
-        previous, rank = None, 0
+        parts.append(f"<h3>{title} · 수집 대상 {len(rows)}개</h3><p>일일 방문자 내림차순 · 1위부터 순차 표기 · 미확인은 맨 아래</p><div style='overflow-x:auto'><table border='1' cellpadding='6' style='border-collapse:collapse;width:100%;font-size:13px'><tr><th>순위</th><th>사이트</th><th>일일 방문자수(증감)</th><th>누적 방문자수(증감)</th><th>총 공개 글(증감)</th><th>Google 색인 글수(증감)</th><th>확인 필요</th></tr>")
         for position, r in enumerate(rows, 1):
             count = r.get("today_visitors")
-            if count is not None and count != previous:
-                rank = position
-            previous = count
+            rank = position if count is not None else None
             url = html.escape(r["url"], quote=True)
             site = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>' if r["url"].startswith("https://") else url
             values = [str(rank) if count is not None else "—", site] + [format_metric(r, k, d) for k, d in [("today_visitors", "today_delta"), ("total_visitors", "total_delta"), ("total_posts", "posts_delta"), ("indexed", "indexed_delta")]]

@@ -204,7 +204,7 @@
             <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block truncate text-xs text-blue-700 underline" title="{{ url }}">{{ url|replace('https://','')|replace('http://','') }} ↗</a>
             <span class="tile-rank mt-2 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-black text-blue-800">순위 미집계</span>
             <div class="tile-metrics mt-2 space-y-1 text-[11px]">
-            {% for title, key, change, basis in [('① 일일 방문자','today_visitors','today_delta','오늘 현재 − 어제 하루 · Blogger는 자체 조회수'),('② Google 색인','indexed','indexed_delta','이전 Google 확인 대비'),('③ 누적 방문자','total_visitors','total_delta','전일 확인값 대비'),('④ 오늘 콘텐츠','new_posts','new_posts_delta','오늘 공개 수 − 어제 공개 수')] %}
+            {% for title, key, change, basis in [('① 전날 일일 방문자','today_visitors','today_delta','전날 일일 실적 · 직전 일 대비'),('② 누적 방문자','total_visitors','total_delta','전날 마감 · 직전 마감 대비'),('③ 총 공개 글','total_posts','posts_delta','현재 공개 글 · 직전 집계 대비'),('④ Google 색인 글','indexed','indexed_delta','이전 Google 확인 대비')] %}
             {% set value = metrics.get(key) if metrics else none %}{% set delta = metrics.get(change) if metrics else none %}
             <p class="flex flex-wrap justify-between gap-1" title="{{ basis }}"><span>{{ title }}</span><strong>{{ '{:,}'.format(value) if value is not none else '미집계' }} <span class="{{ 'text-red-600' if delta is not none and delta < 0 else 'text-emerald-700' }}">({% if delta is none %}증감 미집계{% else %}{{ '+' if delta > 0 else '' }}{{ '{:,}'.format(delta) }}{% endif %})</span></strong></p>
             {% endfor %}
@@ -225,7 +225,7 @@
             <p class="text-xs text-slate-500">카드 하나가 독립 실행 단위입니다. 한 사이트 실패가 다른 사이트를 막지 않습니다.</p>
             <input id="quick-site-search" type="search" class="dashboard-search" placeholder="사이트 이름이나 주소 검색" aria-label="사이트별 실행 검색">
             <div><h2 class="text-xl font-black">사이트별 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
-            <p class="text-xs text-slate-500">플랫폼별 오늘 방문자 순위(동률 공동순위) · 방문자·새 콘텐츠는 어제 대비 · 누적은 오늘 증가 · 색인은 이전 확인 대비 · 시각 KST · 통계 5분 / 발행 로그 1분 갱신</p>
+            <p class="text-xs text-slate-500">플랫폼별 전날 일일 방문자 기준 1위·2위·3위 순차 표기 · 핵심 4지표는 모두 괄호 안 증감 표시 · 시각 KST</p>
             <h3 class="text-sm font-bold">WordPress 27 · 일반 25 + 뉴스 2</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
             {% for site in sites %}{{ quick_tile('WP · ' ~ (site.name or site.domain), 'https://' ~ site.domain, 'wp_' ~ site.site_id, '즉시 발행', site.auth_ready, site.today_visitors, site, site.site_id) }}{% endfor %}
@@ -921,12 +921,9 @@
         });
         function sortSiteTiles() {
             document.querySelectorAll('.ranked-site-tiles').forEach(function(grid) {
-            let last = null, rank = 0;
             Array.from(grid.children).sort(function(a,b) { return Number(b.dataset.visitors) - Number(a.dataset.visitors); }).forEach(function(tile, i) {
                 const value = Number(tile.dataset.visitors);
-                if (value !== last) rank = i + 1;
-                tile.querySelector('.tile-rank').textContent = value < 0 ? '순위 미집계' : rank + '위';
-                last = value;
+                tile.querySelector('.tile-rank').textContent = value < 0 ? '순위 미집계' : (i + 1) + '위';
                 grid.appendChild(tile);
             });
             });
@@ -934,15 +931,12 @@
         sortSiteTiles();
         function sortDetailedSites() {
             document.querySelectorAll('.ranked-detailed-sites').forEach(function(grid) {
-                let last = null, rank = 0;
                 Array.from(grid.children).sort(function(a,b) {
                     return Number(b.dataset.visitors) - Number(a.dataset.visitors);
                 }).forEach(function(card, i) {
                     const value = Number(card.dataset.visitors);
-                    if (value !== last) rank = i + 1;
                     const badge = card.querySelector('.detailed-rank');
-                    if (badge) badge.textContent = value < 0 ? '미집계' : '오늘 ' + rank + '위';
-                    last = value;
+                    if (badge) badge.textContent = value < 0 ? '미집계' : (i + 1) + '위';
                     grid.appendChild(card);
                 });
             });
