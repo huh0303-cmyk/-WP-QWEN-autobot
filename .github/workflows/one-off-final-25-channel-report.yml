@@ -1,0 +1,32 @@
+name: "One-off — final 25-channel report (id, created date, subs)"
+# 2026-09-27. Chairman이 최종 확정 25개 채널 리스트를 구글시트에 붙여넣을 수 있게
+# channel_id, 개설일(publishedAt), 구독자수, 영상수까지 한 번에 뽑아달라고 요청.
+# 공개 API(forHandle)만 사용, OAuth 불필요, 쓰기 없음. workflow_dispatch 전용.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Final 25-channel report (id / created date / subs)
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/lookup_final_25_channels.py
+      - name: Save result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-25-channel-report-${{ github.run_id }}
+          path: artifacts/final_25_channel_report.json
+          if-no-files-found: ignore
