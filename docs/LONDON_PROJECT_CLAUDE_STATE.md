@@ -8,6 +8,64 @@
 평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
 최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
 
+## 2026-09-27 (11차) — 공개 API 교차확인: "브랜드=신원 아님"이 생각보다 훨씬 심각함, 확인 못한 채 Chairman 판단 대기
+
+**배경**: Chairman이 "이걸 지난 몇달전 수십번 했다고... 결과를 박제해 놓으라고 했고..
+이게 뭐야"라며 계정선택 화면 캡처(구독자수 포함 채널 목록)와 본인이 정리한
+key→클릭할 계정 매핑표를 직접 전달함. **지적이 정당함**: `config/youtube_channels.json`에
+이미 nasa/history/invention/silent_era/retro_reels 5개의 실제 handle·channel_id가
+2026-09-05 스냅샷으로 기록돼 있었는데(social_accounts.py가 YOUTUBE_CONFIG로 참조하는
+바로 그 파일), 10차에서 이걸 먼저 확인하지 않고 OAuth API로 새로 알아내려다 스코프
+벽에 막혔음 — 순서가 틀렸었다.
+
+**한 일**: OAuth 없이 공개 `YOUTUBE_API_KEY`(기존에 이미 있던 키, apply_thumbnail_bank_to_
+live_videos.py와 동일 방식)로 `channels?forHandle=`을 후보 이름들에 대해 조회
+(`scripts/lookup_youtube_handles_public.py`, run 36271710937, success).
+
+**확인된 것(channel_id 기준, title 아님 — 실측)**:
+| key | secret | 기존 기록(09-05) | 지금 조회 |
+|---|---|---|---|
+| nasa | NASA_SPACE_TIMES | NASA_XFILES / ...NicxQ3w | 그대로 확인됨 |
+| history | HISTORY_TODAY_TIMES | HISTORY_TV_TODAY / ...cxQ3w | 그대로 확인됨 |
+| invention | INVENTION_TIMES | INVENTION_STORY1 / ...49fww | 그대로 확인됨 |
+| silent_era | SILENT_ERA_TIMES | OLD_HOLLYWOOD1 / ...rfQ47g | 그대로 확인됨(title만 SILENT_ERA_FILM으로 바뀜) |
+| retro_reels | RETRO_REELS_TIMES | RETRO_USA1 / ...zA6XDQ | 그대로 확인됨 |
+
+이 5개는 **신뢰 가능** — 기존 기록과 현재 API 조회가 channel_id 기준으로 일치.
+
+**새로 발견된 것(신뢰 여부 Chairman 확인 필요)**:
+- `@AMERICAN_ARCHIVE_JOURNAL` → 현재 title "French Survival", channel_id
+  `UCmt8f9yUT6iTxBys8eH4-Cg` — **8차 사고에서 실제 업로드가 도달했다고 추정한 그
+  channel_id와 정확히 일치**(`docs/YOUTUBE-CONNECTIONS.md`에 이전부터 기록돼 있던 값).
+  즉 이 채널의 handle이 이미 AMERICAN_ARCHIVE_JOURNAL로 바뀌어 있음 — **이게 의도된
+  전환(French Survival이라는 잠금 언어채널을 American Archive 용도로 공식 전환)이라면
+  8차는 "사고"가 아니라 이미 맞는 채널이었던 것**이 됨. 반대로 이 handle 변경 자체가
+  누군가(Chairman 아닌 다른 트랙?)의 미승인 조치였다면 그건 그것대로 새로운 문제.
+  **판단할 수 없어서 판단하지 않음 — Chairman 확인 필요.**
+- `@SCIENCE_FACTS_JOURNAL` → title "Portuguese Survival" (`UCKvKhETLGPaRV3qfWv2bM2g`),
+  `@ClassicalJournal` → title "Vietnamese Survival" (`UCRZ0uc_bxKDMwz3noBBi9KQ`),
+  `@CLASSIC_READS_JOURNAL` → title "German Survival" (`UCKF98zgzm7YRWlyMaoJJKIQ`) —
+  **같은 패턴 반복**: 구 언어서바이벌 채널들의 handle이 새 archive 브랜드명으로 이미
+  바뀌어 있고 title만 안 바뀜. 의도된 대규모 채널 재활용 작업 중인 것으로 보이나
+  확정 아님. (science/myth/classic_reads는 애초에 OAuth 시크릿 자체가 없어서 — 10차
+  확인 — 지금 당장 업로드에 쓸 수도 없음. classical은 시크릿 있음.)
+- `NASA_SPACE_JOURNAL`, `HISTORY_TODAY_JOURNAL`, `MYTH_LEGEND_JOURNAL`,
+  `INVENTION_JOURNAL`, `SILENT_ERA_JOURNAL`, `RETRO_REELS_JOURNAL`은 handle로 조회
+  안 됨(존재하지 않거나 handle이 그 문자열이 아님) — Chairman이 본 계정선택 화면의
+  텍스트는 handle이 아니라 title이었을 가능성이 높음(예: NASA_XFILES 채널의 title이
+  화면엔 "NASA_SPACE_JOURNAL"로 보였을 수 있는데, 방금 조회한 @NASA_XFILES의 실제
+  title은 여전히 "NASA_XFILES"라 이것도 100% 맞진 않음 — 완전히 별개의 채널일
+  가능성도 있음).
+- **더 근본적인 위험 발견**: `French_Survival`, `FrenchSurvival`, `AMERICAN_ARCHIVE_JOURNAL`
+  세 개의 서로 다른 handle이 전부 title "French Survival"인 서로 다른 channel_id로
+  존재함(최소 3개). **"French Survival"이라는 이름 하나가 아니라 최소 3개 채널이 그
+  이름을 쓰고 있음** — `docs/YOUTUBE-CONNECTIONS.md`의 "브랜드 라벨은 채널 정체성이
+  아니다" 경고가 기존에 생각했던 것보다 훨씬 심각하다는 뜻(이름이 유일하지조차 않음).
+
+**하지 않은 것**: 이 정보들만으로 어떤 channel_id를 "확정"이라고 등록하지 않음 —
+특히 AMERICAN_ARCHIVE_TIMES는 정황상 유력하지만 여전히 추정이지 증명이 아님.
+Chairman에게 그대로 물어봄(다음 액션).
+
 ## 2026-09-27 (10차) — archive 채널 9개 신원 확인 시도: API로는 불가능함을 실측 확인
 
 **Chairman 요청**: "제대로 다른것들 매칭해줘.." — 8차(French Survival 오업로드) 이후
