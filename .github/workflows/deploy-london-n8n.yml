@@ -1,4 +1,4 @@
-name: Deploy London n8n
+﻿name: Deploy London n8n
 on:
   workflow_dispatch:
 permissions:
@@ -20,7 +20,7 @@ jobs:
             git -C "$ROOT" fetch origin main
             git -C "$ROOT" reset --hard origin/main
             mkdir -p "$ROOT/data/n8n"
-            chmod 700 "$ROOT/data/n8n"
+            chmod 700 "$ROOT/data/n8n"`n            chown -R 1000:1000 "$ROOT/data/n8n"
             if [ ! -f /etc/korea365/n8n.env ]; then
               umask 077
               ENC=$(openssl rand -hex 32)
@@ -43,3 +43,4 @@ jobs:
             docker exec korea365-n8n n8n import:workflow --input=/workflows/blogger33_master.json || true
             docker ps --filter name=korea365-n8n --format 'N8N={{.Status}}'
             systemctl is-active korea365-n8n-gateway.service
+
