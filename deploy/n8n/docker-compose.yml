@@ -18,4 +18,4 @@ services:
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
     volumes:
       - /opt/korea365/data/n8n:/home/node/.n8n
-      - /opt/korea365/deploy/n8n/workflows:/workflows:ro
+      - /opt/korea365/data/n8n-workflows:/workflows:ro
