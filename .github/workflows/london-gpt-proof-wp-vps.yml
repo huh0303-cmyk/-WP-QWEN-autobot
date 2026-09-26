@@ -1,0 +1,22 @@
+name: LondonProjectGPT WordPress VPS proof
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Run WP proof on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            git -C /opt/korea365 fetch origin main
+            git -C /opt/korea365 reset --hard origin/main
+            cd /opt/korea365
+            /opt/korea365/.venv/bin/python scripts/london_gpt_proof_wp.py
