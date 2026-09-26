@@ -110,3 +110,12 @@ Portuguese/German Survival)가 `@AMERICAN_ARCHIVE_JOURNAL`/`@ClassicalJournal`/
 - 앞으로 이 표에 없는 매핑 주장(다른 AI 트랙 포함)은 이 문서를 갱신하는 방식으로만
   반영한다 — 별도 리포/문서에 "따로 박제"하지 않는다. 소스가 여러 개면 그 자체가
   혼동의 원인이다.
+
+## 추가: Korean Survival 발견 (언어 10개 완성)
+
+Chairman 지적으로 찾음 — `@KoreanSurvival` → title "korean survival"
+(`UC4n-HHAED1mBKcU6x-Row2Q`), 구독자 0, 영상 0(빈 채널, 아직 안 씀). 이걸로 언어
+Survival 10개(한/영/일/중/독/불/이/서/포/베) 전부 확인 완료. TOPIK은 별도
+채널(공식 대학 채널, 언어 Survival 세트와 다름).
+
+**최종 총계: 25개** = 플리 5 + 지식 5 + 언어Survival 10 + TOPIK 1 + 건강 2(일본어/영어) + 쇼핑 2(1개는 미확정)
