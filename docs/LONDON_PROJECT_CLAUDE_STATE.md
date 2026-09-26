@@ -8,6 +8,61 @@
 평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
 최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
 
+## 2026-09-26 (7차) — 8개 채널 실시연(live proof), 실제 URL로 검증
+
+Chairman 요청("글 써지고 발행까지, 유튜브 비공개 업로드까지 시연해서 증명해줘 ..
+틱톡/페북/인스타/쓰레드까지 1개씩")에 실제로 응답. 추측/보고서 아님 — 전부
+GitHub Actions run id + 실제 URL로 확인함.
+
+### 성공 (3/8, 실제 URL 확보)
+
+| 채널 | 결과 | URL/증거 |
+|---|---|---|
+| WordPress | 초안 등록 성공 | https://k-health365.com/wp-admin/post.php?post=6435&action=edit (run 36237262302) |
+| Blogspot | 초안 등록 성공 | https://www.blogger.com/blog/post/edit/5345010194652095946/5129134516045344070 (run 36237396610) |
+| YouTube | 비공개 업로드 성공 | https://studio.youtube.com/video/cShePd9rQvY/edit (run 36237551322, AMERICAN_ARCHIVE_TIMES) |
+
+### 과정에서 발견하고 고친 실제 버그 2건
+
+1. `scripts/wp_create_draft.py` — 태그 생성 하나가 403(호스팅 WAF 추정)으로 막히면
+   초안 등록 전체가 죽는 구조였음. `create_manual_wp_draft.py`(실제 운영 스크립트)는
+   이미 이 예외를 흡수하고 있었는데 이 스크립트만 안 그랬음. try/except로 맞춤(커밋
+   `ec5c3b9`). k-trip365.com·koreamedicaltour.com 둘 다 /wp-json/wp/v2/tags 및 심지어
+   POST /posts까지 403 — 이 두 사이트는 지금 이 러너 IP에서 쓰기 자체가 막혀 있는
+   것으로 보임(9차 감사에서 나온 WAF 패턴과 동일 계열). k-health365.com으로 바꿔서
+   최종 성공.
+2. `scripts/publish_blogger_33_now.py`(레거시 "33개 한번에" 스크립트)는 GitHub
+   environment `blogger`에 스코프된 GEMINI_API_KEY가 무효화돼 있어 100% 실패였음.
+   **단, 실제 매일 운영 중인 `blogger-rewrite.yml`(→`queue_blogger_rewrite.py`)은
+   같은 이름의 저장소 레벨 시크릿을 쓰고 정상 작동함을 확인** — 처음엔 "블로그스팟
+   전체 발행이 깨졌다"고 과장 보고했는데, 조사해보니 레거시 스크립트 하나만의
+   문제였음(정정). `publish-blogger-33-now.yml`에 안전한 1사이트 draft-mode 옵션도
+   추가함(커밋 `19f56be`) — 이 파일 자체가 push 트리거 대상이라 편집 커밋이 실수로
+   전체 33개 라이브 발행을 트리거할 뻔했음(다행히 그 broken key 때문에 전부 실패해서
+   실피해 없음) — 이후 세션은 이 push-트리거 워크플로우 파일 수정 시 항상 주의.
+
+### 막힘 (5/8, 원인 확인·정직 보고, 억지로 안 함)
+
+| 채널 | 상태 | 이유 |
+|---|---|---|
+| 네이버블로그 | 불가 | `naver_blog_local_runner.py`가 "persistent Playwright 로그인 세션"을 요구 — VPS/로컬 전용, GitHub Actions에서 실행 불가. 이 세션은 사용자 Chrome도 연결 안 되어 있음(tabs_context_mcp 시도 → "Browser extension is not connected"). |
+| 티스토리 | 불가 | 동일(`tistory_local_adapter.py`). `tistory-daily-plan.yml`은 큐에 "예약"만 하지 실제 발행은 안 함. |
+| TikTok | 불가 | `ceo-sns-probe.yml`(read-only) 실측: TOPIK 계정만 공개 프로필 스크래핑으로 팔로워 수 조회 가능(30,900) — 이건 읽기 전용이고 쓰기 토큰 존재 여부 불명. ENGLISH/LANGUAGE 계정은 아예 미설정. |
+| Facebook | 불가 | 위 감사에서 TOPIK/ENGLISH/LANGUAGE 3개 브랜드 전부 FB_PAGE_ID/FB_PAGE_ACCESS_TOKEN 자체가 없음(계정 미설정) — 발행 스크립트도 저장소에 없음. |
+| Instagram | 불가 | TOPIK 브랜드만 공식 API 읽기 접근 확인(팔로워 3,561) — 그러나 저장소 전체에 Instagram 발행/게시 스크립트가 아예 존재하지 않음(`find`로 확인). ENGLISH/LANGUAGE는 계정 미설정. |
+| Threads | 불가 | 3개 브랜드 전부 THREADS_USER_ID/ACCESS_TOKEN 자체가 없음. |
+
+**결론**: 런던프로젝트GPT의 `docs/GPT_CONTINUITY_HANDOFF_2026-09-25.md`가 이미 "TikTok,
+Instagram, Facebook, Threads는 검증된 운영 쓰기 자격증명이 VPS 런타임에 없다"고 밝혀둔
+것과 이번 실측이 정확히 일치함. 지어낸 제약이 아니라 재확인된 것.
+
+### 새로 추가한 파일 (1회성 수동 실행기, 정기 스케줄러 아님)
+
+`.github/workflows/one-off-archive-channel-upload-demo.yml` — 기존에 존재했지만 어떤
+워크플로우도 연결 안 돼 있던 `scripts/archive_channel_upload.py`(완성 폴더의 영상을
+유튜브 비공개로 업로드)를 실행 가능하게 함. workflow_dispatch만 있고 스케줄 없음 —
+"중복 스케줄러 금지" 원칙과 충돌 안 함.
+
 ---
 
 ## 2026-09-26 (6차) — 최종 아키텍처/평가 문서 박제, n8n 배포 성공 확인, 타 트랙 현황 확인
