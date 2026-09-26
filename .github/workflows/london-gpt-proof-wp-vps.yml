@@ -1,6 +1,10 @@
 name: LondonProjectGPT WordPress VPS proof
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/london-gpt-proof-wp-vps.yml'
 permissions:
   contents: read
 jobs:
