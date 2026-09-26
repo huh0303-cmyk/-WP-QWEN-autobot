@@ -8,7 +8,21 @@
 
 ---
 
-## 2026-09-26 — 개설 세션 (Claude Sonnet 5)
+## 2026-09-26 (2차) — APPROVED_GROUP 모순 해소 (Chairman 확인)
+
+Chairman이 직접 확인: **애드센스 승인은 k-health365.com 1개뿐**이다.
+`scripts/audit_adsense_sites.py`의 `APPROVED_GROUP`에 잘못 들어 있던 6개
+(koreataxnlaw.com, jobkoreaglobal.com, studyinkorea365.com, korea365.org,
+sis-korea.com, krealestate365.com)를 제거하고 k-health365.com만 남김. 커밋함.
+이 6개 사이트도 **24개 미승인 타깃에 포함**된 것으로 확정 — 아래 부록 목록은
+이미 24개로 맞게 정리돼 있었으므로 추가 수정 없음.
+
+이 상수는 리포트 라벨용일 뿐 ads.txt/DNS 실제 감사 로직에는 영향을 주지 않았으므로,
+지금까지 나온 감사 결과의 FAIL/WARN/OK 판정 자체는 이 오류로 왜곡되지 않았다.
+
+---
+
+## 2026-09-26 (1차) — 개설 세션 (Claude Sonnet 5)
 
 ### Chairman 지시 원문 요지
 - "런던프로젝트클로드" 이름으로 완전 독립 트랙 운영
@@ -48,16 +62,9 @@
   `DOMAINS` 목록 26개에 **kskin365.com이 빠져 있었음** — `site_registry.py`
   정본에는 27개로 있는데 이 감사 도구에서는 한 번도 감사된 적이 없었다는 뜻.
   **이번 세션에서 목록에 추가함 (코드 수정, 커밋 대상).**
-- **미해결 모순 — Chairman 확인 필요**: `audit_adsense_sites.py`의
-  `APPROVED_GROUP` 상수에는 `koreataxnlaw.com, jobkoreaglobal.com,
-  studyinkorea365.com, korea365.org, sis-korea.com, krealestate365.com,
-  k-health365.com` **7개**가 "승인됨"으로 하드코딩돼 있다. 이는 Chairman이
-  이번에 말한 "현재 1개(k-health365.com)만 승인"과 정면으로 다르다.
-  **둘 중 하나가 최신 정보고 하나는 과거 기준(오래된 신청/보류/재심사 등)일
-  가능성이 있는데, 이 세션은 어느 쪽이 맞는지 판단할 근거가 없어서 임의로
-  고치지 않았다.** 다음 세션 또는 Chairman이 실제 애드센스 계정 화면에서
-  27개 사이트 각각의 현재 승인 상태를 확인해서 알려줘야 `APPROVED_GROUP`
-  상수와 이 STATE 문서를 정확하게 갱신할 수 있다.
+- **모순 발견 → 해소됨 (위 2026-09-26 (2차) 항목 참고)**: `audit_adsense_sites.py`의
+  `APPROVED_GROUP`에 7개가 "승인됨"으로 잘못 하드코딩돼 있던 것을 Chairman이
+  "k-health365.com 1개뿐"이라고 직접 확인해줘서 정정 완료.
 
 ### 이번 세션에서 실제로 변경·추가한 것 (커밋 대상)
 
@@ -94,8 +101,8 @@
 3. GitHub Actions → `Ensure required AdSense pages (27 sites)` 수동 트리거 →
    `ensure_required_pages_results.txt` 아티팩트로 어떤 사이트에 어떤 페이지가
    신규 생성됐는지 확인.
-4. Chairman에게 APPROVED_GROUP 7개 사이트 실제 승인 상태 재확인 요청, 답변
-   받으면 `audit_adsense_sites.py`의 `APPROVED_GROUP`과 이 STATE 문서 갱신.
+4. ~~Chairman에게 APPROVED_GROUP 재확인~~ → 완료 (2026-09-26 (2차)): 승인은
+   k-health365.com 1개뿐으로 확정, 코드 정정 커밋됨.
 5. 두 감사 결과를 종합해 "24개 중 몇 개가 요건 충족, 몇 개가 뭐가 부족한지"
    표로 이 STATE 문서에 기록.
 6. 이 STATE 문서 맨 위에 새 날짜 섹션 추가해서 기록 이어가기.

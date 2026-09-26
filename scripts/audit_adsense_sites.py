@@ -32,8 +32,12 @@ DOMAINS = [
     "kskin365.com",
 ]
 APPROVED_GROUP = {
-    "koreataxnlaw.com", "jobkoreaglobal.com", "studyinkorea365.com",
-    "korea365.org", "sis-korea.com", "krealestate365.com", "k-health365.com",
+    # 2026-09-26 Chairman 직접 확인: 애드센스 승인은 k-health365.com 1개뿐이다.
+    # 이전 값(koreataxnlaw.com/jobkoreaglobal.com/studyinkorea365.com/
+    # korea365.org/sis-korea.com/krealestate365.com까지 7개를 "승인"으로 표기)은
+    # 틀렸다 — 언제부터 틀렸는지, 과거 신청/보류 상태를 잘못 기록한 것인지는
+    # 불명. 리포팅용 라벨일 뿐 감사 로직(ads.txt/DNS 등)에는 영향 없음.
+    "k-health365.com",
 }
 UA = "Mozilla/5.0 (compatible; AdsTxtReadOnlyAudit/1.0; +https://github.com/huh0303-cmyk/-WP-QWEN-autobot)"
 
