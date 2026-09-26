@@ -34,6 +34,12 @@ CANDIDATES = [
     "AMERICAN_ARCHIVE_TIMES", "SILENT_ERA_TIMES", "RETRO_REELS_TIMES", "CLASSIC_READS_TIMES",
     # 8차 사고에서 이미 확인된 실제 채널(교차검증용 baseline)
     "French_Survival", "FrenchSurvival",
+    # 2026-09-27 "LondonProject_Gemini"가 주장한 매핑 교차검증용 (Chairman이 그대로
+    # 붙여넣어 전달함 — 실제 API로 확인 안 하면 신뢰 불가, 검증 없이 받아들이지 않는다)
+    "Studio_k3", "kpop_studio7", "cafe_romantic", "cafe_healing1", "Starbucksvibes", "cafe_mozart",
+    "SIS_GermanSurvival", "SIS_FrenchSurvival", "SIS_ItalianSurvival", "SIS_VietnameseSurvival",
+    "SIS_SpanishSurvival", "SIS_ChineseSurvival", "Portuguese_survival", "English_survival",
+    "seoul_japanese", "sis_languagecenter",
 ]
 
 
