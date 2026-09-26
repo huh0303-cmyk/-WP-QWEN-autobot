@@ -1,0 +1,42 @@
+name: n8n VPS preflight
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect VPS runtime
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            echo "===HOST==="
+            hostname
+            echo "===OS==="
+            . /etc/os-release && echo "$PRETTY_NAME"
+            echo "===NODE==="
+            command -v node || true
+            node --version 2>/dev/null || true
+            echo "===NPM==="
+            command -v npm || true
+            npm --version 2>/dev/null || true
+            echo "===N8N==="
+            command -v n8n || true
+            n8n --version 2>/dev/null || true
+            echo "===DOCKER==="
+            command -v docker || true
+            docker --version 2>/dev/null || true
+            echo "===SERVICES==="
+            systemctl list-unit-files | grep -E 'korea365|n8n' || true
+            echo "===DISK==="
+            df -h / /opt 2>/dev/null || true
+            echo "===MEMORY==="
+            free -h || true
+            echo "===REPO==="
+            test -d /opt/korea365 && git -C /opt/korea365 rev-parse --short HEAD || true
