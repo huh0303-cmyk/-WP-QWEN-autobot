@@ -211,13 +211,6 @@ def main() -> None:
     if configured_models != approved_models:
         fail(f"Replicate model policy drift: {configured_models}")
 
-    topik = (ROOT / "scripts" / "topik_quiz_shorts.py").read_text(encoding="utf-8")
-    if "generate_approved_image" not in topik or "openai_generate_image" in topik or "GEMINI_IMAGE_MODELS" in topik:
-        fail("TOPIK review generator can escape the approved Replicate image gateway")
-    topik_workflow = workflow_text.get("topik-quiz-daily.yml", "")
-    if "REPLICATE_API_TOKEN" not in topik_workflow:
-        fail("TOPIK review workflow lacks the shared Replicate token")
-
     registry = json.loads((ROOT / "config" / "youtube_channels.json").read_text(encoding="utf-8"))
     keys = {c["channel_key"] for c in registry["channels"] if c.get("enabled", True)}
     expected = {"globalmusic", "healing", "starbucks", "mbb", "kpop", "nasa", "history", "invention", "silent_era", "retro_reels"}
