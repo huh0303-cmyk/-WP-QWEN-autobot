@@ -11,3 +11,10 @@
 - Naver/Tistory: owner login when needed, then session reuse; no repeated credential entry.
 - Completion requires Verify stage and saved receipt.
 - Never mark login-only, code-only, or queued-only work as complete.
+
+
+## 2026-09-27 YouTube canonical identity rule
+- Exact production identity is the triple: current channel title + current @handle + exact UC channel ID.
+- Google/Brand account selection labels such as Studio_K3, Chinese Survival, K-ISSUE, K-RELAX, Spanish Survival, Arabic Survival, and *_TIMES names are selector/history aliases only.
+- Never route uploads by legacy selector label alone.
+- `config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json` supersedes old 10-channel-only and legacy archive mappings for LondonProjectGPT routing.
