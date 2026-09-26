@@ -1,4 +1,4 @@
-﻿name: Deploy London n8n
+name: Deploy London n8n
 on:
   workflow_dispatch:
 permissions:
@@ -20,12 +20,24 @@ jobs:
             git -C "$ROOT" fetch origin main
             git -C "$ROOT" reset --hard origin/main
             mkdir -p "$ROOT/data/n8n"
-            chmod 700 "$ROOT/data/n8n"`n            chown -R 1000:1000 "$ROOT/data/n8n"
+            chown -R 1000:1000 "$ROOT/data/n8n"
+            chmod 700 "$ROOT/data/n8n"
             if [ ! -f /etc/korea365/n8n.env ]; then
               umask 077
               ENC=$(openssl rand -hex 32)
               GATE=$(openssl rand -hex 32)
-              printf '%s\n'                 'TZ=Asia/Seoul'                 'GENERIC_TIMEZONE=Asia/Seoul'                 'N8N_PORT=5678'                 'N8N_LISTEN_ADDRESS=127.0.0.1'                 'N8N_DIAGNOSTICS_ENABLED=false'                 'N8N_PERSONALIZATION_ENABLED=false'                 'N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true'                 'N8N_RUNNERS_ENABLED=true'                 'N8N_BLOCK_ENV_ACCESS_IN_NODE=false'                 "N8N_ENCRYPTION_KEY=$ENC"                 "N8N_GATEWAY_TOKEN=$GATE" > /etc/korea365/n8n.env
+              printf '%s\n' \
+                'TZ=Asia/Seoul' \
+                'GENERIC_TIMEZONE=Asia/Seoul' \
+                'N8N_PORT=5678' \
+                'N8N_LISTEN_ADDRESS=127.0.0.1' \
+                'N8N_DIAGNOSTICS_ENABLED=false' \
+                'N8N_PERSONALIZATION_ENABLED=false' \
+                'N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true' \
+                'N8N_RUNNERS_ENABLED=true' \
+                'N8N_BLOCK_ENV_ACCESS_IN_NODE=false' \
+                "N8N_ENCRYPTION_KEY=$ENC" \
+                "N8N_GATEWAY_TOKEN=$GATE" > /etc/korea365/n8n.env
             fi
             install -m 644 "$ROOT/deploy/systemd/korea365-n8n-gateway.service" /etc/systemd/system/korea365-n8n-gateway.service
             systemctl daemon-reload
@@ -34,13 +46,14 @@ jobs:
             docker compose pull
             docker compose up -d
             for i in $(seq 1 40); do
-              if curl -fsS http://127.0.0.1:5678/healthz >/dev/null 2>&1; then break; fi
+              if curl -fsS http://127.0.0.1:5678/healthz >/dev/null 2>&1; then
+                break
+              fi
               sleep 2
             done
             curl -fsS http://127.0.0.1:5678/healthz
             curl -fsS http://127.0.0.1:8766/health
-            docker exec korea365-n8n n8n import:workflow --input=/workflows/wp25_master.json || true
-            docker exec korea365-n8n n8n import:workflow --input=/workflows/blogger33_master.json || true
+            docker exec korea365-n8n n8n import:workflow --input=/workflows/wp25_master.json
+            docker exec korea365-n8n n8n import:workflow --input=/workflows/blogger33_master.json
             docker ps --filter name=korea365-n8n --format 'N8N={{.Status}}'
             systemctl is-active korea365-n8n-gateway.service
-
