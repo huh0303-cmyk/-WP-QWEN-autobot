@@ -1,0 +1,84 @@
+name: LondonProjectGPT proof batch
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  wordpress:
+    runs-on: ubuntu-latest
+    environment: blogger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - name: Publish WordPress proof
+        env:
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+        run: |
+          sudo mkdir -p /etc/korea365
+          python - <<'PY'
+          import json,os
+          open('/tmp/wp-sites.json','w').write(json.dumps({'KSTUDY365COM':os.environ['KSTUDY365COM']}))
+          PY
+          VPS_WP_CREDENTIALS=/tmp/wp-sites.json python scripts/london_gpt_proof_wp.py | tee wp-proof.json
+      - uses: actions/upload-artifact@v4
+        with: {name: london-gpt-wp-proof, path: wp-proof.json, retention-days: 30}
+
+  blogger:
+    runs-on: ubuntu-latest
+    environment: blogger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - name: Publish Blogger proof
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/london_gpt_proof_blogger.py
+      - uses: actions/upload-artifact@v4
+        with: {name: london-gpt-blogger-proof, path: artifacts/london-gpt-blogger-proof.json, retention-days: 30}
+
+  social:
+    runs-on: ubuntu-latest
+    environment: google-metrics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - name: Publish Instagram and Facebook proof
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: python scripts/london_gpt_proof_social.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: london-gpt-social-proof, path: artifacts/london-gpt-social-proof.json, retention-days: 30}
+
+  youtube:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg >/dev/null
+          pip install google-api-python-client google-auth -q
+      - name: Upload private YouTube proof
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+        run: python scripts/london_gpt_proof_youtube.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: london-gpt-youtube-proof, path: artifacts/london-gpt-youtube-proof/receipt.json, retention-days: 30}
