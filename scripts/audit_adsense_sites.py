@@ -26,6 +26,10 @@ DOMAINS = [
     "kieca-korea.org", "ki-korea.com", "ksa-korea.org", "koreataxnlaw.com",
     "jobkoreaglobal.com", "studyinkorea365.com", "korea365.org", "sis-korea.com",
     "krealestate365.com", "k-health365.com",
+    # 2026-09-26 런던프로젝트클로드: kskin365.com이 site_registry.py의
+    # 27-site 정본 목록에는 있는데 이 감사 목록에서 빠져 있었다 — 실제로 감사된
+    # 적 없이 27개 중 하나로 취급됐을 위험이 있어 추가한다. 이제 27개 전체.
+    "kskin365.com",
 ]
 APPROVED_GROUP = {
     "koreataxnlaw.com", "jobkoreaglobal.com", "studyinkorea365.com",

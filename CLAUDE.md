@@ -10,6 +10,7 @@ Before any work, read:
 5. `config/london_activity_policy.json`
 6. `docs/LONDON_PROJECT_ACTIVITY_LEDGER.md`
 7. `docs/GITHUB_OPERATION_RECORD_POLICY_2026-09-25.md`
+8. `docs/LONDON_PROJECT_CLAUDE_STATE.md` — 런던프로젝트클로드 (AdSense 승인 서브트랙) 최신 상태. 이 파일부터 읽고 이어서 진행한다. 헌장은 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md`.
 
 ## Command hierarchy
 
