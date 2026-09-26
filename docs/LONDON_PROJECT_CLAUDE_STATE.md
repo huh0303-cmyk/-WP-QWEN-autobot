@@ -8,6 +8,38 @@
 평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
 최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
 
+## 2026-09-26 (8차) — 사고: 유튜브 시연 업로드가 엉뚱한 채널("French Survival")로 감
+
+**Chairman이 직접 스크린샷으로 발견.** 7차에서 "성공"으로 보고한 AMERICAN_ARCHIVE_TIMES
+비공개 업로드(video cShePd9rQvY, 1946년 미국 철도파업 아카이브 영상)가 실제로는
+**"French Survival" 채널(10개국어 서바이벌 프로젝트의 잠금 채널 중 하나)**에 올라갔음.
+
+**원인(추측 아니고 코드로 확인)**: `YOUTUBE_OAUTH_REFRESH_TOKEN_AMERICAN_ARCHIVE_TIMES`
+시크릿이 실제로는 "French Survival"로 브랜딩된 채널을 인증하고 있었음.
+`docs/YOUTUBE-CONNECTIONS.md`에 이미 "Chinese Survival이 CAFE_STARBUCKSVIBES로
+연결됨 — 브랜드 라벨은 채널 정체성이 아니다"라고 경고돼 있던 것과 정확히 같은 패턴.
+`scripts/curio_upload.py`는 `automation_hub.youtube_identity.verify_authenticated_channel`로
+이런 불일치를 막고 있었는데, 내가 이번에 되살린 `scripts/archive_channel_upload.py`
+(어떤 워크플로우도 연결 안 돼 있던 고아 스크립트)는 이 검증이 아예 없었음 — 그래서
+아무 경고 없이 잘못된 채널에 업로드됨. `automation_hub/youtube_registry.py`에는
+이 archive 채널들(AMERICAN_ARCHIVE_TIMES 등) 항목 자체가 없어서 기존 검증 함수를
+그대로 재사용할 수도 없었음.
+
+**즉시 조치**:
+- 비공개 업로드라 외부 노출은 없음 — 피해는 제한적.
+- `scripts/archive_channel_upload.py`를 fail-closed로 수정(커밋 `35e1f32`): 이제
+  `EXPECTED_YOUTUBE_CHANNEL_ID_<CHANNEL_KEY>` 시크릿이 명시적으로 설정되어 실제
+  인증된 채널 ID와 일치하지 않으면 무조건 업로드 거부. AMERICAN_ARCHIVE_TIMES를
+  포함해 이 스크립트의 모든 channel_key는 사람이 실제 채널 ID를 확인해서 그
+  시크릿을 등록하기 전까지 다시는 업로드 못 함.
+- 잘못 올라간 영상 자체는 이 세션(AI)이 직접 삭제하지 않음(데이터 영구삭제는
+  금지 행동) — Chairman이 YouTube Studio에서 직접 삭제해야 함.
+
+**교훈**: "워크플로우가 없어서 고아 상태였던 스크립트"를 되살릴 때는 왜 연결이 안
+됐는지(혹시 이미 알려진 문제 때문에 일부러 안 붙인 건 아닌지) 먼저 확인했어야 함 —
+이번엔 안 했고, 그 결과가 이 사고다. 다음에 비슷하게 "연결 안 된 기존 스크립트"를
+쓰려면 이 사고를 먼저 참고할 것.
+
 ## 2026-09-26 (7차) — 8개 채널 실시연(live proof), 실제 URL로 검증
 
 Chairman 요청("글 써지고 발행까지, 유튜브 비공개 업로드까지 시연해서 증명해줘 ..
