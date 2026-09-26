@@ -26,21 +26,34 @@ def log(msg):
 
 
 def get_or_create_tag(site, name, auth):
-    r = requests.get(f"{site}/wp-json/wp/v2/tags", auth=auth,
-                      params={"search": name, "per_page": 10}, timeout=20)
-    r.raise_for_status()
-    for t in r.json():
-        if t["name"].strip().lower() == name.strip().lower():
-            return t["id"]
-    r = requests.post(f"{site}/wp-json/wp/v2/tags", auth=auth,
-                       json={"name": name}, timeout=20)
-    r.raise_for_status()
-    return r.json()["id"]
+    """태그 확보 실패(호스팅 WAF가 /tags 엔드포인트만 403으로 막는 경우 등)는
+    초안 등록 자체를 막지 않는다 — 2026-09-26 수정. create_manual_wp_draft.py의
+    resolve_tag_ids()가 이미 같은 방식으로 예외를 흡수하고 있어 그 패턴을 맞췄다.
+    실제로 koreamedicaltour.com/k-trip365.com 두 곳에서 GET /tags 자체가 403으로
+    막혀 있는 걸 이 세션에서 실측 확인함 — 사이트 개별 문제가 아니라 이 스크립트가
+    바깥 실패를 통째로 죽이는 구조였던 것."""
+    try:
+        r = requests.get(f"{site}/wp-json/wp/v2/tags", auth=auth,
+                          params={"search": name, "per_page": 10}, timeout=20)
+        r.raise_for_status()
+        for t in r.json():
+            if t["name"].strip().lower() == name.strip().lower():
+                return t["id"]
+        r = requests.post(f"{site}/wp-json/wp/v2/tags", auth=auth,
+                           json={"name": name}, timeout=20)
+        r.raise_for_status()
+        return r.json()["id"]
+    except Exception as exc:
+        log(f"   ⚠️ 태그 '{name}' 처리 실패(건너뜀): {exc}")
+        return None
 
 
 def markdown_headings_to_html(text):
-    """## / ### 마크다운 헤딩만 최소 변환 (Gem 출력이 마크다운이라 WP 블록에 그대로
-    넣으면 ##이 텍스트로 보임 — 워드프레스 클래식 에디터 기준 <h2>/<h3>로 치환)."""
+    """## / ### 마크다운 헤딩만 최소 변환 (Gem 출력이 마크다운이라 워드프레스 블록에 그대로
+    넣으면 ##이 텍스트로 보임 — 워드프레스 클래식 에디터 기준 <h2>/<h3>로 치환).
+    입력 줄이 이미 HTML 태그로 시작하면 그대로 통과시킨다 — 2026-09-26 수정:
+    이전엔 이미-HTML인 줄도 다시 <p>...</p>로 한 번 더 감싸서 <p><h2>...</h2></p>
+    같은 중첩 마크업이 생겼었다."""
     lines = text.split("\n")
     out = []
     for line in lines:
@@ -51,6 +64,8 @@ def markdown_headings_to_html(text):
             out.append(f"<h2>{stripped[3:]}</h2>")
         elif stripped.startswith("- "):
             out.append(f"<li>{stripped[2:]}</li>")
+        elif stripped.startswith("<"):
+            out.append(stripped)
         elif stripped:
             out.append(f"<p>{stripped}</p>")
     return "\n".join(out)
@@ -73,8 +88,8 @@ def main():
     body_html = markdown_headings_to_html(body_raw)
 
     tag_names = [t.strip() for t in tags_raw.split(",") if t.strip()]
-    tag_ids = [get_or_create_tag(site, name, auth) for name in tag_names]
-    log(f"   태그 {len(tag_ids)}개 확보")
+    tag_ids = [tid for tid in (get_or_create_tag(site, name, auth) for name in tag_names) if tid is not None]
+    log(f"   태그 {len(tag_ids)}/{len(tag_names)}개 확보")
 
     payload = {
         "title": title,
