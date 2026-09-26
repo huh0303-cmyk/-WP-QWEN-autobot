@@ -1,1 +1,1 @@
-{"day": "2026-09-13", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-13-blogger_koreamedicaltour1-a960bc1f", "claimed_at": "2026-09-13T15:33:50.527290+09:00", "run_id": null, "child_run_id": null, "workflow": "platform-publish-v2.yml", "child_job_id": "blogger-9d00bd16c470841c5860"}
+{"day": "2026-09-26", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-26-blogger_koreamedicaltour1-141d9d28", "claimed_at": "2026-09-26T23:26:36.514236+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
