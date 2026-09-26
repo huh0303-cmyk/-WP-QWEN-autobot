@@ -35,13 +35,17 @@ Updated: 2026-09-26 KST
 - Proof run: GitHub Actions 36237092859
 - Public release: NOT ALLOWED by this proof job
 
-## 아직 증명 필요
-
 ### WordPress
-- First GitHub-runner proof attempt: blocked by HTTP 403.
-- VPS proof attempt: TLS connection reset.
-- Correction applied: proof script now matches production worker's IPv4-only network path.
-- Final public URL receipt: still required.
+- Status: VERIFIED_PUBLIC
+- Site: kstudy365.com
+- Post ID: 1372
+- URL: https://kstudy365.com/topik-study-plan-a-7-day-routine-before-applying-to-a-korean-university/
+- Title: TOPIK Study Plan: A 7-Day Routine Before Applying to a Korean University
+- Final proof run: GitHub Actions 36237917097
+- Path: GitHub deploy control -> Hostinger VPS -> IPv4 WordPress REST
+- Earlier GitHub-runner HTTP 403 and VPS TLS-reset attempts are retained as failure evidence.
+
+## 아직 증명 필요
 
 ### Naver Blog
 - Owner reports login completed.
