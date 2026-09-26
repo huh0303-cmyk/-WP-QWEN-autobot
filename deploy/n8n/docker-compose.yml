@@ -17,4 +17,4 @@ services:
       - N8N_RUNNERS_ENABLED=true
     volumes:
       - /opt/korea365/data/n8n:/home/node/.n8n
-      - /opt/korea365/n8n/workflows:/workflows:ro
+      - /opt/korea365/deploy/n8n/workflows:/workflows:ro
