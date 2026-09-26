@@ -8,6 +8,22 @@ name: Ensure required AdSense pages (27 sites) · 런던프로젝트클로드
 
 on:
   workflow_dispatch:
+    inputs:
+      only_sites:
+        description: 'Optional: comma-separated domains to limit this run to (e.g. kstudy365.com,ksa-korea.org). Leave blank for all 27.'
+        required: false
+        type: string
+        default: ""
+      site_gap_seconds:
+        description: 'Delay between sites (seconds). Raise this if a prior run hit connection resets (suspected shared-IP rate limit).'
+        required: false
+        type: string
+        default: "4"
+      page_gap_seconds:
+        description: 'Delay between page creations within a site (seconds).'
+        required: false
+        type: string
+        default: "1.5"
 
 permissions:
   contents: read
@@ -27,6 +43,9 @@ jobs:
       - run: pip install requests -q
       - name: Ensure About/Contact/Privacy/Disclaimer pages exist (create only if missing)
         env:
+          ONLY_SITES: ${{ inputs.only_sites }}
+          SITE_GAP_SECONDS: ${{ inputs.site_gap_seconds }}
+          PAGE_GAP_SECONDS: ${{ inputs.page_gap_seconds }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}

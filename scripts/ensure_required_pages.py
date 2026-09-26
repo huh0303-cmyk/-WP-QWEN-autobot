@@ -15,6 +15,19 @@ import requests
 WP_USER = "huh0303@gmail.com"
 CONTACT_EMAIL = "huh0303@gmail.com"
 
+# 2026-09-26 런던프로젝트클로드: run 36233910201에서 koreawedding365.com부터
+# theseouljournal.com까지 연속 9개 사이트가 전부 "Connection aborted / reset
+# by peer"로 막혔다. 여러 사이트가 같은 공유 호스팅 IP(151.106.124.169,
+# scripts/audit_adsense_sites.py 감사로 확인됨)를 쓰는데 짧은 시간에 여러
+# 사이트로 쓰기요청이 몰려서 호스팅단 WAF/레이트리밋이 그 IP를 막은 것으로
+# 추정된다. 재시도 시 부담을 줄이도록 딜레이를 env로 조절 가능하게 하고,
+# 이미 확인된 12개 사이트를 다시 두드리지 않도록 ONLY_SITES로 대상을 좁힐 수
+# 있게 한다. 페이지 생성/매칭 로직 자체는 건드리지 않는다.
+SITE_GAP_SECONDS = float(os.environ.get("SITE_GAP_SECONDS", "4"))
+PAGE_GAP_SECONDS = float(os.environ.get("PAGE_GAP_SECONDS", "1.5"))
+# 쉼표로 구분된 도메인 또는 wp_pass_env 이름 목록. 비어 있으면 27개 전체.
+ONLY_SITES = {s.strip().lower() for s in os.environ.get("ONLY_SITES", "").split(",") if s.strip()}
+
 SITES = [
     {"url": "https://k-health365.com",        "wp_pass_env": "KHEALTH365COM",        "lang": "ko", "theme": "건강 정보"},
     {"url": "https://koreamedicaltour.com",   "wp_pass_env": "KOREAMEDICALTOURCOM",  "lang": "en", "theme": "Korea Medical Tourism"},
@@ -184,6 +197,9 @@ def main():
 
     for site in SITES:
         url, lang, theme = site["url"], site["lang"], site["theme"]
+        domain = url.replace("https://", "").lower()
+        if ONLY_SITES and domain not in ONLY_SITES and site["wp_pass_env"].lower() not in ONLY_SITES:
+            continue
         wp_pass = os.getenv(site["wp_pass_env"], "")
         is_health = "health" in url
 
@@ -220,7 +236,7 @@ def main():
                 else:
                     log(f"   ❌ {page_type} 생성 실패 ({code}): {str(result)[:150]}")
                     total_error += 1
-                time.sleep(0.5)
+                time.sleep(PAGE_GAP_SECONDS)
         except Exception as e:
             # 2026-08-19: kskin365.com의 SSL 인증서 호스트네임 불일치처럼 사이트
             # 하나가 네트워크 레벨에서 완전히 막혀있으면 예외가 여기까지 올라오는데,
@@ -230,7 +246,7 @@ def main():
             log(f"   ❌ {url} 처리 중 오류(스킵하고 계속): {str(e)[:200]}")
             total_error += 1
 
-        time.sleep(0.5)
+        time.sleep(SITE_GAP_SECONDS)
 
     log("\n" + "=" * 60)
     log(f"✅ 완료 — 기존 확인 {total_ok}건 | 신규 생성 {total_created}건 | 오류 {total_error}건")
