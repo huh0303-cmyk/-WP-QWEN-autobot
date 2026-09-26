@@ -10,7 +10,7 @@ Before any work, read:
 5. `config/london_activity_policy.json`
 6. `docs/LONDON_PROJECT_ACTIVITY_LEDGER.md`
 7. `docs/GITHUB_OPERATION_RECORD_POLICY_2026-09-25.md`
-8. `docs/LONDON_PROJECT_CLAUDE_STATE.md` — 런던프로젝트클로드 (AdSense 승인 서브트랙) 최신 상태. 이 파일부터 읽고 이어서 진행한다. 헌장은 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md`.
+8. `docs/LONDON_PROJECT_CLAUDE_STATE.md` — 런던프로젝트클로드 (AdSense 승인 서브트랙) 최신 상태. 이 파일부터 읽고 이어서 진행한다. 헌장은 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md`, 운영 잠금은 `config/LONDON_PROJECT_CLAUDE_OWNER_LOCK_2026-09-26.md`. 같은 저장소를 병행 운영하는 "런던프로젝트GPT"(`config/LONDON_PROJECT_GPT_OWNER_LOCK_2026-09-26.md`)와는 별도 트랙이며, 겹치는 파일은 먼저 `git log`로 최근 변경자를 확인한다.
 
 ## Command hierarchy
 

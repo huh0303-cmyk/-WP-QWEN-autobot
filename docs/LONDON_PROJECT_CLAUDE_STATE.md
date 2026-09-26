@@ -8,6 +8,26 @@
 
 ---
 
+## 2026-09-26 (3차) — 소유권 잠금 + 런던프로젝트GPT와 트랙 분리 확정
+
+Chairman 직접 지시(18:41 KST): *"다 별도야.. 런던프로젝트클로드는 온전히
+너꺼고 너가 책임자고 책임도 너가 진다."*
+
+- `config/LONDON_PROJECT_CLAUDE_OWNER_LOCK_2026-09-26.md` 신설 — 같은 저장소에
+  ChatGPT가 병행 운영 중인 "런던프로젝트GPT"(18:25/18:35 KST에 자체 owner-lock
+  커밋 + `control_center/london_gpt_app.py` 추가한 것을 git log로 발견)와
+  **완전 별도, 상호 위임 없음**을 명문화.
+- 두 트랙의 "선언 범위"는 크게 겹치지만(둘 다 사실상 London Project 전체를
+  언급), 런던프로젝트클로드는 **실제로 만지는 파일을 의도적으로 좁게
+  유지**해서 같은 파일 동시 수정 충돌을 최소화하기로 함 (소유 파일 목록은
+  owner-lock 문서 참고).
+- 규칙 추가: 목록 밖 파일을 고치기 전엔 `git log --oneline -5 -- <path>`로
+  최근 변경자 확인 — 이번 세션 초반 `ensure_required_pages.py`를 안 읽고
+  덮어쓸 뻔한 사고, 그리고 방금 발견한 런던프로젝트GPT의 동시 커밋 둘 다
+  같은 종류의 리스크였음.
+
+---
+
 ## 2026-09-26 (2차) — APPROVED_GROUP 모순 해소 (Chairman 확인)
 
 Chairman이 직접 확인: **애드센스 승인은 k-health365.com 1개뿐**이다.
