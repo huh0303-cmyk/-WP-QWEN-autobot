@@ -1,0 +1,57 @@
+{
+  "project_name": "런던프로젝트GPT",
+  "project_id": "london-project-gpt",
+  "authority_path": "projects/런던프로젝트GPT",
+  "owner_ai": "GPT/OpenAI",
+  "timezone": "Asia/Seoul",
+  "principles": [
+    "simple",
+    "stable",
+    "no-new-cost",
+    "evidence-first",
+    "failure-isolation"
+  ],
+  "architecture": {
+    "source_of_truth": "GitHub",
+    "runtime": "Hostinger VPS",
+    "orchestrator": "n8n Community Edition",
+    "dashboard": "Control Korea365",
+    "local_browser_worker": "LondonLocalAgent",
+    "browser_surface": "Aside/Chrome"
+  },
+  "fleet": {
+    "wordpress": 25,
+    "newsrooms": 2,
+    "blogspot": 33,
+    "tistory": 5,
+    "naver": 3,
+    "youtube_groups": [
+      "playlist5",
+      "knowledge5",
+      "language_registry"
+    ],
+    "sns": [
+      "instagram",
+      "threads",
+      "facebook",
+      "tiktok"
+    ]
+  },
+  "production_rules": {
+    "make_com": false,
+    "new_paid_saas": false,
+    "one_workflow_per_site": false,
+    "completion_requires_runtime_receipt": true,
+    "captcha_bypass": false
+  },
+  "verified_runtime": {
+    "n8n_running": true,
+    "n8n_health": true,
+    "gateway_health": true,
+    "wp25_imported": true,
+    "blogger33_imported": true,
+    "deployment_run_id": 36234584029
+  },
+  "current_completion_percent": 55,
+  "completion_authority": "EVALUATION_CHECKLIST.md"
+}
