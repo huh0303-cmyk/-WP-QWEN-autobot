@@ -12,6 +12,15 @@ on:
         description: "Unique idempotency key"
         required: false
         type: string
+      site_key:
+        description: "단일 사이트 데모/재시도용 (예: ktrip365). 비우면 기존대로 33개 전체 대상."
+        required: false
+        type: string
+      draft_mode:
+        description: "true = 공개 발행 대신 검토용 비공개 초안만 생성 (수동 실행 기본값). 정기 자동 발행(push 트리거)은 이 값과 무관하게 항상 공개 발행 유지."
+        required: false
+        default: "true"
+        type: string
 
 permissions:
   contents: read
@@ -33,8 +42,13 @@ jobs:
       - run: pip install requests -q
       - name: Publish one independent article to each of 33 Blogger destinations
         env:
-          BLOGGER_REVIEW_DRAFT_MODE: "false"
+          # push 트리거(정기 자동 발행)는 workflow_dispatch inputs가 없으므로 항상 기존 그대로
+          # "false"(공개, 33개 전체)로 평가된다. 수동 dispatch일 때만 draft_mode(기본 true)로
+          # 전환 가능 — 2026-09-26 Chairman 요청으로 1개 사이트 안전 시연을 위해 추가.
+          BLOGGER_REVIEW_DRAFT_MODE: ${{ inputs.draft_mode || 'false' }}
+          BLOGGER_SITE_KEY: ${{ inputs.site_key || '' }}
           PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
+          REVIEW_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
