@@ -83,11 +83,19 @@ def four_metrics_html(row):
  def number(value,delta,unit):
   if value is None:return '미확인 (—)'
   return f'{value:,}{unit} ('+('비교자료 없음' if delta is None else f'{delta:+,}')+')'
- values=[('① 일일 방문자 수',number(row.get('yesterday_visitors'),row.get('visitor_delta'),'명'),'전날 기준 · 전전일 대비'),
- ('② 누적 방문자 수',number(row.get('cumulative_visitors'),row.get('cumulative_delta'),'명'),'전날 마감 · 전전일 마감 대비 · 자체 카운터'),
- ('③ 발행 글 수',number(row.get('published_total'),row.get('published_delta'),'건'),'현재 공개 글 · 전날 마지막 집계 대비'),
- ('④ 구글 색인 글 수 · GSC',index_label(row),'GSC 확인일: '+str(row.get('index_checked_at') or '미확인'))]
- return '<div class="four-metrics" style="display:grid;grid-template-columns:1fr;gap:8px;margin:14px 0">'+''.join('<div style="background:#eef4ff;border:1px solid #c8d8f4;border-radius:9px;padding:10px"><b>'+esc(label)+'</b><div style="font-size:23px;font-weight:850">'+esc(value)+'</div><small style="color:#68788c">'+esc(note)+'</small></div>' for label,value,note in values)+'</div>'
+ values=[
+  ('① 전날 일일 방문자',number(row.get('yesterday_visitors'),row.get('visitor_delta'),'명'),'전날 실적 · 전전일 대비',False),
+  ('② 누적 방문자',number(row.get('cumulative_visitors'),row.get('cumulative_delta'),'명'),'전날 마감 · 자체 카운터',False),
+  ('③ 총 공개 글',number(row.get('published_total'),row.get('published_delta'),'건'),'현재 공개 글 · 직전 집계 대비',False),
+  ('④ Google 색인 글',index_label(row),'GSC 확인일: '+str(row.get('index_checked_at') or '미확인'),True),
+ ]
+ cards=[]
+ for label,value,note,important in values:
+  border='#2563eb' if important else '#c8d8f4'
+  bg='#eff6ff' if important else '#ffffff'
+  weight='950' if important else '900'
+  cards.append('<div style="background:'+bg+';border:2px solid '+border+';border-radius:12px;padding:12px;min-height:92px"><b style="font-size:13px">'+esc(label)+'</b><div style="font-size:27px;font-weight:'+weight+';line-height:1.25;margin-top:4px">'+esc(value)+'</div><small style="color:#64748b">'+esc(note)+'</small></div>')
+ return '<div class="four-metrics" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0">'+''.join(cards)+'</div>'
 
 def index_label(row):
  v=row.get('indexed');d=row.get('index_delta')
@@ -182,18 +190,15 @@ def board():
   group=sorted_cards([r for r in data['sites'] if r['kind']==kind]);cards=[]
   complete=sum(r['today'] is not None and r['today'] >= (3 if kind=='신문사' else 1) for r in group)
   published=sum(r['today'] or 0 for r in group)
-  last=None;rank=0
   for i,r in enumerate(group,1):
    count=r.get('yesterday_visitors')
-   if count is not None:
-    if count!=last:rank=i
-    badge=f'{rank}위';last=count
-   else:badge='순위 미확인'
+   rank=i if count is not None else None
+   badge=f'{rank}위' if rank is not None else '순위 미확인'
    visible_categories=clean_category_labels(r.get('categories',[]),r.get('theme') or fallback_by_site.get(r.get('site',''),'') )
    next_step=r['next']
    if kind=='WP' and r['today']:next_step='오늘 발행 완료 · 다음날 무료 자동작성 복구 확인 필요'
    cards.append('<article data-card-site="'+esc(r['site'])+'" style="background:white;border:1px solid #cbd5e1;border-top:5px solid '+accent+';border-radius:14px;padding:18px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div aria-label="방문자 순위" style="min-width:68px;padding:12px 8px;background:'+accent+';color:white;border-radius:12px;font-size:36px;font-weight:900;line-height:1.1;text-align:center">'+(str(rank)+'<span style="font-size:15px">위</span>' if count is not None else '<span style="font-size:16px">미확인</span>')+'</div><a style="font-weight:bold;color:#0369a1" href="'+esc(r['url'])+'" target="_blank" rel="noopener">'+esc(r['site'])+'</a></div><p style="font-size:12px;color:#64748b">카테고리</p><p style="font-size:23px;line-height:1.35;font-weight:800;color:'+accent+';background:'+tint+';border-radius:10px;padding:12px;margin:4px 0 16px">'+esc(' · '.join(visible_categories) or '분류 정보 확인 중')+'</p>'+four_metrics_html(r)+'<hr style="margin:12px 0"><p>오늘 발행 <b>'+('미확인' if r['today'] is None else str(r['today'])+'건')+'</b> / 목표 '+r['target']+'</p><p>'+esc(r['status'])+'</p><p style="font-size:12px">'+esc(next_step)+'</p>'+('<p style="font-size:12px;color:#b45309">연결 상태 재확인 중</p>' if r.get('error') else '')+('<a style="color:#0369a1;text-decoration:underline" href="'+esc(r['latest_url'])+'" target="_blank" rel="noopener">최근 글: '+esc(r['latest_title'])+'</a><p style="font-size:13px;margin-top:6px;color:#475569">발행일: '+esc(publication_date(r.get('latest_at')))+'</p>' if r['latest_url'] else '')+'<button type="button" data-card-publish-url="'+esc(r['url'])+'" style="width:50%;margin-top:18px;padding:13px 6px;background:'+accent+';color:white;border:0;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer">즉시발행</button><p data-quick-status="" role="status" aria-live="polite" style="font-size:12px;margin-top:6px;color:#475569"></p></article>')
-  sections.append('<section data-platform="'+kind+'" style="margin-top:28px"><h3 style="font-size:23px;font-weight:bold;color:'+accent+';background:'+tint+';border-left:6px solid '+accent+';padding:12px 16px;border-radius:8px">'+title+'</h3><p>오늘 목표 달성 '+str(complete)+'/'+str(len(group))+'곳 · 공개 '+str(published)+'건 · 어제 방문자 내림차순</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">'+''.join(cards)+'</div></section>')
+  sections.append('<section data-platform="'+kind+'" style="margin-top:28px"><h3 style="font-size:23px;font-weight:bold;color:'+accent+';background:'+tint+';border-left:6px solid '+accent+';padding:12px 16px;border-radius:8px">'+title+'</h3><p><b>순위 기준: 전날 일일 방문자 수</b> · 1위부터 순차 표기 · 오늘 목표 달성 '+str(complete)+'/'+str(len(group))+'곳 · 공개 '+str(published)+'건</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px;margin-top:14px">'+''.join(cards)+'</div></section>')
  stale=(datetime.datetime.now(KST)-checked).total_seconds()>1200
- return '<section id="publication-board" style="max-width:1280px;margin:24px auto;padding:16px"><h2 style="font-size:28px;font-weight:bold">사이트별 운영 카드</h2><p>방문자 기준일 '+visitor_day+' · 한국시간 00:00~24:00 · 괄호는 전전일 대비 증감</p><p>같은 방문자 수는 공동 순위 · 미확인은 맨 아래 · 수집 기록이 없으면 0명으로 표시하지 않습니다.</p><p style="font-size:12px">방문자는 사이트 자체 카운터 집계이며 플랫폼 간 측정 방식이 다를 수 있습니다. 갱신 '+esc(data['checked_at'])+(' · 갱신 지연' if stale else '')+'</p>'+''.join(sections)+'</section>'
+ return '<section id="publication-board" style="max-width:1380px;margin:24px auto;padding:16px"><h2 style="font-size:30px;font-weight:950">사이트 성과 대시보드</h2><p style="font-size:16px;font-weight:800">핵심 지표: 전날 일일 방문자(증감) · 누적 방문자(증감) · 총 공개 글(증감) · Google 색인 글(증감)</p><p>방문자 기준일 '+visitor_day+' · 미확인은 맨 아래 · 수집 기록이 없으면 0명으로 표시하지 않습니다.</p><p style="font-size:12px">방문자는 사이트 자체 카운터 집계이며 절대값보다 추세 관리용 지표입니다. 갱신 '+esc(data['checked_at'])+(' · 갱신 지연' if stale else '')+'</p>'+''.join(sections)+'</section>'
 if __name__=='__main__':collect()
