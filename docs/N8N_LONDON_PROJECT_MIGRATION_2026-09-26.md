@@ -55,7 +55,14 @@ Scale only after pilot passes.
 - Site-level readiness checks: focused topic, required pages, navigation, empty/duplicate taxonomy, content quality, indexability, broken URLs, internal links, mobile access and policy-risk flags.
 - WP and Blogger must use independently written content; no verbatim cross-posting.
 
-## Phase 4 — YouTube
+## Phase 4 — Tistory 5 + Naver Blog 3
+- n8n prepares/queues content and records receipts; it does not assume browser login is permanently valid.
+- Tistory: use the persistent local browser runner only after one account-specific canary verifies the current login/session and editor path.
+- Naver: use separate persistent profiles per account/blog. Start with one canary account and scale only after a verified public receipt.
+- CAPTCHA, human verification, login challenge, or platform restriction => HOLD and human handoff. Never loop or brute-force.
+- Login-present is not success; only a verified destination URL/receipt counts.
+
+## Phase 5 — YouTube
 - Keep the VPS video worker as the render/upload owner.
 - n8n orchestrates queueing/status/retry only.
 - Video/thumbnail generation remains behind the existing cost safety gates; no unapproved paid generation.
@@ -96,3 +103,17 @@ London Project modifications:
 - Per-site/per-channel isolation: one failed property cannot block the rest.
 - No unbounded polling loops; retries have caps and dead-letter/HOLD states.
 - No new paid API/SaaS without explicit user approval.
+
+
+## 2026-09-26 cleanup checkpoint
+Removed obsolete active workflows that could conflict with the current baseline:
+- `.github/workflows/_one-off-mbb-set-public-19.yml`
+- `.github/workflows/one-off-bump-youtube-calendar-slots.yml`
+- `.github/workflows/sync-24-sites-gsc-index-visibility.yml`
+
+Current authoritative web-fleet baseline:
+- WordPress 25 ordinary sites
+- Newsrooms 2 separate
+- Blogspot 33
+- Tistory 5
+- Naver Blog 3
