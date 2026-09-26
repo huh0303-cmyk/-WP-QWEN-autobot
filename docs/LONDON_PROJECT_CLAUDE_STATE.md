@@ -7,6 +7,30 @@
 관련 문서: `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` (목표/원칙, 거의 안 바뀜)
 평가용 최종 문서: `docs/LONDON_PROJECT_CLAUDE_FINAL_ARCHITECTURE.md` (Chairman 요청,
 최종 아키텍처/워크플로우/백업플랜/운영설명서/평가기준 통합본)
+**채널 신원 유일 기준**: `docs/ARCHIVE_CHANNEL_IDENTITY_VERIFIED_2026-09-27.md` —
+archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
+등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
+
+## 2026-09-27 (12차) — Gemini 주장 매핑 대조 + Chairman 실계정 스크린샷으로 최종 검증
+
+Chairman이 "LondonProject_Gemini" 트랙이 만든 "최종 매핑"(25개 채널, GitHub에
+봉인 완료 주장)을 그대로 전달하며 내 결과와 비교해달라고 함. 그대로 안 믿고
+대조함: `list_repos`로 "LondonProject_Gemini" 리포 자체가 이 세션에서 안 보여서
+"봉인 완료" 주장은 검증 불가. 내용도 대조해보니 **archive 10개+core 5개(1~15번)는
+거의 다 틀림**(config/youtube_channels.json 및 Chairman 본인 계정 스크린샷과
+불일치) — 반면 **언어 Survival 10개(16~25번)는 Chairman이 직접 찍은
+youtube.com/account "모든 채널" 23개 스크린샷으로 실제로 맞다고 확인됨**.
+
+**가장 중요한 새 발견**: 같은 이름("French Survival", "Vietnamese Survival",
+"Portuguese Survival", "German Survival")을 쓰는 서로 다른 채널이 최소 2개씩
+존재함 — Chairman 본인이 매일 보는 공식 계정의 것과, science/classical/
+american_archive/classic_reads 시크릿이 가리키는 것으로 보이는 Chairman 계정
+목록에 안 뜨는 별도 채널. **8차 사고가 "그 이름 자체가 겹치는 별도의 숨은 채널"
+때문이었을 가능성이 높아졌다** — 브랜드 라벨 문제가 기존에 안 것보다 훨씬 심각함.
+
+**정리해서 `docs/ARCHIVE_CHANNEL_IDENTITY_VERIFIED_2026-09-27.md`로 단일 기준
+문서 작성**(3개 독립 출처 일치해야 "확정" 표시). science/classical/myth/
+american_archive/classic_reads 5개는 여전히 안전하게 업로드 불가 — 등록 안 함.
 
 ## 2026-09-27 (11차) — 공개 API 교차확인: "브랜드=신원 아님"이 생각보다 훨씬 심각함, 확인 못한 채 Chairman 판단 대기
 
