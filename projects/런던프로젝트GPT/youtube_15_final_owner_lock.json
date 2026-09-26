@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "locked_at": "2026-09-27",
+  "authority": "owner_confirmed_cross_checked_with_github",
+  "rule": "account_selector_name_is_navigation_hint_only; actual identity = current handle + channel_id; never upload when expected channel_id is null",
+  "channels": [
+    {
+      "order": 1,
+      "key": "globalmusic",
+      "selector": "Studio_K3 (2nd)",
+      "channel_name": "cafe_K",
+      "handle": "cafe_K1",
+      "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
+      "state": "locked"
+    },
+    {
+      "order": 2,
+      "key": "healing",
+      "selector": "K-ISSUE",
+      "channel_name": "Studio_healing",
+      "handle": "Studio_k3",
+      "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
+      "state": "locked"
+    },
+    {
+      "order": 3,
+      "key": "starbucks",
+      "selector": "Chinese Survival",
+      "channel_name": "Starbucks vibes",
+      "handle": "Starbucksvibes",
+      "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
+      "state": "locked"
+    },
+    {
+      "order": 4,
+      "key": "mbb",
+      "selector": "Mozart-Bach-Beethoven",
+      "channel_name": "Mozart-Bach-Beethoven",
+      "handle": "Mozart_Bach_Beethoven",
+      "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
+      "state": "locked"
+    },
+    {
+      "order": 5,
+      "key": "kpop",
+      "selector": "Studio_K3 (1st)",
+      "channel_name": "kpop_studio7",
+      "handle": "kpop_studio7",
+      "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw",
+      "state": "locked"
+    },
+    {
+      "order": 6,
+      "key": "nasa",
+      "selector": "K-RELAX",
+      "channel_name": "NASA_SPACE_JOURNAL",
+      "handle": "NASA_SPACE_JOURNAL",
+      "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
+      "state": "locked"
+    },
+    {
+      "order": 7,
+      "key": "history",
+      "selector": "Spanish Survival",
+      "channel_name": "HISTORY_TODAY_JOURNAL",
+      "handle": "HISTORY_TODAY_JOURNAL",
+      "channel_id": "UCVBvZwodUF4s57KeNicxQ3w",
+      "state": "locked"
+    },
+    {
+      "order": 8,
+      "key": "science",
+      "selector": "K-health 365",
+      "channel_name": "SCIENCE_FACTS_JOURNAL",
+      "handle": "SCIENCE_FACTS_JOURNAL",
+      "channel_id": null,
+      "state": "handle_locked_id_pending"
+    },
+    {
+      "order": 9,
+      "key": "classical",
+      "selector": "비영리한국유학협회KSA",
+      "channel_name": "Classical Journal",
+      "handle": "ClassicalJournal",
+      "channel_id": null,
+      "state": "handle_locked_id_pending"
+    },
+    {
+      "order": 10,
+      "key": "myth",
+      "selector": "Arabic Survival",
+      "channel_name": "MYTH_LEGEND_JOURNAL",
+      "handle": "MYTH_LEGEND_JOURNAL",
+      "channel_id": null,
+      "state": "handle_locked_id_pending"
+    },
+    {
+      "order": 11,
+      "key": "invention",
+      "selector": "K-pop Studio",
+      "channel_name": "INVENTION_JOURNAL",
+      "handle": "INVENTION_JOURNAL",
+      "channel_id": "UCgNj-yS93A_fOHXXvG49fww",
+      "state": "locked"
+    },
+    {
+      "order": 12,
+      "key": "american_archive",
+      "selector": "AMERICAN_ARCHIVE_TIMES",
+      "channel_name": "AMERICAN_ARCHIVE_JOURNAL",
+      "handle": "AMERICAN_ARCHIVE_JOURNAL",
+      "channel_id": null,
+      "state": "handle_locked_id_pending"
+    },
+    {
+      "order": 13,
+      "key": "silent_era",
+      "selector": "SILENT_ERA_TIMES",
+      "channel_name": "SILENT_ERA_JOURNAL",
+      "handle": "SILENT_ERA_JOURNAL",
+      "channel_id": "UCLvy6kSpC8-7o3hnSrfQ47g",
+      "state": "locked"
+    },
+    {
+      "order": 14,
+      "key": "retro_reels",
+      "selector": "RETRO_REELS_TIMES",
+      "channel_name": "RETRO_REELS_JOURNAL",
+      "handle": "RETRO_REELS_JOURNAL",
+      "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
+      "state": "locked"
+    },
+    {
+      "order": 15,
+      "key": "classic_reads",
+      "selector": "CLASSIC_READS_TIMES",
+      "channel_name": "CLASSIC_READS_JOURNAL",
+      "handle": "CLASSIC_READS_JOURNAL",
+      "channel_id": null,
+      "state": "handle_locked_id_pending"
+    }
+  ],
+  "id_locked_count": 10,
+  "handle_locked_count": 15,
+  "upload_blocked_until_id_verified": [
+    "science",
+    "classical",
+    "myth",
+    "american_archive",
+    "classic_reads"
+  ]
+}
