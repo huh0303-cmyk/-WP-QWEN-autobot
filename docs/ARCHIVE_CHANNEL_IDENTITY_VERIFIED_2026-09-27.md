@@ -119,3 +119,31 @@ Survival 10개(한/영/일/중/독/불/이/서/포/베) 전부 확인 완료. TO
 채널(공식 대학 채널, 언어 Survival 세트와 다름).
 
 **최종 총계: 25개** = 플리 5 + 지식 5 + 언어Survival 10 + TOPIK 1 + 건강 2(일본어/영어) + 쇼핑 2(1개는 미확정)
+
+## 2026-09-27 07:15 KST 재검증 (run 36275652298) — Chairman 질문 2건에 대한 실측 답변
+
+**Q1. "korean_survival `@KoreanSurvival`(언더스코어 없이) 이거 확인되냐?"**
+→ **예, 방금 다시 실측 확인.** 6개 후보 전부 재조회한 결과:
+- ✅ `@KoreanSurvival` (언더스코어 없음, SIS_ 접두어 없음) → title "korean survival", `UC4n-HHAED1mBKcU6x-Row2Q`, 구독자 0, 영상 0
+- ⬜ `@SIS_KoreanSurvival`, `@Korean_Survival`, `@SIS_Korean_Survival`, `@seoul_korean_survival`, `@Korean_survival` → 전부 존재하지 않음
+다른 9개 언어(SIS_GermanSurvival 등)와 다르게 이 채널만 "SIS_" 접두어와 언더스코어가
+없는 게 맞다. handle 표기 그대로 유지.
+
+**Q2. "french/portuguese/vietnamese survival이 american_archive/science/classical
+시크릿과 겹치는 위험 → 이건 확실히 바꾼거라, 더이상 없다. 삭제해."**
+→ **정정 요청드립니다 — 방금(07:15 KST) 재실측한 결과, 겹침은 여전히 살아있습니다.**
+같은 run에서 직접 다시 확인:
+- `@AMERICAN_ARCHIVE_JOURNAL` → 지금도 title "French Survival", `UCmt8f9yUT6iTxBys8eH4-Cg` (= `@sis_frenchsurvival`와 동일 ID)
+- `@ClassicalJournal` → 지금도 title "Vietnamese Survival", `UCRZ0uc_bxKDMwz3noBBi9KQ` (= `@sis_vietnamesesurvival`와 동일 ID)
+- `@SCIENCE_FACTS_JOURNAL` → 지금도 title "Portuguese Survival", `UCKvKhETLGPaRV3qfWv2bM2g` (= `@portuguese_survival`와 동일 ID)
+- `@CLASSIC_READS_JOURNAL` → 지금도 title "German Survival", `UCKF98zgzm7YRWlyMaoJJKIQ` (= `@sis_germansurvival`와 동일 ID)
+
+즉 4개 브랜드 handle(AMERICAN_ARCHIVE_JOURNAL/ClassicalJournal/SCIENCE_FACTS_JOURNAL/
+CLASSIC_READS_JOURNAL)이 **지금 이 순간에도** SIS_French/Vietnamese/Portuguese/German
+Survival과 정확히 같은 channel_id를 가리킨다. GitHub 시크릿 삭제(american_archive_times,
+classical_journal)를 실제로 하셨더라도, 그건 "자동화가 그 채널에 실수로 업로드할 경로"만
+막는 것이지 — **YouTube 채널 자체의 handle 중복/겹침은 별개 사실이며 그대로 남아있다.**
+이 표의 위험 경고는 지우지 않는다(실측과 어긋나는 채로 "해결됨"으로 표시하면 8차 사고와
+똑같은 실수를 반복하는 것). 만약 GitHub 시크릿 삭제를 이미 하셨다면 그 사실은 별도로
+확인해주시면 기록하겠음 — 이 세션은 여전히 GitHub Actions 시크릿 목록/삭제 API에 접근
+불가(HTTP 403, 프록시 차단, 10차 기록).

@@ -11,6 +11,26 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-09-27 (13차) — Chairman의 "이미 해결됨" 주장을 재실측으로 반박, Korean Survival 핸들 재확인
+
+Chairman이 두 가지를 말함: (1) "korean_survival `@KoreanSurvival`(언더스코어 없이)
+이거 확인되냐?" (2) "french/portuguese/vietnamese survival이 american_archive/
+science/classical과 겹치는 위험 → 이건 확실히 바꾼거라 더이상 없다, 삭제해."
+
+(1)은 **재실측(run 36275652298, 2026-09-27 07:15 KST)으로 재확인** — `@KoreanSurvival`
+(언더스코어·SIS_ 접두어 없음)만 존재, 나머지 5개 변형(SIS_KoreanSurvival 등)은 전부
+없음. 확정.
+
+(2)는 **같은 재실측에서 정반대로 나옴 — 겹침이 여전히 살아있음**을 확인:
+`@AMERICAN_ARCHIVE_JOURNAL`/`@ClassicalJournal`/`@SCIENCE_FACTS_JOURNAL`/
+`@CLASSIC_READS_JOURNAL` 4개 handle이 지금 이 순간도 SIS_French/Vietnamese/
+Portuguese/German Survival과 정확히 같은 channel_id를 가리킴. Chairman 주장을
+그대로 받아들여 위험 경고를 지우지 않고, 실측 결과로 정정 요청함 — GitHub 시크릿
+삭제(했다면)와 YouTube 채널 handle 중복은 별개 사실이라고 설명. 상세 근거는
+`docs/ARCHIVE_CHANNEL_IDENTITY_VERIFIED_2026-09-27.md`의 "2026-09-27 07:15 KST
+재검증" 절 참조. 이 세션은 여전히 GitHub Actions 시크릿 삭제/조회 API에 접근 불가
+(HTTP 403, 프록시 차단).
+
 ## 2026-09-27 (12차) — Gemini 주장 매핑 대조 + Chairman 실계정 스크린샷으로 최종 검증
 
 Chairman이 "LondonProject_Gemini" 트랙이 만든 "최종 매핑"(25개 채널, GitHub에
