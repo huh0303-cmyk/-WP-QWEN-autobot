@@ -21,3 +21,12 @@ Last update: 2026-09-26 KST
 3. Add YouTube 23 inventory cards.
 4. Add SNS authorization/readiness cards.
 5. Add bounded retry + HOLD state and verified-publication completion gate.
+
+
+## 2026-09-27 YouTube identity reconciliation
+- Cross-checked owner-provided legacy account-selector mapping, owner channel/handle list, current YouTube account-switcher screenshot, existing GitHub locks, and live public @handle pages.
+- Created canonical 23-channel lock: `config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json`.
+- Resolved exact UC IDs for Chinese, Vietnamese, and Portuguese Survival.
+- Survival 10/10 now have exact UC channel IDs.
+- Current 23-target = playlist 5 + knowledge 5 + language 10 + health 2 + shopping 1.
+- Legacy science/classical/myth/american_archive/classic_reads keys are retained only as historical aliases and excluded from the current 23 production target.
