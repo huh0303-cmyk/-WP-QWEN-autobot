@@ -1,5 +1,7 @@
 {
+  "id": "london-wp25-master",
   "name": "London WP25 Master",
+  "active": false,
   "nodes": [
     {
       "parameters": {
@@ -64,6 +66,5 @@
     "executionOrder": "v1",
     "timezone": "Asia/Seoul"
   },
-  "active": false,
   "tags": []
 }

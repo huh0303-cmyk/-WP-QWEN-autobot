@@ -1,13 +1,15 @@
 {
+  "id": "london-blogger33-master",
   "name": "London Blogger33 Master",
+  "active": false,
   "nodes": [
     {
       "parameters": {
         "rule": {
           "interval": [
             {
-              "field": "hours",
-              "hoursInterval": 24,
+              "field": "days",
+              "daysInterval": 1,
               "triggerAtHour": 0,
               "triggerAtMinute": 17
             }
@@ -65,6 +67,5 @@
     "executionOrder": "v1",
     "timezone": "Asia/Seoul"
   },
-  "active": false,
   "tags": []
 }
