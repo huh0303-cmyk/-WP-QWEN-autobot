@@ -40,6 +40,9 @@ CANDIDATES = [
     "SIS_GermanSurvival", "SIS_FrenchSurvival", "SIS_ItalianSurvival", "SIS_VietnameseSurvival",
     "SIS_SpanishSurvival", "SIS_ChineseSurvival", "Portuguese_survival", "English_survival",
     "seoul_japanese", "sis_languagecenter",
+    # 2026-09-27 Chairman 지적: 언어 Survival 10개 중 Korean Survival이 빠져있음
+    "SIS_KoreanSurvival", "Korean_Survival", "KoreanSurvival", "SIS_Korean_Survival",
+    "seoul_korean_survival", "Korean_survival",
 ]
 
 
