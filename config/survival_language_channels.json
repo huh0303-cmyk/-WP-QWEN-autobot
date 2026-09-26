@@ -43,21 +43,21 @@
       "language_code": "zh",
       "language": "Chinese",
       "series_name": "Survival Chinese",
-      "channel_id": "",
+      "channel_id": "UCGTd7RhfaUaGGbVRsNPUN6Q",
       "handle": "SIS_ChineseSurvival",
-      "channel_status": "HANDLE_CAPTURED_FROM_OWNER_SCREENSHOT_2026-09-26_UC_ID_STILL_NEEDS_API_RESOLUTION",
-      "upload_enabled": false,
-      "required_action": "Resolve exact UC... channel ID via YouTube Data API channels.list(forHandle=@SIS_ChineseSurvival), then enable upload. Do not guess the ID from the handle."
+      "channel_status": "VERIFIED_PUBLIC_HANDLE_PAGE_2026-09-27",
+      "upload_enabled": true,
+      "channel_identity_source": "public YouTube @handle page resolved to exact UC ID on 2026-09-27"
     },
     {
       "language_code": "vi",
       "language": "Vietnamese",
       "series_name": "Survival Vietnamese",
-      "channel_id": "",
+      "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
       "handle": "SIS_VietnameseSurvival",
-      "channel_status": "HANDLE_CAPTURED_FROM_OWNER_SCREENSHOT_2026-09-26_UNCONFIRMED_TRUNCATED_UC_ID_STILL_NEEDS_API_RESOLUTION",
-      "upload_enabled": false,
-      "required_action": "Handle was truncated in the owner's screenshot ('@SIS_VietnameseS...') and inferred from the German/Spanish/Italian/French/Chinese naming pattern (SIS_<Lang>Survival) — confirm exact handle, then resolve UC... channel ID via YouTube Data API before upload."
+      "channel_status": "VERIFIED_PUBLIC_HANDLE_PAGE_2026-09-27",
+      "upload_enabled": true,
+      "channel_identity_source": "public YouTube @handle page resolved to exact UC ID on 2026-09-27"
     },
     {
       "language_code": "es",
@@ -99,22 +99,18 @@
       "language_code": "pt",
       "language": "Portuguese",
       "series_name": "Survival Portuguese",
-      "channel_id": "",
+      "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
       "handle": "Portuguese_survival",
-      "channel_status": "HANDLE_CAPTURED_FROM_OWNER_SCREENSHOT_2026-09-26_UC_ID_STILL_NEEDS_API_RESOLUTION",
-      "upload_enabled": false,
-      "required_action": "Resolve exact UC... channel ID via YouTube Data API channels.list(forHandle=@Portuguese_survival), then enable upload. Note: unlike the other 9 language channels this one does NOT use the SIS_<Lang>Survival naming pattern — confirm this is intentional, not a mis-created channel."
+      "channel_status": "VERIFIED_PUBLIC_HANDLE_PAGE_2026-09-27",
+      "upload_enabled": true,
+      "channel_identity_source": "public YouTube @handle page resolved to exact UC ID on 2026-09-27"
     }
   ],
   "identity_summary": {
-    "as_of": "2026-09-26",
-    "verified_language_channels": 7,
-    "handle_only_pending_uc_id": [
-      "zh",
-      "vi",
-      "pt"
-    ],
-    "evidence_source_2026-09-26": "Chairman-provided YouTube account-switcher screenshot (youtube.com/account, all-channels view). Confirms zh/vi/pt channels exist and are named, closing the prior 'does a channel even exist' unknown. Still open: exact UC... IDs (never guess these from a handle) and whether the pt handle's different naming pattern is intentional.",
-    "rule": "Never reuse a legacy brand label as channel identity; exact UC channel ID is required."
+    "as_of": "2026-09-27",
+    "verified_language_channels": 10,
+    "handle_only_pending_uc_id": [],
+    "evidence_source_2026-09-27": "All 10 language @handle pages resolved to exact UC channel IDs from public YouTube channel metadata; owner account-switcher screenshot cross-checked names/handles.",
+    "rule": "Never reuse a legacy brand/account selector label as channel identity; production identity is exact title + handle + UC channel ID."
   }
 }

@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "locked_at_kst": "2026-09-27",
+  "project": "LondonProjectGPT",
+  "rule": "Production identity is exact YouTube channel title + @handle + UC channel ID. Legacy Google/brand account selector labels are aliases only and must never be used as channel identity.",
+  "target_count": 23,
+  "groups": {
+    "playlist": [
+      {
+        "key": "globalmusic",
+        "title": "CAFE_ROMANTIC",
+        "handle": "cafe_romantic",
+        "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
+        "legacy_selector_alias": "Studio_K3 (2번째)",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "healing",
+        "title": "CAFE_HEALING",
+        "handle": "cafe_healing1",
+        "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
+        "legacy_selector_alias": "K-ISSUE",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "starbucks",
+        "title": "CAFE_STARBUCKSVIBES",
+        "handle": "Starbucksvibes",
+        "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
+        "legacy_selector_alias": "Chinese Survival",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "mbb",
+        "title": "CAFE_MOZART",
+        "handle": "cafe_mozart",
+        "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
+        "legacy_selector_alias": "Mozart-Bach-Beethoven",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "kpop",
+        "title": "CAFE_KPOP",
+        "handle": "kpop_studio7",
+        "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw",
+        "legacy_selector_alias": "Studio_K3 (1번째) / K-pop Studio historical alias",
+        "verified": "public_handle_page_2026-09-27"
+      }
+    ],
+    "knowledge": [
+      {
+        "key": "nasa",
+        "title": "NASA_XFILES",
+        "handle": "NASA_XFILES",
+        "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
+        "legacy_selector_alias": "K-RELAX",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "history",
+        "title": "HISTORY_TV_TODAY",
+        "handle": "HISTORY_TV_TODAY",
+        "channel_id": "UCVBvZwodUF4s57KeNicxQ3w",
+        "legacy_selector_alias": "Spanish Survival",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "invention",
+        "title": "INVENTION_STORY1",
+        "handle": "INVENTION_STORY1",
+        "channel_id": "UCgNj-yS93A_fOHXXvG49fww",
+        "legacy_selector_alias": "K-pop Studio",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "silent_era",
+        "title": "SILENT_ERA_FILM",
+        "handle": "OLD_HOLLYWOOD1",
+        "channel_id": "UCLvy6kSpC8-7o3hnSrfQ47g",
+        "legacy_selector_alias": "SILENT_ERA_TIMES",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "retro_reels",
+        "title": "RETRO_USA1",
+        "handle": "RETRO_USA1",
+        "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
+        "legacy_selector_alias": "RETRO_REELS_TIMES",
+        "verified": "public_handle_page_2026-09-27"
+      }
+    ],
+    "language": [
+      {
+        "key": "ko",
+        "title": "서울국제대학-TOPIK센터",
+        "handle": "seoul_topik1",
+        "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "en",
+        "title": "English Survival",
+        "handle": "English_Survival",
+        "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "ja",
+        "title": "Japanese Survival",
+        "handle": "seoul_japanese1",
+        "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "zh",
+        "title": "Chinese Survival",
+        "handle": "SIS_ChineseSurvival",
+        "channel_id": "UCGTd7RhfaUaGGbVRsNPUN6Q",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "vi",
+        "title": "Vietnamese Survival",
+        "handle": "SIS_VietnameseSurvival",
+        "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "es",
+        "title": "Spanish Survival",
+        "handle": "SIS_SpanishSurvival",
+        "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "fr",
+        "title": "French Survival",
+        "handle": "SIS_FrenchSurvival",
+        "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "de",
+        "title": "German Survival",
+        "handle": "SIS_GermanSurvival",
+        "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "it",
+        "title": "Italian Survival",
+        "handle": "SIS_ItalianSurvival",
+        "channel_id": "UCK8B-BM09Cz-ockaQYLL5LA",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "pt",
+        "title": "Portuguese Survival",
+        "handle": "Portuguese_survival",
+        "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
+        "verified": "public_handle_page_2026-09-27"
+      }
+    ],
+    "health": [
+      {
+        "key": "health_japan",
+        "title": "Health_Clinic_Japan",
+        "handle": "Health_Clinic_Japan",
+        "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
+        "verified": "public_handle_page_2026-09-27"
+      },
+      {
+        "key": "health_usa",
+        "title": "Health Clinic USA",
+        "handle": "health_clinic_USA",
+        "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
+        "verified": "public_handle_page_2026-09-27"
+      }
+    ],
+    "shopping": [
+      {
+        "key": "shopping",
+        "title": "Seoul_Jisoo1",
+        "handle": "rosiespicks",
+        "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
+        "verified": "public_handle_page_2026-09-27"
+      }
+    ]
+  },
+  "retired_legacy_keys": [
+    {
+      "key": "science",
+      "legacy_selector_alias": "K-health 365",
+      "legacy_secret_label": "SCIENCE_FACTS_TIMES",
+      "status": "not_in_current_23_target"
+    },
+    {
+      "key": "classical",
+      "legacy_selector_alias": "비영리한국유학협회KSA",
+      "legacy_secret_label": "CLASSICAL_JOURNAL",
+      "status": "not_in_current_23_target"
+    },
+    {
+      "key": "myth",
+      "legacy_selector_alias": "Arabic Survival",
+      "legacy_secret_label": "MYTH_LEGEND_TIMES",
+      "status": "not_in_current_23_target"
+    },
+    {
+      "key": "american_archive",
+      "legacy_selector_alias": "AMERICAN_ARCHIVE_TIMES",
+      "legacy_secret_label": "AMERICAN_ARCHIVE_TIMES",
+      "status": "not_in_current_23_target"
+    },
+    {
+      "key": "classic_reads",
+      "legacy_selector_alias": "CLASSIC_READS_TIMES",
+      "legacy_secret_label": "CLASSIC_READS_TIMES",
+      "status": "not_in_current_23_target"
+    }
+  ]
+}
