@@ -56,6 +56,7 @@ base.AI_TEXT_PROVIDER = "openai"
 base.PIXABAY_KEY = None
 base.PEXELS_KEY = None
 base.AUTOMATED_IMAGE_PUBLISHING_ENABLED = True
+base.WP_IMAGE_COUNT = 0 if os.environ.get("WP_IMAGE_COUNT", "1").strip() == "0" else 1
 
 
 def _blocked_stock(*args, **kwargs):
@@ -69,7 +70,7 @@ def _no_paid_images(keyword, count=1, theme=""):
 def _pass_generated_images(urls, *args, **kwargs):
     # Images are generated from the article subject itself. Do not spend OpenAI/Gemini
     # vision calls to re-score them; this also closes another legacy image-related cost path.
-    return list(urls or [])[:1]
+    return list(urls or [])[:base.WP_IMAGE_COUNT]
 
 
 base.get_images_pixabay = _blocked_stock

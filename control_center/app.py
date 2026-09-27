@@ -1855,7 +1855,17 @@ def trigger_blogspot_single():
     return redirect(url_for("index") + "#blogspot")
 
 
-def _run_single_draft_generation(platform: str, site_id: str, domain: str, label: str) -> None:
+def _wp_image_count(value: object) -> int:
+    """WordPress supports zero or one image; normal/default operation is one."""
+    return 0 if str(value).strip() == "0" else 1
+
+
+def _wp_return_url(default_anchor: str) -> str:
+    target = request.form.get("return_to", "").strip()
+    return target if target.startswith("/social-accounts") else url_for("index") + default_anchor
+
+
+def _run_single_draft_generation(platform: str, site_id: str, domain: str, label: str, image_count: int = 1) -> None:
     """Generate one review draft without conflating it with public delivery."""
     group = f"{platform}_draft_{site_id}"
     repo = os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-wp-qwen-autobot")
@@ -1874,7 +1884,7 @@ def _run_single_draft_generation(platform: str, site_id: str, domain: str, label
         workflow_name = "daily-network-publish.yml"
         inputs = {
             "target_site_url": f"https://{domain}", "publication_approved": "false",
-            "room_id": f"manual-draft-{site_id}",
+            "room_id": f"manual-draft-{site_id}", "image_count": str(_wp_image_count(image_count)),
         }
     else:
         workflow_name, inputs = _build_draft_workflow_call({
@@ -1894,20 +1904,21 @@ def _run_single_draft_generation(platform: str, site_id: str, domain: str, label
 def trigger_wp_draft_single():
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
-        return redirect(url_for("index") + "#wordpress")
+        return redirect(_wp_return_url("#wordpress"))
     site_id = request.form.get("site_id", "").strip()
     sites_by_id = {str(site["site_id"]): site for site in get_site_data() if site["auth_ready"]}
     if site_id not in sites_by_id:
         flash("초안 생성이 연결된 WordPress 사이트가 아닙니다.", "error")
-        return redirect(url_for("index") + "#wordpress")
+        return redirect(_wp_return_url("#wordpress"))
     site = sites_by_id[site_id]
     group = f"wp_draft_{site_id}"
     if _bulk_read(group).get("status") in {"dispatching", "polling"}:
         flash(f"{site['domain']} 초안 생성이 이미 진행 중입니다.", "error")
-        return redirect(url_for("index") + "#wordpress")
-    threading.Thread(target=_run_single_draft_generation, args=("wp", site_id, site["domain"], site["domain"]), daemon=True).start()
-    flash(f"{site['domain']}: 공개하지 않고 검토용 초안 생성을 시작했습니다.", "success")
-    return redirect(url_for("index") + "#wordpress")
+        return redirect(_wp_return_url("#wordpress"))
+    image_count = _wp_image_count(request.form.get("image_count", "1"))
+    threading.Thread(target=_run_single_draft_generation, args=("wp", site_id, site["domain"], site["domain"], image_count), daemon=True).start()
+    flash(f"{site['domain']}: 이미지 {image_count}장 설정으로 공개하지 않고 검토용 초안 생성을 시작했습니다.", "success")
+    return redirect(_wp_return_url("#wordpress"))
 
 
 @app.post("/trigger/blogspot-draft-single")
@@ -1930,7 +1941,7 @@ def trigger_blogspot_draft_single():
     return redirect(url_for("index") + "#blogspot")
 
 
-def _run_single_wp_publish(site_id: str, domain: str, label: str) -> None:
+def _run_single_wp_publish(site_id: str, domain: str, label: str, image_count: int = 1) -> None:
     """Background worker for one WordPress site's dedicated publish button.
 
     2026-09-06 CEO: wanted every one of the 27 WP sites to get its own
@@ -1956,7 +1967,7 @@ def _run_single_wp_publish(site_id: str, domain: str, label: str) -> None:
 
     item = _dispatch_and_track(
         repo, token, "daily-network-publish.yml",
-        {"target_site_url": f"https://{domain}", "publication_approved": "true", "room_id": f"manual-single-{site_id}"},
+        {"target_site_url": f"https://{domain}", "publication_approved": "true", "room_id": f"manual-single-{site_id}", "image_count": str(_wp_image_count(image_count))},
         label=label, platform="wordpress", site_id=site_id,
     )
     state["items"] = [item]
@@ -1973,22 +1984,23 @@ def trigger_wp_single():
     """One WordPress site's dedicated live-tracked '바이럴자동발행' button."""
     if request.form.get("csrf_token") != app.config["CONTROL_CENTER_CSRF"]:
         flash("요청 확인값이 만료되었습니다. 새로고침 후 다시 시도하세요.", "error")
-        return redirect(url_for("index") + "#wordpress")
+        return redirect(_wp_return_url("#wordpress"))
     site_id = request.form.get("site_id", "").strip()
     sites_by_id = {str(site["site_id"]): site for site in get_site_data() if site["auth_ready"]}
     if not site_id or site_id not in sites_by_id:
         flash("발행이 연결된 WordPress 사이트가 아닙니다.", "error")
-        return redirect(url_for("index") + "#wordpress")
+        return redirect(_wp_return_url("#wordpress"))
     group = f"wp_{site_id}"
     already_running = _bulk_read(group).get("status") in {"dispatching", "polling"}
     site = sites_by_id[site_id]
     label = str(site["domain"])
     if already_running:
         flash(f"{label} 발행이 이미 진행 중입니다. 완료될 때까지 기다려주세요.", "error")
-        return redirect(url_for("index") + "#wordpress")
-    threading.Thread(target=_run_single_wp_publish, args=(site_id, site["domain"], label), daemon=True).start()
+        return redirect(_wp_return_url("#wordpress"))
+    image_count = _wp_image_count(request.form.get("image_count", "1"))
+    threading.Thread(target=_run_single_wp_publish, args=(site_id, site["domain"], label, image_count), daemon=True).start()
     flash(f"{label} 발행을 시작했습니다 — 카드 아래에서 실시간으로 확인하세요.", "success")
-    return redirect(url_for("index") + "#wordpress")
+    return redirect(_wp_return_url("#wordpress"))
 
 
 def _run_single_tistory_publish(site_id: str, label: str, run_key: str = "") -> None:
@@ -2405,7 +2417,7 @@ from .account_publish_button import install as _install_account_publish_button
 _install_account_publish_button(app)
 
 from .social_accounts import install as _install_social_accounts
-_install_social_accounts(app)
+_install_social_accounts(app, get_site_data)
 
 from .pipeline_status import install as _install_pipeline_status
 _install_pipeline_status(app)

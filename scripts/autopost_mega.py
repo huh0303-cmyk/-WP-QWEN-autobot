@@ -75,6 +75,7 @@ SLEEP_BETWEEN_POSTS = float(os.getenv("SLEEP_BETWEEN_POSTS", "8"))
 # 무료 이미지 금지 정책 때문에 여기서 쓰지 않고, 켜지면 replicate_image_provider
 # (FLUX 등 승인된 3개 모델만, 글당 최대 1장, 실패해도 다른 폴백 없음)만 사용한다.
 AUTOMATED_IMAGE_PUBLISHING_ENABLED = os.getenv("AUTOMATED_IMAGE_PUBLISHING_ENABLED", "false").strip().lower() == "true"
+WP_IMAGE_COUNT = 0 if os.getenv("WP_IMAGE_COUNT", "1").strip() == "0" else 1
 
 gemini_client         = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 GEMINI_MODEL_PRIMARY  = os.getenv("GEMINI_REVIEW_MODEL", "gemini-2.5-flash")
@@ -3568,12 +3569,12 @@ def process_one(site, keyword):
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
     site.pop("_newsroom_real_photo", None)
-    if AUTOMATED_IMAGE_PUBLISHING_ENABLED and not site.get("no_image") and mode in ("news", "news_en"):
+    if WP_IMAGE_COUNT and AUTOMATED_IMAGE_PUBLISHING_ENABLED and not site.get("no_image") and mode in ("news", "news_en"):
         from newsroom_real_photos import select_photo
         site["_newsroom_real_photo"] = select_photo(f"{keyword} {title} {news_source_summary}")
         if site["_newsroom_real_photo"]:
-            print("  📷 개별 이용조건 확인된 실제 자료사진 + AI 설명 이미지")
-    if not AUTOMATED_IMAGE_PUBLISHING_ENABLED or site.get("no_image"):
+            print("  📷 개별 이용조건을 확인한 실제 자료사진 1장")
+    if not WP_IMAGE_COUNT or not AUTOMATED_IMAGE_PUBLISHING_ENABLED or site.get("no_image"):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
@@ -3582,7 +3583,8 @@ def process_one(site, keyword):
         # 2) FLUX Schnell once if SDXL fails.
         # 3) If both fail, continue without an image.
         image_theme = f"NEWS ILLUSTRATION ONLY — {theme}" if mode in ("news", "news_en") else theme
-        img_url = replicate_image_provider.generate_image_url(keyword, theme=image_theme)
+        # A licensed newsroom photo already occupies the single allowed image slot.
+        img_url = None if site.get("_newsroom_real_photo") else replicate_image_provider.generate_image_url(keyword, theme=image_theme)
         images = [img_url] if img_url else []
         from stock_image_provider import credit_html
         body += credit_html(img_url)

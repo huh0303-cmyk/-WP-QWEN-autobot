@@ -161,15 +161,51 @@ def _naver_cards() -> list[dict]:
     return cards
 
 
-def _cards() -> list[dict]:
-    return _youtube_cards() + _sns_cards() + _tistory_cards() + _naver_cards()
+def _wordpress_cards(get_site_data) -> list[dict]:
+    """Build WordPress cards from the same live metrics used by the main dashboard."""
+    if get_site_data is None:
+        return []
+    sites = sorted(
+        get_site_data(),
+        key=lambda site: (
+            site.get("today_visitors") is None,
+            -(site.get("today_visitors") or 0),
+            -(site.get("total_visitors") or 0),
+            str(site.get("domain", "")),
+        ),
+    )
+    cards = []
+    for rank, site in enumerate(sites, 1):
+        auth_ready = bool(site.get("auth_ready"))
+        domain = str(site.get("domain", "")).strip()
+        admin_url = site.get("admin_review_url") or f"https://{domain}/wp-admin/edit.php?post_status=draft&post_type=post"
+        cards.append({
+            "key": f"wordpress:{site['site_id']}", "platform": "WordPress", "name": domain,
+            "identity": str(site["site_id"]), "handle": "", "url": f"https://{domain}",
+            "login_url": admin_url, "admin_review_url": admin_url,
+            "role": site.get("category") or "WordPress 독립 사이트",
+            "description": (site.get("cadence") or {}).get("label") or "사이트별 주제에 맞춘 독립 원고",
+            "state_label": "글쓰기·개별 발행 연결 완료" if auth_ready else "WordPress 인증 연결 필요",
+            "connection_level": "publish_connected" if auth_ready else "missing",
+            "publish_mode": "이미지 1장을 기본값으로 검토용 초안을 만들고, 확인 후 이 사이트만 개별 발행합니다.",
+            "can_publish": auth_ready, "channel_key": "", "action_kind": "wordpress_forms" if auth_ready else "login",
+            "button_label": "① 글쓰기 트리거", "site_id": site["site_id"],
+            "today_visitors": site.get("today_visitors"), "total_visitors": site.get("total_visitors"),
+            "rank": rank, "image_count_default": 1,
+            "note": "오늘 방문자 수 내림차순이며 미집계 사이트는 맨 아래에 표시됩니다.",
+        })
+    return cards
 
 
-def install(app):
+def _cards(get_site_data=None) -> list[dict]:
+    return _wordpress_cards(get_site_data) + _youtube_cards() + _sns_cards() + _tistory_cards() + _naver_cards()
+
+
+def install(app, get_site_data=None):
     @app.get("/social-accounts")
     def social_accounts():
-        cards = _cards()
-        platforms = ["전체", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "Tistory", "Naver"]
+        cards = _cards(get_site_data)
+        platforms = ["전체", "WordPress", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "Tistory", "Naver"]
         selected = request.args.get("platform", "전체")
         if selected not in platforms:
             selected = "전체"
@@ -187,7 +223,7 @@ def install(app):
         payload = request.get_json(silent=True) or {}
         if not hmac.compare_digest(str(payload.get("csrf_token", "")), str(app.config["CONTROL_CENTER_CSRF"])):
             return jsonify(message="화면을 새로고침한 뒤 다시 눌러주세요."), 403
-        card = next((c for c in _cards() if c["key"] == payload.get("account_key")), None)
+        card = next((c for c in _cards(get_site_data) if c["key"] == payload.get("account_key")), None)
         if not card:
             return jsonify(message="등록된 계정 카드가 아닙니다."), 404
         if card.get("action_kind") != "youtube_queue" or not card.get("can_publish"):

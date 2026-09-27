@@ -23,6 +23,11 @@ on:
         required: false
         type: string
         default: ""
+      image_count:
+        description: "Number of article images; WordPress supports 0 or 1"
+        required: false
+        type: string
+        default: "1"
 
 permissions:
   contents: read
@@ -102,6 +107,7 @@ jobs:
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          WP_IMAGE_COUNT: ${{ inputs.image_count || '1' }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
           KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
