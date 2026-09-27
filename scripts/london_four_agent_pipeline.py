@@ -101,11 +101,21 @@ def _network_titles() -> list[str]:
     return titles
 
 
-def stage_research(site_id: str, run_id: str) -> dict:
+def stage_research(site_id: str, run_id: str, category: str = "") -> dict:
     _load_runtime_env()
     platform, profile = _profile(site_id)
     settings = profile["wordpress"] if platform == "wordpress" else profile["blogspot"]
     site_url = profile["wordpress"]["url"]
+    state = {
+        "run_id": run_id,
+        "site_id": site_id,
+        "platform": platform,
+        "created_at": datetime.now(KST).isoformat(),
+        "publish_mode": os.environ.get("PIPELINE_PUBLISH_MODE", "draft").strip().lower(),
+        "category": category.strip(),
+        "stage_status": {"research": "running"},
+    }
+    _write_state(state)
     from scripts.collect_keyword_search_demand import demand_context
     from scripts.refresh_keyword_pool import call_search_llm, overlaps_corpus, build_network_corpus
 
@@ -147,6 +157,7 @@ def stage_research(site_id: str, run_id: str) -> dict:
             prompt = f"""Research a current article topic for {settings.get('persona','editor')}.
 Date: {today}
 Site theme: {profile['wordpress'].get('theme','')}
+Selected category: {category or 'auto-select from site categories'}
 Language: {profile.get('language','en')}
 Tone: {settings.get('tone','')}
 
@@ -182,12 +193,7 @@ RATIONALE: <why this topic fits now>
 
     if not keyword:
         raise RuntimeError(f"research exhausted; direct_error={direct_error}")
-    state = {
-        "run_id": run_id,
-        "site_id": site_id,
-        "platform": platform,
-        "created_at": datetime.now(KST).isoformat(),
-        "publish_mode": os.environ.get("PIPELINE_PUBLISH_MODE", "draft").strip().lower(),
+    state.update({
         "research": {
             "keyword": keyword,
             "evidence": last_text,
@@ -196,14 +202,16 @@ RATIONALE: <why this topic fits now>
             "required_surfaces": ["google", "naver", "media", "gsc"],
             "exact_volume_policy": "never fabricated",
         },
-        "stage_status": {"research": "ok"},
-    }
+    })
+    state.setdefault("stage_status", {})["research"] = "ok"
     _write_state(state)
     return {"ok": True, "stage": "research", "site_id": site_id, "run_id": run_id, "keyword": keyword, "provider": research_provider}
 
 def stage_write(run_id: str) -> dict:
     _load_runtime_env()
     state = _read_state(run_id)
+    state.setdefault("stage_status", {})["write"] = "running"
+    _write_state(state)
     site_id = state["site_id"]
     keyword = state["research"]["keyword"]
     platform, profile = _profile(site_id)
@@ -241,6 +249,8 @@ def stage_write(run_id: str) -> dict:
 def stage_image(run_id: str) -> dict:
     _load_runtime_env()
     state = _read_state(run_id)
+    state.setdefault("stage_status", {})["image"] = "running"
+    _write_state(state)
     site_id = state["site_id"]
     article = state["article"]
     image_url = ""
@@ -316,6 +326,8 @@ def _publish_blogger(state: dict, profile: dict, public: bool) -> dict:
 def stage_publish(run_id: str) -> dict:
     _load_runtime_env()
     state = _read_state(run_id)
+    state.setdefault("stage_status", {})["publish"] = "running"
+    _write_state(state)
     platform, profile = _profile(state["site_id"])
     public = state.get("publish_mode", "draft") == "publish"
     article = state["article"]
@@ -330,6 +342,20 @@ def stage_publish(run_id: str) -> dict:
             image_url=image_url,
             keyword=keyword,
         )
+        selected_category = str(state.get("category") or "").strip()
+        if selected_category:
+            from scripts.create_manual_wp_draft import resolve_category_id
+            password = os.environ.get(profile["wordpress"]["secret_name"], "")
+            category_id = resolve_category_id(profile["wordpress"]["url"], password, selected_category)
+            if not category_id:
+                raise RuntimeError(f"selected WordPress category not found: {selected_category}")
+            response = requests.post(
+                f"{profile['wordpress']['url'].rstrip('/')}/wp-json/wp/v2/posts/{receipt['post_id']}",
+                auth=("huh0303@gmail.com", password),
+                json={"categories": [category_id]},
+                timeout=30,
+            )
+            response.raise_for_status()
         if public:
             password = os.environ.get(profile["wordpress"]["secret_name"], "")
             post_id = receipt["post_id"]
@@ -366,20 +392,41 @@ def main() -> int:
     parser.add_argument("--site-id", default="")
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--publish-mode", choices=["draft", "publish"], default=os.environ.get("PIPELINE_PUBLISH_MODE", "draft"))
+    parser.add_argument("--category", default="")
     args = parser.parse_args()
     os.environ["PIPELINE_PUBLISH_MODE"] = args.publish_mode
-    if args.stage == "research":
-        if not args.site_id:
-            raise SystemExit("--site-id is required for research")
-        result = stage_research(args.site_id, args.run_id)
-    elif args.stage == "write":
-        result = stage_write(args.run_id)
-    elif args.stage == "image":
-        result = stage_image(args.run_id)
-    else:
-        result = stage_publish(args.run_id)
-    print(json.dumps(result, ensure_ascii=False))
-    return 0
+    try:
+        if args.stage == "research":
+            if not args.site_id:
+                raise SystemExit("--site-id is required for research")
+            result = stage_research(args.site_id, args.run_id, args.category)
+        elif args.stage == "write":
+            result = stage_write(args.run_id)
+        elif args.stage == "image":
+            result = stage_image(args.run_id)
+        else:
+            result = stage_publish(args.run_id)
+        print(json.dumps(result, ensure_ascii=False))
+        return 0
+    except Exception as exc:
+        try:
+            state = _read_state(args.run_id)
+        except Exception:
+            state = {
+                "run_id": args.run_id,
+                "site_id": args.site_id,
+                "created_at": datetime.now(KST).isoformat(),
+                "stage_status": {},
+            }
+        state.setdefault("stage_status", {})[args.stage] = "failed"
+        state["last_error"] = {
+            "stage": args.stage,
+            "type": type(exc).__name__,
+            "message": str(exc)[:1200],
+            "at": datetime.now(KST).isoformat(),
+        }
+        _write_state(state)
+        raise
 
 
 if __name__ == "__main__":
