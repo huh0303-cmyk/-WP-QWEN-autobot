@@ -1,0 +1,21 @@
+{
+  "name": "london-project-claude-console",
+  "version": "0.1.0",
+  "description": "런던프로젝트클로드 - Naver/Tistory blog automation web console (ported from blogauto-naver-tistory Electron app)",
+  "private": true,
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "build:jobrunner": "node server/build_jobRunner.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "multer": "^2.4.0",
+    "playwright-core": "^1.45.0",
+    "ws": "^8.17.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
