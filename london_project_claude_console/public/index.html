@@ -335,6 +335,45 @@
           <div id="imageNotes" class="image-notes"></div>
         </section>
 
+        <section class="panel registry-panel" aria-label="통합 사이트 설정" style="grid-column: 1 / -1;">
+          <div class="panel-head">
+            <div>
+              <h2>사이트 설정 — WP+블로그스팟+뉴스+네이버+티스토리</h2>
+              <p class="hint" id="registrySummaryText">불러오는 중...</p>
+            </div>
+            <div class="history-actions">
+              <select id="registryPlatformFilter">
+                <option value="">전체 플랫폼</option>
+                <option value="wordpress">WordPress</option>
+                <option value="blogspot">Blogspot</option>
+                <option value="news">뉴스</option>
+                <option value="tistory">Tistory</option>
+                <option value="naver">Naver</option>
+              </select>
+              <button id="registryReloadButton" class="ghost small" type="button">새로고침</button>
+              <button id="n8nHealthButton" class="ghost small" type="button">n8n 게이트웨이 상태</button>
+            </div>
+          </div>
+          <p class="hint" id="n8nHealthText"></p>
+          <div style="overflow-x:auto;">
+            <table id="registryTable" style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr>
+                  <th style="text-align:left; padding:4px;">플랫폼</th>
+                  <th style="text-align:left; padding:4px;">사이트/계정</th>
+                  <th style="text-align:left; padding:4px;">소유 트랙</th>
+                  <th style="text-align:left; padding:4px;">페르소나</th>
+                  <th style="text-align:left; padding:4px;">톤앤매너</th>
+                  <th style="text-align:left; padding:4px;">글자수(최소/목표/최대)</th>
+                  <th style="text-align:left; padding:4px;">이미지수</th>
+                  <th style="text-align:left; padding:4px;">저장</th>
+                </tr>
+              </thead>
+              <tbody id="registryTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
         <section class="panel history-panel" aria-label="작업 이력">
           <div class="panel-head">
             <div>
@@ -369,5 +408,6 @@
     </div>
     <script src="./bridge.js"></script>
     <script src="./app.js"></script>
+    <script src="./registry.js"></script>
   </body>
 </html>
