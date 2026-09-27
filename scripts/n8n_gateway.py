@@ -51,6 +51,7 @@ def pipeline_stage(stage):
     run_id = str(payload.get("run_id") or "").strip()
     site_id = str(payload.get("site_id") or "").strip()
     publish_mode = str(payload.get("publish_mode") or "draft").strip().lower()
+    category = str(payload.get("category") or "").strip()
     if not run_id:
         return jsonify({"ok": False, "error": "run_id_required"}), 400
     if publish_mode not in {"draft", "publish"}:
@@ -61,6 +62,8 @@ def pipeline_stage(stage):
         if not site_id:
             return jsonify({"ok": False, "error": "site_id_required"}), 400
         cmd += ["--site-id", site_id]
+        if category:
+            cmd += ["--category", category]
     try:
         p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
                            timeout=PIPELINE_TIMEOUT[stage])
