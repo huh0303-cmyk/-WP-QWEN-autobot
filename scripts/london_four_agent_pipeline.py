@@ -12,6 +12,9 @@ from pathlib import Path
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
+for candidate in (ROOT, ROOT / "scripts"):
+    if str(candidate) not in sys.path:
+        sys.path.insert(0, str(candidate))
 STATE_DIR = ROOT / "data" / "london-pipeline"
 KST = timezone(timedelta(hours=9))
 
