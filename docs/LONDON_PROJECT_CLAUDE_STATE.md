@@ -11,6 +11,53 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-09-27 (14차) — Tistory One-Daily Dispatcher 100% 실패 원인 발견·수정·재검증
+
+Chairman이 GitHub 알림("Tistory One-Daily Dispatcher: All jobs have failed")을
+전달하며 원인 조사 요청.
+
+**원인**: `.github/workflows/tistory-one-daily-dispatcher.yml`(커밋 ff3fcf0,
+2026-09-27 03:03 KST 신규 생성)이 `scripts/dispatch_tistory_slots.py`를 실행하는데
+이 스크립트는 `import requests`를 쓴다. 그런데 워크플로우에 `pip install` 스텝이
+아예 없음 — `actions/setup-python@v5` 직후 바로 스크립트를 실행해서 매번
+`ModuleNotFoundError: No module named 'requests'`로 10초 만에 죽음. 형제
+워크플로우 `tistory-daily-plan.yml`은 정상적으로 "Install runtime" 스텝
+(`pip install ... requests ...`)이 있어서 대조로 원인이 바로 드러남.
+
+**영향**: 이 워크플로우는 생성된 순간부터 단 한 번도 성공한 적 없음
+(API 조회 시 전체 14/14 run 100% failure, 2026-09-25T00:43 ~ 2026-09-27T01:24).
+즉 이 경로로는 Tistory 일일 1포스트가 단 하나도 디스패치되지 않고 있었음.
+
+**수정**: `actions/setup-python@v5`와 스크립트 실행 사이에
+`- name: Install runtime` / `run: pip install requests` 스텝 추가.
+커밋 `2230d8e`, 원격 최신(`4d3fa84`, n8n 관련 2건 — 다른 트랙이 그 사이에 푸시함)
+위에 rebase 후 push 완료.
+
+**재검증**: 수정 직후 `workflow_dispatch`로 수동 1회 실행(run 36287496959) →
+`completed / success`. 로그 확인 결과 `tistory_ktrip365` 사이트를
+`2026-09-27-daily` 슬롯으로 정상 reserve→dispatch, 후속
+`tistory-daily-plan.yml`(run 36287567599)도 실제로 트리거됨(대기열 진입 확인,
+그 결과까지는 이번 세션에서 끝까지 지켜보지 않음 — 아직 미검증).
+
+**아직 확인 안 된 것**:
+- `tistory-daily-plan.yml` 이번 트리거(36287567599)의 최종 성공/실패 — 직전
+  마지막 기록된 run(35315710914, 09-18)은 실패였음. 별개 문제일 수 있음.
+- 스케줄(`*/5 * * * *`) 트리거 자체가 정상적으로 5분 간격으로 도는지 —
+  09-25T00:43~09-27T01:24 사이 총 run 수가 14개뿐으로, 이론상 예상되는
+  5분 간격 run 수보다 훨씬 적음(GitHub Actions 스케줄 지연/스킵 가능성,
+  별도 확인 필요).
+- 이 dispatcher가 매일 여러 사이트를 실제로 몇 개까지 처리하는지(오늘 첫
+  성공 실행에서는 1개 사이트만 시간대에 걸림) — 나머지 사이트들은 각자의
+  랜덤 슬롯 시간이 되면 다음 5분 주기 run들이 순차로 처리해야 정상.
+
+**Activity-ledger task_id**: 없음(이 저장소에 별도 activity-ledger 시스템이
+아직 이 항목까지 반영 안 됨 — `docs/LONDON_PROJECT_ACTIVITY_LEDGER.md`에도
+기록 필요하면 다음 세션에서 추가).
+
+**다음 세션 할 일**: (1) run 36287567599 최종 결과 확인, (2) 스케줄 트리거
+빈도 이상 여부 확인, (3) 며칠 뒤 해당 32개 Tistory 사이트가 실제로 하루 1개씩
+고르게 발행되는지 실측.
+
 ## 2026-09-27 (13차) — Chairman의 "이미 해결됨" 주장을 재실측으로 반박, Korean Survival 핸들 재확인
 
 Chairman이 두 가지를 말함: (1) "korean_survival `@KoreanSurvival`(언더스코어 없이)
