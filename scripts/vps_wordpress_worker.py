@@ -131,19 +131,67 @@ def run_one(path: Path, job: dict) -> bool:
             from stock_image_provider import contains_public_photo_credit
             if contains_public_photo_credit(job["content_html"]):
                 raise RuntimeError("PUBLIC_PHOTO_CREDIT_LEAK: blocked before WordPress REST write")
-            existing = requests.get(api, params={"search": job["title"], "per_page": 10, "_fields": "id,title,link,status"}, auth=auth, timeout=25)
+            desired_status = str(job.get("status_after_review", "publish")).strip() or "publish"
+            existing = requests.get(
+                api,
+                params={"search": job["title"], "status": "any", "per_page": 10, "_fields": "id,title,link,status"},
+                auth=auth,
+                timeout=25,
+            )
             existing.raise_for_status()
+            existing_id = 0
             for row in existing.json():
-                if row.get("title", {}).get("rendered", "").strip() == job["title"].strip() and row.get("status") == "publish":
-                    job.update(status="published", public_url=row.get("link", ""), remote_id=row.get("id"), checked_at=_now())
-                    target = path.with_name(path.name[:-len(".processing.json")] + ".published.json")
-                    path.rename(target); target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+                if row.get("title", {}).get("rendered", "").strip() != job["title"].strip():
+                    continue
+                row_status = str(row.get("status") or "")
+                if row_status == desired_status:
+                    job.update(
+                        status="published" if row_status == "publish" else "drafted",
+                        public_url=row.get("link", ""),
+                        remote_id=row.get("id"),
+                        checked_at=_now(),
+                    )
+                    target = path.with_name(
+                        path.name[:-len(".processing.json")]
+                        + (".published.json" if row_status == "publish" else ".drafted.json")
+                    )
+                    path.rename(target)
+                    target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
                     return True
+                if row_status == "draft":
+                    existing_id = int(row.get("id") or 0)
+
             content_html, featured_media_id = _rehost_temp_images(job["content_html"], site_url, auth, job.get("job_id", ""))
-            payload = {"title": job["title"], "content": content_html, "status": job.get("status_after_review", "publish")}
+            if not featured_media_id and job.get("image_url"):
+                from create_manual_wp_draft import ensure_featured_media
+                featured_media_id = ensure_featured_media(
+                    site_url,
+                    password,
+                    str(job.get("image_url") or ""),
+                    str(job.get("title") or ""),
+                )
+            payload = {
+                "title": job["title"],
+                "content": content_html,
+                "status": desired_status,
+                "comment_status": "closed",
+                "ping_status": "closed",
+            }
+            if job.get("category_id"):
+                payload["categories"] = [int(job["category_id"])]
             if featured_media_id:
                 payload["featured_media"] = featured_media_id
-            response = requests.post(api, json=payload, auth=auth, timeout=40)
+            focus_keyword = str(job.get("focus_keyword") or "").strip()
+            meta_description = str(job.get("meta_description") or "").strip()
+            if focus_keyword or meta_description:
+                payload["meta"] = {}
+                if focus_keyword:
+                    payload["meta"]["rank_math_focus_keyword"] = focus_keyword
+                if meta_description:
+                    payload["meta"]["rank_math_description"] = meta_description
+
+            endpoint = f"{api}/{existing_id}" if existing_id else api
+            response = requests.post(endpoint, json=payload, auth=auth, timeout=40)
             response.raise_for_status()
             row = response.json()
             if not row.get("id") or not row.get("link"):
@@ -153,10 +201,20 @@ def run_one(path: Path, job: dict) -> bool:
             path.rename(target); target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
             return True
         except Exception as exc:
-            job.update(status="failed", retries=int(job.get("retries", 0)) + 1,
-                       last_output=f"REST publish failed: {type(exc).__name__}: {exc}", checked_at=_now())
-            target = path.with_name(path.name[:-len(".processing.json")] + ".failed.json")
-            path.rename(target); target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+            retries = int(job.get("retries", 0)) + 1
+            job.update(
+                status="failed" if retries >= MAX_RETRIES else "queued",
+                retries=retries,
+                last_output=f"REST publish failed: {type(exc).__name__}: {exc}",
+                checked_at=_now(),
+                next_retry_at=_now(),
+            )
+            suffix = ".failed.json" if retries >= MAX_RETRIES else ".queued.json"
+            target = path.with_name(path.name[:-len(".processing.json")] + suffix)
+            path.rename(target)
+            target.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+            if retries < MAX_RETRIES:
+                time.sleep(min(5 * retries, 15))
             return False
     env = os.environ.copy()
     env[secret_name] = password
