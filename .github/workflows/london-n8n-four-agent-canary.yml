@@ -23,23 +23,39 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           command_timeout: 35m
           script: |
-            set -euo pipefail
+            set -u
             BASE=http://127.0.0.1:5678
-            curl -fsS "$BASE/healthz"
+            curl -sS "$BASE/healthz"
             stamp=$(date -u +%Y%m%d%H%M%S)
 
+            run_canary() {
+              site_id="$1"
+              suffix="$2"
+              payload=$(printf '{"site_id":"%s","run_id":"canary-%s-%s","publish_mode":"draft"}' "$site_id" "$stamp" "$suffix")
+              body_file="/tmp/${suffix}-canary-body.txt"
+              code=$(curl -sS --max-time 1200 -o "$body_file" -w '%{http_code}' -X POST "$BASE/webhook/london-content-four-agent" \
+                -H 'Content-Type: application/json' \
+                --data "$payload" || true)
+              echo "HTTP=$code SITE=$site_id"
+              cat "$body_file" || true
+              echo
+              if [ "$code" != "200" ]; then
+                echo "=== N8N LOG TAIL ==="
+                docker logs korea365-n8n --tail 160 2>&1 || true
+                echo "=== GATEWAY LOG TAIL ==="
+                journalctl -u korea365-n8n-gateway.service -n 160 --no-pager || true
+                echo "=== PIPELINE STATE ==="
+                ls -la /opt/korea365/data/london-pipeline 2>/dev/null || true
+                for f in /opt/korea365/data/london-pipeline/canary-*-${suffix}.json; do
+                  [ -f "$f" ] && { echo "--- $f"; cat "$f"; }
+                done
+                return 1
+              fi
+              python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("CANARY_OK", d.get("status"), d.get("url"))' <"$body_file"
+            }
+
             echo "=== WP CANARY: wp_ktrip365 ==="
-            wp_payload=$(printf '{"site_id":"wp_ktrip365","run_id":"canary-%s-wp","publish_mode":"draft"}' "$stamp")
-            wp_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent" \
-              -H 'Content-Type: application/json' \
-              --data "$wp_payload")
-            echo "$wp_out"
-            python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("WP_CANARY_OK", d.get("status"), d.get("url"))' <<<"$wp_out"
+            run_canary wp_ktrip365 wp || exit 1
 
             echo "=== BLOGGER CANARY: blogger_ktrip365 ==="
-            bg_payload=$(printf '{"site_id":"blogger_ktrip365","run_id":"canary-%s-blogger","publish_mode":"draft"}' "$stamp")
-            bg_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent" \
-              -H 'Content-Type: application/json' \
-              --data "$bg_payload")
-            echo "$bg_out"
-            python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("BLOGGER_CANARY_OK", d.get("status"), d.get("url"))' <<<"$bg_out"
+            run_canary blogger_ktrip365 blogger || exit 1
