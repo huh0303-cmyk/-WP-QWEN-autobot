@@ -46,7 +46,19 @@ def install(app):
         # Existing content-less immediate publish controls cannot constitute
         # approval of a particular reviewed content revision.
         if (ROOT/'data/owner-approval-required.json').exists() and request.method in {'POST','PUT','PATCH','DELETE'}:
-            if request.path in {'/account-schedule/publish-now','/social-accounts/publish-now','/control-login','/control-logout','/api/vps/publish','/trigger/wp-draft-single','/trigger/blogspot-draft-single'} or request.endpoint == 'blog_visits':
+            if (
+                request.path in {
+                    '/account-schedule/publish-now',
+                    '/social-accounts/publish-now',
+                    '/control-login',
+                    '/control-logout',
+                    '/api/vps/publish',
+                    '/trigger/wp-draft-single',
+                    '/trigger/blogspot-draft-single',
+                }
+                or request.path.startswith('/api/london-gpt/')
+                or request.endpoint == 'blog_visits'
+            ):
                 return None
             return jsonify(error='owner_review_required', message='WP·뉴스·Blogspot은 검수 후 자동 발행 대상입니다. 이 경로는 기타 매체 승인 또는 기존 실행 경로 검증이 필요하여 보류 중입니다.'), 423
 
