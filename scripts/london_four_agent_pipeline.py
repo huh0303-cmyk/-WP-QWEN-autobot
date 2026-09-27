@@ -7,6 +7,8 @@ import json
 import os
 import re
 import sys
+import time
+import subprocess
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -77,6 +79,127 @@ def _write_state(state: dict) -> None:
 def _profile(site_id: str) -> tuple[str, dict]:
     from scripts.auto_write_and_draft import _profile_for
     return _profile_for(site_id)
+
+
+def _ensure_wordpress_category(profile: dict, state: dict) -> int:
+    """Resolve/create the selected category before image generation."""
+    selected = str(state.get("category") or "").strip()
+    if not selected:
+        raise RuntimeError("WordPress category must be selected before writing completes")
+    settings = profile["wordpress"]
+    password = os.environ.get(settings["secret_name"], "")
+    if not password:
+        raise RuntimeError(f"WordPress credential missing for category validation: {settings['secret_name']}")
+
+    from scripts.create_manual_wp_draft import WP_USER, resolve_category_id
+    category_id = resolve_category_id(settings["url"], password, selected)
+    if not category_id:
+        last_error = ""
+        for attempt in range(3):
+            try:
+                response = requests.post(
+                    f"{settings['url'].rstrip('/')}/wp-json/wp/v2/categories",
+                    auth=(WP_USER, password),
+                    json={"name": selected},
+                    timeout=30,
+                )
+                if response.status_code in (200, 201):
+                    category_id = int(response.json().get("id") or 0)
+                    break
+                if response.status_code == 400:
+                    category_id = resolve_category_id(settings["url"], password, selected)
+                    if category_id:
+                        break
+                last_error = f"HTTP {response.status_code}: {response.text[:300]}"
+            except requests.RequestException as exc:
+                last_error = f"{type(exc).__name__}: {exc}"
+            time.sleep(2 + attempt)
+        if not category_id:
+            raise RuntimeError(f"WordPress category could not be resolved/created before image stage: {selected}; {last_error}")
+
+    state["category_assignment"] = {
+        "status": "ok",
+        "name": selected,
+        "id": int(category_id),
+        "completed_at": datetime.now(KST).isoformat(),
+    }
+    _write_state(state)
+    return int(category_id)
+
+
+def _publish_wordpress_via_worker(state: dict, profile: dict, public: bool) -> dict:
+    """Hand publication to the existing durable VPS WordPress worker."""
+    queue = Path(os.environ.get("VPS_WP_QUEUE", ROOT / "data/vps-wp-queue"))
+    queue.mkdir(parents=True, exist_ok=True)
+    article = state["article"]
+    category = state.get("category_assignment") or {}
+    if category.get("status") != "ok" or not category.get("id"):
+        raise RuntimeError("category assignment is not complete; publication blocked")
+
+    attempt = int(state.get("publish_attempt") or 0) + 1
+    state["publish_attempt"] = attempt
+    _write_state(state)
+    safe_run = re.sub(r"[^a-zA-Z0-9._-]+", "-", state["run_id"])
+    job_id = f"london-{safe_run}-p{attempt}"
+    payload = {
+        "job_id": job_id,
+        "site_url": profile["wordpress"]["url"].rstrip("/"),
+        "secret_name": profile["wordpress"]["secret_name"],
+        "title": article["title"],
+        "content_html": article["content_html"],
+        "image_url": state.get("image", {}).get("url", ""),
+        "category_id": int(category["id"]),
+        "category_name": category.get("name", ""),
+        "focus_keyword": state["research"]["keyword"],
+        "meta_description": article.get("meta_description", ""),
+        "status_after_review": "publish" if public else "draft",
+        "source": "london-four-agent",
+        "received_at": datetime.now(timezone.utc).isoformat(),
+        "retries": 0,
+    }
+    tmp = queue / f".{job_id}.tmp"
+    queued = queue / f"{job_id}.queued.json"
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.chmod(tmp, 0o600)
+    os.replace(tmp, queued)
+
+    # Worker normally runs continuously; recover it if it is down.
+    check = subprocess.run(
+        ["systemctl", "is-active", "--quiet", "korea365-wp-publisher.service"],
+        capture_output=True,
+    )
+    if check.returncode != 0:
+        subprocess.run(["systemctl", "start", "korea365-wp-publisher.service"], check=True)
+
+    deadline = time.time() + 220
+    suffixes = ("published", "drafted", "failed", "credential_required")
+    while time.time() < deadline:
+        for suffix in suffixes:
+            result_path = queue / f"{job_id}.{suffix}.json"
+            if not result_path.exists():
+                continue
+            result = json.loads(result_path.read_text(encoding="utf-8"))
+            if suffix in {"failed", "credential_required"}:
+                raise RuntimeError(
+                    result.get("last_output")
+                    or result.get("error")
+                    or f"WordPress worker ended with {suffix}"
+                )
+            post_id = result.get("remote_id")
+            url = result.get("public_url")
+            if not post_id or not url:
+                raise RuntimeError("WordPress worker receipt missing post ID or URL")
+            return {
+                "status": "published" if suffix == "published" else "draft",
+                "platform": "wordpress",
+                "site": profile["wordpress"]["url"],
+                "url": url,
+                "post_id": post_id,
+                "title": article["title"],
+                "worker_job_id": job_id,
+            }
+        time.sleep(2)
+    raise RuntimeError(f"WordPress worker timeout waiting for receipt: {job_id}")
 
 
 def _parse_keyword(text: str) -> str:
@@ -251,9 +374,28 @@ def stage_write(run_id: str) -> dict:
         raise RuntimeError(f"writer quality gate failed: score={score} failures={failures}")
     state["article"] = article
     state["writer"] = {"quality_score": score, "provider": provider, "failures": failures}
+    if platform == "wordpress":
+        category_id = _ensure_wordpress_category(profile, state)
+    else:
+        state["category_assignment"] = {
+            "status": "ok",
+            "name": str(state.get("category") or "").strip(),
+            "id": None,
+            "completed_at": datetime.now(KST).isoformat(),
+        }
+        _write_state(state)
+        category_id = None
     state.setdefault("stage_status", {})["write"] = "ok"
     _write_state(state)
-    return {"ok": True, "stage": "write", "site_id": site_id, "run_id": run_id, "quality_score": score, "provider": provider}
+    return {
+        "ok": True,
+        "stage": "write",
+        "site_id": site_id,
+        "run_id": run_id,
+        "quality_score": score,
+        "provider": provider,
+        "category": state["category_assignment"],
+    }
 
 
 def stage_image(run_id: str) -> dict:
@@ -262,6 +404,8 @@ def stage_image(run_id: str) -> dict:
     state.setdefault("stage_status", {})["image"] = "running"
     _write_state(state)
     site_id = state["site_id"]
+    if state.get("platform") == "wordpress" and state.get("category_assignment", {}).get("status") != "ok":
+        raise RuntimeError("category assignment must complete before image generation")
     article = state["article"]
     image_url = ""
     status = "no_image"
@@ -340,48 +484,8 @@ def stage_publish(run_id: str) -> dict:
     _write_state(state)
     platform, profile = _profile(state["site_id"])
     public = state.get("publish_mode", "draft") == "publish"
-    article = state["article"]
-    keyword = state["research"]["keyword"]
-    image_url = state.get("image", {}).get("url", "")
     if platform == "wordpress":
-        from scripts.auto_write_and_draft import _publish_wordpress
-        receipt = _publish_wordpress(
-            site_url=profile["wordpress"]["url"],
-            secret_name=profile["wordpress"]["secret_name"],
-            article=article,
-            image_url=image_url,
-            keyword=keyword,
-        )
-        selected_category = str(state.get("category") or "").strip()
-        if selected_category:
-            from scripts.create_manual_wp_draft import resolve_category_id
-            password = os.environ.get(profile["wordpress"]["secret_name"], "")
-            category_id = resolve_category_id(profile["wordpress"]["url"], password, selected_category)
-            if not category_id:
-                raise RuntimeError(f"selected WordPress category not found: {selected_category}")
-            response = requests.post(
-                f"{profile['wordpress']['url'].rstrip('/')}/wp-json/wp/v2/posts/{receipt['post_id']}",
-                auth=("huh0303@gmail.com", password),
-                json={"categories": [category_id]},
-                timeout=30,
-            )
-            response.raise_for_status()
-        if public:
-            password = os.environ.get(profile["wordpress"]["secret_name"], "")
-            post_id = receipt["post_id"]
-            response = requests.post(
-                f"{profile['wordpress']['url'].rstrip('/')}/wp-json/wp/v2/posts/{post_id}",
-                auth=("huh0303@gmail.com", password),
-                json={"status": "publish"},
-                timeout=40,
-            )
-            response.raise_for_status()
-            row = response.json()
-            from automation_hub.public_verifier import verify_publication
-            verification = verify_publication(row.get("link", ""), article["title"], site_url=profile["wordpress"]["url"], attempts=3)
-            if not verification.ok:
-                raise RuntimeError(f"WordPress public verification failed: {verification.error_code}")
-            receipt.update(status="published", url=verification.final_url or row.get("link", ""))
+        receipt = _publish_wordpress_via_worker(state, profile, public)
     else:
         receipt = _publish_blogger(state, profile, public)
     if not receipt.get("post_id"):
@@ -389,12 +493,21 @@ def stage_publish(run_id: str) -> dict:
     if not receipt.get("url"):
         raise RuntimeError("publisher receipt missing url")
     receipt["verified_at"] = datetime.now(KST).isoformat()
+    state = _read_state(run_id)
     state["receipt"] = receipt
     state.setdefault("stage_status", {})["publish"] = "ok"
+    state.pop("last_error", None)
     state["completed_at"] = datetime.now(KST).isoformat()
     _write_state(state)
-    return {"ok": True, "stage": "publish", "site_id": state["site_id"], "run_id": run_id, "status": receipt["status"], "url": receipt["url"], "post_id": receipt["post_id"]}
-
+    return {
+        "ok": True,
+        "stage": "publish",
+        "site_id": state["site_id"],
+        "run_id": run_id,
+        "status": receipt["status"],
+        "url": receipt["url"],
+        "post_id": receipt["post_id"],
+    }
 
 def main() -> int:
     parser = argparse.ArgumentParser()
