@@ -1,0 +1,52 @@
+name: London Ollama Bootstrap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/london-ollama-bootstrap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Pull and verify Qwen local fallback
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+            for i in $(seq 1 90); do
+              if curl -fsS http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+                break
+              fi
+              sleep 2
+            done
+            curl -fsS http://127.0.0.1:11434/api/tags
+            docker exec korea365-ollama ollama pull qwen2.5:3b
+            echo "=== MODELS ==="
+            curl -fsS http://127.0.0.1:11434/api/tags
+            echo
+            echo "=== LOCAL GENERATION TEST ==="
+            python3 - <<'PY'
+            import json, requests
+            r=requests.post(
+                'http://127.0.0.1:11434/api/generate',
+                json={'model':'qwen2.5:3b','prompt':'Reply exactly LOCAL_OK','stream':False,
+                      'options':{'temperature':0,'num_predict':20}},
+                timeout=240,
+            )
+            r.raise_for_status()
+            text=str(r.json().get('response','')).strip()
+            print(text)
+            if 'LOCAL_OK' not in text:
+                raise SystemExit('local model verification failed')
+            PY
