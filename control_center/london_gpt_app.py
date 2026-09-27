@@ -6,15 +6,12 @@ import json
 import os
 import re
 import secrets
+import threading
 
 import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DIR = PROJECT_ROOT / "data" / "london-pipeline"
-N8N_WEBHOOK = os.environ.get(
-    "LONDON_GPT_N8N_WEBHOOK",
-    "http://127.0.0.1:5678/webhook/london-content-four-agent",
-)
 GATEWAY = os.environ.get("LONDON_GPT_GATEWAY", "http://127.0.0.1:8766").rstrip("/")
 
 
@@ -43,16 +40,15 @@ def _naver_expected(project_root: Path) -> int:
 
 
 def _categories_by_url() -> dict[str, list[str]]:
-    source = (PROJECT_ROOT / "scripts" / "refresh_keyword_pool.py").read_text(encoding="utf-8")
-    pattern = re.compile(
-        r'\{"url":\s*"([^"]+)"[\s\S]*?"categories":\s*\[([^\]]*)\][\s\S]*?"lang":\s*"([^"]+)"\}'
+    """OWNER-LOCKED 24-site category master."""
+    payload = json.loads(
+        (PROJECT_ROOT / "config" / "WP24_CATEGORY_MASTER.json").read_text(encoding="utf-8")
     )
-    out: dict[str, list[str]] = {}
-    for match in pattern.finditer(source):
-        url = match.group(1).rstrip("/")
-        categories = re.findall(r'"([^"]+)"', match.group(2))
-        out[url] = categories
-    return out
+    return {
+        "https://" + str(row["domain"]).strip().lower(): [str(x) for x in row.get("categories", [])]
+        for row in payload.get("sites", [])
+        if row.get("domain")
+    }
 
 
 def _content_sites() -> list[dict]:
@@ -90,16 +86,73 @@ def _state_file(run_id: str) -> Path:
 def _read_run(run_id: str) -> dict:
     path = _state_file(run_id)
     if not path.exists():
-        return {
-            "run_id": run_id,
-            "stage_status": {},
-            "message": "n8n 시작 대기",
-        }
+        return {"run_id": run_id, "stage_status": {}, "message": "실행 대기"}
     try:
-        state = json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:
         return {"run_id": run_id, "stage_status": {}, "last_error": {"message": str(exc)}}
-    return state
+
+
+def _write_run(state: dict) -> None:
+    PIPELINE_DIR.mkdir(parents=True, exist_ok=True)
+    path = _state_file(str(state.get("run_id") or ""))
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def _gateway_call(stage: str, run_id: str) -> None:
+    """Run exactly one visible agent in background."""
+    state = _read_run(run_id)
+    token = os.environ.get("N8N_GATEWAY_TOKEN", "").strip()
+    if not token:
+        state.setdefault("stage_status", {})[stage] = "failed"
+        state["last_error"] = {
+            "stage": stage,
+            "type": "ConfigurationError",
+            "message": "N8N_GATEWAY_TOKEN is missing on the VPS",
+            "at": datetime.now(timezone.utc).isoformat(),
+        }
+        _write_run(state)
+        return
+    body = {
+        "run_id": run_id,
+        "site_id": str(state.get("site_id") or ""),
+        "category": str(state.get("category") or ""),
+        "publish_mode": str(state.get("publish_mode") or "draft"),
+    }
+    try:
+        response = requests.post(
+            f"{GATEWAY}/pipeline/{stage}",
+            json=body,
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=330,
+        )
+        if response.status_code >= 400:
+            latest = _read_run(run_id)
+            if latest.get("stage_status", {}).get(stage) != "failed":
+                latest.setdefault("stage_status", {})[stage] = "failed"
+                latest["last_error"] = {
+                    "stage": stage,
+                    "type": "GatewayStageError",
+                    "message": response.text[:1200],
+                    "at": datetime.now(timezone.utc).isoformat(),
+                }
+                _write_run(latest)
+    except requests.RequestException as exc:
+        latest = _read_run(run_id)
+        latest.setdefault("stage_status", {})[stage] = "failed"
+        latest["last_error"] = {
+            "stage": stage,
+            "type": type(exc).__name__,
+            "message": str(exc)[:1200],
+            "at": datetime.now(timezone.utc).isoformat(),
+        }
+        _write_run(latest)
+
+
+def _start_stage(stage: str, run_id: str) -> None:
+    threading.Thread(target=_gateway_call, args=(stage, run_id), daemon=True).start()
 
 
 def install(app, runtime):
@@ -131,10 +184,10 @@ def install(app, runtime):
             },
             "sites": _content_sites(),
             "pipeline": [
-                {"id": "research", "label": "1. 키워드 리서치", "purpose": "Google·Naver·미디어·GSC 조사 후 주제 확정"},
-                {"id": "write", "label": "2. 글쓰기", "purpose": "사이트 페르소나·톤·언어·길이에 맞춰 원고 생성"},
-                {"id": "image", "label": "3. 이미지 생성", "purpose": "필요 시 0~1장 생성·검증·안정화"},
-                {"id": "publish", "label": "4. 발행·검증", "purpose": "WordPress/Blogger 발행 후 URL·post ID 영수증 확인"},
+                {"id": "research", "label": "1. 키워드/주제어", "purpose": "Google·Naver·미디어·GSC 리서치 후 주제 확정"},
+                {"id": "write", "label": "2. 글쓰기", "purpose": "확정 키워드로 사이트 페르소나·톤·언어에 맞춰 작성"},
+                {"id": "image", "label": "3. 이미지", "purpose": "필요 시 0~1장 생성·검증"},
+                {"id": "publish", "label": "4. 발행", "purpose": "선택 카테고리로 발행 후 URL·post ID 검증"},
             ],
         }
 
@@ -148,8 +201,8 @@ def install(app, runtime):
         from flask import jsonify
         return jsonify(snapshot())
 
-    @app.post("/api/london-gpt/run")
-    def london_gpt_run():
+    @app.post("/api/london-gpt/research")
+    def london_gpt_research():
         from flask import jsonify, request
         payload = request.get_json(silent=True) or {}
         site_id = str(payload.get("site_id") or "").strip()
@@ -162,26 +215,63 @@ def install(app, runtime):
             return jsonify({"ok": False, "error": "invalid_category"}), 400
         if publish_mode not in {"draft", "publish"}:
             return jsonify({"ok": False, "error": "invalid_publish_mode"}), 400
+
         run_id = f"lgpt-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
-        request_body = {
+        state = {
+            "run_id": run_id,
             "site_id": site_id,
+            "platform": "wordpress",
             "category": category,
             "publish_mode": publish_mode,
-            "run_id": run_id,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "stage_status": {
+                "research": "running",
+                "write": "waiting",
+                "image": "waiting",
+                "publish": "waiting",
+            },
         }
-        try:
-            response = requests.post(N8N_WEBHOOK, json=request_body, timeout=8)
-        except requests.RequestException as exc:
-            return jsonify({"ok": False, "error": "n8n_unreachable", "message": str(exc), "run_id": run_id}), 503
-        if response.status_code >= 400:
-            return jsonify({
-                "ok": False,
-                "error": "n8n_rejected",
-                "http": response.status_code,
-                "message": response.text[:500],
-                "run_id": run_id,
-            }), 502
-        return jsonify({"ok": True, "run_id": run_id, "site_id": site_id, "category": category, "publish_mode": publish_mode})
+        _write_run(state)
+        _start_stage("research", run_id)
+        return jsonify({"ok": True, "run_id": run_id, "stage": "research"}), 202
+
+    @app.post("/api/london-gpt/keyword")
+    def london_gpt_keyword():
+        from flask import jsonify, request
+        payload = request.get_json(silent=True) or {}
+        run_id = str(payload.get("run_id") or "").strip()
+        keyword = str(payload.get("keyword") or "").strip()
+        if not run_id or not 3 <= len(keyword) <= 80:
+            return jsonify({"ok": False, "error": "invalid_keyword"}), 400
+        state = _read_run(run_id)
+        if state.get("stage_status", {}).get("research") != "ok":
+            return jsonify({"ok": False, "error": "research_not_complete"}), 409
+        state.setdefault("research", {})["keyword"] = keyword
+        state["research"]["keyword_confirmed"] = True
+        _write_run(state)
+        return jsonify({"ok": True, "run_id": run_id, "keyword": keyword})
+
+    @app.post("/api/london-gpt/stage/<stage>")
+    def london_gpt_stage(stage: str):
+        from flask import jsonify, request
+        if stage not in {"write", "image", "publish"}:
+            return jsonify({"ok": False, "error": "unknown_stage"}), 404
+        payload = request.get_json(silent=True) or {}
+        run_id = str(payload.get("run_id") or "").strip()
+        if not run_id:
+            return jsonify({"ok": False, "error": "run_id_required"}), 400
+        state = _read_run(run_id)
+        required = {"write": "research", "image": "write", "publish": "image"}[stage]
+        if state.get("stage_status", {}).get(required) != "ok":
+            return jsonify({"ok": False, "error": f"{required}_not_complete"}), 409
+        if stage == "write" and not str(state.get("research", {}).get("keyword") or "").strip():
+            return jsonify({"ok": False, "error": "keyword_required"}), 409
+
+        state.setdefault("stage_status", {})[stage] = "running"
+        state.pop("last_error", None)
+        _write_run(state)
+        _start_stage(stage, run_id)
+        return jsonify({"ok": True, "run_id": run_id, "stage": stage}), 202
 
     @app.get("/api/london-gpt/run/<run_id>")
     def london_gpt_run_status(run_id: str):
@@ -198,31 +288,10 @@ def install(app, runtime):
         if not run_id:
             return jsonify({"ok": False, "error": "run_id_required"}), 400
         state = _read_run(run_id)
-        site_id = str(state.get("site_id") or "")
-        category = str(state.get("category") or "")
-        publish_mode = str(state.get("publish_mode") or "draft")
-        token = os.environ.get("N8N_GATEWAY_TOKEN", "").strip()
-        if not token:
-            return jsonify({"ok": False, "error": "gateway_token_missing"}), 503
-        body = {
-            "run_id": run_id,
-            "site_id": site_id,
-            "category": category,
-            "publish_mode": publish_mode,
-        }
-        try:
-            response = requests.post(
-                f"{GATEWAY}/pipeline/{stage}",
-                json=body,
-                headers={"Authorization": f"Bearer {token}"},
-                timeout=330,
-            )
-        except requests.RequestException as exc:
-            return jsonify({"ok": False, "error": "gateway_unreachable", "message": str(exc)}), 503
-        try:
-            data = response.json()
-        except ValueError:
-            data = {"ok": False, "message": response.text[:500]}
-        return jsonify(data), response.status_code
+        state.setdefault("stage_status", {})[stage] = "running"
+        state.pop("last_error", None)
+        _write_run(state)
+        _start_stage(stage, run_id)
+        return jsonify({"ok": True, "run_id": run_id, "stage": stage}), 202
 
     return snapshot
