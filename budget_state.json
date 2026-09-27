@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 14.97,
+  "spent_estimate_usd": 15.0,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -4226,6 +4226,15 @@
       "amount_usd": 0.03,
       "reservation_id": "3441902966f709e42e2f13c7e742c5d28df95e560ad3add96a381826ebe920c4",
       "run_id": "36320795491",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-28T02:43:23.238112+09:00",
+      "label": "blogger-rewrite:blogger_kinvest365",
+      "amount_usd": 0.03,
+      "reservation_id": "4d5a525cf264aaa7856f5c83bcff1d242b992d0aefce44688828f875599e42d3",
+      "run_id": "36337970411",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
