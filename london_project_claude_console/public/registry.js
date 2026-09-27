@@ -1,6 +1,7 @@
 // 통합 사이트 설정 탭 (WP+블로그스팟+뉴스+네이버+티스토리) — 신규 독립 스크립트.
 // app.js/bridge.js(원본 Electron 렌더러 로직)는 전혀 건드리지 않음. fetch()로 직접
-// /api/registry/*, /api/n8n/* 호출.
+// /api/registry/*, /api/n8n/* 호출. .workspace 그리드 밖에 별도 <section>으로 배치되어
+// 기존 패널들과 레이아웃 충돌(겹침) 없음.
 (function () {
   const tbody = document.getElementById("registryTableBody");
   const summaryText = document.getElementById("registrySummaryText");
@@ -39,9 +40,45 @@
     return json;
   }
 
-  function charsText(s) {
-    const parts = [s.min_chars, s.target_chars, s.max_chars].map((v) => (v == null ? "-" : v));
-    return parts.join(" / ");
+  function scrollToJobForm() {
+    const form = document.getElementById("jobForm");
+    if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function actionCell(site) {
+    if (site.platform === "naver") {
+      const btn = document.createElement("button");
+      btn.className = "ghost small";
+      btn.type = "button";
+      btn.textContent = "이 계정으로 글쓰기";
+      btn.addEventListener("click", () => {
+        const blogIdInput = document.getElementById("blogId");
+        const labelInput = document.getElementById("accountLabel");
+        if (blogIdInput) blogIdInput.value = site.blog_slug || "";
+        if (labelInput) labelInput.value = site.label || "";
+        scrollToJobForm();
+      });
+      return btn;
+    }
+    if (site.platform === "tistory") {
+      const btn = document.createElement("button");
+      btn.className = "ghost small";
+      btn.type = "button";
+      btn.textContent = "이 계정으로 글쓰기";
+      btn.addEventListener("click", () => {
+        const tistoryInput = document.getElementById("tistoryBlogId");
+        const checkbox = document.getElementById("publishToTistoryAfterNaver");
+        if (tistoryInput) tistoryInput.value = site.blog_slug || "";
+        if (checkbox) checkbox.checked = true;
+        scrollToJobForm();
+      });
+      return btn;
+    }
+    const span = document.createElement("span");
+    span.className = "hint";
+    span.style.fontSize = "11px";
+    span.textContent = "상단 배치 트리거 버튼 사용";
+    return span;
   }
 
   function row(site) {
@@ -67,17 +104,18 @@
         <input data-field="max_chars" type="number" style="width:60px;" value="${site.max_chars ?? ""}" />
       </td>
       <td style="padding:4px;"><input data-field="image_count" type="number" min="0" max="10" style="width:50px;" value="${site.image_count ?? ""}" /></td>
-      <td style="padding:4px;"><button class="ghost small" type="button">저장</button></td>
+      <td style="padding:4px;"><button class="ghost small" type="button" data-action="save">저장</button></td>
+      <td style="padding:4px;" data-action-cell></td>
     `;
 
-    tr.querySelector("button").addEventListener("click", async () => {
+    tr.querySelector('[data-action="save"]').addEventListener("click", async () => {
       const patch = {};
       tr.querySelectorAll("[data-field]").forEach((el) => {
         const key = el.getAttribute("data-field");
         const val = el.value;
         patch[key] = el.type === "number" ? (val === "" ? null : Number(val)) : val;
       });
-      const btn = tr.querySelector("button");
+      const btn = tr.querySelector('[data-action="save"]');
       btn.disabled = true;
       btn.textContent = "저장중...";
       try {
@@ -91,6 +129,8 @@
         btn.disabled = false;
       }
     });
+
+    tr.querySelector("[data-action-cell]").appendChild(actionCell(site));
 
     return tr;
   }
@@ -123,6 +163,22 @@
     }
   }
 
+  async function runBatch(action, btn) {
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "실행 요청 중...";
+    try {
+      const result = await api(`/api/n8n/run/${encodeURIComponent(action)}`, { method: "POST", body: {} });
+      btn.textContent = result.ok ? "실행됨 ✓" : "실행 실패";
+    } catch (err) {
+      btn.textContent = "실패";
+      alert(`${action} 실행 실패: ${err.message}`);
+    } finally {
+      setTimeout(() => (btn.textContent = original), 2000);
+      btn.disabled = false;
+    }
+  }
+
   filterSelect.addEventListener("change", render);
   reloadBtn.addEventListener("click", loadSummaryAndSites);
   n8nBtn.addEventListener("click", async () => {
@@ -134,6 +190,13 @@
       n8nText.textContent = "n8n 게이트웨이 확인 실패 (VPS 로컬 8766 포트, 토큰 필요): " + err.message;
     }
   });
+
+  const wpBtn = document.getElementById("triggerWpButton");
+  const blogspotBtn = document.getElementById("triggerBlogspotButton");
+  const newsBtn = document.getElementById("triggerNewsButton");
+  if (wpBtn) wpBtn.addEventListener("click", () => runBatch("wp25_tick", wpBtn));
+  if (blogspotBtn) blogspotBtn.addEventListener("click", () => runBatch("blogger33_daily", blogspotBtn));
+  if (newsBtn) newsBtn.addEventListener("click", () => runBatch("news2", newsBtn));
 
   loadSummaryAndSites();
 })();

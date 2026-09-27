@@ -335,45 +335,6 @@
           <div id="imageNotes" class="image-notes"></div>
         </section>
 
-        <section class="panel registry-panel" aria-label="통합 사이트 설정" style="grid-column: 1 / -1;">
-          <div class="panel-head">
-            <div>
-              <h2>사이트 설정 — WP+블로그스팟+뉴스+네이버+티스토리</h2>
-              <p class="hint" id="registrySummaryText">불러오는 중...</p>
-            </div>
-            <div class="history-actions">
-              <select id="registryPlatformFilter">
-                <option value="">전체 플랫폼</option>
-                <option value="wordpress">WordPress</option>
-                <option value="blogspot">Blogspot</option>
-                <option value="news">뉴스</option>
-                <option value="tistory">Tistory</option>
-                <option value="naver">Naver</option>
-              </select>
-              <button id="registryReloadButton" class="ghost small" type="button">새로고침</button>
-              <button id="n8nHealthButton" class="ghost small" type="button">n8n 게이트웨이 상태</button>
-            </div>
-          </div>
-          <p class="hint" id="n8nHealthText"></p>
-          <div style="overflow-x:auto;">
-            <table id="registryTable" style="width:100%; border-collapse:collapse; font-size:13px;">
-              <thead>
-                <tr>
-                  <th style="text-align:left; padding:4px;">플랫폼</th>
-                  <th style="text-align:left; padding:4px;">사이트/계정</th>
-                  <th style="text-align:left; padding:4px;">소유 트랙</th>
-                  <th style="text-align:left; padding:4px;">페르소나</th>
-                  <th style="text-align:left; padding:4px;">톤앤매너</th>
-                  <th style="text-align:left; padding:4px;">글자수(최소/목표/최대)</th>
-                  <th style="text-align:left; padding:4px;">이미지수</th>
-                  <th style="text-align:left; padding:4px;">저장</th>
-                </tr>
-              </thead>
-              <tbody id="registryTableBody"></tbody>
-            </table>
-          </div>
-        </section>
-
         <section class="panel history-panel" aria-label="작업 이력">
           <div class="panel-head">
             <div>
@@ -388,6 +349,52 @@
           <div id="historySummary" class="history-summary"></div>
         </section>
       </main>
+
+      <section class="registry-panel" aria-label="통합 사이트 설정" style="margin:24px 24px 40px; background:#1c1c1c; border:1px solid #333; border-radius:8px; padding:16px;">
+        <div class="panel-head" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h2 style="margin:0 0 4px;">사이트 설정 — WP+블로그스팟+뉴스+네이버+티스토리</h2>
+            <p class="hint" id="registrySummaryText">불러오는 중...</p>
+          </div>
+          <div class="history-actions" style="display:flex; gap:8px; align-items:center;">
+            <select id="registryPlatformFilter">
+              <option value="">전체 플랫폼</option>
+              <option value="wordpress">WordPress</option>
+              <option value="blogspot">Blogspot</option>
+              <option value="news">뉴스</option>
+              <option value="tistory">Tistory</option>
+              <option value="naver">Naver</option>
+            </select>
+            <button id="registryReloadButton" class="ghost small" type="button">새로고침</button>
+            <button id="n8nHealthButton" class="ghost small" type="button">n8n 게이트웨이 상태</button>
+          </div>
+        </div>
+        <p class="hint" id="n8nHealthText"></p>
+        <div class="hint" style="margin:4px 0 12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <span>WP/블로그스팟/뉴스는 사이트별이 아니라 배치 단위로만 트리거됩니다(n8n_gateway.py 구조상):</span>
+          <button id="triggerWpButton" class="ghost small" type="button">WP25 배치 실행</button>
+          <button id="triggerBlogspotButton" class="ghost small" type="button">블로그스팟33 배치 실행</button>
+          <button id="triggerNewsButton" class="ghost small" type="button">뉴스2 배치 실행</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="registryTable" style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:4px;">플랫폼</th>
+                <th style="text-align:left; padding:4px;">사이트/계정</th>
+                <th style="text-align:left; padding:4px;">소유 트랙</th>
+                <th style="text-align:left; padding:4px;">페르소나</th>
+                <th style="text-align:left; padding:4px;">톤앤매너</th>
+                <th style="text-align:left; padding:4px;">글자수(최소/목표/최대)</th>
+                <th style="text-align:left; padding:4px;">이미지수</th>
+                <th style="text-align:left; padding:4px;">저장</th>
+                <th style="text-align:left; padding:4px;">글쓰기/발행</th>
+              </tr>
+            </thead>
+            <tbody id="registryTableBody"></tbody>
+          </table>
+        </div>
+      </section>
     </div>
     <div id="historyModal" class="modal-backdrop" hidden>
       <section class="history-modal" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
