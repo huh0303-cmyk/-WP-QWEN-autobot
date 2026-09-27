@@ -32,10 +32,16 @@ if ! command -v google-chrome-stable >/dev/null 2>&1; then
   apt-get install -y google-chrome-stable
 fi
 
-if ! command -v node >/dev/null 2>&1; then
+if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   apt-get install -y nodejs
 fi
+if ! command -v npm >/dev/null 2>&1; then
+  echo "npm still missing after nodesource install - falling back to distro package"
+  apt-get install -y npm
+fi
+command -v node && node --version
+command -v npm && npm --version
 
 echo "=== [2/6] service user ==="
 id -u "$RUN_USER" >/dev/null 2>&1 || useradd -r -m -s /usr/sbin/nologin "$RUN_USER"
