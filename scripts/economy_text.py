@@ -74,7 +74,7 @@ def _try_gemini(prompt, temperature):
 
         f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent',
 
-        headers={'x-goog-api-key': key}, timeout=60,
+        headers={'x-goog-api-key': key}, timeout=45,
 
         json={'contents': [{'parts': [{'text': prompt}]}],
 
@@ -152,7 +152,7 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
             raise RuntimeError('Daily article fallback permits gpt-5-mini only')
         if _article_attempts is not None:
             _article_attempts.add('openai:gpt-5-mini')
-        text = openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=60)
+        text = openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=45)
         last_writer_model = 'gpt-5-mini'
         receipt = Path('artifacts/article-writer-usage.jsonl')
         receipt.parent.mkdir(parents=True, exist_ok=True)
