@@ -58,8 +58,43 @@ function defaultImageCount(targetChars) {
   return Math.max(1, Math.min(6, n));
 }
 
+function domainFromUrl(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+// WP: daily_site_traffic_result.json (리포 루트, daily-site-traffic.yml 워크플로우 산출물)의
+// yesterday_visitors 필드를 domain 기준으로 매칭.
+function loadWpTrafficByDomain() {
+  const data = readJsonSafe(path.join(REPO_ROOT, "daily_site_traffic_result.json"), null);
+  const map = {};
+  if (data && Array.isArray(data.records)) {
+    for (const r of data.records) {
+      if (r.domain) map[r.domain] = r.yesterday_visitors ?? null;
+    }
+  }
+  return { map, checkedAt: data?.checked_at || null };
+}
+
+// Blogspot: data/blogger_traffic_latest.json의 "yesterday" 필드를 URL 기준으로 매칭.
+function loadBlogspotTrafficByUrl() {
+  const data = readJsonSafe(path.join(REPO_ROOT, "data", "blogger_traffic_latest.json"), null);
+  const map = {};
+  if (data && data.sites && typeof data.sites === "object") {
+    for (const [url, stats] of Object.entries(data.sites)) {
+      map[url.replace(/\/$/, "")] = stats?.yesterday ?? null;
+    }
+  }
+  return { map, generatedAt: data?.generated_at || null };
+}
+
 function buildBaseRegistry() {
   const entries = [];
+  const wpTraffic = loadWpTrafficByDomain();
+  const blogspotTraffic = loadBlogspotTrafficByUrl();
 
   // --- WordPress 27 + Blogspot 33 (content_engine_profiles.json이 가장 완전한 소스) ---
   const profiles = readJsonSafe(
@@ -85,6 +120,8 @@ function buildBaseRegistry() {
         max_chars: w.max_chars ?? null,
         image_count: defaultImageCount(w.target_chars),
         n8n_action: "wp25_tick",
+        yesterday_visitors: wpTraffic.map[domainFromUrl(w.url)] ?? null,
+        traffic_checked_at: wpTraffic.checkedAt,
       });
     }
     if (p.blogspot) {
@@ -96,6 +133,8 @@ function buildBaseRegistry() {
         owner_track: "gpt_n8n",
         language: p.language || null,
         url: b.url,
+        yesterday_visitors: blogspotTraffic.map[(b.url || "").replace(/\/$/, "")] ?? null,
+        traffic_checked_at: blogspotTraffic.generatedAt,
         persona: b.persona || "",
         tone: b.tone || "",
         min_chars: b.min_chars ?? null,
