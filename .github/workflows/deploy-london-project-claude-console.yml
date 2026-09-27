@@ -53,3 +53,13 @@ jobs:
               LPC_PASS='${{ inputs.lpc_password }}' \
               VNC_PASSWORD='${{ inputs.vnc_password }}' \
               "$APP_DIR/deploy/install.sh"
+
+            echo "=== [verify] service status after 3s settle ==="
+            sleep 3
+            systemctl is-active lpc-xvfb lpc-x11vnc lpc-novnc lpc-console || true
+            echo "=== [verify] local HTTP check ==="
+            curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1:8787/login || echo "curl failed"
+            echo "=== [verify] lpc-console journal (last 20 lines) ==="
+            journalctl -u lpc-console -n 20 --no-pager || true
+            echo "=== [verify] open ports ==="
+            ss -tlnp 2>/dev/null | grep -E ':8787|:6077' || echo "(ss not available or ports not listed)"
