@@ -1,6 +1,6 @@
 {
   "month": "2026-09",
-  "spent_estimate_usd": 14.85,
+  "spent_estimate_usd": 14.88,
   "calls": [
     {
       "at": "2026-09-01T15:45:03.595668+09:00",
@@ -4190,6 +4190,15 @@
       "amount_usd": 0.03,
       "reservation_id": "eaf7cfdf8902d6ad9c5ea8fac5b505d0144795c43013c0eb932e1878954e67c3",
       "run_id": "36300530665",
+      "run_attempt": "1",
+      "cost_type": "estimate"
+    },
+    {
+      "at": "2026-09-27T15:35:41.302144+09:00",
+      "label": "blogger-rewrite:blogger_kwellness_lab",
+      "amount_usd": 0.03,
+      "reservation_id": "35fe14ccde477318cb93686b4e1d583abe6cd8a42177481623aa9942ffb9f280",
+      "run_id": "36300525493",
       "run_attempt": "1",
       "cost_type": "estimate"
     }
