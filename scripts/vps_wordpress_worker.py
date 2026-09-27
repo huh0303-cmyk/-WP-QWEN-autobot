@@ -52,6 +52,39 @@ def _is_temporary_image_url(url: str) -> bool:
     return any(host in lowered for host in _TEMP_IMAGE_HOSTS) or "x-amz-signature=" in lowered
 
 
+def _strip_leading_duplicate_hero(content_html: str, hero_url: str) -> str:
+    """Drop a leading <figure>/<img> block if it embeds the same photo that
+    was just assigned as the WordPress featured image.
+
+    The site theme renders the featured image above the post title on its
+    own, so leaving the identical photo as the first block of `content` too
+    shows it twice on the page (2026-09-28: reported on k-trip365.com —
+    "사진이 두번 나와"). Only the leading block is ever touched, and only when
+    it actually contains `hero_url`, so a post whose first image is
+    something else (or that has no duplicate) is left untouched. This is
+    the same safety pattern scripts/fix_duplicate_hero_images.py used for
+    the older review-pipeline hero format, generalized to match the actual
+    rehosted URL instead of one hardcoded inline-style signature.
+    """
+    stripped = content_html.lstrip()
+    if stripped.startswith("<figure"):
+        end = stripped.find("</figure>")
+        if end == -1:
+            return content_html
+        end += len("</figure>")
+        leading_block = stripped[:end]
+        if hero_url not in leading_block:
+            return content_html
+        return stripped[end:].lstrip("\n").lstrip()
+    if stripped.startswith("<img"):
+        end = stripped.find(">") + 1
+        leading_block = stripped[:end]
+        if hero_url not in leading_block:
+            return content_html
+        return stripped[end:].lstrip("\n").lstrip()
+    return content_html
+
+
 def _rehost_temp_images(content_html: str, site_url: str, auth: HTTPBasicAuth, job_id: str) -> tuple[str, int]:
     """Return (content_html with temp URLs replaced, featured media id or 0).
 
@@ -60,8 +93,16 @@ def _rehost_temp_images(content_html: str, site_url: str, auth: HTTPBasicAuth, j
     for the direct-publish path (hold the whole post rather than let a
     broken image through).
     """
-    candidates = [u for u in set(re.findall(r'src="(https?://[^"]+)"', content_html)) if _is_temporary_image_url(u)]
+    # Preserve first-appearance order. The previous `set(...)` here made
+    # "which image becomes the featured image" nondeterministic whenever a
+    # post had more than one temp-hosted image, since set iteration order
+    # is not the order the images appear in the article.
+    candidates: list[str] = []
+    for u in re.findall(r'src="(https?://[^"]+)"', content_html):
+        if _is_temporary_image_url(u) and u not in candidates:
+            candidates.append(u)
     featured_media_id = 0
+    hero_source_url = ""
     for index, temp_url in enumerate(candidates):
         image_response = requests.get(temp_url, timeout=45)
         image_response.raise_for_status()
@@ -80,6 +121,9 @@ def _rehost_temp_images(content_html: str, site_url: str, auth: HTTPBasicAuth, j
         content_html = content_html.replace(temp_url, source_url)
         if not featured_media_id:
             featured_media_id = int(media_data["id"])
+            hero_source_url = source_url
+    if hero_source_url:
+        content_html = _strip_leading_duplicate_hero(content_html, hero_source_url)
     return content_html, featured_media_id
 
 
