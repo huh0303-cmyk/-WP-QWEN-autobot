@@ -86,3 +86,9 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
   - Windows 임시 정리와 재생성 가능한 브라우저·모델 캐시 압축으로 약 3GB 이상 확보
   - 일시적으로 0바이트가 된 `scripts/autopost_mega.py`는 변경 전 Git 원본으로 복구 후 수정 재적용; 운영 서버에는 영향 없음
 - 상태: 코드 검증 완료, GitHub push 및 VPS 배포 검증 예정
+- 배포/실화면 증거:
+  - Git commit `4177366f`, GitHub Actions deploy run `36303309112` 성공
+  - `https://control.korea365.org/social-accounts?platform=WordPress`에서 WordPress 27개, 방문자 158→81→78 순서, 이미지 수 1, 세 개 버튼을 로그인된 Chrome으로 확인
+- 추가 장애:
+  - `daily-network-publish.yml`이 과거 커밋 `05f67cc5`부터 job-level `if`에서 `matrix.site`를 참조해 모든 push에 0초 startup failure를 만들고 있었음
+  - 사이트 선택 조건을 matrix가 사용 가능한 각 step-level `if`로 이동해 글을 발행하지 않고 문법 오류만 복구

@@ -68,20 +68,24 @@ jobs:
           - jobinkorea365.com
           - jobkoreaglobal.com
           - korea365.org
-    if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
       - uses: actions/setup-python@v5
+        if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
         with:
           python-version: "3.11"
-      - run: pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+      - if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
+        run: pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
       - name: Select live keyword
+        if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
         id: viral
         continue-on-error: true
         run: python scripts/select_live_viral_keyword.py --site "https://${{ matrix.site }}"
       - name: Publish one isolated article
+        if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
         env:
           TARGET_SITE_URL: "https://${{ matrix.site }}"
           WP_AUTOPUBLISH_ENABLED: "true"
@@ -137,7 +141,7 @@ jobs:
           mkdir -p artifacts
           python scripts/autopost_current.py 2>&1 | tee "artifacts/${{ matrix.site }}.log"
       - name: Save result
-        if: always()
+        if: ${{ always() && (inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site)) }}
         uses: actions/upload-artifact@v4
         with:
           name: "wp-${{ matrix.site }}-${{ github.run_id }}"
