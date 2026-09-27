@@ -1,5 +1,6 @@
 name: One-off repair LondonProjectGPT failed run
 # retry after bounded writer + durable WP worker
+# retry after deterministic writer SLA
 
 on:
   push:
