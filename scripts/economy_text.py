@@ -167,5 +167,19 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
             last_exc = exc
         safe_reason = str(exc).replace(os.getenv('OPENAI_API_KEY',''), '[redacted]')[:180]
         print(f'GPT-5 mini fallback unavailable: {type(exc).__name__}: {safe_reason}')
+        if os.getenv('LOCAL_TEXT_FALLBACK_ENABLED', 'false').strip().lower() in {'1','true','yes','on'}:
+            try:
+                from local_text import local_generate_text
+                text = local_generate_text(prompt, temperature=temperature)
+                last_writer_model = os.getenv('OLLAMA_MODEL', 'qwen2.5:3b')
+                print(f'Article writer local fallback: {last_writer_model}')
+                return text
+            except Exception as local_exc:
+                local_reason = str(local_exc)[:180]
+                print(f'Local writer fallback unavailable: {type(local_exc).__name__}: {local_reason}')
+                raise RuntimeError(
+                    f'WRITERS_EXHAUSTED: Gemini, GPT and local fallback failed '
+                    f'({type(local_exc).__name__}: {local_reason})'
+                ) from local_exc
         raise RuntimeError(f'WRITERS_EXHAUSTED: Gemini and bounded GPT-5 mini fallback failed ({type(exc).__name__}: {safe_reason})') from last_exc
 
