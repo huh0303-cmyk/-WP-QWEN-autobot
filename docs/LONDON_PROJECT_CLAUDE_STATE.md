@@ -11,6 +11,59 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-09-27 (18차) — 범위 확장 요청 대응: 통합 사이트 레지스트리(대시보드+트리거만)
+
+**Chairman 요청(원문)**: "이건 내가 보여준것과 그대로 똑같잖아... 런던프로젝트는 내 wp25개..뉴스2개,
+블팟33개, 네이버3개, 티스토리5개가 들어가야지.. 미리..톤앤매너, 페르소나 이미지수, 글자수
+등등을 넣어줘야지." → 후속 확인 질문에 "n8n 이 당연히 들어가야지. 그리고 모든 글쓰기가 다
+들어가게."라고 답변.
+
+**충돌 확인**: 이 요청은 GPT/PM 트랙이 OWNER LOCKED로 걸어둔
+`docs/LONDON_PROJECT_GPT_BLOG_CONSOLE_LOCKED_SCOPE_2026-09-27.md`(WP+블로그스팟+네이버+티스토리
+통합을 "런던프로젝트클로드" 이름으로 하지 말라고 명시)와 정면 충돌. 코드를 쓰기 전에
+AskUserQuestion으로 Chairman에게 재확인함.
+
+**Chairman 결정**: "네이버+티스토리만 우선 마무리" / "완전 통합, GPT 락 무시" / **"대시보드+트리거만
+(권장)"** 중 **"대시보드+트리거만"** 선택 — WP25(실제 27도메인/33 컨텐츠 프로필)+뉴스2+블로그스팟33은
+계속 GPT 트랙의 n8n/GitHub Actions가 발행을 소유하고, 이 콘솔은 조회+트리거만 제공. 발행 로직
+재구현 없음 → 중복 발행/스케줄 충돌 위험 없음.
+
+**구현 완료** (커밋 `2e5112e`, main에 rebase 없이 fast-forward push — GPT 트랙과 충돌 없었음):
+- `london_project_claude_console/lib/siteRegistry.js`: `config/automation_hub_sites.json`,
+  `config/content_engine_profiles.json`(min/target/max_chars의 실제 소스),
+  `config/tistory_portfolio.json`, `config/newsrooms.json`을 읽기 전용 병합. 총 76개 사이트
+  행(wordpress 33 프로필/27 실제 도메인 — 일부 도메인이 여러 컨텐츠 버티컬 공유, blogspot 33,
+  news 2, tistory 5, naver 3). 이미지 수 필드가 원본에 없어 `target_chars/700`(1~6 clamp) 기본값
+  산정. persona/tone/image_count/word_count 편집값은 원본 config를 건드리지 않고
+  `runtime/registry_overrides.json` 오버레이로만 저장 — 다른 AI 트랙 파일과 충돌 방지.
+- `london_project_claude_console/lib/n8nGateway.js`: `scripts/n8n_gateway.py`(로컬
+  127.0.0.1:8766, Bearer 인증)를 그대로 호출하는 프록시. `N8N_GATEWAY_TOKEN` 미설정 시 조용히
+  무시하지 않고 501 에러로 명확히 실패.
+- `server.js` 라우트 추가: `GET /api/registry/sites`, `GET /api/registry/summary`,
+  `POST /api/registry/sites/:siteId`, `GET /api/n8n/health`, `POST /api/n8n/run/:action`,
+  `POST /api/n8n/pipeline/:stage`.
+- 네이버 3계정 등록(Blog ID만, 비밀번호 절대 미저장 — 아래 보안 항목 참고):
+  - `huh0303` = 생활의정석 (Chairman이 직접 제공, 확인됨)
+  - `k-insight-vietnam` = 부의정석 (Chairman이 보낸 스크린샷으로 확인됨 — 카테고리
+    "국가 정책-돈의 흐름/글로벌 기업 분석/국제경제 금융" 일치)
+  - `k-healthcare` = 헬스의정석 (**미확인 추정치** — 티스토리 미러링 슬러그 패턴 기반. 티스토리
+    스크린샷에서 5개 계정 확인: 한국보험정보(k-insight-vietnam)=부의정석, 한국생활정보(huh0303)=
+    생활의정석, 한국건강정보(k-healthcare 추정)=헬스의정석, 한국부동산금융정보(k-vietnam),
+    한국여행정보(k-trip365). `needs_confirmation: true`로 레지스트리에 플래그됨.)
+
+**아직 안 된 것 / 다음 세션**:
+- **VPS에 아직 배포 안 함** — 이번 커밋은 로컬 `node --check` + `node -e` 로드 테스트만 통과.
+  기존 `deploy-london-project-claude-console.yml`을 재실행해 반영 필요.
+- **UI(웹 화면)에 레지스트리 탭 없음** — 지금은 API만 존재(`/api/registry/sites` 등). 브라우저에서
+  Persona/Tone/이미지수/글자수를 직접 편집하는 화면은 다음 세션에서 `public/index.html`+`app.js`에
+  추가 필요.
+- **`N8N_GATEWAY_TOKEN` 값 모름** — 이 세션은 그 토큰을 알지 못함(GPT 트랙/Chairman이 VPS
+  `/etc/london-project-claude-console/env`에 직접 넣어야 함). 넣기 전까지 `/api/n8n/run/*`,
+  `/api/n8n/pipeline/*` 호출은 501로 실패함 — 이는 설계상 의도된 동작(조용한 실패 방지).
+- **`k-healthcare` 네이버 Blog ID 확인 필요** — Chairman에게 직접 확인 요청 대기 중.
+- **외부 접속 재확인 미완료** — 17차에서 발견한 ufw 방화벽 수정(8787/6077 포트 개방)이 실제로
+  해결됐는지 Chairman 확인 대기 중 (범위 확장 대화가 끼어들어 확인 전에 넘어감).
+
 ## 2026-09-27 (17차) — 런던프로젝트클로드 콘솔 VPS 실배포 완료·검증
 
 16차에서 로컬까지 완성한 웹 콘솔을 실제 VPS(srv1959434.hstgr.cloud /
