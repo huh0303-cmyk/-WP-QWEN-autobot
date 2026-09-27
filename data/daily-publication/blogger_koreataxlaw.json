@@ -1,1 +1,1 @@
-{"day": "2026-09-26", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-09-26-blogger_koreataxlaw-a935c10b", "claimed_at": "2026-09-26T13:50:54.309826+09:00", "run_id": 36219043598, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-27", "status": "PUBLISHED", "public_url": "https://koreataxnlaw.blogspot.com/2026/09/navigating-south-korean-tax-obligations.html", "published_at": "2026-09-27T01:20:09.406-07:00"}
