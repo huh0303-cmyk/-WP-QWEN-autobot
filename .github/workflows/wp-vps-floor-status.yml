@@ -1,5 +1,6 @@
 name: WP VPS daily floor status
 # verify after worker import repair 2026-09-25
+# manual status trigger 2026-09-27 10:51 KST
 
 on:
   push:
