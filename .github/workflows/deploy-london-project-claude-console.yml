@@ -63,3 +63,18 @@ jobs:
             journalctl -u lpc-console -n 20 --no-pager || true
             echo "=== [verify] open ports ==="
             ss -tlnp 2>/dev/null | grep -E ':8787|:6077' || echo "(ss not available or ports not listed)"
+
+            echo "=== [firewall] checking host-level firewall (ufw/iptables) ==="
+            if command -v ufw >/dev/null 2>&1; then
+              ufw status verbose || true
+              if ufw status | grep -q "Status: active"; then
+                echo "ufw is active - opening 8787 and 6077"
+                ufw allow 8787/tcp || true
+                ufw allow 6077/tcp || true
+                ufw status verbose || true
+              fi
+            else
+              echo "ufw not installed"
+            fi
+            echo "--- iptables INPUT chain ---"
+            iptables -L INPUT -n --line-numbers 2>/dev/null || echo "(no iptables access)"
