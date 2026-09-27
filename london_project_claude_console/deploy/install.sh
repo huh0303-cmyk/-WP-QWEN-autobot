@@ -48,9 +48,16 @@ id -u "$RUN_USER" >/dev/null 2>&1 || useradd -r -m -s /usr/sbin/nologin "$RUN_US
 
 echo "=== [3/6] app dependencies ==="
 cd "$APP_DIR"
-sudo -u "$RUN_USER" npm ci --omit=dev
+# APP_DIR is a git checkout owned by whatever user/permissions the main
+# deploy pipeline uses (root) - install node_modules as the current
+# (root) user rather than sudo -u "$RUN_USER", which would need write
+# access to APP_DIR itself just to create node_modules. The systemd
+# service only needs read+execute on node_modules, which default perms
+# already give it; only runtime/ needs to be writable by RUN_USER.
+npm ci --omit=dev
 mkdir -p "$APP_DIR/runtime"
 chown -R "$RUN_USER":"$RUN_USER" "$APP_DIR/runtime"
+chmod -R a+rX "$APP_DIR/node_modules" "$APP_DIR/server" "$APP_DIR/lib" "$APP_DIR/public"
 
 echo "=== [4/6] EnvironmentFile (credentials live only here, root-readable only) ==="
 install -d -m 700 /etc/london-project-claude-console
