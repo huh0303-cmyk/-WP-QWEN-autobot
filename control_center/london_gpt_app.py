@@ -155,6 +155,24 @@ def _start_stage(stage: str, run_id: str) -> None:
     threading.Thread(target=_gateway_call, args=(stage, run_id), daemon=True).start()
 
 
+def _run_sequence(run_id: str, start_stage: str = "research") -> None:
+    """Run 1→2→3→4 automatically. Stop exactly at the failed agent."""
+    stages = ["research", "write", "image", "publish"]
+    try:
+        start_index = stages.index(start_stage)
+    except ValueError:
+        start_index = 0
+    for stage in stages[start_index:]:
+        state = _read_run(run_id)
+        state.setdefault("stage_status", {})[stage] = "running"
+        state.pop("last_error", None)
+        _write_run(state)
+        _gateway_call(stage, run_id)
+        state = _read_run(run_id)
+        if state.get("stage_status", {}).get(stage) != "ok":
+            return
+
+
 def install(app, runtime):
     def snapshot():
         wp = _safe_call(runtime.get_site_data, [])
@@ -200,6 +218,40 @@ def install(app, runtime):
     def london_gpt_status():
         from flask import jsonify
         return jsonify(snapshot())
+
+    @app.post("/api/london-gpt/run")
+    def london_gpt_run():
+        from flask import jsonify, request
+        payload = request.get_json(silent=True) or {}
+        site_id = str(payload.get("site_id") or "").strip()
+        category = str(payload.get("category") or "").strip()
+        publish_mode = str(payload.get("publish_mode") or "draft").strip().lower()
+        valid = {site["site_id"]: site for site in _content_sites()}
+        if site_id not in valid:
+            return jsonify({"ok": False, "error": "unknown_site"}), 400
+        if category and category not in valid[site_id]["categories"]:
+            return jsonify({"ok": False, "error": "invalid_category"}), 400
+        if publish_mode not in {"draft", "publish"}:
+            return jsonify({"ok": False, "error": "invalid_publish_mode"}), 400
+
+        run_id = f"lgpt-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
+        state = {
+            "run_id": run_id,
+            "site_id": site_id,
+            "platform": "wordpress",
+            "category": category,
+            "publish_mode": publish_mode,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "stage_status": {
+                "research": "waiting",
+                "write": "waiting",
+                "image": "waiting",
+                "publish": "waiting",
+            },
+        }
+        _write_run(state)
+        threading.Thread(target=_run_sequence, args=(run_id, "research"), daemon=True).start()
+        return jsonify({"ok": True, "run_id": run_id, "mode": "auto-1-2-3-4"}), 202
 
     @app.post("/api/london-gpt/research")
     def london_gpt_research():
@@ -288,10 +340,10 @@ def install(app, runtime):
         if not run_id:
             return jsonify({"ok": False, "error": "run_id_required"}), 400
         state = _read_run(run_id)
-        state.setdefault("stage_status", {})[stage] = "running"
+        state.setdefault("stage_status", {})[stage] = "waiting"
         state.pop("last_error", None)
         _write_run(state)
-        _start_stage(stage, run_id)
-        return jsonify({"ok": True, "run_id": run_id, "stage": stage}), 202
+        threading.Thread(target=_run_sequence, args=(run_id, stage), daemon=True).start()
+        return jsonify({"ok": True, "run_id": run_id, "stage": stage, "continues_to_finish": True}), 202
 
     return snapshot
