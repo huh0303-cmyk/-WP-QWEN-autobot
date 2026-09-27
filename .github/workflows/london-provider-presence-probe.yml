@@ -47,3 +47,9 @@ jobs:
             for k in ('OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY','ANTHROPIC_WORKSPACE_ID','HF_TOKEN'):
                 print(k, 'PRESENT' if found.get(k) else 'MISSING')
             PY
+            echo "=== VPS RESOURCES ==="
+            nproc
+            free -h
+            df -h /
+            echo "OLLAMA=$(command -v ollama || true)"
+            echo "LLAMA=$(command -v llama-cli || command -v llama || true)"
