@@ -1,4 +1,5 @@
 name: London n8n 4-Agent Canary
+# retry after import-path fix
 
 on:
   push:
