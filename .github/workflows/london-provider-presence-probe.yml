@@ -53,3 +53,7 @@ jobs:
             df -h /
             echo "OLLAMA=$(command -v ollama || true)"
             echo "LLAMA=$(command -v llama-cli || command -v llama || true)"
+            echo "=== DIRECT RESEARCH HTTP ==="
+            echo -n "GOOGLE_TRENDS_RSS="; curl -L -sS -o /dev/null -w '%{http_code}\n' --max-time 20 'https://trends.google.com/trending/rss?geo=KR' || true
+            echo -n "GOOGLE_NEWS_RSS="; curl -L -sS -o /dev/null -w '%{http_code}\n' --max-time 20 'https://news.google.com/rss/search?q=Korea%20travel&hl=en-US&gl=US&ceid=US:en' || true
+            echo -n "NAVER_NEWS_SEARCH="; curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}\n' --max-time 20 'https://search.naver.com/search.naver?where=news&query=%ED%95%9C%EA%B5%AD%20%EC%97%AC%ED%96%89' || true
