@@ -360,6 +360,8 @@ def stage_write(run_id: str) -> dict:
     from scripts.auto_write_and_draft import _write_article
     require_medical_topic(profile, keyword)
     funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
+    previous_article = state.get("article")
+    previous_writer = state.get("writer") or {}
     article, score, failures, provider = _write_article(
         keyword=keyword,
         site_theme=profile["wordpress"]["theme"] + (f". Editorial funnel: {json.dumps(funnel, ensure_ascii=False)}" if funnel else ""),
@@ -371,7 +373,13 @@ def stage_write(run_id: str) -> dict:
         max_chars=settings["max_chars"],
     )
     if article is None:
-        raise RuntimeError(f"writer quality gate failed: score={score} failures={failures}")
+        if previous_article and int(previous_writer.get("quality_score") or 0) >= 70:
+            article = previous_article
+            score = int(previous_writer.get("quality_score") or 70)
+            provider = "retained-previous-article"
+            failures = list(failures) + ["new rewrite unavailable; retained prior quality-passed article"]
+        else:
+            raise RuntimeError(f"writer quality gate failed: score={score} failures={failures}")
     state["article"] = article
     state["writer"] = {"quality_score": score, "provider": provider, "failures": failures}
     if platform == "wordpress":
