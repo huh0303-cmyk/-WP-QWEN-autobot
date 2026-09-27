@@ -111,6 +111,21 @@
   </div>
 </section>
 
+<section id="articlePanel" class="hidden rounded-3xl border border-violet-400/20 bg-violet-400/10 p-5">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-black text-violet-300">AGENT 2 · 실제 작성 원고</p>
+      <h2 id="articleTitle" class="mt-1 text-2xl font-black"></h2>
+      <p id="articleMeta" class="mt-2 text-sm text-slate-300"></p>
+    </div>
+    <div class="rounded-xl bg-slate-950 px-4 py-3 text-sm">
+      <p class="text-xs font-black text-slate-500">카테고리 지정</p>
+      <p id="articleCategory" class="mt-1 font-black text-emerald-300">확인 중</p>
+    </div>
+  </div>
+  <div id="articleBody" class="prose prose-invert mt-5 max-w-none rounded-2xl bg-white p-6 text-slate-900"></div>
+</section>
+
 <section id="researchPanel" class="hidden rounded-3xl border border-blue-400/20 bg-blue-400/10 p-5">
   <p class="text-xs font-black text-blue-300">AGENT 1 RESULT</p>
   <h2 id="keywordTitle" class="mt-1 text-xl font-black"></h2>
@@ -150,6 +165,17 @@ function refreshProfile(){
   document.getElementById('tone').textContent=o.dataset.tone||'-';
   document.getElementById('theme').textContent=o.dataset.theme||'-';
 }
+function safeArticleHtml(raw){
+  const doc=new DOMParser().parseFromString(String(raw||''),'text/html');
+  doc.querySelectorAll('script,style,iframe,object,embed,form').forEach(el=>el.remove());
+  doc.querySelectorAll('*').forEach(el=>{
+    [...el.attributes].forEach(a=>{
+      const n=a.name.toLowerCase(),v=String(a.value||'').trim().toLowerCase();
+      if(n.startsWith('on')||((n==='href'||n==='src')&&v.startsWith('javascript:')))el.removeAttribute(a.name);
+    });
+  });
+  return doc.body.innerHTML;
+}
 function setAgent(stage,status,detail){
   const card=document.getElementById('agent-'+stage); if(!card)return;
   card.dataset.status=status||'waiting';
@@ -162,6 +188,7 @@ function setAgent(stage,status,detail){
 function resetView(){
   ['research','write','image','publish'].forEach((s,i)=>setAgent(s,'waiting','자동 순서 '+(i+1)+' 대기'));
   document.getElementById('receiptPanel').classList.add('hidden');
+  document.getElementById('articlePanel').classList.add('hidden');
   document.getElementById('researchPanel').classList.add('hidden');
   document.getElementById('rewritePanel').classList.add('hidden');
   document.getElementById('errorPanel').classList.add('hidden');
@@ -208,10 +235,14 @@ async function pollRun(){
     const r=await fetch('/api/london-gpt/run/'+encodeURIComponent(currentRunId),{cache:'no-store'});
     const d=await r.json();
     const s=d.stage_status||{};
+    const category=d.category_assignment;
+    const categoryText=category?.status==='ok'
+      ? ('카테고리 지정 완료: '+(category.name||'-')+(category.id?(' · ID '+category.id):''))
+      : '카테고리 지정 대기';
     const details={
       research:d.research?.keyword?('선정 키워드: '+d.research.keyword):'리서치 대기/진행',
-      write:d.writer?('품질 '+(d.writer.quality_score??'-')+' · '+(d.writer.provider||'')):'글쓰기 대기/진행',
-      image:d.image?.status||'이미지 대기/진행',
+      write:d.writer?('품질 '+(d.writer.quality_score??'-')+' · '+(d.writer.provider||'')+' · '+categoryText):'글쓰기 + 카테고리 지정 대기/진행',
+      image:d.image?.status?((category?.status==='ok'?categoryText+' · ':'')+d.image.status):'카테고리 지정 완료 후 이미지 진행',
       publish:d.receipt?.url?('완료: '+d.receipt.url):'발행·검증 대기/진행'
     };
     ['research','write','image','publish'].forEach(stage=>setAgent(stage,s[stage]||'waiting',details[stage]));
@@ -221,6 +252,16 @@ async function pollRun(){
       document.getElementById('researchPanel').classList.remove('hidden');
       document.getElementById('keywordTitle').textContent='선정 키워드: '+d.research.keyword;
       document.getElementById('researchEvidence').textContent=d.research.evidence||'';
+    }
+    if(d.article?.title && d.article?.content_html){
+      document.getElementById('articlePanel').classList.remove('hidden');
+      document.getElementById('articleTitle').textContent=d.article.title||'';
+      document.getElementById('articleMeta').textContent=d.article.meta_description||'';
+      const ca=d.category_assignment||{};
+      document.getElementById('articleCategory').textContent=ca.status==='ok'
+        ? ((ca.name||'-')+(ca.id?(' · ID '+ca.id):'')+' · 지정 완료')
+        : '카테고리 지정 대기';
+      document.getElementById('articleBody').innerHTML=safeArticleHtml(d.article.content_html||'');
     }
     if(s.write==='ok'){
       document.getElementById('rewritePanel').classList.remove('hidden');
