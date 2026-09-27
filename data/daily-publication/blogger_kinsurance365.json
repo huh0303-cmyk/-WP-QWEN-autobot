@@ -1,1 +1,1 @@
-{"day": "2026-09-27", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-27-blogger_kinsurance365-6e1ccaa4", "claimed_at": "2026-09-27T09:31:44.062124+09:00", "run_id": 36282775321, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-27", "status": "PUBLISHED", "public_url": "https://koreainsurance365.blogspot.com/2026/09/korean-health-insurance-your-guide-to.html", "published_at": "2026-09-27T09:32:46.922+09:00"}
