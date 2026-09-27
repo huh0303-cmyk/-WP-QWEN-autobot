@@ -16,6 +16,10 @@ N8N_WEBHOOK = os.environ.get(
     "LONDON_GPT_N8N_WEBHOOK",
     "http://127.0.0.1:5678/webhook/london-content-four-agent",
 )
+N8N_REWRITE_WEBHOOK = os.environ.get(
+    "LONDON_GPT_N8N_REWRITE_WEBHOOK",
+    "http://127.0.0.1:5678/webhook/london-content-rewrite",
+)
 GATEWAY = os.environ.get("LONDON_GPT_GATEWAY", "http://127.0.0.1:8766").rstrip("/")
 
 
@@ -263,6 +267,48 @@ def install(app, runtime):
             return jsonify({"ok": False, "error": "n8n_rejected", "http": response.status_code, "run_id": run_id}), 502
 
         return jsonify({"ok": True, "run_id": run_id, "orchestrator": "n8n", "mode": "auto-1-2-3-4"}), 202
+
+    @app.post("/api/london-gpt/rewrite")
+    def london_gpt_rewrite():
+        from flask import jsonify, request
+        payload = request.get_json(silent=True) or {}
+        run_id = str(payload.get("run_id") or "").strip()
+        if not run_id:
+            return jsonify({"ok": False, "error": "run_id_required"}), 400
+
+        state = _read_run(run_id)
+        if state.get("stage_status", {}).get("research") != "ok":
+            return jsonify({"ok": False, "error": "research_not_complete"}), 409
+        if not str(state.get("research", {}).get("keyword") or "").strip():
+            return jsonify({"ok": False, "error": "keyword_missing"}), 409
+
+        state.setdefault("stage_status", {})["write"] = "waiting"
+        state["stage_status"]["image"] = "waiting"
+        state["stage_status"]["publish"] = "waiting"
+        state.pop("article", None)
+        state.pop("writer", None)
+        state.pop("image", None)
+        state.pop("receipt", None)
+        state.pop("last_error", None)
+        state["rewrite_requested_at"] = datetime.now(timezone.utc).isoformat()
+        _write_run(state)
+
+        try:
+            response = requests.post(
+                N8N_REWRITE_WEBHOOK,
+                json={
+                    "site_id": str(state.get("site_id") or ""),
+                    "category": str(state.get("category") or ""),
+                    "publish_mode": str(state.get("publish_mode") or "draft"),
+                    "run_id": run_id,
+                },
+                timeout=12,
+            )
+        except requests.RequestException as exc:
+            return jsonify({"ok": False, "error": "n8n_rewrite_unreachable", "message": str(exc)}), 503
+        if response.status_code >= 400:
+            return jsonify({"ok": False, "error": "n8n_rewrite_rejected", "http": response.status_code}), 502
+        return jsonify({"ok": True, "run_id": run_id, "mode": "rewrite-2-3-4"}), 202
 
     @app.get("/api/london-gpt/run/<run_id>")
     def london_gpt_run_status(run_id: str):
