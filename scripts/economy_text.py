@@ -74,7 +74,7 @@ def _try_gemini(prompt, temperature):
 
         f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent',
 
-        headers={'x-goog-api-key': key}, timeout=120,
+        headers={'x-goog-api-key': key}, timeout=60,
 
         json={'contents': [{'parts': [{'text': prompt}]}],
 
@@ -134,14 +134,14 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
     # Normal network articles: prefer free Gemini, but do not let a 429 leave
     # a revenue site empty for the entire day.
     if not force_gpt:
-        for attempt in range(2):
+        for attempt in range(1):
             if _article_attempts is not None:
                 _article_attempts.add('gemini')
             try:
                 return _try_gemini(prompt, temperature)
             except (requests.RequestException, ValueError, RuntimeError) as exc:
                 last_exc = exc
-                print(f'Gemini Flash unavailable or incomplete (attempt {attempt + 1}/2): {_failure_summary(exc)}')
+                print(f'Gemini Flash unavailable or incomplete (attempt {attempt + 1}/1): {_failure_summary(exc)}')
 
     # One bounded GPT-5 mini fallback. No recursive retries, no image spend.
     try:
@@ -152,7 +152,7 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False):
             raise RuntimeError('Daily article fallback permits gpt-5-mini only')
         if _article_attempts is not None:
             _article_attempts.add('openai:gpt-5-mini')
-        text = openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=90)
+        text = openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=60)
         last_writer_model = 'gpt-5-mini'
         receipt = Path('artifacts/article-writer-usage.jsonl')
         receipt.parent.mkdir(parents=True, exist_ok=True)
