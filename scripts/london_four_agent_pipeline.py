@@ -185,8 +185,11 @@ def stage_write(run_id: str) -> dict:
     settings = profile["wordpress"] if platform == "wordpress" else profile["blogspot"]
     from scripts.budget_guard import check_and_record
     from automation_hub.medical_editorial import require_medical_topic
-    from scripts.auto_write_and_draft import _write_article
     check_and_record(0.02, label=f"london-agent2:{site_id}")
+    if os.environ.get("OPENAI_API_KEY", "").strip():
+        os.environ["OPENAI_ENABLED"] = "true"
+        os.environ.setdefault("OPENAI_MODEL", "gpt-5-mini")
+    from scripts.auto_write_and_draft import _write_article
     require_medical_topic(profile, keyword)
     funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
     article, score, failures, provider = _write_article(
