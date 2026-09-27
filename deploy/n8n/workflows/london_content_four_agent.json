@@ -1,0 +1,284 @@
+{
+  "id": "london-content-four-agent-v1",
+  "name": "London Content - 4 Agent Pipeline",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "london-content-four-agent",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "trigger-webhook",
+      "name": "START - Site Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-900, 120],
+      "webhookId": "london-content-four-agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "site-id",
+              "name": "site_id",
+              "value": "={{ $json.body.site_id }}",
+              "type": "string"
+            },
+            {
+              "id": "run-id",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id || ('n8n-' + $execution.id) }}",
+              "type": "string"
+            },
+            {
+              "id": "publish-mode",
+              "name": "publish_mode",
+              "value": "={{ $json.body.publish_mode || 'draft' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "run-context",
+      "name": "RUN CONTEXT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-670, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8766/pipeline/research",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.N8N_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "options": {
+          "timeout": 310000
+        }
+      },
+      "id": "agent-research",
+      "name": "AGENT 1 - Topic Research",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-400, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8766/pipeline/write",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.N8N_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "options": {
+          "timeout": 310000
+        }
+      },
+      "id": "agent-writer",
+      "name": "AGENT 2 - Writer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-110, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8766/pipeline/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.N8N_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "options": {
+          "timeout": 250000
+        }
+      },
+      "id": "agent-image",
+      "name": "AGENT 3 - Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [180, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8766/pipeline/publish",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.N8N_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "options": {
+          "timeout": 250000
+        }
+      },
+      "id": "agent-publisher",
+      "name": "AGENT 4 - Publisher + Verify",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [470, 120]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "final-ok",
+              "name": "ok",
+              "value": "={{ $json.ok }}",
+              "type": "boolean"
+            },
+            {
+              "id": "final-site",
+              "name": "site_id",
+              "value": "={{ $('RUN CONTEXT').item.json.site_id }}",
+              "type": "string"
+            },
+            {
+              "id": "final-run",
+              "name": "run_id",
+              "value": "={{ $('RUN CONTEXT').item.json.run_id }}",
+              "type": "string"
+            },
+            {
+              "id": "final-status",
+              "name": "status",
+              "value": "={{ $json.result.status }}",
+              "type": "string"
+            },
+            {
+              "id": "final-url",
+              "name": "url",
+              "value": "={{ $json.result.url }}",
+              "type": "string"
+            },
+            {
+              "id": "final-post",
+              "name": "post_id",
+              "value": "={{ String($json.result.post_id || '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "receipt",
+      "name": "RECEIPT - Verified Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [760, 120]
+    },
+    {
+      "parameters": {
+        "content": "## AGENT 1 - Topic Research\nGoogle + Naver + current media + GSC evidence.\nNever invent search volume. Duplicate-topic block.",
+        "height": 170,
+        "width": 250
+      },
+      "id": "note-research",
+      "name": "Agent 1 Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-500, -130]
+    },
+    {
+      "parameters": {
+        "content": "## AGENT 2 - Writer\nSite persona/language/tone.\nQuality gate >= 70. Failure stops here.",
+        "height": 170,
+        "width": 250
+      },
+      "id": "note-writer",
+      "name": "Agent 2 Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-210, -130]
+    },
+    {
+      "parameters": {
+        "content": "## AGENT 3 - Image\n0-1 image. Temporary Blogger URLs must be stabilized.\nImage failure may continue with no image.",
+        "height": 170,
+        "width": 250
+      },
+      "id": "note-image",
+      "name": "Agent 3 Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [80, -130]
+    },
+    {
+      "parameters": {
+        "content": "## AGENT 4 - Publisher\nWP REST / Blogger API.\nMust return post_id + URL. Public mode verifies the live URL.",
+        "height": 170,
+        "width": 260
+      },
+      "id": "note-publisher",
+      "name": "Agent 4 Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [370, -130]
+    }
+  ],
+  "connections": {
+    "START - Site Request": {
+      "main": [[{"node": "RUN CONTEXT", "type": "main", "index": 0}]]
+    },
+    "RUN CONTEXT": {
+      "main": [[{"node": "AGENT 1 - Topic Research", "type": "main", "index": 0}]]
+    },
+    "AGENT 1 - Topic Research": {
+      "main": [[{"node": "AGENT 2 - Writer", "type": "main", "index": 0}]]
+    },
+    "AGENT 2 - Writer": {
+      "main": [[{"node": "AGENT 3 - Image", "type": "main", "index": 0}]]
+    },
+    "AGENT 3 - Image": {
+      "main": [[{"node": "AGENT 4 - Publisher + Verify", "type": "main", "index": 0}]]
+    },
+    "AGENT 4 - Publisher + Verify": {
+      "main": [[{"node": "RECEIPT - Verified Result", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "tags": []
+}
