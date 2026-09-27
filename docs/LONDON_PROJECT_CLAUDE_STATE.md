@@ -11,6 +11,51 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-09-27 (15차) — Naver/Tistory 콘텐츠 표준 문서 작성 + GPT 락과의 충돌 확인·회피
+
+Chairman이 Windows Electron 콘솔(`blogauto-naver-tistory`, Naver 수동로그인+
+Tistory 미러링 자동화 앱) 소스 일체를 업로드하며 "WP24개/Blogspot33개를
+페르소나·톤앤매너·이미지까지 포함한 4-Agent(리서치→글쓰기→이미지→발행) 구조로
+단순화·안정화하고 Naver/Tistory까지 넣어달라"고 요청.
+
+**작업 전 확인(중요)**: 문서 작성 후 push 직전 `git fetch`로 원격을 보니
+런던프로젝트GPT 트랙이 같은 날 03:41 KST에 이미
+`docs/LONDON_4_AGENT_N8N_LOCK_2026-09-27.md`를 커밋해서 **WP25+Blogspot33용
+4-Agent(Research→Writer→Image→Publisher) n8n 실행 아키텍처를 "락"**해놓은
+상태였음. 그 문서는 "경쟁 파이프라인 생성 금지, Claude는 병행 대체 파이프라인을
+만들면 안 됨"이라고 명시. 내가 처음 쓴 초안은 구조가 그것과 거의 동일해서
+그대로 커밋했으면 정확히 그 금지 조항을 위반할 뻔했음.
+
+**정정**: 커밋 전에 문서 최상단에 관계 명시 박스를 추가해서 범위를 재한정함 —
+(1) GPT 락이 다루지 않는 **콘텐츠 표준**(페르소나·톤·이미지 정책)만 이 문서가
+다루고, WP/Blogspot의 실행 아키텍처(n8n/VPS/provider)는 GPT 락을 그대로 따름,
+(2) GPT 락이 아예 다루지 않는 **Naver/Tistory**(양쪽 트랙 모두 실행 아키텍처
+없음)만 이 문서가 새로 제안. 최종 채택은 Chairman+GPT/PM 조율 필요라고 명시.
+커밋 `4385f01` → push `e064e21`.
+
+**문서 내용 요약** (`docs/UNIFIED_4AGENT_CONTENT_PIPELINE_GUIDE.md`):
+- 업로드된 콘솔에서 실제 검증된 Naver/Tistory 안정화 패턴을 추출: 아이디·
+  비밀번호 자동입력 절대 금지(수동 로그인만), 계정 전용 브라우저 프로필에
+  세션 저장·재사용, 보안확인(CAPTCHA)과 세션만료(SESSION_EXPIRED)를 구분
+  처리, 임베딩 코사인 유사도 0.75 이상을 중복 제목 판정 임계값으로 채택,
+  Naver 발행 성공 후에만 Tistory 미러링(순서 고정).
+- 사이트/블로그 등록 시 페르소나·톤·목적·금지주제·이미지스타일을 1회 고정해
+  전 Agent에 공통 주입하는 체계 제안.
+- 등록 체크리스트(4절)까지 정리했지만 **실제 24+33개 사이트에 채워 넣는 작업은
+  이번 세션에서 하지 않음**(범위 밖 — Chairman 승인 후 진행 대상).
+
+**아직 확인 안 된 것**:
+- Chairman이 이 문서와 GPT 락 문서의 역할 분담(콘텐츠 표준 vs 실행 아키텍처)에
+  동의하는지 — 다음 세션 또는 Chairman이 직접 확답 필요.
+- GPT/PM 트랙이 이 문서를 실제로 읽고 자신들의 n8n Agent 2/3 노드에 페르소나/
+  톤/이미지 표준을 반영할지 — 이건 이 세션 권한 밖(다른 트랙 소유).
+- Naver/Tistory 4-Agent를 실제 코드로 구현할지, 업로드된 Electron 콘솔을
+  그대로 VPS/서버 환경에 이식할지, 아니면 새로 만들지 — 결정 안 됨.
+
+**다음 세션이 할 일**: (1) Chairman 확답 받으면 등록 체크리스트를 실제
+사이트 목록으로 채우기, (2) Naver/Tistory 구현 방식(콘솔 이식 vs 신규 구현)
+결정 지원, (3) GPT 락 문서 업데이트 여부 `git log`로 계속 추적.
+
 ## 2026-09-27 (14차) — Tistory One-Daily Dispatcher 100% 실패 원인 발견·수정·재검증
 
 Chairman이 GitHub 알림("Tistory One-Daily Dispatcher: All jobs have failed")을
