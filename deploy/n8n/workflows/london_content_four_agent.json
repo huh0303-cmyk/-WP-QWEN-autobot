@@ -107,7 +107,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "body": "={{ JSON.stringify({site_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
         "options": {
           "timeout": 310000
         }
@@ -137,7 +137,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "body": "={{ JSON.stringify({site_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
         "options": {
           "timeout": 250000
         }
@@ -167,7 +167,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode}) }}",
+        "body": "={{ JSON.stringify({site_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
         "options": {
           "timeout": 250000
         }
@@ -194,13 +194,13 @@
             {
               "id": "final-site",
               "name": "site_id",
-              "value": "={{ $('RUN CONTEXT').item.json.site_id }}",
+              "value": "={{ $('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id }}",
               "type": "string"
             },
             {
               "id": "final-run",
               "name": "run_id",
-              "value": "={{ $('RUN CONTEXT').item.json.run_id }}",
+              "value": "={{ $('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id }}",
               "type": "string"
             },
             {
@@ -293,6 +293,64 @@
         370,
         -130
       ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "london-content-rewrite",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "rewrite-webhook",
+      "name": "REWRITE - Same Keyword",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -670,
+        420
+      ],
+      "webhookId": "london-content-rewrite"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "rw-site",
+              "name": "site_id",
+              "value": "={{ $json.body.site_id }}",
+              "type": "string"
+            },
+            {
+              "id": "rw-run",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id }}",
+              "type": "string"
+            },
+            {
+              "id": "rw-mode",
+              "name": "publish_mode",
+              "value": "={{ $json.body.publish_mode || 'draft' }}",
+              "type": "string"
+            },
+            {
+              "id": "rw-category",
+              "name": "category",
+              "value": "={{ $json.body.category || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "rewrite-context",
+      "name": "REWRITE CONTEXT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        420
+      ]
     }
   ],
   "connections": {
@@ -356,6 +414,28 @@
         [
           {
             "node": "RECEIPT - Verified Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REWRITE - Same Keyword": {
+      "main": [
+        [
+          {
+            "node": "REWRITE CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REWRITE CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "AGENT 2 - Writer",
             "type": "main",
             "index": 0
           }
