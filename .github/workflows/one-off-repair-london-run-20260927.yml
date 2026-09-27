@@ -31,6 +31,21 @@ jobs:
             echo '=== BEFORE ==='
             python3 - "$STATE" <<'PY'
             import json,sys
+            p=sys.argv[1]
+            d=json.load(open(p,encoding='utf-8'))
+            d['category']='Jobs in Korea'
+            d['publish_mode']='publish'
+            d.pop('last_error',None)
+            d.pop('receipt',None)
+            d.pop('category_assignment',None)
+            d['stage_status']['write']='waiting'
+            d['stage_status']['image']='waiting'
+            d['stage_status']['publish']='waiting'
+            with open(p,'w',encoding='utf-8') as fh:
+                json.dump(d,fh,ensure_ascii=False,indent=2)
+            PY
+            python3 - "$STATE" <<'PY'
+            import json,sys
             d=json.load(open(sys.argv[1],encoding='utf-8'))
             print(json.dumps({
               'run_id':d.get('run_id'),
