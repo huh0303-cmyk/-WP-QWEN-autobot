@@ -21,6 +21,16 @@ KST = timezone(timedelta(hours=9))
 
 
 def _load_runtime_env() -> None:
+    os.environ.setdefault("FORCE_SOURCE_IPV4", "true")
+    if os.environ.get("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes", "on"}:
+        import socket
+        if not getattr(socket, "_korea365_ipv4_patched", False):
+            original = socket.getaddrinfo
+            def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+                return original(host, port, socket.AF_INET, type, proto, flags)
+            socket.getaddrinfo = _ipv4_only_getaddrinfo
+            socket._korea365_ipv4_patched = True
+
     for path in (Path("/etc/korea365/control.env"), Path("/etc/korea365/n8n.env")):
         if not path.exists():
             continue
