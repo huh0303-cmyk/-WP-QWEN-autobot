@@ -31,11 +31,22 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           script: |
             set -euo pipefail
-            APP_DIR=/opt/korea365/london_project_claude_console
-            if [ ! -d "$APP_DIR" ]; then
-              echo "London Project Claude console directory not found at $APP_DIR - has deploy-to-vps.yml synced main yet?"
+            ROOT=/opt/korea365
+            APP_DIR="$ROOT/london_project_claude_console"
+            if [ ! -d "$ROOT/.git" ]; then
+              echo "$ROOT is not a git checkout - unexpected VPS layout, aborting."
               exit 1
             fi
+            echo "=== current HEAD before sync ==="
+            git -C "$ROOT" log --oneline -1
+            # Don't assume deploy-to-vps.yml's own reconciliation timing/scope has
+            # already landed this untracked-by-it directory - pull just our own
+            # path directly from origin/main so this workflow is self-sufficient.
+            git -C "$ROOT" fetch origin main
+            git -C "$ROOT" checkout origin/main -- london_project_claude_console
+            echo "=== HEAD after targeted checkout (still on old commit, that's fine) ==="
+            git -C "$ROOT" log --oneline -1
+            ls -la "$APP_DIR/deploy/"
             chmod +x "$APP_DIR/deploy/install.sh"
             APP_DIR="$APP_DIR" \
               LPC_USER=admin \
