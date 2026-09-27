@@ -1,0 +1,39 @@
+name: London n8n 4-Agent Canary
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/london-n8n-four-agent-canary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Run WordPress and Blogger draft canaries through n8n
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          command_timeout: 35m
+          script: |
+            set -euo pipefail
+            BASE=http://127.0.0.1:5678
+            curl -fsS "$BASE/healthz"
+            stamp=$(date -u +%Y%m%d%H%M%S)
+
+            echo "=== WP CANARY: wp_ktrip365 ==="
+            wp_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent"               -H 'Content-Type: application/json'               --data "{"site_id":"wp_ktrip365","run_id":"canary-$stamp-wp","publish_mode":"draft"}")
+            echo "$wp_out"
+            python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("WP_CANARY_OK", d.get("status"), d.get("url"))' <<<"$wp_out"
+
+            echo "=== BLOGGER CANARY: blogger_ktrip365 ==="
+            bg_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent"               -H 'Content-Type: application/json'               --data "{"site_id":"blogger_ktrip365","run_id":"canary-$stamp-blogger","publish_mode":"draft"}")
+            echo "$bg_out"
+            python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("BLOGGER_CANARY_OK", d.get("status"), d.get("url"))' <<<"$bg_out"
