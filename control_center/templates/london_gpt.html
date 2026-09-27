@@ -13,6 +13,7 @@
 .agent-card[data-status="running"]{border-color:#f59e0b;background:rgba(245,158,11,.08)}
 .agent-card[data-status="ok"]{border-color:#10b981;background:rgba(16,185,129,.08)}
 .agent-card[data-status="failed"]{border-color:#ef4444;background:rgba(239,68,68,.08)}
+.action-btn:disabled{opacity:.35;cursor:not-allowed}
 </style>
 </head>
 <body class="min-h-screen bg-slate-950 text-white">
@@ -28,13 +29,11 @@
 
 <main class="mx-auto max-w-7xl space-y-5 p-4 sm:p-6">
 <section class="rounded-3xl border border-white/10 bg-slate-900 p-5">
-  <div class="mb-4">
-    <p class="text-xs font-black text-blue-300">ONE-SCREEN OPERATOR</p>
-    <h2 class="mt-1 text-2xl font-black">사이트만 고르고 실행</h2>
-    <p class="mt-1 text-sm text-slate-400">24개 WordPress의 페르소나·톤·카테고리를 미리 넣었습니다. 기본값은 안전한 초안 발행입니다.</p>
-  </div>
+  <p class="text-xs font-black text-blue-300">STEP 0 · 대상 선택</p>
+  <h2 class="mt-1 text-2xl font-black">사이트와 카테고리만 먼저 고르세요</h2>
+  <p class="mt-1 text-sm text-slate-400">그 다음 아래 1번부터 순서대로 실행합니다. 한 번에 전체 실행하지 않습니다.</p>
 
-  <div class="grid gap-4 lg:grid-cols-4">
+  <div class="mt-4 grid gap-4 lg:grid-cols-3">
     <label class="block">
       <span class="mb-1 block text-xs font-black text-slate-400">WordPress 사이트</span>
       <select id="site" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
@@ -58,19 +57,15 @@
     </label>
 
     <label class="block">
-      <span class="mb-1 block text-xs font-black text-slate-400">발행 방식</span>
+      <span class="mb-1 block text-xs font-black text-slate-400">최종 발행 방식</span>
       <select id="publishMode" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
         <option value="draft" selected>초안 생성 · 검토 후 공개</option>
         <option value="publish">즉시 공개 · 검증까지</option>
       </select>
     </label>
-
-    <div class="flex items-end">
-      <button id="runBtn" class="w-full rounded-xl bg-blue-600 px-4 py-3 font-black hover:bg-blue-500 disabled:opacity-40">4-Agent 실행</button>
-    </div>
   </div>
 
-  <div id="profile" class="mt-4 grid gap-3 rounded-2xl bg-slate-950 p-4 text-sm md:grid-cols-3">
+  <div class="mt-4 grid gap-3 rounded-2xl bg-slate-950 p-4 text-sm md:grid-cols-3">
     <div><span class="text-xs font-black text-slate-500">페르소나</span><p id="persona" class="mt-1 font-bold"></p></div>
     <div><span class="text-xs font-black text-slate-500">톤앤매너</span><p id="tone" class="mt-1 font-bold"></p></div>
     <div><span class="text-xs font-black text-slate-500">주제 영역</span><p id="theme" class="mt-1 font-bold"></p></div>
@@ -79,33 +74,59 @@
 
 <section>
   <div class="mb-3 flex items-center justify-between gap-3">
-    <div>
-      <p class="text-xs font-black text-slate-400">DIAGNOSIS</p>
-      <h2 class="text-xl font-black">4개 Agent 상태</h2>
-    </div>
-    <div class="text-right text-xs text-slate-400">
-      <div id="runId">실행 전</div>
-      <div id="pollState"></div>
-    </div>
+    <div><p class="text-xs font-black text-slate-400">4-AGENT PIPELINE</p><h2 class="text-xl font-black">1번부터 하나씩 실행</h2></div>
+    <div class="text-right text-xs text-slate-400"><div id="runId">실행 전</div><div id="pollState"></div></div>
   </div>
 
   <div class="grid gap-4 lg:grid-cols-4">
-    {% for step in snapshot.pipeline %}
-    <article id="agent-{{ step.id }}" data-status="waiting" class="agent-card rounded-3xl border border-white/10 bg-slate-900 p-5 transition">
+    <article id="agent-research" data-status="waiting" class="agent-card rounded-3xl border border-white/10 bg-slate-900 p-5 transition">
       <div class="flex items-center justify-between gap-2">
-        <h3 class="text-lg font-black">{{ step.label }}</h3>
-        <span class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-black">
-          <span class="status-dot s-wait"></span><span class="status-text">대기</span>
-        </span>
+        <h3 class="text-lg font-black">1. 키워드/주제어</h3>
+        <span class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-black"><span class="status-dot s-wait"></span><span class="status-text">대기</span></span>
       </div>
-      <p class="mt-3 min-h-12 text-sm text-slate-400">{{ step.purpose }}</p>
-      <div class="mt-4 rounded-xl bg-slate-950 p-3 text-xs">
-        <p class="font-black text-slate-500">최근 결과</p>
-        <p class="agent-detail mt-1 break-words text-slate-300">아직 실행되지 않았습니다.</p>
+      <p class="mt-3 min-h-12 text-sm text-slate-400">Google·Naver·미디어·GSC를 조사해 현재 쓸 주제를 정합니다.</p>
+      <button id="researchBtn" class="action-btn mt-4 w-full rounded-xl bg-blue-600 px-3 py-3 text-sm font-black hover:bg-blue-500">① 키워드 리서치 실행</button>
+      <div id="keywordBox" class="mt-3 hidden rounded-xl border border-blue-400/20 bg-slate-950 p-3">
+        <label class="text-xs font-black text-blue-300">선정 키워드 · 수정 가능</label>
+        <input id="keywordInput" class="mt-2 w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm font-bold" />
+        <p id="researchEvidence" class="mt-2 max-h-40 overflow-auto whitespace-pre-wrap text-xs text-slate-400"></p>
       </div>
-      <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="{{ step.id }}">이 Agent만 다시 실행</button>
+      <div class="mt-3 rounded-xl bg-slate-950 p-3 text-xs"><p class="font-black text-slate-500">최근 결과</p><p class="agent-detail mt-1 break-words text-slate-300">실행 대기</p></div>
+      <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="research">1번만 다시 실행</button>
     </article>
-    {% endfor %}
+
+    <article id="agent-write" data-status="waiting" class="agent-card rounded-3xl border border-white/10 bg-slate-900 p-5 transition">
+      <div class="flex items-center justify-between gap-2">
+        <h3 class="text-lg font-black">2. 글쓰기</h3>
+        <span class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-black"><span class="status-dot s-wait"></span><span class="status-text">대기</span></span>
+      </div>
+      <p class="mt-3 min-h-12 text-sm text-slate-400">1번에서 확정한 키워드로 사이트 페르소나·톤·언어에 맞춰 작성합니다.</p>
+      <button id="writeBtn" disabled class="action-btn mt-4 w-full rounded-xl bg-violet-600 px-3 py-3 text-sm font-black">② 글쓰기 실행</button>
+      <div class="mt-3 rounded-xl bg-slate-950 p-3 text-xs"><p class="font-black text-slate-500">최근 결과</p><p class="agent-detail mt-1 break-words text-slate-300">1번 성공 후 활성화</p></div>
+      <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="write">2번만 다시 실행</button>
+    </article>
+
+    <article id="agent-image" data-status="waiting" class="agent-card rounded-3xl border border-white/10 bg-slate-900 p-5 transition">
+      <div class="flex items-center justify-between gap-2">
+        <h3 class="text-lg font-black">3. 이미지</h3>
+        <span class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-black"><span class="status-dot s-wait"></span><span class="status-text">대기</span></span>
+      </div>
+      <p class="mt-3 min-h-12 text-sm text-slate-400">본문에 맞는 이미지 0~1장을 생성·검증합니다.</p>
+      <button id="imageBtn" disabled class="action-btn mt-4 w-full rounded-xl bg-amber-600 px-3 py-3 text-sm font-black">③ 이미지 실행</button>
+      <div class="mt-3 rounded-xl bg-slate-950 p-3 text-xs"><p class="font-black text-slate-500">최근 결과</p><p class="agent-detail mt-1 break-words text-slate-300">2번 성공 후 활성화</p></div>
+      <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="image">3번만 다시 실행</button>
+    </article>
+
+    <article id="agent-publish" data-status="waiting" class="agent-card rounded-3xl border border-white/10 bg-slate-900 p-5 transition">
+      <div class="flex items-center justify-between gap-2">
+        <h3 class="text-lg font-black">4. 발행</h3>
+        <span class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-black"><span class="status-dot s-wait"></span><span class="status-text">대기</span></span>
+      </div>
+      <p class="mt-3 min-h-12 text-sm text-slate-400">선택 카테고리에 저장하고 post ID·URL까지 확인합니다.</p>
+      <button id="publishBtn" disabled class="action-btn mt-4 w-full rounded-xl bg-emerald-600 px-3 py-3 text-sm font-black">④ 발행 실행</button>
+      <div class="mt-3 rounded-xl bg-slate-950 p-3 text-xs"><p class="font-black text-slate-500">최근 결과</p><p class="agent-detail mt-1 break-words text-slate-300">3번 성공 후 활성화</p></div>
+      <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="publish">4번만 다시 실행</button>
+    </article>
   </div>
 </section>
 
@@ -127,22 +148,19 @@
 </main>
 
 <script>
-const siteEl=document.getElementById('site');
-const categoryEl=document.getElementById('category');
-const runBtn=document.getElementById('runBtn');
-let currentRunId='';
-let pollTimer=null;
+const siteEl=document.getElementById('site'), categoryEl=document.getElementById('category');
+const researchBtn=document.getElementById('researchBtn'), writeBtn=document.getElementById('writeBtn'), imageBtn=document.getElementById('imageBtn'), publishBtn=document.getElementById('publishBtn');
+let currentRunId='', pollTimer=null, lastState={};
 
 function selectedOption(){return siteEl.options[siteEl.selectedIndex]}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function refreshProfile(){
-  const o=selectedOption();
-  const cats=JSON.parse(o.dataset.categories||'[]');
-  categoryEl.innerHTML='<option value="">자동 선택</option>'+cats.map(c=>'<option value="'+escapeHtml(c)+'">'+escapeHtml(c)+'</option>').join('');
+  const o=selectedOption(), cats=JSON.parse(o.dataset.categories||'[]');
+  categoryEl.innerHTML=cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');
   document.getElementById('persona').textContent=o.dataset.persona||'-';
   document.getElementById('tone').textContent=o.dataset.tone||'-';
   document.getElementById('theme').textContent=o.dataset.theme||'-';
 }
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function setAgent(stage,status,detail){
   const card=document.getElementById('agent-'+stage); if(!card)return;
   card.dataset.status=status||'waiting';
@@ -150,80 +168,86 @@ function setAgent(stage,status,detail){
   dot.className='status-dot '+(status==='running'?'s-run':status==='ok'?'s-ok':status==='failed'?'s-fail':'s-wait');
   card.querySelector('.status-text').textContent=status==='running'?'실행중':status==='ok'?'성공':status==='failed'?'실패':'대기';
   card.querySelector('.agent-detail').textContent=detail||'';
-  const btn=card.querySelector('.rerun');
-  btn.classList.toggle('hidden',status!=='failed');
+  card.querySelector('.rerun').classList.toggle('hidden',status!=='failed');
 }
-function resetAgents(){
-  ['research','write','image','publish'].forEach(s=>setAgent(s,'waiting','실행 대기'));
-  document.getElementById('receiptPanel').classList.add('hidden');
-  document.getElementById('errorPanel').classList.add('hidden');
+function showError(stage,msg){
+  document.getElementById('errorPanel').classList.remove('hidden');
+  document.getElementById('errorStage').textContent=stage+' 실패';
+  document.getElementById('errorMessage').textContent=msg||'오류';
 }
-async function startRun(){
-  resetAgents(); runBtn.disabled=true; runBtn.textContent='시작 중...';
-  const body={site_id:siteEl.value,category:categoryEl.value,publish_mode:document.getElementById('publishMode').value};
+function clearError(){document.getElementById('errorPanel').classList.add('hidden')}
+function startPolling(){if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(pollRun,2000);pollRun()}
+async function research(){
+  clearError();
+  researchBtn.disabled=true; researchBtn.textContent='리서치 중...';
+  setAgent('research','running','Google·Naver·미디어·GSC 조사 중');
   try{
-    const r=await fetch('/api/london-gpt/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d=await r.json();
-    if(!r.ok||!d.ok) throw new Error(d.message||d.error||'실행 실패');
-    currentRunId=d.run_id;
-    document.getElementById('runId').textContent='RUN '+currentRunId;
-    setAgent('research','running','키워드·검색 근거 조사 시작');
-    pollTimer=setInterval(pollRun,2500); pollRun();
-  }catch(e){
-    document.getElementById('errorPanel').classList.remove('hidden');
-    document.getElementById('errorStage').textContent='시작 실패';
-    document.getElementById('errorMessage').textContent=e.message;
-    runBtn.disabled=false; runBtn.textContent='4-Agent 실행';
-  }
+    const r=await fetch('/api/london-gpt/research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({site_id:siteEl.value,category:categoryEl.value,publish_mode:document.getElementById('publishMode').value})});
+    const d=await r.json(); if(!r.ok||!d.ok)throw new Error(d.message||d.error||'리서치 시작 실패');
+    currentRunId=d.run_id; document.getElementById('runId').textContent='RUN '+currentRunId; startPolling();
+  }catch(e){setAgent('research','failed',e.message);showError('1번 리서치',e.message);researchBtn.disabled=false;researchBtn.textContent='① 키워드 리서치 실행'}
+}
+async function saveKeyword(){
+  const keyword=document.getElementById('keywordInput').value.trim();
+  if(!keyword)throw new Error('키워드가 비어 있습니다.');
+  const r=await fetch('/api/london-gpt/keyword',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({run_id:currentRunId,keyword})});
+  const d=await r.json(); if(!r.ok||!d.ok)throw new Error(d.message||d.error||'키워드 저장 실패');
+}
+async function runStage(stage){
+  clearError();
+  try{
+    if(stage==='write')await saveKeyword();
+    const btn={write:writeBtn,image:imageBtn,publish:publishBtn}[stage]; btn.disabled=true;
+    setAgent(stage,'running','실행 중');
+    const r=await fetch('/api/london-gpt/stage/'+stage,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({run_id:currentRunId})});
+    const d=await r.json(); if(!r.ok||!d.ok)throw new Error(d.message||d.error||'실행 실패');
+    startPolling();
+  }catch(e){setAgent(stage,'failed',e.message);showError(stage,e.message)}
 }
 async function pollRun(){
   if(!currentRunId)return;
   try{
-    const r=await fetch('/api/london-gpt/run/'+encodeURIComponent(currentRunId),{cache:'no-store'});
-    const d=await r.json();
+    const r=await fetch('/api/london-gpt/run/'+encodeURIComponent(currentRunId),{cache:'no-store'}), d=await r.json(); lastState=d;
     const s=d.stage_status||{};
     const details={
-      research:d.research?.keyword?('키워드: '+d.research.keyword):'검색·리서치 중',
+      research:d.research?.keyword?('선정: '+d.research.keyword):'리서치 중',
       write:d.writer?('품질 '+(d.writer.quality_score??'-')+' · '+(d.writer.provider||'')):'본문 작성 중',
       image:d.image?.status||'이미지 처리 중',
       publish:d.receipt?.url?('완료: '+d.receipt.url):'발행·검증 중'
     };
-    ['research','write','image','publish'].forEach(stage=>{
-      let st=s[stage]||'waiting';
-      if(st==='running'||st==='ok'||st==='failed') setAgent(stage,st,details[stage]);
-    });
+    ['research','write','image','publish'].forEach(stage=>{const st=s[stage]||'waiting';setAgent(stage,st,details[stage])});
     document.getElementById('pollState').textContent='상태 갱신 '+new Date().toLocaleTimeString('ko-KR');
-    if(d.last_error){
-      clearInterval(pollTimer);
-      document.getElementById('errorPanel').classList.remove('hidden');
-      document.getElementById('errorStage').textContent=(d.last_error.stage||'')+' Agent 실패';
-      document.getElementById('errorMessage').textContent=d.last_error.message||d.last_error.type||'오류';
-      runBtn.disabled=false; runBtn.textContent='4-Agent 실행';
+    if(s.research==='ok'){
+      document.getElementById('keywordBox').classList.remove('hidden');
+      document.getElementById('keywordInput').value=d.research?.keyword||'';
+      document.getElementById('researchEvidence').textContent=d.research?.evidence||'';
+      researchBtn.disabled=false;researchBtn.textContent='① 다시 리서치';
+      writeBtn.disabled=false;
     }
+    if(s.write==='ok') imageBtn.disabled=false;
+    if(s.image==='ok') publishBtn.disabled=false;
+    if(d.last_error && s[d.last_error.stage]==='failed'){showError(d.last_error.stage,d.last_error.message||d.last_error.type); if(pollTimer)clearInterval(pollTimer)}
     if(d.receipt && s.publish==='ok'){
-      clearInterval(pollTimer);
+      if(pollTimer)clearInterval(pollTimer);
       document.getElementById('receiptPanel').classList.remove('hidden');
       document.getElementById('receiptStatus').textContent=d.receipt.status||'완료';
       document.getElementById('receiptPost').textContent=d.receipt.post_id||'-';
       const a=document.getElementById('receiptUrl');a.textContent=d.receipt.url||'-';a.href=d.receipt.url||'#';
-      runBtn.disabled=false; runBtn.textContent='4-Agent 실행';
     }
   }catch(e){document.getElementById('pollState').textContent='상태 조회 실패'}
 }
 async function rerun(stage){
-  if(!currentRunId)return;
+  clearError();
   setAgent(stage,'running','재실행 중');
-  document.getElementById('errorPanel').classList.add('hidden');
-  try{
-    const r=await fetch('/api/london-gpt/rerun/'+stage,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({run_id:currentRunId})});
-    const d=await r.json();
-    if(!r.ok||!d.ok) throw new Error(d.message||d.stderr||d.error||'재실행 실패');
-    setAgent(stage,'ok','재실행 성공');
-    if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(pollRun,2500);pollRun();
-  }catch(e){setAgent(stage,'failed',e.message)}
+  const r=await fetch('/api/london-gpt/rerun/'+stage,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({run_id:currentRunId})});
+  const d=await r.json();if(!r.ok||!d.ok){setAgent(stage,'failed',d.message||d.error||'재실행 실패');return}
+  startPolling();
 }
 siteEl.addEventListener('change',refreshProfile);
-runBtn.addEventListener('click',startRun);
+researchBtn.addEventListener('click',research);
+writeBtn.addEventListener('click',()=>runStage('write'));
+imageBtn.addEventListener('click',()=>runStage('image'));
+publishBtn.addEventListener('click',()=>runStage('publish'));
 document.querySelectorAll('.rerun').forEach(b=>b.addEventListener('click',()=>rerun(b.dataset.stage)));
 refreshProfile();
 </script>
