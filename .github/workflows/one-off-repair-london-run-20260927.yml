@@ -1,6 +1,4 @@
-name: One-off repair LondonProjectGPT failed run
-# retry after bounded writer + durable WP worker
-# retry after deterministic writer SLA
+name: One-off verify LondonProjectGPT published URL
 
 on:
   push:
@@ -12,95 +10,21 @@ permissions:
   contents: read
 
 jobs:
-  repair:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
-      - name: Rewrite and publish the failed jobkorea365 run through n8n
+      - name: Verify published WordPress URL from VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          command_timeout: 12m
           script: |
             set -euo pipefail
-            RUN_ID='lgpt-20260927-055440-df0e59'
-            STATE="/opt/korea365/data/london-pipeline/$RUN_ID.json"
-            BASE='http://127.0.0.1:5678'
-            test -f "$STATE"
-            curl -fsS "$BASE/healthz"
-            echo '=== BEFORE ==='
-            python3 - "$STATE" <<'PY'
-            import json,sys
-            p=sys.argv[1]
-            d=json.load(open(p,encoding='utf-8'))
-            d['category']='Jobs in Korea'
-            d['publish_mode']='publish'
-            d.pop('last_error',None)
-            d.pop('receipt',None)
-            d.pop('category_assignment',None)
-            d['stage_status']['write']='waiting'
-            d['stage_status']['image']='waiting'
-            d['stage_status']['publish']='waiting'
-            with open(p,'w',encoding='utf-8') as fh:
-                json.dump(d,fh,ensure_ascii=False,indent=2)
-            PY
-            python3 - "$STATE" <<'PY'
-            import json,sys
-            d=json.load(open(sys.argv[1],encoding='utf-8'))
-            print(json.dumps({
-              'run_id':d.get('run_id'),
-              'site_id':d.get('site_id'),
-              'category':d.get('category'),
-              'keyword':(d.get('research') or {}).get('keyword'),
-              'stage_status':d.get('stage_status'),
-            },ensure_ascii=False))
-            PY
-
-            code=$(curl -sS -o /tmp/london-rewrite-start.json -w '%{http_code}' \
-              -X POST "$BASE/webhook/london-content-rewrite" \
-              -H 'Content-Type: application/json' \
-              --data '{"site_id":"wp_jobkorea365","run_id":"lgpt-20260927-055440-df0e59","publish_mode":"publish","category":"Jobs in Korea"}')
-            echo "START_HTTP=$code"
-            cat /tmp/london-rewrite-start.json || true
+            URL='https://jobkorea365.com/finding-first-jobs-navigating-youth-employment-in-korea/'
+            code=$(curl -L -sS -o /tmp/london-published.html -w '%{http_code}' --max-time 30 "$URL")
+            echo "PUBLIC_HTTP=$code"
             test "$code" = "200"
-
-            ok=0
-            for i in $(seq 1 180); do
-              status=$(python3 - "$STATE" <<'PY'
-            import json,sys
-            d=json.load(open(sys.argv[1],encoding='utf-8'))
-            s=d.get('stage_status') or {}
-            if s.get('publish')=='ok' and (d.get('receipt') or {}).get('post_id') and (d.get('receipt') or {}).get('url'):
-                print('ok')
-            elif d.get('last_error'):
-                print('failed')
-            else:
-                print('running')
-            PY
-              )
-              echo "poll=$i status=$status"
-              if [ "$status" = "ok" ]; then ok=1; break; fi
-              if [ "$status" = "failed" ]; then break; fi
-              sleep 3
-            done
-
-            echo '=== AFTER ==='
-            cat "$STATE"
-            test "$ok" = "1"
-            python3 - "$STATE" <<'PY'
-            import json,sys
-            d=json.load(open(sys.argv[1],encoding='utf-8'))
-            s=d.get('stage_status') or {}
-            assert s.get('research')=='ok'
-            assert s.get('write')=='ok'
-            assert (d.get('category_assignment') or {}).get('status')=='ok'
-            assert s.get('image')=='ok'
-            assert s.get('publish')=='ok'
-            r=d.get('receipt') or {}
-            assert r.get('status')=='published'
-            assert r.get('post_id')
-            assert str(r.get('url','')).startswith('http')
-            print('LIVE_PUBLISH_OK', r.get('post_id'), r.get('url'))
-            PY
+            grep -qi 'Finding First Jobs' /tmp/london-published.html
+            echo "PUBLIC_VERIFY_OK $URL"
