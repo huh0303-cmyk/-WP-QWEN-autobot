@@ -291,8 +291,10 @@ def install(app, runtime):
         state.setdefault("stage_status", {})["write"] = "waiting"
         state["stage_status"]["image"] = "waiting"
         state["stage_status"]["publish"] = "waiting"
-        state.pop("article", None)
-        state.pop("writer", None)
+        if state.get("article"):
+            state["previous_article"] = state.get("article")
+        if state.get("writer"):
+            state["previous_writer"] = state.get("writer")
         state.pop("image", None)
         state.pop("receipt", None)
         state.pop("last_error", None)
