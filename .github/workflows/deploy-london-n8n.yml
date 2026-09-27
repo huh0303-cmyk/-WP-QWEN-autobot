@@ -54,20 +54,24 @@ jobs:
             systemctl enable --now korea365-n8n-gateway.service
             cd "$ROOT/deploy/n8n"
             docker compose pull
-            docker compose up -d
-            for i in $(seq 1 40); do
-              if curl -fsS http://127.0.0.1:5678/healthz >/dev/null 2>&1; then
-                break
-              fi
-              sleep 2
-            done
-            curl -fsS http://127.0.0.1:5678/healthz
-            curl -fsS http://127.0.0.1:8766/health
-            docker exec korea365-n8n n8n import:workflow --input=/workflows/wp25_master.json
-            docker exec korea365-n8n n8n import:workflow --input=/workflows/blogger33_master.json
-            docker exec korea365-n8n n8n import:workflow --input=/workflows/london_content_four_agent.json
-            docker exec korea365-n8n n8n publish:workflow --id=london-content-four-agent-v1
-            docker restart korea365-n8n >/dev/null
+            docker compose up -d ollama
+            docker compose stop n8n >/dev/null 2>&1 || true
+
+            N8N_IMAGE=docker.n8n.io/n8nio/n8n:latest
+            run_n8n_cli() {
+              docker run --rm \
+                --env-file /etc/korea365/n8n.env \
+                -v "$ROOT/data/n8n:/home/node/.n8n" \
+                -v "$ROOT/data/n8n-workflows:/workflows:ro" \
+                "$N8N_IMAGE" "$@"
+            }
+
+            run_n8n_cli import:workflow --input=/workflows/wp25_master.json
+            run_n8n_cli import:workflow --input=/workflows/blogger33_master.json
+            run_n8n_cli import:workflow --input=/workflows/london_content_four_agent.json
+            run_n8n_cli publish:workflow --id=london-content-four-agent-v1
+
+            docker compose up -d n8n
             for i in $(seq 1 40); do
               if curl -fsS http://127.0.0.1:5678/healthz >/dev/null 2>&1; then
                 break
