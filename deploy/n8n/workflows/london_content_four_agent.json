@@ -7,7 +7,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-four-agent",
-        "responseMode": "lastNode",
+        "responseMode": "onReceived",
         "options": {}
       },
       "id": "trigger-webhook",
