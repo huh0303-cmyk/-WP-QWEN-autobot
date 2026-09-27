@@ -11,6 +11,86 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-09-27 (16차) — "런던프로젝트클로드" Naver/Tistory 웹 콘솔 구현 + GPT 트랙과의 명칭/범위 충돌 발견·Chairman 확인
+
+Chairman이 업로드한 Electron 콘솔(`blogauto-naver-tistory`) 전체 소스
+(accountStore.js, embedding.js, history.js, settings.js, codexRunner.js,
+imageAssets.js, naverPublisher.js, search.js, tistoryPublisher.js, index.html,
+styles.css, app.js, preload.js, main.js)를 참고해 "최종콘솔/앱 명은
+'런던프로젝트클로드'로 납품, PC/모바일 겸용, 베트남 직원도 사용 가능한 블로그
+자동화 앱"을 요청받음. 사전 확인 질문(AskUserQuestion)으로 (1) 범위=Naver+
+Tistory 콘솔 확장만(WP24/Blogspot33은 기존 GPT-lock n8n 파이프라인 유지),
+(2) 플랫폼=브라우저 웹앱 하나(PC/모바일 겸용, 설치 불필요, 기존 VPS),
+(3) 베트남 직원=오너와 동일 권한 공유 로그인 — 3가지를 Chairman이 확정.
+
+**구현 완료 (로컬, 이번 세션에서 실행/테스트까지 확인)**:
+저장소 `london_project_claude_console/`에 Node/Express + WebSocket 웹 콘솔을
+구현. 핵심 원칙 — **안전성이 검증된 원본 로직은 재작성하지 않고 그대로 이식**:
+- `lib/*.js`(accountStore, embedding, history, settings, codexRunner,
+  imageAssets, naverPublisher, search, tistoryPublisher) — grep으로 Electron
+  의존성 없음을 확인 후 **코드 미변경**으로 그대로 복사.
+- `server/jobRunner.js` — 원본 `main.js`(2253줄) 중 `safeLog(...)`부터
+  `startJob(...)`까지 작업 오케스트레이션 전체(키워드 레인 플래닝, 소스 품질
+  검증, 세션 복구/재로그인 처리, Naver 성공 후 Tistory 미러링 순서 등, 약
+  1800줄)를 **byte-for-byte 동일하게** 이식. Electron 전용 플러밍
+  (app/BrowserWindow/ipcMain/dialog/shell)만 제거·대체. 변환 스크립트
+  `server/build_jobRunner.js`로 원본에서 재생성 가능(감사용).
+- `server/server.js` — 원본 `preload.js`의 API 채널을 1:1 HTTP 라우트로 매핑,
+  `emit()`은 WebSocket 브로드캐스트로 대체, 공유 로그인(세션 쿠키) 추가.
+- `public/app.js`(렌더러 UI 로직) — **100% 원본 그대로**, `window.blogAuto`
+  호출부 변경 없음. `public/bridge.js`(신규)가 그 인터페이스를 fetch/WebSocket
+  으로 재구현해 원본 `preload.js`를 대체. 유일한 UI 변경은 `index.html`에
+  샘플이미지 업로드용 숨김 `<input type="file">` 1개 추가(네이티브 파일
+  다이얼로그 대체, 클릭 처리는 bridge.js에서만 담당).
+- `deploy/README.md` — VPS 헤드리스 환경에서 Naver 수동 로그인/캡채를
+  PC·모바일 어디서든 처리하기 위한 방법: **Xvfb(가상 디스플레이) + x11vnc +
+  noVNC**. Playwright가 띄우는 실제 Chrome 창(headless:false, 원본 코드
+  그대로)을 가상 디스플레이에 띄우고 noVNC로 브라우저에서 보고 조작. systemd
+  유닛 4개(Xvfb/x11vnc/noVNC/콘솔 서버) + nginx 리버스프록시 설정 포함.
+- 로컬 스모크 테스트: 로그인/인증 미들웨어(미인증 시 /login 리다이렉트 vs API
+  401 JSON 분기), `getInitialData` API 정상 응답 확인. 첫 구현에서 정적
+  파일 마운트 순서 버그(로그인 전에도 `/`가 200으로 로그인 페이지를 서빙하는
+  문제)를 발견해 수정하고 재검증함.
+
+**작업 중 발견한 중대 충돌 (Chairman 확인 완료)**: 코드 완성 후 push 직전
+`git fetch`에서 런던프로젝트GPT 트랙이 같은 날 추가로 6개 커밋을 올렸고, 그중
+`docs/LONDON_PROJECT_GPT_BLOG_CONSOLE_LOCKED_SCOPE_2026-09-27.md`(OWNER LOCKED)가:
+(1) **"이전 표현인 '런던프로젝트클로드'는 이 콘솔의 공식 명칭으로 사용하지
+않는다"**고 명시 — Chairman이 방금 이 세션에 지시한 이름과 정면 충돌,
+(2) 범위를 WP24+Blogspot33+Naver+Tistory **통합 콘솔**로 정의 — 이 세션이
+받은 범위(Naver+Tistory만)보다 넓음, (3) **n8n을 오케스트레이션 엔진**으로
+명시 — 이 세션의 Node/Express 직접 포팅 방식과 다른 아키텍처. 플랫폼 결정
+(브라우저 웹앱 하나/PC+모바일/동일 VPS/베트남 직원 동일 권한)은 이 세션이
+받은 지시와 동일 — Chairman이 두 트랙에 유사한 지시를 각각 내린 것으로 추정.
+
+AskUserQuestion으로 Chairman에게 직접 확인한 결과: **"클로드 트랙 계속 진행,
+이름/범위 유지"** — 즉 이 `london_project_claude_console/`은 이름
+"런던프로젝트클로드", 범위(Naver+Tistory), 아키텍처(Node/Express) 그대로
+GPT 트랙(n8n 기반 WP/Blogspot+Naver+Tistory 통합 콘솔)과 **별개로 병행
+운영**하는 것으로 확정. 이 결정은 `london_project_claude_console/README.md`
+상단에도 경고 박스로 기록해 다음 세션/GPT 트랙이 인지하도록 함.
+
+**아직 확인 안 된 것**:
+- VPS 실배포 미실시 — SSH 접근 권한 없어 이 세션에서 systemd 유닛 설치/기동을
+  직접 못 함. `deploy/README.md` 절차를 Chairman 또는 별도 워크플로우로 실행 필요.
+- Xvfb(1366x900)+noVNC 환경에서 실제 Naver 로그인/캡챠 E2E 미검증 — 좌표/DOM
+  탐색 로직이 실기에서 그대로 맞을지 확인 필요.
+- 동시 작업 큐잉 미구현 — 원본과 동일하게 `activeJob` 단일 슬롯(한 번에 한
+  작업만). 오너와 베트남 직원이 동시에 다른 계정으로 발행 시도하면 나중 요청이
+  "이미 실행 중" 에러 — 여러 명 동시 사용 시나리오는 Chairman 확인 필요.
+- GPT 트랙이 이 병행 운영 결정을 인지하는 절차가 없음 — GPT 트랙 세션이 이
+  상태 문서를 읽지 않으면 계속 서로 다른 방향으로 진행할 위험 있음. 두 트랙
+  모두 이 파일과 상대 트랙의 owner-lock 문서를 세션 시작 시 `git log`로 확인
+  하는 CLAUDE.md 관행에 의존하고 있음 — 구조적 취약점으로 남아있음, Chairman
+  판단하에 두 트랙 간 명시적 조율 채널이 필요할 수 있음.
+- npm 패키지(express/multer/ws/cookie-parser/playwright-core) `package-lock.json`
+  포함해서 커밋했는지 이번 커밋에서 확인 필요(아래 작업 계속).
+
+**다음 세션이 할 일**: (1) VPS 배포 실행(SSH 접근 확보 또는 GitHub Actions
+workflow 신설), (2) noVNC 경유 실제 Naver 로그인 E2E 테스트, (3) 다중 사용자
+동시 작업 큐 필요 여부 Chairman 확인, (4) GPT 트랙 병행 운영 사실이 실제로
+문제를 일으키는지(같은 VPS 자원 경합 등) 계속 추적.
+
 ## 2026-09-27 (15차) — Naver/Tistory 콘텐츠 표준 문서 작성 + GPT 락과의 충돌 확인·회피
 
 Chairman이 Windows Electron 콘솔(`blogauto-naver-tistory`, Naver 수동로그인+
