@@ -98,6 +98,19 @@
   </div>
 </section>
 
+<section id="rewritePanel" class="hidden rounded-3xl border border-violet-400/20 bg-violet-400/10 p-5">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p class="text-xs font-black text-violet-300">WRITER CONTROL</p>
+      <h2 class="mt-1 text-lg font-black">같은 키워드로 글만 다시 쓰기</h2>
+      <p class="mt-1 text-sm text-slate-300">1번 리서치 결과는 유지하고 n8n이 ② 글쓰기 → ③ 이미지 → ④ 발행만 다시 실행합니다.</p>
+    </div>
+    <button id="rewriteBtn" class="rounded-xl bg-violet-600 px-5 py-3 text-sm font-black hover:bg-violet-500">
+      ② 글 다시 쓰기
+    </button>
+  </div>
+</section>
+
 <section id="researchPanel" class="hidden rounded-3xl border border-blue-400/20 bg-blue-400/10 p-5">
   <p class="text-xs font-black text-blue-300">AGENT 1 RESULT</p>
   <h2 id="keywordTitle" class="mt-1 text-xl font-black"></h2>
@@ -125,6 +138,7 @@
 const siteEl=document.getElementById('site');
 const categoryEl=document.getElementById('category');
 const autoBtn=document.getElementById('autoBtn');
+const rewriteBtn=document.getElementById('rewriteBtn');
 let currentRunId='', pollTimer=null;
 
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -149,6 +163,7 @@ function resetView(){
   ['research','write','image','publish'].forEach((s,i)=>setAgent(s,'waiting','자동 순서 '+(i+1)+' 대기'));
   document.getElementById('receiptPanel').classList.add('hidden');
   document.getElementById('researchPanel').classList.add('hidden');
+  document.getElementById('rewritePanel').classList.add('hidden');
   document.getElementById('errorPanel').classList.add('hidden');
 }
 function showError(stage,msg){
@@ -207,6 +222,9 @@ async function pollRun(){
       document.getElementById('keywordTitle').textContent='선정 키워드: '+d.research.keyword;
       document.getElementById('researchEvidence').textContent=d.research.evidence||'';
     }
+    if(s.write==='ok'){
+      document.getElementById('rewritePanel').classList.remove('hidden');
+    }
 
     if(d.last_error){
       const stage=d.last_error.stage||'unknown';
@@ -232,6 +250,33 @@ async function pollRun(){
     document.getElementById('pollState').textContent='상태 조회 실패';
   }
 }
+async function rewriteArticle(){
+  if(!currentRunId)return;
+  document.getElementById('errorPanel').classList.add('hidden');
+  document.getElementById('receiptPanel').classList.add('hidden');
+  rewriteBtn.disabled=true;
+  rewriteBtn.textContent='다시 쓰는 중...';
+  setAgent('write','running','같은 키워드로 다시 작성 중');
+  setAgent('image','waiting','글쓰기 완료 후 자동 진행');
+  setAgent('publish','waiting','이미지 완료 후 자동 진행');
+  try{
+    const r=await fetch('/api/london-gpt/rewrite',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({run_id:currentRunId})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.ok)throw new Error(d.message||d.error||'다시쓰기 시작 실패');
+    startPolling();
+  }catch(e){
+    setAgent('write','failed',e.message);
+    showError('글 다시쓰기',e.message);
+  }finally{
+    rewriteBtn.disabled=false;
+    rewriteBtn.textContent='② 글 다시 쓰기';
+  }
+}
+
 async function rerun(stage){
   if(!currentRunId)return;
   document.getElementById('errorPanel').classList.add('hidden');
@@ -252,6 +297,7 @@ async function rerun(stage){
 }
 siteEl.addEventListener('change',refreshProfile);
 autoBtn.addEventListener('click',autoRun);
+rewriteBtn.addEventListener('click',rewriteArticle);
 document.querySelectorAll('.rerun').forEach(b=>b.addEventListener('click',()=>rerun(b.dataset.stage)));
 refreshProfile();
 </script>
