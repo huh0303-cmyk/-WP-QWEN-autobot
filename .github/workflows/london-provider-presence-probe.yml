@@ -1,0 +1,49 @@
+name: London Provider Presence Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/london-provider-presence-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe provider configuration presence on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            python3 - <<'PY'
+            import json
+            from pathlib import Path
+            found={}
+            p=Path('/etc/korea365/article-runtime.json')
+            if p.exists():
+                try:
+                    d=json.loads(p.read_text())
+                    for k in ('OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY','ANTHROPIC_WORKSPACE_ID','HF_TOKEN'):
+                        found[k]=bool(str(d.get(k,'')).strip())
+                except Exception:
+                    pass
+            p=Path('/etc/korea365/control.env')
+            if p.exists():
+                for raw in p.read_text(errors='ignore').splitlines():
+                    if '=' not in raw or raw.lstrip().startswith('#'):
+                        continue
+                    k,v=raw.split('=',1)
+                    k=k.strip()
+                    if k in ('OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY','ANTHROPIC_WORKSPACE_ID','HF_TOKEN'):
+                        found[k]=bool(v.strip().strip('"').strip("'"))
+            for k in ('OPENAI_API_KEY','GEMINI_API_KEY','ANTHROPIC_API_KEY','ANTHROPIC_WORKSPACE_ID','HF_TOKEN'):
+                print(k, 'PRESENT' if found.get(k) else 'MISSING')
+            PY
