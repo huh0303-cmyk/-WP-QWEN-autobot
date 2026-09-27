@@ -1,0 +1,44 @@
+name: "Deploy London Project Claude console (Naver/Tistory web console)"
+
+# Manually triggered only - this is a separate app/service from the
+# korea365-* control room and is NOT part of deploy-to-vps.yml's guarded
+# reconciliation. It reuses the same VPS SSH secrets because it deploys to
+# the same VPS, but it never touches managed_roots or the korea365 services.
+on:
+  workflow_dispatch:
+    inputs:
+      lpc_password:
+        description: "Web console login password (admin)"
+        required: true
+      vnc_password:
+        description: "VNC password for the Naver login remote-browser-view"
+        required: true
+
+concurrency:
+  group: deploy-london-project-claude-console
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            APP_DIR=/opt/korea365/london_project_claude_console
+            if [ ! -d "$APP_DIR" ]; then
+              echo "London Project Claude console directory not found at $APP_DIR - has deploy-to-vps.yml synced main yet?"
+              exit 1
+            fi
+            chmod +x "$APP_DIR/deploy/install.sh"
+            APP_DIR="$APP_DIR" \
+              LPC_USER=admin \
+              LPC_PASS='${{ inputs.lpc_password }}' \
+              VNC_PASSWORD='${{ inputs.vnc_password }}' \
+              "$APP_DIR/deploy/install.sh"
