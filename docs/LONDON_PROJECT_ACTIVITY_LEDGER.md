@@ -92,3 +92,8 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 추가 장애:
   - `daily-network-publish.yml`이 과거 커밋 `05f67cc5`부터 job-level `if`에서 `matrix.site`를 참조해 모든 push에 0초 startup failure를 만들고 있었음
   - 사이트 선택 조건을 matrix가 사용 가능한 각 step-level `if`로 이동해 글을 발행하지 않고 문법 오류만 복구
+- 최종 배포:
+  - workflow 복구 commit `95264439`, deploy run `36303452952` 성공
+  - 해당 commit에서는 과거의 `daily-network-publish.yml` startup failure가 더 이상 생성되지 않아 GitHub workflow 문법 복구 확인
+  - 전체 저장소 CI는 변경 전 run과 동일하게 `41 failed, 602 passed`로 실패했으며, 누락된 과거 workflow 파일·오래된 26개 도메인 기대값 등 이번 변경과 무관한 기존 실패 41건임
+- 최종 상태: 요청 화면과 발행 버튼 경로 배포 완료·실화면 확인 완료. 기존 저장소 전체 테스트 부채는 별도 정비 필요.
