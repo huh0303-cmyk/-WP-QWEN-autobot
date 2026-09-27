@@ -29,11 +29,17 @@ jobs:
             stamp=$(date -u +%Y%m%d%H%M%S)
 
             echo "=== WP CANARY: wp_ktrip365 ==="
-            wp_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent"               -H 'Content-Type: application/json'               --data "{"site_id":"wp_ktrip365","run_id":"canary-$stamp-wp","publish_mode":"draft"}")
+            wp_payload=$(printf '{"site_id":"wp_ktrip365","run_id":"canary-%s-wp","publish_mode":"draft"}' "$stamp")
+            wp_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent" \
+              -H 'Content-Type: application/json' \
+              --data "$wp_payload")
             echo "$wp_out"
             python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("WP_CANARY_OK", d.get("status"), d.get("url"))' <<<"$wp_out"
 
             echo "=== BLOGGER CANARY: blogger_ktrip365 ==="
-            bg_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent"               -H 'Content-Type: application/json'               --data "{"site_id":"blogger_ktrip365","run_id":"canary-$stamp-blogger","publish_mode":"draft"}")
+            bg_payload=$(printf '{"site_id":"blogger_ktrip365","run_id":"canary-%s-blogger","publish_mode":"draft"}' "$stamp")
+            bg_out=$(curl -fsS --max-time 1200 -X POST "$BASE/webhook/london-content-four-agent" \
+              -H 'Content-Type: application/json' \
+              --data "$bg_payload")
             echo "$bg_out"
             python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("BLOGGER_CANARY_OK", d.get("status"), d.get("url"))' <<<"$bg_out"
