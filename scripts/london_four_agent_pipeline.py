@@ -108,21 +108,43 @@ def stage_research(site_id: str, run_id: str) -> dict:
     site_url = profile["wordpress"]["url"]
     from scripts.collect_keyword_search_demand import demand_context
     from scripts.refresh_keyword_pool import call_search_llm, overlaps_corpus, build_network_corpus
-    from scripts.budget_guard import check_and_record
-    check_and_record(0.02, label=f"london-agent1:{site_id}")
-    client = None
-    if os.environ.get("GEMINI_API_KEY"):
-        from google import genai
-        client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
     recent_titles = _network_titles()
     corpus_norms, corpus_wordsets = build_network_corpus({"network": recent_titles})
     demand = demand_context(site_url)
-    today = datetime.now(KST).date().isoformat()
     avoid = ""
     last_text = ""
     keyword = ""
-    for attempt in range(3):
-        prompt = f"""Research a current article topic for {settings.get('persona','editor')}.
+    research_provider = ""
+    direct_error = ""
+
+    # Primary path: zero-cost direct evidence collection + local Ollama.
+    try:
+        from scripts.direct_topic_research import collect as collect_direct, choose_keyword as choose_direct
+        evidence = collect_direct(profile, demand)
+        for attempt in range(3):
+            last_text = choose_direct(profile, evidence, avoid=avoid)
+            keyword = _parse_keyword(last_text)
+            if not overlaps_corpus(keyword, corpus_norms, corpus_wordsets):
+                research_provider = "direct-google-naver-media+ollama"
+                break
+            avoid = f"Do not use '{keyword}' or close variants."
+            keyword = ""
+    except Exception as exc:
+        direct_error = f"{type(exc).__name__}: {str(exc)[:300]}"
+
+    # Bounded cloud fallback only when the zero-cost path is unavailable.
+    if not keyword:
+        from scripts.budget_guard import check_and_record
+        check_and_record(0.02, label=f"london-agent1:{site_id}")
+        client = None
+        if os.environ.get("GEMINI_API_KEY"):
+            from google import genai
+            client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+        today = datetime.now(KST).date().isoformat()
+        avoid = ""
+        for attempt in range(3):
+            prompt = f"""Research a current article topic for {settings.get('persona','editor')}.
 Date: {today}
 Site theme: {profile['wordpress'].get('theme','')}
 Language: {profile.get('language','en')}
@@ -150,14 +172,16 @@ MEDIA: <brief independent-media evidence>
 VOLUME: <verified volume if actually available, otherwise unavailable>
 RATIONALE: <why this topic fits now>
 """
-        last_text, grounded = call_search_llm(client, prompt)
-        keyword = _parse_keyword(last_text)
-        if not overlaps_corpus(keyword, corpus_norms, corpus_wordsets):
-            break
-        avoid = f"Do not use '{keyword}' or close variants."
-        keyword = ""
+            last_text, grounded = call_search_llm(client, prompt)
+            keyword = _parse_keyword(last_text)
+            if not overlaps_corpus(keyword, corpus_norms, corpus_wordsets):
+                research_provider = "cloud-search-fallback"
+                break
+            avoid = f"Do not use '{keyword}' or close variants."
+            keyword = ""
+
     if not keyword:
-        raise RuntimeError("research only produced duplicate topics")
+        raise RuntimeError(f"research exhausted; direct_error={direct_error}")
     state = {
         "run_id": run_id,
         "site_id": site_id,
@@ -167,14 +191,15 @@ RATIONALE: <why this topic fits now>
         "research": {
             "keyword": keyword,
             "evidence": last_text,
+            "provider": research_provider,
+            "direct_error": direct_error,
             "required_surfaces": ["google", "naver", "media", "gsc"],
             "exact_volume_policy": "never fabricated",
         },
         "stage_status": {"research": "ok"},
     }
     _write_state(state)
-    return {"ok": True, "stage": "research", "site_id": site_id, "run_id": run_id, "keyword": keyword}
-
+    return {"ok": True, "stage": "research", "site_id": site_id, "run_id": run_id, "keyword": keyword, "provider": research_provider}
 
 def stage_write(run_id: str) -> dict:
     _load_runtime_env()
@@ -189,6 +214,8 @@ def stage_write(run_id: str) -> dict:
     if os.environ.get("OPENAI_API_KEY", "").strip():
         os.environ["OPENAI_ENABLED"] = "true"
         os.environ.setdefault("OPENAI_MODEL", "gpt-5-mini")
+    os.environ["LOCAL_TEXT_FALLBACK_ENABLED"] = "true"
+    os.environ.setdefault("OLLAMA_MODEL", "qwen2.5:3b")
     from scripts.auto_write_and_draft import _write_article
     require_medical_topic(profile, keyword)
     funnel = settings.get("editorial_funnel") or profile["wordpress"].get("editorial_funnel") or {}
