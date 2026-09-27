@@ -20,6 +20,12 @@ N8N_REWRITE_WEBHOOK = os.environ.get(
     "LONDON_GPT_N8N_REWRITE_WEBHOOK",
     "http://127.0.0.1:5678/webhook/london-content-rewrite",
 )
+N8N_RERUN_WEBHOOKS = {
+    "research": os.environ.get("LONDON_GPT_N8N_RERUN_RESEARCH", "http://127.0.0.1:5678/webhook/london-content-rerun-research"),
+    "write": os.environ.get("LONDON_GPT_N8N_RERUN_WRITE", "http://127.0.0.1:5678/webhook/london-content-rerun-write"),
+    "image": os.environ.get("LONDON_GPT_N8N_RERUN_IMAGE", "http://127.0.0.1:5678/webhook/london-content-rerun-image"),
+    "publish": os.environ.get("LONDON_GPT_N8N_RERUN_PUBLISH", "http://127.0.0.1:5678/webhook/london-content-rerun-publish"),
+}
 GATEWAY = os.environ.get("LONDON_GPT_GATEWAY", "http://127.0.0.1:8766").rstrip("/")
 
 
@@ -318,17 +324,30 @@ def install(app, runtime):
     @app.post("/api/london-gpt/rerun/<stage>")
     def london_gpt_rerun(stage: str):
         from flask import jsonify, request
-        if stage not in {"research", "write", "image", "publish"}:
+        if stage not in N8N_RERUN_WEBHOOKS:
             return jsonify({"ok": False, "error": "unknown_stage"}), 404
         payload = request.get_json(silent=True) or {}
         run_id = str(payload.get("run_id") or "").strip()
         if not run_id:
             return jsonify({"ok": False, "error": "run_id_required"}), 400
+
         state = _read_run(run_id)
-        state.setdefault("stage_status", {})[stage] = "running"
+        state.setdefault("stage_status", {})[stage] = "waiting"
         state.pop("last_error", None)
         _write_run(state)
-        threading.Thread(target=_rerun_stage, args=(stage, run_id), daemon=True).start()
-        return jsonify({"ok": True, "run_id": run_id, "stage": stage, "repair_mode": True}), 202
+
+        body = {
+            "run_id": run_id,
+            "site_id": str(state.get("site_id") or ""),
+            "category": str(state.get("category") or ""),
+            "publish_mode": str(state.get("publish_mode") or "draft"),
+        }
+        try:
+            response = requests.post(N8N_RERUN_WEBHOOKS[stage], json=body, timeout=12)
+        except requests.RequestException as exc:
+            return jsonify({"ok": False, "error": "n8n_rerun_unreachable", "message": str(exc)}), 503
+        if response.status_code >= 400:
+            return jsonify({"ok": False, "error": "n8n_rerun_rejected", "http": response.status_code}), 502
+        return jsonify({"ok": True, "run_id": run_id, "stage": stage, "orchestrator": "n8n"}), 202
 
     return snapshot
