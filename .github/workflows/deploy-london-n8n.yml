@@ -66,7 +66,15 @@ jobs:
             docker exec korea365-n8n n8n import:workflow --input=/workflows/wp25_master.json
             docker exec korea365-n8n n8n import:workflow --input=/workflows/blogger33_master.json
             docker exec korea365-n8n n8n import:workflow --input=/workflows/london_content_four_agent.json
-            docker exec korea365-n8n n8n update:workflow --id=london-content-four-agent-v1 --active=true
+            docker exec korea365-n8n n8n publish:workflow --id=london-content-four-agent-v1
+            docker restart korea365-n8n >/dev/null
+            for i in $(seq 1 40); do
+              if curl -fsS http://127.0.0.1:5678/healthz >/dev/null 2>&1; then
+                break
+              fi
+              sleep 2
+            done
+            curl -fsS http://127.0.0.1:5678/healthz
             systemctl restart korea365-n8n-gateway.service
             sleep 2
             curl -fsS http://127.0.0.1:8766/health
