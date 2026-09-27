@@ -11,6 +11,67 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-09-27 (17차) — 런던프로젝트클로드 콘솔 VPS 실배포 완료·검증
+
+16차에서 로컬까지 완성한 웹 콘솔을 실제 VPS(srv1959434.hstgr.cloud /
+187.127.121.57, 기존 `-WP-QWEN-autobot` 저장소 Secrets가 가리키는 바로 그
+서버, Chairman이 hPanel 스크린샷으로 확인해줌)에 배포 완료.
+
+**방법**: SSH 키를 채팅으로 받지 않고, 기존 `deploy-to-vps.yml`이 쓰는
+`VPS_HOST`/`VPS_USER`/`VPS_SSH_PRIVATE_KEY` GitHub Secrets를 재사용하는
+새 워크플로우 `.github/workflows/deploy-london-project-claude-console.yml`
+(workflow_dispatch 전용, `managed_roots`/korea365-* 서비스와 완전 분리)을
+만들어 실행. `london_project_claude_console/deploy/install.sh`가 idempotent
+설치를 담당: apt 패키지(Xvfb/x11vnc/novnc/websockify/Chrome/Node20/한글폰트),
+npm ci, `/etc/london-project-claude-console/env`(0600 root 전용, 자격증명
+git/로그 미노출), systemd 유닛 4개(lpc-xvfb/lpc-x11vnc/lpc-novnc/lpc-console).
+
+**시행착오 3건 (모두 해결)**:
+1. 최초 dispatch에서 `install.sh: No such file`— `deploy-to-vps.yml`이
+   "success"를 보고했어도 그 시점에 `/opt/korea365`가 실제로 새 커밋을 반영
+   했다고 보장할 수 없었음(원인 미상, 통제 밖). 해결: 내 워크플로우가 자체적
+   으로 `git fetch && git checkout origin/main -- london_project_claude_console`
+   을 먼저 실행해 자기 완결적으로 만듦.
+2. `sudo: npm: command not found` — VPS에 node는 이미 있었지만 npm은 없어서
+   `command -v node` 체크만으로는 nodesource 설치가 스킵됨. node/npm 둘 다
+   체크하도록 수정.
+3. `npm ci` EACCES(node_modules mkdir 권한 거부) — `sudo -u lpcconsole npm ci`
+   를 앱 디렉토리(root 소유 git checkout) 안에서 실행해서 발생. root로
+   `npm ci` 실행 후 `runtime/`만 lpcconsole 소유로, 나머지는 world-readable로
+   변경하는 방식으로 수정.
+
+**검증 완료** (같은 워크플로우에 verify 단계 추가해 확인):
+- `systemctl is-active lpc-xvfb lpc-x11vnc lpc-novnc lpc-console` → 4개 전부
+  `active`
+- 서버 자체에서 `curl localhost:8787/login` → `HTTP 200`
+- `journalctl -u lpc-console`: "런던프로젝트클로드 web console listening on
+  :8787" 정상 기동 로그 확인, 크래시 없음
+- `ss -tlnp`: `0.0.0.0:8787`(콘솔), `0.0.0.0:6077`(noVNC) 정상 리슨 확인
+
+**아직 확인 안 된 것**:
+- 외부(인터넷)에서 `http://187.127.121.57:8787` 실제 접속 여부 — 이 세션의
+  샌드박스는 아웃바운드가 allowlist 프록시라서 임의 IP:포트 접속 자체가
+  안 됨(세션 환경 제약, 서버 문제 아님). Chairman이 직접 브라우저로 접속
+  테스트 필요. 안 열리면 VPS 방화벽/Hostinger 클라우드 방화벽에서 8787,
+  6077 포트를 열어야 할 수 있음.
+- **HTTPS 없음** — 지금은 평문 HTTP. 로그인 비밀번호가 평문으로 오간다는
+  뜻이므로, 외부 노출 전에 nginx+Let's Encrypt로 TLS 종단 필요
+  (`deploy/README.md` 4번 참고, 아직 미실행).
+- noVNC(6077)도 인증 없이 그대로 열려있음 — README에 있는 basic auth 등
+  보호 조치 아직 미적용. **지금 상태로는 방화벽으로 막아두거나, 최소한
+  누구나 그 포트로 네이버 로그인 화면을 볼 수 있다는 점을 Chairman이
+  인지해야 함.**
+- 실제 네이버 계정으로 noVNC 경유 로그인/캡챠 E2E 테스트 안 함.
+- 관리자 로그인 계정: `admin` / 비밀번호는 이 세션에서 생성해 Chairman에게
+  채팅으로 직접 전달함 (저장소/로그에는 남기지 않음) — 최초 로그인 후 변경
+  권장.
+
+**다음 세션이 할 일**: (1) Chairman의 실제 접속 테스트 결과 확인, 안 열리면
+방화벽 포트 오픈, (2) nginx+TLS 적용, (3) noVNC 접근 제한(basic auth/IP
+allowlist), (4) 실제 네이버 로그인 E2E, (5) 이번에 만든
+`deploy-london-project-claude-console.yml`/`install.sh`를 참고해 향후
+업데이트 시 재실행 절차 문서화.
+
 ## 2026-09-27 (16차) — "런던프로젝트클로드" Naver/Tistory 웹 콘솔 구현 + GPT 트랙과의 명칭/범위 충돌 발견·Chairman 확인
 
 Chairman이 업로드한 Electron 콘솔(`blogauto-naver-tistory`) 전체 소스
