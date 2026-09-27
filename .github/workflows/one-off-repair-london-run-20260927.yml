@@ -23,7 +23,7 @@ jobs:
           script: |
             set -euo pipefail
             URL='https://jobkorea365.com/finding-first-jobs-navigating-youth-employment-in-korea/'
-            code=$(curl -L -sS -o /tmp/london-published.html -w '%{http_code}' --max-time 30 "$URL")
+            code=$(curl -4 -L -sS -o /tmp/london-published.html -w '%{http_code}' --max-time 30 "$URL")
             echo "PUBLIC_HTTP=$code"
             test "$code" = "200"
             grep -qi 'Finding First Jobs' /tmp/london-published.html
