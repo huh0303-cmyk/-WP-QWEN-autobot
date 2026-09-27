@@ -56,6 +56,47 @@ cd "$APP_DIR"
 # already give it; only runtime/ needs to be writable by RUN_USER.
 npm ci --omit=dev
 mkdir -p "$APP_DIR/runtime"
+
+# 최초 1회만: 계정 스토어가 비어있으면(파일이 없거나, jobRunner가 서버 기동 시
+# 자동 생성한 빈 기본값 그대로면) 확인된 네이버 3계정을 미리 등록해서 Chairman이
+# "계정 관리"에서 Blog ID를 손으로 다시 입력할 필요가 없게 한다. 파일에 "accounts": []
+# 가 아닌 실제 내용이 있으면(=UI에서 계정을 추가/수정한 적 있으면) 절대 덮어쓰지 않음.
+ACCOUNT_STORE="$APP_DIR/runtime/account-categories.json"
+if [ ! -f "$ACCOUNT_STORE" ] || grep -q '"accounts": \[\]' "$ACCOUNT_STORE"; then
+  echo "=== seeding initial Naver account store (first run only) ==="
+  cat > "$ACCOUNT_STORE" <<'ACCTEOF'
+{
+  "selectedAccountId": "acct_huh0303",
+  "accounts": [
+    {
+      "id": "acct_huh0303",
+      "label": "생활의정석",
+      "naverId": "",
+      "blogId": "huh0303",
+      "checked": true,
+      "categories": []
+    },
+    {
+      "id": "acct_k_insight_vietnam",
+      "label": "부의정석",
+      "naverId": "",
+      "blogId": "k-insight-vietnam",
+      "checked": true,
+      "categories": []
+    },
+    {
+      "id": "acct_k_healthcare",
+      "label": "헬스의정석 (Blog ID 확인 필요)",
+      "naverId": "",
+      "blogId": "k-healthcare",
+      "checked": true,
+      "categories": []
+    }
+  ]
+}
+ACCTEOF
+fi
+
 chown -R "$RUN_USER":"$RUN_USER" "$APP_DIR/runtime"
 chmod -R a+rX "$APP_DIR/node_modules" "$APP_DIR/server" "$APP_DIR/lib" "$APP_DIR/public"
 
