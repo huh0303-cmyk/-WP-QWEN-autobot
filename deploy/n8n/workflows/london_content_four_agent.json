@@ -77,7 +77,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: $('RUN CONTEXT').item.json.site_id, run_id: $('RUN CONTEXT').item.json.run_id, publish_mode: $('RUN CONTEXT').item.json.publish_mode, category: $('RUN CONTEXT').item.json.category}) }}",
+        "body": "={{ JSON.stringify({site_id: ($('REPAIR 1 CONTEXT').isExecuted ? $('REPAIR 1 CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REPAIR 1 CONTEXT').isExecuted ? $('REPAIR 1 CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REPAIR 1 CONTEXT').isExecuted ? $('REPAIR 1 CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REPAIR 1 CONTEXT').isExecuted ? $('REPAIR 1 CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
         "options": {
           "timeout": 310000
         }
@@ -107,7 +107,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
+        "body": "={{ JSON.stringify({run_id: $json.run_id}) }}",
         "options": {
           "timeout": 310000
         }
@@ -137,7 +137,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
+        "body": "={{ JSON.stringify({run_id: $json.run_id}) }}",
         "options": {
           "timeout": 250000
         }
@@ -167,7 +167,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({site_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id), run_id: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id), publish_mode: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.publish_mode : $('RUN CONTEXT').item.json.publish_mode), category: ($('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.category : $('RUN CONTEXT').item.json.category)}) }}",
+        "body": "={{ JSON.stringify({run_id: $json.run_id}) }}",
         "options": {
           "timeout": 250000
         }
@@ -194,13 +194,13 @@
             {
               "id": "final-site",
               "name": "site_id",
-              "value": "={{ $('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.site_id : $('RUN CONTEXT').item.json.site_id }}",
+              "value": "={{ $json.result.site_id || $json.site_id || '' }}",
               "type": "string"
             },
             {
               "id": "final-run",
               "name": "run_id",
-              "value": "={{ $('REWRITE CONTEXT').isExecuted ? $('REWRITE CONTEXT').item.json.run_id : $('RUN CONTEXT').item.json.run_id }}",
+              "value": "={{ $json.run_id }}",
               "type": "string"
             },
             {
@@ -351,6 +351,184 @@
         -400,
         420
       ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "london-content-rerun-research",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "repair-research-webhook",
+      "name": "REPAIR 1 - Research",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -670,
+        620
+      ],
+      "webhookId": "london-content-rerun-research"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1-site",
+              "name": "site_id",
+              "value": "={{ $json.body.site_id }}",
+              "type": "string"
+            },
+            {
+              "id": "r1-run",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id }}",
+              "type": "string"
+            },
+            {
+              "id": "r1-mode",
+              "name": "publish_mode",
+              "value": "={{ $json.body.publish_mode || 'draft' }}",
+              "type": "string"
+            },
+            {
+              "id": "r1-category",
+              "name": "category",
+              "value": "={{ $json.body.category || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "repair1-context",
+      "name": "REPAIR 1 CONTEXT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "london-content-rerun-write",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "repair-write-webhook",
+      "name": "REPAIR 2 - Writer",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        620
+      ],
+      "webhookId": "london-content-rerun-write"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "write-run",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "repair-write-context",
+      "name": "REPAIR 2 CONTEXT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -180,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "london-content-rerun-image",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "repair-image-webhook",
+      "name": "REPAIR 3 - Image",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -130,
+        620
+      ],
+      "webhookId": "london-content-rerun-image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "image-run",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "repair-image-context",
+      "name": "REPAIR 3 CONTEXT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        90,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "london-content-rerun-publish",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "repair-publish-webhook",
+      "name": "REPAIR 4 - Publish",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        140,
+        620
+      ],
+      "webhookId": "london-content-rerun-publish"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "publish-run",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "repair-publish-context",
+      "name": "REPAIR 4 CONTEXT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        360,
+        620
+      ]
     }
   ],
   "connections": {
@@ -436,6 +614,94 @@
         [
           {
             "node": "AGENT 2 - Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 1 - Research": {
+      "main": [
+        [
+          {
+            "node": "REPAIR 1 CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 1 CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "AGENT 1 - Topic Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 2 - Writer": {
+      "main": [
+        [
+          {
+            "node": "REPAIR 2 CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 2 CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "AGENT 2 - Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 3 - Image": {
+      "main": [
+        [
+          {
+            "node": "REPAIR 3 CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 3 CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "AGENT 3 - Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 4 - Publish": {
+      "main": [
+        [
+          {
+            "node": "REPAIR 4 CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPAIR 4 CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "AGENT 4 - Publisher + Verify",
             "type": "main",
             "index": 0
           }
