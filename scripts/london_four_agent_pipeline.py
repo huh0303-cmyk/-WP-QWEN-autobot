@@ -245,7 +245,8 @@ def stage_image(run_id: str) -> dict:
     article = state["article"]
     image_url = ""
     status = "no_image"
-    if os.environ.get("PIPELINE_IMAGE_ENABLED", "true").lower() in {"1", "true", "yes", "on"}:
+    image_enabled = not run_id.startswith("canary-") and os.environ.get("PIPELINE_IMAGE_ENABLED", "true").lower() in {"1", "true", "yes", "on"}
+    if image_enabled:
         try:
             from scripts.budget_guard import check_and_record
             from scripts.replicate_image_provider import generate_image_url
@@ -265,6 +266,8 @@ def stage_image(run_id: str) -> dict:
         except Exception as exc:
             image_url = ""
             status = f"image_failed_continue_without_image:{type(exc).__name__}"
+    if not image_enabled and run_id.startswith("canary-"):
+        status = "canary_no_image"
     state["image"] = {"url": image_url, "status": status}
     state.setdefault("stage_status", {})["image"] = "ok"
     _write_state(state)
