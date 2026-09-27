@@ -19,3 +19,18 @@ services:
     volumes:
       - /opt/korea365/data/n8n:/home/node/.n8n
       - /opt/korea365/data/n8n-workflows:/workflows:ro
+
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: korea365-ollama
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_KEEP_ALIVE=5m
+    volumes:
+      - /opt/korea365/data/ollama:/root/.ollama
+    mem_limit: 5g
+    cpus: 1.5
