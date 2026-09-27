@@ -104,6 +104,8 @@ def stage_research(site_id: str, run_id: str) -> dict:
     site_url = profile["wordpress"]["url"]
     from scripts.collect_keyword_search_demand import demand_context
     from scripts.refresh_keyword_pool import call_search_llm, overlaps_corpus, build_network_corpus
+    from scripts.budget_guard import check_and_record
+    check_and_record(0.02, label=f"london-agent1:{site_id}")
     client = None
     if os.environ.get("GEMINI_API_KEY"):
         from google import genai
