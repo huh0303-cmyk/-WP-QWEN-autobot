@@ -46,7 +46,7 @@ tbody tr:hover{filter:brightness(.98)}
 </tr></thead><tbody id="blog-rows"><tr><td colspan="12" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <section class="section">
-<div class="section-head"><div><h2>SNS 순위</h2><p id="social-subtitle">YouTube + TikTok + Facebook + Instagram + Threads 통합 · 구독자/팔로워수 내림차순</p></div><div class="actions"><a class="more" href="https://youtube.korea365.org">YOUTUBE 상세 →</a><a class="more" href="https://sns.korea365.org">SNS 상세 →</a></div></div>
+<div class="section-head"><div><h2 id="social-title">SNS 순위</h2><p id="social-subtitle">YouTube + TikTok + Facebook + Instagram + Threads 통합 · 구독자/팔로워수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="https://youtube.korea365.org">YOUTUBE 상세 →</a><a class="more" href="https://sns.korea365.org">SNS 상세 →</a></div></div>
 <div class="sheet"><table class="social"><thead><tr><th>순위</th><th>플랫폼</th><th>계정/채널</th><th>카테고리</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th></tr></thead><tbody id="social-rows"><tr><td colspan="8" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <div id="updated" style="font-size:9px;color:#64748b;text-align:right">갱신 중…</div>
@@ -124,7 +124,9 @@ async function loadBlog(){
 }
 async function loadSocial(){
  const r=await fetch('/api/control/social-ranking',{cache:'no-store'});if(!r.ok)throw new Error('social '+r.status);const d=await r.json();
- document.getElementById('social-subtitle').textContent='현재 확인 '+d.youtube_total+' YouTube + '+d.sns_active_total+' SNS = '+d.total+' · 목표 30(YouTube18+SNS12) '+(d.count_confirmation_required?'재확인 필요':'확정');
+ const socialDate=String(d.generated_at||'').slice(0,10);
+ document.getElementById('social-title').textContent='SNS 순위 ('+dateLabel(socialDate)+')';
+ document.getElementById('social-subtitle').textContent='현재 확인 '+d.youtube_total+' YouTube + '+d.sns_active_total+' SNS = '+d.total+' · 목표 30(YouTube18+SNS12) '+(d.count_confirmation_required?'재확인 필요':'확정')+' · KST 기준';
  document.getElementById('social-rows').innerHTML=(d.rows||[]).map(c=>{const p=String(c.platform||'').toLowerCase();return '<tr class="platform-'+esc(p)+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(c.platform)+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td>'+esc(c.category||'—')+'</td><td>'+metric(c.audience,c.audience_delta)+'</td><td>'+metric(c.views,c.views_delta)+'</td><td>'+(Number.isFinite(c.content_count)?nf.format(c.content_count):'—')+'</td><td>'+(c.connected?'<span class="good">정상</span>':'<span class="warn">연결 필요</span>')+'</td></tr>'}).join('');
  return d.generated_at;
 }
