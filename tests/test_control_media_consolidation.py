@@ -131,6 +131,7 @@ def test_youtube_group_order_and_verified_survival_channels_are_explicit():
     assert "UCGTd7RhfaUaGGbVRsNPUN6Q" in inventory
     assert "UCKvKhETLGPaRV3qfWv2bM2g" in inventory
     assert "UCRZ0uc_bxKDMwz3noBBi9KQ" in inventory
+    assert inventory.count('"recent_publish_date": "2026-09-13"') >= 3
     assert '"name": "SIS-Language Center"' in inventory
     assert '"state_label": "공개 핸들 확인 실패 · UC ID 필요"' in source
 
@@ -144,3 +145,4 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"target_youtube": 24' in source
     assert '"status": "수익 OAuth 필요"' in source
     assert '"opening_date": str(item.get("created_at")' in source
+    assert 'timeline.get("recent_publish_date") or str(item.get("recent_publish_date")' in source
