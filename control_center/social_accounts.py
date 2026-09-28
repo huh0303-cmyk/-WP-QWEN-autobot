@@ -205,29 +205,29 @@ def install(app, get_site_data=None):
     @app.get("/social-accounts")
     def social_accounts():
         cards = _cards(get_site_data)
-        platforms = ["전체", "통합", "로그인·권한 필요", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "WordPress", "Tistory", "Naver"]
+        media_platforms = {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"}
+        media_cards = [c for c in cards if c["platform"] in media_platforms]
+        platforms = ["전체", "로그인·권한 필요", "YouTube", "TikTok", "Instagram", "Facebook", "Threads"]
         selected = request.args.get("platform", "전체")
         # Legacy subdomain roots still send SNS/YouTube; both now open the
         # owner's single combined media sheet instead of separate products.
-        if selected in {"SNS", "YouTube"} and request.host.split(":", 1)[0].lower() in {
-            "sns.korea365.org", "youtube.korea365.org"
-        }:
-            selected = "통합"
+        if selected in {"SNS", "통합"} or (selected == "YouTube" and request.host.split(":", 1)[0].lower() == "youtube.korea365.org"):
+            selected = "전체"
         if selected not in platforms:
             selected = "전체"
-        if selected == "통합":
-            visible = [c for c in cards if c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"}]
+        if selected == "전체":
+            visible = media_cards
         elif selected == "로그인·권한 필요":
-            visible = [c for c in cards if c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} and c.get("connection_level") != "publish_connected"]
+            visible = [c for c in media_cards if c.get("connection_level") != "publish_connected"]
         else:
-            visible = cards if selected == "전체" else [c for c in cards if c["platform"] == selected]
-        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:] if p not in {"통합", "로그인·권한 필요"}}
-        counts["통합"] = sum(c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} for c in cards)
-        counts["로그인·권한 필요"] = sum(c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} and c.get("connection_level") != "publish_connected" for c in cards)
-        connected = sum(c.get("connection_level") == "publish_connected" for c in cards)
+            visible = [c for c in media_cards if c["platform"] == selected]
+        counts = {p: sum(c["platform"] == p for c in media_cards) for p in platforms[2:]}
+        counts["전체"] = len(media_cards)
+        counts["로그인·권한 필요"] = sum(c.get("connection_level") != "publish_connected" for c in media_cards)
+        connected = sum(c.get("connection_level") == "publish_connected" for c in media_cards)
         return render_template(
             "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
-            selected=selected, total=len(cards), connected=connected,
+            selected=selected, total=len(media_cards), connected=connected,
             csrf_token=app.config["CONTROL_CENTER_CSRF"],
         ), 200, {"Cache-Control": "no-store"}
 
