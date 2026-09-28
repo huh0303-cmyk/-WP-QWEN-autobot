@@ -90,7 +90,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "language",
+      "group": "additional",
       "name": "서울국제대학-TOPIK센터",
       "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
       "state": "analytics_connected",
@@ -115,7 +115,31 @@
       "identity_verified_live": true
     },
     {
-      "group": "health",
+      "group": "language",
+      "name": "Chinese Survival",
+      "channel_id": "UCGTd7RhfaUaGGbVRsNPUN6Q",
+      "state": "public_feed_verified",
+      "handle": "SIS_ChineseSurvival",
+      "identity_verified_live": true
+    },
+    {
+      "group": "language",
+      "name": "Portuguese Survival",
+      "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
+      "state": "public_feed_verified",
+      "handle": "Portuguese_survival",
+      "identity_verified_live": true
+    },
+    {
+      "group": "language",
+      "name": "Vietnamese Survival",
+      "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
+      "state": "public_feed_verified",
+      "handle": "SIS_VietnameseSurvival",
+      "identity_verified_live": true
+    },
+    {
+      "group": "additional",
       "name": "Health Clinic USA",
       "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
       "state": "analytics_connected",
@@ -125,7 +149,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "shopping",
+      "group": "additional",
       "name": "Seoul_Jisoo1",
       "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
       "state": "analytics_connected",
@@ -135,7 +159,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "health",
+      "group": "additional",
       "name": "Health_Clinic_Japan",
       "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
       "state": "analytics_connected",
@@ -236,18 +260,10 @@
   "unconfirmed": [
     {
       "platform": "youtube",
-      "name": "Survival Chinese",
-      "reason": "dedicated_channel_not_present_in_verified_inventory; create/select channel and capture exact UC id"
-    },
-    {
-      "platform": "youtube",
-      "name": "Survival Vietnamese",
-      "reason": "dedicated_channel_not_present_in_verified_inventory; create/select channel and capture exact UC id"
-    },
-    {
-      "platform": "youtube",
-      "name": "Survival Portuguese",
-      "reason": "dedicated_channel_not_present_in_verified_inventory; create/select channel and capture exact UC id"
+      "name": "SIS-Language Center",
+      "handle": "sis_languagecenter",
+      "group": "additional",
+      "reason": "provided handle returned HTTP 404 on 2026-09-29; exact UC id still required"
     },
     {
       "platform": "tiktok",
@@ -257,7 +273,7 @@
   ],
   "youtube_architecture": {
     "as_of": "2026-09-25",
-    "survival_10": "One language per one YouTube channel: Korean/TOPIK, English, Japanese, Chinese, Vietnamese, Spanish, French, German, Italian, Portuguese.",
+    "survival_9": "One language per one YouTube channel: English, Japanese, Chinese, Vietnamese, Spanish, French, German, Italian, Portuguese. TOPIK is managed separately.",
     "shopping": "Seoul_Jisoo1 is the mixed/general commercial channel for supplements, hotel booking and related shopping/reservation content.",
     "health": [
       "Health Clinic USA = US/English-speaking health channel",

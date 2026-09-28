@@ -10,6 +10,7 @@
 .account-table tr[data-platform="YouTube"] td{background:#fff1f2}.account-table tr[data-platform="TikTok"] td{background:#f1f5f9}.account-table tr[data-platform="Instagram"] td{background:#fdf2f8}.account-table tr[data-platform="Facebook"] td{background:#eff6ff}.account-table tr[data-platform="Threads"] td{background:#f3f4f6}
 .account-table tr[data-platform="YouTube"] .badge{background:#dc2626;color:#fff}.account-table tr[data-platform="TikTok"] .badge{background:#111827;color:#fff}.account-table tr[data-platform="Instagram"] .badge{background:#c026d3;color:#fff}.account-table tr[data-platform="Facebook"] .badge{background:#2563eb;color:#fff}.account-table tr[data-platform="Threads"] .badge{background:#4b5563;color:#fff}
 .account-table tr:hover td{filter:brightness(.97)}
+.account-table tr.monetized-row td{box-shadow:inset 0 2px #d4af37,inset 0 -2px #d4af37}.account-table tr.monetized-row td:first-child{border-left:2px solid #d4af37}.account-table tr.monetized-row td:last-child{border-right:2px solid #d4af37}.account-table tr.monetized-row .metric-revenue{background:#fff8d8!important;color:#7a5700;font-weight:950}
 .summary{gap:6px;margin:8px 0;grid-template-columns:repeat(7,minmax(0,1fr))}.summary a,.tab{border-radius:9px;padding:7px 9px;font-size:11px;line-height:1.25}.summary strong{display:inline;margin:0 3px;font-size:18px;line-height:1;color:inherit}.tabs{gap:6px;margin:9px 0}.tab.active{box-shadow:inset 0 0 0 2px currentColor;font-weight:950}
 .summary a[data-platform="YouTube"],.tab[data-platform="YouTube"]{background:#fff1f2;border-color:#fecdd3;color:#b91c1c}.summary a[data-platform="TikTok"],.tab[data-platform="TikTok"]{background:#f1f5f9;border-color:#94a3b8;color:#111827}.summary a[data-platform="Instagram"],.tab[data-platform="Instagram"]{background:#fdf2f8;border-color:#f0abfc;color:#a21caf}.summary a[data-platform="Facebook"],.tab[data-platform="Facebook"]{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}.summary a[data-platform="Threads"],.tab[data-platform="Threads"]{background:#f3f4f6;border-color:#9ca3af;color:#374151}.summary a[data-platform="전체"],.tab[data-platform="전체"]{background:#f8fafc;color:#334155}.summary a[data-platform="로그인·권한 필요"],.tab[data-platform="로그인·권한 필요"]{background:#fff7ed;border-color:#fdba74;color:#c2410c}
 </style>
@@ -20,9 +21,9 @@
 <div class="notice"><strong>전체 = 모든 YouTube+SNS</strong> · 표 맨 오른쪽 `생산·발행 트리거`에서 실행합니다. “비공개 제작·업로드 가능”은 영상 생산부터 YouTube 비공개 업로드까지 한 번에 처리한다는 뜻이며, 공개 전환은 별도 승인입니다. “로그인·권한 필요”에는 사전 로그인이 필요한 항목만 모았습니다.</div>
 <div class="summary">{% for p,n in counts.items() %}<a data-platform="{{p}}" href="?platform={{p}}"><span>{{p}}</span><strong>{{n}}</strong>개</a>{% endfor %}</div>
 <nav class="tabs">{% for p in platforms %}<a data-platform="{{p}}" class="tab {{'active' if p==selected else ''}}" href="?platform={{p}}">{{p}}</a>{% endfor %}</nav>
-<section class="sheet"><table id="socialTable" class="account-table"><thead><tr><th>번호</th><th>플랫폼</th><th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th><th>구독자·팔로워(증감)</th><th>방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>연결 상태</th><th>생산·발행 트리거</th><th>계정 ID</th></tr></thead><tbody>
+<section class="sheet"><table id="socialTable" class="account-table"><thead><tr><th>번호</th><th>플랫폼</th><th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th><th>구독자·팔로워(증감)</th><th>방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>$ 수익</th><th>채널/페이지 생성일</th><th>최근 발행일</th><th>연결 상태</th><th>생산·발행 트리거</th><th>계정 ID</th></tr></thead><tbody>
 {% for c in cards %}
-<tr data-platform="{{c.platform}}" data-channel-id="{{c.identity if c.platform == 'YouTube' and c.identity[:2] == 'UC' else ''}}" data-handle="{{c.handle or ''}}" data-name="{{c.name}}"><td>{{loop.index}}</td><td><span class="badge">{{c.platform}}</span></td><td><span class="group-badge">{{c.group_label or c.group or '-'}}</span></td><td class="name">{{c.name}}{% if c.url %}<a class="open" href="{{c.url}}" target="_blank" rel="noopener">열기 ↗</a>{% endif %}</td><td title="{{c.description}}">{{c.description}}</td><td title="{{c.role}}">{{c.role}}</td><td class="metric-audience">미집계</td><td class="metric-views">미집계</td><td class="metric-content">미집계</td><td class="state {{'ok' if c.connection_level=='publish_connected' else 'seen' if c.connection_level=='identity_verified' else 'wait' if c.connection_level=='observed' else 'missing'}}">{{c.state_label}}</td><td>
+<tr data-platform="{{c.platform}}" data-channel-id="{{c.identity if c.platform == 'YouTube' and c.identity[:2] == 'UC' else ''}}" data-handle="{{c.handle or ''}}" data-name="{{c.name}}"><td>{{loop.index}}</td><td><span class="badge">{{c.platform}}</span></td><td><span class="group-badge">{{c.group_label or c.group or '-'}}</span></td><td class="name">{{c.name}}{% if c.url %}<a class="open" href="{{c.url}}" target="_blank" rel="noopener">열기 ↗</a>{% endif %}</td><td title="{{c.description}}">{{c.description}}</td><td title="{{c.role}}">{{c.role}}</td><td class="metric-audience">미집계</td><td class="metric-views">미집계</td><td class="metric-content">미집계</td><td class="metric-revenue">미연결</td><td class="metric-opening">미확인</td><td class="metric-recent">미확인</td><td class="state {{'ok' if c.connection_level=='publish_connected' else 'seen' if c.connection_level=='identity_verified' else 'wait' if c.connection_level=='observed' else 'missing'}}">{{c.state_label}}</td><td>
   {% if c.action_kind == 'wordpress_forms' %}
     <a class="login" href="https://blog.korea365.org">BLOG에서 실행</a>
   {% elif c.action_kind == 'tistory_form' %}
@@ -42,7 +43,7 @@
 const csrf={{csrf_token|tojson}};
 document.querySelectorAll('.js-publish').forEach(btn=>btn.addEventListener('click',async()=>{const out=btn.parentElement.querySelector('.result');if(!confirm('이 채널의 비공개 영상 제작을 시작할까요? 자동 공개되지 않습니다.'))return;btn.disabled=true;out.textContent='요청 확인 중…';try{const response=await fetch('/social-accounts/publish-now',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({csrf_token:csrf,account_key:btn.dataset.account})});const data=await response.json();out.textContent=data.message||'요청 결과를 확인해 주세요.'}catch(e){out.textContent='응답을 받지 못했습니다. 중복 클릭 전에 대기열을 확인해 주세요.'}finally{btn.disabled=false}}));
 function installColumnMemory(){
- const table=document.getElementById('socialTable'),heads=[...table.querySelectorAll('thead th')],defaults=[48,76,105,175,235,190,135,135,120,210,155,220],key='k365-social-column-widths-v3';
+ const table=document.getElementById('socialTable'),heads=[...table.querySelectorAll('thead th')],defaults=[48,76,105,175,235,190,135,135,120,125,145,125,210,155,220],key='k365-social-column-widths-v5';
  let widths=[...defaults];try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved)&&saved.length===heads.length)widths=saved.map((v,i)=>Number.isFinite(+v)?Math.max(42,Math.min(460,+v)):defaults[i]);}catch(_){}
  const group=document.createElement('colgroup');heads.forEach((_,i)=>{const col=document.createElement('col');col.style.width=widths[i]+'px';group.appendChild(col)});table.prepend(group);
  const apply=()=>{[...group.children].forEach((col,i)=>col.style.width=widths[i]+'px');table.style.width=widths.reduce((a,b)=>a+b,0)+'px'};apply();
@@ -50,6 +51,8 @@ function installColumnMemory(){
 }
 installColumnMemory();
 const metricText=(value,change)=>{if(!Number.isFinite(value))return '미집계';const d=Number.isFinite(change)?' ('+(change>0?'+':'')+new Intl.NumberFormat('ko-KR').format(change)+')':'';return new Intl.NumberFormat('ko-KR').format(value)+d};
+const revenueText=revenue=>{if(!revenue||!revenue.monetized)return '미연결';if(!Number.isFinite(revenue.amount))return revenue.status||'금액 미연결';const symbol=revenue.currency==='KRW'?'₩':revenue.currency==='USD'?'$':(revenue.currency||'');return symbol+new Intl.NumberFormat('ko-KR').format(revenue.amount)};
+const dateText=value=>{const text=String(value||'').trim();return /^\d{4}-\d{2}-\d{2}/.test(text)?text.slice(0,10):'미확인'};
 const metricKey=s=>String(s||'').toLowerCase().replace(/^@/,'').replace(/[^a-z0-9가-힣]/g,'');
 async function loadLiveMetrics(){
  try{
@@ -61,6 +64,10 @@ async function loadLiveMetrics(){
    tr.querySelector('.metric-audience').textContent=metricText(item.audience,item.audience_delta);
    tr.querySelector('.metric-views').textContent=metricText(item.views,item.views_delta);
    tr.querySelector('.metric-content').textContent=metricText(item.content_count,item.content_count_delta);
+   tr.querySelector('.metric-revenue').textContent=revenueText(item.revenue);
+   tr.querySelector('.metric-opening').textContent=dateText(item.opening_date);
+   tr.querySelector('.metric-recent').textContent=dateText(item.recent_publish_date);
+   tr.classList.toggle('monetized-row',!!(item.revenue&&item.revenue.monetized));
   });
  }catch(error){console.warn('live metrics unavailable',error)}
 }
