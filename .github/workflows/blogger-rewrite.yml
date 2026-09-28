@@ -99,10 +99,10 @@ jobs:
           BUDGET_GITHUB_BRANCH: main
           GEMINI_EDITOR_ENABLED: "true"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_ENABLED: "true"
+          OPENAI_ENABLED: "false"
           OPENAI_MODEL: "gpt-5-mini"
           CLAUDE_ENABLED: "false"
-          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          REPLICATE_API_TOKEN: ""
           STOCK_IMAGES_ENABLED: "true"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}

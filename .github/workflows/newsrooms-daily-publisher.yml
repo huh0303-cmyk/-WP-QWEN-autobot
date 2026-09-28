@@ -73,15 +73,15 @@ jobs:
           WP_POST_STATUS: "publish"
           WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
-          AI_TEXT_PROVIDER: "openai"
+          AI_TEXT_PROVIDER: "gemini"
           GH_TOKEN: ${{ github.token }}
           # 2026-09-03: Gemini removed from the reviewer role network-wide —
           # three_model_consensus.py now always runs two independent GPT
           # passes and never calls Gemini at all. See audit_active_policy.py.
-          OPENAI_ENABLED: "true"
-          NEWSROOM_PAID_TEXT_APPROVED: "true"
+          OPENAI_ENABLED: "false"
+          NEWSROOM_PAID_TEXT_APPROVED: "false"
           CLAUDE_ENABLED: "false"
-          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          REPLICATE_API_TOKEN: ""
           STOCK_IMAGES_ENABLED: "true"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}

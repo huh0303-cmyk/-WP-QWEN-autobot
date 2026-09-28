@@ -34,10 +34,10 @@ jobs:
       GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+      REPLICATE_API_TOKEN: ""
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-      AI_TEXT_PROVIDER: openai
+      AI_TEXT_PROVIDER: gemini
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

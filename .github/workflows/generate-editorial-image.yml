@@ -25,7 +25,7 @@ jobs:
       - run: pip install requests
       - name: Generate one approved editorial image
         env:
-          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          REPLICATE_API_TOKEN: ""
           NANO_BANANA_FREE_TIER_ENABLED: "false"
         run: >-
           python scripts/generate_single_editorial_image.py
