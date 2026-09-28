@@ -53,7 +53,7 @@ def test_combined_social_detail_uses_mobile_scrollable_table_not_cards():
     template = (ROOT / "control_center" / "templates" / "social_accounts.html").read_text(encoding="utf-8")
     assert '<table class="account-table">' in template
     assert '<article class="card"' not in template
-    assert "YOUTUBE + SNS 운영표" in template
+    assert "YOUTUBE + SNS 생산·발행 통제실" in template
     assert "overflow:auto" in template
 
 
@@ -74,3 +74,5 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "4-Agent 발행 시작" in blog
     assert '<table class="ranking">' in blog
     assert '<table class="account-table">' in social
+    assert "YOUTUBE + SNS 생산·발행 통제실" in social
+    assert "로그인·권한 필요" in social

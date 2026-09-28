@@ -85,7 +85,7 @@ def _youtube_cards() -> list[dict]:
             "identity": channel_id, "handle": row.get("handle", ""),
             "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
             "role": role if not profile else group, "description": profile.get("tone") or fallback,
-            "state_label": "제작·업로드 연결 완료" if core_key else "계정 등록 · 제작 연결 확인 필요",
+            "state_label": "비공개 제작·업로드 가능 · 공개는 별도 승인" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
             "connection_level": "publish_connected" if core_key else "identity_verified",
             "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "YouTube Studio 로그인 후 제작 프로필을 확인합니다.",
             "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",
@@ -205,7 +205,7 @@ def install(app, get_site_data=None):
     @app.get("/social-accounts")
     def social_accounts():
         cards = _cards(get_site_data)
-        platforms = ["전체", "통합", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "WordPress", "Tistory", "Naver"]
+        platforms = ["전체", "통합", "로그인·권한 필요", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "WordPress", "Tistory", "Naver"]
         selected = request.args.get("platform", "전체")
         # Legacy subdomain roots still send SNS/YouTube; both now open the
         # owner's single combined media sheet instead of separate products.
@@ -217,10 +217,13 @@ def install(app, get_site_data=None):
             selected = "전체"
         if selected == "통합":
             visible = [c for c in cards if c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"}]
+        elif selected == "로그인·권한 필요":
+            visible = [c for c in cards if c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} and c.get("connection_level") != "publish_connected"]
         else:
             visible = cards if selected == "전체" else [c for c in cards if c["platform"] == selected]
-        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:] if p != "통합"}
+        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:] if p not in {"통합", "로그인·권한 필요"}}
         counts["통합"] = sum(c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} for c in cards)
+        counts["로그인·권한 필요"] = sum(c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} and c.get("connection_level") != "publish_connected" for c in cards)
         connected = sum(c.get("connection_level") == "publish_connected" for c in cards)
         return render_template(
             "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
