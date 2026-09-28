@@ -9,10 +9,12 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 .status-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
-.s-wait{background:#64748b}.s-run{background:#f59e0b}.s-ok{background:#10b981}.s-fail{background:#ef4444}
+.s-wait{background:#64748b}.s-run{background:#f59e0b}.s-ok{background:#10b981}.s-fail{background:#ef4444}.s-manual{background:#a78bfa}
 .agent-card[data-status="running"]{border-color:#f59e0b;background:rgba(245,158,11,.08)}
 .agent-card[data-status="ok"]{border-color:#10b981;background:rgba(16,185,129,.08)}
 .agent-card[data-status="failed"]{border-color:#ef4444;background:rgba(239,68,68,.08)}
+.agent-card[data-status="manual_required"]{border-color:#a78bfa;background:rgba(167,139,250,.08)}
+.copy-btn{border:1px solid #475569;border-radius:.6rem;padding:.45rem .7rem;font-size:.75rem;font-weight:700}
 </style>
 </head>
 <body class="min-h-screen bg-slate-950 text-white">
@@ -25,9 +27,14 @@
 
 <main class="mx-auto max-w-7xl space-y-5 p-4 sm:p-6">
 <section class="rounded-3xl border border-white/10 bg-slate-900 p-5">
-  <p class="text-xs font-black text-blue-300">ONE CLICK · n8n ORCHESTRATED</p>
-  <h2 class="mt-1 text-2xl font-black">사이트만 고르고 한 번 실행</h2>
-  <p class="mt-1 text-sm text-slate-400">버튼 한 번으로 ① 리서치 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증까지 자동 진행합니다.</p>
+  <p class="text-xs font-black text-blue-300">n8n · 4 AGENTS</p>
+  <h2 class="mt-1 text-2xl font-black">글쓰기 실행</h2>
+  <p id="modeDescription" class="mt-1 text-sm text-slate-400">자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증까지 진행합니다.</p>
+
+  <div class="mt-4 flex flex-wrap gap-3" role="radiogroup" aria-label="실행 모드">
+    <label class="rounded-xl border border-blue-400 bg-blue-500/10 px-4 py-3 text-sm font-bold"><input type="radio" name="runMode" value="auto" checked> 자동 모드 · ①~④</label>
+    <label class="rounded-xl border border-violet-400 bg-violet-500/10 px-4 py-3 text-sm font-bold"><input type="radio" name="runMode" value="manual"> 수동 모드 · ①~③ 후 직접 발행</label>
+  </div>
 
   <div class="mt-4 grid gap-4 lg:grid-cols-3">
     <label class="block">
@@ -50,7 +57,7 @@
       <select id="category" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm"></select>
     </label>
 
-    <label class="block">
+    <label id="publishModeLabel" class="block">
       <span class="mb-1 block text-xs font-black text-slate-400">최종 발행 방식</span>
       <select id="publishMode" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
         <option value="draft">초안 생성 · 검토 후 공개</option>
@@ -76,7 +83,7 @@
     <div class="text-right text-xs text-slate-400"><div id="runId">실행 전</div><div id="pollState"></div></div>
   </div>
 
-  <div class="grid gap-4 lg:grid-cols-4">
+  <div class="grid gap-4 lg:grid-cols-2">
     {% for step in snapshot.pipeline %}
     <article id="agent-{{ step.id }}" data-status="waiting" class="agent-card rounded-3xl border border-white/10 bg-slate-900 p-5 transition">
       <div class="flex items-center justify-between gap-2">
@@ -90,6 +97,15 @@
         <p class="font-black text-slate-500">최근 결과</p>
         <p class="agent-detail mt-1 break-words text-slate-300">실행 대기</p>
       </div>
+      {% if step.id == 'research' %}
+      <div class="mt-3 space-y-2 text-sm"><p class="font-bold text-blue-300" id="agentKeyword">키워드 대기</p><pre id="agentEvidence" class="max-h-40 overflow-auto whitespace-pre-wrap text-xs text-slate-300"></pre><button class="copy-btn hidden" id="copyKeyword" data-copy="keyword">키워드 복사</button></div>
+      {% elif step.id == 'write' %}
+      <div class="mt-3 space-y-2 text-sm"><p id="agentArticleTitle" class="font-bold text-violet-300">원고 대기</p><p id="agentArticleMeta" class="text-slate-300"></p><p id="agentCategory" class="text-emerald-300"></p><div class="flex flex-wrap gap-2"><button class="copy-btn hidden" id="copyTitle" data-copy="title">제목 복사</button><button class="copy-btn hidden" id="copyHtml" data-copy="html">본문 HTML 복사</button><button class="copy-btn hidden" id="copyMeta" data-copy="meta">설명 복사</button><button class="copy-btn hidden" id="copyCategory" data-copy="category">카테고리 복사</button></div><details id="htmlDetails" class="hidden"><summary class="cursor-pointer text-blue-300">본문 HTML 보기</summary><textarea id="agentArticleHtml" readonly class="mt-2 h-48 w-full rounded-xl bg-slate-950 p-3 text-xs text-slate-200"></textarea></details></div>
+      {% elif step.id == 'image' %}
+      <div class="mt-3 space-y-2 text-sm"><img id="agentImage" class="hidden max-h-48 rounded-xl object-contain" alt="Agent 3 결과 이미지"><p id="agentImageUrl" class="break-all text-slate-300">이미지 대기</p><button class="copy-btn hidden" id="copyImage" data-copy="image">이미지 URL 복사</button></div>
+      {% elif step.id == 'publish' %}
+      <div id="manualPublish" class="mt-3 hidden space-y-3 text-sm"><p class="text-violet-200">1~3번 결과를 복사해 선택한 WordPress 사이트에 직접 공개하세요. 공개한 글 주소를 붙여넣으면 확인합니다.</p><button id="copyPackage" class="copy-btn w-full">발행 자료 전체 복사</button><label class="block text-slate-300">공개한 글 주소<input id="manualUrl" type="url" placeholder="https://선택한사이트/글-주소/" class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-white"></label><button id="verifyManual" class="w-full rounded-xl bg-violet-600 px-3 py-3 font-black disabled:opacity-40">④ 공개 글 검증</button><p id="manualMessage" class="break-words text-xs text-slate-300"></p></div>
+      {% endif %}
       <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="{{ step.id }}">
         이 Agent만 다시 실행
       </button>
@@ -103,7 +119,7 @@
     <div>
       <p class="text-xs font-black text-violet-300">WRITER CONTROL</p>
       <h2 class="mt-1 text-lg font-black">같은 키워드로 글만 다시 쓰기</h2>
-      <p class="mt-1 text-sm text-slate-300">1번 리서치 결과는 유지하고 n8n이 ② 글쓰기 → ③ 이미지 → ④ 발행만 다시 실행합니다.</p>
+      <p id="rewriteDescription" class="mt-1 text-sm text-slate-300">1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지 → ④ 발행을 다시 실행합니다.</p>
     </div>
     <button id="rewriteBtn" class="rounded-xl bg-violet-600 px-5 py-3 text-sm font-black hover:bg-violet-500">
       ② 글 다시 쓰기
@@ -155,6 +171,32 @@ const categoryEl=document.getElementById('category');
 const autoBtn=document.getElementById('autoBtn');
 const rewriteBtn=document.getElementById('rewriteBtn');
 let currentRunId='', pollTimer=null;
+let currentData=null;
+function selectedMode(){return document.querySelector('input[name="runMode"]:checked').value}
+function setModeUI(){
+  const manual=selectedMode()==='manual';
+  document.getElementById('publishModeLabel').classList.toggle('hidden',manual);
+  document.getElementById('modeDescription').textContent=manual
+    ?'수동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지까지 자동으로 준비합니다. ④ 공개 발행은 직접 합니다.'
+    :'자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증까지 진행합니다.';
+  document.getElementById('rewriteDescription').textContent=manual
+    ?'1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지를 다시 준비합니다. 발행은 직접 합니다.'
+    :'1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지 → ④ 발행을 다시 실행합니다.';
+  if(!autoBtn.disabled)autoBtn.textContent=manual?'수동 준비 실행 · ①→②→③':'자동 실행 · ①→②→③→④';
+}
+function copyValue(key){
+  const d=currentData||{}, a=d.article||{};
+  const image=d.image?.url||'';
+  const alt=(a.image_queries||[])[0]||d.research?.keyword||a.title||'';
+  const html=image?'<p><img src="'+esc(image)+'" alt="'+esc(alt)+'" /></p>\n'+(a.content_html||''):(a.content_html||'');
+  const values={keyword:d.research?.keyword||'',title:a.title||'',html,meta:a.meta_description||'',category:d.category_assignment?.name||d.category||'',image};
+  return values[key]||'';
+}
+async function copyText(value,button){
+  if(!value)return;
+  await navigator.clipboard.writeText(value);
+  const previous=button.textContent;button.textContent='복사됨';setTimeout(()=>button.textContent=previous,1800);
+}
 
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function refreshProfile(){
@@ -180,18 +222,22 @@ function setAgent(stage,status,detail){
   const card=document.getElementById('agent-'+stage); if(!card)return;
   card.dataset.status=status||'waiting';
   const dot=card.querySelector('.status-dot');
-  dot.className='status-dot '+(status==='running'?'s-run':status==='ok'?'s-ok':status==='failed'?'s-fail':'s-wait');
-  card.querySelector('.status-text').textContent=status==='running'?'실행중':status==='ok'?'성공':status==='failed'?'실패':'대기';
+  dot.className='status-dot '+(status==='running'?'s-run':status==='ok'?'s-ok':status==='failed'?'s-fail':status==='manual_required'?'s-manual':'s-wait');
+  card.querySelector('.status-text').textContent=status==='running'?'실행중':status==='ok'?'성공':status==='failed'?'실패':status==='manual_required'?'직접 발행 대기':'대기';
   card.querySelector('.agent-detail').textContent=detail||'';
   card.querySelector('.rerun').classList.toggle('hidden',status!=='failed');
 }
 function resetView(){
+  currentData=null;
   ['research','write','image','publish'].forEach((s,i)=>setAgent(s,'waiting','자동 순서 '+(i+1)+' 대기'));
   document.getElementById('receiptPanel').classList.add('hidden');
   document.getElementById('articlePanel').classList.add('hidden');
   document.getElementById('researchPanel').classList.add('hidden');
   document.getElementById('rewritePanel').classList.add('hidden');
   document.getElementById('errorPanel').classList.add('hidden');
+  document.getElementById('manualPublish').classList.add('hidden');
+  document.getElementById('manualMessage').textContent='';
+  document.getElementById('manualUrl').value='';
 }
 function showError(stage,msg){
   document.getElementById('errorPanel').classList.remove('hidden');
@@ -206,7 +252,7 @@ function startPolling(){
 async function autoRun(){
   resetView();
   autoBtn.disabled=true;
-  autoBtn.textContent='n8n 자동 실행 중...';
+  autoBtn.textContent='n8n 실행 중...';
   try{
     const r=await fetch('/api/london-gpt/run',{
       method:'POST',
@@ -214,7 +260,7 @@ async function autoRun(){
       body:JSON.stringify({
         site_id:siteEl.value,
         category:categoryEl.value,
-        publish_mode:document.getElementById('publishMode').value
+        publish_mode:selectedMode()==='manual'?'manual':document.getElementById('publishMode').value
       })
     });
     const d=await r.json();
@@ -226,7 +272,7 @@ async function autoRun(){
   }catch(e){
     showError('시작',e.message);
     autoBtn.disabled=false;
-    autoBtn.textContent='자동 실행 · ①→②→③→④';
+    setModeUI();
   }
 }
 async function pollRun(){
@@ -234,6 +280,7 @@ async function pollRun(){
   try{
     const r=await fetch('/api/london-gpt/run/'+encodeURIComponent(currentRunId),{cache:'no-store'});
     const d=await r.json();
+    currentData=d;
     const s=d.stage_status||{};
     const category=d.category_assignment;
     const categoryText=category?.status==='ok'
@@ -243,9 +290,35 @@ async function pollRun(){
       research:d.research?.keyword?('선정 키워드: '+d.research.keyword):'리서치 대기/진행',
       write:d.writer?('품질 '+(d.writer.quality_score??'-')+' · '+(d.writer.provider||'')+' · '+categoryText):'글쓰기 + 카테고리 지정 대기/진행',
       image:d.image?.status?((category?.status==='ok'?categoryText+' · ':'')+d.image.status):'카테고리 지정 완료 후 이미지 진행',
-      publish:d.receipt?.url?('완료: '+d.receipt.url):'발행·검증 대기/진행'
+      publish:d.receipt?.url?('완료: '+d.receipt.url):d.publish_mode==='manual'?'직접 발행할 자료 준비 중':'발행·검증 대기/진행'
     };
     ['research','write','image','publish'].forEach(stage=>setAgent(stage,s[stage]||'waiting',details[stage]));
+    if(d.research?.keyword){
+      document.getElementById('agentKeyword').textContent=d.research.keyword;
+      document.getElementById('agentEvidence').textContent=d.research.evidence||'';
+      document.getElementById('copyKeyword').classList.remove('hidden');
+    }
+    if(d.article?.title){
+      document.getElementById('agentArticleTitle').textContent=d.article.title;
+      document.getElementById('agentArticleMeta').textContent=d.article.meta_description||'';
+      document.getElementById('agentCategory').textContent=d.category_assignment?.name||d.category||'';
+      document.getElementById('agentArticleHtml').value=copyValue('html');
+      document.getElementById('htmlDetails').classList.remove('hidden');
+      ['copyTitle','copyHtml','copyMeta','copyCategory'].forEach(id=>document.getElementById(id).classList.toggle('hidden',!copyValue(document.getElementById(id).dataset.copy)));
+    }
+    if(d.image){
+      document.getElementById('agentImageUrl').textContent=d.image.url||d.image.status||'이미지 없음';
+      const img=document.getElementById('agentImage');
+      img.classList.toggle('hidden',!d.image.url);
+      if(d.image.url)img.src=d.image.url;
+      document.getElementById('copyImage').classList.toggle('hidden',!d.image.url);
+    }
+    if(d.publish_mode==='manual' && s.publish==='manual_required'){
+      document.getElementById('manualPublish').classList.remove('hidden');
+      setAgent('publish','manual_required','발행 자료 준비 완료 · 직접 공개한 뒤 URL 검증');
+      if(pollTimer)clearInterval(pollTimer);
+      autoBtn.disabled=false;setModeUI();
+    }
     document.getElementById('pollState').textContent='상태 갱신 '+new Date().toLocaleTimeString('ko-KR');
 
     if(d.research?.keyword){
@@ -273,7 +346,7 @@ async function pollRun(){
       showError(stage,d.last_error.message||d.last_error.type||'오류');
       if(pollTimer)clearInterval(pollTimer);
       autoBtn.disabled=false;
-      autoBtn.textContent='다시 자동 실행 · ①→②→③→④';
+      setModeUI();
     }
 
     if(d.receipt && s.publish==='ok'){
@@ -285,7 +358,7 @@ async function pollRun(){
       a.textContent=d.receipt.url||'-';
       a.href=d.receipt.url||'#';
       autoBtn.disabled=false;
-      autoBtn.textContent='새 글 자동 실행 · ①→②→③→④';
+      setModeUI();
     }
   }catch(e){
     document.getElementById('pollState').textContent='상태 조회 실패';
@@ -336,11 +409,32 @@ async function rerun(stage){
     showError(stage,e.message);
   }
 }
+async function verifyManual(){
+  if(!currentRunId)return;
+  const btn=document.getElementById('verifyManual'),message=document.getElementById('manualMessage');
+  btn.disabled=true;message.textContent='공개 글을 확인 중입니다...';
+  try{
+    const r=await fetch('/api/london-gpt/manual-published',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({run_id:currentRunId,url:document.getElementById('manualUrl').value.trim()})});
+    const d=await r.json();
+    if(!r.ok||!d.ok)throw new Error(d.error||d.message||'검증 실패');
+    message.textContent='공개 글 확인 완료';
+    await pollRun();
+  }catch(e){message.textContent='검증 실패: '+e.message;}
+  finally{btn.disabled=false;}
+}
 siteEl.addEventListener('change',refreshProfile);
 autoBtn.addEventListener('click',autoRun);
 rewriteBtn.addEventListener('click',rewriteArticle);
 document.querySelectorAll('.rerun').forEach(b=>b.addEventListener('click',()=>rerun(b.dataset.stage)));
+document.querySelectorAll('input[name="runMode"]').forEach(el=>el.addEventListener('change',setModeUI));
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copyText(copyValue(b.dataset.copy),b).catch(()=>showError('복사','클립보드 접근이 차단되었습니다. HTML 보기에서 직접 선택해 복사하세요.'))));
+document.getElementById('copyPackage').addEventListener('click',e=>{
+  const rows=[['키워드','keyword'],['제목','title'],['카테고리','category'],['메타 설명','meta'],['이미지 URL','image'],['본문 HTML','html']];
+  copyText(rows.map(([label,key])=>label+'\n'+copyValue(key)).join('\n\n'),e.currentTarget).catch(()=>showError('복사','클립보드 접근이 차단되었습니다.'));
+});
+document.getElementById('verifyManual').addEventListener('click',verifyManual);
 refreshProfile();
+setModeUI();
 </script>
 </body>
 </html>

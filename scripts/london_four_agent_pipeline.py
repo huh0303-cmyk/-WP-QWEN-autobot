@@ -486,8 +486,20 @@ def _publish_blogger(state: dict, profile: dict, public: bool) -> dict:
 
 
 def stage_publish(run_id: str) -> dict:
-    _load_runtime_env()
     state = _read_state(run_id)
+    if state.get("publish_mode") == "manual":
+        if any(state.get("stage_status", {}).get(stage) != "ok" for stage in ("research", "write", "image")):
+            raise RuntimeError("manual handoff requires completed research, writing and image stages")
+        if not state.get("article", {}).get("title") or not state.get("article", {}).get("content_html"):
+            raise RuntimeError("manual handoff requires a completed article")
+        state.setdefault("stage_status", {})["publish"] = "manual_required"
+        state["manual_ready_at"] = datetime.now(KST).isoformat()
+        state.pop("receipt", None)
+        state.pop("last_error", None)
+        _write_state(state)
+        return {"ok": True, "stage": "publish", "site_id": state["site_id"],
+                "run_id": run_id, "status": "manual_required", "url": "", "post_id": ""}
+    _load_runtime_env()
     state.setdefault("stage_status", {})["publish"] = "running"
     _write_state(state)
     platform, profile = _profile(state["site_id"])
@@ -522,7 +534,7 @@ def main() -> int:
     parser.add_argument("--stage", required=True, choices=["research", "write", "image", "publish"])
     parser.add_argument("--site-id", default="")
     parser.add_argument("--run-id", required=True)
-    parser.add_argument("--publish-mode", choices=["draft", "publish"], default=os.environ.get("PIPELINE_PUBLISH_MODE", "draft"))
+    parser.add_argument("--publish-mode", choices=["draft", "publish", "manual"], default=os.environ.get("PIPELINE_PUBLISH_MODE", "draft"))
     parser.add_argument("--category", default="")
     args = parser.parse_args()
     os.environ["PIPELINE_PUBLISH_MODE"] = args.publish_mode
