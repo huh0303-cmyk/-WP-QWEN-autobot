@@ -487,6 +487,10 @@ def _publish_blogger(state: dict, profile: dict, public: bool) -> dict:
 
 def stage_publish(run_id: str) -> dict:
     state = _read_state(run_id)
+    existing = state.get("receipt") or {}
+    if state.get("stage_status", {}).get("publish") == "ok" and existing.get("post_id") and existing.get("url"):
+        return {"ok": True, "stage": "publish", "site_id": state["site_id"], "run_id": run_id,
+                "status": existing["status"], "url": existing["url"], "post_id": existing["post_id"]}
     if state.get("publish_mode") == "manual":
         if any(state.get("stage_status", {}).get(stage) != "ok" for stage in ("research", "write", "image")):
             raise RuntimeError("manual handoff requires completed research, writing and image stages")
@@ -518,6 +522,9 @@ def stage_publish(run_id: str) -> dict:
     state.setdefault("stage_status", {})["publish"] = "ok"
     state.pop("last_error", None)
     state["completed_at"] = datetime.now(KST).isoformat()
+    if public and receipt.get("status") == "published":
+        from scripts.london_gsc_dispatch import queue_submission
+        queue_submission(state, profile["wordpress" if platform == "wordpress" else "blogspot"]["url"])
     _write_state(state)
     return {
         "ok": True,

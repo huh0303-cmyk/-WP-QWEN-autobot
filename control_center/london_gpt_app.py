@@ -313,6 +313,9 @@ def install(app, runtime):
                             "post_id": "manual", "title": title, "verified_at": datetime.now(timezone.utc).isoformat()}
         state["stage_status"]["publish"] = "ok"
         state["completed_at"] = datetime.now(timezone.utc).isoformat()
+        from scripts.london_gsc_dispatch import queue_submission
+        # control.env is loaded by the control service; the GSC credential stays in Actions.
+        queue_submission(state, site["url"])
         _write_run(state)
         return jsonify({"ok": True, "receipt": state["receipt"]})
 
@@ -363,7 +366,17 @@ def install(app, runtime):
     @app.get("/api/london-gpt/run/<run_id>")
     def london_gpt_run_status(run_id: str):
         from flask import jsonify
-        return jsonify(_read_run(run_id))
+        state = _read_run(run_id)
+        if re.fullmatch(r"lgpt-[0-9]{8}-[0-9]{6}-[a-f0-9]{6}", run_id):
+            receipt_path = PROJECT_ROOT / "data" / "london-gsc-receipts" / f"{run_id}.json"
+            if receipt_path.is_file():
+                try:
+                    submission = json.loads(receipt_path.read_text(encoding="utf-8"))
+                    if submission.get("url") == (state.get("receipt") or {}).get("url"):
+                        state["indexing_submission"] = submission
+                except (OSError, ValueError):
+                    pass
+        return jsonify(state)
 
     @app.post("/api/london-gpt/rerun/<stage>")
     def london_gpt_rerun(stage: str):
