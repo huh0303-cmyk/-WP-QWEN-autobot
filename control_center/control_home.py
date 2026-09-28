@@ -72,6 +72,7 @@ def build_youtube_ranking(bucket: int) -> dict:
             "views": views,
             "view_delta": _delta(views, previous.get("views") if isinstance(previous, dict) else None),
             "videos": videos,
+            "video_delta": _delta(videos, previous.get("videos") if isinstance(previous, dict) else None),
             "opening_date": timeline.get("opening_date") or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
             "recent_publish_date": timeline.get("recent_publish_date", ""),
             "infrastructure": infrastructure_info("youtube"),
@@ -135,6 +136,8 @@ def build_sns_ranking(bucket: int) -> dict:
             "followers_delta": _delta(followers, old.get("count") if isinstance(old, dict) else None),
             "yesterday_views": yesterday_views,
             "views_delta": audience_row.get("delta") if isinstance(audience_row, dict) else None,
+            "content_count": audience_row.get("content_count") if isinstance(audience_row, dict) else None,
+            "content_delta": audience_row.get("content_delta") if isinstance(audience_row, dict) else None,
             "connected": isinstance(followers, (int, float)),
         })
     rows.sort(key=lambda r: (
@@ -183,6 +186,7 @@ def build_social_ranking(bucket: int) -> dict:
             "views": item.get("views"),
             "views_delta": item.get("view_delta"),
             "content_count": item.get("videos"),
+            "content_count_delta": item.get("video_delta"),
             "revenue": item.get("revenue") or {},
             "opening_date": item.get("opening_date") or "",
             "recent_publish_date": item.get("recent_publish_date") or "",
@@ -190,8 +194,6 @@ def build_social_ranking(bucket: int) -> dict:
             "connected": item.get("connected", False),
         })
     for item in sns["rows"]:
-        if item.get("role") not in ACTIVE_SOCIAL_ROLES:
-            continue
         rows.append({
             "platform": item.get("platform"),
             "name": item.get("name"),
@@ -203,7 +205,8 @@ def build_social_ranking(bucket: int) -> dict:
             "audience_delta": item.get("followers_delta"),
             "views": item.get("yesterday_views"),
             "views_delta": item.get("views_delta"),
-            "content_count": None,
+            "content_count": item.get("content_count"),
+            "content_count_delta": item.get("content_delta"),
             "revenue": item.get("revenue") or {},
             "opening_date": item.get("opening_date") or "",
             "recent_publish_date": item.get("recent_publish_date") or "",
@@ -225,7 +228,7 @@ def build_social_ranking(bucket: int) -> dict:
             rank += 1
             row["rank"] = rank
     youtube_total = len(youtube["rows"])
-    sns_active_total = sum(1 for item in sns["rows"] if item.get("role") in ACTIVE_SOCIAL_ROLES)
+    sns_active_total = len(sns["rows"])
     return {
         "generated_at": datetime.now(KST).isoformat(),
         "ranking_date": (datetime.now(KST).date() - timedelta(days=1)).isoformat(),
@@ -233,9 +236,9 @@ def build_social_ranking(bucket: int) -> dict:
         "ranked": rank,
         "youtube_total": youtube_total,
         "sns_active_total": sns_active_total,
-        "target_total": 30,
-        "target_youtube": 18,
-        "count_confirmation_required": youtube_total != 18 or sns_active_total != 12,
+        "target_total": 44,
+        "target_youtube": 20,
+        "count_confirmation_required": youtube_total != 20 or sns_active_total != 24,
         "rows": rows,
     }
 

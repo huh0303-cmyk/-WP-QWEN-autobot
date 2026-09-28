@@ -85,8 +85,11 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
         assert f'a[data-platform="{platform}"]' in social
     assert '<a data-platform="{{p}}"' in social
     assert "<th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th>" in social
+    assert "<th>구독자·팔로워(증감)</th><th>방문·조회수(증감)</th><th>콘텐츠수(증감)</th>" in social
     assert "<th>생산·발행 트리거</th><th>계정 ID</th>" in social
-    assert "k365-social-column-widths-v2" in social
+    assert "fetch('/api/control/social-ranking'" in social
+    assert "item.content_count_delta" in social
+    assert "k365-social-column-widths-v3" in social
     assert "col-resizer" in social
 
 
@@ -97,3 +100,11 @@ def test_youtube_group_order_and_missing_survival_channels_are_explicit():
     assert '"Survival Vietnamese": 4' in source
     assert '"Survival Portuguese": 9' in source
     assert '"state_label": "채널 생성·선택 필요"' in source
+
+
+def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
+    source = (ROOT / "control_center" / "control_home.py").read_text(encoding="utf-8")
+    assert '"video_delta": _delta(videos, previous.get("videos")' in source
+    assert '"content_count_delta": item.get("video_delta")' in source
+    assert '"content_count_delta": item.get("content_delta")' in source
+    assert '"target_total": 44' in source
