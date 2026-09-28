@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from scripts.opening_recent_snapshot import stamp
+from control_center import blog_metadata
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +41,29 @@ def test_quick_publish_links_reuse_existing_workflows():
 
 def test_recent_publication_snapshot_preserves_kst_time():
     assert stamp("2026-09-29T01:23:45Z") == "2026-09-29T10:23+09:00"
+
+
+def test_local_opening_snapshot_fills_assets_missing_from_remote(monkeypatch, tmp_path):
+    local = tmp_path / "data"
+    local.mkdir()
+    (local / "opening_recent_snapshot.json").write_text(
+        '{"youtube":{"new-id":{"opening_date":"2026-09-12","recent_publish_date":"2026-09-13"}}}',
+        encoding="utf-8",
+    )
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"youtube": {"old-id": {"opening_date": "2025-01-01"}}}
+
+    monkeypatch.setattr(blog_metadata, "ROOT", tmp_path)
+    monkeypatch.setattr(blog_metadata.requests, "get", lambda *args, **kwargs: Response())
+    blog_metadata._opening_recent_snapshot.cache_clear()
+    result = blog_metadata._opening_recent_snapshot(20260929)
+    assert result["youtube"]["old-id"]["opening_date"] == "2025-01-01"
+    assert result["youtube"]["new-id"]["recent_publish_date"] == "2026-09-13"
 
 
 def test_pm_lock_records_three_visible_apps_and_youtube_alias():
