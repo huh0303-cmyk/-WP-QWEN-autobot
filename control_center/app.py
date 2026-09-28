@@ -2302,7 +2302,11 @@ def _overlay_core_metrics(rows, platform):
         if platform == "blogger":
             keys += ["today_visitors", "today_delta", "total_visitors", "total_delta", "visitor_checked_at"]
         for field in keys:
-            row[field] = record.get(field)
+            value = record.get(field)
+            # Never erase a live/previously verified metric with a failed
+            # refresh that returned None. Zero is a valid measured value.
+            if value is not None:
+                row[field] = value
         if manifest.get("generated_at", "")[:10] != today:
             row["posts_delta"] = None
             row["indexed_delta"] = None
