@@ -1,0 +1,30 @@
+name: Blogger visitor counter backfill
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Backfill Korea365 visitor counter to all live Blogger posts
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/backfill_blogger_visitor_counter.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blogger-visitor-counter-backfill-${{ github.run_id }}
+          path: artifacts/blogger-visitor-counter-backfill.json
+          retention-days: 14

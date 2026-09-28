@@ -9,18 +9,11 @@ import json, os, re, sys, time
 from pathlib import Path
 import requests
 
+from automation_hub.blog_visitor_widget import MARK, visitor_counter_html
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "artifacts/blogger-visitor-counter-backfill.json"
-BADGE_MARK = "visitor-badge.laobi.icu"
-
-
-def visitor_counter_html(page_id: str) -> str:
-    safe_id = re.sub(r"[^a-zA-Z0-9_-]", "-", page_id)
-    return (
-        '<p style="text-align:center;margin-top:24px;">'
-        f'<img src="https://visitor-badge.laobi.icu/badge?page_id={safe_id}" '
-        'alt="visitor count" loading="lazy" /></p>'
-    )
+BADGE_MARK = MARK
 
 
 def access_token():
@@ -67,8 +60,7 @@ def main():
         if not blog.get("ready_for_automation"):
             continue
         site_key = p["site_key"]
-        page_id = f"blogger_{site_key}"
-        badge = visitor_counter_html(page_id)
+        badge = visitor_counter_html(site_key, language=p.get("language", "en"))
         blog_id = str(blog["destination_id"])
         endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{blog_id}/posts"
         try:
