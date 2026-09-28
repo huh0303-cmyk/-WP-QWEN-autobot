@@ -14,10 +14,12 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
+import csv
+import io
 import time
 from typing import Callable
 
-from flask import jsonify, render_template
+from flask import Response, jsonify, render_template
 
 KST = timezone(timedelta(hours=9))
 
@@ -122,3 +124,25 @@ def install(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_da
     def blog_korea365_ranking():
         payload = cached_payload(int(time.time() // 300))
         return jsonify(payload), 200, {"Cache-Control": "no-store"}
+
+    @app.get("/api/blog-korea365/ranking.csv")
+    def blog_korea365_ranking_csv():
+        payload = cached_payload(int(time.time() // 300))
+        out = io.StringIO()
+        writer = csv.writer(out)
+        writer.writerow(["순위", "플랫폼", "사이트", "URL", "어제 방문자", "증감", "총 방문자", "증감", "총 콘텐츠", "증감", "Google 색인", "증감", "GSC 확인", "확인시각"])
+        for card in payload["cards"]:
+            writer.writerow([
+                card.get("rank") or "", card.get("kind") if card.get("kind") == "news" else card.get("platform"),
+                card.get("name") or "", card.get("url") or "",
+                card.get("yesterday_visitors"), card.get("yesterday_visitors_delta"),
+                card.get("total_visitors"), card.get("total_visitors_delta"),
+                card.get("total_content"), card.get("total_content_delta"),
+                card.get("google_indexed"), card.get("google_indexed_delta"),
+                "GSC" if card.get("google_indexed_verified_via") == "gsc" else "",
+                card.get("checked_at") or "",
+            ])
+        content = "\ufeff" + out.getvalue()
+        return Response(content, mimetype="text/csv; charset=utf-8",
+                        headers={"Content-Disposition": "attachment; filename=korea365-blog-ranking.csv",
+                                 "Cache-Control": "no-store"})
