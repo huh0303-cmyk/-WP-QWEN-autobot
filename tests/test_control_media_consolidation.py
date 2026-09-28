@@ -82,3 +82,5 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "생산·발행 트리거" in social
     for platform in ("YouTube", "TikTok", "Instagram", "Facebook", "Threads"):
         assert f'tr[data-platform="{platform}"] td' in social
+        assert f'a[data-platform="{platform}"]' in social
+    assert '<a data-platform="{{p}}"' in social
