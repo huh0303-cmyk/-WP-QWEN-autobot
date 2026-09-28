@@ -11,85 +11,99 @@
   "youtube": [
     {
       "group": "playlist",
-      "name": "cafe_romantic",
+      "name": "CAFE_ROMANTIC",
       "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
       "handle": "cafe_romantic",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "playlist",
-      "name": "Cafe healing",
+      "name": "CAFE_HEALING",
       "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
       "handle": "cafe_healing1",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "playlist",
       "name": "CAFE_STARBUCKSVIBES",
       "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
       "handle": "Starbucksvibes",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "playlist",
       "name": "CAFE_MOZART",
       "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
       "handle": "cafe_mozart",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "playlist",
       "name": "CAFE_KPOP",
       "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw",
       "handle": "kpop_studio7",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "knowledge",
       "name": "NASA_XFILES",
       "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
       "handle": "NASA_XFILES",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "knowledge",
       "name": "HISTORY_TV_TODAY",
       "channel_id": "UCVBvZwodUF4s57KeNicxQ3w",
       "handle": "HISTORY_TV_TODAY",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "knowledge",
       "name": "INVENTION_STORY1",
       "channel_id": "UCgNj-yS93A_fOHXXvG49fww",
       "handle": "INVENTION_STORY1",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "knowledge",
       "name": "SILENT_ERA_FILM",
       "channel_id": "UCLvy6kSpC8-7o3hnSrfQ47g",
       "handle": "OLD_HOLLYWOOD1",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "knowledge",
       "name": "RETRO_USA1",
       "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
       "handle": "RETRO_USA1",
-      "state": "connected"
+      "state": "connected",
+      "identity_verified_live": true
     },
     {
       "group": "language",
       "name": "서울국제대학-TOPIK센터",
       "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
-      "state": "analytics_connected"
+      "state": "analytics_connected",
+      "handle": "seoul_topik1",
+      "identity_verified_live": true
     },
     {
       "group": "language",
       "name": "English Survival",
       "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
-      "state": "analytics_connected"
+      "state": "analytics_connected",
+      "handle": "English_survival",
+      "identity_verified_live": true
     },
     {
       "group": "language",
@@ -97,7 +111,8 @@
       "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng",
       "state": "identity_verified_registry_handle_match",
       "handle": "seoul_japanese1",
-      "role": "Japanese-only Survival language channel"
+      "role": "Japanese-only Survival language channel",
+      "identity_verified_live": true
     },
     {
       "group": "health",
@@ -105,7 +120,9 @@
       "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
       "state": "analytics_connected",
       "role": "health_english_usa",
-      "audience": "US / English-speaking"
+      "audience": "US / English-speaking",
+      "handle": "health_clinic_USA",
+      "identity_verified_live": true
     },
     {
       "group": "shopping",
@@ -113,7 +130,9 @@
       "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
       "state": "analytics_connected",
       "role": "shopping_booking",
-      "topic": "건강기능식품, 호텔예약, 여행·생활 예약, 생활상품 등 쇼핑·예약형 콘텐츠"
+      "topic": "건강기능식품, 호텔예약, 여행·생활 예약, 생활상품 등 쇼핑·예약형 콘텐츠",
+      "handle": "rosiespicks",
+      "identity_verified_live": true
     },
     {
       "group": "health",
@@ -121,35 +140,41 @@
       "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
       "state": "analytics_connected",
       "role": "health_japanese",
-      "audience": "Japan / Japanese-speaking"
+      "audience": "Japan / Japanese-speaking",
+      "handle": "Health_Clinic_Japan",
+      "identity_verified_live": true
     },
     {
       "group": "language",
       "name": "French Survival",
       "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
       "state": "analytics_connected",
-      "handle": "SIS_FrenchSurvival"
+      "handle": "SIS_FrenchSurvival",
+      "identity_verified_live": true
     },
     {
       "group": "language",
       "name": "German Survival",
       "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
       "state": "analytics_connected",
-      "handle": "SIS_GermanSurvival"
+      "handle": "SIS_GermanSurvival",
+      "identity_verified_live": true
     },
     {
       "group": "language",
       "name": "Spanish Survival",
       "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
       "state": "analytics_connected",
-      "handle": "SIS_SpanishSurvival"
+      "handle": "SIS_SpanishSurvival",
+      "identity_verified_live": true
     },
     {
       "group": "language",
       "name": "Italian Survival",
       "channel_id": "UCK8B-BM09Cz-ockaQYLL5LA",
       "state": "analytics_connected",
-      "handle": "SIS_ItalianSurvival"
+      "handle": "SIS_ItalianSurvival",
+      "identity_verified_live": true
     }
   ],
   "tiktok": [
