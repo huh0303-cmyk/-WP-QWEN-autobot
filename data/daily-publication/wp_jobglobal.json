@@ -1,1 +1,1 @@
-{"day": "2026-09-27", "status": "CLAIMED", "attempts": 2, "claim": "daily-2026-09-27-wp_jobglobal-85351742", "claimed_at": "2026-09-27T15:35:04.860522+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-09-28", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-28-wp_jobglobal-fa4417d5", "claimed_at": "2026-09-28T15:47:43.418381+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
