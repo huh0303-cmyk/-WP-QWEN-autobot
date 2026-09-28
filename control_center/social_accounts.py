@@ -35,10 +35,9 @@ CORE_YOUTUBE = {
 YOUTUBE_GROUP_ORDER = {"language": 0, "playlist": 1, "knowledge": 2, "health": 3, "shopping": 4, "additional": 5}
 YOUTUBE_GROUP_LABEL = {"language": "언어 Survival", "playlist": "플레이리스트", "knowledge": "지식", "health": "헬스", "shopping": "쇼핑·예약", "additional": "기타"}
 YOUTUBE_LANGUAGE_ORDER = {
-    "서울국제대학-TOPIK센터": 0, "English Survival": 1, "Japanese Survival": 2,
-    "Survival Chinese": 3, "Survival Vietnamese": 4, "Spanish Survival": 5,
-    "French Survival": 6, "German Survival": 7, "Italian Survival": 8,
-    "Survival Portuguese": 9,
+    "German Survival": 0, "French Survival": 1, "Italian Survival": 2,
+    "Spanish Survival": 3, "Chinese Survival": 4, "Portuguese Survival": 5,
+    "Vietnamese Survival": 6, "English Survival": 7, "Japanese Survival": 8,
 }
 
 ROLE_DETAILS = {
@@ -110,17 +109,20 @@ def _youtube_cards() -> list[dict]:
             "button_label": "비공개 제작 시작" if core_key else "YouTube Studio 로그인",
         })
     for row in inventory.get("unconfirmed", []):
-        if row.get("platform") != "youtube" or "Survival" not in str(row.get("name") or ""):
+        if row.get("platform") != "youtube":
             continue
-        language = str(row.get("name") or "").removeprefix("Survival ")
+        name = str(row.get("name") or "미확인 YouTube")
+        language = name.removeprefix("Survival ")
+        group = str(row.get("group") or ("language" if "Survival" in name else "additional"))
         cards.append({
-            "key": f"youtube:planned:{language.lower()}", "platform": "YouTube", "name": row.get("name"),
-            "identity": "채널 생성/선택 후 UC ID 등록", "handle": "", "url": "", "login_url": "https://studio.youtube.com/",
-            "group": "language", "group_label": "언어 Survival", "inventory_order": 100, "role": "언어별 Survival 콘텐츠 생산",
-            "description": f"{language} 초급 생존 회화와 생활 표현",
-            "state_label": "채널 생성·선택 필요", "connection_level": "missing",
-            "publish_mode": "YouTube Studio에서 전용 채널을 만든 뒤 정확한 UC ID와 업로드 권한을 연결합니다.",
-            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "채널 생성·로그인",
+            "key": f"youtube:unconfirmed:{name.lower().replace(' ', '-')}", "platform": "YouTube", "name": name,
+            "identity": "정확한 UC ID 확인 필요", "handle": row.get("handle", ""), "url": "", "login_url": "https://studio.youtube.com/",
+            "group": group, "group_label": YOUTUBE_GROUP_LABEL.get(group, group), "inventory_order": 100,
+            "role": "언어별 Survival 콘텐츠 생산" if group == "language" else "통합 언어 채널",
+            "description": f"{language} 초급 생존 회화와 생활 표현" if group == "language" else "UC ID 확인 후 역할과 자동화를 연결합니다.",
+            "state_label": "공개 핸들 확인 실패 · UC ID 필요", "connection_level": "missing",
+            "publish_mode": "YouTube Studio에서 정확한 UC ID와 업로드 권한을 확인합니다.",
+            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "YouTube Studio에서 확인",
         })
     return sorted(cards, key=lambda c: (
         YOUTUBE_GROUP_ORDER.get(c.get("group"), 99),

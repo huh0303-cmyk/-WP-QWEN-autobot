@@ -85,21 +85,30 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
         assert f'a[data-platform="{platform}"]' in social
     assert '<a data-platform="{{p}}"' in social
     assert "<th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th>" in social
-    assert "<th>구독자·팔로워(증감)</th><th>방문·조회수(증감)</th><th>콘텐츠수(증감)</th>" in social
+    assert "<th>구독자·팔로워(증감)</th><th>방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>$ 수익</th><th>채널/페이지 생성일</th><th>최근 발행일</th>" in social
     assert "<th>생산·발행 트리거</th><th>계정 ID</th>" in social
     assert "fetch('/api/control/social-ranking'" in social
     assert "item.content_count_delta" in social
-    assert "k365-social-column-widths-v3" in social
+    assert "k365-social-column-widths-v5" in social
+    assert 'class="metric-revenue">미연결' in social
+    assert 'class="metric-opening">미확인' in social
+    assert 'class="metric-recent">미확인' in social
+    assert "tr.classList.toggle('monetized-row'" in social
     assert "col-resizer" in social
 
 
-def test_youtube_group_order_and_missing_survival_channels_are_explicit():
+def test_youtube_group_order_and_verified_survival_channels_are_explicit():
     source = (ROOT / "control_center" / "social_accounts.py").read_text(encoding="utf-8")
+    inventory = (ROOT / "config" / "london_social_account_inventory_2026-09-24.json").read_text(encoding="utf-8")
     assert '"language": 0, "playlist": 1, "knowledge": 2, "health": 3, "shopping": 4' in source
-    assert '"Survival Chinese": 3' in source
-    assert '"Survival Vietnamese": 4' in source
-    assert '"Survival Portuguese": 9' in source
-    assert '"state_label": "채널 생성·선택 필요"' in source
+    assert '"Chinese Survival": 4' in source
+    assert '"Portuguese Survival": 5' in source
+    assert '"Vietnamese Survival": 6' in source
+    assert "UCGTd7RhfaUaGGbVRsNPUN6Q" in inventory
+    assert "UCKvKhETLGPaRV3qfWv2bM2g" in inventory
+    assert "UCRZ0uc_bxKDMwz3noBBi9KQ" in inventory
+    assert '"name": "SIS-Language Center"' in inventory
+    assert '"state_label": "공개 핸들 확인 실패 · UC ID 필요"' in source
 
 
 def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
@@ -107,4 +116,7 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"video_delta": _delta(videos, previous.get("videos")' in source
     assert '"content_count_delta": item.get("video_delta")' in source
     assert '"content_count_delta": item.get("content_delta")' in source
-    assert '"target_total": 44' in source
+    assert '"target_total": 48' in source
+    assert '"target_youtube": 24' in source
+    assert '"status": "수익 OAuth 필요"' in source
+    assert '"opening_date": str(item.get("created_at")' in source

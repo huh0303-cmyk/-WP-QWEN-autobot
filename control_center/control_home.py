@@ -30,6 +30,34 @@ def _delta(current, previous):
     return None
 
 
+def _social_revenue(platform: str, handle: str, channel_id: str) -> dict:
+    """Return only revenue states confirmed by the operations ledger.
+
+    TOPIK is recorded as monetization-approved in situation_room_daily.py, but
+    the YouTube revenue OAuth is not connected yet.  Keep the amount empty
+    instead of inventing a zero or an estimate.
+    """
+    normalized_handle = _norm(handle)
+    if platform == "YouTube" and (
+        channel_id == "UCdA24IuR-JE7qButWv5jLqA"
+        or normalized_handle in {"seoultopik", "seoultopik1"}
+    ):
+        return {
+            "monetized": True,
+            "amount": None,
+            "delta": None,
+            "currency": "USD",
+            "status": "수익 OAuth 필요",
+        }
+    return {
+        "monetized": False,
+        "amount": None,
+        "delta": None,
+        "currency": "",
+        "status": "미연결",
+    }
+
+
 def _youtube_stats_by_identity(bucket: int):
     del bucket
     history = _read(ROOT / "situation_room_history.json", {})
@@ -73,10 +101,28 @@ def build_youtube_ranking(bucket: int) -> dict:
             "view_delta": _delta(views, previous.get("views") if isinstance(previous, dict) else None),
             "videos": videos,
             "video_delta": _delta(videos, previous.get("videos") if isinstance(previous, dict) else None),
+            "revenue": _social_revenue("YouTube", current.get("handle") or item.get("handle") or "", item.get("channel_id", "")),
             "opening_date": timeline.get("opening_date") or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
             "recent_publish_date": timeline.get("recent_publish_date", ""),
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
+        })
+    for item in inventory.get("unconfirmed", []):
+        if str(item.get("platform") or "").lower() != "youtube":
+            continue
+        rows.append({
+            "name": item.get("name") or "미확인 YouTube",
+            "channel_id": "",
+            "handle": item.get("handle") or "",
+            "url": "",
+            "category": item.get("group") or "additional",
+            "subscribers": None, "subscriber_delta": None,
+            "views": None, "view_delta": None,
+            "videos": None, "video_delta": None,
+            "revenue": _social_revenue("YouTube", item.get("handle") or "", ""),
+            "opening_date": "", "recent_publish_date": "",
+            "infrastructure": infrastructure_info("youtube"),
+            "connected": False,
         })
     rows.sort(key=lambda r: (
         r["subscribers"] is None,
@@ -138,6 +184,8 @@ def build_sns_ranking(bucket: int) -> dict:
             "views_delta": audience_row.get("delta") if isinstance(audience_row, dict) else None,
             "content_count": audience_row.get("content_count") if isinstance(audience_row, dict) else None,
             "content_delta": audience_row.get("content_delta") if isinstance(audience_row, dict) else None,
+            "revenue": _social_revenue(platform, handle, ""),
+            "opening_date": str(item.get("created_at") or item.get("opening_date") or "")[:10],
             "connected": isinstance(followers, (int, float)),
         })
     rows.sort(key=lambda r: (
@@ -236,9 +284,9 @@ def build_social_ranking(bucket: int) -> dict:
         "ranked": rank,
         "youtube_total": youtube_total,
         "sns_active_total": sns_active_total,
-        "target_total": 44,
-        "target_youtube": 20,
-        "count_confirmation_required": youtube_total != 20 or sns_active_total != 24,
+        "target_total": 48,
+        "target_youtube": 24,
+        "count_confirmation_required": youtube_total != 24 or sns_active_total != 24,
         "rows": rows,
     }
 
