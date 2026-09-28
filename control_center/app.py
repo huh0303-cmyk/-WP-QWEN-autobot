@@ -413,6 +413,7 @@ def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, objec
             payload = response.json()
             today = int(payload["count"])
             yesterday = int(payload["yesterday_count"])
+            day_before = int(payload.get("day_before_yesterday_count", 0))
             total = int(payload["total"])
             return {
                 "connected": True,
@@ -420,6 +421,8 @@ def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, objec
                 "daily_visitors": today,
                 "visitor_delta": today - yesterday,
                 "yesterday_visitors": yesterday,
+                "yesterday_delta": yesterday - day_before,
+                "day_before_yesterday_visitors": day_before,
                 "total_visitors": total,
                 # The all-time counter grows by today's visits since midnight.
                 "total_delta": today,
@@ -737,6 +740,8 @@ def get_site_data():
             "admin_review_url": f"https://{item['domain']}/wp-admin/edit.php?post_status=draft&post_type=post",
             "today_visitors": today_visitors,
             "today_delta": visitor_delta,
+            "yesterday_visitors": traffic.get("yesterday_visitors") if traffic_fresh else None,
+            "yesterday_delta": traffic.get("yesterday_delta") if traffic_fresh else None,
             "total_visitors": total_visitors,
             "total_delta": traffic.get("total_delta") if traffic_fresh else None,
             "total_posts": total_posts,
@@ -786,7 +791,11 @@ def get_blogger_data():
             stats = stats_payload.get("sites", {})
             stats_at = stats_payload.get("generated_at", "")
             if stats_at[:10] != datetime.now(timezone(timedelta(hours=9))).date().isoformat():
-                stats = {url: {**values, "today": None, "today_delta": None, "total_delta": None} for url, values in stats.items()}
+                stats = {
+                    url: {**values, "today": None, "yesterday": None, "today_delta": None,
+                          "yesterday_delta": None, "total_delta": None}
+                    for url, values in stats.items()
+                }
         except (OSError, ValueError):
             stats = {}
     history_bloggers = {}
@@ -834,6 +843,8 @@ def get_blogger_data():
         "visitor_checked_at": stats_at,
         "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
         "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
+        "yesterday_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("yesterday"),
+        "yesterday_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("yesterday_delta"),
         "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
         "total_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("total_delta"),
         "total_posts": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("public_posts"),
@@ -972,6 +983,8 @@ def get_youtube_data() -> list[dict[str, object]]:
             video_count = current.get("videos", registry_channel.get("video_count_snapshot"))
             subscriber_previous = previous.get("subs")
             video_previous = previous.get("videos")
+        view_count = current.get("views")
+        view_previous = previous.get("views")
         rows.append({
             "room_id": str(room.get("room_id", "")),
             "channel_key": channel_key,
@@ -983,6 +996,8 @@ def get_youtube_data() -> list[dict[str, object]]:
             "handle": str(current.get("handle") or registry_channel.get("handle") or "").lstrip("@"),
             "subscriber_count": subscriber_count,
             "subscriber_delta": metric_delta(subscriber_count, subscriber_previous),
+            "view_count": view_count,
+            "view_delta": metric_delta(view_count, view_previous),
             "content_count": video_count,
             "content_delta": metric_delta(video_count, video_previous),
             "created_at": str(current.get("created_at") or registry_channel.get("created_at") or ""),
@@ -1016,6 +1031,13 @@ def get_sns_data() -> list[dict[str, object]]:
     }
     labels = {"tiktok": "TikTok", "instagram": "Instagram", "threads": "Threads", "facebook": "Facebook 페이지"}
     metric_keys = (("followers", "count"), ("likes", "likes"), ("content", "content_count"), ("watch_time", "watch_time"))
+    audience_path = Path("/opt/korea365/data/account-audience-metrics.json")
+    if not audience_path.exists():
+        audience_path = Path(__file__).resolve().parents[1] / "data" / "account-audience-metrics.json"
+    try:
+        audience_accounts = json.loads(audience_path.read_text(encoding="utf-8")).get("accounts", {})
+    except (OSError, ValueError, TypeError):
+        audience_accounts = {}
     rows = []
     for platform in ("tiktok", "instagram", "facebook", "threads"):
         current_platform = latest.get(platform, {}) if isinstance(latest.get(platform, {}), dict) else {}
@@ -1033,6 +1055,14 @@ def get_sns_data() -> list[dict[str, object]]:
             elif platform == "instagram": url = f"https://www.instagram.com/{handle}/" if handle else ""
             elif platform == "threads": url = f"https://www.threads.com/@{handle}" if handle else ""
             else: url = f"https://www.facebook.com/{handle}" if handle else ""
+            audience = audience_accounts.get(handle, {}) if handle else {}
+            if not audience:
+                for candidate in audience_accounts.values():
+                    if isinstance(candidate, dict) and str(candidate.get("identity") or candidate.get("handle") or "").lstrip("@") == handle:
+                        audience = candidate
+                        break
+            yesterday_views = audience.get("views")
+            views_delta = audience.get("delta")
             rows.append({
                 "platform": labels[platform],
                 "platform_key": platform,
@@ -1044,6 +1074,8 @@ def get_sns_data() -> list[dict[str, object]]:
                 # Keep this explicit so the dashboard cannot present a fake action.
                 "publish_connected": False,
                 "publish_unavailable_reason": "계정에서 콘텐츠를 확인하고 게시하세요. 통제실 자동 발행 연결은 아직 확인되지 않았습니다." if handle else "계정 주소 확인이 필요합니다.",
+                "yesterday_views": yesterday_views,
+                "views_delta": views_delta,
                 **metrics,
             })
     return rows
@@ -2299,6 +2331,8 @@ def site_publication_history():
 
 @app.route("/")
 def index():
+    if request.host.split(":", 1)[0].lower() == "blog.korea365.org":
+        return render_template("blog_dashboard.html"), 200, {"Cache-Control": "no-store"}
     # 2026-09-03: WP cards no longer show a manual keyword-entry form (WP
     # auto-publishes from its own keyword pool once the GPT gate approves),
     # so per-site keyword_suggestions is no longer rendered — drop the
@@ -2422,6 +2456,10 @@ _install_social_accounts(app, get_site_data)
 from .pipeline_status import install as _install_pipeline_status
 _install_pipeline_status(app)
 
+
+from .naver_blog import get_naver_data
+from .blog_korea365_ranking import install as _install_blog_korea365_ranking
+_install_blog_korea365_ranking(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_data)
 
 from .london_gpt_app import install as _install_london_gpt_app
 _london_gpt_snapshot = _install_london_gpt_app(app, _sys.modules[__name__])

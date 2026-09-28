@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Korea365 Blog Control</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a;background:#f1f5f9}
+*{box-sizing:border-box} body{margin:0;background:#f1f5f9} a{text-decoration:none;color:inherit}
+.top{position:sticky;top:0;z-index:20;background:#0f172a;color:#fff;border-bottom:1px solid #1e293b}
+.topin{max-width:1500px;margin:auto;padding:10px 12px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.brand{font-size:18px;font-weight:900}.sub{font-size:11px;color:#94a3b8;margin-top:2px}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;min-width:360px}
+.nav a{padding:9px 10px;border-radius:9px;text-align:center;font-size:12px;font-weight:900;background:#1e293b}
+.nav a.active{background:#2563eb}.wrap{max-width:1500px;margin:auto;padding:14px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:12px}
+.hero h1{font-size:23px;margin:0;font-weight:950}.hero p{margin:5px 0 0;color:#475569;font-size:12px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{background:#fff;border:1px solid #cbd5e1;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.toolbar{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
+.search{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:14px}
+.refresh{border:0;border-radius:10px;padding:0 14px;background:#0f172a;color:#fff;font-weight:900}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.card{background:#fff;border:1px solid #dbe3ee;border-radius:14px;padding:12px;box-shadow:0 2px 7px rgba(15,23,42,.05);min-width:0}
+.card.alert{border-color:#f59e0b}.card.offline{border-color:#ef4444}
+.head{display:flex;align-items:flex-start;gap:8px}.rank{font-size:22px;line-height:1;font-weight:950;min-width:42px}
+.meta{min-width:0;flex:1}.site{font-size:14px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.url{font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.platform{font-size:9px;font-weight:950;padding:3px 6px;border-radius:999px;background:#e2e8f0;color:#334155}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
+.metric{border:1px solid #e2e8f0;border-radius:10px;padding:8px;background:#f8fafc}
+.label{font-size:9px;color:#64748b;font-weight:800}.value{font-size:17px;font-weight:950;margin-top:2px}
+.delta{font-size:10px;font-weight:850}.up{color:#059669}.down{color:#dc2626}.flat{color:#64748b}.unknown{color:#b45309}
+.foot{border-top:1px solid #e2e8f0;margin-top:9px;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.status{font-size:9px;font-weight:850}.good{color:#047857}.warn{color:#b45309}.bad{color:#b91c1c}
+.time{font-size:9px;color:#94a3b8;text-align:right}.empty{padding:40px;text-align:center;color:#64748b;background:#fff;border-radius:14px}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:780px){.topin{display:block}.nav{margin-top:8px;min-width:0}.grid{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.badges{justify-content:flex-start}}
+@media(max-width:520px){.wrap{padding:10px}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.brand{font-size:16px}.hero h1{font-size:20px}}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="topin">
+<div><div class="brand">Korea365 BLOG</div><div class="sub">68개 블로그 통합 순위 · KST</div></div>
+<nav class="nav" aria-label="Korea365 apps">
+<a href="https://control.korea365.org">CONTROL</a>
+<a class="active" href="https://blog.korea365.org">BLOG</a>
+<a href="https://youtube.korea365.org">YOUTUBE</a>
+<a href="https://sns.korea365.org">SNS</a>
+</nav>
+</div>
+</header>
+<main class="wrap">
+<section class="hero">
+<div>
+<h1>어제 방문자수 기준 1위 → 68위</h1>
+<p>WP 25 + 뉴스 2 + Blogspot 33 + Naver 3 + Tistory 5 · 플랫폼 구분 없이 한 순위</p>
+</div>
+<div class="badges">
+<span class="pill" id="count">68 cards</span>
+<span class="pill" id="fresh">데이터 확인 중</span>
+<span class="pill" id="connectors">연결 상태 확인 중</span>
+</div>
+</section>
+<section class="toolbar">
+<input id="search" class="search" type="search" placeholder="사이트명 · 주소 · 플랫폼 검색">
+<button id="refresh" class="refresh" type="button">새로고침</button>
+</section>
+<section id="cards" class="grid" aria-live="polite"><div class="empty">68개 사이트 데이터를 불러오는 중…</div></section>
+</main>
+<script>
+const cardsEl=document.getElementById('cards');
+const fmt=v=>Number.isFinite(v)?new Intl.NumberFormat('ko-KR').format(v):'연결 필요';
+const delta=v=>{
+ if(!Number.isFinite(v)) return '<span class="delta unknown">(증감 연결 필요)</span>';
+ const cls=v>0?'up':v<0?'down':'flat';
+ const sign=v>0?'+':'';
+ return '<span class="delta '+cls+'">('+sign+new Intl.NumberFormat('ko-KR').format(v)+')</span>';
+};
+const badge=p=>({wordpress:'WP',blogspot:'BLOGSPOT',naver:'NAVER',tistory:'TISTORY'}[p]||String(p||'').toUpperCase());
+const metric=(label,value,diff,extra='')=>'<div class="metric"><div class="label">'+label+extra+'</div><div class="value">'+fmt(value)+' '+delta(diff)+'</div></div>';
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let allCards=[];
+function connectorText(c){
+ const s=c.connector_status||{};
+ const bad=Object.entries(s).filter(([,v])=>!v?.connected);
+ if(!bad.length) return {cls:'good',text:'DATA 4/4 연결'};
+ return {cls:'bad',text:'연결 필요 · '+bad.map(([k])=>k).join(', ')};
+}
+function cardHtml(c){
+ const status=connectorText(c);
+ const rank=Number.isFinite(c.rank)?'#'+c.rank:'—';
+ const title=esc(c.name||c.url);
+ const url=esc(c.url||'');
+ const verified=c.google_indexed_verified_via==='gsc'?' · GSC':' · 연결 필요';
+ const cardClass=status.cls==='good'?'card':'card offline';
+ return '<article class="'+cardClass+'" data-search="'+esc((c.name+' '+c.url+' '+c.platform).toLowerCase())+'">'+
+ '<div class="head"><div class="rank">'+rank+'</div><div class="meta">'+
+ '<div class="site"><a href="'+url+'" target="_blank" rel="noopener">'+title+'</a></div>'+
+ '<div class="url">'+url+'</div></div><span class="platform">'+badge(c.platform)+'</span></div>'+
+ '<div class="metrics">'+
+ metric('1. 어제 방문자',c.yesterday_visitors,c.yesterday_visitors_delta)+
+ metric('2. 총 방문자',c.total_visitors,c.total_visitors_delta)+
+ metric('3. 총 콘텐츠',c.total_content,c.total_content_delta)+
+ metric('4. Google 색인',c.google_indexed,c.google_indexed_delta,verified)+
+ '</div><div class="foot"><span class="status '+status.cls+'">'+esc(status.text)+'</span>'+
+ '<span class="time">'+esc(c.checked_at||'확인 시각 연결 필요')+'</span></div></article>';
+}
+function render(){
+ const q=document.getElementById('search').value.trim().toLowerCase();
+ const rows=q?allCards.filter(c=>(c.name+' '+c.url+' '+c.platform).toLowerCase().includes(q)):allCards;
+ cardsEl.innerHTML=rows.length?rows.map(cardHtml).join(''):'<div class="empty">검색 결과 없음</div>';
+}
+async function load(){
+ cardsEl.innerHTML='<div class="empty">68개 사이트 데이터를 불러오는 중…</div>';
+ try{
+   const r=await fetch('/api/blog-korea365/ranking',{cache:'no-store'});
+   if(!r.ok) throw new Error('HTTP '+r.status);
+   const data=await r.json();
+   allCards=data.cards||[];
+   document.getElementById('count').textContent=(data.total_cards||0)+' cards';
+   document.getElementById('fresh').textContent='갱신 '+(data.generated_at||'').replace('T',' ').slice(0,16)+' KST';
+   const healthy=allCards.filter(c=>Object.values(c.connector_status||{}).every(x=>x?.connected)).length;
+   document.getElementById('connectors').textContent='4지표 완전연결 '+healthy+'/'+allCards.length;
+   render();
+ }catch(e){
+   cardsEl.innerHTML='<div class="empty">데이터 연결 오류: '+esc(e.message)+'</div>';
+ }
+}
+document.getElementById('search').addEventListener('input',render);
+document.getElementById('refresh').addEventListener('click',load);
+load();
+setInterval(load,300000);
+</script>
+</body>
+</html>

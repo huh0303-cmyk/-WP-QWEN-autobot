@@ -84,7 +84,16 @@ def install(module):
                         conn.execute('INSERT INTO total VALUES(?,1) ON CONFLICT(site_key) DO UPDATE SET count=count+1',(site_key,))
                     cutoff=(datetime.now(KST)-timedelta(days=8)).date().isoformat()
                     conn.execute('DELETE FROM seen WHERE date<?',(cutoff,))
+            yesterday=(datetime.now(KST)-timedelta(days=1)).date().isoformat()
+            day_before=(datetime.now(KST)-timedelta(days=2)).date().isoformat()
             day=conn.execute('SELECT count FROM daily WHERE site_key=? AND date=?',(site_key,today)).fetchone()
+            prev=conn.execute('SELECT count FROM daily WHERE site_key=? AND date=?',(site_key,yesterday)).fetchone()
+            prev2=conn.execute('SELECT count FROM daily WHERE site_key=? AND date=?',(site_key,day_before)).fetchone()
             total=conn.execute('SELECT count FROM total WHERE site_key=?',(site_key,)).fetchone()
-        return respond({'today':day['count'] if day else 0,'total':total['count'] if total else 0,
-                        'counted':counted,'date':today,'timezone':'Asia/Seoul','metric':'daily_browser_visits_since_install'})
+        today_count=day['count'] if day else 0
+        yesterday_count=prev['count'] if prev else 0
+        day_before_count=prev2['count'] if prev2 else 0
+        return respond({'today':today_count,'yesterday':yesterday_count,'day_before_yesterday':day_before_count,
+                        'today_delta':today_count-yesterday_count,'yesterday_delta':yesterday_count-day_before_count,
+                        'total':total['count'] if total else 0,'counted':counted,'date':today,
+                        'timezone':'Asia/Seoul','metric':'daily_browser_visits_since_install'})
