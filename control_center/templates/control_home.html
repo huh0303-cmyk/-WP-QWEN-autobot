@@ -79,10 +79,11 @@ const dateLabel=s=>{if(!s)return '';const [y,m,d]=s.split('-').map(Number);retur
 function shortSite(c){
  try{
   const u=new URL(c.url);let h=u.hostname.replace(/^www\./,'');
-  if(h==='blog.naver.com'){const p=u.pathname.split('/').filter(Boolean);return (p[0]||'naver').slice(0,12);}
-  h=h.replace(/\.blogspot\.com$/,'').replace(/\.tistory\.com$/,'').replace(/\.(com|org|net)$/,'');
+  if(h==='blog.naver.com'){const p=u.pathname.split('/').filter(Boolean);return (c.name||p[0]||'naver').slice(0,14);}
+  if(h.endsWith('.tistory.com')) return String(c.name||h.replace(/\.tistory\.com$/,'')).slice(0,16);
+  h=h.replace(/\.blogspot\.com$/,'').replace(/\.(com|org|net)$/,'');
   return h.slice(0,12);
- }catch(_){return String(c.name||'').replace(/\.(com|org|net)$/,'').slice(0,12);}
+ }catch(_){return String(c.name||'').replace(/\.(com|org|net)$/,'').slice(0,16);}
 }
 const COL_MIN=4,COL_MAX=420;
 const DEFAULTS={
