@@ -1,1 +1,1 @@
-{"day": "2026-09-28", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-28-blogger_kworld365_kpop-088e5b9f", "claimed_at": "2026-09-28T15:47:42.137765+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-28", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-28-blogger_kworld365_kpop-088e5b9f", "claimed_at": "2026-09-28T15:47:42.137765+09:00", "run_id": 36388252911, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
