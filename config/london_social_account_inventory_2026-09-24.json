@@ -120,6 +120,8 @@
       "channel_id": "UCGTd7RhfaUaGGbVRsNPUN6Q",
       "state": "public_feed_verified",
       "handle": "SIS_ChineseSurvival",
+      "created_at": "2026-09-12",
+      "recent_publish_date": "2026-09-13",
       "identity_verified_live": true
     },
     {
@@ -128,6 +130,8 @@
       "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
       "state": "public_feed_verified",
       "handle": "Portuguese_survival",
+      "created_at": "2026-08-02",
+      "recent_publish_date": "2026-09-13",
       "identity_verified_live": true
     },
     {
@@ -136,6 +140,8 @@
       "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
       "state": "public_feed_verified",
       "handle": "SIS_VietnameseSurvival",
+      "created_at": "2025-05-10",
+      "recent_publish_date": "2026-09-13",
       "identity_verified_live": true
     },
     {

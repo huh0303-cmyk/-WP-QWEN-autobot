@@ -102,8 +102,8 @@ def build_youtube_ranking(bucket: int) -> dict:
             "videos": videos,
             "video_delta": _delta(videos, previous.get("videos") if isinstance(previous, dict) else None),
             "revenue": _social_revenue("YouTube", current.get("handle") or item.get("handle") or "", item.get("channel_id", "")),
-            "opening_date": timeline.get("opening_date") or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
-            "recent_publish_date": timeline.get("recent_publish_date", ""),
+            "opening_date": timeline.get("opening_date") or str(item.get("created_at") or "")[:10] or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
+            "recent_publish_date": timeline.get("recent_publish_date") or str(item.get("recent_publish_date") or "")[:10],
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
         })
