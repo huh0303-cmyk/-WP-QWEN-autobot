@@ -373,7 +373,8 @@ async function pollRun(){
     }
     if(d.publish_mode==='manual' && s.publish==='manual_required'){
       document.getElementById('manualPublish').classList.remove('hidden');
-      setAgent('publish','manual_required','발행 자료 준비 완료 · 직접 공개한 뒤 URL 검증');
+      setAgent('publish','manual_required',d.review_reason||'발행 자료 준비 완료 · 직접 공개한 뒤 URL 검증');
+      if(d.review_reason)document.getElementById('manualMessage').textContent=d.review_reason;
       if(pollTimer)clearInterval(pollTimer);
       autoBtn.disabled=false;setModeUI();
     }
