@@ -1,0 +1,70 @@
+name: Daily Google metrics snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * *'  # 07:00 KST
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: google-metrics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests google-auth -q
+      - name: Verify GSC and AdSense OAuth
+        env:
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+        run: python scripts/verify_gsc_adsense_oauth.py
+      - name: Snapshot GSC properties
+        env:
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+        run: python scripts/gsc_property_snapshot.py
+      - name: Collect WP and Blogger metrics
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/core_metrics_report.py
+      - name: Refresh Google URL Inspection evidence
+        env:
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/core_metrics_report.py --refresh-index
+      - name: Persist read-only metrics snapshots
+        run: |
+          git config user.name "korea365-metrics-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/gsc_properties.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html
+          if git diff --cached --quiet; then
+            echo "No metrics changes"
+          else
+            git commit -m "data: refresh Google metrics [skip ci]"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-metrics-snapshot-${{ github.run_id }}
+          path: |
+            data/gsc_properties.json
+            data/core_metrics_latest.json
+            data/core_metrics_daily_latest.json
+            data/core_metrics_report.html
+          if-no-files-found: warn
+          retention-days: 14

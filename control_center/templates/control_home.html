@@ -124,7 +124,7 @@ async function loadBlog(){
 }
 async function loadSocial(){
  const r=await fetch('/api/control/social-ranking',{cache:'no-store'});if(!r.ok)throw new Error('social '+r.status);const d=await r.json();
- const socialDate=String(d.generated_at||'').slice(0,10);
+ const socialDate=String(d.ranking_date||d.generated_at||'').slice(0,10);
  document.getElementById('social-title').textContent='SNS 순위 ('+dateLabel(socialDate)+')';
  document.getElementById('social-subtitle').textContent='현재 확인 '+d.youtube_total+' YouTube + '+d.sns_active_total+' SNS = '+d.total+' · 목표 30(YouTube18+SNS12) '+(d.count_confirmation_required?'재확인 필요':'확정')+' · KST 기준';
  document.getElementById('social-rows').innerHTML=(d.rows||[]).map(c=>{const p=String(c.platform||'').toLowerCase();return '<tr class="platform-'+esc(p)+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(c.platform)+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td>'+esc(c.category||'—')+'</td><td>'+metric(c.audience,c.audience_delta)+'</td><td>'+metric(c.views,c.views_delta)+'</td><td>'+(Number.isFinite(c.content_count)?nf.format(c.content_count):'—')+'</td><td>'+(c.connected?'<span class="good">정상</span>':'<span class="warn">연결 필요</span>')+'</td></tr>'}).join('');

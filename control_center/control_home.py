@@ -206,6 +206,7 @@ def build_social_ranking(bucket: int) -> dict:
     sns_active_total = sum(1 for item in sns["rows"] if item.get("role") in ACTIVE_SOCIAL_ROLES)
     return {
         "generated_at": datetime.now(KST).isoformat(),
+        "ranking_date": (datetime.now(KST).date() - timedelta(days=1)).isoformat(),
         "total": len(rows),
         "ranked": rank,
         "youtube_total": youtube_total,
