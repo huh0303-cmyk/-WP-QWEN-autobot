@@ -29,7 +29,7 @@ th{position:sticky;top:0;z-index:4;background:#e2e8f0;text-align:center;font-wei
 body.col-resizing{cursor:col-resize!important;user-select:none!important}
 
 td:first-child,td:nth-child(2){text-align:center;font-weight:900}
-.blog td:nth-child(3),.blog td:nth-child(8),.blog td:nth-child(9),.blog td:nth-child(11),.blog td:nth-child(12),.social td:nth-child(3),.social td:nth-child(4){text-align:left}
+.blog td:nth-child(3),.blog td:nth-child(8),.blog td:nth-child(9),.blog td:nth-child(11),.blog td:nth-child(12),.social td:nth-child(3),.social td:nth-child(4),.social td:nth-child(5),.social td:nth-child(6){text-align:left}
 tbody tr:hover{filter:brightness(.98)}
 .platform-wp{background:#eef5ff}.platform-blogspot{background:#fff7e6}.platform-naver{background:#edfdf3}.platform-tistory{background:#fff8cc}
 .platform-youtube{background:#fff0f0}.platform-instagram{background:#f8efff}.platform-facebook{background:#edf4ff}.platform-tiktok{background:#eefcff}.platform-threads{background:#f3f4f6}
@@ -55,8 +55,8 @@ tbody tr:hover{filter:brightness(.98)}
 <section class="section">
 <div class="section-head"><div><h2 id="social-title">SNS 순위</h2><p id="social-subtitle">YouTube + TikTok + Facebook + Instagram + Threads 통합 · 구독자/팔로워수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="https://youtube.korea365.org">YOUTUBE 상세 →</a><a class="more" href="https://sns.korea365.org">SNS 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table social"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>계정/채널</th><th>카테고리</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th>
-</tr></thead><tbody id="social-rows"><tr><td colspan="8" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
+<th>순위</th><th>플랫폼</th><th>채널/계정명</th><th>핸들</th><th>채널ID</th><th>카테고리</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th>
+</tr></thead><tbody id="social-rows"><tr><td colspan="10" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <div id="updated" style="font-size:9px;color:#64748b;text-align:right">갱신 중…</div>
 </main>
@@ -79,7 +79,7 @@ function shortSite(c){
  }catch(_){return String(c.name||'').replace(/\.(com|org|net)$/,'').slice(0,12);}
 }
 const COL_MIN=4,COL_MAX=420;
-const DEFAULTS={blog:[42,58,72,92,98,84,90,90,96,86,136,136],social:[42,68,120,92,105,105,72,72]};
+const DEFAULTS={blog:[42,58,72,92,98,84,90,90,96,86,136,136],social:[42,68,120,118,155,92,105,105,72,72]};
 function installColumnMemory(table,key){
  if(!table)return;
  const heads=[...table.querySelectorAll('thead th')];
@@ -145,9 +145,15 @@ async function loadSocial(){
  document.getElementById('social-subtitle').textContent='YouTube + TikTok + Facebook + Instagram + Threads 통합 · 구독자/팔로워수 내림차순 · KST 기준';
  document.getElementById('social-rows').innerHTML=(d.rows||[]).map(c=>{
   const p=String(c.platform||'').toLowerCase();
+  const isYt=p==='youtube';
+  const canonical=isYt&&c.channel_id?'https://www.youtube.com/channel/'+encodeURIComponent(c.channel_id):(c.url||'');
+  const handle=c.handle?('@'+String(c.handle).replace(/^@/,'')):'';
+  const handleCell=handle?(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(handle)+'</a>':esc(handle)):'';
+  const idCell=isYt&&c.channel_id?'<span title="'+esc(c.channel_id)+'">'+esc(c.channel_id)+'</span>':'';
   return '<tr class="platform-'+esc(p)+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(c.platform)+'</span></td>'+
-  '<td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td>'+
-  '<td>'+esc(c.category||'')+'</td><td>'+metric(c.audience,c.audience_delta)+'</td><td>'+metric(c.views,c.views_delta)+'</td>'+
+  '<td>'+(canonical?'<a href="'+esc(canonical)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td>'+
+  '<td>'+handleCell+'</td><td>'+idCell+'</td><td>'+esc(c.category||'')+'</td>'+
+  '<td>'+metric(c.audience,c.audience_delta)+'</td><td>'+metric(c.views,c.views_delta)+'</td>'+
   '<td>'+(Number.isFinite(c.content_count)?nf.format(c.content_count):'')+'</td><td>'+(c.connected?'<span class="good">정상</span>':'')+'</td></tr>';
  }).join('');
  return d.generated_at;

@@ -164,8 +164,14 @@ def build_social_ranking(bucket: int) -> dict:
         rows.append({
             "platform": "YouTube",
             "name": item.get("name"),
+            "handle": item.get("handle") or "",
+            "channel_id": item.get("channel_id") or "",
             "category": item.get("category") or "YouTube",
-            "url": item.get("url") or "",
+            "url": (
+                f"https://www.youtube.com/@{item.get('handle')}"
+                if item.get("handle")
+                else item.get("url") or ""
+            ),
             "audience": item.get("subscribers"),
             "audience_delta": item.get("subscriber_delta"),
             "views": item.get("views"),
@@ -179,6 +185,8 @@ def build_social_ranking(bucket: int) -> dict:
         rows.append({
             "platform": item.get("platform"),
             "name": item.get("name"),
+            "handle": item.get("handle") or "",
+            "channel_id": "",
             "category": item.get("role") or "",
             "url": item.get("url") or "",
             "audience": item.get("followers"),

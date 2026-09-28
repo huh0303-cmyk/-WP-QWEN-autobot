@@ -127,25 +127,29 @@
       "group": "language",
       "name": "French Survival",
       "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
-      "state": "analytics_connected"
+      "state": "analytics_connected",
+      "handle": "SIS_FrenchSurvival"
     },
     {
       "group": "language",
       "name": "German Survival",
       "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
-      "state": "analytics_connected"
+      "state": "analytics_connected",
+      "handle": "SIS_GermanSurvival"
     },
     {
       "group": "language",
       "name": "Spanish Survival",
       "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
-      "state": "analytics_connected"
+      "state": "analytics_connected",
+      "handle": "SIS_SpanishSurvival"
     },
     {
       "group": "language",
       "name": "Italian Survival",
       "channel_id": "UCK8B-BM09Cz-ockaQYLL5LA",
-      "state": "analytics_connected"
+      "state": "analytics_connected",
+      "handle": "SIS_ItalianSurvival"
     }
   ],
   "tiktok": [
