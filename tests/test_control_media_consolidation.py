@@ -125,9 +125,14 @@ def test_youtube_group_order_and_verified_survival_channels_are_explicit():
     source = (ROOT / "control_center" / "social_accounts.py").read_text(encoding="utf-8")
     inventory = (ROOT / "config" / "london_social_account_inventory_2026-09-24.json").read_text(encoding="utf-8")
     assert '"language": 0, "playlist": 1, "knowledge": 2, "health": 3, "shopping": 4' in source
-    assert '"Chinese Survival": 4' in source
-    assert '"Portuguese Survival": 5' in source
-    assert '"Vietnamese Survival": 6' in source
+    assert '"서울국제대학-TOPIK센터": 0' in source
+    assert '"Chinese Survival": 5' in source
+    assert '"Portuguese Survival": 6' in source
+    assert '"Vietnamese Survival": 7' in source
+    assert inventory.count('"group": "language"') == 10
+    assert inventory.count('"group": "health"') == 2
+    assert inventory.count('"group": "shopping"') == 2
+    assert '"role": "multilingual_shopping"' in inventory
     assert "UCGTd7RhfaUaGGbVRsNPUN6Q" in inventory
     assert "UCKvKhETLGPaRV3qfWv2bM2g" in inventory
     assert "UCRZ0uc_bxKDMwz3noBBi9KQ" in inventory

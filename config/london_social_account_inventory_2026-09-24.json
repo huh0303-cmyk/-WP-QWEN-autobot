@@ -90,7 +90,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "additional",
+      "group": "language",
       "name": "서울국제대학-TOPIK센터",
       "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
       "state": "analytics_connected",
@@ -145,7 +145,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "additional",
+      "group": "health",
       "name": "Health Clinic USA",
       "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
       "state": "analytics_connected",
@@ -155,7 +155,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "additional",
+      "group": "shopping",
       "name": "Seoul_Jisoo1",
       "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
       "state": "analytics_connected",
@@ -165,7 +165,7 @@
       "identity_verified_live": true
     },
     {
-      "group": "additional",
+      "group": "health",
       "name": "Health_Clinic_Japan",
       "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
       "state": "analytics_connected",
@@ -268,8 +268,10 @@
       "platform": "youtube",
       "name": "SIS-Language Center",
       "handle": "sis_languagecenter",
-      "group": "additional",
-      "reason": "provided handle returned HTTP 404 on 2026-09-29; exact UC id still required"
+      "group": "shopping",
+      "role": "multilingual_shopping",
+      "topic": "다국어 상품 소개·쇼핑 전환 채널로 변경 예정",
+      "reason": "shopping direction confirmed; provided handle returned HTTP 404 on 2026-09-29; exact UC id still required"
     },
     {
       "platform": "tiktok",
