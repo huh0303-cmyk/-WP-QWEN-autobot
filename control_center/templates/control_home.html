@@ -18,7 +18,8 @@ main{max-width:1800px;margin:auto;padding:7px 7px 22px}.section{background:#fff;
 .sheet{overflow:auto;max-height:45vh;overscroll-behavior:contain}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;font-size:9.5px}
 th,td{height:25px;padding:3px 4px;border-right:1px solid #dbe3ee;border-bottom:1px solid #dbe3ee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
-th{position:sticky;top:0;z-index:4;background:#e2e8f0;text-align:center;font-weight:950;resize:horizontal;overflow:auto;min-width:42px;max-width:320px}
+th{position:sticky;top:0;z-index:4;background:#e2e8f0;text-align:center;font-weight:950;overflow:hidden;min-width:18px;max-width:420px;touch-action:none}
+th.col-resize-active{cursor:col-resize;user-select:none} body.col-resizing{cursor:col-resize;user-select:none}
 .blog th:nth-child(1){width:42px}.blog th:nth-child(2){width:58px}.blog th:nth-child(3){width:72px}.blog th:nth-child(4){width:92px}.blog th:nth-child(5){width:98px}.blog th:nth-child(6){width:84px}.blog th:nth-child(7){width:90px}.blog th:nth-child(8){width:90px}.blog th:nth-child(9){width:96px}.blog th:nth-child(10){width:86px}.blog th:nth-child(11),.blog th:nth-child(12){width:136px}
 .social th:nth-child(1){width:42px}.social th:nth-child(2){width:68px}.social th:nth-child(3){width:120px}.social th:nth-child(4){width:92px}.social th:nth-child(5),.social th:nth-child(6){width:105px}.social th:nth-child(7){width:72px}.social th:nth-child(8){width:72px}
 td:first-child,td:nth-child(2){text-align:center;font-weight:900}.blog td:nth-child(3),.blog td:nth-child(8),.blog td:nth-child(9),.blog td:nth-child(11),.blog td:nth-child(12),.social td:nth-child(3),.social td:nth-child(4){text-align:left}
@@ -60,6 +61,46 @@ const money=r=>{if(!r||!r.monetized)return '—';if(!Number.isFinite(r.amount))r
 const hostInfo=o=>{if(!o)return '<span class="warn">연결 필요</span>';const p=esc(o.provider||'확인중'),pay=esc(o.payment_date||'—'),ren=esc(o.renewal_date||'—');return p+' / '+pay+' / '+ren;};
 const weekday=s=>{if(!s)return '';const d=new Date(s+'T00:00:00+09:00');return ['일','월','화','수','목','금','토'][d.getDay()]};
 const dateLabel=s=>{if(!s)return '';const [y,m,d]=s.split('-').map(Number);return y+'-'+m+'-'+d+'-'+weekday(s)};
+const COL_MIN=18,COL_MAX=420;
+function installColumnMemory(table,key){
+ if(!table)return;
+ const heads=[...table.querySelectorAll('thead th')];
+ let group=table.querySelector('colgroup');
+ if(!group){group=document.createElement('colgroup');table.insertBefore(group,table.firstChild);}
+ while(group.children.length<heads.length)group.appendChild(document.createElement('col'));
+ const cols=[...group.children].slice(0,heads.length);
+ let saved=[];
+ try{saved=JSON.parse(localStorage.getItem('k365-colwidths-'+key)||'[]')}catch(_){}
+ saved.forEach((w,i)=>{if(cols[i]&&Number.isFinite(Number(w))){w=Math.max(COL_MIN,Math.min(COL_MAX,Number(w)));cols[i].style.width=w+'px';heads[i].style.width=w+'px';}});
+ let drag=null;
+ heads.forEach((th,i)=>{
+   th.addEventListener('pointermove',e=>{if(drag)return;const r=th.getBoundingClientRect();th.classList.toggle('col-resize-active',r.right-e.clientX<=10);});
+   th.addEventListener('pointerleave',()=>{if(!drag)th.classList.remove('col-resize-active');});
+   th.addEventListener('pointerdown',e=>{
+     const r=th.getBoundingClientRect();
+     if(r.right-e.clientX>10)return;
+     e.preventDefault();
+     drag={i,startX:e.clientX,startW:r.width,th};
+     document.body.classList.add('col-resizing');
+     th.classList.add('col-resize-active');
+     try{th.setPointerCapture(e.pointerId)}catch(_){}
+   });
+ });
+ document.addEventListener('pointermove',e=>{
+   if(!drag)return;
+   const w=Math.max(COL_MIN,Math.min(COL_MAX,drag.startW+(e.clientX-drag.startX)));
+   cols[drag.i].style.width=w+'px';heads[drag.i].style.width=w+'px';
+ });
+ document.addEventListener('pointerup',()=>{
+   if(!drag)return;
+   const widths=heads.map((th,i)=>Math.round(parseFloat(cols[i].style.width)||th.getBoundingClientRect().width));
+   try{localStorage.setItem('k365-colwidths-'+key,JSON.stringify(widths))}catch(_){}
+   drag.th.classList.remove('col-resize-active');document.body.classList.remove('col-resizing');drag=null;
+ });
+}
+installColumnMemory(document.querySelector('table.blog'),'blog-v1');
+installColumnMemory(document.querySelector('table.social'),'social-v1');
+
 function shortSite(c){
  try{
   const u=new URL(c.url); let h=u.hostname.replace(/^www\./,'');
