@@ -61,3 +61,20 @@ def test_manual_run_and_publish_rerun_guard(monkeypatch, tmp_path):
     run_id = response.json["run_id"]
     assert london_gpt_app._read_run(run_id)["publish_mode"] == "manual"
     assert client.post("/api/london-gpt/rerun/publish", json={"run_id": run_id}).status_code == 409
+
+
+def test_image_clipboard_endpoint_reads_only_trusted_run_image(monkeypatch, tmp_path):
+    client = _app(monkeypatch, tmp_path)
+    run_id = "lgpt-20260928-120000-abcdef"
+    london_gpt_app._write_run({"run_id": run_id, "image": {"url": "https://raw.githubusercontent.com/example/photo.webp"}})
+    class FakeResponse:
+        status_code = 200
+        headers = {"content-type": "image/webp"}
+        def iter_content(self, size): return iter([b"RIFFimage"])
+        def __enter__(self): return self
+        def __exit__(self, *args): return None
+    monkeypatch.setattr(london_gpt_app.requests, "get", lambda *a, **kw: FakeResponse())
+    copied = client.get(f"/api/london-gpt/image/{run_id}")
+    assert copied.status_code == 200 and copied.data == b"RIFFimage"
+    london_gpt_app._write_run({"run_id": run_id, "image": {"url": "http://127.0.0.1/private"}})
+    assert client.get(f"/api/london-gpt/image/{run_id}").status_code == 404

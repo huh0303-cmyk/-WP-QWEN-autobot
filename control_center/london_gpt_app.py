@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import json
 import html
+import io
 import os
 import re
 import secrets
@@ -29,6 +30,8 @@ N8N_RERUN_WEBHOOKS = {
     "publish": os.environ.get("LONDON_GPT_N8N_RERUN_PUBLISH", "http://127.0.0.1:5678/webhook/london-content-rerun-publish"),
 }
 GATEWAY = os.environ.get("LONDON_GPT_GATEWAY", "http://127.0.0.1:8766").rstrip("/")
+WRITER_MODELS = {"auto_free", "local_qwen", "gpt-5-mini", "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash-lite"}
+IMAGE_MODELS = {"auto_free", "pexels", "pixabay", "none", "replicate_sdxl", "replicate_flux"}
 
 
 def _safe_call(fn, fallback):
@@ -195,6 +198,10 @@ def install(app, runtime):
         site_id = str(payload.get("site_id") or "").strip()
         category = str(payload.get("category") or "").strip()
         publish_mode = str(payload.get("publish_mode") or "draft").strip().lower()
+        writer_model = str(payload.get("writer_model") or "auto_free").strip()
+        image_model = str(payload.get("image_model") or "auto_free").strip()
+        if writer_model not in WRITER_MODELS or image_model not in IMAGE_MODELS:
+            return jsonify({"ok": False, "error": "invalid_model_choice"}), 400
         valid = {site["site_id"]: site for site in _content_sites()}
         if site_id not in valid or not valid[site_id].get("enabled", True):
             return jsonify({"ok": False, "error": "unknown_site"}), 400
@@ -212,6 +219,8 @@ def install(app, runtime):
             "platform": valid[site_id].get("platform", "wordpress"),
             "category": category,
             "publish_mode": publish_mode,
+            "writer_model": writer_model,
+            "image_model": image_model,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "orchestrator": "n8n",
             "stage_status": {
@@ -374,6 +383,34 @@ def install(app, runtime):
                 except (OSError, ValueError):
                     pass
         return jsonify(state)
+
+    @app.get("/api/london-gpt/image/<run_id>")
+    def london_gpt_copy_image(run_id: str):
+        from flask import jsonify, send_file
+        if not re.fullmatch(r"lgpt-[0-9]{8}-[0-9]{6}-[a-f0-9]{6}", run_id):
+            return jsonify({"error": "invalid_run_id"}), 400
+        image_url = str((_read_run(run_id).get("image") or {}).get("url") or "")
+        parsed = urlparse(image_url)
+        host = (parsed.hostname or "").lower()
+        allowed = ("images.pexels.com", "pixabay.com", "i.pximg.net", "raw.githubusercontent.com", "replicate.delivery", "pbxt.replicate.delivery")
+        if parsed.scheme != "https" or parsed.port not in (None, 443) or host not in allowed:
+            return jsonify({"error": "image_unavailable"}), 404
+        try:
+            with requests.get(image_url, stream=True, timeout=20, allow_redirects=False) as response:
+                if response.status_code != 200:
+                    return jsonify({"error": "image_unavailable"}), 404
+                kind = response.headers.get("content-type", "").split(";", 1)[0].lower()
+                if kind not in {"image/png", "image/jpeg", "image/webp"}:
+                    return jsonify({"error": "unsupported_image"}), 415
+                chunks, size = [], 0
+                for chunk in response.iter_content(65536):
+                    size += len(chunk)
+                    if size > 10_000_000:
+                        return jsonify({"error": "image_too_large"}), 413
+                    chunks.append(chunk)
+        except requests.RequestException:
+            return jsonify({"error": "image_unavailable"}), 502
+        return send_file(io.BytesIO(b"".join(chunks)), mimetype=kind, max_age=0)
 
     @app.post("/api/london-gpt/rerun/<stage>")
     def london_gpt_rerun(stage: str):

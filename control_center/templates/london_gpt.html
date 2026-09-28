@@ -50,6 +50,7 @@
         {% for site in snapshot.sites %}
         <option value="{{ site.site_id }}"
                 data-platform="{{ site.platform }}" data-auto="{{ 'true' if site.auto_publish else 'false' }}"
+                data-editor-url="{{ site.editor_url }}"
                 data-persona="{{ site.persona }}"
                 data-tone="{{ site.tone }}"
                 data-theme="{{ site.theme }}"
@@ -74,6 +75,31 @@
     </label>
   </div>
   <p id="platformNote" class="mt-3 text-sm text-amber-200"></p>
+  <div class="mt-4 grid gap-4 md:grid-cols-2">
+    <label class="block"><span class="mb-1 block text-xs font-black text-slate-400">글쓰기 모델 · 실패 시 무료 모델 순차 전환</span>
+      <select id="writerModel" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
+        <option value="auto_free" selected>자동 무료 우선 · Gemini 5종 → 로컬 Qwen (무료)</option>
+        <option value="gemini-3.5-flash">Gemini 3.5 Flash · 무료 등급</option>
+        <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite · 무료 등급</option>
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash · 무료 등급</option>
+        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · 무료 등급</option>
+        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · 무료 등급</option>
+        <option value="local_qwen">로컬 Qwen 2.5 3B · 무료</option>
+        <option value="gpt-5-mini">GPT-5 mini API · 유료, 직접 선택할 때만</option>
+      </select>
+    </label>
+    <label class="block"><span class="mb-1 block text-xs font-black text-slate-400">이미지 모델 · 무료 우선</span>
+      <select id="imageModel" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
+        <option value="auto_free" selected>Pexels → Pixabay 스톡 · 무료, 없으면 이미지 생략</option>
+        <option value="pexels">Pexels 스톡 · 무료</option>
+        <option value="pixabay">Pixabay 스톡 · 무료</option>
+        <option value="none">이미지 생략 · 무료</option>
+        <option value="replicate_sdxl">SDXL Lightning → FLUX Schnell · 유료, 직접 선택</option>
+        <option value="replicate_flux">FLUX Schnell → SDXL Lightning · 유료, 직접 선택</option>
+      </select>
+    </label>
+  </div>
+  <p class="mt-2 text-xs text-slate-400">무료 등급도 모델별 사용 한도가 있습니다. 이미지는 맞는 자료와 영구 주소가 확인될 때만 사용합니다.</p>
 
   <button id="autoBtn" class="mt-4 w-full rounded-xl bg-blue-600 px-4 py-4 text-base font-black hover:bg-blue-500 disabled:opacity-40">
     자동 실행 · ①→②→③→④
@@ -111,9 +137,9 @@
       {% elif step.id == 'write' %}
       <div class="mt-3 space-y-2 text-sm"><p id="agentArticleTitle" class="font-bold text-violet-300">원고 대기</p><p id="agentArticleMeta" class="text-slate-300"></p><p id="agentCategory" class="text-emerald-300"></p><div class="flex flex-wrap gap-2"><button class="copy-btn hidden" id="copyTitle" data-copy="title">제목 복사</button><button class="copy-btn hidden" id="copyHtml" data-copy="html">본문 HTML 복사</button><button class="copy-btn hidden" id="copyMeta" data-copy="meta">설명 복사</button><button class="copy-btn hidden" id="copyCategory" data-copy="category">카테고리 복사</button></div><details id="htmlDetails" class="hidden"><summary class="cursor-pointer text-blue-300">본문 HTML 보기</summary><textarea id="agentArticleHtml" readonly class="mt-2 h-48 w-full rounded-xl bg-slate-950 p-3 text-xs text-slate-200"></textarea></details></div>
       {% elif step.id == 'image' %}
-      <div class="mt-3 space-y-2 text-sm"><img id="agentImage" class="hidden max-h-48 rounded-xl object-contain" alt="Agent 3 결과 이미지"><p id="agentImageUrl" class="break-all text-slate-300">이미지 대기</p><button class="copy-btn hidden" id="copyImage" data-copy="image">이미지 URL 복사</button></div>
+      <div class="mt-3 space-y-2 text-sm"><img id="agentImage" class="hidden max-h-48 rounded-xl object-contain" alt="Agent 3 결과 이미지"><p id="agentImageUrl" class="break-all text-slate-300">이미지 대기</p><div class="flex flex-wrap gap-2"><button class="copy-btn hidden" id="copyImageFile">이미지 자체 복사</button><button class="copy-btn hidden" id="copyImage" data-copy="image">이미지 URL 복사</button><a id="openImage" class="copy-btn hidden" target="_blank" rel="noopener noreferrer" href="#">이미지 열기</a></div></div>
       {% elif step.id == 'publish' %}
-      <div id="manualPublish" class="mt-3 hidden space-y-3 text-sm"><p class="text-violet-200">1~3번 결과를 복사해 선택한 블로그에 직접 공개하세요. 공개한 글 주소를 붙여넣으면 확인합니다.</p><button id="copyPackage" class="copy-btn w-full">발행 자료 전체 복사</button><label class="block text-slate-300">공개한 글 주소<input id="manualUrl" type="url" placeholder="https://선택한블로그/글-주소/" class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-white"></label><button id="verifyManual" class="w-full rounded-xl bg-violet-600 px-3 py-3 font-black disabled:opacity-40">④ 공개 글 검증</button><p id="manualMessage" class="break-words text-xs text-slate-300"></p></div>
+      <div id="manualPublish" class="mt-3 hidden space-y-3 text-sm"><p class="text-violet-200">1~3번 결과를 복사해 선택한 블로그에 직접 공개하세요. 공개한 글 주소를 붙여넣으면 확인합니다.</p><button id="copyPackage" class="copy-btn w-full">발행 자료 전체 복사</button><a id="openEditor" class="block rounded-xl bg-violet-600 px-3 py-3 text-center font-black" target="_blank" rel="noopener noreferrer" href="#">선택한 블로그 글쓰기 화면 열기 ↗</a><p class="text-xs text-slate-400">로그인 상태에 따라 로그인 또는 글 관리 화면을 거칠 수 있습니다. 본문·이미지는 위 복사 버튼으로 옮기세요.</p><label class="block text-slate-300">공개한 글 주소<input id="manualUrl" type="url" placeholder="https://선택한블로그/글-주소/" class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-white"></label><button id="verifyManual" class="w-full rounded-xl bg-violet-600 px-3 py-3 font-black disabled:opacity-40">④ 공개 글 검증</button><p id="manualMessage" class="break-words text-xs text-slate-300"></p></div>
       {% endif %}
       <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="{{ step.id }}">
         이 Agent만 다시 실행
@@ -225,6 +251,7 @@ function refreshProfile(){
   document.getElementById('persona').textContent=o.dataset.persona||'-';
   document.getElementById('tone').textContent=o.dataset.tone||'-';
   document.getElementById('theme').textContent=o.dataset.theme||'-';
+  document.getElementById('openEditor').href=o.dataset.editorUrl||'#';
   setModeUI();
 }
 function refreshPlatform(){
@@ -286,6 +313,8 @@ async function autoRun(){
       body:JSON.stringify({
         site_id:siteEl.value,
         category:categoryEl.value,
+        writer_model:document.getElementById('writerModel').value,
+        image_model:document.getElementById('imageModel').value,
         publish_mode:selectedMode()==='manual'?'manual':document.getElementById('publishMode').value
       })
     });
@@ -315,7 +344,7 @@ async function pollRun(){
     const details={
       research:d.research?.keyword?('선정 키워드: '+d.research.keyword):'리서치 대기/진행',
       write:d.writer?('품질 '+(d.writer.quality_score??'-')+' · '+(d.writer.provider||'')+' · '+categoryText):'글쓰기 + 카테고리 지정 대기/진행',
-      image:d.image?.status?((category?.status==='ok'?categoryText+' · ':'')+d.image.status):'카테고리 지정 완료 후 이미지 진행',
+      image:d.image?.status?((category?.status==='ok'?categoryText+' · ':'')+d.image.status+(d.image.model&&d.image.model!=='none'?' · '+d.image.model:'')):'카테고리 지정 완료 후 이미지 진행',
       publish:d.receipt?.url?('완료: '+d.receipt.url):d.publish_mode==='manual'?'직접 발행할 자료 준비 중':'발행·검증 대기/진행'
     };
     ['research','write','image','publish'].forEach(stage=>setAgent(stage,s[stage]||'waiting',details[stage]));
@@ -338,6 +367,9 @@ async function pollRun(){
       img.classList.toggle('hidden',!d.image.url);
       if(d.image.url)img.src=d.image.url;
       document.getElementById('copyImage').classList.toggle('hidden',!d.image.url);
+      document.getElementById('copyImageFile').classList.toggle('hidden',!d.image.url);
+      document.getElementById('openImage').classList.toggle('hidden',!d.image.url);
+      if(d.image.url)document.getElementById('openImage').href=d.image.url;
     }
     if(d.publish_mode==='manual' && s.publish==='manual_required'){
       document.getElementById('manualPublish').classList.remove('hidden');
@@ -465,6 +497,19 @@ rewriteBtn.addEventListener('click',rewriteArticle);
 document.querySelectorAll('.rerun').forEach(b=>b.addEventListener('click',()=>rerun(b.dataset.stage)));
 document.querySelectorAll('input[name="runMode"]').forEach(el=>el.addEventListener('change',setModeUI));
 document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copyText(copyValue(b.dataset.copy),b).catch(()=>showError('복사','클립보드 접근이 차단되었습니다. HTML 보기에서 직접 선택해 복사하세요.'))));
+document.getElementById('copyImageFile').addEventListener('click',async e=>{
+  try{
+    const r=await fetch('/api/london-gpt/image/'+encodeURIComponent(currentRunId));
+    if(!r.ok)throw new Error('이미지 다운로드 실패');
+    const bitmap=await createImageBitmap(await r.blob());
+    const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;
+    canvas.getContext('2d').drawImage(bitmap,0,0);
+    const png=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+    if(!png||!window.ClipboardItem)throw new Error('브라우저 이미지 복사 미지원');
+    await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);
+    const button=e.currentTarget,old=button.textContent;button.textContent='이미지 복사됨';setTimeout(()=>button.textContent=old,1800);
+  }catch(err){showError('이미지 복사','이미지 자체 복사가 안 되면 이미지 열기에서 우클릭해 복사하거나 이미지를 저장하세요.');}
+});
 document.getElementById('copyPackage').addEventListener('click',e=>{
   const rows=[['키워드','keyword'],['제목','title'],['카테고리','category'],['메타 설명','meta'],['이미지 URL','image'],['본문 HTML','html']];
   copyText(rows.map(([label,key])=>label+'\n'+copyValue(key)).join('\n\n'),e.currentTarget).catch(()=>showError('복사','클립보드 접근이 차단되었습니다.'));
