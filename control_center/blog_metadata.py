@@ -11,6 +11,18 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 
+HOSTINGER_SHARED_HOSTING = {
+    "provider": "Hostinger",
+    "payment_date": "2026-02-21",
+    "renewal_date": "2027-02-21",
+    "plan": "Business Web Hosting",
+}
+# Exact VPS billing date must be read from hPanel; never invent it.
+HOSTINGER_VPS = {
+    "provider": "Hostinger VPS",
+    "renewal_date": "",
+}
+
 DOMAIN_PAYMENT_OVERRIDES = {
     "kworld365.com": {"provider": "Gabia", "payment_date": "2026-08-02"},
     "kskin365.com": {"provider": "Gabia", "payment_date": "2026-08-24"},
@@ -68,12 +80,43 @@ def _rdap(domain: str, day_bucket: int) -> dict[str, str]:
     return {"provider": registrar, "renewal_date": expiry}
 
 
+
+
+@lru_cache(maxsize=2)
+def _domain_billing_snapshot(bucket: int) -> dict:
+    repo = "huh0303-cmyk/-WP-QWEN-autobot"
+    try:
+        r = requests.get(
+            f"https://raw.githubusercontent.com/{repo}/main/data/domain_billing_snapshot.json",
+            params={"refresh": bucket},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return r.json()
+    except (requests.RequestException, ValueError):
+        pass
+    for path in (ROOT/"data/domain_billing_snapshot.json", Path("/opt/korea365/data/domain_billing_snapshot.json")):
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+    return {}
+
+
 def domain_info(url: str, platform: str) -> dict[str, str]:
     domain = _domain_from_url(url)
     if platform in PLATFORM_HOSTING:
         provider, note = PLATFORM_HOSTING[platform]
         return {"provider": provider, "payment_date": note, "renewal_date": note}
-    data = dict(_rdap(domain, int(time.time() // 86400)))
+    snap = (_domain_billing_snapshot(int(time.time() // 300)).get("domains") or {}).get(domain) or {}
+    data = {
+        "provider": snap.get("provider") or "",
+        "registration_date": snap.get("registered_date") or "",
+        "renewal_date": snap.get("expiry_date") or "",
+    }
+    if not data["renewal_date"]:
+        live = _rdap(domain, int(time.time() // 86400))
+        data.update({k: v for k, v in live.items() if v})
     data.update({k: v for k, v in DOMAIN_PAYMENT_OVERRIDES.get(domain, {}).items() if v})
     return data
 
@@ -91,8 +134,88 @@ def hosting_info(url: str, platform: str) -> dict[str, str]:
         return {}
     # Current WordPress addresses resolve inside Hostinger AS47583 ranges.
     hostinger_prefixes = ("151.106.", "147.93.", "213.210.", "187.127.", "195.35.", "82.180.", "31.220.")
-    provider = "Hostinger" if ip.startswith(hostinger_prefixes) else ""
-    return {"provider": provider, "payment_date": "", "renewal_date": "", "ip": ip}
+    if ip.startswith(hostinger_prefixes):
+        return {**HOSTINGER_SHARED_HOSTING, "ip": ip}
+    return {"provider": "", "payment_date": "", "renewal_date": "", "ip": ip}
+
+
+
+
+@lru_cache(maxsize=2)
+def _opening_recent_snapshot(bucket: int) -> dict:
+    repo = "huh0303-cmyk/-WP-QWEN-autobot"
+    try:
+        r = requests.get(
+            f"https://raw.githubusercontent.com/{repo}/main/data/opening_recent_snapshot.json",
+            params={"refresh": bucket},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return r.json()
+    except (requests.RequestException, ValueError):
+        pass
+    paths = [
+        ROOT / "data" / "opening_recent_snapshot.json",
+        Path("/opt/korea365/data/opening_recent_snapshot.json"),
+    ]
+    for path in paths:
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+    return {}
+
+
+def opening_recent_info(url: str, platform: str, channel_id: str = "") -> dict[str, str]:
+    snap = _opening_recent_snapshot(int(time.time() // 300))
+    if platform == "youtube" and channel_id:
+        return dict((snap.get("youtube") or {}).get(channel_id) or {})
+    key = url.rstrip("/")
+    return dict((snap.get("blogs") or {}).get(key) or {})
+
+
+def infrastructure_info(platform: str, kind: str = "") -> dict[str, object]:
+    if platform == "wordpress":
+        return {
+            "label": "VPS+n8n · GitHub Actions",
+            "uses_vps": True,
+            "uses_github": True,
+            "vps_expiry": HOSTINGER_VPS.get("renewal_date", ""),
+        }
+    if platform == "blogspot":
+        return {
+            "label": "Blogger · VPS+n8n · GitHub",
+            "uses_vps": True,
+            "uses_github": True,
+            "vps_expiry": HOSTINGER_VPS.get("renewal_date", ""),
+        }
+    if platform == "tistory":
+        return {
+            "label": "Tistory · GitHub · 브라우저",
+            "uses_vps": False,
+            "uses_github": True,
+            "vps_expiry": "",
+        }
+    if platform == "naver":
+        return {
+            "label": "Naver · PC 브라우저",
+            "uses_vps": False,
+            "uses_github": False,
+            "vps_expiry": "",
+        }
+    if platform == "youtube":
+        return {
+            "label": "Hostinger VPS worker · GitHub",
+            "uses_vps": True,
+            "uses_github": True,
+            "vps_expiry": HOSTINGER_VPS.get("renewal_date", ""),
+        }
+    return {
+        "label": "플랫폼 API · GitHub",
+        "uses_vps": False,
+        "uses_github": True,
+        "vps_expiry": "",
+    }
 
 
 def revenue_info(domain: str, row: dict) -> dict[str, object]:

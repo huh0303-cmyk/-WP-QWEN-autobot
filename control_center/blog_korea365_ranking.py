@@ -21,7 +21,14 @@ from typing import Callable
 
 from flask import Response, jsonify, render_template
 
-from .blog_metadata import domain_info, editorial_metadata, hosting_info, revenue_info
+from .blog_metadata import (
+    domain_info,
+    editorial_metadata,
+    hosting_info,
+    infrastructure_info,
+    opening_recent_info,
+    revenue_info,
+)
 
 KST = timezone(timedelta(hours=9))
 
@@ -52,6 +59,8 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
     domain = (url.split("://", 1)[-1].split("/", 1)[0] if url else "")
     topic, categories = editorial_metadata(row)
     revenue = revenue_info(domain, row)
+    timeline = opening_recent_info(url, platform)
+    infra = infrastructure_info(platform, kind)
     return {
         "platform": platform,
         "kind": kind,
@@ -64,6 +73,9 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
         "revenue": revenue,
         "domain_info": domain_info(url, platform),
         "hosting_info": hosting_info(url, platform),
+        "opening_date": timeline.get("opening_date", ""),
+        "recent_publish_date": timeline.get("recent_publish_date", ""),
+        "infrastructure": infra,
         "yesterday_visitors": row.get("yesterday_visitors", row.get("today_visitors")),
         "yesterday_visitors_delta": row.get("yesterday_delta", row.get("today_delta")),
         "total_visitors": row.get("total_visitors"),
@@ -144,11 +156,12 @@ def install(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_da
         payload = cached_payload(int(time.time() // 300))
         out = io.StringIO()
         writer = csv.writer(out)
-        writer.writerow(["순위", "플랫폼", "사이트", "URL", "사이트주제", "카테고리명", "수익", "수익증감", "수익통화", "도메인업체", "도메인결제일", "도메인갱신일", "호스팅", "호스팅결제일", "호스팅갱신일", "어제 방문자", "증감", "총 방문자", "증감", "총 콘텐츠", "증감", "Google 색인", "증감", "GSC 확인", "확인시각"])
+        writer.writerow(["순위", "플랫폼", "사이트", "URL", "사이트주제", "카테고리명", "수익", "수익증감", "수익통화", "도메인업체", "도메인결제일", "도메인만료일", "호스팅", "호스팅결제일", "호스팅만료일", "최근발행일", "개설일", "운영위치", "VPS만료일", "어제 방문자", "증감", "총 방문자", "증감", "총 콘텐츠", "증감", "Google 색인", "증감", "GSC 확인", "확인시각"])
         for card in payload["cards"]:
             revenue = card.get("revenue") or {}
             domain_meta = card.get("domain_info") or {}
             hosting_meta = card.get("hosting_info") or {}
+            infra = card.get("infrastructure") or {}
             writer.writerow([
                 card.get("rank") or "", card.get("kind") if card.get("kind") == "news" else card.get("platform"),
                 card.get("name") or "", card.get("url") or "", card.get("topic") or "",
@@ -156,6 +169,8 @@ def install(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_da
                 revenue.get("amount"), revenue.get("delta"), revenue.get("currency") or "",
                 domain_meta.get("provider") or "", domain_meta.get("payment_date") or "", domain_meta.get("renewal_date") or "",
                 hosting_meta.get("provider") or "", hosting_meta.get("payment_date") or "", hosting_meta.get("renewal_date") or "",
+                card.get("recent_publish_date") or "", card.get("opening_date") or "",
+                infra.get("label") or "", infra.get("vps_expiry") or "",
                 card.get("yesterday_visitors"), card.get("yesterday_visitors_delta"),
                 card.get("total_visitors"), card.get("total_visitors_delta"),
                 card.get("total_content"), card.get("total_content_delta"),

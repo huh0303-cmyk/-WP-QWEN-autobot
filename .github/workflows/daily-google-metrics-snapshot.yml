@@ -46,11 +46,17 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
         run: python scripts/core_metrics_report.py --refresh-index
+      - name: Snapshot opening and latest publication dates
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/opening_recent_snapshot.py
+      - name: Snapshot domain expiry dates
+        run: python scripts/domain_billing_snapshot.py
       - name: Persist read-only metrics snapshots
         run: |
           git config user.name "korea365-metrics-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/gsc_properties.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html
+          git add data/gsc_properties.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html data/opening_recent_snapshot.json data/domain_billing_snapshot.json
           if git diff --cached --quiet; then
             echo "No metrics changes"
           else
@@ -66,5 +72,7 @@ jobs:
             data/core_metrics_latest.json
             data/core_metrics_daily_latest.json
             data/core_metrics_report.html
+            data/opening_recent_snapshot.json
+            data/domain_billing_snapshot.json
           if-no-files-found: warn
           retention-days: 14

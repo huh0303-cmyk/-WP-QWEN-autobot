@@ -7,6 +7,8 @@ from pathlib import Path
 
 from flask import jsonify, render_template
 
+from .blog_metadata import infrastructure_info, opening_recent_info
+
 ROOT = Path(__file__).resolve().parents[1]
 KST = timezone(timedelta(hours=9))
 
@@ -58,6 +60,7 @@ def build_youtube_ranking(bucket: int) -> dict:
         subs = current.get("subs") if isinstance(current, dict) else None
         views = current.get("views") if isinstance(current, dict) else None
         videos = current.get("videos") if isinstance(current, dict) else None
+        timeline = opening_recent_info("", "youtube", item.get("channel_id", ""))
         rows.append({
             "name": current.get("title") or item.get("name") or item.get("channel_id"),
             "channel_id": item.get("channel_id", ""),
@@ -69,6 +72,9 @@ def build_youtube_ranking(bucket: int) -> dict:
             "views": views,
             "view_delta": _delta(views, previous.get("views") if isinstance(previous, dict) else None),
             "videos": videos,
+            "opening_date": timeline.get("opening_date") or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
+            "recent_publish_date": timeline.get("recent_publish_date", ""),
+            "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
         })
     rows.sort(key=lambda r: (
@@ -178,6 +184,9 @@ def build_social_ranking(bucket: int) -> dict:
             "views_delta": item.get("view_delta"),
             "content_count": item.get("videos"),
             "revenue": item.get("revenue") or {},
+            "opening_date": item.get("opening_date") or "",
+            "recent_publish_date": item.get("recent_publish_date") or "",
+            "infrastructure": item.get("infrastructure") or infrastructure_info("youtube"),
             "connected": item.get("connected", False),
         })
     for item in sns["rows"]:
@@ -196,6 +205,9 @@ def build_social_ranking(bucket: int) -> dict:
             "views_delta": item.get("views_delta"),
             "content_count": None,
             "revenue": item.get("revenue") or {},
+            "opening_date": item.get("opening_date") or "",
+            "recent_publish_date": item.get("recent_publish_date") or "",
+            "infrastructure": infrastructure_info(str(item.get("platform") or "").lower()),
             "connected": item.get("connected", False),
         })
     rows.sort(key=lambda r: (
