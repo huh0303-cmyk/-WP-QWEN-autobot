@@ -3,10 +3,12 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 import json
+import html
 import os
 import re
 import secrets
 import threading
+from urllib.parse import urlparse
 
 import requests
 
@@ -220,7 +222,7 @@ def install(app, runtime):
             return jsonify({"ok": False, "error": "unknown_site"}), 400
         if category and category not in valid[site_id]["categories"]:
             return jsonify({"ok": False, "error": "invalid_category"}), 400
-        if publish_mode not in {"draft", "publish"}:
+        if publish_mode not in {"draft", "publish", "manual"}:
             return jsonify({"ok": False, "error": "invalid_publish_mode"}), 400
 
         run_id = f"lgpt-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
@@ -272,7 +274,47 @@ def install(app, runtime):
             _write_run(state)
             return jsonify({"ok": False, "error": "n8n_rejected", "http": response.status_code, "run_id": run_id}), 502
 
-        return jsonify({"ok": True, "run_id": run_id, "orchestrator": "n8n", "mode": "auto-1-2-3-4"}), 202
+        return jsonify({"ok": True, "run_id": run_id, "orchestrator": "n8n", "mode": "manual-1-2-3" if publish_mode == "manual" else "auto-1-2-3-4"}), 202
+
+    @app.post("/api/london-gpt/manual-published")
+    def london_gpt_manual_published():
+        from flask import jsonify, request
+        payload = request.get_json(silent=True) or {}
+        run_id = str(payload.get("run_id") or "").strip()
+        public_url = str(payload.get("url") or "").strip()
+        if not re.fullmatch(r"lgpt-[0-9]{8}-[0-9]{6}-[a-f0-9]{6}", run_id):
+            return jsonify({"ok": False, "error": "invalid_run_id"}), 400
+        if not _state_file(run_id).is_file():
+            return jsonify({"ok": False, "error": "unknown_run"}), 404
+        state = _read_run(run_id)
+        if state.get("publish_mode") != "manual":
+            return jsonify({"ok": False, "error": "not_manual_run"}), 409
+        if state.get("stage_status", {}).get("publish") != "manual_required":
+            return jsonify({"ok": False, "error": "manual_handoff_not_ready"}), 409
+        site = next((item for item in _content_sites() if item["site_id"] == state.get("site_id")), None)
+        if not site:
+            return jsonify({"ok": False, "error": "unknown_site"}), 400
+        parsed = urlparse(public_url)
+        expected = urlparse(site["url"])
+        if (parsed.scheme != "https" or parsed.hostname != expected.hostname or parsed.port not in (None, 443)
+                or parsed.username or parsed.password or not parsed.path.strip("/")):
+            return jsonify({"ok": False, "error": "url_must_be_post_on_selected_site"}), 400
+        try:
+            response = requests.get(public_url, timeout=20, allow_redirects=False)
+        except requests.RequestException as exc:
+            return jsonify({"ok": False, "error": "public_page_unreachable", "message": str(exc)[:250]}), 502
+        if response.status_code != 200 or "html" not in response.headers.get("content-type", "").lower():
+            return jsonify({"ok": False, "error": "public_page_not_verified", "http": response.status_code}), 409
+        title = str(state.get("article", {}).get("title") or "").strip()
+        page_text = re.sub(r"<[^>]+>", " ", html.unescape(response.text))
+        if not title or re.sub(r"\s+", " ", title).casefold() not in re.sub(r"\s+", " ", page_text).casefold():
+            return jsonify({"ok": False, "error": "article_title_not_found_on_public_page"}), 409
+        state["receipt"] = {"status": "published_verified", "platform": "wordpress", "url": public_url,
+                            "post_id": "manual", "title": title, "verified_at": datetime.now(timezone.utc).isoformat()}
+        state["stage_status"]["publish"] = "ok"
+        state["completed_at"] = datetime.now(timezone.utc).isoformat()
+        _write_run(state)
+        return jsonify({"ok": True, "receipt": state["receipt"]})
 
     @app.post("/api/london-gpt/rewrite")
     def london_gpt_rewrite():
@@ -334,6 +376,8 @@ def install(app, runtime):
             return jsonify({"ok": False, "error": "run_id_required"}), 400
 
         state = _read_run(run_id)
+        if state.get("publish_mode") == "manual" and stage == "publish":
+            return jsonify({"ok": False, "error": "publish_is_manual"}), 409
         state.setdefault("stage_status", {})[stage] = "waiting"
         state.pop("last_error", None)
         _write_run(state)

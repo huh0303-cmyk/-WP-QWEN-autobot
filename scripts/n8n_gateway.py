@@ -54,7 +54,7 @@ def pipeline_stage(stage):
     category = str(payload.get("category") or "").strip()
     if not run_id:
         return jsonify({"ok": False, "error": "run_id_required"}), 400
-    if publish_mode not in {"draft", "publish"}:
+    if publish_mode not in {"draft", "publish", "manual"}:
         return jsonify({"ok": False, "error": "invalid_publish_mode"}), 400
     cmd = [sys.executable, str(PIPELINE), "--stage", stage, "--run-id", run_id,
            "--publish-mode", publish_mode]

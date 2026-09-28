@@ -97,3 +97,4 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
   - 해당 commit에서는 과거의 `daily-network-publish.yml` startup failure가 더 이상 생성되지 않아 GitHub workflow 문법 복구 확인
   - 전체 저장소 CI는 변경 전 run과 동일하게 `41 failed, 602 passed`로 실패했으며, 누락된 과거 workflow 파일·오래된 26개 도메인 기대값 등 이번 변경과 무관한 기존 실패 41건임
 - 최종 상태: 요청 화면과 발행 버튼 경로 배포 완료·실화면 확인 완료. 기존 저장소 전체 테스트 부채는 별도 정비 필요.
+- 2026-09-28 KST — 런던프로젝트GPT 자동/수동 모드 확장. 사용자 지시대로 자동 모드는 기존 4-Agent 발행 경로를 유지하고, 수동 모드는 Agent 1~3 준비 후 Agent 4를 사람 발행 대기로 전환했다. 각 Agent 카드에 결과와 복사 동선을 넣고, 사람이 붙여넣은 공개 URL의 사이트/HTTP/제목을 검증하는 API를 추가했다. 수동 분기는 출판자 호출 없이 종료하며 수동 4번 재실행은 거부한다. 로컬 검증: 새 수동 모드 테스트 3개 통과, JavaScript 구문 검사와 `git diff --check` 통과. GitHub 저장 및 운영 서버 적용 결과는 이 항목에 이어 기록한다.
