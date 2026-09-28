@@ -19,6 +19,8 @@ def test_catalog_contains_verified_platform_destinations():
     assert [item["url"] for item in sites if item["platform"] == "naver"] == [
         "https://blog.naver.com/huh0303", "https://blog.naver.com/huh3", "https://blog.naver.com/huh4",
     ]
+    assert next(item for item in sites if item["site_id"] == "naver_n2")["editor_url"].endswith("huh3?Redirect=Write")
+    assert next(item for item in sites if item["site_id"] == "tistory_ktrip365")["editor_url"].endswith("/manage/newpost")
     assert all(not item["auto_publish"] for item in sites if item["platform"] in {"naver", "tistory"})
     assert manual_profile("naver_n2")[0] == "naver"
     assert manual_profile("tistory_ktrip365")[0] == "tistory"
@@ -39,6 +41,8 @@ def test_web_app_renders_template_and_guards_manual_platform(monkeypatch, tmp_pa
     assert 'value="blogger_ktrip365"' in html
     assert 'value="naver_n2"' in html
     assert 'value="tistory_ktrip365"' in html
+    assert 'id="writerModel"' in html and 'id="imageModel"' in html
+    assert 'id="openEditor"' in html
     assert "{{ site." not in html
     assert client.post("/api/london-gpt/run", json={"site_id": "naver_n2", "publish_mode": "publish"}).status_code == 400
     monkeypatch.setattr(london_gpt_app.requests, "post", lambda *a, **kw: SimpleNamespace(status_code=200))
@@ -48,6 +52,9 @@ def test_web_app_renders_template_and_guards_manual_platform(monkeypatch, tmp_pa
     blogger = client.post("/api/london-gpt/run", json={"site_id": "blogger_ktrip365", "publish_mode": "draft"})
     assert blogger.status_code == 202
     assert london_gpt_app._read_run(blogger.json["run_id"])["platform"] == "blogger"
+    assert london_gpt_app._read_run(blogger.json["run_id"])["writer_model"] == "auto_free"
+    assert london_gpt_app._read_run(blogger.json["run_id"])["image_model"] == "auto_free"
+    assert client.post("/api/london-gpt/run", json={"site_id": "blogger_ktrip365", "writer_model": "unknown"}).status_code == 400
 
 
 def test_naver_and_tistory_handoff_never_call_auto_publisher(monkeypatch, tmp_path):

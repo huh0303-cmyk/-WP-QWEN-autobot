@@ -26,12 +26,14 @@ def content_sites() -> list[dict]:
         wp_url = str(wp.get("url") or "").rstrip("/")
         if wp_url in categories:
             sites.append({"site_id": f"wp_{key}", "platform": "wordpress", "url": wp_url,
+                          "editor_url": wp_url + "/wp-admin/post-new.php",
                           "label": wp_url.removeprefix("https://"), "enabled": True, "auto_publish": True,
                           "language": profile.get("language", "en"), "persona": wp.get("persona", ""),
                           "tone": wp.get("tone", ""), "theme": wp.get("theme", ""),
                           "categories": categories[wp_url]})
         blog_url = str(blog.get("url") or "").rstrip("/")
         sites.append({"site_id": f"blogger_{key}", "platform": "blogger", "url": blog_url,
+                      "editor_url": "https://www.blogger.com/blog/posts/" + str(blog.get("destination_id") or ""),
                       "label": blog_url.removeprefix("https://"),
                       "enabled": bool(blog_url and blog.get("destination_id") and blog.get("ready_for_automation")),
                       "auto_publish": True, "language": profile.get("language", "en"),
@@ -41,6 +43,7 @@ def content_sites() -> list[dict]:
     for item in _json("tistory_portfolio.json").get("sites", []):
         url = str(item.get("url") or "").rstrip("/")
         sites.append({"site_id": item["site_id"], "platform": "tistory", "url": url,
+                      "editor_url": url + "/manage/newpost",
                       "label": item.get("title") or url, "enabled": bool(item.get("launch_enabled")),
                       "auto_publish": False, "language": item.get("language", "ko"),
                       "persona": item.get("audience") or "한국어 독자를 위한 생활정보 편집자",
@@ -52,6 +55,7 @@ def content_sites() -> list[dict]:
         blog_id = str(room.get("destination_id") or "").strip()
         sites.append({"site_id": room["room_id"], "platform": "naver",
                       "url": f"https://blog.naver.com/{blog_id}" if blog_id else "",
+                      "editor_url": f"https://blog.naver.com/{blog_id}?Redirect=Write" if blog_id else "",
                       "label": room.get("name") or room["room_id"],
                       "enabled": bool(blog_id), "auto_publish": False,
                       "unavailable_reason": "블로그 ID 연결 필요" if not blog_id else "",

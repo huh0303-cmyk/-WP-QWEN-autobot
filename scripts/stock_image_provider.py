@@ -57,8 +57,8 @@ def _search(provider, query, key):
     return items
 
 
-def find_stock_image(subject, theme=""):
-    if os.getenv("STOCK_IMAGES_ENABLED", "false").lower() != "true":
+def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"):
+    if not force and os.getenv("STOCK_IMAGES_ENABLED", "false").lower() != "true":
         return None
     # Stock cannot document a particular breaking event or identify a patient.
     if "NEWS ILLUSTRATION ONLY" in theme or SENSITIVE.search(subject + " " + theme):
@@ -70,6 +70,8 @@ def find_stock_image(subject, theme=""):
     for provider, key, domain, license_url in [
         ("Pexels", os.getenv("PEXELS_API_KEY", ""), "images.pexels.com", "https://www.pexels.com/license/"),
         ("Pixabay", os.getenv("PIXABAY_KEY", ""), "pixabay.com", "https://pixabay.com/service/license-summary/")]:
+        if selected_provider != "auto" and provider.lower() != selected_provider:
+            continue
         if not key:
             print(f"stock search unavailable: {provider} key missing")
             continue

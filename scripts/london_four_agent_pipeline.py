@@ -355,7 +355,12 @@ def stage_write(run_id: str) -> dict:
     from scripts.budget_guard import check_and_record
     from automation_hub.medical_editorial import require_medical_topic
     check_and_record(0.02, label=f"london-agent2:{site_id}")
-    if os.environ.get("OPENAI_API_KEY", "").strip():
+    writer_choice = str(state.get("writer_model") or "auto_free")
+    from scripts.economy_text import FREE_GEMINI_MODELS
+    if writer_choice not in {"auto_free", "local_qwen", "gpt-5-mini", *FREE_GEMINI_MODELS}:
+        raise ValueError("unsupported writer model")
+    os.environ["LONDON_WRITER_MODEL"] = writer_choice
+    if writer_choice == "gpt-5-mini" and os.environ.get("OPENAI_API_KEY", "").strip():
         os.environ["OPENAI_ENABLED"] = "true"
         os.environ.setdefault("OPENAI_MODEL", "gpt-5-mini")
     os.environ["LOCAL_TEXT_FALLBACK_ENABLED"] = "true"
@@ -419,15 +424,18 @@ def stage_image(run_id: str) -> dict:
         raise RuntimeError("category assignment must complete before image generation")
     article = state["article"]
     image_url = ""
+    image_provider_name = "none"
     status = "no_image"
     image_enabled = not run_id.startswith("canary-") and os.environ.get("PIPELINE_IMAGE_ENABLED", "true").lower() in {"1", "true", "yes", "on"}
     if image_enabled:
         try:
             from scripts.budget_guard import check_and_record
-            from scripts.replicate_image_provider import generate_image_url
+            from scripts import replicate_image_provider as image_provider
             check_and_record(0.01, label=f"london-agent3:{site_id}")
             subject = (article.get("image_queries") or [article["title"]])[0]
-            image_url = generate_image_url(subject, theme=article["title"]) or ""
+            image_url = image_provider.generate_image_url(subject, theme=article["title"],
+                                                           mode=str(state.get("image_model") or "auto_free")) or ""
+            image_provider_name = image_provider.last_image_model
             status = "generated" if image_url else "no_image"
             if image_url and state["platform"] in {"blogger", "naver", "tistory"}:
                 from scripts.stable_image_hosting import is_temporary, host_permanently
@@ -443,7 +451,8 @@ def stage_image(run_id: str) -> dict:
             status = f"image_failed_continue_without_image:{type(exc).__name__}"
     if not image_enabled and run_id.startswith("canary-"):
         status = "canary_no_image"
-    state["image"] = {"url": image_url, "status": status}
+    state["image"] = {"url": image_url, "status": status,
+                      "model": image_provider_name if image_url else "none"}
     state.setdefault("stage_status", {})["image"] = "ok"
     _write_state(state)
     return {"ok": True, "stage": "image", "site_id": site_id, "run_id": run_id, "image_status": status}

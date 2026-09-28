@@ -160,16 +160,15 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     from automation_hub.repetition_guard import RULE
     plan = editorial_brief(f"{language}: {keyword}; {site_theme}")
     failures: list[str] = [review_feedback] if review_feedback else []
-    # A third, feedback-informed pass prevents a transient short response from
-    # wasting an otherwise valid queued topic. It runs only after both normal
-    # providers fail the mechanical 70-point gate.
-    for attempt, provider in enumerate(("writer-chain",), start=1):
+    import economy_text
+    economy_text.begin_article()
+    # If a model returns malformed or thin copy, move to the next free model.
+    for attempt, provider in enumerate(("writer-chain", "quality-retry"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
                                   prior_feedback="; ".join(failures))
         prompt += "\n" + RULE + plan
         try:
-            import economy_text
             raw = economy_text.generate_text(prompt, temperature=0.7)
             provider = economy_text.last_writer_model
             candidate = parse_rewrite_json(raw)
@@ -184,6 +183,8 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
         except Exception as exc:
             failures = [f"invalid output: {exc}"]
             print(json.dumps({"attempt": attempt, "provider": provider, "score": 0, "failures": failures}, ensure_ascii=False))
+            if "WRITERS_EXHAUSTED" in str(exc):
+                break
     return None, 0, failures, ""
 
 

@@ -45,6 +45,7 @@ MAX_POLL_SECONDS = 60
 # another paid prediction within one workflow process.
 _prompt_cache: dict[str, Optional[str]] = {}
 _attempted_prompts: set[str] = set()
+last_image_model = "none"
 
 
 def _token() -> str:
@@ -200,26 +201,38 @@ def _cost_receipt(model, subject, status):
     print("image cost estimate: " + json.dumps(receipt))
 
 
-def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
-    """Generate at most one image using only the approved Replicate model chain."""
+def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -> Optional[str]:
+    """Use free stock first; paid generation requires an explicit mode."""
+    global last_image_model
+    last_image_model = "none"
     from stock_image_provider import find_stock_image
-    stock = find_stock_image(subject, theme)
+    if mode not in {"legacy", "auto_free", "pexels", "pixabay", "none", "replicate_sdxl", "replicate_flux"}:
+        raise ValueError("unsupported image model")
+    if mode == "none":
+        return None
+    stock = find_stock_image(subject, theme, force=mode in {"auto_free", "pexels", "pixabay"},
+                             selected_provider=mode if mode in {"pexels", "pixabay"} else "auto")
     if stock:
+        from stock_image_provider import METADATA
+        last_image_model = (METADATA.get(stock) or {}).get("provider", "stock")
         return stock
+    if mode in {"auto_free", "pexels", "pixabay"}:
+        return None
     token = _token()
     if not token:
         print("  ⛔ REPLICATE_API_TOKEN missing — image generation skipped; legacy fallback forbidden")
         return None
 
     prompt = build_editorial_prompt(subject, theme)
-    cache_key = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    cache_key = hashlib.sha256((mode + ":" + prompt).encode("utf-8")).hexdigest()
     if cache_key in _prompt_cache:
         return _prompt_cache[cache_key]
     if cache_key in _attempted_prompts:
         return None
     _attempted_prompts.add(cache_key)
 
-    for attempt_no, model in enumerate(ALLOWED_MODELS, start=1):
+    model_chain = (SECONDARY_MODEL, PRIMARY_MODEL) if mode == "replicate_flux" else ALLOWED_MODELS
+    for attempt_no, model in enumerate(model_chain, start=1):
         if attempt_no > MAX_MODEL_ATTEMPTS:
             break
         try:
@@ -229,6 +242,7 @@ def generate_image_url(subject: str, theme: str = "") -> Optional[str]:
             if prediction.get("status") == "succeeded":
                 url = _first_output_url(prediction.get("output"))
                 if url:
+                    last_image_model = model
                     _prompt_cache[cache_key] = url
                     return url
             error = prediction.get("error") or prediction.get("status")
