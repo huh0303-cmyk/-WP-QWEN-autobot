@@ -1,8 +1,8 @@
 """VPS new-item detector for the London Project newsrooms.
 
-RSS is the source of timely leads. Each newsroom targets 3-10 verified
-stories per KST day, with a hard dispatch cap of 10. If there are fewer than
-three verified source leads, the system never fabricates filler to hit a quota.
+RSS is the source of timely leads. Each newsroom now targets exactly one
+verified story per KST day. Extra fresh leads remain queued instead of causing
+repeated GitHub runs or paid-model calls.
 """
 import hashlib
 import html
@@ -16,8 +16,8 @@ from urllib.parse import urlparse
 from pathlib import Path
 
 NEWSROOM_COST_HOLD = Path("/etc/korea365/newsroom-cost-hold")
-NEWSROOM_DAILY_TARGET_MIN = 3
-NEWSROOM_DAILY_MAX = 10
+NEWSROOM_DAILY_TARGET_MIN = 1
+NEWSROOM_DAILY_MAX = 1
 KST = timezone(timedelta(hours=9))
 
 import requests

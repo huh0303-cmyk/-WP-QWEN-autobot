@@ -5,8 +5,6 @@ on:
   push:
     branches: [main]
     paths: ['.github/workflows/daily-publication-floor.yml']
-  schedule:
-    - cron: '13 * * * *'
   workflow_dispatch:
     inputs:
       platform:

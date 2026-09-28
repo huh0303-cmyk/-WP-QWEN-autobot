@@ -2,7 +2,7 @@ name: Tistory One-Daily Dispatcher
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '50 13 * * *'  # 22:50 KST; one pass catches every randomized daily slot
   workflow_dispatch:
 
 permissions:
