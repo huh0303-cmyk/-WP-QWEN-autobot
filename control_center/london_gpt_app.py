@@ -31,7 +31,7 @@ N8N_RERUN_WEBHOOKS = {
 }
 GATEWAY = os.environ.get("LONDON_GPT_GATEWAY", "http://127.0.0.1:8766").rstrip("/")
 WRITER_MODELS = {"auto_free", "local_qwen", "gpt-5-mini", "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash-lite"}
-IMAGE_MODELS = {"auto_free", "pexels", "pixabay", "none", "replicate_sdxl", "replicate_flux"}
+IMAGE_MODELS = {"auto_free", "pexels", "pixabay", "wikimedia", "none"}
 
 
 def _safe_call(fn, fallback):

@@ -43,7 +43,7 @@ def _search(provider, query, key):
                   "url": p.get("src", {}).get("large2x", ""), "source": p.get("url", ""),
                   "author": p.get("photographer", ""), "width": p.get("width", 0),
                   "height": p.get("height", 0)} for p in response.json().get("photos", [])]
-    else:
+    elif provider == "Pixabay":
         response = requests.get("https://pixabay.com/api/", params={"key": key, "q": query,
             "image_type": "photo", "orientation": "horizontal", "safesearch": "true",
             "min_width": 1000, "per_page": 12}, timeout=12)
@@ -52,6 +52,30 @@ def _search(provider, query, key):
                   "url": p.get("largeImageURL", ""), "source": p.get("pageURL", ""),
                   "author": p.get("user", ""), "width": p.get("imageWidth", 0),
                   "height": p.get("imageHeight", 0)} for p in response.json().get("hits", [])]
+    else:
+        response = requests.get("https://commons.wikimedia.org/w/api.php", params={
+            "action": "query", "format": "json", "generator": "search",
+            "gsrnamespace": 6, "gsrsearch": f"filetype:bitmap {query}", "gsrlimit": 20,
+            "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1600,
+        }, headers={"User-Agent": "Korea365-Control/1.0"}, timeout=15)
+        response.raise_for_status()
+        items = []
+        for page in (response.json().get("query", {}).get("pages", {}) or {}).values():
+            info = (page.get("imageinfo") or [{}])[0]
+            meta = info.get("extmetadata") or {}
+            license_name = str((meta.get("LicenseShortName") or {}).get("value") or "").lower()
+            if license_name not in {"cc0", "public domain", "pdm"}:
+                continue
+            items.append({
+                "id": str(page.get("pageid") or ""),
+                "description": " ".join(filter(None, [str(page.get("title") or "").removeprefix("File:"), str((meta.get("ImageDescription") or {}).get("value") or "")])),
+                "url": info.get("thumburl") or info.get("url") or "",
+                "source": info.get("descriptionurl") or "",
+                "author": str((meta.get("Artist") or {}).get("value") or ""),
+                "width": info.get("thumbwidth") or info.get("width") or 0,
+                "height": info.get("thumbheight") or info.get("height") or 0,
+                "license": str((meta.get("LicenseUrl") or {}).get("value") or "https://creativecommons.org/publicdomain/mark/1.0/"),
+            })
     CACHE.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"at": time.time(), "items": items}), encoding="utf-8")
     return items
@@ -69,7 +93,8 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
         return None
     for provider, key, domain, license_url in [
         ("Pexels", os.getenv("PEXELS_API_KEY", ""), "images.pexels.com", "https://www.pexels.com/license/"),
-        ("Pixabay", os.getenv("PIXABAY_KEY", ""), "pixabay.com", "https://pixabay.com/service/license-summary/")]:
+        ("Pixabay", os.getenv("PIXABAY_KEY", ""), "pixabay.com", "https://pixabay.com/service/license-summary/"),
+        ("Wikimedia", "public-api", "upload.wikimedia.org", "https://creativecommons.org/publicdomain/mark/1.0/")]:
         if selected_provider != "auto" and provider.lower() != selected_provider:
             continue
         if not key:
@@ -79,7 +104,7 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
             for item in _search(provider, query, key):
                 host = urlparse(item["url"]).hostname or ""
                 source_host = urlparse(item["source"]).hostname or ""
-                source_domain = "pexels.com" if provider == "Pexels" else "pixabay.com"
+                source_domain = {"Pexels": "pexels.com", "Pixabay": "pixabay.com", "Wikimedia": "commons.wikimedia.org"}[provider]
                 if not (host == domain or host.endswith("." + domain)):
                     continue
                 if not (source_host == source_domain or source_host.endswith("." + source_domain)):
@@ -90,7 +115,7 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
                     continue
                 from stable_image_hosting import host_permanently
                 stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
-                metadata = {**item, "provider": provider, "license": license_url,
+                metadata = {**item, "provider": provider, "license": item.get("license") or license_url,
                             "query": query, "estimated_image_cost_usd": 0, "hosted_url": stable}
                 METADATA[stable] = metadata
                 receipt = Path("artifacts/stock-image-receipts.jsonl")
@@ -106,9 +131,9 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
 
 
 PUBLIC_PHOTO_NOTICE = re.compile(
-    r"illustrative\\s+stock\\s+photo|photo\\s+license|"
-    r"not\\s+a\\s+photograph\\s+of\\s+a\\s+specific\\s+event|"
-    r"stock\\s+photo\\s*/\\s*자료사진|class=[\"']?photo-credit",
+    r"illustrative\s+stock\s+photo|photo\s+license|"
+    r"not\s+a\s+photograph\s+of\s+a\s+specific\s+event|"
+    r"stock\s+photo\s*/\s*자료사진|class=[\"']?photo-credit",
     re.I,
 )
 

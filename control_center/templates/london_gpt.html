@@ -90,12 +90,11 @@
     </label>
     <label class="block"><span class="mb-1 block text-xs font-black text-slate-400">이미지 모델 · 무료 우선</span>
       <select id="imageModel" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
-        <option value="auto_free" selected>Pexels → Pixabay 스톡 · 무료, 없으면 이미지 생략</option>
+        <option value="auto_free" selected>무료 자동 · A Pexels → B Pixabay → C Wikimedia 공개자료</option>
         <option value="pexels">Pexels 스톡 · 무료</option>
         <option value="pixabay">Pixabay 스톡 · 무료</option>
+        <option value="wikimedia">Wikimedia Commons · CC0/공개자료만</option>
         <option value="none">이미지 생략 · 무료</option>
-        <option value="replicate_sdxl">SDXL Lightning → FLUX Schnell · 유료, 직접 선택</option>
-        <option value="replicate_flux">FLUX Schnell → SDXL Lightning · 유료, 직접 선택</option>
       </select>
     </label>
   </div>
@@ -254,9 +253,10 @@ function refreshProfile(){
   document.getElementById('openEditor').href=o.dataset.editorUrl||'#';
   setModeUI();
 }
-function refreshPlatform(){
+function refreshPlatform(preferredSite=''){
   siteEl.replaceChildren(...siteOptions.filter(o=>o.dataset.platform===platformEl.value).map(o=>o.cloneNode(true)));
-  const first=[...siteEl.options].find(o=>!o.disabled);
+  const preferred=[...siteEl.options].find(o=>o.value===preferredSite&&!o.disabled);
+  const first=preferred||[...siteEl.options].find(o=>!o.disabled);
   if(first)siteEl.value=first.value;
   refreshProfile();
 }
@@ -516,7 +516,14 @@ document.getElementById('copyPackage').addEventListener('click',e=>{
   copyText(rows.map(([label,key])=>label+'\n'+copyValue(key)).join('\n\n'),e.currentTarget).catch(()=>showError('복사','클립보드 접근이 차단되었습니다.'));
 });
 document.getElementById('verifyManual').addEventListener('click',verifyManual);
-refreshPlatform();
+const launchParams=new URLSearchParams(location.search);
+const launchSite=launchParams.get('site_id')||'';
+const launchOption=siteOptions.find(o=>o.value===launchSite&&!o.disabled);
+if(launchOption)platformEl.value=launchOption.dataset.platform;
+refreshPlatform(launchSite);
+if(launchParams.get('mode')==='manual')document.querySelector('input[name="runMode"][value="manual"]').checked=true;
+if(launchParams.get('publish')==='draft'||launchParams.get('publish')==='publish')document.getElementById('publishMode').value=launchParams.get('publish');
+setModeUI();
 </script>
 </body>
 </html>

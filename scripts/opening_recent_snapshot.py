@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import json, os, re, time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 import xml.etree.ElementTree as ET
@@ -10,6 +10,22 @@ import requests
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"data/opening_recent_snapshot.json"
 UA={"User-Agent":"Mozilla/5.0 Korea365-Control/1.0"}
+KST=timezone(timedelta(hours=9))
+
+def stamp(v):
+    if not v:return ""
+    s=str(v)
+    try:
+        if s.isdigit():
+            n=int(s)
+            if n>10_000_000_000:n//=1000
+            value=datetime.fromtimestamp(n,timezone.utc)
+        else:
+            value=datetime.fromisoformat(s.replace("Z","+00:00"))
+        if value.tzinfo is not None:value=value.astimezone(KST)
+        return value.isoformat(timespec="minutes")
+    except Exception:
+        return d(s)
 
 def d(v):
     if not v: return ""
@@ -29,16 +45,16 @@ def wp_dates(url):
         latest=requests.get(url.rstrip("/")+"/wp-json/wp/v2/posts",params={"status":"publish","per_page":1,"orderby":"date","order":"desc","_fields":"date"},headers=UA,timeout=15);latest.raise_for_status()
         oldest=requests.get(url.rstrip("/")+"/wp-json/wp/v2/posts",params={"status":"publish","per_page":1,"orderby":"date","order":"asc","_fields":"date"},headers=UA,timeout=15);oldest.raise_for_status()
         l=latest.json();o=oldest.json()
-        return d(o[0]["date"]) if o else "", d(l[0]["date"]) if l else ""
+        return d(o[0]["date"]) if o else "", stamp(l[0]["date"]) if l else ""
     except Exception:return "",""
 
 def blogger_dates(url):
     try:
         r=requests.get(url.rstrip("/")+"/feeds/posts/default",params={"alt":"json","max-results":500},headers=UA,timeout=20);r.raise_for_status()
         entries=r.json().get("feed",{}).get("entry",[])
-        dates=[d(x.get("published",{}).get("$t")) for x in entries]
+        dates=[stamp(x.get("published",{}).get("$t")) for x in entries]
         dates=[x for x in dates if x]
-        return (min(dates),max(dates)) if dates else ("","")
+        return (min(dates)[:10],max(dates)) if dates else ("","")
     except Exception:return "",""
 
 def tistory_dates(url):
@@ -49,9 +65,9 @@ def tistory_dates(url):
         for item in root.findall("./channel/item"):
             t=item.findtext("pubDate")
             if t:
-                try: vals.append(datetime.strptime(t,"%a, %d %b %Y %H:%M:%S %z").date().isoformat())
+                try: vals.append(datetime.strptime(t,"%a, %d %b %Y %H:%M:%S %z").astimezone(KST).isoformat(timespec="minutes"))
                 except Exception: pass
-        return (min(vals),max(vals)) if vals else ("","")
+        return (min(vals)[:10],max(vals)) if vals else ("","")
     except Exception:return "",""
 
 def naver_dates(blog_id):
@@ -68,11 +84,11 @@ def naver_dates(blog_id):
             log=str(item.get("logNo") or "")
             if not log or log in seen: continue
             seen.add(log);added+=1
-            dt=d(item.get("addDate"))
+            dt=stamp(item.get("addDate"))
             if dt:dates.append(dt)
         if not added: break
         time.sleep(.05)
-    return (min(dates),max(dates)) if dates else ("","")
+    return (min(dates)[:10],max(dates)) if dates else ("","")
 
 def youtube_rows(items):
     key=os.getenv("YOUTUBE_API_KEY","")
@@ -89,7 +105,7 @@ def youtube_rows(items):
         cid=x.get("channel_id",""); recent=""
         try:
             r=requests.get("https://www.youtube.com/feeds/videos.xml",params={"channel_id":cid},headers=UA,timeout=12);r.raise_for_status()
-            root=ET.fromstring(r.content); vals=[d(e.findtext("a:published",default="",namespaces=ns)) for e in root.findall("a:entry",ns)]; vals=[v for v in vals if v]
+            root=ET.fromstring(r.content); vals=[stamp(e.findtext("a:published",default="",namespaces=ns)) for e in root.findall("a:entry",ns)]; vals=[v for v in vals if v]
             recent=max(vals) if vals else ""
         except Exception:pass
         out[cid]={"opening_date":created.get(cid,""),"recent_publish_date":recent}

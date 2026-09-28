@@ -40,8 +40,26 @@ def test_irrelevant_goes_to_next_provider(monkeypatch,tmp_path):
     monkeypatch.setenv("PIXABAY_KEY","test")
     with patch.object(stock,"_search",return_value=[candidate("New York skyline")]) as search, patch("stable_image_hosting.host_permanently") as host:
         assert stock.find_stock_image("Seoul skyline") is None
-        assert [c.args[0] for c in search.call_args_list] == ["Pexels","Pixabay"]
+        assert [c.args[0] for c in search.call_args_list] == ["Pexels","Pixabay","Wikimedia"]
         host.assert_not_called()
+
+
+def test_wikimedia_plan_c_accepts_only_cc0_or_public_domain(monkeypatch, tmp_path):
+    monkeypatch.setattr(stock, "CACHE", tmp_path)
+    response = Mock()
+    response.json.return_value = {"query": {"pages": {
+        "1": {"pageid": 1, "title": "File:Seoul skyline.jpg", "imageinfo": [{
+            "thumburl": "https://upload.wikimedia.org/seoul.jpg", "descriptionurl": "https://commons.wikimedia.org/wiki/File:Seoul_skyline.jpg",
+            "thumbwidth": 1600, "thumbheight": 900, "extmetadata": {"LicenseShortName": {"value": "CC0"}, "ImageDescription": {"value": "Seoul skyline"}},
+        }]},
+        "2": {"pageid": 2, "title": "File:Restricted.jpg", "imageinfo": [{
+            "thumburl": "https://upload.wikimedia.org/restricted.jpg", "descriptionurl": "https://commons.wikimedia.org/wiki/File:Restricted.jpg",
+            "thumbwidth": 1600, "thumbheight": 900, "extmetadata": {"LicenseShortName": {"value": "CC BY-SA 4.0"}},
+        }]},
+    }}}
+    with patch.object(stock.requests, "get", return_value=response):
+        rows = stock._search("Wikimedia", "Seoul skyline", "public-api")
+    assert [row["id"] for row in rows] == ["1"]
 
 
 def test_event_stock_not_used_as_evidence(monkeypatch):
