@@ -1,1 +1,1 @@
-{"day": "2026-09-29", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-29-blogger_jobinkorea-e4082b18", "claimed_at": "2026-09-29T03:17:14.721526+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
+{"day": "2026-09-29", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-29-blogger_jobinkorea-e4082b18", "claimed_at": "2026-09-29T03:17:14.721526+09:00", "run_id": 36464133802, "child_run_id": null, "child_job_id": null, "workflow": "blogger-rewrite.yml"}
