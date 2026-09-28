@@ -78,3 +78,5 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "로그인·권한 필요" in social
     assert "<th>번호</th><th>플랫폼</th>" in social
     assert "<td>{{loop.index}}</td><td>" in social
+    assert "전체 = 모든 YouTube+SNS" in social
+    assert "생산·발행 트리거" in social
