@@ -18,7 +18,7 @@ main{max-width:1800px;margin:auto;padding:7px 7px 22px}.section{background:#fff;
 .sheet{overflow:auto;max-height:45vh;overscroll-behavior:contain}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;font-size:9.5px}
 th,td{height:25px;padding:3px 4px;border-right:1px solid #dbe3ee;border-bottom:1px solid #dbe3ee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
-th{position:sticky;top:0;z-index:4;background:#e2e8f0;text-align:center;font-weight:950;overflow:hidden;min-width:18px;max-width:420px;touch-action:none}
+th{position:sticky;top:0;z-index:4;background:#e2e8f0;text-align:center;font-weight:950;overflow:hidden;min-width:6px;max-width:420px;touch-action:none}
 th.col-resize-active{cursor:col-resize;user-select:none} body.col-resizing{cursor:col-resize;user-select:none}
 .blog th:nth-child(1){width:42px}.blog th:nth-child(2){width:58px}.blog th:nth-child(3){width:72px}.blog th:nth-child(4){width:92px}.blog th:nth-child(5){width:98px}.blog th:nth-child(6){width:84px}.blog th:nth-child(7){width:90px}.blog th:nth-child(8){width:90px}.blog th:nth-child(9){width:96px}.blog th:nth-child(10){width:86px}.blog th:nth-child(11),.blog th:nth-child(12){width:136px}
 .social th:nth-child(1){width:42px}.social th:nth-child(2){width:68px}.social th:nth-child(3){width:120px}.social th:nth-child(4){width:92px}.social th:nth-child(5),.social th:nth-child(6){width:105px}.social th:nth-child(7){width:72px}.social th:nth-child(8){width:72px}
@@ -61,7 +61,7 @@ const money=r=>{if(!r||!r.monetized)return '—';if(!Number.isFinite(r.amount))r
 const hostInfo=o=>{if(!o)return '<span class="warn">연결 필요</span>';const p=esc(o.provider||'확인중'),pay=esc(o.payment_date||'—'),ren=esc(o.renewal_date||'—');return p+' / '+pay+' / '+ren;};
 const weekday=s=>{if(!s)return '';const d=new Date(s+'T00:00:00+09:00');return ['일','월','화','수','목','금','토'][d.getDay()]};
 const dateLabel=s=>{if(!s)return '';const [y,m,d]=s.split('-').map(Number);return y+'-'+m+'-'+d+'-'+weekday(s)};
-const COL_MIN=18,COL_MAX=420;
+const COL_MIN=6,COL_MAX=420;
 function installColumnMemory(table,key){
  if(!table)return;
  const heads=[...table.querySelectorAll('thead th')];
