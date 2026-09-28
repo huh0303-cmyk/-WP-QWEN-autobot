@@ -20,6 +20,35 @@ for candidate in (ROOT, ROOT / "scripts"):
         sys.path.insert(0, str(candidate))
 STATE_DIR = ROOT / "data" / "london-pipeline"
 KST = timezone(timedelta(hours=9))
+MEDICAL_TOPIC = re.compile(r"(?i)covid|corona|vaccine|vaccination|medical|treatment|hospital|health|코로나|백신|접종|의료|치료|질병|건강")
+
+
+def _clean_research_evidence(raw: str) -> str:
+    """Remove model-invented absolute volumes and repeated prompt templates."""
+    cleaned = []
+    for line in str(raw or "").splitlines():
+        if "<3-6 word search-style phrase>" in line:
+            break
+        label, _, value = line.partition(":")
+        if label.strip().upper() in {"GOOGLE", "NAVER", "VOLUME"} and re.search(r"\d", value) and "http" not in value:
+            line = f"{label}: unavailable (수치 출처 미확인)"
+        cleaned.append(line)
+    return "\n".join(cleaned).strip()
+
+
+def _research_start_state(site_id: str, run_id: str, category: str, platform: str) -> dict:
+    previous = _read_state(run_id) if _state_path(run_id).exists() else {}
+    if previous.get("site_id") and previous["site_id"] != site_id:
+        raise RuntimeError("research site does not match existing run")
+    return {
+        "run_id": run_id, "site_id": site_id, "platform": platform,
+        "created_at": previous.get("created_at") or datetime.now(KST).isoformat(),
+        "publish_mode": previous.get("publish_mode") or os.environ.get("PIPELINE_PUBLISH_MODE", "draft").strip().lower(),
+        "writer_model": previous.get("writer_model") or "auto_free",
+        "image_model": previous.get("image_model") or "auto_free",
+        "category": category.strip() or previous.get("category", ""),
+        "stage_status": {"research": "running"},
+    }
 
 
 def _load_runtime_env() -> None:
@@ -242,15 +271,7 @@ def stage_research(site_id: str, run_id: str, category: str = "") -> dict:
     platform, profile = _profile(site_id)
     settings = profile["blogspot"] if platform == "blogger" else profile["wordpress"]
     site_url = profile["wordpress"]["url"]
-    state = {
-        "run_id": run_id,
-        "site_id": site_id,
-        "platform": platform,
-        "created_at": datetime.now(KST).isoformat(),
-        "publish_mode": os.environ.get("PIPELINE_PUBLISH_MODE", "draft").strip().lower(),
-        "category": category.strip(),
-        "stage_status": {"research": "running"},
-    }
+    state = _research_start_state(site_id, run_id, category, platform)
     _write_state(state)
     from scripts.collect_keyword_search_demand import demand_context
     from scripts.refresh_keyword_pool import call_search_llm, overlaps_corpus, build_network_corpus
@@ -332,7 +353,7 @@ RATIONALE: <why this topic fits now>
     state.update({
         "research": {
             "keyword": keyword,
-            "evidence": last_text,
+            "evidence": _clean_research_evidence(last_text),
             "provider": research_provider,
             "direct_error": direct_error,
             "required_surfaces": ["google", "naver", "media", "gsc"],
@@ -346,6 +367,7 @@ RATIONALE: <why this topic fits now>
 def stage_write(run_id: str) -> dict:
     _load_runtime_env()
     state = _read_state(run_id)
+    state["research"]["evidence"] = _clean_research_evidence(state["research"].get("evidence", ""))
     state.setdefault("stage_status", {})["write"] = "running"
     _write_state(state)
     site_id = state["site_id"]
@@ -390,6 +412,9 @@ def stage_write(run_id: str) -> dict:
             raise RuntimeError(f"writer quality gate failed: score={score} failures={failures}")
     state["article"] = article
     state["writer"] = {"quality_score": score, "provider": provider, "failures": failures}
+    if MEDICAL_TOPIC.search(keyword):
+        state["source_review_required"] = True
+        state["review_reason"] = "의료·백신 글의 최신 사실과 공식 출처를 사람이 확인한 뒤 공개해야 합니다."
     if platform == "wordpress":
         category_id = _ensure_wordpress_category(profile, state)
     else:
@@ -522,6 +547,15 @@ def stage_publish(run_id: str) -> dict:
     _write_state(state)
     platform, profile = _profile(state["site_id"])
     public = state.get("publish_mode", "draft") == "publish"
+    if public and state.get("source_review_required"):
+        state["publish_mode"] = "manual"
+        state.setdefault("stage_status", {})["publish"] = "manual_required"
+        state["manual_ready_at"] = datetime.now(KST).isoformat()
+        state.pop("receipt", None)
+        _write_state(state)
+        return {"ok": True, "stage": "publish", "site_id": state["site_id"],
+                "run_id": run_id, "status": "manual_required", "url": "", "post_id": "",
+                "reason": state.get("review_reason", "source review required")}
     if platform == "wordpress":
         receipt = _publish_wordpress_via_worker(state, profile, public)
     else:

@@ -78,3 +78,18 @@ def test_image_clipboard_endpoint_reads_only_trusted_run_image(monkeypatch, tmp_
     assert copied.status_code == 200 and copied.data == b"RIFFimage"
     london_gpt_app._write_run({"run_id": run_id, "image": {"url": "http://127.0.0.1/private"}})
     assert client.get(f"/api/london-gpt/image/{run_id}").status_code == 404
+
+
+def test_medical_auto_run_hands_off_before_publication(monkeypatch, tmp_path):
+    monkeypatch.setattr(pipeline, "STATE_DIR", tmp_path)
+    run_id = "lgpt-20260928-120000-abcdef"
+    pipeline._write_state({"run_id": run_id, "site_id": "blogger_koreanews", "platform": "blogger",
+                           "publish_mode": "publish", "source_review_required": True,
+                           "review_reason": "official source review required",
+                           "stage_status": {"research": "ok", "write": "ok", "image": "ok"},
+                           "article": {"title": "Test", "content_html": "<p>Test</p>"}})
+    monkeypatch.setattr(pipeline, "_publish_blogger", lambda *args: (_ for _ in ()).throw(AssertionError("published")))
+    result = pipeline.stage_publish(run_id)
+    state = pipeline._read_state(run_id)
+    assert result["status"] == "manual_required"
+    assert state["publish_mode"] == "manual" and "receipt" not in state
