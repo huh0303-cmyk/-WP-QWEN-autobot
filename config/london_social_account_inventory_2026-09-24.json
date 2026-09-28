@@ -266,12 +266,13 @@
   "unconfirmed": [
     {
       "platform": "youtube",
-      "name": "SIS-Language Center",
+      "name": "Jisoo2",
+      "previous_name": "SIS-Language Center",
       "handle": "sis_languagecenter",
       "group": "shopping",
       "role": "multilingual_shopping",
-      "topic": "다국어 상품 소개·쇼핑 전환 채널로 변경 예정",
-      "reason": "shopping direction confirmed; provided handle returned HTTP 404 on 2026-09-29; exact UC id still required"
+      "topic": "다국어 상품 소개·쇼핑 전환 채널",
+      "reason": "operating display mapped from SIS-Language Center to Jisoo2 on 2026-09-29; provided handle returned HTTP 404; exact UC id and actual YouTube rename still require Studio confirmation"
     },
     {
       "platform": "tiktok",
