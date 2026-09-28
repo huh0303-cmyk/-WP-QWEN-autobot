@@ -1,11 +1,15 @@
 """Read-only public collector for the three Naver Blog cards (N1/N2/N3).
 
-Naver Blog does not expose visitor counts through any public API or feed —
-that number is only visible to the logged-in blog owner inside 네이버 블로그
-관리 > 통계. This module never invents that number; every card reports it as
-None with an explicit connector reason instead of a fake zero. Post counts
-and the latest post come from the public RSS feed and, best-effort, the
-public homepage's "전체보기 (N)" widget when the blog skin renders it.
+Naver Blog's own logged-in 네이버 블로그 관리 > 통계 dashboard is still not
+scrapable, but the daily visitor count is not actually private: every blog
+skin renders its "오늘 방문자" widget by calling NVisitorgp4Ajax.naver, a
+public, unauthenticated XML gadget feed keyed only by blogId. This module
+reads that feed directly instead of assuming visitor counts are categorically
+unavailable; when the gadget itself is unreachable or returns nothing
+parseable, the card still reports None with an explicit connector reason
+instead of a fake zero. Post counts and the latest post come from the public
+RSS feed and, best-effort, the public homepage's "전체보기 (N)" widget when
+the blog skin renders it.
 """
 from __future__ import annotations
 
@@ -24,9 +28,11 @@ import requests
 KST = timezone(timedelta(hours=9))
 ROOT = Path(__file__).resolve().parents[1]
 
+NAVER_VISITOR_ENDPOINT = "https://blog.naver.com/NVisitorgp4Ajax.naver"
+
 VISITOR_UNAVAILABLE_REASON = (
-    "네이버 블로그 방문자 수는 로그인한 블로그 소유자만 볼 수 있는 비공개 통계이며 "
-    "공개 API가 없어 자동 수집할 수 없습니다."
+    "네이버 방문자 위젯(NVisitorgp4Ajax.naver) 응답을 확인하지 못했습니다 — "
+    "로그인 전용 통계가 아니라 일시적 연결 실패일 수 있습니다."
 )
 TOTAL_POSTS_PATTERN = re.compile(r"전체보기\s*\(\s*([\d,]+)\s*\)")
 
@@ -136,8 +142,105 @@ def _attach_naver_post_deltas(summaries: dict[str, dict[str, object]]) -> None:
         pass
 
 
+@lru_cache(maxsize=16)
+def _naver_visitor_stats(blog_id: str, five_minute_bucket: int) -> dict[str, object]:
+    """Read Naver Blog's own public daily-visitor XML gadget feed.
+
+    NVisitorgp4Ajax.naver is the same endpoint blog skins call directly to
+    render the "오늘 방문자" counter — it needs no login or API key. Naver
+    does not publish a stable schema for this legacy gadget, so field names
+    are matched loosely (any tag or attribute whose name contains
+    "today"/"yesterday"/"total") rather than pinned to one exact tag.
+    """
+    del five_minute_bucket
+    try:
+        response = requests.get(
+            NAVER_VISITOR_ENDPOINT, params={"blogId": blog_id}, timeout=15,
+            headers={"User-Agent": "Korea365-Control-Room/1.0", "Referer": f"https://blog.naver.com/{blog_id}"},
+        )
+        response.raise_for_status()
+        root = ET.fromstring(response.content)
+    except (requests.RequestException, ET.ParseError):
+        return {"connected": False, "reason": "visitor gadget request failed"}
+
+    # The public gadget returns rows like:
+    # <visitorcnt id="20260928" cnt="5" />.  Use the KST date ids directly.
+    by_day: dict[str, int] = {}
+    for node in root.iter():
+        day_id = str(node.attrib.get("id") or "").strip()
+        count = str(node.attrib.get("cnt") or "").replace(",", "").strip()
+        if len(day_id) == 8 and day_id.isdigit() and count.isdigit():
+            by_day[day_id] = int(count)
+
+    today_date = datetime.now(KST).date()
+    today_key = today_date.strftime("%Y%m%d")
+    yesterday_key = (today_date - timedelta(days=1)).strftime("%Y%m%d")
+    day_before_key = (today_date - timedelta(days=2)).strftime("%Y%m%d")
+    if yesterday_key not in by_day:
+        return {"connected": False, "reason": "visitor gadget response missing yesterday row"}
+    today_count = by_day.get(today_key, 0)
+    yesterday_count = by_day[yesterday_key]
+    day_before_count = by_day.get(day_before_key)
+    return {
+        "connected": True,
+        "today": today_count,
+        "yesterday": yesterday_count,
+        "day_before_yesterday": day_before_count,
+        "today_delta": today_count - yesterday_count,
+        "yesterday_delta": (
+            yesterday_count - day_before_count if day_before_count is not None else None
+        ),
+        # Naver's public gadget is daily-only; cumulative total is not exposed.
+        "total": None,
+        "total_delta": None,
+        "checked_at": datetime.now(KST).isoformat(),
+    }
+
+
+def _attach_naver_visitor_deltas(stats: dict[str, dict[str, object]]) -> None:
+    """Attach yesterday-over-day-before delta using the prior daily snapshot.
+
+    Mirrors _attach_tistory_visitor_deltas in control_center/app.py: the
+    gadget itself only ever reports today/yesterday, so a comparison against
+    the day before yesterday needs yesterday's own stored reading.
+    """
+    snapshot_path = ROOT / "data" / "naver_visitor_latest.json"
+    today = date.today().isoformat()
+    try:
+        stored = json.loads(snapshot_path.read_text(encoding="utf-8")) if snapshot_path.exists() else {}
+    except (OSError, ValueError):
+        stored = {}
+    previous = stored.get("previous", {}) if stored.get("date") == today else stored.get("sites", {})
+    if not isinstance(previous, dict):
+        previous = {}
+    current: dict[str, dict[str, object]] = {}
+    for blog_id, row in stats.items():
+        if not row.get("connected"):
+            continue
+        prior = previous.get(blog_id, {}) if isinstance(previous.get(blog_id, {}), dict) else {}
+        if row.get("yesterday_delta") is None:
+            prior_yesterday = prior.get("yesterday")
+            row["yesterday_delta"] = (
+                int(row["yesterday"]) - int(prior_yesterday) if prior_yesterday is not None else None
+            )
+        if row.get("today_delta") is None:
+            row["today_delta"] = int(row["today"]) - int(row["yesterday"])
+        if row.get("total") is not None and row.get("total_delta") is None:
+            row["total_delta"] = int(row["today"])
+        current[blog_id] = {"today": row["today"], "yesterday": row["yesterday"], "total": row.get("total")}
+    try:
+        snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+        snapshot_path.write_text(
+            json.dumps({"date": today, "previous": previous, "sites": current}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+
 def get_naver_data() -> list[dict[str, object]]:
-    """Build the three Naver control-room cards without inferring visitor data."""
+    """Build the three Naver control-room cards from the public visitor gadget
+    plus the RSS/homepage post summary, never inferring numbers that fail."""
     rooms = _naver_rooms()
     bucket = int(time.time() // 300)
     summaries = {
@@ -145,10 +248,16 @@ def get_naver_data() -> list[dict[str, object]]:
         for room in rooms
     }
     _attach_naver_post_deltas(summaries)
+    visitor_stats = {
+        room["destination_id"]: _naver_visitor_stats(room["destination_id"], bucket)
+        for room in rooms
+    }
+    _attach_naver_visitor_deltas(visitor_stats)
     result = []
     for order, room in enumerate(rooms, 1):
         blog_id = str(room["destination_id"])
         summary = summaries.get(blog_id, {})
+        traffic = visitor_stats.get(blog_id, {})
         persona, tone = PERSONA_BY_BLOG_ID.get(blog_id, DEFAULT_PERSONA)
         result.append({
             "site_id": room.get("room_id") or f"naver_{blog_id}",
@@ -163,11 +272,15 @@ def get_naver_data() -> list[dict[str, object]]:
             "tone": tone,
             "default_text_model": "gpt-5-mini",
             "default_image_model": "bytedance/sdxl-lightning-4step",
-            "today_visitors": None,
-            "today_delta": None,
-            "total_visitors": None,
-            "total_delta": None,
-            "visitor_error": VISITOR_UNAVAILABLE_REASON,
+            "today_visitors": traffic.get("today"),
+            "today_delta": traffic.get("today_delta"),
+            "yesterday_visitors": traffic.get("yesterday"),
+            "yesterday_delta": traffic.get("yesterday_delta"),
+            "total_visitors": traffic.get("total"),
+            "total_delta": traffic.get("total_delta"),
+            "visitor_connected": bool(traffic.get("connected")),
+            "visitor_checked_at": traffic.get("checked_at", "") if traffic.get("connected") else "",
+            "visitor_error": "" if traffic.get("connected") else (traffic.get("reason") or VISITOR_UNAVAILABLE_REASON),
             "total_posts": summary.get("total_posts"),
             "posts_delta": summary.get("total_delta"),
             "today_posts": summary.get("today"),

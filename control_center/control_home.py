@@ -153,6 +153,69 @@ def build_sns_ranking(bucket: int) -> dict:
         "rows": rows,
     }
 
+ACTIVE_SOCIAL_ROLES = {"korean_topik", "english", "japanese"}
+
+
+def build_social_ranking(bucket: int) -> dict:
+    youtube = build_youtube_ranking(bucket)
+    sns = build_sns_ranking(bucket)
+    rows = []
+    for item in youtube["rows"]:
+        rows.append({
+            "platform": "YouTube",
+            "name": item.get("name"),
+            "category": item.get("category") or "YouTube",
+            "url": item.get("url") or "",
+            "audience": item.get("subscribers"),
+            "audience_delta": item.get("subscriber_delta"),
+            "views": item.get("views"),
+            "views_delta": item.get("view_delta"),
+            "content_count": item.get("videos"),
+            "connected": item.get("connected", False),
+        })
+    for item in sns["rows"]:
+        if item.get("role") not in ACTIVE_SOCIAL_ROLES:
+            continue
+        rows.append({
+            "platform": item.get("platform"),
+            "name": item.get("name"),
+            "category": item.get("role") or "",
+            "url": item.get("url") or "",
+            "audience": item.get("followers"),
+            "audience_delta": item.get("followers_delta"),
+            "views": item.get("yesterday_views"),
+            "views_delta": item.get("views_delta"),
+            "content_count": None,
+            "connected": item.get("connected", False),
+        })
+    rows.sort(key=lambda r: (
+        r["audience"] is None,
+        -(r["audience"] or 0),
+        -(r["views"] or 0),
+        str(r["platform"]),
+        str(r["name"]).casefold(),
+    ))
+    rank = 0
+    for row in rows:
+        if row["audience"] is None:
+            row["rank"] = None
+        else:
+            rank += 1
+            row["rank"] = rank
+    youtube_total = len(youtube["rows"])
+    sns_active_total = sum(1 for item in sns["rows"] if item.get("role") in ACTIVE_SOCIAL_ROLES)
+    return {
+        "generated_at": datetime.now(KST).isoformat(),
+        "total": len(rows),
+        "ranked": rank,
+        "youtube_total": youtube_total,
+        "sns_active_total": sns_active_total,
+        "target_total": 30,
+        "target_youtube": 18,
+        "count_confirmation_required": youtube_total != 18 or sns_active_total != 12,
+        "rows": rows,
+    }
+
 
 def install(app):
     @app.get("/control-home")
@@ -166,3 +229,7 @@ def install(app):
     @app.get("/api/control/sns-ranking")
     def sns_ranking():
         return jsonify(build_sns_ranking(int(datetime.now().timestamp() // 300))), 200, {"Cache-Control": "no-store"}
+
+    @app.get("/api/control/social-ranking")
+    def social_ranking():
+        return jsonify(build_social_ranking(int(datetime.now().timestamp() // 300))), 200, {"Cache-Control": "no-store"}
