@@ -109,11 +109,13 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
         assert f'a[data-platform="{platform}"]' in social
     assert '<a data-platform="{{p}}"' in social
     assert "<th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th>" in social
-    assert "<th>구독자·팔로워(증감)</th><th>방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>$ 수익</th><th>채널/페이지 생성일</th><th>최근 발행일</th>" in social
+    assert "<th>구독자수(증감)</th><th>어제 방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>수익$(증감)</th><th>개설일자</th><th>최근 발행일</th>" in social
     assert "<th>생산·발행 트리거</th><th>계정 ID</th>" in social
     assert "fetch('/api/control/social-ranking'" in social
     assert "item.content_count_delta" in social
-    assert "k365-social-column-widths-v5" in social
+    assert "k365-social-column-widths-v6" in social
+    assert "item.yesterday_views,item.yesterday_views_delta" in social
+    assert "Number.isFinite(revenue.delta)" in social
     assert 'class="metric-revenue">미연결' in social
     assert 'class="metric-opening">미확인' in social
     assert 'class="metric-recent">미확인' in social
@@ -137,8 +139,9 @@ def test_youtube_group_order_and_verified_survival_channels_are_explicit():
     assert "UCKvKhETLGPaRV3qfWv2bM2g" in inventory
     assert "UCRZ0uc_bxKDMwz3noBBi9KQ" in inventory
     assert inventory.count('"recent_publish_date": "2026-09-13"') >= 3
-    assert '"name": "SIS-Language Center"' in inventory
-    assert '"state_label": "공개 핸들 확인 실패 · UC ID 필요"' in source
+    assert '"name": "Jisoo2"' in inventory
+    assert '"previous_name": "SIS-Language Center"' in inventory
+    assert '"state_label": "Jisoo2 운영 매핑 · UC ID 확인 필요"' in source
 
 
 def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
@@ -151,3 +154,6 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"status": "수익 OAuth 필요"' in source
     assert '"opening_date": str(item.get("created_at")' in source
     assert 'timeline.get("recent_publish_date") or str(item.get("recent_publish_date")' in source
+    assert '"yesterday_views": item.get("view_delta")' in source
+    assert '"yesterday_views_delta": item.get("views_delta")' in source
+    assert "if item.get(\"handle\") and item.get(\"channel_id\")" in source

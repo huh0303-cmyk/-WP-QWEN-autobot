@@ -226,13 +226,17 @@ def build_social_ranking(bucket: int) -> dict:
             "category": item.get("category") or "YouTube",
             "url": (
                 f"https://www.youtube.com/@{item.get('handle')}"
-                if item.get("handle")
+                if item.get("handle") and item.get("channel_id")
                 else item.get("url") or ""
             ),
             "audience": item.get("subscribers"),
             "audience_delta": item.get("subscriber_delta"),
             "views": item.get("views"),
             "views_delta": item.get("view_delta"),
+            # A YouTube snapshot delta is the available daily view count.  Keep
+            # cumulative views separate so the UI never labels it as yesterday.
+            "yesterday_views": item.get("view_delta"),
+            "yesterday_views_delta": None,
             "content_count": item.get("videos"),
             "content_count_delta": item.get("video_delta"),
             "revenue": item.get("revenue") or {},
@@ -253,6 +257,8 @@ def build_social_ranking(bucket: int) -> dict:
             "audience_delta": item.get("followers_delta"),
             "views": item.get("yesterday_views"),
             "views_delta": item.get("views_delta"),
+            "yesterday_views": item.get("yesterday_views"),
+            "yesterday_views_delta": item.get("views_delta"),
             "content_count": item.get("content_count"),
             "content_count_delta": item.get("content_delta"),
             "revenue": item.get("revenue") or {},

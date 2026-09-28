@@ -121,7 +121,7 @@ def _youtube_cards() -> list[dict]:
             "group": group, "group_label": YOUTUBE_GROUP_LABEL.get(group, group), "inventory_order": 100,
             "role": "언어별 Survival 콘텐츠 생산" if group == "language" else "다국어 쇼핑·상품소개 영상 생산" if group == "shopping" else "채널 역할 확인 필요",
             "description": f"{language} 초급 생존 회화와 생활 표현" if group == "language" else row.get("topic") or "UC ID 확인 후 역할과 자동화를 연결합니다.",
-            "state_label": "공개 핸들 확인 실패 · UC ID 필요", "connection_level": "missing",
+            "state_label": "Jisoo2 운영 매핑 · UC ID 확인 필요" if name == "Jisoo2" else "공개 핸들 확인 실패 · UC ID 필요", "connection_level": "missing",
             "publish_mode": "YouTube Studio에서 정확한 UC ID와 업로드 권한을 확인합니다.",
             "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "YouTube Studio에서 확인",
         })
