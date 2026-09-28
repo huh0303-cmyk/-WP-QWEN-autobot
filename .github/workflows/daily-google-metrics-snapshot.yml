@@ -61,6 +61,7 @@ jobs:
             echo "No metrics changes"
           else
             git commit -m "data: refresh Google metrics [skip ci]"
+            git pull --rebase origin main
             git push origin HEAD:main
           fi
       - uses: actions/upload-artifact@v4
