@@ -51,7 +51,7 @@ def test_pm_lock_records_three_visible_apps_and_youtube_alias():
 
 def test_combined_social_detail_uses_mobile_scrollable_table_not_cards():
     template = (ROOT / "control_center" / "templates" / "social_accounts.html").read_text(encoding="utf-8")
-    assert '<table class="account-table">' in template
+    assert '<table id="socialTable" class="account-table">' in template
     assert '<article class="card"' not in template
     assert "YOUTUBE + SNS 생산·발행 통제실" in template
     assert "overflow:auto" in template
@@ -73,7 +73,7 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert 'id="publishSite"' in blog
     assert "4-Agent 발행 시작" in blog
     assert '<table class="ranking">' in blog
-    assert '<table class="account-table">' in social
+    assert '<table id="socialTable" class="account-table">' in social
     assert "YOUTUBE + SNS 생산·발행 통제실" in social
     assert "로그인·권한 필요" in social
     assert "<th>번호</th><th>플랫폼</th>" in social
@@ -84,3 +84,16 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
         assert f'tr[data-platform="{platform}"] td' in social
         assert f'a[data-platform="{platform}"]' in social
     assert '<a data-platform="{{p}}"' in social
+    assert "<th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th>" in social
+    assert "<th>생산·발행 트리거</th><th>계정 ID</th>" in social
+    assert "k365-social-column-widths-v2" in social
+    assert "col-resizer" in social
+
+
+def test_youtube_group_order_and_missing_survival_channels_are_explicit():
+    source = (ROOT / "control_center" / "social_accounts.py").read_text(encoding="utf-8")
+    assert '"language": 0, "playlist": 1, "knowledge": 2, "health": 3, "shopping": 4' in source
+    assert '"Survival Chinese": 3' in source
+    assert '"Survival Vietnamese": 4' in source
+    assert '"Survival Portuguese": 9' in source
+    assert '"state_label": "채널 생성·선택 필요"' in source

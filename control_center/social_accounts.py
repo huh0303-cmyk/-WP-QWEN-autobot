@@ -32,6 +32,15 @@ CORE_YOUTUBE = {
     "UCwh49EokdWFJqYFE_zA6XDQ": "retro_reels",
 }
 
+YOUTUBE_GROUP_ORDER = {"language": 0, "playlist": 1, "knowledge": 2, "health": 3, "shopping": 4, "additional": 5}
+YOUTUBE_GROUP_LABEL = {"language": "언어 Survival", "playlist": "플레이리스트", "knowledge": "지식", "health": "헬스", "shopping": "쇼핑·예약", "additional": "기타"}
+YOUTUBE_LANGUAGE_ORDER = {
+    "서울국제대학-TOPIK센터": 0, "English Survival": 1, "Japanese Survival": 2,
+    "Survival Chinese": 3, "Survival Vietnamese": 4, "Spanish Survival": 5,
+    "French Survival": 6, "German Survival": 7, "Italian Survival": 8,
+    "Survival Portuguese": 9,
+}
+
 ROLE_DETAILS = {
     "서울국제대학-TOPIK센터": ("한국어·TOPIK 교육", "TOPIK 학습, 한국어 표현, 유학생 대상 교육 콘텐츠"),
     "English Survival": ("생활 영어 교육", "실생활 영어 표현과 생존 회화 중심 콘텐츠"),
@@ -74,24 +83,49 @@ def _youtube_cards() -> list[dict]:
     inventory = _read(INVENTORY, {})
     configured = {r.get("channel_id"): r for r in _read(YOUTUBE_CONFIG, {}).get("channels", []) if r.get("channel_id")}
     cards = []
-    for row in inventory.get("youtube", []):
+    for inventory_order, row in enumerate(inventory.get("youtube", [])):
         channel_id = row["channel_id"]
         profile = configured.get(channel_id, {})
         core_key = CORE_YOUTUBE.get(channel_id)
         group = profile.get("channel_type") or row.get("group") or "additional"
         role, fallback = ROLE_DETAILS.get(row["name"], (group, "채널별 확정 주제 콘텐츠"))
+        group_label = YOUTUBE_GROUP_LABEL.get(group, group)
+        operational_role = {
+            "language": "언어별 Survival 콘텐츠 생산",
+            "playlist": "음악·플레이리스트 영상 생산",
+            "knowledge": "지식·아카이브 다큐 영상 생산",
+            "health": "언어권별 건강정보 영상 생산",
+            "shopping": "쇼핑·예약형 영상 생산",
+        }.get(group, role)
         cards.append({
             "key": f"youtube:{channel_id}", "platform": "YouTube", "name": row["name"],
             "identity": channel_id, "handle": row.get("handle", ""),
             "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
-            "role": role if not profile else group, "description": profile.get("tone") or fallback,
+            "group": group, "group_label": group_label, "inventory_order": inventory_order, "role": operational_role,
+            "description": profile.get("tone") or fallback,
             "state_label": "비공개 제작·업로드 가능 · 공개는 별도 승인" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
             "connection_level": "publish_connected" if core_key else "identity_verified",
             "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "YouTube Studio 로그인 후 제작 프로필을 확인합니다.",
             "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",
             "button_label": "비공개 제작 시작" if core_key else "YouTube Studio 로그인",
         })
-    return cards
+    for row in inventory.get("unconfirmed", []):
+        if row.get("platform") != "youtube" or "Survival" not in str(row.get("name") or ""):
+            continue
+        language = str(row.get("name") or "").removeprefix("Survival ")
+        cards.append({
+            "key": f"youtube:planned:{language.lower()}", "platform": "YouTube", "name": row.get("name"),
+            "identity": "채널 생성/선택 후 UC ID 등록", "handle": "", "url": "", "login_url": "https://studio.youtube.com/",
+            "group": "language", "group_label": "언어 Survival", "inventory_order": 100, "role": "언어별 Survival 콘텐츠 생산",
+            "description": f"{language} 초급 생존 회화와 생활 표현",
+            "state_label": "채널 생성·선택 필요", "connection_level": "missing",
+            "publish_mode": "YouTube Studio에서 전용 채널을 만든 뒤 정확한 UC ID와 업로드 권한을 연결합니다.",
+            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "채널 생성·로그인",
+        })
+    return sorted(cards, key=lambda c: (
+        YOUTUBE_GROUP_ORDER.get(c.get("group"), 99),
+        YOUTUBE_LANGUAGE_ORDER.get(c.get("name"), c.get("inventory_order", 999)) if c.get("group") == "language" else c.get("inventory_order", 999),
+    ))
 
 
 def _sns_cards() -> list[dict]:
@@ -118,6 +152,7 @@ def _sns_cards() -> list[dict]:
             "identity": f"@{row['handle']}" if row.get("handle") else "로그인 후 계정 ID 확인",
             "handle": row.get("handle", ""), "url": row.get("url", ""),
             "login_url": LOGIN_URLS.get(platform, ""), "role": role.get("name", row.get("role", "")),
+            "group": "sns", "group_label": role.get("name", "SNS"),
             "description": role.get("topic", "플랫폼별 확정 주제 콘텐츠"), "state_label": state,
             "connection_level": level,
             "publish_mode": "이 계정으로 하루 1건 공개 발행할 수 있습니다." if publish_ok else "로그인 후 정확한 계정과 게시 권한을 확인합니다. 확인 전에는 공개하지 않습니다.",
