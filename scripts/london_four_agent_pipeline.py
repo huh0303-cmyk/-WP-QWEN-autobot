@@ -547,7 +547,10 @@ def stage_publish(run_id: str) -> dict:
     _write_state(state)
     platform, profile = _profile(state["site_id"])
     public = state.get("publish_mode", "draft") == "publish"
-    if public and state.get("source_review_required"):
+    medical_topic = bool(MEDICAL_TOPIC.search(str((state.get("research") or {}).get("keyword") or "")))
+    if public and (state.get("source_review_required") or medical_topic):
+        state["source_review_required"] = True
+        state.setdefault("review_reason", "의료·백신 글의 최신 사실과 공식 출처를 사람이 확인한 뒤 공개해야 합니다.")
         state["publish_mode"] = "manual"
         state.setdefault("stage_status", {})["publish"] = "manual_required"
         state["manual_ready_at"] = datetime.now(KST).isoformat()

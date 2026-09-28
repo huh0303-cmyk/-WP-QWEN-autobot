@@ -84,8 +84,7 @@ def test_medical_auto_run_hands_off_before_publication(monkeypatch, tmp_path):
     monkeypatch.setattr(pipeline, "STATE_DIR", tmp_path)
     run_id = "lgpt-20260928-120000-abcdef"
     pipeline._write_state({"run_id": run_id, "site_id": "blogger_koreanews", "platform": "blogger",
-                           "publish_mode": "publish", "source_review_required": True,
-                           "review_reason": "official source review required",
+                           "publish_mode": "publish", "research": {"keyword": "코로나 백신 접종 현황"},
                            "stage_status": {"research": "ok", "write": "ok", "image": "ok"},
                            "article": {"title": "Test", "content_html": "<p>Test</p>"}})
     monkeypatch.setattr(pipeline, "_publish_blogger", lambda *args: (_ for _ in ()).throw(AssertionError("published")))
