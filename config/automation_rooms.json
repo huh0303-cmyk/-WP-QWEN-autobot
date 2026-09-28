@@ -1081,27 +1081,27 @@
       "room_id": "naver_n2",
       "platform": "naver",
       "report_code": "N2",
-      "name": "N2",
+      "name": "N2 · huh3",
       "enabled": false,
-      "destination_id": "",
+      "destination_id": "huh3",
       "workflow": "naver-blog-local",
       "language": "ko",
       "publish_policy": "draft",
       "duplicate_guard": true,
-      "status": "ACCOUNT_INFO_REQUIRED"
+      "status": "IDENTITY_OWNER_PROVIDED_LOCAL_SESSION_UNVERIFIED"
     },
     {
       "room_id": "naver_n3",
       "platform": "naver",
       "report_code": "N3",
-      "name": "N3",
+      "name": "N3 · huh4",
       "enabled": false,
-      "destination_id": "",
+      "destination_id": "huh4",
       "workflow": "naver-blog-local",
       "language": "ko",
       "publish_policy": "draft",
       "duplicate_guard": true,
-      "status": "ACCOUNT_INFO_REQUIRED"
+      "status": "IDENTITY_OWNER_PROVIDED_LOCAL_SESSION_UNVERIFIED"
     },
     {
       "room_id": "yt_globalmusic",

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0f172a">
 <title>런던프로젝트GPT</title>
+<script>if(location.protocol==='file:')location.replace('https://control.korea365.org/london-gpt');</script>
 <link rel="manifest" href="{{ url_for('pwa_manifest') }}">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -36,24 +37,31 @@
     <label class="rounded-xl border border-violet-400 bg-violet-500/10 px-4 py-3 text-sm font-bold"><input type="radio" name="runMode" value="manual"> 수동 모드 · ①~③ 후 직접 발행</label>
   </div>
 
-  <div class="mt-4 grid gap-4 lg:grid-cols-3">
+  <div class="mt-4 grid gap-4 lg:grid-cols-4">
+    <label class="block"><span class="mb-1 block text-xs font-black text-slate-400">플랫폼</span>
+      <select id="platform" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
+        <option value="wordpress">WordPress</option><option value="blogger">Blogspot 33개</option>
+        <option value="naver">네이버 3개</option><option value="tistory">티스토리 5개</option>
+      </select>
+    </label>
     <label class="block">
-      <span class="mb-1 block text-xs font-black text-slate-400">WordPress 사이트</span>
+      <span class="mb-1 block text-xs font-black text-slate-400">블로그</span>
       <select id="site" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm">
         {% for site in snapshot.sites %}
         <option value="{{ site.site_id }}"
+                data-platform="{{ site.platform }}" data-auto="{{ 'true' if site.auto_publish else 'false' }}"
                 data-persona="{{ site.persona }}"
                 data-tone="{{ site.tone }}"
                 data-theme="{{ site.theme }}"
-                data-categories='{{ site.categories|tojson }}'>
-          {{ site.url.replace('https://','') }}
+                data-categories='{{ site.categories|tojson }}' {{ 'disabled' if not site.enabled else '' }}>
+          {{ site.label }}{{ ' · 연결 필요' if not site.enabled else '' }}
         </option>
         {% endfor %}
       </select>
     </label>
 
     <label class="block">
-      <span class="mb-1 block text-xs font-black text-slate-400">카테고리</span>
+      <span class="mb-1 block text-xs font-black text-slate-400">카테고리 / 라벨</span>
       <select id="category" class="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-sm"></select>
     </label>
 
@@ -65,6 +73,7 @@
       </select>
     </label>
   </div>
+  <p id="platformNote" class="mt-3 text-sm text-amber-200"></p>
 
   <button id="autoBtn" class="mt-4 w-full rounded-xl bg-blue-600 px-4 py-4 text-base font-black hover:bg-blue-500 disabled:opacity-40">
     자동 실행 · ①→②→③→④
@@ -104,7 +113,7 @@
       {% elif step.id == 'image' %}
       <div class="mt-3 space-y-2 text-sm"><img id="agentImage" class="hidden max-h-48 rounded-xl object-contain" alt="Agent 3 결과 이미지"><p id="agentImageUrl" class="break-all text-slate-300">이미지 대기</p><button class="copy-btn hidden" id="copyImage" data-copy="image">이미지 URL 복사</button></div>
       {% elif step.id == 'publish' %}
-      <div id="manualPublish" class="mt-3 hidden space-y-3 text-sm"><p class="text-violet-200">1~3번 결과를 복사해 선택한 WordPress 사이트에 직접 공개하세요. 공개한 글 주소를 붙여넣으면 확인합니다.</p><button id="copyPackage" class="copy-btn w-full">발행 자료 전체 복사</button><label class="block text-slate-300">공개한 글 주소<input id="manualUrl" type="url" placeholder="https://선택한사이트/글-주소/" class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-white"></label><button id="verifyManual" class="w-full rounded-xl bg-violet-600 px-3 py-3 font-black disabled:opacity-40">④ 공개 글 검증</button><p id="manualMessage" class="break-words text-xs text-slate-300"></p></div>
+      <div id="manualPublish" class="mt-3 hidden space-y-3 text-sm"><p class="text-violet-200">1~3번 결과를 복사해 선택한 블로그에 직접 공개하세요. 공개한 글 주소를 붙여넣으면 확인합니다.</p><button id="copyPackage" class="copy-btn w-full">발행 자료 전체 복사</button><label class="block text-slate-300">공개한 글 주소<input id="manualUrl" type="url" placeholder="https://선택한블로그/글-주소/" class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-3 text-white"></label><button id="verifyManual" class="w-full rounded-xl bg-violet-600 px-3 py-3 font-black disabled:opacity-40">④ 공개 글 검증</button><p id="manualMessage" class="break-words text-xs text-slate-300"></p></div>
       {% endif %}
       <button class="rerun mt-3 hidden w-full rounded-xl border border-red-400/40 px-3 py-2 text-sm font-black text-red-300" data-stage="{{ step.id }}">
         이 Agent만 다시 실행
@@ -167,6 +176,7 @@
 </main>
 
 <script>
+const platformEl=document.getElementById('platform');
 const siteEl=document.getElementById('site');
 const categoryEl=document.getElementById('category');
 const autoBtn=document.getElementById('autoBtn');
@@ -175,6 +185,9 @@ let currentRunId='', pollTimer=null;
 let currentData=null;
 function selectedMode(){return document.querySelector('input[name="runMode"]:checked').value}
 function setModeUI(){
+  const requiresManual=siteEl.selectedOptions[0]?.dataset.auto==='false';
+  document.querySelector('input[name="runMode"][value="auto"]').disabled=requiresManual;
+  if(requiresManual)document.querySelector('input[name="runMode"][value="manual"]').checked=true;
   const manual=selectedMode()==='manual';
   document.getElementById('publishModeLabel').classList.toggle('hidden',manual);
   document.getElementById('modeDescription').textContent=manual
@@ -184,6 +197,9 @@ function setModeUI(){
     ?'1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지를 다시 준비합니다. 발행은 직접 합니다.'
     :'1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지 → ④ 발행을 다시 실행합니다.';
   if(!autoBtn.disabled)autoBtn.textContent=manual?'수동 준비 실행 · ①→②→③':'자동 실행 · ①→②→③→④';
+  document.getElementById('platformNote').textContent=requiresManual
+    ?'네이버·티스토리는 ①~③을 준비한 뒤 직접 발행하고 공개 URL을 확인합니다.'
+    :'';
 }
 function copyValue(key){
   const d=currentData||{}, a=d.article||{};
@@ -202,11 +218,19 @@ async function copyText(value,button){
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function refreshProfile(){
   const o=siteEl.options[siteEl.selectedIndex];
+  if(!o)return;
   const cats=JSON.parse(o.dataset.categories||'[]');
-  categoryEl.innerHTML=cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');
+  categoryEl.innerHTML=cats.length?cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join(''):'<option value="">기본 / 글 주제</option>';
   document.getElementById('persona').textContent=o.dataset.persona||'-';
   document.getElementById('tone').textContent=o.dataset.tone||'-';
   document.getElementById('theme').textContent=o.dataset.theme||'-';
+  setModeUI();
+}
+function refreshPlatform(){
+  for(const o of siteEl.options)o.hidden=o.dataset.platform!==platformEl.value;
+  const first=[...siteEl.options].find(o=>!o.hidden&&!o.disabled);
+  if(first)siteEl.value=first.value;
+  refreshProfile();
 }
 function safeArticleHtml(raw){
   const doc=new DOMParser().parseFromString(String(raw||''),'text/html');
@@ -360,6 +384,7 @@ async function pollRun(){
       const g=d.indexing_submission||{};
       document.getElementById('gscSubmission').textContent=d.receipt.status==='draft'
         ?'초안: GSC 제출 대상이 아닙니다.'
+        :g.status==='not_applicable'?'이 플랫폼은 GSC 사이트맵 자동 제출 대상이 아닙니다.'
         :g.status==='submitted'?'GSC 사이트맵 제출 완료 · Google 색인 완료는 별도 확인이 필요합니다.'
         :g.status==='ready'?'GSC 연결 점검 완료 (실제 제출 전)'
         :g.status==='failed'?'GSC 제출 실패: '+(g.error||'원인 확인 필요')
@@ -433,6 +458,7 @@ async function verifyManual(){
   finally{btn.disabled=false;}
 }
 siteEl.addEventListener('change',refreshProfile);
+platformEl.addEventListener('change',refreshPlatform);
 autoBtn.addEventListener('click',autoRun);
 rewriteBtn.addEventListener('click',rewriteArticle);
 document.querySelectorAll('.rerun').forEach(b=>b.addEventListener('click',()=>rerun(b.dataset.stage)));
@@ -443,8 +469,7 @@ document.getElementById('copyPackage').addEventListener('click',e=>{
   copyText(rows.map(([label,key])=>label+'\n'+copyValue(key)).join('\n\n'),e.currentTarget).catch(()=>showError('복사','클립보드 접근이 차단되었습니다.'));
 });
 document.getElementById('verifyManual').addEventListener('click',verifyManual);
-refreshProfile();
-setModeUI();
+refreshPlatform();
 </script>
 </body>
 </html>
