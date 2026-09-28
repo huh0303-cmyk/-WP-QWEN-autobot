@@ -7,7 +7,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-four-agent",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "trigger-webhook",
@@ -298,7 +298,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-rewrite",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "rewrite-webhook",
@@ -356,7 +356,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-rerun-research",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "repair-research-webhook",
@@ -414,7 +414,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-rerun-write",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "repair-write-webhook",
@@ -454,7 +454,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-rerun-image",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "repair-image-webhook",
@@ -494,7 +494,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "london-content-rerun-publish",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "repair-publish-webhook",
