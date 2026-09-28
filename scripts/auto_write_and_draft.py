@@ -52,11 +52,11 @@ def _consensus_passes(consensus: dict) -> bool:
     return sum(1 for check in checks.values() if check.get("ok") is True) >= 2
 
 
-def _finish_meta_description(article: dict) -> dict:
+def _finish_meta_description(article: dict, keyword: str = "") -> dict:
     """Fit Blogger/Google snippet text to the shared 100-120 char gate."""
     meta = str(article.get("meta_description", "")).strip().rstrip(" ,;:-.!?")
     title = str(article.get("title", "")).strip()
-    korean = bool(re.search(r"[가-힣]", meta))
+    korean = bool(re.search(r"[가-힣]", title + meta))
     if len(meta) > 119:
         complete = re.findall(r".*?[.!?](?=\s|$)", meta)
         meta = " ".join(part.strip() for part in complete if part.strip())
@@ -77,20 +77,16 @@ def _finish_meta_description(article: dict) -> dict:
         fitting = next((suffix for suffix in suffixes if 100 <= len(meta + suffix) <= 119), "")
         meta += fitting
     if not 100 <= len(meta) <= 119:
-        topic = re.sub(r"\s+", " ", title).strip(" ,;:-.!?")
-        topic = topic[:42].rsplit(" ", 1)[0] if len(topic) > 42 and " " in topic[:42] else topic[:42]
+        topic = re.sub(r"\s+", " ", keyword or title).strip(" ,;:-.!?")
+        cap = 23 if korean else 21
+        if len(topic) > cap:
+            clipped = topic[:cap].rsplit(" ", 1)[0]
+            topic = clipped if len(clipped) >= 4 else topic[:cap]
         meta = (
-            f"{topic}의 핵심 절차와 준비사항, 비용과 시기, 놓치기 쉬운 확인 기준을 실제 계획 순서에 맞춰 알기 쉽게 정리합니다."
+            f"{topic}에 대해 독자가 먼저 확인해야 할 핵심 내용과 실제 적용할 때의 주의사항을 정리했습니다. 관련 기준은 상황에 따라 달라질 수 있어 최신 공식 안내도 함께 확인해야 합니다."
             if korean else
-            f"Learn about {topic}, with practical steps, key checks, timing, costs, and preparation tips for informed decisions."
+            f"{topic}: practical steps, key checks and common pitfalls, with guidance on what to verify before you act."
         )
-        if len(meta) > 119:
-            topic = topic[: max(12, 42 - (len(meta) - 119))].rstrip(" ,;:-")
-            meta = (
-                f"{topic}의 핵심 절차와 준비사항, 비용과 시기, 놓치기 쉬운 확인 기준을 실제 계획 순서에 맞춰 알기 쉽게 정리합니다."
-                if korean else
-                f"Learn about {topic}, with practical steps, key checks, timing, costs, and preparation tips for informed decisions."
-            )
     if not 100 <= len(meta) <= 119 or not meta.endswith((".", "!", "?")):
         raise ValueError("Could not build a complete 100-119 character meta description")
     article["meta_description"] = meta
@@ -174,7 +170,7 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             candidate = parse_rewrite_json(raw)
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
-            candidate = _finish_meta_description(candidate)
+            candidate = _finish_meta_description(candidate, keyword=keyword)
             score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
             critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete", "language mismatch"))]
