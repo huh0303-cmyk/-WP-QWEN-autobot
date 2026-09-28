@@ -80,3 +80,5 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "<td>{{loop.index}}</td><td>" in social
     assert "전체 = 모든 YouTube+SNS" in social
     assert "생산·발행 트리거" in social
+    for platform in ("YouTube", "TikTok", "Instagram", "Facebook", "Threads"):
+        assert f'tr[data-platform="{platform}"] td' in social
