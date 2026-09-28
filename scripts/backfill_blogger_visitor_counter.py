@@ -9,9 +9,9 @@ import json, os, re, sys, time
 from pathlib import Path
 import requests
 
-from automation_hub.blog_visitor_widget import MARK, visitor_counter_html
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from automation_hub.blog_visitor_widget import MARK, visitor_counter_html
 OUT = ROOT / "artifacts/blogger-visitor-counter-backfill.json"
 BADGE_MARK = MARK
 
