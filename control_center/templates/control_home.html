@@ -36,6 +36,7 @@ tbody tr:hover{filter:brightness(.98)}
 .platform-badge{display:inline-block;min-width:44px;padding:1px 3px;border-radius:999px;text-align:center;font-size:8px;font-weight:950;border:1px solid rgba(15,23,42,.08)}
 .platform-wp .platform-badge{background:#dbeafe}.platform-blogspot .platform-badge{background:#ffedd5}.platform-naver .platform-badge{background:#dcfce7}.platform-tistory .platform-badge{background:#fde68a}
 .platform-youtube .platform-badge{background:#fee2e2}.platform-instagram .platform-badge{background:#f3e8ff}.platform-facebook .platform-badge{background:#dbeafe}.platform-tiktok .platform-badge{background:#cffafe}.platform-threads .platform-badge{background:#e5e7eb}
+.adsense-medal{display:inline-flex;align-items:center;justify-content:center;margin-right:3px;font-size:11px;line-height:1;vertical-align:-1px;filter:saturate(1.1)}
 .up{color:#059669;font-weight:850}.down{color:#dc2626;font-weight:850}.flat{color:#64748b}.warn{color:#b45309;font-weight:850}.good{color:#047857;font-weight:850}
 @media(max-width:720px){.top{display:block}.nav{margin-top:5px;min-width:0}.brand{font-size:13px}.section-head{align-items:flex-start}.sheet{max-height:49vh}table.k365-table{font-size:8.5px}th,td{height:23px;padding:1px 2px}}
 </style>
@@ -49,13 +50,13 @@ tbody tr:hover{filter:brightness(.98)}
 <section class="section">
 <div class="section-head"><div><h2 id="blog-title">블로그 순위</h2><p>WP25 + 신문사2 + Blogspot33 + Naver3 + Tistory5 = 68 · 어제 방문자수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table blog"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>사이트</th><th>어제 방문자(증감)</th><th>총 방문자(증감)</th><th>총 콘텐츠(증감)</th><th>Google 색인(증감)</th><th>사이트주제</th><th>카테고리</th><th>$ (증감)</th><th>도메인</th><th>호스팅</th>
+<th>순위</th><th>플랫폼</th><th>사이트</th><th>어제 방문자(증감)</th><th>총 방문자(증감)</th><th>총 콘텐츠(증감)</th><th>Google 색인(증감)</th><th>사이트주제</th><th>카테고리</th><th>수익 $ (증감)</th><th>도메인</th><th>호스팅</th>
 </tr></thead><tbody id="blog-rows"><tr><td colspan="12" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <section class="section">
 <div class="section-head"><div><h2 id="social-title">SNS 순위</h2><p id="social-subtitle">YouTube + TikTok + Facebook + Instagram + Threads 통합 · 구독자/팔로워수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="https://youtube.korea365.org">YOUTUBE 상세 →</a><a class="more" href="https://sns.korea365.org">SNS 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table social"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>채널/계정명</th><th>핸들</th><th>채널ID</th><th>카테고리</th><th>$ (증감)</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th>
+<th>순위</th><th>플랫폼</th><th>채널/계정명</th><th>핸들</th><th>채널ID</th><th>카테고리</th><th>수익 $ (증감)</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th>
 </tr></thead><tbody id="social-rows"><tr><td colspan="11" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <div id="updated" style="font-size:9px;color:#64748b;text-align:right">갱신 중…</div>
@@ -132,8 +133,9 @@ async function loadBlog(){
  document.getElementById('blog-title').textContent='블로그 순위 ('+dateLabel(d.ranking_date)+')';
  document.getElementById('blog-rows').innerHTML=(d.cards||[]).map(c=>{
   const p=(c.kind==='news'?'wordpress':String(c.platform||'')).toLowerCase(),label=c.kind==='news'?'NEWS':String(c.platform||'').toUpperCase();
+  const adsenseMedal=c.revenue&&c.revenue.monetized?'<span class="adsense-medal" title="AdSense 승인">🏅</span>':'';
   return '<tr class="platform-'+esc(p)+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(label)+'</span></td>'+
-  '<td title="'+esc(c.name||c.url)+'"><a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+'</a></td>'+
+  '<td title="'+esc(c.name||c.url)+'">'+adsenseMedal+'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+'</a></td>'+
   '<td>'+metric(c.yesterday_visitors,c.yesterday_visitors_delta)+'</td><td>'+metric(c.total_visitors,c.total_visitors_delta)+'</td>'+
   '<td>'+metric(c.total_content,c.total_content_delta)+'</td><td>'+metric(c.google_indexed,c.google_indexed_delta)+'</td>'+
   '<td title="'+esc(c.topic||'')+'">'+esc(c.topic||'')+'</td><td title="'+esc((c.categories||[]).join(' · '))+'">'+esc((c.categories||[]).join(' · '))+'</td>'+
