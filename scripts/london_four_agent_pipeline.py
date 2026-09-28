@@ -77,6 +77,9 @@ def _write_state(state: dict) -> None:
 
 
 def _profile(site_id: str) -> tuple[str, dict]:
+    if site_id.startswith(("naver_", "tistory_")):
+        from scripts.london_site_catalog import manual_profile
+        return manual_profile(site_id)
     from scripts.auto_write_and_draft import _profile_for
     return _profile_for(site_id)
 
@@ -237,7 +240,7 @@ def _network_titles() -> list[str]:
 def stage_research(site_id: str, run_id: str, category: str = "") -> dict:
     _load_runtime_env()
     platform, profile = _profile(site_id)
-    settings = profile["wordpress"] if platform == "wordpress" else profile["blogspot"]
+    settings = profile["blogspot"] if platform == "blogger" else profile["wordpress"]
     site_url = profile["wordpress"]["url"]
     state = {
         "run_id": run_id,
@@ -348,7 +351,7 @@ def stage_write(run_id: str) -> dict:
     site_id = state["site_id"]
     keyword = state["research"]["keyword"]
     platform, profile = _profile(site_id)
-    settings = profile["wordpress"] if platform == "wordpress" else profile["blogspot"]
+    settings = profile["blogspot"] if platform == "blogger" else profile["wordpress"]
     from scripts.budget_guard import check_and_record
     from automation_hub.medical_editorial import require_medical_topic
     check_and_record(0.02, label=f"london-agent2:{site_id}")
@@ -426,7 +429,7 @@ def stage_image(run_id: str) -> dict:
             subject = (article.get("image_queries") or [article["title"]])[0]
             image_url = generate_image_url(subject, theme=article["title"]) or ""
             status = "generated" if image_url else "no_image"
-            if image_url and state["platform"] == "blogger":
+            if image_url and state["platform"] in {"blogger", "naver", "tistory"}:
                 from scripts.stable_image_hosting import is_temporary, host_permanently
                 if is_temporary(image_url):
                     if os.environ.get("GH_ASSET_TOKEN"):
@@ -466,7 +469,7 @@ def _publish_blogger(state: dict, profile: dict, public: bool) -> dict:
         site_id=state["site_id"],
         title=article["title"],
         content_html=content,
-        labels=article.get("labels", []),
+        labels=list(dict.fromkeys([*article.get("labels", []), *([state["category"]] if state.get("category") else [])])),
         publish_now=public,
         source_keyword=keyword,
         search_description=article.get("meta_description", ""),
@@ -487,6 +490,8 @@ def _publish_blogger(state: dict, profile: dict, public: bool) -> dict:
 
 def stage_publish(run_id: str) -> dict:
     state = _read_state(run_id)
+    if state.get("platform") in {"naver", "tistory"} and state.get("publish_mode") != "manual":
+        raise RuntimeError("this platform requires manual publication and URL verification")
     existing = state.get("receipt") or {}
     if state.get("stage_status", {}).get("publish") == "ok" and existing.get("post_id") and existing.get("url"):
         return {"ok": True, "stage": "publish", "site_id": state["site_id"], "run_id": run_id,

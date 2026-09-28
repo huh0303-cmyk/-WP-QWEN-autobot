@@ -67,30 +67,8 @@ def _categories_by_url() -> dict[str, list[str]]:
 
 
 def _content_sites() -> list[dict]:
-    categories = _categories_by_url()
-    profiles = json.loads(
-        (PROJECT_ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8")
-    ).get("profiles", [])
-    by_url = {}
-    for profile in profiles:
-        wp = profile.get("wordpress") or {}
-        url = str(wp.get("url") or "").rstrip("/")
-        if not url or url not in categories or url in by_url:
-            continue
-        by_url[url] = {
-            "site_key": profile.get("site_key", ""),
-            "site_id": f"wp_{profile.get('site_key','')}",
-            "url": url,
-            "language": profile.get("language", "en"),
-            "persona": wp.get("persona", ""),
-            "tone": wp.get("tone", ""),
-            "theme": wp.get("theme", ""),
-            "categories": categories[url],
-            "min_chars": wp.get("min_chars", 1800),
-            "target_chars": wp.get("target_chars", 2400),
-            "max_chars": wp.get("max_chars", 3200),
-        }
-    return [by_url[url] for url in categories if url in by_url]
+    from scripts.london_site_catalog import content_sites
+    return content_sites()
 
 
 def _state_file(run_id: str) -> Path:
@@ -218,18 +196,20 @@ def install(app, runtime):
         category = str(payload.get("category") or "").strip()
         publish_mode = str(payload.get("publish_mode") or "draft").strip().lower()
         valid = {site["site_id"]: site for site in _content_sites()}
-        if site_id not in valid:
+        if site_id not in valid or not valid[site_id].get("enabled", True):
             return jsonify({"ok": False, "error": "unknown_site"}), 400
         if category and category not in valid[site_id]["categories"]:
             return jsonify({"ok": False, "error": "invalid_category"}), 400
         if publish_mode not in {"draft", "publish", "manual"}:
             return jsonify({"ok": False, "error": "invalid_publish_mode"}), 400
+        if not valid[site_id].get("auto_publish", True) and publish_mode != "manual":
+            return jsonify({"ok": False, "error": "manual_mode_required_for_platform"}), 400
 
         run_id = f"lgpt-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
         state = {
             "run_id": run_id,
             "site_id": site_id,
-            "platform": "wordpress",
+            "platform": valid[site_id].get("platform", "wordpress"),
             "category": category,
             "publish_mode": publish_mode,
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -296,8 +276,13 @@ def install(app, runtime):
             return jsonify({"ok": False, "error": "unknown_site"}), 400
         parsed = urlparse(public_url)
         expected = urlparse(site["url"])
-        if (parsed.scheme != "https" or parsed.hostname != expected.hostname or parsed.port not in (None, 443)
-                or parsed.username or parsed.password or not parsed.path.strip("/")):
+        naver_parts = [part for part in parsed.path.split("/") if part]
+        naver_post = (site.get("platform", "wordpress") == "naver" and parsed.hostname in {"blog.naver.com", "m.blog.naver.com"}
+                      and len(naver_parts) >= 2 and naver_parts[0] == expected.path.strip("/")
+                      and naver_parts[1].isdigit())
+        same_site_post = parsed.hostname == expected.hostname and bool(parsed.path.strip("/"))
+        if (parsed.scheme != "https" or not (naver_post if site.get("platform", "wordpress") == "naver" else same_site_post)
+                or parsed.port not in (None, 443) or parsed.username or parsed.password):
             return jsonify({"ok": False, "error": "url_must_be_post_on_selected_site"}), 400
         try:
             response = requests.get(public_url, timeout=20, allow_redirects=False)
@@ -307,15 +292,27 @@ def install(app, runtime):
             return jsonify({"ok": False, "error": "public_page_not_verified", "http": response.status_code}), 409
         title = str(state.get("article", {}).get("title") or "").strip()
         page_text = re.sub(r"<[^>]+>", " ", html.unescape(response.text))
+        if title and site.get("platform") == "naver" and re.sub(r"\s+", " ", title).casefold() not in re.sub(r"\s+", " ", page_text).casefold():
+            # Desktop Naver pages can be iframe shells; inspect the same post's mobile view.
+            mobile_url = f"https://m.blog.naver.com/{naver_parts[0]}/{naver_parts[1]}"
+            try:
+                mobile = requests.get(mobile_url, timeout=20, allow_redirects=False)
+                if mobile.status_code == 200 and "html" in mobile.headers.get("content-type", "").lower():
+                    page_text = re.sub(r"<[^>]+>", " ", html.unescape(mobile.text))
+            except requests.RequestException:
+                pass
         if not title or re.sub(r"\s+", " ", title).casefold() not in re.sub(r"\s+", " ", page_text).casefold():
             return jsonify({"ok": False, "error": "article_title_not_found_on_public_page"}), 409
-        state["receipt"] = {"status": "published_verified", "platform": "wordpress", "url": public_url,
+        state["receipt"] = {"status": "published_verified", "platform": site.get("platform", "wordpress"), "url": public_url,
                             "post_id": "manual", "title": title, "verified_at": datetime.now(timezone.utc).isoformat()}
         state["stage_status"]["publish"] = "ok"
         state["completed_at"] = datetime.now(timezone.utc).isoformat()
-        from scripts.london_gsc_dispatch import queue_submission
-        # control.env is loaded by the control service; the GSC credential stays in Actions.
-        queue_submission(state, site["url"])
+        if site.get("platform", "wordpress") in {"wordpress", "blogger"}:
+            from scripts.london_gsc_dispatch import queue_submission
+            queue_submission(state, site["url"])
+        else:
+            state["indexing_submission"] = {"status": "not_applicable", "url": public_url,
+                                           "reason": "이 플랫폼은 GSC 사이트맵 자동 제출 대상이 아닙니다."}
         _write_run(state)
         return jsonify({"ok": True, "receipt": state["receipt"]})
 
