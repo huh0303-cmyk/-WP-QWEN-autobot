@@ -22,7 +22,6 @@ def main() -> int:
     runtime = json.loads(RUNTIME_CONFIG.read_text(encoding="utf-8"))
     env = os.environ.copy()
     for name in (
-        "GEMINI_API_KEY",
         "BLOGGER_GOOGLE_CLIENT_ID",
         "BLOGGER_GOOGLE_CLIENT_SECRET",
         "BLOGGER_GOOGLE_REFRESH_TOKEN",
@@ -37,7 +36,6 @@ def main() -> int:
         run_date = datetime.now(ZoneInfo("Asia/Seoul")).date().isoformat()
     env["PUBLIC_RUN_KEY"] = f"blogger33-daily-{run_date}"
     env["BLOGGER_REVIEW_DRAFT_MODE"] = "false"
-    env["BLOGGER_GEMINI_MODEL"] = "gemini-2.5-flash-lite"
 
     completed = None
     for attempt in range(3):
@@ -49,6 +47,21 @@ def main() -> int:
         )
         if completed.returncode == 0:
             return 0
+        # A quota hold cannot clear during this short retry window. Preserve
+        # the site's failure without spending more free requests.
+        result_path = ROOT / "artifacts" / "blogger-33-public-results.json"
+        try:
+            result = json.loads(result_path.read_text(encoding="utf-8"))
+            quota_hold = (
+                result.get("run_key") == env["PUBLIC_RUN_KEY"]
+                and len(result.get("results", [])) == 1
+                and result["results"][0].get("site") == env.get("BLOGGER_SITE_KEY")
+                and result["results"][0].get("error") == "free_quota_wait_no_paid_fallback"
+            )
+        except (OSError, ValueError, KeyError, IndexError, TypeError):
+            quota_hold = False
+        if quota_hold:
+            return completed.returncode
         if attempt < 2:
             time.sleep(30 * (attempt + 1))
     assert completed is not None
