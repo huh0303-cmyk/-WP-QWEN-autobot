@@ -18,6 +18,9 @@ def content_sites() -> list[dict]:
     }
     sites: list[dict] = []
     for profile in _json("content_engine_profiles.json").get("profiles", []):
+        if profile.get("site_key") == "kmedical_job_center":
+            from automation_hub.medical_editorial import medical_profile
+            profile = medical_profile(profile)
         key = profile["site_key"]
         wp, blog = profile.get("wordpress") or {}, profile.get("blogspot") or {}
         wp_url = str(wp.get("url") or "").rstrip("/")
