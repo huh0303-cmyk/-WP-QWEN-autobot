@@ -1,0 +1,43 @@
+name: "One-off Korea365 subdomain TLS"
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  expand-certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Expand the existing Korea365 certificate and verify nginx
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            expected_ip="187.127.121.57"
+            for host in control.korea365.org blog.korea365.org sns.korea365.org; do
+              resolved="$(getent ahostsv4 "$host" | awk 'NR==1 {print $1}')"
+              test "$resolved" = "$expected_ip" || {
+                echo "DNS target mismatch for $host: $resolved"
+                exit 1
+              }
+            done
+
+            command -v certbot >/dev/null
+            nginx -t
+            certbot --nginx --non-interactive --agree-tos --expand \
+              -d control.korea365.org \
+              -d blog.korea365.org \
+              -d sns.korea365.org
+            nginx -t
+            systemctl reload nginx
+
+            for host in control.korea365.org blog.korea365.org sns.korea365.org; do
+              curl --fail --silent --show-error --head --max-time 15 "https://$host/" >/tmp/"$host".headers
+              head -n 8 /tmp/"$host".headers
+            done

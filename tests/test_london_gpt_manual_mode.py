@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 
 from flask import Flask
 
 from control_center import london_gpt_app
 from scripts import london_four_agent_pipeline as pipeline
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _app(monkeypatch, tmp_path):
@@ -92,3 +96,13 @@ def test_medical_auto_run_hands_off_before_publication(monkeypatch, tmp_path):
     state = pipeline._read_state(run_id)
     assert result["status"] == "manual_required"
     assert state["publish_mode"] == "manual" and "receipt" not in state
+
+
+def test_manual_copy_package_contains_complete_seo_fields_and_login_notice():
+    template = (ROOT / "control_center" / "templates" / "london_gpt.html").read_text(encoding="utf-8")
+    for value in ("focusKeyword", "tags", "alt"):
+        assert f"data-copy=\"{value}\"" in template
+    assert "검색설명/메타 설명" in template
+    assert "키워드·태그" in template
+    assert "이미지 ALT" in template
+    assert "네이버·티스토리는 먼저 해당 계정에 로그인해야 합니다" in template
