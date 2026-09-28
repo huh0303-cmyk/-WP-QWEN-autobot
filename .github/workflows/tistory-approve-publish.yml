@@ -1,0 +1,68 @@
+name: "Tistory — Approve & Publish One Article"
+
+on:
+  workflow_dispatch:
+    inputs:
+      token:
+        description: "Signed one-time approval token from the review page"
+        required: true
+        type: string
+      job_id:
+        description: "job_id this token authorizes (site_id:date)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: tistory-approve-publish-${{ github.event.inputs.job_id }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Verify signed token and publish this one article
+        id: publish
+        env:
+          TISTORY_APPROVAL_SIGNING_SECRET: ${{ secrets.TISTORY_APPROVAL_SIGNING_SECRET }}
+          TISTORY_ACCESS_TOKEN: ${{ secrets.TISTORY_ACCESS_TOKEN }}
+        run: |
+          python scripts/tistory_approve_publish.py \
+            --token "${{ github.event.inputs.token }}" \
+            --job-id "${{ github.event.inputs.job_id }}" \
+            --state-dir state/tistory_approvals \
+            --public-dir public
+      - name: Commit updated approval state and review page
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state public
+          git diff --cached --quiet || git commit -m "chore: record Tistory approval result for ${{ github.event.inputs.job_id }} [skip ci]"
+          git push
+      - name: Configure GitHub Pages
+        if: always()
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Redeploy GitHub Pages with the updated status
+        if: always()
+        id: deployment
+        uses: actions/deploy-pages@v4
