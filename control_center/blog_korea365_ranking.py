@@ -13,15 +13,15 @@ rank=None; it is never shown as 0.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
+import time
 from typing import Callable
 
 from flask import jsonify, render_template
 
 KST = timezone(timedelta(hours=9))
 
-NO_VISITOR_TRACKING_REASON = {
-    "tistory": "티스토리에는 방문자 카운터 위젯이 연동되어 있지 않습니다.",
-}
+NO_VISITOR_TRACKING_REASON: dict[str, str] = {}
 
 
 def _visitor_connector_status(row: dict, platform: str) -> dict[str, object]:
@@ -109,11 +109,16 @@ def build_ranking(
 
 
 def install(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_data):
+    @lru_cache(maxsize=4)
+    def cached_payload(five_minute_bucket: int):
+        del five_minute_bucket
+        return build_ranking(get_site_data, get_blogger_data, get_tistory_data, get_naver_data)
+
     @app.get("/blog-dashboard")
     def blog_korea365_dashboard():
         return render_template("blog_dashboard.html"), 200, {"Cache-Control": "no-store"}
 
     @app.get("/api/blog-korea365/ranking")
     def blog_korea365_ranking():
-        payload = build_ranking(get_site_data, get_blogger_data, get_tistory_data, get_naver_data)
+        payload = cached_payload(int(time.time() // 300))
         return jsonify(payload), 200, {"Cache-Control": "no-store"}

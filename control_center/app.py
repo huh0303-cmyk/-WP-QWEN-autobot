@@ -482,6 +482,11 @@ def _tistory_feed_summary(site_url: str, five_minute_bucket: int) -> dict[str, o
             homepage.text,
             flags=re.IGNORECASE | re.DOTALL,
         )
+        headline_total_match = re.search(
+            r'<h1[^>]*>\s*<span[^>]*>.*?</span>\s*<em[^>]*>\s*(\d+)\s*</em>\s*</h1>',
+            homepage.text,
+            flags=re.IGNORECASE | re.DOTALL,
+        )
         if category_matches:
             categories = [
                 {
@@ -492,7 +497,11 @@ def _tistory_feed_summary(site_url: str, five_minute_bucket: int) -> dict[str, o
             ]
             categories.sort(key=lambda row: (-int(row["count"]), str(row["name"]).casefold()))
             return {
-                "total_posts": int(total_match.group(1)) if total_match else sum(int(row["count"]) for row in categories),
+                "total_posts": (
+                    int(total_match.group(1)) if total_match else
+                    int(headline_total_match.group(1)) if headline_total_match else
+                    sum(int(row["count"]) for row in categories)
+                ),
                 "categories": categories,
                 "connected": True,
                 "source": "public_category_counts",
@@ -512,7 +521,7 @@ def _tistory_feed_summary(site_url: str, five_minute_bucket: int) -> dict[str, o
                 if name.startswith("[") and name.endswith("]"):
                     categories[name] += 1
         return {
-            "total_posts": len(items),
+            "total_posts": int(headline_total_match.group(1)) if headline_total_match else len(items),
             "categories": [
                 {"name": name, "count": count}
                 for name, count in sorted(categories.items(), key=lambda pair: (-pair[1], pair[0].casefold()))
@@ -522,6 +531,63 @@ def _tistory_feed_summary(site_url: str, five_minute_bucket: int) -> dict[str, o
         }
     except (requests.RequestException, ET.ParseError, ValueError):
         return {"total_posts": None, "categories": [], "connected": False, "source": "unavailable"}
+
+
+@lru_cache(maxsize=32)
+def _tistory_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, object]:
+    """Read Tistory's public Today / Yesterday / total visitor counter."""
+    del five_minute_bucket
+    try:
+        response = requests.get(site_url.rstrip("/") + "/", timeout=15,
+                                headers={"User-Agent": "Korea365-Control-Room/1.0"})
+        response.raise_for_status()
+        text = response.text
+        total = re.search(r'<p\s+class="total">\s*([\d,]+)\s*</p>', text, re.I)
+        today = re.search(r'Today\s*:\s*([\d,]+)', text, re.I)
+        yesterday = re.search(r'Yesterday\s*:\s*([\d,]+)', text, re.I)
+        if not (total and today and yesterday):
+            return {"connected": False, "reason": "public visitor counter not rendered"}
+        return {
+            "connected": True,
+            "today": int(today.group(1).replace(",", "")),
+            "yesterday": int(yesterday.group(1).replace(",", "")),
+            "total": int(total.group(1).replace(",", "")),
+            "checked_at": datetime.now(timezone(timedelta(hours=9))).isoformat(),
+        }
+    except (requests.RequestException, ValueError):
+        return {"connected": False, "reason": "public visitor counter request failed"}
+
+
+def _attach_tistory_visitor_deltas(visitor_results: dict[str, dict[str, object]]) -> None:
+    """Add day-over-day deltas using the prior daily public-counter snapshot."""
+    snapshot_path = Path(__file__).resolve().parents[1] / "data" / "tistory_traffic_latest.json"
+    today = datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+    try:
+        stored = json.loads(snapshot_path.read_text(encoding="utf-8")) if snapshot_path.exists() else {}
+    except (OSError, ValueError):
+        stored = {}
+    previous = stored.get("previous", {}) if stored.get("date") == today else stored.get("sites", {})
+    if not isinstance(previous, dict):
+        previous = {}
+    current = {}
+    for site_id, stats in visitor_results.items():
+        prior = previous.get(site_id, {}) if isinstance(previous.get(site_id, {}), dict) else {}
+        y = stats.get("yesterday")
+        prior_y = prior.get("yesterday")
+        stats["yesterday_delta"] = int(y) - int(prior_y) if y is not None and prior_y is not None else None
+        stats["today_delta"] = (
+            int(stats["today"]) - int(stats["yesterday"])
+            if stats.get("today") is not None and stats.get("yesterday") is not None else None
+        )
+        stats["total_delta"] = int(stats["today"]) if stats.get("today") is not None else None
+        if stats.get("connected"):
+            current[site_id] = {k: stats.get(k) for k in ("today", "yesterday", "total")}
+    try:
+        snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+        snapshot_path.write_text(json.dumps({"date": today, "previous": previous, "sites": current},
+                                            ensure_ascii=False, indent=2), encoding="utf-8")
+    except OSError:
+        pass
 
 
 def _attach_tistory_category_deltas(feed_results: dict[str, dict[str, object]]) -> None:
@@ -877,12 +943,17 @@ def get_tistory_data() -> list[dict[str, object]]:
             }
         except (OSError, ValueError, TypeError):
             latest_by_site = {}
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         feed_results = dict(executor.map(
             lambda row: (row.get("site_id", ""), _tistory_feed_summary(row.get("url", ""), int(time.time() // 300))),
             rows,
         ))
+        visitor_results = dict(executor.map(
+            lambda row: (row.get("site_id", ""), _tistory_visitor_stats(row.get("url", ""), int(time.time() // 300))),
+            rows,
+        ))
     _attach_tistory_category_deltas(feed_results)
+    _attach_tistory_visitor_deltas(visitor_results)
     personas = {
         "tistory_insurance_lab": ("보험·의료비 소비자보호 편집자", "약관·공식자료 우선, 치과비용까지 과장 없이 실제 확인 순서 중심"),
         "tistory_finance_housing": ("주거금융 실무 편집자", "규제 변동을 명시하고 계약 전 확인사항을 구체적으로 설명"),
@@ -893,6 +964,7 @@ def get_tistory_data() -> list[dict[str, object]]:
     result = []
     for row in rows:
         summary = feed_results.get(row.get("site_id", ""), {})
+        traffic = visitor_results.get(row.get("site_id", ""), {})
         latest = latest_by_site.get(row.get("site_id", ""), {})
         persona, tone = personas.get(row.get("site_id", ""), ("전문 편집자", "공식 출처 중심의 실용적 설명"))
         result.append({
@@ -908,10 +980,15 @@ def get_tistory_data() -> list[dict[str, object]]:
             "tone": tone,
             "default_text_model": "gpt-5-mini",
             "default_image_model": "bytedance/sdxl-lightning-4step",
-            "today_visitors": None,
-            "today_delta": None,
-            "total_visitors": None,
-            "total_delta": None,
+            "today_visitors": traffic.get("today"),
+            "today_delta": traffic.get("today_delta"),
+            "yesterday_visitors": traffic.get("yesterday"),
+            "yesterday_delta": traffic.get("yesterday_delta"),
+            "total_visitors": traffic.get("total"),
+            "total_delta": traffic.get("total_delta"),
+            "visitor_connected": bool(traffic.get("connected")),
+            "visitor_checked_at": traffic.get("checked_at", ""),
+            "visitor_error": "" if traffic.get("connected") else traffic.get("reason", "visitor counter unavailable"),
             "total_posts": summary.get("total_posts"),
             "posts_delta": summary.get("total_delta"),
             "indexed": None,
