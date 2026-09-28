@@ -1,6 +1,6 @@
 # LondonProjectGPT: writing, image and GSC submission
 
-Status: implementation and live verification in progress, 2026-09-28 KST.
+Status: deployed and GSC submission verified, 2026-09-28 KST.
 
 ## Current providers and limits
 
@@ -17,6 +17,7 @@ The general Indexing API is restricted by Google to JobPosting and BroadcastEven
 
 ## Operational verification / remaining work
 
-- Targeted local tests, workflow validation and live dry run should be recorded in the activity ledger.
+- Targeted local tests passed (5), workflow YAML and Python syntax checks passed. GitHub Actions dry run `36368595932` confirmed `sc-domain:jobkorea365.com` access without submission. Production server dispatch using its existing `GH_TOKEN` started run `36368699807`, which submitted `https://jobkorea365.com/sitemap_index.xml` and verified Search Console's `lastSubmitted` value. The server received a `submitted` receipt. No new article was published for this test; it reused an existing publication receipt.
+- PR #133 merged as `a341d55`; `Deploy London n8n` succeeded, VPS HEAD matches. The generic deploy job failed because its requested target was stale (`a098047` versus already deployed `a341d55`). The control service was restarted manually and is active.
 - An absent site property, a private/invalid post, a missing credential or a GitHub dispatch permission failure must appear as a failed submission. A GSC failure never triggers another WordPress/Blogger publication.
 - If a submitted post is not indexed later, inspect its URL in Search Console for canonical/noindex/crawl issues; this workflow cannot promise immediate indexing.
