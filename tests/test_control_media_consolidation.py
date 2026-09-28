@@ -76,3 +76,5 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert '<table class="account-table">' in social
     assert "YOUTUBE + SNS 생산·발행 통제실" in social
     assert "로그인·권한 필요" in social
+    assert "<th>번호</th><th>플랫폼</th>" in social
+    assert "<td>{{loop.index}}</td><td>" in social
