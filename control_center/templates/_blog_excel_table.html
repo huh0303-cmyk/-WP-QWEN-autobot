@@ -1,8 +1,8 @@
 <section id="daily-core-metrics" class="rounded-2xl border border-slate-300 bg-white shadow-sm" style="min-width:0;overflow:hidden">
   <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid #cbd5e1;background:#f8fafc">
     <div>
-      <h2 style="margin:0;font-size:20px;font-weight:900;color:#0f172a">블로그 68개 통합 성적표</h2>
-      <p style="margin:4px 0 0;font-size:12px;color:#475569">어제 방문자수 기준 1위 → 68위 · WP25 + 뉴스2 + Blogspot33 + Naver3 + Tistory5</p>
+      <h2 style="margin:0;font-size:20px;font-weight:900;color:#0f172a">오늘 글쓰기 기본 순위 · 블로그 68개 통합</h2>
+      <p style="margin:4px 0 0;font-size:12px;color:#475569">전 플랫폼 완전 혼합 · 어제 방문자수 기준 매일 재산정 · WP25 + 뉴스2 + Blogspot33 + Naver3 + Tistory5</p>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <span id="control-blog-sheet-updated" style="font-size:11px;color:#64748b">갱신 중…</span>
@@ -67,7 +67,7 @@
         '<td>'+state(c)+'</td>'+
         '<td style="text-align:center;color:#64748b">'+esc((c.checked_at||'').replace('T',' ').slice(0,16)||'연결 필요')+'</td>'+
       '</tr>').join('');
-      updated.textContent='갱신 '+String(data.generated_at||'').replace('T',' ').slice(0,16)+' KST';
+      updated.textContent='순위 기준 '+(data.ranking_date||'')+' · 갱신 '+String(data.generated_at||'').replace('T',' ').slice(0,16)+' KST';
     }catch(e){
       body.innerHTML='<tr><td colspan="9" style="padding:26px;text-align:center;color:#b91c1c">데이터 연결 오류: '+esc(e.message)+'</td></tr>';
       updated.textContent='갱신 실패';

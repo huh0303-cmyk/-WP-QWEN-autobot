@@ -98,10 +98,14 @@ def build_ranking(
     for card in cards:
         platform_counts[card["platform"]] = platform_counts.get(card["platform"], 0) + 1
 
+    today = datetime.now(KST).date()
+    ranking_date = (today - timedelta(days=1)).isoformat()
     return {
         "generated_at": datetime.now(KST).isoformat(),
+        "ranking_date": ranking_date,
         "timezone": "Asia/Seoul",
         "ranking_metric": "yesterday_visitors",
+        "ranking_purpose": "daily_writing_priority",
         "total_cards": len(cards),
         "ranked_cards": rank,
         "unranked_cards": len(cards) - rank,
