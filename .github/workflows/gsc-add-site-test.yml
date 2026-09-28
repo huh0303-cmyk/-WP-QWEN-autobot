@@ -1,0 +1,27 @@
+name: "One-off: test GSC sites.add permission"
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_site:
+        description: "Site URL to test-add"
+        required: false
+        default: "https://k-health365.blogspot.com/"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: Test sites.add permission (no schedule, one-off diagnostic)
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/gsc_add_site_test.py "${{ inputs.test_site }}"
