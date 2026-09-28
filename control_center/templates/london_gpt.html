@@ -178,6 +178,7 @@
 <script>
 const platformEl=document.getElementById('platform');
 const siteEl=document.getElementById('site');
+const siteOptions=[...siteEl.options].map(option=>option.cloneNode(true));
 const categoryEl=document.getElementById('category');
 const autoBtn=document.getElementById('autoBtn');
 const rewriteBtn=document.getElementById('rewriteBtn');
@@ -227,8 +228,8 @@ function refreshProfile(){
   setModeUI();
 }
 function refreshPlatform(){
-  for(const o of siteEl.options)o.hidden=o.dataset.platform!==platformEl.value;
-  const first=[...siteEl.options].find(o=>!o.hidden&&!o.disabled);
+  siteEl.replaceChildren(...siteOptions.filter(o=>o.dataset.platform===platformEl.value).map(o=>o.cloneNode(true)));
+  const first=[...siteEl.options].find(o=>!o.disabled);
   if(first)siteEl.value=first.value;
   refreshProfile();
 }

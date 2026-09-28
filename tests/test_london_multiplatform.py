@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from flask import Flask
 
 from control_center import london_gpt_app
+from scripts import london_four_agent_pipeline as pipeline
 from scripts.london_site_catalog import content_sites, manual_profile
 
 
@@ -47,3 +48,15 @@ def test_web_app_renders_template_and_guards_manual_platform(monkeypatch, tmp_pa
     blogger = client.post("/api/london-gpt/run", json={"site_id": "blogger_ktrip365", "publish_mode": "draft"})
     assert blogger.status_code == 202
     assert london_gpt_app._read_run(blogger.json["run_id"])["platform"] == "blogger"
+
+
+def test_naver_and_tistory_handoff_never_call_auto_publisher(monkeypatch, tmp_path):
+    monkeypatch.setattr(pipeline, "STATE_DIR", tmp_path)
+    monkeypatch.setattr(pipeline, "_publish_wordpress_via_worker", lambda *a: (_ for _ in ()).throw(AssertionError("WP publish")))
+    monkeypatch.setattr(pipeline, "_publish_blogger", lambda *a: (_ for _ in ()).throw(AssertionError("Blogger publish")))
+    for site_id, platform in (("naver_n2", "naver"), ("tistory_ktrip365", "tistory")):
+        run_id = "lgpt-20260928-120000-" + ("abcdef" if platform == "naver" else "123456")
+        pipeline._write_state({"run_id": run_id, "site_id": site_id, "platform": platform,
+                               "publish_mode": "manual", "stage_status": {"research": "ok", "write": "ok", "image": "ok"},
+                               "article": {"title": "Test article", "content_html": "<p>Body</p>"}})
+        assert pipeline.stage_publish(run_id)["status"] == "manual_required"
