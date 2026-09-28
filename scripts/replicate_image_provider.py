@@ -206,17 +206,17 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
     global last_image_model
     last_image_model = "none"
     from stock_image_provider import find_stock_image
-    if mode not in {"legacy", "auto_free", "pexels", "pixabay", "none", "replicate_sdxl", "replicate_flux"}:
+    if mode not in {"legacy", "auto_free", "pexels", "pixabay", "wikimedia", "none", "replicate_sdxl", "replicate_flux"}:
         raise ValueError("unsupported image model")
     if mode == "none":
         return None
-    stock = find_stock_image(subject, theme, force=mode in {"auto_free", "pexels", "pixabay"},
-                             selected_provider=mode if mode in {"pexels", "pixabay"} else "auto")
+    stock = find_stock_image(subject, theme, force=mode in {"auto_free", "pexels", "pixabay", "wikimedia"},
+                             selected_provider=mode if mode in {"pexels", "pixabay", "wikimedia"} else "auto")
     if stock:
         from stock_image_provider import METADATA
         last_image_model = (METADATA.get(stock) or {}).get("provider", "stock")
         return stock
-    if mode in {"auto_free", "pexels", "pixabay"}:
+    if mode in {"auto_free", "pexels", "pixabay", "wikimedia"}:
         return None
     token = _token()
     if not token:

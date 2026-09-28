@@ -205,16 +205,22 @@ def install(app, get_site_data=None):
     @app.get("/social-accounts")
     def social_accounts():
         cards = _cards(get_site_data)
-        platforms = ["전체", "SNS", "WordPress", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "Tistory", "Naver"]
+        platforms = ["전체", "통합", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "WordPress", "Tistory", "Naver"]
         selected = request.args.get("platform", "전체")
+        # Legacy subdomain roots still send SNS/YouTube; both now open the
+        # owner's single combined media sheet instead of separate products.
+        if selected in {"SNS", "YouTube"} and request.host.split(":", 1)[0].lower() in {
+            "sns.korea365.org", "youtube.korea365.org"
+        }:
+            selected = "통합"
         if selected not in platforms:
             selected = "전체"
-        if selected == "SNS":
-            visible = [c for c in cards if c["platform"] in {"TikTok", "Instagram", "Facebook", "Threads"}]
+        if selected == "통합":
+            visible = [c for c in cards if c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"}]
         else:
             visible = cards if selected == "전체" else [c for c in cards if c["platform"] == selected]
-        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:] if p != "SNS"}
-        counts["SNS"] = sum(c["platform"] in {"TikTok", "Instagram", "Facebook", "Threads"} for c in cards)
+        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:] if p != "통합"}
+        counts["통합"] = sum(c["platform"] in {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"} for c in cards)
         connected = sum(c.get("connection_level") == "publish_connected" for c in cards)
         return render_template(
             "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
