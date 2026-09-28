@@ -2408,8 +2408,15 @@ def site_publication_history():
 
 @app.route("/")
 def index():
-    if request.host.split(":", 1)[0].lower() == "blog.korea365.org":
+    host = request.host.split(":", 1)[0].lower()
+    if host == "control.korea365.org":
+        return render_template("control_home.html"), 200, {"Cache-Control": "no-store"}
+    if host == "blog.korea365.org":
         return render_template("blog_dashboard.html"), 200, {"Cache-Control": "no-store"}
+    if host == "youtube.korea365.org":
+        return redirect("/social-accounts?platform=YouTube")
+    if host == "sns.korea365.org":
+        return redirect("/social-accounts?platform=SNS")
     # 2026-09-03: WP cards no longer show a manual keyword-entry form (WP
     # auto-publishes from its own keyword pool once the GPT gate approves),
     # so per-site keyword_suggestions is no longer rendered — drop the
@@ -2507,6 +2514,8 @@ if __name__ == "__main__":
 # publication evidence board 20260921
 @app.context_processor
 def publication_evidence_context():
+    if request.host.split(":", 1)[0].lower() == "control.korea365.org":
+        return {"publication_board_html": ""}
     from scripts.publication_board import board
     return {"publication_board_html": board()}
 
@@ -2533,6 +2542,9 @@ _install_social_accounts(app, get_site_data)
 from .pipeline_status import install as _install_pipeline_status
 _install_pipeline_status(app)
 
+
+from .control_home import install as _install_control_home
+_install_control_home(app)
 
 from .naver_blog import get_naver_data
 from .blog_korea365_ranking import install as _install_blog_korea365_ranking

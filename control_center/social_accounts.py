@@ -205,12 +205,16 @@ def install(app, get_site_data=None):
     @app.get("/social-accounts")
     def social_accounts():
         cards = _cards(get_site_data)
-        platforms = ["전체", "WordPress", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "Tistory", "Naver"]
+        platforms = ["전체", "SNS", "WordPress", "YouTube", "TikTok", "Instagram", "Facebook", "Threads", "Tistory", "Naver"]
         selected = request.args.get("platform", "전체")
         if selected not in platforms:
             selected = "전체"
-        visible = cards if selected == "전체" else [c for c in cards if c["platform"] == selected]
-        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:]}
+        if selected == "SNS":
+            visible = [c for c in cards if c["platform"] in {"TikTok", "Instagram", "Facebook", "Threads"}]
+        else:
+            visible = cards if selected == "전체" else [c for c in cards if c["platform"] == selected]
+        counts = {p: sum(c["platform"] == p for c in cards) for p in platforms[1:] if p != "SNS"}
+        counts["SNS"] = sum(c["platform"] in {"TikTok", "Instagram", "Facebook", "Threads"} for c in cards)
         connected = sum(c.get("connection_level") == "publish_connected" for c in cards)
         return render_template(
             "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
