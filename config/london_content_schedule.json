@@ -2,6 +2,8 @@
   "project": "london-project",
   "timezone": "Asia/Seoul",
   "schedule_policy": {
+    "cadence_lock": "youtube_each_channel_2_to_3_per_week_all_other_enabled_sites_and_accounts_1_per_day",
+    "cost_lock": "free_only_no_paid_fallback",
     "planned_jitter_minutes": 60,
     "forbid_exact_hour": true,
     "avoid_regular_minute_multiples": [
@@ -39,17 +41,20 @@
         "The Seoul Journal",
         "Koreanews365"
       ],
-      "target": "3_to_10_verified_breaking_stories_per_newsroom_per_day",
-      "weekly_target_per_newsroom": "21_to_70_when_verified_leads_exist",
+      "target": "1_per_day_per_newsroom",
+      "weekly_target_per_newsroom": 7,
       "source_mode": "rss_and_breaking_news_event_driven",
       "minimum_requires_verified_source_leads": true,
       "never_invent_to_fill_minimum": true,
-      "daily_max": 10,
+      "daily_max": 1,
       "separate_from_general_wordpress": true,
-      "daily_min": 3
+      "daily_min": 1,
+      "randomized_time": true
     },
     "blogspot": {
       "target": "1_public_post_per_enabled_destination_per_day",
+      "weekly_target_per_destination": 7,
+      "randomized_time": true,
       "review_gated": false,
       "no_wordpress_copy_paste": true
     },
@@ -81,8 +86,8 @@
       "avoid_channel_time_collisions": true
     },
     "survival_10_language": {
-      "enabled": true,
-      "status": "daily_after_exact_channel_id_and_publish_auth_verified",
+      "enabled": false,
+      "status": "weekly_2_to_3_after_exact_channel_id_and_publish_auth_verified",
       "languages": [
         "Korean/TOPIK",
         "English",
@@ -99,13 +104,15 @@
       "total_lessons": 500,
       "completed_through_lesson": 2,
       "next_lesson": 3,
-      "target": "1_public_post_per_verified_language_channel_per_day",
-      "upload_default": "public_after_identity_write_and_quality_checks",
+      "weekly_min": 2,
+      "weekly_max": 3,
+      "target": "2_to_3_private_productions_per_verified_language_channel_per_week",
+      "randomize_weekly_days": true,
+      "upload_default": "private",
       "require_verified_private_before_review": true,
       "require_chairman_approval_before_public": true,
       "avoid_language_time_collisions": true,
       "spread_languages_across_distinct_slots": true,
-      "weekly_target_per_verified_channel": 7,
       "public_requires_verified_channel_id": true,
       "public_requires_write_auth": true,
       "missing_channel_ids": [
@@ -116,24 +123,29 @@
     },
     "instagram": {
       "target": "1_public_post_per_verified_account_per_day",
-      "weekly_target": 7
+      "weekly_target": 7,
+      "randomized_time": true
     },
     "threads": {
       "target": "1_public_post_per_verified_account_per_day",
       "weekly_target": 7,
+      "randomized_time": true,
       "content_direction": "mirror_instagram_topic_not_verbatim_copy"
     },
     "tiktok": {
       "target": "1_public_post_per_verified_account_per_day",
-      "weekly_target": 7
+      "weekly_target": 7,
+      "randomized_time": true
     },
     "facebook": {
       "target": "1_public_post_per_verified_account_per_day",
-      "weekly_target": 7
+      "weekly_target": 7,
+      "randomized_time": true
     },
     "naver": {
       "target": "1_public_post_per_verified_account_per_day",
       "weekly_target": 7,
+      "randomized_time": true,
       "public_requires_local_write_verification": true
     },
     "youtube_daily_additional": {
@@ -155,8 +167,11 @@
           "role": "health_japanese"
         }
       ],
-      "target": "1_public_post_per_connected_channel_per_day",
-      "weekly_target_per_channel": 7,
+      "weekly_min": 2,
+      "weekly_max": 3,
+      "target": "2_to_3_private_productions_per_connected_channel_per_week",
+      "randomize_weekly_days": true,
+      "upload_default": "private",
       "public_requires_write_auth": true
     }
   },
@@ -165,8 +180,7 @@
     "order": [
       "pexels",
       "pixabay",
-      "bytedance/sdxl-lightning-4step",
-      "black-forest-labs/flux-schnell",
+      "wikimedia_commons_cc0_public_domain",
       "pass_without_image"
     ],
     "relevance_check_required": true,
@@ -191,7 +205,18 @@
     "safe_hold": "preserve_queue_stop_new_generation_and_unapproved_publication"
   },
   "business_objective": {
-    "primary_goal": "Google AdSense revenue growth through traffic, pageviews and Google index coverage",
+    "primary_goal": "maximize_verified_net_revenue",
+    "phase_order": [
+      "blog_adsense_approval_then_visitor_growth",
+      "youtube_and_social_visitor_subscriber_growth",
+      "shopping_and_affiliate_conversion_growth"
+    ],
+    "commerce_targets": [
+      "shopping_channels",
+      "coupang_partners",
+      "other_verified_affiliate_programs"
+    ],
+    "measurement_rule": "actual_connected_source_data_only_never_infer_or_fabricate",
     "approved_center": "k-health365.com",
     "approved_center_status": "sole currently approved AdSense site and operating benchmark",
     "adsense_growth_scope": {

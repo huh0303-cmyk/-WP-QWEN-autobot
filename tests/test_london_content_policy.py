@@ -26,7 +26,7 @@ def test_london_schedule_contract():
 
 def test_locked_youtube_cadence_is_two_to_three_times_weekly_and_private_first():
     policy = load("london_content_schedule.json")
-    for key in ("youtube_playlist", "youtube_knowledge"):
+    for key in ("youtube_playlist", "youtube_knowledge", "survival_10_language", "youtube_daily_additional"):
         cfg = policy["cadence"][key]
         assert (cfg["weekly_min"], cfg["weekly_max"]) == (2, 3)
         assert cfg["upload_default"] == "private"
@@ -38,6 +38,7 @@ def test_locked_youtube_cadence_is_two_to_three_times_weekly_and_private_first()
     assert survival["completed_through_lesson"] == 2
     assert survival["next_lesson"] == 3
     assert survival["require_chairman_approval_before_public"] is True
+    assert policy["schedule_policy"]["cost_lock"] == "free_only_no_paid_fallback"
 
 
 def test_london_image_policy_prefers_copyright_safe_sources():
@@ -46,8 +47,7 @@ def test_london_image_policy_prefers_copyright_safe_sources():
     assert policy["image_policy"]["order"] == [
         "pexels",
         "pixabay",
-        "bytedance/sdxl-lightning-4step",
-        "black-forest-labs/flux-schnell",
+        "wikimedia_commons_cc0_public_domain",
         "pass_without_image",
     ]
     assert policy["image_policy"]["never_copy_unlicensed_news_photo"] is True
