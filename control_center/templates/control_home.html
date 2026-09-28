@@ -49,14 +49,14 @@ tbody tr:hover{filter:brightness(.98)}
 <section class="section">
 <div class="section-head"><div><h2 id="blog-title">블로그 순위</h2><p>WP25 + 신문사2 + Blogspot33 + Naver3 + Tistory5 = 68 · 어제 방문자수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table blog"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>사이트</th><th>어제 방문자(증감)</th><th>총 방문자(증감)</th><th>총 콘텐츠(증감)</th><th>Google 색인(증감)</th><th>사이트주제</th><th>카테고리</th><th>수익(증감)</th><th>도메인</th><th>호스팅</th>
+<th>순위</th><th>플랫폼</th><th>사이트</th><th>어제 방문자(증감)</th><th>총 방문자(증감)</th><th>총 콘텐츠(증감)</th><th>Google 색인(증감)</th><th>사이트주제</th><th>카테고리</th><th>$ (증감)</th><th>도메인</th><th>호스팅</th>
 </tr></thead><tbody id="blog-rows"><tr><td colspan="12" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <section class="section">
 <div class="section-head"><div><h2 id="social-title">SNS 순위</h2><p id="social-subtitle">YouTube + TikTok + Facebook + Instagram + Threads 통합 · 구독자/팔로워수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="https://youtube.korea365.org">YOUTUBE 상세 →</a><a class="more" href="https://sns.korea365.org">SNS 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table social"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>채널/계정명</th><th>핸들</th><th>채널ID</th><th>카테고리</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th>
-</tr></thead><tbody id="social-rows"><tr><td colspan="10" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
+<th>순위</th><th>플랫폼</th><th>채널/계정명</th><th>핸들</th><th>채널ID</th><th>카테고리</th><th>$ (증감)</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠수</th><th>상태</th>
+</tr></thead><tbody id="social-rows"><tr><td colspan="11" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <div id="updated" style="font-size:9px;color:#64748b;text-align:right">갱신 중…</div>
 </main>
@@ -79,7 +79,7 @@ function shortSite(c){
  }catch(_){return String(c.name||'').replace(/\.(com|org|net)$/,'').slice(0,12);}
 }
 const COL_MIN=4,COL_MAX=420;
-const DEFAULTS={blog:[42,58,72,92,98,84,90,90,96,86,136,136],social:[42,68,120,118,155,92,105,105,72,72]};
+const DEFAULTS={blog:[42,58,72,92,98,84,90,90,96,86,136,136],social:[42,68,120,118,155,92,86,105,105,72,72]};
 function installColumnMemory(table,key){
  if(!table)return;
  const heads=[...table.querySelectorAll('thead th')];
@@ -87,7 +87,10 @@ function installColumnMemory(table,key){
  const storeKey='k365-colwidths-v3-'+key;
  let widths=[...defaults];
  try{
-  const saved=JSON.parse(localStorage.getItem(storeKey)||'[]');
+  let saved=JSON.parse(localStorage.getItem(storeKey)||'[]');
+  if(key==='social'&&Array.isArray(saved)&&saved.length===heads.length-1){
+    saved=[...saved.slice(0,6),defaults[6],...saved.slice(6)];
+  }
   if(Array.isArray(saved)&&saved.length===heads.length)widths=saved.map((v,i)=>Number.isFinite(+v)?Math.max(COL_MIN,Math.min(COL_MAX,+v)):defaults[i]);
  }catch(_){}
  let group=table.querySelector('colgroup');
@@ -152,7 +155,7 @@ async function loadSocial(){
   const idCell=isYt&&c.channel_id?'<span title="'+esc(c.channel_id)+'">'+esc(c.channel_id)+'</span>':'';
   return '<tr class="platform-'+esc(p)+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(c.platform)+'</span></td>'+
   '<td>'+(canonical?'<a href="'+esc(canonical)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td>'+
-  '<td>'+handleCell+'</td><td>'+idCell+'</td><td>'+esc(c.category||'')+'</td>'+
+  '<td>'+handleCell+'</td><td>'+idCell+'</td><td>'+esc(c.category||'')+'</td><td>'+money(c.revenue)+'</td>'+
   '<td>'+metric(c.audience,c.audience_delta)+'</td><td>'+metric(c.views,c.views_delta)+'</td>'+
   '<td>'+(Number.isFinite(c.content_count)?nf.format(c.content_count):'')+'</td><td>'+(c.connected?'<span class="good">정상</span>':'')+'</td></tr>';
  }).join('');

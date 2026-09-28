@@ -177,6 +177,7 @@ def build_social_ranking(bucket: int) -> dict:
             "views": item.get("views"),
             "views_delta": item.get("view_delta"),
             "content_count": item.get("videos"),
+            "revenue": item.get("revenue") or {},
             "connected": item.get("connected", False),
         })
     for item in sns["rows"]:
@@ -194,6 +195,7 @@ def build_social_ranking(bucket: int) -> dict:
             "views": item.get("yesterday_views"),
             "views_delta": item.get("views_delta"),
             "content_count": None,
+            "revenue": item.get("revenue") or {},
             "connected": item.get("connected", False),
         })
     rows.sort(key=lambda r: (
