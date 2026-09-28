@@ -144,6 +144,7 @@ def hosting_info(url: str, platform: str) -> dict[str, str]:
 @lru_cache(maxsize=2)
 def _opening_recent_snapshot(bucket: int) -> dict:
     repo = "huh0303-cmyk/-WP-QWEN-autobot"
+    snapshot = {}
     try:
         r = requests.get(
             f"https://raw.githubusercontent.com/{repo}/main/data/opening_recent_snapshot.json",
@@ -151,7 +152,7 @@ def _opening_recent_snapshot(bucket: int) -> dict:
             timeout=10,
         )
         r.raise_for_status()
-        return r.json()
+        snapshot = r.json()
     except (requests.RequestException, ValueError):
         pass
     paths = [
@@ -160,10 +161,20 @@ def _opening_recent_snapshot(bucket: int) -> dict:
     ]
     for path in paths:
         try:
-            return json.loads(path.read_text(encoding="utf-8"))
+            local = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-    return {}
+        # Raw GitHub may briefly serve the previous commit after deployment.
+        # Keep its existing values, but fill newly deployed assets immediately
+        # from the checked-out snapshot instead of showing them as unverified.
+        if not snapshot:
+            return local
+        for section in ("blogs", "youtube", "social"):
+            merged = snapshot.setdefault(section, {})
+            for key, value in (local.get(section) or {}).items():
+                merged.setdefault(key, value)
+        return snapshot
+    return snapshot
 
 
 def opening_recent_info(url: str, platform: str, channel_id: str = "") -> dict[str, str]:
