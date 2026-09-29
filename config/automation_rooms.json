@@ -1061,21 +1061,21 @@
       "room_id": "naver_n1",
       "platform": "naver",
       "report_code": "N1",
-      "name": "돈의정석",
+      "name": "부의정석",
       "enabled": true,
-      "destination_id": "huh0303",
+      "destination_id": "k-insight-vietnam",
       "workflow": "naver-blog-local",
       "language": "ko",
       "publish_policy": "public",
       "duplicate_guard": true,
-      "status": "READY_EXISTING_BROWSER_SESSION_PENDING_PUBLIC_TEST",
-      "editor_url": "https://blog.naver.com/GoBlogWrite.naver?blogId=huh0303",
+      "status": "VERIFIED_LOGGED_IN_BROWSER_SESSION_MANUAL_ONLY",
+      "editor_url": "https://blog.naver.com/PostWriteForm.naver?blogId=k-insight-vietnam",
       "auth_profile": "naver_n1",
       "daily_min": 1,
       "daily_max": 1,
       "weekly_min": 7,
       "weekly_max": 7,
-      "notes": "2026-09-25 owner selected N1=huh0303 and reported login already completed. Do not request login again unless runtime session check fails."
+      "notes": "2026-09-29 live Chrome verification: account huh0303 publishes to blogId=k-insight-vietnam (부의정석). Keep manual-only because browser login is not an unattended publishing credential."
     },
     {
       "room_id": "naver_n2",
@@ -1083,12 +1083,15 @@
       "report_code": "N2",
       "name": "헬스의정석",
       "enabled": false,
-      "destination_id": "huh3",
+      "destination_id": "health-standard",
       "workflow": "naver-blog-local",
       "language": "ko",
       "publish_policy": "draft",
       "duplicate_guard": true,
-      "status": "IDENTITY_OWNER_PROVIDED_LOCAL_SESSION_UNVERIFIED"
+      "status": "VERIFIED_LOGGED_IN_BROWSER_SESSION_MANUAL_ONLY",
+      "editor_url": "https://blog.naver.com/PostWriteForm.naver?blogId=health-standard",
+      "auth_profile": "naver_n2",
+      "notes": "2026-09-29 live Chrome verification: account huh3 publishes to blogId=health-standard (헬스의정석)."
     },
     {
       "room_id": "naver_n3",
@@ -1096,12 +1099,15 @@
       "report_code": "N3",
       "name": "생활의정석",
       "enabled": false,
-      "destination_id": "huh4",
+      "destination_id": "sky-only",
       "workflow": "naver-blog-local",
       "language": "ko",
       "publish_policy": "draft",
       "duplicate_guard": true,
-      "status": "IDENTITY_OWNER_PROVIDED_LOCAL_SESSION_UNVERIFIED"
+      "status": "VERIFIED_LOGGED_IN_BROWSER_SESSION_MANUAL_ONLY",
+      "editor_url": "https://blog.naver.com/PostWriteForm.naver?blogId=sky-only",
+      "auth_profile": "naver_n3",
+      "notes": "2026-09-29 live Chrome verification: account huh4 publishes to blogId=sky-only (생활의정석)."
     },
     {
       "room_id": "yt_globalmusic",

@@ -112,7 +112,8 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
         "gsc_ctr": row.get("gsc_ctr", gsc.get("ctr")),
         "gsc_position": row.get("gsc_position", gsc.get("position")),
         "gsc_date": row.get("gsc_date", gsc.get("gsc_date", "")),
-        "gsc_connected": bool(row.get("gsc_connected") or (gsc_property and gsc_clicks is not None and gsc_impressions is not None)),
+        "gsc_applicable": platform != "naver",
+        "gsc_connected": bool(row.get("gsc_connected") or gsc_property),
         "connector_status": _connector_status(row, platform),
         "checked_at": row.get("visitor_checked_at") or row.get("checked_at") or "",
     }

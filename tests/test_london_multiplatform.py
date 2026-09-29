@@ -17,9 +17,9 @@ def test_catalog_contains_verified_platform_destinations():
     }
     assert all(item["enabled"] for item in sites)
     assert [item["url"] for item in sites if item["platform"] == "naver"] == [
-        "https://blog.naver.com/huh0303", "https://blog.naver.com/huh3", "https://blog.naver.com/huh4",
+        "https://blog.naver.com/k-insight-vietnam", "https://blog.naver.com/health-standard", "https://blog.naver.com/sky-only",
     ]
-    assert next(item for item in sites if item["site_id"] == "naver_n2")["editor_url"].endswith("huh3?Redirect=Write")
+    assert next(item for item in sites if item["site_id"] == "naver_n2")["editor_url"].endswith("blogId=health-standard")
     assert next(item for item in sites if item["site_id"] == "tistory_ktrip365")["editor_url"].endswith("/manage/newpost")
     assert all(not item["auto_publish"] for item in sites if item["platform"] in {"naver", "tistory"})
     assert manual_profile("naver_n2")[0] == "naver"

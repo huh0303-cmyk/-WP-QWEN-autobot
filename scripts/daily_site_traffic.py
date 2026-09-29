@@ -26,7 +26,7 @@ SHEETS_WEBHOOK = os.environ.get("SHEETS_WEBHOOK", "")
 SHEET_ID = os.environ.get("SHEET_ID", "")
 KST = timezone(timedelta(hours=9))
 
-SITES = [
+WORDPRESS_SITES = [
     "https://k-health365.com/",
     "https://koreamedicaltour.com/",
     "https://koreainvest365.com/",
@@ -55,6 +55,19 @@ SITES = [
     "https://koreanews365.com/",
     "https://theseouljournal.com/",
 ]
+
+# URL-prefix Search Console properties. Visitor and post metrics for these
+# hosted blogs come from their platform collectors in control_center/app.py;
+# this job only supplies official GSC clicks/impressions/index evidence.
+TISTORY_GSC_SITES = [
+    "https://k-insight-vietnam.tistory.com/",
+    "https://k-vietnam.tistory.com/",
+    "https://k-healthcare.tistory.com/",
+    "https://huh0303.tistory.com/",
+    "https://k-trip365.tistory.com/",
+]
+
+SITES = WORDPRESS_SITES + TISTORY_GSC_SITES
 
 BROWSER_HEADERS = {
     "User-Agent": (
@@ -383,17 +396,19 @@ def main():
             "checked_at": checked_at,
         }
 
-        visitor, visitor_err = get_footer_visitor_stats(site_url)
-        if visitor:
-            row.update(visitor)
-            row["weekday"] = weekday_kr(row["date"])
-        else:
-            row["errors"].append(visitor_err or "방문자 API 실패")
+        visitor = None
+        if site_url in WORDPRESS_SITES:
+            visitor, visitor_err = get_footer_visitor_stats(site_url)
+            if visitor:
+                row.update(visitor)
+                row["weekday"] = weekday_kr(row["date"])
+            else:
+                row["errors"].append(visitor_err or "방문자 API 실패")
 
-        post_count, post_err = get_published_post_count(site_url)
-        row["total_posts"] = post_count
-        if post_err:
-            row["errors"].append(post_err)
+            post_count, post_err = get_published_post_count(site_url)
+            row["total_posts"] = post_count
+            if post_err:
+                row["errors"].append(post_err)
 
         if token:
             domain_property = f"sc-domain:{domain}"

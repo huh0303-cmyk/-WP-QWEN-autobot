@@ -55,7 +55,7 @@ def content_sites() -> list[dict]:
         blog_id = str(room.get("destination_id") or "").strip()
         sites.append({"site_id": room["room_id"], "platform": "naver",
                       "url": f"https://blog.naver.com/{blog_id}" if blog_id else "",
-                      "editor_url": f"https://blog.naver.com/{blog_id}?Redirect=Write" if blog_id else "",
+                      "editor_url": room.get("editor_url") or (f"https://blog.naver.com/{blog_id}?Redirect=Write" if blog_id else ""),
                       "label": room.get("name") or room["room_id"],
                       "enabled": bool(blog_id), "auto_publish": False,
                       "unavailable_reason": "블로그 ID 연결 필요" if not blog_id else "",

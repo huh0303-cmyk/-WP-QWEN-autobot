@@ -115,6 +115,9 @@ def test_get_naver_data_never_fabricates_visitor_numbers(monkeypatch, tmp_path):
         "connected": False, "total_posts": None, "today": 0,
         "latest_url": "", "latest_title": "", "latest_at": None, "error": "rss_unavailable",
     })
+    monkeypatch.setattr(naver_blog, "_naver_visitor_stats", lambda blog_id, bucket: {
+        "connected": False, "reason": "visitor gadget unavailable",
+    })
     rows = naver_blog.get_naver_data()
     assert len(rows) == 3
     for row in rows:

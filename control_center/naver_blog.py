@@ -37,7 +37,9 @@ VISITOR_UNAVAILABLE_REASON = (
 TOTAL_POSTS_PATTERN = re.compile(r"전체보기\s*\(\s*([\d,]+)\s*\)")
 
 PERSONA_BY_BLOG_ID = {
-    "huh0303": ("생활행정 정보 큐레이터", "신청기한·대상·공식 조회 경로를 빠르고 명료하게 안내"),
+    "k-insight-vietnam": ("생활금융 정보 큐레이터", "공식 금융자료와 실제 확인 순서를 빠르고 명료하게 안내"),
+    "health-standard": ("근거중심 건강정보 편집자", "진단을 단정하지 않고 공식 의료정보와 생활 속 확인 순서를 설명"),
+    "sky-only": ("생활행정 정보 큐레이터", "신청기한·대상·공식 조회 경로를 빠르고 명료하게 안내"),
 }
 DEFAULT_PERSONA = ("전문 편집자", "공식 출처 중심의 실용적 설명")
 
