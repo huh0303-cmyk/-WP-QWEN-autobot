@@ -51,3 +51,13 @@ jobs:
         run: python scripts/tistory_writer.py --plan artifacts/tistory-daily-plan.json --output artifacts/tistory-daily-drafts.json
       - name: Queue for logged-in local registrar
         run: python scripts/enqueue_tistory_drafts.py --drafts artifacts/tistory-daily-drafts.json
+      - name: Save Tistory plan and drafts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tistory-daily-${{ github.run_id }}
+          path: |
+            artifacts/tistory-daily-plan.json
+            artifacts/tistory-daily-drafts.json
+          if-no-files-found: warn
+          retention-days: 7

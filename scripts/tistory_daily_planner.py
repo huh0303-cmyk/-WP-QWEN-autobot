@@ -155,8 +155,13 @@ def main() -> int:
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"date": plan["date"], "jobs": len(plan["jobs"]), "public_allowed": False}, ensure_ascii=False))
-    return 0
+    print(json.dumps({
+        "date": plan["date"],
+        "jobs": len(plan["jobs"]),
+        "failures": len(plan["failures"]),
+        "public_allowed": False,
+    }, ensure_ascii=False))
+    return 1 if plan["failures"] or not plan["jobs"] else 0
 
 
 if __name__ == "__main__":
