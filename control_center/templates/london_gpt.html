@@ -30,7 +30,7 @@
 <section class="rounded-3xl border border-white/10 bg-slate-900 p-5">
   <p class="text-xs font-black text-blue-300">n8n · 통합 발행</p>
   <h2 class="mt-1 text-2xl font-black">즉시발행</h2>
-  <p id="modeDescription" class="mt-1 text-sm text-slate-400">자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증까지 진행합니다.</p>
+  <p id="modeDescription" class="mt-1 text-sm text-slate-400">자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증·Search Console 제출까지 진행합니다.</p>
 
   <div class="mt-4 flex flex-wrap gap-3" role="radiogroup" aria-label="실행 모드">
     <label class="rounded-xl border border-blue-400 bg-blue-500/10 px-4 py-3 text-sm font-bold"><input type="radio" name="runMode" value="auto" checked> 자동 모드 · ①~④</label>
@@ -218,7 +218,7 @@ function setModeUI(){
   document.getElementById('publishModeLabel').classList.toggle('hidden',manual);
   document.getElementById('modeDescription').textContent=manual
     ?'수동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지까지 자동으로 준비합니다. ④ 공개 발행은 직접 합니다.'
-    :'자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증까지 진행합니다.';
+    :'자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증·Search Console 제출까지 진행합니다.';
   document.getElementById('rewriteDescription').textContent=manual
     ?'1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지를 다시 준비합니다. 발행은 직접 합니다.'
     :'1번 키워드를 유지하고 ② 글쓰기 → ③ 이미지 → ④ 발행을 다시 실행합니다.';
@@ -349,7 +349,7 @@ async function pollRun(){
       research:d.research?.keyword?('선정 키워드: '+d.research.keyword):'리서치 대기/진행',
       write:d.writer?('품질 '+(d.writer.quality_score??'-')+' · '+(d.writer.provider||'')+' · '+categoryText):'글쓰기 + 카테고리 지정 대기/진행',
       image:d.image?.status?((category?.status==='ok'?categoryText+' · ':'')+d.image.status+(d.image.model&&d.image.model!=='none'?' · '+d.image.model:'')):'카테고리 지정 완료 후 이미지 진행',
-      publish:d.receipt?.url?('완료: '+d.receipt.url):d.publish_mode==='manual'?'직접 발행할 자료 준비 중':'발행·검증 대기/진행'
+      publish:d.receipt?.url?('완료: '+d.receipt.url):d.publish_mode==='manual'?'직접 발행할 자료 준비 중':'발행·검증·검색 등록 대기/진행'
     };
     ['research','write','image','publish'].forEach(stage=>setAgent(stage,s[stage]||'waiting',details[stage]));
     if(d.research?.keyword){

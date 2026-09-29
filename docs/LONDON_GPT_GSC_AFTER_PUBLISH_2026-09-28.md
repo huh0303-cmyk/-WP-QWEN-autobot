@@ -13,6 +13,8 @@ Status: deployed and GSC submission verified, 2026-09-28 KST.
 
 After a verified *public* receipt, the server dispatches `.github/workflows/london-gsc-submit.yml` through its existing `GH_TOKEN`. The action checks that the URL is on the selected site, publicly reachable and not marked `noindex`; checks the site's sitemap; uses the existing GitHub `GSC_SERVICE_ACCOUNT_JSON` secret to find the site's verified property; submits its sitemap with the Search Console Sitemaps API; verifies the API response; and copies a small result receipt to `data/london-gsc-receipts`. The web app displays queued, submitted or failed. Drafts do not dispatch. The GSC credential remains in GitHub Actions, not in the VPS application environment.
 
+Public-page checks, sitemap checks and idempotent Search Console API calls retry up to three times for connection failures, HTTP 429 and HTTP 5xx. These retries never call WordPress or Blogger again, so a temporary Search Console-side failure cannot duplicate the published article.
+
 The general Indexing API is restricted by Google to JobPosting and BroadcastEvent pages. Standard articles use sitemap submission. `submitted` means Google received a sitemap request; it does not mean the new URL is indexed. The displayed receipt deliberately does not claim indexing.
 
 ## Operational verification / remaining work

@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import time
 from urllib.parse import quote, urlparse
 
 import requests
@@ -17,6 +18,25 @@ sys.path.insert(0, str(ROOT))
 from scripts.submit_khealth_sitemap import access_token
 
 RUN_PATTERN = re.compile(r"lgpt-[0-9]{8}-[0-9]{6}-[a-f0-9]{6}\Z")
+RETRYABLE_HTTP = {429, 500, 502, 503, 504}
+TRANSIENT_PUBLIC_HTTP = RETRYABLE_HTTP | {301, 302, 307, 308}
+
+
+def request_with_retry(method: str, url: str, **kwargs):
+    """Retry only read checks and idempotent sitemap API calls."""
+    caller = getattr(requests, method.lower())
+    retry_statuses = kwargs.pop("retry_statuses", RETRYABLE_HTTP)
+    for attempt in range(3):
+        try:
+            response = caller(url, **kwargs)
+        except requests.RequestException:
+            if attempt == 2:
+                raise
+        else:
+            if response.status_code not in retry_statuses or attempt == 2:
+                return response
+        time.sleep(1 << attempt)
+    raise RuntimeError("unreachable retry state")
 
 
 def expected_site(site_id: str) -> tuple[str, str]:
@@ -51,13 +71,16 @@ def submit(run_id: str, site_id: str, public_url: str, *, dry_run: bool = False)
         raise ValueError("invalid run ID")
     platform, site_url = expected_site(site_id)
     validate_url(public_url, site_url)
-    response = requests.get(public_url, timeout=25, allow_redirects=False)
+    response = request_with_retry(
+        "get", public_url, timeout=25, allow_redirects=False,
+        retry_statuses=TRANSIENT_PUBLIC_HTTP,
+    )
     if response.status_code != 200 or "html" not in response.headers.get("content-type", "").lower():
         raise RuntimeError(f"published page verification HTTP {response.status_code}")
     if "noindex" in response.headers.get("x-robots-tag", "").lower() or re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex', response.text, re.I):
         raise RuntimeError("published page has noindex")
     sitemap = f"{site_url}/{'sitemap_index.xml' if platform == 'wordpress' else 'sitemap.xml'}"
-    sitemap_response = requests.get(sitemap, timeout=25, allow_redirects=True)
+    sitemap_response = request_with_retry("get", sitemap, timeout=25, allow_redirects=True)
     if sitemap_response.status_code != 200:
         raise RuntimeError(f"sitemap HTTP {sitemap_response.status_code}")
     raw = os.environ.get("GSC_SERVICE_ACCOUNT_JSON", "").strip()
@@ -66,7 +89,7 @@ def submit(run_id: str, site_id: str, public_url: str, *, dry_run: bool = False)
     token = access_token(json.loads(raw))
     headers = {"Authorization": f"Bearer {token}"}
     base = "https://www.googleapis.com/webmasters/v3"
-    sites = requests.get(f"{base}/sites", headers=headers, timeout=30)
+    sites = request_with_retry("get", f"{base}/sites", headers=headers, timeout=30)
     sites.raise_for_status()
     domain = urlparse(site_url).hostname or ""
     prop = select_property(sites.json().get("siteEntry", []), domain)
@@ -75,10 +98,10 @@ def submit(run_id: str, site_id: str, public_url: str, *, dry_run: bool = False)
     if dry_run:
         return {"status": "ready", "property": prop, "sitemap_url": sitemap}
     endpoint = f"{base}/sites/{quote(prop, safe='')}/sitemaps/{quote(sitemap, safe='')}"
-    submitted = requests.put(endpoint, headers=headers, timeout=30)
+    submitted = request_with_retry("put", endpoint, headers=headers, timeout=30)
     if submitted.status_code not in (200, 204):
         raise RuntimeError(f"GSC sitemap submit HTTP {submitted.status_code}: {submitted.text[:180]}")
-    checked = requests.get(endpoint, headers=headers, timeout=30)
+    checked = request_with_retry("get", endpoint, headers=headers, timeout=30)
     checked.raise_for_status()
     return {"status": "submitted", "property": prop, "sitemap_url": sitemap,
             "last_submitted": checked.json().get("lastSubmitted")}

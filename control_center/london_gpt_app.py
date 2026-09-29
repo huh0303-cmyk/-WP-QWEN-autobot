@@ -177,7 +177,7 @@ def install(app, runtime):
                 {"id": "research", "label": "1. 키워드/주제어", "purpose": "Google·Naver·미디어·GSC 리서치 후 주제 확정"},
                 {"id": "write", "label": "2. 글쓰기", "purpose": "확정 키워드로 사이트 페르소나·톤·언어에 맞춰 작성"},
                 {"id": "image", "label": "3. 이미지", "purpose": "필요 시 0~1장 생성·검증"},
-                {"id": "publish", "label": "4. 발행·검증", "purpose": "선택 카테고리로 발행 후 URL·post ID 검증"},
+                {"id": "publish", "label": "4. 발행·검증·검색 등록", "purpose": "발행 URL·post ID 검증 후 Search Console 사이트맵 제출"},
             ],
         }
 
