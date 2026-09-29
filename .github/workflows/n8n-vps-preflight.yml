@@ -41,13 +41,20 @@ jobs:
             echo "===REPO==="
             test -d /opt/korea365 && git -C /opt/korea365 rev-parse --short HEAD || true
             echo "===STALE BATCH PROGRESS==="
-            test -f /opt/korea365/artifacts/london-stale-publish-2026-09-29.json && cat /opt/korea365/artifacts/london-stale-publish-2026-09-29.json || echo "no batch receipt yet"
+            found_batch=0
+            for receipt in /opt/korea365/artifacts/london-stale-publish-2026-09-29*.json; do
+              test -f "$receipt" || continue
+              found_batch=1
+              echo "---$receipt---"
+              cat "$receipt"
+            done
+            test "$found_batch" -eq 1 || echo "no batch receipt yet"
             echo "===LATEST PIPELINE STATES==="
             python3 - <<'PY'
             import json
             from pathlib import Path
             root=Path('/opt/korea365/data/london-pipeline')
-            for path in sorted(root.glob('lgpt-20260929-*.json'), key=lambda p:p.stat().st_mtime, reverse=True)[:8]:
+            for path in sorted(root.glob('lgpt-*.json'), key=lambda p:p.stat().st_mtime, reverse=True)[:12]:
                 try:
                     d=json.loads(path.read_text(encoding='utf-8'))
                 except Exception as exc:
