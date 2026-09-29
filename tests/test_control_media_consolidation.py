@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from scripts.opening_recent_snapshot import stamp
-from control_center import blog_metadata
+from control_center import blog_metadata, control_home
 from control_center.blog_korea365_ranking import build_ranking
 
 
@@ -178,3 +178,40 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"yesterday_views": item.get("view_delta")' in source
     assert '"yesterday_views_delta": item.get("views_delta")' in source
     assert "if item.get(\"handle\") and item.get(\"channel_id\")" in source
+
+
+def test_youtube_ranking_prefers_full_public_api_snapshot(monkeypatch, tmp_path):
+    (tmp_path / "config").mkdir()
+    (tmp_path / "data").mkdir()
+    (tmp_path / "config" / "london_social_account_inventory_2026-09-24.json").write_text(
+        '{"youtube":[{"name":"French Survival","handle":"SIS_FrenchSurvival","channel_id":"UC-test","group":"language"}]}',
+        encoding="utf-8",
+    )
+    (tmp_path / "data" / "youtube_public_metrics.json").write_text(
+        '{"checked_at_kst":"2026-09-29T09:00:00+09:00","channels":{"UC-test":{"subscribers":7,"views":321,"videos":4,"connected":true}}}',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(control_home, "ROOT", tmp_path)
+    monkeypatch.setattr(control_home, "opening_recent_info", lambda *args: {})
+    result = control_home.build_youtube_ranking(1)
+    assert result["ranked"] == 1
+    assert result["rows"][0]["subscribers"] == 7
+    assert result["rows"][0]["views"] == 321
+
+
+def test_sns_ranking_uses_persisted_official_probe(monkeypatch, tmp_path):
+    (tmp_path / "config").mkdir()
+    (tmp_path / "data").mkdir()
+    (tmp_path / "config" / "sns_six_channel_policy.json").write_text(
+        '{"accounts":[{"platform":"Instagram","role":"korean_topik","display_name":"SIS Korean","handle":"sis_topik1"}]}',
+        encoding="utf-8",
+    )
+    (tmp_path / "data" / "ceo_sns_probe.json").write_text(
+        '{"rows":[{"platform":"Instagram","brand":"TOPIK","followers":3555,"status":"조회 성공"}]}',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(control_home, "ROOT", tmp_path)
+    result = control_home.build_sns_ranking(1)
+    assert result["ranked"] == 1
+    assert result["rows"][0]["followers"] == 3555
+    assert result["rows"][0]["metric_status"] == "조회 성공"
