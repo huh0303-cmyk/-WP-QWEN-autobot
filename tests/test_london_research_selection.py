@@ -60,8 +60,29 @@ def test_direct_research_uses_bounded_local_generation(monkeypatch):
         {"wordpress": {"theme": "International Students", "persona": "Student adviser"}, "language": "en"},
         {"google_news_headlines": ["Scholarship applications open"]},
     )
-    assert captured["timeout"] == 120
-    assert captured["max_tokens"] == 320
+    assert captured["timeout"] == 35
+    assert captured["max_tokens"] == 220
+
+
+def test_direct_research_falls_back_to_evidence_when_local_model_times_out(monkeypatch):
+    def fail_generate(prompt, **kwargs):
+        raise TimeoutError("local model stalled")
+
+    local_text = importlib.import_module("local_text")
+    monkeypatch.setattr(local_text, "local_generate_text", fail_generate)
+    result = direct_topic_research.choose_keyword(
+        {"wordpress": {"theme": "International Students", "persona": "Student adviser"}, "language": "en"},
+        {
+            "google_news_headlines": ["Scholarship applications open for international students"],
+            "google_trends_kr": [],
+            "naver_news_headlines": ["한국 유학생 장학 지원 확대"],
+            "gsc_context": "study in Korea scholarship impressions",
+        },
+    )
+    assert pipeline._parse_keyword(result) == "study in Korea scholarships"
+    assert "Scholarship applications open" in result
+    assert "한국 유학생 장학 지원 확대" in result
+    assert "VOLUME: unavailable" in result
 
 
 def test_all_london_webhooks_acknowledge_immediately():

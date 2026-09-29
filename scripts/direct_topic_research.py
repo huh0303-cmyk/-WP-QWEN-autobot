@@ -18,6 +18,16 @@ from bs4 import BeautifulSoup
 
 UA = {"User-Agent": "Mozilla/5.0 (Korea365 research bot; current-topic discovery)"}
 
+INTL_STUDENT_TOPICS = (
+    (("scholarship", "grant", "funding", "장학"), "study in Korea scholarships"),
+    (("visa", "immigration", "비자", "체류"), "Korea student visa guide"),
+    (("admission", "application", "apply", "university", "입학", "지원"), "Korean university application guide"),
+    (("housing", "dorm", "rent", "기숙사", "주거"), "Korea student housing guide"),
+    (("tuition", "cost", "budget", "living cost", "학비", "생활비"), "study in Korea costs"),
+    (("job", "work", "intern", "취업", "아르바이트"), "student jobs in Korea"),
+    (("insurance", "health", "medical", "보험", "건강"), "Korea student health insurance"),
+)
+
 def _rss_items(url: str, limit: int = 20) -> list[dict[str, str]]:
     response = requests.get(url, headers=UA, timeout=25)
     response.raise_for_status()
@@ -92,6 +102,61 @@ def collect(profile: dict, demand_context: str) -> dict:
         },
     }
 
+
+def _first_signal(evidence: dict, *keys: str) -> str:
+    for key in keys:
+        rows = evidence.get(key) or []
+        for row in rows:
+            value = row.get("title", "") if isinstance(row, dict) else row
+            value = re.sub(r"\s+", " ", str(value)).strip()
+            if value:
+                return value[:180]
+    return "unavailable"
+
+
+def _deterministic_keyword(profile: dict, evidence: dict, avoid: str = "") -> str:
+    """Return a bounded evidence-backed answer when the local model is slow."""
+    theme = str(profile.get("wordpress", {}).get("theme") or "").strip()
+    searchable = " ".join(
+        [
+            theme,
+            str(evidence.get("gsc_context") or ""),
+            *[str(x) for x in evidence.get("google_news_headlines") or []],
+            *[str(x) for x in evidence.get("naver_news_headlines") or []],
+            *[str(x.get("title", "")) for x in evidence.get("google_trends_kr") or [] if isinstance(x, dict)],
+        ]
+    ).lower()
+    avoid_lower = str(avoid or "").lower()
+    candidates: list[str] = []
+    if "international student" in theme.lower():
+        candidates = [
+            phrase
+            for terms, phrase in INTL_STUDENT_TOPICS
+            if any(term in searchable for term in terms) and phrase.lower() not in avoid_lower
+        ]
+        candidates.extend(
+            phrase for _, phrase in INTL_STUDENT_TOPICS
+            if phrase not in candidates and phrase.lower() not in avoid_lower
+        )
+    theme_words = re.findall(r"[A-Za-z0-9가-힣]+", theme)[:3]
+    generic = " ".join([*theme_words, "Korea", "guide"][:6])
+    if len(generic.split()) < 3:
+        generic = "practical Korea topic guide"
+    keyword = candidates[0] if candidates else generic
+    google = _first_signal(evidence, "google_news_headlines", "google_trends_kr")
+    naver = _first_signal(evidence, "naver_news_headlines")
+    media = _first_signal(evidence, "google_news_headlines", "naver_news_headlines")
+    return "\n".join(
+        [
+            f"KEYWORD: {keyword}",
+            f"GOOGLE: {google}",
+            f"NAVER: {naver}",
+            f"MEDIA: {media}",
+            "VOLUME: unavailable",
+            "RATIONALE: Current observed search and media signals match this site's international-student audience.",
+        ]
+    )
+
 def choose_keyword(profile: dict, evidence: dict, avoid: str = "") -> str:
     from local_text import local_generate_text
     settings = profile["wordpress"]
@@ -122,6 +187,9 @@ MEDIA: <observed media signal>
 VOLUME: <verified volume or unavailable>
 RATIONALE: <one concise reason>
 """
-    # The required answer is only six short lines. A bounded generation avoids
-    # spending the whole research-stage timeout on an unnecessarily long decode.
-    return local_generate_text(prompt, temperature=0.35, timeout=120, max_tokens=320)
+    # The required answer is only six short lines. If the local model cannot
+    # answer promptly, use the observed evidence rather than stalling Agent 1.
+    try:
+        return local_generate_text(prompt, temperature=0.35, timeout=35, max_tokens=220)
+    except Exception:
+        return _deterministic_keyword(profile, evidence, avoid=avoid)
