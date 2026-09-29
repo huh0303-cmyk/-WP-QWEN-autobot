@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-09-29T09:18:42.104888+09:00",
+  "checked_at_kst": "2026-09-29T17:01:04.023975+09:00",
   "collection_status": "partial",
   "rows": [
     {
@@ -71,8 +71,8 @@
     {
       "platform": "Instagram",
       "brand": "TOPIK",
-      "followers": 3555,
-      "formatted_followers": "3,555(증감 미확인)",
+      "followers": 3553,
+      "formatted_followers": "3,553(증감 미확인)",
       "delta": null,
       "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
       "source": "공식 API",
