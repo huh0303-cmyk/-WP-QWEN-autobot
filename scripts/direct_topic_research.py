@@ -157,10 +157,18 @@ def _deterministic_keyword(profile: dict, evidence: dict, avoid: str = "") -> st
         word for word in re.findall(r"[A-Za-z0-9가-힣]+", theme)
         if word.lower() not in {"korea", "korean"}
     ][:3]
-    generic = " ".join([*theme_words, "Korea", "practical", "guide"][:6])
-    if len(generic.split()) < 3:
-        generic = "practical Korea topic guide"
-    keyword = candidates[0] if candidates else generic
+    generic_stem = [*theme_words, "Korea"]
+    generic_candidates = [
+        " ".join([*generic_stem, "practical", "guide"][:6]),
+        " ".join([*generic_stem, str(date.today().year), "update"][:6]),
+        " ".join([*generic_stem, "current", "changes"][:6]),
+    ]
+    generic_candidates = [
+        item if len(item.split()) >= 3 else "practical Korea topic guide"
+        for item in generic_candidates
+    ]
+    candidates.extend(item for item in generic_candidates if item.lower() not in avoid_lower)
+    keyword = candidates[0] if candidates else generic_candidates[-1]
     google = _first_signal(evidence, "google_news_headlines", "google_trends_kr")
     naver = _first_signal(evidence, "naver_news_headlines")
     media = _first_signal(evidence, "google_news_headlines", "naver_news_headlines")

@@ -98,6 +98,20 @@ def test_direct_research_falls_back_when_local_model_times_out(monkeypatch):
     assert pipeline._parse_keyword(result) == "Travel Korea practical guide"
 
 
+def test_direct_research_rotates_generic_keyword_when_previous_choice_overlaps(monkeypatch):
+    def fail_generate(prompt, **kwargs):
+        raise TimeoutError("local model stalled")
+
+    local_text = importlib.import_module("local_text")
+    monkeypatch.setattr(local_text, "local_generate_text", fail_generate)
+    result = direct_topic_research.choose_keyword(
+        {"wordpress": {"theme": "Korea Travel", "persona": "Travel adviser"}, "language": "en"},
+        {"google_news_headlines": ["Autumn rail routes attract visitors"]},
+        avoid="Do not use 'Travel Korea practical guide' or close variants.",
+    )
+    assert pipeline._parse_keyword(result) == f"Travel Korea {direct_topic_research.date.today().year} update"
+
+
 def test_naver_subscription_boilerplate_is_not_research_evidence():
     assert not direct_topic_research._valid_naver_title(
         "언론사 선정 주요기사 혹은 심층기획 기사입니다. 네이버 메인에서 언론사를 구독하세요."
