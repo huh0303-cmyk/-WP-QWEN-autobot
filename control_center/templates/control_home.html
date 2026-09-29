@@ -77,7 +77,8 @@ const rank=v=>Number.isFinite(v)?v+'위':'—';
 const delta=v=>{if(!Number.isFinite(v))return '';const cls=v>0?'up':v<0?'down':'flat';return '<span class="'+cls+'">('+(v>0?'+':'')+nf.format(v)+')</span>';};
 const metric=(v,d)=>Number.isFinite(v)?nf.format(v)+' '+delta(d):'';
 const money=r=>{if(!r||!r.monetized)return '—';if(!Number.isFinite(r.amount))return esc(r.status||'');const sym=r.currency==='KRW'?'₩':r.currency==='USD'?'$':esc(r.currency||'');return sym+nf.format(r.amount)+' '+delta(r.delta);};
-const revenueStatus=r=>{if(!r)return '수익 데이터 미연결';if(r.monetized)return Number.isFinite(r.amount)?money(r):esc(r.status||'승인')+' · 금액 미연결';return esc(r.status||'미수익화');};
+const revenueStatus=r=>{if(!r)return '수익 데이터 미연결';if(r.monetized)return Number.isFinite(r.amount)?money(r):esc(r.status||'승인')+' · 금액 미연결';return r.status==='미연결'?'수익 데이터 미연결':esc(r.status||'미수익화');};
+const socialMetric=(v,d,status)=>Number.isFinite(v)?metric(v,d):'<span class="warn">'+esc(status||'API 인증 필요')+'</span>';
 const visitorMetric=c=>Number.isFinite(c.yesterday_visitors)?metric(c.yesterday_visitors,c.yesterday_visitors_delta):(Number.isFinite(c.total_visitors)?metric(c.total_visitors,c.total_visitors_delta)+' <span class="source-tag">누적</span>':'방문자 미연결');
 const gscMetric=c=>c.gsc_connected&&Number.isFinite(c.gsc_clicks)&&Number.isFinite(c.gsc_impressions)?'<span title="GSC 기준일 '+esc(c.gsc_date||'')+'">'+nf.format(c.gsc_clicks)+' / '+nf.format(c.gsc_impressions)+'</span>':'GSC 미연결';
 const hostInfo=o=>{if(!o)return '';const p=esc(o.provider||''),pay=o.payment_date&&/^20/.test(o.payment_date)?'결제 '+esc(o.payment_date):esc(o.payment_date||''),ren=o.renewal_date&&/^20/.test(o.renewal_date)?'만료 '+esc(o.renewal_date):esc(o.renewal_date||'');return [p,pay,ren].filter(Boolean).join(' · ');};
@@ -163,7 +164,7 @@ async function loadSocial(){
   const p=String(c.platform||'').toLowerCase();
   const launch='https://sns.korea365.org/social-accounts?platform='+encodeURIComponent(c.platform||'통합');
   const monetized=!!(c.revenue&&c.revenue.monetized);
-  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(c.platform||'')+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+metric(c.audience,c.audience_delta)+'</td><td>'+metric(c.views,c.views_delta)+'</td><td>'+dateTime(c.recent_publish_date)+'</td><td><a class="quick" href="'+launch+'">즉시발행</a></td></tr>';
+  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(c.platform||'')+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+dateTime(c.recent_publish_date)+'</td><td><a class="quick" href="'+launch+'">즉시발행</a></td></tr>';
  }).join('');
  return d.generated_at;
 }

@@ -77,17 +77,42 @@ def _youtube_stats_by_identity(bucket: int):
             if _norm(token):
                 previous_map[_norm(token)] = row
     return current_map, previous_map, history.get("updated_at", "")
+
+
+def _youtube_public_stats() -> tuple[dict[str, dict], str]:
+    snapshot = _read(ROOT / "data" / "youtube_public_metrics.json", {})
+    return snapshot.get("channels", {}), snapshot.get("checked_at_kst", "")
+
+
+def _sns_probe_stats() -> dict[tuple[str, str], dict]:
+    snapshot = _read(ROOT / "data" / "ceo_sns_probe.json", {})
+    return {
+        (str(row.get("platform") or "").lower(), str(row.get("brand") or "").upper()): row
+        for row in snapshot.get("rows", [])
+        if isinstance(row, dict)
+    }
+
+
+ROLE_TO_PROBE_BRAND = {
+    "korean_topik": "TOPIK",
+    "english": "ENGLISH",
+    "japanese": "LANGUAGE",
+}
+
+
 def build_youtube_ranking(bucket: int) -> dict:
     inventory = _read(ROOT / "config" / "london_social_account_inventory_2026-09-24.json", {})
     current_map, previous_map, updated_at = _youtube_stats_by_identity(bucket)
+    public_stats, public_updated_at = _youtube_public_stats()
     rows = []
     for item in inventory.get("youtube", []):
         candidates = [_norm(item.get("name")), _norm(item.get("handle"))]
         current = next((current_map.get(k) for k in candidates if k and current_map.get(k)), {})
         previous = next((previous_map.get(k) for k in candidates if k and previous_map.get(k)), {})
-        subs = current.get("subs") if isinstance(current, dict) else None
-        views = current.get("views") if isinstance(current, dict) else None
-        videos = current.get("videos") if isinstance(current, dict) else None
+        public = public_stats.get(item.get("channel_id", ""), {})
+        subs = public.get("subscribers") if public.get("subscribers") is not None else (current.get("subs") if isinstance(current, dict) else None)
+        views = public.get("views") if public.get("views") is not None else (current.get("views") if isinstance(current, dict) else None)
+        videos = public.get("videos") if public.get("videos") is not None else (current.get("videos") if isinstance(current, dict) else None)
         timeline = opening_recent_info("", "youtube", item.get("channel_id", ""))
         rows.append({
             "name": current.get("title") or item.get("name") or item.get("channel_id"),
@@ -139,7 +164,7 @@ def build_youtube_ranking(bucket: int) -> dict:
             row["rank"] = rank
     return {
         "generated_at": datetime.now(KST).isoformat(),
-        "updated_at": updated_at,
+        "updated_at": public_updated_at or updated_at,
         "total": len(rows),
         "ranked": rank,
         "rows": rows,
@@ -161,6 +186,7 @@ def build_sns_ranking(bucket: int) -> dict:
     if not audience_path.exists():
         audience_path = ROOT / "data" / "account-audience-metrics.json"
     audience = _read(audience_path, {}).get("accounts", {})
+    probe = _sns_probe_stats()
     rows = []
     for item in policy.get("accounts", []):
         platform = str(item.get("platform") or "")
@@ -169,6 +195,9 @@ def build_sns_ranking(bucket: int) -> dict:
         current = latest.get(pkey, {}).get(hist_key, {}) if hist_key else {}
         old = previous.get(pkey, {}).get(hist_key, {}) if hist_key else {}
         followers = current.get("count") if isinstance(current, dict) else None
+        probe_row = probe.get((pkey, ROLE_TO_PROBE_BRAND.get(str(item.get("role") or ""), "")), {})
+        if probe_row.get("followers") is not None:
+            followers = probe_row.get("followers")
         handle = str(item.get("handle") or "")
         audience_row = audience.get(handle, {}) if handle else {}
         yesterday_views = audience_row.get("views") if isinstance(audience_row, dict) else None
@@ -187,6 +216,7 @@ def build_sns_ranking(bucket: int) -> dict:
             "revenue": _social_revenue(platform, handle, ""),
             "opening_date": str(item.get("created_at") or item.get("opening_date") or "")[:10],
             "connected": isinstance(followers, (int, float)),
+            "metric_status": probe_row.get("status") or ("조회 성공" if isinstance(followers, (int, float)) else "API 인증 필요"),
         })
     rows.sort(key=lambda r: (
         r["followers"] is None,
@@ -244,6 +274,8 @@ def build_social_ranking(bucket: int) -> dict:
             "recent_publish_date": item.get("recent_publish_date") or "",
             "infrastructure": item.get("infrastructure") or infrastructure_info("youtube"),
             "connected": item.get("connected", False),
+            "metric_status": "조회 성공" if item.get("connected", False) else "YouTube 공개 API 갱신 필요",
+            "views_status": "조회 성공" if item.get("connected", False) else "YouTube 공개 API 갱신 필요",
         })
     for item in sns["rows"]:
         rows.append({
@@ -266,6 +298,8 @@ def build_social_ranking(bucket: int) -> dict:
             "recent_publish_date": item.get("recent_publish_date") or "",
             "infrastructure": infrastructure_info(str(item.get("platform") or "").lower()),
             "connected": item.get("connected", False),
+            "metric_status": item.get("metric_status") or "플랫폼 API 인증 필요",
+            "views_status": "인사이트 API 인증 필요",
         })
     rows.sort(key=lambda r: (
         r["audience"] is None,
