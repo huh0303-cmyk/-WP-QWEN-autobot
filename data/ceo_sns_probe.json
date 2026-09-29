@@ -1,0 +1,139 @@
+{
+  "checked_at_kst": "2026-09-29T09:18:42.104888+09:00",
+  "collection_status": "partial",
+  "rows": [
+    {
+      "platform": "TikTok",
+      "brand": "TOPIK",
+      "followers": 30900,
+      "formatted_followers": "30,900(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공개 프로필 참고값; 공식 인사이트 아님",
+      "status": "조회 성공",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "TikTok",
+      "brand": "ENGLISH",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공개 프로필 참고값; 공식 인사이트 아님",
+      "status": "TIKTOK_USERNAME_ENGLISH 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "TikTok",
+      "brand": "LANGUAGE",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공개 프로필 참고값; 공식 인사이트 아님",
+      "status": "TIKTOK_USERNAME_LANGUAGE 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Facebook",
+      "brand": "TOPIK",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "FB_PAGE_ID_TOPIK/FB_PAGE_ACCESS_TOKEN_TOPIK 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Facebook",
+      "brand": "ENGLISH",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "FB_PAGE_ID_ENGLISH/FB_PAGE_ACCESS_TOKEN_ENGLISH 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Facebook",
+      "brand": "LANGUAGE",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "FB_PAGE_ID_LANGUAGE/FB_PAGE_ACCESS_TOKEN_LANGUAGE 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Instagram",
+      "brand": "TOPIK",
+      "followers": 3555,
+      "formatted_followers": "3,555(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "조회 성공",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Instagram",
+      "brand": "ENGLISH",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "IG_USER_ID_ENGLISH/IG_ACCESS_TOKEN_ENGLISH 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Instagram",
+      "brand": "LANGUAGE",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "IG_USER_ID_LANGUAGE/IG_ACCESS_TOKEN_LANGUAGE 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Threads",
+      "brand": "TOPIK",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "THREADS_USER_ID_TOPIK/THREADS_ACCESS_TOKEN_TOPIK 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Threads",
+      "brand": "ENGLISH",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "THREADS_USER_ID_ENGLISH/THREADS_ACCESS_TOKEN_ENGLISH 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    },
+    {
+      "platform": "Threads",
+      "brand": "LANGUAGE",
+      "followers": null,
+      "formatted_followers": "미집계(증감 미확인)",
+      "delta": null,
+      "delta_reason": "동일 마감 기준의 전일 스냅샷 미검증",
+      "source": "공식 API",
+      "status": "THREADS_USER_ID_LANGUAGE/THREADS_ACCESS_TOKEN_LANGUAGE 없음(계정 미설정)",
+      "period_views": "미집계(증감 미확인)"
+    }
+  ],
+  "scope": "Read-only SNS statistics; no publications, messages, permission changes, or secret values"
+}
