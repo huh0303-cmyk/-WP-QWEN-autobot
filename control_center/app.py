@@ -892,35 +892,47 @@ def get_blogger_data():
             }
         except (OSError, ValueError, KeyError, TypeError):
             profile_by_order = {}
-    result = [{
-        "site_id": f"blogger_{profile_by_order.get(int(row.get('order') or 0), '')}",
-        "order": row.get("order"),
-        "name": row.get("title") or row.get("name") or f"Blogger {row.get('order', '')}",
-        "wp_url": row.get("wp") or row.get("wordpress") or row.get("wp_url", ""),
-        "url": row.get("blogspot", ""),
-        "google_approved": row.get("blogspot", "").rstrip("/") in ADSENSE_BLOGGER_URLS,
-        "status": row.get("status", "UNKNOWN"),
-        "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"} and row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS),
-        "blog_id": row.get("destination_id", ""),
-        "admin_review_url": f"https://www.blogger.com/blog/posts/{row.get('destination_id', '')}" if row.get("destination_id") else "https://www.blogger.com/",
-        "category": row.get("topic") or "미분류",
-        "official_categories": blogger_labels.get(row.get("blogspot", ""), []),
-        "persona": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "persona", "Specialist editorial desk"),
-        "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
-        "default_text_model": "gpt-5-mini",
-        "default_image_model": "bytedance/sdxl-lightning-4step",
-        "visitor_checked_at": stats_at,
-        "today_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("today"),
-        "today_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("today_delta"),
-        "yesterday_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("yesterday"),
-        "yesterday_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("yesterday_delta"),
-        "total_visitors": (stats.get(row.get("blogspot", ""), {}) or {}).get("total"),
-        "total_delta": (stats.get(row.get("blogspot", ""), {}) or {}).get("total_delta"),
-        "total_posts": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("public_posts"),
-        "posts_delta": None,
-        "indexed": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("indexed"),
-        "indexed_delta": None,
-    } for row in rows]
+    from .blog_visitors import read_site_stats
+    visitor_db = Path(os.environ.get(
+        "BLOG_VISITOR_DB",
+        str(Path(__file__).resolve().parents[1] / "data" / "blog-visitor-counts.sqlite3"),
+    ))
+    result = []
+    for row in rows:
+        site_key = profile_by_order.get(int(row.get("order") or 0), "")
+        central = read_site_stats(visitor_db, site_key) if site_key else {"connected": False}
+        legacy = stats.get(row.get("blogspot", ""), {}) or {}
+        traffic = central if central.get("connected") else legacy
+        result.append({
+            "site_id": f"blogger_{profile_by_order.get(int(row.get('order') or 0), '')}",
+            "order": row.get("order"),
+            "name": row.get("title") or row.get("name") or f"Blogger {row.get('order', '')}",
+            "wp_url": row.get("wp") or row.get("wordpress") or row.get("wp_url", ""),
+            "url": row.get("blogspot", ""),
+            "google_approved": row.get("blogspot", "").rstrip("/") in ADSENSE_BLOGGER_URLS,
+            "status": row.get("status", "UNKNOWN"),
+            "connected": bool(row.get("destination_id") and row.get("status") in {"EXISTING", "CREATED", "SCHEDULED"} and row.get("blogspot", "").rstrip("/") not in HIDDEN_BLOGGER_URLS),
+            "blog_id": row.get("destination_id", ""),
+            "admin_review_url": f"https://www.blogger.com/blog/posts/{row.get('destination_id', '')}" if row.get("destination_id") else "https://www.blogger.com/",
+            "category": row.get("topic") or "미분류",
+            "official_categories": blogger_labels.get(row.get("blogspot", ""), []),
+            "persona": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "persona", "Specialist editorial desk"),
+            "tone": getattr(wp_registry.get((row.get("wp") or "").rstrip("/")), "tone", "Clear, practical and source-aware"),
+            "default_text_model": "gpt-5-mini",
+            "default_image_model": "bytedance/sdxl-lightning-4step",
+            "visitor_connected": bool(central.get("connected")),
+            "visitor_checked_at": central.get("date") or stats_at,
+            "today_visitors": traffic.get("today"),
+            "today_delta": traffic.get("today_delta"),
+            "yesterday_visitors": traffic.get("yesterday"),
+            "yesterday_delta": traffic.get("yesterday_delta"),
+            "total_visitors": traffic.get("total"),
+            "total_delta": traffic.get("total_delta"),
+            "total_posts": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("public_posts"),
+            "posts_delta": None,
+            "indexed": (history_bloggers.get(row.get("blogspot", "").replace("https://", ""), {}) or {}).get("indexed"),
+            "indexed_delta": None,
+        })
     return sorted(
         _overlay_core_metrics(result, "blogger"),
         key=lambda item: (

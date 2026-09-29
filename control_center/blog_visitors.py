@@ -19,6 +19,39 @@ VISITOR_RE = re.compile(r'^[A-Za-z0-9_-]{20,80}$')
 def _today():
     return datetime.now(KST).strftime('%Y-%m-%d')
 
+
+def read_site_stats(path, site_key):
+    """Read one Blogger site's live central counter without inventing data."""
+    path = Path(path)
+    if not path.exists():
+        return {"connected": False}
+    try:
+        today = _today()
+        yesterday = (datetime.now(KST) - timedelta(days=1)).date().isoformat()
+        day_before = (datetime.now(KST) - timedelta(days=2)).date().isoformat()
+        with sqlite3.connect(path, timeout=15) as conn:
+            conn.row_factory = sqlite3.Row
+            day = conn.execute('SELECT count FROM daily WHERE site_key=? AND date=?', (site_key, today)).fetchone()
+            prev = conn.execute('SELECT count FROM daily WHERE site_key=? AND date=?', (site_key, yesterday)).fetchone()
+            prev2 = conn.execute('SELECT count FROM daily WHERE site_key=? AND date=?', (site_key, day_before)).fetchone()
+            total = conn.execute('SELECT count FROM total WHERE site_key=?', (site_key,)).fetchone()
+        today_count = int(day['count']) if day else 0
+        yesterday_count = int(prev['count']) if prev else 0
+        day_before_count = int(prev2['count']) if prev2 else 0
+        return {
+            "connected": True,
+            "date": today,
+            "today": today_count,
+            "yesterday": yesterday_count,
+            "day_before_yesterday": day_before_count,
+            "today_delta": today_count - yesterday_count,
+            "yesterday_delta": yesterday_count - day_before_count,
+            "total": int(total['count']) if total else 0,
+            "total_delta": today_count,
+        }
+    except (OSError, sqlite3.Error, TypeError, ValueError):
+        return {"connected": False}
+
 @contextmanager
 def _connect(path):
     conn=sqlite3.connect(path,timeout=15)
