@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch: {}
+  workflow_run:
+    workflows:
+      - "Daily Google metrics snapshot"
+      - "CEO SNS current statistics (read-only)"
+    types: [completed]
 
 concurrency:
   group: deploy-to-vps
@@ -11,6 +16,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -261,6 +267,21 @@ jobs:
             if not ancestor:
                 raise SystemExit(f"VPS commit does not contain triggering commit: deployed={deployed} expected_ancestor={expected}")
             PY
+
+            # Runtime data is deliberately excluded from the guarded code sync.
+            # Materialize only the two sanitized, source-controlled dashboard
+            # snapshots from the verified deployed commit; never copy secrets or
+            # overwrite unrelated runtime files.
+            for rel in data/youtube_public_metrics.json data/ceo_sns_probe.json; do
+              if git -C "$ROOT" cat-file -e "HEAD:$rel" 2>/dev/null; then
+                tmp="$ROOT/$rel.deploy-tmp"
+                git -C "$ROOT" show "HEAD:$rel" > "$tmp"
+                chmod 644 "$tmp"
+                mv -f "$tmp" "$ROOT/$rel"
+                echo "Installed sanitized dashboard snapshot: $rel"
+              fi
+            done
+            systemctl restart korea365-control.service
 
             # One-time 2026-09-25 remediation: remove any reader-visible internal
             # stock-photo/licence notices from already-published WordPress posts.

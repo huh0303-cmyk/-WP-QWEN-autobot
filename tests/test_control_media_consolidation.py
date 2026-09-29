@@ -215,3 +215,12 @@ def test_sns_ranking_uses_persisted_official_probe(monkeypatch, tmp_path):
     assert result["ranked"] == 1
     assert result["rows"][0]["followers"] == 3555
     assert result["rows"][0]["metric_status"] == "조회 성공"
+
+
+def test_metrics_workflows_redeploy_only_sanitized_dashboard_snapshots():
+    workflow = (ROOT / ".github" / "workflows" / "deploy-to-vps.yml").read_text(encoding="utf-8")
+    assert '"Daily Google metrics snapshot"' in workflow
+    assert '"CEO SNS current statistics (read-only)"' in workflow
+    assert "data/youtube_public_metrics.json data/ceo_sns_probe.json" in workflow
+    assert 'git -C "$ROOT" show "HEAD:$rel"' in workflow
+    assert "systemctl restart korea365-control.service" in workflow
