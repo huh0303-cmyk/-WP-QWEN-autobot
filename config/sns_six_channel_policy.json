@@ -124,7 +124,7 @@
     {
       "platform": "Instagram",
       "role": "korean_topik",
-      "display_name": "SIS Korean · TOPIK",
+      "display_name": "Seoul TOPIK",
       "handle": "sis_topik1",
       "url": "https://www.instagram.com/sis_topik1/",
       "account_exists": true,
@@ -134,22 +134,22 @@
     {
       "platform": "Instagram",
       "role": "japanese",
-      "display_name": "SIS Language Center",
+      "display_name": "Japanese Survival",
       "handle": "sis_language365",
       "url": "https://www.instagram.com/sis_language365/",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false,
-      "note": "2026-09-25 계정 전환 목록에서 확인; 일본어 역할 최종 확인 필요"
+      "note": "2026-09-29 Meta 계정 센터에서 확인. Japanese Survival 브랜드명 적용 및 게시 로그인이 필요함"
     },
     {
       "platform": "Instagram",
       "role": "english",
-      "display_name": "SIS English · Survival",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
+      "display_name": "English Survival",
+      "handle": "englishsurvival1",
+      "url": "https://www.instagram.com/englishsurvival1/",
+      "account_exists": true,
+      "identity_verified": true,
       "publish_connected": false
     },
     {
@@ -176,7 +176,7 @@
     {
       "platform": "Instagram",
       "role": "hot_item_shop",
-      "display_name": "Rosie’s Picks",
+      "display_name": "Seoul Jisoo",
       "handle": "seoul_item365",
       "url": "https://www.instagram.com/seoul_item365/",
       "account_exists": true,
@@ -249,17 +249,17 @@
     {
       "platform": "Threads",
       "role": "korean_topik",
-      "display_name": "SIS Korean · TOPIK",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
+      "display_name": "Seoul TOPIK",
+      "handle": "seoultopik",
+      "url": "https://www.threads.com/@seoultopik",
+      "account_exists": true,
+      "identity_verified": true,
       "publish_connected": false
     },
     {
       "platform": "Threads",
       "role": "japanese",
-      "display_name": "SIS Japanese · Survival",
+      "display_name": "Japanese Survival",
       "handle": "",
       "url": "",
       "account_exists": false,
@@ -269,12 +269,13 @@
     {
       "platform": "Threads",
       "role": "english",
-      "display_name": "SIS English · Survival",
-      "handle": "",
-      "url": "",
-      "account_exists": false,
-      "identity_verified": false,
-      "publish_connected": false
+      "display_name": "English Survival",
+      "handle": "english_survival_1",
+      "url": "https://www.threads.com/@english_survival_1",
+      "account_exists": true,
+      "identity_verified": true,
+      "publish_connected": true,
+      "note": "2026-09-29 프로필명·핸들 변경 및 공개 테스트 게시 URL 확인"
     },
     {
       "platform": "Threads",
@@ -299,7 +300,7 @@
     {
       "platform": "Threads",
       "role": "hot_item_shop",
-      "display_name": "Rosie’s Picks",
+      "display_name": "Seoul Jisoo",
       "handle": "seoul_item365",
       "url": "https://www.threads.com/@seoul_item365",
       "account_exists": true,
