@@ -1,0 +1,65 @@
+name: Queue one verified YouTube private upload today
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Verified upload channel
+        required: true
+        type: choice
+        options:
+          - globalmusic
+          - healing
+
+permissions:
+  contents: read
+
+jobs:
+  enqueue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Queue once on the operating server
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          CHANNEL: ${{ inputs.channel }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          envs: CHANNEL
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /opt/korea365
+            python3 - "$CHANNEL" <<'PY'
+            from datetime import datetime, timedelta, timezone
+            import json
+            from pathlib import Path
+            import sys
+
+            sys.path.insert(0, "/opt/korea365")
+            from automation_hub.youtube_vps_queue import enqueue, queue_root
+
+            channel = sys.argv[1]
+            labels = {"globalmusic": "CAFE_ROMANTIC", "healing": "CAFE_HEALING"}
+            if channel not in labels:
+                raise SystemExit("unsupported channel")
+            kst = timezone(timedelta(hours=9))
+            today = datetime.now(kst).date()
+            root = queue_root()
+            for folder in ("pending", "running", "completed"):
+                for path in (root / folder).glob("*.json"):
+                    try:
+                        row = json.loads(path.read_text(encoding="utf-8"))
+                    except (OSError, ValueError):
+                        continue
+                    queued = datetime.fromtimestamp(float(row.get("queued_at", 0)), kst).date()
+                    if row.get("channel_key") == channel and queued == today:
+                        print(json.dumps({"status": "already_queued_today", "channel": channel,
+                                          "job_id": row.get("job_id"), "folder": folder}))
+                        raise SystemExit(0)
+            job = enqueue(channel, labels[channel], f"youtube_{channel}", run_now=True)
+            print(json.dumps({"status": "queued", "channel": channel, "job_id": job["job_id"]}))
+            PY
+            systemctl is-active korea365-youtube-worker.service
