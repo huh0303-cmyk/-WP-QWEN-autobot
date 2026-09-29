@@ -15,6 +15,14 @@ def test_catalog_contains_verified_platform_destinations():
     assert Counter(item["platform"] for item in sites) == {
         "wordpress": 27, "blogger": 33, "naver": 3, "tistory": 5,
     }
+    wordpress = [item for item in sites if item["platform"] == "wordpress"]
+    assert len({item["url"] for item in wordpress}) == 27
+    assert {"wp_khealth365", "wp_koreanews", "wp_seouljournal"} <= {
+        item["site_id"] for item in wordpress
+    }
+    assert not {"wp_koreamedicaltour1", "wp_kworld365_kpop", "wp_seoul_intl_school_guide"} & {
+        item["site_id"] for item in wordpress
+    }
     assert all(item["enabled"] for item in sites)
     assert [item["url"] for item in sites if item["platform"] == "naver"] == [
         "https://blog.naver.com/k-insight-vietnam", "https://blog.naver.com/health-standard", "https://blog.naver.com/sky-only",

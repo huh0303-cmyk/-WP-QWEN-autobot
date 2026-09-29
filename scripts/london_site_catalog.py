@@ -16,7 +16,13 @@ def content_sites() -> list[dict]:
         "https://" + str(row["domain"]).strip().lower(): list(row.get("categories", []))
         for row in _json("WP24_CATEGORY_MASTER.json").get("sites", []) if row.get("domain")
     }
+    categories.update({
+        "https://k-health365.com": ["건강정보"],
+        "https://koreanews365.com": ["GLOBAL"],
+        "https://theseouljournal.com": ["GLOBAL"],
+    })
     sites: list[dict] = []
+    wordpress_seen: set[str] = set()
     for profile in _json("content_engine_profiles.json").get("profiles", []):
         if profile.get("site_key") == "kmedical_job_center":
             from automation_hub.medical_editorial import medical_profile
@@ -24,13 +30,15 @@ def content_sites() -> list[dict]:
         key = profile["site_key"]
         wp, blog = profile.get("wordpress") or {}, profile.get("blogspot") or {}
         wp_url = str(wp.get("url") or "").rstrip("/")
-        if wp_url in categories:
-            sites.append({"site_id": f"wp_{key}", "platform": "wordpress", "url": wp_url,
+        wp_id = str(profile.get("source_site_id") or f"wp_{key}").strip()
+        if wp_url and wp_id and wp_id not in wordpress_seen:
+            sites.append({"site_id": wp_id, "platform": "wordpress", "url": wp_url,
                           "editor_url": wp_url + "/wp-admin/post-new.php",
                           "label": wp_url.removeprefix("https://"), "enabled": True, "auto_publish": True,
                           "language": profile.get("language", "en"), "persona": wp.get("persona", ""),
                           "tone": wp.get("tone", ""), "theme": wp.get("theme", ""),
-                          "categories": categories[wp_url]})
+                          "categories": categories.get(wp_url, ["General"])})
+            wordpress_seen.add(wp_id)
         blog_url = str(blog.get("url") or "").rstrip("/")
         sites.append({"site_id": f"blogger_{key}", "platform": "blogger", "url": blog_url,
                       "editor_url": "https://www.blogger.com/blog/posts/" + str(blog.get("destination_id") or ""),

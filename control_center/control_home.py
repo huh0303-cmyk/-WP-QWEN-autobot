@@ -326,11 +326,12 @@ def build_social_ranking(bucket: int) -> dict:
             "metric_status": item.get("metric_status") or "플랫폼 API 인증 필요",
             "views_status": "인사이트 API 인증 필요",
         })
+    platform_order = {"YouTube": 0, "Facebook": 1, "Threads": 2, "Instagram": 3, "TikTok": 4}
     rows.sort(key=lambda r: (
+        platform_order.get(str(r["platform"]), 99),
         r["audience"] is None,
         -(r["audience"] or 0),
         -(r["views"] or 0),
-        str(r["platform"]),
         str(r["name"]).casefold(),
     ))
     rank = 0

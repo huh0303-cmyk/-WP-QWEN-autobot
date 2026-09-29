@@ -244,8 +244,12 @@ def install(app, get_site_data=None):
     def social_accounts():
         cards = _cards(get_site_data)
         media_platforms = {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"}
-        media_cards = [c for c in cards if c["platform"] in media_platforms]
-        platforms = ["전체", "로그인·권한 필요", "YouTube", "TikTok", "Instagram", "Facebook", "Threads"]
+        media_order = {"YouTube": 0, "Facebook": 1, "Threads": 2, "Instagram": 3, "TikTok": 4}
+        media_cards = sorted(
+            (c for c in cards if c["platform"] in media_platforms),
+            key=lambda c: (media_order.get(c["platform"], 99), str(c.get("name") or "").casefold()),
+        )
+        platforms = ["전체", "로그인·권한 필요", "YouTube", "Facebook", "Threads", "Instagram", "TikTok"]
         selected = request.args.get("platform", "전체")
         # Legacy subdomain roots still send SNS/YouTube; both now open the
         # owner's single combined media sheet instead of separate products.

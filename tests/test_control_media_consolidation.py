@@ -305,3 +305,13 @@ def test_metrics_workflows_redeploy_only_sanitized_dashboard_snapshots():
     assert "data/youtube_public_metrics.json data/ceo_sns_probe.json" in workflow
     assert 'git -C "$ROOT" show "HEAD:$rel"' in workflow
     assert "systemctl restart korea365-control.service" in workflow
+
+
+def test_social_platforms_are_grouped_in_requested_order():
+    control = (ROOT / "control_center" / "control_home.py").read_text(encoding="utf-8")
+    accounts = (ROOT / "control_center" / "social_accounts.py").read_text(encoding="utf-8")
+    template = (ROOT / "control_center" / "templates" / "control_home.html").read_text(encoding="utf-8")
+    expected = '{"YouTube": 0, "Facebook": 1, "Threads": 2, "Instagram": 3, "TikTok": 4}'
+    assert expected in control
+    assert expected in accounts
+    assert "YouTube · Facebook · Threads · Instagram · TikTok 순서" in template

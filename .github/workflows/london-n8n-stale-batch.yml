@@ -1,0 +1,38 @@
+name: Korea365 stale sites through canonical n8n
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Publish reviewed stale-site manifest sequentially
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          command_timeout: 230m
+          script: |
+            set -euo pipefail
+            ROOT=/opt/korea365
+            MANIFEST="$ROOT/config/london_stale_publish_2026-09-29.json"
+            OUTPUT="$ROOT/artifacts/london-stale-publish-2026-09-29.json"
+            test -f "$MANIFEST"
+            test -f "$ROOT/scripts/london_n8n_stale_batch.py"
+            systemctl is-active --quiet korea365-n8n-gateway.service
+            curl -fsS http://127.0.0.1:5678/healthz >/dev/null
+            set +e
+            python3 "$ROOT/scripts/london_n8n_stale_batch.py" \
+              --manifest "$MANIFEST" \
+              --output "$OUTPUT"
+            code=$?
+            set -e
+            echo "=== RECEIPT_JSON ==="
+            cat "$OUTPUT"
+            exit "$code"
