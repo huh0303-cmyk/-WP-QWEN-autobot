@@ -59,6 +59,39 @@ jobs:
                     job = json.loads(job_path.read_text(encoding="utf-8"))
                     break
             report = {"job_id": job_id, "folder": folder}
+            if job.get("channel_key") == "healing" and folder in {"running", "failed"}:
+                try:
+                    import os
+                    from google.oauth2.credentials import Credentials
+                    from googleapiclient.discovery import build
+
+                    credentials = Credentials(
+                        token=None,
+                        refresh_token=os.environ.get("YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING") or os.environ.get("YOUTUBE_OAUTH_REFRESH_TOKEN"),
+                        token_uri="https://oauth2.googleapis.com/token",
+                        client_id=os.environ.get("YOUTUBE_OAUTH_CLIENT_ID_HEALING") or os.environ.get("YOUTUBE_OAUTH_CLIENT_ID"),
+                        client_secret=os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET_HEALING") or os.environ.get("YOUTUBE_OAUTH_CLIENT_SECRET"),
+                        scopes=None,
+                    )
+                    youtube = build("youtube", "v3", credentials=credentials)
+                    uploads = youtube.channels().list(part="contentDetails", mine=True).execute()["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                    items = youtube.playlistItems().list(part="contentDetails", playlistId=uploads, maxResults=15).execute().get("items", [])
+                    ids = [item["contentDetails"]["videoId"] for item in items]
+                    videos = youtube.videos().list(part="snippet,status,processingDetails", id=",".join(ids)).execute().get("items", []) if ids else []
+                    marker = f"Review reference: healing-motion-{job_id}"
+                    matched = [video for video in videos if marker in video.get("snippet", {}).get("description", "")]
+                    if matched:
+                        video = matched[0]
+                        report["youtube_probe"] = {
+                            "video_id": video["id"],
+                            "privacy_status": video.get("status", {}).get("privacyStatus"),
+                            "processing_status": video.get("processingDetails", {}).get("processingStatus"),
+                            "artifact_url": f"https://studio.youtube.com/video/{video['id']}/edit",
+                        }
+                    else:
+                        report["youtube_probe"] = {"marker_found": False}
+                except Exception as exc:
+                    report["youtube_probe_error"] = f"{type(exc).__name__}: {str(exc)[:180]}"
             if folder == "completed":
                 result_path = Path("/opt/korea365/artifacts/youtube_playlist_result.json")
                 if result_path.exists():
