@@ -28,18 +28,30 @@ jobs:
           script: |
             set -euo pipefail
             cd /opt/korea365
+            set -a
+            source /etc/korea365/control-center.env
+            set +a
             python3 - "$JOB_ID" <<'PY'
+            from collections import Counter
+            import datetime as dt
             import json
             from pathlib import Path
             import re
             import sys
 
+            sys.path[:0] = ["/opt/korea365", "/opt/korea365/scripts"]
+            from automation_hub.youtube_calendar import KST, read_calendar, select_next_ready
+            from gsheets_direct import get_sheets_service
+
             job_id = sys.argv[1]
             root = Path("/opt/korea365/data/youtube_vps_queue")
             folder = "missing"
+            job = {}
             for candidate in ("pending", "running", "completed", "failed"):
-                if (root / candidate / f"{job_id}.json").exists():
+                job_path = root / candidate / f"{job_id}.json"
+                if job_path.exists():
                     folder = candidate
+                    job = json.loads(job_path.read_text(encoding="utf-8"))
                     break
             report = {"job_id": job_id, "folder": folder}
             log_path = root / "logs" / f"{job_id}.log"
@@ -52,5 +64,33 @@ jobs:
             else:
                 report["diagnostic_tail"] = []
                 report["likely_stage"] = "calendar_claim_before_render"
+                try:
+                    channel = job.get("channel_key", "")
+                    service = get_sheets_service()
+                    sheet_id = __import__("os").environ["SHEET_ID"]
+                    settings = service.spreadsheets().values().get(
+                        spreadsheetId=sheet_id, range="'자동화_유튜브채널'!A1:R20"
+                    ).execute().get("values", [])
+                    enabled = {
+                        row[0] for row in settings[1:]
+                        if len(row) >= 7 and row[6] in {"ON", "TRUE", "1"}
+                    }
+                    rows = read_calendar(service, sheet_id)
+                    channel_rows = [row for row in rows if row.get("key") == channel]
+                    selected, _ = select_next_ready(rows, dt.datetime.now(KST), {channel}, 1)
+                    report["channel"] = channel
+                    report["sheet_enabled"] = channel in enabled
+                    report["calendar_status_counts"] = dict(Counter(
+                        row.get("status", "") for row in channel_rows
+                    ))
+                    report["eligible_ready_count"] = len(selected)
+                    if channel not in enabled:
+                        report["failure_reason"] = "channel_disabled_in_control_sheet"
+                    elif not selected:
+                        report["failure_reason"] = "no_eligible_ready_calendar_row"
+                    else:
+                        report["failure_reason"] = "calendar_row_exists_check_worker_runtime"
+                except Exception as exc:
+                    report["diagnostic_error"] = f"{type(exc).__name__}: {str(exc)[:240]}"
             print(json.dumps(report, ensure_ascii=False, indent=2))
             PY
