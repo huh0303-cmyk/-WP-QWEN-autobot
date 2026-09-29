@@ -1,10 +1,22 @@
 {
-  "generated_at": "2026-09-29T09:18:38.336307+09:00",
-  "count": 111,
+  "generated_at": "2026-09-29T10:44:04.098821+09:00",
+  "count": 119,
   "properties": [
     {
       "siteUrl": "https://beauty.k-health365.com/",
       "permissionLevel": "siteOwner"
+    },
+    {
+      "siteUrl": "https://blog.naver.com/health-standard/",
+      "permissionLevel": "siteUnverifiedUser"
+    },
+    {
+      "siteUrl": "https://blog.naver.com/k-insight-vietnam/",
+      "permissionLevel": "siteUnverifiedUser"
+    },
+    {
+      "siteUrl": "https://blog.naver.com/sky-only/",
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "https://chronic-disease.k-health365.com/",
@@ -37,6 +49,10 @@
     {
       "siteUrl": "https://healthinsurance.k-health365.com/",
       "permissionLevel": "siteOwner"
+    },
+    {
+      "siteUrl": "https://huh0303.tistory.com/",
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "https://jobinkorea365.blogspot.com/",
@@ -75,12 +91,28 @@
       "permissionLevel": "siteOwner"
     },
     {
+      "siteUrl": "https://k-healthcare.tistory.com/",
+      "permissionLevel": "siteOwner"
+    },
+    {
+      "siteUrl": "https://k-insight-vietnam.tistory.com/",
+      "permissionLevel": "siteUnverifiedUser"
+    },
+    {
       "siteUrl": "https://k-trip365.blogspot.com/",
       "permissionLevel": "siteOwner"
     },
     {
       "siteUrl": "https://k-trip365.com/",
       "permissionLevel": "siteOwner"
+    },
+    {
+      "siteUrl": "https://k-trip365.tistory.com/",
+      "permissionLevel": "siteOwner"
+    },
+    {
+      "siteUrl": "https://k-vietnam.tistory.com/",
+      "permissionLevel": "siteUnverifiedUser"
     },
     {
       "siteUrl": "https://k-visa365.blogspot.com/",
