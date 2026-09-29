@@ -40,3 +40,21 @@ jobs:
             free -h || true
             echo "===REPO==="
             test -d /opt/korea365 && git -C /opt/korea365 rev-parse --short HEAD || true
+            echo "===STALE BATCH PROGRESS==="
+            test -f /opt/korea365/artifacts/london-stale-publish-2026-09-29.json && cat /opt/korea365/artifacts/london-stale-publish-2026-09-29.json || echo "no batch receipt yet"
+            echo "===LATEST PIPELINE STATES==="
+            python3 - <<'PY'
+            import json
+            from pathlib import Path
+            root=Path('/opt/korea365/data/london-pipeline')
+            for path in sorted(root.glob('lgpt-20260929-*.json'), key=lambda p:p.stat().st_mtime, reverse=True)[:8]:
+                try:
+                    d=json.loads(path.read_text(encoding='utf-8'))
+                except Exception as exc:
+                    print(path.name, type(exc).__name__)
+                    continue
+                err=d.get('last_error') or {}
+                rec=d.get('receipt') or {}
+                print(json.dumps({'run_id':d.get('run_id'),'site_id':d.get('site_id'),'stages':d.get('stage_status'),
+                                  'error':err.get('message',''),'url':rec.get('url','')},ensure_ascii=False))
+            PY
