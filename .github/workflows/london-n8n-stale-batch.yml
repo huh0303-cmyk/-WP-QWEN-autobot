@@ -2,6 +2,18 @@ name: Korea365 stale sites through canonical n8n
 
 on:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Destination platform subset
+        required: true
+        default: all
+        type: choice
+        options: [all, wordpress, blogger]
+      allow_wordpress_dashboard_baseline:
+        description: Use the verified BLOG dashboard snapshot if the VPS public WordPress REST precheck is blocked
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -22,15 +34,21 @@ jobs:
             set -euo pipefail
             ROOT=/opt/korea365
             MANIFEST="$ROOT/config/london_stale_publish_2026-09-29.json"
-            OUTPUT="$ROOT/artifacts/london-stale-publish-2026-09-29.json"
+            OUTPUT="$ROOT/artifacts/london-stale-publish-2026-09-29-${{ inputs.platform }}.json"
             test -f "$MANIFEST"
             test -f "$ROOT/scripts/london_n8n_stale_batch.py"
             systemctl is-active --quiet korea365-n8n-gateway.service
             curl -fsS http://127.0.0.1:5678/healthz >/dev/null
             set +e
+            EXTRA=""
+            if [ "${{ inputs.allow_wordpress_dashboard_baseline }}" = "true" ]; then
+              EXTRA="--allow-wordpress-dashboard-baseline"
+            fi
             python3 "$ROOT/scripts/london_n8n_stale_batch.py" \
               --manifest "$MANIFEST" \
-              --output "$OUTPUT"
+              --output "$OUTPUT" \
+              --platform "${{ inputs.platform }}" \
+              $EXTRA
             code=$?
             set -e
             echo "=== RECEIPT_JSON ==="

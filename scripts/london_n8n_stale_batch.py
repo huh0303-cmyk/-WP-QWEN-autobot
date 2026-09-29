@@ -75,13 +75,21 @@ def _write_report(path: Path, payload: dict) -> None:
     os.replace(tmp, path)
 
 
-def _run_target(target: dict, cutoff: datetime, webhook: str, state_dir: Path, timeout: int) -> dict:
+def _run_target(target: dict, cutoff: datetime, webhook: str, state_dir: Path, timeout: int,
+                allow_baseline_on_precheck_error: bool = False) -> dict:
     site_id = target["site_id"]
     existing = _today_receipt(state_dir, site_id)
     if existing:
         return {"site_id": site_id, "platform": target["platform"], "status": "skipped_today_receipt", "receipt": existing}
 
-    latest = _latest(target)
+    precheck_note = ""
+    try:
+        latest = _latest(target)
+    except requests.RequestException as exc:
+        if not (allow_baseline_on_precheck_error and target["platform"] == "wordpress"):
+            raise
+        latest = {"published_at": target["baseline_recent"], "url": "", "post_id": ""}
+        precheck_note = f"dashboard baseline used after VPS public REST error: {type(exc).__name__}"
     if not latest.get("published_at"):
         return {"site_id": site_id, "platform": target["platform"], "status": "precheck_failed", "error": "latest public post unavailable"}
     latest_at = _dt(latest["published_at"]).astimezone(KST)
@@ -123,6 +131,7 @@ def _run_target(target: dict, cutoff: datetime, webhook: str, state_dir: Path, t
                     verified = False
                 return {"site_id": site_id, "platform": target["platform"], "run_id": run_id,
                         "status": "published" if verified else "receipt_not_public", "receipt": receipt,
+                        "precheck_note": precheck_note,
                         "keyword": (last_state.get("research") or {}).get("keyword", ""),
                         "title": (last_state.get("article") or {}).get("title", "")}
             if stages.get("publish") == "manual_required":
@@ -143,6 +152,8 @@ def main() -> int:
     parser.add_argument("--webhook", default="http://127.0.0.1:5678/webhook/london-content-four-agent")
     parser.add_argument("--state-dir", default="/opt/korea365/data/london-pipeline")
     parser.add_argument("--target-timeout", type=int, default=600)
+    parser.add_argument("--platform", choices=("all", "wordpress", "blogger"), default="all")
+    parser.add_argument("--allow-wordpress-dashboard-baseline", action="store_true")
     args = parser.parse_args()
 
     manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
@@ -150,9 +161,13 @@ def main() -> int:
     output = Path(args.output)
     cutoff = _dt(manifest["cutoff_kst"]).astimezone(KST)
     state_dir = Path(args.state_dir)
-    for target in manifest["targets"]:
+    targets = [target for target in manifest["targets"] if args.platform == "all" or target["platform"] == args.platform]
+    for target in targets:
         try:
-            result = _run_target(target, cutoff, args.webhook, state_dir, args.target_timeout)
+            result = _run_target(
+                target, cutoff, args.webhook, state_dir, args.target_timeout,
+                allow_baseline_on_precheck_error=args.allow_wordpress_dashboard_baseline,
+            )
         except Exception as exc:
             result = {"site_id": target.get("site_id"), "platform": target.get("platform"),
                       "status": "precheck_failed", "error": f"{type(exc).__name__}: {str(exc)[:500]}"}
