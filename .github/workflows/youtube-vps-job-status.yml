@@ -28,9 +28,14 @@ jobs:
           script: |
             set -euo pipefail
             cd /opt/korea365
-            set -a
-            source /etc/korea365/control-center.env
-            set +a
+            for env_file in /etc/korea365/control-center.env /etc/korea365/control.env /opt/korea365/.env; do
+              if [ -f "$env_file" ]; then
+                set -a
+                source "$env_file"
+                set +a
+                break
+              fi
+            done
             python3 - "$JOB_ID" <<'PY'
             from collections import Counter
             import datetime as dt
