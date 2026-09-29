@@ -1,1 +1,1 @@
-{"day": "2026-09-28", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-09-28-wp_medicaltour-1c11c46f", "claimed_at": "2026-09-28T02:42:55.228276+09:00", "run_id": 36337992923, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-09-29", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-09-29-wp_medicaltour-ba1de2bf", "claimed_at": "2026-09-29T18:02:22.366542+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
