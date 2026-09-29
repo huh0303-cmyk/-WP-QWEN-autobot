@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-09-12",
-  "source": "Authenticated AdSense Sites table; approval and Ads.txt columns read separately",
+  "checked_at": "2026-09-29 10:54 KST",
+  "source": "Authenticated AdSense Sites table; approval and Ads.txt columns read separately. Public ads.txt endpoints were also verified independently.",
   "sites": {
     "k-health365.com": {
       "approval_status": "ready",
@@ -20,7 +20,8 @@
     "kfinance365.com": {
       "approval_status": "getting_ready",
       "label": "준비 중",
-      "ads_txt_status": "authorized"
+      "ads_txt_status": "not_found_by_adsense",
+      "ads_txt_probe": "HTTP 200 text/plain with the expected publisher ID; Google recrawl pending"
     },
     "jobkorea365.com": {
       "approval_status": "getting_ready",
@@ -35,7 +36,8 @@
     "koreainsurance365.com": {
       "approval_status": "getting_ready",
       "label": "준비 중",
-      "ads_txt_status": "authorized"
+      "ads_txt_status": "not_found_by_adsense",
+      "ads_txt_probe": "HTTP 200 text/plain with the expected publisher ID; Google recrawl pending"
     },
     "koreataxnlaw.com": {
       "approval_status": "getting_ready",
@@ -48,10 +50,11 @@
       "ads_txt_status": "authorized"
     },
     "koreamedicaltour.com": {
-      "approval_status": "needs_attention",
-      "label": "주의 필요",
-      "ads_txt_status": "authorized",
-      "detail": "가치가 별로 없는 콘텐츠"
+      "approval_status": "getting_ready",
+      "label": "준비 중",
+      "ads_txt_status": "not_found_by_adsense",
+      "ads_txt_probe": "HTTP 200 text/plain with the expected publisher ID; Google recrawl pending",
+      "detail": "사이트 소유권 확인 완료·리뷰 요청 완료; 현재 Google 검토 중"
     },
     "krealestate365.com": {
       "approval_status": "getting_ready",
@@ -76,7 +79,8 @@
     "jobkoreaglobal.com": {
       "approval_status": "getting_ready",
       "label": "준비 중",
-      "ads_txt_status": "authorized"
+      "ads_txt_status": "not_found_by_adsense",
+      "ads_txt_probe": "HTTP 200 text/plain with the expected publisher ID; Google recrawl pending"
     },
     "oliveyoungkorea.com": {
       "approval_status": "getting_ready",
@@ -91,7 +95,8 @@
     "studyinkorea365.com": {
       "approval_status": "getting_ready",
       "label": "준비 중",
-      "ads_txt_status": "authorized"
+      "ads_txt_status": "not_found_by_adsense",
+      "ads_txt_probe": "HTTP 200 text/plain with the expected publisher ID; Google recrawl pending"
     },
     "kieca-korea.org": {
       "approval_status": "getting_ready",
