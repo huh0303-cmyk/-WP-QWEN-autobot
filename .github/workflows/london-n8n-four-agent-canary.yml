@@ -2,10 +2,6 @@ name: London n8n 4-Agent Canary
 # retry after local Qwen bootstrap
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/london-n8n-four-agent-canary.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,9 +28,11 @@ jobs:
             run_canary() {
               site_id="$1"
               suffix="$2"
-              payload=$(printf '{"site_id":"%s","run_id":"canary-%s-%s","publish_mode":"draft"}' "$site_id" "$stamp" "$suffix")
+              run_id="canary-${stamp}-${suffix}"
+              payload=$(printf '{"site_id":"%s","run_id":"%s","publish_mode":"draft"}' "$site_id" "$run_id")
               body_file="/tmp/${suffix}-canary-body.txt"
-              code=$(curl -sS --max-time 1200 -o "$body_file" -w '%{http_code}' -X POST "$BASE/webhook/london-content-four-agent" \
+              state_file="/opt/korea365/data/london-pipeline/${run_id}.json"
+              code=$(curl -sS --max-time 20 -o "$body_file" -w '%{http_code}' -X POST "$BASE/webhook/london-content-four-agent" \
                 -H 'Content-Type: application/json' \
                 --data "$payload" || true)
               echo "HTTP=$code SITE=$site_id"
@@ -52,7 +50,15 @@ jobs:
                 done
                 return 1
               fi
-              python3 -c 'import json,sys; d=json.loads(sys.stdin.read()); assert d.get("ok") is True; assert d.get("post_id"); assert d.get("url"); print("CANARY_OK", d.get("status"), d.get("url"))' <"$body_file"
+              for i in $(seq 1 240); do
+                if [ -f "$state_file" ]; then
+                  outcome=$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf-8")); stage=d.get("stage_status",{}).get("publish","waiting"); print("failed" if d.get("last_error") or stage == "failed" else "done" if stage == "ok" else "waiting")' "$state_file")
+                  [ "$outcome" = "done" ] && break
+                  [ "$outcome" = "failed" ] && { cat "$state_file"; return 1; }
+                fi
+                sleep 5
+              done
+              python3 -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf-8")); r=d.get("receipt") or {}; assert d.get("stage_status",{}).get("publish") == "ok", d; assert r.get("post_id"), d; assert r.get("url"), d; print("CANARY_OK", r.get("status"), r.get("url"))' "$state_file"
             }
 
             echo "=== WP CANARY: wp_ktrip365 ==="

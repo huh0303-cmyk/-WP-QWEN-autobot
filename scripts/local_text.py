@@ -8,7 +8,13 @@ import requests
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:3b")
 
-def local_generate_text(prompt: str, *, temperature: float = 0.6, timeout: int = 75) -> str:
+def local_generate_text(
+    prompt: str,
+    *,
+    temperature: float = 0.6,
+    timeout: int = 75,
+    max_tokens: int = 1800,
+) -> str:
     response = requests.post(
         OLLAMA_URL + "/api/generate",
         json={
@@ -16,7 +22,7 @@ def local_generate_text(prompt: str, *, temperature: float = 0.6, timeout: int =
             "prompt": prompt,
             "stream": False,
             "keep_alive": "5m",
-            "options": {"temperature": temperature, "num_predict": 1800},
+            "options": {"temperature": temperature, "num_predict": max_tokens},
         },
         timeout=timeout,
     )

@@ -7,6 +7,8 @@ on:
       - 'deploy/n8n/**'
       - 'scripts/n8n_gateway.py'
       - 'scripts/london_four_agent_pipeline.py'
+      - 'scripts/direct_topic_research.py'
+      - 'scripts/local_text.py'
       - '.github/workflows/deploy-london-n8n.yml'
 permissions:
   contents: read

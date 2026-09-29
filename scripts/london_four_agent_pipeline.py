@@ -241,6 +241,11 @@ def _parse_keyword(text: str) -> str:
     keyword = match.group(1).strip(" \t\"'")
     if not 3 <= len(keyword) <= 80:
         raise RuntimeError("research keyword length invalid")
+    if any(token in keyword for token in ("<", ">", "http://", "https://")):
+        raise RuntimeError("research keyword contains a placeholder or URL")
+    words = keyword.split()
+    if not 3 <= len(words) <= 6:
+        raise RuntimeError("research keyword must contain 3-6 words")
     return keyword
 
 

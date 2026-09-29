@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import quote_plus
 import xml.etree.ElementTree as ET
 
@@ -63,9 +64,15 @@ def collect(profile: dict, demand_context: str) -> dict:
         + "&hl=en-US&gl=US&ceid=US:en"
     )
     trends_url = "https://trends.google.com/trending/rss?geo=KR"
-    google_news = _rss_items(news_url)
-    trends = _rss_items(trends_url)
-    naver_news = _naver_headlines(naver_query)
+    # These are independent sources. Fetching them concurrently keeps Agent 1
+    # inside the gateway budget even when one provider is slow.
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        google_future = pool.submit(_rss_items, news_url)
+        trends_future = pool.submit(_rss_items, trends_url)
+        naver_future = pool.submit(_naver_headlines, naver_query)
+        google_news = google_future.result()
+        trends = trends_future.result()
+        naver_news = naver_future.result()
     compact_trends = []
     for row in trends[:20]:
         traffic = row.get("approx_traffic") or row.get("approxTraffic") or ""
@@ -115,4 +122,6 @@ MEDIA: <observed media signal>
 VOLUME: <verified volume or unavailable>
 RATIONALE: <one concise reason>
 """
-    return local_generate_text(prompt, temperature=0.35, timeout=240)
+    # The required answer is only six short lines. A bounded generation avoids
+    # spending the whole research-stage timeout on an unnecessarily long decode.
+    return local_generate_text(prompt, temperature=0.35, timeout=120, max_tokens=320)
