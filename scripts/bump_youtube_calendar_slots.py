@@ -30,12 +30,28 @@ def main():
     now = dt.datetime.now(KST)
     bumped, missing = [], []
     for key in requested:
-        candidates = [r for r in rows if r["key"] == key and r["status"] == READY and not r["url"] and r["topic"]]
+        candidates = [
+            r for r in rows
+            if r["key"] == key
+            and r["status"] == READY
+            and not r["url"]
+            and r["topic"]
+            and "[yt-calendar:" not in r["notes"]
+        ]
         if not candidates:
             missing.append(key)
             continue
         row = min(candidates, key=lambda r: r["when"])
-        new_when = now.strftime("%Y-%m-%d %H:%M KST")
+        occupied_dates = {
+            r["when"].date()
+            for r in rows
+            if r["key"] == key
+            and (r["status"] != READY or r["url"] or "[yt-calendar:" in r["notes"])
+        }
+        target_date = now.date()
+        while target_date in occupied_dates:
+            target_date += dt.timedelta(days=1)
+        new_when = dt.datetime.combine(target_date, now.time(), tzinfo=KST).strftime("%Y-%m-%d %H:%M KST")
         service.spreadsheets().values().update(
             spreadsheetId=sid, range=f"'{TAB}'!B{row['row']}",
             valueInputOption="RAW", body={"values": [[new_when]]},
