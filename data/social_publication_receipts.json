@@ -1,0 +1,26 @@
+{
+  "publications": [
+    {
+      "platform": "Instagram",
+      "role": "korean_topik",
+      "handle": "sis_topik1",
+      "post_id": "18138415618624378",
+      "url": "https://www.instagram.com/p/Dd3VARwm1_r/",
+      "reconciled": true,
+      "content_id": "2026-09-29-topik-nunchi",
+      "published_at": "2026-09-29T17:28:45.713916+09:00"
+    },
+    {
+      "platform": "Facebook",
+      "role": "korean_topik",
+      "handle": "",
+      "account_id": "1128119143729384",
+      "account_name": "서울국제대학 SIS - TOPIK Center",
+      "post_id": "1128119143729384_122117876127292581",
+      "url": "https://www.facebook.com/122117300373292581/posts/122117876127292581",
+      "content_id": "2026-09-29-topik-nunchi",
+      "published_at": "2026-09-29T17:28:45.713916+09:00"
+    }
+  ],
+  "updated_at": "2026-09-29T17:28:45.713916+09:00"
+}
