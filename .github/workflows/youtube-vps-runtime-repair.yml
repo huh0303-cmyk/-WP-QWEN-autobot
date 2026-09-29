@@ -21,8 +21,9 @@ jobs:
           script: |
             set -euo pipefail
             python3 -m pip install --disable-pip-version-check --break-system-packages \
-              'google-api-python-client>=2.190,<3' \
-              'google-auth>=2.40,<3'
+              'google-api-python-client==2.187.0' \
+              'google-api-core==2.25.1' \
+              'google-auth==2.41.1'
             python3 -c "from googleapiclient.discovery import build; from google.oauth2.credentials import Credentials; print('google_runtime=PASS')"
             systemctl restart korea365-youtube-worker.service
             systemctl is-active korea365-youtube-worker.service
