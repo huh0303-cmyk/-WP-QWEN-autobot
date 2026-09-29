@@ -51,7 +51,7 @@ jobs:
           - kfinance365.com
           - koreataxnlaw.com
           - koreacrypto365.com
-          - korearealestate365.com
+          - krealestate365.com
           - ktech365.com
           - kskin365.com
           - oliveyoungkorea.com
@@ -78,7 +78,7 @@ jobs:
         with:
           python-version: "3.11"
       - if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
-        run: pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth -q
+        run: pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth google-genai -q
       - name: Select live keyword
         if: ${{ inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site) }}
         id: viral
@@ -138,6 +138,7 @@ jobs:
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
         run: |
+          set -o pipefail
           mkdir -p artifacts
           python scripts/autopost_current.py 2>&1 | tee "artifacts/${{ matrix.site }}.log"
       - name: Save result
