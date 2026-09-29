@@ -24,7 +24,10 @@ def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     assert "GSC 미연결" in template
     assert "GSC 소유권 인증 필요" in template
     assert "GSC 연결 · 클릭 데이터 없음" in template
-    assert '<span class="warn">수익 데이터 미연결</span>' in template
+    assert '<th>순위</th><th>플랫폼</th><th>사이트</th><th>누적 수익</th>' in template
+    assert '<th>순위</th><th>플랫폼</th><th>채널/계정</th><th>누적 수익 $</th>' in template
+    assert "title=\"수익창출\">🏅" in template
+    assert "수익 데이터 미연결</span>" not in template
     assert "timeZone:'Asia/Seoul'" in template
     assert "'블로그 순위 ('+dateLabel(todayKst())" in template
     assert "'YouTube + SNS 순위 ('+dateLabel(todayKst())" in template
@@ -177,14 +180,14 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
         assert f'a[data-platform="{platform}"]' in social
     assert '<a data-platform="{{p}}"' in social
     assert "<th>구분</th><th>채널/계정</th><th>채널 주제</th><th>운영 역할</th>" in social
-    assert "<th>구독자수(증감)</th><th>어제 방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>수익$(증감)</th><th>개설일자</th><th>최근 발행일</th>" in social
+    assert "<th>구독자수(증감)</th><th>어제 방문·조회수(증감)</th><th>콘텐츠수(증감)</th><th>누적 수익 $</th><th>개설일자</th><th>최근 발행일</th>" in social
     assert "<th>생산·발행 트리거</th><th>계정 ID</th>" in social
     assert "fetch('/api/control/social-ranking'" in social
     assert "item.content_count_delta" in social
     assert "k365-social-column-widths-v6" in social
     assert "item.yesterday_views,item.yesterday_views_delta" in social
-    assert "Number.isFinite(revenue.delta)" in social
-    assert 'class="metric-revenue">미연결' in social
+    assert "return '🏅'" in social
+    assert 'class="metric-revenue">—' in social
     assert 'class="metric-opening">미확인' in social
     assert 'class="metric-recent">미확인' in social
     assert "tr.classList.toggle('monetized-row'" in social
@@ -228,6 +231,24 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"yesterday_views": item.get("view_delta")' in source
     assert '"yesterday_views_delta": item.get("views_delta")' in source
     assert "if item.get(\"handle\") and item.get(\"channel_id\")" in source
+
+
+def test_revenue_cells_use_cumulative_amount_and_only_topik_is_youtube_monetized(monkeypatch, tmp_path):
+    (tmp_path / "situation_room_history.json").write_text(
+        '{"latest":{"adsense_khealth365":{"today":6,"cumulative":8625,"currency":"KRW"}},'
+        '"previous":{"adsense_khealth365":{"today":0,"cumulative":8619,"currency":"KRW"}}}',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(blog_metadata, "ROOT", tmp_path)
+
+    blog_revenue = blog_metadata.revenue_info("k-health365.com", {})
+    assert blog_revenue["amount"] == 8625
+    assert blog_revenue["delta"] == 6
+
+    topik = control_home._social_revenue("YouTube", "seoul_topik1", "UCdA24IuR-JE7qButWv5jLqA")
+    other = control_home._social_revenue("YouTube", "English_survival", "UCrjkKWMHzAAvpLIFgHnwcWg")
+    assert topik["monetized"] is True
+    assert other["monetized"] is False
 
 
 def test_youtube_ranking_prefers_full_public_api_snapshot(monkeypatch, tmp_path):

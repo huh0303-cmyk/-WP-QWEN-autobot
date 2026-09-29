@@ -230,6 +230,20 @@ def infrastructure_info(platform: str, kind: str = "") -> dict[str, object]:
 
 
 def revenue_info(domain: str, row: dict) -> dict[str, object]:
+    snapshot_path = ROOT / "data" / "adsense_revenue_by_domain.json"
+    try:
+        snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        snapshot = {}
+    domain_amount = (snapshot.get("domains") or {}).get(domain)
+    if isinstance(domain_amount, (int, float)):
+        return {
+            "monetized": True,
+            "amount": domain_amount,
+            "delta": None,
+            "currency": snapshot.get("currency") or "USD",
+            "status": "",
+        }
     history_path = ROOT / "situation_room_history.json"
     try:
         history = json.loads(history_path.read_text(encoding="utf-8"))
@@ -238,8 +252,8 @@ def revenue_info(domain: str, row: dict) -> dict[str, object]:
     if domain == "k-health365.com":
         latest = history.get("latest", {}).get("adsense_khealth365", {})
         previous = history.get("previous", {}).get("adsense_khealth365", {})
-        current = latest.get("today")
-        old = previous.get("today")
+        current = latest.get("cumulative")
+        old = previous.get("cumulative")
         delta = current - old if isinstance(current, (int, float)) and isinstance(old, (int, float)) else None
         return {
             "monetized": True,
@@ -248,8 +262,6 @@ def revenue_info(domain: str, row: dict) -> dict[str, object]:
             "currency": latest.get("currency") or "KRW",
             "status": latest.get("status") or row.get("adsense_status_label") or "AdSense",
         }
-    if row.get("google_approved"):
-        return {"monetized": True, "amount": None, "delta": None, "currency": "", "status": row.get("adsense_status_label") or "AdSense 승인"}
     return {"monetized": False, "amount": None, "delta": None, "currency": "", "status": row.get("adsense_status_label") or "미수익화"}
 
 

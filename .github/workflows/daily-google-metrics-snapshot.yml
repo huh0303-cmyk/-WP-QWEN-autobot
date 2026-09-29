@@ -31,6 +31,12 @@ jobs:
           GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
           GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
         run: python scripts/gsc_property_snapshot.py
+      - name: Snapshot cumulative AdSense revenue by domain
+        env:
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
+        run: python scripts/adsense_revenue_snapshot.py
       - name: Collect WP and Blogger metrics
         env:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
@@ -60,7 +66,7 @@ jobs:
         run: |
           git config user.name "korea365-metrics-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/gsc_properties.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html data/opening_recent_snapshot.json data/youtube_public_metrics.json data/domain_billing_snapshot.json
+          git add data/gsc_properties.json data/adsense_revenue_by_domain.json data/core_metrics_latest.json data/core_metrics_history.json data/core_metrics_daily_latest.json data/core_metrics_daily_history.json data/core_metrics_report.html data/opening_recent_snapshot.json data/youtube_public_metrics.json data/domain_billing_snapshot.json
           if git diff --cached --quiet; then
             echo "No metrics changes"
           else
@@ -74,6 +80,7 @@ jobs:
           name: google-metrics-snapshot-${{ github.run_id }}
           path: |
             data/gsc_properties.json
+            data/adsense_revenue_by_domain.json
             data/core_metrics_latest.json
             data/core_metrics_daily_latest.json
             data/core_metrics_report.html

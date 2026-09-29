@@ -58,13 +58,13 @@ tbody tr:hover{filter:brightness(.98)}
 <section class="section">
 <div class="section-head"><div><h2 id="blog-title">블로그 순위</h2><p>WP25 + 신문사2 + Blogspot33 + Naver3 + Tistory5 = 68 · 어제 방문자수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table blog"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>사이트</th><th>수익 인증</th><th>방문자(증감)</th><th>GSC 클릭/노출</th><th>최근 발행일시</th><th>사이트 생성일</th><th>즉시발행</th>
+<th>순위</th><th>플랫폼</th><th>사이트</th><th>누적 수익</th><th>방문자(증감)</th><th>GSC 클릭/노출</th><th>최근 발행일시</th><th>사이트 생성일</th><th>즉시발행</th>
 </tr></thead><tbody id="blog-rows"><tr><td colspan="9" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 <section class="section">
 <div class="section-head"><div><h2 id="social-title">YouTube + SNS 순위</h2><p>YouTube · Instagram · Threads · TikTok · Facebook 통합 · 구독자/팔로워 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="https://sns.korea365.org">통합 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table social"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>채널/계정</th><th>수익 인증</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>최근 발행일시</th><th>즉시발행</th>
+<th>순위</th><th>플랫폼</th><th>채널/계정</th><th>누적 수익 $</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>최근 발행일시</th><th>즉시발행</th>
 </tr></thead><tbody id="social-rows"><tr><td colspan="8" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 </div>
@@ -76,8 +76,8 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const rank=v=>Number.isFinite(v)?v+'위':'—';
 const delta=v=>{if(!Number.isFinite(v))return '';const cls=v>0?'up':v<0?'down':'flat';return '<span class="'+cls+'">('+(v>0?'+':'')+nf.format(v)+')</span>';};
 const metric=(v,d)=>Number.isFinite(v)?nf.format(v)+' '+delta(d):'';
-const money=r=>{if(!r||!r.monetized)return '—';if(!Number.isFinite(r.amount))return esc(r.status||'');const sym=r.currency==='KRW'?'₩':r.currency==='USD'?'$':esc(r.currency||'');return sym+nf.format(r.amount)+' '+delta(r.delta);};
-const revenueStatus=r=>{if(!r)return '<span class="warn">수익 데이터 미연결</span>';if(r.monetized)return Number.isFinite(r.amount)?'<span class="good">'+money(r)+'</span>':'<span class="warn">'+esc(r.status||'승인')+' · 금액 미연결</span>';return r.status==='미연결'?'<span class="warn">수익 데이터 미연결</span>':'<span class="warn">'+esc(r.status||'미수익화')+'</span>';};
+const money=r=>{if(!r||!r.monetized||!Number.isFinite(r.amount))return '—';const sym=r.currency==='KRW'?'₩':r.currency==='USD'?'$':esc(r.currency||'');return sym+nf.format(r.amount);};
+const revenueStatus=r=>{if(!r||!r.monetized)return '—';const medal='<span class="adsense-medal" title="수익창출">🏅</span>';return Number.isFinite(r.amount)?medal+'<span class="good">'+money(r)+'</span>':medal;};
 const socialMetric=(v,d,status)=>Number.isFinite(v)?'<span class="good">'+metric(v,d)+'</span>':'<span class="warn">'+esc(status||'API 인증 필요')+'</span>';
 const visitorMetric=c=>Number.isFinite(c.yesterday_visitors)?metric(c.yesterday_visitors,c.yesterday_visitors_delta):(Number.isFinite(c.total_visitors)?metric(c.total_visitors,c.total_visitors_delta)+' <span class="source-tag">누적</span>':'방문자 미연결');
 const gscMetric=c=>c.gsc_applicable===false?'<span class="warn">GSC 지원 제한</span>':(c.gsc_connected?(Number.isFinite(c.gsc_clicks)&&Number.isFinite(c.gsc_impressions)?'<span class="good" title="GSC 기준일 '+esc(c.gsc_date||'')+'">'+nf.format(c.gsc_clicks)+' / '+nf.format(c.gsc_impressions)+'</span>':'<span class="good">GSC 연결 · 클릭 데이터 없음</span>'):(c.gsc_status==='user_auth_required'?'<span class="warn">GSC 소유권 인증 필요</span>':'<span class="warn">GSC 미연결</span>'));
