@@ -30,7 +30,27 @@
       "reconciled": true,
       "content_id": "2026-09-29-english-survival-phrases",
       "published_at": "2026-09-29T21:29:01+09:00"
+    },
+    {
+      "platform": "Instagram",
+      "role": "korean_topik",
+      "handle": "sis_topik1",
+      "post_id": "18112310048029965",
+      "url": "https://www.instagram.com/p/Dd4NQ-aGPEm/",
+      "content_id": "2026-09-30-topik-expressions",
+      "published_at": "2026-09-30T01:38:53.862079+09:00"
+    },
+    {
+      "platform": "Facebook",
+      "role": "korean_topik",
+      "handle": "",
+      "account_id": "1128119143729384",
+      "account_name": "서울국제대학 SIS - TOPIK Center",
+      "post_id": "1128119143729384_122117955243292581",
+      "url": "https://www.facebook.com/122117300373292581/posts/122117955243292581",
+      "content_id": "2026-09-30-topik-expressions",
+      "published_at": "2026-09-30T01:38:53.862079+09:00"
     }
   ],
-  "updated_at": "2026-09-29T21:29:01+09:00"
+  "updated_at": "2026-09-30T01:38:53.862079+09:00"
 }
