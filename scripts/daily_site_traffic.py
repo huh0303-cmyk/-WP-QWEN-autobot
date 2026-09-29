@@ -99,6 +99,7 @@ def get_footer_visitor_stats(site_url):
         data = r.json()
         today_count = int(data.get("count", 0) or 0)
         y_count = int(data.get("yesterday_count", 0) or 0)
+        day_before_count = int(data.get("day_before_yesterday_count", 0) or 0)
         total = int(data.get("total", 0) or 0)
 
         return {
@@ -109,6 +110,8 @@ def get_footer_visitor_stats(site_url):
             "total_delta": today_count,
             "today_live": today_count,
             "yesterday_visitors": y_count,
+            "day_before_yesterday_visitors": day_before_count,
+            "yesterday_delta": y_count - day_before_count,
         }, None
     except Exception as e:
         return None, f"visitor API 예외: {str(e)[:160]}"

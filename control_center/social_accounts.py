@@ -103,7 +103,7 @@ def _youtube_cards() -> list[dict]:
             "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
             "group": group, "group_label": group_label, "inventory_order": inventory_order, "role": operational_role,
             "description": profile.get("tone") or fallback,
-            "state_label": "비공개 제작·업로드 가능 · 공개는 별도 승인" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
+            "state_label": "비공개 제작·업로드 가능 · 공개 전환 시 최종 확인" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
             "connection_level": "publish_connected" if core_key else "identity_verified",
             "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "YouTube Studio 로그인 후 제작 프로필을 확인합니다.",
             "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",

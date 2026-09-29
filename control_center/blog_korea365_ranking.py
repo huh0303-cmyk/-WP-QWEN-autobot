@@ -65,8 +65,13 @@ def _visitor_connector_status(row: dict, platform: str) -> dict[str, object]:
 
 def _connector_status(row: dict, platform: str) -> dict[str, object]:
     """Summarize per-metric connector health strictly from fields the collector already set."""
+    visitor_status = _visitor_connector_status(row, platform)
     return {
-        "visitors": _visitor_connector_status(row, platform),
+        "visitors": visitor_status,
+        "visitor_delta": {
+            "connected": visitor_status["connected"] and row.get("yesterday_delta", row.get("today_delta")) is not None,
+            "reason": "" if row.get("yesterday_delta", row.get("today_delta")) is not None else "직전 비교값 수집 필요",
+        },
         "content": {"connected": row.get("total_posts") is not None, "reason": row.get("feed_error", "")},
         "index": {"connected": row.get("indexed") is not None, "reason": row.get("index_status", "")},
     }

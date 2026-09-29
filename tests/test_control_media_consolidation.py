@@ -172,7 +172,7 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"content_count_delta": item.get("content_delta")' in source
     assert '"target_total": 48' in source
     assert '"target_youtube": 24' in source
-    assert '"status": "수익 OAuth 필요"' in source
+    assert '"status": "수익 데이터 권한 필요"' in source
     assert '"opening_date": str(item.get("created_at")' in source
     assert 'timeline.get("recent_publish_date") or str(item.get("recent_publish_date")' in source
     assert '"yesterday_views": item.get("view_delta")' in source

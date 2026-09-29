@@ -814,7 +814,10 @@ def get_site_data():
             "posts_delta": posts_delta,
             **evidence,
             **post_metrics(post_results.get(item["domain"], {}), audit_entry),
-            "visitor_connected": bool(live_traffic.get("connected")),
+            "visitor_connected": bool(
+                live_traffic.get("connected")
+                or (traffic_fresh and traffic.get("yesterday_visitors") is not None)
+            ),
             "visitor_checked_at": live_traffic.get("date") or stored_traffic.get("checked_at") or "",
             "category": registered.theme if registered else "미분류",
             "cadence": wordpress_cadence(registered),

@@ -47,7 +47,7 @@ def _social_revenue(platform: str, handle: str, channel_id: str) -> dict:
             "amount": None,
             "delta": None,
             "currency": "USD",
-            "status": "수익 OAuth 필요",
+            "status": "수익 데이터 권한 필요",
         }
     return {
         "monetized": False,

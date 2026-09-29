@@ -201,6 +201,7 @@ def test_build_ranking_combines_and_sorts_all_cards():
     assert blog_card["kind"] == "wordpress"
 
     assert payload["platform_counts"] == {"wordpress": 2, "blogspot": 2, "tistory": 1, "naver": 1}
+    assert ranked[0]["connector_status"]["visitor_delta"]["connected"] is True
 
 
 def test_build_ranking_never_coerces_none_to_zero():
@@ -232,6 +233,15 @@ def test_tistory_card_reports_no_visitor_widget_reason():
     assert card["connector_status"]["visitors"]["reason"]
 
 
+def test_missing_visitor_delta_is_its_own_connector_failure():
+    row = _wp_row("a.com", 50, None)
+    payload = blog_korea365_ranking.build_ranking(lambda: [row], lambda: [], lambda: [], lambda: [])
+    status = payload["cards"][0]["connector_status"]
+    assert status["visitors"]["connected"] is True
+    assert status["visitor_delta"]["connected"] is False
+    assert status["visitor_delta"]["reason"] == "직전 비교값 수집 필요"
+
+
 # ---------------------------------------------------------------------------
 # 4. Flask route: shape, status, cache header
 # ---------------------------------------------------------------------------
@@ -253,3 +263,10 @@ def test_install_route_returns_ranked_payload():
     payload = response.get_json()
     assert payload["total_cards"] == 4
     assert payload["cards"][0]["yesterday_visitors"] == 20
+
+
+def test_dashboard_shows_ordinal_rank_and_site_opening_date():
+    template = (ROOT / "control_center" / "templates" / "blog_dashboard.html").read_text(encoding="utf-8")
+    assert "c.row_number+'위'" in template
+    assert "사이트 생성일" in template
+    assert "c.opening_date" in template
