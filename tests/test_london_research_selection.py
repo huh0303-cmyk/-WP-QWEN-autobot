@@ -109,7 +109,8 @@ def test_direct_research_rotates_generic_keyword_when_previous_choice_overlaps(m
         {"google_news_headlines": ["Autumn rail routes attract visitors"]},
         avoid="Do not use 'Travel Korea practical guide' or close variants.",
     )
-    assert pipeline._parse_keyword(result) == f"Travel Korea {direct_topic_research.date.today().year} update"
+    month_year = direct_topic_research.date.today().strftime("%B %Y")
+    assert pipeline._parse_keyword(result) == f"Travel Korea {month_year} checklist"
 
 
 def test_naver_subscription_boilerplate_is_not_research_evidence():

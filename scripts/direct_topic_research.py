@@ -158,10 +158,12 @@ def _deterministic_keyword(profile: dict, evidence: dict, avoid: str = "") -> st
         if word.lower() not in {"korea", "korean"}
     ][:3]
     generic_stem = [*theme_words, "Korea"]
+    month_year = date.today().strftime("%B %Y")
     generic_candidates = [
         " ".join([*generic_stem, "practical", "guide"][:6]),
-        " ".join([*generic_stem, str(date.today().year), "update"][:6]),
-        " ".join([*generic_stem, "current", "changes"][:6]),
+        " ".join([*generic_stem, *month_year.split(), "checklist"][:6]),
+        " ".join([*generic_stem, "newcomer", "action", "steps"][:6]),
+        " ".join([*generic_stem, str(date.today().year), "policy", "changes"][:6]),
     ]
     generic_candidates = [
         item if len(item.split()) >= 3 else "practical Korea topic guide"
