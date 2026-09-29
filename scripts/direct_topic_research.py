@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 from concurrent.futures import ThreadPoolExecutor
+from datetime import date
 from urllib.parse import quote_plus
 import xml.etree.ElementTree as ET
 
@@ -19,12 +20,12 @@ from bs4 import BeautifulSoup
 UA = {"User-Agent": "Mozilla/5.0 (Korea365 research bot; current-topic discovery)"}
 
 INTL_STUDENT_TOPICS = (
-    (("scholarship", "grant", "funding", "장학"), "study in Korea scholarships"),
-    (("visa", "immigration", "비자", "체류"), "Korea student visa guide"),
-    (("admission", "application", "apply", "university", "입학", "지원"), "Korean university application guide"),
-    (("housing", "dorm", "rent", "기숙사", "주거"), "Korea student housing guide"),
-    (("tuition", "cost", "budget", "living cost", "학비", "생활비"), "study in Korea costs"),
-    (("job", "work", "intern", "취업", "아르바이트"), "student jobs in Korea"),
+    (("scholarship", "grant", "funding", "장학"), "Korea scholarship application {year}"),
+    (("visa", "immigration", "비자", "체류"), "Korea student visa {year}"),
+    (("admission", "application", "apply", "university", "입학", "지원"), "Korean university applications {year}"),
+    (("housing", "dorm", "rent", "기숙사", "주거"), "Korea student housing {year}"),
+    (("tuition", "cost", "budget", "living cost", "학비", "생활비"), "Korea study costs {year}"),
+    (("job", "work", "intern", "취업", "아르바이트"), "Korea student jobs {year}"),
     (("insurance", "health", "medical", "보험", "건강"), "Korea student health insurance"),
 )
 
@@ -129,17 +130,21 @@ def _deterministic_keyword(profile: dict, evidence: dict, avoid: str = "") -> st
     avoid_lower = str(avoid or "").lower()
     candidates: list[str] = []
     if "international student" in theme.lower():
+        year = date.today().year
         candidates = [
-            phrase
+            phrase.format(year=year)
             for terms, phrase in INTL_STUDENT_TOPICS
-            if any(term in searchable for term in terms) and phrase.lower() not in avoid_lower
+            if any(term in searchable for term in terms) and phrase.format(year=year).lower() not in avoid_lower
         ]
         candidates.extend(
-            phrase for _, phrase in INTL_STUDENT_TOPICS
-            if phrase not in candidates and phrase.lower() not in avoid_lower
+            formatted for _, phrase in INTL_STUDENT_TOPICS
+            if (formatted := phrase.format(year=year)) not in candidates and formatted.lower() not in avoid_lower
         )
-    theme_words = re.findall(r"[A-Za-z0-9가-힣]+", theme)[:3]
-    generic = " ".join([*theme_words, "Korea", "guide"][:6])
+    theme_words = [
+        word for word in re.findall(r"[A-Za-z0-9가-힣]+", theme)
+        if word.lower() not in {"korea", "korean"}
+    ][:3]
+    generic = " ".join([*theme_words, "Korea", "practical", "guide"][:6])
     if len(generic.split()) < 3:
         generic = "practical Korea topic guide"
     keyword = candidates[0] if candidates else generic
@@ -187,9 +192,12 @@ MEDIA: <observed media signal>
 VOLUME: <verified volume or unavailable>
 RATIONALE: <one concise reason>
 """
+    if "international student" in str(settings.get("theme") or "").lower():
+        return _deterministic_keyword(profile, evidence, avoid=avoid)
+
     # The required answer is only six short lines. If the local model cannot
     # answer promptly, use the observed evidence rather than stalling Agent 1.
     try:
-        return local_generate_text(prompt, temperature=0.35, timeout=35, max_tokens=220)
+        return local_generate_text(prompt, temperature=0.35, timeout=15, max_tokens=220)
     except Exception:
         return _deterministic_keyword(profile, evidence, avoid=avoid)
