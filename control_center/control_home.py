@@ -309,7 +309,8 @@ def build_social_ranking(bucket: int) -> dict:
         str(r["name"]).casefold(),
     ))
     rank = 0
-    for row in rows:
+    for row_number, row in enumerate(rows, 1):
+        row["row_number"] = row_number
         if row["audience"] is None:
             row["rank"] = None
         else:

@@ -25,8 +25,11 @@ def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     assert "GSC 소유권 인증 필요" in template
     assert "GSC 연결 · 클릭 데이터 없음" in template
     assert '<span class="warn">수익 데이터 미연결</span>' in template
-    assert "'블로그 순위 ('+dateLabel(d.display_date" in template
-    assert "'YouTube + SNS 순위 ('+dateLabel(d.display_date" in template
+    assert "timeZone:'Asia/Seoul'" in template
+    assert "'블로그 순위 ('+dateLabel(todayKst())" in template
+    assert "'YouTube + SNS 순위 ('+dateLabel(todayKst())" in template
+    assert "rank(c.row_number)" in template
+    assert "rank(c.rank)" not in template
 
 
 def test_blog_ranking_preserves_real_gsc_clicks_and_impressions():
@@ -217,6 +220,8 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"target_total": 48' in source
     assert '"target_youtube": 24' in source
     assert '"display_date": now.date().isoformat()' in source
+    assert 'for row_number, row in enumerate(rows, 1):' in source
+    assert 'row["row_number"] = row_number' in source
     assert '"status": "수익 데이터 권한 필요"' in source
     assert '"opening_date": str(item.get("created_at")' in source
     assert 'timeline.get("recent_publish_date") or str(item.get("recent_publish_date")' in source
