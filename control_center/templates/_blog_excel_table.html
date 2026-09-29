@@ -14,7 +14,7 @@
     <table id="control-blog-sheet" style="width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;font-size:12px">
       <thead style="position:sticky;top:0;z-index:3;background:#e2e8f0">
         <tr>
-          <th style="width:56px">순위</th><th style="width:90px">플랫폼</th><th style="min-width:220px;text-align:left">사이트</th>
+          <th style="width:56px">번호</th><th style="width:90px">플랫폼</th><th style="min-width:220px;text-align:left">사이트</th>
           <th>어제 방문자(증감)</th><th>총 방문자(증감)</th><th>총 콘텐츠(증감)</th><th>Google 색인(증감)</th>
           <th style="min-width:160px">데이터 상태</th><th style="min-width:140px">확인시각</th>
         </tr>
@@ -57,7 +57,7 @@
       if(!r.ok) throw new Error('HTTP '+r.status);
       const data=await r.json();
       body.innerHTML=(data.cards||[]).map(c=>'<tr>'+
-        '<td>'+(Number.isFinite(c.rank)?c.rank:'—')+'</td>'+
+        '<td>'+(Number.isFinite(c.row_number)?c.row_number:'—')+'</td>'+
         '<td>'+platform(c)+'</td>'+
         '<td><a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name||c.url)+'</a></td>'+
         '<td>'+metric(c.yesterday_visitors,c.yesterday_visitors_delta)+'</td>'+

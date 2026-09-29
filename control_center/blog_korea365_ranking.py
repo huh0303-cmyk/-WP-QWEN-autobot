@@ -138,7 +138,8 @@ def build_ranking(
 
     cards.sort(key=lambda c: (c["yesterday_visitors"] is None, -(c["yesterday_visitors"] or 0), c["name"] or ""))
     rank = 0
-    for card in cards:
+    for row_number, card in enumerate(cards, 1):
+        card["row_number"] = row_number
         if card["yesterday_visitors"] is None:
             card["rank"] = None
         else:
