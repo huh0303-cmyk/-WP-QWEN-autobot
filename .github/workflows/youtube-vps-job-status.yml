@@ -59,6 +59,23 @@ jobs:
                     job = json.loads(job_path.read_text(encoding="utf-8"))
                     break
             report = {"job_id": job_id, "folder": folder}
+            if folder == "completed":
+                result_path = Path("/opt/korea365/artifacts/youtube_playlist_result.json")
+                if result_path.exists():
+                    result = json.loads(result_path.read_text(encoding="utf-8"))
+                    if result.get("channel_key") == job.get("channel_key"):
+                        report["verified_result"] = {
+                            key: result.get(key)
+                            for key in (
+                                "video_id",
+                                "artifact_url",
+                                "privacy_status",
+                                "channel_key",
+                                "verified_channel_id",
+                                "minutes",
+                                "variant",
+                            )
+                        }
             log_path = root / "logs" / f"{job_id}.log"
             if log_path.exists():
                 lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
