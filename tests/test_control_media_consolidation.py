@@ -33,6 +33,8 @@ def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     assert "'YouTube + SNS 순위 ('+dateLabel(todayKst())" in template
     assert "rank(c.row_number)" in template
     assert "rank(c.rank)" not in template
+    assert "recentPublication(c)" in template
+    assert "Post ID " in template
 
 
 def test_blog_ranking_preserves_real_gsc_clicks_and_impressions():

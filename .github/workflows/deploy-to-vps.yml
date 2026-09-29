@@ -272,7 +272,7 @@ jobs:
             # Materialize only the sanitized, source-controlled dashboard
             # snapshots from the verified deployed commit; never copy secrets or
             # overwrite unrelated runtime files.
-            for rel in data/youtube_public_metrics.json data/ceo_sns_probe.json data/adsense_revenue_by_domain.json; do
+            for rel in data/youtube_public_metrics.json data/ceo_sns_probe.json data/adsense_revenue_by_domain.json data/social_publication_receipts.json; do
               if git -C "$ROOT" cat-file -e "HEAD:$rel" 2>/dev/null; then
                 tmp="$ROOT/$rel.deploy-tmp"
                 git -C "$ROOT" show "HEAD:$rel" > "$tmp"

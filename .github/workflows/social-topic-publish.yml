@@ -1,0 +1,44 @@
+name: Publish verified SNS topic post
+
+on:
+  workflow_dispatch:
+    inputs:
+      spec:
+        description: Repository-relative publication spec
+        required: true
+        default: data/social_publication_specs/2026-09-29-topik-nunchi.json
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: google-metrics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Publish to verified Instagram and Facebook accounts
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: python scripts/publish_social_topic_post.py "${{ inputs.spec }}"
+      - name: Save public publication receipts
+        run: |
+          git config user.name "korea365-social-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/social_publication_receipts.json
+          git commit -m "data: record verified SNS publication receipts"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: social-publication-receipts-${{ github.run_id }}
+          path: data/social_publication_receipts.json
+          if-no-files-found: warn
+          retention-days: 30

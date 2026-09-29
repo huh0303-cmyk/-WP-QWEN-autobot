@@ -93,6 +93,20 @@ def _sns_probe_stats() -> dict[tuple[str, str], dict]:
     }
 
 
+def _latest_social_publications() -> dict[tuple[str, str], dict]:
+    snapshot = _read(ROOT / "data" / "social_publication_receipts.json", {})
+    latest: dict[tuple[str, str], dict] = {}
+    for row in snapshot.get("publications", []):
+        if not isinstance(row, dict):
+            continue
+        key = (str(row.get("platform") or "").lower(), str(row.get("role") or ""))
+        if not all(key):
+            continue
+        if key not in latest or str(row.get("published_at") or "") > str(latest[key].get("published_at") or ""):
+            latest[key] = row
+    return latest
+
+
 ROLE_TO_PROBE_BRAND = {
     "korean_topik": "TOPIK",
     "english": "ENGLISH",
@@ -129,6 +143,8 @@ def build_youtube_ranking(bucket: int) -> dict:
             "revenue": _social_revenue("YouTube", current.get("handle") or item.get("handle") or "", item.get("channel_id", "")),
             "opening_date": timeline.get("opening_date") or str(item.get("created_at") or "")[:10] or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
             "recent_publish_date": timeline.get("recent_publish_date") or str(item.get("recent_publish_date") or "")[:10],
+            "last_post_url": "",
+            "last_post_id": "",
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
         })
@@ -145,7 +161,7 @@ def build_youtube_ranking(bucket: int) -> dict:
             "views": None, "view_delta": None,
             "videos": None, "video_delta": None,
             "revenue": _social_revenue("YouTube", item.get("handle") or "", ""),
-            "opening_date": "", "recent_publish_date": "",
+            "opening_date": "", "recent_publish_date": "", "last_post_url": "", "last_post_id": "",
             "infrastructure": infrastructure_info("youtube"),
             "connected": False,
         })
@@ -187,6 +203,7 @@ def build_sns_ranking(bucket: int) -> dict:
         audience_path = ROOT / "data" / "account-audience-metrics.json"
     audience = _read(audience_path, {}).get("accounts", {})
     probe = _sns_probe_stats()
+    publications = _latest_social_publications()
     rows = []
     for item in policy.get("accounts", []):
         platform = str(item.get("platform") or "")
@@ -201,6 +218,7 @@ def build_sns_ranking(bucket: int) -> dict:
         handle = str(item.get("handle") or "")
         audience_row = audience.get(handle, {}) if handle else {}
         yesterday_views = audience_row.get("views") if isinstance(audience_row, dict) else None
+        publication = publications.get((pkey, str(item.get("role") or "")), {})
         rows.append({
             "platform": platform,
             "name": item.get("display_name") or item.get("role") or handle,
@@ -215,6 +233,9 @@ def build_sns_ranking(bucket: int) -> dict:
             "content_delta": audience_row.get("content_delta") if isinstance(audience_row, dict) else None,
             "revenue": _social_revenue(platform, handle, ""),
             "opening_date": str(item.get("created_at") or item.get("opening_date") or "")[:10],
+            "recent_publish_date": publication.get("published_at") or str(item.get("recent_publish_date") or "")[:10],
+            "last_post_url": publication.get("url") or "",
+            "last_post_id": publication.get("post_id") or "",
             "connected": isinstance(followers, (int, float)),
             "metric_status": probe_row.get("status") or ("조회 성공" if isinstance(followers, (int, float)) else "API 인증 필요"),
         })
@@ -272,6 +293,8 @@ def build_social_ranking(bucket: int) -> dict:
             "revenue": item.get("revenue") or {},
             "opening_date": item.get("opening_date") or "",
             "recent_publish_date": item.get("recent_publish_date") or "",
+            "last_post_url": item.get("last_post_url") or "",
+            "last_post_id": item.get("last_post_id") or "",
             "infrastructure": item.get("infrastructure") or infrastructure_info("youtube"),
             "connected": item.get("connected", False),
             "metric_status": "조회 성공" if item.get("connected", False) else "YouTube 공개 API 갱신 필요",
@@ -296,6 +319,8 @@ def build_social_ranking(bucket: int) -> dict:
             "revenue": item.get("revenue") or {},
             "opening_date": item.get("opening_date") or "",
             "recent_publish_date": item.get("recent_publish_date") or "",
+            "last_post_url": item.get("last_post_url") or "",
+            "last_post_id": item.get("last_post_id") or "",
             "infrastructure": infrastructure_info(str(item.get("platform") or "").lower()),
             "connected": item.get("connected", False),
             "metric_status": item.get("metric_status") or "플랫폼 API 인증 필요",
