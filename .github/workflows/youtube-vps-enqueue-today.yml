@@ -47,7 +47,7 @@ jobs:
             kst = timezone(timedelta(hours=9))
             today = datetime.now(kst).date()
             root = queue_root()
-            for folder in ("pending", "running", "completed"):
+            for folder in ("pending", "running", "completed", "failed"):
                 for path in (root / folder).glob("*.json"):
                     try:
                         row = json.loads(path.read_text(encoding="utf-8"))
