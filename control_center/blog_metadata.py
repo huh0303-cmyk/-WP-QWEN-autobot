@@ -255,11 +255,12 @@ def revenue_info(domain: str, row: dict) -> dict[str, object]:
         current = latest.get("cumulative")
         old = previous.get("cumulative")
         delta = current - old if isinstance(current, (int, float)) and isinstance(old, (int, float)) else None
+        currency = latest.get("currency") or "KRW"
         return {
             "monetized": True,
-            "amount": current,
-            "delta": delta,
-            "currency": latest.get("currency") or "KRW",
+            "amount": current if currency == "USD" else None,
+            "delta": delta if currency == "USD" else None,
+            "currency": "USD",
             "status": latest.get("status") or row.get("adsense_status_label") or "AdSense",
         }
     return {"monetized": False, "amount": None, "delta": None, "currency": "", "status": row.get("adsense_status_label") or "미수익화"}
