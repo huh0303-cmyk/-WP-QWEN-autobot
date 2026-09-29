@@ -16,10 +16,10 @@ KST = timezone(timedelta(hours=9))
 GRAPH = "https://graph.facebook.com/v21.0"
 
 
-def api(method: str, url: str, token: str, **fields) -> dict:
+def api(method: str, endpoint: str, token: str, **fields) -> dict:
     response = requests.request(
         method,
-        url,
+        endpoint,
         headers={"Authorization": f"Bearer {token}"},
         timeout=60,
         **({"params": fields} if method == "GET" else {"data": fields}),
@@ -42,6 +42,26 @@ def publish_instagram(spec: dict) -> dict:
     user_id = os.environ.get("IG_USER_ID", "")
     if not token or not user_id:
         raise RuntimeError("Instagram API credentials are not configured")
+    recent = api(
+        "GET",
+        f"{GRAPH}/{user_id}/media",
+        token,
+        fields="id,caption,permalink,timestamp",
+        limit="25",
+    )
+    existing = next(
+        (row for row in recent.get("data", []) if row.get("caption") == spec["instagram"]["caption"]),
+        None,
+    )
+    if existing:
+        return {
+            "platform": "Instagram",
+            "role": spec["role"],
+            "handle": spec["instagram"]["handle"],
+            "post_id": existing["id"],
+            "url": existing.get("permalink", ""),
+            "reconciled": True,
+        }
     container = api(
         "POST",
         f"{GRAPH}/{user_id}/media",
@@ -74,6 +94,28 @@ def publish_facebook(spec: dict) -> dict:
     if not token:
         raise RuntimeError("Facebook Page API credential is not configured")
     page = api("GET", f"{GRAPH}/me", token, fields="id,name")
+    recent = api(
+        "GET",
+        f"{GRAPH}/{page['id']}/feed",
+        token,
+        fields="id,message,permalink_url,created_time",
+        limit="25",
+    )
+    existing = next(
+        (row for row in recent.get("data", []) if row.get("message") == spec["facebook"]["caption"]),
+        None,
+    )
+    if existing:
+        return {
+            "platform": "Facebook",
+            "role": spec["role"],
+            "handle": "",
+            "account_id": page["id"],
+            "account_name": page.get("name", ""),
+            "post_id": existing["id"],
+            "url": existing.get("permalink_url", ""),
+            "reconciled": True,
+        }
     result = api(
         "POST",
         f"{GRAPH}/{page['id']}/photos",
@@ -101,11 +143,16 @@ def save_receipts(content_id: str, rows: list[dict]) -> None:
     except (OSError, ValueError):
         payload = {"publications": []}
     now = datetime.now(KST).isoformat()
+    publications = payload.setdefault("publications", [])
     for row in rows:
         row["content_id"] = content_id
         row["published_at"] = now
+        publications[:] = [
+            old for old in publications
+            if not (old.get("content_id") == content_id and old.get("platform") == row.get("platform"))
+        ]
+        publications.append(row)
     payload["updated_at"] = now
-    payload.setdefault("publications", []).extend(rows)
     RECEIPTS.parent.mkdir(parents=True, exist_ok=True)
     RECEIPTS.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -115,8 +162,10 @@ def main() -> None:
     parser.add_argument("spec")
     args = parser.parse_args()
     spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
-    rows = [publish_instagram(spec), publish_facebook(spec)]
-    save_receipts(spec["content_id"], rows)
+    rows = []
+    for publisher in (publish_instagram, publish_facebook):
+        rows.append(publisher(spec))
+        save_receipts(spec["content_id"], rows)
     print(json.dumps({"published": rows}, ensure_ascii=False))
 
 
