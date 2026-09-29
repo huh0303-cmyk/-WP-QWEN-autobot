@@ -79,6 +79,8 @@ jobs:
             log_path = root / "logs" / f"{job_id}.log"
             if log_path.exists():
                 lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+                report["log_bytes"] = log_path.stat().st_size
+                report["progress_tail"] = lines[-4:]
                 selected = [line for line in lines[-120:] if re.search(
                     r"(?:Traceback|RuntimeError|Error|ERROR|failed|FAIL|upload|PRIVATE|비공개)", line
                 )]
