@@ -16,7 +16,9 @@ from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 import csv
 import io
+import json
 import time
+from pathlib import Path
 from typing import Callable
 
 from flask import Response, jsonify, render_template
@@ -33,6 +35,22 @@ from .blog_metadata import (
 KST = timezone(timedelta(hours=9))
 
 NO_VISITOR_TRACKING_REASON: dict[str, str] = {}
+
+
+@lru_cache(maxsize=2)
+def _gsc_metrics(five_minute_bucket: int) -> dict[str, dict[str, object]]:
+    """Read the existing daily GSC/traffic manifest without inventing gaps."""
+    del five_minute_bucket
+    path = Path(__file__).resolve().parents[1] / "daily_site_traffic_result.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return {
+            str(row.get("domain") or "").lower(): row
+            for row in payload.get("records", [])
+            if row.get("domain")
+        }
+    except (OSError, ValueError, TypeError):
+        return {}
 
 
 def _visitor_connector_status(row: dict, platform: str) -> dict[str, object]:
@@ -61,6 +79,10 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
     revenue = revenue_info(domain, row)
     timeline = opening_recent_info(url, platform)
     infra = infrastructure_info(platform, kind)
+    gsc = _gsc_metrics(int(time.time() // 300)).get(domain.lower(), {})
+    gsc_clicks = row.get("gsc_clicks", gsc.get("gsc_clicks", gsc.get("clicks")))
+    gsc_impressions = row.get("gsc_impressions", gsc.get("impressions"))
+    gsc_property = row.get("gsc_property", gsc.get("gsc_property", ""))
     return {
         "platform": platform,
         "kind": kind,
@@ -85,6 +107,12 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
         "google_indexed": row.get("indexed"),
         "google_indexed_delta": row.get("indexed_delta"),
         "google_indexed_verified_via": "gsc" if row.get("index_checked_at") else None,
+        "gsc_clicks": gsc_clicks,
+        "gsc_impressions": gsc_impressions,
+        "gsc_ctr": row.get("gsc_ctr", gsc.get("ctr")),
+        "gsc_position": row.get("gsc_position", gsc.get("position")),
+        "gsc_date": row.get("gsc_date", gsc.get("gsc_date", "")),
+        "gsc_connected": bool(row.get("gsc_connected") or (gsc_property and gsc_clicks is not None and gsc_impressions is not None)),
         "connector_status": _connector_status(row, platform),
         "checked_at": row.get("visitor_checked_at") or row.get("checked_at") or "",
     }

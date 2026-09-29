@@ -2,6 +2,7 @@ from pathlib import Path
 
 from scripts.opening_recent_snapshot import stamp
 from control_center import blog_metadata
+from control_center.blog_korea365_ranking import build_ranking
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +18,26 @@ def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     assert "fetch('/api/control/social-ranking'" in template
     assert "fetch('/api/control/youtube-ranking'" not in template
     assert "fetch('/api/control/sns-ranking'" not in template
+    assert "GSC 클릭/노출" in template
+    assert "visitorMetric(c)" in template
+    assert "GSC 미연결" in template
+
+
+def test_blog_ranking_preserves_real_gsc_clicks_and_impressions():
+    row = {
+        "site_id": "wp_test",
+        "domain": "example.com",
+        "yesterday_visitors": 12,
+        "gsc_clicks": 3,
+        "gsc_impressions": 91,
+        "gsc_ctr": 0.0329,
+        "gsc_position": 8.4,
+        "gsc_date": "2026-09-26",
+        "gsc_connected": True,
+    }
+    card = build_ranking(lambda: [row], lambda: [], lambda: [], lambda: [])["cards"][0]
+    assert card["gsc_connected"] is True
+    assert (card["gsc_clicks"], card["gsc_impressions"], card["gsc_date"]) == (3, 91, "2026-09-26")
 
 
 def test_visible_navigation_has_only_control_blog_and_combined_social():

@@ -34,10 +34,51 @@ jobs:
               -d control.korea365.org \
               -d blog.korea365.org \
               -d sns.korea365.org
+
+            stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+            backup="/var/backups/korea365-nginx-$stamp"
+            install -d -m 700 "$backup"
+            cp -a /etc/nginx/sites-available/korea365-control "$backup/"
+            cp -a /etc/nginx/sites-available/default "$backup/"
+            python3 - <<'PY'
+            import re
+            from pathlib import Path
+
+            control = Path('/etc/nginx/sites-available/korea365-control')
+            default = Path('/etc/nginx/sites-available/default')
+            extra = {'blog.korea365.org', 'sns.korea365.org'}
+
+            def rewrite_control(match):
+                names = match.group(1).split()
+                if 'control.korea365.org' in names:
+                    for name in ('blog.korea365.org', 'sns.korea365.org'):
+                        if name not in names:
+                            names.append(name)
+                return 'server_name ' + ' '.join(names) + ';'
+
+            text = control.read_text(encoding='utf-8')
+            updated = re.sub(r'server_name\s+([^;]+);', rewrite_control, text)
+            if updated == text and not extra.issubset(set(text.split())):
+                raise SystemExit('control vhost server_name was not found')
+            control.write_text(updated, encoding='utf-8')
+
+            lines = []
+            for line in default.read_text(encoding='utf-8').splitlines(keepends=True):
+                match = re.search(r'^(\s*)server_name\s+([^;]+);(.*)$', line)
+                if not match:
+                    lines.append(line)
+                    continue
+                names = [name for name in match.group(2).split() if name not in extra]
+                ending = '\n' if line.endswith('\n') else ''
+                lines.append(f"{match.group(1)}server_name {' '.join(names) if names else '_'};{match.group(3)}{ending}")
+            default.write_text(''.join(lines), encoding='utf-8')
+            PY
             nginx -t
             systemctl reload nginx
 
             for host in control.korea365.org blog.korea365.org sns.korea365.org; do
               curl --fail --silent --show-error --head --max-time 15 "https://$host/" >/tmp/"$host".headers
+              grep -q '^HTTP/.* 302' /tmp/"$host".headers
+              grep -qi '^Location: /control-login?next=/' /tmp/"$host".headers
               head -n 8 /tmp/"$host".headers
             done
