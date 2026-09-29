@@ -1,0 +1,56 @@
+name: Inspect one YouTube VPS job
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: VPS YouTube job ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read queue state and sanitized diagnostic tail
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          JOB_ID: ${{ inputs.job_id }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          envs: JOB_ID
+          script: |
+            set -euo pipefail
+            cd /opt/korea365
+            python3 - "$JOB_ID" <<'PY'
+            import json
+            from pathlib import Path
+            import re
+            import sys
+
+            job_id = sys.argv[1]
+            root = Path("/opt/korea365/data/youtube_vps_queue")
+            folder = "missing"
+            for candidate in ("pending", "running", "completed", "failed"):
+                if (root / candidate / f"{job_id}.json").exists():
+                    folder = candidate
+                    break
+            report = {"job_id": job_id, "folder": folder}
+            log_path = root / "logs" / f"{job_id}.log"
+            if log_path.exists():
+                lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+                selected = [line for line in lines[-120:] if re.search(
+                    r"(?:Traceback|RuntimeError|Error|ERROR|failed|FAIL|upload|PRIVATE|비공개)", line
+                )]
+                report["diagnostic_tail"] = selected[-12:]
+            else:
+                report["diagnostic_tail"] = []
+                report["likely_stage"] = "calendar_claim_before_render"
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            PY
