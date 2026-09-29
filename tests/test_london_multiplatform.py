@@ -37,7 +37,13 @@ def test_web_app_renders_template_and_guards_manual_platform(monkeypatch, tmp_pa
     client = app.test_client()
     legacy = client.get("/london-gpt?site_id=blogger_ktrip365")
     assert legacy.status_code == 302
-    assert legacy.headers["Location"].endswith("/publish?site_id=blogger_ktrip365")
+    assert legacy.headers["Location"] == "https://blog.korea365.org/publish?site_id=blogger_ktrip365"
+    control_publish = client.get(
+        "/publish?site_id=blogger_ktrip365",
+        headers={"Host": "control.korea365.org"},
+    )
+    assert control_publish.status_code == 302
+    assert control_publish.headers["Location"] == "https://blog.korea365.org/publish?site_id=blogger_ktrip365"
     page = client.get("/publish")
     assert page.status_code == 200
     html = page.get_data(as_text=True)

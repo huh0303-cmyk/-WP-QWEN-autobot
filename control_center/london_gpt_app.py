@@ -183,14 +183,19 @@ def install(app, runtime):
 
     @app.get("/publish")
     def blog_publish_home():
-        from flask import render_template
+        from flask import redirect, render_template, request
+        if request.host.split(":", 1)[0].lower() == "control.korea365.org":
+            query = request.query_string.decode("utf-8", errors="ignore")
+            canonical = "https://blog.korea365.org/publish"
+            return redirect(canonical + (f"?{query}" if query else ""), code=302)
         return render_template("london_gpt.html", snapshot=snapshot())
 
     @app.get("/london-gpt")
     def london_gpt_legacy_redirect():
         from flask import redirect, request
         query = request.query_string.decode("utf-8", errors="ignore")
-        return redirect("/publish" + (f"?{query}" if query else ""), code=302)
+        canonical = "https://blog.korea365.org/publish"
+        return redirect(canonical + (f"?{query}" if query else ""), code=302)
 
     @app.get("/api/london-gpt/status")
     def london_gpt_status():
