@@ -129,7 +129,7 @@
       "url": "https://www.instagram.com/sis_topik1/",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": false
+      "publish_connected": true
     },
     {
       "platform": "Instagram",
@@ -190,9 +190,9 @@
       "handle": "",
       "url": "",
       "account_exists": true,
-      "identity_verified": false,
-      "publish_connected": false,
-      "note": "브라우저 프로필 목록에서 이름 확인, 페이지 ID 필요"
+      "identity_verified": true,
+      "publish_connected": true,
+      "note": "2026-09-30 공식 Meta 발행 영수증으로 페이지 쓰기 연결 확인"
     },
     {
       "platform": "Facebook",
