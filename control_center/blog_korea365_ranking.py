@@ -20,6 +20,7 @@ import json
 import time
 from pathlib import Path
 from typing import Callable
+from urllib.parse import urlparse
 
 from flask import Response, jsonify, render_template
 
@@ -51,6 +52,52 @@ def _gsc_metrics(five_minute_bucket: int) -> dict[str, dict[str, object]]:
         }
     except (OSError, ValueError, TypeError):
         return {}
+
+
+@lru_cache(maxsize=2)
+def _gsc_properties(five_minute_bucket: int) -> dict[str, list[dict[str, str]]]:
+    """Index the sanitized Search Console property inventory by exact host.
+
+    URL Inspection evidence is stored in the core metrics report, while the
+    canonical property/permission list is stored separately. The dashboard
+    must use both so a verified property with no clicks is not labelled as
+    completely disconnected.
+    """
+    del five_minute_bucket
+    path = Path(__file__).resolve().parents[1] / "data" / "gsc_properties.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return {}
+    indexed: dict[str, list[dict[str, str]]] = {}
+    for item in payload.get("properties", []):
+        if not isinstance(item, dict):
+            continue
+        site_url = str(item.get("siteUrl") or "")
+        if site_url.startswith("sc-domain:"):
+            host = site_url.removeprefix("sc-domain:").lower().strip(".")
+        else:
+            host = (urlparse(site_url).hostname or "").lower()
+        if host:
+            indexed.setdefault(host, []).append({
+                "siteUrl": site_url,
+                "permissionLevel": str(item.get("permissionLevel") or ""),
+            })
+    return indexed
+
+
+def _gsc_property_for(url: str) -> dict[str, str]:
+    host = (urlparse(url).hostname or "").lower()
+    rows = _gsc_properties(int(time.time() // 300)).get(host, [])
+    if not rows:
+        return {}
+    exact = url.rstrip("/") + "/"
+    rows.sort(key=lambda item: (
+        item.get("siteUrl") != exact,
+        item.get("siteUrl", "").startswith("sc-domain:"),
+        item.get("siteUrl", ""),
+    ))
+    return rows[0]
 
 
 def _visitor_connector_status(row: dict, platform: str) -> dict[str, object]:
@@ -85,9 +132,20 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
     timeline = opening_recent_info(url, platform)
     infra = infrastructure_info(platform, kind)
     gsc = _gsc_metrics(int(time.time() // 300)).get(domain.lower(), {})
+    property_row = _gsc_property_for(url)
     gsc_clicks = row.get("gsc_clicks", gsc.get("gsc_clicks", gsc.get("clicks")))
     gsc_impressions = row.get("gsc_impressions", gsc.get("impressions"))
-    gsc_property = row.get("gsc_property", gsc.get("gsc_property", ""))
+    gsc_property = (
+        row.get("gsc_property")
+        or row.get("index_property")
+        or gsc.get("gsc_property", "")
+        or property_row.get("siteUrl", "")
+    )
+    gsc_permission = property_row.get("permissionLevel", "")
+    gsc_connected = bool(
+        row.get("gsc_connected")
+        or gsc_property and gsc_permission != "siteUnverifiedUser"
+    )
     return {
         "platform": platform,
         "kind": kind,
@@ -118,7 +176,15 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
         "gsc_position": row.get("gsc_position", gsc.get("position")),
         "gsc_date": row.get("gsc_date", gsc.get("gsc_date", "")),
         "gsc_applicable": platform != "naver",
-        "gsc_connected": bool(row.get("gsc_connected") or gsc_property),
+        "gsc_connected": gsc_connected,
+        "gsc_property": gsc_property,
+        "gsc_permission": gsc_permission,
+        "gsc_status": (
+            "api_unsupported" if platform == "naver"
+            else "connected" if gsc_connected
+            else "user_auth_required" if gsc_permission == "siteUnverifiedUser"
+            else "disconnected"
+        ),
         "connector_status": _connector_status(row, platform),
         "checked_at": row.get("visitor_checked_at") or row.get("checked_at") or "",
     }
@@ -159,6 +225,7 @@ def build_ranking(
     ranking_date = (today - timedelta(days=1)).isoformat()
     return {
         "generated_at": datetime.now(KST).isoformat(),
+        "display_date": today.isoformat(),
         "ranking_date": ranking_date,
         "timezone": "Asia/Seoul",
         "ranking_metric": "yesterday_visitors",

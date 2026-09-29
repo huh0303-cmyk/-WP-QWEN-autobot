@@ -317,9 +317,11 @@ def build_social_ranking(bucket: int) -> dict:
             row["rank"] = rank
     youtube_total = len(youtube["rows"])
     sns_active_total = len(sns["rows"])
+    now = datetime.now(KST)
     return {
-        "generated_at": datetime.now(KST).isoformat(),
-        "ranking_date": (datetime.now(KST).date() - timedelta(days=1)).isoformat(),
+        "generated_at": now.isoformat(),
+        "display_date": now.date().isoformat(),
+        "ranking_date": (now.date() - timedelta(days=1)).isoformat(),
         "total": len(rows),
         "ranked": rank,
         "youtube_total": youtube_total,

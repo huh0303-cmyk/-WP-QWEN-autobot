@@ -183,6 +183,7 @@ def test_build_ranking_combines_and_sorts_all_cards():
     )
 
     assert payload["total_cards"] == 6
+    assert payload["display_date"]
     assert payload["ranked_cards"] == 3  # only the three cards with a confirmed count
     assert payload["unranked_cards"] == 3
     assert [card["row_number"] for card in payload["cards"]] == list(range(1, 7))

@@ -3,6 +3,7 @@ from pathlib import Path
 from scripts.opening_recent_snapshot import stamp
 from control_center import blog_metadata, control_home
 from control_center.blog_korea365_ranking import build_ranking
+import control_center.blog_korea365_ranking as ranking
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +22,11 @@ def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     assert "GSC 클릭/노출" in template
     assert "visitorMetric(c)" in template
     assert "GSC 미연결" in template
+    assert "GSC 소유권 인증 필요" in template
+    assert "GSC 연결 · 클릭 데이터 없음" in template
+    assert '<span class="warn">수익 데이터 미연결</span>' in template
+    assert "'블로그 순위 ('+dateLabel(d.display_date" in template
+    assert "'YouTube + SNS 순위 ('+dateLabel(d.display_date" in template
 
 
 def test_blog_ranking_preserves_real_gsc_clicks_and_impressions():
@@ -38,6 +44,44 @@ def test_blog_ranking_preserves_real_gsc_clicks_and_impressions():
     card = build_ranking(lambda: [row], lambda: [], lambda: [], lambda: [])["cards"][0]
     assert card["gsc_connected"] is True
     assert (card["gsc_clicks"], card["gsc_impressions"], card["gsc_date"]) == (3, 91, "2026-09-26")
+
+
+def test_blog_ranking_uses_verified_gsc_inventory_when_clicks_are_absent(monkeypatch):
+    monkeypatch.setattr(
+        ranking,
+        "_gsc_property_for",
+        lambda url: {
+            "siteUrl": "https://example.blogspot.com/",
+            "permissionLevel": "siteOwner",
+        },
+    )
+    card = ranking._card(
+        {"url": "https://example.blogspot.com", "name": "Example"},
+        "blogspot",
+        "blogspot",
+    )
+    assert card["gsc_connected"] is True
+    assert card["gsc_status"] == "connected"
+    assert card["gsc_permission"] == "siteOwner"
+
+
+def test_blog_ranking_marks_unverified_gsc_property_as_user_auth_required(monkeypatch):
+    monkeypatch.setattr(
+        ranking,
+        "_gsc_property_for",
+        lambda url: {
+            "siteUrl": "https://example.tistory.com/",
+            "permissionLevel": "siteUnverifiedUser",
+        },
+    )
+    card = ranking._card(
+        {"url": "https://example.tistory.com", "name": "Example"},
+        "tistory",
+        "tistory",
+    )
+    assert card["gsc_connected"] is False
+    assert card["gsc_status"] == "user_auth_required"
+    assert card["gsc_permission"] == "siteUnverifiedUser"
 
 
 def test_visible_navigation_has_only_control_blog_and_combined_social():
@@ -172,6 +216,7 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"content_count_delta": item.get("content_delta")' in source
     assert '"target_total": 48' in source
     assert '"target_youtube": 24' in source
+    assert '"display_date": now.date().isoformat()' in source
     assert '"status": "수익 데이터 권한 필요"' in source
     assert '"opening_date": str(item.get("created_at")' in source
     assert 'timeline.get("recent_publish_date") or str(item.get("recent_publish_date")' in source

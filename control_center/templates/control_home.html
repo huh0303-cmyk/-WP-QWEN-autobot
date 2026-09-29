@@ -77,10 +77,10 @@ const rank=v=>Number.isFinite(v)?v+'위':'—';
 const delta=v=>{if(!Number.isFinite(v))return '';const cls=v>0?'up':v<0?'down':'flat';return '<span class="'+cls+'">('+(v>0?'+':'')+nf.format(v)+')</span>';};
 const metric=(v,d)=>Number.isFinite(v)?nf.format(v)+' '+delta(d):'';
 const money=r=>{if(!r||!r.monetized)return '—';if(!Number.isFinite(r.amount))return esc(r.status||'');const sym=r.currency==='KRW'?'₩':r.currency==='USD'?'$':esc(r.currency||'');return sym+nf.format(r.amount)+' '+delta(r.delta);};
-const revenueStatus=r=>{if(!r)return '수익 데이터 미연결';if(r.monetized)return Number.isFinite(r.amount)?money(r):esc(r.status||'승인')+' · 금액 미연결';return r.status==='미연결'?'수익 데이터 미연결':esc(r.status||'미수익화');};
-const socialMetric=(v,d,status)=>Number.isFinite(v)?metric(v,d):'<span class="warn">'+esc(status||'API 인증 필요')+'</span>';
+const revenueStatus=r=>{if(!r)return '<span class="warn">수익 데이터 미연결</span>';if(r.monetized)return Number.isFinite(r.amount)?'<span class="good">'+money(r)+'</span>':'<span class="warn">'+esc(r.status||'승인')+' · 금액 미연결</span>';return r.status==='미연결'?'<span class="warn">수익 데이터 미연결</span>':'<span class="warn">'+esc(r.status||'미수익화')+'</span>';};
+const socialMetric=(v,d,status)=>Number.isFinite(v)?'<span class="good">'+metric(v,d)+'</span>':'<span class="warn">'+esc(status||'API 인증 필요')+'</span>';
 const visitorMetric=c=>Number.isFinite(c.yesterday_visitors)?metric(c.yesterday_visitors,c.yesterday_visitors_delta):(Number.isFinite(c.total_visitors)?metric(c.total_visitors,c.total_visitors_delta)+' <span class="source-tag">누적</span>':'방문자 미연결');
-const gscMetric=c=>c.gsc_applicable===false?'GSC 지원 제한':(c.gsc_connected?(Number.isFinite(c.gsc_clicks)&&Number.isFinite(c.gsc_impressions)?'<span title="GSC 기준일 '+esc(c.gsc_date||'')+'">'+nf.format(c.gsc_clicks)+' / '+nf.format(c.gsc_impressions)+'</span>':'GSC 연결 · 데이터 대기'):'GSC 미연결');
+const gscMetric=c=>c.gsc_applicable===false?'<span class="warn">GSC 지원 제한</span>':(c.gsc_connected?(Number.isFinite(c.gsc_clicks)&&Number.isFinite(c.gsc_impressions)?'<span class="good" title="GSC 기준일 '+esc(c.gsc_date||'')+'">'+nf.format(c.gsc_clicks)+' / '+nf.format(c.gsc_impressions)+'</span>':'<span class="good">GSC 연결 · 클릭 데이터 없음</span>'):(c.gsc_status==='user_auth_required'?'<span class="warn">GSC 소유권 인증 필요</span>':'<span class="warn">GSC 미연결</span>'));
 const hostInfo=o=>{if(!o)return '';const p=esc(o.provider||''),pay=o.payment_date&&/^20/.test(o.payment_date)?'결제 '+esc(o.payment_date):esc(o.payment_date||''),ren=o.renewal_date&&/^20/.test(o.renewal_date)?'만료 '+esc(o.renewal_date):esc(o.renewal_date||'');return [p,pay,ren].filter(Boolean).join(' · ');};
 const infraInfo=o=>{if(!o)return '';const parts=[esc(o.label||'')];if(o.uses_vps)parts.push(o.vps_expiry?'VPS 만료 '+esc(o.vps_expiry):'VPS 만료 확인중');return parts.filter(Boolean).join(' · ');};
 const shortDate=s=>{if(!s)return '';const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?(m[1].slice(2)+'.'+m[2]+'.'+m[3]):esc(s);};
@@ -147,7 +147,7 @@ installColumnMemory(document.querySelector('table.blog'),'blog');
 installColumnMemory(document.querySelector('table.social'),'social');
 async function loadBlog(){
  const r=await fetch('/api/blog-korea365/ranking',{cache:'no-store'});if(!r.ok)throw new Error('blog '+r.status);const d=await r.json();
- document.getElementById('blog-title').textContent='블로그 순위 ('+dateLabel(d.ranking_date)+')';
+ document.getElementById('blog-title').textContent='블로그 순위 ('+dateLabel(d.display_date||String(d.generated_at||'').slice(0,10))+')';
  document.getElementById('blog-rows').innerHTML=(d.cards||[]).map(c=>{
   const p=(c.kind==='news'?'wordpress':String(c.platform||'')).toLowerCase(),label=c.kind==='news'?'NEWS':String(c.platform||'').toUpperCase();
   const monetized=!!(c.revenue&&c.revenue.monetized);
@@ -160,6 +160,7 @@ async function loadBlog(){
 }
 async function loadSocial(){
  const r=await fetch('/api/control/social-ranking',{cache:'no-store'});if(!r.ok)throw new Error('social '+r.status);const d=await r.json();
+ document.getElementById('social-title').textContent='YouTube + SNS 순위 ('+dateLabel(d.display_date||String(d.generated_at||'').slice(0,10))+')';
  document.getElementById('social-rows').innerHTML=(d.rows||[]).map(c=>{
   const p=String(c.platform||'').toLowerCase();
   const launch='https://sns.korea365.org/social-accounts?platform='+encodeURIComponent(c.platform||'통합');
