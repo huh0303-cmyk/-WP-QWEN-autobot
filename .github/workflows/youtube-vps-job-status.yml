@@ -20,11 +20,14 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           JOB_ID: ${{ inputs.job_id }}
+          YOUTUBE_OAUTH_CLIENT_ID_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          envs: JOB_ID
+          envs: JOB_ID,YOUTUBE_OAUTH_CLIENT_ID_HEALING,YOUTUBE_OAUTH_CLIENT_SECRET_HEALING,YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING
           script: |
             set -euo pipefail
             cd /opt/korea365
