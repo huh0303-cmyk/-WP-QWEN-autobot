@@ -35,7 +35,10 @@ def test_web_app_renders_template_and_guards_manual_platform(monkeypatch, tmp_pa
     app.add_url_rule("/manifest.webmanifest", "pwa_manifest", lambda: "{}")
     london_gpt_app.install(app, runtime)
     client = app.test_client()
-    page = client.get("/london-gpt")
+    legacy = client.get("/london-gpt?site_id=blogger_ktrip365")
+    assert legacy.status_code == 302
+    assert legacy.headers["Location"].endswith("/publish?site_id=blogger_ktrip365")
+    page = client.get("/publish")
     assert page.status_code == 200
     html = page.get_data(as_text=True)
     assert 'value="blogger_ktrip365"' in html

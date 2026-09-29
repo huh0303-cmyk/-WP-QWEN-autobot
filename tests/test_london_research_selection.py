@@ -98,6 +98,13 @@ def test_direct_research_falls_back_when_local_model_times_out(monkeypatch):
     assert pipeline._parse_keyword(result) == "Travel Korea practical guide"
 
 
+def test_naver_subscription_boilerplate_is_not_research_evidence():
+    assert not direct_topic_research._valid_naver_title(
+        "언론사 선정 주요기사 혹은 심층기획 기사입니다. 네이버 메인에서 언론사를 구독하세요."
+    )
+    assert direct_topic_research._valid_naver_title("한국 유학생 장학금 지원 대상 확대 발표")
+
+
 def test_all_london_webhooks_acknowledge_immediately():
     workflow_path = Path(__file__).parents[1] / "deploy/n8n/workflows/london_content_four_agent.json"
     workflow = json.loads(workflow_path.read_text(encoding="utf-8"))

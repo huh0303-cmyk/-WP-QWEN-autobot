@@ -181,10 +181,16 @@ def install(app, runtime):
             ],
         }
 
-    @app.get("/london-gpt")
-    def london_gpt_home():
+    @app.get("/publish")
+    def blog_publish_home():
         from flask import render_template
         return render_template("london_gpt.html", snapshot=snapshot())
+
+    @app.get("/london-gpt")
+    def london_gpt_legacy_redirect():
+        from flask import redirect, request
+        query = request.query_string.decode("utf-8", errors="ignore")
+        return redirect("/publish" + (f"?{query}" if query else ""), code=302)
 
     @app.get("/api/london-gpt/status")
     def london_gpt_status():

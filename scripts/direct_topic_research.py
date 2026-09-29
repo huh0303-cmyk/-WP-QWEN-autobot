@@ -29,6 +29,19 @@ INTL_STUDENT_TOPICS = (
     (("insurance", "health", "medical", "보험", "건강"), "Korea student health insurance"),
 )
 
+NAVER_BOILERPLATE = (
+    "언론사 선정",
+    "네이버 메인",
+    "구독하세요",
+    "주요기사",
+    "심층기획",
+)
+
+
+def _valid_naver_title(title: str) -> bool:
+    compact = re.sub(r"\s+", " ", str(title or "")).strip()
+    return 8 <= len(compact) <= 160 and not any(marker in compact for marker in NAVER_BOILERPLATE)
+
 def _rss_items(url: str, limit: int = 20) -> list[dict[str, str]]:
     response = requests.get(url, headers=UA, timeout=25)
     response.raise_for_status()
@@ -52,14 +65,14 @@ def _naver_headlines(query: str, limit: int = 20) -> list[str]:
     found: list[str] = []
     for a in soup.select("a.news_tit"):
         title = a.get("title") or a.get_text(" ", strip=True)
-        if title and title not in found:
+        if _valid_naver_title(title) and title not in found:
             found.append(title)
             if len(found) >= limit:
                 return found
     for a in soup.find_all("a", href=True):
         href = str(a.get("href", ""))
         title = a.get_text(" ", strip=True)
-        if ("news.naver.com" in href or "n.news.naver.com" in href) and 8 <= len(title) <= 160 and title not in found:
+        if ("news.naver.com" in href or "n.news.naver.com" in href) and _valid_naver_title(title) and title not in found:
             found.append(title)
             if len(found) >= limit:
                 break

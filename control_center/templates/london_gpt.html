@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0f172a">
-<title>런던프로젝트GPT</title>
-<script>if(location.protocol==='file:')location.replace('https://control.korea365.org/london-gpt');</script>
+<title>Korea365 BLOG · 즉시발행</title>
+<script>if(location.protocol==='file:')location.replace('https://blog.korea365.org/publish');</script>
 <link rel="manifest" href="{{ url_for('pwa_manifest') }}">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -21,15 +21,15 @@
 <body class="min-h-screen bg-slate-950 text-white">
 <header class="sticky top-0 z-20 border-b border-white/10 bg-slate-950/95 px-4 py-4 backdrop-blur">
   <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
-    <div><h1 class="text-xl font-black sm:text-2xl">런던프로젝트GPT</h1><p class="text-xs text-slate-400">n8n 기반 4-Agent 글쓰기·발행 운영앱</p></div>
-    <a href="/" class="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">기존 통제실</a>
+    <div><h1 class="text-xl font-black sm:text-2xl">Korea365 BLOG · 즉시발행</h1><p class="text-xs text-slate-400">모든 블로그가 같은 n8n 발행 흐름을 사용합니다</p></div>
+    <a href="https://blog.korea365.org" class="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">BLOG 목록</a>
   </div>
 </header>
 
 <main class="mx-auto max-w-7xl space-y-5 p-4 sm:p-6">
 <section class="rounded-3xl border border-white/10 bg-slate-900 p-5">
-  <p class="text-xs font-black text-blue-300">n8n · 4 AGENTS</p>
-  <h2 class="mt-1 text-2xl font-black">글쓰기 실행</h2>
+  <p class="text-xs font-black text-blue-300">n8n · 통합 발행</p>
+  <h2 class="mt-1 text-2xl font-black">즉시발행</h2>
   <p id="modeDescription" class="mt-1 text-sm text-slate-400">자동 모드는 ① 키워드 → ② 글쓰기 → ③ 이미지 → ④ 발행·검증까지 진행합니다.</p>
 
   <div class="mt-4 flex flex-wrap gap-3" role="radiogroup" aria-label="실행 모드">
@@ -113,7 +113,7 @@
 
 <section>
   <div class="mb-3 flex items-center justify-between gap-3">
-    <div><p class="text-xs font-black text-slate-400">n8n 4-AGENT PIPELINE</p><h2 class="text-xl font-black">진행상태 · 고장 위치</h2></div>
+    <div><p class="text-xs font-black text-slate-400">n8n 통합 발행 흐름</p><h2 class="text-xl font-black">진행상태 · 고장 위치</h2></div>
     <div class="text-right text-xs text-slate-400"><div id="runId">실행 전</div><div id="pollState"></div></div>
   </div>
 

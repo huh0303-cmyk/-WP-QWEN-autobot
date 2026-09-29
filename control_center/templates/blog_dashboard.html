@@ -56,7 +56,7 @@
 <section class="hero">
 <div>
 <h1>블로그 발행</h1>
-<p>검색량과 미디어 언급량이 높은 주제를 먼저 고른 뒤 4-Agent가 순서대로 처리합니다.</p>
+<p>즉시발행은 모두 같은 n8n 흐름에서 주제 선정 → 글쓰기 → 이미지 → 발행·검증 순서로 처리합니다.</p>
 </div>
 <div class="badges">
 <span class="pill" id="count">68 cards</span>
@@ -65,7 +65,7 @@
 </div>
 </section>
 <section class="publisher">
-<div class="launchbar"><select id="publishSite" aria-label="발행할 블로그"><option value="">블로그 목록 불러오는 중…</option></select><select id="publishMode" aria-label="발행 방식"><option value="publish">최종 공개 발행</option><option value="draft">초안으로 저장</option></select><button id="startPublish" type="button">4-Agent 발행 시작 →</button></div>
+<div class="launchbar"><select id="publishSite" aria-label="발행할 블로그"><option value="">블로그 목록 불러오는 중…</option></select><select id="publishMode" aria-label="발행 방식"><option value="publish">최종 공개 발행</option><option value="draft">초안으로 저장</option></select><button id="startPublish" type="button">즉시발행 시작 →</button></div>
 <div class="steps"><div class="step primary"><strong>1. 핵심 주제어</strong>검색량 · Google/Naver 신호 · 미디어 언급량을 비교해 가장 유망한 주제 확정</div><div class="step"><strong>2. 글쓰기</strong>사이트별 페르소나 · 톤앤매너 · 언어 적용</div><div class="step"><strong>3. 이미지·카테고리</strong>무료 A Pexels → B Pixabay → C Wikimedia</div><div class="step"><strong>4. 발행·검증</strong>공개 URL · 글 ID · GSC 제출 상태 확인</div></div>
 </section>
 <section class="toolbar">
@@ -100,7 +100,7 @@ function cardHtml(c){
  const title=esc(c.name||c.url);
  const url=esc(c.url||'');
  const verified=c.google_indexed_verified_via==='gsc'?' · GSC':' · 연결 필요';
- const launch='/london-gpt?site_id='+encodeURIComponent(c.site_id||'')+'&mode=auto&publish=publish';
+ const launch='/publish?site_id='+encodeURIComponent(c.site_id||'')+'&mode=auto&publish=publish';
  return '<tr data-search="'+esc((c.name+' '+c.url+' '+c.platform).toLowerCase())+'"><td>'+rank+'</td><td><span class="platform">'+badge(c.platform)+'</span></td><td><a class="site" href="'+url+'" target="_blank" rel="noopener">'+title+'</a><div class="url">'+url+'</div></td><td>'+fmt(c.yesterday_visitors)+' '+delta(c.yesterday_visitors_delta)+'</td><td>'+esc(String(c.recent_publish_date||'미확인').replace('T',' ').slice(0,16))+'</td><td><span class="status '+status.cls+'">'+esc(status.text)+'</span></td><td>'+esc(String(c.opening_date||'미확인').slice(0,10))+'</td><td><a class="go" href="'+launch+'">즉시발행</a></td></tr>';
 }
 function render(){
@@ -127,7 +127,7 @@ async function load(){
 }
 document.getElementById('search').addEventListener('input',render);
 document.getElementById('refresh').addEventListener('click',load);
-document.getElementById('startPublish').addEventListener('click',()=>{const site=document.getElementById('publishSite').value;if(!site)return;location.href='/london-gpt?site_id='+encodeURIComponent(site)+'&mode=auto&publish='+encodeURIComponent(document.getElementById('publishMode').value);});
+document.getElementById('startPublish').addEventListener('click',()=>{const site=document.getElementById('publishSite').value;if(!site)return;location.href='/publish?site_id='+encodeURIComponent(site)+'&mode=auto&publish='+encodeURIComponent(document.getElementById('publishMode').value);});
 load();
 setInterval(load,300000);
 </script>

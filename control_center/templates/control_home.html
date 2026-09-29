@@ -156,7 +156,7 @@ async function loadBlog(){
  document.getElementById('blog-rows').innerHTML=(d.cards||[]).map(c=>{
   const p=(c.kind==='news'?'wordpress':String(c.platform||'')).toLowerCase(),label=c.kind==='news'?'NEWS':String(c.platform||'').toUpperCase();
   const monetized=!!(c.revenue&&c.revenue.monetized);
-  const launch=c.site_id?('/london-gpt?site_id='+encodeURIComponent(c.site_id)+'&mode=auto&publish=publish'):'https://blog.korea365.org';
+  const launch=c.site_id?('https://blog.korea365.org/publish?site_id='+encodeURIComponent(c.site_id)+'&mode=auto&publish=publish'):'https://blog.korea365.org';
   return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.row_number)+'</td><td><span class="platform-badge">'+esc(label)+'</span></td>'+
   '<td title="'+esc(c.name||c.url)+'"><a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+'</a></td>'+
   '<td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+visitorMetric(c)+'</td><td>'+gscMetric(c)+'</td><td>'+dateTime(c.recent_publish_date)+'</td><td>'+dateTime(c.opening_date)+'</td><td><a class="quick" href="'+esc(launch)+'">즉시발행</a></td></tr>';

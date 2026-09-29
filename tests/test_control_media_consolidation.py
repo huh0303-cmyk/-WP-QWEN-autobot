@@ -107,7 +107,10 @@ def test_visible_navigation_has_only_control_blog_and_combined_social():
 def test_quick_publish_links_reuse_existing_workflows():
     control = (ROOT / "control_center" / "templates" / "control_home.html").read_text(encoding="utf-8")
     london = (ROOT / "control_center" / "templates" / "london_gpt.html").read_text(encoding="utf-8")
-    assert "'/london-gpt?site_id='" in control
+    blog = (ROOT / "control_center" / "templates" / "blog_dashboard.html").read_text(encoding="utf-8")
+    assert "'https://blog.korea365.org/publish?site_id='" in control
+    assert "'/publish?site_id='" in blog
+    assert "/london-gpt?site_id=" not in control + blog
     assert "social-accounts?platform='+encodeURIComponent(c.platform||'통합')" in control
     assert "const launchSite=launchParams.get('site_id')||''" in london
     assert "refreshPlatform(launchSite)" in london
@@ -169,7 +172,8 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "1. 핵심 주제어" in blog
     assert "검색량 · Google/Naver 신호 · 미디어 언급량" in blog
     assert 'id="publishSite"' in blog
-    assert "4-Agent 발행 시작" in blog
+    assert "즉시발행 시작" in blog
+    assert "같은 n8n 흐름" in blog
     assert '<table class="ranking">' in blog
     assert '<table id="socialTable" class="account-table">' in social
     assert "YOUTUBE + SNS 생산·발행 통제실" in social
