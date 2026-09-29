@@ -10,6 +10,11 @@ on:
         options:
           - globalmusic
           - healing
+      retry_failed:
+        description: Preserve failed receipt and enqueue one replacement job
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -23,11 +28,12 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           CHANNEL: ${{ inputs.channel }}
+          RETRY_FAILED: ${{ inputs.retry_failed }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          envs: CHANNEL
+          envs: CHANNEL,RETRY_FAILED
           script: |
             set -euo pipefail
             cd /opt/korea365
@@ -41,6 +47,7 @@ jobs:
             from automation_hub.youtube_vps_queue import enqueue, queue_root
 
             channel = sys.argv[1]
+            retry_failed = __import__("os").environ.get("RETRY_FAILED", "false").lower() == "true"
             labels = {"globalmusic": "CAFE_ROMANTIC", "healing": "CAFE_HEALING"}
             if channel not in labels:
                 raise SystemExit("unsupported channel")
@@ -55,6 +62,8 @@ jobs:
                         continue
                     queued = datetime.fromtimestamp(float(row.get("queued_at", 0)), kst).date()
                     if row.get("channel_key") == channel and queued == today:
+                        if folder == "failed" and retry_failed:
+                            continue
                         print(json.dumps({"status": "already_queued_today", "channel": channel,
                                           "job_id": row.get("job_id"), "folder": folder}))
                         raise SystemExit(0)
