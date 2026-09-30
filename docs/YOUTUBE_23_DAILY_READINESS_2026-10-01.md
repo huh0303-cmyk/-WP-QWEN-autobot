@@ -261,3 +261,36 @@ working if access is revoked, unused for six months, or invalidated for other
 documented reasons. The project's OAuth publishing status has not yet been
 verified, so a one-time consent cannot be promised to last forever. Source:
 https://developers.google.com/identity/protocols/oauth2#expiration
+
+## Owner account selector and Japanese Survival renewal
+
+On 2026-10-01 KST the signed-in YouTube account switcher displayed all 23
+locked target channel names and handles under the same Google login. Japanese
+Survival showed `@seoul_japanese1`, matching the existing locked master (the
+older `@seoul_japanese` spelling in chat was stale). The Google OAuth selector
+listed one primary account and 22 brand accounts, but many brand names were
+historical aliases. The order of those two lists aligned with the eight
+already verified exact-ID grants; this is a navigation hint only, not an
+identity guarantee. Every new grant still requires a single exact
+`channels.list(mine=true)` UC ID match before any credential is stored.
+
+The owner approved the primary `CHRIS JUNGYOON HUH` Google account for
+Japanese Survival. The renewal tool returned the single locked ID
+`UCOWoNH_d6p45ywQ6W0Z1Jng` and stored only the `LANGUAGE_JA` refresh secret
+in the protected VPS and GitHub stores. The GitHub secret name and the
+non-secret server CONTROL receipt were independently confirmed; no token
+value was logged. This is account authorization, not a video upload or
+public-release receipt. Health_Clinic_Japan is the next owner approval in
+progress, with old Google selector name `K-KIDS`; its channel ID had not yet
+been accepted at the time of this entry.
+
+The owner then approved `K-KIDS` and `K-HEALING` in separate Google flows.
+Exact `mine=true` checks matched Health_Clinic_Japan
+`UCC_PcHMv-Uxpr00Pjw_J2Wg` and Health Clinic USA
+`UC91BpNSb4nUwD6jrpthK7FQ`, respectively. The `HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP`
+and `HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN` secrets were stored in the
+protected VPS and GitHub stores and non-secret CONTROL receipts were written.
+The historical brand names and Google brand IDs are locked in
+`config/youtube_oauth_brand_mapping.json` only as navigation hints. These
+authorizations do not certify that either health video has been produced or
+published.
