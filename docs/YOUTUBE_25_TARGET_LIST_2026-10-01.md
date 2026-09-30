@@ -33,3 +33,11 @@
 과거 실행키 `science`, `classical`, `myth`, `american_archive`, `classic_reads`는 위 25개 대상의 대체 이름이나 쇼핑 슬롯이 아니며 계속 실행 금지다. 저장소 secret 목록에서는 이 다섯 이름이 보이지 않았지만, GitHub `youtube-channels` 환경에는 `SCIENCE_FACTS_TIMES`, `MYTH_LEGEND_TIMES`, `CLASSIC_READS_TIMES` refresh-token Secret 이름이 남아 있었다. 값은 읽지 않았고 삭제도 확인되지 않았다. 이 상태를 24·25번 채널 생성이나 연결 완료로 해석하지 않는다.
 
 이 명단은 목적지 매핑이다. 매일 공개 여부는 채널별 정확한 OAuth ID, 승인된 소재·썸네일, 업로드 실행기, 실제 공개 영상 영수증으로 별도 확인한다.
+
+## 2026-10-01 KST 운영 상태 재대조
+
+- 기존 23개는 잠금된 UC ID와 공개 채널명이 확인됐다. 이 중 21개는 오늘 새 OAuth 승인 후 `mine=true` 정확한 UC ID 영수증이 VPS에 있고, `CAFE_ROMANTIC`과 `CAFE_HEALING`은 앞선 읽기 전용 인증 검사를 통과했다. `Seoul_Jisoo1`의 새 승인도 `UCAizx0tPkRSol8sIhanN_QQ`에 정확히 일치한다. 인증 성공은 공개 영상의 증거가 아니다.
+- VPS의 YouTube 15분 실행 타이머, 핵심 10개 향후 달력 보충 타이머, 23개 포함 일일 계획 타이머는 모두 `enabled/active`다. 핵심 실행기 등록 대상은 플레이리스트 5개와 지식 5개뿐이다. 언어 10개, 건강 2개, 서울지수 쇼핑 1개는 아직 같은 일일 제작·공개 실행기에 연결되지 않았다.
+- 10월 1일 일일 계획 파일은 전체 47슬롯 중 YouTube 23슬롯을 포함하지만, YouTube 슬롯 23개 모두 `publish_connected=false` 및 `blocked_auth`로 표시된다. 이는 계획용 감사 파일의 보수적 고정 상태이며 새 OAuth 승인 결과를 자동으로 반영하거나 영상을 올리는 실행기가 아니다. `blocked_auth`만 보고 갱신된 OAuth가 실패했다고 판단하지 않는다.
+- 10월 1일 03:04 KST의 공개 API 표본에서는 `CAFE_HEALING`에 오늘자 공개 영상 3건이 있었고 나머지 22개는 최신 5건 안에 당일 공개가 보이지 않았다. 그 뒤의 전체 23개 공개 영수증을 이번 재대조에서 수집하지 않았으므로 오늘 모두 1건씩 공개됐다고 주장할 수 없다. 같은 날짜의 공개 영상 중복 방지가 필요하다.
+- 24·25번은 핸들·UC ID·승인 토큰·발행기가 없는 **신규 채널 계획**이다. 옛 `SIS-Language Center/@sis_languagecenter`는 이 슬롯의 확인된 채널 ID가 아니며, 사용 금지 레거시 키 5개도 대체 채널이 아니다.
