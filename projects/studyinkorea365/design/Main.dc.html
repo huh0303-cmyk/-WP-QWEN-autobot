@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>한국 유학 대학 카드</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+body{margin:0;background:#F2F5F9;font-family:'Noto Sans KR',system-ui,sans-serif;color:#0F1B2D}
+[data-track]{scrollbar-width:none}
+[data-track]::-webkit-scrollbar{display:none}
+button{font-family:inherit;cursor:pointer}
+@keyframes mqL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes mqR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.mq{animation:none!important}}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="width:100%;max-width:1280px;margin:0 auto;box-sizing:border-box;padding:56px 32px 72px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+<div style="font-size:16px;font-weight:900;letter-spacing:.02em;color:#1D4ED8">StudyInKorea365.com</div>
+<div role="group" aria-label="Language" style="display:flex;gap:6px;background:#fff;border:1px solid #D5DDE9;border-radius:999px;padding:4px">
+<sc-for list="{{langs}}" as="l" hint-placeholder-count="4">
+<button onClick="{{l.pick}}" aria-pressed="{{l.on}}" style="min-height:44px;padding:0 16px;border-radius:999px;border:0;font-size:14px;font-weight:700;background:{{l.bg}};color:{{l.fg}}">{{l.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;max-width:780px">
+<h1 style="margin:0;font-size:40px;line-height:1.25;font-weight:900">{{t.h1}}</h1>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3D4A5E">{{t.intro}}</p>
+</div>
+
+<div style="position:relative;border-radius:24px;overflow:hidden;background:#0F1B2D;display:flex;flex-direction:column;gap:16px;padding:16px 0">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+<div style="overflow:hidden;width:100%">
+<div class="mq" style="display:flex;width:max-content;animation:{{r.anim}}">
+<sc-for list="{{r.imgs}}" as="m" hint-placeholder-count="8">
+<img src="{{m.src}}" alt="Korean university campus" style="width:400px;height:240px;object-fit:cover;border-radius:16px;margin-right:16px;flex:0 0 auto">
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(180deg,rgba(15,27,45,.35),rgba(15,27,45,.72));color:#fff;text-align:center;padding:24px;pointer-events:none">
+<div style="font-size:15px;font-weight:700;letter-spacing:.14em;color:#FCEBB5">{{t.tagTop}}</div>
+<div style="font-size:56px;line-height:1.1;font-weight:900">StudyInKorea365.com</div>
+<div style="font-size:18px;line-height:1.6;max-width:640px;color:#E4EAF5">{{t.heroSub}}</div>
+</div>
+</div>
+<div style="font-size:12px;color:#5B6B82;margin-top:-32px">{{t.photoCredit}}</div>
+
+<sc-for list="{{sections}}" as="sec" hint-placeholder-count="3">
+<section data-sec="1" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h2 style="margin:0;font-size:26px;font-weight:900">{{sec.title}}</h2>
+<div style="font-size:14px;line-height:1.6;color:#3D4A5E">{{sec.sub}}</div>
+</div>
+<div style="display:flex;gap:8px">
+<button aria-label="이전 카드" onClick="{{sec.prev}}" style="width:48px;height:48px;border-radius:24px;border:1px solid #B8C3D4;background:#fff;color:#0F1B2D;display:flex;align-items:center;justify-content:center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+</button>
+<button aria-label="다음 카드" onClick="{{sec.next}}" style="width:48px;height:48px;border-radius:24px;border:1px solid #0F1B2D;background:#0F1B2D;color:#fff;display:flex;align-items:center;justify-content:center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+</button>
+</div>
+</div>
+<div data-track="1" style="display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px">
+<sc-for list="{{sec.cards}}" as="c" hint-placeholder-count="4">
+<article style="flex:0 0 260px;scroll-snap-align:start;box-sizing:border-box;background:#fff;border:1px solid #D5DDE9;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+<div style="height:148px;position:relative;overflow:hidden;background:#DCE5F2;display:flex;align-items:center;justify-content:center;color:#5B6B82;font-size:13px">
+<sc-if value="{{c.hasImg}}" hint-placeholder-val="{{false}}"><img src="{{c.img}}" alt="{{c.name}}" style="width:100%;height:100%;object-fit:cover"></sc-if>
+<sc-if value="{{c.noImg}}" hint-placeholder-val="{{true}}"><span>{{t.photo}}</span></sc-if>
+<sc-if value="{{c.sample}}" hint-placeholder-val="{{false}}"><span style="position:absolute;left:10px;top:10px;font-size:11px;font-weight:700;color:#fff;background:rgba(15,27,45,.72);padding:3px 8px;border-radius:999px">{{t.sample}}</span></sc-if>
+</div>
+<div style="padding:18px 20px 20px;display:flex;flex-direction:column;gap:14px;flex-grow:1">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+<div style="font-size:13px;font-weight:700;color:{{sec.tagColor}};background:{{sec.tagBg}};padding:4px 10px;border-radius:999px">{{sec.tag}}</div>
+<sc-if value="{{c.gold}}" hint-placeholder-val="{{true}}">
+<svg width="44" height="52" viewBox="0 0 44 52" role="img" aria-label="우수인증 1등급 메달">
+<path d="M10 0h8l4 16-8 4z" fill="#1D4ED8"/><path d="M34 0h-8l-4 16 8 4z" fill="#1E3A8A"/>
+<circle cx="22" cy="31" r="17" fill="#E3A913" stroke="#B8860B" stroke-width="2"/>
+<circle cx="22" cy="31" r="12.5" fill="none" stroke="#FFF1B8" stroke-width="1.5"/>
+<text x="22" y="38" text-anchor="middle" font-size="20" font-weight="900" fill="#4A3300" font-family="Noto Sans KR, sans-serif">1</text>
+</svg>
+</sc-if>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<div style="font-size:21px;line-height:1.3;font-weight:900">{{c.name}}</div>
+<div style="font-size:14px;color:#3D4A5E">{{c.region}}</div>
+</div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;line-height:1.5;color:#3D4A5E;border-top:1px solid #E4EAF2;padding-top:12px">{{sec.note}}</div>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+</sc-for>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h2 style="margin:0;font-size:26px;font-weight:900">{{t.visaTitle}}</h2>
+<div style="font-size:14px;line-height:1.6;color:#3D4A5E">{{t.visaSub}}</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+<sc-for list="{{visa}}" as="v" hint-placeholder-count="3">
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:13px;font-weight:700;color:{{v.fg}};background:{{v.bg}};padding:4px 10px;border-radius:999px;align-self:flex-start">{{v.tag}}</div>
+<div style="font-size:15px;line-height:1.7">{{v.text}}</div>
+</div>
+</sc-for>
+</div>
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+<div style="font-size:16px;font-weight:900">{{t.vnTitle}}</div>
+<div style="font-size:14px;line-height:1.7;color:#3D4A5E">{{t.vnBody}}</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:14px">
+<a href="https://www.studyinkorea.go.kr/ko/plan/visaAndStay.do">Study in Korea · Visa</a>
+<a href="https://www.immigration.go.kr/bbs/immigration/214/490761/download.do">{{t.pressLink}}</a>
+<a href="https://www.hikorea.go.kr">HiKorea</a>
+</div>
+</div>
+</section>
+
+<div style="font-size:13px;line-height:1.7;color:#3D4A5E;border-top:1px solid #D5DDE9;padding-top:20px">{{t.source}}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2400}}'>
+const I18N = {
+  ko: {
+    heroSub: '한국 유학의 모든 것. 대학 등급과 비자 정책을 한곳에서.', sample: '예시 이미지', photoCredit: '사진: Pexels (무료 라이선스)',
+    h1: '교육부 인증 등급별 대학, 카드를 밀어서 비교하세요',
+    intro: '교육국제화역량 인증제(IEQAS) 등급 기준입니다. 우수인증 대학은 비자 심사 간소화와 장학 우대가 추가됩니다. 지원 조건(TOPIK, 학비, 마감)은 대학별로 확인되는 대로 채워집니다.',
+    tagTop: '우수인증 · 1등급', photo: '학교 사진 추가 예정',
+    s1: '우수인증 대학', s1sub: '일반대학 {n}개 · 비자 심사 간소화 + 장학 우대',
+    s2: '인증 대학', s2sub: '대표 {n}개교 · 비자 간소화 적용',
+    s3: '일반(미인증) 대학', s3sub: '비자정밀심사대학 일부 · 지원 전 유학원 확인 필수',
+    t1: '우수인증', t2: '인증', t3: '주의',
+    n1: '학비 · TOPIK · 마감일 확인 중', n2: '학비 · TOPIK · 마감일 확인 중', n3: '비자정밀심사대학 · 2026년 2학기부터 1년간 신규 비자 발급 원칙적 제한',
+    visaTitle: '비자 정책 안내', visaSub: '법무부·교육부 2026.2.12 발표 기준 요약입니다.',
+    v1: '표준입학허가서만으로 비자 심사. 가장 간소화된 절차입니다.',
+    v2: '표준입학허가서만으로 심사하되, 법무부 고시 국가·중점관리국가 출신은 재정능력 입증서류를 추가로 냅니다.',
+    v3: '2026년 2학기부터 1년간 비자 발급이 원칙적으로 제한됩니다(학위과정 16개교, 어학연수 4개교).',
+    vnTitle: '베트남 학생 안내', vnBody: '베트남 국적에 대한 별도 조항은 이번 발표에 없습니다. 재정 증빙 금액과 TOPIK 요건은 확인 중이며, 아래 공식 사이트에서 최신 기준을 확인하세요.',
+    pressLink: '법무부 보도자료(2026.2.12)',
+    source: '출처: 교육부·법무부 「2025년 교육국제화역량 인증대학 및 유학생 비자정밀 심사대학 발표」(2026.2.12), Study in Korea. 등급은 매년 갱신됩니다. 이 페이지는 입학이나 비자 발급을 보장하지 않습니다.'
+  },
+  vi: {
+    heroSub: 'Mọi thông tin du học Hàn Quốc: hạng trường và chính sách visa tại một nơi.', sample: 'Ảnh minh họa', photoCredit: 'Ảnh: Pexels (giấy phép miễn phí)',
+    h1: 'Các trường theo hạng chứng nhận của Bộ Giáo dục, vuốt thẻ để so sánh',
+    intro: 'Phân hạng theo Chế độ chứng nhận năng lực quốc tế hóa giáo dục (IEQAS). Trường Ưu tú được xét visa đơn giản hơn và ưu tiên học bổng. Điều kiện nhập học (TOPIK, học phí, hạn nộp) sẽ được cập nhật theo từng trường.',
+    tagTop: 'Chứng nhận Ưu tú · Hạng 1', photo: 'Sắp cập nhật ảnh trường',
+    s1: 'Trường Chứng nhận Ưu tú', s1sub: '{n} trường đại học · xét visa đơn giản + ưu tiên học bổng',
+    s2: 'Trường Chứng nhận', s2sub: '{n} trường tiêu biểu · áp dụng xét visa đơn giản',
+    s3: 'Trường thông thường (chưa chứng nhận)', s3sub: 'Một số trường bị xét visa nghiêm ngặt · hãy hỏi trung tâm du học trước khi nộp hồ sơ',
+    t1: 'Ưu tú', t2: 'Chứng nhận', t3: 'Lưu ý',
+    n1: 'Học phí · TOPIK · hạn nộp: đang cập nhật', n2: 'Học phí · TOPIK · hạn nộp: đang cập nhật', n3: 'Trường xét visa nghiêm ngặt · hạn chế cấp visa mới trong 1 năm từ học kỳ 2 năm 2026',
+    visaTitle: 'Chính sách visa', visaSub: 'Tóm tắt theo thông báo của Bộ Tư pháp và Bộ Giáo dục ngày 12/2/2026.',
+    v1: 'Chỉ xét theo Giấy báo nhập học tiêu chuẩn. Thủ tục đơn giản nhất.',
+    v2: 'Xét theo Giấy báo nhập học tiêu chuẩn; học sinh từ các nước trong danh sách của Bộ Tư pháp phải nộp thêm giấy tờ chứng minh tài chính.',
+    v3: 'Hạn chế cấp visa trong 1 năm từ học kỳ 2 năm 2026 (16 trường hệ học vị, 4 trường hệ tiếng).',
+    vnTitle: 'Dành cho học sinh Việt Nam', vnBody: 'Thông báo lần này không có điều khoản riêng cho quốc tịch Việt Nam. Mức chứng minh tài chính và yêu cầu TOPIK đang được xác minh; vui lòng kiểm tra tiêu chuẩn mới nhất tại các trang chính thức bên dưới.',
+    pressLink: 'Thông cáo Bộ Tư pháp (12/2/2026)',
+    source: 'Nguồn: Bộ Giáo dục · Bộ Tư pháp Hàn Quốc, Study in Korea. Hạng chứng nhận được cập nhật hằng năm. Trang này không đảm bảo trúng tuyển hay cấp visa.'
+  },
+  en: {
+    heroSub: 'Everything about studying in Korea: university tiers and visa policy in one place.', sample: 'Sample image', photoCredit: 'Photos: Pexels (free license)',
+    h1: 'Korean universities by Ministry of Education certification tier. Swipe to compare.',
+    intro: 'Tiers follow the IEQAS (Education Internationalization Capability Certification). Excellent-certified universities get a simpler visa review and scholarship priority. Admission requirements (TOPIK, tuition, deadlines) are added school by school.',
+    tagTop: 'Excellent · Tier 1', photo: 'Campus photo coming soon',
+    s1: 'Excellent-certified universities', s1sub: '{n} universities · simplified visa review + scholarship priority',
+    s2: 'Certified universities', s2sub: '{n} featured schools · simplified visa review',
+    s3: 'General (uncertified) universities', s3sub: 'Some visa-scrutiny schools · check with your agency before applying',
+    t1: 'Excellent', t2: 'Certified', t3: 'Caution',
+    n1: 'Tuition · TOPIK · deadline: being verified', n2: 'Tuition · TOPIK · deadline: being verified', n3: 'Visa-scrutiny school · new student visas restricted for one year from 2026 fall semester',
+    visaTitle: 'Visa policy', visaSub: 'Summary of the Ministry of Justice / Ministry of Education announcement of 12 Feb 2026.',
+    v1: 'Reviewed on the standard admission letter alone. The most simplified process.',
+    v2: 'Reviewed on the standard admission letter, but applicants from countries designated by the Ministry of Justice must also submit proof of financial capacity.',
+    v3: 'New visa issuance is restricted in principle for one year from the 2026 second semester (16 degree-program schools, 4 language-program schools).',
+    vnTitle: 'For Vietnamese students', vnBody: 'The announcement has no separate rule for Vietnamese nationals. Financial-proof amounts and TOPIK requirements are still being verified; check the latest rules on the official sites below.',
+    pressLink: 'Ministry of Justice release (12 Feb 2026)',
+    source: 'Sources: Korean Ministry of Education and Ministry of Justice, Study in Korea. Tiers are renewed every year. This page does not guarantee admission or a visa.'
+  },
+  ne: {
+    heroSub: 'कोरियामा अध्ययनको सबै जानकारी: विश्वविद्यालय तह र भिसा नीति एकै ठाउँमा।', sample: 'नमुना तस्बिर', photoCredit: 'फोटो: Pexels (निःशुल्क लाइसेन्स)',
+    h1: 'शिक्षा मन्त्रालयको प्रमाणीकरण तह अनुसार विश्वविद्यालय, तुलना गर्न कार्ड स्वाइप गर्नुहोस्',
+    intro: 'यो IEQAS (शिक्षा अन्तर्राष्ट्रियकरण क्षमता प्रमाणीकरण) तह अनुसार हो। उत्कृष्ट प्रमाणित विश्वविद्यालयमा भिसा जाँच सरल हुन्छ र छात्रवृत्तिमा प्राथमिकता पाइन्छ। भर्ना सर्त (TOPIK, शुल्क, अन्तिम मिति) विश्वविद्यालय अनुसार थपिँदै जानेछ।',
+    tagTop: 'उत्कृष्ट प्रमाणित · तह १', photo: 'क्याम्पस फोटो छिट्टै आउँछ',
+    s1: 'उत्कृष्ट प्रमाणित विश्वविद्यालय', s1sub: '{n} विश्वविद्यालय · सरल भिसा जाँच + छात्रवृत्ति प्राथमिकता',
+    s2: 'प्रमाणित विश्वविद्यालय', s2sub: '{n} प्रतिनिधि विश्वविद्यालय · सरल भिसा जाँच',
+    s3: 'सामान्य (अप्रमाणित) विश्वविद्यालय', s3sub: 'कडा भिसा जाँच हुने केही विश्वविद्यालय · आवेदन अघि एजेन्सीसँग सोध्नुहोस्',
+    t1: 'उत्कृष्ट', t2: 'प्रमाणित', t3: 'सावधानी',
+    n1: 'शुल्क · TOPIK · अन्तिम मिति: जाँच हुँदैछ', n2: 'शुल्क · TOPIK · अन्तिम मिति: जाँच हुँदैछ', n3: 'कडा भिसा जाँच हुने विश्वविद्यालय · २०२६ दोस्रो सेमेस्टरदेखि १ वर्ष नयाँ भिसा सीमित',
+    visaTitle: 'भिसा नीति', visaSub: 'न्याय मन्त्रालय र शिक्षा मन्त्रालयको २०२६ फेब्रुअरी १२ को घोषणाको सारांश।',
+    v1: 'मानक भर्ना पत्रकै आधारमा भिसा जाँच। सबैभन्दा सरल प्रक्रिया।',
+    v2: 'मानक भर्ना पत्रका आधारमा जाँच हुन्छ, तर न्याय मन्त्रालयले तोकेका देशका आवेदकले आर्थिक क्षमताको प्रमाण पनि बुझाउनुपर्छ।',
+    v3: '२०२६ को दोस्रो सेमेस्टरदेखि १ वर्षसम्म नयाँ भिसा जारी गर्न सामान्यतया रोकिन्छ (डिग्री कार्यक्रम १६, भाषा कार्यक्रम ४ विश्वविद्यालय)।',
+    vnTitle: 'भियतनामी विद्यार्थीका लागि', vnBody: 'यस घोषणामा भियतनामी नागरिकका लागि छुट्टै नियम उल्लेख छैन। आर्थिक प्रमाणको रकम र TOPIK सर्त जाँच हुँदैछ; तलका आधिकारिक साइटमा पछिल्लो नियम हेर्नुहोस्।',
+    pressLink: 'न्याय मन्त्रालयको विज्ञप्ति (२०२६.२.१२)',
+    source: 'स्रोत: कोरियाको शिक्षा मन्त्रालय र न्याय मन्त्रालय, Study in Korea। तह प्रत्येक वर्ष नवीकरण हुन्छ। यो पृष्ठले भर्ना वा भिसाको ग्यारेन्टी गर्दैन।'
+  }
+};
+const LANGS = [['vi','Tiếng Việt'],['en','English'],['ko','한국어'],['ne','नेपाली']];
+const PHOTOS = {'건국대학교':'/_blob/3031fa3348a4686a39f98c113c393cc5','경희대학교':'/_blob/7fa8f7b0d93283181d5621427b223bd2','이화여자대학교':'/_blob/962bd5f6cfbe9997ff50374ff712e7fb'};
+const POOL = ['0ab88a769c936ed4f5f8216014ab2bf7','597f201b3bceb82d3d7bfb46496569d1','d783cbd789bc258c41699611526c5ab6','9214273bd7601e67c891bbe772c08c0d','f961368217cb292a450c55e7451bd952','fdbbc7f899fee8ba7fc7e2d37a50fef8','a843d2e60b61e70749be4c375bfbeb5c'];
+const ROWS = [['0ab88a769c936ed4f5f8216014ab2bf7','962bd5f6cfbe9997ff50374ff712e7fb','597f201b3bceb82d3d7bfb46496569d1','3031fa3348a4686a39f98c113c393cc5','9214273bd7601e67c891bbe772c08c0d'],['f961368217cb292a450c55e7451bd952','d783cbd789bc258c41699611526c5ab6','7fa8f7b0d93283181d5621427b223bd2','fdbbc7f899fee8ba7fc7e2d37a50fef8','0ab88a769c936ed4f5f8216014ab2bf7'],['597f201b3bceb82d3d7bfb46496569d1','9214273bd7601e67c891bbe772c08c0d','a843d2e60b61e70749be4c375bfbeb5c','962bd5f6cfbe9997ff50374ff712e7fb','d783cbd789bc258c41699611526c5ab6']];
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const lang = st.lang || 'vi';
+    const t = I18N[lang];
+    const scroller = (dir) => (e) => {
+      const sec = e.currentTarget.closest('[data-sec]');
+      const tr = sec && sec.querySelector('[data-track]');
+      if (tr) tr.scrollBy({ left: dir * 540, behavior: 'smooth' });
+    };
+    let k = 0;
+    const mk = (arr) => arr.map((n) => {
+      const own = PHOTOS[n[0]];
+      const img = own || ('/_blob/' + POOL[(k++) % POOL.length]);
+      return { name: n[0], region: n[1], img: img, hasImg: true, noImg: false, sample: !own };
+    });
+    const top = mk([
+      ['건국대학교','서울'],['건양대학교','대전·논산'],['경북대학교','대구'],['경성대학교','부산'],['경희대학교','서울·수원'],
+      ['계명대학교','대구'],['고려대학교','서울'],['단국대학교','용인·천안'],['덕성여자대학교','서울'],['동국대학교','서울'],
+      ['부산대학교','부산'],['부산외국어대학교','부산'],['서경대학교','서울'],['서울시립대학교','서울'],['서울신학대학교','부천'],
+      ['서울여자대학교','서울'],['선문대학교','아산'],['성결대학교','안양'],['성균관대학교','서울·수원'],['성신여자대학교','서울'],
+      ['세종대학교','서울'],['숙명여자대학교','서울'],['아주대학교','수원'],['울산과학기술원 UNIST','울산'],['이화여자대학교','서울'],
+      ['인하대학교','인천'],['제주대학교','제주'],['중부대학교','고양·금산'],['중앙대학교','서울'],['충남대학교','대전'],
+      ['포항공과대학교 POSTECH','포항'],['한국항공대학교','고양'],['한성대학교','서울'],['한양대학교','서울·안산'],['홍익대학교','서울·세종']
+    ]);
+    const cert = mk([
+      ['서울대학교','서울'],['연세대학교','서울·원주'],['서강대학교','서울'],['한국외국어대학교','서울·용인'],['숭실대학교','서울'],
+      ['국민대학교','서울'],['광운대학교','서울'],['가천대학교','성남'],['동아대학교','부산'],['경기대학교','수원·서울']
+    ]);
+    const gen = mk([
+      ['금강대학교','충남 논산'],['수원가톨릭대학교','화성'],['중앙승가대학교','김포'],['협성대학교','화성'],
+      ['부산경상대학교','부산'],['부산예술대학교','부산'],['한영대학교','전남 영암']
+    ]);
+    const rows = ROWS.map((r, i) => ({
+      imgs: r.concat(r).map((id) => ({ src: '/_blob/' + id })),
+      anim: (i === 1 ? 'mqR' : 'mqL') + ' ' + (60 + i * 12) + 's linear infinite'
+    }));
+    return {
+      t: t,
+      langs: LANGS.map((l) => ({
+        label: l[1], on: lang === l[0],
+        bg: lang === l[0] ? '#0F1B2D' : 'transparent', fg: lang === l[0] ? '#FFFFFF' : '#0F1B2D',
+        pick: () => this.setState({ lang: l[0] })
+      })),
+      rows: rows,
+      sections: [
+        { title: t.s1, sub: t.s1sub.replace('{n}', top.length), tag: t.t1, tagColor: '#5C3B00', tagBg: '#FCEBB5', note: t.n1, cards: top.map((c) => Object.assign({}, c, { gold: true })), prev: scroller(-1), next: scroller(1) },
+        { title: t.s2, sub: t.s2sub.replace('{n}', cert.length), tag: t.t2, tagColor: '#0B3B8F', tagBg: '#DCE8FF', note: t.n2, cards: cert.map((c) => Object.assign({}, c, { gold: false })), prev: scroller(-1), next: scroller(1) },
+        { title: t.s3, sub: t.s3sub, tag: t.t3, tagColor: '#7A1F12', tagBg: '#FFE0DA', note: t.n3, cards: gen.map((c) => Object.assign({}, c, { gold: false })), prev: scroller(-1), next: scroller(1) }
+      ],
+      visa: [
+        { tag: t.t1, text: t.v1, fg: '#5C3B00', bg: '#FCEBB5' },
+        { tag: t.t2, text: t.v2, fg: '#0B3B8F', bg: '#DCE8FF' },
+        { tag: t.t3, text: t.v3, fg: '#7A1F12', bg: '#FFE0DA' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
