@@ -7,8 +7,8 @@ def test_every_non_youtube_target_is_planned_daily(monkeypatch):
     monkeypatch.setattr(planner, "ROOT", planner.Path(__file__).resolve().parents[1])
     payload = planner.build(date(2026, 9, 25))
     non_youtube = [row for row in payload["slots"] if row["platform"] != "YouTube"]
-    assert len(non_youtube) == 28
-    for platform in ("Instagram", "Threads"):
+    assert len(non_youtube) == 20
+    for platform in ("Instagram", "Threads", "Facebook", "TikTok"):
         assert len([row for row in non_youtube if row["platform"] == platform]) == 4
     assert {row["cadence"] for row in non_youtube} == {"1_per_day"}
     assert len({row["duplicate_key"] for row in payload["slots"]}) == len(payload["slots"])
