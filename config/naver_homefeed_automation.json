@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "selected_site_id": "naver_n3",
+  "blog_id": "sky-only",
+  "display_name": "생활의정석",
+  "timezone": "Asia/Seoul",
+  "objective": "네이버 검색·홈 추천에서 신뢰를 쌓아 장기 방문과 합법적 수익 기회를 늘린다",
+  "cadence": {
+    "daily_min": 1,
+    "daily_max": 5,
+    "minimum_interval_minutes": 10,
+    "preferred_slots_kst": [
+      "09:17",
+      "11:43",
+      "14:19",
+      "17:11",
+      "20:37"
+    ],
+    "never_bulk_publish": true
+  },
+  "workflow": [
+    "current_keyword_research",
+    "official_source_verification",
+    "original_title_and_body",
+    "copyright_safe_original_image",
+    "editorial_quality_review",
+    "naver_editor_save_or_publish",
+    "public_url_verification"
+  ],
+  "publishing": {
+    "default": "public_after_editorial_review",
+    "draft_save_supported": true,
+    "require_public_url_verification": true,
+    "owner_authorized_reviewed_public_posts": true
+  },
+  "topics": {
+    "priority": [
+      "정책지원·생활혜택",
+      "검색 수요가 있는 생활제도",
+      "지역 맛집과 실제 방문 정보",
+      "실용 쇼핑과 생활용품 비교",
+      "저작권 안전한 문화·트렌드 해설"
+    ],
+    "blocked": [
+      "확인되지 않은 연예 가십",
+      "허위 또는 종료된 지원금",
+      "의학적 진단이나 치료 지시",
+      "투자 수익 보장",
+      "원문 짜깁기 또는 무단 사진",
+      "제휴 표시 없는 광고성 링크"
+    ]
+  },
+  "quality_gate": {
+    "official_source_required_for_policy_posts": true,
+    "minimum_body_chars": 1200,
+    "duplicate_title_and_body_check": true,
+    "natural_korean_edit_required": true,
+    "ban_ai_meta_phrases": true,
+    "image_count": 1,
+    "source_attribution_required": true,
+    "affiliate_disclosure_required": true
+  }
+}

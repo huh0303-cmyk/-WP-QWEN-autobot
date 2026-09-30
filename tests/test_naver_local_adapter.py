@@ -1,6 +1,35 @@
 import unittest
 
-from automation_hub.naver_local_adapter import html_to_naver_text
+from automation_hub.naver_local_adapter import NaverLocalPublisher, html_to_naver_text
+from automation_hub.publishing import PublishJob
+
+
+class _Visible:
+    def __init__(self):
+        self.clicked = False
+
+    def click(self):
+        self.clicked = True
+
+    def is_visible(self, timeout=0):
+        return True
+
+
+class _TextLookup:
+    def __init__(self, locator):
+        self.first = locator
+
+
+class _DraftPage:
+    def __init__(self):
+        self.confirmation = _Visible()
+        self.waited = 0
+
+    def wait_for_timeout(self, milliseconds):
+        self.waited = milliseconds
+
+    def get_by_text(self, _pattern):
+        return _TextLookup(self.confirmation)
 
 
 class NaverLocalAdapterTests(unittest.TestCase):
@@ -13,6 +42,29 @@ class NaverLocalAdapterTests(unittest.TestCase):
 
     def test_entities_are_decoded(self):
         self.assertEqual("A & B", html_to_naver_text("<p>A &amp; B</p>"))
+
+    def test_draft_mode_clicks_save_and_requires_confirmation(self):
+        publisher = NaverLocalPublisher("naver_n3", "https://example.test", "sky-only")
+        save_button = _Visible()
+        publisher._first_visible = lambda _page, _selectors: save_button
+        job = PublishJob("job-1", "naver_n3", "제목", "<p>본문</p>", publish_now=False)
+
+        result = publisher.submit(_DraftPage(), job)
+
+        self.assertTrue(result.ok)
+        self.assertEqual("draft_saved", result.status)
+        self.assertTrue(save_button.clicked)
+
+    def test_selected_homefeed_policy_is_safe_and_rate_limited(self):
+        import json
+        from pathlib import Path
+
+        policy = json.loads((Path(__file__).parents[1] / "config" / "naver_homefeed_automation.json").read_text(encoding="utf-8"))
+        self.assertEqual("naver_n3", policy["selected_site_id"])
+        self.assertEqual(5, policy["cadence"]["daily_max"])
+        self.assertGreaterEqual(policy["cadence"]["minimum_interval_minutes"], 10)
+        self.assertTrue(policy["quality_gate"]["official_source_required_for_policy_posts"])
+        self.assertTrue(policy["quality_gate"]["source_attribution_required"])
 
 
 if __name__ == "__main__":

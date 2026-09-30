@@ -23,14 +23,15 @@ def test_catalog_contains_verified_platform_destinations():
     assert not {"wp_koreamedicaltour1", "wp_kworld365_kpop", "wp_seoul_intl_school_guide"} & {
         item["site_id"] for item in wordpress
     }
-    assert all(item["enabled"] for item in sites)
+    assert all(item["enabled"] for item in sites if item["platform"] != "naver")
     assert [item["url"] for item in sites if item["platform"] == "naver"] == [
         "https://blog.naver.com/k-insight-vietnam", "https://blog.naver.com/health-standard", "https://blog.naver.com/sky-only",
     ]
     assert next(item for item in sites if item["site_id"] == "naver_n2")["editor_url"].endswith("blogId=health-standard")
     assert next(item for item in sites if item["site_id"] == "tistory_ktrip365")["editor_url"].endswith("/manage/newpost")
     assert all(not item["auto_publish"] for item in sites if item["platform"] in {"naver", "tistory"})
-    assert manual_profile("naver_n2")[0] == "naver"
+    assert [item["site_id"] for item in sites if item["platform"] == "naver" and item["enabled"]] == ["naver_n3"]
+    assert manual_profile("naver_n3")[0] == "naver"
     assert manual_profile("tistory_ktrip365")[0] == "tistory"
 
 

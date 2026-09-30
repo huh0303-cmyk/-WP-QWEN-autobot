@@ -31,6 +31,10 @@ class NaverEditorSelectors:
         ".se-text-paragraph",
         "[contenteditable='true'][data-placeholder*='내용']",
     )
+    save_draft: tuple[str, ...] = (
+        "button:has-text('저장')",
+        "button:has-text('임시저장')",
+    )
 
 
 class NaverLocalPublisher:
@@ -92,10 +96,17 @@ class NaverLocalPublisher:
 
     def submit(self, page, job: PublishJob) -> PublishResult:
         if not job.publish_now:
+            save = self._first_visible(page, self.selectors.save_draft)
+            if save is None:
+                raise RuntimeError("네이버 임시저장 버튼을 찾지 못했습니다.")
+            save.click()
+            page.wait_for_timeout(1000)
+            confirmation = page.get_by_text(re.compile("임시저장이 완료|저장되었습니다")).first
+            if not confirmation.is_visible(timeout=3000):
+                raise RuntimeError("네이버 임시저장 완료 문구를 확인하지 못했습니다.")
             return PublishResult(
-                False, "naver", self.site_id, job.job_id, "review_ready",
-                error_code="manual_review_requested",
-                message="본문 입력 완료. publish_now=FALSE이므로 사용자가 검토 후 발행해야 합니다.",
+                True, "naver", self.site_id, job.job_id, "draft_saved",
+                message="제목과 본문 입력 후 네이버 임시저장 완료를 확인했습니다.",
             )
         publish = page.get_by_role("button", name=re.compile("^발행$|발행하기")).first
         if not publish.is_visible(timeout=3000):

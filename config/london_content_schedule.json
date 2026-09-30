@@ -143,10 +143,19 @@
       "randomized_time": true
     },
     "naver": {
-      "target": "1_public_post_per_verified_account_per_day",
+      "selected_site_id": "naver_n3",
+      "target": "1_to_5_reviewed_public_posts_per_day_on_selected_account",
+      "daily_min": 1,
+      "daily_max": 5,
       "weekly_target": 7,
+      "weekly_target_min": 7,
+      "weekly_target_max": 35,
+      "minimum_interval_minutes": 10,
       "randomized_time": true,
-      "public_requires_local_write_verification": true
+      "public_requires_local_write_verification": true,
+      "official_source_required_for_policy_posts": true,
+      "copyright_safe_original_image_required": true,
+      "never_bulk_publish": true
     },
     "youtube_daily_additional": {
       "channel_count": 3,

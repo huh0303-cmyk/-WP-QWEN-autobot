@@ -65,11 +65,16 @@ def content_sites() -> list[dict]:
                       "url": f"https://blog.naver.com/{blog_id}" if blog_id else "",
                       "editor_url": room.get("editor_url") or (f"https://blog.naver.com/{blog_id}?Redirect=Write" if blog_id else ""),
                       "label": room.get("name") or room["room_id"],
-                      "enabled": bool(blog_id), "auto_publish": False,
-                      "unavailable_reason": "블로그 ID 연결 필요" if not blog_id else "",
+                      "enabled": bool(blog_id and room.get("enabled")), "auto_publish": False,
+                      "unavailable_reason": (
+                          "블로그 ID 연결 필요" if not blog_id else
+                          "선택되지 않은 네이버 계정" if not room.get("enabled") else ""
+                      ),
                       "language": room.get("language", "ko"),
-                      "persona": "한국어 생활정보 블로그 편집자", "tone": "명확하고 실용적인 한국어 안내",
-                      "theme": "한국 생활정보", "categories": []})
+                      "persona": room.get("persona") or "한국어 생활정보 블로그 편집자",
+                      "tone": room.get("tone") or "명확하고 실용적인 한국어 안내",
+                      "theme": room.get("theme") or "한국 생활정보",
+                      "categories": list(room.get("categories") or [])})
     return sites
 
 
