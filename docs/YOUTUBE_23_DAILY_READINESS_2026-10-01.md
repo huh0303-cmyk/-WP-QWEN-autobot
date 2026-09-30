@@ -356,3 +356,12 @@ GitHub `youtube-channels` environment. The non-secret VPS receipt and GitHub
 environment secret name were checked independently. The Google brand selector
 ID `101469748905879577842` is recorded as a navigation hint only. No video
 upload or public-release receipt is implied.
+
+The owner then approved Portuguese Survival and Vietnamese Survival in
+separate Google flows. Exact `mine=true` checks matched their locked IDs
+`UCKvKhETLGPaRV3qfWv2bM2g` and `UCRZ0uc_bxKDMwz3noBBi9KQ`. Their
+protected VPS grants, non-secret receipts, and GitHub `youtube-channels`
+environment secret names `YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT` and
+`YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI` were checked. Historical Google
+brand aliases `K-health 365` and `비영리한국유학협회KSA` are navigation hints
+confirmed only by those exact-ID results. No public videos were established.
