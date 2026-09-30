@@ -174,7 +174,7 @@ def youtube_rows(horizon: dt.date, existing, channels):
                 f"{due} {minute} KST", platform, name, "YouTube channel", channel["language"],
                 topic, topic, "장편 지식 영상" if is_knowledge else "장시간 플레이리스트",
                 "공식·퍼블릭도메인 영상 우선" if is_knowledge else "FLUX 실사형 이미지·채널별 오디오",
-                "자료·권리·렌더 검증 후 비공개 업로드",
+                "자료·권리·렌더·채널 ID 검증 후 즉시 공개",
                 "화면관련≥65·일치도≥80" if is_knowledge else "채널분리·실사품질·권리검수",
                 "기획확정·자료준비", "", "비공개 링크 생성 후 토큰 없는 이메일 보고",
             ])

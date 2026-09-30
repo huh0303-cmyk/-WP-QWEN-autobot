@@ -44,7 +44,7 @@ YT_CONTRACT = {
         "channel_groups": ["PLAYLIST"],
         "inputs": {"room_id": "room.room_id", "channel": "room.account_id"},
         "required_inputs": ["room_id", "channel"],
-        "safe_policy": "private",
+        "safe_policy": "public",
         "artifact_kind": "youtube_video_id",
     }
 }
@@ -76,7 +76,7 @@ def _yt_room(**overrides) -> AutomationRoom:
         room_id="yt_test", platform="youtube", name="Test Channel",
         enabled=True, workflow="generate-youtube-playlist.yml",
         destination_id="UC0000000000000000000000",
-        group="PLAYLIST", publish_policy="private", duplicate_guard=True,
+        group="PLAYLIST", publish_policy="public", duplicate_guard=True,
     )
     base.update(overrides)
     return AutomationRoom.from_dict(base)
@@ -255,14 +255,14 @@ def test_scheduler_managed_room_is_not_in_generic_dispatch_list():
     assert plan["scheduler_managed"][0]["room_id"] == "blogger_test"
 
 
-# ---- YouTube payload can never request PUBLIC --------------------------------------
+# ---- YouTube public policy is carried by the registry, never an unchecked payload --
 
-def test_youtube_dispatch_payload_cannot_request_public():
+def test_youtube_dispatch_payload_uses_public_registry_policy_without_public_input():
     room = _yt_room(destination_id="UCbJfEtsffpgI5MsKkB7BYvQ")
     result = evaluate_room(room, YT_CONTRACT, NOW)
     assert result.eligible
     assert "public" not in {str(v).lower() for v in result.inputs.values()}
-    assert room.publish_policy == "private"
+    assert room.publish_policy == "public"
 
 
 def test_publication_approved_is_always_forced_false_even_if_room_tries_true():

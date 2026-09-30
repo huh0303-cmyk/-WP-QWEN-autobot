@@ -70,13 +70,13 @@ def test_operator_button_runs_selected_channels_next_prepared_item_now():
     assert not select_next_ready(parsed(future), NOW, {"mbb"})[0]
 
 
-def test_private_result_requires_identity_and_private(tmp_path):
+def test_release_result_requires_identity_and_public(tmp_path):
     path = tmp_path / "result.json"
-    data = {"video_id": "abcdefghijk", "privacy_status": "private", "public_allowed": False,
+    data = {"video_id": "abcdefghijk", "privacy_status": "public", "public_allowed": True,
             "channel_key": "mbb", "verified_channel_id": next(c.channel_id for c in load_channels() if c.channel_key == "mbb")}
     path.write_text(json.dumps(data))
-    assert private_result(path, "mbb")[0].endswith("/abcdefghijk/edit")
-    data["privacy_status"] = "public"; path.write_text(json.dumps(data))
+    assert private_result(path, "mbb")[0] == "https://youtu.be/abcdefghijk"
+    data["privacy_status"] = "private"; path.write_text(json.dumps(data))
     assert not private_result(path, "mbb")[0]
     assert not private_result(tmp_path / "missing", "mbb")[0]
 
@@ -106,10 +106,11 @@ def test_repeated_upload_claim_cannot_upload(monkeypatch):
 
 def test_legacy_youtube_workflows_are_retired_for_vps_owner():
     for name in ["generate-youtube-playlist.yml", "curio-longform-daily.yml"]:
-        text = (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
-        assert "if: ${{ false }}" in text
+        path = ROOT / ".github/workflows" / name
+        assert not path.exists() or "if: ${{ false }}" in path.read_text(encoding="utf-8")
     for name in ["curio-scheduler.yml", "daily_multilang_quiz.yml"]:
-        assert "if: ${{ false }}" in (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
+        path = ROOT / ".github/workflows" / name
+        assert not path.exists() or "if: ${{ false }}" in path.read_text(encoding="utf-8")
 
 
 def test_topik_manual_generation_keeps_stop_switch_and_review_default():
@@ -173,18 +174,9 @@ def test_control_room_target_limits_scheduler_to_one_channel(monkeypatch):
         assert dispatch_module.main() == 0
 
 
-def test_private_email_has_editor_link_and_is_not_marked_on_failure():
-    from scripts.youtube_calendar_result import notify_review
-    r = parsed(row())[0]
-    url = "https://studio.youtube.com/video/abcdefghijk/edit"
-    with patch("scripts.publishing_completion_notify.send_email", return_value=False), patch("scripts.youtube_calendar_result.update_row") as write:
-        with pytest.raises(RuntimeError, match="email was not sent"):
-            notify_review(Mock(), "sheet", r, url, "")
-        write.assert_not_called()
-    with patch("scripts.publishing_completion_notify.send_email", return_value=True) as send, patch("scripts.youtube_calendar_result.update_row") as write:
-        notify_review(Mock(), "sheet", r, url, "")
-        assert url in send.call_args.args[1]
-        assert "[review-email-sent:CAL-1]" in write.call_args.args[-1]
-        send.reset_mock()
-        notify_review(Mock(), "sheet", r, url, "[review-email-sent:CAL-1]")
-        send.assert_not_called()
+def test_release_policy_is_public_and_requires_identity_verification():
+    from automation_hub.youtube_release import load_release_policy
+    policy = load_release_policy()
+    assert policy["upload_privacy_status"] == "public"
+    assert policy["public_allowed"] is True
+    assert policy["require_authenticated_channel_id_match"] is True

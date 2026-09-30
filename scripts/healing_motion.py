@@ -3,6 +3,7 @@ import hashlib, json, os, random, re, subprocess
 from pathlib import Path
 import requests
 import healing_rain_review as job
+from automation_hub.youtube_release import public_allowed, result_url, upload_privacy_status
 
 SOURCE_POOLS = {
     'rain': [13166787, 9632520, 5754996, 32679327],
@@ -78,7 +79,7 @@ The soundtrack uses {sound}. There is no music or narration. The visual footage 
 
 Choose a comfortable listening level for your room or headphones. Let the natural textures sit gently in the background, and take a moment to slow down at your own pace. No special routine is needed; enjoy the moving greenery and water whenever you want a peaceful pause.
 
-Footage: Pexels, used under the Pexels License. Bird ambience, when present: Magnesus, Freesound 723913, CC0. This sample is uploaded privately for the channel owner's review.\n\n'''+job.MARKER
+Footage: Pexels, used under the Pexels License. Bird ambience, when present: Magnesus, Freesound 723913, CC0.\n\n'''+job.MARKER
     return mode,seed,minutes
 
 MODE,SEED,MINUTES=configure()
@@ -126,4 +127,5 @@ if __name__=='__main__':
     video_id=receipt['video_id']
     result=job.ROOT/os.environ.get('ROOM_RESULT_SOURCE','artifacts/youtube_playlist_result.json')
     result.parent.mkdir(parents=True,exist_ok=True)
-    result.write_text(json.dumps({'artifact_id':video_id,'video_id':video_id,'artifact_url':f'https://studio.youtube.com/video/{video_id}/edit','privacy_status':'private','channel_key':'healing','verified_channel_id':receipt['channel_id'],'public_allowed':False,'minutes':MINUTES,'variant':MODE}),encoding='utf-8')
+    privacy_status=upload_privacy_status()
+    result.write_text(json.dumps({'artifact_id':video_id,'video_id':video_id,'artifact_url':result_url(video_id),'studio_url':f'https://studio.youtube.com/video/{video_id}/edit','public_url':f'https://youtu.be/{video_id}','privacy_status':privacy_status,'channel_key':'healing','verified_channel_id':receipt['channel_id'],'public_allowed':public_allowed(),'minutes':MINUTES,'variant':MODE}),encoding='utf-8')

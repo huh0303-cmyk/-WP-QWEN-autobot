@@ -22,8 +22,8 @@
 | 인터넷신문 2개 | 각 신문 하루 1건 | 일반 WP와 분리. 검증 가능한 RSS/1차 출처가 없으면 추측 기사를 만들지 않음 | 기사 URL·출처 감사 |
 | Blogspot/Blogger | 활성 대상별 하루 1개 공개 | WordPress 복붙 금지. 같은 주제라도 독립 작성 | 게시 ID·URL 확인 |
 | Tistory 5개 | 사이트별 하루 1개 공개 | 검색형/정책형 독립 글. 로컬 쓰기 권한 확인 계정만 실행 | URL 감사 |
-| YouTube Playlist 5 | 채널별 주 2~3회, 매주 랜덤 요일 | 기존 파이프라인대로 VPS 제작 후 비공개 업로드 | 이사장 검수 후 공개 |
-| YouTube Knowledge 5 | 채널별 주 2~3회, 매주 랜덤 요일 | 대본→음성→영상→썸네일→비공개 업로드 | 이사장 검수 후 공개 |
+| YouTube Playlist 5 | 채널별 주 2~3회, 매주 랜덤 요일 | VPS 제작→채널 ID 검증→즉시 공개 | 공개 상태 API 재검증 |
+| YouTube Knowledge 5 | history 매일, 나머지 채널별 주 2~3회 | 대본→음성→영상→썸네일→채널 ID 검증→즉시 공개 | 공개 상태 API 재검증 |
 | 10-Language Survival | 자동 스케줄 제외 | 확정 YouTube 10개 외 별도 프로젝트. 별도 승인 전 자동 제작하지 않음 | 보류 |
 | Instagram | 게시 권한 검증 계정별 하루 1회 | 원본 콘텐츠를 SNS용으로 재구성 | 게시 ID 확인 |
 | Threads | 게시 권한 검증 계정별 하루 1회 | Instagram과 주제 방향은 같되 문구 복붙 금지 | 게시 ID 확인 |
@@ -69,8 +69,8 @@
 3. Gemini가 기본 대본·현지화·구조화·번역 보조를 수행한다.
 4. Claude가 의미·발음·구성·중복·품질을 독립 QA한다.
 5. VPS가 음성/영상/자막/썸네일 렌더링과 업로드를 수행한다.
-6. YouTube에는 반드시 privacyStatus=private로 업로드한다.
-7. Audit Engine이 video_id, channel_id, privacyStatus=private를 확인해 VERIFIED_PRIVATE만 부여한다.
+6. YouTube에는 소유자 정책에 따라 `privacyStatus=public`으로 즉시 업로드한다.
+7. Audit Engine이 video_id, 정확한 channel_id, privacyStatus=public 및 공개 조회를 확인해야 완료로 판정한다.
 8. Control Korea365에 검수 링크를 노출한다.
 9. 이사장 승인 전에는 공개 전환하지 않는다.
 10. 이사장 승인 후 공개 전환 작업을 수행하고 YouTube API로 public 상태를 다시 확인한 뒤에만 VERIFIED_COMPLETE로 전환한다.
@@ -80,8 +80,8 @@
 - Playlist 5채널과 Knowledge 5채널은 각각 채널별 주 2~3편을 생산하며, 매주 2일 또는 3일을 무작위로 고른다.
 - 채널 간 동일 시각 충돌을 피한다.
 - 같은 채널의 연속 실행 시각이 반복되지 않도록 한다.
-- 모든 신규 영상은 비공개 업로드를 기본값으로 한다.
-- `video_id + exact channel_id + privacyStatus=private` 확인 후에만 VERIFIED_PRIVATE.
+- 모든 신규 영상은 정확한 OAuth 채널 ID 확인 뒤 즉시 공개를 기본값으로 한다.
+- `video_id + exact channel_id + privacyStatus=public` 확인 후에만 VERIFIED_COMPLETE.
 - 이사장 검수 후 공개 전환, 이후 public API 재검증 후 VERIFIED_COMPLETE.
 
 ## 6. Agent 역할
@@ -117,7 +117,7 @@
 - 24시간 Queue/Scheduler
 - 랜덤 발행시각 실행
 - 영상/TTS/자막/썸네일 렌더링
-- YouTube 비공개 업로드
+- YouTube 즉시 공개 업로드
 - RSS/장기 작업
 - SQLite + append-only JSONL 영속 기록
 
@@ -164,7 +164,7 @@ YouTube는 승인 없는 public 전환을 절대 하지 않는다.
 ## 9. 승인과 완료 상태
 
 - 웹 실제 공개 확인 전: READY_FOR_AUDIT
-- YouTube 비공개 업로드 확인: VERIFIED_PRIVATE
+- YouTube 공개 업로드 확인: VERIFIED_COMPLETE
 - 이사장 검수 대기: REVIEW_REQUIRED
 - 이사장 승인 + public API 검증: VERIFIED_COMPLETE
 - 실패/증거 부족: NEEDS_ATTENTION 또는 REWORK_REQUIRED

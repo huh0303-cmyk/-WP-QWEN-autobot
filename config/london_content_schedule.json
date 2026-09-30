@@ -69,20 +69,20 @@
       "channel_count": 5,
       "weekly_min": 2,
       "weekly_max": 3,
-      "target": "2_to_3_private_productions_per_channel_per_week",
+      "target": "2_to_3_public_productions_per_channel_per_week",
       "randomize_weekly_days": true,
-      "upload_default": "private",
-      "human_review_before_public": true,
+      "upload_default": "public",
+      "human_review_before_public": false,
       "avoid_channel_time_collisions": true
     },
     "youtube_knowledge": {
       "channel_count": 5,
       "weekly_min": 2,
       "weekly_max": 3,
-      "target": "2_to_3_private_productions_per_channel_per_week",
+      "target": "history_daily_other_channels_2_to_3_public_productions_per_week",
       "randomize_weekly_days": true,
-      "upload_default": "private",
-      "human_review_before_public": true,
+      "upload_default": "public",
+      "human_review_before_public": false,
       "avoid_channel_time_collisions": true
     },
     "survival_10_language": {
@@ -188,10 +188,10 @@
     "never_copy_unlicensed_news_photo": true
   },
   "approval": {
-    "youtube_private_state": "VERIFIED_PRIVATE",
-    "human_review_state": "REVIEW_REQUIRED",
+    "youtube_upload_state": "PUBLIC_VERIFY_REQUIRED",
+    "human_review_state": "OWNER_POLICY_APPROVED_IMMEDIATE_PUBLIC",
     "public_state_after_api_verification": "VERIFIED_COMPLETE",
-    "never_public_without_human_approval": true
+    "youtube_immediate_public_owner_approved": true
   },
   "activity_ledger": {
     "policy_file": "config/london_activity_policy.json",

@@ -37,14 +37,14 @@
     "tistory": "1_public_post_per_enabled_site_per_day_after_local_write_verification",
     "social_non_youtube": "1_public_post_per_verified_account_per_day",
     "naver": "1_public_post_per_verified_account_per_day",
-    "youtube_playlist": "2_to_3_private_productions_per_channel_per_week_random_days",
-    "youtube_knowledge": "2_to_3_private_productions_per_channel_per_week_random_days",
+    "youtube_playlist": "2_to_3_public_productions_per_channel_per_week_random_days",
+    "youtube_knowledge": "history_daily_other_channels_2_to_3_public_productions_per_week_random_days",
     "survival_10_language": "disabled_outside_locked_youtube_10_scope",
     "survival_lessons_per_language": 50,
     "survival_completed_through_lesson": 2,
     "survival_next_lesson": 3,
-    "youtube_private_first": true,
-    "chairman_approval_before_review_gated_publication": true,
+    "youtube_immediate_public_after_identity_verification": true,
+    "chairman_approval_before_review_gated_publication": false,
     "copyright_safe_image_first": true
   },
   "activity_ledger": {
@@ -56,7 +56,7 @@
   },
   "truth_model": {
     "states": ["REQUESTED", "PLANNED", "ASSIGNED", "RUNNING", "READY_FOR_AUDIT", "AUDITING", "VERIFIED_PRIVATE", "REVIEW_REQUIRED", "VERIFIED_COMPLETE", "REWORK_REQUIRED", "FAILED", "BLOCKED", "NEEDS_ATTENTION", "CANCELLED"],
-    "rules": ["no_ai_may_self_certify_verified_complete", "workflow_success_is_not_publication_evidence", "generated_file_is_not_upload_evidence", "queue_status_is_not_publication_evidence", "external_evidence_must_match_exact_job_and_target", "review_gated_youtube_must_not_be_public_before_chairman_approval", "no_task_may_be_silently_dropped"]
+    "rules": ["no_ai_may_self_certify_verified_complete", "workflow_success_is_not_publication_evidence", "generated_file_is_not_upload_evidence", "queue_status_is_not_publication_evidence", "external_evidence_must_match_exact_job_and_target", "youtube_public_requires_exact_channel_and_privacy_verification", "no_task_may_be_silently_dropped"]
   },
   "verification": {
     "web_publication": ["exact_target_identity", "public_url", "successful_http_response", "not_admin_preview_or_login", "not_404_or_error_placeholder", "expected_title_or_job_marker_when_available", "verification_timestamp"],

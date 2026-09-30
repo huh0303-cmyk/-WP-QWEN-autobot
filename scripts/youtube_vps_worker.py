@@ -75,8 +75,8 @@ def _claim(job: dict) -> tuple[object, str]:
     row = selected[0]
     token = uuid.uuid4().hex
     marker = f"[yt-calendar:{row['id']}:{token}]"
-    note = "운영자 VPS 즉시 제작 요청" if job.get("run_now") else "VPS 예약 비공개 제작 요청"
-    update_row(service, sid, row, "자료수집", "", row["notes"] + f"\n{marker} {note}; 업로드 상태 PRIVATE")
+    note = "운영자 VPS 즉시 제작·공개 요청" if job.get("run_now") else "VPS 예약 제작·즉시 공개 요청"
+    update_row(service, sid, row, "자료수집", "", row["notes"] + f"\n{marker} {note}; 업로드 상태 PUBLIC")
     return row, token
 
 

@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Upload an approved playlist render to YouTube in PRIVATE review mode only.
-
-MASTER safety policy: automation may create/upload the asset, but it may not schedule
-or publish it publicly. A human must review and explicitly publish later.
-"""
+"""Upload an approved playlist render using the canonical release policy."""
 import json
 import os
 import socket
@@ -17,7 +13,8 @@ import requests
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.youtube_identity import verify_authenticated_channel, verify_uploaded_video
+from automation_hub.youtube_release import public_allowed, result_url, upload_privacy_status
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -92,8 +89,8 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
     from googleapiclient.http import MediaFileUpload
     from youtube_english_metadata import validate_metadata
     validate_metadata(title, description)
-    # HARD GATE: automated playlist uploads are always PRIVATE. Never set publishAt here.
-    status = {"selfDeclaredMadeForKids": False, "privacyStatus": "private"}
+    privacy_status = upload_privacy_status()
+    status = {"selfDeclaredMadeForKids": False, "privacyStatus": privacy_status}
     snippet = {"title": title, "description": description, "categoryId": "10"}
     if tags:
         kept, total = [], 0
@@ -152,16 +149,19 @@ def main():
     verified_id = verify_authenticated_channel(youtube, channel_key)
     video_id = upload_to_youtube(youtube, video_path, thumb_path, os.environ["YT_TITLE"],
         os.environ.get("YT_DESCRIPTION", ""), [t.strip() for t in os.environ.get("YT_TAGS", "").split(",") if t.strip()])
+    verify_uploaded_video(youtube, video_id, channel_key, upload_privacy_status())
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
-    result = {"artifact_id": video_id, "video_id": video_id, "artifact_url": studio_url,
-        "studio_url": studio_url, "privacy_status": "private", "channel_key": channel_key,
-        "verified_channel_id": verified_id, "public_allowed": False, "timestamp": datetime.now(timezone.utc).isoformat()}
+    public_url = f"https://youtu.be/{video_id}"
+    privacy_status = upload_privacy_status()
+    result = {"artifact_id": video_id, "video_id": video_id, "artifact_url": result_url(video_id),
+        "studio_url": studio_url, "public_url": public_url, "privacy_status": privacy_status, "channel_key": channel_key,
+        "verified_channel_id": verified_id, "public_allowed": public_allowed(), "timestamp": datetime.now(timezone.utc).isoformat()}
     path = os.path.join(ROOT, RESULT_PATH)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f: json.dump(result, f, ensure_ascii=False, indent=2)
-    log(f"✅ 업로드 완료(PRIVATE): {studio_url}")
+    log(f"✅ 업로드 완료({privacy_status.upper()}): {result_url(video_id)}")
     if not os.getenv("SCHEDULE_ID"):
-        send_email(f"[유튜브 비공개 업로드 완료] {os.environ['YT_TITLE'][:60]}", f"검토 후 직접 공개해주세요.\n\n{studio_url}\n")
+        send_email(f"[유튜브 공개 발행 완료] {os.environ['YT_TITLE'][:60]}", f"즉시 공개와 채널 검증이 완료되었습니다.\n\n{public_url}\n")
 
 
 if __name__ == "__main__":

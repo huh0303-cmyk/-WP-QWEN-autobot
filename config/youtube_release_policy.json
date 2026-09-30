@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "effective_at_kst": "2026-09-30T23:39:36+09:00",
+  "owner_decision": "publish_immediately_after_successful_upload_and_identity_verification",
+  "upload_privacy_status": "public",
+  "public_allowed": true,
+  "require_authenticated_channel_id_match": true,
+  "require_post_upload_privacy_verification": true,
+  "scheduled_release_allowed": false,
+  "duplicate_upload_on_release_failure": false
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Upload Curio longform videos to YouTube in PRIVATE review mode only."""
+"""Upload Curio longform videos using the canonical release policy."""
 import json
 import os
 import subprocess
@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.youtube_identity import verify_authenticated_channel, verify_uploaded_video
+from automation_hub.youtube_release import public_allowed, result_url, upload_privacy_status
 
 for _stream in (sys.stdout, sys.stderr):
     try:
@@ -117,12 +118,12 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
                 total += len(tag)
         snippet["tags"] = kept
 
-    # MASTER POLICY: automated Curio uploads never set publishAt and never publish public.
+    privacy_status = upload_privacy_status()
     body = {
         "snippet": snippet,
         "status": {
             "selfDeclaredMadeForKids": False,
-            "privacyStatus": "private",
+            "privacyStatus": privacy_status,
         },
     }
     request = service.videos().insert(
@@ -148,22 +149,24 @@ def upload_to_youtube(service, video_path, thumb_path, title, description, tags=
 
 def write_result(video_id, channel_key, verified_channel_id):
     studio_url = f"https://studio.youtube.com/video/{video_id}/edit"
+    privacy_status = upload_privacy_status()
     result = {
         "artifact_id": video_id,
         "video_id": video_id,
-        "artifact_url": studio_url,
+        "artifact_url": result_url(video_id),
         "studio_url": studio_url,
-        "privacy_status": "private",
+        "public_url": f"https://youtu.be/{video_id}",
+        "privacy_status": privacy_status,
         "channel_key": channel_key,
         "verified_channel_id": verified_channel_id,
-        "public_allowed": False,
+        "public_allowed": public_allowed(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
     path = os.path.join(ROOT, RESULT_PATH)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
-    return studio_url
+    return result_url(video_id)
 
 
 def main():
@@ -190,8 +193,9 @@ def main():
     verified_id = verify_authenticated_channel(service, channel_key)
     log(f"   ✅ OAuth 채널 일치 확인: {channel_key} ({verified_id})")
     video_id = upload_to_youtube(service, video_path, thumb_path, title, description, tags)
+    verify_uploaded_video(service, video_id, channel_key, upload_privacy_status())
     studio_url = write_result(video_id, channel_key, verified_id)
-    log(f"✅ 업로드 완료(PRIVATE): {studio_url}")
+    log(f"✅ 업로드 완료({upload_privacy_status().upper()}): {studio_url}")
 
 
 if __name__ == "__main__":

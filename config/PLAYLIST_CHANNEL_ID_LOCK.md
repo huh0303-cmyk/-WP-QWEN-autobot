@@ -10,7 +10,7 @@
 | `starbucks` | 스타벅스바이브-노동요 | [UC_e-sbLkVgwJNYEeobolNog](https://www.youtube.com/channel/UC_e-sbLkVgwJNYEeobolNog) |
 | `healing` | 힐링카페 | [UC7yEsLM-HoXudngrD-4FIqg](https://www.youtube.com/channel/UC7yEsLM-HoXudngrD-4FIqg) |
 
-실행 설정: `config/youtube_channels.json`. 채널 ID가 OAuth 인증 결과와 다르면 업로드를 중단한다. 다른 채널로 자동 대체하지 않는다. 모든 자동 업로드는 비공개이며, 최종 공개는 사용자가 결정한다.
+실행 설정: `config/youtube_channels.json`. 채널 ID가 OAuth 인증 결과와 다르면 업로드를 중단한다. 다른 채널로 자동 대체하지 않는다. 2026-09-30 소유자 결정에 따라 검증 성공한 자동 업로드는 즉시 공개한다.
 이 매핑은 사용자의 명시적인 변경 요청 없이 바꾸지 않는다.
 
 ## 인증 화면 매핑 — 사용자 확인

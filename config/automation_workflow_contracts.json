@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "description": "Workflow input contracts used by the central room scheduler. PUBLIC is never implied by this file.",
+  "description": "Workflow input contracts used by the central room scheduler. Public is explicit only for owner-approved destinations.",
   "contracts": {
     "daily-network-publish.yml": {
       "platforms": ["wordpress"],
@@ -56,7 +56,7 @@
         "publish_delay_hours": ""
       },
       "required_inputs": ["room_id", "channel"],
-      "safe_policy": "private",
+      "safe_policy": "public",
       "artifact_kind": "youtube_video_id"
     },
     "curio-longform-daily.yml": {
@@ -70,7 +70,7 @@
         "publish_delay_hours": ""
       },
       "required_inputs": ["room_id", "channel"],
-      "safe_policy": "private",
+      "safe_policy": "public",
       "artifact_kind": "youtube_video_id"
     }
   }

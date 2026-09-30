@@ -48,7 +48,7 @@ Playlist 5와 Knowledge 5를 별도 pipeline으로 유지한다.
 - Knowledge 5: topic -> sources -> script -> TTS -> footage -> subtitles -> thumbnail -> FFmpeg -> PRIVATE upload.
 - 모든 작업은 순차 queue 방식이며 동시 대량 렌더를 금지한다.
 - 신규 영상은 PRIVATE가 기본이다.
-- video_id + exact channel_id + privacyStatus=private 확인 전 성공으로 기록하지 않는다.
+- video_id + exact channel_id + privacyStatus=public 확인 전 성공으로 기록하지 않는다.
 - Chairman 승인 전 public 전환 금지.
 - GitHub에서 영상 렌더링 workflow를 운영하지 않는다.
 
@@ -116,8 +116,8 @@ Control Korea365는 Publisher가 아니다.
 - News: 각 신문 하루 1건. RSS·1차 출처가 검증되지 않으면 숫자를 채우기 위해 만들지 않는다.
 - Blogger: 활성 사이트별 하루 1건 공개, 랜덤 KST 슬롯.
 - Tistory·Naver·TikTok·Instagram·Threads·Facebook: 게시 권한이 검증된 계정별 하루 1건.
-- YouTube Playlist 5: 채널별 주 2~3회, 매주 랜덤 요일, 비공개 업로드.
-- YouTube Knowledge 5: 채널별 주 2~3회, 매주 랜덤 요일, 비공개 업로드.
+- YouTube Playlist 5: 채널별 주 2~3회, 매주 랜덤 요일, 채널 ID 검증 후 즉시 공개.
+- YouTube Knowledge 5: history는 매일, 나머지는 채널별 주 2~3회, 채널 ID 검증 후 즉시 공개.
 - 위 확정 10개 외 YouTube 채널은 별도 승인 전 자동 제작 스케줄에 포함하지 않는다.
 
 ## 8. PM and provider roles
@@ -141,7 +141,7 @@ Web 성공:
 - exact destination + Post ID + actual URL 검증.
 
 YouTube PRIVATE 성공:
-- valid video_id + exact channel_id + privacyStatus=private 검증.
+- valid video_id + exact channel_id + privacyStatus=public + 공개 watch URL 검증.
 
 ## 10. Current migration order
 

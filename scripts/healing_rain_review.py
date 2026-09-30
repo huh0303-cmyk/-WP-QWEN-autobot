@@ -1,10 +1,11 @@
-"""Owner-requested 75-minute synthetic rain review; private only, text-free art."""
+"""Owner-requested healing upload with text-free art and canonical release policy."""
 import json, os, secrets, subprocess, sys, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT/'scripts')]
 import youtube_publish_approved as publisher
 from automation_hub.youtube_identity import verify_authenticated_channel
+from automation_hub.youtube_release import public_allowed, upload_privacy_status
 from googleapiclient.http import MediaFileUpload
 from PIL import Image, ImageOps
 WORK = ROOT/'data/healing-rain-review'
@@ -66,17 +67,18 @@ def main():
     if len(matches)>1: raise RuntimeError('Duplicate review markers need inspection')
     if matches:
         video_id=matches[0]['id']
-        if matches[0]['status']['privacyStatus']!='private': raise RuntimeError('Existing sample privacy changed')
+        if matches[0]['status']['privacyStatus']!=upload_privacy_status(): raise RuntimeError('Existing sample privacy changed')
         # Preserve the existing thumbnail when resuming a previously uploaded motion sample.
     else:
         render()
         video_id=publisher.upload_to_youtube(service,str(WORK/'rain-75.mp4'),None,TITLE,DESCRIPTION,['nature sounds','forest ambience','no music','relaxation'])
-    save('upload.json',{'video_id':video_id,'channel_id':actual,'privacy':'private'})
+    expected_privacy=upload_privacy_status()
+    save('upload.json',{'video_id':video_id,'channel_id':actual,'privacy':expected_privacy,'public_allowed':public_allowed()})
     if (WORK/'thumbnail.jpg').exists(): service.thumbnails().set(videoId=video_id,media_body=MediaFileUpload(str(WORK/'thumbnail.jpg'))).execute()
     for _ in range(90):
         video=service.videos().list(part='snippet,status,processingDetails,contentDetails',id=video_id).execute()['items'][0]
         save('verified-status.json',video)
-        if video['status']['privacyStatus']!='private' or video['snippet']['channelId']!=actual: raise RuntimeError('Upload identity/privacy mismatch')
+        if video['status']['privacyStatus']!=expected_privacy or video['snippet']['channelId']!=actual: raise RuntimeError('Upload identity/privacy mismatch')
         state=video.get('processingDetails',{}).get('processingStatus')
         if state=='succeeded':
             import re
@@ -84,7 +86,7 @@ def main():
             parts=re.fullmatch(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?',duration)
             actual_seconds=sum(int(v or 0)*m for v,m in zip(parts.groups(),(3600,60,1))) if parts else -1
             if abs(actual_seconds-DURATION)>2: raise RuntimeError('Unexpected uploaded duration')
-            print('PRIVATE_UPLOAD_VERIFIED',video_id,flush=True); return
+            print(expected_privacy.upper()+'_UPLOAD_VERIFIED',video_id,flush=True); return
         if state in ('failed','terminated'): raise RuntimeError('YouTube processing '+state)
         time.sleep(10)
     raise RuntimeError('Upload exists, YouTube processing remains pending; do not blindly upload again')

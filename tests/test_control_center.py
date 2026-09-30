@@ -102,14 +102,14 @@ def test_youtube_cards_show_official_identity_growth_and_pastel_action():
 def test_pwa_has_per_target_buttons_for_all_draft_only_modules():
     template = (Path(__file__).resolve().parents[1] / "control_center" / "templates" / "index.html").read_text(encoding="utf-8")
     assert "바이럴자동발행" in template
-    assert "YouTube 콘텐츠 바로 만들기 · 비공개" in template
+    assert "YouTube 콘텐츠 만들기 · 바로 공개" in template
     assert 'name="site_id" value="{{ blog.site_id }}"' in template
     assert 'name="channel_key" value="{{ channel.channel_key }}"' in template
     assert "{% if site.auth_ready %}" in template
     assert "{% if blog.connected %}" in template
     assert "{% if channel.action_ready %}" in template
     assert 'id="review-queue"' not in template
-    assert "완성된 영상은 먼저 비공개로 저장됩니다." in template
+    assert "채널 ID와 업로드 상태를 검증한 뒤 바로 공개됩니다." in template
 
 
 def test_tiktok_heading_shows_logo_account_label_and_connected_count():

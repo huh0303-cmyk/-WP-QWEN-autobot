@@ -103,11 +103,11 @@ def _youtube_cards() -> list[dict]:
             "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
             "group": group, "group_label": group_label, "inventory_order": inventory_order, "role": operational_role,
             "description": profile.get("tone") or fallback,
-            "state_label": "비공개 제작·업로드 가능 · 공개 전환 시 최종 확인" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
+            "state_label": "제작·즉시 공개 가능 · 채널 ID 검증 필수" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
             "connection_level": "publish_connected" if core_key else "identity_verified",
             "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "YouTube Studio 로그인 후 제작 프로필을 확인합니다.",
             "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",
-            "button_label": "비공개 제작 시작" if core_key else "YouTube Studio 로그인",
+            "button_label": "제작·바로 공개" if core_key else "YouTube Studio 로그인",
         })
     for row in inventory.get("unconfirmed", []):
         if row.get("platform") != "youtube":
@@ -291,6 +291,6 @@ def install(app, get_site_data=None):
             return jsonify(message=str(exc)), 409
         item = {"job_id": job["job_id"], "label": card["name"], "platform": "youtube", "site_id": channel_key,
                 "workflow": "youtube-vps-worker", "run_id": None, "run_url": "", "status": "queued",
-                "conclusion": None, "reason": "VPS 비공개 제작 대기"}
+                "conclusion": None, "reason": "VPS 제작·즉시 공개 대기"}
         _write_state(group, {"status": "polling", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": [item]})
         return jsonify(message=f"{card['name']}: 비공개 영상 제작을 접수했습니다. 자동 공개하지 않습니다.", job_id=job["job_id"]), 202

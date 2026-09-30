@@ -1117,7 +1117,7 @@
       "destination_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
       "workflow": "generate-youtube-playlist.yml",
       "group": "PLAYLIST",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1129,7 +1129,7 @@
       "destination_id": "UC7yEsLM-HoXudngrD-4FIqg",
       "workflow": "generate-youtube-playlist.yml",
       "group": "PLAYLIST",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1141,7 +1141,7 @@
       "destination_id": "UC_e-sbLkVgwJNYEeobolNog",
       "workflow": "generate-youtube-playlist.yml",
       "group": "PLAYLIST",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1153,7 +1153,7 @@
       "destination_id": "UC7jOhyMa-FIrzZuea97z1Pw",
       "workflow": "generate-youtube-playlist.yml",
       "group": "PLAYLIST",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1165,7 +1165,7 @@
       "destination_id": "UCKZsfAWyCmY0jckf4IWZrqw",
       "workflow": "generate-youtube-playlist.yml",
       "group": "PLAYLIST",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1177,7 +1177,7 @@
       "destination_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
       "workflow": "curio-longform-daily.yml",
       "group": "KNOWLEDGE",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1189,7 +1189,7 @@
       "destination_id": "UCVBvZwodUF4s57KeNicxQ3w",
       "workflow": "curio-longform-daily.yml",
       "group": "KNOWLEDGE",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1201,7 +1201,7 @@
       "destination_id": "UCgNj-yS93A_fOHXXvG49fww",
       "workflow": "curio-longform-daily.yml",
       "group": "KNOWLEDGE",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1213,7 +1213,7 @@
       "destination_id": "UCLvy6kSpC8-7o3hnSrfQ47g",
       "workflow": "curio-longform-daily.yml",
       "group": "KNOWLEDGE",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     },
@@ -1225,7 +1225,7 @@
       "destination_id": "UCwh49EokdWFJqYFE_zA6XDQ",
       "workflow": "curio-longform-daily.yml",
       "group": "KNOWLEDGE",
-      "publish_policy": "private",
+      "publish_policy": "public",
       "duplicate_guard": true,
       "status": "READY"
     }

@@ -1,0 +1,52 @@
+name: Publish one verified YouTube video now
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Canonical YouTube channel key
+        required: true
+        type: string
+      video_id:
+        description: Existing 11-character YouTube video ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify ownership and publish immediately
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          CHANNEL_KEY: ${{ inputs.channel }}
+          VIDEO_ID: ${{ inputs.video_id }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          envs: CHANNEL_KEY,VIDEO_ID
+          script: |
+            set -euo pipefail
+            cd /opt/korea365
+            case "$VIDEO_ID" in
+              ???????????) ;;
+              *) echo "Invalid video ID" >&2; exit 2 ;;
+            esac
+            RECEIPT="data/youtube-release-${VIDEO_ID}.json"
+            /opt/korea365/.venv/bin/python scripts/youtube_set_privacy.py \
+              --channel "$CHANNEL_KEY" \
+              --video-id "$VIDEO_ID" \
+              --privacy public \
+              --receipt "$RECEIPT"
+            python3 - "$RECEIPT" <<'PY'
+            import json, sys
+            row=json.load(open(sys.argv[1], encoding='utf-8'))
+            if row.get('privacy_status') != 'public' or not row.get('verified_channel_id'):
+                raise SystemExit('Release receipt verification failed')
+            print('PUBLICATION_RECEIPT', json.dumps(row, ensure_ascii=False))
+            PY

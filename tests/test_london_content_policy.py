@@ -24,9 +24,14 @@ def test_london_schedule_contract():
         assert policy["cadence"][key]["weekly_target"] == 7
 
 
-def test_locked_youtube_cadence_is_two_to_three_times_weekly_and_private_first():
+def test_locked_youtube_cadence_uses_owner_approved_immediate_public_for_core_ten():
     policy = load("london_content_schedule.json")
-    for key in ("youtube_playlist", "youtube_knowledge", "survival_10_language", "youtube_daily_additional"):
+    for key in ("youtube_playlist", "youtube_knowledge"):
+        cfg = policy["cadence"][key]
+        assert (cfg["weekly_min"], cfg["weekly_max"]) == (2, 3)
+        assert cfg["upload_default"] == "public"
+        assert cfg["human_review_before_public"] is False
+    for key in ("survival_10_language", "youtube_daily_additional"):
         cfg = policy["cadence"][key]
         assert (cfg["weekly_min"], cfg["weekly_max"]) == (2, 3)
         assert cfg["upload_default"] == "private"

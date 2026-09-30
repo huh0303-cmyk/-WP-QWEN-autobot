@@ -7,6 +7,7 @@ import uuid
 import requests
 from automation_hub.youtube_calendar import KST, READY, read_calendar, select_due, select_next_ready, update_row
 from automation_hub.youtube_registry import load_channels
+from automation_hub.youtube_release import public_allowed
 from gsheets_direct import get_sheets_service
 
 
@@ -65,9 +66,9 @@ def main():
     selector = select_next_ready if run_selected_now else select_due
     selected, skipped = selector(read_calendar(service, sid), now, enabled,
                                  min(10, max(1, int(os.getenv("MAX_DISPATCH", "3")))) if dry else 1)
-    print(json.dumps({"mode": "dry_run" if dry else "private-production", "due": [
+    print(json.dumps({"mode": "dry_run" if dry else "immediate-public-production", "due": [
         {"id": r["id"], "channel": r["key"], "planned_at": r["when"].isoformat(), "topic": r["topic"]}
-        for r in selected], "suppressed_duplicates": skipped, "public_allowed": False}, ensure_ascii=False))
+        for r in selected], "suppressed_duplicates": skipped, "public_allowed": public_allowed()}, ensure_ascii=False))
     if dry:
         return 0
     for planned in selected:
@@ -79,8 +80,8 @@ def main():
             continue
         token = uuid.uuid4().hex
         marker = f"[yt-calendar:{row['id']}:{token}]"
-        request_kind = "운영자 즉시 제작 요청" if run_selected_now else "예약 비공개 제작 요청"
-        notes = row["notes"] + "\n" + marker + f" {request_kind}; 업로드 상태 PRIVATE"
+        request_kind = "운영자 즉시 제작·공개 요청" if run_selected_now else "예약 제작·즉시 공개 요청"
+        notes = row["notes"] + "\n" + marker + f" {request_kind}; 업로드 상태 PUBLIC"
         update_row(service, sid, row, "자료수집", "", notes)
         c = channels[row["key"]]
         inputs = {"channel": c.channel_key, "topic": row["topic"], "schedule_id": row["id"],
@@ -96,7 +97,7 @@ def main():
             # The server may have accepted a timed-out request. Leave the claim intact.
             print(f"Dispatch not confirmed for {row['id']}; retained claim, manual inspection required")
             return 1
-        print(f"Dispatched {row['id']} to {c.channel_key}; private only")
+        print(f"Dispatched {row['id']} to {c.channel_key}; publish immediately")
     return 0
 
 

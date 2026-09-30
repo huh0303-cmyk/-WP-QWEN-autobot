@@ -7,7 +7,7 @@ from typing import Any
 
 ROOMS_PATH = Path(__file__).resolve().parents[1] / "config" / "automation_rooms.json"
 ALLOWED_PLATFORMS = {"wordpress", "blogger", "tistory", "youtube"}
-SAFE_POLICIES = {"draft", "private", "awaiting_approval", "paused"}
+SAFE_POLICIES = {"draft", "private", "public", "awaiting_approval", "paused"}
 
 
 @dataclass(slots=True)

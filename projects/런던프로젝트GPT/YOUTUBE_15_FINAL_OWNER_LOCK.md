@@ -10,7 +10,7 @@ Authority: owner-confirmed account-selector mapping + owner-confirmed current ch
 3. 이름이 충돌할 때는 이 문서의 현재 owner-confirmed handle을 우선한다.
 4. UC ID가 이미 과거 직접 잠겨 있는 10개는 그대로 승계한다.
 5. UC ID를 현재 GitHub에서 찾을 수 없는 5개는 추측 금지. 실제 로그인 후 `channels.list(mine=true)` 또는 YouTube Studio URL로 캡처할 때까지 업로드 금지.
-6. 모든 자동 업로드는 PRIVATE. 업로드 전 authenticated channel ID가 expected ID와 다르면 즉시 중단.
+6. 2026-09-30 소유자 결정에 따라 자동 업로드는 채널 ID 검증 직후 즉시 PUBLIC으로 발행한다. 업로드 전 authenticated channel ID가 expected ID와 다르면 즉시 중단한다.
 7. **Studio_K3가 두 번 보이는 것은 정상**이다. 선택화면의 1번째/2번째 위치를 구분해야 한다.
 8. **K-pop Studio는 Studio_K3와 다른 항목**이다.
 

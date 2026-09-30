@@ -43,11 +43,10 @@ def test_main_proceeds_past_the_freeze_only_when_flag_is_true():
             pass
 
 
-def test_workflow_enables_private_calendar_video_generation():
-    workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows" /
-                "generate-youtube-playlist.yml").read_text(encoding="utf-8")
+def test_canonical_worker_enables_public_calendar_video_generation():
+    worker = (Path(__file__).resolve().parents[1] / "scripts" /
+              "youtube_vps_worker.py").read_text(encoding="utf-8")
     uploader = (Path(__file__).resolve().parents[1] / "scripts" /
                 "youtube_publish_approved.py").read_text(encoding="utf-8")
-    assert 'PLAYLIST_VIDEO_GENERATION_ENABLED: "true"' in workflow
-    assert "PRIVATE only" in workflow
-    assert '"privacyStatus": "private"' in uploader
+    assert 'PLAYLIST_VIDEO_GENERATION_ENABLED="true"' in worker
+    assert "upload_privacy_status()" in uploader

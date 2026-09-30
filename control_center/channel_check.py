@@ -13,7 +13,7 @@ def install(app):
   if platform=='youtube':
    for c in d.get('youtube',[]):
     connection_ok=c.get('connection_ok',c.get('oauth_ok',c.get('status')=='채널 일치 · 읽기 확인'))
-    items.append(dict(name=c.get('actual_name') or c['name'],group='플레이리스트' if c.get('type')=='playlist' else '지식',status=c['status'],ok=connection_ok,identity=c['channel_id'],topic='확정된 채널별 제작 지침 유지',next='완성본·권리 검수 후 비공개 업로드 시험' if connection_ok else '기존 읽기 연결 확인 필요 · 자동 공개 안 함',url='https://www.youtube.com/channel/'+c['channel_id']))
+    items.append(dict(name=c.get('actual_name') or c['name'],group='플레이리스트' if c.get('type')=='playlist' else '지식',status=c['status'],ok=connection_ok,identity=c['channel_id'],topic='확정된 채널별 제작 지침 유지',next='완성본·권리 검수 후 채널 ID 확인·즉시 공개' if connection_ok else '기존 읽기 연결 확인 필요 · 공개 불가',url='https://www.youtube.com/channel/'+c['channel_id']))
    connected_count=sum(1 for c in d.get('youtube',[]) if c.get('connection_ok'))
    note=f'영구 고정 10개 채널: {connected_count}개 기존 읽기 연결 정상, {len(d.get("youtube",[]))-connected_count}개 확인 필요. 채널 ID 기준이며 업로드·공개는 수행하지 않았습니다.'
   else:
