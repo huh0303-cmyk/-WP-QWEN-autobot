@@ -227,6 +227,34 @@ the History refresh token in both protected stores and wrote its CONTROL
 receipt. This historical selector name must not be confused with the
 separate Spanish Survival language channel `UC9mvVEdL9Tllkit5v2Qv8UQ`.
 
+The owner approved the `K-pop Studio` Google brand for INVENTION_STORY1.
+The tool accepted only exact `UCgNj-yS93A_fOHXXvG49fww`, stored the
+Invention refresh token in the protected VPS and GitHub stores and wrote
+the non-secret CONTROL receipt. This historical selector name is distinct
+from CAFE_KPOP `UCKZsfAWyCmY0jckf4IWZrqw`.
+
+The owner's screenshot showed an Aside browser `ERR_BLOCKED_BY_CLIENT` page
+at `localhost` after a consent link was opened from chat. The completed
+OAuth runs had already returned exact-ID success via Chrome. Therefore the
+Aside error is a blocked duplicate callback view, not evidence that those
+successful token stores failed. For the next approvals the owner was told to
+copy each link address into Chrome, which supports the local callback; no
+Aside protection was disabled.
+
+The owner approved `SILENT_ERA_TIMES` for SILENT_ERA_FILM. The tool accepted
+only exact `UCLvy6kSpC8-7o3hnSrfQ47g`, stored the Silent Era refresh token
+in both protected stores and wrote its non-secret CONTROL receipt. Its
+Google brand ID is stored as a navigation hint, with the UC ID authoritative.
+
+The owner approved `RETRO_REELS_TIMES` for RETRO_USA1. The tool accepted
+only exact `UCwh49EokdWFJqYFE_zA6XDQ`, stored the Retro refresh token in
+the protected VPS and GitHub stores and wrote the non-secret CONTROL receipt.
+Together with the earlier KPOP, Starbucks, Mozart, NASA, History, Invention
+and Silent Era renewals, all eight core channels that had failed the earlier
+identity-read scope preflight now have exact-ID OAuth receipts. Romantic and
+Healing had passed the earlier read-only preflight and were not asked to
+repeat consent. None of these receipts is a public-video receipt.
+
 Google's OAuth documentation says external Testing-mode refresh tokens with
 YouTube scope expire after seven days. Production-mode tokens can also stop
 working if access is revoked, unused for six months, or invalidated for other
