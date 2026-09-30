@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-01",
+  "timezone": "Asia/Seoul",
+  "generated_at": "2026-10-01T07:11:38+09:00",
+  "deadline_kst": "07:50",
+  "status": "COMPLETE",
+  "candidate_count": 30,
+  "measurement_policy": {
+    "absolute_naver_search_volume_available": false,
+    "invented_search_volume": false,
+    "naver_news_sample_title_anchor_count_is_not_total_results": true,
+    "google_trends_traffic_is_feed_supplied_approximation": true,
+    "selection_rule": "Use current repetition and primary-source freshness as directional evidence; re-open the primary source immediately before writing."
+  },
+  "source_checks": {
+    "naver_news_checked_at_kst": "2026-10-01T07:09:00+09:00",
+    "google_trends_kr_rss_checked_at_kst": "2026-10-01T07:10:00+09:00",
+    "recent_blog_rss_checked_at_kst": "2026-10-01T07:11:00+09:00",
+    "naver_rate_limit_note": "Naver returned HTTP 403 after repeated read-only queries; measured counts are recorded only for queries completed before the limit."
+  },
+  "recent_public_duplicate_guard": [
+    {
+      "site_id": "naver_n3",
+      "title": "2026년 10월 양육비 선지급, 소득기준 폐지 전에 꼭 확인할 것",
+      "url": "https://blog.naver.com/sky-only/224427681159",
+      "published_at_kst": "2026-10-01T00:45:29+09:00"
+    },
+    {
+      "site_id": "naver_n3",
+      "title": "‘등기 왔습니다’ 한마디에 속는다…우체국 사칭 피싱 구별법",
+      "url": "https://blog.naver.com/sky-only/224425890307",
+      "published_at_kst": "2026-09-29T13:58:40+09:00"
+    },
+    {
+      "site_id": "naver_n2",
+      "title": "비타민B군 (활성비타민, 피로회복), 내 몸에 딱 맞는 거 찾는 법 말해줄게",
+      "url": "https://blog.naver.com/health-standard/224423820392",
+      "published_at_kst": "2026-09-27T14:26:00+09:00"
+    }
+  ],
+  "candidates": [
+    {"rank": 1, "query": "2026 아시안게임 오늘 한국 경기 일정", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Naver News sample 17 title anchors plus live event window through 2026-10-04", "official_sources": ["https://www.aichi-nagoya2026.org/en/", "https://psports.kbs.co.kr/"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 2, "query": "2026 아시안게임 메달 순위", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Naver News sample 20 title anchors and multiple same-day medal stories", "official_sources": ["https://www.aichi-nagoya2026.org/en/", "https://psports.kbs.co.kr/"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 3, "query": "아시안게임 트랙 사이클 남녀 단체추발 동메달", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Repeated Naver News headlines dated 2026-09-30", "official_sources": ["https://www.aichi-nagoya2026.org/en/", "https://psports.kbs.co.kr/"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 4, "query": "아시안게임 스포츠클라이밍 이도현 은메달", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Repeated same-day Naver News headlines", "official_sources": ["https://www.aichi-nagoya2026.org/en/", "https://psports.kbs.co.kr/"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 5, "query": "아시안게임 양궁 여자 컴파운드 단체전 동메달", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Repeated same-day Naver News headlines", "official_sources": ["https://www.aichi-nagoya2026.org/en/", "https://psports.kbs.co.kr/"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 6, "query": "아시안게임 유도 장세윤 은메달", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Same-day Naver News headline", "official_sources": ["https://www.aichi-nagoya2026.org/en/", "https://psports.kbs.co.kr/"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 7, "query": "아시안게임 오늘 경기 중계", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "Live event intent and broadcaster schedule availability", "official_sources": ["https://psports.kbs.co.kr/", "https://news.sbs.co.kr/ag2026/main.do"], "measured_search_volume": null, "status": "READY_FOR_PRIMARY_SOURCE_RECHECK"},
+    {"rank": 8, "query": "2026 아시안게임 야구 경기 결과", "cluster": "스포츠·국제대회", "site_ids": ["naver_n3"], "signal": "KBO has a dedicated official Asian Games schedule/result page", "official_sources": ["https://koreabaseball.com/Schedule/International/AsianGames/Main2026.aspx"], "measured_search_volume": null, "status": "SECONDARY_TODAY_AFTER_LIVE_CHECK"},
+    {"rank": 9, "query": "암살자(들) 박스오피스 1위", "cluster": "영화·문화", "site_ids": ["naver_n3"], "signal": "Naver News sample 35 title anchors; KOBIS daily and weekend data show rank 1", "official_sources": ["https://www.kobis.or.kr/kobis/business/main/searchMainDailySeatTicket.do", "https://kobis.or.kr/kobis/business/main/searchMainWeekEndBoxOffice.do"], "measured_search_volume": null, "status": "READY_FOR_KOBIS_RECHECK"},
+    {"rank": 10, "query": "암살자(들) 상영시간 관람등급", "cluster": "영화·문화", "site_ids": ["naver_n3"], "signal": "Current theatrical release and strong Naver News repetition", "official_sources": ["https://www.kobis.or.kr/kobis/business/main/searchMainDailySeatTicket.do"], "measured_search_volume": null, "status": "READY_FOR_KOBIS_RECHECK"},
+    {"rank": 11, "query": "오늘 영화 박스오피스 순위", "cluster": "영화·문화", "site_ids": ["naver_n3"], "signal": "Daily recurring search intent with current KOBIS data", "official_sources": ["https://www.kobis.or.kr/kobis/business/main/searchMainDailySeatTicket.do"], "measured_search_volume": null, "status": "READY_FOR_KOBIS_RECHECK"},
+    {"rank": 12, "query": "지뢰 사건 공식 발표 팩트체크", "cluster": "군사·안전", "site_ids": ["naver_n3"], "signal": "Google Trends Korea RSS listed 지뢰 at approximately 200+; same-day news context exists", "official_sources": ["https://www.mnd.go.kr", "https://www.korea.kr"], "google_trends_approx_traffic": "200+", "measured_search_volume": null, "status": "HOLD_UNTIL_EXACT_OFFICIAL_STATEMENT"},
+    {"rank": 13, "query": "지뢰 발견 시 행동요령", "cluster": "군사·안전", "site_ids": ["naver_n3"], "signal": "Google Trends Korea directional interest can support a non-operational public-safety explainer", "official_sources": ["https://www.mnd.go.kr", "https://www.safetyreport.go.kr"], "google_trends_approx_traffic": "200+", "measured_search_volume": null, "status": "READY_ONLY_WITH_PUBLIC_SAFETY_SOURCE"},
+    {"rank": 14, "query": "대호 김종서함 진수식 잠수함", "cluster": "군사·안전", "site_ids": ["naver_n3"], "signal": "Google Trends Korea RSS listed 잠수함 at approximately 1000+; current official policy briefing published 2026-09-30", "official_sources": ["https://m.korea.kr/news/policyNewsView.do?newsId=148972841"], "google_trends_approx_traffic": "1000+", "measured_search_volume": null, "status": "READY_FOR_OFFICIAL_SOURCE_RECHECK"},
+    {"rank": 15, "query": "10월 1일 국회 일정", "cluster": "정치·정책", "site_ids": ["naver_n1", "naver_n3"], "signal": "Same-day schedule article exists; official schedule must be opened before writing", "official_sources": ["https://www.assembly.go.kr"], "measured_search_volume": null, "status": "HOLD_UNTIL_OFFICIAL_SCHEDULE_CHECK"},
+    {"rank": 16, "query": "2026 청년내일저축계좌 최종 선정 이후 해야 할 일", "cluster": "국가지원금·자산형성", "site_ids": ["naver_n1"], "signal": "Fresh Ministry of Health and Welfare release dated 2026-09-29/30", "official_sources": ["https://admin.korea.kr/briefing/pressReleaseView.do?newsId=156783452"], "measured_search_volume": null, "status": "READY_FOR_OFFICIAL_SOURCE_RECHECK"},
+    {"rank": 17, "query": "2026 에너지바우처 신청기간 대상", "cluster": "국가지원금·에너지", "site_ids": ["naver_n1", "naver_n3"], "signal": "Naver News sample 18 title anchors for use-period query; current Bokjiro notice remains open through 2026-12-31", "official_sources": ["https://www.bokjiro.go.kr/ssis-tbu/cms/pc/customer/notice/1309896_1141.html"], "measured_search_volume": null, "status": "READY_FOR_OFFICIAL_SOURCE_RECHECK"},
+    {"rank": 18, "query": "에너지바우처 동절기 요금 차감 10월 1일", "cluster": "국가지원금·에너지", "site_ids": ["naver_n1", "naver_n3"], "signal": "Naver News sample includes a same-day start headline", "official_sources": ["https://www.bokjiro.go.kr/ssis-tbu/cms/pc/customer/notice/1309896_1141.html", "https://www.energyv.or.kr"], "measured_search_volume": null, "status": "HOLD_UNTIL_EXACT_START_DATE_SOURCE"},
+    {"rank": 19, "query": "도시가스 요금 지원 대상", "cluster": "국가지원금·에너지", "site_ids": ["naver_n1", "naver_n3"], "signal": "Naver News sample 27 anchors were dominated by unrelated Japan electricity stories", "official_sources": ["https://www.bokjiro.go.kr", "https://www.gov.kr"], "measured_search_volume": null, "status": "LOW_RELEVANCE_DO_NOT_PROMOTE_TODAY"},
+    {"rank": 20, "query": "보조금24 내가 받을 수 있는 혜택 확인", "cluster": "국가지원금·생활혜택", "site_ids": ["naver_n1", "naver_n3"], "signal": "Stable high-intent evergreen path; no measured same-day spike", "official_sources": ["https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"], "measured_search_volume": null, "status": "EVERGREEN_BACKUP"},
+    {"rank": 21, "query": "2026 독감 무료접종 대상", "cluster": "예방접종·건강", "site_ids": ["naver_n2"], "signal": "Naver News sample 29 title anchors and current national program", "official_sources": ["https://www.kdca.go.kr", "https://nip.kdca.go.kr"], "measured_search_volume": null, "status": "READY_FOR_KDCA_RECHECK"},
+    {"rank": 22, "query": "65세 이상 독감 무료접종 10월 일정", "cluster": "예방접종·건강", "site_ids": ["naver_n2"], "signal": "Same-day Naver headlines mention staged October start; age/date must be rechecked", "official_sources": ["https://www.kdca.go.kr", "https://nip.kdca.go.kr"], "measured_search_volume": null, "status": "READY_FOR_KDCA_RECHECK"},
+    {"rank": 23, "query": "2026 코로나19 무료 예방접종 10월 12일 대상", "cluster": "예방접종·건강", "site_ids": ["naver_n2"], "signal": "Naver News sample 28 title anchors plus KDCA plan dated 2026-09-17", "official_sources": ["https://www.kdca.go.kr/bbs/kdca/42/312644/artclView.do", "https://cert.kdca.go.kr/irhp/covd/goCov19Vcnt.do?menuCd=47&menuLv=4"], "measured_search_volume": null, "status": "READY_FOR_KDCA_RECHECK"},
+    {"rank": 24, "query": "국가건강검진 연말 예약 10월 준비", "cluster": "건강검진", "site_ids": ["naver_n2"], "signal": "Naver News sample 12 title anchors; official eligibility and provider search still required", "official_sources": ["https://www.nhis.or.kr", "https://health.kdca.go.kr"], "measured_search_volume": null, "status": "READY_FOR_NHIS_RECHECK"},
+    {"rank": 25, "query": "추석 KTX 취소표 예약대기 환불 위약금", "cluster": "철도·예매", "site_ids": ["naver_n3"], "signal": "Seasonal post-holiday intent with current Korail reservation and penalty guidance", "official_sources": ["https://dev.letskorail.com/", "https://m.letskorail.com/mbt/m_guide.html"], "measured_search_volume": null, "status": "READY_FOR_KORAIL_RECHECK"},
+    {"rank": 26, "query": "강릉역 KTX 시간표", "cluster": "철도·시간표", "site_ids": ["naver_n3"], "signal": "Persistent route-specific intent; no same-day Naver count due HTTP 403 limit", "official_sources": ["https://www.letskorail.com"], "measured_search_volume": null, "status": "EVERGREEN_BACKUP"},
+    {"rank": 27, "query": "광주송정역 KTX 시간표", "cluster": "철도·시간표", "site_ids": ["naver_n3"], "signal": "Persistent route-specific intent; no same-day Naver count due HTTP 403 limit", "official_sources": ["https://www.letskorail.com"], "measured_search_volume": null, "status": "EVERGREEN_BACKUP"},
+    {"rank": 28, "query": "인천공항 버스 시간표", "cluster": "공항버스", "site_ids": ["naver_n3"], "signal": "Naver News sample 10 title anchors, though not all were exact timetable answers", "official_sources": ["https://www.airport.kr"], "measured_search_volume": null, "status": "READY_AFTER_ROUTE_OPERATOR_CHECK"},
+    {"rank": 29, "query": "수원 인천공항버스 시간표 요금 타는 곳", "cluster": "공항버스", "site_ids": ["naver_n3"], "signal": "Prepared regional search-intent candidate; Naver same-day sample unavailable after HTTP 403", "official_sources": ["https://www.airport.kr"], "measured_search_volume": null, "status": "EVERGREEN_BACKUP"},
+    {"rank": 30, "query": "대전 인천공항버스 시간표 요금 타는 곳", "cluster": "공항버스", "site_ids": ["naver_n3"], "signal": "Prepared regional search-intent candidate; Naver same-day sample unavailable after HTTP 403", "official_sources": ["https://www.airport.kr"], "measured_search_volume": null, "status": "EVERGREEN_BACKUP"}
+  ],
+  "recommended_plan_overrides": {
+    "naver_n1": [16, 17, 20],
+    "naver_n2": [21, 23, 24],
+    "naver_n3": [1, 2, 9, 13, 14, 25, 28, 29]
+  },
+  "blocked_today": [
+    "Candidate 12 requires an exact official incident statement before any factual event article.",
+    "Candidate 15 requires the National Assembly official schedule before publication.",
+    "Candidate 18 requires an exact official October 1 deduction-start source.",
+    "Candidate 19 is not promoted because Naver results were dominated by unrelated overseas electricity stories."
+  ]
+}
