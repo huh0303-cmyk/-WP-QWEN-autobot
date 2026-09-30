@@ -346,6 +346,48 @@ It is signed out. Its Google reauthentication page was opened for the owner;
 its YouTube channel list has not been inspected. This is a concrete next
 account to check before drawing any conclusion about the personal channel.
 
+Later the owner supplied a screenshot of a Google account menu showing
+`huh0303@gmail.com` in the top profile card and a separate
+`CHRIS JUNGYOON HUH / seoultopik@gmail.com` row carrying the `기본값`
+(`Default`) badge. This supersedes the assumption that the second login
+was unavailable in every browser session: the two emails are distinct and
+the owner's pictured browser shows the second row as default. Our connected
+Chrome sessions still showed only the project 23 under `huh0303@gmail.com`;
+the screenshot does **not** expose the personal YouTube UC ID or prove a
+channel was deleted. Do not change the locked Japanese channel mapping or
+any OAuth secret based on the Google default badge. The owner has asked for
+the default email to be `huh0303@gmail.com` and explicitly confirmed this
+means Google's browser sign-in order. In the connected Chrome profile, the
+Google account menu currently lists only `huh0303@gmail.com` and its brands;
+the Google account page resolves with `authuser=0` for that email. A separate
+connected Edge profile is signed out. The pictured session with a
+`seoultopik@gmail.com` default badge is not presently identifiable among
+those live sessions, so no broad sign-out was applied to the wrong browser.
+The owner clarified that `seoultopik@gmail.com` is used to log in to
+Instagram and Threads. That clarification does not identify the missing
+personal YouTube channel or change any locked YouTube UC ID.
+
+## Seoul Jisoo shopping identity grant
+
+The owner approved the `K-ENTER` Google brand flow. The OAuth tool accepted
+only the exact locked `channels.list(mine=true)` ID
+`UCAizx0tPkRSol8sIhanN_QQ` for `Seoul_Jisoo1` / `@rosiespicks`. It stored
+`YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1` in the protected VPS
+runtime and GitHub `youtube-channels` environment. The independent non-secret
+VPS receipt and GitHub environment secret name were checked. This finishes
+exact-ID identity grants for the 23 current target channels; it does not
+establish today's public upload for any channel or connect the daily timer.
+The two additional shopping slots have no verified UC IDs and remain outside
+this 23-channel set.
+
+The environment secret-name inventory also still includes legacy
+`YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES`,
+`YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES`, and
+`YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES`. These names are not part
+of the active 23-channel map and must not be selected by any publishing job.
+Their continued presence in this environment should be reconciled with the
+owner's earlier expectation that retired credentials had been deleted.
+
 ## Italian Survival identity grant
 
 The owner completed the Italian Survival Google consent. The tool accepted
