@@ -127,10 +127,91 @@ a{color:#1D4ED8}a:hover{color:#1E3A8A}
 </div>
 </section>
 
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h2 style="margin:0;font-size:26px;font-weight:900">{{t.apoTitle}}</h2>
+<div style="font-size:15px;line-height:1.7;color:#3D4A5E;max-width:820px">{{t.apoIntro}}</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:700;color:#7A1F12;background:#FFE0DA;padding:4px 10px;border-radius:999px;align-self:flex-start">{{t.apoBeforeTag}}</div>
+<div style="font-size:15px;line-height:1.7">{{t.apoBefore}}</div>
+</div>
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:700;color:#0B5A2B;background:#D9F2E3;padding:4px 10px;border-radius:999px;align-self:flex-start">{{t.apoAfterTag}}</div>
+<div style="font-size:15px;line-height:1.7">{{t.apoAfter}}</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+<sc-for list="{{apoSteps}}" as="st" hint-placeholder-count="5">
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+<div style="width:32px;height:32px;border-radius:16px;background:#0F1B2D;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center">{{st.n}}</div>
+<div style="font-size:16px;font-weight:900">{{st.title}}</div>
+<div style="font-size:14px;line-height:1.7;color:#3D4A5E">{{st.body}}</div>
+</div>
+</sc-for>
+</div>
+<div style="font-size:14px;line-height:1.8;color:#3D4A5E;background:#FFF6DB;border:1px solid #F0DC9A;border-radius:12px;padding:16px 20px">{{t.apoNotes}}</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h2 style="margin:0;font-size:26px;font-weight:900">{{t.ckTitle}}</h2>
+<div style="font-size:14px;line-height:1.6;color:#3D4A5E">{{t.ckSub}}</div>
+</div>
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>{{t.ckProgress}}</span><span>{{ckDone}} / {{ckTotal}}</span></div>
+<div style="height:10px;border-radius:5px;background:#E4EAF2;overflow:hidden"><div style="height:100%;width:{{ckPct}};background:#1D4ED8"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{docs}}" as="d" hint-placeholder-count="7">
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+<div style="flex:1 1 280px;display:flex;flex-direction:column;gap:4px">
+<div style="font-size:16px;font-weight:900">{{d.name}}</div>
+<div style="font-size:13px;line-height:1.6;color:#3D4A5E">{{d.note}}</div>
+</div>
+<div style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;color:{{d.fg}};background:{{d.bg}}">{{d.badge}}</div>
+<button onClick="{{d.cycle}}" style="min-height:44px;min-width:200px;padding:0 16px;border-radius:10px;border:1px solid {{d.bd}};background:{{d.btnBg}};color:{{d.btnFg}};font-size:14px;font-weight:700">{{d.label}}</button>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h2 style="margin:0;font-size:26px;font-weight:900">{{t.apTitle}}</h2>
+<div style="font-size:14px;line-height:1.6;color:#3D4A5E">{{t.apSub}}</div>
+</div>
+<div style="background:#fff;border:1px solid #D5DDE9;border-radius:16px;padding:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-name" style="font-size:14px;font-weight:700">{{t.fName}}</label><input id="f-name" type="text" autocomplete="name" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit"></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-email" style="font-size:14px;font-weight:700">{{t.fEmail}}</label><input id="f-email" type="email" autocomplete="email" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit"></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-zalo" style="font-size:14px;font-weight:700">{{t.fZalo}}</label><input id="f-zalo" type="tel" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit"></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-school" style="font-size:14px;font-weight:700">{{t.fSchool}}</label>
+<select id="f-school" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit;background:#fff">
+<sc-for list="{{schoolOpts}}" as="o" hint-placeholder-count="3"><option value="{{o.name}}">{{o.name}}</option></sc-for>
+</select></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-prog" style="font-size:14px;font-weight:700">{{t.fProg}}</label>
+<select id="f-prog" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit;background:#fff">
+<option>{{t.fProgD4}}</option><option>{{t.fProgD2}}</option></select></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-term" style="font-size:14px;font-weight:700">{{t.fTerm}}</label>
+<select id="f-term" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit;background:#fff">
+<option>{{t.fTerm1}}</option><option>{{t.fTerm2}}</option></select></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-topik" style="font-size:14px;font-weight:700">{{t.fTopik}}</label>
+<select id="f-topik" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit;background:#fff">
+<option>{{t.fTopik0}}</option><option>TOPIK 1</option><option>TOPIK 2</option><option>TOPIK 3</option><option>TOPIK 4</option><option>TOPIK 5</option><option>TOPIK 6</option></select></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="f-agency" style="font-size:14px;font-weight:700">{{t.fAgency}}</label><input id="f-agency" type="text" style="min-height:44px;box-sizing:border-box;padding:0 12px;border:1px solid #B8C3D4;border-radius:10px;font-size:15px;font-family:inherit"></div>
+<div style="grid-column:1/-1;display:flex;align-items:flex-start;gap:10px"><input id="f-consent" type="checkbox" style="width:22px;height:22px;margin-top:2px"><label for="f-consent" style="font-size:14px;line-height:1.6;color:#3D4A5E">{{t.fConsent}}</label></div>
+<div style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+<button onClick="{{submit}}" style="min-height:48px;padding:0 28px;border-radius:12px;border:0;background:#1D4ED8;color:#fff;font-size:16px;font-weight:900">{{t.fSubmit}}</button>
+<sc-if value="{{sent}}" hint-placeholder-val="{{false}}"><div style="font-size:14px;line-height:1.6;color:#7A1F12;background:#FFE0DA;border-radius:10px;padding:10px 14px">{{t.fSent}}</div></sc-if>
+</div>
+</div>
+</section>
+
 <div style="font-size:13px;line-height:1.7;color:#3D4A5E;border-top:1px solid #D5DDE9;padding-top:20px">{{t.source}}</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2400}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":4300}}'>
 const I18N = {
   ko: {
     heroSub: '한국 유학의 모든 것. 대학 등급과 비자 정책을 한곳에서.', sample: '예시 이미지', photoCredit: '사진: Pexels (무료 라이선스)',
@@ -205,6 +286,56 @@ const I18N = {
     source: 'स्रोत: कोरियाको शिक्षा मन्त्रालय र न्याय मन्त्रालय, Study in Korea। तह प्रत्येक वर्ष नवीकरण हुन्छ। यो पृष्ठले भर्ना वा भिसाको ग्यारेन्टी गर्दैन।'
   }
 };
+const APO = {
+ko:{
+ apoTitle:'아포스티유 안내 (베트남, 2026.9.11 시행)',
+ apoIntro:'아포스티유는 헤이그 협약 가입국끼리 공문서의 서명·직인을 한 번의 확인으로 인정하는 국제 인증입니다. 베트남은 이 협약에 가입했고 2026년 9월 11일부터 적용됩니다. 베트남 서류를 한국 대학에 낼 때 한국 대사관·영사관의 영사확인 대신 베트남 외교부의 아포스티유를 쓰게 됩니다.',
+ apoBeforeTag:'기존 (영사확인)', apoBefore:'공증 → 베트남 외교부 확인 → 한국 대사관 영사확인. 3단계에 대사관 접수·수령 기간이 필요했습니다.',
+ apoAfterTag:'이후 (아포스티유)', apoAfter:'공증(필요한 서류만) → 베트남 외교부 아포스티유. 2단계로 줄어 시간과 비용이 크게 단축됩니다.',
+ apoS:[['서류 발급','졸업증명서, 성적증명서 등을 발급 기관에서 받습니다. 많은 대학이 발급 3개월 이내 서류를 요구하니 대학에 확인하세요.'],['공증(필요 시)','사본·번역본처럼 공증이 필요한 서류는 공증사무소나 인민위원회에서 처리합니다.'],['아포스티유 발급','베트남 외교부(하노이 영사국, 호치민 외교부 지부)에서 아포스티유를 받습니다.'],['한국어 번역','번역은 아포스티유와 별개입니다. 대학이 요구하는 형식을 먼저 확인하세요.'],['제출','대학 또는 유학원에 서류를 냅니다. 이 사이트 체크리스트에서 진행 상태를 관리하세요.']],
+ apoNotes:'참고: 9월 11일 이전에 영사확인을 받은 서류는 계속 유효한 것으로 알려져 있습니다. 시행 초기에는 일부 기관이 기존 영사확인을 계속 요구할 수 있으니 지원 대학에 반드시 사전 확인하세요. 온라인 아포스티유도 효력은 인정되지만 초기에는 종이본을 권장합니다. 이 안내는 일반 정보이며 대학·출입국의 최신 요구가 우선합니다.',
+ ckTitle:'지원서류 체크리스트', ckSub:'서류별로 버튼을 눌러 진행 상태를 바꾸세요. 아포스티유 필요 여부는 일반 기준이며 대학별로 다를 수 있습니다.', ckProgress:'제출 준비 완료',
+ st:['준비 전','발급 완료','아포스티유 완료','번역 완료','제출 준비 완료'], stNo:['준비 전','준비 완료'],
+ need:{yes:'아포스티유 필요',ask:'대학 확인',no:'불필요'},
+ docs:[['passport','여권 사본','no','사진면 사본. 유효기간을 확인하세요.'],['diploma','졸업증명서','yes','베트남 학교 발급 공문서. 아포스티유와 한국어 번역이 필요합니다.'],['transcript','성적증명서','yes','베트남 학교 발급 공문서. 아포스티유와 한국어 번역이 필요합니다.'],['family','가족관계·출생 관련 서류','ask','대학이 요구할 때만. 요구 시 공증·아포스티유·번역 필요 여부를 대학에 확인하세요.'],['bank','재정 증빙(은행 잔고)','ask','민간 기관 서류는 공증 후 아포스티유 여부가 다를 수 있어 대학과 출입국 기준을 확인하세요.'],['topik','TOPIK 성적표','no','한국에서 발급되므로 아포스티유가 필요 없습니다.'],['form','입학지원서·증명사진','no','대학 지정 양식으로 작성합니다.']],
+ apTitle:'지원하기', apSub:'희망 대학과 과정을 남기면 상담을 이어갑니다.', fName:'이름(여권 영문)', fEmail:'이메일', fZalo:'Zalo / 전화번호', fSchool:'희망 대학', fProg:'과정', fProgD4:'어학연수 (D-4)', fProgD2:'학위과정 (D-2)', fTerm:'입학 학기', fTerm1:'2026 겨울학기', fTerm2:'2027 봄학기', fTopik:'TOPIK 급수', fTopik0:'아직 없음', fAgency:'유학원 코드(선택)', fConsent:'개인정보 수집·이용에 동의합니다. 입력한 정보는 지원 상담 목적으로만 사용합니다.', fSubmit:'지원 문의 보내기', fSent:'시안 화면입니다. 접수 수신처(이메일 또는 시트)가 연결되기 전에는 전송되지 않습니다.'},
+vi:{
+ apoTitle:'Hướng dẫn Apostille (Việt Nam, hiệu lực 11/9/2026)',
+ apoIntro:'Apostille là chứng nhận quốc tế giúp công nhận chữ ký và con dấu trên giấy tờ công chỉ bằng một lần xác nhận giữa các nước thành viên Công ước La Hay. Việt Nam đã gia nhập và áp dụng từ ngày 11/9/2026. Khi nộp giấy tờ Việt Nam cho trường Hàn Quốc, bạn dùng Apostille của Bộ Ngoại giao Việt Nam thay cho hợp pháp hóa lãnh sự của Đại sứ quán Hàn Quốc.',
+ apoBeforeTag:'Trước đây (hợp pháp hóa lãnh sự)', apoBefore:'Công chứng → Bộ Ngoại giao Việt Nam xác nhận → Đại sứ quán Hàn Quốc hợp pháp hóa. 3 bước và phải chờ tiếp nhận, trả kết quả tại đại sứ quán.',
+ apoAfterTag:'Hiện nay (Apostille)', apoAfter:'Công chứng (chỉ khi cần) → Bộ Ngoại giao Việt Nam cấp Apostille. Giảm còn 2 bước, tiết kiệm nhiều thời gian và chi phí.',
+ apoS:[['Xin giấy tờ','Lấy bằng tốt nghiệp, bảng điểm... tại nơi cấp. Nhiều trường yêu cầu giấy tờ cấp trong vòng 3 tháng, hãy hỏi trường.'],['Công chứng (nếu cần)','Bản sao, bản dịch cần công chứng thì làm tại phòng công chứng hoặc UBND.'],['Cấp Apostille','Nhận Apostille tại Bộ Ngoại giao (Cục Lãnh sự Hà Nội, Sở Ngoại vụ TP.HCM).'],['Dịch sang tiếng Hàn','Dịch thuật độc lập với Apostille. Hãy hỏi trường về định dạng yêu cầu.'],['Nộp hồ sơ','Nộp cho trường hoặc trung tâm du học. Theo dõi tiến độ bằng danh sách kiểm tra bên dưới.']],
+ apoNotes:'Lưu ý: giấy tờ đã được hợp pháp hóa lãnh sự trước ngày 11/9 được cho là vẫn còn giá trị. Giai đoạn đầu một số cơ quan vẫn có thể yêu cầu hợp pháp hóa lãnh sự, vì vậy hãy hỏi trường trước. Apostille điện tử có hiệu lực nhưng nên dùng bản giấy trong giai đoạn đầu. Đây là thông tin chung, yêu cầu mới nhất của trường và cơ quan xuất nhập cảnh được ưu tiên.',
+ ckTitle:'Danh sách hồ sơ', ckSub:'Bấm nút ở từng giấy tờ để đổi trạng thái. Việc có cần Apostille hay không là quy định chung, có thể khác theo từng trường.', ckProgress:'Đã sẵn sàng nộp',
+ st:['Chưa chuẩn bị','Đã xin giấy tờ','Đã có Apostille','Đã dịch','Sẵn sàng nộp'], stNo:['Chưa chuẩn bị','Đã sẵn sàng'],
+ need:{yes:'Cần Apostille',ask:'Hỏi trường',no:'Không cần'},
+ docs:[['passport','Bản sao hộ chiếu','no','Bản sao trang thông tin. Kiểm tra thời hạn.'],['diploma','Bằng tốt nghiệp','yes','Giấy tờ do trường tại Việt Nam cấp. Cần Apostille và bản dịch tiếng Hàn.'],['transcript','Bảng điểm','yes','Giấy tờ do trường tại Việt Nam cấp. Cần Apostille và bản dịch tiếng Hàn.'],['family','Giấy tờ quan hệ gia đình / khai sinh','ask','Chỉ khi trường yêu cầu. Hỏi trường về công chứng, Apostille và dịch thuật.'],['bank','Chứng minh tài chính (số dư ngân hàng)','ask','Giấy tờ của tổ chức tư có thể cần quy trình khác, hãy hỏi trường và cơ quan xuất nhập cảnh.'],['topik','Bảng điểm TOPIK','no','Cấp tại Hàn Quốc nên không cần Apostille.'],['form','Đơn nhập học và ảnh thẻ','no','Điền theo mẫu của trường.']],
+ apTitle:'Đăng ký', apSub:'Để lại trường và chương trình mong muốn, chúng tôi sẽ tư vấn tiếp.', fName:'Họ tên (như trên hộ chiếu)', fEmail:'Email', fZalo:'Zalo / Số điện thoại', fSchool:'Trường mong muốn', fProg:'Chương trình', fProgD4:'Học tiếng (D-4)', fProgD2:'Đại học/Sau đại học (D-2)', fTerm:'Kỳ nhập học', fTerm1:'Kỳ đông 2026', fTerm2:'Kỳ xuân 2027', fTopik:'Cấp TOPIK', fTopik0:'Chưa có', fAgency:'Mã trung tâm du học (tùy chọn)', fConsent:'Tôi đồng ý cho thu thập và sử dụng thông tin cá nhân. Thông tin chỉ dùng cho mục đích tư vấn hồ sơ.', fSubmit:'Gửi yêu cầu', fSent:'Đây là bản thiết kế mẫu. Biểu mẫu chưa gửi được cho đến khi kết nối nơi nhận (email hoặc bảng tính).'},
+en:{
+ apoTitle:'Apostille guide (Vietnam, effective 11 Sep 2026)',
+ apoIntro:'An apostille is an international certificate that lets Hague Convention members accept the signature and seal on a public document after a single check. Vietnam has joined and the Convention applies from 11 September 2026. For Vietnamese documents sent to Korean universities, the Vietnamese Ministry of Foreign Affairs apostille replaces consular legalization by a Korean embassy.',
+ apoBeforeTag:'Before (consular legalization)', apoBefore:'Notarization, then Vietnamese MOFA authentication, then Korean embassy legalization. Three steps plus embassy drop-off and pickup time.',
+ apoAfterTag:'Now (apostille)', apoAfter:'Notarization (only where needed), then a Vietnamese MOFA apostille. Two steps, with far less time and cost.',
+ apoS:[['Get the document','Obtain your diploma, transcript and similar documents from the issuer. Many universities require documents issued within 3 months, so ask your school.'],['Notarize if needed','Copies or translations that need notarization go to a notary office or the People\'s Committee.'],['Get the apostille','Apply at the Ministry of Foreign Affairs (Consular Department in Hanoi, Department of Foreign Affairs in Ho Chi Minh City).'],['Korean translation','Translation is separate from the apostille. Check the format your university wants.'],['Submit','Send to the university or your agency. Track progress in the checklist below.']],
+ apoNotes:'Note: documents legalized before 11 September are reported to remain valid. Some offices may still ask for consular legalization at first, so confirm with your university beforehand. Electronic apostilles are legally valid but paper copies are advised during the transition. This is general information; your university and immigration office requirements take priority.',
+ ckTitle:'Application document checklist', ckSub:'Tap each button to change its status. Apostille requirements shown are general and can differ by university.', ckProgress:'Ready to submit',
+ st:['Not started','Issued','Apostille done','Translated','Ready to submit'], stNo:['Not started','Ready'],
+ need:{yes:'Apostille needed',ask:'Ask university',no:'Not needed'},
+ docs:[['passport','Passport copy','no','Copy of the photo page. Check the expiry date.'],['diploma','Graduation certificate','yes','Public document from a Vietnamese school. Needs an apostille and a Korean translation.'],['transcript','Academic transcript','yes','Public document from a Vietnamese school. Needs an apostille and a Korean translation.'],['family','Family / birth records','ask','Only if the university asks. Confirm notarization, apostille and translation needs with them.'],['bank','Proof of funds (bank balance)','ask','Private-institution documents may follow a different route. Check university and immigration rules.'],['topik','TOPIK score report','no','Issued in Korea, so no apostille is needed.'],['form','Application form and photo','no','Use the university\'s own form.']],
+ apTitle:'Apply', apSub:'Tell us your preferred school and program and we will follow up.', fName:'Full name (as on passport)', fEmail:'Email', fZalo:'Zalo / phone', fSchool:'Preferred university', fProg:'Program', fProgD4:'Language course (D-4)', fProgD2:'Degree program (D-2)', fTerm:'Intake', fTerm1:'Winter 2026', fTerm2:'Spring 2027', fTopik:'TOPIK level', fTopik0:'None yet', fAgency:'Agency code (optional)', fConsent:'I consent to the collection and use of my personal data. It is used only to handle my application inquiry.', fSubmit:'Send inquiry', fSent:'This is a design preview. Nothing is sent until a receiving inbox or sheet is connected.'},
+ne:{
+ apoTitle:'अपोस्टिल मार्गदर्शन (भियतनाम, २०२६ सेप्टेम्बर ११ देखि लागू)',
+ apoIntro:'अपोस्टिल भनेको हेग महासन्धिका सदस्य देशहरूले सार्वजनिक कागजातको हस्ताक्षर र छाप एकपटकको प्रमाणीकरणबाट मान्ने अन्तर्राष्ट्रिय प्रमाणपत्र हो। भियतनाम सदस्य बनेको छ र २०२६ सेप्टेम्बर ११ देखि लागू हुन्छ। भियतनामी कागजात कोरियाली विश्वविद्यालयमा बुझाउँदा कोरियाली दूतावासको कन्सुलर प्रमाणीकरणको सट्टा भियतनामको विदेश मन्त्रालयको अपोस्टिल प्रयोग हुन्छ।',
+ apoBeforeTag:'पहिले (कन्सुलर प्रमाणीकरण)', apoBefore:'नोटरी, त्यसपछि भियतनाम विदेश मन्त्रालयको प्रमाणीकरण, त्यसपछि कोरियाली दूतावासको प्रमाणीकरण। तीन चरण र दूतावासमा बुझाउने र लिने समय।',
+ apoAfterTag:'अहिले (अपोस्टिल)', apoAfter:'नोटरी (आवश्यक परे मात्र), त्यसपछि भियतनाम विदेश मन्त्रालयको अपोस्टिल। दुई चरण, समय र खर्च धेरै कम।',
+ apoS:[['कागजात लिनुहोस्','डिप्लोमा, ट्रान्सक्रिप्ट जस्ता कागजात जारी गर्ने निकायबाट लिनुहोस्। धेरै विश्वविद्यालयले ३ महिनाभित्र जारी कागजात मागछन्, सोध्नुहोस्।'],['नोटरी (आवश्यक परे)','प्रतिलिपि वा अनुवादमा नोटरी चाहिए नोटरी कार्यालय वा जन समितिमा गर्नुहोस्।'],['अपोस्टिल लिनुहोस्','विदेश मन्त्रालय (हनोईको कन्सुलर विभाग, हो ची मिन्ह सहरको विदेश विभाग) मा आवेदन दिनुहोस्।'],['कोरियाली अनुवाद','अनुवाद अपोस्टिलभन्दा अलग हो। विश्वविद्यालयले चाहेको ढाँचा जाँच्नुहोस्।'],['बुझाउनुहोस्','विश्वविद्यालय वा एजेन्सीमा बुझाउनुहोस्। तलको चेकलिस्टमा प्रगति हेर्नुहोस्।']],
+ apoNotes:'नोट: सेप्टेम्बर ११ अघि कन्सुलर प्रमाणीकरण गरिएका कागजात मान्य रहन्छन् भनिएको छ। सुरुमा केही कार्यालयले अझै पुरानो प्रमाणीकरण माग्न सक्छन्, त्यसैले पहिले विश्वविद्यालयसँग पुष्टि गर्नुहोस्। विद्युतीय अपोस्टिल मान्य छ तर सुरुमा कागजी प्रति सिफारिस गरिन्छ। यो सामान्य जानकारी हो; विश्वविद्यालय र अध्यागमन कार्यालयको पछिल्लो आवश्यकता प्राथमिक हुन्छ।',
+ ckTitle:'आवेदन कागजात चेकलिस्ट', ckSub:'अवस्था बदल्न प्रत्येक बटन थिच्नुहोस्। अपोस्टिल चाहिने कि नचाहिने सामान्य नियम हो र विश्वविद्यालय अनुसार फरक हुन सक्छ।', ckProgress:'बुझाउन तयार',
+ st:['सुरु भएको छैन','जारी भयो','अपोस्टिल भयो','अनुवाद भयो','बुझाउन तयार'], stNo:['सुरु भएको छैन','तयार'],
+ need:{yes:'अपोस्टिल चाहिन्छ',ask:'विश्वविद्यालयसँग सोध्नुहोस्',no:'चाहिँदैन'},
+ docs:[['passport','राहदानी प्रतिलिपि','no','फोटो भएको पृष्ठको प्रतिलिपि। म्याद जाँच्नुहोस्।'],['diploma','स्नातक प्रमाणपत्र','yes','भियतनामी विद्यालयले जारी गरेको सार्वजनिक कागजात। अपोस्टिल र कोरियाली अनुवाद चाहिन्छ।'],['transcript','शैक्षिक ट्रान्सक्रिप्ट','yes','भियतनामी विद्यालयले जारी गरेको सार्वजनिक कागजात। अपोस्टिल र कोरियाली अनुवाद चाहिन्छ।'],['family','पारिवारिक / जन्म सम्बन्धी कागजात','ask','विश्वविद्यालयले माग्दा मात्र। नोटरी, अपोस्टिल र अनुवादबारे सोध्नुहोस्।'],['bank','आर्थिक प्रमाण (बैंक मौज्दात)','ask','निजी संस्थाको कागजातको प्रक्रिया फरक हुन सक्छ। विश्वविद्यालय र अध्यागमन नियम जाँच्नुहोस्।'],['topik','TOPIK अंकपत्र','no','कोरियामा जारी हुने भएकाले अपोस्टिल चाहिँदैन।'],['form','आवेदन फारम र फोटो','no','विश्वविद्यालयको आफ्नै फारम प्रयोग गर्नुहोस्।']],
+ apTitle:'आवेदन गर्नुहोस्', apSub:'मनपर्ने विश्वविद्यालय र कार्यक्रम लेख्नुहोस्, हामी सम्पर्क गर्छौं।', fName:'नाम (राहदानी अनुसार)', fEmail:'इमेल', fZalo:'Zalo / फोन', fSchool:'मनपर्ने विश्वविद्यालय', fProg:'कार्यक्रम', fProgD4:'भाषा कोर्स (D-4)', fProgD2:'डिग्री कार्यक्रम (D-2)', fTerm:'भर्ना सत्र', fTerm1:'जाडो २०२६', fTerm2:'वसन्त २०२७', fTopik:'TOPIK स्तर', fTopik0:'अहिलेसम्म छैन', fAgency:'एजेन्सी कोड (ऐच्छिक)', fConsent:'म व्यक्तिगत जानकारी संकलन र प्रयोगमा सहमत छु। यो आवेदन सम्बन्धी सल्लाहका लागि मात्र प्रयोग हुन्छ।', fSubmit:'सोधपुछ पठाउनुहोस्', fSent:'यो डिजाइन नमुना हो। प्राप्त गर्ने इमेल वा सिट जोडिएसम्म केही पठाइँदैन।'}
+};
 const LANGS = [['vi','Tiếng Việt'],['en','English'],['ko','한국어'],['ne','नेपाली']];
 const PHOTOS = {'건국대학교':'/_blob/3031fa3348a4686a39f98c113c393cc5','경희대학교':'/_blob/7fa8f7b0d93283181d5621427b223bd2','이화여자대학교':'/_blob/962bd5f6cfbe9997ff50374ff712e7fb'};
 const POOL = ['0ab88a769c936ed4f5f8216014ab2bf7','597f201b3bceb82d3d7bfb46496569d1','d783cbd789bc258c41699611526c5ab6','9214273bd7601e67c891bbe772c08c0d','f961368217cb292a450c55e7451bd952','fdbbc7f899fee8ba7fc7e2d37a50fef8','a843d2e60b61e70749be4c375bfbeb5c'];
@@ -213,7 +344,8 @@ class Component extends DCLogic {
   renderVals() {
     const st = this.state || {};
     const lang = st.lang || 'vi';
-    const t = I18N[lang];
+    const A = APO[lang];
+    const t = Object.assign({}, I18N[lang], A);
     const scroller = (dir) => (e) => {
       const sec = e.currentTarget.closest('[data-sec]');
       const tr = sec && sec.querySelector('[data-track]');
@@ -246,8 +378,25 @@ class Component extends DCLogic {
       imgs: r.concat(r).map((id) => ({ src: '/_blob/' + id })),
       anim: (i === 1 ? 'mqR' : 'mqL') + ' ' + (60 + i * 12) + 's linear infinite'
     }));
+    const docsState = st.docs || {};
+    const rowsDocs = A.docs.map((d) => {
+      const id = d[0], need = d[2];
+      const labels = need === 'no' ? A.stNo : A.st;
+      const last = labels.length - 1;
+      const cur = Math.min(docsState[id] || 0, last);
+      const done = cur === last;
+      const col = need === 'yes' ? ['#7A1F12','#FFE0DA'] : (need === 'ask' ? ['#5C3B00','#FCEBB5'] : ['#0B5A2B','#D9F2E3']);
+      return { name: d[1], note: d[3], badge: A.need[need], fg: col[0], bg: col[1], label: labels[cur], done: done,
+        btnBg: done ? '#0B5A2B' : '#FFFFFF', btnFg: done ? '#FFFFFF' : '#0F1B2D', bd: done ? '#0B5A2B' : '#B8C3D4',
+        cycle: () => { const n = Object.assign({}, docsState); n[id] = (cur + 1) % labels.length; this.setState({ docs: n }); } };
+    });
+    const ckDone = rowsDocs.filter((d) => d.done).length;
+    const schoolOpts = top.concat(cert).map((c) => ({ name: c.name }));
     return {
       t: t,
+      docs: rowsDocs, ckDone: ckDone, ckTotal: rowsDocs.length, ckPct: Math.round(ckDone * 100 / rowsDocs.length) + '%',
+      apoSteps: A.apoS.map((x, i) => ({ n: i + 1, title: x[0], body: x[1] })),
+      schoolOpts: schoolOpts, sent: !!st.sent, submit: () => this.setState({ sent: true }),
       langs: LANGS.map((l) => ({
         label: l[1], on: lang === l[0],
         bg: lang === l[0] ? '#0F1B2D' : 'transparent', fg: lang === l[0] ? '#FFFFFF' : '#0F1B2D',

@@ -254,3 +254,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## studyinkorea365-design-20261001
 - 2026-10-01 05:55 KST — StudyInKorea365.com 디자인 시안 v4(우수인증 금메달 캐러셀, 인증·일반 3단, 첫 화면 사진 3줄 캐러셀, 4개 언어, 비자 정책 섹션)를 Artifact로 발행. 소스와 사진을 `projects/studyinkorea365/design/` 에 저장하고 상태 문서 `docs/STUDYINKOREA365_PROJECT_STATE_2026-10-01.md` 작성. 우수인증 28개 vs 공식 39~43개 불일치, 인증·일반 목록, 호스팅, 번역 검수는 미결. VERIFIED 아님(렌더링 미확인).
+
+## studyinkorea365-apostille-apply-20261001
+- 2026-10-01 06:10 KST — 시안 v5: 베트남 아포스티유(2026-09-11 발효) 안내, 서류 체크리스트, 지원 문의 폼 추가(4개 언어). 상태 문서에 출처·가정·미결 기록. 폼 수신처 미정(전송 안 됨). VERIFIED 아님.
