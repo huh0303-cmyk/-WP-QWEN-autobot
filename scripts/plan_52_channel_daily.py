@@ -69,7 +69,7 @@ def daily_non_youtube_targets() -> list[dict]:
     roles = {row.get("key"): row for row in sns.get("roles", [])}
     for row in sns.get("accounts", []):
         platform = str(row.get("platform", ""))
-        if platform in {"Instagram", "Threads"} and row.get("role") not in {
+        if platform in {"Instagram", "Threads", "Facebook", "TikTok"} and row.get("role") not in {
             "korean_topik", "english", "japanese", "hot_item_shop"
         }:
             continue
@@ -107,8 +107,8 @@ def daily_non_youtube_targets() -> list[dict]:
             "topic_source": "account_specific_keyword_bank",
             "topic_brief": "Select one original account-specific search topic with duplicate protection.",
         })
-    if len(result) != 28:
-        raise RuntimeError(f"expected 28 daily non-YouTube targets, found {len(result)}")
+    if len(result) != 24:
+        raise RuntimeError(f"expected 24 daily non-YouTube targets, found {len(result)}")
     return result
 
 
