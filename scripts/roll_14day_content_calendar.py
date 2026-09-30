@@ -2,6 +2,7 @@
 """Keep the CEO content calendar continuously filled through KST today + 13 days."""
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import hashlib
 import json
@@ -184,7 +185,11 @@ def youtube_rows(horizon: dt.date, existing, channels):
     return rows
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--youtube-only", action="store_true",
+                        help="Append only missing future core YouTube dates")
+    args = parser.parse_args(argv)
     service = get_sheets_service()
     current = load_rows(service)
     if not current or current[0] != HEADERS:
@@ -196,8 +201,9 @@ def main():
     today = dt.datetime.now(KST).date()
     horizon = today + dt.timedelta(days=13)
     new_rows = []
-    for offset in range(14):
-        new_rows.extend(wp_blogger_rows(today + dt.timedelta(days=offset), existing_keys))
+    if not args.youtube_only:
+        for offset in range(14):
+            new_rows.extend(wp_blogger_rows(today + dt.timedelta(days=offset), existing_keys))
     channels = json.loads((ROOT / "config" / "youtube_channels.json").read_text(encoding="utf-8"))["channels"]
     new_rows.extend(youtube_rows(horizon, data + new_rows, channels))
     if not new_rows:

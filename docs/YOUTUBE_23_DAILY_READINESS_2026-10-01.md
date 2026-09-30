@@ -12,6 +12,8 @@ The owner reaffirmed one public item per channel per day and asked to connect ac
 
 The interactive exact-ID OAuth renewal tool now accepts every key in the locked 23, using unique per-channel secret names, and saves a new token only after `mine=true` returns exactly the expected UC ID. The K-POP flow was restarted and reached Google's unverified-app warning after selecting the first `Studio_K3` brand alias. The owner must personally review/continue that security warning and consent; no new K-POP token or publication is claimed until the callback and exact-ID check succeed. Remaining language, health and shopping channels still need their account-specific authorization plus video production and public receipt paths. Instagram, Threads, TikTok and Facebook also lack a verified per-role daily API publisher; the current 16 role slots must stay blocked until exact external account IDs, write credentials and content assets are verified.
 
+The daily plan timer only writes an audit manifest; the core YouTube scheduler reads a separate Google Sheet. A new YouTube-only calendar roll service and daily timer now fill missing dates for the core ten from tomorrow through day 13. The roll uses the protected VPS Google runtime, a single-process lock, and the existing Sheet header/date guards. It never rewrites an existing date, creates same-day catch-up rows, or invokes the upload worker. Public execution still depends on a verified token, fresh content and the separate 15-minute dispatcher. Its live timer/service result must be recorded after deployment.
+
 ## Today's evidence
 
 Read-only YouTube Data API checked all 23 exact UC IDs at 03:04 KST. Healing
