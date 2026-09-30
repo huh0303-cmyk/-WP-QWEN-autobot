@@ -345,3 +345,14 @@ account menu: `seoultopik@gmail.com`, also displaying `CHRIS JUNGYOON HUH`.
 It is signed out. Its Google reauthentication page was opened for the owner;
 its YouTube channel list has not been inspected. This is a concrete next
 account to check before drawing any conclusion about the personal channel.
+
+## Italian Survival identity grant
+
+The owner completed the Italian Survival Google consent. The tool accepted
+only the exact locked `channels.list(mine=true)` ID
+`UCK8B-BM09Cz-ockaQYLL5LA` and stored
+`YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT` in the protected VPS and the
+GitHub `youtube-channels` environment. The non-secret VPS receipt and GitHub
+environment secret name were checked independently. The Google brand selector
+ID `101469748905879577842` is recorded as a navigation hint only. No video
+upload or public-release receipt is implied.
