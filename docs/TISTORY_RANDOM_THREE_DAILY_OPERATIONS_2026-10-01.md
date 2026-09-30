@@ -35,5 +35,8 @@ Canonical configuration: `config/tistory_portfolio.json`.
   - `tistory_life365` at 21:38 KST
 - Selection receipt: `data/tistory-slots/2026-10-01/selection.json`, remote commit `21f9e818`.
 - At 01:15 KST all three times were still in the future, so the bootstrap run correctly saved the selection without prematurely dispatching article generation.
-- The current local Tistory registrar has no queued job. Public URLs will be recorded only after the remote workflow generates, queues, and the logged-in local registrar verifies each post.
+- The Windows local registrar task `Tistory5개_일일자동발행` was still running only once at 11:24 KST, which could miss later randomized jobs. Its prior trigger was replaced with 16 daily checks at 08:45 through 23:45 KST, one per hour.
+- The scheduled-task action and working directory were preserved. After the change the task state was `Ready`, next run was 08:45 KST, and its last result remained success (`0`).
+- The local runtime checkout was clean and was fast-forwarded to the same GitHub main commit before the trigger change.
+- The current local Tistory registrar has no queued job because all three 2026-10-01 slots are still in the future. Public URLs will be recorded only after the remote workflow generates, queues, and the logged-in local registrar verifies each post.
 - No password, token, or private credential is stored in this document or the repository.
