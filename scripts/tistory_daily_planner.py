@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-import hashlib
 import json
-import random
 import os
 import re
 from datetime import datetime
@@ -21,19 +19,6 @@ KST = ZoneInfo("Asia/Seoul")
 
 def load_config(path: Path = CONFIG) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-def _daily_rng(site_id: str, day: str) -> random.Random:
-    seed = int(hashlib.sha256(f"{site_id}:{day}".encode()).hexdigest()[:16], 16)
-    return random.Random(seed)
-
-
-def _pick_time(site: dict, day: str) -> str:
-    start, end = site.get("daily_window", [8, 20])
-    rng = _daily_rng(site["site_id"], day)
-    hour = rng.randint(int(start), int(end))
-    minute = rng.choice([7, 11, 17, 23, 29, 37, 43, 47, 53])
-    return f"{hour:02d}:{minute:02d}"
 
 
 def _golden_keyword_score(topic: str, site: dict) -> tuple[int, dict[str, int]]:
@@ -86,12 +71,27 @@ def build_plan(now: datetime | None = None) -> dict:
     jobs = []
     failures = []
     requested_site_ids = {s.strip() for s in os.environ.get("SITE_IDS", "").split(",") if s.strip()}
-    enabled_sites = sorted(
+    eligible_sites = sorted(
         (site for site in cfg["sites"]
          if site.get("launch_enabled") is True
          and (not requested_site_ids or site["site_id"] in requested_site_ids)),
         key=lambda site: int(site.get("launch_order", 999)),
     )
+    from automation_hub.tistory_schedule import random_daily_selection
+    if requested_site_ids:
+        enabled_sites = eligible_sites
+        selected_times = {
+            site["site_id"]: os.environ.get("TISTORY_SCHEDULED_LOCAL_TIME", "").strip()
+            for site in enabled_sites
+        }
+    else:
+        selection = random_daily_selection(
+            [site["site_id"] for site in eligible_sites],
+            int(cfg.get("network_daily_posts", 3)),
+        )
+        selected_ids = {item["site_id"] for item in selection}
+        enabled_sites = [site for site in eligible_sites if site["site_id"] in selected_ids]
+        selected_times = {item["site_id"]: item["scheduled_local_time"] for item in selection}
     for site in enabled_sites:
         from automation_hub.tistory_keywords import recent_history
         from automation_hub.tistory_schedule import slot_time
@@ -111,7 +111,7 @@ def build_plan(now: datetime | None = None) -> dict:
             "description": site.get("description", ""),
             "url": site.get("url", ""),
             "launch_order": site.get("launch_order"),
-            "scheduled_local_time": slot_time(site["site_id"], day, os.environ.get("TISTORY_SLOT", "daily")),
+            "scheduled_local_time": selected_times.get(site["site_id"]) or slot_time(site["site_id"], day, os.environ.get("TISTORY_SLOT", "daily")),
             "recent_titles": site["recent_history"],
             "publish_policy": cfg.get("default_publish_policy", "awaiting_approval"),
             "duplicate_guard": True,
@@ -138,9 +138,11 @@ def build_plan(now: datetime | None = None) -> dict:
         "date": day,
         "run_key": run_key,
         "timezone": "Asia/Seoul",
-        "daily_posts_per_site": 1,
+        "network_daily_posts": int(cfg.get("network_daily_posts", 3)),
+        "daily_max_per_site": int(cfg.get("daily_max_per_site", 1)),
         "portfolio_sites": len(cfg["sites"]),
-        "enabled_sites": len(enabled_sites),
+        "eligible_sites": len(eligible_sites),
+        "selected_sites": len(enabled_sites),
         "public_allowed": False,
         "jobs": jobs,
         "failures": failures,

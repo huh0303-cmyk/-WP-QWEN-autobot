@@ -1,13 +1,16 @@
 {
   "version": 1,
-  "selected_site_id": "naver_n3",
-  "blog_id": "sky-only",
-  "display_name": "생활의정석",
+  "primary_site_id": "naver_n3",
+  "active_site_ids": [
+    "naver_n1",
+    "naver_n2",
+    "naver_n3"
+  ],
   "timezone": "Asia/Seoul",
   "objective": "네이버 검색·홈 추천에서 신뢰를 쌓아 장기 방문과 합법적 수익 기회를 늘린다",
   "cadence": {
-    "daily_min": 1,
-    "daily_max": 5,
+    "network_daily_min": 3,
+    "network_daily_max": 7,
     "minimum_interval_minutes": 10,
     "preferred_slots_kst": [
       "09:17",
@@ -17,6 +20,11 @@
       "20:37"
     ],
     "never_bulk_publish": true
+  },
+  "per_site_cadence": {
+    "naver_n1": {"display_name": "부의정석", "blog_id": "k-insight-vietnam", "daily_min": 1, "daily_max": 1},
+    "naver_n2": {"display_name": "헬스의정석", "blog_id": "health-standard", "daily_min": 1, "daily_max": 1},
+    "naver_n3": {"display_name": "생활의정석", "blog_id": "sky-only", "daily_min": 1, "daily_max": 5}
   },
   "workflow": [
     "current_keyword_research",

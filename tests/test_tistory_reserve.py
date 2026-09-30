@@ -32,8 +32,16 @@ def test_one_history_failure_does_not_stop_other_sites(monkeypatch):
             raise RuntimeError('unavailable')
         return []
     monkeypatch.setattr('automation_hub.tistory_keywords.recent_history', history)
+    monkeypatch.setattr(
+        'automation_hub.tistory_schedule.random_daily_selection',
+        lambda site_ids, count: [
+            {'site_id': site_id, 'scheduled_local_time': f'{9 + index * 3:02d}:17'}
+            for index, site_id in enumerate(site_ids[:count])
+        ],
+    )
     monkeypatch.setattr('scripts.tistory_daily_planner._pick_seed_topic', lambda *a: ('새 주제',0,{}))
     plan = build_plan()
-    assert len(plan['jobs']) == 4
+    assert len(plan['jobs']) == 2
     assert len(plan['failures']) == 1
-    assert plan['enabled_sites'] == 5
+    assert plan['eligible_sites'] == 5
+    assert plan['selected_sites'] == 3

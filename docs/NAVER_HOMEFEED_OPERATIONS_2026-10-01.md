@@ -1,17 +1,15 @@
 # Naver Home-feed operating setup — 2026-10-01
 
-## Selected account
+## Active accounts
 
-- Site ID: `naver_n3`
-- Display name: `생활의정석`
-- Naver blog ID: `sky-only`
-- Editor: `https://blog.naver.com/PostWriteForm.naver?blogId=sky-only`
-- Verified Chrome login: account `huh4`
-- Standby accounts: `naver_n1` 부의정석, `naver_n2` 헬스의정석
+- `naver_n1`: 부의정석, blog ID `k-insight-vietnam`, one reviewed public post per day.
+- `naver_n2`: 헬스의정석, blog ID `health-standard`, one reviewed public post per day.
+- `naver_n3`: 생활의정석, blog ID `sky-only`, one to five reviewed public posts per day; primary account.
+- The browser session must be verified against the exact destination blog ID before editing or publishing.
 
 ## Operating contract
 
-- One to five reviewed posts per KST day.
+- Network total: three to seven reviewed posts per KST day: N1 one, N2 one, and N3 one to five.
 - At least ten minutes between saves or publications; no bulk publishing.
 - Current keyword research, official-source verification, original writing, one copyright-safe image, editorial review, Naver save/publish, and result verification.
 - Policy/support posts require a current government or public-agency source and clear attribution.
@@ -38,7 +36,14 @@ Canonical machine-readable policy: `config/naver_homefeed_automation.json`.
 ## Recurring operation
 
 - Codex heartbeat automation ID: `5-2`
-- Name: `생활의정석 하루 5회 운영`
+- Name: `네이버 3개 블로그 일일 운영`
 - Status: active
 - Planned daily checks: five non-hourly KST slots, with the ten-minute minimum gap enforced by policy.
 - Each run must stop at an honest failure or required confirmation instead of inventing a public result.
+
+## 2026-10-01 account handoff state
+
+- A separate browser session was opened at the exact `naver_n1` editor destination.
+- Naver redirected it to the sign-in screen, proving that no usable `naver_n1` authenticated session was available in that browser.
+- No credentials were stored in files, logs, commits, or automation prompts.
+- Exact next action: the owner completes the visible Naver sign-in; the operator then rechecks the destination blog ID before preparing or publishing the first N1 post. N2 follows in its own verified session.

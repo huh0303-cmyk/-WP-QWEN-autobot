@@ -12,23 +12,26 @@ def test_tistory_portfolio_is_five_distinct_sites():
     assert len({s["title"] for s in cfg["sites"]}) == 5
 
 
-def test_daily_plan_includes_all_five_launched_sites():
+def test_daily_plan_selects_exactly_three_of_five_launched_sites():
     plan = build_plan(datetime(2026, 8, 28, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
     assert plan["portfolio_sites"] == 5
-    assert plan["enabled_sites"] == 5
-    assert len(plan["jobs"]) == 5
-    assert plan["daily_posts_per_site"] == 2
+    assert plan["eligible_sites"] == 5
+    assert plan["selected_sites"] == 3
+    assert len(plan["jobs"]) == 3
+    assert len({job["site_id"] for job in plan["jobs"]}) == 3
+    assert plan["network_daily_posts"] == 3
+    assert plan["daily_max_per_site"] == 1
     assert plan["public_allowed"] is False
-    assert all(j["publish_policy"] == "awaiting_approval" for j in plan["jobs"])
+    assert all(j["publish_policy"] == "public_after_logged_in_local_registrar" for j in plan["jobs"])
     assert all(j["duplicate_guard"] is True for j in plan["jobs"])
     assert all(j["public_allowed"] is False for j in plan["jobs"])
 
 
-def test_explicit_run_key_creates_a_unique_five_item_bundle(monkeypatch):
+def test_explicit_run_key_creates_a_unique_three_item_bundle(monkeypatch):
     monkeypatch.setenv("TISTORY_RUN_KEY", "manual-20260903-1")
     plan = build_plan(datetime(2026, 9, 3, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
     assert plan["run_key"] == "manual-20260903-1"
-    assert len({job["job_id"] for job in plan["jobs"]}) == 5
+    assert len({job["job_id"] for job in plan["jobs"]}) == 3
     assert all(job["job_id"].endswith(":manual-20260903-1") for job in plan["jobs"])
 
 

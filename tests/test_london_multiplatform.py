@@ -30,7 +30,7 @@ def test_catalog_contains_verified_platform_destinations():
     assert next(item for item in sites if item["site_id"] == "naver_n2")["editor_url"].endswith("blogId=health-standard")
     assert next(item for item in sites if item["site_id"] == "tistory_ktrip365")["editor_url"].endswith("/manage/newpost")
     assert all(not item["auto_publish"] for item in sites if item["platform"] in {"naver", "tistory"})
-    assert [item["site_id"] for item in sites if item["platform"] == "naver" and item["enabled"]] == ["naver_n3"]
+    assert [item["site_id"] for item in sites if item["platform"] == "naver" and item["enabled"]] == ["naver_n1", "naver_n2", "naver_n3"]
     assert manual_profile("naver_n3")[0] == "naver"
     assert manual_profile("tistory_ktrip365")[0] == "tistory"
 

@@ -4,7 +4,9 @@
   "default_timezone": "Asia/Seoul",
   "default_publish_policy": "public_after_logged_in_local_registrar",
   "duplicate_guard": true,
-  "daily_posts_per_site": 1,
+  "network_daily_posts": 3,
+  "daily_max_per_site": 1,
+  "randomization_policy": "Select exactly three distinct enabled sites once per KST day, persist that selection, and assign non-round publishing minutes at least 90 minutes apart.",
   "sites": [
     {
       "site_id": "tistory_finance_housing",
@@ -47,8 +49,8 @@
         7,
         9
       ],
-      "daily_posts_per_site": 1,
-      "publish_target": "1_public_post_per_kst_day"
+      "daily_max_per_site": 1,
+      "publish_target": "0_or_1_public_post_when_randomly_selected"
     },
     {
       "site_id": "tistory_insurance_lab",
@@ -93,8 +95,8 @@
         10,
         12
       ],
-      "daily_posts_per_site": 1,
-      "publish_target": "1_public_post_per_kst_day"
+      "daily_max_per_site": 1,
+      "publish_target": "0_or_1_public_post_when_randomly_selected"
     },
     {
       "site_id": "tistory_health_info",
@@ -137,8 +139,8 @@
         13,
         15
       ],
-      "daily_posts_per_site": 1,
-      "publish_target": "1_public_post_per_kst_day"
+      "daily_max_per_site": 1,
+      "publish_target": "0_or_1_public_post_when_randomly_selected"
     },
     {
       "site_id": "tistory_life365",
@@ -266,8 +268,8 @@
         16,
         18
       ],
-      "daily_posts_per_site": 1,
-      "publish_target": "1_public_post_per_kst_day"
+      "daily_max_per_site": 1,
+      "publish_target": "0_or_1_public_post_when_randomly_selected"
     },
     {
       "site_id": "tistory_ktrip365",
@@ -310,20 +312,12 @@
         19,
         21
       ],
-      "daily_posts_per_site": 1,
-      "publish_target": "1_public_post_per_kst_day"
+      "daily_max_per_site": 1,
+      "publish_target": "0_or_1_public_post_when_randomly_selected"
     }
   ],
-  "daily_windows_kst": {
-    "am": [
-      "07:00",
-      "11:00"
-    ],
-    "pm": [
-      "13:00",
-      "17:00"
-    ]
-  },
+  "network_window_kst": ["08:10", "22:50"],
+  "minimum_network_gap_minutes": 90,
   "owner_login_checkpoint": {
     "reported_at": "2026-09-25",
     "state": "OWNER_REPORTED_ALREADY_LOGGED_IN",

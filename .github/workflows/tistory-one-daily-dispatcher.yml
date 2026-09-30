@@ -1,8 +1,8 @@
-name: Tistory One-Daily Dispatcher
+name: Tistory Random Three-Daily Dispatcher
 
 on:
   schedule:
-    - cron: '50 13 * * *'  # 22:50 KST; one pass catches every randomized daily slot
+    - cron: '7 * * * *'  # Hourly lightweight check; persisted selection prevents a fourth site
   workflow_dispatch:
 
 permissions:
@@ -10,7 +10,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: tistory-one-daily-dispatcher
+  group: tistory-random-three-daily-dispatcher
   cancel-in-progress: false
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
       - name: Install runtime
         run: pip install requests
-      - name: Dispatch due one-daily Tistory jobs
+      - name: Dispatch due randomized Tistory jobs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}

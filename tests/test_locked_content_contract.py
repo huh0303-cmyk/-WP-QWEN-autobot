@@ -81,7 +81,8 @@ def test_blogger_and_tistory_daily_contract():
     tistory = load_json("tistory_portfolio.json")
     assert len(blogger) == 33
     assert all((s["daily_min"], s["daily_max"], s["weekly_min"], s["weekly_max"]) == (1, 1, 7, 7) for s in blogger)
-    assert tistory["daily_posts_per_site"] == 2
+    assert tistory["network_daily_posts"] == 3
+    assert tistory["daily_max_per_site"] == 1
     assert len([s for s in tistory["sites"] if s.get("launch_enabled")]) == 5
 
 

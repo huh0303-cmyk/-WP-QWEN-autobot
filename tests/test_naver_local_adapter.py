@@ -55,13 +55,16 @@ class NaverLocalAdapterTests(unittest.TestCase):
         self.assertEqual("draft_saved", result.status)
         self.assertTrue(save_button.clicked)
 
-    def test_selected_homefeed_policy_is_safe_and_rate_limited(self):
+    def test_active_homefeed_policy_is_safe_and_rate_limited(self):
         import json
         from pathlib import Path
 
         policy = json.loads((Path(__file__).parents[1] / "config" / "naver_homefeed_automation.json").read_text(encoding="utf-8"))
-        self.assertEqual("naver_n3", policy["selected_site_id"])
-        self.assertEqual(5, policy["cadence"]["daily_max"])
+        self.assertEqual("naver_n3", policy["primary_site_id"])
+        self.assertEqual(["naver_n1", "naver_n2", "naver_n3"], policy["active_site_ids"])
+        self.assertEqual(5, policy["per_site_cadence"]["naver_n3"]["daily_max"])
+        self.assertEqual(1, policy["per_site_cadence"]["naver_n1"]["daily_max"])
+        self.assertEqual(1, policy["per_site_cadence"]["naver_n2"]["daily_max"])
         self.assertGreaterEqual(policy["cadence"]["minimum_interval_minutes"], 10)
         self.assertTrue(policy["quality_gate"]["official_source_required_for_policy_posts"])
         self.assertTrue(policy["quality_gate"]["source_attribution_required"])

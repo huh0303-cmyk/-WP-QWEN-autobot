@@ -1,20 +1,21 @@
 from datetime import date,timedelta
+import random
 from types import SimpleNamespace
 import pytest
-from automation_hub.tistory_schedule import slot_minute
+from automation_hub.tistory_schedule import random_daily_selection
 from automation_hub.tistory_keywords import choose,duplicate
 
-def test_each_day_has_distinct_morning_and_afternoon_times():
-    for site in ['insurance','finance','health','life','travel']:
-        previous={}
-        for offset in range(365):
-            day=(date(2026,9,7)+timedelta(days=offset)).isoformat()
-            for slot,start,end in [('am',420,660),('pm',780,1020)]:
-                value=slot_minute(site,day,slot)
-                assert start<=value<end
-                assert previous.get(slot)!=value
-                assert slot_minute(site,day,slot)==value
-                previous[slot]=value
+def test_random_daily_selection_has_three_sites_non_round_spaced_times():
+    jobs = random_daily_selection(
+        ['insurance', 'finance', 'health', 'life', 'travel'],
+        rng=random.Random(20261001),
+    )
+    assert len(jobs) == 3
+    assert len({job['site_id'] for job in jobs}) == 3
+    minutes = sorted(job['scheduled_minute_kst'] for job in jobs)
+    assert all(8 * 60 + 10 <= minute < 22 * 60 + 51 for minute in minutes)
+    assert all(minute % 5 != 0 for minute in minutes)
+    assert all(b - a >= 90 for a, b in zip(minutes, minutes[1:]))
 
 def candidate(keyword='건강검진',mentions=5,outlets=3):
     return SimpleNamespace(keyword=keyword,mention_count=mentions,outlet_count=outlets,evidence_urls=['https://a','https://b'])
