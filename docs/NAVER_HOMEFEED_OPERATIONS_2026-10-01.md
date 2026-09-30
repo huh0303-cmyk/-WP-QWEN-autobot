@@ -22,6 +22,7 @@
 - Prepared catalog: `config/naver_monthly_keyword_100.json`; it contains exactly 100 research-gated candidate queries for every month. These are candidates, not claims of measured volume.
 - The catalog is reproducible with `scripts/build_naver_monthly_keyword_catalog.py`; every selected candidate is rechecked on the day it is used.
 - Daily planner: `scripts/naver_monthly_keyword_planner.py`; it persists a daily plan before the first post and keeps every same-account base query distinct that day.
+- Same-day override applier: `scripts/apply_naver_trend_overrides.py`; after the 30-candidate brief is complete, it replaces only untouched `RESEARCH_REQUIRED` jobs, preserves their IDs and times, and rejects blocked or wrong-site candidates.
 - Research order: Naver DataLab relative trend, Naver News freshness, existing search-entry queries, primary official source, recent-title/body duplicate check.
 - Naver DataLab is a relative trend signal. The operation never fabricates absolute volume, visitor counts, or rank probability.
 - October priorities include government/local support deadlines, heating and energy support, influenza and year-end health checks, station-specific KTX queries, and area-specific airport-bus queries.
@@ -87,3 +88,9 @@ Canonical machine-readable policy: `config/naver_homefeed_automation.json`.
 - The next-day plan is persisted at `data/naver-daily-plans/2026-10-02.json` with 17 research-required jobs.
 - All slots are between 08:17 and 23:17 and retain the N1/N2 180-minute and N3 75-minute same-account minimum gaps.
 - The 07:07 run may replace a planned topic only when the same-day trend brief records stronger evidence; a replaced topic still needs the same source, originality, login, and public-URL gates.
+
+## 2026-10-01 08:07 trend-plan application
+
+- Before the first 09:19 slot, the completed 30-candidate trend brief was applied to all 14 untouched jobs in the persisted plan.
+- The planned times, per-site counts, minimum gaps, destination blog IDs, and `RESEARCH_REQUIRED` state were preserved.
+- No public post was advanced to 08:07. The already verified 생활의정석 URL remains the only Naver public receipt recorded for the day at this checkpoint.
