@@ -29,6 +29,7 @@ jobs:
           script: |
             set -euo pipefail
             systemctl stop korea365-youtube-worker.service
+            trap 'systemctl start korea365-youtube-worker.service >/dev/null 2>&1 || true' EXIT
             python3 - "$JOB_ID" <<'PY'
             import os
             from pathlib import Path
