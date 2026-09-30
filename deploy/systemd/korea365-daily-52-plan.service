@@ -1,5 +1,5 @@
 [Unit]
-Description=Build Korea365 daily non-YouTube and weekly YouTube-10 plan
+Description=Build Korea365 daily 23-channel and SNS account plan
 After=network-online.target
 
 [Service]

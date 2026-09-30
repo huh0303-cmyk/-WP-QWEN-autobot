@@ -320,7 +320,14 @@ jobs:
             systemctl stop korea365-youtube-private-weekly.service >/dev/null 2>&1 || true
             systemctl enable --now korea365-youtube-worker.service korea365-youtube-scheduler.timer
             systemctl restart korea365-youtube-worker.service
-            systemctl is-active korea365-control.service korea365-operations.service korea365-wp-publisher.service korea365-youtube-worker.service korea365-youtube-scheduler.timer
+            # The daily account plan must be written by the service user.
+            # Install its units on every deploy so ownership/timer drift is repaired.
+            install -d -o korea365 -g korea365 -m 750 "$ROOT/data/daily-channel-schedule"
+            install -m 644 "$ROOT/deploy/systemd/korea365-daily-52-plan.service" /etc/systemd/system/korea365-daily-52-plan.service
+            install -m 644 "$ROOT/deploy/systemd/korea365-daily-52-plan.timer" /etc/systemd/system/korea365-daily-52-plan.timer
+            systemctl daemon-reload
+            systemctl enable --now korea365-daily-52-plan.timer
+            systemctl is-active korea365-control.service korea365-operations.service korea365-wp-publisher.service korea365-youtube-worker.service korea365-youtube-scheduler.timer korea365-daily-52-plan.timer
 
             python3 - <<'PY'
             import json, time

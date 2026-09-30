@@ -131,23 +131,21 @@ def youtube_rows(horizon: dt.date, existing, channels):
     }
     for channel in channels:
         name = channel["display_name"]
-        scheduled = sorted(
+        scheduled = dict(sorted(
             (dt.date.fromisoformat(row[1][:10]), row[1][11:16]) for row in existing
             if len(row) > 3 and row[2].startswith("YouTube") and channel_key(row[3]) == channel["channel_key"]
-        )
-        due = scheduled[-1][0] if scheduled else dt.datetime.now(KST).date()
-        previous_time = scheduled[-1][1] if scheduled else ""
+        ))
         counter = len(scheduled)
-        while True:
-            gap_min = int(channel.get("interval_days_min", 2))
-            gap_max = int(channel.get("interval_days_max", 3))
-            expected = (1, 1) if channel["channel_key"] == "history" else (2, 3)
-            if (gap_min, gap_max) != expected:
-                raise ValueError(f"{name}: YouTube cadence contract must be {expected[0]}-{expected[1]} days")
-            gap = gap_min + stable_int(f"{name}|{due}|gap") % (gap_max - gap_min + 1)
-            due += dt.timedelta(days=gap)
-            if due > horizon:
-                break
+        if (int(channel.get("interval_days_min", 1)), int(channel.get("interval_days_max", 1))) != (1, 1):
+            raise ValueError(f"{name}: YouTube cadence contract must be 1-1 days")
+        # Add missing future dates, including gaps inside the old 2-3 day
+        # calendar. Never create a new row for today without a public-post
+        # reconciliation, and never replace an existing claimed/failed row.
+        due = dt.datetime.now(KST).date() + dt.timedelta(days=1)
+        while due <= horizon:
+            if due in scheduled:
+                due += dt.timedelta(days=1)
+                continue
             platform = "YouTube Playlist" if channel["channel_type"] == "playlist" else "YouTube Knowledge"
             key = f"{due}|{platform}|{name}"
             topic_pool = YT_TOPICS.get(name, [])
@@ -160,11 +158,12 @@ def youtube_rows(horizon: dt.date, existing, channels):
             # A channel must not look like a fixed-time bot. If the deterministic
             # random slot repeats the previous run's HH:MM, reroll with a salt.
             salt = 1
-            while (minute == previous_time or (due.isoformat(), minute) in used_slots) and salt <= 64:
+            adjacent = {scheduled.get(due - dt.timedelta(days=1)), scheduled.get(due + dt.timedelta(days=1))}
+            while (minute in adjacent or (due.isoformat(), minute) in used_slots) and salt <= 64:
                 minute = irregular_time(f"{key}|reroll-{salt}", channel["allowed_hour_start"] * 60,
                                         (channel["allowed_hour_end"] - channel["allowed_hour_start"] + 1) * 60)
                 salt += 1
-            if minute == previous_time:
+            if minute in adjacent:
                 raise RuntimeError(f"{name}: could not produce a different publication time")
             if (due.isoformat(), minute) in used_slots:
                 raise RuntimeError(f"{name}: could not produce a collision-free publication time")
@@ -176,11 +175,12 @@ def youtube_rows(horizon: dt.date, existing, channels):
                 "공식·퍼블릭도메인 영상 우선" if is_knowledge else "FLUX 실사형 이미지·채널별 오디오",
                 "자료·권리·렌더·채널 ID 검증 후 즉시 공개",
                 "화면관련≥65·일치도≥80" if is_knowledge else "채널분리·실사품질·권리검수",
-                "기획확정·자료준비", "", "비공개 링크 생성 후 토큰 없는 이메일 보고",
+                "기획확정·자료준비", "", "정확한 채널 ID·업로드 권한과 공개 영수증 확인",
             ])
-            previous_time = minute
+            scheduled[due] = minute
             used_slots.add((due.isoformat(), minute))
             counter += 1
+            due += dt.timedelta(days=1)
     return rows
 
 

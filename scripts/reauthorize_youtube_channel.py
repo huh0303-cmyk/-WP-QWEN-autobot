@@ -20,12 +20,19 @@ MASTER = ROOT / "config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json"
 HOST = "root@187.127.121.57"
 SSH_KEY = Path.home() / ".ssh" / "id_ed25519"
 PROFILES = {
+    "globalmusic": "GLOBALMUSIC", "healing": "HEALING",
     "starbucks": "STARBUCKS", "mbb": "MBB", "kpop": "KPOP",
     "nasa": "NASA_SPACE_TIMES", "history": "HISTORY_TODAY_TIMES",
     "invention": "INVENTION_TIMES", "silent_era": "SILENT_ERA_TIMES",
     "retro_reels": "RETRO_REELS_TIMES",
     "health_japan": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP",
     "health_usa": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN",
+    "ko": "LANGUAGE_KO", "en": "LANGUAGE_EN",
+    "ja": "LANGUAGE_JA", "zh": "LANGUAGE_ZH",
+    "vi": "LANGUAGE_VI", "es": "LANGUAGE_ES",
+    "fr": "LANGUAGE_FR", "de": "LANGUAGE_DE",
+    "it": "LANGUAGE_IT", "pt": "LANGUAGE_PT",
+    "shopping": "SHOPPING_SEOUL_JISOO1",
 }
 
 
@@ -103,8 +110,7 @@ def main() -> None:
     profile = PROFILES[args.channel]
     secret_name = (profile if profile.startswith("HEALTH_CLINIC_")
                    else f"YOUTUBE_OAUTH_REFRESH_TOKEN_{profile}")
-    if not profile.startswith("HEALTH_CLINIC_"):
-        _store_vps(secret_name, creds.refresh_token)
+    _store_vps(secret_name, creds.refresh_token)
     subprocess.run(["gh", "secret", "set", secret_name], input=creds.refresh_token,
                    text=True, capture_output=True, check=True, cwd=ROOT)
     print(f"Verified {expected}; stored {secret_name} in approved secret stores", flush=True)
