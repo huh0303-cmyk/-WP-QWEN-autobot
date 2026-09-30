@@ -48,6 +48,22 @@
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
     },
+    "pt": {
+      "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
+      "display_name": "Portuguese Survival",
+      "oauth_brand_name": "K-health 365",
+      "google_brand_id": "113384771035218611829",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
+    "vi": {
+      "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
+      "display_name": "Vietnamese Survival",
+      "oauth_brand_name": "비영리한국유학협회KSA",
+      "google_brand_id": "109363668247401986184",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
     "retro_reels": {
       "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
       "display_name": "RETRO_USA1",
