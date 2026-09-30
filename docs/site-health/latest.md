@@ -1,4 +1,4 @@
-# 사이트 건강도 리포트 (2026-10-01 02:49 KST)
+# 사이트 건강도 리포트 (2026-10-01 03:00 KST)
 
 - 점검 60곳 · 정상 34 · 경고 24 · 심각 2
 - 자동수정 모드: OFF(점검만)
@@ -46,13 +46,13 @@
 
 ## 최근 28일 검색 클릭 상위
 
-- https://koreawedding365.com: 클릭 6 / 노출 476
-- https://jobinkorea365.com: 클릭 4 / 노출 304
+- https://koreawedding365.com: 클릭 6 / 노출 450
+- https://jobinkorea365.com: 클릭 4 / 노출 295
 - https://k-trip365.com: 클릭 3 / 노출 9
-- https://ki-korea.com: 클릭 1 / 노출 92
-- https://oliveyoungkorea.com: 클릭 1 / 노출 850
+- https://ki-korea.com: 클릭 1 / 노출 87
+- https://oliveyoungkorea.com: 클릭 1 / 노출 837
 - https://kieca-korea.org: 클릭 1 / 노출 55
-- https://jobkoreaglobal.com: 클릭 1 / 노출 432
+- https://jobkoreaglobal.com: 클릭 1 / 노출 426
 - https://k-health365.com: 클릭 0 / 노출 1
-- https://koreamedicaltour.com: 클릭 0 / 노출 87
+- https://koreamedicaltour.com: 클릭 0 / 노출 85
 - https://koreainvest365.com: 클릭 0 / 노출 0
