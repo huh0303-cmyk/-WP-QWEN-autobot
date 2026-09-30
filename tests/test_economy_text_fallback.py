@@ -53,3 +53,19 @@ def test_independent_engines_after_gemini(monkeypatch):
     et.begin_article()
     assert et.generate_text("x") == "from-openrouter"
     assert order == ["groq", "groq", "openrouter"]   # groq 2회 실패 → openrouter
+
+
+def test_local_qwen_is_last_resort_after_all_keyed_engines(monkeypatch):
+    import types, sys
+    monkeypatch.setattr(et, "RETRY_SLEEP", 0)
+    monkeypatch.setattr(et, "_try_gemini", lambda *a: (_ for _ in ()).throw(requests.Timeout("t")))
+    for k in ("GROQ_API_KEY", "OPENROUTER_API_KEY", "CEREBRAS_API_KEY"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setenv("LONDON_WRITER_MODEL", "auto_free")
+    monkeypatch.setenv("LOCAL_TEXT_FALLBACK_ENABLED", "true")
+    seen = {}
+    fake = types.SimpleNamespace(local_generate_text=lambda p, **kw: seen.update(kw) or "qwen-ok")
+    monkeypatch.setitem(sys.modules, "local_text", fake)
+    et.begin_article()
+    assert et.generate_text("x") == "qwen-ok"
+    assert "timeout" in seen and "max_tokens" in seen

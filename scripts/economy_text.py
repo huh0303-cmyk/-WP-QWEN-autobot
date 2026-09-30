@@ -189,7 +189,9 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer
     if os.getenv("LOCAL_TEXT_FALLBACK_ENABLED", "false").lower() in {"1", "true", "yes", "on"}:
         try:
             from local_text import local_generate_text
-            text = local_generate_text(prompt, temperature=temperature, timeout=190)
+            text = local_generate_text(prompt, temperature=temperature,
+                                       timeout=int(os.getenv("LOCAL_TEXT_TIMEOUT", "190")),
+                                       max_tokens=int(os.getenv("LOCAL_TEXT_MAX_TOKENS", "1800")))
             last_writer_model = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
             _record("ollama", last_writer_model)
             return text
