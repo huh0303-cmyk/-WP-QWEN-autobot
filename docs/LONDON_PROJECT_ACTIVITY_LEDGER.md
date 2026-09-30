@@ -196,3 +196,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## revenue-daily-plan-20261001
 - 2026-10-01 KST, Claude. 수익 극대화 일일 운영 계획 문서화, guardian에 주간 추이(7d vs prev 7d) 추가. 근거: docs/REVENUE_MAXIMIZATION_DAILY_PLAN_2026-10-01.md. 미검증: 주간 추이 실제 실행 결과, noindex 40개, 글 보강.
+
+## publish-retry-wrapper-20261001
+- 2026-10-01 KST, Claude. scripts/retry_run.py 추가(타임아웃+3회 재시도), daily-network-publish.yml의 autopost_current 호출에 적용. 로컬 단위 시험(실패/타임아웃 exit code)만 확인, 실제 Actions 실행은 미검증. 모델 폴백은 autopost_current의 GPT-5 mini 고정 정책 때문에 미적용.

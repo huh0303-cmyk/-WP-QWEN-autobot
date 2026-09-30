@@ -23,7 +23,7 @@
 | 주간 추이(7일 vs 직전 7일) | site-health-guardian 리포트 | 2일마다 |
 
 ## 발행 실패·타임아웃 폴백
-- 작성 타임아웃/실패 → 동일 작업 재시도 → 다른 작성 모델로 전환 → 그래도 실패 시 ledger 기록 후 다음 실행에서 재시도.
+- 작성 타임아웃/실패 → 최대 3회 재시도(시도당 1200초, 30·60초 백오프; scripts/retry_run.py, daily-network-publish에 적용 완료). 모델 전환은 GPT-5 mini 고정 정책과 충돌해 보류(회장 결정 필요).
 - 예약시각 초과 글(future overdue)은 guardian이 자동 발행(GUARDIAN_FIX=1, 예약 실행).
 - 공개 전환 승인·삭제·비공개 전환은 자동화하지 않음.
 
