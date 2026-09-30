@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       channel_key:
-        description: "예: SCIENCE_FACTS_TIMES, NASA_SPACE_TIMES 등"
+        description: "승인된 활성 아카이브 채널 키"
         required: true
-        default: "SCIENCE_FACTS_TIMES"
+        default: "NASA_SPACE_TIMES"
         type: string
 
 permissions:
@@ -27,6 +27,14 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests google-api-python-client google-auth -q
+      - name: Reject inactive archive channel keys before resolving secrets
+        env:
+          CHANNEL_KEY: ${{ inputs.channel_key }}
+        run: |
+          case "$CHANNEL_KEY" in
+            NASA_SPACE_TIMES|HISTORY_TODAY_TIMES|INVENTION_TIMES|SILENT_ERA_TIMES|RETRO_REELS_TIMES) ;;
+            *) echo "Inactive archive channel key" >&2; exit 2 ;;
+          esac
       - name: "Resolve per-channel secret into a dynamically-named env var"
         # 스크립트가 YOUTUBE_OAUTH_REFRESH_TOKEN_<CHANNEL_KEY> 처럼 채널마다 다른
         # 이름의 환경변수를 읽는데, YAML env: 블록의 키 이름 자체는 동적으로 만들 수

@@ -32,8 +32,8 @@ def validate_episode(plan):
     if plan.get("date_is_primary") is not True:
         errors.append("Month/day must dominate historical year visually")
     events = plan.get("events", [])
-    if not isinstance(events, list) or not events:
-        return errors + ["At least one verified event is required"]
+    if not isinstance(events, list) or len(events) != 2:
+        return errors + ["Exactly two verified events are required"]
     dates = []
     for index, event in enumerate(events):
         prefix = f"event {index + 1}: "

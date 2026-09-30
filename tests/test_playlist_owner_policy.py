@@ -6,8 +6,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from playlist_language_policy import romantic_languages, select_bank_tracks
 from youtube_english_metadata import playlist_metadata, validate_metadata
 
-def test_twenty_tracks_mix_all_four_languages():
-    assert Counter(romantic_languages(20)) == dict.fromkeys(['french','japanese','spanish','italian'], 5)
+def test_twenty_tracks_mix_french_and_japanese():
+    assert Counter(romantic_languages(20)) == dict.fromkeys(['french','japanese'], 10)
 
 def test_bank_refuses_missing_language():
     with pytest.raises(RuntimeError, match='WAITING_ASSETS'):

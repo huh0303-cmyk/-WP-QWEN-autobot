@@ -21,10 +21,10 @@ def history_events(now: dt.datetime) -> list[dict]:
             continue
         sources = [p.get("content_urls", {}).get("desktop", {}).get("page", "") for p in event["pages"]]
         candidates.append({"year": event["year"], "text": event["text"], "sources": [s for s in sources if s], "coverage": len(event["pages"])})
-    if not candidates:
-        raise RuntimeError("No sourced events for today's date")
+    if len(candidates) < 2:
+        raise RuntimeError("Fewer than two sourced events for today's date")
     # Coverage selects research leads; presentation is always reverse chronology.
-    selected = sorted(candidates, key=lambda e: e['coverage'], reverse=True)[:8]
+    selected = sorted(candidates, key=lambda e: e['coverage'], reverse=True)[:2]
     return sorted(selected, key=lambda e: e['year'], reverse=True)
 
 

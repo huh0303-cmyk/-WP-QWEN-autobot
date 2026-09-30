@@ -137,6 +137,10 @@ def _sns_cards() -> list[dict]:
     cards = []
     for row in policy.get("accounts", []):
         platform = row.get("platform", "")
+        if platform in {"Instagram", "Threads"} and row.get("role") not in {
+            "korean_topik", "english", "japanese", "hot_item_shop"
+        }:
+            continue
         role = roles.get(row.get("role"), {})
         exists = bool(row.get("account_exists"))
         identity_ok = bool(row.get("identity_verified"))

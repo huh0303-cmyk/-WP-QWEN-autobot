@@ -1,6 +1,6 @@
 # Today in History — approved production contract
 
-Updated: 2026-09-06. Channel routing key: `history` (existing HISTORY_TODAY_TIMES OAuth mapping).
+Updated: 2026-10-01. Channel routing key: `history` (`HISTORY_TV_TODAY`, exact UC ID in locked master).
 
 ## Implementation status — do not confuse specification with a working service
 
@@ -19,7 +19,8 @@ has not been ingested into this repository. The revised sample is not finished.
 - English narration and English burned-in subtitles plus editable SRT.
 - MONTH + DAY (e.g. SEPTEMBER 6) is the largest identifying text on thumbnail,
   opening and event transitions. The event year is secondary. Use the same date in title.
-- Order verified events newest to oldest. September 6 example: 1901, 1757, 1522.
+- Use exactly two verified events on the episode month/day, newest to oldest.
+  September 6 example: 1901, 1757.
   Event dates are not filming dates. McKinley's attack and later death must stay distinct.
 - Sample: approximately 2–3 minutes. Regular episodes: 10–15 minutes when supported
   by sufficient relevant material. Never pad with unrelated or repeated footage.
@@ -37,7 +38,7 @@ has not been ingested into this repository. The revised sample is not finished.
 ## Fixed production sequence
 
 1. Create persistent episode ID, date, intended channel and status; check duplicates.
-2. Research events for that month/day. Save primary-source URLs and checked factual claims.
+2. Research two events for that month/day. Save primary-source URLs and checked factual claims.
 3. Sort events descending by event date, BEFORE writing or generating audio.
 4. Search/download candidate visuals; retain item URLs and per-item commercial-use basis.
    An institution/collection name alone is not proof that every item is reusable.

@@ -123,3 +123,16 @@ eligible for upload until a distinct UC ID is verified in YouTube Studio and
 the public page. The supplied social table has 23 locked YouTube channels
 plus this one provisional `Jisoo2` row; its Facebook/Threads/Instagram/TikTok
 rows are other platforms, not extra verified YouTube channels.
+
+## Owner's final editorial correction, 03:55 KST
+
+The five knowledge destinations are `NASA_XFILES`, `HISTORY_TV_TODAY`,
+`INVENTION_STORY1`, `SILENT_ERA_FILM`, and `RETRO_USA1`. History selects
+exactly two sourced events on the episode month/day, newest historical year
+first. The topic selector and offline manifest validator now enforce two;
+the full event/scene renderer remains an integration gate.
+
+The two health destinations are **Health_Clinic_Japan (Japanese)** and
+**Health Clinic USA (English)**. The owner's intervening Korea reference was
+explicitly corrected to USA. The benchmark and format evidence is in
+`docs/HEALTH_CLINIC_JP_USA_SENIOR_FORMAT_2026-10-01.md`.

@@ -1,0 +1,13 @@
+{
+  "date_kst": "2026-10-01",
+  "decision": "Four active Instagram brands, confirmed again by owner. Six-row role inventory is not the daily active set.",
+  "active_instagram_count": 4,
+  "active_instagram": [
+    {"role": "korean_topik", "name": "Seoul TOPIK", "handle": "sis_topik1", "identity_status": "confirmed"},
+    {"role": "english", "name": "English Survival", "handle": "englishsurvival1", "identity_status": "confirmed"},
+    {"role": "japanese", "name": "Japanese Survival", "handle": "japanese_survival1", "identity_status": "account_center_confirmed_2026-10-01_exact_handle_unavailable", "older_display_handle": "sis_language365"},
+    {"role": "shopping", "name": "Seoul Jisoo", "handle": "seoul_jisoo", "identity_status": "account_center_saved_2026-10-01", "older_handle": "seoul_item365", "display_name_status": "password_reauth_pending"}
+  ],
+  "inventory_not_active": ["seoul_trip365", "seoul_health365"],
+  "notes": "Personal private huh.chris is excluded. No publishing authority is inferred from a handle."
+}

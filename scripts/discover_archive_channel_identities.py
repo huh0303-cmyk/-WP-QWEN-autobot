@@ -3,12 +3,9 @@
 """
 discover_archive_channel_identities.py
 ─────────────────────────────────────────────────────────────
-읽기 전용. archive_channel_upload.py / curio_upload.py가 쓰는 10개
-"컨텐츠팜" 채널 키 각각의 YOUTUBE_OAUTH_REFRESH_TOKEN_<KEY>가 실제로
+읽기 전용. 현재 운영 지식 채널 5개의 YOUTUBE_OAUTH_REFRESH_TOKEN_<KEY>가 실제로
 어느 채널로 인증되는지 channels().list(mine=true)로 확인만 한다.
-업로드/쓰기 없음 — 2026-09-26 AMERICAN_ARCHIVE_TIMES가 실제로는
-"French Survival" 채널로 인증되던 사고 이후, 나머지 채널 키들도
-브랜드 라벨과 실제 채널이 일치하는지 전수 확인하기 위해 작성.
+업로드/쓰기 없음. 퇴역 채널 시크릿은 검사 입력에서도 제외한다.
 
 출력: 각 채널 키별로 {키: 있음/없음, 실제 채널명, 실제 채널ID}를 JSON으로
 artifacts/archive_channel_identity_discovery.json에 저장.
@@ -21,14 +18,9 @@ from pathlib import Path
 CHANNEL_KEYS = [
     "NASA_SPACE_TIMES",
     "HISTORY_TODAY_TIMES",
-    "SCIENCE_FACTS_TIMES",
-    "CLASSICAL_JOURNAL",
-    "MYTH_LEGEND_TIMES",
     "INVENTION_TIMES",
-    "AMERICAN_ARCHIVE_TIMES",
     "SILENT_ERA_TIMES",
     "RETRO_REELS_TIMES",
-    "CLASSIC_READS_TIMES",
 ]
 
 
