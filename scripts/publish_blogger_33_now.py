@@ -14,7 +14,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
-from gemini_text import gemini_generate_text  # noqa: E402
+from blogger_free_text import free_blogger_generate_text  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
 from automation_hub.editorial_language_policy import language_mismatch_fields
 from review_sheet import append_review_rows
@@ -56,7 +56,7 @@ Use 5 useful H2 sections, an actionable checklist, cautious source-aware wording
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
 English: 900-1300 words. Korean: 1800-3000 characters. Provide 1-3 short, highly relevant labels only."""
-    raw = gemini_generate_text(prompt, temperature=0.5).strip()
+    raw = free_blogger_generate_text(prompt, temperature=0.5).strip()
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].removeprefix("json").strip()
     try:

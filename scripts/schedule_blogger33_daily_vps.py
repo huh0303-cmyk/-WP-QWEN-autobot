@@ -25,8 +25,8 @@ def site_keys() -> list[str]:
 
 def build_slots(now: datetime, count: int) -> list[datetime]:
     day = now.date()
-    normal_start = datetime.combine(day, time(6, 10), KST)
-    normal_end = datetime.combine(day, time(23, 20), KST)
+    normal_start = datetime.combine(day, time(0, 20), KST)
+    normal_end = datetime.combine(day, time(23, 30), KST)
     if now < normal_start:
         start, end = normal_start, normal_end
     else:
