@@ -88,3 +88,31 @@ def free_blogger_generate_text(prompt: str, *, temperature: float = 0.5) -> str:
     if unavailable:
         raise RuntimeError("free_provider_temporarily_unavailable")
     raise RuntimeError("free_quota_wait_no_paid_fallback")
+
+
+_TRANSIENT = {"free_provider_temporarily_unavailable"}
+
+
+def blogger_generate_with_fallback(prompt: str, *, temperature: float = 0.5, tries: int = 2) -> str:
+    """Blogger 글쓰기 3단 폴백.
+    1) 서버 보관 무료 Gemini 3모델(free_blogger_generate_text) — 일시 장애면 최대 `tries`회.
+       쿼터/설정 오류는 재시도 없이 다음 단계로.
+    2) 공용 엔진 체인(economy_text): Gemini 무료 모델 순차 → Groq → OpenRouter → Cerebras
+       (각 엔진 일시 장애 시 2회, 키가 있는 엔진만).
+    모두 실패하면 WRITERS_EXHAUSTED 로 종료(다음 실행에서 재시도)."""
+    import time
+    failures: list[str] = []
+    for n in range(1, tries + 1):
+        try:
+            return free_blogger_generate_text(prompt, temperature=temperature)
+        except (RuntimeError, OSError, ValueError, requests.RequestException) as exc:
+            failures.append(f"server_free#{n}: {type(exc).__name__}: {exc}")
+            transient = str(exc) in _TRANSIENT or isinstance(exc, (requests.Timeout, requests.ConnectionError))
+            if not transient:
+                break
+            if n < tries:
+                time.sleep(float(os.environ.get("WRITER_RETRY_SLEEP", "3")))
+    print("Blogger writer fallback ->", "; ".join(failures))
+    import economy_text
+    economy_text.begin_article()
+    return economy_text.generate_text(prompt, temperature=temperature)

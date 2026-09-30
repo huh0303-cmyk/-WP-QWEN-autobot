@@ -86,3 +86,31 @@ def test_schedule_uses_nearly_full_korea_day():
     assert slots[0].hour == 0
     assert slots[-1].hour == 23
     assert all(a < b for a, b in zip(slots, slots[1:]))
+
+
+def test_fallback_goes_to_shared_chain_when_server_path_fails(monkeypatch):
+    import sys, types
+    monkeypatch.setattr(writer, "free_blogger_generate_text",
+                        lambda *a, **k: (_ for _ in ()).throw(RuntimeError("free_quota_wait_no_paid_fallback")))
+    calls = []
+    fake = types.SimpleNamespace(begin_article=lambda: None,
+                                 generate_text=lambda p, temperature=0.5: calls.append(p) or "from-shared-chain")
+    monkeypatch.setitem(sys.modules, "economy_text", fake)
+    assert writer.blogger_generate_with_fallback("prompt") == "from-shared-chain"
+    assert calls == ["prompt"]
+
+
+def test_transient_server_error_retried_twice_before_fallback(monkeypatch):
+    import sys, types
+    n = {"c": 0}
+
+    def flaky(*a, **k):
+        n["c"] += 1
+        raise RuntimeError("free_provider_temporarily_unavailable")
+
+    monkeypatch.setattr(writer, "free_blogger_generate_text", flaky)
+    monkeypatch.setenv("WRITER_RETRY_SLEEP", "0")
+    fake = types.SimpleNamespace(begin_article=lambda: None, generate_text=lambda p, temperature=0.5: "ok")
+    monkeypatch.setitem(sys.modules, "economy_text", fake)
+    assert writer.blogger_generate_with_fallback("prompt") == "ok"
+    assert n["c"] == 2
