@@ -67,6 +67,64 @@ def _try_gemini(prompt: str, temperature: float, model: str) -> str:
     return content.strip()
 
 
+TRIES_PER_ENGINE = int(os.getenv("WRITER_TRIES_PER_ENGINE", "2"))
+RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "3"))
+
+# Independent free-tier engines beyond Gemini. Each activates only when its key secret exists.
+# (provider, key env, endpoint, default model env, default model)
+OPENAI_COMPAT = (
+    ("groq", "GROQ_API_KEY", "https://api.groq.com/openai/v1/chat/completions",
+     "GROQ_MODEL", "llama-3.3-70b-versatile"),
+    ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1/chat/completions",
+     "OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
+    ("cerebras", "CEREBRAS_API_KEY", "https://api.cerebras.ai/v1/chat/completions",
+     "CEREBRAS_MODEL", "llama-3.3-70b"),
+)
+
+
+def _try_compat(prompt: str, temperature: float, spec: tuple) -> str:
+    global last_writer_model
+    provider, key_env, url, model_env, default_model = spec
+    key = os.getenv(key_env, "").strip()
+    if not key:
+        raise RuntimeError(f"{key_env} missing")
+    model = os.getenv(model_env, default_model)
+    response = requests.post(
+        url, headers={"Authorization": f"Bearer {key}"},
+        json={"model": model, "temperature": temperature, "max_tokens": 8192,
+              "messages": [{"role": "user", "content": prompt}]}, timeout=90)
+    response.raise_for_status()
+    data = response.json()
+    choice = (data.get("choices") or [{}])[0]
+    text = (choice.get("message") or {}).get("content") or ""
+    if choice.get("finish_reason") not in ("stop", None) or not text.strip():
+        raise ValueError(f"{provider} response incomplete")
+    last_writer_model = f"{provider}:{model}"
+    _record(provider, model, data.get("usage"))
+    return text.strip()
+
+
+def _with_tries(label: str, fn, failures: list):
+    """같은 엔진을 일시 장애 시 TRIES_PER_ENGINE번까지 시도."""
+    import time
+    for n in range(1, TRIES_PER_ENGINE + 1):
+        try:
+            return fn()
+        except (requests.RequestException, ValueError, RuntimeError) as exc:
+            failures.append(f"{label}#{n}: {_failure_summary(exc)}")
+            print(f"Article writer fallback: {failures[-1]}")
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            # 재시도는 일시 장애(타임아웃·연결·5xx·불완전 응답)만. 쿼터(429)·인증(401/403)·키 없음은
+            # 같은 엔진을 다시 호출해도 소용없으므로 바로 다음 엔진으로.
+            transient = (isinstance(exc, (requests.Timeout, requests.ConnectionError, ValueError))
+                         or (status is not None and status >= 500))
+            if not transient:
+                break
+            if n < TRIES_PER_ENGINE:
+                time.sleep(RETRY_SLEEP)
+    return None
+
+
 def _model_chain(choice: str) -> tuple[str, ...]:
     if choice == "auto_free":
         return FREE_GEMINI_MODELS
@@ -97,11 +155,18 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer
             continue
         if _article_attempts is not None:
             _article_attempts.add(model)
-        try:
-            return _try_gemini(prompt, temperature, model)
-        except (requests.RequestException, ValueError, RuntimeError) as exc:
-            failures.append(f"{model}: {_failure_summary(exc)}")
-            print(f"Article writer fallback: {failures[-1]}")
+        text = _with_tries(model, lambda m=model: _try_gemini(prompt, temperature, m), failures)
+        if text:
+            return text
+
+    # 독립 무료 엔진들(키가 있을 때만): 각 엔진 2회 시도 후 다음 엔진
+    if choice != "gpt-5-mini":
+        for spec in OPENAI_COMPAT:
+            if not os.getenv(spec[1], "").strip():
+                continue
+            text = _with_tries(spec[0], lambda sp=spec: _try_compat(prompt, temperature, sp), failures)
+            if text:
+                return text
 
     # GPT is paid and only used when the operator explicitly selects it.
     if choice == "gpt-5-mini":

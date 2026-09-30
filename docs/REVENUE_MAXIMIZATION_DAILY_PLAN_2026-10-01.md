@@ -23,7 +23,7 @@
 | 주간 추이(7일 vs 직전 7일) | site-health-guardian 리포트 | 2일마다 |
 
 ## 발행 실패·타임아웃 폴백
-- 작성 실패 → 무료 Gemini 모델 순차 폴백(gemini-3.5-flash → 3.1-flash-lite → 2.5-flash → 2.5-flash-lite → 3.5-flash-lite, scripts/economy_text.py, LONDON_WRITER_MODEL=auto_free) + 전체 재시도 3회(시도당 1200초, scripts/retry_run.py). daily-network-publish에 GEMINI_API_KEY 전달 누락을 수정해 적용. 유료 GPT는 자동 사용 안 함.
+- 작성 실패 → Gemini 무료 5개 모델 순차(각 모델 일시장애 시 2회) → 독립 무료 엔진 Groq → OpenRouter → Cerebras(각 2회, 해당 API 키 시크릿이 있을 때만) → 전체 재시도 3회(scripts/retry_run.py). 쿼터(429)·인증 오류는 같은 엔진 재호출 없이 다음 엔진으로. 유료 GPT 자동 사용 없음. 주의: Gemini 키 1개가 전부 막히면(키 만료·계정 정지) 독립 엔진 키가 없는 한 글쓰기 불가.
 - 예약시각 초과 글(future overdue)은 guardian이 자동 발행(GUARDIAN_FIX=1, 예약 실행).
 - 공개 전환 승인·삭제·비공개 전환은 자동화하지 않음.
 
