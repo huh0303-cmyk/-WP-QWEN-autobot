@@ -33,7 +33,10 @@ def select_source(mode, seed, history):
 def select_thumbnail_second(source_id, source_seconds, seed, history):
     upper=max(2,int(source_seconds)-2)
     candidates=list(range(2,upper+1))
-    used={(int(row.get('source_id',0)),int(row.get('thumbnail_second',-1))) for row in history[-HISTORY_LIMIT:]}
+    # Every legacy automation thumbnail used second 3 of one of these two
+    # sources. Treat those pairs as permanently used during migration.
+    used={(13166787,3),(18132437,3)}
+    used.update((int(row.get('source_id',0)),int(row.get('thumbnail_second',-1))) for row in history[-HISTORY_LIMIT:])
     start=seed % len(candidates)
     for offset in range(len(candidates)):
         second=candidates[(start+offset)%len(candidates)]

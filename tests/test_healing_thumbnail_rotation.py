@@ -27,6 +27,13 @@ def test_thumbnail_frame_is_not_reused_for_same_source(monkeypatch):
     assert module.select_thumbnail_second(7351460, 12, 0, history) != 2
 
 
+def test_legacy_fixed_three_second_frames_are_never_reused(monkeypatch):
+    monkeypatch.syspath_prepend(str(ROOT / "scripts"))
+    module = load_module()
+    assert module.select_thumbnail_second(13166787, 12, 1, []) != 3
+    assert module.select_thumbnail_second(18132437, 12, 1, []) != 3
+
+
 def test_thumbnail_history_is_bounded_and_atomic(tmp_path, monkeypatch):
     monkeypatch.syspath_prepend(str(ROOT / "scripts"))
     module = load_module()

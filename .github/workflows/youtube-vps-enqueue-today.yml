@@ -15,6 +15,11 @@ on:
         required: true
         type: boolean
         default: false
+      owner_repeat:
+        description: Explicit owner request for one additional distinct private production today
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,11 +34,12 @@ jobs:
         env:
           CHANNEL: ${{ inputs.channel }}
           RETRY_FAILED: ${{ inputs.retry_failed }}
+          OWNER_REPEAT: ${{ inputs.owner_repeat }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          envs: CHANNEL,RETRY_FAILED
+          envs: CHANNEL,RETRY_FAILED,OWNER_REPEAT
           script: |
             set -euo pipefail
             cd /opt/korea365
@@ -48,6 +54,7 @@ jobs:
 
             channel = sys.argv[1]
             retry_failed = __import__("os").environ.get("RETRY_FAILED", "false").lower() == "true"
+            owner_repeat = __import__("os").environ.get("OWNER_REPEAT", "false").lower() == "true"
             labels = {"globalmusic": "CAFE_ROMANTIC", "healing": "CAFE_HEALING"}
             if channel not in labels:
                 raise SystemExit("unsupported channel")
@@ -63,6 +70,8 @@ jobs:
                     queued = datetime.fromtimestamp(float(row.get("queued_at", 0)), kst).date()
                     if row.get("channel_key") == channel and queued == today:
                         if folder == "failed" and retry_failed:
+                            continue
+                        if folder == "completed" and owner_repeat:
                             continue
                         print(json.dumps({"status": "already_queued_today", "channel": channel,
                                           "job_id": row.get("job_id"), "folder": folder}))
