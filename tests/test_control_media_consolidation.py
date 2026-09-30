@@ -180,7 +180,7 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "로그인·권한 필요" in social
     assert "<th>번호</th><th>플랫폼</th>" in social
     assert "<td>{{loop.index}}</td><td>" in social
-    assert "전체 = 모든 YouTube+SNS" in social
+    assert "확인된 YouTube 채널과 SNS 운영 대상" in social
     assert "생산·발행 트리거" in social
     for platform in ("YouTube", "TikTok", "Instagram", "Facebook", "Threads"):
         assert f'tr[data-platform="{platform}"] td' in social
@@ -220,7 +220,7 @@ def test_youtube_group_order_and_verified_survival_channels_are_explicit():
     assert inventory.count('"recent_publish_date": "2026-09-13"') >= 3
     assert '"name": "Jisoo2"' in inventory
     assert '"previous_name": "SIS-Language Center"' in inventory
-    assert '"state_label": "Jisoo2 운영 매핑 · UC ID 확인 필요"' in source
+    assert "Planned shopping slots have no UC ID" in source
 
 
 def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
@@ -228,8 +228,9 @@ def test_social_ranking_exposes_real_metric_deltas_without_zero_fill():
     assert '"video_delta": _delta(videos, previous.get("videos")' in source
     assert '"content_count_delta": item.get("video_delta")' in source
     assert '"content_count_delta": item.get("content_delta")' in source
-    assert '"target_total": 48' in source
-    assert '"target_youtube": 24' in source
+    assert '"target_total": 39' in source
+    assert '"target_youtube": 23' in source
+    assert '"target_sns": 16' in source
     assert '"display_date": now.date().isoformat()' in source
     assert 'for row_number, row in enumerate(rows, 1):' in source
     assert 'row["row_number"] = row_number' in source
@@ -264,17 +265,20 @@ def test_youtube_ranking_prefers_full_public_api_snapshot(monkeypatch, tmp_path)
     (tmp_path / "config").mkdir()
     (tmp_path / "data").mkdir()
     (tmp_path / "config" / "london_social_account_inventory_2026-09-24.json").write_text(
-        '{"youtube":[{"name":"French Survival","handle":"SIS_FrenchSurvival","channel_id":"UC-test","group":"language"}]}',
+        '{"youtube":[{"name":"Old label","handle":"SIS_FrenchSurvival","channel_id":"UC-test","group":"language"}],'
+        '"unconfirmed":[{"platform":"youtube","name":"Jisoo2","handle":"sis_languagecenter"}]}',
         encoding="utf-8",
     )
     (tmp_path / "data" / "youtube_public_metrics.json").write_text(
-        '{"checked_at_kst":"2026-09-29T09:00:00+09:00","channels":{"UC-test":{"subscribers":7,"views":321,"videos":4,"connected":true}}}',
+        '{"checked_at_kst":"2026-09-29T09:00:00+09:00","channels":{"UC-test":{"name":"French Survival","subscribers":7,"views":321,"videos":4,"connected":true}}}',
         encoding="utf-8",
     )
     monkeypatch.setattr(control_home, "ROOT", tmp_path)
     monkeypatch.setattr(control_home, "opening_recent_info", lambda *args: {})
     result = control_home.build_youtube_ranking(1)
     assert result["ranked"] == 1
+    assert result["total"] == 1
+    assert result["rows"][0]["name"] == "French Survival"
     assert result["rows"][0]["subscribers"] == 7
     assert result["rows"][0]["views"] == 321
 

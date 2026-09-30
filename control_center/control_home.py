@@ -129,9 +129,9 @@ def build_youtube_ranking(bucket: int) -> dict:
         videos = public.get("videos") if public.get("videos") is not None else (current.get("videos") if isinstance(current, dict) else None)
         timeline = opening_recent_info("", "youtube", item.get("channel_id", ""))
         rows.append({
-            "name": current.get("title") or item.get("name") or item.get("channel_id"),
+            "name": public.get("name") or item.get("name") or item.get("channel_id"),
             "channel_id": item.get("channel_id", ""),
-            "handle": current.get("handle") or item.get("handle") or "",
+            "handle": item.get("handle") or "",
             "url": f"https://www.youtube.com/channel/{item.get('channel_id')}" if item.get("channel_id") else "",
             "category": item.get("group") or "YouTube",
             "subscribers": subs,
@@ -148,23 +148,7 @@ def build_youtube_ranking(bucket: int) -> dict:
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
         })
-    for item in inventory.get("unconfirmed", []):
-        if str(item.get("platform") or "").lower() != "youtube":
-            continue
-        rows.append({
-            "name": item.get("name") or "미확인 YouTube",
-            "channel_id": "",
-            "handle": item.get("handle") or "",
-            "url": "",
-            "category": item.get("group") or "additional",
-            "subscribers": None, "subscriber_delta": None,
-            "views": None, "view_delta": None,
-            "videos": None, "video_delta": None,
-            "revenue": _social_revenue("YouTube", item.get("handle") or "", ""),
-            "opening_date": "", "recent_publish_date": "", "last_post_url": "", "last_post_id": "",
-            "infrastructure": infrastructure_info("youtube"),
-            "connected": False,
-        })
+    # UC ID가 없는 계획 슬롯은 실제 채널 순위/개수에 포함하지 않는다.
     rows.sort(key=lambda r: (
         r["subscribers"] is None,
         -(r["subscribers"] or 0),
@@ -225,10 +209,12 @@ def build_sns_ranking(bucket: int) -> dict:
         publication = publications.get((pkey, str(item.get("role") or "")), {})
         rows.append({
             "platform": platform,
-            "name": item.get("display_name") or item.get("role") or handle,
+            "name": (f"{item.get('display_name')} (현재: {item.get('current_public_name')})"
+                     if item.get("current_public_name") and item.get("current_public_name") != item.get("display_name")
+                     else item.get("display_name") or item.get("role") or handle),
             "role": item.get("role") or "",
-            "handle": handle,
-            "url": item.get("url") or "",
+            "handle": handle if item.get("identity_verified") else "",
+            "url": (item.get("url") or "") if item.get("identity_verified") else "",
             "followers": followers,
             "followers_delta": _delta(followers, old.get("count") if isinstance(old, dict) else None),
             "yesterday_views": yesterday_views,
@@ -357,9 +343,10 @@ def build_social_ranking(bucket: int) -> dict:
         "ranked": rank,
         "youtube_total": youtube_total,
         "sns_active_total": sns_active_total,
-        "target_total": 48,
-        "target_youtube": 24,
-        "count_confirmation_required": youtube_total != 24 or sns_active_total != 24,
+        "target_total": 39,
+        "target_youtube": 23,
+        "target_sns": 16,
+        "count_confirmation_required": youtube_total != 23 or sns_active_total != 16,
         "rows": rows,
     }
 

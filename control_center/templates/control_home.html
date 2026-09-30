@@ -64,7 +64,7 @@ tbody tr:hover{filter:brightness(.98)}
 <section class="section">
 <div class="section-head"><div><h2 id="social-title">YouTube + SNS 순위</h2><p>YouTube · Facebook · Threads · Instagram · TikTok 순서 · 매체 안에서 구독자/팔로워 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="https://sns.korea365.org">통합 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table social"><thead><tr>
-<th>순위</th><th>플랫폼</th><th>채널/계정</th><th>누적 수익 (USD)</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>최근 발행일시</th><th>즉시발행</th>
+  <th>순위</th><th>플랫폼</th><th>채널/계정</th><th>누적 수익 (USD)</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>최근 발행일시</th><th>계정 작업</th>
 </tr></thead><tbody id="social-rows"><tr><td colspan="8" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 </div>
@@ -170,7 +170,7 @@ async function loadSocial(){
   const p=String(c.platform||'').toLowerCase();
   const launch='https://sns.korea365.org/social-accounts?platform='+encodeURIComponent(c.platform||'통합');
   const monetized=!!(c.revenue&&c.revenue.monetized);
-  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.row_number)+'</td><td><span class="platform-badge">'+esc(c.platform||'')+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+recentPublication(c)+'</td><td><a class="quick" href="'+launch+'">즉시발행</a></td></tr>';
+  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.row_number)+'</td><td><span class="platform-badge">'+esc(c.platform||'')+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+recentPublication(c)+'</td><td><a class="quick" href="'+launch+'">상태·작업</a></td></tr>';
  }).join('');
  return d.generated_at;
 }

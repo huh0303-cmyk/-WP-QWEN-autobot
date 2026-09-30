@@ -24,14 +24,14 @@
       "topic": "한국어 표현, TOPIK 학습, 한국 유학 생활"
     },
     {
-      "order": 2,
+      "order": 3,
       "key": "japanese",
       "name": "일본어",
       "shopping": false,
       "topic": "초급 일본어 표현과 상황별 생존 회화"
     },
     {
-      "order": 3,
+      "order": 2,
       "key": "english",
       "name": "영어",
       "shopping": false,
@@ -68,7 +68,8 @@
       "url": "https://www.tiktok.com/@sis_topik",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": false
+      "publish_connected": false,
+      "current_public_name": "서울국제대학SIS"
     },
     {
       "platform": "TikTok",
@@ -88,7 +89,8 @@
       "url": "https://www.tiktok.com/@sis_languagecenter",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": false
+      "publish_connected": false,
+      "current_public_name": "서울국제대학SIS - English center"
     },
     {
       "platform": "TikTok",
@@ -129,7 +131,9 @@
       "url": "https://www.instagram.com/sis_topik1/",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": true
+      "publish_connected": false,
+      "current_public_name": "서울국제대학 SIS - Language center",
+      "note": "공개 프로필·Meta 계정 센터 확인. 과거 게시 영수증은 있으나 현재 CONTROL 자동 게시 권한은 미검증."
     },
     {
       "platform": "Instagram",
@@ -181,27 +185,29 @@
       "url": "https://www.instagram.com/seoul_jisoo/",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": false
+      "publish_connected": false,
+      "current_public_name": "Chris Huh",
+      "note": "@seoul_jisoo 핸들 확인. 공개 표시 이름은 아직 Chris Huh이며 Seoul Jisoo 변경은 Meta 재인증 대기."
     },
     {
       "platform": "Facebook",
       "role": "korean_topik",
       "display_name": "서울국제대학 SIS - TOPIK Center",
       "handle": "",
-      "url": "",
+      "url": "https://www.facebook.com/profile.php?id=61588777439380",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": true,
-      "note": "2026-10-01 directly opened managed Facebook page; prior official publishing receipt. Current VPS write credentials still missing.",
+      "publish_connected": false,
+      "note": "과거 공식 게시 영수증 있음. 현재 VPS Meta 쓰기 자격 증명은 없어 CONTROL 자동 게시 권한 미확인.",
       "profile_id": "61588777439380",
       "page_asset_id": "1128119143729384"
     },
     {
       "platform": "Facebook",
       "role": "japanese",
-      "display_name": "Japanese Survival (기존 Language Center)",
+      "display_name": "Japanese Survival",
       "handle": "",
-      "url": "",
+      "url": "https://www.facebook.com/profile.php?id=61593057083167",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false,
@@ -215,7 +221,7 @@
       "role": "english",
       "display_name": "서울국제대학 SIS-ENGLISH Center",
       "handle": "",
-      "url": "",
+      "url": "https://www.facebook.com/profile.php?id=61592457107609",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false,
@@ -282,8 +288,8 @@
       "url": "https://www.threads.com/@english_survival_1",
       "account_exists": true,
       "identity_verified": true,
-      "publish_connected": true,
-      "note": "2026-09-29 프로필명·핸들 변경 및 공개 테스트 게시 URL 확인"
+      "publish_connected": false,
+      "note": "2026-09-29 브라우저 공개 게시 영수증 있음. 현재 CONTROL 자동 게시 권한은 미검증."
     },
     {
       "platform": "Threads",
@@ -309,8 +315,8 @@
       "platform": "Threads",
       "role": "hot_item_shop",
       "display_name": "Seoul Jisoo",
-      "handle": "seoul_item365",
-      "url": "https://www.threads.com/@seoul_item365",
+      "handle": "",
+      "url": "",
       "account_exists": false,
       "identity_verified": false,
       "publish_connected": false,
