@@ -16,8 +16,10 @@ DATA = ROOT / "data"
 INVENTORY = ROOT / "config" / "london_social_account_inventory_2026-09-24.json"
 SNS_POLICY = ROOT / "config" / "sns_six_channel_policy.json"
 YOUTUBE_CONFIG = ROOT / "config" / "youtube_channels.json"
+YOUTUBE_MASTER = ROOT / "config" / "YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json"
 TISTORY_CONFIG = ROOT / "config" / "tistory_portfolio.json"
 ROOMS_CONFIG = ROOT / "config" / "automation_rooms.json"
+YOUTUBE_OAUTH_RECEIPTS = DATA / "youtube_oauth_verified_receipts.json"
 
 CORE_YOUTUBE = {
     "UCbJfEtsffpgI5MsKkB7BYvQ": "globalmusic",
@@ -82,6 +84,7 @@ def _write_state(group: str, state: dict) -> None:
 def _youtube_cards() -> list[dict]:
     inventory = _read(INVENTORY, {})
     configured = {r.get("channel_id"): r for r in _read(YOUTUBE_CONFIG, {}).get("channels", []) if r.get("channel_id")}
+    oauth_receipts = _read(YOUTUBE_OAUTH_RECEIPTS, {})
     cards = []
     for inventory_order, row in enumerate(inventory.get("youtube", [])):
         channel_id = row["channel_id"]
@@ -90,6 +93,13 @@ def _youtube_cards() -> list[dict]:
         group = profile.get("channel_type") or row.get("group") or "additional"
         role, fallback = ROLE_DETAILS.get(row["name"], (group, "채널별 확정 주제 콘텐츠"))
         group_label = YOUTUBE_GROUP_LABEL.get(group, group)
+        receipt = oauth_receipts.get(channel_id, {}) if isinstance(oauth_receipts, dict) else {}
+        oauth_verified = (
+            isinstance(receipt, dict)
+            and receipt.get("channel_id") == channel_id
+            and bool(receipt.get("secret_name"))
+            and bool(receipt.get("verified_at_utc"))
+        )
         operational_role = {
             "language": "언어별 Survival 콘텐츠 생산",
             "playlist": "음악·플레이리스트 영상 생산",
@@ -103,7 +113,9 @@ def _youtube_cards() -> list[dict]:
             "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
             "group": group, "group_label": group_label, "inventory_order": inventory_order, "role": operational_role,
             "description": profile.get("tone") or fallback,
-            "state_label": "채널 확인됨 · 비공개 제작 대기열" if core_key else "채널 확인됨 · 제작 경로/업로드 권한 미연결",
+            "state_label": ("OAuth 채널 ID 확인 · 공개 영수증 없음" if oauth_verified
+                            else "채널 확인됨 · 비공개 제작 대기열" if core_key
+                            else "채널 확인됨 · 제작 경로/업로드 권한 미연결"),
             "connection_level": "identity_verified",
             "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "이 채널 전용 제작 흐름과 정확한 UC ID의 업로드 권한을 연결해야 합니다.",
             "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",
@@ -272,6 +284,7 @@ def install(app, get_site_data=None):
         return render_template(
             "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
             selected=selected, total=len(media_cards), connected=connected,
+            planned_shopping_slots=_read(YOUTUBE_MASTER, {}).get("planned_shopping_slots", []) if selected in {"전체", "YouTube"} else [],
             csrf_token=app.config["CONTROL_CENTER_CSRF"],
         ), 200, {"Cache-Control": "no-store"}
 

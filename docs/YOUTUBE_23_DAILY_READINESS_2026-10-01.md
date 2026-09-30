@@ -190,3 +190,29 @@ The two health destinations are **Health_Clinic_Japan (Japanese)** and
 **Health Clinic USA (English)**. The owner's intervening Korea reference was
 explicitly corrected to USA. The benchmark and format evidence is in
 `docs/HEALTH_CLINIC_JP_USA_SENIOR_FORMAT_2026-10-01.md`.
+
+## OAuth continuation after owner approval
+
+The owner completed K-POP consent. The renewal script accepted only the exact
+single `mine=true` ID `UCKZsfAWyCmY0jckf4IWZrqw` and stored the KPOP
+refresh-token secret in the VPS runtime and GitHub Actions; neither value was
+logged or committed. The live CONTROL sheet will read a separate non-secret
+OAuth receipt file, written only after this exact-ID check. Its label means
+channel identity was checked at the receipt time; it does not certify current
+token health or a public video.
+
+The next Starbucks consent attempt revealed that Google's brand selector does
+not display `CAFE_STARBUCKSVIBES`. It displays **two** entries named `Chinese
+Survival`. The owner approved the first observed entry; the script accepted
+only the exact single `mine=true` ID `UC_e-sbLkVgwJNYEeobolNog` and stored
+`YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS` in the VPS runtime and GitHub Actions.
+The successful Google brand ID is recorded in
+`config/youtube_oauth_brand_mapping.json`; selector order is not an identity
+rule. The other Chinese Survival entry has not been mapped.
+
+Google's OAuth documentation says external Testing-mode refresh tokens with
+YouTube scope expire after seven days. Production-mode tokens can also stop
+working if access is revoked, unused for six months, or invalidated for other
+documented reasons. The project's OAuth publishing status has not yet been
+verified, so a one-time consent cannot be promised to last forever. Source:
+https://developers.google.com/identity/protocols/oauth2#expiration

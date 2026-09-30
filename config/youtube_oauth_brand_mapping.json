@@ -1,6 +1,15 @@
 {
   "version": 1,
   "channels": {
+    "starbucks": {
+      "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
+      "display_name": "CAFE_STARBUCKSVIBES",
+      "oauth_brand_name": "Chinese Survival",
+      "google_brand_id": "100701315143211582152",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01",
+      "note": "Two Chinese Survival entries appeared; this Google brand ID was selected and returned the exact Starbucks UC ID. Never infer identity from selector order alone."
+    },
     "healing": {
       "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
       "display_name": "힐링카페",

@@ -9,6 +9,30 @@ import control_center.blog_korea365_ranking as ranking
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_youtube_oauth_receipt_displays_identity_without_claiming_publication(monkeypatch, tmp_path):
+    import sys
+    import types
+
+    monkeypatch.setitem(sys.modules, "fcntl", types.ModuleType("fcntl"))
+    from control_center import social_accounts
+
+    channel_id = "UCKZsfAWyCmY0jckf4IWZrqw"
+    inventory = tmp_path / "inventory.json"
+    inventory.write_text('{"youtube":[{"name":"CAFE_KPOP","channel_id":"' + channel_id + '"}]}', encoding="utf-8")
+    config = tmp_path / "channels.json"
+    config.write_text('{"channels":[{"channel_id":"' + channel_id + '","channel_type":"playlist"}]}', encoding="utf-8")
+    receipts = tmp_path / "receipts.json"
+    receipts.write_text('{"' + channel_id + '":{"channel_id":"' + channel_id + '","secret_name":"YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP","verified_at_utc":"2026-10-01T00:00:00+00:00"}}', encoding="utf-8")
+    monkeypatch.setattr(social_accounts, "INVENTORY", inventory)
+    monkeypatch.setattr(social_accounts, "YOUTUBE_CONFIG", config)
+    monkeypatch.setattr(social_accounts, "YOUTUBE_OAUTH_RECEIPTS", receipts)
+    card = social_accounts._youtube_cards()[0]
+    assert card["state_label"] == "OAuth 채널 ID 확인 · 공개 영수증 없음"
+    assert card["connection_level"] == "identity_verified"
+    receipts.write_text('{"' + channel_id + '":{"channel_id":"wrong","secret_name":"YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP","verified_at_utc":"2026-10-01T00:00:00+00:00"}}', encoding="utf-8")
+    assert "OAuth 채널 ID 확인" not in social_accounts._youtube_cards()[0]["state_label"]
+
+
 def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     template = (ROOT / "control_center" / "templates" / "control_home.html").read_text(encoding="utf-8")
     assert "grid-template-columns:repeat(2,minmax(0,1fr))" in template
