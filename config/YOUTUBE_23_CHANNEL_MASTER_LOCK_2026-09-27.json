@@ -7,17 +7,17 @@
   "planned_shopping_slots": [
     {
       "key": "shopping2",
-      "display_name": "Jisoo2",
-      "legacy_handle_candidate": "sis_languagecenter",
+      "display_name": "쇼핑 채널 추가 1 (이름 미정)",
+      "rejected_legacy_handle_candidate": "sis_languagecenter",
       "channel_id": null,
-      "status": "unverified_handle_404_no_upload"
+      "status": "planned_new_shopping_channel_no_account_no_upload"
     },
     {
       "key": "shopping3",
-      "display_name": "second_additional_shopping_slot",
+      "display_name": "쇼핑 채널 추가 2 (이름 미정)",
       "handle": null,
       "channel_id": null,
-      "status": "unidentified_no_upload"
+      "status": "planned_new_shopping_channel_no_account_no_upload"
     }
   ],
   "groups": {

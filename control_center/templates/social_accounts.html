@@ -37,6 +37,7 @@
 </td><td class="identity">{{c.identity}}{% if c.handle %} · @{{c.handle}}{% endif %}</td></tr>
 {% endfor %}
 </tbody></table></section>
+{% if planned_shopping_slots %}<section class="notice" style="margin-top:14px"><strong>YouTube 목표 25개 = 기존 채널 23개 + 신규 쇼핑 채널 계획 2개</strong><p>아래 두 채널은 아직 계정·핸들·UC ID가 없어 위의 실제 채널 수와 발행 대상에 포함하지 않습니다.</p><ol>{% for slot in planned_shopping_slots %}<li>{{slot.display_name}} — 생성·ID 확인 대기</li>{% endfor %}</ol></section>{% endif %}
 <p class="footer">계정 존재, 계정 ID 확인, 게시 권한, 시험 발행, 일일 자동화는 서로 다른 상태입니다. ID가 없는 예정 슬롯은 YouTube 실계정 수에 포함하지 않습니다. 비밀번호나 토큰은 이 화면과 GitHub에 저장하지 않습니다.</p>
 </main>
 <script>

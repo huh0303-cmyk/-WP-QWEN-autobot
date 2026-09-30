@@ -16,6 +16,7 @@ DATA = ROOT / "data"
 INVENTORY = ROOT / "config" / "london_social_account_inventory_2026-09-24.json"
 SNS_POLICY = ROOT / "config" / "sns_six_channel_policy.json"
 YOUTUBE_CONFIG = ROOT / "config" / "youtube_channels.json"
+YOUTUBE_MASTER = ROOT / "config" / "YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json"
 TISTORY_CONFIG = ROOT / "config" / "tistory_portfolio.json"
 ROOMS_CONFIG = ROOT / "config" / "automation_rooms.json"
 YOUTUBE_OAUTH_RECEIPTS = DATA / "youtube_oauth_verified_receipts.json"
@@ -283,6 +284,7 @@ def install(app, get_site_data=None):
         return render_template(
             "social_accounts.html", cards=visible, counts=counts, platforms=platforms,
             selected=selected, total=len(media_cards), connected=connected,
+            planned_shopping_slots=_read(YOUTUBE_MASTER, {}).get("planned_shopping_slots", []) if selected in {"전체", "YouTube"} else [],
             csrf_token=app.config["CONTROL_CENTER_CSRF"],
         ), 200, {"Cache-Control": "no-store"}
 

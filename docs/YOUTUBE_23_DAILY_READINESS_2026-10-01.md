@@ -203,13 +203,12 @@ token health or a public video.
 
 The next Starbucks consent attempt revealed that Google's brand selector does
 not display `CAFE_STARBUCKSVIBES`. It displays **two** entries named `Chinese
-Survival`. The locked master calls this a historical Starbucks selector alias,
-but does not identify which duplicate entry is the Starbucks UC ID. The first
-entry has been selected only as a candidate and reached Google's unverified-app
-warning. The owner must handle that warning. The script will reject any
-`mine=true` result other than `UC_e-sbLkVgwJNYEeobolNog` and store nothing
-on mismatch. Do not mark either duplicate alias as proved in the registry
-until that exact check passes.
+Survival`. The owner approved the first observed entry; the script accepted
+only the exact single `mine=true` ID `UC_e-sbLkVgwJNYEeobolNog` and stored
+`YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS` in the VPS runtime and GitHub Actions.
+The successful Google brand ID is recorded in
+`config/youtube_oauth_brand_mapping.json`; selector order is not an identity
+rule. The other Chinese Survival entry has not been mapped.
 
 Google's OAuth documentation says external Testing-mode refresh tokens with
 YouTube scope expire after seven days. Production-mode tokens can also stop
