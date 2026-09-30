@@ -218,6 +218,15 @@ not an upload or public video receipt. The Google brand ID is now locked in
 `config/youtube_oauth_brand_mapping.json` as a navigation hint; exact UC ID
 remains the authority.
 
+The owner approved the `K-RELAX` Google brand for NASA_XFILES. The tool
+accepted only exact `UCtNLZO07Oh3UnXPI2CjOgNg`, stored the NASA refresh
+token in both protected stores and wrote the non-secret CONTROL receipt.
+The owner next approved the `Spanish Survival` Google brand selector entry;
+the History tool accepted only exact `UCVBvZwodUF4s57KeNicxQ3w`, stored
+the History refresh token in both protected stores and wrote its CONTROL
+receipt. This historical selector name must not be confused with the
+separate Spanish Survival language channel `UC9mvVEdL9Tllkit5v2Qv8UQ`.
+
 Google's OAuth documentation says external Testing-mode refresh tokens with
 YouTube scope expire after seven days. Production-mode tokens can also stop
 working if access is revoked, unused for six months, or invalidated for other
