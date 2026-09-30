@@ -19,7 +19,9 @@
     "health_usa": {
       "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
       "display_name": "Health Clinic USA",
-      "oauth_brand_name": "K-HEALING",
+      "oauth_brand_name": "Health Clinic USA",
+      "prior_oauth_brand_name": "K-HEALING",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
       "google_brand_id": "100139444347726889788",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -67,7 +69,9 @@
     "es": {
       "channel_id": "UC9mvVEdL9Tllkit5v2Qv8UQ",
       "display_name": "Spanish Survival",
-      "oauth_brand_name": "Arabic Survival",
+      "oauth_brand_name": "Spanish Survival",
+      "prior_oauth_brand_name": "Arabic Survival",
+      "brand_profile_name_verified": "live_google_brand_list_2026-10-01",
       "google_brand_id": "105922525541599728865",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -83,7 +87,9 @@
     "de": {
       "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
       "display_name": "German Survival",
-      "oauth_brand_name": "CLASSIC_READS_TIMES",
+      "oauth_brand_name": "German Survival",
+      "prior_oauth_brand_name": "CLASSIC_READS_TIMES",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
       "google_brand_id": "107899574901731335221",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -91,7 +97,9 @@
     "fr": {
       "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
       "display_name": "French Survival",
-      "oauth_brand_name": "AMERICAN_ARCHIVE_TIMES",
+      "oauth_brand_name": "French Survival",
+      "prior_oauth_brand_name": "AMERICAN_ARCHIVE_TIMES",
+      "brand_profile_name_verified": "live_google_brand_list_2026-10-01",
       "google_brand_id": "105017684393643407967",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -123,7 +131,9 @@
     "history": {
       "channel_id": "UCVBvZwodUF4s57KeNicxQ3w",
       "display_name": "HISTORY_TV_TODAY",
-      "oauth_brand_name": "Spanish Survival",
+      "oauth_brand_name": "HISTORY_TV_TODAY",
+      "prior_oauth_brand_name": "Spanish Survival",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
       "google_brand_id": "106734459301129845742",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -147,11 +157,43 @@
     "starbucks": {
       "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
       "display_name": "CAFE_STARBUCKSVIBES",
-      "oauth_brand_name": "Chinese Survival",
+      "oauth_brand_name": "CAFE_STARBUCKSVIBES",
+      "prior_oauth_brand_name": "Chinese Survival",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
       "google_brand_id": "100701315143211582152",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01",
       "note": "Two Chinese Survival entries appeared; this Google brand ID was selected and returned the exact Starbucks UC ID. Never infer identity from selector order alone."
+    },
+    "kpop": {
+      "channel_id": "UCKZsfAWyCmY0jckf4IWZrqw",
+      "display_name": "CAFE_KPOP",
+      "oauth_brand_name": "CAFE_KPOP",
+      "prior_oauth_brand_name": "Studio_K3",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
+      "google_brand_id": "107027220305669374994",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
+    "globalmusic": {
+      "channel_id": "UCbJfEtsffpgI5MsKkB7BYvQ",
+      "display_name": "CAFE_ROMANTIC",
+      "oauth_brand_name": "CAFE_ROMANTIC",
+      "prior_oauth_brand_name": "Studio_K3",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
+      "google_brand_id": "101180557547708405545",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "existing_channel_oauth_preflight_and_owner_brand_mapping_2026-10-01"
+    },
+    "shopping": {
+      "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
+      "display_name": "Seoul_Jisoo1",
+      "oauth_brand_name": "Seoul_Jisoo1",
+      "prior_oauth_brand_name": "K-ENTER",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
+      "google_brand_id": "101619364237374251295",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
     },
     "healing": {
       "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
