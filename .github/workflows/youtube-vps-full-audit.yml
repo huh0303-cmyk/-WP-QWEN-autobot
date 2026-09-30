@@ -1,0 +1,54 @@
+name: YouTube VPS full workflow audit
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect canonical scheduler and private queue
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            cd /opt/korea365
+            echo CANONICAL_WORKER=$(systemctl is-active korea365-youtube-worker.service || true)
+            echo CANONICAL_SCHEDULER=$(systemctl is-active korea365-youtube-scheduler.timer || true)
+            echo LEGACY_WEEKLY=$(systemctl is-active korea365-youtube-private-weekly.timer || true)
+            python3 - <<'PY'
+            import json
+            from pathlib import Path
+
+            root = Path('/opt/korea365/data/youtube_vps_queue')
+            summary = {}
+            recent = []
+            for folder in ('pending', 'running', 'completed', 'failed'):
+                paths = sorted((root / folder).glob('*.json'), key=lambda p: p.stat().st_mtime, reverse=True)
+                summary[folder] = len(paths)
+                for path in paths[:5]:
+                    try:
+                        row = json.loads(path.read_text(encoding='utf-8'))
+                    except (OSError, ValueError):
+                        continue
+                    recent.append({
+                        'folder': folder,
+                        'job_id': row.get('job_id'),
+                        'channel_key': row.get('channel_key'),
+                        'queued_at': row.get('queued_at'),
+                        'result_url': row.get('result_url') or row.get('url'),
+                        'error_type': row.get('error_type'),
+                    })
+            print('QUEUE_COUNTS', json.dumps(summary, sort_keys=True))
+            print('RECENT_JOBS', json.dumps(recent, ensure_ascii=False))
+            history = Path('/opt/korea365/data/healing_thumbnail_history.json')
+            rows = json.loads(history.read_text(encoding='utf-8')) if history.exists() else []
+            print('HEALING_THUMBNAIL_HISTORY', json.dumps(rows[-10:], ensure_ascii=False))
+            PY

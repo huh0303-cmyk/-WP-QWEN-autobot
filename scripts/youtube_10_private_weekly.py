@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Schedule the locked ten YouTube channels for 2-3 private jobs per 7-day cycle."""
+"""Schedule History daily and the other locked channels 2-3 times per cycle."""
 from __future__ import annotations
 import hashlib,json,os,random,sys
 from datetime import date,datetime,timedelta,timezone
@@ -19,7 +19,7 @@ def cycle_start(day):
 def make_plan(start):
  rng=random.Random(int(hashlib.sha256(('youtube-private-10|'+start.isoformat()).encode()).hexdigest(),16)); rows=[]
  for key,name in CHANNELS:
-  count=rng.choice((2,3));days=rng.sample(range(7),count)
+  count=7 if key=='history' else rng.choice((2,3));days=range(7) if key=='history' else rng.sample(range(7),count)
   for d in days:
    minute=rng.randrange(0,1440);at=datetime.combine(start+timedelta(days=d),datetime.min.time(),tzinfo=KST)+timedelta(minutes=minute)
    rows.append({'channel_key':key,'name':name,'scheduled_at':at.isoformat(),'mode':'private_review_only','status':'planned','duplicate_key':f'{start}|{key}|{d}'})

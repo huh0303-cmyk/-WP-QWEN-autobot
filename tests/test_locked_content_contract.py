@@ -88,7 +88,10 @@ def test_blogger_and_tistory_daily_contract():
 def test_youtube_contract_and_global_worker_owner():
     channels = [c for c in load_json("youtube_channels.json")["channels"] if c.get("enabled")]
     assert len(channels) == 10
-    assert all((c["interval_days_min"], c["interval_days_max"]) == (2, 3) for c in channels)
+    history = next(c for c in channels if c["channel_key"] == "history")
+    assert (history["interval_days_min"], history["interval_days_max"]) == (1, 1)
+    assert all((c["interval_days_min"], c["interval_days_max"]) == (2, 3)
+               for c in channels if c["channel_key"] != "history")
     for name in ("generate-youtube-playlist.yml", "curio-longform-daily.yml"):
         text = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
         assert "if: ${{ false }}" in text
@@ -110,8 +113,11 @@ def test_youtube_generated_schedule_has_no_fixed_short_period_or_time_collision(
             for row in rows if row[3] == channel["display_name"]
         ]
         gaps = [(b[0] - a[0]).days for a, b in zip(dates_and_times, dates_and_times[1:])]
-        assert gaps and set(gaps) == {2, 3}
+        assert gaps
+        assert set(gaps) == ({1} if channel["channel_key"] == "history" else {2, 3})
         assert all(a[1] != b[1] for a, b in zip(dates_and_times, dates_and_times[1:]))
+        if channel["channel_key"] == "history":
+            continue
         for period in range(1, min(9, len(gaps) // 2 + 1)):
             assert gaps != [gaps[i % period] for i in range(len(gaps))]
 

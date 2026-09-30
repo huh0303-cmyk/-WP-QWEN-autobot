@@ -14,7 +14,7 @@ ACTIONS = {
     "blogger33_daily": ("start", "korea365-blogger33-daily.service"),
     "news2": ("start", "korea365-daily-52-plan.service"),
     "youtube_playlist": ("start", "korea365-playlist-v3.service"),
-    "youtube_private": ("start", "korea365-youtube-private-weekly.service"),
+    "youtube_private": ("start", "korea365-youtube-scheduler.service"),
     "metrics": ("start", "korea365-channel-metrics.service"),
     "evidence": ("start", "korea365-publication-evidence.service"),
     "account_schedule": ("start", "korea365-account-schedule.service"),

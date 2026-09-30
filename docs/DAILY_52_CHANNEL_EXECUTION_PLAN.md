@@ -2,7 +2,7 @@
 
 ## Goal
 
-Prepare one daily slot for every non-YouTube destination: TikTok 6, Instagram 6, Facebook 6, Threads 6, Tistory 5, and Naver 3. Only the locked ten YouTube channels are scheduled, each on two or three randomly selected days per week and always as private/review-only production.
+Prepare one daily slot for every non-YouTube destination: TikTok 6, Instagram 6, Facebook 6, Threads 6, Tistory 5, and Naver 3. Only the locked ten YouTube channels are scheduled: History every day, the other nine on two or three randomly selected days per week, always as private/review-only production.
 
 ## Implemented foundation
 
@@ -15,7 +15,7 @@ Prepare one daily slot for every non-YouTube destination: TikTok 6, Instagram 6,
 
 ## Release gates
 
-1. YouTube: only the locked ten channels are eligible, two or three times weekly, and remain `private_review_only`; public release requires a separate owner decision.
+1. YouTube: only the locked ten channels are eligible. History is daily; the other nine are two or three times weekly. All remain `private_review_only`; public release requires a separate owner decision.
 2. TikTok, Instagram, Facebook, Threads: public posting requires account identity, platform write authorization, and one receipt-backed test.
 3. Tistory: public posting requires the local persistent browser login and one successful account-specific test.
 4. Naver: each of N1, N2, and N3 requires a separate persistent login profile, exact blog ID, and one successful test.

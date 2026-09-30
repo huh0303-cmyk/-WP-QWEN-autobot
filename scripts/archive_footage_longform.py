@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,7 +31,8 @@ def _history_date_overlay(path: str) -> str:
     image = Image.open(path).convert("RGB")
     draw = ImageDraw.Draw(image)
     font_path = base.ensure_thumbnail_font("en", base.DATA_DIR)
-    date_text = datetime.now(timezone(timedelta(hours=9))).strftime("%B %d").upper()
+    episode_date = date.fromisoformat(os.environ["EPISODE_DATE"]) if os.environ.get("EPISODE_DATE") else datetime.now(timezone(timedelta(hours=9))).date()
+    date_text = episode_date.strftime("%B %d").upper()
     date_font = ImageFont.truetype(font_path, max(118, image.width // 10))
     label_font = ImageFont.truetype(font_path, max(34, image.width // 32))
     for text, font, y in (

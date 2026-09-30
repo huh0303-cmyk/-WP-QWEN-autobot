@@ -141,8 +141,9 @@ def youtube_rows(horizon: dt.date, existing, channels):
         while True:
             gap_min = int(channel.get("interval_days_min", 2))
             gap_max = int(channel.get("interval_days_max", 3))
-            if (gap_min, gap_max) != (2, 3):
-                raise ValueError(f"{name}: YouTube cadence contract must be 2-3 days")
+            expected = (1, 1) if channel["channel_key"] == "history" else (2, 3)
+            if (gap_min, gap_max) != expected:
+                raise ValueError(f"{name}: YouTube cadence contract must be {expected[0]}-{expected[1]} days")
             gap = gap_min + stable_int(f"{name}|{due}|gap") % (gap_max - gap_min + 1)
             due += dt.timedelta(days=gap)
             if due > horizon:
@@ -150,7 +151,7 @@ def youtube_rows(horizon: dt.date, existing, channels):
             platform = "YouTube Playlist" if channel["channel_type"] == "playlist" else "YouTube Knowledge"
             key = f"{due}|{platform}|{name}"
             topic_pool = YT_TOPICS.get(name, [])
-            if name == "History Today Times":
+            if channel["channel_key"] == "history":
                 topic = f"{due.strftime('%B %d').upper()} — This Day in History (dated archive event)"
             else:
                 topic = topic_pool[counter % len(topic_pool)] if topic_pool else channel["tone"]

@@ -137,6 +137,7 @@ def run_job(job: dict) -> None:
         channel = next(c for c in load_channels() if c.channel_key == row["key"])
         env.update(CHANNEL_KEY=row["key"], TOPIC=row["topic"], LANGUAGE=row.get("language", ""),
                    TOPIC_KEYWORD=row["topic"], LANGUAGE_KEYWORD=row.get("language", ""), SCHEDULE_ID=row["id"],
+                   EPISODE_DATE=row["when"].date().isoformat(),
                    CLAIM_TOKEN=token, VPS_JOB_ID=job["job_id"], WORKER_WORKFLOW="youtube-vps-worker",
                    GITHUB_RUN_ATTEMPT="1")
         result_path = "artifacts/youtube_playlist_result.json" if channel.channel_type == "playlist" else "artifacts/youtube_curio_result.json"

@@ -1,7 +1,54 @@
 """Real moving nature footage, private review presets, randomized runtime."""
 import hashlib, json, os, random, re, subprocess
+from pathlib import Path
 import requests
 import healing_rain_review as job
+
+SOURCE_POOLS = {
+    'rain': [13166787, 9632520, 5754996, 32679327],
+    'creek': [18132437, 7351460, 7067022, 5257861],
+}
+HISTORY_LIMIT = 50
+
+
+def _history_path():
+    return Path(os.environ.get('HEALING_THUMBNAIL_HISTORY', job.ROOT/'data/healing_thumbnail_history.json'))
+
+
+def _read_history(path):
+    try:
+        rows=json.loads(path.read_text(encoding='utf-8'))
+        return rows if isinstance(rows,list) else []
+    except (OSError,ValueError):
+        return []
+
+
+def select_source(mode, seed, history):
+    pool=SOURCE_POOLS[mode]
+    recent=[int(row.get('source_id',0)) for row in reversed(history) if row.get('mode')==mode]
+    available=[source_id for source_id in pool if source_id not in recent[:min(3,len(pool)-1)]] or pool
+    return available[seed % len(available)]
+
+
+def select_thumbnail_second(source_id, source_seconds, seed, history):
+    upper=max(2,int(source_seconds)-2)
+    candidates=list(range(2,upper+1))
+    used={(int(row.get('source_id',0)),int(row.get('thumbnail_second',-1))) for row in history[-HISTORY_LIMIT:]}
+    start=seed % len(candidates)
+    for offset in range(len(candidates)):
+        second=candidates[(start+offset)%len(candidates)]
+        if (source_id,second) not in used:
+            return second
+    return candidates[start]
+
+
+def record_thumbnail(path, payload):
+    rows=_read_history(path)
+    rows.append(payload)
+    path.parent.mkdir(parents=True,exist_ok=True)
+    tmp=path.with_suffix(path.suffix+'.tmp')
+    tmp.write_text(json.dumps(rows[-HISTORY_LIMIT:],ensure_ascii=False,indent=2),encoding='utf-8')
+    os.replace(tmp,path)
 
 def download(url, path):
     with requests.get(url,stream=True,timeout=90) as response:
@@ -34,14 +81,17 @@ Footage: Pexels, used under the Pexels License. Bird ambience, when present: Mag
 MODE,SEED,MINUTES=configure()
 def render():
     work=job.WORK
-    source_id=13166787 if MODE=='rain' else 18132437
+    history_path=_history_path()
+    history=_read_history(history_path)
+    source_id=select_source(MODE,SEED,history)
     source=work/'source.mp4'
     download(f'https://www.pexels.com/download/video/{source_id}/',source)
-    job.ff('-ss','3','-i',source,'-frames:v','1','-vf','scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080',work/'thumbnail.jpg')
     # Last second dissolves into first second; next loop begins where the dissolve ends.
     source_seconds=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','default=nw=1:nk=1',str(source)]))
     end=min(40,int(source_seconds))
     if end<10: raise RuntimeError('Nature source is too short')
+    thumbnail_second=select_thumbnail_second(source_id,source_seconds,SEED,history)
+    job.ff('-ss',str(thumbnail_second),'-i',source,'-frames:v','1','-vf','scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080',work/'thumbnail.jpg')
     transition=f'[0:v]fps=24,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,setsar=1,split[a][b];[a]trim=start=1:end={end},setpts=PTS-STARTPTS[x];[b]trim=start=0:end=1,setpts=PTS-STARTPTS[y];[x][y]xfade=transition=fade:duration=1:offset={end-2}[v]'
     job.ff('-i',source,'-filter_complex_threads','1','-filter_complex',transition,'-map','[v]','-an','-c:v','libx264','-preset','fast','-b:v','2200k','-maxrate','2600k','-bufsize','5200k','-pix_fmt','yuv420p',work/'scene.mp4')
     tail=f'afade=t=in:d=4,afade=t=out:st={job.DURATION-6}:d=6'
@@ -57,11 +107,12 @@ def render():
         job.ff('-i',water_source,'-filter_complex','[0:a]asplit[x][y];[x]atrim=start=1:end=18,asetpts=PTS-STARTPTS[a];[y]atrim=start=0:end=1,asetpts=PTS-STARTPTS[b];[a][b]acrossfade=d=1[c]','-map','[c]','-c:a','pcm_s16le',work/'water.wav')
         inputs=['-stream_loop','-1','-i',work/'water.wav','-stream_loop','-1','-i',work/'birds.mp3']
         filters='[1:a]loudnorm=I=-25:TP=-3:LRA=7[w];[2:a]loudnorm=I=-32:TP=-5:LRA=7[b];[w][b]amix=inputs=2:normalize=0,'+tail+'[a]'
-    job.save('synthesis.json',{'minutes':MINUTES,'mode':MODE,'seed':SEED,'motion':'real footage with crossfaded loop','source_id':source_id,'license':'https://www.pexels.com/license/','bird_license':'CC0 https://freesound.org/people/Magnesus/sounds/723913/','thumbnail_text':False})
+    job.save('synthesis.json',{'minutes':MINUTES,'mode':MODE,'seed':SEED,'motion':'real footage with crossfaded loop','source_id':source_id,'source_page':f'https://www.pexels.com/video/{source_id}/','thumbnail_second':thumbnail_second,'license':'https://www.pexels.com/license/','bird_license':'CC0 https://freesound.org/people/Magnesus/sounds/723913/','thumbnail_text':False})
     job.ff('-stream_loop','-1','-i',work/'scene.mp4',*inputs,'-filter_complex',filters,'-map','0:v','-map','[a]','-t',job.DURATION,'-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart',work/'rain-75.mp4')
     seconds=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','default=nw=1:nk=1',str(work/'rain-75.mp4')]))
     if abs(seconds-job.DURATION)>2: raise RuntimeError('Rendered duration mismatch')
     job.ff('-ss','30','-i',work/'rain-75.mp4','-t','20','-c','copy',work/'preview.mp4')
+    record_thumbnail(history_path,{'token':job.MARKER.rsplit('-',1)[-1],'mode':MODE,'source_id':source_id,'thumbnail_second':thumbnail_second})
     print('MOTION_RENDERED',MODE,MINUTES,flush=True)
 
 if __name__=='__main__':

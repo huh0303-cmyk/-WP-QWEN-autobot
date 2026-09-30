@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build the London Project daily publication plan.
 
-Owner cadence (2026-09-25): the locked ten YouTube channels receive two or
-three randomly selected private-production days per week. Every non-YouTube
-account receives one slot every day. Planning never bypasses identity or write
+Owner cadence: History receives one dated private production every day; the
+other nine locked YouTube channels receive two or three randomly selected
+private-production days per week. Every non-YouTube account receives one slot every day. Planning never bypasses identity or write
 authorization gates and never makes a YouTube video public.
 """
 from __future__ import annotations
@@ -20,6 +20,7 @@ ROOT = Path(os.environ.get("KOREA365_ROOT", "/opt/korea365"))
 KST = timezone(timedelta(hours=9))
 WINDOW_START_MINUTE = 8 * 60 + 10
 WINDOW_END_MINUTE = 22 * 60 + 50
+HISTORY_CHANNEL_ID = "UCVBvZwodUF4s57KeNicxQ3w"
 
 
 def read(path: Path, default):
@@ -46,16 +47,18 @@ def youtube_targets(day: date) -> list[dict]:
     due = []
     for row in rows:
         channel_id = str(row.get("channel_id", ""))
-        if day.weekday() not in _weekly_youtube_days(channel_id, week_start):
+        is_history = channel_id == HISTORY_CHANNEL_ID
+        if not is_history and day.weekday() not in _weekly_youtube_days(channel_id, week_start):
             continue
         group = "playlist" if int(row.get("order", 0)) <= 5 else "knowledge"
         due.append({
             "key": f"youtube:{channel_id}", "platform": "YouTube",
             "name": row.get("label", channel_id), "identity": channel_id,
             "publish_connected": True, "release_policy": "private_review_only",
-            "cadence": "2_to_3_per_week_random_days",
+            "cadence": "1_per_day_private" if is_history else "2_to_3_per_week_random_days",
             "topic_source": f"youtube_{group}_topic_pipeline",
-            "topic_brief": "Select a fresh, non-duplicate topic from the channel-specific topic bank.",
+            "topic_brief": (f"{day.strftime('%B %d').upper()} — select one source-grounded event from this date; reject duplicate events."
+                            if is_history else "Select a fresh, non-duplicate topic from the channel-specific topic bank."),
         })
     return due
 

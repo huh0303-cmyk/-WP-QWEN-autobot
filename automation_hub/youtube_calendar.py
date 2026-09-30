@@ -11,6 +11,8 @@ READY = "기획확정·자료준비"
 ALIASES = {
     "Healing": "healing", "Cafe Music": "starbucks", "MBB": "mbb",
     "K-pop": "kpop", "플리-로맨틱글로벌": "globalmusic",
+    "History Today Times": "history", "HISTORY_TV_TODAY": "history",
+    "HISTORY_TODAY_JOURNAL": "history", "Today in World History": "history",
 }
 
 

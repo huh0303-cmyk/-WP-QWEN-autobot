@@ -309,7 +309,18 @@ jobs:
             systemctl daemon-reload
             systemctl enable korea365-wp-publisher.service >/dev/null 2>&1 || true
             systemctl restart korea365-wp-publisher.service
-            systemctl is-active korea365-control.service korea365-operations.service korea365-wp-publisher.service
+
+            # One canonical YouTube dispatcher owns calendar claims. The legacy
+            # weekly timer would create a second queue and is always disabled.
+            install -m 644 "$ROOT/deploy/vps/korea365-youtube-worker.service" /etc/systemd/system/korea365-youtube-worker.service
+            install -m 644 "$ROOT/deploy/vps/korea365-youtube-scheduler.service" /etc/systemd/system/korea365-youtube-scheduler.service
+            install -m 644 "$ROOT/deploy/vps/korea365-youtube-scheduler.timer" /etc/systemd/system/korea365-youtube-scheduler.timer
+            systemctl daemon-reload
+            systemctl disable --now korea365-youtube-private-weekly.timer >/dev/null 2>&1 || true
+            systemctl stop korea365-youtube-private-weekly.service >/dev/null 2>&1 || true
+            systemctl enable --now korea365-youtube-worker.service korea365-youtube-scheduler.timer
+            systemctl restart korea365-youtube-worker.service
+            systemctl is-active korea365-control.service korea365-operations.service korea365-wp-publisher.service korea365-youtube-worker.service korea365-youtube-scheduler.timer
 
             python3 - <<'PY'
             import json, time
