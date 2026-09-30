@@ -1,1 +1,1 @@
-run 2026-10-01 read-only audit
+run 1790791922 weekly-trend audit

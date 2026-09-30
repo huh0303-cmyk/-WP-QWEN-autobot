@@ -139,6 +139,20 @@ class GSC:
         r = self._req("PUT", f"/sites/{quote(prop, safe='')}/sitemaps/{quote(sitemap_url, safe='')}")
         return r.status_code in (200, 204)
 
+    def traffic_week(self, prop):
+        """최근 7일 vs 직전 7일 (GSC는 ~2일 지연이라 end=오늘-2)."""
+        end = datetime.now(timezone.utc).date() - timedelta(days=2)
+        out = {}
+        for label, e in (("this", end), ("prev", end - timedelta(days=7))):
+            r = self._req("POST", f"/sites/{quote(prop, safe='')}/searchAnalytics/query",
+                          json={"startDate": str(e - timedelta(days=6)), "endDate": str(e)})
+            if r.status_code != 200:
+                return None
+            rows = r.json().get("rows", [])
+            out[label] = ({"clicks": int(rows[0]["clicks"]), "impressions": int(rows[0]["impressions"])}
+                          if rows else {"clicks": 0, "impressions": 0})
+        return out
+
     def traffic_28d(self, prop):
         end = datetime.now(timezone.utc).date() - timedelta(days=2)
         start = end - timedelta(days=27)
@@ -331,6 +345,7 @@ def check_wp(site, gsc):
             traffic = gsc.traffic_28d(prop)
             if traffic is not None:
                 row["gsc_28d"] = traffic
+                row["gsc_week"] = gsc.traffic_week(prop)
                 if traffic["impressions"] == 0 and row.get("public_total", 0) >= 10:
                     issue("warn", "zero_impressions_28d")
 
@@ -389,6 +404,7 @@ def check_blogger(ch, gsc):
                 traffic = gsc.traffic_28d(prop)
                 if traffic is not None:
                     row["gsc_28d"] = traffic
+                row["gsc_week"] = gsc.traffic_week(prop)
     except (requests.RequestException, ValueError, KeyError) as exc:
         row["issues"].append(f"critical:unreachable_{type(exc).__name__}")
     return row
@@ -428,6 +444,12 @@ def render_md(rows, started):
     if traffic:
         lines += ["## 최근 28일 검색 클릭 상위", ""] + [
             f"- {s}: 클릭 {t['clicks']} / 노출 {t['impressions']}" for s, t in traffic] + [""]
+    wk = [(r["site"], r["gsc_week"]) for r in rows if r.get("gsc_week")]
+    if wk:
+        tc = sum(w["this"]["clicks"] for _, w in wk); pc = sum(w["prev"]["clicks"] for _, w in wk)
+        ti = sum(w["this"]["impressions"] for _, w in wk); pi = sum(w["prev"]["impressions"] for _, w in wk)
+        lines += ["## 주간 추이 (최근 7일 vs 직전 7일, 전체 사이트 합계)", "",
+                  f"- 클릭 {tc} (직전 {pc}) · 노출 {ti} (직전 {pi})", ""]
     return "\n".join(lines)
 
 
