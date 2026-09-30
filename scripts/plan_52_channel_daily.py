@@ -90,7 +90,8 @@ def daily_non_youtube_targets() -> list[dict]:
         result.append({
             "key": f"naver:{row['room_id']}", "platform": "Naver",
             "name": row.get("name", row["room_id"]), "identity": destination,
-            "publish_connected": bool(row.get("enabled") and destination),
+            "publish_connected": bool(row.get("enabled") and destination
+                                      and row.get("identity_verified") and row.get("publish_connected")),
             "release_policy": "public_after_local_login_test", "cadence": "1_per_day",
             "topic_source": "account_specific_keyword_bank",
             "topic_brief": "Select one original account-specific search topic with duplicate protection.",
