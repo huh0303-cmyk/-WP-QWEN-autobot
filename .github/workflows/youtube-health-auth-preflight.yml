@@ -1,0 +1,43 @@
+name: Verify Health Clinic YouTube upload credentials
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  japan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Verify Health Clinic Japan exact channel
+        env:
+          PROFILE: health_japan
+          EXPECTED_CHANNEL_ID: UCC_PcHMv-Uxpr00Pjw_J2Wg
+          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP }}
+        run: python scripts/youtube_health_auth_preflight.py
+  usa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Verify Health Clinic USA exact channel
+        env:
+          PROFILE: health_usa
+          EXPECTED_CHANNEL_ID: UC91BpNSb4nUwD6jrpthK7FQ
+          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN }}
+        run: python scripts/youtube_health_auth_preflight.py
