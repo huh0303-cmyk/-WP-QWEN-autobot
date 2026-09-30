@@ -315,3 +315,27 @@ in place; new channel names use the environment. GitHub Actions jobs need
 `environment: youtube-channels` to read environment secrets, while the VPS
 has its own protected runtime copy. Neither a token value nor a public video
 is in GitHub.
+
+## Owner's missing personal YouTube channel investigation
+
+On 2026-10-01 KST the owner reported that a personal YouTube channel named
+`CHRIS JUNGYOON HUH` was no longer visible. The signed-in
+`huh0303@gmail.com` YouTube **All channels** switcher showed exactly the 23
+project channels and no channel with that personal display name. Google's
+OAuth chooser showed `CHRIS JUNGYOON HUH` as the **primary Google account**;
+its earlier user-approved `channels.list(mine=true)` returned the single
+Japanese Survival channel `UCOWoNH_d6p45ywQ6W0Z1Jng`. The public channel
+currently displays `Japanese Survival` / `@seoul_japanese1`; its description
+says it was previously `SIS-Language Center`, and its About panel says it
+joined on 2021-02-20. Google's signed-in Brand Accounts management page
+listed 22 current brand accounts and said there were no deleted brand
+accounts. An exact-name YouTube channel search returned no result.
+
+These observations establish that the named personal channel is **not
+currently selectable under this signed-in Google account**. They do not
+establish that a channel was deleted or identify a prior personal-channel
+UC ID. A different Google login or an earlier renamed channel remains
+possible. Do not create, rename, move, or overwrite a channel based on the
+Google account display name. Next: inspect any old personal video/channel
+URL or a second Google account if the owner can supply one; compare the
+stable UC ID with current channel identities.
