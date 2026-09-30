@@ -1,0 +1,80 @@
+name: "사이트 건강도 자동 점검·복구 (2일마다)"
+
+# WP 27 + Blogger 33 점검 → 안전한 항목만 자동 수정 → 리포트를 docs/site-health/ 에 커밋.
+# 삭제/비공개 전환/Site Kit 재설정 등 되돌리기 어려운 작업은 자동 실행하지 않는다.
+on:
+  schedule:
+    - cron: "17 21 */2 * *"   # 매 2일, 06:17 KST (정각 회피)
+  workflow_dispatch:
+    inputs:
+      fix:
+        description: "안전 자동수정 실행 (1=수정, 0=점검만)"
+        default: "1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: site-health-guardian
+  cancel-in-progress: false
+
+jobs:
+  guardian:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: Run site health guardian
+        env:
+          GUARDIAN_FIX: ${{ github.event.inputs.fix || '1' }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
+        run: python scripts/site_health_guardian.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: site-health-${{ github.run_id }}
+          path: artifacts/site-health/
+          retention-days: 30
+      - name: Commit report to GitHub (durable record)
+        if: always()
+        run: |
+          mkdir -p docs/site-health
+          cp artifacts/site-health/report.md docs/site-health/latest.md || exit 0
+          cp artifacts/site-health/report.json docs/site-health/latest.json
+          git config user.name "site-health-guardian"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/site-health
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: site health report $(date -u +%F)"
+          git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"
