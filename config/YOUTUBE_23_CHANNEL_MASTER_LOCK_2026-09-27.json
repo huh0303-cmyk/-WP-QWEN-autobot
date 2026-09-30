@@ -4,6 +4,22 @@
   "project": "LondonProjectGPT",
   "rule": "Production identity is exact YouTube channel title + @handle + UC channel ID. Legacy Google/brand account selector labels are aliases only and must never be used as channel identity.",
   "target_count": 23,
+  "planned_shopping_slots": [
+    {
+      "key": "shopping2",
+      "display_name": "Jisoo2",
+      "legacy_handle_candidate": "sis_languagecenter",
+      "channel_id": null,
+      "status": "unverified_handle_404_no_upload"
+    },
+    {
+      "key": "shopping3",
+      "display_name": "second_additional_shopping_slot",
+      "handle": null,
+      "channel_id": null,
+      "status": "unidentified_no_upload"
+    }
+  ],
   "groups": {
     "playlist": [
       {

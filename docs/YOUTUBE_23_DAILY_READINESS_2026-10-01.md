@@ -94,12 +94,32 @@ differs. No alias shown in Google's brand-account selector establishes a
 channel identity until `mine=true` returns the exact locked UC ID.
 
 The five retired keys (`science`, `classical`, `myth`, `american_archive`,
-`classic_reads`) remain excluded from the executor. A 2026-10-01 GitHub
-repository-secret name listing (98 names) found no matching refresh-token
-secret for those five; this updates the owner's older warning that they were
-still present. No secret was deleted in this session.
+`classic_reads`) remain excluded from the executor. **Correction to the
+repository-only check:** the `youtube-channels` GitHub Actions environment
+still contains three retired refresh-token secrets:
+`YOUTUBE_OAUTH_REFRESH_TOKEN_SCIENCE_FACTS_TIMES`,
+`YOUTUBE_OAUTH_REFRESH_TOKEN_MYTH_LEGEND_TIMES`, and
+`YOUTUBE_OAUTH_REFRESH_TOKEN_CLASSIC_READS_TIMES`. The other two retired
+names (`CLASSICAL_JOURNAL`, `AMERICAN_ARCHIVE_TIMES`) were absent from the
+repository and every listed environment. No secret values were read and no
+secret was deleted. Keep all five keys prohibited; the owner must remove the
+remaining three environment secrets from the GitHub Settings UI before the
+old warning can be closed.
 
 The KPOP selector's first `Studio_K3` was chosen according to the locked
 legacy alias. Google then displayed an unverified-app warning for the owner's
 OAuth app. The browser was handed to the owner to decide whether to proceed;
 no warning was bypassed by automation. The exact-ID guard still applies.
+
+The owner confirmed French Survival `UCmt8f9yUT6iTxBys8eH4-Cg`, Portuguese
+Survival `UCKvKhETLGPaRV3qfWv2bM2g`, and Vietnamese Survival
+`UCRZ0uc_bxKDMwz3noBBi9KQ` are **language** targets. Direct YouTube
+`/channel/<UC ID>` pages on 2026-10-01 displayed those respective titles.
+They must never be repurposed as shopping channels. The two additional
+shopping slots are separate from the 23 verified channels: the historical
+`Jisoo2/@sis_languagecenter` candidate still returns YouTube 404 and has no
+verified UC ID; the second new slot has no known handle or ID. Neither is
+eligible for upload until a distinct UC ID is verified in YouTube Studio and
+the public page. The supplied social table has 23 locked YouTube channels
+plus this one provisional `Jisoo2` row; its Facebook/Threads/Instagram/TikTok
+rows are other platforms, not extra verified YouTube channels.
