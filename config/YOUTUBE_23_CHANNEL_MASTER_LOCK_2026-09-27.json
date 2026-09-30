@@ -139,7 +139,7 @@
         "title": "Vietnamese Survival",
         "handle": "SIS_VietnameseSurvival",
         "channel_id": "UCRZ0uc_bxKDMwz3noBBi9KQ",
-        "verified": "public_handle_page_2026-09-27"
+        "verified": "public_uc_page_and_owner_language_confirmation_2026-10-01"
       },
       {
         "key": "es",
@@ -153,7 +153,7 @@
         "title": "French Survival",
         "handle": "SIS_FrenchSurvival",
         "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
-        "verified": "public_handle_page_2026-09-27"
+        "verified": "public_uc_page_and_owner_language_confirmation_2026-10-01"
       },
       {
         "key": "de",
@@ -174,7 +174,7 @@
         "title": "Portuguese Survival",
         "handle": "Portuguese_survival",
         "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
-        "verified": "public_handle_page_2026-09-27"
+        "verified": "public_uc_page_and_owner_language_confirmation_2026-10-01"
       }
     ],
     "health": [
@@ -199,7 +199,10 @@
         "title": "Seoul_Jisoo1",
         "handle": "rosiespicks",
         "channel_id": "UCAizx0tPkRSol8sIhanN_QQ",
-        "verified": "public_handle_page_2026-09-27"
+        "verified": "public_uc_page_and_owner_shopping_confirmation_2026-10-01",
+        "editorial_role": "Seoul Jisoo multi-category shopping and booking",
+        "previous_content_role": "owner_attested_Health_Clinic_Korea_Korean_health",
+        "previous_health_videos": "owner_plans_removal_not_deleted_2026-10-01"
       }
     ]
   },
