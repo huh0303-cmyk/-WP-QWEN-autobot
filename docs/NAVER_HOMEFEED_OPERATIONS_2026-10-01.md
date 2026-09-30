@@ -28,7 +28,12 @@ Canonical machine-readable policy: `config/naver_homefeed_automation.json`.
 - Verification: 2026-10-29 income-test removal; other eligibility review remains; child payment amount described from official material.
 - Image: original generated editorial illustration at `assets/naver/2026-10-01-child-support-advance.png`; no third-party news photo copied.
 - Naver editor evidence: logged-in `생활의정석` editor accepted title, body, and image; explicit `저장` returned `임시저장이 완료되었습니다.` and the saved-draft count changed from 114 to 115.
-- Publication state at record time: `draft_saved`; no public URL yet. Do not report as published until Naver returns and the public post URL is verified.
+- Draft state at 00:32 KST: `draft_saved`; the draft was not reported as published at that point.
+- Public state: `published` after the owner confirmed the logged-in `생활의정석` session.
+- Naver log number: `224427681159`
+- Public URL: `https://blog.naver.com/sky-only/224427681159`
+- Browser verification: Naver PostView showed the exact title, category `[정부지원금]`, author `생활의정석`, timestamp `방금 전`, body, source links, and tags.
+- External verification: desktop and mobile public URLs returned HTTP 200; the mobile response contained the exact title.
 
 ## Recurring operation
 
