@@ -4,7 +4,7 @@ Merged PR 42: existing approved music and Gemini app exports are the defaults; p
 
 Merged PR 43: runtime secrets are encrypted to the existing VPS public key; only the VPS private key can decrypt them. Plaintext credentials are stored at /etc/korea365/youtube-runtime.json with mode 0600. No plaintext credentials are in Git or artifacts.
 
-On srv1959434, the existing control service uses root and `/etc/korea365/control.env`. The source-controlled YouTube worker and calendar scheduler now match that runtime user and environment and invoke `scripts/youtube_vps_worker.py`. Do not introduce a second unit or a different environment-file path.
+On srv1959434, the existing control service uses root and `/etc/korea365/control.env`. The source-controlled YouTube worker and calendar scheduler match that runtime user and environment and enter through `scripts/run_youtube_vps.py`, which loads the encrypted `/etc/korea365/youtube-runtime.json` before invoking the canonical worker. Do not bypass that loader, introduce a second unit, or use a different environment-file path.
 
 Verified: Cafe Romantic OAuth resolves to the locked owner channel. Worker service installed and enabled. Gemini subscription app generated a new cafe image and a 3-minute French vocal sample at https://gemini.google.com/app/1046918719863b9f.
 

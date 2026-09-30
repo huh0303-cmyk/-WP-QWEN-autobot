@@ -34,7 +34,7 @@ jobs:
             Group=root
             WorkingDirectory=/opt/korea365
             EnvironmentFile=/etc/korea365/control.env
-            ExecStart=/opt/korea365/.venv/bin/python scripts/youtube_vps_worker.py --daemon
+            ExecStart=/opt/korea365/.venv/bin/python scripts/run_youtube_vps.py --daemon
             Restart=always
             RestartSec=5
             Nice=5
@@ -52,7 +52,7 @@ jobs:
             Group=root
             WorkingDirectory=/opt/korea365
             EnvironmentFile=/etc/korea365/control.env
-            ExecStart=/opt/korea365/.venv/bin/python scripts/youtube_vps_worker.py --enqueue-due
+            ExecStart=/opt/korea365/.venv/bin/python scripts/run_youtube_vps.py --enqueue-due
             UNIT
             install -m 644 "$WORKER_UNIT" /etc/systemd/system/korea365-youtube-worker.service
             install -m 644 "$SCHEDULER_UNIT" /etc/systemd/system/korea365-youtube-scheduler.service
