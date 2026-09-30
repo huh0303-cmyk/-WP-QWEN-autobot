@@ -23,6 +23,11 @@ jobs:
             echo CANONICAL_WORKER=$(systemctl is-active korea365-youtube-worker.service || true)
             echo CANONICAL_SCHEDULER=$(systemctl is-active korea365-youtube-scheduler.timer || true)
             echo LEGACY_WEEKLY=$(systemctl is-active korea365-youtube-private-weekly.timer || true)
+            systemctl show korea365-youtube-worker.service \
+              --property=ActiveState,SubState,Result,ExecMainCode,ExecMainStatus,NRestarts \
+              --no-pager
+            journalctl -u korea365-youtube-worker.service -n 25 --no-pager \
+              | sed -E 's/(token|secret|key|authorization)=[^ ]+/\1=[REDACTED]/Ig' || true
             python3 - <<'PY'
             import json
             from pathlib import Path
