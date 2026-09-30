@@ -6,7 +6,7 @@
     {"role": "korean_topik", "name": "Seoul TOPIK", "handle": "sis_topik1", "identity_status": "confirmed"},
     {"role": "english", "name": "English Survival", "handle": "englishsurvival1", "identity_status": "confirmed"},
     {"role": "japanese", "name": "Japanese Survival", "handle": "japanese_survival1", "identity_status": "account_center_confirmed_2026-10-01_exact_handle_unavailable", "older_display_handle": "sis_language365"},
-    {"role": "shopping", "name": "Seoul Jisoo", "handle": "seoul_jisoo", "identity_status": "account_center_saved_2026-10-01", "older_handle": "seoul_item365", "display_name_status": "password_reauth_pending"}
+    {"role": "shopping", "name": "Seoul Jisoo", "handle": "seoul_jisoo", "identity_status": "account_center_saved_and_public_profile_opened_2026-10-01", "older_handle": "seoul_item365", "display_name_status": "password_reauth_pending", "editorial_role": "multi-category_shopping_and_booking_owner_final_2026-10-01"}
   ],
   "inventory_not_active": ["seoul_trip365", "seoul_health365"],
   "notes": "Personal private huh.chris is excluded. No publishing authority is inferred from a handle."

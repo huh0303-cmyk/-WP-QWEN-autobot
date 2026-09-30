@@ -151,6 +151,23 @@ URL opened a login screen, which does not confirm a Threads handle change.
 Do not delete old videos, infer token ownership or upload to these targets
 from this public-page inspection.
 
+## Owner's final channel-role confirmation, 04:23 KST
+
+The owner reconfirmed the exact UC IDs above for French, Portuguese and
+Vietnamese **language** channels. Existing off-topic videos do not change
+their destination identities. The owner also clarified that the six older
+Korean-language health items on `Seoul_Jisoo1` are legacy *Health Clinic
+Korea* content. Its definitive forward role is **Seoul Jisoo multi-category
+shopping/booking**, paired with the active Seoul Jisoo Instagram brand
+`@seoul_jisoo`. Do not classify this UC ID as an active Health Clinic Korea
+destination. The only active Health Clinic destinations remain Japan and USA.
+The owner intends to remove the old Korean health videos, but no deletion was
+performed or verified in this session. Record removal receipts only after an
+explicit deletion run and public-page check. The Instagram username is live;
+its display name remains `Chris Huh` until Meta reauthentication and save.
+Other Seoul Jisoo platform accounts are a shopping-brand direction, not
+verified account IDs or publish permissions.
+
 ## Owner's final editorial correction, 03:55 KST
 
 The five knowledge destinations are `NASA_XFILES`, `HISTORY_TV_TODAY`,
