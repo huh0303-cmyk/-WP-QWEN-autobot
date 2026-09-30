@@ -339,3 +339,9 @@ possible. Do not create, rename, move, or overwrite a channel based on the
 Google account display name. Next: inspect any old personal video/channel
 URL or a second Google account if the owner can supply one; compare the
 stable UC ID with current channel identities.
+
+Further direct inspection found a **second remembered Google login** in the
+account menu: `seoultopik@gmail.com`, also displaying `CHRIS JUNGYOON HUH`.
+It is signed out. Its Google reauthentication page was opened for the owner;
+its YouTube channel list has not been inspected. This is a concrete next
+account to check before drawing any conclusion about the personal channel.
