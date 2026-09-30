@@ -233,3 +233,7 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## vps-deploy-deferred-20261001
 - 2026-10-01 KST 04:35, Claude. 증거(GitHub Actions 로그, run 0807a93): Deploy to VPS가 05cdb90부터 8회 연속 실패로 표시됐으나 원인은 오류가 아니라 VPS 배포기의 지연 상태 `waiting_for_video`(영상 작업 중 배포 보류). VPS는 36a46cd(오늘 03:44 KST, 무료 Gemini 키 전달 수정까지 포함)에 머무름. 따라서 2-tries/독립엔진/로컬 Qwen/늘려쓰기/플랫폼 길이 정책은 GitHub Actions 경로에는 적용, VPS 경로(blog.korea365.org 즉시발행 등)에는 영상 작업 종료 후 재배포되어야 적용됨. 배포 트리거는 push/workflow_dispatch뿐이라 자동 재시도 없음 → 영상 종료 후 재트리거 필요.
+
+## control-sns-live-20261001
+- 2026-10-01 04:45 KST — GitHub Actions deploy run 36767708437 성공, VPS deployed commit 0a0a9da8, control.korea365.org 및 sns.korea365.org 실화면에 Instagram 4, Threads 4, Facebook 6행 표시를 확인했다. 인스타그램은 TOPIK @sis_topik1, English @englishsurvival1, Japanese @japanese_survival1, Seoul Jisoo 쇼핑 @seoul_jisoo. Threads는 TOPIK @seoultopik, English @english_survival_1, Japanese 실계정/핸들 미확정, Seoul Jisoo는 정책에 옛 @seoul_item365가 남아 새 핸들 확인 필요. Facebook 6행 중 TOPIK·ENGLISH·Language Center 3개는 이름 또는 과거 게시 영수증이 있고 Health365·Travel365·Hot Items365 3개는 계획 슬롯이다. 6행 모두 현재 게시권한 확인을 뜻하지 않는다. TikTok도 6행 슬롯으로 유지한다. YouTube 24행은 UC ID 미확인 Jisoo2 잠정행을 포함하며 확정 활성 채널은 23개다.
+- 앞선 VPS 배포 지연 waiting_for_video는 업로드가 아닌 고아 YouTube 큐 running 마커 vps-1790793906-5185e3f4e0 때문이었다. 작업 로그/잠금/대시보드 부재와 유휴 worker를 확인하고 배타 잠금 아래 failed로 이동, 복구 영수증을 VPS에 보존했다. 실제 영상 발행은 하지 않았다. 다음 배포 성공 및 화면 갱신으로 복구 검증. 남은 일: Meta 표시 이름 재인증, Threads 두 계정 정체성, Facebook 페이지 ID/게시권한, 계획 쇼핑 페이지 실존 여부, Jisoo2 잠정행과 활성 카운트 분리. 상세: docs/CONTROL_SNS_LIVE_RECONCILIATION_2026-10-01.md.
