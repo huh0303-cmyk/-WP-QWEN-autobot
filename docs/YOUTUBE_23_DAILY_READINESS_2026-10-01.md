@@ -365,3 +365,13 @@ environment secret names `YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT` and
 `YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI` were checked. Historical Google
 brand aliases `K-health 365` and `비영리한국유학협회KSA` are navigation hints
 confirmed only by those exact-ID results. No public videos were established.
+
+Spanish Survival was approved next. The tool verified locked ID
+`UC9mvVEdL9Tllkit5v2Qv8UQ`, stored
+`YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES` in the protected VPS and GitHub
+`youtube-channels` environment, and wrote the non-secret VPS receipt. The
+historical Google brand name was `Arabic Survival`. The browser showed
+`ERR_BLOCKED_BY_CLIENT` on the localhost completion page, but the local
+authorization tool exited successfully after the exact-ID and storage checks.
+The blocked display alone did not invalidate the completed OAuth callback.
+No Spanish video publication has been verified.
