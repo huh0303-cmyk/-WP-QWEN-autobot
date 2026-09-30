@@ -69,7 +69,7 @@ def daily_non_youtube_targets() -> list[dict]:
     roles = {row.get("key"): row for row in sns.get("roles", [])}
     for row in sns.get("accounts", []):
         platform = str(row.get("platform", ""))
-        if platform in {"Instagram", "Threads"} and row.get("role") not in {
+        if platform in {"Instagram", "Threads", "Facebook", "TikTok"} and row.get("role") not in {
             "korean_topik", "english", "japanese", "hot_item_shop"
         }:
             continue
