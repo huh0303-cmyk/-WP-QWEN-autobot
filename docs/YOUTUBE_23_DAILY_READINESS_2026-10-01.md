@@ -210,6 +210,14 @@ The successful Google brand ID is recorded in
 `config/youtube_oauth_brand_mapping.json`; selector order is not an identity
 rule. The other Chinese Survival entry has not been mapped.
 
+The owner then approved the `Mozart-Bach-Beethoven` Google brand. Its
+`mine=true` result matched only CAFE_MOZART `UC7jOhyMa-FIrzZuea97z1Pw`.
+The MBB refresh token was stored in the protected VPS runtime and GitHub
+Actions secret store, and a non-secret CONTROL receipt was written. This is
+not an upload or public video receipt. The Google brand ID is now locked in
+`config/youtube_oauth_brand_mapping.json` as a navigation hint; exact UC ID
+remains the authority.
+
 Google's OAuth documentation says external Testing-mode refresh tokens with
 YouTube scope expire after seven days. Production-mode tokens can also stop
 working if access is revoked, unused for six months, or invalidated for other

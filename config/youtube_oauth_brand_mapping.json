@@ -1,6 +1,14 @@
 {
   "version": 1,
   "channels": {
+    "mbb": {
+      "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
+      "display_name": "CAFE_MOZART",
+      "oauth_brand_name": "Mozart-Bach-Beethoven",
+      "google_brand_id": "100198972855437260214",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
     "starbucks": {
       "channel_id": "UC_e-sbLkVgwJNYEeobolNog",
       "display_name": "CAFE_STARBUCKSVIBES",
