@@ -81,6 +81,20 @@ def _store_vps(name: str, token: str) -> None:
     _ssh("python3", "-c", code, name, input_text=token)
 
 
+def _record_verified_channel(channel_id: str, secret_name: str) -> None:
+    """Write only non-secret, exact-ID OAuth evidence for the live CONTROL UI."""
+    code = (
+        "import datetime,json,os,sys;from pathlib import Path;"
+        "p=Path('/opt/korea365/data/youtube_oauth_verified_receipts.json');"
+        "d=json.loads(p.read_text()) if p.exists() else {};"
+        "d[sys.argv[1]]={'channel_id':sys.argv[1],'secret_name':sys.argv[2],"
+        "'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()};"
+        "t=p.with_suffix('.tmp');t.write_text(json.dumps(d,sort_keys=True));"
+        "os.chmod(t,0o644);os.replace(t,p)"
+    )
+    _ssh("python3", "-c", code, channel_id, secret_name)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("channel", choices=sorted(PROFILES))
@@ -113,6 +127,7 @@ def main() -> None:
     _store_vps(secret_name, creds.refresh_token)
     subprocess.run(["gh", "secret", "set", secret_name], input=creds.refresh_token,
                    text=True, capture_output=True, check=True, cwd=ROOT)
+    _record_verified_channel(expected, secret_name)
     print(f"Verified {expected}; stored {secret_name} in approved secret stores", flush=True)
 
 
