@@ -113,13 +113,13 @@
     {
       "platform": "TikTok",
       "role": "hot_item_shop",
-      "display_name": "지수의 하루 · Jisoo Picks",
-      "handle": "sis_languageccenter",
-      "url": "https://www.tiktok.com/@sis_languageccenter",
-      "account_exists": true,
-      "identity_verified": true,
+      "display_name": "Seoul Jisoo shopping",
+      "handle": "",
+      "url": "",
+      "account_exists": false,
+      "identity_verified": false,
       "publish_connected": false,
-      "note": "현재 건강·뷰티·여행 통합 쇼핑 계정으로 기록됨"
+      "note": "2026-10-01 direct TikTok check: legacy @sis_languageccenter exists as SIS-LANGUAGEcenter with language videos, not Jisoo shopping. Shopping account handle/ownership unverified."
     },
     {
       "platform": "Instagram",
@@ -192,7 +192,9 @@
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": true,
-      "note": "2026-09-30 공식 Meta 발행 영수증으로 페이지 쓰기 연결 확인"
+      "note": "2026-10-01 directly opened managed Facebook page; prior official publishing receipt. Current VPS write credentials still missing.",
+      "profile_id": "61588777439380",
+      "page_asset_id": "1128119143729384"
     },
     {
       "platform": "Facebook",
@@ -201,9 +203,11 @@
       "handle": "",
       "url": "",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
-      "note": "일본어 역할 매핑과 페이지 ID 재확인 필요"
+      "note": "2026-10-01 directly opened managed SIS Language Center Facebook page. Japanese editorial role is not independently verified; page includes German and other languages. API write permission unverified.",
+      "profile_id": "61593057083167",
+      "page_asset_id": "1236641259534475"
     },
     {
       "platform": "Facebook",
@@ -212,9 +216,11 @@
       "handle": "",
       "url": "",
       "account_exists": true,
-      "identity_verified": false,
+      "identity_verified": true,
       "publish_connected": false,
-      "note": "브라우저 프로필 목록에서 이름 확인, 페이지 ID 필요"
+      "note": "2026-10-01 directly opened managed Facebook page from Jungyoon Huh profile. API write permission unverified.",
+      "profile_id": "61592457107609",
+      "page_asset_id": "1247951015067104"
     },
     {
       "platform": "Facebook",
@@ -303,8 +309,8 @@
       "display_name": "Seoul Jisoo",
       "handle": "seoul_item365",
       "url": "https://www.threads.com/@seoul_item365",
-      "account_exists": true,
-      "identity_verified": true,
+      "account_exists": false,
+      "identity_verified": false,
       "publish_connected": false
     }
   ],
