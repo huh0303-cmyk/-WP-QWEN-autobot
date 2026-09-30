@@ -36,6 +36,10 @@ upload policy; these are not proof of current exact-channel write credentials.
 The Health Clinic EN/JP refresh-token secret names exist in GitHub. Read-only
 preflight run `36757036544` refreshed both tokens but `mine=true` returned
 HTTP 403 for Japan and USA. Their exact channel identity remains unverified.
+The follow-up preflight run `36757425951` identified Google's error reason as
+`insufficientPermissions` for both, matching the eight core channels. The
+existing refresh tokens are upload-only; reauthorization must add identity
+read access and verify the locked UC ID before any secret is replaced.
 The legacy health pipeline also needs content sourcing,
 medical quality review, and the new public receipt guard before activation.
 Shopping lacks a current executor and verified write token.
@@ -55,3 +59,47 @@ ChatGPT subscription is not a free server-side OpenAI API credential. The VPS
 worker remains the durable uploader; Codex is reserved for code and connector
 repairs. API pricing: https://developers.openai.com/api/docs/pricing. ChatGPT
 scheduled tasks: https://learn.chatgpt.com/docs/automations.
+
+## Interactive authorization repair
+
+`scripts/reauthorize_youtube_channel.py` authorizes one locked core or health
+channel at a time with full YouTube scope. The owner selects the Google/brand
+account and approves in the browser. The script compares `mine=true` with the
+locked UC ID before it stores a refresh token; an account mismatch stores
+nothing. Core tokens go to the protected VPS runtime and GitHub repository
+secret; health tokens go to their existing GitHub repository secrets. It does
+not print token values or publish a video. Authorization is a prerequisite,
+not proof that fresh approved content and a daily executor are ready.
+
+At 03:23 KST the first KPOP authorization window was open at Google's account
+selection screen, waiting for the owner's account choice and consent. No new
+token or video publication has been verified yet.
+
+## Owner inventory correction, 03:27 KST
+
+The owner supplied the full displayed-name/handle list with 23 current channel
+targets and two future shopping slots. The locked master already contains
+exact UC IDs for all 23 current targets, including Japanese Survival
+`@seoul_japanese1`, TOPIK `UCdA24IuR-JE7qButWv5jLqA`, both Health Clinic
+channels, and Seoul_Jisoo1 `UCAizx0tPkRSol8sIhanN_QQ`. The two additional
+shopping slots have neither handle nor UC ID and must not be counted as
+active targets or sent uploads. `SIS-Language Center` appears in the owner's
+supplemental list but is outside this 23-channel daily target.
+
+Use the locked UC IDs over the pasted list's corrupted/missing characters:
+`CAFE_ROMANTIC` starts `UCbJ...`, `CAFE_HEALING` is
+`UC7yEsLM-HoXudngrD-4FIqg`, and `INVENTION_STORY1` includes the final `1`.
+The locked title/handle is authoritative when an older displayed-name row
+differs. No alias shown in Google's brand-account selector establishes a
+channel identity until `mine=true` returns the exact locked UC ID.
+
+The five retired keys (`science`, `classical`, `myth`, `american_archive`,
+`classic_reads`) remain excluded from the executor. A 2026-10-01 GitHub
+repository-secret name listing (98 names) found no matching refresh-token
+secret for those five; this updates the owner's older warning that they were
+still present. No secret was deleted in this session.
+
+The KPOP selector's first `Studio_K3` was chosen according to the locked
+legacy alias. Google then displayed an unverified-app warning for the owner's
+OAuth app. The browser was handed to the owner to decide whether to proceed;
+no warning was bypassed by automation. The exact-ID guard still applies.
