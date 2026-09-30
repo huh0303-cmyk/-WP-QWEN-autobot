@@ -226,3 +226,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## writer-short-body-rescue-20261001
 - 2026-10-01 KST 04:20, Claude. 증상: blog.korea365.org 즉시발행(site naver_n1, RUN lgpt-20260930-191256-ee5b77) 2단계 글쓰기 실패 "writer quality gate failed: score=0 failures=['body length 958 is outside 1560-2700 characters']". 원인: 모델이 본문을 기준(1560자)보다 짧게 생성, 재생성 2회도 미달 → 즉시 실패. 수정: scripts/auto_write_and_draft.py에 _expand_short_article 추가 — 길이만 미달이면 처음부터 다시 쓰지 않고 '늘려 쓰기'(최대 2회, 엔진 체인 재사용)로 구제, provider에 "+expanded" 표기. tests/test_write_article_expand.py 통과. 미검증: VPS 배포 여부(이 파이프라인은 VPS에서 실행), 실제 재실행 결과, 어떤 모델이 958자를 냈는지(로그 미확인).
+
+## platform-length-policy-20261001
+- 2026-10-01 KST 04:30, Claude (Chairman 지적: 네이버/티스토리/워드프레스/블로그스팟 글 길이는 플랫폼별로 달라야 함). 원인: london_site_catalog.manual_profile이 Naver·Tistory 모두 1400/2000/3000 하드코딩, 품질 게이트(original_quality_score)는 전달된 min/max를 무시하고 target×0.78(≥1000)~×1.35만 사용. 수정: config/platform_length_policy.json 신설(naver 1200/1800/2600 [naver_homefeed 기존 기준 1200 근거], tistory 1800/2400/3400, wordpress·blogger는 기존 사이트별 profiles 값 유지), manual_profile이 이를 읽음, original_quality_score에 min_chars/max_chars 추가, _write_article·늘려쓰기가 플랫폼 기준을 게이트에 전달. 테스트: 동일 본문이 네이버 통과/티스토리 실패, 프로필별 값 상이 확인. 미검증: VPS 배포·실제 재실행; naver 1200/1800/2600, tistory 1800/2400/3400은 Claude가 기존 기준을 근거로 정한 기본값이라 Chairman 확인 필요.

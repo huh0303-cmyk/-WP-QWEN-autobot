@@ -173,7 +173,8 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
             candidate = _finish_meta_description(candidate, keyword=keyword)
-            score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language)
+            score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language,
+                                                   min_chars=min_chars, max_chars=max_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
             critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete", "language mismatch"))]
             if score >= 70 and not critical:
@@ -187,30 +188,33 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     # 본문이 짧아서만 막힌 글은 처음부터 다시 쓰지 말고 '늘려 쓰기'로 구제한다(최대 2회).
     if last_candidate is not None:
         expanded = _expand_short_article(last_candidate, keyword=keyword, language=language,
-                                         target_chars=target_chars, provider=last_provider)
+                                         target_chars=target_chars, provider=last_provider,
+                                         min_chars=min_chars, max_chars=max_chars)
         if expanded is not None:
             return expanded
     return None, 0, failures, ""
 
 
 def _expand_short_article(candidate: dict, *, keyword: str, language: str, target_chars: int,
-                          provider: str, tries: int = 2):
+                          provider: str, tries: int = 2, min_chars: int | None = None,
+                          max_chars: int | None = None):
     """body length 미달 글을 같은 제목·구조 위에 섹션을 추가해 늘린다. 통과하면
     (article, score, failures, provider) 반환, 아니면 None."""
     import economy_text
-    _, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language)
+    _, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars,
+                                         language=language, min_chars=min_chars, max_chars=max_chars)
     other = [f for f in failures if f.startswith(("language mismatch", "title "))]
     if other or not any(f.startswith("body length") for f in failures):
         return None
     for n in range(1, tries + 1):
         body_chars = len(re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", str(candidate.get("content_html", "")))))
-        minimum = max(1000, int(target_chars * 0.78))
+        minimum = min_chars or max(1000, int(target_chars * 0.78))
         if body_chars >= minimum:
             break
         need = minimum - body_chars
         prompt = (
             f"The article below is too short: it has {body_chars} visible non-whitespace characters but needs "
-            f"at least {minimum} and at most {int(target_chars * 1.2)}. Add about {int(need * 1.25)} more characters "
+            f"at least {minimum} and at most {max_chars or int(target_chars * 1.2)}. Add about {int(need * 1.25)} more characters "
             f"of genuinely useful content in {language}: add 1-2 new H2 sections or deepen thin sections with concrete, "
             f"practical, verifiable detail. Do not repeat existing sentences, do not invent statistics, sources or links, "
             f"keep the existing title, tone and every existing section. Return JSON only with the same keys "
@@ -224,7 +228,8 @@ def _expand_short_article(candidate: dict, *, keyword: str, language: str, targe
             grown = parse_rewrite_json(raw)
             grown = normalize_rewrite_format(grown, target_chars=target_chars, source_url="", ymyl=False)
             grown = _finish_meta_description(grown, keyword=keyword)
-            score, f2 = original_quality_score(grown, keyword=keyword, target_chars=target_chars, language=language)
+            score, f2 = original_quality_score(grown, keyword=keyword, target_chars=target_chars, language=language,
+                                                min_chars=min_chars, max_chars=max_chars)
             print(json.dumps({"attempt": f"expand-{n}", "provider": economy_text.last_writer_model,
                               "score": score, "failures": f2}, ensure_ascii=False))
             crit = [f for f in f2 if f.startswith(("body length", "meta description must",
