@@ -1,0 +1,63 @@
+name: Resume one stalled YouTube VPS job
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: Exact stalled VPS job ID to resume with the same marker
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Stop, requeue the same receipt, deploy, and resume
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          JOB_ID: ${{ inputs.job_id }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          envs: JOB_ID
+          command_timeout: 8m
+          script: |
+            set -euo pipefail
+            systemctl stop korea365-youtube-worker.service
+            python3 - "$JOB_ID" <<'PY'
+            import os
+            from pathlib import Path
+            import re
+            import sys
+
+            job_id = sys.argv[1]
+            if not re.fullmatch(r"vps-[0-9]+-[0-9a-f]+", job_id):
+                raise SystemExit("invalid job id")
+            root = Path("/opt/korea365/data/youtube_vps_queue").resolve()
+            source = (root / "running" / f"{job_id}.json").resolve()
+            target = (root / "pending" / f"{job_id}.json").resolve()
+            if root not in source.parents or root not in target.parents:
+                raise SystemExit("invalid queue path")
+            if not source.exists():
+                raise SystemExit("exact running receipt not found; refusing a new job")
+            if target.exists():
+                raise SystemExit("pending receipt already exists")
+            os.replace(source, target)
+            print("REQUEUED_SAME_JOB", job_id)
+            PY
+            systemctl start korea365-deploy.service
+            python3 - <<'PY'
+            import json
+            from pathlib import Path
+            state = json.loads(Path('/opt/korea365/data/deploy-status.json').read_text())
+            if state.get('status') not in {'current', 'deployed'}:
+                raise SystemExit('latest YouTube timeout fix was not deployed')
+            print('DEPLOYED', state.get('deployed_commit'))
+            PY
+            systemctl start korea365-youtube-worker.service
+            systemctl is-active korea365-youtube-worker.service

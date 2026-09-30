@@ -7,6 +7,7 @@ or publish it publicly. A human must review and explicitly publish later.
 """
 import json
 import os
+import socket
 import sys
 import time
 from datetime import datetime, timezone
@@ -33,6 +34,7 @@ YOUTUBE_OAUTH_REFRESH_TOKEN = os.environ.get("YOUTUBE_OAUTH_REFRESH_TOKEN", "")
 GMAIL_USER = "huh0303@gmail.com"
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 WORKDIR = "publish_output"
+socket.setdefaulttimeout(180)
 RESULT_PATH = os.environ.get("ROOM_RESULT_SOURCE", "artifacts/youtube_playlist_result.json")
 
 
