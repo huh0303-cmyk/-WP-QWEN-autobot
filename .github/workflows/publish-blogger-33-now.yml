@@ -52,6 +52,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
           LONDON_WRITER_MODEL: "auto_free"
+          # 마지막 수단: 무료 로컬 Qwen 2.5 3B (러너에서 필요할 때만 Ollama 설치·pull)
+          LOCAL_TEXT_FALLBACK_ENABLED: "true"
+          RUNNER_OLLAMA_BOOTSTRAP: "true"
+          LOCAL_TEXT_TIMEOUT: "900"
+          LOCAL_TEXT_MAX_TOKENS: "3500"
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}            # 선택
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}  # 선택
           CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}      # 선택

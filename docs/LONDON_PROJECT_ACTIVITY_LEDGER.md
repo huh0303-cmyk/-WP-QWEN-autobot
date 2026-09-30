@@ -219,3 +219,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## blogger-writer-fallback-20261001
 - 2026-10-01 KST, Claude. blogger_free_text.blogger_generate_with_fallback 추가(서버 무료 Gemini 3모델 → 일시장애 시 2회 → 공용 economy_text 체인[Gemini 무료 5모델→Groq→OpenRouter→Cerebras]). publish_blogger_33_now.py가 사용. publish-blogger-33-now.yml에 선택 시크릿 전달. 테스트 15개 통과. 미검증: 실제 실행; GitHub 러너에는 /etc/korea365/free-writer.json이 없어 1단계는 실패하고 2단계(GEMINI_API_KEY 무료티어 여부 미확인)로 넘어감; VPS 러너는 자체 환경변수에 GEMINI_API_KEY/독립엔진 키가 있어야 2단계 작동.
+
+## writer-local-qwen-last-resort-20261001
+- 2026-10-01 KST, Claude. 컨트롤룸 드롭다운("자동 무료 우선 · Gemini 5종 → 로컬 Qwen")과 일치하도록 GitHub 러너에서도 마지막 수단 무료 로컬 Qwen2.5 3B 활성화: local_text.ensure_runner_ollama(필요 시에만 공식 릴리스 .tar.zst 다운로드·서버 기동·모델 pull), daily-network-publish·publish-blogger-33-now에 LOCAL_TEXT_FALLBACK_ENABLED/RUNNER_OLLAMA_BOOTSTRAP/LOCAL_TEXT_TIMEOUT=900/MAX_TOKENS=3500 전달. 검증: 테스트 18개 통과, 실제 번들 다운로드·압축해제·바이너리 실행(v0.35.0) 확인. 미검증: ollama serve 기동과 qwen2.5:3b pull(2GB) 및 러너 CPU에서의 생성 속도·품질(3B 모델, 품질 게이트 미통과 가능), 실제 Actions 실행.
