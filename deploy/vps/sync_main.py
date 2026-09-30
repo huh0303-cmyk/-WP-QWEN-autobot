@@ -116,7 +116,8 @@ def deploy(root, target, control=service, check=healthy):
             compile(after, name, "exec")
         changes.append((name, current, after, path.stat().st_mode & 0o777 if path.exists() else 0o644))
     if old == target and not changes:
-        state(root, "current", deployed_commit=old)
+        state(root, "current", deployed_commit=old, target_commit=target,
+              failed_commit=None, reason=None, recovery_pending=False)
         return
     backup = root / "data/deployment-backups" / (time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-" + target[:12])
     backup.mkdir(parents=True, exist_ok=False)
@@ -149,7 +150,9 @@ def deploy(root, target, control=service, check=healthy):
         state(root, "rolled_back", deployed_commit=old, failed_commit=target, recovery_pending=False)
         check()
         raise
-    state(root, "deployed", deployed_commit=target, changed_files=[c[0] for c in changes], failed_commit=None, reason=None, recovery_pending=False)
+    state(root, "deployed", deployed_commit=target, target_commit=target,
+          changed_files=[c[0] for c in changes], failed_commit=None,
+          reason=None, recovery_pending=False)
 
 
 def main():
