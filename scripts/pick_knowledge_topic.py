@@ -33,6 +33,8 @@ def history_today(now: dt.datetime) -> str:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     channel = sys.argv[1] if len(sys.argv) > 1 else ""
     now = dt.datetime.now(KST)
     if channel == "history":

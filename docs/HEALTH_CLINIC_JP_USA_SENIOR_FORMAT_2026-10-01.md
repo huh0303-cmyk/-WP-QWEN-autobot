@@ -16,9 +16,14 @@ daily health target. Verify each locked UC ID with its own upload token.
   1.08 million subscribers and 200 million cumulative views in July 2026.
   Reference its accessible illustrated explanations and older-adult walking
   themes: https://www.kadokawa.co.jp/topics/17250/ .
-- These sources verify channel scale, not an individual video's 500,000
-  views. The requested per-video threshold remains unverified until direct
-  public counts are captured; do not claim it has been met.
+- vidIQ's public video lookup at 04:08 KST confirmed individual long-form
+  examples over 500,000 views: Bob & Brad, *Physical Therapist Shows How to
+  Walk Correctly* (`2BfbiyIKnK4`, 3,391,007 views, 12:10), and Japanese
+  予防医学ch, its older-adult leg-strength/sarcopenia episode (`1sHJPctbjTI`,
+  2,493,444 views, 18:30). The counts are a point-in-time observation, not
+  forecasts for our channels. Direct source pages:
+  https://www.youtube.com/watch?v=2BfbiyIKnK4 and
+  https://www.youtube.com/watch?v=1sHJPctbjTI .
 
 ## Format and evidence gate
 
@@ -41,7 +46,7 @@ strong contrast, phone-size legibility, and local-language layout. Do not
 copy another channel's actual thumbnail, photo, lettering, clip, or script.
 
 Before daily publication, renew exact-channel read+upload OAuth, verify each
-UC ID, capture 500,000+ view examples, finish source and medical review,
+UC ID, finish source and medical review,
 produce the video and thumbnail, and integrate one-per-day deduplication and
 public URL receipts. No new Health Clinic video was created or published by
 this research.
