@@ -113,7 +113,7 @@
     {
       "platform": "TikTok",
       "role": "hot_item_shop",
-      "display_name": "Seoul Jisoo shopping",
+      "display_name": "Seoul Jisoo",
       "handle": "",
       "url": "",
       "account_exists": false,
@@ -199,7 +199,7 @@
     {
       "platform": "Facebook",
       "role": "japanese",
-      "display_name": "서울국제대학교 SIS - Language Center",
+      "display_name": "Japanese Survival (기존 Language Center)",
       "handle": "",
       "url": "",
       "account_exists": true,
@@ -207,7 +207,8 @@
       "publish_connected": false,
       "note": "2026-10-01 directly opened managed SIS Language Center Facebook page. Japanese editorial role is not independently verified; page includes German and other languages. API write permission unverified.",
       "profile_id": "61593057083167",
-      "page_asset_id": "1236641259534475"
+      "page_asset_id": "1236641259534475",
+      "current_public_name": "서울국제대학교 SIS - Language Center"
     },
     {
       "platform": "Facebook",
@@ -245,7 +246,7 @@
     {
       "platform": "Facebook",
       "role": "hot_item_shop",
-      "display_name": "Seoul Hot Items365 Shop",
+      "display_name": "Seoul Jisoo",
       "handle": "",
       "url": "",
       "account_exists": false,
@@ -335,5 +336,15 @@
     "threads": "META_INSTAGRAM_SESSION_PRESENT",
     "facebook": "SESSION_PRESENT",
     "note": "Browser session presence is verified without reading cookie values. This does not equal API/write authorization; publish_connected remains false until account-specific write permission and a receipt-backed test succeed."
-  }
+  },
+  "active_roles": [
+    "korean_topik",
+    "english",
+    "japanese",
+    "hot_item_shop"
+  ],
+  "inactive_legacy_roles": [
+    "health_shop",
+    "travel_shop"
+  ]
 }
