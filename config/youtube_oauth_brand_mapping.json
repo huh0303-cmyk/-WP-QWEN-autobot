@@ -1,6 +1,22 @@
 {
   "version": 1,
   "channels": {
+    "history": {
+      "channel_id": "UCVBvZwodUF4s57KeNicxQ3w",
+      "display_name": "HISTORY_TV_TODAY",
+      "oauth_brand_name": "Spanish Survival",
+      "google_brand_id": "106734459301129845742",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
+    "nasa": {
+      "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
+      "display_name": "NASA_XFILES",
+      "oauth_brand_name": "K-RELAX",
+      "google_brand_id": "117587630465805532297",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
     "mbb": {
       "channel_id": "UC7jOhyMa-FIrzZuea97z1Pw",
       "display_name": "CAFE_MOZART",
