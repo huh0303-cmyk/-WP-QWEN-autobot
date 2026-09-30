@@ -19,7 +19,9 @@
     "health_usa": {
       "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ",
       "display_name": "Health Clinic USA",
-      "oauth_brand_name": "K-HEALING",
+      "oauth_brand_name": "Health Clinic USA",
+      "prior_oauth_brand_name": "K-HEALING",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
       "google_brand_id": "100139444347726889788",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
