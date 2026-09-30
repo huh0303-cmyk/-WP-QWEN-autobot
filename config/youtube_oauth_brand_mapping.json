@@ -72,6 +72,30 @@
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
     },
+    "zh": {
+      "channel_id": "UCGTd7RhfaUaGGbVRsNPUN6Q",
+      "display_name": "Chinese Survival",
+      "oauth_brand_name": "Chinese Survival (second same-name brand)",
+      "google_brand_id": "107471814279256124167",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
+    "de": {
+      "channel_id": "UCKF98zgzm7YRWlyMaoJJKIQ",
+      "display_name": "German Survival",
+      "oauth_brand_name": "CLASSIC_READS_TIMES",
+      "google_brand_id": "107899574901731335221",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
+    "fr": {
+      "channel_id": "UCmt8f9yUT6iTxBys8eH4-Cg",
+      "display_name": "French Survival",
+      "oauth_brand_name": "AMERICAN_ARCHIVE_TIMES",
+      "google_brand_id": "105017684393643407967",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
     "retro_reels": {
       "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
       "display_name": "RETRO_USA1",
