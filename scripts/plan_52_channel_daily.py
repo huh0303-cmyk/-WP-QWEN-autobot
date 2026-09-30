@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Build the London Project daily publication plan.
+"""Plan one daily slot for each locked channel and active social role.
 
-Owner cadence: History receives one dated private production every day; the
-other nine locked YouTube channels receive two or three randomly selected
-private-production days per week. Every non-YouTube account receives one slot every day. Planning never bypasses identity or write
-authorization gates and never makes a YouTube video public.
+The schedule is an audit/dispatch manifest. A slot remains blocked until its
+exact-account write permission and production workflow are verified.
 """
 from __future__ import annotations
 
@@ -30,35 +28,25 @@ def read(path: Path, default):
         return default
 
 
-def _weekly_youtube_days(channel_id: str, week_start: date) -> set[int]:
-    salt = os.environ.get("SCHEDULE_RANDOM_SALT", "")
-    seed = f"london-youtube-week|{week_start.isoformat()}|{channel_id}|{salt}"
-    rng = random.Random(int(hashlib.sha256(seed.encode()).hexdigest(), 16))
-    weekly_count = rng.choice((2, 3))
-    return set(rng.sample(range(7), weekly_count))
-
-
 def youtube_targets(day: date) -> list[dict]:
-    lock = read(ROOT / "config/youtube-ten-channel-lock.json", {})
-    rows = lock.get("groups", {}).get("playlist", []) + lock.get("groups", {}).get("knowledge", [])
-    if len(rows) != 10:
-        raise RuntimeError(f"expected 10 locked YouTube channels, found {len(rows)}")
-    week_start = day - timedelta(days=day.weekday())
+    lock = read(ROOT / "config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json", {})
+    groups = lock.get("groups", {})
+    rows = [(group, row) for group in ("playlist", "knowledge", "language", "health", "shopping")
+            for row in groups.get(group, [])]
+    if len(rows) != 23 or len({row.get("channel_id") for _, row in rows}) != 23:
+        raise RuntimeError("expected 23 distinct locked YouTube channel IDs")
     due = []
-    for row in rows:
+    for group, row in rows:
         channel_id = str(row.get("channel_id", ""))
-        is_history = channel_id == HISTORY_CHANNEL_ID
-        if not is_history and day.weekday() not in _weekly_youtube_days(channel_id, week_start):
-            continue
-        group = "playlist" if int(row.get("order", 0)) <= 5 else "knowledge"
         due.append({
             "key": f"youtube:{channel_id}", "platform": "YouTube",
-            "name": row.get("label", channel_id), "identity": channel_id,
-            "publish_connected": True, "release_policy": "private_review_only",
-            "cadence": "1_per_day_private" if is_history else "2_to_3_per_week_random_days",
-            "topic_source": f"youtube_{group}_topic_pipeline",
+            "name": row.get("title", channel_id), "identity": channel_id,
+            "handle": row.get("handle", ""), "group": group,
+            "publish_connected": False, "release_policy": "public_after_exact_channel_auth_and_receipt",
+            "cadence": "1_per_day",
+            "topic_source": f"youtube_{group}_topic_pipeline" if group in {"playlist", "knowledge"} else "channel_specific_editorial_plan",
             "topic_brief": (f"{day.strftime('%B %d').upper()} — select exactly two source-grounded events from this date, newest year first; reject duplicate events."
-                            if is_history else "Select a fresh, non-duplicate topic from the channel-specific topic bank."),
+                            if channel_id == HISTORY_CHANNEL_ID else "Select a fresh, non-duplicate topic for this exact channel."),
         })
     return due
 
@@ -131,8 +119,10 @@ def build(day: date) -> dict:
     span = WINDOW_END_MINUTE - WINDOW_START_MINUTE
     interval = span / max(1, len(rows) - 1)
     slots = []
+    previous_minute = WINDOW_START_MINUTE - 15
     for index, row in enumerate(rows):
-        minute = _safe_minute(round(WINDOW_START_MINUTE + index * interval + rng.randint(-3, 3)))
+        minute = _safe_minute(max(previous_minute + 15, round(WINDOW_START_MINUTE + index * interval + rng.randint(-2, 2))))
+        previous_minute = minute
         at = datetime.combine(day, datetime.min.time(), tzinfo=KST) + timedelta(minutes=minute)
         slots.append({**row, "scheduled_at": at.isoformat(),
                       "status": "ready" if row["publish_connected"] else "blocked_auth",
@@ -144,9 +134,9 @@ def build(day: date) -> dict:
     return {
         "version": 2, "task_id": f"london-{day.isoformat()}-owner-cadence",
         "date": day.isoformat(), "timezone": "Asia/Seoul",
-        "target_count": len(slots), "daily_non_youtube_count": 32,
+        "target_count": len(slots), "daily_non_youtube_count": 24,
         "youtube_due_count": youtube_due,
-        "policy": "non_youtube_one_daily; locked_youtube10_two_or_three_weekly_private_only; dispatch_after_write_auth",
+        "policy": "locked_youtube23_and_active_sns16_one_daily; dispatch_after_exact_account_write_auth",
         "generated_at": datetime.now(KST).isoformat(),
         "minimum_gap_minutes": min(gaps) if gaps else 0,
         "maximum_gap_minutes": max(gaps) if gaps else 0, "slots": slots,

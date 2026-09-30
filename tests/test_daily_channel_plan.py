@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 
 from scripts import plan_52_channel_daily as planner
 
@@ -15,17 +15,13 @@ def test_every_non_youtube_target_is_planned_daily(monkeypatch):
     assert all(row["topic_brief"] for row in payload["slots"])
 
 
-def test_history_is_daily_and_other_locked_channels_are_due_two_or_three_days_per_week(monkeypatch):
+def test_all_locked_youtube_channels_have_one_daily_slot_without_claiming_publish_auth(monkeypatch):
     monkeypatch.setattr(planner, "ROOT", planner.Path(__file__).resolve().parents[1])
-    monday = date(2026, 9, 21)
-    counts = {}
-    for offset in range(7):
-        for row in planner.youtube_targets(monday + timedelta(days=offset)):
-            counts[row["identity"]] = counts.get(row["identity"], 0) + 1
-            assert row["release_policy"] == "private_review_only"
-    assert len(counts) == 10
-    assert counts[planner.HISTORY_CHANNEL_ID] == 7
-    assert set(value for key, value in counts.items() if key != planner.HISTORY_CHANNEL_ID) <= {2, 3}
+    rows = planner.youtube_targets(date(2026, 10, 1))
+    assert len(rows) == len({row["identity"] for row in rows}) == 23
+    assert {row["group"] for row in rows} == {"playlist", "knowledge", "language", "health", "shopping"}
+    assert all(row["cadence"] == "1_per_day" and not row["publish_connected"] for row in rows)
+    assert all(row["release_policy"] == "public_after_exact_channel_auth_and_receipt" for row in rows)
 
 
 def test_daily_slots_use_randomized_non_round_minutes(monkeypatch):
@@ -33,3 +29,6 @@ def test_daily_slots_use_randomized_non_round_minutes(monkeypatch):
     payload = planner.build(date(2026, 9, 25))
     minutes = [int(row["scheduled_at"][14:16]) for row in payload["slots"]]
     assert all(minute % 5 for minute in minutes)
+    assert payload["target_count"] == 47
+    assert payload["daily_non_youtube_count"] == 24
+    assert payload["minimum_gap_minutes"] >= 15

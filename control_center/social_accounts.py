@@ -103,28 +103,14 @@ def _youtube_cards() -> list[dict]:
             "url": f"https://www.youtube.com/channel/{channel_id}", "login_url": "https://studio.youtube.com/",
             "group": group, "group_label": group_label, "inventory_order": inventory_order, "role": operational_role,
             "description": profile.get("tone") or fallback,
-            "state_label": "제작·즉시 공개 가능 · 채널 ID 검증 필수" if core_key else "채널 확인됨 · 업로드 로그인/권한 필요",
-            "connection_level": "publish_connected" if core_key else "identity_verified",
-            "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "YouTube Studio 로그인 후 제작 프로필을 확인합니다.",
+            "state_label": "채널 확인됨 · 비공개 제작 대기열" if core_key else "채널 확인됨 · 제작 경로/업로드 권한 미연결",
+            "connection_level": "identity_verified",
+            "publish_mode": "비공개 영상 제작 대기열에 1건 추가합니다. 자동 공개하지 않습니다." if core_key else "이 채널 전용 제작 흐름과 정확한 UC ID의 업로드 권한을 연결해야 합니다.",
             "can_publish": bool(core_key), "channel_key": core_key or "", "action_kind": "youtube_queue" if core_key else "login",
-            "button_label": "제작·바로 공개" if core_key else "YouTube Studio 로그인",
+            "button_label": "비공개 제작 요청" if core_key else "YouTube Studio 로그인",
         })
-    for row in inventory.get("unconfirmed", []):
-        if row.get("platform") != "youtube":
-            continue
-        name = str(row.get("name") or "미확인 YouTube")
-        language = name.removeprefix("Survival ")
-        group = str(row.get("group") or ("language" if "Survival" in name else "additional"))
-        cards.append({
-            "key": f"youtube:unconfirmed:{name.lower().replace(' ', '-')}", "platform": "YouTube", "name": name,
-            "identity": "정확한 UC ID 확인 필요", "handle": row.get("handle", ""), "url": "", "login_url": "https://studio.youtube.com/",
-            "group": group, "group_label": YOUTUBE_GROUP_LABEL.get(group, group), "inventory_order": 100,
-            "role": "언어별 Survival 콘텐츠 생산" if group == "language" else "다국어 쇼핑·상품소개 영상 생산" if group == "shopping" else "채널 역할 확인 필요",
-            "description": f"{language} 초급 생존 회화와 생활 표현" if group == "language" else row.get("topic") or "UC ID 확인 후 역할과 자동화를 연결합니다.",
-            "state_label": "Jisoo2 운영 매핑 · UC ID 확인 필요" if name == "Jisoo2" else "공개 핸들 확인 실패 · UC ID 필요", "connection_level": "missing",
-            "publish_mode": "YouTube Studio에서 정확한 UC ID와 업로드 권한을 확인합니다.",
-            "can_publish": False, "channel_key": "", "action_kind": "login", "button_label": "YouTube Studio에서 확인",
-        })
+    # Planned shopping slots have no UC ID. Keep them in the master plan, not
+    # in the count of existing YouTube channels shown in CONTROL.
     return sorted(cards, key=lambda c: (
         YOUTUBE_GROUP_ORDER.get(c.get("group"), 99),
         YOUTUBE_LANGUAGE_ORDER.get(c.get("name"), c.get("inventory_order", 999)) if c.get("group") == "language" else c.get("inventory_order", 999),
@@ -153,16 +139,24 @@ def _sns_cards() -> list[dict]:
             state, level = "계정 보임 · ID 확인 필요", "observed"
         else:
             state, level = "계정 미확인 · 로그인 후 확인", "missing"
+        verified_handle = str(row.get("handle") or "") if identity_ok else ""
+        page_id = str(row.get("page_asset_id") or "")
+        profile_id = str(row.get("profile_id") or "")
+        public_name = str(row.get("current_public_name") or "").strip()
+        name = str(row.get("display_name") or role.get("name") or row.get("role"))
+        if public_name and public_name != name:
+            name = f"{name} (현재: {public_name})"
         cards.append({
             "key": f"{platform.lower()}:{row.get('role')}", "platform": platform,
-            "name": row.get("display_name") or role.get("name") or row.get("role"),
-            "identity": f"@{row['handle']}" if row.get("handle") else "로그인 후 계정 ID 확인",
-            "handle": row.get("handle", ""), "url": row.get("url", ""),
+            "name": name,
+            "identity": f"페이지 ID {page_id}" if platform == "Facebook" and page_id else f"@{verified_handle}" if verified_handle else "계정 ID 미확인",
+            "handle": verified_handle,
+            "url": f"https://www.facebook.com/profile.php?id={profile_id}" if platform == "Facebook" and profile_id else row.get("url", "") if identity_ok else "",
             "login_url": LOGIN_URLS.get(platform, ""), "role": role.get("name", row.get("role", "")),
             "group": "sns", "group_label": role.get("name", "SNS"),
             "description": role.get("topic", "플랫폼별 확정 주제 콘텐츠"), "state_label": state,
             "connection_level": level,
-            "publish_mode": "이 계정으로 하루 1건 공개 발행할 수 있습니다." if publish_ok else "로그인 후 정확한 계정과 게시 권한을 확인합니다. 확인 전에는 공개하지 않습니다.",
+            "publish_mode": "CONTROL 공개발행 연결을 확인했습니다." if publish_ok else "계정과 CONTROL 게시 권한은 별도 확인합니다. 확인 전에는 공개하지 않습니다.",
             "can_publish": publish_ok, "channel_key": "", "action_kind": "sns_publish" if publish_ok else "login",
             "button_label": "즉시발행" if publish_ok else "로그인 · 계정 연결", "note": row.get("note", ""),
         })
@@ -249,10 +243,14 @@ def install(app, get_site_data=None):
         cards = _cards(get_site_data)
         media_platforms = {"YouTube", "TikTok", "Instagram", "Facebook", "Threads"}
         media_order = {"YouTube": 0, "Facebook": 1, "Threads": 2, "Instagram": 3, "TikTok": 4}
-        media_cards = sorted(
-            (c for c in cards if c["platform"] in media_platforms),
-            key=lambda c: (media_order.get(c["platform"], 99), str(c.get("name") or "").casefold()),
-        )
+        role_order = {"korean_topik": 0, "english": 1, "japanese": 2, "hot_item_shop": 3}
+        media_cards = [card for _, card in sorted(
+            ((index, card) for index, card in enumerate(cards) if card["platform"] in media_platforms),
+            key=lambda pair: (
+                media_order.get(pair[1]["platform"], 99),
+                pair[0] if pair[1]["platform"] == "YouTube" else role_order.get(str(pair[1].get("key", "")).split(":")[-1], 99),
+            ),
+        )]
         platforms = ["전체", "로그인·권한 필요", "YouTube", "Facebook", "Threads", "Instagram", "TikTok"]
         selected = request.args.get("platform", "전체")
         # Legacy subdomain roots still send SNS/YouTube; both now open the
