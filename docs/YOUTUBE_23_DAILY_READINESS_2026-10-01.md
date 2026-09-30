@@ -18,7 +18,12 @@ contains only playlist 5 and knowledge 5, with a 2–3 day cadence except
 History daily. The latest exact-channel OAuth preflight (run `36689192200`)
 passed only `globalmusic` and `healing`. `starbucks`, `mbb`, `kpop`, `nasa`,
 `history`, `invention`, `silent_era`, and `retro_reels` failed HTTP 403 at
-`channels.list(mine=true)`. Public read access is not upload authorization.
+`channels.list(mine=true)`. A further read-only VPS check found all eight
+refresh tokens valid but limited to `youtube.upload`; Google's response reason
+was `insufficientPermissions`. The upload scope alone cannot prove the exact
+authenticated channel before posting, so each channel requires an OAuth token
+with both upload and read/identity scope. This does not prove the tokens could
+not upload; it proves the safety preflight cannot identify their destination.
 
 `globalmusic` has a failed calendar row for today. Its original worker log
 shows `WAITING_FRESH_COMPOSITIONS` before upload: the owner requires new
@@ -28,9 +33,10 @@ that row would not supply the missing composition. No public URL exists.
 Language 10, Health Clinic 2, and shopping 1 are outside the current canonical
 worker registry. The language series config has old upload flags and a private
 upload policy; these are not proof of current exact-channel write credentials.
-The Health Clinic EN/JP refresh-token secret names exist in GitHub, so a
-read-only exact-UC preflight has been added before deciding whether those
-tokens can be reused. The legacy health pipeline also needs content sourcing,
+The Health Clinic EN/JP refresh-token secret names exist in GitHub. Read-only
+preflight run `36757036544` refreshed both tokens but `mine=true` returned
+HTTP 403 for Japan and USA. Their exact channel identity remains unverified.
+The legacy health pipeline also needs content sourcing,
 medical quality review, and the new public receipt guard before activation.
 Shopping lacks a current executor and verified write token.
 

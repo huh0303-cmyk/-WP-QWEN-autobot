@@ -28,7 +28,9 @@ def main() -> None:
         params={"part": "id", "mine": "true"},
         headers={"Authorization": f"Bearer {data['access_token']}"}, timeout=30)
     if not check.ok:
-        raise RuntimeError(f"{profile}: channel verification HTTP {check.status_code}")
+        reasons = [item.get("reason", "") for item in check.json().get("error", {}).get("errors", [])]
+        reason = ",".join(reasons) or "unknown"
+        raise RuntimeError(f"{profile}: channel verification HTTP {check.status_code} ({reason})")
     found = {item["id"] for item in check.json().get("items", [])}
     if expected not in found:
         raise RuntimeError(f"{profile}: authenticated channel does not match locked UC ID")
