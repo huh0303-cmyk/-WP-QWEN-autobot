@@ -9,6 +9,7 @@ import argparse
 import json
 import shlex
 import subprocess
+import time
 from pathlib import Path
 
 import requests
@@ -81,26 +82,93 @@ def _store_vps(name: str, token: str) -> None:
     _ssh("python3", "-c", code, name, input_text=token)
 
 
-def _record_verified_channel(channel_id: str, secret_name: str) -> None:
+def _record_verified_channel(channel_id: str, secret_name: str,
+                             github_scope: str) -> None:
     """Write only non-secret, exact-ID OAuth evidence for the live CONTROL UI."""
     code = (
         "import datetime,json,os,sys;from pathlib import Path;"
         "p=Path('/opt/korea365/data/youtube_oauth_verified_receipts.json');"
         "d=json.loads(p.read_text()) if p.exists() else {};"
         "d[sys.argv[1]]={'channel_id':sys.argv[1],'secret_name':sys.argv[2],"
+        "'github_scope':sys.argv[3],"
         "'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()};"
         "t=p.with_suffix('.tmp');t.write_text(json.dumps(d,sort_keys=True));"
         "os.chmod(t,0o644);os.replace(t,p)"
     )
-    _ssh("python3", "-c", code, channel_id, secret_name)
+    _ssh("python3", "-c", code, channel_id, secret_name, github_scope)
+
+
+def _read_vps_token(name: str) -> str:
+    """Read a previously verified token into process memory without logging it."""
+    code = (
+        "import json,sys;"
+        "d=json.load(open('/etc/korea365/youtube-runtime.json'));"
+        "print(d[sys.argv[1]],end='')"
+    )
+    token = _ssh("python3", "-c", code, name)
+    if not token:
+        raise RuntimeError(f"No VPS token for {name}; nothing synchronized")
+    return token
+
+
+def _check_access_token(access_token: str, expected: str) -> None:
+    response = requests.get(
+        "https://www.googleapis.com/youtube/v3/channels",
+        params={"part": "id", "mine": "true"},
+        headers={"Authorization": f"Bearer {access_token}"}, timeout=30,
+    )
+    response.raise_for_status()
+    _require_exact_channel(response.json().get("items", []), expected)
+
+
+def _sync_gh_secret(name: str, token: str) -> str:
+    listed = subprocess.run(
+        ["gh", "secret", "list", "--json", "name"],
+        text=True, capture_output=True, check=True, cwd=ROOT,
+    )
+    repository_names = {entry["name"] for entry in json.loads(listed.stdout)}
+    # GitHub permits only 100 repository secrets. Keep existing names in place;
+    # put new channel grants in the existing restricted youtube-channels environment.
+    scope = "repository" if name in repository_names else "environment:youtube-channels"
+    flags = [] if scope == "repository" else ["--env", "youtube-channels"]
+    last_error = "unknown error"
+    for attempt in range(3):
+        result = subprocess.run(
+            ["gh", "secret", "set", *flags, name], input=token,
+            text=True, capture_output=True, cwd=ROOT,
+        )
+        if result.returncode == 0:
+            return scope
+        last_error = (result.stderr or result.stdout or "unknown error").replace(token, "[REDACTED]").strip()
+        if attempt < 2:
+            time.sleep(2 ** attempt)
+    raise RuntimeError(f"GitHub {scope} secret sync failed after 3 tries for {name}: {last_error}; VPS token retained")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("channel", choices=sorted(PROFILES))
+    parser.add_argument("--resume-from-vps", action="store_true",
+                        help="repair GitHub secret/receipt after an interrupted verified run")
     args = parser.parse_args()
     expected, title = _expected(args.channel)
     client = _client()
+    profile = PROFILES[args.channel]
+    secret_name = (profile if profile.startswith("HEALTH_CLINIC_")
+                   else f"YOUTUBE_OAUTH_REFRESH_TOKEN_{profile}")
+    if args.resume_from_vps:
+        token = _read_vps_token(secret_name)
+        response = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={"client_id": client["id"], "client_secret": client["secret"],
+                  "refresh_token": token, "grant_type": "refresh_token"}, timeout=30,
+        )
+        response.raise_for_status()
+        _check_access_token(response.json()["access_token"], expected)
+        github_scope = _sync_gh_secret(secret_name, token)
+        _record_verified_channel(expected, secret_name, github_scope)
+        print(f"Verified {expected}; repaired {secret_name} in VPS and GitHub {github_scope}", flush=True)
+        return
     print(f"OAuth 승인 대상: {args.channel} / {title} / {expected}", flush=True)
     config = {"installed": {
         "client_id": client["id"], "client_secret": client["secret"],
@@ -114,21 +182,11 @@ def main() -> None:
                                   access_type="offline", prompt="consent")
     if not creds.refresh_token:
         raise RuntimeError("Google did not return a refresh token; nothing stored")
-    response = requests.get(
-        "https://www.googleapis.com/youtube/v3/channels",
-        params={"part": "id", "mine": "true"},
-        headers={"Authorization": f"Bearer {creds.token}"}, timeout=30,
-    )
-    response.raise_for_status()
-    _require_exact_channel(response.json().get("items", []), expected)
-    profile = PROFILES[args.channel]
-    secret_name = (profile if profile.startswith("HEALTH_CLINIC_")
-                   else f"YOUTUBE_OAUTH_REFRESH_TOKEN_{profile}")
+    _check_access_token(creds.token, expected)
     _store_vps(secret_name, creds.refresh_token)
-    subprocess.run(["gh", "secret", "set", secret_name], input=creds.refresh_token,
-                   text=True, capture_output=True, check=True, cwd=ROOT)
-    _record_verified_channel(expected, secret_name)
-    print(f"Verified {expected}; stored {secret_name} in approved secret stores", flush=True)
+    github_scope = _sync_gh_secret(secret_name, creds.refresh_token)
+    _record_verified_channel(expected, secret_name, github_scope)
+    print(f"Verified {expected}; stored {secret_name} in VPS and GitHub {github_scope}", flush=True)
 
 
 if __name__ == "__main__":
