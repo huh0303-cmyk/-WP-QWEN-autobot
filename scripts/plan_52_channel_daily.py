@@ -107,8 +107,8 @@ def daily_non_youtube_targets() -> list[dict]:
             "topic_source": "account_specific_keyword_bank",
             "topic_brief": "Select one original account-specific search topic with duplicate protection.",
         })
-    if len(result) != 28:
-        raise RuntimeError(f"expected 28 daily non-YouTube targets, found {len(result)}")
+    if len(result) != 24:
+        raise RuntimeError(f"expected 24 daily non-YouTube targets, found {len(result)}")
     return result
 
 
