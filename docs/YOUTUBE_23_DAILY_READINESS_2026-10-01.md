@@ -375,3 +375,21 @@ historical Google brand name was `Arabic Survival`. The browser showed
 authorization tool exited successfully after the exact-ID and storage checks.
 The blocked display alone did not invalidate the completed OAuth callback.
 No Spanish video publication has been verified.
+
+Chinese Survival and German Survival were approved next. Exact ID checks
+matched `UCGTd7RhfaUaGGbVRsNPUN6Q` and `UCKF98zgzm7YRWlyMaoJJKIQ`,
+respectively; their protected VPS receipts and GitHub environment secret
+names `YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH` and
+`YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE` were independently confirmed.
+Google listed two brands named `Chinese Survival`; the second brand returned
+the locked Chinese UC ID. The historical Google brand name for German was
+`CLASSIC_READS_TIMES`. No retired publishing key or credential was used:
+the new grant was stored under the German language secret name only.
+Neither grant proves a public video.
+
+French Survival was also approved. The new exact-ID grant matched
+`UCmt8f9yUT6iTxBys8eH4-Cg`, with a protected VPS receipt and the GitHub
+environment secret `YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR`. Its old Google
+brand display name was `AMERICAN_ARCHIVE_TIMES`; the retired archive secret
+was not used or reactivated. The French channel remains a language target,
+and its actual daily public video is still unverified.
