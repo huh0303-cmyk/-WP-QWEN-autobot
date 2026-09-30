@@ -88,7 +88,7 @@ Hard rules:
 
 ### YouTube media generation lock (updated 2026-09-07)
 
-- playlist music is generated fresh for every run through Lyria 3.5; existing Drive music is forbidden as input
+- playlist music may use the owner's paid-plan downloads in the desktop `음악원본` library after audio-hash deduplication, channel/genre review and explicit staging; fresh exports from a rights-verified music tool may supplement each mix. The existing Drive bank is not the desktop library and must not be silently substituted
 - every playlist and knowledge-channel thumbnail source is generated fresh through Gemini 3.1 Flash Image
 - Drive thumbnail-bank, free-stock, SDXL, FLUX and OpenAI image fallback are forbidden for these ten channels
 - the result must look like authentic professional photography; obvious AI anatomy, plastic skin,
@@ -106,7 +106,8 @@ Hard rules:
 - K-pop uses high-end realistic Korean pop editorial photography
 - all YouTube generation and FFmpeg rendering runs on the Hostinger VPS single-owner queue; retained GitHub Actions
   video workflows stay hard-disabled, and no second production host is allowed
-- every playlist channel runs once after a random 2-3 day interval, never a fixed two-day cadence
+- the owner's current target is one verified public upload per playlist channel per KST day. Keep the existing 2-3 day runtime cadence until exact-channel OAuth, reviewed audio, thumbnail and public-receipt gates pass; then change the executable schedule with per-day deduplication
+- every music mix must shuffle its reviewed tracks, use each audio hash at most once, vary the total runtime within the approved channel range and retain a track manifest. The thumbnail is reviewed at phone size before publication
 - the next KST execution time uses an irregular random minute inside the allowed window; round
   five-minute marks and the channel's previous HH:MM are excluded so repeated machine-like timestamps
   are forbidden

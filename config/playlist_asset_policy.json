@@ -1,6 +1,16 @@
 {
-  "generation_mode": "approved_bank_and_gemini_app",
+  "generation_mode": "owner_paid_local_library_plus_new_approved_exports",
   "reuse_existing_assets": true,
+  "local_library_status": "pending_genre_catalog_and_vps_staging",
+  "local_library_source": "OneDrive/Desktop/음악원본",
+  "local_library_rights": "owner_confirmed_paid_plan_downloads_2026-10-01",
+  "audio_sha256_deduplication_required": true,
+  "reviewed_genre_match_required": true,
+  "shuffle_track_order_per_run": true,
+  "variable_total_runtime_required": true,
+  "phone_size_thumbnail_review_required": true,
+  "daily_publication_target": true,
+  "daily_publication_runtime_status": "not_activated_pending_channel_and_asset_gates",
   "paid_api_fallback": false,
   "image_source": "gemini_app_export",
   "thumbnail_benchmark": "common_layout_patterns_from_playlist_channels_over_500k_subscribers_only",
@@ -9,23 +19,23 @@
   "thumbnail_typography": "new_font_and_size_with_each_house_layout",
   "music_sources": {
     "healing": [
-      "approved_existing_audio",
+      "owner_paid_local_originals_after_review",
       "gemini_app_lyria_export"
     ],
     "mbb": [
-      "approved_existing_audio",
+      "owner_paid_local_originals_after_review",
       "gemini_app_lyria_export"
     ],
     "starbucks": [
-      "approved_existing_audio",
+      "owner_paid_local_originals_after_review",
       "gemini_app_lyria_export"
     ],
     "globalmusic": [
-      "approved_existing_audio",
+      "owner_paid_local_originals_after_review",
       "gemini_app_lyria_export"
     ],
     "kpop": [
-      "approved_existing_audio",
+      "owner_paid_local_originals_after_review",
       "gemini_app_lyria_export"
     ]
   },
@@ -33,7 +43,8 @@
   "api_key_required": false,
   "interval_days_min": 2,
   "interval_days_max": 3,
-  "publication_status": "private",
+  "desired_interval_days": 1,
+  "publication_status": "public_after_exact_channel_and_receipt_gates",
   "intro_seconds": 6,
   "kpop": {
     "language": "ko",
