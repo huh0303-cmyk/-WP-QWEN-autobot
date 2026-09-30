@@ -137,7 +137,7 @@ def _sns_cards() -> list[dict]:
     cards = []
     for row in policy.get("accounts", []):
         platform = row.get("platform", "")
-        if platform in {"Instagram", "Threads"} and row.get("role") not in {
+        if platform in {"Instagram", "Threads", "Facebook", "TikTok"} and row.get("role") not in {
             "korean_topik", "english", "japanese", "hot_item_shop"
         }:
             continue
