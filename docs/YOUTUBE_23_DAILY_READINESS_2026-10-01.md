@@ -14,6 +14,8 @@ The interactive exact-ID OAuth renewal tool now accepts every key in the locked 
 
 The daily plan timer only writes an audit manifest; the core YouTube scheduler reads a separate Google Sheet. A new YouTube-only calendar roll service and daily timer now fill missing dates for the core ten from tomorrow through day 13. The roll uses the protected VPS Google runtime, a single-process lock, and the existing Sheet header/date guards. It never rewrites an existing date, creates same-day catch-up rows, or invokes the upload worker. Public execution still depends on a verified token, fresh content and the separate 15-minute dispatcher. Its live timer/service result must be recorded after deployment.
 
+Live receipt: PR #176 merged as `2d15e2e9ccb3cb77f744e87dfd48d701cba8ffaf`, Deploy to VPS run `36774910541` succeeded, VPS HEAD matched, and `korea365-youtube-calendar-roll.timer` was enabled/active. An operator-started service run succeeded and logged `Added 128 calendar rows; rolling horizon=2026-10-14`. A second immediate service run succeeded and logged `Calendar already covers 2026-10-01 through 2026-10-14; no rows added`, establishing calendar idempotency. The new rows are future core-channel schedule entries, not video publication receipts. The old 15-minute scheduler remains the upload queue owner. K-POP OAuth remained at the owner-only Google warning at the time of this receipt.
+
 ## Today's evidence
 
 Read-only YouTube Data API checked all 23 exact UC IDs at 03:04 KST. Healing
