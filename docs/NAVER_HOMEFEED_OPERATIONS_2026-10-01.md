@@ -70,3 +70,4 @@ Canonical machine-readable policy: `config/naver_homefeed_automation.json`.
 - Naver redirected it to the sign-in screen, proving that no usable `naver_n1` authenticated session was available in that browser.
 - No credentials were stored in files, logs, commits, or automation prompts.
 - Exact next action: the owner completes the visible Naver sign-in; the operator then rechecks the destination blog ID before preparing or publishing the first N1 post. N2 follows in its own verified session.
+- Latest verification at approximately 01:45 KST: Naver advanced the N1 account to `아이디 보호조치 해제하기` and requires the owner to set and confirm a new password. This is a mandatory security handoff; the operator did not type, read, store, or submit a password. No N1 public post is claimed until the owner completes the visible form and the exact `k-insight-vietnam` editor is rechecked.
