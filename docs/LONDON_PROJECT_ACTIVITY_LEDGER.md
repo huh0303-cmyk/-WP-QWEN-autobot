@@ -292,5 +292,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## google-brand-names-20261001
 
+- 2026-10-01 KST 후속 — 변경 후 Google 브랜드 계정 목록을 다시 열어 누적 9개 모두에서 정확히 같은 Google 브랜드 ID 행에 새 표시 이름이 나타남을 확인했다. 다른 10개는 여전히 옛 이름이고, 중국어·영어·이탈리아어 3개는 이미 맞는다. 일본 건강 브랜드 `K-KIDS`는 Google OTP 코드를 사용자 본인이 열린 Chrome에 직접 입력해야 계속할 수 있다.
 - 2026-10-01 KST 후속 — `K-HEALING` 브랜드 ID `100139444347726889788`의 Google 프로필 이름을 실제 Health Clinic USA 채널과 같은 `Health Clinic USA`로 저장 확인했다. 누적 변경 9개. 다음 `K-KIDS`/Health_Clinic_Japan 편집에서는 Google이 전화 알림에서 Google OTP 입력으로 인증 방식을 바꿔, 사용자가 열린 화면에 코드를 직접 넣도록 넘겼다. 코드는 읽거나 기록하지 않는다.
 - 2026-10-01 KST — 회장님이 Google 브랜드 계정 목록의 과거 표시 이름을 현재 YouTube 채널명과 같게 고치도록 지시했다. `huh0303@gmail.com`의 내 브랜드 계정 22개를 실제 브랜드 ID와 잠금 UC ID 매핑에 대조했다. 공식 Google 설명상 브랜드 Google 프로필 이름은 YouTube 공개 채널명과 별개다. 사용자가 Galaxy A36 5G에서 브랜드별 본인 확인을 직접 승인했고 Google 프로필 저장 결과 French Survival(기존 AMERICAN_ARCHIVE_TIMES), Spanish Survival(Arabic Survival), German Survival(CLASSIC_READS_TIMES), Seoul_Jisoo1(K-ENTER), CAFE_STARBUCKSVIBES(첫 번째 Chinese Survival), HISTORY_TV_TODAY(옛 Spanish Survival), CAFE_KPOP(첫 번째 Studio_K3), CAFE_ROMANTIC(두 번째 Studio_K3) 8개를 각 고정 브랜드 ID에서 확인했다. 프랑스어는 브랜드 목록 새 이름 반영까지 확인했다. 다른 Google 브랜드 11개의 이름 변경은 추가 사용자별 본인 확인 대기다. 실중국어·영어·이탈리아어 3개는 이미 일치. YouTube UC ID·핸들·OAuth 시크릿은 변경하지 않았다. 상세표: `docs/YOUTUBE_GOOGLE_BRAND_NAME_ALIGNMENT_2026-10-01.md`.
