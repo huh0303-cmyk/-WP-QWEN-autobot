@@ -13,6 +13,7 @@ def test_every_non_youtube_target_is_planned_daily(monkeypatch):
     assert {row["cadence"] for row in non_youtube} == {"1_per_day"}
     assert len({row["duplicate_key"] for row in payload["slots"]}) == len(payload["slots"])
     assert all(row["topic_brief"] for row in payload["slots"])
+    assert all(row["status"] == "blocked_auth" for row in non_youtube if row["platform"] == "Naver")
 
 
 def test_all_locked_youtube_channels_have_one_daily_slot_without_claiming_publish_auth(monkeypatch):
