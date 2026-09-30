@@ -5,6 +5,9 @@ name: "사이트 건강도 자동 점검·복구 (2일마다)"
 on:
   schedule:
     - cron: "17 21 */2 * *"   # 매 2일, 06:17 KST (정각 회피)
+  push:
+    paths:
+      - ".github/triggers/site-health-guardian.txt"   # 이 파일을 커밋하면 점검만(수정 없이) 1회 실행
   workflow_dispatch:
     inputs:
       fix:
@@ -30,7 +33,7 @@ jobs:
       - run: pip install requests pyjwt cryptography -q
       - name: Run site health guardian
         env:
-          GUARDIAN_FIX: ${{ github.event.inputs.fix || '1' }}
+          GUARDIAN_FIX: ${{ github.event_name == 'push' && '0' || github.event.inputs.fix || '1' }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
