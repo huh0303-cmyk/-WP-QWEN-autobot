@@ -19,11 +19,21 @@
 ## Monthly search-demand operation
 
 - Canonical calendar: `config/naver_monthly_keyword_calendar.json`; it covers January through December.
+- Prepared catalog: `config/naver_monthly_keyword_100.json`; it contains exactly 100 research-gated candidate queries for every month. These are candidates, not claims of measured volume.
+- The catalog is reproducible with `scripts/build_naver_monthly_keyword_catalog.py`; every selected candidate is rechecked on the day it is used.
 - Daily planner: `scripts/naver_monthly_keyword_planner.py`; it persists a daily plan before the first post and keeps every same-account base query distinct that day.
 - Research order: Naver DataLab relative trend, Naver News freshness, existing search-entry queries, primary official source, recent-title/body duplicate check.
 - Naver DataLab is a relative trend signal. The operation never fabricates absolute volume, visitor counts, or rank probability.
 - October priorities include government/local support deadlines, heating and energy support, influenza and year-end health checks, station-specific KTX queries, and area-specific airport-bus queries.
 - Article links point first to the current government, public-agency, railway, bus, or airport source. A general search-result link never replaces the primary source.
+
+## Morning trend brief and wake behavior
+
+- A Windows wake-only task named `Korea365_오전운영_깨우기` is scheduled for 06:55 KST with `WakeToRun=true` and `StartWhenAvailable=true`.
+- This wakes a sleeping PC; it cannot power on a fully shut-down PC unless the machine firmware separately supports and enables scheduled RTC power-on.
+- Codex automation `5-2` starts at 07:07 KST and must finish the daily 30-candidate evidence brief by 07:50. Publishing slots start at 08:17.
+- Daily candidates may include current sports, politics/policy, film/culture, military/public-safety, support-program changes, and transport topics when same-day evidence and a primary source exist.
+- Political posts stay factual and source-led; film posts use KOBIS/distributor sources without copying; military and mine-safety posts use only public safety information and never operational or location-sensitive information.
 
 ## Search registration boundary
 
@@ -61,7 +71,7 @@ Canonical machine-readable policy: `config/naver_homefeed_automation.json`.
 - Codex heartbeat automation ID: `5-2`
 - Name: `네이버 3개 월별 키워드 운영`
 - Status: active
-- Planned checks: hourly at minute 37 from 07:37 through 23:37 KST; daily persisted plan and per-site gaps remain authoritative.
+- Planned checks: hourly at minute 07 from 07:07 through 23:07 KST; the 07:07 run prepares the morning trend brief and later runs process due work. Daily persisted plan and per-site gaps remain authoritative.
 - Each run must stop at an honest failure or required confirmation instead of inventing a public result.
 
 ## 2026-10-01 account handoff state
@@ -71,3 +81,9 @@ Canonical machine-readable policy: `config/naver_homefeed_automation.json`.
 - No credentials were stored in files, logs, commits, or automation prompts.
 - Exact next action: the owner completes the visible Naver sign-in; the operator then rechecks the destination blog ID before preparing or publishing the first N1 post. N2 follows in its own verified session.
 - Latest verification at approximately 01:45 KST: Naver advanced the N1 account to `아이디 보호조치 해제하기` and requires the owner to set and confirm a new password. This is a mandatory security handoff; the operator did not type, read, store, or submit a password. No N1 public post is claimed until the owner completes the visible form and the exact `k-insight-vietnam` editor is rechecked.
+
+## 2026-10-02 prepared plan
+
+- The next-day plan is persisted at `data/naver-daily-plans/2026-10-02.json` with 17 research-required jobs.
+- All slots are between 08:17 and 23:17 and retain the N1/N2 180-minute and N3 75-minute same-account minimum gaps.
+- The 07:07 run may replace a planned topic only when the same-day trend brief records stronger evidence; a replaced topic still needs the same source, originality, login, and public-URL gates.

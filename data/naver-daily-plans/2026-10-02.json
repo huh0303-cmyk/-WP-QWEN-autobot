@@ -1,0 +1,570 @@
+{
+  "generated_at": "2026-10-02T00:00:00+09:00",
+  "date": "2026-10-02",
+  "timezone": "Asia/Seoul",
+  "month": 10,
+  "morning_research_deadline_kst": "07:50",
+  "monthly_keyword_catalog": "config/naver_monthly_keyword_100.json",
+  "network_daily_min": 14,
+  "network_daily_max": 18,
+  "selected_job_count": 17,
+  "search_volume_numbers_invented": false,
+  "google_indexing_api_for_general_posts": false,
+  "jobs": [
+    {
+      "job_id": "naver_n3:2026-10-02:1",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "08:28",
+      "cluster": "지원·금융",
+      "title_seed": "2026년 10월 자녀장려금 최신 정보와 확인 방법",
+      "base_query": "10월 자녀장려금",
+      "catalog_keyword_id": "2026-10-012",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EC%9E%90%EB%85%80%EC%9E%A5%EB%A0%A4%EA%B8%88",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EC%9E%90%EB%85%80%EC%9E%A5%EB%A0%A4%EA%B8%88",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n2:2026-10-02:1",
+      "site_id": "naver_n2",
+      "display_name": "헬스의정석",
+      "blog_id": "health-standard",
+      "scheduled_local_time": "09:03",
+      "cluster": "건강·검진",
+      "title_seed": "2026년 10월 예방접종 일정 최신 정보와 확인 방법",
+      "base_query": "10월 예방접종 일정",
+      "catalog_keyword_id": "2026-10-035",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EC%98%88%EB%B0%A9%EC%A0%91%EC%A2%85+%EC%9D%BC%EC%A0%95",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EC%98%88%EB%B0%A9%EC%A0%91%EC%A2%85+%EC%9D%BC%EC%A0%95",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.kdca.go.kr",
+          "https://www.nhis.or.kr",
+          "https://health.kdca.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:2",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "09:44",
+      "cluster": "철도·예매",
+      "title_seed": "2026년 대전역 기차표 예매 최신 정보와 확인 방법",
+      "base_query": "대전역 기차표 예매",
+      "catalog_keyword_id": "2026-10-055",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=%EB%8C%80%EC%A0%84%EC%97%AD+%EA%B8%B0%EC%B0%A8%ED%91%9C+%EC%98%88%EB%A7%A4",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=%EB%8C%80%EC%A0%84%EC%97%AD+%EA%B8%B0%EC%B0%A8%ED%91%9C+%EC%98%88%EB%A7%A4",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.letskorail.com"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n1:2026-10-02:1",
+      "site_id": "naver_n1",
+      "display_name": "부의정석",
+      "blog_id": "k-insight-vietnam",
+      "scheduled_local_time": "09:53",
+      "cluster": "난방비·에너지바우처",
+      "title_seed": "난방비 지원 대상 신청방법과 확인할 것",
+      "base_query": "난방비 지원 대상",
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=%EB%82%9C%EB%B0%A9%EB%B9%84+%EC%A7%80%EC%9B%90+%EB%8C%80%EC%83%81",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=%EB%82%9C%EB%B0%A9%EB%B9%84+%EC%A7%80%EC%9B%90+%EB%8C%80%EC%83%81",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:3",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "11:06",
+      "cluster": "철도·예매",
+      "title_seed": "2026년 광명역 기차표 예매 최신 정보와 확인 방법",
+      "base_query": "광명역 기차표 예매",
+      "catalog_keyword_id": "2026-10-051",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=%EA%B4%91%EB%AA%85%EC%97%AD+%EA%B8%B0%EC%B0%A8%ED%91%9C+%EC%98%88%EB%A7%A4",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=%EA%B4%91%EB%AA%85%EC%97%AD+%EA%B8%B0%EC%B0%A8%ED%91%9C+%EC%98%88%EB%A7%A4",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.letskorail.com"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:4",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "13:09",
+      "cluster": "국가지원금 마감·지역 보조금",
+      "title_seed": "2026년 2026년 10월 정부지원금 대상 최신 정보와 확인 방법",
+      "base_query": "2026년 10월 정부지원금 대상",
+      "catalog_keyword_id": "2026-10-091",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=2026%EB%85%84+10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EB%8C%80%EC%83%81",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=2026%EB%85%84+10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EB%8C%80%EC%83%81",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n1:2026-10-02:2",
+      "site_id": "naver_n1",
+      "display_name": "부의정석",
+      "blog_id": "k-insight-vietnam",
+      "scheduled_local_time": "13:46",
+      "cluster": "난방비·에너지바우처",
+      "title_seed": "2026년 10월 에너지바우처 사용기간",
+      "base_query": "에너지바우처 사용기간",
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=%EC%97%90%EB%84%88%EC%A7%80%EB%B0%94%EC%9A%B0%EC%B2%98+%EC%82%AC%EC%9A%A9%EA%B8%B0%EA%B0%84",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=%EC%97%90%EB%84%88%EC%A7%80%EB%B0%94%EC%9A%B0%EC%B2%98+%EC%82%AC%EC%9A%A9%EA%B8%B0%EA%B0%84",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n2:2026-10-02:2",
+      "site_id": "naver_n2",
+      "display_name": "헬스의정석",
+      "blog_id": "health-standard",
+      "scheduled_local_time": "14:23",
+      "cluster": "건강·검진",
+      "title_seed": "2026년 10월 감염병 예방수칙 최신 정보와 확인 방법",
+      "base_query": "10월 감염병 예방수칙",
+      "catalog_keyword_id": "2026-10-042",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EA%B0%90%EC%97%BC%EB%B3%91+%EC%98%88%EB%B0%A9%EC%88%98%EC%B9%99",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EA%B0%90%EC%97%BC%EB%B3%91+%EC%98%88%EB%B0%A9%EC%88%98%EC%B9%99",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.kdca.go.kr",
+          "https://www.nhis.or.kr",
+          "https://health.kdca.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:5",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "14:39",
+      "cluster": "지원·금융",
+      "title_seed": "2026년 10월 문화누리카드 사용처 최신 정보와 확인 방법",
+      "base_query": "10월 문화누리카드 사용처",
+      "catalog_keyword_id": "2026-10-030",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EB%AC%B8%ED%99%94%EB%88%84%EB%A6%AC%EC%B9%B4%EB%93%9C+%EC%82%AC%EC%9A%A9%EC%B2%98",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EB%AC%B8%ED%99%94%EB%88%84%EB%A6%AC%EC%B9%B4%EB%93%9C+%EC%82%AC%EC%9A%A9%EC%B2%98",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:6",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "17:08",
+      "cluster": "국가지원금 마감·지역 보조금",
+      "title_seed": "2026년 2026년 10월 정부지원금 일정 최신 정보와 확인 방법",
+      "base_query": "2026년 10월 정부지원금 일정",
+      "catalog_keyword_id": "2026-10-094",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=2026%EB%85%84+10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EC%9D%BC%EC%A0%95",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=2026%EB%85%84+10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EC%9D%BC%EC%A0%95",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:7",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "18:29",
+      "cluster": "난방비·에너지바우처",
+      "title_seed": "난방비 지원 대상 신청방법과 확인할 것",
+      "base_query": "난방비 지원 대상",
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=%EB%82%9C%EB%B0%A9%EB%B9%84+%EC%A7%80%EC%9B%90+%EB%8C%80%EC%83%81",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=%EB%82%9C%EB%B0%A9%EB%B9%84+%EC%A7%80%EC%9B%90+%EB%8C%80%EC%83%81",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n1:2026-10-02:3",
+      "site_id": "naver_n1",
+      "display_name": "부의정석",
+      "blog_id": "k-insight-vietnam",
+      "scheduled_local_time": "18:42",
+      "cluster": "국가지원금 마감·지역 보조금",
+      "title_seed": "2026년 10월 10월 정부지원금",
+      "base_query": "10월 정부지원금",
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n2:2026-10-02:3",
+      "site_id": "naver_n2",
+      "display_name": "헬스의정석",
+      "blog_id": "health-standard",
+      "scheduled_local_time": "19:18",
+      "cluster": "건강·검진",
+      "title_seed": "2026년 10월 독감 무료접종 대상 최신 정보와 확인 방법",
+      "base_query": "10월 독감 무료접종 대상",
+      "catalog_keyword_id": "2026-10-034",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EB%8F%85%EA%B0%90+%EB%AC%B4%EB%A3%8C%EC%A0%91%EC%A2%85+%EB%8C%80%EC%83%81",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EB%8F%85%EA%B0%90+%EB%AC%B4%EB%A3%8C%EC%A0%91%EC%A2%85+%EB%8C%80%EC%83%81",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.kdca.go.kr",
+          "https://www.nhis.or.kr",
+          "https://health.kdca.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:8",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "20:21",
+      "cluster": "단풍·기차·공항버스",
+      "title_seed": "2026년 10월 10월 KTX 여행",
+      "base_query": "10월 KTX 여행",
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+KTX+%EC%97%AC%ED%96%89",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+KTX+%EC%97%AC%ED%96%89",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.letskorail.com",
+          "https://www.airport.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n1:2026-10-02:4",
+      "site_id": "naver_n1",
+      "display_name": "부의정석",
+      "blog_id": "k-insight-vietnam",
+      "scheduled_local_time": "22:22",
+      "cluster": "국가지원금 마감·지역 보조금",
+      "title_seed": "2026년 2026년 10월 정부지원금 일정 최신 정보와 확인 방법",
+      "base_query": "2026년 10월 정부지원금 일정",
+      "catalog_keyword_id": "2026-10-094",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=2026%EB%85%84+10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EC%9D%BC%EC%A0%95",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=2026%EB%85%84+10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EC%9D%BC%EC%A0%95",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr",
+          "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n2:2026-10-02:4",
+      "site_id": "naver_n2",
+      "display_name": "헬스의정석",
+      "blog_id": "health-standard",
+      "scheduled_local_time": "22:43",
+      "cluster": "독감·건강검진",
+      "title_seed": "폐렴구균 무료접종 대상 대상·기간·공식 링크",
+      "base_query": "폐렴구균 무료접종 대상",
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=%ED%8F%90%EB%A0%B4%EA%B5%AC%EA%B7%A0+%EB%AC%B4%EB%A3%8C%EC%A0%91%EC%A2%85+%EB%8C%80%EC%83%81",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=%ED%8F%90%EB%A0%B4%EA%B5%AC%EA%B7%A0+%EB%AC%B4%EB%A3%8C%EC%A0%91%EC%A2%85+%EB%8C%80%EC%83%81",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.kdca.go.kr",
+          "https://www.nhis.or.kr",
+          "https://health.kdca.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    },
+    {
+      "job_id": "naver_n3:2026-10-02:9",
+      "site_id": "naver_n3",
+      "display_name": "생활의정석",
+      "blog_id": "sky-only",
+      "scheduled_local_time": "23:03",
+      "cluster": "지원·금융",
+      "title_seed": "2026년 10월 정부지원금 신청 최신 정보와 확인 방법",
+      "base_query": "10월 정부지원금 신청",
+      "catalog_keyword_id": "2026-10-001",
+      "requires_same_day_validation": true,
+      "research": {
+        "naver_search": "https://search.naver.com/search.naver?query=10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EC%8B%A0%EC%B2%AD",
+        "naver_news": "https://search.naver.com/search.naver?where=news&query=10%EC%9B%94+%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90%EA%B8%88+%EC%8B%A0%EC%B2%AD",
+        "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+        "official_sources": [
+          "https://www.gov.kr",
+          "https://www.bokjiro.go.kr"
+        ]
+      },
+      "status": "RESEARCH_REQUIRED",
+      "measured_search_volume": null,
+      "gates": [
+        "compare_relative_interest_in_naver_datalab",
+        "rank_against_same_day_trend_brief_before_0750_kst",
+        "confirm_current_news_or_evergreen_intent",
+        "open_primary_official_source",
+        "check_recent_titles_and_body_similarity",
+        "write_original_answer_first_article",
+        "verify_exact_destination_blog_id",
+        "verify_public_url_after_publish"
+      ]
+    }
+  ]
+}

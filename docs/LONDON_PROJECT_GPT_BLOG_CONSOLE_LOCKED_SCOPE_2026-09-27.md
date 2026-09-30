@@ -130,3 +130,10 @@
 - Daily times are randomized and persisted before the first post. Minimum same-account gaps are 180 minutes for N1/N2 and 75 minutes for N3. A missed slot is not recovered by bulk posting.
 - A January–December candidate calendar feeds current Naver DataLab relative trends, Naver News freshness, existing entry queries, and official sources. Absolute volume, rank, visits, and revenue are never invented or guaranteed.
 - General Naver blog articles do not use Google Indexing API. Search Console actions require verified property ownership; publication is followed by exact public-URL and Naver visibility checks.
+
+## 13. 2026-10-01 Naver morning trend and wake override
+
+- The three-account Naver operation prepares a same-day evidence brief from 07:07 to 07:50 KST; public publishing slots begin at 08:17.
+- Every month has exactly 100 prepared candidate queries in `config/naver_monthly_keyword_100.json`. The catalog is a research queue, not verified absolute search volume or a ranking guarantee.
+- Same-day evidence may promote current sports, politics/policy, film/culture, military/public-safety, support-program changes, and regional transport topics. Primary-source, non-duplication, brand-fit, and public-URL gates still apply.
+- The local Windows host may wake from sleep at 06:55 through `Korea365_오전운영_깨우기`; a fully powered-off machine is outside this guarantee. The desktop app and authenticated browser sessions must remain available.

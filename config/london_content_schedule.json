@@ -158,6 +158,11 @@
       "official_source_required_for_policy_posts": true,
       "copyright_safe_original_image_required": true,
       "monthly_keyword_calendar": "config/naver_monthly_keyword_calendar.json",
+      "monthly_keyword_catalog": "config/naver_monthly_keyword_100.json",
+      "monthly_keyword_candidates": 100,
+      "morning_trend_research_start_kst": "07:07",
+      "morning_trend_research_deadline_kst": "07:50",
+      "publishing_window_kst": ["08:17", "23:17"],
       "google_indexing_api_for_general_posts": false,
       "never_bulk_publish": true
     },

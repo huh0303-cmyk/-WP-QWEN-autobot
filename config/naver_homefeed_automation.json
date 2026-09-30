@@ -11,11 +11,40 @@
   "cadence": {
     "network_daily_min": 14,
     "network_daily_max": 18,
-    "operating_window_kst": ["06:37", "23:17"],
+    "operating_window_kst": ["08:17", "23:17"],
     "random_non_round_minutes": true,
     "persist_daily_schedule_before_first_post": true,
     "never_bulk_publish": true,
     "skip_instead_of_lowering_quality": true
+  },
+  "morning_research": {
+    "start_kst": "07:07",
+    "deadline_kst": "07:50",
+    "daily_brief_path": "data/naver-trend-brief/YYYY-MM-DD.json",
+    "candidate_count": 30,
+    "sources": [
+      "Naver DataLab relative trend comparison",
+      "Naver News freshness and repetition",
+      "Naver search result intent",
+      "Google Trends Korea directional signal",
+      "primary official source"
+    ],
+    "dynamic_topic_families": [
+      "스포츠·국제대회",
+      "정치·정책",
+      "영화·문화",
+      "군사·안전",
+      "국가지원금·지역보조금 변경",
+      "지역별 열차·고속버스·공항버스"
+    ],
+    "replace_daily_plan_only_with_stronger_current_evidence": true,
+    "never_claim_absolute_search_volume_without_measured_data": true
+  },
+  "monthly_keyword_catalog": {
+    "path": "config/naver_monthly_keyword_100.json",
+    "required_candidates_per_month": 100,
+    "refresh_before_new_month_kst_day": 25,
+    "all_candidates_require_same_day_validation": true
   },
   "per_site_cadence": {
     "naver_n1": {"display_name": "부의정석", "blog_id": "k-insight-vietnam", "daily_min": 3, "daily_max": 4, "minimum_interval_minutes": 180},
@@ -49,6 +78,11 @@
   },
   "topics": {
     "priority": [
+      "당일 검증된 네이버 인기 검색 의도",
+      "스포츠·국제대회 일정과 결과",
+      "정치·정부정책의 확인 가능한 변경",
+      "영화·문화의 공식 일정과 흥행 정보",
+      "군사·재난·지뢰 등 공공 안전 정보",
       "정책지원·생활혜택",
       "검색 수요가 있는 생활제도",
       "지역 맛집과 실제 방문 정보",
@@ -57,6 +91,9 @@
     ],
     "blocked": [
       "확인되지 않은 연예 가십",
+      "출처 없는 정치 주장·선거 예측·인물 비방",
+      "확인되지 않은 군사정보·작전정보·위치정보",
+      "영화 줄거리·기사·리뷰의 무단 복제",
       "허위 또는 종료된 지원금",
       "의학적 진단이나 치료 지시",
       "투자 수익 보장",
@@ -75,6 +112,8 @@
     "affiliate_disclosure_required": true,
     "maximum_exact_keyword_repetitions": 6,
     "official_deep_link_required_for_application_or_timetable_posts": true,
+    "same_day_primary_source_required_for_politics_military_and_live_events": true,
+    "movie_box_office_requires_kobis_or_distributor_source": true,
     "internal_related_link_max": 3,
     "search_result_link_must_not_replace_primary_source": true,
     "stale_timetable_numbers_forbidden": true,

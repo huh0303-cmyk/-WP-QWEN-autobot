@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "naver_homefeed_automation.json"
 CALENDAR_PATH = ROOT / "config" / "naver_monthly_keyword_calendar.json"
+CATALOG_PATH = ROOT / "config" / "naver_monthly_keyword_100.json"
 KST = ZoneInfo("Asia/Seoul")
 
 
@@ -20,8 +21,19 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _spaced_minutes(count: int, minimum_gap: int, rng: random.Random) -> list[int]:
-    start, end = 6 * 60 + 37, 23 * 60 + 18
+def _clock_minutes(value: str) -> int:
+    hour, minute = (int(part) for part in value.split(":"))
+    return hour * 60 + minute
+
+
+def _spaced_minutes(
+    count: int,
+    minimum_gap: int,
+    rng: random.Random,
+    operating_window: list[str],
+) -> list[int]:
+    start = _clock_minutes(operating_window[0])
+    end = _clock_minutes(operating_window[1]) + 1
     slack = (end - 1 - start) - minimum_gap * (count - 1)
     if slack < count - 1:
         raise RuntimeError(f"cannot fit {count} slots with {minimum_gap}-minute gaps")
@@ -33,10 +45,34 @@ def _spaced_minutes(count: int, minimum_gap: int, rng: random.Random) -> list[in
     raise RuntimeError(f"cannot create {count} slots with {minimum_gap}-minute gaps")
 
 
-def _topic_pool(calendar: dict, month: int, site_id: str, year: int) -> list[dict]:
+def _topic_pool(calendar: dict, catalog: dict, month: int, site_id: str, year: int) -> list[dict]:
     links = calendar["research_links"]
     candidates = []
     seen = set()
+    for keyword in catalog["months"][str(month)]:
+        if site_id not in keyword["site_ids"]:
+            continue
+        query = keyword["query"]
+        encoded = quote_plus(query)
+        normalized = "".join(query.split()).lower()
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        candidates.append({
+            "cluster": keyword["cluster"],
+            "title_seed": keyword.get("title_seed", f"{year}년 {query} 최신 정보와 확인 방법"),
+            "base_query": query,
+            "catalog_keyword_id": keyword["keyword_id"],
+            "requires_same_day_validation": True,
+            "research": {
+                "naver_search": links["naver_web_search_template"].format(query=encoded),
+                "naver_news": links["naver_news_search_template"].format(query=encoded),
+                "naver_datalab": links["naver_datalab"],
+                "official_sources": keyword["official_sources"],
+            },
+            "status": "RESEARCH_REQUIRED",
+            "measured_search_volume": None,
+        })
     for cluster in calendar["months"][str(month)]:
         if site_id not in cluster["site_ids"]:
             continue
@@ -123,12 +159,13 @@ def build_plan(now: datetime | None = None, rng: random.Random | None = None) ->
     rng = rng or random.SystemRandom()
     policy = load_json(POLICY_PATH)
     calendar = load_json(CALENDAR_PATH)
+    catalog = load_json(CATALOG_PATH)
     day = now.date().isoformat()
     jobs = []
     for site_id in policy["active_site_ids"]:
         cadence = policy["per_site_cadence"][site_id]
         count = rng.randint(int(cadence["daily_min"]), int(cadence["daily_max"]))
-        topics = _topic_pool(calendar, now.month, site_id, now.year)
+        topics = _topic_pool(calendar, catalog, now.month, site_id, now.year)
         by_query = {}
         for topic in topics:
             by_query.setdefault(topic["base_query"], []).append(topic)
@@ -136,7 +173,12 @@ def build_plan(now: datetime | None = None, rng: random.Random | None = None) ->
             raise RuntimeError(f"not enough monthly candidates for {site_id}")
         selected_queries = rng.sample(list(by_query), count)
         selected = [rng.choice(by_query[query]) for query in selected_queries]
-        minutes = _spaced_minutes(count, int(cadence["minimum_interval_minutes"]), rng)
+        minutes = _spaced_minutes(
+            count,
+            int(cadence["minimum_interval_minutes"]),
+            rng,
+            policy["cadence"]["operating_window_kst"],
+        )
         for index, (topic, minute) in enumerate(zip(selected, minutes), start=1):
             jobs.append({
                 "job_id": f"{site_id}:{day}:{index}",
@@ -147,6 +189,7 @@ def build_plan(now: datetime | None = None, rng: random.Random | None = None) ->
                 **topic,
                 "gates": [
                     "compare_relative_interest_in_naver_datalab",
+                    "rank_against_same_day_trend_brief_before_0750_kst",
                     "confirm_current_news_or_evergreen_intent",
                     "open_primary_official_source",
                     "check_recent_titles_and_body_similarity",
@@ -160,6 +203,8 @@ def build_plan(now: datetime | None = None, rng: random.Random | None = None) ->
         "date": day,
         "timezone": "Asia/Seoul",
         "month": now.month,
+        "morning_research_deadline_kst": policy["morning_research"]["deadline_kst"],
+        "monthly_keyword_catalog": policy["monthly_keyword_catalog"]["path"],
         "network_daily_min": policy["cadence"]["network_daily_min"],
         "network_daily_max": policy["cadence"]["network_daily_max"],
         "selected_job_count": len(jobs),
@@ -172,8 +217,12 @@ def build_plan(now: datetime | None = None, rng: random.Random | None = None) ->
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="artifacts/naver-daily-plan.json")
+    parser.add_argument("--date", help="KST plan date in YYYY-MM-DD format")
     args = parser.parse_args()
-    plan = build_plan()
+    plan_time = None
+    if args.date:
+        plan_time = datetime.fromisoformat(args.date).replace(tzinfo=KST)
+    plan = build_plan(plan_time)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
