@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-09-29T17:25:37.121572+09:00",
+  "checked_at_kst": "2026-09-30T10:18:38.819693+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -89,7 +89,7 @@
       "handle": "seoul_topik1",
       "subscribers": 5840,
       "views": 415768,
-      "videos": 1293,
+      "videos": 1295,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
@@ -120,7 +120,7 @@
       "name": "Portuguese Survival",
       "handle": "Portuguese_survival",
       "subscribers": 2,
-      "views": 38,
+      "views": 39,
       "videos": 5,
       "connected": true
     },
