@@ -213,3 +213,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## writer-fallback-tiers-20261001
 - 2026-10-01 KST, Claude. economy_text.py: 엔진별 2회 시도(일시장애만), Gemini 5모델 후 Groq/OpenRouter/Cerebras(키 있을 때만) 순차. daily-network-publish에 3개 선택 시크릿 전달. 테스트 25개 통과(폴백 순서·2회 시도). 기존 실패 2건(test_locked_content_contract)은 변경 전부터 실패. 미검증: 실제 Actions 실행, Groq/OpenRouter/Cerebras 키·모델명(시크릿 미등록), Blogger VPS 경로(blogger_free_text.py는 Gemini 3모델만).
+
+## blogger-writer-fallback-20261001
+- 2026-10-01 KST, Claude. blogger_free_text.blogger_generate_with_fallback 추가(서버 무료 Gemini 3모델 → 일시장애 시 2회 → 공용 economy_text 체인[Gemini 무료 5모델→Groq→OpenRouter→Cerebras]). publish_blogger_33_now.py가 사용. publish-blogger-33-now.yml에 선택 시크릿 전달. 테스트 15개 통과. 미검증: 실제 실행; GitHub 러너에는 /etc/korea365/free-writer.json이 없어 1단계는 실패하고 2단계(GEMINI_API_KEY 무료티어 여부 미확인)로 넘어감; VPS 러너는 자체 환경변수에 GEMINI_API_KEY/독립엔진 키가 있어야 2단계 작동.

@@ -51,6 +51,10 @@ jobs:
           REVIEW_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
+          LONDON_WRITER_MODEL: "auto_free"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}            # 선택
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}  # 선택
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}      # 선택
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
