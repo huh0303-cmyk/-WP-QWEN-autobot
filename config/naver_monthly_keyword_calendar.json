@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "timezone": "Asia/Seoul",
+  "purpose": "Generate seasonal candidate queries for three Naver blogs without inventing search volume or copying another publisher.",
+  "selection_rule": "Randomize only among candidates that pass current Naver DataLab, Naver News freshness, official-source, recent-title and site-fit checks.",
+  "research_links": {
+    "naver_datalab": "https://datalab.naver.com/keyword/trendSearch.naver",
+    "naver_web_search_template": "https://search.naver.com/search.naver?query={query}",
+    "naver_news_search_template": "https://search.naver.com/search.naver?where=news&query={query}",
+    "google_trends": "https://trends.google.com/trends/explore?geo=KR",
+    "government24": "https://www.gov.kr",
+    "bokjiro": "https://www.bokjiro.go.kr",
+    "subsidy24": "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin",
+    "hometax": "https://www.hometax.go.kr",
+    "employment24": "https://www.work24.go.kr",
+    "korail": "https://www.letskorail.com",
+    "srt": "https://etk.srail.kr",
+    "kobus": "https://www.kobus.co.kr",
+    "bustago": "https://www.bustago.or.kr",
+    "airport_transport": "https://www.airport.kr",
+    "kdca": "https://www.kdca.go.kr",
+    "national_health": "https://health.kdca.go.kr",
+    "nhis": "https://www.nhis.or.kr"
+  },
+  "evergreen_expansions": {
+    "rail_origins": ["서울역", "용산역", "광명역", "수서역", "대전역", "동대구역", "부산역", "광주송정역", "목포역", "여수엑스포역", "강릉역"],
+    "airport_bus_areas": ["서울역", "강남", "잠실", "수원", "용인", "성남", "고양", "파주", "부천", "인천", "대전", "청주"],
+    "finance_queries": ["전세 계약 등기부등본 확인", "확정일자 신청", "전입신고 준비물", "신용점수 무료조회", "주택담보대출 비교", "보조금24 혜택 확인"],
+    "support_modifiers": ["신청대상", "소득기준", "신청기간", "지급일", "필요서류", "온라인 신청", "결과조회", "지역별 차이"],
+    "transport_modifiers": ["첫차", "막차", "시간표", "요금", "타는곳", "예매", "취소수수료", "소요시간"]
+  },
+  "months": {
+    "1": [
+      {"cluster": "연말정산 간소화·환급", "site_ids": ["naver_n1", "naver_n3"], "queries": ["연말정산 간소화 서비스", "연말정산 환급금 조회", "월세 세액공제 서류"], "official_sources": ["hometax"]},
+      {"cluster": "자동차세 연납", "site_ids": ["naver_n1", "naver_n3"], "queries": ["자동차세 연납 신청", "자동차세 연납 할인", "위택스 자동차세"], "official_sources": ["government24"]},
+      {"cluster": "설 교통", "site_ids": ["naver_n3"], "queries": ["설 KTX 예매 일정", "설 SRT 예매", "명절 고속버스 예매"], "official_sources": ["korail", "srt", "kobus"]},
+      {"cluster": "겨울 건강", "site_ids": ["naver_n2"], "queries": ["한파 건강수칙", "겨울철 혈압 관리", "노로바이러스 예방", "겨울철 낙상 예방"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "2": [
+      {"cluster": "국가장학금·교육비", "site_ids": ["naver_n1", "naver_n3"], "queries": ["국가장학금 신청기간", "초중고 교육비 지원", "교육급여 신청"], "official_sources": ["government24", "bokjiro"]},
+      {"cluster": "이사·전월세", "site_ids": ["naver_n1"], "queries": ["전입신고 준비물", "확정일자 신청", "전세 계약 체크리스트"], "official_sources": ["government24"]},
+      {"cluster": "봄방학 교통", "site_ids": ["naver_n3"], "queries": ["공항버스 시간표", "인천공항 버스 타는곳", "KTX 가족석 예매"], "official_sources": ["airport_transport", "korail"]},
+      {"cluster": "환절기 건강", "site_ids": ["naver_n2"], "queries": ["환절기 알레르기 비염", "미세먼지 건강수칙", "봄철 예방접종 확인", "환절기 천식 관리"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "3": [
+      {"cluster": "근로장려금 반기·청년지원", "site_ids": ["naver_n1", "naver_n3"], "queries": ["근로장려금 반기 신청", "청년 지원금 신청", "청년도약계좌 일정"], "official_sources": ["hometax", "employment24", "government24"]},
+      {"cluster": "벚꽃·봄 기차", "site_ids": ["naver_n3"], "queries": ["벚꽃 KTX 여행", "진해 기차 가는법", "봄 축제 교통통제"], "official_sources": ["korail", "government24"]},
+      {"cluster": "신학기 건강", "site_ids": ["naver_n2"], "queries": ["학생 건강검진", "수두 예방접종 확인", "학교 감염병 예방", "청소년 예방접종 확인"], "official_sources": ["kdca", "nhis"]}
+    ],
+    "4": [
+      {"cluster": "종합소득세 준비", "site_ids": ["naver_n1"], "queries": ["종합소득세 신고 준비서류", "종합소득세 환급", "간편장부 대상자"], "official_sources": ["hometax"]},
+      {"cluster": "봄 지원사업", "site_ids": ["naver_n1", "naver_n3"], "queries": ["소상공인 지원금", "지자체 청년지원금", "근로자 휴가지원"], "official_sources": ["government24", "employment24"]},
+      {"cluster": "어린이날 교통", "site_ids": ["naver_n3"], "queries": ["어린이날 KTX 예매", "공항버스 어린이 요금", "연휴 고속버스 예매"], "official_sources": ["korail", "kobus", "airport_transport"]},
+      {"cluster": "건강검진 준비", "site_ids": ["naver_n2"], "queries": ["건강검진 금식시간", "건강검진 복용약", "국가건강검진 대상자", "건강검진 결과 조회"], "official_sources": ["nhis", "national_health"]}
+    ],
+    "5": [
+      {"cluster": "종합소득세·장려금", "site_ids": ["naver_n1", "naver_n3"], "queries": ["종합소득세 신고기간", "근로장려금 정기 신청", "자녀장려금 소득기준"], "official_sources": ["hometax"]},
+      {"cluster": "가정의달 지원", "site_ids": ["naver_n3"], "queries": ["아이돌봄 지원", "한부모가족 지원", "어르신 교통비 지원"], "official_sources": ["bokjiro", "government24"]},
+      {"cluster": "연휴 교통", "site_ids": ["naver_n3"], "queries": ["KTX 취소표", "고속버스 취소수수료", "인천공항 심야버스"], "official_sources": ["korail", "kobus", "airport_transport"]},
+      {"cluster": "여름 전 건강", "site_ids": ["naver_n2"], "queries": ["식중독 예방수칙", "A형간염 예방", "온열질환 초기 증상", "자외선 건강수칙"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "6": [
+      {"cluster": "에너지바우처·냉방비", "site_ids": ["naver_n1", "naver_n3"], "queries": ["에너지바우처 신청", "냉방비 지원 대상", "전기요금 복지할인"], "official_sources": ["bokjiro", "government24"]},
+      {"cluster": "자동차세·재산세 준비", "site_ids": ["naver_n1"], "queries": ["자동차세 납부기간", "재산세 조회", "지방세 납부방법"], "official_sources": ["government24"]},
+      {"cluster": "여름 교통", "site_ids": ["naver_n3"], "queries": ["여름휴가 KTX 예매", "공항버스 첫차 막차", "공항철도 시간표"], "official_sources": ["korail", "airport_transport"]},
+      {"cluster": "장마·온열질환", "site_ids": ["naver_n2"], "queries": ["온열질환 응급처치", "장마철 곰팡이 건강", "여름 식중독 예방", "여름철 탈수 예방"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "7": [
+      {"cluster": "재산세·휴가비", "site_ids": ["naver_n1"], "queries": ["재산세 납부기간", "재산세 카드납부", "휴가비 지원"], "official_sources": ["government24"]},
+      {"cluster": "침수·재난 지원", "site_ids": ["naver_n1", "naver_n3"], "queries": ["침수 피해 지원금", "풍수해보험 신청", "재난지원금 지역별"], "official_sources": ["government24", "bokjiro"]},
+      {"cluster": "성수기 교통", "site_ids": ["naver_n3"], "queries": ["인천공항 리무진 시간표", "휴가철 KTX 예매", "고속버스 환불 수수료"], "official_sources": ["airport_transport", "korail", "kobus"]},
+      {"cluster": "폭염 건강", "site_ids": ["naver_n2"], "queries": ["폭염 건강수칙", "열사병 일사병 차이", "여름철 혈압 관리", "냉방병 예방"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "8": [
+      {"cluster": "근로장려금 지급·조회", "site_ids": ["naver_n1", "naver_n3"], "queries": ["근로장려금 지급일", "근로장려금 결과조회", "장려금 계좌 변경"], "official_sources": ["hometax"]},
+      {"cluster": "추석 예매 준비", "site_ids": ["naver_n3"], "queries": ["추석 KTX 예매 일정", "추석 SRT 예매", "명절 고속버스 예매"], "official_sources": ["korail", "srt", "kobus"]},
+      {"cluster": "가을 지원 공고", "site_ids": ["naver_n1", "naver_n3"], "queries": ["지자체 지원금", "청년 월세 지원", "소상공인 지원사업"], "official_sources": ["government24", "employment24"]},
+      {"cluster": "개학·감염병", "site_ids": ["naver_n2"], "queries": ["개학 감염병 예방", "독감 예방접종 일정", "가을 알레르기", "유행성 눈병 예방"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "9": [
+      {"cluster": "추석 교통·택배", "site_ids": ["naver_n3"], "queries": ["추석 KTX 취소표", "추석 고속버스 예매", "공항버스 연휴 시간표"], "official_sources": ["korail", "kobus", "airport_transport"]},
+      {"cluster": "재산세·장려금", "site_ids": ["naver_n1", "naver_n3"], "queries": ["9월 재산세 납부", "근로장려금 반기 신청", "추석 지원금 지역별"], "official_sources": ["government24", "hometax"]},
+      {"cluster": "독감·환절기", "site_ids": ["naver_n2"], "queries": ["독감 무료접종 대상", "독감 예방접종 시기", "환절기 혈압 관리", "가을철 진드기 감염병 예방"], "official_sources": ["kdca", "nhis"]}
+    ],
+    "10": [
+      {"cluster": "국가지원금 마감·지역 보조금", "site_ids": ["naver_n1", "naver_n3"], "queries": ["10월 정부지원금", "지자체 지원금 신청", "보조금24 혜택 확인"], "official_sources": ["government24", "bokjiro", "subsidy24"]},
+      {"cluster": "난방비·에너지바우처", "site_ids": ["naver_n1", "naver_n3"], "queries": ["에너지바우처 사용기간", "난방비 지원 대상", "도시가스 요금 지원"], "official_sources": ["bokjiro", "government24"]},
+      {"cluster": "단풍·기차·공항버스", "site_ids": ["naver_n3"], "queries": ["10월 KTX 여행", "단풍 기차여행", "인천공항 버스 시간표"], "official_sources": ["korail", "airport_transport"]},
+      {"cluster": "독감·건강검진", "site_ids": ["naver_n2"], "queries": ["독감 무료접종 대상", "국가건강검진 연말 예약", "환절기 건강수칙", "폐렴구균 무료접종 대상"], "official_sources": ["kdca", "nhis", "national_health"]}
+    ],
+    "11": [
+      {"cluster": "연말정산 미리보기", "site_ids": ["naver_n1", "naver_n3"], "queries": ["연말정산 미리보기", "신용카드 소득공제", "월세 세액공제"], "official_sources": ["hometax"]},
+      {"cluster": "수능·겨울 교통", "site_ids": ["naver_n3"], "queries": ["수능 교통통제", "수능 지하철 시간", "겨울 KTX 예매"], "official_sources": ["government24", "korail"]},
+      {"cluster": "난방·겨울 지원", "site_ids": ["naver_n1", "naver_n3"], "queries": ["난방비 지원", "에너지바우처 잔액조회", "겨울철 취약계층 지원"], "official_sources": ["bokjiro", "government24"]},
+      {"cluster": "겨울 감염병", "site_ids": ["naver_n2"], "queries": ["독감 유행주의보", "노로바이러스 예방", "겨울철 심뇌혈관 건강", "한랭질환 예방"], "official_sources": ["kdca", "national_health"]}
+    ],
+    "12": [
+      {"cluster": "연말정산·자동차세", "site_ids": ["naver_n1", "naver_n3"], "queries": ["연말정산 준비서류", "자동차세 납부", "연말 세액공제"], "official_sources": ["hometax", "government24"]},
+      {"cluster": "지원금 신청 마감", "site_ids": ["naver_n1", "naver_n3"], "queries": ["12월 정부지원금", "에너지바우처 신청 마감", "지자체 보조금 마감"], "official_sources": ["government24", "bokjiro", "subsidy24"]},
+      {"cluster": "연말·해돋이 교통", "site_ids": ["naver_n3"], "queries": ["해돋이 기차 예매", "연말 KTX 시간표", "인천공항 심야버스"], "official_sources": ["korail", "airport_transport"]},
+      {"cluster": "한파·연말 건강", "site_ids": ["naver_n2"], "queries": ["한파 건강수칙", "연말 건강검진 예약", "겨울철 낙상 예방", "연말 건강검진 결과 조회"], "official_sources": ["kdca", "nhis", "national_health"]}
+    ]
+  }
+}

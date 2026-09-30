@@ -7,27 +7,26 @@
     "naver_n3"
   ],
   "timezone": "Asia/Seoul",
-  "objective": "네이버 검색·홈 추천에서 신뢰를 쌓아 장기 방문과 합법적 수익 기회를 늘린다",
+  "objective": "네이버 검색·홈 추천에서 신뢰를 쌓아 장기 방문과 합법적 수익 기회를 늘리되 방문자·순위·수익을 보장하지 않는다",
   "cadence": {
-    "network_daily_min": 3,
-    "network_daily_max": 7,
-    "minimum_interval_minutes": 10,
-    "preferred_slots_kst": [
-      "09:17",
-      "11:43",
-      "14:19",
-      "17:11",
-      "20:37"
-    ],
-    "never_bulk_publish": true
+    "network_daily_min": 14,
+    "network_daily_max": 18,
+    "operating_window_kst": ["06:37", "23:17"],
+    "random_non_round_minutes": true,
+    "persist_daily_schedule_before_first_post": true,
+    "never_bulk_publish": true,
+    "skip_instead_of_lowering_quality": true
   },
   "per_site_cadence": {
-    "naver_n1": {"display_name": "부의정석", "blog_id": "k-insight-vietnam", "daily_min": 1, "daily_max": 1},
-    "naver_n2": {"display_name": "헬스의정석", "blog_id": "health-standard", "daily_min": 1, "daily_max": 1},
-    "naver_n3": {"display_name": "생활의정석", "blog_id": "sky-only", "daily_min": 1, "daily_max": 5}
+    "naver_n1": {"display_name": "부의정석", "blog_id": "k-insight-vietnam", "daily_min": 3, "daily_max": 4, "minimum_interval_minutes": 180},
+    "naver_n2": {"display_name": "헬스의정석", "blog_id": "health-standard", "daily_min": 3, "daily_max": 4, "minimum_interval_minutes": 180},
+    "naver_n3": {"display_name": "생활의정석", "blog_id": "sky-only", "daily_min": 8, "daily_max": 10, "minimum_interval_minutes": 75}
   },
   "workflow": [
-    "current_keyword_research",
+    "monthly_evergreen_keyword_rotation",
+    "naver_datalab_relative_trend_research",
+    "naver_news_freshness_check",
+    "existing_search_entry_query_review",
     "official_source_verification",
     "original_title_and_body",
     "copyright_safe_original_image",
@@ -39,7 +38,14 @@
     "default": "public_after_editorial_review",
     "draft_save_supported": true,
     "require_public_url_verification": true,
-    "owner_authorized_reviewed_public_posts": true
+    "owner_authorized_reviewed_public_posts": true,
+    "search_follow_up": {
+      "naver_public_url_verification": true,
+      "naver_search_visibility_check": true,
+      "google_search_console_only_when_property_ownership_is_verified": true,
+      "google_indexing_api_for_general_blog_posts": false,
+      "reason": "Google Indexing API is restricted to JobPosting and BroadcastEvent pages; a Naver-hosted blog URL must not be submitted as a general-article shortcut."
+    }
   },
   "topics": {
     "priority": [
@@ -66,6 +72,12 @@
     "ban_ai_meta_phrases": true,
     "image_count": 1,
     "source_attribution_required": true,
-    "affiliate_disclosure_required": true
+    "affiliate_disclosure_required": true,
+    "maximum_exact_keyword_repetitions": 6,
+    "official_deep_link_required_for_application_or_timetable_posts": true,
+    "internal_related_link_max": 3,
+    "search_result_link_must_not_replace_primary_source": true,
+    "stale_timetable_numbers_forbidden": true,
+    "unverified_search_volume_numbers_forbidden": true
   }
 }

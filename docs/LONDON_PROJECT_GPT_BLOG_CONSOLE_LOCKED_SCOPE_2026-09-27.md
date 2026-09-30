@@ -122,3 +122,11 @@
 - YouTube 제작물은 2026-09-30 소유자 변경 결정에 따라 정확한 OAuth 채널 ID와 업로드 결과를 검증한 뒤 즉시 공개한다. 채널 ID 불일치·쓰기 권한 미연결·품질 실패는 공개하지 않고 실패로 기록한다. 의료·법률·금융 등 민감 주제와 공개 발행 권한이 확인되지 않은 목적지는 자동 공개하지 않는다. AdSense 승인, 검색 순위, 방문자, 수익은 보장 표현을 금지한다.
 - 운영 권한은 이 목표 안에서의 진단·준비·예약·검증으로 한정하며, 계정 로그인/OAuth·공개 발행·제휴 고지 등 기존 승인 및 영수증 규칙을 계속 따른다.
 - 수동 모드는 직원용 복사 패키지를 제공한다. 글마다 제목/SEO 제목, 본문 HTML, 검색설명/메타 설명, 포커스 키워드, 키워드·태그, 카테고리, 이미지 URL과 ALT를 함께 준비하고 항목별 복사와 전체 복사를 모두 제공한다. 네이버·티스토리는 사람이 먼저 해당 계정에 로그인하고 CAPTCHA·추가 인증을 처리한 뒤 붙여넣으며, 로그인 우회나 비밀번호 저장은 하지 않는다.
+
+## 12. 2026-10-01 Naver cadence and monthly keyword override
+
+- The owner superseded the one-post-per-day Naver cadence: N1 부의정석 and N2 헬스의정석 each target 3–4 reviewed posts per KST day; N3 생활의정석 targets 8–10.
+- This exception applies only to the three Naver rooms. It does not change WordPress, Blogspot, Tistory, YouTube, or SNS cadence.
+- Daily times are randomized and persisted before the first post. Minimum same-account gaps are 180 minutes for N1/N2 and 75 minutes for N3. A missed slot is not recovered by bulk posting.
+- A January–December candidate calendar feeds current Naver DataLab relative trends, Naver News freshness, existing entry queries, and official sources. Absolute volume, rank, visits, and revenue are never invented or guaranteed.
+- General Naver blog articles do not use Google Indexing API. Search Console actions require verified property ownership; publication is followed by exact public-URL and Naver visibility checks.
