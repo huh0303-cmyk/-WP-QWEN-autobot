@@ -200,3 +200,6 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## publish-retry-wrapper-20261001
 - 2026-10-01 KST, Claude. scripts/retry_run.py 추가(타임아웃+3회 재시도), daily-network-publish.yml의 autopost_current 호출에 적용. 로컬 단위 시험(실패/타임아웃 exit code)만 확인, 실제 Actions 실행은 미검증. 모델 폴백은 autopost_current의 GPT-5 mini 고정 정책 때문에 미적용.
+
+## writer-free-fallback-wired-20261001
+- 2026-10-01 KST, Claude. 원인: daily-network-publish.yml에 GEMINI_API_KEY/LONDON_WRITER_MODEL 미전달 → 엔진의 무료 Gemini 폴백 체인(economy_text.py)이 이 워크플로에서 작동 불가. 수정: 두 env 전달. tests/test_economy_text_fallback.py 2개 통과(3번째 모델 폴백, 전체 실패 시 WRITERS_EXHAUSTED). 미검증: 실제 Actions 실행·GEMINI_API_KEY 시크릿의 무료티어 여부.
