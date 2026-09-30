@@ -24,6 +24,22 @@
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
     },
+    "ko": {
+      "channel_id": "UCdA24IuR-JE7qButWv5jLqA",
+      "display_name": "서울국제대학-TOPIK센터",
+      "oauth_brand_name": "서울국제대학SIS",
+      "google_brand_id": "106362135040860340178",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
+    "en": {
+      "channel_id": "UCrjkKWMHzAAvpLIFgHnwcWg",
+      "display_name": "English Survival",
+      "oauth_brand_name": "English Survival",
+      "google_brand_id": "103144850455313221947",
+      "google_account": "huh0303@gmail.com",
+      "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
+    },
     "retro_reels": {
       "channel_id": "UCwh49EokdWFJqYFE_zA6XDQ",
       "display_name": "RETRO_USA1",

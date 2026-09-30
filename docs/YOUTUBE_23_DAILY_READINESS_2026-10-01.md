@@ -294,3 +294,24 @@ The historical brand names and Google brand IDs are locked in
 `config/youtube_oauth_brand_mapping.json` only as navigation hints. These
 authorizations do not certify that either health video has been produced or
 published.
+
+The owner next approved Google brand `서울국제대학SIS` for the TOPIK center.
+The tool accepted only its locked `UCdA24IuR-JE7qButWv5jLqA` and stored
+`YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO` in both protected stores, with a
+non-secret CONTROL receipt.
+
+The owner approved `English Survival`. Its exact `mine=true` result was
+`UCrjkKWMHzAAvpLIFgHnwcWg`, and the VPS token was stored. The next GitHub
+repository-secret write failed with HTTP 400 because the repository had
+reached GitHub's 100-secret limit. The original script had not yet written
+the CONTROL receipt, so the English grant was partially recorded. The
+repair path reads the stored token into process memory without printing it,
+refreshes it, repeats the exact UC ID check, and stores it in the existing
+`youtube-channels` GitHub environment (which has its own 100-secret quota).
+The script then wrote a non-secret CONTROL receipt including
+`github_scope=environment:youtube-channels`. This repair succeeded without
+another owner approval. Existing repository secret names continue to update
+in place; new channel names use the environment. GitHub Actions jobs need
+`environment: youtube-channels` to read environment secrets, while the VPS
+has its own protected runtime copy. Neither a token value nor a public video
+is in GitHub.
