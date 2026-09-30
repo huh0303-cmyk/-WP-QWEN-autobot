@@ -40,6 +40,13 @@ if not CHANNEL_KEY:
     print("❌ CHANNEL_KEY가 없습니다.")
     raise SystemExit(1)
 CK = CHANNEL_KEY.upper()
+ACTIVE_ARCHIVE_KEYS = {
+    "NASA_SPACE_TIMES", "HISTORY_TODAY_TIMES", "INVENTION_TIMES",
+    "SILENT_ERA_TIMES", "RETRO_REELS_TIMES",
+}
+if CK not in ACTIVE_ARCHIVE_KEYS:
+    print(f"Blocked inactive archive channel key: {CK}")
+    raise SystemExit(2)
 
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")

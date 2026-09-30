@@ -22,11 +22,27 @@ deduplication before automatic selection or transfer to the VPS.
 
 The production `scripts/youtube_playlist_maker.py` still defaults to an
 approved Drive bank and intentionally raises `WAITING_FRESH_COMPOSITIONS` for
-`globalmusic` and `kpop`. The owner decision requires a new, tested local
-source/staging path; merely resetting today's failed calendar row would fail
-again. The desktop folder contains non-audio files, including credential-like
+`globalmusic` and `kpop`. A new opt-in `PLAYLIST_MUSIC_SOURCE=owner_local`
+path now reads a private, reviewed manifest and staged audio. It validates
+the channel's genre, owner's paid-plan or independently verified export
+rights, exact SHA-256, duration and distinct recordings, then shuffles the
+selection and targets 50–70 minutes. Romantic mixes keep equal French and
+Japanese track counts. It writes a track manifest in
+the video work directory. Missing or changed assets stop before rendering.
+This path is **not activated** until the private genre catalog and staged
+files are ready. Merely resetting today's failed calendar row would still
+fail. The desktop folder contains non-audio files, including credential-like
 JSON names; transfer only approved audio by an explicit allowlist. Do not
 upload or commit the directory wholesale.
+
+Private manifest format: `{"version":1,"tracks":[{"channel":"globalmusic",
+"file":"song.mp3","sha256":"<64 hex>","approved":true,
+"genre":"romantic_acoustic","language":"french",
+"rights":"owner_paid_suno"}]}`. `kpop` requires genre
+`korean_acoustic_pop`; `starbucks` requires `instrumental_cafe`. The
+manifest must not be committed with local filenames or rights evidence.
+`healing` retains its nature-sound pipeline and `mbb` its approved classical
+recordings; neither silently selects Suno tracks by title.
 
 ## Current free composition options
 

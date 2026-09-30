@@ -226,23 +226,23 @@
   ],
   "instagram": [
     {
-      "name": "SIS Korean · TOPIK",
+      "name": "Seoul TOPIK",
       "handle": "sis_topik1",
+      "state": "publish_connected_receipt_verified_2026-09-30"
+    },
+    {
+      "name": "English Survival",
+      "handle": "englishsurvival1",
       "state": "handle_confirmed_publish_auth_missing"
     },
     {
-      "name": "지수의 생활 발견",
-      "handle": "seoul_item365",
+      "name": "Japanese Survival",
+      "handle": "japanese_survival1",
       "state": "handle_confirmed_publish_auth_missing"
     },
     {
-      "name": "지수의 여행과 생활",
-      "handle": "seoul_life365",
-      "state": "handle_confirmed_publish_auth_missing"
-    },
-    {
-      "name": "지수의 건강 노트",
-      "handle": "seoul_health365",
+      "name": "Seoul Jisoo",
+      "handle": "seoul_jisoo",
       "state": "handle_confirmed_publish_auth_missing"
     }
   ],

@@ -60,16 +60,14 @@
   },
   "romantic": {
     "languages": {
-      "fr": 0.25,
-      "ja": 0.25,
-      "es": 0.25,
-      "it": 0.25
+      "fr": 0.5,
+      "ja": 0.5
     },
     "french_voice": "sweet cute adult female, soft natural singing",
     "style": "sweet acoustic cafe romance",
     "reference_sample": "https://gemini.google.com/app/7b76cb5aaf4a3a56",
     "sample_approved": true,
-    "ratio_basis": "track_count_per_playlist; French and Japanese together 50%, Spanish 25%, Italian 25%"
+    "ratio_basis": "track_count_per_playlist; sweet French and Japanese vocals, balanced one-to-one"
   },
   "duration_minutes_min": 50,
   "duration_minutes_max": 70,

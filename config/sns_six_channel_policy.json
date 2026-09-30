@@ -135,12 +135,12 @@
       "platform": "Instagram",
       "role": "japanese",
       "display_name": "Japanese Survival",
-      "handle": "sis_language365",
-      "url": "https://www.instagram.com/sis_language365/",
+      "handle": "japanese_survival1",
+      "url": "https://www.instagram.com/japanese_survival1/",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false,
-      "note": "2026-09-29 Meta 계정 센터에서 확인. Japanese Survival 브랜드명 적용 및 게시 로그인이 필요함"
+      "note": "2026-10-01 Meta 계정 센터에서 Japanese Survival 표시 이름과 japanese_survival1 핸들 확인. japanese_survival 정확 핸들은 사용 불가. 게시 로그인 필요."
     },
     {
       "platform": "Instagram",
@@ -177,8 +177,8 @@
       "platform": "Instagram",
       "role": "hot_item_shop",
       "display_name": "Seoul Jisoo",
-      "handle": "seoul_item365",
-      "url": "https://www.instagram.com/seoul_item365/",
+      "handle": "seoul_jisoo",
+      "url": "https://www.instagram.com/seoul_jisoo/",
       "account_exists": true,
       "identity_verified": true,
       "publish_connected": false

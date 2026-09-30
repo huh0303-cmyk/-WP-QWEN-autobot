@@ -57,7 +57,7 @@ def youtube_targets(day: date) -> list[dict]:
             "publish_connected": True, "release_policy": "private_review_only",
             "cadence": "1_per_day_private" if is_history else "2_to_3_per_week_random_days",
             "topic_source": f"youtube_{group}_topic_pipeline",
-            "topic_brief": (f"{day.strftime('%B %d').upper()} — select one source-grounded event from this date; reject duplicate events."
+            "topic_brief": (f"{day.strftime('%B %d').upper()} — select exactly two source-grounded events from this date, newest year first; reject duplicate events."
                             if is_history else "Select a fresh, non-duplicate topic from the channel-specific topic bank."),
         })
     return due
@@ -69,6 +69,10 @@ def daily_non_youtube_targets() -> list[dict]:
     roles = {row.get("key"): row for row in sns.get("roles", [])}
     for row in sns.get("accounts", []):
         platform = str(row.get("platform", ""))
+        if platform in {"Instagram", "Threads"} and row.get("role") not in {
+            "korean_topik", "english", "japanese", "hot_item_shop"
+        }:
+            continue
         role = roles.get(row.get("role"), {})
         result.append({
             "key": f"{platform.lower()}:{row.get('role')}", "platform": platform,
@@ -103,8 +107,8 @@ def daily_non_youtube_targets() -> list[dict]:
             "topic_source": "account_specific_keyword_bank",
             "topic_brief": "Select one original account-specific search topic with duplicate protection.",
         })
-    if len(result) != 32:
-        raise RuntimeError(f"expected 32 daily non-YouTube targets, found {len(result)}")
+    if len(result) != 28:
+        raise RuntimeError(f"expected 28 daily non-YouTube targets, found {len(result)}")
     return result
 
 

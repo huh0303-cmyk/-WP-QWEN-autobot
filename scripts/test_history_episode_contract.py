@@ -8,11 +8,12 @@ class ContractTests(unittest.TestCase):
                     voice_name='Brian', date_label='SEPTEMBER 6', date_is_primary=True,
                     rights_review_passed=True, audio_file_verified=True,
                     caption_sync_checked=True, visual_alignment_checked=True,
-                    upload_visibility='private', events=[dict(date='1901-09-06',
+                    upload_visibility='private', events=[dict(date=event_date,
                     fact_sources=['https://www.loc.gov/'], narration='Reviewed narration',
                     scenes=[dict(kind='archival_video', source='https://www.loc.gov/',
                     rights_basis='Reviewed item', visible_content='Public appearance',
-                    narration_excerpt='Public appearance, not the attack')])])
+                    narration_excerpt='Public appearance, not the attack')])
+                    for event_date in ('1901-09-06', '1757-09-06')])
 
     def test_valid(self):
         self.assertEqual(validate_episode(self.plan()), [])
@@ -31,9 +32,13 @@ class ContractTests(unittest.TestCase):
         self.assertTrue(validate_episode(p))
 
     def test_ascending_blocks(self):
-        p = self.plan(); old = dict(p['events'][0], date='1757-09-06')
-        p['events'].insert(0, old)
+        p = self.plan(); p['events'].reverse()
         self.assertTrue(validate_episode(p))
+
+    def test_one_or_three_events_block(self):
+        for count in (1, 3):
+            p = self.plan(); p['events'] = p['events'][:1] * count
+            self.assertIn('Exactly two verified events are required', validate_episode(p))
 
     def test_unapproved_voice_blocks(self):
         p = self.plan(); p['voice_name'] = 'Other'

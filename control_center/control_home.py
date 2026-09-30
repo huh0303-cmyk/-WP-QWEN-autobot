@@ -207,6 +207,10 @@ def build_sns_ranking(bucket: int) -> dict:
     rows = []
     for item in policy.get("accounts", []):
         platform = str(item.get("platform") or "")
+        if platform in {"Instagram", "Threads"} and item.get("role") not in {
+            "korean_topik", "english", "japanese", "hot_item_shop"
+        }:
+            continue
         pkey = platform.lower()
         hist_key = ROLE_TO_HISTORY.get(str(item.get("role") or ""))
         current = latest.get(pkey, {}).get(hist_key, {}) if hist_key else {}

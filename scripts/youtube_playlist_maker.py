@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create every playlist from fresh Lyria music and a fresh Gemini image.
+"""Create playlists from reviewed music and a fresh Gemini image.
 
 Prefer existing approved music and Gemini app exports; API generation is explicit opt-in.
 """
@@ -38,7 +38,7 @@ def metadata(topic, caption, duration_min):
 
 
 def balanced_language(counts):
-    languages = ["french", "japanese", "spanish", "italian"]
+    languages = ["french", "japanese"]
     minimum = min(counts.get(language, 0) for language in languages)
     return random.choice([language for language in languages if counts.get(language, 0) == minimum])
 
@@ -283,7 +283,27 @@ def build_fresh_healing(_service, _theme, output_path):
 
 
 def select_music(service, folder_id, exts, mime_prefix):
-    if os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank") == "lyria_api":
+    source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
+    if source == "owner_local":
+        from playlist_owner_library import select_owner_tracks
+        root = Path(os.environ.get("PLAYLIST_OWNER_AUDIO_ROOT",
+                                   "/opt/korea365/data/playlist-owner-music/audio"))
+        manifest = Path(os.environ.get("PLAYLIST_OWNER_MANIFEST",
+                                       "/opt/korea365/data/playlist-owner-music/approved.json"))
+        chosen = select_owner_tracks(base.CHANNEL_KEY, root, manifest,
+                                     base.get_duration)
+        result = []
+        for row in chosen:
+            file_id = f"owner-local:{row['sha256']}"
+            _generated_paths[file_id] = row["path"]
+            result.append({"id": file_id, "name": row["name"],
+                           "duration": row["duration"]})
+        Path(base.WORKDIR, "owner_audio_selection.json").write_text(
+            json.dumps([{key: row[key] for key in ("name", "sha256", "duration",
+                      "language", "genre", "rights")} for row in chosen],
+                      ensure_ascii=False, indent=2), encoding="utf-8")
+        return result
+    if source == "lyria_api":
         if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").lower() != "true":
             raise RuntimeError("Paid music generation is disabled")
         return generate_fresh_tracks()
