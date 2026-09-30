@@ -1,0 +1,11 @@
+[Unit]
+Description=Fill the next 13 KST days of core YouTube calendar slots
+
+[Timer]
+OnCalendar=*-*-* 15:10:00 UTC
+Persistent=true
+RandomizedDelaySec=120
+Unit=korea365-youtube-calendar-roll.service
+
+[Install]
+WantedBy=timers.target

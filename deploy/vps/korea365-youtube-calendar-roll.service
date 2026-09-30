@@ -1,0 +1,10 @@
+[Unit]
+Description=Fill missing future core YouTube calendar dates once daily
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/korea365
+ExecStart=/usr/bin/flock -w 30 /opt/korea365/data/youtube-calendar-roll.lock /opt/korea365/.venv/bin/python scripts/run_youtube_calendar_roll_vps.py
