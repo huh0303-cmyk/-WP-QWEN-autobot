@@ -124,6 +124,33 @@ the public page. The supplied social table has 23 locked YouTube channels
 plus this one provisional `Jisoo2` row; its Facebook/Threads/Instagram/TikTok
 rows are other platforms, not extra verified YouTube channels.
 
+## Direct live-page recheck, 04:16–04:20 KST
+
+The owner supplied a 48-row CONTROL/SNS export and asked us to open the
+destinations directly. The live `https://sns.korea365.org/social-accounts?platform=SNS`
+page still showed YouTube 24, Instagram 6, Threads 6 and the old Jisoo/Japanese
+handles. This is the pre-deployment page: the 23/4/4 policy in merged PR #167
+has not reached VPS because the deploy owner returned `waiting_for_video`.
+Treat the page as a navigation inventory, not evidence of upload OAuth rights.
+
+Opening the explicit `/channel/<UC ID>` destinations in a browser confirmed:
+
+| Destination | Live title and handle | Important observed content |
+| --- | --- | --- |
+| `UCmt8f9yUT6iTxBys8eH4-Cg` | French Survival, `@SIS_FrenchSurvival` | 1 French lesson; 2 older unrelated US archive videos remain. |
+| `UCKvKhETLGPaRV3qfWv2bM2g` | Portuguese Survival, `@Portuguese_survival` | 2 Portuguese lessons; 3 older unrelated science/archive/health videos remain. |
+| `UCRZ0uc_bxKDMwz3noBBi9KQ` | Vietnamese Survival, `@SIS_VietnameseSurvival` | 2 Vietnamese lessons; 1 older Bach video remains. |
+| `UCAizx0tPkRSol8sIhanN_QQ` | Seoul_Jisoo1, `@rosiespicks` | Public channel has 6 existing health-themed videos/Shorts; shopping transition is an editorial plan, not evidence of existing shopping output. |
+
+`https://www.youtube.com/@sis_languagecenter` still returned a visible 404,
+so the provisional Jisoo2 row cannot be used to infer a second shopping UC ID.
+The direct `https://www.instagram.com/seoul_jisoo/` profile opened and its
+page title showed `Chris Huh(@seoul_jisoo)`: the username is live, while the
+display-name change is still pending Meta reauthentication. The new Threads
+URL opened a login screen, which does not confirm a Threads handle change.
+Do not delete old videos, infer token ownership or upload to these targets
+from this public-page inspection.
+
 ## Owner's final editorial correction, 03:55 KST
 
 The five knowledge destinations are `NASA_XFILES`, `HISTORY_TV_TODAY`,
