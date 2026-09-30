@@ -7,7 +7,6 @@ import json
 import os
 import subprocess
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -22,7 +21,6 @@ def main() -> int:
     runtime = json.loads(RUNTIME_CONFIG.read_text(encoding="utf-8"))
     env = os.environ.copy()
     for name in (
-        "GEMINI_API_KEY",
         "BLOGGER_GOOGLE_CLIENT_ID",
         "BLOGGER_GOOGLE_CLIENT_SECRET",
         "BLOGGER_GOOGLE_REFRESH_TOKEN",
@@ -37,21 +35,12 @@ def main() -> int:
         run_date = datetime.now(ZoneInfo("Asia/Seoul")).date().isoformat()
     env["PUBLIC_RUN_KEY"] = f"blogger33-daily-{run_date}"
     env["BLOGGER_REVIEW_DRAFT_MODE"] = "false"
-    env["BLOGGER_GEMINI_MODEL"] = "gemini-2.5-flash-lite"
-
-    completed = None
-    for attempt in range(3):
-        completed = subprocess.run(
-            [sys.executable, str(PUBLISHER)],
-            cwd=ROOT,
-            env=env,
-            check=False,
-        )
-        if completed.returncode == 0:
-            return 0
-        if attempt < 2:
-            time.sleep(30 * (attempt + 1))
-    assert completed is not None
+    completed = subprocess.run(
+        [sys.executable, str(PUBLISHER)],
+        cwd=ROOT,
+        env=env,
+        check=False,
+    )
     return completed.returncode
 
 
