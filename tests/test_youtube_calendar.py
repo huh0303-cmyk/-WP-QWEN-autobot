@@ -33,10 +33,30 @@ def test_aliases_and_future_time():
     assert selected[0]["topic"] == "Exact calendar topic"
 
 
-def test_original_series_blocks_rolled_alias_even_on_different_day():
+def test_original_series_blocks_only_same_day_rolled_alias():
     selected, skipped = select_due(parsed(row("CAL-1", when="2026-09-02 12:00 KST"), row("ROLL-X", "플리-MBB")), NOW, {"mbb"})
-    assert not selected
+    assert [item["id"] for item in selected] == ["ROLL-X"]
+    assert not skipped
+    selected, skipped = select_due(parsed(row(), row("ROLL-X", "플리-MBB")), NOW, {"mbb"})
+    assert [item["id"] for item in selected] == ["CAL-1"]
     assert skipped == [("ROLL-X", "original-calendar-series-exists")]
+
+
+def test_daily_roll_fills_future_gaps_without_duplicate_channel_dates():
+    channel = next(c for c in load_channels() if c.channel_key == "mbb")
+    today = dt.datetime.now(KST).date()
+    existing_date = today + dt.timedelta(days=2)
+    original = row(when=f"{existing_date} 12:00 KST")
+    generated = youtube_rows(today + dt.timedelta(days=3), [original], [{
+        "display_name": channel.display_name, "channel_key": channel.channel_key,
+        "channel_type": channel.channel_type, "language": channel.language,
+        "tone": channel.tone, "allowed_hour_start": channel.allowed_hour_start,
+        "allowed_hour_end": channel.allowed_hour_end,
+        "interval_days_min": 1, "interval_days_max": 1,
+    }])
+    assert [item[1][:10] for item in generated] == [
+        str(today + dt.timedelta(days=1)), str(today + dt.timedelta(days=3))
+    ]
 
 
 @pytest.mark.parametrize("status", ["자료수집", "실패", "비공개 업로드", "보류", "공개완료"])

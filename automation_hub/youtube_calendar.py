@@ -59,10 +59,10 @@ def select_due(rows, now, enabled, limit=3):
     Keep past records, never retry claimed/failed work, and never catch up yesterday's
     dated history automatically. Resolve legacy display names to one channel key.
     """
-    original_end = {}
+    original_dates = set()
     for r in rows:
         if r["id"].startswith("CAL-"):
-            original_end[r["key"]] = max(original_end.get(r["key"], dt.date.min), r["when"].date())
+            original_dates.add((r["key"], r["when"].date()))
     blocked = {r["key"] for r in rows if r["status"] in {"자료수집", "대본작성", "검수중"}}
     # A claimed/completed row must win even if a duplicate has an earlier clock time.
     occupied = {(r["key"], r["when"].date()) for r in rows
@@ -70,7 +70,7 @@ def select_due(rows, now, enabled, limit=3):
     selected, skipped, seen = [], [], set()
     for r in sorted(rows, key=lambda r: (not r["id"].startswith("CAL-"), r["when"], r["id"])):
         slot = (r["key"], r["when"].date())
-        if r["id"].startswith("ROLL-") and r["when"].date() <= original_end.get(r["key"], dt.date.min):
+        if r["id"].startswith("ROLL-") and slot in original_dates:
             skipped.append((r["id"], "original-calendar-series-exists"))
             continue
         if slot in seen:

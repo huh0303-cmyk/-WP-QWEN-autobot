@@ -2,7 +2,7 @@
   "project": "london-project",
   "timezone": "Asia/Seoul",
   "schedule_policy": {
-    "cadence_lock": "youtube_each_channel_2_to_3_per_week_tistory_network_3_random_daily_other_enabled_sites_and_accounts_1_per_day",
+    "cadence_lock": "youtube_23_each_channel_daily_tistory_network_3_random_daily_other_enabled_sites_and_accounts_1_per_day",
     "cost_lock": "free_only_no_paid_fallback",
     "planned_jitter_minutes": 60,
     "forbid_exact_hour": true,
@@ -70,27 +70,28 @@
     },
     "youtube_playlist": {
       "channel_count": 5,
-      "weekly_min": 2,
-      "weekly_max": 3,
-      "target": "2_to_3_public_productions_per_channel_per_week",
-      "randomize_weekly_days": true,
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_channel_per_day_after_exact_auth",
+      "randomize_weekly_days": false,
       "upload_default": "public",
       "human_review_before_public": false,
       "avoid_channel_time_collisions": true
     },
     "youtube_knowledge": {
       "channel_count": 5,
-      "weekly_min": 2,
-      "weekly_max": 3,
-      "target": "history_daily_other_channels_2_to_3_public_productions_per_week",
-      "randomize_weekly_days": true,
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_channel_per_day_after_exact_auth",
+      "randomize_weekly_days": false,
       "upload_default": "public",
       "human_review_before_public": false,
       "avoid_channel_time_collisions": true
     },
     "survival_10_language": {
       "enabled": false,
-      "status": "weekly_2_to_3_after_exact_channel_id_and_publish_auth_verified",
+      "status": "daily_target_waiting_for_exact_channel_publish_auth_and_executor",
+      "target_enabled": true,
       "languages": [
         "Korean/TOPIK",
         "English",
@@ -107,22 +108,18 @@
       "total_lessons": 500,
       "completed_through_lesson": 2,
       "next_lesson": 3,
-      "weekly_min": 2,
-      "weekly_max": 3,
-      "target": "2_to_3_private_productions_per_verified_language_channel_per_week",
-      "randomize_weekly_days": true,
-      "upload_default": "private",
-      "require_verified_private_before_review": true,
-      "require_chairman_approval_before_public": true,
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_verified_language_channel_per_day",
+      "randomize_weekly_days": false,
+      "upload_default": "public_after_exact_channel_auth",
+      "require_verified_private_before_review": false,
+      "require_chairman_approval_before_public": false,
       "avoid_language_time_collisions": true,
       "spread_languages_across_distinct_slots": true,
       "public_requires_verified_channel_id": true,
       "public_requires_write_auth": true,
-      "missing_channel_ids": [
-        "Chinese",
-        "Vietnamese",
-        "Portuguese"
-      ]
+      "missing_channel_ids": []
     },
     "instagram": {
       "target": "1_public_post_per_verified_account_per_day",
@@ -185,11 +182,11 @@
           "role": "health_japanese"
         }
       ],
-      "weekly_min": 2,
-      "weekly_max": 3,
-      "target": "2_to_3_private_productions_per_connected_channel_per_week",
-      "randomize_weekly_days": true,
-      "upload_default": "private",
+      "weekly_min": 7,
+      "weekly_max": 7,
+      "target": "1_public_production_per_connected_channel_per_day",
+      "randomize_weekly_days": false,
+      "upload_default": "public_after_exact_channel_auth",
       "public_requires_write_auth": true
     }
   },

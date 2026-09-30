@@ -19,22 +19,23 @@ def test_london_schedule_contract():
     assert news["target"] == "1_per_day_per_newsroom"
     assert news["never_invent_to_fill_minimum"] is True
     assert policy["cadence"]["blogspot"]["target"] == "1_public_post_per_enabled_destination_per_day"
-    assert policy["cadence"]["tistory"]["target"] == "1_public_post_per_enabled_site_per_day"
-    for key in ("instagram", "threads", "tiktok", "facebook", "naver"):
+    assert policy["cadence"]["tistory"]["network_daily_total"] == 3
+    for key in ("instagram", "threads", "tiktok", "facebook"):
         assert policy["cadence"][key]["weekly_target"] == 7
+    assert policy["cadence"]["naver"]["network_daily_min"] >= 3
 
 
 def test_locked_youtube_cadence_uses_owner_approved_immediate_public_for_core_ten():
     policy = load("london_content_schedule.json")
     for key in ("youtube_playlist", "youtube_knowledge"):
         cfg = policy["cadence"][key]
-        assert (cfg["weekly_min"], cfg["weekly_max"]) == (2, 3)
+        assert (cfg["weekly_min"], cfg["weekly_max"]) == (7, 7)
         assert cfg["upload_default"] == "public"
         assert cfg["human_review_before_public"] is False
     for key in ("survival_10_language", "youtube_daily_additional"):
         cfg = policy["cadence"][key]
-        assert (cfg["weekly_min"], cfg["weekly_max"]) == (2, 3)
-        assert cfg["upload_default"] == "private"
+        assert (cfg["weekly_min"], cfg["weekly_max"]) == (7, 7)
+        assert cfg["upload_default"] == "public_after_exact_channel_auth"
     survival = policy["cadence"]["survival_10_language"]
     assert survival["enabled"] is False
     assert len(survival["languages"]) == 10
@@ -42,7 +43,8 @@ def test_locked_youtube_cadence_uses_owner_approved_immediate_public_for_core_te
     assert survival["total_lessons"] == 500
     assert survival["completed_through_lesson"] == 2
     assert survival["next_lesson"] == 3
-    assert survival["require_chairman_approval_before_public"] is True
+    assert survival["require_chairman_approval_before_public"] is False
+    assert survival["missing_channel_ids"] == []
     assert policy["schedule_policy"]["cost_lock"] == "free_only_no_paid_fallback"
 
 
