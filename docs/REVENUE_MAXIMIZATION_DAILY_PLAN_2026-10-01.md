@@ -23,7 +23,7 @@
 | 주간 추이(7일 vs 직전 7일) | site-health-guardian 리포트 | 2일마다 |
 
 ## 발행 실패·타임아웃 폴백
-- 작성 타임아웃/실패 → 동일 작업 재시도 → 다른 작성 모델로 전환 → 그래도 실패 시 ledger 기록 후 다음 실행에서 재시도.
+- 작성 실패 → 무료 Gemini 모델 순차 폴백(gemini-3.5-flash → 3.1-flash-lite → 2.5-flash → 2.5-flash-lite → 3.5-flash-lite, scripts/economy_text.py, LONDON_WRITER_MODEL=auto_free) + 전체 재시도 3회(시도당 1200초, scripts/retry_run.py). daily-network-publish에 GEMINI_API_KEY 전달 누락을 수정해 적용. 유료 GPT는 자동 사용 안 함.
 - 예약시각 초과 글(future overdue)은 guardian이 자동 발행(GUARDIAN_FIX=1, 예약 실행).
 - 공개 전환 승인·삭제·비공개 전환은 자동화하지 않음.
 

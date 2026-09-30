@@ -101,6 +101,8 @@ jobs:
           OPENAI_ENABLED: "false"
           OPENAI_MODEL: "gpt-5-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LONDON_WRITER_MODEL: "auto_free"   # 무료 Gemini 모델 순차 폴백 (scripts/economy_text.py)
           CLAUDE_ENABLED: "false"
           GEMINI_EDITOR_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
@@ -140,7 +142,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          python scripts/autopost_current.py 2>&1 | tee "artifacts/${{ matrix.site }}.log"
+          python scripts/retry_run.py --attempts 3 --timeout 1200 -- python scripts/autopost_current.py 2>&1 | tee "artifacts/${{ matrix.site }}.log"
       - name: Save result
         if: ${{ always() && (inputs.target_site_url == '' || inputs.target_site_url == format('https://{0}', matrix.site)) }}
         uses: actions/upload-artifact@v4
