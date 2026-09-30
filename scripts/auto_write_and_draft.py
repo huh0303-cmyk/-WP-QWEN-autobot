@@ -159,6 +159,8 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
     import economy_text
     economy_text.begin_article()
     # If a model returns malformed or thin copy, move to the next free model.
+    last_candidate: dict | None = None
+    last_provider = ""
     for attempt, provider in enumerate(("writer-chain", "quality-retry"), start=1):
         prompt = original_prompt(keyword=keyword, site_theme=site_theme, language=language,
                                   persona=persona, tone=tone, target_chars=target_chars,
@@ -171,17 +173,74 @@ def _write_article(*, keyword: str, site_theme: str, language: str, persona: str
             ymyl = any(w in keyword.lower() for w in ("visa", "immigration", "insurance", "medical", "hospital", "treatment", "비자", "보험", "의료"))
             candidate = normalize_rewrite_format(candidate, target_chars=target_chars, source_url="", ymyl=ymyl)
             candidate = _finish_meta_description(candidate, keyword=keyword)
-            score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language)
+            score, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars, language=language,
+                                                   min_chars=min_chars, max_chars=max_chars)
             print(json.dumps({"attempt": attempt, "provider": provider, "score": score, "failures": failures}, ensure_ascii=False))
             critical = [f for f in failures if f.startswith(("body length", "meta description must", "meta description is incomplete", "language mismatch"))]
             if score >= 70 and not critical:
                 return candidate, score, failures, provider
+            last_candidate, last_provider = candidate, provider
         except Exception as exc:
             failures = [f"invalid output: {exc}"]
             print(json.dumps({"attempt": attempt, "provider": provider, "score": 0, "failures": failures}, ensure_ascii=False))
             if "WRITERS_EXHAUSTED" in str(exc):
                 break
+    # 본문이 짧아서만 막힌 글은 처음부터 다시 쓰지 말고 '늘려 쓰기'로 구제한다(최대 2회).
+    if last_candidate is not None:
+        expanded = _expand_short_article(last_candidate, keyword=keyword, language=language,
+                                         target_chars=target_chars, provider=last_provider,
+                                         min_chars=min_chars, max_chars=max_chars)
+        if expanded is not None:
+            return expanded
     return None, 0, failures, ""
+
+
+def _expand_short_article(candidate: dict, *, keyword: str, language: str, target_chars: int,
+                          provider: str, tries: int = 2, min_chars: int | None = None,
+                          max_chars: int | None = None):
+    """body length 미달 글을 같은 제목·구조 위에 섹션을 추가해 늘린다. 통과하면
+    (article, score, failures, provider) 반환, 아니면 None."""
+    import economy_text
+    _, failures = original_quality_score(candidate, keyword=keyword, target_chars=target_chars,
+                                         language=language, min_chars=min_chars, max_chars=max_chars)
+    other = [f for f in failures if f.startswith(("language mismatch", "title "))]
+    if other or not any(f.startswith("body length") for f in failures):
+        return None
+    for n in range(1, tries + 1):
+        body_chars = len(re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", str(candidate.get("content_html", "")))))
+        minimum = min_chars or max(1000, int(target_chars * 0.78))
+        if body_chars >= minimum:
+            break
+        need = minimum - body_chars
+        prompt = (
+            f"The article below is too short: it has {body_chars} visible non-whitespace characters but needs "
+            f"at least {minimum} and at most {max_chars or int(target_chars * 1.2)}. Add about {int(need * 1.25)} more characters "
+            f"of genuinely useful content in {language}: add 1-2 new H2 sections or deepen thin sections with concrete, "
+            f"practical, verifiable detail. Do not repeat existing sentences, do not invent statistics, sources or links, "
+            f"keep the existing title, tone and every existing section. Return JSON only with the same keys "
+            f"(title, meta_description, content_html, image_queries, labels) and the FULL expanded content_html.\n\n"
+            f"Keyword: {keyword}\n"
+            f"CURRENT JSON:\n{json.dumps(candidate, ensure_ascii=False)}"
+        )
+        try:
+            economy_text.begin_article()  # 새 호출에서는 모든 엔진을 다시 사용할 수 있게 초기화
+            raw = economy_text.generate_text(prompt, temperature=0.6)
+            grown = parse_rewrite_json(raw)
+            grown = normalize_rewrite_format(grown, target_chars=target_chars, source_url="", ymyl=False)
+            grown = _finish_meta_description(grown, keyword=keyword)
+            score, f2 = original_quality_score(grown, keyword=keyword, target_chars=target_chars, language=language,
+                                                min_chars=min_chars, max_chars=max_chars)
+            print(json.dumps({"attempt": f"expand-{n}", "provider": economy_text.last_writer_model,
+                              "score": score, "failures": f2}, ensure_ascii=False))
+            crit = [f for f in f2 if f.startswith(("body length", "meta description must",
+                                                   "meta description is incomplete", "language mismatch"))]
+            if score >= 70 and not crit:
+                return grown, score, f2, economy_text.last_writer_model + "+expanded"
+            candidate = grown
+        except Exception as exc:  # noqa: BLE001
+            print(json.dumps({"attempt": f"expand-{n}", "score": 0, "failures": [f"invalid output: {exc}"]},
+                             ensure_ascii=False))
+    return None
 
 
 def _publish_wordpress(*, site_url: str, secret_name: str, article: dict, image_url: str, keyword: str) -> dict:

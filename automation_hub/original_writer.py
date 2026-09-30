@@ -54,7 +54,8 @@ For visa, insurance, or medical/health topics (YMYL), within the first three par
 
 
 def original_quality_score(article: dict[str, Any], *, keyword: str, target_chars: int,
-                           language: str = "") -> tuple[int, list[str]]:
+                           language: str = "", min_chars: int | None = None,
+                           max_chars: int | None = None) -> tuple[int, list[str]]:
     """Pre-publication score for an original (non-rewrite) article. No
     source-similarity check applies since there is no source to compare to."""
     title = str(article.get("title", "")).strip()
@@ -79,8 +80,9 @@ def original_quality_score(article: dict[str, Any], *, keyword: str, target_char
         failures.append("TITLE_QUALITY_FAIL: mass-produced AI title formula is forbidden")
 
     body_chars = len(re.sub(r"\s+", "", text))
-    minimum = max(1000, int(target_chars * 0.78))
-    maximum = int(target_chars * 1.35)
+    # 플랫폼별 기준(min/max)이 명시되면 그대로 사용. 없으면 기존 target 비율 규칙.
+    minimum = min_chars if min_chars else max(1000, int(target_chars * 0.78))
+    maximum = max_chars if max_chars else int(target_chars * 1.35)
     if minimum <= body_chars <= maximum:
         score += 20
     else:

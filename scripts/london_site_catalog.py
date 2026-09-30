@@ -82,8 +82,13 @@ def manual_profile(site_id: str) -> tuple[str, dict]:
     site = next((item for item in content_sites() if item["site_id"] == site_id and item["enabled"]), None)
     if not site or site["platform"] not in {"naver", "tistory"}:
         raise ValueError("manual publishing site is unavailable")
+    import json as _json
+    from pathlib import Path as _Path
+    policy = _json.loads((_Path(__file__).resolve().parents[1] / "config" / "platform_length_policy.json")
+                         .read_text(encoding="utf-8"))["platforms"][site["platform"]]
     settings = {"url": site["url"], "theme": site["theme"], "persona": site["persona"],
-                "tone": site["tone"], "min_chars": 1400, "target_chars": 2000,
-                "max_chars": 3000, "editorial_funnel": {}}
+                "tone": site["tone"], "min_chars": policy["min_chars"],
+                "target_chars": policy["target_chars"], "max_chars": policy["max_chars"],
+                "editorial_funnel": {}}
     return site["platform"], {"language": site["language"], "wordpress": settings,
                               "manual_destination": site["url"]}

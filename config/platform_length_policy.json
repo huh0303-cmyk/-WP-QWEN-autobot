@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "unit": "visible non-whitespace characters of the article body (HTML tags, spaces, title, labels, meta excluded)",
+  "note": "플랫폼별 본문 길이 기준. 글쓰기 품질 게이트와 프롬프트가 이 값을 따른다. WordPress/Blogger는 사이트별 content_engine_profiles.json 값을 우선 사용하고, 아래 값은 Naver/Tistory(수동·n8n 경로)의 기본값이다. 값 조정은 이 파일만 고치면 된다.",
+  "platforms": {
+    "naver":   {"min_chars": 1200, "target_chars": 1800, "max_chars": 2600, "basis": "naver_homefeed_automation.json quality_gate.minimum_body_chars=1200"},
+    "tistory": {"min_chars": 1800, "target_chars": 2400, "max_chars": 3400, "basis": "검색·애드센스형 블로그: 정보형 장문"},
+    "wordpress": {"min_chars": 1800, "target_chars": 2400, "max_chars": 3200, "basis": "content_engine_profiles.json 30개 사이트 공통값(사이트별 값 우선)"},
+    "blogger": {"min_chars": 1260, "target_chars": 1680, "max_chars": 2304, "basis": "content_engine_profiles.json blogspot 30개 사이트 공통값(사이트별 값 우선)"}
+  }
+}
