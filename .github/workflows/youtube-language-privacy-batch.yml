@@ -1,0 +1,39 @@
+name: Verify language video privacy batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      videos:
+        description: Comma-separated language:videoId map to make private
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  set-private:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: youtube-channels
+    env:
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check google-api-python-client google-auth pillow edge-tts
+      - name: Make only the verified old videos private
+        run: python scripts/set_language_video_privacy.py --videos "${{ inputs.videos }}"

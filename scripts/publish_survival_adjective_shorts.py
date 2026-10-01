@@ -6,6 +6,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import time
 from pathlib import Path
 
 from google.oauth2.credentials import Credentials
@@ -70,7 +71,16 @@ def make_old_video_private(service, video_id: str, expected_channel_id: str) -> 
     }
     body_status["privacyStatus"] = "private"
     service.videos().update(part="status", body={"id": video_id, "status": body_status}).execute()
-    verified_video(service, video_id, expected_channel_id, "private")
+    last_error = None
+    for _ in range(8):
+        try:
+            verified_video(service, video_id, expected_channel_id, "private")
+            break
+        except RuntimeError as exc:
+            last_error = exc
+            time.sleep(2)
+    else:
+        raise RuntimeError(f"Old video privacy did not converge to private: {last_error}")
     return {"video_id": video_id, "privacy_status": "private"}
 
 
