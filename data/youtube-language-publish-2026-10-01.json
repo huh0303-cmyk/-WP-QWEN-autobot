@@ -1,21 +1,23 @@
 {
   "task_id": "youtube-daily-adjective-shorts-20261001",
-  "workflow_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36809717343",
+  "workflow_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36811689202",
+  "privacy_cleanup_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36812064056",
   "date_kst": "2026-10-01",
   "pair_id": "long-short",
-  "format": "1080x1920; 36.42 seconds; each target word pronounced 8 times",
+  "format": "1080x1920; 28.43 seconds; word A pronounced exactly 5 times with pauses, then word B pronounced exactly 5 times with pauses",
   "privacy_status": "public",
   "public_oembed_verified": true,
+  "replaced_videos_oembed_not_public": true,
   "items": [
-    {"language":"ko","channel_id":"UCdA24IuR-JE7qButWv5jLqA","video_id":"gaH6FYcdYRM","url":"https://www.youtube.com/shorts/gaH6FYcdYRM","title":"길다 (gil-da) vs 짧다 (jjal-tta) | long vs short #Shorts","author":"서울국제대학-TOPIK센터","corrected_from_video_id":"hv9rG0AWZC0","old_video_privacy_status":"private"},
-    {"language":"en","channel_id":"UCrjkKWMHzAAvpLIFgHnwcWg","video_id":"VLHEXFMBYvw","url":"https://www.youtube.com/shorts/VLHEXFMBYvw","title":"long vs short | Listen & Repeat 6x #Shorts","author":"English Survival"},
-    {"language":"ja","channel_id":"UCOWoNH_d6p45ywQ6W0Z1Jng","video_id":"772g73TngYY","url":"https://www.youtube.com/shorts/772g73TngYY","title":"長い vs 短い | Listen & Repeat 6x #Shorts","author":"Japanese Survival"},
-    {"language":"zh","channel_id":"UCGTd7RhfaUaGGbVRsNPUN6Q","video_id":"qmKPppRsdoc","url":"https://www.youtube.com/shorts/qmKPppRsdoc","title":"长 vs 短 | Listen & Repeat 6x #Shorts","author":"Chinese Survival"},
-    {"language":"vi","channel_id":"UCRZ0uc_bxKDMwz3noBBi9KQ","video_id":"k-j_1cwgAW8","url":"https://www.youtube.com/shorts/k-j_1cwgAW8","title":"dài vs ngắn | Listen & Repeat 6x #Shorts","author":"Vietnamese Survival"},
-    {"language":"es","channel_id":"UC9mvVEdL9Tllkit5v2Qv8UQ","video_id":"Xu0qrGV4V3E","url":"https://www.youtube.com/shorts/Xu0qrGV4V3E","title":"largo vs corto | Listen & Repeat 6x #Shorts","author":"Spanish Survival"},
-    {"language":"fr","channel_id":"UCmt8f9yUT6iTxBys8eH4-Cg","video_id":"kLIxEDdx2qQ","url":"https://www.youtube.com/shorts/kLIxEDdx2qQ","title":"long vs court | Listen & Repeat 6x #Shorts","author":"French Survival"},
-    {"language":"de","channel_id":"UCKF98zgzm7YRWlyMaoJJKIQ","video_id":"XSn8OisSPcU","url":"https://www.youtube.com/shorts/XSn8OisSPcU","title":"lang vs kurz | Listen & Repeat 6x #Shorts","author":"German Survival"},
-    {"language":"it","channel_id":"UCK8B-BM09Cz-ockaQYLL5LA","video_id":"vsM_hOIxPhM","url":"https://www.youtube.com/shorts/vsM_hOIxPhM","title":"lungo vs corto | Listen & Repeat 6x #Shorts","author":"Italian Survival"},
-    {"language":"pt","channel_id":"UCKvKhETLGPaRV3qfWv2bM2g","video_id":"WbSn-_9iZ5E","url":"https://www.youtube.com/shorts/WbSn-_9iZ5E","title":"longo vs curto | Listen & Repeat 6x #Shorts","author":"Portuguese Survival"}
+    {"language":"ko","channel_id":"UCdA24IuR-JE7qButWv5jLqA","video_id":"FO3Tr7QfLyY","url":"https://www.youtube.com/shorts/FO3Tr7QfLyY","title":"길다 (gil-da) vs 짧다 (jjal-tta) | long vs short #Shorts","author":"서울국제대학-TOPIK센터","corrected_from_video_id":"gaH6FYcdYRM","old_video_privacy_status":"private"},
+    {"language":"en","channel_id":"UCrjkKWMHzAAvpLIFgHnwcWg","video_id":"d007ZHmzKU8","url":"https://www.youtube.com/shorts/d007ZHmzKU8","title":"long vs short | Listen & Repeat 5x #Shorts","author":"English Survival","corrected_from_video_id":"VLHEXFMBYvw","old_video_privacy_status":"private"},
+    {"language":"ja","channel_id":"UCOWoNH_d6p45ywQ6W0Z1Jng","video_id":"MpHhKDtoGiw","url":"https://www.youtube.com/shorts/MpHhKDtoGiw","title":"長い (na-ga-i) vs 短い (mi-ji-ka-i) | long vs short #Shorts","author":"Japanese Survival","corrected_from_video_id":"772g73TngYY","old_video_privacy_status":"private"},
+    {"language":"zh","channel_id":"UCGTd7RhfaUaGGbVRsNPUN6Q","video_id":"ymB1tMsFi-g","url":"https://www.youtube.com/shorts/ymB1tMsFi-g","title":"长 (cháng) vs 短 (duǎn) | long vs short #Shorts","author":"Chinese Survival","corrected_from_video_id":"qmKPppRsdoc","old_video_privacy_status":"private"},
+    {"language":"vi","channel_id":"UCRZ0uc_bxKDMwz3noBBi9KQ","video_id":"fVFE4c_ZWMI","url":"https://www.youtube.com/shorts/fVFE4c_ZWMI","title":"dài vs ngắn | Listen & Repeat 5x #Shorts","author":"Vietnamese Survival","corrected_from_video_id":"k-j_1cwgAW8","old_video_privacy_status":"private"},
+    {"language":"es","channel_id":"UC9mvVEdL9Tllkit5v2Qv8UQ","video_id":"cu-sEm4-7SQ","url":"https://www.youtube.com/shorts/cu-sEm4-7SQ","title":"largo vs corto | Listen & Repeat 5x #Shorts","author":"Spanish Survival","corrected_from_video_id":"Xu0qrGV4V3E","old_video_privacy_status":"private"},
+    {"language":"fr","channel_id":"UCmt8f9yUT6iTxBys8eH4-Cg","video_id":"CwqrMe7gLns","url":"https://www.youtube.com/shorts/CwqrMe7gLns","title":"long vs court | Listen & Repeat 5x #Shorts","author":"French Survival","corrected_from_video_id":"kLIxEDdx2qQ","old_video_privacy_status":"private"},
+    {"language":"de","channel_id":"UCKF98zgzm7YRWlyMaoJJKIQ","video_id":"SBrFPau3ZZ4","url":"https://www.youtube.com/shorts/SBrFPau3ZZ4","title":"lang vs kurz | Listen & Repeat 5x #Shorts","author":"German Survival","corrected_from_video_id":"XSn8OisSPcU","old_video_privacy_status":"private"},
+    {"language":"it","channel_id":"UCK8B-BM09Cz-ockaQYLL5LA","video_id":"uHoaHu2Jqmc","url":"https://www.youtube.com/shorts/uHoaHu2Jqmc","title":"lungo vs corto | Listen & Repeat 5x #Shorts","author":"Italian Survival","corrected_from_video_id":"vsM_hOIxPhM","old_video_privacy_status":"private"},
+    {"language":"pt","channel_id":"UCKvKhETLGPaRV3qfWv2bM2g","video_id":"b3vuT3kAAWA","url":"https://www.youtube.com/shorts/b3vuT3kAAWA","title":"longo vs curto | Listen & Repeat 5x #Shorts","author":"Portuguese Survival","corrected_from_video_id":"WbSn-_9iZ5E","old_video_privacy_status":"private"}
   ]
 }
