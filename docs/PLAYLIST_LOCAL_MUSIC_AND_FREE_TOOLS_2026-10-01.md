@@ -54,6 +54,24 @@ manifest must not be committed with local filenames or rights evidence.
 `healing` retains its nature-sound pipeline and `mbb` its approved classical
 recordings; neither silently selects Suno tracks by title.
 
+## Suno cafe-instrumental batch created on 2026-10-01
+
+Twelve new V6 instrumentals were created in the owner's paid Suno workspace for
+the Starbucks playlist channel. They used an empty lyrics field and explicit
+instrumental/no-vocal prompts:
+
+- Midnight Cafe Window: `9f8a7d8a-ac33-4bc3-83a1-c86501e54c65`, `2351e16b-51b2-430a-a4ac-269a402ffc92`
+- Morning Bossa Table: `2a48b4f8-03e8-42e9-9e1a-5e3c594dbb40`, `0d761339-55e8-402d-b3a0-738eeab7d4ce`
+- Rainy Afternoon Piano: `b2afe38b-8b07-4654-bc14-aecd81b5ff9e`, `42fdf7d9-e2ec-4af5-a926-25486c6a53ca`
+- Vibraphone Coffee Break: `8c1b0944-ba22-4bde-a005-e476e9675770`, `e7dc9401-b5fe-45c7-97e6-8e0a47f46b0e`
+- Quiet Lobby Keys: `71ec2efb-489a-4ef4-9eed-e272c47afb30`, `3598089c-6c07-403f-94d2-809c7b69a5d9`
+- Golden Hour Cafe Guitar: `06b30fed-b12c-4575-ad4e-30ae5bbedd61`, `16398899-456f-4b23-919d-a45ff3c82c9d`
+
+Suno then displayed `Out of Downloads`, zero downloads remaining, and a
+2026-10-05 refresh date. None of these twelve tracks has been copied to the VPS
+or used in a YouTube upload. The Starbucks worker now fails closed instead of
+falling back to the unreviewed mixed-vocal Drive bank.
+
 ## Current free composition options
 
 | Service | Current free route | Fit for this long-form pipeline |
@@ -92,4 +110,6 @@ xAI https://docs.x.ai/grok/overview .
    then render and verify exact channel/public video receipts. The thumbnail
    must not be a generic copy or obscure its subject.
 
-No new music or video was published by this audit.
+The later execution batch publishes only after separate channel identity and
+public receipt verification; creation or inventory alone is not a publication
+receipt.
