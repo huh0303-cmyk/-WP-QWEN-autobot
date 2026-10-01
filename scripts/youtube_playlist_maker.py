@@ -315,7 +315,7 @@ def build_fresh_healing(_service, _theme, output_path):
 
 def select_music(service, folder_id, exts, mime_prefix):
     source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
-    if source == "owner_local" and base.CHANNEL_KEY in {"globalmusic", "kpop"}:
+    if source == "owner_local" and base.CHANNEL_KEY in {"globalmusic", "kpop", "starbucks"}:
         from playlist_owner_library import select_owner_tracks
         root = Path(os.environ.get("PLAYLIST_OWNER_AUDIO_ROOT",
                                    "/opt/korea365/data/playlist-owner-music/audio"))
