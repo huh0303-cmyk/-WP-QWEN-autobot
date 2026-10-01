@@ -19,7 +19,7 @@
 | `108767753086893855106` | K-KIDS | Health_Clinic_Japan | **저장·목록 반영 확인** |
 | `117587630465805532297` | K-RELAX | NASA_XFILES | **저장·목록 반영 확인** |
 | `113384771035218611829` | K-health 365 | Portuguese Survival | **저장·목록 반영 확인** |
-| `112975172469027628086` | K-pop Studio | INVENTION_STORY1 | 대기 |
+| `112975172469027628086` | K-pop Studio | INVENTION_STORY1 | **프로필 저장 확인** |
 | `100198972855437260214` | Mozart-Bach-Beethoven | CAFE_MOZART | 대기 |
 | `100419392102201693624` | RETRO_REELS_TIMES | RETRO_USA1 | 대기 |
 | `101090753941969226396` | SILENT_ERA_TIMES | SILENT_ERA_FILM | 대기 |
@@ -36,3 +36,5 @@ Google은 브랜드별 이름 편집 진입 때 `huh0303@gmail.com`의 본인 �
 사용자가 별도로 찾은 `huh0303@gmail.com`의 개인 Google 계정은 Google 브랜드 계정 22개 목록에 들어가지 않는다. 2026-10-01 로그인된 YouTube의 **계정 전환** 목록에서 머리글 `CHRIS JUNGYOON HUH / huh0303@gmail.com` 아래 `Japanese Survival @seoul_japanese1`을 확인하고 이를 직접 선택했다. 계정 메뉴의 Google 계정 링크에는 브랜드 계정용 `/b/<brand_id>` 경로가 없고, YouTube 고급 설정은 이를 기본 채널로 표시한다. 현재 채널 ID는 `UCOWoNH_d6p45ywQ6W0Z1Jng`이며 별도 `CHRIS JUNGYOON HUH` 채널은 현재 23개 전환 목록에서 보이지 않는다. **이는 현재 연결 상태이며, 사용자가 기억하는 비행기 사진의 과거 개인 채널과 동일한지 확정하는 증거는 아니다.** 유료 멤버십 화면은 Japanese 채널과 브랜드 CAFE HEALING 양쪽 선택에서 동일하게 표시돼 특정 채널 소유의 증거가 아니다.
 
 사용자는 현재 Japanese Survival을 개인 Google 계정에서 분리하고 개인 채널을 되찾기를 요청했다. 실제 YouTube `계정 > 채널 이전` 화면은 이 채널의 구독자 22명, 영상 116개, 재생목록 13개를 표시한다. 이전 후보로 나열된 기존 22개 브랜드 계정은 **모두 이미 YouTube 채널이 있고 `교체`만 제공**한다. 기존 프로젝트 채널을 교체하면 그 대상의 영상·목록 등이 삭제될 위험이 있으므로 선택하지 않는다. 권장 후보는 `huh0303@gmail.com` 아래 **새로운 빈 Japanese Survival 브랜드 계정**을 만든 뒤 현재 채널을 이전하는 방식이다. 그러면 현재 Japanese 채널의 UC ID·영상은 유지할 수 있지만 개인 Google 계정에 새로 만들 개인 YouTube 채널의 UC ID와 채널 기록은 새것이 된다. YouTube 공식 이전 안내는 대상 채널의 영구 삭제와 일부 기록 손실을 경고한다: https://support.google.com/youtube/answer/3056283?hl=ko. 과거 개인 채널의 정확한 URL/UC ID는 아직 찾지 못했다. 기존 채널 이전·새 개인 채널 생성은 사용자의 선택과 실제 이전 전 최종 확인까지 보류한다. `@sis_languagecenter` 직접 방문은 404였고 소유·ID도 확인되지 않아 후보로 쓰지 않는다.
+
+후속으로 브랜드 ID `112975172469027628086`의 Google 이름 편집에서 `INVENTION_STORY1`을 저장했고, 같은 브랜드 ID의 이름 페이지에서 새 값을 확인했다. 변경 완료 14개, 원래 일치 3개, 대기 5개. `CAFE_MOZART` 이름 편집은 Google 본인 확인 중이라 저장 여부가 확인되지 않았다.

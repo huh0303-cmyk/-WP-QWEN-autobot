@@ -129,7 +129,9 @@
     "invention": {
       "channel_id": "UCgNj-yS93A_fOHXXvG49fww",
       "display_name": "INVENTION_STORY1",
-      "oauth_brand_name": "K-pop Studio",
+      "oauth_brand_name": "INVENTION_STORY1",
+      "prior_oauth_brand_name": "K-pop Studio",
+      "brand_profile_name_verified": "live_google_brand_profile_2026-10-01",
       "google_brand_id": "112975172469027628086",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
