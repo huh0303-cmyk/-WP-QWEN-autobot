@@ -182,9 +182,9 @@ def make_card(path: Path, profile: LanguageProfile, word: str, reading: str, mea
         centered(draw, reading, 950, font(62, True), profile.accent)
         centered(draw, f"MEANING  {meaning.upper()}", 1115, font(48, True), (220, 226, 238))
         if count is not None:
-            centered(draw, f"{count} / 6", 1335, font(54, True), (220, 226, 238))
-            x0, gap = 330, 84
-            for index in range(6):
+            centered(draw, f"{count} / 5", 1335, font(54, True), (220, 226, 238))
+            x0, gap = 372, 84
+            for index in range(5):
                 fill = profile.accent if index < count else (57, 67, 88)
                 draw.ellipse((x0 + index * gap, 1465, x0 + index * gap + 42, 1507), fill=fill)
     draw.text((84, 1765), "Hear it. Pause. Say it out loud.", font=font(34), fill=(186, 195, 211))
@@ -262,11 +262,8 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     await synthesize(words[0], profile, raw_a)
     await synthesize(words[1], profile, raw_b)
     a_audio, b_audio = workdir / "word_a.m4a", workdir / "word_b.m4a"
-    make_fixed_audio(raw_a, a_audio, 2.1)
-    make_fixed_audio(raw_b, b_audio, 2.1)
-    a_final, b_final = workdir / "word_a_final.m4a", workdir / "word_b_final.m4a"
-    make_fixed_audio(raw_a, a_final, 1.7)
-    make_fixed_audio(raw_b, b_final, 1.7)
+    make_fixed_audio(raw_a, a_audio, 2.4)
+    make_fixed_audio(raw_b, b_audio, 2.4)
     intro_audio, divider_audio, outro_audio = workdir / "intro.m4a", workdir / "divider.m4a", workdir / "outro.m4a"
     make_silence(intro_audio, 1.8)
     make_silence(divider_audio, 1.0)
@@ -279,20 +276,15 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     make_card(divider, profile, words[0], "", "", None, counterpart=words[1], mode="contrast")
     make_card(outro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="outro")
     timeline: list[tuple[Path, Path, float]] = [(intro, intro_audio, 1.8)]
-    for index in range(1, 7):
+    for index in range(1, 6):
         card = workdir / f"a_{index}.png"
         make_card(card, profile, words[0], readings[0], meanings[0], index)
-        timeline.append((card, a_audio, 2.1))
+        timeline.append((card, a_audio, 2.4))
     timeline.append((divider, divider_audio, 1.0))
-    for index in range(1, 7):
+    for index in range(1, 6):
         card = workdir / f"b_{index}.png"
         make_card(card, profile, words[1], readings[1], meanings[1], index)
-        timeline.append((card, b_audio, 2.1))
-    for index, (word, audio_file) in enumerate(((words[0], a_final), (words[1], b_final), (words[0], a_final), (words[1], b_final)), 1):
-        card = workdir / f"final_{index}.png"
-        counterpart = words[1] if word == words[0] else words[0]
-        make_card(card, profile, word, "", "", None, counterpart=counterpart, mode="contrast")
-        timeline.append((card, audio_file, 1.7))
+        timeline.append((card, b_audio, 2.4))
     timeline.append((outro, outro_audio, 1.6))
 
     output = destination / f"{target_date.isoformat()}_{code}_{pair['id']}.mp4"
@@ -303,7 +295,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     if code in {"ko", "ja", "zh"}:
         title = f"{words[0]} ({readings[0]}) vs {words[1]} ({readings[1]}) | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
     else:
-        title = f"{words[0]} vs {words[1]} | Listen & Repeat 6x #Shorts"
+        title = f"{words[0]} vs {words[1]} | Listen & Repeat 5x #Shorts"
     manifest = {
         "date": target_date.isoformat(),
         "language_code": code,
@@ -316,7 +308,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "voice": profile.voice,
         "voice_locale": profile.locale,
         "synthetic_voice_disclosure": "native-locale neural voice; not a recorded human speaker",
-        "repeat_each_word": 8,
+        "repeat_each_word": 5,
         "channel_id": channel["channel_id"],
         "series_name": channel["series_name"],
         "video_path": str(output.resolve()),

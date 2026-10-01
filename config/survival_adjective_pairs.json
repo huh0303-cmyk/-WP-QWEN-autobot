@@ -1,7 +1,7 @@
 {
   "version": 1,
   "format": "one_antonym_pair_per_daily_short",
-  "repeat_each_word_minimum": 6,
+  "repeat_each_word_minimum": 5,
   "review_cycle_days": 30,
   "pairs": [
     {

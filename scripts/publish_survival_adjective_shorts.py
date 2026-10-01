@@ -132,6 +132,7 @@ def main() -> int:
     parser.add_argument("--languages", default="all")
     parser.add_argument("--privacy", choices=("public", "private", "unlisted"), default="public")
     parser.add_argument("--replace-video-id", help="With exactly one language, make this old video private after the corrected upload is public")
+    parser.add_argument("--replace-video-ids", help="Comma-separated language:oldVideoId map for a corrected batch")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT))
     args = parser.parse_args()
     root = Path(args.output_root).resolve() / args.date
@@ -139,15 +140,24 @@ def main() -> int:
     codes = batch["completed_languages"] if args.languages == "all" else [v.strip() for v in args.languages.split(",") if v.strip()]
     if args.replace_video_id and len(codes) != 1:
         raise RuntimeError("--replace-video-id requires exactly one language")
+    replace_map = {}
+    if args.replace_video_ids:
+        for item in args.replace_video_ids.split(","):
+            code, separator, video_id = item.strip().partition(":")
+            if not separator or code not in codes or not video_id:
+                raise RuntimeError(f"Invalid replacement mapping: {item}")
+            replace_map[code] = video_id
+    if args.replace_video_id:
+        replace_map[codes[0]] = args.replace_video_id
     receipts = []
     for code in codes:
         print(f"PUBLISH {code}", flush=True)
         receipts.append(publish_one(root / code / "manifest.json", args.privacy))
-    if args.replace_video_id:
-        code = codes[0]
+    for code, old_video_id in replace_map.items():
         service = youtube_service(code)
         expected_channel = json.loads((root / code / "manifest.json").read_text(encoding="utf-8"))["channel_id"]
-        receipts[0]["replaced_old_video"] = make_old_video_private(service, args.replace_video_id, expected_channel)
+        receipt = next(row for row in receipts if row["language_code"] == code)
+        receipt["replaced_old_video"] = make_old_video_private(service, old_video_id, expected_channel)
     summary = {"date": args.date, "privacy": args.privacy, "count": len(receipts), "receipts": receipts}
     (root / "publication_batch_receipt.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False))

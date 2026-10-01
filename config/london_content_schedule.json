@@ -121,7 +121,7 @@
       "public_requires_write_auth": true,
       "missing_channel_ids": [],
       "daily_content_format": "one antonym adjective pair per Short",
-      "pronunciation_repetitions_per_word": 8,
+      "pronunciation_repetitions_per_word": 5,
       "voice_policy": "dedicated native-locale neural voice; block production if the configured language voice fails",
       "generator": "scripts/survival_adjective_short.py",
       "pair_catalog": "config/survival_adjective_pairs.json"

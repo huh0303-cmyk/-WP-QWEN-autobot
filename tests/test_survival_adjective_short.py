@@ -16,7 +16,7 @@ def test_all_ten_languages_have_exact_unique_channels_and_native_locale_voices()
 
 def test_catalog_has_a_full_month_of_localized_pairs():
     catalog = json.loads(Path(PAIR_PATH).read_text(encoding="utf-8"))
-    assert catalog["repeat_each_word_minimum"] >= 5
+    assert catalog["repeat_each_word_minimum"] == 5
     assert len(catalog["pairs"]) >= 30
     for pair in catalog["pairs"]:
         assert set(LANGUAGES).issubset(pair)

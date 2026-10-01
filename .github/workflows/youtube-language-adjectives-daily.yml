@@ -27,6 +27,10 @@ on:
         description: Optional old video ID to make private after one corrected upload is verified public
         required: false
         type: string
+      replace_video_ids:
+        description: Optional comma-separated language:oldVideoId map, applied only after corrected uploads are public
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -79,9 +83,11 @@ jobs:
         if: ${{ github.event_name == 'schedule' || inputs.publish }}
         env:
           REPLACE_VIDEO_ID: ${{ inputs.replace_video_id }}
+          REPLACE_VIDEO_IDS: ${{ inputs.replace_video_ids }}
         run: |
           ARGS=(--date "${{ steps.build.outputs.target_date }}" --languages "${{ steps.build.outputs.languages }}" --privacy public)
           if [ -n "${REPLACE_VIDEO_ID:-}" ]; then ARGS+=(--replace-video-id "$REPLACE_VIDEO_ID"); fi
+          if [ -n "${REPLACE_VIDEO_IDS:-}" ]; then ARGS+=(--replace-video-ids "$REPLACE_VIDEO_IDS"); fi
           python scripts/publish_survival_adjective_shorts.py "${ARGS[@]}"
       - name: Preserve manifests and publication receipts
         if: always()
