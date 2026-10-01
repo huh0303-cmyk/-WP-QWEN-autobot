@@ -67,6 +67,10 @@ instrumental/no-vocal prompts:
 - Quiet Lobby Keys: `71ec2efb-489a-4ef4-9eed-e272c47afb30`, `3598089c-6c07-403f-94d2-809c7b69a5d9`
 - Golden Hour Cafe Guitar: `06b30fed-b12c-4575-ad4e-30ae5bbedd61`, `16398899-456f-4b23-919d-a45ff3c82c9d`
 
+The twelve completed durations total about 39 minutes. Combined after download
+with the five distinct reviewed desktop cafe instrumentals (excluding the WAV
+duplicate), the approved Starbucks pool should be about 53.6 minutes.
+
 Suno then displayed `Out of Downloads`, zero downloads remaining, and a
 2026-10-05 refresh date. None of these twelve tracks has been copied to the VPS
 or used in a YouTube upload. The Starbucks worker now fails closed instead of
