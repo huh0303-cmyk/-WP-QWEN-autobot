@@ -328,6 +328,8 @@ async def async_main(args: argparse.Namespace) -> int:
     for code in codes:
         print(f"BUILD {code}: {pair[code][0]} / {pair[code][1]} ({LANGUAGES[code].voice})", flush=True)
         manifests.append(await build_language(target_date, pair, code, registry[code], output_root))
+        if not args.keep_work:
+            shutil.rmtree(output_root / target_date.isoformat() / code / "work", ignore_errors=True)
     batch = {
         "date": target_date.isoformat(),
         "pair_id": pair["id"],
@@ -349,6 +351,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pair-id")
     parser.add_argument("--languages", default="all", help="all or comma-separated language codes")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT))
+    parser.add_argument("--keep-work", action="store_true", help="Keep intermediate cards and render files for debugging")
     return parser.parse_args()
 
 

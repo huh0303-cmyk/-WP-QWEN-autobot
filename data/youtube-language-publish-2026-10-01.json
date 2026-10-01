@@ -1,0 +1,21 @@
+{
+  "task_id": "youtube-daily-adjective-shorts-20261001",
+  "workflow_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36809717343",
+  "date_kst": "2026-10-01",
+  "pair_id": "long-short",
+  "format": "1080x1920; 36.42 seconds; each target word pronounced 8 times",
+  "privacy_status": "public",
+  "public_oembed_verified": true,
+  "items": [
+    {"language":"ko","channel_id":"UCdA24IuR-JE7qButWv5jLqA","video_id":"hv9rG0AWZC0","url":"https://www.youtube.com/shorts/hv9rG0AWZC0","title":"길다 vs 짧다 | Listen & Repeat 6x #Shorts","author":"서울국제대학-TOPIK센터"},
+    {"language":"en","channel_id":"UCrjkKWMHzAAvpLIFgHnwcWg","video_id":"VLHEXFMBYvw","url":"https://www.youtube.com/shorts/VLHEXFMBYvw","title":"long vs short | Listen & Repeat 6x #Shorts","author":"English Survival"},
+    {"language":"ja","channel_id":"UCOWoNH_d6p45ywQ6W0Z1Jng","video_id":"772g73TngYY","url":"https://www.youtube.com/shorts/772g73TngYY","title":"長い vs 短い | Listen & Repeat 6x #Shorts","author":"Japanese Survival"},
+    {"language":"zh","channel_id":"UCGTd7RhfaUaGGbVRsNPUN6Q","video_id":"qmKPppRsdoc","url":"https://www.youtube.com/shorts/qmKPppRsdoc","title":"长 vs 短 | Listen & Repeat 6x #Shorts","author":"Chinese Survival"},
+    {"language":"vi","channel_id":"UCRZ0uc_bxKDMwz3noBBi9KQ","video_id":"k-j_1cwgAW8","url":"https://www.youtube.com/shorts/k-j_1cwgAW8","title":"dài vs ngắn | Listen & Repeat 6x #Shorts","author":"Vietnamese Survival"},
+    {"language":"es","channel_id":"UC9mvVEdL9Tllkit5v2Qv8UQ","video_id":"Xu0qrGV4V3E","url":"https://www.youtube.com/shorts/Xu0qrGV4V3E","title":"largo vs corto | Listen & Repeat 6x #Shorts","author":"Spanish Survival"},
+    {"language":"fr","channel_id":"UCmt8f9yUT6iTxBys8eH4-Cg","video_id":"kLIxEDdx2qQ","url":"https://www.youtube.com/shorts/kLIxEDdx2qQ","title":"long vs court | Listen & Repeat 6x #Shorts","author":"French Survival"},
+    {"language":"de","channel_id":"UCKF98zgzm7YRWlyMaoJJKIQ","video_id":"XSn8OisSPcU","url":"https://www.youtube.com/shorts/XSn8OisSPcU","title":"lang vs kurz | Listen & Repeat 6x #Shorts","author":"German Survival"},
+    {"language":"it","channel_id":"UCK8B-BM09Cz-ockaQYLL5LA","video_id":"vsM_hOIxPhM","url":"https://www.youtube.com/shorts/vsM_hOIxPhM","title":"lungo vs corto | Listen & Repeat 6x #Shorts","author":"Italian Survival"},
+    {"language":"pt","channel_id":"UCKvKhETLGPaRV3qfWv2bM2g","video_id":"WbSn-_9iZ5E","url":"https://www.youtube.com/shorts/WbSn-_9iZ5E","title":"longo vs curto | Listen & Repeat 6x #Shorts","author":"Portuguese Survival"}
+  ]
+}
