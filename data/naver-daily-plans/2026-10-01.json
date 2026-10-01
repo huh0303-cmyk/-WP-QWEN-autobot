@@ -42,7 +42,7 @@
           "https://psports.kbs.co.kr/"
         ]
       },
-      "status": "RESEARCH_REQUIRED",
+      "status": "DRAFT_SAVED_AWAITING_PUBLIC_CONFIRMATION",
       "measured_search_volume": null,
       "gates": [
         "compare_relative_interest_in_naver_datalab",
@@ -57,7 +57,10 @@
       "trend_candidate_rank": 1,
       "trend_signal": "Naver News sample 17 title anchors plus live event window through 2026-10-04",
       "trend_source_status": "READY_FOR_PRIMARY_SOURCE_RECHECK",
-      "topic_source": "data/naver-trend-brief/2026-10-01.json"
+      "topic_source": "data/naver-trend-brief/2026-10-01.json",
+      "draft_path": "data/naver-drafts/2026-10-01/naver_n3-1.json",
+      "editor_saved_at_kst": "2026-10-01T10:14:00+09:00",
+      "public_url": null
     },
     {
       "job_id": "naver_n1:2026-10-01:1",
