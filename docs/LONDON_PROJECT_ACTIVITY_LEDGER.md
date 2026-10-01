@@ -233,3 +233,11 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 
 ## vps-deploy-deferred-20261001
 - 2026-10-01 KST 04:35, Claude. 증거(GitHub Actions 로그, run 0807a93): Deploy to VPS가 05cdb90부터 8회 연속 실패로 표시됐으나 원인은 오류가 아니라 VPS 배포기의 지연 상태 `waiting_for_video`(영상 작업 중 배포 보류). VPS는 36a46cd(오늘 03:44 KST, 무료 Gemini 키 전달 수정까지 포함)에 머무름. 따라서 2-tries/독립엔진/로컬 Qwen/늘려쓰기/플랫폼 길이 정책은 GitHub Actions 경로에는 적용, VPS 경로(blog.korea365.org 즉시발행 등)에는 영상 작업 종료 후 재배포되어야 적용됨. 배포 트리거는 push/workflow_dispatch뿐이라 자동 재시도 없음 → 영상 종료 후 재트리거 필요.
+
+## 2026-10-02 01:20 KST — Blogger 33 daily audit
+
+- `task_id=blogger33-daily-audit-20261002-0120-kst`; read-only SSH audit on `187.127.121.57`. No GitHub Actions dispatch, retry, or publication was performed.
+- `korea365-blogger33-daily.timer` is enabled and active. The completed `2026-10-01` schedule contains exactly the 33 `ready_for_automation` keys in `config/content_engine_profiles.json`, once each, with 33 unique units and all entries `scheduled`; no missing, extra, or duplicate target/unit.
+- All 33 `2026-10-01` transient services ran once and completed: 28 public posts have journal receipts with public URL and HTTP 200. Five sites were not published: `koreawedding`, `kinsurance365`, `krealestate`, `kfinance365`, and `kstudy365`; each final error was `language mismatch: English output contains Korean text in content`. No OAuth/Blogger API error, `existing` duplicate result, or repeated service was observed. The per-site publication marker guard remains in the deployed publisher: it searches draft/live/scheduled posts for `blogger33-public:<run_key>:<site>` before writing.
+- The shared `blogger-33-public-results.json` is intentionally a latest-invocation artifact and by the audit had already been overwritten by the in-progress `2026-10-02` run (`ktrip365` language-mismatch failure); journals are the complete evidence for Oct. 1. At audit time, Oct. 2 had `kinsurance365` published with HTTP 200 and `ktrip365` failed the same language gate; the other 31 slots were still pending.
+- Next action: repair the English writer/language-gate output, then only selectively retry a failed site after rechecking that day's publication marker and public post. Do not dispatch `publish-blogger-33-now.yml`.
