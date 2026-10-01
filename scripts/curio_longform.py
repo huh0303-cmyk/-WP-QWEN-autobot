@@ -119,7 +119,10 @@ def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
     except ImportError:
         pass
 
-    provider = os.environ.get("AI_TEXT_PROVIDER", "local").strip().lower()
+    provider = os.environ.get("AI_TEXT_PROVIDER", "auto_free").strip().lower()
+    if provider in {"auto_free", "gemini"}:
+        from economy_text import generate_text
+        return generate_text(prompt, temperature=temperature, writer_model="auto_free")
     if provider == "local":
         from local_text import local_generate_text
         return local_generate_text(
