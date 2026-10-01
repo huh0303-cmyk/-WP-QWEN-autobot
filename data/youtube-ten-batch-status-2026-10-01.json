@@ -1,0 +1,89 @@
+{
+  "automation_id": "youtube-10",
+  "checked_at_kst": "2026-10-01T14:27:00+09:00",
+  "batch_date_kst": "2026-10-01",
+  "summary": {
+    "public_completed": 1,
+    "failed_blocked": 9,
+    "pending_or_running": 0,
+    "monitor_continues": true
+  },
+  "items": [
+    {
+      "channel_key": "globalmusic",
+      "job_id": "vps-1790824573-02965068e3",
+      "status": "failed",
+      "reason": "WAITING_FRESH_COMPOSITIONS: owner requires newly composed music; Drive bank reuse is disabled",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819846953"
+    },
+    {
+      "channel_key": "healing",
+      "job_id": "vps-1790824576-a4125f5ae9",
+      "status": "public_completed",
+      "video_id": "SWIHSQ6H9uo",
+      "public_url": "https://www.youtube.com/watch?v=SWIHSQ6H9uo",
+      "privacy_status": "public",
+      "verified_channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
+      "title": "Clear Forest Stream & Birds | 94 Minutes of Refreshing Nature Sounds",
+      "author": "CAFE HEALING",
+      "public_oembed_verified": true,
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819850359"
+    },
+    {
+      "channel_key": "starbucks",
+      "job_id": "vps-1790824578-f6054bc9ae",
+      "status": "failed",
+      "reason": "WAITING_ASSETS: approved Gemini thumbnail export named gemini_* is missing",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819853005"
+    },
+    {
+      "channel_key": "mbb",
+      "job_id": "vps-1790824580-c43dbc04c9",
+      "status": "failed",
+      "reason": "WAITING_ASSETS: approved Gemini thumbnail export named gemini_* is missing",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819855592"
+    },
+    {
+      "channel_key": "kpop",
+      "job_id": "vps-1790824582-46a7d9c7b5",
+      "status": "failed",
+      "reason": "WAITING_FRESH_COMPOSITIONS: owner requires newly composed music; Drive bank reuse is disabled",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819858526"
+    },
+    {
+      "channel_key": "history",
+      "job_id": "vps-1790824586-a446198e77",
+      "status": "failed",
+      "reason": "Visual relevance gate failed: 0/4 clips scored 75+",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819860979"
+    },
+    {
+      "channel_key": "invention",
+      "job_id": "vps-1790824588-88cedae8ca",
+      "status": "failed",
+      "reason": "OpenAI text generation unavailable; Gemini fallback is disabled (LOC search also returned HTTP 403)",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819863753"
+    },
+    {
+      "channel_key": "silent_era",
+      "job_id": "vps-1790824590-2ad8db04cb",
+      "status": "failed",
+      "reason": "Visual relevance gate failed: 0/1 clips scored 75+ (LOC search also returned HTTP 403)",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819866513"
+    },
+    {
+      "channel_key": "retro_reels",
+      "job_id": "vps-1790824592-fe36aba643",
+      "status": "failed",
+      "reason": "Gemini 2.5 Flash free-tier daily request quota exhausted (LOC search also returned HTTP 403)",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819869668"
+    },
+    {
+      "channel_key": "nasa",
+      "job_id": "vps-1790824681-c84ec10999",
+      "status": "failed",
+      "reason": "Gemini 2.5 Flash free-tier daily request quota exhausted",
+      "audit_run": "https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/36819872221"
+    }
+  ]
+}
