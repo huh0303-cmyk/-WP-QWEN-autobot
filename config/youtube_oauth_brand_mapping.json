@@ -6,6 +6,8 @@
       "display_name": "Japanese Survival",
       "oauth_brand_name": "CHRIS JUNGYOON HUH (primary Google account)",
       "google_account": "huh0303@gmail.com",
+      "account_type": "primary_google_account_not_brand",
+      "account_switcher_verified": "live_youtube_account_switcher_and_channel_move_preflight_2026-10-01",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
     },
     "health_japan": {
@@ -55,7 +57,9 @@
     "pt": {
       "channel_id": "UCKvKhETLGPaRV3qfWv2bM2g",
       "display_name": "Portuguese Survival",
-      "oauth_brand_name": "K-health 365",
+      "oauth_brand_name": "Portuguese Survival",
+      "prior_oauth_brand_name": "K-health 365",
+      "brand_profile_name_verified": "live_google_brand_list_2026-10-01",
       "google_brand_id": "113384771035218611829",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -143,7 +147,9 @@
     "nasa": {
       "channel_id": "UCtNLZO07Oh3UnXPI2CjOgNg",
       "display_name": "NASA_XFILES",
-      "oauth_brand_name": "K-RELAX",
+      "oauth_brand_name": "NASA_XFILES",
+      "prior_oauth_brand_name": "K-RELAX",
+      "brand_profile_name_verified": "live_google_brand_list_2026-10-01",
       "google_brand_id": "117587630465805532297",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
@@ -199,10 +205,13 @@
     },
     "healing": {
       "channel_id": "UC7yEsLM-HoXudngrD-4FIqg",
-      "display_name": "힐링카페",
-      "oauth_brand_name": "K-ISSUE",
+      "display_name": "CAFE HEALING",
+      "oauth_brand_name": "CAFE HEALING",
+      "prior_oauth_brand_name": "K-ISSUE",
+      "brand_profile_name_verified": "live_google_brand_list_2026-10-01",
+      "google_brand_id": "117694050183547616927",
       "google_account": "huh0303@gmail.com",
-      "confirmed_by": "owner",
+      "confirmed_by": "owner_and_live_youtube_account_switcher_2026-10-01",
       "reject_brand_names": [
         "K-HEALING"
       ]
