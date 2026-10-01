@@ -42,7 +42,7 @@
           "https://psports.kbs.co.kr/"
         ]
       },
-      "status": "DRAFT_SAVED_AWAITING_PUBLIC_CONFIRMATION",
+      "status": "PUBLISHED_VERIFIED",
       "measured_search_volume": null,
       "gates": [
         "compare_relative_interest_in_naver_datalab",
@@ -60,7 +60,10 @@
       "topic_source": "data/naver-trend-brief/2026-10-01.json",
       "draft_path": "data/naver-drafts/2026-10-01/naver_n3-1.json",
       "editor_saved_at_kst": "2026-10-01T10:14:00+09:00",
-      "public_url": null
+      "published_at_kst": "2026-10-01T10:20:00+09:00",
+      "naver_log_no": "224427975413",
+      "public_url": "https://blog.naver.com/sky-only/224427975413",
+      "naver_search_visible_at_first_check": false
     },
     {
       "job_id": "naver_n1:2026-10-01:1",
