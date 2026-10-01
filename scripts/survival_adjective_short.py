@@ -129,6 +129,23 @@ def centered(draw: ImageDraw.ImageDraw, text: str, y: int, selected_font, fill, 
     draw.text(((WIDTH - (box[2] - box[0])) / 2, y), text, font=current, fill=fill)
 
 
+def pronunciation(pair: dict, code: str, word: str) -> str:
+    overrides = pair.get("pronunciations", {}).get(code)
+    if overrides:
+        return overrides[pair[code].index(word)]
+    if code == "ko":
+        from hangul_romanize import Transliter
+        from hangul_romanize.rule import academic
+        return Transliter(academic).translit(word)
+    if code == "ja":
+        from pykakasi import kakasi
+        return " ".join(item["hepburn"] for item in kakasi().convert(word))
+    if code == "zh":
+        from pypinyin import Style, lazy_pinyin
+        return " ".join(lazy_pinyin(word, style=Style.TONE))
+    return word
+
+
 def card_background(profile: LanguageProfile) -> tuple[Image.Image, ImageDraw.ImageDraw]:
     image = Image.new("RGB", (WIDTH, HEIGHT), (7, 12, 27))
     draw = ImageDraw.Draw(image)
@@ -143,7 +160,7 @@ def card_background(profile: LanguageProfile) -> tuple[Image.Image, ImageDraw.Im
     return image, draw
 
 
-def make_card(path: Path, profile: LanguageProfile, word: str, gloss: str, count: int | None,
+def make_card(path: Path, profile: LanguageProfile, word: str, reading: str, meaning: str, count: int | None,
               counterpart: str = "", mode: str = "repeat") -> None:
     image, draw = card_background(profile)
     if mode == "intro":
@@ -162,13 +179,14 @@ def make_card(path: Path, profile: LanguageProfile, word: str, gloss: str, count
     else:
         centered(draw, "LISTEN, THEN SAY IT", 405, font(48, True), (220, 226, 238))
         centered(draw, word, 650, font(150, True), (255, 255, 255))
-        centered(draw, gloss, 980, font(66, True), profile.accent)
+        centered(draw, reading, 950, font(62, True), profile.accent)
+        centered(draw, f"MEANING  {meaning.upper()}", 1115, font(48, True), (220, 226, 238))
         if count is not None:
-            centered(draw, f"{count} / 6", 1265, font(54, True), (220, 226, 238))
+            centered(draw, f"{count} / 6", 1335, font(54, True), (220, 226, 238))
             x0, gap = 330, 84
             for index in range(6):
                 fill = profile.accent if index < count else (57, 67, 88)
-                draw.ellipse((x0 + index * gap, 1395, x0 + index * gap + 42, 1437), fill=fill)
+                draw.ellipse((x0 + index * gap, 1465, x0 + index * gap + 42, 1507), fill=fill)
     draw.text((84, 1765), "Hear it. Pause. Say it out loud.", font=font(34), fill=(186, 195, 211))
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path, quality=95)
@@ -231,8 +249,9 @@ def build_video(workdir: Path, timeline: list[tuple[Path, Path, float]], output:
 async def build_language(target_date: dt.date, pair: dict, code: str, channel: dict, output_root: Path) -> dict:
     profile = LANGUAGES[code]
     words = pair[code]
-    gloss_code = "en" if code == "ko" else "ko"
-    glosses = pair[gloss_code]
+    meaning_code = "ko" if code == "en" else "en"
+    meanings = pair[meaning_code]
+    readings = [pronunciation(pair, code, word) for word in words]
     destination = output_root / target_date.isoformat() / code
     workdir = destination / "work"
     if workdir.exists():
@@ -256,23 +275,23 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     intro = workdir / "intro.png"
     divider = workdir / "divider.png"
     outro = workdir / "outro.png"
-    make_card(intro, profile, f"{words[0]}  /  {words[1]}", "", None, mode="intro")
-    make_card(divider, profile, words[0], "", None, counterpart=words[1], mode="contrast")
-    make_card(outro, profile, f"{words[0]}  /  {words[1]}", "", None, mode="outro")
+    make_card(intro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="intro")
+    make_card(divider, profile, words[0], "", "", None, counterpart=words[1], mode="contrast")
+    make_card(outro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="outro")
     timeline: list[tuple[Path, Path, float]] = [(intro, intro_audio, 1.8)]
     for index in range(1, 7):
         card = workdir / f"a_{index}.png"
-        make_card(card, profile, words[0], glosses[0], index)
+        make_card(card, profile, words[0], readings[0], meanings[0], index)
         timeline.append((card, a_audio, 2.1))
     timeline.append((divider, divider_audio, 1.0))
     for index in range(1, 7):
         card = workdir / f"b_{index}.png"
-        make_card(card, profile, words[1], glosses[1], index)
+        make_card(card, profile, words[1], readings[1], meanings[1], index)
         timeline.append((card, b_audio, 2.1))
     for index, (word, audio_file) in enumerate(((words[0], a_final), (words[1], b_final), (words[0], a_final), (words[1], b_final)), 1):
         card = workdir / f"final_{index}.png"
         counterpart = words[1] if word == words[0] else words[0]
-        make_card(card, profile, word, "", None, counterpart=counterpart, mode="contrast")
+        make_card(card, profile, word, "", "", None, counterpart=counterpart, mode="contrast")
         timeline.append((card, audio_file, 1.7))
     timeline.append((outro, outro_audio, 1.6))
 
@@ -281,14 +300,18 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     duration = ffprobe_duration(output)
     if not 28 <= duration <= 40:
         raise RuntimeError(f"Unexpected Short duration for {code}: {duration}")
-    title = f"{words[0]} vs {words[1]} | Listen & Repeat 6x #Shorts"
+    if code in {"ko", "ja", "zh"}:
+        title = f"{words[0]} ({readings[0]}) vs {words[1]} ({readings[1]}) | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
+    else:
+        title = f"{words[0]} vs {words[1]} | Listen & Repeat 6x #Shorts"
     manifest = {
         "date": target_date.isoformat(),
         "language_code": code,
         "language_label": profile.label,
         "pair_id": pair["id"],
         "words": words,
-        "glosses": glosses,
+        "pronunciations": readings,
+        "meanings": meanings,
         "voice_provider": "Microsoft Edge neural TTS",
         "voice": profile.voice,
         "voice_locale": profile.locale,
@@ -300,7 +323,8 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "duration_seconds": round(duration, 3),
         "title": title,
         "description": (
-            f"Listen to {words[0]} and {words[1]}, pause, and repeat each word aloud. "
+            f"{words[0]} ({readings[0]}) means {meanings[0]}; {words[1]} ({readings[1]}) means {meanings[1]}. "
+            "Listen, pause, and repeat each word aloud. "
             "Short daily pronunciation practice with clear spaced repetition. #languagelearning #Shorts"
         ),
         "tags": ["language learning", "pronunciation", "listen and repeat", pair["id"], "Shorts"],

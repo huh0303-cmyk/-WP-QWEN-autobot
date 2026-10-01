@@ -58,6 +58,22 @@ def verified_video(service, video_id: str, expected_channel_id: str, expected_pr
     return video
 
 
+def make_old_video_private(service, video_id: str, expected_channel_id: str) -> dict:
+    rows = service.videos().list(part="snippet,status", id=video_id).execute().get("items", [])
+    if len(rows) != 1 or rows[0].get("snippet", {}).get("channelId") != expected_channel_id:
+        raise RuntimeError("Replacement target does not belong to the exact authenticated channel")
+    old_status = rows[0].get("status", {})
+    body_status = {
+        key: old_status[key]
+        for key in ("license", "embeddable", "publicStatsViewable", "selfDeclaredMadeForKids")
+        if key in old_status
+    }
+    body_status["privacyStatus"] = "private"
+    service.videos().update(part="status", body={"id": video_id, "status": body_status}).execute()
+    verified_video(service, video_id, expected_channel_id, "private")
+    return {"video_id": video_id, "privacy_status": "private"}
+
+
 def publish_one(manifest_path: Path, privacy: str) -> dict:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     code = manifest["language_code"]
@@ -115,15 +131,23 @@ def main() -> int:
     parser.add_argument("--date", default=dt.date.today().isoformat())
     parser.add_argument("--languages", default="all")
     parser.add_argument("--privacy", choices=("public", "private", "unlisted"), default="public")
+    parser.add_argument("--replace-video-id", help="With exactly one language, make this old video private after the corrected upload is public")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT))
     args = parser.parse_args()
     root = Path(args.output_root).resolve() / args.date
     batch = json.loads((root / "batch_manifest.json").read_text(encoding="utf-8"))
     codes = batch["completed_languages"] if args.languages == "all" else [v.strip() for v in args.languages.split(",") if v.strip()]
+    if args.replace_video_id and len(codes) != 1:
+        raise RuntimeError("--replace-video-id requires exactly one language")
     receipts = []
     for code in codes:
         print(f"PUBLISH {code}", flush=True)
         receipts.append(publish_one(root / code / "manifest.json", args.privacy))
+    if args.replace_video_id:
+        code = codes[0]
+        service = youtube_service(code)
+        expected_channel = json.loads((root / code / "manifest.json").read_text(encoding="utf-8"))["channel_id"]
+        receipts[0]["replaced_old_video"] = make_old_video_private(service, args.replace_video_id, expected_channel)
     summary = {"date": args.date, "privacy": args.privacy, "count": len(receipts), "receipts": receipts}
     (root / "publication_batch_receipt.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False))

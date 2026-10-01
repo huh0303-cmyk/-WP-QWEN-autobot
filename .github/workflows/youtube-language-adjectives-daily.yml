@@ -23,6 +23,10 @@ on:
         required: true
         default: true
         type: boolean
+      replace_video_id:
+        description: Optional old video ID to make private after one corrected upload is verified public
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -55,7 +59,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth
+          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth hangul-romanize pykakasi pypinyin
       - name: Resolve KST date and render ten native-locale voice Shorts
         id: build
         shell: bash
@@ -73,11 +77,12 @@ jobs:
           echo "languages=$LANGUAGES" >> "$GITHUB_OUTPUT"
       - name: Publish only after exact channel identity verification
         if: ${{ github.event_name == 'schedule' || inputs.publish }}
-        run: >-
-          python scripts/publish_survival_adjective_shorts.py
-          --date "${{ steps.build.outputs.target_date }}"
-          --languages "${{ steps.build.outputs.languages }}"
-          --privacy public
+        env:
+          REPLACE_VIDEO_ID: ${{ inputs.replace_video_id }}
+        run: |
+          ARGS=(--date "${{ steps.build.outputs.target_date }}" --languages "${{ steps.build.outputs.languages }}" --privacy public)
+          if [ -n "${REPLACE_VIDEO_ID:-}" ]; then ARGS+=(--replace-video-id "$REPLACE_VIDEO_ID"); fi
+          python scripts/publish_survival_adjective_shorts.py "${ARGS[@]}"
       - name: Preserve manifests and publication receipts
         if: always()
         uses: actions/upload-artifact@v4

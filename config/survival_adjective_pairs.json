@@ -15,7 +15,12 @@
       "fr": ["long", "court"],
       "de": ["lang", "kurz"],
       "it": ["lungo", "corto"],
-      "pt": ["longo", "curto"]
+      "pt": ["longo", "curto"],
+      "pronunciations": {
+        "ko": ["gil-da", "jjal-tta"],
+        "ja": ["na-ga-i", "mi-ji-ka-i"],
+        "zh": ["cháng", "duǎn"]
+      }
     },
     {
       "id": "heavy-light",

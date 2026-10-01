@@ -2,7 +2,7 @@ import datetime as dt
 import json
 from pathlib import Path
 
-from scripts.survival_adjective_short import LANGUAGES, PAIR_PATH, channel_map, select_pair
+from scripts.survival_adjective_short import LANGUAGES, PAIR_PATH, channel_map, pronunciation, select_pair
 
 
 def test_all_ten_languages_have_exact_unique_channels_and_native_locale_voices():
@@ -28,3 +28,7 @@ def test_first_day_is_the_requested_long_short_example():
     assert pair["id"] == "long-short"
     assert pair["ko"] == ["길다", "짧다"]
     assert pair["en"] == ["long", "short"]
+    assert pronunciation(pair, "ko", "길다") == "gil-da"
+    assert pronunciation(pair, "ko", "짧다") == "jjal-tta"
+    assert pronunciation(pair, "ja", "長い") == "na-ga-i"
+    assert pronunciation(pair, "zh", "长") == "cháng"
