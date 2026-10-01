@@ -31,6 +31,13 @@ _generated_paths: dict[str, str] = {}
 _selected_language = ""
 _track_languages = []
 
+OWNER_IMAGE_FILENAMES = {
+    "globalmusic": "globalmusic-romantic-source.png",
+    "kpop": "kpop-acoustic-source.png",
+    "starbucks": "starbucks-cafe-source.png",
+    "mbb": "mbb-classical-source.png",
+}
+
 
 def metadata(topic, caption, duration_min):
     from youtube_english_metadata import playlist_metadata
@@ -216,7 +223,27 @@ def _thumbnail_prompt(topic: str) -> str:
 
 
 def fresh_image(topic, workdir, service=None):
-    if os.environ.get("PLAYLIST_IMAGE_SOURCE", "gemini_app_export") != "gemini_api":
+    image_source = os.environ.get("PLAYLIST_IMAGE_SOURCE", "gemini_app_export")
+    if image_source == "owner_local":
+        filename = OWNER_IMAGE_FILENAMES.get(base.CHANNEL_KEY)
+        if filename:
+            source_root = Path(os.environ.get(
+                "PLAYLIST_OWNER_IMAGE_ROOT",
+                "/opt/korea365/assets/youtube/playlist/2026-10-01",
+            )).resolve()
+            source = (source_root / filename).resolve()
+            if source.parent != source_root or not source.is_file():
+                raise RuntimeError(f"WAITING_ASSETS: reviewed owner image is missing: {filename}")
+            with Image.open(source) as image:
+                image.verify()
+            with Image.open(source) as image:
+                if image.width < 1280 or image.height < 720:
+                    raise RuntimeError("Reviewed owner image must be at least 1280x720")
+            output = Path(workdir) / filename
+            shutil.copyfile(source, output)
+            return [str(output)]
+        image_source = "gemini_app_export"
+    if image_source != "gemini_api":
         service = base.get_drive_service()
         items = _bank_list(service, base.THUMBNAIL_FOLDER_ID, base.IMAGE_EXTS, "image/")
         items = [item for item in items if "gemini" in item['name'].lower()]
@@ -284,7 +311,7 @@ def build_fresh_healing(_service, _theme, output_path):
 
 def select_music(service, folder_id, exts, mime_prefix):
     source = os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")
-    if source == "owner_local":
+    if source == "owner_local" and base.CHANNEL_KEY in {"globalmusic", "kpop"}:
         from playlist_owner_library import select_owner_tracks
         root = Path(os.environ.get("PLAYLIST_OWNER_AUDIO_ROOT",
                                    "/opt/korea365/data/playlist-owner-music/audio"))

@@ -29,11 +29,21 @@ rights, exact SHA-256, duration and distinct recordings, then shuffles the
 selection and targets 50–70 minutes. Romantic mixes keep equal French and
 Japanese track counts. It writes a track manifest in
 the video work directory. Missing or changed assets stop before rendering.
-This path is **not activated** until the private genre catalog and staged
-files are ready. Merely resetting today's failed calendar row would still
-fail. The desktop folder contains non-audio files, including credential-like
+This path was activated on 2026-10-01 after the private catalog, selection and
+staging checks completed. The desktop folder contains non-audio files,
+including credential-like
 JSON names; transfer only approved audio by an explicit allowlist. Do not
 upload or commit the directory wholesale.
+
+Activation receipt: 692 source audio files were inventoried, 492 distinct
+audio hashes and 107 distinct Suno song IDs were observed, and 36 reviewed
+tracks were staged. The Globalmusic pool is 20 tracks / 65.68 minutes with
+exactly ten French and ten Japanese tracks. The K-pop pool is 16 tracks /
+61.47 minutes. Production re-hashes every staged file before selection, uses
+no duplicate hash inside a mix, and keeps the private filenames and manifest
+outside Git. Four separate 1672x941 channel-specific source images were added
+for Globalmusic, K-pop, Starbucks and MBB. Healing remains on its existing
+nature-sound/image path and is not part of this recovery batch.
 
 Private manifest format: `{"version":1,"tracks":[{"channel":"globalmusic",
 "file":"song.mp3","sha256":"<64 hex>","approved":true,
