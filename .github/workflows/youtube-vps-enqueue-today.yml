@@ -1,4 +1,4 @@
-name: Queue one verified YouTube private upload today
+name: Queue one verified YouTube public production today
 
 on:
   workflow_dispatch:
@@ -10,13 +10,21 @@ on:
         options:
           - globalmusic
           - healing
+          - starbucks
+          - mbb
+          - kpop
+          - nasa
+          - history
+          - invention
+          - silent_era
+          - retro_reels
       retry_failed:
         description: Preserve failed receipt and enqueue one replacement job
         required: true
         type: boolean
         default: false
       owner_repeat:
-        description: Explicit owner request for one additional distinct private production today
+        description: Explicit owner request for one additional distinct public production today
         required: true
         type: boolean
         default: false
@@ -55,7 +63,18 @@ jobs:
             channel = sys.argv[1]
             retry_failed = __import__("os").environ.get("RETRY_FAILED", "false").lower() == "true"
             owner_repeat = __import__("os").environ.get("OWNER_REPEAT", "false").lower() == "true"
-            labels = {"globalmusic": "CAFE_ROMANTIC", "healing": "CAFE_HEALING"}
+            labels = {
+                "globalmusic": "CAFE_ROMANTIC",
+                "healing": "CAFE_HEALING",
+                "starbucks": "CAFE_STARBUCKSVIBES",
+                "mbb": "CAFE_MOZART",
+                "kpop": "CAFE_KPOP",
+                "nasa": "NASA_XFILES",
+                "history": "HISTORY_TV_TODAY",
+                "invention": "INVENTION_STORY1",
+                "silent_era": "SILENT_ERA_FILM",
+                "retro_reels": "RETRO_USA1",
+            }
             if channel not in labels:
                 raise SystemExit("unsupported channel")
             kst = timezone(timedelta(hours=9))

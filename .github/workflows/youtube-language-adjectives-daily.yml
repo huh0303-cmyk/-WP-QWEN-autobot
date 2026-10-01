@@ -1,0 +1,88 @@
+name: Daily ten-language adjective Shorts
+
+on:
+  schedule:
+    - cron: "17 23 * * *"
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: KST production date (YYYY-MM-DD); blank uses current KST date
+        required: false
+        type: string
+      pair_id:
+        description: Optional adjective pair override
+        required: false
+        type: string
+      languages:
+        description: all or comma-separated language codes
+        required: true
+        default: all
+        type: string
+      publish:
+        description: Upload immediately after successful generation
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: youtube-channels
+    env:
+      PYTHONUTF8: "1"
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_KO }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_EN }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ZH }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_VI }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_ES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_FR }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_DE }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_IT }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_PT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install production runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --disable-pip-version-check pillow edge-tts google-api-python-client google-auth
+      - name: Resolve KST date and render ten native-locale voice Shorts
+        id: build
+        shell: bash
+        env:
+          INPUT_DATE: ${{ inputs.target_date }}
+          INPUT_PAIR: ${{ inputs.pair_id }}
+          INPUT_LANGUAGES: ${{ inputs.languages }}
+        run: |
+          TARGET_DATE="${INPUT_DATE:-$(TZ=Asia/Seoul date +%F)}"
+          LANGUAGES="${INPUT_LANGUAGES:-all}"
+          ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES")
+          if [ -n "${INPUT_PAIR:-}" ]; then ARGS+=(--pair-id "$INPUT_PAIR"); fi
+          python scripts/survival_adjective_short.py "${ARGS[@]}"
+          echo "target_date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
+          echo "languages=$LANGUAGES" >> "$GITHUB_OUTPUT"
+      - name: Publish only after exact channel identity verification
+        if: ${{ github.event_name == 'schedule' || inputs.publish }}
+        run: >-
+          python scripts/publish_survival_adjective_shorts.py
+          --date "${{ steps.build.outputs.target_date }}"
+          --languages "${{ steps.build.outputs.languages }}"
+          --privacy public
+      - name: Preserve manifests and publication receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-adjective-shorts-${{ steps.build.outputs.target_date }}
+          path: artifacts/youtube/language-adjectives/${{ steps.build.outputs.target_date }}/
+          retention-days: 30
+          if-no-files-found: warn

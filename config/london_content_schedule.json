@@ -89,8 +89,8 @@
       "avoid_channel_time_collisions": true
     },
     "survival_10_language": {
-      "enabled": false,
-      "status": "daily_target_waiting_for_exact_channel_publish_auth_and_executor",
+      "enabled": true,
+      "status": "daily_adjective_short_generator_active_exact_channel_auth_verified",
       "target_enabled": true,
       "languages": [
         "Korean/TOPIK",
@@ -119,7 +119,12 @@
       "spread_languages_across_distinct_slots": true,
       "public_requires_verified_channel_id": true,
       "public_requires_write_auth": true,
-      "missing_channel_ids": []
+      "missing_channel_ids": [],
+      "daily_content_format": "one antonym adjective pair per Short",
+      "pronunciation_repetitions_per_word": 8,
+      "voice_policy": "dedicated native-locale neural voice; block production if the configured language voice fails",
+      "generator": "scripts/survival_adjective_short.py",
+      "pair_catalog": "config/survival_adjective_pairs.json"
     },
     "instagram": {
       "target": "1_public_post_per_verified_account_per_day",

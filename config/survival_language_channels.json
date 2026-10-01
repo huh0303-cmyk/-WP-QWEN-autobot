@@ -5,10 +5,10 @@
   "lessons_per_language": 50,
   "completed_through_lesson": 2,
   "next_lesson": 3,
-  "interval_days_min": 2,
-  "interval_days_max": 3,
-  "upload_default": "private",
-  "chairman_approval_before_public": true,
+  "interval_days_min": 1,
+  "interval_days_max": 1,
+  "upload_default": "public_after_exact_channel_auth",
+  "chairman_approval_before_public": false,
   "rule": "never_guess_channel_id; upload is blocked until exact channel ownership/identity is verified",
   "languages": [
     {
@@ -35,7 +35,7 @@
       "series_name": "Survival Japanese",
       "channel_id": "UCOWoNH_d6p45ywQ6W0Z1Jng",
       "channel_status": "VERIFIED_REGISTRY_HANDLE_MATCH",
-      "upload_enabled": false,
+      "upload_enabled": true,
       "channel_identity_source": "inventory + situation_room_history handle seoul_japanese1",
       "handle": "seoul_japanese1"
     },
@@ -107,10 +107,14 @@
     }
   ],
   "identity_summary": {
-    "as_of": "2026-09-27",
+    "as_of": "2026-10-01",
     "verified_language_channels": 10,
     "handle_only_pending_uc_id": [],
     "evidence_source_2026-09-27": "All 10 language @handle pages resolved to exact UC channel IDs from public YouTube channel metadata; owner account-switcher screenshot cross-checked names/handles.",
-    "rule": "Never reuse a legacy brand/account selector label as channel identity; production identity is exact title + handle + UC channel ID."
+    "rule": "Never reuse a legacy brand/account selector label as channel identity; production identity is exact title + handle + UC channel ID.",
+    "daily_format": "one important antonym adjective pair per vertical Short; native-locale neural pronunciation repeated at least six times per word plus contrast review",
+    "daily_pair_catalog": "config/survival_adjective_pairs.json",
+    "generator": "scripts/survival_adjective_short.py",
+    "voice_failover": "fail_closed_never_replace_with_another_language_voice"
   }
 }
