@@ -26,6 +26,10 @@ def inspect_and_filter_clips(topic, clips, workdir, run_ffmpeg, log, min_score=7
     from google.genai import types
 
     client = genai.Client(api_key=api_key)
+    models = [value.strip() for value in os.getenv(
+        "KNOWLEDGE_VISION_MODELS",
+        "gemini-3.1-flash-lite,gemini-2.5-flash-lite,gemini-2.5-flash",
+    ).split(",") if value.strip()]
     accepted = []
     for index, clip in enumerate(clips):
         duration = min(max(float(clip.get("duration", 1)), 1.0), 45.0)
@@ -58,11 +62,18 @@ the metadata. Judge what is visibly on screen. Generic or unrelated filler score
             for frame in frames
         ]
         contents.append(prompt)
-        response = client.models.generate_content(
-            model=os.getenv("KNOWLEDGE_VISION_MODEL", "gemini-2.5-flash"),
-            contents=contents,
-        )
+        last_error = None
+        for model in models:
+            try:
+                response = client.models.generate_content(model=model, contents=contents)
+                break
+            except Exception as exc:
+                last_error = exc
+                log(f"   visual model unavailable ({model}); trying next reviewed model")
+        else:
+            raise RuntimeError("All bounded knowledge vision reviewers are unavailable") from last_error
         analysis = json.loads(_strip_json(response.text or ""))
+        analysis["review_model"] = model
         score = int(analysis.get("relevance_score", 0))
         clip["visual_analysis"] = analysis
         log(f"   visual check {index + 1}: {score}/100 — {analysis.get('visual_summary', '')[:100]}")

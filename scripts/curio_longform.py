@@ -119,7 +119,16 @@ def gemini_generate_text(prompt, temperature=0.9, max_retries=5):
     except ImportError:
         pass
 
-    if os.environ.get("AI_TEXT_PROVIDER", "openai").strip().lower() == "openai":
+    provider = os.environ.get("AI_TEXT_PROVIDER", "local").strip().lower()
+    if provider == "local":
+        from local_text import local_generate_text
+        return local_generate_text(
+            prompt,
+            temperature=temperature,
+            timeout=int(os.environ.get("KNOWLEDGE_LOCAL_TEXT_TIMEOUT", "190")),
+            max_tokens=int(os.environ.get("KNOWLEDGE_LOCAL_TEXT_MAX_TOKENS", "3500")),
+        )
+    if provider == "openai":
         raise RuntimeError("OpenAI text generation unavailable; Gemini fallback is disabled")
 
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"

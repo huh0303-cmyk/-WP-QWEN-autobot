@@ -248,6 +248,8 @@ def fetch_archive_clips(topic, channel_key, workdir, n_target=16):
     (History Today 영상, 사용자가 "계속 반복된다"고 지적). 20으로 올려 반복을
     거의 없애거나 최소화."""
     cfg = CHANNEL_ARCHIVE_CONFIG[channel_key]
+    if channel_key == "silent_era" and topic.lower().startswith("public-domain silent comedy"):
+        topic = "Charlie Chaplin silent comedy"
 
     attempts = [topic]
     core_words = " ".join(topic.split()[:3])
@@ -540,7 +542,11 @@ def main():
             event_clips = fetch_archive_clips(event['text'], channel_key, event_dir, n_target=4)
             if not event_clips:
                 continue
-            event_clips = inspect_and_filter_clips(event['text'], event_clips, event_dir, run_ffmpeg, log)
+            try:
+                event_clips = inspect_and_filter_clips(event['text'], event_clips, event_dir, run_ffmpeg, log)
+            except RuntimeError as exc:
+                log(f"   ⚠️ 관련 화면이 없는 역사 사건은 제외하고 다음 사건으로 진행: {exc}")
+                continue
             for clip in event_clips:
                 clip['event_label'] = f"{today.strftime('%B %d')} · {event['year']}"
                 clip['event_text'] = event['text']

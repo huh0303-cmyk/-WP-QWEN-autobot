@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -25,13 +26,18 @@ def _select_narrator() -> None:
 
 def _gemini_thumbnail(topic: str, hero_frame_path: str, workdir: str):
     del hero_frame_path
-    source_path = os.path.join(workdir, "thumbnail_gemini_source.bin")
-    generate_thumbnail(
-        f"Create a completely original photorealistic 16:9 NASA space-history documentary thumbnail source "
-        f"about '{topic}'. One iconic focal subject, scientifically and historically plausible detail, dramatic "
-        "cinematic depth, clean space for later title typography, no text, no logo, no watermark, no copied image.",
-        source_path,
-    )
+    episode_date = os.environ.get("EPISODE_DATE", "").strip()
+    if not episode_date:
+        raise RuntimeError("WAITING_ASSETS: EPISODE_DATE is required for a unique NASA image")
+    root = Path(os.environ.get(
+        "KNOWLEDGE_OWNER_IMAGE_ROOT",
+        f"/opt/korea365/assets/youtube/knowledge/{episode_date}",
+    )).resolve()
+    source = (root / "nasa-source.png").resolve()
+    if source.parent != root or not source.is_file():
+        raise RuntimeError("WAITING_ASSETS: reviewed NASA image is missing")
+    source_path = os.path.join(workdir, "nasa-source.png")
+    shutil.copyfile(source, source_path)
     return base._legacy_build_thumbnail(topic, source_path, workdir)
 
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -16,6 +17,33 @@ import archive_footage_longform_legacy as base
 import classic_reads_longform as narration_engine
 from gemini_media_provider import generate_thumbnail
 from knowledge_narrator import select_documentary_narrator
+
+
+KNOWLEDGE_IMAGE_FILENAMES = {
+    "history": "history-source.png",
+    "invention": "invention-source.png",
+    "silent_era": "silent-era-source.png",
+    "retro_reels": "retro-reels-source.png",
+}
+
+
+def _reviewed_image(channel_key: str, workdir: str) -> str:
+    episode_date = os.environ.get("EPISODE_DATE", "").strip()
+    if not episode_date:
+        raise RuntimeError("WAITING_ASSETS: EPISODE_DATE is required for a unique knowledge image")
+    filename = KNOWLEDGE_IMAGE_FILENAMES.get(channel_key)
+    if not filename:
+        raise RuntimeError(f"WAITING_ASSETS: no reviewed knowledge image mapping for {channel_key}")
+    root = Path(os.environ.get(
+        "KNOWLEDGE_OWNER_IMAGE_ROOT",
+        f"/opt/korea365/assets/youtube/knowledge/{episode_date}",
+    )).resolve()
+    source = (root / filename).resolve()
+    if source.parent != root or not source.is_file():
+        raise RuntimeError(f"WAITING_ASSETS: reviewed knowledge image is missing: {filename}")
+    target = Path(workdir) / filename
+    shutil.copyfile(source, target)
+    return str(target)
 
 
 def _select_narrator(channel_key: str) -> None:
@@ -55,11 +83,8 @@ def _gemini_thumbnail(topic: str, channel_key: str, hero_frame_path: str, workdi
         "retro_reels": "Retro USA everyday American homes and social life from the 1960s through 2000s",
         "american_archive": "American archive history documentary",
     }.get(channel_key, "archival history documentary")
-    source_path = os.path.join(workdir, "thumbnail_gemini_source.bin")
-    prompt = (f"Create a completely original photorealistic 16:9 documentary thumbnail source image about '{topic}'. "
-              f"Editorial direction: {channel_theme}. One unmistakable focal subject, strong depth, historically "
-              "plausible details, clean space for later title typography, no text, no logo, no watermark, no copied image.")
-    generate_thumbnail(prompt, source_path)
+    del channel_theme
+    source_path = _reviewed_image(channel_key, workdir)
     result = base._legacy_build_thumbnail(topic, channel_key, source_path, workdir)
     return _history_date_overlay(result) if channel_key == "history" else result
 
