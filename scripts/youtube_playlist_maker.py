@@ -294,14 +294,18 @@ def benchmark_thumbnail(_channel, image_path, output_path, topic, **_kwargs):
 
 
 def make_intro_video(image_path, audio_path, out_path):
+    fps = max(6, min(12, int(os.environ.get("PLAYLIST_VIDEO_FPS", "8"))))
+    preset = os.environ.get("PLAYLIST_VIDEO_PRESET", "ultrafast")
+    if preset not in {"ultrafast", "superfast", "veryfast"}:
+        raise ValueError("Unsupported playlist video preset")
     vf=("[0:v]scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,"
-        "zoompan=z='1+min(on,71)*0.00025':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1280x720:fps=12,"
+        f"zoompan=z='1+min(on,47)*0.000375':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1280x720:fps={fps},"
         "fade=t=in:st=0:d=1,drawbox=x=0:y=625:w=iw:h=95:color=black@0.30:t=fill[bg];"
-        "[1:a]aformat=channel_layouts=mono,showwaves=s=1152x56:mode=cline:rate=12:colors=white:scale=sqrt[wave];"
+        f"[1:a]aformat=channel_layouts=mono,showwaves=s=1152x56:mode=cline:rate={fps}:colors=white:scale=sqrt[wave];"
         "[bg][wave]overlay=64:646:shortest=1,format=yuv420p[v]")
-    base.run_ffmpeg(["ffmpeg","-y","-loop","1","-framerate","12","-i",image_path,"-i",audio_path,
-                    "-filter_complex",vf,"-map","[v]","-map","1:a","-c:v","libx264","-preset","veryfast",
-                    "-tune","stillimage","-crf","20","-threads","2","-c:a","aac","-b:a","192k",
+    base.run_ffmpeg(["ffmpeg","-y","-loop","1","-framerate",str(fps),"-i",image_path,"-i",audio_path,
+                    "-filter_complex",vf,"-map","[v]","-map","1:a","-c:v","libx264","-preset",preset,
+                    "-tune","stillimage","-crf","22","-threads","2","-c:a","aac","-b:a","192k",
                     "-movflags","+faststart","-shortest",out_path])
 
 
