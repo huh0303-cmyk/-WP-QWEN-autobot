@@ -334,6 +334,10 @@ def select_music(service, folder_id, exts, mime_prefix):
                       "language", "genre", "rights")} for row in chosen],
                       ensure_ascii=False, indent=2), encoding="utf-8")
         return result
+    if source == "owner_local" and base.CHANNEL_KEY == "mbb":
+        # MBB is the one playlist whose approved source is explicitly
+        # public-domain performance audio rather than the owner's Suno bank.
+        return generate_fresh_tracks()
     if source == "lyria_api":
         if os.environ.get("PLAYLIST_PAID_API_ENABLED", "false").lower() != "true":
             raise RuntimeError("Paid music generation is disabled")
