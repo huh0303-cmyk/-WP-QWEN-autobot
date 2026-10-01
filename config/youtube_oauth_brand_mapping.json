@@ -11,7 +11,9 @@
     "health_japan": {
       "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg",
       "display_name": "Health_Clinic_Japan",
-      "oauth_brand_name": "K-KIDS",
+      "oauth_brand_name": "Health_Clinic_Japan",
+      "prior_oauth_brand_name": "K-KIDS",
+      "brand_profile_name_verified": "live_google_brand_list_2026-10-01",
       "google_brand_id": "108767753086893855106",
       "google_account": "huh0303@gmail.com",
       "confirmed_by": "owner_consent_and_exact_mine_channel_id_2026-10-01"
