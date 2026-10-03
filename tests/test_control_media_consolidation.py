@@ -124,8 +124,9 @@ def test_visible_navigation_has_only_control_blog_and_combined_social():
         "control_center/templates/index.html",
     ):
         template = (ROOT / relative).read_text(encoding="utf-8")
-        assert "YOUTUBE + SNS" in template
         assert 'href="https://youtube.korea365.org"' not in template
+    nav = (ROOT / "control_center/templates/_korea365_app_nav.html").read_text(encoding="utf-8")
+    assert "YOUTUBE + SNS" in nav
 
 
 def test_quick_publish_links_reuse_existing_workflows():
@@ -178,7 +179,7 @@ def test_combined_social_detail_uses_mobile_scrollable_table_not_cards():
     template = (ROOT / "control_center" / "templates" / "social_accounts.html").read_text(encoding="utf-8")
     assert '<table id="socialTable" class="account-table">' in template
     assert '<article class="card"' not in template
-    assert "YOUTUBE + SNS 생산·발행 통제실" in template
+    assert "Korea365 · YOUTUBE + SNS" in template
     assert "overflow:auto" in template
 
 
@@ -197,14 +198,15 @@ def test_blog_and_social_are_lightweight_publishing_sheets():
     assert "검색량 · Google/Naver 신호 · 미디어 언급량" in blog
     assert 'id="publishSite"' in blog
     assert "즉시발행 시작" in blog
-    assert "같은 n8n 흐름" in blog
+    assert "선택한 목적지의 실행은 n8n 4-Agent" in blog
+    assert "정기 예약 경로까지 모두 통합됐다는 뜻은 아닙니다" in blog
     assert '<table class="ranking">' in blog
     assert '<table id="socialTable" class="account-table">' in social
-    assert "YOUTUBE + SNS 생산·발행 통제실" in social
+    assert "Korea365 · YOUTUBE + SNS" in social
     assert "로그인·권한 필요" in social
     assert "<th>번호</th><th>플랫폼</th>" in social
     assert "<td>{{loop.index}}</td><td>" in social
-    assert "확인된 YouTube 채널과 SNS 운영 대상" in social
+    assert "상태를 구분해 표시합니다" in social
     assert "생산·발행 트리거" in social
     for platform in ("YouTube", "TikTok", "Instagram", "Facebook", "Threads"):
         assert f'tr[data-platform="{platform}"] td' in social

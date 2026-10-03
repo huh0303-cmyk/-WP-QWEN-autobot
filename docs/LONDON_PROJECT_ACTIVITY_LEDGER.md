@@ -325,3 +325,10 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Read-only OAuth preflight run `37108520303`에서 지정된 5개 지식채널 모두와 전체 10개 채널의 정확한 `mine=true` 채널-ID·업로드 권한이 성공했다. 따라서 이번 차단은 현재 사전검사상 OAuth 연결이 아니라 콘텐츠/시각 매칭/달력 공급이다. 새 업로드는 실제 신규 영상 파일과 품질 검증이 없어서 실행하지 않았다.
 - `scripts/knowledge_scene_edit.py`에 alignment 실패 시 한 번만 리뷰어 피드백을 반영해 대본을 다시 쓰고, 동일한 기존 alignment 게이트를 다시 통과해야 하는 제한 재작성 기능을 추가했다. 테스트 2건으로 통과/재실패 폐쇄 동작 확인. 재렌더·YouTube 공개 전 새 topic/rights/frames 검증이 필요하다.
 - Next steps: feature branch에 로컬 수정과 결과를 분리 커밋·PR; WP/Blogger n8n parity와 중복 방지 키를 먼저 구현하고 1개 WP + 1개 Blogger draft receipt canary 통과 후에만 scheduler cutover 제안; 지식 채널은 source/scene selection을 고쳐 우선 1개 채널의 새 렌더를 검증한 다음 공개, 나머지는 순차 진행. No credentials, paid media, or live blog publication were read or changed.
+
+## korea365-three-console-refresh-20261003
+
+- 2026-10-03 18:26 KST — 사용자는 새 운영 개선에 맞춰 `control.korea365.org`, `blog.korea365.org`, `sns.korea365.org`의 세 화면을 함께 업데이트하라고 요청했다. 저장소에서는 세 도메인이 한 Flask 앱의 host-routed view임을 확인했다. 익명 HTTP 요청은 세 도메인 모두 `/control-login` 화면을 반환했으므로 인증정보를 읽거나 입력하지 않았고, 비로그인 응답은 앱 화면 검증에 사용하지 않았다.
+- 동일한 반응형 상단 탐색을 세 화면에 공유하도록 만들고, CONTROL에는 발행 화면/채널 현황 바로가기와 공개 영수증 원칙을 추가했다. BLOG 문구에서 모든 예약 작업이 n8n 통합됐다고 오해할 부분을 정정하고, 시작 응답 지연 때 중복 클릭하지 말고 동일 실행 ID를 추적하며 공개 영수증 전에는 성공으로 보지 않도록 안내했다. SNS 화면은 채널 OAuth 확인·대기열 접수·실제 공개를 분리하고, 플랫폼별 4개 행을 실계정/권한 수로 오인하지 않도록 안내한다.
+- 배포 차단 검증: Deploy to VPS run `37095819260` failed with `status=waiting_for_video`, target commit `fc61d14e`, deployed commit `223cf89e`. This is an existing guarded deployment gate. It must not be bypassed; these UI changes and the prior timeout fix remain source/PR-only pending the gate clearing.
+- Added template consistency tests for shared navigation, responsive CSS, and truthful status copy. Deployment and live authenticated-page verification have not occurred.

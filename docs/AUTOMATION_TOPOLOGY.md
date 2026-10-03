@@ -60,3 +60,9 @@ before both schedules can be declared duplicate-safe.
 - The YouTube knowledge job runner remains a separate VPS worker; its Oct 3 queue
   audit showed no pending/running jobs. Do not treat that worker as a blog publisher
   or as proof that n8n owns the complete blog schedule.
+- CONTROL, BLOG, and SNS are three host-routed views of the same authenticated
+  control-center app, not three independent deployments. Their shared navigation and
+  operating copy distinguishes dispatch, acknowledgement-pending, queued work,
+  verified account permission, and a public receipt. BLOG must not imply that every
+  daily platform scheduler has cut over to n8n; production page changes remain
+  pending the guarded VPS deploy gate.
