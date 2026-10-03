@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build one pronunciation-first adjective Short for each Survival language channel.
+"""Build pronunciation-first vocabulary Shorts for each Survival language channel.
 
 The target-language neural voice is mandatory. A language fails closed when its
 configured voice cannot be produced; it is never replaced with another language.
@@ -26,7 +26,6 @@ PAIR_PATH = ROOT / "config" / "survival_adjective_pairs.json"
 CHANNEL_PATH = ROOT / "config" / "survival_language_channels.json"
 DEFAULT_OUTPUT = ROOT / "artifacts" / "youtube" / "language-adjectives"
 WIDTH, HEIGHT = 1080, 1920
-START_DATE = dt.date(2026, 10, 1)
 
 
 @dataclass(frozen=True)
@@ -78,8 +77,19 @@ def select_pair(target_date: dt.date, pair_id: str | None) -> dict:
             if pair["id"] == pair_id:
                 return pair
         raise ValueError(f"Unknown pair id: {pair_id}")
-    index = (target_date - START_DATE).days % len(pairs)
-    return pairs[index]
+    # New recurring batch cadence: Monday / Wednesday / Friday (KST), beginning
+    # 2026-10-05. Alternate adjective and noun lessons by release, not calendar
+    # day, so skipped days do not skew the curriculum.
+    monday = target_date - dt.timedelta(days=target_date.weekday())
+    anchor_monday = dt.date(2026, 10, 5)
+    week_index = (monday - anchor_monday).days // 7
+    slot = {0: 0, 2: 1, 4: 2}.get(target_date.weekday(), min(target_date.weekday() // 2, 2))
+    release_index = week_index * 3 + slot
+    category = "adjective" if release_index % 2 == 0 else "noun"
+    options = [row for row in pairs if row.get("category", "adjective") == category]
+    if not options:
+        raise RuntimeError(f"Vocabulary catalog has no {category} lessons")
+    return options[(release_index // 2) % len(options)]
 
 
 def channel_map() -> dict[str, dict]:
@@ -146,7 +156,7 @@ def pronunciation(pair: dict, code: str, word: str) -> str:
     return word
 
 
-def card_background(profile: LanguageProfile) -> tuple[Image.Image, ImageDraw.ImageDraw]:
+def card_background(profile: LanguageProfile, category: str) -> tuple[Image.Image, ImageDraw.ImageDraw]:
     image = Image.new("RGB", (WIDTH, HEIGHT), (7, 12, 27))
     draw = ImageDraw.Draw(image)
     for y in range(HEIGHT):
@@ -156,22 +166,28 @@ def card_background(profile: LanguageProfile) -> tuple[Image.Image, ImageDraw.Im
     draw.rounded_rectangle((68, 86, WIDTH - 68, HEIGHT - 92), radius=54, outline=profile.accent, width=5)
     draw.text((84, 116), profile.label, font=font(39, True), fill=(226, 232, 240))
     draw.rounded_rectangle((82, 181, 430, 245), radius=30, fill=profile.accent)
-    draw.text((112, 193), "DAILY ADJECTIVES", font=font(27, True), fill=(255, 255, 255))
+    label = "ADJECTIVES" if category == "adjective" else "NOUNS"
+    draw.text((112, 193), f"VOCABULARY  •  {label}", font=font(25, True), fill=(255, 255, 255))
     return image, draw
 
 
 def make_card(path: Path, profile: LanguageProfile, word: str, reading: str, meaning: str, count: int | None,
-              counterpart: str = "", mode: str = "repeat") -> None:
-    image, draw = card_background(profile)
+              counterpart: str = "", counterpart_reading: str = "", counterpart_meaning: str = "",
+              mode: str = "repeat", category: str = "adjective") -> None:
+    image, draw = card_background(profile, category)
     if mode == "intro":
         centered(draw, "TODAY'S PAIR", 480, font(62, True), (220, 226, 238))
         centered(draw, word, 670, font(112, True), (255, 255, 255))
         draw.rounded_rectangle((160, 1030, 920, 1190), radius=80, fill=profile.accent)
         centered(draw, "LISTEN  -  REPEAT", 1070, font(46, True), (255, 255, 255))
     elif mode == "outro":
-        centered(draw, "GREAT JOB", 520, font(76, True), (255, 255, 255))
-        centered(draw, word, 730, font(90, True), profile.accent)
-        centered(draw, "Repeat tomorrow.", 1110, font(48, True), (220, 226, 238))
+        # Use the final card as a study recap, not generic praise. The learner
+        # sees both the target spelling and the accessible Latin reading/gloss.
+        centered(draw, "TODAY'S WORDS", 420, font(58, True), (220, 226, 238))
+        centered(draw, word, 610, font(88, True), profile.accent)
+        centered(draw, f"{reading}   •   {meaning}", 760, font(52, True), (255, 255, 255))
+        centered(draw, counterpart, 970, font(88, True), profile.accent)
+        centered(draw, f"{counterpart_reading}   •   {counterpart_meaning}", 1120, font(52, True), (255, 255, 255))
     elif mode == "contrast":
         centered(draw, word, 580, font(112, True), (255, 255, 255))
         centered(draw, counterpart, 930, font(112, True), profile.accent)
@@ -262,29 +278,31 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     await synthesize(words[0], profile, raw_a)
     await synthesize(words[1], profile, raw_b)
     a_audio, b_audio = workdir / "word_a.m4a", workdir / "word_b.m4a"
-    make_fixed_audio(raw_a, a_audio, 2.4)
-    make_fixed_audio(raw_b, b_audio, 2.4)
-    intro_audio, divider_audio, outro_audio = workdir / "intro.m4a", workdir / "divider.m4a", workdir / "outro.m4a"
+    # 2.5 seconds per word leaves a deliberate listen-and-repeat pause.
+    make_fixed_audio(raw_a, a_audio, 2.5)
+    make_fixed_audio(raw_b, b_audio, 2.5)
+    intro_audio, outro_audio = workdir / "intro.m4a", workdir / "outro.m4a"
     make_silence(intro_audio, 1.8)
-    make_silence(divider_audio, 1.0)
     make_silence(outro_audio, 1.6)
 
     intro = workdir / "intro.png"
-    divider = workdir / "divider.png"
     outro = workdir / "outro.png"
-    make_card(intro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="intro")
-    make_card(divider, profile, words[0], "", "", None, counterpart=words[1], mode="contrast")
-    make_card(outro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="outro")
+    category = pair.get("category", "adjective")
+    make_card(intro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="intro", category=category)
+    make_card(
+        outro, profile, words[0], readings[0], meanings[0], None,
+        counterpart=words[1], counterpart_reading=readings[1],
+        counterpart_meaning=meanings[1], mode="outro", category=category,
+    )
     timeline: list[tuple[Path, Path, float]] = [(intro, intro_audio, 1.8)]
     for index in range(1, 6):
-        card = workdir / f"a_{index}.png"
-        make_card(card, profile, words[0], readings[0], meanings[0], index)
-        timeline.append((card, a_audio, 2.4))
-    timeline.append((divider, divider_audio, 1.0))
-    for index in range(1, 6):
-        card = workdir / f"b_{index}.png"
-        make_card(card, profile, words[1], readings[1], meanings[1], index)
-        timeline.append((card, b_audio, 2.4))
+        for letter, word, reading, meaning, track in (
+            ("a", words[0], readings[0], meanings[0], a_audio),
+            ("b", words[1], readings[1], meanings[1], b_audio),
+        ):
+            card = workdir / f"{letter}_{index}.png"
+            make_card(card, profile, word, reading, meaning, index, category=category)
+            timeline.append((card, track, 2.5))
     timeline.append((outro, outro_audio, 1.6))
 
     output = destination / f"{target_date.isoformat()}_{code}_{pair['id']}.mp4"
@@ -292,7 +310,10 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     duration = ffprobe_duration(output)
     if not 28 <= duration <= 40:
         raise RuntimeError(f"Unexpected Short duration for {code}: {duration}")
-    if code in {"ko", "ja", "zh"}:
+    if category == "noun":
+        glosses = meanings if code == "en" else pair["en"]
+        title = f"{words[0]} ({readings[0]}) • {words[1]} ({readings[1]}) | {glosses[0]} • {glosses[1]} #Shorts"
+    elif code in {"ko", "ja", "zh"}:
         title = f"{words[0]} ({readings[0]}) vs {words[1]} ({readings[1]}) | {pair['en'][0]} vs {pair['en'][1]} #Shorts"
     else:
         title = f"{words[0]} vs {words[1]} | Listen & Repeat 5x #Shorts"
@@ -301,6 +322,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "language_code": code,
         "language_label": profile.label,
         "pair_id": pair["id"],
+        "category": category,
         "words": words,
         "pronunciations": readings,
         "meanings": meanings,
@@ -316,8 +338,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "title": title,
         "description": (
             f"{words[0]} ({readings[0]}) means {meanings[0]}; {words[1]} ({readings[1]}) means {meanings[1]}. "
-            "Listen, pause, and repeat each word aloud. "
-            "Short daily pronunciation practice with clear spaced repetition. #languagelearning #Shorts"
+            f"Short {category} pronunciation practice: listen, pause, and repeat each word aloud. #languagelearning #Shorts"
         ),
         "tags": ["language learning", "pronunciation", "listen and repeat", pair["id"], "Shorts"],
         "publication_status": "generated_not_uploaded",
@@ -349,6 +370,7 @@ async def async_main(args: argparse.Namespace) -> int:
     batch = {
         "date": target_date.isoformat(),
         "pair_id": pair["id"],
+        "category": pair.get("category", "adjective"),
         "requested_languages": codes,
         "completed_languages": [row["language_code"] for row in manifests],
         "count": len(manifests),
