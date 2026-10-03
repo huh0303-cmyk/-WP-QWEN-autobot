@@ -1,12 +1,13 @@
 {
-  "generated": "2026-10-02 09:49 KST",
+  "generated": "2026-10-04 08:47 KST",
   "fix_mode": true,
   "rows": [
     {
       "site": "https://k-health365.com",
       "platform": "wordpress",
       "issues": [
-        "warn:duplicate_titles_2groups"
+        "warn:duplicate_titles_2groups",
+        "warn:zero_impressions_28d"
       ],
       "manual_actions": [
         "중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)"
@@ -25,7 +26,7 @@
       "ads_txt_ok": true,
       "public_total": 323,
       "latest_published": "2026-10-01T09:53:00Z",
-      "days_since_last_post": 0.6,
+      "days_since_last_post": 2.6,
       "duplicate_title_groups": 2,
       "rankmath": "active",
       "sitekit": "active",
@@ -35,12 +36,12 @@
       "future_overdue": 0,
       "gsc_property": "sc-domain:k-health365.com",
       "gsc_sitemaps": 6,
-      "gsc_submitted": 247,
+      "gsc_submitted": 241,
       "gsc_indexed_reported": 0,
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 1
+        "impressions": 0
       },
       "gsc_week": {
         "this": {
@@ -58,7 +59,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
-        "warn:stale_5d"
+        "warn:stale_7d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -75,7 +76,7 @@
       "ads_txt_ok": true,
       "public_total": 19,
       "latest_published": "2026-09-26T10:10:19Z",
-      "days_since_last_post": 5.6,
+      "days_since_last_post": 7.6,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -90,7 +91,7 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 76
+        "impressions": 74
       },
       "gsc_week": {
         "this": {
@@ -99,7 +100,7 @@
         },
         "prev": {
           "clicks": 0,
-          "impressions": 1
+          "impressions": 0
         }
       }
     },
@@ -108,6 +109,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "warn:zero_impressions_28d"
       ],
       "manual_actions": [],
@@ -125,7 +127,7 @@
       "ads_txt_ok": true,
       "public_total": 63,
       "latest_published": "2026-09-29T15:54:30Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -157,7 +159,8 @@
       "site": "https://ki-korea.com",
       "platform": "wordpress",
       "issues": [
-        "warn:robots_no_sitemap_line"
+        "warn:robots_no_sitemap_line",
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -174,7 +177,7 @@
       "ads_txt_ok": true,
       "public_total": 12,
       "latest_published": "2026-09-29T15:46:21Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -189,16 +192,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 1,
-        "impressions": 88
+        "impressions": 85
       },
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 29
+          "impressions": 26
         },
         "prev": {
           "clicks": 0,
-          "impressions": 11
+          "impressions": 12
         }
       }
     },
@@ -207,13 +210,10 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
-        "warn:overdue_scheduled_5"
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
-        {
-          "published_overdue_scheduled": 5
-        },
         {
           "indexnow_ping": true
         }
@@ -225,16 +225,16 @@
       "sitemap_url": "https://koreainsurance365.com/sitemap_index.xml",
       "sitemap_index_entries": 3,
       "ads_txt_ok": true,
-      "public_total": 22,
+      "public_total": 27,
       "latest_published": "2026-09-29T15:53:29Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
       "sitekit_connected": true,
       "sitekit_setup_completed": true,
-      "future_total": 5,
-      "future_overdue": 5,
+      "future_total": 0,
+      "future_overdue": 0,
       "gsc_property": "sc-domain:koreainsurance365.com",
       "gsc_sitemaps": 4,
       "gsc_submitted": 68,
@@ -242,16 +242,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 66
+        "impressions": 65
       },
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 19
+          "impressions": 16
         },
         "prev": {
           "clicks": 0,
-          "impressions": 10
+          "impressions": 13
         }
       }
     },
@@ -259,7 +259,8 @@
       "site": "https://kfinance365.com",
       "platform": "wordpress",
       "issues": [
-        "warn:robots_no_sitemap_line"
+        "warn:robots_no_sitemap_line",
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -276,7 +277,7 @@
       "ads_txt_ok": true,
       "public_total": 34,
       "latest_published": "2026-09-29T01:01:19Z",
-      "days_since_last_post": 3.0,
+      "days_since_last_post": 4.9,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -291,7 +292,7 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 51
+        "impressions": 50
       },
       "gsc_week": {
         "this": {
@@ -309,6 +310,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "warn:thin_public_content_3"
       ],
       "manual_actions": [],
@@ -326,7 +328,7 @@
       "ads_txt_ok": true,
       "public_total": 3,
       "latest_published": "2026-09-29T15:45:19Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -350,7 +352,7 @@
         },
         "prev": {
           "clicks": 0,
-          "impressions": 3
+          "impressions": 2
         }
       }
     },
@@ -359,6 +361,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "critical:sitekit_disconnected"
       ],
       "manual_actions": [
@@ -378,7 +381,7 @@
       "ads_txt_ok": true,
       "public_total": 20,
       "latest_published": "2026-09-29T15:48:52Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -411,6 +414,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "warn:thin_public_content_2"
       ],
       "manual_actions": [],
@@ -428,7 +432,7 @@
       "ads_txt_ok": true,
       "public_total": 2,
       "latest_published": "2026-09-29T15:51:42Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -460,7 +464,8 @@
       "site": "https://ktech365.com",
       "platform": "wordpress",
       "issues": [
-        "warn:robots_no_sitemap_line"
+        "warn:robots_no_sitemap_line",
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -477,7 +482,7 @@
       "ads_txt_ok": true,
       "public_total": 15,
       "latest_published": "2026-09-29T15:43:00Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -492,7 +497,7 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 46
+        "impressions": 45
       },
       "gsc_week": {
         "this": {
@@ -501,7 +506,7 @@
         },
         "prev": {
           "clicks": 0,
-          "impressions": 6
+          "impressions": 5
         }
       }
     },
@@ -510,6 +515,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "critical:sitekit_disconnected",
         "warn:zero_impressions_28d"
       ],
@@ -530,7 +536,7 @@
       "ads_txt_ok": true,
       "public_total": 38,
       "latest_published": "2026-09-29T15:49:54Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -563,6 +569,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "warn:thin_public_content_3"
       ],
       "manual_actions": [],
@@ -580,7 +587,7 @@
       "ads_txt_ok": true,
       "public_total": 3,
       "latest_published": "2026-09-29T15:16:58Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.4,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -595,16 +602,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 1,
-        "impressions": 807
+        "impressions": 767
       },
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 179
+          "impressions": 153
         },
         "prev": {
           "clicks": 1,
-          "impressions": 176
+          "impressions": 182
         }
       }
     },
@@ -613,6 +620,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "warn:thin_public_content_4"
       ],
       "manual_actions": [],
@@ -630,7 +638,7 @@
       "ads_txt_ok": true,
       "public_total": 4,
       "latest_published": "2026-09-29T15:31:53Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -662,6 +670,7 @@
       "site": "https://k-trip365.com",
       "platform": "wordpress",
       "issues": [
+        "warn:stale_4d",
         "warn:thin_public_content_9"
       ],
       "manual_actions": [],
@@ -679,7 +688,7 @@
       "ads_txt_ok": true,
       "public_total": 9,
       "latest_published": "2026-09-29T15:41:59Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -694,7 +703,7 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 3,
-        "impressions": 9
+        "impressions": 8
       },
       "gsc_week": {
         "this": {
@@ -703,7 +712,7 @@
         },
         "prev": {
           "clicks": 2,
-          "impressions": 6
+          "impressions": 5
         }
       }
     },
@@ -711,7 +720,8 @@
       "site": "https://k-visa365.com",
       "platform": "wordpress",
       "issues": [
-        "warn:robots_no_sitemap_line"
+        "warn:robots_no_sitemap_line",
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -728,7 +738,7 @@
       "ads_txt_ok": true,
       "public_total": 48,
       "latest_published": "2026-09-29T15:44:02Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -775,9 +785,9 @@
       "sitemap_url": "https://koreawedding365.com/sitemap_index.xml",
       "sitemap_index_entries": 3,
       "ads_txt_ok": true,
-      "public_total": 70,
-      "latest_published": "2026-09-29T15:09:55Z",
-      "days_since_last_post": 2.4,
+      "public_total": 71,
+      "latest_published": "2026-10-03T02:00:54Z",
+      "days_since_last_post": 0.9,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -792,16 +802,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 7,
-        "impressions": 467
+        "impressions": 452
       },
       "gsc_week": {
         "this": {
           "clicks": 2,
-          "impressions": 120
+          "impressions": 107
         },
         "prev": {
           "clicks": 1,
-          "impressions": 130
+          "impressions": 125
         }
       }
     },
@@ -810,6 +820,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_4d",
         "warn:thin_public_content_7"
       ],
       "manual_actions": [],
@@ -827,7 +838,7 @@
       "ads_txt_ok": true,
       "public_total": 7,
       "latest_published": "2026-09-29T15:55:46Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -860,14 +871,11 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
-        "warn:overdue_scheduled_5",
+        "warn:stale_4d",
         "warn:zero_impressions_28d"
       ],
       "manual_actions": [],
       "fixes": [
-        {
-          "published_overdue_scheduled": 5
-        },
         {
           "indexnow_ping": true
         }
@@ -879,16 +887,16 @@
       "sitemap_url": "https://studyinkorea365.com/sitemap_index.xml",
       "sitemap_index_entries": 3,
       "ads_txt_ok": true,
-      "public_total": 57,
+      "public_total": 62,
       "latest_published": "2026-09-29T15:50:10Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
       "sitekit_connected": true,
       "sitekit_setup_completed": true,
-      "future_total": 5,
-      "future_overdue": 5,
+      "future_total": 0,
+      "future_overdue": 0,
       "gsc_property": "sc-domain:studyinkorea365.com",
       "gsc_sitemaps": 4,
       "gsc_submitted": 134,
@@ -914,7 +922,7 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
-        "warn:stale_6d",
+        "warn:stale_8d",
         "warn:thin_public_content_7"
       ],
       "manual_actions": [],
@@ -932,7 +940,7 @@
       "ads_txt_ok": true,
       "public_total": 7,
       "latest_published": "2026-09-25T09:13:25Z",
-      "days_since_last_post": 6.7,
+      "days_since_last_post": 8.6,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -947,16 +955,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 48
+        "impressions": 44
       },
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 7
+          "impressions": 4
         },
         "prev": {
           "clicks": 0,
-          "impressions": 9
+          "impressions": 11
         }
       }
     },
@@ -964,15 +972,11 @@
       "site": "https://ksa-korea.org",
       "platform": "wordpress",
       "issues": [
-        "warn:stale_10d",
-        "warn:thin_public_content_1",
-        "warn:overdue_scheduled_6"
+        "warn:stale_12d",
+        "warn:thin_public_content_7"
       ],
       "manual_actions": [],
       "fixes": [
-        {
-          "published_overdue_scheduled": 6
-        },
         {
           "indexnow_ping": false
         }
@@ -984,16 +988,16 @@
       "sitemap_url": "https://ksa-korea.org/sitemap_index.xml",
       "sitemap_index_entries": 1,
       "ads_txt_ok": true,
-      "public_total": 1,
+      "public_total": 7,
       "latest_published": "2026-09-21T23:06:14Z",
-      "days_since_last_post": 10.1,
+      "days_since_last_post": 12.0,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
       "sitekit_connected": true,
       "sitekit_setup_completed": true,
-      "future_total": 6,
-      "future_overdue": 6,
+      "future_total": 0,
+      "future_overdue": 0,
       "gsc_property": "sc-domain:ksa-korea.org",
       "gsc_sitemaps": 4,
       "gsc_submitted": 24,
@@ -1018,7 +1022,8 @@
       "site": "https://sis-korea.com",
       "platform": "wordpress",
       "issues": [
-        "warn:robots_no_sitemap_line"
+        "warn:robots_no_sitemap_line",
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -1035,7 +1040,7 @@
       "ads_txt_ok": true,
       "public_total": 61,
       "latest_published": "2026-09-29T15:39:26Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -1050,16 +1055,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 88
+        "impressions": 83
       },
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 44
+          "impressions": 42
         },
         "prev": {
           "clicks": 0,
-          "impressions": 3
+          "impressions": 5
         }
       }
     },
@@ -1067,7 +1072,8 @@
       "site": "https://jobkorea365.com",
       "platform": "wordpress",
       "issues": [
-        "warn:robots_no_sitemap_line"
+        "warn:robots_no_sitemap_line",
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
@@ -1084,7 +1090,7 @@
       "ads_txt_ok": true,
       "public_total": 21,
       "latest_published": "2026-09-29T15:38:40Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -1104,11 +1110,11 @@
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 5
+          "impressions": 4
         },
         "prev": {
           "clicks": 0,
-          "impressions": 6
+          "impressions": 7
         }
       }
     },
@@ -1117,13 +1123,10 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
-        "warn:overdue_scheduled_5"
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
-        {
-          "published_overdue_scheduled": 5
-        },
         {
           "indexnow_ping": false
         }
@@ -1135,16 +1138,16 @@
       "sitemap_url": "https://jobinkorea365.com/sitemap_index.xml",
       "sitemap_index_entries": 3,
       "ads_txt_ok": true,
-      "public_total": 37,
+      "public_total": 42,
       "latest_published": "2026-09-29T15:40:57Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.3,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
       "sitekit_connected": true,
       "sitekit_setup_completed": true,
-      "future_total": 5,
-      "future_overdue": 5,
+      "future_total": 0,
+      "future_overdue": 0,
       "gsc_property": "sc-domain:jobinkorea365.com",
       "gsc_sitemaps": 4,
       "gsc_submitted": 92,
@@ -1152,23 +1155,25 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 4,
-        "impressions": 277
+        "impressions": 265
       },
       "gsc_week": {
         "this": {
           "clicks": 0,
-          "impressions": 56
+          "impressions": 53
         },
         "prev": {
           "clicks": 2,
-          "impressions": 61
+          "impressions": 56
         }
       }
     },
     {
       "site": "https://jobkoreaglobal.com",
       "platform": "wordpress",
-      "issues": [],
+      "issues": [
+        "warn:stale_4d"
+      ],
       "manual_actions": [],
       "fixes": [
         {
@@ -1184,7 +1189,7 @@
       "ads_txt_ok": true,
       "public_total": 28,
       "latest_published": "2026-09-29T02:06:05Z",
-      "days_since_last_post": 2.9,
+      "days_since_last_post": 4.9,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -1199,16 +1204,16 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 2,
-        "impressions": 404
+        "impressions": 385
       },
       "gsc_week": {
         "this": {
           "clicks": 1,
-          "impressions": 76
+          "impressions": 59
         },
         "prev": {
-          "clicks": 1,
-          "impressions": 57
+          "clicks": 0,
+          "impressions": 69
         }
       }
     },
@@ -1217,13 +1222,10 @@
       "platform": "wordpress",
       "issues": [
         "warn:robots_no_sitemap_line",
-        "warn:overdue_scheduled_5"
+        "warn:stale_4d"
       ],
       "manual_actions": [],
       "fixes": [
-        {
-          "published_overdue_scheduled": 5
-        },
         {
           "indexnow_ping": false
         }
@@ -1235,16 +1237,16 @@
       "sitemap_url": "https://korea365.org/sitemap_index.xml",
       "sitemap_index_entries": 3,
       "ads_txt_ok": true,
-      "public_total": 100,
+      "public_total": 105,
       "latest_published": "2026-09-29T15:08:54Z",
-      "days_since_last_post": 2.4,
+      "days_since_last_post": 4.4,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
       "sitekit_connected": true,
       "sitekit_setup_completed": true,
-      "future_total": 5,
-      "future_overdue": 5,
+      "future_total": 0,
+      "future_overdue": 0,
       "gsc_property": "sc-domain:korea365.org",
       "gsc_sitemaps": 4,
       "gsc_submitted": 218,
@@ -1252,7 +1254,7 @@
       "gsc_sitemap_errors": 0,
       "gsc_28d": {
         "clicks": 0,
-        "impressions": 71
+        "impressions": 68
       },
       "gsc_week": {
         "this": {
@@ -1261,7 +1263,7 @@
         },
         "prev": {
           "clicks": 0,
-          "impressions": 4
+          "impressions": 2
         }
       }
     },
@@ -1270,6 +1272,7 @@
       "platform": "newsroom",
       "issues": [
         "warn:robots_no_sitemap_line",
+        "warn:stale_5d",
         "warn:zero_impressions_28d"
       ],
       "manual_actions": [],
@@ -1287,7 +1290,7 @@
       "ads_txt_ok": true,
       "public_total": 133,
       "latest_published": "2026-09-28T15:12:40Z",
-      "days_since_last_post": 3.4,
+      "days_since_last_post": 5.4,
       "duplicate_title_groups": 0,
       "rankmath": "active",
       "sitekit": "active",
@@ -1332,9 +1335,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-01T10:08:11.360+09:00",
-      "days_since_last_post": 1.0,
+      "public_total": 8,
+      "latest_published": "2026-10-03T10:23:43.019+09:00",
+      "days_since_last_post": 0.9,
       "sitemap_status": 200,
       "gsc_property": "https://k-trip365.blogspot.com/",
       "gsc_week": null
@@ -1347,9 +1350,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-10-01T14:49:41.841-07:00",
-      "days_since_last_post": 0.1,
+      "public_total": 10,
+      "latest_published": "2026-10-03T12:43:02.376-07:00",
+      "days_since_last_post": 0.2,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1361,9 +1364,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-02T04:02:01.103+09:00",
-      "days_since_last_post": 0.2,
+      "public_total": 8,
+      "latest_published": "2026-10-03T07:37:07.106+09:00",
+      "days_since_last_post": 1.0,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1375,9 +1378,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 9,
-      "latest_published": "2026-09-30T20:06:09.175+09:00",
-      "days_since_last_post": 1.6,
+      "public_total": 12,
+      "latest_published": "2026-10-04T01:52:07.096+09:00",
+      "days_since_last_post": 0.3,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1389,9 +1392,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-10-02T00:37:44.518+09:00",
-      "days_since_last_post": 0.4,
+      "public_total": 7,
+      "latest_published": "2026-10-03T02:00:03.291+09:00",
+      "days_since_last_post": 1.3,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1403,8 +1406,8 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 5,
-      "latest_published": "2026-09-30T01:46:59.101-07:00",
+      "public_total": 6,
+      "latest_published": "2026-10-02T00:54:56.795-07:00",
       "days_since_last_post": 1.7,
       "sitemap_status": 200,
       "gsc_property": null
@@ -1417,9 +1420,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-10-02T09:15:13.699+09:00",
-      "days_since_last_post": 0.0,
+      "public_total": 9,
+      "latest_published": "2026-10-03T06:15:39.461+09:00",
+      "days_since_last_post": 1.1,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1431,9 +1434,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-10-02T05:06:34.118+09:00",
-      "days_since_last_post": 0.2,
+      "public_total": 9,
+      "latest_published": "2026-10-03T18:18:00.731+09:00",
+      "days_since_last_post": 0.6,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1445,9 +1448,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 4,
-      "latest_published": "2026-09-30T20:31:34.145-07:00",
-      "days_since_last_post": 0.9,
+      "public_total": 6,
+      "latest_published": "2026-10-03T00:01:18.301-07:00",
+      "days_since_last_post": 0.7,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1459,9 +1462,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 9,
-      "latest_published": "2026-10-01T07:05:54.485-07:00",
-      "days_since_last_post": 0.4,
+      "public_total": 12,
+      "latest_published": "2026-10-03T10:55:35.896-07:00",
+      "days_since_last_post": 0.2,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1473,9 +1476,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-02T08:28:18.126+09:00",
-      "days_since_last_post": 0.1,
+      "public_total": 9,
+      "latest_published": "2026-10-04T07:48:41.815+09:00",
+      "days_since_last_post": 0.0,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1487,8 +1490,8 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-01T09:28:15.837+09:00",
+      "public_total": 9,
+      "latest_published": "2026-10-03T08:14:40.163+09:00",
       "days_since_last_post": 1.0,
       "sitemap_status": 200,
       "gsc_property": null
@@ -1501,8 +1504,8 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-01T01:17:53.056-07:00",
+      "public_total": 9,
+      "latest_published": "2026-10-02T23:28:55.734-07:00",
       "days_since_last_post": 0.7,
       "sitemap_status": 200,
       "gsc_property": null
@@ -1515,9 +1518,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-10-02T06:11:17.937+09:00",
-      "days_since_last_post": 0.2,
+      "public_total": 10,
+      "latest_published": "2026-10-04T07:12:39.066+09:00",
+      "days_since_last_post": 0.1,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1529,9 +1532,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 3,
-      "latest_published": "2026-10-01T06:07:41.302-07:00",
-      "days_since_last_post": 0.5,
+      "public_total": 5,
+      "latest_published": "2026-10-02T12:23:13.495-07:00",
+      "days_since_last_post": 1.2,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1543,9 +1546,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 9,
-      "latest_published": "2026-10-01T04:00:26.598-07:00",
-      "days_since_last_post": 0.6,
+      "public_total": 11,
+      "latest_published": "2026-10-03T00:49:27.185-07:00",
+      "days_since_last_post": 0.7,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1557,9 +1560,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-10-01T05:38:55.512-07:00",
-      "days_since_last_post": 0.5,
+      "public_total": 7,
+      "latest_published": "2026-10-02T08:50:16.507-07:00",
+      "days_since_last_post": 1.3,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1571,9 +1574,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-01T13:39:32.874-07:00",
-      "days_since_last_post": 0.2,
+      "public_total": 8,
+      "latest_published": "2026-10-02T13:22:37.635-07:00",
+      "days_since_last_post": 1.1,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1585,9 +1588,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-09-30T19:15:05.593-07:00",
-      "days_since_last_post": 0.9,
+      "public_total": 9,
+      "latest_published": "2026-10-02T17:11:10.964-07:00",
+      "days_since_last_post": 1.0,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1599,9 +1602,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-01T10:14:37.944-07:00",
-      "days_since_last_post": 0.3,
+      "public_total": 9,
+      "latest_published": "2026-10-03T14:27:25.009-07:00",
+      "days_since_last_post": 0.1,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1613,9 +1616,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-09-30T15:49:50.704-07:00",
-      "days_since_last_post": 1.1,
+      "public_total": 11,
+      "latest_published": "2026-10-03T09:28:55.519-07:00",
+      "days_since_last_post": 0.3,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1627,9 +1630,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-09-30T19:38:20.475-07:00",
-      "days_since_last_post": 0.9,
+      "public_total": 9,
+      "latest_published": "2026-10-02T17:42:24.655-07:00",
+      "days_since_last_post": 1.0,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1641,9 +1644,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-10-01T00:47:07.404-07:00",
-      "days_since_last_post": 0.7,
+      "public_total": 9,
+      "latest_published": "2026-10-03T12:14:23.286-07:00",
+      "days_since_last_post": 0.2,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1655,9 +1658,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 5,
-      "latest_published": "2026-10-01T10:58:12.337-07:00",
-      "days_since_last_post": 0.3,
+      "public_total": 6,
+      "latest_published": "2026-10-02T09:30:45.102-07:00",
+      "days_since_last_post": 1.3,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1669,9 +1672,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-09-30T05:03:07.176-07:00",
-      "days_since_last_post": 1.5,
+      "public_total": 9,
+      "latest_published": "2026-10-03T03:30:43.244-07:00",
+      "days_since_last_post": 0.6,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1683,9 +1686,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 7,
-      "latest_published": "2026-10-01T17:48:31.268+09:00",
-      "days_since_last_post": 0.7,
+      "public_total": 9,
+      "latest_published": "2026-10-03T21:44:55.612+09:00",
+      "days_since_last_post": 0.5,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1697,9 +1700,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-10-01T11:29:23.222-07:00",
-      "days_since_last_post": 0.3,
+      "public_total": 9,
+      "latest_published": "2026-10-02T21:53:12.145-07:00",
+      "days_since_last_post": 0.8,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1711,9 +1714,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 5,
-      "latest_published": "2026-10-01T06:29:01.678+09:00",
-      "days_since_last_post": 1.1,
+      "public_total": 8,
+      "latest_published": "2026-10-04T03:28:05.002+09:00",
+      "days_since_last_post": 0.2,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1725,9 +1728,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-10-01T22:30:09.899+09:00",
-      "days_since_last_post": 0.5,
+      "public_total": 8,
+      "latest_published": "2026-10-03T04:42:10.377+09:00",
+      "days_since_last_post": 1.2,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1739,9 +1742,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-09-30T17:02:13.287-07:00",
-      "days_since_last_post": 1.0,
+      "public_total": 9,
+      "latest_published": "2026-10-03T16:14:45.284-07:00",
+      "days_since_last_post": 0.0,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1753,9 +1756,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-10-01T15:53:04.185-07:00",
-      "days_since_last_post": 0.1,
+      "public_total": 8,
+      "latest_published": "2026-10-03T08:43:35.340-07:00",
+      "days_since_last_post": 0.3,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1767,9 +1770,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 8,
-      "latest_published": "2026-09-30T16:32:18.098-07:00",
-      "days_since_last_post": 1.1,
+      "public_total": 10,
+      "latest_published": "2026-10-03T07:12:12.741-07:00",
+      "days_since_last_post": 0.4,
       "sitemap_status": 200,
       "gsc_property": null
     },
@@ -1781,9 +1784,9 @@
       "manual_actions": [],
       "fixes": [],
       "feed_status": 200,
-      "public_total": 6,
-      "latest_published": "2026-09-30T23:08:38.520-07:00",
-      "days_since_last_post": 0.8,
+      "public_total": 8,
+      "latest_published": "2026-10-03T04:22:09.517-07:00",
+      "days_since_last_post": 0.5,
       "sitemap_status": 200,
       "gsc_property": null
     }
