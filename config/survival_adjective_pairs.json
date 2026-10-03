@@ -6,6 +6,7 @@
   "pairs": [
     {
       "id": "long-short",
+      "category": "adjective",
       "en": ["long", "short"],
       "ko": ["길다", "짧다"],
       "ja": ["長い", "短い"],
@@ -24,6 +25,7 @@
     },
     {
       "id": "heavy-light",
+      "category": "adjective",
       "en": ["heavy", "light"],
       "ko": ["무겁다", "가볍다"],
       "ja": ["重い", "軽い"],
@@ -37,6 +39,7 @@
     },
     {
       "id": "fast-slow",
+      "category": "adjective",
       "en": ["fast", "slow"],
       "ko": ["빠르다", "느리다"],
       "ja": ["速い", "遅い"],
@@ -49,7 +52,80 @@
       "pt": ["rápido", "lento"]
     },
     {
+      "id": "sun-moon",
+      "category": "noun",
+      "en": ["sun", "moon"],
+      "ko": ["해", "달"],
+      "ja": ["太陽", "月"],
+      "zh": ["太阳", "月亮"],
+      "vi": ["mặt trời", "mặt trăng"],
+      "es": ["sol", "luna"],
+      "fr": ["soleil", "lune"],
+      "de": ["Sonne", "Mond"],
+      "it": ["sole", "luna"],
+      "pt": ["sol", "lua"],
+      "pronunciations": {
+        "ko": ["hae", "dal"],
+        "ja": ["tai-yō", "tsuki"],
+        "zh": ["tài-yáng", "yuè-liang"],
+        "es": ["sohl", "LOO-nah"],
+        "fr": ["soh-LAY", "loon"],
+        "de": ["ZON-uh", "mohnt"],
+        "it": ["SOH-leh", "LOO-nah"],
+        "pt": ["sohl", "LOO-ah"]
+      }
+    },
+    {
+      "id": "book-phone",
+      "category": "noun",
+      "en": ["book", "phone"],
+      "ko": ["책", "전화"],
+      "ja": ["本", "電話"],
+      "zh": ["书", "电话"],
+      "vi": ["sách", "điện thoại"],
+      "es": ["libro", "teléfono"],
+      "fr": ["livre", "téléphone"],
+      "de": ["Buch", "Telefon"],
+      "it": ["libro", "telefono"],
+      "pt": ["livro", "telefone"],
+      "pronunciations": {
+        "ko": ["chaek", "jeon-hwa"],
+        "ja": ["hon", "den-wa"],
+        "zh": ["shū", "diàn-huà"],
+        "es": ["LEE-broh", "teh-LEH-foh-noh"],
+        "fr": ["leevr", "tay-lay-FOHN"],
+        "de": ["bookh", "teh-leh-FOHN"],
+        "it": ["LEE-broh", "teh-LEH-foh-noh"],
+        "pt": ["LEE-vroo", "teh-leh-FOH-nee"]
+      }
+    },
+    {
+      "id": "water-coffee",
+      "category": "noun",
+      "en": ["water", "coffee"],
+      "ko": ["물", "커피"],
+      "ja": ["水", "コーヒー"],
+      "zh": ["水", "咖啡"],
+      "vi": ["nước", "cà phê"],
+      "es": ["agua", "café"],
+      "fr": ["eau", "café"],
+      "de": ["Wasser", "Kaffee"],
+      "it": ["acqua", "caffè"],
+      "pt": ["água", "café"],
+      "pronunciations": {
+        "ko": ["mul", "keo-pi"],
+        "ja": ["mi-zu", "kō-hī"],
+        "zh": ["shuǐ", "kā-fēi"],
+        "es": ["AH-gwah", "kah-FEH"],
+        "fr": ["oh", "kah-FEH"],
+        "de": ["VAH-suh", "kah-FAY"],
+        "it": ["AHK-kwah", "kahf-FEH"],
+        "pt": ["AH-gwah", "kah-FEH"]
+      }
+    },
+    {
       "id": "big-small",
+      "category": "adjective",
       "en": ["big", "small"],
       "ko": ["크다", "작다"],
       "ja": ["大きい", "小さい"],
