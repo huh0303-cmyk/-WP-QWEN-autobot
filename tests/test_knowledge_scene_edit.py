@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from knowledge_scene_edit import validate_scene, render_scenes
+from knowledge_scene_edit import validate_scene, render_scenes, generate_grounded_scene_narration
 
 
 def test_reject_overlong_narration():
@@ -38,3 +38,54 @@ def test_each_scene_keeps_own_clip_and_voice(tmp_path):
                   lambda *a: None, lambda *a: None, normalize, lambda *a: None, lambda *a: 8)
     assert pairs == [('first', 8), ('second', 8)]
     assert (tmp_path / 'scene_manifest.json').exists()
+
+
+def test_alignment_feedback_gets_one_grounded_rewrite_without_weakening_gate():
+    prompts = []
+    checks = []
+    responses = iter((
+        '{"narration":"A generic account of the topic."}',
+        '{"narration":"A worker turns the hand crank beside the machine."}',
+    ))
+
+    def generate(prompt, **kwargs):
+        prompts.append(prompt)
+        return next(responses)
+
+    def verify(topic, clips, narration, generate_fn):
+        checks.append(narration)
+        if len(checks) == 1:
+            raise RuntimeError('alignment 5/100: narration does not match the machine')
+        return {'alignment_score': 96, 'verdict': 'PASS'}
+
+    narration, review = generate_grounded_scene_narration(
+        'an early telephone exchange', 'invention',
+        {'title': 'Switchboard at work', 'duration': 12,
+         'visual_analysis': {'visual_summary': 'An operator turns a hand crank beside a switchboard.'}},
+        12, generate, lambda value: value, verify,
+    )
+
+    assert len(checks) == 2
+    assert 'alignment reviewer rejected' in prompts[1]
+    assert 'hand crank' in prompts[1]
+    assert review['alignment_score'] == 96
+    assert narration == checks[1]
+
+
+def test_alignment_retry_still_fails_closed():
+    responses = iter((
+        '{"narration":"First mismatch."}',
+        '{"narration":"Second mismatch."}',
+    ))
+    checks = []
+
+    def verify(*args):
+        checks.append(True)
+        raise RuntimeError('alignment rejected')
+
+    with pytest.raises(RuntimeError, match='alignment rejected'):
+        generate_grounded_scene_narration(
+            'topic', 'invention', {'duration': 12, 'visual_analysis': {}}, 12,
+            lambda *a, **k: next(responses), lambda value: value, verify,
+        )
+    assert len(checks) == 2

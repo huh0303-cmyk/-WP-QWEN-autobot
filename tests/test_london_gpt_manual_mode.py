@@ -67,6 +67,32 @@ def test_manual_run_and_publish_rerun_guard(monkeypatch, tmp_path):
     assert client.post("/api/london-gpt/rerun/publish", json={"run_id": run_id}).status_code == 409
 
 
+def test_n8n_start_timeout_stays_pending_instead_of_false_failure(monkeypatch, tmp_path):
+    client = _app(monkeypatch, tmp_path)
+
+    def timeout(*args, **kwargs):
+        raise london_gpt_app.requests.Timeout("read timed out")
+
+    monkeypatch.setattr(london_gpt_app.requests, "post", timeout)
+    response = client.post("/api/london-gpt/run", json={
+        "site_id": "wp_test", "category": "Health", "publish_mode": "draft",
+    })
+
+    assert response.status_code == 202
+    assert response.json["ok"] is True
+    assert response.json["start_ack_pending"] is True
+    run_id = response.json["run_id"]
+    state = london_gpt_app._read_run(run_id)
+    assert state["start_status"] == "dispatching"
+    assert "last_error" not in state
+
+    status = client.get(f"/api/london-gpt/run/{run_id}")
+    assert status.status_code == 200
+    assert status.json["stage_status"] == {
+        "research": "waiting", "write": "waiting", "image": "waiting", "publish": "waiting",
+    }
+
+
 def test_image_clipboard_endpoint_reads_only_trusted_run_image(monkeypatch, tmp_path):
     client = _app(monkeypatch, tmp_path)
     run_id = "lgpt-20260928-120000-abcdef"
