@@ -326,7 +326,10 @@ async function autoRun(){
     if(!r.ok||!d.ok)throw new Error(d.message||d.error||'n8n 시작 실패');
     currentRunId=d.run_id;
     document.getElementById('runId').textContent='RUN '+currentRunId;
-    setAgent('research','running','n8n이 Agent 1을 시작했습니다.');
+    setAgent('research','running',d.start_ack_pending
+      ?'n8n 응답 확인 중 · 중복 실행 방지를 위해 상태를 확인하고 있습니다.'
+      :'n8n이 Agent 1을 시작했습니다.');
+    if(d.start_ack_pending)document.getElementById('pollState').textContent=d.message||'실행 접수 여부 확인 중';
     startPolling();
   }catch(e){
     showError('시작',e.message);
@@ -341,6 +344,9 @@ async function pollRun(){
     const d=await r.json();
     currentData=d;
     const s=d.stage_status||{};
+    if(d.start_status==='dispatching' && Object.values(s).every(value=>value==='waiting')){
+      setAgent('research','running','n8n 시작 응답을 확인 중입니다. 중복 실행을 막기 위해 다시 시작하지 않고 상태를 확인합니다.');
+    }
     const category=d.category_assignment;
     const categoryText=category?.status==='ok'
       ? ('카테고리 지정 완료: '+(category.name||'-')+(category.id?(' · ID '+category.id):''))

@@ -234,6 +234,7 @@ def install(app, runtime):
             "image_model": image_model,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "orchestrator": "n8n",
+            "start_status": "dispatching",
             "stage_status": {
                 "research": "waiting",
                 "write": "waiting",
@@ -255,14 +256,18 @@ def install(app, runtime):
                 timeout=12,
             )
         except requests.RequestException as exc:
-            state["last_error"] = {
-                "stage": "start",
-                "type": type(exc).__name__,
-                "message": str(exc)[:1200],
-                "at": datetime.now(timezone.utc).isoformat(),
-            }
-            _write_run(state)
-            return jsonify({"ok": False, "error": "n8n_unreachable", "message": str(exc), "run_id": run_id}), 503
+            # A timed-out webhook response does not prove n8n failed to accept
+            # the execution. Keep the run pollable and avoid inviting a second
+            # click that could enqueue duplicate research or publication.
+            return jsonify({
+                "ok": True,
+                "run_id": run_id,
+                "orchestrator": "n8n",
+                "status": "start_ack_pending",
+                "start_ack_pending": True,
+                "error_type": type(exc).__name__,
+                "message": "n8n 응답이 늦어 실행 여부를 확인하고 있습니다. 중복 실행을 막기 위해 다시 시작하지 않고 상태를 확인합니다.",
+            }), 202
 
         if response.status_code >= 400:
             state["last_error"] = {

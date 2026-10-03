@@ -1,0 +1,12 @@
+.k365-app-nav{display:grid;grid-template-columns:repeat(3,minmax(92px,1fr));gap:7px;min-width:min(390px,42vw)}
+.k365-app-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:42px;padding:6px 10px;border:1px solid #334155;border-radius:10px;background:#17243a;color:#e2e8f0;text-align:center;text-decoration:none;font-size:11px;font-weight:950;letter-spacing:.025em;transition:background .15s,border-color .15s,transform .15s}
+.k365-app-nav a:hover{background:#243650;border-color:#64748b;transform:translateY(-1px)}
+.k365-app-nav a.active{background:#1d4ed8;border-color:#60a5fa;color:#fff;box-shadow:0 5px 16px #1d4ed833}
+.k365-app-nav small{font-size:9px;font-weight:650;letter-spacing:0;color:#bfcee2}
+.k365-app-nav a.active small{color:#dbeafe}
+.k365-ops-note{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 12px;padding:12px 15px;border:1px solid #bfdbfe;border-radius:12px;background:linear-gradient(110deg,#eff6ff,#f8fafc);color:#1e3a5f;font-size:12px;line-height:1.55}
+.k365-ops-note strong{color:#0f2e59}
+.k365-ops-actions{display:flex;flex-wrap:wrap;gap:7px;flex-shrink:0}
+.k365-ops-actions a{display:inline-block;padding:7px 10px;border-radius:8px;background:#172f54;color:#fff;font-weight:850;text-decoration:none;white-space:nowrap}
+.k365-ops-actions a:hover{background:#1d4ed8}
+@media(max-width:720px){.k365-app-nav{min-width:0;width:100%;gap:5px}.k365-app-nav a{min-height:39px;padding:5px 4px;font-size:10px}.k365-app-nav small{font-size:8px}.k365-ops-note{display:block}.k365-ops-actions{margin-top:9px}}

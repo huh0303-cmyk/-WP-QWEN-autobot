@@ -20,6 +20,50 @@ def validate_scene(text, duration):
         raise ValueError('Narration exceeds available footage word budget')
 
 
+def generate_grounded_scene_narration(topic, channel, clip, available, generate, parse,
+                                     verify, max_attempts=2, log=None):
+    """Write from inspected footage; allow one evidence-guided rewrite, never a weaker gate."""
+    visual = clip.get('visual_analysis') or {}
+    source_context = {
+        key: clip.get(key)
+        for key in ('title', 'year', 'date', 'description', 'source_url', 'license_url', 'event_text', 'event_sources')
+        if clip.get(key)
+    }
+    source_context['visible_summary'] = visual.get('visual_summary', '')
+    source_context['shot_sequence'] = visual.get('shot_sequence', [])
+    source_context['era_cues'] = visual.get('era_cues', '')
+    feedback = ''
+    for attempt in range(max_attempts):
+        retry_note = (
+            f' The prior alignment reviewer rejected this narration: {feedback}. '
+            'Rewrite around only the visible actions and the supported source context; '
+            'remove every mismatched claim.' if feedback else ''
+        )
+        prompt = (
+            f'{ANGLES[channel]} Topic: {topic}. Narrate ONLY this actual clip, '
+            f'maximum {max(8, int(available * 1.6))} words. Open with the literal '
+            'visible action, not a generic introduction. Describe only inspected '
+            'visuals and verifiable facts supported by the provided source context. '
+            'Do not infer an identity, event, date, or action that the images do not '
+            'show. Do not describe later footage or pad the narration. '
+            f'{retry_note}\nSource context: {json.dumps(source_context, ensure_ascii=False)}\n'
+            'Return JSON with narration.'
+        )
+        data = json.loads(parse(generate(prompt, temperature=0.4)))
+        text = str(data.get('narration', '')).strip()
+        validate_scene(text, available)
+        try:
+            review = verify(clip.get('event_text', topic), [clip], text, generate)
+            return text, review
+        except RuntimeError as exc:
+            feedback = str(exc)
+            if attempt + 1 >= max_attempts:
+                raise
+            if log:
+                log(f'   narration alignment rejected; one evidence-guided rewrite: {feedback[:180]}')
+    raise RuntimeError('No grounded narration passed the alignment review')
+
+
 def render_scenes(topic, channel, clips, workdir, generate, parse, verify,
                   tts, write_srt, mux, normalize, ffmpeg, duration):
     """Generate and synthesize each scene independently, then concatenate AV pairs."""
@@ -33,19 +77,9 @@ def render_scenes(topic, channel, clips, workdir, generate, parse, verify,
         available = min(float(clip['duration']), 45.0, 900 - elapsed)
         if available < 5:
             continue
-        budget = max(8, int(available * 1.6))
-        prompt = (
-            f'{ANGLES[channel]} Topic: {topic}. Write English documentary narration '
-            f'for ONLY this actual clip, maximum {budget} words. Begin naturally; '
-            'do not repeat a generic introduction in each scene. Describe only '
-            'the inspected footage and supported source facts. Omit uncertain claims. '
-            'Do not describe later footage or pad duration. Return JSON with narration. '
-            f'Source: {json.dumps(clip, ensure_ascii=False)}'
+        text, review = generate_grounded_scene_narration(
+            topic, channel, clip, available, generate, parse, verify, log=print
         )
-        data = json.loads(parse(generate(prompt, temperature=0.4)))
-        text = data.get('narration', '').strip()
-        validate_scene(text, available)
-        review = verify(clip.get('event_text', topic), [clip], text, generate)
         def reject_silence(*args, **kwargs):
             raise RuntimeError('ElevenLabs failed: silent narration is not publishable')
         globals_ = tts.__globals__

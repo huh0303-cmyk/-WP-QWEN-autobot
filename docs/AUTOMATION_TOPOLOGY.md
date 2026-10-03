@@ -37,3 +37,32 @@ downstream-dispatched. `prune-unindexed-posts` is destructive and must remain ex
 Blogger daily generation and `자동화_발행대기` can address the same Blogger property.
 Neither path was deleted. A shared stable `content_id/source_id` lock is still required
 before both schedules can be declared duplicate-safe.
+
+## 2026-10-03 implementation status — do not mistake target architecture for live cutover
+
+- The locked architecture names n8n as the intended central orchestrator, but the
+  checked-in `wp25_master.json` and `blogger33_master.json` both have `active: false`.
+  The deploy workflow imports both and explicitly publishes only the four-agent
+  content workflow. This repository state does not establish that the two scheduled
+  master workflows are active on the VPS.
+- The VPS preflight on 2026-10-03 found the Blogger daily timer, WP publisher service,
+  operations service, and n8n gateway installed/enabled. A unit-file listing is not
+  proof that a timer fired successfully or that a public post was created.
+- Therefore the 60-site schedule is **not yet proven to be a single n8n-owned path**.
+  Do not activate the n8n master schedules or disable the existing publishers until
+  a shared per-site/date/content idempotency key, duplicate reconciliation, and
+  receipt-backed end-to-end canaries pass for WP and Blogger.
+- The four-agent console had a separate 12-second webhook-start timeout that could
+  label an ambiguous n8n acknowledgement as a terminal start failure. The UI now
+  keeps that run in acknowledgement-pending status and polls the same `run_id`;
+  it must not automatically submit a second run. This code change is tested locally
+  but is not deployed to production yet.
+- The YouTube knowledge job runner remains a separate VPS worker; its Oct 3 queue
+  audit showed no pending/running jobs. Do not treat that worker as a blog publisher
+  or as proof that n8n owns the complete blog schedule.
+- CONTROL, BLOG, and SNS are three host-routed views of the same authenticated
+  control-center app, not three independent deployments. Their shared navigation and
+  operating copy distinguishes dispatch, acknowledgement-pending, queued work,
+  verified account permission, and a public receipt. BLOG must not imply that every
+  daily platform scheduler has cut over to n8n; production page changes remain
+  pending the guarded VPS deploy gate.

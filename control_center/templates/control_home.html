@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
 <title>Korea365 Control</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='korea365-app-shell.css') }}?v=20261003">
 <style>
 :root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a;background:#f1f5f9}
 *{box-sizing:border-box}body{margin:0;background:#f1f5f9}a{color:inherit;text-decoration:none}
@@ -49,11 +50,16 @@ tbody tr:hover{filter:brightness(.98)}
 </style>
 </head>
 <body>
+{% set active_console = 'control' %}
 <header><div class="top">
-<div><div class="brand">Korea365 CONTROL</div><div class="desc">가벼운 초기화면 · 상세 작업은 하위도메인</div></div>
-<nav class="nav"><a class="active" href="https://control.korea365.org">CONTROL</a><a href="https://blog.korea365.org">BLOG</a><a href="https://sns.korea365.org">YOUTUBE + SNS</a></nav>
+<div><div class="brand">Korea365 CONTROL</div><div class="desc">블로그 · YouTube · SNS 운영 현황 · KST 기준</div></div>
+{% include '_korea365_app_nav.html' %}
 </div></header>
 <main>
+<section class="k365-ops-note" aria-label="운영 상태 안내">
+  <div><strong>완료 기준은 공개 영수증입니다.</strong> 접수·대기열·계정 연결은 발행 완료가 아니며, 공개 URL과 목적지 확인 뒤 완료로 표시합니다.</div>
+  <div class="k365-ops-actions"><a href="https://blog.korea365.org/publish">4-Agent 글 발행</a><a href="https://sns.korea365.org/social-accounts?platform=YouTube">채널 상태 확인</a></div>
+</section>
 <div class="dashboard-grid">
 <section class="section">
 <div class="section-head"><div><h2 id="blog-title">블로그 순위</h2><p>WP25 + 신문사2 + Blogspot33 + Naver3 + Tistory5 = 68 · 어제 방문자수 내림차순 · KST 기준</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>

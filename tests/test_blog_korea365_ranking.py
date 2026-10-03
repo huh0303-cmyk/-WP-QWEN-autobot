@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -276,15 +277,18 @@ def test_dashboard_shows_ordinal_rank_and_site_opening_date():
 
 def test_blogger_central_counter_reads_zero_as_connected(monkeypatch, tmp_path):
     db = tmp_path / "visitors.sqlite3"
-    monkeypatch.setattr(blog_visitors, "_today", lambda: "2026-09-29")
+    today = datetime.now(timezone(timedelta(hours=9))).date()
+    yesterday = (today - timedelta(days=1)).isoformat()
+    day_before = (today - timedelta(days=2)).isoformat()
+    monkeypatch.setattr(blog_visitors, "_today", lambda: today.isoformat())
     with sqlite3.connect(db) as conn:
         conn.executescript("""
             CREATE TABLE daily(site_key TEXT,date TEXT,count INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(site_key,date));
             CREATE TABLE total(site_key TEXT PRIMARY KEY,count INTEGER NOT NULL DEFAULT 0);
-            INSERT INTO daily VALUES('kfinance365','2026-09-28',2);
-            INSERT INTO daily VALUES('kfinance365','2026-09-27',1);
             INSERT INTO total VALUES('kfinance365',3);
         """)
+        conn.execute("INSERT INTO daily VALUES(?,?,?)", ("kfinance365", yesterday, 2))
+        conn.execute("INSERT INTO daily VALUES(?,?,?)", ("kfinance365", day_before, 1))
     stats = blog_visitors.read_site_stats(db, "kfinance365")
     assert stats["connected"] is True
     assert stats["today"] == 0

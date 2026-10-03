@@ -1,0 +1,11 @@
+<nav class="k365-app-nav" aria-label="Korea365 운영 화면">
+  <a href="https://control.korea365.org" class="{{ 'active' if active_console == 'control' else '' }}" {% if active_console == 'control' %}aria-current="page"{% endif %}>
+    <span>CONTROL</span><small>전체 현황</small>
+  </a>
+  <a href="https://blog.korea365.org" class="{{ 'active' if active_console == 'blog' else '' }}" {% if active_console == 'blog' %}aria-current="page"{% endif %}>
+    <span>BLOG</span><small>글 발행</small>
+  </a>
+  <a href="https://sns.korea365.org" class="{{ 'active' if active_console == 'social' else '' }}" {% if active_console == 'social' %}aria-current="page"{% endif %}>
+    <span>YOUTUBE + SNS</span><small>채널 운영</small>
+  </a>
+</nav>
