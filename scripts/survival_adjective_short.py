@@ -161,7 +161,8 @@ def card_background(profile: LanguageProfile) -> tuple[Image.Image, ImageDraw.Im
 
 
 def make_card(path: Path, profile: LanguageProfile, word: str, reading: str, meaning: str, count: int | None,
-              counterpart: str = "", mode: str = "repeat") -> None:
+              counterpart: str = "", counterpart_reading: str = "", counterpart_meaning: str = "",
+              mode: str = "repeat") -> None:
     image, draw = card_background(profile)
     if mode == "intro":
         centered(draw, "TODAY'S PAIR", 480, font(62, True), (220, 226, 238))
@@ -169,9 +170,13 @@ def make_card(path: Path, profile: LanguageProfile, word: str, reading: str, mea
         draw.rounded_rectangle((160, 1030, 920, 1190), radius=80, fill=profile.accent)
         centered(draw, "LISTEN  -  REPEAT", 1070, font(46, True), (255, 255, 255))
     elif mode == "outro":
-        centered(draw, "GREAT JOB", 520, font(76, True), (255, 255, 255))
-        centered(draw, word, 730, font(90, True), profile.accent)
-        centered(draw, "Repeat tomorrow.", 1110, font(48, True), (220, 226, 238))
+        # Use the final card as a study recap, not generic praise. The learner
+        # sees both the target spelling and the accessible Latin reading/gloss.
+        centered(draw, "TODAY'S WORDS", 420, font(58, True), (220, 226, 238))
+        centered(draw, word, 610, font(88, True), profile.accent)
+        centered(draw, f"{reading}   •   {meaning}", 760, font(52, True), (255, 255, 255))
+        centered(draw, counterpart, 970, font(88, True), profile.accent)
+        centered(draw, f"{counterpart_reading}   •   {counterpart_meaning}", 1120, font(52, True), (255, 255, 255))
     elif mode == "contrast":
         centered(draw, word, 580, font(112, True), (255, 255, 255))
         centered(draw, counterpart, 930, font(112, True), profile.accent)
@@ -262,29 +267,30 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     await synthesize(words[0], profile, raw_a)
     await synthesize(words[1], profile, raw_b)
     a_audio, b_audio = workdir / "word_a.m4a", workdir / "word_b.m4a"
-    make_fixed_audio(raw_a, a_audio, 2.4)
-    make_fixed_audio(raw_b, b_audio, 2.4)
-    intro_audio, divider_audio, outro_audio = workdir / "intro.m4a", workdir / "divider.m4a", workdir / "outro.m4a"
+    # 2.5 seconds per word leaves a deliberate listen-and-repeat pause.
+    make_fixed_audio(raw_a, a_audio, 2.5)
+    make_fixed_audio(raw_b, b_audio, 2.5)
+    intro_audio, outro_audio = workdir / "intro.m4a", workdir / "outro.m4a"
     make_silence(intro_audio, 1.8)
-    make_silence(divider_audio, 1.0)
     make_silence(outro_audio, 1.6)
 
     intro = workdir / "intro.png"
-    divider = workdir / "divider.png"
     outro = workdir / "outro.png"
     make_card(intro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="intro")
-    make_card(divider, profile, words[0], "", "", None, counterpart=words[1], mode="contrast")
-    make_card(outro, profile, f"{words[0]}  /  {words[1]}", "", "", None, mode="outro")
+    make_card(
+        outro, profile, words[0], readings[0], meanings[0], None,
+        counterpart=words[1], counterpart_reading=readings[1],
+        counterpart_meaning=meanings[1], mode="outro",
+    )
     timeline: list[tuple[Path, Path, float]] = [(intro, intro_audio, 1.8)]
     for index in range(1, 6):
-        card = workdir / f"a_{index}.png"
-        make_card(card, profile, words[0], readings[0], meanings[0], index)
-        timeline.append((card, a_audio, 2.4))
-    timeline.append((divider, divider_audio, 1.0))
-    for index in range(1, 6):
-        card = workdir / f"b_{index}.png"
-        make_card(card, profile, words[1], readings[1], meanings[1], index)
-        timeline.append((card, b_audio, 2.4))
+        for letter, word, reading, meaning, track in (
+            ("a", words[0], readings[0], meanings[0], a_audio),
+            ("b", words[1], readings[1], meanings[1], b_audio),
+        ):
+            card = workdir / f"{letter}_{index}.png"
+            make_card(card, profile, word, reading, meaning, index)
+            timeline.append((card, track, 2.5))
     timeline.append((outro, outro_audio, 1.6))
 
     output = destination / f"{target_date.isoformat()}_{code}_{pair['id']}.mp4"

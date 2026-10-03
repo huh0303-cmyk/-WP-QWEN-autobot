@@ -59,6 +59,26 @@ def verified_video(service, video_id: str, expected_channel_id: str, expected_pr
     return video
 
 
+def wait_for_verified_video(service, video_id: str, expected_channel_id: str, expected_privacy: str) -> dict:
+    """Allow YouTube's videos.list index to catch up after insert.
+
+    Never repeat an upload on an ambiguous verification result: that can create
+    duplicate public videos. Retry only the read, then fail closed.
+    """
+    last_error = None
+    for attempt in range(8):
+        try:
+            return verified_video(service, video_id, expected_channel_id, expected_privacy)
+        except RuntimeError as exc:
+            message = str(exc)
+            if "is not readable" not in message:
+                raise
+            last_error = exc
+            if attempt < 7:
+                time.sleep(2)
+    raise RuntimeError(f"Uploaded video {video_id} still not readable after bounded checks: {last_error}")
+
+
 def make_old_video_private(service, video_id: str, expected_channel_id: str) -> dict:
     rows = service.videos().list(part="snippet,status", id=video_id).execute().get("items", [])
     if len(rows) != 1 or rows[0].get("snippet", {}).get("channelId") != expected_channel_id:
@@ -118,7 +138,7 @@ def publish_one(manifest_path: Path, privacy: str) -> dict:
     while response is None:
         _, response = request.next_chunk()
     video_id = response["id"]
-    video = verified_video(service, video_id, expected_channel, privacy)
+    video = wait_for_verified_video(service, video_id, expected_channel, privacy)
     receipt = {
         "published_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "language_code": code,

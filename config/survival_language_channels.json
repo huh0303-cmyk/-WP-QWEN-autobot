@@ -112,7 +112,7 @@
     "handle_only_pending_uc_id": [],
     "evidence_source_2026-09-27": "All 10 language @handle pages resolved to exact UC channel IDs from public YouTube channel metadata; owner account-switcher screenshot cross-checked names/handles.",
     "rule": "Never reuse a legacy brand/account selector label as channel identity; production identity is exact title + handle + UC channel ID.",
-    "daily_format": "one important antonym adjective pair per vertical Short; word A five times with a pause, then word B five times with a pause",
+    "daily_format": "one important antonym adjective pair per vertical Short; alternate A/B for five slow rounds with a pause after each native-voice word, show a Latin pronunciation guide and English meaning under each word, no generic praise outro",
     "daily_pair_catalog": "config/survival_adjective_pairs.json",
     "generator": "scripts/survival_adjective_short.py",
     "voice_failover": "fail_closed_never_replace_with_another_language_voice"
