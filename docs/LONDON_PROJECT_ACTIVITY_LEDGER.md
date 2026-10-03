@@ -234,6 +234,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 ## vps-deploy-deferred-20261001
 - 2026-10-01 KST 04:35, Claude. 증거(GitHub Actions 로그, run 0807a93): Deploy to VPS가 05cdb90부터 8회 연속 실패로 표시됐으나 원인은 오류가 아니라 VPS 배포기의 지연 상태 `waiting_for_video`(영상 작업 중 배포 보류). VPS는 36a46cd(오늘 03:44 KST, 무료 Gemini 키 전달 수정까지 포함)에 머무름. 따라서 2-tries/독립엔진/로컬 Qwen/늘려쓰기/플랫폼 길이 정책은 GitHub Actions 경로에는 적용, VPS 경로(blog.korea365.org 즉시발행 등)에는 영상 작업 종료 후 재배포되어야 적용됨. 배포 트리거는 push/workflow_dispatch뿐이라 자동 재시도 없음 → 영상 종료 후 재트리거 필요.
 
+## 2026-10-11 23:50 KST — Blogger 33 daily audit blocked
+
+- `task_id=blogger33-daily-audit-20261011-2350-kst`; intended read-only SSH audit of `187.127.121.57`. No GitHub Actions dispatch, retry, manual publication, or production mutation was performed.
+- Two independent SSH attempts using the established key both timed out on TCP port 22 (first with a 20-second connection timeout, then a 10-second retry). Consequently the status of `korea365-blogger33-daily.timer`, the exact 33-item `2026-10-11` schedule, transient-service outcomes, publication-key duplicates, OAuth/API errors, and `blogger-33-public-results.json` could not be verified.
+- Next action: restore or confirm SSH/network reachability to the VPS, then run this same read-only audit. Do not dispatch `publish-blogger-33-now.yml`; do not retry any site until same-date publication markers and public posts are checked.
+
 ## 2026-10-02 01:20 KST — Blogger 33 daily audit
 
 - `task_id=blogger33-daily-audit-20261002-0120-kst`; read-only SSH audit on `187.127.121.57`. No GitHub Actions dispatch, retry, or publication was performed.
