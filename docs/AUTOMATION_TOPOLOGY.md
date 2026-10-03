@@ -55,8 +55,8 @@ before both schedules can be declared duplicate-safe.
 - The four-agent console had a separate 12-second webhook-start timeout that could
   label an ambiguous n8n acknowledgement as a terminal start failure. The UI now
   keeps that run in acknowledgement-pending status and polls the same `run_id`;
-  it must not automatically submit a second run. This code change is tested locally
-  but is not deployed to production yet.
+  it must not automatically submit a second run. This code change was tested and
+  included in PR #203; follow-up deployment receipt is recorded in the activity ledger.
 - The YouTube knowledge job runner remains a separate VPS worker; its Oct 3 queue
   audit showed no pending/running jobs. Do not treat that worker as a blog publisher
   or as proof that n8n owns the complete blog schedule.
@@ -64,5 +64,5 @@ before both schedules can be declared duplicate-safe.
   control-center app, not three independent deployments. Their shared navigation and
   operating copy distinguishes dispatch, acknowledgement-pending, queued work,
   verified account permission, and a public receipt. BLOG must not imply that every
-  daily platform scheduler has cut over to n8n; production page changes remain
-  pending the guarded VPS deploy gate.
+  daily platform scheduler has cut over to n8n. These console changes were deployed
+  after the guarded VPS deploy gate cleared; details are in the activity ledger.
