@@ -45,7 +45,8 @@ def authenticated_channel_id(service) -> str:
     return result[0]["id"]
 
 
-def verified_video(service, video_id: str, expected_channel_id: str, expected_privacy: str) -> dict:
+def verified_video(service, video_id: str, expected_channel_id: str, expected_privacy: str,
+                   expected_publish_at: str | None = None) -> dict:
     rows = service.videos().list(part="snippet,status,processingDetails", id=video_id).execute().get("items", [])
     if len(rows) != 1:
         raise RuntimeError(f"Uploaded video {video_id} is not readable")
@@ -56,10 +57,19 @@ def verified_video(service, video_id: str, expected_channel_id: str, expected_pr
         raise RuntimeError(f"Wrong-channel upload blocked: expected {expected_channel_id}, got {actual_channel}")
     if actual_privacy != expected_privacy:
         raise RuntimeError(f"Privacy verification failed: expected {expected_privacy}, got {actual_privacy}")
+    if expected_publish_at:
+        actual_publish_at = video.get("status", {}).get("publishAt")
+        if not actual_publish_at:
+            raise RuntimeError(f"Scheduled publish time missing for {video_id}")
+        expected = dt.datetime.fromisoformat(expected_publish_at.replace("Z", "+00:00")).astimezone(dt.timezone.utc)
+        actual = dt.datetime.fromisoformat(actual_publish_at.replace("Z", "+00:00")).astimezone(dt.timezone.utc)
+        if actual != expected:
+            raise RuntimeError(f"Scheduled publish time mismatch for {video_id}: expected {expected.isoformat()}, got {actual.isoformat()}")
     return video
 
 
-def wait_for_verified_video(service, video_id: str, expected_channel_id: str, expected_privacy: str) -> dict:
+def wait_for_verified_video(service, video_id: str, expected_channel_id: str, expected_privacy: str,
+                            expected_publish_at: str | None = None) -> dict:
     """Allow YouTube's videos.list index to catch up after insert.
 
     Never repeat an upload on an ambiguous verification result: that can create
@@ -68,7 +78,7 @@ def wait_for_verified_video(service, video_id: str, expected_channel_id: str, ex
     last_error = None
     for attempt in range(8):
         try:
-            return verified_video(service, video_id, expected_channel_id, expected_privacy)
+            return verified_video(service, video_id, expected_channel_id, expected_privacy, expected_publish_at)
         except RuntimeError as exc:
             message = str(exc)
             if "is not readable" not in message:
@@ -104,7 +114,7 @@ def make_old_video_private(service, video_id: str, expected_channel_id: str) -> 
     return {"video_id": video_id, "privacy_status": "private"}
 
 
-def publish_one(manifest_path: Path, privacy: str) -> dict:
+def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None) -> dict:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     code = manifest["language_code"]
     expected_channel = manifest["channel_id"]
@@ -115,11 +125,16 @@ def publish_one(manifest_path: Path, privacy: str) -> dict:
         raise RuntimeError(f"Authenticated channel mismatch for {code}: expected {expected_channel}, got {mine}")
     if receipt_path.exists():
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-        verified_video(service, receipt["video_id"], expected_channel, privacy)
+        verified_video(service, receipt["video_id"], expected_channel, privacy, publish_at)
         return receipt
     video_path = Path(manifest["video_path"])
     if not video_path.exists():
         raise FileNotFoundError(video_path)
+    status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
+    if publish_at:
+        if privacy != "private":
+            raise RuntimeError("YouTube scheduled videos must be uploaded as private")
+        status["publishAt"] = publish_at
     request = service.videos().insert(
         part="snippet,status",
         body={
@@ -130,7 +145,7 @@ def publish_one(manifest_path: Path, privacy: str) -> dict:
                 "categoryId": "27",
                 "defaultLanguage": code if code != "zh" else "zh-Hans",
             },
-            "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False},
+            "status": status,
         },
         media_body=MediaFileUpload(str(video_path), mimetype="video/mp4", resumable=True, chunksize=8 * 1024 * 1024),
     )
@@ -138,7 +153,7 @@ def publish_one(manifest_path: Path, privacy: str) -> dict:
     while response is None:
         _, response = request.next_chunk()
     video_id = response["id"]
-    video = wait_for_verified_video(service, video_id, expected_channel, privacy)
+    video = wait_for_verified_video(service, video_id, expected_channel, privacy, publish_at)
     receipt = {
         "published_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "language_code": code,
@@ -148,6 +163,7 @@ def publish_one(manifest_path: Path, privacy: str) -> dict:
         "privacy_status": video["status"]["privacyStatus"],
         "processing_status": video.get("processingDetails", {}).get("processingStatus"),
         "pair_id": manifest["pair_id"],
+        "scheduled_publish_at": video.get("status", {}).get("publishAt"),
     }
     receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     manifest["publication_status"] = "verified_public" if privacy == "public" else f"verified_{privacy}"
@@ -161,6 +177,7 @@ def main() -> int:
     parser.add_argument("--date", default=dt.date.today().isoformat())
     parser.add_argument("--languages", default="all")
     parser.add_argument("--privacy", choices=("public", "private", "unlisted"), default="public")
+    parser.add_argument("--publish-at", help="Schedule publication time as an ISO-8601 timestamp; uploads privately")
     parser.add_argument("--replace-video-id", help="With exactly one language, make this old video private after the corrected upload is public")
     parser.add_argument("--replace-video-ids", help="Comma-separated language:oldVideoId map for a corrected batch")
     parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT))
@@ -182,7 +199,7 @@ def main() -> int:
     receipts = []
     for code in codes:
         print(f"PUBLISH {code}", flush=True)
-        receipts.append(publish_one(root / code / "manifest.json", args.privacy))
+        receipts.append(publish_one(root / code / "manifest.json", args.privacy, args.publish_at))
     for code, old_video_id in replace_map.items():
         service = youtube_service(code)
         expected_channel = json.loads((root / code / "manifest.json").read_text(encoding="utf-8"))["channel_id"]

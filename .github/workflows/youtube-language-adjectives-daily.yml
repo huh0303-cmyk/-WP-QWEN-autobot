@@ -1,13 +1,17 @@
-name: Three weekly ten-language vocabulary Shorts
+name: Three weekly scheduled ten-language vocabulary Shorts
 
 on:
   schedule:
-    # 08:17 KST Monday, Wednesday, Friday (23:17 UTC on the prior day).
-    - cron: "17 23 * * 0,2,4"
+    # Prepare and upload privately at 20:17 KST the prior evening; publish at 08:17 KST Mon/Wed/Fri.
+    - cron: "17 11 * * 0,2,4"
   workflow_dispatch:
     inputs:
       target_date:
-        description: KST production date (YYYY-MM-DD); blank uses current KST date
+        description: KST release date (YYYY-MM-DD); blank uses today's KST date
+        required: false
+        type: string
+      publish_at:
+        description: Optional ISO-8601 future release time; uploads privately and schedules publication
         required: false
         type: string
       pair_id:
@@ -70,23 +74,37 @@ jobs:
         shell: bash
         env:
           INPUT_DATE: ${{ inputs.target_date }}
+          INPUT_PUBLISH_AT: ${{ inputs.publish_at }}
           INPUT_PAIR: ${{ inputs.pair_id }}
           INPUT_LANGUAGES: ${{ inputs.languages }}
         run: |
-          TARGET_DATE="${INPUT_DATE:-$(TZ=Asia/Seoul date +%F)}"
+          if [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
+            TARGET_DATE="$(TZ=Asia/Seoul date -d 'tomorrow' +%F)"
+            PUBLISH_AT="${TARGET_DATE}T08:17:00+09:00"
+          else
+            TARGET_DATE="${INPUT_DATE:-$(TZ=Asia/Seoul date +%F)}"
+            PUBLISH_AT="${INPUT_PUBLISH_AT:-}"
+          fi
           LANGUAGES="${INPUT_LANGUAGES:-all}"
           ARGS=(--date "$TARGET_DATE" --languages "$LANGUAGES")
           if [ -n "${INPUT_PAIR:-}" ]; then ARGS+=(--pair-id "$INPUT_PAIR"); fi
           python scripts/survival_adjective_short.py "${ARGS[@]}"
           echo "target_date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
+          echo "publish_at=$PUBLISH_AT" >> "$GITHUB_OUTPUT"
           echo "languages=$LANGUAGES" >> "$GITHUB_OUTPUT"
       - name: Publish only after exact channel identity verification
         if: ${{ github.event_name == 'schedule' || inputs.publish }}
         env:
           REPLACE_VIDEO_ID: ${{ inputs.replace_video_id }}
           REPLACE_VIDEO_IDS: ${{ inputs.replace_video_ids }}
+          PUBLISH_AT: ${{ steps.build.outputs.publish_at }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          ARGS=(--date "${{ steps.build.outputs.target_date }}" --languages "${{ steps.build.outputs.languages }}" --privacy public)
+          if [ "$EVENT_NAME" = "schedule" ] || [ -n "${PUBLISH_AT:-}" ]; then
+            ARGS=(--date "${{ steps.build.outputs.target_date }}" --languages "${{ steps.build.outputs.languages }}" --privacy private --publish-at "$PUBLISH_AT")
+          else
+            ARGS=(--date "${{ steps.build.outputs.target_date }}" --languages "${{ steps.build.outputs.languages }}" --privacy public)
+          fi
           if [ -n "${REPLACE_VIDEO_ID:-}" ]; then ARGS+=(--replace-video-id "$REPLACE_VIDEO_ID"); fi
           if [ -n "${REPLACE_VIDEO_IDS:-}" ]; then ARGS+=(--replace-video-ids "$REPLACE_VIDEO_IDS"); fi
           python scripts/publish_survival_adjective_shorts.py "${ARGS[@]}"
