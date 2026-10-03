@@ -89,7 +89,10 @@ def select_pair(target_date: dt.date, pair_id: str | None) -> dict:
     options = [row for row in pairs if row.get("category", "adjective") == category]
     if not options:
         raise RuntimeError(f"Vocabulary catalog has no {category} lessons")
-    return options[(release_index // 2) % len(options)]
+    # Start beyond the pair just published in the one-off correction on Oct 3.
+    # Later releases continue in catalog order and alternate category.
+    start_offset = 3 if category == "adjective" else 0
+    return options[(release_index // 2 + start_offset) % len(options)]
 
 
 def channel_map() -> dict[str, dict]:
