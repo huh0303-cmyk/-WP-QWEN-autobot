@@ -17,6 +17,8 @@ archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. �
 - 미검증: 변경 후 실제 발행 run 결과(신문사 워크플로우 1회 실행 필요). 시크릿 값 유효성(키 자체)도 미확인.
 - 신문사 발행 막힘 원인(증거: run 36547079856, 9/29~): Gemini 503 + 편집 게이트 `CONSENSUS_FAILED: GPT checker unavailable`. 워크플로우가 OPENAI_ENABLED=false(유료 중단)인데 `three_model_consensus.py`가 GPT 리뷰어만 허용해서 모든 신문사 초안이 차단됨. 9/29 이후 신문사 실행 기록 없음(전부 failure).
 - 변경: `scripts/three_model_consensus.py` — OpenAI 불가 시 무료 엔진 체인(economy_text: Gemini 무료→Groq→OpenRouter→Cerebras)으로 동일한 2회 독립 검토 수행. 로컬 소형모델은 리뷰어로 안 씀. fail-closed 유지(엔진 없음/JSON 오류/issue 1개라도 있으면 차단). 끄는 스위치: FREE_REVIEWER_ENABLED=false. 테스트 tests/test_free_reviewer.py 4개 통과.
+- 조치/검증(10/4 16:58 KST): `Two Newsrooms — New RSS Story` 워크플로우가 9/29 18:07 KST부터 disabled_manually 상태여서 재활성화(enable). koreanews365 수동 1회 실행 run 37187429377 = success, 공개 글 1건 발행, URL HTTP 200 확인. 리뷰어는 Gemini 무료(재시도 후 성공)가 사용됨 — Groq/OpenRouter/Cerebras 폴백은 이번 실행에서 호출 안 됨(=키 유효성은 아직 미확인). theseouljournal은 미실행.
+- 참고: blogger-rewrite.yml도 9/29부터 disabled_manually — 의도적 비활성으로 보고 손대지 않음(키 env만 추가).
 - 기존 실패 테스트 5개(워크플로우 문자열 단언·economy_text 2건)는 이번 변경 전부터 실패 — 미수정.
 - 미검증: 신문사 실제 발행 run. 무료 소형 모델의 사실검증 정확도(오승인/오거부 가능성) 운영 관찰 필요.
 - 참고: 시크릿 한도 근본 해결 후보 — 사이트별 WP 시크릿 27개를 JSON 1개로 통합(미착수).
