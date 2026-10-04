@@ -1,0 +1,23 @@
+name: Provider key check
+
+# Read-only: calls Gemini models.list (no generation, no cost) and fails loudly if the
+# key is rejected. Run it by hand after replacing GEMINI_API_KEY to confirm the fix.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install requests -q
+      - name: Check Gemini key
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/provider_key_check.py

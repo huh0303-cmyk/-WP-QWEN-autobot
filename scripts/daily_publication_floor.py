@@ -22,6 +22,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from publication_health_audit import check
+from provider_key_check import BLOCKING, MESSAGES, check_gemini
 from automation_hub.public_verifier import verify_publication
 
 KST = timezone(timedelta(hours=9))
@@ -268,6 +269,11 @@ def main():
     force_ipv4_dns()
     now = datetime.now(KST)
     sites = sites_for(args.platform)
+    # A rejected key makes every child worker fail the same way. Claiming sites
+    # anyway burns the two daily attempts per site and records DISPATCHED for
+    # articles that can never be written, so stop before any claim is made.
+    provider = check_gemini(os.environ.get('GEMINI_API_KEY')) if os.environ.get('GEMINI_API_KEY') is not None else None
+    provider_blocked = provider in BLOCKING
     api = GitHub(os.environ['GITHUB_REPOSITORY'], os.environ['GH_DISPATCH_TOKEN'])
     with ThreadPoolExecutor(max_workers=8) as pool:
         public = list(pool.map(lambda site: public_status(site, now), sites))
@@ -276,18 +282,25 @@ def main():
     pairs = list(zip(sites, public))
     pairs = pairs[offset:] + pairs[:offset]
     rows, dispatched = [], 0
+    max_dispatch = 0 if provider_blocked else args.max_dispatch
     for site, result in pairs:
         try:
-            row, used = reconcile(site, result, api, now, dispatched < args.max_dispatch)
+            row, used = reconcile(site, result, api, now, dispatched < max_dispatch)
             dispatched += int(used)
         except (requests.RequestException, ValueError, KeyError) as exc:
             row = {'site_id': site['site_id'], 'url': site['url'], 'status': 'RECONCILIATION_ERROR', 'error_type': type(exc).__name__}
         rows.append(row)
     report = {'day_kst': now.date().isoformat(), 'platform': args.platform, 'target': len(sites),
-              'public_verified': sum(r['status']=='PUBLISHED' for r in rows), 'dispatched': dispatched, 'sites': rows}
+              'public_verified': sum(r['status']=='PUBLISHED' for r in rows), 'dispatched': dispatched,
+              'provider': {'gemini': provider, 'blocked': provider_blocked}, 'sites': rows}
     Path('artifacts').mkdir(exist_ok=True)
     Path(f'artifacts/daily-publication-floor-{args.platform}.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False))
+    if provider_blocked:
+        # Red run = visible alert. Public verification above still ran, so the
+        # report shows which sites are actually missing today's post.
+        print('::error::' + MESSAGES[provider], file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
