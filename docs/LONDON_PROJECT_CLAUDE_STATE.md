@@ -11,6 +11,11 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 (5차) — theseouljournal.com 갱신 판단 자료
+- 사용자 질문: 갱신비 24,000원, 25개 사이트 중 선택·집중. 근거 자료 `docs/GSC_12M_SITE_PERFORMANCE_2026-10-04.md`(GSC 12개월, 실측). 결론(Claude 권고): theseouljournal.com 갱신 안 함. 네트워크 전체가 12개월 약 1,235클릭이고 k-trip365.com이 70%.
+- 도메인: 2025-09-29 등록, Gabia client hold(미납 추정). 결정은 Chairman. 미정 상태.
+- 미검증: 사이트별 AdSense 승인 가능성, 신규 사이트(2026-06~07 시작)의 장기 추세.
+
 ## 2026-10-04 (4차) — 무료 키 검증 · 신문사 도메인 이상 · blogger-rewrite 재활성화 · 박제
 - 박제: 글쓰기 목적=애드센스 승인, 발행=전부 무료 — `CLAUDE.md` 및 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` §0에 명문화.
 - 키 검증(`Free LLM key check` 워크플로우, run 결과): Gemini 무료 5개 모델 전부 VALID / **Groq VALID**(모델을 `openai/gpt-oss-120b`로 교체, 기존 llama-3.3-70b-versatile는 접근 불가였음) / **OpenRouter 키 VALID**, 모델을 `google/gemma-4-31b-it:free`로 교체(기존 `llama-3.3-70b-instruct:free`는 무료 종료) — 검증 시점엔 업스트림 429(일시 한도)였음 / **Cerebras 키 401 "Wrong API Key"** — 키 재발급·재등록 필요(사용자 조치).
