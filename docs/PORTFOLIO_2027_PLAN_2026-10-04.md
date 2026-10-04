@@ -58,3 +58,7 @@
 | koreainvest365 | 0 / 0 | 0 / 0 | 버림 |
 주의: 9월 노출 급감은 전 사이트 공통(비색인 글 Private 정제 영향 가능성) → 수요 감소로 단정 불가.
 수정: kstudy365·jobkorea365는 이전 후 재연장하지 않음(11/18 만료, 이전은 그 전 완료).
+
+## 27사이트 최근 2개월(2026-08+09) GSC 클릭 순위 (지표=구글 검색 클릭, 방문자 수 아님)
+합계 58클릭/11,336노출. 1 koreawedding365 15 · 2 jobkoreaglobal 9 · 3 jobinkorea365 7 · 4 oliveyoungkorea 6(노출 3,090) · 5 sis-korea 4 · 5 kieca-korea 4 · 7 jobkorea365 3 · 7 k-trip365 3(노출 11) · 9 kfinance365 2 · 9 theseouljournal 2 · 9 k-visa365 2 · 12 ki-korea 1 · 나머지 15개 0클릭(노출 순: koreamedicaltour 814, ktech365 251, koreainsurance365 211, kstudy365 206, koreacrypto365 152, korea365.org 114, krealestate365 75, koreataxnlaw 57, k-health365 4, kworld365 2, ksa-korea 2, 나머지 0).
+정정: k-trip365(12개월 871클릭)·k-health365(98)는 2026-05 이후 검색 노출이 거의 사라짐(최근 2개월 노출 11/4). "수익 엔진" 표기는 과거 실적 기준이며 현재 아님 → 원인(정제로 인한 비공개화 여부) 확인 필요.
