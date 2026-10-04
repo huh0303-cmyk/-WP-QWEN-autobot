@@ -196,7 +196,7 @@ def main() -> int:
             "new_title": translated["title"],
             "old_labels": old_labels,
             "new_labels": translated["labels"],
-            "images_before": len(re.findall(r"<img\\b", old_content, re.I)),
+            "images_before": len(re.findall(r"<img\b", old_content, re.I)),
             "dry_run": DRY_RUN,
         }
 
@@ -211,7 +211,7 @@ def main() -> int:
             }
             updated = api("PATCH", endpoint, headers, json=body).json()
             updated_content = str(updated.get("content", ""))
-            if len(re.findall(r"<img\\b", updated_content, re.I)) != record["images_before"]:
+            if len(re.findall(r"<img\b", updated_content, re.I)) != record["images_before"]:
                 raise RuntimeError(f"Image preservation verification failed: post {post['id']}")
             record["status"] = "updated"
         else:
