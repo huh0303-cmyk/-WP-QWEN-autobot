@@ -11,6 +11,12 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 (3차) — 무료 폴백 키 3종 연결(워크플로우 env)
+- 사용자 조치 완료(확인: Secrets 목록, 16:44 KST): GROQ_API_KEY / OPENROUTER_API_KEY / CEREBRAS_API_KEY 등록. 레포 시크릿 100개 한도 때문에 미사용 시크릿 일부 정리 필요했음(워크플로우·코드 참조 0건 확인 후 사용자가 삭제).
+- 변경: 아래 4개 워크플로우 env에 3개 키 추가(daily-network-publish.yml / publish-blogger-33-now.yml과 동일 방식): newsrooms-daily-publisher.yml, publication-health.yml, blogger-rewrite.yml, tistory-daily-plan.yml. 이전엔 신문사 2곳 등이 Gemini 503 때 이어받을 엔진이 없었음.
+- 미검증: 변경 후 실제 발행 run 결과(신문사 워크플로우 1회 실행 필요). 시크릿 값 유효성(키 자체)도 미확인.
+- 참고: 시크릿 한도 근본 해결 후보 — 사이트별 WP 시크릿 27개를 JSON 1개로 통합(미착수).
+
 ## 2026-10-04 (2차) — 카나리 발행 실패 원인: 글쓰기 AI
 - 증거: oliveyoung run 37174748454 — Gemini 3.5-flash/3.1-flash-lite HTTP 503 및 ValueError(응답 불완전), Groq/OpenRouter/Cerebras 키 없음, 로컬 Qwen 3b 폴백 결과는 품질점수 미달 → skip_low_seo ×3. 키워드 선정도 fallback(빈 키워드).
 - 변경: economy_text.py — 엔진당 재시도 2→4회, 지수 백오프(5/10/20초), Gemini maxOutputTokens 8192→16384(MAX_TOKENS 절단 방지), 불완전 응답에 finishReason 기록.
