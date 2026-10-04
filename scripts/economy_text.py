@@ -47,7 +47,7 @@ def _try_gemini(prompt: str, temperature: float, model: str) -> str:
         raise RuntimeError("GEMINI_API_KEY missing")
     if model not in FREE_GEMINI_MODELS:
         raise ValueError("unsupported Gemini model")
-    config = {"temperature": temperature, "maxOutputTokens": 8192}
+    config = {"temperature": temperature, "maxOutputTokens": int(os.getenv("GEMINI_MAX_OUTPUT_TOKENS", "16384"))}
     if model.startswith("gemini-2.5-"):
         config["thinkingConfig"] = {"thinkingBudget": 0}
     response = requests.post(
@@ -61,14 +61,14 @@ def _try_gemini(prompt: str, temperature: float, model: str) -> str:
     candidate = (data.get("candidates") or [{}])[0]
     content = "".join(part.get("text", "") for part in candidate.get("content", {}).get("parts", []))
     if candidate.get("finishReason") != "STOP" or not content.strip():
-        raise ValueError("Gemini response incomplete")
+        raise ValueError(f"Gemini response incomplete finish={candidate.get('finishReason')}")
     last_writer_model = model
     _record("gemini", model, data.get("usageMetadata"))
     return content.strip()
 
 
-TRIES_PER_ENGINE = int(os.getenv("WRITER_TRIES_PER_ENGINE", "2"))
-RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "3"))
+TRIES_PER_ENGINE = int(os.getenv("WRITER_TRIES_PER_ENGINE", "4"))
+RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "5"))
 
 # Independent free-tier engines beyond Gemini. Each activates only when its key secret exists.
 # (provider, key env, endpoint, default model env, default model)
@@ -111,7 +111,7 @@ def _with_tries(label: str, fn, failures: list):
         try:
             return fn()
         except (requests.RequestException, ValueError, RuntimeError) as exc:
-            failures.append(f"{label}#{n}: {_failure_summary(exc)}")
+            failures.append(f"{label}#{n}: {_failure_summary(exc)} {str(exc)[:80] if isinstance(exc, ValueError) else ''}")
             print(f"Article writer fallback: {failures[-1]}")
             status = getattr(getattr(exc, "response", None), "status_code", None)
             # 재시도는 일시 장애(타임아웃·연결·5xx·불완전 응답)만. 쿼터(429)·인증(401/403)·키 없음은
@@ -121,7 +121,7 @@ def _with_tries(label: str, fn, failures: list):
             if not transient:
                 break
             if n < TRIES_PER_ENGINE:
-                time.sleep(RETRY_SLEEP)
+                time.sleep(RETRY_SLEEP * (2 ** (n - 1)))  # 5s,10s,20s backoff for 503 overload
     return None
 
 

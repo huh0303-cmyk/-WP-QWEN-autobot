@@ -11,6 +11,12 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 (2차) — 카나리 발행 실패 원인: 글쓰기 AI
+- 증거: oliveyoung run 37174748454 — Gemini 3.5-flash/3.1-flash-lite HTTP 503 및 ValueError(응답 불완전), Groq/OpenRouter/Cerebras 키 없음, 로컬 Qwen 3b 폴백 결과는 품질점수 미달 → skip_low_seo ×3. 키워드 선정도 fallback(빈 키워드).
+- 변경: economy_text.py — 엔진당 재시도 2→4회, 지수 백오프(5/10/20초), Gemini maxOutputTokens 8192→16384(MAX_TOKENS 절단 방지), 불완전 응답에 finishReason 기록.
+- 사용자 조치 필요: Groq/OpenRouter/Cerebras 무료 API 키를 GitHub Secrets(GROQ_API_KEY 등)에 추가 — 독립 무료 폴백.
+- 미해결: 키워드 선정 빈값(fallback:true), 단일주제 게이트 20개 사이트 미적용.
+
 ## 2026-10-04 — WP25 일일 1포스팅 자동 발행 복구 (스케줄 부재 원인 확정)
 
 **Chairman 요청**: WP 25개 1일 1포가 안정적으로 되게 확인·수정. 주제는 사이트당 한 가지에 집중.
