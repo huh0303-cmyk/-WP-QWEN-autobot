@@ -10,6 +10,7 @@ with older call sites but is never invoked."""
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import date
 from typing import Callable
@@ -28,9 +29,41 @@ def _json(raw: str) -> dict:
         return json.loads(match.group(0))
 
 
+def _free_check(label: str, rule: str) -> dict:
+    """Free-tier reviewer used when the paid OpenAI reviewer is switched off.
+
+    2026-10-04: with OPENAI_ENABLED=false (no paid APIs) every newsroom draft
+    was blocked with "GPT checker unavailable". The same two cold-context
+    passes now run on the free engine chain (Gemini free -> Groq -> OpenRouter
+    -> Cerebras). Local small models are never used as a reviewer. Fail-closed
+    is unchanged: no engine, invalid JSON/schema, or any issue blocks the draft.
+    """
+    if os.getenv("FREE_REVIEWER_ENABLED", "true").strip().lower() in {"0", "false", "no", "off"}:
+        return {"ok": False, "issues": ["GPT checker unavailable"]}
+    prev_local = os.environ.get("LOCAL_TEXT_FALLBACK_ENABLED")
+    os.environ["LOCAL_TEXT_FALLBACK_ENABLED"] = "false"
+    try:
+        import economy_text
+        raw = economy_text.generate_text(
+            f"You are the {label} independent quality checker. " + rule, temperature=0.0)
+        result = _json(raw)
+        if not isinstance(result, dict) or not isinstance(result.get('issues'), list):
+            return {'ok': False, 'issues': ['check_failed: invalid review schema']}
+        result['ok'] = result.get('ok') is True and not result['issues']
+        result['model'] = economy_text.last_writer_model
+        return result
+    except Exception as exc:
+        return {"ok": False, "issues": [f"check_failed: free reviewer {type(exc).__name__}: {str(exc)[:120]}"]}
+    finally:
+        if prev_local is None:
+            os.environ.pop("LOCAL_TEXT_FALLBACK_ENABLED", None)
+        else:
+            os.environ["LOCAL_TEXT_FALLBACK_ENABLED"] = prev_local
+
+
 def _gpt_check(label: str, rule: str) -> dict:
     if not openai_available():
-        return {"ok": False, "issues": ["GPT checker unavailable"]}
+        return _free_check(label, rule)
     try:
         result = _json(openai_generate_text(f"You are the {label} independent quality checker. " + rule,
                                           temperature=0.0, max_retries=1, timeout=120))

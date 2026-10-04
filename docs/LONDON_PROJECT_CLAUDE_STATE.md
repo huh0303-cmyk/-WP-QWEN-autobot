@@ -15,6 +15,10 @@ archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. �
 - 사용자 조치 완료(확인: Secrets 목록, 16:44 KST): GROQ_API_KEY / OPENROUTER_API_KEY / CEREBRAS_API_KEY 등록. 레포 시크릿 100개 한도 때문에 미사용 시크릿 일부 정리 필요했음(워크플로우·코드 참조 0건 확인 후 사용자가 삭제).
 - 변경: 아래 4개 워크플로우 env에 3개 키 추가(daily-network-publish.yml / publish-blogger-33-now.yml과 동일 방식): newsrooms-daily-publisher.yml, publication-health.yml, blogger-rewrite.yml, tistory-daily-plan.yml. 이전엔 신문사 2곳 등이 Gemini 503 때 이어받을 엔진이 없었음.
 - 미검증: 변경 후 실제 발행 run 결과(신문사 워크플로우 1회 실행 필요). 시크릿 값 유효성(키 자체)도 미확인.
+- 신문사 발행 막힘 원인(증거: run 36547079856, 9/29~): Gemini 503 + 편집 게이트 `CONSENSUS_FAILED: GPT checker unavailable`. 워크플로우가 OPENAI_ENABLED=false(유료 중단)인데 `three_model_consensus.py`가 GPT 리뷰어만 허용해서 모든 신문사 초안이 차단됨. 9/29 이후 신문사 실행 기록 없음(전부 failure).
+- 변경: `scripts/three_model_consensus.py` — OpenAI 불가 시 무료 엔진 체인(economy_text: Gemini 무료→Groq→OpenRouter→Cerebras)으로 동일한 2회 독립 검토 수행. 로컬 소형모델은 리뷰어로 안 씀. fail-closed 유지(엔진 없음/JSON 오류/issue 1개라도 있으면 차단). 끄는 스위치: FREE_REVIEWER_ENABLED=false. 테스트 tests/test_free_reviewer.py 4개 통과.
+- 기존 실패 테스트 5개(워크플로우 문자열 단언·economy_text 2건)는 이번 변경 전부터 실패 — 미수정.
+- 미검증: 신문사 실제 발행 run. 무료 소형 모델의 사실검증 정확도(오승인/오거부 가능성) 운영 관찰 필요.
 - 참고: 시크릿 한도 근본 해결 후보 — 사이트별 WP 시크릿 27개를 JSON 1개로 통합(미착수).
 
 ## 2026-10-04 (2차) — 카나리 발행 실패 원인: 글쓰기 AI
