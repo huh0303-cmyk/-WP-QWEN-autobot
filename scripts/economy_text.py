@@ -74,9 +74,9 @@ RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "5"))
 # (provider, key env, endpoint, default model env, default model)
 OPENAI_COMPAT = (
     ("groq", "GROQ_API_KEY", "https://api.groq.com/openai/v1/chat/completions",
-     "GROQ_MODEL", "llama-3.3-70b-versatile"),
+     "GROQ_MODEL", "openai/gpt-oss-120b"),
     ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1/chat/completions",
-     "OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
+     "OPENROUTER_MODEL", "google/gemma-4-31b-it:free"),
     ("cerebras", "CEREBRAS_API_KEY", "https://api.cerebras.ai/v1/chat/completions",
      "CEREBRAS_MODEL", "llama-3.3-70b"),
 )
