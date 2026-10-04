@@ -11,6 +11,17 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 (19차) — 파이프라인 레인 분리 (WP / Blogspot / YouTube / SNS), 브랜치 push 대기
+
+**Chairman 요청(원문)**: "WP, blogspot 이두개만 따로 해줘. 유튜브와 SNS따로 나눠줘."
+**한 일**: `control_center/lanes.py` 신설 + `operations.py`/`operation_routes.py` 수정 — 레인별 DB·워커·상태 분리,
+레거시 작업 1회 복사(롤백 안전), `/api/operations`에 레인별 health 추가. 상세: `docs/PIPELINE_LANES_2026-10-04.md`.
+**검증**: `tests/test_lanes.py` 18개 + `tests/test_operations.py` 31개 통과(로컬). VPS 미배포, `main` 미병합.
+**미검증/남은 것**: YouTube·SNS 실행 경로는 재배선하지 않음(원래 공용 큐 미사용) — 레인은 준비만 됨.
+`orchestrator.provider_health`는 코어 DB 공유 유지. 대시보드 화면(UI)에 레인 health 표시는 아직 없음(API만).
+Chairman 결정 필요: 브랜치를 `main`에 병합(=VPS 재배포) 할지.
+**참고**: 기존 실패 테스트 1건(`test_visitor_deploy_uses_current_wordpress_secret_names`)은 변경 전 main에서도 실패.
+
 ## 2026-09-27 (18차) — 범위 확장 요청 대응: 통합 사이트 레지스트리(대시보드+트리거만)
 
 **Chairman 요청(원문)**: "이건 내가 보여준것과 그대로 똑같잖아... 런던프로젝트는 내 wp25개..뉴스2개,

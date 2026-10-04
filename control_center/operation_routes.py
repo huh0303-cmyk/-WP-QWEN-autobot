@@ -12,7 +12,8 @@ import requests
 from flask import flash, jsonify, redirect, request
 
 from .operation_gateway import GitHubGateway
-from .operations import Conflict, Store, Worker
+from .lanes import build_lanes, lane_for_group, migrate_legacy
+from .operations import Conflict, Store
 from .rss_watch import RSSWatcher
 from automation_hub.sheet_schema import PUBLISH_QUEUE_HEADER
 
@@ -20,7 +21,10 @@ from automation_hub.sheet_schema import PUBLISH_QUEUE_HEADER
 def install(module):
     app = module.app
     root = Path(module.__file__).resolve().parents[1]
-    store = Store(os.environ.get("CONTROL_OPERATIONS_DB", str(root / "data/control-operations.sqlite3")))
+    core_path = os.environ.get("CONTROL_OPERATIONS_DB", str(root / "data/control-operations.sqlite3"))
+    # `store` stays the CORE database: session/csrf secrets and the legacy job
+    # table only.  Jobs now live in one database per lane (see lanes.py).
+    store = Store(core_path)
     # The fallback must be the SAME for every VPS process and after restart.
     app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or store.secret("session")
     app.config["CONTROL_CENTER_CSRF"] = os.environ.get("CONTROL_CENTER_CSRF") or store.secret("csrf")
@@ -33,8 +37,18 @@ def install(module):
 
     gateway = GitHubGateway(os.environ.get("CONTROL_CENTER_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot"),
                             os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip(), lambda: queue_rows(int(time.time() // 15)))
-    worker = Worker(store, gateway)
-    app.extensions["operations"] = {"store": store, "worker": worker, "gateway": gateway}
+    lanes = build_lanes(core_path, gateway)
+    try:
+        migrate_legacy(store, lanes)
+    except Exception:
+        # Never block startup on the one-time copy; legacy rows stay untouched
+        # and the copy is retried on the next start (the marker is set last).
+        app.logger.exception("legacy job migration into lanes failed")
+    worker = lanes["wordpress"].worker
+    wp_store = lanes["wordpress"].store
+    # Old keys ("store", "worker") keep pointing at the WordPress lane because
+    # the newsroom/RSS code that reads them only ever handled WordPress jobs.
+    app.extensions["operations"] = {"store": wp_store, "worker": worker, "gateway": gateway, "lanes": lanes, "core": store}
 
     def targets(group, site_id):
         if group in {"wp25", "news2"} or group.startswith("wp_"):
@@ -77,7 +91,7 @@ def install(module):
         flash({"text": payload.get("message", "요청 접수"), "target": payload.get("target", "operation-summary")}, "success" if code < 300 else "error")
         return redirect("/#" + payload.get("target", "operation-summary"))
 
-    rss = RSSWatcher(store, root / "config/newsroom_rss_watch.json", lambda: targets("news2", ""))
+    rss = RSSWatcher(wp_store, root / "config/newsroom_rss_watch.json", lambda: targets("news2", ""))
     app.extensions["operations"]["rss"] = rss
     imported_history = False
 
@@ -100,7 +114,7 @@ def install(module):
                     if len(keys) == 1:
                         key = keys.pop()
                 if key in sites:
-                    store.observe_run(sites[key], run)
+                    wp_store.observe_run(sites[key], run)
             imported_history = True
         except Exception:
             raise
@@ -135,12 +149,13 @@ def install(module):
             request_id = request.form.get("operation_request_id") or module.secrets.token_hex(16)
             if not re.fullmatch(r"[a-zA-Z0-9-]{16,80}", request_id):
                 raise ValueError("요청 번호 형식이 올바르지 않습니다.")
-            request_id, skipped = store.submit(group, descriptors, request_id)
+            lane = lanes[lane_for_group(group)]
+            request_id, skipped = lane.store.submit(group, descriptors, request_id)
         except Conflict as exc:
             return reply({"message": str(exc), "target": target}, 409)
         except (ValueError, RuntimeError) as exc:
             return reply({"message": str(exc), "target": target}, 422)
-        worker.start()
+        lane.worker.start()
         accepted_count = len(descriptors) - len(skipped)
         message = f"{descriptors[0]['label'] if len(descriptors) == 1 else str(accepted_count) + '개 사이트'} 요청을 접수했습니다."
         if skipped:
@@ -153,8 +168,22 @@ def install(module):
     @app.get("/api/operations")
     def operation_status():
         if os.environ.get("CONTROL_CENTER_GITHUB_TOKEN", "").strip():
-            worker.start()
-        return jsonify(jobs=store.snapshot(), server_time=time.time(), automatic_news=rss.status())
+            for lane in lanes.values():
+                lane.worker.start()
+        jobs, health = [], {}
+        for name, lane in lanes.items():
+            # A lane whose database or worker fails reports its own error and
+            # the other lanes still answer - one broken lane never blanks the page.
+            try:
+                lane_jobs = lane.store.snapshot()
+                for job in lane_jobs:
+                    job["lane"] = name
+                jobs.extend(lane_jobs)
+                health[name] = lane.health()
+            except Exception as exc:
+                health[name] = {"lane": name, "error": type(exc).__name__}
+        jobs.sort(key=lambda job: job.get("created_at", 0), reverse=True)
+        return jsonify(jobs=jobs, lanes=health, server_time=time.time(), automatic_news=rss.status())
 
     @app.post("/admin/jobs/<job_id>/stop")
     def stop_job(job_id):
@@ -166,7 +195,15 @@ def install(module):
         if not hmac.compare_digest(request.form.get("csrf_token", ""), app.config["CONTROL_CENTER_CSRF"]):
             return jsonify({"message": "요청 확인값이 만료되었습니다."}), 403
         now = time.time()
-        with store.connect() as db:
+        owner = None
+        for lane in lanes.values():
+            with lane.store.connect() as probe:
+                if probe.execute("SELECT 1 FROM jobs WHERE id=?", (job_id,)).fetchone():
+                    owner = lane.store
+                    break
+        if owner is None:
+            return jsonify({"message": "해당 작업을 찾을 수 없습니다."}), 404
+        with owner.connect() as db:
             row = db.execute("SELECT payload FROM jobs WHERE id=?", (job_id,)).fetchone()
             if not row:
                 return jsonify({"message": "해당 작업을 찾을 수 없습니다."}), 404

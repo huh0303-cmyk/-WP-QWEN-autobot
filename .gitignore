@@ -30,3 +30,4 @@ wp_info_out.json
 yt_meta.txt
 healing_work_*.mp3
 data/control-operations.sqlite3*
+data/control-operations-*.sqlite3*

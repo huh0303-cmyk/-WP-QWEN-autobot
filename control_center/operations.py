@@ -141,6 +141,16 @@ class Store:
                        (job_id, job_id, descriptor["site_id"], "news2", "queued", json.dumps(payload, ensure_ascii=False), created, now))
             db.execute("INSERT INTO events(job_id,at,phase,detail) VALUES (?,?,?,?)", (job_id, now, "queued", payload["detail"]))
 
+    def summary(self):
+        """Cheap per-lane counters for the health panel (no payload decoding)."""
+        with self.connect() as db:
+            phases = {row[0]: row[1] for row in db.execute("SELECT phase, COUNT(*) FROM jobs GROUP BY phase")}
+            last = db.execute("SELECT MAX(updated) FROM jobs WHERE phase='published'").fetchone()[0]
+            oldest = db.execute("SELECT MIN(created) FROM jobs WHERE phase NOT IN ('published','stopped','failed')").fetchone()[0]
+        active = sum(n for phase, n in phases.items() if phase not in TERMINAL)
+        return {"active": active, "attention": phases.get("attention", 0), "failed": phases.get("failed", 0),
+                "published": phases.get("published", 0), "last_published_at": last, "oldest_active_at": oldest}
+
     def claim(self):
         now = time.time()
         with self.connect() as db:
@@ -185,18 +195,32 @@ class Store:
 
 class Worker:
     """One process-local poller; SQLite leases coordinate all gunicorn workers."""
-    def __init__(self, store, gateway):
+    def __init__(self, store, gateway, name="publication-receipts", pool_size=4):
         self.store, self.gateway = store, gateway
+        self.name, self.pool_size = name, pool_size
         self.lock = threading.Lock()
         self.thread = None
         self.discover = lambda: None
         self.last_discovery = 0
+        self.last_tick = 0.0       # last time the loop completed a pass
+        self.last_error = ""       # exception TYPE only - never tokens or payloads
+        self.error_count = 0
 
     def start(self):
         with self.lock:
             if not self.thread or not self.thread.is_alive():
-                self.thread = threading.Thread(target=self.run, daemon=True, name="publication-receipts")
+                self.thread = threading.Thread(target=self.run, daemon=True, name=self.name)
                 self.thread.start()
+
+    def record_error(self, exc):
+        self.last_error = type(exc).__name__
+        self.error_count += 1
+
+    def health(self):
+        alive = bool(self.thread and self.thread.is_alive())
+        return {"alive": alive, "last_tick": self.last_tick or None, "last_error": self.last_error,
+                "error_count": self.error_count,
+                "stalled": alive and bool(self.last_tick) and time.time() - self.last_tick > 120}
 
     def tick(self):
         data = self.store.claim()
@@ -215,17 +239,19 @@ class Worker:
         self.store.save(data)
 
     def run(self):
-        with ThreadPoolExecutor(max_workers=4) as pool:
+        with ThreadPoolExecutor(max_workers=self.pool_size) as pool:
             discovery = None
             while True:
                 if time.time() - self.last_discovery > 60 and (discovery is None or discovery.done()):
                     self.last_discovery = time.time()
                     discovery = pool.submit(self.discover)
-                futures = [pool.submit(self.tick) for _ in range(4)]
+                futures = [pool.submit(self.tick) for _ in range(self.pool_size)]
                 for future in futures:
                     try:
                         future.result()
-                    except Exception:
+                    except Exception as exc:
                         # Durable leases recover after storage / process failures.
-                        pass
+                        # Recorded so the health panel can show WHICH lane is failing.
+                        self.record_error(exc)
+                self.last_tick = time.time()
                 time.sleep(4)
