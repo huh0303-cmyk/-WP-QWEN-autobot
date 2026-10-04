@@ -1,0 +1,23 @@
+name: "GSC 12-month performance report (one-off)"
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - name: Per-site 12-month GSC clicks/impressions
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/gsc_year_report.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gsc-year-report
+          path: gsc_year_report.json
