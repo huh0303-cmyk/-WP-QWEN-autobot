@@ -1,0 +1,51 @@
+name: "Free LLM key check (Groq / OpenRouter / Cerebras / Gemini)"
+
+# 2026-10-04: one-click proof that each free fallback engine key is valid and its
+# configured model answers. Uses the same code path as economy_text.py. Never prints keys.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Ping each free engine
+        run: |
+          cd scripts
+          python - <<'PY'
+          import os, sys
+          import economy_text as e
+          bad = 0
+          for spec in e.OPENAI_COMPAT:
+              name, key_env = spec[0], spec[1]
+              if not os.getenv(key_env, "").strip():
+                  print(f"{name}: KEY MISSING"); bad += 1; continue
+              try:
+                  out = e._try_compat("Reply with the single word OK.", 0.0, spec)
+                  print(f"{name}: VALID  model={e.last_writer_model} reply={out[:20]!r}")
+              except Exception as exc:
+                  status = getattr(getattr(exc, "response", None), "status_code", None)
+                  print(f"{name}: FAILED status={status} {type(exc).__name__} {str(exc)[:120]}"); bad += 1
+          for model in e.FREE_GEMINI_MODELS:
+              try:
+                  e._try_gemini("Reply with the single word OK.", 0.0, model)
+                  print(f"gemini {model}: VALID")
+              except Exception as exc:
+                  status = getattr(getattr(exc, "response", None), "status_code", None)
+                  print(f"gemini {model}: FAILED status={status} {type(exc).__name__}")
+          sys.exit(1 if bad else 0)
+          PY
