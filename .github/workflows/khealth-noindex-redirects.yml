@@ -26,6 +26,7 @@ jobs:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           DRY_RUN: ${{ inputs.dry_run }}
           SCRIPT: ${{ inputs.script }}
+          MODE: ${{ inputs.dry_run == 'true' && 'probe' || 'run' }}
         run: python "$SCRIPT"
       - uses: actions/upload-artifact@v4
         with:
