@@ -2,6 +2,11 @@ name: Daily public publication floor
 # Blogger daily floor rerun after cached-source branch repair and reset 2026-09-25
 
 on:
+  # Restored 2026-10-04: the hourly schedule removed in 0201910 (09-29) left WordPress with
+  # no automatic daily publisher. WordPress-only on schedule (Blogger has its own VPS timer,
+  # so scheduled runs must not touch it). Odd minutes; per-site random slots in the script.
+  schedule:
+    - cron: '11,29,47 * * * *'
   workflow_dispatch:
     inputs:
       platform:
@@ -22,7 +27,7 @@ concurrency:
 jobs:
   wordpress:
     # Safety floor: verify today's real public post first, then fill only missing sites.
-    if: ${{ inputs.platform == '' || inputs.platform == 'wordpress' || github.event_name == 'schedule' }}
+    if: ${{ github.event_name == 'schedule' || inputs.platform == '' || inputs.platform == 'wordpress' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -59,7 +64,7 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 4
+        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -68,7 +73,7 @@ jobs:
           retention-days: 7
 
   blogger:
-    if: ${{ inputs.platform == '' || inputs.platform == 'blogger' || github.event_name == 'schedule' }}
+    if: ${{ github.event_name != 'schedule' && (inputs.platform == '' || inputs.platform == 'blogger') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

@@ -87,3 +87,25 @@ def test_no_more_than_two_generation_attempts_per_site_day():
     api=API({'status':'FAILED','day':'2026-09-12','attempts':2})
     row,used=floor.reconcile(BLOG,{'status':'DUE'},api,NOW,True)
     assert row['status']=='REPAIR_REQUIRED' and not used and not api.sent
+
+
+def test_wp_slots_are_unique_spread_and_not_on_regular_minutes():
+    from datetime import date
+    ids=['wp_%02d'%i for i in range(25)]
+    slots=floor.daily_slots(ids,date(2026,10,5))
+    assert set(slots)==set(ids)
+    times=sorted(slots.values())
+    assert all(t.minute%5 for t in times)                       # never :00 / multiples of 5
+    assert all((b-a).total_seconds()>=25*60 for a,b in zip(times,times[1:]))
+    assert times[0].hour>=5 and times[-1].hour<=23
+    assert floor.daily_slots(ids,date(2026,10,5))==slots        # deterministic within a day
+    assert floor.daily_slots(ids,date(2026,10,6))!=slots        # different next day
+
+
+def test_slot_gate_waits_then_catches_up_late_evening():
+    from datetime import date,timedelta
+    slot=datetime(2026,10,5,14,17,tzinfo=floor.KST)
+    assert not floor.slot_open(slot,datetime(2026,10,5,14,16,tzinfo=floor.KST))
+    assert floor.slot_open(slot,datetime(2026,10,5,14,18,tzinfo=floor.KST))
+    late=datetime(2026,10,5,23,5,tzinfo=floor.KST)
+    assert floor.slot_open(datetime(2026,10,5,23,0,tzinfo=floor.KST)+timedelta(minutes=30),late)

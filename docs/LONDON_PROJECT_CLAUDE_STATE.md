@@ -11,6 +11,15 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 — WP25 일일 1포스팅 자동 발행 복구 (스케줄 부재 원인 확정)
+
+**Chairman 요청**: WP 25개 1일 1포가 안정적으로 되게 확인·수정. 주제는 사이트당 한 가지에 집중.
+
+**확인된 사실(실측)**: WP 사이트 약 20개가 9/29~9/30 이후 새 글 없음(공개 REST 실측, 10/4 12:30 KST). Blogger 33개는 10/2~10/4 정상(VPS 타이머 `korea365-blogger33-daily`).
+**원인(증거)**: 커밋 `0201910`(09-29 03:15 "remove noisy GitHub schedules")이 `daily-publication-floor.yml`의 `13 * * * *` 크론을 삭제. 이후 WP는 수동 dispatch 외 자동 경로 없음. n8n `wp25_master.json`은 `active:false`이고 게이트웨이 `wp25_tick`은 `korea365-wp-publisher.service` 재시작만 수행(일일 발행 스케줄러 아님).
+**변경**: `daily-publication-floor.yml` 스케줄 복구(`11,29,47 * * * *`, WP 전용, scheduled 실행은 Blogger job 제외 — Blogger는 VPS 타이머 소유라 이중 발행 방지), WP `--max-dispatch 2`. `scripts/daily_publication_floor.py`에 사이트별 랜덤 발행 슬롯(05:30–23:00 KST, 날짜별 상이, 정시·5분배수 회피, 사이트 간 약 30분 간격, 23:00 이후 누락분 보충) 추가. 테스트 2건 추가.
+**미검증/주의**: 기존 테스트 `test_unknown_dispatch_is_never_replayed`는 변경 전부터 실패(전일 claim 리셋 로직과 테스트 불일치) — 이번 변경과 무관. n8n의 VPS 실제 가동 상태는 미확인. 주제 한 가지 강제(`editorial_topic_scope.topic_fits`)는 현재 구직/비자/여행 5개 사이트에만 적용 — 나머지 20개는 후속 작업 필요.
+
 ## 2026-09-27 (18차) — 범위 확장 요청 대응: 통합 사이트 레지스트리(대시보드+트리거만)
 
 **Chairman 요청(원문)**: "이건 내가 보여준것과 그대로 똑같잖아... 런던프로젝트는 내 wp25개..뉴스2개,

@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 import io
 import json
 import os
+import hashlib
+import random
 import socket
 from pathlib import Path
 import sys
@@ -93,6 +95,40 @@ def public_status(site, now):
             return {'status': 'READ_ERROR', 'reason': verified.error_code}
         return {'status': 'PUBLISHED', 'url': verified.final_url, 'published_at': raw}
     return {'status': 'DUE'}
+
+# --- Randomized per-site daily publication slots (WordPress) -----------------
+# One post per site per KST day. Slots are deterministic for (day, site) so every
+# hourly/sub-hourly run agrees, evenly spread (>= ~30 min apart across the fleet),
+# never on an exact hour or a 5-minute multiple, and different on every day.
+# After SLOT_END the slot gate is lifted so a missed site is still filled the same day.
+SLOT_START_MIN = 5 * 60 + 30     # 05:30 KST
+SLOT_END_MIN = 23 * 60           # 23:00 KST (catch-up: no gate after this)
+SLOT_JITTER_MIN = 5.0
+
+
+def daily_slots(site_ids, day):
+    """Return {site_id: aware datetime} for one KST day."""
+    ids = sorted(site_ids)
+    if not ids:
+        return {}
+    rng = random.Random('wp-daily-slots:' + day.isoformat())
+    order = ids[:]
+    rng.shuffle(order)
+    step = (SLOT_END_MIN - SLOT_START_MIN) / len(order)
+    slots = {}
+    for index, sid in enumerate(order):
+        minute = SLOT_START_MIN + (index + 0.5) * step + rng.uniform(-SLOT_JITTER_MIN, SLOT_JITTER_MIN)
+        minute = int(round(minute))
+        if minute % 60 == 0 or minute % 5 == 0:
+            minute += 1 if (minute + 1) % 5 else 2   # land on a non-multiple-of-5 minute
+        slots[sid] = datetime(day.year, day.month, day.day, tzinfo=KST) + timedelta(minutes=minute)
+    return slots
+
+
+def slot_open(slot, now):
+    """True once the site's slot has arrived, or once the catch-up window starts."""
+    catch_up = datetime(now.year, now.month, now.day, tzinfo=KST) + timedelta(minutes=SLOT_END_MIN)
+    return now >= slot or now >= catch_up
 
 
 class GitHub:
@@ -271,14 +307,23 @@ def main():
     api = GitHub(os.environ['GITHUB_REPOSITORY'], os.environ['GH_DISPATCH_TOKEN'])
     with ThreadPoolExecutor(max_workers=8) as pool:
         public = list(pool.map(lambda site: public_status(site, now), sites))
-    # Rotate the starting point by hour, so retries cannot starve later sites.
-    offset = (now.hour*4) % len(sites) if sites else 0
     pairs = list(zip(sites, public))
-    pairs = pairs[offset:] + pairs[:offset]
+    slots = {}
+    if args.platform == 'wordpress':
+        # Randomized one-post-per-day slots; earliest due slot is served first.
+        slots = daily_slots([site['site_id'] for site in sites], now.date())
+        pairs.sort(key=lambda pair: slots[pair[0]['site_id']])
+    else:
+        # Rotate the starting point by hour, so retries cannot starve later sites.
+        offset = (now.hour*4) % len(sites) if sites else 0
+        pairs = pairs[offset:] + pairs[:offset]
     rows, dispatched = [], 0
     for site, result in pairs:
         try:
-            row, used = reconcile(site, result, api, now, dispatched < args.max_dispatch)
+            gate = slot_open(slots[site['site_id']], now) if slots else True
+            row, used = reconcile(site, result, api, now, gate and dispatched < args.max_dispatch)
+            if slots:
+                row['slot_kst'] = slots[site['site_id']].strftime('%H:%M')
             dispatched += int(used)
         except (requests.RequestException, ValueError, KeyError) as exc:
             row = {'site_id': site['site_id'], 'url': site['url'], 'status': 'RECONCILIATION_ERROR', 'error_type': type(exc).__name__}
