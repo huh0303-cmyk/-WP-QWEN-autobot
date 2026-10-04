@@ -2,6 +2,10 @@ name: k-health365 noindex redirected posts
 on:
   workflow_dispatch:
     inputs:
+      script:
+        description: "script path"
+        default: "scripts/khealth_sitemap_exclude_snippet.py"
+        type: string
       dry_run:
         description: "true = read only"
         default: "true"
@@ -21,8 +25,10 @@ jobs:
       - env:
           KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
           DRY_RUN: ${{ inputs.dry_run }}
-        run: python scripts/noindex_khealth_redirect_posts.py
+          SCRIPT: ${{ inputs.script }}
+        run: python "$SCRIPT"
       - uses: actions/upload-artifact@v4
         with:
           name: khealth-noindex-result
           path: khealth_noindex_result.json
+          if-no-files-found: ignore
