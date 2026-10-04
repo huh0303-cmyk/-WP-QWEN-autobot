@@ -38,8 +38,23 @@ jobs:
                   out = e._try_compat("Reply with the single word OK.", 0.0, spec)
                   print(f"{name}: VALID  model={e.last_writer_model} reply={out[:20]!r}")
               except Exception as exc:
-                  status = getattr(getattr(exc, "response", None), "status_code", None)
-                  print(f"{name}: FAILED status={status} {type(exc).__name__} {str(exc)[:120]}"); bad += 1
+                  resp = getattr(exc, "response", None)
+                  status = getattr(resp, "status_code", None)
+                  body = (resp.text[:300].replace(chr(10), " ") if resp is not None else "")
+                  print(f"{name}: FAILED status={status} {type(exc).__name__} body={body}"); bad += 1
+              # list models this key can see (names only) to pick a working default
+              try:
+                  import requests
+                  base = spec[2].rsplit("/chat/completions", 1)[0] + "/models"
+                  r = requests.get(base, headers={"Authorization": "Bearer " + os.environ[key_env].strip()}, timeout=30)
+                  print(f"{name}: models endpoint status={r.status_code}")
+                  if r.ok:
+                      ids = [m.get("id") for m in r.json().get("data", [])]
+                      if name == "openrouter":
+                          ids = [i for i in ids if i and i.endswith(":free")]
+                      print(f"{name}: models={ids[:60]}")
+              except Exception as exc2:
+                  print(f"{name}: models list failed {type(exc2).__name__}")
           for model in e.FREE_GEMINI_MODELS:
               try:
                   e._try_gemini("Reply with the single word OK.", 0.0, model)
