@@ -13,7 +13,7 @@ archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. �
 
 ## 2026-10-04 (8차) — 2027 포트폴리오 계획 초안
 
-- 분야별 1사이트 12개 유지, 나머지 통합/만료. 상세: docs/PORTFOLIO_2027_PLAN_2026-10-04.md. Chairman 확정 전(초안). 통합 작업 미착수.
+- 분야별 1사이트 12개 유지, 나머지 통합/만료. 상세: docs/PORTFOLIO_2027_PLAN_2026-10-04.md. **확정(10/4 18:20 KST)**. 통합 작업 미착수. 1일 1포스팅 유지(WP 25 + Blogger 33), 만료 7일 전 재확인 예약 2건(11/11, 2027-02-12).
 - 도메인 연장 판단(임박분): oliveyoungkorea·sis-korea 연장, ki-korea·ksa-korea 버림(Chairman 의사), kstudy365·jobkorea365는 이전 완료까지 1회 연장.
 
 ## 2026-10-04 (7차) — 인터넷신문 등록 준비 + 사단법인(KIECA-Korea) 준비 방향
