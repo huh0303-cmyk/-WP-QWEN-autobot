@@ -11,6 +11,14 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 (20차) — 매일 발행 안정화: 스케줄 부재 + Gemini 키 거부 진단, 사전점검·스케줄 복구(브랜치, 미병합)
+
+- 요청: Chairman "매일 안정적으로 발행(VPS·GitHub)". 상세: `docs/DAILY_PUBLISH_STABILITY_2026-10-04.md`
+- 근거: 9/28 커밋 `0201910`이 floor 스케줄 제거, n8n 마스터 저장소상 inactive, 마지막 실행 9/29. 9/29 실패는 `GEMINI_API_KEY` 거부("API key not valid") + 뉴스룸 GPT checker 불가.
+- 변경(브랜치 `stable-daily-publish-2026-10-04`, 커밋 `696e9dd`, main 미병합): 키 사전점검(INVALID/MISSING이면 claim·dispatch 중단, run 실패), 9회/일 스케줄, 수동 "Provider key check" 워크플로.
+- 미검증: 현재 키 상태, VPS n8n 활성 여부, 라이브 사이트 상태, 스케줄 실제 실행. VERIFIED_COMPLETE 아님.
+- 필요한 결정: 키 교체(Chairman), 스케줄 복구 vs n8n 선택, 브랜치 병합(main push = VPS 재배포).
+
 ## 2026-09-27 (18차) — 범위 확장 요청 대응: 통합 사이트 레지스트리(대시보드+트리거만)
 
 **Chairman 요청(원문)**: "이건 내가 보여준것과 그대로 똑같잖아... 런던프로젝트는 내 wp25개..뉴스2개,
