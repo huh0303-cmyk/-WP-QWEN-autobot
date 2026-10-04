@@ -1,0 +1,28 @@
+name: k-health365 noindex redirected posts
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = read only"
+        default: "true"
+        type: string
+permissions:
+  contents: read
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - env:
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python scripts/noindex_khealth_redirect_posts.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: khealth-noindex-result
+          path: khealth_noindex_result.json
