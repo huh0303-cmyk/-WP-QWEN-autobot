@@ -12,6 +12,13 @@ Before any work, read:
 7. `docs/GITHUB_OPERATION_RECORD_POLICY_2026-09-25.md`
 8. `docs/LONDON_PROJECT_CLAUDE_STATE.md` — 런던프로젝트클로드 (AdSense 승인 서브트랙) 최신 상태. 이 파일부터 읽고 이어서 진행한다. 헌장은 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md`, 운영 잠금은 `config/LONDON_PROJECT_CLAUDE_OWNER_LOCK_2026-09-26.md`. 같은 저장소를 병행 운영하는 "런던프로젝트GPT"(`config/LONDON_PROJECT_GPT_OWNER_LOCK_2026-09-26.md`)와는 별도 트랙이며, 겹치는 파일은 먼저 `git log`로 최근 변경자를 확인한다.
 
+## 박제 — 이 저장소 글쓰기의 목적과 원칙 (Chairman 지시, 2026-10-04)
+
+- 모든 글쓰기의 목적은 **구글 애드센스 승인**이다(WP 25 · 신문사 2 · Blogspot 33). 양 채우기·날조 금지.
+- 발행은 **전부 무료**: Gemini 무료 모델 체인 → Groq → OpenRouter(:free) → Cerebras. 유료 API 사용·신규 유료 SaaS 도입 금지(Chairman 명시 승인 전까지).
+- 한 엔진이 실패해도 다음 무료 엔진으로 이어 발행하되, 품질·출처 게이트 통과 못 한 글은 발행하지 않는다.
+- 상세: `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` §0.
+
 ## Command hierarchy
 
 1. Chairman/user = final business decision maker

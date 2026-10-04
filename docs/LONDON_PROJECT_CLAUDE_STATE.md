@@ -11,6 +11,13 @@
 archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. 다른 트랙(Gemini
 등)이 주장하는 매핑은 이 파일과 대조 없이 믿지 말 것.
 
+## 2026-10-04 (4차) — 무료 키 검증 · 신문사 도메인 이상 · blogger-rewrite 재활성화 · 박제
+- 박제: 글쓰기 목적=애드센스 승인, 발행=전부 무료 — `CLAUDE.md` 및 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` §0에 명문화.
+- 키 검증(`Free LLM key check` 워크플로우, run 결과): Gemini 무료 5개 모델 전부 VALID / **Groq VALID**(모델을 `openai/gpt-oss-120b`로 교체, 기존 llama-3.3-70b-versatile는 접근 불가였음) / **OpenRouter 키 VALID**, 모델을 `google/gemma-4-31b-it:free`로 교체(기존 `llama-3.3-70b-instruct:free`는 무료 종료) — 검증 시점엔 업스트림 429(일시 한도)였음 / **Cerebras 키 401 "Wrong API Key"** — 키 재발급·재등록 필요(사용자 조치).
+- **theseouljournal.com 발행 불가(실측)**: Google DNS NXDOMAIN, RDAP 상태 `client hold`(등록기관 Gabia), 네임서버 DNS-PARKING.COM, 만료 2027-09-29. run 37187830815 = skip_unreachable. 사용자가 Gabia에서 hold 해제(이메일 인증/결제 확인) + 네임서버를 호스팅으로 복구해야 함. 코드 문제 아님.
+- blogger-rewrite.yml: disabled_manually → 사용자 지시로 enable(dispatch 전용, 크론 없음).
+- 아직 미검증: blogger-rewrite 실제 실행, OpenRouter/Cerebras를 통한 실발행.
+
 ## 2026-10-04 (3차) — 무료 폴백 키 3종 연결(워크플로우 env)
 - 사용자 조치 완료(확인: Secrets 목록, 16:44 KST): GROQ_API_KEY / OPENROUTER_API_KEY / CEREBRAS_API_KEY 등록. 레포 시크릿 100개 한도 때문에 미사용 시크릿 일부 정리 필요했음(워크플로우·코드 참조 0건 확인 후 사용자가 삭제).
 - 변경: 아래 4개 워크플로우 env에 3개 키 추가(daily-network-publish.yml / publish-blogger-33-now.yml과 동일 방식): newsrooms-daily-publisher.yml, publication-health.yml, blogger-rewrite.yml, tistory-daily-plan.yml. 이전엔 신문사 2곳 등이 Gemini 503 때 이어받을 엔진이 없었음.
