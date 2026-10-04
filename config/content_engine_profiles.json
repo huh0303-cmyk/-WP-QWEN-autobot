@@ -305,12 +305,12 @@
         "editorial_funnel": {}
       },
       "blogspot": {
-        "url": "https://koreanews365daily.blogspot.com",
+        "url": "https://koreanews365.blogspot.com",
         "status": "EXISTING",
-        "destination_id": "7521251102691129954",
+        "destination_id": "1548983591062080646",
         "ready_for_automation": true,
-        "description": "한국의 주요 뉴스와 시사 이슈를 알기 쉽고 친절하게 정리해서 전해드리는 블로그입니다. 바쁜 일상 속에서도 핵심을 빠르게 확인하실 수 있어요.",
-        "search_description": "한국 뉴스와 시사 이슈를 쉽고 친절하게 정리해서 전해드립니다.",
+        "description": "한국의 주요 뉴스와 시사 이슈를 알기 쉽고 정확하게 정리해서 전해드리는 한국어 뉴스·시사 블로그입니다.",
+        "search_description": "한국 뉴스와 시사 이슈를 쉽고 정확하게 정리해 전해드립니다.",
         "notes": "",
         "editorial_funnel": {},
         "persona": "독립 종합 인터넷신문 편집국",
