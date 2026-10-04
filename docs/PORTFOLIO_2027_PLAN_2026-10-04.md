@@ -40,3 +40,21 @@
 - Blogger 33: 1일 1포스팅 유지. VPS 타이머 소유(10/2~10/4 정상 확인), GitHub 스케줄과 이중 발행 금지.
 - 만료 7일 전 재확인(예약됨): kstudy365·jobkorea365 → 2026-11-11, ktech365·krealestate365 → 2027-02-12. 나머지 정리 대상은 만료일 확인 후 추가 예약.
 - 임박분(oliveyoungkorea 10/6, ki-korea·sis-korea 10/12, ksa-korea 10/14)은 위 결정대로 처리: 앞의 둘+sis 연장, ki·ksa 버림.
+
+## 정리 대상 11개 재평가 (지난달=2026-09 GSC 근거, 2026-10-04 18:50 KST)
+출처: gsc_year_report.json (run 37188642843). 9월 클릭/노출.
+| 사이트 | 9월 | 28일 | 판정 |
+|---|---|---|---|
+| jobinkorea365 | 4 / 319 | 4 / 265 | 유일한 상승 신호 → 만료 전까지 유지, 취업 2번 사이트로 jobkoreaglobal과 비교 후 결정 |
+| koreainsurance365 | 0 / 68 | 0 / 65 | 12개월 노출 2,427(최대)이나 클릭 2 → kfinance365로 통합 |
+| koreamedicaltour | 0 / 87 | 0 / 74 | k-health365로 통합 |
+| jobkorea365 | 0 / 47 | 0 / 36 | 통합 후 만료(재연장 안 함) |
+| ktech365 | 0 / 47 | 0 / 45 | 버림 |
+| kstudy365 | 0 / 17 | 0 / 17 | 통합 후 만료(재연장 안 함) |
+| koreataxnlaw | 0 / 10 | 0 / 10 | 통합 |
+| k-visa365 | 0 / 8 | 0 / 8 | studyinkorea365로 통합 |
+| koreacrypto365 | 0 / 5 | 0 / 5 | 통합 |
+| krealestate365 | 0 / 1 | 0 / 1 | 버림 |
+| koreainvest365 | 0 / 0 | 0 / 0 | 버림 |
+주의: 9월 노출 급감은 전 사이트 공통(비색인 글 Private 정제 영향 가능성) → 수요 감소로 단정 불가.
+수정: kstudy365·jobkorea365는 이전 후 재연장하지 않음(11/18 만료, 이전은 그 전 완료).
