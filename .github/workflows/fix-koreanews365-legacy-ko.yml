@@ -1,0 +1,42 @@
+name: "One-time KoreaNews365 Korean repair"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Translate without publishing changes"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+      BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+      BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: "gpt-5-mini"
+      DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests -q
+      - name: Repair exact legacy blog
+        run: python scripts/fix_koreanews365_legacy_korean.py
+      - name: Upload repair receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: koreanews365-korean-repair
+          path: artifacts/koreanews365_ko_repair.json
+          if-no-files-found: warn
+          retention-days: 7
