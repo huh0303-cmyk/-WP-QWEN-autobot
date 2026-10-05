@@ -1,9 +1,9 @@
-name: Three weekly scheduled ten-language vocabulary Shorts
+name: Daily scheduled ten-language vocabulary Shorts
 
 on:
   schedule:
-    # Prepare and upload privately at 20:17 KST the prior evening; publish at 08:17 KST Mon/Wed/Fri.
-    - cron: "17 11 * * 0,2,4"
+    # Prepare and upload privately at 20:17 KST the prior evening; publish at 08:17 KST every day (owner-confirmed 1 per language per day).
+    - cron: "17 11 * * *"
   workflow_dispatch:
     inputs:
       target_date:
