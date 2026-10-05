@@ -1,1 +1,1 @@
-{"day": "2026-10-05", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-05-wp_sis-4c92a1bb", "claimed_at": "2026-10-05T06:57:49.778231+09:00", "run_id": 37238181497, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-05", "status": "PUBLISHED", "public_url": "https://sis-korea.com/korea-university-global-leader-scholarship-selection-criteria-and-academic-pathway-requirements/", "published_at": "2026-10-04T22:05:59Z"}
