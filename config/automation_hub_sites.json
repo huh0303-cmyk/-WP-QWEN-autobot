@@ -51,7 +51,10 @@
         ]
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kstudy365",
@@ -71,7 +74,10 @@
         "theme": "Study in Korea"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_oliveyoung",
@@ -92,7 +98,10 @@
       },
       "affiliate_profile": "beauty",
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_jobkorea365",
@@ -112,7 +121,10 @@
         "theme": "Employment"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kvisa365",
@@ -132,7 +144,10 @@
         "theme": "Visa Guide"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_khealth365",
@@ -152,7 +167,10 @@
         "theme": "건강과 의학"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kskin365",
@@ -173,7 +191,10 @@
       },
       "affiliate_profile": "beauty",
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_ktrip365",
@@ -194,7 +215,10 @@
       },
       "affiliate_profile": "travel",
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kfinance365",
@@ -214,7 +238,10 @@
         "theme": "Finance"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kinsurance365",
@@ -234,7 +261,10 @@
         "theme": "Insurance"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_koreataxlaw",
@@ -254,7 +284,10 @@
         "theme": "Tax and Law"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_medicaltour",
@@ -274,7 +307,10 @@
         "theme": "Korea Medical Tourism"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_studyinkorea",
@@ -294,7 +330,10 @@
         "theme": "International Students"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_jobinkorea",
@@ -314,7 +353,10 @@
         "theme": "Jobs in Korea"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kworld365",
@@ -334,7 +376,10 @@
         "theme": "K-POP"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_koreawedding",
@@ -376,7 +421,10 @@
       },
       "affiliate_profile": "wedding",
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_jobglobal",
@@ -396,7 +444,10 @@
         "theme": "Recruitment"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kinvest365",
@@ -416,7 +467,10 @@
         "theme": "Investment"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_krealestate",
@@ -436,7 +490,10 @@
         "theme": "Korea Real Estate"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kcrypto365",
@@ -456,7 +513,10 @@
         "theme": "Crypto"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_ktech365",
@@ -476,7 +536,10 @@
         "theme": "Technology"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kieca",
@@ -496,7 +559,10 @@
         "theme": "국제교육문화"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_ksa",
@@ -516,7 +582,10 @@
         "theme": "한국유학정보"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_sis",
@@ -536,7 +605,10 @@
         "theme": "TOPIK, online Korean classes and study pathways to Korea"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_kikorea",
@@ -556,7 +628,10 @@
         "theme": "Korea Investment"
       },
       "daily_min": 1,
-      "daily_max": 1
+      "daily_max": 1,
+      "image_mode": "free_stock_ai",
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_koreanews",
@@ -586,7 +661,9 @@
       ],
       "keyword_rules": {
         "max_age_hours": 72
-      }
+      },
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "wp_seouljournal",
@@ -617,7 +694,9 @@
       ],
       "keyword_rules": {
         "max_age_hours": 72
-      }
+      },
+      "image_min": 0,
+      "image_max": 1
     },
     {
       "site_id": "blogger_ktrip365",
