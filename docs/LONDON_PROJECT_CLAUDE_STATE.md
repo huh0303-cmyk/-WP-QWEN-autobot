@@ -895,3 +895,10 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 일일 점검: `.github/workflows/writer-image-health.yml` (05:17 KST, 읽기전용).
 - 사용자 조치 필요: ①Gemini 무료 키 2–3개 발급(서로 다른 Google Cloud 프로젝트)해 GitHub 시크릿 GEMINI_API_KEY/_2/_3 등록 ②Cerebras 키 재발급. "Grok(xAI)"은 무료 API 없음 → 전면 무료 원칙상 Groq로 해석, Grok 유료 사용은 승인 필요.
 - 미검증: 33개 전체 일일 실행, WP 25·신문사 실발행에서 새 폴백 동작.
+
+## 10차 후속 (10/5 12:00 KST) — 실측 결과와 수정
+- Blogspot 33 전체 AM 재실행(run 37253651199): published 6 / existing 20 / failed 5 / verification_failed 2 (429). 실패 원인: 글이 짧음(716–1445), 모델이 빈/비JSON 응답. → 길이·JSON 피드백 힌트 재시도 4회, API LIVE 검증 수용. 남은 블로그는 30분 틱에서 자동 재시도(첫 예약 틱 실행은 아직 미관측).
+- **WP 25 근본원인 2건 발견·수정**: ①`automation_hub_sites.json` 전 WP 사이트가 image_mode=none/image_max=0(모델 기본값) → 모든 WP 글이 이미지 0장 + SEO 점수 하락 → `skip_low_seo`로 발행 실패(22개 사이트가 약 131시간 무발행). 25개 블로그에 `image_mode=free_stock_ai, image_max=1`, 신문사 image_max=1 설정. ②WP 워크플로 로컬 Qwen 3B 폴백 비활성(품질게이트 미달·15분 낭비).
+- 검증: koreacrypto365 시험 발행 성공(이미지 Pexels 1장, SEO 79) https://koreacrypto365.com/legislative-review-of-south-korea-travel-rule-elimination-for-digital-asset-compliance/ — 직전엔 4회 연속 skip_low_seo.
+- Gemini: repo 수준 GEMINI_API_KEY는 정상(4개 모델 OK), `blogger` 환경의 GEMINI_API_KEY가 1글자 값으로 덮어써서 Blogger 워크플로에서만 무효. 조치: Settings→Environments→blogger 에서 그 시크릿 삭제(Chairman) + GEMINI_API_KEY_2/_3 추가.
+- 미검증: 나머지 WP 24곳 실발행/이미지, 예약(schedule) 틱 정상 동작(Blogger 워크플로), 하루 한도.
