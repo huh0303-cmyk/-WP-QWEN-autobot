@@ -1,1 +1,1 @@
-{"day": "2026-10-05", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-05-wp_kskin365-33cfde2f", "claimed_at": "2026-10-05T09:51:19.016891+09:00", "run_id": 37249119541, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-05", "status": "PUBLISHED", "public_url": "https://kskin365.com/digital-transparency-and-the-k-beauty-e-labeling-system-2028/", "published_at": "2026-10-05T00:55:40Z"}
