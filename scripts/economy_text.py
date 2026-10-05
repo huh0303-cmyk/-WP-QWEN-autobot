@@ -124,8 +124,44 @@ OPENAI_COMPAT = (
 )
 
 
+_DISCOVERED: dict = {}
+_PREFER = ("gpt-oss-120b", "llama-3.3-70b", "qwen3", "gemma", "deepseek", "gpt-oss-20b", "llama")
+_SKIP = ("whisper", "guard", "tts", "orpheus", "embed", "vision", "image", "audio", "safeguard", "moderation", "lyria", "veo")
+
+
+def _discover(spec: tuple) -> list:
+    """Ask the provider which models this key can use right now (free-model slugs rotate), once per process."""
+    provider, key_env, url = spec[0], spec[1], spec[2]
+    if provider in _DISCOVERED:
+        return _DISCOVERED[provider]
+    ids: list = []
+    key = os.getenv(key_env, "").strip()
+    try:
+        r = requests.get(url.rsplit("/chat/completions", 1)[0] + "/models",
+                         headers={"Authorization": f"Bearer {key}"}, timeout=20)
+        r.raise_for_status()
+        for m in r.json().get("data", []):
+            mid = str(m.get("id", ""))
+            if not mid or any(x in mid.lower() for x in _SKIP):
+                continue
+            if provider == "openrouter":
+                price = m.get("pricing") or {}
+                if not (mid.endswith(":free") or (str(price.get("prompt")) == "0" and str(price.get("completion")) == "0")):
+                    continue
+            ids.append(mid)
+    except Exception:
+        ids = []
+    ids.sort(key=lambda m: next((i for i, p in enumerate(_PREFER) if p in m.lower()), len(_PREFER)))
+    _DISCOVERED[provider] = ids[:8]
+    return _DISCOVERED[provider]
+
+
 def _compat_models(spec: tuple) -> list:
-    return [m.strip() for m in os.getenv(spec[3], spec[4]).split(",") if m.strip()]
+    """Configured models first (env override or defaults), then whatever the provider currently offers for free."""
+    models = [m.strip() for m in os.getenv(spec[3], spec[4]).split(",") if m.strip()]
+    if spec[0] in ("groq", "openrouter") and os.getenv(spec[1], "").strip():
+        models += [m for m in _discover(spec) if m not in models]
+    return models
 
 
 def _try_compat(prompt: str, temperature: float, spec: tuple, model: str | None = None) -> str:
