@@ -109,6 +109,8 @@ Provide 1-3 short, highly relevant labels only."""
         content=body, labels=labels,
     )
     if mismatches:
+        for m in list(_re.finditer(_HANGUL + r"+", body))[:4]:
+            print("hangul context:", repr(body[max(0, m.start() - 40):m.end() + 20]))
         raise RuntimeError("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
     description = build_search_description(title=title, topic=site["theme"], language=site["language"])
     validate_search_description(description)
