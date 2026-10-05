@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Apply config/wp_retitle_*.json: replace titles only (slug/body/status untouched).
 Skips a post if its current raw title no longer equals "old" (someone changed it). Writes rollback log."""
-import json, os, sys, requests
+import html, json, os, re, sys, requests
+
+
+def norm(t):
+    t = html.unescape(t or "").replace("\u2019", "'").replace("\u2018", "'").replace("\u201c", '"').replace("\u201d", '"').replace("\u2013", "-").replace("\u2014", "-")
+    return re.sub(r"\s+", " ", t).strip().lower()
+
 
 MAP = sys.argv[1] if len(sys.argv) > 1 else "config/wp_retitle_2026-10-05.json"
 USER = os.environ.get("WP_USER", "huh0303@gmail.com")
@@ -15,9 +21,9 @@ for r in rows:
         cur.raise_for_status()
         j = cur.json()
         raw = j.get("title", {}).get("raw", "")
-        if raw == r["new"]:
+        if raw == r["new"] or r["old"] == r["new"]:
             skip += 1; continue
-        if raw.strip() != r["old"].strip():
+        if norm(raw) != norm(r["old"]):
             print("SKIP changed", r["site"], r["id"], raw[:60]); skip += 1; continue
         if "unlock" in r["new"].lower():
             raise ValueError("banned word")

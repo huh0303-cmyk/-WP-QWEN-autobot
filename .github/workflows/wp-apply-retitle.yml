@@ -55,4 +55,4 @@ jobs:
           git commit -m "log: WP retitle rollback 2026-10-05" || exit 0
           git pull --rebase && git push
 
-# rerun 2026-10-05: idempotent retry for posts not yet retitled
+# rerun 2: normalize title comparison (curly quotes/entities)
