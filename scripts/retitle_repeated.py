@@ -113,6 +113,10 @@ def valid(new, old, banned, used):
         return False
     if " ".join(words(new)) in used:
         return False
+    num = r"\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b"
+    old_nums = set(re.findall(num, old.lower()))
+    if {n for n in re.findall(num, new.lower()) if n != "2026"} - old_nums:
+        return False  # no invented counts
     return True
 
 
