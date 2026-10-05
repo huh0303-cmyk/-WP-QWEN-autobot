@@ -1,71 +1,58 @@
-import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "scripts"))
+import os, sys, types
+sys.path.insert(0, "scripts")
 import requests
-import economy_text as et
+import economy_text as e
 
 
-def test_chain_falls_through_three_free_models(monkeypatch):
+def _http(status):
+    r = requests.Response(); r.status_code = status
+    return requests.HTTPError(response=r)
+
+
+def setup_function(_):
+    e._DEAD.clear(); e._COOLDOWN.clear()
+    for n in ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GROQ_API_KEY", "OPENROUTER_API_KEY", "CEREBRAS_API_KEY"):
+        os.environ.pop(n, None)
+    os.environ["WRITER_RETRY_SLEEP"] = "0"
+
+
+def test_placeholder_gemini_key_ignored():
+    os.environ["GEMINI_API_KEY"] = "x"
+    os.environ["GEMINI_API_KEY_2"] = "k" * 30
+    assert [n for n, _ in e._gemini_keys()] == ["GEMINI_API_KEY_2"]
+
+
+def test_second_key_used_when_first_rejected(monkeypatch):
+    os.environ["GEMINI_API_KEY"] = "a" * 30
+    os.environ["GEMINI_API_KEY_2"] = "b" * 30
     calls = []
-
-    def fake(prompt, temperature, model):
-        calls.append(model)
-        if len(calls) < 3:
-            raise requests.Timeout("timeout")
-        et.last_writer_model = model
-        return "ok"
-
-    monkeypatch.setattr(et, "_try_gemini", fake)
-    monkeypatch.delenv("NEWSROOM_PAID_TEXT_APPROVED", raising=False)
-    monkeypatch.setenv("LONDON_WRITER_MODEL", "auto_free")
-    monkeypatch.setattr(et, "RETRY_SLEEP", 0)
-    et.begin_article()
-    assert et.generate_text("x") == "ok"
-    # 첫 모델 2회 실패 → 두 번째 모델 1회째 성공... (calls<3 실패)
-    assert calls == [et.FREE_GEMINI_MODELS[0], et.FREE_GEMINI_MODELS[0], et.FREE_GEMINI_MODELS[1]]
+    def fake(prompt, temp, model, key=None):
+        calls.append(key[0])
+        if key[0] == "a":
+            raise _http(403)
+        return "ok-from-b"
+    monkeypatch.setattr(e, "_try_gemini", fake)
+    e.begin_article()
+    assert e.generate_text("p") == "ok-from-b"
+    assert calls[0] == "a" and "b" in calls
+    assert ("gemini", "GEMINI_API_KEY", "*") in e._DEAD       # bad key parked for the rest of the run
+    calls.clear(); e.begin_article()
+    assert e.generate_text("p") == "ok-from-b" and calls == ["b"]  # never retried the dead key
 
 
-def test_all_fail_raises(monkeypatch):
-    monkeypatch.setattr(et, "_try_gemini", lambda *a: (_ for _ in ()).throw(ValueError("x")))
-    monkeypatch.setenv("LONDON_WRITER_MODEL", "auto_free")
-    et.begin_article()
-    try:
-        et.generate_text("x")
-        assert False
-    except RuntimeError as e:
-        assert "WRITERS_EXHAUSTED" in str(e)
-
-
-def test_independent_engines_after_gemini(monkeypatch):
-    order = []
-    monkeypatch.setattr(et, "RETRY_SLEEP", 0)
-    monkeypatch.setattr(et, "_try_gemini", lambda p, t, m: (_ for _ in ()).throw(ValueError("x")))
-
-    def compat(p, t, spec):
-        order.append(spec[0])
-        if spec[0] == "groq":
-            raise requests.ConnectionError("down")
-        return "from-" + spec[0]
-
-    monkeypatch.setattr(et, "_try_compat", compat)
-    monkeypatch.setenv("LONDON_WRITER_MODEL", "auto_free")
-    monkeypatch.setenv("GROQ_API_KEY", "k"); monkeypatch.setenv("OPENROUTER_API_KEY", "k")
-    monkeypatch.delenv("CEREBRAS_API_KEY", raising=False)
-    et.begin_article()
-    assert et.generate_text("x") == "from-openrouter"
-    assert order == ["groq", "groq", "openrouter"]   # groq 2회 실패 → openrouter
-
-
-def test_local_qwen_is_last_resort_after_all_keyed_engines(monkeypatch):
-    import types, sys
-    monkeypatch.setattr(et, "RETRY_SLEEP", 0)
-    monkeypatch.setattr(et, "_try_gemini", lambda *a: (_ for _ in ()).throw(requests.Timeout("t")))
-    for k in ("GROQ_API_KEY", "OPENROUTER_API_KEY", "CEREBRAS_API_KEY"):
-        monkeypatch.delenv(k, raising=False)
-    monkeypatch.setenv("LONDON_WRITER_MODEL", "auto_free")
-    monkeypatch.setenv("LOCAL_TEXT_FALLBACK_ENABLED", "true")
-    seen = {}
-    fake = types.SimpleNamespace(local_generate_text=lambda p, **kw: seen.update(kw) or "qwen-ok")
-    monkeypatch.setitem(sys.modules, "local_text", fake)
-    et.begin_article()
-    assert et.generate_text("x") == "qwen-ok"
-    assert "timeout" in seen and "max_tokens" in seen
+def test_groq_model_rotation_on_404_and_429(monkeypatch):
+    os.environ["GROQ_API_KEY"] = "g" * 30
+    seen = []
+    def fake(prompt, temp, spec, model=None):
+        seen.append(model)
+        if model == "openai/gpt-oss-120b":
+            raise _http(429)
+        if model == "openai/gpt-oss-20b":
+            raise _http(404)
+        return "ok-" + model
+    monkeypatch.setattr(e, "_try_compat", fake)
+    e.begin_article()
+    assert e.generate_text("p") == "ok-llama-3.3-70b-versatile"
+    assert seen[:3] == ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile"]
+    seen.clear(); e.begin_article()
+    assert e.generate_text("p") == "ok-llama-3.3-70b-versatile" and seen == ["llama-3.3-70b-versatile"]

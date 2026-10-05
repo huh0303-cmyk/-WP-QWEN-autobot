@@ -40,9 +40,50 @@ def _record(provider: str, model: str, usage: dict | None = None) -> None:
                                 ensure_ascii=False) + "\n")
 
 
-def _try_gemini(prompt: str, temperature: float, model: str) -> str:
+import time as _time
+
+# ---- process-wide engine health (one publisher process writes many articles) ----
+_DEAD: set = set()          # (provider, key_id, model) that returned 400/401/403/404: do not retry this run
+_COOLDOWN: dict = {}        # (provider, key_id, model) -> epoch seconds until which a 429 keeps it parked
+_KEY_NAMES = ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3")
+
+
+def _gemini_keys() -> list:
+    """Up to three independent free-tier Gemini keys (separate projects = separate quotas).
+    Values shorter than 20 chars are placeholders/broken secrets and are ignored."""
+    keys = []
+    for name in _KEY_NAMES:
+        value = os.getenv(name, "").strip()
+        if len(value) >= 20 and value not in [k for _, k in keys]:
+            keys.append((name, value))
+    return keys
+
+
+def _parked(provider: str, key_id: str, model: str) -> bool:
+    ident = (provider, key_id, model)
+    if ident in _DEAD or (provider, key_id, "*") in _DEAD:
+        return True
+    return _COOLDOWN.get(ident, 0) > _time.time()
+
+
+def _note_failure(provider: str, key_id: str, model: str, exc: Exception) -> None:
+    status = getattr(getattr(exc, "response", None), "status_code", None)
+    if status in (401, 403):
+        _DEAD.add((provider, key_id, "*"))          # the whole key is bad
+    elif status in (400, 404):
+        _DEAD.add((provider, key_id, model))        # this model is unusable for this key
+    elif status == 429:
+        _COOLDOWN[(provider, key_id, model)] = _time.time() + float(os.getenv("WRITER_429_COOLDOWN", "900"))
+
+
+def engine_health() -> dict:
+    return {"dead": sorted("/".join(map(str, d)) for d in _DEAD),
+            "cooling": sorted("/".join(map(str, d)) for d, t in _COOLDOWN.items() if t > _time.time())}
+
+
+def _try_gemini(prompt: str, temperature: float, model: str, key: str | None = None) -> str:
     global last_writer_model
-    key = os.getenv("GEMINI_API_KEY", "").strip()
+    key = (key or os.getenv("GEMINI_API_KEY", "")).strip()
     if not key:
         raise RuntimeError("GEMINI_API_KEY missing")
     if model not in FREE_GEMINI_MODELS:
@@ -74,21 +115,26 @@ RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "5"))
 # (provider, key env, endpoint, default model env, default model)
 OPENAI_COMPAT = (
     ("groq", "GROQ_API_KEY", "https://api.groq.com/openai/v1/chat/completions",
-     "GROQ_MODEL", "openai/gpt-oss-120b"),
+     "GROQ_MODEL", "openai/gpt-oss-120b,openai/gpt-oss-20b,llama-3.3-70b-versatile,qwen/qwen3-32b"),
     ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1/chat/completions",
-     "OPENROUTER_MODEL", "google/gemma-4-31b-it:free"),
+     "OPENROUTER_MODEL", "google/gemma-4-31b-it:free,openai/gpt-oss-120b:free,qwen/qwen3-next-80b-a3b-instruct:free,"
+                         "meta-llama/llama-3.3-70b-instruct:free,deepseek/deepseek-chat-v3.1:free"),
     ("cerebras", "CEREBRAS_API_KEY", "https://api.cerebras.ai/v1/chat/completions",
-     "CEREBRAS_MODEL", "llama-3.3-70b"),
+     "CEREBRAS_MODEL", "llama-3.3-70b,gpt-oss-120b"),
 )
 
 
-def _try_compat(prompt: str, temperature: float, spec: tuple) -> str:
+def _compat_models(spec: tuple) -> list:
+    return [m.strip() for m in os.getenv(spec[3], spec[4]).split(",") if m.strip()]
+
+
+def _try_compat(prompt: str, temperature: float, spec: tuple, model: str | None = None) -> str:
     global last_writer_model
     provider, key_env, url, model_env, default_model = spec
     key = os.getenv(key_env, "").strip()
     if not key:
         raise RuntimeError(f"{key_env} missing")
-    model = os.getenv(model_env, default_model)
+    model = model or _compat_models(spec)[0]
     response = requests.post(
         url, headers={"Authorization": f"Bearer {key}"},
         json={"model": model, "temperature": temperature, "max_tokens": 8192,
@@ -104,13 +150,15 @@ def _try_compat(prompt: str, temperature: float, spec: tuple) -> str:
     return text.strip()
 
 
-def _with_tries(label: str, fn, failures: list):
+def _with_tries(label: str, fn, failures: list, on_error=None):
     """같은 엔진을 일시 장애 시 TRIES_PER_ENGINE번까지 시도."""
     import time
     for n in range(1, TRIES_PER_ENGINE + 1):
         try:
             return fn()
         except (requests.RequestException, ValueError, RuntimeError) as exc:
+            if on_error:
+                on_error(exc)
             failures.append(f"{label}#{n}: {_failure_summary(exc)} {str(exc)[:80] if isinstance(exc, ValueError) else ''}")
             print(f"Article writer fallback: {failures[-1]}")
             status = getattr(getattr(exc, "response", None), "status_code", None)
@@ -150,23 +198,39 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer
     choice = "gpt-5-mini" if force_gpt else (writer_model or os.getenv("LONDON_WRITER_MODEL", "auto_free"))
     models = _model_chain(choice)
     failures: list[str] = []
+    keys = _gemini_keys()
+    if not keys and models:
+        failures.append("gemini: no valid key (GEMINI_API_KEY*, >=20 chars)")
     for model in models:
-        if _article_attempts is not None and model in _article_attempts:
-            continue
-        if _article_attempts is not None:
-            _article_attempts.add(model)
-        text = _with_tries(model, lambda m=model: _try_gemini(prompt, temperature, m), failures)
-        if text:
-            return text
+        for key_id, key in keys:
+            if _parked("gemini", key_id, model):
+                continue
+            attempt_id = f"{model}@{key_id}"
+            if _article_attempts is not None:
+                if attempt_id in _article_attempts:
+                    continue
+                _article_attempts.add(attempt_id)
+            try:
+                text = _with_tries(attempt_id, lambda m=model, k=key: _try_gemini(prompt, temperature, m, k), failures,
+                                   on_error=lambda e, m=model, kid=key_id: _note_failure("gemini", kid, m, e))
+            except Exception as exc:  # never let one engine abort the chain
+                failures.append(f"{attempt_id}: {_failure_summary(exc)}")
+                text = None
+            if text:
+                return text
 
-    # 독립 무료 엔진들(키가 있을 때만): 각 엔진 2회 시도 후 다음 엔진
+    # 독립 무료 엔진들(키가 있을 때만): 엔진별 모델 목록을 차례로, 죽은/한도 초과 모델은 건너뜀
     if choice != "gpt-5-mini":
         for spec in OPENAI_COMPAT:
             if not os.getenv(spec[1], "").strip():
                 continue
-            text = _with_tries(spec[0], lambda sp=spec: _try_compat(prompt, temperature, sp), failures)
-            if text:
-                return text
+            for model in _compat_models(spec):
+                if _parked(spec[0], spec[1], model):
+                    continue
+                text = _with_tries(f"{spec[0]}:{model}", lambda sp=spec, m=model: _try_compat(prompt, temperature, sp, m),
+                                   failures, on_error=lambda e, sp=spec, m=model: _note_failure(sp[0], sp[1], m, e))
+                if text:
+                    return text
 
     # GPT is paid and only used when the operator explicitly selects it.
     if choice == "gpt-5-mini":

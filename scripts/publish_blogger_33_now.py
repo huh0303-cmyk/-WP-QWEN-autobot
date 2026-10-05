@@ -167,7 +167,7 @@ def main() -> int:
                         raise
                     print(f"structure retry {attempt + 1} for {site['key']}: {gate_exc}")
             try:  # free image chain; failure must never block publication
-                found = pick_image(image_subject or site['theme'])
+                found = pick_image(image_subject or site['theme'], alternates=[site['theme']])
                 if found:
                     body = insert_image(body, found, title)
             except Exception as exc:

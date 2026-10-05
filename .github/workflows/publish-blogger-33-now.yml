@@ -50,6 +50,8 @@ jobs:
           PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           REVIEW_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
           LONDON_WRITER_MODEL: "auto_free"
           # 마지막 수단: 무료 로컬 Qwen 2.5 3B (러너에서 필요할 때만 Ollama 설치·pull)

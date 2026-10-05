@@ -95,26 +95,42 @@ def _wikimedia(query: str):
 
 
 def _ai_free(query: str):
-    """Free AI fallback (Pollinations, no key). Hotlinks are unstable, so it is only used when hosting is possible."""
-    if not (os.getenv("GH_ASSET_TOKEN") and os.getenv("GITHUB_REPOSITORY")):
+    """Free AI fallback (Pollinations, no key). Needs hosting for Blogger (hotlinks are unstable);
+    WP sideloads the file into its own media library, so callers may allow the raw URL."""
+    hostable = bool(os.getenv("GH_ASSET_TOKEN") and os.getenv("GITHUB_REPOSITORY"))
+    if not hostable and os.getenv("IMAGE_ALLOW_UNHOSTED_AI") != "1":
         return None
-    url = f"https://image.pollinations.ai/prompt/{quote('editorial photo, ' + query + ', natural light, no text')}?width=1200&height=675&nologo=true"
-    if _is_image(url):
-        return {"url": url, "provider": "Pollinations", "id": re.sub(r"\W+", "-", query)[:40], "desc": query, "needs_hosting": True}
+    seed = abs(hash(query)) % 100000
+    url = (f"https://image.pollinations.ai/prompt/{quote('editorial photograph, ' + query + ', natural light, no text, no watermark')}"
+           f"?width=1200&height=675&nologo=true&seed={seed}")
+    for _ in range(2):  # Pollinations is occasionally slow/queued
+        if _is_image(url):
+            return {"url": url, "provider": "Pollinations", "id": re.sub(r"\W+", "-", query)[:40], "desc": query,
+                    "needs_hosting": hostable}
     return None
 
 
-def pick_image(query: str):
-    """Return {url, alt-ready desc, provider} or None. Order is fixed; any failure moves to the next source."""
-    query = " ".join(str(query or "").split())[:100]
-    if not _words(query):
+def pick_image(query: str, alternates=()):
+    """Return {url, alt-ready desc, provider} or None.
+    Source order is fixed (Pexels, Pixabay, Wikimedia, free AI); within each source the specific query is tried
+    first, then looser alternates (e.g. the site's topic) so a relevant-enough photo is found almost always."""
+    queries = []
+    for q in [query, *alternates]:
+        q = " ".join(str(q or "").split())[:100]
+        if _words(q) and q not in queries:
+            queries.append(q)
+    if not queries:
         return None
     for fn in (_pexels, _pixabay, _wikimedia, _ai_free):
-        try:
-            found = fn(query)
-        except Exception as exc:  # never log request URLs (keys)
-            print(f"blogger image source unavailable: {fn.__name__} ({type(exc).__name__})")
-            continue
+        found = None
+        for q in (queries[:1] if fn is _ai_free else queries):
+            try:
+                found = fn(q)
+            except Exception as exc:  # never log request URLs (keys)
+                print(f"image source unavailable: {fn.__name__} ({type(exc).__name__})")
+                break
+            if found:
+                break
         if not found:
             continue
         if found.get("needs_hosting"):
@@ -122,9 +138,9 @@ def pick_image(query: str):
                 from stable_image_hosting import host_permanently
                 found["url"] = host_permanently(found["url"], asset_key=f"blogger-{found['provider'].lower()}-{found['id']}", folder="blogger_images")
             except Exception as exc:
-                print(f"blogger image hosting unavailable: {found['provider']} ({type(exc).__name__})")
+                print(f"image hosting unavailable: {found['provider']} ({type(exc).__name__})")
                 continue
-        print(f"blogger image selected: {found['provider']} {found['id']}")
+        print(f"image selected: {found['provider']} {found['id']}")
         return found
     return None
 

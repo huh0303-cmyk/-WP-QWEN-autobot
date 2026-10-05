@@ -9,10 +9,12 @@ from editorial_topic_scope import topic_fits, choose_scoped_keyword
 
 
 def test_quality_retry_uses_next_untried_free_model(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k" * 30)
+    engine._DEAD.clear(); engine._COOLDOWN.clear()
     engine.begin_article()
     calls = []
 
-    def write(_prompt, _temperature, model):
+    def write(_prompt, _temperature, model, key=None):
         calls.append(model)
         return "article"
 
@@ -33,10 +35,14 @@ def test_geography_alone_does_not_qualify_keyword():
 
 
 def test_all_free_models_exhausted_stops_without_paid_gpt(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k" * 30)
+    for n in ("GROQ_API_KEY", "OPENROUTER_API_KEY", "CEREBRAS_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"):
+        monkeypatch.delenv(n, raising=False)
+    engine._DEAD.clear(); engine._COOLDOWN.clear()
     engine.begin_article()
     monkeypatch.setattr(engine, "_try_gemini", lambda *args: (_ for _ in ()).throw(RuntimeError("quota")))
     monkeypatch.setenv("LOCAL_TEXT_FALLBACK_ENABLED", "false")
     with pytest.raises(RuntimeError, match="WRITERS_EXHAUSTED"):
         engine.generate_text("prompt")
-    assert engine._article_attempts == set(engine.FREE_GEMINI_MODELS)
+    assert engine._article_attempts == {f"{m}@GEMINI_API_KEY" for m in engine.FREE_GEMINI_MODELS}
     engine._article_attempts = None

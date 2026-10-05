@@ -11,13 +11,14 @@ def test_free_chain_uses_next_model_after_quota_without_paid_call():
     writer.begin_article()
     calls = []
 
-    def gemini(_prompt, _temperature, model):
+    def gemini(_prompt, _temperature, model, key=None):
         calls.append(model)
         if len(calls) == 1:
             raise writer.requests.HTTPError("quota")
         return "usable article"
 
-    with patch.object(writer, "_try_gemini", side_effect=gemini), patch.dict(os.environ, {"LOCAL_TEXT_FALLBACK_ENABLED": "false"}):
+    with patch.object(writer, "_try_gemini", side_effect=gemini), patch.dict(os.environ, {"LOCAL_TEXT_FALLBACK_ENABLED": "false", "GEMINI_API_KEY": "k" * 30}):
+        writer._DEAD.clear(); writer._COOLDOWN.clear()
         assert writer.generate_text("prompt") == "usable article"
     assert calls == list(writer.FREE_GEMINI_MODELS[:2])
 

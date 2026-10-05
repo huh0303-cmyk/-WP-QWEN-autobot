@@ -22,7 +22,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write   # lets the free-image step re-host Pixabay/AI images under assets/blogger_images
 
 concurrency:
   group: blogger-33-direct-publish
@@ -77,6 +77,8 @@ jobs:
           BLOGGER_SITE_KEY: ${{ inputs.site_key || '' }}
           PUBLIC_RUN_KEY: ${{ needs.gate.outputs.key }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
           LONDON_WRITER_MODEL: "auto_free"
           LOCAL_TEXT_FALLBACK_ENABLED: "true"
@@ -88,7 +90,7 @@ jobs:
           CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN }}
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}

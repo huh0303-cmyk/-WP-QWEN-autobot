@@ -201,6 +201,27 @@ def _cost_receipt(model, subject, status):
     print("image cost estimate: " + json.dumps(receipt))
 
 
+def _free_image_fallback(subject: str, theme: str = "") -> Optional[str]:
+    """All-free fallback (Chairman 2026-10-05): relaxed Pexels/Pixabay/Wikimedia, then free AI (Pollinations).
+    WordPress sideloads the returned URL into its media library. Never raises; no image is acceptable."""
+    global last_image_model
+    try:
+        os.environ.setdefault("IMAGE_ALLOW_UNHOSTED_AI", "1")
+        import blogger_free_image as free
+        if str(theme).upper().startswith("NEWS ILLUSTRATION ONLY"):
+            # Newsroom: never a stock photo that could be read as a photo of the event; free AI illustration only.
+            found = free._ai_free(f"{subject} editorial illustration, flat vector style")
+        else:
+            found = free.pick_image(subject, alternates=[theme])
+        if found:
+            last_image_model = found["provider"]
+            return found["url"]
+    except Exception as exc:
+        print(f"  ⚠️ free image fallback error: {type(exc).__name__}")
+    print("  ℹ️ no free image available — continue without an image")
+    return None
+
+
 def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -> Optional[str]:
     """Use free stock first; paid generation requires an explicit mode."""
     global last_image_model
@@ -220,8 +241,7 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
         return None
     token = _token()
     if not token:
-        print("  ⛔ REPLICATE_API_TOKEN missing — image generation skipped; legacy fallback forbidden")
-        return None
+        return _free_image_fallback(subject, theme)
 
     prompt = build_editorial_prompt(subject, theme)
     cache_key = hashlib.sha256((mode + ":" + prompt).encode("utf-8")).hexdigest()
@@ -250,9 +270,10 @@ def generate_image_url(subject: str, theme: str = "", *, mode: str = "legacy") -
         except Exception as exc:
             print(f"  ⚠️ approved image model error: {model} ({exc})")
 
-    print("  ℹ️ SDXL Lightning and FLUX Schnell both failed — continue without an image")
-    _prompt_cache[cache_key] = None
-    return None
+    print("  ℹ️ SDXL Lightning and FLUX Schnell both failed — trying the free fallback chain")
+    free = _free_image_fallback(subject, theme)
+    _prompt_cache[cache_key] = free
+    return free
 
 
 def generate_image_urls(subject: str, count: int = 1, theme: str = "") -> list[str]:

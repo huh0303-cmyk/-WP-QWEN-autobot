@@ -57,6 +57,8 @@ jobs:
           NUM_ITEMS: ${{ inputs.num_items || '5' }}
           TARGET_LANG: ${{ inputs.lang || 'ko' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
           REPLICATE_API_TOKEN: ""
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
