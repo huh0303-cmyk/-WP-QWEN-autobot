@@ -902,3 +902,12 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 검증: koreacrypto365 시험 발행 성공(이미지 Pexels 1장, SEO 79) https://koreacrypto365.com/legislative-review-of-south-korea-travel-rule-elimination-for-digital-asset-compliance/ — 직전엔 4회 연속 skip_low_seo.
 - Gemini: repo 수준 GEMINI_API_KEY는 정상(4개 모델 OK), `blogger` 환경의 GEMINI_API_KEY가 1글자 값으로 덮어써서 Blogger 워크플로에서만 무효. 조치: Settings→Environments→blogger 에서 그 시크릿 삭제(Chairman) + GEMINI_API_KEY_2/_3 추가.
 - 미검증: 나머지 WP 24곳 실발행/이미지, 예약(schedule) 틱 정상 동작(Blogger 워크플로), 하루 한도.
+
+## 11차 (2026-10-05 17:50 KST) — Gemini 키 복구 · 9/21 비공개 전환 · 제목 반복 정리
+- Gemini: Chairman이 `blogger` 환경의 1글자 GEMINI_API_KEY를 삭제하고 GEMINI_API_KEY/_2/_3 등록. writer-image-health run 37269033107: 3키 × 5모델 전부 OK, Groq(gpt-oss-120b/20b, qwen3.8-27b) OK, Cerebras 401(키 재발급 필요, 선택), OpenRouter 일부 OK, Pexels OK. PM 슬롯(run 37269286777)은 Gemini(3.1-flash-lite/3.5-flash)로 작성 확인.
+- Blogspot 오늘(10/5) LIVE 66편(33블로그 × AM/PM) 확인(API). PM run의 verification_failed 23건은 공개페이지 429로 인한 오표시 — 게시 자체는 LIVE. `publish_blogger_33_now.py`가 삽입 응답 status/API status를 함께 보도록 수정.
+- 예약 틱: schedule 이벤트 run 최초 관측 2026-10-05 06:55Z(15:55 KST) success → Blogger 워크플로 cron 정상.
+- Chairman 지시로 9/21자 Blogspot 글 33편(블로그당 1편) **삭제가 아니라 초안 전환**(`scripts/blogger_unpublish_by_date.py`, `.github/workflows/blogger-unpublish-by-date.yml`; 1차 31 + 재실행 2). 영구 삭제는 Chairman이 Blogger에서 직접 수행(정책: 영구삭제 금지).
+- 검색 설명(meta description): Blogger API는 값 입력 미지원 → 생성 시 "붙여넣기용" 문구만 기록됨. 현재 게시글에는 미입력 상태. 해결안(브라우저 자동 입력)은 Chairman 결정 대기.
+- 제목 반복 감사: WP+Blogspot 59곳 1,507편. 동일 제목 2건(khealth365) + 틀 반복("Before You Try… Read This First" 26, "The Real Cost of…" 21 등). 원인: 과거 `retitle_all_posts.py`(템플릿 30개 풀 일괄 교체). 조치: ①`scripts/retitle_repeated.py`+`retitle-repeated.yml`(AI 고유 제목, 사이트별 가장 오래된 1편 유지, 제목만 변경) 실행 — 1차 268 + 2차 54 반영, 접속실패 사이트는 재시도 로직 추가 후 재실행 ②`retitle_all_posts.py`/`cleanup_ai_tells.py`는 ALLOW_TEMPLATE_RETITLE=1 없이는 실행 차단.
+- 미검증: 3차 재실행 후 잔여 flagged 수, 새 제목의 SEO 점수 영향(Rank Math), Cerebras 키, 검색 설명 처리 방식.
