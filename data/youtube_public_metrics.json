@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-10-04T09:34:28.563539+09:00",
+  "checked_at_kst": "2026-10-05T09:47:45.197479+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -9,7 +9,7 @@
       "handle": "cafe_romantic",
       "subscribers": 11,
       "views": 2000,
-      "videos": 35,
+      "videos": 37,
       "connected": true
     },
     "UC7yEsLM-HoXudngrD-4FIqg": {
@@ -40,8 +40,8 @@
       "name": "CAFE_KPOP",
       "handle": "kpop_studio7",
       "subscribers": 5,
-      "views": 546,
-      "videos": 11,
+      "views": 603,
+      "videos": 12,
       "connected": true
     },
     "UCtNLZO07Oh3UnXPI2CjOgNg": {
@@ -56,7 +56,7 @@
       "name": "HISTORY_TV_TODAY",
       "handle": "HISTORY_TV_TODAY",
       "subscribers": 2,
-      "views": 28,
+      "views": 29,
       "videos": 8,
       "connected": true
     },
@@ -88,7 +88,7 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5840,
-      "views": 418278,
+      "views": 418623,
       "videos": 1315,
       "connected": true
     },
@@ -96,7 +96,7 @@
       "name": "English Survival",
       "handle": "English_survival",
       "subscribers": 10,
-      "views": 3721,
+      "views": 3795,
       "videos": 28,
       "connected": true
     },
@@ -104,7 +104,7 @@
       "name": "Japanese Survival",
       "handle": "seoul_japanese1",
       "subscribers": 23,
-      "views": 10482,
+      "views": 10530,
       "videos": 66,
       "connected": true
     },
@@ -112,7 +112,7 @@
       "name": "Chinese Survival",
       "handle": "SIS_ChineseSurvival",
       "subscribers": 2,
-      "views": 198,
+      "views": 425,
       "videos": 4,
       "connected": true
     },
@@ -128,7 +128,7 @@
       "name": "Vietnamese Survival",
       "handle": "SIS_VietnameseSurvival",
       "subscribers": 3,
-      "views": 310,
+      "views": 439,
       "videos": 6,
       "connected": true
     },
@@ -160,15 +160,15 @@
       "name": "French Survival",
       "handle": "SIS_FrenchSurvival",
       "subscribers": 0,
-      "views": 13,
+      "views": 14,
       "videos": 5,
       "connected": true
     },
     "UCKF98zgzm7YRWlyMaoJJKIQ": {
       "name": "German Survival",
       "handle": "SIS_GermanSurvival",
-      "subscribers": 2,
-      "views": 289,
+      "subscribers": 3,
+      "views": 292,
       "videos": 3,
       "connected": true
     },
@@ -184,7 +184,7 @@
       "name": "Italian Survival",
       "handle": "SIS_ItalianSurvival",
       "subscribers": 0,
-      "views": 310,
+      "views": 309,
       "videos": 3,
       "connected": true
     }
