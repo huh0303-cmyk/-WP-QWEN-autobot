@@ -886,3 +886,12 @@ jobinkorea365.com, jobkoreaglobal.com, korea365.org
 - 결과: ktrip365 GitHub 시험 발행 성공(https://k-trip365.blogspot.com/2026/10/how-to-spend-five-perfect-days.html — h2 10개, Pexels 이미지, FAQ·Before you decide 포함).
 - Chairman 지시: Blogspot 33 = **오전 1회 + 오후 1회, 매일 랜덤 시각** → blogger-33-daily-github.yml 개편: 30분 틱 + 날짜 시드 랜덤 목표시각(AM 07:05–11:55, PM 14:05–20:55 KST, 정각 회피), 키 `blogger33-daily-<날짜>`(AM, VPS 타이머와 동일 키) / `-pm`(PM). 하루 33×2=66편.
 - 미검증: 33개 전체 실행 결과, 무료 쿼터(Groq 등)가 하루 66편을 감당하는지, VPS 타이머가 같은 날 AM을 먼저 쓰는 경우의 동작(마커로 스킵되도록 설계됨).
+
+## 10차 (2026-10-05 11:00 KST) — 글쓰기·이미지 안정화 (WP 25 · 신문사 1 · Blogspot 33 공통)
+Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 안정.
+- 실측(writer-image-health run): Gemini 키 전부 사용불가(GEMINI_API_KEY 길이 1, _2/_3 미설정) / Groq 정상(gpt-oss-120b, gpt-oss-20b, qwen3.8-27b) / OpenRouter 무료모델 다수 정상(일부 429) / Cerebras 키 401(무효) / 이미지: Pexels·Pixabay 정상, Wikimedia 무매칭 잦음, Pollinations 간헐.
+- 코드(`scripts/economy_text.py`, 모든 글쓰기 경로 공통): Gemini 키 3개(`GEMINI_API_KEY`,`_2`,`_3`, 길이 20 미만은 무효 취급) × 5개 모델, 죽은 키/모델(400/401/403/404)은 해당 프로세스에서 재시도 안 함, 429는 15분 쿨다운, Groq·OpenRouter·Cerebras는 모델 목록 순회 + 공급자가 현재 무료로 제공하는 모델 자동 탐색. 11개 워크플로에 GEMINI_API_KEY_2/_3 전달 추가. 테스트 11 통과.
+- 이미지: `blogger_free_image.pick_image(query, alternates=[theme])` — Pexels→Pixabay→Wikimedia→Pollinations, 구체 질의 후 주제 질의로 완화. WP: `replicate_image_provider.generate_image_url`가 유료 토큰 없을 때/실패 시 무료 폴백 사용(뉴스룸은 실사 대신 AI 일러스트만). Blogger GitHub 워크플로는 `GH_ASSET_TOKEN || github.token`으로 Pixabay/AI 이미지를 repo에 영구 호스팅.
+- 일일 점검: `.github/workflows/writer-image-health.yml` (05:17 KST, 읽기전용).
+- 사용자 조치 필요: ①Gemini 무료 키 2–3개 발급(서로 다른 Google Cloud 프로젝트)해 GitHub 시크릿 GEMINI_API_KEY/_2/_3 등록 ②Cerebras 키 재발급. "Grok(xAI)"은 무료 API 없음 → 전면 무료 원칙상 Groq로 해석, Grok 유료 사용은 승인 필요.
+- 미검증: 33개 전체 일일 실행, WP 25·신문사 실발행에서 새 폴백 동작.

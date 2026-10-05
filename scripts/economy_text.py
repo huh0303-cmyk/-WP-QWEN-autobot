@@ -126,7 +126,7 @@ OPENAI_COMPAT = (
 
 _DISCOVERED: dict = {}
 _PREFER = ("gpt-oss-120b", "llama-3.3-70b", "qwen3", "gemma", "deepseek", "gpt-oss-20b", "llama")
-_SKIP = ("whisper", "guard", "tts", "orpheus", "embed", "vision", "image", "audio", "safeguard", "moderation", "lyria", "veo")
+_SKIP = ("allam", "whisper", "guard", "tts", "orpheus", "embed", "vision", "image", "audio", "safeguard", "moderation", "lyria", "veo")
 
 
 def _discover(spec: tuple) -> list:
