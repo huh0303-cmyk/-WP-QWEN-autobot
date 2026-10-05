@@ -36,3 +36,19 @@ class TitleRepeatGuard(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PhotoReuseGuard(unittest.TestCase):
+    def test_pexels_skips_already_used_photo(self):
+        import blogger_free_image as B
+        from unittest import mock
+        photos = {"photos": [{"id": 1, "width": 9, "height": 5, "alt": "seoul subway train", "src": {"large": "https://images.pexels.com/photos/1/pexels-photo-1.jpeg"}},
+                             {"id": 2, "width": 9, "height": 5, "alt": "seoul subway station", "src": {"large": "https://images.pexels.com/photos/2/pexels-photo-2.jpeg"}}]}
+        resp = mock.Mock(); resp.raise_for_status = lambda: None; resp.json = lambda: photos
+        with mock.patch.object(B, "_key", return_value="k"), mock.patch.object(B.requests, "get", return_value=resp), mock.patch.object(B, "_is_image", return_value=True):
+            self.assertEqual(B._pexels("seoul subway", frozenset({"1"}))["id"], "2")
+            self.assertEqual(B._pexels("seoul subway")["id"], "1")
+
+    def test_photo_id_parse(self):
+        import blogger_free_image as B
+        self.assertEqual(B.photo_id_from_url("https://images.pexels.com/photos/39488322/pexels-photo-39488322.jpeg?auto=compress"), "39488322")

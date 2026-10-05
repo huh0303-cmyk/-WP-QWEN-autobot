@@ -42,7 +42,44 @@ def _is_image(url: str) -> bool:
         return False
 
 
-def _pexels(query: str):
+
+_USED_CACHE: dict = {}
+
+
+def photo_id_from_url(url: str) -> str:
+    m = re.search(r"pexels-photo-(\d+)|/photos/(\d+)/", url or "")
+    return (m.group(1) or m.group(2)) if m else ""
+
+
+def used_photo_ids() -> set[str]:
+    """Photo ids already used on any of our Blogger blogs (live scan, cached per process, fail-open).
+    Prevents the 'first search hit' picker from putting the same photo on many posts/sites."""
+    if "ids" in _USED_CACHE:
+        return _USED_CACHE["ids"]
+    ids: set[str] = set()
+    try:
+        cid, sec, ref = (os.environ.get(k) for k in ("BLOGGER_GOOGLE_CLIENT_ID", "BLOGGER_GOOGLE_CLIENT_SECRET", "BLOGGER_GOOGLE_REFRESH_TOKEN"))
+        if cid and sec and ref:
+            tok = requests.post("https://oauth2.googleapis.com/token", data={"client_id": cid, "client_secret": sec,
+                                "refresh_token": ref, "grant_type": "refresh_token"}, timeout=20).json()["access_token"]
+            root = Path(__file__).resolve().parents[1]
+            prof = json.loads((root / "config/content_engine_profiles.json").read_text(encoding="utf-8"))
+            for row in prof["profiles"]:
+                bid = (row.get("blogspot") or {}).get("destination_id")
+                if not bid:
+                    continue
+                r = requests.get(f"https://www.googleapis.com/blogger/v3/blogs/{bid}/posts", headers={"Authorization": f"Bearer {tok}"},
+                                 params={"maxResults": 500, "fetchBodies": "false", "fetchImages": "true", "status": "LIVE"}, timeout=30)
+                if r.ok:
+                    for post in r.json().get("items", []):
+                        ids.update(filter(None, (photo_id_from_url(i.get("url", "")) for i in post.get("images", []))))
+    except Exception as exc:  # never block publishing on the dedup scan
+        print(f"used-photo scan unavailable ({type(exc).__name__})")
+    _USED_CACHE["ids"] = ids
+    return ids
+
+
+def _pexels(query: str, exclude=frozenset()):
     key = _key("PEXELS_API_KEY")
     if not key:
         return None
@@ -54,6 +91,8 @@ def _pexels(query: str):
                          params={"query": q, "orientation": "landscape", "per_page": 12}, timeout=15)
         r.raise_for_status()
         for p in r.json().get("photos", []):
+            if str(p.get("id")) in exclude:
+                continue
             url = p.get("src", {}).get("large", "")
             if urlparse(url).hostname == "images.pexels.com" and p.get("width", 0) > p.get("height", 0) \
                     and _relevant(q, p.get("alt", "")) and _is_image(url):
@@ -61,7 +100,7 @@ def _pexels(query: str):
     return None
 
 
-def _pixabay(query: str):
+def _pixabay(query: str, exclude=frozenset()):
     key = _key("PIXABAY_KEY")
     if not key:
         return None
@@ -69,11 +108,17 @@ def _pixabay(query: str):
                      "orientation": "horizontal", "safesearch": "true", "min_width": 1000, "per_page": 12}, timeout=15)
     r.raise_for_status()
     for p in r.json().get("hits", []):
+        if str(p.get("id")) in exclude:
+            continue
         url = p.get("largeImageURL", "")
         if urlparse(url).hostname == "pixabay.com" or str(urlparse(url).hostname).endswith(".pixabay.com"):
             if _relevant(query, p.get("tags", "")):
                 return {"url": url, "provider": "Pixabay", "id": str(p["id"]), "desc": p.get("tags", ""), "needs_hosting": True}
     return None
+
+
+_pexels.accepts_exclude = True
+_pixabay.accepts_exclude = True
 
 
 def _wikimedia(query: str):
@@ -121,11 +166,12 @@ def pick_image(query: str, alternates=()):
             queries.append(q)
     if not queries:
         return None
+    exclude = used_photo_ids()
     for fn in (_pexels, _pixabay, _wikimedia, _ai_free):
         found = None
         for q in (queries[:1] if fn is _ai_free else queries):
             try:
-                found = fn(q)
+                found = fn(q, exclude) if getattr(fn, "accepts_exclude", False) else fn(q)
             except Exception as exc:  # never log request URLs (keys)
                 print(f"image source unavailable: {fn.__name__} ({type(exc).__name__})")
                 break
