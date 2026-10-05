@@ -12,6 +12,7 @@ import audit_titles_all as A          # noqa: E402
 import economy_text                    # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+from automation_hub.repetition_guard import title_self_issues  # noqa: E402
 APPLY = os.environ.get("APPLY_CHANGES", "false").lower() == "true"
 WP_USER = "huh0303@gmail.com"
 KEEP_PER_PATTERN = 1
@@ -25,17 +26,35 @@ def opening(t): w = words(t); return " ".join(w[:3]) if len(w) >= 3 else ""
 def ending(t): w = words(t); return " ".join(w[-3:]) if len(w) >= 4 else ""
 
 
+STOPW = set("a an the and or of to in on for with from by at as is are your you how what vs about korea korean".split())
+
+
+def _jac(a, b):
+    x = {w for w in words(a) if w not in STOPW and len(w) > 2}
+    y = {w for w in words(b) if w not in STOPW and len(w) > 2}
+    return len(x & y) / len(x | y) if len(x) >= 4 and len(y) >= 4 else 0.0
+
+
+def det_fix(t):
+    """Deterministic repair: drop a trailing keyword parenthetical / stock tail."""
+    n = re.sub(r"\s*\([^()]{6,}\)", "", t)
+    n = re.sub(r"(?i)[:\-]?\s*(a closer look at what really matters|frequently overlooked facts)\s*$", "", n)
+    n = re.sub(r"\s{2,}", " ", n).strip(" :-")
+    return n if n != t and len(n) >= 12 else ""
+
+
 def flag(data):
     """Return {(site, id): reason} for posts to rewrite (keep the oldest per pattern)."""
     rows = [(s, r) for s, rs in data.items() for r in rs]
     rows.sort(key=lambda x: x[1].get("date", ""))
     seen_open, seen_end, seen_exact = collections.Counter(), collections.Counter(), set()
+    seen_site = collections.defaultdict(list)
     op_total = collections.Counter(opening(r["title"]) for _, r in rows if opening(r["title"]))
     en_total = collections.Counter(ending(r["title"]) for _, r in rows if ending(r["title"]))
     out = {}
     for s, r in rows:
         t, o, e = r["title"], opening(r["title"]), ending(r["title"])
-        ex = (s, " ".join(words(t)))
+        ex = " ".join(words(t))  # network-wide exact duplicate
         reason = None
         if ex in seen_exact:
             reason = "duplicate"
@@ -43,6 +62,11 @@ def flag(data):
             reason = f"opening:{o}"
         elif e and en_total[e] >= END_MIN and seen_end[e] >= KEEP_PER_PATTERN:
             reason = f"ending:{e}"
+        elif title_self_issues(t):
+            reason = "self:" + title_self_issues(t)[0][:60]
+        elif any(_jac(t, o) >= 0.8 for o in seen_site[s]):
+            reason = "near_duplicate"
+        seen_site[s].append(t)
         seen_exact.add(ex); seen_open[o] += 1; seen_end[e] += 1
         if reason:
             out[(s, str(r["id"]))] = reason
@@ -136,8 +160,13 @@ def main():
                     print("  gen retry", site, attempt, str(e)[:120], flush=True); time.sleep(3)
             for idx, k in enumerate(chunk):
                 old = by_id[k]["title"]
-                new = result.get(idx, "")
-                if not valid(new, old, banned, used):
+                new = det_fix(old)
+                if not (new and not title_self_issues(new) and " ".join(words(new)) not in used):
+                    new = result.get(idx, "")
+                    ok = valid(new, old, banned, used) and not title_self_issues(new)
+                else:
+                    ok = True
+                if not ok:
                     log.append({"site": site, "id": k[1], "old": old, "new": new, "status": "skipped_invalid", "reason": flagged[k]})
                     fail_n += 1
                     continue

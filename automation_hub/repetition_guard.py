@@ -47,9 +47,45 @@ def opening(body):
         node.decompose()
     return next((plain(str(p)) for p in soup.find_all('p') if len(plain(str(p))) >= 50), '')
 
+
+_STOP = set("a an the and or but of to in on for with from by at as is are was were be it its this that you your how what when where why which vs about more new best top guide step korea korean south".split())
+STOCK_TITLE_TAIL = re.compile(r"(?i)a closer look at what really matters|frequently overlooked facts|questions people ask about|the costly .{0,40}mistake|\bmistakes? every \w+ makes\b")
+
+def _title_words(title):
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", plain(title).casefold())).split()
+
+def title_self_issues(title):
+    """Within-title repetition: keyword-template parenthetical, repeated word/phrase, stock tails."""
+    t = plain(title)
+    issues = []
+    m = re.search(r"\(([^()]{6,})\)\s*[:\-]?[^()]*$", t)
+    if m:
+        inner = set(_title_words(m.group(1))) - _STOP
+        outer = set(_title_words(t[:m.start()])) - _STOP
+        if inner and len(inner & outer) >= max(2, len(inner) // 2):
+            issues.append('TITLE_REPEAT: trailing "(keyword)" parenthetical repeats the headline words')
+    hangul = bool(re.search(r"[가-힣]", t))
+    words = [w for w in _title_words(re.sub(r"\([^()]*\)", " ", t) if False else t) if (len(w) >= 2 if hangul else len(w) >= 4) and w not in _STOP and not w.isdigit()]
+    seen = {}
+    for w in words:
+        seen[w] = seen.get(w, 0) + 1
+    rep = [w for w, n in seen.items() if n >= 2]
+    if rep:
+        issues.append('TITLE_REPEAT: word repeated inside headline: ' + ', '.join(rep[:4]))
+    allw = _title_words(t)
+    bg = {}
+    for a, b in zip(allw, allw[1:]):
+        if a in _STOP and b in _STOP: continue
+        bg[(a, b)] = bg.get((a, b), 0) + 1
+    if any(n >= 2 for n in bg.values()):
+        issues.append('TITLE_REPEAT: phrase repeated inside headline')
+    if STOCK_TITLE_TAIL.search(t):
+        issues.append('TITLE_REPEAT: stock template tail in headline')
+    return list(dict.fromkeys(issues))
+
 def repetition_issues(title, body, history):
     lead = opening(clean_opening(title, body)).casefold()
-    issues = []
+    issues = list(title_self_issues(title))
     if re.match(r'^how\b', plain(title), re.I):
         issues.append('REPETITION: How-start headline is forbidden')
     for old in history:
