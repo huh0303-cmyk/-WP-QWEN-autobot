@@ -23,7 +23,7 @@ for r in rows:
         raw = j.get("title", {}).get("raw", "")
         if raw == r["new"] or r["old"] == r["new"]:
             skip += 1; continue
-        if norm(raw) != norm(r["old"]):
+        if norm(raw) != norm(r["old"]) and not r.get("force"):
             print("SKIP changed", r["site"], r["id"], raw[:60]); skip += 1; continue
         if "unlock" in r["new"].lower():
             raise ValueError("banned word")
