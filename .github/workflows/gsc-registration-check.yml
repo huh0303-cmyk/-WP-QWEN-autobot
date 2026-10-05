@@ -1,0 +1,22 @@
+name: GSC registration check (read-only)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyjwt cryptography -q
+      - env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/gsc_registration_check.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gsc-registration
+          path: gsc_registration.json
