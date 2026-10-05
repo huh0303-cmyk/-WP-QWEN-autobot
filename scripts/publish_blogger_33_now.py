@@ -140,7 +140,7 @@ def main() -> int:
                     title, body, labels, description, image_subject = generate(site)
                     break
                 except RuntimeError as gate_exc:
-                    if "adsense structure gate" not in str(gate_exc) or attempt == 2:
+                    if not any(k in str(gate_exc) for k in ("adsense structure gate", "language mismatch")) or attempt == 2:
                         raise
                     print(f"structure retry {attempt + 1} for {site['key']}: {gate_exc}")
             try:  # free image chain; failure must never block publication
