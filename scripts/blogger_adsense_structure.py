@@ -5,13 +5,13 @@ import re
 
 YMYL = re.compile(r"health|medical|insurance|financ|tax|law|invest|crypto|real estate|visa|immigration|건강|의료|보험|세무|법|투자|부동산|지원금", re.I)
 
-RULES = """AdSense-ready structure (follow exactly, HTML only, no <h1>, no <html>/<body> tags):
+_RULES_TEMPLATE = """AdSense-ready structure (follow exactly, HTML only, no <h1>, no <html>/<body> tags):
 1. Opening: 2-3 sentences that directly answer the reader's main question (answer first), no filler or hype.
-2. <h2>Key takeaways</h2> followed by a <ul> of 3-5 concrete points (Korean: <h2>핵심 요약</h2>).
+2. {H_KEY} followed by a <ul> of 3-5 concrete points.
 3. At least 5 more <h2> sections, each with real, specific, practical information; use <h3> where useful;
    include one <table> or one numbered how-to list and one actionable checklist.
-4. <h2>Frequently asked questions</h2> with 3 genuine questions and short direct answers (Korean: <h2>자주 묻는 질문</h2>).
-5. <h2>Before you decide</h2> (Korean: <h2>확인할 사항</h2>): name the official institutions or primary sources the reader
+4. {H_FAQ} with 3 genuine questions and short direct answers.
+5. {H_VERIFY}: name the official institutions or primary sources the reader
    should verify with (e.g. a ministry, regulator or university by name). Do NOT invent URLs, statistics, quotes,
    dates, prices or credentials; if you are not sure of a number, describe it qualitatively or say it varies.
 6. Original wording, no copied passages, no keyword stuffing, no clickbait, no promises of income or guaranteed results,
@@ -45,3 +45,19 @@ def structure_issues(body: str, theme: str, language: str) -> list[str]:
     if (not ko and words < 900) or (ko and words < 1800):
         issues.append(f"too short ({words})")
     return issues
+
+
+_HEADINGS = {
+    "en": ("<h2>Key takeaways</h2>", "<h2>Frequently asked questions</h2>", "<h2>Before you decide</h2>"),
+    "ko": ("<h2>핵심 요약</h2>", "<h2>자주 묻는 질문</h2>", "<h2>확인할 사항</h2>"),
+}
+
+
+def rules_for(language: str) -> str:
+    """Language-specific rules so English prompts never contain Hangul (models copy it into the article)."""
+    key = "ko" if str(language).lower().startswith("ko") else "en"
+    k, f, v = _HEADINGS[key]
+    return _RULES_TEMPLATE.replace("{H_KEY}", k).replace("{H_FAQ}", f).replace("{H_VERIFY}", v)
+
+
+RULES = rules_for("en")

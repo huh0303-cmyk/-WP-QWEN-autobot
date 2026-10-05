@@ -20,7 +20,7 @@ from automation_hub.editorial_language_policy import language_mismatch_fields
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
 from blogger_free_image import pick_image, insert_image
-from blogger_adsense_structure import RULES as ADSENSE_RULES, structure_issues
+from blogger_adsense_structure import rules_for, structure_issues
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
 
@@ -65,7 +65,7 @@ def generate(site: dict) -> tuple[str, str, list[str], str, str]:
     prompt = f"""Write one original evergreen article for {site['url']}.
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
-{ADSENSE_RULES}
+{rules_for(site['language'])}
 Cautious source-aware wording and no invented facts.
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
