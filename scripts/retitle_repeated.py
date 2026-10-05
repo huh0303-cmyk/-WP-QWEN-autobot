@@ -118,9 +118,13 @@ def main():
         per_site[k[0]].append(k)
     token = None
     log, ok_n, fail_n = [], 0, 0
+    deadline = time.time() + float(os.environ.get("RETITLE_BUDGET_MIN", "35")) * 60
     for site, keys in per_site.items():
         avoid = [r["title"] for r in data[site][:30]]
         for i in range(0, len(keys), 8):
+            if time.time() > deadline:
+                print("budget reached; stopping", flush=True)
+                break
             chunk = keys[i:i + 8]
             batch = [by_id[k] for k in chunk]
             result = {}
@@ -129,7 +133,7 @@ def main():
                     result = make_titles(batch, banned, avoid)
                     break
                 except Exception as e:
-                    print("  gen retry", site, attempt, str(e)[:120]); time.sleep(3)
+                    print("  gen retry", site, attempt, str(e)[:120], flush=True); time.sleep(3)
             for idx, k in enumerate(chunk):
                 old = by_id[k]["title"]
                 new = result.get(idx, "")
@@ -154,7 +158,7 @@ def main():
                     ok_n += int(good); fail_n += int(not good)
                     time.sleep(0.8)
                 log.append({"site": site, "id": k[1], "old": old, "new": new, "status": status, "reason": flagged[k]})
-        print(f"{site}: {len(keys)} flagged")
+        print(f"{site}: {len(keys)} flagged", flush=True)
     Path("retitle_log.json").write_text(json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps({"flagged": len(flagged), "updated": ok_n, "failed_or_skipped": fail_n}))
     for x in log[:60]:

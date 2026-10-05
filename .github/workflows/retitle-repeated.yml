@@ -57,7 +57,7 @@ jobs:
           OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
           SISKOREACOM: ${{ secrets.SISKOREACOM }}
           STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
-        run: python scripts/retitle_repeated.py
+        run: python -u scripts/retitle_repeated.py
       - if: always()
         uses: actions/upload-artifact@v4
         with:
