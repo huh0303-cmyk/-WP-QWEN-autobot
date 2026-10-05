@@ -931,3 +931,13 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 검색 설명(meta description): Blogger API는 값 입력 미지원 → 생성 시 "붙여넣기용" 문구만 기록됨. 현재 게시글에는 미입력 상태. 해결안(브라우저 자동 입력)은 Chairman 결정 대기.
 - 제목 반복 감사: WP+Blogspot 59곳 1,507편. 동일 제목 2건(khealth365) + 틀 반복("Before You Try… Read This First" 26, "The Real Cost of…" 21 등). 원인: 과거 `retitle_all_posts.py`(템플릿 30개 풀 일괄 교체). 조치: ①`scripts/retitle_repeated.py`+`retitle-repeated.yml`(AI 고유 제목, 사이트별 가장 오래된 1편 유지, 제목만 변경) 실행 — 1차 268 + 2차 54 반영, 접속실패 사이트는 재시도 로직 추가 후 재실행 ②`retitle_all_posts.py`/`cleanup_ai_tells.py`는 ALLOW_TEMPLATE_RETITLE=1 없이는 실행 차단.
 - 미검증: 3차 재실행 후 잔여 flagged 수, 새 제목의 SEO 점수 영향(Rank Math), Cerebras 키, 검색 설명 처리 방식.
+
+## 2026-10-06 KST — 15차: 제목 반복·중복 이미지 감사/수정/재발방지 (task: claude-title-image-dedup-2026-10-06)
+- 감사(run 37333118372, 읽기 전용, WP 25 + Blogspot 33 = 1,511글): 제목 내 단어 반복 59, 키워드 괄호 접미 "(…)" 8, 사이트 간 동일 제목 2, 근접 중복 2; 같은 사진 25그룹/65글(최대 1장이 10개 사이트 11글에 재사용 — Pexels 39488322).
+- 수정 적용: 제목 61건 재작성(run 37335883566, 뉴스룸 3곳 제외, 슬러그/본문 불변), 중복 이미지 40글에서 제거·가장 오래된 글 1곳만 유지(run 37335886776, 40/40 updated, 백업 artifacts/dup_image_backups).
+- 재감사(run 37338385862): 이미지 중복 그룹 25→0, 동일/근접 중복 제목 0, 괄호 반복 0, 제목 내 단어 반복 59→18(뉴스룸 헤드라인 7 의도적 제외, step-by-step 오탐 4, 실제 잔여 3: wp_korea365#1967, wp_studyinkorea#3017 등 → retitle 재실행 대상).
+- 재발방지: `automation_hub/repetition_guard.title_self_issues`(제목 내 단어/구 반복·"(키워드)" 접미·정형 꼬리 차단)를 `title_cliches`·`repetition_issues`에 연결(autopost_mega/original_writer/blogger_rewriter/queue_blogger_rewrite 경로 모두 적용); `blogger_free_image.pick_image`가 33개 블로그에서 이미 쓴 Pexels ID를 제외; retitle는 근접중복/교차사이트중복/발명된 숫자 거부. 테스트 `tests/test_title_repeat_guard.py` 8건 통과.
+- 사전 존재 실패(내 변경 무관): tests/test_editorial_title_gate.py::live_wp_path(AI_TEXT_PROVIDER openai 기대), tests/test_blogger_33_portfolio.py::six_new_cards.
+- 폴백 증거(run 37335902021): 글쓰기 gemini(키3개 중 다수 OK, 3.5-flash 429/503)·groq·openrouter(:free) 사용 가능, cerebras 401(키 재발급 필요); 이미지 pexels·pixabay OK, wikimedia 무매치, pollinations 간헐.
+- 스케줄 증거: 10/05 실제 발행 WP 5/25곳, Blogspot 13/33곳 — 설계(일 2~3회/사이트) 미달. 원인 추정: GitHub cron 지연(floor 24h 2회). 미검증/미수정.
+- 미해결: WP 글 상당수가 대표이미지 없음(featured_media=0; khealth 323중 268 이미지 無) — 정책 확인 필요.
