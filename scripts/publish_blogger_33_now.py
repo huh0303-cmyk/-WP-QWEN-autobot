@@ -50,6 +50,17 @@ def access_token() -> str:
     return response.json()["access_token"]
 
 
+import re as _re
+_HANGUL = r"[\u1100-\u11ff\u3130-\u318f\uac00-\ud7a3]"
+
+
+def strip_hangul_parentheticals(text: str) -> str:
+    """English articles: drop '(경복궁)' style Hangul glosses; the romanization before them stays."""
+    text = _re.sub(r"\s*[\(（][^()（）]*" + _HANGUL + r"[^()（）]*[\)）]", "", text)
+    text = _re.sub(r"\s*[\[「『][^\]」』]*" + _HANGUL + r"[^\]」』]*[\]」』]", "", text)
+    return text
+
+
 def generate(site: dict) -> tuple[str, str, list[str], str, str]:
     prompt = f"""Write one original evergreen article for {site['url']}.
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
@@ -78,6 +89,9 @@ Provide 1-3 short, highly relevant labels only."""
         data = json.loads(re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw))
     title, body = str(data["title"]).strip(), str(data["content_html"]).strip()
     labels = [str(x).strip()[:80] for x in data["labels"] if str(x).strip()][:3]
+    if str(site["language"]).lower().startswith("en"):
+        title, body = strip_hangul_parentheticals(title), strip_hangul_parentheticals(body)
+        labels = [strip_hangul_parentheticals(x) for x in labels]
     if not title or len(body) < 1500 or not (1 <= len(labels) <= 3):
         raise RuntimeError("Gemini Flash output failed quality gate")
     issues = structure_issues(body, site["theme"], site["language"])
