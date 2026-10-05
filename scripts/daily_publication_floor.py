@@ -42,7 +42,7 @@ def force_ipv4_dns():
 def sites_for(platform):
     sites = json.loads((ROOT/'config/automation_hub_sites.json').read_text(encoding='utf-8'))['sites']
     if platform == 'newsroom':
-        return [dict(s, platform='newsroom') for s in sites if s['platform']=='wordpress' and s.get('content_type') in {'news_ko','news_en'}]
+        return [dict(s, platform='newsroom') for s in sites if s['platform']=='wordpress' and s.get('enabled', True) and s.get('content_type') in {'news_ko','news_en'}]
     return [s for s in sites if s['platform'] == platform and s.get('enabled', True)
             and (platform != 'wordpress' or s.get('content_type') == 'blog')]
 

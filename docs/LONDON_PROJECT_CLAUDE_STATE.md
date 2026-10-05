@@ -873,3 +873,11 @@ jobinkorea365.com, jobkoreaglobal.com, korea365.org
 ### 커밋 (이번 세션)
 
 - (이 턴 마지막에 커밋 실행 — SHA는 다음 세션이 `git log`로 확인)
+
+
+## 9차 (2026-10-05) — 발행 대상 확정 + GitHub 전용 구동
+- Chairman 확정: WP 25 + 신문사 1(koreanews365.com) + Blogspot 33. theseouljournal.com = 버림 → `config/automation_hub_sites.json` wp_seouljournal `enabled:false`, `daily_publication_floor.py` newsroom 필터에 enabled 반영(검증: newsroom=['koreanews365.com'], wordpress=25, blogger=33). theseouljournal.blogspot.com(Blogspot 33 중 15번)은 유지.
+- GSC: WP 27/27 + Blogspot 33/33 허정윤 계정 인증 소유자 확인(docs/GSC_REGISTRATION_CHECK_2026-10-05.md).
+- 신규 `.github/workflows/blogger-33-daily-github.yml`: 06:23 KST + 13:41 KST 재시도, PC 불필요. run key `blogger33-daily-<KST날짜>`는 VPS 타이머와 동일 → 마커 기반으로 같은 날 이중 발행 방지.
+- WP 25 + 신문사는 기존 `daily-publication-floor.yml`(GitHub schedule 11,29,47분)이 담당.
+- 미검증: 새 워크플로 실제 실행 결과, 예약 실행 첫 관측.

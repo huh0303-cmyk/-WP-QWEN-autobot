@@ -590,6 +590,7 @@
     },
     {
       "site_id": "wp_seouljournal",
+      "enabled": false,
       "platform": "wordpress",
       "name": "The Seoul Journal",
       "url": "https://theseouljournal.com",

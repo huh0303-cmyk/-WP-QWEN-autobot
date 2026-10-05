@@ -1,0 +1,68 @@
+name: "Blogger 33 — daily (GitHub, PC-independent)"
+
+# Chairman 2026-10-05: 33 Blogspot blogs must publish daily from GitHub, not from a PC.
+# Idempotent: the run key is blogger33-daily-<KST date>, the SAME key the VPS timer uses, and the
+# publisher skips any blog that already holds a post with that marker -> no double posting even if
+# both the VPS timer and this workflow run on the same day. The second cron is a retry window.
+on:
+  schedule:
+    - cron: '23 21 * * *'   # 06:23 KST
+    - cron: '41 4 * * *'    # 13:41 KST retry (no-op for blogs already done)
+  workflow_dispatch:
+    inputs:
+      site_key:
+        description: "Optional single blog key; empty = all 33"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blogger-33-direct-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    environment: blogger
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Resolve KST run date
+        run: echo "RUN_DATE=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_ENV"
+      - name: Publish one article per blog (skips blogs already done today)
+        env:
+          BLOGGER_REVIEW_DRAFT_MODE: "false"
+          BLOGGER_SITE_KEY: ${{ inputs.site_key || '' }}
+          PUBLIC_RUN_KEY: blogger33-daily-${{ env.RUN_DATE }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
+          LONDON_WRITER_MODEL: "auto_free"
+          LOCAL_TEXT_FALLBACK_ENABLED: "true"
+          RUNNER_OLLAMA_BOOTSTRAP: "true"
+          LOCAL_TEXT_TIMEOUT: "900"
+          LOCAL_TEXT_MAX_TOKENS: "3500"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/publish_blogger_33_now.py
+      - name: Save exact post IDs and URLs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-33-daily-${{ github.run_id }}
+          path: artifacts/blogger-33-public-results.json
+          retention-days: 7
+          if-no-files-found: ignore
