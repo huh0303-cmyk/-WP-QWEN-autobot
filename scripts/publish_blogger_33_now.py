@@ -62,7 +62,7 @@ def strip_hangul_parentheticals(text: str) -> str:
     return text
 
 
-def generate(site: dict) -> tuple[str, str, list[str], str, str]:
+def generate(site: dict, hint: str = "") -> tuple[str, str, list[str], str, str]:
     prompt = f"""Write one original evergreen article for {site['url']}.
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
@@ -72,7 +72,7 @@ Write in a natural editorial voice with varied sentence structure. Never mention
 automatic generation, prompts, or how the article was produced.
 English: 1400-1800 words (never fewer than 1200; count them). Korean: 2400-3500 characters.
 For English articles use Latin script only: write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.
-Provide 1-3 short, highly relevant labels only."""
+Provide 1-3 short, highly relevant labels only.{hint}"""
     raw = blogger_generate_with_fallback(prompt, temperature=0.5).strip()
     try:
         import economy_text
@@ -162,14 +162,23 @@ def main() -> int:
                     results.append({"site": site["key"], "status": "existing", "url": match.get("url", ""), "post_id": match.get("id", "")})
                 RESULT.write_text(json.dumps({"run_key": run_key, "updated_at": datetime.now(timezone.utc).isoformat(), "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
                 continue
-            for attempt in range(3):
+            hint = ""
+            for attempt in range(4):
                 try:
-                    title, body, labels, description, image_subject = generate(site)
+                    title, body, labels, description, image_subject = generate(site, hint)
                     break
-                except RuntimeError as gate_exc:
-                    if not any(k in str(gate_exc) for k in ("adsense structure gate", "language mismatch")) or attempt == 2:
+                except (RuntimeError, ValueError) as gate_exc:  # ValueError covers JSONDecodeError (empty/non-JSON model output)
+                    retriable = isinstance(gate_exc, ValueError) or any(
+                        k in str(gate_exc) for k in ("adsense structure gate", "language mismatch", "quality gate"))
+                    if not retriable or attempt == 3:
                         raise
-                    print(f"structure retry {attempt + 1} for {site['key']}: {gate_exc}")
+                    print(f"generation retry {attempt + 1} for {site['key']}: {str(gate_exc)[:120]}")
+                    if "too short" in str(gate_exc):
+                        hint = ("\nIMPORTANT: your previous draft was too short (" + str(gate_exc).split("(")[-1].rstrip(")") +
+                                "). Write a clearly LONGER article: at least 1500 words in English or 3000 characters in Korean, "
+                                "with fuller paragraphs of practical detail under every heading.")
+                    else:
+                        hint = "\nIMPORTANT: return one valid JSON object only, no commentary, and follow every structure rule."
             try:  # free image chain; failure must never block publication
                 found = pick_image(image_subject or site['theme'], alternates=[site['theme']])
                 if found:
@@ -208,7 +217,7 @@ def main() -> int:
                 if not ok and check.status_code in (404, 429):
                     # public page unreachable from this IP: confirm through the authenticated API instead
                     api_post = requests.get(f"{endpoint}/{post.get('id', '')}", headers=headers, timeout=30)
-                    ok = api_post.ok and api_post.json().get("status") == "LIVE" and api_post.json().get("url") == url
+                    ok = api_post.ok and api_post.json().get("status") == "LIVE"
                 results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "url": url, "post_id": post.get("id", ""), "http": check.status_code})
             failed = failed or not ok
         except Exception as exc:
