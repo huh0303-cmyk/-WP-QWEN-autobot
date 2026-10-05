@@ -30,6 +30,12 @@ def main() -> int:
             raise RuntimeError(f"missing required runtime value: {name}")
         env[name] = value
 
+    # Optional free image-chain credentials (never required; image step is skipped without them).
+    for name in ("PEXELS_API_KEY", "PIXABAY_KEY", "GH_ASSET_TOKEN", "GITHUB_REPOSITORY"):
+        value = str(runtime.get(name, "")).strip()
+        if value:
+            env[name] = value
+
     run_date = os.environ.get("BLOGGER_RUN_DATE", "").strip()
     if not run_date:
         run_date = datetime.now(ZoneInfo("Asia/Seoul")).date().isoformat()

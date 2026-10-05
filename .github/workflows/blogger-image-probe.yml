@@ -1,0 +1,26 @@
+name: Blogger free image chain probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+        working-directory: scripts
+        run: |
+          python - <<'PY'
+          import blogger_free_image as b
+          for q in ("Seoul palace autumn", "Korean skincare routine", "Korea study abroad university campus", "Korean health checkup"):
+              r = b.pick_image(q)
+              print(q, "->", (r or {}).get("provider"), (r or {}).get("id"))
+          PY

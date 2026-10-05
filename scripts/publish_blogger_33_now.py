@@ -19,6 +19,7 @@ from automation_hub.blogger_search_description import build_search_description, 
 from automation_hub.editorial_language_policy import language_mismatch_fields
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
+from blogger_free_image import pick_image, insert_image
 
 RESULT = ROOT / "artifacts" / "blogger-33-public-results.json"
 
@@ -48,10 +49,10 @@ def access_token() -> str:
     return response.json()["access_token"]
 
 
-def generate(site: dict) -> tuple[str, str, list[str], str]:
+def generate(site: dict) -> tuple[str, str, list[str], str, str]:
     prompt = f"""Write one original evergreen article for {site['url']}.
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
-Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject.
+Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
 Use 5 useful H2 sections, an actionable checklist, cautious source-aware wording, and no invented facts.
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
@@ -85,7 +86,8 @@ English: 900-1300 words. Korean: 1800-3000 characters. Provide 1-3 short, highly
         raise RuntimeError("language mismatch: English output contains Korean text in " + ", ".join(mismatches))
     description = build_search_description(title=title, topic=site["theme"], language=site["language"])
     validate_search_description(description)
-    return title, body, labels, description
+    image_subject = str(data.get("image_subject") or "").strip()[:100]
+    return title, body, labels, description, image_subject
 
 
 def main() -> int:
@@ -128,7 +130,13 @@ def main() -> int:
                     results.append({"site": site["key"], "status": "existing", "url": match.get("url", ""), "post_id": match.get("id", "")})
                 RESULT.write_text(json.dumps({"run_key": run_key, "updated_at": datetime.now(timezone.utc).isoformat(), "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
                 continue
-            title, body, labels, description = generate(site)
+            title, body, labels, description, image_subject = generate(site)
+            try:  # free image chain; failure must never block publication
+                found = pick_image(image_subject or site['theme'])
+                if found:
+                    body = insert_image(body, found, title)
+            except Exception as exc:
+                print(f"image step skipped: {type(exc).__name__}")
             body = f"<!-- {marker} -->\n{body}"
             response = requests.post(endpoint, params={"isDraft": "true" if draft_mode else "false"}, headers=headers,
                                      json={"kind": "blogger#post", "title": title, "content": body, "labels": labels}, timeout=30)
