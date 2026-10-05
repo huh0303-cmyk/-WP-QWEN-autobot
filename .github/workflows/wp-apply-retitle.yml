@@ -1,0 +1,56 @@
+name: WordPress — Apply retitle mapping
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - config/wp_retitle_2026-10-05.json
+      - .github/workflows/wp-apply-retitle.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Apply titles
+        env:
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+        run: python scripts/wp_apply_retitle.py config/wp_retitle_2026-10-05.json
+      - name: Commit rollback log
+        if: always()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add logs/wp_retitle_rollback_2026-10-05.json || true
+          git commit -m "log: WP retitle rollback 2026-10-05" || exit 0
+          git pull --rebase && git push
