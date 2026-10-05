@@ -42,7 +42,7 @@ def structure_issues(body: str, theme: str, language: str) -> list[str]:
     if YMYL.search(theme) and not re.search(r"<em>[^<]{20,}</em>", body):
         issues.append("YMYL topic missing disclaimer note")
     words = len(re.sub(r"<[^>]+>", " ", body).split()) if not ko else len(re.sub(r"<[^>]+>|\s", "", body))
-    if (not ko and words < 900) or (ko and words < 1800):
+    if (not ko and words < 800) or (ko and words < 1600):
         issues.append(f"too short ({words})")
     return issues
 

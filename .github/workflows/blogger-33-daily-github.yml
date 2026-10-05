@@ -81,8 +81,9 @@ jobs:
           GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
           BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
           LONDON_WRITER_MODEL: "auto_free"
-          LOCAL_TEXT_FALLBACK_ENABLED: "true"
-          RUNNER_OLLAMA_BOOTSTRAP: "true"
+          LOCAL_TEXT_FALLBACK_ENABLED: "false"   # a 3B local model fails the quality gates and burns ~15 min; retry next tick instead
+          BLOGGER_PACE_SECONDS: "40"
+          RUNNER_OLLAMA_BOOTSTRAP: "false"
           LOCAL_TEXT_TIMEOUT: "900"
           LOCAL_TEXT_MAX_TOKENS: "3500"
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}

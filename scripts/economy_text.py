@@ -74,6 +74,8 @@ def _note_failure(provider: str, key_id: str, model: str, exc: Exception) -> Non
         _DEAD.add((provider, key_id, model))        # this model is unusable for this key
     elif status == 429:
         _COOLDOWN[(provider, key_id, model)] = _time.time() + float(os.getenv("WRITER_429_COOLDOWN", "900"))
+    elif isinstance(exc, ValueError) and "incomplete" in str(exc):
+        _DEAD.add((provider, key_id, model))        # keeps truncating: not worth more tries this run
 
 
 def engine_health() -> dict:
@@ -145,6 +147,8 @@ def _discover(spec: tuple) -> list:
             if not mid or any(x in mid.lower() for x in _SKIP):
                 continue
             if provider == "openrouter":
+                if not any(f in mid.lower() for f in ("gemma", "qwen", "llama", "gpt-oss", "deepseek", "mistral", "nemotron", "glm")):
+                    continue
                 price = m.get("pricing") or {}
                 if not (mid.endswith(":free") or (str(price.get("prompt")) == "0" and str(price.get("completion")) == "0")):
                     continue
@@ -173,8 +177,10 @@ def _try_compat(prompt: str, temperature: float, spec: tuple, model: str | None 
     model = model or _compat_models(spec)[0]
     response = requests.post(
         url, headers={"Authorization": f"Bearer {key}"},
-        json={"model": model, "temperature": temperature, "max_tokens": 8192,
-              "messages": [{"role": "user", "content": prompt}]}, timeout=90)
+        json=({"model": model, "temperature": temperature, "max_tokens": 6144,
+               "messages": [{"role": "user", "content": prompt}]}
+              | ({"reasoning_effort": "low"} if provider == "groq" and "gpt-oss" in model else {})),
+        timeout=120)
     response.raise_for_status()
     data = response.json()
     choice = (data.get("choices") or [{}])[0]
@@ -186,10 +192,11 @@ def _try_compat(prompt: str, temperature: float, spec: tuple, model: str | None 
     return text.strip()
 
 
-def _with_tries(label: str, fn, failures: list, on_error=None):
+def _with_tries(label: str, fn, failures: list, on_error=None, tries=None):
     """같은 엔진을 일시 장애 시 TRIES_PER_ENGINE번까지 시도."""
     import time
-    for n in range(1, TRIES_PER_ENGINE + 1):
+    tries = tries or TRIES_PER_ENGINE
+    for n in range(1, tries + 1):
         try:
             return fn()
         except (requests.RequestException, ValueError, RuntimeError) as exc:
@@ -204,7 +211,7 @@ def _with_tries(label: str, fn, failures: list, on_error=None):
                          or (status is not None and status >= 500))
             if not transient:
                 break
-            if n < TRIES_PER_ENGINE:
+            if n < tries:
                 time.sleep(RETRY_SLEEP * (2 ** (n - 1)))  # 5s,10s,20s backoff for 503 overload
     return None
 
@@ -264,7 +271,7 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer
                 if _parked(spec[0], spec[1], model):
                     continue
                 text = _with_tries(f"{spec[0]}:{model}", lambda sp=spec, m=model: _try_compat(prompt, temperature, sp, m),
-                                   failures, on_error=lambda e, sp=spec, m=model: _note_failure(sp[0], sp[1], m, e))
+                                   failures, on_error=lambda e, sp=spec, m=model: _note_failure(sp[0], sp[1], m, e), tries=2)
                 if text:
                     return text
 

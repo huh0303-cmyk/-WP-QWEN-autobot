@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import time
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -69,7 +70,7 @@ Language: {site['language']}. Return JSON only with title, content_html, labels,
 Cautious source-aware wording and no invented facts.
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
-English: 1200-1600 words (never fewer than 1100; count them). Korean: 2400-3500 characters.
+English: 1400-1800 words (never fewer than 1200; count them). Korean: 2400-3500 characters.
 For English articles use Latin script only: write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.
 Provide 1-3 short, highly relevant labels only."""
     raw = blogger_generate_with_fallback(prompt, temperature=0.5).strip()
@@ -134,7 +135,10 @@ def main() -> int:
     expected_count = len(sites)
     results, failed = [], False
     RESULT.parent.mkdir(parents=True, exist_ok=True)
-    for site in sites:
+    pace = float(os.environ.get("BLOGGER_PACE_SECONDS", "0") or 0)
+    for site_no, site in enumerate(sites):
+        if pace and site_no:
+            time.sleep(pace)  # keeps free-tier writers under their per-minute token limits
         marker = f"blogger33-{'review' if draft_mode else 'public'}:{run_key}:{site['key']}"
         endpoint = f"https://www.googleapis.com/blogger/v3/blogs/{site['id']}/posts"
         try:
