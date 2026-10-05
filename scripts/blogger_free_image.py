@@ -46,14 +46,18 @@ def _pexels(query: str):
     key = _key("PEXELS_API_KEY")
     if not key:
         return None
-    r = requests.get("https://api.pexels.com/v1/search", headers={"Authorization": key},
-                     params={"query": query, "orientation": "landscape", "per_page": 12}, timeout=15)
-    r.raise_for_status()
-    for p in r.json().get("photos", []):
-        url = p.get("src", {}).get("large", "")
-        if urlparse(url).hostname == "images.pexels.com" and p.get("width", 0) > p.get("height", 0) \
-                and _relevant(query, p.get("alt", "")) and _is_image(url):
-            return {"url": url, "provider": "Pexels", "id": str(p["id"]), "desc": p.get("alt", "")}
+    ordered = [w for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 2 and w not in STOP]
+    for q in dict.fromkeys([query, " ".join(ordered[:2])]):  # full query first, then a looser 2-word retry
+        if not q:
+            continue
+        r = requests.get("https://api.pexels.com/v1/search", headers={"Authorization": key},
+                         params={"query": q, "orientation": "landscape", "per_page": 12}, timeout=15)
+        r.raise_for_status()
+        for p in r.json().get("photos", []):
+            url = p.get("src", {}).get("large", "")
+            if urlparse(url).hostname == "images.pexels.com" and p.get("width", 0) > p.get("height", 0) \
+                    and _relevant(q, p.get("alt", "")) and _is_image(url):
+                return {"url": url, "provider": "Pexels", "id": str(p["id"]), "desc": p.get("alt", "")}
     return None
 
 
