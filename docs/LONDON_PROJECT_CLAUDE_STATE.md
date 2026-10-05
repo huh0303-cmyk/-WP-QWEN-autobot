@@ -355,6 +355,26 @@ Chairman이 GitHub 알림("Tistory One-Daily Dispatcher: All jobs have failed")�
 빈도 이상 여부 확인, (3) 며칠 뒤 해당 32개 Tistory 사이트가 실제로 하루 1개씩
 고르게 발행되는지 실측.
 
+## 2026-09-27 (14차) — Chairman 본인 Google 브랜드계정 목록으로 혼동의 근원 규명
+
+Chairman이 `myaccount.google.com/brandaccounts` 22개를 직접 붙여넣고 "최종 25개
+리스트 맨 마지막 칸에 매칭해줘"라고 요청. Claude in Chrome(본인 로그인)으로 22개
+전부 열어서 **지금 그 계정이 실제로 운영하는 YouTube 채널명**을 확인 — 가장 강력한
+증거 등급(본인 1차 소스).
+
+**핵심 발견**: 22개 중 10개는 Chairman이 붙인 라벨과 실제 운영 채널이 전혀 다름
+(예: "K-RELAX"→실제론 NASA_XFILES, "Studio_K3"→CAFE_KPOP/CAFE_ROMANTIC, "K-ENTER"
+→Seoul_Jisoo1). **"런던프로젝트GPT"/"Gemini"가 core5·archive10에 대해 틀린 이름을
+주장했던 이유가 바로 이것** — 아마 이 브랜드계정 "라벨"을 보고 추측했을 것.
+AMERICAN_ARCHIVE_TIMES=French Survival, CLASSIC_READS_TIMES=German Survival 겹침은
+본인 로그인 페이지로 재확인(가장 강한 증거). "K-health 365" 라벨 계정도 Portuguese
+Survival 운영 중 — science_facts_journal 겹침의 또 다른 이름임을 추가 확인.
+
+25개 중 17개는 이제 브랜드계정ID까지 확정, 8개(korean/japanese/vietnamese_survival,
+topik, shopping2, +title 불일치로 보류한 mbb/retro_reels/silent_era)는 미확인.
+상세 표는 `docs/ARCHIVE_CHANNEL_IDENTITY_VERIFIED_2026-09-27.md`의 "2026-09-27
+08:5x KST" 절. Chairman에게 구글시트 붙여넣기용 TSV 최종표 전달.
+
 ## 2026-09-27 (13차) — Chairman의 "이미 해결됨" 주장을 재실측으로 반박, Korean Survival 핸들 재확인
 
 Chairman이 두 가지를 말함: (1) "korean_survival `@KoreanSurvival`(언더스코어 없이)

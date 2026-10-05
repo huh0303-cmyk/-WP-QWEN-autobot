@@ -147,3 +147,61 @@ classical_journal)를 실제로 하셨더라도, 그건 "자동화가 그 채널
 똑같은 실수를 반복하는 것). 만약 GitHub 시크릿 삭제를 이미 하셨다면 그 사실은 별도로
 확인해주시면 기록하겠음 — 이 세션은 여전히 GitHub Actions 시크릿 목록/삭제 API에 접근
 불가(HTTP 403, 프록시 차단, 10차 기록).
+
+## 2026-09-27 08:5x KST — Chairman 본인 Google 브랜드 계정 목록 직접 대조 (가장 강력한 증거)
+
+Chairman이 `myaccount.google.com/brandaccounts`의 "내 브랜드 계정" 22개를 직접 붙여넣음.
+Claude in Chrome(Chairman 본인 로그인 세션)으로 22개 전부 `/view` 페이지를 열어 **지금
+그 계정이 실제로 운영 중인 YouTube 채널명**을 하나씩 읽었다 — 이건 공개 API보다도 더
+강력한 증거(본인 로그인 1차 소스, OAuth 스코프 문제 없음).
+
+**핵심 발견: 브랜드 계정의 "라벨"(Chairman이 붙인 이름)과 그 계정이 지금 실제로 돌리는
+YouTube 채널명이 전혀 다른 경우가 압도적으로 많다.** 이게 몇 달간의 혼동의 진짜 근원.
+
+| 브랜드계정ID | Chairman 라벨 | 지금 실제 채널명(로그인 페이지 확인) | 비고 |
+|---|---|---|---|
+| 105017684393643407967 | AMERICAN_ARCHIVE_TIMES | **French Survival** | ★겹침 재확인(3중 증거) |
+| 105922525541599728865 | Arabic Survival | **Spanish Survival** | ★라벨 불일치(신규) |
+| 107899574901731335221 | CLASSIC_READS_TIMES | **German Survival** | ★겹침 재확인 |
+| 100701315143211582152 | Chinese Survival(#1) | **CAFE_STARBUCKSVIBES** | starbucks 채널 실주소 |
+| 107471814279256124167 | Chinese Survival(#2) | Chinese Survival | 라벨 일치(안전) |
+| 103144850455313221947 | English Survival | English Survival | 라벨 일치(안전) |
+| 101469748905879577842 | Italian Survival | Italian Survival | 라벨 일치(안전) |
+| 101619364237374251295 | K-ENTER | **Seoul_Jisoo1** | shopping1 채널 실주소 |
+| 100139444347726889788 | K-HEALING | **Health Clinic USA** | health_usa 채널 실주소 |
+| 117694050183547616927 | K-ISSUE | **CAFE HEALING** | healing 채널 실주소 |
+| 108767753086893855106 | K-KIDS | **Health_Clinic_Japan** | health_jp 채널 실주소 |
+| 117587630465805532297 | K-RELAX | **NASA_XFILES** | nasa 채널 실주소 |
+| 113384771035218611829 | K-health 365 | **Portuguese Survival** | ★겹침(science_facts 쪽) |
+| 112975172469027628086 | K-pop Studio | **INVENTION_STORY** | invention 채널 실주소(kpop 아님!) |
+| 100198972855437260214 | Mozart-Bach-Beethoven | Mozart-Bach-Beethoven | 라벨 일치 — 25개 중 아무 것과도 title 불일치(별도 계정 추정) |
+| 100419392102201693624 | RETRO_REELS_TIMES | RETRO_REELS_TIMES | 라벨 일치 — 확인된 RETRO_USA1과 title 불일치(별도 계정 추정) |
+| 101090753941969226396 | SILENT_ERA_TIMES | SILENT_ERA_TIMES | 라벨 일치 — 확인된 SILENT_ERA_FILM과 title 불일치(별도 계정 추정) |
+| 106734459301129845742 | Spanish Survival | **HISTORY_TV_TODAY** | history 채널 실주소(Spanish Survival 아님!) |
+| 107027220305669374994 | Studio_K3(#1) | **CAFE_KPOP** | kpop 채널 실주소 |
+| 101180557547708405545 | Studio_K3(#2) | **CAFE_ROMANTIC** | globalmusic 채널 실주소 |
+| 109363668247401986184 | 비영리한국유학협회KSA | 비영리한국유학협회KSA | 기관 계정, 25개 밖 |
+| 106362135040860340178 | 서울국제대학SIS | 서울국제대학SIS | 기관 계정, 25개 밖 |
+
+**결론**:
+1. Studio_K3(#1,#2), K-ENTER, K-HEALING, K-ISSUE, K-KIDS, K-RELAX, K-health 365,
+   K-pop Studio, "Chinese Survival"(#1), "Spanish Survival"(라벨) — 이 10개 브랜드
+   계정은 **라벨과 실제 운영 채널이 전혀 다르다.** "LondonProject_Gemini"가 core5/
+   archive10에 대해 주장한 이름(Studio_K3, K-ISSUE, Mozart-Bach-Beethoven 등, 12차
+   기록 참조)이 실측과 안 맞았던 이유가 설명됨 — Gemini는 아마 이 **브랜드 계정
+   라벨**을 보고 주장했을 가능성이 높음(라벨 자체는 실재하지만 그 계정이 지금 돌리는
+   채널은 다름).
+2. AMERICAN_ARCHIVE_TIMES=French Survival, CLASSIC_READS_TIMES=German Survival
+   겹침은 **본인 로그인 페이지로 재확인** — 가장 강한 증거 등급. "K-health 365"
+   라벨 계정도 Portuguese Survival을 운영 중 — science_facts_journal 겹침 건의
+   또 다른 이름.
+3. Mozart-Bach-Beethoven / RETRO_REELS_TIMES / SILENT_ERA_TIMES — 라벨 그대로
+   운영 중이지만, 25개 확정표의 cafe_mozart(title: CAFE_MOZART)/retro_reels(title:
+   RETRO_USA1)/silent_era(title: SILENT_ERA_FILM)와 **title이 일치하지 않는다** —
+   즉 이 3개는 25개 운영 채널과는 **별도의, 아직 용도 미확인인 계정**일 가능성이 높음.
+   섣불리 매칭하지 않음.
+4. 이 22개 목록에는 korean_survival/japanese_survival/vietnamese_survival/topik/
+   shopping2(sis_languagecenter)에 대응하는 라벨이 없음 — Chairman이 붙여넣은 건
+   전체 브랜드 계정의 일부일 가능성(페이지네이션 등). 나머지도 필요하면 요청.
+
+**최종 25개표의 "브랜드계정ID" 칸은 17/25 확정, 8/25 미확인**(아래 최종표 참조).
