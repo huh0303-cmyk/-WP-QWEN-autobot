@@ -1,0 +1,31 @@
+name: Blogger — unpublish posts of a date (revert to draft)
+on:
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: KST date YYYY-MM-DD
+        default: "2026-09-21"
+      apply_changes:
+        description: Apply (false = list only)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: blogger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          TARGET_DATE: ${{ inputs.target_date }}
+          APPLY_CHANGES: ${{ inputs.apply_changes }}
+        run: python scripts/blogger_unpublish_by_date.py
