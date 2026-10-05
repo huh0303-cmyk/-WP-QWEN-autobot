@@ -394,8 +394,27 @@ def _wp_category_counts(site_url: str, five_minute_bucket: int) -> list[dict[str
         return []
 
 
-@lru_cache(maxsize=128)
+_WP_LAST_GOOD: dict[str, dict[str, object]] = {}
+
+
 def _wp_visitor_stats(site_url: str, five_minute_bucket: int) -> dict[str, object]:
+    """Live counter, falling back to the last successful live read from the same KST day.
+
+    Yesterday's count is final once the day ends, so a transient fetch failure must not
+    blank the column."""
+    result = _wp_visitor_stats_live(site_url, five_minute_bucket)
+    if result and result.get("connected"):
+        _WP_LAST_GOOD[site_url] = result
+        return result
+    cached = _WP_LAST_GOOD.get(site_url)
+    today = datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+    if cached and str(cached.get("date") or "")[:10] == today:
+        return cached
+    return result or {"connected": False}
+
+
+@lru_cache(maxsize=128)
+def _wp_visitor_stats_live(site_url: str, five_minute_bucket: int) -> dict[str, object]:
     """Read the public visitor counter deployed on each WordPress site.
 
     The bucket keeps VPS page loads fast while refreshing every five minutes.

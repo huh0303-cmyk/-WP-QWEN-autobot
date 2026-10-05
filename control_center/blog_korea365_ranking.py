@@ -207,7 +207,7 @@ def build_ranking(
     for row in get_naver_data():
         cards.append(_card(row, "naver", "naver"))
 
-    cards.sort(key=lambda c: (c["yesterday_visitors"] is None, -(c["yesterday_visitors"] or 0), c["name"] or ""))
+    cards.sort(key=lambda c: (c["yesterday_visitors"] is None, -(c["yesterday_visitors"] or 0), -(c["total_visitors"] or 0), c["name"] or ""))
     rank = 0
     for row_number, card in enumerate(cards, 1):
         card["row_number"] = row_number
