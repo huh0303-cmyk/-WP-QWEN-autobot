@@ -16,9 +16,16 @@ def norm(t):
 def wp_titles(url):
     out, page = [], 1
     while page <= 20:
-        r = requests.get(f"{url}/wp-json/wp/v2/posts", params={"per_page": 100, "page": page, "_fields": "id,title,date,status,link"},
-                         headers=UA, timeout=30)
-        if r.status_code != 200:
+        r = None
+        for _try in range(4):
+            try:
+                r = requests.get(f"{url}/wp-json/wp/v2/posts", params={"per_page": 100, "page": page, "_fields": "id,title,date,status,link"},
+                                 headers=UA, timeout=45)
+                break
+            except requests.RequestException:
+                import time as _t
+                _t.sleep(6 * (_try + 1))
+        if r is None or r.status_code != 200:
             break
         rows = r.json()
         if not rows:
