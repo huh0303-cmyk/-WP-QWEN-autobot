@@ -1,1 +1,1 @@
-{"day": "2026-10-05", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-10-05-wp_kcrypto365-5355714d", "claimed_at": "2026-10-05T09:51:19.016891+09:00", "run_id": 37249116292, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-05", "status": "PUBLISHED", "public_url": "https://koreacrypto365.com/legislative-review-of-south-korea-travel-rule-elimination-for-digital-asset-compliance/", "published_at": "2026-10-05T02:52:40Z"}
