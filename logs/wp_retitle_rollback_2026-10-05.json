@@ -1,14 +1,134 @@
 [
  {
-  "site": "wp_khealth365",
-  "id": 3827,
-  "old": "갱년기 증상 완화법, 다들 잘못 알고 있는 3가지 진실과 현명한 대처법",
-  "new": "갱년기 증상 완화법: 호르몬 요법의 장단점과 비호르몬 대안"
+  "site": "wp_jobinkorea",
+  "id": 642,
+  "old": "Health Insurance Salary Korea: Understanding Deductions &amp; Benefits for Expats",
+  "new": "Salary Deductions in Korea: How Health Insurance Affects Expats' Take-Home Pay"
  },
  {
   "site": "wp_khealth365",
-  "id": 3822,
-  "old": "전문가가 밝히는 유산균 추천 효과 7가지: 당신의 장 건강을 위한 필수가이드",
-  "new": "유산균 추천 효과: 마이크로바이옴과 프로바이오틱스·프리바이오틱스 차이"
+  "id": 3726,
+  "old": "이것 모르면 100% 후회! 당신의 '번아웃 증후군 자가진단' 치명적 오류 3가지",
+  "new": "번아웃 증후군 자가진단 체크리스트: 단순 피로와 번아웃 구분하기"
+ },
+ {
+  "site": "wp_khealth365",
+  "id": 3722,
+  "old": "혈압 130 80 정상? 당신이 꼭 알아야 할 '경계성 혈압'의 숨겨진 위험과 관리 전략",
+  "new": "혈압 130/80은 정상일까? 경계성 혈압의 위험과 관리 방법"
+ },
+ {
+  "site": "wp_khealth365",
+  "id": 3746,
+  "old": "다들 놓치는 '이것': 의사가 알려주는 탈모 초기증상 자가진단, 진짜는 따로 있다!",
+  "new": "탈모 유형별 특징: 안드로겐성 탈모와 원형탈모 구별하기"
+ },
+ {
+  "site": "wp_khealth365",
+  "id": 3974,
+  "old": "종합비타민, 당신이 잘못 고르는 3가지 이유: 내과 전문의가 '진짜' 종합비타민 추천하는 법",
+  "new": "종합비타민 선택 기준: 대규모 연구로 본 효과와 개인 맞춤 복용"
+ },
+ {
+  "site": "wp_khealth365",
+  "id": 4844,
+  "old": "임상경력 20년 내과 전문의가 알려주는 안전한 의약품 복용, '의약품 리콜 확인법",
+  "new": "의약품 리콜 확인 방법: 품질·안전성 문제와 내가 먹는 약 점검하기"
+ },
+ {
+  "site": "wp_kinsurance365",
+  "id": 2768,
+  "old": "Don't Risk Your Future: Why Understanding the Four Major Social Insurance Breakdown is Critical Now",
+  "new": "Korea's Four Major Social Insurances Explained: Health, Pension, Employment and Accident Coverage"
+ },
+ {
+  "site": "wp_kinvest365",
+  "id": 2756,
+  "old": "KODEX ETF Comparison: Navigating Korea's Dynamic ETF Landscape",
+  "new": "KODEX ETF Lineup Compared: Selected Funds, Earnings Growth and Drivers"
+ },
+ {
+  "site": "wp_korea365",
+  "id": 1555,
+  "old": "Don't Wait: Essential Noreabang Korean Karaoke Tips You Need to Master Before Your Next Visit!",
+  "new": "Noreabang Karaoke Etiquette: Choosing a Room and Using the Song Machine"
+ },
+ {
+  "site": "wp_korea365",
+  "id": 1624,
+  "old": "Don't Lose Money! The Seoul Transportation Card Mistakes Every Tourist Makes (Seoul transportation card guide)",
+  "new": "Seoul Transportation Card Mistakes Tourists Make and How to Avoid Them"
+ },
+ {
+  "site": "wp_korea365",
+  "id": 1639,
+  "old": "How to Actually Handle Itaewon foreigner friendly area: A Specialist's Guide",
+  "new": "Itaewon, Seoul's Foreigner-Friendly Area: History, Food and Getting Around"
+ },
+ {
+  "site": "wp_korea365",
+  "id": 1671,
+  "old": "Don't Miss Out: Why Your Hanok Stay Recommendation Seoul Needs to Be Booked NOW",
+  "new": "Hanok Stays in Seoul: Neighborhoods, Booking and What to Expect"
+ },
+ {
+  "site": "wp_korea365",
+  "id": 1968,
+  "old": "Navigating Seoul's Urban Labyrinth: The Expat's Guide to Apartment Hunting",
+  "new": "Apartment Hunting in Seoul for Expats: Jeonse, Wolse and Neighborhoods"
+ },
+ {
+  "site": "wp_korea365",
+  "id": 1972,
+  "old": "Navigating the Labyrinth: An Expat's Guide to Apartment Hunting in Seoul",
+  "new": "Renting in Seoul as an Expat: Housing Types, Contracts and Key Terms"
+ },
+ {
+  "site": "wp_koreanews",
+  "id": 6239,
+  "old": "이재명 대통령, 경기도서 시작한 '그냥드림' 전국 모든 시군구로 확대",
+  "new": "'그냥드림' 전국 시군구 확대, 경기도 시작 사업을 이재명 대통령이 발표"
+ },
+ {
+  "site": "wp_koreanews",
+  "id": 6375,
+  "old": "영국 정부, 북아일랜드·본토 지역사회 협력 돕는 '커넥트 펀드' 3차 지원 개시",
+  "new": "영국 정부, 북아일랜드·본토 지역사회 협력 '커넥트 펀드' 3차 지원 개시"
+ },
+ {
+  "site": "wp_kskin365",
+  "id": 1589,
+  "old": "Vitamin C Serum Korea Review: Top 7 Picks for Radiant Skin S: A Beginner's Starting Point",
+  "new": "Vitamin C Serums in Korea: Benefits and How Korean Formulas Differ"
+ },
+ {
+  "site": "wp_ktrip365",
+  "id": 4212,
+  "old": "I Discovered the Secret to Unforgettable autumn foliage Korea spots — And You Won't Believe Where",
+  "new": "Autumn Foliage Spots in Korea: Mountain Escapes and Expert Picks"
+ },
+ {
+  "site": "wp_kvisa365",
+  "id": 3327,
+  "old": "Navigating Korean Visa Applications: Understanding the 'Visa Navigator'",
+  "new": "Korean Visa Applications and the Visa Navigator Tool: How to Use It and Its Limits"
+ },
+ {
+  "site": "wp_kworld365",
+  "id": 895,
+  "old": "Navigating Korea's Public Transportation for K-Pop Events",
+  "new": "Public Transportation in Korea for K-Pop Events: T-Money, Routes and Subway"
+ },
+ {
+  "site": "wp_medicaltour",
+  "id": 777,
+  "old": "The Real Liposuction Recovery Time in Korea: An Expert's Perspective",
+  "new": "Liposuction Recovery Time in Korea: Healing Factors and Global Comparison"
+ },
+ {
+  "site": "wp_studyinkorea",
+  "id": 2898,
+  "old": "Korea university club activities, From Someone Who's Been There",
+  "new": "Joining University Clubs in Korea: A Student's Experience"
  }
 ]
