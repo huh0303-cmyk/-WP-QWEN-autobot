@@ -250,7 +250,7 @@ def image_findings(data: dict[str, list[dict]]) -> dict:
             "photo_urls": sorted({refs[i][4] for i in idxs})[:4],
             "sites": sorted({refs[i][1] for i in idxs}),
             "posts": [{"site": refs[i][1], "id": refs[i][2]["id"], "date": refs[i][2]["date"], "role": refs[i][3],
-                       "title": refs[i][2]["title"], "link": refs[i][2]["link"]} for i in sorted(idxs, key=lambda i: refs[i][2]["date"])],
+                       "title": refs[i][2]["title"], "link": refs[i][2]["link"], "url": refs[i][4], "blog_id": refs[i][2].get("blog_id", "")} for i in sorted(idxs, key=lambda i: refs[i][2]["date"])],
         })
     groups.sort(key=lambda g: -len(g["posts"]))
     none = {site: sum(1 for r in rows if not r["featured"] and not r["inline"]) for site, rows in data.items()}

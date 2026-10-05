@@ -16,6 +16,7 @@ from automation_hub.repetition_guard import title_self_issues  # noqa: E402
 APPLY = os.environ.get("APPLY_CHANGES", "false").lower() == "true"
 WP_USER = "huh0303@gmail.com"
 KEEP_PER_PATTERN = 1
+NEWSROOM_SITES = {"wp_koreanews", "blogger_koreanews", "blogger_seouljournal"}  # factual headlines: never LLM-rewritten
 OPEN_MIN, END_MIN = 4, 6
 HANGUL = re.compile(r"[가-힣]")
 
@@ -37,6 +38,8 @@ def _jac(a, b):
 
 def det_fix(t):
     """Deterministic repair: drop a trailing keyword parenthetical / stock tail."""
+    if not re.search(r"\([^()]{6,}\)", t):
+        return ""  # keyword-salad titles need a real rewrite, not a truncation
     n = re.sub(r"\s*\([^()]{6,}\)", "", t)
     n = re.sub(r"(?i)[:\-]?\s*(a closer look at what really matters|frequently overlooked facts)\s*$", "", n)
     n = re.sub(r"\s{2,}", " ", n).strip(" :-")
@@ -68,7 +71,7 @@ def flag(data):
             reason = "near_duplicate"
         seen_site[s].append(t)
         seen_exact.add(ex); seen_open[o] += 1; seen_end[e] += 1
-        if reason:
+        if reason and s not in NEWSROOM_SITES:
             out[(s, str(r["id"]))] = reason
     return out
 
