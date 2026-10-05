@@ -882,3 +882,7 @@ jobinkorea365.com, jobkoreaglobal.com, korea365.org
 - WP 25 + 신문사는 기존 `daily-publication-floor.yml`(GitHub schedule 11,29,47분)이 담당.
 - 미검증: 새 워크플로 실제 실행 결과, 예약 실행 첫 관측.
 - 9차 시험 실행(ktrip365 1곳, run 2회): **GitHub 단독 글쓰기는 아직 품질게이트 통과 못 함.** 원인: ①`/etc/korea365/free-writer.json`(서버 보관 무료 Gemini 키)이 VPS에만 있음 ②GitHub 시크릿 GEMINI_API_KEY로는 모든 Gemini 모델이 HTTP 400 ③Groq/OpenRouter 시도 흔적 없이 로컬 Qwen까지 내려가 "too short(813)" / "language mismatch" 게이트 차단 → 발행 안 됨(날조·저품질 방지 게이트는 정상 작동). 반영: language mismatch도 3회 재시도(커밋 후). 다음: Gemini 400 원인(키/요청형식) 진단, VPS free-writer 키를 GitHub 시크릿으로 이관 여부는 Chairman 승인(키 이동). 그 전까지 Blogspot 실발행은 VPS 타이머가 담당, GitHub 워크플로는 이중발행 방지 마커 덕에 백업.
+- 9차 정정/진척 (10/5 09:50 KST): 위 "GitHub 단독 불가" 진단은 일부 틀림. 실제 원인 = ①GitHub의 GEMINI_API_KEY 시크릿이 사실상 무효(길이 1) — 단 글은 `groq:openai/gpt-oss-120b`(무료)가 정상 생성 ②영어 글에 한글이 섞인 건 내 프롬프트가 영어 글에도 "(Korean: 핵심 요약)"을 넣어서였음 → `rules_for(language)`로 언어별 분리 ③발행 후 검증이 Blogger의 HTTP 429(공유 IP 제한)에 걸려 verification_failed → 재시도+API LIVE 확인으로 보강.
+- 결과: ktrip365 GitHub 시험 발행 성공(https://k-trip365.blogspot.com/2026/10/how-to-spend-five-perfect-days.html — h2 10개, Pexels 이미지, FAQ·Before you decide 포함).
+- Chairman 지시: Blogspot 33 = **오전 1회 + 오후 1회, 매일 랜덤 시각** → blogger-33-daily-github.yml 개편: 30분 틱 + 날짜 시드 랜덤 목표시각(AM 07:05–11:55, PM 14:05–20:55 KST, 정각 회피), 키 `blogger33-daily-<날짜>`(AM, VPS 타이머와 동일 키) / `-pm`(PM). 하루 33×2=66편.
+- 미검증: 33개 전체 실행 결과, 무료 쿼터(Groq 등)가 하루 66편을 감당하는지, VPS 타이머가 같은 날 AM을 먼저 쓰는 경우의 동작(마커로 스킵되도록 설계됨).
