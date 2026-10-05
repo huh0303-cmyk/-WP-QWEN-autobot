@@ -881,3 +881,4 @@ jobinkorea365.com, jobkoreaglobal.com, korea365.org
 - 신규 `.github/workflows/blogger-33-daily-github.yml`: 06:23 KST + 13:41 KST 재시도, PC 불필요. run key `blogger33-daily-<KST날짜>`는 VPS 타이머와 동일 → 마커 기반으로 같은 날 이중 발행 방지.
 - WP 25 + 신문사는 기존 `daily-publication-floor.yml`(GitHub schedule 11,29,47분)이 담당.
 - 미검증: 새 워크플로 실제 실행 결과, 예약 실행 첫 관측.
+- 9차 시험 실행(ktrip365 1곳, run 2회): **GitHub 단독 글쓰기는 아직 품질게이트 통과 못 함.** 원인: ①`/etc/korea365/free-writer.json`(서버 보관 무료 Gemini 키)이 VPS에만 있음 ②GitHub 시크릿 GEMINI_API_KEY로는 모든 Gemini 모델이 HTTP 400 ③Groq/OpenRouter 시도 흔적 없이 로컬 Qwen까지 내려가 "too short(813)" / "language mismatch" 게이트 차단 → 발행 안 됨(날조·저품질 방지 게이트는 정상 작동). 반영: language mismatch도 3회 재시도(커밋 후). 다음: Gemini 400 원인(키/요청형식) 진단, VPS free-writer 키를 GitHub 시크릿으로 이관 여부는 Chairman 승인(키 이동). 그 전까지 Blogspot 실발행은 VPS 타이머가 담당, GitHub 워크플로는 이중발행 방지 마커 덕에 백업.
