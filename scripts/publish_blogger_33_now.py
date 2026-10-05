@@ -58,8 +58,15 @@ Language: {site['language']}. Return JSON only with title, content_html, labels,
 Cautious source-aware wording and no invented facts.
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
-English: 1000-1500 words. Korean: 2200-3500 characters. Provide 1-3 short, highly relevant labels only."""
+English: 1200-1600 words (never fewer than 1100; count them). Korean: 2400-3500 characters.
+For English articles use Latin script only: write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.
+Provide 1-3 short, highly relevant labels only."""
     raw = blogger_generate_with_fallback(prompt, temperature=0.5).strip()
+    try:
+        import economy_text
+        print(f"writer engine for {site['key']}: {economy_text.last_writer_model}")
+    except Exception:
+        pass
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].removeprefix("json").strip()
     try:
