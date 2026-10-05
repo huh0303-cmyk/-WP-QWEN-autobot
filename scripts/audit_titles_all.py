@@ -59,6 +59,7 @@ def blogger_titles():
 
 def main():
     sites = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
+    sites = sites if isinstance(sites, list) else sites["sites"]
     data = {}
     for s in sites:
         if s["platform"] == "wordpress" and s.get("enabled", True):
