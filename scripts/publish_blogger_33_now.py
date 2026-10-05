@@ -193,8 +193,18 @@ def main() -> int:
                                 "search_description_length": len(description),
                                 "search_description_status": "required_in_blogger_editor"})
             else:
+                import time as _t
                 check = requests.get(url, timeout=30)
+                for _n in range(3):  # Blogger throttles shared runner IPs (429) and lags briefly (404)
+                    if check.status_code == 200:
+                        break
+                    _t.sleep(8 * (_n + 1))
+                    check = requests.get(url, timeout=30)
                 ok = check.status_code == 200 and marker in check.text and title in check.text
+                if not ok and check.status_code in (404, 429):
+                    # public page unreachable from this IP: confirm through the authenticated API instead
+                    api_post = requests.get(f"{endpoint}/{post.get('id', '')}", headers=headers, timeout=30)
+                    ok = api_post.ok and api_post.json().get("status") == "LIVE" and api_post.json().get("url") == url
                 results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "url": url, "post_id": post.get("id", ""), "http": check.status_code})
             failed = failed or not ok
         except Exception as exc:
