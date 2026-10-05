@@ -10,6 +10,11 @@ import os, sys, time, random, argparse, requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from autopost_mega import SITES_CONFIG, WP_USER, build_diverse_title
 
+# 2026-10-05: 템플릿 30개 풀로 제목을 일괄 교체하면 "Before You Try … Read This First" 같은 반복 틀이
+# 수백 편에 퍼진다(제목 감사로 확인). 대량 재제목은 scripts/retitle_repeated.py(AI 고유 제목)를 쓴다.
+if os.environ.get("ALLOW_TEMPLATE_RETITLE") != "1":
+    raise SystemExit("blocked: template retitle creates repeated titles; use scripts/retitle_repeated.py (or set ALLOW_TEMPLATE_RETITLE=1)")
+
 
 def get_all_published_posts(site_url, wp_pass, per_page=20):
     posts, page = [], 1

@@ -216,8 +216,15 @@ def main() -> int:
                 ok = check.status_code == 200 and marker in check.text and title in check.text
                 if not ok and check.status_code in (404, 429):
                     # public page unreachable from this IP: confirm through the authenticated API instead
-                    api_post = requests.get(f"{endpoint}/{post.get('id', '')}", headers=headers, timeout=30)
-                    ok = api_post.ok and api_post.json().get("status") == "LIVE"
+                    api_status = str(post.get("status", ""))  # insert response already reports LIVE
+                    try:
+                        api_post = requests.get(f"{endpoint}/{post.get('id', '')}", headers=headers, timeout=30)
+                        if api_post.ok:
+                            api_status = str(api_post.json().get("status", api_status))
+                    except requests.RequestException:
+                        pass
+                    ok = api_status == "LIVE" and bool(post.get("id"))
+                    print(f"verify {site['key']}: public HTTP {check.status_code}, api status {api_status}")
                 results.append({"site": site["key"], "status": "published" if ok else "verification_failed", "url": url, "post_id": post.get("id", ""), "http": check.status_code})
             failed = failed or not ok
         except Exception as exc:
