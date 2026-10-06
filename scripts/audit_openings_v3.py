@@ -38,7 +38,7 @@ def wp(url):
         for p in rows:
             b = p["content"]["rendered"]
             out.append({"id": p["id"], "title": clean(p["title"]["rendered"]), "link": p["link"],
-                        "opening": first_sentence(b), "feat": int(p.get("featured_media") or 0), "imgs": len(imgs_of(b))})
+                        "opening": first_sentence(b), "feat": int(p.get("featured_media") or 0), "imgs": len(imgs_of(b)), "urls": imgs_of(b)[:4]})
         if len(rows) < 50:
             break
         page += 1
@@ -67,7 +67,7 @@ def blogger():
             for x in d.get("items", []):
                 b = x.get("content", "")
                 items.append({"id": x["id"], "title": clean(x.get("title", "")), "link": x.get("url", ""),
-                              "opening": first_sentence(b), "feat": 0, "imgs": len(imgs_of(b)), "blog_id": str(bid)})
+                              "opening": first_sentence(b), "feat": 0, "imgs": len(imgs_of(b)), "urls": imgs_of(b)[:4], "blog_id": str(bid)})
             pt = d.get("nextPageToken")
             if not pt:
                 break
