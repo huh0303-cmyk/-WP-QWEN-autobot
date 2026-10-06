@@ -1,0 +1,121 @@
+name: Daily long videos - Health Clinic USA / Japan + Seoul_Jisoo1 shopping
+
+# One narrated 3-5 minute video per channel per KST day (owner decision 2026-10-06).
+# Free stack only: free LLM chain -> Edge neural TTS -> Pexels/Pixabay -> ffmpeg -> YouTube API.
+# Upload happens only after the authenticated channel ID equals the locked UC ID; the job fails
+# visibly (and publishes nothing) while a channel's OAuth token is not yet re-authorised.
+on:
+  schedule:
+    - cron: "37 3 * * *"   # 12:37 KST  Health Clinic USA (English)
+    - cron: "23 5 * * *"   # 14:23 KST  Health_Clinic_Japan (Japanese)
+    - cron: "47 9 * * *"   # 18:47 KST  Seoul_Jisoo1 shopping (English)
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Channel to produce
+        required: true
+        default: health_usa
+        type: choice
+        options: [health_usa, health_japan, shopping]
+      topic:
+        description: Optional topic key (blank = daily rotation)
+        required: false
+        type: string
+      upload:
+        description: Upload after the exact-channel check (false = build only, video kept as artifact)
+        required: true
+        default: false
+        type: boolean
+      privacy:
+        description: Privacy for a manual upload
+        required: true
+        default: private
+        type: choice
+        options: [private, unlisted, public]
+      force:
+        description: Ignore the one-video-per-KST-day guard
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: long-video-${{ github.event_name == 'schedule' && github.event.schedule || inputs.channel }}
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    environment: youtube-channels
+    env:
+      PYTHONUTF8: "1"
+      LOCAL_TEXT_FALLBACK_ENABLED: "false"
+      RUNNER_OLLAMA_BOOTSTRAP: "false"
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN }}
+      HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1 }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+      GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      BOOKING_AID: ${{ secrets.BOOKING_AID }}
+      AGODA_CID: ${{ secrets.AGODA_CID }}
+      KLOOK_AID: ${{ secrets.KLOOK_AID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free production runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          python -m pip install --disable-pip-version-check requests pillow edge-tts google-api-python-client google-auth
+      - name: Resolve channel
+        id: pick
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_CHANNEL: ${{ inputs.channel }}
+        run: |
+          if [ "$EVENT" = "schedule" ]; then
+            case "$SCHEDULE" in
+              "37 3 * * *") CH=health_usa ;;
+              "23 5 * * *") CH=health_japan ;;
+              "47 9 * * *") CH=shopping ;;
+              *) echo "unknown schedule $SCHEDULE"; exit 1 ;;
+            esac
+            echo "args=--channel $CH --upload --privacy public" >> "$GITHUB_OUTPUT"
+          else
+            ARGS="--channel $INPUT_CHANNEL"
+            [ "${{ inputs.upload }}" = "true" ] && ARGS="$ARGS --upload --privacy ${{ inputs.privacy }}"
+            [ "${{ inputs.force }}" = "true" ] && ARGS="$ARGS --force"
+            [ -n "${{ inputs.topic }}" ] && ARGS="$ARGS --topic ${{ inputs.topic }}"
+            echo "args=$ARGS" >> "$GITHUB_OUTPUT"
+            CH="$INPUT_CHANNEL"
+          fi
+          echo "channel=$CH" >> "$GITHUB_OUTPUT"
+      - name: Write script, narrate, render, verify channel, upload
+        run: python -u scripts/channel_long_video.py ${{ steps.pick.outputs.args }}
+      - name: Keep manifest, subtitles and receipt (video only for build-only runs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: long-video-${{ steps.pick.outputs.channel }}-${{ github.run_id }}
+          path: |
+            artifacts/long-video/${{ steps.pick.outputs.channel }}/**/manifest.json
+            artifacts/long-video/${{ steps.pick.outputs.channel }}/**/subtitles.srt
+            artifacts/long-video/${{ steps.pick.outputs.channel }}/**/publication_receipt.json
+            artifacts/long-video/${{ steps.pick.outputs.channel }}/**/thumbnail.jpg
+            artifacts/long-video/${{ steps.pick.outputs.channel }}/**/video.mp4
+          retention-days: 14
+          if-no-files-found: warn

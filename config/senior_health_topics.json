@@ -1,0 +1,355 @@
+{
+ "note": "Senior health topic rotation. Education only; no dosing, no cure claims.",
+ "topics": [
+  {
+   "key": "chondroitin",
+   "kind": "supplement",
+   "en": "Chondroitin",
+   "ja": "コンドロイチン",
+   "focus": "joint cartilage support"
+  },
+  {
+   "key": "glucosamine",
+   "kind": "supplement",
+   "en": "Glucosamine",
+   "ja": "グルコサミン",
+   "focus": "joint comfort"
+  },
+  {
+   "key": "lutein",
+   "kind": "supplement",
+   "en": "Lutein and Zeaxanthin",
+   "ja": "ルテイン",
+   "focus": "eye health"
+  },
+  {
+   "key": "omega3",
+   "kind": "supplement",
+   "en": "Omega-3 (fish oil)",
+   "ja": "オメガ3脂肪酸",
+   "focus": "heart and brain"
+  },
+  {
+   "key": "calcium_d",
+   "kind": "supplement",
+   "en": "Calcium and Vitamin D",
+   "ja": "カルシウムとビタミンD",
+   "focus": "bones"
+  },
+  {
+   "key": "magnesium",
+   "kind": "supplement",
+   "en": "Magnesium",
+   "ja": "マグネシウム",
+   "focus": "muscles, sleep"
+  },
+  {
+   "key": "coq10",
+   "kind": "supplement",
+   "en": "Coenzyme Q10",
+   "ja": "コエンザイムQ10",
+   "focus": "heart energy"
+  },
+  {
+   "key": "probiotics",
+   "kind": "supplement",
+   "en": "Probiotics",
+   "ja": "プロバイオティクス(乳酸菌)",
+   "focus": "gut"
+  },
+  {
+   "key": "b12",
+   "kind": "supplement",
+   "en": "Vitamin B12",
+   "ja": "ビタミンB12",
+   "focus": "nerves, energy"
+  },
+  {
+   "key": "vitd",
+   "kind": "supplement",
+   "en": "Vitamin D",
+   "ja": "ビタミンD",
+   "focus": "bones, immunity"
+  },
+  {
+   "key": "collagen",
+   "kind": "supplement",
+   "en": "Collagen",
+   "ja": "コラーゲン",
+   "focus": "skin and joints"
+  },
+  {
+   "key": "k2",
+   "kind": "supplement",
+   "en": "Vitamin K2",
+   "ja": "ビタミンK2",
+   "focus": "bone and arteries"
+  },
+  {
+   "key": "curcumin",
+   "kind": "supplement",
+   "en": "Curcumin (turmeric)",
+   "ja": "クルクミン(ウコン)",
+   "focus": "inflammation"
+  },
+  {
+   "key": "saw_palmetto",
+   "kind": "supplement",
+   "en": "Saw Palmetto",
+   "ja": "ノコギリヤシ",
+   "focus": "prostate"
+  },
+  {
+   "key": "cranberry",
+   "kind": "supplement",
+   "en": "Cranberry",
+   "ja": "クランベリー",
+   "focus": "urinary tract"
+  },
+  {
+   "key": "zinc",
+   "kind": "supplement",
+   "en": "Zinc",
+   "ja": "亜鉛",
+   "focus": "immunity, taste"
+  },
+  {
+   "key": "iron",
+   "kind": "supplement",
+   "en": "Iron",
+   "ja": "鉄分",
+   "focus": "anemia"
+  },
+  {
+   "key": "vitc",
+   "kind": "supplement",
+   "en": "Vitamin C",
+   "ja": "ビタミンC",
+   "focus": "immunity"
+  },
+  {
+   "key": "folate",
+   "kind": "supplement",
+   "en": "Folate (Vitamin B9)",
+   "ja": "葉酸",
+   "focus": "blood cells"
+  },
+  {
+   "key": "psyllium",
+   "kind": "supplement",
+   "en": "Psyllium fiber",
+   "ja": "サイリウム(食物繊維)",
+   "focus": "digestion, cholesterol"
+  },
+  {
+   "key": "red_ginseng",
+   "kind": "supplement",
+   "en": "Red Ginseng",
+   "ja": "高麗人参",
+   "focus": "fatigue"
+  },
+  {
+   "key": "milk_thistle",
+   "kind": "supplement",
+   "en": "Milk Thistle",
+   "ja": "ミルクシスル",
+   "focus": "liver"
+  },
+  {
+   "key": "melatonin",
+   "kind": "supplement",
+   "en": "Melatonin",
+   "ja": "メラトニン",
+   "focus": "sleep"
+  },
+  {
+   "key": "ginkgo",
+   "kind": "supplement",
+   "en": "Ginkgo biloba",
+   "ja": "イチョウ葉",
+   "focus": "memory"
+  },
+  {
+   "key": "hyaluronic",
+   "kind": "supplement",
+   "en": "Hyaluronic Acid",
+   "ja": "ヒアルロン酸",
+   "focus": "joints, skin"
+  },
+  {
+   "key": "msm",
+   "kind": "supplement",
+   "en": "MSM",
+   "ja": "MSM",
+   "focus": "joints"
+  },
+  {
+   "key": "astaxanthin",
+   "kind": "supplement",
+   "en": "Astaxanthin",
+   "ja": "アスタキサンチン",
+   "focus": "eyes, skin"
+  },
+  {
+   "key": "selenium",
+   "kind": "supplement",
+   "en": "Selenium",
+   "ja": "セレン",
+   "focus": "thyroid, antioxidant"
+  },
+  {
+   "key": "potassium",
+   "kind": "supplement",
+   "en": "Potassium",
+   "ja": "カリウム",
+   "focus": "blood pressure"
+  },
+  {
+   "key": "protein",
+   "kind": "supplement",
+   "en": "Protein supplements for seniors",
+   "ja": "高齢者のためのプロテイン",
+   "focus": "muscle loss"
+  },
+  {
+   "key": "blood_pressure",
+   "kind": "knowledge",
+   "en": "Understanding blood pressure after 60",
+   "ja": "60歳からの血圧の基礎知識",
+   "focus": ""
+  },
+  {
+   "key": "blood_sugar",
+   "kind": "knowledge",
+   "en": "Blood sugar basics for seniors",
+   "ja": "高齢者の血糖値の基礎",
+   "focus": ""
+  },
+  {
+   "key": "sleep",
+   "kind": "knowledge",
+   "en": "Better sleep for seniors",
+   "ja": "シニアの睡眠を整える方法",
+   "focus": ""
+  },
+  {
+   "key": "falls",
+   "kind": "knowledge",
+   "en": "Preventing falls at home",
+   "ja": "自宅での転倒予防",
+   "focus": ""
+  },
+  {
+   "key": "hydration",
+   "kind": "knowledge",
+   "en": "Staying hydrated as you age",
+   "ja": "年齢とともに大切な水分補給",
+   "focus": ""
+  },
+  {
+   "key": "eyes",
+   "kind": "knowledge",
+   "en": "Protecting your eyesight",
+   "ja": "目の健康を守る習慣",
+   "focus": ""
+  },
+  {
+   "key": "bones",
+   "kind": "knowledge",
+   "en": "Bone density and osteoporosis basics",
+   "ja": "骨密度と骨粗しょう症の基礎",
+   "focus": ""
+  },
+  {
+   "key": "memory",
+   "kind": "knowledge",
+   "en": "Keeping your memory sharp",
+   "ja": "記憶力を保つ生活習慣",
+   "focus": ""
+  },
+  {
+   "key": "walking",
+   "kind": "knowledge",
+   "en": "Why daily walking matters",
+   "ja": "毎日の散歩が大切な理由",
+   "focus": ""
+  },
+  {
+   "key": "protein_food",
+   "kind": "knowledge",
+   "en": "Eating enough protein to keep muscle",
+   "ja": "筋肉を保つたんぱく質の摂り方",
+   "focus": ""
+  },
+  {
+   "key": "hearing",
+   "kind": "knowledge",
+   "en": "Hearing health basics",
+   "ja": "聴力の健康と補聴の基礎",
+   "focus": ""
+  },
+  {
+   "key": "vaccines",
+   "kind": "knowledge",
+   "en": "Vaccines older adults should ask about",
+   "ja": "高齢者が相談したいワクチン",
+   "focus": ""
+  },
+  {
+   "key": "meds_safety",
+   "kind": "knowledge",
+   "en": "Medication safety and supplement interactions",
+   "ja": "薬とサプリの飲み合わせの注意",
+   "focus": ""
+  },
+  {
+   "key": "gut",
+   "kind": "knowledge",
+   "en": "Gut health and digestion",
+   "ja": "腸と消化の健康",
+   "focus": ""
+  },
+  {
+   "key": "joint_move",
+   "kind": "knowledge",
+   "en": "Gentle exercise for stiff joints",
+   "ja": "関節がこわばるときの軽い運動",
+   "focus": ""
+  },
+  {
+   "key": "heart",
+   "kind": "knowledge",
+   "en": "Heart-healthy habits",
+   "ja": "心臓にやさしい生活習慣",
+   "focus": ""
+  },
+  {
+   "key": "cholesterol",
+   "kind": "knowledge",
+   "en": "Cholesterol: what the numbers mean",
+   "ja": "コレステロール値の読み方",
+   "focus": ""
+  },
+  {
+   "key": "loneliness",
+   "kind": "knowledge",
+   "en": "Staying socially connected",
+   "ja": "人とのつながりと心の健康",
+   "focus": ""
+  },
+  {
+   "key": "teeth",
+   "kind": "knowledge",
+   "en": "Oral health and chewing",
+   "ja": "口腔ケアと噛む力",
+   "focus": ""
+  },
+  {
+   "key": "checkups",
+   "kind": "knowledge",
+   "en": "Which health checkups to keep up",
+   "ja": "受けておきたい健康診断",
+   "focus": ""
+  }
+ ]
+}

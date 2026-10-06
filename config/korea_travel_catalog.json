@@ -1,0 +1,211 @@
+{
+ "hotels": {
+  "lotte_seoul": {
+   "id": "lotte_seoul",
+   "name": "Lotte Hotel Seoul",
+   "area": "Myeongdong",
+   "note": "large luxury hotel next to Myeongdong shopping and the subway"
+  },
+  "shilla_seoul": {
+   "id": "shilla_seoul",
+   "name": "The Shilla Seoul",
+   "area": "Jangchung-dong",
+   "note": "luxury hotel near Dongdae Gate and Namsan with a well-known indoor-outdoor pool"
+  },
+  "signiel_seoul": {
+   "id": "signiel_seoul",
+   "name": "Signiel Seoul",
+   "area": "Jamsil, inside Lotte World Tower",
+   "note": "high-floor luxury rooms with city views near Lotte World and Han River"
+  },
+  "parkhyatt_seoul": {
+   "id": "parkhyatt_seoul",
+   "name": "Park Hyatt Seoul",
+   "area": "Gangnam",
+   "note": "upscale hotel in the Gangnam business and shopping district"
+  },
+  "l7_myeongdong": {
+   "id": "l7_myeongdong",
+   "name": "L7 Myeongdong",
+   "area": "Myeongdong",
+   "note": "mid-range hotel in the shopping district, popular with first-time visitors"
+  },
+  "l7_hongdae": {
+   "id": "l7_hongdae",
+   "name": "L7 Hongdae",
+   "area": "Hongdae",
+   "note": "mid-range hotel in the youth culture and nightlife area near Hongik University"
+  },
+  "skypark_myeongdong": {
+   "id": "skypark_myeongdong",
+   "name": "Hotel Skypark Myeongdong",
+   "area": "Myeongdong",
+   "note": "budget-friendly hotel with easy subway access"
+  },
+  "rakkojae": {
+   "id": "rakkojae",
+   "name": "Rakkojae Seoul",
+   "area": "Bukchon",
+   "note": "traditional hanok stay among historic palaces"
+  },
+  "paradise_busan": {
+   "id": "paradise_busan",
+   "name": "Paradise Hotel Busan",
+   "area": "Haeundae Beach, Busan",
+   "note": "beachfront resort hotel"
+  },
+  "parkhyatt_busan": {
+   "id": "parkhyatt_busan",
+   "name": "Park Hyatt Busan",
+   "area": "Haeundae, Busan",
+   "note": "upscale harbor and sea views"
+  },
+  "shilla_jeju": {
+   "id": "shilla_jeju",
+   "name": "The Shilla Jeju",
+   "area": "Jungmun, Jeju",
+   "note": "resort hotel near Jungmun beach"
+  },
+  "grandhyatt_jeju": {
+   "id": "grandhyatt_jeju",
+   "name": "Grand Hyatt Jeju",
+   "area": "Jeju City",
+   "note": "large hotel with a casino and city access"
+  }
+ },
+ "topics": [
+  {
+   "key": "seoul_luxury",
+   "kind": "hotels",
+   "title_hint": "Luxury hotels in Seoul worth booking",
+   "items": [
+    "lotte_seoul",
+    "shilla_seoul",
+    "signiel_seoul",
+    "parkhyatt_seoul"
+   ]
+  },
+  {
+   "key": "seoul_midrange",
+   "kind": "hotels",
+   "title_hint": "Best-value Seoul hotels for first-time visitors",
+   "items": [
+    "l7_myeongdong",
+    "l7_hongdae",
+    "skypark_myeongdong"
+   ]
+  },
+  {
+   "key": "seoul_hanok",
+   "kind": "hotels",
+   "title_hint": "Stay in a traditional hanok in Seoul",
+   "items": [
+    "rakkojae"
+   ]
+  },
+  {
+   "key": "busan_hotels",
+   "kind": "hotels",
+   "title_hint": "Where to stay in Busan",
+   "items": [
+    "paradise_busan",
+    "parkhyatt_busan"
+   ]
+  },
+  {
+   "key": "jeju_hotels",
+   "kind": "hotels",
+   "title_hint": "Where to stay in Jeju",
+   "items": [
+    "shilla_jeju",
+    "grandhyatt_jeju"
+   ]
+  },
+  {
+   "key": "where_to_stay_seoul",
+   "kind": "area_guide",
+   "title_hint": "Where to stay in Seoul: Myeongdong vs Hongdae vs Gangnam vs Jongno",
+   "facts": [
+    "Myeongdong: central, shopping, many hotels, easy airport bus and subway",
+    "Hongdae: young crowd, cafes, nightlife, direct airport rail (AREX) link",
+    "Gangnam: business district, upscale shopping, nightlife, further from old palaces",
+    "Jongno/Bukchon: palaces, hanok, traditional streets, quieter at night"
+   ],
+   "items": [
+    "l7_myeongdong",
+    "l7_hongdae",
+    "parkhyatt_seoul",
+    "rakkojae"
+   ]
+  },
+  {
+   "key": "tmoney",
+   "kind": "travel_tip",
+   "title_hint": "Seoul transport: T-money card and subway tips for visitors",
+   "facts": [
+    "T-money is a rechargeable transit card for subway and buses; usable at convenience stores",
+    "Seoul subway lines are color coded with English signs and announcements",
+    "Airport Railroad (AREX) connects Incheon Airport to Seoul Station and Hongdae"
+   ],
+   "links": [
+    "klook_korea"
+   ]
+  },
+  {
+   "key": "esim",
+   "kind": "travel_tip",
+   "title_hint": "Stay connected in Korea: eSIM and pocket Wi-Fi for tourists",
+   "facts": [
+    "Travelers commonly use an eSIM, a local SIM, or pocket Wi-Fi",
+    "Free Wi-Fi is common in cafes, subway stations and many public places",
+    "Set up an eSIM before arrival if your phone supports it"
+   ],
+   "links": [
+    "klook_korea"
+   ]
+  },
+  {
+   "key": "airport",
+   "kind": "travel_tip",
+   "title_hint": "Incheon Airport to Seoul: train, bus or taxi",
+   "facts": [
+    "AREX airport railroad runs to Seoul Station and Hongdae",
+    "Airport limousine buses serve many major hotels",
+    "Taxis and pre-booked transfers are an option with heavy luggage"
+   ],
+   "links": [
+    "klook_korea"
+   ]
+  },
+  {
+   "key": "taxrefund",
+   "kind": "travel_tip",
+   "title_hint": "Tax refund and K-beauty shopping tips in Seoul",
+   "facts": [
+    "Tourists can often claim a tax refund on qualifying purchases at participating shops",
+    "Bring your passport when shopping",
+    "Olive Young and similar stores are popular for K-beauty"
+   ],
+   "links": []
+  },
+  {
+   "key": "day_trips",
+   "kind": "travel_tip",
+   "title_hint": "Best day trips from Seoul",
+   "facts": [
+    "Palaces and Bukchon Hanok Village are in central Seoul",
+    "DMZ tours depart from Seoul and require advance booking with a passport",
+    "Nami Island and Suwon Hwaseong Fortress are popular half or full day trips"
+   ],
+   "links": [
+    "klook_korea"
+   ]
+  }
+ ],
+ "link_templates": {
+  "booking": "https://www.booking.com/searchresults.html?ss={q}",
+  "agoda": "https://www.agoda.com/search?textToSearch={q}",
+  "klook_korea": "https://www.klook.com/en-US/search/result/?query={q}"
+ },
+ "note": "Facts are intentionally general; no prices, ratings or availability. Affiliate IDs come from env (BOOKING_AID, AGODA_CID, KLOOK_AID)."
+}
