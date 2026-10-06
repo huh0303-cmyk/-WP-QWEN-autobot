@@ -941,3 +941,10 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 폴백 증거(run 37335902021): 글쓰기 gemini(키3개 중 다수 OK, 3.5-flash 429/503)·groq·openrouter(:free) 사용 가능, cerebras 401(키 재발급 필요); 이미지 pexels·pixabay OK, wikimedia 무매치, pollinations 간헐.
 - 스케줄 증거: 10/05 실제 발행 WP 5/25곳, Blogspot 13/33곳 — 설계(일 2~3회/사이트) 미달. 원인 추정: GitHub cron 지연(floor 24h 2회). 미검증/미수정.
 - 미해결: WP 글 상당수가 대표이미지 없음(featured_media=0; khealth 323중 268 이미지 無) — 정책 확인 필요.
+
+## 2026-10-06 KST — 16차: Health 2 + 쇼핑 일일 영상 워크플로 신설 (task: claude-health-shopping-video-2026-10-06)
+- 결정(Chairman): 언어 Shorts 매일 1건(cron `17 11 * * *`로 변경), Health USA/Japan = 시니어 건강상식·건강기능식품 설명(3~5분, 사진+짧은 영상+자막), 쇼핑 Seoul_Jisoo1 = 영어, 한국 호텔·Booking·여행팁 + 링크.
+- 구현: `scripts/channel_long_video.py`(대본 free LLM chain→Edge TTS→Pexels/Pixabay→ffmpeg 자막 번인→썸네일→업로드), `config/senior_health_topics.json`(50주제 일일 로테이션), `config/korea_travel_catalog.json`(실존 호텔/가이드 11주제, 가격·평점 금지), `.github/workflows/youtube-health-shopping-daily.yml`(크론 USA 12:37·JP 14:23·쇼핑 18:47 KST, 비정시 분).
+- 안전장치: 업로드 전 `channels.list(mine)` = 잠금 UC ID 일치 필수, KST 하루 1건 가드(채널 업로드 목록), 건강 대본 금지어/용량(mg) 게이트 + 면책 장면 자동 추가, 쇼핑 가격/별점 금지 게이트, 업로드 후 채널·공개상태 검증(fail closed).
+- 증거: 시험 제작 4건 성공(USA 225s, JP 252s, 쇼핑 212s·232s, 1280x720 자막 번인 프레임 확인); preflight-only 3건 모두 `PREFLIGHT_OK`(3채널 정확 UC ID + 쓰기 권한 확인 — 10/01 403 상태 해소). 테스트 tests/test_channel_long_video.py 7건 통과.
+- 미검증: 실제 공개 업로드 1회(예약 실행 후 확인), 제목/썸네일 품질 반복, 어필리에이트 ID(BOOKING_AID/AGODA_CID/KLOOK_AID) 미설정(설정 시 링크에 자동 부착), 쇼핑 주제 11개뿐(2주 후 반복).
