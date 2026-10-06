@@ -44,13 +44,37 @@ def ddg(q):
     return out
 
 
+def _bing_url(h):
+    import base64
+    if "bing.com/ck/a" in h:
+        u = parse_qs(urlparse(h).query).get("u", [""])[0]
+        if u.startswith("a1"):
+            u = u[2:]; u += "=" * (-len(u) % 4)
+            try:
+                return base64.urlsafe_b64decode(u).decode("utf-8", "ignore")
+            except Exception:  # noqa: BLE001
+                return ""
+        return ""
+    return h
+
+
 def bing(q):
     r = requests.get("https://www.bing.com/search", params={"q": q, "setlang": "en"}, headers=UA, timeout=25)
-    return [(a.get_text(" ", strip=True), a["href"]) for a in BeautifulSoup(r.text, "html.parser").select("li.b_algo h2 a") if a.get("href", "").startswith("http")]
+    out = []
+    for a in BeautifulSoup(r.text, "html.parser").select("li.b_algo h2 a"):
+        u = _bing_url(a.get("href", ""))
+        if u.startswith("http"):
+            out.append((a.get_text(" ", strip=True), u))
+    return out
+
+
+def wiki(q):
+    r = requests.get("https://en.wikipedia.org/w/api.php", params={"action": "query", "list": "search", "srsearch": q, "format": "json", "srlimit": 3}, headers=UA, timeout=25)
+    return [(x["title"], "https://en.wikipedia.org/wiki/" + x["title"].replace(" ", "_")) for x in r.json().get("query", {}).get("search", [])]
 
 
 def search(q):
-    for fn in (ddg, bing):
+    for fn in (bing, ddg):
         try:
             res = fn(q)
             if res:
@@ -83,6 +107,10 @@ def gather(title, host):
         cands += search(q)
         if len(cands) >= 8:
             break
+    try:
+        cands += wiki(base)[:2]
+    except Exception:  # noqa: BLE001
+        pass
     cands.sort(key=lambda x: (0 if GOOD.search(x[1]) else 1))
     for ttl, url in cands:
         d = urlparse(url).netloc
