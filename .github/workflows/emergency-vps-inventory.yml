@@ -1,0 +1,53 @@
+name: "EMERGENCY VPS INVENTORY"
+
+on:
+  push:
+    paths:
+      - ".github/workflows/emergency-vps-inventory.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect VPS before migration
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            echo "=== VPS IDENTITY ==="
+            hostname
+            id -un
+            date -u
+            echo "=== DISK ==="
+            df -h /
+            echo "=== /opt/korea365 ==="
+            du -sh /opt/korea365 2>/dev/null || true
+            echo "=== TOP-LEVEL ==="
+            du -xhd1 /opt/korea365 2>/dev/null | sort -h || true
+            echo "=== DATA ==="
+            du -xhd2 /opt/korea365/data 2>/dev/null | sort -h | tail -80 || true
+            echo "=== N8N / DOCKER ==="
+            du -sh /opt/korea365/n8n /opt/n8n /home/*/.n8n 2>/dev/null || true
+            docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' 2>/dev/null || true
+            echo "=== RCLONE REMOTES ==="
+            if command -v rclone >/dev/null 2>&1; then
+              rclone listremotes || true
+            else
+              echo "RCLONE_NOT_INSTALLED"
+            fi
+            echo "=== LARGE FILES (TOP 100) ==="
+            find /opt/korea365 -type f -printf '%s\t%p\n' 2>/dev/null | sort -n | tail -100 || true
+            echo "=== SYSTEMD KOREA365 ==="
+            systemctl list-unit-files 'korea365-*' --no-pager 2>/dev/null || true
+            echo "=== CRON ==="
+            crontab -l 2>/dev/null || true
+            echo "=== DONE ==="
