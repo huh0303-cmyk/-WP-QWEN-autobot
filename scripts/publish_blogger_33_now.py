@@ -73,7 +73,7 @@ def generate(site: dict, hint: str = "") -> tuple[str, str, list[str], str, str]
     prompt = f"""Write one original evergreen article for {site['url']}.
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
-{rules_for(site['language'])}
+{rules_for(site['language'], site['theme'])}
 Cautious source-aware wording and no invented facts.
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.

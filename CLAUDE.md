@@ -18,6 +18,7 @@ Before any work, read:
 - 발행은 **전부 무료**: Gemini 무료 모델 체인 → Groq → OpenRouter(:free) → Cerebras. 유료 API 사용·신규 유료 SaaS 도입 금지(Chairman 명시 승인 전까지).
 - 한 엔진이 실패해도 다음 무료 엔진으로 이어 발행하되, 품질·출처 게이트 통과 못 한 글은 발행하지 않는다.
 - 상세: `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` §0.
+- **글 품질 5원칙(Chairman 승인, 2026-10-06)**: ①YMYL 글은 공식기관 홈페이지 링크 2개 이상+기준일 ②템플릿 제목·찍어내기 금지(구체적 사례·조건) ③깊이>수량, 게이트 미통과 글은 발행 금지 ④신뢰 표시(대상·확인일·전문가 사칭 금지) ⑤한글 사이트는 한글로만. 상세 `docs/LONDON_PROJECT_CLAUDE_CHARTER.md` §0-1.
 
 ## Command hierarchy
 
