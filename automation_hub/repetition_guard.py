@@ -52,7 +52,8 @@ _STOP = set("a an the and or but of to in on for with from by at as is are was w
 STOCK_TITLE_TAIL = re.compile(r"(?i)a closer look at what really matters|frequently overlooked facts|questions people ask about|the costly .{0,40}mistake|\bmistakes? every \w+ makes\b")
 
 def _title_words(title):
-    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", plain(title).casefold())).split()
+    t = re.sub(r"\b(\w+)-by-\1\b", r"\1", plain(title).casefold())  # "step-by-step" is one idiom, not a repeated word
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", t)).split()
 
 def title_self_issues(title):
     """Within-title repetition: keyword-template parenthetical, repeated word/phrase, stock tails."""

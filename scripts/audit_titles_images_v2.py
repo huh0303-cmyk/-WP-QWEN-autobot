@@ -48,7 +48,8 @@ def clean(t: str) -> str:
 
 
 def words(t: str) -> list[str]:
-    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", clean(t).lower())).split()
+    t = re.sub(r"\b(\w+)-by-\1\b", r"\1", clean(t).lower())  # step-by-step is one idiom
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", t)).split()
 
 
 def get(url, **kw):
