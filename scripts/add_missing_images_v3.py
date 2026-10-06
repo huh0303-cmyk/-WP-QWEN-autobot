@@ -57,6 +57,22 @@ def llm_queries(rows: list[dict]) -> dict[str, str]:
     return out
 
 
+FOREIGN = re.compile(r"tokyo|japan|uruguay|montevideo|poland|wroc|purdue|kazakh|ukrain|austria|portug|europe|\\beuro|dollar|\\busd\\b|american|united states|\\bus flag|covid|adoption|bible|london|paris|new york|chinese|china\\b|thai|india|vietnam|russia|german|france|spain|italy|brazil|mexico|canad|australia|vintage|hostel|sale sign", re.I)
+_GENERIC = set("korea korean south the and for with".split())
+
+
+def alt_ok(alt: str, query: str) -> bool:
+    """Strict: no foreign-place/unrelated cues unless the query asks for them, and >=50% of query content words appear in the alt text."""
+    if not alt or FOREIGN.search(alt) and not FOREIGN.search(query):
+        return False
+    q = {w.rstrip("s") for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 2 and w not in _GENERIC}
+    a = {w.rstrip("s") for w in re.findall(r"[a-z0-9]+", alt.lower())}
+    if not q:
+        return True
+    need = max(1, -(-len(q) // 2))
+    return len(q & a) >= need
+
+
 def search(query: str, used: set[str]):
     pk, xk = B._key("PEXELS_API_KEY"), B._key("PIXABAY_KEY") or B._key("PIXABAY_API_KEY")
     if pk:
@@ -68,11 +84,11 @@ def search(query: str, used: set[str]):
                 alt = p.get("alt", "")
                 if pid in used or p.get("width", 0) < 1000:
                     continue
-                if alt and not B._relevant(query, alt):
+                if not alt_ok(alt, query):
                     continue
                 if SENSITIVE.search(alt or ""):
                     continue
-                return {"id": pid, "url": p["src"]["large"], "author": p.get("photographer", ""), "provider": "Pexels", "page": p.get("url", "")}
+                return {"alt": alt, "id": pid, "url": p["src"]["large"], "author": p.get("photographer", ""), "provider": "Pexels", "page": p.get("url", "")}
         except requests.RequestException:
             pass
     if xk:
