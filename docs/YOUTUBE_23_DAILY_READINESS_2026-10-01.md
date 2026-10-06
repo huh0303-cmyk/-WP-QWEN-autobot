@@ -3,7 +3,7 @@
 Owner request: use ChatGPT for routine planning and operation, Codex when code
 changes are necessary; publish one verified public video per channel each day.
 The locked inventory has 23 channels: playlist 5, knowledge 5, language 10,
-health 2, shopping 1 (`Seoul_Jisoo1`, @rosiespicks). Exact UC IDs remain in
+health 2, shopping 1 (`Seoul_Jisoo1`, @jisoopicks). Exact UC IDs remain in
 `config/YOUTUBE_23_CHANNEL_MASTER_LOCK_2026-09-27.json`.
 
 ## October 1 daily cadence repair, 05:40 KST
@@ -150,7 +150,7 @@ Opening the explicit `/channel/<UC ID>` destinations in a browser confirmed:
 | `UCmt8f9yUT6iTxBys8eH4-Cg` | French Survival, `@SIS_FrenchSurvival` | 1 French lesson; 2 older unrelated US archive videos remain. |
 | `UCKvKhETLGPaRV3qfWv2bM2g` | Portuguese Survival, `@Portuguese_survival` | 2 Portuguese lessons; 3 older unrelated science/archive/health videos remain. |
 | `UCRZ0uc_bxKDMwz3noBBi9KQ` | Vietnamese Survival, `@SIS_VietnameseSurvival` | 2 Vietnamese lessons; 1 older Bach video remains. |
-| `UCAizx0tPkRSol8sIhanN_QQ` | Seoul_Jisoo1, `@rosiespicks` | Public channel has 6 existing health-themed videos/Shorts; shopping transition is an editorial plan, not evidence of existing shopping output. |
+| `UCAizx0tPkRSol8sIhanN_QQ` | Seoul_Jisoo1, `@jisoopicks` | Public channel has 6 existing health-themed videos/Shorts; shopping transition is an editorial plan, not evidence of existing shopping output. |
 
 `https://www.youtube.com/@sis_languagecenter` still returned a visible 404,
 so the provisional Jisoo2 row cannot be used to infer a second shopping UC ID.
@@ -371,7 +371,7 @@ personal YouTube channel or change any locked YouTube UC ID.
 
 The owner approved the `K-ENTER` Google brand flow. The OAuth tool accepted
 only the exact locked `channels.list(mine=true)` ID
-`UCAizx0tPkRSol8sIhanN_QQ` for `Seoul_Jisoo1` / `@rosiespicks`. It stored
+`UCAizx0tPkRSol8sIhanN_QQ` for `Seoul_Jisoo1` / `@jisoopicks`. It stored
 `YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1` in the protected VPS
 runtime and GitHub `youtube-channels` environment. The independent non-secret
 VPS receipt and GitHub environment secret name were checked. This finishes
