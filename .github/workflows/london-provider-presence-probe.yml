@@ -1,10 +1,7 @@
 name: London Provider Presence Probe
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/london-provider-presence-probe.yml'
+  # VPS migration: legacy manual recovery only.
   workflow_dispatch:
 
 permissions:
