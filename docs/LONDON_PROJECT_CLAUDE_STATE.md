@@ -1030,3 +1030,9 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - GSC(sc-domain:k-health365.com) 사이트맵 제출: job·medical·lab·beauty `/sitemap.xml` 4건. 직후 상태: beauty 성공(5), 나머지 3건 '가져올 수 없음'(제출 직후 표시; job sitemap.xml은 브라우저에서 12 URL 정상 응답 확인). 재확인 필요.
 - 관찰: job에 같은 제목의 중복 글 URL(understanding-pathway-to-becoming 와 _0934617816) 존재 — 중복 발행 점검 필요.
 - 미검증: GSC 3건의 최종 읽기 성공 여부, 색인 반영.
+
+## 29차 (2026-10-07 07:00~07:20 KST, Chairman 지시: 티스토리 마무리 + 네이버 글)
+- 티스토리 8편 공개 발행 완료(RSS 확인): 부동산금융 2·보험 2·생활 2·건강정보 2(독감접종·검진결과표)·여행 2(KBO·인천공항). 여행정보는 카카오 캡차를 Chairman이 2회 직접 풀어 발행(Claude는 캡차 미해결).
+- 네이버 3곳: Claude in Chrome이 blog.naver.com을 "safety restrictions"로 차단 → 직접 발행 불가. 대신 초안 6편 작성(`data/naver-drafts/2026-10-07/`, ALL_PASTE_READY.md), 발행은 Chairman 수동 붙여넣기. 상태 DRAFT_READY_MANUAL_PASTE (PUBLISHED_VERIFIED 아님, 공개 URL 미검증).
+- 초안 주의: n3-2 누리호 5차 발사(10/7 12:23)는 발사 전 기준 → 결과 나오면 수정; n2-1 혈압 출처가 2017·2022 기사라 수치 기준 미기재; n1-2 청년미래적금 수치는 언론 보도 기준(공식 확인 못함); fsc/kinfa/mohw/mfds 홈페이지는 접속 차단으로 미확인.
+- 자동화 현황: 티스토리·네이버 공개 발행은 로컬 PC의 Playwright 로그인 세션 러너(`tistory_local_runner.py`, `naver_blog_local_runner.py`)에 의존. 9/29 이후 티스토리 로컬 registrar 중단(PC 가동·스케줄 필요). 네이버는 10/1 1건 PUBLISHED_VERIFIED 이후 중단. 미구현: 하루 2편(주제+핫이슈) trend_mode, 로컬 러너 상시 구동 또는 VPS 이전.
