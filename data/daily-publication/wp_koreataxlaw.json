@@ -1,1 +1,1 @@
-{"day": "2026-10-06", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-06-wp_koreataxlaw-85d1e31f", "claimed_at": "2026-10-06T07:35:13.954279+09:00", "run_id": 37383446002, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-06", "status": "PUBLISHED", "public_url": "https://koreataxnlaw.com/applying-for-double-taxation-relief-essential-compliance-for-non-resident-professionals-and-foreign-owned-businesses-in-south-korea/", "published_at": "2026-10-05T22:37:58Z"}
