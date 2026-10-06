@@ -46,4 +46,4 @@ jobs:
               echo "ROOT_RECOVERY_KEY_NOT_INSTALLED"
             fi
             echo "RECOVERY_KEY_INSTALLED"
-            echo "RECOVERY_USER=$(id -un)"
+            echo "RECOVERY_USER_B64=$(printf %s "$(id -un)" | base64 -w0)"
