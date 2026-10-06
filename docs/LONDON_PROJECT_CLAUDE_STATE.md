@@ -1023,3 +1023,10 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 초안·카드: data/tistory-manual/2026-10-06.json, assets/generated_cards/tistory-20261006-*.png (원문은 raw URL로 에디터에 주입).
 - 핫이슈 출처: 뉴스핌 정치일정(10/6)·증시 전망(10/2), 다음 뉴스 KBO PS 지연, 스페셜타임스 독감 접종. 수치 인용은 보도 기준 표기.
 - 후속: 자동 발행 중단 원인(로컬 registrar) 복구 + 슬롯별 trend_mode(핫이슈 1편) 반영 필요 — 미구현.
+
+## 28. k-health365 하위도메인 4곳 재확인 결과 (2026-10-06 23시 KST, 예약작업 trig_01Cdd93o7wco3VYTcTqLnpAT)
+- job/medical/lab/beauty.k-health365.com: Chrome에서 HTTPS로 정상 표시. 각 호스트 /ads.txt에 `google.com, pub-3456727916386941, DIRECT, f08c47fec0942fa0` 확인, 홈 HTML에 ca-pub-3456727916386941 포함 확인(4곳 모두 true). Blogger HTTPS 상태 '사용 가능'(job 확인).
+- 정정: Blogger '도메인 리디렉션'은 apex(k-health365.com)를 해당 하위도메인으로 넘기는 설정(화면 문구 "k-health365.com부터 job.k-health365.com까지"). 승인된 WordPress 본 도메인과 충돌 위험 → 4곳 모두 OFF 유지(켜지 않음). 옛 blogspot 주소→맞춤 도메인 이동은 맞춤 도메인 설정만으로 자동.
+- GSC(sc-domain:k-health365.com) 사이트맵 제출: job·medical·lab·beauty `/sitemap.xml` 4건. 직후 상태: beauty 성공(5), 나머지 3건 '가져올 수 없음'(제출 직후 표시; job sitemap.xml은 브라우저에서 12 URL 정상 응답 확인). 재확인 필요.
+- 관찰: job에 같은 제목의 중복 글 URL(understanding-pathway-to-becoming 와 _0934617816) 존재 — 중복 발행 점검 필요.
+- 미검증: GSC 3건의 최종 읽기 성공 여부, 색인 반영.
