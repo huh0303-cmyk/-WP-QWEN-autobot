@@ -98,9 +98,31 @@ def page_text(url):
     return (title, text) if len(text) > 600 else None
 
 
-def gather(title, host):
+STOPQ = set("the and for with from your you are how what why guide korea korean south new best complete checklist update".split())
+
+
+def terms(t):
+    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{3,}", t.lower()) if w not in STOPQ}
+
+
+def topic_queries(title, old_text):
+    import economy_text
+    prompt = ("A blog post titled below is too vague. From the title and the existing text, decide the ONE concrete topic it is really about and write "
+              "2 web-search queries IN ENGLISH (5-9 words each) that would find official or authoritative pages about that topic in Korea "
+              "(include 'Korea' and the relevant authority/term, e.g. HiKorea, NHIS, NTS, Study in Korea, Ministry). Return ONLY the 2 queries, one per line.\n"
+              f"TITLE: {title}\nTEXT: {old_text[:700]}")
+    try:
+        out = economy_text.generate_text(prompt, temperature=0.2)
+        qs = [re.sub(r"^[\-\d.\s\"']+|[\"']+$", "", l).strip() for l in out.splitlines() if len(l.strip()) > 8][:2]
+        return [q for q in qs if q]
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def gather(title, host, old_text=""):
     base = HEAD_YEAR.sub("", title)
-    qs = [f"{base} official guide", base]
+    qs = topic_queries(title, old_text) or [f"{base} Korea official guide"]
+    qterms = terms(" ".join(qs))
     seen, ev = set(), []
     cands = []
     for q in qs:
@@ -108,10 +130,11 @@ def gather(title, host):
         if len(cands) >= 8:
             break
     try:
-        cands += wiki(base)[:2]
+        cands += wiki(qs[0])[:2]
     except Exception:  # noqa: BLE001
         pass
-    cands.sort(key=lambda x: (0 if GOOD.search(x[1]) else 1))
+    cands = [c for c in cands if GOOD.search(c[1])]
+    cands.sort(key=lambda x: (0 if re.search(r"\.go\.kr|\.gov|korea\.net|hikorea|nhis|nts\.go|kosis|studyinkorea|visitkorea", x[1], re.I) else 1))
     for ttl, url in cands:
         d = urlparse(url).netloc
         if d in seen or BAD.search(url) or host in d:
@@ -120,7 +143,7 @@ def gather(title, host):
             pt = page_text(url)
         except Exception:  # noqa: BLE001
             pt = None
-        if pt:
+        if pt and re.search(r"korea|한국", pt[1] + pt[0] + url, re.I) and len(terms(pt[0] + " " + pt[1]) & qterms) >= 3:
             seen.add(d); ev.append({"title": pt[0], "url": url, "text": pt[1]})
         if len(ev) >= 4:
             break
@@ -138,7 +161,7 @@ def build_prompt(title, language, ev, old_text, feedback=""):
             f"- Answer the main reader question in the first 2-3 sentences. Do NOT open with a cliche ('In today's', 'Navigating', 'Embarking', 오늘날, 알아보겠습니다...).\n"
             f"- 900-1300 words (Korean: about 2200-3200 characters). 5-6 <h2> sections with specific headings (not generic), short paragraphs, a bulleted checklist or step list where useful, and one short 'Common mistakes' or 'What to verify' section.\n"
             f"- Last section: a brief note that rules change and the reader should confirm with the official body (name it if the sources do), then <h2>Sources</h2> with a <ul> of <a href=URL>source title</a> for the sources you actually used (at least 2).\n"
-            f"- Output ONLY clean HTML using <h2>,<p>,<ul>,<ol>,<li>,<strong>,<a>,<table>. No markdown, no code fences, no <h1>, no images.\n"
+            f"- If the SOURCE blocks are not clearly about the topic, output exactly: INSUFFICIENT\n- Output ONLY clean HTML using <h2>,<p>,<ul>,<ol>,<li>,<strong>,<a>,<table>. No markdown, no code fences, no <h1>, no images.\n"
             + (f"- Previous attempt was rejected because: {feedback}. Fix that.\n" if feedback else "")
             + f"\nEXISTING THIN VERSION (for topic scope only; do not copy its claims unless a SOURCE supports them):\n{old_text[:1200]}\n\n{blocks}\n")
 
@@ -161,6 +184,8 @@ def validate(body, ev, old_text, language, title):
     bad = [n for n in re.findall(r"\d[\d,.]*", t) if n.rstrip(".,") not in {a.rstrip(".,") for a in allowed} and not (len(n.rstrip(".,")) <= 1 or n.rstrip(".,") in {"10", "12", "2026", "24", "30", "1", "2", "3", "4", "5", "6", "7"})]
     if len(bad) > 2: errs.append(f"numbers not in sources: {bad[:5]}")
     if lang(t) != language and not (language == "en" and lang(t) == "en"): errs.append("wrong language")
+    if len(re.findall(r"korea|한국", t, re.I)) < 3: errs.append("not about Korea")
+    if t.strip().upper().startswith("INSUFFICIENT"): errs.append("llm: insufficient evidence")
     return errs, size
 
 
@@ -235,7 +260,7 @@ def main():
                 body = requests.get(f"{s['url']}/wp-json/wp/v2/posts/{c['id']}", auth=auth, params={"context": "edit"}, timeout=30).json()["content"]["raw"]
             old_text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body))).strip()
             language = lang(old_text + c["title"])
-            ev = gather(c["title"], c["host"])
+            ev = gather(c["title"], c["host"], old_text)
             rec["sources"] = [e["url"] for e in ev]
             if len(ev) < 2:
                 rec["status"] = "no_evidence"; log.append(rec); print("no_evidence", c["site"], c["id"], flush=True); continue
