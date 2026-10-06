@@ -1,0 +1,67 @@
+name: Apply rewrites v3 (validated, researched)
+on:
+  workflow_dispatch:
+    inputs:
+      validate_only:
+        description: Validate only (no write)
+        type: boolean
+        default: true
+      only_keys:
+        description: Comma keys site-id (blank = all valid)
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment: blogger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4
+      - env:
+          VALIDATE_ONLY: ${{ inputs.validate_only }}
+          ONLY_KEYS: ${{ inputs.only_keys }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+        run: python -u scripts/apply_rewrites_v3.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apply-artifacts
+          path: |
+            artifacts/apply_log.json
+            artifacts/rewrite_validation.json
+            artifacts/rewrite_backups/
+          if-no-files-found: ignore

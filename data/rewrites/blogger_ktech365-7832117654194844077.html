@@ -1,0 +1,58 @@
+<p>A specialized AI foundation model is worth adopting only if it fits a real data and workflow need, and the cost of adapting and maintaining it is justified by better results. Foundation models are trained on broad data and then adapted, so the main decisions are what data you will adapt it with, how you will check its errors, and whether a lighter approach would do the job.</p>
+
+<h2>What the government announcement says, and what it does not</h2>
+<p>The English homepage of Korea's Ministry of Science and ICT (MSIT) lists a September 3, 2026 item titled "Selection Result Announced for the Cybersecurity-specialized AI Foundation Model Development Project." I could read only that headline. The press release itself could not be opened, so details such as the selected participants, funding and timeline are not covered here. Read the notice directly on the MSIT site before relying on any of them.</p>
+<p>What the headline does show is that a Korean ministry is running a project for a foundation model specialized for cybersecurity. That is a security-focused example of the domain-specific approach discussed below.</p>
+
+<h2>What a foundation model is</h2>
+<p>Wikipedia quotes Stanford's Center for Research on Foundation Models: a foundation model is any model trained on broad data that can be adapted to a wide range of downstream tasks. It says developers can adapt an existing model by prompting, in-context learning or fine-tuning, which is far less costly than initial training, though compute needs and data availability still matter. It lists specialized domains such as radiology, genomics and chemistry.</p>
+
+<h2>Three ways to adapt a model</h2>
+<ul>
+<li><strong>Prompting and in-context examples:</strong> the cheapest option and often a good first test.</li>
+<li><strong>Retrieval-augmented generation (RAG):</strong> Wikipedia's article on large language models says a retriever pulls the most relevant documents before the model answers, which reduces hallucination and gives access to information beyond its training data.</li>
+<li><strong>Fine-tuning:</strong> the model is trained further on your data. The same article describes fine-tuning as a way to customize a model for specialized fields without full retraining.</li>
+</ul>
+
+<h2>Questions to ask before committing</h2>
+<ol>
+<li><strong>Does the model address a genuine bottleneck?</strong> A task that a rules engine or a search tool already handles may not need one.</li>
+<li><strong>Is your data good enough?</strong> Wikipedia's article says cleaned datasets, with duplicates, toxic content and low-quality material removed, can improve training efficiency and downstream performance.</li>
+<li><strong>How will you measure results?</strong> The article warns that rapid model improvement regularly makes benchmarks obsolete, so build a test set from your own cases.</li>
+<li><strong>How will you catch errors?</strong> It defines hallucinations as fluent, natural-sounding output that is factually wrong or unfaithful to the source, so plan human review where mistakes are costly.</li>
+<li><strong>What will it cost to run and maintain?</strong> The foundation-model article says advanced models can need hundreds of millions of dollars for data and compute to build, and that a 2023 survey found AI companies put over 80 percent of capital spending into compute. Adapting an existing model is described as far cheaper than building one, but adaptation and upkeep still carry costs.</li>
+<li><strong>Can it be integrated?</strong> Check how it connects to your existing systems and what delay is acceptable.</li>
+</ol>
+
+<h2>Risks the sources highlight</h2>
+<p>Wikipedia lists biased or toxic training data, privacy violations, hallucinations and potential misuse among the concerns about foundation models. In security work, a model that confidently produces a wrong answer can be worse than no answer, so define when a person must review output and which data may never leave your systems.</p>
+
+<h2>Data decisions before any training</h2>
+<p>Before any fine-tuning, decide where the data comes from, who owns it, and whether it contains personal or confidential material. Wikipedia lists privacy violations among the risks of foundation models, so involve whoever handles data protection in your organization early. Then check that the examples reflect the cases you actually care about: a model adapted on tidy historical records may do poorly on messy real requests. Cleaning duplicates and low-quality items comes first, because the sources say it improves downstream performance.</p>
+
+<h2>A sensible way to start</h2>
+<ul>
+<li>Pick one narrow task with measurable outcomes.</li>
+<li>Build a small test set from real cases, including hard ones.</li>
+<li>Try prompting and retrieval before fine-tuning.</li>
+<li>Record errors by type and decide the review step.</li>
+<li>Repeat the test when the model or your data changes.</li>
+</ul>
+
+<h2>Common mistakes and what to verify</h2>
+<ul>
+<li>Choosing fine-tuning first when retrieval would do.</li>
+<li>Judging a model on public benchmarks instead of your own cases.</li>
+<li>Training on data you have not cleaned or checked for sensitive content.</li>
+<li>Treating a government project headline as a guide to what you may deploy.</li>
+</ul>
+
+<h2>Rules change: confirm with the official body</h2>
+<p>This is general information, not legal, security or technical advice. Government programs, data-protection duties and AI regulation change. Confirm current notices with the Ministry of Science and ICT and the relevant data-protection authority, and consult a qualified professional before deploying a model with sensitive data.</p>
+
+<h2>Sources</h2>
+<ul>
+<li><a href="https://www.msit.go.kr/eng/index.do">Ministry of Science and ICT (English) - Republic of Korea</a> - listing of the cybersecurity-specialized AI foundation model project selection notice</li>
+<li><a href="https://en.wikipedia.org/wiki/Foundation_model">Foundation model - Wikipedia</a> - definition, adaptation, costs, risks</li>
+<li><a href="https://en.wikipedia.org/wiki/Large_language_model">Large language model - Wikipedia</a> - fine-tuning, retrieval, hallucination, benchmarks, data quality</li>
+</ul>

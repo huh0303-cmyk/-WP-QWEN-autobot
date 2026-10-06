@@ -1,0 +1,49 @@
+<p>Lithography prints the patterns of a chip onto a wafer, materials decide what those patterns are made of and how cleanly they transfer, and yield is the share of working chips that comes out. The three are linked: a pattern that is slightly off, or a single particle, can ruin a die. Extreme ultraviolet (EUV) lithography is the best-known recent change, and it brings its own yield problems.</p>
+
+<h2>Where lithography fits in the process</h2>
+<p>Wikipedia's article on semiconductor device fabrication lists four process families: deposition, removal (etching and chemical-mechanical planarization), patterning through photolithography, and doping. In photolithography, a photoresist-coated wafer is exposed through a mask and then developed to create the pattern. Industry standardized on 300 mm wafers in 2000, replacing 200 mm.</p>
+<p>The article also says process node names are now more of a marketing term disconnected from actual feature sizes, giving the example of Intel's 10 nm process containing 7 nm-wide FinFET fins. Compare chips by measured performance, not by the node label alone.</p>
+
+<h2>What EUV changes</h2>
+<p>According to Wikipedia's article on EUV lithography, it uses 13.5 nm light produced from a laser-pulsed tin plasma. Because EUV is absorbed by all matter, systems use reflective multilayer mirrors rather than lenses, with 40 to 50 alternating silicon and molybdenum layers and a theoretical reflectance of about 75 percent. The article says ASML is the only company that produces and sells EUV systems for chip production, that a typical tool weighs nearly 200 tons and costs around 180 million dollars, and that newer high-NA systems support a numerical aperture up to 0.55.</p>
+<p>It also reports that EUV systems consume at least ten times more energy than immersion tools, about 1.31 megawatts against 0.13 megawatts. Samsung and TSMC are named among the adopters; the article says TSMC's 5 nm node in the second half of 2018 used extensive EUV, and that Samsung's 7 nm process used EUV single patterning but met line-roughness problems.</p>
+
+<h2>Why yield is the hard part</h2>
+<p>Wikipedia defines device yield as the percentage of working chips per wafer and says yield can range from 30 percent to above 80 percent depending on die size and process maturity. It states that a particle needs to be about one fifth the size of a feature to cause a killer defect, and that FOUPs and SMIF pods isolate wafers from cleanroom air to reduce dust-related defects.</p>
+<p>The EUV article adds specific problems: stochastic defects, meaning random printing failures, with a reported 2024 contact-hole defect density of 0.25 per square centimeter, or 177 defects per wafer. It says ASML's pellicle membrane reached 82 percent EUV transmission, yet fewer than half of the membranes survived expected EUV power levels. These figures come from a secondary summary, so confirm them against current technical papers before citing them.</p>
+
+<h2>Limits that keep patterns from being perfect</h2>
+<p>The EUV article lists physical limits on printing small features: secondary electrons that scatter more than 15 nanometers, shot noise that causes dose variations of several percent, and mask defects below 50 nanometers that are hard to detect yet can affect critical dimensions by about 10 percent. It concludes that these factors explain why the industry still relies on multi-patterning, instead of single exposures at sub-30 nanometer pitches.</p>
+<p>For readers, the point is that each new lithography generation moves the problem, and does not simply remove it. Better optics raise resolution, then defects, dose and mask quality become the limiting factors.</p>
+
+<h2>Materials in the picture</h2>
+<p>The sources in this article point to materials mainly through the process steps: photoresist for patterning, silicon and molybdenum layers in EUV mirrors, tin as the light source, and pellicle membranes that protect the mask. They do not give a full list of fab materials, so treat this as partial. Korea's weight in the supply chain is described separately: Wikipedia's article on the country's semiconductor industry says the K-CHIPS Act of March 2023 provides tax credits and that the government aims to raise self-sufficiency in critical materials to 50 percent by 2030.</p>
+
+<h2>Korea's stake</h2>
+<p>The same article says Korea held 17.7 percent of the global semiconductor market in 2022, falling to about 13 percent by 2023, and controls 60.5 percent of the global memory market, led by Samsung Electronics and SK Hynix. It also says SK Hynix passed Samsung in DRAM for the first time in the first quarter of 2025. Memory makers' output depends on patterning and yield, so lithography progress affects them directly.</p>
+
+<h2>How to read lithography and yield news</h2>
+<ol>
+<li>Check whether a claim is about a process node name or a measured feature size.</li>
+<li>Ask whether a yield figure is for a test chip, a small die or a mature product, since yield varies widely.</li>
+<li>Separate tool news (a new EUV or high-NA system) from output news (chips shipped).</li>
+<li>Note whether the figure comes from a company, a regulator or a secondary summary.</li>
+</ol>
+
+<h2>Common mistakes and what to verify</h2>
+<ul>
+<li>Treating the node name as a physical dimension.</li>
+<li>Quoting a yield percentage without the die size or maturity stage.</li>
+<li>Assuming EUV removes the need for multiple patterning. The EUV article says multi-patterning continues.</li>
+<li>Using old market-share figures after the rankings have shifted.</li>
+</ul>
+
+<h2>Rules change: confirm with the official body</h2>
+<p>This is general technology information, not investment or business advice. Technical figures and market data change quickly. Confirm current numbers with company reports, Korean government statistics and peer-reviewed or standards-body publications.</p>
+
+<h2>Sources</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Extreme_ultraviolet_lithography">Extreme ultraviolet lithography - Wikipedia</a> - EUV light source, mirrors, costs, defects, adoption</li>
+<li><a href="https://en.wikipedia.org/wiki/Semiconductor_device_fabrication">Semiconductor device fabrication - Wikipedia</a> - process steps, wafers, node naming, yield</li>
+<li><a href="https://en.wikipedia.org/wiki/Semiconductor_industry_in_South_Korea">Semiconductor industry in South Korea - Wikipedia</a> - market share, memory, K-CHIPS Act</li>
+</ul>

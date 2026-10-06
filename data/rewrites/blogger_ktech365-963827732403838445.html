@@ -1,0 +1,47 @@
+<p>Advanced packaging is the stage after the wafer is made, where chips are tested, sorted and connected to each other and to the outside world. It has become central because stacking memory dies and combining small chips in one package can raise performance without shrinking transistors further. The clearest example is high bandwidth memory (HBM), which South Korea's two big memory makers produce and which sits next to AI processors on a silicon interposer.</p>
+
+<h2>Where packaging sits in chipmaking</h2>
+<p>According to Wikipedia's overview of semiconductor device fabrication, wafer processing involves deposition, removal (etching and chemical-mechanical planarization), patterning through photolithography, and doping. After fabrication, dies are tested, binned by performance tier and packaged. The article calls this back end "Assembly, Test, Marking, and Packaging" (ATMP) and notes it is often outsourced to specialized companies separate from foundries.</p>
+<p>That division matters. A chip can be perfect as a bare die and still fail as a product if the package cannot deliver power, remove heat or carry signals fast enough.</p>
+
+<h2>Stacking memory: what HBM does</h2>
+<p>Wikipedia describes HBM as a memory interface for 3D-stacked SDRAM, originally developed by Samsung, AMD and SK Hynix. It uses vertical die stacking with through-silicon vias (TSVs) and microbumps to connect the layers, with stacks of up to 32 DRAM dies plus an optional base die. The memory connects to a processor through a silicon interposer, which shortens signal paths but adds manufacturing cost.</p>
+<p>The same article lists generations from HBM1 in 2013 to HBM4 in 2025, with listed per-stack bandwidth rising from 128 GB/s to 2 TB/s. It names SK Hynix, Samsung Electronics and Micron as the main producers as of 2025, with TSMC making base dies, and it says HBM is used with accelerators such as Nvidia's H100 and Blackwell processors. It also reports industry observers saying HBM is crowding out commodity DRAM capacity.</p>
+
+<h2>Combining small chips: chiplets</h2>
+<p>Wikipedia defines a chiplet as a small integrated circuit containing a well-defined subset of functionality, combined on an interposer in one package. It lists three advantages over a single large chip: reusability, the freedom to make each piece on a different process or material, and better yield because chiplets are tested before assembly. They can be joined as multi-chip modules, 2.5D integrated circuits or advanced packages, and interconnect standards such as UCIe, AIB and BoW support interoperability. The article names AMD, Intel and NVIDIA as users of chiplet designs.</p>
+<p>The trade-off is complexity. Chiplets from different companies must be designed with interoperability in mind, and every extra connection is something that can go wrong in assembly.</p>
+
+<h2>Why packaging is getting attention now</h2>
+<p>Two points in the sources explain the timing. First, Wikipedia says node names are now more of a marketing term than a physical measurement, which means "a smaller node" is no longer a reliable shorthand for a better chip. Packaging offers another route to performance: put memory closer to the processor, or split a large design into smaller dies that each yield better. Second, the HBM article reports that AI demand drove HBM growth and that, according to industry observers, producing HBM crowds out commodity DRAM capacity, with a reported 3-to-1 conversion ratio between HBM and DDR5 wafer production.</p>
+<p>The implication is that packaging choices affect supply of ordinary memory as well as AI hardware. A reader tracking memory prices or availability should therefore look at HBM capacity news, not only at DRAM output figures.</p>
+
+<h2>Why this matters for Korea</h2>
+<p>Wikipedia's article on South Korea's semiconductor industry says Korea controls 60.5 percent of the global memory semiconductor market and that, as of the first quarter of 2025, SK Hynix surpassed Samsung for the first time in DRAM with 36 percent against 34 percent. It reports that semiconductors were Korea's leading export category in 2022, at 129 billion dollars and nearly 19 percent of exports, and that the K-CHIPS Act, enacted in March 2023, provides tax credits of up to 25 percent for facility investment and up to 50 percent for R&amp;D. Treat these as encyclopedia summaries and check the original statistics before quoting them.</p>
+
+<h2>How to read packaging news</h2>
+<ol>
+<li>Find out whether the story is about stacking dies (HBM) or joining separate chips (chiplets). They are different techniques.</li>
+<li>Check whether a claim is about capacity, performance per stack, or customer qualification.</li>
+<li>Look at who makes which part. The HBM article notes TSMC makes base dies while memory makers produce the stacks.</li>
+<li>Be wary of generation names, since figures differ by product and speed grade.</li>
+</ol>
+
+<h2>Common mistakes and what to verify</h2>
+<ul>
+<li>Treating packaging as an afterthought. It is a separate stage with its own yield and cost.</li>
+<li>Mixing up HBM generations and their listed bandwidth.</li>
+<li>Assuming a company's market-share ranking is permanent. The DRAM lead has changed between quarters.</li>
+<li>Quoting encyclopedia figures as if they were current filings.</li>
+</ul>
+
+<h2>Rules change: confirm with the official body</h2>
+<p>This is general technology information, not investment or business advice. Product specifications, market shares and subsidy rules change often. Confirm current figures with company filings, the Korean government's statistics, and official policy notices before relying on them.</p>
+
+<h2>Sources</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/High_Bandwidth_Memory">High Bandwidth Memory - Wikipedia</a> - stacking, TSVs, interposers, generations, producers</li>
+<li><a href="https://en.wikipedia.org/wiki/Chiplet">Chiplet - Wikipedia</a> - definition, advantages, packaging and interconnect standards</li>
+<li><a href="https://en.wikipedia.org/wiki/Semiconductor_device_fabrication">Semiconductor device fabrication - Wikipedia</a> - process steps, yield, testing and packaging (ATMP)</li>
+<li><a href="https://en.wikipedia.org/wiki/Semiconductor_industry_in_South_Korea">Semiconductor industry in South Korea - Wikipedia</a> - market position, exports, K-CHIPS Act</li>
+</ul>
