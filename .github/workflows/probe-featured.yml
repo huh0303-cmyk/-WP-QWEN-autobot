@@ -1,0 +1,17 @@
+name: Probe featured images (read-only)
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: site:id list space separated
+        type: string
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python -u scripts/probe_featured.py ${{ inputs.targets }}
