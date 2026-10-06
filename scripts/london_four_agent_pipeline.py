@@ -160,7 +160,10 @@ def _ensure_wordpress_category(profile: dict, state: dict) -> int:
 
 
 def _publish_wordpress_via_worker(state: dict, profile: dict, public: bool) -> dict:
-    """Hand publication to the existing durable VPS WordPress worker."""
+    """Publish directly to WordPress REST when LONDON_VPS_FREE=true; keep VPS fallback during migration."""
+    if os.environ.get("LONDON_VPS_FREE", "false").strip().lower() in {"1", "true", "yes", "on"}:
+        return _publish_wordpress_native(state, profile, public)
+
     queue = Path(os.environ.get("VPS_WP_QUEUE", ROOT / "data/vps-wp-queue"))
     queue.mkdir(parents=True, exist_ok=True)
     article = state["article"]
@@ -195,7 +198,6 @@ def _publish_wordpress_via_worker(state: dict, profile: dict, public: bool) -> d
     os.chmod(tmp, 0o600)
     os.replace(tmp, queued)
 
-    # Worker normally runs continuously; recover it if it is down.
     check = subprocess.run(
         ["systemctl", "is-active", "--quiet", "korea365-wp-publisher.service"],
         capture_output=True,
@@ -232,6 +234,74 @@ def _publish_wordpress_via_worker(state: dict, profile: dict, public: bool) -> d
             }
         time.sleep(2)
     raise RuntimeError(f"WordPress worker timeout waiting for receipt: {job_id}")
+
+
+def _publish_wordpress_native(state: dict, profile: dict, public: bool) -> dict:
+    """Publish to WordPress REST directly from a GitHub-hosted runner; no VPS queue/systemd."""
+    article = state["article"]
+    category = state.get("category_assignment") or {}
+    settings = profile.get("wordpress") or {}
+    site_url = str(settings.get("url") or "").rstrip("/")
+    secret_name = str(settings.get("secret_name") or "")
+    password = os.environ.get(secret_name, "")
+    if not site_url or not secret_name or not password:
+        raise RuntimeError(f"WordPress credential missing for native publisher: {secret_name or site_url}")
+
+    from scripts.create_manual_wp_draft import WP_USER, ensure_featured_media, resolve_tag_ids
+
+    payload = {
+        "title": article["title"],
+        "content": article["content_html"],
+        "status": "publish" if public else "draft",
+        "comment_status": "closed",
+        "ping_status": "closed",
+    }
+    if category.get("id"):
+        payload["categories"] = [int(category["id"])]
+    tags = [str(tag).strip() for tag in (article.get("tags") or []) if str(tag).strip()]
+    tag_ids = resolve_tag_ids(site_url, password, tags)
+    if tag_ids:
+        payload["tags"] = tag_ids
+    meta_description = str(article.get("meta_description") or "").strip()
+    if meta_description:
+        payload["meta"] = {"rank_math_description": meta_description}
+
+    image_url = str((state.get("image") or {}).get("url") or "").strip()
+    if image_url:
+        media_id = ensure_featured_media(site_url, password, image_url, article["title"])
+        if media_id:
+            payload["featured_media"] = media_id
+
+    response = requests.post(
+        f"{site_url}/wp-json/wp/v2/posts",
+        auth=(WP_USER, password),
+        json=payload,
+        timeout=45,
+    )
+    if response.status_code not in (200, 201):
+        raise RuntimeError(f"WordPress native publish failed: HTTP {response.status_code}: {response.text[:500]}")
+    remote = response.json()
+    post_id = remote.get("id")
+    url = remote.get("link")
+    status = remote.get("status")
+    expected = "publish" if public else "draft"
+    if not post_id or not url or status != expected:
+        raise RuntimeError(f"WordPress native receipt invalid: id={post_id} status={status!r} url={url!r}")
+
+    if public:
+        verify = requests.get(url, timeout=30, headers={"User-Agent": "LondonProjectGPT/1.0"})
+        if verify.status_code != 200:
+            raise RuntimeError(f"WordPress public URL verification failed: HTTP {verify.status_code} {url}")
+
+    return {
+        "status": "published" if public else "draft",
+        "platform": "wordpress",
+        "site": site_url,
+        "url": url,
+        "post_id": post_id,
+        "title": article["title"],
+        "publisher": "github-native",
+    }
 
 
 def _parse_keyword(text: str) -> str:
