@@ -970,3 +970,11 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 증거: 실행 37440652454 성공 — 131건 전부 `rewritten`(HTTP OK), 실패 0.
 - 미검증/주의: 일부 글은 출처가 Wikipedia·2차 사이트(SeoulStart, ChemLinked 등) 의존 — 본문에 "공식 기관 확인" 안내 포함. 정부 사이트(HiKorea 등) 다수 접속 차단으로 1차 출처 부족. 적용 후 품질 재스캔(quality-scan-v3) 결과 확인 필요. 라이브 페이지 렌더링 직접 확인 안 함.
 - 후속 후보: 점수 70~80 중 출처 없는 글, WP 반복 소제목(FAQ/Key takeaways) 템플릿, 스킵 15건(1차 출처 확보 시).
+
+## 2026-10-06 KST — 20차: VPS→GitHub 이전 점검 (task: claude-vps-migration-audit-2026-10-06)
+- 읽기전용 점검 + draft 카나리 2회 + 발행량 프로브(`probe-publish-counts.yml`, 실행 성공).
+- 판정: **이전은 아직 미완료. VPS는 계속 엔진으로 남아 있음.** 근거: push마다 "Deploy to VPS"가 `waiting_for_video`로 지연/실패(VPS 정상 동작, 배포만 보류). 이전 커밋(huh0303-cmyk, 16:14~16:27 KST)은 WP 네이티브 발행기(`LONDON_VPS_FREE`) + 카나리 2개 + 복구키 워크플로 추가 단계.
+- 카나리 결과: ① WP 네이티브(37445725004) 성공 — k-trip365.com에 draft(?p=4788) 생성, Gemini 429/503 후 flash-lite 폴백, SEO 69(<70)·본문 3.7k자(얇음). ② 4-agent(37445728324) 실패 — push 트리거 때는 site_id 입력이 비어 "Validate target"에서 즉시 실패(37428809642), dispatch 시에는 Agent2에서 "WordPress category must be selected" 실패(카테고리 입력 필수인데 기본 공란). 테스트 draft는 k-trip365 1건(삭제 안 함, 비공개 초안).
+- 발행량(프로브): WP 공개 글 사이트 수 10/03=1, 10/04=2, 10/05=5, 10/06=6 (목표 25/일); Blogger 33곳은 10/05=33, 10/04=33, 10/03=29. WP는 GitHub floor 영수증 수와 정확히 일치 → VPS WP 발행기가 사실상 발행하지 않음. floor 마지막 실행(18:25 KST) 시점 슬롯 도래했으나 미발행 DUE 19곳; 원인 = floor가 실행당 최대 2곳 dispatch + GitHub cron이 하루 ~3회만 실행(시간당 설정 무시).
+- 조치(작은 변경): floor `--max-dispatch` 2→8 (daily-publication-floor.yml). 미검증: 다음 예약 실행 시 실제 증가 여부.
+- 미해결/권고: WP 일 25건은 GitHub cron 불안정으로 구조적으로 미달 가능 → 외부 트리거(무료 cron 서비스로 workflow_dispatch 호출) 또는 하루 1회 전체 matrix dispatch 필요; 자동글 품질(SEO<70 초안·얇은 본문)은 애드센스 기준 미달 → 4-agent 품질 게이트(≥70) 안정화 후 활성화; youtube-health-shopping-daily는 예약 실행 기록 없음(수동만) — 11시 이후 자연 실행 확인 필요; 4-agent budget guard가 "$80/월" 가상 비용을 기록(유료 금지 원칙 확인 필요).
