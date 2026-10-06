@@ -1,1 +1,1 @@
-{"day": "2026-10-06", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-06-wp_krealestate-0abed295", "claimed_at": "2026-10-06T07:35:13.954279+09:00", "run_id": 37383452763, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-06", "status": "PUBLISHED", "public_url": "https://krealestate365.com/evaluation-of-heating-infrastructure-and-deposit-protection-mechanisms-for-foreign-residents-in-korea/", "published_at": "2026-10-05T22:38:35Z"}
