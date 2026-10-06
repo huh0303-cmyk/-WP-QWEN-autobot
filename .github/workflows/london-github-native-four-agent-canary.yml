@@ -1,6 +1,12 @@
 name: "London — GitHub Native 4-Agent Canary (no n8n/VPS)"
 
 on:
+  push:
+    paths:
+      - ".github/workflows/london-github-native-four-agent-canary.yml"
+      - "scripts/london_four_agent_pipeline.py"
+      - "scripts/auto_write_and_draft.py"
+      - "scripts/economy_text.py"
   workflow_dispatch:
     inputs:
       site_id:
