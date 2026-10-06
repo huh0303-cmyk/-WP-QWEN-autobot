@@ -68,7 +68,7 @@ def search(query: str, used: set[str]):
                 alt = p.get("alt", "")
                 if pid in used or p.get("width", 0) < 1000:
                     continue
-                if alt and not B._relevant(query, alt) and not SENSITIVE.search(alt) is None:
+                if alt and not B._relevant(query, alt):
                     continue
                 if SENSITIVE.search(alt or ""):
                     continue
