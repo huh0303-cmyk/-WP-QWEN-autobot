@@ -997,3 +997,10 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - hPanel에 CNAME `job` → ghs.google.com (TTL 14400) 추가, 공개 DNS 조회로 반영 확인(Google DNS 응답). Blogger 맞춤도메인 연결(K-Medical Job Center, blog 3205814823967421343)은 화면 멈춤으로 미완 — 보류.
 - 확장 보류 사유: 같은 도메인 GSC 색인 1/미색인 947(docs KHEALTH365_INDEX_FINDINGS_*), 28일 노출 0. 색인 안 되는 도메인에 하위도메인을 더 붙이는 건 득이 불분명 → 사용자 결정 대기.
 - 확인(오늘): robots/noindex/canonical/사이트맵 정상, 글 323(사이트맵 284 + 리다이렉트 40 제외), Googlebot UA 200. 구 k-health365.blogspot.com은 여전히 공개·자동발행 중(영문+한글 혼재, 13건) → WP와 주제 중복 가능성(미검증).
+
+## 24. k-health365 하위도메인 확장 실행 + GSC 점검 (2026-10-06 22시대, 사용자 승인)
+- GSC(sc-domain k-health365.com, 사용자 로그인 크롬): 직접 조치 없음, 보안 문제 없음. 90일 실적 클릭 1·노출 9. 색인 1/미색인 947(페이지 색인 보고서 최종 갱신 9/21): noindex 제외 471=전부 /tag/ 페이지(의도된 것), 크롤링됨-미색인 217=건강 본문(YMYL), 발견됨-미색인 192, 404 57. 사이트맵: sitemap_index 발견 0, post-sitemap.xml(구)은 202. glow/skin 사이트맵 읽힘(9/12).
+- Hostinger hPanel DNS에 CNAME 추가(→ghs.google.com, TTL 14400): job, medical, lab, beauty. 공개 DNS(dns.google)로 6개(skin,glow 포함) 모두 ghs.google.com 확인.
+- Blogger 맞춤 도메인 저장 완료("설정 업데이트됨"/표시 확인): job→K-Medical Job Center(3205814823967421343), medical→koreamedicaltour365(270775542645307723), lab→K-Health365 연구소(8294304371132383961), beauty→oliveyoungkorea(473506254375374117, HTTPS 상태 '요청되지 않음').
+- 미검증: 4개 주소 실제 접속(job은 크롬에서 오류 페이지 — 인증서 발급 대기로 추정). 도메인 리디렉션(구 blogspot→새 주소) 토글은 꺼짐 상태 유지. 광고 코드/ads.txt가 새 주소에서도 나오는지 미확인.
+- 주의(실수 기록): beauty 설정 중 '블로그 주소' 대화상자가 먼저 열렸으나 취소해 변경 없음(oliveyoungkorea.blogspot.com 그대로).
