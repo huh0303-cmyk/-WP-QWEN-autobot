@@ -40,7 +40,7 @@ FINAL_25 = [
     (21, "기타", "topik", "seoul_topik1"),
     (22, "기타", "health_jp", "Health_Clinic_Japan"),
     (23, "기타", "health_usa", "health_clinic_USA"),
-    (24, "기타", "shopping1", "rosiespicks"),
+    (24, "기타", "shopping1", "jisoopicks"),
     (25, "기타", "shopping2", "sis_languagecenter"),
 ]
 
