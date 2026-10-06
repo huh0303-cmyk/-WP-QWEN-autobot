@@ -305,6 +305,15 @@ def generate_draft(job: dict) -> dict:
             generated_url = host_permanently(generated_url, asset_key=job["job_id"])
         except (RuntimeError, KeyError):
             generated_url = None
+    if not generated_url:
+        # 2026-10-06 Chairman: every post gets an image. Free chain (Pexels/Pixabay/Wikimedia/Openverse/AI) then a generated topic card.
+        try:
+            from image_guarantee import ensure_image
+            guaranteed = ensure_image(draft["title"], queries=[draft.get("image_prompt", ""), draft["title"], draft["category"]],
+                                      theme=draft["category"], asset_key=job["job_id"])
+            generated_url = guaranteed.get("url") or None
+        except Exception as exc:  # noqa: BLE001
+            print(f"image guarantee failed: {type(exc).__name__}")
     from stock_image_provider import credit_html, contains_public_photo_credit
     draft["body_html"] += credit_html(generated_url)
     if contains_public_photo_credit(draft["body_html"]):

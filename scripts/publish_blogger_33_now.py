@@ -181,7 +181,11 @@ def main() -> int:
                         hint = "\nIMPORTANT: return one valid JSON object only, no commentary, and follow every structure rule."
             try:  # free image chain; failure must never block publication
                 found = pick_image(image_subject or site['theme'], alternates=[site['theme']])
-                if found:
+                if not found:  # Chairman 2026-10-06: never publish without an image
+                    from image_guarantee import ensure_image
+                    found = ensure_image(title, queries=[image_subject or site['theme'], title], theme=site['theme'],
+                                         asset_key=f"blogger-{site['key']}")
+                if found and found.get("url"):
                     body = insert_image(body, found, title)
             except Exception as exc:
                 print(f"image step skipped: {type(exc).__name__}")

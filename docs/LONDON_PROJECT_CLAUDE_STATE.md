@@ -979,3 +979,9 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 조치(작은 변경): floor `--max-dispatch` 2→8 (daily-publication-floor.yml). 미검증: 다음 예약 실행 시 실제 증가 여부.
 - 미해결/권고: WP 일 25건은 GitHub cron 불안정으로 구조적으로 미달 가능 → 외부 트리거(무료 cron 서비스로 workflow_dispatch 호출) 또는 하루 1회 전체 matrix dispatch 필요; 자동글 품질(SEO<70 초안·얇은 본문)은 애드센스 기준 미달 → 4-agent 품질 게이트(≥70) 안정화 후 활성화; youtube-health-shopping-daily는 예약 실행 기록 없음(수동만) — 11시 이후 자연 실행 확인 필요; 4-agent budget guard가 "$80/월" 가상 비용을 기록(유료 금지 원칙 확인 필요).
 - 20차 추가 (2026-10-06 19:40~19:42 KST, Chairman 지시 "로그인돼 있으니 글 써줘"): Claude in Chrome으로 티스토리 한국보험정보(k-insight-vietnam) 2편 공개 발행 — id 48 「보험금 청구 5단계…」(카테고리 정부 지원 의료비·청구, 출처 KB손해보험·DB손해보험), id 49 「한글날 사흘 주말 해외여행 전, 여행자보험…」(핫키워드, 카테고리 자동차·화재·생활보험 비교, 출처 재경일보·dallyeok·DB손해보험). 확인: manage/posts.json visibility=PUBLIC, RSS 반영. 직전 이 블로그 마지막 발행은 09-29(id 47) → 티스토리 자동 발행(로컬 registrar 단계)이 9/29 이후 사실상 중단. 티스토리 워크플로의 "success"는 초안 생성·시트 대기열 등록까지이며 공개 발행 증거가 아님(정정). 미실시: 나머지 티스토리 4곳, 네이버 3곳.
+
+## 2026-10-06 KST — 21차: 이미지 필수 + 무료 폴백 체인 (Chairman 지시: "이미지 빠졌을 때 폴백 1·2·3 모두 무료로 반드시 넣어라")
+- 신규 `scripts/image_guarantee.py::ensure_image()` — 절대 None 반환 안 함. 순서: ① Pexels ② Pixabay ③ Wikimedia(Commons CC0/PD) [blogger_free_image.pick_image: 관련성 검사·사진ID 중복 금지] ④ Openverse(CC0/PDM, 키 불필요) ⑤ Pollinations 무료 AI ⑥ 주제·카테고리 문구를 담은 생성 카드(Pillow+Noto CJK, 실패 불가). 유료 API 미사용.
+- 적용: 티스토리 `tistory_writer.py`(이미지 없으면 MEDIA_REQUIRED로 막던 것 → 체인 실행), Blogger `publish_blogger_33_now.py`(이미지 단계 실패 시 체인), WP `autopost_mega.py`(기존 "이미지 없이 발행" → 체인; 카드는 WP 미디어로 업로드). 카드 영구보관용 `stable_image_hosting.host_bytes()` 추가. 테스트 `tests/test_image_guarantee.py` 3건 통과.
+- 사고 기록: 오늘 Chrome으로 직접 올린 티스토리 2글(id 48·49)이 처음엔 ① 이미지 없음 ② 본문 비어 있음(에디터 setContent 후 `editor.save()` 누락)으로 공개됐고, 19:5x에 본문+이미지 재발행하여 본문 1.5k자·h2 7~8·이미지 1 확인(fetch /48,/49). 교훈: 수동 발행 후 공개 URL 본문 길이·이미지 수 검증 필수.
+- 미검증: 3개 경로의 실제 예약 실행에서 폴백 동작(로컬 단위테스트만), Actions 러너 CJK 폰트 존재(없으면 카드 글자 깨짐 — 필요 시 fonts-noto-cjk 설치 단계 추가).

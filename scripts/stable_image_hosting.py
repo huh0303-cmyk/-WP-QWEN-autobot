@@ -73,3 +73,27 @@ def host_permanently(url: str, *, asset_key: str, folder: str = "tistory_images"
             return stable_url
         time.sleep(2 ** attempt)
     raise RuntimeError(f"stable asset did not verify after upload: {evidence}")
+
+
+def host_bytes(data: bytes, *, asset_key: str, folder: str = "generated_cards", ext: str = ".png") -> str:
+    """Commit raw image bytes under assets/<folder>/ and return a verified stable URL (same contract as host_permanently)."""
+    repo = os.environ["GITHUB_REPOSITORY"]
+    token = os.environ["GH_ASSET_TOKEN"]
+    digest = hashlib.sha256(data).hexdigest()[:16]
+    path = f"assets/{folder}/{asset_key}-{digest}{ext}"
+    api = f"https://api.github.com/repos/{repo}/contents/{path}"
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
+    existing = requests.get(api, headers=headers, params={"ref": "main"}, timeout=30)
+    stable_url = f"https://raw.githubusercontent.com/{repo}/main/{path}"
+    if existing.status_code != 200:
+        response = requests.put(api, headers=headers, json={
+            "message": f"assets: host generated image {asset_key} [skip ci]",
+            "content": base64.b64encode(data).decode(), "branch": "main"}, timeout=60)
+        response.raise_for_status()
+    evidence = {}
+    for attempt in range(5):
+        ok, evidence = _image_ok(stable_url)
+        if ok:
+            return stable_url
+        time.sleep(2 ** attempt)
+    raise RuntimeError(f"stable asset did not verify after upload: {evidence}")
