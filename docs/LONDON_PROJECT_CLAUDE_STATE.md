@@ -962,3 +962,11 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 ## 2026-10-06 KST — 18차: VPS → GitHub 이전 검토 (Chairman 질문: "VPS 꼭 필요한가, GitHub/무료로 옮길 수 있나")
 - 실측(워크플로 `vps-inventory.yml`, 실행 37425585836, 이름·용량만 조회, 비밀값 미조회): 실행 서비스 = control center(control/blog/sns.korea365.org), n8n(docker), ollama(docker), operations worker, WP publisher, YouTube worker, lpc-console + noVNC/x11vnc/xvfb(원격 로그인용). 타이머 = blogger33(일 단위 동적 타이머), daily-52-plan, free-article-supplier, playlist-v3, account-schedule, publication-evidence, channel-metrics, youtube-scheduler, youtube-calendar-roll. 디스크 55/96GB, /opt/korea365 12GB(과거 영상 산출물·백업이 대부분). /etc/korea365에 런타임 비밀 파일 10여 개(값은 조회 안 함).
 - 결정 대기: Chairman 승인 후 단계적 이전(1 발행·지표 타이머 → 2 YouTube 큐 → 3 대시보드 정적화/무료 호스팅 → 4 VPS 종료). VPS 만료 2026-11-06, 자동 갱신 켜짐. 이중 발행 방지를 위해 병행 기간에는 VPS 타이머를 먼저 끄지 않음.
+
+## 2026-10-06 KST — 19차: 발행글 품질 스캔 + 검색 기반 리라이트 (task: claude-quality-research-rewrite-2026-10-06)
+- 스캔(`scripts/quality_scan_v3.py`): 클리셰·출처·수치·h2·게이트 점수. 약한 비뉴스 글 146건 추출(data/rewrite_candidates_2026-10-06.json). 자동 검색(DDG 차단·Bing 부정확)은 품질 미달 → Claude WebSearch/WebFetch 서브에이전트 10개로 대체(배치 data/rewrites/batch_NN.json).
+- 서브에이전트가 글당 2개 이상 실제 열람 출처로 900~1,300단어 영어/한국어 글 작성(출처 목록 포함, 수치는 열람 문서에서만). 출처 확보 못한 15건은 `.skip`(날조 방지): wp_kcrypto365-2283, wp_kieca-1215/1211, wp_koreawedding-148, wp_jobkorea365-1206, wp_ktrip365-4768, wp_kworld365-899/897/893, wp_medicaltour-976/977, blogger_kstudy365-8050375274498781344/6458245838839175285 등.
+- 결정론 검증+적용(`scripts/apply_rewrites_v3.py`, `apply-rewrites-v3.yml`): h2≥4, 길이, 외부 출처 링크≥2, 마지막 h2=Sources, 클리셰/1인칭/페르소나/img/h1 금지, 한국 관련성. 133건 중 131건 통과, blogger_ktech365-582239826443398072(Matter 표준, 한국 무관)는 제외·파일 삭제. 기존 첫 이미지(figure)는 유지, 구 본문 백업 artifacts/rewrite_backups(실행 37440652454 아티팩트).
+- 증거: 실행 37440652454 성공 — 131건 전부 `rewritten`(HTTP OK), 실패 0.
+- 미검증/주의: 일부 글은 출처가 Wikipedia·2차 사이트(SeoulStart, ChemLinked 등) 의존 — 본문에 "공식 기관 확인" 안내 포함. 정부 사이트(HiKorea 등) 다수 접속 차단으로 1차 출처 부족. 적용 후 품질 재스캔(quality-scan-v3) 결과 확인 필요. 라이브 페이지 렌더링 직접 확인 안 함.
+- 후속 후보: 점수 70~80 중 출처 없는 글, WP 반복 소제목(FAQ/Key takeaways) 템플릿, 스킵 15건(1차 출처 확보 시).
