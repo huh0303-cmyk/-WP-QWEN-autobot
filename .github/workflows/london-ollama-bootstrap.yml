@@ -1,10 +1,7 @@
 name: London Ollama Bootstrap
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/london-ollama-bootstrap.yml'
+  # VPS migration: legacy manual recovery only.
   workflow_dispatch:
 
 permissions:
