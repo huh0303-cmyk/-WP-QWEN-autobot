@@ -1,9 +1,7 @@
 name: "EMERGENCY VPS ACCESS KEY"
 
 on:
-  push:
-    paths:
-      - ".github/workflows/emergency-vps-access-key.yml"
+  # VPS migration: legacy manual recovery only.
   workflow_dispatch:
 
 permissions:
