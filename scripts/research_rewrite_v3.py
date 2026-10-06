@@ -133,6 +133,7 @@ def gather(title, host, old_text=""):
         cands += wiki(qs[0])[:2]
     except Exception:  # noqa: BLE001
         pass
+    print("   queries:", qs, "| raw candidates:", [urlparse(c[1]).netloc for c in cands][:12], flush=True)
     cands = [c for c in cands if GOOD.search(c[1])]
     cands.sort(key=lambda x: (0 if re.search(r"\.go\.kr|\.gov|korea\.net|hikorea|nhis|nts\.go|kosis|studyinkorea|visitkorea", x[1], re.I) else 1))
     for ttl, url in cands:
@@ -143,7 +144,9 @@ def gather(title, host, old_text=""):
             pt = page_text(url)
         except Exception:  # noqa: BLE001
             pt = None
-        if pt and re.search(r"korea|한국", pt[1] + pt[0] + url, re.I) and len(terms(pt[0] + " " + pt[1]) & qterms) >= 3:
+        ok = bool(pt) and bool(re.search(r"korea|한국", pt[1] + pt[0] + url, re.I)) and len(terms(pt[0] + " " + pt[1]) & qterms) >= 3
+        print("   cand", d, "text" if pt else "no-text", "overlap", len(terms(pt[0] + " " + pt[1]) & qterms) if pt else 0, "OK" if ok else "drop", flush=True)
+        if ok:
             seen.add(d); ev.append({"title": pt[0], "url": url, "text": pt[1]})
         if len(ev) >= 4:
             break
