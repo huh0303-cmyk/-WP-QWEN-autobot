@@ -16,6 +16,7 @@ APPLY = os.environ.get("APPLY_CHANGES", "false").lower() == "true"
 ONLY = {x.strip() for x in os.environ.get("ONLY_SITES", "").split(",") if x.strip()}
 WP_USER = "huh0303@gmail.com"
 ATTRIB = re.compile(r"보도에 따르면|according to|reported by|에 따르면", re.I)
+FLAG = re.compile(r"전문의|의학박사|임상 경력|SEO 전문|AF Themes|Dynamic World of WordPress", re.I)  # fabricated-credential / off-topic: report, never polish
 OUT = Path("artifacts/opening_backups"); OUT.mkdir(parents=True, exist_ok=True)
 NUM = re.compile(r"\d[\d,.]*")
 
@@ -34,7 +35,7 @@ def groups(data):
     for g in list(ex.values()) + [v for v in pf.values() if len(v) >= 3]:
         if len(g) < (2 if g in ex.values() else 3): continue
         for r in g[1:]:
-            if ATTRIB.search(r["opening"]): continue
+            if ATTRIB.search(r["opening"]) or FLAG.search(r["opening"]): continue
             targets[(r.get("site_key"), r["id"])] = r
     return targets
 
