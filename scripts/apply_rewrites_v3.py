@@ -81,7 +81,12 @@ def main():
                 old = requests.get(u, auth=auth, params={"context": "edit"}, timeout=30).json()["content"]["raw"]
             (BAK / f"{key}.html").write_text(old, encoding="utf-8")
             final = (first_figure(old) + "\n" + new).strip()
-            rr = requests.patch(u, headers=H, json={"content": final}, timeout=60) if site.startswith("blogger_") else requests.post(u, auth=auth, json={"content": final}, timeout=60)
+            payload = {"content": final}
+            mf = RW / f"{key}.meta.json"
+            if mf.exists() and site.startswith("blogger_"):
+                meta = json.loads(mf.read_text(encoding="utf-8"))
+                payload.update({k: meta[k] for k in ("title", "labels") if k in meta})
+            rr = requests.patch(u, headers=H, json=payload, timeout=60) if site.startswith("blogger_") else requests.post(u, auth=auth, json={"content": final}, timeout=60)
             rec["status"] = "rewritten" if rr.ok else f"failed {rr.status_code}"
         except Exception as e:  # noqa: BLE001
             rec["status"] = f"error {type(e).__name__}: {str(e)[:100]}"

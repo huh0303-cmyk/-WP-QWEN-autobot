@@ -31,7 +31,7 @@ def load_sites() -> list[dict]:
     sites = [{
         "key": p["site_key"], "id": str(p["blogspot"]["destination_id"]),
         "url": p["blogspot"]["url"], "language": p["language"],
-        "theme": p["wordpress"]["theme"], "persona": p["blogspot"]["persona"],
+        "theme": p["blogspot"].get("theme") or p["wordpress"]["theme"], "persona": p["blogspot"]["persona"],
         "tone": p["blogspot"]["tone"],
     } for p in profiles if p["blogspot"].get("ready_for_automation")]
     if len(sites) != 33 or len({s["id"] for s in sites}) != 33 or len({s["url"].rstrip('/').lower() for s in sites}) != 33:
@@ -63,6 +63,13 @@ def strip_hangul_parentheticals(text: str) -> str:
 
 
 def generate(site: dict, hint: str = "") -> tuple[str, str, list[str], str, str]:
+    if str(site["language"]).lower().startswith("ko"):
+        lang_rule = ("반드시 한국어로만 작성하세요. 제목·본문·소제목·라벨 전부 한글이어야 하며 영어 문장은 절대 쓰지 않습니다 "
+                     "(고유명사·약어만 예외). 본문 분량은 한글 2400~3500자. 영어로 쓰면 폐기됩니다. "
+                     "image_subject 만 영어 단어 2~5개로 씁니다.")
+    else:
+        lang_rule = ("English: 1400-1800 words (never fewer than 1200; count them). For English articles use Latin script only: "
+                     "write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.")
     prompt = f"""Write one original evergreen article for {site['url']}.
 Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
@@ -70,8 +77,7 @@ Language: {site['language']}. Return JSON only with title, content_html, labels,
 Cautious source-aware wording and no invented facts.
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
-English: 1400-1800 words (never fewer than 1200; count them). Korean: 2400-3500 characters.
-For English articles use Latin script only: write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.
+{lang_rule}
 Provide 1-3 short, highly relevant labels only.{hint}"""
     raw = blogger_generate_with_fallback(prompt, temperature=0.5).strip()
     try:
@@ -93,6 +99,11 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
     if str(site["language"]).lower().startswith("en"):
         title, body = strip_hangul_parentheticals(title), strip_hangul_parentheticals(body)
         labels = [strip_hangul_parentheticals(x) for x in labels]
+    if str(site["language"]).lower().startswith("ko"):
+        import re as _r2
+        _t = _r2.sub(r"<[^>]+>", "", body)
+        if len(_r2.findall(r"[가-힣]", _t)) < 0.5 * max(1, len(_r2.findall(r"[A-Za-z가-힣]", _t))) or not _r2.search(r"[가-힣]", title):
+            raise RuntimeError("language mismatch: Korean site produced non-Korean output")
     if not title or len(body) < 1500 or not (1 <= len(labels) <= 3):
         raise RuntimeError("Gemini Flash output failed quality gate")
     issues = structure_issues(body, site["theme"], site["language"])

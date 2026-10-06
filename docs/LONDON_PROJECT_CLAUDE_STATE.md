@@ -985,3 +985,9 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 적용: 티스토리 `tistory_writer.py`(이미지 없으면 MEDIA_REQUIRED로 막던 것 → 체인 실행), Blogger `publish_blogger_33_now.py`(이미지 단계 실패 시 체인), WP `autopost_mega.py`(기존 "이미지 없이 발행" → 체인; 카드는 WP 미디어로 업로드). 카드 영구보관용 `stable_image_hosting.host_bytes()` 추가. 테스트 `tests/test_image_guarantee.py` 3건 통과.
 - 사고 기록: 오늘 Chrome으로 직접 올린 티스토리 2글(id 48·49)이 처음엔 ① 이미지 없음 ② 본문 비어 있음(에디터 setContent 후 `editor.save()` 누락)으로 공개됐고, 19:5x에 본문+이미지 재발행하여 본문 1.5k자·h2 7~8·이미지 1 확인(fetch /48,/49). 교훈: 수동 발행 후 공개 URL 본문 길이·이미지 수 검증 필수.
 - 미검증: 3개 경로의 실제 예약 실행에서 폴백 동작(로컬 단위테스트만), Actions 러너 CJK 폰트 존재(없으면 카드 글자 깨짐 — 필요 시 fonts-noto-cjk 설치 단계 추가).
+
+## 22. 한국생활지원정보 Blogspot 한글 전환 (2026-10-06)
+- 원인: Blogger 프롬프트가 영어 위주(언어 규칙이 영어 단어수·Latin-only만 안내)라 ko 사이트(korea_life_support365)에서 영어 글 4건(10/04~10/06) 생성됨.
+- 수정: publish_blogger_33_now.py — ko 사이트는 "한국어로만" 명시 규칙 + 한글 비율 검사(미달 시 재시도/폐기), blogspot.theme 오버라이드 지원. content_engine_profiles.json에 해당 사이트 theme을 "한국 생활 정보·검색량 많은 한국 이야기(한국어)"로 확장.
+- 기존 영어 4건: data/rewrites/blogger_korea_life_support365-*.html(+ .meta.json 제목·라벨)로 한글 신규 작성(자체 사실 검증 가능한 공식 출처만). apply_rewrites_v3.py가 meta의 title/labels도 반영하도록 확장.
+- 검증 전: 적용 워크플로 실행 후 공개 URL 본문 한글 비율로 확인 필요.

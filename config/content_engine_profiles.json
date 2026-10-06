@@ -1169,7 +1169,8 @@
         "image_models": [
           "bytedance/sdxl-lightning-4step",
           "black-forest-labs/flux-schnell"
-        ]
+        ],
+        "theme": "한국 생활 정보와 검색량 많은 한국 이야기(정부지원금·혜택, 생활 꿀팁, 이슈·트렌드, 잡다한 한국 소식)를 한국어로 다룸"
       }
     },
     {
