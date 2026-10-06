@@ -1,0 +1,33 @@
+name: "EMERGENCY VPS ACCESS KEY"
+
+on:
+  push:
+    paths:
+      - ".github/workflows/emergency-vps-access-key.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install-key:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Install local recovery public key
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            PUB='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEGvt4rSZQ4t2zm9Yf5nK9DcupDtVTPm93VFfvvNDcY7 huh03@ChrisHUH'
+            mkdir -p "$HOME/.ssh"
+            chmod 700 "$HOME/.ssh"
+            touch "$HOME/.ssh/authorized_keys"
+            chmod 600 "$HOME/.ssh/authorized_keys"
+            grep -qxF "$PUB" "$HOME/.ssh/authorized_keys" || printf '%s\n' "$PUB" >> "$HOME/.ssh/authorized_keys"
+            echo "RECOVERY_KEY_INSTALLED"
+            echo "RECOVERY_USER=$(id -un)"
