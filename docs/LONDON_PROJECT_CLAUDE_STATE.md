@@ -991,3 +991,9 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 수정: publish_blogger_33_now.py — ko 사이트는 "한국어로만" 명시 규칙 + 한글 비율 검사(미달 시 재시도/폐기), blogspot.theme 오버라이드 지원. content_engine_profiles.json에 해당 사이트 theme을 "한국 생활 정보·검색량 많은 한국 이야기(한국어)"로 확장.
 - 기존 영어 4건: data/rewrites/blogger_korea_life_support365-*.html(+ .meta.json 제목·라벨)로 한글 신규 작성(자체 사실 검증 가능한 공식 출처만). apply_rewrites_v3.py가 meta의 title/labels도 반영하도록 확장.
 - 검증 전: 적용 워크플로 실행 후 공개 URL 본문 한글 비율로 확인 필요.
+
+## 23. k-health365 하위도메인 확장 검토 + 색인 원인 점검 (2026-10-06 밤)
+- k-health365.com 등록기관·네임서버 = Hostinger(RDAP: HOSTINGER operations, NS1/2.DNS-PARKING.COM). 가비아 계정(dns.gabia.com)에는 이 도메인 없음(검색 "보유 도메인이 존재하지 않습니다"). DNS는 hPanel에서 관리.
+- hPanel에 CNAME `job` → ghs.google.com (TTL 14400) 추가, 공개 DNS 조회로 반영 확인(Google DNS 응답). Blogger 맞춤도메인 연결(K-Medical Job Center, blog 3205814823967421343)은 화면 멈춤으로 미완 — 보류.
+- 확장 보류 사유: 같은 도메인 GSC 색인 1/미색인 947(docs KHEALTH365_INDEX_FINDINGS_*), 28일 노출 0. 색인 안 되는 도메인에 하위도메인을 더 붙이는 건 득이 불분명 → 사용자 결정 대기.
+- 확인(오늘): robots/noindex/canonical/사이트맵 정상, 글 323(사이트맵 284 + 리다이렉트 40 제외), Googlebot UA 200. 구 k-health365.blogspot.com은 여전히 공개·자동발행 중(영문+한글 혼재, 13건) → WP와 주제 중복 가능성(미검증).
