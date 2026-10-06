@@ -10,6 +10,10 @@ on:
         description: Comma site ids (blank = all)
         type: string
         default: ''
+      provider:
+        description: Pexels or Pixabay
+        type: string
+        default: Pexels
       limit_per_site:
         description: Max posts per site (0 = all)
         type: string
@@ -31,6 +35,7 @@ jobs:
           APPLY_CHANGES: ${{ inputs.apply_changes }}
           ONLY_SITES: ${{ inputs.only_sites }}
           LIMIT_PER_SITE: ${{ inputs.limit_per_site }}
+          PROVIDER: ${{ inputs.provider }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
           GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}

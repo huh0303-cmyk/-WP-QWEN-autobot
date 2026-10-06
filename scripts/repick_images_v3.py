@@ -12,6 +12,8 @@ import blogger_free_image as B  # noqa: E402
 from audit_titles_images_v2 import ROOT  # noqa: E402
 
 APPLY = os.environ.get("APPLY_CHANGES", "false").lower() == "true"
+PROVIDER = os.environ.get("PROVIDER", "Pexels")
+PX = B._key("PIXABAY_KEY") or B._key("PIXABAY_API_KEY")
 log = [x for x in json.load(open(ROOT / "data/add_images_log_2026-10-06.json", encoding="utf-8")) if x.get("status") == "updated"]
 extra = ROOT / "data/add_images_log_extra.json"
 sites = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
@@ -29,12 +31,16 @@ token = None
 out, stats = [], {}
 for x in log:
     prov, pid = x["photo"].split(":")
-    if prov != "Pexels":
+    if prov != PROVIDER:
         continue
-    r = requests.get(f"https://api.pexels.com/v1/photos/{pid}", headers={"Authorization": pk}, timeout=20)
-    alt = r.json().get("alt", "") if r.ok else ""
-    if not r.ok and r.status_code == 404:
-        alt = ""
+    if prov == "Pexels":
+        r = requests.get(f"https://api.pexels.com/v1/photos/{pid}", headers={"Authorization": pk}, timeout=20)
+        alt = r.json().get("alt", "") if r.ok else ""
+    else:  # Pixabay: only tags are available
+        r = requests.get("https://pixabay.com/api/", params={"key": PX, "id": pid}, timeout=20)
+        hits = r.json().get("hits", []) if r.ok else []
+        alt = (hits[0].get("tags", "") if hits else "").replace(",", " ")
+        time.sleep(0.8)
     if M.alt_ok(alt, x["query"]):
         stats["ok"] = stats.get("ok", 0) + 1
         continue
@@ -57,7 +63,8 @@ for x in log:
             body = requests.get(u, headers=h, timeout=30).json()["content"]
             soup = BeautifulSoup(body, "html.parser"); done = False
             for img in soup.find_all("img"):
-                if pid in img.get("src", ""):
+                fg = img.find_parent("figure")
+                if pid in img.get("src", "") or (prov == "Pixabay" and fg and fg.find("figcaption") and "Pixabay" in fg.find("figcaption").get_text()):
                     img["src"] = pic["url"]
                     fig = img.find_parent("figure")
                     cp = fig.find("figcaption") if fig else None
