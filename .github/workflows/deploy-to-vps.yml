@@ -1,14 +1,10 @@
-name: "Deploy to VPS (control room + operations)"
+name: "LEGACY — VPS deployment (manual archive only)"
 
+# VPS migration: automatic triggers are intentionally removed.
+# The GitHub-native pipeline is the replacement. This legacy workflow is kept
+# only as a manual recovery reference until the migration is fully verified.
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
-  workflow_run:
-    workflows:
-      - "Daily Google metrics snapshot"
-      - "CEO SNS current statistics (read-only)"
-    types: [completed]
 
 concurrency:
   group: deploy-to-vps
