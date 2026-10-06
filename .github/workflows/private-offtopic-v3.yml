@@ -1,0 +1,71 @@
+name: Set off-topic theme-promo posts private v3
+on:
+  workflow_dispatch:
+    inputs:
+      apply_changes:
+        description: Apply (false = dry run)
+        type: boolean
+        default: false
+      only_sites:
+        description: Comma site ids (blank = all)
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    environment: blogger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4 pillow
+      - env:
+          APPLY_CHANGES: ${{ inputs.apply_changes }}
+          ONLY_SITES: ${{ inputs.only_sites }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+        run: python -u scripts/private_offtopic_v3.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: offtopic-log
+          path: artifacts/
+          if-no-files-found: ignore
