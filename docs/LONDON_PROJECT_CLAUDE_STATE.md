@@ -948,3 +948,10 @@ Chairman 지시: 무료 Gemini 2–3개 + Groq 등 폴백, 글쓰기·이미지 
 - 안전장치: 업로드 전 `channels.list(mine)` = 잠금 UC ID 일치 필수, KST 하루 1건 가드(채널 업로드 목록), 건강 대본 금지어/용량(mg) 게이트 + 면책 장면 자동 추가, 쇼핑 가격/별점 금지 게이트, 업로드 후 채널·공개상태 검증(fail closed).
 - 증거: 시험 제작 4건 성공(USA 225s, JP 252s, 쇼핑 212s·232s, 1280x720 자막 번인 프레임 확인); preflight-only 3건 모두 `PREFLIGHT_OK`(3채널 정확 UC ID + 쓰기 권한 확인 — 10/01 403 상태 해소). 테스트 tests/test_channel_long_video.py 7건 통과.
 - 미검증: 실제 공개 업로드 1회(예약 실행 후 확인), 제목/썸네일 품질 반복, 어필리에이트 ID(BOOKING_AID/AGODA_CID/KLOOK_AID) 미설정(설정 시 링크에 자동 부착), 쇼핑 주제 11개뿐(2주 후 반복).
+
+## 2026-10-06 KST — 17차: 전 사이트(WP 25 + Blogspot 33 + 신문사) 첫 문장 반복·무이미지 감사 및 수정 (task: claude-fullsite-openings-images-2026-10-06)
+- 감사(`scripts/audit_openings_v3.py`, 읽기전용): 59개 사이트/1,533글. 이미지 없는 글 ≈1,046건(WP 대부분, Blogspot 대부분), 같은 첫 문장 6그룹/18글, 첫 5단어 동일(≥3) 21그룹/131글.
+- 이미지(`scripts/add_missing_images_v3.py`): LLM이 제목→영어 검색어, Pexels→Pixabay 무료 사진, 사진 ID 중복 금지. WP=미디어 업로드+대표이미지(featured_media), Blogger=본문 상단 figure+출처 캡션. 결과 1,043건 updated / 2건 민감주제 제외 / 1건 오류(422). 재감사: 이미지 없는 글 3건만 남음(wp_sis·wp_koreanews·blogger_kinsurance365 각 1).
+- 첫 문장(`scripts/fix_repeated_openings_v3.py`): 첫 문장만 재작성(같은 언어, 새 숫자 금지, 앞 3단어 중복 금지), 그룹당 1건 유지. 24건 updated, 8건 문장 위치 못 찾아 미수정(제목+본문 합쳐진 케이스). 백업 artifacts/opening_backups. 재감사: 동일 첫 문장 2그룹/10글, 첫 5단어 동일 13그룹/100글로 감소.
+- 의도적으로 미수정(보고 대상): ① wp_koreanews "…조선일보/동아일보 보도에 따르면" 출처 표기 시작문(출처 명시 의무) ② wp_khealth365의 "안녕하세요 20년 임상 경력 내과 전문의 ○○○입니다" 류 가상 의사/기자 페르소나(허위 자격 — YMYL·애드센스 리스크, 삭제/비공개는 Chairman 결정) ③ wp_koreanews의 AF Themes/"In the Dynamic World of WordPress" 주제 이탈 글 ≈10건.
+- 미검증: 라이브 페이지에서 이미지가 실제로 보이는지(샌드박스는 사이트 직접 접속 불가, 재감사의 이미지 개수로만 확인), 중복 이미지 재감사(진행 중), 이미지-주제 적합성 표본 검사 필요.
