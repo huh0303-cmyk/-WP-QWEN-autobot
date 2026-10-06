@@ -555,12 +555,17 @@ def main() -> int:
     ap.add_argument("--topic", default="")
     ap.add_argument("--privacy", choices=("public", "private", "unlisted"), default="private")
     ap.add_argument("--upload", action="store_true", help="upload after exact-channel verification (otherwise build only)")
+    ap.add_argument("--preflight-only", action="store_true", help="only verify the exact authenticated channel, then exit")
     ap.add_argument("--force", action="store_true", help="ignore the one-video-per-KST-day guard")
     ap.add_argument("--output-root", default=str(ROOT / "artifacts" / "long-video"))
     a = ap.parse_args()
     date = dt.date.fromisoformat(a.date)
     outdir = Path(a.output_root) / a.channel / a.date
     outdir.mkdir(parents=True, exist_ok=True)
+    if a.preflight_only:
+        preflight(a.channel)
+        print(f"PREFLIGHT_OK {a.channel}: authenticated channel equals locked {CHANNELS[a.channel]['channel_id']}")
+        return 0
     svc = None
     if a.upload:
         svc, uploads = preflight(a.channel)  # exact channel + write access before spending any time rendering

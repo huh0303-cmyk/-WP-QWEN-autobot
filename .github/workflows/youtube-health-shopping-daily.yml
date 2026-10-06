@@ -32,6 +32,11 @@ on:
         default: private
         type: choice
         options: [private, unlisted, public]
+      preflight_only:
+        description: Only verify the exact channel / write access (no script, no render, no upload)
+        required: true
+        default: false
+        type: boolean
       force:
         description: Ignore the one-video-per-KST-day guard
         required: true
@@ -99,6 +104,7 @@ jobs:
             ARGS="--channel $INPUT_CHANNEL"
             [ "${{ inputs.upload }}" = "true" ] && ARGS="$ARGS --upload --privacy ${{ inputs.privacy }}"
             [ "${{ inputs.force }}" = "true" ] && ARGS="$ARGS --force"
+            [ "${{ inputs.preflight_only }}" = "true" ] && ARGS="$ARGS --preflight-only"
             [ -n "${{ inputs.topic }}" ] && ARGS="$ARGS --topic ${{ inputs.topic }}"
             echo "args=$ARGS" >> "$GITHUB_OUTPUT"
             CH="$INPUT_CHANNEL"
