@@ -1,0 +1,130 @@
+name: "London — GitHub Native WP Canary (VPS-free)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "One WordPress site to test"
+        required: true
+        default: "k-trip365.com"
+        type: string
+      publish:
+        description: "Public publish only after explicit approval"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: london-github-native-wp-canary
+  cancel-in-progress: false
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml Pillow google-api-python-client google-auth google-genai -q
+
+      - name: Validate selected target
+        env:
+          TARGET_SITE_URL: https://${{ inputs.site }}
+        run: |
+          python - <<'PY'
+          import os
+          allowed = {
+              "k-health365.com","koreamedicaltour.com","koreainvest365.com",
+              "ki-korea.com","koreainsurance365.com","kfinance365.com",
+              "koreataxnlaw.com","koreacrypto365.com","krealestate365.com",
+              "ktech365.com","kskin365.com","oliveyoungkorea.com","kworld365.com",
+              "k-trip365.com","k-visa365.com","koreawedding365.com","kstudy365.com",
+              "studyinkorea365.com","kieca-korea.org","ksa-korea.org","sis-korea.com",
+              "jobkorea365.com","jobinkorea365.com","jobkoreaglobal.com","korea365.org",
+          }
+          site = os.environ["TARGET_SITE_URL"].removeprefix("https://")
+          if site not in allowed:
+              raise SystemExit(f"Refusing unapproved target: {site}")
+          print(f"TARGET_OK {site}")
+          PY
+
+      - name: Run existing GitHub-native publisher
+        env:
+          TARGET_SITE_URL: https://${{ inputs.site }}
+          WP_AUTOPUBLISH_ENABLED: "true"
+          WP_POST_STATUS: ${{ inputs.publish && 'publish' || 'draft' }}
+          WP_PUBLICATION_APPROVED: ${{ inputs.publish && 'true' || 'false' }}
+          NEWSROOM_REQUIRE_PUBLICATION: "true"
+          FORCE_SOURCE_IPV4: "true"
+          RUN_SLOT: "1"
+          MAX_REGEN: "1"
+          AI_TEXT_PROVIDER: "gemini"
+          CHATGPT_SINGLE_MODEL_PIPELINE: "true"
+          OPENAI_ENABLED: "false"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          LONDON_WRITER_MODEL: "auto_free"
+          LOCAL_TEXT_FALLBACK_ENABLED: "false"
+          RUNNER_OLLAMA_BOOTSTRAP: "false"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+          OPENAI_IMAGE_ENABLED: "false"
+          PAID_IMAGE_GENERATION_ENABLED: "false"
+          GEMINI_IMAGE_GENERATION_ENABLED: "false"
+          STOCK_IMAGES_ENABLED: "true"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
+          WP_IMAGE_COUNT: "1"
+          KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+          KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+          KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+          KIKOREACOM: ${{ secrets.KIKOREACOM }}
+          KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+          KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+          KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+          KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+          KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+          KTECH365COM: ${{ secrets.KTECH365COM }}
+          KSKIN365COM: ${{ secrets.KSKIN365COM }}
+          OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+          KWORLD365COM: ${{ secrets.KWORLD365COM }}
+          KTRIP365COM: ${{ secrets.KTRIP365COM }}
+          KVISA365COM: ${{ secrets.KVISA365COM }}
+          KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+          KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+          STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+          KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+          KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+          SISKOREACOM: ${{ secrets.SISKOREACOM }}
+          JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+          JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+          JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+          KOREA365ORG: ${{ secrets.KOREA365ORG }}
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          python scripts/retry_run.py --attempts 2 --timeout 900 -- python scripts/autopost_current.py 2>&1 | tee artifacts/github-native-wp-canary.log
+
+      - name: Upload canary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: london-github-native-wp-canary-${{ github.run_id }}
+          path: |
+            newsroom_publish_result.json
+            artifacts/github-native-wp-canary.log
+          if-no-files-found: warn
+          retention-days: 7
