@@ -1,9 +1,7 @@
 name: "EMERGENCY VPS INVENTORY"
 
 on:
-  push:
-    paths:
-      - ".github/workflows/emergency-vps-inventory.yml"
+  # VPS migration: legacy manual recovery only.
   workflow_dispatch:
 
 permissions:
