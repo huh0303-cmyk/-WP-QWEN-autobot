@@ -1,1 +1,1 @@
-{"day": "2026-10-06", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-06-wp_studyinkorea-990e8af3", "claimed_at": "2026-10-06T11:31:10.143761+09:00", "run_id": 37404534643, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-06", "status": "PUBLISHED", "public_url": "https://studyinkorea365.com/essential-administrative-and-budgeting-steps-for-new-international-students-at-a-korean-university/", "published_at": "2026-10-06T02:34:35Z"}
