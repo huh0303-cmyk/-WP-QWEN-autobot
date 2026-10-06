@@ -139,7 +139,7 @@ def build_prompt(channel: str, topic: dict, retry_note: str = "") -> str:
 {rules}
 Structure: a hook (1 scene), 6-9 content scenes, a short friendly closing (1 scene). 9-12 scenes in total.
 Total narration length: {lo}-{hi} {unit}. Each scene is 2-5 sentences of spoken narration (no headings, no bullet marks, no emojis, no stage directions).
-For every scene give "visual": 2-4 ENGLISH words to search stock footage (concrete, wholesome, generic: e.g. 'senior couple walking park', 'fish oil capsules', 'seoul street evening').
+For every scene give "visual": 2-4 ENGLISH words to search stock footage (concrete, wholesome, generic: e.g. 'senior couple walking park', 'fish oil capsules'; for Korea travel always name the place, e.g. 'seoul hanok village', 'myeongdong street night', 'busan haeundae beach').
 {retry_note}
 Return ONLY JSON: {{"title":"<=65 chars, specific and honest, no clickbait, no year","hook":"one sentence summary for the description",
 "tags":["5-10 short tags"],"scenes":[{{"narration":"...","visual":"..."}}]}}"""
@@ -229,7 +229,9 @@ def pixabay_photo(query: str, used: set, key: str):
     return None
 
 
-def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int):
+def fetch_media(query: str, want_video: bool, used: set, tmp: Path, idx: int, kind: str = ""):
+    if kind == "shopping" and not re.search(r"(?i)korea|seoul|busan|jeju|hanok|myeongdong|hongdae|gangnam", query):
+        query = "Korea " + query  # generic stock has no Korean context unless asked
     pk, xk = os.getenv("PEXELS_API_KEY", ""), os.getenv("PIXABAY_KEY", "") or os.getenv("PIXABAY_API_KEY", "")
     words = query.split()
     queries = [query] + ([" ".join(words[:2])] if len(words) > 2 else [])
@@ -395,7 +397,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
         audio = tmp / f"a_{i:02d}.mp3"
         asyncio.run(_tts(sc["narration"], cfg["voice"], audio))
         dur = duration(audio) + 0.45
-        media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i)
+        media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"])
         if media is None:
             card = tmp / f"card_{i:02d}.jpg"
             fallback_card(sc["visual"].title(), card, i)
@@ -425,7 +427,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     srt = outdir / "subtitles.srt"
     srt.write_text(make_srt(texts, durs, lang), encoding="utf-8")
     final = outdir / "video.mp4"
-    size = 15 if lang == "en" else 13
+    size = 18 if lang == "en" else 16
     style = (f"FontName=Noto Sans CJK JP,FontSize={size},Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,"
              f"BackColour=&H80000000,BorderStyle=1,Outline=1.6,Shadow=0.6,MarginV=22,Alignment=2")
     (tmp / "subs.srt").write_text(srt.read_text(encoding="utf-8"), encoding="utf-8")
