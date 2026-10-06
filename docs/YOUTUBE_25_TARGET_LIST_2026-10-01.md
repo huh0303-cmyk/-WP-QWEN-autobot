@@ -20,7 +20,7 @@
 | 14 | CAFE_MOZART | @cafe_mozart | UC7jOhyMa-FIrzZuea97z1Pw | 클래식·모차르트 믹스 | 기존 채널 |
 | 15 | CAFE_HEALING | @cafe_healing1 | UC7yEsLM-HoXudngrD-4FIqg | 비·바람·새소리 힐링 | 기존 채널 |
 | 16 | CAFE_STARBUCKSVIBES | @Starbucksvibes | UC_e-sbLkVgwJNYEeobolNog | 작업·공부용 재즈 플레이리스트 | 기존 채널 · OAuth ID 확인 |
-| 17 | Seoul_Jisoo1 | @rosiespicks | UCAizx0tPkRSol8sIhanN_QQ | 서울지수 쇼핑·예약·라이프스타일 | 기존 채널 · 쇼핑 전환 |
+| 17 | Seoul_Jisoo1 | @jisoopicks | UCAizx0tPkRSol8sIhanN_QQ | 서울지수 쇼핑·예약·라이프스타일 | 기존 채널 · 쇼핑 전환 |
 | 18 | HISTORY_TV_TODAY | @HISTORY_TV_TODAY | UCVBvZwodUF4s57KeNicxQ3w | 역사 속 오늘, 최근 연도부터 사건 2개 | 기존 채널 |
 | 19 | INVENTION_STORY1 | @INVENTION_STORY1 | UCgNj-yS93A_fOHXXvG49fww | 위대한 발명 역사 | 기존 채널 · 명칭 끝 `1` |
 | 20 | RETRO_USA1 | @RETRO_USA1 | UCwh49EokdWFJqYFE_zA6XDQ | 레트로 미국 아카이브 | 기존 채널 |
