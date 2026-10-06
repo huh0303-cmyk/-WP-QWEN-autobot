@@ -40,16 +40,14 @@ jobs:
           LONDON_PUBLIC_URL: ${{ inputs.public_url }}
           LONDON_GSC_DRY_RUN: ${{ inputs.dry_run }}
         run: python scripts/london_gsc_submit.py
-      - name: Copy receipt to operating server
+      - name: Store receipt in GitHub Actions
         if: always()
-        uses: appleboy/scp-action@v1
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          source: artifacts/london-gsc-receipts/*.json
-          target: /opt/korea365/data/london-gsc-receipts
-          strip_components: 2
+          name: london-gsc-receipts-${{ github.run_id }}
+          path: artifacts/london-gsc-receipts/*.json
+          if-no-files-found: warn
+          retention-days: 14
       - name: Fail if submission failed
         if: steps.submit.outcome != 'success'
         run: exit 1
