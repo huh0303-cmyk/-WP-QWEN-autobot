@@ -1,1 +1,1 @@
-{"day": "2026-10-07", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-07-wp_jobglobal-f0ef8f45", "claimed_at": "2026-10-07T15:30:35.763279+09:00", "run_id": 37581927008, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-07", "status": "PUBLISHED", "public_url": "https://jobkoreaglobal.com/expansion-of-the-e-8-seasonal-worker-quota-and-implications-for-agricultural-employer-sponsorship/", "published_at": "2026-10-07T06:35:02Z"}
