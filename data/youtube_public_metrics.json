@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-10-06T11:17:17.417349+09:00",
+  "checked_at_kst": "2026-10-07T10:29:57.801148+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -8,7 +8,7 @@
       "name": "CAFE_ROMANTIC",
       "handle": "cafe_romantic",
       "subscribers": 11,
-      "views": 2002,
+      "views": 2005,
       "videos": 38,
       "connected": true
     },
@@ -17,7 +17,7 @@
       "handle": "cafe_healing1",
       "subscribers": 13,
       "views": 496,
-      "videos": 30,
+      "videos": 31,
       "connected": true
     },
     "UC_e-sbLkVgwJNYEeobolNog": {
@@ -40,7 +40,7 @@
       "name": "CAFE_KPOP",
       "handle": "kpop_studio7",
       "subscribers": 5,
-      "views": 651,
+      "views": 700,
       "videos": 13,
       "connected": true
     },
@@ -88,8 +88,8 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5840,
-      "views": 418862,
-      "videos": 1320,
+      "views": 419504,
+      "videos": 1324,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
@@ -104,7 +104,7 @@
       "name": "Japanese Survival",
       "handle": "seoul_japanese1",
       "subscribers": 23,
-      "views": 10533,
+      "views": 10534,
       "videos": 67,
       "connected": true
     },
@@ -128,7 +128,7 @@
       "name": "Vietnamese Survival",
       "handle": "SIS_VietnameseSurvival",
       "subscribers": 3,
-      "views": 440,
+      "views": 442,
       "videos": 7,
       "connected": true
     },
@@ -137,7 +137,7 @@
       "handle": "health_clinic_USA",
       "subscribers": 0,
       "views": 4,
-      "videos": 3,
+      "videos": 4,
       "connected": true
     },
     "UCAizx0tPkRSol8sIhanN_QQ": {
@@ -145,7 +145,7 @@
       "handle": "jisoopicks",
       "subscribers": 0,
       "views": 28,
-      "videos": 6,
+      "videos": 7,
       "connected": true
     },
     "UCC_PcHMv-Uxpr00Pjw_J2Wg": {
@@ -153,14 +153,14 @@
       "handle": "Health_Clinic_Japan",
       "subscribers": 2,
       "views": 14,
-      "videos": 3,
+      "videos": 4,
       "connected": true
     },
     "UCmt8f9yUT6iTxBys8eH4-Cg": {
       "name": "French Survival",
       "handle": "SIS_FrenchSurvival",
       "subscribers": 0,
-      "views": 14,
+      "views": 15,
       "videos": 6,
       "connected": true
     },
