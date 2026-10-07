@@ -1,1 +1,1 @@
-{"day": "2026-10-07", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-07-wp_kcrypto365-06b8b79a", "claimed_at": "2026-10-07T09:38:32.498799+09:00", "run_id": 37553061238, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-07", "status": "PUBLISHED", "public_url": "https://koreacrypto365.com/regulatory-oversight-of-crypto-transfers-and-cross-platform-asset-movement-in-south-korea/", "published_at": "2026-10-07T00:41:50Z"}
