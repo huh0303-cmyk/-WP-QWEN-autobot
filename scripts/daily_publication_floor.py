@@ -48,35 +48,49 @@ def sites_for(platform):
 
 
 def public_status(site, now):
-    # WordPress fleet: use the same protected application-password channel as
-    # publishing. Public anonymous REST is frequently blocked by ModSecurity/
-    # bot rules and must not be interpreted as "no post today".
+    # WordPress fleet: prefer the same authenticated REST channel as publishing,
+    # but fall back to the public REST inventory when the site allows it.
+    # A read-only inventory failure must not suppress a due publication when
+    # the public WordPress endpoint is healthy.
     if site.get('platform') == 'wordpress':
+        base = site['url'].rstrip('/') + '/wp-json/wp/v2/posts'
         secret = os.getenv(site.get('secret_name', ''), '').strip()
-        if not secret:
-            return {'status': 'READ_ERROR', 'reason': 'credential_missing'}
         user = os.getenv('WP_USER', 'huh0303@gmail.com')
-        try:
-            response = requests.get(
-                site['url'].rstrip('/') + '/wp-json/wp/v2/posts',
-                auth=(user, secret),
-                headers={'User-Agent': 'Korea365-Control/1.0'},
-                params={'status': 'publish', 'per_page': 1, 'orderby': 'date',
-                        'order': 'desc', '_fields': 'link,date_gmt,title'},
-                timeout=15,
-            )
-            response.raise_for_status()
-            posts = response.json()
-            if not isinstance(posts, list):
-                raise ValueError('invalid WordPress post inventory')
-            result = {
-                'status': 'public_post_found' if posts else 'no_public_post_in_response',
-                'latest_url': posts[0].get('link','') if posts else '',
-                'latest_published': (posts[0].get('date_gmt','') + 'Z') if posts and posts[0].get('date_gmt') else None,
-                'latest_title': ((posts[0].get('title') or {}).get('rendered','')) if posts else '',
-            }
-        except (requests.RequestException, ValueError, TypeError):
-            return {'status': 'READ_ERROR', 'reason': 'authenticated_wp_inventory_failed'}
+        params = {
+            'status': 'publish', 'per_page': 1, 'orderby': 'date',
+            'order': 'desc', '_fields': 'id,link,date_gmt,title'
+        }
+        result = None
+        last_error = 'wordpress_inventory_failed'
+        attempts = []
+        if secret:
+            attempts.append(('authenticated', {'auth': (user, secret)}))
+        attempts.append(('public', {}))
+        for source, kwargs in attempts:
+            try:
+                response = requests.get(
+                    base,
+                    headers={'User-Agent': 'Korea365-Control/1.1'},
+                    params=params,
+                    timeout=15,
+                    **kwargs,
+                )
+                response.raise_for_status()
+                posts = response.json()
+                if not isinstance(posts, list):
+                    raise ValueError('invalid WordPress post inventory')
+                result = {
+                    'status': 'public_post_found' if posts else 'no_public_post_in_response',
+                    'latest_url': posts[0].get('link','') if posts else '',
+                    'latest_published': (posts[0].get('date_gmt','') + 'Z') if posts and posts[0].get('date_gmt') else None,
+                    'latest_title': ((posts[0].get('title') or {}).get('rendered','')) if posts else '',
+                    'inventory_source': source,
+                }
+                break
+            except (requests.RequestException, ValueError, TypeError) as exc:
+                last_error = f'{source}_inventory_failed:{type(exc).__name__}'
+        if result is None:
+            return {'status': 'READ_ERROR', 'reason': last_error}
     else:
         result = check(site)
         if result['status'] not in {'public_post_found', 'no_public_post_in_response'}:
