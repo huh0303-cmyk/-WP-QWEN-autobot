@@ -3386,7 +3386,7 @@ def process_one(site, keyword):
     begin_article()
     report_publication_progress("working", site["url"], detail="주제·출처 확인 및 글 작성·검수 중")
     url=site["url"]; lang=site["lang"]; theme=site["theme"]; mode=site["mode"]
-    quality_target = 70 if mode in ("news", "news_en") else SEO_TARGET
+    quality_target = None  # SEO score is informational only; never a publication gate.
     p=SITE_PERSONA.get(url,{}); min_chars=resolve_min_chars(url); max_chars=p.get("max_chars")
 
     reporter=pick_reporter(site)
@@ -3473,8 +3473,8 @@ def process_one(site, keyword):
             print("REWRITE_REQUIRED " + "; ".join(repeat_errors))
             prompt = base_prompt + "\nRewrite the headline and opening from the article facts.\n" + "\n".join(repeat_errors)
             continue
-        pre=estimate_seo_score(title,body,meta,tags,faq,["x"],keyword)
-        print(f"  📝 {attempt+1}회차 → SEO {pre}점")
+        pre=None
+        print(f"  📝 {attempt+1}회차 작성 완료")
 
         # A missing or too-short title can never win best_result, even with a
         # high SEO score elsewhere — this is what let outline-heading leftovers
@@ -3487,13 +3487,12 @@ def process_one(site, keyword):
             print(f"  🔍 raw 응답 앞부분: {raw[:400]!r}")
         # NEWSROOM EXCEPTION: KoreaNews365 and The Seoul Journal are never
         # selected or rejected by article length. Prefer the strongest factual/SEO draft.
-        elif pre > best_score:
-            best_score=pre; best_result=(body,title,meta,faq,tags)
+        else:
+            best_score=0; best_result=(body,title,meta,faq,tags)
 
         if mode in ("news", "news_en") and best_result is not None:
             break
-        if pre>=quality_target:
-            print(f"  ✅ {pre}점 달성"); break
+        break
 
         if attempt<MAX_REGEN:
             # 부족 항목 진단
@@ -3564,8 +3563,8 @@ def process_one(site, keyword):
         except Exception as exc:
             print(f"  ⚠️ 뉴스 메타 보완 실패: {exc}")
 
-    if best_score<quality_target and mode not in ("news", "news_en"):
-        print(f"  🔧 {best_score}점 → post-processing")
+    if mode not in ("news", "news_en"):
+        print("  🔧 post-processing")
         body,meta=postprocess(body,meta,title,keyword,lang,min_chars,generate_content_gemini)
 
     site.pop("_newsroom_real_photo", None)
@@ -3623,16 +3622,7 @@ def process_one(site, keyword):
             except Exception as exc:
                 print(f"  ⚠️ 관련 글 미리보기 실패(채점은 원문 기준으로 계속): {exc}")
 
-    score=estimate_seo_score(title,scoring_body,meta,tags,faq,images,keyword)
-    # The generic blog score does not measure newsroom-specific safeguards.
-    # Credit a story only after it has a named, linked, <=72-hour source lead;
-    # source-URL duplication was already rejected in crawl_rss_news().
-    if mode in ("news", "news_en") and news_source and news_source_url:
-        score=min(100, score + 10)
-    rank="🏆" if score>=95 else "✅" if score>=90 else "⚠️" if score>=80 else "❌"
-    print(f"  📊 SEO {score}/100 {rank}")
-
-    plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    # SEO score intentionally removed from the publication pipeline.\n    score=None\n\n    plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
@@ -3658,25 +3648,7 @@ def process_one(site, keyword):
             print(f"  ⛔ 뉴스룸 품질 게이트 실패: {reason}")
             log(url,theme,keyword,title,"",score,len(images),"⛔ skip_newsroom_gate",reason)
             return False
-    elif score < quality_target:
-        review_draft = (
-            os.getenv("WP_POST_STATUS", "publish").strip().lower() == "draft"
-            and os.getenv("WP_PUBLICATION_APPROVED", "false").strip().lower()
-                not in {"1", "true", "yes", "on"}
-        )
-        if review_draft:
-            # A private review draft must still reach the user. The quality gate
-            # blocks public publication, not draft creation/email review.
-            print(
-                f"  ⚠️ 품질점수 {score}점 < 목표 {quality_target}점 — "
-                "비공개 검토 초안으로 계속 진행"
-            )
-        else:
-            print(f"  ⛔ 품질점수 {score}점 < 목표 {quality_target}점 → 공개 발행 차단")
-            log(url,theme,keyword,title,"",score,len(images),"⛔ skip_low_seo")
-            return False
-
-    # 2026-09-03: news_source_category comes from a keyword-*search* RSS feed
+    # No SEO-score publication gate.\n\n    # 2026-09-03: news_source_category comes from a keyword-*search* RSS feed
     # (e.g. gov.uk ?keywords=sport) that does not guarantee the matched item
     # is actually about that topic — forcing it into the match string made
     # every article from that feed get mis-categorized (e.g. tagged 스포츠
