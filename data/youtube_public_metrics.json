@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-10-07T10:29:57.801148+09:00",
+  "checked_at_kst": "2026-10-08T10:52:14.048606+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -39,8 +39,8 @@
     "UCKZsfAWyCmY0jckf4IWZrqw": {
       "name": "CAFE_KPOP",
       "handle": "kpop_studio7",
-      "subscribers": 5,
-      "views": 700,
+      "subscribers": 6,
+      "views": 756,
       "videos": 13,
       "connected": true
     },
@@ -56,7 +56,7 @@
       "name": "HISTORY_TV_TODAY",
       "handle": "HISTORY_TV_TODAY",
       "subscribers": 2,
-      "views": 29,
+      "views": 30,
       "videos": 8,
       "connected": true
     },
@@ -72,7 +72,7 @@
       "name": "SILENT_ERA_FILM",
       "handle": "OLD_HOLLYWOOD1",
       "subscribers": 1,
-      "views": 28,
+      "views": 29,
       "videos": 6,
       "connected": true
     },
@@ -88,48 +88,48 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5840,
-      "views": 419504,
-      "videos": 1324,
+      "views": 419938,
+      "videos": 1326,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
       "name": "English Survival",
       "handle": "English_survival",
-      "subscribers": 10,
-      "views": 3796,
-      "videos": 29,
+      "subscribers": 11,
+      "views": 3844,
+      "videos": 30,
       "connected": true
     },
     "UCOWoNH_d6p45ywQ6W0Z1Jng": {
       "name": "Japanese Survival",
       "handle": "seoul_japanese1",
-      "subscribers": 23,
-      "views": 10534,
-      "videos": 67,
+      "subscribers": 22,
+      "views": 10640,
+      "videos": 68,
       "connected": true
     },
     "UCGTd7RhfaUaGGbVRsNPUN6Q": {
       "name": "Chinese Survival",
       "handle": "SIS_ChineseSurvival",
       "subscribers": 2,
-      "views": 424,
-      "videos": 5,
+      "views": 585,
+      "videos": 6,
       "connected": true
     },
     "UCKvKhETLGPaRV3qfWv2bM2g": {
       "name": "Portuguese Survival",
       "handle": "Portuguese_survival",
       "subscribers": 3,
-      "views": 271,
-      "videos": 8,
+      "views": 337,
+      "videos": 9,
       "connected": true
     },
     "UCRZ0uc_bxKDMwz3noBBi9KQ": {
       "name": "Vietnamese Survival",
       "handle": "SIS_VietnameseSurvival",
       "subscribers": 3,
-      "views": 442,
-      "videos": 7,
+      "views": 459,
+      "videos": 8,
       "connected": true
     },
     "UC91BpNSb4nUwD6jrpthK7FQ": {
@@ -137,7 +137,7 @@
       "handle": "health_clinic_USA",
       "subscribers": 0,
       "views": 4,
-      "videos": 4,
+      "videos": 5,
       "connected": true
     },
     "UCAizx0tPkRSol8sIhanN_QQ": {
@@ -153,7 +153,7 @@
       "handle": "Health_Clinic_Japan",
       "subscribers": 2,
       "views": 14,
-      "videos": 4,
+      "videos": 5,
       "connected": true
     },
     "UCmt8f9yUT6iTxBys8eH4-Cg": {
@@ -161,31 +161,31 @@
       "handle": "SIS_FrenchSurvival",
       "subscribers": 0,
       "views": 15,
-      "videos": 6,
+      "videos": 7,
       "connected": true
     },
     "UCKF98zgzm7YRWlyMaoJJKIQ": {
       "name": "German Survival",
       "handle": "SIS_GermanSurvival",
       "subscribers": 3,
-      "views": 298,
-      "videos": 4,
+      "views": 345,
+      "videos": 5,
       "connected": true
     },
     "UC9mvVEdL9Tllkit5v2Qv8UQ": {
       "name": "Spanish Survival",
       "handle": "SIS_SpanishSurvival",
       "subscribers": 0,
-      "views": 4,
-      "videos": 5,
+      "views": 82,
+      "videos": 6,
       "connected": true
     },
     "UCK8B-BM09Cz-ockaQYLL5LA": {
       "name": "Italian Survival",
       "handle": "SIS_ItalianSurvival",
       "subscribers": 0,
-      "views": 309,
-      "videos": 4,
+      "views": 334,
+      "videos": 5,
       "connected": true
     }
   }
