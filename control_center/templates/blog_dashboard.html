@@ -53,11 +53,11 @@
 <section class="hero">
 <div>
 <h1>블로그 발행</h1>
-<p>선택한 목적지의 실행은 n8n 4-Agent로 주제 → 글쓰기 → 이미지 → 발행·검증 순서로 진행합니다. 정기 예약 경로까지 모두 통합됐다는 뜻은 아닙니다.</p>
+<p>WP25 + Blogspot33은 Google Search Console(GSC) 클릭수 하나의 동일 기준으로 순위를 계산합니다. 방문자 위젯·자체 방문자 API는 이 순위에서 제외합니다.</p>
 </div>
 <div class="badges">
-<span class="pill" id="count">68 cards</span>
-<span class="pill" id="fresh">데이터 확인 중</span>
+<span class="pill" id="count">58 GSC cards</span>
+<span class="pill" id="fresh">GSC 기준일 확인 중</span>
 <span class="pill" id="connectors">연결 상태 확인 중</span>
 </div>
 </section>
@@ -72,7 +72,7 @@
 <input id="search" class="search" type="search" placeholder="사이트명 · 주소 · 플랫폼 검색">
 <button id="refresh" class="refresh" type="button">새로고침</button>
 </section>
-<section class="sheet" aria-live="polite"><table class="ranking"><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>어제 방문자</th><th>최근 발행</th><th>연결 상태</th><th>사이트 생성일</th><th>발행</th></tr></thead><tbody id="cards"><tr><td colspan="8" class="empty">68개 사이트 데이터를 불러오는 중…</td></tr></tbody></table></section>
+<section class="sheet" aria-live="polite"><table class="ranking"><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>GSC 클릭수</th><th>증감</th><th>GSC 기준일</th><th>최근 발행</th><th>발행</th></tr></thead><tbody id="cards"><tr><td colspan="8" class="empty">68개 사이트 데이터를 불러오는 중…</td></tr></tbody></table></section>
 </main>
 <script>
 const cardsEl=document.getElementById('cards');
@@ -101,7 +101,9 @@ function cardHtml(c){
  const url=esc(c.url||'');
  const verified=c.google_indexed_verified_via==='gsc'?' · GSC':' · 연결 필요';
  const launch='/publish?site_id='+encodeURIComponent(c.site_id||'')+'&mode=auto&publish=publish';
- return '<tr data-search="'+esc((c.name+' '+c.url+' '+c.platform).toLowerCase())+'"><td>'+rank+'</td><td><span class="platform">'+badge(c.platform)+'</span></td><td><a class="site" href="'+url+'" target="_blank" rel="noopener">'+title+'</a><div class="url">'+url+'</div></td><td>'+fmt(c.yesterday_visitors)+' '+delta(c.yesterday_visitors_delta)+'</td><td>'+esc(String(c.recent_publish_date||'미확인').replace('T',' ').slice(0,16))+'</td><td><span class="status '+status.cls+'">'+esc(status.text)+'</span></td><td>'+esc(String(c.opening_date||'미확인').slice(0,10))+'</td><td><a class="go" href="'+launch+'">즉시발행</a></td></tr>';
+ const gscOk=c.gsc_status==='OK' || (Number.isFinite(c.gsc_clicks) && c.gsc_applicable!==false);
+ const gscStatus=c.gsc_status==='ACCESS_UNAVAILABLE'?'GSC 권한 없음':(c.gsc_applicable===false?'GSC 대상 아님':(gscOk?'GSC 확인':'GSC 데이터 없음'));
+ return '<tr data-search="'+esc((c.name+' '+c.url+' '+c.platform).toLowerCase())+'"><td>'+rank+'</td><td><span class="platform">'+badge(c.platform)+'</span></td><td><a class="site" href="'+url+'" target="_blank" rel="noopener">'+title+'</a><div class="url">'+url+'</div></td><td>'+fmt(c.gsc_clicks)+'</td><td>'+delta(c.gsc_delta)+'</td><td><span class="status '+(gscOk?'good':'warn')+'">'+esc(gscStatus+(c.gsc_date?' · '+c.gsc_date:''))+'</span></td><td>'+esc(String(c.recent_publish_date||'미확인').replace('T',' ').slice(0,16))+'</td><td><a class="go" href="'+launch+'">즉시발행</a></td></tr>';
 }
 function render(){
  const q=document.getElementById('search').value.trim().toLowerCase();
@@ -109,17 +111,19 @@ function render(){
  cardsEl.innerHTML=rows.length?rows.map(cardHtml).join(''):'<tr><td colspan="8" class="empty">검색 결과 없음</td></tr>';
 }
 async function load(){
- cardsEl.innerHTML='<tr><td colspan="8" class="empty">68개 사이트 데이터를 불러오는 중…</td></tr>';
+ cardsEl.innerHTML='<tr><td colspan="8" class="empty">WP25 + Blogspot33 GSC 데이터를 불러오는 중…</td></tr>';
  try{
    const r=await fetch('/api/blog-korea365/ranking',{cache:'no-store'});
    if(!r.ok) throw new Error('HTTP '+r.status);
    const data=await r.json();
    allCards=data.cards||[];
+   allCards=allCards.filter(c=>['wordpress','blogspot'].includes(c.platform) || c.platform==='tistory' || c.platform==='naver');
    document.getElementById('publishSite').innerHTML=allCards.filter(c=>c.site_id).map(c=>'<option value="'+esc(c.site_id)+'">'+esc(c.name||c.url)+' · '+badge(c.platform)+'</option>').join('');
    document.getElementById('count').textContent=(data.total_cards||0)+' cards';
-   document.getElementById('fresh').textContent='갱신 '+(data.generated_at||'').replace('T',' ').slice(0,16)+' KST';
+   document.getElementById('fresh').textContent='GSC 기준일 '+(data.ranking_date||'미확인');
    const healthy=allCards.filter(c=>Object.values(c.connector_status||{}).every(x=>x?.connected)).length;
-   document.getElementById('connectors').textContent='4지표 완전연결 '+healthy+'/'+allCards.length;
+   const gscRanked=allCards.filter(c=>['wordpress','blogspot'].includes(c.platform)&&Number.isFinite(c.gsc_clicks)).length;
+   document.getElementById('connectors').textContent='GSC 확인 '+gscRanked+'/58';
    render();
  }catch(e){
    cardsEl.innerHTML='<tr><td colspan="8" class="empty">데이터 연결 오류: '+esc(e.message)+'</td></tr>';
