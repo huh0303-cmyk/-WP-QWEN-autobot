@@ -23,13 +23,13 @@ if str(ROOT) not in sys.path:
 
 # Set provider policy before importing the legacy engine so import-time defaults cannot
 # silently route WordPress back to Gemini or enable legacy paid image generation.
-os.environ["AI_TEXT_PROVIDER"] = "openai"
-os.environ.setdefault("OPENAI_ENABLED", "false")
+os.environ["AI_TEXT_PROVIDER"] = "gemini"
+os.environ["OPENAI_ENABLED"] = "false"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "true"
 os.environ["AUTOMATED_IMAGE_PUBLISHING_ENABLED"] = "true"
-os.environ.setdefault("NANO_BANANA_FREE_TIER_ENABLED", "false")
+os.environ["NANO_BANANA_FREE_TIER_ENABLED"] = "false"
 
 # Hostinger sites can advertise IPv6 while GitHub-hosted runners have an
 # intermittently unusable IPv6 route.  Prefer IPv4 at the client only; this
@@ -49,8 +49,8 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # ---------------------------------------------------------------------------
 # HARD ROUTING GUARDS
 # ---------------------------------------------------------------------------
-# All WordPress and newsroom draft text uses GPT-5 mini.
-base.AI_TEXT_PROVIDER = "openai"
+# All WordPress draft text uses free Gemini only.
+base.AI_TEXT_PROVIDER = "gemini"
 
 # Images use the shared stock-first gateway; legacy helpers remain bypassed.
 base.PIXABAY_KEY = None
