@@ -97,10 +97,8 @@ jobs:
           RUN_SLOT: "1"
           MAX_REGEN: "1"
           AI_TEXT_PROVIDER: "gemini"
-          CHATGPT_SINGLE_MODEL_PIPELINE: "true"
+          CHATGPT_SINGLE_MODEL_PIPELINE: "false"
           OPENAI_ENABLED: "false"
-          OPENAI_MODEL: "gpt-5-mini"
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
           GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
@@ -110,9 +108,6 @@ jobs:
           RUNNER_OLLAMA_BOOTSTRAP: "false"
           LOCAL_TEXT_TIMEOUT: "900"
           LOCAL_TEXT_MAX_TOKENS: "3500"
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}            # 선택: 없으면 건너뜀
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}  # 선택
-          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}      # 선택
           CLAUDE_ENABLED: "false"
           GEMINI_EDITOR_ENABLED: "false"
           OPENAI_IMAGE_ENABLED: "false"
