@@ -1,14 +1,11 @@
 """Unified 68-card ranking for blog.korea365.org.
 
-WordPress 25 general sites + 2 newsrooms, Blogspot 33, Naver 3 and Tistory 5
-(27 + 33 + 3 + 5 = 68) combined into one list, ranked together by yesterday's
-visitors. This module does not recompute any metric itself — it normalises
-the rows already produced by each platform's existing collector
-(get_site_data, get_blogger_data, get_tistory_data, get_naver_data) so the
-same public counters, GSC-verified index counts and connector-failure
-reasons stay the single source of truth instead of drifting into a second
-implementation. A card with no confirmed visitor count is ranked last with
-rank=None; it is never shown as 0.
+WordPress 25 + Blogspot 33 are ranked together using one canonical metric:
+Google Search Console Search Analytics clicks on the same confirmed date.
+Impressions, CTR and average position are secondary. Visitor widgets, custom
+visitor APIs, GA4 and platform counters are excluded from this unified ranking.
+ACCESS_UNAVAILABLE is never converted to zero. Naver/Tistory remain visible
+on the dashboard but are outside this 58-site GSC ranking.
 """
 from __future__ import annotations
 
@@ -42,7 +39,7 @@ NO_VISITOR_TRACKING_REASON: dict[str, str] = {}
 def _gsc_metrics(five_minute_bucket: int) -> dict[str, dict[str, object]]:
     """Read the existing daily GSC/traffic manifest without inventing gaps."""
     del five_minute_bucket
-    path = Path(__file__).resolve().parents[1] / "daily_site_traffic_result.json"
+    path = Path(__file__).resolve().parents[1] / "data" / "gsc_unified_ranking.json"
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         return {
@@ -131,10 +128,24 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
     revenue = revenue_info(domain, row)
     timeline = opening_recent_info(url, platform)
     infra = infrastructure_info(platform, kind)
-    gsc = _gsc_metrics(int(time.time() // 300)).get(domain.lower(), {})
+    gsc = _gsc_metrics(int(time.time() // 300)).get(url.rstrip("/").lower(), {})
     property_row = _gsc_property_for(url)
-    gsc_clicks = row.get("gsc_clicks", gsc.get("gsc_clicks", gsc.get("clicks")))
-    gsc_impressions = row.get("gsc_impressions", gsc.get("impressions"))
+    if platform in {"wordpress", "blogspot"}:
+        gsc_clicks = gsc.get("clicks")
+        gsc_impressions = gsc.get("impressions")
+        gsc_ctr = gsc.get("ctr")
+        gsc_position = gsc.get("position")
+        gsc_date = gsc.get("date", "")
+        gsc_delta = gsc.get("delta")
+        gsc_status = gsc.get("status", "ACCESS_UNAVAILABLE")
+    else:
+        gsc_clicks = row.get("gsc_clicks", gsc.get("gsc_clicks", gsc.get("clicks")))
+        gsc_impressions = row.get("gsc_impressions", gsc.get("impressions"))
+        gsc_ctr = row.get("gsc_ctr", gsc.get("ctr"))
+        gsc_position = row.get("gsc_position", gsc.get("position"))
+        gsc_date = row.get("gsc_date", gsc.get("date", ""))
+        gsc_delta = row.get("gsc_delta")
+        gsc_status = row.get("gsc_status", "connected" if gsc_clicks is not None else "disconnected")
     gsc_property = (
         row.get("gsc_property")
         or row.get("index_property")
@@ -172,9 +183,11 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
         "google_indexed_verified_via": "gsc" if row.get("index_checked_at") else None,
         "gsc_clicks": gsc_clicks,
         "gsc_impressions": gsc_impressions,
-        "gsc_ctr": row.get("gsc_ctr", gsc.get("ctr")),
-        "gsc_position": row.get("gsc_position", gsc.get("position")),
-        "gsc_date": row.get("gsc_date", gsc.get("gsc_date", "")),
+        "gsc_ctr": gsc_ctr,
+        "gsc_position": gsc_position,
+        "gsc_date": gsc_date,
+        "gsc_delta": gsc_delta,
+        "gsc_status": gsc_status,
         "gsc_applicable": platform != "naver",
         "gsc_connected": gsc_connected,
         "gsc_property": gsc_property,
@@ -207,11 +220,16 @@ def build_ranking(
     for row in get_naver_data():
         cards.append(_card(row, "naver", "naver"))
 
-    cards.sort(key=lambda c: (c["yesterday_visitors"] is None, -(c["yesterday_visitors"] or 0), -(c["total_visitors"] or 0), c["name"] or ""))
+    def ranking_key(card):
+        applicable = card["platform"] in {"wordpress", "blogspot"}
+        value = card.get("gsc_clicks")
+        return (not applicable or value is None, -(value or 0), card.get("name") or "")
+    cards.sort(key=ranking_key)
     rank = 0
     for row_number, card in enumerate(cards, 1):
         card["row_number"] = row_number
-        if card["yesterday_visitors"] is None:
+        applicable = card["platform"] in {"wordpress", "blogspot"}
+        if not applicable or card.get("gsc_clicks") is None:
             card["rank"] = None
         else:
             rank += 1
@@ -222,14 +240,15 @@ def build_ranking(
         platform_counts[card["platform"]] = platform_counts.get(card["platform"], 0) + 1
 
     today = datetime.now(KST).date()
-    ranking_date = (today - timedelta(days=1)).isoformat()
+    ranking_date = next((c.get("gsc_date") for c in cards if c.get("gsc_date")), "") or (today - timedelta(days=1)).isoformat()
     return {
         "generated_at": datetime.now(KST).isoformat(),
         "display_date": today.isoformat(),
         "ranking_date": ranking_date,
         "timezone": "Asia/Seoul",
-        "ranking_metric": "yesterday_visitors",
-        "ranking_purpose": "daily_writing_priority",
+        "ranking_metric": "gsc_clicks",
+        "ranking_purpose": "WP25 + Blogspot33 unified GSC ranking",
+        "ranking_policy": "Same confirmed GSC date; clicks primary; impressions/CTR/position secondary; visitor counters excluded; ACCESS_UNAVAILABLE is never zero.",
         "total_cards": len(cards),
         "ranked_cards": rank,
         "unranked_cards": len(cards) - rank,
