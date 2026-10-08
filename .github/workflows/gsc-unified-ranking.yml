@@ -1,0 +1,55 @@
+name: Unified GSC ranking · WP25 + Blogspot33
+
+on:
+  schedule:
+    - cron: "17 22 * * *" # 07:17 KST
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: unified-gsc-ranking
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install GSC client dependencies
+        run: pip install requests pyjwt cryptography -q
+
+      - name: Collect canonical GSC ranking evidence
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/gsc_unified_ranking.py
+
+      - name: Validate unified evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("data/gsc_unified_ranking.json")
+          d = json.loads(p.read_text(encoding="utf-8"))
+          assert d["metric"] == "gsc_clicks"
+          assert d["counts"]["wordpress"] == 25
+          assert d["counts"]["blogspot"] == 33
+          assert len(d["records"]) == 58
+          assert d["policy"].startswith("WP25 + Blogspot33 unified ranking uses only Google Search Console")
+          print("validated", d["confirmed_date"], d["counts"])
+          PY
+
+      - name: Commit evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/gsc_unified_ranking.json
+          git diff --cached --quiet || git commit -m "chore: refresh unified GSC ranking evidence [skip ci]"
+          git push
