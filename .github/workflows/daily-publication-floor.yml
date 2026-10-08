@@ -6,7 +6,7 @@ on:
   # no automatic daily publisher. WordPress-only on schedule (Blogger has its own VPS timer,
   # so scheduled runs must not touch it). Odd minutes; per-site random slots in the script.
   schedule:
-    - cron: '11,29,47 * * * *'
+    - cron: '7,17,27,37,47,57 * * * *'
   workflow_dispatch:
     inputs:
       platform:
@@ -64,7 +64,7 @@ jobs:
           JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
           JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
           KOREA365ORG: ${{ secrets.KOREA365ORG }}
-        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 8
+        run: python scripts/daily_publication_floor.py --platform wordpress --max-dispatch 2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
