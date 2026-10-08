@@ -113,24 +113,6 @@ def _try_gemini(prompt: str, temperature: float, model: str, key: str | None = N
 TRIES_PER_ENGINE = int(os.getenv("WRITER_TRIES_PER_ENGINE", "4"))
 RETRY_SLEEP = float(os.getenv("WRITER_RETRY_SLEEP", "5"))
 
-# Independent free-tier engines beyond Gemini. Each activates only when its key secret exists.
-# (provider, key env, endpoint, default model env, default model)
-OPENAI_COMPAT = (
-    ("groq", "GROQ_API_KEY", "https://api.groq.com/openai/v1/chat/completions",
-     "GROQ_MODEL", "openai/gpt-oss-120b,openai/gpt-oss-20b,llama-3.3-70b-versatile,qwen/qwen3-32b"),
-    ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1/chat/completions",
-     "OPENROUTER_MODEL", "google/gemma-4-31b-it:free,openai/gpt-oss-120b:free,qwen/qwen3-next-80b-a3b-instruct:free,"
-                         "meta-llama/llama-3.3-70b-instruct:free,deepseek/deepseek-chat-v3.1:free"),
-    ("cerebras", "CEREBRAS_API_KEY", "https://api.cerebras.ai/v1/chat/completions",
-     "CEREBRAS_MODEL", "llama-3.3-70b,gpt-oss-120b"),
-)
-
-
-_DISCOVERED: dict = {}
-_PREFER = ("gpt-oss-120b", "llama-3.3-70b", "qwen3", "gemma", "deepseek", "gpt-oss-20b", "llama")
-_SKIP = ("allam", "whisper", "guard", "tts", "orpheus", "embed", "vision", "image", "audio", "safeguard", "moderation", "lyria", "veo")
-
-
 def _discover(spec: tuple) -> list:
     """Ask the provider which models this key can use right now (free-model slugs rotate), once per process."""
     provider, key_env, url = spec[0], spec[1], spec[2]
@@ -238,7 +220,7 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer
         last_writer_model = recovery.last_model
         return text
 
-    choice = "gpt-5-mini" if force_gpt else (writer_model or os.getenv("LONDON_WRITER_MODEL", "auto_free"))
+    choice = writer_model or os.getenv("LONDON_WRITER_MODEL", "auto_free")
     models = _model_chain(choice)
     failures: list[str] = []
     keys = _gemini_keys()
@@ -261,37 +243,6 @@ def generate_text(prompt, temperature=0.7, force_gpt=False, repair=False, writer
                 text = None
             if text:
                 return text
-
-    # 독립 무료 엔진들(키가 있을 때만): 엔진별 모델 목록을 차례로, 죽은/한도 초과 모델은 건너뜀
-    if choice != "gpt-5-mini":
-        for spec in OPENAI_COMPAT:
-            if not os.getenv(spec[1], "").strip():
-                continue
-            for model in _compat_models(spec):
-                if _parked(spec[0], spec[1], model):
-                    continue
-                text = _with_tries(f"{spec[0]}:{model}", lambda sp=spec, m=model: _try_compat(prompt, temperature, sp, m),
-                                   failures, on_error=lambda e, sp=spec, m=model: _note_failure(sp[0], sp[1], m, e), tries=2)
-                if text:
-                    return text
-
-    # GPT is paid and only used when the operator explicitly selects it.
-    if choice == "gpt-5-mini":
-        try:
-            from openai_text import openai_available, openai_generate_text
-            if not openai_available():
-                raise RuntimeError("GPT API unavailable")
-            text = openai_generate_text(prompt, temperature=temperature, max_retries=1, timeout=45)
-            last_writer_model = "gpt-5-mini"
-            _record("openai", "gpt-5-mini")
-            return text
-        except Exception as exc:
-            failures.append(f"gpt-5-mini: {_failure_summary(exc)}")
-            for model in FREE_GEMINI_MODELS:
-                try:
-                    return _try_gemini(prompt, temperature, model)
-                except (requests.RequestException, ValueError, RuntimeError) as gemini_exc:
-                    failures.append(f"{model}: {_failure_summary(gemini_exc)}")
 
     if os.getenv("LOCAL_TEXT_FALLBACK_ENABLED", "false").lower() in {"1", "true", "yes", "on"}:
         try:
