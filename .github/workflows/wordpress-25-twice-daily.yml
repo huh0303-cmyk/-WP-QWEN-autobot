@@ -31,7 +31,6 @@ jobs:
     uses: ./.github/workflows/daily-network-publish.yml
     with:
       target_site_url: ${{ inputs.target_site_url }}
-      target_site_url: ${{ inputs.target_site_url }}
       publication_approved: true
       image_count: "1"
     secrets: inherit
@@ -40,6 +39,7 @@ jobs:
     if: ${{ (github.event_name == 'schedule' && github.event.schedule == '17 10 * * *') || (github.event_name == 'workflow_dispatch' && inputs.slot == 'pm') }}
     uses: ./.github/workflows/daily-network-publish.yml
     with:
+      target_site_url: ${{ inputs.target_site_url }}
       publication_approved: true
       image_count: "1"
     secrets: inherit
