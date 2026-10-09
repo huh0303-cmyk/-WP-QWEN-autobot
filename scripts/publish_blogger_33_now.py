@@ -7,7 +7,7 @@ import json
 import os
 import time
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
@@ -203,7 +203,7 @@ def main() -> int:
             if schedule_at_raw:
                 try:
                     candidate = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M")
-                    now_kst = datetime.now(timezone.utc) + __import__("datetime").timedelta(hours=9)
+                    now_kst = datetime.now(timezone.utc) + timedelta(hours=9)
                     if candidate > now_kst:
                         scheduled_kst = candidate
                 except ValueError:
@@ -216,7 +216,7 @@ def main() -> int:
             post = response.json(); url = post.get("url", "")
             if schedule_mode:
                 publish_endpoint = f"{endpoint}/{post.get('id', '')}/publish"
-                publish_date = scheduled_kst.replace(tzinfo=timezone(__import__("datetime").timedelta(hours=9))).astimezone(timezone.utc).isoformat().replace("+00:00","Z")
+                publish_date = scheduled_kst.replace(tzinfo=timezone(timedelta(hours=9))).astimezone(timezone.utc).isoformat().replace("+00:00","Z")
                 scheduled = requests.post(publish_endpoint, params={"publishDate": publish_date}, headers=headers, timeout=30)
                 scheduled.raise_for_status()
                 post = scheduled.json()
