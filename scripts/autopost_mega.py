@@ -3577,32 +3577,21 @@ def process_one(site, keyword):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
-        # 2026-09-02 GitHub-pinned blog order:
-        # 1) SDXL Lightning 4-step.
-        # 2) FLUX Schnell once if SDXL fails.
-        # 3) If both fail, continue without an image.
-        image_theme = f"NEWS ILLUSTRATION ONLY — {theme}" if mode in ("news", "news_en") else theme
-        # A licensed newsroom photo already occupies the single allowed image slot.
-        img_url = None if site.get("_newsroom_real_photo") else replicate_image_provider.generate_image_url(keyword, theme=image_theme)
-        images = [img_url] if img_url else []
-        from stock_image_provider import credit_html
-        body += credit_html(img_url)
-        if not images and not site.get("_newsroom_real_photo"):
-            # Chairman 2026-10-06: never publish without an image -> free chain, then generated topic card.
+        # WordPress blog policy: use only a relevant Pexels/Pixabay stock photo.
+        # If no genuinely relevant stock photo exists, publish without an image.
+        # Never manufacture a generic topic card or paid/generated image as a fallback.
+        images = []
+        if not site.get("_newsroom_real_photo"):
             try:
-                from image_guarantee import ensure_image
-                g = ensure_image(keyword, queries=[keyword, theme], theme=theme, host=False)
-                if g.get("url"):
-                    images = [g["url"]]
-                elif g.get("png"):
-                    _p = f"/tmp/guarantee_{hashlib.md5(keyword.encode()).hexdigest()[:10]}.png"
-                    open(_p, "wb").write(g["png"])
-                    _u = upload_local_image_to_wp(site["url"], os.getenv(site["wp_pass_env"], ""), _p, "card-" + re.sub(r"[^a-zA-Z0-9]+", "-", keyword)[:40].strip("-"))
-                    images = [_u] if _u else []
+                from stock_image_provider import find_stock_image, credit_html
+                img_url = find_stock_image(keyword, theme=theme)
+                if img_url:
+                    images = [img_url]
+                    body += credit_html(img_url)
             except Exception as _e:  # noqa: BLE001
-                print(f"  ⚠️ 이미지 보장 체인 실패: {type(_e).__name__}")
-        if not images:
-            print("  ⚠️ 모든 무료 이미지 단계 실패 → 이미지 없이 발행(점검 필요)")
+                print(f"  ⚠️ stock photo selection failed: {type(_e).__name__}")
+        if not images and not site.get("_newsroom_real_photo"):
+            print("  ℹ️ relevant Pexels/Pixabay photo unavailable → publish without image")
     print(f"  🖼  이미지 {len(images)}장")
 
     # ★ 2026-09-06: wp_post()가 발행 직전에 코드로 강제 삽입하는 "관련 글" 박스
