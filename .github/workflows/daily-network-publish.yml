@@ -71,7 +71,7 @@ jobs:
   publish:
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 2
       matrix:
         site:
           - k-health365.com
