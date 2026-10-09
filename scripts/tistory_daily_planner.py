@@ -163,7 +163,15 @@ def main() -> int:
         "failures": len(plan["failures"]),
         "public_allowed": False,
     }, ensure_ascii=False))
-    return 1 if plan["failures"] or not plan["jobs"] else 0
+    # A per-site planning exception (e.g. a transient RSS/network hiccup in
+    # _pick_seed_topic) is already caught above and recorded in plan["failures"]
+    # without touching the other selected sites' jobs. Only 2-3 sites are
+    # selected per day, so treating ANY failure as fatal here was killing the
+    # whole day's Tistory output (steps 6/7 skipped for every site) over a
+    # single site's hiccup. Fail the step only when there is truly nothing to
+    # hand downstream; a non-empty failures list still surfaces in the saved
+    # plan JSON for diagnosis.
+    return 1 if not plan["jobs"] else 0
 
 
 if __name__ == "__main__":
