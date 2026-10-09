@@ -3622,7 +3622,10 @@ def process_one(site, keyword):
             except Exception as exc:
                 print(f"  ⚠️ 관련 글 미리보기 실패(채점은 원문 기준으로 계속): {exc}")
 
-    # SEO score intentionally removed from the publication pipeline.\n    score=None\n\n    plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
+    # SEO score intentionally removed from the publication pipeline.
+    score=None
+
+    plain_len=newsroom_char_count(body) if mode in ("news", "news_en") else len(re.sub(r'<[^>]+>','',body).replace(' ','').replace('\n',''))
     ilinks=len(re.findall(r'<a\s+href=["\']https?://',body,re.IGNORECASE))
     tb=len(re.findall(r'<table[\s>]',body,re.IGNORECASE))
     print(f"     본문:{plain_len}자 | 링크:{ilinks} | TABLE:{tb} | META:{len(meta)}자")
