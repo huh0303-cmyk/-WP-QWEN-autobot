@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
 # silently route WordPress back to Gemini or enable legacy paid image generation.
 os.environ["AI_TEXT_PROVIDER"] = "gemini"
 os.environ["OPENAI_ENABLED"] = "false"
+os.environ["CHATGPT_SINGLE_MODEL_PIPELINE"] = "true"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
 os.environ["GEMINI_IMAGE_GENERATION_ENABLED"] = "true"
@@ -51,6 +52,9 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # ---------------------------------------------------------------------------
 # All WordPress draft text uses free Gemini only.
 base.AI_TEXT_PROVIDER = "gemini"
+# Normal WordPress blogs use the deterministic gate only; never block publication
+# on the legacy two-pass Gemini consensus review. Newsroom paths keep their own review.
+os.environ["CHATGPT_SINGLE_MODEL_PIPELINE"] = "true"
 
 # Images use the shared stock-first gateway; legacy helpers remain bypassed.
 base.PIXABAY_KEY = None
