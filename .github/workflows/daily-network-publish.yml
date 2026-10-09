@@ -119,7 +119,7 @@ jobs:
           RUN_SLOT: "1"
           MAX_REGEN: "1"
           AI_TEXT_PROVIDER: "gemini"
-          CHATGPT_SINGLE_MODEL_PIPELINE: "false"
+          CHATGPT_SINGLE_MODEL_PIPELINE: "true"  # 2026-10-09 Chairman: drop the blocking two-pass GPT consensus check (was stalling k-visa365 etc.); keep the cheap deterministic title/body-cliche gate only
           OPENAI_ENABLED: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
