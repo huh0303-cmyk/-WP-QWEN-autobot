@@ -1,1 +1,1 @@
-{"day": "2026-10-07", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-10-07-wp_ktech365-72345156", "claimed_at": "2026-10-07T22:57:35.874780+09:00", "run_id": 37632754198, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-09", "status": "PUBLISHED", "public_url": "https://ktech365.com/strategic-shifts-in-korean-semiconductor-manufacturing-as-reliability-concerns-grow/", "published_at": "2026-10-09T04:51:10Z"}
