@@ -359,3 +359,16 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 실시간 검증: WP 단일사이트 schedule_at 재디스패치(`37919677913`, k-trip365.com, 20분 뒤 예약) 큐에 넣었으나 오늘 쌓인 백로그(동시 실행/대기 30여개, GitHub 무료 동시실행 한도)로 인해 즉시 확인 못함 — 다음 턴에 재확인 필요. Korea365 popup.js 수정은 확장 reload 전까지 미적용.
 - What remains unverified: WP schedule_at 수정이 실제로 미래 시각에 publish=future 상태로 들어가는지, Blogspot 쪽 popup.js 수정 후 실제 공개발행 성공 여부, 오늘 실패한 ~49건 중 schedule_at 버그가 전부인지 아니면 다른 원인도 섞였는지(표본 1건만 확인).
 - Next action: 백로그 해소 후 schedule_at 런 재확인; Korea365 확장 reload 요청; reload 후 Blogspot 1건 재테스트.
+
+## image-provider-pexels-pixabay-order-randomized-20261009
+
+- 2026-10-09 KST — `task_id=image-provider-pexels-pixabay-order-randomized-20261009`. 사용자 지시: "pexels, pixabay는두개를 랜덤으로 하나 먼저 다른하나 두번째로" — 매 글마다 Pexels를 항상 먼저 시도하던 고정 순서를 제거.
+- What was requested: Blogspot 경로(`scripts/blogger_free_image.py`)와 WordPress 경로(`scripts/stock_image_provider.py`) 양쪽에서 이미지 provider 탐색 순서 중 Pexels/Pixabay 두 개만 무작위로 섞고, Wikimedia/AI 폴백은 그 뒤 순서 고정 유지.
+- What was checked: 두 파일의 기존 고정순서 확인(`blogger_free_image.py`의 `pick_image()`, `stock_image_provider.py`의 `find_stock_image()`). 둘 다 `random` 모듈이 import돼 있지 않음을 grep으로 확인.
+- What changed: (1) `blogger_free_image.py`: `import html, json, os, re` → `import html, json, os, random, re`; `pick_image()`에서 `pexels_pixabay = [_pexels, _pixabay]; random.shuffle(pexels_pixabay)` 후 `for fn in (*pexels_pixabay, _wikimedia, _ai_free)`로 변경. (2) `stock_image_provider.py`: `import random` 추가; `find_stock_image()`의 provider 리스트를 Pexels/Pixabay 튜플만 별도 리스트로 분리해 `random.shuffle()` 후 Wikimedia를 뒤에 고정 연결. 커밋 `28e9fa2`.
+- Evidence: `python3 -c "import ast; ast.parse(...)"` 양쪽 통과. 실제 `import blogger_free_image`, `import stock_image_provider`로 모듈을 로드해 `NameError` 없음을 확인(런타임 레벨 검증, 단순 문법검사 이상). 동일 셔플 로직을 2000회 시뮬레이션해 Pexels가 먼저 오는 비율이 50.0%(1001/2000)로 편향 없음을 확인.
+- Activity-ledger task_id: `image-provider-pexels-pixabay-order-randomized-20261009`.
+- Schedule/cadence compliance: 이 커밋은 `.github/workflows/publish-blogger-33-now.yml` 등 `on: push` 트리거 파일을 건드리지 않음(의도적으로 분리) — 33개 전체 재발행 flooding 재발 없음. `git status`로 변경 파일이 `scripts/blogger_free_image.py`, `scripts/stock_image_provider.py` 두 개뿐임을 push 전 확인.
+- What is still unverified: 실제 라이브 발행(Blogspot/WP 신규 글)에서 Pexels/Pixabay 중 어느 쪽이 실제로 선택됐는지 매 건 로그 기반 교차검증은 아직 안 함(다음 실제 발행 시 "image selected: Pexels/Pixabay ..." 로그 라인으로 확인 가능 — `pick_image()`는 이미 이 로그를 출력함). `stock_image_provider.py`의 `find_stock_image()`는 `print()` 로그가 없어 provider 선택 로그가 WP 쪽엔 없음(기존부터 그랬음, 이번 변경으로 새로 생긴 문제 아님).
+- Risks: 없음 — 순수 순서 무작위화이며 각 provider 함수의 동작·게이트(라이선스/관련성/해상도 체크)는 변경하지 않음.
+- Next action: 사용자가 Chrome 확장 reload 후 실제 즉시발행 1건(WP 또는 Blogspot)으로 로그에서 어느 provider가 선택됐는지 확인 가능. 이전 미해결 항목(on:push 트리거 구조적 리스크, Blogspot schedule_at 종단 라이브 테스트, Korea365 popup.js 수정 반영 확인)은 여전히 열려 있음 — 별도 작업.
