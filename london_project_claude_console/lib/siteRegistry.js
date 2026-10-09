@@ -213,13 +213,16 @@ function buildBaseRegistry() {
     });
   }
 
-  // --- 네이버 3 (이 콘솔이 직접 발행 소유; 실제 blogId는 티스토리 미러링 슬러그와 동일한 계정 쌍) ---
-  // 2026-09-27 Chairman 확인: huh0303=생활의정석, k-insight-vietnam=부의정석(스크린샷 확인),
-  // k-healthcare=헬스의정석(추정 — 티스토리 한국건강정보 슬러그와 동일 패턴, 확인 필요).
+  // --- 네이버 3 (이 콘솔이 직접 발행 소유) ---
+  // 2026-10-09 Chairman 확정 (Blogauto 확장 Chrome 세션 페어링 완료, 비밀번호는 앱/저장소에 저장하지 않음):
+  //   huh0303 = 부의정석 (이전에 "돈의정석"/"생활의정석"으로 잘못 기재되었던 것을 수정)
+  //   huh3    = 헬스의정석
+  //   huh4    = 생활의정석
+  // 카테고리는 Blogauto 앱의 계정별 카테고리 설정과 Naver 블로그 자체 카테고리 메뉴에 동일하게 등록되어야 함.
   const naverAccounts = [
-    { blogId: "huh0303", label: "생활의정석", mirrors: "tistory_life365 (한국생활정보)", confirmed: true },
-    { blogId: "k-insight-vietnam", label: "부의정석", mirrors: "tistory_insurance_lab (한국보험정보)", confirmed: true },
-    { blogId: "k-healthcare", label: "헬스의정석", mirrors: "tistory_health_info (한국건강정보)", confirmed: false },
+    { blogId: "huh0303", label: "부의정석", categories: ["부의흐름-국가정책", "기타핫이슈"], confirmed: true },
+    { blogId: "huh3", label: "헬스의정석", categories: ["건강의학정보", "기타핫이슈"], confirmed: true },
+    { blogId: "huh4", label: "생활의정석", categories: ["생활정보", "기타핫이슈"], confirmed: true },
   ];
   for (const acc of naverAccounts) {
     entries.push({
@@ -231,6 +234,8 @@ function buildBaseRegistry() {
       label: acc.label,
       persona: "",
       tone: "",
+      theme: acc.categories.join(", "),
+      categories: acc.categories,
       min_chars: null,
       target_chars: null,
       max_chars: null,
