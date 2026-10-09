@@ -1,6 +1,28 @@
 name: "WordPress 25 — immediate isolated publish"
 
 on:
+  workflow_call:
+    inputs:
+      target_site_url:
+        required: false
+        type: string
+        default: ""
+      room_id:
+        required: false
+        type: string
+        default: ""
+      publication_approved:
+        required: false
+        type: boolean
+        default: true
+      force_keyword:
+        required: false
+        type: string
+        default: ""
+      image_count:
+        required: false
+        type: string
+        default: "1"
   workflow_dispatch:
     inputs:
       target_site_url:
