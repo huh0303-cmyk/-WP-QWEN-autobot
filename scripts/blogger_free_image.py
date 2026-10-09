@@ -2,7 +2,7 @@
   1) Pexels  2) Pixabay  3) Wikimedia Commons (CC0/PD)  4) free AI (Pollinations, needs hosting)  5) no image.
 Never blocks publication: every failure returns None. No paid API is ever called."""
 from __future__ import annotations
-import html, json, os, re
+import html, json, os, random, re
 from pathlib import Path
 from urllib.parse import quote, urlparse
 import requests
@@ -167,7 +167,11 @@ def pick_image(query: str, alternates=()):
     if not queries:
         return None
     exclude = used_photo_ids()
-    for fn in (_pexels, _pixabay, _wikimedia, _ai_free):
+    # 2026-10-09: Pexels/Pixabay 둘 중 하나를 매번 고정으로 먼저 호출하지 않도록 둘의
+    # 순서만 무작위로 섞는다(Chairman 지시) — Wikimedia/AI는 그 뒤 순서 고정 유지.
+    pexels_pixabay = [_pexels, _pixabay]
+    random.shuffle(pexels_pixabay)
+    for fn in (*pexels_pixabay, _wikimedia, _ai_free):
         found = None
         for q in (queries[:1] if fn is _ai_free else queries):
             try:
