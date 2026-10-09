@@ -386,3 +386,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - What is still unverified: (1) 실제 확장 reload 후 네이버 3곳 중 원클릭 발행이 로그인 상태까지 포함해 끝까지 성공하는지(특히 N1 huh0303/N2 huh3 계정 로그인 여부는 과거 "미검증/보호조치"로 남아 있었음), (2) "기타핫이슈" 프롬프트가 실제로 적절한 트렌드 소재를 골라내는지 라이브 생성 결과로 확인 필요, (3) `huh0303.tistory.com`(한국생활정보)의 8개월 발행 중단 원인.
 - Risks: 없음(프롬프트/데이터 수정만, 발행 로직·게이트는 변경 안 함). 다만 "기타핫이슈" 소재가 사실관계 오류를 낼 위험은 프롬프트에 단정 금지 지시로 완화했으나 100% 보장은 아님 — 생성 결과를 몇 건 검토 권장.
 - Next action: 확장 reload 요청, 네이버 3곳 각 1건 실제 발행 테스트(로그인 상태 확인 겸), `huh0303.tistory.com` 중단 원인 확인, "기타핫이슈" 생성 결과 샘플 검토.
+
+## chrisbot-one-click-all-naver-tistory-button-20261009
+
+- 2026-10-09 20:2x KST — `task_id=chrisbot-one-click-all-naver-tistory-button-20261009`. 사용자가 "크리스봇을 액티브(클릭)하면 네이버블로그·티스토리에 자동으로 글이 올라가게" 버튼 하나를 요청("배치 파일 같은 거 만들어달라"). 기존엔 "플랫폼 통합 실행" 드롭다운에서 네이버/티스토리를 각각 따로 골라야 했음.
+- 추가: `sidepanel.html`에 새 섹션 "🚀 원클릭 전체발행 — 네이버3+티스토리5" 및 버튼(`runAllDom`) 신설. `sidepanel.js`에 `onRunAllDom()` 함수 신설 — 네이버 3곳+티스토리 5곳(총 8곳)을 순서대로 돌며 각 사이트에 등록된 카테고리 중 하나를 무작위로 골라(네이버는 "기타핫이슈" 포함) `onGenerate()`+`onPublish()`를 그대로 재사용해 즉시 글쓰기+공개발행. 기존 `buildTextPrompt()`의 검색트렌드 지시(이전 작업)가 그대로 적용됨. `manifest.json` 버전 2.4.1→2.5.0, 설명 갱신.
+- Evidence: `node --check sidepanel.js` 통과, `manifest.json` JSON 파싱 통과, `sidepanel.html` `<section>`/`</section>` 개수 일치(5/5)로 태그 균형 확인. 실제 Chrome에서 버튼을 눌러 8곳 전체가 끝까지 도는지는 확장 reload 후 라이브 테스트 필요 — 아직 안 함.
+- Activity-ledger task_id: `chrisbot-one-click-all-naver-tistory-button-20261009`.
+- What is still unverified: 라이브 실행(8곳 순차 글쓰기+발행)이 끝까지 성공하는지, 특히 네이버 N1/N2 로그인 상태가 중간에 막히면 어디서 멈추는지(에러 메시지로 사이트명이 표시되므로 확인 가능).
+- Risks: 없음(기존 onGenerate/onPublish 로직 재사용, 새 발행 경로를 만들지 않음). 8곳을 한 번에 돌리므로 총 소요시간이 길어짐(사이트당 생성~10~30초+발행+4초 대기) — 창을 끝까지 열어둬야 함.
+- Next action: 확장 reload 후 "🚀 네이버3+티스토리5 전체 지금 발행" 버튼 1회 실행해 8곳 성공/실패 결과 확인.
