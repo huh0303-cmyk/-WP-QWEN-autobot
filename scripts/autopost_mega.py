@@ -3210,7 +3210,10 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     scheduled_date_gmt_str = None
     if post_status == "publish" and schedule_at_raw:
         try:
-            sched_kst = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M")
+            # 2026-10-09(2차): naive datetime을 now_kst()(tz-aware)와 직접 비교해
+            # "can't compare offset-naive and offset-aware datetimes"로 거의 모든
+            # 예약 슬롯이 실패하고 있었음 — tzinfo를 명시해서 비교하도록 수정.
+            sched_kst = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M").replace(tzinfo=KST)
             if sched_kst > now_kst():
                 post_status = "future"
                 scheduled_date_str = sched_kst.strftime("%Y-%m-%dT%H:%M:%S")
