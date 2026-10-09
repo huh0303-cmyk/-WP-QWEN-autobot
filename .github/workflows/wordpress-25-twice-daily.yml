@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   wordpress_am:
-    if: ${{ github.event_name == 'schedule' || inputs.slot == '' || inputs.slot == 'am' }}
+    if: ${{ (github.event_name == 'schedule' && github.event.schedule == '17 22 * * *') || (github.event_name == 'workflow_dispatch' && (inputs.slot == '' || inputs.slot == 'am')) }}
     uses: ./.github/workflows/daily-network-publish.yml
     with:
       publication_approved: true
@@ -30,7 +30,7 @@ jobs:
     secrets: inherit
 
   wordpress_pm:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.slot == 'pm' }}
+    if: ${{ (github.event_name == 'schedule' && github.event.schedule == '17 10 * * *') || (github.event_name == 'workflow_dispatch' && inputs.slot == 'pm') }}
     uses: ./.github/workflows/daily-network-publish.yml
     with:
       publication_approved: true
