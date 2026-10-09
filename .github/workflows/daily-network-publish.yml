@@ -23,6 +23,14 @@ on:
         required: false
         type: string
         default: "1"
+      image_policy:
+        required: false
+        type: string
+        default: "auto_free"
+      random_seed:
+        required: false
+        type: string
+        default: ""
       schedule_at:
         required: false
         type: string
@@ -54,6 +62,16 @@ on:
         required: false
         type: string
         default: "1"
+      image_policy:
+        description: "auto_free = Pexels/Pixabay/Wikimedia/free-AI/no-image; stock = stock only; none = no image"
+        required: false
+        type: string
+        default: "auto_free"
+      random_seed:
+        description: "Random trace seed from quick runner"
+        required: false
+        type: string
+        default: ""
       schedule_at:
         description: "Optional future KST datetime (YYYY-MM-DDTHH:MM) — write now, publish later. Blank = publish immediately."
         required: false
@@ -130,6 +148,8 @@ jobs:
           AI_TEXT_PROVIDER: "gemini"
           CHATGPT_SINGLE_MODEL_PIPELINE: "true"  # 2026-10-09 Chairman: drop the blocking two-pass GPT consensus check (was stalling k-visa365 etc.); keep the cheap deterministic title/body-cliche gate only
           WP_SCHEDULE_AT: ${{ inputs.schedule_at || '' }}  # 2026-10-09: write now, publish later (Chrome extension batch scheduling)
+          FREE_IMAGE_POLICY: ${{ inputs.image_policy || 'auto_free' }}
+          RANDOM_SEED: ${{ inputs.random_seed || '' }}
           OPENAI_ENABLED: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
