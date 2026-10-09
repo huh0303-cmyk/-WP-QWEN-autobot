@@ -51,9 +51,8 @@ for spec in e.OPENAI_COMPAT:
         except requests.RequestException as ex:
             add(provider, model, False, type(ex).__name__)
 
-os.environ["IMAGE_ALLOW_UNHOSTED_AI"] = "1"
 for q in ("Seoul palace autumn", "Korean skincare routine", "jeju island coast"):
-    for fn in (img._pexels, img._pixabay, img._wikimedia, img._ai_free):
+    for fn in (img._pexels, img._pixabay, img._wikimedia):
         try:
             f = fn(q)
             add("image", f"{fn.__name__} '{q}'", f, "no match" if not f else "")

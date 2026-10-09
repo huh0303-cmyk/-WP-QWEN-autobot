@@ -202,17 +202,18 @@ def _cost_receipt(model, subject, status):
 
 
 def _free_image_fallback(subject: str, theme: str = "") -> Optional[str]:
-    """All-free fallback (Chairman 2026-10-05): relaxed Pexels/Pixabay/Wikimedia, then free AI (Pollinations).
+    """All-free fallback: relaxed Pexels/Pixabay/Wikimedia (1:1 crop). No AI-image service (Pollinations removed 2026-10-10).
     WordPress sideloads the returned URL into its media library. Never raises; no image is acceptable."""
     global last_image_model
     try:
-        os.environ.setdefault("IMAGE_ALLOW_UNHOSTED_AI", "1")
-        import blogger_free_image as free
         if str(theme).upper().startswith("NEWS ILLUSTRATION ONLY"):
-            # Newsroom: never a stock photo that could be read as a photo of the event; free AI illustration only.
-            found = free._ai_free(f"{subject} editorial illustration, flat vector style")
-        else:
-            found = free.pick_image(subject, alternates=[theme])
+            # Newsroom: never a stock photo that could be read as a photo of the event -> plain 1:1 topic card, hosted.
+            from image_guarantee import make_card_png
+            from stable_image_hosting import host_bytes
+            last_image_model = "GeneratedCard"
+            return host_bytes(make_card_png(subject), asset_key="news-" + hashlib.sha256(subject.encode("utf-8")).hexdigest()[:12])
+        import blogger_free_image as free
+        found = free.pick_image(subject, alternates=[theme])
         if found:
             last_image_model = found["provider"]
             return found["url"]

@@ -17,10 +17,34 @@ def test_insert_after_first_paragraph_with_alt():
 
 def test_fallback_order_and_none(monkeypatch):
     calls = []
-    for name in ("_pexels", "_pixabay", "_wikimedia", "_ai_free"):
+    for name in ("_pexels", "_pixabay", "_wikimedia"):
         monkeypatch.setattr(b, name, (lambda n: lambda q: calls.append(n))(name))
     assert b.pick_image("Seoul palace autumn") is None
-    assert calls == ["_pexels", "_pixabay", "_wikimedia", "_ai_free"]
+    # Pexels/Pixabay are shuffled; Wikimedia is always last; no AI source exists any more.
+    assert set(calls[:2]) == {"_pexels", "_pixabay"} and calls[2] == "_wikimedia" and len(calls) == 3
+
+
+def test_no_pollinations_anywhere():
+    assert not hasattr(b, "_ai_free")
+
+
+def test_insert_image_is_square():
+    out = b.insert_image("<p>one</p>", {"url": "https://images.pexels.com/x.jpg"}, "t")
+    assert 'width="1080" height="1080"' in out
+
+
+def test_pexels_url_is_1x1_crop():
+    url = b._pexels_square({"src": {"original": "https://images.pexels.com/photos/1/pexels-photo-1.jpeg"}})
+    assert "fit=crop" in url and "w=1080" in url and "h=1080" in url
+
+
+def test_square_jpeg_crop():
+    import io
+    from PIL import Image
+    import square_image
+    buf = io.BytesIO(); Image.new("RGB", (1600, 900), (10, 20, 30)).save(buf, "JPEG")
+    out = Image.open(io.BytesIO(square_image.to_square_jpeg(buf.getvalue())))
+    assert out.size == (1080, 1080)
 
 
 def test_exception_falls_through(monkeypatch):

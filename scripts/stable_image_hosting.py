@@ -54,6 +54,14 @@ def host_permanently(url: str, *, asset_key: str, folder: str = "tistory_images"
     data = download.content
     content_type = download.headers.get("content-type", "")
     ext = ".png" if "png" in content_type else ".jpg" if "jpeg" in content_type else ".webp"
+    # 2026-10-10 Chairman: all blog photos are 1:1. Centre-crop before committing; keep the original if Pillow fails.
+    try:
+        from square_image import to_square_jpeg
+        squared = to_square_jpeg(data)
+        if squared:
+            data, ext = squared, ".jpg"
+    except ImportError:
+        pass
     digest = hashlib.sha256(data).hexdigest()[:16]
     path = f"assets/{folder}/{asset_key}-{digest}{ext}"
     api = f"https://api.github.com/repos/{repo}/contents/{path}"

@@ -1,10 +1,11 @@
-"""Free-only image step for Blogger posts. Order (Chairman 2026-10-05, all-free):
-  1) Pexels  2) Pixabay  3) Wikimedia Commons (CC0/PD)  4) free AI (Pollinations, needs hosting)  5) no image.
+"""Free-only image step for Blogger posts. Order (all-free):
+  1) Pexels  2) Pixabay  3) Wikimedia Commons (CC0/PD)  4) no image (caller falls back to a topic card).
+2026-10-10 Chairman: Pollinations/AI images are removed for good (watermarked, uncanny); every photo is 1:1.
 Never blocks publication: every failure returns None. No paid API is ever called."""
 from __future__ import annotations
 import html, json, os, random, re
 from pathlib import Path
-from urllib.parse import quote, urlparse
+from urllib.parse import urlparse
 import requests
 
 RUNTIME = Path("/etc/korea365/article-runtime.json")
@@ -79,23 +80,27 @@ def used_photo_ids() -> set[str]:
     return ids
 
 
+def _pexels_square(p: dict) -> str:
+    """Pexels serves imgix-resized files: ask for a centred 1:1 crop directly (no hosting needed)."""
+    base = (p.get("src", {}).get("original") or p.get("src", {}).get("large") or "").split("?")[0]
+    return f"{base}?auto=compress&cs=tinysrgb&fit=crop&w=1080&h=1080" if base else ""
+
+
 def _pexels(query: str, exclude=frozenset()):
     key = _key("PEXELS_API_KEY")
     if not key:
         return None
     ordered = [w for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 2 and w not in STOP]
-    for q in dict.fromkeys([query, " ".join(ordered[:2])]):  # full query first, then a looser 2-word retry
-        if not q:
-            continue
+    variants = [query, " ".join(ordered[:3]), " ".join(ordered[:2]), (ordered[0] if ordered else "")]
+    for q in dict.fromkeys(v for v in variants if v):  # full query first, then progressively looser retries
         r = requests.get("https://api.pexels.com/v1/search", headers={"Authorization": key},
-                         params={"query": q, "orientation": "landscape", "per_page": 12}, timeout=15)
+                         params={"query": q, "per_page": 30}, timeout=15)  # any orientation: the 1:1 crop handles it
         r.raise_for_status()
         for p in r.json().get("photos", []):
-            if str(p.get("id")) in exclude:
+            if str(p.get("id")) in exclude or min(p.get("width", 0), p.get("height", 0)) < 800:
                 continue
-            url = p.get("src", {}).get("large", "")
-            if urlparse(url).hostname == "images.pexels.com" and p.get("width", 0) > p.get("height", 0) \
-                    and _relevant(q, p.get("alt", "")) and _is_image(url):
+            url = _pexels_square(p)
+            if urlparse(url).hostname == "images.pexels.com" and _relevant(q, p.get("alt", "")) and _is_image(url):
                 return {"url": url, "provider": "Pexels", "id": str(p["id"]), "desc": p.get("alt", "")}
     return None
 
@@ -104,16 +109,19 @@ def _pixabay(query: str, exclude=frozenset()):
     key = _key("PIXABAY_KEY")
     if not key:
         return None
-    r = requests.get("https://pixabay.com/api/", params={"key": key, "q": query, "image_type": "photo",
-                     "orientation": "horizontal", "safesearch": "true", "min_width": 1000, "per_page": 12}, timeout=15)
-    r.raise_for_status()
-    for p in r.json().get("hits", []):
-        if str(p.get("id")) in exclude:
-            continue
-        url = p.get("largeImageURL", "")
-        if urlparse(url).hostname == "pixabay.com" or str(urlparse(url).hostname).endswith(".pixabay.com"):
-            if _relevant(query, p.get("tags", "")):
-                return {"url": url, "provider": "Pixabay", "id": str(p["id"]), "desc": p.get("tags", ""), "needs_hosting": True}
+    ordered = [w for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 2 and w not in STOP]
+    variants = [query, " ".join(ordered[:3]), " ".join(ordered[:2]), (ordered[0] if ordered else "")]
+    for q in dict.fromkeys(v for v in variants if v):
+        r = requests.get("https://pixabay.com/api/", params={"key": key, "q": q[:100], "image_type": "photo",
+                         "safesearch": "true", "min_width": 800, "min_height": 800, "per_page": 40}, timeout=15)
+        r.raise_for_status()
+        for p in r.json().get("hits", []):
+            if str(p.get("id")) in exclude:
+                continue
+            url = p.get("largeImageURL", "")
+            if urlparse(url).hostname == "pixabay.com" or str(urlparse(url).hostname).endswith(".pixabay.com"):
+                if _relevant(q, p.get("tags", "")):  # hosting step centre-crops to 1:1
+                    return {"url": url, "provider": "Pixabay", "id": str(p["id"]), "desc": p.get("tags", ""), "needs_hosting": True}
     return None
 
 
@@ -134,30 +142,14 @@ def _wikimedia(query: str):
         url = info.get("thumburl") or info.get("url") or ""
         title = str(page.get("title") or "").removeprefix("File:")
         if lic in {"cc0", "public domain", "pdm"} and urlparse(url).hostname == "upload.wikimedia.org" \
-                and info.get("thumbwidth", 0) >= info.get("thumbheight", 0) and _relevant(query, title) and _is_image(url):
+                and _relevant(query, title) and _is_image(url):
             return {"url": url, "provider": "Wikimedia", "id": str(page.get("pageid")), "desc": title}
-    return None
-
-
-def _ai_free(query: str):
-    """Free AI fallback (Pollinations, no key). Needs hosting for Blogger (hotlinks are unstable);
-    WP sideloads the file into its own media library, so callers may allow the raw URL."""
-    hostable = bool(os.getenv("GH_ASSET_TOKEN") and os.getenv("GITHUB_REPOSITORY"))
-    if not hostable and os.getenv("IMAGE_ALLOW_UNHOSTED_AI") != "1":
-        return None
-    seed = abs(hash(query)) % 100000
-    url = (f"https://image.pollinations.ai/prompt/{quote('editorial photograph, ' + query + ', natural light, no text, no watermark')}"
-           f"?width=1200&height=675&nologo=true&seed={seed}")
-    for _ in range(2):  # Pollinations is occasionally slow/queued
-        if _is_image(url):
-            return {"url": url, "provider": "Pollinations", "id": re.sub(r"\W+", "-", query)[:40], "desc": query,
-                    "needs_hosting": hostable}
     return None
 
 
 def pick_image(query: str, alternates=()):
     """Return {url, alt-ready desc, provider} or None.
-    Source order is fixed (Pexels, Pixabay, Wikimedia, free AI); within each source the specific query is tried
+    Source order: Pexels/Pixabay (random order), then Wikimedia; within each source the specific query is tried
     first, then looser alternates (e.g. the site's topic) so a relevant-enough photo is found almost always."""
     queries = []
     for q in [query, *alternates]:
@@ -171,9 +163,9 @@ def pick_image(query: str, alternates=()):
     # 순서만 무작위로 섞는다(Chairman 지시) — Wikimedia/AI는 그 뒤 순서 고정 유지.
     pexels_pixabay = [_pexels, _pixabay]
     random.shuffle(pexels_pixabay)
-    for fn in (*pexels_pixabay, _wikimedia, _ai_free):
+    for fn in (*pexels_pixabay, _wikimedia):
         found = None
-        for q in (queries[:1] if fn is _ai_free else queries):
+        for q in queries:
             try:
                 found = fn(q, exclude) if getattr(fn, "accepts_exclude", False) else fn(q)
             except Exception as exc:  # never log request URLs (keys)
@@ -183,13 +175,14 @@ def pick_image(query: str, alternates=()):
                 break
         if not found:
             continue
-        if found.get("needs_hosting"):
+        if found.get("needs_hosting") or found["provider"] == "Wikimedia":  # hosting also centre-crops to 1:1
             try:
                 from stable_image_hosting import host_permanently
                 found["url"] = host_permanently(found["url"], asset_key=f"blogger-{found['provider'].lower()}-{found['id']}", folder="blogger_images")
             except Exception as exc:
                 print(f"image hosting unavailable: {found['provider']} ({type(exc).__name__})")
-                continue
+                if found.get("needs_hosting"):
+                    continue
         print(f"image selected: {found['provider']} {found['id']}")
         return found
     return None
@@ -199,6 +192,6 @@ def insert_image(body_html: str, found: dict, alt_text: str) -> str:
     """Place the figure after the first paragraph (or at top). ALT = article title; no visible licence copy."""
     fig = ('<div class="separator" style="clear:both;text-align:center;margin:0 0 1.2em">'
            f'<img src="{html.escape(found["url"], quote=True)}" alt="{html.escape(alt_text, quote=True)}" '
-           'style="max-width:100%;height:auto" loading="lazy" width="1200" height="675"/></div>')
+           'style="max-width:100%;height:auto;aspect-ratio:1/1" loading="lazy" width="1080" height="1080"/></div>')
     m = re.search(r"</p>", body_html, re.I)
     return body_html[:m.end()] + "\n" + fig + body_html[m.end():] if m else fig + "\n" + body_html

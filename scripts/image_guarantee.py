@@ -2,7 +2,7 @@
 
 Order (all free, no paid API):
   1) Pexels  2) Pixabay  3) Wikimedia Commons (CC0/PD)  -> blogger_free_image.pick_image (relevance-checked, unique photo IDs)
-  4) Openverse (CC0/PDM, no key)  5) Pollinations free AI (hosted)  6) generated topic card (Pillow, cannot fail)
+  4) Openverse (CC0/PDM, no key)  5) generated 1:1 topic card (Pillow, cannot fail). No AI-image services (Pollinations removed 2026-10-10).
 `ensure_image()` never returns None. The card is a last resort that still names the topic, so it is never "irrelevant".
 """
 from __future__ import annotations
@@ -38,10 +38,10 @@ def _font(size: int):
 
 
 def make_card_png(title: str, badge: str = "") -> bytes:
-    """1200x630 topic card: solid colour, title wrapped to <=4 lines. Always succeeds."""
+    """1080x1080 (1:1) topic card: solid colour, title wrapped to <=5 lines. Always succeeds."""
     import textwrap
     from PIL import Image, ImageDraw
-    W, H = 1200, 630
+    W, H = 1080, 1080
     key = "health" if re.search(r"건강|health|medical|의료", badge + title, re.I) else \
           "finance" if re.search(r"보험|금융|finance|invest|insurance|tax", badge + title, re.I) else \
           "travel" if re.search(r"여행|travel|trip", badge + title, re.I) else "default"
@@ -50,11 +50,11 @@ def make_card_png(title: str, badge: str = "") -> bytes:
     d = ImageDraw.Draw(img)
     d.rectangle([0, 0, W, 14], fill=fg); d.rectangle([0, H - 14, W, H], fill=fg)
     ko = bool(re.search(r"[가-힣]", title))
-    lines = textwrap.wrap(re.sub(r"\s+", " ", title).strip() or "Korea", width=16 if ko else 26)[:4]
-    f = _font(60); y = (H - len(lines) * 80) // 2 - 10
+    lines = textwrap.wrap(re.sub(r"\s+", " ", title).strip() or "Korea", width=12 if ko else 20)[:5]
+    f = _font(72); y = (H - len(lines) * 96) // 2 - 10
     for line in lines:
         w = d.textbbox((0, 0), line, font=f)[2]
-        d.text(((W - w) // 2, y), line, font=f, fill=fg); y += 80
+        d.text(((W - w) // 2, y), line, font=f, fill=fg); y += 96
     if badge:
         fb = _font(30); w = d.textbbox((0, 0), badge, font=fb)[2]
         d.text(((W - w) // 2, H - 70), badge, font=fb, fill=fg)
@@ -99,6 +99,11 @@ def ensure_image(title: str, queries=(), theme: str = "", asset_key: str = "post
             if found:
                 print(f"image selected: Openverse {found['id']}")
                 found["alt"] = title
+                try:
+                    from stable_image_hosting import host_permanently  # centre-crops to 1:1
+                    found["url"] = host_permanently(found["url"], asset_key=f"openverse-{found['id']}", folder="blogger_images")
+                except Exception as exc:  # noqa: BLE001
+                    print(f"openverse hosting unavailable: {type(exc).__name__}")
                 return found
         except Exception as exc:  # noqa: BLE001
             print(f"openverse unavailable: {type(exc).__name__}")

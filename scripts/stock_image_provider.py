@@ -27,6 +27,16 @@ def matches(subject, description):
     return bool(required) and required <= terms(description)
 
 
+def query_variants(query):
+    """Full query, then progressively shorter ones (3 words, 2 words, first word)."""
+    words = re.findall(r"[a-zA-Z0-9가-힣]+", query)
+    out = [query]
+    for n in (3, 2, 1):
+        if len(words) > n:
+            out.append(" ".join(words[:n]))
+    return list(dict.fromkeys(out))
+
+
 def _search(provider, query, key):
     cache_key = hashlib.sha256(f"{provider}:{query}".encode()).hexdigest()
     path = CACHE / (cache_key + ".json")
@@ -38,7 +48,7 @@ def _search(provider, query, key):
         pass
     if provider == "Pexels":
         response = requests.get("https://api.pexels.com/v1/search", headers={"Authorization": key},
-            params={"query": query, "orientation": "landscape", "per_page": 12}, timeout=12)
+            params={"query": query, "per_page": 30}, timeout=12)
         response.raise_for_status()
         items = [{"id": str(p["id"]), "description": p.get("alt", ""),
                   "url": p.get("src", {}).get("large2x", ""), "source": p.get("url", ""),
@@ -46,8 +56,8 @@ def _search(provider, query, key):
                   "height": p.get("height", 0)} for p in response.json().get("photos", [])]
     elif provider == "Pixabay":
         response = requests.get("https://pixabay.com/api/", params={"key": key, "q": query,
-            "image_type": "photo", "orientation": "horizontal", "safesearch": "true",
-            "min_width": 1000, "per_page": 12}, timeout=12)
+            "image_type": "photo", "safesearch": "true",
+            "min_width": 800, "min_height": 800, "per_page": 40}, timeout=12)
         response.raise_for_status()
         items = [{"id": str(p["id"]), "description": p.get("tags", ""),
                   "url": p.get("largeImageURL", ""), "source": p.get("pageURL", ""),
@@ -109,29 +119,34 @@ def find_stock_image(subject, theme="", *, force=False, selected_provider="auto"
             print(f"stock search unavailable: {provider} key missing")
             continue
         try:
-            for item in _search(provider, query, key):
-                host = urlparse(item["url"]).hostname or ""
-                source_host = urlparse(item["source"]).hostname or ""
-                source_domain = {"Pexels": "pexels.com", "Pixabay": "pixabay.com", "Wikimedia": "commons.wikimedia.org"}[provider]
-                if not (host == domain or host.endswith("." + domain)):
-                    continue
-                if not (source_host == source_domain or source_host.endswith("." + source_domain)):
-                    continue
-                if not item["url"].startswith("https://") or not item["source"].startswith("https://"):
-                    continue
-                if item["width"] < 1000 or item["width"] <= item["height"] or not matches(query, item["description"]):
-                    continue
-                from stable_image_hosting import host_permanently
-                stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
-                metadata = {**item, "provider": provider, "license": item.get("license") or license_url,
-                            "query": query, "estimated_image_cost_usd": 0, "hosted_url": stable}
-                METADATA[stable] = metadata
-                receipt = Path("artifacts/stock-image-receipts.jsonl")
-                receipt.parent.mkdir(parents=True, exist_ok=True)
-                with receipt.open("a", encoding="utf-8") as handle:
-                    handle.write(json.dumps(metadata, ensure_ascii=False) + "\n")
-                print(f"stock photo selected: {provider} {item['id']}; image API estimate $0")
-                return stable
+            if True:  # full query first, then shorter variants; each variant must still match strictly (no off-subject photos)
+                for q in query_variants(query):
+                    for item in _search(provider, q, key):
+                        host = urlparse(item["url"]).hostname or ""
+                        source_host = urlparse(item["source"]).hostname or ""
+                        source_domain = {"Pexels": "pexels.com", "Pixabay": "pixabay.com", "Wikimedia": "commons.wikimedia.org"}[provider]
+                        if not (host == domain or host.endswith("." + domain)):
+                            continue
+                        if not (source_host == source_domain or source_host.endswith("." + source_domain)):
+                            continue
+                        if not item["url"].startswith("https://") or not item["source"].startswith("https://"):
+                            continue
+                        # 1:1 crop makes orientation irrelevant; only require a usable short side.
+                        if min(item["width"], item["height"]) < 800:
+                            continue
+                        if not matches(q, item["description"]):
+                            continue
+                        from stable_image_hosting import host_permanently  # also centre-crops to 1:1
+                        stable = host_permanently(item["url"], asset_key=f"stock-{provider.lower()}-{item['id']}")
+                        metadata = {**item, "provider": provider, "license": item.get("license") or license_url,
+                                    "query": q, "estimated_image_cost_usd": 0, "hosted_url": stable}
+                        METADATA[stable] = metadata
+                        receipt = Path("artifacts/stock-image-receipts.jsonl")
+                        receipt.parent.mkdir(parents=True, exist_ok=True)
+                        with receipt.open("a", encoding="utf-8") as handle:
+                            handle.write(json.dumps(metadata, ensure_ascii=False) + "\n")
+                        print(f"stock photo selected: {provider} {item['id']}; image API estimate $0")
+                        return stable
         except Exception as exc:
             # Never log the request URL: Pixabay's query includes its secret key.
             print(f"stock search/hosting unavailable: {provider} ({type(exc).__name__})")
