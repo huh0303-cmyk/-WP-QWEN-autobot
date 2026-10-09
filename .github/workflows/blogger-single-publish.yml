@@ -1,0 +1,78 @@
+name: "Blogspot 33 — quick single publish / schedule"
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_key:
+        description: "One Blogspot site_key"
+        required: true
+        type: string
+      schedule_at:
+        description: "KST YYYY-MM-DDTHH:MM. Blank = publish immediately."
+        required: false
+        type: string
+        default: ""
+      publication_approved:
+        description: "Public publication approval"
+        required: false
+        type: boolean
+        default: true
+      image_policy:
+        description: "auto_free or stock"
+        required: false
+        type: string
+        default: "auto_free"
+      random_seed:
+        description: "Random trace seed"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blogger-quick-${{ inputs.site_key }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: blogger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests -q
+      - name: Publish one Blogspot article
+        env:
+          BLOGGER_REVIEW_DRAFT_MODE: "false"
+          BLOGGER_SITE_KEY: ${{ inputs.site_key }}
+          PUBLIC_RUN_KEY: "quick-${{ github.run_id }}-${{ inputs.site_key }}-${{ inputs.random_seed }}"
+          BLOGGER_SCHEDULE_AT: ${{ inputs.schedule_at || '' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          BLOGGER_GEMINI_MODEL: "gemini-2.5-flash-lite"
+          LONDON_WRITER_MODEL: "auto_free"
+          LOCAL_TEXT_FALLBACK_ENABLED: "false"
+          BLOGGER_PACE_SECONDS: "0"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          FREE_IMAGE_POLICY: ${{ inputs.image_policy }}
+        run: python scripts/publish_blogger_33_now.py
+      - name: Save publication proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-quick-${{ github.run_id }}
+          path: artifacts/blogger-33-public-results.json
+          retention-days: 7
+          if-no-files-found: warn
