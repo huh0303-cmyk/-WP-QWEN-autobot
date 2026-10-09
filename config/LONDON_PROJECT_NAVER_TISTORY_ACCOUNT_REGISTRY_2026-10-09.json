@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "updated_at": "2026-10-09",
+  "purpose": "Canonical account pairing registry for the Chrome BlogAuto workflow.",
+  "credentials_policy": "Never store passwords. Use browser sessions/cookies only.",
+  "naver": [
+    {
+      "label": "부의정석",
+      "naver_id": "huh0303",
+      "blog_id": "huh0303",
+      "categories": ["부의흐름-국가정책", "기타핫이슈"]
+    },
+    {
+      "label": "헬스의정석",
+      "naver_id": "huh3",
+      "blog_id": "huh3",
+      "categories": ["건강의학정보", "기타핫이슈"]
+    },
+    {
+      "label": "생활의정석",
+      "naver_id": "huh4",
+      "blog_id": "huh4",
+      "categories": ["생활정보", "기타핫이슈"]
+    }
+  ],
+  "tistory": [
+    {"id":"k-vietnam","label":"한국부동산금융정보","url":"https://k-vietnam.tistory.com/"},
+    {"id":"k-insight-vietnam","label":"한국보험정보","url":"https://k-insight-vietnam.tistory.com/"},
+    {"id":"k-healthcare","label":"한국건강정보","url":"https://k-healthcare.tistory.com/"},
+    {"id":"huh0303","label":"한국생활정보","url":"https://huh0303.tistory.com/"},
+    {"id":"k-trip365","label":"한국여행정보","url":"https://k-trip365.tistory.com/"}
+  ]
+}
