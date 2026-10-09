@@ -396,3 +396,14 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - What is still unverified: 라이브 실행(8곳 순차 글쓰기+발행)이 끝까지 성공하는지, 특히 네이버 N1/N2 로그인 상태가 중간에 막히면 어디서 멈추는지(에러 메시지로 사이트명이 표시되므로 확인 가능).
 - Risks: 없음(기존 onGenerate/onPublish 로직 재사용, 새 발행 경로를 만들지 않음). 8곳을 한 번에 돌리므로 총 소요시간이 길어짐(사이트당 생성~10~30초+발행+4초 대기) — 창을 끝까지 열어둬야 함.
 - Next action: 확장 reload 후 "🚀 네이버3+티스토리5 전체 지금 발행" 버튼 1회 실행해 8곳 성공/실패 결과 확인.
+
+## naver-persistent-profile-publisher-built-20261009
+
+- 2026-10-09 20:3x KST — `task_id=naver-persistent-profile-publisher-built-20261009`. 사용자가 제3자 저장소(`github.com/boksajang/naverblog-extention`, .bat 런처+스크린샷 공유)를 예시로 들며 "한번 로그인해두면 다음부터 로그인 없이 빠르게" 방식을 요청. 해당 제3자 저장소는 내부 코드를 확인하지 못해 직접 설치/실행하지 않고(미검증 외부 코드 실행 금지), 동일한 결과를 내는 독립 시스템을 Playwright로 신규 제작.
+- 위치: 사용자 PC `C:\Users\huh03\Downloads\naver-persistent-publisher\` (이 저장소 git 추적 대상 아님, chrisbot과 완전히 별개의 독립 Node.js 프로젝트).
+- 구성: `accounts.json`(네이버 3계정 — chrisbot의 수정된 blogId와 동일하게 k-insight-vietnam/health-standard/sky-only), `naver-dom.js`(chrisbot의 content/naver.js와 동일한 DOM 선택자를 Playwright evaluate 호환 형태로 포팅), `login-once.js`(계정별 영구 브라우저 프로필에 최초 1회 수동 로그인 — 비밀번호는 스크립트가 보지 않음, Playwright가 프로필 폴더에 쿠키/세션 저장), `publish-naver.js`(저장된 프로필 재사용해 Gemini로 글 생성 후 삽입→카테고리→발행까지 자동, chrisbot의 "기타핫이슈 전분야 트렌드/그외 테마+트렌드/100% 한국어" 프롬프트 전략 동일 적용), `1-로그인설정.bat`/`2-발행하기.bat`(사용자용 더블클릭 런처), `README.txt`.
+- Evidence: `node --check` 3개 JS 파일 모두 통과. `npm install`로 playwright 패키지 설치 완료(0 vulnerabilities). `npx playwright install chromium` 성공(exit code 0, Chrome for Testing 156.0.8078.4 + ffmpeg + headless shell 다운로드 완료).
+- What is still unverified (명시적으로 미완료 상태로 기록): 실제 로그인 플로우(사용자가 직접 브라우저 창에서 로그인)와 실제 발행 플로우(Gemini 생성→네이버 에디터 삽입→카테고리→공개발행)는 사용자의 실제 조작이 필요해 이번 세션에서 라이브로 끝까지 확인하지 못했음. `config.json`도 사용자가 직접 Gemini 키를 채워야 하며 아직 생성 안 됨(`config.example.json`만 존재). "완료"로 기록하지 않음.
+- Activity-ledger task_id: `naver-persistent-profile-publisher-built-20261009`.
+- Risks: 네이버 에디터 구조가 바뀌면(기존 chrisbot content/naver.js와 동일한 리스크) 선택자가 깨질 수 있음 — 실패 시 단계별로 멈추고 에러 메시지로 어디서 막혔는지 알려주도록 구현(chrisbot과 동일한 fail-safe 정책).
+- Next action: 사용자가 `config.json` 생성(Gemini 키 입력) → `1-로그인설정.bat`로 3계정 순서대로 로그인 → `2-발행하기.bat` 1회 실행해 3계정 전부 실제 발행되는지 확인 → 결과 보고받아 선택자/프롬프트 조정.
