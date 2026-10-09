@@ -23,6 +23,10 @@ on:
         required: false
         type: string
         default: "1"
+      schedule_at:
+        required: false
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       target_site_url:
@@ -50,6 +54,11 @@ on:
         required: false
         type: string
         default: "1"
+      schedule_at:
+        description: "Optional future KST datetime (YYYY-MM-DDTHH:MM) — write now, publish later. Blank = publish immediately."
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -120,6 +129,7 @@ jobs:
           MAX_REGEN: "1"
           AI_TEXT_PROVIDER: "gemini"
           CHATGPT_SINGLE_MODEL_PIPELINE: "true"  # 2026-10-09 Chairman: drop the blocking two-pass GPT consensus check (was stalling k-visa365 etc.); keep the cheap deterministic title/body-cliche gate only
+          WP_SCHEDULE_AT: ${{ inputs.schedule_at || '' }}  # 2026-10-09: write now, publish later (Chrome extension batch scheduling)
           OPENAI_ENABLED: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}

@@ -3200,10 +3200,28 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
     post_status = resolve_wordpress_post_status(
         site, requested_status=requested_status, public_approved=public_approved
     )
-    data={"title":title,"content":final,"status":post_status,"excerpt":opening(body_html),
-          # Let WordPress assign its own current local/GMT dates.
-          # Sending a hard-coded KST local date schedules posts on non-KST sites.
 
+    # 2026-10-09 Chairman: 크롬 확장(단타 실행기)에서 1주일~1달치 "즉시 작성 + 예약 발행"을
+    # 일괄 등록할 수 있게, 승인된 publish 건에 한해 WP_SCHEDULE_AT(미래 KST 시각,
+    # "YYYY-MM-DDTHH:MM")이 오면 status=future + date/date_gmt를 명시적으로 채운다.
+    # 과거 시각이거나 파싱 실패면 조용히 무시하고 기존 즉시발행 동작 그대로 간다.
+    schedule_at_raw = os.getenv("WP_SCHEDULE_AT", "").strip()
+    scheduled_date_str = None
+    scheduled_date_gmt_str = None
+    if post_status == "publish" and schedule_at_raw:
+        try:
+            sched_kst = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M")
+            if sched_kst > now_kst():
+                post_status = "future"
+                scheduled_date_str = sched_kst.strftime("%Y-%m-%dT%H:%M:%S")
+                scheduled_date_gmt_str = (sched_kst - timedelta(hours=9)).strftime("%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            pass
+
+    data={"title":title,"content":final,"status":post_status,"excerpt":opening(body_html),
+          # 즉시발행은 WordPress가 현재 로컬/GMT 시각을 그대로 쓰도록 date를 보내지 않는다.
+          # 예약발행(post_status=="future")일 때만 위에서 계산한 미래 시각을 명시적으로 채운다.
+          **({"date": scheduled_date_str, "date_gmt": scheduled_date_gmt_str} if scheduled_date_str else {}),
           "comment_status":"closed","ping_status":"closed",
           "categories":[cat_id] if cat_id and cat_id>0 else [],
           "tags":tag_ids,
@@ -3235,6 +3253,13 @@ def wp_post(site, title, body_html, meta, tags, faq, images, keyword, score, rep
                 return {"ok":True,"post_id":pid,"url":purl,"status":"draft","title":title,
                         "author":reporter["name"],"category":cat_name,
                         "verification":{"ok":True,"mode":"draft_review"}}
+            if post_status == "future":
+                # 예약 발행: 지정 시각까지 공개 페이지가 존재하지 않는 게 정상이므로
+                # verify_publication(공개 접근 확인)은 건너뛰고 예약 성공만 보고한다.
+                return {"ok":True,"post_id":pid,"url":purl,"status":"future","title":title,
+                        "author":reporter["name"],"category":cat_name,
+                        "scheduled_at":scheduled_date_str,
+                        "verification":{"ok":True,"mode":"scheduled_future"}}
             verification = verify_publication(purl, title, site_url=url)
             if not verification.ok:
                 return {"ok":False,"post_id":pid,"status":wp_status,"url":purl,
@@ -3687,7 +3712,8 @@ def process_one(site, keyword):
     if result["ok"]:
         title = result.get("title", title)
         is_draft = result.get("status") == "draft"
-        outcome = "초안 생성" if is_draft else "공개 발행"
+        is_scheduled = result.get("status") == "future"
+        outcome = "초안 생성" if is_draft else ("예약 발행 (" + str(result.get("scheduled_at", "")) + ")" if is_scheduled else "공개 발행")
         log_status = "✅ DRAFT" if is_draft else "✅ OK"
         print(f"  ✅ {outcome}: {result.get('url','')} | {result.get('author','')} | {result.get('category','')}")
         log(url,theme,keyword,title,result.get("url",""),score,len(images),log_status,author=result.get("author",""),category=result.get("category",""))
