@@ -372,3 +372,17 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - What is still unverified: 실제 라이브 발행(Blogspot/WP 신규 글)에서 Pexels/Pixabay 중 어느 쪽이 실제로 선택됐는지 매 건 로그 기반 교차검증은 아직 안 함(다음 실제 발행 시 "image selected: Pexels/Pixabay ..." 로그 라인으로 확인 가능 — `pick_image()`는 이미 이 로그를 출력함). `stock_image_provider.py`의 `find_stock_image()`는 `print()` 로그가 없어 provider 선택 로그가 WP 쪽엔 없음(기존부터 그랬음, 이번 변경으로 새로 생긴 문제 아님).
 - Risks: 없음 — 순수 순서 무작위화이며 각 provider 함수의 동작·게이트(라이선스/관련성/해상도 체크)는 변경하지 않음.
 - Next action: 사용자가 Chrome 확장 reload 후 실제 즉시발행 1건(WP 또는 Blogspot)으로 로그에서 어느 provider가 선택됐는지 확인 가능. 이전 미해결 항목(on:push 트리거 구조적 리스크, Blogspot schedule_at 종단 라이브 테스트, Korea365 popup.js 수정 반영 확인)은 여전히 열려 있음 — 별도 작업.
+
+## chrisbot-naver-blogid-fix-and-hot-issue-trending-topic-20261009
+
+- 2026-10-09 20:xx KST — `task_id=chrisbot-naver-blogid-fix-and-hot-issue-trending-topic-20261009`. 사용자가 chrisbot(사용자 PC `C:\Users\huh03\Downloads\wp-blogspot-writer-extension\`, 이 저장소 git 추적 대상 아님) 확장이 네이버 3개+카테고리, 티스토리 5개를 확장프로그램 클릭만으로 발행 가능하도록 준비됐는지 확인·보완을 요청했다.
+- 발견한 버그: `sites-data.js`의 네이버 3곳 `blogId`에 크롬 로그인 계정명(huh0303/huh3/huh4)이 그대로 들어가 있었음. `sidepanel.js`의 `postNewUrlFor()`는 `blogId`를 그대로 `blog.naver.com/{blogId}?Redirect=Write` URL에 사용하므로, 원클릭 시 실제 블로그가 아닌 로그인계정명 경로로 이동하게 돼 있었음(2026-10-01 활동원장에 기록된 실제 로그인 검증 결과와 불일치).
+- 수정: `blogId`를 실제 블로그 URL 슬러그로 교체 — 부의정석→`k-insight-vietnam`(계정 huh0303), 헬스의정석→`health-standard`(계정 huh3), 생활의정석→`sky-only`(계정 huh4). `chromeAccount` 필드로 로그인계정명은 별도 보존. 이 매핑은 2026-10-01 실측 기록과 사용자가 이번 대화에서 직접 재확인한 내용과 일치. `node --check` 통과.
+- 확인: 네이버 3개(각 2개 카테고리, 2번째는 공통으로 "기타핫이슈")·티스토리 5개가 수동모드 `#site` 드롭다운에 이미 개별 등록돼 있고, "⚡ 자동 생성 + 즉시발행 (한번에)" 단일 버튼으로 생성+발행이 끝나는 구조가 기존에 구현돼 있었음(추가 구현 불필요, 확인만).
+- 콘텐츠 전략 반영(Chairman 지시): `sidepanel.js`의 `buildTextPrompt()`를 수정 — (1) 네이버 3곳의 2번째 카테고리("기타핫이슈")는 사이트 고유 테마에 묶이지 않고 스포츠·정치·경제·문화·연예·사회 등 전 분야에서 오늘 검색량이 가장 높을 소재를 직접 골라 하루 방문자 100명 이상을 목표로 쓰도록 프롬프트 지시 추가(사실 확인이 필요한 소재는 단정 금지, 체크리스트/대처법 형태 권장). (2) 네이버 1번째 카테고리 + 티스토리 5곳 전체는 사이트 테마는 유지하되 그 안에서 네이버/구글 검색·언급이 많은 구체적 소재를 고르도록 지시 추가. (3) 네이버·티스토리는 100% 한국어로만 작성하도록 명시(기존에도 한국어 작가로 지정돼 있었으나 영어 혼용 금지를 명시적으로 추가). `node --check` 통과.
+- Evidence: `node --check` 2개 파일(`sites-data.js`, `sidepanel.js`) 통과. Tistory 5곳 공개 피드를 WebFetch로 직접 확인(k-healthcare/k-vietnam/k-insight-vietnam/k-trip365는 2026-10-07~10-09 최근 발행, `huh0303.tistory.com`(한국생활정보)는 2026-02 이후 신규 글 없음 — 별도 확인 필요 항목으로 분리). Naver 3곳은 Claude in Chrome이 `blog.naver.com`을 안전정책으로 차단해 이번 세션에서 직접 재확인하지 못했고, 매핑은 2026-10-01 실측 기록 + 사용자의 이번 대화 내 재확인으로 뒷받침됨 — 라이브 글쓰기 자체로 검증된 것은 아님.
+- Activity-ledger task_id: `chrisbot-naver-blogid-fix-and-hot-issue-trending-topic-20261009`.
+- Schedule/cadence compliance: 해당 없음(이 변경은 사용자 PC 로컬 확장 파일이며 GitHub Actions 스케줄과 무관).
+- What is still unverified: (1) 실제 확장 reload 후 네이버 3곳 중 원클릭 발행이 로그인 상태까지 포함해 끝까지 성공하는지(특히 N1 huh0303/N2 huh3 계정 로그인 여부는 과거 "미검증/보호조치"로 남아 있었음), (2) "기타핫이슈" 프롬프트가 실제로 적절한 트렌드 소재를 골라내는지 라이브 생성 결과로 확인 필요, (3) `huh0303.tistory.com`(한국생활정보)의 8개월 발행 중단 원인.
+- Risks: 없음(프롬프트/데이터 수정만, 발행 로직·게이트는 변경 안 함). 다만 "기타핫이슈" 소재가 사실관계 오류를 낼 위험은 프롬프트에 단정 금지 지시로 완화했으나 100% 보장은 아님 — 생성 결과를 몇 건 검토 권장.
+- Next action: 확장 reload 요청, 네이버 3곳 각 1건 실제 발행 테스트(로그인 상태 확인 겸), `huh0303.tistory.com` 중단 원인 확인, "기타핫이슈" 생성 결과 샘플 검토.
