@@ -62,6 +62,15 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          # 2026-10-09: 수동 dispatch 워크플로우에 이 네 개가 빠져 있어서 pick_image()의
+          # 무료 스톡 검색(Pexels/Pixabay)도, image_guarantee.ensure_image()의 최종 카드
+          # 호스팅(GH_ASSET_TOKEN/GITHUB_REPOSITORY)도 둘 다 조용히 실패해 이미지 없이
+          # 발행되고 있었음. blogger-33-daily-github.yml(정기 자동발행)과 동일하게 추가 —
+          # 전부 무료(Pexels/Pixabay 무료 키, GH_ASSET_TOKEN은 github.token 폴백).
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: python scripts/publish_blogger_33_now.py
       - name: Save exact post IDs and URLs
         if: always()

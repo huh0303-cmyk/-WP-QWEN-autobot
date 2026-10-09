@@ -168,6 +168,11 @@ jobs:
           STOCK_IMAGES_ENABLED: "true"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          # 2026-10-09: Blogspot용 image_guarantee.ensure_image() 최종 카드 폴백과 동일한
+          # 무료 호스팅 경로를 WordPress에도 적용(Chairman: "같은로직으로"). github.token
+          # 폴백이라 추가 비용 없음.
+          GH_ASSET_TOKEN: ${{ secrets.GH_ASSET_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           REPLICATE_API_TOKEN: ""
           AUTOMATED_IMAGE_PUBLISHING_ENABLED: "true"
           WP_IMAGE_COUNT: ${{ inputs.image_count || '1' }}

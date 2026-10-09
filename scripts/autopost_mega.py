@@ -3602,9 +3602,12 @@ def process_one(site, keyword):
         images=[]
         print("  🚫 자동 이미지 생성·검색·첨부 전면 중지")
     else:
-        # WordPress blog policy: use only a relevant Pexels/Pixabay stock photo.
-        # If no genuinely relevant stock photo exists, publish without an image.
-        # Never manufacture a generic topic card or paid/generated image as a fallback.
+        # WordPress blog policy: prefer a relevant Pexels/Pixabay stock photo.
+        # 2026-10-10 Chairman ("같은로직으로 하라니까"): if no genuinely relevant
+        # stock photo exists, fall through to the same free-only guarantee chain
+        # already used for Blogspot (image_guarantee.ensure_image — Wikimedia/
+        # Openverse, then a Pillow-generated topic card as the last resort that
+        # can never fail) instead of simply publishing without an image.
         images = []
         if not site.get("_newsroom_real_photo"):
             try:
@@ -3616,7 +3619,19 @@ def process_one(site, keyword):
             except Exception as _e:  # noqa: BLE001
                 print(f"  ⚠️ stock photo selection failed: {type(_e).__name__}")
         if not images and not site.get("_newsroom_real_photo"):
-            print("  ℹ️ relevant Pexels/Pixabay photo unavailable → publish without image")
+            try:
+                from image_guarantee import ensure_image
+                found = ensure_image(
+                    title, queries=[keyword, title], theme=theme,
+                    asset_key=f"wp-{site.get('url', keyword)}",
+                )
+                if found and found.get("url"):
+                    images = [found["url"]]
+                    print(f"  🖼️ fallback image: {found.get('provider', 'unknown')}")
+            except Exception as _e:  # noqa: BLE001
+                print(f"  ⚠️ image guarantee fallback failed: {type(_e).__name__}")
+        if not images and not site.get("_newsroom_real_photo"):
+            print("  ℹ️ image guarantee chain exhausted → publish without image")
     print(f"  🖼  이미지 {len(images)}장")
 
     # ★ 2026-09-06: wp_post()가 발행 직전에 코드로 강제 삽입하는 "관련 글" 박스
