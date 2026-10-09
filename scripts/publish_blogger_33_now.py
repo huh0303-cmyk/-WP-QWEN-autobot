@@ -192,20 +192,39 @@ def main() -> int:
                         hint = "\nIMPORTANT: return one valid JSON object only, no commentary, and follow every structure rule."
             try:  # free image chain; failure must never block publication
                 found = pick_image(image_subject or site['theme'], alternates=[site['theme']])
-                if not found:  # Chairman 2026-10-06: never publish without an image
-                    from image_guarantee import ensure_image
-                    found = ensure_image(title, queries=[image_subject or site['theme'], title], theme=site['theme'],
-                                         asset_key=f"blogger-{site['key']}")
+                # Free-only rule: relevant free stock/AI image or no image; never a generic topic card.
                 if found and found.get("url"):
                     body = insert_image(body, found, title)
             except Exception as exc:
                 print(f"image step skipped: {type(exc).__name__}")
             body = f"<!-- {marker} -->\n{body}"
-            response = requests.post(endpoint, params={"isDraft": "true" if draft_mode else "false"}, headers=headers,
+            schedule_at_raw = os.environ.get("BLOGGER_SCHEDULE_AT", "").strip()
+            scheduled_kst = None
+            if schedule_at_raw:
+                try:
+                    candidate = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M")
+                    now_kst = datetime.now(timezone.utc) + __import__("datetime").timedelta(hours=9)
+                    if candidate > now_kst:
+                        scheduled_kst = candidate
+                except ValueError:
+                    scheduled_kst = None
+            schedule_mode = bool(scheduled_kst) and not draft_mode
+            insert_is_draft = draft_mode or schedule_mode
+            response = requests.post(endpoint, params={"isDraft": "true" if insert_is_draft else "false"}, headers=headers,
                                      json={"kind": "blogger#post", "title": title, "content": body, "labels": labels}, timeout=30)
             response.raise_for_status()
             post = response.json(); url = post.get("url", "")
-            if draft_mode:
+            if schedule_mode:
+                publish_endpoint = f"{endpoint}/{post.get('id', '')}/publish"
+                publish_date = scheduled_kst.replace(tzinfo=timezone(__import__("datetime").timedelta(hours=9))).astimezone(timezone.utc).isoformat().replace("+00:00","Z")
+                scheduled = requests.post(publish_endpoint, params={"publishDate": publish_date}, headers=headers, timeout=30)
+                scheduled.raise_for_status()
+                post = scheduled.json()
+                ok = bool(post.get("id")) and str(post.get("status", "")).upper() == "SCHEDULED"
+                results.append({"site": site["key"], "status": "scheduled" if ok else "verification_failed",
+                                "url": post.get("url", url), "post_id": post.get("id", ""),
+                                "scheduled_at": scheduled_kst.strftime("%Y-%m-%dT%H:%M")})
+            elif draft_mode:
                 review_url = f"https://www.blogger.com/blog/post/edit/{site['id']}/{post.get('id', '')}"
                 queued = append_review_rows([{
                     "platform": "Blogspot", "channel": site["key"], "title": title,
@@ -246,7 +265,7 @@ def main() -> int:
             failed = True
             results.append({"site": site["key"], "status": "failed", "error": str(exc)[:500]})
         RESULT.write_text(json.dumps({"run_key": run_key, "updated_at": datetime.now(timezone.utc).isoformat(), "results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
-    expected = {"drafted", "drafted_existing"} if draft_mode else {"published", "existing"}
+    expected = {"drafted", "drafted_existing"} if draft_mode else ({"scheduled"} if os.environ.get("BLOGGER_SCHEDULE_AT", "").strip() else {"published", "existing"})
     exact_complete = len(results) == expected_count and len({r.get("site") for r in results}) == expected_count and all(r.get("status") in expected for r in results)
     print(json.dumps(results, ensure_ascii=False, indent=2))
     return 1 if failed or not exact_complete else 0
