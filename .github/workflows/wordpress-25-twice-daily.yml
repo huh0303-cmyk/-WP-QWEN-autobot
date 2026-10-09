@@ -1,0 +1,38 @@
+name: "WordPress 25 — twice daily automatic"
+
+on:
+  schedule:
+    - cron: "17 22 * * *"
+    - cron: "17 10 * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Optional single slot"
+        required: false
+        type: choice
+        options: ["", "am", "pm"]
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordpress-25-twice-daily
+  cancel-in-progress: false
+
+jobs:
+  wordpress_am:
+    if: ${{ github.event_name == 'schedule' || inputs.slot == '' || inputs.slot == 'am' }}
+    uses: ./.github/workflows/daily-network-publish.yml
+    with:
+      publication_approved: true
+      image_count: "1"
+    secrets: inherit
+
+  wordpress_pm:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.slot == 'pm' }}
+    uses: ./.github/workflows/daily-network-publish.yml
+    with:
+      publication_approved: true
+      image_count: "1"
+    secrets: inherit
