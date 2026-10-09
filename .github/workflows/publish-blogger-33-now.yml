@@ -21,6 +21,11 @@ on:
         required: false
         default: "true"
         type: string
+      schedule_at:
+        description: "선택: 미래 KST 시각(YYYY-MM-DDTHH:MM). Blogger 네이티브 예약발행(publishDate) 사용 — 비우면 즉시."
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -47,6 +52,10 @@ jobs:
           # 전환 가능 — 2026-09-26 Chairman 요청으로 1개 사이트 안전 시연을 위해 추가.
           BLOGGER_REVIEW_DRAFT_MODE: ${{ inputs.draft_mode || 'false' }}
           BLOGGER_SITE_KEY: ${{ inputs.site_key || '' }}
+          # 2026-10-09: publish_blogger_33_now.py는 Blogger API 네이티브 예약발행
+          # (publishDate, BLOGGER_SCHEDULE_AT)을 이미 지원하지만 이 워크플로우에는 입력이
+          # 연결돼 있지 않았음 — WP와 동일한 "진짜 미래 예약" 경로로 연결(큐/크론 불필요).
+          BLOGGER_SCHEDULE_AT: ${{ inputs.schedule_at || '' }}
           PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           REVIEW_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
