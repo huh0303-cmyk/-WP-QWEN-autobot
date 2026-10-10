@@ -115,6 +115,7 @@ def content_count(url, platform):
 def one(h, props, platform, url, ref, prev_hist):
     row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url, "platform": platform, "status": "OK"}
     prop = prop_for(url, props)
+    row["gsc_property"] = prop
     day = ref.isoformat()
     before = (ref - dt.timedelta(days=1)).isoformat()
     row["content"] = content_count(url, platform)
