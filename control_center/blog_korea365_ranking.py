@@ -232,20 +232,31 @@ def build_ranking(
     for row in get_naver_data():
         cards.append(_card(row, "naver", "naver"))
 
+    def numeric_metric(value):
+        if value is None or value == "":
+            return None
+        try:
+            return float(str(value).replace(",", "").strip())
+        except (TypeError, ValueError):
+            return None
+
     def ranking_key(card):
-        applicable = card["platform"] in {"wordpress", "blogspot"}
-        value = card.get("gsc_clicks")
-        return (not applicable or value is None, -(value or 0), card.get("name") or "")
+        # The user's primary ranking is yesterday's actual visitor count.
+        # Keep sites without a measured visitor count at the bottom, never as zero.
+        yesterday = numeric_metric(card.get("yesterday_visitors"))
+        total = numeric_metric(card.get("total_visitors"))
+        return (
+            yesterday is None,
+            -(yesterday if yesterday is not None else 0),
+            total is None,
+            -(total if total is not None else 0),
+            str(card.get("name") or "").lower(),
+        )
+
     cards.sort(key=ranking_key)
-    rank = 0
     for row_number, card in enumerate(cards, 1):
         card["row_number"] = row_number
-        applicable = card["platform"] in {"wordpress", "blogspot"}
-        if not applicable or card.get("gsc_clicks") is None:
-            card["rank"] = None
-        else:
-            rank += 1
-            card["rank"] = rank
+        card["rank"] = row_number
 
     platform_counts: dict[str, int] = {}
     for card in cards:
@@ -257,10 +268,11 @@ def build_ranking(
         "generated_at": datetime.now(KST).isoformat(),
         "display_date": today.isoformat(),
         "ranking_date": ranking_date,
+        "visitor_ranking_date": (today - timedelta(days=1)).isoformat(),
         "timezone": "Asia/Seoul",
-        "ranking_metric": "gsc_clicks",
-        "ranking_purpose": "WP25 + Blogspot33 unified GSC ranking",
-        "ranking_policy": "Same confirmed GSC date; clicks primary; impressions/CTR/position secondary; visitor counters excluded; ACCESS_UNAVAILABLE is never zero.",
+        "ranking_metric": "yesterday_visitors",
+        "ranking_purpose": "Unified 68-site blog ranking by yesterday visitors descending",
+        "ranking_policy": "Yesterday visitor count descending; ties by total visitors descending then site name; missing visitor metrics at bottom; GSC is secondary information and unavailable data is never treated as zero.",
         "total_cards": len(cards),
         "ranked_cards": rank,
         "unranked_cards": len(cards) - rank,
