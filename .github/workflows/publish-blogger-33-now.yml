@@ -25,6 +25,16 @@ on:
         required: false
         default: ""
         type: string
+      topic:
+        description: "선택: 지정한 카테고리/주제로 글 생성"
+        required: false
+        default: ""
+        type: string
+      image_policy:
+        description: "auto_free = 무료 이미지, stock = 무료 스톡, none = 이미지 없이"
+        required: false
+        default: "auto_free"
+        type: string
 
 permissions:
   contents: read
@@ -55,6 +65,8 @@ jobs:
           # (publishDate, BLOGGER_SCHEDULE_AT)을 이미 지원하지만 이 워크플로우에는 입력이
           # 연결돼 있지 않았음 — WP와 동일한 "진짜 미래 예약" 경로로 연결(큐/크론 불필요).
           BLOGGER_SCHEDULE_AT: ${{ inputs.schedule_at || '' }}
+          BLOGGER_TOPIC_HINT: ${{ inputs.topic || '' }}
+          BLOGGER_IMAGE_POLICY: ${{ inputs.image_policy || 'auto_free' }}
           PUBLIC_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           REVIEW_RUN_KEY: ${{ inputs.run_key || github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
