@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Korea365 일일 현황</title>
+<style>
+body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:16px;background:#f6f7f9;color:#1c1c1e}
+h1{font-size:1.2rem;margin:0 0 4px}.sub{color:#666;font-size:.85rem;margin-bottom:12px}
+table{border-collapse:collapse;width:100%;background:#fff;font-size:.88rem}
+th,td{padding:7px 9px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap}
+th{background:#1f2937;color:#fff;position:sticky;top:0}
+td:nth-child(1),td:nth-child(2),td:nth-child(3),th:nth-child(1),th:nth-child(2),th:nth-child(3){text-align:left}
+.up{color:#0a7d33}.down{color:#c62828}.na{color:#999}
+.tag{font-size:.72rem;padding:1px 6px;border-radius:8px;background:#e5e7eb}
+.WP{background:#dbeafe}.BS{background:#fde68a}
+</style></head><body>
+<h1>Korea365 일일 현황 (WP + Blogspot)</h1>
+<div class="sub" id="meta">불러오는 중...</div>
+<table><thead><tr><th>#</th><th>구분</th><th>사이트</th>
+<th>어제 방문자</th><th>증감</th><th>누적 방문자</th><th>증감</th>
+<th>콘텐츠 수</th><th>증감</th><th>구글 노출 글</th><th>증감</th></tr></thead>
+<tbody id="b"></tbody></table>
+<script>
+function d(v){if(v===null||v===undefined)return '<span class="na">-</span>';
+return v>0?'<span class="up">+'+v+'</span>':v<0?'<span class="down">'+v+'</span>':'0'}
+function n(v){return v===null||v===undefined?'<span class="na">수집불가</span>':v.toLocaleString()}
+fetch('dashboard.json?'+Date.now()).then(r=>r.json()).then(j=>{
+document.getElementById('meta').textContent='기준일 '+j.reference_date+' (매일 07:00 KST 갱신, 생성 '+j.generated_at.slice(0,16).replace('T',' ')+') · '+j.basis;
+document.getElementById('b').innerHTML=j.rows.map(r=>'<tr><td>'+r.rank+'</td><td><span class="tag '+(r.platform==='wordpress'?'WP">WP':'BS">Blogspot')+'</span></td><td>'+r.site+'</td><td>'+n(r.visitors)+'</td><td>'+d(r.visitors_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+d(r.cumulative_delta)+'</td><td>'+n(r.content)+'</td><td>'+d(r.content_delta)+'</td><td>'+n(r.google_pages)+'</td><td>'+d(r.google_pages_delta)+'</td></tr>').join('')});
+</script></body></html>
