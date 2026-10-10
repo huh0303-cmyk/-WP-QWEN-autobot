@@ -315,7 +315,7 @@ def send_to_sheets(records):
         domains = [s.rstrip("/").replace("https://", "") for s in SITES]
         values_by_domain = {
             r["domain"]: [
-                fmt_value_delta(r.get("daily_visitors"), r.get("visitor_delta")),
+                fmt_value_delta(r.get("day_before_yesterday_visitors"), None),
                 fmt_value_delta(r.get("total_visitors"), r.get("total_delta")),
                 r.get("sitemap_indexed"),
                 r.get("sitemap_submitted"),
@@ -324,7 +324,6 @@ def send_to_sheets(records):
                 fmt_delta(r.get("recent_index_increase")),
                 r.get("total_posts"),
                 r.get("gsc_clicks"),
-                r.get("impressions"),
                 r.get("ctr"),
                 r.get("position"),
                 r.get("gsc_date"),
@@ -338,14 +337,15 @@ def send_to_sheets(records):
             domains,
             date_label,
             [
-                "오늘방문(전일대비)", "누적방문(오늘증가)", "사이트맵 보고 색인수", "사이트맵 제출URL수",
+                "그저께 방문자", "누적방문(오늘증가)", "GSC 사이트맵 색인수", "GSC 제출 URL수",
                 "미색인수", "색인율(%)", "최근 색인 증가", "총 발행글",
-                "GSC클릭", "GSC노출", "GSC CTR(%)", "GSC평균순위", "GSC기준일",
+                "GSC 클릭", "GSC CTR(%)", "GSC 평균순위", "GSC 기준일",
                 "오류/연결상태",
             ],
             values_by_domain,
+            link_urls={r["domain"]: next((u for u in SITES if u.rstrip("/").replace("https://", "") == r["domain"]), "https://" + r["domain"]) for r in records},
         )
-        log(f"📊 시트 갱신 완료 — {date_label} / footer 방문자 기준")
+        log(f"📊 시트 갱신 완료 — {date_label} / 그저께 방문자 + GSC 색인수 기준")
     except Exception as e:
         log(f"⚠️ 구글시트 직접 쓰기 실패: {e}")
 
@@ -480,7 +480,7 @@ def main():
             {"checked_at": checked_at, "records": records, "partial": False},
             f, ensure_ascii=False, indent=2,
         )
-    log("✅ 완료 — 오늘방문(전일대비)·누적방문(오늘증가) 형식으로 기록")
+    log("✅ 완료 — 그저께 방문자·누적방문·GSC 사이트맵 색인수 형식으로 기록")
 
 
 if __name__ == "__main__":
