@@ -42,11 +42,19 @@ def _gsc_metrics(five_minute_bucket: int) -> dict[str, dict[str, object]]:
     path = Path(__file__).resolve().parents[1] / "data" / "gsc_unified_ranking.json"
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
-        return {
-            str(row.get("domain") or "").lower(): row
-            for row in payload.get("records", [])
-            if row.get("domain")
-        }
+        # Collector records use "site" (canonical URL), not "domain".
+        # Normalize both forms to the same URL key used by _card().
+        indexed: dict[str, dict[str, object]] = {}
+        for row in payload.get("records", []):
+            raw = str(row.get("site") or row.get("url") or row.get("domain") or "").strip().lower()
+            if not raw:
+                continue
+            key = raw.rstrip("/")
+            indexed[key] = row
+            # Accept older manifests keyed by bare host/domain too.
+            host = (urlparse(raw).hostname or raw).lower().strip(".")
+            indexed.setdefault(host, row)
+        return indexed
     except (OSError, ValueError, TypeError):
         return {}
 
@@ -128,7 +136,10 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
     revenue = revenue_info(domain, row)
     timeline = opening_recent_info(url, platform)
     infra = infrastructure_info(platform, kind)
-    gsc = _gsc_metrics(int(time.time() // 300)).get(url.rstrip("/").lower(), {})
+    gsc_index = _gsc_metrics(int(time.time() // 300))
+    gsc = gsc_index.get(url.rstrip("/").lower(), {})
+    if not gsc and domain:
+        gsc = gsc_index.get(domain.lower().strip("."), {})
     property_row = _gsc_property_for(url)
     if platform in {"wordpress", "blogspot"}:
         gsc_clicks = gsc.get("clicks")
@@ -198,6 +209,7 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
             else "user_auth_required" if gsc_permission == "siteUnverifiedUser"
             else "disconnected"
         ),
+        "gsc_data_status": str(gsc.get("status") or ("OK" if gsc_clicks is not None and gsc_impressions is not None else "ACCESS_UNAVAILABLE")),
         "connector_status": _connector_status(row, platform),
         "checked_at": row.get("visitor_checked_at") or row.get("checked_at") or "",
     }
