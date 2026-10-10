@@ -1,4 +1,5 @@
 name: "Blogger 33 — direct public publish"
+run-name: "Chrisbot Blogger | ${{ inputs.site_key || 'all-sites' }} | ${{ inputs.run_key || github.run_id }}"
 
 on:
   push:
