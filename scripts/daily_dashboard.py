@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Daily dashboard: WP + Blogspot in one ranking. Runs 07:00 KST, no AI/tokens.
-Metrics per site (reference day = yesterday KST):
- 1 visitors yesterday (GSC clicks, dataState=all) + delta vs day before
- 2 cumulative clicks (GSC, all available history) + delta (= yesterday)
+Metrics per site (reference day = day before yesterday KST, so GSC data is more settled):
+ 1 day-before-yesterday search clicks (daily traffic proxy) + delta vs three days ago
+ 2 cumulative clicks (GSC, all available history) + delta (= reference-day clicks)
  3 content count (WP REST / Blogspot feed) + delta vs previous snapshot
- 4 pages shown in Google (distinct pages with impressions, last 28 days) + delta
+ 4 GSC sitemap indexed URL count + delta vs previous snapshot (not search impressions)
 """
 import datetime as dt
 import json
@@ -25,7 +25,7 @@ EXCLUDE = ("theseouljournal",)
 OUT = ROOT / "docs" / "dashboard.json"
 HIST = ROOT / "data" / "dashboard_history.json"
 EMPTY = dict(visitors=None, visitors_delta=None, cumulative=None, cumulative_delta=None,
-             google_pages=None, google_pages_delta=None)
+             google_indexed=None, google_indexed_delta=None)
 
 
 def token():
@@ -53,6 +53,45 @@ def prop_for(url, props):
     return max(m, key=len) if m else None
 
 
+def indexed_sitemap_count(h, prop):
+    """Return indexed web-URL counts reported for submitted GSC sitemaps.
+    This is the GSC sitemap count, not pages with impressions. Missing or
+    unsupported counts remain None rather than being fabricated as zero.
+    """
+    try:
+        encoded_prop = quote(prop, safe="")
+        r = requests.get(
+            "https://www.googleapis.com/webmasters/v3/sites/" + encoded_prop + "/sitemaps",
+            headers=h, timeout=30,
+        )
+        if r.status_code != 200:
+            return None
+        total = 0
+        found = False
+        for sm in r.json().get("sitemap", []):
+            path = sm.get("path")
+            if not path:
+                continue
+            detail = requests.get(
+                "https://www.googleapis.com/webmasters/v3/sites/" + encoded_prop
+                + "/sitemaps/" + quote(path, safe=""),
+                headers=h, timeout=30,
+            )
+            if detail.status_code != 200:
+                continue
+            for item in detail.json().get("contents", []):
+                if str(item.get("type", "")).lower() != "web":
+                    continue
+                count = item.get("indexed")
+                if count is None:
+                    continue
+                total += int(count)
+                found = True
+        return total if found else None
+    except (requests.RequestException, ValueError, TypeError):
+        return None
+
+
 def content_count(url, platform):
     try:
         if platform == "wordpress":
@@ -65,7 +104,7 @@ def content_count(url, platform):
 
 
 def one(h, props, platform, url, ref, prev_hist):
-    row = {"site": url.split("://", 1)[-1].rstrip("/"), "platform": platform, "status": "OK"}
+    row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url, "platform": platform, "status": "OK"}
     prop = prop_for(url, props)
     day = ref.isoformat()
     before = (ref - dt.timedelta(days=1)).isoformat()
@@ -92,19 +131,18 @@ def one(h, props, platform, url, ref, prev_hist):
                         "dataState": "all"})
     row["cumulative"] = int(sum(r["clicks"] for r in tot)) if tot else 0
     row["cumulative_delta"] = row["visitors"]
-    pages = gsc(h, prop, {"startDate": (ref - dt.timedelta(days=27)).isoformat(), "endDate": day,
-                          "dimensions": ["page"], "dataState": "all", "rowLimit": 25000})
-    row["google_pages"] = len(pages) if pages is not None else None
-    if row["google_pages"] is not None and p.get("google_pages") is not None:
-        row["google_pages_delta"] = row["google_pages"] - p["google_pages"]
+    row["google_indexed"] = indexed_sitemap_count(h, prop)
+    previous_indexed = p.get("google_indexed", p.get("google_pages"))
+    if row["google_indexed"] is not None and previous_indexed is not None:
+        row["google_indexed_delta"] = row["google_indexed"] - previous_indexed
     else:
-        row["google_pages_delta"] = None
+        row["google_indexed_delta"] = None
     return row
 
 
 def main():
     now = dt.datetime.now(KST)
-    ref = now.date() - dt.timedelta(days=1)
+    ref = now.date() - dt.timedelta(days=2)
     h = {"Authorization": "Bearer " + token(), "Content-Type": "application/json"}
     ents = requests.get("https://www.googleapis.com/webmasters/v3/sites", headers=h, timeout=30).json().get("siteEntry", [])
     props = {e["siteUrl"] for e in ents if e.get("permissionLevel") != "siteUnverifiedUser"}
@@ -122,9 +160,9 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "generated_at": now.isoformat(), "reference_date": ref.isoformat(),
-        "basis": "Every day 07:00 KST. Visitors = Google Search Console clicks for the reference day (provisional, may shift slightly).",
+        "basis": "매일 07:00 KST 갱신 · 방문 통계 기준일은 그저께(2일 전) · 방문자 대체 지표는 GSC 검색 클릭 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
         "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
-    hist[ref.isoformat()] = {r["site"]: {"content": r["content"], "google_pages": r.get("google_pages")} for r in rows}
+    hist[ref.isoformat()] = {r["site"]: {"content": r["content"], "google_indexed": r.get("google_indexed")} for r in rows}
     for k in sorted(hist)[:-60]:
         del hist[k]
     HIST.write_text(json.dumps(hist, ensure_ascii=False), encoding="utf-8")
