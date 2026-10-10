@@ -1,6 +1,12 @@
 name: Daily dashboard (WP + Blogspot)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/daily_dashboard.py"
+      - "docs/index.html"
+      - ".github/workflows/daily-dashboard.yml"
   workflow_dispatch: {}
   schedule:
     - cron: "0 22 * * *" # 07:00 KST
