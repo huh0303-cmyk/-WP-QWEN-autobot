@@ -25,7 +25,7 @@ EXCLUDE = ("theseouljournal",)
 OUT = ROOT / "docs" / "dashboard.json"
 HIST = ROOT / "data" / "dashboard_history.json"
 EMPTY = dict(visitors=None, visitors_delta=None, cumulative=None, cumulative_delta=None,
-             google_indexed=None, google_indexed_delta=None)
+             google_indexed=None, google_indexed_delta=None, google_indexed_status="GSC_INDEX_COUNT_UNAVAILABLE")
 
 
 def token():
@@ -67,6 +67,7 @@ def indexed_sitemap_count(h, prop):
         if r.status_code != 200:
             return None
         total = 0
+        submitted_total = 0
         found = False
         for sm in r.json().get("sitemap", []):
             path = sm.get("path")
@@ -82,12 +83,20 @@ def indexed_sitemap_count(h, prop):
             for item in detail.json().get("contents", []):
                 if str(item.get("type", "")).lower() != "web":
                     continue
+                submitted_total += int(item.get("submitted", 0) or 0)
                 count = item.get("indexed")
                 if count is None:
                     continue
                 total += int(count)
                 found = True
-        return total if found else None
+        # Search Console deprecated the sitemap contents[].indexed field.
+        # In current responses it can appear as 0 for every site even when
+        # the site has hundreds of submitted URLs. Never present that as a
+        # real indexed-page count; the aggregate Page indexing report has no
+        # supported API endpoint.
+        if not found or (total == 0 and submitted_total > 0):
+            return None
+        return total
     except (requests.RequestException, ValueError, TypeError):
         return None
 
@@ -132,6 +141,7 @@ def one(h, props, platform, url, ref, prev_hist):
     row["cumulative"] = int(sum(r["clicks"] for r in tot)) if tot else 0
     row["cumulative_delta"] = row["visitors"]
     row["google_indexed"] = indexed_sitemap_count(h, prop)
+    row["google_indexed_status"] = "OK" if row["google_indexed"] is not None else "GSC_INDEX_COUNT_UNAVAILABLE"
     previous_indexed = p.get("google_indexed", p.get("google_pages"))
     if row["google_indexed"] is not None and previous_indexed is not None:
         row["google_indexed_delta"] = row["google_indexed"] - previous_indexed
