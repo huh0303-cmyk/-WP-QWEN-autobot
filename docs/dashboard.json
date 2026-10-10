@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-10T23:55:26.050612+09:00",
+ "generated_at": "2026-10-10T23:57:23.119666+09:00",
  "reference_date": "2026-10-08",
  "basis": "매일 07:00 KST 갱신 · 방문 통계 기준일은 그저께(2일 전) · 방문자 대체 지표는 GSC 검색 클릭 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
  "rows": [
@@ -14,7 +14,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 1
   },
@@ -29,7 +30,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 2
   },
@@ -44,7 +46,8 @@
    "visitors_delta": 0,
    "cumulative": 10,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 3
   },
@@ -59,7 +62,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 4
   },
@@ -74,7 +78,8 @@
    "visitors_delta": 0,
    "cumulative": 15,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 5
   },
@@ -89,7 +94,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 6
   },
@@ -104,7 +110,8 @@
    "visitors_delta": -1,
    "cumulative": 47,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 7
   },
@@ -119,7 +126,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 8
   },
@@ -134,7 +142,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 9
   },
@@ -149,7 +158,8 @@
    "visitors_delta": 0,
    "cumulative": 30,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 10
   },
@@ -164,7 +174,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 11
   },
@@ -179,7 +190,8 @@
    "visitors_delta": 0,
    "cumulative": 5,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 12
   },
@@ -194,7 +206,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 13
   },
@@ -209,7 +222,8 @@
    "visitors_delta": 0,
    "cumulative": 8,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 14
   },
@@ -224,7 +238,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 15
   },
@@ -239,7 +254,8 @@
    "visitors_delta": 0,
    "cumulative": 5,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 16
   },
@@ -254,7 +270,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 17
   },
@@ -269,7 +286,8 @@
    "visitors_delta": 0,
    "cumulative": 1,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 18
   },
@@ -284,7 +302,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 19
   },
@@ -299,7 +318,8 @@
    "visitors_delta": 0,
    "cumulative": 16,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 20
   },
@@ -314,7 +334,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 21
   },
@@ -329,7 +350,8 @@
    "visitors_delta": 0,
    "cumulative": 8,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 22
   },
@@ -344,7 +366,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 23
   },
@@ -359,7 +382,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 24
   },
@@ -374,7 +398,8 @@
    "visitors_delta": 0,
    "cumulative": 3,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 25
   },
@@ -389,7 +414,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 26
   },
@@ -404,7 +430,8 @@
    "visitors_delta": -1,
    "cumulative": 3,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 27
   },
@@ -419,7 +446,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 28
   },
@@ -434,7 +462,8 @@
    "visitors_delta": 0,
    "cumulative": 2,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 29
   },
@@ -449,7 +478,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 30
   },
@@ -464,7 +494,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 31
   },
@@ -479,7 +510,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 32
   },
@@ -494,7 +526,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 33
   },
@@ -509,7 +542,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 34
   },
@@ -524,7 +558,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 35
   },
@@ -539,7 +574,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 36
   },
@@ -554,7 +590,8 @@
    "visitors_delta": 0,
    "cumulative": 20,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 37
   },
@@ -569,7 +606,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 38
   },
@@ -584,7 +622,8 @@
    "visitors_delta": 0,
    "cumulative": 2,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 39
   },
@@ -599,7 +638,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 40
   },
@@ -614,7 +654,8 @@
    "visitors_delta": 0,
    "cumulative": 1,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 41
   },
@@ -629,7 +670,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 42
   },
@@ -644,7 +686,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 43
   },
@@ -659,7 +702,8 @@
    "visitors_delta": 0,
    "cumulative": 13,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 44
   },
@@ -674,7 +718,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 45
   },
@@ -689,7 +734,8 @@
    "visitors_delta": 0,
    "cumulative": 1,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 46
   },
@@ -704,7 +750,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 47
   },
@@ -719,7 +766,8 @@
    "visitors_delta": 0,
    "cumulative": 17,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 48
   },
@@ -734,7 +782,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 49
   },
@@ -749,7 +798,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 50
   },
@@ -764,7 +814,8 @@
    "visitors_delta": 0,
    "cumulative": 11,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 51
   },
@@ -779,7 +830,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 52
   },
@@ -794,7 +846,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 53
   },
@@ -809,7 +862,8 @@
    "visitors_delta": 0,
    "cumulative": 4,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 54
   },
@@ -824,7 +878,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 55
   },
@@ -839,7 +894,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 56
   },
@@ -854,7 +910,8 @@
    "visitors_delta": 0,
    "cumulative": 0,
    "cumulative_delta": 0,
-   "google_indexed": 0,
+   "google_indexed": null,
+   "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
    "rank": 57
   }
