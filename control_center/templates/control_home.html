@@ -110,7 +110,7 @@ function shortSite(c){
 }
 const COL_MIN=4,COL_MAX=420;
 const DEFAULTS={
- blog:[48,62,125,105,115,115,90,105,90,70],
+ blog:[48,62,125,90,72,72,70,85,105,90,70],
  social:[42,72,150,90,120,110,105,70]
 };
 function installColumnMemory(table,key){
@@ -164,7 +164,7 @@ async function loadBlog(){
   const p=(c.kind==='news'?'wordpress':String(c.platform||'')).toLowerCase(),label=c.kind==='news'?'NEWS':String(c.platform||'').toUpperCase();
   const monetized=!!(c.revenue&&c.revenue.monetized);
   const launch=c.site_id?('https://blog.korea365.org/publish?site_id='+encodeURIComponent(c.site_id)+'&mode=auto&publish=publish'):'https://blog.korea365.org';
-  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.row_number)+'</td><td><span class="platform-badge">'+esc(label)+'</span></td>'+
+  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.rank)+'</td><td><span class="platform-badge">'+esc(label)+'</span></td>'+
   '<td title="'+esc(c.name||c.url)+'"><a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+'</a></td>'+
   '<td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+gscNumber(c.gsc_clicks,c)+'</td><td>'+gscNumber(c.gsc_impressions,c)+'</td><td>'+gscCtr(c.gsc_ctr,c)+'</td><td>'+gscPosition(c.gsc_position,c)+'</td><td>'+dateTime(c.recent_publish_date)+'</td><td>'+dateTime(c.opening_date)+'</td><td><a class="quick" href="'+esc(launch)+'">즉시발행</a></td></tr>';
  }).join('');
