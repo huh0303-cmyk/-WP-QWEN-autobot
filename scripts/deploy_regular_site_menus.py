@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Separate category navigation from required legal/about pages on 25 WP blogs."""
+"""Keep category navigation and show four required information pages in a top bar on all 25 WP blogs."""
 from __future__ import annotations
 
 import os
@@ -28,12 +28,12 @@ SNIPPET_NAME = "Network utility footer and one-line category menu"
 def is_utility_footer_snippet(item: dict) -> bool:
     """Match only the managed footer renderer, never a comment/reference.
 
-    The visitor counter intentionally mentions ``network-utility-footer`` in
+    The visitor counter intentionally mentions ``network-utility-topbar`` in
     a comment to explain ordering. A loose substring check therefore disabled
     the real counter as if it were a duplicate footer.
     """
     code = str(item.get("code", ""))
-    return item.get("name") == SNIPPET_NAME or '<nav class="network-utility-footer"' in code
+    return item.get("name") == SNIPPET_NAME or '<nav class="network-utility-topbar"' in code
 
 
 def api(site, password, method, path, **kwargs):
@@ -81,13 +81,14 @@ add_action('init', function () {{
     foreach (array('primary', 'menu-1', 'main', 'header') as $candidate) {{
         if (array_key_exists($candidate, $registered)) {{ $locations[$candidate] = $category_menu->term_id; break; }}
     }}
+    // The four information pages are rendered in a dedicated top row, not in the footer menu.
     foreach ($registered as $location => $label) {{
         $key = strtolower($location . ' ' . $label);
-        if (strpos($key, 'footer') !== false) $locations[$location] = $utility_menu->term_id;
+        if (strpos($key, 'footer') !== false) unset($locations[$location]);
     }}
     set_theme_mod('nav_menu_locations', $locations);
 }}, 99);
-// Legal/about pages are footer-only even when an old theme menu still contains them.
+// Keep the four information pages out of the category menu; the managed top bar links to them directly.
 add_filter('wp_nav_menu_objects', function ($items, $args) {{
     $location = strtolower(isset($args->theme_location) ? $args->theme_location : '');
     if (strpos($location, 'footer') !== false) return $items;
@@ -97,35 +98,31 @@ add_filter('wp_nav_menu_objects', function ($items, $args) {{
         return !in_array(strtolower($path), $blocked, true);
     }}));
 }}, 999, 2);
-add_action('wp_footer', function () {{
-    if (is_admin()) return;
-    // GeneratePress (and other themes with a real footer location) already
-    // renders the utility menu. The managed fallback must not print a second
-    // identical row underneath it.
-    $registered = get_registered_nav_menus();
-    $locations = get_nav_menu_locations();
-    foreach ($registered as $location => $label) {{
-        $key = strtolower($location . ' ' . $label);
-        if (strpos($key, 'footer') !== false && !empty($locations[$location])) return;
-    }}
+$render_topbar = function () {{
+    static $rendered = false;
+    if ($rendered || is_admin()) return;
+    $rendered = true;
     $links = array(
         {php_links}
     );
-    echo '<nav class="network-utility-footer" aria-label="Site information">';
+    echo '<nav class="network-utility-topbar" aria-label="Site information">';
     foreach ($links as $link) {{
         echo '<a href="' . esc_url($link[1]) . '">' . esc_html($link[0]) . '</a>';
     }}
     echo '</nav>';
-}}, 90);
+}};
+add_action('wp_body_open', $render_topbar, 5);
+// Theme fallback: if the theme omits wp_body_open, still render the links.
+add_action('wp_footer', $render_topbar, 1);
 add_action('wp_head', function () {{
     echo '<style id="network-menu-layout-css">
     header .site-logo,header .custom-logo-link,header .custom-logo,
     .site-header .site-logo,.site-header .custom-logo-link,.site-header .custom-logo,
     .header-image,.site-branding img{{display:none!important}}
-    .network-utility-footer{{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:18px 12px;border-top:1px solid rgba(127,127,127,.25);font-size:14px}}
-    .network-utility-footer a{{text-decoration:none}}
+    .network-utility-topbar{{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:18px 12px;border-top:1px solid rgba(127,127,127,.25);font-size:14px}}
+    .network-utility-topbar a{{text-decoration:none}}
     #site-navigation>div>ul,.main-navigation>div>ul,.primary-menu,.main-header-menu{{display:flex;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;scrollbar-width:thin}}
-    @media(max-width:640px){{.network-utility-footer{{gap:12px;font-size:12px}}}}
+    @media(max-width:640px){{.network-utility-topbar{{gap:12px;font-size:12px}}}}
     </style>';
 }}, 99);'''
     response = snippet_api(site, password, "GET", "snippets", params={"per_page": 100})
@@ -142,7 +139,7 @@ add_action('wp_head', function () {{
         match = candidates[0]
     payload = {
         "name": SNIPPET_NAME,
-        "desc": "Required pages in footer; category navigation kept on one line.",
+        "desc": "Four required information pages in a top row; category navigation stays separate.",
         "code": code,
         "scope": "global",
         "active": True,
