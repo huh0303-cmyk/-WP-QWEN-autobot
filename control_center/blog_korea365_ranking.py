@@ -289,7 +289,7 @@ def install(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_da
         payload = cached_payload(int(time.time() // 300))
         out = io.StringIO()
         writer = csv.writer(out)
-        writer.writerow(["순위", "플랫폼", "사이트", "URL", "사이트주제", "카테고리명", "수익", "수익증감", "수익통화", "도메인업체", "도메인결제일", "도메인만료일", "호스팅", "호스팅결제일", "호스팅만료일", "최근발행일", "개설일", "운영위치", "VPS만료일", "어제 방문자", "증감", "총 방문자", "증감", "총 콘텐츠", "증감", "Google 색인", "증감", "GSC 확인", "확인시각"])
+        writer.writerow(["순위", "플랫폼", "사이트", "URL", "사이트주제", "카테고리명", "수익", "수익증감", "수익통화", "도메인업체", "도메인결제일", "도메인만료일", "호스팅", "호스팅결제일", "호스팅만료일", "최근발행일", "개설일", "운영위치", "VPS만료일", "GSC 클릭", "GSC 노출", "GSC CTR(%)", "GSC 평균 게재순위", "GSC 기준일", "GSC 데이터 상태", "총 콘텐츠", "증감", "Google 색인", "증감", "GSC 확인", "확인시각"])
         for card in payload["cards"]:
             revenue = card.get("revenue") or {}
             domain_meta = card.get("domain_info") or {}
@@ -304,8 +304,8 @@ def install(app, get_site_data, get_blogger_data, get_tistory_data, get_naver_da
                 hosting_meta.get("provider") or "", hosting_meta.get("payment_date") or "", hosting_meta.get("renewal_date") or "",
                 card.get("recent_publish_date") or "", card.get("opening_date") or "",
                 infra.get("label") or "", infra.get("vps_expiry") or "",
-                card.get("yesterday_visitors"), card.get("yesterday_visitors_delta"),
-                card.get("total_visitors"), card.get("total_visitors_delta"),
+                card.get("gsc_clicks"), card.get("gsc_impressions"), card.get("gsc_ctr"),
+                card.get("gsc_position"), card.get("gsc_date"), card.get("gsc_data_status"),
                 card.get("total_content"), card.get("total_content_delta"),
                 card.get("google_indexed"), card.get("google_indexed_delta"),
                 "GSC" if card.get("google_indexed_verified_via") == "gsc" else "",
