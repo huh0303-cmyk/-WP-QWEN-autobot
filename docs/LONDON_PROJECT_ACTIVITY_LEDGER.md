@@ -407,3 +407,8 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Activity-ledger task_id: `naver-persistent-profile-publisher-built-20261009`.
 - Risks: 네이버 에디터 구조가 바뀌면(기존 chrisbot content/naver.js와 동일한 리스크) 선택자가 깨질 수 있음 — 실패 시 단계별로 멈추고 에러 메시지로 어디서 막혔는지 알려주도록 구현(chrisbot과 동일한 fail-safe 정책).
 - Next action: 사용자가 `config.json` 생성(Gemini 키 입력) → `1-로그인설정.bat`로 3계정 순서대로 로그인 → `2-발행하기.bat` 1회 실행해 3계정 전부 실제 발행되는지 확인 → 결과 보고받아 선택자/프롬프트 조정.
+
+## blogger-33-concurrency-cancel-fix-20261010
+- 증거: publish-blogger-33-now.yml 최근 40 run 중 다수 `cancelled`(같은 concurrency 그룹 대기열은 1개만 유지) — 확장 배치 예약이 조용히 소실.
+- 변경: concurrency 그룹에 `github.run_id` 추가(취소 방지, 확장의 백로그 가드 10개가 동시성 제어), push `paths`에서 워크플로우 파일 자신 제거(커밋만으로 33사이트 발행되는 위험 제거; `data/blogger33-run-trigger.txt`는 유지).
+- 미검증: 일부 run `failure` 원인(로그 접근 불가, 별도 확인 필요). 소량 예약 시험 미실시.
