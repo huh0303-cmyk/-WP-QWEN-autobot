@@ -159,7 +159,7 @@ installColumnMemory(document.querySelector('table.blog'),'blog');
 installColumnMemory(document.querySelector('table.social'),'social');
 async function loadBlog(){
  const r=await fetch('/api/blog-korea365/ranking',{cache:'no-store'});if(!r.ok)throw new Error('blog '+r.status);const d=await r.json();
- document.getElementById('blog-title').textContent='블로그 순위 ('+dateLabel(todayKst())+')';
+ document.getElementById('blog-title').textContent='블로그 GSC 순위 ('+dateLabel(d.ranking_date||'')+')';
  document.getElementById('blog-rows').innerHTML=(d.cards||[]).map(c=>{
   const p=(c.kind==='news'?'wordpress':String(c.platform||'')).toLowerCase(),label=c.kind==='news'?'NEWS':String(c.platform||'').toUpperCase();
   const monetized=!!(c.revenue&&c.revenue.monetized);
