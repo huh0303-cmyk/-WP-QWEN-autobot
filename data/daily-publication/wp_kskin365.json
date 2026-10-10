@@ -1,1 +1,1 @@
-{"day": "2026-10-09", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-10-09-wp_kskin365-3f8c7184", "claimed_at": "2026-10-09T12:03:36.956802+09:00", "run_id": 37877518717, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-10", "status": "PUBLISHED", "public_url": "https://kskin365.com/evidence-based-framework-for-modernizing-glass-skin-2-0-routine-steps/", "published_at": "2026-10-09T17:16:45Z"}
