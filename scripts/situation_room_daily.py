@@ -661,7 +661,7 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
         for item in site_details:
             vm = item.get("visitor_metrics") or {}
             wp_values[item["domain"]] = [
-                _fmt_value_delta(vm.get("today"), vm.get("daily_delta")),
+                _fmt_value_delta(vm.get("day_before_yesterday"), None),
                 _fmt_value_delta(vm.get("total"), vm.get("total_delta")),
                 _fmt_value_delta(item.get("total_posts"), item.get("published_delta")),
                 _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
@@ -669,9 +669,10 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
             ]
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "아침_WP상세", [item["domain"] for item in site_details], date_label,
-            ["오늘방문(전일대비)", "누적방문(오늘증가)", "공개글(전일대비)",
-             "구글색인(전일대비)", "검색클릭(전일대비)", "수집상태"],
+            ["그저께 방문자", "누적방문(오늘증가)", "공개글(전일대비)",
+             "GSC 사이트맵 색인수", "GSC 검색클릭", "수집상태"],
             wp_values,
+            link_urls={item["domain"]: item.get("url") or ("https://" + item["domain"]) for item in site_details},
         )
 
         blogger_values = {
@@ -684,8 +685,9 @@ def send_morning_asset_dashboard(site_details, blogger_details, yt_stats, yt_dif
         }
         gsheets_direct.append_dated_metric_columns(
             SHEET_ID, "아침_Blogger상세", [item["domain"] for item in blogger_details], date_label,
-            ["공개글(전일대비)", "구글색인(전일대비)", "Blogger URL", "수집상태"],
+            ["공개글(전일대비)", "GSC 사이트맵 색인수", "Blogger URL", "수집상태"],
             blogger_values,
+            link_urls={item["domain"]: item.get("url") or ("https://" + item["domain"]) for item in blogger_details},
         )
 
         sns_values = {}
@@ -727,11 +729,15 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
     number = 1
     for item in site_details:
         vm = item.get("visitor_metrics") or {}
+        site_url = item.get("url") or ("https://" + item["domain"])
+        safe_name = str(item["domain"]).replace('"', '""')
+        safe_url = str(site_url).replace('"', '""')
         rows.append([
-            number, "WP", item["domain"], item.get("url", ""),
+            number, "WP", f'=HYPERLINK("{safe_url}","{safe_name}")',
+            f'=HYPERLINK("{safe_url}","사이트 열기 ↗")',
             _fmt_value_delta(item.get("total_posts"), item.get("published_delta")),
             _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
-            _fmt_value_delta(vm.get("today"), vm.get("daily_delta")),
+            _fmt_value_delta(vm.get("day_before_yesterday"), None),
             _fmt_value_delta(vm.get("total"), vm.get("total_delta")),
             _fmt_value_delta(item.get("clicks"), item.get("clicks_delta")),
             item.get("status", ""), checked_at,
@@ -741,8 +747,12 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
     # Blogger rows follow the corresponding WP order and reuse its confirmed name.
     for index, item in enumerate(blogger_details):
         wp_name = site_details[index]["domain"] if index < len(site_details) else item.get("name", item["domain"])
+        site_url = item.get("url") or ("https://" + str(item.get("domain", "")))
+        safe_name = str(item.get("domain") or wp_name).replace('"', '""')
+        safe_url = str(site_url).replace('"', '""')
         rows.append([
-            number, "BLOGSPOT", wp_name, item.get("url", ""),
+            number, "BLOGSPOT", f'=HYPERLINK("{safe_url}","{safe_name}")',
+            f'=HYPERLINK("{safe_url}","사이트 열기 ↗")',
             _fmt_value_delta(item.get("public_posts"), item.get("published_delta")),
             _fmt_value_delta(item.get("indexed"), item.get("indexed_delta")),
             "", "", "", item.get("status", ""), checked_at,
@@ -750,18 +760,33 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
         number += 1
 
     for room in tistory_rooms:
+        site_url = room.get("destination_id", "")
+        label = room.get("name") or room.get("report_code", f"T{number - 54}")
+        if str(site_url).startswith("http"):
+            safe_url = str(site_url).replace('"', '""')
+            safe_label = str(label).replace('"', '""')
+            label = f'=HYPERLINK("{safe_url}","{safe_label}")'
+            site_link = f'=HYPERLINK("{safe_url}","사이트 열기 ↗")'
+        else:
+            site_link = ""
         rows.append([
-            number, "TISTORY", room.get("report_code", f"T{number - 54}"),
-            room.get("destination_id", ""), "", "", "", "", "",
+            number, "TISTORY", label, site_link, "", "", "", "", "",
             "등록완료 · 수치수집 연결 필요", checked_at,
         ])
         number += 1
 
     for room in naver_rooms:
+        blog_id = str(room.get("destination_id") or "")
+        site_url = "https://blog.naver.com/" + blog_id if blog_id else ""
+        label = room.get("name") or room.get("report_code", f"N{number - 59}")
+        if site_url:
+            label = f'=HYPERLINK("{site_url}","{str(label).replace(chr(34), chr(34)*2)}")'
+            site_link = f'=HYPERLINK("{site_url}","사이트 열기 ↗")'
+        else:
+            site_link = ""
         rows.append([
-            number, "NAVER", room.get("report_code", f"N{number - 59}"),
-            room.get("destination_id", ""), "", "", "", "", "",
-            "계정 주소 등록 필요", checked_at,
+            number, "NAVER", label, site_link, "", "", "", "", "",
+            "계정 주소 확인 필요", checked_at,
         ])
         number += 1
 
@@ -777,11 +802,13 @@ def send_master_62_dashboard(site_details, blogger_details, checked_at):
         raise RuntimeError(f"종합상황실 자산 수 불일치: {len(rows)} (기대 {expected})")
 
     header = [
-        "번호", "플랫폼", "관리명", "사이트 주소", "공개글(전일대비)",
-        "구글색인(전일대비)", "오늘방문(전일대비)", "누적방문(오늘증가)",
-        "검색클릭(전일대비)", "수집상태", "기준시각(KST)",
+        "번호", "플랫폼", "사이트(클릭해 열기)", "바로가기", "공개글(전일대비)",
+        "GSC 사이트맵 색인수", "그저께 방문자", "누적방문(오늘증가)",
+        "GSC 검색클릭", "수집상태", "기준시각(KST)",
     ]
-    gsheets_direct.replace_tab_rows(SHEET_ID, "종합_62개현황", header, rows)
+    gsheets_direct.replace_tab_rows(
+        SHEET_ID, "종합_62개현황", header, rows, value_input_option="USER_ENTERED"
+    )
     log(f"📊 종합상황실 자산 현황 갱신 완료 — WP{len(site_details)} + Blogspot{len(blogger_details)} "
         f"+ Tistory{len(tistory_rooms)} + Naver{len(naver_rooms)} = {len(rows)}개")
 
