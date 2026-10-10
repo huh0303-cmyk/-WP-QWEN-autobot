@@ -111,7 +111,7 @@ def ensure_tab(service, spreadsheet_id, tab_name, header):
     return new_tab_id
 
 
-def replace_tab_rows(spreadsheet_id, tab_name, header, rows):
+def replace_tab_rows(spreadsheet_id, tab_name, header, rows, value_input_option="RAW"):
     """탭을 "현재 상태 스냅샷" 표로 유지 — 헤더 포함 전체를 매번 지우고
     새로 쓴다(계속 쌓이는 로그가 아니라 27개 사이트처럼 매일 같은 행
     수를 유지하는 현황판에 적합). 헤더도 매번 다시 쓰므로 컬럼 구성이
@@ -124,7 +124,7 @@ def replace_tab_rows(spreadsheet_id, tab_name, header, rows):
     service.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id,
         range=f"'{tab_name}'!A1",
-        valueInputOption="RAW",
+        valueInputOption=value_input_option,
         body={"values": [header] + rows},
     ).execute()
 
@@ -190,7 +190,7 @@ def _col_letter(idx0):
     return s
 
 
-def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, metric_labels, values_by_domain):
+def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, metric_labels, values_by_domain, link_urls=None):
     """기존 "Youtube-tiktok" 탭과 같은 구조 — A열에 항목(사이트 도메인)을
     세로로 한 번만 고정해두고, 새 날짜가 생길 때마다 오른쪽에 그 날짜용
     컬럼 묶음(metric_labels 개수만큼, 예: 일일방문자수/색인수)을 추가한다.
@@ -221,21 +221,29 @@ def append_dated_metric_columns(spreadsheet_id, tab_name, domains, date_label, m
             body={"requests": [{"addSheet": {"properties": {"title": tab_name}}}]},
         ).execute()
         tab_id = resp["replies"][0]["addSheet"]["properties"]["sheetId"]
+        domain_values = (
+            [[f'=HYPERLINK("{str(link_urls[d]).replace(chr(34), chr(34) * 2)}","{str(d).replace(chr(34), chr(34) * 2)}")'] for d in domains]
+            if link_urls else [[d] for d in domains]
+        )
         service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
             range=f"'{tab_name}'!A3",
-            valueInputOption="RAW",
-            body={"values": [[d] for d in domains]},
+            valueInputOption="USER_ENTERED" if link_urls else "RAW",
+            body={"values": domain_values},
         ).execute()
         start_col = 1  # B열(0-기준 인덱스 1)부터 시작
     else:
         # 주소 교정이나 사이트 목록 변경이 A열에도 즉시 반영되도록 매 실행마다
         # 정규 목록을 다시 쓴다. 지표 데이터가 있는 B열 이후는 건드리지 않는다.
+        domain_values = (
+            [[f'=HYPERLINK("{str(link_urls[d]).replace(chr(34), chr(34) * 2)}","{str(d).replace(chr(34), chr(34) * 2)}")'] for d in domains]
+            if link_urls else [[d] for d in domains]
+        )
         service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
             range=f"'{tab_name}'!A3",
-            valueInputOption="RAW",
-            body={"values": [[d] for d in domains]},
+            valueInputOption="USER_ENTERED" if link_urls else "RAW",
+            body={"values": domain_values},
         ).execute()
 
         row1 = service.spreadsheets().values().get(
