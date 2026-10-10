@@ -166,6 +166,20 @@ def main() -> None:
         for entry in entries
         if entry.get("permissionLevel") != "siteUnverifiedUser"
     }
+    # Merge the latest saved property inventory as a fallback. The dashboard's
+    # property inventory can be newer/more complete than the list endpoint
+    # returned to this collector run. Query these properties with the same
+    # token; API query errors remain visible rather than being fabricated as 0.
+    property_inventory = ROOT / "data" / "gsc_properties.json"
+    try:
+        inventory = json.loads(property_inventory.read_text(encoding="utf-8"))
+        for item in inventory.get("properties", []):
+            site_url = item.get("siteUrl")
+            permission = item.get("permissionLevel", "")
+            if site_url and permission != "siteUnverifiedUser":
+                properties.add(site_url)
+    except (OSError, ValueError, TypeError):
+        pass
 
     portfolio = json.loads(
         (ROOT / "config" / "blogger_portfolio.json").read_text(encoding="utf-8")
