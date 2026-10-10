@@ -110,6 +110,8 @@ $render_topbar = function () {{
         echo '<a href="' . esc_url($link[1]) . '">' . esc_html($link[0]) . '</a>';
     }}
     echo '</nav>';
+    // If a theme calls wp_body_open late or lacks it, move the row directly before the site header.
+    echo '<script>(function(){var n=document.querySelector(".network-utility-topbar");var h=document.querySelector("header.site-header,#masthead,.site-header,header");if(n&&h&&h.parentNode){h.parentNode.insertBefore(n,h);}})();</script>';
 }};
 add_action('wp_body_open', $render_topbar, 5);
 // Theme fallback: if the theme omits wp_body_open, still render the links.
