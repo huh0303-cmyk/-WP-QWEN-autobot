@@ -1,4 +1,5 @@
 name: "WordPress 25 — immediate isolated publish"
+run-name: "Chrisbot WP | ${{ inputs.target_site_url || 'all-sites' }} | ${{ inputs.random_seed || github.run_id }}"
 
 on:
   workflow_call:
