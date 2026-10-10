@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-09T10:56:00.884678+09:00",
+  "generated_at": "2026-10-10T10:38:39.565415+09:00",
   "count": 119,
   "properties": [
     {
@@ -80,11 +80,11 @@
     },
     {
       "siteUrl": "https://k-health365-edu.blogspot.com/",
-      "permissionLevel": "siteUnverifiedUser"
+      "permissionLevel": "siteOwner"
     },
     {
       "siteUrl": "https://k-health365.blogspot.com/",
-      "permissionLevel": "siteUnverifiedUser"
+      "permissionLevel": "siteOwner"
     },
     {
       "siteUrl": "https://k-health365.com/",
@@ -184,7 +184,7 @@
     },
     {
       "siteUrl": "https://koreamedicaltour365.blogspot.com/",
-      "permissionLevel": "siteUnverifiedUser"
+      "permissionLevel": "siteOwner"
     },
     {
       "siteUrl": "https://koreanews365.com/",
@@ -276,7 +276,7 @@
     },
     {
       "siteUrl": "https://oliveyoungkorea.blogspot.com/",
-      "permissionLevel": "siteUnverifiedUser"
+      "permissionLevel": "siteOwner"
     },
     {
       "siteUrl": "https://oliveyoungkorea.com/",
@@ -380,7 +380,7 @@
     },
     {
       "siteUrl": "sc-domain:k-health365.blogspot.com",
-      "permissionLevel": "siteUnverifiedUser"
+      "permissionLevel": "siteOwner"
     },
     {
       "siteUrl": "sc-domain:k-health365.com",
