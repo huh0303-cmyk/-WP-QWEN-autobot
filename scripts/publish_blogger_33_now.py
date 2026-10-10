@@ -70,8 +70,10 @@ def generate(site: dict, hint: str = "") -> tuple[str, str, list[str], str, str]
     else:
         lang_rule = ("English: 1400-1800 words (never fewer than 1200; count them). For English articles use Latin script only: "
                      "write Korean names and terms in romanization (e.g. Gyeongbokgung), with no Hangul characters anywhere in title, body or labels.")
+    requested_topic = os.environ.get("BLOGGER_TOPIC_HINT", "").strip()
+    topic = requested_topic or site["theme"]
     prompt = f"""Write one original evergreen article for {site['url']}.
-Topic: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
+Topic: {topic}. Site theme: {site['theme']}. Persona: {site['persona']}. Tone: {site['tone']}.
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
 {rules_for(site['language'], site['theme'])}
 Cautious source-aware wording and no invented facts.
@@ -191,7 +193,8 @@ def main() -> int:
                     else:
                         hint = "\nIMPORTANT: return one valid JSON object only, no commentary, and follow every structure rule."
             try:  # free image chain; failure must never block publication
-                found = pick_image(image_subject or site['theme'], alternates=[site['theme']])
+                image_policy = os.environ.get("BLOGGER_IMAGE_POLICY", "auto_free").strip().lower()
+                found = None if image_policy == "none" else pick_image(image_subject or site['theme'], alternates=[site['theme']])
                 # Free-only rule: relevant free stock/AI image or no image; never a generic topic card.
                 if found and found.get("url"):
                     body = insert_image(body, found, title)
