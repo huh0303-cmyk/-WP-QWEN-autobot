@@ -4,7 +4,7 @@
 
 2026-08-31 확정:
 - 이메일은 KST 기준 하루 1통, schedule 실행에서만 발송.
-- WP 일일방문자는 '어제 완료값'을 표시하고 괄호에는 전전일 대비 증감.
+- WP 일일방문자는 수집 지연을 고려해 '그저께 완료값'을 표시한다.
 - 27개 WP 사이트를 번호로 한눈에 표시.
 - 기존 situation_room_daily.py가 이후 수정되어도 이 승인 규칙은 여기서 강제한다.
 """
@@ -21,7 +21,7 @@ STATE_FILE = Path(sr.REPO_ROOT) / "situation_room_email_state.json"
 
 
 def approved_visitor_metrics(site_url):
-    """최종 승인 기준: 어제 완료값 vs 전전일 완료값."""
+    """최종 승인 기준: Google 카운터의 그저께 확정 방문자 값을 사용한다."""
     try:
         r = sr.requests.get(
             f"{site_url}/wp-json/site-stats/v1/visitors",
@@ -29,16 +29,15 @@ def approved_visitor_metrics(site_url):
         )
         if r.status_code == 200:
             data = r.json()
-            yesterday = int(data.get("yesterday_count", 0))
             day_before = int(data.get("day_before_yesterday_count", 0))
-            total = int(data.get("total", yesterday))
+            total = int(data.get("total", day_before))
             return {
-                "today": yesterday,
+                "today": day_before,
                 "yesterday": day_before,
                 "day_before_yesterday": day_before,
-                "daily_delta": yesterday - day_before,
+                "daily_delta": None,
                 "total": total,
-                "total_delta": yesterday,
+                "total_delta": day_before,
             }
     except Exception:
         pass
@@ -46,12 +45,12 @@ def approved_visitor_metrics(site_url):
 
 
 def approved_email_body(body):
-    """최종 승인 이메일 가독성: WP 27개 번호 + 어제 완료 일일방문/증감 표기."""
+    """최종 승인 이메일 가독성: WP 27개 번호 + 그저께 확정 방문자 표기."""
     body = body.replace("오늘 방문자·증감 리포트", "CEO 종합상황실 일일보고")
-    body = body.replace("오늘방문 합계", "일일방문 합계(어제 최종)")
-    body = body.replace("오늘방문 ", "일일방문(어제) ")
-    body = body.replace("실제방문자 합계(오늘)", "일일방문 합계(어제 최종)")
-    body = body.replace("실제방문자(오늘)", "일일방문(어제)")
+    body = body.replace("일일방문(그저께) 합계", "일일방문 합계(그저께 확정)")
+    body = body.replace("오늘방문 ", "일일방문(그저께) ")
+    body = body.replace("일일방문 합계(그저께 확정)", "일일방문 합계(그저께 확정)")
+    body = body.replace("실제방문자(그저께)", "일일방문(어제)")
 
     lines = body.splitlines()
     in_wp = False
