@@ -1,1 +1,1 @@
-{"day": "2026-10-08", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-08-wp_sis-4aad926d", "claimed_at": "2026-10-08T09:09:21.552482+09:00", "run_id": 37706266047, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-10", "status": "PUBLISHED", "public_url": "https://sis-korea.com/navigating-the-harvard-ewha-summer-program-2027-academic-framework-and-eligibility-requirements/", "published_at": "2026-10-09T17:33:18Z"}
