@@ -2,6 +2,11 @@ name: Deploy 25 Regular WordPress Menus
 
 on:
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "scripts/deploy_regular_site_menus.py"
+      - ".github/workflows/deploy-regular-site-menus.yml"
 
 permissions:
   contents: read
