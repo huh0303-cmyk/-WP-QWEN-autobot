@@ -1,6 +1,12 @@
 name: Deploy canonical GSC ranking to Control Center
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "control_center/blog_korea365_ranking.py"
+      - "control_center/templates/control_home.html"
+      - ".github/workflows/deploy-gsc-control.yml"
   workflow_run:
     workflows: ["Unified GSC ranking · WP25 + Blogspot33"]
     types: [completed]
@@ -34,16 +40,18 @@ jobs:
             git fetch origin main
             BACKUP="$ROOT/data/pre-gsc-ranking/$(date -u +%Y%m%dT%H%M%SZ)"
             mkdir -p "$BACKUP/control_center/templates"
-            for rel in               control_center/blog_korea365_ranking.py               control_center/templates/blog_dashboard.html               scripts/gsc_unified_ranking.py               data/gsc_unified_ranking.json; do
+            for rel in               control_center/blog_korea365_ranking.py               control_center/templates/blog_dashboard.html               control_center/templates/control_home.html               scripts/gsc_unified_ranking.py               data/gsc_unified_ranking.json; do
               if [ -f "$ROOT/$rel" ]; then
                 mkdir -p "$BACKUP/$(dirname "$rel")"
                 cp -a "$ROOT/$rel" "$BACKUP/$rel"
               fi
             done
-            git -C "$ROOT" checkout origin/main --               control_center/blog_korea365_ranking.py               control_center/templates/blog_dashboard.html               scripts/gsc_unified_ranking.py               data/gsc_unified_ranking.json
+            git -C "$ROOT" checkout origin/main --               control_center/blog_korea365_ranking.py               control_center/templates/blog_dashboard.html               control_center/templates/control_home.html               scripts/gsc_unified_ranking.py               data/gsc_unified_ranking.json
             "$ROOT/.venv/bin/python" -m py_compile               "$ROOT/control_center/blog_korea365_ranking.py"               "$ROOT/scripts/gsc_unified_ranking.py"
             systemctl restart korea365-control.service
             sleep 3
             systemctl is-active --quiet korea365-control.service
             echo "GSC_CONTROL_DEPLOYED=$(git -C "$ROOT" rev-parse HEAD)"
+            curl -fsS https://control.korea365.org/ | grep -q 'GSC 클릭'
+            curl -fsS https://control.korea365.org/api/blog-korea365/ranking | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('ranking_metric') == 'gsc_clicks'; print('GSC_RANKED_SITES='+str(d.get('ranked_cards',0)))"
             echo "GSC_RANKING_DATE=$(python3 -c "import json; print(json.load(open('$ROOT/data/gsc_unified_ranking.json',encoding='utf-8')).get('confirmed_date',''))")"
