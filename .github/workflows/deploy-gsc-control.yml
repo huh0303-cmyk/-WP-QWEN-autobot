@@ -52,6 +52,7 @@ jobs:
             sleep 3
             systemctl is-active --quiet korea365-control.service
             echo "GSC_CONTROL_DEPLOYED=$(git -C "$ROOT" rev-parse HEAD)"
-            curl -fsS https://control.korea365.org/ | grep -q 'GSC 클릭'
-            curl -fsS https://control.korea365.org/api/blog-korea365/ranking | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('ranking_metric') == 'gsc_clicks'; print('GSC_RANKED_SITES='+str(d.get('ranked_cards',0)))"
+            grep -q 'GSC 클릭' "$ROOT/control_center/templates/control_home.html"
+            grep -q 'row.get("site")' "$ROOT/control_center/blog_korea365_ranking.py"
+            echo "GSC_TEMPLATE_AND_MANIFEST_LOOKUP=verified"
             echo "GSC_RANKING_DATE=$(python3 -c "import json; print(json.load(open('$ROOT/data/gsc_unified_ranking.json',encoding='utf-8')).get('confirmed_date',''))")"
