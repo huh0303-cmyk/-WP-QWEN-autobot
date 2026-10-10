@@ -234,7 +234,25 @@ def configure(site, secret_name):
     password = os.getenv(secret_name, "").strip()
     if not password:
         raise RuntimeError(f"missing secret {secret_name}")
-    menus = api(site, password, "GET", "wp/v2/menus", params={"per_page": 100})
+    try:
+        menus = api(site, password, "GET", "wp/v2/menus", params={"per_page": 100})
+    except requests.HTTPError as exc:
+        # Some hosts/WAF rules forbid the menu REST endpoints while allowing pages and Code Snippets.
+        # In that case, still publish the four top-row links through the managed snippet.
+        if exc.response is None or exc.response.status_code != 403:
+            raise
+        pages = find_required_pages(site, password)
+        disabled_duplicates = deploy_footer_fallback(site, password, pages)
+        return {
+            "site": urlparse(site).netloc,
+            "categories": [],
+            "utility_pages": [
+                pages[slug].get("title", {}).get("rendered") or title
+                for slug, title in UTILITY
+            ],
+            "disabled_duplicate_footer_snippets": disabled_duplicates,
+            "locations": "top-row fallback; menu REST API returned 403",
+        }
     category_menu = ensure_menu(site, password, menus, name="Network Categories", slug="network-categories")
     utility_menu = ensure_menu(site, password, menus, name="Network Utility", slug="network-utility")
     clear_menu(site, password, category_menu)
