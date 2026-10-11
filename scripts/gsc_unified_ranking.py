@@ -61,7 +61,7 @@ def token_from_service_account() -> str:
     assertion = jwt.encode(
         {
             "iss": key["client_email"],
-            "scope": "https://www.googleapis.com/auth/webmasters.readonly",
+            "scope": "https://www.googleapis.com/auth/webmasters",
             "aud": "https://oauth2.googleapis.com/token",
             "iat": now,
             "exp": now + 3600,
