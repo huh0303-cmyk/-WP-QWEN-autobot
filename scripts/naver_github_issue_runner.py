@@ -59,6 +59,48 @@ def api(method: str, path: str, **kwargs: Any) -> requests.Response:
     return response
 
 
+def ensure_label(name: str, color: str, description: str) -> None:
+    response = requests.get(
+        f"{API_ROOT}/labels/{requests.utils.quote(name, safe='')}",
+        headers={
+            "Authorization": f"Bearer {GH_PAT}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        timeout=TIMEOUT,
+    )
+    if response.status_code == 200:
+        return
+    if response.status_code != 404:
+        raise RuntimeError(f"GitHub label lookup failed: HTTP {response.status_code}")
+    created = requests.post(
+        f"{API_ROOT}/labels",
+        headers={
+            "Authorization": f"Bearer {GH_PAT}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        json={"name": name, "color": color, "description": description[:100]},
+        timeout=TIMEOUT,
+    )
+    if created.status_code not in {201, 422}:
+        raise RuntimeError(f"GitHub label creation failed: HTTP {created.status_code}")
+
+
+def ensure_queue_labels(blog_id: str) -> None:
+    labels = (
+        (STATUS_READY, "1D76DB", "Waiting for local Naver draft save"),
+        (STATUS_PROCESSING, "FBCA04", "Claimed by local Naver runner"),
+        (STATUS_PUBLISHED, "0E8A16", "Public URL verified"),
+        (STATUS_DRAFT_SAVED, "0E8A16", "Naver draft save confirmed"),
+        (STATUS_FAILED, "B60205", "Queue processing failed"),
+        (STATUS_ATTENTION, "D93F0B", "Human review required"),
+        (f"{ACCOUNT_PREFIX}{blog_id}", "5319E7", f"Naver blog account {blog_id}"),
+    )
+    for name, color, description in labels:
+        ensure_label(name, color, description)
+
+
 def get_ready_issues(blog_id: str, max_jobs: int) -> list[dict[str, Any]]:
     response = api(
         "GET", "/issues",
@@ -126,6 +168,7 @@ def main() -> int:
             context.close()
             return 0
 
+        ensure_queue_labels(args.site_id)
         publisher = NaverLocalPublisher(
             args.site_id, "https://blog.naver.com/GoBlogWrite.naver", args.site_id
         )
