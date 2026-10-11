@@ -48,8 +48,13 @@ jobs:
           assert d["counts"]["wordpress"] == 25
           assert d["counts"]["blogspot"] == 33
           assert len(d["records"]) == 58
+          assert len({r["requested_date"] for r in d["records"]}) == 1
+          a = json.loads(Path("data/gsc_target_property_audit.json").read_text(encoding="utf-8"))
+          assert a["counts"]["target_total"] == 58
+          assert len(a["targets"]) == 58
+          assert len({r["site"] for r in a["targets"]}) == 58
           assert d["policy"].startswith("WP25 + Blogspot33 unified ranking uses only Google Search Console")
-          print("validated", d["confirmed_date"], d["counts"])
+          print("validated", d["confirmed_date"], d["counts"], "property_audit", a["counts"])
           PY
 
       - name: Commit evidence
