@@ -134,8 +134,15 @@ async def enqueue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
 
     try:
-        ensure_label(STATUS_LABEL, "1D76DB", "Waiting for the local Naver publisher")
-        ensure_label(f"{ACCOUNT_LABEL_PREFIX}{blog_id}", "5319E7", f"Naver blog account {blog_id}")
+        for name, color, description in (
+            ("queue:ready", "1D76DB", "Waiting for the local Naver publisher"),
+            ("queue:processing", "FBCA04", "Claimed by the local Naver publisher"),
+            ("queue:published", "0E8A16", "Public Naver URL verified"),
+            ("queue:attention", "D93F0B", "Human review required"),
+            ("queue:failed", "B60205", "Queue processing failed"),
+            (f"{ACCOUNT_LABEL_PREFIX}{blog_id}", "5319E7", f"Naver blog account {blog_id}"),
+        ):
+            ensure_label(name, color, description)
         issue_body = (
             f"<!-- london-project-queue:v1 -->\n"
             f"**Target account:** `{blog_id}`\n\n"
