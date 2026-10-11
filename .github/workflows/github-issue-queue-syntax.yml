@@ -1,0 +1,29 @@
+name: GitHub Issues Queue Syntax Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/github_queue_bot.py"
+      - "scripts/naver_github_issue_runner.py"
+      - ".github/workflows/github-issue-queue-syntax.yml"
+  pull_request:
+    paths:
+      - "scripts/github_queue_bot.py"
+      - "scripts/naver_github_issue_runner.py"
+      - ".github/workflows/github-issue-queue-syntax.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile queue scripts
+        run: python -m py_compile scripts/github_queue_bot.py scripts/naver_github_issue_runner.py
