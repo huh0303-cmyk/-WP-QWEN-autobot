@@ -153,6 +153,7 @@ def main() -> int:
     if not GH_PAT:
         raise SystemExit("GH_PAT 환경변수가 필요합니다.")
 
+    ensure_queue_labels(args.site_id)
     profile_dir = Path(args.profile_root).resolve() / args.site_id
     profile_dir.mkdir(parents=True, exist_ok=True)
     from playwright.sync_api import sync_playwright
@@ -168,7 +169,6 @@ def main() -> int:
             context.close()
             return 0
 
-        ensure_queue_labels(args.site_id)
         publisher = NaverLocalPublisher(
             args.site_id, "https://blog.naver.com/GoBlogWrite.naver", args.site_id
         )
