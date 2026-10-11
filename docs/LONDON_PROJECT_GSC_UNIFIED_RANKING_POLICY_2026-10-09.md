@@ -5,12 +5,15 @@
 - 통합 기준: **Google Search Console (GSC) Search Analytics**
 - 1차 순위 지표: **GSC clicks (클릭수)**
 - 2차 지표: GSC impressions, CTR, average position
-- 비교 기준: 각 사이트에서 반환되는 **동일한 최신 확정일(dataState=final)**을 사용
-- 증감: 같은 사이트의 직전 확정 GSC 날짜 클릭수 대비
-- GSC 데이터 지연을 고려하여 수집기는 KST 현재일 기준 3일 전까지 조회하고, 그 기간에서 반환되는 가장 최근 확정일을 사용
+- 비교 기준: **모든 대상 사이트에 동일한 기준일(KST 오늘 - 3일)**을 지정해 조회
+- 증감: 같은 사이트의 바로 전 달력 날짜 클릭수 대비 (데이터가 없으면 증감은 null)
+- 기준일에 행이 없으면 `NO_DATA` 및 null로 표시하며, 사이트별 최신 날짜를 섞지 않는다
 - ACCESS_UNAVAILABLE, 인증 오류, 권한 없음은 **0으로 추정하지 않는다**
 - WordPress 방문자 위젯, `/wp-json/site-stats/v1/visitors`, Blogger Stats 위젯, GA4 방문자수, 기타 플랫폼 방문자 카운터는 **통합 블로그 순위에서 사용하지 않는다**
 - 통합 근거 파일: `data/gsc_unified_ranking.json`
+- 대상 58개와 실제 API에서 조회 가능한 GSC 속성 대조표: `data/gsc_target_property_audit.json`
+- 실제 권한 기준: 서비스 계정으로 호출한 live `sites.list` 결과만 인정하며 `data/gsc_properties.json`의 저장 기록만으로 권한을 인정하지 않는다
+- 수집기는 누락된 URL-prefix 속성에 `sites.add`를 시도한다. 소유권/검증 권한이 없으면 실패 상태로 남기며 정상 등록으로 간주하지 않는다
 - 수집 코드: `scripts/gsc_unified_ranking.py`
 - 정기 워크플로: `.github/workflows/gsc-unified-ranking.yml`
 - Control Center 순위 코드: `control_center/blog_korea365_ranking.py`
