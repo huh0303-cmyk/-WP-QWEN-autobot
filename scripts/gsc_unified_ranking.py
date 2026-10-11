@@ -188,20 +188,32 @@ def main() -> None:
     # Attempt to register target URL-prefix properties that are missing entirely.
     # GSC rejects properties the service account cannot verify; failures remain
     # visible and are not misrepresented as accessible.
-    for _, site in targets:
-        if property_for(site, properties):
-            continue
-        candidate = site.rstrip("/") + "/"
+    missing_targets = [
+        (platform, site, site.rstrip("/") + "/")
+        for platform, site in targets
+        if not property_for(site, properties)
+    ]
+
+    def try_add_property(item):
+        _, site, candidate = item
         add_url = "https://www.googleapis.com/webmasters/v3/sites/" + quote(candidate, safe="")
         try:
-            added = requests.put(add_url, headers=headers, timeout=20)
+            added = requests.put(add_url, headers=headers, timeout=8)
             if added.status_code in (200, 201, 204):
-                properties.add(candidate)
                 print("GSC_PROPERTY_ADDED=" + candidate)
-            else:
-                print(f"GSC_PROPERTY_ADD_FAILED={candidate} HTTP_{added.status_code}")
+                return candidate, "ADDED"
+            print(f"GSC_PROPERTY_ADD_FAILED={candidate} HTTP_{added.status_code}")
+            return candidate, f"HTTP_{added.status_code}"
         except requests.RequestException as exc:
             print(f"GSC_PROPERTY_ADD_FAILED={candidate} {type(exc).__name__}")
+            return candidate, type(exc).__name__
+
+    # Bound elapsed time by attempting registrations concurrently with short
+    # timeouts rather than serially blocking on dozens of inaccessible sites.
+    with ThreadPoolExecutor(max_workers=12) as add_pool:
+        for candidate, status in add_pool.map(try_add_property, missing_targets):
+            if status == "ADDED":
+                properties.add(candidate)
 
     # Refresh live permissions after registration attempts.
     refreshed = requests.get(
