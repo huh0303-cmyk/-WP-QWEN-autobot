@@ -32,6 +32,7 @@ GH_PAT = os.getenv("GH_PAT", "").strip()
 STATUS_READY = "queue:ready"
 STATUS_PROCESSING = "queue:processing"
 STATUS_PUBLISHED = "queue:published"
+STATUS_DRAFT_SAVED = "queue:draft-saved"
 STATUS_FAILED = "queue:failed"
 STATUS_ATTENTION = "queue:attention"
 ACCOUNT_PREFIX = "blog:"
@@ -95,8 +96,8 @@ def parse_job(issue: dict[str, Any], blog_id: str) -> PublishJob:
         title=title,
         content_html=content,
         labels=[],
-        publish_now=True,
-        source_keyword="telegram-github-issue",
+        publish_now=False,
+        source_keyword="github-issues-manual",
     )
 
 
@@ -135,29 +136,33 @@ def main() -> int:
             return 0
 
         for issue in issues:
-            # Claim the issue before browser actions to reduce duplicate processing.
-            replace_status(issue, STATUS_PROCESSING)
             try:
+                # Claim inside the guarded block so API failures are reported cleanly.
+                replace_status(issue, STATUS_PROCESSING)
                 job = parse_job(issue, args.site_id)
                 result = publisher.publish(page, job)
-                if result.ok and result.status == "published" and result.public_url:
-                    replace_status(issue, STATUS_PUBLISHED)
-                    add_comment(issue["number"], f"✅ 네이버 공개 발행 확인\n\nURL: {result.public_url}")
-                    print(f"#{issue['number']} published {result.public_url}")
+                if result.ok and result.status == "draft_saved":
+                    replace_status(issue, STATUS_DRAFT_SAVED)
+                    add_comment(
+                        issue["number"],
+                        "✅ 네이버 임시저장 완료를 확인했습니다.\n"
+                        "공개 발행은 하지 않았습니다. 네이버 블로그 임시저장함에서 확인하세요.",
+                    )
+                    print(f"#{issue['number']} draft_saved")
                 else:
                     replace_status(issue, STATUS_ATTENTION)
                     add_comment(
                         issue["number"],
-                        "⚠️ 자동 발행 완료를 확인하지 못했습니다. 수동 확인이 필요합니다.\n\n"
+                        "⚠️ 네이버 임시저장 완료를 확인하지 못했습니다. 수동 확인이 필요합니다.\n\n"
                         f"상태: {result.status}\n오류: {result.error_code or '-'}\n"
-                        f"내용: {(result.message or '공개 URL 미확인')[:800]}",
+                        f"내용: {(result.message or '임시저장 확인 실패')[:800]}",
                     )
                     print(f"#{issue['number']} attention: {result.status}")
                     break
             except Exception as exc:
                 try:
                     replace_status(issue, STATUS_FAILED)
-                    add_comment(issue["number"], f"❌ 로컬 발행기 오류\n\n{str(exc)[:800]}")
+                    add_comment(issue["number"], f"❌ 로컬 발행기 오류\\n\\n{str(exc)[:800]}")
                 except Exception:
                     log.exception("Could not write failure state for issue #%s", issue.get("number"))
                 log.exception("Failed issue #%s", issue.get("number"))
