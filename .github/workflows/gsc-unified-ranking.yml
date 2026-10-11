@@ -1,6 +1,12 @@
 name: Unified GSC ranking · WP25 + Blogspot33
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/gsc_unified_ranking.py"
+      - "config/blogger_portfolio.json"
+      - ".github/workflows/gsc-unified-ranking.yml"
   schedule:
     - cron: "17 22 * * *" # 07:17 KST
   workflow_dispatch: {}
