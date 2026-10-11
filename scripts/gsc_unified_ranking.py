@@ -276,6 +276,36 @@ def main() -> None:
     tmp = OUT.with_suffix(".tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.replace(OUT)
+
+    # Dedicated exact target-to-live-GSC-property audit; unrelated GSC properties
+    # (subdomains, Naver, Tistory, feeds, etc.) are deliberately excluded.
+    audit_path = ROOT / "data" / "gsc_target_property_audit.json"
+    audit = {
+        "schema": 1,
+        "generated_at": dt.datetime.now(KST).isoformat(),
+        "reporting_date": end.isoformat(),
+        "source": "live Google Search Console sites.list after registration attempts",
+        "counts": {
+            "target_total": len(targets),
+            "matched_property": sum(bool(row.get("property")) for row in results),
+            "property_missing": sum(not row.get("property") for row in results),
+            "query_ok": sum(row.get("status") == "OK" for row in results),
+            "query_error": sum(str(row.get("status", "")).startswith("QUERY_ERROR_") for row in results),
+        },
+        "targets": [
+            {
+                "platform": row["platform"],
+                "site": row["site"],
+                "gsc_property": row.get("property"),
+                "query_status": row.get("status"),
+                "requested_date": row.get("requested_date"),
+            }
+            for row in results
+        ],
+    }
+    audit_tmp = audit_path.with_suffix(".tmp")
+    audit_tmp.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
+    audit_tmp.replace(audit_path)
     print(
         f"GSC unified ranking: {len(results)} sites / "
         f"{payload['counts']['ok']} OK / {payload['counts']['unavailable']} unavailable / "
