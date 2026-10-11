@@ -32,6 +32,15 @@ log = logging.getLogger("telegram-queue")
 KST = ZoneInfo("Asia/Seoul")
 SHEET_ID = os.getenv("SHEET_ID", "").strip()
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+if not BOT_TOKEN:
+    # Optional compatibility with the existing JSON secret bundle.
+    import json
+    bundle = os.getenv("BLOG_ALL_KEYS", "").strip()
+    if bundle:
+        try:
+            BOT_TOKEN = str(json.loads(bundle).get("TELEGRAM_TOKEN") or "").strip()
+        except (ValueError, TypeError):
+            raise SystemExit("BLOG_ALL_KEYS is not valid JSON.")
 ALLOWED_CHAT_IDS = {
     item.strip() for item in os.getenv("TELEGRAM_ALLOWED_CHAT_IDS", "").split(",")
     if item.strip()
