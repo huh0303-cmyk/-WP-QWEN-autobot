@@ -59,6 +59,9 @@ def test_control_home_keeps_blog_and_social_as_two_equal_tables():
     assert "rank(c.row_number)" in template
     assert "rank(c.rank)" not in template
     assert "recentPublication(c)" in template
+    assert "최근 콘텐츠 발행일시" in template
+    assert "recentBlogPublication(c)" in template
+    assert "recent_publish_checked_at" in (ROOT / "control_center" / "blog_korea365_ranking.py").read_text(encoding="utf-8")
     assert "Post ID " in template
 
 
