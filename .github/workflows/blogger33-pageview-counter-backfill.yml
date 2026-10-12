@@ -1,0 +1,38 @@
+﻿name: Blogger 33 pageview counter backfill
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_all_33:
+        description: Apply today's and cumulative pageview counters to all existing live Blogger posts
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  backfill:
+    if: ${{ inputs.confirm_all_33 == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: Wait for production counter API
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -sS -o /tmp/counter.json -w '%{http_code}' https://control.korea365.org/api/blog-visits/ktrip365 || true)
+            if [ "$code" = "200" ]; then cat /tmp/counter.json; exit 0; fi
+            echo "Counter API not deployed yet (HTTP $code); waiting $i/60"
+            sleep 30
+          done
+          echo 'Counter API did not become ready within 30 minutes.'
+          exit 1
+      - name: Backfill every existing live post across the 33 registered blogs
+        env:
+          BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+          BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+          BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/backfill_blogger_visitor_counter.py
