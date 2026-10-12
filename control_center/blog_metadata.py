@@ -180,9 +180,13 @@ def _opening_recent_snapshot(bucket: int) -> dict:
 def opening_recent_info(url: str, platform: str, channel_id: str = "") -> dict[str, str]:
     snap = _opening_recent_snapshot(int(time.time() // 300))
     if platform == "youtube" and channel_id:
-        return dict((snap.get("youtube") or {}).get(channel_id) or {})
-    key = url.rstrip("/")
-    return dict((snap.get("blogs") or {}).get(key) or {})
+        result = dict((snap.get("youtube") or {}).get(channel_id) or {})
+    else:
+        key = url.rstrip("/")
+        result = dict((snap.get("blogs") or {}).get(key) or {})
+    # This is the time the public-feed snapshot was collected, not the post time.
+    result["snapshot_updated_at"] = str(snap.get("generated_at") or "")
+    return result
 
 
 def infrastructure_info(platform: str, kind: str = "") -> dict[str, object]:
