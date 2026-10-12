@@ -263,3 +263,9 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - All 33 scheduled transient services started exactly once. Journal receipts show 32 `published` results with public URLs and HTTP 200. `kfinance365` was not published: `language mismatch: English output contains Korean text in content`; its transient service recorded an exit-code failure. No OAuth/Blogger API error, duplicate-publication (`existing`) result, or repeated service was observed.
 - `/opt/korea365/artifacts/blogger-33-public-results.json` has `run_key=blogger33-daily-2026-10-03` and its final per-site entry is the successful `kworld365_kpop` HTTP 200 receipt. It is a latest-invocation artifact, so journals are the complete day-level evidence.
 - Next action: repair the English writer/language gate for `kfinance365`; before any selective retry, recheck the 2026-10-03 publication marker and public post. Do not dispatch `publish-blogger-33-now.yml`.
+
+## 2026-10-12 23:47 KST — Blogger 33 daily audit blocked
+
+- `task_id=blogger33-daily-audit-20261012-2347-kst`; a read-only SSH audit of `187.127.121.57` was attempted with the established key and a 20-second TCP connection timeout. Port 22 timed out, so the audit could not begin.
+- No GitHub Actions dispatch, retry, manual publication, or production mutation was performed. `korea365-blogger33-daily.timer`, the 2026-10-12 33-target schedule, transient service outcomes, publication-key duplicate state, OAuth/API errors, and `blogger-33-public-results.json` remain unverified.
+- Next action: restore or confirm VPS SSH/network reachability, then repeat this read-only audit. Do not dispatch `publish-blogger-33-now.yml` or retry a site until its same-date publication marker and public post have been checked.
