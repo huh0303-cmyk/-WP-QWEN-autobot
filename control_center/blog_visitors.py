@@ -111,10 +111,12 @@ def install(module):
                     key=str(app.config['SECRET_KEY']).encode()
                     digest=hmac.new(key,f'{site_key}:{today}:{visitor}'.encode(),hashlib.sha256).hexdigest()
                     conn.execute('BEGIN IMMEDIATE')
-                    counted=conn.execute('INSERT OR IGNORE INTO seen VALUES(?,?,?)',(site_key,today,digest)).rowcount==1
-                    if counted:
-                        conn.execute('INSERT INTO daily VALUES(?,?,1) ON CONFLICT(site_key,date) DO UPDATE SET count=count+1',(site_key,today))
-                        conn.execute('INSERT INTO total VALUES(?,1) ON CONFLICT(site_key) DO UPDATE SET count=count+1',(site_key,))
+                    # This widget is a PAGEVIEW counter, not a unique-visitor counter.
+                    # Every valid page load increments today's and cumulative pageviews.
+                    counted=True
+                    conn.execute('INSERT OR IGNORE INTO seen VALUES(?,?,?)',(site_key,today,digest))
+                    conn.execute('INSERT INTO daily VALUES(?,?,1) ON CONFLICT(site_key,date) DO UPDATE SET count=count+1',(site_key,today))
+                    conn.execute('INSERT INTO total VALUES(?,1) ON CONFLICT(site_key) DO UPDATE SET count=count+1',(site_key,))
                     cutoff=(datetime.now(KST)-timedelta(days=8)).date().isoformat()
                     conn.execute('DELETE FROM seen WHERE date<?',(cutoff,))
             yesterday=(datetime.now(KST)-timedelta(days=1)).date().isoformat()
@@ -129,4 +131,4 @@ def install(module):
         return respond({'today':today_count,'yesterday':yesterday_count,'day_before_yesterday':day_before_count,
                         'today_delta':today_count-yesterday_count,'yesterday_delta':yesterday_count-day_before_count,
                         'total':total['count'] if total else 0,'counted':counted,'date':today,
-                        'timezone':'Asia/Seoul','metric':'daily_browser_visits_since_install'})
+                        'timezone':'Asia/Seoul','metric':'pageviews_since_install'})

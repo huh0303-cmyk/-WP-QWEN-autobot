@@ -68,7 +68,7 @@ def main():
                 content = post.get("content", "")
                 row = {"site": site_key, "blog_id": blog_id, "post_id": str(post["id"]),
                        "url": post.get("url", ""), "status": "skipped_already_has_badge"}
-                if BADGE_MARK not in content:
+                if f"{BADGE_MARK}{site_key}" not in content:
                     new_content = content + badge
                     for attempt in range(4):
                         patch = requests.patch(
