@@ -182,6 +182,7 @@ def _card(row: dict, platform: str, kind: str) -> dict[str, object]:
         "hosting_info": hosting_info(url, platform),
         "opening_date": timeline.get("opening_date", ""),
         "recent_publish_date": timeline.get("recent_publish_date", ""),
+        "recent_publish_checked_at": timeline.get("snapshot_updated_at", ""),
         "infrastructure": infra,
         "yesterday_visitors": row.get("yesterday_visitors", row.get("today_visitors")),
         "yesterday_visitors_delta": row.get("yesterday_delta", row.get("today_delta")),
