@@ -24,7 +24,18 @@ return v>0?'<span class="up">+'+v+'</span>':v<0?'<span class="down">'+v+'</span>
 function n(v,status){return v===null||v===undefined?'<span class="na">'+(status==='GSC_INDEX_COUNT_UNAVAILABLE'?'GSC에서 확인':'수집불가')+'</span>':v.toLocaleString()}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function indexedCell(r){if(r.google_indexed!==null&&r.google_indexed!==undefined)return n(r.google_indexed);if(r.gsc_property)return '<a href="https://search.google.com/search-console/index?resource_id='+encodeURIComponent(r.gsc_property)+'" target="_blank" rel="noopener" title="Google Search Console 색인 보고서 열기">GSC에서 확인 ↗</a>';return n(null,r.google_indexed_status)}
-fetch('dashboard.json?'+Date.now()).then(r=>r.json()).then(j=>{
-document.getElementById('meta').textContent='기준일 '+j.reference_date+' (매일 07:00 KST 갱신, 생성 '+j.generated_at.slice(0,16).replace('T',' ')+') · '+j.basis;
-document.getElementById('b').innerHTML=j.rows.map(r=>'<tr><td>'+r.rank+'</td><td><span class="tag '+(r.platform==='wordpress'?'WP">WP':'BS">Blogspot')+'</span></td><td><a href="'+esc(r.url||('https://'+r.site))+'" target="_blank" rel="noopener">'+esc(r.site)+'</a></td><td>'+n(r.visitors)+'</td><td>'+d(r.visitors_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+d(r.cumulative_delta)+'</td><td>'+n(r.content)+'</td><td>'+d(r.content_delta)+'</td><td>'+indexedCell(r)+'</td><td>'+d(r.google_indexed_delta)+'</td></tr>').join('')});
+fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(j=>{
+const generated=new Date(j.generated_at);
+const ageHours=(Date.now()-generated.getTime())/3600000;
+const stale=!Number.isFinite(ageHours)||ageHours>30;
+document.getElementById('meta').textContent='기준일 '+j.reference_date+' · 데이터 생성 '+j.generated_at.slice(0,16).replace('T',' ')+' KST · 순위 기준: GSC 검색 클릭 내림차순'+(stale?' · ⚠ 데이터 갱신 지연':' · '+j.basis);
+const rows=[...(j.rows||[])].sort((a,b)=>{
+ const av=Number.isFinite(a.visitors)?a.visitors:null,bv=Number.isFinite(b.visitors)?b.visitors:null;
+ if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;
+ if(av!==null&&bv!==null&&av!==bv)return bv-av;
+ return String(a.site||'').localeCompare(String(b.site||''),'ko');
+});
+document.getElementById('b').innerHTML=rows.map((r,i)=>'<tr><td>'+(Number.isFinite(r.visitors)?(i+1)+'위':'—')+'</td><td><span class="tag '+(r.platform==='wordpress'?'WP">WP':'BS">Blogspot')+'</span></td><td><a href="'+esc(r.url||('https://'+r.site))+'" target="_blank" rel="noopener">'+esc(r.site)+'</a></td><td>'+n(r.visitors,r.status)+'</td><td>'+d(r.visitors_delta)+'</td><td>'+n(r.cumulative,r.status)+'</td><td>'+d(r.cumulative_delta)+'</td><td>'+n(r.content,r.status)+'</td><td>'+d(r.content_delta)+'</td><td>'+indexedCell(r)+'</td><td>'+d(r.google_indexed_delta)+'</td></tr>').join('');
+if(stale)document.getElementById('meta').style.color='#b45309';
+}).catch(e=>{document.getElementById('meta').textContent='데이터를 불러오지 못했습니다: '+e.message+' · 마지막 정상 데이터 확인 필요';document.getElementById('meta').style.color='#b91c1c'});
 </script></body></html>
