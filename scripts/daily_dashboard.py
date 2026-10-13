@@ -114,8 +114,10 @@ def content_count(url, platform):
         return None
 
 
-def one(h, props, platform, url, ref, prev_hist):
-    row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url, "platform": platform, "status": "OK"}
+def one(h, props, platform, url, display_name, ref, prev_hist):
+    row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url,
+           "platform": platform, "display_name": display_name or url.split("://", 1)[-1].rstrip("/"),
+           "status": "OK"}
     prop = prop_for(url, props)
     row["gsc_property"] = prop
     day = ref.isoformat()
@@ -164,23 +166,28 @@ def main():
     rooms = json.loads((ROOT / "config" / "automation_rooms.json").read_text(encoding="utf-8"))
     hub = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
 
-    # Build inventory from canonical registries. Seoul Journal is intentionally excluded.
-    targets = [("wordpress", s) for s in WP25]
-    targets += [("blogspot", item["blogspot"].rstrip("/")) for item in blogger_portfolio["channels"]]
-    targets += [("tistory", item["url"].rstrip("/")) for item in tistory_portfolio["sites"] if item.get("launch_enabled")]
-    targets += [("naver", "https://blog.naver.com/" + str(room.get("destination_id", "")).strip())
+    # Build inventory from canonical registries. Display labels never determine identity.
+    # Exclude only the exact newsroom domain theseouljournal.com; keep its separate
+    # Blogger property theseouljournal.blogspot.com in the 33-blog Blogger inventory.
+    targets = [("wordpress", s.rstrip("/"), s.split("://", 1)[-1].rstrip("/")) for s in WP25]
+    targets += [("blogspot", item["blogspot"].rstrip("/"), item.get("title", item["blogspot"]))
+                for item in blogger_portfolio["channels"]]
+    targets += [("tistory", item["url"].rstrip("/"), item.get("current_label", item.get("title", item["url"])))
+                for item in tistory_portfolio["sites"] if item.get("launch_enabled")]
+    targets += [("naver", "https://blog.naver.com/" + str(room.get("destination_id", "")).strip(),
+                 room.get("name", room.get("destination_id", "")))
                 for room in rooms.get("rooms", [])
                 if room.get("platform") == "naver" and room.get("enabled") and room.get("destination_id")]
-    targets += [("newsroom", item["url"].rstrip("/")) for item in hub.get("sites", [])
+    targets += [("newsroom", item["url"].rstrip("/"), item.get("name", item.get("url", ""))) for item in hub.get("sites", [])
                 if item.get("platform") == "wordpress"
                 and item.get("url", "").rstrip("/") == "https://koreanews365.com"]
     targets = list(dict.fromkeys(targets))
-    targets = [t for t in targets if not any(x in t[1] for x in EXCLUDE)]
+    targets = [t for t in targets if t[1].split("://", 1)[-1].split("/", 1)[0].lower() not in EXCLUDE]
     hist = json.loads(HIST.read_text(encoding="utf-8")) if HIST.exists() else {}
     prev_dates = sorted(k for k in hist if k < ref.isoformat())
     prev = hist[prev_dates[-1]] if prev_dates else {}
     with ThreadPoolExecutor(max_workers=8) as ex:
-        rows = list(ex.map(lambda t: one(h, props, t[0], t[1], ref, prev), targets))
+        rows = list(ex.map(lambda t: one(h, props, t[0], t[1], t[2], ref, prev), targets))
     rows.sort(key=lambda r: (r["visitors"] is None, -(r["visitors"] or 0), r["site"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i
