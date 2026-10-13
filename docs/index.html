@@ -10,7 +10,7 @@ th{background:#1f2937;color:#fff;position:sticky;top:0}
 td:nth-child(1),td:nth-child(2),td:nth-child(3),th:nth-child(1),th:nth-child(2),th:nth-child(3){text-align:left}
 .up{color:#0a7d33}.down{color:#c62828}.na{color:#999}
 .tag{font-size:.72rem;padding:1px 6px;border-radius:8px;background:#e5e7eb}
-.WP{background:#dbeafe}.BS{background:#fde68a}
+.WP{background:#dbeafe}.BS{background:#fde68a}.TS{background:#fce7f3}.NV{background:#dcfce7}.NR{background:#e9d5ff}
 </style></head><body>
 <h1>Korea365 GSC 검색 성과 현황</h1>
 <div class="sub" id="meta">불러오는 중...</div>
@@ -23,12 +23,13 @@ function d(v){if(v===null||v===undefined)return '<span class="na">-</span>';
 return v>0?'<span class="up">+'+v+'</span>':v<0?'<span class="down">'+v+'</span>':'0'}
 function n(v,status){return v===null||v===undefined?'<span class="na">'+(status==='GSC_INDEX_COUNT_UNAVAILABLE'?'GSC에서 확인':'수집불가')+'</span>':v.toLocaleString()}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function platformCell(p){const m={wordpress:['WP','WP'],blogspot:['Blogspot','BS'],tistory:['Tistory','TS'],naver:['Naver','NV'],newsroom:['신문','NR']};const v=m[p]||[p,''];return '<span class="tag '+v[1]+'">'+v[0]+'</span>'}
 function indexedCell(r){if(r.google_indexed!==null&&r.google_indexed!==undefined)return n(r.google_indexed);if(r.gsc_property)return '<a href="https://search.google.com/search-console/index?resource_id='+encodeURIComponent(r.gsc_property)+'" target="_blank" rel="noopener" title="Google Search Console 색인 보고서 열기">GSC에서 확인 ↗</a>';return n(null,r.google_indexed_status)}
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(j=>{
 const generated=new Date(j.generated_at);
 const ageHours=(Date.now()-generated.getTime())/3600000;
 const stale=!Number.isFinite(ageHours)||ageHours>30;
-document.getElementById('meta').textContent='기준일 '+j.reference_date+' · 데이터 생성 '+j.generated_at.slice(0,16).replace('T',' ')+' KST · 순위 기준: GSC 검색 클릭 내림차순 · 방문자 수가 아닌 검색 클릭'+(stale?' · ⚠ 데이터 갱신 지연':' · '+j.basis);
+document.getElementById('meta').textContent='기준일 '+j.reference_date+' · 데이터 생성 '+j.generated_at.slice(0,16).replace('T',' ')+' KST · 순위 기준: GSC 검색 클릭 내림차순 · 실제 방문자 수가 아닌 검색 클릭'+(stale?' · ⚠ 데이터 갱신 지연':' · '+j.basis);
 const rows=[...(j.rows||[])].sort((a,b)=>{
  const av=Number.isFinite(a.visitors)?a.visitors:null,bv=Number.isFinite(b.visitors)?b.visitors:null;
  if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;
