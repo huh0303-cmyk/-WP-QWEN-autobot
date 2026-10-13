@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Korea365 일일 현황</title>
+<title>Korea365 GSC 검색 성과 현황</title>
 <style>
 body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:16px;background:#f6f7f9;color:#1c1c1e}
 h1{font-size:1.2rem;margin:0 0 4px}.sub{color:#666;font-size:.85rem;margin-bottom:12px}
@@ -12,10 +12,10 @@ td:nth-child(1),td:nth-child(2),td:nth-child(3),th:nth-child(1),th:nth-child(2),
 .tag{font-size:.72rem;padding:1px 6px;border-radius:8px;background:#e5e7eb}
 .WP{background:#dbeafe}.BS{background:#fde68a}
 </style></head><body>
-<h1>Korea365 일일 현황 (WP + Blogspot)</h1>
+<h1>Korea365 GSC 검색 성과 현황</h1>
 <div class="sub" id="meta">불러오는 중...</div>
 <table><thead><tr><th>#</th><th>구분</th><th>사이트</th>
-<th>그저께 방문자</th><th>증감</th><th>누적 방문자</th><th>증감</th>
+<th>GSC 클릭 수 (기준일)</th><th>전일 대비</th><th>최근 16개월 누적 GSC 클릭</th><th>기준일 클릭</th>
 <th>콘텐츠 수</th><th>증감</th><th>GSC 색인수</th><th>증감</th></tr></thead>
 <tbody id="b"></tbody></table>
 <script>
@@ -28,7 +28,7 @@ fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw n
 const generated=new Date(j.generated_at);
 const ageHours=(Date.now()-generated.getTime())/3600000;
 const stale=!Number.isFinite(ageHours)||ageHours>30;
-document.getElementById('meta').textContent='기준일 '+j.reference_date+' · 데이터 생성 '+j.generated_at.slice(0,16).replace('T',' ')+' KST · 순위 기준: GSC 검색 클릭 내림차순'+(stale?' · ⚠ 데이터 갱신 지연':' · '+j.basis);
+document.getElementById('meta').textContent='기준일 '+j.reference_date+' · 데이터 생성 '+j.generated_at.slice(0,16).replace('T',' ')+' KST · 순위 기준: GSC 검색 클릭 내림차순 · 방문자 수가 아닌 검색 클릭'+(stale?' · ⚠ 데이터 갱신 지연':' · '+j.basis);
 const rows=[...(j.rows||[])].sort((a,b)=>{
  const av=Number.isFinite(a.visitors)?a.visitors:null,bv=Number.isFinite(b.visitors)?b.visitors:null;
  if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;
