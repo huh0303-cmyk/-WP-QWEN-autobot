@@ -21,7 +21,7 @@ from gsc_unified_ranking import WP25
 
 ROOT = Path(__file__).resolve().parents[1]
 KST = dt.timezone(dt.timedelta(hours=9))
-EXCLUDE = ("theseouljournal",)
+EXCLUDE = ("theseouljournal.com",)
 OUT = ROOT / "docs" / "dashboard.json"
 HIST = ROOT / "data" / "dashboard_history.json"
 EMPTY = dict(visitors=None, visitors_delta=None, cumulative=None, cumulative_delta=None,
