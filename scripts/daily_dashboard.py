@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Daily dashboard: WP + Blogspot in one ranking. Runs 07:00 KST, no AI/tokens.
+"""Daily dashboard: GSC clicks across the managed web portfolio. Runs 07:00 KST.
 Metrics per site (reference day = day before yesterday KST, so GSC data is more settled):
  1 day-before-yesterday search clicks (daily traffic proxy) + delta vs three days ago
  2 cumulative clicks (GSC, all available history) + delta (= reference-day clicks)
@@ -103,11 +103,13 @@ def indexed_sitemap_count(h, prop):
 
 def content_count(url, platform):
     try:
-        if platform == "wordpress":
+        if platform in {"wordpress", "newsroom"}:
             r = requests.get(url.rstrip("/") + "/wp-json/wp/v2/posts?per_page=1&_fields=id", timeout=25)
             return int(r.headers["X-WP-Total"]) if r.ok and "X-WP-Total" in r.headers else None
-        r = requests.get(url.rstrip("/") + "/feeds/posts/summary?alt=json&max-results=0", timeout=25)
-        return int(r.json()["feed"]["openSearch$totalResults"]["$t"]) if r.ok else None
+        if platform == "blogspot":
+            r = requests.get(url.rstrip("/") + "/feeds/posts/summary?alt=json&max-results=0", timeout=25)
+            return int(r.json()["feed"]["openSearch$totalResults"]["$t"]) if r.ok else None
+        return None
     except Exception:
         return None
 
@@ -139,8 +141,8 @@ def one(h, props, platform, url, ref, prev_hist):
     row["visitors_delta"] = int(d.get(day, 0) - d.get(before, 0))
     tot = gsc(h, prop, {"startDate": (ref - dt.timedelta(days=480)).isoformat(), "endDate": day,
                         "dataState": "all"})
-    row["cumulative"] = int(sum(r["clicks"] for r in tot)) if tot else 0
-    row["cumulative_delta"] = row["visitors"]
+    row["cumulative"] = int(sum(r["clicks"] for r in tot)) if tot is not None else None
+    row["cumulative_delta"] = row["visitors"] if row["cumulative"] is not None else None
     row["google_indexed"] = indexed_sitemap_count(h, prop)
     row["google_indexed_status"] = "OK" if row["google_indexed"] is not None else "GSC_INDEX_COUNT_UNAVAILABLE"
     previous_indexed = p.get("google_indexed", p.get("google_pages"))
@@ -157,8 +159,22 @@ def main():
     h = {"Authorization": "Bearer " + token(), "Content-Type": "application/json"}
     ents = requests.get("https://www.googleapis.com/webmasters/v3/sites", headers=h, timeout=30).json().get("siteEntry", [])
     props = {e["siteUrl"] for e in ents if e.get("permissionLevel") != "siteUnverifiedUser"}
-    portfolio = json.loads((ROOT / "config" / "blogger_portfolio.json").read_text(encoding="utf-8"))
-    targets = [("wordpress", s) for s in WP25] + [("blogspot", c["blogspot"].rstrip("/")) for c in portfolio["channels"]]
+    blogger_portfolio = json.loads((ROOT / "config" / "blogger_portfolio.json").read_text(encoding="utf-8"))
+    tistory_portfolio = json.loads((ROOT / "config" / "tistory_portfolio.json").read_text(encoding="utf-8"))
+    rooms = json.loads((ROOT / "config" / "automation_rooms.json").read_text(encoding="utf-8"))
+    hub = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
+
+    # Build inventory from canonical registries. Seoul Journal is intentionally excluded.
+    targets = [("wordpress", s) for s in WP25]
+    targets += [("blogspot", item["blogspot"].rstrip("/")) for item in blogger_portfolio["channels"]]
+    targets += [("tistory", item["url"].rstrip("/")) for item in tistory_portfolio["sites"] if item.get("launch_enabled")]
+    targets += [("naver", "https://blog.naver.com/" + str(room.get("destination_id", "")).strip())
+                for room in rooms.get("rooms", [])
+                if room.get("platform") == "naver" and room.get("enabled") and room.get("destination_id")]
+    targets += [("newsroom", item["url"].rstrip("/")) for item in hub.get("sites", [])
+                if item.get("platform") == "wordpress"
+                and item.get("url", "").rstrip("/") == "https://koreanews365.com"]
+    targets = list(dict.fromkeys(targets))
     targets = [t for t in targets if not any(x in t[1] for x in EXCLUDE)]
     hist = json.loads(HIST.read_text(encoding="utf-8")) if HIST.exists() else {}
     prev_dates = sorted(k for k in hist if k < ref.isoformat())
@@ -177,7 +193,7 @@ def main():
     for k in sorted(hist)[:-60]:
         del hist[k]
     HIST.write_text(json.dumps(hist, ensure_ascii=False), encoding="utf-8")
-    print("rows", len(rows), "ok", sum(r["status"] == "OK" for r in rows), "ref", ref)
+    print("rows", len(rows), "ok", sum(r["status"] == "OK" for r in rows), "gsc_access", sum(bool(r.get("gsc_property")) for r in rows), "platforms", {p: sum(r["platform"] == p for r in rows) for p in sorted({r["platform"] for r in rows})}, "ref", ref)
 
 
 if __name__ == "__main__":
