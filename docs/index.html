@@ -36,7 +36,7 @@ const rows=[...(j.rows||[])].sort((a,b)=>{
  if(av!==null&&bv!==null&&av!==bv)return bv-av;
  return String(a.site||'').localeCompare(String(b.site||''),'ko');
 });
-document.getElementById('b').innerHTML=rows.map((r,i)=>'<tr><td>'+(Number.isFinite(r.visitors)?(i+1)+'위':'—')+'</td><td><span class="tag '+(r.platform==='wordpress'?'WP">WP':'BS">Blogspot')+'</span></td><td><a href="'+esc(r.url||('https://'+r.site))+'" target="_blank" rel="noopener">'+esc(r.site)+'</a></td><td>'+n(r.visitors,r.status)+'</td><td>'+d(r.visitors_delta)+'</td><td>'+n(r.cumulative,r.status)+'</td><td>'+d(r.cumulative_delta)+'</td><td>'+n(r.content,r.status)+'</td><td>'+d(r.content_delta)+'</td><td>'+indexedCell(r)+'</td><td>'+d(r.google_indexed_delta)+'</td></tr>').join('');
+document.getElementById('b').innerHTML=rows.map((r,i)=>'<tr><td>'+(Number.isFinite(r.visitors)?(i+1)+'위':'—')+'</td><td><span class="tag '+(r.platform==='wordpress'?'WP">WP':r.platform==='blogspot'?'BS">Blogspot':r.platform==='tistory'?'TS">Tistory':r.platform==='naver'?'NV">Naver':'NR">신문')+'</span></td><td><a href="'+esc(r.url||('https://'+r.site))+'" target="_blank" rel="noopener">'+esc(r.site)+'</a></td><td>'+n(r.visitors,r.status)+'</td><td>'+d(r.visitors_delta)+'</td><td>'+n(r.cumulative,r.status)+'</td><td>'+d(r.cumulative_delta)+'</td><td>'+n(r.content,r.status)+'</td><td>'+d(r.content_delta)+'</td><td>'+indexedCell(r)+'</td><td>'+d(r.google_indexed_delta)+'</td></tr>').join('');
 if(stale)document.getElementById('meta').style.color='#b45309';
 }).catch(e=>{document.getElementById('meta').textContent='데이터를 불러오지 못했습니다: '+e.message+' · 마지막 정상 데이터 확인 필요';document.getElementById('meta').style.color='#b91c1c'});
 </script></body></html>
