@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "generated_at": "2026-10-13T12:02:55.560691+09:00",
-  "reporting_date": "2026-10-10",
+  "generated_at": "2026-10-14T10:12:57.923967+09:00",
+  "reporting_date": "2026-10-11",
   "source": "live Google Search Console sites.list after registration attempts",
   "counts": {
     "target_total": 58,
@@ -16,406 +16,406 @@
       "site": "https://glow.k-health365.com",
       "gsc_property": "sc-domain:k-health365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://jobinkorea365.com",
       "gsc_property": "sc-domain:jobinkorea365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://jobkorea365.com",
       "gsc_property": "sc-domain:jobkorea365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://jobkoreaglobal.com",
       "gsc_property": "sc-domain:jobkoreaglobal.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://k-health365.com",
       "gsc_property": "sc-domain:k-health365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://k-trip365.com",
       "gsc_property": "sc-domain:k-trip365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://k-visa365.com",
       "gsc_property": "sc-domain:k-visa365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://kfinance365.com",
       "gsc_property": "sc-domain:kfinance365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://ki-korea.com",
       "gsc_property": "sc-domain:ki-korea.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://kieca-korea.org",
       "gsc_property": "sc-domain:kieca-korea.org",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://korea365.org",
       "gsc_property": "sc-domain:korea365.org",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://koreacrypto365.com",
       "gsc_property": "sc-domain:koreacrypto365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://koreainsurance365.com",
       "gsc_property": "sc-domain:koreainsurance365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://koreainvest365.com",
       "gsc_property": "sc-domain:koreainvest365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://koreamedicaltour.com",
       "gsc_property": "sc-domain:koreamedicaltour.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://koreataxnlaw.com",
       "gsc_property": "sc-domain:koreataxnlaw.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://koreawedding365.com",
       "gsc_property": "sc-domain:koreawedding365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://krealestate365.com",
       "gsc_property": "sc-domain:krealestate365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://ksa-korea.org",
       "gsc_property": "sc-domain:ksa-korea.org",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://kskin365.com",
       "gsc_property": "sc-domain:kskin365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://kstudy365.com",
       "gsc_property": "sc-domain:kstudy365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://ktech365.com",
       "gsc_property": "sc-domain:ktech365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://kworld365.com",
       "gsc_property": "sc-domain:kworld365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://oliveyoungkorea.com",
       "gsc_property": "sc-domain:oliveyoungkorea.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://sis-korea.com",
       "gsc_property": "sc-domain:sis-korea.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://skin.k-health365.com",
       "gsc_property": "sc-domain:k-health365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "wordpress",
       "site": "https://studyinkorea365.com",
       "gsc_property": "sc-domain:studyinkorea365.com",
       "query_status": "OK",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://jobinkorea365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://jobkorea365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://jobkoreaglobal.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://k-health365-edu.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://k-health365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://k-trip365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://k-visa365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://kfinance365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://ki-korea.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://kieca-korea.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://korea-life-support365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://korea365guide.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreacrypto365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreainsurance365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreainvest365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreamedicaltour1.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreamedicaltour365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreanews365daily.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreataxnlaw.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://koreawedding365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://krealestate365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://ksa-korea.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://kstudy365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://ktech365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://kworld365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://kworld365seoul.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://oliveyoungkorea.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://seoulintlschoolguide.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://sis-korea.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://studyinkorea365.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     },
     {
       "platform": "blogspot",
       "site": "https://theseouljournal.blogspot.com",
       "gsc_property": null,
       "query_status": "PROPERTY_NOT_AVAILABLE",
-      "requested_date": "2026-10-10"
+      "requested_date": "2026-10-11"
     }
   ]
 }
