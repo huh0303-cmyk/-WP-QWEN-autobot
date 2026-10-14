@@ -1,4 +1,4 @@
-# 사이트 건강도 리포트 (2026-10-12 09:35 KST)
+# 사이트 건강도 리포트 (2026-10-14 09:20 KST)
 
 - 점검 60곳 · 정상 36 · 경고 20 · 심각 4
 - 자동수정 모드: ON
@@ -23,11 +23,12 @@
   - 자동수정: {'indexnow_ping': True}
 - **https://ki-korea.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://koreainsurance365.com** (wordpress): warn:robots_no_sitemap_line
+- **https://koreainsurance365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_2
+  - 자동수정: {'published_overdue_scheduled': 2}
   - 자동수정: {'indexnow_ping': True}
 - **https://kfinance365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://koreataxnlaw.com** (wordpress): warn:robots_no_sitemap_line, warn:thin_public_content_9
+- **https://koreataxnlaw.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
 - **https://krealestate365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
@@ -52,12 +53,11 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://jobkorea365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:stale_12d
+- **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:stale_14d
   - 자동수정: {'indexnow_ping': False}
-- **https://korea365.org** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_1
-  - 자동수정: {'published_overdue_scheduled': 1}
+- **https://korea365.org** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:stale_7d, warn:zero_impressions_28d
+- **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:stale_9d, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': False}
 
 ## 사람이 해야 하는 일
@@ -68,17 +68,17 @@
 
 ## 최근 28일 검색 클릭 상위
 
-- https://koreawedding365.com: 클릭 5 / 노출 491
-- https://jobinkorea365.com: 클릭 4 / 노출 254
-- https://jobkoreaglobal.com: 클릭 4 / 노출 281
-- https://k-trip365.com: 클릭 3 / 노출 10
-- https://korea365.org: 클릭 3 / 노출 215
-- https://koreainsurance365.com: 클릭 1 / 노출 92
-- https://oliveyoungkorea.com: 클릭 1 / 노출 696
-- https://ksa-korea.org: 클릭 1 / 노출 27
-- https://k-health365.com: 클릭 0 / 노출 1
-- https://koreamedicaltour.com: 클릭 0 / 노출 54
+- https://koreawedding365.com: 클릭 4 / 노출 482
+- https://jobkoreaglobal.com: 클릭 4 / 노출 262
+- https://k-trip365.com: 클릭 3 / 노출 9
+- https://korea365.org: 클릭 3 / 노출 265
+- https://jobinkorea365.com: 클릭 2 / 노출 250
+- https://koreainsurance365.com: 클릭 1 / 노출 120
+- https://oliveyoungkorea.com: 클릭 1 / 노출 657
+- https://ksa-korea.org: 클릭 1 / 노출 32
+- https://k-health365.com: 클릭 0 / 노출 2
+- https://koreamedicaltour.com: 클릭 0 / 노출 50
 
 ## 주간 추이 (최근 7일 vs 직전 7일, 전체 사이트 합계)
 
-- 클릭 3 (직전 7) · 노출 652 (직전 833)
+- 클릭 3 (직전 7) · 노출 718 (직전 743)
