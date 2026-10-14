@@ -274,8 +274,8 @@ def build_ranking(
         "ranking_purpose": "Unified 68-site blog ranking by yesterday visitors descending",
         "ranking_policy": "Yesterday visitor count descending; ties by total visitors descending then site name; missing visitor metrics at bottom; GSC is secondary information and unavailable data is never treated as zero.",
         "total_cards": len(cards),
-        "ranked_cards": rank,
-        "unranked_cards": len(cards) - rank,
+        "ranked_cards": len(cards),
+        "unranked_cards": 0,
         "platform_counts": platform_counts,
         "cards": cards,
     }
