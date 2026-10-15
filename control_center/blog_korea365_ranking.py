@@ -241,15 +241,12 @@ def build_ranking(
             return None
 
     def ranking_key(card):
-        # The user's primary ranking is yesterday's actual visitor count.
-        # Keep sites without a measured visitor count at the bottom, never as zero.
-        yesterday = numeric_metric(card.get("yesterday_visitors"))
-        total = numeric_metric(card.get("total_visitors"))
+        # Control ranking is based exclusively on confirmed Google Search Console clicks.
+        # Missing/unavailable GSC data sorts last and is never converted to zero.
+        clicks = numeric_metric(card.get("gsc_clicks"))
         return (
-            yesterday is None,
-            -(yesterday if yesterday is not None else 0),
-            total is None,
-            -(total if total is not None else 0),
+            clicks is None or str(card.get("gsc_data_status") or "").upper() not in {"OK", "CONNECTED"},
+            -(clicks if clicks is not None else 0),
             str(card.get("name") or "").lower(),
         )
 
@@ -270,9 +267,9 @@ def build_ranking(
         "ranking_date": ranking_date,
         "visitor_ranking_date": (today - timedelta(days=1)).isoformat(),
         "timezone": "Asia/Seoul",
-        "ranking_metric": "yesterday_visitors",
-        "ranking_purpose": "Unified 68-site blog ranking by yesterday visitors descending",
-        "ranking_policy": "Yesterday visitor count descending; ties by total visitors descending then site name; missing visitor metrics at bottom; GSC is secondary information and unavailable data is never treated as zero.",
+        "ranking_metric": "gsc_clicks",
+        "ranking_purpose": "Control blog ranking ordered by confirmed GSC clicks descending; only GSC metrics are ranking evidence",
+        "ranking_policy": "GSC clicks descending for the same confirmed GSC date; missing, stale, inaccessible, or unavailable GSC values stay null and sort last; non-GSC visitor/revenue/platform counters are not used.",
         "total_cards": len(cards),
         "ranked_cards": len(cards),
         "unranked_cards": 0,
