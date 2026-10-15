@@ -6,6 +6,8 @@ on:
     paths:
       - "scripts/gsc_unified_ranking.py"
       - "config/blogger_portfolio.json"
+      - "control_center/blog_korea365_ranking.py"
+      - "control_center/templates/control_home.html"
       - ".github/workflows/gsc-unified-ranking.yml"
   schedule:
     - cron: "17 22 * * *" # 07:17 KST
