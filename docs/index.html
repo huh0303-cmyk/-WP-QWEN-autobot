@@ -13,7 +13,7 @@ td:nth-child(1),td:nth-child(2),td:nth-child(3),th:nth-child(1),th:nth-child(2),
 </style></head><body>
 <h1>Korea365 GSC 검색 성과 현황</h1>
 <div class="sub" id="meta">Google Search Console 데이터를 불러오는 중...</div>
-<table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>GSC 클릭 (기준일)</th><th>전일 대비 클릭</th><th>최근 16개월 GSC 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th></tr></thead>
+<table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>GSC 검색 클릭 (기준일)</th><th>전일 대비 검색 클릭</th><th>최근 16개월 GSC 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th></tr></thead>
 <tbody id="b"></tbody></table>
 <script>
 function d(v){if(v===null||v===undefined)return '<span class="na">—</span>';return v>0?'<span class="up">+'+v+'</span>':v<0?'<span class="down">'+v+'</span>':'0'}
@@ -22,9 +22,9 @@ function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function platformCell(p){const m={wordpress:['WP','WP'],blogspot:['Blogspot','BS'],tistory:['Tistory','TS'],naver:['Naver','NV'],newsroom:['신문','NR']};const v=m[p]||[p,''];return '<span class="tag '+v[1]+'">'+v[0]+'</span>'}
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(j=>{
 const generated=new Date(j.generated_at),ageHours=(Date.now()-generated.getTime())/3600000,stale=!Number.isFinite(ageHours)||ageHours>30;
-document.getElementById('meta').textContent='GSC 기준일 '+j.reference_date+' · 데이터 생성 '+String(j.generated_at||'').slice(0,16).replace('T',' ')+' · 정렬: GSC 클릭 내림차순 · 방문자·콘텐츠 수 등 GSC 외 수치는 표시하지 않음'+(stale?' · ⚠ 데이터 갱신 지연':'');
-const rows=[...(j.rows||[])].sort((a,b)=>{const av=Number.isFinite(a.visitors)?a.visitors:null,bv=Number.isFinite(b.visitors)?b.visitors:null;if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;if(av!==null&&bv!==null&&av!==bv)return bv-av;return String(a.site||'').localeCompare(String(b.site||''),'ko')});
-document.getElementById('b').innerHTML=rows.map((r,i)=>'<tr><td>'+(Number.isFinite(r.visitors)?(i+1)+'위':'—')+'</td><td>'+platformCell(r.platform)+'</td><td><a href="'+esc(r.url||('https://'+r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+n(r.visitors)+'</td><td>'+d(r.visitors_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(r.google_indexed_status==='OK'?'확인됨':r.status==='NO_GSC_ACCESS'?'GSC 접근 불가':r.status==='QUERY_ERROR'?'조회 오류':'GSC에서 확인 불가')+'</td></tr>').join('');
+document.getElementById('meta').textContent='GSC 기준일 '+j.reference_date+' · 데이터 생성 '+String(j.generated_at||'').slice(0,16).replace('T',' ')+' · 정렬: GSC 검색 클릭 내림차순 · 클릭수는 실제 방문자 수가 아님'+(stale?' · ⚠ 데이터 갱신 지연':'');
+const rows=[...(j.rows||[])].sort((a,b)=>{const av=Number.isFinite(a.clicks)?a.clicks:null,bv=Number.isFinite(b.clicks)?b.clicks:null;if(av===null&&bv!==null)return 1;if(av!==null&&bv===null)return -1;if(av!==null&&bv!==null&&av!==bv)return bv-av;return String(a.site||'').localeCompare(String(b.site||''),'ko')});
+document.getElementById('b').innerHTML=rows.map((r,i)=>'<tr><td>'+(Number.isFinite(r.clicks)?(i+1)+'위':'—')+'</td><td>'+platformCell(r.platform)+'</td><td><a href="'+esc(r.url||('https://'+r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+n(r.clicks)+'</td><td>'+d(r.clicks_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(r.google_indexed_status==='OK'?'확인됨':r.status==='NO_GSC_ACCESS'?'GSC 접근 불가':r.status==='QUERY_ERROR'?'조회 오류':'GSC에서 확인 불가')+'</td></tr>').join('');
 if(stale)document.getElementById('meta').style.color='#b45309';
 }).catch(e=>{document.getElementById('meta').textContent='GSC 데이터를 불러오지 못했습니다: '+e.message;document.getElementById('meta').style.color='#b91c1c'});
 </script></body></html>
