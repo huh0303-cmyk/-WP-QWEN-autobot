@@ -138,6 +138,12 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
         row.update(EMPTY)
         row["status"] = "QUERY_ERROR"
         return row
+    if not days:
+        # GSC returns no rows when the property/date has no reportable data.
+        # Do not turn that absence into a fake numeric zero that sorts as a real result.
+        row.update(EMPTY)
+        row["status"] = "NO_DATA"
+        return row
     d = {r["keys"][0]: r["clicks"] for r in days}
     row["clicks"] = int(d.get(day, 0))
     row["clicks_delta"] = int(d.get(day, 0) - d.get(before, 0))
@@ -157,7 +163,7 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
 
 def main():
     now = dt.datetime.now(KST)
-    ref = now.date() - dt.timedelta(days=2)
+    ref = now.date() - dt.timedelta(days=3)  # GSC 2–3 day lag: use a settled reporting day
     h = {"Authorization": "Bearer " + token(), "Content-Type": "application/json"}
     ents = requests.get("https://www.googleapis.com/webmasters/v3/sites", headers=h, timeout=30).json().get("siteEntry", [])
     props = {e["siteUrl"] for e in ents if e.get("permissionLevel") != "siteUnverifiedUser"}
