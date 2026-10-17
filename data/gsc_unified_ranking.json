@@ -6,7 +6,7 @@
   "confirmed_date": "2026-10-14",
   "requested_reporting_date": "2026-10-14",
   "property_source": "live Google Search Console sites.list only",
-  "generated_at": "2026-10-17T00:28:03.209244+00:00",
+  "generated_at": "2026-10-17T01:26:29.495596+00:00",
   "timezone": "Asia/Seoul",
   "policy": "WP25 + Blogspot33 unified ranking uses only Google Search Console Search Analytics. Primary ranking metric is clicks. Impressions, CTR and average position are secondary. Visitor widgets, custom visitor APIs, GA4 and platform counters are excluded. Only live properties visible to the configured service account are used. All sites query the exact same reporting date and immediately prior calendar day. NO_DATA, missing properties and access errors remain null and are never converted to zero.",
   "counts": {
