@@ -1,0 +1,122 @@
+name: CAFE HEALING - GitHub Publisher
+
+on:
+  # Three spaced candidate windows per week. The deterministic weekly gate selects
+  # two or three; a rerun keeps the same decision and release ID.
+  schedule:
+    - cron: "23 2 * * 1"
+    - cron: "41 8 * * 3"
+    - cron: "17 13 * * 5"
+  workflow_dispatch:
+    inputs:
+      publish_now:
+        description: "Attempt a real upload now (requires channel OAuth secrets)"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cafe-healing-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 180
+    env:
+      EXPECTED_YOUTUBE_CHANNEL_ID: UC7yEsLM-HoXudngrD-4FIqg
+      CHANNEL: healing
+      HEALING_VARIANT: random
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide whether this is one of the week's 2–3 release slots
+        id: gate
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime, hashlib, os
+          now = datetime.datetime.now(datetime.timezone.utc)
+          week = now.strftime("%G-W%V")
+          # Stable per-week selection; retries don't change the chosen weekdays.
+          digest = hashlib.sha256(("cafe-healing:" + week).encode()).digest()
+          target = 2 + (digest[0] % 2)
+          slots = sorted(["mon", "wed", "fri"], key=lambda s: hashlib.sha256((week+s).encode()).digest())
+          today = {0:"mon", 2:"wed", 4:"fri"}.get(now.weekday(), "")
+          manual = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
+          selected = manual or (today in slots[:target])
+          print("run_now=" + ("true" if selected else "false"))
+          print(f"week={week}")
+          print(f"target={target}")
+          print(f"slot={today or 'manual'}")
+          PY
+      - name: Skip non-selected weekly candidate
+        if: steps.gate.outputs.run_now != 'true'
+        run: echo "This candidate was not selected for the current 2–3 release weekly plan. No upload attempted."
+
+      - name: Set up Python
+        if: steps.gate.outputs.run_now == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install free runtime tools
+        if: steps.gate.outputs.run_now == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+
+      - name: Check required OAuth credentials
+        if: steps.gate.outputs.run_now == 'true'
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+        run: |
+          set -euo pipefail
+          for key in YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET YOUTUBE_OAUTH_REFRESH_TOKEN; do
+            if [[ -z "${!key:-}" ]]; then
+              echo "::error::Missing $key in the youtube-channels GitHub Environment. No upload attempted."
+              exit 1
+            fi
+          done
+          echo "OAuth secrets are present (values are not printed)."
+
+      - name: Render and upload; verify exact channel and processing receipt
+        if: steps.gate.outputs.run_now == 'true'
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+          YOUTUBE_EXPECTED_CHANNEL_ID: UC7yEsLM-HoXudngrD-4FIqg
+          HEALING_VARIANT: random
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          HEALING_SAMPLE_ID: cafe-healing-${{ github.run_id }}
+          ROOM_RESULT_SOURCE: artifacts/youtube_playlist_result.json
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python scripts/healing_motion.py
+
+      - name: Save run receipt and preview artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cafe-healing-run-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            data/healing-rain-review/upload.json
+            data/healing-rain-review/verified-status.json
+            data/healing-rain-review/preview.mp4
+            data/healing-rain-review/thumbnail.jpg
+            data/healing-rain-review/synthesis.json
+          if-no-files-found: warn
+          retention-days: 30
