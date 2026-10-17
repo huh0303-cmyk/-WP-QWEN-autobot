@@ -1,0 +1,88 @@
+name: Tistory Manual Draft Trigger (safe)
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_ids:
+        description: "Comma-separated Tistory site IDs; blank selects the configured daily set"
+        required: false
+        type: string
+        default: ""
+      run_key:
+        description: "Unique idempotency key for this run"
+        required: true
+        type: string
+      mode:
+        description: "Safe mode only; this workflow never publishes publicly"
+        required: true
+        type: choice
+        options:
+          - audit
+          - plan
+        default: audit
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tistory-manual-draft-${{ inputs.run_key }}
+  cancel-in-progress: false
+
+jobs:
+  tistory-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate run key and repository policy
+        env:
+          RUN_KEY: ${{ inputs.run_key }}
+          SITE_IDS: ${{ inputs.site_ids }}
+        run: |
+          python - <<'PY'
+          import os, re, sys
+          key = os.environ.get("RUN_KEY", "")
+          if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", key):
+              print("Invalid run_key: use 1-80 letters, numbers, dot, underscore or hyphen.")
+              sys.exit(2)
+          known = {
+              "tistory_insurance_lab",
+              "tistory_finance_housing",
+              "tistory_health_info",
+              "tistory_life365",
+              "tistory_ktrip365",
+          }
+          requested = {x.strip() for x in os.environ.get("SITE_IDS", "").split(",") if x.strip()}
+          unknown = requested - known
+          if unknown:
+              print("Unknown Tistory site IDs:", ", ".join(sorted(unknown)))
+              sys.exit(2)
+          print("Policy gate passed. Public publishing is disabled in this workflow.")
+          PY
+      - name: Audit Tistory contracts
+        run: python scripts/tistory_readiness.py
+      - name: Build a plan only when explicitly requested
+        if: inputs.mode == 'plan'
+        env:
+          TISTORY_RUN_KEY: ${{ inputs.run_key }}
+          SITE_IDS: ${{ inputs.site_ids }}
+        run: |
+          python scripts/tistory_daily_planner.py --help
+          python scripts/tistory_daily_planner.py --output artifacts/tistory-plan.json
+      - name: Explain safe boundary
+        run: |
+          echo "This trigger performs readiness audit and optional planning only."
+          echo "It does not invoke paid model APIs, upload images, or publish posts."
+          echo "Actual article generation requires an approved free-provider fallback implementation."
+      - name: Upload plan/audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tistory-manual-trigger-${{ github.run_id }}
+          path: |
+            artifacts/tistory-plan.json
+          if-no-files-found: ignore
+          retention-days: 7
