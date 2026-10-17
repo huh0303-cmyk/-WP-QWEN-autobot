@@ -54,52 +54,11 @@ def prop_for(url, props):
 
 
 def indexed_sitemap_count(h, prop):
-    """Return indexed web-URL counts reported for submitted GSC sitemaps.
-    This is the GSC sitemap count, not pages with impressions. Missing or
-    unsupported counts remain None rather than being fabricated as zero.
+    """Return unavailable: Search Console's sitemap API no longer provides
+    reliable indexed-page totals. Avoid dozens of obsolete API requests on
+    every dashboard refresh; never fabricate index counts.
     """
-    try:
-        encoded_prop = quote(prop, safe="")
-        r = requests.get(
-            "https://www.googleapis.com/webmasters/v3/sites/" + encoded_prop + "/sitemaps",
-            headers=h, timeout=30,
-        )
-        if r.status_code != 200:
-            return None
-        total = 0
-        submitted_total = 0
-        found = False
-        for sm in r.json().get("sitemap", []):
-            path = sm.get("path")
-            if not path:
-                continue
-            detail = requests.get(
-                "https://www.googleapis.com/webmasters/v3/sites/" + encoded_prop
-                + "/sitemaps/" + quote(path, safe=""),
-                headers=h, timeout=30,
-            )
-            if detail.status_code != 200:
-                continue
-            for item in detail.json().get("contents", []):
-                if str(item.get("type", "")).lower() != "web":
-                    continue
-                submitted_total += int(item.get("submitted", 0) or 0)
-                count = item.get("indexed")
-                if count is None:
-                    continue
-                total += int(count)
-                found = True
-        # Search Console deprecated the sitemap contents[].indexed field.
-        # In current responses it can appear as 0 for every site even when
-        # the site has hundreds of submitted URLs. Never present that as a
-        # real indexed-page count; the aggregate Page indexing report has no
-        # supported API endpoint.
-        if not found or (total == 0 and submitted_total > 0):
-            return None
-        return total
-    except (requests.RequestException, ValueError, TypeError):
-        return None
-
+    return None
 
 def content_count(url, platform):
     try:
