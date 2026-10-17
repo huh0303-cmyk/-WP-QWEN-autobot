@@ -276,7 +276,7 @@ def main() -> None:
             "CTR and average position are secondary. Visitor widgets, custom "
             "visitor APIs, GA4 and platform counters are excluded. "
             "Only live properties visible to the configured service account are used. "
-            "All sites query the exact same reporting date and immediately prior calendar day. "
+            "All sites query the same latest 7-day window and compare against the immediately preceding 7-day window. "
             "NO_DATA, missing properties and access errors remain null and are never converted to zero."
         ),
         "counts": {
