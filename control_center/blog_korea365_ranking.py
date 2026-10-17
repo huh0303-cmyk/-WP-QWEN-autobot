@@ -241,12 +241,12 @@ def build_ranking(
             return None
 
     def ranking_key(card):
-        # Control ranking is based exclusively on confirmed Google Search Console clicks.
-        # Missing/unavailable GSC data sorts last and is never converted to zero.
-        clicks = numeric_metric(card.get("gsc_clicks"))
+        # London Project Control ranking is yesterday's confirmed visitor count descending.
+        # Missing visitor measurements sort last; they are never fabricated as zero.
+        visitors = numeric_metric(card.get("yesterday_visitors"))
         return (
-            clicks is None or str(card.get("gsc_data_status") or "").upper() not in {"OK", "CONNECTED"},
-            -(clicks if clicks is not None else 0),
+            visitors is None,
+            -(visitors if visitors is not None else 0),
             str(card.get("name") or "").lower(),
         )
 
@@ -267,9 +267,9 @@ def build_ranking(
         "ranking_date": ranking_date,
         "visitor_ranking_date": (today - timedelta(days=1)).isoformat(),
         "timezone": "Asia/Seoul",
-        "ranking_metric": "gsc_clicks",
-        "ranking_purpose": "Control blog ranking ordered by confirmed GSC clicks descending; only GSC metrics are ranking evidence",
-        "ranking_policy": "GSC clicks descending for the same confirmed GSC date; missing, stale, inaccessible, or unavailable GSC values stay null and sort last; non-GSC visitor/revenue/platform counters are not used.",
+        "ranking_metric": "yesterday_visitors",
+        "ranking_purpose": "London Project Control blog ranking ordered by yesterday visitor count descending; GSC metrics remain secondary",
+        "ranking_policy": "Previous KST calendar day confirmed visitor count descending; missing visitor values stay null and sort last. GSC metrics are displayed as secondary data.",
         "total_cards": len(cards),
         "ranked_cards": len(cards),
         "unranked_cards": 0,
