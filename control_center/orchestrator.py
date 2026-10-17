@@ -12,8 +12,6 @@ import requests
 
 from . import london_activity
 
-OPENAI_URL = "https://api.openai.com/v1/responses"
-ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 
@@ -111,58 +109,6 @@ def _should_cooldown(status: int, body: str) -> bool:
     return status in {401, 403, 408, 409, 429, 500, 502, 503, 504} or any(m in text for m in markers)
 
 
-def _openai(model: str, prompt: str) -> str:
-    key = os.environ.get("OPENAI_API_KEY", "").strip()
-    if not key:
-        raise ProviderUnavailable("OPENAI_API_KEY missing")
-    response = requests.post(
-        OPENAI_URL,
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-        json={"model": model, "input": prompt},
-        timeout=120,
-    )
-    if response.status_code >= 400:
-        message = f"OpenAI HTTP {response.status_code}: {response.text[:300]}"
-        if _should_cooldown(response.status_code, response.text):
-            raise ProviderUnavailable(message)
-        raise RuntimeError(message)
-    data = response.json()
-    if isinstance(data.get("output_text"), str) and data["output_text"].strip():
-        return data["output_text"]
-    texts: list[str] = []
-    for item in data.get("output", []):
-        for block in item.get("content", []) or []:
-            value = block.get("text")
-            if isinstance(value, str) and value:
-                texts.append(value)
-    text = "".join(texts).strip()
-    if text:
-        return text
-    raise ProviderUnavailable("OpenAI response shape invalid or empty")
-
-
-def _anthropic(model: str, prompt: str) -> str:
-    key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-    if not key:
-        raise ProviderUnavailable("ANTHROPIC_API_KEY missing")
-    response = requests.post(
-        ANTHROPIC_URL,
-        headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"},
-        json={"model": model, "max_tokens": 8192, "messages": [{"role": "user", "content": prompt}]},
-        timeout=120,
-    )
-    if response.status_code >= 400:
-        message = f"Anthropic HTTP {response.status_code}: {response.text[:300]}"
-        if _should_cooldown(response.status_code, response.text):
-            raise ProviderUnavailable(message)
-        raise RuntimeError(message)
-    blocks = response.json()["content"]
-    text = "".join(block.get("text", "") for block in blocks if block.get("type") == "text").strip()
-    if text:
-        return text
-    raise ProviderUnavailable("Anthropic response shape invalid or empty")
-
-
 def _gemini(model: str, prompt: str) -> str:
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
@@ -185,45 +131,38 @@ def _gemini(model: str, prompt: str) -> str:
     raise ProviderUnavailable("Gemini response shape invalid or empty")
 
 
+# Free Gemini text models only. OpenAI/GPT and Anthropic/Claude are intentionally
+# excluded from generation, fallback, and LLM-assisted audit chains.
 CALLERS: dict[str, Callable[[str, str], str]] = {
-    "openai": _openai,
-    "anthropic": _anthropic,
     "gemini": _gemini,
 }
 
 
 def _models() -> dict[str, str]:
     return {
-        "openai": os.environ.get("ORCHESTRATOR_OPENAI_MODEL", "gpt-5.6-luna").strip(),
-        "anthropic": os.environ.get("ORCHESTRATOR_CLAUDE_MODEL", "claude-sonnet-4-6").strip(),
         "gemini": os.environ.get("ORCHESTRATOR_GEMINI_MODEL", "gemini-3.8-flash").strip(),
     }
 
 
 def _default_chain(task_type: str) -> list[ProviderSpec]:
-    models = _models()
-    if task_type == "blogger":
-        order = ["gemini", "openai", "anthropic"]
-    elif task_type == "audit":
-        order = ["anthropic", "gemini", "openai"]
-    else:
-        order = ["openai", "anthropic", "gemini"]
-    return [ProviderSpec(name, models[name]) for name in order]
+    primary = _models()["gemini"]
+    raw = os.environ.get(
+        "ORCHESTRATOR_GEMINI_MODELS",
+        "gemini-3.8-flash,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash-lite",
+    )
+    ordered = [model.strip() for model in raw.split(",") if model.strip()]
+    if primary:
+        ordered = [primary] + [model for model in ordered if model != primary]
+    # The same Gemini-only policy applies to writing, review, verification assistance,
+    # and orchestration tasks. Deterministic external audit remains the final authority.
+    return [ProviderSpec("gemini", model) for model in dict.fromkeys(ordered)]
 
 
 def _chain_from_env(task_type: str) -> list[ProviderSpec]:
-    raw = os.environ.get(f"ORCHESTRATOR_CHAIN_{task_type.upper()}", "").strip()
-    if not raw:
-        return _default_chain(task_type)
-    defaults = {spec.name: spec.model for spec in _default_chain(task_type)}
-    specs: list[ProviderSpec] = []
-    for item in raw.split(","):
-        provider, _, model = item.strip().partition(":")
-        provider = provider.strip().lower()
-        if provider not in CALLERS:
-            continue
-        specs.append(ProviderSpec(provider, model.strip() or defaults.get(provider, _models()[provider])))
-    return specs or _default_chain(task_type)
+    # Legacy chain variables may still contain GPT/Claude entries; ignore them.
+    # Only Gemini model names are accepted, and only from the explicit Gemini list.
+    return _default_chain(task_type)
+
 
 
 def generate_text(prompt: str, *, task_type: str = "pm", task_id: str = "",
