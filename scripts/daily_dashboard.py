@@ -145,12 +145,17 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
         row["status"] = "NO_DATA"
         return row
     d = {r["keys"][0]: r["clicks"] for r in days}
-    row["clicks"] = int(d.get(day, 0))
-    row["clicks_delta"] = int(d.get(day, 0) - d.get(before, 0))
+    # Search Analytics omits dates with no returned data. A missing date is
+    # not proof of zero clicks; keep daily rank metric unavailable in that case.
+    has_day = day in d
+    row["clicks"] = int(d[day]) if has_day else None
+    row["clicks_delta"] = int(d[day] - d.get(before, 0)) if has_day else None
+    if not has_day:
+        row["status"] = "NO_DATA"
     tot = gsc(h, prop, {"startDate": (ref - dt.timedelta(days=480)).isoformat(), "endDate": day,
                         "dataState": "all"})
     row["cumulative"] = int(sum(r["clicks"] for r in tot)) if tot is not None else None
-    row["cumulative_delta"] = row["clicks"] if row["cumulative"] is not None else None
+    row["cumulative_delta"] = row["clicks"] if row["cumulative"] is not None and has_day else None
     row["google_indexed"] = indexed_sitemap_count(h, prop)
     row["google_indexed_status"] = "OK" if row["google_indexed"] is not None else "GSC_INDEX_COUNT_UNAVAILABLE"
     previous_indexed = p.get("google_indexed", p.get("google_pages"))
