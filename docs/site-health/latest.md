@@ -1,6 +1,6 @@
-# 사이트 건강도 리포트 (2026-10-16 08:42 KST)
+# 사이트 건강도 리포트 (2026-10-18 08:09 KST)
 
-- 점검 60곳 · 정상 36 · 경고 18 · 심각 6
+- 점검 60곳 · 정상 36 · 경고 17 · 심각 7
 - 자동수정 모드: ON
 
 ## 심각
@@ -14,6 +14,7 @@
   - 수동 필요: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
 - **https://k-visa365.com** (wordpress): critical:home_http_403, critical:home_noindex, critical:sitemap_missing, warn:ads_txt_missing_or_wrong, warn:plugins_api_403
   - 수동 필요: 설정>읽기>검색엔진 노출 체크 해제 및 SEO 플러그인 noindex 확인
+- **https://ksa-korea.org** (wordpress): critical:home_unreachable_ConnectionError
 - **https://sis-korea.com** (wordpress): critical:home_unreachable_ConnectionError
 - **https://theseouljournal.com** (newsroom): critical:home_unreachable_SSLError
 
@@ -23,7 +24,8 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://koreainvest365.com** (wordpress): warn:robots_no_sitemap_line, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': True}
-- **https://koreainsurance365.com** (wordpress): warn:robots_no_sitemap_line
+- **https://koreainsurance365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_2
+  - 자동수정: {'published_overdue_scheduled': 2}
   - 자동수정: {'indexnow_ping': True}
 - **https://kfinance365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
@@ -41,13 +43,9 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://kstudy365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://studyinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_2, warn:zero_impressions_28d
-  - 자동수정: {'published_overdue_scheduled': 2}
+- **https://studyinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': True}
 - **https://kieca-korea.org** (wordpress): warn:robots_no_sitemap_line
-  - 자동수정: {'indexnow_ping': False}
-- **https://ksa-korea.org** (wordpress): warn:overdue_scheduled_2
-  - 자동수정: {'published_overdue_scheduled': 2}
   - 자동수정: {'indexnow_ping': False}
 - **https://jobkorea365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
@@ -56,7 +54,7 @@
 - **https://korea365.org** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_1
   - 자동수정: {'published_overdue_scheduled': 1}
   - 자동수정: {'indexnow_ping': False}
-- **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:stale_11d, warn:zero_impressions_28d
+- **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:stale_13d, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': False}
 
 ## 사람이 해야 하는 일
@@ -67,17 +65,17 @@
 
 ## 최근 28일 검색 클릭 상위
 
-- https://koreawedding365.com: 클릭 5 / 노출 504
-- https://jobkoreaglobal.com: 클릭 5 / 노출 282
-- https://k-trip365.com: 클릭 3 / 노출 9
-- https://ksa-korea.org: 클릭 3 / 노출 43
-- https://jobinkorea365.com: 클릭 3 / 노출 255
-- https://korea365.org: 클릭 3 / 노출 320
-- https://koreainsurance365.com: 클릭 1 / 노출 144
-- https://oliveyoungkorea.com: 클릭 1 / 노출 646
+- https://korea365.org: 클릭 5 / 노출 383
+- https://koreawedding365.com: 클릭 4 / 노출 491
+- https://jobkoreaglobal.com: 클릭 4 / 노출 287
+- https://k-trip365.com: 클릭 3 / 노출 11
+- https://jobinkorea365.com: 클릭 3 / 노출 249
+- https://koreainsurance365.com: 클릭 1 / 노출 168
+- https://oliveyoungkorea.com: 클릭 1 / 노출 635
 - https://k-health365.com: 클릭 0 / 노출 2
-- https://koreamedicaltour.com: 클릭 0 / 노출 48
+- https://koreamedicaltour.com: 클릭 0 / 노출 42
+- https://koreainvest365.com: 클릭 0 / 노출 0
 
 ## 주간 추이 (최근 7일 vs 직전 7일, 전체 사이트 합계)
 
-- 클릭 7 (직전 6) · 노출 749 (직전 701)
+- 클릭 5 (직전 6) · 노출 737 (직전 685)
