@@ -8,6 +8,7 @@ on:
       - "config/blogger_portfolio.json"
       - "control_center/blog_korea365_ranking.py"
       - "control_center/templates/control_home.html"
+      - "docs/ranking/index.html"
       - ".github/workflows/gsc-unified-ranking.yml"
   schedule:
     - cron: "17 22 * * *" # 07:17 KST
@@ -39,6 +40,12 @@ jobs:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
         run: python scripts/gsc_unified_ranking.py
 
+      - name: Publish evidence to static ranking page
+        run: |
+          set -euo pipefail
+          mkdir -p docs/ranking
+          cp data/gsc_unified_ranking.json docs/ranking/data.json
+
       - name: Validate unified evidence
         run: |
           python - <<'PY'
@@ -63,6 +70,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/gsc_unified_ranking.json data/gsc_target_property_audit.json
+          git add data/gsc_unified_ranking.json data/gsc_target_property_audit.json docs/ranking/data.json
           git diff --cached --quiet || git commit -m "chore: refresh unified GSC ranking evidence [skip ci]"
           git push
