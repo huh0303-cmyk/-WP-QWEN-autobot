@@ -30,3 +30,10 @@ Last update: 2026-09-26 KST
 - Survival 10/10 now have exact UC channel IDs.
 - Current 23-target = playlist 5 + knowledge 5 + language 10 + health 2 + shopping 1.
 - Legacy science/classical/myth/american_archive/classic_reads keys are retained only as historical aliases and excluded from the current 23 production target.
+
+
+## 2026-10-17 YouTube misroute repair — cShePd9rQvY
+- Incident documented: `docs/YOUTUBE_MISROUTE_REPAIR_cShePd9rQvY_2026-10-17.md`.
+- Correct target is `HISTORY_TV_TODAY` / `UCVBvZwodUF4s57KeNicxQ3w`; the existing private video was misrouted to French Survival because the legacy AMERICAN_ARCHIVE_TIMES OAuth token authenticated `UCmt8f9yUT6iTxBys8eH4-Cg`.
+- Repair requires re-uploading the original source asset to the correct channel and verifying the replacement video ID/channel/privacy via YouTube API. Existing video cannot be transferred between channels.
+- Do not delete the incorrect private copy until the replacement is verified. GitHub record is committed; replacement upload remains pending runtime execution/evidence.
