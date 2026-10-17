@@ -94,17 +94,16 @@ def property_for(url: str, properties: set[str]) -> str | None:
     return max(matches, key=len) if matches else None
 
 
-def query_day(headers: dict[str, str], prop: str, day: dt.date) -> dict | None:
+def query_range(headers: dict[str, str], prop: str, start: dt.date, end: dt.date) -> dict | None:
     endpoint = (
         "https://www.googleapis.com/webmasters/v3/sites/"
         + quote(prop, safe="")
         + "/searchAnalytics/query"
     )
     body = {
-        "startDate": day.isoformat(),
-        "endDate": day.isoformat(),
-        "dimensions": ["date"],
-        "rowLimit": 10,
+        "startDate": start.isoformat(),
+        "endDate": end.isoformat(),
+        "rowLimit": 1,
         "dataState": "final",
     }
     response = requests.post(endpoint, headers=headers, json=body, timeout=20)
@@ -115,24 +114,31 @@ def query_day(headers: dict[str, str], prop: str, day: dt.date) -> dict | None:
 
 
 def query_site(headers: dict[str, str], site: str, prop: str | None, end: dt.date) -> dict:
+    start = end - dt.timedelta(days=6)
+    previous_end = start - dt.timedelta(days=1)
+    previous_start = previous_end - dt.timedelta(days=6)
     result = {
         "site": site,
         "property": prop,
         "status": "PROPERTY_NOT_AVAILABLE" if not prop else "NO_DATA",
         "requested_date": end.isoformat(),
+        "period_start": start.isoformat(),
+        "period_end": end.isoformat(),
+        "previous_period_start": previous_start.isoformat(),
+        "previous_period_end": previous_end.isoformat(),
         "date": None,
         "clicks": None,
         "delta": None,
         "impressions": None,
         "ctr": None,
         "position": None,
-        "previous_date": (end - dt.timedelta(days=1)).isoformat(),
+        "previous_date": previous_end.isoformat(),
     }
     if not prop:
         return result
     try:
-        current = query_day(headers, prop, end)
-        previous = query_day(headers, prop, end - dt.timedelta(days=1))
+        current = query_range(headers, prop, start, end)
+        previous = query_range(headers, prop, previous_start, previous_end)
         if current is None:
             result["status"] = "NO_DATA"
             return result
@@ -256,8 +262,9 @@ def main() -> None:
     payload = {
         "schema": 3,
         "metric": "gsc_clicks",
-        "metric_label": "GSC 클릭수",
-        "delta_label": "직전 확정 GSC 날짜 대비",
+        "metric_label": "GSC 최근 7일 클릭수",
+        "delta_label": "직전 7일 대비",
+        "reporting_window_days": 7,
         "confirmed_date": end.isoformat(),
         "requested_reporting_date": end.isoformat(),
         "property_source": "live Google Search Console sites.list only",
