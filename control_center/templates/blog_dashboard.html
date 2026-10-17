@@ -32,7 +32,7 @@
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
 .metric{border:1px solid #e2e8f0;border-radius:10px;padding:8px;background:#f8fafc}
 .label{font-size:9px;color:#64748b;font-weight:800}.value{font-size:17px;font-weight:950;margin-top:2px}
-.delta{font-size:10px;font-weight:850}.up{color:#059669}.down{color:#dc2626}.flat{color:#64748b}.unknown{color:#b45309}
+.delta{font-size:10px;font-weight:850}.up{color:#1d4ed8}.down{color:#dc2626}.flat{color:#64748b}.unknown{color:#b45309}
 .foot{border-top:1px solid #e2e8f0;margin-top:9px;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .status{font-size:9px;font-weight:850}.good{color:#047857}.warn{color:#b45309}.bad{color:#b91c1c}
 .time{font-size:9px;color:#94a3b8;text-align:right}.empty{padding:40px;text-align:center;color:#64748b;background:#fff;border-radius:14px}
@@ -81,7 +81,8 @@ const delta=v=>{
  if(!Number.isFinite(v)) return '<span class="delta unknown">(증감 연결 필요)</span>';
  const cls=v>0?'up':v<0?'down':'flat';
  const sign=v>0?'+':'';
- return '<span class="delta '+cls+'">('+sign+new Intl.NumberFormat('ko-KR').format(v)+')</span>';
+ const arrow=v>0?'▲ ':v<0?'▼ ':'';
+ return '<span class="delta '+cls+'">'+arrow+sign+new Intl.NumberFormat('ko-KR').format(v)+'</span>';
 };
 const badge=p=>({wordpress:'WP',blogspot:'BLOGSPOT',naver:'NAVER',tistory:'TISTORY'}[p]||String(p||'').toUpperCase());
 const metric=(label,value,diff,extra='')=>'<div class="metric"><div class="label">'+label+extra+'</div><div class="value">'+fmt(value)+' '+delta(diff)+'</div></div>';
