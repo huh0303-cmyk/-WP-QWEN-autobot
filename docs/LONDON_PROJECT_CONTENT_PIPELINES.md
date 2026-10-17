@@ -65,9 +65,9 @@
 
 운영 순서:
 1. CODEX PM이 다음 Lesson 번호와 언어별 작업 묶음을 생성한다.
-2. Orchestrator가 언어별 작업을 Gemini/Claude/VPS에 배정한다.
+2. Orchestrator는 Gemini 무료 텍스트 모델 체인에만 언어별 텍스트 작업을 배정한다. GPT/OpenAI 및 Claude/Anthropic은 사용하지 않는다.
 3. Gemini가 기본 대본·현지화·구조화·번역 보조를 수행한다.
-4. Claude가 의미·발음·구성·중복·품질을 독립 QA한다.
+4. Gemini 무료 텍스트 모델 체인이 의미·발음·구성·중복·품질을 검토한다. 독립 완료 판정은 LLM이 아니라 결정론적 외부 감사 엔진이 수행한다.
 5. VPS가 음성/영상/자막/썸네일 렌더링과 업로드를 수행한다.
 6. YouTube에는 소유자 정책에 따라 `privacyStatus=public`으로 즉시 업로드한다.
 7. Audit Engine이 video_id, 정확한 channel_id, privacyStatus=public 및 공개 조회를 확인해야 완료로 판정한다.
@@ -96,22 +96,19 @@
 - 사용자 보고
 - 직접 VERIFIED_COMPLETE 판정 금지
 
-### Claude — Independent QA + Plan B Acting PM
-- 대본/기사/메타데이터 품질 QA
-- 10개 언어 의미·구성·중복·오류 감사
-- 실제 발행 증거 검토
-- CODEX/OpenAI 장애 시 현재 handoff packet을 이어 받아 Acting PM
-- 전략을 새로 만들지 않고 기존 우선순위와 스케줄을 이어감
-- 성공·실패·재작업 결과를 작업원장에 남김
-
-### Gemini — Production + Plan C Continuity
-- Blogspot 독립 콘텐츠 생산
-- 10개 언어 Survival 대본·현지화·구조화의 기본 생산 엔진
-- 대량/반복 콘텐츠 작업
-- 멀티모달/이미지 프롬프트 보조
-- Claude 감사 결과 2차 교차검증
-- CODEX와 Claude 모두 불가할 때 승인된 작업만 Plan C로 계속 수행
+### Gemini 무료 텍스트 모델 체인 — 유일한 LLM 공급자
+- 글쓰기, 재작성, 편집 검토, LLM 보조 검증을 모두 Gemini 무료 텍스트 모델로 수행
+- 우선순위: `gemini-3.8-flash` → `gemini-2.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.0-flash-lite` (사용 가능 모델·무료 쿼터에 따라 순차 시도)
+- GPT/OpenAI 및 Claude/Anthropic은 생성·검토·검증·대체 모델 경로에서 금지
+- 모든 Gemini 모델이 실패하면 유료 모델로 전환하지 말고 작업/큐를 보존해 보류
 - 결과와 오류를 작업원장에 남김
+
+### Deterministic Audit Engine
+- 실제 URL/호스트/HTTP/제목·작업 식별
+- YouTube: video_id/channel_id/privacyStatus/API 조회
+- 게시 ID, 대상 계정/사이트, 공개 상태 및 타임스탬프를 외부 증거로 검증
+- VERIFIED_COMPLETE 또는 VERIFIED_PRIVATE 판정의 유일한 권한
+- 감사 결과와 증거를 task_id에 연결하여 보존
 
 ### VPS Workers
 - 24시간 Queue/Scheduler
@@ -129,20 +126,14 @@
 
 ## 7. Plan A / B / C / SAFE HOLD
 
-### Plan A — CODEX 정상
-CODEX PM → Orchestrator → Claude/Gemini/VPS → Audit.
+### Plan A — 정상
+Orchestrator → Gemini 무료 텍스트 모델 체인 → VPS/플랫폼 작업자 → 결정론적 외부 감사.
 
-### Plan B — CODEX/OpenAI 장애 또는 API 토큰·쿼터 고갈
-트리거: quota/rate limit/timeout/provider outage/auth failure/PM lease expiry.
-Orchestrator가 durable handoff packet을 생성하고 Claude를 Acting PM으로 승계한다.
-Claude는 열린 작업, 스케줄, 최근 결정, 완료 기준, 오류와 감사 실패를 그대로 이어받는다.
-전환 자체도 FAILOVER 이벤트로 작업원장에 기록한다.
+### Gemini 체인 장애 또는 무료 쿼터 소진
+Gemini 모델을 설정된 순서대로 한 번씩 순차 시도하고, 쿼터/속도 제한 오류 모델은 쿨다운 처리한다. 모든 허용 모델이 실패하면 작업과 큐를 보존하고 SAFE HOLD로 전환한다. GPT/OpenAI·Claude/Anthropic 또는 유료 API로 승계하지 않는다.
 
-### Plan C — CODEX와 Claude 모두 사용 불가
-Gemini가 continuity 역할을 맡는다.
-이미 승인된 생산/예약/감사 보조만 계속한다.
-새 유료 서비스, 전략 변경, 사이트 추가·삭제, 되돌리기 어려운 작업은 하지 않는다.
-전환과 결과를 작업원장에 기록한다.
+### SAFE HOLD — 모든 허용 Gemini 모델 사용 불가
+상태와 Queue를 보존한다. 새 콘텐츠 생성 및 검증되지 않은 발행을 보류한다. 사용 가능한 무료 Gemini 텍스트 모델이 복구되면 기존 작업 ID와 기록을 이어서 재개한다.
 
 ### SAFE HOLD — 세 AI 모두 사용 불가
 VPS는 상태와 Queue를 보존한다.
