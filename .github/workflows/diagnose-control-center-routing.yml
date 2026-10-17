@@ -1,0 +1,44 @@
+name: Diagnose control-center routing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/diagnose-control-center-routing.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read-only VPS and nginx checks
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set +e
+            echo "=== VPS identity and addresses ==="
+            hostname
+            hostname -I
+            echo "=== Control service ==="
+            systemctl is-active korea365-control.service
+            systemctl show korea365-control.service -p User -p WorkingDirectory -p EnvironmentFiles --no-pager
+            echo "=== Local Flask health ==="
+            curl --max-time 5 -sS -o /dev/null -w "healthz HTTP %{http_code}\n" http://127.0.0.1:8000/healthz
+            curl --max-time 5 -sS -o /dev/null -w "social-accounts HTTP %{http_code}\n" http://127.0.0.1:8000/social-accounts
+            echo "=== Active nginx routing lines (no credentials) ==="
+            nginx -T 2>/dev/null | grep -E 'server_name.*control\.korea365\.org|proxy_pass.*127\.0\.0\.1:8000' | head -20
+            echo "=== Public listeners ==="
+            ss -ltn 2>/dev/null | grep -E ':(80|443|8000) ' || true
+            echo "=== VPS deploy status ==="
+            if test -f /opt/korea365/data/deploy-status.json; then
+              python3 -c 'import json; p="/opt/korea365/data/deploy-status.json"; d=json.load(open(p)); print({k:d.get(k) for k in ("status","deployed_sha","last_success","last_error")})'
+            else
+              echo "deploy-status.json missing"
+            fi
