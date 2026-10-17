@@ -1,0 +1,105 @@
+name: CAFE HEALING Publisher
+
+on:
+  # Three candidate windows each week; the job gate chooses 2–3 slots deterministically
+  # for the ISO week, so retries don't change the week's plan.
+  schedule:
+    - cron: "23 2 * * 1"
+    - cron: "41 8 * * 3"
+    - cron: "17 13 * * 5"
+  workflow_dispatch:
+    inputs:
+      force_slot:
+        description: "Run a manual publish attempt (still checks channel, assets, and duplicate ledger)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cafe-healing-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 90
+    env:
+      EXPECTED_YOUTUBE_CHANNEL_ID: UC7yEsLM-HoXudngrD-4FIqg
+      CHANNEL_SLUG: CAFE_HEALING
+      HEALING_VARIANT: random
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate project root and required publisher
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f scripts/healing_motion.py && -f scripts/youtube_publish_approved.py ]]; then
+            echo "project_root=." >> "$GITHUB_OUTPUT"
+          elif [[ -f automation-master/scripts/healing_motion.py && -f automation-master/scripts/youtube_publish_approved.py ]]; then
+            echo "project_root=automation-master" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Publisher scripts not present in checkout. This run will not claim or attempt an upload. Inspect repository layout and migrate the existing publisher into the checked-out project before enabling scheduled publishing."
+            find . -maxdepth 4 -type f \( -name healing_motion.py -o -name youtube_publish_approved.py \) -print
+            exit 1
+          fi
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free runtime dependencies
+        working-directory: ${{ steps.locate.outputs.project_root }}
+        run: |
+          python -m pip install --upgrade pip
+          if [[ -f requirements.txt ]]; then
+            pip install -r requirements.txt
+          elif [[ -f requirements/playlist.txt ]]; then
+            pip install -r requirements/playlist.txt
+          else
+            echo "::error::No checked-in dependency manifest found; refusing to guess the runtime dependency set."
+            exit 1
+          fi
+      - name: Verify locked channel identity before any upload
+        working-directory: ${{ steps.locate.outputs.project_root }}
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_CAFE_HEALING }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_CAFE_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CAFE_HEALING }}
+        run: |
+          set -euo pipefail
+          for key in YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET YOUTUBE_OAUTH_REFRESH_TOKEN; do
+            if [[ -z "${!key:-}" ]]; then
+              echo "::error::Missing GitHub Actions secret for CAFE_HEALING OAuth ($key). No upload was attempted."
+              exit 1
+            fi
+          done
+          python scripts/playlist_asset_preflight.py "$EXPECTED_YOUTUBE_CHANNEL_ID"
+      - name: Run existing healing publisher with retry-safe job ID
+        working-directory: ${{ steps.locate.outputs.project_root }}
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID_CAFE_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_CAFE_HEALING }}
+          YOUTUBE_OAUTH_CLIENT_SECRET_CAFE_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_CAFE_HEALING }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_CAFE_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_CAFE_HEALING }}
+          YOUTUBE_EXPECTED_CHANNEL_ID: UC7yEsLM-HoXudngrD-4FIqg
+          HEALING_VARIANT: random
+          RELEASE_JOB_ID: cafe-healing-${{ github.run_id }}-${{ github.run_attempt }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          python scripts/healing_motion.py
+      - name: Preserve upload receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cafe-healing-publish-receipt-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            artifacts/*.log
+          if-no-files-found: warn
+          retention-days: 30
