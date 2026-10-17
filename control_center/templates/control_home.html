@@ -62,7 +62,7 @@ tbody tr:hover{filter:brightness(.98)}
 </section>
 <div class="dashboard-grid">
 <section class="section">
-<div class="section-head"><div><h2 id="blog-title">블로그 순위</h2><p>GSC 확인 데이터 기준 · 클릭수 내림차순 · 같은 확정 기준일 · 비GSC 방문자/수익 숫자 제외</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>
+<div class="section-head"><div><h2 id="blog-title">블로그 순위</h2><p>어제 방문자수 내림차순 · 매일 순위 갱신 · GSC 클릭/노출은 참고 지표</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>
 <div class="sheet"><table class="k365-table blog"><thead><tr>
 <th>순위</th><th>플랫폼</th><th>사이트</th><th>GSC 클릭(증감)</th><th>GSC 노출</th><th>CTR</th><th>평균 게재순위</th><th>GSC 기준일/상태</th>
 </tr></thead><tbody id="blog-rows"><tr><td colspan="8" style="text-align:center">GSC 데이터 불러오는 중…</td></tr></tbody></table></div>
@@ -161,7 +161,7 @@ installColumnMemory(document.querySelector('table.blog'),'blog');
 installColumnMemory(document.querySelector('table.social'),'social');
 async function loadBlog(){
  const r=await fetch('/api/blog-korea365/ranking',{cache:'no-store'});if(!r.ok)throw new Error('blog '+r.status);const d=await r.json();
- document.getElementById('blog-title').textContent='GSC 블로그 순위 ('+dateLabel(d.ranking_date||d.display_date||todayKst())+')';
+ document.getElementById('blog-title').textContent='블로그 순위 · 어제 방문자수 내림차순 ('+dateLabel(d.visitor_ranking_date||d.display_date||todayKst())+')';
  document.getElementById('blog-rows').innerHTML=(d.cards||[]).map(c=>{
   const p=(c.kind==='news'?'wordpress':String(c.platform||'')).toLowerCase(),label=c.kind==='news'?'NEWS':String(c.platform||'').toUpperCase();
   const gscDate=c.gsc_date||'';
