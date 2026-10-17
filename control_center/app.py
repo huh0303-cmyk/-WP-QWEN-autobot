@@ -46,6 +46,31 @@ app.config["SECRET_KEY"] = os.environ.get("CONTROL_CENTER_SECRET_KEY") or secret
 app.config["CONTROL_CENTER_CSRF"] = os.environ.get("CONTROL_CENTER_CSRF") or secrets.token_urlsafe(24)
 
 
+@app.get("/ranking")
+def gsc_ranking_page():
+    """Serve the official GSC ranking directly from the control-center website."""
+    ranking_path = Path(__file__).resolve().parents[1] / "data" / "gsc_unified_ranking.json"
+    try:
+        payload = json.loads(ranking_path.read_text(encoding="utf-8"))
+        records = payload.get("records", [])
+    except (OSError, ValueError, TypeError):
+        payload, records = {}, []
+    records = sorted(
+        records,
+        key=lambda row: (
+            row.get("clicks") is not None,
+            row.get("clicks") if row.get("clicks") is not None else -1,
+        ),
+        reverse=True,
+    )
+    return render_template(
+        "gsc_ranking.html",
+        ranking=payload,
+        records=records,
+        active_console="ranking",
+    )
+
+
 @app.template_filter("compact_category")
 def compact_category(value: object, limit: int = 22) -> str:
     """Short dashboard label; the source category remains unchanged."""
