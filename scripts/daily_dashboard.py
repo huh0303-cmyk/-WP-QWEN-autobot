@@ -164,7 +164,7 @@ def main():
     prev = hist[prev_dates[-1]] if prev_dates else {}
     with ThreadPoolExecutor(max_workers=8) as ex:
         rows = list(ex.map(lambda t: one(h, props, t[0], t[1], t[2], ref, prev), targets))
-    rows.sort(key=lambda r: (r["impressions"] is None, -(r["impressions"] or 0), -(r["clicks"] or 0), r["site"]))
+    rows.sort(key=lambda r: (r["clicks"] is None, -(r["clicks"] or 0), -(r["impressions"] or 0), r["site"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i
     OUT.parent.mkdir(parents=True, exist_ok=True)
