@@ -146,7 +146,7 @@ def main():
     # Exclude only the exact newsroom domain theseouljournal.com; keep its separate
     # Blogger property theseouljournal.blogspot.com in the 33-blog Blogger inventory.
     targets = [("wordpress", s.rstrip("/"), s.split("://", 1)[-1].rstrip("/")) for s in WP25]
-    targets += [("blogspot", item["blogspot"].rstrip("/"), item.get("title", item["blogspot"]))
+    targets += [("blogspot", item["blogspot"].rstrip("/"), item["blogspot"].rstrip("/").split("://", 1)[-1])
                 for item in blogger_portfolio["channels"]]
     targets += [("tistory", item["url"].rstrip("/"), item.get("current_label", item.get("title", item["url"])))
                 for item in tistory_portfolio["sites"] if item.get("launch_enabled")]
