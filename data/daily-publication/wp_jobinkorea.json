@@ -1,1 +1,1 @@
-{"day": "2026-10-18", "status": "CLAIMED", "attempts": 1, "claim": "daily-2026-10-18-wp_jobinkorea-88fbbd69", "claimed_at": "2026-10-18T13:22:51.745515+09:00", "run_id": null, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-18", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-18-wp_jobinkorea-88fbbd69", "claimed_at": "2026-10-18T13:22:51.745515+09:00", "run_id": 39096903657, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
