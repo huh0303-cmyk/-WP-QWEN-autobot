@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Korea365 · 노출·클릭 · GSC 검색 성과</title>
+<title>런던프로젝트 통제실 · 전체 운영 통계</title>
 <style>
 body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:8px;background:#f6f7f9;color:#1c1c1e}
-h1{font-size:1.2rem;margin:0 0 4px}.sub{color:#666;font-size:.85rem;margin-bottom:8px}
+h1{font-size:1.25rem;margin:0 0 4px;color:#0f172a}.sub{color:#475569;font-size:.85rem;margin-bottom:8px}.publish-link{display:inline-block;padding:4px 9px;border-radius:5px;background:#1d4ed8;color:#fff!important;text-decoration:none;font-size:.78rem;font-weight:750}.publish-link:hover{background:#1e40af}.control-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.control-tag{font-size:.75rem;color:#334155;background:#e2e8f0;border-radius:6px;padding:4px 8px}
 .bar{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.85rem}
 select{padding:4px 7px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}
 .table-wrap{width:100%;overflow:auto;background:#fff;border:1px solid #dbe2ea}
@@ -23,12 +23,12 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 .WP{background:#dbeafe}.BS{background:#fde68a}.TS{background:#fce7f3}.NV{background:#dcfce7}.NR{background:#e9d5ff}
 .d{font-size:.78rem;margin-left:5px}
 </style></head><body>
-<h1>Korea365 노출·클릭 · GSC 검색 성과 현황</h1>
-<div class="sub" id="meta">Google Search Console 데이터를 불러오는 중...</div>
+<div class="control-head"><h1>런던프로젝트 통제실 · 전체 운영 통계</h1><span class="control-tag">LONDON PROJECT · CONTROL ROOM</span></div>
+<div class="sub" id="meta">공식 Google Search Console 통계를 불러오는 중...</div>
 <div class="bar"><label for="sortKey">정렬 기준</label>
 <select id="sortKey"><option value="clicks">GSC 클릭수</option><option value="impressions">GSC 노출수</option><option value="visitors">일일방문자</option></select>
 <span class="na">기준 값이 같으면 다음 지표로 순서를 정합니다</span></div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th></tr></thead>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <script>
 var J=null;
@@ -56,13 +56,14 @@ function draw(){
   var hasImp=rows.some(function(r){return Number.isFinite(r.impressions)});
   var g=new Date(J.generated_at),age=(Date.now()-g.getTime())/3600000,stale=!Number.isFinite(age)||age>30;
   var m=document.getElementById('meta');
-  m.textContent='GSC 기준일 '+J.reference_date+' · 데이터 생성 '+String(J.generated_at||'').slice(0,16).replace('T',' ')+' · 정렬: '+names[key]+' 내림차순'+(key==='visitors'&&!rows.some(function(r){return Number.isFinite(r.visitors)})?' (일일방문자 데이터 수집 전이라 노출수·클릭수 순)':'')+(hasImp?'':' · 노출수는 다음 자동 갱신(매일 07:00 KST)부터 표시')+' · 클릭·노출은 실제 방문자 수가 아님'+(stale?' · ⚠ 데이터 갱신 지연':'');
+  m.textContent='GSC 기준일 '+J.reference_date+' · 데이터 생성 '+String(J.generated_at||'').slice(0,16).replace('T',' ')+' · 정렬: '+names[key]+' 내림차순'+(key==='visitors'&&!rows.some(function(r){return Number.isFinite(r.visitors)})?' (일일방문자 데이터 수집 전이라 노출수·클릭수 순)':'')+(hasImp?'':' · 노출수는 다음 자동 갱신(매일 07:00 KST)부터 표시')+' · 클릭·노출은 실제 방문자 수가 아님 · 발행 버튼은 기존 발행 화면으로 이동'+(stale?' · ⚠ 데이터 갱신 지연':'');
   m.style.color=stale?'#b45309':'';
   document.getElementById('b').innerHTML=rows.map(function(r,i){
     var ranked=order.some(function(k){return val(r,k)!==null});
     var vis=Number.isFinite(r.visitors)?'<b>'+f(r.visitors)+'</b>'+d(r.visitors_delta):'<span class="na">수집 전</span>';
     var st=r.google_indexed_status==='OK'?'확인됨':r.status==='NO_GSC_ACCESS'?'GSC 접근 불가':r.status==='QUERY_ERROR'?'조회 오류':'GSC에서 확인 불가';
-    return '<tr><td>'+(ranked?(i+1)+'위':'—')+'</td><td>'+platformCell(r.platform)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+cell(val(r,'impressions'),r.impressions_delta,hasImp?'':'수집 전')+'</td><td>'+cell(val(r,'clicks'),r.clicks_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td></tr>';
+    var publishUrl='https://blog.korea365.org/publish';
+    return '<tr><td>'+(ranked?(i+1)+'위':'—')+'</td><td>'+platformCell(r.platform)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+cell(val(r,'impressions'),r.impressions_delta,hasImp?'':'수집 전')+'</td><td>'+cell(val(r,'clicks'),r.clicks_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td><td><a class="publish-link" href="'+publishUrl+'" target="_blank" rel="noopener">발행 화면 ↗</a></td></tr>';
   }).join('');
 }
 document.getElementById('sortKey').addEventListener('change',draw);
