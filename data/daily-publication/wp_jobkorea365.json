@@ -1,1 +1,1 @@
-{"day": "2026-10-18", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-18-wp_jobkorea365-6bdbf42a", "claimed_at": "2026-10-18T08:59:42.412683+09:00", "run_id": 39081105751, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-18", "status": "PUBLISHED", "public_url": "https://jobkorea365.com/manufacturing-sector-regulations-and-employment-standards-for-e-9-workers-in-korea/", "published_at": "2026-10-18T00:51:16Z"}
