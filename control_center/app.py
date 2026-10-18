@@ -1735,32 +1735,65 @@ def _bulk_snapshot(group: str) -> dict[str, object]:
 
 
 def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[str, str], label: str, platform: str, site_id: str = "") -> dict[str, object]:
-    """Dispatch one workflow and try to find its resulting run id for later polling.
+    """Dispatch a workflow with bounded retries for explicit transient GitHub failures.
 
-    workflow_dispatch returns HTTP 204 with no run id, so this looks the run
-    up right after by filtering that workflow's recent runs to the
-    workflow_dispatch event created since this call started. It can
-    misattribute if something else dispatches the SAME workflow within the
-    same few seconds (e.g. a CEO manually clicking a single-site button
-    mid-bulk-run) — an acceptable, rare edge case, not a crash risk."""
+    GitHub can return HTTP 500 with "Failed to run workflow dispatch" even when
+    the request is otherwise valid. Retry only explicit transient HTTP responses;
+    do not blindly retry network timeouts, whose acceptance state is ambiguous.
+    """
     item: dict[str, object] = {
         "label": label, "platform": platform, "site_id": site_id, "workflow": workflow_name,
         "run_id": None, "run_url": "", "status": "dispatched", "conclusion": None, "reason": "",
         "dispatched_at": datetime.now(timezone.utc).isoformat(),
     }
     dispatch_time = datetime.now(timezone.utc)
-    try:
-        response = requests.post(
-            f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches",
-            headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
-            json={"ref": "main", "inputs": inputs},
-            timeout=30,
-        )
-        if response.status_code != 204:
-            item.update(status="done", conclusion="dispatch_failed", reason=f"GitHub 실행요청 실패 (HTTP {response.status_code})")
+    url = f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/dispatches"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {token}",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    last_reason = ""
+    # 4 total attempts: enough to ride out a brief GitHub Actions API incident,
+    # while avoiding a long blocked bulk run. Explicit 5xx means GitHub rejected
+    # the dispatch attempt; network timeouts are not retried to avoid duplicates.
+    for attempt in range(4):
+        try:
+            response = requests.post(
+                url, headers=headers, json={"ref": "main", "inputs": inputs}, timeout=30,
+            )
+        except requests.RequestException as exc:
+            item.update(
+                status="done", conclusion="dispatch_failed",
+                reason=f"GitHub 실행요청 연결 결과 불확실 · {type(exc).__name__}; 중복 방지를 위해 자동 재전송하지 않았습니다.",
+            )
             return item
-    except requests.RequestException as exc:
-        item.update(status="done", conclusion="dispatch_failed", reason=f"GitHub 실행요청 실패 · {exc}")
+        if response.status_code == 204:
+            break
+        if response.status_code in {429, 500, 502, 503, 504} and attempt < 3:
+            retry_after = response.headers.get("Retry-After", "").strip()
+            try:
+                wait_seconds = min(30, max(1, int(retry_after))) if retry_after else (2 ** (attempt + 1))
+            except ValueError:
+                wait_seconds = 2 ** (attempt + 1)
+            last_reason = f"HTTP {response.status_code}"
+            time.sleep(wait_seconds)
+            continue
+        detail = ""
+        try:
+            detail = str(response.json().get("message", ""))[:180]
+        except (ValueError, AttributeError):
+            detail = response.text[:180]
+        item.update(
+            status="done", conclusion="dispatch_failed",
+            reason=f"GitHub 실행요청 실패 (HTTP {response.status_code})" + (f" · {detail}" if detail else ""),
+        )
+        return item
+    else:
+        item.update(
+            status="done", conclusion="dispatch_failed",
+            reason=f"GitHub 실행요청 실패 · 일시적 {last_reason}가 4회 연속 발생",
+        )
         return item
 
     for _ in range(6):
@@ -1768,7 +1801,7 @@ def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[
         try:
             runs_response = requests.get(
                 f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_name}/runs",
-                headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}", "X-GitHub-Api-Version": "2022-11-28"},
+                headers=headers,
                 params={"event": "workflow_dispatch", "per_page": 5},
                 timeout=15,
             )
@@ -1783,11 +1816,8 @@ def _dispatch_and_track(repo: str, token: str, workflow_name: str, inputs: dict[
             newest = max(candidates, key=lambda row: row["created_at"])
             item.update(run_id=newest["id"], run_url=newest.get("html_url", ""), status="running")
             return item
-    # Run not found yet — still let the poller keep watching for completion
-    # by conclusion never resolving; mark it unresolved instead of failed.
     item.update(status="done", conclusion="unknown", reason="실행 ID를 확인하지 못했습니다 · GitHub Actions에서 직접 확인 필요")
     return item
-
 
 def _poll_bulk_items(group: str, repo: str, token: str, timeout_seconds: int = 1500) -> None:
     """Update each dispatched item's real conclusion as its GitHub Actions run finishes."""
