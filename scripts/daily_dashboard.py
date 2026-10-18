@@ -24,7 +24,8 @@ KST = dt.timezone(dt.timedelta(hours=9))
 EXCLUDE = ("theseouljournal.com",)
 OUT = ROOT / "docs" / "dashboard.json"
 HIST = ROOT / "data" / "dashboard_history.json"
-EMPTY = dict(clicks=None, clicks_delta=None, cumulative=None, cumulative_delta=None,
+EMPTY = dict(clicks=None, clicks_delta=None, impressions=None, impressions_delta=None,
+             cumulative=None, cumulative_delta=None, cumulative_impressions=None,
              google_indexed=None, google_indexed_delta=None, google_indexed_status="GSC_INDEX_COUNT_UNAVAILABLE")
 
 
@@ -115,6 +116,11 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
                         "dataState": "all"})
     row["cumulative"] = int(sum(r["clicks"] for r in tot)) if tot is not None else None
     row["cumulative_delta"] = row["clicks"] if row["cumulative"] is not None and has_day else None
+    # 노출수: 클릭이 너무 작아 순위 변별이 안 되므로 함께 수집한다 (같은 GSC 응답의 impressions 필드).
+    im = {r["keys"][0]: r.get("impressions", 0) for r in days}
+    row["impressions"] = int(im[day]) if has_day else None
+    row["impressions_delta"] = int(im[day] - im.get(before, 0)) if has_day else None
+    row["cumulative_impressions"] = int(sum(r.get("impressions", 0) for r in tot)) if tot is not None else None
     row["google_indexed"] = indexed_sitemap_count(h, prop)
     row["google_indexed_status"] = "OK" if row["google_indexed"] is not None else "GSC_INDEX_COUNT_UNAVAILABLE"
     previous_indexed = p.get("google_indexed", p.get("google_pages"))
@@ -158,13 +164,13 @@ def main():
     prev = hist[prev_dates[-1]] if prev_dates else {}
     with ThreadPoolExecutor(max_workers=8) as ex:
         rows = list(ex.map(lambda t: one(h, props, t[0], t[1], t[2], ref, prev), targets))
-    rows.sort(key=lambda r: (r["clicks"] is None, -(r["clicks"] or 0), r["site"]))
+    rows.sort(key=lambda r: (r["impressions"] is None, -(r["impressions"] or 0), -(r["clicks"] or 0), r["site"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "generated_at": now.isoformat(), "reference_date": ref.isoformat(),
-        "basis": "매일 07:00 KST 갱신 · GSC 검색 클릭 기준일은 그저께(2일 전) · 클릭수는 사이트 방문자 수가 아님 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
+        "basis": "매일 07:00 KST 갱신 · GSC 검색 클릭·노출 기준일은 3일 전(GSC 지연 반영) · 클릭수는 사이트 방문자 수가 아님 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
         "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
     hist[ref.isoformat()] = {r["site"]: {"content": r["content"], "google_indexed": r.get("google_indexed")} for r in rows}
     for k in sorted(hist)[:-60]:
