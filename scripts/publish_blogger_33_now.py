@@ -205,8 +205,10 @@ def main() -> int:
             scheduled_kst = None
             if schedule_at_raw:
                 try:
-                    candidate = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M")
-                    now_kst = datetime.now(timezone.utc) + timedelta(hours=9)
+                    candidate = datetime.strptime(schedule_at_raw[:16], "%Y-%m-%dT%H:%M").replace(
+                        tzinfo=timezone(timedelta(hours=9))
+                    )
+                    now_kst = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=9)))
                     if candidate > now_kst:
                         scheduled_kst = candidate
                 except ValueError:
