@@ -2,14 +2,20 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Korea365 · 노출·클릭 · GSC 검색 성과</title>
 <style>
-body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:16px;background:#f6f7f9;color:#1c1c1e}
-h1{font-size:1.2rem;margin:0 0 4px}.sub{color:#666;font-size:.85rem;margin-bottom:10px}
-.bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;font-size:.85rem}
-select{padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}
-table{border-collapse:collapse;width:100%;background:#fff;font-size:.88rem}
-th,td{padding:7px 9px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap}
-th{background:#1f2937;color:#fff;position:sticky;top:0}
-td:nth-child(1),td:nth-child(2),td:nth-child(3),th:nth-child(1),th:nth-child(2),th:nth-child(3){text-align:left}
+body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:8px;background:#f6f7f9;color:#1c1c1e}
+h1{font-size:1.2rem;margin:0 0 4px}.sub{color:#666;font-size:.85rem;margin-bottom:8px}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.85rem}
+select{padding:4px 7px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}
+.table-wrap{width:100%;overflow:auto;background:#fff;border:1px solid #dbe2ea}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;background:#fff;font-size:.84rem;table-layout:auto}
+th,td{padding:5px 7px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap}
+th{background:#1f2937;color:#fff;position:sticky;top:0;z-index:3}
+th:first-child,td:first-child{position:sticky;left:0;z-index:2;text-align:center;min-width:48px;width:48px;background:#eef2f7;font-weight:800;border-right:1px solid #cbd5e1}
+th:first-child{z-index:5;background:#1f2937}
+th:nth-child(2),td:nth-child(2){text-align:left;min-width:68px;width:68px}
+th:nth-child(3),td:nth-child(3){text-align:left;padding-left:7px;padding-right:8px;min-width:150px}
+th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
+
 .up{color:#1d4ed8;font-weight:700}.down{color:#dc2626;font-weight:700}.na{color:#999}.tag{font-size:.72rem;padding:1px 6px;border-radius:8px;background:#e5e7eb}
 .WP{background:#dbeafe}.BS{background:#fde68a}.TS{background:#fce7f3}.NV{background:#dcfce7}.NR{background:#e9d5ff}
 .d{font-size:.78rem;margin-left:5px}
@@ -19,8 +25,8 @@ td:nth-child(1),td:nth-child(2),td:nth-child(3),th:nth-child(1),th:nth-child(2),
 <div class="bar"><label for="sortKey">정렬 기준</label>
 <select id="sortKey"><option value="clicks">GSC 클릭수</option><option value="impressions">GSC 노출수</option><option value="visitors">일일방문자</option></select>
 <span class="na">기준 값이 같으면 다음 지표로 순서를 정합니다</span></div>
-<table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th></tr></thead>
-<tbody id="b"></tbody></table>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th></tr></thead>
+<tbody id="b"></tbody></table></div>
 <script>
 var J=null;
 function f(v){return Number(v).toLocaleString()}
