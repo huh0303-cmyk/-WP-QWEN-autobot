@@ -198,7 +198,7 @@ function drawBloggerPageviews(payload){
    const labels=[0,Math.floor((series.length-1)/2),series.length-1].filter((x,i,a)=>a.indexOf(x)===i&&series[x]).map(i=>'<text x="'+(L+(series.length<=1?PW/2:i*PW/(series.length-1)))+'" y="'+(H-14)+'" text-anchor="middle" font-size="11" fill="#64748b">'+esc(String(series[i].date||'').slice(5))+'</text>').join('');
    chart.innerHTML=grid+'<polyline points="'+poly+'" fill="none" stroke="#2563eb" stroke-width="2.5"/>'+dots+labels;
   }
-  tbody.innerHTML=blogs.map(x=>'<tr><td style="text-align:left"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener">'+esc(x.title||x.url)+'</a></td><td>'+fmt(x.total_pageviews)+'</td><td>'+fmt(x.daily_pageviews)+'</td><td>'+esc(status(x))+'</td><td>'+esc(String(x.checked_at||'').slice(0,16).replace('T',' ')||'미확인')+'</td></tr>').join('');
+  tbody.innerHTML=blogs.map(x=>'<tr><td style="text-align:left"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener">'+esc(x.title||x.url)+'</a></td><td>'+fmt(x.total_pageviews)+'</td><td>'+fmt(x.daily_pageviews)+'</td><td>'+esc(status(x))+(x.error?' · '+esc(x.error.slice(0,100)):'')+'</td><td>'+esc(String(x.checked_at||'').slice(0,16).replace('T',' ')||'미확인')+'</td></tr>').join('');
  }
  select.onchange=render;render();
 }
