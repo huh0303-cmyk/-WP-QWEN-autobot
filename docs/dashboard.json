@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-19T13:34:44.490006+09:00",
+ "generated_at": "2026-10-19T13:36:07.548551+09:00",
  "reference_date": "2026-10-16",
  "blogger_pageviews": {
-  "generated_at": "2026-10-19T13:34:44.490006+09:00",
+  "generated_at": "2026-10-19T13:36:07.548551+09:00",
   "source": "Blogger API v3 pageviews range=ALL; daily values are differences between consecutive cumulative snapshots",
   "history_days": [],
   "blogs": [
@@ -12,7 +12,7 @@
     "title": "K-Trip365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -22,7 +22,7 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -32,7 +32,7 @@
     "title": "JobKorea365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -42,7 +42,7 @@
     "title": "KStudy365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -52,7 +52,7 @@
     "title": "Korea Insurance 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -62,7 +62,7 @@
     "title": "KFinance365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -72,7 +72,7 @@
     "title": "Korea Medical Tour",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -82,7 +82,7 @@
     "title": "K-Visa365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -92,7 +92,7 @@
     "title": "KoreaNews365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -102,7 +102,7 @@
     "title": "Korea Invest 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -112,7 +112,7 @@
     "title": "Olive Young Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -122,7 +122,7 @@
     "title": "Korea Crypto 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -132,7 +132,7 @@
     "title": "Job in Korea 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -142,7 +142,7 @@
     "title": "Korea Wedding 365 | International Couples",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -152,7 +152,7 @@
     "title": "The Seoul Journal",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -162,7 +162,7 @@
     "title": "KTech365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -172,7 +172,7 @@
     "title": "KIECA Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -182,7 +182,7 @@
     "title": "KI Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -192,7 +192,7 @@
     "title": "KSA Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -202,7 +202,7 @@
     "title": "Korea Tax & Law",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -212,7 +212,7 @@
     "title": "Job Korea Global",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -222,7 +222,7 @@
     "title": "Study in Korea 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -232,7 +232,7 @@
     "title": "Korea365 | Korea Life A-Z",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -242,7 +242,7 @@
     "title": "SIS Korea | Seoul International School",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -252,7 +252,7 @@
     "title": "Korea Real Estate 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -262,7 +262,7 @@
     "title": "K-Health365 연구소",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -272,7 +272,7 @@
     "title": "KSkin365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -282,7 +282,7 @@
     "title": "K-wellness Lab",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -292,7 +292,7 @@
     "title": "K-Medical Job Center",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -302,7 +302,7 @@
     "title": "한국생활지원정보",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -312,7 +312,7 @@
     "title": "Korea Daily Mix",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -322,7 +322,7 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    },
@@ -332,7 +332,7 @@
     "title": "Seoul International School Guide",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "status": "API_ERROR",
     "checked_at": null,
     "history": []
    }
