@@ -30,7 +30,7 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 <span class="na">기준 값이 같으면 다음 지표로 순서를 정합니다</span></div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
-<h2 style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a">YouTube · Facebook · Instagram · Threads · TikTok 계정 현황 (<span id="social-count">0</span>개)</h2>
+<h2 style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a">YouTube (<span id="count-youtube">0</span>) · Facebook (<span id="count-facebook">0</span>) · Instagram (<span id="count-instagram">0</span>) · Threads (<span id="count-threads">0</span>) · TikTok (<span id="count-tiktok">0</span>) · 총 <span id="social-count">0</span>개</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>조회수</th><th>최근 발행</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
 <script>
@@ -76,8 +76,15 @@ function drawSocial(data){
  SOCIAL_DATA=data;
  var list=data.accounts||[];
  var m={YouTube:'YouTube',Facebook:'Facebook',Instagram:'Instagram',Threads:'Threads',TikTok:'TikTok'};
+ var platformCounts={YouTube:0,Facebook:0,Instagram:0,Threads:0,TikTok:0};
+ list.forEach(function(a){if(Object.prototype.hasOwnProperty.call(platformCounts,a.platform))platformCounts[a.platform]++;});
+ document.getElementById('count-youtube').textContent=String(platformCounts.YouTube);
+ document.getElementById('count-facebook').textContent=String(platformCounts.Facebook);
+ document.getElementById('count-instagram').textContent=String(platformCounts.Instagram);
+ document.getElementById('count-threads').textContent=String(platformCounts.Threads);
+ document.getElementById('count-tiktok').textContent=String(platformCounts.TikTok);
  document.getElementById('social-count').textContent=String(list.length);
- document.getElementById('social-meta').textContent='등록부 기준 '+list.length+'개 계정/예정 계정 · 블로그 표의 마지막 번호 다음부터 연속 번호 부여 · 최신 공식 API 통계가 연결되지 않은 값은 비워 둠 · 계정 미확인/게시 인증 미완료는 상태로 표시';
+ document.getElementById('social-meta').textContent='등록부 기준 계정/예정 항목 '+list.length+'개 · 블로그 표 마지막 번호 다음부터 연속 번호 부여 · API 통계 미연결 및 계정 미확인은 상태로 표시';
  document.getElementById('social-rows').innerHTML=list.map(function(a,i){
   var name=esc(a.name||a.handle||'계정명 미등록');
   var linked=a.url?'<a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+name+'</a>':name;
