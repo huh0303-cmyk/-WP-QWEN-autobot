@@ -162,7 +162,7 @@ def collect_blogger_pageviews(portfolio, now):
                 message = str(detail.get("message") or "").strip()
                 reasons = detail.get("errors", [])
                 reason = str(reasons[0].get("reason") or "") if reasons and isinstance(reasons[0], dict) else ""
-                row["error"] = ((reason + ": ") if reason else "") + (message or ("Blogger API HTTP " + str(code))
+                row["error"] = ((reason + ": ") if reason else "") + (message or ("Blogger API HTTP " + str(code)))
                 row["error"] = row["error"][:180]
             except requests.RequestException as exc:
                 row["status"] = "NETWORK_ERROR"
