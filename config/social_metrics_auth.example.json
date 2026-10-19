@@ -1,0 +1,26 @@
+{
+  "_comment": "Copy this structure into the GitHub Actions environment secret SOCIAL_METRICS_AUTH_JSON. Never put real tokens in this file or commit them.",
+  "Facebook": {
+    "https://www.facebook.com/profile.php?id=PAGE_ID": {
+      "page_id": "PAGE_ID",
+      "access_token": "PAGE_ACCESS_TOKEN"
+    }
+  },
+  "Instagram": {
+    "instagram_handle": {
+      "user_id": "INSTAGRAM_BUSINESS_OR_CREATOR_USER_ID",
+      "access_token": "INSTAGRAM_GRAPH_ACCESS_TOKEN"
+    }
+  },
+  "Threads": {
+    "threads_handle": {
+      "user_id": "THREADS_USER_ID",
+      "access_token": "THREADS_ACCESS_TOKEN"
+    }
+  },
+  "TikTok": {
+    "tiktok_username": {
+      "access_token": "TIKTOK_OAUTH_ACCESS_TOKEN"
+    }
+  }
+}
