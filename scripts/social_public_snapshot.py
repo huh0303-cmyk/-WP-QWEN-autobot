@@ -130,17 +130,20 @@ def fetch_youtube(rows: list[dict[str, Any]], api_key: str) -> dict[str, dict[st
         return {}
     if not api_key:
         return {account_key(row): {"status": "auth_needed", "error": "GitHub Secret YOUTUBE_API_KEY 없음"} for row, _ in channels}
+
     ids = [channel_id for _, channel_id in channels]
     collected: dict[str, dict[str, Any]] = {}
+    latest_video_ids: dict[str, str] = {}
     for offset in range(0, len(ids), 50):
         batch = ids[offset:offset + 50]
         data = get_json("https://www.googleapis.com/youtube/v3/channels",
                         params={"part": "snippet,statistics,contentDetails", "id": ",".join(batch), "key": api_key})
         found = {item["id"]: item for item in data.get("items", []) if item.get("id")}
         for row, channel_id in channels[offset:offset + 50]:
+            key = account_key(row)
             item = found.get(channel_id)
             if not item:
-                collected[account_key(row)] = {"status": "api_error", "error": "YouTube API에서 채널 ID를 찾지 못함"}
+                collected[key] = {"status": "api_error", "error": "YouTube API에서 채널 ID를 찾지 못함"}
                 continue
             snippet = item.get("snippet", {})
             stats = item.get("statistics", {})
@@ -166,11 +169,37 @@ def fetch_youtube(rows: list[dict[str, Any]], api_key: str) -> dict[str, dict[st
                     if items:
                         details = items[0].get("contentDetails", {})
                         metrics["last_publish"] = date_part(details.get("videoPublishedAt") or items[0].get("snippet", {}).get("publishedAt"))
+                        video_id = details.get("videoId") or (items[0].get("snippet", {}).get("resourceId") or {}).get("videoId")
+                        if video_id:
+                            latest_video_ids[key] = video_id
                 except Exception as exc:
                     metrics["last_publish_error"] = str(exc)[:180]
-            collected[account_key(row)] = metrics
-    return collected
+            collected[key] = metrics
 
+    # Latest-item engagement is fetched in batches to keep YouTube quota use low.
+    video_ids = list(latest_video_ids.values())
+    key_by_video = {video_id: key for key, video_id in latest_video_ids.items()}
+    for offset in range(0, len(video_ids), 50):
+        batch = video_ids[offset:offset + 50]
+        try:
+            data = get_json("https://www.googleapis.com/youtube/v3/videos",
+                            params={"part": "statistics", "id": ",".join(batch), "key": api_key})
+            for item in data.get("items", []):
+                key = key_by_video.get(item.get("id"))
+                if not key or key not in collected:
+                    continue
+                stats = item.get("statistics", {})
+                collected[key].update({
+                    "latest_content_views": as_int(stats.get("viewCount")),
+                    "latest_content_likes": as_int(stats.get("likeCount")),
+                    "latest_content_comments": as_int(stats.get("commentCount")),
+                })
+        except Exception as exc:
+            # Keep account-level statistics even if the optional latest-video metrics fail.
+            for key in key_by_video.values():
+                if key in collected:
+                    collected[key]["latest_content_error"] = str(exc)[:180]
+    return collected
 
 def fetch_facebook(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
     token = str(auth.get("access_token") or "").strip()
