@@ -109,7 +109,7 @@ function drawSocial(data){
   var followers=metric?metricNumber(metric.followers!==null&&metric.followers!==undefined?metric.followers:metric.subscribers,''):'<span class="na">수집 전</span>';
   var following=metric?metricNumber(metric.following,''):'<span class="na">수집 전</span>';
   var count=metric?metricNumber(metric.content_count,''):'<span class="na">수집 전</span>';
-  var total=metric&&metric.total_views!==null&&metric.total_views!==undefined?metricNumber(metric.total_views,'조회'):metric&&metric.total_likes!==null&&metric.total_likes!==undefined?metricNumber(metric.total_likes,'좋아요'):'<span class="na">미수집</span>';
+  var total=metric&&metric.total_views!==null&&metric.total_views!==undefined?metricNumber(metric.total_views,metric.total_metric_label||'조회'):metric&&metric.total_likes!==null&&metric.total_likes!==undefined?metricNumber(metric.total_likes,metric.total_metric_label||'좋아요'):'<span class="na">미수집</span>';
   var recentParts=[];
   if(metric&&metric.latest_content_views!==null&&metric.latest_content_views!==undefined)recentParts.push('조회 '+f(metric.latest_content_views));
   if(metric&&metric.latest_content_likes!==null&&metric.latest_content_likes!==undefined)recentParts.push('좋아요 '+f(metric.latest_content_likes));
