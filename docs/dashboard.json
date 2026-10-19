@@ -1,6 +1,343 @@
 {
- "generated_at": "2026-10-19T12:30:55.795177+09:00",
+ "generated_at": "2026-10-19T13:34:44.490006+09:00",
  "reference_date": "2026-10-16",
+ "blogger_pageviews": {
+  "generated_at": "2026-10-19T13:34:44.490006+09:00",
+  "source": "Blogger API v3 pageviews range=ALL; daily values are differences between consecutive cumulative snapshots",
+  "history_days": [],
+  "blogs": [
+   {
+    "key": "5345010194652095946",
+    "url": "https://k-trip365.blogspot.com",
+    "title": "K-Trip365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "5061870975921599649",
+    "url": "https://kworld365seoul.blogspot.com",
+    "title": "KWorld365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "9124051754121584517",
+    "url": "https://jobkorea365.blogspot.com",
+    "title": "JobKorea365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "1529526209955625690",
+    "url": "https://kstudy365.blogspot.com",
+    "title": "KStudy365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "8888982369193041814",
+    "url": "https://koreainsurance365.blogspot.com",
+    "title": "Korea Insurance 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "1687098888954822322",
+    "url": "https://kfinance365.blogspot.com",
+    "title": "KFinance365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "270775542645307723",
+    "url": "https://koreamedicaltour365.blogspot.com",
+    "title": "Korea Medical Tour",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "8661782623130728248",
+    "url": "https://k-visa365.blogspot.com",
+    "title": "K-Visa365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "7521251102691129954",
+    "url": "https://koreanews365daily.blogspot.com",
+    "title": "KoreaNews365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "4890361213499831195",
+    "url": "https://koreainvest365.blogspot.com",
+    "title": "Korea Invest 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "473506254375374117",
+    "url": "https://oliveyoungkorea.blogspot.com",
+    "title": "Olive Young Korea",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "3406327845659558883",
+    "url": "https://koreacrypto365.blogspot.com",
+    "title": "Korea Crypto 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "3560791242887862780",
+    "url": "https://jobinkorea365.blogspot.com",
+    "title": "Job in Korea 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "2674139059432343378",
+    "url": "https://koreawedding365.blogspot.com",
+    "title": "Korea Wedding 365 | International Couples",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "6946912888985634794",
+    "url": "https://theseouljournal.blogspot.com",
+    "title": "The Seoul Journal",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "6878877615041749185",
+    "url": "https://ktech365.blogspot.com",
+    "title": "KTech365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "3364333636330259319",
+    "url": "https://kieca-korea.blogspot.com",
+    "title": "KIECA Korea",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "2490110552890683078",
+    "url": "https://ki-korea.blogspot.com",
+    "title": "KI Korea",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "4432103895513840706",
+    "url": "https://ksa-korea.blogspot.com",
+    "title": "KSA Korea",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "8654603097966481527",
+    "url": "https://koreataxnlaw.blogspot.com",
+    "title": "Korea Tax & Law",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "5264943720375052759",
+    "url": "https://jobkoreaglobal.blogspot.com",
+    "title": "Job Korea Global",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "2107448954473357757",
+    "url": "https://studyinkorea365.blogspot.com",
+    "title": "Study in Korea 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "242870255610398021",
+    "url": "https://korea365guide.blogspot.com",
+    "title": "Korea365 | Korea Life A-Z",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "6436826795706658249",
+    "url": "https://sis-korea.blogspot.com",
+    "title": "SIS Korea | Seoul International School",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "6980941479069687285",
+    "url": "https://krealestate365.blogspot.com",
+    "title": "Korea Real Estate 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "8294304371132383961",
+    "url": "https://k-health365.blogspot.com",
+    "title": "K-Health365 연구소",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "7354545101201355815",
+    "url": "https://skin.k-health365.com",
+    "title": "KSkin365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "4456888951628869767",
+    "url": "https://glow.k-health365.com",
+    "title": "K-wellness Lab",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "3205814823967421343",
+    "url": "https://k-health365-edu.blogspot.com",
+    "title": "K-Medical Job Center",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "2531035487222435079",
+    "url": "https://korea-life-support365.blogspot.com",
+    "title": "한국생활지원정보",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "2234527810530371008",
+    "url": "https://koreamedicaltour1.blogspot.com",
+    "title": "Korea Daily Mix",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "3683978748331752523",
+    "url": "https://kworld365.blogspot.com",
+    "title": "KWorld365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   },
+   {
+    "key": "8077962392257357260",
+    "url": "https://seoulintlschoolguide.blogspot.com",
+    "title": "Seoul International School Guide",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "BLOGGER_OAUTH_SECRETS_MISSING",
+    "checked_at": null,
+    "history": []
+   }
+  ]
+ },
  "basis": "매일 07:00 KST 갱신 · GSC 검색 클릭·노출 기준일은 3일 전(GSC 지연 반영) · 클릭수는 사이트 방문자 수가 아님 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
  "rows": [
   {
@@ -871,8 +1208,8 @@
    "display_name": "koreamedicaltour.com",
    "status": "OK",
    "gsc_property": "https://koreamedicaltour.com/",
-   "content": 51,
-   "content_delta": 2,
+   "content": 52,
+   "content_delta": 3,
    "clicks": 0,
    "clicks_delta": 0,
    "cumulative": 0,
