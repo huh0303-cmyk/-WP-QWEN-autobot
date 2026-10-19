@@ -151,8 +151,19 @@ def collect_blogger_pageviews(portfolio, now):
                     else:
                         row["status"] = "BASELINE_PENDING"
                     current[row["key"]] = total
-            except (requests.RequestException, ValueError, TypeError, KeyError):
-                row["status"] = "API_ERROR"
+            except requests.HTTPError as exc:
+                code = exc.response.status_code if exc.response is not None else 0
+                row["status"] = "HTTP_" + str(code)
+                if code in {401, 403}:
+                    row["error"] = "Blogger API authentication/scope permission rejected"
+                else:
+                    row["error"] = "Blogger API HTTP " + str(code)
+            except requests.RequestException as exc:
+                row["status"] = "NETWORK_ERROR"
+                row["error"] = type(exc).__name__
+            except (ValueError, TypeError, KeyError):
+                row["status"] = "INVALID_API_RESPONSE"
+                row["error"] = "Pageviews response missing expected counts"
         rows.append(row)
 
     # Persist a dated cumulative snapshot even when only some blogs succeeded.
