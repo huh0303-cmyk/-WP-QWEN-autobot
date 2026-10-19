@@ -102,13 +102,32 @@ def youtube_rows(items):
     out={}
     ns={"a":"http://www.w3.org/2005/Atom","yt":"http://www.youtube.com/xml/schemas/2015"}
     for x in items:
-        cid=x.get("channel_id",""); recent=""
+        cid=x.get("channel_id",""); recent=""; recent_video_id=""; recent_video_title=""
         try:
             r=requests.get("https://www.youtube.com/feeds/videos.xml",params={"channel_id":cid},headers=UA,timeout=12);r.raise_for_status()
-            root=ET.fromstring(r.content); vals=[stamp(e.findtext("a:published",default="",namespaces=ns)) for e in root.findall("a:entry",ns)]; vals=[v for v in vals if v]
-            recent=max(vals) if vals else ""
+            root=ET.fromstring(r.content)
+            entries=[]
+            for entry in root.findall("a:entry",ns):
+                published=stamp(entry.findtext("a:published",default="",namespaces=ns))
+                if not published: continue
+                entries.append({
+                    "published": published,
+                    "video_id": entry.findtext("yt:videoId",default="",namespaces=ns),
+                    "title": entry.findtext("a:title",default="",namespaces=ns),
+                })
+            if entries:
+                latest=max(entries,key=lambda row:row["published"])
+                recent=latest["published"]
+                recent_video_id=latest["video_id"]
+                recent_video_title=latest["title"]
         except Exception:pass
-        out[cid]={"opening_date":created.get(cid,""),"recent_publish_date":recent}
+        out[cid]={
+            "opening_date":created.get(cid,""),
+            "recent_publish_date":recent,
+            "recent_video_id":recent_video_id,
+            "recent_video_title":recent_video_title,
+            "recent_video_url":f"https://www.youtube.com/watch?v={recent_video_id}" if recent_video_id else "",
+        }
     return out
 
 def main():
