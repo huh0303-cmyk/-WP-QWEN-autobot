@@ -159,10 +159,10 @@ def collect_blogger_pageviews(portfolio, now):
     # Failed API requests are not recorded as zero.
     if current:
         history["days"][today] = current
-        for old_day in sorted(history["days"])[:-60]:
-            del history["days"][old_day]
-        PAGEVIEWS_HIST.parent.mkdir(parents=True, exist_ok=True)
-        PAGEVIEWS_HIST.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
+    for old_day in sorted(history["days"])[:-60]:
+        del history["days"][old_day]
+    PAGEVIEWS_HIST.parent.mkdir(parents=True, exist_ok=True)
+    PAGEVIEWS_HIST.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
 
     dates = sorted(history.get("days", {}))[-30:]
     for row in rows:
