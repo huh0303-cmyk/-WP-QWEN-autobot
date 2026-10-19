@@ -31,7 +31,7 @@
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
             <div class="min-w-0">
                 <h1 class="truncate text-base font-black tracking-tight sm:text-xl">Korea365 운영 통제실</h1>
-                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WP 25 · Blogspot {{ bloggers|length }} · 뉴스룸 2 · Tistory 5</p>
+                <p class="text-[10px] font-semibold text-slate-400 sm:text-xs">WordPress 전체 {{ sites|length }} · 일반 WP 25 · 뉴스룸 2 · Blogspot {{ bloggers|length }} · Tistory {{ tistory_sites|length }}</p>
             </div>
             <div class="flex shrink-0 items-center gap-2">
                 <button id="install-pwa" type="button" hidden class="rounded-lg border border-white/20 bg-white px-2.5 py-1 text-[10px] font-black text-slate-950 shadow sm:text-xs">앱 설치</button>
@@ -209,7 +209,7 @@
             <input id="quick-site-search" type="search" class="dashboard-search" placeholder="사이트 이름이나 주소 검색" aria-label="사이트별 실행 검색">
             <div><h2 class="text-xl font-black">사이트별 실행</h2><p class="mt-1 text-xs text-slate-500">주소 → 사이트 열기 · 실행 버튼 → 해당 사이트 하나만 실행 · 상세정보는 아래에서 확인</p></div>
             <p class="text-xs text-slate-500">플랫폼별 전날 일일 방문자 기준 1위·2위·3위 순차 표기 · 핵심 4지표는 모두 괄호 안 증감 표시 · 시각 KST</p>
-            <h3 class="text-sm font-bold">WordPress 27 · 일반 25 + 뉴스 2</h3>
+            <h3 class="text-sm font-bold">WordPress 전체 {{ sites|length }}개 · 일반 WP 25 + 뉴스룸 2</h3>
             <div class="ranked-site-tiles grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
             {% for site in sites %}{{ quick_tile('WP · ' ~ (site.name or site.domain), 'https://' ~ site.domain, 'wp_' ~ site.site_id, '즉시 발행', site.auth_ready, site.today_visitors, site, site.site_id) }}{% endfor %}
             </div>
@@ -799,7 +799,7 @@
             <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm sm:p-7">
                 <p class="text-xs font-bold text-emerald-600">CENTRAL SCHEDULER · SINGLE SOURCE OF TRUTH</p>
                 <h2 class="mt-1 text-2xl font-extrabold text-slate-900 sm:text-3xl">Google Sheet 통제실</h2>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">WordPress 27 · Blogspot {{ bloggers|length }} · Tistory 5 · YouTube 10의 발행 일정, 승인, 실행 결과와 히스토리를 CEO종합상황실 한 곳에서 확인합니다.</p>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">WordPress 전체 {{ sites|length }} · Blogspot {{ bloggers|length }} · Tistory {{ tistory_sites|length }} · YouTube 10의 발행 일정, 승인, 실행 결과와 히스토리를 CEO종합상황실 한 곳에서 확인합니다.</p>
                 <a href="https://docs.google.com/spreadsheets/d/12l1w6g-DF4YvVpkEx8YCEsIMTf7TXkUzANm3ldauYiI/edit#gid=693660577" target="_blank" rel="noopener" class="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-emerald-800 sm:w-auto">CEO종합상황실 열기 →</a>
             </div>
         </section>
