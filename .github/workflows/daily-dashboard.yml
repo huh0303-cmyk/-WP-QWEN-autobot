@@ -47,6 +47,6 @@ jobs:
           git fetch origin main
           git reset --mixed origin/main
           git checkout origin/main -- scripts/daily_dashboard.py docs/index.html .github/workflows/daily-dashboard.yml
-          git add docs/dashboard.json data/dashboard_history.json
+          git add docs/dashboard.json data/dashboard_history.json data/blogger_pageviews_history.json
           git diff --cached --quiet || git commit -m "data: refresh daily dashboard [skip ci]"
           git push origin HEAD:main
