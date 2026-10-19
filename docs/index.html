@@ -35,6 +35,7 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>조회수</th><th>최근 발행</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
 <script>
 var J=null;
+var SOCIAL_DATA=null;
 function f(v){return Number(v).toLocaleString()}
 function d(v){if(v===null||v===undefined)return '';return v>0?'<span class="d up">▲ +'+f(v)+'</span>':v<0?'<span class="d down">▼ -'+f(Math.abs(v))+'</span>':'<span class="d na">– 0</span>'}
 function cell(val,delta,naText){return val===null||val===undefined||!Number.isFinite(val)?'<span class="na">'+(naText||'GSC에서 확인 불가')+'</span>':'<b>'+f(val)+'</b>'+d(delta)}
@@ -71,6 +72,8 @@ function draw(){
 }
 document.getElementById('sortKey').addEventListener('change',draw);
 function drawSocial(data){
+ if(!data)return;
+ SOCIAL_DATA=data;
  var list=data.accounts||[];
  var m={YouTube:'YouTube',Facebook:'Facebook',Instagram:'Instagram',Threads:'Threads',TikTok:'TikTok'};
  document.getElementById('social-count').textContent=String(list.length);
@@ -90,5 +93,6 @@ fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok
   var hasV=(j.rows||[]).some(function(r){return Number.isFinite(r.visitors)});
   document.getElementById('sortKey').value=hasV?'visitors':'clicks';
   draw();
+  if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);
 }).catch(function(e){var m=document.getElementById('meta');m.textContent='GSC 데이터를 불러오지 못했습니다: '+e.message;m.style.color='#b91c1c'});
 </script></body></html>
