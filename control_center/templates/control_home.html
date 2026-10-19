@@ -74,6 +74,18 @@ tbody tr:hover{filter:brightness(.98)}
 </tr></thead><tbody id="social-rows"><tr><td colspan="9" style="text-align:center">불러오는 중…</td></tr></tbody></table></div>
 </section>
 </div>
+<section class="section" style="margin-top:8px">
+<div class="section-head"><div><h2>Blogspot · Total Pageviews</h2><p id="blogger-pageviews-meta">Blogger API 공식 누적 페이지뷰 수집 상태 확인 중…</p></div></div>
+<div style="padding:8px">
+<div class="row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+<label for="blogger-pageviews-select">블로그</label><select id="blogger-pageviews-select" style="max-width:300px"><option>수집 대기</option></select>
+<strong id="blogger-pageviews-total">Total Pageviews: 미확인</strong><span id="blogger-pageviews-daily" class="warn">일일 페이지뷰: 미확인</span>
+</div>
+<div style="width:100%;overflow-x:auto;border:1px solid #dbe3ee;border-radius:6px;padding:5px"><svg id="blogger-pageviews-chart" viewBox="0 0 900 250" role="img" aria-label="Blogspot daily pageviews chart" style="display:block;width:100%;min-width:500px;height:auto"><text x="450" y="120" text-anchor="middle" fill="#64748b">통계 수집 대기</text></svg></div>
+<p style="font-size:10px;color:#64748b">공식 Blogger API 누적 페이지뷰를 매일 저장하고, 연속된 날짜의 차이로 일일 수치를 계산합니다. 기준값이 없는 날짜는 0으로 만들지 않습니다.</p>
+<div class="sheet"><table class="k365-table" style="width:100%"><thead><tr><th>블로그</th><th>Total Pageviews</th><th>일일 Pageviews</th><th>수집 상태</th><th>확인 시각</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="5">수집 전</td></tr></tbody></table></div>
+</div>
+</section>
 <div id="updated" style="font-size:9px;color:#64748b;text-align:right">갱신 중…</div>
 </main>
 <script>
@@ -159,7 +171,39 @@ function installColumnMemory(table,key){
 }
 installColumnMemory(document.querySelector('table.blog'),'blog');
 installColumnMemory(document.querySelector('table.social'),'social');
+function drawBloggerPageviews(payload){
+ const meta=document.getElementById('blogger-pageviews-meta'), select=document.getElementById('blogger-pageviews-select');
+ const totalEl=document.getElementById('blogger-pageviews-total'), dailyEl=document.getElementById('blogger-pageviews-daily');
+ const chart=document.getElementById('blogger-pageviews-chart'), tbody=document.getElementById('blogger-pageviews-rows');
+ if(!payload||!Array.isArray(payload.blogs)||!payload.blogs.length){meta.textContent='Blogger 페이지뷰 스냅샷 미수집 · API 인증/워크플로 실행 상태 확인 필요';return;}
+ const blogs=payload.blogs.slice().sort((a,b)=>(Number.isFinite(b.total_pageviews)?b.total_pageviews:-1)-(Number.isFinite(a.total_pageviews)?a.total_pageviews:-1));
+ const previous=select.value;
+ select.innerHTML=blogs.map(b=>'<option value="'+esc(b.key)+'">'+esc(b.title)+'</option>').join('');
+ if(previous&&blogs.some(b=>b.key===previous))select.value=previous;else{const first=blogs.find(b=>Number.isFinite(b.total_pageviews));if(first)select.value=first.key;}
+ const fmt=v=>Number.isFinite(v)?nf.format(v):'미확인';
+ const status=b=>({OK:'정상 수집',BASELINE_PENDING:'누적값 수집됨 · 일일 기준 축적 중',COUNTER_RESET_BASELINE_REQUIRED:'누적 카운터 감소 · 기준 재설정 필요',BLOGGER_OAUTH_SECRETS_MISSING:'Blogger API 인증 정보 미설정',BLOGGER_OAUTH_REFRESH_FAILED:'Blogger 인증 갱신 실패',TOTAL_PAGEVIEWS_NOT_RETURNED:'API 누적값 미반환',API_ERROR:'API 수집 실패',NOT_COLLECTED:'미수집'})[b.status]||b.status||'미확인';
+ function render(){
+  const b=blogs.find(x=>x.key===select.value)||blogs[0];
+  totalEl.textContent='Total Pageviews: '+fmt(b.total_pageviews);
+  dailyEl.textContent='일일 Pageviews: '+fmt(b.daily_pageviews);
+  dailyEl.className=Number.isFinite(b.daily_pageviews)?'good':'warn';
+  meta.textContent='최종 수집 '+String(payload.generated_at||'미확인').slice(0,16).replace('T',' ')+' · Blogger API v3 · '+blogs.length+'개 블로그';
+  const series=(b.history||[]).slice(-30), valid=series.filter(x=>Number.isFinite(x.daily_pageviews));
+  if(!valid.length){chart.innerHTML='<text x="450" y="110" text-anchor="middle" fill="#64748b" font-size="15">일별 기준값이 아직 축적되지 않았습니다.</text><text x="450" y="138" text-anchor="middle" fill="#94a3b8" font-size="12">'+esc(status(b))+'</text>';}
+  else{
+   const W=900,H=250,L=55,R=18,T=18,B=42,PW=W-L-R,PH=H-T-B,max=Math.max(1,...valid.map(x=>x.daily_pageviews));
+   const pts=series.map((x,i)=>Number.isFinite(x.daily_pageviews)?{x:L+(series.length<=1?PW/2:i*PW/(series.length-1)),y:T+PH-x.daily_pageviews/max*PH,v:x.daily_pageviews,date:x.date}:null).filter(Boolean);
+   const grid=[0,.5,1].map(q=>{const y=T+PH-q*PH;return '<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#e2e8f0"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#64748b">'+fmt(Math.round(max*q))+'</text>';}).join('');
+   const poly=pts.map(x=>x.x+','+x.y).join(' '), dots=pts.map(x=>'<circle cx="'+x.x+'" cy="'+x.y+'" r="3" fill="#2563eb"><title>'+esc(x.date)+': '+fmt(x.v)+'</title></circle>').join('');
+   const labels=[0,Math.floor((series.length-1)/2),series.length-1].filter((x,i,a)=>a.indexOf(x)===i&&series[x]).map(i=>'<text x="'+(L+(series.length<=1?PW/2:i*PW/(series.length-1)))+'" y="'+(H-14)+'" text-anchor="middle" font-size="11" fill="#64748b">'+esc(String(series[i].date||'').slice(5))+'</text>').join('');
+   chart.innerHTML=grid+'<polyline points="'+poly+'" fill="none" stroke="#2563eb" stroke-width="2.5"/>'+dots+labels;
+  }
+  tbody.innerHTML=blogs.map(x=>'<tr><td style="text-align:left"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener">'+esc(x.title||x.url)+'</a></td><td>'+fmt(x.total_pageviews)+'</td><td>'+fmt(x.daily_pageviews)+'</td><td>'+esc(status(x))+'</td><td>'+esc(String(x.checked_at||'').slice(0,16).replace('T',' ')||'미확인')+'</td></tr>').join('');
+ }
+ select.onchange=render;render();
+}
 async function loadBlog(){
+ fetch('/api/control/blogger-pageviews',{cache:'no-store'}).then(r=>r.ok?r.json():r.json().then(d=>{throw new Error(d.status||('HTTP '+r.status))})).then(drawBloggerPageviews).catch(e=>{document.getElementById('blogger-pageviews-meta').textContent='페이지뷰 수집 실패: '+e.message});
  const r=await fetch('/api/blog-korea365/ranking',{cache:'no-store'});if(!r.ok)throw new Error('blog '+r.status);const d=await r.json();
  document.getElementById('blog-title').textContent='블로그 순위 · 어제 방문자수 내림차순 ('+dateLabel(d.visitor_ranking_date||d.display_date||todayKst())+')';
  document.getElementById('blog-rows').innerHTML=(d.cards||[]).map(c=>{
