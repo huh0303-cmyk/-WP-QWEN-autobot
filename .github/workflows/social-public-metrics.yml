@@ -1,0 +1,51 @@
+name: Daily social account metrics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 22 * * *" # 07:23 KST daily
+  push:
+    branches: [main]
+    paths:
+      - "scripts/social_public_snapshot.py"
+      - "docs/social_inventory.json"
+      - "config/social_metrics_auth.example.json"
+      - ".github/workflows/social-public-metrics.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: social-public-metrics
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: google-metrics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependency
+        run: pip install requests -q
+      - name: Collect YouTube and authorized social metrics
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          SOCIAL_METRICS_AUTH_JSON: ${{ secrets.SOCIAL_METRICS_AUTH_JSON }}
+          META_GRAPH_API_VERSION: ${{ vars.META_GRAPH_API_VERSION }}
+        run: python scripts/social_public_snapshot.py
+      - name: Commit daily metrics and history
+        run: |
+          git config user.name "korea365-social-metrics-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/social_metrics.json data/social_metrics_history/
+          if git diff --cached --quiet; then
+            echo "No social metrics changes"
+          else
+            git commit -m "data: refresh daily social metrics [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
