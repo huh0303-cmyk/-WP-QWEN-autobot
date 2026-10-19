@@ -143,8 +143,8 @@ def build_youtube_ranking(bucket: int) -> dict:
             "revenue": _social_revenue("YouTube", current.get("handle") or item.get("handle") or "", item.get("channel_id", "")),
             "opening_date": timeline.get("opening_date") or str(item.get("created_at") or "")[:10] or (str(current.get("created_at") or "")[:10] if isinstance(current, dict) else ""),
             "recent_publish_date": timeline.get("recent_publish_date") or str(item.get("recent_publish_date") or "")[:10],
-            "last_post_url": "",
-            "last_post_id": "",
+            "last_post_url": timeline.get("recent_video_url") or "",
+            "last_post_id": timeline.get("recent_video_id") or "",
             "infrastructure": infrastructure_info("youtube"),
             "connected": isinstance(subs, (int, float)),
         })
