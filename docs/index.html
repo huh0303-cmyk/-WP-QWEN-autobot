@@ -137,7 +137,7 @@ function drawBloggerPageviews(payload){
   dailyEl.className=Number.isFinite(b.daily_pageviews)?'good':'na';
   meta.textContent='수집 시각 '+String(payload.generated_at||'미확인').slice(0,16).replace('T',' ')+' · Blogger API v3 · '+blogs.length+'개 블로그 · 차트는 누적 페이지뷰 차이로 계산';
   renderChart(b);
-  tbody.innerHTML=blogs.map(function(x){return '<tr><td style="text-align:left"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener">'+esc(x.title||x.url)+'</a></td><td>'+num(x.total_pageviews)+'</td><td>'+num(x.daily_pageviews)+'</td><td>'+esc(statusLabel(x))+'</td><td>'+esc(String(x.checked_at||'').slice(0,16).replace('T',' ')||'미확인')+'</td></tr>';}).join('');
+  tbody.innerHTML=blogs.map(function(x){return '<tr><td style="text-align:left"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener">'+esc(x.title||x.url)+'</a></td><td>'+num(x.total_pageviews)+'</td><td>'+num(x.daily_pageviews)+'</td><td>'+esc(statusLabel(x))+(x.error?' · '+esc(x.error.slice(0,100)):'')+'</td><td>'+esc(String(x.checked_at||'').slice(0,16).replace('T',' ')||'미확인')+'</td></tr>';}).join('');
  }
  select.onchange=render;render();
 }
