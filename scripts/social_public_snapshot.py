@@ -105,6 +105,7 @@ def base_record(row: dict[str, Any]) -> dict[str, Any]:
         "subscribers": None,
         "total_views": None,
         "total_likes": None,
+        "total_metric_label": None,
         "content_count": None,
         "account_created_at": None,
         "creation_date_note": "해당 플랫폼 공식 API에서 개설일을 제공하지 않음",
@@ -152,6 +153,7 @@ def fetch_youtube(rows: list[dict[str, Any]], api_key: str) -> dict[str, dict[st
                 "followers": as_int(stats.get("subscriberCount")),
                 "subscribers": as_int(stats.get("subscriberCount")),
                 "total_views": as_int(stats.get("viewCount")),
+                "total_metric_label": "누적 조회수",
                 "content_count": as_int(stats.get("videoCount")),
                 "account_created_at": date_part(snippet.get("publishedAt")),
                 "creation_date_note": "YouTube Data API channels.snippet.publishedAt",
@@ -225,14 +227,14 @@ def fetch_facebook(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
         # The Page profile metrics can still be used if post-list permission is narrower.
         pass
     return {
-        "status": "ok", "followers": as_int(data.get("followers_count", data.get("fan_count"))),
-        "total_likes": as_int(data.get("fan_count")), "content_count": post_count,
+        "status": "ok", "followers": as_int(data.get("followers_count")),
+        "total_likes": as_int(data.get("fan_count")), "total_metric_label": "페이지 좋아요", "content_count": post_count,
         "last_publish": date_part(latest_post.get("created_time")) or None,
         "latest_content_likes": as_int((latest_post.get("likes") or {}).get("summary", {}).get("total_count")),
         "latest_content_comments": as_int((latest_post.get("comments") or {}).get("summary", {}).get("total_count")),
         "data_source": f"Meta Graph API {META_VERSION}", "last_successful_at": iso_now(),
         "account_created_at": date_part(data.get("created_time")),
-        "creation_date_note": "API에서 제공되지 않으면 첫 게시일만 표시",
+        "creation_date_note": "Facebook Page API는 계정 개설일을 제공하지 않음; 최근 게시일은 별도 표시",
         "error": "",
     }
 
@@ -281,6 +283,8 @@ def fetch_threads(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
             name = item.get("name") or item.get("metric")
             total = item.get("total_value") or {}
             value = total.get("value")
+            if value is None and item.get("values"):
+                value = item["values"][0].get("value")
             if isinstance(value, (int, float)):
                 values[name] = int(value)
     except Exception as exc:
@@ -310,7 +314,7 @@ def fetch_threads(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
         raise RuntimeError(values.get("_insights_error") or values.get("_media_error") or "Threads API에서 측정값을 반환하지 않음")
     return {
         "status": "ok", "followers": as_int(values.get("followers_count")),
-        "total_views": as_int(values.get("views")), "content_count": content_count,
+        "total_views": as_int(values.get("views")), "total_metric_label": "계정 조회(인사이트)", "content_count": content_count,
         "last_publish": date_part(latest_post.get("timestamp")) or None,
         "latest_content_views": as_int(latest_post.get("views")),
         "latest_content_likes": as_int(latest_post.get("likes")),
@@ -345,7 +349,7 @@ def fetch_tiktok(row: dict[str, Any], auth: dict[str, Any]) -> dict[str, Any]:
     return {
         "status": "ok", "followers": as_int(user.get("follower_count")),
         "following": as_int(user.get("following_count")), "total_likes": as_int(user.get("likes_count")),
-        "content_count": as_int(user.get("video_count")),
+        "total_metric_label": "누적 좋아요", "content_count": as_int(user.get("video_count")),
         "last_publish": date_part(latest.get("create_time")) or None,
         "latest_content_views": as_int(latest.get("view_count")),
         "latest_content_likes": as_int(latest.get("like_count")),
