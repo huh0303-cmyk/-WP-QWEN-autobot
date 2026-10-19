@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-19T13:36:57.523585+09:00",
+ "generated_at": "2026-10-19T13:38:52.391586+09:00",
  "reference_date": "2026-10-16",
  "blogger_pageviews": {
-  "generated_at": "2026-10-19T13:36:57.523585+09:00",
+  "generated_at": "2026-10-19T13:38:52.391586+09:00",
   "source": "Blogger API v3 pageviews range=ALL; daily values are differences between consecutive cumulative snapshots",
   "history_days": [],
   "blogs": [
@@ -15,7 +15,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "5061870975921599649",
@@ -26,7 +26,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "9124051754121584517",
@@ -37,7 +37,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "1529526209955625690",
@@ -48,7 +48,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "8888982369193041814",
@@ -59,7 +59,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "1687098888954822322",
@@ -70,7 +70,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "270775542645307723",
@@ -81,7 +81,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "8661782623130728248",
@@ -92,7 +92,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "7521251102691129954",
@@ -103,7 +103,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "4890361213499831195",
@@ -114,7 +114,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "473506254375374117",
@@ -125,7 +125,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "3406327845659558883",
@@ -136,7 +136,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "3560791242887862780",
@@ -147,7 +147,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "2674139059432343378",
@@ -158,7 +158,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "6946912888985634794",
@@ -169,7 +169,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "6878877615041749185",
@@ -180,7 +180,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "3364333636330259319",
@@ -191,7 +191,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "2490110552890683078",
@@ -202,7 +202,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "4432103895513840706",
@@ -213,7 +213,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "8654603097966481527",
@@ -224,7 +224,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "5264943720375052759",
@@ -235,7 +235,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "2107448954473357757",
@@ -246,7 +246,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "242870255610398021",
@@ -257,7 +257,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "6436826795706658249",
@@ -268,7 +268,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "6980941479069687285",
@@ -279,7 +279,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "8294304371132383961",
@@ -290,7 +290,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "7354545101201355815",
@@ -301,7 +301,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "4456888951628869767",
@@ -312,7 +312,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "3205814823967421343",
@@ -323,7 +323,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "2531035487222435079",
@@ -334,7 +334,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "2234527810530371008",
@@ -345,7 +345,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "3683978748331752523",
@@ -356,7 +356,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    },
    {
     "key": "8077962392257357260",
@@ -367,7 +367,7 @@
     "status": "HTTP_403",
     "checked_at": null,
     "history": [],
-    "error": "Blogger API authentication/scope permission rejected"
+    "error": "insufficientPermissions: Request had insufficient authentication scopes."
    }
   ]
  },
