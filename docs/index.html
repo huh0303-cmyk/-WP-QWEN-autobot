@@ -39,10 +39,14 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 <tbody id="b"></tbody></table></div>
 <h2 style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a"><span class="platform-heading platform-youtube">YouTube (<span id="count-youtube">0</span>)</span> · <span class="platform-heading platform-facebook">Facebook (<span id="count-facebook">0</span>)</span> · <span class="platform-heading platform-instagram">Instagram (<span id="count-instagram">0</span>)</span> · <span class="platform-heading platform-threads">Threads (<span id="count-threads">0</span>)</span> · <span class="platform-heading platform-tiktok">TikTok (<span id="count-tiktok">0</span>)</span> · 총 <span id="social-count">0</span>개</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>조회수</th><th>최근 발행</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>팔로잉</th><th>콘텐츠 수</th><th>누적 조회 / 좋아요</th><th>개설일</th><th>최근 발행</th><th>데이터 확인일</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
 <script>
 var J=null;
 var SOCIAL_DATA=null;
+var SOCIAL_METRICS=null;
+function metricNumber(v,unit){return v===null||v===undefined||!Number.isFinite(Number(v))?'<span class="na">미수집</span>':'<b>'+f(Number(v))+'</b>'+(unit?' <span class="na">'+unit+'</span>':'');}
+function metricDay(v){return v?esc(String(v).slice(0,10)):'<span class="na">미확인</span>';}
+function metricKey(a){var h=String(a.handle||'').replace(/^@/,'').trim().toLowerCase();return String(a.platform||'').toLowerCase()+'|'+(h||String(a.url||'').trim().toLowerCase());}
 function f(v){return Number(v).toLocaleString()}
 function d(v){if(v===null||v===undefined)return '';return v>0?'<span class="d up">▲ +'+f(v)+'</span>':v<0?'<span class="d down">▼ -'+f(Math.abs(v))+'</span>':'<span class="d na">– 0</span>'}
 function cell(val,delta,naText){return val===null||val===undefined||!Number.isFinite(val)?'<span class="na">'+(naText||'GSC에서 확인 불가')+'</span>':'<b>'+f(val)+'</b>'+d(delta)}
@@ -84,6 +88,8 @@ function drawSocial(data){
  var list=data.accounts||[];
  var m={YouTube:'YouTube',Facebook:'Facebook',Instagram:'Instagram',Threads:'Threads',TikTok:'TikTok'};
  var platformClass={YouTube:'platform-youtube',Facebook:'platform-facebook',Instagram:'platform-instagram',Threads:'platform-threads',TikTok:'platform-tiktok'};
+ var metricMap={};
+ (SOCIAL_METRICS&&SOCIAL_METRICS.accounts||[]).forEach(function(x){metricMap[x.key]=x;});
  var platformCounts={YouTube:0,Facebook:0,Instagram:0,Threads:0,TikTok:0};
  list.forEach(function(a){if(Object.prototype.hasOwnProperty.call(platformCounts,a.platform))platformCounts[a.platform]++;});
  document.getElementById('count-youtube').textContent=String(platformCounts.YouTube);
@@ -92,17 +98,29 @@ function drawSocial(data){
  document.getElementById('count-threads').textContent=String(platformCounts.Threads);
  document.getElementById('count-tiktok').textContent=String(platformCounts.TikTok);
  document.getElementById('social-count').textContent=String(list.length);
- document.getElementById('social-meta').textContent='등록부 기준 계정/예정 항목 '+list.length+'개 · 블로그 표 마지막 번호 다음부터 연속 번호 부여 · API 통계 미연결 및 계정 미확인은 상태로 표시';
+ var mc=SOCIAL_METRICS&&SOCIAL_METRICS.generated_at_kst?(' · 통계 스냅샷 '+String(SOCIAL_METRICS.generated_at_kst).slice(0,16).replace('T',' ')):'';
+ document.getElementById('social-meta').textContent='등록부 '+list.length+'개 계정/예정 항목 · 구독자, 팔로잉, 콘텐츠 수, 누적 조회/좋아요, 개설일, 최근 발행, 데이터 확인일'+mc+' · 값이 없으면 미수집/공식 API 미제공으로 표시';
  document.getElementById('social-rows').innerHTML=list.map(function(a,i){
   var name=esc(a.name||a.handle||'계정명 미등록');
   var linked=a.url?'<a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+name+'</a>':name;
   var status=esc(a.status||'상태 미확인');
   var action=a.url?'<a class="publish-link" href="https://sns.korea365.org" target="_blank" rel="noopener">발행 화면 ↗</a>':'<span class="na">계정 확인 필요</span>';
+  var metric=metricMap[metricKey(a)]||null;
+  var followers=metric?metricNumber(metric.followers!==null&&metric.followers!==undefined?metric.followers:metric.subscribers,''):'<span class="na">수집 전</span>';
+  var following=metric?metricNumber(metric.following,''):'<span class="na">수집 전</span>';
+  var count=metric?metricNumber(metric.content_count,''):'<span class="na">수집 전</span>';
+  var total=metric&&metric.total_views!==null&&metric.total_views!==undefined?metricNumber(metric.total_views,'조회'):metric&&metric.total_likes!==null&&metric.total_likes!==undefined?metricNumber(metric.total_likes,'좋아요'):'<span class="na">미수집</span>';
+  var created=metric&&metric.account_created_at?metricDay(metric.account_created_at):'<span class="na" title="'+esc(metric&&metric.creation_date_note||'공식 API 또는 인증 정보에서 개설일을 확인하지 못함')+'">공식 API 미제공/미확인</span>';
+  var recent=metric&&metric.last_publish?metricDay(metric.last_publish):esc(a.last_publish||'미확인');
+  var checked=metric?metricDay(metric.last_successful_at||metric.last_stats_checked_at):'<span class="na">수집 전</span>';
+  var apiStatus=metric?({ok:'API 확인됨',stale:'이전 수치(갱신 실패)',auth_needed:'인증 필요',api_error:'API 오류',not_created_or_unverified:'계정 미생성/미확인',not_checked:'미수집',unsupported:'미지원'})[metric.status]||metric.status:'수집 전';
+  if(metric&&metric.error)apiStatus+=' · '+metric.error;
   var firstSocialRank=(J&&Array.isArray(J.rows)?J.rows.length:0)+1;
-  return '<tr><td>'+(firstSocialRank+i)+'위</td><td><span class="social-platform '+(platformClass[a.platform]||'')+'">'+esc(m[a.platform]||a.platform)+'</span></td><td style="text-align:left">'+linked+(a.handle?' <span class="na">@'+esc(a.handle)+'</span>':'')+'</td><td>'+(Number.isFinite(a.followers)?f(a.followers):'<span class="na">API 미연결</span>')+'</td><td>'+(Number.isFinite(a.views)?f(a.views):'<span class="na">API 미연결</span>')+'</td><td>'+esc(a.last_publish||'미확인')+'</td><td>'+status+'</td><td>'+action+'</td></tr>';
+  return '<tr><td>'+(firstSocialRank+i)+'위</td><td><span class="social-platform '+(platformClass[a.platform]||'')+'">'+esc(m[a.platform]||a.platform)+'</span></td><td style="text-align:left">'+linked+(a.handle?' <span class="na">@'+esc(a.handle)+'</span>':'')+'</td><td>'+followers+'</td><td>'+following+'</td><td>'+count+'</td><td>'+total+'</td><td>'+created+'</td><td>'+recent+'</td><td>'+checked+'</td><td title="'+esc(apiStatus)+'">'+esc(apiStatus)+'</td><td>'+action+'</td></tr>';
  }).join('');
 }
-fetch('social_inventory.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(drawSocial).catch(function(e){document.getElementById('social-meta').textContent='계정 등록부 오류: '+e.message;});
+fetch('social_inventory.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_DATA=d;drawSocial(d);}).catch(function(e){document.getElementById('social-meta').textContent='계정 등록부 오류: '+e.message;});
+fetch('social_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_METRICS=d;if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);}).catch(function(e){document.getElementById('social-meta').textContent+=' · 통계 스냅샷을 불러오지 못함';});
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(j){
   J=j;
   var hasV=(j.rows||[]).some(function(r){return Number.isFinite(r.visitors)});
