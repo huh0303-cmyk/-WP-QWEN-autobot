@@ -24,6 +24,7 @@ KST = dt.timezone(dt.timedelta(hours=9))
 EXCLUDE = ("theseouljournal.com",)
 OUT = ROOT / "docs" / "dashboard.json"
 HIST = ROOT / "data" / "dashboard_history.json"
+PAGEVIEWS_HIST = ROOT / "data" / "blogger_pageviews_history.json"
 EMPTY = dict(clicks=None, clicks_delta=None, impressions=None, impressions_delta=None,
              cumulative=None, cumulative_delta=None, cumulative_impressions=None,
              google_indexed=None, google_indexed_delta=None, google_indexed_status="GSC_INDEX_COUNT_UNAVAILABLE")
@@ -73,6 +74,114 @@ def content_count(url, platform):
     except Exception:
         return None
 
+
+
+def blogger_access_token():
+    """Read Blogger API credentials separately from Search Console credentials."""
+    values = {
+        "client_id": os.getenv("BLOGGER_GOOGLE_CLIENT_ID"),
+        "client_secret": os.getenv("BLOGGER_GOOGLE_CLIENT_SECRET"),
+        "refresh_token": os.getenv("BLOGGER_GOOGLE_REFRESH_TOKEN"),
+        "grant_type": "refresh_token",
+    }
+    if not all(values.values()):
+        return None, "BLOGGER_OAUTH_SECRETS_MISSING"
+    try:
+        response = requests.post("https://oauth2.googleapis.com/token", data=values, timeout=20)
+        response.raise_for_status()
+        return response.json().get("access_token"), None
+    except (requests.RequestException, ValueError):
+        return None, "BLOGGER_OAUTH_REFRESH_FAILED"
+
+
+def collect_blogger_pageviews(portfolio, now):
+    """Collect official Blogger API ALL-time pageviews and derive daily deltas from snapshots.
+
+    A daily delta is shown only when the previous calendar day's cumulative total exists.
+    Missing API data is never converted to zero. History is retained for a 30-day chart.
+    """
+    try:
+        history = json.loads(PAGEVIEWS_HIST.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        history = {"days": {}}
+    history.setdefault("days", {})
+    today = now.date().isoformat()
+    previous_day = (now.date() - dt.timedelta(days=1)).isoformat()
+    previous = history["days"].get(previous_day, {})
+    access, auth_error = blogger_access_token()
+    channels = portfolio.get("channels", [])
+    current = {}
+    rows = []
+    headers = {"Authorization": "Bearer " + access} if access else {}
+    for blog in channels:
+        url = str(blog.get("blogspot") or "").rstrip("/")
+        key = str(blog.get("destination_id") or "").strip()
+        row = {
+            "key": key or url, "url": url, "title": blog.get("title") or url,
+            "total_pageviews": None, "daily_pageviews": None,
+            "status": auth_error or "NOT_COLLECTED", "checked_at": None,
+            "history": [],
+        }
+        if access and key:
+            try:
+                response = requests.get(
+                    "https://www.googleapis.com/blogger/v3/blogs/" + key + "/pageviews",
+                    headers=headers, params={"range": "ALL"}, timeout=20,
+                )
+                response.raise_for_status()
+                payload = response.json()
+                counts = payload.get("counts", [])
+                total = next(
+                    (int(item["count"]) for item in counts
+                     if str(item.get("timeRange", "")).upper() in {"ALL", "ALL_TIME"}
+                     and item.get("count") is not None),
+                    None,
+                )
+                if total is None:
+                    row["status"] = "TOTAL_PAGEVIEWS_NOT_RETURNED"
+                else:
+                    row["total_pageviews"] = total
+                    row["checked_at"] = now.isoformat()
+                    old = previous.get(row["key"])
+                    if old is not None and total >= int(old):
+                        row["daily_pageviews"] = total - int(old)
+                        row["status"] = "OK"
+                    elif old is not None:
+                        row["status"] = "COUNTER_RESET_BASELINE_REQUIRED"
+                    else:
+                        row["status"] = "BASELINE_PENDING"
+                    current[row["key"]] = total
+            except (requests.RequestException, ValueError, TypeError, KeyError):
+                row["status"] = "API_ERROR"
+        rows.append(row)
+
+    # Persist a dated cumulative snapshot even when only some blogs succeeded.
+    # Failed API requests are not recorded as zero.
+    if current:
+        history["days"][today] = current
+        for old_day in sorted(history["days"])[:-60]:
+            del history["days"][old_day]
+        PAGEVIEWS_HIST.parent.mkdir(parents=True, exist_ok=True)
+        PAGEVIEWS_HIST.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    dates = sorted(history.get("days", {}))[-30:]
+    for row in rows:
+        key = row["key"]
+        series = []
+        for day in dates:
+            day_values = history["days"].get(day, {})
+            prev_day = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
+            current_total = day_values.get(key)
+            prior_total = history["days"].get(prev_day, {}).get(key)
+            daily = int(current_total) - int(prior_total) if current_total is not None and prior_total is not None and int(current_total) >= int(prior_total) else None
+            series.append({"date": day, "daily_pageviews": daily})
+        row["history"] = series
+    return {
+        "generated_at": now.isoformat(),
+        "source": "Blogger API v3 pageviews range=ALL; daily values are differences between consecutive cumulative snapshots",
+        "history_days": dates,
+        "blogs": rows,
+    }
 
 def one(h, props, platform, url, display_name, ref, prev_hist):
     row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url,
@@ -167,9 +276,11 @@ def main():
     rows.sort(key=lambda r: (r["clicks"] is None, -(r["clicks"] or 0), -(r["impressions"] or 0), r["site"]))
     for i, r in enumerate(rows, 1):
         r["rank"] = i
+    blogger_pageviews = collect_blogger_pageviews(blogger_portfolio, now)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "generated_at": now.isoformat(), "reference_date": ref.isoformat(),
+        "blogger_pageviews": blogger_pageviews,
         "basis": "매일 07:00 KST 갱신 · GSC 검색 클릭·노출 기준일은 3일 전(GSC 지연 반영) · 클릭수는 사이트 방문자 수가 아님 · 색인수는 GSC 사이트맵 보고값이며 노출 페이지 수가 아님.",
         "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
     hist[ref.isoformat()] = {r["site"]: {"content": r["content"], "google_indexed": r.get("google_indexed")} for r in rows}
