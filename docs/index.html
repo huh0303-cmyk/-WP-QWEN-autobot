@@ -39,7 +39,7 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 <tbody id="b"></tbody></table></div>
 <h2 style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a"><span class="platform-heading platform-youtube">YouTube (<span id="count-youtube">0</span>)</span> · <span class="platform-heading platform-facebook">Facebook (<span id="count-facebook">0</span>)</span> · <span class="platform-heading platform-instagram">Instagram (<span id="count-instagram">0</span>)</span> · <span class="platform-heading platform-threads">Threads (<span id="count-threads">0</span>)</span> · <span class="platform-heading platform-tiktok">TikTok (<span id="count-tiktok">0</span>)</span> · 총 <span id="social-count">0</span>개</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>팔로잉</th><th>콘텐츠 수</th><th>누적 조회 / 좋아요</th><th>개설일</th><th>최근 발행</th><th>데이터 확인일</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>팔로잉</th><th>콘텐츠 수</th><th>누적 조회 / 좋아요</th><th>최근 콘텐츠 반응</th><th>개설일</th><th>최근 발행</th><th>데이터 확인일</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
 <script>
 var J=null;
 var SOCIAL_DATA=null;
@@ -110,13 +110,18 @@ function drawSocial(data){
   var following=metric?metricNumber(metric.following,''):'<span class="na">수집 전</span>';
   var count=metric?metricNumber(metric.content_count,''):'<span class="na">수집 전</span>';
   var total=metric&&metric.total_views!==null&&metric.total_views!==undefined?metricNumber(metric.total_views,'조회'):metric&&metric.total_likes!==null&&metric.total_likes!==undefined?metricNumber(metric.total_likes,'좋아요'):'<span class="na">미수집</span>';
+  var recentParts=[];
+  if(metric&&metric.latest_content_views!==null&&metric.latest_content_views!==undefined)recentParts.push('조회 '+f(metric.latest_content_views));
+  if(metric&&metric.latest_content_likes!==null&&metric.latest_content_likes!==undefined)recentParts.push('좋아요 '+f(metric.latest_content_likes));
+  if(metric&&metric.latest_content_comments!==null&&metric.latest_content_comments!==undefined)recentParts.push('댓글/답글 '+f(metric.latest_content_comments));
+  var recentImpact=recentParts.length?esc(recentParts.join(' · ')):'<span class="na">미수집</span>';
   var created=metric&&metric.account_created_at?metricDay(metric.account_created_at):'<span class="na" title="'+esc(metric&&metric.creation_date_note||'공식 API 또는 인증 정보에서 개설일을 확인하지 못함')+'">공식 API 미제공/미확인</span>';
   var recent=metric&&metric.last_publish?metricDay(metric.last_publish):esc(a.last_publish||'미확인');
   var checked=metric?metricDay(metric.last_successful_at||metric.last_stats_checked_at):'<span class="na">수집 전</span>';
   var apiStatus=metric?({ok:'API 확인됨',stale:'이전 수치(갱신 실패)',auth_needed:'인증 필요',api_error:'API 오류',not_created_or_unverified:'계정 미생성/미확인',not_checked:'미수집',unsupported:'미지원'})[metric.status]||metric.status:'수집 전';
   if(metric&&metric.error)apiStatus+=' · '+metric.error;
   var firstSocialRank=(J&&Array.isArray(J.rows)?J.rows.length:0)+1;
-  return '<tr><td>'+(firstSocialRank+i)+'위</td><td><span class="social-platform '+(platformClass[a.platform]||'')+'">'+esc(m[a.platform]||a.platform)+'</span></td><td style="text-align:left">'+linked+(a.handle?' <span class="na">@'+esc(a.handle)+'</span>':'')+'</td><td>'+followers+'</td><td>'+following+'</td><td>'+count+'</td><td>'+total+'</td><td>'+created+'</td><td>'+recent+'</td><td>'+checked+'</td><td title="'+esc(apiStatus)+'">'+esc(apiStatus)+'</td><td>'+action+'</td></tr>';
+  return '<tr><td>'+(firstSocialRank+i)+'위</td><td><span class="social-platform '+(platformClass[a.platform]||'')+'">'+esc(m[a.platform]||a.platform)+'</span></td><td style="text-align:left">'+linked+(a.handle?' <span class="na">@'+esc(a.handle)+'</span>':'')+'</td><td>'+followers+'</td><td>'+following+'</td><td>'+count+'</td><td>'+total+'</td><td>'+recentImpact+'</td><td>'+created+'</td><td>'+recent+'</td><td>'+checked+'</td><td title="'+esc(apiStatus)+'">'+esc(apiStatus)+'</td><td>'+action+'</td></tr>';
  }).join('');
 }
 fetch('social_inventory.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_DATA=d;drawSocial(d);}).catch(function(e){document.getElementById('social-meta').textContent='계정 등록부 오류: '+e.message;});
