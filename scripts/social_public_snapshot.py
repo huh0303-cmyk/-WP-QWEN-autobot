@@ -86,8 +86,10 @@ def get_json(url: str, *, params: dict[str, Any] | None = None,
     if isinstance(data, dict) and isinstance(data.get("error"), dict):
         error = data["error"]
         code = error.get("code") or error.get("type") or "API_ERROR"
-        message = str(error.get("message") or "API request failed")[:180]
-        raise RuntimeError(f"{code}: {message}")
+        message = str(error.get("message") or "")
+        # TikTok v2 includes an error object with code="ok" on successful responses.
+        if str(code).lower() not in {"ok", "0", "none"} or message:
+            raise RuntimeError(f"{code}: {message or 'API request failed'}"[:220])
     return data if isinstance(data, dict) else {}
 
 
