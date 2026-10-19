@@ -39,6 +39,7 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 <tbody id="b"></tbody></table></div>
 <h2 style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a"><span class="platform-heading platform-youtube">YouTube (<span id="count-youtube">0</span>)</span> · <span class="platform-heading platform-facebook">Facebook (<span id="count-facebook">0</span>)</span> · <span class="platform-heading platform-instagram">Instagram (<span id="count-instagram">0</span>)</span> · <span class="platform-heading platform-threads">Threads (<span id="count-threads">0</span>)</span> · <span class="platform-heading platform-tiktok">TikTok (<span id="count-tiktok">0</span>)</span> · 총 <span id="social-count">0</span>개</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
+<div class="bar"><label for="socialSortKey">SNS 정렬 기준</label><select id="socialSortKey"><option value="followers">구독자 / 팔로워 수 ↓</option><option value="total_views">누적 조회수 ↓</option><option value="content_count">콘텐츠 수 ↓</option><option value="latest_content_views">최근 콘텐츠 조회수 ↓</option><option value="last_publish">최근 발행일 ↓</option></select><span class="na">숫자 미수집 계정은 아래쪽 표시</span></div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>팔로잉</th><th>콘텐츠 수</th><th>누적 조회 / 좋아요</th><th>최근 콘텐츠 반응</th><th>개설일</th><th>최근 발행</th><th>데이터 확인일</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
 <script>
 var J=null;
@@ -85,11 +86,38 @@ document.getElementById('sortKey').addEventListener('change',draw);
 function drawSocial(data){
  if(!data)return;
  SOCIAL_DATA=data;
- var list=data.accounts||[];
+ var list=(data.accounts||[]).slice();
  var m={YouTube:'YouTube',Facebook:'Facebook',Instagram:'Instagram',Threads:'Threads',TikTok:'TikTok'};
  var platformClass={YouTube:'platform-youtube',Facebook:'platform-facebook',Instagram:'platform-instagram',Threads:'platform-threads',TikTok:'platform-tiktok'};
  var metricMap={};
  (SOCIAL_METRICS&&SOCIAL_METRICS.accounts||[]).forEach(function(x){metricMap[x.key]=x;});
+ var sortControl=document.getElementById('socialSortKey');
+ var sortMode=sortControl?sortControl.value:'followers';
+ function metricFor(a){return metricMap[metricKey(a)]||null;}
+ function sortValue(a,key){
+  var x=metricFor(a);
+  if(key==='followers')return x?(x.followers!==null&&x.followers!==undefined?x.followers:x.subscribers):null;
+  if(key==='last_publish')return (x&&x.last_publish)||(a.last_publish)||null;
+  return x&&x[key]!==undefined?x[key]:null;
+ }
+ list.sort(function(a,b){
+  var av=sortValue(a,sortMode),bv=sortValue(b,sortMode);
+  var an=sortMode==='last_publish'?!!av:(av!==null&&av!==undefined&&Number.isFinite(Number(av)));
+  var bn=sortMode==='last_publish'?!!bv:(bv!==null&&bv!==undefined&&Number.isFinite(Number(bv)));
+  if(an!==bn)return an?-1:1;
+  if(an&&bn){
+   if(sortMode==='last_publish'){if(String(av)!==String(bv))return String(bv).localeCompare(String(av));}
+   else if(Number(av)!==Number(bv))return Number(bv)-Number(av);
+  }
+  var af=sortValue(a,'followers'),bf=sortValue(b,'followers');
+  if(af===null||af===undefined)af=-1;
+  if(bf===null||bf===undefined)bf=-1;
+  if(Number(af)!==Number(bf))return Number(bf)-Number(af);
+  var at=sortValue(a,'total_views'),bt=sortValue(b,'total_views');
+  at=at===null||at===undefined?-1:Number(at);bt=bt===null||bt===undefined?-1:Number(bt);
+  if(at!==bt)return bt-at;
+  return String(a.name||'').localeCompare(String(b.name||''),'ko');
+ });
  var platformCounts={YouTube:0,Facebook:0,Instagram:0,Threads:0,TikTok:0};
  list.forEach(function(a){if(Object.prototype.hasOwnProperty.call(platformCounts,a.platform))platformCounts[a.platform]++;});
  document.getElementById('count-youtube').textContent=String(platformCounts.YouTube);
@@ -125,6 +153,7 @@ function drawSocial(data){
  }).join('');
 }
 fetch('social_inventory.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_DATA=d;drawSocial(d);}).catch(function(e){document.getElementById('social-meta').textContent='계정 등록부 오류: '+e.message;});
+document.getElementById('socialSortKey').addEventListener('change',function(){if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);});
 fetch('social_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_METRICS=d;if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);}).catch(function(e){document.getElementById('social-meta').textContent+=' · 통계 스냅샷을 불러오지 못함';});
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(j){
   J=j;
