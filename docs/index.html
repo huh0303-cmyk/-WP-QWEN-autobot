@@ -116,7 +116,7 @@ function drawBloggerPageviews(payload){
  if(old&&blogs.some(function(b){return b.key===old;}))select.value=old;
  else {var first=blogs.find(function(b){return Number.isFinite(b.total_pageviews);});if(first)select.value=first.key;}
  function num(v){return Number.isFinite(v)?f(v):'<span class="na">미확인</span>';}
- function statusLabel(b){return ({OK:'정상 수집',BASELINE_PENDING:'누적값 수집됨 · 일일 기준값 축적 중',COUNTER_RESET_BASELINE_REQUIRED:'누적 카운터 감소 · 기준 재설정 필요',BLOGGER_OAUTH_SECRETS_MISSING:'Blogger API 인증 정보 미설정',BLOGGER_OAUTH_REFRESH_FAILED:'Blogger 인증 갱신 실패',TOTAL_PAGEVIEWS_NOT_RETURNED:'API가 누적값을 반환하지 않음',API_ERROR:'API 수집 실패',NOT_COLLECTED:'미수집'})[b.status]||b.status||'미확인';}
+ function statusLabel(b){return ({OK:'정상 수집',BASELINE_PENDING:'누적값 수집됨 · 일일 기준값 축적 중',COUNTER_RESET_BASELINE_REQUIRED:'누적 카운터 감소 · 기준 재설정 필요',BLOGGER_OAUTH_SECRETS_MISSING:'Blogger API 인증 정보 미설정',BLOGGER_OAUTH_REFRESH_FAILED:'Blogger 인증 갱신 실패',TOTAL_PAGEVIEWS_NOT_RETURNED:'API가 누적값을 반환하지 않음',API_ERROR:'API 수집 실패',HTTP_401:'Blogger 인증 거부(401)',HTTP_403:'Blogger API 권한/범위 거부(403)',HTTP_404:'Blogger 페이지뷰 API 경로 확인(404)',NETWORK_ERROR:'네트워크 오류',INVALID_API_RESPONSE:'API 응답 형식 오류',NOT_COLLECTED:'미수집'})[b.status]||b.status||'미확인';}
  function selected(){return blogs.find(function(b){return b.key===select.value;})||blogs[0];}
  function renderChart(b){
   var series=(b.history||[]).slice(-30), valid=series.filter(function(p){return Number.isFinite(p.daily_pageviews);});
