@@ -35,8 +35,15 @@ def delta(current, previous):
 
 
 def oauth():
-    data = {"client_id": os.getenv("BLOGGER_GOOGLE_CLIENT_ID"), "client_secret": os.getenv("BLOGGER_GOOGLE_CLIENT_SECRET"),
-            "refresh_token": os.getenv("BLOGGER_GOOGLE_REFRESH_TOKEN"), "grant_type": "refresh_token"}
+    # Prefer Blogger-specific OAuth, but fall back to the configured Google Metrics
+    # OAuth. The latter works only if its granted scopes include Blogger read access;
+    # API permission errors remain visible in each site's collection status.
+    data = {
+        "client_id": os.getenv("BLOGGER_GOOGLE_CLIENT_ID") or os.getenv("GOOGLE_METRICS_CLIENT_ID"),
+        "client_secret": os.getenv("BLOGGER_GOOGLE_CLIENT_SECRET") or os.getenv("GOOGLE_METRICS_CLIENT_SECRET"),
+        "refresh_token": os.getenv("BLOGGER_GOOGLE_REFRESH_TOKEN") or os.getenv("GOOGLE_METRICS_REFRESH_TOKEN"),
+        "grant_type": "refresh_token",
+    }
     if not all(data.values()):
         return {}
     r = requests.post("https://oauth2.googleapis.com/token", data=data, timeout=20)
