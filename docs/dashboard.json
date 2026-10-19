@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-19T13:36:07.548551+09:00",
+ "generated_at": "2026-10-19T13:36:57.523585+09:00",
  "reference_date": "2026-10-16",
  "blogger_pageviews": {
-  "generated_at": "2026-10-19T13:36:07.548551+09:00",
+  "generated_at": "2026-10-19T13:36:57.523585+09:00",
   "source": "Blogger API v3 pageviews range=ALL; daily values are differences between consecutive cumulative snapshots",
   "history_days": [],
   "blogs": [
@@ -12,9 +12,10 @@
     "title": "K-Trip365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "5061870975921599649",
@@ -22,9 +23,10 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "9124051754121584517",
@@ -32,9 +34,10 @@
     "title": "JobKorea365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "1529526209955625690",
@@ -42,9 +45,10 @@
     "title": "KStudy365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "8888982369193041814",
@@ -52,9 +56,10 @@
     "title": "Korea Insurance 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "1687098888954822322",
@@ -62,9 +67,10 @@
     "title": "KFinance365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "270775542645307723",
@@ -72,9 +78,10 @@
     "title": "Korea Medical Tour",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "8661782623130728248",
@@ -82,9 +89,10 @@
     "title": "K-Visa365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "7521251102691129954",
@@ -92,9 +100,10 @@
     "title": "KoreaNews365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "4890361213499831195",
@@ -102,9 +111,10 @@
     "title": "Korea Invest 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "473506254375374117",
@@ -112,9 +122,10 @@
     "title": "Olive Young Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "3406327845659558883",
@@ -122,9 +133,10 @@
     "title": "Korea Crypto 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "3560791242887862780",
@@ -132,9 +144,10 @@
     "title": "Job in Korea 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "2674139059432343378",
@@ -142,9 +155,10 @@
     "title": "Korea Wedding 365 | International Couples",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "6946912888985634794",
@@ -152,9 +166,10 @@
     "title": "The Seoul Journal",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "6878877615041749185",
@@ -162,9 +177,10 @@
     "title": "KTech365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "3364333636330259319",
@@ -172,9 +188,10 @@
     "title": "KIECA Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "2490110552890683078",
@@ -182,9 +199,10 @@
     "title": "KI Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "4432103895513840706",
@@ -192,9 +210,10 @@
     "title": "KSA Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "8654603097966481527",
@@ -202,9 +221,10 @@
     "title": "Korea Tax & Law",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "5264943720375052759",
@@ -212,9 +232,10 @@
     "title": "Job Korea Global",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "2107448954473357757",
@@ -222,9 +243,10 @@
     "title": "Study in Korea 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "242870255610398021",
@@ -232,9 +254,10 @@
     "title": "Korea365 | Korea Life A-Z",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "6436826795706658249",
@@ -242,9 +265,10 @@
     "title": "SIS Korea | Seoul International School",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "6980941479069687285",
@@ -252,9 +276,10 @@
     "title": "Korea Real Estate 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "8294304371132383961",
@@ -262,9 +287,10 @@
     "title": "K-Health365 연구소",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "7354545101201355815",
@@ -272,9 +298,10 @@
     "title": "KSkin365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "4456888951628869767",
@@ -282,9 +309,10 @@
     "title": "K-wellness Lab",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "3205814823967421343",
@@ -292,9 +320,10 @@
     "title": "K-Medical Job Center",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "2531035487222435079",
@@ -302,9 +331,10 @@
     "title": "한국생활지원정보",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "2234527810530371008",
@@ -312,9 +342,10 @@
     "title": "Korea Daily Mix",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "3683978748331752523",
@@ -322,9 +353,10 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    },
    {
     "key": "8077962392257357260",
@@ -332,9 +364,10 @@
     "title": "Seoul International School Guide",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "API_ERROR",
+    "status": "HTTP_403",
     "checked_at": null,
-    "history": []
+    "history": [],
+    "error": "Blogger API authentication/scope permission rejected"
    }
   ]
  },
