@@ -79,7 +79,7 @@ function drawSocial(data){
   var linked=a.url?'<a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+name+'</a>':name;
   var status=esc(a.status||'상태 미확인');
   var action=a.url?'<a class="publish-link" href="https://sns.korea365.org" target="_blank" rel="noopener">발행 화면 ↗</a>':'<span class="na">계정 확인 필요</span>';
-  return '<tr><td>'+(i+1)+'위</td><td>'+esc(m[a.platform]||a.platform)+'</td><td style="text-align:left">'+linked+(a.handle?' <span class="na">@'+esc(a.handle)+'</span>':'')+'</td><td>'+(Number.isFinite(a.followers)?f(a.followers):'<span class="na">API 미연결</span>')+'</td><td>'+(Number.isFinite(a.views)?f(a.views):'<span class="na">API 미연결</span>')+'</td><td>'+esc(a.last_publish||'미확인')+'</td><td>'+status+'</td><td>'+action+'</td></tr>';
+  return '<tr><td>'+(i+62)+'위</td><td>'+esc(m[a.platform]||a.platform)+'</td><td style="text-align:left">'+linked+(a.handle?' <span class="na">@'+esc(a.handle)+'</span>':'')+'</td><td>'+(Number.isFinite(a.followers)?f(a.followers):'<span class="na">API 미연결</span>')+'</td><td>'+(Number.isFinite(a.views)?f(a.views):'<span class="na">API 미연결</span>')+'</td><td>'+esc(a.last_publish||'미확인')+'</td><td>'+status+'</td><td>'+action+'</td></tr>';
  }).join('');
 }
 fetch('social_inventory.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(drawSocial).catch(function(e){document.getElementById('social-meta').textContent='계정 등록부 오류: '+e.message;});
