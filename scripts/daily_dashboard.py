@@ -79,13 +79,13 @@ def content_count(url, platform):
 def blogger_access_token():
     """Read Blogger API credentials separately from Search Console credentials."""
     values = {
-        "client_id": os.getenv("BLOGGER_GOOGLE_CLIENT_ID"),
-        "client_secret": os.getenv("BLOGGER_GOOGLE_CLIENT_SECRET"),
-        "refresh_token": os.getenv("BLOGGER_GOOGLE_REFRESH_TOKEN"),
+        "client_id": os.getenv("BLOGGER_GOOGLE_CLIENT_ID") or os.getenv("GOOGLE_METRICS_CLIENT_ID"),
+        "client_secret": os.getenv("BLOGGER_GOOGLE_CLIENT_SECRET") or os.getenv("GOOGLE_METRICS_CLIENT_SECRET"),
+        "refresh_token": os.getenv("BLOGGER_GOOGLE_REFRESH_TOKEN") or os.getenv("GOOGLE_METRICS_REFRESH_TOKEN"),
         "grant_type": "refresh_token",
     }
     if not all(values.values()):
-        return None, "BLOGGER_OAUTH_SECRETS_MISSING"
+        return None, "BLOGGER_AND_GOOGLE_METRICS_OAUTH_SECRETS_MISSING"
     try:
         response = requests.post("https://oauth2.googleapis.com/token", data=values, timeout=20)
         response.raise_for_status()
