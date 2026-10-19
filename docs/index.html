@@ -130,9 +130,9 @@ function drawSocial(data){
  document.getElementById('social-meta').textContent='등록부 '+list.length+'개 계정/예정 항목 · 구독자, 팔로잉, 콘텐츠 수, 누적 조회/좋아요, 개설일, 최근 발행, 데이터 확인일'+mc+' · 값이 없으면 미수집/공식 API 미제공으로 표시';
  document.getElementById('social-rows').innerHTML=list.map(function(a,i){
   var name=esc(a.name||a.handle||'계정명 미등록');
-  var linked=a.url?'<a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+name+'</a>':name;
+  var linked=a.url?'<a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+name+'</a>':a.search_url?'<a href="'+esc(a.search_url)+'" target="_blank" rel="noopener" title="프로필 직접 링크 미확인 · 플랫폼에서 이름 검색">'+name+' <span class="na">(검색 결과 ↗)</span></a>':name;
   var status=esc(a.status||'상태 미확인');
-  var action=a.url?'<a class="publish-link" href="https://sns.korea365.org" target="_blank" rel="noopener">발행 화면 ↗</a>':'<span class="na">계정 확인 필요</span>';
+  var action=a.url?'<a class="publish-link" href="https://sns.korea365.org" target="_blank" rel="noopener">발행 화면 ↗</a>':a.search_url?'<a href="'+esc(a.search_url)+'" target="_blank" rel="noopener">검색으로 확인 ↗</a>':'<span class="na">프로필 링크 미확인</span>';
   var metric=metricMap[metricKey(a)]||null;
   var followers=metric?metricNumber(metric.followers!==null&&metric.followers!==undefined?metric.followers:metric.subscribers,''):'<span class="na">수집 전</span>';
   var following=metric?metricNumber(metric.following,''):'<span class="na">수집 전</span>';
