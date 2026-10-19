@@ -154,10 +154,16 @@ def collect_blogger_pageviews(portfolio, now):
             except requests.HTTPError as exc:
                 code = exc.response.status_code if exc.response is not None else 0
                 row["status"] = "HTTP_" + str(code)
-                if code in {401, 403}:
-                    row["error"] = "Blogger API authentication/scope permission rejected"
-                else:
-                    row["error"] = "Blogger API HTTP " + str(code)
+                detail = {}
+                try:
+                    detail = exc.response.json().get("error", {}) if exc.response is not None else {}
+                except (ValueError, AttributeError):
+                    detail = {}
+                message = str(detail.get("message") or "").strip()
+                reasons = detail.get("errors", [])
+                reason = str(reasons[0].get("reason") or "") if reasons and isinstance(reasons[0], dict) else ""
+                row["error"] = ((reason + ": ") if reason else "") + (message or ("Blogger API HTTP " + str(code))
+                row["error"] = row["error"][:180]
             except requests.RequestException as exc:
                 row["status"] = "NETWORK_ERROR"
                 row["error"] = type(exc).__name__
