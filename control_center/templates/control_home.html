@@ -181,7 +181,7 @@ function drawBloggerPageviews(payload){
  select.innerHTML=blogs.map(b=>'<option value="'+esc(b.key)+'">'+esc(b.title)+'</option>').join('');
  if(previous&&blogs.some(b=>b.key===previous))select.value=previous;else{const first=blogs.find(b=>Number.isFinite(b.total_pageviews));if(first)select.value=first.key;}
  const fmt=v=>Number.isFinite(v)?nf.format(v):'미확인';
- const status=b=>({OK:'정상 수집',BASELINE_PENDING:'누적값 수집됨 · 일일 기준 축적 중',COUNTER_RESET_BASELINE_REQUIRED:'누적 카운터 감소 · 기준 재설정 필요',BLOGGER_OAUTH_SECRETS_MISSING:'Blogger API 인증 정보 미설정',BLOGGER_OAUTH_REFRESH_FAILED:'Blogger 인증 갱신 실패',TOTAL_PAGEVIEWS_NOT_RETURNED:'API 누적값 미반환',API_ERROR:'API 수집 실패',NOT_COLLECTED:'미수집'})[b.status]||b.status||'미확인';
+ const status=b=>({OK:'정상 수집',BASELINE_PENDING:'누적값 수집됨 · 일일 기준 축적 중',COUNTER_RESET_BASELINE_REQUIRED:'누적 카운터 감소 · 기준 재설정 필요',BLOGGER_OAUTH_SECRETS_MISSING:'Blogger API 인증 정보 미설정',BLOGGER_OAUTH_REFRESH_FAILED:'Blogger 인증 갱신 실패',TOTAL_PAGEVIEWS_NOT_RETURNED:'API 누적값 미반환',API_ERROR:'API 수집 실패',HTTP_401:'Blogger 인증 거부(401)',HTTP_403:'Blogger API 권한/범위 거부(403)',HTTP_404:'Blogger API 경로 오류(404)',NETWORK_ERROR:'네트워크 오류',INVALID_API_RESPONSE:'API 응답 형식 오류',NOT_COLLECTED:'미수집'})[b.status]||b.status||'미확인';
  function render(){
   const b=blogs.find(x=>x.key===select.value)||blogs[0];
   totalEl.textContent='Total Pageviews: '+fmt(b.total_pageviews);
