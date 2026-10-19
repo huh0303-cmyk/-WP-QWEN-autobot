@@ -42,6 +42,9 @@ jobs:
           BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
           BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
           BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+          GOOGLE_METRICS_CLIENT_ID: ${{ secrets.GOOGLE_METRICS_CLIENT_ID }}
+          GOOGLE_METRICS_CLIENT_SECRET: ${{ secrets.GOOGLE_METRICS_CLIENT_SECRET }}
+          GOOGLE_METRICS_REFRESH_TOKEN: ${{ secrets.GOOGLE_METRICS_REFRESH_TOKEN }}
         run: python scripts/core_metrics_report.py
       - name: Refresh Google URL Inspection evidence
         env:
