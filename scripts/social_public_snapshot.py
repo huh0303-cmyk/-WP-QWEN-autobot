@@ -425,7 +425,7 @@ def collect() -> dict[str, Any]:
             item["last_successful_at"] = fresh.get("last_successful_at") or now
         else:
             keep = ("followers", "following", "subscribers", "total_views", "total_likes", "content_count",
-                    "account_created_at", "creation_date_note", "last_publish", "latest_content_views",
+                    "account_created_at", "creation_date_note", "total_metric_label", "last_publish", "latest_content_views",
                     "latest_content_likes", "latest_content_comments", "data_source", "last_successful_at")
             for field in keep:
                 if old.get(field) is not None:
