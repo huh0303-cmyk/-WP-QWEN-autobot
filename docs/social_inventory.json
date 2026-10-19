@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-18",
-  "basis": "저장소 계정 등록부 스냅샷. 구독자·조회수는 최신 API 통계가 연결되지 않은 경우 빈 값으로 표시. 게시 권한은 계정 상태와 별도.",
+  "generated_at": "2026-10-19",
+  "basis": "계정 등록부 스냅샷. 직접 프로필 URL이 검증되지 않은 항목은 실제 프로필인 척하는 가짜 URL을 만들지 않고, 플랫폼 검색 링크(search_url)를 제공해 사용자가 검색 결과로 확인하도록 표시.",
   "accounts": [
     {
       "platform": "YouTube",
@@ -275,7 +275,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.facebook.com/search/top/?q=Seoul%20Health365%20Shop",
+      "link_type": "platform_search"
     },
     {
       "platform": "Facebook",
@@ -286,7 +288,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.facebook.com/search/top/?q=Seoul%20Jisoo",
+      "link_type": "platform_search"
     },
     {
       "platform": "Facebook",
@@ -297,7 +301,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.facebook.com/search/top/?q=Seoul%20Travel365%20Shop",
+      "link_type": "platform_search"
     },
     {
       "platform": "Facebook",
@@ -407,7 +413,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.threads.com/search?q=Japanese%20Survival",
+      "link_type": "platform_search"
     },
     {
       "platform": "Threads",
@@ -418,7 +426,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.threads.com/search?q=Seoul%20Jisoo",
+      "link_type": "platform_search"
     },
     {
       "platform": "Threads",
@@ -462,7 +472,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.tiktok.com/search?q=Seoul%20Health365%20Shop",
+      "link_type": "platform_search"
     },
     {
       "platform": "TikTok",
@@ -473,7 +485,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.tiktok.com/search?q=Seoul%20Jisoo",
+      "link_type": "platform_search"
     },
     {
       "platform": "TikTok",
@@ -484,7 +498,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.tiktok.com/search?q=Seoul%20Travel365%20Shop",
+      "link_type": "platform_search"
     },
     {
       "platform": "TikTok",
@@ -506,7 +522,9 @@
       "exists": false,
       "followers": null,
       "views": null,
-      "last_publish": ""
+      "last_publish": "",
+      "search_url": "https://www.tiktok.com/search?q=SIS%20Japanese%20%C2%B7%20Survival",
+      "link_type": "platform_search"
     },
     {
       "platform": "TikTok",
