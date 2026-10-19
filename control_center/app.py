@@ -992,6 +992,37 @@ def get_tistory_data() -> list[dict[str, object]]:
     """Build five Tistory control-room cards without inferring unavailable traffic data."""
     path = Path(__file__).resolve().parents[1] / "config" / "tistory_portfolio.json"
     rows = json.loads(path.read_text(encoding="utf-8")).get("sites", [])
+    # Recover missing Tistory cards from the canonical automation-room registry.
+    # This prevents a stale/partial portfolio file from hiding T4/T5 on the dashboard.
+    room_path = Path(__file__).resolve().parents[1] / "config" / "automation_rooms.json"
+    try:
+        room_rows = json.loads(room_path.read_text(encoding="utf-8")).get("rooms", [])
+    except (OSError, ValueError, TypeError):
+        room_rows = []
+    by_id = {str(row.get("site_id") or ""): row for row in rows if row.get("site_id")}
+    room_order = {"tistory_insurance_lab": 1, "tistory_finance_housing": 2,
+                  "tistory_health_info": 3, "tistory_life365": 4, "tistory_ktrip365": 5}
+    for room in room_rows:
+        site_id = str(room.get("room_id") or "")
+        if str(room.get("platform") or "").lower() != "tistory" or not site_id or site_id in by_id:
+            continue
+        url = str(room.get("destination_id") or "").strip()
+        if not url:
+            continue
+        recovered = {
+            "site_id": site_id, "url": url,
+            "title": str(room.get("name") or site_id),
+            "current_label": str(room.get("name") or site_id),
+            "launch_order": room_order.get(site_id, 99),
+            "launch_enabled": bool(room.get("enabled", True)),
+            "lifecycle": "recovered_from_automation_rooms",
+            "preserve_identity": True, "language": str(room.get("language") or "ko"),
+            "categories": [], "description": "자동화 등록부에서 복구한 Tistory 계정 카드",
+            "publish_policy": room.get("publish_policy", "awaiting_approval"),
+        }
+        rows.append(recovered)
+        by_id[site_id] = recovered
+    rows.sort(key=lambda row: (row.get("launch_order") or 999, str(row.get("site_id") or "")))
     latest_by_site: dict[str, dict[str, object]] = {}
     latest_path = Path(__file__).resolve().parents[1] / "output" / "tistory_5_drafts_2026-09-01.json"
     if latest_path.exists():
