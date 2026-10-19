@@ -37,6 +37,21 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 <span class="na">기준 값이 같으면 다음 지표로 순서를 정합니다</span></div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
+<section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
+<h2 style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot · Total Pageviews</h2>
+<div class="sub" id="blogger-pageviews-meta">Blogger API 공식 누적 페이지뷰 수집을 기다리는 중...</div>
+<div class="bar" style="margin-top:8px;flex-wrap:wrap">
+<label for="blogger-pageviews-select">블로그 선택</label>
+<select id="blogger-pageviews-select"><option>수집 대기</option></select>
+<strong id="blogger-pageviews-total" style="margin-left:8px">누적 페이지뷰 미수집</strong>
+<span id="blogger-pageviews-daily" class="na">일일 증감 미확인</span>
+</div>
+<div style="width:100%;overflow-x:auto;background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px">
+<svg id="blogger-pageviews-chart" viewBox="0 0 900 250" role="img" aria-label="Blogspot daily pageviews chart" style="display:block;width:100%;min-width:520px;height:auto"><text x="450" y="120" text-anchor="middle" fill="#64748b">공식 Blogger API 통계를 수집 중입니다.</text></svg>
+</div>
+<div class="sub" style="margin:7px 0">일일 페이지뷰는 연속된 날짜의 Blogger 누적 페이지뷰 차이로 계산합니다. 과거 스냅샷이 없는 날짜는 0이 아닌 미확인으로 표시합니다.</div>
+<div class="table-wrap"><table><thead><tr><th>블로그</th><th>Total Pageviews</th><th>일일 Pageviews</th><th>수집 상태</th><th>확인 시각</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="5" class="na">데이터 수집 전</td></tr></tbody></table></div>
+</section>
 <h2 style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a"><span class="platform-heading platform-youtube">YouTube (<span id="count-youtube">0</span>)</span> · <span class="platform-heading platform-facebook">Facebook (<span id="count-facebook">0</span>)</span> · <span class="platform-heading platform-instagram">Instagram (<span id="count-instagram">0</span>)</span> · <span class="platform-heading platform-threads">Threads (<span id="count-threads">0</span>)</span> · <span class="platform-heading platform-tiktok">TikTok (<span id="count-tiktok">0</span>)</span> · 총 <span id="social-count">0</span>개</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
 <div class="bar"><label for="socialSortKey">SNS 정렬 기준</label><select id="socialSortKey"><option value="followers">구독자 / 팔로워 수 ↓</option><option value="total_views">누적 조회수 ↓</option><option value="content_count">콘텐츠 수 ↓</option><option value="latest_content_views">최근 콘텐츠 조회수 ↓</option><option value="last_publish">최근 발행일 ↓</option></select><span class="na">숫자 미수집 계정은 아래쪽 표시</span></div>
@@ -83,6 +98,49 @@ function draw(){
   }).join('');
 }
 document.getElementById('sortKey').addEventListener('change',draw);
+function drawBloggerPageviews(payload){
+ var meta=document.getElementById('blogger-pageviews-meta');
+ var select=document.getElementById('blogger-pageviews-select');
+ var totalEl=document.getElementById('blogger-pageviews-total');
+ var dailyEl=document.getElementById('blogger-pageviews-daily');
+ var chart=document.getElementById('blogger-pageviews-chart');
+ var tbody=document.getElementById('blogger-pageviews-rows');
+ if(!payload||!Array.isArray(payload.blogs)){meta.textContent='Blogger 페이지뷰 데이터가 아직 없습니다.';return;}
+ var blogs=payload.blogs.slice().sort(function(a,b){
+  var av=Number.isFinite(a.total_pageviews)?a.total_pageviews:-1;
+  var bv=Number.isFinite(b.total_pageviews)?b.total_pageviews:-1;
+  return bv-av||String(a.title).localeCompare(String(b.title));
+ });
+ var old=select.value;
+ select.innerHTML=blogs.map(function(b){return '<option value="'+esc(b.key)+'">'+esc(b.title)+'</option>';}).join('');
+ if(old&&blogs.some(function(b){return b.key===old;}))select.value=old;
+ else {var first=blogs.find(function(b){return Number.isFinite(b.total_pageviews);});if(first)select.value=first.key;}
+ function num(v){return Number.isFinite(v)?f(v):'<span class="na">미확인</span>';}
+ function statusLabel(b){return ({OK:'정상 수집',BASELINE_PENDING:'누적값 수집됨 · 일일 기준값 축적 중',COUNTER_RESET_BASELINE_REQUIRED:'누적 카운터 감소 · 기준 재설정 필요',BLOGGER_OAUTH_SECRETS_MISSING:'Blogger API 인증 정보 미설정',BLOGGER_OAUTH_REFRESH_FAILED:'Blogger 인증 갱신 실패',TOTAL_PAGEVIEWS_NOT_RETURNED:'API가 누적값을 반환하지 않음',API_ERROR:'API 수집 실패',NOT_COLLECTED:'미수집'})[b.status]||b.status||'미확인';}
+ function selected(){return blogs.find(function(b){return b.key===select.value;})||blogs[0];}
+ function renderChart(b){
+  var series=(b.history||[]).slice(-30), valid=series.filter(function(p){return Number.isFinite(p.daily_pageviews);});
+  if(!valid.length){chart.innerHTML='<text x="450" y="112" text-anchor="middle" fill="#64748b" font-size="16">일일 그래프는 누적값이 2일 이상 수집된 뒤 표시됩니다.</text><text x="450" y="140" text-anchor="middle" fill="#94a3b8" font-size="12">현재 수집 상태: '+esc(statusLabel(b))+'</text>';return;}
+  var W=900,H=250,L=54,R=18,T=18,B=42,PW=W-L-R,PH=H-T-B;
+  var max=Math.max.apply(null,valid.map(function(p){return p.daily_pageviews;}));max=Math.max(max,1);
+  var pts=series.map(function(p,i){if(!Number.isFinite(p.daily_pageviews))return null;return {x:L+(series.length<=1?PW/2:i*PW/(series.length-1)),y:T+PH-(p.daily_pageviews/max)*PH,v:p.daily_pageviews,date:p.date};});
+  var lines=[0,0.5,1].map(function(q){var y=T+PH-q*PH;return '<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#e2e8f0"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#64748b">'+f(Math.round(max*q))+'</text>';}).join('');
+  var validPts=pts.filter(Boolean), poly=validPts.map(function(p){return p.x+','+p.y;}).join(' ');
+  var circles=validPts.map(function(p){return '<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="#2563eb"><title>'+esc(p.date)+': '+f(p.v)+'</title></circle>';}).join('');
+  var labels=[0,Math.floor((series.length-1)/2),series.length-1].filter(function(v,i,a){return a.indexOf(v)===i&&series[v];}).map(function(i){var p=series[i];return '<text x="'+(L+(series.length<=1?PW/2:i*PW/(series.length-1)))+'" y="'+(H-14)+'" text-anchor="middle" font-size="11" fill="#64748b">'+esc(String(p.date||'').slice(5))+'</text>';}).join('');
+  chart.innerHTML=lines+'<polyline points="'+poly+'" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+circles+labels;
+ }
+ function render(){
+  var b=selected();if(!b)return;
+  totalEl.innerHTML='Total Pageviews: '+num(b.total_pageviews);
+  dailyEl.innerHTML='일일 Pageviews: '+num(b.daily_pageviews);
+  dailyEl.className=Number.isFinite(b.daily_pageviews)?'good':'na';
+  meta.textContent='수집 시각 '+String(payload.generated_at||'미확인').slice(0,16).replace('T',' ')+' · Blogger API v3 · '+blogs.length+'개 블로그 · 차트는 누적 페이지뷰 차이로 계산';
+  renderChart(b);
+  tbody.innerHTML=blogs.map(function(x){return '<tr><td style="text-align:left"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener">'+esc(x.title||x.url)+'</a></td><td>'+num(x.total_pageviews)+'</td><td>'+num(x.daily_pageviews)+'</td><td>'+esc(statusLabel(x))+'</td><td>'+esc(String(x.checked_at||'').slice(0,16).replace('T',' ')||'미확인')+'</td></tr>';}).join('');
+ }
+ select.onchange=render;render();
+}
 function drawSocial(data){
  if(!data)return;
  SOCIAL_DATA=data;
@@ -157,6 +215,7 @@ document.getElementById('socialSortKey').addEventListener('change',function(){if
 fetch('social_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_METRICS=d;if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);}).catch(function(e){document.getElementById('social-meta').textContent+=' · 통계 스냅샷을 불러오지 못함';});
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(j){
   J=j;
+  drawBloggerPageviews(j.blogger_pageviews);
   var hasV=(j.rows||[]).some(function(r){return Number.isFinite(r.visitors)});
   document.getElementById('sortKey').value=hasV?'visitors':'clicks';
   draw();
