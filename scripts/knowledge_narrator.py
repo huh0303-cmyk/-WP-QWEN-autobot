@@ -51,28 +51,15 @@ CHANNEL_PROFILES = {
 
 
 def select_documentary_narrator(channel_key: str = "") -> dict[str, str]:
-    """Choose a stable professional narrator per channel; explicit env overrides win."""
-    key = (channel_key or "").strip().lower()
-    profile = CHANNEL_PROFILES.get(key)
-    if profile:
-        voice_id = os.getenv(profile["env"], "").strip() or profile["default"]
-        return {
-            "voice_id": voice_id, "name": profile["name"],
-            "accent": profile["accent"], "gender": profile["gender"],
-            "style": profile["style"], "profile": key,
-        }
+    """Choose one date-stable narrator per episode, alternating male/female across dates."""
+    from voice_rotation import choose_voice
 
-    # Backwards-compatible fallback for other callers: honor account-specific profiles,
-    # then account voices, then known public premade voices.
-    configured = []
-    for profile_key in ("US_MALE", "US_FEMALE", "UK_MALE", "UK_FEMALE"):
-        voice_id = os.getenv(f"KNOWLEDGE_VOICE_{profile_key}_ID", "").strip()
-        if voice_id:
-            country, gender = profile_key.lower().split("_")
-            configured.append({"voice_id": voice_id, "name": profile_key, "accent": country, "gender": gender})
-    try:
-        available = _documentary_candidates(os.getenv("ELEVENLABS_API_KEY", "").strip())
-    except Exception:
-        available = []
-    pool = configured or available or FALLBACKS
-    return random.SystemRandom().choice(pool)
+    key = (channel_key or "").strip().lower()
+    voice = choose_voice(key)
+    profile = CHANNEL_PROFILES.get(key, {})
+    return {
+        "voice_id": voice["id"], "name": voice["name"],
+        "accent": profile.get("accent", "english"), "gender": voice["gender"],
+        "style": profile.get("style", "documentary narration"),
+        "profile": key, "language": voice["language"], "date": voice["date"],
+    }
