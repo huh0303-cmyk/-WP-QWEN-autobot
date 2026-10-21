@@ -305,3 +305,9 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - `task_id=blogger33-daily-audit-20261021-0153-kst`; a read-only reachability and SSH audit of `root@187.127.121.57` was attempted using the established key. ICMP did not reply, TCP port 22 timed out, and SSH again ended after its 15-second connection limit with `connect to host 187.127.121.57 port 22: Connection timed out`.
 - No GitHub Actions dispatch, retry, manual publication, or production mutation was performed. `korea365-blogger33-daily.timer`, the 2026-10-20 exact 33-target schedule, all transient service outcomes, same-date publication-key duplicates, OAuth/API errors, and `/opt/korea365/artifacts/blogger-33-public-results.json` remain unverified.
 - Next action: restore or confirm VPS network/SSH reachability, then repeat this read-only audit for the 2026-10-20 run before any recovery. Do not dispatch `publish-blogger-33-now.yml` or retry a key until its same-date publication marker and public post have been checked.
+
+## 2026-10-22 01:55 KST — Blogger 33 daily audit blocked
+
+- `task_id=blogger33-daily-audit-20261022-0155-kst`; a bounded, read-only TCP port-22 check of `root@187.127.121.57` was attempted using the established audit path. The probe returned `False` after approximately 22 seconds, so SSH and the remote audit could not begin.
+- No GitHub Actions dispatch, retry, manual publication, or production mutation was performed. The timer's enabled/active state, the latest completed 2026-10-21 33-target schedule, transient-service outcomes, same-date publication-key duplicates, OAuth/API errors, and `/opt/korea365/artifacts/blogger-33-public-results.json` remain unverified.
+- Next action: restore or confirm VPS SSH/network reachability, then repeat this read-only audit for the 2026-10-21 run before any recovery. Do not dispatch `publish-blogger-33-now.yml` or retry a key until its same-date publication marker and public post have been checked.
