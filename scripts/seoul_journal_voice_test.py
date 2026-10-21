@@ -46,4 +46,6 @@ out.mkdir(parents=True, exist_ok=True)
 audio = out / "seoul-journal-korean-voice-test.mp3"
 audio.write_bytes(response.content)
 (out / "script.txt").write_text(text + "\n", encoding="utf-8")
+import json
+(out / "voice-selection.json").write_text(json.dumps(voice, ensure_ascii=False, indent=2), encoding="utf-8")
 print(f"Created {audio} ({len(response.content)} bytes). No YouTube upload was attempted.")
