@@ -51,7 +51,9 @@ def choose_voice(channel: str, episode_date: dt.date | None = None) -> dict[str,
     if not configured and cfg.get("single_env"):
         one = os.getenv(cfg["single_env"], "").strip()
         if one:
-            configured = [one]
+            # Keep the account's existing voice in the pool while adding multilingual
+            # fallbacks so the channel still varies if only one ID was configured.
+            configured = [one] + [v["id"] for v in DEFAULT_VOICES if v["id"] != one]
     if configured:
         # Resolve known names when possible; custom IDs are retained as custom voices.
         known = {v["id"]: v for v in DEFAULT_VOICES}
