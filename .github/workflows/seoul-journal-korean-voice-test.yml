@@ -1,0 +1,48 @@
+name: Seoul Journal Korean Voice Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      voice_id:
+        description: "ElevenLabs voice ID for the Korean Seoul Journal anchor"
+        required: true
+        type: string
+      script:
+        description: "Korean script to render (short test recommended)"
+        required: true
+        type: string
+        default: "안녕하십니까. 서울저널입니다. 확인된 사실을 바탕으로 오늘의 주요 소식을 전해드립니다."
+
+permissions:
+  contents: read
+
+jobs:
+  generate-korean-voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependency
+        run: python -m pip install requests
+
+      - name: Generate Seoul Journal Korean audio
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          SEOUL_JOURNAL_VOICE_ID: ${{ inputs.voice_id }}
+          SEOUL_JOURNAL_TEXT: ${{ inputs.script }}
+        run: python scripts/seoul_journal_voice_test.py
+
+      - name: Upload audio for listening
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-korean-voice-test
+          path: artifacts/seoul-journal/
+          if-no-files-found: error
+          retention-days: 7
