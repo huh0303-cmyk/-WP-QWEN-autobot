@@ -141,7 +141,7 @@ def _sns_cards() -> list[dict]:
         platform = row.get("platform", "")
         if platform in {"Instagram", "Threads", "Facebook", "TikTok"} and row.get("role") not in {
             "korean_topik", "english", "japanese", "hot_item_shop"
-        }:
+        } and not (platform == "Instagram" and row.get("role") in {"travel_shop", "health_shop"}):
             continue
         role = roles.get(row.get("role"), {})
         exists = bool(row.get("account_exists"))
