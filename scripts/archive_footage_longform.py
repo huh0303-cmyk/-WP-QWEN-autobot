@@ -48,7 +48,7 @@ def _reviewed_image(channel_key: str, workdir: str) -> str:
 
 def _select_narrator(channel_key: str) -> None:
     """Choose one of three approved male/female voices once per production."""
-    narrator = select_documentary_narrator()
+    narrator = select_documentary_narrator(channel_key)
     narration_engine.VOICE_ID = narrator["voice_id"]
     base.log(f"   narrator: {narrator['name']} ({narrator['accent']}, {narrator['gender']}) for {channel_key}")
 
