@@ -40,14 +40,36 @@ def _documentary_candidates(api_key: str) -> list[dict[str, str]]:
     return candidates
 
 
-def select_documentary_narrator() -> dict[str, str]:
-    """Prefer account voices spanning US/UK and male/female; never select a blank ID."""
+# Stable channel assignments. IDs are ElevenLabs public premade voices; per-channel
+# environment overrides allow the owner to substitute a preferred voice without code changes.
+CHANNEL_PROFILES = {
+    "nasa": {"env": "ELEVENLABS_VOICE_ID_NASA", "default": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "accent": "american", "gender": "male", "style": "authoritative science documentary"},
+    "history": {"env": "ELEVENLABS_VOICE_ID_HISTORY_TODAY", "default": "21m00Tcm4TlvDq8ikWAM", "name": "Rachel", "accent": "american", "gender": "female", "style": "clear, measured historical narration"},
+    "silent_era": {"env": "ELEVENLABS_VOICE_ID_OLD_HOLLYWOOD", "default": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "accent": "american", "gender": "male", "style": "classic cinema documentary"},
+    "retro_reels": {"env": "ELEVENLABS_VOICE_ID_RETRO_USA", "default": "EXAVITQu4vr4xnSDxMaL", "name": "Bella", "accent": "american", "gender": "female", "style": "warm, conversational nostalgia"},
+}
+
+
+def select_documentary_narrator(channel_key: str = "") -> dict[str, str]:
+    """Choose a stable professional narrator per channel; explicit env overrides win."""
+    key = (channel_key or "").strip().lower()
+    profile = CHANNEL_PROFILES.get(key)
+    if profile:
+        voice_id = os.getenv(profile["env"], "").strip() or profile["default"]
+        return {
+            "voice_id": voice_id, "name": profile["name"],
+            "accent": profile["accent"], "gender": profile["gender"],
+            "style": profile["style"], "profile": key,
+        }
+
+    # Backwards-compatible fallback for other callers: honor account-specific profiles,
+    # then account voices, then known public premade voices.
     configured = []
-    for profile in ("US_MALE", "US_FEMALE", "UK_MALE", "UK_FEMALE"):
-        voice_id = os.getenv(f"KNOWLEDGE_VOICE_{profile}_ID", "").strip()
+    for profile_key in ("US_MALE", "US_FEMALE", "UK_MALE", "UK_FEMALE"):
+        voice_id = os.getenv(f"KNOWLEDGE_VOICE_{profile_key}_ID", "").strip()
         if voice_id:
-            country, gender = profile.lower().split("_")
-            configured.append({"voice_id": voice_id, "name": profile, "accent": country, "gender": gender})
+            country, gender = profile_key.lower().split("_")
+            configured.append({"voice_id": voice_id, "name": profile_key, "accent": country, "gender": gender})
     try:
         available = _documentary_candidates(os.getenv("ELEVENLABS_API_KEY", "").strip())
     except Exception:
