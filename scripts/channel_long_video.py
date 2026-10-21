@@ -413,11 +413,15 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     scenes = list(data["scenes"])
     if cfg["kind"] == "health":
         scenes.append({"narration": DISCLAIMER[lang], "visual": "doctor consultation senior"})
+    from voice_rotation import choose_voice
+    voice_profile = choose_voice(channel)
+    selected_voice_id = voice_profile["id"]
+    print(f"VOICE_ROTATION channel={channel} language={voice_profile['language']} gender={voice_profile['gender']} name={voice_profile['name']} id={selected_voice_id}", flush=True)
     used: set = set()
     clips, durs, texts, credits = [], [], [], []
     for i, sc in enumerate(scenes):
         audio = tmp / f"a_{i:02d}.mp3"
-        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, os.getenv(cfg["voice_id_env"], "").strip() or cfg["voice_id_default"]))
+        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, selected_voice_id))
         dur = duration(audio) + 0.45
         media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"])
         if media is None:
@@ -604,7 +608,7 @@ def main() -> int:
         raise RuntimeError(f"Duration {built['duration_s']}s outside the 3-5 minute window (tolerance 150-330s)")
     make_thumbnail(data["title"], outdir, CHANNELS[a.channel]["lang"])
     manifest = {"channel": a.channel, "date": a.date, "topic": topic, "title": data["title"], "hook": data.get("hook"),
-                "tags": data.get("tags"), "scenes": data["scenes"], "description": description_for(a.channel, data, topic), **built}
+                "voice": voice_profile, "tags": data.get("tags"), "scenes": data["scenes"], "description": description_for(a.channel, data, topic), **built}
     (outdir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"BUILT {built['duration_s']}s -> {built['video_path']}", flush=True)
     if a.upload:
