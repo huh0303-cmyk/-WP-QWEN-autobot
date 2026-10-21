@@ -67,7 +67,7 @@ def choose_voice(channel: str, episode_date: dt.date | None = None) -> dict[str,
     digest = hashlib.sha256(key.encode("utf-8")).digest()
     offset = digest[0] % 2
     target_gender = "male" if (date.toordinal() + offset) % 2 == 0 else "female"
-    matching = [v for v in pool if v.get("gender") == target_gender]
+    matching = [v for v in pool if v.get("gender") in (target_gender, "unknown")]
     candidates = matching or pool
     # Date/channel-seeded choice is repeatable on reruns, yet rotates across episodes.
     seed = int.from_bytes(hashlib.sha256(f"{key}:{date.isoformat()}".encode()).digest()[:8], "big")
