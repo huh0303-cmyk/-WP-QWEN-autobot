@@ -412,3 +412,14 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 증거: publish-blogger-33-now.yml 최근 40 run 중 다수 `cancelled`(같은 concurrency 그룹 대기열은 1개만 유지) — 확장 배치 예약이 조용히 소실.
 - 변경: concurrency 그룹에 `github.run_id` 추가(취소 방지, 확장의 백로그 가드 10개가 동시성 제어), push `paths`에서 워크플로우 파일 자신 제거(커밋만으로 33사이트 발행되는 위험 제거; `data/blogger33-run-trigger.txt`는 유지).
 - 미검증: 일부 run `failure` 원인(로그 접근 불가, 별도 확인 필요). 소량 예약 시험 미실시.
+
+
+## tistory-daily-audit-20261021
+
+- `task_id=tistory-daily-audit-20261021`; heartbeat 2026-10-21T16:57:28Z (2026-10-22 01:57 KST) 기준, 2026-10-21 KST Tistory 일일 점검.
+- 선택표의 정확한 대상 3곳: `tistory_health_info` (16:53 KST, https://k-healthcare.tistory.com/), `tistory_insurance_lab` (19:27 KST, https://k-insight-vietnam.tistory.com/), `tistory_ktrip365` (21:37 KST, https://k-trip365.tistory.com/).
+- GitHub Dispatcher #120은 19:04 KST에 첫 대상만 `dispatched`로 기록했다. 연결된 Tistory Daily Plan은 `PAUSED — quality incident` 상태로 `skipped`; dispatch는 공개 발행 증거가 아니다. 두 번째·세 번째 대상의 예약 영수증은 없었고 다음 Dispatcher #121은 2026-10-22 00:12 KST 실행으로 다음 날 건이다.
+- Windows 예약 작업 `Tistory5개_일일자동발행`은 22:45 KST에 종료 코드 0을 반환했으나, 읽기 전용 로컬 상태에는 86개 pending/retry와 해당 날짜 대상의 처리 완료 영수증이 없었다. 종료 코드만으로 공개 성공 처리하지 않았다.
+- 공개 RSS 직접 확인: k-healthcare 최신 글 2026-10-18, k-insight-vietnam 2026-10-17, k-trip365 2026-10-10. 2026-10-21 날짜의 새 공개 글은 확인되지 않음. 결론: 공개 발행 확인 0/3, 공개 URL 없음.
+- Google Sheets 큐의 셀 데이터는 브라우저의 내보내기/렌더링 경로 차단으로 읽지 못해 대조 미완료. 비밀·인증정보는 기록하지 않음.
+- 조치: 실패 작업을 임의 재시도하거나 몰아발행하지 말 것. 품질 일시중지 원인과 dispatcher/로컬 큐 연결을 해결한 뒤 다음 정상 슬롯에서 진행; 선택표 외 대상 추가 금지.
