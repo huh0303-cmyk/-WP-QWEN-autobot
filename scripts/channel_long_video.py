@@ -463,7 +463,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     if burn.returncode != 0:
         raise RuntimeError(f"subtitle burn failed: {burn.stderr[-600:]}")
     total = duration(final)
-    return {"video_path": str(final), "duration_s": round(total, 1), "credits": credits, "srt": str(srt), "first_media": credits[0]}
+    return {"video_path": str(final), "duration_s": round(total, 1), "credits": credits, "srt": str(srt), "first_media": credits[0], "voice": voice_profile}
 
 
 def make_thumbnail(title: str, outdir: Path, lang: str):
@@ -608,7 +608,7 @@ def main() -> int:
         raise RuntimeError(f"Duration {built['duration_s']}s outside the 3-5 minute window (tolerance 150-330s)")
     make_thumbnail(data["title"], outdir, CHANNELS[a.channel]["lang"])
     manifest = {"channel": a.channel, "date": a.date, "topic": topic, "title": data["title"], "hook": data.get("hook"),
-                "voice": voice_profile, "tags": data.get("tags"), "scenes": data["scenes"], "description": description_for(a.channel, data, topic), **built}
+                "voice": built.get("voice"), "tags": data.get("tags"), "scenes": data["scenes"], "description": description_for(a.channel, data, topic), **built}
     (outdir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"BUILT {built['duration_s']}s -> {built['video_path']}", flush=True)
     if a.upload:
