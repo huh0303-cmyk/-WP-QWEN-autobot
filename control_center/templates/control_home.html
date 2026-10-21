@@ -56,6 +56,7 @@ tbody tr:hover{filter:brightness(.98)}
 {% include '_korea365_app_nav.html' %}
 </div></header>
 <main>
+<div id="today-banner" style="margin:0 0 7px;padding:8px 10px;border-radius:7px;background:#0f172a;color:#fff;font-size:14px;font-weight:900;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>런던 프로젝트 통제실</span><span id="today-date-kst">한국 시간 날짜 확인 중…</span></div>
 <section class="k365-ops-note" aria-label="운영 상태 안내">
   <div><strong>완료 기준은 공개 영수증입니다.</strong> 접수·대기열·계정 연결은 발행 완료가 아니며, 공개 URL과 목적지 확인 뒤 완료로 표시합니다.</div>
   <div class="k365-ops-actions"><a href="https://blog.korea365.org/publish">4-Agent 글 발행</a><a href="https://sns.korea365.org/social-accounts?platform=YouTube">채널 상태 확인</a></div>
@@ -113,6 +114,10 @@ const todayKst=()=>{
  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
  return parts.year+'-'+parts.month+'-'+parts.day;
 };
+function refreshTodayBanner(){
+ const el=document.getElementById('today-date-kst');
+ if(el)el.textContent='오늘 날짜 · '+dateLabel(todayKst())+' KST · '+new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
+}
 function shortSite(c){
  try{
   const u=new URL(c.url);let h=u.hostname.replace(/^www\./,'');
@@ -223,12 +228,24 @@ async function loadBlog(){
 }
 async function loadSocial(){
  const r=await fetch('/api/control/social-ranking',{cache:'no-store'});if(!r.ok)throw new Error('social '+r.status);const d=await r.json();
- document.getElementById('social-title').textContent='YouTube + SNS 순위 ('+dateLabel(todayKst())+')';
- document.getElementById('social-rows').innerHTML=(d.rows||[]).map(c=>{
+ const platformOrder=['YouTube','TikTok','Instagram','Facebook','Threads'];
+ const platformRank=p=>{const i=platformOrder.findIndex(x=>x.toLowerCase()===String(p||'').toLowerCase());return i<0?platformOrder.length:i;};
+ const rows=(d.rows||[]).slice().sort((a,b)=>{
+  const pa=platformRank(a.platform),pb=platformRank(b.platform);if(pa!==pb)return pa-pb;
+  const aa=Number.isFinite(a.audience)?a.audience:-1,ab=Number.isFinite(b.audience)?b.audience:-1;
+  if(aa!==ab)return ab-aa;
+  return String(a.name||'').localeCompare(String(b.name||''),'ko');
+ });
+ const ranks={};
+ document.getElementById('social-title').textContent='YouTube + SNS 플랫폼별 순위 ('+dateLabel(todayKst())+')';
+ document.getElementById('social-rows').innerHTML=rows.map((c,i)=>{
   const p=String(c.platform||'').toLowerCase();
+  ranks[p]=(ranks[p]||0)+1;
+  const prior=i>0?String(rows[i-1].platform||'').toLowerCase():'';
+  const groupStart=prior!==p?' group-start':'';
   const launch='https://sns.korea365.org/social-accounts?platform='+encodeURIComponent(c.platform||'통합');
   const monetized=!!(c.revenue&&c.revenue.monetized);
-  return '<tr class="platform-'+esc(p)+(monetized?' monetized-row':'')+'"><td>'+rank(c.row_number)+'</td><td><span class="platform-badge">'+esc(c.platform||'')+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+socialMetric(c.content_count,c.content_count_delta,c.metric_status)+'</td><td>'+recentPublication(c)+'</td><td><a class="quick" href="'+launch+'">상태·작업</a></td></tr>';
+  return '<tr class="platform-'+esc(p)+groupStart+(monetized?' monetized-row':'')+'"><td>'+rank(ranks[p])+'</td><td><span class="platform-badge">'+esc(c.platform||'')+'</span></td><td>'+(c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a>':esc(c.name))+'</td><td class="'+(monetized?'revenue-cell':'')+'">'+revenueStatus(c.revenue)+'</td><td>'+socialMetric(c.audience,c.audience_delta,c.metric_status)+'</td><td>'+socialMetric(c.views,c.views_delta,c.views_status||c.metric_status)+'</td><td>'+socialMetric(c.content_count,c.content_count_delta,c.metric_status)+'</td><td>'+recentPublication(c)+'</td><td><a class="quick" href="'+launch+'">상태·작업</a></td></tr>';
  }).join('');
  return d.generated_at;
 }
@@ -236,7 +253,7 @@ async function refresh(){
  try{const stamps=await Promise.all([loadBlog(),loadSocial()]);document.getElementById('updated').textContent='최근 갱신 '+String(stamps.filter(Boolean).sort().pop()||'').replace('T',' ').slice(0,16)+' KST';}
  catch(e){document.getElementById('updated').textContent='데이터 갱신 중 · '+e.message;}
 }
-refresh();setInterval(refresh,300000);
+refreshTodayBanner();setInterval(refreshTodayBanner,30000);refresh();setInterval(refresh,300000);
 </script>
 </body>
 </html>
