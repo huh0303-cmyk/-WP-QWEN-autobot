@@ -71,6 +71,11 @@ jobs:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+      ELEVENLABS_MODEL_ID: eleven_multilingual_v2
+      ELEVENLABS_VOICE_ID_HEALTH_USA: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_B }}
+      ELEVENLABS_VOICE_ID_HEALTH_JAPAN: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_A }}
+      ELEVENLABS_VOICE_ID_SEOUL_JISOO1: ${{ vars.ELEVENLABS_VOICE_ID_SEOUL_JISOO1 }}
       BOOKING_AID: ${{ secrets.BOOKING_AID }}
       AGODA_CID: ${{ secrets.AGODA_CID }}
       KLOOK_AID: ${{ secrets.KLOOK_AID }}
