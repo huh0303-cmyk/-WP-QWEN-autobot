@@ -19,7 +19,7 @@ from knowledge_narrator import select_documentary_narrator
 
 
 def _select_narrator() -> None:
-    narrator = select_documentary_narrator()
+    narrator = select_documentary_narrator("nasa")
     narration_engine.VOICE_ID = narrator["voice_id"]
     base.log(f"   narrator: {narrator['name']} ({narrator['accent']}, {narrator['gender']}) for NASA & Space Times")
 
