@@ -1,0 +1,44 @@
+name: ElevenLabs voice audition - seven channels
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_audio_generation:
+        description: Generate seven short audition clips only (no video or YouTube upload)
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  audition:
+    if: inputs.confirm_audio_generation == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: youtube-channels
+    env:
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+      ELEVENLABS_MODEL_ID: eleven_multilingual_v2
+      HEALTH_CLINIC_VOICE_ID_EN_B: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_B }}
+      HEALTH_CLINIC_VOICE_ID_JP_A: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_A }}
+      ELEVENLABS_VOICE_ID_HEALTH_USA: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_B }}
+      ELEVENLABS_VOICE_ID_HEALTH_JAPAN: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_A }}
+      ELEVENLABS_VOICE_ID_NASA: ${{ vars.ELEVENLABS_VOICE_ID_NASA }}
+      ELEVENLABS_VOICE_ID_HISTORY_TODAY: ${{ vars.ELEVENLABS_VOICE_ID_HISTORY_TODAY }}
+      ELEVENLABS_VOICE_ID_RETRO_USA: ${{ vars.ELEVENLABS_VOICE_ID_RETRO_USA }}
+      ELEVENLABS_VOICE_ID_OLD_HOLLYWOOD: ${{ vars.ELEVENLABS_VOICE_ID_OLD_HOLLYWOOD }}
+      ELEVENLABS_VOICE_ID_SEOUL_JISOO1: ${{ vars.ELEVENLABS_VOICE_ID_SEOUL_JISOO1 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install audition dependencies
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Generate seven private voice samples
+        run: python scripts/elevenlabs_voice_audit.py
+      - name: Save audio samples and voice manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: elevenlabs-voice-audition-${{ github.run_id }}
+          path: artifacts/voice-audit/
+          retention-days: 14
