@@ -586,6 +586,7 @@ def main() -> int:
     ap.add_argument("--output-root", default=str(ROOT / "artifacts" / "long-video"))
     a = ap.parse_args()
     date = dt.date.fromisoformat(a.date)
+    os.environ.setdefault("EPISODE_DATE", a.date)
     outdir = Path(a.output_root) / a.channel / a.date
     outdir.mkdir(parents=True, exist_ok=True)
     if a.preflight_only:
