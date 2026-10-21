@@ -417,7 +417,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     clips, durs, texts, credits = [], [], [], []
     for i, sc in enumerate(scenes):
         audio = tmp / f"a_{i:02d}.mp3"
-        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, os.getenv(cfg["voice_id_env"], cfg["voice_id_default"])))
+        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, os.getenv(cfg["voice_id_env"], "").strip() or cfg["voice_id_default"]))
         dur = duration(audio) + 0.45
         media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"])
         if media is None:
