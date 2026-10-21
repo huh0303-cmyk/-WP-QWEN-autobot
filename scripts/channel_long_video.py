@@ -33,17 +33,17 @@ UA = {"User-Agent": "Korea365-ChannelVideo/1.0"}
 CHANNELS = {
     "health_usa": {
         "channel_id": "UC91BpNSb4nUwD6jrpthK7FQ", "token_env": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN",
-        "lang": "en", "voice": "en-US-AriaNeural", "category": "26", "kind": "health", "offset": 0,
+        "lang": "en", "voice": "en-US-AriaNeural", "voice_id_env": "ELEVENLABS_VOICE_ID_HEALTH_USA", "voice_id_default": "pNInz6obpgDQGcFmaJgB", "category": "26", "kind": "health", "offset": 0,
         "name": "Health Clinic USA", "tag": "#HealthClinic #SeniorHealth #HealthyAging",
     },
     "health_japan": {
         "channel_id": "UCC_PcHMv-Uxpr00Pjw_J2Wg", "token_env": "HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP",
-        "lang": "ja", "voice": "ja-JP-NanamiNeural", "category": "26", "kind": "health", "offset": 17,
+        "lang": "ja", "voice": "ja-JP-NanamiNeural", "voice_id_env": "ELEVENLABS_VOICE_ID_HEALTH_JAPAN", "voice_id_default": "", "category": "26", "kind": "health", "offset": 17,
         "name": "Health_Clinic_Japan", "tag": "#シニア健康 #健康習慣 #サプリメント",
     },
     "shopping": {
         "channel_id": "UCAizx0tPkRSol8sIhanN_QQ", "token_env": "YOUTUBE_OAUTH_REFRESH_TOKEN_SHOPPING_SEOUL_JISOO1",
-        "lang": "en", "voice": "en-US-JennyNeural", "category": "19", "kind": "shopping", "offset": 0,
+        "lang": "en", "voice": "en-US-JennyNeural", "voice_id_env": "ELEVENLABS_VOICE_ID_SEOUL_JISOO1", "voice_id_default": "EXAVITQu4vr4xnSDxMaL", "category": "19", "kind": "shopping", "offset": 0,
         "name": "Seoul_Jisoo1", "tag": "#Korea #SeoulTravel #KoreaHotels",
     },
 }
@@ -301,18 +301,40 @@ def duration(path: Path) -> float:
     return float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]).strip())
 
 
-async def _tts(text: str, voice: str, out: Path):
-    import edge_tts
-    last = None
-    for _ in range(4):
-        try:
-            await edge_tts.Communicate(text, voice, rate="-6%").save(str(out))
-            if out.exists() and out.stat().st_size > 2000:
-                return
-        except Exception as exc:  # network/voice service hiccup
-            last = exc
-            await asyncio.sleep(3)
-    raise RuntimeError(f"TTS failed for voice {voice}: {last}")
+async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = ""):
+    """Prefer the channel's fixed ElevenLabs narrator; Edge TTS is emergency fallback only."""
+    api_key = os.getenv("ELEVENLABS_API_KEY", "").strip()
+    voice_id = (elevenlabs_voice_id or "").strip()
+    if api_key and voice_id:
+        last = None
+        for attempt in range(5):
+            try:
+                response = requests.post(
+                    f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+                    headers={"xi-api-key": api_key, "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                    json={
+                        "text": text,
+                        "model_id": os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2"),
+                        "voice_settings": {"stability": 0.55, "similarity_boost": 0.78, "style": 0.15, "use_speaker_boost": True},
+                    },
+                    timeout=90,
+                )
+                if response.status_code == 429 or response.status_code >= 500:
+                    last = f"HTTP {response.status_code}: {response.text[:180]}"
+                    await asyncio.sleep(min(5 * (attempt + 1), 20))
+                    continue
+                response.raise_for_status()
+                out.write_bytes(response.content)
+                if out.exists() and out.stat().st_size > 2000:
+                    return
+                raise RuntimeError("ElevenLabs returned an empty/short audio file")
+            except Exception as exc:
+                last = exc
+                if attempt < 4:
+                    await asyncio.sleep(2)
+        raise RuntimeError(f"ElevenLabs TTS failed for voice ID {voice_id}: {last}")
+    # Fail visibly rather than silently using the cheap voice for a channel that should be upgraded.
+    raise RuntimeError(f"Missing ELEVENLABS_API_KEY or voice ID for ElevenLabs narrator (Edge voice {voice} is disabled).")
 
 
 def split_chunks(text: str, lang: str) -> list[str]:
@@ -395,7 +417,7 @@ def build_video(channel: str, data: dict, outdir: Path) -> dict:
     clips, durs, texts, credits = [], [], [], []
     for i, sc in enumerate(scenes):
         audio = tmp / f"a_{i:02d}.mp3"
-        asyncio.run(_tts(sc["narration"], cfg["voice"], audio))
+        asyncio.run(_tts(sc["narration"], cfg["voice"], audio, os.getenv(cfg["voice_id_env"], cfg["voice_id_default"])))
         dur = duration(audio) + 0.45
         media = fetch_media(sc["visual"], want_video=(i % 2 == 0), used=used, tmp=tmp, idx=i, kind=cfg["kind"])
         if media is None:
