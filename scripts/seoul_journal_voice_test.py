@@ -6,16 +6,17 @@ from pathlib import Path
 import requests
 
 api_key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
-voice_id = os.environ.get("SEOUL_JOURNAL_VOICE_ID", "").strip()
 text = os.environ.get("SEOUL_JOURNAL_TEXT", "").strip()
 
 if not api_key:
     sys.exit("ERROR: GitHub Actions secret ELEVENLABS_API_KEY is missing.")
-if not voice_id:
-    sys.exit("ERROR: enter the Korean-capable ElevenLabs voice ID in the workflow input.")
 if not text:
     sys.exit("ERROR: enter the Korean script in the workflow input.")
 
+from voice_rotation import choose_voice
+voice = choose_voice("seoul_journal")
+voice_id = voice["id"]
+print(f"VOICE_ROTATION channel=seoul_journal language=ko gender={voice['gender']} name={voice['name']} id={voice_id}")
 endpoint = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
 response = requests.post(
     endpoint,
