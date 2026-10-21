@@ -423,3 +423,14 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - 공개 RSS 직접 확인: k-healthcare 최신 글 2026-10-18, k-insight-vietnam 2026-10-17, k-trip365 2026-10-10. 2026-10-21 날짜의 새 공개 글은 확인되지 않음. 결론: 공개 발행 확인 0/3, 공개 URL 없음.
 - Google Sheets 큐의 셀 데이터는 브라우저의 내보내기/렌더링 경로 차단으로 읽지 못해 대조 미완료. 비밀·인증정보는 기록하지 않음.
 - 조치: 실패 작업을 임의 재시도하거나 몰아발행하지 말 것. 품질 일시중지 원인과 dispatcher/로컬 큐 연결을 해결한 뒤 다음 정상 슬롯에서 진행; 선택표 외 대상 추가 금지.
+
+
+## naver-daily-check-20261022
+
+- `task_id=naver-daily-check-20261022`; heartbeat received 2026-10-21T23:47:34Z = 2026-10-22 08:47 KST.
+- Requested destinations: 부의정석 `k-insight-vietnam`, 헬스의정석 `health-standard`, 생활의정석 `sky-only`. Public Naver RSS was checked read-only; no posts dated 2026-10-22 were present (confirmed count 0/3 as of 08:48 KST).
+- Latest public RSS items: N1 2026-10-10 10:18 KST, “2026년 숨은 정부 지원금과 환급금 한 번에 조회하고 신청하는 방법”, https://blog.naver.com/k-insight-vietnam/224436711920; N2 2026-10-07 19:39 KST, “콘드로이친 효능과 부작용, 올바른 선택 방법 총정리”, https://blog.naver.com/health-standard/224433862078; N3 2026-10-08 19:20 KST, “2026년 이재명 재판 재개 가능성 검토와 사법부 충돌의 모든 것”, https://blog.naver.com/sky-only/224433905222.
+- No 2026-10-22 daily plan or same-day trend brief exists locally; the configured 07:50 KST evidence deadline had passed. No workflow filename containing “naver” was present in the current GitHub workflow directory, and no Naver task other than the PC wake task was found in Windows Task Scheduler.
+- Account mapping conflict remains: the 2026-10-09 account registry lists `huh0303/huh3/huh4` as both login IDs and blog IDs, while the user heartbeat, prior daily plans, and earlier ledger mapping use the public blog IDs above. Do not publish until this registry discrepancy is reconciled.
+- Read-only opening of the N1 editor URL redirected to the Naver sign-in page; no Naver account was logged in in the inspected Chrome profile. No credentials were entered and no post/editor changes were made.
+- Outcome: no drafts were pushed to Naver and no public posts were made. Safe hold due to missing current-day research/plan, account-map discrepancy, and sign-in requirement. User must sign in manually to the intended Naver account; do not request or record a password. Then reconcile the registry and resume at a future valid slot; do not backfill missed posts.
