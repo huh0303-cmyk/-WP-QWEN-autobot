@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-21",
+  "purpose": "Stable, backed-up ElevenLabs voice assignments for the seven requested channels. These are voice IDs, not API keys.",
+  "model_id": "eleven_multilingual_v2",
+  "voice_settings": {
+    "stability": 0.55,
+    "similarity_boost": 0.78,
+    "style": 0.15,
+    "use_speaker_boost": true
+  },
+  "channels": {
+    "health_clinic_usa": {
+      "display_name": "Health Clinic USA",
+      "language": "en-US",
+      "voice_id_env": "HEALTH_CLINIC_VOICE_ID_EN_B",
+      "fallback_voice_id": "pNInz6obpgDQGcFmaJgB",
+      "voice_name": "Adam",
+      "direction": "Trustworthy, warm, measured American male health educator",
+      "source": "Existing repository secret preferred; public premade voice is fallback"
+    },
+    "health_clinic_japan": {
+      "display_name": "Health Clinic Japan",
+      "language": "ja-JP",
+      "voice_id_env": "HEALTH_CLINIC_VOICE_ID_JP_A",
+      "fallback_voice_id": "",
+      "voice_name": "Existing Japanese account voice",
+      "direction": "Calm, clear, respectful Japanese health narrator",
+      "source": "Existing repository secret required; do not substitute an English voice"
+    },
+    "nasa": {
+      "display_name": "NASA / NASA_XFILES",
+      "language": "en-US",
+      "voice_id_env": "ELEVENLABS_VOICE_ID_NASA",
+      "fallback_voice_id": "pNInz6obpgDQGcFmaJgB",
+      "voice_name": "Adam",
+      "direction": "Authoritative, deep, clear science-documentary narration"
+    },
+    "history_today": {
+      "display_name": "History Today",
+      "language": "en-US",
+      "voice_id_env": "ELEVENLABS_VOICE_ID_HISTORY_TODAY",
+      "fallback_voice_id": "21m00Tcm4TlvDq8ikWAM",
+      "voice_name": "Rachel",
+      "direction": "Clear, measured, neutral historical narration"
+    },
+    "retro_usa": {
+      "display_name": "Retro USA / RETRO_USA1",
+      "language": "en-US",
+      "voice_id_env": "ELEVENLABS_VOICE_ID_RETRO_USA",
+      "fallback_voice_id": "EXAVITQu4vr4xnSDxMaL",
+      "voice_name": "Bella",
+      "direction": "Warm, conversational, nostalgic American narration"
+    },
+    "old_hollywood": {
+      "display_name": "Old Hollywood / SILENT_ERA_FILM",
+      "language": "en-US",
+      "voice_id_env": "ELEVENLABS_VOICE_ID_OLD_HOLLYWOOD",
+      "fallback_voice_id": "pNInz6obpgDQGcFmaJgB",
+      "voice_name": "Adam",
+      "direction": "Classic cinema, composed, low-register documentary narration"
+    },
+    "seoul_jisoo1": {
+      "display_name": "Seoul_Jisoo1 / @jisoopicks",
+      "language": "en-US",
+      "voice_id_env": "ELEVENLABS_VOICE_ID_SEOUL_JISOO1",
+      "fallback_voice_id": "EXAVITQu4vr4xnSDxMaL",
+      "voice_name": "Bella",
+      "direction": "Polished, friendly, premium travel and hotel recommendation voice"
+    }
+  },
+  "notes": [
+    "Voice assignments are stable by channel; do not randomly rotate voices between uploads.",
+    "For health_clinic_japan, use the existing Japanese voice ID secret. The workflow should fail visibly if it is absent.",
+    "These fallback IDs are known public premade voice IDs. They are not proof that a voice is saved as a custom voice in the user's account.",
+    "The voice profile is backed up in this file. Do not store ELEVENLABS_API_KEY here."
+  ]
+}
