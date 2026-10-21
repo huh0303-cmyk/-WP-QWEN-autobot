@@ -1,0 +1,37 @@
+name: Seoul Journal Daily Shorts Editorial Queue
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:30, 09:00, 17:00 Vietnam time (UTC+7) = 23:30, 02:00, 10:00 UTC.
+    - cron: "30 23 * * *"
+    - cron: "0 2 * * *"
+    - cron: "0 10 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seoul-journal-daily-shorts
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build source-auditable editorial queue
+        env:
+          SEOUL_JOURNAL_GOLDEN_CALENDAR_CSV_URL: https://docs.google.com/spreadsheets/d/1lGKkvLxKOi9pufCuzvYpylqnK7apLx8f/export?format=csv&gid=796729184
+        run: python scripts/seoul_journal_daily_queue.py
+      - name: Upload editorial queue artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-editorial-queue-${{ github.run_id }}
+          path: artifacts/seoul-journal-daily-queue.json
+          if-no-files-found: error
+          retention-days: 14
