@@ -1,10 +1,20 @@
 # NASA / NASA_XFILES — 2026-10-22
-**Title:** NASA’s Bennu Mission Is Over—But the Asteroid Story Isn’t
-**Cover:** 121.6 GRAMS FROM SPACE
-**Narration:** ElevenLabs only; use existing `ELEVENLABS_VOICE_ID_NASA` profile (Adam fallback in config).
+**Title:** Halley’s Comet Left the Trail—Tonight, Earth Crosses It
+**Cover:** ORIONIDS PEAK TONIGHT
+**Target duration:** 30–40 seconds
+**Voice:** ElevenLabs only; retain the existing NASA voice profile. Verify API and voice ID before rendering.
 
-NASA’s original OSIRIS-REx sample-return mission has reached the end of its main chapter, but the science is still unfolding. The spacecraft delivered 121.6 grams of material from asteroid Bennu—more than twice the mission’s minimum target. Researchers are studying the sample for clues about the early solar system, including evidence of water-related alteration and organic compounds. That does not mean scientists found life. The spacecraft, now called OSIRIS-APEX, is heading toward another encounter: asteroid Apophis in 2029. One mission returned ancient material; the next will investigate a near-Earth asteroid up close.
+**Narration**
+Tonight, Earth is moving through debris left behind by Halley’s Comet.
 
-**Visual beats:** NASA Bennu imagery; sample curation; “121.6 g / target 60 g”; OSIRIS-APEX → Apophis 2029.
-**Sources:** https://www.space.com/astronomy/asteroids/nasa-closes-the-book-on-epic-osiris-rex-asteroid-sampling-mission-i-am-immensely-proud-of-what-we-did ; https://science.nasa.gov/blogs/osiris-rex/2024/02/15/nasa-announces-osiris-rex-bulk-sample-mass/
-**Status:** SCRIPT_READY; ElevenLabs audio/MP4 not created. Do not imply organics prove life.
+The Orionid meteor shower peaks around the night of October 21 into the morning of October 22. Tiny fragments enter Earth’s atmosphere at high speed and create the streaks we call meteors.
+
+NASA says a bright Moon may wash out some of the fainter meteors this year, so one useful strategy is to look before dawn, after moonset, from a dark location.
+
+Give your eyes time to adjust, look across a wide area of sky, and remember: meteors can streak far from the constellation Orion, even though that is where their paths appear to radiate.
+
+No telescope is needed—but patience helps.
+
+**Visual beats:** Halley’s Comet orbit illustration; Earth crossing a debris stream; meteor streaks; on-screen note “Moonlight may reduce visibility”.
+**Source:** NASA Science, “What’s Up: October 2026 Skywatching Tips from NASA,” published 2026-10-01 — https://science.nasa.gov/solar-system/whats-up-october-2026-skywatching-tips-from-nasa/
+**Status:** script ready; no audio/MP4 created.
