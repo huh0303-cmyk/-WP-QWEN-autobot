@@ -1,0 +1,60 @@
+name: Seoul Journal Political Shorts (private upload)
+
+on:
+  workflow_dispatch:
+    inputs:
+      article_url:
+        description: "Optional Naver Politics article URL; leave blank to select a prominent article from Naver Politics"
+        required: false
+        type: string
+      confirm_private_upload:
+        description: "Confirm upload will be PRIVATE only (public release is manual after review)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seoul-journal-political-shorts
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload-private:
+    if: ${{ inputs.confirm_private_upload == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install system fonts and FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2
+      - name: Build one-minute political Short and upload as PRIVATE
+        env:
+          INPUT_ARTICLE_URL: ${{ inputs.article_url }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          SEOUL_JOURNAL_VOICE_ID: ${{ secrets.SEOUL_JOURNAL_VOICE_ID }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+        run: python scripts/seoul_journal_shorts_pipeline.py
+      - name: Upload package, MP4, and private upload receipt as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-political-short-${{ github.run_id }}
+          path: artifacts/seoul-journal-short/
+          if-no-files-found: warn
+          retention-days: 14
