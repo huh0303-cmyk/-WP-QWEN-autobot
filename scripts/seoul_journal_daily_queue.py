@@ -69,7 +69,7 @@ def main():
             usable_rows = []
             for row in calendar_rows:
                 row_date_text = row.get("날짜", "").strip()
-                if not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", row_date_text):
+                if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row_date_text):
                     continue
                 keywords = [row.get(f"키워드 {i}", "").strip() for i in range(1, 6)]
                 if not any(keywords):
