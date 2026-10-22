@@ -67,10 +67,10 @@ jobs:
           CATEGORY="${{ inputs.preferred_category }}"
           if [ "$KEY" = "theseouljournal" ]; then
             URL="https://theseouljournal.com"
-            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\\n' World Business Technology 'Asia & Korea' Military Culture Art Sports | shuf -n 1)"; fi
+            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' World Business Technology 'Asia & Korea' Military Culture Art Sports | shuf -n 1)"; fi
           else
             URL="https://koreanews365.com"
-            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\\n' 정치 경제 국방 글로벌 스포츠 | shuf -n 1)"; fi
+            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' 정치 경제 국방 글로벌 스포츠 | shuf -n 1)"; fi
           fi
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
@@ -93,12 +93,10 @@ jobs:
           WP_POST_STATUS: "publish"
           WP_PUBLICATION_APPROVED: "true"
           AUTOMATION_HUB_SOURCE: "sheets"
-          AI_TEXT_PROVIDER: "gemini"
+          AI_TEXT_PROVIDER: "openai"
           GH_TOKEN: ${{ github.token }}
-          # 2026-09-03: Gemini removed from the reviewer role network-wide —
-          # three_model_consensus.py now always runs two independent GPT
-          # passes and never calls Gemini at all. See audit_active_policy.py.
-          OPENAI_ENABLED: "false"
+          # Newsroom writing uses GPT-5 mini. Gemini is not used for newsroom text.
+          OPENAI_ENABLED: "true"
           NEWSROOM_PAID_TEXT_APPROVED: "false"
           CLAUDE_ENABLED: "false"
           REPLICATE_API_TOKEN: ""
