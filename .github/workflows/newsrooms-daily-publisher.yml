@@ -70,7 +70,7 @@ jobs:
             if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' World Business Technology 'Asia & Korea' Military Culture Art Sports | shuf -n 1)"; fi
           else
             URL="https://koreanews365.com"
-            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' 정치 경제 국방 글로벌 스포츠 | shuf -n 1)"; fi
+            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' 정치 경제 국방 글로벌 문화 스포츠 국제 금융 | shuf -n 1)"; fi
           fi
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
