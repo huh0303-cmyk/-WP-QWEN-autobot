@@ -19,7 +19,7 @@ on:
         description: "Optional RSS desk (World/Sports/Military/Art)"
         required: false
         type: choice
-        options: ["", 속보, 정치, 경제, 사회, 국제, 군사, 스포츠, World, Business, Technology, "Asia & Korea", Military, Culture, Art, Sports]
+        options: ["", 정치, 경제, 국방, 글로벌, 문화, 스포츠, 국제, 금융, World, Business, Technology, "Asia & Korea", Military, Culture, Art, Sports]
         default: ""
       source_url:
         description: "Exact newly detected RSS story URL; blank for manual source selection"
