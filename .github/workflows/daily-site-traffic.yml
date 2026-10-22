@@ -38,6 +38,9 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: python scripts/daily_site_traffic.py
 
+      - name: Export verified visitor metrics for GitHub Pages
+        run: python scripts/build_control_page_visitors.py
+
       - name: "결과 JSON 저장소에 커밋 (시트 없이도 바로 확인 가능하게)"
         if: always()
         run: |
@@ -46,6 +49,6 @@ jobs:
           git stash --include-untracked || true
           git pull --rebase origin main
           git stash pop || true
-          git add daily_site_traffic_result.json 2>/dev/null || true
+          git add daily_site_traffic_result.json docs/visitor_metrics.json 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: 27사이트 footer 방문자 현황 갱신 [skip ci]"
           git push
