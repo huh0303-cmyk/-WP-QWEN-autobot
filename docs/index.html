@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>런던프로젝트 통제실 · 전체 운영 통계</title>
+<title>Korea365 통제실 · 플랫폼별 순위</title>
 <style>
 body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:8px;background:#f6f7f9;color:#1c1c1e}
 h1{font-size:1.25rem;margin:0 0 4px;color:#0f172a}.sub{color:#475569;font-size:.85rem;margin-bottom:8px}.publish-link{display:inline-block;padding:4px 9px;border-radius:5px;background:#1d4ed8;color:#fff!important;text-decoration:none;font-size:.78rem;font-weight:750}.publish-link:hover{background:#1e40af}.control-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.control-tag{font-size:.75rem;color:#334155;background:#e2e8f0;border-radius:6px;padding:4px 8px}
@@ -46,9 +46,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 </style></head><body>
 <div class="control-head"><h1>Korea365 통제실 · 플랫폼별 순위</h1><span class="control-tag">LONDON PROJECT · CONTROL ROOM</span></div>
 <div class="sub" id="meta">공식 Google Search Console 통계를 불러오는 중...</div>
-<div class="bar"><label for="sortKey">정렬 기준</label>
-<select id="sortKey"><option value="clicks">GSC 클릭수</option><option value="impressions">GSC 노출수</option><option value="visitors">일일방문자</option></select>
-<span class="na">기준 값이 같으면 다음 지표로 순서를 정합니다</span></div>
+<div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">GSC 클릭·노출은 별도 참고 지표이며 방문자 수로 사용하지 않습니다.</span></div>
 <nav class="platform-tabs" id="blog-platform-tabs" aria-label="블로그 플랫폼 순위"><button class="platform-tab" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" data-platform="tistory" aria-pressed="false">Tistory</button><button class="platform-tab" data-platform="naver" aria-pressed="false">Naver</button></nav>
 <div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
@@ -75,6 +73,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>팔로잉</th><th>콘텐츠 수</th><th>누적 조회 / 좋아요</th><th>최근 콘텐츠 반응</th><th>개설일</th><th>최근 발행</th><th>데이터 확인일</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
 <script>
 var J=null;
+var VISITOR_DATA=null;
 var SOCIAL_DATA=null;
 var SOCIAL_METRICS=null;
 function metricNumber(v,unit){return v===null||v===undefined||!Number.isFinite(Number(v))?'<span class="na">미수집</span>':'<b>'+f(Number(v))+'</b>'+(unit?' <span class="na">'+unit+'</span>':'');}
@@ -90,6 +89,7 @@ function platformCell(p){var m={wordpress:['WordPress','WP'],newsroom:['WordPres
 function val(r,k){return Number.isFinite(r[k])?r[k]:null}
 var blogPlatform='wordpress';
 function blogPlatformOf(r){return String(r.platform||'').toLowerCase()==='newsroom'?'wordpress':String(r.platform||'').toLowerCase()}
+function visitorFor(r){var key=String(r.site||'').toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');return VISITOR_DATA&&VISITOR_DATA.sites?VISITOR_DATA.sites[key]||null:null}
 function drawBlogTabs(){
  var labels={wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'},rows=J&&J.rows||[];
  document.querySelectorAll('#blog-platform-tabs .platform-tab').forEach(function(b){var p=b.dataset.platform,count=rows.filter(function(r){return blogPlatformOf(r)===p}).length;b.textContent=labels[p]+' · '+count;b.setAttribute('aria-pressed',String(p===blogPlatform));});
@@ -97,35 +97,31 @@ function drawBlogTabs(){
 function draw(){
   if(!J)return;
   drawBlogTabs();
-  var key=document.getElementById('sortKey').value;
-  var order=[key].concat(['visitors','impressions','clicks'].filter(function(x){return x!==key}));
   var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)===blogPlatform}).slice().sort(function(a,b){
-    for(var i=0;i<order.length;i++){
-      var av=val(a,order[i]),bv=val(b,order[i]);
-      if(av===null&&bv!==null)return 1; if(av!==null&&bv===null)return -1;
-      if(av!==null&&bv!==null&&av!==bv)return bv-av;
-    }
+    var av=visitorFor(a),bv=visitorFor(b),an=av&&Number.isFinite(av.yesterday_visitors),bn=bv&&Number.isFinite(bv.yesterday_visitors);
+    if(an!==bn)return an?-1:1;
+    if(an&&bn&&av.yesterday_visitors!==bv.yesterday_visitors)return bv.yesterday_visitors-av.yesterday_visitors;
     return String(a.site||'').localeCompare(String(b.site||''),'ko');
   });
-  var names={impressions:'GSC 노출수',clicks:'GSC 클릭수',visitors:'일일방문자'};
-  document.getElementById('blog-ranking-meta').textContent=({wordpress:'WordPress (뉴스룸 2곳 포함)',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'})[blogPlatform]+' · '+rows.length+'개 · 플랫폼 안에서만 순위 · 정렬: '+names[key]+' 내림차순';
+  var referenceDate=VISITOR_DATA&&VISITOR_DATA.reference_date||'확인된 기준일 없음';
+  document.getElementById('blog-ranking-meta').textContent=({wordpress:'WordPress (뉴스룸 2곳 포함)',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'})[blogPlatform]+' · '+rows.length+'개 · 기준일 '+referenceDate+' · 확인된 전일 방문자 기준 · 미수집은 순위 없음';
   var hasImp=rows.some(function(r){return Number.isFinite(r.impressions)});
   var g=new Date(J.generated_at),age=(Date.now()-g.getTime())/3600000,stale=!Number.isFinite(age)||age>30;
   var m=document.getElementById('meta');
-  m.textContent='GSC 기준일 '+J.reference_date+' · 데이터 생성 '+String(J.generated_at||'').slice(0,16).replace('T',' ')+' · 정렬: '+names[key]+' 내림차순'+(key==='visitors'&&!rows.some(function(r){return Number.isFinite(r.visitors)})?' (일일방문자 데이터 수집 전이라 노출수·클릭수 순)':'')+(hasImp?'':' · 노출수는 다음 자동 갱신(매일 07:00 KST)부터 표시')+' · 클릭·노출은 실제 방문자 수가 아님 · 발행 버튼은 기존 발행 화면으로 이동'+(stale?' · ⚠ 데이터 갱신 지연':'');
+  m.textContent='전일 방문자 기준일 '+referenceDate+' · GSC 기준일 '+J.reference_date+' · GSC 데이터 생성 '+String(J.generated_at||'').slice(0,16).replace('T',' ')+' · GSC 클릭·노출은 순위와 별도'+(hasImp?'':' · GSC 노출 수집 대기')+' · 발행 버튼은 기존 발행 화면으로 이동'+(stale?' · ⚠ GSC 데이터 갱신 지연':'');
   m.style.color=stale?'#b45309':'';
   var rankNumber=0;
   document.getElementById('b').innerHTML=rows.map(function(r){
-    var ranked=order.some(function(k){return val(r,k)!==null});
+    var visitor=visitorFor(r),ranked=visitor&&Number.isFinite(visitor.yesterday_visitors);
     var rankValue=ranked?++rankNumber:null;
-    var vis=Number.isFinite(r.visitors)?'<b>'+f(r.visitors)+'</b>'+d(r.visitors_delta):'<span class="na">수집 전</span>';
+    var vis=ranked?'<b>'+f(visitor.yesterday_visitors)+'</b>'+d(visitor.yesterday_delta):'<span class="na">수집 전</span>';
     var st=r.google_indexed_status==='OK'?'확인됨':r.status==='NO_GSC_ACCESS'?'GSC 접근 불가':r.status==='QUERY_ERROR'?'조회 오류':'GSC에서 확인 불가';
     var publishUrl='https://blog.korea365.org/publish';
     var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+cell(val(r,'impressions'),r.impressions_delta,hasImp?'':'수집 전')+'</td><td>'+cell(val(r,'clicks'),r.clicks_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td><td><a class="publish-link" href="'+publishUrl+'" target="_blank" rel="noopener">발행 화면 ↗</a></td></tr>';
   }).join('');
 }
-document.getElementById('sortKey').addEventListener('change',draw);
 document.getElementById('blog-platform-tabs').addEventListener('click',function(e){var b=e.target.closest('.platform-tab');if(!b)return;blogPlatform=b.dataset.platform;draw();});
+fetch('visitor_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){VISITOR_DATA=d;draw();}).catch(function(e){var el=document.getElementById('blog-ranking-meta');el.textContent+=' · 방문자 순위 데이터 미수집';});
 function drawBloggerPageviews(payload){
  var meta=document.getElementById('blogger-pageviews-meta');
  var select=document.getElementById('blogger-pageviews-select');
@@ -244,8 +240,6 @@ fetch('social_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(j){
   J=j;
   drawBloggerPageviews(j.blogger_pageviews);
-  var hasV=(j.rows||[]).some(function(r){return Number.isFinite(r.visitors)});
-  document.getElementById('sortKey').value=hasV?'visitors':'clicks';
   draw();
   if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);
 }).catch(function(e){var m=document.getElementById('meta');m.textContent='GSC 데이터를 불러오지 못했습니다: '+e.message;m.style.color='#b91c1c'});
