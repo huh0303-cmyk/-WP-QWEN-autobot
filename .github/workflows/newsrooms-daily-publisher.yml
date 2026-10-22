@@ -2,6 +2,11 @@ name: "Two Newsrooms — New RSS Story"
 run-name: "newsroom:${{ inputs.newsroom }} · RSS ${{ github.event_name }}"
 
 on:
+  # Three daily Korean newsroom attempts (UTC): 07:17, 14:17, 21:17 Vietnam time.
+  # Each run adds a random delay and category suggestion; the RSS/recency/rights gates
+  # still prevent fabricated or stale stories when no eligible item exists.
+  schedule:
+    - cron: '17 0,7,14 * * *'
   workflow_dispatch:
     inputs:
       newsroom:
@@ -14,7 +19,7 @@ on:
         description: "Optional RSS desk (World/Sports/Military/Art)"
         required: false
         type: choice
-        options: ["", World, Sports, Military, Art]
+        options: ["", 속보, 정치, 경제, 사회, 국제, 군사, 스포츠, World, Business, Technology, "Asia & Korea", Military, Culture, Art, Sports]
         default: ""
       source_url:
         description: "Exact newly detected RSS story URL; blank for manual source selection"
@@ -58,10 +63,25 @@ jobs:
         shell: bash
         run: |
           KEY="${{ inputs.newsroom }}"
-          if [ "$KEY" = "theseouljournal" ]; then URL="https://theseouljournal.com"; else URL="https://koreanews365.com"; fi
+          KEY="${KEY:-koreanews365}"
+          CATEGORY="${{ inputs.preferred_category }}"
+          if [ "$KEY" = "theseouljournal" ]; then
+            URL="https://theseouljournal.com"
+            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\\n' World Business Technology 'Asia & Korea' Military Culture Art Sports | shuf -n 1)"; fi
+          else
+            URL="https://koreanews365.com"
+            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\\n' 정치 경제 국방 글로벌 스포츠 | shuf -n 1)"; fi
+          fi
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "category=" >> "$GITHUB_OUTPUT"
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "Selected newsroom=$KEY suggested category=$CATEGORY"
+      - name: Randomize publication time within this slot
+        shell: bash
+        run: |
+          DELAY="$(shuf -i 0-1800 -n 1)"
+          echo "Waiting $DELAY seconds to avoid fixed-minute publishing patterns."
+          sleep "$DELAY"
       # Historical category maintenance must not block a new verified edition.
       # Run scripts/repair_recent_newsroom_categories.py as a maintenance task.
       - name: Publish one source-checked edition
