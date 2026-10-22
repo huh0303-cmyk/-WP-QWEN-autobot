@@ -180,6 +180,11 @@ ROLE_TO_HISTORY = {
 def build_sns_ranking(bucket: int) -> dict:
     del bucket
     policy = _read(ROOT / "config" / "sns_six_channel_policy.json", {})
+    active_roles = set(policy.get("active_roles", []))
+    role_labels = {
+        str(row.get("key") or ""): str(row.get("name") or row.get("key") or "")
+        for row in policy.get("roles", []) if isinstance(row, dict)
+    }
     history = _read(ROOT / "situation_room_history.json", {})
     latest = history.get("latest", {})
     previous = history.get("previous", {})
@@ -192,11 +197,9 @@ def build_sns_ranking(bucket: int) -> dict:
     rows = []
     for item in policy.get("accounts", []):
         platform = str(item.get("platform") or "")
-        if platform in {"Instagram", "Threads", "Facebook", "TikTok"} and item.get("role") not in {
-            "korean_topik", "english", "japanese", "hot_item_shop"
-        }:
-            continue
         pkey = platform.lower()
+        role = str(item.get("role") or "")
+        active_role = role in active_roles
         hist_key = ROLE_TO_HISTORY.get(str(item.get("role") or ""))
         current = latest.get(pkey, {}).get(hist_key, {}) if hist_key else {}
         old = previous.get(pkey, {}).get(hist_key, {}) if hist_key else {}
@@ -207,13 +210,30 @@ def build_sns_ranking(bucket: int) -> dict:
         handle = str(item.get("handle") or "")
         audience_row = audience.get(handle, {}) if handle else {}
         yesterday_views = audience_row.get("views") if isinstance(audience_row, dict) else None
-        publication = publications.get((pkey, str(item.get("role") or "")), {})
+        publication = publications.get((pkey, role), {})
+        display_name = str(item.get("display_name") or role_labels.get(role) or role or handle)
+        current_public_name = str(item.get("current_public_name") or "").strip()
+        if current_public_name and current_public_name != display_name:
+            display_name = f"{display_name} (현재: {current_public_name})"
+        if not active_role:
+            metric_status = "비활성 레거시 역할 · 순위 제외"
+        elif not item.get("account_exists"):
+            metric_status = "계정 미확인 · 순위 없음"
+        elif not item.get("identity_verified"):
+            metric_status = "계정 ID 확인 필요"
+        elif isinstance(followers, (int, float)):
+            metric_status = probe_row.get("status") or "조회 성공"
+        else:
+            metric_status = probe_row.get("status") or "API 인증 필요"
         rows.append({
             "platform": platform,
-            "name": (f"{item.get('display_name')} (현재: {item.get('current_public_name')})"
-                     if item.get("current_public_name") and item.get("current_public_name") != item.get("display_name")
-                     else item.get("display_name") or item.get("role") or handle),
-            "role": item.get("role") or "",
+            "name": display_name,
+            "role": role,
+            "role_label": role_labels.get(role, role or "SNS 계정"),
+            "active_role": active_role,
+            "account_exists": bool(item.get("account_exists")),
+            "identity_verified": bool(item.get("identity_verified")),
+            "publish_connected": bool(item.get("publish_connected")),
             "handle": handle if item.get("identity_verified") else "",
             "url": (item.get("url") or "") if item.get("identity_verified") else "",
             "followers": followers,
@@ -228,32 +248,31 @@ def build_sns_ranking(bucket: int) -> dict:
             "last_post_url": publication.get("url") or "",
             "last_post_id": publication.get("post_id") or "",
             "connected": isinstance(followers, (int, float)),
-            "metric_status": probe_row.get("status") or ("조회 성공" if isinstance(followers, (int, float)) else "API 인증 필요"),
+            "metric_status": metric_status,
         })
+    platform_order = {"Facebook": 0, "Threads": 1, "Instagram": 2, "TikTok": 3}
     rows.sort(key=lambda r: (
+        platform_order.get(str(r["platform"]), 99),
         r["followers"] is None,
         -(r["followers"] or 0),
         -(r["yesterday_views"] or 0),
-        str(r["platform"]),
         str(r["name"]).casefold(),
     ))
-    rank = 0
+    platform_rank: dict[str, int] = {}
     for row in rows:
-        if row["followers"] is None:
+        platform = str(row["platform"] or "")
+        if not row["active_role"] or not row["identity_verified"] or row["followers"] is None:
             row["rank"] = None
         else:
-            rank += 1
-            row["rank"] = rank
+            platform_rank[platform] = platform_rank.get(platform, 0) + 1
+            row["rank"] = platform_rank[platform]
     return {
         "generated_at": datetime.now(KST).isoformat(),
         "updated_at": history.get("updated_at", ""),
         "total": len(rows),
-        "ranked": rank,
+        "ranked": sum(platform_rank.values()),
         "rows": rows,
     }
-
-ACTIVE_SOCIAL_ROLES = {"korean_topik", "english", "japanese"}
-
 
 def build_social_ranking(bucket: int) -> dict:
     youtube = build_youtube_ranking(bucket)
@@ -266,6 +285,10 @@ def build_social_ranking(bucket: int) -> dict:
             "handle": item.get("handle") or "",
             "channel_id": item.get("channel_id") or "",
             "category": item.get("category") or "YouTube",
+            "active_role": True,
+            "account_exists": True,
+            "identity_verified": True,
+            "publish_connected": False,
             "url": (
                 f"https://www.youtube.com/@{item.get('handle')}"
                 if item.get("handle") and item.get("channel_id")
@@ -297,7 +320,11 @@ def build_social_ranking(bucket: int) -> dict:
             "name": item.get("name"),
             "handle": item.get("handle") or "",
             "channel_id": "",
-            "category": item.get("role") or "",
+            "category": item.get("role_label") or item.get("role") or "",
+            "active_role": bool(item.get("active_role")),
+            "account_exists": bool(item.get("account_exists")),
+            "identity_verified": bool(item.get("identity_verified")),
+            "publish_connected": bool(item.get("publish_connected")),
             "url": item.get("url") or "",
             "audience": item.get("followers"),
             "audience_delta": item.get("followers_delta"),
@@ -325,29 +352,33 @@ def build_social_ranking(bucket: int) -> dict:
         -(r["views"] or 0),
         str(r["name"]).casefold(),
     ))
-    rank = 0
+    platform_rank: dict[str, int] = {}
     for row_number, row in enumerate(rows, 1):
         row["row_number"] = row_number
-        if row["audience"] is None:
+        platform = str(row["platform"] or "")
+        if not row.get("active_role") or not row.get("identity_verified") or row["audience"] is None:
             row["rank"] = None
         else:
-            rank += 1
-            row["rank"] = rank
+            platform_rank[platform] = platform_rank.get(platform, 0) + 1
+            row["rank"] = platform_rank[platform]
     youtube_total = len(youtube["rows"])
-    sns_active_total = len(sns["rows"])
+    sns_account_total = len(sns["rows"])
+    sns_active_total = sum(bool(row.get("active_role")) for row in sns["rows"])
     now = datetime.now(KST)
     return {
         "generated_at": now.isoformat(),
         "display_date": now.date().isoformat(),
         "ranking_date": (now.date() - timedelta(days=1)).isoformat(),
         "total": len(rows),
-        "ranked": rank,
+        "ranked": sum(platform_rank.values()),
         "youtube_total": youtube_total,
         "sns_active_total": sns_active_total,
-        "target_total": 39,
+        "target_total": 47,
         "target_youtube": 23,
-        "target_sns": 16,
-        "count_confirmation_required": youtube_total != 23 or sns_active_total != 16,
+        "target_sns": 24,
+        "target_active_sns": 16,
+        "sns_account_total": sns_account_total,
+        "count_confirmation_required": youtube_total != 23 or sns_account_total != 24,
         "rows": rows,
     }
 
