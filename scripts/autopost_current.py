@@ -21,10 +21,14 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-# Set provider policy before importing the legacy engine so import-time defaults cannot
-# silently route WordPress back to Gemini or enable legacy paid image generation.
-os.environ["AI_TEXT_PROVIDER"] = "gemini"
-os.environ["OPENAI_ENABLED"] = "false"
+# Newsrooms use GPT-5 mini; ordinary WordPress blogs retain the configured Gemini path.
+# This distinction is necessary because the legacy publisher module has import-time defaults.
+_NEWSROOM_URLS = {"https://koreanews365.com", "https://theseouljournal.com"}
+_TARGET_SITE = os.getenv("TARGET_SITE_URL", "").strip().rstrip("/")
+_IS_NEWSROOM = _TARGET_SITE in _NEWSROOM_URLS
+_TEXT_PROVIDER = "openai" if _IS_NEWSROOM else "gemini"
+os.environ["AI_TEXT_PROVIDER"] = _TEXT_PROVIDER
+os.environ["OPENAI_ENABLED"] = "true" if _IS_NEWSROOM else "false"
 os.environ["CHATGPT_SINGLE_MODEL_PIPELINE"] = "true"
 os.environ["PAID_IMAGE_GENERATION_ENABLED"] = "false"
 os.environ["OPENAI_IMAGE_ENABLED"] = "false"
@@ -50,8 +54,8 @@ from automation_hub.wordpress_adapter import apply_wordpress_registry
 # ---------------------------------------------------------------------------
 # HARD ROUTING GUARDS
 # ---------------------------------------------------------------------------
-# All WordPress draft text uses free Gemini only.
-base.AI_TEXT_PROVIDER = "gemini"
+# Keep newsroom writing on GPT-5 mini while preserving the existing ordinary-blog route.
+base.AI_TEXT_PROVIDER = _TEXT_PROVIDER
 # Normal WordPress blogs use the deterministic gate only; never block publication
 # on the legacy two-pass Gemini consensus review. Newsroom paths keep their own review.
 os.environ["CHATGPT_SINGLE_MODEL_PIPELINE"] = "true"
