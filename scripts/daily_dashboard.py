@@ -21,7 +21,6 @@ from gsc_unified_ranking import WP25
 
 ROOT = Path(__file__).resolve().parents[1]
 KST = dt.timezone(dt.timedelta(hours=9))
-EXCLUDE = ("theseouljournal.com",)
 OUT = ROOT / "docs" / "dashboard.json"
 HIST = ROOT / "data" / "dashboard_history.json"
 PAGEVIEWS_HIST = ROOT / "data" / "blogger_pageviews_history.json"
@@ -269,8 +268,9 @@ def main():
     hub = json.loads((ROOT / "config" / "automation_hub_sites.json").read_text(encoding="utf-8"))
 
     # Build inventory from canonical registries. Display labels never determine identity.
-    # Exclude only the exact newsroom domain theseouljournal.com; keep its separate
-    # Blogger property theseouljournal.blogspot.com in the 33-blog Blogger inventory.
+    # The CONTROL WordPress group includes both canonical WordPress newsrooms.
+    # The Seoul Journal Blogspot property remains a distinct Blogspot destination.
+    wp25_sites = {s.rstrip("/") for s in WP25}
     targets = [("wordpress", s.rstrip("/"), s.split("://", 1)[-1].rstrip("/")) for s in WP25]
     targets += [("blogspot", item["blogspot"].rstrip("/"), item["blogspot"].rstrip("/").split("://", 1)[-1])
                 for item in blogger_portfolio["channels"]]
@@ -281,10 +281,8 @@ def main():
                 for room in rooms.get("rooms", [])
                 if room.get("platform") == "naver" and room.get("enabled") and room.get("destination_id")]
     targets += [("newsroom", item["url"].rstrip("/"), item.get("name", item.get("url", ""))) for item in hub.get("sites", [])
-                if item.get("platform") == "wordpress"
-                and item.get("url", "").rstrip("/") == "https://koreanews365.com"]
+                if item.get("platform") == "wordpress" and item.get("url", "").rstrip("/") not in wp25_sites]
     targets = list(dict.fromkeys(targets))
-    targets = [t for t in targets if t[1].split("://", 1)[-1].split("/", 1)[0].lower() not in EXCLUDE]
     hist = json.loads(HIST.read_text(encoding="utf-8")) if HIST.exists() else {}
     prev_dates = sorted(k for k in hist if k < ref.isoformat())
     prev = hist[prev_dates[-1]] if prev_dates else {}
