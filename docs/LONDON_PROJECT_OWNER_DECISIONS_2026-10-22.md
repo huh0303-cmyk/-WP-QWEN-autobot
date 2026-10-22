@@ -28,3 +28,20 @@ Updated: 2026-10-22 (Vietnam time; KST noted where applicable)
 - BLOCKED_OWNER = explicit owner action/decision required.
 - BLOCKED_TECH = code, workflow, deployment, or credential validation incomplete.
 - NEVER mark COMMITTED as DONE or queued as published.
+
+
+## Owner decisions confirmed — 2026-10-22 (Vietnam time)
+
+1. **Seoul Journal calendar:** change the rule to use valid keywords from another dated calendar row when the target row is missing. The queue must record both the target date and actual selected row; every keyword remains pending same-day trend/news validation. Never imply an old/future calendar row is currently trending without that validation.
+2. **YouTube:** owner will directly connect and authorize the dedicated Seoul Journal account. Until the integration returns evidence of the exact channel ID, do not upload or substitute another channel.
+3. **Instagram:** owner will connect publishing authorization for the exact `@seoul_jisoo` account. Handle existence alone is not sufficient.
+4. **ElevenLabs:** retain existing per-channel voice assignments and verify credential/voice-ID availability. Do not rotate voices or substitute the Japanese voice.
+5. **Public publishing:** after technical validation, public publishing is allowed only to pre-designated channels with account-specific authorization. Do not publish to any unapproved account. Record platform post URL/ID as proof.
+
+## Execution evidence — 2026-10-22
+
+- Implemented the calendar fallback in `scripts/seoul_journal_daily_queue.py`: if the target date is absent, select the closest dated row containing at least one of the five keyword cells, record target date, selected row, distance, and explicit override; each item remains `awaiting_datalab_and_media_validation`.
+- The existing Seoul Journal workflow remains an editorial queue only; it does not render an MP4 or publish. This change does not authorize a public post by itself.
+- GitHub Actions secret values cannot be read back through repository file APIs. ElevenLabs connectivity is not yet verified because the audition workflow has not been run with its required confirmation input; credentials must remain in GitHub environment secrets, never in Git.
+- YouTube and Instagram connection/authorization remain owner actions in their respective platform/integration UI. No public post has been attempted.
+- Status: calendar rule **COMMITTED, execution test pending**; YouTube **BLOCKED_OWNER**; Instagram **BLOCKED_OWNER**; ElevenLabs **BLOCKED_TECH until workflow audit evidence**; public publishing **AUTHORIZED BY POLICY AFTER VALIDATION, NOT YET EXECUTED**.
