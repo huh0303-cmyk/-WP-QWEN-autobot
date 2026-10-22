@@ -1,5 +1,5 @@
 {
-  "checked_at_kst": "2026-10-21T09:38:14.980535+09:00",
+  "checked_at_kst": "2026-10-22T09:42:01.665784+09:00",
   "source": "YouTube Data API v3 public statistics",
   "confirmed_channels": 23,
   "connected_channels": 23,
@@ -9,7 +9,7 @@
       "handle": "cafe_romantic",
       "subscribers": 11,
       "views": 2014,
-      "videos": 37,
+      "videos": 38,
       "connected": true
     },
     "UC7yEsLM-HoXudngrD-4FIqg": {
@@ -40,7 +40,7 @@
       "name": "CAFE_KPOP",
       "handle": "kpop_studio7",
       "subscribers": 7,
-      "views": 1022,
+      "views": 1025,
       "videos": 13,
       "connected": true
     },
@@ -56,7 +56,7 @@
       "name": "HISTORY_TV_TODAY",
       "handle": "HISTORY_TV_TODAY",
       "subscribers": 2,
-      "views": 36,
+      "views": 38,
       "videos": 8,
       "connected": true
     },
@@ -88,48 +88,48 @@
       "name": "서울국제대학-TOPIK센터",
       "handle": "seoul_topik1",
       "subscribers": 5830,
-      "views": 425140,
-      "videos": 1370,
+      "views": 425305,
+      "videos": 1374,
       "connected": true
     },
     "UCrjkKWMHzAAvpLIFgHnwcWg": {
       "name": "English Survival",
       "handle": "English_survival",
       "subscribers": 12,
-      "views": 4118,
-      "videos": 37,
+      "views": 4122,
+      "videos": 38,
       "connected": true
     },
     "UCOWoNH_d6p45ywQ6W0Z1Jng": {
       "name": "Japanese Survival",
       "handle": "seoul_japanese1",
       "subscribers": 22,
-      "views": 10993,
-      "videos": 80,
+      "views": 10994,
+      "videos": 81,
       "connected": true
     },
     "UCGTd7RhfaUaGGbVRsNPUN6Q": {
       "name": "Chinese Survival",
       "handle": "SIS_ChineseSurvival",
       "subscribers": 8,
-      "views": 1160,
-      "videos": 19,
+      "views": 1205,
+      "videos": 20,
       "connected": true
     },
     "UCKvKhETLGPaRV3qfWv2bM2g": {
       "name": "Portuguese Survival",
       "handle": "Portuguese_survival",
-      "subscribers": 5,
-      "views": 874,
-      "videos": 16,
+      "subscribers": 6,
+      "views": 875,
+      "videos": 17,
       "connected": true
     },
     "UCRZ0uc_bxKDMwz3noBBi9KQ": {
       "name": "Vietnamese Survival",
       "handle": "SIS_VietnameseSurvival",
       "subscribers": 3,
-      "views": 769,
-      "videos": 15,
+      "views": 767,
+      "videos": 16,
       "connected": true
     },
     "UC91BpNSb4nUwD6jrpthK7FQ": {
@@ -137,55 +137,55 @@
       "handle": "health_clinic_USA",
       "subscribers": 0,
       "views": 7,
-      "videos": 16,
+      "videos": 17,
       "connected": true
     },
     "UCAizx0tPkRSol8sIhanN_QQ": {
       "name": "Seoul_Jisoo1",
       "handle": "jisoopicks",
       "subscribers": 1,
-      "views": 71,
-      "videos": 11,
+      "views": 79,
+      "videos": 12,
       "connected": true
     },
     "UCC_PcHMv-Uxpr00Pjw_J2Wg": {
       "name": "Health_Clinic_Japan",
       "handle": "Health_Clinic_Japan",
       "subscribers": 3,
-      "views": 34,
-      "videos": 15,
+      "views": 39,
+      "videos": 16,
       "connected": true
     },
     "UCmt8f9yUT6iTxBys8eH4-Cg": {
       "name": "French Survival",
       "handle": "SIS_FrenchSurvival",
       "subscribers": 1,
-      "views": 399,
-      "videos": 19,
+      "views": 403,
+      "videos": 20,
       "connected": true
     },
     "UCKF98zgzm7YRWlyMaoJJKIQ": {
       "name": "German Survival",
       "handle": "SIS_GermanSurvival",
       "subscribers": 4,
-      "views": 743,
-      "videos": 17,
+      "views": 742,
+      "videos": 18,
       "connected": true
     },
     "UC9mvVEdL9Tllkit5v2Qv8UQ": {
       "name": "Spanish Survival",
       "handle": "SIS_SpanishSurvival",
       "subscribers": 0,
-      "views": 468,
-      "videos": 19,
+      "views": 480,
+      "videos": 20,
       "connected": true
     },
     "UCK8B-BM09Cz-ockaQYLL5LA": {
       "name": "Italian Survival",
       "handle": "SIS_ItalianSurvival",
       "subscribers": 1,
-      "views": 569,
-      "videos": 13,
+      "views": 568,
+      "videos": 14,
       "connected": true
     }
   }
