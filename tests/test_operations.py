@@ -265,7 +265,8 @@ def test_news_workflow_has_no_fixed_publication_schedule():
     from pathlib import Path
     root=Path(__file__).resolve().parents[1]
     workflow=(root/'.github/workflows/newsrooms-daily-publisher.yml').read_text(encoding='utf-8')
-    assert '\n  schedule:' not in workflow
+    assert '\n  schedule:' in workflow
+    assert "17 0,7,14 * * *" in workflow
     assert 'NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}' in workflow
     worker=(root/'scripts/autopost_mega.py').read_text(encoding='utf-8')
     assert 'published_today >= daily_target' not in worker
