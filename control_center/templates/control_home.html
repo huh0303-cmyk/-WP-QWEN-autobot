@@ -21,9 +21,20 @@ main{max-width:1920px;margin:auto;padding:7px 7px 22px}
 .section-head h2{margin:0;font-size:14px;font-weight:950}.section-head p{margin:2px 0 0;font-size:9px;color:#64748b}
 .actions{display:flex;gap:4px}.more{padding:5px 6px;border-radius:5px;background:#0f172a;color:#fff;font-size:8.5px;font-weight:900;white-space:nowrap}
 .platform-tabs{display:flex;gap:4px;overflow:auto;padding:6px 7px;border-bottom:1px solid #dbe3ee;background:#fff;scrollbar-width:thin}
-.platform-tab{flex:0 0 auto;border:1px solid #cbd5e1;border-radius:999px;padding:5px 9px;background:#f8fafc;color:#334155;font-family:inherit;font-size:9px;font-weight:800;line-height:1.2;cursor:pointer;white-space:nowrap}
+.platform-tab{flex:0 0 auto;border:1px solid #cbd5e1;border-radius:999px;padding:5px 9px;background:#f8fafc;color:#334155;font-family:inherit;font-size:9px;font-weight:850;line-height:1.2;cursor:pointer;white-space:nowrap;transition:filter .15s,box-shadow .15s}
+.platform-tab:hover{filter:brightness(.97)}
 .platform-tab[aria-pressed="true"]{background:#0f172a;border-color:#0f172a;color:#fff}
-.platform-tab[data-platform="wordpress"][aria-pressed="true"]{background:#2563eb;border-color:#2563eb}.platform-tab[data-platform="blogspot"][aria-pressed="true"]{background:#c2410c;border-color:#c2410c}.platform-tab[data-platform="naver"][aria-pressed="true"]{background:#15803d;border-color:#15803d}.platform-tab[data-platform="tistory"][aria-pressed="true"]{background:#b45309;border-color:#b45309}.platform-tab[data-platform="youtube"][aria-pressed="true"]{background:#dc2626;border-color:#dc2626}.platform-tab[data-platform="tiktok"][aria-pressed="true"]{background:#111827;border-color:#111827}.platform-tab[data-platform="threads"][aria-pressed="true"]{background:#4b5563;border-color:#4b5563}.platform-tab[data-platform="instagram"][aria-pressed="true"]{background:#a21caf;border-color:#a21caf}.platform-tab[data-platform="facebook"][aria-pressed="true"]{background:#2563eb;border-color:#2563eb}.platform-tab[data-platform="news"][aria-pressed="true"]{background:#475569;border-color:#475569}
+.platform-tab[data-platform="wordpress"]{background:#eef2ff;border-color:#a5b4fc;color:#4338ca}.platform-tab[data-platform="wordpress"][aria-pressed="true"]{background:#4f46e5;border-color:#4f46e5;color:#fff}
+.platform-tab[data-platform="blogspot"]{background:#fff7ed;border-color:#fdba74;color:#c2410c}.platform-tab[data-platform="blogspot"][aria-pressed="true"]{background:#c2410c;border-color:#c2410c;color:#fff}
+.platform-tab[data-platform="naver"]{background:#f0fdf4;border-color:#86efac;color:#15803d}.platform-tab[data-platform="naver"][aria-pressed="true"]{background:#15803d;border-color:#15803d;color:#fff}
+.platform-tab[data-platform="tistory"]{background:#fffbeb;border-color:#fcd34d;color:#92400e}.platform-tab[data-platform="tistory"][aria-pressed="true"]{background:#b45309;border-color:#b45309;color:#fff}
+.platform-tab[data-platform="youtube"]{background:#fef2f2;border-color:#fca5a5;color:#b91c1c}.platform-tab[data-platform="youtube"][aria-pressed="true"]{background:#dc2626;border-color:#dc2626;color:#fff}
+.platform-tab[data-platform="tiktok"]{background:#ecfeff;border-color:#67e8f9;color:#0e7490}.platform-tab[data-platform="tiktok"][aria-pressed="true"]{background:#111827;border-color:#111827;color:#fff}
+.platform-tab[data-platform="instagram"]{background:#fdf4ff;border-color:#e9a8f5;color:#a21caf}.platform-tab[data-platform="instagram"][aria-pressed="true"]{background:#a21caf;border-color:#a21caf;color:#fff}
+.platform-tab[data-platform="threads"]{background:#f3f4f6;border-color:#9ca3af;color:#374151}.platform-tab[data-platform="threads"][aria-pressed="true"]{background:#374151;border-color:#374151;color:#fff}
+.platform-tab[data-platform="facebook"]{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}.platform-tab[data-platform="facebook"][aria-pressed="true"]{background:#1877f2;border-color:#1877f2;color:#fff}
+.platform-section[data-active-platform="wordpress"] .section-head{background:#eef2ff;border-bottom-color:#a5b4fc}.platform-section[data-active-platform="blogspot"] .section-head{background:#fff7ed;border-bottom-color:#fdba74}.platform-section[data-active-platform="naver"] .section-head{background:#f0fdf4;border-bottom-color:#86efac}.platform-section[data-active-platform="tistory"] .section-head{background:#fffbeb;border-bottom-color:#fcd34d}
+.platform-section[data-active-platform="youtube"] .section-head{background:#fef2f2;border-bottom-color:#fca5a5}.platform-section[data-active-platform="tiktok"] .section-head{background:#ecfeff;border-bottom-color:#67e8f9}.platform-section[data-active-platform="instagram"] .section-head{background:#fdf4ff;border-bottom-color:#e9a8f5}.platform-section[data-active-platform="threads"] .section-head{background:#f3f4f6;border-bottom-color:#9ca3af}.platform-section[data-active-platform="facebook"] .section-head{background:#eff6ff;border-bottom-color:#93c5fd}
 .sheet{overflow:auto;max-height:calc(100vh - 116px);overscroll-behavior:contain}
 table.k365-table{border-collapse:separate;border-spacing:0;table-layout:fixed;width:auto;min-width:0;font-size:9.5px}
 table.k365-table col{min-width:0}
@@ -37,10 +48,10 @@ body.col-resizing{cursor:col-resize!important;user-select:none!important}
 td:first-child,td:nth-child(2){text-align:center;font-weight:900}
 .blog td:nth-child(2),.social td:nth-child(2),.social td:nth-child(3){text-align:left}
 tbody tr:hover{filter:brightness(.98)}
-.platform-wp{background:#eef5ff}.platform-blogspot{background:#fff7e6}.platform-naver{background:#edfdf3}.platform-tistory{background:#fff8cc}
+.platform-wordpress{background:#eef2ff}.platform-blogspot{background:#fff7e6}.platform-naver{background:#edfdf3}.platform-tistory{background:#fff8cc}
 .platform-youtube{background:#fff0f0}.platform-instagram{background:#f8efff}.platform-facebook{background:#edf4ff}.platform-tiktok{background:#eefcff}.platform-threads{background:#f3f4f6}
 .platform-badge{display:inline-block;min-width:44px;padding:1px 3px;border-radius:999px;text-align:center;font-size:8px;font-weight:950;border:1px solid rgba(15,23,42,.08)}
-.platform-wp .platform-badge{background:#dbeafe}.platform-blogspot .platform-badge{background:#ffedd5}.platform-naver .platform-badge{background:#dcfce7}.platform-tistory .platform-badge{background:#fde68a}
+.platform-wordpress .platform-badge{background:#e0e7ff}.platform-blogspot .platform-badge{background:#ffedd5}.platform-naver .platform-badge{background:#dcfce7}.platform-tistory .platform-badge{background:#fde68a}
 .platform-youtube .platform-badge{background:#fee2e2}.platform-instagram .platform-badge{background:#f3e8ff}.platform-facebook .platform-badge{background:#dbeafe}.platform-tiktok .platform-badge{background:#cffafe}.platform-threads .platform-badge{background:#e5e7eb}
 .adsense-medal{display:inline-flex;align-items:center;justify-content:center;margin-right:3px;font-size:11px;line-height:1;vertical-align:-1px;filter:saturate(1.1)}
 .inactive-row{opacity:.72;background:#f1f5f9!important}.identity-note{display:block;color:#64748b;font-size:8px;line-height:1.2}.status-note{display:inline-block;max-width:185px;white-space:normal;color:#475569;font-size:8px;line-height:1.25}
@@ -66,19 +77,19 @@ tbody tr:hover{filter:brightness(.98)}
   <div class="k365-ops-actions"><a href="https://blog.korea365.org/publish">4-Agent 글 발행</a><a href="https://sns.korea365.org/social-accounts?platform=YouTube">채널 상태 확인</a></div>
 </section>
 <div class="dashboard-grid">
-<section class="section">
+<section class="section platform-section blog-platform-section" data-active-platform="wordpress">
 <div class="section-head"><div><h2 id="blog-title">플랫폼별 사이트 순위</h2><p id="blog-basis">플랫폼을 선택하면 해당 플랫폼 안에서만 순위를 매깁니다. 방문자 미집계 사이트는 순위에서 비워둡니다.</p></div><div class="actions"><a class="more" href="/api/blog-korea365/ranking.csv">CSV</a><a class="more" href="https://blog.korea365.org">BLOG 상세 →</a></div></div>
 <nav class="platform-tabs" id="blog-platform-tabs" aria-label="블로그 플랫폼 순위">
-<button class="platform-tab" type="button" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" type="button" data-platform="news" aria-pressed="false">신문사</button><button class="platform-tab" type="button" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" type="button" data-platform="naver" aria-pressed="false">Naver</button><button class="platform-tab" type="button" data-platform="tistory" aria-pressed="false">Tistory</button>
+<button class="platform-tab" type="button" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" type="button" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" type="button" data-platform="tistory" aria-pressed="false">Tistory</button><button class="platform-tab" type="button" data-platform="naver" aria-pressed="false">Naver</button>
 </nav>
 <div class="sheet"><table class="k365-table blog"><thead><tr>
 <th>순위</th><th>사이트</th><th>어제 방문자(증감)</th><th>GSC 클릭(증감)</th><th>GSC 노출</th><th>CTR</th><th>평균 게재순위</th><th>기준일/수집 상태</th>
 </tr></thead><tbody id="blog-rows"><tr><td colspan="8" style="text-align:center">데이터 불러오는 중…</td></tr></tbody></table></div>
 </section>
-<section class="section">
+<section class="section platform-section social-platform-section" data-active-platform="youtube">
 <div class="section-head"><div><h2 id="social-title">계정별 플랫폼 순위</h2><p id="social-basis">플랫폼별 계정을 각각 표시합니다. 구독자·팔로워가 확인된 운영 계정만 순위에 포함합니다.</p></div><div class="actions"><a class="more" href="https://sns.korea365.org/social-accounts">계정 관리 →</a></div></div>
 <nav class="platform-tabs" id="social-platform-tabs" aria-label="SNS 플랫폼 순위">
-<button class="platform-tab" type="button" data-platform="youtube" aria-pressed="true">YouTube</button><button class="platform-tab" type="button" data-platform="tiktok" aria-pressed="false">TikTok</button><button class="platform-tab" type="button" data-platform="threads" aria-pressed="false">Threads</button><button class="platform-tab" type="button" data-platform="instagram" aria-pressed="false">Instagram</button><button class="platform-tab" type="button" data-platform="facebook" aria-pressed="false">Facebook</button>
+<button class="platform-tab" type="button" data-platform="youtube" aria-pressed="true">YouTube</button><button class="platform-tab" type="button" data-platform="tiktok" aria-pressed="false">TikTok</button><button class="platform-tab" type="button" data-platform="instagram" aria-pressed="false">Instagram</button><button class="platform-tab" type="button" data-platform="threads" aria-pressed="false">Threads</button><button class="platform-tab" type="button" data-platform="facebook" aria-pressed="false">Facebook</button>
 </nav>
 <div class="sheet"><table class="k365-table social"><thead><tr>
   <th>순위</th><th>채널/계정</th><th>운영 역할</th><th>구독자/팔로워(증감)</th><th>조회수(증감)</th><th>콘텐츠(증감)</th><th>누적 수익 (USD)</th><th>최근 발행</th><th>계정·연결 상태</th>
@@ -220,8 +231,8 @@ async function loadBlog(){
  return d.generated_at;
 }
 let blogPlatform='wordpress',socialPlatform='youtube',blogPayload=null,socialPayload=null;
-const BLOG_TABS={wordpress:'WordPress',news:'신문사',blogspot:'Blogspot',naver:'Naver',tistory:'Tistory'};
-const SOCIAL_TABS={youtube:'YouTube',tiktok:'TikTok',threads:'Threads',instagram:'Instagram',facebook:'Facebook'};
+const BLOG_TABS={wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'};
+const SOCIAL_TABS={youtube:'YouTube',tiktok:'TikTok',instagram:'Instagram',threads:'Threads',facebook:'Facebook'};
 function setPlatformTabs(containerId,selection,counts,labels){
  document.querySelectorAll('#'+containerId+' .platform-tab').forEach(button=>{
   const key=button.dataset.platform;button.setAttribute('aria-pressed',String(key===selection));
@@ -230,12 +241,13 @@ function setPlatformTabs(containerId,selection,counts,labels){
 }
 function blogCardsFor(platform){
  const cards=blogPayload?.cards||[];
- return cards.filter(c=>platform==='news'?c.kind==='news':String(c.platform||'').toLowerCase()===platform&&c.kind!=='news');
+ return cards.filter(c=>String(c.platform||'').toLowerCase()===platform);
 }
 function renderBlogRanking(){
  if(!blogPayload)return;
  const counts={};for(const key of Object.keys(BLOG_TABS))counts[key]=blogCardsFor(key).length;
  setPlatformTabs('blog-platform-tabs',blogPlatform,counts,BLOG_TABS);
+ document.querySelector('.blog-platform-section').dataset.activePlatform=blogPlatform;
  const label=BLOG_TABS[blogPlatform]||blogPlatform;
  document.getElementById('blog-title').textContent=label+' 순위 ('+counts[blogPlatform]+'개)';
  document.getElementById('blog-basis').textContent='기준일 '+dateLabel(blogPayload.visitor_ranking_date||blogPayload.display_date||todayKst())+' · 전일 방문자 기준 · 미집계 사이트는 순위 미부여 · GSC는 별도 참고 지표';
@@ -254,7 +266,7 @@ function renderBlogRanking(){
   const position=c.gsc_position==null?'—':Number(c.gsc_position).toFixed(1);
   const visitor=Number.isFinite(c.yesterday_visitors)?'<span class="good">'+metric(c.yesterday_visitors,c.yesterday_visitors_delta)+'</span>':'<span class="warn">미집계 · 순위 없음</span>';
   const identity=c.url?'<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(shortSite(c))+' ↗</a>':esc(shortSite(c));
-  const rowPlatform=c.kind==='news'?'news':String(c.platform||'').toLowerCase();
+  const rowPlatform=String(c.platform||'').toLowerCase();
   return '<tr class="platform-'+esc(rowPlatform)+'"><td>'+rank(rankValue)+'</td><td title="'+esc(c.name||c.url)+'">'+identity+'</td><td>'+visitor+'</td><td>'+clicks+'</td><td>'+impressions+'</td><td>'+ctr+'</td><td>'+position+'</td><td title="'+esc(status)+'">'+esc(shortDate(c.checked_at||c.gsc_date)||'—')+' · '+esc(status)+'</td></tr>';
  }).join('')||'<tr><td colspan="8" style="text-align:center">이 플랫폼의 등록 데이터가 없습니다.</td></tr>';
 }
@@ -273,6 +285,7 @@ function renderSocialRanking(){
  const rows=socialPayload.rows||[],counts={};
  for(const key of Object.keys(SOCIAL_TABS))counts[key]=rows.filter(c=>String(c.platform||'').toLowerCase()===key).length;
  setPlatformTabs('social-platform-tabs',socialPlatform,counts,SOCIAL_TABS);
+ document.querySelector('.social-platform-section').dataset.activePlatform=socialPlatform;
  const label=SOCIAL_TABS[socialPlatform]||socialPlatform;
  document.getElementById('social-title').textContent=label+' 계정별 순위 ('+counts[socialPlatform]+'개)';
  document.getElementById('social-basis').textContent=(socialPlatform==='youtube'?'구독자 수':'팔로워 수')+' 기준 · '+dateLabel(socialPayload.ranking_date||todayKst())+' · 확인된 운영 계정만 순위 부여 · 게시 권한은 별도 표시';
