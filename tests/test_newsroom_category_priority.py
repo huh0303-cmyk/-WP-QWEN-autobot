@@ -19,10 +19,13 @@ def test_rights_cleared_art_feed_is_registered():
     assert "open-government-licence/version/3" in registry
 
 
-def test_newsrooms_accept_new_story_events_without_fixed_publication_slots():
+def test_newsrooms_run_three_scheduled_slots_with_random_category_and_delay():
     workflow = (ROOT / ".github" / "workflows" / "newsrooms-daily-publisher.yml").read_text(encoding="utf-8")
-    cron_lines = [line.strip() for line in workflow.splitlines() if line.strip().startswith('- cron:')]
-    assert not cron_lines
+    cron_lines = [line.strip() for line in workflow.splitlines() if line.strip().startswith("- cron:")]
+    assert cron_lines == ["- cron: '17 0,7,14 * * *'"]
+    assert "KEY=\"${KEY:-koreanews365}\"" in workflow
+    assert "shuf -i 0-1800 -n 1" in workflow
+    assert "NEWSROOM_SUGGESTED_CATEGORY: ${{ steps.target.outputs.category }}" in workflow
     assert "options: [koreanews365, theseouljournal]" in workflow
     assert "NEWSROOM_SOURCE_URL: ${{ inputs.source_url }}" in workflow
     assert "KO_CATS=" not in workflow
