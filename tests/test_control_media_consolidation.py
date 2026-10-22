@@ -33,33 +33,22 @@ def test_youtube_oauth_receipt_displays_identity_without_claiming_publication(mo
     assert "OAuth 채널 ID 확인" not in social_accounts._youtube_cards()[0]["state_label"]
 
 
-def test_control_home_keeps_blog_and_social_as_two_equal_tables():
+def test_control_home_separates_platform_rankings_and_colors():
     template = (ROOT / "control_center" / "templates" / "control_home.html").read_text(encoding="utf-8")
     assert "grid-template-columns:repeat(2,minmax(0,1fr))" in template
     assert '<tbody id="blog-rows">' in template
     assert '<tbody id="social-rows">' in template
-    assert '<tbody id="youtube-rows">' not in template
-    assert '<tbody id="sns-rows">' not in template
     assert "fetch('/api/control/social-ranking'" in template
-    assert "fetch('/api/control/youtube-ranking'" not in template
-    assert "fetch('/api/control/sns-ranking'" not in template
-    assert "GSC 클릭/노출" in template
-    assert "visitorMetric(c)" in template
-    assert "GSC 미연결" in template
-    assert "GSC 소유권 인증 필요" in template
-    assert "GSC 연결 · 클릭 데이터 없음" in template
-    assert '<th>순위</th><th>플랫폼</th><th>사이트</th><th>누적 수익 (USD)</th>' in template
-    assert '<th>순위</th><th>플랫폼</th><th>채널/계정</th><th>누적 수익 (USD)</th>' in template
-    assert "return 'US$'+nf.format(r.amount)" in template
-    assert "title=\"수익창출\">🏅" in template
-    assert "수익 데이터 미연결</span>" not in template
-    assert "timeZone:'Asia/Seoul'" in template
-    assert "'블로그 순위 ('+dateLabel(todayKst())" in template
-    assert "'YouTube + SNS 순위 ('+dateLabel(todayKst())" in template
-    assert "rank(c.row_number)" in template
-    assert "rank(c.rank)" not in template
-    assert "recentPublication(c)" in template
-    assert "Post ID " in template
+    assert "const BLOG_TABS={wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'}" in template
+    assert "const SOCIAL_TABS={youtube:'YouTube',tiktok:'TikTok',instagram:'Instagram',threads:'Threads',facebook:'Facebook'}" in template
+    assert 'data-platform="news"' not in template
+    assert "return cards.filter(c=>String(c.platform||'').toLowerCase()===platform)" in template
+    assert "const rankValue=Number.isFinite(c.yesterday_visitors)?++rankNumber:null" in template
+    assert "const rankValue=canRank?++rankNumber:null" in template
+    for platform in ("wordpress", "blogspot", "tistory", "naver", "youtube", "tiktok", "instagram", "threads", "facebook"):
+        assert f'.platform-tab[data-platform="{platform}"]' in template
+        assert f'.platform-section[data-active-platform="{platform}"]' in template
+        assert f'.platform-{platform}' in template
 
 
 def test_blog_ranking_preserves_real_gsc_clicks_and_impressions():
@@ -313,7 +302,7 @@ def test_sns_ranking_uses_persisted_official_probe(monkeypatch, tmp_path):
     (tmp_path / "config").mkdir()
     (tmp_path / "data").mkdir()
     (tmp_path / "config" / "sns_six_channel_policy.json").write_text(
-        '{"accounts":[{"platform":"Instagram","role":"korean_topik","display_name":"SIS Korean","handle":"sis_topik1"}]}',
+        '{"active_roles":["korean_topik"],"roles":[{"key":"korean_topik","name":"TOPIK"}],"accounts":[{"platform":"Instagram","role":"korean_topik","display_name":"SIS Korean","handle":"sis_topik1","account_exists":true,"identity_verified":true}]}',
         encoding="utf-8",
     )
     (tmp_path / "data" / "ceo_sns_probe.json").write_text(
@@ -338,10 +327,7 @@ def test_metrics_workflows_redeploy_only_sanitized_dashboard_snapshots():
 
 
 def test_social_platforms_are_grouped_in_requested_order():
-    control = (ROOT / "control_center" / "control_home.py").read_text(encoding="utf-8")
-    accounts = (ROOT / "control_center" / "social_accounts.py").read_text(encoding="utf-8")
     template = (ROOT / "control_center" / "templates" / "control_home.html").read_text(encoding="utf-8")
-    expected = '{"YouTube": 0, "Facebook": 1, "Threads": 2, "Instagram": 3, "TikTok": 4}'
-    assert expected in control
-    assert expected in accounts
-    assert "YouTube · Facebook · Threads · Instagram · TikTok 순서" in template
+    social_tabs = template.split('id="social-platform-tabs"', 1)[1].split("</nav>", 1)[0]
+    expected = ('youtube', 'tiktok', 'instagram', 'threads', 'facebook')
+    assert tuple(__import__("re").findall(r'data-platform="([^"]+)"', social_tabs)) == expected
