@@ -142,7 +142,7 @@ def render(headline,photo,audio):
     still=OUT/"cover.jpg"; base.save(still,quality=94)
     ffmpeg=os.getenv("FFMPEG_BINARY","ffmpeg")
     video=OUT/"seoul-journal-short.mp4"
-    cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
+    cmd=[ffmpeg,"-y","-loop","1","-i",str(still),"-i",str(audio),"-vf","scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p","-c:v","libx264","-preset","medium","-tune","stillimage","-af","atempo=1.2","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(video)]
     p=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
     if p.returncode: raise RuntimeError("FFmpeg 렌더링 실패: "+p.stderr[-1200:])
     return video
