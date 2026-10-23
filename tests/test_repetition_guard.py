@@ -2,6 +2,17 @@ import pytest
 from automation_hub.repetition_guard import title_repeats, repetition_issues, clean_opening, opening, fetch_wp_history
 from automation_hub.content_identity import is_similar_content
 
+def test_reworded_same_topic_title_is_blocked():
+    # 2026-09-10: k-trip365.com published both of these within 2 days - the
+    # prefix/sequence checks alone missed it because the wording diverges at
+    # the third word ("palaces" vs "cultural"), even though the underlying
+    # topic (Seoul central area, subway, timed itinerary, seasonal notes) is
+    # identical.
+    assert title_repeats(
+        "Seoul central palaces and markets by subway — an 8-hour timed tourism route with ticketing and seasonal cautions",
+        "Seoul central cultural loop by subway — a timed public-transport itinerary with admission and seasonal notes",
+    )
+
 def test_reported_investment_template():
     assert title_repeats("How to evaluate Korean AI Digital Finance exposure in listed stocks and ETFs: data, drivers and investor access", "How to evaluate South Korea ESG ETF investment: market snapshot, drivers, risks and access for foreign investors")
 
