@@ -1,0 +1,21 @@
+name: Seoul Journal Studio syntax check
+on:
+  push:
+    paths:
+      - "apps/seoul_journal_studio.py"
+      - "scripts/seoul_journal_shorts_pipeline.py"
+      - "requirements-seoul-journal-studio.txt"
+      - ".github/workflows/seoul-journal-studio-check.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile app and pipeline
+        run: python -m py_compile apps/seoul_journal_studio.py scripts/seoul_journal_shorts_pipeline.py
