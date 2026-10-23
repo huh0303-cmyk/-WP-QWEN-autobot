@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   build-and-upload-private:
-    if: ${{ inputs.confirm_private_upload == true }}
+    if: ${{ github.event_name == 'schedule' || inputs.confirm_private_upload == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
