@@ -77,15 +77,22 @@ def draft(title,body):
     return data
 
 def tts(text):
-    key=os.getenv("ELEVENLABS_API_KEY","").strip()
-    voice=os.getenv("SEOUL_JOURNAL_VOICE_ID","EXAVITQu4vr4xnSDxMaL").strip()
-    if not key: raise RuntimeError("ELEVENLABS_API_KEY GitHub Actions secret이 없습니다.")
-    r=requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
-      headers={"xi-api-key":key,"Content-Type":"application/json","Accept":"audio/mpeg"},
-      json={"text":text,"model_id":"eleven_multilingual_v2","voice_settings":{"stability":0.52,"similarity_boost":0.78,"style":0.15,"use_speaker_boost":True}},timeout=120)
-    if not r.ok: raise RuntimeError(f"ElevenLabs TTS 실패 HTTP {r.status_code}: {r.text[:300]}")
-    p=OUT/"voice.mp3"; p.write_bytes(r.content)
-    if p.stat().st_size<2000: raise RuntimeError("ElevenLabs 음성 파일이 비정상적으로 작습니다.")
+    """Generate Korean narration using free Edge neural TTS; no API key required."""
+    import asyncio
+    import edge_tts
+    voice=os.getenv("SEOUL_JOURNAL_EDGE_VOICE","ko-KR-SunHiNeural").strip()
+    rate=os.getenv("SEOUL_JOURNAL_TTS_RATE","+15%").strip()
+    p=OUT/"voice.mp3"
+    async def generate():
+        communicate=edge_tts.Communicate(text=text,voice=voice,rate=rate)
+        await communicate.save(str(p))
+    try:
+        asyncio.run(generate())
+    except Exception as e:
+        raise RuntimeError(f"무료 Edge TTS 음성 생성 실패 ({voice}): {e}") from e
+    if not p.exists() or p.stat().st_size<2000:
+        raise RuntimeError("무료 Edge TTS 음성 파일이 없거나 비정상적으로 작습니다.")
+    log(f"TTS_ENGINE=edge-tts voice={voice} rate={rate} bytes={p.stat().st_size}")
     return p
 
 def fetch_photo(image_url):
