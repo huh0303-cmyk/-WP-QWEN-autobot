@@ -22,7 +22,6 @@ concurrency:
 
 jobs:
   build-and-upload-private:
-    if: ${{ github.event_name == 'schedule' || inputs.confirm_private_upload == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -35,8 +34,13 @@ jobs:
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
+          CONFIRM_PRIVATE_UPLOAD: ${{ inputs.confirm_private_upload }}
         run: |
           set -eu
+          if [ "$CONFIRM_PRIVATE_UPLOAD" != "true" ]; then
+            echo "::error title=Confirmation required::Re-run this workflow and check 'Confirm upload will be PRIVATE only'."
+            exit 1
+          fi
           missing=""
           for name in OPENAI_API_KEY ELEVENLABS_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
