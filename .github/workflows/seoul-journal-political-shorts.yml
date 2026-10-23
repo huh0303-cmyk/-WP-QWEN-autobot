@@ -68,7 +68,6 @@ jobs:
         env:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
