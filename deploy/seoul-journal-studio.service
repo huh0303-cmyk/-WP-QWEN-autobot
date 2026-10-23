@@ -1,0 +1,23 @@
+[Unit]
+Description=Seoul Journal Shorts Studio (isolated London Project module)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=seoulstudio
+Group=seoulstudio
+WorkingDirectory=/opt/seoul-journal-studio
+EnvironmentFile=/etc/seoul-journal-studio.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/seoul-journal-studio/.venv/bin/streamlit run /opt/seoul-journal-studio/apps/seoul_journal_studio.py --server.address 127.0.0.1 --server.port 8501 --server.headless true
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/seoul-journal-studio/artifacts
+
+[Install]
+WantedBy=multi-user.target
