@@ -26,12 +26,10 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependency
-        run: python -m pip install requests
+        run: python -m pip install edge-tts
 
-      - name: Generate Seoul Journal Korean audio
+      - name: Generate free Seoul Journal Korean audio
         env:
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          SEOUL_JOURNAL_VOICE_ID: EXAVITQu4vr4xnSDxMaL
           SEOUL_JOURNAL_TEXT: ${{ inputs.script }}
         run: python scripts/seoul_journal_voice_test.py
 
