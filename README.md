@@ -101,3 +101,12 @@ python scripts/naver_blog_local_runner.py run --site-id naver_main --max-jobs 1
 python -m unittest discover -s tests -v
 python -m automation_hub.cli validate
 ```
+
+
+## Seoul Journal Shorts Studio (separate app)
+
+A standalone Streamlit production UI reuses `scripts/seoul_journal_shorts_pipeline.py` without replacing the London Project control center. App entrypoint: [`apps/seoul_journal_studio.py`](apps/seoul_journal_studio.py). Dependencies: [`requirements-seoul-journal-studio.txt`](requirements-seoul-journal-studio.txt). VPS service template and prerequisites: [deployment notes](deploy/DEPLOY_SEOUL_JOURNAL_STUDIO.md).
+
+Features: Naver article extraction, AI script draft/edit, 1.2x narration generation, vertical video rendering, estimated-timing Korean subtitle burn-in, video preview/download, explicit confirmation before private-only YouTube upload with expected channel-ID validation. No automatic public publishing is implemented.
+
+This app has been committed to the repository, but is **not considered deployed or production-verified** until the Hostinger VPS service, environment secrets, TLS/authenticated reverse proxy, and end-to-end tests are verified. Do not expose Streamlit port 8501 directly to the internet. Existing video cost-hold safeguards remain in force.
