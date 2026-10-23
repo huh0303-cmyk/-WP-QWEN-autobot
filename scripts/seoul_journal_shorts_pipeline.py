@@ -77,21 +77,41 @@ def draft(title,body):
     return data
 
 def tts(text):
-    """Generate Korean narration using free Edge neural TTS; no API key required."""
+    """Prefer Fish Audio S2.1 Pro Free when configured; fall back to free Edge TTS."""
     import asyncio
+    p=OUT/"voice.mp3"
+    fish_key=os.getenv("FISH_AUDIO_API_KEY","").strip()
+    if fish_key:
+        import requests
+        model=os.getenv("FISH_AUDIO_MODEL","s2.1-pro-free").strip()
+        reference_id=os.getenv("FISH_AUDIO_REFERENCE_ID","933563129e564b19a115bedd57b7406a").strip()
+        try:
+            r=requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={"Authorization":f"Bearer {fish_key}","Content-Type":"application/json","model":model},
+                json={"text":text,"reference_id":reference_id,"format":"mp3"},
+                timeout=120,
+            )
+            if r.ok and len(r.content)>2000:
+                p.write_bytes(r.content)
+                log(f"TTS_ENGINE=fish-audio model={model} bytes={p.stat().st_size}")
+                return p
+            log(f"Fish Audio failed HTTP {r.status_code}; falling back to Edge TTS.")
+        except Exception as e:
+            log(f"Fish Audio request failed ({e}); falling back to Edge TTS.")
+    else:
+        log("FISH_AUDIO_API_KEY not configured; using free Edge TTS fallback.")
     import edge_tts
     voice=os.getenv("SEOUL_JOURNAL_EDGE_VOICE","ko-KR-SunHiNeural").strip()
     rate=os.getenv("SEOUL_JOURNAL_TTS_RATE","+15%").strip()
-    p=OUT/"voice.mp3"
     async def generate():
-        communicate=edge_tts.Communicate(text=text,voice=voice,rate=rate)
-        await communicate.save(str(p))
+        await edge_tts.Communicate(text=text,voice=voice,rate=rate).save(str(p))
     try:
         asyncio.run(generate())
     except Exception as e:
-        raise RuntimeError(f"무료 Edge TTS 음성 생성 실패 ({voice}): {e}") from e
+        raise RuntimeError(f"Free Edge TTS failed ({voice}): {e}") from e
     if not p.exists() or p.stat().st_size<2000:
-        raise RuntimeError("무료 Edge TTS 음성 파일이 없거나 비정상적으로 작습니다.")
+        raise RuntimeError("Generated TTS audio is missing or too small.")
     log(f"TTS_ENGINE=edge-tts voice={voice} rate={rate} bytes={p.stat().st_size}")
     return p
 
