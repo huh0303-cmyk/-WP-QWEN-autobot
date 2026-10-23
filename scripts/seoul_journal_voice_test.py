@@ -1,51 +1,36 @@
 #!/usr/bin/env python3
-"""Generate a Seoul Journal Korean voice sample with ElevenLabs; no publishing."""
+"""Generate a free Korean Edge neural TTS sample; no API key and no publishing."""
 import os
 import sys
+import asyncio
 from pathlib import Path
-import requests
+import edge_tts
 
-api_key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
 text = os.environ.get("SEOUL_JOURNAL_TEXT", "").strip()
+voice = os.environ.get("SEOUL_JOURNAL_EDGE_VOICE", "ko-KR-SunHiNeural").strip()
+rate = os.environ.get("SEOUL_JOURNAL_TTS_RATE", "+15%").strip()
 
-if not api_key:
-    sys.exit("ERROR: GitHub Actions secret ELEVENLABS_API_KEY is missing.")
 if not text:
     sys.exit("ERROR: enter the Korean script in the workflow input.")
-
-from voice_rotation import choose_voice
-voice = choose_voice("seoul_journal")
-voice_id = voice["id"]
-print(f"VOICE_ROTATION channel=seoul_journal language=ko gender={voice['gender']} name={voice['name']} id={voice_id}")
-endpoint = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
-response = requests.post(
-    endpoint,
-    headers={
-        "xi-api-key": api_key,
-        "Accept": "audio/mpeg",
-        "Content-Type": "application/json",
-    },
-    json={
-        "text": text,
-        "model_id": "eleven_multilingual_v2",
-        "voice_settings": {
-            "stability": 0.55,
-            "similarity_boost": 0.8,
-            "style": 0.2,
-            "use_speaker_boost": True,
-        },
-    },
-    timeout=120,
-)
-if not response.ok:
-    # Do not print headers or secrets.
-    sys.exit(f"ElevenLabs request failed ({response.status_code}): {response.text[:1000]}")
 
 out = Path("artifacts/seoul-journal")
 out.mkdir(parents=True, exist_ok=True)
 audio = out / "seoul-journal-korean-voice-test.mp3"
-audio.write_bytes(response.content)
-(out / "script.txt").write_text(text + "\n", encoding="utf-8")
-import json
-(out / "voice-selection.json").write_text(json.dumps(voice, ensure_ascii=False, indent=2), encoding="utf-8")
-print(f"Created {audio} ({len(response.content)} bytes). No YouTube upload was attempted.")
+
+async def main():
+    await edge_tts.Communicate(text=text, voice=voice, rate=rate).save(str(audio))
+
+try:
+    asyncio.run(main())
+except Exception as exc:
+    sys.exit(f"Free Edge TTS request failed ({voice}): {exc}")
+
+if not audio.exists() or audio.stat().st_size < 2000:
+    sys.exit("ERROR: generated audio is missing or too small.")
+(out / "script.txt").write_text(text + "\\n", encoding="utf-8")
+(out / "voice-selection.json").write_text(
+    __import__("json").dumps({"engine": "edge-tts", "voice": voice, "rate": rate}, ensure_ascii=False, indent=2),
+    encoding="utf-8",
+)
+print(f"TTS_ENGINE=edge-tts voice={voice} rate={rate}")
+print(f"Created {audio} ({audio.stat().st_size} bytes). No YouTube upload was attempted.")
