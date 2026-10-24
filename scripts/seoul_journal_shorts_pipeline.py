@@ -86,7 +86,7 @@ def draft(title, body):
             ],
         )
         raw = (res.choices[0].message.content or "").strip()
-        raw = re.sub(r"^\`\`\`(?:json)?\\s*|\\s*\`\`\`$", "", raw)
+    raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
         try:
             data = json.loads(raw)
             data["narration"] = data["narration"].strip()
@@ -113,7 +113,7 @@ def tts(text):
     if not voice_id:
         raise RuntimeError("Approved Seoul Journal ElevenLabs voice ID is missing; refusing to use a substitute voice.")
     p = OUT / "voice.mp3"
-    model = os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2").strip()
+    model = os.getenv("ELEVENLABS_MODEL_ID", "").strip() or "eleven_multilingual_v2"
     r = requests.post(
         f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
         headers={"xi-api-key": api_key, "Content-Type": "application/json", "Accept": "audio/mpeg"},
