@@ -498,3 +498,12 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Public verification: Ktrip RSS latest remains 2026-10-10; Finance/Housing RSS latest remains 2026-10-18. Insurance Lab RSS exposes an Oct23 19:08:15 KST post titled “2026 정부지원 의료비 청구 핵심 가이드: 실손보험과 재난적의료비 차이점 및 신청 방법”; its exact public URL returned HTTP 200 and contains the title: https://k-insight-vietnam.tistory.com/entry/2026-%EC%A0%95%EB%B6%80%EC%A7%80%EC%9B%90-%EC%9D%98%EB%A3%8C%EB%B9%84-%EC%B2%AD%EA%B5%AC-%ED%95%B5%EC%8B%AC-%EA%B0%80%EC%9D%B4%EB%93%9C-%EC%8B%A4%EC%86%90%EB%B3%B4%ED%97%98%EA%B3%BC-%EC%9E%AC%EB%82%9C%EC%A0%81%EC%9D%98%EB%A3%8C%EB%B9%84-%EC%B0%A8%EC%9D%B4%EC%A0%90-%EB%B0%8F-%EC%8B%A0%EC%B2%AD-%EB%B0%A9%EB%B2%95. Verified public result: 1/3.
 - Local `tistory_local_runner.py status` returned no `2026-10-23` job IDs. Windows task `Tistory5개_일일자동발행` last ran 2026-10-23 23:45 KST with result 0, but no matching local receipt; task exit status is not publication proof. Google Sheets queue data remains unavailable through the connected browser/export path.
 - No retry or catch-up post was triggered. Keep any remaining two selections closed for this date; fix paused plan/queue evidence before future selected slots.
+
+
+## naver-daily-check-20261024
+
+- `task_id=naver-daily-check-20261024`; heartbeat received 2026-10-24T00:09:43Z = 09:09 KST. Read-only check for N1 `k-insight-vietnam`, N2 `health-standard`, N3 `sky-only`.
+- Registry mapping remains N1 `huh0303` → `k-insight-vietnam`; N2 `huh3` → `health-standard`; N3 `huh4` → `sky-only` (configured mapping, not live session proof).
+- No `data/naver-daily-plans/2026-10-24.json` or `data/naver-trend-brief/2026-10-24.json` exists. Public RSS latest dates are N1 Oct10, N2 Oct7, N3 Oct8 (KST), so confirmed Oct24 published count is 0/3 as of 09:09 KST.
+- Browser state inspection timed out twice; current account identity, CAPTCHA and editor could not be checked. No draft/editor change or publication was made. The Naver sign-in page was queued to the current Codex browser panel for the user; no credentials were requested or handled. Must verify each account/blog pairing after the user completes sign-in before any publication.
+- Same-day research window (07:07–07:50 KST) was missed and no evidence-backed plan exists. No late or backfill posts attempted. Next action: user completes intended Naver sign-in in the queued browser; resume with current evidence at a future valid slot, after plan/duplicate/source checks.
