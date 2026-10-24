@@ -29,6 +29,10 @@ jobs:
       - name: Validate Seoul Journal secrets before spending build time
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_MODEL_ID: ${{ vars.ELEVENLABS_MODEL_ID }}
+          SEOUL_JOURNAL_VOICE_ID: ${{ secrets.SEOUL_JOURNAL_VOICE_ID }}
+          ELEVENLABS_VOICE_ID_SEOUL_JOURNAL: ${{ secrets.ELEVENLABS_VOICE_ID_SEOUL_JOURNAL }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
@@ -41,13 +45,17 @@ jobs:
             exit 1
           fi
           missing=""
-          for name in OPENAI_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+          for name in OPENAI_API_KEY ELEVENLABS_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
               echo "::error title=Missing GitHub secret::$name is not configured. Add it in Settings > Secrets and variables > Actions."
               missing="yes"
             fi
           done
+          if [ -z "$SEOUL_JOURNAL_VOICE_ID" ] && [ -z "$ELEVENLABS_VOICE_ID_SEOUL_JOURNAL" ]; then
+            echo "::error title=Missing ElevenLabs voice::Configure SEOUL_JOURNAL_VOICE_ID or ELEVENLABS_VOICE_ID_SEOUL_JOURNAL."
+            missing="yes"
+          fi
           if [ -n "$missing" ]; then
             echo "Stopped before installing dependencies. No video was generated or uploaded."
             exit 1
@@ -63,16 +71,19 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
+          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2
       - name: Build one-minute political Short and upload as PRIVATE
         env:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_MODEL_ID: ${{ vars.ELEVENLABS_MODEL_ID }}
+          SEOUL_JOURNAL_VOICE_ID: ${{ secrets.SEOUL_JOURNAL_VOICE_ID }}
+          ELEVENLABS_VOICE_ID_SEOUL_JOURNAL: ${{ secrets.ELEVENLABS_VOICE_ID_SEOUL_JOURNAL }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
-          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
         run: python scripts/seoul_journal_shorts_pipeline.py
       - name: Upload package, MP4, and private upload receipt as workflow artifact
         if: always()
