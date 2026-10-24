@@ -60,6 +60,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 </section>
 <h2 id="social-title" style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a">SNS 계정별 플랫폼 순위</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
+<div id="social-focus-note" class="sub" style="display:none;margin:0 0 8px;padding:8px 10px;border-left:4px solid #e11d48;background:#fff1f2;color:#881337;font-weight:700">seoul_journal — 쇼츠 전문 채널 · 정치 · 사회 핫이슈 · 스포츠</div>
 <nav class="platform-tabs" id="social-platform-tabs" aria-label="SNS 플랫폼 순위"><button class="platform-tab" data-platform="YouTube" aria-pressed="true">YouTube</button><button class="platform-tab" data-platform="TikTok" aria-pressed="false">TikTok</button><button class="platform-tab" data-platform="Instagram" aria-pressed="false">Instagram</button><button class="platform-tab" data-platform="Threads" aria-pressed="false">Threads</button><button class="platform-tab" data-platform="Facebook" aria-pressed="false">Facebook</button></nav>
 <div class="bar"><label for="socialSortKey">SNS 정렬 기준</label><select id="socialSortKey"><option value="followers">구독자 / 팔로워 수 ↓</option><option value="total_views">누적 조회수 ↓</option><option value="content_count">콘텐츠 수 ↓</option><option value="latest_content_views">최근 콘텐츠 조회수 ↓</option><option value="last_publish">최근 발행일 ↓</option></select><span class="na">숫자 미수집 계정은 아래쪽 표시</span></div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>채널 / 계정</th><th>구독자 / 팔로워</th><th>팔로잉</th><th>콘텐츠 수</th><th>누적 조회 / 좋아요</th><th>최근 콘텐츠 반응</th><th>개설일</th><th>최근 발행</th><th>데이터 확인일</th><th>연결 상태</th><th>즉시 발행</th></tr></thead><tbody id="social-rows"></tbody></table></div>
@@ -190,6 +191,7 @@ function drawBloggerPageviews(payload){
  select.onchange=render;render();
 }
 var socialPlatform='YouTube';
+function listCountForTitle(data,platform){return (data.accounts||[]).filter(function(a){return a.platform===platform;}).length;}
 function drawSocial(data){
  if(!data)return;
  SOCIAL_DATA=data;
@@ -200,7 +202,9 @@ function drawSocial(data){
  var platformCounts={YouTube:0,TikTok:0,Instagram:0,Threads:0,Facebook:0};
  all.forEach(function(a){if(Object.prototype.hasOwnProperty.call(platformCounts,a.platform))platformCounts[a.platform]++;});
  document.querySelectorAll('#social-platform-tabs .platform-tab').forEach(function(b){b.textContent=b.dataset.platform+' · '+platformCounts[b.dataset.platform];b.setAttribute('aria-pressed',String(b.dataset.platform===socialPlatform));});
- document.getElementById('social-title').textContent=socialPlatform+' 계정별 순위';
+ document.getElementById('social-title').textContent=socialPlatform+' ('+listCountForTitle(data,socialPlatform)+'개) 계정별 순위';
+ var socialFocus=document.getElementById('social-focus-note');
+ if(socialFocus){socialFocus.style.display=socialPlatform==='YouTube'?'block':'none';}
  var list=all.filter(function(a){return a.platform===socialPlatform});
  var metricMap={};
  (SOCIAL_METRICS&&SOCIAL_METRICS.accounts||[]).forEach(function(x){metricMap[x.key]=x;});
