@@ -134,12 +134,10 @@ def blogger_access_token():
 
 
 def collect_blogger_pageviews(portfolio, now):
-    """Collect cumulative pageviews from the same central counter used by Blogger widgets.
+    """Read Blogger native pageview totals through Blogger API v3 when exposed.
 
-    This deliberately avoids Blogger API OAuth/pageviews permissions (the current
-    API integration returns 403). Counts represent pageviews counted by our
-    embedded control.korea365.org widget since it was installed, not Blogger's
-    historical native stats. Missing endpoints remain unknown, never zero.
+    The old /api/blog-visits/{site_key} endpoint does not exist (HTTP 404), so
+    it was never a valid visitor source. Never fabricate visitor counts.
     """
     try:
         history = json.loads(PAGEVIEWS_HIST.read_text(encoding="utf-8"))
@@ -147,86 +145,69 @@ def collect_blogger_pageviews(portfolio, now):
         history = {"days": {}}
     history.setdefault("days", {})
     today = now.date().isoformat()
-    previous_day = (now.date() - dt.timedelta(days=1)).isoformat()
-    previous = history["days"].get(previous_day, {})
-    try:
-        profiles = json.loads((ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8")).get("profiles", [])
-    except (OSError, ValueError):
-        profiles = []
-    key_by_url = {}
-    for profile in profiles.values() if isinstance(profiles, dict) else profiles:
-        site_key = str(profile.get("site_key") or "").strip()
-        blog_url = str((profile.get("blogspot") or {}).get("url") or "").rstrip("/")
-        if site_key and blog_url:
-            key_by_url[blog_url] = site_key
-
-    current = {}
-    rows = []
+    previous = history["days"].get((now.date() - dt.timedelta(days=1)).isoformat(), {})
+    access_token, token_error = blogger_access_token()
+    current, rows = {}, []
     for blog in portfolio.get("channels", []):
         url = str(blog.get("blogspot") or "").rstrip("/")
-        site_key = key_by_url.get(url, "")
-        row = {
-            "key": site_key or url, "site_key": site_key, "url": url,
-            "title": blog.get("title") or url,
-            "total_pageviews": None, "daily_pageviews": None,
-            "status": "WIDGET_KEY_NOT_FOUND" if not site_key else "NOT_COLLECTED",
-            "checked_at": None, "history": [],
-        }
-        if site_key:
+        site_key = str(blog.get("site_key") or "").strip()
+        blog_id = str(blog.get("destination_id") or "").strip()
+        row = {"key": site_key or url, "site_key": site_key, "url": url,
+               "title": blog.get("title") or url, "total_pageviews": None,
+               "daily_pageviews": None, "status": token_error or "BLOGGER_VIEWS_UNAVAILABLE",
+               "checked_at": None, "history": []}
+        if access_token and blog_id:
             try:
-                response = requests.get("https://control.korea365.org/api/blog-visits/" + quote(site_key, safe=""), timeout=20)
-                response.raise_for_status()
-                payload = response.json()
-                total = payload.get("total")
-                if not isinstance(total, (int, float)) or total < 0:
-                    row["status"] = "TOTAL_NOT_RETURNED"
-                else:
-                    total = int(total)
-                    row["total_pageviews"] = total
-                    row["checked_at"] = now.isoformat()
-                    old = previous.get(site_key)
-                    if old is not None and total >= int(old):
-                        row["daily_pageviews"] = total - int(old)
-                        row["status"] = "OK"
-                    elif old is not None:
-                        row["status"] = "COUNTER_RESET_BASELINE_REQUIRED"
+                response = requests.get(
+                    "https://www.googleapis.com/blogger/v3/blogs/" + quote(blog_id, safe=""),
+                    params={"view": "ADMIN"},
+                    headers={"Authorization": "Bearer " + access_token}, timeout=20)
+                if response.ok:
+                    payload = response.json()
+                    views = payload.get("views") or {}
+                    total = views.get("total") or views.get("allTime")
+                    if isinstance(total, (int, float)) and total >= 0:
+                        total = int(total)
+                        row["total_pageviews"] = total
+                        row["checked_at"] = now.isoformat()
+                        old = previous.get(site_key or url)
+                        if old is not None and total >= int(old):
+                            row["daily_pageviews"] = total - int(old)
+                            row["status"] = "OK"
+                        elif old is not None:
+                            row["status"] = "COUNTER_RESET_BASELINE_REQUIRED"
+                        else:
+                            row["status"] = "BASELINE_PENDING"
+                        current[site_key or url] = total
                     else:
-                        row["status"] = "BASELINE_PENDING"
-                    current[site_key] = total
-                    row["counter_date"] = payload.get("date")
-                    row["counter_source"] = payload.get("metric", "pageviews_since_install")
-            except requests.HTTPError as exc:
-                row["status"] = "HTTP_" + str(exc.response.status_code if exc.response is not None else 0)
+                        row["status"] = "BLOGGER_API_NO_VIEW_TOTAL"
+                else:
+                    row["status"] = "BLOGGER_API_HTTP_" + str(response.status_code)
             except (requests.RequestException, ValueError, TypeError):
-                row["status"] = "COUNTER_UNAVAILABLE"
+                row["status"] = "BLOGGER_API_REQUEST_FAILED"
+        elif not blog_id:
+            row["status"] = "BLOG_ID_MISSING"
         rows.append(row)
-
-    # Save only successful cumulative values. A missing counter is never stored as zero.
     if current:
         history["days"][today] = current
     for old_day in sorted(history["days"])[:-60]:
         del history["days"][old_day]
     PAGEVIEWS_HIST.parent.mkdir(parents=True, exist_ok=True)
     PAGEVIEWS_HIST.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    dates = sorted(history.get("days", {}))[-30:]
+    dates = sorted(history["days"])[-30:]
     for row in rows:
         key = row["key"]
         series = []
         for day in dates:
-            values = history["days"].get(day, {})
-            prior_day = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
-            total = values.get(key)
-            old = history["days"].get(prior_day, {}).get(key)
-            daily = int(total) - int(old) if total is not None and old is not None and int(total) >= int(old) else None
+            total = history["days"].get(day, {}).get(key)
+            prev_day = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
+            old = history["days"].get(prev_day, {}).get(key)
+            daily = int(total)-int(old) if total is not None and old is not None and int(total)>=int(old) else None
             series.append({"date": day, "daily_pageviews": daily, "total_pageviews": total})
         row["history"] = series
-    return {
-        "generated_at": now.isoformat(),
-        "source": "control.korea365.org embedded Blogger visitor widget counter API; cumulative since widget installation; daily delta from consecutive snapshots",
-        "history_days": dates,
-        "blogs": rows,
-    }
+    return {"generated_at": now.isoformat(),
+            "source": "Blogger API v3 Blog resource views (when exposed); missing totals remain unavailable",
+            "history_days": dates, "blogs": rows}
 
 def one(h, props, platform, url, display_name, ref, prev_hist):
     row = {"site": url.split("://", 1)[-1].rstrip("/"), "url": url,
