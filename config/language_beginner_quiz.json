@@ -1,0 +1,72 @@
+{
+  "project": "London Project - Language Beginner Vocabulary Quiz",
+  "status": "approved_specification",
+  "batch_size": {
+    "languages": 10,
+    "videos_per_language": 100,
+    "questions_per_video": 3,
+    "total_videos": 1000,
+    "total_questions": 3000
+  },
+  "language_codes": [
+    "en",
+    "ja",
+    "ko",
+    "zh",
+    "vi",
+    "es",
+    "fr",
+    "de",
+    "it",
+    "th"
+  ],
+  "format": {
+    "aspect_ratio": "9:16",
+    "resolution": "1080x1920",
+    "questions_per_video": 3,
+    "answer_choices": 3,
+    "reveal_answer": true,
+    "photo_first": true
+  },
+  "question_fields": [
+    "id",
+    "language",
+    "level",
+    "target_word",
+    "native_script",
+    "native_pronunciation_text",
+    "tts_locale",
+    "image_prompt",
+    "image_asset",
+    "question_text",
+    "choices",
+    "correct_choice",
+    "answer_reveal_text",
+    "audio_asset",
+    "validation_status"
+  ],
+  "quality_gates": [
+    "Photo must depict the exact target word, not a loosely related concept.",
+    "Native-speaker audio locale must match the target language.",
+    "Validate image/audio/question/answer by shared stable question ID.",
+    "Do not silently substitute silence or a placeholder image for a failed asset.",
+    "Retry only the failed asset-generation task, with a bounded retry count.",
+    "Keep generated videos private until separately approved for publishing.",
+    "Do not mark a language batch complete until all 100 videos and 300 questions pass validation."
+  ],
+  "voice_policy": {
+    "language_channels": "Use one native male and one native female voice per language when configured; randomly select per video.",
+    "native_audio_required": true,
+    "fallback": "Fail the affected audio task and report missing voice configuration; never claim native audio if not produced."
+  },
+  "image_policy": {
+    "preferred": "clear, real-world photograph or unambiguous high-quality illustration",
+    "shorts_safe_area": true,
+    "no_text_in_generated_photo": true
+  },
+  "notes": [
+    "Language list is provisional and must be reconciled with actual channel registry before production.",
+    "This manifest records the approved specification; it does not mean 1,000 videos have been generated.",
+    "Existing scripts/topik_quiz_shorts.py is Korean TOPIK-centered and currently supports only ko, ja, en, es, vi; do not assume all ten languages are production-ready."
+  ]
+}
