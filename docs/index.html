@@ -48,7 +48,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="sub" id="meta">공식 Google Search Console 통계를 불러오는 중...</div>
 <nav id="all-platform-summary" class="platform-tabs" aria-label="전체 플랫폼 계정 수" style="margin:8px 0 12px"></nav>
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">GSC 클릭·노출은 별도 참고 지표이며 방문자 수로 사용하지 않습니다.</span></div>
-<nav class="platform-tabs" id="blog-platform-tabs" aria-label="블로그 플랫폼 순위"><button class="platform-tab" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" data-platform="tistory" aria-pressed="false">Tistory</button><button class="platform-tab" data-platform="naver" aria-pressed="false">Naver</button></nav>
+
 <div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>콘텐츠 수(증감)</th><th>최근 발행일</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
@@ -109,14 +109,18 @@ function updateAllPlatformSummary(){
  (J&&J.rows||[]).forEach(function(r){var p=blogPlatformOf(r);var k={wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'}[p];if(k)counts[k]++;});
  (SOCIAL_DATA&&SOCIAL_DATA.accounts||[]).forEach(function(a){if(Object.prototype.hasOwnProperty.call(counts,a.platform))counts[a.platform]++;});
  var order=['WordPress','Blogspot','Tistory','Naver','YouTube','TikTok','Instagram','Threads','Facebook'];
- el.innerHTML=order.map(function(k){return '<span class="platform-tab" style="cursor:default">'+k+' · '+counts[k]+'</span>';}).join('');
+ el.innerHTML=order.map(function(k){var p=({WordPress:'wordpress',Blogspot:'blogspot',Tistory:'tistory',Naver:'naver',YouTube:'youtube',TikTok:'tiktok',Instagram:'instagram',Threads:'threads',Facebook:'facebook'})[k];return '<button type="button" class="platform-tab" data-platform="'+p+'" data-kind="'+(p==='wordpress'||p==='blogspot'||p==='tistory'||p==='naver'?'blog':'social')+'" aria-pressed="false">'+k+' · '+counts[k]+'</button>';}).join('');
  var blogCounts={};(J&&J.rows||[]).forEach(function(r){var p=blogPlatformOf(r);blogCounts[p]=(blogCounts[p]||0)+1;});
- document.querySelectorAll('#blog-platform-tabs .platform-tab').forEach(function(b){var p=b.dataset.platform;b.textContent=({wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'}[p]||p)+' · '+(blogCounts[p]||0);});
+ 
  var bs=document.getElementById('blogger-pageviews-title');if(bs)bs.textContent='Blogspot ('+(blogCounts.blogspot||0)+'개) · 누적 방문자 순위';
 }
 function drawBlogTabs(){
- var labels={wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'},rows=J&&J.rows||[];
- document.querySelectorAll('#blog-platform-tabs .platform-tab').forEach(function(b){var p=b.dataset.platform,count=rows.filter(function(r){return blogPlatformOf(r)===p}).length;b.textContent=labels[p]+' · '+count;b.setAttribute('aria-pressed',String(p===blogPlatform));});
+ var rows=J&&J.rows||[];
+ document.querySelectorAll('#all-platform-summary .platform-tab[data-kind="blog"]').forEach(function(b){
+  var p=b.dataset.platform,count=rows.filter(function(r){return blogPlatformOf(r)===p}).length;
+  b.textContent=({wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'}[p]||p)+' · '+count;
+  b.setAttribute('aria-pressed',String(p===blogPlatform));
+ });
 }
 function draw(){
   if(!J)return;
@@ -201,7 +205,7 @@ function drawSocial(data){
  var platformClass={YouTube:'platform-youtube',Facebook:'platform-facebook',Instagram:'platform-instagram',Threads:'platform-threads',TikTok:'platform-tiktok'};
  var platformCounts={YouTube:0,TikTok:0,Instagram:0,Threads:0,Facebook:0};
  all.forEach(function(a){if(Object.prototype.hasOwnProperty.call(platformCounts,a.platform))platformCounts[a.platform]++;});
- document.querySelectorAll('#social-platform-tabs .platform-tab').forEach(function(b){b.textContent=b.dataset.platform+' · '+platformCounts[b.dataset.platform];b.setAttribute('aria-pressed',String(b.dataset.platform===socialPlatform));});
+ document.querySelectorAll('#all-platform-summary .platform-tab[data-kind="social"],#social-platform-tabs .platform-tab').forEach(function(b){if(b.dataset.kind==='social'){b.textContent=b.dataset.platform.charAt(0).toUpperCase()+b.dataset.platform.slice(1)+' · '+platformCounts[b.dataset.platform];b.setAttribute('aria-pressed',String(b.dataset.platform.toLowerCase()===socialPlatform.toLowerCase()));}else{b.textContent=b.dataset.platform+' · '+platformCounts[b.dataset.platform];b.setAttribute('aria-pressed',String(b.dataset.platform===socialPlatform));}});
  document.getElementById('social-title').textContent=socialPlatform+' ('+listCountForTitle(data,socialPlatform)+'개) 계정별 순위';
  var socialFocus=document.getElementById('social-focus-note');
  if(socialFocus){socialFocus.style.display=socialPlatform==='YouTube'?'block':'none';}
