@@ -86,7 +86,7 @@ def draft(title, body):
             ],
         )
         raw = (res.choices[0].message.content or "").strip()
-    raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
         try:
             data = json.loads(raw)
             data["narration"] = data["narration"].strip()
