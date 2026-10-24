@@ -1,0 +1,29 @@
+name: Japanese Survival duplicate cleanup (keep highest views)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: japanese-survival-duplicate-cleanup
+  cancel-in-progress: false
+
+jobs:
+  privatize-lower-view-duplicates:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install YouTube API client
+        run: python -m pip install --disable-pip-version-check google-api-python-client google-auth
+      - name: Verify channel and privatize lower-view duplicates
+        env:
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_LANGUAGE_JA }}
+        run: python scripts/privatize_japanese_survival_duplicates.py
