@@ -268,7 +268,12 @@ function drawSocial(data){
 }
 fetch('social_inventory.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_DATA=d;drawSocial(d);}).catch(function(e){document.getElementById('social-meta').textContent='계정 등록부 오류: '+e.message;});
 document.getElementById('socialSortKey').addEventListener('change',function(){if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);});
-document.getElementById('social-platform-tabs').addEventListener('click',function(e){var b=e.target.closest('.platform-tab');if(!b)return;socialPlatform=b.dataset.platform;if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);});
+document.getElementById('social-platform-tabs').addEventListener('click',function(e){
+ var b=e.target.closest('#all-platform-summary .platform-tab');if(!b)return;
+ var p=b.dataset.platform,kind=b.dataset.kind;
+ if(kind==='blog'){blogPlatform=p;draw();var target=document.getElementById('blog-ranking-meta');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}
+ else{socialPlatform=p.charAt(0).toUpperCase()+p.slice(1);if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);var target=document.getElementById('social-title');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}
+});
 fetch('social_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){SOCIAL_METRICS=d;if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);}).catch(function(e){document.getElementById('social-meta').textContent+=' · 통계 스냅샷을 불러오지 못함';});
 fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(j){
   J=j;
