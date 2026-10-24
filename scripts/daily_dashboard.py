@@ -94,10 +94,12 @@ def blogger_access_token():
 
 
 def collect_blogger_pageviews(portfolio, now):
-    """Collect official Blogger API ALL-time pageviews and derive daily deltas from snapshots.
+    """Collect cumulative pageviews from the same central counter used by Blogger widgets.
 
-    A daily delta is shown only when the previous calendar day's cumulative total exists.
-    Missing API data is never converted to zero. History is retained for a 30-day chart.
+    This deliberately avoids Blogger API OAuth/pageviews permissions (the current
+    API integration returns 403). Counts represent pageviews counted by our
+    embedded control.korea365.org widget since it was installed, not Blogger's
+    historical native stats. Missing endpoints remain unknown, never zero.
     """
     try:
         history = json.loads(PAGEVIEWS_HIST.read_text(encoding="utf-8"))
@@ -107,41 +109,42 @@ def collect_blogger_pageviews(portfolio, now):
     today = now.date().isoformat()
     previous_day = (now.date() - dt.timedelta(days=1)).isoformat()
     previous = history["days"].get(previous_day, {})
-    access, auth_error = blogger_access_token()
-    channels = portfolio.get("channels", [])
+    try:
+        profiles = json.loads((ROOT / "config" / "content_engine_profiles.json").read_text(encoding="utf-8")).get("profiles", [])
+    except (OSError, ValueError):
+        profiles = []
+    key_by_url = {}
+    for profile in profiles.values() if isinstance(profiles, dict) else profiles:
+        site_key = str(profile.get("site_key") or "").strip()
+        blog_url = str((profile.get("blogspot") or {}).get("url") or "").rstrip("/")
+        if site_key and blog_url:
+            key_by_url[blog_url] = site_key
+
     current = {}
     rows = []
-    headers = {"Authorization": "Bearer " + access} if access else {}
-    for blog in channels:
+    for blog in portfolio.get("channels", []):
         url = str(blog.get("blogspot") or "").rstrip("/")
-        key = str(blog.get("destination_id") or "").strip()
+        site_key = key_by_url.get(url, "")
         row = {
-            "key": key or url, "url": url, "title": blog.get("title") or url,
+            "key": site_key or url, "site_key": site_key, "url": url,
+            "title": blog.get("title") or url,
             "total_pageviews": None, "daily_pageviews": None,
-            "status": auth_error or "NOT_COLLECTED", "checked_at": None,
-            "history": [],
+            "status": "WIDGET_KEY_NOT_FOUND" if not site_key else "NOT_COLLECTED",
+            "checked_at": None, "history": [],
         }
-        if access and key:
+        if site_key:
             try:
-                response = requests.get(
-                    "https://www.googleapis.com/blogger/v3/blogs/" + key + "/pageviews",
-                    headers=headers, params={"range": "ALL"}, timeout=20,
-                )
+                response = requests.get("https://control.korea365.org/api/blog-visits/" + quote(site_key, safe=""), timeout=20)
                 response.raise_for_status()
                 payload = response.json()
-                counts = payload.get("counts", [])
-                total = next(
-                    (int(item["count"]) for item in counts
-                     if str(item.get("timeRange", "")).upper() in {"ALL", "ALL_TIME"}
-                     and item.get("count") is not None),
-                    None,
-                )
-                if total is None:
-                    row["status"] = "TOTAL_PAGEVIEWS_NOT_RETURNED"
+                total = payload.get("total")
+                if not isinstance(total, (int, float)) or total < 0:
+                    row["status"] = "TOTAL_NOT_RETURNED"
                 else:
+                    total = int(total)
                     row["total_pageviews"] = total
                     row["checked_at"] = now.isoformat()
-                    old = previous.get(row["key"])
+                    old = previous.get(site_key)
                     if old is not None and total >= int(old):
                         row["daily_pageviews"] = total - int(old)
                         row["status"] = "OK"
@@ -149,30 +152,16 @@ def collect_blogger_pageviews(portfolio, now):
                         row["status"] = "COUNTER_RESET_BASELINE_REQUIRED"
                     else:
                         row["status"] = "BASELINE_PENDING"
-                    current[row["key"]] = total
+                    current[site_key] = total
+                    row["counter_date"] = payload.get("date")
+                    row["counter_source"] = payload.get("metric", "pageviews_since_install")
             except requests.HTTPError as exc:
-                code = exc.response.status_code if exc.response is not None else 0
-                row["status"] = "HTTP_" + str(code)
-                detail = {}
-                try:
-                    detail = exc.response.json().get("error", {}) if exc.response is not None else {}
-                except (ValueError, AttributeError):
-                    detail = {}
-                message = str(detail.get("message") or "").strip()
-                reasons = detail.get("errors", [])
-                reason = str(reasons[0].get("reason") or "") if reasons and isinstance(reasons[0], dict) else ""
-                row["error"] = ((reason + ": ") if reason else "") + (message or ("Blogger API HTTP " + str(code)))
-                row["error"] = row["error"][:180]
-            except requests.RequestException as exc:
-                row["status"] = "NETWORK_ERROR"
-                row["error"] = type(exc).__name__
-            except (ValueError, TypeError, KeyError):
-                row["status"] = "INVALID_API_RESPONSE"
-                row["error"] = "Pageviews response missing expected counts"
+                row["status"] = "HTTP_" + str(exc.response.status_code if exc.response is not None else 0)
+            except (requests.RequestException, ValueError, TypeError):
+                row["status"] = "COUNTER_UNAVAILABLE"
         rows.append(row)
 
-    # Persist a dated cumulative snapshot even when only some blogs succeeded.
-    # Failed API requests are not recorded as zero.
+    # Save only successful cumulative values. A missing counter is never stored as zero.
     if current:
         history["days"][today] = current
     for old_day in sorted(history["days"])[:-60]:
@@ -185,16 +174,16 @@ def collect_blogger_pageviews(portfolio, now):
         key = row["key"]
         series = []
         for day in dates:
-            day_values = history["days"].get(day, {})
-            prev_day = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
-            current_total = day_values.get(key)
-            prior_total = history["days"].get(prev_day, {}).get(key)
-            daily = int(current_total) - int(prior_total) if current_total is not None and prior_total is not None and int(current_total) >= int(prior_total) else None
-            series.append({"date": day, "daily_pageviews": daily})
+            values = history["days"].get(day, {})
+            prior_day = (dt.date.fromisoformat(day) - dt.timedelta(days=1)).isoformat()
+            total = values.get(key)
+            old = history["days"].get(prior_day, {}).get(key)
+            daily = int(total) - int(old) if total is not None and old is not None and int(total) >= int(old) else None
+            series.append({"date": day, "daily_pageviews": daily, "total_pageviews": total})
         row["history"] = series
     return {
         "generated_at": now.isoformat(),
-        "source": "Blogger API v3 pageviews range=ALL; daily values are differences between consecutive cumulative snapshots",
+        "source": "control.korea365.org embedded Blogger visitor widget counter API; cumulative since widget installation; daily delta from consecutive snapshots",
         "history_days": dates,
         "blogs": rows,
     }
