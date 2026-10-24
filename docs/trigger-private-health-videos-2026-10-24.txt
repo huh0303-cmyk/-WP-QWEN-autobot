@@ -1,1 +1,2 @@
 One-time request: set Health Clinic USA video 7qUEOZk8rB0 and Health Clinic Japan video eQsq_5utuHc to Private, verify exact channel IDs and final privacyStatus. No other videos may be changed.
+Retry after using the existing OAuth grant without requesting a new scope.
