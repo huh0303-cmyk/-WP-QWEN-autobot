@@ -1,9 +1,6 @@
 name: One-time private remediation for existing Health Clinic videos
 
 on:
-  push:
-    paths:
-      - "docs/trigger-private-health-videos-2026-10-24.txt"
   workflow_dispatch:
     inputs:
       confirm_private_remediation:
@@ -17,9 +14,7 @@ permissions:
 
 jobs:
   set-private:
-    if: >-
-      (github.event_name == 'push' && github.event.head_commit.message == 'Run one-time private remediation for two health videos')
-      || (github.event_name == 'workflow_dispatch' && inputs.confirm_private_remediation)
+    if: github.event_name == 'workflow_dispatch' && inputs.confirm_private_remediation
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: youtube-channels
