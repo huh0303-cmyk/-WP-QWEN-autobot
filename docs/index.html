@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Korea365 통제실 · 플랫폼별 순위</title>
+<title>런던프로젝트 통제실</title>
 <style>
 body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:8px;background:#f6f7f9;color:#1c1c1e}
-h1{font-size:1.25rem;margin:0 0 4px;color:#0f172a}.sub{color:#475569;font-size:.85rem;margin-bottom:8px}.publish-link{display:inline-block;padding:4px 9px;border-radius:5px;background:#1d4ed8;color:#fff!important;text-decoration:none;font-size:.78rem;font-weight:750}.publish-link:hover{background:#1e40af}.control-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.control-tag{font-size:.75rem;color:#334155;background:#e2e8f0;border-radius:6px;padding:4px 8px}
+h1{font-size:2rem;margin:0 0 4px;color:#0f172a}.sub{color:#475569;font-size:.85rem;margin-bottom:8px}.publish-link{display:inline-block;padding:4px 9px;border-radius:5px;background:#1d4ed8;color:#fff!important;text-decoration:none;font-size:.78rem;font-weight:750}.publish-link:hover{background:#1e40af}.control-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.control-tag{font-size:.75rem;color:#334155;background:#e2e8f0;border-radius:6px;padding:4px 8px}
 .bar{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.85rem}
 select{padding:4px 7px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}
 .table-wrap{width:100%;overflow:auto;background:#fff;border:1px solid #dbe2ea}
@@ -44,7 +44,7 @@ th:nth-child(n+4),td:nth-child(n+4){padding-left:6px;padding-right:6px}
 tr.platform-wordpress{background:#f5f6ff}tr.platform-blogspot{background:#fffaf2}tr.platform-tistory{background:#fff7fb}tr.platform-naver{background:#f4fcf6}
 tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.platform-instagram{background:#fcf8ff}tr.platform-threads{background:#f7f7f8}tr.platform-facebook{background:#f5f9ff}
 </style></head><body>
-<div class="control-head"><h1>Korea365 통제실 · 플랫폼별 순위</h1><span class="control-tag">LONDON PROJECT · CONTROL ROOM</span></div>
+<div class="control-head"><div><h1>런던프로젝트 통제실</h1><div id="live-clock" style="font-size:clamp(1.6rem,4vw,2.8rem);font-weight:850;letter-spacing:.02em;color:#0f172a;line-height:1.2;margin:4px 0 8px">현재 시각 불러오는 중…</div></div><span class="control-tag">LONDON PROJECT · CONTROL ROOM</span></div>
 <div class="sub" id="meta">공식 Google Search Console 통계를 불러오는 중...</div>
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">GSC 클릭·노출은 별도 참고 지표이며 방문자 수로 사용하지 않습니다.</span></div>
 <nav class="platform-tabs" id="blog-platform-tabs" aria-label="블로그 플랫폼 순위"><button class="platform-tab" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" data-platform="tistory" aria-pressed="false">Tistory</button><button class="platform-tab" data-platform="naver" aria-pressed="false">Naver</button></nav>
@@ -243,4 +243,14 @@ fetch('dashboard.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok
   draw();
   if(SOCIAL_DATA)drawSocial(SOCIAL_DATA);
 }).catch(function(e){var m=document.getElementById('meta');m.textContent='GSC 데이터를 불러오지 못했습니다: '+e.message;m.style.color='#b91c1c'});
+
+function updateControlClock(){
+  var now=new Date();
+  var parts=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(now);
+  var v={};parts.forEach(function(p){v[p.type]=p.value});
+  var el=document.getElementById('live-clock');
+  if(el)el.textContent=v.year+'-'+v.month+'-'+v.day+' ('+v.weekday+') '+v.hour+':'+v.minute+':'+v.second+' KST';
+}
+updateControlClock();setInterval(updateControlClock,1000);
+
 </script></body></html>
