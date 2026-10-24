@@ -1,1 +1,1 @@
-{"day": "2026-10-23", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-23-wp_korea365-0b4cfce8", "claimed_at": "2026-10-23T23:55:20.254134+09:00", "run_id": 39973845307, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-24", "status": "PUBLISHED", "public_url": "https://korea365.org/understanding-annual-leave-and-public-holidays-for-employees-in-south-korea/", "published_at": "2026-10-23T23:00:00Z"}
