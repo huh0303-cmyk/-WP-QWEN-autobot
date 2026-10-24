@@ -49,7 +49,7 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="bar"><span>블로그 순위 기준: 확인된 전일 방문자 수</span><span class="na">GSC 클릭·노출은 별도 참고 지표이며 방문자 수로 사용하지 않습니다.</span></div>
 <nav class="platform-tabs" id="blog-platform-tabs" aria-label="블로그 플랫폼 순위"><button class="platform-tab" data-platform="wordpress" aria-pressed="true">WordPress</button><button class="platform-tab" data-platform="blogspot" aria-pressed="false">Blogspot</button><button class="platform-tab" data-platform="tistory" aria-pressed="false">Tistory</button><button class="platform-tab" data-platform="naver" aria-pressed="false">Naver</button></nav>
 <div class="sub" id="blog-ranking-meta">플랫폼별로 순위를 따로 표시합니다.</div>
-<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>최근 16개월 클릭</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
 <h2 style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot · Total Pageviews</h2>
@@ -117,7 +117,7 @@ function draw(){
     var vis=ranked?'<b>'+f(visitor.yesterday_visitors)+'</b>'+d(visitor.yesterday_delta):'<span class="na">수집 전</span>';
     var st=r.google_indexed_status==='OK'?'확인됨':r.status==='NO_GSC_ACCESS'?'GSC 접근 불가':r.status==='QUERY_ERROR'?'조회 오류':'GSC에서 확인 불가';
     var publishUrl='https://blog.korea365.org/publish';
-    var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+cell(val(r,'impressions'),r.impressions_delta,hasImp?'':'수집 전')+'</td><td>'+cell(val(r,'clicks'),r.clicks_delta)+'</td><td>'+n(r.cumulative)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td><td><a class="publish-link" href="'+publishUrl+'" target="_blank" rel="noopener">발행 화면 ↗</a></td></tr>';
+    var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+cell(val(r,'impressions'),r.impressions_delta,hasImp?'':'수집 전')+'</td><td>'+cell(val(r,'clicks'),r.clicks_delta)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td><td><a class="publish-link" href="'+publishUrl+'" target="_blank" rel="noopener">발행 화면 ↗</a></td></tr>';
   }).join('');
 }
 document.getElementById('blog-platform-tabs').addEventListener('click',function(e){var b=e.target.closest('.platform-tab');if(!b)return;blogPlatform=b.dataset.platform;draw();});
