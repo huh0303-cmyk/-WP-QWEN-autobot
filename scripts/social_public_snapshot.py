@@ -417,6 +417,22 @@ def collect() -> dict[str, Any]:
         key = item["key"]
         fresh = results.get(key, {"status": "not_checked", "error": "수집 결과 없음"})
         old = previous.get(key, {})
+        # Compute meaningful deltas against the previous successful snapshot.
+        # Missing baselines remain null; never pretend the first snapshot is +0.
+        delta_fields = {
+            "followers_delta": "followers",
+            "subscribers_delta": "subscribers",
+            "following_delta": "following",
+            "content_count_delta": "content_count",
+            "total_views_delta": "total_views",
+            "total_likes_delta": "total_likes",
+        }
+        for delta_key, source_key in delta_fields.items():
+            fresh_value = fresh.get(source_key)
+            old_value = old.get(source_key)
+            item[delta_key] = (int(fresh_value) - int(old_value)
+                               if fresh_value is not None and old_value is not None
+                               else None)
         # Preserve last successful values if today's API call fails; mark the row stale instead of fabricating zeroes.
         successful = fresh.get("status") == "ok"
         if successful:
@@ -430,6 +446,10 @@ def collect() -> dict[str, Any]:
             for field in keep:
                 if old.get(field) is not None:
                     item[field] = old[field]
+            # Failed fetches retain prior deltas only as historical context, not as fresh changes.
+            for delta_key in ("followers_delta", "subscribers_delta", "following_delta",
+                              "content_count_delta", "total_views_delta", "total_likes_delta"):
+                item[delta_key] = None
             item["status"] = "stale" if old.get("last_successful_at") else fresh.get("status", "api_error")
             item["error"] = fresh.get("error", "")
             item["last_stats_checked_at"] = now
