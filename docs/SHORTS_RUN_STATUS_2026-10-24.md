@@ -23,12 +23,14 @@ Prepare two current-response Seoul Journal scripts (politics/current affairs and
 - The current vidIQ connection lists only @seoul_topik1 for YouTube and @englishsurvival1 for Instagram. It does not show @seouljournal1 or @seoul_jisoo. Separate GitHub OAuth secrets exist for some channels, but this run did not execute a fresh live OAuth preflight for every requested channel.
 - NASA/Retro/Old Hollywood/History have existing archive generation/upload code and documented channel mappings, but no new per-channel video was generated in this run.
 
-## Public videos from previous run — urgent remediation
-The 2026-10-23 GitHub Actions logs show two older scheduled uploads were public:
-- Health Clinic USA video 7qUEOZk8rB0, channel UC91BpNSb4nUwD6jrpthK7FQ.
-- Health Clinic Japan video eQsq_5utuHc, channel UCC_PcHMv-Uxpr00Pjw_J2Wg.
+## Public videos from previous run — remediation verified
+The 2026-10-23 GitHub Actions logs showed two older scheduled uploads were public. A one-time GitHub Actions remediation then authenticated each exact channel, updated only these two video IDs, and re-read their final privacy state:
+- Health Clinic USA video 7qUEOZk8rB0, channel UC91BpNSb4nUwD6jrpthK7FQ: public → private, verified.
+- Health Clinic Japan video eQsq_5utuHc, channel UCC_PcHMv-Uxpr00Pjw_J2Wg: public → private, verified.
 
-This conflicts with the current Private-only instruction. The schedule now defaults to Private for future uploads, but these two existing videos still require a verified privacy update. Do not claim they are private until a fresh YouTube API response confirms status=private.
+Evidence: workflow run https://github.com/huh0303-cmyk/-WP-QWEN-autobot/actions/runs/40052646388 ; successful job log printed VERIFIED_PRIVATE with both channel IDs, video IDs, and final status. The remediation workflow is now manual-only and requires an explicit confirmation input; its one-time push trigger was removed.
+
+The daily Health Clinic/Seoul Jisoo1 workflow on main now sets scheduled uploads to Private. No public release or scheduled public release is permitted.
 
 ## Release guard
 Do not run any workflow that sets privacy=public. Do not use Edge TTS, Fish Audio, or a generic fallback voice. Do not mark a video as produced or uploaded without a non-empty MP4/MP3 and, for uploads, a verified YouTube video ID plus privacyStatus=private.
