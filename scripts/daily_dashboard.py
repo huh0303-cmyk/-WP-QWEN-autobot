@@ -312,7 +312,20 @@ def main():
                 for room in rooms.get("rooms", [])
                 if room.get("platform") == "naver" and room.get("enabled") and room.get("destination_id")]
     targets += [("newsroom", item["url"].rstrip("/"), item.get("name", item.get("url", ""))) for item in hub.get("sites", [])
-                if item.get("platform") == "wordpress" and item.get("url", "").rstrip("/") not in wp25_sites]
+                if item.get("platform") == "wordpress" and item.get("url", "").rstrip("/") not in wp25_sites
+                and "ksa-korea.org" not in item.get("url", "").lower()
+                and "theseouljournal.com" not in item.get("url", "").lower()]
+    # Retired destinations: exclude from dashboard inventory without deleting any site content.
+    targets = [t for t in targets if "ksa-korea.org" not in t[1].lower()
+               and "theseouljournal.com" not in t[1].lower()
+               and "theseouljournal.blogspot.com" not in t[1].lower()
+               and "ksa-korea.blogspot.com" not in t[1].lower()]
+    # Only one newsroom is active in the control-room inventory.
+    newsroom_targets = [t for t in targets if t[0] == "newsroom"]
+    if newsroom_targets:
+        chosen = next((t for t in newsroom_targets if "koreanews365.com" in t[1].lower()), newsroom_targets[0])
+        targets = [t for t in targets if t[0] != "newsroom"]
+        targets.append((chosen[0], chosen[1], "한국신문 Koreanews24"))
     targets = list(dict.fromkeys(targets))
     hist = json.loads(HIST.read_text(encoding="utf-8")) if HIST.exists() else {}
     prev_dates = sorted(k for k in hist if k < ref.isoformat())
