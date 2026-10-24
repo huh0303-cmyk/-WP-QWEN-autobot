@@ -1,7 +1,7 @@
 name: Daily long videos - Health Clinic USA / Japan + Seoul_Jisoo1 shopping
 
 # One narrated 3-5 minute video per channel per KST day. Scheduled uploads are PRIVATE only per owner instruction (2026-10-24).
-# Free stack only: free LLM chain -> Edge neural TTS -> Pexels/Pixabay -> ffmpeg -> YouTube API.
+# Narration is ElevenLabs-only -> Pexels/Pixabay -> ffmpeg -> YouTube API. No TTS fallback.
 # Upload happens only after the authenticated channel ID equals the locked UC ID; the job fails
 # visibly (and publishes nothing) while a channel's OAuth token is not yet re-authorised.
 on:
@@ -27,11 +27,11 @@ on:
         default: false
         type: boolean
       privacy:
-        description: Privacy for a manual upload
+        description: Private only; public/unlisted release is disabled by owner instruction
         required: true
         default: private
         type: choice
-        options: [private, unlisted, public]
+        options: [private]
       preflight_only:
         description: Only verify the exact channel / write access (no script, no render, no upload)
         required: true
@@ -88,7 +88,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          python -m pip install --disable-pip-version-check requests pillow edge-tts google-api-python-client google-auth
+          python -m pip install --disable-pip-version-check requests pillow google-api-python-client google-auth
       - name: Resolve channel
         id: pick
         shell: bash
@@ -107,7 +107,7 @@ jobs:
             echo "args=--channel $CH --upload --privacy private" >> "$GITHUB_OUTPUT"
           else
             ARGS="--channel $INPUT_CHANNEL"
-            [ "${{ inputs.upload }}" = "true" ] && ARGS="$ARGS --upload --privacy ${{ inputs.privacy }}"
+            [ "${{ inputs.upload }}" = "true" ] && ARGS="$ARGS --upload --privacy private"
             [ "${{ inputs.force }}" = "true" ] && ARGS="$ARGS --force"
             [ "${{ inputs.preflight_only }}" = "true" ] && ARGS="$ARGS --preflight-only"
             [ -n "${{ inputs.topic }}" ] && ARGS="$ARGS --topic ${{ inputs.topic }}"
