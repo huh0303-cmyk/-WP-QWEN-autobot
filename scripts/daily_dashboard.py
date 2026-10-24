@@ -218,7 +218,9 @@ def one(h, props, platform, url, display_name, ref, prev_hist):
     row["gsc_property"] = prop
     day = ref.isoformat()
     before = (ref - dt.timedelta(days=1)).isoformat()
-    row["content"] = content_count(url, platform)
+    content_meta = content_metadata(url, platform)
+    row["content"] = content_meta.get("content_count")
+    row["latest_publish_date"] = content_meta.get("latest_publish_date")
     p = prev_hist.get(row["site"], {})
     if row["content"] is not None and p.get("content") is not None:
         row["content_delta"] = row["content"] - p["content"]
