@@ -40,6 +40,11 @@ on:
 permissions:
   contents: read
 
+# Serialize scheduled and manual runs so the same channel batch cannot overlap.
+concurrency:
+  group: youtube-language-adjectives-${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
