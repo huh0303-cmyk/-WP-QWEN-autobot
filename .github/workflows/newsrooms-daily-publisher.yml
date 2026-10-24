@@ -1,20 +1,13 @@
-name: "Two Newsrooms — New RSS Story"
-run-name: "newsroom:${{ inputs.newsroom }} · RSS ${{ github.event_name }}"
+name: "한국신문 Koreanews365 — Breaking News Publisher"
+run-name: "한국신문 Koreanews365 · 속보 발행 · ${{ github.event_name }}"
 
 on:
-  # Three daily Korean newsroom attempts (UTC): 07:17, 14:17, 21:17 Vietnam time.
-  # Each run adds a random delay and category suggestion; the RSS/recency/rights gates
-  # still prevent fabricated or stale stories when no eligible item exists.
+  # Four daily attempts for the sole active newsroom. UTC 00:17, 06:17, 12:17, 18:17 = KST 09:17, 15:17, 21:17, 03:17.
+  # Each attempt still requires a fresh eligible source and passes verification/deduplication.
   schedule:
-    - cron: '17 0,7,14 * * *'
+    - cron: '17 0,6,12,18 * * *'
   workflow_dispatch:
     inputs:
-      newsroom:
-        description: "koreanews365 / theseouljournal"
-        required: true
-        type: choice
-        options: [koreanews365, theseouljournal]
-        default: koreanews365
       preferred_category:
         description: "Optional RSS desk (World/Sports/Military/Art)"
         required: false
@@ -62,16 +55,10 @@ jobs:
         id: target
         shell: bash
         run: |
-          KEY="${{ inputs.newsroom }}"
-          KEY="${KEY:-koreanews365}"
+          KEY="koreanews365"
+          URL="https://koreanews365.com"
           CATEGORY="${{ inputs.preferred_category }}"
-          if [ "$KEY" = "theseouljournal" ]; then
-            URL="https://theseouljournal.com"
-            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' World Business Technology 'Asia & Korea' Military Culture Art Sports | shuf -n 1)"; fi
-          else
-            URL="https://koreanews365.com"
-            if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' 정치 경제 국방 글로벌 문화 스포츠 국제 금융 | shuf -n 1)"; fi
-          fi
+          if [ -z "$CATEGORY" ]; then CATEGORY="$(printf '%s\n' 정치 경제 국방 글로벌 문화 스포츠 국제 금융 | shuf -n 1)"; fi
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
@@ -133,7 +120,6 @@ jobs:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           SHEETS_WEBHOOK: ${{ secrets.SHEETS_WEBHOOK }}
           KOREANEWS365COM: ${{ secrets.KOREANEWS365COM }}
-          THESEOULJOURNALCOM: ${{ secrets.THESEOULJOURNALCOM }}
         shell: bash
         run: |
           set -o pipefail
