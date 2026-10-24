@@ -302,7 +302,9 @@ def main():
     # The CONTROL WordPress group includes both canonical WordPress newsrooms.
     # The Seoul Journal Blogspot property remains a distinct Blogspot destination.
     wp25_sites = {s.rstrip("/") for s in WP25}
-    targets = [("wordpress", s.rstrip("/"), s.split("://", 1)[-1].rstrip("/")) for s in WP25]
+    targets = [("wordpress", s.rstrip("/"),
+                "한국신문 Koreanews24" if "koreanews365.com" in s.lower() else s.split("://", 1)[-1].rstrip("/"))
+               for s in WP25 if "ksa-korea.org" not in s.lower() and "theseouljournal.com" not in s.lower()]
     targets += [("blogspot", item["blogspot"].rstrip("/"), item["blogspot"].rstrip("/").split("://", 1)[-1])
                 for item in blogger_portfolio["channels"]]
     targets += [("tistory", item["url"].rstrip("/"), item.get("current_label", item.get("title", item["url"])))
