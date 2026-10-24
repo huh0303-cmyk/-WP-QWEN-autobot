@@ -43,33 +43,34 @@ def _episode_date() -> dt.date:
     return dt.datetime.now(dt.timezone.utc).date()
 
 def choose_voice(channel: str, episode_date: dt.date | None = None) -> dict[str, str]:
-    """Choose a date-stable, gender-alternating voice for one channel's episode."""
+    """Return the channel's fixed approved ElevenLabs voice; never rotate silently."""
     key = channel.strip().lower()
     cfg = CHANNELS.get(key, {"env": "", "single_env": "", "lang": "en"})
     date = episode_date or _episode_date()
-    configured = [v.strip() for v in os.getenv(cfg["env"], "").split(",") if v.strip()]
-    if not configured and cfg.get("single_env"):
-        one = os.getenv(cfg["single_env"], "").strip()
-        if one:
-            # Keep the account's existing voice in the pool while adding multilingual
-            # fallbacks so the channel still varies if only one ID was configured.
-            configured = [one] + [v["id"] for v in DEFAULT_VOICES if v["id"] != one]
-    if configured:
-        # Resolve known names when possible; custom IDs are retained as custom voices.
-        known = {v["id"]: v for v in DEFAULT_VOICES}
-        pool = [dict(known.get(vid, {"id": vid, "name": "Account voice", "gender": "unknown"})) for vid in configured]
-    else:
-        pool = [dict(v) for v in DEFAULT_VOICES]
 
-    # Rotate male/female on alternating episode dates, with channel offsets to avoid
-    # every channel using the same gender on the same day. If the pool is custom and
-    # gender metadata is unknown, rotate through the full pool instead.
-    digest = hashlib.sha256(key.encode("utf-8")).digest()
-    offset = digest[0] % 2
-    target_gender = "male" if (date.toordinal() + offset) % 2 == 0 else "female"
-    matching = [v for v in pool if v.get("gender") in (target_gender, "unknown")]
-    candidates = matching or pool
-    # Date/channel-seeded choice is repeatable on reruns, yet rotates across episodes.
-    seed = int.from_bytes(hashlib.sha256(f"{key}:{date.isoformat()}".encode()).digest()[:8], "big")
-    selected = random.Random(seed).choice(candidates)
-    return {**selected, "channel": key, "language": cfg.get("lang", "en"), "date": date.isoformat()}
+    # A single channel-specific voice always wins. A configured list is treated as
+    # an explicitly ordered approved list; use its first entry to keep assignments stable.
+    single = os.getenv(cfg.get("single_env", ""), "").strip() if cfg.get("single_env") else ""
+    pool = [v.strip() for v in os.getenv(cfg.get("env", ""), "").split(",") if v.strip()] if cfg.get("env") else []
+    voice_id = single or (pool[0] if pool else "")
+
+    fallback = {
+        "health_usa": {"id": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "gender": "male"},
+        "shopping": {"id": "EXAVITQu4vr4xnSDxMaL", "name": "Bella", "gender": "female"},
+        "nasa": {"id": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "gender": "male"},
+        "history": {"id": "21m00Tcm4TlvDq8ikWAM", "name": "Rachel", "gender": "female"},
+        "silent_era": {"id": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "gender": "male"},
+        "retro_reels": {"id": "EXAVITQu4vr4xnSDxMaL", "name": "Bella", "gender": "female"},
+    }
+    known = {v["id"]: v for v in DEFAULT_VOICES}
+    if not voice_id:
+        # Japanese health and Seoul Journal must never silently switch to a generic voice.
+        if key in {"health_japan", "seoul_journal"}:
+            raise RuntimeError(f"No approved ElevenLabs voice ID configured for {key}; refusing to synthesize with a substitute.")
+        voice = fallback.get(key)
+        if not voice:
+            raise RuntimeError(f"No fixed ElevenLabs voice configured for {key}; refusing to rotate to an unrelated voice.")
+    else:
+        voice = dict(known.get(voice_id, {"id": voice_id, "name": "Approved account voice", "gender": "unknown"}))
+
+    return {**voice, "channel": key, "language": cfg.get("lang", "en"), "date": date.isoformat()}
