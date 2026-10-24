@@ -55,11 +55,29 @@ def prop_for(url, props):
 
 
 def indexed_sitemap_count(h, prop):
-    """Return unavailable: Search Console's sitemap API no longer provides
-    reliable indexed-page totals. Avoid dozens of obsolete API requests on
-    every dashboard refresh; never fabricate index counts.
+    """Sum indexed URL counts reported by the Search Console Sitemaps API.
+
+    These are sitemap-reported indexed counts (not a guarantee of all indexed
+    URLs). Return None when access/API data is unavailable; never invent zero.
     """
-    return None
+    endpoint = "https://www.googleapis.com/webmasters/v3/sites/" + quote(prop, safe="") + "/sitemaps"
+    try:
+        response = requests.get(endpoint, headers=h, timeout=25)
+        if response.status_code != 200:
+            return None
+        entries = response.json().get("sitemap", [])
+        counts = []
+        for item in entries:
+            for content in item.get("contents", []):
+                indexed = content.get("indexed")
+                if indexed is not None:
+                    try:
+                        counts.append(int(indexed))
+                    except (TypeError, ValueError):
+                        pass
+        return sum(counts) if counts else None
+    except (requests.RequestException, ValueError, TypeError):
+        return None
 
 def content_metadata(url, platform):
     """Return published content count and latest publish date using lightweight public endpoints."""
