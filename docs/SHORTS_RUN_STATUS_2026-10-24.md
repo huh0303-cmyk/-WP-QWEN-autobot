@@ -20,8 +20,8 @@ The pack contains:
 3. Health Clinic Japan — sleep habits based on the Japanese MHLW Sleep Guide 2023.
 4. Health Clinic USA — home fall-prevention steps based on CDC guidance reviewed 2026-01-27.
 5. NASA — NASA's 2026-10-23 Artemis III Earth-orbit test plan and Artemis IV 2028 lunar-landing target.
-6. Retro Reels — Super 8 home-movie history; evergreen and requires final source/visual check.
-7. Old Hollywood — The Jazz Singer; script explicitly avoids calling it the first sound film.
+6. Retro Reels — Super 8 home-movie history; official Kodak history verified, licensed/original visuals still required.
+7. Old Hollywood — The Jazz Singer; AFI Catalog verified the film's role and the script explicitly avoids calling it the first sound film.
 8. History Today — United Nations Day on 2026-10-24.
 9. Seoul Jisoo1 — practical hotel-booking checklist, without unverified prices or ratings.
 
