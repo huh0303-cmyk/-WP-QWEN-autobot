@@ -1,0 +1,39 @@
+name: One-time private remediation for existing Health Clinic videos
+
+on:
+  push:
+    paths:
+      - "docs/trigger-private-health-videos-2026-10-24.txt"
+  workflow_dispatch:
+    inputs:
+      confirm_private_remediation:
+        description: "Confirm changing only the two listed Health Clinic videos to Private"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  set-private:
+    if: >-
+      (github.event_name == 'push' && github.event.head_commit.message == 'Run one-time private remediation for two health videos')
+      || (github.event_name == 'workflow_dispatch' && inputs.confirm_private_remediation)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: youtube-channels
+    env:
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_EN }}
+      HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP: ${{ secrets.HEALTH_CLINIC_YOUTUBE_REFRESH_TOKEN_JP }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install YouTube API client
+        run: python -m pip install --disable-pip-version-check google-api-python-client google-auth google-auth-httplib2
+      - name: Verify exact channels and set only the two specified videos to Private
+        run: python scripts/set_health_video_private.py
