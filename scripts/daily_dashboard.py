@@ -61,17 +61,39 @@ def indexed_sitemap_count(h, prop):
     """
     return None
 
-def content_count(url, platform):
+def content_metadata(url, platform):
+    """Return published content count and latest publish date using lightweight public endpoints."""
     try:
         if platform in {"wordpress", "newsroom"}:
-            r = requests.get(url.rstrip("/") + "/wp-json/wp/v2/posts?per_page=1&_fields=id", timeout=25)
-            return int(r.headers["X-WP-Total"]) if r.ok and "X-WP-Total" in r.headers else None
-        if platform == "blogspot":
-            r = requests.get(url.rstrip("/") + "/feeds/posts/summary?alt=json&max-results=0", timeout=25)
-            return int(r.json()["feed"]["openSearch$totalResults"]["$t"]) if r.ok else None
-        return None
+            endpoint = url.rstrip("/") + "/wp-json/wp/v2/posts?per_page=1&orderby=date&order=desc&_fields=id,date"
+            r = requests.get(endpoint, timeout=25)
+            if r.ok:
+                total = int(r.headers["X-WP-Total"]) if "X-WP-Total" in r.headers else None
+                items = r.json()
+                latest = (items[0].get("date") or "")[:10] if items else None
+                return {"content_count": total, "latest_publish_date": latest or None}
+        elif platform == "blogspot":
+            # Blogger's public JSON feed is readable without OAuth for public blogs.
+            endpoint = url.rstrip("/") + "/feeds/posts/summary?alt=json&max-results=1&orderby=published"
+            r = requests.get(endpoint, timeout=25)
+            if r.ok:
+                feed = r.json().get("feed", {})
+                total = feed.get("openSearch$totalResults", {}).get("$t")
+                entries = feed.get("entry", [])
+                latest = None
+                if entries:
+                    for item in entries[0].get("published", []):
+                        latest = item.get("$t", "")[:10]
+                return {"content_count": int(total) if total is not None else None,
+                        "latest_publish_date": latest or None}
+        return {"content_count": None, "latest_publish_date": None}
     except Exception:
-        return None
+        return {"content_count": None, "latest_publish_date": None}
+
+
+def content_count(url, platform):
+    # Compatibility wrapper for existing callers.
+    return content_metadata(url, platform).get("content_count")
 
 
 
