@@ -122,7 +122,7 @@ But the film was limited. Every second used part of the roll, so the person behi
 
 Today, recording can feel endless. Super 8 reminds us that a short, carefully chosen moment can hold a memory for decades.
 
-**Source note:** Historical background is evergreen, not a claim about a new event today. Before final production, verify the exact Super 8 launch details against Kodak's official historical materials and use only licensed or original visuals.
+**Source:** Kodak's official Super 8 history confirms the 1965 launch, cartridge loading, and the 50-foot cartridge. https://www.kodak.com/en/motion/page/super-8-history/\n\n**Production note:** Historical background is evergreen, not a claim about a new event today. Use only licensed or original visuals.
 
 ## 7. Old Hollywood / SILENT_ERA_TIMES
 
@@ -138,7 +138,7 @@ The Jazz Singer mattered because audiences responded to hearing a major screen p
 
 So the story is not that one movie invented sound. It helped prove that audiences were ready for a new movie experience.
 
-**Source note:** Verify the details against the American Film Institute or a comparable film-history institution before rendering; do not call it the first sound film.
+**Source:** American Film Institute Catalog confirms the film's release and explains that it was not the first talking picture; its success helped accelerate the transition to sound. https://catalog.afi.com/Film/1535-THE-JAZZ-SINGER\n\n**Fact-check note:** Do not call it the first sound film.
 
 ## 8. History Today / HISTORY_TODAY_TIMES
 
