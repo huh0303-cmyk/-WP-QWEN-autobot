@@ -49,16 +49,18 @@ def extract(url):
     if not text or len(text)<300: raise RuntimeError("기사 본문 추출 실패/본문 부족. 접근 제한 기사일 수 있습니다.")
     return title,text,image_url
 
-def draft(title,body):
-    key=os.getenv("OPENAI_API_KEY","").strip()
-    if not key: raise RuntimeError("OPENAI_API_KEY GitHub Actions secret이 없습니다.")
-    prompt=f"""당신은 서울저널의 한국어 정치 뉴스 기자 겸 팩트체커입니다.
+def draft(title, body):
+    key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("OPENAI_API_KEY GitHub Actions secret이 없습니다.")
+    client = OpenAI(api_key=key)
+    base_prompt = f"""당신은 서울저널의 한국어 정치 뉴스 기자 겸 팩트체커입니다.
 기사 제목: {title}
 기사 본문:
 {body[:12000]}
 
 약 55~60초 세로 쇼츠 패키지를 작성하세요. 내레이션은 공백 포함 한국어 450~650자 정도로 충분히 작성하고, 최소 4개의 짧은 문단으로 구성하세요. 첫 문장은 핵심 사실을 바로 제시하고, 중간에는 기사에 나온 배경·당사자 발언·확인된 사실을 구체적으로 설명하며, 마지막에는 확인된 사실과 아직 확인되지 않은 점을 구분하고 '서울저널이 알려드립니다. 여러분은 어떻게 생각하십니까?'로 마무리하세요. 기사에 없는 사실을 채우기 위해 분량을 늘리지 마세요. 결과는 JSON 객체 하나:
-{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"공백 포함 450~650자, 약 55~60초 분량의 자연스러운 한국어 기자 내레이션","description":"기사 핵심을 중립적으로 요약하고 원문 출처가 들어갈 자리 [원문 기사]를 포함한 설명","source_note":"기사에서 확인한 핵심 사실과 확인 한계"}}
+{{"headline":"썸네일용 10~18자 헤드라인","youtube_title":"사실에 근거한 제목 100자 이내","narration":"공백 포함 한국어 450~650자, 약 55~60초 분량의 자연스러운 기자 내레이션","description":"기사 핵심을 중립적으로 요약하고 원문 출처가 들어갈 자리 [원문 기사]를 포함한 설명","source_note":"기사에서 확인한 핵심 사실과 확인 한계"}}
 규칙:
 - 기사 본문에 있는 정보만 말한다. 논평·주장은 발언자에게 귀속한다.
 - 혐의/의혹/수사/재판/여론조사는 확정 사실로 과장하지 않는다.
@@ -66,53 +68,73 @@ def draft(title,body):
 - 헤드라인은 모바일에서 크게 읽히도록 짧게 작성한다.
 - 발언을 직접 인용할 때 원문과 일치하는 표현만 사용한다.
 - JSON 이외 텍스트 금지."""
-    client=OpenAI(api_key=key)
-    res=client.chat.completions.create(model=os.getenv("SEOUL_JOURNAL_MODEL","gpt-4o-mini"),temperature=0.35,
-       messages=[{"role":"system","content":"Return valid JSON only. Be factually conservative."},{"role":"user","content":prompt}])
-    raw=res.choices[0].message.content.strip()
-    raw=re.sub(r"^\`\`\`(?:json)?\s*|\s*\`\`\`$","",raw)
-    data=json.loads(raw)
-    data["narration"]=data["narration"].strip()
-    if len(data["narration"])<420: raise RuntimeError(f"생성된 내레이션이 너무 짧습니다: {len(data['narration'])}자 (최소 420자). 대본을 다시 생성해야 합니다.")
-    return data
+    last_error = ""
+    for attempt in range(3):
+        retry_note = ""
+        if attempt:
+            retry_note = (
+                "\\n\\n수정 요청: 직전 응답이 최소 길이를 충족하지 못했습니다. "
+                "기사에 실제로 있는 배경·당사자 발언·확인된 수치를 더 구체적으로 설명해 "
+                "내레이션을 반드시 450~650자로 작성하세요. 반복 문장이나 추측은 추가하지 마세요."
+            )
+        res = client.chat.completions.create(
+            model=os.getenv("SEOUL_JOURNAL_MODEL", "gpt-4o-mini"),
+            temperature=0.35,
+            messages=[
+                {"role": "system", "content": "Return valid JSON only. Be factually conservative."},
+                {"role": "user", "content": base_prompt + retry_note},
+            ],
+        )
+        raw = (res.choices[0].message.content or "").strip()
+        raw = re.sub(r"^\`\`\`(?:json)?\\s*|\\s*\`\`\`$", "", raw)
+        try:
+            data = json.loads(raw)
+            data["narration"] = data["narration"].strip()
+        except (ValueError, KeyError, TypeError) as exc:
+            last_error = f"JSON/field validation failed: {type(exc).__name__}"
+            log(f"Draft attempt {attempt + 1} rejected: {last_error}")
+            continue
+        if len(data["narration"]) >= 420:
+            return data
+        last_error = f"narration too short: {len(data['narration'])} characters"
+        log(f"Draft attempt {attempt + 1} rejected: {last_error}; retrying with fact-based expansion.")
+    raise RuntimeError(f"Could not generate a sufficiently long fact-grounded narration after 3 attempts: {last_error}")
+
 
 def tts(text):
-    """Prefer Fish Audio S2.1 Pro Free when configured; fall back to free Edge TTS."""
-    import asyncio
-    p=OUT/"voice.mp3"
-    fish_key=os.getenv("FISH_AUDIO_API_KEY","").strip()
-    if fish_key:
-        import requests
-        model=os.getenv("FISH_AUDIO_MODEL","s2.1-pro-free").strip()
-        reference_id=os.getenv("FISH_AUDIO_REFERENCE_ID","933563129e564b19a115bedd57b7406a").strip()
-        try:
-            r=requests.post(
-                "https://api.fish.audio/v1/tts",
-                headers={"Authorization":f"Bearer {fish_key}","Content-Type":"application/json","model":model},
-                json={"text":text,"reference_id":reference_id,"format":"mp3"},
-                timeout=120,
-            )
-            if r.ok and len(r.content)>2000:
-                p.write_bytes(r.content)
-                log(f"TTS_ENGINE=fish-audio model={model} bytes={p.stat().st_size}")
-                return p
-            log(f"Fish Audio failed HTTP {r.status_code}; falling back to Edge TTS.")
-        except Exception as e:
-            log(f"Fish Audio request failed ({e}); falling back to Edge TTS.")
-    else:
-        log("FISH_AUDIO_API_KEY not configured; using free Edge TTS fallback.")
-    import edge_tts
-    voice=os.getenv("SEOUL_JOURNAL_EDGE_VOICE","ko-KR-SunHiNeural").strip()
-    rate=os.getenv("SEOUL_JOURNAL_TTS_RATE","+15%").strip()
-    async def generate():
-        await edge_tts.Communicate(text=text,voice=voice,rate=rate).save(str(p))
-    try:
-        asyncio.run(generate())
-    except Exception as e:
-        raise RuntimeError(f"Free Edge TTS failed ({voice}): {e}") from e
-    if not p.exists() or p.stat().st_size<2000:
-        raise RuntimeError("Generated TTS audio is missing or too small.")
-    log(f"TTS_ENGINE=edge-tts voice={voice} rate={rate} bytes={p.stat().st_size}")
+    """Generate narration with ElevenLabs only; never fall back to another TTS provider."""
+    api_key = os.getenv("ELEVENLABS_API_KEY", "").strip()
+    voice_id = (
+        os.getenv("SEOUL_JOURNAL_VOICE_ID", "").strip()
+        or os.getenv("ELEVENLABS_VOICE_ID_SEOUL_JOURNAL", "").strip()
+    )
+    if not api_key:
+        raise RuntimeError("ELEVENLABS_API_KEY is missing; refusing to use a substitute TTS provider.")
+    if not voice_id:
+        raise RuntimeError("Approved Seoul Journal ElevenLabs voice ID is missing; refusing to use a substitute voice.")
+    p = OUT / "voice.mp3"
+    model = os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2").strip()
+    r = requests.post(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+        headers={"xi-api-key": api_key, "Content-Type": "application/json", "Accept": "audio/mpeg"},
+        json={
+            "text": text,
+            "model_id": model,
+            "voice_settings": {
+                "stability": 0.55,
+                "similarity_boost": 0.78,
+                "style": 0.15,
+                "use_speaker_boost": True,
+            },
+        },
+        timeout=120,
+    )
+    if not r.ok:
+        raise RuntimeError(f"ElevenLabs TTS failed with HTTP {r.status_code}: {r.text[:180]}")
+    if len(r.content) < 2000:
+        raise RuntimeError("ElevenLabs returned a missing or unexpectedly short audio file.")
+    p.write_bytes(r.content)
+    log(f"TTS_ENGINE=elevenlabs model={model} bytes={p.stat().st_size}")
     return p
 
 def fetch_photo(image_url):
