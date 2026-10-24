@@ -1,6 +1,6 @@
 name: Daily long videos - Health Clinic USA / Japan + Seoul_Jisoo1 shopping
 
-# One narrated 3-5 minute video per channel per KST day (owner decision 2026-10-06).
+# One narrated 3-5 minute video per channel per KST day. Scheduled uploads are PRIVATE only per owner instruction (2026-10-24).
 # Free stack only: free LLM chain -> Edge neural TTS -> Pexels/Pixabay -> ffmpeg -> YouTube API.
 # Upload happens only after the authenticated channel ID equals the locked UC ID; the job fails
 # visibly (and publishes nothing) while a channel's OAuth token is not yet re-authorised.
@@ -104,7 +104,7 @@ jobs:
               "47 9 * * *") CH=shopping ;;
               *) echo "unknown schedule $SCHEDULE"; exit 1 ;;
             esac
-            echo "args=--channel $CH --upload --privacy public" >> "$GITHUB_OUTPUT"
+            echo "args=--channel $CH --upload --privacy private" >> "$GITHUB_OUTPUT"
           else
             ARGS="--channel $INPUT_CHANNEL"
             [ "${{ inputs.upload }}" = "true" ] && ARGS="$ARGS --upload --privacy ${{ inputs.privacy }}"
