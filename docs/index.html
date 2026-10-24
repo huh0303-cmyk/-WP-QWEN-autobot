@@ -52,19 +52,10 @@ tr.platform-youtube{background:#fff7f7}tr.platform-tiktok{background:#f2fcfd}tr.
 <div class="table-wrap"><table><thead><tr><th>순위</th><th>구분</th><th>사이트</th><th>일일방문자 (증감)</th><th>GSC 노출 (증감)</th><th>GSC 클릭 (증감)</th><th>GSC 사이트맵 색인 수</th><th>색인 상태</th><th>즉시 발행</th></tr></thead>
 <tbody id="b"></tbody></table></div>
 <section id="blogger-pageviews" style="margin:18px 0 10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px">
-<h2 style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot · Total Pageviews</h2>
-<div class="sub" id="blogger-pageviews-meta">Blogger API 공식 누적 페이지뷰 수집을 기다리는 중...</div>
-<div class="bar" style="margin-top:8px;flex-wrap:wrap">
-<label for="blogger-pageviews-select">블로그 선택</label>
-<select id="blogger-pageviews-select"><option>수집 대기</option></select>
-<strong id="blogger-pageviews-total" style="margin-left:8px">누적 페이지뷰 미수집</strong>
-<span id="blogger-pageviews-daily" class="na">일일 증감 미확인</span>
-</div>
-<div style="width:100%;overflow-x:auto;background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px">
-<svg id="blogger-pageviews-chart" viewBox="0 0 900 250" role="img" aria-label="Blogspot daily pageviews chart" style="display:block;width:100%;min-width:520px;height:auto"><text x="450" y="120" text-anchor="middle" fill="#64748b">공식 Blogger API 통계를 수집 중입니다.</text></svg>
-</div>
-<div class="sub" style="margin:7px 0">일일 페이지뷰는 연속된 날짜의 Blogger 누적 페이지뷰 차이로 계산합니다. 과거 스냅샷이 없는 날짜는 0이 아닌 미확인으로 표시합니다.</div>
-<div class="table-wrap"><table><thead><tr><th>블로그</th><th>Total Pageviews</th><th>일일 Pageviews</th><th>수집 상태</th><th>확인 시각</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="5" class="na">데이터 수집 전</td></tr></tbody></table></div>
+<h2 style="margin:0 0 4px;font-size:1.05rem;color:#0f172a">Blogspot · 누적 방문자 순위</h2>
+<div class="sub" id="blogger-pageviews-meta">33개 블로그 방문자·게시물 정보를 수집 중...</div>
+<div class="bar"><span>정렬 기준: 누적 방문자 수 내림차순</span><span class="na">방문자 수를 확인할 수 없는 블로그는 아래쪽에 표시</span></div>
+<div class="table-wrap"><table><thead><tr><th>순위</th><th>플랫폼</th><th>블로그</th><th>누적 방문자(증감)</th><th>글 수</th><th>최근 글 발행일</th><th>방문자 수집 상태</th></tr></thead><tbody id="blogger-pageviews-rows"><tr><td colspan="7" class="na">데이터 수집 전</td></tr></tbody></table></div>
 </section>
 <h2 id="social-title" style="margin:18px 0 5px;font-size:1.05rem;color:#0f172a">SNS 계정별 플랫폼 순위</h2>
 <div class="sub" id="social-meta">계정 등록부를 불러오는 중...</div>
@@ -90,6 +81,26 @@ function val(r,k){return Number.isFinite(r[k])?r[k]:null}
 var blogPlatform='wordpress';
 function blogPlatformOf(r){return String(r.platform||'').toLowerCase()==='newsroom'?'wordpress':String(r.platform||'').toLowerCase()}
 function visitorFor(r){var key=String(r.site||'').toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');return VISITOR_DATA&&VISITOR_DATA.sites?VISITOR_DATA.sites[key]||null:null}
+function drawBloggerRanking(){
+ var tbody=document.getElementById('blogger-pageviews-rows');
+ if(!tbody||!J)return;
+ var visitorRows=(J.blogger_pageviews&&J.blogger_pageviews.blogs)||[];
+ var byUrl={};visitorRows.forEach(function(v){byUrl[String(v.url||'').replace(/\/$/,'').toLowerCase()]=v;});
+ var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)==='blogspot';}).map(function(r){
+  var key=String(r.url||'').replace(/\/$/,'').toLowerCase();
+  var v=byUrl[key]||{};
+  return {r:r,v:v,total:Number.isFinite(v.total_pageviews)?v.total_pageviews:null};
+ }).sort(function(a,b){if(a.total===null&&b.total!==null)return 1;if(a.total!==null&&b.total===null)return -1;if(a.total!==null&&b.total!==null&&a.total!==b.total)return b.total-a.total;return String(a.r.site||'').localeCompare(String(b.r.site||''));});
+ var rank=0;
+ tbody.innerHTML=rows.map(function(x){
+  var r=x.r,v=x.v;rank++;
+  var delta=v.daily_pageviews===null||v.daily_pageviews===undefined?'<span class="na">증감 미확인</span>':d(v.daily_pageviews);
+  var total=x.total===null?'<span class="na">미수집</span>':'<b>'+f(x.total)+'</b> '+delta;
+  return '<tr class="platform-blogspot"><td>'+rank+'위</td><td>'+platformCell('blogspot')+'</td><td style="text-align:left"><a href="'+esc(r.url||'')+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site||r.url)+'</a></td><td>'+total+'</td><td>'+metricNumber(r.content,'글')+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td style="text-align:left">'+esc(v.status||'미수집')+'</td></tr>';
+ }).join('');
+ var meta=document.getElementById('blogger-pageviews-meta');
+ if(meta)meta.textContent='등록 '+rows.length+'개 · 기준 '+String(J.blogger_pageviews&&J.blogger_pageviews.generated_at||J.generated_at||'').slice(0,16).replace('T',' ')+' · 누적 방문자 수 기준 내림차순';
+}
 function drawBlogTabs(){
  var labels={wordpress:'WordPress',blogspot:'Blogspot',tistory:'Tistory',naver:'Naver'},rows=J&&J.rows||[];
  document.querySelectorAll('#blog-platform-tabs .platform-tab').forEach(function(b){var p=b.dataset.platform,count=rows.filter(function(r){return blogPlatformOf(r)===p}).length;b.textContent=labels[p]+' · '+count;b.setAttribute('aria-pressed',String(p===blogPlatform));});
@@ -97,6 +108,7 @@ function drawBlogTabs(){
 function draw(){
   if(!J)return;
   drawBlogTabs();
+  drawBloggerRanking();
   var rows=(J.rows||[]).filter(function(r){return blogPlatformOf(r)===blogPlatform}).slice().sort(function(a,b){
     var av=visitorFor(a),bv=visitorFor(b),an=av&&Number.isFinite(av.yesterday_visitors),bn=bv&&Number.isFinite(bv.yesterday_visitors);
     if(an!==bn)return an?-1:1;
@@ -113,7 +125,7 @@ function draw(){
   var rankNumber=0;
   document.getElementById('b').innerHTML=rows.map(function(r){
     var visitor=visitorFor(r),ranked=visitor&&Number.isFinite(visitor.yesterday_visitors);
-    var rankValue=ranked?++rankNumber:null;
+    var rankValue=++rankNumber;
     var vis=ranked?'<b>'+f(visitor.yesterday_visitors)+'</b>'+d(visitor.yesterday_delta):'<span class="na">수집 전</span>';
     var st=r.google_indexed_status==='OK'?'확인됨':r.status==='NO_GSC_ACCESS'?'GSC 접근 불가':r.status==='QUERY_ERROR'?'조회 오류':'GSC에서 확인 불가';
     var publishUrl='https://blog.korea365.org/publish';
