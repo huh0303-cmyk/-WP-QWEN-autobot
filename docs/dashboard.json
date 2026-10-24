@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-24T12:44:46.640781+09:00",
+ "generated_at": "2026-10-24T12:45:19.360563+09:00",
  "reference_date": "2026-10-21",
  "blogger_pageviews": {
-  "generated_at": "2026-10-24T12:44:46.640781+09:00",
+  "generated_at": "2026-10-24T12:45:19.360563+09:00",
   "source": "control.korea365.org embedded Blogger visitor widget counter API; cumulative since widget installation; daily delta from consecutive snapshots",
   "history_days": [],
   "blogs": [
@@ -572,28 +572,6 @@
    "rank": 9
   },
   {
-   "site": "theseouljournal.blogspot.com",
-   "url": "https://theseouljournal.blogspot.com",
-   "platform": "blogspot",
-   "display_name": "theseouljournal.blogspot.com",
-   "status": "OK",
-   "gsc_property": "https://theseouljournal.blogspot.com/",
-   "content": null,
-   "latest_publish_date": null,
-   "content_delta": null,
-   "clicks": 0,
-   "clicks_delta": 0,
-   "cumulative": 0,
-   "cumulative_delta": 0,
-   "impressions": 4,
-   "impressions_delta": 4,
-   "cumulative_impressions": 39,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": null,
-   "rank": 10
-  },
-  {
    "site": "koreawedding365.blogspot.com",
    "url": "https://koreawedding365.blogspot.com",
    "platform": "blogspot",
@@ -613,7 +591,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 11
+   "rank": 10
   },
   {
    "site": "kieca-korea.org",
@@ -635,7 +613,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 12
+   "rank": 11
   },
   {
    "site": "koreataxnlaw.com",
@@ -657,7 +635,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 13
+   "rank": 12
   },
   {
    "site": "jobkorea365.blogspot.com",
@@ -679,7 +657,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 14
+   "rank": 13
   },
   {
    "site": "jobkorea365.com",
@@ -701,7 +679,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 15
+   "rank": 14
   },
   {
    "site": "k-trip365.com",
@@ -723,7 +701,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 16
+   "rank": 15
   },
   {
    "site": "k-trip365.tistory.com",
@@ -745,7 +723,7 @@
    "google_indexed": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
-   "rank": 17
+   "rank": 16
   },
   {
    "site": "kfinance365.com",
@@ -767,7 +745,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 18
+   "rank": 17
   },
   {
    "site": "sis-korea.com",
@@ -789,29 +767,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 19
-  },
-  {
-   "site": "theseouljournal.com",
-   "url": "https://theseouljournal.com",
-   "platform": "newsroom",
-   "display_name": "The Seoul Journal",
-   "status": "OK",
-   "gsc_property": "https://theseouljournal.com/",
-   "content": null,
-   "latest_publish_date": null,
-   "content_delta": null,
-   "clicks": 0,
-   "clicks_delta": 0,
-   "cumulative": 3,
-   "cumulative_delta": 0,
-   "impressions": 1,
-   "impressions_delta": 0,
-   "cumulative_impressions": 1121,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": null,
-   "rank": 20
+   "rank": 18
   },
   {
    "site": "glow.k-health365.com",
@@ -833,7 +789,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 21
+   "rank": 19
   },
   {
    "site": "jobinkorea365.blogspot.com",
@@ -855,7 +811,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 22
+   "rank": 20
   },
   {
    "site": "jobkoreaglobal.blogspot.com",
@@ -877,7 +833,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 23
+   "rank": 21
   },
   {
    "site": "k-health365-edu.blogspot.com",
@@ -899,7 +855,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 24
+   "rank": 22
   },
   {
    "site": "k-health365.blogspot.com",
@@ -921,7 +877,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 25
+   "rank": 23
   },
   {
    "site": "k-health365.com",
@@ -943,7 +899,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 26
+   "rank": 24
   },
   {
    "site": "k-healthcare.tistory.com",
@@ -965,7 +921,7 @@
    "google_indexed": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
    "google_indexed_delta": null,
-   "rank": 27
+   "rank": 25
   },
   {
    "site": "k-trip365.blogspot.com",
@@ -987,7 +943,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 28
+   "rank": 26
   },
   {
    "site": "k-visa365.blogspot.com",
@@ -1009,7 +965,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 29
+   "rank": 27
   },
   {
    "site": "k-visa365.com",
@@ -1031,7 +987,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 30
+   "rank": 28
   },
   {
    "site": "kfinance365.blogspot.com",
@@ -1053,7 +1009,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 31
+   "rank": 29
   },
   {
    "site": "ki-korea.blogspot.com",
@@ -1075,7 +1031,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 32
+   "rank": 30
   },
   {
    "site": "ki-korea.com",
@@ -1097,7 +1053,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 33
+   "rank": 31
   },
   {
    "site": "kieca-korea.blogspot.com",
@@ -1119,7 +1075,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 34
+   "rank": 32
   },
   {
    "site": "korea-life-support365.blogspot.com",
@@ -1141,7 +1097,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 35
+   "rank": 33
   },
   {
    "site": "korea365guide.blogspot.com",
@@ -1163,7 +1119,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 36
+   "rank": 34
   },
   {
    "site": "koreacrypto365.blogspot.com",
@@ -1185,7 +1141,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 37
+   "rank": 35
   },
   {
    "site": "koreacrypto365.com",
@@ -1207,7 +1163,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 38
+   "rank": 36
   },
   {
    "site": "koreainvest365.blogspot.com",
@@ -1229,7 +1185,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 39
+   "rank": 37
   },
   {
    "site": "koreainvest365.com",
@@ -1251,7 +1207,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 40
+   "rank": 38
   },
   {
    "site": "koreamedicaltour.com",
@@ -1273,7 +1229,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 41
+   "rank": 39
   },
   {
    "site": "koreamedicaltour1.blogspot.com",
@@ -1295,7 +1251,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 42
+   "rank": 40
   },
   {
    "site": "koreamedicaltour365.blogspot.com",
@@ -1317,13 +1273,13 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 43
+   "rank": 41
   },
   {
    "site": "koreanews365.com",
    "url": "https://koreanews365.com",
    "platform": "newsroom",
-   "display_name": "한국신문",
+   "display_name": "한국신문 Koreanews24",
    "status": "OK",
    "gsc_property": "https://koreanews365.com/",
    "content": 124,
@@ -1339,7 +1295,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 44
+   "rank": 42
   },
   {
    "site": "koreanews365daily.blogspot.com",
@@ -1361,7 +1317,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 45
+   "rank": 43
   },
   {
    "site": "koreataxnlaw.blogspot.com",
@@ -1383,7 +1339,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 46
+   "rank": 44
   },
   {
    "site": "krealestate365.blogspot.com",
@@ -1405,7 +1361,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 47
+   "rank": 45
   },
   {
    "site": "krealestate365.com",
@@ -1427,51 +1383,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 48
-  },
-  {
-   "site": "ksa-korea.blogspot.com",
-   "url": "https://ksa-korea.blogspot.com",
-   "platform": "blogspot",
-   "display_name": "ksa-korea.blogspot.com",
-   "status": "OK",
-   "gsc_property": "https://ksa-korea.blogspot.com/",
-   "content": null,
-   "latest_publish_date": null,
-   "content_delta": null,
-   "clicks": 0,
-   "clicks_delta": 0,
-   "cumulative": 0,
-   "cumulative_delta": 0,
-   "impressions": 0,
-   "impressions_delta": 0,
-   "cumulative_impressions": 0,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": null,
-   "rank": 49
-  },
-  {
-   "site": "ksa-korea.org",
-   "url": "https://ksa-korea.org",
-   "platform": "wordpress",
-   "display_name": "ksa-korea.org",
-   "status": "OK",
-   "gsc_property": "https://ksa-korea.org/",
-   "content": null,
-   "latest_publish_date": null,
-   "content_delta": null,
-   "clicks": 0,
-   "clicks_delta": 0,
-   "cumulative": 4,
-   "cumulative_delta": 0,
-   "impressions": 0,
-   "impressions_delta": -1,
-   "cumulative_impressions": 82,
-   "google_indexed": 0,
-   "google_indexed_status": "OK",
-   "google_indexed_delta": null,
-   "rank": 50
+   "rank": 46
   },
   {
    "site": "kskin365.com",
@@ -1493,7 +1405,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 51
+   "rank": 47
   },
   {
    "site": "kstudy365.blogspot.com",
@@ -1515,7 +1427,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 52
+   "rank": 48
   },
   {
    "site": "kstudy365.com",
@@ -1537,7 +1449,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 53
+   "rank": 49
   },
   {
    "site": "ktech365.blogspot.com",
@@ -1559,7 +1471,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 54
+   "rank": 50
   },
   {
    "site": "kworld365.com",
@@ -1581,7 +1493,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 55
+   "rank": 51
   },
   {
    "site": "kworld365seoul.blogspot.com",
@@ -1603,7 +1515,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 56
+   "rank": 52
   },
   {
    "site": "oliveyoungkorea.blogspot.com",
@@ -1625,7 +1537,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 57
+   "rank": 53
   },
   {
    "site": "seoulintlschoolguide.blogspot.com",
@@ -1647,7 +1559,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 58
+   "rank": 54
   },
   {
    "site": "sis-korea.blogspot.com",
@@ -1669,7 +1581,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 59
+   "rank": 55
   },
   {
    "site": "skin.k-health365.com",
@@ -1691,7 +1603,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 60
+   "rank": 56
   },
   {
    "site": "studyinkorea365.blogspot.com",
@@ -1713,7 +1625,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 61
+   "rank": 57
   },
   {
    "site": "studyinkorea365.com",
@@ -1735,7 +1647,7 @@
    "google_indexed": 0,
    "google_indexed_status": "OK",
    "google_indexed_delta": null,
-   "rank": 62
+   "rank": 58
   },
   {
    "site": "blog.naver.com/health-standard",
@@ -1757,7 +1669,7 @@
    "google_indexed": null,
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 63
+   "rank": 59
   },
   {
    "site": "blog.naver.com/k-insight-vietnam",
@@ -1779,7 +1691,7 @@
    "google_indexed": null,
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 64
+   "rank": 60
   },
   {
    "site": "blog.naver.com/sky-only",
@@ -1801,7 +1713,7 @@
    "google_indexed": null,
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 65
+   "rank": 61
   },
   {
    "site": "huh0303.tistory.com",
@@ -1823,7 +1735,7 @@
    "google_indexed": null,
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 66
+   "rank": 62
   },
   {
    "site": "k-insight-vietnam.tistory.com",
@@ -1845,7 +1757,7 @@
    "google_indexed": null,
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 67
+   "rank": 63
   },
   {
    "site": "k-vietnam.tistory.com",
@@ -1867,7 +1779,7 @@
    "google_indexed": null,
    "google_indexed_delta": null,
    "google_indexed_status": "GSC_INDEX_COUNT_UNAVAILABLE",
-   "rank": 68
+   "rank": 64
   }
  ]
 }
