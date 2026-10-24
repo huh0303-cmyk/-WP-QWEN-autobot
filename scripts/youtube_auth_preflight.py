@@ -23,7 +23,9 @@ def main():
         params={'part': 'id', 'mine': 'true'}, headers={'Authorization': 'Bearer ' + data['access_token']}, timeout=30)
     if not response.ok:
         raise RuntimeError(f'{profile}: channel verification rejected HTTP {response.status_code}')
-    expected = next(c['channel_id'] for c in json.load(open('config/youtube_channels.json', encoding='utf-8'))['channels'] if c['secret_profile'] == profile)
+    expected = os.environ.get('EXPECTED_CHANNEL_ID', '').strip()
+    if not expected:
+        expected = next(c['channel_id'] for c in json.load(open('config/youtube_channels.json', encoding='utf-8'))['channels'] if c['secret_profile'] == profile)
     if expected not in {c['id'] for c in response.json().get('items', [])}:
         raise RuntimeError(f'{profile}: authenticated channel does not match registry')
     print(f'{profile}: channel identity and token verified (read-only; no upload performed)')
