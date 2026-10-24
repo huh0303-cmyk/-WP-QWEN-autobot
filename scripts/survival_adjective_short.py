@@ -77,14 +77,13 @@ def select_pair(target_date: dt.date, pair_id: str | None) -> dict:
             if pair["id"] == pair_id:
                 return pair
         raise ValueError(f"Unknown pair id: {pair_id}")
-    # New recurring batch cadence: Monday / Wednesday / Friday (KST), beginning
-    # 2026-10-05. Alternate adjective and noun lessons by release, not calendar
-    # day, so skipped days do not skew the curriculum.
-    monday = target_date - dt.timedelta(days=target_date.weekday())
+    # Each calendar date must resolve to a distinct lesson, including manual
+    # reruns on Tuesday/Thursday/weekends. The old weekday-slot mapping mapped
+    # Mon+Tue and Wed+Thu to the same release_index, causing duplicate pairs.
+    # Keep the Oct 5, 2026 curriculum anchor and derive the lesson from elapsed
+    # calendar days so a rerun on a different date cannot silently repeat it.
     anchor_monday = dt.date(2026, 10, 5)
-    week_index = (monday - anchor_monday).days // 7
-    slot = {0: 0, 2: 1, 4: 2}.get(target_date.weekday(), min(target_date.weekday() // 2, 2))
-    release_index = week_index * 3 + slot
+    release_index = (target_date - anchor_monday).days
     category = "adjective" if release_index % 2 == 0 else "noun"
     options = [row for row in pairs if row.get("category", "adjective") == category]
     if not options:
