@@ -31,8 +31,8 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
-          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
           CONFIRM_PRIVATE_UPLOAD: ${{ inputs.confirm_private_upload }}
@@ -43,7 +43,7 @@ jobs:
             exit 1
           fi
           missing=""
-          for name in OPENAI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+          for name in OPENAI_API_KEY FISH_AUDIO_API_KEY GOOGLE_OAUTH_CLIENT_ID GOOGLE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
               echo "::error title=Missing GitHub secret::$name is not configured. Check the repository secret or the FISH_AUDIO_API_KEY environment secret."
@@ -63,8 +63,8 @@ jobs:
       - name: Verify exact Seoul Journal channel before generation
         env:
           PROFILE: SEOUL_JOURNAL
-          CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           EXPECTED_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
         run: python scripts/youtube_auth_preflight.py
@@ -81,8 +81,8 @@ jobs:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
-          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
-          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
         run: python scripts/seoul_journal_shorts_pipeline.py
