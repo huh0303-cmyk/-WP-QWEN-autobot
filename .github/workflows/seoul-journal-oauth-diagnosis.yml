@@ -23,6 +23,10 @@ jobs:
           GOOGLE_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           SEOUL_TOPIK_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_SEOUL_TOPIK }}
           SEOUL_TOPIK_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_SEOUL_TOPIK }}
+          GLOBALMUSIC_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC }}
+          GLOBALMUSIC_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
+          HEALING_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+          HEALING_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
         run: |
           python -m pip install --disable-pip-version-check requests
           python - <<'PY'
@@ -33,6 +37,8 @@ jobs:
               ("repo_youtube_pair", os.getenv("YOUTUBE_ID","").strip(), os.getenv("YOUTUBE_SECRET","").strip()),
               ("repo_google_pair", os.getenv("GOOGLE_ID","").strip(), os.getenv("GOOGLE_SECRET","").strip()),
               ("youtube_channels_seoul_topik_pair", os.getenv("SEOUL_TOPIK_ID","").strip(), os.getenv("SEOUL_TOPIK_SECRET","").strip()),
+              ("youtube_channels_globalmusic_pair", os.getenv("GLOBALMUSIC_ID","").strip(), os.getenv("GLOBALMUSIC_SECRET","").strip()),
+              ("youtube_channels_healing_pair", os.getenv("HEALING_ID","").strip(), os.getenv("HEALING_SECRET","").strip()),
           ]
           if not refresh or not expected:
               raise SystemExit("Required Seoul Journal refresh token or expected channel ID is missing.")
