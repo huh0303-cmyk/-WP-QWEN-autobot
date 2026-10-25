@@ -1,7 +1,7 @@
 name: Daily long videos - Health Clinic USA / Japan + Seoul_Jisoo1 shopping
 
 # One narrated 3-5 minute video per channel per KST day. Scheduled uploads are PRIVATE only per owner instruction (2026-10-24).
-# Narration is ElevenLabs-only -> Pexels/Pixabay -> ffmpeg -> YouTube API. No TTS fallback.
+# Narration uses free Fish Audio S2.1 Pro Free when available, then free Edge TTS -> Pexels/Pixabay -> ffmpeg -> YouTube API. No paid TTS fallback.
 # Upload happens only after the authenticated channel ID equals the locked UC ID; the job fails
 # visibly (and publishes nothing) while a channel's OAuth token is not yet re-authorised.
 on:
@@ -71,11 +71,7 @@ jobs:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-      ELEVENLABS_MODEL_ID: eleven_multilingual_v2
-      ELEVENLABS_VOICE_ID_HEALTH_USA: ${{ secrets.HEALTH_CLINIC_VOICE_ID_EN_B }}
-      ELEVENLABS_VOICE_ID_HEALTH_JAPAN: ${{ secrets.HEALTH_CLINIC_VOICE_ID_JP_A }}
-      ELEVENLABS_VOICE_ID_SEOUL_JISOO1: ${{ vars.ELEVENLABS_VOICE_ID_SEOUL_JISOO1 }}
+      FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
       BOOKING_AID: ${{ secrets.BOOKING_AID }}
       AGODA_CID: ${{ secrets.AGODA_CID }}
       KLOOK_AID: ${{ secrets.KLOOK_AID }}
@@ -88,7 +84,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          python -m pip install --disable-pip-version-check requests pillow google-api-python-client google-auth
+          python -m pip install --disable-pip-version-check requests pillow google-api-python-client google-auth edge-tts
       - name: Resolve channel
         id: pick
         shell: bash
