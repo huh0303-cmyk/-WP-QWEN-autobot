@@ -22,6 +22,7 @@ concurrency:
 
 jobs:
   build-and-upload-private:
+    environment: youtube-publish
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -42,10 +43,10 @@ jobs:
             exit 1
           fi
           missing=""
-          for name in OPENAI_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
+          for name in OPENAI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
-              echo "::error title=Missing GitHub secret::$name is not configured. Add it in Settings > Secrets and variables > Actions."
+              echo "::error title=Missing GitHub secret::$name is not configured. Check the repository secret or the youtube-publish environment secret."
               missing="yes"
             fi
           done
