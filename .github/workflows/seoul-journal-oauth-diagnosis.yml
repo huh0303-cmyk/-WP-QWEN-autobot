@@ -30,6 +30,8 @@ jobs:
           GLOBALMUSIC_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
           HEALING_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
           SEOUL_TOPIK_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SEOUL_TOPIK }}
+          GENERIC_YOUTUBE_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          GENERIC_GOOGLE_REFRESH: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: |
           python -m pip install --disable-pip-version-check requests
           python - <<'PY'
@@ -98,6 +100,23 @@ jobs:
                       print(f"{name}: refresh_ok; expected_channel_match={expected_id in ids}")
                   else:
                       print(f"{name}: refresh_ok")
+              except Exception as e:
+                  print(f"{name}: request_failed={type(e).__name__}")
+          print("Testing each generic client against its own stored refresh token.")
+          for name, cid, secret, token in [
+              ("generic_youtube_pair_with_generic_token", os.getenv("YOUTUBE_ID","").strip(), os.getenv("YOUTUBE_SECRET","").strip(), os.getenv("GENERIC_YOUTUBE_REFRESH","").strip()),
+              ("generic_google_pair_with_generic_token", os.getenv("GOOGLE_ID","").strip(), os.getenv("GOOGLE_SECRET","").strip(), os.getenv("GENERIC_GOOGLE_REFRESH","").strip()),
+          ]:
+              if not all((cid, secret, token)):
+                  print(f"{name}: skipped_missing_config")
+                  continue
+              try:
+                  r = requests.post("https://oauth2.googleapis.com/token", data={"client_id":cid,"client_secret":secret,"refresh_token":token,"grant_type":"refresh_token"}, timeout=25)
+                  if r.ok: print(f"{name}: refresh_ok")
+                  else:
+                      try: code = r.json().get("error", f"HTTP_{r.status_code}")
+                      except Exception: code = f"HTTP_{r.status_code}"
+                      print(f"{name}: refresh_failed={code}")
               except Exception as e:
                   print(f"{name}: request_failed={type(e).__name__}")
           if not success:
