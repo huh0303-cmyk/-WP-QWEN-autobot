@@ -102,40 +102,50 @@ def draft(title, body):
 
 
 def tts(text):
-    """Generate narration with ElevenLabs only; never fall back to another TTS provider."""
-    api_key = os.getenv("ELEVENLABS_API_KEY", "").strip()
-    voice_id = (
-        os.getenv("SEOUL_JOURNAL_VOICE_ID", "").strip()
-        or os.getenv("ELEVENLABS_VOICE_ID_SEOUL_JOURNAL", "").strip()
-    )
-    if not api_key:
-        raise RuntimeError("ELEVENLABS_API_KEY is missing; refusing to use a substitute TTS provider.")
-    if not voice_id:
-        raise RuntimeError("Approved Seoul Journal ElevenLabs voice ID is missing; refusing to use a substitute voice.")
+    """Free-only narration: Fish Audio S2.1 Pro Free first, then Edge TTS.
+    Never calls a paid endpoint. Secrets are never printed to logs.
+    """
     p = OUT / "voice.mp3"
-    model = os.getenv("ELEVENLABS_MODEL_ID", "").strip() or "eleven_multilingual_v2"
-    r = requests.post(
-        f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-        headers={"xi-api-key": api_key, "Content-Type": "application/json", "Accept": "audio/mpeg"},
-        json={
-            "text": text,
-            "model_id": model,
-            "voice_settings": {
-                "stability": 0.55,
-                "similarity_boost": 0.78,
-                "style": 0.15,
-                "use_speaker_boost": True,
-            },
-        },
-        timeout=120,
-    )
-    if not r.ok:
-        raise RuntimeError(f"ElevenLabs TTS failed with HTTP {r.status_code}: {r.text[:180]}")
-    if len(r.content) < 2000:
-        raise RuntimeError("ElevenLabs returned a missing or unexpectedly short audio file.")
-    p.write_bytes(r.content)
-    log(f"TTS_ENGINE=elevenlabs model={model} bytes={p.stat().st_size}")
-    return p
+    errors = []
+    api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+    if api_key:
+        try:
+            r = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "model": "s2.1-pro-free",
+                    "Content-Type": "application/json",
+                    "Accept": "audio/mpeg",
+                },
+                json={"text": text, "format": "mp3"},
+                timeout=150,
+            )
+            if r.ok and len(r.content) >= 2000 and not r.content.lstrip().startswith(b"{"):
+                p.write_bytes(r.content)
+                log(f"TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={p.stat().st_size}")
+                return p
+            errors.append(f"Fish Audio returned HTTP {r.status_code} or invalid audio")
+        except Exception as exc:
+            errors.append(f"Fish Audio failed ({type(exc).__name__})")
+    else:
+        errors.append("Fish Audio API key not configured; trying free Edge TTS")
+
+    # Edge TTS is a free fallback. No paid provider is called if it fails.
+    try:
+        import asyncio
+        import edge_tts
+        async def save_edge():
+            await edge_tts.Communicate(text, "ko-KR-SunHiNeural").save(str(p))
+        asyncio.run(save_edge())
+        if p.exists() and p.stat().st_size >= 2000:
+            log(f"TTS_ENGINE=edge_tts voice=ko-KR-SunHiNeural bytes={p.stat().st_size}")
+            return p
+        errors.append("Edge TTS returned invalid audio")
+    except Exception as exc:
+        errors.append(f"Edge TTS failed ({type(exc).__name__})")
+
+    raise RuntimeError("All free TTS providers failed: " + "; ".join(errors))
 
 def fetch_photo(image_url):
     if not image_url: return None
