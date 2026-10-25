@@ -1,4 +1,4 @@
-# 사이트 건강도 리포트 (2026-10-24 08:52 KST)
+# 사이트 건강도 리포트 (2026-10-26 08:18 KST)
 
 - 점검 60곳 · 정상 35 · 경고 18 · 심각 7
 - 자동수정 모드: ON
@@ -9,8 +9,9 @@
 - **https://koreacrypto365.com** (wordpress): warn:robots_no_sitemap_line, critical:sitekit_disconnected
   - 자동수정: {'indexnow_ping': True}
   - 수동 필요: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
-- **https://kskin365.com** (wordpress): warn:robots_no_sitemap_line, critical:sitekit_disconnected, warn:zero_impressions_28d
+- **https://kskin365.com** (wordpress): warn:robots_no_sitemap_line, warn:duplicate_titles_1groups, critical:sitekit_disconnected, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': False}
+  - 수동 필요: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
   - 수동 필요: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
 - **https://k-visa365.com** (wordpress): critical:home_http_403, critical:home_noindex, critical:sitemap_missing, warn:ads_txt_missing_or_wrong, warn:plugins_api_403
   - 수동 필요: 설정>읽기>검색엔진 노출 체크 해제 및 SEO 플러그인 noindex 확인
@@ -24,8 +25,8 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://koreainvest365.com** (wordpress): warn:robots_no_sitemap_line, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': True}
-- **https://koreainsurance365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_6
-  - 자동수정: {'published_overdue_scheduled': 6}
+- **https://koreainsurance365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_3
+  - 자동수정: {'published_overdue_scheduled': 3}
   - 자동수정: {'indexnow_ping': True}
 - **https://kfinance365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
@@ -43,8 +44,8 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://kstudy365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://studyinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_5, warn:zero_impressions_28d
-  - 자동수정: {'published_overdue_scheduled': 5}
+- **https://studyinkorea365.com** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_3, warn:zero_impressions_28d
+  - 자동수정: {'published_overdue_scheduled': 3}
   - 자동수정: {'indexnow_ping': True}
 - **https://kieca-korea.org** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
@@ -52,35 +53,36 @@
   - 자동수정: {'indexnow_ping': False}
 - **https://jobinkorea365.com** (wordpress): warn:robots_no_sitemap_line
   - 자동수정: {'indexnow_ping': False}
-- **https://jobkoreaglobal.com** (wordpress): warn:duplicate_titles_1groups
+- **https://jobkoreaglobal.com** (wordpress): warn:duplicate_titles_2groups
   - 자동수정: {'indexnow_ping': False}
   - 수동 필요: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - **https://korea365.org** (wordpress): warn:robots_no_sitemap_line, warn:overdue_scheduled_4
   - 자동수정: {'published_overdue_scheduled': 4}
   - 자동수정: {'indexnow_ping': False}
-- **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:stale_19d, warn:zero_impressions_28d
+- **https://koreanews365.com** (newsroom): warn:robots_no_sitemap_line, warn:stale_21d, warn:zero_impressions_28d
   - 자동수정: {'indexnow_ping': False}
 
 ## 사람이 해야 하는 일
 
 - https://koreacrypto365.com: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
+- https://kskin365.com: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 - https://kskin365.com: wp-admin > Site Kit > 설정에서 Google 계정으로 재연결(자동 불가: 구글 로그인 필요)
 - https://k-visa365.com: 설정>읽기>검색엔진 노출 체크 해제 및 SEO 플러그인 noindex 확인
 - https://jobkoreaglobal.com: 중복 제목 그룹 검토 후 대표 1개만 공개(비공개 전환은 승인 후)
 
 ## 최근 28일 검색 클릭 상위
 
-- https://korea365.org: 클릭 6 / 노출 518
-- https://koreainsurance365.com: 클릭 4 / 노출 270
-- https://koreawedding365.com: 클릭 4 / 노출 473
-- https://jobkoreaglobal.com: 클릭 4 / 노출 314
-- https://k-trip365.com: 클릭 1 / 노출 14
-- https://kieca-korea.org: 클릭 1 / 노출 30
-- https://jobinkorea365.com: 클릭 1 / 노출 253
+- https://korea365.org: 클릭 7 / 노출 555
+- https://koreainsurance365.com: 클릭 4 / 노출 317
+- https://jobkoreaglobal.com: 클릭 4 / 노출 319
+- https://koreawedding365.com: 클릭 3 / 노출 467
+- https://koreataxnlaw.com: 클릭 1 / 노출 16
+- https://k-trip365.com: 클릭 1 / 노출 17
+- https://kieca-korea.org: 클릭 1 / 노출 28
+- https://jobinkorea365.com: 클릭 1 / 노출 255
 - https://k-health365.com: 클릭 0 / 노출 2
-- https://koreamedicaltour.com: 클릭 0 / 노출 42
-- https://koreainvest365.com: 클릭 0 / 노출 0
+- https://koreamedicaltour.com: 클릭 0 / 노출 46
 
 ## 주간 추이 (최근 7일 vs 직전 7일, 전체 사이트 합계)
 
-- 클릭 6 (직전 5) · 노출 899 (직전 713)
+- 클릭 8 (직전 5) · 노출 938 (직전 763)
