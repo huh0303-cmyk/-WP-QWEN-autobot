@@ -527,3 +527,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Browser session status could not be inspected: the CUA state call failed before returning browser state. A Naver login page had been queued to the current Codex panel in the prior check, but whether it opened or an account logged in remains unknown. No account has been assumed; no editor insertion or publication performed.
 - The running prompt's per-site cadence (N1 1, N2 1, N3 1–5) differs from checked-in automation config (N1/N2 3–4; N3 8–10). No new plan was generated to avoid scheduling above the current instruction or publishing without today's source evidence.
 - Next step: repair/restore same-day plan and browser-session verification, then resume only at a future valid slot. No catch-up posts attempted; credentials were not read or requested.
+
+
+## tistory-daily-audit-20261025
+
+- `task_id=tistory-daily-audit-20261025`; heartbeat received 2026-10-25T17:00:12Z (2026-10-26 02:00 KST), auditing the exact 2026-10-25 persisted selection.
+- Selected targets: `tistory_health_info` → https://k-healthcare.tistory.com/ at 09:43 KST; `tistory_ktrip365` → https://k-trip365.tistory.com/ at 11:39 KST; `tistory_finance_housing` → https://k-vietnam.tistory.com/ at 21:46 KST. `data/tistory-daily-plans/2026-10-25.json` is absent. Canonical workflow file remains `PAUSED — quality incident`.
+- Dispatcher receipts found for Health (dispatched 10:05:05 KST) and Ktrip (15:04:38 KST), both after their scheduled slots. Finance/Housing has no slot receipt. These are dispatch statuses only, not publication proof.
+- Direct public RSS: Health latest remains Oct18; Ktrip Oct10; Finance/Housing Oct18. No Oct25 post on the three exact feeds; verified public publications 0/3.
+- Local runner status had no Oct25 jobs. Windows scheduled task last ran Oct25 23:58 KST with exit result 0, but there is no matching local receipt and no public result; exit code alone is insufficient. Google Sheets queue remains unverified; the connected browser export path was blocked on prior checks.
+- No retries or catch-up posting were triggered. Keep the date closed; resolve the paused plan and missing dispatch/receipt path before future runs.
