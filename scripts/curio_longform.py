@@ -389,23 +389,37 @@ def write_srt(srt_entries, out_path):
 # 4. TTS
 # ════════════════════════════════════════════════════════════
 def elevenlabs_tts(text, out_path):
-    if not ELEVENLABS_API_KEY:
-        return False
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
-    headers = {"xi-api-key": ELEVENLABS_API_KEY,
-               "Content-Type": "application/json", "Accept": "audio/mpeg"}
-    body = {"text": text, "model_id": ELEVENLABS_MODEL,
-            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}}
+    """Legacy function name retained for call compatibility; uses FREE TTS only."""
+    api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+    if api_key:
+        try:
+            r = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={"Authorization": f"Bearer {api_key}", "model": "s2.1-pro-free",
+                         "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                json={"text": text, "format": "mp3"}, timeout=150,
+            )
+            if r.ok and len(r.content) > 2000 and not r.content.lstrip().startswith(b"{"):
+                with open(out_path, "wb") as f: f.write(r.content)
+                log(f"   TTS_ENGINE=fish_audio model=s2.1-pro-free bytes={len(r.content)}")
+                return True
+            log(f"   Fish Audio unavailable (HTTP {r.status_code}); trying Edge TTS.")
+        except Exception as e:
+            log(f"   Fish Audio unavailable ({type(e).__name__}); trying Edge TTS.")
     try:
-        r = requests.post(url, headers=headers, json=body, timeout=90)
-        r.raise_for_status()
-        with open(out_path, "wb") as f:
-            f.write(r.content)
-        return True
+        import asyncio, edge_tts
+        lang = (os.getenv("TTS_LANGUAGE", "") or (sys.argv[2] if len(sys.argv) > 2 else "en")).lower().split("-")[0]
+        voice = {"ko":"ko-KR-SunHiNeural","en":"en-US-AriaNeural","ja":"ja-JP-NanamiNeural",
+                 "vi":"vi-VN-HoaiMyNeural","zh":"zh-CN-XiaoxiaoNeural"}.get(lang, "en-US-AriaNeural")
+        async def save():
+            await edge_tts.Communicate(text, voice).save(str(out_path))
+        asyncio.run(save())
+        if os.path.exists(out_path) and os.path.getsize(out_path) > 2000:
+            log(f"   TTS_ENGINE=edge_tts voice={voice} bytes={os.path.getsize(out_path)}")
+            return True
     except Exception as e:
-        log(f"   ⚠️ TTS 실패: {e}")
-        return False
-
+        log(f"   Free TTS failed ({type(e).__name__}); no paid fallback attempted.")
+    return False
 
 def make_silence(out_path, duration):
     run_ffmpeg(["ffmpeg", "-y", "-f", "lavfi", "-i",
