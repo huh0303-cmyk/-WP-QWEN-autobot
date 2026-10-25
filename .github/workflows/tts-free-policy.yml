@@ -1,0 +1,38 @@
+name: London Project - Free-only TTS Policy Check
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'docs/TTS_PROVIDER_PRIORITY.md'
+      - 'scripts/tts_provider_priority.py'
+      - '.github/workflows/tts-free-policy.yml'
+permissions:
+  contents: read
+jobs:
+  verify-free-tts-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile shared TTS helper
+        run: python -m py_compile scripts/tts_provider_priority.py
+      - name: Verify provider order and paid-fallback guard
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import importlib.util
+          source = Path('scripts/tts_provider_priority.py').read_text(encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('tts_provider_priority', 'scripts/tts_provider_priority.py')
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          expected = ('fish_audio', 'qwen3_tts', 'edge_tts', 'additional_free')
+          assert module.TTS_PRIORITY == expected, module.TTS_PRIORITY
+          assert 'elevenlabs_generator' not in source.lower()
+          assert 's2.1-pro-free' in source
+          policy = Path('docs/TTS_PROVIDER_PRIORITY.md').read_text(encoding='utf-8')
+          assert 'Paid TTS is prohibited as an automatic fallback' in policy
+          print('PASS: free-only TTS priority and paid fallback guard verified.')
+          print('NOTE: This validates the policy/helper only; it does not prove every channel is migrated.')
+          PY
