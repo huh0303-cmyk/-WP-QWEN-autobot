@@ -302,40 +302,33 @@ def duration(path: Path) -> float:
 
 
 async def _tts(text: str, voice: str, out: Path, elevenlabs_voice_id: str = ""):
-    """Prefer the channel's fixed ElevenLabs narrator; Edge TTS is emergency fallback only."""
-    api_key = os.getenv("ELEVENLABS_API_KEY", "").strip()
-    voice_id = (elevenlabs_voice_id or "").strip()
-    if api_key and voice_id:
-        last = None
-        for attempt in range(5):
-            try:
-                response = requests.post(
-                    f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-                    headers={"xi-api-key": api_key, "Content-Type": "application/json", "Accept": "audio/mpeg"},
-                    json={
-                        "text": text,
-                        "model_id": os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2"),
-                        "voice_settings": {"stability": 0.55, "similarity_boost": 0.78, "style": 0.15, "use_speaker_boost": True},
-                    },
-                    timeout=90,
-                )
-                if response.status_code == 429 or response.status_code >= 500:
-                    last = f"HTTP {response.status_code}: {response.text[:180]}"
-                    await asyncio.sleep(min(5 * (attempt + 1), 20))
-                    continue
-                response.raise_for_status()
+    """Free-only TTS: Fish Audio S2.1 Pro Free when configured, then Edge neural TTS.
+    Paid ElevenLabs is intentionally never called by this pipeline.
+    """
+    api_key = os.getenv("FISH_AUDIO_API_KEY", "").strip()
+    if api_key:
+        try:
+            response = requests.post(
+                "https://api.fish.audio/v1/tts",
+                headers={"Authorization": f"Bearer {api_key}", "model": "s2.1-pro-free",
+                         "Content-Type": "application/json", "Accept": "audio/mpeg"},
+                json={"text": text, "format": "mp3"},
+                timeout=150,
+            )
+            if response.ok and len(response.content) > 2000 and not response.content.lstrip().startswith(b"{"):
                 out.write_bytes(response.content)
-                if out.exists() and out.stat().st_size > 2000:
-                    return
-                raise RuntimeError("ElevenLabs returned an empty/short audio file")
-            except Exception as exc:
-                last = exc
-                if attempt < 4:
-                    await asyncio.sleep(2)
-        raise RuntimeError(f"ElevenLabs TTS failed for voice ID {voice_id}: {last}")
-    # Fail visibly rather than silently using the cheap voice for a channel that should be upgraded.
-    raise RuntimeError(f"Missing ELEVENLABS_API_KEY or voice ID for ElevenLabs narrator (Edge voice {voice} is disabled).")
-
+                return
+            print(f"Fish Audio TTS unavailable (HTTP {response.status_code}); using free Edge TTS.", flush=True)
+        except Exception as exc:
+            print(f"Fish Audio TTS unavailable ({type(exc).__name__}); using free Edge TTS.", flush=True)
+    try:
+        import edge_tts
+        await edge_tts.Communicate(text, voice).save(str(out))
+        if out.exists() and out.stat().st_size > 2000:
+            return
+        raise RuntimeError("Edge TTS returned an empty/short audio file")
+    except Exception as exc:
+        raise RuntimeError(f"All free TTS providers failed; no paid fallback was attempted: {type(exc).__name__}: {exc}") from exc
 
 def split_chunks(text: str, lang: str) -> list[str]:
     limit = 34 if lang == "en" else 17  # per line; two lines per cue
