@@ -16,6 +16,8 @@ jobs:
       - name: Test available OAuth client pairs without exposing credentials
         env:
           SEOUL_REFRESH: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
+          SEOUL_JOURNAL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_ID }}
+          SEOUL_JOURNAL_SECRET: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_CLIENT_SECRET }}
           EXPECTED_CHANNEL: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
           YOUTUBE_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
@@ -39,6 +41,7 @@ jobs:
           refresh = os.getenv("SEOUL_REFRESH", "").strip()
           expected = os.getenv("EXPECTED_CHANNEL", "").strip()
           candidates = [
+              ("seoul_journal_dedicated_pair", os.getenv("SEOUL_JOURNAL_ID","").strip(), os.getenv("SEOUL_JOURNAL_SECRET","").strip()),
               ("repo_youtube_pair", os.getenv("YOUTUBE_ID","").strip(), os.getenv("YOUTUBE_SECRET","").strip()),
               ("repo_google_pair", os.getenv("GOOGLE_ID","").strip(), os.getenv("GOOGLE_SECRET","").strip()),
               ("youtube_channels_seoul_topik_pair", os.getenv("SEOUL_TOPIK_ID","").strip(), os.getenv("SEOUL_TOPIK_SECRET","").strip()),
