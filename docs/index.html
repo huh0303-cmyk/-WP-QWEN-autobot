@@ -149,7 +149,7 @@ function draw(){
     var p=blogPlatformOf(r);return '<tr class="platform-'+esc(p)+'"><td>'+(rankValue===null?'—':rankValue+'위')+'</td><td>'+platformCell(p)+'</td><td><a href="'+esc(safeUrl(r.url,r.site))+'" target="_blank" rel="noopener">'+esc(r.display_name||r.site)+'</a></td><td>'+vis+'</td><td>'+cell(val(r,'impressions'),r.impressions_delta,hasImp?'':'수집 전')+'</td><td>'+cell(val(r,'clicks'),r.clicks_delta)+'</td><td>'+metricNumber(r.content,'글')+(r.content_delta===null||r.content_delta===undefined?' <span class="na">(증감 미수집)</span>':' '+d(r.content_delta))+'</td><td>'+metricDay(r.latest_publish_date)+'</td><td>'+n(r.google_indexed)+'</td><td>'+esc(st)+'</td><td><a class="publish-link" href="'+publishUrl+'" target="_blank" rel="noopener">발행 화면 ↗</a></td></tr>';
   }).join('');
 }
-document.getElementById('blog-platform-tabs').addEventListener('click',function(e){var b=e.target.closest('.platform-tab');if(!b)return;blogPlatform=b.dataset.platform;draw();});
+document.getElementById('all-platform-summary').addEventListener('click',function(e){var b=e.target.closest('.platform-tab[data-kind="blog"]');if(!b)return;blogPlatform=b.dataset.platform;draw();});
 fetch('visitor_metrics.json?'+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){VISITOR_DATA=d;draw();}).catch(function(e){var el=document.getElementById('blog-ranking-meta');el.textContent+=' · 방문자 순위 데이터 미수집';});
 function drawBloggerPageviews(payload){
  var meta=document.getElementById('blogger-pageviews-meta');
