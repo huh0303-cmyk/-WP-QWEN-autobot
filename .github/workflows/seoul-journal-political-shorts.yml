@@ -67,18 +67,6 @@ jobs:
           REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
           EXPECTED_CHANNEL_ID: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID }}
         run: python scripts/youtube_auth_preflight.py
-      - name: Validate ElevenLabs key and approved voice ID
-        env:
-        run: |
-          set -eu
-          if [ -z "$ELEVENLABS_API_KEY" ]; then
-            echo "::error title=Missing ElevenLabs key::ELEVENLABS_API_KEY is not configured."
-            exit 1
-          fi
-          if [ -z "$SEOUL_JOURNAL_VOICE_ID" ] && [ -z "$ELEVENLABS_VOICE_ID_SEOUL_JOURNAL" ]; then
-            echo "::error title=Missing ElevenLabs voice::Configure SEOUL_JOURNAL_VOICE_ID or ELEVENLABS_VOICE_ID_SEOUL_JOURNAL."
-            exit 1
-          fi
       - name: Install system fonts and FFmpeg
         run: |
           sudo apt-get update
@@ -91,9 +79,7 @@ jobs:
         env:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          SEOUL_JOURNAL_VOICE_ID: ${{ secrets.SEOUL_JOURNAL_VOICE_ID }}
-          ELEVENLABS_VOICE_ID_SEOUL_JOURNAL: ${{ secrets.ELEVENLABS_VOICE_ID_SEOUL_JOURNAL }}
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
