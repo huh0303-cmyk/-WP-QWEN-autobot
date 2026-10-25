@@ -517,3 +517,13 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Direct public RSS checks: Health latest is dated Oct18; Life latest Oct23 19:17 KST; Ktrip latest Oct10. None has an Oct24 publication. Verified public publication count: 0/3.
 - Read-only local runner has no Oct24 job IDs. Windows task's latest execution is Oct25 07:17 Bangkok (=09:17 KST), after the audited day, and it was still Running at check; no Oct24 publication receipt can be inferred. Google Sheets queue remains unavailable through the connected browser/export path.
 - No retries or catch-up publications were initiated. Keep the three Oct24 slots closed; resolve the paused content plan and dispatch-to-publication receipt gap before future runs.
+
+
+## naver-daily-check-20261025
+
+- `task_id=naver-daily-check-20261025`; heartbeat received 2026-10-25T00:18:33Z = 09:18 KST. Checked public blogs N1 `k-insight-vietnam`, N2 `health-standard`, N3 `sky-only`.
+- No `data/naver-daily-plans/2026-10-25.json` or `data/naver-trend-brief/2026-10-25.json` exists. The same-day trend window 07:07–07:50 KST has passed; current evidence-backed topics were not available.
+- Direct Naver RSS shows 0 posts dated Oct25 in each blog. Latest entries: N1 Oct10 (“2026년 숨은 정부 지원금과 환급금 한 번에 조회하고 신청하는 방법”); N2 Oct7 (“콘드로이친 효능과 부작용, 올바른 선택 방법 총정리”); N3 Oct8 (“2026년 이재명 재판 재개 가능성 검토와 사법부 충돌의 모든 것”). Confirmed Oct25 count: 0/3 so far.
+- Browser session status could not be inspected: the CUA state call failed before returning browser state. A Naver login page had been queued to the current Codex panel in the prior check, but whether it opened or an account logged in remains unknown. No account has been assumed; no editor insertion or publication performed.
+- The running prompt's per-site cadence (N1 1, N2 1, N3 1–5) differs from checked-in automation config (N1/N2 3–4; N3 8–10). No new plan was generated to avoid scheduling above the current instruction or publishing without today's source evidence.
+- Next step: repair/restore same-day plan and browser-session verification, then resume only at a future valid slot. No catch-up posts attempted; credentials were not read or requested.
