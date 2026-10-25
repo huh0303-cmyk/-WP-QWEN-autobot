@@ -27,6 +27,9 @@ jobs:
           GLOBALMUSIC_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
           HEALING_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
           HEALING_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+          GLOBALMUSIC_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+          HEALING_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+          SEOUL_TOPIK_REFRESH: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SEOUL_TOPIK }}
         run: |
           python -m pip install --disable-pip-version-check requests
           python - <<'PY'
@@ -70,6 +73,31 @@ jobs:
                       success = True
                       break
                   print(f"{name}: token_ok_but_expected_channel_not_returned")
+              except Exception as e:
+                  print(f"{name}: request_failed={type(e).__name__}")
+          print("Checking whether the existing profile client/token pairs work, without uploading.")
+          sanity = [
+              ("globalmusic_matching_pair", os.getenv("GLOBALMUSIC_ID","").strip(), os.getenv("GLOBALMUSIC_SECRET","").strip(), os.getenv("GLOBALMUSIC_REFRESH","").strip(), "UCbJfEtsffpgI5MsKkB7BYvQ"),
+              ("healing_matching_pair", os.getenv("HEALING_ID","").strip(), os.getenv("HEALING_SECRET","").strip(), os.getenv("HEALING_REFRESH","").strip(), "UC7yEsLM-HoXudngrD-4FIqg"),
+              ("seoul_topik_matching_pair", os.getenv("SEOUL_TOPIK_ID","").strip(), os.getenv("SEOUL_TOPIK_SECRET","").strip(), os.getenv("SEOUL_TOPIK_REFRESH","").strip(), ""),
+          ]
+          for name, cid, secret, token, expected_id in sanity:
+              if not all((cid, secret, token)):
+                  print(f"{name}: skipped_missing_config")
+                  continue
+              try:
+                  r = requests.post("https://oauth2.googleapis.com/token", data={"client_id":cid,"client_secret":secret,"refresh_token":token,"grant_type":"refresh_token"}, timeout=25)
+                  if not r.ok:
+                      try: code = r.json().get("error", f"HTTP_{r.status_code}")
+                      except Exception: code = f"HTTP_{r.status_code}"
+                      print(f"{name}: refresh_failed={code}")
+                      continue
+                  if expected_id:
+                      ch = requests.get("https://www.googleapis.com/youtube/v3/channels",params={"part":"id","mine":"true"},headers={"Authorization":"Bearer "+r.json()["access_token"]},timeout=25)
+                      ids = {item.get("id") for item in ch.json().get("items", [])} if ch.ok else set()
+                      print(f"{name}: refresh_ok; expected_channel_match={expected_id in ids}")
+                  else:
+                      print(f"{name}: refresh_ok")
               except Exception as e:
                   print(f"{name}: request_failed={type(e).__name__}")
           if not success:
