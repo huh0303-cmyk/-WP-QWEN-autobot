@@ -112,7 +112,14 @@ jobs:
                   continue
               try:
                   r = requests.post("https://oauth2.googleapis.com/token", data={"client_id":cid,"client_secret":secret,"refresh_token":token,"grant_type":"refresh_token"}, timeout=25)
-                  if r.ok: print(f"{name}: refresh_ok")
+                  if r.ok:
+                      token = r.json()["access_token"]
+                      ch = requests.get("https://www.googleapis.com/youtube/v3/channels",params={"part":"id","mine":"true"},headers={"Authorization":"Bearer "+token},timeout=25)
+                      if ch.ok:
+                          ids = {item.get("id") for item in ch.json().get("items", [])}
+                          print(f"{name}: refresh_ok; youtube_api_ok=True; seoul_journal_match={expected in ids}")
+                      else:
+                          print(f"{name}: refresh_ok; youtube_api_status=HTTP_{ch.status_code}")
                   else:
                       try: code = r.json().get("error", f"HTTP_{r.status_code}")
                       except Exception: code = f"HTTP_{r.status_code}"
