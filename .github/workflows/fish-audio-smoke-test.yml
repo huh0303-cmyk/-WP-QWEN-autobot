@@ -1,0 +1,69 @@
+name: Fish Audio Korean Voice Sample (no YouTube upload)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fish-audio-smoke-test:
+    name: Generate Korean newsroom voice sample
+    environment: FISH_AUDIO_API_KEY
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate sample with Fish Audio only
+        env:
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+        run: |
+          set -eu
+          python - <<'PY'
+          import os, sys, requests
+          text = (
+              "서울저널 음성 샘플입니다.\n"
+              "오늘의 정치 이슈를 전해드리기 전에, 사실과 의견을 구분하고 "
+              "확인된 정보부터 살펴보겠습니다.\n"
+              "여러분은 어떤 점이 가장 중요하다고 생각하십니까? "
+              "댓글로 의견을 남겨주세요. 서울저널이 알려드립니다."
+          )
+          key = os.environ.get("FISH_AUDIO_API_KEY", "").strip()
+          if not key:
+              print("ERROR: FISH_AUDIO_API_KEY is missing in the selected environment.")
+              sys.exit(2)
+          r = requests.post(
+              "https://api.fish.audio/v1/tts",
+              headers={
+                  "Authorization": f"Bearer {key}",
+                  "model": "s2.1-pro-free",
+                  "Content-Type": "application/json",
+                  "Accept": "audio/mpeg",
+              },
+              json={"text": text, "format": "mp3"},
+              timeout=150,
+          )
+          print(f"Fish Audio HTTP status: {r.status_code}")
+          print(f"Response content length: {len(r.content)} bytes")
+          if not r.ok:
+              # Never print response body: it could contain service diagnostics or sensitive data.
+              print("ERROR: Fish Audio rejected the request; response body intentionally hidden.")
+              sys.exit(3)
+          if len(r.content) < 2000 or r.content.lstrip().startswith(b"{"):
+              print("ERROR: Response did not look like a valid audio file.")
+              sys.exit(4)
+          with open("seoul-journal-fish-audio-sample.mp3", "wb") as f:
+              f.write(r.content)
+          with open("sample-metadata.txt", "w", encoding="utf-8") as f:
+              f.write("provider=Fish Audio\nmodel=s2.1-pro-free\nvoice_language=Korean\n")
+              f.write(f"bytes={len(r.content)}\n")
+          print("SUCCESS: Korean voice sample generated. No YouTube upload was attempted.")
+          PY
+          python -m pip --version
+      - name: Upload playable sample artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-journal-fish-audio-sample
+          path: |
+            seoul-journal-fish-audio-sample.mp3
+            sample-metadata.txt
+          retention-days: 7
