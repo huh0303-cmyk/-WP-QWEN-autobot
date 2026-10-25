@@ -34,7 +34,7 @@ jobs:
           assert 'edge_tts' in tts
           assert 'elevenlabs' not in tts
           assert 'elevenlabs' not in workflow
-          assert '"privacyStatus":"private"' in pipeline
+          assert '"privacystatus":"private"' in pipeline
           print('PASS: Seoul Journal Shorts TTS is free-only and upload remains private.')
           PY
       - name: Verify provider order and paid-fallback guard
