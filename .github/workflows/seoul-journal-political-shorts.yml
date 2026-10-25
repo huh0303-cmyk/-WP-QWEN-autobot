@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   build-and-upload-private:
-    environment: youtube-publish
+    environment: FISH_AUDIO_API_KEY
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -46,7 +46,7 @@ jobs:
           for name in OPENAI_API_KEY FISH_AUDIO_API_KEY YOUTUBE_OAUTH_CLIENT_ID YOUTUBE_OAUTH_CLIENT_SECRET SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID; do
             eval 'value=${'"$name"'-}'
             if [ -z "$value" ]; then
-              echo "::error title=Missing GitHub secret::$name is not configured. Check the repository secret or the youtube-publish environment secret."
+              echo "::error title=Missing GitHub secret::$name is not configured. Check the repository secret or the FISH_AUDIO_API_KEY environment secret."
               missing="yes"
             fi
           done
