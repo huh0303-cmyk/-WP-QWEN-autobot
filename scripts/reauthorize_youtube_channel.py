@@ -34,6 +34,7 @@ PROFILES = {
     "fr": "LANGUAGE_FR", "de": "LANGUAGE_DE",
     "it": "LANGUAGE_IT", "pt": "LANGUAGE_PT",
     "shopping": "SHOPPING_SEOUL_JISOO1",
+    "seoul_journal": "SEOUL_JOURNAL",
 }
 
 
@@ -46,7 +47,13 @@ def _ssh(*args: str, input_text: str | None = None) -> str:
     return result.stdout
 
 
-def _client() -> dict:
+def _client(client_json: Path | None = None) -> dict:
+    if client_json is not None:
+        data = json.loads(client_json.read_text(encoding="utf-8"))
+        item = data.get("installed") or data.get("web")
+        if not item or not item.get("client_id") or not item.get("client_secret"):
+            raise ValueError("OAuth client JSON must contain client_id and client_secret")
+        return {"id": item["client_id"], "secret": item["client_secret"]}
     code = (
         "import json;d=json.load(open('/etc/korea365/youtube-runtime.json'));"
         "print(json.dumps({'id':d['YOUTUBE_OAUTH_CLIENT_ID'],"
@@ -56,6 +63,11 @@ def _client() -> dict:
 
 
 def _expected(key: str) -> tuple[str, str]:
+    if key == "seoul_journal":
+        channel_id = __import__("os").environ.get("SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID", "").strip()
+        if not channel_id.startswith("UC"):
+            raise ValueError("Set SEOUL_JOURNAL_YOUTUBE_CHANNEL_ID to the confirmed Seoul Journal channel ID")
+        return channel_id, "Seoul Journal"
     groups = json.loads(MASTER.read_text(encoding="utf-8"))["groups"]
     for entries in groups.values():
         for entry in entries:
@@ -148,13 +160,17 @@ def _sync_gh_secret(name: str, token: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("channel", choices=sorted(PROFILES))
+    parser.add_argument("--client-json", type=Path,
+                        help="use a specific downloaded OAuth client JSON for this authorization")
     parser.add_argument("--resume-from-vps", action="store_true",
                         help="repair GitHub secret/receipt after an interrupted verified run")
     args = parser.parse_args()
     expected, title = _expected(args.channel)
-    client = _client()
+    client = _client(args.client_json)
     profile = PROFILES[args.channel]
-    secret_name = (profile if profile.startswith("HEALTH_CLINIC_")
+    secret_name = ("SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN"
+                   if args.channel == "seoul_journal" else
+                   profile if profile.startswith("HEALTH_CLINIC_")
                    else f"YOUTUBE_OAUTH_REFRESH_TOKEN_{profile}")
     if args.resume_from_vps:
         token = _read_vps_token(secret_name)
