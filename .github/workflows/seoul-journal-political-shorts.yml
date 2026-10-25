@@ -29,6 +29,7 @@ jobs:
       - name: Validate OAuth secrets before spending build time
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
           YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
           SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.SEOUL_JOURNAL_YOUTUBE_OAUTH_REFRESH_TOKEN }}
@@ -68,9 +69,6 @@ jobs:
         run: python scripts/youtube_auth_preflight.py
       - name: Validate ElevenLabs key and approved voice ID
         env:
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          SEOUL_JOURNAL_VOICE_ID: ${{ secrets.SEOUL_JOURNAL_VOICE_ID }}
-          ELEVENLABS_VOICE_ID_SEOUL_JOURNAL: ${{ secrets.ELEVENLABS_VOICE_ID_SEOUL_JOURNAL }}
         run: |
           set -eu
           if [ -z "$ELEVENLABS_API_KEY" ]; then
@@ -88,13 +86,12 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2
+          pip install requests trafilatura beautifulsoup4 Pillow openai google-api-python-client google-auth google-auth-httplib2 edge-tts
       - name: Build one-minute political Short and upload as PRIVATE
         env:
           INPUT_ARTICLE_URL: ${{ inputs.article_url }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
-          ELEVENLABS_MODEL_ID: ${{ vars.ELEVENLABS_MODEL_ID }}
           SEOUL_JOURNAL_VOICE_ID: ${{ secrets.SEOUL_JOURNAL_VOICE_ID }}
           ELEVENLABS_VOICE_ID_SEOUL_JOURNAL: ${{ secrets.ELEVENLABS_VOICE_ID_SEOUL_JOURNAL }}
           YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
