@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 from flask import request,render_template,Response
 from scripts.publication_board import four_metrics_html
-FILE=Path('/opt/korea365/data/account-schedule-20260923.json')
+FILE=Path(__file__).resolve().parents[1]/'data'/'account-schedule-20260923.json'
 def rank_cards(cards, day):
  for c in cards:
   v=c.get('audience_value',c.get('visitors'))
