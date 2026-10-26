@@ -112,7 +112,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
-          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai pydub mutagen numpy scipy moviepy
+          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai edge-tts pydub mutagen numpy scipy moviepy
       - name: Verify explicit cost-hold release
         env:
           COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
