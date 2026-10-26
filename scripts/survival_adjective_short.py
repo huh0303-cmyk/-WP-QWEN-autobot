@@ -291,6 +291,11 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     intro_duration = round(rng.uniform(1.1, 2.8), 2)
     outro_duration = round(rng.uniform(1.3, 3.2), 2)
     word_durations = [round(rng.uniform(1.8, 4.0), 2) for _ in range(10)]
+    # YouTube displays rounded seconds. Avoid the conspicuous 0:29 duration
+    # even if the randomized timing happens to land in the 28.5–29.5s window.
+    planned_duration = intro_duration + outro_duration + sum(word_durations)
+    if round(planned_duration) == 29:
+        word_durations[0] = round(word_durations[0] + (1.15 if word_durations[0] <= 2.85 else -1.15), 2)
     audio_tracks = []
     for index, duration in enumerate(word_durations):
         letter = "a" if index % 2 == 0 else "b"
