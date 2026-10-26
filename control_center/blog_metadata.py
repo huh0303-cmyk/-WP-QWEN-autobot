@@ -17,11 +17,6 @@ HOSTINGER_SHARED_HOSTING = {
     "renewal_date": "2027-02-21",
     "plan": "Business Web Hosting",
 }
-# Exact VPS billing date must be read from hPanel; never invent it.
-HOSTINGER_VPS = {
-    "provider": "Hostinger VPS",
-    "renewal_date": "",
-}
 
 DOMAIN_PAYMENT_OVERRIDES = {
     "kworld365.com": {"provider": "Gabia", "payment_date": "2026-08-02"},
@@ -95,7 +90,7 @@ def _domain_billing_snapshot(bucket: int) -> dict:
         return r.json()
     except (requests.RequestException, ValueError):
         pass
-    for path in (ROOT/"data/domain_billing_snapshot.json", Path("/opt/korea365/data/domain_billing_snapshot.json")):
+    for path in (ROOT / "data" / "domain_billing_snapshot.json",):
         try:
             return json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
@@ -157,7 +152,6 @@ def _opening_recent_snapshot(bucket: int) -> dict:
         pass
     paths = [
         ROOT / "data" / "opening_recent_snapshot.json",
-        Path("/opt/korea365/data/opening_recent_snapshot.json"),
     ]
     for path in paths:
         try:
@@ -188,17 +182,17 @@ def opening_recent_info(url: str, platform: str, channel_id: str = "") -> dict[s
 def infrastructure_info(platform: str, kind: str = "") -> dict[str, object]:
     if platform == "wordpress":
         return {
-            "label": "VPS+n8n · GitHub Actions",
-            "uses_vps": True,
+            "label": "GitHub Actions · WordPress REST API",
+            "uses_vps": False,
             "uses_github": True,
-            "vps_expiry": HOSTINGER_VPS.get("renewal_date", ""),
+            "vps_expiry": "",
         }
     if platform == "blogspot":
         return {
-            "label": "Blogger · VPS+n8n · GitHub",
-            "uses_vps": True,
+            "label": "GitHub Actions · Blogger API",
+            "uses_vps": False,
             "uses_github": True,
-            "vps_expiry": HOSTINGER_VPS.get("renewal_date", ""),
+            "vps_expiry": "",
         }
     if platform == "tistory":
         return {
@@ -216,10 +210,10 @@ def infrastructure_info(platform: str, kind: str = "") -> dict[str, object]:
         }
     if platform == "youtube":
         return {
-            "label": "Hostinger VPS worker · GitHub",
-            "uses_vps": True,
+            "label": "GitHub Actions · YouTube API",
+            "uses_vps": False,
             "uses_github": True,
-            "vps_expiry": HOSTINGER_VPS.get("renewal_date", ""),
+            "vps_expiry": "",
         }
     return {
         "label": "플랫폼 API · GitHub",
