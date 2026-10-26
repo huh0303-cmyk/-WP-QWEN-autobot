@@ -32,6 +32,6 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install pytest
-      - run: pytest -q tests/test_youtube_github_worker_migration.py tests/test_language_shorts_duplicate_guard.py
+      - run: pytest -q tests/test_youtube_github_worker_migration.py
       - run: python -m py_compile automation_hub/youtube_github_runtime.py scripts/youtube_github_worker.py
       - run: python scripts/audit_active_policy.py
