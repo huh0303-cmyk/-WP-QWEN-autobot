@@ -1,38 +1,39 @@
 # VPS cancellation and GitHub-only transition — 2026-10-09
 
 ## Owner decision
-- Hostinger VPS cancellation was confirmed by the owner on 2026-10-09.
-- The n8n-on-VPS migration plan is retired.
-- All production scheduling and execution must move to GitHub Actions. VPS must not remain a production dependency.
-- This is a migration directive, not evidence that every repository component has already been migrated.
+The owner retired VPS hosting and requires London Project to use GitHub Actions as its only hosted execution plane. This decision is binding. The former VPS/n8n architecture is not an approved production path.
 
-## Audit update — 2026-10-26
+## Migration work completed on branch `migration/github-only-no-vps-2026-10-26`
+- Removed all 21 previously inventoried SSH-based VPS workflows from this branch.
+- Removed the VPS deployment engine and its systemd unit/timer files from `deploy/vps`.
+- Removed n8n Docker deployment assets, the n8n gateway service, and VPS runtime installer/sealer scripts.
+- Retired server-only YouTube/Blogger/WordPress worker entry points.
+- Added `automation_hub/youtube_github_runtime.py` and `scripts/youtube_github_worker.py`.
+- Added `.github/workflows/youtube-github-worker.yml` for one-channel GitHub-hosted execution, with explicit manual confirmation and a fail-closed cost hold.
+- Routed control-center YouTube actions to GitHub Actions dispatch instead of creating a local/server queue.
+- Updated architecture, topology, status, and migration documents to stop treating VPS/n8n as active infrastructure.
 
-A repository search found that the directive has not yet been fully implemented in code:
-- 21 workflow files still matched `appleboy/ssh-action`.
-- `.github/workflows/youtube-vps-enqueue-today.yml` still reads `VPS_HOST`, `VPS_USER`, and `VPS_SSH_PRIVATE_KEY`, then runs a queue command on the remote host.
-- `scripts/run_youtube_vps.py` reads `/etc/korea365/youtube-runtime.json`.
-- `scripts/youtube_vps_worker.py` and `automation_hub/youtube_vps_queue.py` depend on a server-local queue and other persistent runtime state.
-- `projects/런던프로젝트GPT/ARCHITECTURE.md` previously described VPS/systemd/n8n as the production runtime; it has now been updated to the GitHub-only target architecture.
-
-## Migration safety rules
+## Safety rules
 1. Do not delete existing posts or videos.
-2. Do not change privacy/publication state as part of infrastructure migration.
-3. Do not remove a production worker before a GitHub-native replacement is tested.
-4. Preserve cost-hold, duplicate prevention, exact account/channel identity checks, and publication receipts.
-5. A workflow run is not proof of publication; verify the destination ID and resulting content URL/privacy state.
-6. Do not claim the migration is complete until each platform's actual execution path is either migrated and verified or explicitly held because it requires unavailable authentication.
+2. Do not change privacy/publication state during infrastructure migration.
+3. Never report an upload as successful without a destination-verified receipt.
+4. Preserve channel identity checks, duplicate protection, cost hold, and bounded retries.
+5. GitHub Actions is not a durable filesystem: only use explicit persisted state (Google Sheet calendar, workflow artifacts, or approved GitHub-native storage).
+6. Do not enable public publishing until owner-approved cost review and read-only channel identity checks pass.
 
-## Historical checks from 2026-10-09 (not a current health guarantee)
-- Blogger 33 had a GitHub Actions schedule.
-- WordPress daily publication floor and Tistory error isolation were being repaired.
-- Control center, Naver/Tistory browser runners, YouTube worker, queue, and metrics still needed individual migration review.
+## Remaining verification — migration is not yet complete
+- The legacy file `automation_hub/youtube_vps_queue.py` still exists as a historical/compatibility remnant and must be retired after all consumers are confirmed migrated.
+- Several older scripts and runbooks still contain server-specific paths or historical VPS instructions; these must be classified and either ported to repository-relative paths/environment secrets or clearly marked as historical.
+- The GitHub-hosted worker has not yet completed an authorized end-to-end canary. Its cost hold is intentionally active by default.
+- The 10-channel scheduled cadence is not yet restored as a verified GitHub Actions schedule. The current new worker workflow is manual-only.
+- Naver/Tistory browser-based tasks cannot be called GitHub-migrated unless a supported non-interactive auth path exists; otherwise they remain explicitly HOLD.
 
-## Required next steps
-1. Inventory every SSH-based workflow and classify it as replace, retire, or read-only historical evidence.
-2. Replace the YouTube server queue/worker with GitHub-hosted execution and durable GitHub-native state before retiring it.
-3. Verify channel OAuth identity and use private canaries before enabling any new recurring public upload.
-4. Migrate WordPress, Blogger, news, social, Naver, and Tistory separately with exact publication receipts.
-5. After replacements pass, retire VPS workflows, server-only scripts, deployment paths, and obsolete secret references.
+## Acceptance criteria
+- No active production workflow uses SSH, VPS secrets, systemd, n8n-on-server, `/opt/korea365`, or `/etc/korea365`.
+- The old queue/runtime files have no active consumers.
+- GitHub-only worker tests pass.
+- Read-only OAuth identity checks confirm the exact channel IDs.
+- A manually authorized canary produces a verified video ID, destination URL, expected channel ID, privacy state, and durable receipt.
+- Other platforms have equivalent destination-verified receipts or are explicitly marked HOLD.
 
-**Status: migration in progress; repository is not yet fully VPS-free.**
+**Status: VPS workflows and deployment assets are retired in the migration branch; final runtime verification and residual-code cleanup remain in progress.**
