@@ -106,7 +106,7 @@ def existing_channel_fingerprints(access_token):
 def upload_one(access_token, path, title, desc):
     size = os.path.getsize(path)
     fingerprint = content_fingerprint(path)
-    marker = f"\\n\\n<!-- quiz-content-sha256:{fingerprint} -->"
+    marker = f"\n\n<!-- quiz-content-sha256:{fingerprint} -->"
     desc = desc + marker
     metadata = {
         "snippet": {"title": title, "description": desc, "categoryId": "27",
