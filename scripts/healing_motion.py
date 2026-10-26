@@ -61,7 +61,7 @@ def download(url, path):
             for chunk in response.iter_content(1024*1024): output.write(chunk)
 
 def configure():
-    token=os.environ.get('HEALING_SAMPLE_ID') or os.environ.get('SCHEDULE_ID') or os.environ.get('VPS_JOB_ID') or os.environ.get('GITHUB_RUN_ID','local-preview')
+    token=os.environ.get('HEALING_SAMPLE_ID') or os.environ.get('SCHEDULE_ID') or os.environ.get('GITHUB_RUN_ID','local-preview')
     seed=int(hashlib.sha256(token.encode()).hexdigest()[:16],16)
     rng=random.Random(seed)
     mode=os.environ.get('HEALING_VARIANT','random')
