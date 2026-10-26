@@ -71,7 +71,7 @@ def _state_file(run_id: str) -> Path:
 def _read_run(run_id: str) -> dict:
     path = _state_file(run_id)
     if not path.exists():
-        return {"run_id": run_id, "stage_status": {}, "message": "n8n 시작 대기"}
+        return {"run_id": run_id, "stage_status": {}, "message": "GitHub Actions 실행 대기"}
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:
