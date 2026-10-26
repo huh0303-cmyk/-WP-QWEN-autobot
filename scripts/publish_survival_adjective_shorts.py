@@ -128,7 +128,8 @@ def normalized_title(value: str) -> str:
 def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[dict]:
     """Read recent uploads from this exact channel; read-only duplicate audit."""
     channels = service.channels().list(part="contentDetails", id=channel_id).execute().get("items", [])
-    if len(channels) != 1:        raise RuntimeError(f"Cannot resolve uploads playlist for channel {channel_id}")
+    if len(channels) != 1:
+        raise RuntimeError(f"Cannot resolve uploads playlist for channel {channel_id}")
     playlist_id = channels[0]["contentDetails"]["relatedPlaylists"]["uploads"]
     ids = []
     page_token = None
@@ -278,14 +279,3 @@ def main() -> int:
         replace_map[codes[0]] = args.replace_video_id
     receipts = []
     for code in codes:
-        print(f"PUBLISH {code}", flush=True)
-        receipts.append(publish_one(root / code / "manifest.json", args.privacy, args.publish_at))
-    for code, old_video_id in replace_map.items():
-        service = youtube_service(code)
-        expected_channel = json.loads((root / code / "manifest.json").read_text(encoding="utf-8"))["channel_id"]
-        receipt = next(row for row in receipts if row["language_code"] == code)
-        receipt["replaced_old_video"] = make_old_video_private(service, old_video_id, expected_channel)
-    summary = {"date": args.date, "privacy": args.privacy, "count": len(receipts), "receipts": receipts}
-    (root / "publication_batch_receipt.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps(summary, ensure_ascii=False))
-    return 0
