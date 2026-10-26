@@ -11,6 +11,8 @@ import asyncio
 import datetime as dt
 import json
 import math
+import random
+import hashlib
 import shutil
 import subprocess
 import sys
@@ -279,13 +281,23 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     raw_a, raw_b = workdir / "word_a.mp3", workdir / "word_b.mp3"
     await synthesize(words[0], profile, raw_a)
     await synthesize(words[1], profile, raw_b)
-    a_audio, b_audio = workdir / "word_a.m4a", workdir / "word_b.m4a"
-    # 2.5 seconds per word leaves a deliberate listen-and-repeat pause.
-    make_fixed_audio(raw_a, a_audio, 2.5)
-    make_fixed_audio(raw_b, b_audio, 2.5)
+    # Stable per date/language/pair randomization varies pacing while keeping reruns reproducible.
+    seed_text = f"{target_date.isoformat()}|{code}|{pair['id']}"
+    seed = int(hashlib.sha256(seed_text.encode("utf-8")).hexdigest()[:16], 16)
+    rng = random.Random(seed)
+    intro_duration = round(rng.uniform(1.4, 2.3), 2)
+    outro_duration = round(rng.uniform(1.5, 2.6), 2)
+    word_durations = [round(rng.uniform(2.4, 3.5), 2) for _ in range(10)]
+    audio_tracks = []
+    for index, duration in enumerate(word_durations):
+        letter = "a" if index % 2 == 0 else "b"
+        source = raw_a if letter == "a" else raw_b
+        track = workdir / f"word_{letter}_{index + 1}.m4a"
+        make_fixed_audio(source, track, duration)
+        audio_tracks.append(track)
     intro_audio, outro_audio = workdir / "intro.m4a", workdir / "outro.m4a"
-    make_silence(intro_audio, 1.8)
-    make_silence(outro_audio, 1.6)
+    make_silence(intro_audio, intro_duration)
+    make_silence(outro_audio, outro_duration)
 
     intro = workdir / "intro.png"
     outro = workdir / "outro.png"
@@ -296,22 +308,25 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         counterpart=words[1], counterpart_reading=readings[1],
         counterpart_meaning=meanings[1], mode="outro", category=category,
     )
-    timeline: list[tuple[Path, Path, float]] = [(intro, intro_audio, 1.8)]
+    timeline: list[tuple[Path, Path, float]] = [(intro, intro_audio, intro_duration)]
+    duration_index = 0
     for index in range(1, 6):
-        for letter, word, reading, meaning, track in (
-            ("a", words[0], readings[0], meanings[0], a_audio),
-            ("b", words[1], readings[1], meanings[1], b_audio),
+        for letter, word, reading, meaning in (
+            ("a", words[0], readings[0], meanings[0]),
+            ("b", words[1], readings[1], meanings[1]),
         ):
             card = workdir / f"{letter}_{index}.png"
             make_card(card, profile, word, reading, meaning, index, category=category)
-            timeline.append((card, track, 2.5))
-    timeline.append((outro, outro_audio, 1.6))
+            duration = word_durations[duration_index]
+            timeline.append((card, audio_tracks[duration_index], duration))
+            duration_index += 1
+    timeline.append((outro, outro_audio, outro_duration))
 
     output = destination / f"{target_date.isoformat()}_{code}_{pair['id']}.mp4"
     build_video(workdir, timeline, output)
     duration = ffprobe_duration(output)
-    if not 28 <= duration <= 40:
-        raise RuntimeError(f"Unexpected Short duration for {code}: {duration}")
+    if not 27 <= duration <= 42:
+        raise RuntimeError(f"Unexpected randomized Short duration for {code}: {duration}")
     if category == "noun":
         glosses = meanings if code == "en" else pair["en"]
         title = f"{words[0]} ({readings[0]}) • {words[1]} ({readings[1]}) | {glosses[0]} • {glosses[1]} #Shorts"
@@ -337,6 +352,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "series_name": channel["series_name"],
         "video_path": str(output.resolve()),
         "duration_seconds": round(duration, 3),
+        "duration_policy": "date-language-pair-seeded randomized slide timing; 2.4-3.5s per word repetition",
         "title": title,
         "description": (
             f"{words[0]} ({readings[0]}) means {meanings[0]}; {words[1]} ({readings[1]}) means {meanings[1]}. "
