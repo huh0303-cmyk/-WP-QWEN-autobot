@@ -159,7 +159,7 @@ def main():
         per_site[k[0]].append(k)
     token = None
     log, ok_n, fail_n = [], 0, 0
-    deadline = time.time() + float(os.environ.get("RETITLE_BUDGET_MIN", "35")) * 60
+    deadline = time.time() + float(os.environ.get("RETITLE_BUDGET_MIN", "110")) * 60
     for site, keys in per_site.items():
         avoid = [r["title"] for r in data[site][:30]]
         for i in range(0, len(keys), 8):
