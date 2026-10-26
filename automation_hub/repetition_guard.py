@@ -50,6 +50,8 @@ def opening(body):
 
 _STOP = set("a an the and or but of to in on for with from by at as is are was were be it its this that you your how what when where why which vs about more new best top guide step korea korean south".split())
 STOCK_TITLE_TAIL = re.compile(r"(?i)a closer look at what really matters|frequently overlooked facts|questions people ask about|the costly .{0,40}mistake|\bmistakes? every \w+ makes\b")
+GENERIC_GERUND_OPENING = re.compile(r"(?i)^\s*(?:understanding|navigating|managing|preparing|exploring|discovering|learning|knowing|finding|choosing|building|improving|protecting|avoiding|comparing|using|making|getting|dealing|handling|planning|creating|developing|identifying|recognizing|evaluating|addressing|considering|explaining|examining|maintaining|reducing|increasing|preventing|balancing|traveling|travelling|living|working|investing|saving|applying|starting|staying)\b")
+
 
 def _title_words(title):
     t = re.sub(r"\b(\w+)-by-\1\b", r"\1", plain(title).casefold())  # "step-by-step" is one idiom, not a repeated word
@@ -59,6 +61,8 @@ def title_self_issues(title):
     """Within-title repetition: keyword-template parenthetical, repeated word/phrase, stock tails."""
     t = plain(title)
     issues = []
+    if GENERIC_GERUND_OPENING.search(t):
+        issues.append("TITLE_TEMPLATE: generic gerund opening; lead with the concrete subject or outcome")
     m = re.search(r"\(([^()]{6,})\)\s*[:\-]?[^()]*$", t)
     if m:
         inner = set(_title_words(m.group(1))) - _STOP
