@@ -45,11 +45,8 @@ BANNED_DEPRECATED_CHANNEL_REFS = (
     "AMERICAN_ARCHIVE_TIMES",
 )
 YOUTUBE_IMAGE_WORKFLOWS = (
-    "generate-youtube-playlist.yml",
-    "generate-youtube-video.yml",
-    "refresh-playlist-thumbnails.yml",
-    "health-clinic-daily.yml",
-    "curio-longform-daily.yml",
+    "cafe-healing-publish.yml",
+    "youtube-github-worker.yml",
 )
 
 
@@ -106,12 +103,9 @@ def main() -> None:
     for name in YOUTUBE_IMAGE_WORKFLOWS:
         text = workflow_text.get(name, "")
         if not text:
-            fail(f"missing expected workflow {name}")
-        if name == "generate-youtube-playlist.yml":
-            if any(token in text for token in ("secrets.REPLICATE_API_TOKEN", "secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
-                fail("playlist must not receive paid generation credentials")
-        elif "REPLICATE_API_TOKEN" not in text:
-            fail(f"{name} does not receive REPLICATE_API_TOKEN")
+            fail(f"missing expected GitHub-native YouTube workflow {name}")
+        if any(token in text for token in ("secrets.REPLICATE_API_TOKEN", "secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
+            fail(f"{name} must not receive paid generation credentials")
 
     # YouTube production is GitHub Actions-only and fail-closed until the owner releases cost hold.
     github_workflow_path = WF / "youtube-github-worker.yml"
