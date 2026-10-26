@@ -1,6 +1,6 @@
 // 통합 사이트 설정 탭 (WP+블로그스팟+뉴스+네이버+티스토리) — 신규 독립 스크립트.
 // app.js/bridge.js(원본 Electron 렌더러 로직)는 전혀 건드리지 않음. fetch()로 직접
-// /api/registry/*, /api/n8n/* 호출. .workspace 그리드 밖에 별도 <section>으로 배치되어
+// /api/registry/*, /api/github/actions/* 호출. .workspace 그리드 밖에 별도 <section>으로 배치되어
 // 기존 패널들과 레이아웃 충돌(겹침) 없음.
 //
 // Chairman 요청(2026-09-27): "WP 순위별(전날방문자수 내림차순) 따로.. 블팟따로,
@@ -12,8 +12,8 @@
   const summaryText = document.getElementById("registrySummaryText");
   const groupsRoot = document.getElementById("registryGroups");
   const reloadBtn = document.getElementById("registryReloadButton");
-  const n8nBtn = document.getElementById("n8nHealthButton");
-  const n8nText = document.getElementById("n8nHealthText");
+  const actionsBtn = document.getElementById("actionsHealthButton");
+  const actionsText = document.getElementById("actionsHealthText");
   if (!groupsRoot) return;
 
   const GROUPS = [
@@ -25,7 +25,7 @@
   ];
 
   const OWNER_LABEL = {
-    gpt_n8n: "GPT트랙(n8n) — 대시보드+트리거만",
+    gpt_n8n: "GPT트랙(GitHub Actions) — 대시보드+트리거",
     claude_console: "이 콘솔이 직접 발행",
   };
 
@@ -225,7 +225,7 @@
       const warn = summary.needsConfirmation.length
         ? ` — ⚠ 확인 필요: ${summary.needsConfirmation.join(", ")}`
         : "";
-      summaryText.textContent = `총 ${summary.total}개 (${byPlat}) · 이 콘솔 직접 발행 ${summary.claudeConsoleOwned} / GPT트랙(n8n) 대시보드+트리거만 ${summary.gptN8nDashboardOnly}${warn}`;
+      summaryText.textContent = `총 ${summary.total}개 (${byPlat}) · 이 콘솔 직접 발행 ${summary.claudeConsoleOwned} / GPT트랙(GitHub Actions) 대시보드+트리거 ${summary.gptN8nDashboardOnly}${warn}`;
       render();
     } catch (err) {
       summaryText.textContent = "불러오기 실패: " + err.message;
@@ -237,7 +237,7 @@
     btn.disabled = true;
     btn.textContent = "실행 요청 중...";
     try {
-      const result = await api(`/api/n8n/run/${encodeURIComponent(action)}`, { method: "POST", body: {} });
+      const result = await api(`/api/github/actions/run/${encodeURIComponent(action)}`, { method: "POST", body: {} });
       btn.textContent = result.ok ? "실행됨 ✓" : "실행 실패";
     } catch (err) {
       btn.textContent = "실패";
@@ -249,13 +249,13 @@
   }
 
   reloadBtn.addEventListener("click", loadSummaryAndSites);
-  n8nBtn.addEventListener("click", async () => {
-    n8nText.textContent = "확인 중...";
+  actionsBtn.addEventListener("click", async () => {
+    actionsText.textContent = "확인 중...";
     try {
-      const health = await api("/api/n8n/health");
-      n8nText.textContent = `n8n 게이트웨이: ${JSON.stringify(health)}`;
+      const health = await api("/api/github/actions/health");
+      actionsText.textContent = `GitHub Actions 최근 실행: ${JSON.stringify(health.latestRuns || [])}`;
     } catch (err) {
-      n8nText.textContent = "n8n 게이트웨이 확인 실패 (VPS 로컬 8766 포트, 토큰 필요): " + err.message;
+      actionsText.textContent = "GitHub Actions 상태 확인 실패 (Actions 권한 토큰 필요): " + err.message;
     }
   });
 
