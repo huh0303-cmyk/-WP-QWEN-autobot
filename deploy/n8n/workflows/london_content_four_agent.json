@@ -1,7 +1,0 @@
-{
-  "name": "RETIRED — London Four-Agent n8n Workflow",
-  "active": false,
-  "retired": true,
-  "retired_on": "2026-10-26",
-  "reason": "VPS and server-hosted n8n are retired. Do not import or execute this historical workflow. Use reviewed GitHub Actions workflows instead."
-}
