@@ -24,7 +24,8 @@ def parse_visible_total(text):
     numbers = re.findall(r"(?<![\w.])\d[\d,]*(?![\w.])", block)
     if not numbers:
         raise ValueError("TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND")
-    return int(numbers[-1].replace(",", ""))
+    # Do not choose the last number: chart labels can be larger than the counter.
+    return int(numbers[0].replace(",", ""))
 
 
 async def extract_widget_total(page):
