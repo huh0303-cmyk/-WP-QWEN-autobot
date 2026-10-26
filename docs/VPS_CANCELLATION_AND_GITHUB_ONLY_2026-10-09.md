@@ -22,7 +22,7 @@ The owner retired VPS hosting and requires London Project to use GitHub Actions 
 6. Do not enable public publishing until owner-approved cost review and read-only channel identity checks pass.
 
 ## Remaining verification — migration is not yet complete
-- The legacy file `automation_hub/youtube_vps_queue.py` still exists as a historical/compatibility remnant and must be retired after all consumers are confirmed migrated.
+- The legacy module `automation_hub/youtube_vps_queue.py` was removed after active consumers were moved to GitHub Actions dispatch/runtime.
 - Several older scripts and runbooks still contain server-specific paths or historical VPS instructions; these must be classified and either ported to repository-relative paths/environment secrets or clearly marked as historical.
 - The GitHub-hosted worker has not yet completed an authorized end-to-end canary. Its cost hold is intentionally active by default.
 - The 10-channel scheduled cadence is not yet restored as a verified GitHub Actions schedule. The current new worker workflow is manual-only.
