@@ -44,7 +44,11 @@ def blogger_titles():
     h = {"Authorization": f"Bearer {tok}"}
     prof = json.loads((ROOT / "config/content_engine_profiles.json").read_text(encoding="utf-8"))
     res = {}
+    site_filter = os.environ.get("RETITLE_SITE_KEY", "").strip().lower()
     for row in prof["profiles"]:
+        site_key = str(row.get("site_key", "")).strip().lower()
+        if site_filter and site_key != site_filter:
+            continue
         bid = row.get("blogspot", {}).get("destination_id")
         if not bid:
             continue
