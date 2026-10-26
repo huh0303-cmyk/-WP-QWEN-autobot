@@ -5,7 +5,7 @@ from flask import Response, flash, jsonify, redirect, render_template_string, re
 from .keywords import tistory_seed_topics, top_keywords_by_category, weekly_suggestions
 from .registry import load_wordpress_sites
 from .models import IMAGE_MODELS, TEXT_MODELS
-from automation_hub.youtube_vps_queue import enqueue as enqueue_youtube_vps
+from automation_hub.github_youtube_dispatch import dispatch_youtube_job
 
 import json
 import csv
@@ -1480,10 +1480,10 @@ def _run_youtube_publish(channel_key: str, label: str) -> None:
     state: dict[str, object] = {"status": "dispatching", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": []}
     _bulk_write(group, state)
     try:
-        job = enqueue_youtube_vps(channel_key, label, group, run_now=True)
+        job = dispatch_youtube_job(channel_key, label, group, run_now=True)
         item = {"job_id": job["job_id"], "label": label, "platform": "youtube", "site_id": channel_key,
-                "workflow": "youtube-vps-worker", "run_id": None, "run_url": "", "status": "queued",
-                "conclusion": None, "reason": "VPS 제작 대기"}
+                "workflow": "youtube-github-worker", "run_id": None, "run_url": "", "status": "queued",
+                "conclusion": None, "reason": "GitHub Actions 실행 대기"}
         state.update(status="polling", items=[item])
     except RuntimeError as exc:
         state.update(status="done", finished_at=datetime.now(timezone.utc).isoformat(), items=[{
