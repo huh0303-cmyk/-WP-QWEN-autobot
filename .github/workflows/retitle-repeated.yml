@@ -6,6 +6,14 @@ on:
         description: Apply (false = dry run list only)
         type: boolean
         default: false
+      scope:
+        description: Limit changes to Blogger or WordPress; all is broader
+        type: choice
+        options:
+          - blogger
+          - wordpress
+          - all
+        default: blogger
 permissions:
   contents: read
 jobs:
@@ -21,6 +29,7 @@ jobs:
       - run: pip install requests beautifulsoup4
       - env:
           APPLY_CHANGES: ${{ inputs.apply_changes }}
+          RETITLE_SCOPE: ${{ inputs.scope || 'blogger' }}
           LOCAL_TEXT_FALLBACK_ENABLED: "false"
           RUNNER_OLLAMA_BOOTSTRAP: "false"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

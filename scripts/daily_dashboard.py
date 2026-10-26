@@ -146,19 +146,19 @@ def scrape_widget_pageviews(url):
                             headers={"User-Agent": "Mozilla/5.0 (compatible; LondonProjectDashboard/1.0)"})
     response.raise_for_status()
     source = response.text
-    match = re.search(r"Total\\s+Pageviews(.*?)Archive", source, flags=re.I | re.S)
+    match = re.search(r"Total\s+Pageviews(.*?)Archive", source, flags=re.I | re.S)
     if not match:
         # Blogger themes may wrap the title in markup or use non-breaking spaces.
         plain = html.unescape(re.sub(r"<[^>]+>", " ", source))
-        match = re.search(r"Total\\s+Pageviews(.*?)Archive", plain, flags=re.I | re.S)
+        match = re.search(r"Total\s+Pageviews(.*?)Archive", plain, flags=re.I | re.S)
         if not match:
             raise ValueError("TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND")
         block = match.group(1)
     else:
         block = match.group(1)
-    block = html.unescape(re.sub(r"<script\\b.*?</script>|<style\\b.*?</style>", " ", block, flags=re.I | re.S))
+    block = html.unescape(re.sub(r"<script\b.*?</script>|<style\b.*?</style>", " ", block, flags=re.I | re.S))
     block = re.sub(r"<[^>]+>", " ", block)
-    numbers = re.findall(r"(?<![\\w.])\\d[\\d,]*(?![\\w.])", block)
+    numbers = re.findall(r"(?<![\w.])\d[\d,]*(?![\w.])", block)
     if not numbers:
         raise ValueError("TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND")
     return int(numbers[-1].replace(",", ""))

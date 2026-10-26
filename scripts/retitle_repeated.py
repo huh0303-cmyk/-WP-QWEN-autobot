@@ -145,6 +145,13 @@ def main():
             print("WP FAIL", sid, e)
     data.update(A.blogger_titles())
     flagged = flag(data)
+    scope = os.environ.get("RETITLE_SCOPE", "all").strip().lower()
+    if scope == "blogger":
+        flagged = {k: v for k, v in flagged.items() if k[0].startswith("blogger_")}
+    elif scope == "wordpress":
+        flagged = {k: v for k, v in flagged.items() if k[0].startswith("wp_")}
+    elif scope != "all":
+        raise ValueError("RETITLE_SCOPE must be all, blogger, or wordpress")
     banned = banned_list(data)
     print(f"posts={sum(len(v) for v in data.values())} flagged={len(flagged)} apply={APPLY}")
     by_id = {(s, str(r["id"])): r for s, rs in data.items() for r in rs}
