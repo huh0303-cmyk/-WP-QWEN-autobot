@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from flask import render_template_string
-ROOT=Path('/opt/korea365')
+ROOT=Path(__file__).resolve().parents[1]
 def install(app):
  @app.get('/pipeline-status')
  def pipeline_status():
