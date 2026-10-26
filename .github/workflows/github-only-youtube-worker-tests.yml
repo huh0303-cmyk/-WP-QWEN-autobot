@@ -59,4 +59,5 @@ jobs:
         with:
           node-version: "20"
       - run: node --check london_project_claude_console/server/server.js && node --check london_project_claude_console/lib/githubActions.js && node --check london_project_claude_console/public/registry.js
+      - run: python -c "import yaml; [yaml.safe_load(open(p, encoding='utf-8')) for p in ['.github/workflows/youtube-github-worker.yml', '.github/workflows/youtube-github-scheduler.yml', '.github/workflows/london-content-pipeline.yml']]"
       - run: python scripts/audit_no_vps_runtime.py
