@@ -309,39 +309,13 @@ def healthz():
 
 
 @app.post("/api/vps/publish")
-def enqueue_vps_publication():
-    """Receive one reviewed article for the VPS WordPress publisher.
-
-    GitHub supplies content; the VPS performs the authenticated REST write.
-    The bearer token is kept in the VPS environment and no credentials are
-    accepted in the request body.
-    """
-    expected = os.environ.get("VPS_PUBLISH_INGEST_TOKEN", "").strip()
-    supplied = request.headers.get("Authorization", "")
-    if not expected or not hmac.compare_digest(supplied, "Bearer " + expected):
-        return jsonify({"ok": False, "error": "unauthorized"}), 401
-    payload = request.get_json(silent=True) or {}
-    required = ("job_id", "site_url", "secret_name", "title", "content_html")
-    if any(not str(payload.get(key, "")).strip() for key in required):
-        return jsonify({"ok": False, "error": "missing publication fields"}), 400
-    site = str(payload["site_url"]).rstrip("/")
-    if not site.startswith("https://") or not re.match(r"^https://[A-Za-z0-9.-]+$", site):
-        return jsonify({"ok": False, "error": "invalid site_url"}), 400
-    registered = {site_row.url.rstrip("/"): site_row for site_row in load_wordpress_sites()}
-    if site not in registered or str(payload["secret_name"]) != str(registered[site].secret_name):
-        return jsonify({"ok": False, "error": "site is not registered"}), 403
-    queue = Path(os.environ.get("VPS_WP_QUEUE", "/opt/korea365/data/vps-wp-queue"))
-    queue.mkdir(parents=True, exist_ok=True)
-    job_id = re.sub(r"[^A-Za-z0-9_.:-]", "-", str(payload["job_id"]))[:120]
-    target = queue / f"{job_id}.queued.json"
-    if target.exists() or (queue / f"{job_id}.processing.json").exists() or (queue / f"{job_id}.published.json").exists():
-        return jsonify({"ok": True, "status": "already_queued", "job_id": job_id}), 200
-    tmp = queue / f".{job_id}.tmp"
-    tmp.write_text(json.dumps({**payload, "job_id": job_id, "site_url": site, "received_at": datetime.now(timezone.utc).isoformat()}, ensure_ascii=False), encoding="utf-8")
-    os.chmod(tmp, 0o600)
-    os.replace(tmp, target)
-    return jsonify({"ok": True, "status": "queued", "job_id": job_id}), 202
-
+def retired_vps_publication():
+    """Return a clear tombstone for clients still trying to use the retired server queue."""
+    return jsonify({
+        "ok": False,
+        "error": "server_queue_retired",
+        "message": "The server-local publication queue has been retired. Use the reviewed GitHub Actions workflow; no content was queued or published.",
+    }), 410
 
 @app.get("/manifest.webmanifest")
 def pwa_manifest():
@@ -1198,9 +1172,7 @@ def get_sns_data() -> list[dict[str, object]]:
     }
     labels = {"tiktok": "TikTok", "instagram": "Instagram", "threads": "Threads", "facebook": "Facebook 페이지"}
     metric_keys = (("followers", "count"), ("likes", "likes"), ("content", "content_count"), ("watch_time", "watch_time"))
-    audience_path = Path("/opt/korea365/data/account-audience-metrics.json")
-    if not audience_path.exists():
-        audience_path = Path(__file__).resolve().parents[1] / "data" / "account-audience-metrics.json"
+    audience_path = Path(__file__).resolve().parents[1] / "data" / "account-audience-metrics.json"
     try:
         audience_accounts = json.loads(audience_path.read_text(encoding="utf-8")).get("accounts", {})
     except (OSError, ValueError, TypeError):
