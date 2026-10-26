@@ -167,13 +167,20 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
         old_key = normalized_title(old_title)
         old_text = unicodedata.normalize("NFKC", old_title + " " + old_description).casefold()
         old_tags = " ".join(str(tag) for tag in snippet.get("tags", [])).casefold()
+        combined_key = normalized_title(old_title + " " + old_description + " " + old_tags)
         exact_title = bool(title_key and old_key == title_key)
+        # New uploads carry a stable semantic content key in both description
+        # and tags. Pair IDs also catch older uploads that predate that marker.
+        content_key = str(manifest.get("content_key", "")).strip().casefold()
+        content_key_match = bool(content_key and content_key in old_text + " " + old_tags)
         pair_in_text = bool(pair_id and (pair_id in old_text or pair_id in old_tags))
-        # Compare normalized tokens so punctuation/spacing variations cannot bypass the guard.
-        old_title_key = normalized_title(old_title)
+        # Compare both words against the full metadata, not title only: title
+        # templates differ by language/category and cannot be the sole guard.
         normalized_words = [normalized_title(word) for word in words]
-        both_words_in_title = len(normalized_words) >= 2 and all(word and word in old_title_key for word in normalized_words)
-        if exact_title or pair_in_text or both_words_in_title:
+        both_words_in_metadata = len(normalized_words) >= 2 and all(
+            word and word in combined_key for word in normalized_words
+        )
+        if exact_title or content_key_match or pair_in_text or both_words_in_metadata:
             stats = video.get("statistics", {})
             duplicates.append({
                 "video_id": video.get("id"),
@@ -181,7 +188,7 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
                 "views": int(stats.get("viewCount", 0)),
                 "published_at": snippet.get("publishedAt", ""),
                 "privacy_status": video.get("status", {}).get("privacyStatus", "unknown"),
-                "match_reason": "title" if exact_title else ("pair_id" if pair_in_text else "word_pair"),
+                "match_reason": "title" if exact_title else ("content_key" if content_key_match else ("pair_id" if pair_in_text else "word_pair")),
             })
     if duplicates:
         duplicates.sort(key=lambda row: (-row["views"], row["published_at"]))
