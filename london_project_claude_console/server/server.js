@@ -151,7 +151,7 @@ app.post("/api/job/start", wrap((req) => {
 // ---- 통합 사이트 레지스트리 (WP27+블로그스팟33+뉴스2+티스토리5+네이버3) ----
 // "대시보드+트리거만" 범위(2026-09-27 Chairman 확인): wordpress/blogspot/news 사이트는
 // 여기서 persona/tone/글자수/이미지수를 보고 편집할 수는 있지만, 실제 발행은 이 콘솔이 하지
-// 않는다 — n8n_gateway를 통해 GPT 트랙의 기존 파이프라인을 트리거만 한다.
+// 않는다 — GitHub Actions API를 통해 GPT 트랙의 검증된 워크플로우만 트리거한다.
 app.get("/api/registry/sites", wrap(() => ({ sites: siteRegistry.listSites(runtimeRoot) })));
 app.get("/api/registry/summary", wrap(() => siteRegistry.summary(runtimeRoot)));
 app.post("/api/registry/sites/:siteId", wrap((req) => {
