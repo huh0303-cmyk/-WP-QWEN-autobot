@@ -6,7 +6,7 @@ from pathlib import Path
 
 from flask import render_template_string
 
-PLAN_PATH = Path("/opt/korea365/playlist-v3/production-plan.json")
+PLAN_PATH = Path(__file__).resolve().parents[1] / "data" / "playlist-v3" / "production-plan.json"
 
 PAGE = r'''<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
