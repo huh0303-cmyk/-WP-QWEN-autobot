@@ -70,7 +70,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install requests -q
+      - run: pip install requests beautifulsoup4 -q
+      - name: Verify network-wide editorial title/body gates before publishing
+        run: python scripts/editorial_gate_preflight.py
       - name: Publish one article per blog (skips blogs already done for this slot)
         env:
           BLOGGER_REVIEW_DRAFT_MODE: "false"

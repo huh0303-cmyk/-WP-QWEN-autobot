@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from blogger_free_text import blogger_generate_with_fallback  # noqa: E402
 from automation_hub.blogger_search_description import build_search_description, validate_search_description
-from automation_hub.editorial_language_policy import language_mismatch_fields
+from automation_hub.editorial_language_policy import body_cliches, language_mismatch_fields, title_cliches
 from review_sheet import append_review_rows
 from repair_blogger_images import stabilize_html_images
 from blogger_free_image import pick_image, insert_image
@@ -62,7 +62,7 @@ def strip_hangul_parentheticals(text: str) -> str:
     return text
 
 
-def generate(site: dict, hint: str = "") -> tuple[str, str, list[str], str, str]:
+def generate(site: dict, hint: str = "", recent_titles: list[str] | None = None) -> tuple[str, str, list[str], str, str]:
     if str(site["language"]).lower().startswith("ko"):
         lang_rule = ("반드시 한국어로만 작성하세요. 제목·본문·소제목·라벨 전부 한글이어야 하며 영어 문장은 절대 쓰지 않습니다 "
                      "(고유명사·약어만 예외). 본문 분량은 한글 2400~3500자. 영어로 쓰면 폐기됩니다. "
@@ -77,6 +77,9 @@ Topic: {topic}. Site theme: {site['theme']}. Persona: {site['persona']}. Tone: {
 Language: {site['language']}. Return JSON only with title, content_html, labels, image_subject (2-5 plain English words describing one concrete photographable subject for the article, e.g. 'Seoul palace autumn').
 {rules_for(site['language'], site['theme'])}
 Cautious source-aware wording and no invented facts.
+Never start titles with generic gerunds such as Understanding, Navigating, Managing, Preparing, Exploring, Discovering, Learning, Choosing, Building, Improving, Protecting, Avoiding, Comparing, Using, Making, Handling, Planning, Creating, Developing, Evaluating, Addressing, Maintaining, Reducing, Preventing, Traveling, Living, Working, Investing, Saving, Applying, or Starting. Lead with the concrete subject, finding, decision, or reader outcome. Vary headline structures across articles.
+Recent titles from this blog that must not be reused or lightly reworded:
+{chr(10).join("- " + x for x in (recent_titles or [])[:40]) or "- none available"}
 Write in a natural editorial voice with varied sentence structure. Never mention AI, language models,
 automatic generation, prompts, or how the article was produced.
 {lang_rule}
@@ -106,6 +109,12 @@ Provide 1-3 short, highly relevant labels only.{hint}"""
         _t = _r2.sub(r"<[^>]+>", "", body)
         if len(_r2.findall(r"[가-힣]", _t)) < 0.5 * max(1, len(_r2.findall(r"[A-Za-z가-힣]", _t))) or not _r2.search(r"[가-힣]", title):
             raise RuntimeError("language mismatch: Korean site produced non-Korean output")
+    title_issues = title_cliches(title)
+    if title_issues:
+        raise RuntimeError("title quality gate: mass-produced/repetitive headline rejected: " + "; ".join(title_issues))
+    body_issues = body_cliches(body)
+    if body_issues:
+        raise RuntimeError("body quality gate: AI filler phrasing rejected: " + "; ".join(body_issues[:5]))
     if not title or len(body) < 1500 or not (1 <= len(labels) <= 3):
         raise RuntimeError("Gemini Flash output failed quality gate")
     issues = structure_issues(body, site["theme"], site["language"])
@@ -157,7 +166,9 @@ def main() -> int:
         try:
             existing = requests.get(endpoint, params={"status": ["draft", "live", "scheduled"], "view": "ADMIN", "fetchBodies": "true", "maxResults": 100}, headers=headers, timeout=30)
             existing.raise_for_status()
-            match = next((p for p in existing.json().get("items", []) if marker in str(p.get("content", ""))), None)
+            existing_items = existing.json().get("items", [])
+            recent_titles = [str(p.get("title", "")).strip() for p in existing_items if str(p.get("title", "")).strip()]
+            match = next((p for p in existing_items if marker in str(p.get("content", ""))), None)
             if match:
                 if draft_mode:
                     review_url = f"https://www.blogger.com/blog/post/edit/{site['id']}/{match.get('id', '')}"
@@ -178,7 +189,7 @@ def main() -> int:
             hint = ""
             for attempt in range(4):
                 try:
-                    title, body, labels, description, image_subject = generate(site, hint)
+                    title, body, labels, description, image_subject = generate(site, hint, recent_titles)
                     break
                 except (RuntimeError, ValueError) as gate_exc:  # ValueError covers JSONDecodeError (empty/non-JSON model output)
                     retriable = isinstance(gate_exc, ValueError) or any(
@@ -191,7 +202,7 @@ def main() -> int:
                                 "). Write a clearly LONGER article: at least 1500 words in English or 3000 characters in Korean, "
                                 "with fuller paragraphs of practical detail under every heading.")
                     else:
-                        hint = "\nIMPORTANT: return one valid JSON object only, no commentary, and follow every structure rule."
+                        hint = "\nIMPORTANT: your previous draft failed a deterministic editorial quality gate. Correct this exact issue before returning new JSON: " + str(gate_exc) + ". Use a concrete subject-led title; never use a generic gerund opener or stock AI phrasing. Return one valid JSON object only."
             try:  # free image chain; failure must never block publication
                 image_policy = os.environ.get("BLOGGER_IMAGE_POLICY", "auto_free").strip().lower()
                 found = None if image_policy == "none" else pick_image(image_subject or site['theme'], alternates=[site['theme']])
