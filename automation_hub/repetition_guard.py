@@ -5,7 +5,7 @@ from difflib import SequenceMatcher
 from bs4 import BeautifulSoup
 
 RULE = """Use an article-specific headline and opening grounded in the supplied facts.
-Do not start headlines with generic gerund templates such as Understanding, Navigating, Managing, Preparing, Exploring, Discovering, or Learning. Lead with the concrete subject, decision, change, comparison, or result instead. Never start a headline with How. Do not substitute another repeated question formula.
+Do not start headlines with generic gerund templates such as Understanding, Navigating, Managing, Preparing, Exploring, Discovering, or Learning. Lead with the concrete subject, decision, change, comparison, or result instead. Do not start headlines with How to, How do, How can, How does, or A guide to. Do not replace one repeated formula with another. Prefer specific declarative headlines; use a question only when genuinely useful.
 Do not invent a connection between a trending person and Korean visas or services.
 Do not reuse a recent headline's sentence frame with only a different keyword.
 Treat profile outlines as coverage requirements, not literal headings or a fixed order.
@@ -50,7 +50,7 @@ def opening(body):
 
 _STOP = set("a an the and or but of to in on for with from by at as is are was were be it its this that you your how what when where why which vs about more new best top guide step korea korean south".split())
 STOCK_TITLE_TAIL = re.compile(r"(?i)a closer look at what really matters|frequently overlooked facts|questions people ask about|the costly .{0,40}mistake|\bmistakes? every \w+ makes\b")
-GENERIC_GERUND_OPENING = re.compile(r"(?i)^\s*(?:understanding|navigating|managing|preparing|exploring|discovering|learning|knowing|finding|choosing|building|improving|protecting|avoiding|comparing|using|making|getting|dealing|handling|planning|creating|developing|identifying|recognizing|evaluating|addressing|considering|explaining|examining|maintaining|reducing|increasing|preventing|balancing|traveling|travelling|living|working|investing|saving|applying|starting|staying)\b")
+GENERIC_GERUND_OPENING = re.compile(r"(?i)^\s*(?:how\s+(?:to|do|does|can|could|should|is|are|much|many|long|often|old)|a\s+guide\s+to|understanding|navigating|managing|preparing|exploring|discovering|learning|knowing|finding|choosing|building|improving|protecting|avoiding|comparing|using|making|getting|dealing|handling|planning|creating|developing|identifying|recognizing|evaluating|addressing|considering|explaining|examining|maintaining|reducing|increasing|preventing|balancing|traveling|travelling|living|working|investing|saving|applying|starting|staying)\b")
 
 
 def _title_words(title):
@@ -62,7 +62,7 @@ def title_self_issues(title):
     t = plain(title)
     issues = []
     if GENERIC_GERUND_OPENING.search(t):
-        issues.append("TITLE_TEMPLATE: generic gerund opening; lead with the concrete subject or outcome")
+        issues.append("TITLE_TEMPLATE: repetitive/how-to headline template; lead with the concrete subject or outcome")
     m = re.search(r"\(([^()]{6,})\)\s*[:\-]?[^()]*$", t)
     if m:
         inner = set(_title_words(m.group(1))) - _STOP
@@ -91,7 +91,7 @@ def title_self_issues(title):
 def repetition_issues(title, body, history):
     lead = opening(clean_opening(title, body)).casefold()
     issues = list(title_self_issues(title))
-    if re.match(r'^how\b', plain(title), re.I):
+    if re.match(r'(?i)^\s*(?:how\s+(?:to|do|does|can|could|should|is|are|much|many|long|often|old)|a\s+guide\s+to)\b', plain(title)):
         issues.append('REPETITION: How-start headline is forbidden')
     for old in history:
         old_title = old.get('title', '')

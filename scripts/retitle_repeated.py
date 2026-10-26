@@ -87,7 +87,10 @@ def make_titles(batch, banned, avoid):
     prompt = f"""Rewrite each blog post title below so it reads like a human editor wrote it and is clearly different from the others.
 Rules:
 - Keep the same topic, main keyword and language ([KO]=Korean, [EN]=English).
-- Natural phrasing, no clickbait clichés, no templates. Vary the structure (question, statement, how-to, number, comparison).
+- Natural phrasing, no clickbait clichés, no templates. Do NOT use a single repeated headline formula across this batch.
+- STRICTLY FORBIDDEN: titles beginning with How to, How do, How can, How does, A guide to, Understanding, Navigating, Managing, or Preparing. Do not replace one banned template with another.
+- Prefer specific declarative headlines grounded in the article's actual subject, fact, decision, or result. Questions are allowed only when genuinely useful; instructional/how-to framing is not the default.
+- Across each batch, vary the first 3 meaningful words and sentence structure. Never repeat an opening formula by swapping only the keyword.
 - Do NOT start or end with these overused phrases: {', '.join(banned[:40])}
 - Never use years other than 2026; omit the year if unsure.
 - English: Title Case, max 62 characters. Korean: max 38 characters. No quotes, no trailing period.
@@ -117,6 +120,8 @@ def valid(new, old, banned, used):
     old_nums = set(re.findall(num, old.lower()))
     if {n for n in re.findall(num, new.lower()) if n != "2026"} - old_nums:
         return False  # no invented counts
+    if re.match(r"(?i)^\s*(?:how\s+(?:to|do|does|can|could|should|is|are|much|many|long|often|old)|a\s+guide\s+to|understanding|navigating|managing|preparing)\b", new):
+        return False
     return True
 
 
@@ -129,16 +134,21 @@ def apply_wp(site_cfg, pid, title):
 
 
 def main():
+    scope = os.environ.get("RETITLE_SCOPE", "all").strip().lower()
+    if scope not in {"all", "blogger", "wordpress"}:
+        raise ValueError("RETITLE_SCOPE must be all, blogger, or wordpress")
     cfg = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
     cfg = cfg if isinstance(cfg, list) else cfg["sites"]
     wp = {s["site_id"]: s for s in cfg if s["platform"] == "wordpress" and s.get("enabled", True)}
     data = {}
-    for sid, s in wp.items():
-        try:
-            data[sid] = A.wp_titles(s["url"])
-        except Exception as e:
-            print("WP FAIL", sid, e)
-    data.update(A.blogger_titles())
+    if scope in {"all", "wordpress"}:
+        for sid, s in wp.items():
+            try:
+                data[sid] = A.wp_titles(s["url"])
+            except Exception as e:
+                print("WP FAIL", sid, e)
+    if scope in {"all", "blogger"}:
+        data.update(A.blogger_titles())
     flagged = flag(data)
     banned = banned_list(data)
     print(f"posts={sum(len(v) for v in data.values())} flagged={len(flagged)} apply={APPLY}")
