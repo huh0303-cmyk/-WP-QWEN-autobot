@@ -230,11 +230,10 @@ def collect_blogger_pageviews(portfolio, now):
         elif not row.get("status", "").startswith("TOTAL_PAGEVIEWS_") and row.get("status") != "WIDGET_SCRAPE_FAILED":
             row["status"] = row.get("api_status", token_error or "WIDGET_SCRAPE_FAILED")
         rows.append(row)
-    # Preserve the last known value for sites that fail today; never replace it with zero.
-    today_values = dict(previous)
-    today_values.update(current)
-    if today_values:
-        history["days"][today] = today_values
+    # Store only values actually collected today. A failed scrape must not be
+    # carried forward as if it were a fresh observation, or it would fake a zero delta.
+    if current:
+        history["days"][today] = current
     for old_day in sorted(history["days"])[:-60]:
         del history["days"][old_day]
     PAGEVIEWS_HIST.parent.mkdir(parents=True, exist_ok=True)
