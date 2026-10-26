@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-10-26T11:48:39.630403+09:00",
+ "generated_at": "2026-10-26T12:32:34.007120+09:00",
  "reference_date": "2026-10-23",
  "blogger_pageviews": {
-  "generated_at": "2026-10-26T11:58:21.053917+09:00",
-  "source": "Rendered public Blogger Total Pageviews widget; approximate dashboard signal, not analytics-grade",
+  "generated_at": "2026-10-26T12:32:34.007120+09:00",
+  "source": "Blogger API v3 when available; otherwise public Total Pageviews widget (directional estimate)",
   "history_days": [
    "2026-10-26"
   ],
@@ -15,16 +15,16 @@
     "title": "K-Trip365",
     "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -34,8 +34,8 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -53,27 +53,8 @@
     "title": "JobKorea365",
     "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
-    "history": [
-     {
-      "date": "2026-10-26",
-      "daily_pageviews": null,
-      "total_pageviews": null
-     }
-    ],
-    "source": "rendered_public_blogger_widget",
-    "api_status": "BLOGGER_API_HTTP_403"
-   },
-   {
-    "key": "https://kstudy365.blogspot.com",
-    "site_key": "",
-    "url": "https://kstudy365.blogspot.com",
-    "title": "KStudy365",
-    "total_pageviews": 45,
-    "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -81,7 +62,26 @@
       "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
+    "api_status": "BLOGGER_API_HTTP_403"
+   },
+   {
+    "key": "https://kstudy365.blogspot.com",
+    "site_key": "",
+    "url": "https://kstudy365.blogspot.com",
+    "title": "KStudy365",
+    "total_pageviews": 365,
+    "daily_pageviews": null,
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
+    "history": [
+     {
+      "date": "2026-10-26",
+      "daily_pageviews": null,
+      "total_pageviews": 365
+     }
+    ],
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -89,18 +89,18 @@
     "site_key": "",
     "url": "https://koreainsurance365.blogspot.com",
     "title": "Korea Insurance 365",
-    "total_pageviews": 76,
+    "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -110,8 +110,8 @@
     "title": "KFinance365",
     "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -119,7 +119,7 @@
       "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -129,16 +129,16 @@
     "title": "Korea Medical Tour",
     "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -148,16 +148,16 @@
     "title": "K-Visa365",
     "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -167,8 +167,8 @@
     "title": "KoreaNews365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -186,8 +186,8 @@
     "title": "Korea Invest 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -203,10 +203,10 @@
     "site_key": "",
     "url": "https://oliveyoungkorea.blogspot.com",
     "title": "Olive Young Korea",
-    "total_pageviews": 476,
+    "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -214,7 +214,7 @@
       "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -224,46 +224,8 @@
     "title": "Korea Crypto 365",
     "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
-    "history": [
-     {
-      "date": "2026-10-26",
-      "daily_pageviews": null,
-      "total_pageviews": null
-     }
-    ],
-    "source": "rendered_public_blogger_widget",
-    "api_status": "BLOGGER_API_HTTP_403"
-   },
-   {
-    "key": "https://jobinkorea365.blogspot.com",
-    "site_key": "",
-    "url": "https://jobinkorea365.blogspot.com",
-    "title": "Job in Korea 365",
-    "total_pageviews": 55,
-    "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
-    "history": [
-     {
-      "date": "2026-10-26",
-      "daily_pageviews": null,
-      "total_pageviews": null
-     }
-    ],
-    "source": "rendered_public_blogger_widget",
-    "api_status": "BLOGGER_API_HTTP_403"
-   },
-   {
-    "key": "https://koreawedding365.blogspot.com",
-    "site_key": "",
-    "url": "https://koreawedding365.blogspot.com",
-    "title": "Korea Wedding 365 | International Couples",
-    "total_pageviews": 58,
-    "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -271,7 +233,45 @@
       "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
+    "api_status": "BLOGGER_API_HTTP_403"
+   },
+   {
+    "key": "https://jobinkorea365.blogspot.com",
+    "site_key": "",
+    "url": "https://jobinkorea365.blogspot.com",
+    "title": "Job in Korea 365",
+    "total_pageviews": null,
+    "daily_pageviews": null,
+    "status": "TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND",
+    "checked_at": null,
+    "history": [
+     {
+      "date": "2026-10-26",
+      "daily_pageviews": null,
+      "total_pageviews": null
+     }
+    ],
+    "source": null,
+    "api_status": "BLOGGER_API_HTTP_403"
+   },
+   {
+    "key": "https://koreawedding365.blogspot.com",
+    "site_key": "",
+    "url": "https://koreawedding365.blogspot.com",
+    "title": "Korea Wedding 365 | International Couples",
+    "total_pageviews": 365,
+    "daily_pageviews": null,
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
+    "history": [
+     {
+      "date": "2026-10-26",
+      "daily_pageviews": null,
+      "total_pageviews": 365
+     }
+    ],
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -281,8 +281,8 @@
     "title": "The Seoul Journal",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -300,8 +300,8 @@
     "title": "KTech365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -319,8 +319,8 @@
     "title": "KIECA Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -338,8 +338,8 @@
     "title": "KI Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -357,8 +357,8 @@
     "title": "KSA Korea",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -377,7 +377,7 @@
     "total_pageviews": 365,
     "daily_pageviews": null,
     "status": "BASELINE_PENDING",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -393,10 +393,10 @@
     "site_key": "",
     "url": "https://jobkoreaglobal.blogspot.com",
     "title": "Job Korea Global",
-    "total_pageviews": 72,
+    "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -404,7 +404,7 @@
       "total_pageviews": null
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": null,
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -414,8 +414,8 @@
     "title": "Study in Korea 365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_NUMBER_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -431,18 +431,18 @@
     "site_key": "",
     "url": "https://korea365guide.blogspot.com",
     "title": "Korea365 | Korea Life A-Z",
-    "total_pageviews": 1221,
+    "total_pageviews": 1792985580654,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 1792985580654
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -450,18 +450,18 @@
     "site_key": "",
     "url": "https://sis-korea.blogspot.com",
     "title": "SIS Korea | Seoul International School",
-    "total_pageviews": 43,
+    "total_pageviews": 1792985581166,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": 0
+      "total_pageviews": 1792985581166
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -469,10 +469,10 @@
     "site_key": "",
     "url": "https://krealestate365.blogspot.com",
     "title": "Korea Real Estate 365",
-    "total_pageviews": 57,
+    "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
@@ -480,7 +480,7 @@
       "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -490,8 +490,8 @@
     "title": "K-Health365 연구소",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -507,18 +507,18 @@
     "site_key": "",
     "url": "https://skin.k-health365.com",
     "title": "KSkin365",
-    "total_pageviews": 1100,
+    "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    },
    {
@@ -528,8 +528,8 @@
     "title": "K-wellness Lab",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -547,8 +547,8 @@
     "title": "K-Medical Job Center",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -566,8 +566,8 @@
     "title": "한국생활지원정보",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -585,8 +585,8 @@
     "title": "Korea Daily Mix",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -604,8 +604,8 @@
     "title": "KWorld365",
     "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "HTTP_429",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "TOTAL_PAGEVIEWS_WIDGET_NOT_FOUND",
+    "checked_at": null,
     "history": [
      {
       "date": "2026-10-26",
@@ -621,18 +621,18 @@
     "site_key": "seoul_intl_school_guide",
     "url": "https://seoulintlschoolguide.blogspot.com",
     "title": "Seoul International School Guide",
-    "total_pageviews": 75,
+    "total_pageviews": 365,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
-    "checked_at": "2026-10-26T11:58:21.053917+09:00",
+    "status": "BASELINE_PENDING",
+    "checked_at": "2026-10-26T12:32:34.007120+09:00",
     "history": [
      {
       "date": "2026-10-26",
       "daily_pageviews": null,
-      "total_pageviews": null
+      "total_pageviews": 365
      }
     ],
-    "source": "rendered_public_blogger_widget",
+    "source": "public_stats_widget",
     "api_status": "BLOGGER_API_HTTP_403"
    }
   ]
@@ -778,9 +778,9 @@
    "display_name": "jobkorea365.com",
    "status": "OK",
    "gsc_property": "https://jobkorea365.com/",
-   "content": 67,
-   "latest_publish_date": "2026-10-25",
-   "content_delta": 0,
+   "content": 68,
+   "latest_publish_date": "2026-10-26",
+   "content_delta": 1,
    "clicks": 0,
    "clicks_delta": 0,
    "cumulative": 15,
@@ -888,9 +888,9 @@
    "display_name": "k-trip365.com",
    "status": "OK",
    "gsc_property": "https://k-trip365.com/",
-   "content": 58,
+   "content": 59,
    "latest_publish_date": "2026-10-26",
-   "content_delta": 2,
+   "content_delta": 3,
    "clicks": 0,
    "clicks_delta": 0,
    "cumulative": 5,
