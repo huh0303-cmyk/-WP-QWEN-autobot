@@ -27,4 +27,4 @@ These ten channels are permanently identified by YouTube channel ID, never by a 
 - Channel ID is the only identity key. Brand-account labels are historical aliases only.
 - Control-room cards report the stored read connection, not whether an unrelated publishing token has extra scopes.
 - No automatic upload or publication is authorized by this lock.
-- Runtime proof lives in `/opt/korea365/data/windsor-youtube-connection-proof.json`, `/opt/korea365/data/account-audience-metrics.json`, and `/opt/korea365/data/youtube-ten-channel-lock.json`.
+- Runtime proof must be attached as GitHub Actions artifacts or stored in an approved GitHub-native/Google Sheets location. Former /opt/korea365 runtime paths are retired and must not be used.
