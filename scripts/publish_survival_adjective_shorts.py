@@ -151,6 +151,7 @@ def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[di
 def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None:
     """Block duplicate title, pair ID, or same vocabulary pair on this channel."""
     import re
+    import unicodedata
     title_key = normalized_title(manifest["title"])
     pair_id = str(manifest.get("pair_id", "")).strip().casefold()
     words = [str(w).strip().casefold() for w in manifest.get("words", []) if str(w).strip()]
@@ -161,10 +162,14 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
         old_title = snippet.get("title", "")
         old_description = snippet.get("description", "")
         old_key = normalized_title(old_title)
-        old_text = (old_title + " " + old_description).casefold()
+        old_text = unicodedata.normalize("NFKC", old_title + " " + old_description).casefold()
+        old_tags = " ".join(str(tag) for tag in snippet.get("tags", [])).casefold()
         exact_title = bool(title_key and old_key == title_key)
-        pair_in_text = bool(pair_id and pair_id in old_text)
-        both_words_in_title = len(words) >= 2 and all(word in old_title.casefold() for word in words)
+        pair_in_text = bool(pair_id and (pair_id in old_text or pair_id in old_tags))
+        # Compare normalized tokens so punctuation/spacing variations cannot bypass the guard.
+        old_title_key = normalized_title(old_title)
+        normalized_words = [normalized_title(word) for word in words]
+        both_words_in_title = len(normalized_words) >= 2 and all(word and word in old_title_key for word in normalized_words)
         if exact_title or pair_in_text or both_words_in_title:
             stats = video.get("statistics", {})
             duplicates.append({
