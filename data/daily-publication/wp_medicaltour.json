@@ -1,1 +1,1 @@
-{"day": "2026-10-26", "status": "DISPATCHED", "attempts": 2, "claim": "daily-2026-10-26-wp_medicaltour-ad72bb65", "claimed_at": "2026-10-26T14:15:00.364959+09:00", "run_id": 40273230321, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-26", "status": "PUBLISHED", "public_url": "https://koreamedicaltour.com/south-korea-regional-healing-clusters-integrating-clinical-procedures-with-certified-recovery-pathways/", "published_at": "2026-10-26T08:37:28Z"}
