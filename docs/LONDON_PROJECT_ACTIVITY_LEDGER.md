@@ -537,3 +537,11 @@ YouTube 및 review-gated 콘텐츠는 사용자 승인 자체가 `HUMAN_APPROVAL
 - Direct public RSS: Health latest remains Oct18; Ktrip Oct10; Finance/Housing Oct18. No Oct25 post on the three exact feeds; verified public publications 0/3.
 - Local runner status had no Oct25 jobs. Windows scheduled task last ran Oct25 23:58 KST with exit result 0, but there is no matching local receipt and no public result; exit code alone is insufficient. Google Sheets queue remains unverified; the connected browser export path was blocked on prior checks.
 - No retries or catch-up posting were triggered. Keep the date closed; resolve the paused plan and missing dispatch/receipt path before future runs.
+
+
+## naver-daily-check-20261026
+
+- `task_id=naver-daily-check-20261026`; heartbeat received 2026-10-26T01:05:26Z = 10:05 KST. Checked N1 `k-insight-vietnam`, N2 `health-standard`, N3 `sky-only` via their public Naver RSS.
+- No `data/naver-daily-plans/2026-10-26.json` or `data/naver-trend-brief/2026-10-26.json` exists. The 07:07–07:50 KST trend window has passed. No same-day posts in any feed (0/3 as of 10:05 KST); latest public items remain N1 Oct10, N2 Oct7, N3 Oct8.
+- Current prompt cadence (N1 1/day, N2 1/day, N3 1–5/day) still differs from checked-in configuration (N1/N2 3–4, N3 8–10). No plan was generated or post drafted/published while this mismatch, missing current-day evidence, and unavailable browser session remain unresolved. Prior CUA state inspection failed; no fresh login-state proof.
+- No catch-up posting. The same-day research and account-session blockers remain; keep the current date on safe hold rather than publish unverified content.
