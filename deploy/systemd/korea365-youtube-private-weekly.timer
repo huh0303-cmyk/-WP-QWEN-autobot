@@ -1,9 +1,0 @@
-# RETIRED 2026-10-26 — no VPS/systemd scheduling is permitted.
-[Unit]
-Description=Retired legacy YouTube timer — do not install
-
-[Timer]
-# Intentionally no OnCalendar or Unit; this timer does not schedule work.
-
-[Install]
-WantedBy=multi-user.target
