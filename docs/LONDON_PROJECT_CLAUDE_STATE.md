@@ -17,7 +17,7 @@ archive 10개 + core 5개 + 언어 Survival 10개 채널의 검증된 매핑. �
 - Migration branch removes the 21 SSH workflows, VPS systemd/deploy assets, n8n container/gateway assets, and server-only worker entry points.
 - New path: youtube-github-worker.yml + scripts/youtube_github_worker.py + automation_hub/youtube_github_runtime.py. Cost hold fails closed by default; no upload was triggered by this migration.
 - Control-center YouTube buttons now dispatch GitHub Actions rather than writing a server-local queue.
-- Do not treat the migration as complete: the legacy automation_hub/youtube_vps_queue.py file still remains, some historical scripts/docs still reference server paths, the 10-channel schedule is not restored, and no authorized end-to-end canary has passed.
+- Do not treat the migration as complete: some historical scripts/docs still need classification, the 10-channel schedule is not restored, and no authorized end-to-end canary has passed.
 - Preserve all existing videos/posts and privacy states. Before enabling any publication, verify GitHub environment secrets, read-only OAuth channel IDs, cost hold, deduplication, and durable publication receipts.
 - Current source of truth for migration status: docs/VPS_CANCELLATION_AND_GITHUB_ONLY_2026-10-09.md and docs/GITHUB_ONLY_NO_VPS_MIGRATION_INVENTORY_2026-10-26.md.
 
