@@ -1,54 +1,31 @@
-# 런던프로젝트GPT — Operations Manual
+# 런던프로젝트GPT — GitHub-only Operations Manual
 
-## Daily operator view
-Control Korea365 should make these four numbers dominant:
+## Daily check
+1. Open the GitHub Actions page for huh0303-cmyk/-WP-QWEN-autobot.
+2. Review failed or cancelled runs and inspect their logs/artifacts without exposing secrets.
+3. For every reported publication, verify the destination URL/content ID, account or channel ID, privacy state, and timestamp.
+4. Check the Google Sheets calendar and publication ledger for duplicate keys and unresolved attempts before retrying.
+5. Keep YouTube cost hold active unless the owner explicitly approves a cost review and releases it.
+6. Treat Naver/Tistory tasks as local-browser HOLD unless the user's authenticated PC session is available; never claim they are GitHub-hosted.
 
-1. previous-day daily visitors (delta)
-2. cumulative visitors (delta)
-3. total public posts (delta)
-4. Google indexed public posts (delta)
+## YouTube
+- Current workflow: .github/workflows/youtube-github-worker.yml.
+- Manual dispatch only; choose one channel and explicitly confirm publication.
+- The youtube-channels environment variable YOUTUBE_COST_HOLD must be explicitly false or the workflow stops before work.
+- Confirm OAuth identity against the exact channel ID before upload.
+- Do not retry an upload after an ambiguous network failure until the calendar/receipt is reconciled.
+- Do not change privacy on existing videos as part of infrastructure migration.
 
-Ranking:
-- previous-day daily visitors descending
-- explicit 1위, 2위, 3위...
-- unknown values at bottom
-- metric is for trend management; perfect absolute visitor accuracy is not required.
+## Platform routing
+- WordPress: GitHub Actions to the destination WordPress REST API, using per-site secrets.
+- Blogger/Blogspot: GitHub Actions using Google Blogger API/OAuth.
+- Naver/Tistory: user-PC authenticated browser execution only until a supported non-interactive path is approved.
+- YouTube: GitHub Actions workflow with exact channel identity and publication receipts.
+- Other social platforms: direct API workflows only when write permissions and destination IDs are verified.
 
-## Normal daily operation
-1. n8n schedules due jobs.
-2. due registry is checked.
-3. worker executes one isolated destination.
-4. receipt is verified.
-5. Control Korea365 updates state.
-6. failed destinations move to retry/HOLD without stopping fleet.
-
-## Naver/Tistory
-- n8n queues work.
-- LondonLocalAgent executes only while PC/browser session is available.
-- if login challenge appears, HOLD.
-- user login is preserved locally, not in GitHub.
-
-## Maintenance
-Weekly:
-- dead-letter review
-- stale queue review
-- disk usage
-- n8n execution failures
-- YouTube render queue
-- obsolete GitHub workflow candidates
-
-Monthly:
-- VPS cost/capacity review
-- backup restore sanity check
-- remove superseded schedulers
-- validate registry counts and channel IDs
-
-## No-cost operating rule
-Prefer:
-- existing VPS
-- n8n Community
-- Python
-- systemd
-- GitHub
-- free/open-source tooling
-No new paid service without explicit owner approval.
+## Failure rules
+- A green workflow status is not proof of publication.
+- Missing credentials, identity mismatch, duplicate suspicion, cost hold, or missing receipt means HOLD.
+- Do not delete content or mass-change privacy during cleanup.
+- Never use VPS, SSH, systemd, server-local queues, or server-hosted n8n as a fallback.
+- See docs/GITHUB_ONLY_NO_VPS_MIGRATION_INVENTORY_2026-10-26.md for outstanding migration gates.
