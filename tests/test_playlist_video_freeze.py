@@ -45,7 +45,7 @@ def test_main_proceeds_past_the_freeze_only_when_flag_is_true():
 
 def test_canonical_worker_enables_public_calendar_video_generation():
     worker = (Path(__file__).resolve().parents[1] / "scripts" /
-              "youtube_vps_worker.py").read_text(encoding="utf-8")
+              "youtube_github_worker.py").read_text(encoding="utf-8")
     uploader = (Path(__file__).resolve().parents[1] / "scripts" /
                 "youtube_publish_approved.py").read_text(encoding="utf-8")
     assert 'PLAYLIST_VIDEO_GENERATION_ENABLED="true"' in worker
