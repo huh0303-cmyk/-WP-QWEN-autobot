@@ -6,6 +6,10 @@ on:
       - 'docs/TTS_PROVIDER_PRIORITY.md'
       - 'scripts/tts_provider_priority.py'
       - 'scripts/seoul_journal_shorts_pipeline.py'
+      - 'scripts/classic_reads_longform.py'
+      - 'scripts/archive_footage_longform.py'
+      - 'scripts/nasa_archive_longform.py'
+      - '.github/workflows/youtube-github-worker.yml'
       - '.github/workflows/seoul-journal-political-shorts.yml'
       - '.github/workflows/tts-free-policy.yml'
 permissions:
@@ -22,6 +26,8 @@ jobs:
         run: python -m py_compile scripts/tts_provider_priority.py
       - name: Compile Seoul Journal Shorts pipeline
         run: python -m py_compile scripts/seoul_journal_shorts_pipeline.py
+      - name: Compile knowledge documentary TTS pipeline
+        run: python -m py_compile scripts/classic_reads_longform.py scripts/archive_footage_longform.py scripts/nasa_archive_longform.py
       - name: Verify Seoul Journal Shorts uses free-only TTS
         run: |
           python - <<'PY'
@@ -36,6 +42,24 @@ jobs:
           assert 'elevenlabs' not in workflow
           assert '"privacystatus":"private"' in pipeline
           print('PASS: Seoul Journal Shorts TTS is free-only and upload remains private.')
+          PY
+      - name: Verify knowledge documentary narration uses free-only TTS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path('scripts/classic_reads_longform.py').read_text(encoding='utf-8')
+          start = source.index('def elevenlabs_tts_voice(')
+          end = source.index('def _normalize_audio', start)
+          tts = source[start:end].lower()
+          assert 'from tts_provider_priority import generate_tts' in tts
+          assert 's2.1-pro-free' in source or 'fish_audio_free' in tts
+          assert 'api.elevenlabs.io' not in tts
+          assert 'raise runtimeerror' not in tts or 'all configured free tts providers failed' in Path('scripts/tts_provider_priority.py').read_text(encoding='utf-8').lower()
+          worker = Path('.github/workflows/youtube-github-worker.yml').read_text(encoding='utf-8')
+          assert 'FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}' in worker
+          assert 'edge-tts' in worker
+          print('PASS: knowledge narration is routed through free-only Fish Audio -> Edge TTS; no paid TTS endpoint in narration adapter.')
+          print('NOTE: Fish Audio still requires the FISH_AUDIO_API_KEY GitHub Actions secret to be configured.')
           PY
       - name: Verify provider order and paid-fallback guard
         run: |
