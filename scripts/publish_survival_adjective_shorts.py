@@ -124,17 +124,18 @@ def normalized_title(value: str) -> str:
     return re.sub(r"[^\w]+", "", value, flags=re.UNICODE)
 
 
-def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[dict]:
-    """Read recent uploads from this exact channel; read-only duplicate audit."""
+def recent_channel_videos(service, channel_id: str, limit: int | None = None) -> list[dict]:
+    """Read channel upload history for duplicate audit; limit=None checks the full playlist."""
     channels = service.channels().list(part="contentDetails", id=channel_id).execute().get("items", [])
     if len(channels) != 1:
         raise RuntimeError(f"Cannot resolve uploads playlist for channel {channel_id}")
     playlist_id = channels[0]["contentDetails"]["relatedPlaylists"]["uploads"]
     ids = []
     page_token = None
-    while len(ids) < limit:
+    while limit is None or len(ids) < limit:
+        page_size = 50 if limit is None else min(50, limit - len(ids))
         result = service.playlistItems().list(
-            part="contentDetails", playlistId=playlist_id, maxResults=min(50, limit-len(ids)),
+            part="contentDetails", playlistId=playlist_id, maxResults=page_size,
             pageToken=page_token,
         ).execute()
         ids.extend(row["contentDetails"]["videoId"] for row in result.get("items", []))
@@ -155,7 +156,9 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
     title_key = normalized_title(manifest["title"])
     pair_id = str(manifest.get("pair_id", "")).strip().casefold()
     words = [str(w).strip().casefold() for w in manifest.get("words", []) if str(w).strip()]
-    rows = recent_channel_videos(service, channel_id, limit=500)
+    # Scan the complete uploads playlist, not just the latest 500 videos, so an
+    # old pair cannot silently reappear after the catalog cycles.
+    rows = recent_channel_videos(service, channel_id, limit=None)
     duplicates = []
     for video in rows:
         snippet = video.get("snippet", {})
