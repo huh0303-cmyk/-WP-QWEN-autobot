@@ -23,7 +23,7 @@ The owner retired VPS hosting and requires London Project to use GitHub Actions 
 
 ## Remaining verification — migration is not yet complete
 - The legacy module `automation_hub/youtube_vps_queue.py` was removed after active consumers were moved to GitHub Actions dispatch/runtime.
-- Several older scripts and runbooks still contain server-specific paths or historical VPS instructions; these must be classified and either ported to repository-relative paths/environment secrets or clearly marked as historical.
+- Historical documentation and activity ledgers still mention the former VPS for audit context. They are non-executable records, not current runbooks; active workflow/code/config directories pass the static no-VPS runtime scan.
 - The GitHub-hosted worker has not yet completed an authorized end-to-end canary. Its cost hold is intentionally active by default.
 - The hourly GitHub Actions scheduler is now present, but it remains disabled by default unless YOUTUBE_AUTO_PUBLISH_ENABLED=true and YOUTUBE_COST_HOLD=false in the youtube-channels environment. No automatic public publishing was enabled.
 - Naver/Tistory browser-based tasks cannot be called GitHub-migrated unless a supported non-interactive auth path exists; otherwise they remain explicitly HOLD.
