@@ -188,9 +188,7 @@ def build_sns_ranking(bucket: int) -> dict:
     history = _read(ROOT / "situation_room_history.json", {})
     latest = history.get("latest", {})
     previous = history.get("previous", {})
-    audience_path = Path("/opt/korea365/data/account-audience-metrics.json")
-    if not audience_path.exists():
-        audience_path = ROOT / "data" / "account-audience-metrics.json"
+    audience_path = ROOT / "data" / "account-audience-metrics.json"
     audience = _read(audience_path, {}).get("accounts", {})
     probe = _sns_probe_stats()
     publications = _latest_social_publications()
