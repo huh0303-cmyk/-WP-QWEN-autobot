@@ -195,7 +195,9 @@ def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         verified_video(service, receipt["video_id"], expected_channel, privacy, publish_at)
         return receipt
-    # Fail closed if the same title or vocabulary pair already exists on this channel.\n    assert_no_recent_duplicate(service, manifest, expected_channel)\n    video_path = Path(manifest["video_path"])
+    # Fail closed if duplicate content is detected on this channel.
+    assert_no_recent_duplicate(service, manifest, expected_channel)
+    video_path = Path(manifest["video_path"])
     if not video_path.exists():
         raise FileNotFoundError(video_path)
     status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
