@@ -52,38 +52,8 @@ def _research_start_state(site_id: str, run_id: str, category: str, platform: st
 
 
 def _load_runtime_env() -> None:
-    os.environ.setdefault("FORCE_SOURCE_IPV4", "true")
-    if os.environ.get("FORCE_SOURCE_IPV4", "false").strip().lower() in {"1", "true", "yes", "on"}:
-        import socket
-        if not getattr(socket, "_korea365_ipv4_patched", False):
-            original = socket.getaddrinfo
-            def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
-                return original(host, port, socket.AF_INET, type, proto, flags)
-            socket.getaddrinfo = _ipv4_only_getaddrinfo
-            socket._korea365_ipv4_patched = True
-
-    for path in (Path("/etc/korea365/control.env"), Path("/etc/korea365/n8n.env")):
-        if not path.exists():
-            continue
-        for raw in path.read_text(encoding="utf-8", errors="ignore").splitlines():
-            line = raw.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
-    for path in (Path("/etc/korea365/article-runtime.json"), Path("/etc/korea365/wp-sites.json")):
-        if not path.exists():
-            continue
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        if isinstance(data, dict):
-            for key, value in data.items():
-                if isinstance(value, (str, int, float)) and str(value).strip():
-                    os.environ.setdefault(str(key), str(value))
+    """Use only environment-scoped credentials provided by the GitHub Actions job."""
     os.environ.setdefault("GITHUB_REPOSITORY", "huh0303-cmyk/-WP-QWEN-autobot")
-
 
 def _state_path(run_id: str) -> Path:
     safe = re.sub(r"[^a-zA-Z0-9._-]+", "-", run_id)
@@ -160,80 +130,8 @@ def _ensure_wordpress_category(profile: dict, state: dict) -> int:
 
 
 def _publish_wordpress_via_worker(state: dict, profile: dict, public: bool) -> dict:
-    """Publish directly to WordPress REST when LONDON_VPS_FREE=true; keep VPS fallback during migration."""
-    if os.environ.get("LONDON_VPS_FREE", "false").strip().lower() in {"1", "true", "yes", "on"}:
-        return _publish_wordpress_native(state, profile, public)
-
-    queue = Path(os.environ.get("VPS_WP_QUEUE", ROOT / "data/vps-wp-queue"))
-    queue.mkdir(parents=True, exist_ok=True)
-    article = state["article"]
-    category = state.get("category_assignment") or {}
-    if category.get("status") != "ok" or not category.get("id"):
-        raise RuntimeError("category assignment is not complete; publication blocked")
-
-    attempt = int(state.get("publish_attempt") or 0) + 1
-    state["publish_attempt"] = attempt
-    _write_state(state)
-    safe_run = re.sub(r"[^a-zA-Z0-9._-]+", "-", state["run_id"])
-    job_id = f"london-{safe_run}-p{attempt}"
-    payload = {
-        "job_id": job_id,
-        "site_url": profile["wordpress"]["url"].rstrip("/"),
-        "secret_name": profile["wordpress"]["secret_name"],
-        "title": article["title"],
-        "content_html": article["content_html"],
-        "image_url": state.get("image", {}).get("url", ""),
-        "category_id": int(category["id"]),
-        "category_name": category.get("name", ""),
-        "focus_keyword": state["research"]["keyword"],
-        "meta_description": article.get("meta_description", ""),
-        "status_after_review": "publish" if public else "draft",
-        "source": "london-four-agent",
-        "received_at": datetime.now(timezone.utc).isoformat(),
-        "retries": 0,
-    }
-    tmp = queue / f".{job_id}.tmp"
-    queued = queue / f"{job_id}.queued.json"
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    os.chmod(tmp, 0o600)
-    os.replace(tmp, queued)
-
-    check = subprocess.run(
-        ["systemctl", "is-active", "--quiet", "korea365-wp-publisher.service"],
-        capture_output=True,
-    )
-    if check.returncode != 0:
-        subprocess.run(["systemctl", "start", "korea365-wp-publisher.service"], check=True)
-
-    deadline = time.time() + 220
-    suffixes = ("published", "drafted", "failed", "credential_required")
-    while time.time() < deadline:
-        for suffix in suffixes:
-            result_path = queue / f"{job_id}.{suffix}.json"
-            if not result_path.exists():
-                continue
-            result = json.loads(result_path.read_text(encoding="utf-8"))
-            if suffix in {"failed", "credential_required"}:
-                raise RuntimeError(
-                    result.get("last_output")
-                    or result.get("error")
-                    or f"WordPress worker ended with {suffix}"
-                )
-            post_id = result.get("remote_id")
-            url = result.get("public_url")
-            if not post_id or not url:
-                raise RuntimeError("WordPress worker receipt missing post ID or URL")
-            return {
-                "status": "published" if suffix == "published" else "draft",
-                "platform": "wordpress",
-                "site": profile["wordpress"]["url"],
-                "url": url,
-                "post_id": post_id,
-                "title": article["title"],
-                "worker_job_id": job_id,
-            }
-        time.sleep(2)
-    raise RuntimeError(f"WordPress worker timeout waiting for receipt: {job_id}")
+    """Compatibility name; publishing is executed directly on the GitHub-hosted runner."""
+    return _publish_wordpress_native(state, profile, public)
 
 
 def _publish_wordpress_native(state: dict, profile: dict, public: bool) -> dict:
