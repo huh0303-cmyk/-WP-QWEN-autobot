@@ -138,8 +138,7 @@ def run_job(job: dict) -> None:
         env.update(CHANNEL_KEY=row["key"], TOPIC=row["topic"], LANGUAGE=row.get("language", ""),
                    TOPIC_KEYWORD=row["topic"], LANGUAGE_KEYWORD=row.get("language", ""), SCHEDULE_ID=row["id"],
                    EPISODE_DATE=row["when"].date().isoformat(),
-                   CLAIM_TOKEN=token, GITHUB_JOB_ID=job["job_id"], WORKER_WORKFLOW="youtube-github-worker",
-                   GITHUB_RUN_ATTEMPT="1")
+                   CLAIM_TOKEN=token, GITHUB_JOB_ID=job["job_id"], WORKER_WORKFLOW="youtube-github-worker")
         result_path = "artifacts/youtube_playlist_result.json" if channel.channel_type == "playlist" else "artifacts/youtube_curio_result.json"
         target = ROOT / result_path
         target.unlink(missing_ok=True)
