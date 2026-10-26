@@ -185,7 +185,7 @@ def install(app, runtime):
         payload = request.get_json(silent=True) or {}
         site_id = str(payload.get("site_id") or "").strip()
         category = str(payload.get("category") or "").strip()
-        publish_mode = str(payload.get("publish_mode") or "draft").strip().lower()
+        publish_mode = str(payload.get("publish_mode") or "manual").strip().lower()
         writer_model = str(payload.get("writer_model") or "auto_free").strip()
         image_model = str(payload.get("image_model") or "auto_free").strip()
         if writer_model not in WRITER_MODELS or image_model not in IMAGE_MODELS:
@@ -210,53 +210,37 @@ def install(app, runtime):
             "writer_model": writer_model,
             "image_model": image_model,
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "orchestrator": "n8n",
+            "orchestrator": "github-actions",
             "start_status": "dispatching",
-            "stage_status": {
-                "research": "waiting",
-                "write": "waiting",
-                "image": "waiting",
-                "publish": "waiting",
-            },
+            "stage_status": {"research": "waiting", "write": "waiting", "image": "waiting", "publish": "waiting"},
         }
         _write_run(state)
-
         try:
-            response = requests.post(
-                N8N_WEBHOOK,
-                json={
-                    "site_id": site_id,
-                    "category": category,
-                    "publish_mode": publish_mode,
-                    "run_id": run_id,
-                },
-                timeout=12,
-            )
-        except requests.RequestException as exc:
-            # A timed-out webhook response does not prove n8n failed to accept
-            # the execution. Keep the run pollable and avoid inviting a second
-            # click that could enqueue duplicate research or publication.
-            return jsonify({
-                "ok": True,
-                "run_id": run_id,
-                "orchestrator": "n8n",
-                "status": "start_ack_pending",
-                "start_ack_pending": True,
-                "error_type": type(exc).__name__,
-                "message": "n8n 응답이 늦어 실행 여부를 확인하고 있습니다. 중복 실행을 막기 위해 다시 시작하지 않고 상태를 확인합니다.",
-            }), 202
-
-        if response.status_code >= 400:
+            workflow_url = _dispatch_github_pipeline(site_id, category, publish_mode, run_id)
+        except Exception as exc:
+            state["start_status"] = "dispatch_failed"
             state["last_error"] = {
-                "stage": "start",
-                "type": "N8NWebhookError",
-                "message": response.text[:1200],
+                "stage": "dispatch",
+                "type": type(exc).__name__,
+                "message": str(exc)[:1000],
                 "at": datetime.now(timezone.utc).isoformat(),
             }
             _write_run(state)
-            return jsonify({"ok": False, "error": "n8n_rejected", "http": response.status_code, "run_id": run_id}), 502
+            return jsonify({"ok": False, "error": "github_dispatch_failed", "run_id": run_id, "message": str(exc)[:500]}), 503
 
-        return jsonify({"ok": True, "run_id": run_id, "orchestrator": "n8n", "mode": "manual-1-2-3" if publish_mode == "manual" else "auto-1-2-3-4"}), 202
+        state["start_status"] = "dispatch_requested"
+        state["workflow_url"] = workflow_url
+        state["stage_status"] = {stage: "queued" for stage in ("research", "write", "image", "publish")}
+        _write_run(state)
+        return jsonify({
+            "ok": True,
+            "run_id": run_id,
+            "orchestrator": "github-actions",
+            "workflow": GITHUB_PIPELINE_WORKFLOW,
+            "workflow_url": workflow_url,
+            "status": "dispatch_requested",
+            "mode": publish_mode,
+        }), 202
 
     @app.post("/api/london-gpt/manual-published")
     def london_gpt_manual_published():
@@ -320,47 +304,12 @@ def install(app, runtime):
 
     @app.post("/api/london-gpt/rewrite")
     def london_gpt_rewrite():
-        from flask import jsonify, request
-        payload = request.get_json(silent=True) or {}
-        run_id = str(payload.get("run_id") or "").strip()
-        if not run_id:
-            return jsonify({"ok": False, "error": "run_id_required"}), 400
-
-        state = _read_run(run_id)
-        if state.get("stage_status", {}).get("research") != "ok":
-            return jsonify({"ok": False, "error": "research_not_complete"}), 409
-        if not str(state.get("research", {}).get("keyword") or "").strip():
-            return jsonify({"ok": False, "error": "keyword_missing"}), 409
-
-        state.setdefault("stage_status", {})["write"] = "waiting"
-        state["stage_status"]["image"] = "waiting"
-        state["stage_status"]["publish"] = "waiting"
-        if state.get("article"):
-            state["previous_article"] = state.get("article")
-        if state.get("writer"):
-            state["previous_writer"] = state.get("writer")
-        state.pop("image", None)
-        state.pop("receipt", None)
-        state.pop("last_error", None)
-        state["rewrite_requested_at"] = datetime.now(timezone.utc).isoformat()
-        _write_run(state)
-
-        try:
-            response = requests.post(
-                N8N_REWRITE_WEBHOOK,
-                json={
-                    "site_id": str(state.get("site_id") or ""),
-                    "category": str(state.get("category") or ""),
-                    "publish_mode": str(state.get("publish_mode") or "draft"),
-                    "run_id": run_id,
-                },
-                timeout=12,
-            )
-        except requests.RequestException as exc:
-            return jsonify({"ok": False, "error": "n8n_rewrite_unreachable", "message": str(exc)}), 503
-        if response.status_code >= 400:
-            return jsonify({"ok": False, "error": "n8n_rewrite_rejected", "http": response.status_code}), 502
-        return jsonify({"ok": True, "run_id": run_id, "mode": "rewrite-2-3-4"}), 202
+        from flask import jsonify
+        return jsonify({
+            "ok": False,
+            "error": "rewrite_only_not_migrated",
+            "message": "Rewrite-only reruns are not yet mapped to a GitHub-native workflow. No work was started; use a new reviewed pipeline run or wait for the dedicated rewrite workflow.",
+        }), 501
 
     @app.get("/api/london-gpt/run/<run_id>")
     def london_gpt_run_status(run_id: str):
@@ -407,33 +356,12 @@ def install(app, runtime):
 
     @app.post("/api/london-gpt/rerun/<stage>")
     def london_gpt_rerun(stage: str):
-        from flask import jsonify, request
-        if stage not in N8N_RERUN_WEBHOOKS:
-            return jsonify({"ok": False, "error": "unknown_stage"}), 404
-        payload = request.get_json(silent=True) or {}
-        run_id = str(payload.get("run_id") or "").strip()
-        if not run_id:
-            return jsonify({"ok": False, "error": "run_id_required"}), 400
-
-        state = _read_run(run_id)
-        if state.get("publish_mode") == "manual" and stage == "publish":
-            return jsonify({"ok": False, "error": "publish_is_manual"}), 409
-        state.setdefault("stage_status", {})[stage] = "waiting"
-        state.pop("last_error", None)
-        _write_run(state)
-
-        body = {
-            "run_id": run_id,
-            "site_id": str(state.get("site_id") or ""),
-            "category": str(state.get("category") or ""),
-            "publish_mode": str(state.get("publish_mode") or "draft"),
-        }
-        try:
-            response = requests.post(N8N_RERUN_WEBHOOKS[stage], json=body, timeout=12)
-        except requests.RequestException as exc:
-            return jsonify({"ok": False, "error": "n8n_rerun_unreachable", "message": str(exc)}), 503
-        if response.status_code >= 400:
-            return jsonify({"ok": False, "error": "n8n_rerun_rejected", "http": response.status_code}), 502
-        return jsonify({"ok": True, "run_id": run_id, "stage": stage, "orchestrator": "n8n"}), 202
+        from flask import jsonify
+        return jsonify({
+            "ok": False,
+            "error": "stage_rerun_not_migrated",
+            "stage": stage,
+            "message": "Stage-only retries are disabled until a GitHub-native state restore and deduplication workflow is available. No job was started.",
+        }), 501
 
     return snapshot
