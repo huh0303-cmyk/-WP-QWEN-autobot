@@ -5,7 +5,7 @@ from difflib import SequenceMatcher
 from bs4 import BeautifulSoup
 
 RULE = """Use an article-specific headline and opening grounded in the supplied facts.
-Never start a headline with How. Do not substitute another repeated question formula.
+Do not start headlines with generic gerund templates such as Understanding, Navigating, Managing, Preparing, Exploring, Discovering, or Learning. Lead with the concrete subject, decision, change, comparison, or result instead. Never start a headline with How. Do not substitute another repeated question formula.
 Do not invent a connection between a trending person and Korean visas or services.
 Do not reuse a recent headline's sentence frame with only a different keyword.
 Treat profile outlines as coverage requirements, not literal headings or a fixed order.
