@@ -25,7 +25,7 @@ No production path may depend on VPS, SSH, systemd timers, server-local queues, 
 
 ## Remaining blockers
 - `automation_hub/youtube_vps_queue.py` was removed after the control-center and worker callers were migrated.
-- Some legacy scripts/docs still contain VPS paths or old n8n instructions; they need targeted migration or a clear historical-only label.
+- Historical documentation and activity ledgers still mention the former VPS for audit context. They are non-executable records, not current runbooks; active workflow/code/config directories pass the static no-VPS runtime scan.
 - The new GitHub worker has not completed an authorized end-to-end canary, so it must not be described as production-verified.
 - The hourly GitHub scheduler is installed in .github/workflows/youtube-github-scheduler.yml and processes at most one due calendar row per run. It is intentionally disabled unless YOUTUBE_AUTO_PUBLISH_ENABLED=true and YOUTUBE_COST_HOLD=false in the youtube-channels environment; no automatic public publishing was enabled by this migration.
 - Naver/Tistory browser tasks must remain HOLD unless a supported GitHub-hosted non-interactive authentication path is available.
