@@ -116,12 +116,13 @@ def make_old_video_private(service, video_id: str, expected_channel_id: str) -> 
 
 
 def normalized_title(value: str) -> str:
-    """Normalize titles for conservative duplicate detection."""
+    """Normalize title text consistently across punctuation, case, and Unicode."""
     import re
     import unicodedata
+
     value = unicodedata.normalize("NFKC", value).casefold()
-    value = re.sub(r"#shorts?\\b", "", value)
-    return re.sub(r"[^\\w]+", "", value, flags=re.UNICODE)
+    value = re.sub(r"#shorts?\b", " ", value)
+    return " ".join(re.findall(r"\w+", value, flags=re.UNICODE))
 
 
 def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[dict]:
@@ -149,23 +150,33 @@ def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[di
 
 
 def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None:
-    """Block only a matching existing title or matching word pair in the title.
+    """Fail closed on a matching normalized title or exact vocabulary pair.
 
-    Reusing vocabulary in a later lesson is allowed; matching only words in an
-    old description would incorrectly block legitimate curriculum repetition.
+    Reusing vocabulary in later lessons is allowed; matching only words inside
+    other words (for example, "long" in "longer") is not a duplicate.
     """
     import re
+    import unicodedata
+
     title_key = normalized_title(manifest["title"])
-    words = [str(w).strip().casefold() for w in manifest.get("words", []) if str(w).strip()]
+    words = [
+        " ".join(re.findall(r"\w+", unicodedata.normalize("NFKC", str(word)).casefold(), flags=re.UNICODE))
+        for word in manifest.get("words", [])
+        if str(word).strip()
+    ]
+    word_tokens = [set(word.split()) for word in words if word]
     rows = recent_channel_videos(service, channel_id)
     duplicates = []
     for video in rows:
         snippet = video.get("snippet", {})
         old_title = snippet.get("title", "")
         old_key = normalized_title(old_title)
-        old_title_folded = old_title.casefold()
+        old_title_tokens = set(old_key.split())
         exact_title = bool(title_key and old_key == title_key)
-        both_words_in_title = len(words) >= 2 and all(word in old_title_folded for word in words)
+        both_words_in_title = (
+            len(word_tokens) >= 2
+            and all(tokens and tokens.issubset(old_title_tokens) for tokens in word_tokens[:2])
+        )
         if exact_title or both_words_in_title:
             stats = video.get("statistics", {})
             duplicates.append({
@@ -182,6 +193,7 @@ def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None
             + json.dumps(duplicates[:5], ensure_ascii=False)
         )
 
+
 def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None) -> dict:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     code = manifest["language_code"]
@@ -195,7 +207,9 @@ def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         verified_video(service, receipt["video_id"], expected_channel, privacy, publish_at)
         return receipt
-    # Fail closed if the same title or vocabulary pair already exists on this channel.\n    assert_no_recent_duplicate(service, manifest, expected_channel)\n    video_path = Path(manifest["video_path"])
+    # Fail closed if the same title or vocabulary pair already exists on this channel.
+    assert_no_recent_duplicate(service, manifest, expected_channel)
+    video_path = Path(manifest["video_path"])
     if not video_path.exists():
         raise FileNotFoundError(video_path)
     status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
