@@ -26,6 +26,19 @@ def test_node_console_uses_github_actions_routes_not_n8n_gateway():
     assert "n8nGateway" not in server
 
 
+def test_scheduler_is_disabled_without_explicit_owner_flags():
+    workflow = (ROOT / ".github/workflows/youtube-github-scheduler.yml").read_text(encoding="utf-8")
+    script = (ROOT / "scripts/youtube_github_scheduler.py").read_text(encoding="utf-8")
+    assert 'cron: "17 * * * *"' in workflow
+    assert "YOUTUBE_AUTO_PUBLISH_ENABLED" in workflow
+    assert "YOUTUBE_COST_HOLD" in workflow
+    assert "has_due_calendar_row" in script
+    assert "check_cost_hold()" in script
+    assert "process_one()" in script
+    assert "systemctl" not in workflow
+    assert "appleboy/ssh-action" not in workflow
+
+
 def test_pipeline_workflow_is_manual_and_cost_hold_gated():
     workflow = (ROOT / ".github/workflows/london-content-pipeline.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch" in workflow

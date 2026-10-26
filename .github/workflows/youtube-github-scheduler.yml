@@ -1,0 +1,119 @@
+name: YouTube GitHub Calendar Scheduler
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: youtube-github-publisher
+  cancel-in-progress: false
+
+jobs:
+  scheduler:
+    runs-on: ubuntu-latest
+    environment: youtube-channels
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: "1"
+      YOUTUBE_COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+      YOUTUBE_AUTO_PUBLISH_ENABLED: ${{ vars.YOUTUBE_AUTO_PUBLISH_ENABLED }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      SHEET_ID: ${{ secrets.SHEET_ID }}
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+      MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_GLOBALMUSIC }}
+      MUSIC_SOURCE_FOLDER_ID_HEALING: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_HEALING }}
+      MUSIC_SOURCE_FOLDER_ID_KPOP: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_KPOP }}
+      MUSIC_SOURCE_FOLDER_ID_MBB: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_MBB }}
+      MUSIC_SOURCE_FOLDER_ID_STARBUCKS: ${{ secrets.MUSIC_SOURCE_FOLDER_ID_STARBUCKS }}
+      OUTPUT_FOLDER_ID_GLOBALMUSIC: ${{ secrets.OUTPUT_FOLDER_ID_GLOBALMUSIC }}
+      OUTPUT_FOLDER_ID_HEALING: ${{ secrets.OUTPUT_FOLDER_ID_HEALING }}
+      OUTPUT_FOLDER_ID_KPOP: ${{ secrets.OUTPUT_FOLDER_ID_KPOP }}
+      OUTPUT_FOLDER_ID_MBB: ${{ secrets.OUTPUT_FOLDER_ID_MBB }}
+      OUTPUT_FOLDER_ID_STARBUCKS: ${{ secrets.OUTPUT_FOLDER_ID_STARBUCKS }}
+      THUMBNAIL_FOLDER_ID_GLOBALMUSIC: ${{ secrets.THUMBNAIL_FOLDER_ID_GLOBALMUSIC }}
+      THUMBNAIL_FOLDER_ID_HEALING: ${{ secrets.THUMBNAIL_FOLDER_ID_HEALING }}
+      THUMBNAIL_FOLDER_ID_KPOP: ${{ secrets.THUMBNAIL_FOLDER_ID_KPOP }}
+      THUMBNAIL_FOLDER_ID_MBB: ${{ secrets.THUMBNAIL_FOLDER_ID_MBB }}
+      THUMBNAIL_FOLDER_ID_STARBUCKS: ${{ secrets.THUMBNAIL_FOLDER_ID_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_ID: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID }}
+      YOUTUBE_OAUTH_CLIENT_SECRET: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN }}
+      YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_GLOBALMUSIC }}
+      YOUTUBE_OAUTH_CLIENT_ID_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HEALING: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HEALING }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HEALING }}
+      YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_STARBUCKS }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_STARBUCKS }}
+      YOUTUBE_OAUTH_CLIENT_ID_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_MBB }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_MBB: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_MBB }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_MBB: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_MBB }}
+      YOUTUBE_OAUTH_CLIENT_ID_KPOP: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_KPOP }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_KPOP: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_KPOP }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_KPOP }}
+      YOUTUBE_OAUTH_CLIENT_ID_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_NASA_SPACE_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_HISTORY_TODAY_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_INVENTION_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_SILENT_ERA_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_ID_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_ID_RETRO_REELS_TIMES }}
+      YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_CLIENT_SECRET_RETRO_REELS_TIMES }}
+      YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES: ${{ secrets.YOUTUBE_OAUTH_REFRESH_TOKEN_RETRO_REELS_TIMES }}
+    steps:
+      - name: Guard auto-publishing and cost hold
+        id: guard
+        env:
+          AUTO_ENABLED: ${{ vars.YOUTUBE_AUTO_PUBLISH_ENABLED }}
+          COST_HOLD: ${{ vars.YOUTUBE_COST_HOLD }}
+        run: |
+          set -euo pipefail
+          if [[ "${AUTO_ENABLED,,}" != "true" || "${COST_HOLD,,}" != "false" ]]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduler is safely disabled. Set YOUTUBE_AUTO_PUBLISH_ENABLED=true and YOUTUBE_COST_HOLD=false in the youtube-channels environment only after owner-approved identity/cost review."
+            exit 0
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: ${{ steps.guard.outputs.enabled == 'true' }}
+      - uses: actions/setup-python@v5
+        if: ${{ steps.guard.outputs.enabled == 'true' }}
+        with:
+          python-version: "3.11"
+      - name: Install free runner tools
+        if: ${{ steps.guard.outputs.enabled == 'true' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install requests Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai google-generativeai pydub mutagen numpy scipy moviepy
+      - name: Process at most one due calendar row
+        if: ${{ steps.guard.outputs.enabled == 'true' }}
+        run: python scripts/youtube_github_scheduler.py
+      - name: Save sanitized scheduler artifacts
+        if: ${{ always() && steps.guard.outputs.enabled == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-github-scheduler-${{ github.run_id }}
+          path: |
+            artifacts/youtube_playlist_result.json
+            artifacts/youtube_curio_result.json
+            data/youtube_github_queue/logs/
+          if-no-files-found: warn
+          retention-days: 30
