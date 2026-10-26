@@ -285,9 +285,12 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     seed_text = f"{target_date.isoformat()}|{code}|{pair['id']}"
     seed = int(hashlib.sha256(seed_text.encode("utf-8")).hexdigest()[:16], 16)
     rng = random.Random(seed)
-    intro_duration = round(rng.uniform(1.4, 2.3), 2)
-    outro_duration = round(rng.uniform(1.5, 2.6), 2)
-    word_durations = [round(rng.uniform(2.4, 3.5), 2) for _ in range(10)]
+    # Wider, natural-looking pacing: vary the intro/outro and each spoken card.
+    # The seeded RNG makes a rerun for the same date deterministic, but different
+    # dates/pairs produce visibly different total durations instead of a 0:29 template.
+    intro_duration = round(rng.uniform(1.1, 2.8), 2)
+    outro_duration = round(rng.uniform(1.3, 3.2), 2)
+    word_durations = [round(rng.uniform(1.8, 4.0), 2) for _ in range(10)]
     audio_tracks = []
     for index, duration in enumerate(word_durations):
         letter = "a" if index % 2 == 0 else "b"
@@ -325,7 +328,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     output = destination / f"{target_date.isoformat()}_{code}_{pair['id']}.mp4"
     build_video(workdir, timeline, output)
     duration = ffprobe_duration(output)
-    if not 27 <= duration <= 42:
+    if not 22 <= duration <= 48:
         raise RuntimeError(f"Unexpected randomized Short duration for {code}: {duration}")
     if category == "noun":
         glosses = meanings if code == "en" else pair["en"]
@@ -352,7 +355,7 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "series_name": channel["series_name"],
         "video_path": str(output.resolve()),
         "duration_seconds": round(duration, 3),
-        "duration_policy": "date-language-pair-seeded randomized slide timing; 2.4-3.5s per word repetition",
+        "duration_policy": "date-language-pair-seeded randomized slide timing; 1.8-4.0s per word repetition, randomized intro/outro",
         "title": title,
         "description": (
             f"{words[0]} ({readings[0]}) means {meanings[0]}; {words[1]} ({readings[1]}) means {meanings[1]}. "
