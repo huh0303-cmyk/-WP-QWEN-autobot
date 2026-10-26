@@ -12,6 +12,7 @@ on:
       - "london_project_claude_console/public/registry.js"
       - ".github/workflows/london-content-pipeline.yml"
       - "tests/test_github_only_routing.py"
+      - "scripts/audit_no_vps_runtime.py"
       - "tests/test_youtube_github_worker_migration.py"
       - ".github/workflows/youtube-github-worker.yml"
       - ".github/workflows/github-only-youtube-worker-tests.yml"
@@ -52,3 +53,4 @@ jobs:
         with:
           node-version: "20"
       - run: node --check london_project_claude_console/server/server.js && node --check london_project_claude_console/lib/githubActions.js && node --check london_project_claude_console/public/registry.js
+      - run: python scripts/audit_no_vps_runtime.py
