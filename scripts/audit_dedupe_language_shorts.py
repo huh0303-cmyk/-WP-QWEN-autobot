@@ -19,8 +19,8 @@ def svc(code):
  return build("youtube","v3",credentials=c,cache_discovery=False)
 def norm(s):
  s=unicodedata.normalize("NFKC",s).casefold()
- s=re.sub(r"#shorts?\b","",s)
- return re.sub(r"[^\w]+","",s,flags=re.UNICODE)
+ s=re.sub(r"#shorts?\\b","",s)
+ return re.sub(r"[^\\w]+","",s,flags=re.UNICODE)
 def videos(api,cid,limit):
  rows=api.channels().list(part="contentDetails",id=cid).execute().get("items",[])
  if len(rows)!=1: raise RuntimeError(f"Cannot resolve uploads playlist {cid}")
@@ -65,6 +65,6 @@ def main():
     report["actions"].append(action); losers+=1
   report["channels"].append({"language":code,"videos_scanned":len(allv),"duplicate_losers":losers,"status":"SCANNED"})
  path=OUT/f"duplicate_audit_{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
- path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
  print(json.dumps({"mode":report["mode"],"channels":report["channels"],"actions":report["actions"],"report_path":str(path)},ensure_ascii=False,indent=2))
 if __name__=="__main__": main()
