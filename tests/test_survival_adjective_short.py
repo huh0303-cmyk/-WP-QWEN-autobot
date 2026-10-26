@@ -52,3 +52,26 @@ def test_randomized_timing_never_intentionally_targets_29_seconds():
             planned = intro + outro + sum(durations)
         assert not 28.5 <= planned < 29.5
         assert all(1.8 <= duration <= 4.0 for duration in durations)
+
+
+
+def test_daily_curriculum_uses_every_catalog_pair_before_repeating():
+    catalog = json.loads(Path(PAIR_PATH).read_text(encoding="utf-8"))
+    anchor = dt.date(2026, 10, 5)
+    pairs = [
+        select_pair(anchor + dt.timedelta(days=offset), None)["id"]
+        for offset in range(len(catalog["pairs"]))
+    ]
+    assert len(pairs) == len(set(pairs)) == len(catalog["pairs"])
+    assert select_pair(anchor + dt.timedelta(days=len(catalog["pairs"])), None)["id"] == pairs[0]
+
+
+def test_daily_curriculum_spreads_noun_lessons_instead_of_repeating_them_every_six_days():
+    anchor = dt.date(2026, 10, 5)
+    first_cycle = [
+        select_pair(anchor + dt.timedelta(days=offset), None)
+        for offset in range(30)
+    ]
+    noun_positions = [index for index, pair in enumerate(first_cycle) if pair.get("category") == "noun"]
+    assert len(noun_positions) == 3
+    assert all((right - left) >= 7 for left, right in zip(noun_positions, noun_positions[1:]))
