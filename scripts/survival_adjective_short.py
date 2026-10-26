@@ -79,21 +79,26 @@ def select_pair(target_date: dt.date, pair_id: str | None) -> dict:
             if pair["id"] == pair_id:
                 return pair
         raise ValueError(f"Unknown pair id: {pair_id}")
-    # Each calendar date must resolve to a distinct lesson, including manual
-    # reruns on Tuesday/Thursday/weekends. The old weekday-slot mapping mapped
-    # Mon+Tue and Wed+Thu to the same release_index, causing duplicate pairs.
-    # Keep the Oct 5, 2026 curriculum anchor and derive the lesson from elapsed
-    # calendar days so a rerun on a different date cannot silently repeat it.
-    anchor_monday = dt.date(2026, 10, 5)
-    release_index = (target_date - anchor_monday).days
-    category = "adjective" if release_index % 2 == 0 else "noun"
-    options = [row for row in pairs if row.get("category", "adjective") == category]
-    if not options:
-        raise RuntimeError(f"Vocabulary catalog has no {category} lessons")
-    # Start beyond the pair just published in the one-off correction on Oct 3.
-    # Later releases continue in catalog order and alternate category.
-    start_offset = 3 if category == "adjective" else 0
-    return options[(release_index // 2 + start_offset) % len(options)]
+
+    # The previous category-first selector cycled through only THREE noun
+    # lessons while the catalog had 30 adjective lessons. This silently
+    # repeated noun content every six days (sun-moon, book-phone, water-coffee).
+    # Build one deterministic 33-lesson cycle from the entire catalog and
+    # spread the smaller category across the cycle. No pair repeats until
+    # every catalog entry has been used once.
+    adjectives = [row for row in pairs if row.get("category", "adjective") != "noun"]
+    nouns = [row for row in pairs if row.get("category", "adjective") == "noun"]
+    if not adjectives or not nouns:
+        raise RuntimeError("Vocabulary catalog must contain adjective and noun lessons")
+    ordered = list(adjectives)
+    # Insert nouns at evenly spaced positions rather than clustering them.
+    for index, noun in enumerate(nouns):
+        position = round((index + 1) * (len(adjectives) + 1) / (len(nouns) + 1))
+        ordered.insert(min(position, len(ordered)), noun)
+
+    anchor_date = dt.date(2026, 10, 5)
+    release_index = (target_date - anchor_date).days
+    return ordered[release_index % len(ordered)]
 
 
 def channel_map() -> dict[str, dict]:
@@ -367,11 +372,15 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
         "duration_seconds": round(duration, 3),
         "duration_policy": "date-language-pair-seeded randomized slide timing; 1.8-4.0s per word repetition, randomized intro/outro",
         "title": title,
+        # Stable semantic key lets the publisher recognize the same lesson
+        # even when a rerun generates a different date or video file.
+        "content_key": f"{code}:{pair['id']}",
         "description": (
             f"{words[0]} ({readings[0]}) means {meanings[0]}; {words[1]} ({readings[1]}) means {meanings[1]}. "
-            f"Short {category} pronunciation practice: listen, pause, and repeat each word aloud. #languagelearning #Shorts"
+            f"Short {category} pronunciation practice: listen, pause, and repeat each word aloud. "
+            f"Lesson ID: {pair['id']} | Content key: {code}:{pair['id']}. #languagelearning #Shorts"
         ),
-        "tags": ["language learning", "pronunciation", "listen and repeat", pair["id"], "Shorts"],
+        "tags": ["language learning", "pronunciation", "listen and repeat", pair["id"], f"lesson-{pair['id']}", f"content-{code}-{pair['id']}", "Shorts"],
         "publication_status": "generated_not_uploaded",
     }
     manifest_path = destination / "manifest.json"
