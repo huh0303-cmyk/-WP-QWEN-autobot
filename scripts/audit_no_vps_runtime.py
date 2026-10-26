@@ -49,7 +49,7 @@ def main() -> int:
         print("VPS/n8n runtime dependency scan failed:")
         print("\n".join(findings))
         return 1
-    print("VPS/n8n runtime dependency scan: PASS (one documented orphan module excluded)")
+    print("VPS/n8n runtime dependency scan: PASS")
     return 0
 
 
