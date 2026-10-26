@@ -294,8 +294,13 @@ async def build_language(target_date: dt.date, pair: dict, code: str, channel: d
     # YouTube displays rounded seconds. Avoid the conspicuous 0:29 duration
     # even if the randomized timing happens to land in the 28.5–29.5s window.
     planned_duration = intro_duration + outro_duration + sum(word_durations)
-    if round(planned_duration) == 29:
-        word_durations[0] = round(word_durations[0] + (1.15 if word_durations[0] <= 2.85 else -1.15), 2)
+    if 28.5 <= planned_duration < 29.5:
+        adjustable = next((i for i, value in enumerate(word_durations) if value <= 2.8), None)
+        if adjustable is not None:
+            word_durations[adjustable] = round(word_durations[adjustable] + 1.1, 2)
+        else:
+            adjustable = next(i for i, value in enumerate(word_durations) if value >= 3.0)
+            word_durations[adjustable] = round(word_durations[adjustable] - 1.1, 2)
     audio_tracks = []
     for index, duration in enumerate(word_durations):
         letter = "a" if index % 2 == 0 else "b"
