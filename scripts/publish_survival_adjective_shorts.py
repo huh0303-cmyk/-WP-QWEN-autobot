@@ -149,21 +149,24 @@ def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[di
 
 
 def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None:
-    """Block a new upload if its title or both target words match a recent upload."""
+    """Block only a matching existing title or matching word pair in the title.
+
+    Reusing vocabulary in a later lesson is allowed; matching only words in an
+    old description would incorrectly block legitimate curriculum repetition.
+    """
+    import re
     title_key = normalized_title(manifest["title"])
     words = [str(w).strip().casefold() for w in manifest.get("words", []) if str(w).strip()]
-    if len(words) < 2:
-        raise RuntimeError("Duplicate guard requires both vocabulary words")
     rows = recent_channel_videos(service, channel_id)
     duplicates = []
     for video in rows:
         snippet = video.get("snippet", {})
         old_title = snippet.get("title", "")
         old_key = normalized_title(old_title)
-        old_text = (old_title + " " + snippet.get("description", "")).casefold()
+        old_title_folded = old_title.casefold()
         exact_title = bool(title_key and old_key == title_key)
-        both_words = all(word in old_text for word in words)
-        if exact_title or both_words:
+        both_words_in_title = len(words) >= 2 and all(word in old_title_folded for word in words)
+        if exact_title or both_words_in_title:
             stats = video.get("statistics", {})
             duplicates.append({
                 "video_id": video.get("id"),
