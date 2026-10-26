@@ -1,0 +1,135 @@
+name: London Four-Agent Pipeline — GitHub Only
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_id:
+        description: Registry site ID to process
+        required: true
+        type: string
+      category:
+        description: Exact destination category (required for WordPress)
+        required: false
+        type: string
+      publish_mode:
+        description: Draft, manual review, or public publication
+        required: true
+        type: choice
+        options: [manual, draft, publish]
+        default: manual
+      confirm_run:
+        description: Explicitly authorize research/write/image work (may call free-tier providers)
+        required: true
+        type: boolean
+        default: false
+      confirm_publication:
+        description: Explicitly authorize a public post if publish_mode=publish
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: london-four-agent-${{ inputs.site_id }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    if: ${{ inputs.confirm_run != true }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No pipeline work started. Dispatch again with confirm_run=true after checking the cost hold and destination credentials."
+
+  pipeline:
+    if: ${{ inputs.confirm_run == true }}
+    runs-on: ubuntu-latest
+    environment: london-project
+    timeout-minutes: 45
+    env:
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_RUN_ID: ${{ github.run_id }}
+      PIPELINE_PUBLISH_MODE: ${{ inputs.publish_mode }}
+      PIPELINE_COST_HOLD: ${{ vars.LONDON_PIPELINE_COST_HOLD }}
+      AI_TEXT_PROVIDER: auto_free
+      IMAGE_MODEL: auto_free
+      FORCE_SOURCE_IPV4: "true"
+      KHEALTH365COM: ${{ secrets.KHEALTH365COM }}
+      KOREAMEDICALTOURCOM: ${{ secrets.KOREAMEDICALTOURCOM }}
+      KOREAINVEST365COM: ${{ secrets.KOREAINVEST365COM }}
+      KIKOREACOM: ${{ secrets.KIKOREACOM }}
+      KOREAINSURANCE365COM: ${{ secrets.KOREAINSURANCE365COM }}
+      KFINANCE365COM: ${{ secrets.KFINANCE365COM }}
+      KOREATAXNLAWCOM: ${{ secrets.KOREATAXNLAWCOM }}
+      KOREACRYPTO365COM: ${{ secrets.KOREACRYPTO365COM }}
+      KREALESTATE365COM: ${{ secrets.KREALESTATE365COM }}
+      KTECH365COM: ${{ secrets.KTECH365COM }}
+      KSKIN365COM: ${{ secrets.KSKIN365COM }}
+      OLIVEYOUNGKOREACOM: ${{ secrets.OLIVEYOUNGKOREACOM }}
+      KWORLD365COM: ${{ secrets.KWORLD365COM }}
+      KTRIP365COM: ${{ secrets.KTRIP365COM }}
+      KVISA365COM: ${{ secrets.KVISA365COM }}
+      KOREAWEDDING365COM: ${{ secrets.KOREAWEDDING365COM }}
+      KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
+      STUDYINKOREA365COM: ${{ secrets.STUDYINKOREA365COM }}
+      KIECAKOREAORG: ${{ secrets.KIECAKOREAORG }}
+      KSAKOREAORG: ${{ secrets.KSAKOREAORG }}
+      SISKOREACOM: ${{ secrets.SISKOREACOM }}
+      JOBKOREA365COM: ${{ secrets.JOBKOREA365COM }}
+      JOBINKOREA365COM: ${{ secrets.JOBINKOREA365COM }}
+      JOBKOREAGLOBALCOM: ${{ secrets.JOBKOREAGLOBALCOM }}
+      KOREA365ORG: ${{ secrets.KOREA365ORG }}
+      BLOGGER_GOOGLE_CLIENT_ID: ${{ secrets.BLOGGER_GOOGLE_CLIENT_ID }}
+      BLOGGER_GOOGLE_CLIENT_SECRET: ${{ secrets.BLOGGER_GOOGLE_CLIENT_SECRET }}
+      BLOGGER_GOOGLE_REFRESH_TOKEN: ${{ secrets.BLOGGER_GOOGLE_REFRESH_TOKEN }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce cost hold and public-publish confirmation
+        env:
+          COST_HOLD: ${{ vars.LONDON_PIPELINE_COST_HOLD }}
+          MODE: ${{ inputs.publish_mode }}
+          CONFIRM_PUBLICATION: ${{ inputs.confirm_publication }}
+        run: |
+          set -euo pipefail
+          if [[ "${COST_HOLD,,}" != "false" ]]; then
+            echo "::error::Pipeline is blocked. Set LONDON_PIPELINE_COST_HOLD=false only after owner-approved cost review."
+            exit 1
+          fi
+          if [[ "$MODE" == "publish" && "$CONFIRM_PUBLICATION" != "true" ]]; then
+            echo "::error::Public publication requires confirm_publication=true."
+            exit 1
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install requests beautifulsoup4 Pillow google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib google-genai
+      - name: Run research, writing, image and final handoff sequentially
+        env:
+          SITE_ID: ${{ inputs.site_id }}
+          CATEGORY: ${{ inputs.category }}
+          MODE: ${{ inputs.publish_mode }}
+        run: |
+          set -euo pipefail
+          RUN_ID="gh-${GITHUB_RUN_ID}"
+          export PIPELINE_PUBLISH_MODE="$MODE"
+          python scripts/london_four_agent_pipeline.py --stage research --site-id "$SITE_ID" --run-id "$RUN_ID" --publish-mode "$MODE" --category "$CATEGORY"
+          python scripts/london_four_agent_pipeline.py --stage write --run-id "$RUN_ID" --publish-mode "$MODE"
+          python scripts/london_four_agent_pipeline.py --stage image --run-id "$RUN_ID" --publish-mode "$MODE"
+          python scripts/london_four_agent_pipeline.py --stage publish --run-id "$RUN_ID" --publish-mode "$MODE"
+      - name: Save pipeline state and receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: london-four-agent-${{ github.run_id }}
+          path: data/london-pipeline/
+          if-no-files-found: warn
+          retention-days: 30
