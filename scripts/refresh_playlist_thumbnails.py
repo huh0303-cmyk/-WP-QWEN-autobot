@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Refresh one review thumbnail per playlist channel through the approved image gateway.
+"""Refresh playlist thumbnails with collision-resistant, traceable asset names.
 
-Cost policy: one image per channel per manual refresh. The active youtube_playlist_maker
-policy module has already replaced legacy Gemini/OpenAI/Pexels/Pixabay image calls with
-the approved image gateway.
+Each render gets a topic-derived slug, UTC timestamp, and content hash. Never
+overwrite a previous local image or upload every channel as refresh_01.png.
 """
+import hashlib
 import os
+import re
 import sys
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -17,8 +19,14 @@ import youtube_playlist_maker as policy
 # globals such as CHANNEL_KEY affect the functions that actually execute.
 pm = policy.base
 
-THUMBNAILS_PER_CHANNEL = 1
 BANK_DIR = "thumbnail_bank"
+
+
+def unique_asset_stem(channel_key: str, topic: str) -> str:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    slug = re.sub(r"[^a-z0-9]+", "-", topic.lower()).strip("-")[:48] or "thumbnail"
+    digest = hashlib.sha256(f"{channel_key}|{topic}|{stamp}".encode("utf-8")).hexdigest()[:10]
+    return f"{channel_key}_{slug}_{stamp}_{digest}"
 
 
 def refresh_channel(channel_key: str):
@@ -32,8 +40,8 @@ def refresh_channel(channel_key: str):
 
     topic, _ = pm.pick_auto_topic()
     pm.log(f"[{channel_key}] topic: {topic}")
-    workdir = f"/tmp/thumb_refresh_{channel_key}"
-    os.makedirs(workdir, exist_ok=True)
+    workdir = os.path.join("/tmp", unique_asset_stem(channel_key, topic))
+    os.makedirs(workdir, exist_ok=False)
     try:
         image_paths = pm.build_ai_images(topic, workdir)
     except Exception as exc:
@@ -43,12 +51,16 @@ def refresh_channel(channel_key: str):
         pm.log("   ⚠️ no approved image generated, skip")
         return
 
-    out_path = os.path.join(out_dir, "01.png")
+    stem = unique_asset_stem(channel_key, topic)
+    out_path = os.path.join(out_dir, f"{stem}.png")
+    # Never clobber a prior asset if a provider returns an unexpected path.
+    if os.path.exists(out_path):
+        raise RuntimeError(f"Refusing to overwrite existing thumbnail: {out_path}")
     out_path = pm.make_channel_thumbnail(channel_key, image_paths[0], out_path, topic)
+    upload_name = os.path.basename(out_path)
     try:
-        thumb_ext = os.path.splitext(out_path)[1] or ".png"
-        pm.upload_to_drive(drive, out_path, thumb_folder_id, f"refresh_01{thumb_ext}")
-        pm.log("   ✅ Drive upload complete")
+        pm.upload_to_drive(drive, out_path, thumb_folder_id, upload_name)
+        pm.log(f"   ✅ Drive upload complete: {upload_name}")
     except Exception as exc:
         pm.log(f"   ⚠️ Drive upload failed (local copy retained): {exc}")
 
