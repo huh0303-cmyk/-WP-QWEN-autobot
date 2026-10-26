@@ -1,4 +1,5 @@
 name: London Four-Agent Pipeline — GitHub Only
+run-name: "London Pipeline · ${{ inputs.site_id }} · ${{ inputs.run_id }}"
 
 on:
   workflow_dispatch:
@@ -6,6 +7,10 @@ on:
       site_id:
         description: Registry site ID to process
         required: true
+        type: string
+      run_id:
+        description: Optional correlation ID from the operator console
+        required: false
         type: string
       category:
         description: Exact destination category (required for WordPress)
@@ -117,9 +122,10 @@ jobs:
           SITE_ID: ${{ inputs.site_id }}
           CATEGORY: ${{ inputs.category }}
           MODE: ${{ inputs.publish_mode }}
+          REQUESTED_RUN_ID: ${{ inputs.run_id }}
         run: |
           set -euo pipefail
-          RUN_ID="gh-${GITHUB_RUN_ID}"
+          RUN_ID="${REQUESTED_RUN_ID:-gh-${GITHUB_RUN_ID}}"
           export PIPELINE_PUBLISH_MODE="$MODE"
           python scripts/london_four_agent_pipeline.py --stage research --site-id "$SITE_ID" --run-id "$RUN_ID" --publish-mode "$MODE" --category "$CATEGORY"
           python scripts/london_four_agent_pipeline.py --stage write --run-id "$RUN_ID" --publish-mode "$MODE"
