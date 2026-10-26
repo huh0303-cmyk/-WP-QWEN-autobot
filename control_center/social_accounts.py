@@ -11,7 +11,7 @@ from flask import jsonify, render_template, request
 from automation_hub.github_youtube_dispatch import dispatch_youtube_job
 
 
-ROOT = Path("/opt/korea365")
+ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 INVENTORY = ROOT / "config" / "london_social_account_inventory_2026-09-24.json"
 SNS_POLICY = ROOT / "config" / "sns_six_channel_policy.json"
