@@ -1,8 +1,10 @@
 """Read-only channel identity and approved asset inventory before rendering."""
 import json, os, sys
 from pathlib import Path
-values=json.loads(Path('/etc/korea365/youtube-runtime.json').read_text());os.environ.update(values)
 os.environ['CHANNEL_KEY']=sys.argv[1]
+required=('GOOGLE_OAUTH_CLIENT_ID','GOOGLE_OAUTH_CLIENT_SECRET','GOOGLE_OAUTH_REFRESH_TOKEN')
+missing=[name for name in required if not os.environ.get(name)]
+if missing:raise SystemExit('Missing GitHub Actions environment credentials: '+', '.join(missing))
 import youtube_playlist_maker as maker
 from collections import Counter
 service=maker.base.get_drive_service()
