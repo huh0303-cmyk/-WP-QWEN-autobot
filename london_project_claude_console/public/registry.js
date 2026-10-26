@@ -25,7 +25,7 @@
   ];
 
   const OWNER_LABEL = {
-    gpt_n8n: "GPT트랙(GitHub Actions) — 대시보드+트리거",
+    gpt_github_actions: "GPT트랙(GitHub Actions) — 대시보드+트리거",
     claude_console: "이 콘솔이 직접 발행",
   };
 
@@ -225,7 +225,7 @@
       const warn = summary.needsConfirmation.length
         ? ` — ⚠ 확인 필요: ${summary.needsConfirmation.join(", ")}`
         : "";
-      summaryText.textContent = `총 ${summary.total}개 (${byPlat}) · 이 콘솔 직접 발행 ${summary.claudeConsoleOwned} / GPT트랙(GitHub Actions) 대시보드+트리거 ${summary.gptN8nDashboardOnly}${warn}`;
+      summaryText.textContent = `총 ${summary.total}개 (${byPlat}) · 이 콘솔 직접 발행 ${summary.claudeConsoleOwned} / GPT트랙(GitHub Actions) 대시보드+트리거 ${summary.gptGithubActionsOnly}${warn}`;
       render();
     } catch (err) {
       summaryText.textContent = "불러오기 실패: " + err.message;
