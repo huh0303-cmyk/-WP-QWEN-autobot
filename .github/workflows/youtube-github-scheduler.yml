@@ -2,7 +2,7 @@ name: YouTube GitHub Calendar Scheduler
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
