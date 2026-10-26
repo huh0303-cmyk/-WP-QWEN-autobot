@@ -134,24 +134,22 @@ def apply_wp(site_cfg, pid, title):
 
 
 def main():
+    scope = os.environ.get("RETITLE_SCOPE", "all").strip().lower()
+    if scope not in {"all", "blogger", "wordpress"}:
+        raise ValueError("RETITLE_SCOPE must be all, blogger, or wordpress")
     cfg = json.loads((ROOT / "config/automation_hub_sites.json").read_text(encoding="utf-8"))
     cfg = cfg if isinstance(cfg, list) else cfg["sites"]
     wp = {s["site_id"]: s for s in cfg if s["platform"] == "wordpress" and s.get("enabled", True)}
     data = {}
-    for sid, s in wp.items():
-        try:
-            data[sid] = A.wp_titles(s["url"])
-        except Exception as e:
-            print("WP FAIL", sid, e)
-    data.update(A.blogger_titles())
+    if scope in {"all", "wordpress"}:
+        for sid, s in wp.items():
+            try:
+                data[sid] = A.wp_titles(s["url"])
+            except Exception as e:
+                print("WP FAIL", sid, e)
+    if scope in {"all", "blogger"}:
+        data.update(A.blogger_titles())
     flagged = flag(data)
-    scope = os.environ.get("RETITLE_SCOPE", "all").strip().lower()
-    if scope == "blogger":
-        flagged = {k: v for k, v in flagged.items() if k[0].startswith("blogger_")}
-    elif scope == "wordpress":
-        flagged = {k: v for k, v in flagged.items() if k[0].startswith("wp_")}
-    elif scope != "all":
-        raise ValueError("RETITLE_SCOPE must be all, blogger, or wordpress")
     banned = banned_list(data)
     print(f"posts={sum(len(v) for v in data.values())} flagged={len(flagged)} apply={APPLY}")
     by_id = {(s, str(r["id"])): r for s, rs in data.items() for r in rs}
