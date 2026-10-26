@@ -24,7 +24,7 @@ def test_catalog_has_a_full_month_of_localized_pairs():
 
 
 def test_first_day_is_the_requested_long_short_example():
-    pair = select_pair(dt.date(2026, 10, 1), None)
+    pair = select_pair(dt.date(2026, 10, 1), "long-short")
     assert pair["id"] == "long-short"
     assert pair["ko"] == ["길다", "짧다"]
     assert pair["en"] == ["long", "short"]
