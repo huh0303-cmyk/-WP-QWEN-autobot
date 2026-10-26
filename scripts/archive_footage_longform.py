@@ -36,7 +36,7 @@ def _reviewed_image(channel_key: str, workdir: str) -> str:
         raise RuntimeError(f"WAITING_ASSETS: no reviewed knowledge image mapping for {channel_key}")
     root = Path(os.environ.get(
         "KNOWLEDGE_OWNER_IMAGE_ROOT",
-        f"/opt/korea365/assets/youtube/knowledge/{episode_date}",
+        str(Path(__file__).resolve().parents[1] / "assets" / "youtube" / "knowledge" / episode_date),
     )).resolve()
     source = (root / filename).resolve()
     if source.parent != root or not source.is_file():
