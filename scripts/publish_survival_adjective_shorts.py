@@ -114,6 +114,71 @@ def make_old_video_private(service, video_id: str, expected_channel_id: str) -> 
     return {"video_id": video_id, "privacy_status": "private"}
 
 
+
+def normalized_title(value: str) -> str:
+    """Normalize titles for conservative duplicate detection."""
+    import re
+    import unicodedata
+    value = unicodedata.normalize("NFKC", value).casefold()
+    value = re.sub(r"#shorts?\\b", "", value)
+    return re.sub(r"[^\\w]+", "", value, flags=re.UNICODE)
+
+
+def recent_channel_videos(service, channel_id: str, limit: int = 100) -> list[dict]:
+    """Read recent uploads from this exact channel; read-only duplicate audit."""
+    channels = service.channels().list(part="contentDetails", id=channel_id).execute().get("items", [])
+    if len(channels) != 1:
+        raise RuntimeError(f"Cannot resolve uploads playlist for channel {channel_id}")
+    playlist_id = channels[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    ids = []
+    page_token = None
+    while len(ids) < limit:
+        result = service.playlistItems().list(
+            part="contentDetails", playlistId=playlist_id, maxResults=min(50, limit-len(ids)),
+            pageToken=page_token,
+        ).execute()
+        ids.extend(row["contentDetails"]["videoId"] for row in result.get("items", []))
+        page_token = result.get("nextPageToken")
+        if not page_token:
+            break
+    videos = []
+    for offset in range(0, len(ids), 50):
+        result = service.videos().list(part="snippet,statistics,status", id=",".join(ids[offset:offset+50])).execute()
+        videos.extend(result.get("items", []))
+    return videos
+
+
+def assert_no_recent_duplicate(service, manifest: dict, channel_id: str) -> None:
+    """Block a new upload if its title or both target words match a recent upload."""
+    title_key = normalized_title(manifest["title"])
+    words = [str(w).strip().casefold() for w in manifest.get("words", []) if str(w).strip()]
+    if len(words) < 2:
+        raise RuntimeError("Duplicate guard requires both vocabulary words")
+    rows = recent_channel_videos(service, channel_id)
+    duplicates = []
+    for video in rows:
+        snippet = video.get("snippet", {})
+        old_title = snippet.get("title", "")
+        old_key = normalized_title(old_title)
+        old_text = (old_title + " " + snippet.get("description", "")).casefold()
+        exact_title = bool(title_key and old_key == title_key)
+        both_words = all(word in old_text for word in words)
+        if exact_title or both_words:
+            stats = video.get("statistics", {})
+            duplicates.append({
+                "video_id": video.get("id"),
+                "title": old_title,
+                "views": int(stats.get("viewCount", 0)),
+                "published_at": snippet.get("publishedAt", ""),
+                "privacy_status": video.get("status", {}).get("privacyStatus", "unknown"),
+            })
+    if duplicates:
+        duplicates.sort(key=lambda row: (-row["views"], row["published_at"]))
+        raise RuntimeError(
+            "Duplicate upload blocked for safety. Existing matching video(s): "
+            + json.dumps(duplicates[:5], ensure_ascii=False)
+        )
+
 def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None) -> dict:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     code = manifest["language_code"]
@@ -127,7 +192,7 @@ def publish_one(manifest_path: Path, privacy: str, publish_at: str | None = None
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         verified_video(service, receipt["video_id"], expected_channel, privacy, publish_at)
         return receipt
-    video_path = Path(manifest["video_path"])
+    # Fail closed if the same title or vocabulary pair already exists on this channel.\n    assert_no_recent_duplicate(service, manifest, expected_channel)\n    video_path = Path(manifest["video_path"])
     if not video_path.exists():
         raise FileNotFoundError(video_path)
     status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
