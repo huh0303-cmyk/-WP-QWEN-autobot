@@ -29,7 +29,7 @@ def test_node_console_uses_github_actions_routes_not_n8n_gateway():
 def test_scheduler_is_disabled_without_explicit_owner_flags():
     workflow = (ROOT / ".github/workflows/youtube-github-scheduler.yml").read_text(encoding="utf-8")
     script = (ROOT / "scripts/youtube_github_scheduler.py").read_text(encoding="utf-8")
-    assert "*/15 * * * *" in workflow
+    assert 'cron: "17 * * * *"' in workflow
     assert "YOUTUBE_AUTO_PUBLISH_ENABLED" in workflow
     assert "YOUTUBE_COST_HOLD" in workflow
     assert "has_due_calendar_row" in script
