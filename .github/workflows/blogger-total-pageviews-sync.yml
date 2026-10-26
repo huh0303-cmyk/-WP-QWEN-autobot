@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install playwright -q
-      - run: python -m playwright install --with-deps chromium
+      - run: python -m playwright install chromium
       - name: Render Blogger widgets and update the Control dashboard feed
         env:
           PAGEVIEWS_SITE_KEY: ${{ inputs.site_key || '' }}
