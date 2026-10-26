@@ -27,7 +27,7 @@ CONTENT="""<p>Preparing for TOPIK does not have to mean studying for hours every
 <p>Before relying on any score requirement, check the current admissions notice from the university or program you plan to apply to. Requirements can differ by school, department and admission track.</p>"""
 
 def main():
-    creds_path=Path(os.environ.get("VPS_WP_CREDENTIALS","/etc/korea365/wp-sites.json"))
+    creds_path=Path(os.environ.get("WP_CREDENTIALS_FILE",str(Path(__file__).resolve().parents[1]/"config"/"wp-sites.json")))
     creds=json.loads(creds_path.read_text(encoding="utf-8"))
     pw=creds.get(SECRET,"")
     if not pw: raise SystemExit("credential missing")
