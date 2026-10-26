@@ -56,3 +56,16 @@ Owner directive: VPS is no longer used. GitHub is the execution and source-of-tr
 ## Current status
 
 This commit records the owner's binding migration decision and the concrete blockers found in the current repository. It is not evidence that the full publisher has already been ported or that uploads are running from GitHub Actions. The next code change must replace the current plan-only playlist scheduler with a GitHub-native queue/runner and test it against CAFE_MOZART's exact channel ID `UC7jOhyMa-FIrzZuea97z1Pw` before enabling publication.
+
+## Status update — 2026-10-26
+
+The 2026-10-26 migration branch supersedes the earlier VPS worker plan. The previously inventoried 21 SSH-based workflows, VPS systemd/deploy assets, n8n container/gateway assets, and server-only worker entry points have been retired from this branch. Control-center YouTube actions now dispatch the GitHub-hosted workflow.
+
+New execution path:
+- `.github/workflows/youtube-github-worker.yml`
+- `scripts/youtube_github_worker.py`
+- `automation_hub/youtube_github_runtime.py`
+
+The worker is manual-only, requires explicit publication confirmation, and fails closed unless the `youtube-channels` environment variable `YOUTUBE_COST_HOLD` is explicitly `false`. Do not re-enable scheduled public uploads until the focused CI tests, read-only OAuth identity checks, and an authorized destination-verified canary pass.
+
+Remaining blockers: legacy module `automation_hub/youtube_vps_queue.py` still exists; some legacy code/docs retain server path references; the 10-channel automatic schedule is not yet restored; Naver/Tistory require supported non-interactive auth before they can be considered GitHub-migrated. Current acceptance criteria live in `docs/GITHUB_ONLY_NO_VPS_MIGRATION_INVENTORY_2026-10-26.md`.

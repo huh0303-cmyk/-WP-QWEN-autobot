@@ -4,9 +4,9 @@
  *
  * 범위 결정(2026-09-27, Chairman 확인): "대시보드+트리거만" 방식.
  *   - naver / tistory: 이 콘솔이 직접 소유·발행(jobRunner.js/naverPublisher.js/tistoryPublisher.js).
- *   - wordpress / blogspot / news: 실제 발행 로직은 GPT/PM 트랙의 n8n·GitHub Actions 파이프라인이
+ *   - wordpress / blogspot / news: 실제 발행 로직은 GPT/PM 트랙의 GitHub Actions 파이프라인이
  *     계속 소유한다. 이 레지스트리는 그 60+2개 사이트의 persona/tone/글자수 설정을 "읽기 전용"으로
- *     보여주고, 필요하면 scripts/n8n_gateway.py를 통해 기존 서비스를 트리거만 한다.
+ *     보여주고, 필요하면 GitHub Actions API를 통해 기존 서비스를 트리거만 한다.
  *     (여기서 WP/Blogspot/뉴스용 발행 코드를 재구현하지 않는다 — GPT 트랙 OWNER LOCKED 범위와
  *     충돌 방지를 위한 의도적 설계.)
  *
@@ -109,7 +109,7 @@ function buildBaseRegistry() {
         site_id: `wp_${p.site_key}`,
         source_site_id: p.source_site_id || null,
         platform: "wordpress",
-        owner_track: "gpt_n8n", // 대시보드+트리거만
+        owner_track: "gpt_github_actions", // 대시보드+트리거만
         language: p.language || w.language || null,
         url: w.url,
         persona: w.persona || "",
@@ -119,7 +119,7 @@ function buildBaseRegistry() {
         target_chars: w.target_chars ?? null,
         max_chars: w.max_chars ?? null,
         image_count: defaultImageCount(w.target_chars),
-        n8n_action: "wp25_tick",
+        github_action: "wp25_tick",
         yesterday_visitors: wpTraffic.map[domainFromUrl(w.url)] ?? null,
         traffic_checked_at: wpTraffic.checkedAt,
       });
@@ -130,7 +130,7 @@ function buildBaseRegistry() {
         site_id: `blogspot_${p.site_key}`,
         source_site_id: p.source_site_id || null,
         platform: "blogspot",
-        owner_track: "gpt_n8n",
+        owner_track: "gpt_github_actions",
         language: p.language || null,
         url: b.url,
         yesterday_visitors: blogspotTraffic.map[(b.url || "").replace(/\/$/, "")] ?? null,
@@ -141,7 +141,7 @@ function buildBaseRegistry() {
         target_chars: b.target_chars ?? null,
         max_chars: b.max_chars ?? null,
         image_count: defaultImageCount(b.target_chars),
-        n8n_action: "blogger33_daily",
+        github_action: "blogger33_daily",
       });
     }
   }
@@ -155,7 +155,7 @@ function buildBaseRegistry() {
       entries.push({
         site_id: `news_${domain.replace(/[^a-z0-9]/gi, "_")}`,
         platform: "news",
-        owner_track: "gpt_n8n",
+        owner_track: "gpt_github_actions",
         url: cfg.url || `https://${domain}`,
         persona: cfg.persona || "",
         tone: cfg.tone || "",
@@ -163,7 +163,7 @@ function buildBaseRegistry() {
         target_chars: cfg.target_chars ?? 1100,
         max_chars: cfg.max_chars ?? 1500,
         image_count: defaultImageCount(cfg.target_chars ?? 1100),
-        n8n_action: "news2",
+        github_action: "news2",
       });
     }
   } else {
@@ -175,7 +175,7 @@ function buildBaseRegistry() {
       entries.push({
         site_id: `news_${domain.replace(/[^a-z0-9]/gi, "_")}`,
         platform: "news",
-        owner_track: "gpt_n8n",
+        owner_track: "gpt_github_actions",
         url,
         persona: "",
         tone: "",
@@ -183,7 +183,7 @@ function buildBaseRegistry() {
         target_chars: 1100,
         max_chars: 1500,
         image_count: 2,
-        n8n_action: "news2",
+        github_action: "news2",
       });
     }
   }
@@ -293,7 +293,7 @@ function summary(runtimeRoot) {
     total: sites.length,
     byPlatform,
     claudeConsoleOwned: sites.filter((s) => s.owner_track === "claude_console").length,
-    gptN8nDashboardOnly: sites.filter((s) => s.owner_track === "gpt_n8n").length,
+    gptGithubActionsOnly: sites.filter((s) => s.owner_track === "gpt_github_actions").length,
     needsConfirmation: sites.filter((s) => s.needs_confirmation).map((s) => s.site_id),
   };
 }

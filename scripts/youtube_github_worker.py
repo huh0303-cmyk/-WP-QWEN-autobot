@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run all YouTube generation/render/upload jobs on the VPS, one at a time."""
+"""Run one YouTube generation/render/upload job on a GitHub Actions runner."""
 from __future__ import annotations
 
 import argparse
@@ -20,7 +20,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from automation_hub.youtube_calendar import KST, read_calendar, select_due, select_next_ready, update_row
 from automation_hub.youtube_registry import load_channels
-from automation_hub.youtube_vps_queue import enqueue, queue_root, cost_hold_active, check_cost_hold
+from automation_hub.youtube_github_runtime import enqueue, queue_root, cost_hold_active, check_cost_hold
 from gsheets_direct import get_sheets_service
 
 
@@ -75,7 +75,7 @@ def _claim(job: dict) -> tuple[object, str]:
     row = selected[0]
     token = uuid.uuid4().hex
     marker = f"[yt-calendar:{row['id']}:{token}]"
-    note = "운영자 VPS 즉시 제작·공개 요청" if job.get("run_now") else "VPS 예약 제작·즉시 공개 요청"
+    note = "운영자 GitHub Actions 즉시 제작·공개 요청" if job.get("run_now") else "GitHub Actions 예약 제작·즉시 공개 요청"
     update_row(service, sid, row, "자료수집", "", row["notes"] + f"\n{marker} {note}; 업로드 상태 PUBLIC")
     return row, token
 
@@ -138,8 +138,7 @@ def run_job(job: dict) -> None:
         env.update(CHANNEL_KEY=row["key"], TOPIC=row["topic"], LANGUAGE=row.get("language", ""),
                    TOPIC_KEYWORD=row["topic"], LANGUAGE_KEYWORD=row.get("language", ""), SCHEDULE_ID=row["id"],
                    EPISODE_DATE=row["when"].date().isoformat(),
-                   CLAIM_TOKEN=token, VPS_JOB_ID=job["job_id"], WORKER_WORKFLOW="youtube-vps-worker",
-                   GITHUB_RUN_ATTEMPT="1")
+                   CLAIM_TOKEN=token, GITHUB_JOB_ID=job["job_id"], WORKER_WORKFLOW="youtube-github-worker")
         result_path = "artifacts/youtube_playlist_result.json" if channel.channel_type == "playlist" else "artifacts/youtube_curio_result.json"
         target = ROOT / result_path
         target.unlink(missing_ok=True)
@@ -183,6 +182,7 @@ def process_one() -> bool:
             run_job(job)
         except Exception:
             os.replace(running, root / "failed" / running.name)
+            raise
         else:
             os.replace(running, root / "completed" / running.name)
         return True
@@ -204,6 +204,8 @@ def main() -> int:
         channel = next(item for item in load_channels() if item.channel_key == args.enqueue_channel)
         enqueue(channel.channel_key, channel.official_name or channel.display_name,
                 f"youtube_{channel.channel_key}", run_now=True)
+        if not process_one():
+            raise RuntimeError("GitHub worker did not claim the newly enqueued job")
         return 0
     while True:
         worked = process_one()

@@ -31,7 +31,7 @@ def _gemini_thumbnail(topic: str, hero_frame_path: str, workdir: str):
         raise RuntimeError("WAITING_ASSETS: EPISODE_DATE is required for a unique NASA image")
     root = Path(os.environ.get(
         "KNOWLEDGE_OWNER_IMAGE_ROOT",
-        f"/opt/korea365/assets/youtube/knowledge/{episode_date}",
+        str(Path(__file__).resolve().parents[1] / "assets" / "youtube" / "knowledge" / episode_date),
     )).resolve()
     source = (root / "nasa-source.png").resolve()
     if source.parent != root or not source.is_file():

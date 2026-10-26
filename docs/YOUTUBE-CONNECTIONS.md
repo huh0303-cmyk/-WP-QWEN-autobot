@@ -21,17 +21,15 @@ Playlist 5 and knowledge 5: all ten channel identities verified with actual API 
 - NASA_XFILES: `UCtNLZO07Oh3UnXPI2CjOgNg`
 - RETRO_USA1: `UCwh49EokdWFJqYFE_zA6XDQ`
 
-## Runtime
-- VPS systemd `korea365-channel-metrics.timer` invokes `korea365-channel-metrics.service` daily.
-- Collectors execute direct Analytics, public metrics, then Windsor metrics in that order.
-- Output `/opt/korea365/data/account-audience-metrics.json` is read by the control center account cards.
-- Evidence `/opt/korea365/data/windsor-youtube-connection-proof.json`.
-- Credentials remain ONLY in restricted VPS `/etc/korea365/youtube-runtime.json` and `/etc/korea365/windsor-analytics.json`; never commit their contents.
-- Windsor API returned HTTP 200, 75 daily channel rows, latest available date 2026-09-20. Missing yesterday is pending, never a fabricated zero.
-- Windsor trial supports 15 selected accounts, expires 2026-10-23. No payment authorized. Health Clinic Japan and USA are authorized but not selected for daily Windsor collection. Other unverified channels are not marked complete.
-- The old Google brand `Chinese Survival` resolved to CAFE_STARBUCKSVIBES. Brand labels MUST NOT be used as channel identity.
-- Reauthorization can change Windsor numeric account IDs; use the selected-account IDs shown in its preview and verify the real YouTube IDs.
-- This is analytics collection, not a new publishing authorization. YouTube/SNS remain subject to content-specific final approval. No publication queues were changed.
+## Runtime — GitHub-only target
+
+- VPS systemd collection and server-local runtime files are retired. Do not use /opt/korea365 or /etc/korea365.
+- GitHub-hosted workflows must use the youtube-channels environment and scoped GitHub Actions secrets.
+- The current youtube-github-worker.yml is manual-only, one channel per run, and blocked unless YOUTUBE_COST_HOLD is explicitly false and the operator confirms publication.
+- The worker is not considered production-verified until a read-only OAuth check confirms the exact locked channel ID and a permitted canary returns a verified receipt.
+- Analytics collection must be implemented as a GitHub Actions workflow with explicit artifacts/receipts; no old VPS timer should be treated as active.
+- Never commit tokens, API keys, full OAuth URLs, or secret JSON. This record lists only public channel IDs and connection metadata.
+- This is analytics connection documentation, not publishing authorization. Channel IDs are the identity source; display names are not.
 
 ## Recovery
 Read this record first, then check the timer and latest evidence. Retry stored credentials before asking for login. Never put tokens, API keys or full OAuth URLs in this repository. Do not claim that a third-party trial is permanent free operation.

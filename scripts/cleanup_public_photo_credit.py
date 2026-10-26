@@ -29,15 +29,15 @@ from site_registry import SITES
 WP_USER = os.getenv("WP_USER", "huh0303@gmail.com")
 APPLY = os.getenv("PHOTO_CREDIT_CLEANUP_APPLY", "false").strip().lower() in {"1", "true", "yes", "on"}
 REPORT = ROOT / "artifacts" / "photo-credit-cleanup.json"
-VPS_CREDENTIALS = Path(os.getenv("VPS_WP_CREDENTIALS", "/etc/korea365/wp-sites.json"))
+WP_CREDENTIALS_FILE = Path(os.getenv("WP_CREDENTIALS_FILE", ROOT / "config" / "wp-sites.json"))
 
 
 def _credential_map() -> dict[str, str]:
-    """Use environment secrets in Actions, or the root-only provisioned VPS credential map."""
+    """Use environment-scoped secrets in Actions, or an explicitly configured local credential file."""
     values: dict[str, str] = {}
-    if VPS_CREDENTIALS.exists():
+    if WP_CREDENTIALS_FILE.exists():
         try:
-            loaded = json.loads(VPS_CREDENTIALS.read_text(encoding="utf-8"))
+            loaded = json.loads(WP_CREDENTIALS_FILE.read_text(encoding="utf-8"))
             if isinstance(loaded, dict):
                 values.update({str(k): str(v) for k, v in loaded.items() if str(v).strip()})
         except (OSError, ValueError, TypeError):

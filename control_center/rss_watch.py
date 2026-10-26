@@ -9,13 +9,16 @@ import html
 import re
 import json
 import time
+import os
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
 from pathlib import Path
 
-NEWSROOM_COST_HOLD = Path("/etc/korea365/newsroom-cost-hold")
+def newsroom_cost_hold_active() -> bool:
+    value = os.environ.get("NEWSROOM_COST_HOLD", "true").strip().lower()
+    return value not in {"false", "0", "no", "off"}
 NEWSROOM_DAILY_TARGET_MIN = 1
 NEWSROOM_DAILY_MAX = 1
 KST = timezone(timedelta(hours=9))
@@ -142,7 +145,7 @@ class RSSWatcher:
                 with self.store.connect() as db:
                     db.execute("INSERT INTO rss_feeds(key,checked,error) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET checked=excluded.checked,error=excluded.error",
                                (source["key"], time.time(), "RSS 연결 또는 형식 확인 실패"))
-        if NEWSROOM_COST_HOLD.exists():
+        if newsroom_cost_hold_active():
             with self.store.connect() as db:
                 db.execute("UPDATE settings SET value=? WHERE key='rss_scan_lease'", (str(time.time() + self.config["poll_seconds"]),))
             return
@@ -192,7 +195,7 @@ class RSSWatcher:
             f"RSS 새 기사 감지 → 검증·작성·게시 · newsroom별 목표 {NEWSROOM_DAILY_TARGET_MIN}-{NEWSROOM_DAILY_MAX}건/일 "
             f"(검증 소스 부족 시 억지 충족 금지) · 오늘 dispatch {today_counts}"
         )
-        if NEWSROOM_COST_HOLD.exists():
+        if newsroom_cost_hold_active():
             message = "RSS 새 기사 감지 중 · 비용 중지로 작성·게시 대기"
         message += f" · 대기 기사 {waiting}건"
         if not feeds:

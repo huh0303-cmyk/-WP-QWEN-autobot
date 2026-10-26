@@ -11,8 +11,9 @@ import requests
 
 
 KST = ZoneInfo("Asia/Seoul")
-CONFIG = Path(os.environ.get("BLOGGER_FREE_WRITER_CONFIG", "/etc/korea365/free-writer.json"))
-STATE = Path(os.environ.get("BLOGGER_FREE_MODEL_STATE", "/opt/korea365/data/blogger33-free-model-state.json"))
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG = Path(os.environ.get("BLOGGER_FREE_WRITER_CONFIG", ROOT / "config" / "blogger-free-writer.json"))
+STATE = Path(os.environ.get("BLOGGER_FREE_MODEL_STATE", ROOT / "data" / "blogger33-free-model-state.json"))
 MODELS = ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite")
 
 

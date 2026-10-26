@@ -14,7 +14,7 @@ import random
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-ROOT = Path(os.environ.get("KOREA365_ROOT", "/opt/korea365"))
+ROOT = Path(os.environ.get("KOREA365_ROOT", str(Path(__file__).resolve().parents[1])))
 KST = timezone(timedelta(hours=9))
 WINDOW_START_MINUTE = 8 * 60 + 10
 WINDOW_END_MINUTE = 22 * 60 + 50

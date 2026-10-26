@@ -8,7 +8,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 import requests
 
-RUNTIME = Path("/etc/korea365/article-runtime.json")
+ROOT = Path(__file__).resolve().parents[1]
+RUNTIME = Path(os.environ.get("ARTICLE_RUNTIME_CONFIG", ROOT / "config" / "article-runtime.json"))
 UA = {"User-Agent": "Korea365-Control/1.0"}
 STOP = set("a an the of in on at for and with to your you guide complete best how what why korea korean".split())
 

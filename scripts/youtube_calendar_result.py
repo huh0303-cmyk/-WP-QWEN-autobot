@@ -41,9 +41,9 @@ def main():
     service = get_sheets_service()
     row = next(r for r in read_calendar(service, sid) if r["id"] == schedule_id)
     marker = f"[yt-calendar:{schedule_id}:{token}]"
-    run_id = os.environ.get("VPS_JOB_ID") or os.environ.get("GITHUB_RUN_ID")
+    run_id = os.environ.get("GITHUB_RUN_ID")
     if not run_id:
-        raise RuntimeError("VPS_JOB_ID is required for a VPS worker run")
+        raise RuntimeError("GITHUB_RUN_ID is required for a GitHub Actions worker run")
     worker = f"[yt-worker:{run_id}]"
     if row["key"] != channel or marker not in row["notes"]:
         raise RuntimeError("Calendar claim/channel mismatch")
@@ -67,10 +67,7 @@ def main():
         return
     url, error = private_result(args.result, channel)
     status = expected_status if url else "실패"
-    if os.environ.get("VPS_JOB_ID"):
-        run_url = os.environ.get("CONTROL_CENTER_PUBLIC_URL", "https://control.korea365.org").rstrip("/") + "/#youtube"
-    else:
-        run_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run_id}"
+    run_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run_id}"
     notes = row["notes"] + f"\n{run_url}\n" + (error or "채널 ID 및 공개 상태 검증 완료; 업로드 즉시 공개")
     update_row(service, sid, row, status, url, notes)
     service.spreadsheets().values().append(spreadsheetId=sid, range="'자동화_유튜브실행'!A:I",

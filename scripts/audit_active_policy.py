@@ -45,11 +45,8 @@ BANNED_DEPRECATED_CHANNEL_REFS = (
     "AMERICAN_ARCHIVE_TIMES",
 )
 YOUTUBE_IMAGE_WORKFLOWS = (
-    "generate-youtube-playlist.yml",
-    "generate-youtube-video.yml",
-    "refresh-playlist-thumbnails.yml",
-    "health-clinic-daily.yml",
-    "curio-longform-daily.yml",
+    "cafe-healing-publish.yml",
+    "youtube-github-worker.yml",
 )
 
 
@@ -106,33 +103,32 @@ def main() -> None:
     for name in YOUTUBE_IMAGE_WORKFLOWS:
         text = workflow_text.get(name, "")
         if not text:
-            fail(f"missing expected workflow {name}")
-        if name == "generate-youtube-playlist.yml":
-            if any(token in text for token in ("secrets.REPLICATE_API_TOKEN", "secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
-                fail("playlist must not receive paid generation credentials")
-        elif "REPLICATE_API_TOKEN" not in text:
-            fail(f"{name} does not receive REPLICATE_API_TOKEN")
+            fail(f"missing expected GitHub-native YouTube workflow {name}")
+        if any(token in text for token in ("secrets.REPLICATE_API_TOKEN", "secrets.OPENAI_API_KEY", "secrets.GEMINI_API_KEY")):
+            fail(f"{name} must not receive paid generation credentials")
 
-    # YouTube rendering is VPS-owned. The retained Actions definitions are
-    # emergency documentation only and must stay un-runnable.
-    for name in ("youtube-control-scheduler.yml", "generate-youtube-playlist.yml", "curio-longform-daily.yml"):
-        if "if: ${{ false }}" not in workflow_text.get(name, ""):
-            fail(f"{name} can still run; YouTube production must be VPS-only")
-    vps_readme = (ROOT / "deploy" / "vps" / "README.md").read_text(encoding="utf-8")
-    if "Hostinger VPS is the sole production host" not in vps_readme:
-        fail("Hostinger VPS single-host contract is missing")
-    control_source = (ROOT / "control_center" / "app.py").read_text(encoding="utf-8")
-    vps_worker = (ROOT / "scripts" / "youtube_vps_worker.py").read_text(encoding="utf-8")
+    # YouTube production is GitHub Actions-only and fail-closed until the owner releases cost hold.
+    github_workflow_path = WF / "youtube-github-worker.yml"
+    github_runtime_path = ROOT / "automation_hub" / "youtube_github_runtime.py"
+    github_worker_path = ROOT / "scripts" / "youtube_github_worker.py"
+    if not github_workflow_path.exists() or not github_runtime_path.exists() or not github_worker_path.exists():
+        fail("GitHub-only YouTube worker/runtime/workflow is incomplete")
+    github_workflow = github_workflow_path.read_text(encoding="utf-8")
+    github_runtime = github_runtime_path.read_text(encoding="utf-8")
+    github_worker = github_worker_path.read_text(encoding="utf-8")
+    if "confirm_publication" not in github_workflow or "YOUTUBE_COST_HOLD" not in github_workflow:
+        fail("GitHub YouTube workflow must require explicit publication confirmation and cost-hold check")
+    if 'return value not in {"false", "0", "no", "off"}' not in github_runtime:
+        fail("GitHub YouTube runtime must fail closed unless cost hold is explicitly released")
+    if "automation_hub.youtube_github_runtime" not in github_worker:
+        fail("GitHub worker is not using the GitHub-only runtime")
+    if "/opt/" in github_workflow or "/etc/" in github_workflow or "appleboy/ssh-action" in github_workflow:
+        fail("GitHub YouTube workflow still depends on server paths or SSH")
     playlist = (ROOT / "scripts" / "youtube_playlist_maker.py").read_text(encoding="utf-8")
-    if "enqueue_youtube_vps" not in control_source or "youtube-control-scheduler.yml" in control_source:
-        fail("control center YouTube buttons are not exclusively routed to the VPS queue")
     if 'os.environ.get("PLAYLIST_MUSIC_SOURCE", "approved_bank")' not in playlist:
         fail("playlist must default to prepared music rather than paid generation")
-    queue = (ROOT / "automation_hub" / "youtube_vps_queue.py").read_text(encoding="utf-8")
-    if "cost_hold_active" not in queue or "/etc/korea365/youtube-cost-hold" not in queue:
-        fail("VPS YouTube queue lost the active cost-hold check")
-    if "youtube_calendar_result.py" not in vps_worker or "youtube_publish_approved.py" not in vps_worker:
-        fail("VPS worker lost calendar reporting or private playlist upload")
+    if "youtube_calendar_result.py" not in github_worker or "youtube_publish_approved.py" not in github_worker:
+        fail("GitHub worker lost calendar reporting or approved playlist upload")
     for name in ("archive_footage_longform.py", "nasa_archive_longform.py"):
         source = (ROOT / "scripts" / name).read_text(encoding="utf-8")
         if "generate_thumbnail" not in source or "flux_thumbnail_provider" in source:

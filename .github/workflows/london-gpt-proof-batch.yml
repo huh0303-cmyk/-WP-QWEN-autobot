@@ -16,12 +16,11 @@ jobs:
         env:
           KSTUDY365COM: ${{ secrets.KSTUDY365COM }}
         run: |
-          sudo mkdir -p /etc/korea365
           python - <<'PY'
           import json,os
           open('/tmp/wp-sites.json','w').write(json.dumps({'KSTUDY365COM':os.environ['KSTUDY365COM']}))
           PY
-          VPS_WP_CREDENTIALS=/tmp/wp-sites.json python scripts/london_gpt_proof_wp.py | tee wp-proof.json
+          WP_CREDENTIALS_FILE=/tmp/wp-sites.json python scripts/london_gpt_proof_wp.py | tee wp-proof.json
       - uses: actions/upload-artifact@v4
         with: {name: london-gpt-wp-proof, path: wp-proof.json, retention-days: 30}
 

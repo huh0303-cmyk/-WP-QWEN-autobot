@@ -356,7 +356,7 @@ def test_youtube_trigger_queues_the_selected_channel_on_vps(monkeypatch):
 
     monkeypatch.setattr("control_center.app.threading.Thread", SyncThread)
     with patch("control_center.app._bulk_read", return_value={"status": "idle"}), \
-            patch("control_center.app.enqueue_youtube_vps", return_value={"job_id": "vps-test"}) as enqueue:
+            patch("control_center.app.dispatch_youtube_job", return_value={"job_id": "gh-test"}) as enqueue:
         response = client.post(
             "/trigger/youtube-batch",
             data={
@@ -366,8 +366,7 @@ def test_youtube_trigger_queues_the_selected_channel_on_vps(monkeypatch):
         )
     assert response.status_code == 302
     assert response.headers["Location"].endswith("#youtube")
-    assert enqueue.call_args.args[:3] == (channel["channel_key"], channel["official_name"], f"youtube_{channel['channel_key']}")
-    assert enqueue.call_args.kwargs["run_now"] is True
+    assert enqueue.call_args.args == (channel["channel_key"],)
 
 
 def test_blogspot_dashboard_uses_precise_connection_label_and_compact_categories():

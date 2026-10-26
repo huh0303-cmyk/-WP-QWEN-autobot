@@ -42,8 +42,8 @@ def test_post_upload_verification_rejects_wrong_privacy_or_channel():
             verify_uploaded_video(_service("UCwrong", "public"), "abcdefghijk", "mbb", "public")
 
 
-def test_existing_video_release_workflow_uses_verified_script():
-    text = (ROOT / ".github/workflows/youtube-publish-existing-now.yml").read_text(encoding="utf-8")
-    assert "scripts/youtube_set_privacy.py" in text
-    assert "--privacy public" in text
-    assert "PUBLICATION_RECEIPT" in text
+def test_legacy_existing_video_release_path_is_retired():
+    assert not (ROOT / ".github/workflows/youtube-publish-existing-now.yml").exists()
+    text = (ROOT / "scripts/youtube_set_privacy.py").read_text(encoding="utf-8")
+    assert "performs no API calls" in text
+    assert "No video was changed" in text

@@ -12,10 +12,10 @@ Operating principles: **Simple · Stable · No-New-Cost · Evidence-First**
 
 ## Final TO-BE
 1. GitHub = source/config/version/rollback/audit.
-2. Hostinger VPS = 24/7 runtime + n8n + YouTube render/upload.
-3. n8n Community Edition = central orchestrator.
-4. Existing Python/systemd = proven execution engines reused behind n8n.
-5. Control Korea365 = operator dashboard and safe control surface.
+2. GitHub Actions = the only approved hosted execution plane; no VPS or server-hosted n8n dependency.
+3. GitHub Actions workflows = schedules, dispatch, bounded retries and run receipts.
+4. Python workers run on ephemeral GitHub-hosted runners; persistent state must be stored in approved GitHub-native or Google Sheets state.
+5. Control Korea365 = operator dashboard that dispatches GitHub Actions; no local/server queue.
 6. LondonLocalAgent = Naver 3 + Tistory 5 browser-only local executor.
 7. Aside/Chrome = authenticated local browser session only.
 8. No Make.com, no new paid SaaS, no duplicate scheduler sprawl.

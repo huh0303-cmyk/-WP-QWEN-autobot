@@ -8,10 +8,10 @@ from pathlib import Path
 
 from flask import jsonify, render_template, request
 
-from automation_hub.youtube_vps_queue import enqueue as enqueue_youtube_vps
+from automation_hub.github_youtube_dispatch import dispatch_youtube_job
 
 
-ROOT = Path("/opt/korea365")
+ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 INVENTORY = ROOT / "config" / "london_social_account_inventory_2026-09-24.json"
 SNS_POLICY = ROOT / "config" / "sns_six_channel_policy.json"
@@ -310,11 +310,11 @@ def install(app, get_site_data=None):
         channel_key = card["channel_key"]
         group = f"youtube_{channel_key}"
         try:
-            job = enqueue_youtube_vps(channel_key, card["name"], group, run_now=True)
+            job = dispatch_youtube_job(channel_key, card["name"], group, run_now=True)
         except RuntimeError as exc:
             return jsonify(message=str(exc)), 409
         item = {"job_id": job["job_id"], "label": card["name"], "platform": "youtube", "site_id": channel_key,
-                "workflow": "youtube-vps-worker", "run_id": None, "run_url": "", "status": "queued",
-                "conclusion": None, "reason": "VPS 제작·즉시 공개 대기"}
+                "workflow": "youtube-github-worker", "run_id": None, "run_url": "", "status": "queued",
+                "conclusion": None, "reason": "GitHub Actions 실행 대기"}
         _write_state(group, {"status": "polling", "started_at": datetime.now(timezone.utc).isoformat(), "finished_at": None, "items": [item]})
-        return jsonify(message=f"{card['name']}: 비공개 영상 제작을 접수했습니다. 자동 공개하지 않습니다.", job_id=job["job_id"]), 202
+        return jsonify(message=f"{card['name']}: GitHub Actions에 제작·발행 요청을 접수했습니다. 비용 차단 설정에 따라 실행이 막힐 수 있습니다.", job_id=job["job_id"]), 202

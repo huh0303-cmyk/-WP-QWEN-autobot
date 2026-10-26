@@ -19,7 +19,7 @@ const { WebSocketServer } = require("ws");
 
 const jobRunner = require("./jobRunner");
 const siteRegistry = require("../lib/siteRegistry");
-const n8nGateway = require("../lib/n8nGateway");
+const githubActions = require("../lib/githubActions");
 
 const PORT = Number(process.env.PORT || 8787);
 const APP_USER = process.env.LPC_USER || "admin";
@@ -151,7 +151,7 @@ app.post("/api/job/start", wrap((req) => {
 // ---- 통합 사이트 레지스트리 (WP27+블로그스팟33+뉴스2+티스토리5+네이버3) ----
 // "대시보드+트리거만" 범위(2026-09-27 Chairman 확인): wordpress/blogspot/news 사이트는
 // 여기서 persona/tone/글자수/이미지수를 보고 편집할 수는 있지만, 실제 발행은 이 콘솔이 하지
-// 않는다 — n8n_gateway를 통해 GPT 트랙의 기존 파이프라인을 트리거만 한다.
+// 않는다 — GitHub Actions API를 통해 GPT 트랙의 검증된 워크플로우만 트리거한다.
 app.get("/api/registry/sites", wrap(() => ({ sites: siteRegistry.listSites(runtimeRoot) })));
 app.get("/api/registry/summary", wrap(() => siteRegistry.summary(runtimeRoot)));
 app.post("/api/registry/sites/:siteId", wrap((req) => {
@@ -160,9 +160,9 @@ app.post("/api/registry/sites/:siteId", wrap((req) => {
   return { site: updated };
 }));
 
-app.get("/api/n8n/health", wrap(() => n8nGateway.health()));
-app.post("/api/n8n/run/:action", wrap((req) => n8nGateway.runAction(req.params.action)));
-app.post("/api/n8n/pipeline/:stage", wrap((req) => n8nGateway.pipelineStage(req.params.stage, req.body)));
+app.get("/api/github/actions/health", wrap(() => githubActions.health()));
+app.post("/api/github/actions/run/:action", wrap((req) => githubActions.runAction(req.params.action)));
+app.post("/api/github/actions/pipeline/:stage", wrap((req) => githubActions.pipelineStage(req.params.stage, req.body)));
 
 // Serves files from within the runtime root only (mirrors the path-containment
 // check in the original file:open / file:showInFolder handlers).

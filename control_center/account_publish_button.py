@@ -1,7 +1,7 @@
 import datetime as dt,fcntl,hashlib,hmac,json
 from pathlib import Path
 from flask import request,jsonify
-ROOT=Path('/opt/korea365');DATA=ROOT/'data';KST=dt.timezone(dt.timedelta(hours=9))
+ROOT=Path(__file__).resolve().parents[1];DATA=ROOT/'data';KST=dt.timezone(dt.timedelta(hours=9))
 def read(p,default):return json.loads(p.read_text()) if p.exists() else default
 def write(p,d):
  p.parent.mkdir(parents=True,exist_ok=True);t=p.with_suffix('.tmp');t.write_text(json.dumps(d,ensure_ascii=False));t.chmod(0o600);t.replace(p)

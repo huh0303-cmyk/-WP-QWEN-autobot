@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from flask import render_template, request, jsonify, send_file
 
-ROOT = Path('/opt/korea365')
+ROOT = Path(__file__).resolve().parents[1]
 
 OWNER_CADENCE = {
     'effective_date': '2026-09-25',
@@ -15,8 +15,7 @@ OWNER_CADENCE = {
 def apply_owner_cadence_copy(html):
     """Keep the server template aligned with the canonical owner cadence.
 
-    The production template predates this rule and may be retained as a VPS
-    operational asset. These narrow replacements avoid replacing the whole
+    The production template predates this rule and is retained as a repository asset. These narrow replacements avoid replacing the whole
     page while removing stale weekly-SNS and high-volume-news wording.
     """
     replacements = {

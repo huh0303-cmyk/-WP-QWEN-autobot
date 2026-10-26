@@ -15,21 +15,10 @@ import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DIR = PROJECT_ROOT / "data" / "london-pipeline"
-N8N_WEBHOOK = os.environ.get(
-    "LONDON_GPT_N8N_WEBHOOK",
-    "http://127.0.0.1:5678/webhook/london-content-four-agent",
-)
-N8N_REWRITE_WEBHOOK = os.environ.get(
-    "LONDON_GPT_N8N_REWRITE_WEBHOOK",
-    "http://127.0.0.1:5678/webhook/london-content-rewrite",
-)
-N8N_RERUN_WEBHOOKS = {
-    "research": os.environ.get("LONDON_GPT_N8N_RERUN_RESEARCH", "http://127.0.0.1:5678/webhook/london-content-rerun-research"),
-    "write": os.environ.get("LONDON_GPT_N8N_RERUN_WRITE", "http://127.0.0.1:5678/webhook/london-content-rerun-write"),
-    "image": os.environ.get("LONDON_GPT_N8N_RERUN_IMAGE", "http://127.0.0.1:5678/webhook/london-content-rerun-image"),
-    "publish": os.environ.get("LONDON_GPT_N8N_RERUN_PUBLISH", "http://127.0.0.1:5678/webhook/london-content-rerun-publish"),
-}
-GATEWAY = os.environ.get("LONDON_GPT_GATEWAY", "http://127.0.0.1:8766").rstrip("/")
+GITHUB_REPOSITORY = os.environ.get("LONDON_PROJECT_GITHUB_REPO", "huh0303-cmyk/-WP-QWEN-autobot")
+GITHUB_REF = os.environ.get("LONDON_PROJECT_GITHUB_REF", "main")
+GITHUB_TOKEN = os.environ.get("LONDON_PROJECT_GITHUB_TOKEN") or os.environ.get("GH_DISPATCH_TOKEN") or os.environ.get("GITHUB_TOKEN") or ""
+GITHUB_PIPELINE_WORKFLOW = "london-content-pipeline.yml"
 WRITER_MODELS = {"auto_free", "local_qwen", "gpt-5-mini", "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash-lite"}
 IMAGE_MODELS = {"auto_free", "pexels", "pixabay", "wikimedia", "none"}
 
@@ -82,7 +71,7 @@ def _state_file(run_id: str) -> Path:
 def _read_run(run_id: str) -> dict:
     path = _state_file(run_id)
     if not path.exists():
-        return {"run_id": run_id, "stage_status": {}, "message": "n8n 시작 대기"}
+        return {"run_id": run_id, "stage_status": {}, "message": "GitHub Actions 실행 대기"}
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:
@@ -97,52 +86,40 @@ def _write_run(state: dict) -> None:
     os.replace(tmp, path)
 
 
+def _dispatch_github_pipeline(site_id: str, category: str, publish_mode: str, run_id: str) -> str:
+    if not GITHUB_TOKEN:
+        raise RuntimeError("LONDON_PROJECT_GITHUB_TOKEN is missing; no pipeline was started.")
+    url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/actions/workflows/{GITHUB_PIPELINE_WORKFLOW}/dispatches"
+    response = requests.post(
+        url,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        json={
+            "ref": GITHUB_REF,
+            "inputs": {
+                "site_id": site_id,
+                "run_id": run_id,
+                "category": category,
+                "publish_mode": publish_mode,
+                "confirm_run": "true",
+                "confirm_publication": "true" if publish_mode == "publish" else "false",
+            },
+        },
+        timeout=30,
+    )
+    if response.status_code != 204:
+        raise RuntimeError(f"GitHub workflow dispatch failed (HTTP {response.status_code}): {(response.text or '')[:500]}")
+    return f"https://github.com/{GITHUB_REPOSITORY}/actions/workflows/{GITHUB_PIPELINE_WORKFLOW}"
+
+
 def _rerun_stage(stage: str, run_id: str) -> None:
-    state = _read_run(run_id)
-    token = os.environ.get("N8N_GATEWAY_TOKEN", "").strip()
-    if not token:
-        state.setdefault("stage_status", {})[stage] = "failed"
-        state["last_error"] = {
-            "stage": stage,
-            "type": "ConfigurationError",
-            "message": "N8N_GATEWAY_TOKEN is missing on the VPS",
-            "at": datetime.now(timezone.utc).isoformat(),
-        }
-        _write_run(state)
-        return
-    body = {
-        "run_id": run_id,
-        "site_id": str(state.get("site_id") or ""),
-        "category": str(state.get("category") or ""),
-        "publish_mode": str(state.get("publish_mode") or "draft"),
-    }
-    try:
-        response = requests.post(
-            f"{GATEWAY}/pipeline/{stage}",
-            json=body,
-            headers={"Authorization": f"Bearer {token}"},
-            timeout=330,
-        )
-        if response.status_code >= 400:
-            latest = _read_run(run_id)
-            latest.setdefault("stage_status", {})[stage] = "failed"
-            latest["last_error"] = {
-                "stage": stage,
-                "type": "GatewayStageError",
-                "message": response.text[:1200],
-                "at": datetime.now(timezone.utc).isoformat(),
-            }
-            _write_run(latest)
-    except requests.RequestException as exc:
-        latest = _read_run(run_id)
-        latest.setdefault("stage_status", {})[stage] = "failed"
-        latest["last_error"] = {
-            "stage": stage,
-            "type": type(exc).__name__,
-            "message": str(exc)[:1200],
-            "at": datetime.now(timezone.utc).isoformat(),
-        }
-        _write_run(latest)
+    raise RuntimeError(
+        f"Stage-only rerun is not yet supported by the GitHub-native pipeline ({stage}, {run_id}); "
+        "no duplicate job was started. Reconcile the previous workflow run first."
+    )
 
 
 def install(app, runtime):
@@ -208,7 +185,7 @@ def install(app, runtime):
         payload = request.get_json(silent=True) or {}
         site_id = str(payload.get("site_id") or "").strip()
         category = str(payload.get("category") or "").strip()
-        publish_mode = str(payload.get("publish_mode") or "draft").strip().lower()
+        publish_mode = str(payload.get("publish_mode") or "manual").strip().lower()
         writer_model = str(payload.get("writer_model") or "auto_free").strip()
         image_model = str(payload.get("image_model") or "auto_free").strip()
         if writer_model not in WRITER_MODELS or image_model not in IMAGE_MODELS:
@@ -233,53 +210,37 @@ def install(app, runtime):
             "writer_model": writer_model,
             "image_model": image_model,
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "orchestrator": "n8n",
+            "orchestrator": "github-actions",
             "start_status": "dispatching",
-            "stage_status": {
-                "research": "waiting",
-                "write": "waiting",
-                "image": "waiting",
-                "publish": "waiting",
-            },
+            "stage_status": {"research": "waiting", "write": "waiting", "image": "waiting", "publish": "waiting"},
         }
         _write_run(state)
-
         try:
-            response = requests.post(
-                N8N_WEBHOOK,
-                json={
-                    "site_id": site_id,
-                    "category": category,
-                    "publish_mode": publish_mode,
-                    "run_id": run_id,
-                },
-                timeout=12,
-            )
-        except requests.RequestException as exc:
-            # A timed-out webhook response does not prove n8n failed to accept
-            # the execution. Keep the run pollable and avoid inviting a second
-            # click that could enqueue duplicate research or publication.
-            return jsonify({
-                "ok": True,
-                "run_id": run_id,
-                "orchestrator": "n8n",
-                "status": "start_ack_pending",
-                "start_ack_pending": True,
-                "error_type": type(exc).__name__,
-                "message": "n8n 응답이 늦어 실행 여부를 확인하고 있습니다. 중복 실행을 막기 위해 다시 시작하지 않고 상태를 확인합니다.",
-            }), 202
-
-        if response.status_code >= 400:
+            workflow_url = _dispatch_github_pipeline(site_id, category, publish_mode, run_id)
+        except Exception as exc:
+            state["start_status"] = "dispatch_failed"
             state["last_error"] = {
-                "stage": "start",
-                "type": "N8NWebhookError",
-                "message": response.text[:1200],
+                "stage": "dispatch",
+                "type": type(exc).__name__,
+                "message": str(exc)[:1000],
                 "at": datetime.now(timezone.utc).isoformat(),
             }
             _write_run(state)
-            return jsonify({"ok": False, "error": "n8n_rejected", "http": response.status_code, "run_id": run_id}), 502
+            return jsonify({"ok": False, "error": "github_dispatch_failed", "run_id": run_id, "message": str(exc)[:500]}), 503
 
-        return jsonify({"ok": True, "run_id": run_id, "orchestrator": "n8n", "mode": "manual-1-2-3" if publish_mode == "manual" else "auto-1-2-3-4"}), 202
+        state["start_status"] = "dispatch_requested"
+        state["workflow_url"] = workflow_url
+        state["stage_status"] = {stage: "queued" for stage in ("research", "write", "image", "publish")}
+        _write_run(state)
+        return jsonify({
+            "ok": True,
+            "run_id": run_id,
+            "orchestrator": "github-actions",
+            "workflow": GITHUB_PIPELINE_WORKFLOW,
+            "workflow_url": workflow_url,
+            "status": "dispatch_requested",
+            "mode": publish_mode,
+        }), 202
 
     @app.post("/api/london-gpt/manual-published")
     def london_gpt_manual_published():
@@ -343,47 +304,12 @@ def install(app, runtime):
 
     @app.post("/api/london-gpt/rewrite")
     def london_gpt_rewrite():
-        from flask import jsonify, request
-        payload = request.get_json(silent=True) or {}
-        run_id = str(payload.get("run_id") or "").strip()
-        if not run_id:
-            return jsonify({"ok": False, "error": "run_id_required"}), 400
-
-        state = _read_run(run_id)
-        if state.get("stage_status", {}).get("research") != "ok":
-            return jsonify({"ok": False, "error": "research_not_complete"}), 409
-        if not str(state.get("research", {}).get("keyword") or "").strip():
-            return jsonify({"ok": False, "error": "keyword_missing"}), 409
-
-        state.setdefault("stage_status", {})["write"] = "waiting"
-        state["stage_status"]["image"] = "waiting"
-        state["stage_status"]["publish"] = "waiting"
-        if state.get("article"):
-            state["previous_article"] = state.get("article")
-        if state.get("writer"):
-            state["previous_writer"] = state.get("writer")
-        state.pop("image", None)
-        state.pop("receipt", None)
-        state.pop("last_error", None)
-        state["rewrite_requested_at"] = datetime.now(timezone.utc).isoformat()
-        _write_run(state)
-
-        try:
-            response = requests.post(
-                N8N_REWRITE_WEBHOOK,
-                json={
-                    "site_id": str(state.get("site_id") or ""),
-                    "category": str(state.get("category") or ""),
-                    "publish_mode": str(state.get("publish_mode") or "draft"),
-                    "run_id": run_id,
-                },
-                timeout=12,
-            )
-        except requests.RequestException as exc:
-            return jsonify({"ok": False, "error": "n8n_rewrite_unreachable", "message": str(exc)}), 503
-        if response.status_code >= 400:
-            return jsonify({"ok": False, "error": "n8n_rewrite_rejected", "http": response.status_code}), 502
-        return jsonify({"ok": True, "run_id": run_id, "mode": "rewrite-2-3-4"}), 202
+        from flask import jsonify
+        return jsonify({
+            "ok": False,
+            "error": "rewrite_only_not_migrated",
+            "message": "Rewrite-only reruns are not yet mapped to a GitHub-native workflow. No work was started; use a new reviewed pipeline run or wait for the dedicated rewrite workflow.",
+        }), 501
 
     @app.get("/api/london-gpt/run/<run_id>")
     def london_gpt_run_status(run_id: str):
@@ -430,33 +356,12 @@ def install(app, runtime):
 
     @app.post("/api/london-gpt/rerun/<stage>")
     def london_gpt_rerun(stage: str):
-        from flask import jsonify, request
-        if stage not in N8N_RERUN_WEBHOOKS:
-            return jsonify({"ok": False, "error": "unknown_stage"}), 404
-        payload = request.get_json(silent=True) or {}
-        run_id = str(payload.get("run_id") or "").strip()
-        if not run_id:
-            return jsonify({"ok": False, "error": "run_id_required"}), 400
-
-        state = _read_run(run_id)
-        if state.get("publish_mode") == "manual" and stage == "publish":
-            return jsonify({"ok": False, "error": "publish_is_manual"}), 409
-        state.setdefault("stage_status", {})[stage] = "waiting"
-        state.pop("last_error", None)
-        _write_run(state)
-
-        body = {
-            "run_id": run_id,
-            "site_id": str(state.get("site_id") or ""),
-            "category": str(state.get("category") or ""),
-            "publish_mode": str(state.get("publish_mode") or "draft"),
-        }
-        try:
-            response = requests.post(N8N_RERUN_WEBHOOKS[stage], json=body, timeout=12)
-        except requests.RequestException as exc:
-            return jsonify({"ok": False, "error": "n8n_rerun_unreachable", "message": str(exc)}), 503
-        if response.status_code >= 400:
-            return jsonify({"ok": False, "error": "n8n_rerun_rejected", "http": response.status_code}), 502
-        return jsonify({"ok": True, "run_id": run_id, "stage": stage, "orchestrator": "n8n"}), 202
+        from flask import jsonify
+        return jsonify({
+            "ok": False,
+            "error": "stage_rerun_not_migrated",
+            "stage": stage,
+            "message": "Stage-only retries are disabled until a GitHub-native state restore and deduplication workflow is available. No job was started.",
+        }), 501
 
     return snapshot
