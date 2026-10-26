@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Find exact normalized-title duplicates in all ten language channels.
+"""Find normalized-title duplicates in all ten language channels.
+Normalization uses Unicode word boundaries and Unicode word characters.
 Keep highest views; ties keep newest. Missing view counts are report-only.
 """
 import argparse, datetime as dt, json, os, re, unicodedata
