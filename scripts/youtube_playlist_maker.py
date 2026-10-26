@@ -229,7 +229,7 @@ def fresh_image(topic, workdir, service=None):
         if filename:
             source_root = Path(os.environ.get(
                 "PLAYLIST_OWNER_IMAGE_ROOT",
-                "/opt/korea365/assets/youtube/playlist/2026-10-01",
+                str(Path(__file__).resolve().parents[1] / "assets" / "youtube" / "playlist" / episode_date),
             )).resolve()
             source = (source_root / filename).resolve()
             if source.parent != source_root or not source.is_file():
@@ -318,9 +318,9 @@ def select_music(service, folder_id, exts, mime_prefix):
     if source == "owner_local" and base.CHANNEL_KEY in {"globalmusic", "kpop", "starbucks"}:
         from playlist_owner_library import select_owner_tracks
         root = Path(os.environ.get("PLAYLIST_OWNER_AUDIO_ROOT",
-                                   "/opt/korea365/data/playlist-owner-music/audio"))
+                                   str(Path(__file__).resolve().parents[1] / "data" / "playlist-owner-music" / "audio")))
         manifest = Path(os.environ.get("PLAYLIST_OWNER_MANIFEST",
-                                       "/opt/korea365/data/playlist-owner-music/approved.json"))
+                                       str(Path(__file__).resolve().parents[1] / "data" / "playlist-owner-music" / "approved.json")))
         chosen = select_owner_tracks(base.CHANNEL_KEY, root, manifest,
                                      base.get_duration)
         result = []
