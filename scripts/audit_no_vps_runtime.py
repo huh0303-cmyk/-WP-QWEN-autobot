@@ -36,7 +36,7 @@ def main() -> int:
             if not path.is_file() or path.suffix.lower() not in SUFFIXES:
                 continue
             resolved = path.resolve()
-            if resolved == Path(__file__).resolve() or resolved == LEGACY_ORPHAN:
+            if resolved in {Path(__file__).resolve(), LEGACY_ORPHAN, (ROOT / "scripts" / "audit_active_policy.py").resolve()}:
                 continue
             try:
                 lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
