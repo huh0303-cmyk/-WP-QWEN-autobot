@@ -27,6 +27,22 @@ def parse_visible_total(text):
     return int(numbers[-1].replace(",", ""))
 
 
+async def extract_widget_total(page):
+    # Inspect the smallest DOM ancestor containing the widget title, not the whole page.
+    title = page.get_by_text(re.compile(r"Total\s+Pageviews", re.I)).first
+    for depth in range(1, 8):
+        try:
+            node = title.locator(f"xpath=ancestor::*[{depth}]")
+            text = await node.inner_text(timeout=2000)
+            if len(text) > 1800 or not re.search(r"Total\s+Pageviews", text, re.I):
+                continue
+            value = parse_visible_total(text)
+            return value
+        except Exception:
+            continue
+    raise ValueError("TOTAL_PAGEVIEWS_WIDGET_CONTAINER_NOT_FOUND")
+
+
 async def collect_one(browser, blog, semaphore, checked_at):
     key = str(blog.get("site_key") or blog.get("title") or blog.get("blogspot") or "unknown")
     url = str(blog.get("blogspot") or "").rstrip("/")
@@ -44,8 +60,7 @@ async def collect_one(browser, blog, semaphore, checked_at):
             if response and response.status >= 400:
                 row["status"] = "HTTP_" + str(response.status)
             else:
-                body = await page.locator("body").inner_text(timeout=10000)
-                row["total_pageviews"] = parse_visible_total(body)
+                row["total_pageviews"] = await extract_widget_total(page)
                 row["status"] = "OK_WIDGET_ESTIMATE"
         except Exception as exc:
             msg = str(exc)

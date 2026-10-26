@@ -51,9 +51,9 @@
     "site_key": "",
     "url": "https://jobkorea365.blogspot.com",
     "title": "JobKorea365",
-    "total_pageviews": 365,
+    "total_pageviews": null,
     "daily_pageviews": null,
-    "status": "OK_WIDGET_ESTIMATE",
+    "status": "RECHECK_REQUIRED",
     "checked_at": "2026-10-26T11:50:25.828602+09:00",
     "history": [
      {
@@ -2048,4 +2048,4 @@
    "rank": 64
   }
  ]
-}
+}\n
