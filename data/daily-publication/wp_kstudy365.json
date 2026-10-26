@@ -1,1 +1,1 @@
-{"day": "2026-10-25", "status": "DISPATCHED", "attempts": 1, "claim": "daily-2026-10-25-wp_kstudy365-d08ac0f4", "claimed_at": "2026-10-25T18:44:01.890048+09:00", "run_id": 40181877247, "child_run_id": null, "child_job_id": null, "workflow": "daily-network-publish.yml"}
+{"day": "2026-10-26", "status": "PUBLISHED", "public_url": "https://kstudy365.com/navigating-degree-admissions-and-eligibility-frameworks-at-south-korean-institutions/", "published_at": "2026-10-26T08:10:00Z"}
